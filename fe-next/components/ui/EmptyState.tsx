@@ -138,7 +138,7 @@ export const EmptyState = memo(function EmptyState({
 
       {/* Description */}
       {description && (
-        <p className={`${sizeClasses[size].desc} text-neo-white/70 font-neo-body max-w-xs mx-auto`}>
+        <p className={`${sizeClasses[size].desc} text-neo-white font-neo-body max-w-xs mx-auto`}>
           {description}
         </p>
       )}

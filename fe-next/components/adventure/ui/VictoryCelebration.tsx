@@ -160,7 +160,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
                       'w-16 h-16 sm:w-20 sm:h-20',
                       starNum <= stars
                         ? 'text-neo-yellow fill-neo-yellow'
-                        : 'text-neo-white/30'
+                        : 'text-neo-white'
                     )}
                   />
                 </AdaptiveMotion.div>
@@ -176,7 +176,7 @@ export const VictoryCelebration = memo(function VictoryCelebration({
             >
               {/* Score */}
               <div className="bg-neo-black/80 border-3 border-neo-white/20 rounded-neo p-4">
-                <div className="text-neo-white/60 text-sm font-bold mb-1">{t('adventure.score')}</div>
+                <div className="text-neo-white text-sm font-bold mb-1">{t('adventure.score')}</div>
                 <RollingNumber
                   value={score}
                   variant="white"

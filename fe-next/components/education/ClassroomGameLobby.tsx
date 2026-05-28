@@ -207,8 +207,8 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   if (classrooms.length === 0) {
     return (
       <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard text-center">
-        <School className="w-12 h-12 text-neo-white/30 mx-auto mb-4" />
-        <p className="text-neo-white/70 font-neo-body mb-4">
+        <School className="w-12 h-12 text-neo-white mx-auto mb-4" />
+        <p className="text-neo-white font-neo-body mb-4">
           {t('education.classroomGame.noClassrooms')}
         </p>
         <div className="flex items-center justify-center gap-3">
@@ -227,8 +227,8 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
   if (lessons.length === 0) {
     return (
       <div className="p-8 rounded-neo border-neo border-neo-black bg-neo-navy/80 shadow-hard text-center">
-        <BookOpen className="w-12 h-12 text-neo-white/30 mx-auto mb-4" />
-        <p className="text-neo-white/70 font-neo-body mb-4">
+        <BookOpen className="w-12 h-12 text-neo-white mx-auto mb-4" />
+        <p className="text-neo-white font-neo-body mb-4">
           {t('education.classroomGame.noLessonsAvailable')}
         </p>
         <div className="flex items-center justify-center gap-3">

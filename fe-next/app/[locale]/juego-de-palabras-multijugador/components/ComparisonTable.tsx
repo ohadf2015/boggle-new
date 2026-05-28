@@ -20,7 +20,7 @@ function Cell({ value, lead }: { value: CompareCell; lead: boolean }) {
     return (
       <span
         aria-label="No"
-        className="mx-auto grid h-7 w-7 place-items-center rounded-neo border-2 border-neo-black bg-neo-navy text-neo-white/35 shadow-hard-sm"
+        className="mx-auto grid h-7 w-7 place-items-center rounded-neo border-2 border-neo-black bg-neo-navy text-neo-white shadow-hard-sm"
       >
         <X className="h-4 w-4" strokeWidth={3.5} aria-hidden />
       </span>
@@ -30,7 +30,7 @@ function Cell({ value, lead }: { value: CompareCell; lead: boolean }) {
     <span
       className={cn(
         'font-neo-body text-xs font-bold sm:text-sm',
-        lead ? 'text-neo-pink' : 'text-neo-white/55',
+        lead ? 'text-neo-pink' : 'text-neo-white',
       )}
     >
       {value}
@@ -44,11 +44,11 @@ export function ComparisonTable() {
   return (
     <section className="mb-14">
       <h2 className="mb-2 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
-        {lead} <span className="text-neo-white/40">vs</span> Scrabble{' '}
-        <span className="text-neo-white/40">vs</span>{' '}
+        {lead} <span className="text-neo-white">vs</span> Scrabble{' '}
+        <span className="text-neo-white">vs</span>{' '}
         <span className="text-neo-cyan">Apalabrados</span>
       </h2>
-      <p className="mb-6 max-w-xl font-neo-body text-sm text-neo-white/65 sm:text-base">
+      <p className="mb-6 max-w-xl font-neo-body text-sm text-neo-white sm:text-base">
         Por qué LexiClash es la alternativa a Scrabble online en español más
         completa de 2026.
       </p>
@@ -72,7 +72,7 @@ export function ComparisonTable() {
                     'p-3 text-center font-neo-display text-xs font-black uppercase tracking-wide sm:p-4 sm:text-sm',
                     i === 0
                       ? 'bg-neo-pink/15 text-neo-pink'
-                      : 'text-neo-white/70',
+                      : 'text-neo-white',
                   )}
                 >
                   {col}
@@ -91,7 +91,7 @@ export function ComparisonTable() {
               >
                 <th
                   scope="row"
-                  className="p-3 font-neo-body text-xs font-bold text-neo-white/85 sm:p-4 sm:text-sm"
+                  className="p-3 font-neo-body text-xs font-bold text-neo-white sm:p-4 sm:text-sm"
                 >
                   {row.label}
                 </th>

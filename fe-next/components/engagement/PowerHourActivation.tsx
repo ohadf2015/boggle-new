@@ -72,7 +72,7 @@ export const PowerHourActivation: React.FC<PowerHourActivationProps> = memo(
             </h3>
 
             {/* Description */}
-            <p className="text-neo-white/80 text-sm font-neo-body">
+            <p className="text-neo-white text-sm font-neo-body">
               {t('powerHour.description')}
             </p>
           </m.div>

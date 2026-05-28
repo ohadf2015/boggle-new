@@ -42,7 +42,7 @@ function InfoCard({ children, className }: { children: React.ReactNode; classNam
 
 function CardTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h4 className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-white/60 mb-3">
+    <h4 className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-white mb-3">
       {children}
     </h4>
   );
@@ -95,7 +95,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                   'text-xs font-bold',
                   trend.direction === 'up' && 'text-green-400',
                   trend.direction === 'down' && 'text-red-400',
-                  trend.direction === 'stable' && 'text-white/70',
+                  trend.direction === 'stable' && 'text-white',
                 )}>
                   {trend.direction === 'up' && `+${Math.min(Math.abs(trend.percentChange), 999)}%`}
                   {trend.direction === 'down' && `${Math.max(trend.percentChange, -999)}%`}
@@ -119,21 +119,21 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
               <Zap className="w-3.5 h-3.5 text-amber-400" />
               <div>
                 <span className="text-sm font-black text-white">{trend.bestScore}</span>
-                <span className="text-[9px] text-white/60 block font-bold uppercase">{t('results.best')}</span>
+                <span className="text-[9px] text-white block font-bold uppercase">{t('results.best')}</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
               <div>
                 <span className="text-sm font-black text-white">{trend.averageScore}</span>
-                <span className="text-[9px] text-white/60 block font-bold uppercase">{t('results.avg')}</span>
+                <span className="text-[9px] text-white block font-bold uppercase">{t('results.avg')}</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px]">🎮</span>
               <div>
                 <span className="text-sm font-black text-white">{trend.totalGames}</span>
-                <span className="text-[9px] text-white/60 block font-bold uppercase">{t('results.games')}</span>
+                <span className="text-[9px] text-white block font-bold uppercase">{t('results.games')}</span>
               </div>
             </div>
           </div>
@@ -142,9 +142,9 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
         {!hasSparkline && !trend && (
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-neo border-2 border-white/10 bg-white/5 flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-white/60" />
+              <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <p className="text-white/60 text-xs">{t('chart.noHistory')}</p>
+            <p className="text-white text-xs">{t('chart.noHistory')}</p>
             {/* Archetype shown here when no sparkline */}
             {archetype && (
               <div className="ms-auto">
@@ -173,14 +173,14 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                   <RankBadge rank={i + 1} />
                   <span className={cn(
                     'text-sm font-bold truncate max-w-[120px]',
-                    p.isPlayer ? 'text-white' : 'text-white/70',
+                    p.isPlayer ? 'text-white' : 'text-white',
                   )}>
                     {p.name}
                   </span>
                 </div>
                 <span className={cn(
                   'text-sm font-black',
-                  p.isPlayer ? 'text-white' : 'text-white/70',
+                  p.isPlayer ? 'text-white' : 'text-white',
                 )}>
                   {p.score}
                 </span>
@@ -210,7 +210,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                 )}>
                   +{coins}
                 </span>
-                <span className="text-[10px] text-white/60 block font-bold uppercase">
+                <span className="text-[10px] text-white block font-bold uppercase">
                   {t('results.dailyPlayBonus')}
                 </span>
               </div>
@@ -225,7 +225,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
               </div>
               <div>
                 <span className="font-black text-lg text-neo-orange">{streak}</span>
-                <span className="text-[10px] text-white/60 block font-bold uppercase">
+                <span className="text-[10px] text-white block font-bold uppercase">
                   {t('results.keepItUp')}
                 </span>
               </div>
@@ -240,7 +240,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
               </div>
               <div>
                 <span className="font-black text-lg text-purple-400">{achievementCount}</span>
-                <span className="text-[10px] text-white/60 block font-bold uppercase">
+                <span className="text-[10px] text-white block font-bold uppercase">
                   {t('results.achievementsUnlocked')}
                 </span>
               </div>
@@ -250,7 +250,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
           {/* Guest CTA */}
           {!isAuthenticated && coins > 0 && (
             <div className="bg-white/5 rounded-neo border border-white/10 p-3 mt-2">
-              <p className="text-xs font-bold text-white/60">
+              <p className="text-xs font-bold text-white">
                 {t('results.guestSavePrompt')}
               </p>
             </div>
@@ -258,7 +258,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
 
           {/* No rewards fallback */}
           {coins === 0 && streak === 0 && achievementCount === 0 && (
-            <p className="text-white/60 text-xs">{t('results.noRewards')}</p>
+            <p className="text-white text-xs">{t('results.noRewards')}</p>
           )}
         </div>
       </InfoCard>

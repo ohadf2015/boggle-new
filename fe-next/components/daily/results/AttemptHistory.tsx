@@ -34,7 +34,7 @@ const FEEDBACK_COLORS = {
     bg: 'bg-neo-navy-light',
     border: 'border-neo-cream/20',
     glow: '',
-    text: 'text-neo-cream/60',
+    text: 'text-neo-white',
   },
 } as const;
 
@@ -120,7 +120,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
               {/* Row number */}
               <span className={cn(
                 "text-[11px] font-bold w-5 text-right tabular-nums",
-                isCorrectRow ? "text-neo-lime" : "text-neo-cream/30"
+                isCorrectRow ? "text-neo-lime" : "text-neo-white"
               )}>
                 {rowIdx + 1}
               </span>

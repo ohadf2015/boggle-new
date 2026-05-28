@@ -42,7 +42,7 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
   if (locale === 'ja') {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center bg-neo-navy p-8 text-center text-neo-white">
-        <p className="max-w-md text-lg text-neo-white/80">{t('connections.noAccess')}</p>
+        <p className="max-w-md text-lg text-neo-white">{t('connections.noAccess')}</p>
       </div>
     );
   }

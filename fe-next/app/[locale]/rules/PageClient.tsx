@@ -127,7 +127,7 @@ export default function RulesPageClient(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.2 }}
                 >
-                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800 overflow-hidden">
+                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-neo-navy-light overflow-hidden">
                         <CardHeader className="bg-linear-to-r from-neo-cyan/30 to-neo-pink/30 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Gamepad2 className="text-neo-pink w-5 h-5 sm:w-6 sm:h-6" />
@@ -148,7 +148,7 @@ export default function RulesPageClient(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.3 }}
                 >
-                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-neo-navy-light">
                         <CardHeader className="bg-neo-lime/20 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Play className="text-neo-black dark:text-white w-5 h-5 sm:w-6 sm:h-6" />
@@ -237,7 +237,7 @@ export default function RulesPageClient(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.4 }}
                 >
-                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-neo-navy-light">
                         <CardHeader className="bg-neo-pink/10 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Trophy className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
@@ -255,7 +255,7 @@ export default function RulesPageClient(): React.JSX.Element {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">
+                                        <tr className="bg-white dark:bg-neo-navy-elevated text-slate-900 dark:text-slate-100">
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>3-4 {t('howToPlay.letters')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-neo-cyan ${dir === 'rtl' ? 'text-right' : ''}`}>1-2 {t('howToPlay.pts')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-600 dark:text-slate-300 hidden sm:table-cell ${dir === 'rtl' ? 'text-right' : ''}`}>CAT, GAME</td>
@@ -265,7 +265,7 @@ export default function RulesPageClient(): React.JSX.Element {
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-pink-600 dark:text-pink-300 ${dir === 'rtl' ? 'text-right' : ''}`}>2-3 {t('howToPlay.pts')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-600 dark:text-slate-300 hidden sm:table-cell ${dir === 'rtl' ? 'text-right' : ''}`}>BRAIN</td>
                                         </tr>
-                                        <tr className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">
+                                        <tr className="bg-white dark:bg-neo-navy-elevated text-slate-900 dark:text-slate-100">
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>7+ {t('howToPlay.letters')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-pink-600 dark:text-pink-300 ${dir === 'rtl' ? 'text-right' : ''}`}>5+ {t('howToPlay.pts')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-600 dark:text-slate-300 hidden sm:table-cell ${dir === 'rtl' ? 'text-right' : ''}`}>CHAMPION</td>
@@ -286,7 +286,7 @@ export default function RulesPageClient(): React.JSX.Element {
                     {...fadeInUp}
                     transition={{ delay: 0.5 }}
                 >
-                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
+                    <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-neo-navy-light">
                         <CardHeader className="bg-neo-pink/10 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Lightbulb className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />

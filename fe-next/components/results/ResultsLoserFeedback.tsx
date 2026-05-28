@@ -36,10 +36,10 @@ const ResultsLoserFeedback = memo<ResultsLoserFeedbackProps>(function ResultsLos
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="font-black text-sm text-neo-cream uppercase tracking-wide leading-tight">
+        <p className="font-black text-sm text-neo-white uppercase tracking-wide leading-tight">
           {t(getMessageKey(rank))}
         </p>
-        <p className="text-[11px] text-neo-cream/60 mt-0.5">
+        <p className="text-[11px] text-neo-white mt-0.5">
           {t('results.loserFeedback.encouragement')}
         </p>
       </div>

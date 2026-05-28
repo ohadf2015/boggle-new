@@ -80,9 +80,9 @@ export function MobileGameDrawer({
           {/* Drag indicator + chevron */}
           <div className="flex items-center gap-1.5">
             {isOpen ? (
-              <ChevronDown className="w-4 h-4 text-neo-cream/50" />
+              <ChevronDown className="w-4 h-4 text-neo-white" />
             ) : (
-              <ChevronUp className="w-4 h-4 text-neo-cream/50" />
+              <ChevronUp className="w-4 h-4 text-neo-white" />
             )}
           </div>
 
@@ -90,21 +90,21 @@ export function MobileGameDrawer({
           {peekStats && (
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1">
-                <BookOpen className="w-3 h-3 text-neo-cream/50" />
-                <span className="text-xs font-bold text-neo-cream tabular-nums">
+                <BookOpen className="w-3 h-3 text-neo-white" />
+                <span className="text-xs font-bold text-neo-white tabular-nums">
                   {peekStats.wordCount}
                 </span>
-                <span className="text-[9px] text-neo-cream/40">
+                <span className="text-[9px] text-neo-white">
                   {t('results.wordsFound')}
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <Gem className="w-3 h-3 text-neo-cream/50" />
+                <Gem className="w-3 h-3 text-neo-white" />
                 <m.span
                   key={peekStats.score}
                   initial={{ scale: 1.2 }}
                   animate={{ scale: 1 }}
-                  className="text-xs font-black text-neo-cream tabular-nums"
+                  className="text-xs font-black text-neo-white tabular-nums"
                 >
                   {peekStats.score}
                 </m.span>

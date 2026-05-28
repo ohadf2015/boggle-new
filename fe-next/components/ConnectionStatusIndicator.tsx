@@ -136,7 +136,7 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
         {/* Status text */}
         <span className={cn(
           'text-xs font-bold uppercase tracking-wide',
-          status === 'disconnected' ? 'text-neo-cream' : 'text-neo-black'
+          status === 'disconnected' ? 'text-neo-white' : 'text-neo-black'
         )}>
           {showExpandedState ? (
             <>
@@ -222,8 +222,8 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
           className={cn(
             'text-xs font-bold uppercase tracking-wide',
             status === 'connected' && 'text-neo-lime',
-            status === 'connecting' && 'text-neo-cream',
-            status === 'reconnecting' && 'text-neo-cream',
+            status === 'connecting' && 'text-neo-white',
+            status === 'reconnecting' && 'text-neo-white',
             status === 'disconnected' && 'text-neo-red'
           )}
         >
@@ -414,13 +414,13 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
 
                 {/* Progress indicator */}
                 {!copy.isUpdate && status === 'reconnecting' && reconnectAttempt > 0 && (
-                  <span className="text-neo-white/80 text-xs">
+                  <span className="text-neo-white text-xs">
                     {t('connection.attempt')} {reconnectAttempt}/{maxReconnectAttempts}
                   </span>
                 )}
 
                 {status === 'disconnected' && connectionError && (
-                  <span className="text-neo-white/80 text-xs">
+                  <span className="text-neo-white text-xs">
                     {t('connection.checkConnection')}
                   </span>
                 )}
@@ -482,7 +482,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
                 onClick={onLeaveGame}
                 className={cn(
                   'px-4 py-2 rounded-neo',
-                  'bg-neo-black/50 text-neo-white/80',
+                  'bg-neo-black/50 text-neo-white',
                   'font-bold text-xs uppercase tracking-wide',
                   'border-2 border-neo-white/20',
                   'hover:bg-neo-black/70 hover:text-neo-white',

@@ -109,10 +109,10 @@ const TurningPointCard = memo<TurningPointCardProps>(({ allPlayerWords, currentU
           turningPoint.isCurrentPlayer ? 'text-neo-lime' : 'text-neo-pink'
         )} />
         <div className="min-w-0">
-          <div className="text-[10px] font-black uppercase tracking-wide text-neo-cream/50 mb-0.5">
+          <div className="text-[10px] font-black uppercase tracking-wide text-neo-white mb-0.5">
             {t('results.turningPoint')}
           </div>
-          <p className="text-xs font-bold text-neo-cream leading-snug">
+          <p className="text-xs font-bold text-neo-white leading-snug">
             {turningPoint.isCurrentPlayer
               ? t('results.turningPointYou', {
                   word: turningPoint.word.toUpperCase(),
@@ -128,7 +128,7 @@ const TurningPointCard = memo<TurningPointCardProps>(({ allPlayerWords, currentU
           {turningPoint.totalLeadChanges > 1 && (
             <div className="flex items-center gap-1 mt-1">
               <TrendingUp className="w-3 h-3 text-neo-cyan" />
-              <span className="text-[10px] text-neo-cream/60 font-bold">
+              <span className="text-[10px] text-neo-white font-bold">
                 {t('results.leadChanges', { count: turningPoint.totalLeadChanges })}
               </span>
             </div>

@@ -73,7 +73,7 @@ export function BossRushPageClient() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-        <div className="text-neo-white/50 font-bold animate-pulse">
+        <div className="text-neo-white font-bold animate-pulse">
           {t('common.loading')}
         </div>
       </div>
@@ -88,17 +88,17 @@ export function BossRushPageClient() {
           'p-6 rounded-neo border-3 border-neo-black shadow-hard',
           'bg-neo-white/5 text-center max-w-sm',
         )}>
-          <Lock className="w-12 h-12 text-neo-white/30 mx-auto mb-4" />
+          <Lock className="w-12 h-12 text-neo-white mx-auto mb-4" />
           <h1 className="text-xl font-black text-neo-white mb-2">
             {t('adventure.hub.bossRush')}
           </h1>
-          <p className="text-neo-white/50 text-sm font-bold">
+          <p className="text-neo-white text-sm font-bold">
             {t('adventure.hub.bossRushLocked')}
           </p>
         </div>
         <Link
           href={`/${language}/adventure`}
-          className="text-neo-white/70 hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
+          className="text-neo-white hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
           {t('adventure.bossRush.backToHub')}
@@ -132,7 +132,7 @@ export function BossRushPageClient() {
             {isFullClear ? t('adventure.bossRush.fullClear') : t('adventure.bossRush.runOver')}
           </h1>
 
-          <p className="text-neo-white/60 text-sm font-bold mb-6">
+          <p className="text-neo-white text-sm font-bold mb-6">
             {t('adventure.bossRush.bossOf', {
               current: String(state.defeatedCount),
               total: String(state.totalBosses),
@@ -207,7 +207,7 @@ export function BossRushPageClient() {
       {/* Back link */}
       <Link
         href={`/${language}/adventure`}
-        className="absolute top-4 inset-s-4 text-neo-white/70 hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
+        className="absolute top-4 inset-s-4 text-neo-white hover:text-neo-white font-bold text-sm flex items-center gap-2 transition-colors"
       >
         <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
         {t('adventure.bossRush.backToHub')}
@@ -223,7 +223,7 @@ export function BossRushPageClient() {
         <h1 className="text-3xl font-black text-neo-white uppercase tracking-tight">
           {t('adventure.bossRush.title')}
         </h1>
-        <p className="text-neo-white/50 text-sm font-bold mt-1">
+        <p className="text-neo-white text-sm font-bold mt-1">
           {t('adventure.bossRush.subtitle')}
         </p>
       </AdaptiveMotion.div>
@@ -236,7 +236,7 @@ export function BossRushPageClient() {
           className="w-full max-w-sm"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-neo-white/70 text-sm font-bold">
+            <span className="text-neo-white text-sm font-bold">
               {t('adventure.bossRush.bossOf', {
                 current: String(state.currentBossIndex + 1),
                 total: String(state.totalBosses),
@@ -268,7 +268,7 @@ export function BossRushPageClient() {
           {levelConfig && grid && (
             <div className="w-full -mx-4">
               <div className="mb-3 text-center">
-                <p className="text-neo-white/50 text-sm font-bold">
+                <p className="text-neo-white text-sm font-bold">
                   {currentWorldConfig && t(`adventure.worlds.${currentWorldConfig.name}`)}
                 </p>
               </div>

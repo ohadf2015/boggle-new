@@ -49,7 +49,7 @@ export function MobileTabBar({
               'transition-all duration-100',
               isActive
                 ? 'text-neo-lime scale-110'
-                : 'text-neo-white/70 hover:text-neo-white'
+                : 'text-neo-white hover:text-neo-white'
             )}
           >
             <div className="relative">

@@ -56,7 +56,7 @@ export function WordBankFilters({
   const { t } = useLanguage();
 
   return (
-    <div className="bg-gray-800 border-2 border-gray-700 rounded-lg p-4">
+    <div className="bg-neo-navy-light border-2 border-gray-700 rounded-lg p-4">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {/* Language Filter */}
         <div>
@@ -64,7 +64,7 @@ export function WordBankFilters({
           <select
             value={selectedLanguage}
             onChange={e => onLanguageChange(e.target.value as Language)}
-            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
           >
             {LANGUAGES.map(lang => (
               <option key={lang} value={lang}>
@@ -80,7 +80,7 @@ export function WordBankFilters({
           <select
             value={selectedStatus}
             onChange={e => onStatusChange(e.target.value as typeof selectedStatus)}
-            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
           >
             {STATUSES.map(status => (
               <option key={status.value} value={status.value}>
@@ -96,7 +96,7 @@ export function WordBankFilters({
           <select
             value={selectedValidationStatus}
             onChange={e => onValidationStatusChange(e.target.value as typeof selectedValidationStatus)}
-            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
           >
             {VALIDATION_STATUSES.map(status => (
               <option key={status.value} value={status.value}>
@@ -112,7 +112,7 @@ export function WordBankFilters({
           <select
             value={selectedSource}
             onChange={e => onSourceChange(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
           >
             {SOURCES.map(source => (
               <option key={source.value} value={source.value}>
@@ -132,7 +132,7 @@ export function WordBankFilters({
               value={searchQuery}
               onChange={e => onSearchChange(e.target.value)}
               placeholder={t('admin.wordBank.filters.search')}
-              className="w-full bg-gray-900 border border-gray-700 text-white rounded-lg ps-10 pe-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+              className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg ps-10 pe-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
             />
           </div>
         </div>

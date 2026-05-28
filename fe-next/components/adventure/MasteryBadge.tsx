@@ -17,7 +17,7 @@ const TIER_CONFIG: Record<Exclude<MasteryTier, 0>, {
   bgClass: string;
 }> = {
   1: { nameKey: 'adventure.mastery.tier.bronze', colorClass: 'text-amber-600', pipColor: 'bg-amber-600', bgClass: 'bg-amber-900/30' },
-  2: { nameKey: 'adventure.mastery.tier.silver', colorClass: 'text-gray-300', pipColor: 'bg-gray-300', bgClass: 'bg-gray-700/30' },
+  2: { nameKey: 'adventure.mastery.tier.silver', colorClass: 'text-gray-300', pipColor: 'bg-gray-300', bgClass: 'bg-neo-navy-elevated/30' },
   3: { nameKey: 'adventure.mastery.tier.gold', colorClass: 'text-yellow-400', pipColor: 'bg-yellow-400', bgClass: 'bg-yellow-900/30' },
   4: { nameKey: 'adventure.mastery.tier.platinum', colorClass: 'text-gray-100', pipColor: 'bg-gray-100', bgClass: 'bg-gray-600/30' },
   5: { nameKey: 'adventure.mastery.tier.diamond', colorClass: 'text-cyan-200', pipColor: 'bg-cyan-200', bgClass: 'bg-cyan-900/30' },

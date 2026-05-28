@@ -163,7 +163,7 @@ export const PauseOverlay = memo(function PauseOverlay({
               className={cn(
                 'w-full py-3 px-6',
                 'flex items-center justify-center gap-3',
-                'bg-neo-white/5 text-neo-white/70',
+                'bg-neo-white/5 text-neo-white',
                 'font-bold',
                 'border-2 border-neo-white/10 rounded-neo-lg',
                 'hover:bg-neo-red/10 hover:text-neo-red hover:border-neo-red/30',
@@ -176,7 +176,7 @@ export const PauseOverlay = memo(function PauseOverlay({
           </div>
 
           {/* Keyboard Hint */}
-          <p className="text-center text-neo-white/40 text-xs mt-6">
+          <p className="text-center text-neo-white text-xs mt-6">
             {t('common.press')}{' '}
             <kbd className="px-2 py-1 bg-neo-black rounded font-mono">ESC</kbd>{' '}
             {t('common.toResume')}

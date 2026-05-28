@@ -40,7 +40,7 @@ export default function FAQPageClient(): React.ReactElement {
               size="sm"
               className={cn(
                 'rounded-neo border-3 border-neo-black shadow-hard',
-                isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-white text-neo-black hover:bg-neo-cream'
+                isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
               )}
             >
               <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -86,7 +86,7 @@ export default function FAQPageClient(): React.ReactElement {
                       className={cn(
                         'rounded-neo border-3 border-neo-black transition-all',
                         isDarkMode
-                          ? 'bg-slate-800'
+                          ? 'bg-neo-navy-light'
                           : 'bg-white shadow-hard',
                         isOpen && 'shadow-hard-lg'
                       )}
@@ -133,7 +133,7 @@ export default function FAQPageClient(): React.ReactElement {
         {/* Contact CTA */}
         <div className={cn(
           'mt-12 p-6 rounded-neo border-3 border-neo-black text-center',
-          isDarkMode ? 'bg-slate-800' : 'bg-neo-lime/20'
+          isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-lime/20'
         )}>
           <h3 className={cn('text-xl font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
             {c.stillHaveQuestions}
@@ -151,7 +151,7 @@ export default function FAQPageClient(): React.ReactElement {
         {/* Blog CTA */}
         <div className={cn(
           'mt-6 p-6 rounded-neo border-3 border-neo-black',
-          isDarkMode ? 'bg-slate-800' : 'bg-neo-cyan/10'
+          isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-cyan/10'
         )}>
           <div className="flex items-center gap-3 mb-3">
             <BookOpen className={cn('w-6 h-6', 'text-neo-cyan')} />

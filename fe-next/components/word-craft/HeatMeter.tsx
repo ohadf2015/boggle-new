@@ -78,7 +78,7 @@ export function HeatMeter({ heat, overdrive, burnout, label }: HeatMeterProps) {
       className="w-full flex items-center gap-2 shrink-0"
       aria-label={`${label}: ${heat}%`}
     >
-      <span className="text-[10px] font-neo-display uppercase tracking-widest text-neo-white/60 shrink-0 min-w-12">
+      <span className="text-[10px] font-neo-display uppercase tracking-widest text-neo-white shrink-0 min-w-12">
         {label}
       </span>
       <div className="relative flex-1 h-2.5 bg-neo-navy-light border-2 border-black rounded-sm overflow-hidden">

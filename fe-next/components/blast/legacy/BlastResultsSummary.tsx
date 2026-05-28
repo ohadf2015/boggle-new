@@ -130,13 +130,13 @@ export function BlastResultsSummary({
               ? t('blast.results.tilesShort', { count: failReason.tilesShort })
               : t('blast.results.needClearPct', { required: 90, got: results.clearPercentage })}
           </p>
-          <p className="text-[11px] uppercase tracking-wider font-bold text-white/80">
+          <p className="text-[11px] uppercase tracking-wider font-bold text-white">
             {t('blast.results.failHint')}
           </p>
           {results.targetWord && !results.targetWordFound && (
             <p
               data-testid="blast-target-word-missed"
-              className="mt-1 text-[11px] uppercase tracking-wider font-bold text-white/85"
+              className="mt-1 text-[11px] uppercase tracking-wider font-bold text-white"
             >
               {t('blast.objective.targetWordMissed', { word: results.targetWord })}
             </p>
@@ -173,7 +173,7 @@ export function BlastResultsSummary({
           className={cn(
             'inline-flex items-center gap-2 px-3 py-1.5',
             'rounded-neo border-2 border-neo-black/30',
-            'bg-neo-navy-light text-neo-cream',
+            'bg-neo-navy-light text-neo-white',
             'font-neo-body font-bold text-xs',
           )}
           data-testid="blast-target-word-cascade-credit"
@@ -212,7 +212,7 @@ export function BlastResultsSummary({
         <p className="text-6xl font-black text-white tabular-nums font-neo-display drop-shadow-[2px_2px_0_#000]">
           {results.finalScore.toLocaleString()}
         </p>
-        <p className="text-xs uppercase tracking-widest text-white/50 mt-1 font-bold">
+        <p className="text-xs uppercase tracking-widest text-white mt-1 font-bold">
           {results.wordsFound.length} {t('blast.wordsFound')} &middot;{' '}
           {results.wavesCompleted} {t('blast.waves')}
         </p>
@@ -225,7 +225,7 @@ export function BlastResultsSummary({
         {/* Tiles cleared progress bar */}
         <div className="mt-3 pt-3 border-t border-white/10">
           <div className="flex justify-between items-center mb-1.5">
-            <span className="text-[10px] uppercase tracking-wider font-bold text-white/50">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-white">
               {t('blast.results.tilesCleared')}
             </span>
             <span className="text-[11px] font-black text-neo-cyan tabular-nums">
@@ -296,7 +296,7 @@ export function BlastResultsSummary({
           className="w-full"
           data-testid="blast-results-wave-breakdown"
         >
-          <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-white mb-2 px-1">
             {t('blast.waveBreakdown')}
           </p>
           <div className="flex flex-col gap-1.5">
@@ -315,7 +315,7 @@ export function BlastResultsSummary({
                 >
                   <span className={cn(
                     'font-neo-display font-black text-xs min-w-[48px]',
-                    isBest ? 'text-neo-lime' : 'text-white/60',
+                    isBest ? 'text-neo-lime' : 'text-white',
                   )}>
                     {t('blast.results.wave', { n: String(wave.waveNumber) })}
                   </span>
@@ -328,7 +328,7 @@ export function BlastResultsSummary({
                   <span className="font-black text-xs text-white tabular-nums min-w-[44px] text-right">
                     {wave.score.toLocaleString()}
                   </span>
-                  <span className="text-[10px] text-white/40 tabular-nums min-w-[30px] text-right">
+                  <span className="text-[10px] text-white tabular-nums min-w-[30px] text-right">
                     {pct}%
                   </span>
                 </div>
@@ -346,7 +346,7 @@ export function BlastResultsSummary({
         className="w-full"
         data-testid="blast-results-skills"
       >
-        <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
+        <p className="text-[10px] uppercase tracking-widest font-bold text-white mb-2 px-1">
           {t('blast.skillBreakdown')}
         </p>
         <div className="grid grid-cols-2 gap-2">
@@ -366,7 +366,7 @@ export function BlastResultsSummary({
           className="w-full"
           data-testid="blast-results-words"
         >
-          <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-white mb-2 px-1">
             {t('blast.foundWords')} ({wordCount})
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -378,14 +378,14 @@ export function BlastResultsSummary({
                   'font-neo-display font-black uppercase text-[11px] tracking-wide',
                   word.length >= 6 ? 'bg-neo-lime text-neo-black' :
                   word.length >= 4 ? 'bg-neo-navy text-neo-cyan border-neo-cyan/40' :
-                  'bg-neo-navy text-white/60 border-white/10',
+                  'bg-neo-navy text-white border-white/10',
                 )}
               >
                 {word}
               </span>
             ))}
             {wordCount > 8 && (
-              <span className="px-2.5 py-1 text-[11px] text-white/40 font-bold">
+              <span className="px-2.5 py-1 text-[11px] text-white font-bold">
                 +{wordCount - 8}
               </span>
             )}
@@ -402,7 +402,7 @@ export function BlastResultsSummary({
           className="w-full"
           data-testid="blast-results-badges"
         >
-          <p className="text-[10px] uppercase tracking-widest font-bold text-white/60 mb-2 px-1">
+          <p className="text-[10px] uppercase tracking-widest font-bold text-white mb-2 px-1">
             {t('blast.results.badgesEarned')}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -509,7 +509,7 @@ export function BlastResultsSummary({
           variant="ghost"
           size="sm"
           onClick={onQuit}
-          className="font-semibold text-white/40 hover:text-white/70 hover:bg-transparent uppercase tracking-wider text-xs"
+          className="font-semibold text-white hover:text-white hover:bg-transparent uppercase tracking-wider text-xs"
         >
           {t('common.home')}
         </Button>
@@ -530,14 +530,14 @@ function BestMomentCell({ icon: Icon, label, value, sub, tint }: BestMomentCellP
   return (
     <div className="flex flex-col items-center text-center px-1 py-1">
       <Icon className={cn('w-5 h-5 mb-1', tint)} strokeWidth={2.75} />
-      <p className="text-[9px] uppercase tracking-wider font-bold text-white/50 leading-tight">
+      <p className="text-[9px] uppercase tracking-wider font-bold text-white leading-tight">
         {label}
       </p>
       <p className={cn('font-neo-display font-black uppercase text-sm leading-tight', tint)}>
         {value}
       </p>
       {sub && (
-        <p className="text-[10px] text-white/60 tabular-nums leading-tight">{sub}</p>
+        <p className="text-[10px] text-white tabular-nums leading-tight">{sub}</p>
       )}
     </div>
   );
@@ -557,7 +557,7 @@ function SkillCell({ icon: Icon, label, value, tint }: SkillCellProps) {
     )}>
       <Icon className={cn('w-4 h-4 shrink-0', tint)} strokeWidth={2.5} />
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] uppercase tracking-wider font-bold text-white/40 leading-none mb-0.5">
+        <p className="text-[9px] uppercase tracking-wider font-bold text-white leading-none mb-0.5">
           {label}
         </p>
         <p className={cn('font-neo-display font-black text-base leading-none tabular-nums', tint)}>
@@ -584,7 +584,7 @@ function StarRating({ stars, label }: StarRatingProps) {
               'w-6 h-6 transition-all',
               n <= stars
                 ? 'text-yellow-400 fill-yellow-400 drop-shadow-[1px_1px_0_#000]'
-                : 'text-white/20',
+                : 'text-white',
             )}
             strokeWidth={2}
           />

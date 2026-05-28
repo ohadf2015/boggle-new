@@ -57,7 +57,7 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
       </h1>
 
       {/* Message */}
-      <p className="mb-8 text-center text-neo-white/80 max-w-xs">
+      <p className="mb-8 text-center text-neo-white max-w-xs">
         {t('native.offline.message')}
       </p>
 
@@ -85,7 +85,7 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
       </button>
 
       {/* Subtle version info */}
-      <p className="mt-auto pt-8 text-xs text-neo-white/40">
+      <p className="mt-auto pt-8 text-xs text-neo-white">
         LexiClash
       </p>
     </div>

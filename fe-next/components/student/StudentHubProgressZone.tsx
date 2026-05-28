@@ -199,7 +199,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
               >
                 <Trophy className="w-5 h-5 text-black" />
               </m.div>
-              <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.rank')}</p>
+              <p className="text-xs text-neo-white font-bold">{t('education.leaderboard.rank')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">
                 {typeof rank === 'number' ? `#${rank}` : rank}
               </p>
@@ -214,7 +214,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
               >
                 <Zap className="w-5 h-5 text-black" />
               </m.div>
-              <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.totalXP')}</p>
+              <p className="text-xs text-neo-white font-bold">{t('education.leaderboard.totalXP')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">{totalXP.toLocaleString()}</p>
             </m.div>
 
@@ -227,7 +227,7 @@ export function StudentHubProgressZone({ classroomId, userId }: StudentHubProgre
               >
                 <Flame className="w-5 h-5 text-white" />
               </m.div>
-              <p className="text-xs text-neo-cream/60 font-bold">{t('education.leaderboard.streak')}</p>
+              <p className="text-xs text-neo-white font-bold">{t('education.leaderboard.streak')}</p>
               <p className="text-xl font-black text-neo-white tabular-nums">
                 {currentStreak} {t('common.days')}
               </p>

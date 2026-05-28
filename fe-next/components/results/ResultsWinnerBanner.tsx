@@ -74,7 +74,7 @@ const RANK_STYLES: Record<number, {
     iconBgClass: 'bg-neo-cream',
     iconTextClass: 'text-tier-gold',
     messageBgClass: 'bg-neo-pink',
-    messageTextClass: 'text-neo-cream',
+    messageTextClass: 'text-neo-white',
     nameShadowColor: 'var(--neo-cyan)',
     trophyShadowColor: 'var(--neo-pink)',
     accentColor: '#FFD700',
@@ -94,7 +94,7 @@ const RANK_STYLES: Record<number, {
   },
   3: {
     bgClass: 'bg-linear-to-br from-amber-700 via-orange-600 to-amber-700',
-    textClass: 'text-neo-cream',
+    textClass: 'text-neo-white',
     iconBgClass: 'bg-amber-100',
     iconTextClass: 'text-amber-700',
     messageBgClass: 'bg-amber-900',
@@ -344,7 +344,7 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                     className={`${styles.iconTextClass} ${compact ? 'w-5 h-5' : 'w-6 h-6 sm:w-7 sm:h-7'}`}
                   />
                   <span className={`
-                    absolute -bottom-2 -inset-e-2 bg-neo-black text-neo-cream border-2 border-neo-cream
+                    absolute -bottom-2 -inset-e-2 bg-neo-black text-neo-white border-2 border-neo-cream
                     rounded-neo font-black flex items-center justify-center shadow-hard-sm leading-none
                     ${compact ? 'px-1.5 py-0.5 min-w-[28px] text-[11px]' : 'px-2 py-1 min-w-[32px] text-xs sm:min-w-[36px] sm:text-sm'}
                   `}>

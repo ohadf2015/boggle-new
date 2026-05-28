@@ -29,7 +29,7 @@ function formatCountdown(ms: number): string {
 }
 
 const RANK_ICONS = [Crown, Medal, Medal]; // 1st, 2nd, 3rd
-const RANK_COLORS = ['text-neo-lime', 'text-neo-white/80', 'text-neo-pink'];
+const RANK_COLORS = ['text-neo-lime', 'text-neo-white', 'text-neo-pink'];
 
 const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
   isOpen,
@@ -97,15 +97,15 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
               className="p-1.5 rounded-neo hover:bg-neo-white/10 transition-colors"
               aria-label={t('common.close')}
             >
-              <X className="w-5 h-5 text-neo-white/60" />
+              <X className="w-5 h-5 text-neo-white" />
             </button>
           </div>
 
           {/* Description + Reset Timer */}
-          <p className="text-sm text-neo-white/60 mb-3">
+          <p className="text-sm text-neo-white mb-3">
             {t('adventure.weeklyChallenge.description')}
           </p>
-          <div className="flex items-center gap-2 mb-4 text-xs text-neo-white/40">
+          <div className="flex items-center gap-2 mb-4 text-xs text-neo-white">
             <Clock className="w-3.5 h-3.5" />
             <span>{t('adventure.weeklyChallenge.resetsIn')}: {formatCountdown(resetMs)}</span>
             {weekId && <span className="ms-auto font-mono opacity-50">{weekId}</span>}
@@ -134,21 +134,21 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
           )}
 
           {/* Leaderboard */}
-          <h3 className="text-sm font-bold text-neo-white/60 uppercase mb-3">
+          <h3 className="text-sm font-bold text-neo-white uppercase mb-3">
             {t('adventure.weeklyChallenge.leaderboard')}
           </h3>
 
           {loading ? (
-            <div className="py-8 text-center text-neo-white/30 text-sm">...</div>
+            <div className="py-8 text-center text-neo-white text-sm">...</div>
           ) : leaderboard.length === 0 ? (
-            <div className="py-8 text-center text-neo-white/30 text-sm">
+            <div className="py-8 text-center text-neo-white text-sm">
               {t('adventure.weeklyChallenge.noScoresYet')}
             </div>
           ) : (
             <div className="space-y-1.5">
               {leaderboard.map((entry, i) => {
                 const RankIcon = i < 3 ? RANK_ICONS[i] : null;
-                const rankColor = i < 3 ? RANK_COLORS[i] : 'text-neo-white/50';
+                const rankColor = i < 3 ? RANK_COLORS[i] : 'text-neo-white';
                 return (
                   <div
                     key={entry.rank}
@@ -165,7 +165,7 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
                     {/* Player info */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-neo-white truncate">{entry.playerName}</p>
-                      <p className="text-xs text-neo-white/40">
+                      <p className="text-xs text-neo-white">
                         {entry.wordsFound} words · {entry.longestWord}
                       </p>
                     </div>

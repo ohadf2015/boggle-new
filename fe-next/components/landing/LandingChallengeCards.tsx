@@ -554,7 +554,7 @@ export function LandingChallengeCards({
                 <span className="font-neo-display font-black text-base sm:text-lg uppercase tracking-wide text-neo-white truncate">
                   {t('landing.moreGameModes') || 'More Game Modes'}
                 </span>
-                <span className="font-neo-body text-xs sm:text-sm text-neo-white/70 group-open:hidden flex items-center gap-2">
+                <span className="font-neo-body text-xs sm:text-sm text-neo-white group-open:hidden flex items-center gap-2">
                   {hiddenCount > 0 && (
                     <span className="inline-flex items-center justify-center min-w-[1.4rem] h-5 px-1.5 rounded-full bg-neo-lime text-neo-navy font-neo-display font-black text-[0.65rem] leading-none border border-black">
                       +{hiddenCount}
@@ -562,7 +562,7 @@ export function LandingChallengeCards({
                   )}
                   {t('landing.moreGameModesHint') || 'Tap to explore'}
                 </span>
-                <span className="font-neo-body text-xs sm:text-sm text-neo-white/70 hidden group-open:inline">
+                <span className="font-neo-body text-xs sm:text-sm text-neo-white hidden group-open:inline">
                   {t('common.collapse') || 'Hide'}
                 </span>
               </span>

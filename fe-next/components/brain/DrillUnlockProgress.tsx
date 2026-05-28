@@ -105,7 +105,7 @@ export default function DrillUnlockProgress({
               </div>
               <p className={cn(
                 'text-xs',
-                'text-neo-white/70'
+                'text-neo-white'
               )}>
                 {t(`brain.drills.${drill.drillType}.name`)} {t('brain.unlock.nowAvailable')}
               </p>
@@ -160,7 +160,7 @@ export default function DrillUnlockProgress({
                 </p>
                 <p className={cn(
                   'text-[10px] font-bold',
-                  'text-neo-white/70'
+                  'text-neo-white'
                 )}>
                   {gamesLeft} {gamesLeft === 1 ? t('brain.unlock.gameLeft') : t('brain.unlock.gamesLeft')}
                 </p>
@@ -182,7 +182,7 @@ export default function DrillUnlockProgress({
 
             <Icon className={cn(
               'w-5 h-5',
-              'text-neo-white/50'
+              'text-neo-white'
             )} />
           </m.div>
         );

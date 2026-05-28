@@ -94,7 +94,7 @@ export const ParentalConsentBanner = memo<ParentalConsentBannerProps>(({
                 </div>
 
                 {/* Message */}
-                <p className="text-xs sm:text-sm mt-1 text-white/90">
+                <p className="text-xs sm:text-sm mt-1 text-white">
                   {t('consent.banner.message')}
                 </p>
 

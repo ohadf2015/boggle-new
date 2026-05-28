@@ -129,7 +129,7 @@ export function GameModeIntro({
 
         {/* Description */}
         <m.p
-          className={`text-neo-white/80 max-w-md text-center ${
+          className={`text-neo-white max-w-md text-center ${
             isTv ? 'text-3xl' : 'text-lg'
           }`}
           initial={{ y: 30, opacity: 0 }}

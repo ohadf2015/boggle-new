@@ -108,7 +108,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
             size="sm"
             className={cn(
               'mb-6 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-white text-neo-black hover:bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -169,7 +169,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
           aria-label="Table of Contents"
           className={cn(
             'mb-8 p-4 rounded-neo border-3 border-neo-black',
-            isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
+            isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-cream'
           )}
         >
           <p className={cn('font-bold text-sm mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
@@ -246,10 +246,10 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
                   </h3>
                   <table className={cn(
                     'w-full text-sm border-3 border-neo-black rounded-neo overflow-hidden',
-                    isDarkMode ? 'bg-slate-800' : 'bg-white'
+                    isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                   )}>
                     <thead>
-                      <tr className={cn('border-b-2 border-neo-black', isDarkMode ? 'bg-slate-700' : 'bg-neo-cream')}>
+                      <tr className={cn('border-b-2 border-neo-black', isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream')}>
                         <th className="px-3 py-2 text-start font-bold">{headers.game}</th>
                         <th className="px-3 py-2 text-center font-bold">{headers.realtime}</th>
                         <th className="px-3 py-2 text-center font-bold">{headers.payToWin}</th>
@@ -298,12 +298,12 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
                   key={`faq-${i}-${faq.question}`}
                   className={cn(
                     'group rounded-neo border-3 border-neo-black overflow-hidden',
-                    isDarkMode ? 'bg-slate-800' : 'bg-white'
+                    isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                   )}
                 >
                   <summary className={cn(
                     'cursor-pointer px-4 py-3 font-semibold text-sm list-none flex items-center justify-between',
-                    isDarkMode ? 'text-white hover:bg-slate-700' : 'text-neo-black hover:bg-neo-cream'
+                    isDarkMode ? 'text-white hover:bg-neo-navy-elevated' : 'text-neo-black hover:bg-neo-cream'
                   )}>
                     {faq.question}
                     <span className="ms-2 text-xs transition-transform group-open:rotate-180">&#9660;</span>

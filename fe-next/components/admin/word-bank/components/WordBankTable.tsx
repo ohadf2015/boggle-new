@@ -121,14 +121,14 @@ export function WordBankTable({
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full border-2 border-gray-700 rounded-lg">
-          <thead className="bg-gray-800 border-b-2 border-gray-700">
+          <thead className="bg-neo-navy-light border-b-2 border-gray-700">
             <tr>
               <th className="px-2 py-3 text-center">
                 <input
                   type="checkbox"
                   checked={allSelected}
                   onChange={onToggleSelectAll}
-                  className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-neo-yellow focus:ring-neo-yellow"
+                  className="w-4 h-4 rounded border-gray-600 bg-neo-navy-light text-neo-yellow focus:ring-neo-yellow"
                 />
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
@@ -153,13 +153,13 @@ export function WordBankTable({
           </thead>
           <tbody className="divide-y divide-gray-700">
             {words.map(word => (
-              <tr key={word.id} className={`hover:bg-gray-800/50 transition-colors ${selectedWords.has(word.id) ? 'bg-neo-yellow/5' : ''}`}>
+              <tr key={word.id} className={`hover:bg-neo-navy-light/50 transition-colors ${selectedWords.has(word.id) ? 'bg-neo-yellow/5' : ''}`}>
                 <td className="px-2 py-3 text-center">
                   <input
                     type="checkbox"
                     checked={selectedWords.has(word.id)}
                     onChange={() => onToggleSelect(word.id)}
-                    className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-neo-yellow focus:ring-neo-yellow"
+                    className="w-4 h-4 rounded border-gray-600 bg-neo-navy-light text-neo-yellow focus:ring-neo-yellow"
                   />
                 </td>
                 <td className="px-4 py-3">

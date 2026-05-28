@@ -154,7 +154,7 @@ export function DailyChallengeInvite({ isWinner, className, placement = null, to
         data-testid="daily-challenge-invite-dismiss"
         onClick={handleDismiss}
         aria-label={t('dailyInvite.dismiss')}
-        className="absolute top-1 end-1 p-1 rounded-md text-white/40 hover:text-white/80 transition-colors"
+        className="absolute top-1 end-1 p-1 rounded-md text-white hover:text-white transition-colors"
       >
         <X className="w-3.5 h-3.5" />
       </button>
@@ -167,7 +167,7 @@ export function DailyChallengeInvite({ isWinner, className, placement = null, to
         <p className={cn('text-xs font-neo-display font-bold uppercase tracking-wider mb-0.5', accent.text)}>
           {title}
         </p>
-        <p data-testid="daily-challenge-invite-body" className="text-sm font-neo-body text-neo-white/90 leading-snug">
+        <p data-testid="daily-challenge-invite-body" className="text-sm font-neo-body text-neo-white leading-snug">
           {body}
         </p>
       </div>

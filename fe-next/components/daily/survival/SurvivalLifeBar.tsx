@@ -157,7 +157,7 @@ export const SurvivalLifeBar = memo<SurvivalLifeBarProps>(({
           <span className={cn(
             "text-xs sm:text-sm font-black tabular-nums tracking-wide",
             "drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]",
-            pct > 50 ? "text-white" : pct > 0 ? "text-neo-white" : "text-neo-white/60"
+            pct > 50 ? "text-white" : pct > 0 ? "text-neo-white" : "text-neo-white"
           )}>
             {Math.floor(lifePoints)}/100
           </span>

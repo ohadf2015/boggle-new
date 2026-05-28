@@ -56,7 +56,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
       case 'too-long':
         return { text: 'text-neo-pink', bg: 'bg-neo-pink/20', border: 'border-neo-pink' };
       default:
-        return { text: 'text-neo-cream/70', bg: 'bg-neo-navy/50', border: 'border-neo-cream/30' };
+        return { text: 'text-neo-white', bg: 'bg-neo-navy/50', border: 'border-neo-cream/30' };
     }
   };
 
@@ -81,7 +81,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
             >
               <Wand2 className="w-5 h-5 text-neo-pink" />
             </AdaptiveMotion.div>
-            <h2 className="text-xl font-black text-neo-cream ltr:drop-shadow-[2px_2px_0px_black] rtl:drop-shadow-[-2px_2px_0px_black]">
+            <h2 className="text-xl font-black text-neo-white ltr:drop-shadow-[2px_2px_0px_black] rtl:drop-shadow-[-2px_2px_0px_black]">
               {t('customPuzzle.createTitle')}
             </h2>
           </div>
@@ -144,7 +144,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
                   animate={{ scale: 1 }}
                   className="w-8 h-8 bg-neo-pink border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
                 >
-                  <AlertCircle className="w-5 h-5 text-neo-cream" strokeWidth={3} />
+                  <AlertCircle className="w-5 h-5 text-neo-white" strokeWidth={3} />
                 </AdaptiveMotion.div>
               )}
             </AdaptiveMotion.div>

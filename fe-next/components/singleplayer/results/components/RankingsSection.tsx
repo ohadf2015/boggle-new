@@ -39,13 +39,13 @@ function getRankIcon(rank: number): React.ReactNode {
       </span>
     );
   }
-  return <span className="text-neo-black/70 dark:text-white/70 font-bold">#{rank}</span>;
+  return <span className="text-neo-black/70 dark:text-white font-bold">#{rank}</span>;
 }
 
 export function RankingsSection({ participants, maxDisplay = 4, title }: RankingsSectionProps): React.ReactElement {
   return (
-    <div className="bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white border-2 border-neo-black rounded-neo p-2">
-      <h3 className="text-xs font-black uppercase text-neo-black/80 dark:text-neo-cream mb-1">
+    <div className="bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white border-2 border-neo-black rounded-neo p-2">
+      <h3 className="text-xs font-black uppercase text-neo-black/80 dark:text-neo-white mb-1">
         {title}
       </h3>
       <div className="space-y-1">

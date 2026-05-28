@@ -338,7 +338,7 @@ export default function PracticeWordHuntSandbox() {
 
       {/* Discovery mechanic onboarding tip */}
       {showDiscoveryTip && (
-        <div className="flex items-start gap-2 bg-neo-navy/60 border-2 border-neo-lime text-neo-cream text-sm p-3 mb-2 rounded-neo">
+        <div className="flex items-start gap-2 bg-neo-navy/60 border-2 border-neo-lime text-neo-white text-sm p-3 mb-2 rounded-neo">
           <Lightbulb aria-hidden className="w-4 h-4 mt-0.5 shrink-0 text-neo-lime" strokeWidth={2.5} />
           <div className="flex-1">
             <span className="font-bold">{t('practice.wordHunt.discoveryTip')}</span>
@@ -347,7 +347,7 @@ export default function PracticeWordHuntSandbox() {
                 localStorage.setItem('practice-wh-discovery-seen', '1');
                 setShowDiscoveryTip(false);
               }}
-              className="ml-2 underline text-neo-lime text-xs hover:text-neo-cream transition-colors"
+              className="ml-2 underline text-neo-lime text-xs hover:text-neo-white transition-colors"
             >
               {t('common.understood')}
             </button>
@@ -361,14 +361,14 @@ export default function PracticeWordHuntSandbox() {
           href={`/${language}/practice`}
           data-testid="practice-back-to-hub"
           aria-label={t('practiceHub.backToHub')}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 shrink-0 transition-colors opacity-70 hover:opacity-100"
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-white hover:text-neo-white hover:border-neo-cream/60 shrink-0 transition-colors opacity-70 hover:opacity-100"
         >
           <ArrowLeft className="w-3 h-3 rtl:rotate-180" aria-hidden />
           <span>{t('practiceHub.backToHub')}</span>
         </Link>
         <div
           data-testid="practice-tries-chip"
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neo-navy/60 border-2 border-neo-cream/15 text-neo-cream text-[10px] sm:text-xs font-neo-display font-black whitespace-nowrap"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neo-navy/60 border-2 border-neo-cream/15 text-neo-white text-[10px] sm:text-xs font-neo-display font-black whitespace-nowrap"
           title={t('practice.wordHunt.livesNote', { max: REAL_GAME_MAX_TRIES })}
         >
           <Heart className="w-3 h-3 text-neo-pink fill-neo-pink" aria-hidden />
@@ -409,7 +409,7 @@ export default function PracticeWordHuntSandbox() {
               matchesTargetLength={!solved && currentSelectionLength === target.length}
             />
           </div>
-          <p className="text-[10px] sm:text-xs text-neo-cream/60 text-center max-w-xs px-2 mt-1">
+          <p className="text-[10px] sm:text-xs text-neo-white text-center max-w-xs px-2 mt-1">
             {t('practice.wordHunt.livesNote', { max: REAL_GAME_MAX_TRIES })}
           </p>
         </div>
@@ -420,7 +420,7 @@ export default function PracticeWordHuntSandbox() {
               data-testid="practice-short-tip"
               role="status"
               aria-live="polite"
-              className="px-3 py-1.5 rounded-neo border-2 border-neo-pink bg-neo-pink/15 text-neo-cream font-neo-display font-bold text-xs text-center max-w-xs"
+              className="px-3 py-1.5 rounded-neo border-2 border-neo-pink bg-neo-pink/15 text-neo-white font-neo-display font-bold text-xs text-center max-w-xs"
             >
               {shortTip}
             </div>
@@ -469,7 +469,7 @@ export default function PracticeWordHuntSandbox() {
         <Link
           href={liveHref}
           data-testid="practice-bailout-cta"
-          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
+          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
         >
           {t(solved ? 'practice.wordHunt.playRealCta' : 'practice.wordHunt.bailoutCta')}
         </Link>

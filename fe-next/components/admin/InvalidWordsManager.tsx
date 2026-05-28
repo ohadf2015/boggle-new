@@ -324,7 +324,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-yellow-500/20 rounded-lg">
@@ -337,7 +337,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-500/20 rounded-lg">
@@ -350,7 +350,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-slate-500/20 rounded-lg">
@@ -364,7 +364,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
             </CardContent>
           </Card>
           {autoPromoteStats && (
-            <Card className="bg-slate-800 border-slate-700">
+            <Card className="bg-neo-navy-light border-slate-700">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-cyan-500/20 rounded-lg">
@@ -385,7 +385,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
       )}
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 bg-slate-800 text-white p-4 rounded-lg border border-slate-700">
+      <div className="flex flex-col md:flex-row gap-4 bg-neo-navy-light text-white p-4 rounded-lg border border-slate-700">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
@@ -395,13 +395,13 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
               setSearchQuery(e.target.value);
               setOffset(0);
             }}
-            className="pl-9 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+            className="pl-9 bg-neo-navy-elevated border-slate-600 text-white placeholder:text-slate-400"
           />
         </div>
 
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <Select value={langFilter} onValueChange={(val) => { setLangFilter(val); setOffset(0); }}>
-            <SelectTrigger className="w-full sm:w-[140px] bg-slate-700 border-slate-600">
+            <SelectTrigger className="w-full sm:w-[140px] bg-neo-navy-elevated border-slate-600">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
             <SelectContent>
@@ -415,7 +415,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
           </Select>
 
           <Select value={minCount.toString()} onValueChange={(val) => { setMinCount(parseInt(val)); setOffset(0); }}>
-            <SelectTrigger className="w-full sm:w-[140px] bg-slate-700 border-slate-600">
+            <SelectTrigger className="w-full sm:w-[140px] bg-neo-navy-elevated border-slate-600">
               <SelectValue placeholder="Min Count" />
             </SelectTrigger>
             <SelectContent>
@@ -427,7 +427,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
           </Select>
 
           <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setOffset(0); }}>
-            <SelectTrigger className="w-full sm:w-[170px] bg-slate-700 border-slate-600">
+            <SelectTrigger className="w-full sm:w-[170px] bg-neo-navy-elevated border-slate-600">
               <SelectValue placeholder="Verification" />
             </SelectTrigger>
             <SelectContent>
@@ -444,13 +444,13 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
 
       {/* Bulk Selection Toolbar */}
       {words.length > 0 && (
-        <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-800 p-3 rounded-lg border border-slate-700">
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-neo-navy-light p-3 rounded-lg border border-slate-700">
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <Button
               variant="outline"
               size="sm"
               onClick={selectAll}
-              className="border-slate-600 hover:bg-slate-700"
+              className="border-slate-600 hover:bg-neo-navy-elevated"
               disabled={selectedIds.size === words.length}
             >
               Select All ({words.length})
@@ -531,7 +531,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                   exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                 >
                   <Card className={cn(
-                    "bg-slate-800 border-slate-700 transition-all relative",
+                    "bg-neo-navy-light border-slate-700 transition-all relative",
                     isSelected(word.id) && "ring-2 ring-neo-yellow",
                     isProcessing && "opacity-50 pointer-events-none"
                   )}>
@@ -542,7 +542,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                           type="checkbox"
                           checked={isSelected(word.id)}
                           onChange={() => toggleSelection(word.id)}
-                          className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-neo-yellow focus:ring-neo-yellow cursor-pointer"
+                          className="w-5 h-5 rounded border-slate-600 bg-neo-navy-elevated text-neo-yellow focus:ring-neo-yellow cursor-pointer"
                           aria-label={`Select ${word.word}`}
                         />
                       </div>
@@ -617,7 +617,7 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="flex-1 border-slate-600 hover:bg-slate-700"
+                          className="flex-1 border-slate-600 hover:bg-neo-navy-elevated"
                           onClick={() => handleApprove(word.word, word.language, true)}
                           disabled={isProcessing}
                         >

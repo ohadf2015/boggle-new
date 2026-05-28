@@ -71,7 +71,7 @@ export default function PartyPlayClient() {
   if (flagLoading) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-        <div className="animate-pulse text-neo-cream font-neo-display">
+        <div className="animate-pulse text-neo-white font-neo-display">
           {t('common.loading') || 'Loading...'}
         </div>
       </div>
@@ -81,7 +81,7 @@ export default function PartyPlayClient() {
   if (!hasAccess) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
-        <div className="text-neo-cream/50 font-neo-body text-center">
+        <div className="text-neo-white font-neo-body text-center">
           {t('party.noAccess') || 'Not available'}
         </div>
       </div>
@@ -103,11 +103,11 @@ export default function PartyPlayClient() {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-pulse text-neo-cream font-neo-display text-lg">
+          <div className="animate-pulse text-neo-white font-neo-display text-lg">
             {t('party.joining') || 'Joining...'}
           </div>
           {roomCode && (
-            <div className="mt-2 text-neo-cream/50 font-neo-body text-sm">
+            <div className="mt-2 text-neo-white font-neo-body text-sm">
               Room: {roomCode}
             </div>
           )}
@@ -122,18 +122,18 @@ export default function PartyPlayClient() {
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
         <div className="text-6xl mb-4">{gameDef?.icon || ''}</div>
-        <h1 className="font-neo-display text-neo-cream text-2xl uppercase">
+        <h1 className="font-neo-display text-neo-white text-2xl uppercase">
           {t(gameDef?.nameKey || '') || room.gameId}
         </h1>
         <div className="mt-4 bg-neo-navy-elevated border-3 border-neo-cream/30 rounded-neo p-4 text-center">
-          <p className="text-neo-cream font-neo-display text-lg">
+          <p className="text-neo-white font-neo-display text-lg">
             {room.roomCode}
           </p>
-          <p className="text-neo-cream/50 font-neo-body text-sm mt-1">
+          <p className="text-neo-white font-neo-body text-sm mt-1">
             {playerCount} {t('party.playersJoined') || 'players joined'}
           </p>
         </div>
-        <div className="mt-6 animate-pulse text-neo-cream/40 font-neo-body text-sm">
+        <div className="mt-6 animate-pulse text-neo-white font-neo-body text-sm">
           {isSpectator
             ? (t('party.spectating') || 'Spectating...')
             : (t('party.waitingForHost') || 'Waiting for host to start...')}
@@ -178,10 +178,10 @@ export default function PartyPlayClient() {
   return (
     <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
       <div className="text-4xl mb-3">{gameDef?.icon || ''}</div>
-      <p className="text-neo-cream font-neo-display uppercase">
+      <p className="text-neo-white font-neo-display uppercase">
         {room.phase}
       </p>
-      <p className="text-neo-cream/40 font-neo-body text-sm mt-2">
+      <p className="text-neo-white font-neo-body text-sm mt-2">
         Phone controller coming in Sprint 2-3
       </p>
       {isSpectator && (

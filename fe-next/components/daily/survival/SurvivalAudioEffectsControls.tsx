@@ -58,7 +58,7 @@ export const SurvivalAudioEffectsControls = memo<SurvivalAudioEffectsControlsPro
       <button
         type="button"
         onClick={handleAudioClick}
-        className={`${BTN_BASE} ${allMuted ? 'text-neo-cream/40' : 'text-neo-cream/70'}`}
+        className={`${BTN_BASE} ${allMuted ? 'text-neo-white' : 'text-neo-white'}`}
         aria-label={audioLabel}
         aria-pressed={!allMuted}
         title={allMuted ? t('music.soundOff', 'Sound off') : t('music.soundOn', 'Sound on')}
@@ -71,7 +71,7 @@ export const SurvivalAudioEffectsControls = memo<SurvivalAudioEffectsControlsPro
       <button
         type="button"
         onClick={toggleEffects}
-        className={`${BTN_BASE} ${effectsReduced ? 'text-neo-cream/40' : 'text-neo-lime/80'}`}
+        className={`${BTN_BASE} ${effectsReduced ? 'text-neo-white' : 'text-neo-lime/80'}`}
         aria-label={effectsLabel}
         aria-pressed={effectsReduced}
         title={effectsLabel}

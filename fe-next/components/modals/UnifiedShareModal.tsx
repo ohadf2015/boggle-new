@@ -402,7 +402,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             transition={{ delay: 0.1 }}
             className="hidden sm:flex flex-col items-center"
           >
-            <p className="text-xs font-bold text-white/70 uppercase tracking-wide mb-2">
+            <p className="text-xs font-bold text-white uppercase tracking-wide mb-2">
               {t('share.scanToJoin')}
             </p>
             <div
@@ -511,7 +511,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               aria-controls="more-platforms"
               className={cn(
                 'w-full flex items-center justify-center gap-1.5 py-2 rounded-neo',
-                'text-white/70 hover:text-white transition-colors',
+                'text-white hover:text-white transition-colors',
                 'font-medium text-xs uppercase tracking-wide',
                 'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
               )}

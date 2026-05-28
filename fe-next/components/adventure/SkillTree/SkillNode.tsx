@@ -155,7 +155,7 @@ export const SkillNode = memo<SkillNodeProps>(
             'line-clamp-2 px-1',
             isUnlocked && 'text-neo-white',
             isClickable && 'text-neo-yellow',
-            isLocked && 'text-neo-white/50'
+            isLocked && 'text-neo-white'
           )}
         >
           {t(skill.nameKey)}
@@ -183,7 +183,7 @@ export const SkillNode = memo<SkillNodeProps>(
         {/* Locked Icon Overlay */}
         {isLocked && (
           <span
-            className="absolute top-1 inset-e-1 text-neo-white/30"
+            className="absolute top-1 inset-e-1 text-neo-white"
             aria-label={t('adventure.skills.locked')}
           >
             🔒

@@ -147,7 +147,7 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
             </div>
 
             {/* Text */}
-            <p className="text-neo-cream font-black uppercase text-center text-sm leading-snug">
+            <p className="text-neo-white font-black uppercase text-center text-sm leading-snug">
               {t('tutorial.multiDirection')}
             </p>
 

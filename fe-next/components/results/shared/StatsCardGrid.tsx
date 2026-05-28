@@ -28,7 +28,7 @@ const accentBg: Record<string, string> = {
   orange: 'bg-neo-orange/8 border-neo-orange/30',
   cyan: 'bg-neo-cyan/8 border-neo-cyan/30',
   amber: 'bg-amber-500/8 border-amber-500/30',
-  default: 'bg-slate-800/40 border-slate-700/40',
+  default: 'bg-neo-navy-light/40 border-slate-700/40',
 };
 
 const container = {
@@ -79,7 +79,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
               {i > 0 && (
                 <div
                   data-testid="stat-divider"
-                  className="w-px h-8 bg-slate-700"
+                  className="w-px h-8 bg-neo-navy-elevated"
                 />
               )}
               <m.div
@@ -94,7 +94,7 @@ export function StatsCardGrid({ cards, variant = 'grid', className }: StatsCardG
                     {card.value}
                   </span>
                 </div>
-                <div className="text-xs text-neo-cream/60 font-bold">
+                <div className="text-xs text-neo-white font-bold">
                   {card.label}
                 </div>
               </m.div>

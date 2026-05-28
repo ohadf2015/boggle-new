@@ -369,7 +369,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         <div>
           <button
             onClick={() => setShowDetails(v => !v)}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-cream font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+            className="w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-white font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
           >
             {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             {t('results.showDetails')}

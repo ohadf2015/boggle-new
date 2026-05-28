@@ -101,7 +101,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Pack name */}
           <div>
-            <label className="block text-sm font-neo-body text-neo-white/80 mb-1">
+            <label className="block text-sm font-neo-body text-neo-white mb-1">
               {t('ugc.pack.builder.nameLabel')}
             </label>
             <input
@@ -116,7 +116,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-neo-body text-neo-white/80 mb-1">
+            <label className="block text-sm font-neo-body text-neo-white mb-1">
               {t('ugc.pack.builder.descriptionLabel')}
             </label>
             <textarea
@@ -132,7 +132,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
           {/* Language + Emoji row */}
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-sm font-neo-body text-neo-white/80 mb-1">
+              <label className="block text-sm font-neo-body text-neo-white mb-1">
                 {t('ugc.pack.builder.languageLabel')}
               </label>
               <select
@@ -149,7 +149,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
             </div>
 
             <div className="w-28">
-              <label className="block text-sm font-neo-body text-neo-white/80 mb-1">
+              <label className="block text-sm font-neo-body text-neo-white mb-1">
                 {t('ugc.pack.builder.emojiLabel')}
               </label>
               <input
@@ -165,7 +165,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-neo-body text-neo-white/80 mb-2">
+            <label className="block text-sm font-neo-body text-neo-white mb-2">
               {t('ugc.pack.builder.tagsLabel')}
             </label>
             <div className="flex flex-wrap gap-2">
@@ -184,7 +184,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
                     className={`px-3 py-1 text-sm rounded-neo border-neo border-black font-neo-body transition-colors ${
                       active
                         ? 'bg-neo-yellow text-black'
-                        : 'bg-neo-navy/60 text-neo-white/70 hover:bg-neo-navy'
+                        : 'bg-neo-navy/60 text-neo-white hover:bg-neo-navy'
                     }`}
                   >
                     {tagLabel}
@@ -196,7 +196,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
 
           {/* Word input */}
           <div>
-            <label className="block text-sm font-neo-body text-neo-white/80 mb-1">
+            <label className="block text-sm font-neo-body text-neo-white mb-1">
               {t('ugc.pack.builder.wordsLabel')}
             </label>
             <div className="flex gap-2">
@@ -256,7 +256,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
                       type="button"
                       onClick={() => hook.removeWord(word)}
                       aria-label={`Remove ${word}`}
-                      className="text-neo-white/60 hover:text-neo-white"
+                      className="text-neo-white hover:text-neo-white"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -309,7 +309,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-neo-display text-neo-white/80 border-neo border-black/40 rounded-neo hover:bg-white/10"
+            className="px-4 py-2 text-sm font-neo-display text-neo-white border-neo border-black/40 rounded-neo hover:bg-white/10"
           >
             {t('ugc.pack.builder.cancel')}
           </button>

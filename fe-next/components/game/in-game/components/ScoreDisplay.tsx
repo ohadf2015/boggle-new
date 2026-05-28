@@ -81,7 +81,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           >
             {displayScore(score)}
           </AdaptiveMotion.div>
-          <div className="text-sm font-bold uppercase tracking-wider text-neo-cream/70 flex items-center justify-center gap-0.5">
+          <div className="text-sm font-bold uppercase tracking-wider text-neo-white flex items-center justify-center gap-0.5">
             {t('common.score')}
             <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
           </div>
@@ -92,7 +92,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-            className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-6 h-6 bg-neo-pink text-neo-cream border-2 border-neo-pink/50 rounded-full flex items-center justify-center text-xs font-black shadow-none"
+            className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-6 h-6 bg-neo-pink text-neo-white border-2 border-neo-pink/50 rounded-full flex items-center justify-center text-xs font-black shadow-none"
           >
             #{rank}
           </AdaptiveMotion.div>
@@ -135,7 +135,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
         >
           {displayScore(score)}
         </AdaptiveMotion.div>
-        <div className="font-bold uppercase tracking-wider text-neo-cream/70 text-[9px] md:text-xs">
+        <div className="font-bold uppercase tracking-wider text-neo-white text-[9px] md:text-xs">
           {t('common.score')}
         </div>
       </div>
@@ -146,7 +146,7 @@ export const ScoreDisplay = memo<ScoreDisplayProps>(function ScoreDisplay({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-          className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-pink/50 rounded-full flex items-center justify-center text-[8px] md:text-xs font-black shadow-none"
+          className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 md:w-6 md:h-6 bg-neo-pink text-neo-white border-2 border-neo-pink/50 rounded-full flex items-center justify-center text-[8px] md:text-xs font-black shadow-none"
         >
           #{rank}
         </AdaptiveMotion.div>

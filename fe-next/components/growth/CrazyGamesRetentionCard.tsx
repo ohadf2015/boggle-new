@@ -99,7 +99,7 @@ export const CrazyGamesRetentionCard: React.FC = () => {
       </div>
       <p
         data-testid="cg-retention-message"
-        className="font-neo-body text-sm text-neo-cream"
+        className="font-neo-body text-sm text-neo-white"
       >
         {t(messageKey)}
       </p>

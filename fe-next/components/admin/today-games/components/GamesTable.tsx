@@ -33,9 +33,9 @@ export function GamesTable({
 }: GamesTableProps) {
   return (
     <>
-      <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
+      <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[600px] sm:min-w-[800px]">
-          <thead className="bg-slate-700/50">
+          <thead className="bg-neo-navy-elevated/50">
             <tr>
               <SortableHeader
                 label={t('admin.todayGames.time')}

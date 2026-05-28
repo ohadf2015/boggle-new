@@ -398,7 +398,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
         <p
           className={cn(
             'font-medium',
-            'text-neo-white/80'
+            'text-neo-white'
           )}
           style={{
             fontSize: 'clamp(0.875rem, 3.75cqw, 1.25rem)',

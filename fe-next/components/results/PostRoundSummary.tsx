@@ -48,7 +48,7 @@ export function PostRoundSummary(): React.JSX.Element | null {
       dir={dir}
       className="rounded-neo border-3 border-neo-black bg-neo-navy-light/80 p-3 text-sm"
     >
-      <h4 className="mb-2 font-neo-display font-black uppercase text-neo-cream">
+      <h4 className="mb-2 font-neo-display font-black uppercase text-neo-white">
         {t('multiplayer.postRound.title')}
       </h4>
       <div className="flex flex-wrap gap-2">

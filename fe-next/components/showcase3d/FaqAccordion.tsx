@@ -31,7 +31,7 @@ export default function FaqAccordion({ title, items }: { title: string; items: F
                   type="button"
                   onClick={() => setOpen(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start font-neo-display text-lg font-bold text-neo-cream"
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-start font-neo-display text-lg font-bold text-neo-white"
                 >
                   <span>{item.q}</span>
                   <span
@@ -49,7 +49,7 @@ export default function FaqAccordion({ title, items }: { title: string; items: F
                 style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
               >
                 <div className="overflow-hidden">
-                  <p className="border-t-[3px] border-black/40 px-5 py-4 font-neo-body text-neo-cream/80">{item.a}</p>
+                  <p className="border-t-[3px] border-black/40 px-5 py-4 font-neo-body text-neo-white">{item.a}</p>
                 </div>
               </div>
             </div>

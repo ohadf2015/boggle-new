@@ -236,7 +236,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
           <div className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-4 mb-6">
             <p className="text-sm font-medium">
               {t('customPuzzle.creatorScore')}:{' '}
-              <span className="font-bold text-neo-navy dark:text-neo-cream">
+              <span className="font-bold text-neo-navy dark:text-neo-white">
                 {puzzle.creatorEfficiencyScore} pts
               </span>
             </p>

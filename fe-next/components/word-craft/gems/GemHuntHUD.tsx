@@ -31,10 +31,10 @@ function GemHuntHUDImpl({ inventory, totalScore, tilesRemaining, turnIndex, labe
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-1.5" aria-label={labels.crownsWon}>
           <Trophy className="h-3.5 w-3.5 text-neo-yellow" aria-hidden />
-          <span className="font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-cream/70">
+          <span className="font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">
             {labels.crownsWon}
           </span>
-          <span className="font-neo-display text-base font-black tabular-nums text-neo-cream">
+          <span className="font-neo-display text-base font-black tabular-nums text-neo-white">
             {wonCount}/{GEM_COLORS.length}
           </span>
           <span className="ms-1 flex items-center gap-0.5">
@@ -49,7 +49,7 @@ function GemHuntHUDImpl({ inventory, totalScore, tilesRemaining, turnIndex, labe
             ))}
           </span>
         </div>
-        <div className="flex items-center gap-3 text-[10px] font-neo-display font-black uppercase tracking-wider text-neo-cream/60">
+        <div className="flex items-center gap-3 text-[10px] font-neo-display font-black uppercase tracking-wider text-neo-white">
           <span className="inline-flex items-center gap-1">
             {labels.score}
             <span className="text-neo-lime tabular-nums">{totalScore}</span>

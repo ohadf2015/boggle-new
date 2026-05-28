@@ -73,7 +73,7 @@ export function MatchmakingOverlay({
             </div>
 
             {/* Queue info */}
-            <div className="flex gap-4 text-sm text-neo-cream/70">
+            <div className="flex gap-4 text-sm text-neo-white">
               <span>
                 {t('matchmaking.playersInQueue', { count: queueSize })}
               </span>
@@ -111,7 +111,7 @@ export function MatchmakingOverlay({
 
         {status === 'timeout' && (
           <div className="flex flex-col items-center gap-4">
-            <h2 className="font-neo-display text-xl text-neo-cream">
+            <h2 className="font-neo-display text-xl text-neo-white">
               {t('matchmaking.timeout')}
             </h2>
 
@@ -124,7 +124,7 @@ export function MatchmakingOverlay({
 
             <button
               onClick={onCancel}
-              className="text-sm text-neo-cream/60 underline"
+              className="text-sm text-neo-white underline"
             >
               {t('matchmaking.cancel')}
             </button>

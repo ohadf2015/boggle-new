@@ -178,7 +178,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
-            className={cn('mb-6 p-4 rounded-xl', isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50')}
+            className={cn('mb-6 p-4 rounded-xl', isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50')}
           >
             <p
               className={cn(

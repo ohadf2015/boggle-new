@@ -128,7 +128,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                   {this.state.error.toString()}
                 </pre>
                 {this.state.errorInfo && (
-                  <pre className="overflow-x-auto text-neo-cream mt-2 text-[11px]">
+                  <pre className="overflow-x-auto text-neo-white mt-2 text-[11px]">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 )}

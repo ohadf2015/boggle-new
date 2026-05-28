@@ -33,7 +33,7 @@ export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButto
         onClick={onClose}
         className={cn(
           'rounded-full w-8 h-8',
-          isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
+          isDarkMode ? 'hover:bg-neo-navy-elevated' : 'hover:bg-gray-100'
         )}
         aria-label={t('common.close')}
       >

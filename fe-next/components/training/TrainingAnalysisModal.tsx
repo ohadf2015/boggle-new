@@ -158,7 +158,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
             className={cn(
               'absolute top-4 right-4 rtl:right-auto rtl:left-4 rounded-full p-2 z-10 transition-colors',
               isDarkMode
-                ? 'hover:bg-slate-700 text-gray-400 hover:text-gray-200'
+                ? 'hover:bg-neo-navy-elevated text-gray-400 hover:text-gray-200'
                 : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
             )}
           >
@@ -246,7 +246,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
             </div>
             <div className={cn(
               'h-3 rounded-full overflow-hidden',
-              isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200'
             )}>
               <m.div
                 initial={{ width: 0 }}
@@ -287,7 +287,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                         ? 'bg-green-900/20 border-green-500/30'
                         : 'bg-green-50 border-green-200')
                       : (isDarkMode
-                        ? 'bg-slate-700/50 border-slate-600'
+                        ? 'bg-neo-navy-elevated/50 border-slate-600'
                         : 'bg-gray-50 border-gray-200')
                   )}
                 >
@@ -331,7 +331,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
             transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
             className={cn(
               'p-4 rounded-xl mb-6',
-              isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
+              isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50'
             )}
           >
             <p className={cn(
@@ -464,7 +464,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   className={cn(
                     'w-full h-10 text-sm font-medium rounded-xl transition-all',
                     isDarkMode
-                      ? 'text-gray-400 hover:text-gray-200 hover:bg-slate-700'
+                      ? 'text-gray-400 hover:text-gray-200 hover:bg-neo-navy-elevated'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   )}
                 >
@@ -496,7 +496,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     className={cn(
                       'w-full h-10 text-sm font-medium rounded-xl transition-all',
                       isDarkMode
-                        ? 'text-gray-400 hover:text-gray-200 hover:bg-slate-700'
+                        ? 'text-gray-400 hover:text-gray-200 hover:bg-neo-navy-elevated'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                     )}
                   >

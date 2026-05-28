@@ -323,10 +323,10 @@ export default function ConnectionsGame() {
             className="w-full max-w-sm rounded-neo border-neo-thick border-neo-lime bg-neo-navy-light shadow-hard-lg p-6 text-center"
           >
             <p className="text-5xl mb-3" aria-hidden="true">🏆</p>
-            <h2 className="font-neo-display text-2xl text-neo-cream font-bold mb-2">
+            <h2 className="font-neo-display text-2xl text-neo-white font-bold mb-2">
               {t('connections.finished')}
             </h2>
-            <p className="text-neo-white/60 text-sm mb-4">
+            <p className="text-neo-white text-sm mb-4">
               {t('connections.subtitle')}
             </p>
             <div className="flex justify-around gap-3 mb-5 text-sm font-neo-body">
@@ -354,7 +354,7 @@ export default function ConnectionsGame() {
               <button
                 type="button"
                 onClick={handleQuit}
-                className="w-full rounded-neo border-neo border-neo-white/30 bg-transparent text-neo-white/70 font-neo-body text-sm px-5 py-2.5 hover:bg-neo-white/5 transition-colors"
+                className="w-full rounded-neo border-neo border-neo-white/30 bg-transparent text-neo-white font-neo-body text-sm px-5 py-2.5 hover:bg-neo-white/5 transition-colors"
               >
                 {t('connections.quitToMenu')}
               </button>
@@ -365,7 +365,7 @@ export default function ConnectionsGame() {
     }
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="text-neo-white/50 font-neo-body text-center px-4">{t('connections.noAccess')}</p>
+        <p className="text-neo-white font-neo-body text-center px-4">{t('connections.noAccess')}</p>
       </div>
     );
   }
@@ -464,7 +464,7 @@ export default function ConnectionsGame() {
               </m.span>
             )}
           </AnimatePresence>
-          <span className="text-neo-white/60">
+          <span className="text-neo-white">
             <AnimatePresence mode="popLayout">
               <m.span
                 key={sessionScore + state.score}

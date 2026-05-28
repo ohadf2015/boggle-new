@@ -41,7 +41,7 @@ function QuestRow({ quest, t }: { quest: QuestProgress; t: (key: string, params?
           >
             {t(QUEST_LABEL_KEYS[quest.id], { target: quest.target })}
           </span>
-          <span className="text-xs font-mono text-neo-white/60 ms-2">
+          <span className="text-xs font-mono text-neo-white ms-2">
             {quest.current}/{quest.target}
           </span>
         </div>

@@ -147,7 +147,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               running their own framer-motion pulse loop at 5s remaining. */}
           <div className="absolute inset-0 flex items-center justify-center">
             <m.div
-              className={`${isCriticalTime ? 'text-4xl sm:text-5xl' : config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
+              className={`${isCriticalTime ? 'text-4xl sm:text-5xl' : config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-white'}`}
               animate={isSelecting ? {} : isCriticalTime && !reduceMotion ? {
                 scale: [1, 1.25, 1],
                 opacity: [1, 0.8, 1],

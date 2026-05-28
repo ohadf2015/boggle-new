@@ -17,7 +17,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   wordCounts,
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
+    <div className="bg-white dark:bg-neo-navy-light/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
       <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
         {LANGUAGES.map(lang => (
           <button
@@ -27,7 +27,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               'px-2.5 sm:px-4 py-2 rounded-lg border-2 font-bold transition-all shrink-0 text-xs sm:text-sm min-h-[40px]',
               selectedLang === lang.code
                 ? 'bg-purple-600 text-white border-purple-700 shadow-md'
-                : 'bg-white dark:bg-slate-700 border-gray-300 dark:border-slate-600 hover:border-purple-400 text-gray-800 dark:text-gray-200'
+                : 'bg-white dark:bg-neo-navy-elevated border-gray-300 dark:border-slate-600 hover:border-purple-400 text-gray-800 dark:text-gray-200'
             )}
           >
             <span className="me-1">{lang.flag}</span>

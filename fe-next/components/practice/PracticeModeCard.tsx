@@ -80,13 +80,13 @@ export default function PracticeModeCard({
         <span aria-hidden className="text-lg leading-none mt-0.5">
           {mode.emoji}
         </span>
-        <h2 className="text-base sm:text-lg font-neo-display font-black text-neo-cream flex-1 text-start">
+        <h2 className="text-base sm:text-lg font-neo-display font-black text-neo-white flex-1 text-start">
           {t(mode.titleKey)}
         </h2>
       </div>
 
       {/* Description */}
-      <p className="text-xs sm:text-sm font-neo-body text-neo-cream/80 text-start line-clamp-2">
+      <p className="text-xs sm:text-sm font-neo-body text-neo-white text-start line-clamp-2">
         {t(mode.descKey)}
       </p>
 

@@ -101,7 +101,7 @@ export const PastSeasonsLeaderboard: React.FC = () => {
               'px-3 py-1.5 text-xs font-neo-display rounded-neo border-neo border-black transition-all',
               activeSeason === s.season_id
                 ? 'bg-neo-pink text-black shadow-hard'
-                : 'bg-neo-navy-light text-neo-cream hover:bg-neo-navy'
+                : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy'
             )}
           >
             {s.name} <span className="opacity-70">· {s.entry_count}</span>
@@ -117,13 +117,13 @@ export const PastSeasonsLeaderboard: React.FC = () => {
             const color = tierColor(row.peak_tier);
             return (
               <div key={row.player_id} className="grid grid-cols-12 gap-2 px-3 py-2 items-center">
-                <div className="col-span-1 text-center font-neo-display text-neo-cream">
+                <div className="col-span-1 text-center font-neo-display text-neo-white">
                   {row.rank_position === 1 ? '🥇' : row.rank_position === 2 ? '🥈' : row.rank_position === 3 ? '🥉' : `#${row.rank_position}`}
                 </div>
-                <div className="col-span-5 truncate font-neo-body text-sm text-neo-cream">
+                <div className="col-span-5 truncate font-neo-body text-sm text-neo-white">
                   {row.username ?? '—'}
                 </div>
-                <div className="col-span-3 text-right font-neo-display text-sm text-neo-cream">
+                <div className="col-span-3 text-right font-neo-display text-sm text-neo-white">
                   {row.total_score.toLocaleString()}
                 </div>
                 <div className="col-span-3 text-right">

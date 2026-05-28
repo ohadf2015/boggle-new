@@ -31,7 +31,7 @@ export default function AdventureViewHeader({
 
   const backClass = cn(
     'flex items-center justify-center w-10 h-10 rounded-neo',
-    'text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10',
+    'text-neo-white hover:text-neo-white hover:bg-neo-white/10',
     'transition-colors'
   );
 
@@ -51,11 +51,11 @@ export default function AdventureViewHeader({
 
         {/* Breadcrumb — world name on levelGrid, section title on worldMap */}
         {viewState === 'levelGrid' && worldName ? (
-          <p className="text-xs sm:text-sm font-bold text-neo-white/50 truncate max-w-[40%] text-center">
+          <p className="text-xs sm:text-sm font-bold text-neo-white truncate max-w-[40%] text-center">
             {worldName}
           </p>
         ) : (
-          <p className="text-xs sm:text-sm font-bold text-neo-white/50 truncate max-w-[40%] text-center">
+          <p className="text-xs sm:text-sm font-bold text-neo-white truncate max-w-[40%] text-center">
             {t('adventure.title')}
           </p>
         )}

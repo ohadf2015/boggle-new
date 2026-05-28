@@ -147,14 +147,14 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
               <div className="flex items-center justify-between px-4 py-2 border-b-2 border-neo-black/30 shrink-0">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-neo-cyan" />
-                  <span className="text-sm font-bold text-neo-cream uppercase tracking-wide">{t('common.chat')}</span>
+                  <span className="text-sm font-bold text-neo-white uppercase tracking-wide">{t('common.chat')}</span>
                 </div>
                 <button
                   onClick={handleClose}
                   className={cn(
                     'w-8 h-8 min-w-[44px] min-h-[44px]',
                     'flex items-center justify-center',
-                    'text-neo-cream/60 hover:text-neo-cream',
+                    'text-neo-white hover:text-neo-white',
                     'transition-colors',
                   )}
                   aria-label={t('common.close')}

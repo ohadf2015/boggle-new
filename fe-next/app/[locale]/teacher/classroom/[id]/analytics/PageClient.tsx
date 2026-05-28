@@ -131,7 +131,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             <h1 className="text-3xl md:text-4xl font-neo-display text-neo-white mb-2">
               {t('education.analytics.title')}
             </h1>
-            <p className="text-neo-white/70 font-neo-body">
+            <p className="text-neo-white font-neo-body">
               {t('education.analytics.subtitle')}
             </p>
           </div>
@@ -174,7 +174,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               className={cn(
                 'font-neo-body font-bold rounded-neo',
                 'data-[state=active]:bg-neo-cyan data-[state=active]:text-neo-black',
-                'data-[state=inactive]:text-neo-white/70',
+                'data-[state=inactive]:text-neo-white',
                 'transition-all duration-200'
               )}
             >
@@ -185,7 +185,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               className={cn(
                 'font-neo-body font-bold rounded-neo',
                 'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white',
-                'data-[state=inactive]:text-neo-white/70',
+                'data-[state=inactive]:text-neo-white',
                 'transition-all duration-200'
               )}
             >
@@ -196,7 +196,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               className={cn(
                 'font-neo-body font-bold rounded-neo',
                 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black',
-                'data-[state=inactive]:text-neo-white/70',
+                'data-[state=inactive]:text-neo-white',
                 'transition-all duration-200'
               )}
             >
@@ -207,7 +207,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               className={cn(
                 'font-neo-body font-bold rounded-neo',
                 'data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black',
-                'data-[state=inactive]:text-neo-white/70',
+                'data-[state=inactive]:text-neo-white',
                 'transition-all duration-200'
               )}
             >
@@ -276,7 +276,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
                   key={`${activity.studentId}-${activity.timestamp.getTime()}-${index}`}
                   className="flex items-center justify-between text-sm font-neo-body"
                 >
-                  <span className="text-neo-white/80">
+                  <span className="text-neo-white">
                     {activity.studentName}{' '}
                     <span className="text-neo-cyan">
                       {activity.activity === 'lesson_completed'
@@ -286,7 +286,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
                         : 'attempted a word'}
                     </span>
                   </span>
-                  <span className="text-neo-white/50 text-xs">
+                  <span className="text-neo-white text-xs">
                     {new Date(activity.timestamp).toLocaleTimeString(locale, {
                       hour: '2-digit',
                       minute: '2-digit',

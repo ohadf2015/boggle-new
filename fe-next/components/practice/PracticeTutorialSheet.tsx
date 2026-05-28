@@ -139,18 +139,18 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
             href={backHref}
             data-testid="practice-tutorial-back"
             aria-label={t('common.back')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-neo-cream/30 text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 text-xs font-neo-display font-bold uppercase tracking-wide transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-neo-cream/30 text-neo-white hover:text-neo-white hover:border-neo-cream/60 text-xs font-neo-display font-bold uppercase tracking-wide transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" aria-hidden />
             <span>{t('common.back')}</span>
           </Link>
-          <p className="text-[0.65rem] font-neo-body text-neo-cream/70 uppercase tracking-wider font-bold">
+          <p className="text-[0.65rem] font-neo-body text-neo-white uppercase tracking-wider font-bold">
             {t('gameModes.tutorial.title')}
           </p>
           <button
             type="button"
             onClick={handleSkip}
-            className="py-2 px-3 text-sm bg-neo-cream/10 rounded-full border-2 border-neo-cream/30 hover:bg-neo-cream/20 transition text-neo-cream font-neo-display font-bold"
+            className="py-2 px-3 text-sm bg-neo-cream/10 rounded-full border-2 border-neo-cream/30 hover:bg-neo-cream/20 transition text-neo-white font-neo-display font-bold"
           >
             {t('gameModes.intro.skip')}
           </button>
@@ -158,10 +158,10 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
 
         {/* Title row */}
         <div className="text-center">
-          <h2 className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-cream">
+          <h2 className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-white">
             {t(`gameModes.${mode}.name`)}
           </h2>
-          <p className="text-sm sm:text-base font-neo-body text-neo-cream/85 italic mt-1">
+          <p className="text-sm sm:text-base font-neo-body text-neo-white italic mt-1">
             {t(`gameModes.${mode}.intro.greet`)}
           </p>
         </div>
@@ -209,7 +209,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
                       >
                         <Icon className="w-5 h-5" strokeWidth={2.5} />
                       </span>
-                      <p className="flex-1 text-base sm:text-lg font-neo-display font-bold text-neo-cream leading-tight line-clamp-2 max-h-[3.5rem]">
+                      <p className="flex-1 text-base sm:text-lg font-neo-display font-bold text-neo-white leading-tight line-clamp-2 max-h-[3.5rem]">
                         {t(tipKey)}
                       </p>
                     </div>
@@ -218,7 +218,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
               })}
             </m.div>
             {/* Step ribbon */}
-            <div className="absolute top-3 end-3 px-3 py-1 rounded-full bg-neo-navy border-2 border-neo-cream/60 text-neo-cream text-sm font-neo-display font-bold">
+            <div className="absolute top-3 end-3 px-3 py-1 rounded-full bg-neo-navy border-2 border-neo-cream/60 text-neo-white text-sm font-neo-display font-bold">
               {activeSlide + 1} / {tipKeys.length}
             </div>
             {/* Prev / next chevrons (desktop affordance) */}
@@ -227,7 +227,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
               onClick={() => goToSlide(activeSlide - 1, { user: true })}
               disabled={activeSlide === 0}
               aria-label={t('howToPlay.back')}
-              className="hidden md:flex absolute start-2 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-neo-navy/80 border-2 border-neo-black text-neo-cream disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neo-navy"
+              className="hidden md:flex absolute start-2 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-neo-navy/80 border-2 border-neo-black text-neo-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neo-navy"
             >
               <ChevronLeft className="w-5 h-5 rtl:rotate-180" aria-hidden />
             </button>
@@ -236,7 +236,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
               onClick={() => goToSlide(activeSlide + 1, { user: true })}
               disabled={activeSlide === tipKeys.length - 1}
               aria-label={t('howToPlay.nextStep')}
-              className="hidden md:flex absolute end-2 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-neo-navy/80 border-2 border-neo-black text-neo-cream disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neo-navy"
+              className="hidden md:flex absolute end-2 top-1/2 -translate-y-1/2 w-9 h-9 items-center justify-center rounded-full bg-neo-navy/80 border-2 border-neo-black text-neo-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-neo-navy"
             >
               <ChevronRight className="w-5 h-5 rtl:rotate-180" aria-hidden />
             </button>

@@ -78,7 +78,7 @@ export default function MemoryHunt({
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        'bg-slate-800'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
@@ -94,7 +94,7 @@ export default function MemoryHunt({
           </div>
           <div className={cn(
             'px-2 py-1 rounded border-2 border-neo-black text-xs font-bold',
-            'bg-slate-700 text-neo-white'
+            'bg-neo-navy-elevated text-neo-white'
           )}>
             {t('brain.drills.round')} {game.round}/5
           </div>
@@ -128,13 +128,13 @@ export default function MemoryHunt({
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              'text-neo-white/70'
+              'text-neo-white'
             )}>
               {t('brain.drills.memory-hunt.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-slate-800'
+              'bg-neo-navy-light'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.memory-hunt.wordsToRemember')}: {game.levelConfig.wordCount}</p>
@@ -181,7 +181,7 @@ export default function MemoryHunt({
                     exit={{ scale: 0.8, opacity: 0 }}
                     className={cn(
                       'w-full max-w-lg p-6 rounded-neo border-4 border-neo-black shadow-hard-lg',
-                      'bg-slate-800'
+                      'bg-neo-navy-light'
                     )}
                   >
                     <div className="flex items-center justify-between mb-6">
@@ -206,7 +206,7 @@ export default function MemoryHunt({
                     </div>
                     <p className={cn(
                       'text-center text-lg font-medium mb-4',
-                      'text-neo-white/80'
+                      'text-neo-white'
                     )}>
                       {t('brain.drills.memory-hunt.studyTheseWords')}
                     </p>
@@ -327,11 +327,11 @@ export default function MemoryHunt({
 
             <div className={cn(
               'p-3 rounded-neo border-2 border-neo-black text-center',
-              'bg-slate-800'
+              'bg-neo-navy-light'
             )}>
               <p className={cn(
                 'text-xs font-medium mb-2',
-                'text-neo-white/70'
+                'text-neo-white'
               )}>
                 {t('brain.drills.memory-hunt.remaining')}: {game.remainingWords.length}
               </p>
@@ -343,7 +343,7 @@ export default function MemoryHunt({
                       'px-3 py-1.5 rounded-neo border-2 border-neo-black text-base font-bold min-w-[5ch] text-center',
                       tw.found
                         ? 'bg-neo-green/30 text-neo-green line-through'
-                        : 'bg-slate-700 text-gray-300'
+                        : 'bg-neo-navy-elevated text-gray-300'
                     )}
                   >
                     {tw.found ? tw.word : '???'}
@@ -395,7 +395,7 @@ export default function MemoryHunt({
                   'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
                   'font-bold text-sm uppercase',
                   'transition-all hover:-translate-y-px',
-                  'bg-slate-700 text-neo-white'
+                  'bg-neo-navy-elevated text-neo-white'
                 )}
               >
                 {t('brain.drills.finishGame')}

@@ -136,7 +136,7 @@ const BotControls: React.FC<BotControlsProps> = ({
   };
 
   return (
-    <div className="bg-neo-navy-light text-neo-cream p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden space-y-3">
+    <div className="bg-neo-navy-light text-neo-white p-4 rounded-xl border-3 border-neo-black shadow-hard relative overflow-hidden space-y-3">
       <div className="absolute inset-0 bg-linear-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
 
       {/* Screen reader announcements */}
@@ -147,7 +147,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       {/* Header - always visible */}
       <div className="relative flex items-center gap-2">
         <Bot className="text-neo-cyan" aria-hidden="true" />
-        <span className="text-sm font-bold text-neo-cream uppercase">{t('bots.title')}</span>
+        <span className="text-sm font-bold text-neo-white uppercase">{t('bots.title')}</span>
         {bots.length > 0 && (
           <Badge className="bg-neo-cyan text-neo-black text-xs px-2 py-0.5 font-bold">
             {bots.length}
@@ -179,11 +179,11 @@ const BotControls: React.FC<BotControlsProps> = ({
             <div className="min-w-0">
               <label
                 htmlFor="auto-fill-switch"
-                className="text-sm font-bold text-neo-cream block cursor-pointer"
+                className="text-sm font-bold text-neo-white block cursor-pointer"
               >
                 {t('bots.autoFill')}
               </label>
-              <p className="text-xs text-neo-cream/60 truncate">
+              <p className="text-xs text-neo-white truncate">
                 {t('bots.autoFillDesc')}
               </p>
             </div>
@@ -201,7 +201,7 @@ const BotControls: React.FC<BotControlsProps> = ({
       {/* Current Bots List */}
       {bots.length > 0 && (
         <div className="relative space-y-2">
-          <p className="text-xs text-neo-cream/60">
+          <p className="text-xs text-neo-white">
             {t('bots.currentBots')}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -222,7 +222,7 @@ const BotControls: React.FC<BotControlsProps> = ({
                     )}
                   >
                     <Avatar customAvatar={bot.avatar?.customAvatar} userId={bot.username} size="sm" />
-                    <span className="text-xs text-neo-cream font-medium truncate max-w-[80px]">
+                    <span className="text-xs text-neo-white font-medium truncate max-w-[80px]">
                       {bot.username}
                     </span>
                     <Badge

@@ -58,7 +58,7 @@ export function VocabularyHeatmap({
         <div className="text-neo-white text-lg font-neo-display mb-2">
           {t('education.analytics.noVocabularyData')}
         </div>
-        <div className="text-neo-white/70">
+        <div className="text-neo-white">
           {t('education.analytics.practiceToSee')}
         </div>
       </div>

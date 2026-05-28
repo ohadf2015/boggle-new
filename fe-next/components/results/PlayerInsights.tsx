@@ -328,12 +328,12 @@ const PlayerInsights = memo<PlayerInsightsProps>(({ insights }) => {
               >
                 {playerStory.emoji}
               </m.span>
-              <h3 className="text-lg font-black text-neo-cream uppercase tracking-wide">
+              <h3 className="text-lg font-black text-neo-white uppercase tracking-wide">
                 {playerStory.headline}
               </h3>
               <Sparkles className="w-4 h-4 text-neo-lime ms-auto" />
             </div>
-            <p className="text-sm font-bold text-neo-cream leading-relaxed">
+            <p className="text-sm font-bold text-neo-white leading-relaxed">
               {playerStory.story}
             </p>
           </div>

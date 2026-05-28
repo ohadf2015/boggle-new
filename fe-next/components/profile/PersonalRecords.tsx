@@ -28,13 +28,13 @@ function RecordCard({ record, onShare }: { record: PersonalRecord; onShare: () =
     >
       <div className="flex items-center gap-2 text-neo-cyan">
         {ICON_MAP[record.icon] || <Trophy className="w-5 h-5" />}
-        <span className="text-xs font-bold uppercase tracking-wide text-neo-white/70">
+        <span className="text-xs font-bold uppercase tracking-wide text-neo-white">
           {t(record.label)}
         </span>
       </div>
       <div className="text-2xl font-black text-neo-white">{String(record.value)}</div>
       {record.date && (
-        <span className="text-[10px] text-neo-white/50">{record.date}</span>
+        <span className="text-[10px] text-neo-white">{record.date}</span>
       )}
       <button
         onClick={onShare}

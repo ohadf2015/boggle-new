@@ -10,7 +10,7 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon }: StatCardProps) {
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-3 flex items-center gap-3">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-3 flex items-center gap-3">
       {icon}
       <div>
         <div className="text-xl font-neo-display text-neo-white">{value}</div>

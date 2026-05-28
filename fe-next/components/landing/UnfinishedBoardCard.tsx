@@ -42,7 +42,7 @@ function MiniGridPreview({ grid }: { grid: LetterGrid }) {
               className={cn(
                 'aspect-square rounded-sm border border-neo-black/30',
                 'flex items-center justify-center',
-                'text-[8px] font-black text-white/80',
+                'text-[8px] font-black text-white',
                 colors[colorIndex]
               )}
             >
@@ -103,7 +103,7 @@ const UnfinishedBoardCard = memo<UnfinishedBoardCardProps>(({
 
         {/* Info + CTA */}
         <div className="flex-1 flex flex-col justify-between">
-          <p className="text-xs text-neo-cream/70 font-medium">
+          <p className="text-xs text-neo-white font-medium">
             {t('unfinishedBoard.resumeDesc', { found: wordsFound, total: totalWords })}
           </p>
 

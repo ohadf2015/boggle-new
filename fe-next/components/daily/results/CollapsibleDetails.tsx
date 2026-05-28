@@ -33,7 +33,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
     <div className="rounded-neo border-2 border-neo-black overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+        className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-neo-navy-elevated hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
       >
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-neo-lime" />
@@ -67,7 +67,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-3 space-y-3 bg-white dark:bg-slate-800 text-neo-black dark:text-neo-white">
+            <div className="p-3 space-y-3 bg-white dark:bg-neo-navy-light text-neo-black dark:text-neo-white">
               {/* Coin rewards */}
               {coinReward && coinReward.awarded > 0 && (
                 <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">

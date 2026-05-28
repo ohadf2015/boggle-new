@@ -214,7 +214,7 @@ export function PowerUpBar({
             </button>
             <button
               onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); }}
-              className="px-2 py-1 text-xs font-bold text-neo-white/60"
+              className="px-2 py-1 text-xs font-bold text-neo-white"
             >
               ✕
             </button>

@@ -39,7 +39,7 @@ export default function PracticeHubWelcome() {
         />
       </AdaptiveMotion.div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-neo-display font-black text-neo-cream leading-tight">
+        <p className="text-sm font-neo-display font-black text-neo-white leading-tight">
           {t('practiceHub.welcome.title')}
         </p>
       </div>

@@ -67,7 +67,7 @@ export function AdminSubNav() {
   };
 
   return (
-    <div className="sm:hidden bg-slate-900/80 border-b border-slate-700/50 sticky top-0 z-40">
+    <div className="sm:hidden bg-neo-navy/80 border-b border-slate-700/50 sticky top-0 z-40">
       <div
         ref={scrollRef}
         className="flex gap-1.5 px-3 py-2 overflow-x-auto scrollbar-hide"
@@ -84,7 +84,7 @@ export function AdminSubNav() {
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors shrink-0',
                 active
                   ? 'bg-neo-lime/20 text-neo-lime border border-neo-lime/40'
-                  : 'bg-slate-800 text-slate-400 border border-slate-700 active:bg-slate-700'
+                  : 'bg-neo-navy-light text-slate-400 border border-slate-700 active:bg-neo-navy-elevated'
               )}
             >
               <Icon className="w-3.5 h-3.5" />

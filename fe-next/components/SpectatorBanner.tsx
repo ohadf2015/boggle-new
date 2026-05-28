@@ -76,7 +76,7 @@ export function SpectatorBanner({
                   </span>
                 )}
               </div>
-              <p className="text-xs sm:text-sm mt-0.5 text-white/90 line-clamp-1">
+              <p className="text-xs sm:text-sm mt-0.5 text-white line-clamp-1">
                 {customMessage || t('spectator.explanation')}
               </p>
             </div>

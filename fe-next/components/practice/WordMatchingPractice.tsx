@@ -246,7 +246,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               size="sm"
               onClick={onBack}
               aria-label={t('common.back')}
-              className="text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10"
+              className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
             >
               <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
             </Button>
@@ -256,7 +256,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
                 {t('education.practice.matchPairs')}
               </h2>
               <div className="flex flex-col items-center gap-1">
-                <p className="text-neo-white/70 font-neo-body">
+                <p className="text-neo-white font-neo-body">
                   {matchedPairs.size} / {words.length}
                 </p>
                 <div className="h-1.5 w-24 bg-neo-black/30 rounded-neo overflow-hidden">
@@ -288,7 +288,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
           >
             {/* Word column */}
             <div className="space-y-3">
-              <h3 className="text-sm font-neo-display text-neo-white/60 uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-neo-display text-neo-white uppercase tracking-wide mb-3">
                 {t('education.practice.matchingWords')}
               </h3>
               <AdaptiveMotion.div className="space-y-3">
@@ -321,7 +321,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
 
             {/* Definition column */}
             <div className="space-y-3">
-              <h3 className="text-sm font-neo-display text-neo-white/60 uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-neo-display text-neo-white uppercase tracking-wide mb-3">
                 {t('education.practice.matchingDefinitions')}
               </h3>
               <AdaptiveMotion.div className="space-y-3">

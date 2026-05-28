@@ -232,7 +232,7 @@ export default function DrillProgressionOverlay({
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className={cn(
               'relative w-full max-w-sm rounded-neo border-4 border-neo-black shadow-hard-lg p-6',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             {/* Close button */}
@@ -242,7 +242,7 @@ export default function DrillProgressionOverlay({
               className={cn(
                 'absolute top-3 right-3 p-1.5 rounded-neo border-2 border-neo-black',
                 'transition-all hover:scale-105',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-100 text-neo-black'
+                isDarkMode ? 'bg-neo-navy-elevated text-neo-white' : 'bg-gray-100 text-neo-black'
               )}
             >
               <X className="w-4 h-4" />
@@ -273,7 +273,7 @@ export default function DrillProgressionOverlay({
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                   'text-sm font-bold uppercase tracking-wide mb-2',
-                  isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                  isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
                 )}
               >
                 {t('brain.drills.brainTraining')}
@@ -334,7 +334,7 @@ export default function DrillProgressionOverlay({
                     </span>
                     <span className={cn(
                       'text-xl font-bold',
-                      isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                     )}>
                       /100
                     </span>
@@ -343,7 +343,7 @@ export default function DrillProgressionOverlay({
                   {/* Progress Bar */}
                   <div className={cn(
                     'h-3 mt-3 rounded-full border-2 border-neo-black overflow-hidden',
-                    isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                    isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200'
                   )}>
                     <m.div
                       className={cn('h-full', domainConfig.bgColor)}
@@ -414,7 +414,7 @@ export default function DrillProgressionOverlay({
                 >
                   <p className={cn(
                     'text-xs font-bold uppercase tracking-wide mb-1',
-                    isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                    isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                   )}>
                     {t('brain.overallScore')}
                   </p>
@@ -427,7 +427,7 @@ export default function DrillProgressionOverlay({
                     </span>
                     <span className={cn(
                       'px-2 py-0.5 rounded-neo border-2 border-neo-black text-xs font-bold uppercase',
-                      isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-100 text-neo-black'
+                      isDarkMode ? 'bg-neo-navy-elevated text-neo-white' : 'bg-gray-100 text-neo-black'
                     )}>
                       {t(`brain.tiers.${tier}`)}
                     </span>

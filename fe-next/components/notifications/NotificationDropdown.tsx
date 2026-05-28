@@ -100,7 +100,7 @@ export function NotificationDropdown({
               onClick={() => setShowUnreadOnly(!showUnreadOnly)}
               className={`
                 text-xs transition-colors font-medium
-                ${showUnreadOnly ? 'text-neo-lime' : 'text-neo-white/50 hover:text-neo-cyan'}
+                ${showUnreadOnly ? 'text-neo-lime' : 'text-neo-white hover:text-neo-cyan'}
               `}
             >
               {showUnreadOnly ? t('notifications.showAll', 'All') : t('notifications.unreadOnly', 'Unread')}
@@ -121,7 +121,7 @@ export function NotificationDropdown({
             <button
               onClick={onClearAll}
               className="
-                text-xs text-neo-white/50 hover:text-neo-red
+                text-xs text-neo-white hover:text-neo-red
                 transition-colors font-medium
               "
             >
@@ -134,7 +134,7 @@ export function NotificationDropdown({
       {/* Notification list */}
       <div className="overflow-y-auto max-h-72">
         {notifications.length === 0 ? (
-          <div className="py-8 px-4 text-center text-neo-white/50">
+          <div className="py-8 px-4 text-center text-neo-white">
             <span className="text-3xl block mb-2">🔔</span>
             <p className="text-sm">
               {t('notifications.empty')}
@@ -177,7 +177,7 @@ export function NotificationDropdown({
           }}
           className="
             w-full flex items-center justify-center gap-1.5
-            text-xs text-neo-white/40 hover:text-neo-cyan
+            text-xs text-neo-white hover:text-neo-cyan
             transition-colors font-medium py-1
           "
         >
@@ -192,17 +192,17 @@ export function NotificationDropdown({
       {showPrevious && (
         <div className="border-t-2 border-black/20">
           <div className="px-4 py-2 bg-neo-navy/80">
-            <span className="text-xs text-neo-white/40 font-medium">
+            <span className="text-xs text-neo-white font-medium">
               {t('notifications.previousTitle', 'Previously cleared')}
             </span>
           </div>
           <div className="overflow-y-auto overscroll-contain max-h-64 bg-neo-white/5">
             {isLoadingPrevious ? (
-              <div className="py-4 text-center text-neo-white/40 text-xs">
+              <div className="py-4 text-center text-neo-white text-xs">
                 {t('common.loading', 'Loading...')}
               </div>
             ) : previousNotifications.length === 0 ? (
-              <div className="py-4 text-center text-neo-white/30 text-xs">
+              <div className="py-4 text-center text-neo-white text-xs">
                 {t('notifications.noPrevious', 'No previous notifications')}
               </div>
             ) : (

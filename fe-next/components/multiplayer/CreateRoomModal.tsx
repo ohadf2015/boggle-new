@@ -213,7 +213,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 className={cn(
                   'w-full bg-transparent text-center font-neo-display font-bold text-2xl text-neo-white',
                   'border-b-3 pb-1.5 outline-hidden transition-colors',
-                  'placeholder:text-neo-white/15',
+                  'placeholder:text-neo-white',
                   nameError
                     ? 'border-red-500 animate-neo-shake'
                     : nameFocused
@@ -250,14 +250,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                       {isAuthenticated ? `✓ ${t('common.verified')}` : `✓ ${t('common.looksGood')}`}
                     </AdaptiveMotion.span>
                   ) : (
-                    <span className="text-[10px] text-neo-white/25">
+                    <span className="text-[10px] text-neo-white">
                       {t('multiplayerFlow.profileSetup.usernameHint')}
                     </span>
                   )}
                 </AdaptiveAnimatePresence>
                 <span className={cn(
                   'text-[10px] font-mono tabular-nums',
-                  username.length >= MAX_NAME_LENGTH ? 'text-neo-orange font-bold' : 'text-neo-white/20',
+                  username.length >= MAX_NAME_LENGTH ? 'text-neo-orange font-bold' : 'text-neo-white',
                 )}>
                   {username.length}/{MAX_NAME_LENGTH}
                 </span>
@@ -275,7 +275,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             transition={{ ...SPRING, delay: 0.18 }}
             className="space-y-1.5"
           >
-            <label htmlFor="create-room-name" className="text-[10px] font-black uppercase text-neo-white/35 flex items-center gap-1.5 tracking-widest">
+            <label htmlFor="create-room-name" className="text-[10px] font-black uppercase text-neo-white flex items-center gap-1.5 tracking-widest">
               <MapPin className="w-3 h-3" />
               {t('multiplayerFlow.createModal.roomNameLabel')}
               <span className="font-normal lowercase opacity-50 ms-auto">
@@ -288,7 +288,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               onChange={(e) => setRoomName(e.target.value)}
               maxLength={MAX_ROOM_LENGTH}
               placeholder={generateRoomName(username || 'Your')}
-              className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white/25 outline-hidden focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
+              className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white outline-hidden focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
             />
           </AdaptiveMotion.div>
 
@@ -299,7 +299,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             transition={{ ...SPRING, delay: 0.22 }}
             className="space-y-2"
           >
-            <p className="text-[10px] font-black uppercase text-neo-white/35 tracking-widest">
+            <p className="text-[10px] font-black uppercase text-neo-white tracking-widest">
               {t('joinView.selectLanguage')}
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -314,7 +314,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 font-bold text-sm transition-all',
                     language === lang.code
                       ? 'bg-neo-lime/15 border-neo-lime text-neo-lime shadow-hard-sm'
-                      : 'bg-neo-navy-light/30 border-neo-white/10 text-neo-white/50 hover:border-neo-white/30 hover:text-neo-white/70',
+                      : 'bg-neo-navy-light/30 border-neo-white/10 text-neo-white hover:border-neo-white/30 hover:text-neo-white',
                   )}
                 >
                   <span className="text-base leading-none">{lang.flag}</span>
@@ -340,7 +340,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               'flex items-center justify-center gap-3',
               'transition-all duration-150',
               isCreating
-                ? 'bg-neo-navy-light text-neo-white/40 shadow-none cursor-wait'
+                ? 'bg-neo-navy-light text-neo-white shadow-none cursor-wait'
                 : 'bg-neo-lime text-neo-black shadow-hard-lg hover:shadow-hard-xl active:shadow-hard-pressed',
             )}
           >

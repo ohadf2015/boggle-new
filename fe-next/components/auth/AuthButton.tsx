@@ -164,7 +164,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
   // Without this guard, standard auth buttons flash for ~5s before SDK detects CrazyGames.
   if (loading || !isReady) {
     return (
-      <div className={cn('w-24 h-9 rounded-full animate-pulse', isDarkMode ? 'bg-slate-700' : 'bg-gray-200')} />
+      <div className={cn('w-24 h-9 rounded-full animate-pulse', isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200')} />
     );
   }
 
@@ -207,7 +207,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           className={cn(
             'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
             isDarkMode
-              ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
+              ? 'bg-neo-navy-light text-cyan-300 hover:bg-neo-navy-elevated hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
               : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
           )}
         >
@@ -310,7 +310,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
   if (hideLogin) {
     if (isCrazyGamesLoggedIn && crazyGamesUser) {
       return (
-        <div className="flex items-center gap-1 sm:gap-2 rounded-full px-2 sm:px-3 min-h-[44px] bg-slate-800 text-cyan-300 border border-slate-700">
+        <div className="flex items-center gap-1 sm:gap-2 rounded-full px-2 sm:px-3 min-h-[44px] bg-neo-navy-light text-cyan-300 border border-slate-700">
           {crazyGamesUser.profilePictureUrl ? (
             <Image src={crazyGamesUser.profilePictureUrl} alt={crazyGamesUser.username} width={24} height={24} className="w-6 h-6 rounded-full object-cover" unoptimized />
           ) : (

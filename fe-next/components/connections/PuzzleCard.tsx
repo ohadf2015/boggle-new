@@ -152,7 +152,7 @@ export default function PuzzleCard({
               'absolute top-3 font-mono text-xs uppercase tracking-widest',
               'px-2 py-0.5 rounded border',
               isRTL ? 'left-3' : 'right-3',
-              DIFFICULTY_STYLE[puzzle.difficulty] ?? 'border-neo-white/20 text-neo-white/40',
+              DIFFICULTY_STYLE[puzzle.difficulty] ?? 'border-neo-white/20 text-neo-white',
             ].join(' ')}
           >
             {puzzle.difficulty}
@@ -167,7 +167,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
+              className="font-neo-display text-2xl text-neo-white font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
             >
               {puzzle.word1}
             </m.span>
@@ -178,7 +178,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="text-neo-white/30 text-xl font-mono select-none"
+              className="text-neo-white text-xl font-mono select-none"
             >
               +
             </m.span>
@@ -223,7 +223,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="text-neo-white/30 text-xl font-mono select-none"
+              className="text-neo-white text-xl font-mono select-none"
             >
               +
             </m.span>
@@ -234,7 +234,7 @@ export default function PuzzleCard({
               initial="initial"
               animate="animate"
               exit="exit"
-              className="font-neo-display text-2xl text-neo-cream font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
+              className="font-neo-display text-2xl text-neo-white font-bold tracking-wider px-3 py-1 rounded-neo border border-neo-white/20 bg-neo-navy shadow-hard-sm"
             >
               {puzzle.word2}
             </m.span>
@@ -289,7 +289,7 @@ export default function PuzzleCard({
               transition={{ type: 'spring', stiffness: 320, damping: 18 }}
               className="text-neo-red text-center text-sm font-bold mb-4"
             >
-              {t('connections.solutionIs')}: <span className="text-neo-cream">{puzzle.bridge}</span>
+              {t('connections.solutionIs')}: <span className="text-neo-white">{puzzle.bridge}</span>
             </m.p>
           )}
         </AnimatePresence>
@@ -307,7 +307,7 @@ export default function PuzzleCard({
             className={[
               'flex-1 min-w-0 rounded-neo border-neo bg-neo-navy text-neo-white font-neo-body',
               'px-4 py-3 text-lg outline-none transition-colors duration-200',
-              'placeholder:text-neo-white/30 shadow-hard',
+              'placeholder:text-neo-white shadow-hard',
               isRTL ? 'text-right' : 'text-left',
               isCorrect ? 'border-neo-lime' : 'border-neo-white/20 focus:border-neo-cyan',
             ].join(' ')}
@@ -398,7 +398,7 @@ export default function PuzzleCard({
           >
             {!hasRated ? (
               <>
-                <p className="text-neo-white/60 text-xs uppercase tracking-widest">
+                <p className="text-neo-white text-xs uppercase tracking-widest">
                   {t('connections.rateThis')}
                 </p>
                 <div className="flex gap-3">

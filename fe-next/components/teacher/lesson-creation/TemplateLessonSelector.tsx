@@ -211,7 +211,7 @@ export default function TemplateLessonSelector({
               'px-3 py-2 rounded-neo border-neo font-neo-body text-sm transition-all',
               selectedCategory === category
                 ? 'bg-neo-pink text-neo-white shadow-hard-sm'
-                : 'bg-neo-navy text-neo-white/60 hover:bg-neo-navy/80'
+                : 'bg-neo-navy text-neo-white hover:bg-neo-navy/80'
             )}
           >
             {t(`teacher.lesson.category.${category}`)}
@@ -234,7 +234,7 @@ export default function TemplateLessonSelector({
             <div className="font-neo-display text-neo-white mb-1 text-balance">
               {template.name}
             </div>
-            <div className="text-sm text-neo-white/70 mb-2 text-pretty">
+            <div className="text-sm text-neo-white mb-2 text-pretty">
               {template.description}
             </div>
             <div className="flex items-center gap-2 text-xs text-neo-cyan">
@@ -247,7 +247,7 @@ export default function TemplateLessonSelector({
 
       {/* Empty state */}
       {filteredTemplates.length === 0 && (
-        <div className="text-center py-8 text-neo-white/50 font-neo-body">
+        <div className="text-center py-8 text-neo-white font-neo-body">
           No templates available for this category
         </div>
       )}

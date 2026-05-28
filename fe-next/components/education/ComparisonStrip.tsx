@@ -124,7 +124,7 @@ export function ComparisonStrip() {
       >
         {t('education.landing.compare.title')}
       </h2>
-      <p data-compare-head className="mt-2 text-neo-white/80">
+      <p data-compare-head className="mt-2 text-neo-white">
         {t('education.landing.compare.subtitle')}
       </p>
 

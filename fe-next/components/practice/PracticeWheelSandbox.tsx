@@ -370,7 +370,7 @@ export default function PracticeWheelSandbox() {
           href={`/${language}/practice`}
           data-testid="practice-back-to-hub"
           aria-label={t('practiceHub.backToHub')}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 shrink-0 transition-colors opacity-70 hover:opacity-100"
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-white hover:text-neo-white hover:border-neo-cream/60 shrink-0 transition-colors opacity-70 hover:opacity-100"
         >
           <ArrowLeft className="w-3 h-3 rtl:rotate-180" aria-hidden />
           <span>{t('practiceHub.backToHub')}</span>
@@ -378,13 +378,13 @@ export default function PracticeWheelSandbox() {
         <div className="flex items-center gap-2">
           <div
             data-testid="practice-wheel-score"
-            className="px-2.5 py-1 rounded-full bg-neo-purple/20 border border-neo-purple text-neo-cream text-xs font-neo-display font-black whitespace-nowrap"
+            className="px-2.5 py-1 rounded-full bg-neo-purple/20 border border-neo-purple text-neo-white text-xs font-neo-display font-black whitespace-nowrap"
           >
             {t('practice.wheelRush.scoreChip', { score: previewScore })}
           </div>
           <div
             data-testid="practice-goal-indicator"
-            className="px-2.5 py-1 rounded-full bg-neo-cream/10 border border-neo-cream/30 text-neo-cream text-xs font-neo-display font-black whitespace-nowrap"
+            className="px-2.5 py-1 rounded-full bg-neo-cream/10 border border-neo-cream/30 text-neo-white text-xs font-neo-display font-black whitespace-nowrap"
           >
             {foundWords.length}/{PRACTICE_GOALS.wheelRush}
           </div>
@@ -461,7 +461,7 @@ export default function PracticeWheelSandbox() {
                 : feedback === 'noCenter'
                   ? 'bg-neo-pink/20 border-neo-pink text-neo-pink'
                   : feedback === 'dup'
-                    ? 'bg-neo-cream/15 border-neo-cream/50 text-neo-cream/85'
+                    ? 'bg-neo-cream/15 border-neo-cream/50 text-neo-white'
                     : 'bg-neo-red/20 border-neo-red text-neo-red')
             }
           >
@@ -487,7 +487,7 @@ export default function PracticeWheelSandbox() {
         transition={{ duration: 0.4 }}
       >
         {built.length === 0 && (
-          <span className="text-neo-cream/55 font-neo-body text-xs italic">
+          <span className="text-neo-white font-neo-body text-xs italic">
             {t('practice.wheelRush.builderHint')}
           </span>
         )}
@@ -539,7 +539,7 @@ export default function PracticeWheelSandbox() {
           data-testid="practice-wheel-shuffle"
           onClick={handleShuffle}
           aria-label={t('practice.wheelRush.shuffle')}
-          className="inline-flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-purple text-neo-cream shadow-hard active:translate-y-px active:shadow-hard-pressed"
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-purple text-neo-white shadow-hard active:translate-y-px active:shadow-hard-pressed"
           initial={{ opacity: 0, y: 8, scale: 0.85 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.18, type: 'spring', stiffness: 360, damping: 22 }}
@@ -561,7 +561,7 @@ export default function PracticeWheelSandbox() {
                 'px-2 py-0.5 rounded border text-xs font-neo-display font-bold transition-colors ' +
                 (isLast
                   ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
-                  : 'bg-neo-navy-light border-neo-black/40 text-neo-cream')
+                  : 'bg-neo-navy-light border-neo-black/40 text-neo-white')
               }
             >
               {w}
@@ -592,7 +592,7 @@ export default function PracticeWheelSandbox() {
             exit={{ opacity: 0, y: -60 }}
             transition={{ duration: 0.9, ease: 'easeOut' }}
             onAnimationComplete={() => setScorePopup(null)}
-            className="absolute left-1/2 top-1/3 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-purple text-neo-cream font-neo-display font-black text-base shadow-hard"
+            className="absolute left-1/2 top-1/3 -translate-x-1/2 pointer-events-none px-3 py-1.5 rounded-neo border-2 border-neo-black bg-neo-purple text-neo-white font-neo-display font-black text-base shadow-hard"
           >
             +{scorePopup.points} pts
           </m.div>
@@ -605,7 +605,7 @@ export default function PracticeWheelSandbox() {
         <Link
           href={`/${language}/daily/word-wheel`}
           data-testid="practice-bailout-cta"
-          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
+          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
         >
           {t(isComplete ? 'practice.wordHunt.playRealCta' : 'practice.wordHunt.bailoutCta')}
         </Link>

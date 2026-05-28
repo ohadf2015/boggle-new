@@ -33,7 +33,7 @@ export const BotWordCard = memo(function BotWordCard({ bot, language, t }: BotWo
   );
 
   return (
-    <div className="bg-slate-800/50 border-2 border-slate-600 rounded-neo p-3">
+    <div className="bg-neo-navy-light/50 border-2 border-slate-600 rounded-neo p-3">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
@@ -42,7 +42,7 @@ export const BotWordCard = memo(function BotWordCard({ bot, language, t }: BotWo
           <span className="font-bold text-white text-sm">{bot.name}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-white/60 font-medium">
+          <span className="text-xs text-white font-medium">
             {bot.totalWords} {t('singlePlayer.botWords')}
           </span>
           <span className="text-sm font-black text-neo-lime">{bot.score} pts</span>
@@ -63,13 +63,13 @@ export const BotWordCard = memo(function BotWordCard({ bot, language, t }: BotWo
             );
           })}
           {bot.words.length > 20 && (
-            <span className="text-[10px] text-white/70 font-medium self-center">
+            <span className="text-[10px] text-white font-medium self-center">
               +{bot.words.length - 20} more
             </span>
           )}
         </div>
       ) : (
-        <p className="text-xs text-white/60 italic">
+        <p className="text-xs text-white italic">
           {t('singlePlayer.noWordsToShow')}
         </p>
       )}

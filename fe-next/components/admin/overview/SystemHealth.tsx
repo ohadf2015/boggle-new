@@ -26,7 +26,7 @@ export function SystemHealth({ health }: SystemHealthProps) {
 
   if (!health) {
     return (
-      <div data-testid="health-loading" className="bg-slate-800/50 rounded-neo border-neo border-black p-4 animate-pulse h-20" />
+      <div data-testid="health-loading" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 animate-pulse h-20" />
     );
   }
 
@@ -36,7 +36,7 @@ export function SystemHealth({ health }: SystemHealthProps) {
   ];
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           {services.map((svc) => {

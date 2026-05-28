@@ -26,7 +26,7 @@ export const ChapterQuestProgress = memo(function ChapterQuestProgress({
 
   return (
     <div data-testid="chapter-quest-progress" className="space-y-2">
-      <h3 className="text-xs font-black text-neo-white/70 uppercase tracking-wide">
+      <h3 className="text-xs font-black text-neo-white uppercase tracking-wide">
         {t('adventure.quest.title')}
       </h3>
       {quests.map((quest) => {
@@ -45,7 +45,7 @@ export const ChapterQuestProgress = memo(function ChapterQuestProgress({
             )}
           >
             <div className="flex items-center justify-between mb-1">
-              <span className={cn('text-[10px] font-bold', isComplete ? 'text-neo-lime' : 'text-neo-white/70')}>
+              <span className={cn('text-[10px] font-bold', isComplete ? 'text-neo-lime' : 'text-neo-white')}>
                 {t(quest.titleKey)}
               </span>
               {isComplete && (
@@ -70,7 +70,7 @@ export const ChapterQuestProgress = memo(function ChapterQuestProgress({
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <span className="text-[9px] font-mono font-bold text-neo-white/50">
+              <span className="text-[9px] font-mono font-bold text-neo-white">
                 {current}/{quest.target}
               </span>
             </div>

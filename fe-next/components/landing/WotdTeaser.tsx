@@ -61,7 +61,7 @@ export function WotdTeaser({ className }: WotdTeaserProps) {
               <>
                 <span
                   data-testid="wotd-masked"
-                  className="text-lg font-neo-display text-white/30 tracking-[0.3em]"
+                  className="text-lg font-neo-display text-white tracking-[0.3em]"
                 >
                   {maskedChars}
                 </span>
@@ -82,7 +82,7 @@ export function WotdTeaser({ className }: WotdTeaserProps) {
                 </span>
                 <span
                   data-testid="wotd-masked"
-                  className="text-lg font-mono text-white/30 tracking-[0.3em]"
+                  className="text-lg font-mono text-white tracking-[0.3em]"
                 >
                   {maskedChars}
                 </span>

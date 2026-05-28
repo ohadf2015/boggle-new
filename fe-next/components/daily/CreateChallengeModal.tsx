@@ -554,7 +554,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <Button
                       variant="ghost"
                       onClick={handleClose}
-                      className="w-full max-w-btn text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg py-3"
+                      className="w-full max-w-btn text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-neo-navy-light rounded-lg py-3"
                     >
                       {t('daily.close')}
                     </Button>

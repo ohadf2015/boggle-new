@@ -241,7 +241,7 @@ lexiclash.com`;
                 <Brain className="w-5 h-5 text-white" />
                 <span className="text-white font-bold text-sm">LexiClash</span>
               </div>
-              <span className="text-white/70 text-xs">
+              <span className="text-white text-xs">
                 {gamesAnalyzed} {t('brain.share.games')}
               </span>
             </div>
@@ -250,7 +250,7 @@ lexiclash.com`;
           {/* Share Actions */}
           <div className={cn(
             'mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard',
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
+            isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
           )}>
             <div className="flex items-center justify-between mb-3">
               <h3 className={cn(
@@ -264,7 +264,7 @@ lexiclash.com`;
                 aria-label={t('common.close')}
                 className={cn(
                   'p-1.5 rounded-neo border-2 border-neo-black',
-                  isDarkMode ? 'bg-slate-700' : 'bg-gray-100'
+                  isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-100'
                 )}
               >
                 <X className="w-4 h-4" />
@@ -278,7 +278,7 @@ lexiclash.com`;
                 className={cn(
                   'flex flex-col items-center gap-1.5 p-3 rounded-neo border-2 border-neo-black',
                   'transition-all hover:translate-y-[-2px] hover:shadow-hard-sm',
-                  copied ? 'bg-neo-green' : isDarkMode ? 'bg-slate-700' : 'bg-gray-100'
+                  copied ? 'bg-neo-green' : isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-100'
                 )}
               >
                 {copied ? (

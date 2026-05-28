@@ -19,12 +19,12 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'home', labelKey: 'nav.home', icon: Home, route: '', color: 'text-neo-white/50', activeColor: 'text-neo-lime border-neo-lime' },
-  { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Zap, route: '/singleplayer', color: 'text-neo-white/50', activeColor: 'text-neo-cyan border-neo-cyan' },
-  { id: 'multiplayer', labelKey: 'nav.play', icon: Swords, route: '/multiplayer', color: 'text-neo-white/50', activeColor: 'text-neo-pink border-neo-pink' },
-  { id: 'daily', labelKey: 'nav.daily', icon: Calendar, route: '/daily', color: 'text-neo-white/50', activeColor: 'text-neo-yellow border-neo-yellow' },
-  { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: Trophy, route: '/leaderboard', color: 'text-neo-white/50', activeColor: 'text-neo-yellow border-neo-yellow' },
-  { id: 'friends', labelKey: 'nav.friends', icon: Users, route: '/friends', color: 'text-neo-white/50', activeColor: 'text-neo-pink border-neo-pink' },
+  { id: 'home', labelKey: 'nav.home', icon: Home, route: '', color: 'text-neo-white', activeColor: 'text-neo-lime border-neo-lime' },
+  { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Zap, route: '/singleplayer', color: 'text-neo-white', activeColor: 'text-neo-cyan border-neo-cyan' },
+  { id: 'multiplayer', labelKey: 'nav.play', icon: Swords, route: '/multiplayer', color: 'text-neo-white', activeColor: 'text-neo-pink border-neo-pink' },
+  { id: 'daily', labelKey: 'nav.daily', icon: Calendar, route: '/daily', color: 'text-neo-white', activeColor: 'text-neo-yellow border-neo-yellow' },
+  { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: Trophy, route: '/leaderboard', color: 'text-neo-white', activeColor: 'text-neo-yellow border-neo-yellow' },
+  { id: 'friends', labelKey: 'nav.friends', icon: Users, route: '/friends', color: 'text-neo-white', activeColor: 'text-neo-pink border-neo-pink' },
 ];
 
 /**
@@ -78,7 +78,7 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
                   'flex items-center gap-1.5 px-3 py-2.5 text-sm font-bold whitespace-nowrap transition-all duration-150 border-b-3 -mb-[2px]',
                   isActive
                     ? item.activeColor
-                    : cn(item.color, 'border-transparent hover:text-neo-white/80 hover:border-neo-white/20'),
+                    : cn(item.color, 'border-transparent hover:text-neo-white hover:border-neo-white/20'),
                 )}
                 aria-current={isActive ? 'page' : undefined}
               >

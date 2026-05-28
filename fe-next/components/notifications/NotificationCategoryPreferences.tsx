@@ -47,7 +47,9 @@ function CategoryToggle({ label, checked, onChange, icon, disabled }: CategoryTo
         <span
           className={cn(
             'absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200',
-            checked ? 'translate-x-5.5' : 'translate-x-0.5'
+            // Arbitrary px (track 44 − knob 20 − 2px gap = 22); the fractional
+            // translate-x-5.5 didn't generate reliably, leaving the knob short.
+            checked ? 'translate-x-[22px]' : 'translate-x-[2px]'
           )}
         />
       </button>
@@ -97,7 +99,7 @@ export function NotificationCategoryPreferences() {
     <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-neo border-neo border-slate-700 bg-slate-800/50 p-5"
+      className="rounded-neo border-neo border-slate-700 bg-neo-navy-light/50 p-5"
     >
       <h3 className="flex items-center gap-2 font-neo-display text-base font-bold text-neo-white mb-3">
         <Bell className="w-5 h-5 text-neo-pink" />

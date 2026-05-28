@@ -30,7 +30,7 @@ function StatChip({ icon, value, label, accent }: {
       <span className={`flex items-center gap-1 ${accent}`}>{icon}
         <span className="text-base font-black tabular-nums">{value}</span>
       </span>
-      <span className="text-[9px] uppercase tracking-wider text-neo-cream/50">{label}</span>
+      <span className="text-[9px] uppercase tracking-wider text-neo-white">{label}</span>
     </div>
   );
 }
@@ -60,7 +60,7 @@ export default function BlastResultsScene({ playerStats, scores, currentUsername
     <m.div variants={container} initial="hidden" animate="show" className="space-y-3">
       <m.div variants={v} className="flex items-center gap-2 px-1">
         <Bomb className="w-5 h-5 text-neo-lime" />
-        <h3 className="text-sm font-black uppercase tracking-wider text-neo-cream/80">
+        <h3 className="text-sm font-black uppercase tracking-wider text-neo-white">
           {t('blast.results.sceneTitle')}
         </h3>
       </m.div>
@@ -96,7 +96,7 @@ export default function BlastResultsScene({ playerStats, scores, currentUsername
             {me.stats.bestWord && (
               <div className="mt-3 flex items-center gap-1.5 justify-center pt-2 border-t-2 border-neo-black/40">
                 <Trophy className="w-3.5 h-3.5 text-neo-yellow" />
-                <span className="text-[10px] uppercase tracking-wider text-neo-cream/50">
+                <span className="text-[10px] uppercase tracking-wider text-neo-white">
                   {t('blast.results.bestWord')}:
                 </span>
                 <span className="font-bold text-neo-white text-sm uppercase">{me.stats.bestWord}</span>
@@ -116,15 +116,15 @@ export default function BlastResultsScene({ playerStats, scores, currentUsername
               data-testid="blast-result-opponent"
               className="flex items-center gap-2 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy/60"
             >
-              <span className="text-xs font-black text-neo-cream/50 tabular-nums w-6 shrink-0">#{rank}</span>
-              <span className="text-sm font-bold truncate text-neo-cream/80 flex-1 min-w-0">{username}</span>
+              <span className="text-xs font-black text-neo-white tabular-nums w-6 shrink-0">#{rank}</span>
+              <span className="text-sm font-bold truncate text-neo-white flex-1 min-w-0">{username}</span>
               {stats.maxCombo > 0 && (
                 <span className="flex items-center gap-0.5 text-neo-orange shrink-0">
                   <Flame className="w-3 h-3" />
                   <span className="text-xs font-black tabular-nums">{stats.maxCombo}x</span>
                 </span>
               )}
-              <span className="text-base font-black tabular-nums text-neo-cream shrink-0 w-16 text-right">{score}</span>
+              <span className="text-base font-black tabular-nums text-neo-white shrink-0 w-16 text-right">{score}</span>
             </m.div>
           ))}
         </div>

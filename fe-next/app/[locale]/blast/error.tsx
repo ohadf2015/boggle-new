@@ -57,7 +57,7 @@ export default function BlastError({
           </button>
           <button
             onClick={() => window.location.href = `/${locale}`}
-            className="px-5 py-2 rounded-lg font-bold bg-neo-navy-light text-white border border-gray-600 hover:bg-gray-700 transition-all"
+            className="px-5 py-2 rounded-lg font-bold bg-neo-navy-light text-white border border-gray-600 hover:bg-neo-navy-elevated transition-all"
           >
             {t('common.back')}
           </button>

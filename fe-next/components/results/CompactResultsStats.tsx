@@ -138,7 +138,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             </div>
             <span className="text-xl sm:text-2xl font-black text-white">{wordCount}</span>
           </div>
-          <div className="text-[10px] sm:text-xs text-white/60 font-bold uppercase">
+          <div className="text-[10px] sm:text-xs text-white font-bold uppercase">
             {t('results.words')}
           </div>
         </m.div>
@@ -157,7 +157,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
               {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
             </span>
           </div>
-          <div className="text-[10px] sm:text-xs text-white/60 font-bold uppercase">
+          <div className="text-[10px] sm:text-xs text-white font-bold uppercase">
             {t('results.accuracy')}
           </div>
         </m.div>
@@ -238,7 +238,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
                     'text-xs font-bold',
                     visualTrend.direction === 'up' && 'text-neo-lime',
                     visualTrend.direction === 'down' && 'text-neo-red',
-                    visualTrend.direction === 'stable' && 'text-white/60'
+                    visualTrend.direction === 'stable' && 'text-white'
                   )}>
                     {visualTrend.direction === 'up' && (t('chart.improving'))}
                     {visualTrend.direction === 'down' && (t('chart.declining'))}
@@ -284,7 +284,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.7 }}
-              className="text-xs font-bold text-white/60 px-1.5 py-0.5 bg-white/10 rounded-neo border border-white/20"
+              className="text-xs font-bold text-white px-1.5 py-0.5 bg-white/10 rounded-neo border border-white/20"
             >
               +{achievements.length - MAX_VISIBLE_ACHIEVEMENTS}
             </m.span>

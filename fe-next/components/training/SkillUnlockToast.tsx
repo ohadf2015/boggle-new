@@ -125,7 +125,7 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
             className={cn(
               'flex items-center gap-3 px-4 py-3 rounded-xl border-2 shadow-hard-md',
               isDarkMode
-                ? 'bg-slate-800 border-neo-lime text-white'
+                ? 'bg-neo-navy-light border-neo-lime text-white'
                 : 'bg-white border-neo-lime text-neo-black'
             )}
             animate={{ scale: [1, 1.02, 1] }}

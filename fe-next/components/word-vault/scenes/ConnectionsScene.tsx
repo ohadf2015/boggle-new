@@ -272,7 +272,7 @@ export function ConnectionsScene({ onSolved, onExit }: Props) {
             <span style={{ color: solvedZones.length === 4 ? 'rgba(255,200,120,0.95)' : 'rgba(220,200,180,0.6)' }}>
               {solvedZones.length} / 4 קבוצות
             </span>
-            <span className="text-white/30">·</span>
+            <span className="text-white">·</span>
             <span style={{ color: mistakes >= 3 ? 'rgba(255,80,80,0.9)' : 'rgba(220,200,180,0.6)' }}>
               {mistakes} / {MAX_MISTAKES} טעויות
             </span>
@@ -344,7 +344,7 @@ export function ConnectionsScene({ onSolved, onExit }: Props) {
         type="button"
         onClick={onExit}
         aria-label="חזרה"
-        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white/30 hover:text-white/60"
+        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white hover:text-white"
       >
         ←
       </button>
@@ -363,12 +363,12 @@ export function ConnectionsScene({ onSolved, onExit }: Props) {
             <h2 className="mt-2 font-fredoka text-3xl font-black text-amber-200" style={{ textShadow: '2px 2px 0 #000' }}>
               ארבע משפחות. סיפור אחד.
             </h2>
-            <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
+            <p className="mt-4 font-rubik text-base leading-relaxed text-white">
               ששה־עשר דברים על השולחן. קאל הסתיר בהם את הסיפור שלו —
               מה היה <em>לפני</em>, מה קרה <em>בלילה</em>, מה הוא <em>נתן</em>,
               ומה <em>מלו</em> מוצא בדרך.
             </p>
-            <p className="mt-4 font-rubik text-sm text-white/65">
+            <p className="mt-4 font-rubik text-sm text-white">
               גרור כל פריט לפינה הנכונה. ארבעה בכל פינה. טעות ארבע פעמים — והסיפור נשרף.
             </p>
             <p className="mt-3 font-rubik text-xs text-amber-300/70">
@@ -395,7 +395,7 @@ export function ConnectionsScene({ onSolved, onExit }: Props) {
             animation: 'wv-bloom 1.4s ease-out forwards',
           }}
         >
-          <p className="font-rubik text-sm tracking-wide text-white/70" dir="rtl">
+          <p className="font-rubik text-sm tracking-wide text-white" dir="rtl">
             ארבע מילים. בסדר.
           </p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-3" dir="rtl">
@@ -419,7 +419,7 @@ export function ConnectionsScene({ onSolved, onExit }: Props) {
           >
             “{FINAL_LINE_HE}”
           </p>
-          <p className="mt-2 font-rubik text-xs text-white/60" dir="rtl">{FINAL_PHRASE_HE}</p>
+          <p className="mt-2 font-rubik text-xs text-white" dir="rtl">{FINAL_PHRASE_HE}</p>
           <button
             type="button"
             onClick={onSolved}
@@ -440,7 +440,7 @@ export function ConnectionsScene({ onSolved, onExit }: Props) {
           }}
         >
           <p className="font-fredoka text-2xl font-black text-pink-300" dir="rtl">הסיפור נשרף.</p>
-          <p className="max-w-md font-rubik text-base text-white/75" dir="rtl">
+          <p className="max-w-md font-rubik text-base text-white" dir="rtl">
             פעם אחרת, קאל. אולי הפעם תקשיב לכלים יותר.
           </p>
           <button

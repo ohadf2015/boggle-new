@@ -66,7 +66,7 @@ export function DailyActivityChart({ authToken }: DailyActivityChartProps) {
   }, [authToken, days]);
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-neo-cyan" />
@@ -83,7 +83,7 @@ export function DailyActivityChart({ authToken }: DailyActivityChartProps) {
                 'px-2 py-0.5 text-xs font-bold rounded-neo border border-black transition-colors',
                 days === d
                   ? 'bg-neo-cyan text-black'
-                  : 'bg-slate-700 text-neo-white/60 hover:bg-slate-600'
+                  : 'bg-neo-navy-elevated text-neo-white hover:bg-slate-600'
               )}
             >
               {d}d
@@ -103,7 +103,7 @@ export function DailyActivityChart({ authToken }: DailyActivityChartProps) {
       ) : data === null ? (
         <div
           data-testid="daily-activity-skeleton"
-          className="bg-slate-700/30 rounded animate-pulse h-48"
+          className="bg-neo-navy-elevated/30 rounded animate-pulse h-48"
         />
       ) : data.length === 0 ? (
         <div

@@ -59,7 +59,7 @@ function SyncFeedDrawer({ rows, onClose }: DrawerProps) {
             ref={closeRef}
             onClick={onClose}
             aria-label={t('offline.queue.close')}
-            className="text-neo-white/60 hover:text-neo-white transition-colors p-1"
+            className="text-neo-white hover:text-neo-white transition-colors p-1"
           >
             ✕
           </button>
@@ -77,7 +77,7 @@ function SyncFeedDrawer({ rows, onClose }: DrawerProps) {
                     {row.mode}
                   </span>
                   {date && (
-                    <span className="font-neo-body text-neo-white/50 text-xs">{date}</span>
+                    <span className="font-neo-body text-neo-white text-xs">{date}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -90,7 +90,7 @@ function SyncFeedDrawer({ rows, onClose }: DrawerProps) {
                     className={`text-xs font-neo-body px-2 py-0.5 rounded-full border ${
                       status === 'rejected'
                         ? 'border-neo-red/40 text-neo-red bg-neo-red/10'
-                        : 'border-neo-white/20 text-neo-white/50 bg-neo-white/5'
+                        : 'border-neo-white/20 text-neo-white bg-neo-white/5'
                     }`}
                   >
                     {t(`offline.queue.status.${status}`)}
@@ -142,7 +142,7 @@ export function PendingSyncBadge(){
       <button
         onClick={() => setOpen(true)}
         aria-label={t('offline.pending.badge', { count })}
-        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-neo-navy-light border border-neo-white/20 text-neo-white/70 text-xs font-neo-body hover:border-neo-white/40 transition-colors cursor-pointer"
+        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-neo-navy-light border border-neo-white/20 text-neo-white text-xs font-neo-body hover:border-neo-white/40 transition-colors cursor-pointer"
       >
         <span className="w-1.5 h-1.5 rounded-full bg-neo-yellow animate-pulse" aria-hidden="true" />
         {t('offline.pending.badge', { count })}

@@ -97,7 +97,7 @@ export function HubFoyer({ store, onEnterRoom }: HubFoyerProps) {
         <button
           type="button"
           onClick={() => setShowWorldmap(true)}
-          className="border-b border-white/15 px-2 pb-1 font-rubik text-[11px] uppercase tracking-[0.25em] text-white/50 transition hover:border-white/40 hover:text-white/80"
+          className="border-b border-white/15 px-2 pb-1 font-rubik text-[11px] uppercase tracking-[0.25em] text-white transition hover:border-white/40 hover:text-white"
         >
           מפת חדרים
         </button>
@@ -132,7 +132,7 @@ function WorldmapPanel({ solvedRooms, onClose, onEnterRoom }: WorldmapPanelProps
           <button
             type="button"
             onClick={onClose}
-            className="rounded border-2 border-white/40 px-2 py-0.5 text-xs text-white/70"
+            className="rounded border-2 border-white/40 px-2 py-0.5 text-xs text-white"
           >
             סגור
           </button>
@@ -150,7 +150,7 @@ function WorldmapPanel({ solvedRooms, onClose, onEnterRoom }: WorldmapPanelProps
                   className={
                     'flex w-full items-center justify-between rounded border-2 px-3 py-2 font-rubik transition ' +
                     (isLocked
-                      ? 'cursor-not-allowed border-white/20 bg-white/5 text-white/40'
+                      ? 'cursor-not-allowed border-white/20 bg-white/5 text-white'
                       : isSolved
                       ? 'border-amber-300 bg-amber-300/10 text-amber-200'
                       : 'border-pink-400 bg-pink-400/10 text-white hover:bg-pink-400/30')

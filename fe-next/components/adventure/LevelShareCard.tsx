@@ -81,7 +81,7 @@ export function LevelShareCard(props: LevelShareCardProps) {
           W{worldNumber}-L{levelNumber}
         </span>
         <div className="flex-1 h-px bg-neo-lime/20" />
-        <span className="font-black text-xs uppercase tracking-wider text-neo-white/40">
+        <span className="font-black text-xs uppercase tracking-wider text-neo-white">
           {t('adventure.share.perfectClear')}
         </span>
       </div>
@@ -108,7 +108,7 @@ export function LevelShareCard(props: LevelShareCardProps) {
           className="text-neo-white font-black text-base tabular-nums"
         >
           {score.toLocaleString()}{' '}
-          <span className="text-neo-white/30 font-normal text-xs">{t('common.pts')}</span>
+          <span className="text-neo-white font-normal text-xs">{t('common.pts')}</span>
         </AdaptiveMotion.div>
       </div>
 
@@ -121,7 +121,7 @@ export function LevelShareCard(props: LevelShareCardProps) {
       >
         <Star className="w-5 h-5 shrink-0 text-neo-lime" />
         <div className="min-w-0">
-          <div className="text-neo-white/40 text-[10px] font-bold uppercase tracking-wider">
+          <div className="text-neo-white text-[10px] font-bold uppercase tracking-wider">
             {t('adventure.share.bestWord')}
           </div>
           <div className="font-black text-xl tracking-widest uppercase truncate text-neo-lime">
@@ -131,12 +131,12 @@ export function LevelShareCard(props: LevelShareCardProps) {
       </AdaptiveMotion.div>
 
       {/* Stats row */}
-      <div className="flex items-center gap-4 mb-3 text-neo-white/60 text-xs font-bold">
+      <div className="flex items-center gap-4 mb-3 text-neo-white text-xs font-bold">
         <span>{wordsFound} {t('adventure.share.wordsFound')}</span>
       </div>
 
       {/* Domain */}
-      <div className="text-neo-white/20 text-[10px] font-mono tracking-wider mb-4">
+      <div className="text-neo-white text-[10px] font-mono tracking-wider mb-4">
         lexiclash.live
       </div>
 

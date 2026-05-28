@@ -47,7 +47,7 @@ export function WordOfTheDay({ word, definition, className = '' }: WordOfTheDayP
 
       <m.div
         data-testid="wotd-word"
-        className="text-xl font-neo-display text-neo-cream mb-1"
+        className="text-xl font-neo-display text-neo-white mb-1"
         variants={shouldReduceMotion ? undefined : CONTAINER_VARIANTS}
         initial={shouldReduceMotion ? undefined : 'hidden'}
         animate={shouldReduceMotion ? undefined : 'visible'}
@@ -64,7 +64,7 @@ export function WordOfTheDay({ word, definition, className = '' }: WordOfTheDayP
       </m.div>
 
       {definition && (
-        <p data-testid="wotd-definition" className="text-sm text-neo-cream/70 font-neo-body">
+        <p data-testid="wotd-definition" className="text-sm text-neo-white font-neo-body">
           {definition}
         </p>
       )}

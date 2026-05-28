@@ -204,7 +204,7 @@ export function GuestManager({ authToken }: { authToken: string }) {
       )}
 
       {/* Filters */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 bg-white dark:bg-slate-800 text-black dark:text-white p-3 rounded-lg shadow-xs">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 bg-white dark:bg-neo-navy-light text-black dark:text-white p-3 rounded-lg shadow-xs">
         <div className="col-span-2 md:col-span-2 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
@@ -377,7 +377,7 @@ export function GuestManager({ authToken }: { authToken: string }) {
 
       {/* Pagination */}
       {total > pageSize && (
-        <div className="flex justify-between items-center bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-xs">
+        <div className="flex justify-between items-center bg-white dark:bg-neo-navy-light text-black dark:text-white p-4 rounded-lg shadow-xs">
           <span className="text-sm text-slate-500">
             Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, total)} of {total}
           </span>

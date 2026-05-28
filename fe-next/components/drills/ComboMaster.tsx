@@ -221,13 +221,13 @@ export default function ComboMaster({
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        'bg-slate-800'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Combo display */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            combo >= 5 ? 'bg-neo-orange' : 'bg-slate-700'
+            combo >= 5 ? 'bg-neo-orange' : 'bg-neo-navy-elevated'
           )}>
             <Flame className={cn(
               'w-4 h-4',
@@ -269,7 +269,7 @@ export default function ComboMaster({
       {phase === 'playing' && (
         <div className={cn(
           'h-2 border-b-2 border-neo-black',
-          'bg-slate-700'
+          'bg-neo-navy-elevated'
         )}>
           <AdaptiveMotion.div
             className={cn(
@@ -301,13 +301,13 @@ export default function ComboMaster({
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              'text-neo-white/70'
+              'text-neo-white'
             )}>
               {t('brain.drills.combo-master.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-slate-800'
+              'bg-neo-navy-light'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.combo-master.targetCombo', { combo: levelConfig.targetCombo })}</p>
@@ -421,7 +421,7 @@ export default function ComboMaster({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:-translate-y-px',
-                'bg-slate-700 text-neo-white'
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}

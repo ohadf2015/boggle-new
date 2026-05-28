@@ -106,7 +106,7 @@ export default function DuelChallengeModal({
           </div>
           <button
             onClick={onClose}
-            className="text-neo-white/50 hover:text-neo-white transition-colors"
+            className="text-neo-white hover:text-neo-white transition-colors"
             aria-label={t('common.close', 'Close')}
           >
             <X className="w-6 h-6" />
@@ -126,7 +126,7 @@ export default function DuelChallengeModal({
             {/* Name */}
             <div>
               <p className="text-neo-white font-bold">{opponent.displayName ?? '?'}</p>
-              <p className="text-neo-white/50 text-sm">{t('availableOpponents')}</p>
+              <p className="text-neo-white text-sm">{t('availableOpponents')}</p>
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function DuelChallengeModal({
               )}
             >
               <div className="font-black text-lg mb-1">{t('turnBased')}</div>
-              <div className={cn('text-sm', duelType === 'async' ? 'text-neo-black/70' : 'text-neo-white/60')}>
+              <div className={cn('text-sm', duelType === 'async' ? 'text-neo-black/70' : 'text-neo-white')}>
                 {t('turnBasedDesc')}
               </div>
             </button>
@@ -170,7 +170,7 @@ export default function DuelChallengeModal({
               )}
             >
               <div className="font-black text-lg mb-1">{t('realTime')}</div>
-              <div className={cn('text-sm', duelType === 'realtime' ? 'text-neo-black/70' : 'text-neo-white/60')}>
+              <div className={cn('text-sm', duelType === 'realtime' ? 'text-neo-black/70' : 'text-neo-white')}>
                 {t('realTimeDesc')}
               </div>
             </button>

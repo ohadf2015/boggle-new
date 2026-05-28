@@ -93,7 +93,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
             {t('vault.title')}
           </h3>
         </div>
-        <p className="text-sm text-white/50">
+        <p className="text-sm text-white">
           {t('vault.nextVault', { time: countdownStr })}
         </p>
       </div>
@@ -143,7 +143,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
             data-testid="vault-countdown"
           >
             <Clock size={14} className="text-neo-yellow/70" />
-            <span className="text-sm font-mono text-white/80">
+            <span className="text-sm font-mono text-white">
               {t('vault.closesIn', { time: countdownStr })}
             </span>
           </div>
@@ -151,7 +151,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
           {/* Mini leaderboard */}
           {top3.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-xs font-bold text-white/60 uppercase tracking-wide mb-2">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wide mb-2">
                 {t('vault.leaderboard')}
               </h4>
               <div className="space-y-1">

@@ -80,7 +80,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
                   ? 'bg-neo-lime text-neo-navy'
                   : isFlashing
                     ? 'bg-neo-cyan/80 text-neo-navy'
-                    : 'bg-neo-navy/85 text-neo-cream',
+                    : 'bg-neo-navy/85 text-neo-white',
               )}
               aria-label={`#${i + 1} ${entry.username} ${entry.score}`}
             >

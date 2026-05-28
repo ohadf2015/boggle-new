@@ -174,14 +174,14 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                 <h2 className="text-2xl font-black text-neo-white mb-2">
                   {t('adventure.retry.title')}
                 </h2>
-                <p className="text-neo-white/70">
+                <p className="text-neo-white">
                   {t('adventure.retry.subtitle')}
                 </p>
               </div>
 
               {/* Stats */}
               <div className="p-4 border-b-2 border-neo-black/20">
-                <p className="text-xs font-bold text-neo-white/50 uppercase tracking-wide mb-3">
+                <p className="text-xs font-bold text-neo-white uppercase tracking-wide mb-3">
                   {t('adventure.retry.yourProgress')}
                 </p>
                 <div className="grid grid-cols-3 gap-3">
@@ -194,7 +194,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                     )}
                   >
                     <p className="text-xl font-black text-neo-cyan">{bestWords}</p>
-                    <p className="text-xs text-neo-white/60">
+                    <p className="text-xs text-neo-white">
                       {t('adventure.retry.bestWords')}
                     </p>
                   </div>
@@ -208,7 +208,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                     )}
                   >
                     <p className="text-xl font-black text-neo-lime">{bestScore}</p>
-                    <p className="text-xs text-neo-white/60">
+                    <p className="text-xs text-neo-white">
                       {t('adventure.retry.bestScore')}
                     </p>
                   </div>
@@ -222,7 +222,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                     )}
                   >
                     <p className="text-xl font-black text-neo-orange">{attemptCount}</p>
-                    <p className="text-xs text-neo-white/60">
+                    <p className="text-xs text-neo-white">
                       {t('adventure.retry.attempts')}
                     </p>
                   </div>
@@ -235,7 +235,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                   data-testid="objective-progress-section"
                   className="px-4 py-3 border-b-2 border-neo-black/20"
                 >
-                  <p className="text-xs font-bold text-neo-white/50 uppercase tracking-wide mb-2">
+                  <p className="text-xs font-bold text-neo-white uppercase tracking-wide mb-2">
                     {t('adventure.retry.objectiveProgress')}
                   </p>
                   <ul className="space-y-2">
@@ -246,8 +246,8 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                       return (
                         <li key={obj.type}>
                           <div className="flex items-baseline justify-between mb-1">
-                            <span className="text-sm font-bold text-neo-white/80">{label}</span>
-                            <span className="text-xs font-mono text-neo-white/60">
+                            <span className="text-sm font-bold text-neo-white">{label}</span>
+                            <span className="text-xs font-mono text-neo-white">
                               {current} / {obj.target}
                             </span>
                           </div>
@@ -283,7 +283,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                   </p>
                   <ul className="space-y-1">
                     {nearMissMessages.map((msg) => (
-                      <li key={msg.type} className="text-sm text-neo-white/80 font-medium">
+                      <li key={msg.type} className="text-sm text-neo-white font-medium">
                         {t(msg.translationKey, msg.params as Record<string, string | number>)}
                       </li>
                     ))}
@@ -386,7 +386,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                   className={cn(
                     'w-full py-2 px-4',
                     'flex items-center justify-center gap-2',
-                    'bg-transparent text-neo-white/60',
+                    'bg-transparent text-neo-white',
                     'font-medium text-sm',
                     'border border-neo-white/20 rounded-neo',
                     'hover:text-neo-white hover:border-neo-white/40',

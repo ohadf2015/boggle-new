@@ -71,13 +71,13 @@ export default function DeleteAccountPageClient() {
 
   const cardClass = cn(
     'max-w-md mx-auto p-6 rounded-neo border-3',
-    isDarkMode ? 'bg-slate-800 border-slate-600' : 'bg-white border-neo-black'
+    isDarkMode ? 'bg-neo-navy-light border-slate-600' : 'bg-white border-neo-black'
   );
 
   const inputClass = cn(
     'w-full px-4 py-3 rounded-neo border-3 text-sm min-h-[44px]',
     isDarkMode
-      ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-500'
+      ? 'bg-neo-navy-elevated border-slate-600 text-white placeholder:text-slate-500'
       : 'bg-white border-gray-300 text-neo-black placeholder:text-gray-400'
   );
 
@@ -198,7 +198,7 @@ export default function DeleteAccountPageClient() {
                 href={`/${language}`}
                 className={cn(
                   'inline-block px-6 py-3 rounded-neo border-3 border-neo-black font-bold text-sm min-h-[44px]',
-                  isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-neo-black'
+                  isDarkMode ? 'bg-neo-navy-elevated text-white' : 'bg-white text-neo-black'
                 )}
               >
                 <ArrowLeft className="w-4 h-4 inline me-2" />

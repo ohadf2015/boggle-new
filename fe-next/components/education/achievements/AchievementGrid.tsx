@@ -171,7 +171,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                         <span>{tierProgress.currentTier}</span>
                       </div>
                     ) : (
-                      <div className="px-3 py-1 rounded-full border-neo border-neo-black bg-neo-navy-light text-neo-white/80 font-black text-xs">
+                      <div className="px-3 py-1 rounded-full border-neo border-neo-black bg-neo-navy-light text-neo-white font-black text-xs">
                         {t('education.achievements.locked')}
                       </div>
                     )}
@@ -181,7 +181,7 @@ export const AchievementGrid = memo<AchievementGridProps>(
                   {!tierProgress.isMaxTier && tierProgress.nextThreshold && (
                     <div className="space-y-1">
                       {/* Progress text */}
-                      <p className="text-xs text-center text-neo-white/70">
+                      <p className="text-xs text-center text-neo-white">
                         {count}/{tierProgress.nextThreshold}
                       </p>
 

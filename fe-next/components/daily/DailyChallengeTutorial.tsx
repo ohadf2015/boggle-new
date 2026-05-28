@@ -166,7 +166,7 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
         {/* Close button */}
         <button
           onClick={onSkip}
-          className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-neo-navy-light rounded-full transition-colors"
           aria-label={t('common.close')}
         >
           <X className="w-5 h-5" />
@@ -243,11 +243,11 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
         {t('tutorial.wordHunt.lifeSystem.description')}
       </p>
 
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4">
+      <div className="bg-gray-100 dark:bg-neo-navy-light rounded-neo border-2 border-neo-black p-4 mb-4">
         {/* Life bar example */}
         <div className="mb-3">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('tutorial.wordHunt.lifeSystem.lifeBarLabel')}</div>
-          <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 border-neo-black">
+          <div className="bg-gray-200 dark:bg-neo-navy-elevated rounded-full h-6 overflow-hidden border-2 border-neo-black">
             <div className="h-full bg-green-500 flex items-center justify-center text-xs font-bold text-white" style={{ width: '85%' }}>
               <Heart className="w-3 h-3 me-1 fill-current" />
               85/100
@@ -301,7 +301,7 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
       </div>
 
       {/* Example visual - self-explanatory */}
-      <div className="bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-4">
+      <div className="bg-slate-100 dark:bg-neo-navy-light rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-4">
         <div className="text-sm text-center text-slate-700 dark:text-slate-300 font-bold mb-3">
           {t('tutorial.wordHunt.letterFeedback.example')}
         </div>
@@ -360,7 +360,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
         {t('tutorial.wordHunt.triesRule.description')}
       </p>
 
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4 space-y-3">
+      <div className="bg-gray-100 dark:bg-neo-navy-light rounded-neo border-2 border-neo-black p-4 mb-4 space-y-3">
         {/* Example: target word (length matches the locale's example word) */}
         <div className="text-center mb-3">
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
@@ -448,7 +448,7 @@ const Step5Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
         <h2 className="text-3xl font-black mb-4">{t('tutorial.wordHunt.complete.title')}</h2>
       </div>
 
-      <div className="bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-6 text-center">
+      <div className="bg-slate-100 dark:bg-neo-navy-light rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-6 text-center">
         <div className="text-sm text-gray-600 dark:text-gray-300">
           {t('tutorial.wordHunt.complete.sameChallenge')}
         </div>

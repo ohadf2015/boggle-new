@@ -22,7 +22,7 @@ interface StatItemProps {
 
 function StatItem({ label, value, icon, color }: StatItemProps): React.ReactElement {
   return (
-    <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 rounded-lg border-2 border-gray-200 dark:border-slate-700">
+    <div className="flex items-center gap-3 p-3 bg-white dark:bg-neo-navy-light rounded-lg border-2 border-gray-200 dark:border-slate-700">
       <div className={cn('p-2 rounded-lg', color)}>
         {icon}
       </div>
@@ -80,7 +80,7 @@ export function WikipediaStatsCard({
           <button
             onClick={handleRefresh}
             disabled={loading || isRefreshing}
-            className="px-3 py-2 bg-slate-700 text-white rounded-lg text-sm font-bold hover:bg-slate-600 disabled:opacity-50 transition-colors flex items-center gap-2"
+            className="px-3 py-2 bg-neo-navy-elevated text-white rounded-lg text-sm font-bold hover:bg-slate-600 disabled:opacity-50 transition-colors flex items-center gap-2"
           >
             <RefreshCw className={cn('w-4 h-4', isRefreshing && 'animate-spin')} />
             Refresh

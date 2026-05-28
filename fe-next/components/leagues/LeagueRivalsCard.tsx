@@ -31,7 +31,7 @@ function RivalRow({
   return (
     <div className="flex items-center gap-3 px-3 py-2">
       {/* Position */}
-      <span className="font-mono text-xs font-bold text-neo-white/60 w-6 text-center">
+      <span className="font-mono text-xs font-bold text-neo-white w-6 text-center">
         #{rival.position}
       </span>
 
@@ -46,7 +46,7 @@ function RivalRow({
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-sm font-bold text-neo-white/70">
+          <span className="text-sm font-bold text-neo-white">
             {rival.username.charAt(0).toUpperCase()}
           </span>
         )}
@@ -59,7 +59,7 @@ function RivalRow({
       </div>
 
       {/* Score */}
-      <span className="font-mono text-sm font-bold text-neo-white/80">
+      <span className="font-mono text-sm font-bold text-neo-white">
         {rival.score.toLocaleString()}
       </span>
     </div>
@@ -175,7 +175,7 @@ export function LeagueRivalsCard() {
         </div>
       ) : (
         <div className="px-3 py-4 text-center">
-          <p className="text-sm text-neo-white/60">
+          <p className="text-sm text-neo-white">
             {t('leagueRivals.noRivals') || 'Climb the league to find rivals!'}
           </p>
         </div>

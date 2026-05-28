@@ -66,7 +66,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                 <Gamepad2 size={48} className="text-neo-black" aria-hidden="true" />
               </div>
             </div>
-            <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
+            <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-white tracking-tight">
               {t('joinView.inviteTitle')}
             </CardTitle>
             {/* Room number prominently displayed */}
@@ -109,7 +109,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                   transition={{ duration: 0.4 }}
                   className="space-y-2"
                 >
-                  <Label htmlFor="username" className="text-base font-black uppercase text-neo-cream">
+                  <Label htmlFor="username" className="text-base font-black uppercase text-neo-white">
                     {t('joinView.enterNameToPlay')}
                   </Label>
                   <div className="relative">
@@ -187,7 +187,7 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = ({
 }) => (
   <div className="space-y-4 sm:space-y-6">
     <div className="space-y-3">
-      <Label htmlFor="auth-display-name" className="text-base font-black uppercase text-neo-cream">
+      <Label htmlFor="auth-display-name" className="text-base font-black uppercase text-neo-white">
         {t('joinView.joiningAs')}
       </Label>
       <Input
@@ -198,7 +198,7 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = ({
         placeholder={displayName}
         maxLength={20}
       />
-      <p className="text-neo-cream/90 text-xs font-bold uppercase text-center">
+      <p className="text-neo-white text-xs font-bold uppercase text-center">
         {t('joinView.tapToChangeDisplayName')}
       </p>
     </div>

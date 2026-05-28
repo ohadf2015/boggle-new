@@ -91,7 +91,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         className="
           relative flex items-center justify-center
           w-10 h-10
-          bg-neo-cream dark:bg-slate-700 text-neo-black dark:text-white
+          bg-neo-cream dark:bg-neo-navy-elevated text-neo-black dark:text-white
           border-3 border-neo-black dark:border-slate-500
           rounded-neo shadow-hard-sm
           hover:-translate-x-px hover:-translate-y-px hover:shadow-hard hover:bg-neo-lime/30

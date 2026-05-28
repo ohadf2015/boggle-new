@@ -32,7 +32,7 @@ export default function ConnectionsHEClassic({ copy }: Props): React.JSX.Element
             <h2 className="mb-3 font-neo-display text-2xl font-black text-neo-white sm:text-3xl">
               {copy.title}
             </h2>
-            <p className="text-base leading-relaxed text-neo-cream">{copy.body}</p>
+            <p className="text-base leading-relaxed text-neo-white">{copy.body}</p>
           </div>
         </div>
       </div>

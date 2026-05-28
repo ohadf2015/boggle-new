@@ -17,10 +17,10 @@ export function RoundResultScene({ passed, round, roundScore, target, onProceed 
       <h2 className={`text-3xl font-neo-display ${passed ? 'text-neo-lime' : 'text-neo-red'}`}>
         {t(passed ? 'wordcraft.run.roundResult.passed' : 'wordcraft.run.roundResult.failed')}
       </h2>
-      <p className="font-neo-body text-neo-white/80">
+      <p className="font-neo-body text-neo-white">
         {t(passed ? 'wordcraft.run.roundResult.passedSub' : 'wordcraft.run.roundResult.failedSub')}
       </p>
-      <p className="font-neo-display text-neo-cream">
+      <p className="font-neo-display text-neo-white">
         {roundScore} / {target}
       </p>
       <button

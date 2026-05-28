@@ -193,7 +193,7 @@ export default function AvatarBuilderModal({
                 <span className="text-neo-yellow font-black text-sm tabular-nums">{premium.coins}</span>
               </div>
             )}
-            <button onClick={onClose} className="text-neo-white/60 hover:text-neo-white p-2.5 transition-colors" aria-label={t('common.close')}>
+            <button onClick={onClose} className="text-neo-white hover:text-neo-white p-2.5 transition-colors" aria-label={t('common.close')}>
               <X size={20} />
             </button>
           </div>
@@ -232,7 +232,7 @@ export default function AvatarBuilderModal({
                   className={`shrink-0 snap-start min-h-[40px] flex items-center justify-center gap-1.5 px-2.5 py-2 text-xs @[38rem]:text-sm font-bold rounded-neo whitespace-nowrap border-2 transition-colors ${
                     isActive
                       ? 'bg-neo-lime text-neo-black border-black shadow-hard-sm'
-                      : 'bg-neo-navy-light text-neo-white/70 border-transparent hover:border-neo-white/30 hover:bg-neo-navy-light/80'
+                      : 'bg-neo-navy-light text-neo-white border-transparent hover:border-neo-white/30 hover:bg-neo-navy-light/80'
                   }`}
                   title={t(cat.labelKey)}
                 >
@@ -295,7 +295,7 @@ export default function AvatarBuilderModal({
             whileTap={{ scale: 0.88, rotate: -20 }}
             transition={BUTTON_SPRING}
             disabled={historyRef.current.length === 0}
-            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white/70 rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0"
+            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 disabled:opacity-30 disabled:cursor-not-allowed transition-all shrink-0"
             title={t('avatarBuilder.undo')}
             aria-label={t('avatarBuilder.undo')}
           >
@@ -305,7 +305,7 @@ export default function AvatarBuilderModal({
             onClick={handleDownload}
             whileTap={{ scale: 0.88 }}
             transition={BUTTON_SPRING}
-            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white/70 rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all shrink-0"
+            className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all shrink-0"
             title={t('avatarBuilder.download') || 'Download'}
             aria-label={t('avatarBuilder.download') || 'Download'}
           >
@@ -314,7 +314,7 @@ export default function AvatarBuilderModal({
           <div className="flex-1 min-w-0" />
           <button
             onClick={onClose}
-            className="px-3 @[24rem]:px-4 py-2 text-sm text-neo-white/70 font-bold hover:text-neo-white transition-colors shrink-0"
+            className="px-3 @[24rem]:px-4 py-2 text-sm text-neo-white font-bold hover:text-neo-white transition-colors shrink-0"
           >
             {t('avatarBuilder.cancel')}
           </button>

@@ -36,7 +36,7 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
-      className="w-full bg-slate-900/80 border-3 border-neo-black rounded-xl p-4 shadow-hard-sm"
+      className="w-full bg-neo-navy/80 border-3 border-neo-black rounded-xl p-4 shadow-hard-sm"
     >
       {justEarnedBadge && (
         <div className="mb-3 px-3 py-1.5 rounded-lg bg-neo-yellow/15 border border-neo-yellow/40 text-center">
@@ -60,12 +60,12 @@ export function DailyRewardPreview({ currentStreakDay, t }: DailyRewardPreviewPr
             ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm'
             : entry.isBadge
               ? 'bg-neo-yellow text-neo-black border-neo-black'
-              : 'bg-neo-navy-light text-neo-cream/80 border-neo-black/60';
+              : 'bg-neo-navy-light text-neo-white border-neo-black/60';
           const labelClass = entry.isToday
             ? 'text-neo-cyan'
             : entry.isBadge
               ? 'text-neo-yellow'
-              : 'text-neo-cream/55';
+              : 'text-neo-white';
 
           return (
             <div

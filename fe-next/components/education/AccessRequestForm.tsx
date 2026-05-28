@@ -155,7 +155,7 @@ export function AccessRequestForm() {
         <textarea id="tar-use_case" required minLength={10} maxLength={800} rows={4}
           value={useCase} onChange={(e) => setUseCase(e.target.value)}
           className={FIELD_CLASS} />
-        <p className={`text-xs mt-1 ${useCaseOk ? 'text-neo-lime' : 'text-neo-white/60'}`}>{useCase.length}/800</p>
+        <p className={`text-xs mt-1 ${useCaseOk ? 'text-neo-lime' : 'text-neo-white'}`}>{useCase.length}/800</p>
       </m.div>
       {error && <p role="alert" aria-live="polite" className="text-neo-red font-semibold">{error}</p>}
       <m.button type="submit" disabled={!canSubmit} variants={item}

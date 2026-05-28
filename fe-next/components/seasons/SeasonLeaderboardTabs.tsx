@@ -20,7 +20,7 @@ const TABS: ReadonlyArray<{
 }> = [
   { key: 'season',      labelKey: 'season.thisSeason',  icon: Trophy,  activeClass: 'bg-neo-lime text-black' },
   { key: 'allTime',     labelKey: 'season.allTime',     icon: Clock,   activeClass: 'bg-neo-cyan text-black' },
-  { key: 'pastSeasons', labelKey: 'season.pastSeasons', icon: Archive, activeClass: 'bg-neo-purple text-neo-cream' },
+  { key: 'pastSeasons', labelKey: 'season.pastSeasons', icon: Archive, activeClass: 'bg-neo-purple text-neo-white' },
 ];
 
 export const SeasonLeaderboardTabs: React.FC<SeasonLeaderboardTabsProps> = ({
@@ -58,7 +58,7 @@ export const SeasonLeaderboardTabs: React.FC<SeasonLeaderboardTabsProps> = ({
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink
               ${isActive
                 ? `${activeClass} shadow-hard-sm`
-                : 'bg-neo-navy-light text-neo-cream hover:bg-neo-navy'}
+                : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy'}
             `}
           >
             <Icon className="w-4 h-4" />

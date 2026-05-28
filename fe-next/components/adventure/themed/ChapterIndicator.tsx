@@ -123,7 +123,7 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
       {/* Chapter info */}
       <div className="flex flex-col">
         {showFullName && (
-          <span className="text-xs font-bold text-neo-white/80 uppercase tracking-wide">
+          <span className="text-xs font-bold text-neo-white uppercase tracking-wide">
             {t(chapter.nameKey)}
           </span>
         )}

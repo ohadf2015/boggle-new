@@ -52,14 +52,14 @@ export function RunPageClient() {
   }, [state.lastWordScore]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!dict) {
-    return <div className="p-6 text-center font-neo-body text-neo-white/70">{t('common.loading')}</div>;
+    return <div className="p-6 text-center font-neo-body text-neo-white">{t('common.loading')}</div>;
   }
 
   if (state.phase === 'intro') {
     return (
       <section className="flex flex-col items-center gap-4 p-6 text-center">
         <h1 className="text-3xl font-neo-display text-neo-lime">{t('wordcraft.run.intro.title')}</h1>
-        <p className="max-w-md font-neo-body text-neo-white/80">{t('wordcraft.run.intro.howTo')}</p>
+        <p className="max-w-md font-neo-body text-neo-white">{t('wordcraft.run.intro.howTo')}</p>
         <button
           type="button"
           onClick={run.startRun}

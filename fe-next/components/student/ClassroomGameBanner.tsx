@@ -224,7 +224,7 @@ export function ClassroomGameBanner({
 
         {/* Dark body */}
         <div className="bg-neo-navy-light px-6 py-4">
-          <p className="text-neo-cream/80 font-neo-body font-bold mb-3">
+          <p className="text-neo-white font-neo-body font-bold mb-3">
             {t('student.activeGame.teacherStarted', { teacher: activeGame.teacherName })}
           </p>
 

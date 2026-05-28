@@ -149,7 +149,7 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
   if (!isAdmin && !isDev) {
     return (
       <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
-        <p className="font-neo-body text-neo-white/60 text-center max-w-sm">
+        <p className="font-neo-body text-neo-white text-center max-w-sm">
           {t('shiritori.solo.adminOnly')}
         </p>
       </main>
@@ -170,11 +170,11 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
       />
       <div className="mx-auto w-full max-w-2xl space-y-5">
         <header className="flex items-center justify-between">
-          <Link href={`/${locale}/shiritori`} className="inline-flex items-center gap-1.5 font-neo-body text-sm text-neo-white/60 hover:text-neo-white">
+          <Link href={`/${locale}/shiritori`} className="inline-flex items-center gap-1.5 font-neo-body text-sm text-neo-white hover:text-neo-white">
             <ArrowLeft className="h-4 w-4" />
             {t('shiritori.solo.back')}
           </Link>
-          <span className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/50">
+          <span className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white">
             {t('shiritori.solo.adminBadge')}
           </span>
         </header>
@@ -183,7 +183,7 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
           <h1 className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white">
             {t('shiritori.solo.title')}
           </h1>
-          <p className="font-neo-body text-sm text-neo-white/70">{t('shiritori.solo.tagline')}</p>
+          <p className="font-neo-body text-sm text-neo-white">{t('shiritori.solo.tagline')}</p>
         </div>
 
         <div className="flex items-center justify-center gap-2" role="radiogroup" aria-label={t('shiritori.solo.difficultyLabel')}>
@@ -197,7 +197,7 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
               className={`rounded-neo border-2 border-black px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide shadow-hard-sm transition-transform ${
                 difficulty === d
                   ? 'bg-neo-lime text-neo-navy'
-                  : 'bg-neo-navy-light text-neo-white/70 hover:text-neo-white'
+                  : 'bg-neo-navy-light text-neo-white hover:text-neo-white'
               }`}
             >
               {t(`shiritori.solo.difficulty.${d}`)}
@@ -206,7 +206,7 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
         </div>
 
         {!ended && state.turn === 'player' && (
-          <p className="text-center font-neo-body text-sm text-neo-white/80">
+          <p className="text-center font-neo-body text-sm text-neo-white">
             {t('shiritori.solo.headPrompt')}{' '}
             <span dir="ltr" className="inline-block rounded-neo border-2 border-black bg-neo-cyan px-2 py-0.5 font-neo-display font-black text-neo-navy">
               {head || '—'}
@@ -223,7 +223,7 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
             const Icon = fromBot ? Bot : User;
             return (
               <span key={`${w}-${i}`} className="inline-flex items-center gap-1.5">
-                {i > 0 && <span className="text-neo-white/30">→</span>}
+                {i > 0 && <span className="text-neo-white">→</span>}
                 <span
                   className={`inline-flex items-center gap-1 rounded-neo border-2 border-black px-2.5 py-1 font-neo-display font-black text-base shadow-hard-sm ${
                     fromBot ? 'bg-neo-pink text-neo-navy' : 'bg-neo-lime text-neo-navy'
@@ -293,7 +293,7 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
               </button>
             </div>
             {state.turn === 'bot' && (
-              <p className="text-center font-neo-body text-xs text-neo-white/50 animate-pulse">
+              <p className="text-center font-neo-body text-xs text-neo-white animate-pulse">
                 {t('shiritori.solo.botThinking')}
               </p>
             )}

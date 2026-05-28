@@ -46,7 +46,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           'rounded-2xl p-6 mb-6',
-          isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+          isDarkMode ? 'bg-neo-navy-light/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
         )}
         data-testid="push-notifications-loading"
       >
@@ -103,7 +103,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'rounded-2xl p-6 mb-6',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        isDarkMode ? 'bg-neo-navy-light/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
       )}
     >
       {/* Header */}
@@ -157,7 +157,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
       {/* Daily Reminder Toggle */}
       <div className={cn(
         'flex items-center justify-between p-4 rounded-xl mb-4',
-        isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+        isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
       )}>
         <div className="flex items-center gap-3">
           {preferences.enabled ? (
@@ -219,7 +219,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
       {preferences.enabled && permissionStatus !== 'denied' && (
         <div className={cn(
           'p-4 rounded-xl',
-          isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+          isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
         )}>
           <div className="flex items-center gap-3 mb-3">
             <Clock className="w-5 h-5 text-neo-cyan" />
@@ -249,7 +249,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
               className={cn(
                 'flex-1 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-600 text-white'
+                  ? 'bg-neo-navy-light border-slate-600 text-white'
                   : 'bg-white border-gray-300 text-gray-900',
                 isSaving && 'opacity-50 cursor-not-allowed'
               )}
@@ -270,7 +270,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
               className={cn(
                 'w-24 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-600 text-white'
+                  ? 'bg-neo-navy-light border-slate-600 text-white'
                   : 'bg-white border-gray-300 text-gray-900',
                 isSaving && 'opacity-50 cursor-not-allowed'
               )}

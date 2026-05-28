@@ -44,7 +44,7 @@ function PlayerStatus({
       ) : (
         <X className="w-5 h-5 text-red-400" data-testid="x-icon" />
       )}
-      <span className="text-sm text-neo-white/80">{label}</span>
+      <span className="text-sm text-neo-white">{label}</span>
     </div>
   );
 }
@@ -84,7 +84,7 @@ export const WordPactCard: React.FC = memo(function WordPactCard() {
               {t('wordPact.title')}
             </h3>
           </div>
-          <p className="text-sm text-neo-white/70">{t('wordPact.formDesc')}</p>
+          <p className="text-sm text-neo-white">{t('wordPact.formDesc')}</p>
           <button
             data-testid="form-pact-btn"
             onClick={() => setShowSelector(true)}
@@ -140,7 +140,7 @@ export const WordPactCard: React.FC = memo(function WordPactCard() {
       </div>
 
       {/* Status message */}
-      <p data-testid="pact-status" className="text-sm text-neo-white/80 font-medium">
+      <p data-testid="pact-status" className="text-sm text-neo-white font-medium">
         {statusMessage}
       </p>
 
@@ -156,7 +156,7 @@ export const WordPactCard: React.FC = memo(function WordPactCard() {
       <button
         data-testid="dissolve-pact-btn"
         onClick={dissolvePact}
-        className="flex items-center gap-1 text-xs text-neo-white/40 hover:text-red-400 self-end mt-1"
+        className="flex items-center gap-1 text-xs text-neo-white hover:text-red-400 self-end mt-1"
       >
         <Trash2 className="w-3 h-3" />
         {t('wordPact.dissolve')}

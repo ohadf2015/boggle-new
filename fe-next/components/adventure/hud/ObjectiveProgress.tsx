@@ -192,7 +192,7 @@ export const ObjectiveProgress = memo<ObjectiveProgressProps>(
                     <span
                       className={cn(
                         'text-xs font-mono font-bold whitespace-nowrap tabular-nums',
-                        objective.isComplete ? 'text-neo-lime' : 'text-neo-white/90'
+                        objective.isComplete ? 'text-neo-lime' : 'text-neo-white'
                       )}
                     >
                       {objective.current}/{objective.target}

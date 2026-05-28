@@ -158,7 +158,7 @@ export default function AchievementProgressCard({
                 </p>
               )}
               {isLocked && (
-                <p className="text-sm text-neo-white/85">
+                <p className="text-sm text-neo-white">
                   {t('education.achievements.locked')}
                 </p>
               )}
@@ -200,7 +200,7 @@ export default function AchievementProgressCard({
               </div>
 
               {/* Progress Text */}
-              <div className="flex items-center justify-between mt-2 text-xs text-neo-white/80">
+              <div className="flex items-center justify-between mt-2 text-xs text-neo-white">
                 <span>{t('education.achievements.progress', {
                   current: achievement.progressValue,
                   next: achievement.nextThreshold,
@@ -225,7 +225,7 @@ export default function AchievementProgressCard({
           {/* Hint for Locked Badges */}
           {isLocked && (
             <div className="mt-3">
-              <p className="text-sm text-neo-white/85 italic">
+              <p className="text-sm text-neo-white italic">
                 {achievement.isSecret
                   ? t(`education.achievements.${achievement.key}.hint`)
                   : t(`education.achievements.${achievement.key}.hint`)}

@@ -41,13 +41,13 @@ export function FriendActivityRow({ event }: FriendActivityRowProps) {
             </span>
           )}
         </div>
-        <p className="text-neo-white/60 text-[11px] truncate">
+        <p className="text-neo-white text-[11px] truncate">
           {t(event.actionKey, event.actionParams as Record<string, string | number>)}
         </p>
       </div>
 
       {/* Time ago */}
-      <span className="text-neo-white/40 text-[10px] font-medium shrink-0">
+      <span className="text-neo-white text-[10px] font-medium shrink-0">
         {event.timeAgo}
       </span>
     </div>

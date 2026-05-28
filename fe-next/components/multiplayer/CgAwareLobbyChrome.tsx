@@ -56,7 +56,7 @@ const CgAwareLobbyChrome: React.FC<CgAwareLobbyChromeProps> = ({
       {/* UX-014: Room fetch timeout retry banner */}
       {roomFetchTimedOut && !roomsLoading && activeRooms.length === 0 && (
         <div className="mx-4 mb-3 p-3 bg-neo-navy-light border-neo-thick border-neo-red rounded-neo shadow-hard-sm flex items-center justify-between gap-3">
-          <p className="text-sm font-neo-body font-bold text-neo-cream">
+          <p className="text-sm font-neo-body font-bold text-neo-white">
             {t('multiplayerFlow.roomList.fetchTimeout')}
           </p>
           <button

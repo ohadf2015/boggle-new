@@ -115,7 +115,7 @@ export function KeyboardInlineHint({
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5',
             'bg-neo-navy/80',
-            'text-neo-cream/90 hover:text-neo-cream',
+            'text-neo-white hover:text-neo-white',
             'border-2 border-neo-cream/20 hover:border-neo-cyan/50',
             'rounded-neo',
             'text-xs font-medium',
@@ -140,7 +140,7 @@ export function KeyboardInlineHint({
           </span>
 
           {/* Keyboard visualization */}
-          <span className="text-neo-cream/50 group-hover:text-neo-cream/70 transition-colors">
+          <span className="text-neo-white group-hover:text-neo-white transition-colors">
             ⌨️
           </span>
         </m.button>

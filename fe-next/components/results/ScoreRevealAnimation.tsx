@@ -235,7 +235,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
               : position === 1
                 ? 'bg-linear-to-r from-slate-400/15 via-slate-300/10 to-slate-400/15 border-slate-400'
                 : 'bg-linear-to-r from-neo-orange/15 via-neo-orange/10 to-neo-orange/15 border-neo-orange'
-            : 'bg-slate-800/60 border-slate-700',
+            : 'bg-neo-navy-light/60 border-slate-700',
           isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-1 ring-offset-neo-navy',
           'shadow-hard-sm',
           // Flash highlight when position just swapped
@@ -250,7 +250,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           'w-8 h-8 flex items-center justify-center border-3 border-neo-black font-neo-display shrink-0',
           isTop3
             ? position === 0 ? 'bg-neo-lime text-neo-black' : position === 1 ? 'bg-slate-300 text-slate-800' : 'bg-neo-orange text-neo-black'
-            : 'bg-neo-black text-white/60'
+            : 'bg-neo-black text-white'
         )}>
           {isTop3 ? (
             <RankIcon className="w-4 h-4" />
@@ -271,7 +271,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         <div className="flex-1 min-w-0 relative z-10">
           <p className={cn(
             'font-neo-display uppercase truncate text-sm',
-            isTop3 ? 'text-white' : 'text-white/70'
+            isTop3 ? 'text-white' : 'text-white'
           )}>
             {player.username}
             {isCurrentPlayer && <span className="text-neo-cyan ms-1">*</span>}
@@ -288,7 +288,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
             'px-3 py-1 border-3 border-neo-black font-black text-lg tabular-nums relative z-10',
             isTop3
               ? position === 0 ? 'bg-neo-black text-neo-lime' : position === 1 ? 'bg-neo-black text-slate-300' : 'bg-neo-black text-neo-orange'
-              : 'bg-neo-black/60 text-white/60'
+              : 'bg-neo-black/60 text-white'
           )}
         >
           {score.toLocaleString()}
@@ -364,7 +364,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           onClick={handleSkip}
-          className="flex items-center justify-center gap-1.5 mx-auto mt-1 px-3 py-1.5 border-3 border-slate-700 bg-neo-black hover:bg-slate-800 text-[10px] font-black text-neo-cream/50 uppercase tracking-widest shadow-hard-sm hover:text-neo-cream/80 transition-colors"
+          className="flex items-center justify-center gap-1.5 mx-auto mt-1 px-3 py-1.5 border-3 border-slate-700 bg-neo-black hover:bg-neo-navy-light text-[10px] font-black text-neo-white uppercase tracking-widest shadow-hard-sm hover:text-neo-white transition-colors"
         >
           <SkipForward className="w-3 h-3" />
           {t('results.skipReveal')}

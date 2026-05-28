@@ -93,7 +93,7 @@ export const PageLoader = memo(function PageLoader({
         </AdaptiveMotion.div>
         {text && (
           <AdaptiveMotion.p
-            className="text-sm font-neo-body text-neo-cream/70"
+            className="text-sm font-neo-body text-neo-white"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >

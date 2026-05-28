@@ -147,7 +147,7 @@ export function KeyboardHintTooltip({
                 >
                   Type
                 </m.kbd>
-                <span className="text-white/70">→</span>
+                <span className="text-white">→</span>
                 <m.kbd
                   className="px-1.5 py-0.5 bg-neo-black/30 rounded border border-white/20 font-mono"
                   animate={{ y: [0, -2, 0] }}

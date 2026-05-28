@@ -396,7 +396,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                 {t('auth.guestStatsTitle')}
               </p>
               <div className="flex gap-3 text-sm">
-                <div className="flex-1 text-center p-2 rounded-lg bg-slate-800/50">
+                <div className="flex-1 text-center p-2 rounded-lg bg-neo-navy-light/50">
                   <div className="font-black text-lg text-neo-cyan">
                     {guestStats.gamesPlayed}
                   </div>
@@ -404,7 +404,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     {t('profile.totalGames')}
                   </div>
                 </div>
-                <div className="flex-1 text-center p-2 rounded-lg bg-slate-800/50">
+                <div className="flex-1 text-center p-2 rounded-lg bg-neo-navy-light/50">
                   <div className="font-black text-lg text-neo-pink">
                     {guestStats.totalScore}
                   </div>
@@ -510,7 +510,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                               aria-invalid={emailError ? true : undefined}
                               aria-describedby={emailError ? 'otp-email-error' : undefined}
                               className={cn(
-                                'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                                'w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
                                 'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                                 emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                               )}
@@ -566,7 +566,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                               value={otpCode}
                               onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                               placeholder="000000"
-                              className="w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
+                              className="w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
                               disabled={isAnyLoading}
                             />
                           </div>
@@ -616,7 +616,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           aria-invalid={emailError ? true : undefined}
                           aria-describedby={emailError ? 'magic-email-error' : undefined}
                           className={cn(
-                            'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                            'w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
                             'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                             emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                           )}
@@ -674,7 +674,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           aria-invalid={emailError ? true : undefined}
                           aria-describedby={emailError ? 'pwd-email-error' : undefined}
                           className={cn(
-                            'w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                            'w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
                             'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                             emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                           )}
@@ -699,7 +699,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                             aria-invalid={passwordError ? true : undefined}
                             aria-describedby={passwordError ? 'pwd-password-error' : undefined}
                             className={cn(
-                              'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500',
+                              'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
                               'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
                               passwordError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
                             )}

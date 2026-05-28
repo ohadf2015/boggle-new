@@ -25,7 +25,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   return (
     <nav
       aria-label="Breadcrumb"
-      className={cn('text-sm text-neo-black/60 dark:text-neo-white/60 mb-4', className)}
+      className={cn('text-sm text-neo-black/60 dark:text-neo-white mb-4', className)}
     >
       <ol className="flex items-center gap-1 flex-wrap">
         {/* Home */}
@@ -41,7 +41,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
 
         {items.map((item, i) => (
           <li key={item.href ?? `${item.label}-${i}`} className="flex items-center gap-1">
-            <ChevronRight className="w-3.5 h-3.5 text-neo-black/30 dark:text-neo-white/30 rtl:rotate-180" aria-hidden="true" />
+            <ChevronRight className="w-3.5 h-3.5 text-neo-black/30 dark:text-neo-white rtl:rotate-180" aria-hidden="true" />
             {item.href ? (
               <Link
                 href={item.href}
@@ -50,7 +50,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                 {item.label}
               </Link>
             ) : (
-              <span className="text-neo-black/80 dark:text-neo-white/80 font-medium" aria-current="page">
+              <span className="text-neo-black/80 dark:text-neo-white font-medium" aria-current="page">
                 {item.label}
               </span>
             )}

@@ -56,14 +56,14 @@ function StatCard({
       transition={{ delay }}
       className={cn(
         'rounded-neo border-3 border-neo-black shadow-hard p-4',
-        'bg-slate-800/80 flex flex-col items-center gap-1'
+        'bg-neo-navy-light/80 flex flex-col items-center gap-1'
       )}
     >
       <div className={cn('p-2 rounded-neo border-2 border-neo-black/30', accentClass)}>
         {icon}
       </div>
       <span className="text-2xl font-black text-neo-white font-neo-display">{value}</span>
-      <span className="text-xs font-bold text-neo-white/60 uppercase tracking-wide text-center">
+      <span className="text-xs font-bold text-neo-white uppercase tracking-wide text-center">
         {label}
       </span>
     </m.div>
@@ -94,7 +94,7 @@ function MilestoneProgress({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.25 }}
-      className="rounded-neo border-3 border-neo-black shadow-hard bg-slate-800/80 p-4"
+      className="rounded-neo border-3 border-neo-black shadow-hard bg-neo-navy-light/80 p-4"
     >
       <div className="flex items-center gap-2 mb-3">
         <Trophy className="w-5 h-5 text-neo-yellow" aria-hidden="true" />
@@ -104,7 +104,7 @@ function MilestoneProgress({
       </div>
 
       {/* Progress bar */}
-      <div className="relative h-5 rounded-neo border-3 border-neo-black bg-slate-700 overflow-hidden mb-4">
+      <div className="relative h-5 rounded-neo border-3 border-neo-black bg-neo-navy-elevated overflow-hidden mb-4">
         <div
           className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 bg-linear-to-r rtl:bg-linear-to-l from-neo-lime to-neo-cyan transition-all duration-500"
           style={{ width: `${pct}%` }}
@@ -131,7 +131,7 @@ function MilestoneProgress({
               'rounded-neo border-2 p-2 text-center transition-colors',
               m.reached
                 ? 'border-neo-lime/60 bg-neo-lime/10'
-                : 'border-neo-black/30 bg-slate-700/50'
+                : 'border-neo-black/30 bg-neo-navy-elevated/50'
             )}
           >
             <div
@@ -140,7 +140,7 @@ function MilestoneProgress({
                 tierColors[m.id] || 'bg-gray-500'
               )}
             />
-            <div className="text-[10px] font-bold text-neo-white/80 uppercase">{m.label}</div>
+            <div className="text-[10px] font-bold text-neo-white uppercase">{m.label}</div>
             <div className="text-xs font-black text-neo-white">
               {m.threshold} {t('referralDashboard.friendsJoined').toLowerCase()}
             </div>
@@ -172,7 +172,7 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
     const map: Record<string, string> = {
       active: 'bg-neo-lime/20 text-neo-lime border-neo-lime/40',
       invited: 'bg-neo-yellow/20 text-neo-yellow border-neo-yellow/40',
-      inactive: 'bg-neo-white/10 text-neo-white/50 border-neo-white/20',
+      inactive: 'bg-neo-white/10 text-neo-white border-neo-white/20',
     };
     return map[s] ?? '';
   };
@@ -183,10 +183,10 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
-        className="rounded-neo border-3 border-neo-black shadow-hard bg-slate-800/80 p-6 text-center"
+        className="rounded-neo border-3 border-neo-black shadow-hard bg-neo-navy-light/80 p-6 text-center"
       >
-        <Users className="w-8 h-8 text-neo-white/30 mx-auto mb-2" aria-hidden="true" />
-        <p className="text-sm font-bold text-neo-white/50">
+        <Users className="w-8 h-8 text-neo-white mx-auto mb-2" aria-hidden="true" />
+        <p className="text-sm font-bold text-neo-white">
           {t('referralDashboard.noReferrals')}
         </p>
       </m.div>
@@ -198,7 +198,7 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
-      className="rounded-neo border-3 border-neo-black shadow-hard bg-slate-800/80 overflow-hidden"
+      className="rounded-neo border-3 border-neo-black shadow-hard bg-neo-navy-light/80 overflow-hidden"
     >
       <div className="p-4 border-b-3 border-neo-black/30">
         <h3 className="font-black text-sm uppercase text-neo-white font-neo-display">
@@ -220,7 +220,7 @@ function ReferralList({ referrals }: { referrals: ReferralEntry[] }) {
               <div className="font-bold text-sm text-neo-white truncate">
                 {r.displayName || r.username || '?'}
               </div>
-              <div className="text-[10px] text-neo-white/40">
+              <div className="text-[10px] text-neo-white">
                 {new Date(r.createdAt).toLocaleDateString()}
               </div>
             </div>
@@ -374,7 +374,7 @@ export default function ReferralDashboardClient() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-neo border-3 border-neo-black shadow-hard bg-slate-800/80 p-4"
+          className="rounded-neo border-3 border-neo-black shadow-hard bg-neo-navy-light/80 p-4"
         >
           <div className="flex items-center gap-2 mb-3">
             <QrCode className="w-5 h-5 text-neo-cyan" aria-hidden="true" />
@@ -392,7 +392,7 @@ export default function ReferralDashboardClient() {
 
           {/* URL display + copy */}
           <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1 bg-slate-700/60 rounded-neo border-2 border-neo-black/30 px-3 py-2 text-xs text-neo-white/70 font-mono truncate">
+            <div className="flex-1 bg-neo-navy-elevated/60 rounded-neo border-2 border-neo-black/30 px-3 py-2 text-xs text-neo-white font-mono truncate">
               {data.shareUrl}
             </div>
             <button

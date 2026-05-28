@@ -63,7 +63,7 @@ function WordPackCardCompact({ pack, onPlay, className }: Pick<WordPackCardProps
         <h4 className="font-neo-display font-bold text-sm text-neo-white truncate">
           {pack.name}
         </h4>
-        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-neo-white/50">
+        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-neo-white">
           <span className="flex items-center gap-0.5">
             <Hash className="w-3 h-3" /> {pack.word_count} {t('ugc.pack.card.words')}
           </span>
@@ -117,7 +117,7 @@ const WordPackCard = memo(function WordPackCard({
           customAvatar={pack.creator_avatar as CustomAvatarConfig | null}
           size="sm"
         />
-        <span className="text-xs text-neo-white/60 font-neo-body truncate">
+        <span className="text-xs text-neo-white font-neo-body truncate">
           {pack.creator_display_name}
         </span>
       </div>
@@ -138,7 +138,7 @@ const WordPackCard = memo(function WordPackCard({
             {pack.name}
           </h3>
           {pack.description && (
-            <p className="mt-1 text-sm text-neo-white/60 font-neo-body line-clamp-2">
+            <p className="mt-1 text-sm text-neo-white font-neo-body line-clamp-2">
               {pack.description}
             </p>
           )}
@@ -165,7 +165,7 @@ const WordPackCard = memo(function WordPackCard({
       )}
 
       {/* Stats */}
-      <div className="flex items-center gap-3 px-4 mt-3 text-xs text-neo-white/50 font-neo-body">
+      <div className="flex items-center gap-3 px-4 mt-3 text-xs text-neo-white font-neo-body">
         <span className="flex items-center gap-1">
           <Hash className="w-3 h-3" aria-hidden="true" />
           {pack.word_count} {t('ugc.pack.card.words')}
@@ -203,7 +203,7 @@ const WordPackCard = memo(function WordPackCard({
             'hover:shadow-hard active:shadow-hard-pressed transition-all duration-100',
             isUpvoted
               ? 'bg-neo-pink text-white'
-              : 'bg-neo-navy text-neo-white/70 hover:bg-neo-white/5'
+              : 'bg-neo-navy text-neo-white hover:bg-neo-white/5'
           )}
         >
           <ThumbsUp className={cn('w-4 h-4', isUpvoted && 'fill-white')} aria-hidden="true" />

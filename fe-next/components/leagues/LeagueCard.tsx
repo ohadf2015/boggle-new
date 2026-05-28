@@ -15,7 +15,7 @@ const TIER_COLORS: Record<LeagueTier, string> = {
 
 const TIER_BG: Record<LeagueTier, string> = {
   bronze: 'bg-amber-900/30',
-  silver: 'bg-gray-700/30',
+  silver: 'bg-neo-navy-elevated/30',
   gold: 'bg-yellow-900/30',
   diamond: 'bg-cyan-900/30',
   ruby: 'bg-red-900/30',
@@ -34,7 +34,7 @@ export function LeagueCard({ tier, myPosition, myXp, topStandings }: LeagueCardP
   if (myPosition === null && topStandings.length === 0) {
     return (
       <div className="border-neo rounded-neo bg-neo-navy/50 p-4 text-center">
-        <p className="text-neo-white/60">{t('league.noLeague')}</p>
+        <p className="text-neo-white">{t('league.noLeague')}</p>
       </div>
     );
   }
@@ -53,24 +53,24 @@ export function LeagueCard({ tier, myPosition, myXp, topStandings }: LeagueCardP
         </h3>
         {myPosition !== null && (
           <div className="flex items-center gap-2">
-            <span className="text-neo-white/60 text-sm">{t('league.yourPosition')}</span>
+            <span className="text-neo-white text-sm">{t('league.yourPosition')}</span>
             <span className="font-neo-display text-xl font-bold text-neo-white">#{myPosition}</span>
           </div>
         )}
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-neo-white/60 text-sm">{t('league.xp')}</span>
+        <span className="text-neo-white text-sm">{t('league.xp')}</span>
         <span className="font-bold text-neo-yellow">{myXp}</span>
       </div>
 
       {topStandings.length > 0 && (
         <div className="space-y-1">
-          <p className="text-xs text-neo-white/40 uppercase">{t('league.standings')}</p>
+          <p className="text-xs text-neo-white uppercase">{t('league.standings')}</p>
           {topStandings.map((s) => (
             <div key={s.userId} className="flex items-center justify-between text-sm">
-              <span className="text-neo-white/80">
-                <span className="text-neo-white/40 me-2">#{s.position}</span>
+              <span className="text-neo-white">
+                <span className="text-neo-white me-2">#{s.position}</span>
                 {s.displayName}
               </span>
               <span className="text-neo-yellow font-mono">{s.weeklyXp}</span>

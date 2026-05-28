@@ -141,7 +141,7 @@ const RankDeltaIndicator = memo<RankDeltaProps>(({ rankDelta, isNew }) => {
 
   if (rankDelta === null || rankDelta === 0) {
     return (
-      <span data-testid="rank-delta-none" className="text-neo-white/40 text-sm">
+      <span data-testid="rank-delta-none" className="text-neo-white text-sm">
         −
       </span>
     );
@@ -291,7 +291,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
               {displayName}
             </p>
             {isInactive && (
-              <span className="px-2 py-0.5 text-xs font-neo-body bg-neo-black/50 text-neo-white/70 rounded">
+              <span className="px-2 py-0.5 text-xs font-neo-body bg-neo-black/50 text-neo-white rounded">
                 {t('education.leaderboard.inactive')}
               </span>
             )}
@@ -345,7 +345,7 @@ LeaderboardEntryRow.displayName = 'LeaderboardEntryRow';
 const SeparatorRow = memo(() => (
   <div
     data-testid="leaderboard-separator"
-    className="flex items-center justify-center py-2 text-neo-white/40 font-neo-body font-bold text-lg tracking-widest"
+    className="flex items-center justify-center py-2 text-neo-white font-neo-body font-bold text-lg tracking-widest"
   >
     ...
   </div>
@@ -492,7 +492,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
 
         {/* Footer: Total students */}
         <div className="text-center pt-2">
-          <p className="font-neo-body text-sm text-neo-white/60">
+          <p className="font-neo-body text-sm text-neo-white">
             {t('education.leaderboard.studentsInClass', { count: totalStudents })}
           </p>
         </div>

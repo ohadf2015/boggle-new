@@ -219,7 +219,7 @@ export function CinematicFallback({
 
       {/* Progress Bar */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800"
+        className="absolute bottom-0 left-0 right-0 h-1 bg-neo-navy-light"
         role="progressbar"
         aria-valuenow={progress}
         aria-valuemin={0}

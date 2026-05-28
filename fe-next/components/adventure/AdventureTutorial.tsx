@@ -77,7 +77,7 @@ export function AdventureTutorial({ onComplete }: AdventureTutorialProps) {
           </h2>
 
           {/* Body */}
-          <p className="text-neo-white/70 font-neo-body text-sm text-center leading-relaxed mb-5">
+          <p className="text-neo-white font-neo-body text-sm text-center leading-relaxed mb-5">
             {t(body)}
           </p>
 
@@ -97,7 +97,7 @@ export function AdventureTutorial({ onComplete }: AdventureTutorialProps) {
           <div className="flex gap-2">
             <button
               onClick={markSeen}
-              className="flex-1 py-2 rounded-neo border-2 border-neo-white/20 text-neo-white/60 font-neo-display font-bold text-sm hover:border-neo-white/40 transition-colors"
+              className="flex-1 py-2 rounded-neo border-2 border-neo-white/20 text-neo-white font-neo-display font-bold text-sm hover:border-neo-white/40 transition-colors"
               data-testid="tutorial-skip"
             >
               {t('adventure.tutorial.skip')}

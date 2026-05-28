@@ -233,7 +233,7 @@ export default function GemHuntPageClient() {
         {!dict ? (
           <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
             <PageLoader size="sm" />
-            <span className="text-xs text-neo-cream">{t('wordcraft.loadingDict')}</span>
+            <span className="text-xs text-neo-white">{t('wordcraft.loadingDict')}</span>
           </div>
         ) : null}
 
@@ -321,7 +321,7 @@ export default function GemHuntPageClient() {
             type="button"
             onClick={handleRecallAll}
             disabled={state.pendingPlacements.length === 0}
-            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2 font-neo-display text-sm font-black uppercase tracking-wider text-neo-cream shadow-hard disabled:opacity-50"
+            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2 font-neo-display text-sm font-black uppercase tracking-wider text-neo-white shadow-hard disabled:opacity-50"
           >
             {t('wordcraft.recall')}
           </button>

@@ -166,7 +166,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
           <h3 className="font-neo-display font-bold text-sm leading-tight truncate">
             {t(upgrade.nameKey)}
           </h3>
-          <p className="text-xs text-neo-white/60 font-neo-body leading-snug mt-0.5">
+          <p className="text-xs text-neo-white font-neo-body leading-snug mt-0.5">
             {t(upgrade.descriptionKey)}
           </p>
         </div>
@@ -183,7 +183,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
             )}
           />
         ))}
-        <span className="text-xs font-mono font-bold text-neo-white/50 ms-1.5">
+        <span className="text-xs font-mono font-bold text-neo-white ms-1.5">
           {tier}/{maxTier}
         </span>
       </div>
@@ -199,7 +199,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
       {/* Next tier preview with delta highlight */}
       {!isMaxed && tier < maxTier && (
         <div className="text-xs font-neo-body">
-          <div className="flex items-center gap-1 text-neo-white/40">
+          <div className="flex items-center gap-1 text-neo-white">
             <ChevronRight className="w-3 h-3 rtl:scale-x-[-1]" />
             <span>{t(upgrade.tiers[tier].effectKey)}</span>
           </div>
@@ -207,7 +207,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
           {tier > 0 && (
             <div dir="ltr" className="mt-1 ms-4 inline-flex items-center gap-1 px-1.5 py-0.5 bg-neo-lime/10 border border-neo-lime/30 rounded text-[10px] font-bold text-neo-lime">
               <span>{upgrade.tiers[tier - 1].value}</span>
-              <span className="text-neo-white/30">→</span>
+              <span className="text-neo-white">→</span>
               <span>{upgrade.tiers[tier].value}</span>
             </div>
           )}
@@ -217,7 +217,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
       {/* Purchase row */}
       <div className="flex items-center justify-between mt-auto pt-2 border-t border-neo-white/10">
         {isMaxed ? (
-          <div className="flex items-center gap-1 text-neo-white/40">
+          <div className="flex items-center gap-1 text-neo-white">
             <Check className="w-4 h-4" />
             <span className="text-xs font-neo-display font-bold">{t('adventure.upgrades.maxLevel')}</span>
           </div>
@@ -236,7 +236,7 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
                 'px-3 py-1.5 rounded-neo border-2 border-neo-black font-neo-display font-bold text-xs transition-all',
                 canAfford
                   ? 'bg-neo-lime text-neo-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed'
-                  : 'bg-neo-navy/60 text-neo-white/30 cursor-not-allowed'
+                  : 'bg-neo-navy/60 text-neo-white cursor-not-allowed'
               )}
               whileHover={canAfford ? { scale: 1.05 } : {}}
               whileTap={canAfford ? { scale: 0.95 } : {}}

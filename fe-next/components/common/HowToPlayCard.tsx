@@ -54,12 +54,12 @@ export function HowToPlayCard({ storageKey, title, steps, cta, accent = 'cyan' }
           a.border,
         )}
       >
-        <h2 className="text-2xl font-black uppercase font-neo-display text-neo-cream text-center tracking-tight">
+        <h2 className="text-2xl font-black uppercase font-neo-display text-neo-white text-center tracking-tight">
           {title}
         </h2>
         <ul className="flex flex-col gap-3">
           {steps.map((step, i) => (
-            <li key={i} className="flex items-start gap-3 text-neo-cream/90 font-neo-body text-base">
+            <li key={i} className="flex items-start gap-3 text-neo-white font-neo-body text-base">
               <span className={cn('shrink-0 w-7 h-7 rounded-neo border-neo flex items-center justify-center font-black text-sm', a.btn)}>
                 {i + 1}
               </span>

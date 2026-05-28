@@ -69,7 +69,7 @@ const UnfinishedBoardTeaser = memo<UnfinishedBoardTeaserProps>(({
             data-testid={`masked-word-${index}`}
             className={cn(
               'px-3 py-2 rounded-neo bg-neo-navy-light border-2 border-neo-black/30',
-              'font-mono text-sm font-bold text-neo-cream tracking-[0.25em]',
+              'font-mono text-sm font-bold text-neo-white tracking-[0.25em]',
               'text-center'
             )}
           >

@@ -193,7 +193,7 @@ export function BlastBragCard({ results, t }: BlastBragCardProps) {
       <p className="text-white font-neo-display font-black text-2xl leading-tight">
         {t('blast.results.brag.beats', { pct: String(beats) })}
       </p>
-      <p className="text-[11px] uppercase tracking-widest text-white/60 font-bold mt-0.5">
+      <p className="text-[11px] uppercase tracking-widest text-white font-bold mt-0.5">
         {t('blast.results.brag.weeklyCohort')}
       </p>
 
@@ -234,7 +234,7 @@ function BragStat({ icon: Icon, label, value, tint }: BragStatProps) {
     <div className="rounded-neo border-2 border-neo-black bg-neo-black/40 px-2 py-1.5">
       <div className="flex items-center gap-1">
         <Icon className={cn('w-3 h-3', tint)} strokeWidth={2.75} />
-        <p className="text-[9px] uppercase tracking-widest font-bold text-white/50">
+        <p className="text-[9px] uppercase tracking-widest font-bold text-white">
           {label}
         </p>
       </div>

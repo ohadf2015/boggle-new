@@ -33,7 +33,7 @@ export default function RunProgressMeter({ score, target, t }: RunProgressMeterP
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-bold uppercase tracking-wide text-neo-white/80">
+        <span className="text-xs font-bold uppercase tracking-wide text-neo-white">
           {t('wordcraft.run.target')}
         </span>
         <span className="text-xs font-black tabular-nums text-neo-white">
@@ -47,7 +47,7 @@ export default function RunProgressMeter({ score, target, t }: RunProgressMeterP
         aria-valuemin={0}
         aria-valuemax={target}
         data-zone={zone}
-        className="relative h-4 w-full rounded-neo border-2 border-neo-black overflow-hidden bg-slate-900"
+        className="relative h-4 w-full rounded-neo border-2 border-neo-black overflow-hidden bg-neo-navy"
       >
         <div
           data-testid="run-meter-fill"

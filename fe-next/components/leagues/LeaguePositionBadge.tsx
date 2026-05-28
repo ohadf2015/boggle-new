@@ -16,7 +16,7 @@ const TIER_COLORS: Record<LeagueTier, string> = {
 
 const TIER_BG: Record<LeagueTier, string> = {
   bronze: 'bg-amber-900/30',
-  silver: 'bg-gray-700/30',
+  silver: 'bg-neo-navy-elevated/30',
   gold: 'bg-yellow-900/30',
   diamond: 'bg-cyan-900/30',
   ruby: 'bg-red-900/30',
@@ -91,7 +91,7 @@ export function LeaguePositionBadge() {
 
   // Determine which gap message to show
   let gapText: string | null = null;
-  let gapColor = 'text-neo-white/50';
+  let gapColor = 'text-neo-white';
 
   if (xpGap?.xpToPromote != null && xpGap.xpToPromote > 0) {
     gapText = interpolate(t('league.xpToPromote') || '{xp} XP to promote', {
@@ -102,7 +102,7 @@ export function LeaguePositionBadge() {
     gapText = interpolate(t('league.xpAboveRelegation') || '{xp} XP above relegation', {
       xp: xpGap.xpAboveRelegation,
     });
-    gapColor = xpGap.xpAboveRelegation <= 50 ? 'text-red-400' : 'text-neo-white/50';
+    gapColor = xpGap.xpAboveRelegation <= 50 ? 'text-red-400' : 'text-neo-white';
   }
 
   return (

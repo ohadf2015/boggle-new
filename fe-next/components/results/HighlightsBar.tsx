@@ -89,7 +89,7 @@ export default function HighlightsBar({ stats }: HighlightsBarProps) {
             />
           )}
           <div className="text-center px-2 shrink-0">
-            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">
+            <p className="text-[10px] font-bold text-white uppercase tracking-widest mb-1">
               {stat.label}
             </p>
             <div className="flex items-center justify-center gap-1.5">

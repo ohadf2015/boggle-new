@@ -105,7 +105,7 @@ export function ProfileXpSection({
 
       {!compact && (
         <div className="mt-4 flex items-center justify-between gap-3 px-3 py-2.5 bg-neo-black/40 border-2 border-neo-black rounded-neo">
-          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-neo-white/60">
+          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-neo-white">
             {t('xp.totalXpEarned')}
           </span>
           <span className="font-neo-display font-black text-xl text-neo-cyan tabular-nums">

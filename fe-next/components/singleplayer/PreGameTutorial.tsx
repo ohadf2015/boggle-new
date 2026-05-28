@@ -82,7 +82,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
           e.stopPropagation();
           onComplete();
         }}
-        className="absolute top-4 right-4 z-[60] text-neo-white/70 hover:text-neo-white text-sm font-bold px-4 py-2 rounded-neo border-2 border-neo-white/30 hover:border-neo-white/60 hover:bg-neo-white/10 transition-colors cursor-pointer"
+        className="absolute top-4 right-4 z-[60] text-neo-white hover:text-neo-white text-sm font-bold px-4 py-2 rounded-neo border-2 border-neo-white/30 hover:border-neo-white/60 hover:bg-neo-white/10 transition-colors cursor-pointer"
       >
         {t('preGameTutorial.skip')}
       </button>
@@ -147,7 +147,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
               >
                 <div className="flex items-center gap-3">
                   <Mascot variant="gaming" size="md" clipBorder="none" />
-                  <p className="font-bold text-sm text-neo-white/80">
+                  <p className="font-bold text-sm text-neo-white">
                     {t('preGameTutorial.practice.instruction')}
                   </p>
                 </div>
@@ -247,7 +247,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
                 transition={{ delay: 0.6, ...SPRING_SOFT }}
                 whileHover={{ scale: 1.03, backgroundColor: 'rgba(139,92,246,0.2)' }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-white/20 bg-neo-white/5 hover:border-neo-purple/50 transition-colors text-neo-white/70 hover:text-neo-white"
+                className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-white/20 bg-neo-white/5 hover:border-neo-purple/50 transition-colors text-neo-white hover:text-neo-white"
               >
                 <Palette className="w-4 h-4" />
                 <span className="text-xs font-bold">{t('preGameTutorial.buildAvatar')}</span>
@@ -295,7 +295,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
           onClick={handleBack}
           animate={{ opacity: currentStep > 0 ? 1 : 0, scale: currentStep > 0 ? 1 : 0.8 }}
           disabled={currentStep === 0}
-          className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-white/30 text-neo-white/70 hover:border-neo-white/60 hover:text-neo-white transition-colors disabled:pointer-events-none"
+          className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-white/30 text-neo-white hover:border-neo-white/60 hover:text-neo-white transition-colors disabled:pointer-events-none"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -326,7 +326,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
 
         <m.button
           onClick={currentStep < TOTAL_STEPS - 1 ? handleNext : onComplete}
-          className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-white/30 text-neo-white/70 hover:border-neo-white/60 hover:text-neo-white transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-white/30 text-neo-white hover:border-neo-white/60 hover:text-neo-white transition-colors"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >

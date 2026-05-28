@@ -128,7 +128,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
             </div>
           )}
 
-          <p className="text-sm text-neo-white/60 uppercase tracking-wide">
+          <p className="text-sm text-neo-white uppercase tracking-wide">
             {t('adventure.worldLabel')} {worldNumber}
           </p>
           <h2 className="text-3xl font-black text-neo-white">
@@ -148,7 +148,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
             <span className="text-2xl font-black text-neo-white">
               {levelConfig.timerSeconds}
             </span>
-            <span className="text-sm text-neo-white/60 ms-2">
+            <span className="text-sm text-neo-white ms-2">
               {t('adventure.preview.seconds')}
             </span>
           </div>
@@ -156,7 +156,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
 
         {/* Objectives */}
         <div className="p-4 border-b-2 border-neo-black/20">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-neo-white/70 uppercase tracking-wide mb-3">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-neo-white uppercase tracking-wide mb-3">
             <Target className="w-4 h-4" />
             {t('adventure.preview.objectives')}
           </h3>
@@ -171,7 +171,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
                   objective.isPrimary && 'border-l-4 border-neo-lime'
                 )}
               >
-                <span className="text-neo-white/80">
+                <span className="text-neo-white">
                   {t(OBJECTIVE_TRANSLATION_KEYS[objective.type], { target: objective.target })}
                 </span>
                 <span className="font-black text-neo-lime">
@@ -184,7 +184,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
 
         {/* Star Requirements */}
         <div className="p-4 border-b-2 border-neo-black/20">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-neo-white/70 uppercase tracking-wide mb-3">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-neo-white uppercase tracking-wide mb-3">
             <Star className="w-4 h-4" />
             {t('adventure.preview.stars.title')}
           </h3>
@@ -194,7 +194,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
               <div className="flex items-center gap-0.5 shrink-0">
                 <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
               </div>
-              <span className="text-sm text-neo-white/80">
+              <span className="text-sm text-neo-white">
                 {t('adventure.preview.stars.oneStar')}
               </span>
             </div>
@@ -204,7 +204,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
                 <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
                 <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
               </div>
-              <span className="text-sm text-neo-white/80">
+              <span className="text-sm text-neo-white">
                 {t('adventure.preview.stars.twoStars')}
               </span>
             </div>
@@ -215,7 +215,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
                 <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
                 <Star className="w-4 h-4 text-neo-yellow fill-neo-yellow" />
               </div>
-              <span className="text-sm text-neo-white/80">
+              <span className="text-sm text-neo-white">
                 {(() => {
                   const secondaryCount = levelConfig.objectives.filter(o => !o.isPrimary).length;
                   if (secondaryCount >= 3) {
@@ -230,7 +230,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
 
         {/* Special Tiles */}
         <div className="p-4 border-b-2 border-neo-black/20">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-neo-white/70 uppercase tracking-wide mb-3">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-neo-white uppercase tracking-wide mb-3">
             <Sparkles className="w-4 h-4" />
             {t('adventure.preview.specialTiles')}
           </h3>
@@ -249,7 +249,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
                     )}
                   >
                     <Icon className={cn('w-4 h-4', color)} />
-                    <span className="text-sm text-neo-white/80">
+                    <span className="text-sm text-neo-white">
                       {t(key)}
                     </span>
                   </div>
@@ -257,7 +257,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
               })}
             </div>
           ) : (
-            <p className="text-neo-white/50 text-sm italic">
+            <p className="text-neo-white text-sm italic">
               {t('adventure.preview.noSpecialTiles')}
             </p>
           )}
@@ -265,22 +265,22 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
 
         {/* Best Attempt */}
         <div className="p-4 border-b-2 border-neo-black/20">
-          <h3 className="text-sm font-bold text-neo-white/70 uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-bold text-neo-white uppercase tracking-wide mb-3">
             {t('adventure.preview.bestAttempt')}
           </h3>
           {bestAttempt ? (
             <div className="grid grid-cols-2 gap-3">
               <div className="p-2 rounded-neo bg-neo-black/20 text-center">
                 <p className="text-xl font-black text-neo-cyan">{bestAttempt.bestWords}</p>
-                <p className="text-xs text-neo-white/60">{t('common.wordsFound')}</p>
+                <p className="text-xs text-neo-white">{t('common.wordsFound')}</p>
               </div>
               <div className="p-2 rounded-neo bg-neo-black/20 text-center">
                 <p className="text-xl font-black text-neo-lime">{bestAttempt.bestScore}</p>
-                <p className="text-xs text-neo-white/60">{t('common.score')}</p>
+                <p className="text-xs text-neo-white">{t('common.score')}</p>
               </div>
             </div>
           ) : (
-            <p className="text-neo-white/50 text-sm italic">
+            <p className="text-neo-white text-sm italic">
               {t('adventure.preview.notAttempted')}
             </p>
           )}
@@ -310,7 +310,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
             className={cn(
               'w-full py-2 px-4',
               'flex items-center justify-center gap-2',
-              'bg-transparent text-neo-white/60',
+              'bg-transparent text-neo-white',
               'font-medium text-sm',
               'border border-neo-white/20 rounded-neo',
               'hover:text-neo-white hover:border-neo-white/40',

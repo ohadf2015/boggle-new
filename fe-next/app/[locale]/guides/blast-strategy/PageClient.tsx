@@ -34,7 +34,7 @@ export default function BlastStrategyPageClient(): React.ReactElement {
             size="sm"
             className={cn(
               'mb-6 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-white text-neo-black hover:bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -83,7 +83,7 @@ export default function BlastStrategyPageClient(): React.ReactElement {
           data-speakable="true"
           className={cn(
             'mb-8 p-6 rounded-neo border-3 border-neo-black shadow-hard',
-            isDarkMode ? 'bg-slate-800' : 'bg-neo-orange/20'
+            isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-orange/20'
           )}
         >
           <h2 className={cn('text-xl font-bold mb-4', isDarkMode ? 'text-white' : 'text-neo-black')}>
@@ -107,11 +107,11 @@ export default function BlastStrategyPageClient(): React.ReactElement {
           </h2>
           <div className={cn(
             'overflow-hidden rounded-neo border-3 border-neo-black shadow-hard',
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
+            isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
           )}>
             <table className="w-full text-center">
               <thead>
-                <tr className={cn('border-b-3 border-neo-black', isDarkMode ? 'bg-slate-700' : 'bg-neo-orange')}>
+                <tr className={cn('border-b-3 border-neo-black', isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-orange')}>
                   <th className="py-3 px-4 font-bold">Level</th>
                   <th className="py-3 px-4 font-bold">Multiplier</th>
                   <th className="py-3 px-4 font-bold">Window</th>
@@ -121,8 +121,8 @@ export default function BlastStrategyPageClient(): React.ReactElement {
                 {content.comboTable.map((row, i) => (
                   <tr key={`row-${row.level}`} className={cn(
                     i % 2 === 0
-                      ? (isDarkMode ? 'bg-slate-800' : 'bg-white')
-                      : (isDarkMode ? 'bg-slate-700/50' : 'bg-neo-cream/50')
+                      ? (isDarkMode ? 'bg-neo-navy-light' : 'bg-white')
+                      : (isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-neo-cream/50')
                   )}>
                     <td className={cn('py-2 px-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
                       {row.level}
@@ -175,12 +175,12 @@ export default function BlastStrategyPageClient(): React.ReactElement {
                   key={`faq-${i}-${item.question}`}
                   className={cn(
                     'rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
-                    isDarkMode ? 'bg-slate-800' : 'bg-white'
+                    isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                   )}
                 >
                   <summary className={cn(
                     'p-4 font-bold cursor-pointer',
-                    isDarkMode ? 'text-white hover:bg-slate-700' : 'text-neo-black hover:bg-neo-cream'
+                    isDarkMode ? 'text-white hover:bg-neo-navy-elevated' : 'text-neo-black hover:bg-neo-cream'
                   )}>
                     {item.question}
                   </summary>

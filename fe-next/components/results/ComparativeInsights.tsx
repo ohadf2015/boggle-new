@@ -79,7 +79,7 @@ const ComparativeInsights: React.FC<ComparativeInsightsProps> = ({
       </h3>
       <div className="space-y-1.5">
         {uniqueWordCount > 0 && (
-          <div className="flex items-center gap-2 text-sm text-neo-cream">
+          <div className="flex items-center gap-2 text-sm text-neo-white">
             <Fingerprint className="w-4 h-4 text-neo-cyan shrink-0" />
             <span>
               {t('results.comparativeInsights.uniqueWords', { count: uniqueWordCount }) ||
@@ -88,7 +88,7 @@ const ComparativeInsights: React.FC<ComparativeInsightsProps> = ({
           </div>
         )}
         {longestDiff > 0 && (
-          <div className="flex items-center gap-2 text-sm text-neo-cream">
+          <div className="flex items-center gap-2 text-sm text-neo-white">
             <TrendingUp className="w-4 h-4 text-neo-lime shrink-0" />
             <span>
               {t('results.comparativeInsights.longestWord', { count: longestDiff }) ||
@@ -97,7 +97,7 @@ const ComparativeInsights: React.FC<ComparativeInsightsProps> = ({
           </div>
         )}
         {scorePctDiff !== 0 && (
-          <div className="flex items-center gap-2 text-sm text-neo-cream">
+          <div className="flex items-center gap-2 text-sm text-neo-white">
             <Sparkles className="w-4 h-4 text-neo-orange shrink-0" />
             <span>
               {scorePctDiff > 0

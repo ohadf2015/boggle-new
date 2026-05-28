@@ -52,16 +52,16 @@ export const MilestoneTracker = memo<MilestoneTrackerProps>(
             <span className="text-neo-lime font-black text-lg">
               {currentLevel}
             </span>
-            <span className="text-neo-white/50">→</span>
+            <span className="text-neo-white">→</span>
             <span className={cn(
               'font-black text-lg',
-              nextMilestone ? 'text-neo-white/70' : 'text-neo-white/30'
+              nextMilestone ? 'text-neo-white' : 'text-neo-white'
             )}>
               {nextMilestone?.level || '—'}
             </span>
           </div>
           {nextMilestone && (
-            <div className="text-sm text-neo-white/70">
+            <div className="text-sm text-neo-white">
               {t('education.milestones.xpRemaining')}: <span className="font-bold text-neo-lime">{xpToNextMilestone}</span>
             </div>
           )}

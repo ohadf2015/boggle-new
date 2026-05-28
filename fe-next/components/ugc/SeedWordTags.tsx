@@ -70,7 +70,7 @@ export function SeedWordTags({
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      <label className="font-neo-body text-sm text-neo-white/80">
+      <label className="font-neo-body text-sm text-neo-white">
         {t('ugc.board.seedWords')}
       </label>
 
@@ -150,12 +150,12 @@ export function SeedWordTags({
           className={cn(
             'flex-1 min-w-[80px] bg-transparent text-neo-white',
             'font-neo-body text-sm outline-hidden',
-            'placeholder:text-neo-white/40'
+            'placeholder:text-neo-white'
           )}
         />
       </div>
 
-      <p className="font-neo-body text-xs text-neo-white/40">
+      <p className="font-neo-body text-xs text-neo-white">
         {t('ugc.board.seedWordsHelp') || 'Press Enter or comma to add words. Click a tag to edit.'}
       </p>
     </div>

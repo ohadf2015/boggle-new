@@ -173,7 +173,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
       {description && (
         <m.p
           className={cn(
-            'font-medium text-neo-black/70 dark:text-neo-white/70 max-w-sm',
+            'font-medium text-neo-black/70 dark:text-neo-white max-w-sm',
             compact ? 'text-sm mt-2' : 'text-base mt-3'
           )}
           variants={reduceMotion ? {} : itemVariants}

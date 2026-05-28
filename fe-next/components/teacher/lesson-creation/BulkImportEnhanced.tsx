@@ -180,7 +180,7 @@ export default function BulkImportEnhanced({
           <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-4 text-balance">
             {t('teacher.lesson.bulkImportTitle')}
           </Dialog.Title>
-          <Dialog.Description className="text-sm text-neo-white/70 mb-4 text-pretty">
+          <Dialog.Description className="text-sm text-neo-white mb-4 text-pretty">
             {t('teacher.lesson.bulkImportDescription')}
           </Dialog.Description>
 
@@ -220,7 +220,7 @@ export default function BulkImportEnhanced({
                   'w-full h-40 px-4 py-3 bg-neo-black/50 border-neo border-neo-black',
                   'text-neo-white font-neo-body shadow-hard-sm resize-none',
                   'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan',
-                  'placeholder:text-neo-white/40'
+                  'placeholder:text-neo-white'
                 )}
               />
             </div>
@@ -286,7 +286,7 @@ export default function BulkImportEnhanced({
                       </div>
                     ))}
                     {validationResults.length > 50 && (
-                      <span className="text-neo-white/50 text-xs self-center">
+                      <span className="text-neo-white text-xs self-center">
                         +{validationResults.length - 50} {t('common.more')}
                       </span>
                     )}
@@ -318,7 +318,7 @@ export default function BulkImportEnhanced({
 
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
+              className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />

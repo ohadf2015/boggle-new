@@ -88,7 +88,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
         <p className="font-black text-neo-white text-sm sm:text-base uppercase">
           {t('landing.createAvatar')}
         </p>
-        <p className="text-neo-white/50 text-xs sm:text-sm font-medium flex items-center gap-1.5 mt-0.5">
+        <p className="text-neo-white text-xs sm:text-sm font-medium flex items-center gap-1.5 mt-0.5">
           {t('landing.designYourLook')}
           <AdaptiveMotion.span
             animate={{ x: dir === 'rtl' ? [0, -5, 0] : [0, 5, 0] }}

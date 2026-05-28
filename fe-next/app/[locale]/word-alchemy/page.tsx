@@ -225,7 +225,7 @@ export default function WordAlchemyPage() {
   if (!isAdmin && !isDev) {
     return (
       <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
-        <p className="font-neo-body text-neo-white/60 text-center max-w-sm">
+        <p className="font-neo-body text-neo-white text-center max-w-sm">
           {t('wordAlchemy.adminOnly')}
         </p>
       </main>
@@ -263,10 +263,10 @@ export default function WordAlchemyPage() {
           <h1 className="font-neo-display font-black text-3xl sm:text-4xl uppercase tracking-tight text-neo-white">
             {t('wordAlchemy.title')}
           </h1>
-          <p className="font-neo-body text-sm sm:text-base text-neo-white/70 max-w-md mx-auto">
+          <p className="font-neo-body text-sm sm:text-base text-neo-white max-w-md mx-auto">
             {t('wordAlchemy.instructions')}
           </p>
-          <p className="font-neo-body text-xs text-neo-white/50">
+          <p className="font-neo-body text-xs text-neo-white">
             {t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: PUZZLES.length })}
           </p>
         </header>
@@ -287,7 +287,7 @@ export default function WordAlchemyPage() {
           {!won && (
             <span className="flex items-center gap-2">
               <ArrowRight className="h-4 w-4 text-neo-purple-light" strokeWidth={3} aria-hidden="true" />
-              <span className="rounded-neo border-2 border-dashed border-neo-white/40 px-3 py-1.5 font-neo-display font-black text-lg uppercase tracking-[0.3em] text-neo-white/40">
+              <span className="rounded-neo border-2 border-dashed border-neo-white/40 px-3 py-1.5 font-neo-display font-black text-lg uppercase tracking-[0.3em] text-neo-white">
                 {showHint ? revealHint(step!.answer, wrongCount) : '?'}
               </span>
             </span>
@@ -314,15 +314,15 @@ export default function WordAlchemyPage() {
           /* Active step */
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="rounded-neo border-3 border-black bg-neo-navy-light p-5 shadow-hard space-y-2">
-              <p className="font-neo-body text-xs uppercase tracking-widest text-neo-white/50">
+              <p className="font-neo-body text-xs uppercase tracking-widest text-neo-white">
                 {t('wordAlchemy.stepProgress', { n: stepIdx + 1, total: puzzle.steps.length })}
               </p>
               <p className="font-neo-display font-black text-lg text-neo-white">
                 <span dir="ltr" className="text-neo-cyan">{prevWord}</span>
-                <span className="mx-2 text-neo-white/60">·</span>
+                <span className="mx-2 text-neo-white">·</span>
                 <span className="text-neo-purple-light">{opLabel}</span>
               </p>
-              {clue && <p className="font-neo-body text-sm text-neo-white/60 italic">{clue}</p>}
+              {clue && <p className="font-neo-body text-sm text-neo-white italic">{clue}</p>}
             </div>
 
             <input
@@ -341,7 +341,7 @@ export default function WordAlchemyPage() {
             />
 
             {showHint && (
-              <p className="text-center font-neo-body text-sm text-neo-white/60">
+              <p className="text-center font-neo-body text-sm text-neo-white">
                 {t('wordAlchemy.hintLabel')}{' '}
                 <span dir="ltr" className="font-neo-display font-black tracking-[0.3em] text-neo-white">
                   {revealHint(step!.answer, wrongCount)}
@@ -359,7 +359,7 @@ export default function WordAlchemyPage() {
             <button
               type="button"
               onClick={() => resetPuzzle(puzzleIdx)}
-              className="mx-auto flex items-center gap-1.5 font-neo-body text-xs uppercase tracking-wide text-neo-white/50 transition-colors hover:text-neo-white"
+              className="mx-auto flex items-center gap-1.5 font-neo-body text-xs uppercase tracking-wide text-neo-white transition-colors hover:text-neo-white"
             >
               <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
               {t('wordAlchemy.restart')}

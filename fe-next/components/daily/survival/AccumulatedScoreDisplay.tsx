@@ -150,7 +150,7 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
 
         <div className="relative overflow-visible">
           <animated.span
-            className="text-xl @[100px]:text-2xl font-black font-neo-display text-neo-cream tabular-nums block whitespace-nowrap"
+            className="text-xl @[100px]:text-2xl font-black font-neo-display text-neo-white tabular-nums block whitespace-nowrap"
           >
             {springProps.val.to((v) => Math.round(v).toLocaleString())}
           </animated.span>
@@ -210,7 +210,7 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
                 transition={{ type: 'spring', stiffness: 90, damping: 20 }}
               />
             </div>
-            <span className="text-neo-cream/85 font-bold tabular-nums">{progressNote}</span>
+            <span className="text-neo-white font-bold tabular-nums">{progressNote}</span>
           </>
         )}
       </div>

@@ -20,7 +20,7 @@ const STREAK_TIERS = [
   { min: 1, emoji: '✨', icon: Star, bg: 'bg-neo-lime', text: 'text-neo-black', bar: 'bg-neo-lime', name: 'Starting' },
   { min: 3, emoji: '⚡', icon: Zap, bg: 'bg-neo-cyan', text: 'text-neo-black', bar: 'bg-neo-cyan', name: 'Hot' },
   { min: 7, emoji: '🔥', icon: Flame, bg: 'bg-neo-red', text: 'text-neo-black', bar: 'bg-neo-red', name: 'On Fire' },
-  { min: 14, emoji: '💎', icon: Gem, bg: 'bg-neo-pink', text: 'text-neo-cream', bar: 'bg-neo-pink', name: 'Epic' },
+  { min: 14, emoji: '💎', icon: Gem, bg: 'bg-neo-pink', text: 'text-neo-white', bar: 'bg-neo-pink', name: 'Epic' },
   { min: 30, emoji: '👑', icon: Crown, bg: 'bg-tier-gold', text: 'text-neo-black', bar: 'bg-tier-gold', name: 'Legendary' },
 ];
 
@@ -165,7 +165,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
               </span>
               <span className={cn(
                 'text-sm font-bold',
-                'text-neo-cream/80'
+                'text-neo-white'
               )}>
                 {t('growth.dayStreak')}
               </span>
@@ -174,7 +174,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
             {tier && (
               <div className={cn(
                 'text-xs font-bold flex items-center gap-1',
-                'text-neo-cream/70'
+                'text-neo-white'
               )}>
                 <span>{tier.emoji}</span>
                 <span className="uppercase tracking-wide">{tier.name}</span>
@@ -193,7 +193,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
           <div className="text-right">
             <div className={cn(
               'text-xs font-bold',
-              'text-neo-cream/60'
+              'text-neo-white'
             )}>
               {t('growth.nextTier')}
             </div>
@@ -201,7 +201,7 @@ const WinStreakDisplay = memo<WinStreakDisplayProps>(({
               <span className="text-lg">{nextTier.emoji}</span>
               <span className={cn(
                 'text-sm font-bold',
-                'text-neo-cream/80'
+                'text-neo-white'
               )}>
                 {nextTier.min - currentStreak} {t('growth.daysAway')}
               </span>

@@ -33,12 +33,12 @@ export function ChurnRiskPanel({ players, total }: ChurnRiskPanelProps) {
 
   if (!players) {
     return (
-      <div data-testid="churn-loading" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
+      <div data-testid="churn-loading" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
     );
   }
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-neo-orange" />
@@ -61,7 +61,7 @@ export function ChurnRiskPanel({ players, total }: ChurnRiskPanelProps) {
               <div
                 key={player.id}
                 data-testid="churn-player-row"
-                className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-slate-700/30 transition-colors"
+                className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-neo-navy-elevated/30 transition-colors"
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="text-sm text-neo-white truncate">

@@ -35,7 +35,7 @@ export function PerformanceSection({ insights, title, archetype }: PerformanceSe
             <div>
               <span className="text-sm font-bold text-neo-lime">{archetype.name}</span>
               {archetype.description && (
-                <p className="text-xs text-white/60">{archetype.description}</p>
+                <p className="text-xs text-white">{archetype.description}</p>
               )}
             </div>
           </div>

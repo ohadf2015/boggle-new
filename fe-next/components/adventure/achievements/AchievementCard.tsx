@@ -88,7 +88,7 @@ export function AchievementCard({
       <span
         className={cn(
           'text-xs font-bold',
-          isEarned && tierColors ? '' : 'text-neo-white/70'
+          isEarned && tierColors ? '' : 'text-neo-white'
         )}
         style={isEarned && tierColors ? { color: tierColors.text } : undefined}
       >

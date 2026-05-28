@@ -142,7 +142,7 @@ export default function WordListEditor({
           </div>
         </div>
       ) : (
-        <p className="text-sm text-neo-white/40 text-center py-4">
+        <p className="text-sm text-neo-white text-center py-4">
           {t('teacher.lesson.noWords')}
         </p>
       )}

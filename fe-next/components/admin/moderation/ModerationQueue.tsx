@@ -27,12 +27,12 @@ export function ModerationQueue({ items, total, onAction }: ModerationQueueProps
 
   if (!items) {
     return (
-      <div data-testid="queue-loading" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
+      <div data-testid="queue-loading" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
     );
   }
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2">
           <ShieldAlert className="w-4 h-4 text-neo-pink" />
@@ -50,7 +50,7 @@ export function ModerationQueue({ items, total, onAction }: ModerationQueueProps
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between py-2 px-2 rounded hover:bg-slate-700/30 transition-colors"
+              className="flex items-center justify-between py-2 px-2 rounded hover:bg-neo-navy-elevated/30 transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <span className="text-sm">{LANG_FLAGS[item.language] ?? '🌐'}</span>

@@ -135,7 +135,7 @@ const WordHuntDeathRecap = memo<WordHuntDeathRecapProps>(({ stats, t }) => {
         <div className="mx-3 mb-3 p-3 rounded-neo bg-neo-cyan/10 border-2 border-neo-cyan/30">
           <div className="flex items-start gap-2">
             <Zap size={14} className="text-neo-cyan shrink-0 mt-0.5" />
-            <p className="text-xs font-neo-body text-neo-cream leading-relaxed font-medium">
+            <p className="text-xs font-neo-body text-neo-white leading-relaxed font-medium">
               {t(lesson.key, lesson.params)}
             </p>
           </div>
@@ -143,7 +143,7 @@ const WordHuntDeathRecap = memo<WordHuntDeathRecapProps>(({ stats, t }) => {
 
         {/* Elimination order */}
         <div className="px-4 pb-3 text-center">
-          <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">
+          <span className="text-[10px] font-bold text-white uppercase tracking-widest">
             {t('wordHuntDeathRecap.eliminatedOrder', {
               order: stats.eliminationOrder,
               total: stats.totalPlayers,
@@ -166,7 +166,7 @@ function StatPill({ icon, value, label }: { icon: React.ReactNode; value: string
       <span className="text-sm font-mono font-black text-neo-white tabular-nums">
         {value}
       </span>
-      <span className="text-[8px] font-bold text-white/40 uppercase tracking-wider">
+      <span className="text-[8px] font-bold text-white uppercase tracking-wider">
         {label}
       </span>
     </div>

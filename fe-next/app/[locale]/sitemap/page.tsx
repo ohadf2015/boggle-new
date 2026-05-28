@@ -115,7 +115,7 @@ export default async function SitemapPage({ params }: PageProps) {
                   <li key={link.href}>
                     <Link
                       href={`/${locale}${link.href}`}
-                      className="text-sm text-neo-cream/70 hover:text-neo-cyan transition-colors duration-100"
+                      className="text-sm text-neo-white hover:text-neo-cyan transition-colors duration-100"
                     >
                       {resolve(link.labelKey, link.fallback)}
                     </Link>

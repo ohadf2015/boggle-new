@@ -304,7 +304,7 @@ describe('PushNotificationPreferences', () => {
       const { container } = render(<PushNotificationPreferences isDarkMode={true} />);
 
       // THEN - Should have dark mode classes
-      expect(container.firstChild).toHaveClass('bg-slate-800/50');
+      expect(container.firstChild).toHaveClass('bg-neo-navy-light/50');
     });
   });
 });

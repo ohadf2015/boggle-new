@@ -158,7 +158,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
           </div>
 
           {/* Tables Breakdown */}
-          <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+          <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
             <h4 className="font-neo-display text-neo-white mb-3">Database Tables</h4>
             <div className="space-y-3">
               {Object.entries(data.diagnostic.tables).map(([tableName, tableData]: [string, any]) => (
@@ -169,7 +169,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
 
           {/* Server Info */}
           {data.diagnostic.serverInfo && (
-            <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+            <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
               <h4 className="font-neo-display text-neo-white mb-2">Server Info</h4>
               <div className="text-sm text-slate-300">
                 Process Uptime: {data.diagnostic.serverInfo.processUptimeFormatted}
@@ -184,7 +184,7 @@ export function GamesDiagnostic({ authToken }: GamesDiagnosticProps) {
 
 function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-3">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-3">
       <div className="flex items-center gap-2 text-slate-400 text-xs mb-1">
         {icon}
         <span>{label}</span>
@@ -196,7 +196,7 @@ function InfoCard({ icon, label, value }: { icon: React.ReactNode; label: string
 
 function StatCard({ label, value, trend }: { label: string; value: number; trend: 'positive' | 'neutral' }) {
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
       <div className="flex items-center justify-between">
         <div>
           <div className="text-slate-400 text-sm mb-1">{label}</div>

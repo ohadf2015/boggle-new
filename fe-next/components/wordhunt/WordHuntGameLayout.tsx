@@ -174,7 +174,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         {targetLength > 0 && (
           <p
             data-testid="wh-heal-hint"
-            className="shrink-0 px-2 text-center text-[11px] sm:text-xs font-neo-body text-neo-cream/70 leading-tight"
+            className="shrink-0 px-2 text-center text-[11px] sm:text-xs font-neo-body text-neo-white leading-tight"
           >
             {t('wordHunt.survival.healHint')}
           </p>
@@ -288,14 +288,14 @@ function ClueTilesSkeleton({ t }: { t: (key: string) => string }) {
       aria-live="polite"
       aria-label={t('wordHunt.survival.syncingTarget')}
     >
-      <div className="text-center mb-2 text-xl sm:text-2xl font-black text-neo-cream/40">
+      <div className="text-center mb-2 text-xl sm:text-2xl font-black text-neo-white">
         {t('wordHunt.survival.syncingTarget')}
       </div>
       <div className="flex justify-center flex-wrap gap-2 sm:gap-2.5">
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center border-2 rounded-neo font-bold shadow-hard bg-neo-black/60 border-neo-black text-neo-cream/40"
+            className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center border-2 rounded-neo font-bold shadow-hard bg-neo-black/60 border-neo-black text-neo-white"
           >
             ?
           </div>

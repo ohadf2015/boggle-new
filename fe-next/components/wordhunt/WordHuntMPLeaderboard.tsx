@@ -159,7 +159,7 @@ export const WordHuntMPLeaderboard = memo<WordHuntMPLeaderboardProps>(({
 
       {/* Desktop sidebar: vertical detailed list */}
       <div className="hidden min-[720px]:block">
-        <div className="text-xs font-bold text-neo-white/60 uppercase mb-1.5 tracking-wider">
+        <div className="text-xs font-bold text-neo-white uppercase mb-1.5 tracking-wider">
           {t('wordHunt.mp.players')}
         </div>
         <div className="flex flex-col gap-1.5">

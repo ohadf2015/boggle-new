@@ -170,7 +170,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
     return (
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
         <div className="mb-4 flex items-center gap-4">
-          <span className="text-neo-cream/50 font-neo-body text-sm uppercase">
+          <span className="text-neo-white font-neo-body text-sm uppercase">
             {t('party.round')} {phaseData.round}/{phaseData.totalRounds}
           </span>
         </div>
@@ -188,14 +188,14 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
             <DrawingDisplay paths={artistStrokes} size={400} />
           ) : (
             <div className="w-[400px] h-[400px] border-3 border-neo-cyan/30 border-dashed rounded-neo-lg flex items-center justify-center">
-              <span className="text-neo-cream/30 font-neo-body animate-pulse">
+              <span className="text-neo-white font-neo-body animate-pulse">
                 {t('party.drawingInProgress')}
               </span>
             </div>
           )}
         </AdaptiveMotion.div>
 
-        <div className={`font-neo-display text-4xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+        <div className={`font-neo-display text-4xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {timeRemaining}s
         </div>
 
@@ -237,7 +237,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
           )}
         </div>
 
-        <div className={`font-neo-display text-3xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+        <div className={`font-neo-display text-3xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {timeRemaining}s
         </div>
       </div>
@@ -250,7 +250,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
         <div className="flex gap-8 items-center mb-6">
           <div className="text-center">
-            <p className="font-neo-display text-neo-cream/60 text-sm uppercase mb-2">
+            <p className="font-neo-display text-neo-white text-sm uppercase mb-2">
               {t('party.rebuilt')}
             </p>
             <AdaptiveMotion.div
@@ -262,10 +262,10 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
             </AdaptiveMotion.div>
           </div>
 
-          <div className="font-neo-display text-neo-cream/30 text-3xl">vs</div>
+          <div className="font-neo-display text-neo-white text-3xl">vs</div>
 
           <div className="text-center">
-            <p className="font-neo-display text-neo-cream/60 text-sm uppercase mb-2">
+            <p className="font-neo-display text-neo-white text-sm uppercase mb-2">
               {t('party.original')}
             </p>
             <AdaptiveMotion.div
@@ -287,7 +287,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
           <p className="font-neo-display text-neo-cyan text-3xl uppercase">
             &ldquo;{mergeData.prompt}&rdquo;
           </p>
-          <p className="text-neo-cream/50 font-neo-body text-sm mt-1">
+          <p className="text-neo-white font-neo-body text-sm mt-1">
             {t('party.drawnBy')} {mergeData.artistUsername}
           </p>
         </AdaptiveMotion.div>
@@ -302,7 +302,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
             <span className="font-neo-display text-5xl text-neo-cyan">
               {mergeData.score}%
             </span>
-            <p className="font-neo-body text-neo-cream/50 text-sm mt-1">
+            <p className="font-neo-body text-neo-white text-sm mt-1">
               {t('party.similarity')}
             </p>
           </div>
@@ -315,7 +315,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
   if (phase === 'gallery-reveal' && chainData) {
     return (
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
-        <p className="text-neo-cream/50 font-neo-body text-sm mb-4">
+        <p className="text-neo-white font-neo-body text-sm mb-4">
           Chain {chainData.index + 1}/{chainData.total}
         </p>
 
@@ -330,17 +330,17 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
             >
               {step.type === 'write' ? (
                 <div className="bg-neo-navy-elevated border-3 border-neo-cyan/40 rounded-neo p-4 min-w-[150px]">
-                  <p className="font-neo-body text-neo-cream text-sm">&ldquo;{step.content as string}&rdquo;</p>
-                  <p className="font-neo-body text-neo-cream/40 text-xs mt-1">{step.username}</p>
+                  <p className="font-neo-body text-neo-white text-sm">&ldquo;{step.content as string}&rdquo;</p>
+                  <p className="font-neo-body text-neo-white text-xs mt-1">{step.username}</p>
                 </div>
               ) : (
                 <div>
                   <DrawingDisplay paths={step.content as DrawingData} size={200} />
-                  <p className="font-neo-body text-neo-cream/40 text-xs mt-1">{step.username}</p>
+                  <p className="font-neo-body text-neo-white text-xs mt-1">{step.username}</p>
                 </div>
               )}
               {i < chainData.chain.steps.length - 1 && (
-                <div className="text-neo-cream/20 mt-2 text-lg">→</div>
+                <div className="text-neo-white mt-2 text-lg">→</div>
               )}
             </AdaptiveMotion.div>
           ))}
@@ -353,7 +353,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
   if (phase === 'crown' && showdownResults) {
     return (
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
-        <h2 className="font-neo-display text-neo-cream text-2xl uppercase mb-2">
+        <h2 className="font-neo-display text-neo-white text-2xl uppercase mb-2">
           &ldquo;{showdownResults.prompt}&rdquo;
         </h2>
 
@@ -372,7 +372,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
                 <div className={`p-2 rounded-neo-lg border-3 ${isBest ? 'border-neo-lime shadow-hard-lime' : isFunniest ? 'border-neo-pink shadow-hard-pink' : 'border-neo-cream/20'}`}>
                   <DrawingDisplay paths={entry.strokes} size={200} />
                 </div>
-                <p className="font-neo-body text-neo-cream text-sm mt-1">{entry.username}</p>
+                <p className="font-neo-body text-neo-white text-sm mt-1">{entry.username}</p>
                 {isBest && <span className="text-neo-lime font-neo-display text-xs uppercase">Best</span>}
                 {isFunniest && <span className="text-neo-pink font-neo-display text-xs uppercase ms-2">Funniest</span>}
               </AdaptiveMotion.div>
@@ -394,7 +394,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
            phase === 'drawing' || phase === 'showdown-draw' ? t('party.everyoneDrawing') :
            t('party.everyoneGuessing')}
         </h2>
-        <div className={`mt-4 font-neo-display text-3xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+        <div className={`mt-4 font-neo-display text-3xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {timeRemaining}s
         </div>
       </div>
@@ -407,7 +407,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
       <div className="text-center">
         <div className="text-6xl mb-4">🎨</div>
         <h1 className="font-neo-display text-neo-cyan text-3xl uppercase">Pixel Clash</h1>
-        <p className="text-neo-cream/40 font-neo-body mt-2 animate-pulse">
+        <p className="text-neo-white font-neo-body mt-2 animate-pulse">
           {t('party.starting')}
         </p>
       </div>

@@ -195,7 +195,7 @@ const StreakBonusIndicator = memo<StreakBonusIndicatorProps>(({
       <span className="font-neo-display font-black text-neo-pink">
         {currentStreak}
       </span>
-      <span className="font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70">
+      <span className="font-neo-body font-bold text-neo-black/70 dark:text-neo-white">
         {t('education.xp.streak')}
       </span>
       {showBonus && bonus !== null && (

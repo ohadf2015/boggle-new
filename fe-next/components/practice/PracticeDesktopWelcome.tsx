@@ -18,7 +18,7 @@ const MODE_ACCENT: Record<PracticeMode, string> = {
 const MODE_CTA: Record<PracticeMode, string> = {
   classic: 'bg-neo-cyan text-neo-black',
   wordHunt: 'bg-neo-lime text-neo-black',
-  wheelRush: 'bg-neo-purple text-neo-cream',
+  wheelRush: 'bg-neo-purple text-neo-white',
 };
 
 // Icon-tile accent (text color) + hard-shadow tint per mode.
@@ -83,7 +83,7 @@ export default function PracticeDesktopWelcome({ mode, onDismiss }: Props) {
         >
           <HeaderIcon className="w-4 h-4" strokeWidth={2.5} />
         </span>
-        <p className="text-xs font-neo-display font-black uppercase tracking-wider text-neo-cream/85">
+        <p className="text-xs font-neo-display font-black uppercase tracking-wider text-neo-white">
           {t('gameModes.tutorial.title')}
         </p>
       </div>
@@ -104,7 +104,7 @@ export default function PracticeDesktopWelcome({ mode, onDismiss }: Props) {
               >
                 <Icon className="w-5 h-5" strokeWidth={2.5} />
               </span>
-              <p className="text-xs font-neo-body text-neo-cream/90 leading-snug">
+              <p className="text-xs font-neo-body text-neo-white leading-snug">
                 {t(key)}
               </p>
             </div>

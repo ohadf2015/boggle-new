@@ -33,8 +33,8 @@ export default function PublicProfilePageClient({ username }: { username: string
   if (profileQuery.isError || !profile) {
     return (
       <div className="flex-1 bg-neo-navy min-h-screen flex flex-col items-center justify-center px-6">
-        <UserIcon className="text-neo-cream/40 w-16 h-16 mb-4" />
-        <h1 className="font-neo-display text-xl text-neo-cream mb-2">
+        <UserIcon className="text-neo-white w-16 h-16 mb-4" />
+        <h1 className="font-neo-display text-xl text-neo-white mb-2">
           {t('profile.notFound') || 'Player not found'}
         </h1>
         <Link
@@ -69,13 +69,13 @@ export default function PublicProfilePageClient({ username }: { username: string
           className="rounded-neo-xl p-6 bg-neo-navy-light border-2 border-black shadow-hard-lg flex items-center gap-4"
         >
           <div className="w-20 h-20 rounded-full border-3 border-black bg-neo-pink/30 flex items-center justify-center">
-            <UserIcon className="w-9 h-9 text-neo-cream" />
+            <UserIcon className="w-9 h-9 text-neo-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="font-neo-display text-2xl text-neo-cream truncate">
+            <h1 className="font-neo-display text-2xl text-neo-white truncate">
               {displayName}
             </h1>
-            <p className="text-sm text-neo-cream/70 font-neo-body">
+            <p className="text-sm text-neo-white font-neo-body">
               @{profile.username} · Lv {profile.currentLevel}
             </p>
             <div className="flex flex-wrap gap-2 mt-2 text-xs">

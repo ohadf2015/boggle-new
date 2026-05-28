@@ -80,7 +80,7 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             data-complete={p.isComplete ? 'true' : 'false'}
             className={cn(
               'flex items-center gap-2 text-xs font-bold tabular-nums transition-opacity',
-              p.isComplete ? 'text-neo-lime opacity-80' : 'text-neo-cream',
+              p.isComplete ? 'text-neo-lime opacity-80' : 'text-neo-white',
             )}
           >
             {isTargetWord && <Target className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />}
@@ -91,17 +91,17 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             )}
             <span dir="auto" className="flex-1 truncate">{formatObjectiveLabel(p.objective, t)}</span>
             {!isTargetWord && !isColorPower && (
-              <span dir="ltr" className="shrink-0 text-white/70">
+              <span dir="ltr" className="shrink-0 text-white">
                 {Math.min(p.current, p.objective.target)} / {p.objective.target}
               </span>
             )}
             {isTargetWord && (
-              <span className="shrink-0 text-white/70">
+              <span className="shrink-0 text-white">
                 {p.isComplete ? '✓' : '○'}
               </span>
             )}
             {isColorPower && (
-              <span dir="ltr" className="shrink-0 text-white/70">
+              <span dir="ltr" className="shrink-0 text-white">
                 {p.current} / {p.objective.minColorCount}
               </span>
             )}

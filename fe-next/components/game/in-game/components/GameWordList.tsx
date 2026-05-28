@@ -72,7 +72,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                     }
                     className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${
                       wordObj.isValid === false
-                        ? 'bg-neo-red text-neo-cream line-through opacity-70'
+                        ? 'bg-neo-red text-neo-white line-through opacity-70'
                         : index === 0 && wordObj.word.length >= 6
                           ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0px_black,0_0_10px_rgba(191,255,0,0.5)]'
                           : index === 0
@@ -134,7 +134,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                   className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
                     ${
                       isInvalid
-                        ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
+                        ? 'bg-neo-red text-neo-white shadow-hard-sm line-through opacity-70'
                         : isLatest && wordText.length >= 6
                           ? 'bg-neo-lime text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.6)]'
                           : isLatest

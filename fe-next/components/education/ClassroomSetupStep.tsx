@@ -118,7 +118,7 @@ export function ClassroomSetupStep({
                 <span className="ms-3 text-neo-white font-bold flex-1">
                   {classroom.name}
                 </span>
-                <span className="text-neo-white/70 text-sm">
+                <span className="text-neo-white text-sm">
                   {classroom.member_count || 0} {t('education.students')}
                 </span>
               </label>

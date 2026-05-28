@@ -163,7 +163,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                       customAvatar={(board.creator_avatar as CustomAvatarConfig | null) ?? null}
                       size="sm"
                     />
-                    <span className="text-neo-white/50 text-[10px] font-neo-body truncate">
+                    <span className="text-neo-white text-[10px] font-neo-body truncate">
                       {board.creator_display_name}
                     </span>
                   </div>
@@ -179,7 +179,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                   )}>
                     {t(`ugc.difficulty.${board.difficulty.toLowerCase()}`)}
                   </span>
-                  <span className="flex items-center gap-0.5 text-neo-white/60 text-[10px]">
+                  <span className="flex items-center gap-0.5 text-neo-white text-[10px]">
                     <Users size={10} /> {board.play_count}
                   </span>
                   {avgRating && (
@@ -231,7 +231,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
             <p className="text-xs font-bold text-neo-white">
               {t('landing.createYourBoard')}
             </p>
-            <p className="text-[10px] text-neo-white/50 font-neo-body">
+            <p className="text-[10px] text-neo-white font-neo-body">
               {t('landing.createBoardDesc')}
             </p>
           </div>

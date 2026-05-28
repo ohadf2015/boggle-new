@@ -161,12 +161,12 @@ export default function AccessibilitySettingsPageClient() {
           transition={{ duration: 0.3 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl md:text-5xl font-black text-neo-cream mb-3 uppercase">
+          <h1 className="text-4xl md:text-5xl font-black text-neo-white mb-3 uppercase">
             {language === 'he' && '♿'}
             <span className="mx-2">{t('accessibility.title')}</span>
             {language !== 'he' && '♿'}
           </h1>
-          <p className="text-neo-cream text-lg opacity-90 max-w-2xl mx-auto">
+          <p className="text-neo-white text-lg opacity-90 max-w-2xl mx-auto">
             {t('accessibility.subtitle') ||
               'Customize your experience to meet your needs. These settings are saved locally.'}
           </p>
@@ -190,8 +190,8 @@ export default function AccessibilitySettingsPageClient() {
 
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className="font-black text-neo-cream text-xl mb-2">{setting.title}</h3>
-                  <p className="text-neo-cream opacity-80 text-sm md:text-base mb-4">
+                  <h3 className="font-black text-neo-white text-xl mb-2">{setting.title}</h3>
+                  <p className="text-neo-white opacity-80 text-sm md:text-base mb-4">
                     {setting.description}
                   </p>
                 </div>
@@ -230,7 +230,7 @@ export default function AccessibilitySettingsPageClient() {
           transition={{ duration: 0.3, delay: 0.6 }}
           className="mt-8 p-4 bg-neo-purple bg-opacity-20 border-2 border-neo-purple rounded-neo"
         >
-          <p className="text-neo-cream text-sm text-center">
+          <p className="text-neo-white text-sm text-center">
             {t('accessibility.footer') ||
               'These settings are stored locally on your device. For additional system-level accessibility features, check your device settings.'}
           </p>

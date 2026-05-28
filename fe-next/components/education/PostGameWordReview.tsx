@@ -54,7 +54,7 @@ export default function PostGameWordReview({
       </div>
 
       {/* Score */}
-      <p className="text-sm text-neo-cream/80">
+      <p className="text-sm text-neo-white">
         {t('education.postGame.vocabScore', {
           found: found.length,
           total: vocabularyWords.length,
@@ -71,7 +71,7 @@ export default function PostGameWordReview({
             {found.map((word) => (
               <span
                 key={word}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-neo bg-neo-lime/15 border border-neo-lime/30 text-neo-cream font-bold text-sm"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-neo bg-neo-lime/15 border border-neo-lime/30 text-neo-white font-bold text-sm"
               >
                 <Check className="w-3 h-3 text-neo-lime" />
                 {word}
@@ -84,17 +84,17 @@ export default function PostGameWordReview({
       {/* Missed words */}
       {missed.length > 0 && (
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-neo-cream/50">
+          <span className="text-xs font-bold uppercase tracking-wider text-neo-white">
             {t('education.postGame.wordsToLearn')}
           </span>
-          <p className="text-xs text-neo-cream/40">
+          <p className="text-xs text-neo-white">
             {t('education.postGame.studyTheseNext')}
           </p>
           <div className="flex flex-wrap gap-2">
             {missed.map((word) => (
               <span
                 key={word}
-                className="inline-flex items-center px-2 py-1 rounded-neo bg-neo-white/5 border border-neo-white/10 text-neo-cream/50 text-sm"
+                className="inline-flex items-center px-2 py-1 rounded-neo bg-neo-white/5 border border-neo-white/10 text-neo-white text-sm"
               >
                 {word}
               </span>

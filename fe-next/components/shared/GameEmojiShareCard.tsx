@@ -244,7 +244,7 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-slate-900 border-3 border-neo-black rounded-neo shadow-hard p-4 font-mono text-sm select-all"
+      className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4 font-mono text-sm select-all"
     >
       {/* Header */}
       <div className="text-neo-lime font-black text-xs uppercase tracking-widest mb-3">

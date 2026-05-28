@@ -277,7 +277,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-1.5 rounded-full hover:bg-white/10 transition-colors z-10"
             aria-label={t('common.dismiss')}
           >
-            <X className="w-4 h-4 text-neo-cream/60 hover:text-white" />
+            <X className="w-4 h-4 text-neo-white hover:text-white" />
           </button>
         )}
 
@@ -327,7 +327,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
           <h3 className="text-xl font-black text-white">
             {t('auth.inlineSignup.title')}
           </h3>
-          <p className="text-sm text-neo-cream/60 mt-1">
+          <p className="text-sm text-neo-white mt-1">
             {t('auth.inlineSignup.subtitle')}
           </p>
         </m.div>
@@ -348,7 +348,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               className="flex items-center gap-2 text-xs"
             >
               <benefit.icon className="w-4 h-4 text-neo-cyan shrink-0" />
-              <span className="text-neo-cream/60">
+              <span className="text-neo-white">
                 {t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}
               </span>
             </m.div>
@@ -431,7 +431,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
                 onClick={() => setShowEmailForm(true)}
-                className="w-full text-sm text-neo-cream/60 hover:text-neo-cream/80 transition-colors flex items-center justify-center gap-2 py-2"
+                className="w-full text-sm text-neo-white hover:text-neo-white transition-colors flex items-center justify-center gap-2 py-2"
               >
                 <Mail className="w-4 h-4" />
                 <span>{t('auth.inlineSignup.orContinueWith')}</span>
@@ -443,7 +443,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 className="space-y-3"
               >
                 {/* Divider */}
-                <div className="flex items-center gap-2 text-xs text-neo-cream/50">
+                <div className="flex items-center gap-2 text-xs text-neo-white">
                   <div className="flex-1 h-px bg-gray-600" />
                   <span>{t('auth.magicLink.divider')}</span>
                   <div className="flex-1 h-px bg-gray-600" />
@@ -518,7 +518,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                     <button
                       type="button"
                       onClick={() => setUsePassword(true)}
-                      className="w-full text-xs text-neo-cream/50 hover:text-neo-cream/60"
+                      className="w-full text-xs text-neo-white hover:text-neo-white"
                     >
                       {t('auth.magicLink.usePassword')}
                     </button>
@@ -567,7 +567,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-neo-cream/60 hover:text-neo-cream/80"
+                          className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-neo-white hover:text-neo-white"
                         >
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                         </button>
@@ -596,7 +596,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                       <button
                         type="button"
                         onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                        className="text-xs text-neo-cream/50 hover:text-neo-cream/60"
+                        className="text-xs text-neo-white hover:text-neo-white"
                       >
                         {authMode === 'signup'
                           ? t('auth.alreadyHaveAccount')
@@ -605,7 +605,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                       <button
                         type="button"
                         onClick={() => setUsePassword(false)}
-                        className="text-xs text-neo-cream/50 hover:text-neo-cream/60"
+                        className="text-xs text-neo-white hover:text-neo-white"
                       >
                         {t('auth.magicLink.useMagicLink')}
                       </button>
@@ -622,7 +622,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
                 onClick={onDismiss}
-                className="w-full mt-4 text-sm text-neo-cream/50 hover:text-neo-cream/60 transition-colors group"
+                className="w-full mt-4 text-sm text-neo-white hover:text-neo-white transition-colors group"
               >
                 <span className="group-hover:hidden">
                   {t('auth.inlineSignup.skipForNow')}
@@ -636,13 +636,13 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
         )}
 
         {/* Terms & Privacy */}
-        <div className="mt-4 text-center text-[10px] text-neo-cream/50">
+        <div className="mt-4 text-center text-[10px] text-neo-white">
           {t('auth.termsPrefix')}{' '}
-          <Link href={`/${language}/legal/terms`} className="underline hover:text-neo-cream/60 transition-colors">
+          <Link href={`/${language}/legal/terms`} className="underline hover:text-neo-white transition-colors">
             {t('auth.termsLink')}
           </Link>
           {' '}{t('auth.andText')}{' '}
-          <Link href={`/${language}/legal/privacy`} className="underline hover:text-neo-cream/60 transition-colors">
+          <Link href={`/${language}/legal/privacy`} className="underline hover:text-neo-white transition-colors">
             {t('auth.privacyLink')}
           </Link>
         </div>

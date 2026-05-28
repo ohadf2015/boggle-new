@@ -54,10 +54,10 @@ function GemInventoryImpl({ inventory, onTransmute, labels }: GemInventoryProps)
       className="rounded-neo border-neo-thick border-black bg-neo-navy-light/95 p-2 shadow-hard"
     >
       <header className="mb-1.5 flex items-center justify-between px-0.5">
-        <h2 className="font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-cream/80">
+        <h2 className="font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">
           {labels.title}
         </h2>
-        <span className="font-neo-body text-[9px] uppercase tracking-wider text-neo-cream/40">
+        <span className="font-neo-body text-[9px] uppercase tracking-wider text-neo-white">
           {labels.crownGoal}
         </span>
       </header>
@@ -95,7 +95,7 @@ function GemInventoryImpl({ inventory, onTransmute, labels }: GemInventoryProps)
                   <span
                     className={cn(
                       'font-neo-display text-[10px] font-black tabular-nums',
-                      count > 0 ? 'text-neo-cream' : 'text-neo-cream/30',
+                      count > 0 ? 'text-neo-white' : 'text-neo-white',
                     )}
                   >
                     {count}

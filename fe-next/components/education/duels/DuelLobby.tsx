@@ -178,7 +178,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neo-cyan"></div>
           </div>
         ) : pendingChallenges.length === 0 ? (
-          <p className="text-neo-white/80 text-center py-4">{t('noPendingChallenges')}</p>
+          <p className="text-neo-white text-center py-4">{t('noPendingChallenges')}</p>
         ) : (
           <div className="space-y-3">
             {pendingChallenges.map((challenge) => (
@@ -261,8 +261,8 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
 
         {opponents.length === 0 ? (
           <div className="text-center py-6">
-            <Users className="w-10 h-10 mx-auto mb-3 text-neo-white/60" />
-            <p className="text-neo-white/80 mb-3">{t('education.duels.noClassmatesOnline')}</p>
+            <Users className="w-10 h-10 mx-auto mb-3 text-neo-white" />
+            <p className="text-neo-white mb-3">{t('education.duels.noClassmatesOnline')}</p>
             {onTabChange && (
               <button
                 onClick={() => onTabChange('classmates')}

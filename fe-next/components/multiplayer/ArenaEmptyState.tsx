@@ -48,7 +48,7 @@ const ArenaEmptyState: React.FC = () => {
         <h3 className="font-neo-display text-neo-white font-black text-lg sm:text-xl uppercase tracking-tight leading-tight">
           {t('multiplayerFlow.roomList.noRoomsYet')}
         </h3>
-        <p className="text-white/55 text-sm mt-1.5 font-bold leading-snug">
+        <p className="text-white text-sm mt-1.5 font-bold leading-snug">
           {t('multiplayerFlow.roomList.beTheLegend')}
         </p>
       </div>

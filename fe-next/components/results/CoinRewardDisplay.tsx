@@ -220,10 +220,10 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
         className
       )}>
         <div className="flex items-center justify-center gap-1">
-          <Lock className="w-3 h-3 text-neo-cream/70" />
-          <span className="font-bold text-neo-cream/70 text-xs">+{reward.awarded}</span>
+          <Lock className="w-3 h-3 text-neo-white" />
+          <span className="font-bold text-neo-white text-xs">+{reward.awarded}</span>
         </div>
-        <div className="text-[9px] font-bold text-neo-cream/50">
+        <div className="text-[9px] font-bold text-neo-white">
           {t('coins.signInShort')}
         </div>
       </div>
@@ -234,7 +234,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
   if (variant === 'compact') {
     return (
       <div className={cn(
-        'bg-slate-700/80 rounded-neo border-3 border-slate-500 shadow-hard px-4 py-2',
+        'bg-neo-navy-elevated/80 rounded-neo border-3 border-slate-500 shadow-hard px-4 py-2',
         className
       )}>
         <div className="flex items-center justify-center gap-2">
@@ -242,7 +242,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
           <Coins className="w-5 h-5 text-amber-400/60" />
           <span className="font-black text-xl text-amber-400/80">+{reward.awarded}</span>
         </div>
-        <p className="text-xs text-neo-cream/80 mt-1 text-center">
+        <p className="text-xs text-neo-white mt-1 text-center">
           {formattedMessage}
         </p>
       </div>
@@ -256,7 +256,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
       className={cn(
-        'px-4 py-3 bg-slate-700/80 rounded-neo border-3 border-slate-500 shadow-hard',
+        'px-4 py-3 bg-neo-navy-elevated/80 rounded-neo border-3 border-slate-500 shadow-hard',
         className
       )}
     >
@@ -265,13 +265,13 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
         <Lock className="w-4 h-4 text-amber-400" />
         <Coins className="w-5 h-5 text-amber-400/60" />
         <span className="font-black text-xl text-amber-400/80">+{reward.awarded}</span>
-        <span className="text-sm font-bold text-neo-cream/60">
+        <span className="text-sm font-bold text-neo-white">
           {t('reveal.coins')}
         </span>
       </div>
 
       {/* Teasing message */}
-      <p className="text-sm text-neo-cream/80 text-center font-bold">
+      <p className="text-sm text-neo-white text-center font-bold">
         {formattedMessage}
       </p>
     </m.div>

@@ -216,7 +216,7 @@ export function ReferralCard() {
       {/* Referral Code + Copy */}
       <div className={cn(
         'rounded-xl p-3 mb-4',
-        isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+        isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
       )}>
         <div className="flex items-center gap-2">
           <div className="flex-1">
@@ -238,7 +238,7 @@ export function ReferralCard() {
               copied
                 ? 'bg-green-500 hover:bg-green-500 text-white'
                 : isDarkMode
-                  ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                  ? 'bg-neo-navy-elevated hover:bg-slate-600 text-white'
                   : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
             )}
           >
@@ -287,7 +287,7 @@ export function ReferralCard() {
         className={cn(
           'w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors',
           isDarkMode
-            ? 'text-gray-400 hover:bg-slate-700/50'
+            ? 'text-gray-400 hover:bg-neo-navy-elevated/50'
             : 'text-gray-500 hover:bg-gray-100'
         )}
       >
@@ -306,7 +306,7 @@ export function ReferralCard() {
           >
             <div className={cn(
               'grid grid-cols-2 gap-2 mt-2 p-3 rounded-lg text-xs',
-              isDarkMode ? 'bg-slate-900/30' : 'bg-gray-50'
+              isDarkMode ? 'bg-neo-navy/30' : 'bg-gray-50'
             )}>
               <div className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
                 🎯 Friend joins: <span className="font-bold text-neo-pink">+100 XP</span>
@@ -343,7 +343,7 @@ export function ReferralCard() {
                 key={referral.id}
                 className={cn(
                   'flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs',
-                  isDarkMode ? 'bg-slate-700/50' : 'bg-gray-100'
+                  isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-100'
                 )}
                 title={`${referral.display_name || referral.username} - ${referral.referred_games_played} games`}
               >
@@ -362,7 +362,7 @@ export function ReferralCard() {
             {referralData.referrals.length > 6 && (
               <div className={cn(
                 'px-2 py-1 rounded-lg text-xs font-medium',
-                isDarkMode ? 'bg-slate-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'
+                isDarkMode ? 'bg-neo-navy-elevated/50 text-gray-400' : 'bg-gray-100 text-gray-500'
               )}>
                 +{referralData.referrals.length - 6}
               </div>

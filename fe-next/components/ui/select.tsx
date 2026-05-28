@@ -20,7 +20,7 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-10 w-full items-center justify-between",
-      "bg-neo-cream text-neo-black dark:bg-slate-700 dark:text-white",
+      "bg-neo-cream text-neo-black dark:bg-neo-navy-elevated dark:text-white",
       "border-3 border-neo-black dark:border-slate-500 rounded-neo",
       "px-3 py-2 text-sm font-medium",
       "shadow-hard-sm",
@@ -87,7 +87,7 @@ const SelectContent = React.forwardRef<
       className={cn(
         "relative z-100 max-h-96 min-w-32 overflow-hidden",
         // Neo-brutalist styling
-        "bg-neo-cream text-neo-black dark:bg-slate-800 dark:text-white",
+        "bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white",
         "border-3 border-neo-black dark:border-slate-500 rounded-neo",
         "shadow-hard-lg",
         // Animations

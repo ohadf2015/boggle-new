@@ -127,7 +127,7 @@ export function PlayerDetailView({ detail }: Props) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+      <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <Avatar customAvatar={profile.avatar_config as never} userId={profile.id} size="lg" />
           <div>
@@ -233,7 +233,7 @@ export function PlayerDetailView({ detail }: Props) {
 
       {/* Per-mode breakdown (game_sessions) */}
       {detail.modeBreakdown.length > 0 && (
-        <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+        <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
           <h3 className="text-sm font-neo-display text-neo-white mb-3">
             {t('admin.player.byMode')}
           </h3>
@@ -274,13 +274,13 @@ export function PlayerDetailView({ detail }: Props) {
 
       {/* Languages played (from recent 50) */}
       {detail.aggregates.byLanguage.length > 0 && (
-        <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+        <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
           <h3 className="text-sm font-neo-display text-neo-white mb-2">
             {t('admin.player.byLanguage')}
           </h3>
           <div className="flex flex-wrap gap-2">
             {detail.aggregates.byLanguage.map((row) => (
-              <span key={row.language} className="text-xs px-2 py-1 rounded bg-slate-700 text-neo-white">
+              <span key={row.language} className="text-xs px-2 py-1 rounded bg-neo-navy-elevated text-neo-white">
                 <span className="font-mono">{row.language}</span>
                 <span className="text-slate-400 ms-1">×{row.count}</span>
               </span>
@@ -290,7 +290,7 @@ export function PlayerDetailView({ detail }: Props) {
       )}
 
       {/* Recent games table */}
-      <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden">
+      <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
           <h3 className="text-sm font-neo-display text-neo-white">
             {t('admin.player.recentGames')}
@@ -307,7 +307,7 @@ export function PlayerDetailView({ detail }: Props) {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[600px]">
-              <thead className="bg-slate-700/40">
+              <thead className="bg-neo-navy-elevated/40">
                 <tr className="text-xs text-slate-400 uppercase tracking-wider">
                   <th className="text-start px-4 py-2">{t('admin.player.gameCode')}</th>
                   <th className="text-start px-4 py-2">{t('admin.player.score')}</th>
@@ -321,7 +321,7 @@ export function PlayerDetailView({ detail }: Props) {
               </thead>
               <tbody className="divide-y divide-slate-700/50">
                 {detail.recentGames.map((game) => (
-                  <tr key={game.id} data-testid="game-row" className="text-sm text-slate-300 hover:bg-slate-700/20">
+                  <tr key={game.id} data-testid="game-row" className="text-sm text-slate-300 hover:bg-neo-navy-elevated/20">
                     <td className="px-4 py-2 font-mono text-neo-white">{game.game_code ?? '—'}</td>
                     <td className="px-4 py-2 font-mono">{game.score ?? 0}</td>
                     <td className="px-4 py-2 font-mono">{game.word_count ?? 0}</td>
@@ -352,7 +352,7 @@ export function PlayerDetailView({ detail }: Props) {
 
 function Card({ testId, label, value, subtitle }: { testId?: string; label: string; value: string | number; subtitle?: string }) {
   return (
-    <div data-testid={testId} className="bg-slate-800/50 rounded-neo border-neo border-black p-3">
+    <div data-testid={testId} className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-3">
       <div className="text-[10px] text-slate-400 uppercase tracking-wider truncate">{label}</div>
       <div className="text-xl font-neo-display text-neo-white">{value}</div>
       {subtitle && <div className="text-[10px] text-slate-500 mt-0.5">{subtitle}</div>}
@@ -362,7 +362,7 @@ function Card({ testId, label, value, subtitle }: { testId?: string; label: stri
 
 function InfoBlock({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-3 space-y-1">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-3 space-y-1">
       <div className="text-xs uppercase tracking-wider text-slate-400 mb-1">{title}</div>
       {children}
     </div>

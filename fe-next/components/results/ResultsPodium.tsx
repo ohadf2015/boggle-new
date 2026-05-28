@@ -213,8 +213,8 @@ export default function ResultsPodium({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05, duration: 0.3 }}
       >
-        <Trophy className="w-3.5 h-3.5 text-white/30" />
-        <span className="font-black text-[10px] text-white/30 uppercase tracking-wider">
+        <Trophy className="w-3.5 h-3.5 text-white" />
+        <span className="font-black text-[10px] text-white uppercase tracking-wider">
           {t('results.matchResults') || 'Match Results'}
         </span>
       </m.div>
@@ -380,7 +380,7 @@ export default function ResultsPodium({
                           )}
                           aria-label={`Send emoji to ${player.username}`}
                         >
-                          <SmilePlus className="w-3.5 h-3.5 text-neo-white/70" />
+                          <SmilePlus className="w-3.5 h-3.5 text-neo-white" />
                         </button>
                         <AnimatePresence>
                           {openPicker === player.username && (

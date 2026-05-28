@@ -51,7 +51,7 @@ export const RankedTierBadge: React.FC = memo(function RankedTierBadge() {
           >
             {tier.name}
           </span>
-          <span className="text-xs text-neo-white/60 font-bold">
+          <span className="text-xs text-neo-white font-bold">
             {elo}
           </span>
         </div>

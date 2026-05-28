@@ -47,7 +47,7 @@ export const CatalystTeaser = memo(function CatalystTeaser({ t }: CatalystTeaser
         <p className="font-neo-display font-black uppercase tracking-wider text-sm text-neo-lime">
           {t('catalystTeaser.title')}
         </p>
-        <p className="font-neo-body text-[11px] text-neo-white/60 mt-0.5">
+        <p className="font-neo-body text-[11px] text-neo-white mt-0.5">
           {t('catalystTeaser.subtitle')}
         </p>
       </header>
@@ -76,7 +76,7 @@ export const CatalystTeaser = memo(function CatalystTeaser({ t }: CatalystTeaser
               <span className="block font-neo-display font-black uppercase text-[11px] text-neo-white tracking-wide">
                 {t(`catalystTeaser.${c.id}.name`)}
               </span>
-              <span className="block font-neo-body text-[10px] text-neo-white/65 leading-snug">
+              <span className="block font-neo-body text-[10px] text-neo-white leading-snug">
                 {t(`catalystTeaser.${c.id}.desc`)}
               </span>
             </span>

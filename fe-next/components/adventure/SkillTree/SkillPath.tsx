@@ -126,7 +126,7 @@ export const SkillPath = memo<SkillPathProps>(
             return (
               <div key={tier} className="flex flex-col items-center">
                 {/* Tier Label */}
-                <div className="text-neo-white/50 text-xs font-bold mb-2 uppercase tracking-wider">
+                <div className="text-neo-white text-xs font-bold mb-2 uppercase tracking-wider">
                   Tier {tier}
                 </div>
 

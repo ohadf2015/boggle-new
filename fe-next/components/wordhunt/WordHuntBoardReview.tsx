@@ -52,7 +52,7 @@ export const WordHuntBoardReview = memo<WordHuntBoardReviewProps>(({
       <m.button
         onClick={() => setIsOpen(!isOpen)}
         whileTap={{ scale: 0.98 }}
-        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm text-neo-cream/80 hover:text-neo-white transition-colors"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-neo-navy/50 border-3 border-neo-black rounded-neo shadow-hard-sm text-neo-white hover:text-neo-white transition-colors"
       >
         <div className="flex items-center gap-2">
           <Grid3X3 className="w-4 h-4 text-neo-cyan" />
@@ -93,7 +93,7 @@ export const WordHuntBoardReview = memo<WordHuntBoardReviewProps>(({
                         className={`aspect-square flex items-center justify-center rounded-neo border-2 text-sm font-black uppercase ${
                           isHighlighted
                             ? 'bg-neo-yellow/30 border-neo-yellow text-neo-yellow'
-                            : 'bg-neo-white/5 border-neo-white/10 text-neo-white/60'
+                            : 'bg-neo-white/5 border-neo-white/10 text-neo-white'
                         }`}
                       >
                         {(letter || '').toUpperCase()}
@@ -106,7 +106,7 @@ export const WordHuntBoardReview = memo<WordHuntBoardReviewProps>(({
               {/* Legend */}
               <div className="flex items-center gap-2 mt-2 justify-center">
                 <div className="w-3 h-3 rounded-sm bg-neo-yellow/30 border border-neo-yellow" />
-                <span className="text-xs text-neo-cream/50">
+                <span className="text-xs text-neo-white">
                   {t('wordHunt.mp.boardReview')}
                 </span>
               </div>

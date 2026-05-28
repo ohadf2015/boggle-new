@@ -61,7 +61,7 @@ export function LiveActivityIndicator({
         shouldPulse = true;
       } else {
         statusText = t('education.analytics.live');
-        statusColor = 'text-neo-white/70';
+        statusColor = 'text-neo-white';
         dotColor = 'bg-green-500';
         shouldPulse = false;
       }
@@ -84,7 +84,7 @@ export function LiveActivityIndicator({
     case 'disconnected':
     default:
       statusText = t('education.analytics.offline');
-      statusColor = 'text-neo-white/50';
+      statusColor = 'text-neo-white';
       dotColor = 'bg-neo-navy';
       shouldPulse = false;
       break;
@@ -149,7 +149,7 @@ export function LiveActivityIndicator({
 
         {/* Activity/Last Update */}
         {activityText && (
-          <span className="text-xs text-neo-white/60 font-neo-body">
+          <span className="text-xs text-neo-white font-neo-body">
             {activityText}
             {lastUpdateText && ` • ${lastUpdateText}`}
           </span>

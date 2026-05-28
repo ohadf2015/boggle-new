@@ -35,7 +35,7 @@ export function MoatTrifectaSection() {
         </h2>
         <p
           data-moat-item
-          className="mt-2 text-center text-neo-white/70"
+          className="mt-2 text-center text-neo-white"
         >
           {t('education.landing.moat.subtitle')}
         </p>

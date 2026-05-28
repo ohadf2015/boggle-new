@@ -119,7 +119,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
           transition={{ delay: 1 }}
-          className="text-neo-white/60 text-xs underline hover:text-neo-white/80 transition-colors"
+          className="text-neo-white text-xs underline hover:text-neo-white transition-colors"
         >
           {t('onboarding.skip')}
         </m.button>

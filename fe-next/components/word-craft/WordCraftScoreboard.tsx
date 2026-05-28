@@ -62,11 +62,11 @@ function WordCraftScoreboardImpl({ player, bot, turn, tilesRemaining, labels }: 
           >
             {player.score}
           </span>
-          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-cream/80">
+          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white">
             {labels.you}
           </span>
         </div>
-        <div className="text-[10px] font-neo-display font-black uppercase tracking-widest text-neo-cream/40">
+        <div className="text-[10px] font-neo-display font-black uppercase tracking-widest text-neo-white">
           {/* No "VS" word — let the bar do the work */}
           —
         </div>
@@ -77,7 +77,7 @@ function WordCraftScoreboardImpl({ player, bot, turn, tilesRemaining, labels }: 
           >
             {bot.score}
           </span>
-          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-cream/80">
+          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white">
             {labels.bot}
           </span>
         </div>
@@ -105,7 +105,7 @@ function WordCraftScoreboardImpl({ player, bot, turn, tilesRemaining, labels }: 
           <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-current me-1.5 align-middle" />
           {status}
         </span>
-        <span className="inline-flex items-center gap-1 text-neo-cream/60">
+        <span className="inline-flex items-center gap-1 text-neo-white">
           <Hourglass className="w-3 h-3" aria-hidden />
           <span className="font-neo-body">{labels.bagRemaining}</span>
           <span className="font-neo-display font-black tabular-nums text-neo-cyan ms-0.5">

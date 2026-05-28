@@ -84,7 +84,7 @@ export function PageClient() {
           >
             {t('education.access.h1')}
           </h1>
-          <p data-access-hero className="mt-3 text-lg text-neo-white/80">
+          <p data-access-hero className="mt-3 text-lg text-neo-white">
             {t('education.access.lede')}
           </p>
         </div>
@@ -130,7 +130,7 @@ export function PageClient() {
                 <p className="text-sm text-neo-white">{latestRequest.admin_note}</p>
               </div>
             )}
-            <p className="mt-3 text-sm text-neo-white/90">{t('education.access.declined_reapply')}</p>
+            <p className="mt-3 text-sm text-neo-white">{t('education.access.declined_reapply')}</p>
           </div>
         )}
 
@@ -152,7 +152,7 @@ export function PageClient() {
             >
               <div className="text-3xl font-extrabold text-neo-lime font-neo-display">{i + 1}</div>
               <h3 className="mt-2 font-bold text-neo-white font-neo-display">{t(`education.access.next.${k}_title`)}</h3>
-              <p className="mt-1 text-sm text-neo-white/80">{t(`education.access.next.${k}_body`)}</p>
+              <p className="mt-1 text-sm text-neo-white">{t(`education.access.next.${k}_body`)}</p>
             </div>
           ))}
         </div>
@@ -167,7 +167,7 @@ export function PageClient() {
           >
             {t('education.access.regular_game_title')}
           </h2>
-          <p data-access-try className="mt-2 text-neo-white/80">
+          <p data-access-try className="mt-2 text-neo-white">
             {t('education.access.regular_game_body')}
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">

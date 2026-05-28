@@ -113,7 +113,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
               autoFocus
               className={cn(
                 'font-bold text-lg bg-neo-navy/60 border-neo-black text-neo-white',
-                'placeholder:text-neo-white/40',
+                'placeholder:text-neo-white',
                 nameError && 'border-red-500'
               )}
               placeholder={t('multiplayerFlow.createModal.namePlaceholder')}
@@ -136,7 +136,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
             </p>
           )}
           {!isEditingName && !isAuthenticated && username && (
-            <p className="text-xs text-neo-white/40 font-medium mt-0.5">
+            <p className="text-xs text-neo-white font-medium mt-0.5">
               {t('multiplayerFlow.profileSetup.tapToChange')}
             </p>
           )}

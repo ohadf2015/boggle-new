@@ -24,7 +24,7 @@ const TabsList = React.forwardRef<
     ref={ref}
     className={cn(
       variant === 'pill' && [
-        "inline-flex h-10 items-center justify-center rounded-md bg-neo-navy/50 p-1 text-neo-white/80",
+        "inline-flex h-10 items-center justify-center rounded-md bg-neo-navy/50 p-1 text-neo-white",
       ],
       variant === 'underline' && [
         "flex border-b-4 border-neo-black",

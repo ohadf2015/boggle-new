@@ -127,7 +127,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               <h1 className="text-2xl sm:text-3xl font-black uppercase text-neo-white mb-2">
                 {t('education.student.join.title')}
               </h1>
-              <p className="text-sm text-neo-white/70">
+              <p className="text-sm text-neo-white">
                 {t('education.student.join.subtitle')}
               </p>
             </div>
@@ -137,7 +137,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               <div className="space-y-2">
                 <Label
                   htmlFor="classroom-code"
-                  className="text-sm font-bold uppercase text-neo-white/70"
+                  className="text-sm font-bold uppercase text-neo-white"
                 >
                   {t('education.student.join.codeLabel')}
                 </Label>
@@ -158,7 +158,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     aria-invalid={codeError ? 'true' : undefined}
                     aria-describedby={codeError ? 'code-error' : 'code-hint'}
                     className={cn(
-                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pe-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
+                      "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pe-14 bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white",
                       codeError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
                     )}
                   />
@@ -182,7 +182,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                     </Tooltip>
                   </TooltipProvider>
                 </div>
-                <p id="code-hint" className="text-xs text-neo-white/70">
+                <p id="code-hint" className="text-xs text-neo-white">
                   {t('education.student.join.codeHint')}
                 </p>
                 {codeError && (
@@ -212,7 +212,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               <button
                 onClick={() => router.push(`/${language}/student`)}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 text-sm text-neo-white/70 hover:text-neo-cyan transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 text-sm text-neo-white hover:text-neo-cyan transition-colors disabled:opacity-50"
               >
                 <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
                 {t('common.back')}

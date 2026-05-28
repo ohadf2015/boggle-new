@@ -63,7 +63,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
         "rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
         canAffordAction
           ? `bg-linear-to-br ${gradientFrom} ${gradientTo} cursor-pointer hover:shadow-hard-lg`
-          : "bg-gray-700"
+          : "bg-neo-navy-elevated"
       )}
       onClick={handleClick}
     >
@@ -78,7 +78,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
           <div className={cn("font-black text-sm uppercase tracking-wide", canAffordAction ? "text-neo-black" : "text-white")}>
             {title}
           </div>
-          <div className={cn("text-xs mt-0.5 truncate", canAffordAction ? "text-neo-black/70" : "text-white/70")}>
+          <div className={cn("text-xs mt-0.5 truncate", canAffordAction ? "text-neo-black/70" : "text-white")}>
             {subtitle}
           </div>
         </div>
@@ -89,7 +89,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
         </div>
       </div>
       {!canAffordAction && (
-        <div className="px-4 pb-2 text-[10px] text-white/60 text-center">
+        <div className="px-4 pb-2 text-[10px] text-white text-center">
           {t('wordHunt.results.earnMoreHint')}
         </div>
       )}

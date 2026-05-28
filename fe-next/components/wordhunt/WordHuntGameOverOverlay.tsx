@@ -171,9 +171,9 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
         'px-6 py-3 rounded-neo border-3 shadow-hard-lg',
         'font-neo-display text-2xl sm:text-3xl font-black uppercase tracking-wider',
         isEliminated
-          ? 'border-neo-red bg-neo-red/90 text-neo-cream'
+          ? 'border-neo-red bg-neo-red/90 text-neo-white'
           : isOtherFound
-          ? 'border-blue-500 bg-blue-500/90 text-neo-cream'
+          ? 'border-blue-500 bg-blue-500/90 text-neo-white'
           : 'border-yellow-500 bg-yellow-500/90 text-neo-black',
       )}
     >
@@ -185,7 +185,7 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 1.2, duration: 0.5 }}
-      className="text-neo-white/80 font-neo-body text-sm"
+      className="text-neo-white font-neo-body text-sm"
     >
       {t('wordHunt.mp.watchOthers')}
     </AdaptiveMotion.p>
@@ -211,8 +211,8 @@ const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
     className="relative flex flex-col items-center gap-2"
   >
     <div className="flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-white/30 bg-neo-black/60">
-      <Eye size={18} className="text-neo-white/70" />
-      <span className="text-neo-white/70 font-neo-body text-sm font-medium">
+      <Eye size={18} className="text-neo-white" />
+      <span className="text-neo-white font-neo-body text-sm font-medium">
         {t('wordHunt.mp.watchOthers')}
       </span>
     </div>

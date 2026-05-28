@@ -41,7 +41,7 @@ const MechanicIndicator = memo(function MechanicIndicator({
       <span className="font-bold text-neo-purple-light truncate">
         {t(`adventure.mechanic.${mechanic}`)}
       </span>
-      <span className="text-neo-white/50 truncate">
+      <span className="text-neo-white truncate">
         {t(`adventure.mechanics.${mechanic}`)}
       </span>
       {hitCount > 0 && (

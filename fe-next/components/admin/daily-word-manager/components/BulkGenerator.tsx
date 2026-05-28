@@ -39,7 +39,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
   onSave,
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
+    <div className="bg-white dark:bg-neo-navy-light/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
       <button onClick={onToggleShow} className="w-full flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-purple-500" />
@@ -61,7 +61,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                 type="date"
                 value={bulkStartDate}
                 onChange={e => onStartDateChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-neo-navy-elevated text-sm"
               />
             </div>
             <div className="flex-1">
@@ -73,7 +73,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                 type="date"
                 value={bulkEndDate}
                 onChange={e => onEndDateChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-sm"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-neo-navy-elevated text-sm"
               />
             </div>
             <div className="flex items-end">
@@ -138,7 +138,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
 
           {/* Existing Words Display */}
           {bulkState.existingWords.length > 0 && (
-            <div className="p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+            <div className="p-3 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded-lg">
               <h4 className="font-semibold text-sm mb-2 text-gray-600 dark:text-gray-400">
                 Already Scheduled:
               </h4>
@@ -165,7 +165,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                 {bulkState.generatedWords.map((item, index) => (
                   <div
                     key={item.date}
-                    className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600"
+                    className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded-lg border border-gray-200 dark:border-slate-600"
                   >
                     <div className="shrink-0 text-xs text-gray-500 dark:text-gray-400 w-20">
                       {formatDateDisplay(item.date)}
@@ -234,7 +234,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
               <summary className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
                 Show excluded words (used within 30 days)
               </summary>
-              <div className="mt-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded text-xs font-mono text-gray-600 dark:text-gray-400 max-h-32 overflow-y-auto">
+              <div className="mt-2 p-2 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded text-xs font-mono text-gray-600 dark:text-gray-400 max-h-32 overflow-y-auto">
                 {bulkState.excludedWords.join(', ')}
               </div>
             </details>

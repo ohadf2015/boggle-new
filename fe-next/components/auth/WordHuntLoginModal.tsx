@@ -141,7 +141,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         noDescription
-        className="max-w-sm bg-slate-800 border-orange-500/30"
+        className="max-w-sm bg-neo-navy-light border-orange-500/30"
       >
         <DialogHeader className="bg-transparent border-b-0 p-0">
           <DialogTitle className="sr-only">
@@ -243,7 +243,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                       onChange={(e) => handleEmailChange(e.target.value)}
                       placeholder={t('auth.inlineSignup.emailPlaceholder')}
                       className={cn(
-                        "w-full px-4 py-3 rounded-xl border-2 bg-slate-700 text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
+                        "w-full px-4 py-3 rounded-xl border-2 bg-neo-navy-elevated text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
                         emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
                       )}
                       disabled={isLoading !== null || otpSent}
@@ -264,7 +264,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                         value={otpCode}
                         onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder={t('auth.otp.enterCode')}
-                        className="w-full px-4 py-3 rounded-xl border-2 bg-slate-700 text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
+                        className="w-full px-4 py-3 rounded-xl border-2 bg-neo-navy-elevated text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
                         disabled={isLoading !== null}
                       />
                     </div>

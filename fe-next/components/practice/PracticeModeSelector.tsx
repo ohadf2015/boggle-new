@@ -122,7 +122,7 @@ export default function PracticeModeSelector({
       case 'started':
         return 'text-neo-orange';
       default:
-        return 'text-neo-white/60';
+        return 'text-neo-white';
     }
   };
 
@@ -171,7 +171,7 @@ export default function PracticeModeSelector({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10"
+            className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
           </Button>
@@ -179,7 +179,7 @@ export default function PracticeModeSelector({
             <h1 className="text-2xl font-neo-display text-neo-white">
               {t('education.practice.title')}
             </h1>
-            <p className="text-sm text-neo-white/60">{lessonName}</p>
+            <p className="text-sm text-neo-white">{lessonName}</p>
           </div>
         </AdaptiveMotion.div>
 
@@ -195,7 +195,7 @@ export default function PracticeModeSelector({
                 <div className="flex items-center gap-4">
                   <div className="text-center">
                     <p className="text-2xl font-neo-display text-neo-white">{wordCount}</p>
-                    <p className="text-xs text-neo-white/60">
+                    <p className="text-xs text-neo-white">
                       {t('education.practice.wordCount')}
                     </p>
                   </div>

@@ -59,7 +59,7 @@ export default function PartyHostClient() {
   if (flagLoading) {
     return (
       <div className="min-h-screen bg-neo-abyss flex items-center justify-center">
-        <div className="animate-pulse text-neo-cream font-neo-display text-xl">
+        <div className="animate-pulse text-neo-white font-neo-display text-xl">
           {t('common.loading') || 'Loading...'}
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function PartyHostClient() {
   if (!hasAccess || !gameDef) {
     return (
       <div className="min-h-screen bg-neo-abyss flex items-center justify-center">
-        <div className="text-neo-cream/50 font-neo-body text-center">
+        <div className="text-neo-white font-neo-body text-center">
           {t('party.noAccess') || 'Not available'}
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function PartyHostClient() {
   if (!room || room.phase === 'lobby') {
     // Debug overlay in dev
     const debugInfo = process.env.NODE_ENV === 'development' ? (
-      <div className="fixed top-2 left-2 z-50 bg-black/80 text-xs text-neo-cream font-mono p-2 rounded max-w-xs">
+      <div className="fixed top-2 left-2 z-50 bg-black/80 text-xs text-neo-white font-mono p-2 rounded max-w-xs">
         <div>connected: {String(connected)}</div>
         <div>hasAccess: {String(hasAccess)}</div>
         <div>username: {profile?.username || 'null'}</div>
@@ -123,13 +123,13 @@ export default function PartyHostClient() {
       <div className="min-h-screen bg-neo-abyss flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">{gameDef.icon}</div>
-          <h1 className="font-neo-display text-neo-cream text-3xl uppercase">
+          <h1 className="font-neo-display text-neo-white text-3xl uppercase">
             {t(gameDef.nameKey) || gameId}
           </h1>
-          <p className="text-neo-cream/50 font-neo-body mt-2">
+          <p className="text-neo-white font-neo-body mt-2">
             Round {room.round}/{room.totalRounds} — {room.phase}
           </p>
-          <p className="text-neo-cream/30 font-neo-body text-sm mt-4">
+          <p className="text-neo-white font-neo-body text-sm mt-4">
             Game view coming in Sprint 2-3
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function PartyHostClient() {
         <h1 className="font-neo-display text-neo-lime text-4xl uppercase">
           {t('party.gameOver') || 'Game Over!'}
         </h1>
-        <p className="text-neo-cream/50 mt-2">Results view coming in Sprint 4</p>
+        <p className="text-neo-white mt-2">Results view coming in Sprint 4</p>
       </div>
     </div>
   );

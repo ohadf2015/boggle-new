@@ -89,7 +89,7 @@ const VARIANT_STYLES: Record<StatVariant, { bg: string; border: string; text: st
   default: {
     bg: 'bg-neo-navy/50',
     border: 'border-neo-cream/20',
-    text: 'text-neo-cream',
+    text: 'text-neo-white',
   },
   accent: {
     bg: 'bg-neo-cyan/20',
@@ -290,7 +290,7 @@ export function Stat({
           'font-black',
           variant === 'highlight' || variant === 'accent' || variant === 'success'
             ? variantStyle.text
-            : 'text-neo-cream',
+            : 'text-neo-white',
           sizeConfig.value
         )}
       >

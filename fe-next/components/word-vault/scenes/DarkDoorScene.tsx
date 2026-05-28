@@ -424,7 +424,7 @@ export function DarkDoorScene({ onSolved, onExit }: Props) {
         type="button"
         onClick={onExit}
         aria-label="חזרה"
-        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white/30 hover:text-white/60"
+        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white hover:text-white"
       >
         ←
       </button>

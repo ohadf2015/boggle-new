@@ -72,7 +72,7 @@ export function LandingHeroVariant({
           </div>
 
           {/* Subtitle — value prop */}
-          <p className="text-neo-white/70 font-neo-body text-sm sm:text-base md:text-lg mt-2 sm:mt-3 animate-[fadeInUp_0.4s_ease-out_0.25s_both]">
+          <p className="text-neo-white font-neo-body text-sm sm:text-base md:text-lg mt-2 sm:mt-3 animate-[fadeInUp_0.4s_ease-out_0.25s_both]">
             {t('landing.welcomeSubtitle')}
           </p>
 
@@ -87,9 +87,9 @@ export function LandingHeroVariant({
 
           {/* Compact live player count */}
           {activePlayers > 10 && (
-            <div className="mt-3 inline-flex items-center gap-1.5 text-neo-white/50 text-xs sm:text-sm animate-[fadeInUp_0.4s_ease-out_0.45s_both]">
+            <div className="mt-3 inline-flex items-center gap-1.5 text-neo-white text-xs sm:text-sm animate-[fadeInUp_0.4s_ease-out_0.45s_both]">
               <Flame className="w-3.5 h-3.5 text-neo-orange" aria-hidden="true" />
-              <span className="tabular-nums font-bold text-neo-white/70">{activePlayers}</span>
+              <span className="tabular-nums font-bold text-neo-white">{activePlayers}</span>
               <span>{t('landing.playingNow')}</span>
             </div>
           )}

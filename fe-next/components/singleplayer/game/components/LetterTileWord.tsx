@@ -60,7 +60,7 @@ export function LetterTileWord({
   if (letters.length === 0) {
     return (
       <div className="h-12 flex items-center justify-center">
-        <span className="text-white/60 font-bold text-sm uppercase tracking-wide">
+        <span className="text-white font-bold text-sm uppercase tracking-wide">
           {/* Empty - waiting for word */}
         </span>
       </div>
@@ -150,7 +150,7 @@ export function LetterTileWord({
 
             {/* Message for rejected/duplicate */}
             {(feedback.type === 'rejected' || feedback.type === 'duplicate') && feedback.message && (
-              <span className="font-bold text-white/80 text-[10px] uppercase tracking-wide max-w-[80px] leading-tight">
+              <span className="font-bold text-white text-[10px] uppercase tracking-wide max-w-[80px] leading-tight">
                 {feedback.message}
               </span>
             )}

@@ -34,7 +34,7 @@ function WordCraftHandoffImpl({ incomingName, onReady, labels }: WordCraftHandof
       <div className="font-neo-display text-2xl sm:text-3xl font-black text-neo-pink drop-shadow-[2px_2px_0_rgba(0,0,0,0.9)]">
         {heading}
       </div>
-      <p className="font-neo-body text-sm text-neo-cream/80 max-w-xs">{labels.tapReady}</p>
+      <p className="font-neo-body text-sm text-neo-white max-w-xs">{labels.tapReady}</p>
       <button
         type="button"
         onClick={onReady}

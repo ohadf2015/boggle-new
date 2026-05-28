@@ -367,7 +367,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           </div>
         </div>
 
-        <p className="text-neo-white/70 text-sm">
+        <p className="text-neo-white text-sm">
           {t('duels.scoreToBeat')}: <span className="font-bold">{validatedScore.score}</span>
         </p>
       </AdaptiveMotion.div>
@@ -403,7 +403,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-neo-white/70 text-sm">{t('duels.vs')}</span>
+            <span className="text-neo-white text-sm">{t('duels.vs')}</span>
             <span className="text-neo-white font-bold">{duelData.opponentName}</span>
           </div>
         </div>
@@ -462,7 +462,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
             <AdaptiveAnimatePresence>
               {wordsFound.length === 0 ? (
-                <p className="text-neo-white/50 text-sm text-center py-8">
+                <p className="text-neo-white text-sm text-center py-8">
                   {t('duels.typeWord')}
                 </p>
               ) : (

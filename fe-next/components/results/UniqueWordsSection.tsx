@@ -56,7 +56,7 @@ const UniqueWordsSection: React.FC<UniqueWordsSectionProps> = ({
     <div className="bg-neo-navy/60 border-2 border-neo-cyan/40 rounded-neo shadow-hard-sm p-3 space-y-2">
       <div className="flex items-center gap-2">
         <Fingerprint className="w-4 h-4 text-neo-cyan shrink-0" />
-        <h3 className="text-sm font-black text-neo-cream uppercase tracking-wide">
+        <h3 className="text-sm font-black text-neo-white uppercase tracking-wide">
           {t('results.uniqueWords.title')}
         </h3>
         <span className="ms-auto text-xs font-bold text-neo-cyan">

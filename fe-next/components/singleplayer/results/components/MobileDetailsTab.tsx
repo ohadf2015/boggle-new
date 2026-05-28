@@ -120,13 +120,13 @@ export function MobileDetailsTab({
           <div className="space-y-2 p-3">
             {totalComboBonus > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-white/60">{t('results.comboBonus')}</span>
+                <span className="text-white">{t('results.comboBonus')}</span>
                 <span className="font-bold text-neo-cyan">+{totalComboBonus}</span>
               </div>
             )}
             {totalFireRoundBonus > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-white/60">{t('results.fireRoundBonus')}</span>
+                <span className="text-white">{t('results.fireRoundBonus')}</span>
                 <span className="font-bold text-neo-orange">+{totalFireRoundBonus}</span>
               </div>
             )}

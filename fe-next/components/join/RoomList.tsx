@@ -65,7 +65,7 @@ export const RoomList: React.FC<RoomListProps> = ({
   // Compact mode: No Card wrapper, minimal header
   if (compact) {
     return (
-      <div className="h-full flex flex-col rounded-neo border-3 border-neo-black bg-slate-800 shadow-hard overflow-hidden">
+      <div className="h-full flex flex-col rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard overflow-hidden">
         {/* Compact header - inline title + badge + refresh */}
         <button
           type="button"
@@ -129,7 +129,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                     "w-full p-2.5 rounded-neo text-left transition-all duration-100 border-3",
                     selectedGameCode === room.gameCode
                       ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
-                      : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px hover:border-neo-cyan"
+                      : "bg-neo-navy border-neo-cream/50 text-neo-white shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px hover:border-neo-cyan"
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -140,13 +140,13 @@ export const RoomList: React.FC<RoomListProps> = ({
                       <div className="min-w-0">
                         <div className={cn(
                           "font-black text-base truncate",
-                          selectedGameCode === room.gameCode ? "text-neo-black" : "text-neo-cream"
+                          selectedGameCode === room.gameCode ? "text-neo-black" : "text-neo-white"
                         )}>
                           {room.roomName || room.gameCode}
                         </div>
                         <div className={cn(
                           "text-xs font-bold",
-                          selectedGameCode === room.gameCode ? "text-neo-black/90" : "text-neo-cream/90"
+                          selectedGameCode === room.gameCode ? "text-neo-black/90" : "text-neo-white"
                         )}>
                           {room.gameCode}
                         </div>
@@ -237,7 +237,7 @@ export const RoomList: React.FC<RoomListProps> = ({
                     "w-full p-3 rounded-neo text-left transition-all duration-100 border-3",
                     selectedGameCode === room.gameCode
                       ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
-                      : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px hover:border-neo-cyan"
+                      : "bg-neo-navy border-neo-cream/50 text-neo-white shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px hover:border-neo-cyan"
                   )}
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -248,13 +248,13 @@ export const RoomList: React.FC<RoomListProps> = ({
                       <div>
                         <div className={cn(
                           "font-black text-lg",
-                          selectedGameCode === room.gameCode ? "text-neo-black" : "text-neo-cream"
+                          selectedGameCode === room.gameCode ? "text-neo-black" : "text-neo-white"
                         )}>
                           {room.roomName || room.gameCode}
                         </div>
                         <div className={cn(
                           "text-xs font-bold",
-                          selectedGameCode === room.gameCode ? "text-neo-black/90" : "text-neo-cream/90"
+                          selectedGameCode === room.gameCode ? "text-neo-black/90" : "text-neo-white"
                         )}>
                           {t('joinView.host')}: {room.gameCode}
                         </div>
@@ -317,7 +317,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
   onSwitchToHostMode,
   t,
 }) => (
-  <div className="text-center py-6 text-neo-cream/90 space-y-4">
+  <div className="text-center py-6 text-neo-white space-y-4">
     {isJoinMode && (
       <m.div whileHover={{ x: -2, y: -2 }} whileTap={{ x: 2, y: 2 }}>
         <Button
@@ -330,7 +330,7 @@ const EmptyRoomsState: React.FC<EmptyRoomsStateProps> = ({
       </m.div>
     )}
     <div className="flex justify-center">
-      <Gamepad2 size={48} className="text-neo-cream/90" />
+      <Gamepad2 size={48} className="text-neo-white" />
     </div>
     <div>
       <p className="text-base font-bold uppercase">{t('joinView.noRooms')}</p>

@@ -108,7 +108,7 @@ export function ResultsActionButtons({
             onClick={onExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
+            className="w-full bg-neo-red text-neo-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
@@ -128,14 +128,14 @@ export function ResultsActionButtons({
             <Check className="w-5 h-5" />
             {t('results.ready')}
           </m.button>
-          <p className="text-center text-[10px] text-neo-cream/50">
+          <p className="text-center text-[10px] text-neo-white">
             {t('results.waitingForHost')}
           </p>
           <m.button
             onClick={onExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
+            className="w-full bg-neo-red text-neo-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}
@@ -156,7 +156,7 @@ export function ResultsActionButtons({
               <Star className="w-5 h-5" />
               {t('results.imReady')}
             </m.button>
-            <p className="text-center text-[10px] text-neo-cream/50">
+            <p className="text-center text-[10px] text-neo-white">
               {t('results.readyExplanation')}
             </p>
           </div>
@@ -164,7 +164,7 @@ export function ResultsActionButtons({
             onClick={onExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
+            className="w-full bg-neo-red text-neo-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
           >
             <DoorOpen className="w-4 h-4" />
             {t('results.leaveRoom')}

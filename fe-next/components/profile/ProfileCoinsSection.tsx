@@ -88,7 +88,7 @@ export function ProfileCoinsSection({
               {tile.icon}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[9px] font-black uppercase tracking-[0.15em] text-neo-white/60 truncate leading-none">
+              <p className="text-[9px] font-black uppercase tracking-[0.15em] text-neo-white truncate leading-none">
                 {tile.label}
               </p>
               <p className="font-neo-display font-black text-base text-neo-yellow leading-tight tabular-nums">
@@ -101,7 +101,7 @@ export function ProfileCoinsSection({
 
       {/* Lifetime earned — same plate treatment as XP totals */}
       <div className="mt-3 flex items-center justify-between gap-3 px-3 py-2.5 bg-neo-black/40 border-2 border-neo-black rounded-neo">
-        <span className="text-[10px] font-black uppercase tracking-[0.18em] text-neo-white/60">
+        <span className="text-[10px] font-black uppercase tracking-[0.18em] text-neo-white">
           {t('coins.lifetimeEarned')}
         </span>
         <span className="font-neo-display font-black text-xl text-neo-yellow tabular-nums">

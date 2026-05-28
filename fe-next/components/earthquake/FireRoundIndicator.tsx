@@ -35,12 +35,12 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
           <div className="relative z-10 flex items-center gap-2">
             <span className="text-2xl">🔥</span>
             <div className="flex flex-col">
-              <span className="text-sm font-black uppercase tracking-wide text-neo-cream leading-none">{t('earthquake.fireRound')}</span>
+              <span className="text-sm font-black uppercase tracking-wide text-neo-white leading-none">{t('earthquake.fireRound')}</span>
               <span className="text-xs font-bold text-neo-lime leading-none mt-0.5">{t('earthquake.multiplier')}</span>
-              <span className="max-w-[11rem] text-[10px] font-semibold text-neo-cream/85 leading-tight mt-1">{t('earthquake.effect')}</span>
+              <span className="max-w-[11rem] text-[10px] font-semibold text-neo-white leading-tight mt-1">{t('earthquake.effect')}</span>
             </div>
             <div className="ms-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
-              <span className="text-xl font-black text-neo-cream tabular-nums">{remainingSeconds}s</span>
+              <span className="text-xl font-black text-neo-white tabular-nums">{remainingSeconds}s</span>
             </div>
           </div>
         </div>
@@ -120,13 +120,13 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
 
               {/* Text */}
               <div className="flex flex-col">
-                <span className="text-sm font-black uppercase tracking-wide text-neo-cream leading-none">
+                <span className="text-sm font-black uppercase tracking-wide text-neo-white leading-none">
                   {t('earthquake.fireRound')}
                 </span>
                 <span className="text-xs font-bold text-neo-lime leading-none mt-0.5">
                   {t('earthquake.multiplier')}
                 </span>
-                <span className="max-w-[11rem] text-[10px] font-semibold text-neo-cream/85 leading-tight mt-1">
+                <span className="max-w-[11rem] text-[10px] font-semibold text-neo-white leading-tight mt-1">
                   {t('earthquake.effect')}
                 </span>
               </div>
@@ -135,7 +135,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
               <div className="ms-2 bg-neo-black/20 text-white rounded-neo px-2 py-1 border-2 border-neo-black/40">
                 <m.span
                   key={remainingSeconds}
-                  className="text-xl font-black text-neo-cream tabular-nums"
+                  className="text-xl font-black text-neo-white tabular-nums"
                   initial={{ scale: 1.3 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 400 }}

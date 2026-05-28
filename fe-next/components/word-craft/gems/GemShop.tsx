@@ -46,7 +46,7 @@ function GemShopImpl({ shop, inventory, pendingAbilities, onBuy, onReroll, label
   return (
     <section aria-label={labels.title} className="rounded-neo border-neo-thick border-black bg-neo-navy/95 p-2 shadow-hard">
       <header className="mb-1.5 flex items-center justify-between px-0.5">
-        <h2 className="inline-flex items-center gap-1 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-cream/85">
+        <h2 className="inline-flex items-center gap-1 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">
           <Sparkles className="h-3 w-3 text-neo-yellow" aria-hidden />
           {labels.title}
         </h2>
@@ -86,21 +86,21 @@ function GemShopImpl({ shop, inventory, pendingAbilities, onBuy, onReroll, label
             >
               <span className="inline-flex items-center gap-1">
                 <Icon className="h-3.5 w-3.5 text-neo-cyan" aria-hidden />
-                <span className="font-neo-display text-[11px] font-black uppercase tracking-wider text-neo-cream">
+                <span className="font-neo-display text-[11px] font-black uppercase tracking-wider text-neo-white">
                   {labels.abilityName[card.kind]}
                 </span>
               </span>
-              <span className="font-neo-body text-[9px] leading-tight text-neo-cream/65">
+              <span className="font-neo-body text-[9px] leading-tight text-neo-white">
                 {labels.abilityDesc[card.kind]}
               </span>
               <span className="mt-auto inline-flex items-center justify-between gap-1 rounded border border-black/40 bg-neo-navy/80 px-1 py-0.5">
-                <span className="font-neo-body text-[8px] uppercase tracking-wider text-neo-cream/50">
+                <span className="font-neo-body text-[8px] uppercase tracking-wider text-neo-white">
                   {labels.cost}
                 </span>
                 <GemIcon color={card.cost.color} rarity={card.cost.rarity} sizePx={12} />
               </span>
               {!affordable ? (
-                <span className="pointer-events-none absolute inset-x-1 bottom-1 rounded bg-neo-red/85 px-1 text-center font-neo-display text-[7px] font-black uppercase tracking-widest text-neo-cream">
+                <span className="pointer-events-none absolute inset-x-1 bottom-1 rounded bg-neo-red/85 px-1 text-center font-neo-display text-[7px] font-black uppercase tracking-widest text-neo-white">
                   {labels.insufficient}
                 </span>
               ) : null}

@@ -44,7 +44,7 @@ export function ForfeitConfirmDialog({
             {t('duels.forfeitTitle')}
           </AlertDialog.Title>
 
-          <AlertDialog.Description className="text-neo-white/80 mb-6">
+          <AlertDialog.Description className="text-neo-white mb-6">
             {t('duels.forfeitDescription')}
           </AlertDialog.Description>
 

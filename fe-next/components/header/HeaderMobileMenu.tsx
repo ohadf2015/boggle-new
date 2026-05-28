@@ -399,7 +399,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         className={cn(
                                             "flex items-center justify-center",
                                             "w-9 h-9",
-                                            "bg-neo-white/10 text-neo-white/70",
+                                            "bg-neo-white/10 text-neo-white",
                                             "border-2 border-neo-white/20",
                                             "rounded-full",
                                             "hover:bg-neo-white/20 hover:text-neo-white",
@@ -463,13 +463,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                         </div>
                                                     )}
                                                     {profile.total_games != null && profile.total_games > 0 && (
-                                                        <span className="text-[10px] text-neo-white/40 mt-0.5 font-bold">
+                                                        <span className="text-[10px] text-neo-white mt-0.5 font-bold">
                                                             {profile.total_games} {t('profile.gamesPlayed')}
                                                         </span>
                                                     )}
                                                 </div>
                                                 <ChevronRight className={cn(
-                                                    "ms-auto w-4 h-4 text-neo-white/30 group-hover:text-neo-white/60 transition-colors shrink-0",
+                                                    "ms-auto w-4 h-4 text-neo-white group-hover:text-neo-white transition-colors shrink-0",
                                                     isRtl && "rotate-180"
                                                 )} />
                                             </div>
@@ -507,10 +507,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                         onClick={handleStartEditGuestName}
                                                         className="flex items-center gap-2 group min-w-0"
                                                     >
-                                                        <span className="text-base font-black text-neo-white/60 group-hover:text-neo-cyan transition-colors truncate">
+                                                        <span className="text-base font-black text-neo-white group-hover:text-neo-cyan transition-colors truncate">
                                                             {guestName || t('common.guest')}
                                                         </span>
-                                                        <Pencil className="w-3.5 h-3.5 text-neo-white/30 group-hover:text-neo-cyan shrink-0 transition-colors" />
+                                                        <Pencil className="w-3.5 h-3.5 text-neo-white group-hover:text-neo-cyan shrink-0 transition-colors" />
                                                     </button>
                                                 )}
                                             </div>
@@ -530,13 +530,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         <div className="flex items-center justify-between px-1">
                                             <div className="flex items-center gap-2">
                                                 <Trophy className="w-4 h-4 text-neo-lime shrink-0" />
-                                                <span className="text-[10px] font-black text-neo-white/50 uppercase tracking-widest">
+                                                <span className="text-[10px] font-black text-neo-white uppercase tracking-widest">
                                                     {t('dailyMissions.title')}
                                                 </span>
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-black",
-                                                isGrandSlam ? "text-neo-lime" : "text-neo-white/50"
+                                                isGrandSlam ? "text-neo-lime" : "text-neo-white"
                                             )}>
                                                 {completedCount}/{missions.length}
                                             </span>
@@ -562,7 +562,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 </div>
                                                 <span className={cn(
                                                     "text-xs font-bold flex-1",
-                                                    m.completed ? "text-neo-lime/80 line-through" : "text-neo-white/70"
+                                                    m.completed ? "text-neo-lime/80 line-through" : "text-neo-white"
                                                 )}>
                                                     {t(`dailyMissions.${m.type}`)}
                                                 </span>
@@ -585,7 +585,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         <div className="flex items-center justify-between mb-1.5">
                                             <div className="flex items-center gap-2">
                                                 <Bell className="w-3.5 h-3.5 text-neo-lime" />
-                                                <span className="text-[10px] font-black text-neo-white/30 uppercase tracking-widest">
+                                                <span className="text-[10px] font-black text-neo-white uppercase tracking-widest">
                                                     {t('notifications.title')}
                                                 </span>
                                                 {notificationCount > 0 && (
@@ -638,7 +638,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 {filteredNotifications.length > 3 && (
                                                     <button
                                                         onClick={() => setShowAllNotifications(!showAllNotifications)}
-                                                        className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
+                                                        className="w-full mt-1 text-center text-[10px] text-neo-white hover:text-neo-cyan transition-colors font-bold py-1"
                                                     >
                                                         {showAllNotifications
                                                             ? t('common.showLess')
@@ -648,13 +648,13 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 )}
                                             </>
                                         ) : (
-                                            <div className="text-[10px] text-neo-white/40 text-center py-2 font-bold">
+                                            <div className="text-[10px] text-neo-white text-center py-2 font-bold">
                                                 {t('notifications.empty')}
                                             </div>
                                         )}
                                         <button
                                             onClick={togglePreviousNotifications}
-                                            className="w-full mt-1 text-center text-[10px] text-neo-white/40 hover:text-neo-cyan transition-colors font-bold py-1"
+                                            className="w-full mt-1 text-center text-[10px] text-neo-white hover:text-neo-cyan transition-colors font-bold py-1"
                                             aria-expanded={showPreviousNotifications}
                                         >
                                             {showPreviousNotifications
@@ -668,11 +668,11 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 "max-h-64 overflow-y-auto overscroll-contain"
                                             )}>
                                                 {isLoadingPrevious ? (
-                                                    <div className="text-[10px] text-neo-white/40 text-center py-2">
+                                                    <div className="text-[10px] text-neo-white text-center py-2">
                                                         …
                                                     </div>
                                                 ) : previousNotifications.length === 0 ? (
-                                                    <div className="text-[10px] text-neo-white/40 text-center py-2 font-bold">
+                                                    <div className="text-[10px] text-neo-white text-center py-2 font-bold">
                                                         {t('notifications.noPrevious')}
                                                     </div>
                                                 ) : (
@@ -725,7 +725,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     </MenuIcon>
                                                     <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
                                                     <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
-                                                    <Sparkles className="absolute top-1 right-2 w-3 h-3 text-white/50 animate-pulse" aria-hidden="true" />
+                                                    <Sparkles className="absolute top-1 right-2 w-3 h-3 text-white animate-pulse" aria-hidden="true" />
                                                 </button>
                                                 <button
                                                     onClick={(e) => {
@@ -743,7 +743,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                             .filter(n => n.notification_type === 'gift')
                                                             .forEach(n => dismissNotification(n.id));
                                                     }}
-                                                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-neo-black/80 border-2 border-neo-white/20 flex items-center justify-center text-neo-white/60 hover:text-neo-white hover:bg-neo-black transition-colors z-10"
+                                                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-neo-black/80 border-2 border-neo-white/20 flex items-center justify-center text-neo-white hover:text-neo-white hover:bg-neo-black transition-colors z-10"
                                                     aria-label={t('notifications.dismiss')}
                                                 >
                                                     <X size={12} />
@@ -762,7 +762,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             "flex items-center gap-3 px-4 py-3 rounded-neo",
                                             "bg-neo-white/5 border-2 border-neo-white/10"
                                         )}>
-                                            <span className="text-sm font-bold text-neo-white/80">
+                                            <span className="text-sm font-bold text-neo-white">
                                                 {t('settings.language')}
                                             </span>
                                             <div className="ms-auto">
@@ -874,7 +874,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             <InfoLink href={`/${language}/about`} onClick={closeMenu} icon={<Info className="w-3.5 h-3.5" />} color="bg-neo-cyan/20 text-neo-cyan">{t('footer.about')}</InfoLink>
                                             <InfoLink href={`/${language}/faq`} onClick={closeMenu} icon={<HelpCircle className="w-3.5 h-3.5" />} color="bg-neo-purple/20 text-neo-purple">{t('footer.faq')}</InfoLink>
                                             <InfoLink href={`/${language}/leaderboard`} onClick={closeMenu} icon={<Trophy className="w-3.5 h-3.5" />} color="bg-neo-lime/20 text-neo-lime">{t('footer.leaderboard')}</InfoLink>
-                                            <InfoLink href={`/${language}/contact`} onClick={closeMenu} icon={<Mail className="w-3.5 h-3.5" />} color="bg-neo-white/10 text-neo-white/60">{t('footer.contact')}</InfoLink>
+                                            <InfoLink href={`/${language}/contact`} onClick={closeMenu} icon={<Mail className="w-3.5 h-3.5" />} color="bg-neo-white/10 text-neo-white">{t('footer.contact')}</InfoLink>
                                             <InfoLink href={`/${language}/legal`} onClick={closeMenu} icon={<ScrollText className="w-3.5 h-3.5" />} color="bg-neo-pink/20 text-neo-pink-light">{t('legal.title')}</InfoLink>
                                             <InfoLinkExternal href="https://ko-fi.com/lexiclash" onClick={closeMenu} icon={<Coffee className="w-3.5 h-3.5" />} color="bg-neo-pink/30 text-neo-pink" label={t('common.opensInNewTab')}>{t('support.kofiFooter')}</InfoLinkExternal>
                                         </div>
@@ -890,7 +890,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 aria-label="Instagram"
                                                 className={cn(
                                                     "flex items-center gap-2 flex-1 px-3 py-2 text-xs font-bold rounded-neo",
-                                                    "bg-linear-to-r from-purple-500/20 to-pink-500/20 text-neo-white/70",
+                                                    "bg-linear-to-r from-purple-500/20 to-pink-500/20 text-neo-white",
                                                     "border-2 border-neo-white/10",
                                                     "hover:border-neo-white/20 hover:text-neo-white",
                                                     "transition-all duration-100"
@@ -908,7 +908,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeMenu(); } }}
                                                 className={cn(
                                                     "flex items-center gap-2 flex-1 px-3 py-2 text-xs font-bold rounded-neo cursor-pointer",
-                                                    "bg-neo-white/5 text-neo-white/70",
+                                                    "bg-neo-white/5 text-neo-white",
                                                     "border-2 border-neo-white/10",
                                                     "hover:border-neo-white/20 hover:text-neo-white",
                                                     "transition-all duration-100"
@@ -941,7 +941,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
                                     {/* Swipe hint */}
                                     <m.div variants={itemVariants} className="flex justify-center pt-2 pb-1">
-                                        <span className="text-[10px] text-neo-white/20 font-bold">
+                                        <span className="text-[10px] text-neo-white font-bold">
                                             {isRtl ? '← ' : ''}
                                             {t('common.swipeToClose') || 'Swipe to close'}
                                             {!isRtl ? ' →' : ''}
@@ -972,7 +972,7 @@ export default HeaderMobileMenu;
 function SectionLabel({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex items-center gap-2 pt-3 pb-1 px-1">
-            <span className="text-[10px] font-black text-neo-white/30 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-neo-white uppercase tracking-widest">
                 {children}
             </span>
             <div className="flex-1 h-px bg-neo-white/10" />
@@ -1010,7 +1010,7 @@ function MenuLink({ href, onClick, accentColor, children }: {
             onClick={onClick}
             className={cn(
                 "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo w-full",
-                "bg-neo-white/5 text-neo-white/90",
+                "bg-neo-white/5 text-neo-white",
                 "border-2 border-neo-white/10",
                 hoverColors[accentColor],
                 "hover:bg-neo-white/8",
@@ -1036,7 +1036,7 @@ function InfoLink({ href, onClick, icon, color, children }: {
             onClick={onClick}
             className={cn(
                 "flex items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-neo",
-                "bg-neo-white/5 text-neo-white/70",
+                "bg-neo-white/5 text-neo-white",
                 "border-2 border-neo-white/10",
                 "hover:border-neo-white/20 hover:text-neo-white",
                 "active:scale-[0.97]",
@@ -1068,7 +1068,7 @@ function InfoLinkExternal({ href, onClick, icon, color, label, children }: {
             aria-label={`${children} (${label})`}
             className={cn(
                 "flex items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-neo",
-                "bg-neo-white/5 text-neo-white/70",
+                "bg-neo-white/5 text-neo-white",
                 "border-2 border-neo-white/10",
                 "hover:border-neo-white/20 hover:text-neo-white",
                 "active:scale-[0.97]",

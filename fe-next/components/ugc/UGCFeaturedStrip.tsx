@@ -142,7 +142,7 @@ const UGCFeaturedStrip = memo<UGCFeaturedStripProps>(({
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-neo-white">{t('ugc.strip.createOwn')}</p>
-            <p className="text-[10px] text-neo-white/50 font-neo-body">{t('ugc.strip.createDesc')}</p>
+            <p className="text-[10px] text-neo-white font-neo-body">{t('ugc.strip.createDesc')}</p>
           </div>
           <ArrowIcon className="w-3.5 h-3.5 text-neo-pink/60 group-hover:text-neo-pink transition-colors shrink-0" />
         </Link>

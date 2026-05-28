@@ -47,7 +47,7 @@ const MobileCompactRewards: React.FC<MobileCompactRewardsProps> = memo(({
         <div className="flex items-center gap-1.5">
           <span className="text-lg">🔥</span>
           <span className="text-base font-black text-neo-orange">{winStreak}</span>
-          <span className="text-xs text-white/60 font-bold">
+          <span className="text-xs text-white font-bold">
             {t('results.winStreak')}
           </span>
         </div>
@@ -72,7 +72,7 @@ const MobileCompactRewards: React.FC<MobileCompactRewardsProps> = memo(({
             +{coins}
           </span>
           {!isAuthenticated && (
-            <span className="text-[10px] text-white/60">
+            <span className="text-[10px] text-white">
               {t('coins.signInShort')}
             </span>
           )}

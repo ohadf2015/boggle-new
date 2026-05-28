@@ -56,7 +56,7 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
             <Hash className="w-3 h-3" />
           </div>
           <span className="text-lg font-black text-white">{wordCount}</span>
-          <span className="text-[10px] text-white/60 font-bold uppercase">
+          <span className="text-[10px] text-white font-bold uppercase">
             {t('results.words')}
           </span>
         </div>
@@ -69,7 +69,7 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
           <span className="text-lg font-black text-white">
             {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
           </span>
-          <span className="text-[10px] text-white/60 font-bold uppercase">
+          <span className="text-[10px] text-white font-bold uppercase">
             {t('results.accuracy')}
           </span>
         </div>
@@ -88,7 +88,7 @@ const MobileCompactStats: React.FC<MobileCompactStatsProps> = memo(({
             <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
           ))}
           {overflowCount > 0 && (
-            <span className="text-xs font-bold text-white/60 px-1.5 py-0.5 bg-white/10 rounded-neo border border-white/20">
+            <span className="text-xs font-bold text-white px-1.5 py-0.5 bg-white/10 rounded-neo border border-white/20">
               +{overflowCount}
             </span>
           )}

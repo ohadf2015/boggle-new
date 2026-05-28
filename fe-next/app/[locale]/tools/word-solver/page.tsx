@@ -166,7 +166,7 @@ export default async function WordSolverPage({ params }: PageParams) {
             <Link
               key={letters}
               href={`/${locale}/anagram/${letters}`}
-              className="bg-slate-900 border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
+              className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
             >
               <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
                 {letters}

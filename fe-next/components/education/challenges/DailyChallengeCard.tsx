@@ -46,7 +46,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       <h3 className="font-neo-display text-lg text-white mb-1" data-testid="challenge-title">
         {t(challenge.title)}
       </h3>
-      <p className="text-sm text-neo-white/85 mb-3" data-testid="challenge-description">
+      <p className="text-sm text-neo-white mb-3" data-testid="challenge-description">
         {t(challenge.description, { target: challenge.target_value })}
       </p>
 

@@ -81,7 +81,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
               <div className="space-y-2">
                 {selectedGameMode !== undefined && onSelectGameMode && (
                   <div className="bg-neo-navy/60 border-2 border-slate-700/40 rounded-neo p-2.5">
-                    <p className="text-[9px] font-black uppercase text-neo-cream/40 tracking-[0.2em] mb-1.5">
+                    <p className="text-[9px] font-black uppercase text-neo-white tracking-[0.2em] mb-1.5">
                       {t('gameModes.nextMode')}
                     </p>
                     <GameModeSelector
@@ -114,7 +114,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
                   <Check className="w-5 h-5" />
                   <span className="font-black uppercase">{t('results.youAreReady')}</span>
                 </div>
-                <p className="text-center text-sm text-white/80 mt-1">
+                <p className="text-center text-sm text-white mt-1">
                   {t('results.waitingForHostToStart')}
                 </p>
               </div>
@@ -151,7 +151,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
                     {t('results.imReady')}
                   </m.button>
                 )}
-                <p className="text-center text-xs text-neo-cream/60">
+                <p className="text-center text-xs text-neo-white">
                   {t('results.readyExplanation')}
                 </p>
               </div>
@@ -162,7 +162,7 @@ export const ResultsCtaSection: React.FC<ResultsCtaSectionProps> = ({
           {currentPlayerData && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
             <div className="space-y-1.5">
               {currentPlayerValidWords.length > 0 && (
-                <p className="text-[10px] text-neo-cream/40 text-center italic px-2">
+                <p className="text-[10px] text-neo-white text-center italic px-2">
                   {currentPlayerRank === 1
                     ? t('results.shareNarrativeWin', {
                         word: currentPlayerValidWords.reduce((a, b) => a.word.length >= b.word.length ? a : b).word.toUpperCase(),

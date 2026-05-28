@@ -137,7 +137,7 @@ function StatPill({
       className={cn(
         'flex items-center gap-1.5 px-3 py-1.5',
         'bg-neo-white/5 border border-neo-white/10 rounded-neo',
-        'text-neo-white/70 font-neo-body text-xs'
+        'text-neo-white font-neo-body text-xs'
       )}
     >
       <Icon className="w-3.5 h-3.5 text-neo-cyan" />
@@ -185,7 +185,7 @@ export default function CommunityPageClient() {
           transition={{ duration: 0.25 }}
           className={cn(
             'flex items-center gap-1.5 mb-6 px-3 py-1.5',
-            'text-neo-white/50 hover:text-neo-white',
+            'text-neo-white hover:text-neo-white',
             'font-neo-body text-sm transition-colors'
           )}
         >
@@ -217,7 +217,7 @@ export default function CommunityPageClient() {
             </span>
           </div>
 
-          <p className="text-neo-white/50 font-neo-body text-sm max-w-md mx-auto mb-5">
+          <p className="text-neo-white font-neo-body text-sm max-w-md mx-auto mb-5">
             {t('ugc.community.subtitle')}
           </p>
 
@@ -300,7 +300,7 @@ export default function CommunityPageClient() {
                 'rounded-[3px] transition-colors duration-150 z-10',
                 activeTab === key
                   ? 'text-black'
-                  : 'text-neo-white/50 hover:text-neo-white'
+                  : 'text-neo-white hover:text-neo-white'
               )}
             >
               {/* Sliding background indicator */}

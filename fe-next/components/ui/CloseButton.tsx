@@ -56,7 +56,7 @@ const variantStyles: Record<CloseButtonVariant, string> = {
   ].join(' '),
   ghost: [
     'rounded-full',
-    'text-white/60 hover:text-white',
+    'text-white hover:text-white',
     'hover:bg-white/10',
   ].join(' '),
   minimal: [

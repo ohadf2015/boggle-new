@@ -69,7 +69,7 @@ export default function StudentPageClient() {
               {t('student.dashboard.title')}
             </h1>
           </div>
-          <p className="text-neo-white/70 font-neo-body text-pretty ps-1 mb-3">
+          <p className="text-neo-white font-neo-body text-pretty ps-1 mb-3">
             {t('student.dashboard.subtitle')}
           </p>
 

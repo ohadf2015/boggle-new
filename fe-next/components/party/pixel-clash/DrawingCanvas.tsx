@@ -158,7 +158,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
                 backgroundImage: !isEraser ? 'repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.1) 3px, rgba(255,255,255,0.1) 6px)' : undefined,
               }}
             >
-              <span className="text-neo-cream/70 text-xs font-bold">E</span>
+              <span className="text-neo-white text-xs font-bold">E</span>
             </button>
           </div>
 
@@ -188,14 +188,14 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
           <div className="flex gap-2">
             <button
               onClick={() => canvasRef.current?.undo()}
-              className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-cream/60 text-xs font-neo-body
+              className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-white text-xs font-neo-body
                 hover:border-neo-cream/50 active:translate-y-px transition-all"
             >
               {t('party.undo') || 'Undo'}
             </button>
             <button
               onClick={() => canvasRef.current?.redo()}
-              className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-cream/60 text-xs font-neo-body
+              className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-white text-xs font-neo-body
                 hover:border-neo-cream/50 active:translate-y-px transition-all"
             >
               {t('party.redo') || 'Redo'}

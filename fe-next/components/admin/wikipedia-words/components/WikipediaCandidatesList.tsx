@@ -178,7 +178,7 @@ export function WikipediaCandidatesList({
             <button
               onClick={() => handleBulkAction('delete')}
               disabled={bulkProcessing}
-              className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm font-bold hover:bg-gray-700 disabled:opacity-50 transition-colors flex items-center gap-1"
+              className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm font-bold hover:bg-neo-navy-elevated disabled:opacity-50 transition-colors flex items-center gap-1"
             >
               <Trash2 className="w-4 h-4" />
               Delete
@@ -218,7 +218,7 @@ export function WikipediaCandidatesList({
                 'p-4 rounded-lg border-2 transition-all',
                 isSelected
                   ? 'border-neo-pink bg-neo-pink/10'
-                  : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800',
+                  : 'border-gray-200 dark:border-slate-700 bg-white dark:bg-neo-navy-light',
                 isProcessing && 'opacity-50'
               )}
             >
@@ -287,7 +287,7 @@ export function WikipediaCandidatesList({
                     <button
                       onClick={() => handleDelete(candidate.id)}
                       disabled={isProcessing}
-                      className="p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                      className="p-2 bg-gray-600 text-white rounded-lg hover:bg-neo-navy-elevated disabled:opacity-50 transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -364,7 +364,7 @@ export function WikipediaCandidatesList({
                   <button
                     onClick={() => handleDelete(candidate.id)}
                     disabled={isProcessing}
-                    className="p-1.5 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                    className="p-1.5 bg-gray-600 text-white rounded hover:bg-neo-navy-elevated disabled:opacity-50 transition-colors"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />

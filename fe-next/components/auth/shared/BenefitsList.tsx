@@ -30,7 +30,7 @@ export function BenefitsList({
     <m.div
       className={cn(
         'p-4 rounded-xl',
-        isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50',
+        isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50',
         className
       )}
     >

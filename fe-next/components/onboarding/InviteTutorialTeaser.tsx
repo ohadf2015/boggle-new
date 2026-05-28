@@ -84,7 +84,7 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
       <InviteContextBanner roomCode={roomCode} hostName={hostName} onSkip={onSkip} />
 
       <div className="px-6 py-8 flex flex-col items-center gap-6">
-        <h2 className="text-xl font-neo-display font-black text-neo-cream uppercase tracking-wide text-center">
+        <h2 className="text-xl font-neo-display font-black text-neo-white uppercase tracking-wide text-center">
           {t('invite.tutorial.prompt')}
         </h2>
 
@@ -104,7 +104,7 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
                 onClick={() => handleTap(idx)}
                 aria-pressed={isSelected}
                 className={`min-w-[64px] min-h-[64px] rounded-neo border-neo-thick font-neo-display font-black text-2xl uppercase shadow-hard transition-transform active:translate-y-px ${
-                  isSelected ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-cream'
+                  isSelected ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-white'
                 }`}
               >
                 {letter}
@@ -115,7 +115,7 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
 
         <p
           data-testid="teaser-current-word"
-          className="font-mono text-xl text-neo-cream min-h-[2rem]"
+          className="font-mono text-xl text-neo-white min-h-[2rem]"
           aria-live="polite"
         >
           {word || '—'}
@@ -126,7 +126,7 @@ const InviteTutorialTeaser: React.FC<Props> = ({ roomCode, hostName, onComplete,
             data-testid="teaser-clear"
             type="button"
             onClick={handleClear}
-            className="min-h-[44px] px-4 py-2 rounded-neo border-2 border-neo-cream/60 text-neo-cream font-neo-display text-sm uppercase tracking-wide active:translate-y-px"
+            className="min-h-[44px] px-4 py-2 rounded-neo border-2 border-neo-cream/60 text-neo-white font-neo-display text-sm uppercase tracking-wide active:translate-y-px"
           >
             {t('invite.tutorial.clear')}
           </button>

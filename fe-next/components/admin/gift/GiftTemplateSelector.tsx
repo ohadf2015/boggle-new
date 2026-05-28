@@ -28,7 +28,7 @@ export function GiftTemplateSelector({
               'hover:border-neo-lime hover:bg-neo-lime/5',
               isSelected
                 ? 'border-neo-lime bg-neo-lime/10 shadow-hard-sm'
-                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800'
+                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-neo-navy-light'
             )}
           >
             <div className="flex items-start gap-3">

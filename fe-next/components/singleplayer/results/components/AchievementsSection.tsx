@@ -40,7 +40,7 @@ export function AchievementsSection({
         ))}
       </div>
       {disclaimer && (
-        <p className="text-xs text-white/70 mt-2 italic">{disclaimer}</p>
+        <p className="text-xs text-white mt-2 italic">{disclaimer}</p>
       )}
     </CollapsibleSection>
   );

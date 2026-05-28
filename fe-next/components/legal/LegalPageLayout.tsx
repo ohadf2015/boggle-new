@@ -73,7 +73,7 @@ export default function LegalPageLayout({
           transition={{ delay: 0.1 }}
           className={cn(
             'rounded-2xl p-6 md:p-8',
-            isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+            isDarkMode ? 'bg-neo-navy-light/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
           )}
         >
           <div className={cn(
@@ -98,7 +98,7 @@ export default function LegalPageLayout({
             className={cn(
               'rounded-full font-bold',
               isDarkMode
-                ? 'border-slate-500 bg-slate-700 text-slate-100 hover:bg-slate-600 hover:text-white'
+                ? 'border-slate-500 bg-neo-navy-elevated text-slate-100 hover:bg-slate-600 hover:text-white'
                 : 'border-gray-400 bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900'
             )}
           >

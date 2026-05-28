@@ -82,7 +82,7 @@ describe('CircularTimer', () => {
     it('uses default cream color when time > 20 seconds', () => {
       const { container } = render(<CircularTimer remainingTime={21} />);
 
-      const timerText = container.querySelector('.text-neo-cream');
+      const timerText = container.querySelector('.text-neo-white');
       expect(timerText).toBeInTheDocument();
       expect(container.querySelector('.text-neo-red')).not.toBeInTheDocument();
     });

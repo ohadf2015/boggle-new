@@ -186,13 +186,13 @@ export default function LightningRound({
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        'bg-slate-800'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Timer */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            'bg-slate-700'
+            'bg-neo-navy-elevated'
           )}>
             <Clock className={cn('w-4 h-4', getTimeColor())} />
             <span role="status" className={cn('font-black text-lg tabular-nums', getTimeColor())}>
@@ -203,7 +203,7 @@ export default function LightningRound({
           {/* Words found */}
           <div className={cn(
             'px-2 py-1 rounded border-2 border-neo-black text-xs font-bold',
-            'bg-slate-700 text-neo-white'
+            'bg-neo-navy-elevated text-neo-white'
           )}>
             {wordsFound.length} {t('brain.drills.wordsFound')}
           </div>
@@ -255,13 +255,13 @@ export default function LightningRound({
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              'text-neo-white/70'
+              'text-neo-white'
             )}>
               {t('brain.drills.lightning-round.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-slate-800'
+              'bg-neo-navy-light'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.timeLimit')}: {levelConfig.timeLimit}s</p>
@@ -349,11 +349,11 @@ export default function LightningRound({
               data-testid="drill-found-words"
               className={cn(
                 'flex flex-wrap gap-2 justify-center content-start p-3 rounded-neo border-2 border-neo-black h-28 overflow-y-auto',
-                'bg-slate-800'
+                'bg-neo-navy-light'
               )}
             >
               {wordsFound.length === 0 ? (
-                <span className="self-center text-xs text-neo-white/40">
+                <span className="self-center text-xs text-neo-white">
                   {t('brain.drills.foundWordsHint')}
                 </span>
               ) : (
@@ -397,7 +397,7 @@ export default function LightningRound({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:-translate-y-px',
-                'bg-slate-700 text-neo-white'
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}

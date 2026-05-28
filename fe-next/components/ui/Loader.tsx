@@ -68,7 +68,7 @@ export const Loader = memo(function Loader({
       </div>
       {text && (
         <p className={cn(
-          'font-neo-body text-neo-cream/70 mt-2',
+          'font-neo-body text-neo-white mt-2',
           TEXT_CLASSES[size]
         )}>
           {text}

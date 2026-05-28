@@ -78,16 +78,16 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
                       )}
                     />
                   </span>
-                  <span dir="auto" className="font-neo-display font-bold text-[11px] text-neo-cream truncate">{p.username}</span>
+                  <span dir="auto" className="font-neo-display font-bold text-[11px] text-neo-white truncate">{p.username}</span>
                 </div>
                 <div className="flex items-baseline justify-between mt-0.5">
                   {fogActive ? (
                     <span className="font-neo-display font-black text-sm text-neo-cyan tracking-wider">???</span>
                   ) : (
-                    <span className="font-neo-display font-black text-sm text-neo-cream tabular-nums">{p.score}</span>
+                    <span className="font-neo-display font-black text-sm text-neo-white tabular-nums">{p.score}</span>
                   )}
                   {!fogActive && (p.wordCount ?? 0) > 0 && (
-                    <span className="text-[10px] text-neo-cream/50 tabular-nums">{p.wordCount}w</span>
+                    <span className="text-[10px] text-neo-white tabular-nums">{p.wordCount}w</span>
                   )}
                 </div>
                 {!fogActive && <ProgressBar ratio={p.score / leaderScore} tone="opp" />}

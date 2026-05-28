@@ -76,7 +76,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
 
           {/* Room Code */}
           <div className="text-center">
-            <p className="text-neo-cream/50 font-neo-body text-sm uppercase tracking-wider mb-2">
+            <p className="text-neo-white font-neo-body text-sm uppercase tracking-wider mb-2">
               {t('party.roomCode')}
             </p>
             <div className={`border-4 ${accentClasses.split(' ')[1]} rounded-neo-lg px-8 py-4 bg-neo-navy`}>
@@ -84,7 +84,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
                 {room?.roomCode || '-----'}
               </span>
             </div>
-            <p className="text-neo-cream/30 font-neo-body text-xs mt-2">
+            <p className="text-neo-white font-neo-body text-xs mt-2">
               {t('party.scanOrEnter')}
             </p>
           </div>
@@ -97,7 +97,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
               key={p.socketId}
               className="bg-neo-navy-elevated border-3 border-neo-cream/30 rounded-neo-lg px-4 py-3 shadow-hard animate-neo-pop"
             >
-              <span className="font-neo-display text-neo-cream text-lg">
+              <span className="font-neo-display text-neo-white text-lg">
                 {p.username}
               </span>
               {p.isHost && (
@@ -112,7 +112,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
               key={`empty-${i}`}
               className="border-3 border-dashed border-neo-cream/15 rounded-neo-lg px-4 py-3 animate-pulse"
             >
-              <span className="font-neo-body text-neo-cream/20 text-lg">
+              <span className="font-neo-body text-neo-white text-lg">
                 {t('party.waiting')}
               </span>
             </div>
@@ -120,7 +120,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
         </div>
 
         {/* Player Count */}
-        <p className="text-center text-neo-cream/40 font-neo-body text-sm mb-6">
+        <p className="text-center text-neo-white font-neo-body text-sm mb-6">
           {playerCount}/{gameDef.maxPlayers} {t('party.players')}
           {spectators.length > 0 && ` + ${spectators.length} ${t('party.spectators')}`}
           {!canStart && (

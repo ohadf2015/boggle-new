@@ -64,7 +64,7 @@ export function WordCollectionCard({ onReviewClick, className = '' }: WordCollec
               aria-valuenow={masteryPercent}
               aria-valuemin={0}
               aria-valuemax={100}
-              className="h-2 w-full overflow-hidden rounded-full border border-neutral-700 bg-neutral-800"
+              className="h-2 w-full overflow-hidden rounded-full border border-neutral-700 bg-neo-navy-light"
             >
               <div
                 className="h-full rounded-full bg-neo-cyan transition-all duration-300"
@@ -79,7 +79,7 @@ export function WordCollectionCard({ onReviewClick, className = '' }: WordCollec
               {recentWords.map(w => (
                 <span
                   key={w.word}
-                  className="rounded-neo border border-neutral-700 bg-neutral-800 px-2 py-0.5 text-xs font-medium text-neo-white"
+                  className="rounded-neo border border-neutral-700 bg-neo-navy-light px-2 py-0.5 text-xs font-medium text-neo-white"
                 >
                   {w.word}
                 </span>

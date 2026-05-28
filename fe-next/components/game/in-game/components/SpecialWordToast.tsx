@@ -59,7 +59,7 @@ export const SpecialWordToast = memo<SpecialWordToastProps>(function SpecialWord
           <span className="font-bold text-yellow-300 text-base">
             {t('specialWord.bonus', { bonus: event.bonus })}
           </span>
-          <span className="text-neo-cream/70 text-xs font-neo-body">
+          <span className="text-neo-white text-xs font-neo-body">
             {t('specialWord.foundBy', { username: event.finderUsername })}
           </span>
         </AdaptiveMotion.div>

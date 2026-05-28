@@ -68,7 +68,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
           {t('auth.multiGames.title')}
         </h3>
       </div>
-      <p className="text-sm text-neo-cream/80 mb-4 leading-snug">
+      <p className="text-sm text-neo-white mb-4 leading-snug">
         {t('auth.multiGames.subtitle')}
       </p>
 
@@ -80,7 +80,7 @@ const InlineSignupCard: React.FC<InlineSignupCardProps> = ({
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 + index * 0.08 }}
-            className="flex items-center gap-2.5 text-sm text-neo-cream"
+            className="flex items-center gap-2.5 text-sm text-neo-white"
           >
             <benefit.icon className="shrink-0 text-neo-cyan" size={16} aria-hidden />
             <span>{t(benefit.translationKey)}</span>

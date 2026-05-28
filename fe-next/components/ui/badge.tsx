@@ -19,7 +19,7 @@ const badgeVariants = cva(
         // Secondary: Pink - interactive
         secondary: "bg-neo-pink text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Destructive: Red (4.8:1 contrast with cream)
-        destructive: "bg-neo-red text-neo-cream shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        destructive: "bg-neo-red text-neo-white shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Outline: Cream/transparent - interactive
         outline: "bg-neo-cream text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Success: Lime green - interactive
@@ -29,7 +29,7 @@ const badgeVariants = cva(
         // Cyan: For special highlights - interactive
         cyan: "bg-neo-cyan text-neo-black shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // Purple: For rare/special (7.2:1 contrast with cream) - interactive
-        purple: "bg-neo-purple text-neo-cream shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
+        purple: "bg-neo-purple text-neo-white shadow-hard-sm focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2",
         // DISPLAY-ONLY variants: No shadow, muted border, no focus ring
         // Use these for static info displays that aren't clickable
         "display-default": "bg-neo-lime/80 text-neo-black border-neo-black/50 shadow-none cursor-default",
@@ -37,8 +37,8 @@ const badgeVariants = cva(
         "display-success": "bg-neo-lime/80 text-neo-black border-neo-black/50 shadow-none cursor-default",
         "display-accent": "bg-neo-pink/80 text-neo-black border-neo-black/50 shadow-none cursor-default",
         "display-cyan": "bg-neo-cyan/80 text-neo-black border-neo-black/50 shadow-none cursor-default",
-        "display-purple": "bg-neo-purple/80 text-neo-cream border-neo-black/50 shadow-none cursor-default",
-        "display-muted": "bg-neo-gray text-neo-cream/70 border-neo-cream/40 shadow-none cursor-default",
+        "display-purple": "bg-neo-purple/80 text-neo-white border-neo-black/50 shadow-none cursor-default",
+        "display-muted": "bg-neo-gray text-neo-white border-neo-cream/40 shadow-none cursor-default",
       },
       /**
        * Size variants:

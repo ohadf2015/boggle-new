@@ -92,7 +92,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="border-3 border-neo-black shadow-hard rounded-neo bg-slate-800 p-6 sm:p-8 mb-6"
+            className="border-3 border-neo-black shadow-hard rounded-neo bg-neo-navy-light p-6 sm:p-8 mb-6"
             aria-label={todayWord.word}
           >
             {/* Word + Badges */}
@@ -106,7 +106,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
               <span className={cn('px-2 py-0.5 rounded-neo text-xs font-bold uppercase border-2 border-neo-black', difficultyColors[todayWord.difficulty])}>
                 {difficultyLabels[todayWord.difficulty]?.[lang] || todayWord.difficulty}
               </span>
-              <span className="px-2 py-0.5 rounded-neo text-xs font-bold bg-slate-700 text-neo-cream border-2 border-neo-black">
+              <span className="px-2 py-0.5 rounded-neo text-xs font-bold bg-neo-navy-elevated text-neo-white border-2 border-neo-black">
                 {todayWord.partOfSpeech}
               </span>
             </div>
@@ -116,7 +116,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
               <h3 className="font-neo-display text-sm font-bold text-neo-yellow uppercase tracking-wide mb-1">
                 {label('definition', lang)}
               </h3>
-              <p data-speakable="true" className="text-lg text-neo-cream leading-relaxed">
+              <p data-speakable="true" className="text-lg text-neo-white leading-relaxed">
                 {todayWord.definition}
               </p>
             </section>
@@ -126,7 +126,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
               <h3 className="font-neo-display text-sm font-bold text-neo-yellow uppercase tracking-wide mb-1">
                 {label('etymology', lang)}
               </h3>
-              <p data-speakable="true" className="text-neo-cream/80 leading-relaxed">
+              <p data-speakable="true" className="text-neo-white leading-relaxed">
                 {todayWord.etymology}
               </p>
             </section>
@@ -138,18 +138,18 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
               </h3>
               <blockquote
                 data-speakable="true"
-                className="border-s-4 border-neo-cyan ps-4 italic text-neo-cream/90"
+                className="border-s-4 border-neo-cyan ps-4 italic text-neo-white"
               >
                 {todayWord.example}
               </blockquote>
             </section>
 
             {/* Fun Fact */}
-            <section className="mb-6 bg-slate-700/50 border-2 border-neo-black rounded-neo p-4">
+            <section className="mb-6 bg-neo-navy-elevated/50 border-2 border-neo-black rounded-neo p-4">
               <h3 className="font-neo-display text-sm font-bold text-neo-pink uppercase tracking-wide mb-1">
                 {label('funFact', lang)}
               </h3>
-              <p data-speakable="true" className="text-neo-cream/90">
+              <p data-speakable="true" className="text-neo-white">
                 {todayWord.funFact}
               </p>
             </section>
@@ -186,7 +186,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.05 * i }}
-                  className="border-3 border-neo-black shadow-hard-sm rounded-neo bg-slate-800 p-4"
+                  className="border-3 border-neo-black shadow-hard-sm rounded-neo bg-neo-navy-light p-4"
                 >
                   <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="font-neo-display text-xl font-black text-neo-cyan">
@@ -195,9 +195,9 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
                     <span className={cn('px-1.5 py-0.5 rounded-neo text-[10px] font-bold uppercase border border-neo-black', difficultyColors[word.difficulty])}>
                       {difficultyLabels[word.difficulty]?.[lang] || word.difficulty}
                     </span>
-                    <span className="text-xs text-neo-cream/50 ms-auto">{word.dateKey}</span>
+                    <span className="text-xs text-neo-white ms-auto">{word.dateKey}</span>
                   </div>
-                  <p className="text-sm text-neo-cream/80">{word.definition}</p>
+                  <p className="text-sm text-neo-white">{word.definition}</p>
                 </m.div>
               ))}
             </div>

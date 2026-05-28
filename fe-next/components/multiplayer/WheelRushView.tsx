@@ -512,7 +512,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const fogEndsAt = (startedAt ?? 0) + WHEEL_RUSH_FOG_MS;
   if (!puzzle) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-cream">
+      <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-white">
         <div className="animate-pulse font-neo-display">{t('wheel.rush.loading') || 'Loading wheel...'}</div>
       </div>
     );
@@ -566,7 +566,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               (prevents post-reset horizontal shift). */}
           <m.span
             aria-hidden={builtLetters.length > 0}
-            className="absolute inset-0 flex items-center justify-center text-neo-cream/30 font-neo-display text-base sm:text-lg pointer-events-none"
+            className="absolute inset-0 flex items-center justify-center text-neo-white font-neo-display text-base sm:text-lg pointer-events-none"
             animate={{ opacity: builtLetters.length === 0 ? 1 : 0 }}
             transition={{ duration: 0.18 }}
           >
@@ -610,7 +610,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           {nextRival && (
             <m.div
               data-testid="mp-next-rival-pill"
-              className="px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5"
+              className="px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-white font-semibold flex items-center gap-1.5"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -698,7 +698,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             />
           )}
         </div>
-        <p className="text-neo-cream/40 text-xs text-center px-2">
+        <p className="text-neo-white text-xs text-center px-2">
           {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}
         </p>
 
@@ -710,7 +710,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           onClick={handleClear}
           disabled={builtLetters.length === 0}
           className={cn(
-            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
+            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
@@ -728,7 +728,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg',
             builtWord.length >= MIN_LEN
               ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
-              : 'bg-neo-navy-light text-neo-cream/40 shadow-hard-lg',
+              : 'bg-neo-navy-light text-neo-white shadow-hard-lg',
             'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:cursor-not-allowed',
           )}
@@ -745,7 +745,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           onClick={handleBackspace}
           disabled={builtLetters.length === 0}
           className={cn(
-            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
+            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}

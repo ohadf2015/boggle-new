@@ -113,7 +113,7 @@ export default function CookieConsent() {
         className={cn(
           'absolute top-2 inset-e-2 p-1.5 min-h-[44px] min-w-[44px]',
           'flex items-center justify-center',
-          'text-neo-cream/60 hover:text-neo-white',
+          'text-neo-white hover:text-neo-white',
           'transition-colors duration-100'
         )}
       >
@@ -125,7 +125,7 @@ export default function CookieConsent() {
       <div className="max-w-4xl mx-auto">
         {/* Main message */}
         <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-          <p className="text-sm text-neo-cream/90 font-medium flex-1 text-center sm:text-start pe-8 sm:pe-0">
+          <p className="text-sm text-neo-white font-medium flex-1 text-center sm:text-start pe-8 sm:pe-0">
             {t('cookieConsent.message')}{' '}
             <a
               href={`/${language}/legal/cookies`}
@@ -139,7 +139,7 @@ export default function CookieConsent() {
               onClick={handleDeclineAll}
               className={cn(
                 'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
-                'text-neo-cream/80 hover:text-neo-white',
+                'text-neo-white hover:text-neo-white',
                 'border-2 border-neo-cream/30 rounded-neo',
                 'transition-colors duration-100'
               )}
@@ -272,12 +272,12 @@ function ConsentToggle({ label, description, checked, disabled, requiredLabel, o
         <span className="text-sm font-bold text-neo-white block">
           {label}
           {disabled && (
-            <span className="text-neo-cream/50 font-normal ms-1">
+            <span className="text-neo-white font-normal ms-1">
               ({requiredLabel || 'Required'})
             </span>
           )}
         </span>
-        <span className="text-xs text-neo-cream/60 block mt-0.5">{description}</span>
+        <span className="text-xs text-neo-white block mt-0.5">{description}</span>
       </div>
     </label>
   );
@@ -299,7 +299,7 @@ export function ManageCookiesButton() {
   return (
     <button
       onClick={handleClick}
-      className="text-sm text-neo-cream/50 hover:text-neo-cream/80 underline transition-colors"
+      className="text-sm text-neo-white hover:text-neo-white underline transition-colors"
     >
       {t('cookieConsent.manageCookies')}
     </button>

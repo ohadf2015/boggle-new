@@ -43,7 +43,7 @@ export function AuthorBioCard() {
   return (
     <div className={cn(
       'mt-10 mb-8 p-4 md:p-5 rounded-neo border-3 border-neo-black shadow-hard flex flex-col sm:flex-row items-center sm:items-start gap-4',
-      isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
+      isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-cream'
     )}>
       <Image
         src="/images/author-ohad.png"

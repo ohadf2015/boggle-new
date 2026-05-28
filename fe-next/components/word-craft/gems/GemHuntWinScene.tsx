@@ -53,7 +53,7 @@ function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, labels
         >
           {isWin ? labels.titleWon : labels.titleLost}
         </h2>
-        <p className="mb-3 font-neo-body text-sm text-neo-cream/80">
+        <p className="mb-3 font-neo-body text-sm text-neo-white">
           {isWin ? labels.subtitleWon : labels.subtitleLost}
         </p>
         <div className="mb-4 flex items-center justify-center gap-2">
@@ -63,7 +63,7 @@ function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, labels
             </span>
           ))}
         </div>
-        <div className="mb-4 flex items-center justify-around font-neo-display text-xs uppercase tracking-wider text-neo-cream/70">
+        <div className="mb-4 flex items-center justify-around font-neo-display text-xs uppercase tracking-wider text-neo-white">
           <span>{labels.score} <span className="ms-1 text-neo-lime text-lg tabular-nums">{totalScore}</span></span>
           <span>{labels.turns} <span className="ms-1 text-neo-cyan text-lg tabular-nums">{turnIndex}</span></span>
         </div>

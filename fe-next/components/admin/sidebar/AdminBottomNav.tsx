@@ -54,7 +54,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
 
   return (
     <nav
-      className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-slate-900 border-t border-slate-700/50 safe-area-pb"
+      className="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t border-slate-700/50 safe-area-pb"
       aria-label="Admin navigation"
     >
       <div className="flex justify-around">

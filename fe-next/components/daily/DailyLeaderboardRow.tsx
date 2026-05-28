@@ -182,7 +182,7 @@ export const TodayParticipantRow = memo<{
 
       {/* Time */}
       {!compact && (
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-neo-navy-elevated/50 px-2 py-1 rounded-lg">
           <Clock className="w-3.5 h-3.5" />
           <span>{timeAgo}</span>
         </div>
@@ -323,16 +323,16 @@ export const SkeletonRow = memo<{ index: number }>(({ index }) => (
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
-    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50"
+    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-neo-navy-light/50"
   >
     {/* Rank skeleton */}
-    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
+    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-neo-navy-elevated animate-pulse" />
     {/* Avatar skeleton */}
-    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
+    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-neo-navy-elevated animate-pulse" />
     {/* Name & stats skeleton */}
     <div className="flex-1 space-y-2">
-      <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-      <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+      <div className="h-4 w-24 bg-slate-200 dark:bg-neo-navy-elevated rounded animate-pulse" />
+      <div className="h-3 w-16 bg-slate-200 dark:bg-neo-navy-elevated rounded animate-pulse" />
     </div>
   </m.div>
 ));

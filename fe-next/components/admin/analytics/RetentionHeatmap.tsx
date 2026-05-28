@@ -49,7 +49,7 @@ export function RetentionHeatmap({ cohorts }: RetentionHeatmapProps) {
 
   if (!grouped) {
     return (
-      <div data-testid="retention-loading" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
+      <div data-testid="retention-loading" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
     );
   }
 
@@ -58,7 +58,7 @@ export function RetentionHeatmap({ cohorts }: RetentionHeatmapProps) {
   const offsets = Array.from({ length: maxOffset + 1 }, (_, i) => i);
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6 overflow-x-auto">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6 overflow-x-auto">
       <h3 className="text-sm font-neo-display text-neo-white mb-3">
         {t('admin.analytics.retentionTitle')}
       </h3>

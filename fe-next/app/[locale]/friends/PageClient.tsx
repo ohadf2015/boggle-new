@@ -105,7 +105,7 @@ export default function FriendsPageClient(): React.JSX.Element {
       <header
         className={cn(
           'sticky top-0 z-40 px-4 py-3 border-b-3 border-neo-black',
-          isDark ? 'bg-slate-800/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'
+          isDark ? 'bg-neo-navy-light/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'
         )}
         style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
       >
@@ -115,7 +115,7 @@ export default function FriendsPageClient(): React.JSX.Element {
             className={cn(
               'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
               'hover:shadow-hard hover:-translate-y-0.5 transition-all',
-              isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-900'
+              isDark ? 'bg-neo-navy-elevated text-white' : 'bg-white text-gray-900'
             )}
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
@@ -161,7 +161,7 @@ export default function FriendsPageClient(): React.JSX.Element {
               )}
               <div className={cn(
                 'text-center py-12 px-4 rounded-neo border-3 border-neo-black',
-                isDark ? 'bg-slate-800' : 'bg-white'
+                isDark ? 'bg-neo-navy-light' : 'bg-white'
               )}>
               {isCrazyGames ? (
                 <>

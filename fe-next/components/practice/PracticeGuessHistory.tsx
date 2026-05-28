@@ -17,7 +17,7 @@ interface Props {
 const TONE: Record<LetterFeedback, string> = {
   correct: 'bg-neo-lime text-neo-black border-neo-black',
   present: 'bg-neo-yellow text-neo-black border-neo-black',
-  absent: 'bg-neo-navy-light text-neo-cream/85 border-neo-cream/30',
+  absent: 'bg-neo-navy-light text-neo-white border-neo-cream/30',
 };
 
 /**

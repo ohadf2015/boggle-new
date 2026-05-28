@@ -248,7 +248,7 @@ export default async function AnagramHubPage({ params }: PageParams) {
               <Link
                 key={letters}
                 href={`/${locale}/anagram/${letters}`}
-                className="bg-slate-900 border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
+                className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
               >
                 <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
                   {letters}
@@ -280,21 +280,21 @@ export default async function AnagramHubPage({ params }: PageParams) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Link
               href={`/${locale}/tools/word-solver`}
-              className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-cyan transition-all"
+              className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-cyan transition-all"
             >
               <div className="font-neo-display font-bold text-neo-white">Word Solver</div>
               <div className="text-xs text-slate-400 mt-1">Interactive UI version</div>
             </Link>
             <Link
               href={`/${locale}/words`}
-              className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-cyan transition-all"
+              className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-cyan transition-all"
             >
               <div className="font-neo-display font-bold text-neo-white">Words Dictionary</div>
               <div className="text-xs text-slate-400 mt-1">Browse by length or letter</div>
             </Link>
             <Link
               href={`/${locale}/multiplayer`}
-              className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-lime transition-all"
+              className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 shadow-hard hover:border-neo-lime transition-all"
             >
               <div className="font-neo-display font-bold text-neo-white">Play LexiClash</div>
               <div className="text-xs text-slate-400 mt-1">Real-time word game</div>

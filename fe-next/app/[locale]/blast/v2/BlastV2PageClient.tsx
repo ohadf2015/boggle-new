@@ -119,7 +119,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
               className="object-contain drop-shadow-[3px_3px_0_#000]"
             />
           </div>
-          <p className="font-neo-body text-base text-white/80">{t('blast.loadingProgress')}</p>
+          <p className="font-neo-body text-base text-white">{t('blast.loadingProgress')}</p>
         </div>
       </div>
     );
@@ -142,7 +142,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
           <h1 className="font-neo-display text-3xl leading-tight">
             {t('blast.allCleared')}
           </h1>
-          <p className="font-neo-body text-base text-white/80">
+          <p className="font-neo-body text-base text-white">
             {t('blast.moreLevelsComingSoon')}
           </p>
           <button

@@ -14,7 +14,7 @@ interface BadgeSelectorProps {
 }
 
 const rarityColors: Record<string, string> = {
-  common: 'border-gray-400 bg-gray-50 dark:bg-gray-800',
+  common: 'border-gray-400 bg-gray-50 dark:bg-neo-navy-light',
   uncommon: 'border-green-500 bg-green-50 dark:bg-green-900/30',
   rare: 'border-blue-500 bg-blue-50 dark:bg-blue-900/30',
   epic: 'border-purple-500 bg-purple-50 dark:bg-purple-900/30',
@@ -102,7 +102,7 @@ export function BadgeSelector({ authToken, selectedBadgeId, onSelect }: BadgeSel
             : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
         )}
       >
-        <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-neo-navy-light flex items-center justify-center">
           <span className="text-xl">❌</span>
         </div>
         <div className="flex-1 text-left">

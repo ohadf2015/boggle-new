@@ -95,7 +95,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
           <h4 className="text-sm font-neo-display text-neo-white font-bold truncate">
             {notification.title}
           </h4>
-          <p className="text-xs text-neo-white/70 line-clamp-2 mt-0.5">
+          <p className="text-xs text-neo-white line-clamp-2 mt-0.5">
             {notification.body}
           </p>
         </div>
@@ -109,7 +109,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
           className="
             absolute top-2 inset-e-2
             w-6 h-6 rounded-md flex items-center justify-center
-            text-neo-white/50 hover:text-neo-white hover:bg-white/10
+            text-neo-white hover:text-neo-white hover:bg-white/10
             transition-colors
           "
         >

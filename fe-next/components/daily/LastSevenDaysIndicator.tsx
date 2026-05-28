@@ -37,7 +37,7 @@ export default function LastSevenDaysIndicator({ days }: Props) {
           );
         })}
       </div>
-      <span className="text-xs text-neo-cream/70">
+      <span className="text-xs text-neo-white">
         {t('daily.dedicationProgress')}
       </span>
     </div>

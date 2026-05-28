@@ -176,13 +176,13 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
   const textColorMap: Record<string, string> = {
     strategist: 'text-neo-black',
     speedster: 'text-neo-black',
-    scholar: 'text-neo-cream',
+    scholar: 'text-neo-white',
     explorer: 'text-neo-black',
     perfectionist: 'text-neo-black',
-    maverick: 'text-neo-cream',
+    maverick: 'text-neo-white',
     workhorse: 'text-neo-black',
     closer: 'text-neo-black',
-    trailblazer: 'text-neo-cream',
+    trailblazer: 'text-neo-white',
   };
 
   const bgColor = bgColorMap[archetype.id] || 'bg-neo-cyan';
@@ -309,7 +309,7 @@ const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
                 <span className="text-base">{archetype.emoji}</span>
               )}
             </div>
-            <span className={cn('font-black text-sm uppercase tracking-wide', textColor === 'text-neo-cream' ? 'text-neo-black' : textColor)}>
+            <span className={cn('font-black text-sm uppercase tracking-wide', textColor === 'text-neo-white' ? 'text-neo-black' : textColor)}>
               {archetypeName}
             </span>
           </div>

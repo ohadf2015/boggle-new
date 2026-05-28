@@ -196,7 +196,7 @@ export default function SoloPracticeBoard({
               >
                 <Star className="w-6 h-6 text-neo-yellow" />
                 <span className="text-4xl font-neo-display font-black text-neo-cyan tabular-nums">{score}</span>
-                <span className="text-neo-white/60 font-bold">{t('education.practice.points')}</span>
+                <span className="text-neo-white font-bold">{t('education.practice.points')}</span>
               </m.div>
 
               <m.div
@@ -210,7 +210,7 @@ export default function SoloPracticeBoard({
                   className="p-3 bg-neo-yellow/10 rounded-neo border-2 border-black shadow-hard-sm"
                 >
                   <p className="text-2xl font-neo-display font-black text-neo-white tabular-nums">{validWordCount}</p>
-                  <p className="text-xs text-neo-white/60 font-bold">
+                  <p className="text-xs text-neo-white font-bold">
                     {t('education.practice.wordsFound')}
                   </p>
                 </m.div>
@@ -219,7 +219,7 @@ export default function SoloPracticeBoard({
                   className="p-3 bg-neo-cyan/10 rounded-neo border-2 border-black shadow-hard-sm"
                 >
                   <p className="text-2xl font-neo-display font-black text-neo-cyan tabular-nums">{vocabularyFound.length}</p>
-                  <p className="text-xs text-neo-white/60 font-bold">
+                  <p className="text-xs text-neo-white font-bold">
                     {t('education.practice.vocabularyWords')}
                   </p>
                 </m.div>
@@ -243,7 +243,7 @@ export default function SoloPracticeBoard({
                   initial={{ scale: 0.8 }}
                   animate={{ scale: [1, 1.15, 1] }}
                   transition={{ delay: 0.9, duration: 0.4 }}
-                  className="text-neo-white/80 font-neo-body font-bold"
+                  className="text-neo-white font-neo-body font-bold"
                 >
                   +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
                 </m.p>
@@ -258,7 +258,7 @@ export default function SoloPracticeBoard({
                 transition={{ delay: 0.8 }}
                 className="bg-black/20 rounded-neo border-2 border-black/30 p-4 mb-6 max-h-32 overflow-y-auto"
               >
-                <p className="text-xs text-neo-white/50 font-bold mb-2">{t('education.practice.vocabularyWordsFound')}</p>
+                <p className="text-xs text-neo-white font-bold mb-2">{t('education.practice.vocabularyWordsFound')}</p>
                 <div className="flex flex-wrap gap-2">
                   {vocabularyFound.map((word, i) => (
                     <m.span

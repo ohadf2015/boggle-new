@@ -93,7 +93,7 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-slate-900 border-3 border-neo-black rounded-neo shadow-hard p-4 font-mono text-sm select-all"
+      className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4 font-mono text-sm select-all"
     >
       {/* Puzzle header */}
       <div className="flex items-center justify-between mb-3">
@@ -106,7 +106,7 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
             e.stopPropagation();
             setRevealed(!revealed);
           }}
-          className="p-1 rounded-lg hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200"
+          className="p-1 rounded-lg hover:bg-neo-navy-light transition-colors text-slate-400 hover:text-slate-200"
           aria-label={revealed ? 'Hide words' : 'Reveal words'}
         >
           {revealed ? (

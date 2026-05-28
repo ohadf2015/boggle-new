@@ -97,7 +97,7 @@ const CircularTimer = memo<CircularTimerProps>(({
           return (
             <span
               className={cn(
-                'font-neo-display font-black tabular-nums text-neo-cream',
+                'font-neo-display font-black tabular-nums text-neo-white',
                 size < 60 ? 'text-xs' : size < 100 ? 'text-lg' : 'text-2xl'
               )}
             >

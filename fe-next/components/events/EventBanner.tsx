@@ -77,7 +77,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
           <button
             onClick={onDismiss}
             aria-label={t('events.dismiss')}
-            className="absolute top-2 right-2 p-1 text-white/60 hover:text-white transition-colors"
+            className="absolute top-2 right-2 p-1 text-white hover:text-white transition-colors"
           >
             <X size={18} />
           </button>
@@ -96,14 +96,14 @@ const EventBanner: React.FC<EventBannerProps> = ({
               <h3 className="font-neo-display text-lg font-bold text-white truncate">
                 {event.name}
               </h3>
-              <p className="text-sm text-white/70 line-clamp-2 mt-0.5">
+              <p className="text-sm text-white line-clamp-2 mt-0.5">
                 {event.description}
               </p>
 
               {/* Countdown */}
               <div className="flex items-center gap-2 mt-2" data-testid="event-countdown">
-                <Clock size={14} className="text-white/60" />
-                <span className="text-sm font-mono text-white/80">
+                <Clock size={14} className="text-white" />
+                <span className="text-sm font-mono text-white">
                   {t('events.endsIn')} {formatCountdownFromMs(timeRemaining)}
                 </span>
               </div>

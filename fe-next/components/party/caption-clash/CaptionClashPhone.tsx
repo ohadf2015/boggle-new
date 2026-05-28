@@ -157,10 +157,10 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
       <div className="min-h-screen bg-neo-navy flex flex-col p-4">
         {/* Round badge */}
         <div className="flex items-center justify-between mb-3">
-          <span className="text-neo-cream/50 font-neo-body text-xs uppercase">
+          <span className="text-neo-white font-neo-body text-xs uppercase">
             {t('party.round') || 'Round'} {imageData.round}/{imageData.totalRounds}
           </span>
-          <span className={`font-neo-display text-lg ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+          <span className={`font-neo-display text-lg ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
             {timeRemaining}s
           </span>
         </div>
@@ -191,7 +191,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
               <p className="font-neo-display text-neo-lime uppercase">
                 {t('party.captionSubmitted') || 'Submitted!'}
               </p>
-              <p className="text-neo-cream/40 font-neo-body text-sm mt-1">
+              <p className="text-neo-white font-neo-body text-sm mt-1">
                 {t('party.waitingForOthers') || 'Waiting for others...'}
               </p>
             </AdaptiveMotion.div>
@@ -205,14 +205,14 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
               autoFocus
               className="
                 flex-1 bg-neo-navy-elevated border-3 border-neo-pink/50 rounded-neo-lg
-                p-4 text-neo-cream font-neo-body text-lg
-                placeholder:text-neo-cream/20
+                p-4 text-neo-white font-neo-body text-lg
+                placeholder:text-neo-white
                 focus:outline-hidden focus:border-neo-pink
                 resize-none
               "
             />
             <div className="flex items-center justify-between mt-2">
-              <span className="text-neo-cream/30 text-xs font-neo-body">
+              <span className="text-neo-white text-xs font-neo-body">
                 {captionText.length}/200
               </span>
               <button
@@ -240,7 +240,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
   if (phase === 'lineup') {
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
-        <p className="font-neo-display text-neo-cream/60 uppercase text-sm mb-6">
+        <p className="font-neo-display text-neo-white uppercase text-sm mb-6">
           {t('party.tapToLaugh') || 'Tap to laugh!'}
         </p>
         <button
@@ -256,7 +256,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
         >
           😂
         </button>
-        <p className="mt-4 text-neo-cream/30 font-neo-body text-xs">
+        <p className="mt-4 text-neo-white font-neo-body text-xs">
           {t('party.watchTheTv') || 'Watch the TV!'}
         </p>
       </div>
@@ -272,7 +272,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
             {phase === 'voted' ? (t('party.voted') || 'Voted!') : (t('party.pickFavorite') || 'Pick your favorite')}
           </h2>
           {phase === 'voting' && (
-            <span className={`font-neo-display text-lg ${timeRemaining <= 5 ? 'text-neo-red' : 'text-neo-cream/60'}`}>
+            <span className={`font-neo-display text-lg ${timeRemaining <= 5 ? 'text-neo-red' : 'text-neo-white'}`}>
               {timeRemaining}s
             </span>
           )}
@@ -293,8 +293,8 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
                   ${isSelected
                     ? 'bg-neo-pink text-neo-black shadow-hard-pink'
                     : phase === 'voted'
-                      ? 'bg-neo-navy-elevated text-neo-cream/40'
-                      : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px active:shadow-hard-pressed'
+                      ? 'bg-neo-navy-elevated text-neo-white'
+                      : 'bg-neo-navy-elevated text-neo-white shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px active:shadow-hard-pressed'
                   }
                 `}
               >
@@ -316,7 +316,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
           <p className="font-neo-display text-neo-pink uppercase">
             {t('party.results') || 'Results!'}
           </p>
-          <p className="text-neo-cream/40 font-neo-body text-sm mt-2">
+          <p className="text-neo-white font-neo-body text-sm mt-2">
             {t('party.watchTheTv') || 'Watch the TV!'}
           </p>
         </div>
@@ -327,7 +327,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
   // Default waiting
   return (
     <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-      <div className="animate-pulse text-neo-cream/50 font-neo-display">
+      <div className="animate-pulse text-neo-white font-neo-display">
         {t('party.starting') || 'Starting...'}
       </div>
     </div>

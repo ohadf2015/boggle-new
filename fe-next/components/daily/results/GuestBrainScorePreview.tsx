@@ -150,7 +150,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
           <div className="mt-4 space-y-2">
             {[65, 78, 52, 89, 71].map((value) => (
               <div key={`progress-bar-${value}`} className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="flex-1 bg-gray-200 dark:bg-neo-navy-elevated rounded-full h-2">
                   <div
                     className="bg-purple-500 h-2 rounded-full"
                     style={{ width: `${value}%` }}

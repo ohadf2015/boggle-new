@@ -115,8 +115,8 @@ const LevelGridHeader = memo(function LevelGridHeader({
                   {worldStars}/{maxWorldStars}
                 </span>
               </div>
-              <span className="text-neo-white/30 text-xs">·</span>
-              <span className="font-mono text-neo-white/50 text-xs tabular-nums">
+              <span className="text-neo-white text-xs">·</span>
+              <span className="font-mono text-neo-white text-xs tabular-nums">
                 {completedLevels}/{totalLevels} {t('adventure.lvl')}
               </span>
               {isPerfect && (

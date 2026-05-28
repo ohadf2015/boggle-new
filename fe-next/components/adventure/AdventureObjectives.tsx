@@ -196,7 +196,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                     ? 'bg-neo-lime border-neo-black text-neo-black'
                     : objective.isPrimary
                       ? `bg-neo-black/50 border-neo-yellow/40 ${colorClass}`
-                      : 'bg-neo-black/30 border-neo-white/20 text-neo-white/60'
+                      : 'bg-neo-black/30 border-neo-white/20 text-neo-white'
                 )}
               >
                 <Icon className="w-4 h-4" />
@@ -212,7 +212,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                         ? 'text-neo-lime'
                         : objective.isPrimary
                           ? 'text-neo-white'
-                          : 'text-neo-white/70'
+                          : 'text-neo-white'
                     )}
                   >
                     {label}
@@ -222,7 +222,7 @@ const AdventureObjectives = memo<AdventureObjectivesProps>(
                       'shrink-0 text-sm font-mono font-black tabular-nums leading-snug',
                       objective.isComplete
                         ? 'text-neo-lime'
-                        : 'text-neo-white/80'
+                        : 'text-neo-white'
                     )}
                   >
                     {current}/{objective.target}

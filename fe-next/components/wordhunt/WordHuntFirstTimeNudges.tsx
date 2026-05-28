@@ -147,7 +147,7 @@ const WordHuntFirstTimeNudges = memo<WordHuntFirstTimeNudgesProps>(({
             data-testid={`nudge-${activeNudge.type}`}
           >
             <span className="text-lg" aria-hidden="true">{activeNudge.icon}</span>
-            <span className="text-xs font-neo-body font-bold text-neo-cream max-w-[240px]">
+            <span className="text-xs font-neo-body font-bold text-neo-white max-w-[240px]">
               {t(activeNudge.key)}
             </span>
           </AdaptiveMotion.div>

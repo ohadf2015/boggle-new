@@ -207,7 +207,7 @@ function PixelCanvasInner({
                   backgroundImage: i === 0 ? 'repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.1) 3px, rgba(255,255,255,0.1) 6px)' : undefined,
                 }}
               >
-                {i === 0 && <span className="text-neo-cream/50 text-xs">X</span>}
+                {i === 0 && <span className="text-neo-white text-xs">X</span>}
               </button>
             ))}
           </div>
@@ -216,7 +216,7 @@ function PixelCanvasInner({
           <div className="flex gap-2">
             <button
               onClick={handleUndo}
-              className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-cream/60 text-xs font-neo-body
+              className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-white text-xs font-neo-body
                 hover:border-neo-cream/50 active:translate-y-px transition-all"
             >
               Undo

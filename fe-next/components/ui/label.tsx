@@ -8,7 +8,7 @@ import { cn } from "../../lib/utils";
 const labelVariants = cva(
   [
     "text-sm font-bold uppercase tracking-wide leading-none",
-    "text-neo-cream",
+    "text-neo-white",
     "peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
   ].join(" ")
 );

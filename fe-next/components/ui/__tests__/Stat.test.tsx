@@ -433,7 +433,7 @@ describe('Stat', () => {
 
       // Value text uses neo-cream color
       const valueDiv = stat?.querySelector('.font-black');
-      expect(valueDiv?.className).toContain('text-neo-cream');
+      expect(valueDiv?.className).toContain('text-neo-white');
     });
   });
 

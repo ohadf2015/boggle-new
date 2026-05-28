@@ -61,7 +61,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden",
-        levelUpData ? "bg-linear-to-br from-neo-lime via-neo-lime to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
+        levelUpData ? "bg-linear-to-br from-neo-lime via-neo-lime to-neo-pink" : "bg-neo-cream dark:bg-neo-navy-elevated"
       )}
     >
       {/* Comic-style halftone dots */}
@@ -82,7 +82,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
           >
             ⭐
           </m.span>
-          <h4 className="font-black text-neo-black dark:text-neo-cream uppercase text-sm">
+          <h4 className="font-black text-neo-black dark:text-neo-white uppercase text-sm">
             {t('xp.xpGained')}
           </h4>
         </div>
@@ -90,7 +90,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.7, ...SPRING_PRESETS.balanced }}
-          className="bg-neo-black text-neo-cream px-3 py-1 rounded-neo font-black text-lg"
+          className="bg-neo-black text-neo-white px-3 py-1 rounded-neo font-black text-lg"
         >
           +{xpEarned}
         </m.div>
@@ -109,11 +109,11 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
               item.highlight ? "bg-neo-lime" : "bg-neo-cream/50 dark:bg-slate-600/50"
             )}
           >
-            <span className="flex items-center gap-2 text-sm font-bold text-neo-black dark:text-neo-cream">
+            <span className="flex items-center gap-2 text-sm font-bold text-neo-black dark:text-neo-white">
               <span>{item.icon}</span>
               {item.label}
             </span>
-            <span className="font-black text-neo-black dark:text-neo-cream">+{item.value}</span>
+            <span className="font-black text-neo-black dark:text-neo-white">+{item.value}</span>
           </m.div>
         ))}
       </div>
@@ -155,7 +155,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       {/* Diminishing returns indicator */}
       {newLevel > 25 && (
         <div className="mt-2 px-2 py-1.5 rounded-neo bg-neo-black/10 dark:bg-neo-black/30 relative z-10">
-          <div className="flex items-center justify-between text-[10px] font-bold text-neo-black/60 dark:text-neo-cream/60">
+          <div className="flex items-center justify-between text-[10px] font-bold text-neo-black/60 dark:text-neo-white">
             <span className="flex items-center gap-1">
               📉 {t('xp.diminishingReturns')}
             </span>
@@ -172,7 +172,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       )}
 
       {/* Daily cap note */}
-      <div className="mt-1 text-[9px] text-neo-black/40 dark:text-neo-cream/40 text-center relative z-10">
+      <div className="mt-1 text-[9px] text-neo-black/40 dark:text-neo-white text-center relative z-10">
         {t('xp.dailyCapNote', { fullRate: XP_CONFIG.DAILY_FULL_RATE })}
       </div>
 

@@ -147,14 +147,14 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
           <Avatar avatarImage={opponent.avatar ?? undefined} customAvatar={undefined} size="md" />
           <div className="flex-1 min-w-0">
             <p className="font-bold truncate">{opponent.name}</p>
-            <p className="text-xs text-neo-white/60">
+            <p className="text-xs text-neo-white">
               {t(`asyncChallenge.mode.${challenge.gameMode}`, challenge.gameMode)} · {challenge.durationSeconds}s
             </p>
           </div>
         </div>
 
         {challenge.message && (
-          <blockquote className="italic text-sm text-neo-white/80 border-l-4 border-neo-cyan/40 ps-3">
+          <blockquote className="italic text-sm text-neo-white border-l-4 border-neo-cyan/40 ps-3">
             &ldquo;{challenge.message}&rdquo;
           </blockquote>
         )}
@@ -162,13 +162,13 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
         {/* Score / status block */}
         {status === 'pending' && !viewerIsChallenger && (
           <div className="text-center py-4">
-            <p className="text-xs uppercase tracking-wider text-neo-white/60">
+            <p className="text-xs uppercase tracking-wider text-neo-white">
               {t('friends.challenges.targetScoreLabel')}
             </p>
             <p className="font-neo-display text-5xl text-neo-yellow mt-1">
               {challenge.challengerScore ?? '—'}
             </p>
-            <p className="text-sm text-neo-white/70 mt-2">
+            <p className="text-sm text-neo-white mt-2">
               {t('friends.challenges.targetScore', { score: String(challenge.challengerScore ?? 0) })}
             </p>
           </div>
@@ -176,7 +176,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
 
         {status === 'pending' && viewerIsChallenger && (
           <div className="text-center py-4">
-            <p className="text-sm text-neo-white/70">
+            <p className="text-sm text-neo-white">
               {t('friends.challenges.waitingForFriend', { name: opponent.name })}
             </p>
           </div>
@@ -198,7 +198,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
                 ? t('friends.challenges.result.win', { mine: String(myScore ?? 0), theirs: String(theirScore ?? 0) })
                 : t('friends.challenges.result.loss', { mine: String(myScore ?? 0), theirs: String(theirScore ?? 0) })}
             </p>
-            <div className="flex gap-4 mt-2 text-sm text-neo-white/70">
+            <div className="flex gap-4 mt-2 text-sm text-neo-white">
               <span>{t('friends.challenges.yourScore')}: <b className="text-neo-white">{myScore ?? 0}</b></span>
               <span>{t('friends.challenges.theirScore')}: <b className="text-neo-white">{theirScore ?? 0}</b></span>
             </div>
@@ -206,7 +206,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
         )}
 
         {(status === 'declined' || status === 'expired' || status === 'expired_unfinished') && (
-          <div className="text-center py-4 text-sm text-neo-white/60">
+          <div className="text-center py-4 text-sm text-neo-white">
             {status === 'declined' && t('friends.challenges.declinedNotice')}
             {status === 'expired' && t('friends.challenges.expiredNotice')}
             {status === 'expired_unfinished' && t('friends.challenges.expiredUnfinishedNotice')}
@@ -282,7 +282,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
         <button
           type="button"
           onClick={() => router.push(`/${locale}/friends`)}
-          className="text-sm text-neo-white/60 underline self-center"
+          className="text-sm text-neo-white underline self-center"
         >
           {t('friends.backToFriends')}
         </button>

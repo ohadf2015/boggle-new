@@ -57,8 +57,8 @@ export default function ShiritoriHero({ title, tagline, kana }: ShiritoriHeroPro
           </span>
         ))}
       </div>
-      <h1 className="shiritori-copy mt-6 font-neo-display text-3xl font-bold text-neo-cream sm:text-5xl">{title}</h1>
-      <p className="shiritori-copy mt-3 max-w-xl font-neo-body text-base text-neo-cream/80 sm:text-lg">{tagline}</p>
+      <h1 className="shiritori-copy mt-6 font-neo-display text-3xl font-bold text-neo-white sm:text-5xl">{title}</h1>
+      <p className="shiritori-copy mt-3 max-w-xl font-neo-body text-base text-neo-white sm:text-lg">{tagline}</p>
     </div>
   );
 }

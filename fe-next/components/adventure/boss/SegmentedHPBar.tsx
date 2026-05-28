@@ -345,7 +345,7 @@ const SegmentedHPBar = memo<SegmentedHPBarProps>(({
           {/* HP numbers */}
           <span
             className={`font-mono text-[10px] sm:text-xs font-bold tabular-nums ${
-              isLowHP ? 'text-neo-red' : 'text-neo-white/70'
+              isLowHP ? 'text-neo-red' : 'text-neo-white'
             }`}
           >
             {displayHP} / {maxHP}

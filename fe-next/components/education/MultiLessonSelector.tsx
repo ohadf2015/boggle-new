@@ -64,8 +64,8 @@ export function MultiLessonSelector({
   if (lessons.length === 0) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <BookOpen className="w-12 h-12 text-neo-white/30 mx-auto mb-3" />
-        <p className="text-neo-white/70 font-neo-body">
+        <BookOpen className="w-12 h-12 text-neo-white mx-auto mb-3" />
+        <p className="text-neo-white font-neo-body">
           {t('education.classroomGame.noLessonsAvailable')}
         </p>
       </div>
@@ -145,7 +145,7 @@ export function MultiLessonSelector({
               </div>
 
               {/* Word count */}
-              <div className={cn('text-sm', isSelected ? 'text-neo-black/70' : 'text-neo-white/70')}>
+              <div className={cn('text-sm', isSelected ? 'text-neo-black/70' : 'text-neo-white')}>
                 {lesson.playableWordCount} {lesson.playableWordCount === 1
                   ? t('education.lesson.word')
                   : t('education.lesson.words', { count: lesson.playableWordCount })}
@@ -153,7 +153,7 @@ export function MultiLessonSelector({
 
               {/* Description if available */}
               {lesson.description && (
-                <p className={cn('text-xs mt-2', isSelected ? 'text-neo-black/60' : 'text-neo-white/50')}>
+                <p className={cn('text-xs mt-2', isSelected ? 'text-neo-black/60' : 'text-neo-white')}>
                   {lesson.description}
                 </p>
               )}
@@ -164,7 +164,7 @@ export function MultiLessonSelector({
 
       {/* Helper text */}
       {selectedLessonIds.length > 1 && (
-        <p className="text-sm text-neo-white/60 font-neo-body">
+        <p className="text-sm text-neo-white font-neo-body">
           {t('education.classroomGame.multiLessonHelp')}
         </p>
       )}

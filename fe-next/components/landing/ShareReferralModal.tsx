@@ -109,13 +109,13 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                 className="flex items-center justify-between bg-neo-black/5 dark:bg-white/10 rounded-neo border border-neo-black/10 p-3 mb-3"
               >
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-wide text-neo-black/50 dark:text-white/70 mb-0.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-neo-black/50 dark:text-white mb-0.5">
                     {t('profile.yourReferralCode')}
                   </div>
                   <code className="text-xl font-black text-neo-pink tracking-wider">{referralCode}</code>
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] font-bold uppercase tracking-wide text-neo-black/50 dark:text-white/70 mb-0.5">
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-neo-black/50 dark:text-white mb-0.5">
                     {t('common.reward')}
                   </div>
                   <div className="text-lg font-black text-neo-lime">+{referralRewardXp} XP</div>
@@ -132,7 +132,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
             {!isAuthenticated && (
               <p
                 data-testid="share-modal-guest-nudge"
-                className="text-sm text-neo-black/70 dark:text-white/70 mb-4 bg-neo-lime/20 rounded-neo p-3 border-2 border-neo-lime/50"
+                className="text-sm text-neo-black/70 dark:text-white mb-4 bg-neo-lime/20 rounded-neo p-3 border-2 border-neo-lime/50"
               >
                 🎯 {t('landing.shareGuestNudge')}
               </p>

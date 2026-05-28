@@ -72,7 +72,7 @@ export function VocabularyReview({ words, onReview, onComplete }: VocabularyRevi
 
       {/* Word card */}
       <div
-        className={`flex min-h-[160px] w-full max-w-md cursor-pointer items-center justify-center rounded-neo border-neo bg-neutral-800 p-6 shadow-hard transition-transform duration-300 ${
+        className={`flex min-h-[160px] w-full max-w-md cursor-pointer items-center justify-center rounded-neo border-neo bg-neo-navy-light p-6 shadow-hard transition-transform duration-300 ${
           isFlipped ? 'rotate-y-0' : ''
         }`}
         onClick={() => setIsFlipped(!isFlipped)}

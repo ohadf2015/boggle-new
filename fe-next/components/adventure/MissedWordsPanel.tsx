@@ -65,10 +65,10 @@ export const MissedWordsPanel = memo<MissedWordsPanelProps>(({
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <p className="text-neo-white/70 text-xs font-bold uppercase tracking-wide">
+        <p className="text-neo-white text-xs font-bold uppercase tracking-wide">
           {t('adventure.game.wordsYouMissed')}
         </p>
-        <span className="text-neo-white/40 text-xs font-mono">
+        <span className="text-neo-white text-xs font-mono">
           {t('adventure.game.missedWordsSummary', { count: missedWords.length })}
         </span>
       </div>
@@ -85,7 +85,7 @@ export const MissedWordsPanel = memo<MissedWordsPanelProps>(({
             className={cn(
               'px-2.5 py-1 rounded-neo',
               'bg-neo-navy-light border-2 border-neo-white/20',
-              'text-neo-white/60 text-xs font-bold font-mono tracking-wide',
+              'text-neo-white text-xs font-bold font-mono tracking-wide',
               'select-none'
             )}
           >

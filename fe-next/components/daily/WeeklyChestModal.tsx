@@ -188,7 +188,7 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
           {chest.labelKey ? (
             <p
               data-testid="chest-prize-label"
-              className="font-neo-display font-black text-2xl text-neo-cream uppercase tracking-wider text-center leading-tight"
+              className="font-neo-display font-black text-2xl text-neo-white uppercase tracking-wider text-center leading-tight"
             >
               {t(chest.labelKey)}
             </p>
@@ -259,7 +259,7 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
           <button
             onClick={onClose}
             aria-label={t('common.tapToContinue')}
-            className="absolute top-2 end-2 p-1 rounded-full text-neo-cream/40 hover:text-neo-cream/80 z-10"
+            className="absolute top-2 end-2 p-1 rounded-full text-neo-white hover:text-neo-white z-10"
           >
             <X className="w-5 h-5" />
           </button>

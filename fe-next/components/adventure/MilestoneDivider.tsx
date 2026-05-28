@@ -22,7 +22,7 @@ const MilestoneDivider = memo(function MilestoneDivider({ chapter }: MilestoneDi
           data-testid="milestone-trophy"
           className="w-4 h-4 text-neo-yellow"
         />
-        <span className="text-[10px] font-neo-display font-bold text-neo-white/70 uppercase tracking-wider">
+        <span className="text-[10px] font-neo-display font-bold text-neo-white uppercase tracking-wider">
           {t('adventure.chapterComplete', { chapter })}
         </span>
       </div>

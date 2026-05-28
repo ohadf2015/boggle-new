@@ -114,7 +114,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
       className={cn(
         'flex items-center gap-3 p-2 rounded-neo border-2 cursor-pointer transition-colors',
         isDark
-          ? 'bg-slate-700/50 border-white/10 hover:border-cyan-500/50'
+          ? 'bg-neo-navy-elevated/50 border-white/10 hover:border-cyan-500/50'
           : 'bg-white border-gray-200 hover:border-cyan-400',
         compact && 'p-1.5'
       )}

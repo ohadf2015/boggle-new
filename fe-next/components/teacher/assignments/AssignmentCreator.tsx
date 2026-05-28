@@ -206,7 +206,7 @@ export default function AssignmentCreator({
                     </Button>
                   </div>
                   <div className="border-t border-neo-black/30 pt-3">
-                    <label className="block text-xs text-neo-white/60 mb-1">
+                    <label className="block text-xs text-neo-white mb-1">
                       {t('teacher.assignment.customDate')}
                     </label>
                     <input
@@ -256,7 +256,7 @@ export default function AssignmentCreator({
 
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
+              className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label="Close"
               disabled={isSubmitting}
             >

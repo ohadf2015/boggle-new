@@ -190,7 +190,7 @@ export default function WarmupRound({
                     {xpSessionData.sessionMasteryMessage}
                   </p>
                 )}
-                <p className="text-neo-white/80 font-neo-body">
+                <p className="text-neo-white font-neo-body">
                   +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
                 </p>
               </div>

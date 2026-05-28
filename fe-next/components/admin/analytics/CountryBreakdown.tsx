@@ -54,7 +54,7 @@ export function CountryBreakdown({ authToken }: Props) {
 
   if (error) {
     return (
-      <div data-testid="country-breakdown-error" className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+      <div data-testid="country-breakdown-error" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
         <div className="flex items-center gap-2 text-sm text-red-400">
           <AlertTriangle className="w-4 h-4" />
           <span>{t('admin.geo.error')}: {error}</span>
@@ -65,14 +65,14 @@ export function CountryBreakdown({ authToken }: Props) {
 
   if (data === null) {
     return (
-      <div data-testid="country-breakdown-skeleton" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 mb-6 animate-pulse h-48" />
+      <div data-testid="country-breakdown-skeleton" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 mb-6 animate-pulse h-48" />
     );
   }
 
   const max = data.countries[0]?.count ?? 1;
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2">
           <Globe className="w-4 h-4 text-neo-cyan" />
@@ -97,7 +97,7 @@ export function CountryBreakdown({ authToken }: Props) {
             return (
               <div key={c.country} data-testid="country-row" className="flex items-center gap-3 text-xs">
                 <span className="font-mono text-neo-white w-10 shrink-0">{c.country}</span>
-                <div className="flex-1 h-5 bg-slate-700/50 rounded-sm overflow-hidden flex">
+                <div className="flex-1 h-5 bg-neo-navy-elevated/50 rounded-sm overflow-hidden flex">
                   <div
                     className={cn('h-full bg-neo-lime/70')}
                     style={{ width: `${(c.registered / max) * 100}%` }}
@@ -107,7 +107,7 @@ export function CountryBreakdown({ authToken }: Props) {
                     style={{ width: `${(c.guests / max) * 100}%` }}
                   />
                 </div>
-                <span className="font-mono text-neo-white/70 w-10 text-right">{c.count}</span>
+                <span className="font-mono text-neo-white w-10 text-right">{c.count}</span>
                 <span className="font-mono text-slate-500 w-12 text-right">{pct.toFixed(0)}%</span>
               </div>
             );

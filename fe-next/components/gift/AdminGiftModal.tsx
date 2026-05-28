@@ -331,7 +331,7 @@ export function AdminGiftModal({
                 )}
                 aria-label={t('common.close')}
               >
-                <X className="w-6 h-6 text-white/90" /> {/* Increased from w-5 h-5, improved contrast */}
+                <X className="w-6 h-6 text-white" /> {/* Increased from w-5 h-5, improved contrast */}
               </button>
             )}
 
@@ -371,7 +371,7 @@ export function AdminGiftModal({
               </h2>
 
               {/* Message */}
-              <p className="gift-message text-white/80 text-sm leading-relaxed mb-6 whitespace-pre-wrap">
+              <p className="gift-message text-white text-sm leading-relaxed mb-6 whitespace-pre-wrap">
                 {gift.message}
               </p>
 
@@ -421,19 +421,19 @@ export function AdminGiftModal({
                     >
                       {gift.xp_amount > 0 && (
                         <div className="text-purple-300/80">
-                          <span className="text-white/70">{t('gift.newTotal')}:</span>{' '}
+                          <span className="text-white">{t('gift.newTotal')}:</span>{' '}
                           <span className="font-bold">{(startXpRef.current + gift.xp_amount).toLocaleString()} XP</span>
                         </div>
                       )}
                       {gift.coin_amount > 0 && (
                         <div className="text-amber-300/80">
-                          <span className="text-white/70">{t('gift.newTotal')}:</span>{' '}
+                          <span className="text-white">{t('gift.newTotal')}:</span>{' '}
                           <span className="font-bold">{(startCoinsRef.current + gift.coin_amount).toLocaleString()} {t('gift.coins')}</span>
                         </div>
                       )}
                     </m.div>
                   ) : (
-                    <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white/60">
+                    <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white">
                       {gift.xp_amount > 0 && (
                         <div>
                           <span>{t('gift.currentBalance')}:</span>{' '}
@@ -530,7 +530,7 @@ export function AdminGiftModal({
 
               {/* From line */}
               {gift.sender && (
-                <p className="mt-4 text-xs text-white/70">
+                <p className="mt-4 text-xs text-white">
                   {t('gift.from')}: {gift.sender.display_name || gift.sender.username}
                 </p>
               )}

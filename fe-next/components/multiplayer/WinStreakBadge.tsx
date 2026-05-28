@@ -31,7 +31,7 @@ export const WinStreakBadge: React.FC<WinStreakBadgeProps> = ({ streak, t, anima
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 400, damping: 15 }}
       aria-label={label}
-      className="inline-flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-2 py-0.5 text-sm font-bold text-neo-cream shadow-hard-sm"
+      className="inline-flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-2 py-0.5 text-sm font-bold text-neo-white shadow-hard-sm"
     >
       <span>{emoji}</span>
       <span>{streak}</span>

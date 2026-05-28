@@ -255,7 +255,7 @@ export default function StickyReadyBar({
               setCancelled(true);
               try { sessionStorage.setItem('mp-auto-advance-cancelled', '1'); } catch {}
             }}
-            className="shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-neo-white/40 hover:text-neo-white/80 hover:bg-neo-white/10 transition-colors"
+            className="shrink-0 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-neo-white hover:text-neo-white hover:bg-neo-white/10 transition-colors"
             aria-label={t('autoPlay.exit')}
           >
             <X className="w-4 h-4" />
@@ -351,7 +351,7 @@ export default function StickyReadyBar({
             </div>
             <span className="text-neo-lime font-black text-sm">{seriesWinnerUsername}</span>
           </div>
-          <span className="text-neo-cream/60 text-xs font-bold uppercase">{t('results.series.winner')}</span>
+          <span className="text-neo-white text-xs font-bold uppercase">{t('results.series.winner')}</span>
         </m.div>
 
         {/* New Series button (host only starts, non-host just sees the winner) */}
@@ -365,7 +365,7 @@ export default function StickyReadyBar({
             <span>{t('results.series.newSeries')}</span>
           </m.button>
         ) : !isHost ? (
-          <div className={cn(btnBase, 'bg-neo-white/10 text-neo-cream/60 pointer-events-none')}>
+          <div className={cn(btnBase, 'bg-neo-white/10 text-neo-white pointer-events-none')}>
             <span>{t('results.series.waitingNewSeries')}</span>
           </div>
         ) : null}
@@ -400,7 +400,7 @@ export default function StickyReadyBar({
                       'flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
                       isActive
                         ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-xs')
-                        : 'text-neo-cream/40 border-transparent hover:text-neo-cream/70 hover:bg-neo-white/5'
+                        : 'text-neo-white border-transparent hover:text-neo-white hover:bg-neo-white/5'
                     )}
                   >
                     <span className="shrink-0 [&>svg]:w-3 [&>svg]:h-3">{MODE_ICONS[mode]}</span>
@@ -410,7 +410,7 @@ export default function StickyReadyBar({
               })}
             </div>
             <div
-              className="min-h-[14px] text-center text-[10px] leading-tight text-neo-cream/60 px-2 transition-opacity duration-150"
+              className="min-h-[14px] text-center text-[10px] leading-tight text-neo-white px-2 transition-opacity duration-150"
               aria-live="polite"
             >
               {(() => {

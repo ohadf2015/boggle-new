@@ -92,7 +92,7 @@ export default function InsightCard({
       <p className="font-neo-display font-black text-sm text-neo-white leading-tight">
         {headline}
       </p>
-      <p className="text-xs text-neo-cream/60 mt-0.5 leading-tight">{sub}</p>
+      <p className="text-xs text-neo-white mt-0.5 leading-tight">{sub}</p>
     </m.div>
   )
 }

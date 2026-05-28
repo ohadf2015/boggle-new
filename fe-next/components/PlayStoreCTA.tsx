@@ -51,7 +51,7 @@ export default function PlayStoreCTA({
         <polygon points="2,13 12,18.5 2,24" fill="#FF424A" />
       </svg>
       <span className="flex flex-col items-start leading-none text-neo-white">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-neo-white/80">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-neo-white">
           {label}
         </span>
         <span className="font-neo-display text-xl font-black tracking-tight">Google Play</span>

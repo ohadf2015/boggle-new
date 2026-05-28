@@ -52,7 +52,7 @@ const BossStarDisplay = memo<{ filled: boolean; index: number }>(
           'w-10 h-10 md:w-14 md:h-14',
           filled
             ? 'text-neo-yellow fill-neo-yellow drop-shadow-[0_0_15px_rgba(255,225,53,0.9)]'
-            : 'text-neo-white/30 fill-transparent'
+            : 'text-neo-white fill-transparent'
         )}
       />
     </AdaptiveMotion.div>
@@ -248,7 +248,7 @@ const BossVictory = memo<BossVictoryProps>(
                 <p className="text-neo-yellow font-black text-sm">
                   {t('adventure.bosses.nearMiss')}
                 </p>
-                <p className="text-neo-white/60 text-xs mt-0.5">
+                <p className="text-neo-white text-xs mt-0.5">
                   {t('adventure.bosses.nearMissDesc', { hp: 100 - bossHpDepleted })}
                 </p>
               </AdaptiveMotion.div>
@@ -276,7 +276,7 @@ const BossVictory = memo<BossVictoryProps>(
                 <p className="text-neo-lime font-black text-sm">
                   {t('adventure.bosses.fragmentCollected')}
                 </p>
-                <p className="text-neo-white/60 text-xs mt-0.5">
+                <p className="text-neo-white text-xs mt-0.5">
                   {t('adventure.bosses.fragmentCount', { current: boss.worldId, total: 10 })}
                 </p>
               </AdaptiveMotion.div>
@@ -286,7 +286,7 @@ const BossVictory = memo<BossVictoryProps>(
             <div className="grid grid-cols-2 gap-4 mb-6">
               {/* Score */}
               <div className="text-center">
-                <p className="text-neo-white/60 text-xs font-bold uppercase tracking-wide">
+                <p className="text-neo-white text-xs font-bold uppercase tracking-wide">
                   {t('common.score')}
                 </p>
                 <p className="text-2xl md:text-3xl font-black text-neo-white">
@@ -296,7 +296,7 @@ const BossVictory = memo<BossVictoryProps>(
 
               {/* Words Found */}
               <div className="text-center">
-                <p className="text-neo-white/60 text-xs font-bold uppercase tracking-wide">
+                <p className="text-neo-white text-xs font-bold uppercase tracking-wide">
                   {t('adventure.game.wordsFound')}
                 </p>
                 <p className="text-2xl md:text-3xl font-black text-neo-white">

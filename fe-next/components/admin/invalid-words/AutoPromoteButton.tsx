@@ -114,7 +114,7 @@ export function AutoPromoteButton({
           </button>
         </AlertDialogTrigger>
 
-        <AlertDialogContent className="bg-slate-800 border-slate-700 text-white">
+        <AlertDialogContent className="bg-neo-navy-light border-slate-700 text-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-white">
               <AlertTriangle className="w-5 h-5 text-neo-cyan" />
@@ -127,7 +127,7 @@ export function AutoPromoteButton({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600">
+            <AlertDialogCancel className="bg-neo-navy-elevated border-slate-600 text-white hover:bg-slate-600">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction

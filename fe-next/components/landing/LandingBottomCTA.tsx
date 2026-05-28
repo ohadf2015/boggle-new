@@ -46,7 +46,7 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
         <h2 className="font-black text-neo-white uppercase text-xl sm:text-2xl lg:text-3xl mb-3 neo-title">
           {t('landing.readyToCompete')}
         </h2>
-        <p className="text-neo-white/60 font-medium text-sm sm:text-base mb-8 max-w-lg mx-auto">
+        <p className="text-neo-white font-medium text-sm sm:text-base mb-8 max-w-lg mx-auto">
           {t('landing.welcomeSubtitle')}
         </p>
         <m.button

@@ -108,7 +108,7 @@ export function ReferralMilestonePopup({
               onClick={handleClose}
               className={`absolute right-3 top-3 z-10 p-1.5 rounded-full transition-colors ${
                 isDarkMode
-                  ? 'hover:bg-white/10 text-neo-cream/70'
+                  ? 'hover:bg-white/10 text-neo-white'
                   : 'hover:bg-black/10 text-neo-black/70'
               }`}
               aria-label={t('common.close')}
@@ -146,7 +146,7 @@ export function ReferralMilestonePopup({
                 transition={{ delay: 0.4 }}
                 className="mb-4"
               >
-                <p className={`text-lg ${isDarkMode ? 'text-neo-cream' : 'text-neo-black'}`}>
+                <p className={`text-lg ${isDarkMode ? 'text-neo-white' : 'text-neo-black'}`}>
                   <span className="font-bold">{milestone.referredUsername}</span>
                   {' '}
                   {t(`referral.milestone_${milestone.milestone}`)}
@@ -180,7 +180,7 @@ export function ReferralMilestonePopup({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className={`text-sm ${isDarkMode ? 'text-neo-cream/70' : 'text-neo-black/70'}`}
+                className={`text-sm ${isDarkMode ? 'text-neo-white' : 'text-neo-black/70'}`}
               >
                 {t('referral.milestoneMessage')}
               </m.p>

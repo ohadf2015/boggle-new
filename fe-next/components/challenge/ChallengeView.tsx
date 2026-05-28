@@ -154,7 +154,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           animate={{ scale: 1, opacity: 1 }}
           className={cn(
             'max-w-md w-full p-6 rounded-neo border-4 border-neo-black shadow-hard-lg text-center',
-            isDark ? 'bg-slate-800' : 'bg-white'
+            isDark ? 'bg-neo-navy-light' : 'bg-white'
           )}
         >
           <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />

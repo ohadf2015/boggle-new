@@ -113,11 +113,11 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
           {/* Rank indicator */}
           <div className="flex items-center gap-1">
             <Trophy className="w-3.5 h-3.5 text-neo-yellow" />
-            <span className="text-xs font-bold text-neo-cream/80">
+            <span className="text-xs font-bold text-neo-white">
               {myRank ? `#${myRank}` : `${totalPlayers}`}
             </span>
             {totalPlayers > 0 && (
-              <span className="text-[10px] text-neo-cream/70">
+              <span className="text-[10px] text-neo-white">
                 <Users className="w-2.5 h-2.5 inline" /> {totalPlayers}
               </span>
             )}
@@ -132,7 +132,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
             <span data-testid="mobile-info-words-count" className="text-xs font-bold text-neo-lime">
               {discoveredWords.length}
             </span>
-            <span className="text-[10px] text-neo-cream/70">
+            <span className="text-[10px] text-neo-white">
               {t('wordHunt.mobile.words')}
             </span>
           </div>
@@ -140,9 +140,9 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
 
         {/* Expand indicator */}
         {isExpanded ? (
-          <ChevronDown className="w-4 h-4 text-neo-cream/50" />
+          <ChevronDown className="w-4 h-4 text-neo-white" />
         ) : (
-          <ChevronUp className="w-4 h-4 text-neo-cream/50" />
+          <ChevronUp className="w-4 h-4 text-neo-white" />
         )}
       </button>
 
@@ -167,7 +167,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
                     'flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs font-bold uppercase transition-colors',
                     activeTab === 'loot'
                       ? 'text-neo-lime border-b-2 border-neo-lime bg-neo-lime/5'
-                      : 'text-neo-cream/50 hover:text-neo-cream/70'
+                      : 'text-neo-white hover:text-neo-white'
                   )}
                 >
                   <Package className="w-3 h-3" />
@@ -180,7 +180,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
                     'flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs font-bold uppercase transition-colors',
                     activeTab === 'ranks'
                       ? 'text-neo-yellow border-b-2 border-neo-yellow bg-neo-yellow/5'
-                      : 'text-neo-cream/50 hover:text-neo-cream/70'
+                      : 'text-neo-white hover:text-neo-white'
                   )}
                 >
                   <Trophy className="w-3 h-3" />
@@ -224,7 +224,7 @@ const LootTabContent: React.FC<{
 }> = ({ sortedWords, hintStage, triesRemaining, discoveredWordsCount, t }) => (
   <div className="space-y-1">
     {sortedWords.length === 0 ? (
-      <div className="flex flex-col items-center py-4 text-neo-cream/70 text-xs">
+      <div className="flex flex-col items-center py-4 text-neo-white text-xs">
         <Package className="w-6 h-6 mb-1 opacity-50" />
         <span>{t('wordHunt.desktop.noWordsYet')}</span>
       </div>
@@ -234,7 +234,7 @@ const LootTabContent: React.FC<{
           <MobileLootItem key={`${word.word}-${word.timestamp}`} word={word} />
         ))}
         {/* Mini stats footer */}
-        <div className="flex items-center justify-between pt-2 mt-1 border-t border-neo-black/20 text-[10px] text-neo-cream/50">
+        <div className="flex items-center justify-between pt-2 mt-1 border-t border-neo-black/20 text-[10px] text-neo-white">
           <span>{discoveredWordsCount} {t('wordHunt.mobile.words')}</span>
           <span className="text-neo-cyan">{triesRemaining} tries left</span>
         </div>
@@ -249,7 +249,7 @@ const MobileLootItem: React.FC<{ word: WordDiscovery }> = ({ word }) => {
     ? 'text-neo-pink'
     : word.word.length >= 5
       ? 'text-neo-cyan'
-      : 'text-neo-cream';
+      : 'text-neo-white';
 
   return (
     <div className="flex items-center justify-between px-2 py-1 rounded bg-neo-black/20">
@@ -287,7 +287,7 @@ const RanksTabContent: React.FC<{
 }> = ({ entries, totalPlayers, isCurrentPlayer }) => (
   <div className="space-y-1">
     {entries.length === 0 ? (
-      <div className="flex flex-col items-center py-4 text-neo-cream/70 text-xs">
+      <div className="flex flex-col items-center py-4 text-neo-white text-xs">
         <Trophy className="w-6 h-6 mb-1 opacity-50" />
         <span>Loading ranks...</span>
       </div>
@@ -308,7 +308,7 @@ const RanksTabContent: React.FC<{
               entry.rank === 1 ? 'text-neo-yellow' :
               entry.rank === 2 ? 'text-gray-300' :
               entry.rank === 3 ? 'text-amber-600' :
-              'text-neo-cream/50'
+              'text-neo-white'
             )}>
               {getRankDisplay(entry.rank)}
             </span>
@@ -321,7 +321,7 @@ const RanksTabContent: React.FC<{
             </div>
             <span className={cn(
               'flex-1 truncate font-medium',
-              isCurrentPlayer(entry) ? 'text-neo-cyan font-bold' : 'text-neo-cream'
+              isCurrentPlayer(entry) ? 'text-neo-cyan font-bold' : 'text-neo-white'
             )}>
               {entry.displayName}
             </span>
@@ -331,7 +331,7 @@ const RanksTabContent: React.FC<{
           </div>
         ))}
         {totalPlayers > entries.length && (
-          <div className="text-center text-[10px] text-neo-cream/30 pt-1">
+          <div className="text-center text-[10px] text-neo-white pt-1">
             +{totalPlayers - entries.length} more players
           </div>
         )}

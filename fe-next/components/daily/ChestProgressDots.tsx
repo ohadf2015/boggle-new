@@ -66,9 +66,9 @@ export default function ChestProgressDots({ completedDates, cycleStart, today }:
           ) : dot.missed ? (
             <XCircle className="w-6 h-6 text-neo-red/80" />
           ) : (
-            <Circle className="w-6 h-6 text-neo-white/30" />
+            <Circle className="w-6 h-6 text-neo-white" />
           )}
-          <span className="text-[10px] text-neo-cream/50 font-bold uppercase">{dot.label}</span>
+          <span className="text-[10px] text-neo-white font-bold uppercase">{dot.label}</span>
         </div>
       ))}
     </div>

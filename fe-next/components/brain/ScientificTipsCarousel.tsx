@@ -139,7 +139,7 @@ export default function ScientificTipsCarousel() {
         </div>
         <div className={cn(
           'flex items-center gap-1.5 px-2 py-1 rounded-full border-2 border-neo-black text-xs font-bold uppercase',
-          isDarkMode ? 'bg-slate-800 text-neo-cyan' : 'bg-white text-neo-purple'
+          isDarkMode ? 'bg-neo-navy-light text-neo-cyan' : 'bg-white text-neo-purple'
         )}>
           <FlaskConical className="w-3 h-3" />
           {t('brain.researchBacked')}
@@ -150,7 +150,7 @@ export default function ScientificTipsCarousel() {
       <div
         className={cn(
           'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-neo-navy' : 'bg-white'
         )}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -196,7 +196,7 @@ export default function ScientificTipsCarousel() {
                   transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
                   className={cn(
                     'shrink-0 w-14 h-14 flex items-center justify-center rounded-xl border-3 border-neo-black shadow-hard-sm',
-                    isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
+                    isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-cream'
                   )}
                 >
                   <span className="text-3xl">{activeTip.icon}</span>
@@ -219,14 +219,14 @@ export default function ScientificTipsCarousel() {
                 className={cn(
                   'flex items-center justify-between p-3 rounded-lg border-2',
                   isDarkMode
-                    ? 'bg-slate-800/80 border-slate-600'
+                    ? 'bg-neo-navy-light/80 border-slate-600'
                     : 'bg-neo-cream/80 border-slate-300'
                 )}
               >
                 <div className="flex-1 min-w-0">
                   <p className={cn(
                     'text-xs font-semibold uppercase tracking-wide mb-0.5',
-                    isDarkMode ? 'text-neo-white/60' : 'text-neo-black/50'
+                    isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                   )}>
                     {t('brain.sourceLabel')}
                   </p>
@@ -260,7 +260,7 @@ export default function ScientificTipsCarousel() {
         {/* Navigation footer */}
         <div className={cn(
           'flex items-center justify-between px-4 py-3 border-t-2 border-neo-black',
-          isDarkMode ? 'bg-slate-800/70' : 'bg-slate-100/70'
+          isDarkMode ? 'bg-neo-navy-light/70' : 'bg-slate-100/70'
         )}>
           <button
             onClick={goToPrevious}
@@ -268,7 +268,7 @@ export default function ScientificTipsCarousel() {
             className={cn(
               'p-2 rounded-lg border-2 border-neo-black transition-all',
               'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-px',
-              isDarkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-white hover:bg-slate-50'
+              isDarkMode ? 'bg-neo-navy-elevated hover:bg-slate-600' : 'bg-white hover:bg-slate-50'
             )}
           >
             <ChevronLeft className={cn(
@@ -306,7 +306,7 @@ export default function ScientificTipsCarousel() {
             className={cn(
               'p-2 rounded-lg border-2 border-neo-black transition-all',
               'hover:translate-y-[-2px] hover:shadow-hard-sm active:translate-y-px',
-              isDarkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-white hover:bg-slate-50'
+              isDarkMode ? 'bg-neo-navy-elevated hover:bg-slate-600' : 'bg-white hover:bg-slate-50'
             )}
           >
             <ChevronRight className={cn(
@@ -317,7 +317,7 @@ export default function ScientificTipsCarousel() {
         </div>
 
         {/* Progress bar */}
-        <div className="h-1 bg-slate-300 dark:bg-slate-700">
+        <div className="h-1 bg-slate-300 dark:bg-neo-navy-elevated">
           <m.div
             key={`progress-${activeIndex}`}
             initial={{ width: '0%' }}

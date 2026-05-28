@@ -187,7 +187,7 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
             <p className="font-fredoka text-xs uppercase tracking-[0.3em] text-amber-200/60">
               זיכרון
             </p>
-            <p className="mt-2 font-rubik text-base leading-relaxed text-white/90">
+            <p className="mt-2 font-rubik text-base leading-relaxed text-white">
               {MEMENTOS.find((m) => m.id === activeMemento)?.memoryHe}
             </p>
             <p className="mt-3 font-rubik text-[11px] italic text-amber-200/50">
@@ -305,7 +305,7 @@ export function OldKitchenScene({ onSolved, onExit }: Props) {
         type="button"
         onClick={onExit}
         aria-label="חזרה"
-        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white/30 hover:text-white/60"
+        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white hover:text-white"
       >
         ←
       </button>

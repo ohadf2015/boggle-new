@@ -134,8 +134,8 @@ describe('DeleteAccountSection', () => {
 
   it('applies dark mode styles', () => {
     render(<DeleteAccountSection isDarkMode={true} />);
-    // The bg-slate-800 is on the outer card div with border-neo-red/50
+    // Surface migrated from raw bg-slate-800 to the neo token (cosy-themable).
     const card = screen.getByText('settings.deleteAccount').closest('[class*="border-neo-red"]');
-    expect(card?.className).toContain('bg-slate-800');
+    expect(card?.className).toContain('bg-neo-navy-light');
   });
 });

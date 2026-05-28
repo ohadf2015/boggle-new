@@ -62,7 +62,7 @@ export function RankHighlight({ rank, totalPlayers, gapToWinner, winnerUsername 
   const config = RANK_CONFIGS[rank] || {
     bg: 'bg-neo-navy-light',
     border: 'border-neo-black/40',
-    text: 'text-neo-cream',
+    text: 'text-neo-white',
     icon: Swords,
     glowColor: 'rgba(255,20,147,0.2)',
     messageKey: 'results.rankHighlight.keepGoing',

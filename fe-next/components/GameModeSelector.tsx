@@ -123,7 +123,7 @@ export function GameModeSelector({
               compact ? 'min-h-10 py-1' : 'min-h-11 py-1.5',
               isActive
                 ? `${MODE_ACTIVE_COLORS[mode]} ${MODE_GLOW[mode]} shadow-hard-sm`
-                : 'bg-neo-navy/60 text-neo-cream/70 border-neo-white/20 hover:bg-neo-navy hover:text-neo-cream'
+                : 'bg-neo-navy/60 text-neo-white border-neo-white/20 hover:bg-neo-navy hover:text-neo-white'
             )}
           >
             {/* Icon with bounce on active */}
@@ -140,7 +140,7 @@ export function GameModeSelector({
       })}
     </div>
     <div
-      className="min-h-[14px] text-center text-[10px] leading-tight text-neo-cream/60 px-2"
+      className="min-h-[14px] text-center text-[10px] leading-tight text-neo-white px-2"
       aria-live="polite"
     >
       {activeTooltip ? getModeDescription(activeTooltip, t) : ''}

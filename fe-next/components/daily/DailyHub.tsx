@@ -67,7 +67,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
     {/* Text */}
     <div className="flex-1 min-w-0">
       <h3 className="font-neo-display font-black text-lg text-neo-white">{title}</h3>
-      <p className="text-sm text-neo-cream/70">{description}</p>
+      <p className="text-sm text-neo-white">{description}</p>
     </div>
 
     {/* Play badge */}
@@ -110,10 +110,10 @@ const PlayedSummaryCard: React.FC<PlayedSummaryCardProps> = ({ title, href, isRT
       <CheckCircle2 className="w-5 h-5 text-neo-black" />
     </div>
     <div className="flex-1 min-w-0">
-      <h3 className="font-neo-display font-black text-sm text-neo-cream/90 truncate">
+      <h3 className="font-neo-display font-black text-sm text-neo-white truncate">
         {title}
       </h3>
-      <p className="text-xs text-neo-cream/55">
+      <p className="text-xs text-neo-white">
         {t('daily.questPlayedSubtitle')}
       </p>
     </div>
@@ -166,7 +166,7 @@ export default function DailyHub() {
           <h1 className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white mb-1">
             {t('daily.title')}
           </h1>
-          <span className="text-neo-cream/60 text-sm">
+          <span className="text-neo-white text-sm">
             #{puzzleNumber}
           </span>
         </div>
@@ -178,7 +178,7 @@ export default function DailyHub() {
               🔥 {streak.currentStreak}
             </span>
           )}
-          <span className="flex items-center gap-1.5 text-neo-cream/50 text-sm">
+          <span className="flex items-center gap-1.5 text-neo-white text-sm">
             <Clock className="w-4 h-4" />
             {countdown}
           </span>
@@ -250,7 +250,7 @@ export default function DailyHub() {
         <div className="flex items-center justify-center gap-2">
           <div className={cn('w-3 h-3 rounded-full border-2 border-neo-black', playedWH ? 'bg-neo-lime' : 'bg-neo-navy-light')} />
           <div className={cn('w-3 h-3 rounded-full border-2 border-neo-black', playedWW ? 'bg-neo-lime' : 'bg-neo-navy-light')} />
-          <span className="text-neo-cream/40 text-xs ms-1">
+          <span className="text-neo-white text-xs ms-1">
             {playedWH && playedWW ? '2/2' : playedWH || playedWW ? '1/2' : '0/2'}
           </span>
         </div>

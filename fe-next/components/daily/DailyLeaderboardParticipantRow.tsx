@@ -122,7 +122,7 @@ const ParticipantRow = memo<{
 
       {/* Time */}
       {!compact && (
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-neo-navy-elevated/50 px-2 py-1 rounded-lg">
           <Clock className="w-3.5 h-3.5" />
           <span>{timeAgo}</span>
         </div>

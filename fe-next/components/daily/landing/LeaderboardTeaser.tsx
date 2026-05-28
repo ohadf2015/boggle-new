@@ -124,7 +124,7 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
 
   return (
     <div
-      className="bg-slate-900/95 border-3 border-black shadow-hard rounded-xl overflow-hidden w-full"
+      className="bg-neo-navy/95 border-3 border-black shadow-hard rounded-xl overflow-hidden w-full"
       data-testid="leaderboard-teaser"
     >
       {/* Header */}

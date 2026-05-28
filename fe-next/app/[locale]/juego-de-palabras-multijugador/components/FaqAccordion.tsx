@@ -57,7 +57,7 @@ export function FaqAccordion() {
                     transition={{ type: 'spring', stiffness: 240, damping: 28 }}
                     className="overflow-hidden"
                   >
-                    <p className="border-t-2 border-dashed border-neo-white/15 px-5 py-4 font-neo-body text-sm leading-relaxed text-neo-white/75 sm:text-base">
+                    <p className="border-t-2 border-dashed border-neo-white/15 px-5 py-4 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
                       {faq.a}
                     </p>
                   </m.div>

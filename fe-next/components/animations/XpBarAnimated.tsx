@@ -266,7 +266,7 @@ export function XpBarAnimated({
           {/* XP text */}
           {showXpText && (
             <div className={cn('flex justify-between mt-1', sizeConfig[size].text)}>
-              <span className="text-neo-white/60 font-medium">
+              <span className="text-neo-white font-medium">
                 {displayXp.toLocaleString()} / {maxXp.toLocaleString()} XP
               </span>
               <span className={cn('font-bold', colors.text)}>

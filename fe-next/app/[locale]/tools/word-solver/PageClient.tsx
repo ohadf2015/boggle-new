@@ -81,17 +81,17 @@ export default function WordSolverPageClient() {
           >
             {content.title}
           </h1>
-          <p className="text-neo-cream/80 text-lg">{content.subtitle}</p>
+          <p className="text-neo-white text-lg">{content.subtitle}</p>
         </header>
 
         <section
-          className="bg-slate-800 border-3 border-neo-black shadow-hard rounded-neo p-6 mb-6"
+          className="bg-neo-navy-light border-3 border-neo-black shadow-hard rounded-neo p-6 mb-6"
           aria-label={content.inputLabel}
         >
           <div className="mb-4">
             <label
               htmlFor="solver-language"
-              className="block font-neo-display text-sm font-bold text-neo-cream/70 mb-2"
+              className="block font-neo-display text-sm font-bold text-neo-white mb-2"
             >
               {content.languageLabel}
             </label>
@@ -105,7 +105,7 @@ export default function WordSolverPageClient() {
                     'border-2 border-neo-black rounded-neo transition-all duration-100',
                     solverLang === lang.code
                       ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
-                      : 'bg-slate-700 text-white hover:bg-slate-600'
+                      : 'bg-neo-navy-elevated text-white hover:bg-slate-600'
                   )}
                 >
                   <span className="me-1">{lang.flag}</span>
@@ -191,7 +191,7 @@ export default function WordSolverPageClient() {
             </div>
 
             {totalCount === 0 ? (
-              <p className="text-neo-cream/70 text-lg bg-slate-800 border-3 border-neo-black rounded-neo p-6 text-center">
+              <p className="text-neo-white text-lg bg-neo-navy-light border-3 border-neo-black rounded-neo p-6 text-center">
                 {content.noResults}
               </p>
             ) : (
@@ -200,7 +200,7 @@ export default function WordSolverPageClient() {
                   {grouped.map(([len, words]) => (
                     <div
                       key={len}
-                      className="bg-slate-800 border-3 border-neo-black rounded-neo p-4"
+                      className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-4"
                     >
                       <h3 className="font-neo-display font-bold text-neo-orange mb-3">
                         {len}{content.letterWords} ({words.length})
@@ -222,7 +222,7 @@ export default function WordSolverPageClient() {
                     </div>
                   ))}
                 </div>
-                <p className="text-neo-cream/60 text-sm mt-4 italic">
+                <p className="text-neo-white text-sm mt-4 italic">
                   {content.fullDictionaryNote}
                 </p>
               </>
@@ -252,13 +252,13 @@ export default function WordSolverPageClient() {
         </section>
 
         <section
-          className="bg-slate-800 border-3 border-neo-black rounded-neo p-6 mb-8"
+          className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-6 mb-8"
           data-speakable="true"
         >
           <h2 className="font-neo-display text-2xl font-bold text-white mb-4">
             {content.howToTitle}
           </h2>
-          <ol className="list-decimal list-inside space-y-3 text-neo-cream/90">
+          <ol className="list-decimal list-inside space-y-3 text-neo-white">
             {content.howToSteps.map((step, i) => (
               <li key={`step-${i}-${step.slice(0, 24)}`} className="leading-relaxed">{step}</li>
             ))}
@@ -273,12 +273,12 @@ export default function WordSolverPageClient() {
             {content.tips.map((tip) => (
               <article
                 key={tip.title}
-                className="bg-slate-800 border-3 border-neo-black rounded-neo p-4"
+                className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-4"
               >
                 <h3 className="font-neo-display font-bold text-neo-cyan mb-2">
                   {tip.title}
                 </h3>
-                <p className="text-neo-cream/80 text-sm leading-relaxed">
+                <p className="text-neo-white text-sm leading-relaxed">
                   {tip.body}
                 </p>
               </article>
@@ -294,15 +294,15 @@ export default function WordSolverPageClient() {
             {content.faqs.map((faq, i) => (
               <details
                 key={`faq-${i}-${faq.question}`}
-                className="bg-slate-800 border-3 border-neo-black rounded-neo p-4 group"
+                className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-4 group"
               >
                 <summary className="font-neo-display font-bold text-neo-orange cursor-pointer list-none flex items-center justify-between">
                   {faq.question}
-                  <span className="text-neo-cream/60 group-open:rotate-180 transition-transform">
+                  <span className="text-neo-white group-open:rotate-180 transition-transform">
                     &#9660;
                   </span>
                 </summary>
-                <p className="text-neo-cream/80 mt-3 leading-relaxed">
+                <p className="text-neo-white mt-3 leading-relaxed">
                   {faq.answer}
                 </p>
               </details>

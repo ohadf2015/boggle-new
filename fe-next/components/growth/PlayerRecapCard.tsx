@@ -28,7 +28,7 @@ function StatItem({
       <span className="text-lg font-bold text-neo-white font-neo-display">
         {value}
       </span>
-      <span className="text-xs text-neo-white/60">{label}</span>
+      <span className="text-xs text-neo-white">{label}</span>
     </div>
   );
 }
@@ -120,7 +120,7 @@ export const PlayerRecapCard: React.FC = memo(function PlayerRecapCard() {
           aria-label={t('recap.shareAriaLabel')}
         >
           <Share2
-            className={cn('w-4 h-4', copied ? 'text-green-400' : 'text-neo-white/70')}
+            className={cn('w-4 h-4', copied ? 'text-green-400' : 'text-neo-white')}
             aria-hidden="true"
           />
         </button>
@@ -139,7 +139,7 @@ export const PlayerRecapCard: React.FC = memo(function PlayerRecapCard() {
               'flex-1 py-1.5 text-sm font-bold rounded-neo transition-colors',
               period === p
                 ? 'bg-neo-pink text-neo-white shadow-hard-sm'
-                : 'text-neo-white/50 hover:text-neo-white/80'
+                : 'text-neo-white hover:text-neo-white'
             )}
           >
             {t(`recap.${p}`)}
@@ -174,20 +174,20 @@ export const PlayerRecapCard: React.FC = memo(function PlayerRecapCard() {
       <div className="flex flex-col gap-1 px-2">
         {recap.longestWord && (
           <div className="flex justify-between text-sm">
-            <span className="text-neo-white/60">{t('recap.longestWord')}</span>
+            <span className="text-neo-white">{t('recap.longestWord')}</span>
             <span className="font-bold text-neo-white uppercase">
               {recap.longestWord}
             </span>
           </div>
         )}
         <div className="flex justify-between text-sm">
-          <span className="text-neo-white/60">{t('recap.bestScore')}</span>
+          <span className="text-neo-white">{t('recap.bestScore')}</span>
           <span className="font-bold text-neo-yellow">
             {recap.bestScore.toLocaleString()}
           </span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-neo-white/60">{t('recap.bestCombo')}</span>
+          <span className="text-neo-white">{t('recap.bestCombo')}</span>
           <span className="font-bold text-neo-orange">
             {recap.bestCombo}x
           </span>

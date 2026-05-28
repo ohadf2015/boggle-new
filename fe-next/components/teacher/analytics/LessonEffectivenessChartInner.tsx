@@ -91,11 +91,11 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
     return (
       <Card className="border-neo border-neo-black shadow-hard bg-neo-navy/50">
         <CardContent className="py-12 text-center">
-          <TrendingUp className="w-12 h-12 text-neo-white/40 mx-auto mb-4" />
+          <TrendingUp className="w-12 h-12 text-neo-white mx-auto mb-4" />
           <h3 className="text-xl font-neo-display text-neo-white mb-2">
             {t('education.analytics.noLessons')}
           </h3>
-          <p className="text-neo-white/60">{t('education.analytics.assignLessonsHint')}</p>
+          <p className="text-neo-white">{t('education.analytics.assignLessonsHint')}</p>
         </CardContent>
       </Card>
     );

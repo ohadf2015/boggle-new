@@ -116,7 +116,7 @@ export default function TeacherDashboard() {
           <h1 className="text-2xl sm:text-3xl font-neo-display font-black text-neo-white">
             {t('teacher.dashboard.title')}
           </h1>
-          <p className="text-sm text-neo-white/60 font-neo-body mt-1">
+          <p className="text-sm text-neo-white font-neo-body mt-1">
             {t('teacher.dashboard.subtitle')}
           </p>
         </m.div>
@@ -148,7 +148,7 @@ export default function TeacherDashboard() {
                     'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-offset-1 focus-visible:ring-offset-neo-navy',
                     isActive
                       ? cn(tab.activeBg, tab.activeText, 'border-2 border-black shadow-hard-sm')
-                      : 'text-neo-white/60 hover:text-neo-white hover:bg-neo-white/5 border-2 border-transparent'
+                      : 'text-neo-white hover:text-neo-white hover:bg-neo-white/5 border-2 border-transparent'
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -214,7 +214,7 @@ export default function TeacherDashboard() {
                 <span className="text-lg shrink-0">💡</span>
                 <div>
                   <p className="text-sm font-bold text-neo-lime">{t('teacher.dashboard.quickTip')}</p>
-                  <p className="text-xs text-neo-white/60 font-neo-body mt-0.5">
+                  <p className="text-xs text-neo-white font-neo-body mt-0.5">
                     {t('teacher.dashboard.quickTipDescription')}
                   </p>
                 </div>
@@ -251,7 +251,7 @@ export default function TeacherDashboard() {
           {activeTab === 'review' && (
             <m.div key="review" {...fadeSlide} className="space-y-6">
               {classrooms.length === 0 ? (
-                <p className="text-neo-white/60 font-neo-body font-bold text-center py-8">
+                <p className="text-neo-white font-neo-body font-bold text-center py-8">
                   {t('teacher.dashboard.createClassroomFirst')}
                 </p>
               ) : (

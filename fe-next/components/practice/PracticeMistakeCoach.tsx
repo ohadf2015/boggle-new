@@ -111,7 +111,7 @@ export default function PracticeMistakeCoach({ kind, mode, onClose }: Props) {
               data-testid="practice-mistake-coach-dismiss"
               onClick={handleDismiss}
               aria-label={t('practice.mistakeCoach.cta')}
-              className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-cream/70 hover:text-neo-cream hover:bg-neo-cream/10 transition-colors"
+              className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-white hover:text-neo-white hover:bg-neo-cream/10 transition-colors"
             >
               <X className="w-4 h-4" aria-hidden />
             </button>
@@ -131,13 +131,13 @@ export default function PracticeMistakeCoach({ kind, mode, onClose }: Props) {
                 />
               </div>
 
-              <div className="flex flex-col gap-2 text-neo-cream text-center">
+              <div className="flex flex-col gap-2 text-neo-white text-center">
                 <h2
                   className={`text-lg font-neo-display font-black ${ACCENT_TEXT[mode]}`}
                 >
                   {t(`practice.mistakeCoach.${kind}.title`)}
                 </h2>
-                <p className="text-sm font-neo-body text-neo-cream/90 leading-snug">
+                <p className="text-sm font-neo-body text-neo-white leading-snug">
                   {t(`practice.mistakeCoach.${kind}.body`)}
                 </p>
               </div>

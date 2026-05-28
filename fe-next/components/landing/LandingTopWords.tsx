@@ -26,7 +26,7 @@ export function LandingTopWords({ words }: LandingTopWordsProps) {
 
   return (
     <div className="w-full max-w-4xl mx-auto xl:max-w-5xl">
-      <h3 className="font-black text-neo-white/60 uppercase text-xs sm:text-sm text-center mb-3">
+      <h3 className="font-black text-neo-white uppercase text-xs sm:text-sm text-center mb-3">
         {t('landing.todaysTopWords')}
       </h3>
 

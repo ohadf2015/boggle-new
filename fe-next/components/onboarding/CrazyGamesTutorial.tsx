@@ -116,7 +116,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.05, ease: DECEL }}
-            className="font-neo-display uppercase leading-[0.85] tracking-tight text-neo-cream"
+            className="font-neo-display uppercase leading-[0.85] tracking-tight text-neo-white"
             style={{ fontSize: 'clamp(2.5rem, 7cqw, 4.25rem)' }}
           >
             <span
@@ -133,7 +133,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.15 }}
-            className="font-neo-body text-base sm:text-lg text-neo-cream/85 max-w-[44ch] leading-relaxed"
+            className="font-neo-body text-base sm:text-lg text-neo-white max-w-[44ch] leading-relaxed"
           >
             {t('onboarding.crazygames.tutorial.subtitle')}
           </m.p>
@@ -166,7 +166,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
                   initial={{ opacity: 0, x: isRTL ? 12 : -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: isRTL ? -12 : 12 }}
-                  className="flex items-center gap-2 px-4 py-3 bg-neo-navy-light text-neo-cream border-neo border-black rounded-neo shadow-hard"
+                  className="flex items-center gap-2 px-4 py-3 bg-neo-navy-light text-neo-white border-neo border-black rounded-neo shadow-hard"
                 >
                   <span className="inline-block w-2 h-2 bg-neo-pink rounded-full animate-pulse" aria-hidden />
                   <span className="font-neo-display uppercase text-sm sm:text-base tracking-tight">
@@ -201,7 +201,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
               animate={{ opacity: 0.75 }}
               transition={{ delay: 0.6 }}
               onClick={handleSkip}
-              className="font-neo-display text-xs uppercase tracking-wider text-neo-cream/70 underline-offset-4 underline hover:text-neo-cream/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan rounded-sm px-1 py-1"
+              className="font-neo-display text-xs uppercase tracking-wider text-neo-white underline-offset-4 underline hover:text-neo-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan rounded-sm px-1 py-1"
             >
               {t('onboarding.crazygames.tutorial.skip')}
             </m.button>
@@ -234,7 +234,7 @@ const CrazyGamesTutorial: React.FC<CrazyGamesTutorialProps> = ({ onContinue, onS
                 {t('onboarding.crazygames.tutorial.caption')}
               </span>
               <span
-                className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-cream/70"
+                className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-white"
                 aria-hidden
               >
                 {demoConfig.word.split('').join('-')}

@@ -98,7 +98,7 @@ describe('BrainScoreHero UI Fixes', () => {
       expect(progressBar).toBeTruthy();
 
       // Should use darker background (slate-900) for more contrast in dark mode
-      expect(progressBar?.className).toMatch(/bg-slate-900/);
+      expect(progressBar?.className).toMatch(/bg-neo-navy/);
     });
   });
 

@@ -96,7 +96,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
       <div className="flex items-center justify-between px-4 py-3 border-b-3 border-neo-black shrink-0 bg-neo-black/30">
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-neo-yellow" />
-          <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
+          <span className="font-bold text-neo-white text-sm uppercase tracking-wide">
             {t('wordHunt.desktop.liveRanks')}
           </span>
         </div>
@@ -130,7 +130,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
                 entry.rank === 1 ? 'text-neo-yellow' :
                 entry.rank === 2 ? 'text-gray-300' :
                 entry.rank === 3 ? 'text-amber-600' :
-                'text-neo-cream/60'
+                'text-neo-white'
               )}>
                 {getRankDisplay(entry.rank)}
               </span>
@@ -160,7 +160,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               >
                 <span className={cn(
                   'flex-1 truncate text-sm font-medium',
-                  isCurrentPlayer(entry) ? 'text-neo-cyan font-bold' : 'text-neo-cream cursor-pointer hover:underline'
+                  isCurrentPlayer(entry) ? 'text-neo-cyan font-bold' : 'text-neo-white cursor-pointer hover:underline'
                 )}>
                   {entry.displayName}
                 </span>
@@ -176,7 +176,7 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
 
         {/* Empty State */}
         {entries.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/70">
+          <div className="flex flex-col items-center justify-center py-8 text-neo-white">
             <Trophy className="w-8 h-8 mb-2 opacity-50" />
             <span className="text-sm">
               {hasLoaded

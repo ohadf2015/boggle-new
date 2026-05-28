@@ -52,7 +52,7 @@ export default function PartyHubClient() {
   if (loading) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-        <div className="animate-pulse text-neo-cream font-neo-display text-xl">
+        <div className="animate-pulse text-neo-white font-neo-display text-xl">
           {t('common.loading') || 'Loading...'}
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function PartyHubClient() {
   if (!hasAccess) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-        <div className="text-neo-cream/50 font-neo-body text-center">
+        <div className="text-neo-white font-neo-body text-center">
           <p className="text-lg">{t('party.noAccess') || 'Party games are not available yet.'}</p>
           <p className="text-sm mt-2">{t('party.comingSoon') || 'Coming soon!'}</p>
         </div>
@@ -85,10 +85,10 @@ export default function PartyHubClient() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="font-neo-display text-4xl sm:text-5xl text-neo-cream uppercase tracking-tight">
+          <h1 className="font-neo-display text-4xl sm:text-5xl text-neo-white uppercase tracking-tight">
             {t('party.title') || 'Party Games'}
           </h1>
-          <p className="font-neo-body text-neo-cream/60 mt-2 text-sm uppercase tracking-wide">
+          <p className="font-neo-body text-neo-white mt-2 text-sm uppercase tracking-wide">
             {t('party.subtitle') || 'Grab your phones!'}
           </p>
           <div className="mt-2 inline-block bg-neo-red/20 border-2 border-neo-red rounded-neo px-3 py-1">
@@ -133,7 +133,7 @@ export default function PartyHubClient() {
 
         {/* Join Existing Room */}
         <div className="bg-neo-navy-elevated border-3 border-neo-cream/30 rounded-neo-lg shadow-hard p-5">
-          <h3 className="font-neo-display text-neo-cream text-lg uppercase mb-3">
+          <h3 className="font-neo-display text-neo-white text-lg uppercase mb-3">
             {t('party.joinRoom') || 'Join a Room'}
           </h3>
           <div className="flex gap-3">
@@ -145,9 +145,9 @@ export default function PartyHubClient() {
               maxLength={6}
               className="
                 flex-1 bg-neo-navy border-3 border-neo-cream/40 rounded-neo
-                px-4 py-3 text-neo-cream font-neo-display text-xl text-center
+                px-4 py-3 text-neo-white font-neo-display text-xl text-center
                 uppercase tracking-[0.3em]
-                placeholder:text-neo-cream/30 placeholder:tracking-[0.2em]
+                placeholder:text-neo-white placeholder:tracking-[0.2em]
                 focus:outline-hidden focus:border-neo-lime
                 transition-colors
               "

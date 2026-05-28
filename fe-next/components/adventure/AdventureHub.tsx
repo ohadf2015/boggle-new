@@ -131,7 +131,7 @@ const AdventureHub = memo<AdventureHubProps>(({
         <Link
           href="/"
           aria-label={t('common.back')}
-          className="absolute top-2 start-2 z-20 flex items-center justify-center w-10 h-10 rounded-neo bg-neo-navy/60 text-neo-white/80 hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
+          className="absolute top-2 start-2 z-20 flex items-center justify-center w-10 h-10 rounded-neo bg-neo-navy/60 text-neo-white hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
           style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}
         >
           <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
@@ -151,7 +151,7 @@ const AdventureHub = memo<AdventureHubProps>(({
                 </span>
               )}
             </div>
-            <div className="text-neo-white/60 text-xs font-bold mt-0.5">
+            <div className="text-neo-white text-xs font-bold mt-0.5">
               {t(`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`)}
             </div>
           </div>
@@ -186,11 +186,11 @@ const AdventureHub = memo<AdventureHubProps>(({
           )}>
             <Flame className={cn(
               'w-5 h-5',
-              streakDays > 0 ? 'text-neo-pink' : 'text-neo-white/30'
+              streakDays > 0 ? 'text-neo-pink' : 'text-neo-white'
             )} />
             <span className={cn(
               'text-sm font-black tabular-nums',
-              streakDays > 0 ? 'text-neo-pink' : 'text-neo-white/30'
+              streakDays > 0 ? 'text-neo-pink' : 'text-neo-white'
             )}>
               {streakDays}
             </span>
@@ -200,7 +200,7 @@ const AdventureHub = memo<AdventureHubProps>(({
               </span>
             )}
             {bestStreak > 0 && (
-              <span className="text-neo-white/40 font-bold text-[10px] ms-0.5">
+              <span className="text-neo-white font-bold text-[10px] ms-0.5">
                 {t('adventure.hub.bestStreak')}: {bestStreak}
               </span>
             )}
@@ -289,7 +289,7 @@ const AdventureHub = memo<AdventureHubProps>(({
             className={cn(
               'flex-1 py-2.5 px-3',
               'flex items-center justify-center gap-1.5',
-              'bg-neo-white/5 text-neo-white/70',
+              'bg-neo-white/5 text-neo-white',
               'font-bold text-xs',
               'border border-neo-white/15 rounded-neo',
               'hover:bg-neo-white/10 transition-colors'
@@ -351,7 +351,7 @@ const AdventureHub = memo<AdventureHubProps>(({
             className={cn(
               'flex-1 py-2.5 px-3',
               'flex items-center justify-center gap-1.5',
-              'bg-neo-white/5 text-neo-white/70',
+              'bg-neo-white/5 text-neo-white',
               'font-bold text-xs',
               'border border-neo-white/15 rounded-neo',
               'hover:bg-neo-white/10 transition-colors'

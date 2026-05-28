@@ -102,7 +102,7 @@ export function QuestCard({
         <p
           className={cn(
             'font-neo-display text-sm font-bold leading-tight',
-            completed ? 'text-neo-white/50 line-through' : 'text-neo-white',
+            completed ? 'text-neo-white line-through' : 'text-neo-white',
           )}
         >
           {t(nameKey)}
@@ -110,7 +110,7 @@ export function QuestCard({
         <p
           className={cn(
             'font-neo-body text-xs mt-0.5 leading-snug',
-            completed ? 'text-neo-white/30' : 'text-neo-white/70',
+            completed ? 'text-neo-white' : 'text-neo-white',
           )}
         >
           {t(descKey)}

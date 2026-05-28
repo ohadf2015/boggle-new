@@ -157,7 +157,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           className={cn(
             'fixed z-30 -translate-x-1/2',
             'w-56 sm:w-64 px-3 py-2.5 rounded-neo border-3 border-neo-black',
-            'bg-neo-red text-neo-cream shadow-hard-lg',
+            'bg-neo-red text-neo-white shadow-hard-lg',
             tooltipPosition.showAbove && '-translate-y-full'
           )}
           style={{
@@ -182,7 +182,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <div className="flex items-center gap-2 mb-1.5 relative z-10">
              {isAiVerified && (
                 <p className="font-black text-xs uppercase flex items-center gap-1.5 text-neo-lime">
-                  <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
+                  <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-white">AI</span>
                   {t('results.aiRejected')}
                 </p>
               )}
@@ -252,7 +252,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="bg-neo-red text-neo-cream border-2 border-neo-black shadow-hard rounded-neo p-2"
+                className="bg-neo-red text-neo-white border-2 border-neo-black shadow-hard rounded-neo p-2"
               >
                 <p className="text-xs font-bold text-neo-black">
                   {t('results.fireRoundBonus')}
@@ -269,7 +269,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-xs px-1.5 py-0.5 bg-neo-pink text-neo-cream rounded border border-neo-black font-black cursor-help">
+                <span className="text-xs px-1.5 py-0.5 bg-neo-pink text-neo-white rounded border border-neo-black font-black cursor-help">
                   AI
                 </span>
               </TooltipTrigger>
@@ -277,7 +277,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                 side="top"
                 className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
               >
-                <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified')}</p>
+                <p className="text-xs font-bold text-neo-white">{t('results.aiVerified')}</p>
                 {aiReason && (
                   <p className="text-xs text-neo-lime mt-1">{aiReason}</p>
                 )}
@@ -291,7 +291,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       {isOpen && isMounted && createPortal(validationTooltipContent, document.body)}
 
       {isDuplicate && playerCount > 1 && (
-        <span className="absolute -top-2 inset-e-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
+        <span className="absolute -top-2 inset-e-[-8px] bg-neo-black text-neo-white text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
           {playerCount}
         </span>
       )}

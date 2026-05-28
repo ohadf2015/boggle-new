@@ -37,7 +37,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
                 <Gamepad2 size={48} className="text-neo-black" />
               </div>
             </div>
-            <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
+            <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-white tracking-tight">
               {t('joinView.joiningRoom')}
             </CardTitle>
             <div className="flex justify-center">
@@ -45,7 +45,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
                 {t('joinView.room')} {gameCode}
               </div>
             </div>
-            <p className="text-neo-cream/70 font-bold uppercase text-sm">
+            <p className="text-neo-white font-bold uppercase text-sm">
               {t('joinView.welcomeBack')}, <span className="text-neo-cyan">{username}</span>!
             </p>
           </CardHeader>
@@ -85,7 +85,7 @@ export const AutoJoiningState: React.FC<AutoJoiningStateProps> = ({
               </div>
             </div>
 
-            <p className="text-center text-neo-cream/75 text-sm font-bold uppercase">
+            <p className="text-center text-neo-white text-sm font-bold uppercase">
               {t('joinView.connectingToRoom')}
             </p>
           </CardContent>

@@ -138,7 +138,7 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
           variants={itemVariants}
           whileHover={{ opacity: 1 }}
           onClick={handleSkip}
-          className="w-full py-3 px-6 bg-transparent text-neo-white/55 font-neo-body text-sm tracking-wide underline-offset-4 hover:underline hover:text-neo-white/85 transition-colors"
+          className="w-full py-3 px-6 bg-transparent text-neo-white font-neo-body text-sm tracking-wide underline-offset-4 hover:underline hover:text-neo-white transition-colors"
         >
           {t('onboarding.returningUser.skip')}
         </m.button>

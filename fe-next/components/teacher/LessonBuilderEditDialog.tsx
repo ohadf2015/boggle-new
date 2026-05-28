@@ -40,7 +40,7 @@ export default function LessonBuilderEditDialog({
           <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
             {t('teacher.lesson.editLesson')}
           </Dialog.Title>
-          <Dialog.Description className="text-sm text-neo-white/70 mb-4 text-pretty">
+          <Dialog.Description className="text-sm text-neo-white mb-4 text-pretty">
             {t('teacher.lesson.dialog.editDescription')}
           </Dialog.Description>
 
@@ -71,7 +71,7 @@ export default function LessonBuilderEditDialog({
 
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
+              className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label={t('common.close')}
             >
               <X className="w-5 h-5" />

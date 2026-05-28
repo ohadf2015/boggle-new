@@ -278,7 +278,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             aria-busy={roomsLoading}
           >
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-xs font-black text-white/50 uppercase tracking-[0.15em]">
+              <h2 className="text-xs font-black text-white uppercase tracking-[0.15em]">
                 {t('multiplayerFlow.roomList.openArenas')}
                 {totalPlayers > 0 && (
                   <span className="text-neo-cyan ms-2 text-[11px]">
@@ -298,7 +298,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 {roomsLoading ? (
                   <Loader size="sm" />
                 ) : (
-                  <RefreshCw className="w-4 h-4 text-neo-cream" />
+                  <RefreshCw className="w-4 h-4 text-neo-white" />
                 )}
               </m.button>
             </div>
@@ -399,16 +399,16 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                                 <ModeIcon className="w-2.5 h-2.5" />
                                 {t(mode.labelKey)}
                               </span>
-                              <span className="text-[10px] font-bold text-white/60">
+                              <span className="text-[10px] font-bold text-white">
                                 {LANGUAGE_FLAGS[room.language] || '🎮'}
                               </span>
                               <span className="flex items-center gap-1">
-                                <Users className="w-2.5 h-2.5 text-white/50" />
+                                <Users className="w-2.5 h-2.5 text-white" />
                                 <span className={cn(
                                   'text-[10px] font-black',
                                   room.maxPlayers && room.playerCount >= room.maxPlayers
                                     ? 'text-neo-red/70'
-                                    : 'text-white/50'
+                                    : 'text-white'
                                 )}>
                                   {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''}
                                 </span>
@@ -432,7 +432,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                               size="sm"
                             />
                           )}
-                          <ChevronRight className="w-4 h-4 text-white/40 shrink-0 rtl:rotate-180 group-hover:text-white/60 transition-colors" />
+                          <ChevronRight className="w-4 h-4 text-white shrink-0 rtl:rotate-180 group-hover:text-white transition-colors" />
                         </div>
                       </m.button>
                     );

@@ -30,10 +30,10 @@ const variantStyles = {
   secondary: {
     header: 'bg-neo-cream text-neo-black border-neo-black',
     content: 'bg-neo-navy',
-    badge: 'bg-neo-purple text-neo-cream',
+    badge: 'bg-neo-purple text-neo-white',
   },
   tertiary: {
-    header: 'bg-neo-gray text-neo-cream border-neo-black/30',
+    header: 'bg-neo-gray text-neo-white border-neo-black/30',
     content: 'bg-neo-navy',
     badge: 'bg-muted-foreground text-white',
   },

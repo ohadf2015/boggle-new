@@ -122,7 +122,7 @@ export const PactFriendSelector: React.FC<PactFriendSelectorProps> = memo(
             <button
               data-testid="close-selector-btn"
               onClick={onClose}
-              className="text-neo-white/60 hover:text-neo-white"
+              className="text-neo-white hover:text-neo-white"
             >
               <X className="w-5 h-5" />
             </button>
@@ -130,9 +130,9 @@ export const PactFriendSelector: React.FC<PactFriendSelectorProps> = memo(
 
           {/* Friend list */}
           {loading ? (
-            <div className="text-center text-neo-white/50 py-4">...</div>
+            <div className="text-center text-neo-white py-4">...</div>
           ) : friends.length === 0 ? (
-            <p className="text-sm text-neo-white/50 text-center py-4">
+            <p className="text-sm text-neo-white text-center py-4">
               {t('friendsActivity.empty')}
             </p>
           ) : (
@@ -149,7 +149,7 @@ export const PactFriendSelector: React.FC<PactFriendSelectorProps> = memo(
                   {friend.hasActivePact ? (
                     <span
                       data-testid={`already-in-pact-${friend.id}`}
-                      className="text-xs text-neo-white/40"
+                      className="text-xs text-neo-white"
                     >
                       {t('wordPact.alreadyInPact')}
                     </span>

@@ -172,7 +172,7 @@ export default async function GlobalNotFound() {
             </div>
 
             {/* Copy */}
-            <h1 className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-cream mb-2">
+            <h1 className="text-2xl sm:text-3xl font-neo-display font-bold text-neo-white mb-2">
               {t.title}
             </h1>
             <p className="text-lg sm:text-xl font-neo-display text-neo-cyan mb-2">

@@ -37,7 +37,7 @@ export function GamesFilters({
   t,
 }: GamesFiltersProps) {
   return (
-    <div className="flex flex-wrap gap-3 bg-slate-800/50 rounded-neo border-neo border-black p-4">
+    <div className="flex flex-wrap gap-3 bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
       <div className="flex items-center gap-2">
         <Filter className="w-4 h-4 text-slate-400" />
         <span className="text-sm text-slate-400">
@@ -48,7 +48,7 @@ export function GamesFilters({
       <select
         value={dateRange}
         onChange={(e) => onDateRangeChange(e.target.value as DateRange)}
-        className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
+        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
         aria-label={t('admin.todayGames.dateRange', 'Date range')}
       >
         {DATE_RANGES.map((range) => (
@@ -61,7 +61,7 @@ export function GamesFilters({
       <select
         value={languageFilter}
         onChange={(e) => onLanguageChange(e.target.value)}
-        className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
+        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
       >
         <option value="all">{t('admin.todayGames.allLanguages')}</option>
         <option value="en">🇺🇸 English</option>
@@ -74,7 +74,7 @@ export function GamesFilters({
       <select
         value={gameTypeFilter}
         onChange={(e) => onGameTypeChange(e.target.value as GameTypeFilter)}
-        className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
+        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
       >
         <option value="all">{t('admin.todayGames.allTypes')}</option>
         <option value="multiplayer">{t('admin.todayGames.multiplayer')}</option>
@@ -89,7 +89,7 @@ export function GamesFilters({
       <select
         value={rankedFilter}
         onChange={(e) => onRankedChange(e.target.value)}
-        className="bg-slate-700 text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
+        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
       >
         <option value="all">{t('admin.todayGames.allModes')}</option>
         <option value="true">{t('admin.todayGames.rankedOnly')}</option>

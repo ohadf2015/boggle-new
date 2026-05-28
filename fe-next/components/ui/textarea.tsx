@@ -15,7 +15,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           "flex min-h-[100px] w-full px-4 py-3 text-sm font-medium resize-y",
           // Neo-Brutalist: thick border, hard shadow
           "rounded-neo border-3 border-neo-black dark:border-slate-500",
-          "bg-neo-cream dark:bg-slate-700 text-slate-900 dark:text-white",
+          "bg-neo-cream dark:bg-neo-navy-elevated text-slate-900 dark:text-white",
           // Inset shadow for depth
           "shadow-hard-pressed",
           // Placeholder styling

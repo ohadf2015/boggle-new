@@ -91,7 +91,7 @@ export function BulkImportModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-gray-900 border-2 border-gray-700 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="bg-neo-navy border-2 border-gray-700 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -100,7 +100,7 @@ export function BulkImportModal({
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 hover:bg-gray-800 rounded transition-colors"
+            className="p-1 hover:bg-neo-navy-light rounded transition-colors"
             aria-label="Close"
           >
             <X className="w-5 h-5 text-gray-400" />
@@ -110,7 +110,7 @@ export function BulkImportModal({
         {/* Content */}
         <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-200px)]">
           {/* Instructions */}
-          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+          <div className="bg-neo-navy-light border border-gray-700 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <FileText className="w-5 h-5 text-neo-yellow shrink-0 mt-0.5" />
               <div className="text-sm text-gray-300">
@@ -133,7 +133,7 @@ export function BulkImportModal({
               <select
                 value={source}
                 onChange={e => setSource(e.target.value as typeof source)}
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+                className="w-full bg-neo-navy-light border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
               >
                 <option value="admin">Admin</option>
                 <option value="dictionary">Dictionary</option>
@@ -147,7 +147,7 @@ export function BulkImportModal({
               <select
                 value={validationStatus}
                 onChange={e => setValidationStatus(e.target.value as ValidationStatus)}
-                className="w-full bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
+                className="w-full bg-neo-navy-light border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
               >
                 <option value="approved">Approved (Add to Dictionary)</option>
                 <option value="pending">Pending (Needs Review)</option>
@@ -167,7 +167,7 @@ export function BulkImportModal({
 WORD2
 WORD3
 ...`}
-              className="w-full h-48 bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow font-mono text-sm"
+              className="w-full h-48 bg-neo-navy-light border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow font-mono text-sm"
             />
           </div>
 
@@ -181,7 +181,7 @@ WORD3
 
           {/* Result */}
           {result && (
-            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 space-y-2">
+            <div className="bg-neo-navy-light border border-gray-700 rounded-lg p-4 space-y-2">
               <h3 className="font-medium text-white">{t('admin.wordBank.bulkImport.result')}</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>

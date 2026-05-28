@@ -212,7 +212,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                 <m.div
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1, repeat: Infinity }}
-                  className="text-sm text-white/60"
+                  className="text-sm text-white"
                 >
                   {t('mysteryReward.opening')}
                 </m.div>
@@ -329,13 +329,13 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   transition={{ delay: 0.5 }}
                   className="text-center space-y-1"
                 >
-                  <p className="text-xs text-white/70">
+                  <p className="text-xs text-white">
                     {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletion'))}
                     {reward.triggerType === 'win' && (t('mysteryReward.winBonus'))}
                     {reward.triggerType === 'long_word' && (t('mysteryReward.longWord'))}
                     {reward.triggerType === 'achievement' && (t('mysteryReward.achievement'))}
                   </p>
-                  <p className="text-xs text-white/70 italic">
+                  <p className="text-xs text-white italic">
                     {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletionExplain'))}
                     {reward.triggerType === 'win' && (t('mysteryReward.winBonusExplain'))}
                     {reward.triggerType === 'long_word' && (t('mysteryReward.longWordExplain'))}

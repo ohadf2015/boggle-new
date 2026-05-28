@@ -78,7 +78,7 @@ export default function BrainScoreHero({
   return (
     <div className={cn(
       'rounded-neo border-4 border-neo-black shadow-hard p-4 sm:p-6 relative overflow-hidden',
-      isDarkMode ? 'bg-slate-800' : 'bg-white'
+      isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
     )}>
       {/* Main Score Display */}
       <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
@@ -105,7 +105,7 @@ export default function BrainScoreHero({
           <div className="min-w-0">
             <p className={cn(
               'text-xs sm:text-sm font-bold uppercase tracking-wide',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.score')}
             </p>
@@ -123,7 +123,7 @@ export default function BrainScoreHero({
               </m.span>
               <span className={cn(
                 'text-base sm:text-xl font-bold',
-                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
               )}>
                 /100
               </span>
@@ -154,11 +154,11 @@ export default function BrainScoreHero({
           {/* Activities Analyzed Badge */}
           <div className={cn(
             'text-right px-2 sm:px-3 py-1.5 sm:py-2 rounded-neo border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream'
           )}>
             <p className={cn(
               'text-[10px] sm:text-xs font-bold uppercase leading-tight',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.activitiesAnalyzed')}
             </p>
@@ -192,7 +192,7 @@ export default function BrainScoreHero({
               <TrendingUp className="w-3 h-3 text-neo-green" />
               <span className={cn(
                 'text-xs font-medium',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
               )}>
                 {t(`brain.tiers.${nextTier}`)}
               </span>
@@ -204,7 +204,7 @@ export default function BrainScoreHero({
         <div className="relative">
           <div className={cn(
             'h-5 rounded-full border-2 border-neo-black overflow-hidden',
-            isDarkMode ? 'bg-slate-900' : 'bg-gray-300'
+            isDarkMode ? 'bg-neo-navy' : 'bg-gray-300'
           )}>
             <m.div
               className={cn('h-full', progressBarGradient)}
@@ -224,13 +224,13 @@ export default function BrainScoreHero({
               </span>
               <span className={cn(
                 'text-xs font-medium px-2 py-0.5 rounded-full',
-                isDarkMode ? 'bg-slate-700 text-neo-lime' : 'bg-gray-200 text-neo-purple'
+                isDarkMode ? 'bg-neo-navy-elevated text-neo-lime' : 'bg-gray-200 text-neo-purple'
               )}>
                 {tierConfig.max + 1 - score} {t('brain.pointsToGo')}
               </span>
               <span className={cn(
                 'text-xs font-bold',
-                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
               )}>
                 {tierConfig.max + 1}
               </span>

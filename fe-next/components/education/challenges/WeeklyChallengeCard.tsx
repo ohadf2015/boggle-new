@@ -35,7 +35,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
       </div>
 
       <h3 className="font-neo-display text-lg text-white mb-1">{t(quest.title)}</h3>
-      <p className="text-sm text-neo-white/60 mb-3">
+      <p className="text-sm text-neo-white mb-3">
         {t(quest.description, { target })}
       </p>
 

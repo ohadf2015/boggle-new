@@ -127,7 +127,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
       meta: { className: 'hidden lg:table-cell' },
       enableSorting: false,
       cell: ({ getValue }) => (
-        <span className="text-neo-white/60 text-sm">
+        <span className="text-neo-white text-sm">
           {formatLastActive(getValue())}
         </span>
       ),
@@ -166,7 +166,7 @@ export function StudentProgressTable({ classroomId, onStudentClick }: StudentPro
         <p className="text-neo-white font-neo-body text-lg mb-2">
           {t('education.analytics.noStudents')}
         </p>
-        <p className="text-neo-white/60 font-neo-body text-sm">
+        <p className="text-neo-white font-neo-body text-sm">
           {t('education.analytics.inviteStudents')}
         </p>
       </div>

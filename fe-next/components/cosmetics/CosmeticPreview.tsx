@@ -33,7 +33,7 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
         <button
           onClick={onClose}
           aria-label={t('cosmetics.close')}
-          className="absolute top-2 inset-e-2 text-neo-cream hover:text-neo-lime"
+          className="absolute top-2 inset-e-2 text-neo-white hover:text-neo-lime"
         >
           <X className="w-5 h-5" />
         </button>
@@ -44,7 +44,7 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
         </div>
 
         {/* Info */}
-        <h3 className="text-lg font-neo-display font-bold text-neo-cream">{t(cosmetic.name)}</h3>
+        <h3 className="text-lg font-neo-display font-bold text-neo-white">{t(cosmetic.name)}</h3>
         <p className="text-sm text-gray-400 mb-2">{t(cosmetic.description)}</p>
         <p className={`text-xs font-bold mb-4 ${rarityClass}`}>
           {t(`cosmetics.rarity.${cosmetic.rarity}`)}
@@ -64,7 +64,7 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
           const hint = formatUnlockHint(cosmetic);
           return (
           <div>
-            <p className="text-sm text-neo-cream/80 mb-2 font-neo-body">
+            <p className="text-sm text-neo-white mb-2 font-neo-body">
               <span className="text-gray-500 me-1">🔒</span>
               {hint ? t(hint.key, hint.params) : t('cosmetics.locked')}
             </p>

@@ -152,14 +152,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           {/* Score Comparison */}
           <div className="grid grid-cols-3 gap-3 mt-4">
             <div className="text-center p-4 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
-              <p className="text-[10px] font-black uppercase text-neo-cream/50 mb-1">{t('challengeResults.you')}</p>
+              <p className="text-[10px] font-black uppercase text-neo-white mb-1">{t('challengeResults.you')}</p>
               <p className="text-3xl font-black text-neo-cyan">{results.playerScore}</p>
             </div>
             <div className="flex items-center justify-center">
               <span className="bg-neo-yellow text-neo-black border-2 border-neo-black rounded-neo font-black px-3 py-1 shadow-hard-sm text-xs uppercase">VS</span>
             </div>
             <div className="text-center p-4 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
-              <p className="text-[10px] font-black uppercase text-neo-cream/50 mb-1">{challenge.creatorUsername}</p>
+              <p className="text-[10px] font-black uppercase text-neo-white mb-1">{challenge.creatorUsername}</p>
               <p className="text-3xl font-black text-neo-yellow">{challenge.creatorScore}</p>
             </div>
           </div>
@@ -188,11 +188,11 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           <div className="grid grid-cols-2 gap-3 mt-3">
             <div className="text-center p-3 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
               <p className="text-2xl font-black text-white">{results.playerWords.length}</p>
-              <p className="text-[10px] font-black uppercase text-neo-cream/50">{t('challengeResults.words')}</p>
+              <p className="text-[10px] font-black uppercase text-neo-white">{t('challengeResults.words')}</p>
             </div>
             <div className="text-center p-3 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
               <p className="text-2xl font-black text-white">{Math.max(...results.playerWords.map(w => w.length), 0)}</p>
-              <p className="text-[10px] font-black uppercase text-neo-cream/50">{t('challengeResults.longest')}</p>
+              <p className="text-[10px] font-black uppercase text-neo-white">{t('challengeResults.longest')}</p>
             </div>
           </div>
         </div>
@@ -232,7 +232,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           <Button
             onClick={onBackToHome}
             variant="ghost"
-            className="w-full flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo text-neo-cream/70 hover:text-white hover:bg-neo-white/10"
+            className="w-full flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo text-neo-white hover:text-white hover:bg-neo-white/10"
           >
             <Home className="w-4 h-4" />
             {t('common.backToHome')}

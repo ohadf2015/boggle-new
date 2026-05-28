@@ -48,7 +48,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
         'flex items-center gap-3 w-full mb-3 rounded-xl border-3 border-black shadow-hard px-3 py-2.5',
         allDone
           ? 'bg-neo-lime/10 border-neo-lime/50'
-          : 'bg-slate-900/90'
+          : 'bg-neo-navy/90'
       )}
       data-testid="daily-missions-header"
     >
@@ -76,7 +76,7 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
           </h2>
           <span className={cn(
             'text-[10px] font-black shrink-0 ms-2',
-            allDone ? 'text-neo-lime' : 'text-neo-cream/60'
+            allDone ? 'text-neo-lime' : 'text-neo-white'
           )}>
             {completedCount}/2
           </span>

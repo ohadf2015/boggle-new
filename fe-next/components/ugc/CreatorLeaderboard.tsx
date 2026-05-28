@@ -40,7 +40,7 @@ const RANK_STYLES: Record<number, { bg: string; text: string; icon: string }> = 
 };
 
 function RatingStars({ value }: { value: number | null }) {
-  if (value === null) return <span className="text-neo-white/30 text-xs">—</span>;
+  if (value === null) return <span className="text-neo-white text-xs">—</span>;
   return (
     <span className="flex items-center gap-0.5 text-sm font-bold text-neo-yellow">
       <Star className="w-3.5 h-3.5 fill-neo-yellow" aria-hidden />
@@ -85,7 +85,7 @@ function ChampionSpotlight({ creator }: { creator: CreatorRow }) {
           <p className="font-neo-display text-neo-white font-bold text-xl truncate">
             {creator.display_name}
           </p>
-          <div className="flex items-center gap-3 mt-1.5 text-xs text-neo-white/50 font-neo-body">
+          <div className="flex items-center gap-3 mt-1.5 text-xs text-neo-white font-neo-body">
             <span className="flex items-center gap-1">
               <LayoutGrid className="w-3 h-3" />
               {creator.boards_created} {t('ugc.creator.leaderboard.boards')}
@@ -100,7 +100,7 @@ function ChampionSpotlight({ creator }: { creator: CreatorRow }) {
         {/* Rating badge */}
         <div className="shrink-0 flex flex-col items-center gap-0.5">
           <RatingStars value={creator.avg_rating} />
-          <span className="text-[9px] text-neo-white/30 uppercase font-bold">
+          <span className="text-[9px] text-neo-white uppercase font-bold">
             {t('ugc.creator.leaderboard.rating')}
           </span>
         </div>
@@ -137,7 +137,7 @@ function CreatorRow_({ creator, rank }: { creator: CreatorRow; rank: number }) {
           {isTopThree ? (
             <span className="text-lg leading-none" aria-hidden>{RANK_STYLES[rank]?.icon}</span>
           ) : (
-            <span className="font-bold text-neo-white/40 text-sm">#{rank}</span>
+            <span className="font-bold text-neo-white text-sm">#{rank}</span>
           )}
         </div>
 
@@ -149,14 +149,14 @@ function CreatorRow_({ creator, rank }: { creator: CreatorRow; rank: number }) {
           />
           <span className={cn(
             'font-neo-body font-bold text-sm truncate',
-            isTopThree ? 'text-neo-white' : 'text-neo-white/80'
+            isTopThree ? 'text-neo-white' : 'text-neo-white'
           )}>
             {creator.display_name}
           </span>
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 shrink-0 text-xs text-neo-white/50">
+        <div className="flex items-center gap-4 shrink-0 text-xs text-neo-white">
           <span className="hidden sm:flex items-center gap-1 min-w-12 justify-end">
             <LayoutGrid className="w-3 h-3" />
             {creator.boards_created}
@@ -200,8 +200,8 @@ export default function CreatorLeaderboard() {
       {/* Empty */}
       {!loading && creators.length === 0 && (
         <div className="text-center py-16">
-          <Crown className="w-12 h-12 text-neo-white/10 mx-auto mb-3" />
-          <p className="text-neo-white/50 font-neo-body text-sm">
+          <Crown className="w-12 h-12 text-neo-white mx-auto mb-3" />
+          <p className="text-neo-white font-neo-body text-sm">
             {t('ugc.creator.leaderboard.empty')}
           </p>
         </div>
@@ -214,7 +214,7 @@ export default function CreatorLeaderboard() {
           <ChampionSpotlight creator={creators[0]} />
 
           {/* Table header */}
-          <div className="flex items-center gap-3 px-3 py-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-neo-white/30">
+          <div className="flex items-center gap-3 px-3 py-2 mb-1 text-[10px] font-bold uppercase tracking-wider text-neo-white">
             <div className="w-8 text-center">#</div>
             <div className="flex-1">{t('ugc.creator.leaderboard.creator')}</div>
             <div className="hidden sm:block min-w-12 text-end">{t('ugc.creator.leaderboard.boards')}</div>

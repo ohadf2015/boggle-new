@@ -248,7 +248,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
       className
     )}>
       {/* Header with Race Track theme */}
-      <div className="bg-neo-navy text-neo-cream px-2 py-1 flex items-center justify-between">
+      <div className="bg-neo-navy text-neo-white px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <div
             data-anim="zap-wiggle"
@@ -256,12 +256,12 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
           >
             <Zap className="w-3.5 h-3.5 text-neo-lime" />
           </div>
-          <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
+          <span className="text-[10px] font-black uppercase text-neo-white tracking-wider">
             {t('leaderboard.liveRace')}
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-[10px] font-bold text-neo-cream/90">
+          <span className="text-[10px] font-bold text-neo-white">
             {totalPlayers} {t('leaderboard.racing')}
           </span>
         </div>

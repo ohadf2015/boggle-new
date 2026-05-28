@@ -40,7 +40,7 @@ export function DuelMonitoringPanel({ classroomId }: DuelMonitoringPanelProps) {
 
   if (duelActivities.length === 0) {
     return (
-      <div className="text-center py-8 text-neo-white/60 font-neo-body">
+      <div className="text-center py-8 text-neo-white font-neo-body">
         <Swords className="w-12 h-12 mx-auto mb-3 opacity-30" />
         <p>{t('teacher.duels.noDuels')}</p>
       </div>
@@ -71,7 +71,7 @@ export function DuelMonitoringPanel({ classroomId }: DuelMonitoringPanelProps) {
                   <p className="font-neo-body font-bold text-neo-white">
                     {actorName}
                   </p>
-                  <p className="text-sm text-neo-white/60">
+                  <p className="text-sm text-neo-white">
                     {score} {t('teacher.duels.points')}
                   </p>
                 </div>
@@ -91,7 +91,7 @@ export function DuelMonitoringPanel({ classroomId }: DuelMonitoringPanelProps) {
                 </span>
 
                 {/* Time ago */}
-                <span className="text-xs text-neo-white/40">
+                <span className="text-xs text-neo-white">
                   {formatDistanceToNow(timestamp, { addSuffix: true })}
                 </span>
               </div>

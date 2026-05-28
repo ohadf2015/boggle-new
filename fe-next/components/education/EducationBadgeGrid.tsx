@@ -142,7 +142,7 @@ export default function EducationBadgeGrid({
 
         {/* Overall Completion */}
         <div className="space-y-2">
-          <p className="text-neo-white/80 font-neo-body">
+          <p className="text-neo-white font-neo-body">
             {t('education.achievements.completion', {
               percent: completionPercent,
               earned: earnedCount,
@@ -229,14 +229,14 @@ export default function EducationBadgeGrid({
               </h3>
 
               <div className="flex items-center gap-4">
-                <span className="text-sm text-neo-white/60 group-hover:text-neo-white/80 transition-colors">
+                <span className="text-sm text-neo-white group-hover:text-neo-white transition-colors">
                   {t('education.achievements.earned', {
                     count: categoryEarnedCount,
                     total: categoryAchievements.length,
                   })}
                 </span>
                 <ChevronDown
-                  className={`w-5 h-5 text-neo-white/60 group-hover:text-neo-cyan transition-all duration-200 ${
+                  className={`w-5 h-5 text-neo-white group-hover:text-neo-cyan transition-all duration-200 ${
                     isCollapsed ? '-rotate-90' : 'rotate-0'
                   }`}
                 />
@@ -312,7 +312,7 @@ export default function EducationBadgeGrid({
       <div className="text-center">
         <p className={cn(
           'text-sm font-neo-body',
-          canPinMore ? 'text-neo-white/60' : 'text-neo-lime'
+          canPinMore ? 'text-neo-white' : 'text-neo-lime'
         )}>
           {t('education.achievements.pinLimit', {
             current: pinCount,
@@ -324,7 +324,7 @@ export default function EducationBadgeGrid({
       {/* Footer: Secret Badges Hint */}
       {lockedSecretsCount > 0 && (
         <div className="text-center">
-          <p className="text-neo-white/60 italic font-neo-body">
+          <p className="text-neo-white italic font-neo-body">
             {t('education.achievements.secretRemaining', { count: lockedSecretsCount })}
           </p>
         </div>

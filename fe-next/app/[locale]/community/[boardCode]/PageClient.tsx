@@ -36,7 +36,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
   if (loading) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-        <div className="text-neo-white/60 font-neo-body">{t('common.loading')}</div>
+        <div className="text-neo-white font-neo-body">{t('common.loading')}</div>
       </div>
     );
   }
@@ -44,7 +44,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
   if (!board) {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-        <div className="text-neo-white/60 font-neo-body">{t('ugc.board.notFound')}</div>
+        <div className="text-neo-white font-neo-body">{t('ugc.board.notFound')}</div>
       </div>
     );
   }
@@ -63,7 +63,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
     <div className="min-h-screen bg-neo-navy px-4 py-8 max-w-lg mx-auto">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1 text-neo-white/60 font-neo-body text-sm mb-6 hover:text-neo-white transition-colors"
+        className="flex items-center gap-1 text-neo-white font-neo-body text-sm mb-6 hover:text-neo-white transition-colors"
       >
         <ArrowLeft size={16} className="rtl:scale-x-[-1]" />
         {t('common.back')}
@@ -76,7 +76,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
             customAvatar={(board.creator_avatar as CustomAvatarConfig | null) ?? null}
             size="sm"
           />
-          <span className="text-neo-white/70 text-xs font-neo-body">
+          <span className="text-neo-white text-xs font-neo-body">
             {t('ugc.gallery.createdBy')}{' '}
             <span className="text-neo-white font-bold">{board.creator_display_name}</span>
           </span>
@@ -116,7 +116,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
         )}
 
         {/* Difficulty & info */}
-        <div className="flex items-center gap-3 text-sm font-neo-body text-neo-white/70">
+        <div className="flex items-center gap-3 text-sm font-neo-body text-neo-white">
           <span className="bg-neo-orange text-white px-2 py-0.5 rounded-neo border border-black font-bold text-xs">
             {difficultyLabel}
           </span>

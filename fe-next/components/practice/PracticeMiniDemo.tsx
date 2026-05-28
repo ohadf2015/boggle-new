@@ -22,9 +22,9 @@ interface Props {
 }
 
 const COLOR_FOR_MODE: Record<PracticeMode, { tile: string }> = {
-  classic: { tile: 'bg-neo-cyan/30 border-neo-cyan text-neo-cream' },
-  wordHunt: { tile: 'bg-neo-lime/30 border-neo-lime text-neo-cream' },
-  wheelRush: { tile: 'bg-neo-purple/30 border-neo-purple text-neo-cream' },
+  classic: { tile: 'bg-neo-cyan/30 border-neo-cyan text-neo-white' },
+  wordHunt: { tile: 'bg-neo-lime/30 border-neo-lime text-neo-white' },
+  wheelRush: { tile: 'bg-neo-purple/30 border-neo-purple text-neo-white' },
 };
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';

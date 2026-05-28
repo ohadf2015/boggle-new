@@ -210,7 +210,7 @@ export const MPDragCoachmark: React.FC<Props> = ({
         <button
           type="button"
           onClick={onDismiss}
-          className="px-3 py-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/80 text-neo-cream text-xs font-neo-display font-bold hover:bg-neo-navy"
+          className="px-3 py-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/80 text-neo-white text-xs font-neo-display font-bold hover:bg-neo-navy"
         >
           {t('wheelRush.ftue.dismiss')}
         </button>

@@ -306,7 +306,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
         type="button"
         onClick={onExit}
         aria-label="חזרה"
-        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white/30 hover:text-white/60"
+        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white hover:text-white"
       >
         ←
       </button>
@@ -323,11 +323,11 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
             <h2 className="mt-2 font-fredoka text-3xl font-black text-amber-200" style={{ textShadow: '2px 2px 0 #000' }}>
               אורי חרת. הפיח כיסה.
             </h2>
-            <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
+            <p className="mt-4 font-rubik text-base leading-relaxed text-white">
               ארבע מילים נשרטו בקיר — מצרכי לחם.
               בכל אחת אות אחת חסרה מתחת לפיח.
             </p>
-            <p className="mt-3 font-rubik text-sm text-white/65">
+            <p className="mt-3 font-rubik text-sm text-white">
               <strong>גרור</strong> על אזור בקיר כדי לנגב פיח (מספיק כדי לקרוא).
               <strong> גע</strong> במילה החשופה. <strong>בחר</strong> את האות הנכונה מהאוסף למטה.
             </p>
@@ -352,7 +352,7 @@ export function SootedWallScene({ onSolved, onExit }: Props) {
             animation: 'wv-bloom 1.4s ease-out forwards',
           }}
         >
-          <p className="font-rubik text-sm tracking-wide text-white/70" dir="rtl">המתכון שלם.</p>
+          <p className="font-rubik text-sm tracking-wide text-white" dir="rtl">המתכון שלם.</p>
           <div className="flex flex-wrap justify-center gap-2" dir="rtl">
             {CARVINGS.map((c) => (
               <span

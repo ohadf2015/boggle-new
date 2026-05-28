@@ -191,7 +191,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       <div className="w-full flex justify-start z-10">
         <Link
           href={`/${language}/daily`}
-          className="inline-flex items-center text-sm text-neo-cream/70 hover:text-neo-white transition-colors"
+          className="inline-flex items-center text-sm text-neo-white hover:text-neo-white transition-colors"
         >
           <ArrowLeft className="me-2 rtl:rotate-180 w-4 h-4" />
           {t('common.back')}
@@ -208,7 +208,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         <h2 className="font-neo-display font-black text-2xl text-neo-white mb-1">
           {t('wordWheel.results.title')}
         </h2>
-        <span className="text-neo-cream/60 text-sm">#{puzzleNumber}</span>
+        <span className="text-neo-white text-sm">#{puzzleNumber}</span>
       </m.div>
 
       {/* Score circle */}
@@ -233,7 +233,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         <span className={cn('font-neo-display font-black text-4xl', tier.color)}>
           {animatedScore}
         </span>
-        <span className="text-neo-cream/50 text-xs">{t('wordWheel.scoreLabel')}</span>
+        <span className="text-neo-white text-xs">{t('wordWheel.scoreLabel')}</span>
       </m.div>
 
       {/* Tier message */}
@@ -274,13 +274,13 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       >
         <div className="flex flex-col items-center p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard">
           <span className="text-neo-lime font-black text-xl">{result.wordsFound.length}</span>
-          <span className="text-neo-cream/60 text-xs">{t('wordWheel.results.wordsFound')}</span>
+          <span className="text-neo-white text-xs">{t('wordWheel.results.wordsFound')}</span>
         </div>
         <div className="flex flex-col items-center p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard">
           <span className="text-neo-cyan font-black text-xl">
             {Math.floor(result.timeSeconds / 60)}:{(result.timeSeconds % 60).toString().padStart(2, '0')}
           </span>
-          <span className="text-neo-cream/60 text-xs">{t('wordWheel.results.time')}</span>
+          <span className="text-neo-white text-xs">{t('wordWheel.results.time')}</span>
         </div>
       </m.div>
 
@@ -394,14 +394,14 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
-          <h3 className="text-neo-cream/70 text-xs font-bold uppercase mb-2">
+          <h3 className="text-neo-white text-xs font-bold uppercase mb-2">
             {t('wordWheel.foundWords')}
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {result.wordsFound.map((word, i) => (
               <m.span
                 key={word}
-                className="px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-cream text-xs font-semibold shadow-hard-xs"
+                className="px-2 py-0.5 rounded-neo border-2 border-neo-black bg-neo-navy-light text-neo-white text-xs font-semibold shadow-hard-xs"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.7 + i * 0.05 }}
@@ -416,7 +416,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
       {/* Hint: tap a player row to see diff */}
       {!isPractice && result.wordsFound.length > 0 && (
-        <p className="text-xs text-neo-cream/60 text-center font-medium -mb-1">
+        <p className="text-xs text-neo-white text-center font-medium -mb-1">
           {t('wordWheel.results.tapPlayerHint', 'Tap a player to see what you missed')}
         </p>
       )}

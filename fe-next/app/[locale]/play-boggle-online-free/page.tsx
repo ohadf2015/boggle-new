@@ -272,7 +272,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               <h3 className="mt-3 font-neo-display text-xl font-black uppercase leading-tight text-neo-white sm:text-2xl">
                 The free <span className="bg-neo-navy px-2 text-neo-lime">Words With Friends</span> alternative — but real-time.
               </h3>
-              <p className="mt-2 max-w-xl text-sm text-neo-white/90">2-20 friends play the same grid simultaneously. Match takes 2-3 min, not 3 days. No download.</p>
+              <p className="mt-2 max-w-xl text-sm text-neo-white">2-20 friends play the same grid simultaneously. Match takes 2-3 min, not 3 days. No download.</p>
             </div>
             <span className="relative shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy px-4 py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-lime shadow-hard transition-all group-hover:translate-x-1">
               Compare →
@@ -371,7 +371,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             <h2 className="mt-4 font-neo-display text-3xl font-black uppercase leading-tight text-neo-white sm:text-4xl">
               The party <span className="bg-neo-navy px-2 text-neo-lime">starts</span> when friends join.
             </h2>
-            <p className="mt-4 text-neo-white/90">
+            <p className="mt-4 text-neo-white">
               Spin up a room in 3 seconds. Share a 4-letter code or QR. 20 people on phones, one TV in the middle —
               chaos in five languages. Real-time scoring, combo streaks, the works.
             </p>

@@ -14,7 +14,7 @@ function getStreakTier(streak: number) {
   if (streak >= 30) return { label: 'legendary', color: 'text-neo-pink', glow: 'shadow-[0_0_12px_rgba(255,20,147,0.4)]', bg: 'bg-neo-pink/10 border-neo-pink/40' };
   if (streak >= 14) return { label: 'blazing', color: 'text-neo-cyan', glow: 'shadow-[0_0_10px_rgba(0,255,255,0.3)]', bg: 'bg-neo-cyan/10 border-neo-cyan/40' };
   if (streak >= 7) return { label: 'hot', color: 'text-neo-lime', glow: 'shadow-[0_0_8px_rgba(191,255,0,0.3)]', bg: 'bg-neo-lime/10 border-neo-lime/40' };
-  return { label: 'warm', color: 'text-neo-cream', glow: '', bg: 'bg-neo-navy-light border-black' };
+  return { label: 'warm', color: 'text-neo-white', glow: '', bg: 'bg-neo-navy-light border-black' };
 }
 
 /**
@@ -59,7 +59,7 @@ export function StreakCounter({ streak }: StreakCounterProps) {
         <span className={cn('font-neo-display font-black text-lg tabular-nums', tier.color)}>
           {streak}
         </span>
-        <span className="font-black text-neo-cream/70 text-xs uppercase tracking-wide">
+        <span className="font-black text-neo-white text-xs uppercase tracking-wide">
           {t('daily.streakDays', { count: streak })}
         </span>
       </div>

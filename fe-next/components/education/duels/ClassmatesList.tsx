@@ -63,7 +63,7 @@ export function ClassmatesList({
   // Empty state
   if (displayClassmates.length === 0) {
     return (
-      <div className="p-6 text-center text-neo-white/70">
+      <div className="p-6 text-center text-neo-white">
         {t('noClassmatesFound')}
       </div>
     );

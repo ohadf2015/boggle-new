@@ -104,7 +104,7 @@ export function TeacherAccessQueue() {
                   tabIndex={0}
                   role="button"
                   aria-label={t('admin.teacherAccess.row_open').replace('{name}', r.full_name)}
-                  className="cursor-pointer hover:bg-slate-800 border-b border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-inset"
+                  className="cursor-pointer hover:bg-neo-navy-light border-b border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime focus-visible:ring-inset"
                 >
                   <td className="p-2">{r.full_name}</td>
                   <td className="p-2">{r.email}</td>

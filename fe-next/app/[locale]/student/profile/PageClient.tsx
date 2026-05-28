@@ -247,11 +247,11 @@ export default function StudentProfilePageClient() {
           {/* XP Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-neo-white/70 font-neo-body text-sm">
+              <span className="text-neo-white font-neo-body text-sm">
                 {xpProgress.xpInCurrentLevel} / {xpProgress.xpNeededForNextLevel} XP
               </span>
               {!xpProgress.isMaxLevel ? (
-                <span className="text-neo-white/70 font-neo-body text-sm">
+                <span className="text-neo-white font-neo-body text-sm">
                   {t('education.xp.nextLevel')}: {currentLevel + 1}
                 </span>
               ) : (
@@ -290,7 +290,7 @@ export default function StudentProfilePageClient() {
           ) : (
             <>
               <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
-                <div className="text-neo-white/60 font-neo-body text-sm mb-1">
+                <div className="text-neo-white font-neo-body text-sm mb-1">
                   {t('education.student.lessonsAssigned')}
                 </div>
                 <div className="text-3xl font-neo-display font-black text-neo-white">
@@ -299,7 +299,7 @@ export default function StudentProfilePageClient() {
               </div>
 
               <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
-                <div className="text-neo-white/60 font-neo-body text-sm mb-1">
+                <div className="text-neo-white font-neo-body text-sm mb-1">
                   {t('education.practice.wordsFound')}
                 </div>
                 <div className="text-3xl font-neo-display font-black text-neo-lime">
@@ -308,7 +308,7 @@ export default function StudentProfilePageClient() {
               </div>
 
               <div className="p-6 bg-neo-navy/50 border-neo border-neo-black rounded-neo shadow-hard">
-                <div className="text-neo-white/60 font-neo-body text-sm mb-1">
+                <div className="text-neo-white font-neo-body text-sm mb-1">
                   {t('education.practice.complete')}
                 </div>
                 <div className="text-3xl font-neo-display font-black text-neo-cyan">
@@ -491,7 +491,7 @@ export default function StudentProfilePageClient() {
                               <div className="text-neo-white font-neo-body text-sm">
                                 {t('duels.vs')} {opponentName}
                               </div>
-                              <div className="text-neo-white/50 font-neo-body text-xs">
+                              <div className="text-neo-white font-neo-body text-xs">
                                 {duel.completed_at && formatDistanceToNow(new Date(duel.completed_at), { addSuffix: true })}
                               </div>
                             </div>
@@ -526,11 +526,11 @@ export default function StudentProfilePageClient() {
               animate={{ opacity: 1, y: 0 }}
               className="p-8 bg-neo-navy/30 border-neo border-neo-black rounded-neo shadow-hard text-center"
             >
-              <Swords className="w-12 h-12 text-neo-white/30 mx-auto mb-3" />
-              <div className="text-neo-white/70 font-neo-body mb-1">
+              <Swords className="w-12 h-12 text-neo-white mx-auto mb-3" />
+              <div className="text-neo-white font-neo-body mb-1">
                 {t('student.profile.noDuelsYet')}
               </div>
-              <div className="text-neo-white/50 font-neo-body text-sm">
+              <div className="text-neo-white font-neo-body text-sm">
                 {t('student.profile.challengePrompt')}
               </div>
             </m.div>

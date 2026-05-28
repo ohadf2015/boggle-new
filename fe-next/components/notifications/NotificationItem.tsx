@@ -65,15 +65,15 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
         <h4
           className={`
             text-sm font-neo-display truncate
-            ${!notification.read ? 'text-neo-white font-bold' : 'text-neo-white/80'}
+            ${!notification.read ? 'text-neo-white font-bold' : 'text-neo-white'}
           `}
         >
           {notification.title}
         </h4>
-        <p className="text-xs text-neo-white/60 line-clamp-2 mt-0.5">
+        <p className="text-xs text-neo-white line-clamp-2 mt-0.5">
           {notification.body}
         </p>
-        <span className="text-xs text-neo-white/40 mt-1 block">
+        <span className="text-xs text-neo-white mt-1 block">
           {timeAgo}
         </span>
       </div>
@@ -85,7 +85,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
           absolute top-2 inset-e-2
           w-6 h-6 rounded-full
           flex items-center justify-center
-          text-neo-white/40 hover:text-neo-white hover:bg-neo-white/10
+          text-neo-white hover:text-neo-white hover:bg-neo-white/10
           transition-all duration-150
         "
         title={t('notifications.dismiss')}

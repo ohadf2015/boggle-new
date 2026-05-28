@@ -369,7 +369,7 @@ function FriendButton({
 
   if (state === 'pending') {
     return (
-      <div className={cn(base, 'bg-slate-700 text-slate-300 cursor-default')}>
+      <div className={cn(base, 'bg-neo-navy-elevated text-slate-300 cursor-default')}>
         <Clock className="w-4 h-4" />
         {t('profile.requestSent')}
       </div>

@@ -355,7 +355,7 @@ function AwardCard({
       {/* Text content */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-black uppercase tracking-wider text-neo-cream/60">
+          <span className="text-[10px] font-black uppercase tracking-wider text-neo-white">
             {t(def.labelKey)}
           </span>
         </div>

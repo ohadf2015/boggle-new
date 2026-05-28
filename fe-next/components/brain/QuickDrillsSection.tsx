@@ -128,7 +128,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
                   isUnlocked
                     ? 'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none'
                     : 'opacity-75 cursor-not-allowed',
-                  isDarkMode ? 'bg-slate-800' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                 )}
               >
                 {/* Header row with icon and title */}
@@ -155,7 +155,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
 
                     <p className={cn(
                       'text-[10px] md:text-sm uppercase',
-                      isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                     )}>
                       {t(`brain.domains.${drill.domain}`)}
                     </p>
@@ -167,7 +167,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
                   <div className="w-full mt-2 md:mt-3">
                     <div className={cn(
                       'h-1.5 md:h-2 rounded-full border border-neo-black overflow-hidden',
-                      isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                      isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200'
                     )}>
                       <m.div
                         className={cn('h-full', drill.bgColor)}
@@ -178,7 +178,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
                     </div>
                     <p className={cn(
                       'text-[10px] md:text-xs text-center mt-1 font-bold',
-                      isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                     )}>
                       {gamesPlayed}/{drill.unlockRequirement} {t('brain.drills.gamesToUnlock')}
                     </p>

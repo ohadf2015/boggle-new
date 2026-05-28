@@ -99,10 +99,10 @@ const VARIANT_STYLES: Record<CollapsibleVariant, { header: string; content: stri
   secondary: {
     header: 'bg-neo-cream text-neo-black border-neo-black',
     content: 'bg-neo-navy',
-    badge: 'bg-neo-purple text-neo-cream',
+    badge: 'bg-neo-purple text-neo-white',
   },
   tertiary: {
-    header: 'bg-neo-gray text-neo-cream border-neo-black/30',
+    header: 'bg-neo-gray text-neo-white border-neo-black/30',
     content: 'bg-neo-navy',
     badge: 'bg-muted-foreground text-white',
   },
@@ -117,9 +117,9 @@ const VARIANT_STYLES: Record<CollapsibleVariant, { header: string; content: stri
     badge: 'bg-neo-cyan/30 text-white',
   },
   subtle: {
-    header: 'border-neo-gray bg-neo-navy hover:bg-neo-gray text-neo-cream/70',
+    header: 'border-neo-gray bg-neo-navy hover:bg-neo-gray text-neo-white',
     content: '',
-    badge: 'bg-neo-gray text-neo-cream/70',
+    badge: 'bg-neo-gray text-neo-white',
   },
 };
 

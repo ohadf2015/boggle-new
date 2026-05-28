@@ -39,7 +39,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
         </h3>
       </div>
 
-      <p className="text-sm text-neo-white/70 mb-4">
+      <p className="text-sm text-neo-white mb-4">
         {t('streaks.wager.description')}
       </p>
 
@@ -59,7 +59,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
                 selectedAmount === amount && !disabled
                   ? 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
                   : disabled
-                  ? 'bg-neo-navy/50 text-neo-white/30 border-neo-white/10 cursor-not-allowed'
+                  ? 'bg-neo-navy/50 text-neo-white border-neo-white/10 cursor-not-allowed'
                   : 'bg-neo-navy text-neo-white border-neo-white/20 hover:border-neo-yellow/50'
               )}
             >
@@ -74,7 +74,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
         data-testid="potential-payout"
         className="text-center mb-4 p-3 rounded-neo bg-neo-black/30 border-2 border-neo-yellow/20"
       >
-        <span className="text-xs text-neo-white/60 uppercase tracking-wide">
+        <span className="text-xs text-neo-white uppercase tracking-wide">
           {t('streaks.wager.payout')}
         </span>
         <div className="text-2xl font-black text-neo-yellow">{potentialPayout}</div>

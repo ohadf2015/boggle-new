@@ -57,14 +57,14 @@ export const GameFeedback: React.FC<GameFeedbackProps> = (props) => {
       {phase === 'prompt' ? (
         <>
           <div className="flex items-center justify-between gap-2">
-            <span className="font-neo-body font-semibold text-neo-cream text-sm">
+            <span className="font-neo-body font-semibold text-neo-white text-sm">
               {t('gameFeedback.prompt')}
             </span>
             <button
               type="button"
               aria-label={t('gameFeedback.dismiss')}
               onClick={handleDismiss}
-              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-neo text-neo-cream/50 hover:text-neo-cream hover:bg-neo-white/10 transition-colors"
+              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-neo text-neo-white hover:text-neo-white hover:bg-neo-white/10 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>

@@ -177,7 +177,7 @@ export default function CognitiveDomainGrid({
                       </div>
                       <p className={cn(
                         'text-[11px] font-bold uppercase tracking-wide line-clamp-1 flex-1',
-                        isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                        isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
                       )}>
                         {t(`brain.domains.${domainKey}`)}
                       </p>
@@ -200,7 +200,7 @@ export default function CognitiveDomainGrid({
                       </span>
                       <span className={cn(
                         'text-[10px] font-bold',
-                        isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                        isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                       )}>
                         /100
                       </span>
@@ -209,7 +209,7 @@ export default function CognitiveDomainGrid({
                     {/* Mini Progress Bar */}
                     <div className={cn(
                       'h-1 mt-1.5 rounded-full border border-neo-black overflow-hidden',
-                      isDarkMode ? 'bg-slate-700' : 'bg-white'
+                      isDarkMode ? 'bg-neo-navy-elevated' : 'bg-white'
                     )}>
                       <m.div
                         className={cn('h-full', config.progressBar)}

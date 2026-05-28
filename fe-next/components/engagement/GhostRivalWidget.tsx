@@ -65,7 +65,7 @@ export const GhostRivalWidget: React.FC = memo(() => {
       <div className="flex items-center justify-between gap-3">
         {/* Player */}
         <div className="flex flex-col items-center gap-1 flex-1">
-          <span className="text-xs text-neo-white/60 uppercase tracking-wide">
+          <span className="text-xs text-neo-white uppercase tracking-wide">
             {t('ghostRival.you')}
           </span>
           <span
@@ -77,11 +77,11 @@ export const GhostRivalWidget: React.FC = memo(() => {
         </div>
 
         {/* VS divider */}
-        <span className="text-neo-white/40 font-bold text-xs">VS</span>
+        <span className="text-neo-white font-bold text-xs">VS</span>
 
         {/* Rival */}
         <div className="flex flex-col items-center gap-1 flex-1">
-          <span className="text-xs text-neo-white/60 truncate max-w-[100px]">
+          <span className="text-xs text-neo-white truncate max-w-[100px]">
             {rival.username}
           </span>
           <span
@@ -113,7 +113,7 @@ export const GhostRivalWidget: React.FC = memo(() => {
 
       {/* Footer: countdown + CTA */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 text-neo-white/50 text-xs">
+        <div className="flex items-center gap-1 text-neo-white text-xs">
           <Clock className="w-3.5 h-3.5" />
           <span>{countdown}</span>
         </div>

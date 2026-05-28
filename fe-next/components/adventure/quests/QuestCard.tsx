@@ -36,10 +36,10 @@ export const QuestCard = memo(function QuestCard({ quest, progress }: QuestCardP
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1">
-          <span className={cn('text-xs font-bold truncate', progress.isComplete ? 'text-neo-lime' : 'text-neo-white/80')}>
+          <span className={cn('text-xs font-bold truncate', progress.isComplete ? 'text-neo-lime' : 'text-neo-white')}>
             {t(quest.titleKey)}
           </span>
-          <span className="text-[10px] font-mono font-black text-neo-white/60 tabular-nums shrink-0">
+          <span className="text-[10px] font-mono font-black text-neo-white tabular-nums shrink-0">
             {progress.current}/{quest.target}
           </span>
         </div>

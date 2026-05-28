@@ -29,8 +29,8 @@ function WordCraftTerritoryStripImpl({ playerCount, botCount, labels }: WordCraf
       className="flex items-center justify-between gap-2 px-1 text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-wider"
     >
       <span className="inline-flex items-center gap-1.5">
-        <Crown className="w-3 h-3 text-neo-cream/50" aria-hidden />
-        <span className="text-neo-cream/60">{labels.territoryLabel}</span>
+        <Crown className="w-3 h-3 text-neo-white" aria-hidden />
+        <span className="text-neo-white">{labels.territoryLabel}</span>
       </span>
       <span className="inline-flex items-center gap-3">
         <span
@@ -49,7 +49,7 @@ function WordCraftTerritoryStripImpl({ playerCount, botCount, labels }: WordCraf
           <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-neo-pink" />
           <span className="tabular-nums">{botCount}</span>
         </span>
-        <span className="text-neo-cream/40 normal-case tracking-normal font-neo-body">
+        <span className="text-neo-white normal-case tracking-normal font-neo-body">
           {labels.endgameBonusHint}
         </span>
       </span>

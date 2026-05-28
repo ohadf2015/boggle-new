@@ -173,7 +173,7 @@ function WordCraftBoardImpl({
                   : pending
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
                     : isCenter
-                      ? 'bg-neo-pink text-neo-cream ring-1 ring-inset ring-neo-pink-light'
+                      ? 'bg-neo-pink text-neo-white ring-1 ring-inset ring-neo-pink-light'
                       : (cell.premium && PREMIUM_TINT[cell.premium]) || 'bg-neo-navy-light/80',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
@@ -244,7 +244,7 @@ function WordCraftBoardImpl({
                 // shadow keeps cream text legible on every tint tier.
                 <span
                   aria-hidden
-                  className="font-neo-display font-black leading-none select-none text-neo-cream/95 text-[clamp(6px,2.4cqi,11px)] drop-shadow-[1px_1px_0_rgba(0,0,0,0.9)]"
+                  className="font-neo-display font-black leading-none select-none text-neo-white text-[clamp(6px,2.4cqi,11px)] drop-shadow-[1px_1px_0_rgba(0,0,0,0.9)]"
                 >
                   {premiumLabels[cell.premium]}
                 </span>

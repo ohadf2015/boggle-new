@@ -22,10 +22,10 @@ export function PowerCardView({ card, onSelect, selected = false }: PowerCardVie
       <span className="text-xs font-neo-body uppercase tracking-wide opacity-70">
         {t(`wordcraft.run.rarity.${card.rarity}`)}
       </span>
-      <span className="text-lg font-neo-display text-neo-cream">
+      <span className="text-lg font-neo-display text-neo-white">
         {t(`wordcraft.run.card.${card.id}.name`)}
       </span>
-      <span className="text-sm font-neo-body text-neo-white/80">
+      <span className="text-sm font-neo-body text-neo-white">
         {t(`wordcraft.run.card.${card.id}.desc`)}
       </span>
     </>

@@ -156,7 +156,7 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
         aria-label={t('common.exit')}
         className={cn(
           'absolute top-2 start-2 z-20 p-2 rounded-neo',
-          'bg-neo-white/8 text-neo-white/70 hover:bg-neo-red/20 hover:text-neo-red',
+          'bg-neo-white/8 text-neo-white hover:bg-neo-red/20 hover:text-neo-red',
           'transition-colors duration-200'
         )}
       >
@@ -192,7 +192,7 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
             onClick={() => setPaused(false)}
           >
             <div className="text-neo-white font-neo-display text-3xl">{t('common.pause')}</div>
-            <div className="text-neo-white/70 text-sm">{t('common.toResume')}</div>
+            <div className="text-neo-white text-sm">{t('common.toResume')}</div>
           </div>
         )}
       </div>

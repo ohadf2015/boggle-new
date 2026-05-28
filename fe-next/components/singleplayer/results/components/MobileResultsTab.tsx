@@ -80,7 +80,7 @@ export function MobileResultsTab({
       {/* Top back button - visible immediately without scrolling */}
       <button
         onClick={onBackToLobby}
-        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white/80 hover:text-white border border-white/30 hover:border-white/50 rounded-neo transition-colors"
+        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white hover:text-white border border-white/30 hover:border-white/50 rounded-neo transition-colors"
       >
         <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
         {t('nextStep.backToLobby')}
@@ -130,7 +130,7 @@ export function MobileResultsTab({
 
       {/* Global rank - text only */}
       {globalRank && (
-        <div className="text-center text-sm text-white/60">
+        <div className="text-center text-sm text-white">
           <span className="font-bold">#{globalRank}</span> {t('leaderboard.globalRank')}
         </div>
       )}

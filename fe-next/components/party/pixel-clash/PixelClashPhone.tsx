@@ -233,7 +233,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
   // Timer display - inline to avoid component-during-render lint error
   const timerBadge = (
-    <span className={`font-neo-display text-lg ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+    <span className={`font-neo-display text-lg ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
       {timeRemaining}s
     </span>
   );
@@ -243,7 +243,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col p-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-neo-cream/50 font-neo-body text-xs uppercase">
+          <span className="text-neo-white font-neo-body text-xs uppercase">
             {t('party.writePrompt')}
           </span>
           {timerBadge}
@@ -257,8 +257,8 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
           autoFocus
           className="
             bg-neo-navy-elevated border-3 border-neo-cyan/50 rounded-neo
-            px-4 py-3 text-neo-cream font-neo-body text-lg
-            placeholder:text-neo-cream/20
+            px-4 py-3 text-neo-white font-neo-body text-lg
+            placeholder:text-neo-white
             focus:outline-hidden focus:border-neo-cyan mb-4
           "
         />
@@ -303,7 +303,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         {/* Drawing reference for telephone: show the text prompt */}
         {assignment?.phase === 'drawing' && typeof assignment.content === 'string' && (
           <div className="bg-neo-navy-elevated border-2 border-neo-cyan/30 rounded-neo px-3 py-2 mb-2 w-full">
-            <p className="font-neo-body text-neo-cream text-sm text-center">
+            <p className="font-neo-body text-neo-white text-sm text-center">
               {t('party.draw')}: &ldquo;{assignment.content}&rdquo;
             </p>
           </div>
@@ -338,7 +338,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center p-4">
         <div className="flex items-center justify-between w-full mb-3">
-          <span className="text-neo-cream/50 font-neo-body text-xs uppercase">
+          <span className="text-neo-white font-neo-body text-xs uppercase">
             {t('party.whatIsThis')}
           </span>
           {timerBadge}
@@ -364,8 +364,8 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
           autoFocus
           className="
             w-full bg-neo-navy-elevated border-3 border-neo-cyan/50 rounded-neo
-            px-4 py-3 text-neo-cream font-neo-body text-lg
-            placeholder:text-neo-cream/20
+            px-4 py-3 text-neo-white font-neo-body text-lg
+            placeholder:text-neo-white
             focus:outline-hidden focus:border-neo-cyan mb-3
           "
         />
@@ -397,7 +397,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
           {timerBadge}
         </div>
 
-        <p className="text-neo-cream/50 font-neo-body text-xs mb-3">
+        <p className="text-neo-white font-neo-body text-xs mb-3">
           &ldquo;{showdownCanvases.prompt}&rdquo;
         </p>
 
@@ -429,7 +429,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
                   initialPaths={entry.strokes}
                   readOnly
                 />
-                <span className="text-neo-cream/40 text-xs font-neo-body mt-1 block">#{entry.number}</span>
+                <span className="text-neo-white text-xs font-neo-body mt-1 block">#{entry.number}</span>
                 {isBest && <span className="text-neo-lime text-xs font-bold">Best</span>}
                 {isFunniest && <span className="text-neo-pink text-xs font-bold">Funniest</span>}
               </button>
@@ -472,7 +472,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   // Default waiting
   return (
     <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-      <div className="animate-pulse text-neo-cream/50 font-neo-display">
+      <div className="animate-pulse text-neo-white font-neo-display">
         {t('party.starting')}
       </div>
     </div>

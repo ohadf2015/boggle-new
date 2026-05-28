@@ -39,12 +39,12 @@ function SettingRow({ icon, label, description, children, isDarkMode }: SettingR
   return (
     <div className={cn(
       'flex items-center justify-between p-4 rounded-neo border-3 border-neo-black',
-      isDarkMode ? 'bg-slate-800' : 'bg-white'
+      isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
     )}>
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <div className={cn(
           'w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center border-2 border-neo-black',
-          isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+          isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream'
         )}>
           {icon}
         </div>
@@ -121,7 +121,7 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode, labe
           'w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center border-2 border-neo-black transition-colors',
           isMuted
             ? 'bg-neo-red text-white'
-            : isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-neo-cream text-neo-black'
+            : isDarkMode ? 'bg-neo-navy-elevated text-gray-300' : 'bg-neo-cream text-neo-black'
         )}
       >
         {isMuted ? <VolumeX className="w-5 h-5" aria-hidden="true" /> : <Volume2 className="w-5 h-5" aria-hidden="true" />}
@@ -199,7 +199,7 @@ export default function SettingsPageClient(): React.JSX.Element {
             onClick={() => router.push(`/${language}`)}
             className={cn(
               'rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700 hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -251,7 +251,7 @@ export default function SettingsPageClient(): React.JSX.Element {
                   onChange={(e) => setLanguage(e.target.value as 'en' | 'he' | 'sv' | 'ja' | 'es')}
                   className={cn(
                     'px-3 py-2 rounded-neo border-3 border-neo-black font-bold',
-                    isDarkMode ? 'bg-slate-700 text-white' : 'bg-neo-cream text-neo-black'
+                    isDarkMode ? 'bg-neo-navy-elevated text-white' : 'bg-neo-cream text-neo-black'
                   )}
                 >
                   {LANGUAGES.map((lang) => (
@@ -446,7 +446,7 @@ export default function SettingsPageClient(): React.JSX.Element {
               href={`/${language}/contact`}
               className={cn(
                 'flex items-center justify-between p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.01]',
-                isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-white hover:bg-neo-cream shadow-hard'
+                isDarkMode ? 'bg-neo-navy-light hover:bg-neo-navy-elevated' : 'bg-white hover:bg-neo-cream shadow-hard'
               )}
             >
               <div className="flex items-center gap-3">

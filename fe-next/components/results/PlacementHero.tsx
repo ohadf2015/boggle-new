@@ -69,7 +69,7 @@ const RANK_THEMES: Record<number, RankTheme> = {
   },
   3: {
     bgClass: 'bg-amber-600',
-    textClass: 'text-neo-cream',
+    textClass: 'text-neo-white',
     accentColor: '#CD7F32',
     scoreTextColor: 'text-neo-black',
     badgeBg: 'bg-amber-100',
@@ -79,9 +79,9 @@ const RANK_THEMES: Record<number, RankTheme> = {
   },
   0: {
     bgClass: 'bg-neo-navy',
-    textClass: 'text-neo-cream',
+    textClass: 'text-neo-white',
     accentColor: '#FF1493',
-    scoreTextColor: 'text-neo-cream',
+    scoreTextColor: 'text-neo-white',
     badgeBg: 'bg-neo-pink',
     badgeText: 'text-white',
     icon: TrendingUp,
@@ -172,7 +172,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Avatar with rank badge */}
             <div className="relative shrink-0">
-              <div className={`border-3 border-neo-black rounded-full shadow-hard ${isPodium ? 'bg-neo-cream' : 'bg-slate-800'} p-0.5`}>
+              <div className={`border-3 border-neo-black rounded-full shadow-hard ${isPodium ? 'bg-neo-cream' : 'bg-neo-navy-light'} p-0.5`}>
                 <Avatar
                   customAvatar={avatar?.customAvatar}
                   userId={username}
@@ -188,7 +188,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
 
             {/* Name + message */}
             <div className="flex-1 min-w-0">
-              <span className={`inline-block ${rank === 1 ? 'bg-neo-pink text-neo-cream' : isPodium ? 'bg-neo-black/80 text-neo-cream' : 'bg-neo-pink/20 text-neo-pink'} text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 border-2 border-neo-black rounded-neo shadow-hard-sm tracking-wider mb-1`}>
+              <span className={`inline-block ${rank === 1 ? 'bg-neo-pink text-neo-white' : isPodium ? 'bg-neo-black/80 text-neo-white' : 'bg-neo-pink/20 text-neo-pink'} text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 border-2 border-neo-black rounded-neo shadow-hard-sm tracking-wider mb-1`}>
                 {formatRankOrdinal(rank, t)} — {t(theme.messageKey)}
               </span>
               {username && (

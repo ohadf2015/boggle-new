@@ -202,7 +202,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
       : type === 'rejected' ? 'bg-neo-red'
       : type === 'duplicate' || type === 'foundByOther' ? 'bg-neo-pink'
       : 'bg-neo-cyan';
-    return { bgColor: bg, textColor: type === 'rejected' ? 'text-neo-cream' : 'text-neo-black' };
+    return { bgColor: bg, textColor: type === 'rejected' ? 'text-neo-white' : 'text-neo-black' };
   }, [showFeedback, visibleFeedback?.type]);
 
   // Sparkle positions for accepted state

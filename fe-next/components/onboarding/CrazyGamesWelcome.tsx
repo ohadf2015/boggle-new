@@ -194,7 +194,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.05, ease: DECEL }}
-            className="font-neo-display uppercase leading-[0.85] tracking-tight text-neo-cream"
+            className="font-neo-display uppercase leading-[0.85] tracking-tight text-neo-white"
             style={{ fontSize: 'clamp(2.75rem, 8cqw, 5rem)' }}
           >
             {t('onboarding.crazygames.title')}{' '}
@@ -211,7 +211,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.45, delay: 0.15 }}
-            className="font-neo-body text-base sm:text-lg text-neo-cream/85 max-w-[44ch] leading-relaxed"
+            className="font-neo-body text-base sm:text-lg text-neo-white max-w-[44ch] leading-relaxed"
           >
             {t('onboarding.crazygames.howTo')}
           </m.p>
@@ -235,7 +235,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
             {remaining > 0 && (
               <p
                 data-testid="crazygames-welcome-autostart"
-                className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-cream/60 text-center"
+                className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-white text-center"
                 aria-live="polite"
               >
                 {t('onboarding.crazygames.autoStart', { n: remaining })}
@@ -246,7 +246,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
               <button
                 data-testid="crazygames-welcome-cta-practice"
                 onClick={() => handlePlay('practice')}
-                className="py-3 px-4 rounded-neo border-neo border-black bg-neo-navy-light text-neo-cream font-neo-display text-sm uppercase tracking-tight shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100 flex items-center justify-center gap-1.5 hover:bg-neo-cyan hover:text-black"
+                className="py-3 px-4 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white font-neo-display text-sm uppercase tracking-tight shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100 flex items-center justify-center gap-1.5 hover:bg-neo-cyan hover:text-black"
               >
                 <Gamepad2 className="w-4 h-4" aria-hidden />
                 {t('onboarding.crazygames.playPractice')}
@@ -254,7 +254,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
               <button
                 data-testid="crazygames-welcome-cta-multiplayer"
                 onClick={() => handlePlay('multiplayer')}
-                className="py-3 px-4 rounded-neo border-neo border-black bg-neo-navy-light text-neo-cream font-neo-display text-sm uppercase tracking-tight shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100 flex items-center justify-center gap-1.5 hover:bg-neo-pink hover:text-black"
+                className="py-3 px-4 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white font-neo-display text-sm uppercase tracking-tight shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100 flex items-center justify-center gap-1.5 hover:bg-neo-pink hover:text-black"
               >
                 <Users className="w-4 h-4" aria-hidden />
                 {t('onboarding.crazygames.playMultiplayer')}
@@ -282,7 +282,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
               <m.span
                 animate={{ x: isRTL ? [0, -4, 0] : [0, 4, 0] }}
                 transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-                className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-cream/70"
+                className="font-neo-display text-[11px] uppercase tracking-[0.15em] text-neo-white"
                 aria-hidden
               >
                 {isRTL

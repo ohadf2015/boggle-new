@@ -76,7 +76,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.profile.title')}
         </h2>
-        <p className="text-xs sm:text-sm text-neo-white/70">
+        <p className="text-xs sm:text-sm text-neo-white">
           {t('onboarding.profile.subtitle')}
         </p>
       </m.div>

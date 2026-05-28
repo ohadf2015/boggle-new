@@ -141,7 +141,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
           </div>
 
           {/* Name input — full width, prominent */}
-          <div className="bg-neo-cream dark:bg-slate-700 border-3 border-neo-black dark:border-slate-600 rounded-neo p-3 shadow-hard-sm">
+          <div className="bg-neo-cream dark:bg-neo-navy-elevated border-3 border-neo-black dark:border-slate-600 rounded-neo p-3 shadow-hard-sm">
             <label className="block text-xs font-black text-neo-black/70 dark:text-gray-300 uppercase tracking-wide mb-1.5">
               {t('validation.usernameRequired')}
             </label>

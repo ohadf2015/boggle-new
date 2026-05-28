@@ -57,7 +57,7 @@ export function BulkActionsBar({
   };
 
   return (
-    <div className="sticky bottom-0 bg-gray-900 border-t-2 border-gray-700 p-4 -mx-4 -mb-4 mt-4">
+    <div className="sticky bottom-0 bg-neo-navy border-t-2 border-gray-700 p-4 -mx-4 -mb-4 mt-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           {selectedCount > 0 && (

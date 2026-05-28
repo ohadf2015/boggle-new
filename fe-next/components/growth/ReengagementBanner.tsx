@@ -87,7 +87,7 @@ export const ReengagementBanner: React.FC<ReengagementBannerProps> = memo(
           onClick={handleDismiss}
           className={cn(
             'absolute top-2 inset-e-2 p-1 rounded-neo',
-            'text-neo-white/40 hover:text-neo-white/80',
+            'text-neo-white hover:text-neo-white',
             'hover:bg-neo-white/10 transition-colors'
           )}
           aria-label={t('reengagement.dismiss')}
@@ -105,7 +105,7 @@ export const ReengagementBanner: React.FC<ReengagementBannerProps> = memo(
         </div>
 
         {/* Personalized message */}
-        <p className="text-sm text-neo-white/70">
+        <p className="text-sm text-neo-white">
           {t('reengagement.bonusMessage', { days: String(daysAway) })}
         </p>
 

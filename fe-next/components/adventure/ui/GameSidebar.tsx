@@ -173,7 +173,7 @@ export const GameSidebar = memo(function GameSidebar({
       {showTargetWordUI && huntTargetLength === 0 && (
         <div className="px-3 py-2 border-b border-neo-white/10 flex items-center gap-2">
           <div className="w-3.5 h-3.5 border-2 border-neo-cyan/40 border-t-neo-cyan rounded-full animate-spin" />
-          <span className="text-xs text-neo-white/40 font-mono">{t('adventure.mode.huntLoadingTarget')}</span>
+          <span className="text-xs text-neo-white font-mono">{t('adventure.mode.huntLoadingTarget')}</span>
         </div>
       )}
 
@@ -201,7 +201,7 @@ export const GameSidebar = memo(function GameSidebar({
             'bg-neo-black/30 border-neo-white/8'
           )}>
             {[0, 1, 2].map(i => (
-              <Star key={`star-mobile-${i}`} className={cn('w-3.5 h-3.5 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/20')} />
+              <Star key={`star-mobile-${i}`} className={cn('w-3.5 h-3.5 transition-all duration-300', i < currentStars ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white')} />
             ))}
           </div>
 
@@ -248,7 +248,7 @@ export const GameSidebar = memo(function GameSidebar({
                 <span
                   className={cn(
                     'text-[10px] font-mono font-bold tabular-nums leading-tight',
-                    obj.isComplete ? 'text-neo-lime' : 'text-neo-white/70'
+                    obj.isComplete ? 'text-neo-lime' : 'text-neo-white'
                   )}
                 >
                   {current}/{obj.target}
@@ -277,7 +277,7 @@ export const GameSidebar = memo(function GameSidebar({
                   : showAutoHint
                     ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_12px_2px_rgba(255,225,53,0.6)] animate-pulse motion-reduce:animate-none'
                     : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard-sm'
-                : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
+                : 'bg-neo-black/30 text-neo-white border-neo-white/10 cursor-not-allowed'
             )}
           >
             <Lightbulb className="w-4 h-4" />
@@ -303,7 +303,7 @@ export const GameSidebar = memo(function GameSidebar({
                   ? isFrozen
                     ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm animate-pulse motion-reduce:animate-none'
                     : 'bg-neo-cyan/80 text-neo-black border-neo-black shadow-hard-sm'
-                  : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
+                  : 'bg-neo-black/30 text-neo-white border-neo-white/10 cursor-not-allowed'
               )}
             >
               <Timer className="w-4 h-4" />
@@ -375,7 +375,7 @@ export const GameSidebar = memo(function GameSidebar({
               'transition-all duration-300',
               i < currentStars
                 ? 'w-6 h-6 text-neo-yellow fill-neo-yellow'
-                : 'w-5 h-5 text-neo-white/15 scale-90'
+                : 'w-5 h-5 text-neo-white scale-90'
             )}
             style={i < currentStars ? { filter: 'drop-shadow(0 0 4px rgba(255,225,53,0.4))' } : undefined}
             />
@@ -405,10 +405,10 @@ export const GameSidebar = memo(function GameSidebar({
             )}>
               <Target className={cn('w-3 h-3', allComplete ? 'text-neo-lime' : 'text-neo-yellow/80')} />
             </div>
-            <h2 className="text-[11px] font-black text-neo-white/60 uppercase tracking-wider">
+            <h2 className="text-[11px] font-black text-neo-white uppercase tracking-wider">
               {t('adventure.game.objectives')}
             </h2>
-            <span className="ms-auto text-[10px] font-mono font-bold text-neo-white/30 tabular-nums">
+            <span className="ms-auto text-[10px] font-mono font-bold text-neo-white tabular-nums">
               {completedCount}/{totalCount}
             </span>
           </div>
@@ -441,7 +441,7 @@ export const GameSidebar = memo(function GameSidebar({
                 ? showAutoHint
                   ? 'bg-neo-yellow text-neo-black border-neo-black shadow-[0_0_16px_3px_rgba(255,225,53,0.5)] animate-pulse motion-reduce:animate-none'
                   : 'bg-neo-yellow text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg'
-                : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
+                : 'bg-neo-black/30 text-neo-white border-neo-white/10 cursor-not-allowed'
             )}
           >
             <Lightbulb className="w-4 h-4" />
@@ -465,7 +465,7 @@ export const GameSidebar = memo(function GameSidebar({
                   ? isFrozen
                     ? 'bg-neo-cyan text-neo-black border-neo-black animate-pulse motion-reduce:animate-none'
                     : 'bg-neo-cyan/80 text-neo-black border-neo-black hover:shadow-hard-lg'
-                  : 'bg-neo-black/30 text-neo-white/60 border-neo-white/10 cursor-not-allowed'
+                  : 'bg-neo-black/30 text-neo-white border-neo-white/10 cursor-not-allowed'
               )}
             >
               <Timer className="w-4 h-4" />

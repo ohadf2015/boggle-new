@@ -117,7 +117,7 @@ function BoardCardCompact({ board, personalBest, onPlay, className }: Omit<Board
               {row.map((cell, ci) => (
                 <div
                   key={ci}
-                  className="w-5 h-5 flex items-center justify-center bg-neo-navy-light border border-neo-white/15 rounded-sm font-neo-display font-bold text-[7px] text-neo-white/80 uppercase"
+                  className="w-5 h-5 flex items-center justify-center bg-neo-navy-light border border-neo-white/15 rounded-sm font-neo-display font-bold text-[7px] text-neo-white uppercase"
                 >
                   {cell}
                 </div>
@@ -143,7 +143,7 @@ function BoardCardCompact({ board, personalBest, onPlay, className }: Omit<Board
           <span className={cn('text-[10px] font-bold px-1.5 py-px rounded border border-black text-white', diff.bg)}>
             {t(diff.key)}
           </span>
-          <span className="flex items-center gap-0.5 text-neo-white/50 text-[10px]">
+          <span className="flex items-center gap-0.5 text-neo-white text-[10px]">
             <Users size={9} /> {board.play_count}
           </span>
           {avgRating && (
@@ -213,7 +213,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
           customAvatar={(board.creator_avatar as CustomAvatarConfig | null) ?? null}
           size="sm"
         />
-        <span className="text-neo-white/60 text-xs font-neo-body truncate">
+        <span className="text-neo-white text-xs font-neo-body truncate">
           {board.creator_display_name}
         </span>
       </div>
@@ -248,7 +248,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
         )}>
           {t(diff.key)}
         </span>
-        <span className="flex items-center gap-1 text-neo-white/50 text-xs">
+        <span className="flex items-center gap-1 text-neo-white text-xs">
           <Users size={11} /> {board.play_count}
         </span>
         {avgRating !== null && (

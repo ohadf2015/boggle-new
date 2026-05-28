@@ -88,9 +88,9 @@ export function LexiScoreBadge({ variant = 'compact', className }: LexiScoreBadg
         {breakdownItems.map(({ label, value }) => (
           <div
             key={label}
-            className="bg-neo-navy/40 rounded-neo px-2 py-1 text-xs text-neo-cream/70"
+            className="bg-neo-navy/40 rounded-neo px-2 py-1 text-xs text-neo-white"
           >
-            <span className="font-bold text-neo-cream/90">+{value}</span>{' '}
+            <span className="font-bold text-neo-white">+{value}</span>{' '}
             <span className="opacity-60">{label}</span>
           </div>
         ))}

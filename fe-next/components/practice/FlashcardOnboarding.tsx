@@ -107,7 +107,7 @@ export const FlashcardOnboarding = memo<FlashcardOnboardingProps>(({
               </h2>
 
               {/* Explanation */}
-              <p className="text-neo-white/70 font-neo-body mb-6">
+              <p className="text-neo-white font-neo-body mb-6">
                 {t('education.practice.swipeExplain') ||
                   "Swipe right for 'Got It', left for 'Don't Know'"}
               </p>

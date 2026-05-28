@@ -141,7 +141,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
         )}
 
         {/* Compact Header — Puzzle # and Streak */}
-        <div className="flex items-center justify-between px-4 py-2 bg-slate-900/50 border-b border-slate-700/50 relative z-10">
+        <div className="flex items-center justify-between px-4 py-2 bg-neo-navy/50 border-b border-slate-700/50 relative z-10">
           <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">
             {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))}
           </span>
@@ -243,7 +243,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: 0.5 + i * 0.04 }}
-                          className="inline-flex items-center justify-center w-8 h-10 bg-slate-800 rounded-neo border-2 border-slate-600 text-slate-500 font-black text-lg"
+                          className="inline-flex items-center justify-center w-8 h-10 bg-neo-navy-light rounded-neo border-2 border-slate-600 text-slate-500 font-black text-lg"
                         >
                           ?
                         </m.span>
@@ -277,7 +277,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                       e.stopPropagation();
                       setWordHidden(!wordHidden);
                     }}
-                    className="p-1.5 rounded-lg hover:bg-slate-800 transition-colors text-slate-400 hover:text-slate-200 select-none"
+                    className="p-1.5 rounded-lg hover:bg-neo-navy-light transition-colors text-slate-400 hover:text-slate-200 select-none"
                     aria-label={wordHidden ? 'Show word' : 'Hide word'}
                   >
                     {wordHidden ? (
@@ -324,7 +324,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.0, type: 'spring', stiffness: 300, damping: 26 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-neo-navy-light/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
               >
                 <Clock className="w-4 h-4 text-neo-cyan" />
                 <div>
@@ -424,7 +424,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8, type: 'spring', stiffness: 300, damping: 26 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-neo-navy-light/80 rounded-neo border-2 border-neo-black shadow-hard-sm"
               >
                 <Clock className="w-4 h-4 text-neo-cyan" />
                 <div>

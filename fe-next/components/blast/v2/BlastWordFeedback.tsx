@@ -61,7 +61,7 @@ export function BlastWordFeedback({
         className="pointer-events-none absolute left-1/2 top-2 z-30 -translate-x-1/2"
       >
         <span
-          className="inline-flex items-center gap-1.5 rounded-neo border-neo px-3 py-1.5 font-neo-body text-sm font-bold text-neo-cream"
+          className="inline-flex items-center gap-1.5 rounded-neo border-neo px-3 py-1.5 font-neo-body text-sm font-bold text-neo-white"
           style={{ borderColor: modeColor, background: '#16213e' }}
         >
           <span
@@ -97,7 +97,7 @@ export function BlastWordFeedback({
               {bonusWord}
             </div>
           </div>
-          <div className="mt-1 font-neo-body text-[0.7rem] font-semibold text-neo-cream/90">
+          <div className="mt-1 font-neo-body text-[0.7rem] font-semibold text-neo-white">
             {t('blast.feedback.bonusHint', 'Not on the list — still counts!')}
           </div>
         </m.div>

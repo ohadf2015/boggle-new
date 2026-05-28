@@ -94,7 +94,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
       <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mt-3 p-4 rounded-neo border-2 border-neo-black bg-slate-100 dark:bg-slate-700"
+        className="mt-3 p-4 rounded-neo border-2 border-neo-black bg-slate-100 dark:bg-neo-navy-elevated"
       >
         {/* Crying mascot — Lexi commiserates with the player */}
         <div className="flex justify-center mb-3">
@@ -194,7 +194,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
             >
               <div className="flex items-start gap-2">
                 <div className="w-6 h-6 rounded-md bg-neo-purple text-white border-2 border-neo-black flex items-center justify-center shrink-0">
-                  <Brain className="w-3.5 h-3.5 text-neo-cream" />
+                  <Brain className="w-3.5 h-3.5 text-neo-white" />
                 </div>
                 <p className="text-xs font-bold text-neo-black leading-relaxed">
                   {encouragement.tip}

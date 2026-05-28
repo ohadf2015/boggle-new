@@ -151,7 +151,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           'rounded-2xl p-6 mb-6',
-          isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+          isDarkMode ? 'bg-neo-navy-light/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
         )}
       >
         <div className="flex items-center justify-center py-4">
@@ -167,7 +167,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'rounded-2xl p-6 mb-6',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        isDarkMode ? 'bg-neo-navy-light/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
       )}
     >
       <h2 className={cn(
@@ -191,7 +191,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
       {/* Daily Challenge Email Toggle */}
       <div className={cn(
         'flex items-center justify-between p-4 rounded-xl mb-4',
-        isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+        isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
       )}>
         <div className="flex items-center gap-3">
           {dailyEmailSubscribed ? (
@@ -251,7 +251,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
       {dailyEmailSubscribed && (
         <div className={cn(
           'p-4 rounded-xl',
-          isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+          isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
         )}>
           <div className="flex items-center gap-3 mb-3">
             <Globe className="w-5 h-5 text-neo-orange" />
@@ -279,7 +279,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
             className={cn(
               'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
               isDarkMode
-                ? 'bg-slate-800 border-slate-600 text-white'
+                ? 'bg-neo-navy-light border-slate-600 text-white'
                 : 'bg-white border-gray-300 text-gray-900',
               isSaving && 'opacity-50 cursor-not-allowed'
             )}

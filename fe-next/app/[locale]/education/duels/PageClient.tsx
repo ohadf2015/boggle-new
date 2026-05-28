@@ -56,8 +56,8 @@ function DuelsPageClientInner() {
   if (!classroom) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-neo-navy min-h-dvh p-8">
-        <Swords className="w-16 h-16 text-neo-white/30 mb-4" />
-        <p className="text-neo-white/70 font-neo-body text-lg text-center">
+        <Swords className="w-16 h-16 text-neo-white mb-4" />
+        <p className="text-neo-white font-neo-body text-lg text-center">
           {t('education.duels.joinClassroomToDuel')}
         </p>
       </div>
@@ -91,7 +91,7 @@ function DuelsPageClientInner() {
                 'flex items-center gap-2 px-6 py-3 font-bold transition-all',
                 activeTab === tab.id
                   ? 'text-neo-lime border-b-4 border-neo-lime -mb-[2px]'
-                  : 'text-neo-white/50 hover:text-neo-white/80'
+                  : 'text-neo-white hover:text-neo-white'
               )}
             >
               <Icon className="w-5 h-5" />

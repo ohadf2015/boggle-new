@@ -186,7 +186,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
               <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
                 {t('wordWheel.results.completeDailyTitle', "Finish today's challenge")}
               </span>
-              <p className="text-neo-cream/80 text-xs mt-0.5">
+              <p className="text-neo-white text-xs mt-0.5">
                 {t('wordWheel.results.completeDailyDesc', 'Play Word Wheel to complete your Daily Challenge')}
               </p>
             </div>
@@ -335,7 +335,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       <div className="space-y-3">
         {/* Reveal target word */}
         {coinActions.targetWordRevealed ? (
-          <div className="py-3 px-4 bg-slate-800/50 rounded-neo border-2 border-slate-700/50 text-center">
+          <div className="py-3 px-4 bg-neo-navy-light/50 rounded-neo border-2 border-slate-700/50 text-center">
             <div className="text-xs text-slate-400 mb-1">{t('wordHunt.results.theTargetWordWas')}</div>
             <div className="text-2xl font-black text-neo-lime tracking-wider">
               {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
@@ -370,9 +370,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         {!coinActions.canAffordRetry && (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs text-slate-500">
-              <div className="flex-1 h-px bg-slate-700" />
+              <div className="flex-1 h-px bg-neo-navy-elevated" />
               <span>{t('wordHunt.ad.needMoreCoins')}</span>
-              <div className="flex-1 h-px bg-slate-700" />
+              <div className="flex-1 h-px bg-neo-navy-elevated" />
             </div>
             <WatchAdButton onCoinsEarned={() => {}} t={t} surface="word_hunt_results" />
           </div>
@@ -380,7 +380,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </div>
     )}
 
-    {(result.wordsDiscovered?.length ?? 0) > 0 && <p className="text-xs text-neo-cream/60 text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
+    {(result.wordsDiscovered?.length ?? 0) > 0 && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
 
     {/* Leaderboard — in place of the removed emoji share section */}
     <TabbedDailyLeaderboard
@@ -484,7 +484,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
               <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
                 {t('connections.landing.crossPromoTitle', language === 'he' ? 'נסה ראש זנב' : 'Try Word Bridge')}
               </span>
-              <p className="text-neo-cream/90 text-xs mt-0.5">
+              <p className="text-neo-white text-xs mt-0.5">
                 {t('connections.landing.crossPromoBody', language === 'he' ? 'שתי מילים, גשר אחד. חינם.' : 'Two words. One bridge. Free.')}
               </p>
             </div>

@@ -18,14 +18,14 @@ export function RunHUD({ round, target, score, runTotal, activeCards, tilesRemai
   const { t } = useLanguage();
   return (
     <div className="flex flex-col gap-2 rounded-neo border-neo bg-neo-navy-light p-3 shadow-hard">
-      <div className="flex items-center justify-between font-neo-display text-neo-cream">
+      <div className="flex items-center justify-between font-neo-display text-neo-white">
         <span>{t('wordcraft.run.round', { n: round, total: ROUND_COUNT })}</span>
         <span className="text-sm">{t('wordcraft.run.runTotal')}: {runTotal}</span>
       </div>
       <div data-wc-run-score>
         <RunProgressMeter score={score} target={target} t={t} />
       </div>
-      <div className="flex items-center justify-end text-sm font-neo-body text-neo-white/80">
+      <div className="flex items-center justify-end text-sm font-neo-body text-neo-white">
         <span>{t('wordcraft.tilesLeft')}: {tilesRemaining}</span>
       </div>
       {activeCards.length > 0 && (

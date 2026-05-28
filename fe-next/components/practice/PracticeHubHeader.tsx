@@ -21,7 +21,7 @@ export default function PracticeHubHeader({ completedCount, totalCount }: Practi
       className="relative mb-6"
     >
       <div className="text-center mb-4">
-        <h1 className="text-3xl sm:text-4xl font-neo-display font-black text-neo-cream">
+        <h1 className="text-3xl sm:text-4xl font-neo-display font-black text-neo-white">
           {t('practice.hub.title')}
         </h1>
       </div>
@@ -29,7 +29,7 @@ export default function PracticeHubHeader({ completedCount, totalCount }: Practi
       {/* Progress bar */}
       <div className="mb-3">
         <div className="flex items-center justify-between gap-2 mb-2">
-          <span className="text-xs font-neo-display font-bold text-neo-cream/70 uppercase tracking-wider">
+          <span className="text-xs font-neo-display font-bold text-neo-white uppercase tracking-wider">
             {t('practice.hub.progress', { count: completedCount, total: totalCount })}
           </span>
         </div>

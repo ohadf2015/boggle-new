@@ -111,7 +111,7 @@ export function WorldOrbitingLetters({
           duration={8 + i * 3}
           delay={i * 2.5}
           clockwise={i % 2 === 0}
-          color={COLOR_CLASSES[colorPrimary] || 'text-neo-white/60'}
+          color={COLOR_CLASSES[colorPrimary] || 'text-neo-white'}
         />
       ))}
     </>

@@ -74,7 +74,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
       <div className="flex items-center justify-between px-4 py-3 border-b border-neo-cream/15 bg-neo-black/20 shrink-0">
         <div className="flex items-center gap-2">
           <List className="w-4 h-4 text-neo-cyan" />
-          <span className="font-bold text-neo-cream text-sm uppercase tracking-wide">
+          <span className="font-bold text-neo-white text-sm uppercase tracking-wide">
             {t('singlePlayer.wordsFound')}
           </span>
         </div>
@@ -103,7 +103,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
         {hiddenCount > 0 && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="w-full flex items-center justify-center gap-1 py-2 text-xs text-neo-cream/50 hover:text-neo-cream/80 transition-colors"
+            className="w-full flex items-center justify-center gap-1 py-2 text-xs text-neo-white hover:text-neo-white transition-colors"
           >
             {isExpanded ? (
               <>
@@ -121,7 +121,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
 
         {/* Empty State */}
         {displayWords.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8 text-neo-cream/70">
+          <div className="flex flex-col items-center justify-center py-8 text-neo-white">
             <List className="w-8 h-8 mb-2 opacity-50" />
             <span className="text-sm">{t('singlePlayer.noWordsYet')}</span>
           </div>
@@ -134,7 +134,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
           {/* Best Word */}
           {longestWord && (
             <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1 text-neo-cream/60">
+              <div className="flex items-center gap-1 text-neo-white">
                 <Trophy className="w-3 h-3 text-neo-lime" />
                 <span>{t('singlePlayer.bestWord')}</span>
               </div>
@@ -147,7 +147,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
           {/* Bonus Points */}
           {totalBonusPoints > 0 && (
             <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1 text-neo-cream/60">
+              <div className="flex items-center gap-1 text-neo-white">
                 <Zap className="w-3 h-3 text-neo-pink" />
                 <span>{t('singlePlayer.bonusPoints')}</span>
               </div>
@@ -185,7 +185,7 @@ const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
     ? 'text-neo-pink'
     : word.word.length >= 5
       ? 'text-neo-cyan'
-      : 'text-neo-cream';
+      : 'text-neo-white';
 
   return (
     <m.div
@@ -228,7 +228,7 @@ const WordItem: React.FC<WordItemProps> = ({ word, isNew, t }) => {
 
       {/* Score */}
       <div className="flex items-center gap-1 shrink-0 tabular-nums">
-        <span className="font-black text-neo-cream tracking-normal">
+        <span className="font-black text-neo-white tracking-normal">
           {totalScore}
         </span>
         {(hasComboBonus || hasFireBonus) && (
@@ -274,7 +274,7 @@ const WordLengthDistribution: React.FC<WordLengthDistributionProps> = ({ words }
               )}
               style={{ height: `${height}%`, minHeight: count > 0 ? '4px' : '0' }}
             />
-            <span className="text-[8px] text-neo-cream/70">{len}</span>
+            <span className="text-[8px] text-neo-white">{len}</span>
           </div>
         );
       })}

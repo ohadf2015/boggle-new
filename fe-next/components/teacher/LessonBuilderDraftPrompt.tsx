@@ -35,7 +35,7 @@ export default function LessonBuilderDraftPrompt({
           <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
             {t('teacher.lesson.resumeDraft')}
           </AlertDialog.Title>
-          <AlertDialog.Description className="text-neo-white/60 mb-6 text-pretty">
+          <AlertDialog.Description className="text-neo-white mb-6 text-pretty">
             {t('teacher.lesson.draftFound', { time: formattedAge })}
           </AlertDialog.Description>
 

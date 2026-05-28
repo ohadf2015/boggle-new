@@ -126,13 +126,13 @@ export function PlayerSelector({
             setShowResults(true);
           }}
           onFocus={() => setShowResults(true)}
-          className="ps-10 bg-white dark:bg-slate-800"
+          className="ps-10 bg-white dark:bg-neo-navy-light"
           disabled={selectedPlayers.length >= maxSelection}
         />
 
         {/* Search Results Dropdown */}
         {showResults && searchQuery.length >= 2 && (
-          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-neo-navy-light border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
             {loading ? (
               <div className="flex justify-center py-4">
                 <Loader size="sm" />
@@ -150,7 +150,7 @@ export function PlayerSelector({
                     onClick={() => handleSelectPlayer(player)}
                     disabled={isSelected}
                     className={cn(
-                      'w-full flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left',
+                      'w-full flex items-center gap-3 p-3 hover:bg-slate-100 dark:hover:bg-neo-navy-elevated transition-colors text-left',
                       isSelected && 'opacity-50 cursor-not-allowed'
                     )}
                   >

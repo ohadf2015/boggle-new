@@ -118,7 +118,7 @@ export default function GuidesIndexPageClient(): React.ReactElement {
               <Link key={guide.slug} href={`/${locale}/guides/${guide.slug}`}>
                 <div className={cn(
                   'h-full p-6 rounded-neo border-3 border-neo-black shadow-hard transition-transform hover:-translate-y-1 hover:shadow-hard-lg',
-                  isDarkMode ? 'bg-slate-800' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                 )}>
                   <div className={cn(
                     'w-12 h-12 rounded-neo border-2 border-neo-black flex items-center justify-center mb-4',

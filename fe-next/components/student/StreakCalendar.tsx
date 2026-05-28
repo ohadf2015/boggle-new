@@ -145,7 +145,7 @@ export default function StreakCalendar({ currentStreak, lastWinDate }: StreakCal
               'flex flex-col items-center gap-1.5 p-2 rounded-neo border-3 cursor-default',
               day.isActive
                 ? 'bg-neo-lime border-black shadow-hard-sm text-black'
-                : 'bg-neo-navy border-black/40 text-neo-white/40',
+                : 'bg-neo-navy border-black/40 text-neo-white',
               day.isToday && !day.isActive && 'border-neo-cyan bg-neo-cyan/10 text-neo-white',
               day.isToday && 'ring-2 ring-neo-cyan ring-offset-1 ring-offset-neo-navy'
             )}

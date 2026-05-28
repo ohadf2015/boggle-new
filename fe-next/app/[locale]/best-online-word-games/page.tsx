@@ -431,13 +431,13 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
                 </div>
 
                 <div className="grid gap-2 border-t border-neo-gray-400/20 pt-3 text-sm sm:grid-cols-2">
-                  <div><span className="text-neo-white/50">Type:</span> {game.type}</div>
-                  <div><span className="text-neo-white/50">Multiplayer:</span> {game.multiplayer}</div>
-                  <div><span className="text-neo-white/50">Free:</span> {game.free}</div>
-                  <div><span className="text-neo-white/50">Ads:</span> {game.ads}</div>
-                  <div><span className="text-neo-white/50">Download:</span> {game.download}</div>
-                  <div><span className="text-neo-white/50">Languages:</span> {game.languages}</div>
-                  <div><span className="text-neo-white/50">Daily challenge:</span> {game.daily}</div>
+                  <div><span className="text-neo-white">Type:</span> {game.type}</div>
+                  <div><span className="text-neo-white">Multiplayer:</span> {game.multiplayer}</div>
+                  <div><span className="text-neo-white">Free:</span> {game.free}</div>
+                  <div><span className="text-neo-white">Ads:</span> {game.ads}</div>
+                  <div><span className="text-neo-white">Download:</span> {game.download}</div>
+                  <div><span className="text-neo-white">Languages:</span> {game.languages}</div>
+                  <div><span className="text-neo-white">Daily challenge:</span> {game.daily}</div>
                 </div>
               </div>
             ))}

@@ -358,7 +358,7 @@ export const FullPageLoader: React.FC<FullPageLoaderProps> = ({
           {message}
         </AdaptiveMotion.h2>
         {subMessage && (
-          <p className="text-neo-white/70 font-medium">{subMessage}</p>
+          <p className="text-neo-white font-medium">{subMessage}</p>
         )}
       </div>
     );
@@ -383,7 +383,7 @@ export const FullPageLoader: React.FC<FullPageLoaderProps> = ({
         {message}
       </AdaptiveMotion.p>
       {subMessage && (
-        <p className="text-neo-black/60 dark:text-neo-white/60 font-medium mt-2">
+        <p className="text-neo-black/60 dark:text-neo-white font-medium mt-2">
           {subMessage}
         </p>
       )}

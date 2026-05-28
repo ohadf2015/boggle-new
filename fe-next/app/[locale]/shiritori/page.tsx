@@ -172,29 +172,29 @@ export default async function ShiritoriLandingPage({ params }: PageProps) {
           >
             {copy.cta}
           </Link>
-          <p className="font-neo-body text-sm text-neo-cream/60">{copy.comingSoon}</p>
+          <p className="font-neo-body text-sm text-neo-white">{copy.comingSoon}</p>
           <Link
             href={`/${locale}/shiritori/solo`}
-            className="font-neo-body text-xs underline text-neo-cream/50 hover:text-neo-cream"
+            className="font-neo-body text-xs underline text-neo-white hover:text-neo-white"
           >
             {copy.soloPreview}
           </Link>
         </div>
 
         <section className="mt-14 rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard">
-          <h2 className="font-neo-display text-2xl font-bold text-neo-cream">{copy.whatTitle}</h2>
-          <p className="mt-3 font-neo-body text-neo-cream/80">{copy.whatBody}</p>
+          <h2 className="font-neo-display text-2xl font-bold text-neo-white">{copy.whatTitle}</h2>
+          <p className="mt-3 font-neo-body text-neo-white">{copy.whatBody}</p>
         </section>
 
         <section className="mt-8">
-          <h2 className="font-neo-display text-2xl font-bold text-neo-cream">{copy.howTitle}</h2>
+          <h2 className="font-neo-display text-2xl font-bold text-neo-white">{copy.howTitle}</h2>
           <ol className="mt-4 space-y-3">
             {copy.steps.map((s, i) => (
               <li key={i} className="flex gap-3 rounded-neo border-neo border-black bg-neo-navy-light p-4">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo border-black bg-neo-cyan font-neo-display font-bold text-black">{i + 1}</span>
                 <div>
-                  <p className="font-neo-display font-bold text-neo-cream">{s.title}</p>
-                  <p className="font-neo-body text-sm text-neo-cream/70">{s.text}</p>
+                  <p className="font-neo-display font-bold text-neo-white">{s.title}</p>
+                  <p className="font-neo-body text-sm text-neo-white">{s.text}</p>
                 </div>
               </li>
             ))}
@@ -202,12 +202,12 @@ export default async function ShiritoriLandingPage({ params }: PageProps) {
         </section>
 
         <section className="mt-8">
-          <h2 className="font-neo-display text-2xl font-bold text-neo-cream">FAQ</h2>
+          <h2 className="font-neo-display text-2xl font-bold text-neo-white">FAQ</h2>
           <dl className="mt-4 space-y-4">
             {copy.faqs.map((f, i) => (
               <div key={i} className="rounded-neo border-neo border-black bg-neo-navy-light p-4">
-                <dt className="font-neo-display font-bold text-neo-cream">{f.q}</dt>
-                <dd className="mt-1 font-neo-body text-sm text-neo-cream/70">{f.a}</dd>
+                <dt className="font-neo-display font-bold text-neo-white">{f.q}</dt>
+                <dd className="mt-1 font-neo-body text-sm text-neo-white">{f.a}</dd>
               </div>
             ))}
           </dl>

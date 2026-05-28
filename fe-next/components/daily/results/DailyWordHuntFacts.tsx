@@ -127,7 +127,7 @@ const DailyWordHuntFacts: React.FC<DailyWordHuntFactsProps> = ({ result, stats, 
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-bold text-neo-cream/70 uppercase tracking-wider text-center">
+      <h3 className="text-sm font-bold text-neo-white uppercase tracking-wider text-center">
         {t('wordHunt.facts.title')}
       </h3>
 
@@ -181,7 +181,7 @@ const EncouragementCard: React.FC<{
       >
         <IconComponent className="w-5 h-5" />
       </div>
-      <p className="min-w-0 flex-1 text-xs text-neo-cream/90 font-semibold leading-snug">
+      <p className="min-w-0 flex-1 text-xs text-neo-white font-semibold leading-snug">
         {renderFactText(fact, t)}
       </p>
       {fact.value != null && (
@@ -189,7 +189,7 @@ const EncouragementCard: React.FC<{
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
-          className="shrink-0 text-lg font-black text-neo-cream"
+          className="shrink-0 text-lg font-black text-neo-white"
         >
           {fact.value}
         </m.span>
@@ -213,13 +213,13 @@ const CoachTipCard: React.FC<{
     className="flex items-start gap-3 p-3 rounded-neo border-2 border-dashed border-neo-cream/25 bg-neo-navy-light/60"
   >
     <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-neo-cream/10 border border-neo-cream/30">
-      <Lightbulb className="w-4 h-4 text-neo-cream/80" />
+      <Lightbulb className="w-4 h-4 text-neo-white" />
     </div>
     <div className="min-w-0 flex-1">
-      <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-neo-cream/55 mb-0.5">
+      <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-neo-white mb-0.5">
         {t('wordHunt.facts.coachLabel', 'Coach tip')}
       </div>
-      <p className="text-xs text-neo-cream/75 leading-snug">
+      <p className="text-xs text-neo-white leading-snug">
         {renderFactText(fact, t)}
       </p>
     </div>
@@ -259,12 +259,12 @@ const InsightCard: React.FC<{
         <IconComponent className="w-4 h-4" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-neo-cream/60 mb-0.5">
+        <div className="text-[10px] uppercase tracking-[0.15em] font-bold text-neo-white mb-0.5">
           {isPersonal
             ? t('wordHunt.facts.yourJourneyLabel', 'Your journey')
             : t('wordHunt.facts.insightLabel', 'Did you know')}
         </div>
-        <p className="text-xs text-neo-cream/85 leading-snug">
+        <p className="text-xs text-neo-white leading-snug">
           {renderFactText(fact, t)}
         </p>
       </div>

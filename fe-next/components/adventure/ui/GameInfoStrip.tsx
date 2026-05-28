@@ -67,7 +67,7 @@ export const GameInfoStrip = memo(function GameInfoStrip({
             </span>
           )}
           {themedWordCount > 0 && (
-            <span className="text-neo-white/40 shrink-0 tabular-nums">
+            <span className="text-neo-white shrink-0 tabular-nums">
               {themedWordsFound}/{themedWordCount}
             </span>
           )}
@@ -76,7 +76,7 @@ export const GameInfoStrip = memo(function GameInfoStrip({
 
       {/* Separator */}
       {hasTheme && hasMechanic && (
-        <span className="text-neo-white/15">|</span>
+        <span className="text-neo-white">|</span>
       )}
 
       {/* Mechanic info */}
@@ -104,7 +104,7 @@ export const GameInfoStrip = memo(function GameInfoStrip({
 
       {/* Separator */}
       {(hasTheme || hasMechanic) && hasUpgrades && (
-        <span className="text-neo-white/15">|</span>
+        <span className="text-neo-white">|</span>
       )}
 
       {/* Upgrade badges — compact inline */}

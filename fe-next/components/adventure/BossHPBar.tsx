@@ -233,7 +233,7 @@ export const BossHPBar = memo(function BossHPBar({
 
       {/* HP text */}
       <div className="flex items-center justify-between mt-0.5">
-        <span className="text-[10px] font-mono text-neo-white/50 tabular-nums">{current}/{max}</span>
+        <span className="text-[10px] font-mono text-neo-white tabular-nums">{current}/{max}</span>
       </div>
 
       {/* Floating damage number */}

@@ -268,7 +268,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   userId={currentWord.submittedBy}
                   size="xl"
                 />
-                <span className="text-xs text-neo-cream/70 font-semibold">
+                <span className="text-xs text-neo-white font-semibold">
                   {currentWord.submittedBy}
                 </span>
               </m.div>
@@ -328,7 +328,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   onClick={() => handleVote('dislike')}
                   className="
                     flex-1 max-w-28
-                    bg-neo-red text-neo-cream
+                    bg-neo-red text-neo-white
                     border-3 border-neo-black
                     rounded-neo-lg
                     shadow-hard
@@ -349,7 +349,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   onClick={handleDontKnow}
                   className="
                     flex-1 max-w-28
-                    bg-neo-gray text-neo-cream
+                    bg-neo-gray text-neo-white
                     border-3 border-neo-black
                     rounded-neo-lg
                     shadow-hard

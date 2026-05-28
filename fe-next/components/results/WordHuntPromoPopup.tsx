@@ -95,7 +95,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
               {showCloseButton && (
                 <m.button
                   onClick={handleClose}
-                  className="absolute top-2 inset-e-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white/80 hover:text-neo-white hover:bg-neo-black/80 transition-colors"
+                  className="absolute top-2 inset-e-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white hover:text-neo-white hover:bg-neo-black/80 transition-colors"
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0 }}
@@ -155,7 +155,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                 {t('wordHuntPromo.title')}
               </h2>
 
-              <p className="text-sm text-neo-white/60 leading-snug mb-5 max-w-[280px] mx-auto">
+              <p className="text-sm text-neo-white leading-snug mb-5 max-w-[280px] mx-auto">
                 {t('wordHuntPromo.subtitle')}
               </p>
 
@@ -186,7 +186,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                 {showCloseButton && (
                   <m.button
                     onClick={handleClose}
-                    className="mt-3 text-xs text-neo-white/30 hover:text-neo-white/50 transition-colors"
+                    className="mt-3 text-xs text-neo-white hover:text-neo-white transition-colors"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}

@@ -135,7 +135,7 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
         </m.h1>
 
         <m.p
-          className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-neo-cream/80"
+          className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-neo-white"
           variants={fadeUp}
         >
           {hero.description}
@@ -203,8 +203,8 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
                   <div className={`mb-1 font-neo-display text-xs font-bold uppercase tracking-wider ${accent.text}`}>
                     {item.step}
                   </div>
-                  <h3 className="font-neo-display font-bold text-neo-cream">{item.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-neo-cream/75">{item.desc}</p>
+                  <h3 className="font-neo-display font-bold text-neo-white">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-neo-white">{item.desc}</p>
                 </div>
               </m.div>
             );
@@ -235,7 +235,7 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
                   <span>{faq.q}</span>
                   <span className="text-neo-lime transition-transform group-open:rotate-180">&#9660;</span>
                 </summary>
-                <div className="border-t border-neo-cream/20 px-6 py-4 text-neo-cream/80">{faq.a}</div>
+                <div className="border-t border-neo-cream/20 px-6 py-4 text-neo-white">{faq.a}</div>
               </m.details>
             ))}
           </div>
@@ -253,7 +253,7 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
         <m.h2 className="font-neo-display text-2xl font-bold sm:text-3xl" variants={fadeUp}>
           {finalCta.heading}
         </m.h2>
-        <m.p className="mt-4 text-neo-cream/80" variants={fadeUp}>
+        <m.p className="mt-4 text-neo-white" variants={fadeUp}>
           {finalCta.description}
         </m.p>
         <m.div className="mt-6" variants={scaleIn}>

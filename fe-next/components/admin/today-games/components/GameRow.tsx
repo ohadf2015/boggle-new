@@ -112,7 +112,7 @@ export function GameRow({ game, t }: GameRowProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="hover:bg-slate-700/30 transition-colors"
+      className="hover:bg-neo-navy-elevated/30 transition-colors"
     >
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">

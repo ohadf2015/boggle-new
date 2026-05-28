@@ -124,14 +124,14 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           className={cn(
             'fixed inset-0 z-50 flex flex-col',
             'pt-[env(safe-area-inset-top)]',
-            isDark ? 'bg-slate-900' : 'bg-white',
+            isDark ? 'bg-neo-navy' : 'bg-white',
             className
           )}
         >
           {/* Header */}
           <div className={cn(
             'flex items-center justify-between px-4 py-3 border-b-2 border-neo-black',
-            isDark ? 'bg-slate-800' : 'bg-gray-50'
+            isDark ? 'bg-neo-navy-light' : 'bg-gray-50'
           )}>
             <div className="flex items-center gap-3">
               <button
@@ -139,7 +139,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                 className={cn(
                   'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
                   'hover:shadow-hard hover:-translate-y-0.5 transition-all',
-                  isDark ? 'bg-slate-700' : 'bg-white'
+                  isDark ? 'bg-neo-navy-elevated' : 'bg-white'
                 )}
               >
                 {isRTL ? (
@@ -246,7 +246,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                           'max-w-[70%] p-3 rounded-neo border-2 border-neo-black relative',
                           isMine
                             ? 'bg-neo-cyan text-neo-black shadow-hard'
-                            : (isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-900') + ' shadow-hard'
+                            : (isDark ? 'bg-neo-navy-elevated text-white' : 'bg-white text-gray-900') + ' shadow-hard'
                         )}
                         onContextMenu={(e) => {
                           if (isMine && onDeleteMessage) {
@@ -352,7 +352,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                     />
                     <div className={cn(
                       'px-4 py-2 rounded-neo border-2 border-neo-black',
-                      isDark ? 'bg-slate-700' : 'bg-white'
+                      isDark ? 'bg-neo-navy-elevated' : 'bg-white'
                     )}>
                       <div className="flex gap-1">
                         <span className={cn(
@@ -380,7 +380,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           {/* Message composer */}
           <div className={cn(
             'border-t-2 border-neo-black pb-[env(safe-area-inset-bottom)]',
-            isDark ? 'bg-slate-800' : 'bg-gray-50'
+            isDark ? 'bg-neo-navy-light' : 'bg-gray-50'
           )}>
             <MessageComposer
               onSend={onSendMessage}

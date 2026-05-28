@@ -59,23 +59,23 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-4 text-gray-900 dark:text-gray-100">
+    <div className="bg-white dark:bg-neo-navy-light/50 rounded-xl border border-gray-200 dark:border-slate-700 p-4 text-gray-900 dark:text-gray-100">
       <h2 className="font-bold text-lg sm:text-xl mb-3">Statistics</h2>
 
       <div className="grid grid-cols-3 gap-2 sm:block sm:space-y-3">
-        <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg sm:bg-transparent sm:p-0">
+        <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded-lg sm:bg-transparent sm:p-0">
           <span className="block sm:inline text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             Total
           </span>
           <span className="block sm:inline font-bold text-lg sm:text-base">{stats.total}</span>
         </div>
-        <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg sm:bg-transparent sm:p-0">
+        <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded-lg sm:bg-transparent sm:p-0">
           <span className="block sm:inline text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             Shortest
           </span>
           <span className="block sm:inline font-bold text-lg sm:text-base">{stats.shortest}L</span>
         </div>
-        <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg sm:bg-transparent sm:p-0">
+        <div className="text-center sm:text-left sm:flex sm:justify-between p-2 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded-lg sm:bg-transparent sm:p-0">
           <span className="block sm:inline text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             Longest
           </span>
@@ -91,7 +91,7 @@ export const WordListStats: React.FC<WordListStatsProps> = ({
             .map(([len, count]) => (
               <div
                 key={len}
-                className="flex justify-between px-2 py-1 bg-gray-50 dark:bg-slate-700/50 rounded"
+                className="flex justify-between px-2 py-1 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded"
               >
                 <span className="text-gray-600 dark:text-gray-400">{len}L:</span>
                 <span className="font-mono font-bold">{count}</span>

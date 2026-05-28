@@ -80,7 +80,7 @@ export function RelatedArticles({ currentSlug, locale, heading, articles }: Rela
             className={cn(
               'group block rounded-neo border-3 border-neo-black overflow-hidden transition-all hover:scale-[1.02]',
               isDarkMode
-                ? 'bg-slate-800 hover:bg-slate-700'
+                ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                 : 'bg-white hover:bg-neo-cream shadow-hard-sm hover:shadow-hard'
             )}
           >

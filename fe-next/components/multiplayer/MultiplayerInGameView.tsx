@@ -360,7 +360,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           {Array.from({ length: 16 }).map((_, i) => (
             <div
               key={`tile-${i}`}
-              className="aspect-square rounded-xl bg-slate-700/50 text-white animate-pulse"
+              className="aspect-square rounded-xl bg-neo-navy-elevated/50 text-white animate-pulse"
               style={{ animationDelay: `${i * 50}ms` }}
             />
           ))}
@@ -630,7 +630,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         >
           <DialogContent
             noDescription
-            className="max-w-4xl max-h-[90vh] overflow-y-auto overscroll-contain scrollable-area bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30"
+            className="max-w-4xl max-h-[90vh] overflow-y-auto overscroll-contain scrollable-area bg-white text-neo-black dark:bg-neo-navy-light dark:text-white border-purple-500/30"
           >
             <DialogHeader>
               <DialogTitle className="text-center text-2xl font-black text-neo-pink dark:text-neo-pink">
@@ -650,7 +650,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
             <DialogFooter className="sm:justify-center">
               <Button
                 onClick={handleCloseTournamentStandings}
-                className="w-full bg-neo-pink text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
+                className="w-full bg-neo-pink text-neo-white font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
               >
                 {t('common.close')}
               </Button>
@@ -662,7 +662,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       {/* Exit Confirmation Dialog (player-only) */}
       {!isHost && setShowExitConfirm && onConfirmExit && (
         <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-          <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
+          <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white border-red-500/30">
             <AlertDialogHeader>
               <AlertDialogTitle className="text-slate-900 dark:text-white">
                 {t('playerView.exitConfirmation')}
@@ -672,12 +672,12 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+              <AlertDialogCancel className="bg-slate-100 dark:bg-neo-navy-elevated text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
                 {t('common.cancel')}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={onConfirmExit}
-                className="bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
+                className="bg-neo-red text-neo-white font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
               >
                 {t('common.confirm')}
               </AlertDialogAction>

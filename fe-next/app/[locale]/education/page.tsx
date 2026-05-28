@@ -269,7 +269,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           className="group rounded-neo border-3 border-neo-black bg-neo-pink p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
         >
           <h3 className="font-neo-display text-lg font-black uppercase text-neo-white">{t.cards.duels.title}</h3>
-          <p className="mt-2 text-sm text-neo-white/90">{t.cards.duels.desc}</p>
+          <p className="mt-2 text-sm text-neo-white">{t.cards.duels.desc}</p>
           <span className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-yellow">→</span>
         </Link>
         <Link

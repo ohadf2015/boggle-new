@@ -88,7 +88,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
           whileTap={{ scale: 0.9 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 10 }}
           className={cn(
-            'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-cream font-black cursor-default',
+            'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-white font-black cursor-default',
             sizeClasses
           )}
         >
@@ -105,7 +105,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
           whileTap={{ scale: 0.9 }}
           transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 10 }}
           className={cn(
-            'bg-neo-pink border-neo-black rounded-neo shadow-hard-sm text-neo-cream font-black cursor-default',
+            'bg-neo-pink border-neo-black rounded-neo shadow-hard-sm text-neo-white font-black cursor-default',
             sizeClasses
           )}
         >

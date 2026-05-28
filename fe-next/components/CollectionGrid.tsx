@@ -23,7 +23,7 @@ const rarityColors: Record<string, string> = {
 };
 
 const rarityBgColors: Record<string, string> = {
-  common: 'bg-gray-100 dark:bg-gray-800',
+  common: 'bg-gray-100 dark:bg-neo-navy-light',
   uncommon: 'bg-green-50 dark:bg-green-900/30',
   rare: 'bg-blue-50 dark:bg-blue-900/30',
   epic: 'bg-purple-50 dark:bg-purple-900/30',

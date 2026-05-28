@@ -102,10 +102,10 @@ describe('WordFeedbackToast — Archetype B (Invalid/Red)', () => {
     expect(el?.className).toContain('bg-neo-red');
   });
 
-  it('Archetype B: invalid-word uses text-neo-cream color', () => {
+  it('Archetype B: invalid-word uses text-neo-white color', () => {
     render(<WordFeedbackToast type="invalid-word" message="NAH" />);
     const el = getToastEl('NAH');
-    expect(el?.className).toContain('text-neo-cream');
+    expect(el?.className).toContain('text-neo-white');
   });
 
   it('Archetype B: invalid-word has animate-neo-shake entrance animation', () => {
@@ -206,10 +206,10 @@ describe('WordFeedbackToast — Archetype D (Target Found/Purple)', () => {
     expect(el?.className).toContain('bg-neo-purple');
   });
 
-  it('Archetype D: target-found uses text-neo-cream color', () => {
+  it('Archetype D: target-found uses text-neo-white color', () => {
     render(<WordFeedbackToast type="target-found" message="JACKPOT" />);
     const el = getToastEl('JACKPOT');
-    expect(el?.className).toContain('text-neo-cream');
+    expect(el?.className).toContain('text-neo-white');
   });
 
   it('Archetype D: target-found has animate-neo-pop entrance animation', () => {

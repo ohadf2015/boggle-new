@@ -31,7 +31,7 @@ export function EngagementFunnel({ funnel }: EngagementFunnelProps) {
 
   if (!funnel) {
     return (
-      <div data-testid="funnel-loading" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
+      <div data-testid="funnel-loading" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
     );
   }
 
@@ -43,7 +43,7 @@ export function EngagementFunnel({ funnel }: EngagementFunnelProps) {
   ];
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <h3 className="text-sm font-neo-display text-neo-white mb-3">
         {t('admin.analytics.funnelTitle')}
       </h3>

@@ -40,9 +40,9 @@ function MemberRow({
         className={cn(
           'shrink-0 w-5 text-center text-xs font-bold',
           rank === 1 && 'text-neo-yellow',
-          rank === 2 && 'text-neo-white/80',
+          rank === 2 && 'text-neo-white',
           rank === 3 && 'text-neo-orange',
-          rank > 3 && 'text-neo-white/50'
+          rank > 3 && 'text-neo-white'
         )}
       >
         {rank}
@@ -52,7 +52,7 @@ function MemberRow({
       <span
         className={cn(
           'flex-1 text-sm truncate',
-          isCurrentUser ? 'font-bold text-neo-cyan' : 'text-neo-white/80'
+          isCurrentUser ? 'font-bold text-neo-cyan' : 'text-neo-white'
         )}
       >
         {member.displayName ?? member.userId.slice(0, 8)}
@@ -102,7 +102,7 @@ export const WordClubCard: React.FC = memo(function WordClubCard() {
             {t('wordClub.title')}
           </h3>
         </div>
-        <p className="text-sm text-neo-white/70">{t('wordClub.emptyDesc')}</p>
+        <p className="text-sm text-neo-white">{t('wordClub.emptyDesc')}</p>
         <div className="flex gap-2">
           <button
             data-testid="create-club-btn"
@@ -174,7 +174,7 @@ export const WordClubCard: React.FC = memo(function WordClubCard() {
       </div>
 
       {/* Member count */}
-      <p className="text-xs text-neo-white/40 text-center">
+      <p className="text-xs text-neo-white text-center">
         {t('wordClub.memberCount', { count: String(club.memberCount) })}
       </p>
     </div>

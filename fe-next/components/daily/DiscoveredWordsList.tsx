@@ -20,12 +20,12 @@ export const DiscoveredWordsList: React.FC<DiscoveredWordsListProps> = ({ words,
   return (
     <div className="shrink-0 px-1 pb-1">
       <div className="flex items-center justify-between px-2 py-1">
-        <span className="text-[11px] text-neo-cream/60 font-bold tabular-nums">
+        <span className="text-[11px] text-neo-white font-bold tabular-nums">
           {words.length} {t('wordHunt.mobile.words')}
         </span>
         <button
           onClick={() => setObfuscated(!obfuscated)}
-          className="text-[10px] text-neo-cream/40 hover:text-neo-cream/70 font-medium transition-colors px-1.5 py-0.5 rounded"
+          className="text-[10px] text-neo-white hover:text-neo-white font-medium transition-colors px-1.5 py-0.5 rounded"
         >
           {obfuscated ? t('common.show') : t('common.hide')}
         </button>
@@ -43,7 +43,7 @@ export const DiscoveredWordsList: React.FC<DiscoveredWordsListProps> = ({ words,
                   ? 'bg-neo-pink/15 text-neo-pink'
                   : w.word.length >= 5
                     ? 'bg-neo-cyan/15 text-neo-cyan'
-                    : 'bg-neo-cream/10 text-neo-cream/70'
+                    : 'bg-neo-cream/10 text-neo-white'
               }`}
             >
               {obfuscated ? '•'.repeat(w.word.length) : w.word}

@@ -42,11 +42,11 @@ export function DailyPartClaimModal({
               <Sparkles className="h-8 w-8 text-neo-navy" strokeWidth={3} />
             </div>
 
-            <h2 className="font-neo-display text-2xl font-black text-neo-cream">
+            <h2 className="font-neo-display text-2xl font-black text-neo-white">
               {t('avatar.dailyPart.title')}
             </h2>
 
-            <p className="font-neo-body text-sm text-neo-cream/80">
+            <p className="font-neo-body text-sm text-neo-white">
               {t('avatar.dailyPart.description')}
             </p>
 
@@ -55,7 +55,7 @@ export function DailyPartClaimModal({
                 <button
                   data-testid="avatar-daily-claim-cta"
                   onClick={offer}
-                  className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-purple px-6 py-3 font-neo-display text-lg font-black text-neo-cream shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
+                  className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-purple px-6 py-3 font-neo-display text-lg font-black text-neo-white shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
                 >
                   <Play className="h-5 w-5" strokeWidth={3} />
                   {t('avatar.dailyPart.claim')}
@@ -64,7 +64,7 @@ export function DailyPartClaimModal({
               <button
                 data-testid="avatar-daily-claim-close"
                 onClick={onClose}
-                className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy px-4 py-2 font-neo-body text-sm text-neo-cream/70 hover:text-neo-cream"
+                className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy px-4 py-2 font-neo-body text-sm text-neo-white hover:text-neo-white"
               >
                 <X className="h-4 w-4" />
                 {t('avatar.dailyPart.close')}

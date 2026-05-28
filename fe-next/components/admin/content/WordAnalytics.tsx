@@ -28,7 +28,7 @@ export function WordAnalytics({ data }: WordAnalyticsProps) {
 
   if (!data) {
     return (
-      <div data-testid="word-analytics-loading" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
+      <div data-testid="word-analytics-loading" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 animate-pulse h-48" />
     );
   }
 
@@ -36,14 +36,14 @@ export function WordAnalytics({ data }: WordAnalyticsProps) {
     <div className="space-y-4">
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+        <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
           <div className="flex items-center gap-2 mb-1">
             <AlertTriangle className="w-4 h-4 text-yellow-400" />
             <span className="text-xs text-slate-400">{t('admin.content.pendingWords')}</span>
           </div>
           <div className="text-2xl font-neo-display text-neo-white font-bold">{data.totalPending}</div>
         </div>
-        <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+        <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
           <div className="flex items-center gap-2 mb-1">
             <CheckCircle className="w-4 h-4 text-emerald-400" />
             <span className="text-xs text-slate-400">{t('admin.content.approvedWords')}</span>
@@ -53,7 +53,7 @@ export function WordAnalytics({ data }: WordAnalyticsProps) {
       </div>
 
       {/* Top reported words — dictionary gap detection */}
-      <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+      <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
         <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2 mb-3">
           <BookOpen className="w-4 h-4 text-neo-cyan" />
           {t('admin.content.topReported')}
@@ -66,7 +66,7 @@ export function WordAnalytics({ data }: WordAnalyticsProps) {
             {data.invalidTrends.map((item) => (
               <div
                 key={`${item.word}-${item.language}`}
-                className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-slate-700/30"
+                className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-neo-navy-elevated/30"
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm">{LANG_FLAGS[item.language] ?? '🌐'}</span>

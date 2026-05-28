@@ -105,7 +105,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-slate-900 border-2 border-neo-black rounded-neo p-3 text-center shadow-hard-sm">
+    <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-3 text-center shadow-hard-sm">
       <div className="text-xl font-black text-neo-white">{value}</div>
       <div className="text-xs text-slate-400 uppercase tracking-wider mt-0.5">{label}</div>
     </div>
@@ -206,14 +206,14 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
               <StatCard label="Avg Attempts" value={stats.avgAttemptsSolved?.toFixed(1) || '-'} />
             </div>
           ) : (
-            <div className="bg-slate-900 border-2 border-neo-black rounded-neo p-6 mb-8 text-center">
+            <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-6 mb-8 text-center">
               <p className="text-slate-400">Stats not available for this puzzle yet.</p>
             </div>
           )}
 
           {/* Attempt distribution */}
           {stats?.attemptDistribution && (
-            <div className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 mb-8">
+            <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-8">
               <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
                 Attempt Distribution
               </h2>
@@ -226,7 +226,7 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
                   return (
                     <div key={attempt} className="flex items-center gap-2 text-sm">
                       <span className="w-4 text-slate-400 text-end">{attempt}</span>
-                      <div className="flex-1 h-5 bg-slate-800 rounded-sm overflow-hidden">
+                      <div className="flex-1 h-5 bg-neo-navy-light rounded-sm overflow-hidden">
                         <div
                           className={`h-full rounded-sm ${attempt <= 2 ? 'bg-green-500' : attempt <= 4 ? 'bg-neo-cyan' : attempt <= 6 ? 'bg-neo-yellow' : 'bg-neo-orange'}`}
                           style={{ width: `${Math.max(width, count > 0 ? 2 : 0)}%` }}

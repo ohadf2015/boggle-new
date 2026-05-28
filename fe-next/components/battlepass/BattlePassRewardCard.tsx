@@ -90,7 +90,7 @@ export default function BattlePassRewardCard({
       {/* Locked overlay */}
       {state === 'locked' && (
         <div className="absolute inset-0 bg-neo-black/30 rounded-neo flex items-center justify-center z-10">
-          <Lock className="w-5 h-5 text-neo-cream" />
+          <Lock className="w-5 h-5 text-neo-white" />
         </div>
       )}
 

@@ -59,10 +59,10 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
             <div className="w-12 h-12 bg-neo-cyan/20 border-2 border-neo-cyan/40 rounded-neo flex items-center justify-center">
               <Icon className="w-6 h-6 text-neo-cyan" />
             </div>
-            <h3 className="text-sm font-black uppercase text-neo-cream">
+            <h3 className="text-sm font-black uppercase text-neo-white">
               {t(currentStep.titleKey)}
             </h3>
-            <p className="text-xs text-neo-cream/70 max-w-[240px]">
+            <p className="text-xs text-neo-white max-w-[240px]">
               {t(currentStep.descKey)}
             </p>
           </m.div>
@@ -76,7 +76,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
             className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
             aria-label={isRTL ? t('common.next') : t('common.previous')}
           >
-            <ChevronRight className="w-4 h-4 text-neo-cream" />
+            <ChevronRight className="w-4 h-4 text-neo-white" />
           </button>
           <div className="flex gap-1.5">
             {TUTORIAL_STEPS.map((_, i) => (
@@ -92,7 +92,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
             className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
             aria-label={isRTL ? t('common.previous') : t('common.next')}
           >
-            <ChevronLeft className="w-4 h-4 text-neo-cream" />
+            <ChevronLeft className="w-4 h-4 text-neo-white" />
           </button>
         </div>
       </div>
@@ -100,8 +100,8 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
       {/* UI Language Switcher (CrazyGames) */}
       <div className="shrink-0 border-t border-neo-white/10 pt-3 mt-3">
         <div className="flex items-center gap-2 mb-2">
-          <Globe className="w-3.5 h-3.5 text-neo-cream/60" />
-          <span className="text-[10px] font-bold uppercase text-neo-cream/60">{t('tutorial.uiLanguage')}</span>
+          <Globe className="w-3.5 h-3.5 text-neo-white" />
+          <span className="text-[10px] font-bold uppercase text-neo-white">{t('tutorial.uiLanguage')}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {SUPPORTED_LOCALES.map((loc) => (
@@ -111,7 +111,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
               className={`px-2 py-1 text-xs font-bold rounded border-2 transition-all ${
                 language === loc
                   ? 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
-                  : 'bg-neo-white/5 border-neo-white/20 text-neo-cream/60 hover:border-neo-cream/40'
+                  : 'bg-neo-white/5 border-neo-white/20 text-neo-white hover:border-neo-cream/40'
               }`}
             >
               {LANGUAGE_FLAGS[loc] || ''} {t(`joinView.${loc === 'en' ? 'english' : loc === 'he' ? 'hebrew' : loc === 'sv' ? 'swedish' : loc === 'ja' ? 'japanese' : 'spanish'}`)}

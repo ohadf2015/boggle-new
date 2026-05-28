@@ -72,7 +72,7 @@ const TomorrowPreview: React.FC<TomorrowPreviewProps> = memo(({ mode, onDismiss 
         <p className="text-neo-yellow font-bold text-sm leading-snug">
           {teaserText}
         </p>
-        <p className="text-neo-white/60 text-xs">
+        <p className="text-neo-white text-xs">
           {seeYouText}
         </p>
       </div>

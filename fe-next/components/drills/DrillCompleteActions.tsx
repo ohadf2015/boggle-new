@@ -63,7 +63,7 @@ export default function DrillCompleteActions({
           data-testid="drill-play-again"
           whileTap={{ scale: 0.95 }}
           onClick={onPlayAgain}
-          className="flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-slate-700 text-neo-white"
+          className="flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-navy-elevated text-neo-white"
         >
           <RotateCcw className="w-5 h-5" />
           {t('brain.drills.playAgain')}
@@ -88,7 +88,7 @@ export default function DrillCompleteActions({
             onClick={onExit}
             className={cn(
               'px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm uppercase',
-              'bg-slate-800 text-neo-white/80',
+              'bg-neo-navy-light text-neo-white',
             )}
           >
             {t('brain.drills.exit')}

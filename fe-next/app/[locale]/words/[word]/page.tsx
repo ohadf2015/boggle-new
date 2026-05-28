@@ -192,7 +192,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
           </div>
 
           {/* Points breakdown */}
-          <div className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
+          <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
             <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
               Scoring
             </h2>
@@ -211,7 +211,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
           </div>
 
           {/* Letter tiles */}
-          <div className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
+          <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
             <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
               Letters
             </h2>
@@ -219,7 +219,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
               {word.toUpperCase().split('').map((letter, i) => (
                 <div
                   key={`${letter}-${i}`}
-                  className="w-10 h-10 bg-slate-800 border-2 border-neo-black rounded-neo flex items-center justify-center font-neo-display font-black text-lg text-neo-yellow shadow-hard-sm"
+                  className="w-10 h-10 bg-neo-navy-light border-2 border-neo-black rounded-neo flex items-center justify-center font-neo-display font-black text-lg text-neo-yellow shadow-hard-sm"
                 >
                   {letter}
                 </div>
@@ -235,7 +235,7 @@ export default async function WordExplorerPage({ params }: PageParams) {
           <InlineBannerAd webZone="content-page" className="mb-6" />
 
           {/* Word facts */}
-          <div className="bg-slate-900 border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
+          <div className="bg-neo-navy border-2 border-neo-black rounded-neo p-4 mb-6 shadow-hard-sm">
             <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-3">
               Word Facts
             </h2>
@@ -267,19 +267,19 @@ export default async function WordExplorerPage({ params }: PageParams) {
             <div className="flex flex-wrap gap-2">
               <Link
                 href={`/${locale}/tools/word-solver?length=${word.length}`}
-                className="text-sm bg-slate-800 border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
+                className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
               >
                 {word.length}-letter words
               </Link>
               <Link
                 href={`/${locale}/tools/word-solver?starts=${word[0].toLowerCase()}`}
-                className="text-sm bg-slate-800 border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
+                className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
               >
                 Words starting with {word[0].toUpperCase()}
               </Link>
               <Link
                 href={`/${locale}/daily`}
-                className="text-sm bg-slate-800 border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
+                className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
               >
                 Daily Challenge
               </Link>

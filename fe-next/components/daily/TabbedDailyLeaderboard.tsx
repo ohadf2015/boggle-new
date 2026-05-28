@@ -98,7 +98,7 @@ const LeaderboardTabs = memo<{
       type="single"
       value={activeTab}
       onValueChange={(value) => value && onTabChange(value as LeaderboardTab)}
-      className="bg-slate-100 dark:bg-slate-800 p-1 rounded-neo border-2 border-neo-black"
+      className="bg-slate-100 dark:bg-neo-navy-light p-1 rounded-neo border-2 border-neo-black"
     >
       <ToggleGroupItem value="today" size="sm" className="text-xs px-3">
         <Calendar className="w-3.5 h-3.5 me-1.5" />
@@ -621,7 +621,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={`
-        bg-white/95 dark:bg-slate-800/95
+        bg-white/95 dark:bg-neo-navy-light/95
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
         shadow-lg

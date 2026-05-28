@@ -113,13 +113,13 @@ export function WordCraftTutor({ labels, isRTL }: WordCraftTutorProps) {
                 type="button"
                 onClick={dismiss}
                 aria-label={labels.dismiss}
-                className="p-1.5 rounded-neo border-2 border-black bg-neo-navy text-neo-white/80 hover:bg-neo-red hover:text-white transition-colors"
+                className="p-1.5 rounded-neo border-2 border-black bg-neo-navy text-neo-white hover:bg-neo-red hover:text-white transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <ol className="space-y-3 text-sm text-neo-cream">
+            <ol className="space-y-3 text-sm text-neo-white">
               <li data-tutor-step className="flex items-start gap-3">
                 <span className="shrink-0 w-7 h-7 rounded-full bg-neo-lime text-neo-navy font-neo-display font-black flex items-center justify-center border-2 border-black shadow-hard-sm">1</span>
                 <span className="flex-1 pt-1">{labels.step1}</span>
@@ -134,7 +134,7 @@ export function WordCraftTutor({ labels, isRTL }: WordCraftTutorProps) {
               </li>
             </ol>
 
-            <div className="grid grid-cols-1 gap-2 text-[11px] text-neo-white/80 pt-3 border-t border-black/30">
+            <div className="grid grid-cols-1 gap-2 text-[11px] text-neo-white pt-3 border-t border-black/30">
               <div className="flex items-center gap-2">
                 <span aria-hidden className="text-neo-pink text-base leading-none">★</span>
                 <span>{labels.tipFirst}</span>

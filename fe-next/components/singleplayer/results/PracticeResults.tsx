@@ -335,7 +335,7 @@ const PracticeResults = memo(function PracticeResults({
               initial={reducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-white/70 text-sm font-bold mt-1"
+              className="text-white text-sm font-bold mt-1"
             >
               {t('practiceResults.wordsFound', { count: validWordCount })}
             </m.p>
@@ -360,7 +360,7 @@ const PracticeResults = memo(function PracticeResults({
               initial={reducedMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-white/50 text-xs mt-2 max-w-[260px] mx-auto"
+              className="text-white text-xs mt-2 max-w-[260px] mx-auto"
             >
               {t(subtitleKey)}
             </m.p>
@@ -384,7 +384,7 @@ const PracticeResults = memo(function PracticeResults({
                   className={cn(
                     'w-full flex items-center justify-center gap-3',
                     'px-6 py-4',
-                    'bg-white/5 text-white/40',
+                    'bg-white/5 text-white',
                     'font-black text-base uppercase',
                     'border-3 border-white/10 rounded-neo',
                     'cursor-not-allowed',
@@ -393,7 +393,7 @@ const PracticeResults = memo(function PracticeResults({
                   <Lock className="w-5 h-5" />
                   <div className="text-start">
                     <span className="block">{t('practiceResults.wordHuntAlreadyPlayed')}</span>
-                    <span className="text-xs font-medium text-white/30 block">
+                    <span className="text-xs font-medium text-white block">
                       {t('practiceResults.wordHuntAlreadyPlayedDesc')}
                     </span>
                   </div>
@@ -438,7 +438,7 @@ const PracticeResults = memo(function PracticeResults({
                 onClick={onBackToLobby}
                 className={cn(
                   'inline-flex items-center gap-2 px-5 py-2.5',
-                  'bg-white/10 text-white/80',
+                  'bg-white/10 text-white',
                   'font-bold text-sm uppercase',
                   'border-2 border-white/20 rounded-neo',
                   'transition-colors hover:bg-white/20',
@@ -468,7 +468,7 @@ const PracticeResults = memo(function PracticeResults({
           )}
           <button
             onClick={onBackToLobby}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/10 text-white/80 font-bold text-sm uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/10 text-white font-bold text-sm uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             {t('practiceResults.goHome')}

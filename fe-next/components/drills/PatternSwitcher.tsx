@@ -266,7 +266,7 @@ export default function PatternSwitcher({
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        'bg-slate-800'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Required length */}
@@ -303,7 +303,7 @@ export default function PatternSwitcher({
       {phase !== 'ready' && phase !== 'complete' && (
         <div className={cn(
           'flex items-center justify-center gap-2 py-2 border-b-2 border-neo-black',
-          'bg-slate-800'
+          'bg-neo-navy-light'
         )}>
           {pattern.map((len, i) => (
             <div
@@ -312,7 +312,7 @@ export default function PatternSwitcher({
                 'w-8 h-8 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-sm',
                 i < patternIndex ? 'bg-neo-green text-neo-black' :
                 i === patternIndex ? 'bg-neo-cyan text-neo-black' :
-                'bg-slate-700 text-neo-white/50'
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
               {len}
@@ -338,13 +338,13 @@ export default function PatternSwitcher({
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              'text-neo-white/70'
+              'text-neo-white'
             )}>
               {t('brain.drills.pattern-switcher.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-slate-800'
+              'bg-neo-navy-light'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.patternLength')}: {levelConfig.patternLength}</p>
@@ -407,7 +407,7 @@ export default function PatternSwitcher({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:-translate-y-px',
-                'bg-slate-700 text-neo-white'
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}

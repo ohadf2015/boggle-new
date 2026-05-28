@@ -75,7 +75,7 @@ const MissedWords = memo<MissedWordsProps>(({
 
   if (allHighValueWords.length === 0) {
     return (
-      <div className={cn('py-6 text-center text-neo-cream/50 text-sm', className)}>
+      <div className={cn('py-6 text-center text-neo-white text-sm', className)}>
         {t('results.noMissedWords')}
       </div>
     );
@@ -158,7 +158,7 @@ const MissedWords = memo<MissedWordsProps>(({
                   {hasPath && (
                     <Grid3X3 className={cn(
                       'w-3 h-3',
-                      isSelected ? 'text-neo-lime' : 'text-neo-cream/50'
+                      isSelected ? 'text-neo-lime' : 'text-neo-white'
                     )} />
                   )}
                 </m.button>
@@ -175,7 +175,7 @@ const MissedWords = memo<MissedWordsProps>(({
               className={cn(
                 'w-full flex items-center justify-center gap-1.5 py-1.5 rounded-neo',
                 'text-xs font-bold uppercase',
-                'bg-neo-navy-light hover:bg-neo-navy text-neo-cream/80 hover:text-white',
+                'bg-neo-navy-light hover:bg-neo-navy text-neo-white hover:text-white',
                 'border-2 border-neo-black/30 transition-colors'
               )}
             >

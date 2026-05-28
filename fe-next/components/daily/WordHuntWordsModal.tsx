@@ -79,7 +79,7 @@ export const WordHuntWordsModal: React.FC<WordHuntWordsModalProps> = ({
 
           {/* Word list */}
           {sortedWords.length === 0 ? (
-            <p data-testid="nothing-missed" className="py-6 text-center text-neo-cream/60 text-sm font-medium">
+            <p data-testid="nothing-missed" className="py-6 text-center text-neo-white text-sm font-medium">
               {diffMode && allWords.length > 0
                 ? t('wordWheel.youFoundEverything', 'You found every word they did. Nice.')
                 : t('wordWheel.noWordsSubmitted', 'No words found')}
@@ -109,7 +109,7 @@ export const WordHuntWordsModal: React.FC<WordHuntWordsModalProps> = ({
 
 const StatBox: React.FC<{ icon: React.ReactNode; label: string; value: React.ReactNode }> = ({ icon, label, value }) => (
   <div className="rounded-neo border-2 border-neo-black bg-neo-navy-light p-2 text-center shadow-hard-xs">
-    <div className="flex items-center justify-center gap-1 text-neo-cream/60 text-[10px] font-bold uppercase tracking-wide">
+    <div className="flex items-center justify-center gap-1 text-neo-white text-[10px] font-bold uppercase tracking-wide">
       {icon}
       <span className="truncate">{label}</span>
     </div>

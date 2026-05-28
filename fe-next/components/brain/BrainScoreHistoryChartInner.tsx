@@ -49,7 +49,7 @@ const CustomTooltip = ({
   return (
     <div className={cn(
       'border-3 border-neo-black rounded-neo p-3 shadow-hard min-w-[140px]',
-      isDarkMode ? 'bg-slate-800 text-white' : 'bg-neo-cream text-neo-black'
+      isDarkMode ? 'bg-neo-navy-light text-white' : 'bg-neo-cream text-neo-black'
     )}>
       <div className="font-black text-xl mb-1.5">
         {data.score} <span className="text-base">{t('brain.score')}</span>
@@ -187,7 +187,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
             </h4>
             <p className={cn(
               'text-xs px-4 text-center',
-              isDarkMode ? 'text-white/60' : 'text-neo-black/60'
+              isDarkMode ? 'text-white' : 'text-neo-black/60'
             )}>
               {t('brain.historyEmptyDesc')}
             </p>
@@ -318,7 +318,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
             <div className="flex items-center justify-center h-full">
               <div className={cn(
                 'text-sm font-bold',
-                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
               )}>
                 {t('common.loading')}
               </div>
@@ -337,7 +337,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
             </div>
             <div className={cn(
               'text-[9px] font-bold uppercase',
-              isDarkMode ? 'text-white/60' : 'text-neo-black/60'
+              isDarkMode ? 'text-white' : 'text-neo-black/60'
             )}>
               {t('brain.daysTracked')}
             </div>
@@ -351,7 +351,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
             </div>
             <div className={cn(
               'text-[9px] font-bold uppercase',
-              isDarkMode ? 'text-white/60' : 'text-neo-black/60'
+              isDarkMode ? 'text-white' : 'text-neo-black/60'
             )}>
               {t('brain.currentScore')}
             </div>
@@ -365,7 +365,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
             </div>
             <div className={cn(
               'text-[9px] font-bold uppercase',
-              isDarkMode ? 'text-white/60' : 'text-neo-black/60'
+              isDarkMode ? 'text-white' : 'text-neo-black/60'
             )}>
               {t('brain.peakScore')}
             </div>

@@ -73,7 +73,7 @@ export default function ConsolationRows({
           >
             <div className="flex items-center gap-3">
               {/* Placement number */}
-              <span className="text-xs font-black tabular-nums text-white/30 w-6 text-center shrink-0">
+              <span className="text-xs font-black tabular-nums text-white w-6 text-center shrink-0">
                 {rank}
               </span>
 
@@ -111,7 +111,7 @@ export default function ConsolationRows({
                 <p
                   className={cn(
                     'text-xs font-bold uppercase tracking-tight truncate',
-                    isCurrent ? 'text-white' : 'text-white/80'
+                    isCurrent ? 'text-white' : 'text-white'
                   )}
                 >
                   {player.username}
@@ -126,7 +126,7 @@ export default function ConsolationRows({
                     >
                       {t(`results.crowns.${crown.id}`) || crown.name}
                     </span>
-                    <span className="text-[8px] text-white/40 leading-tight">
+                    <span className="text-[8px] text-white leading-tight">
                       {t(crown.descriptionKey)}
                     </span>
                   </div>
@@ -140,7 +140,7 @@ export default function ConsolationRows({
               <span
                 className={cn(
                   'text-xs font-black tabular-nums',
-                  isCurrent ? 'text-white/60' : 'text-white/40'
+                  isCurrent ? 'text-white' : 'text-white'
                 )}
               >
                 {formatScore(player.score)}

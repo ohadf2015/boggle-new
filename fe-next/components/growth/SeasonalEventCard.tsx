@@ -40,7 +40,7 @@ function RewardPreview({ rewards }: { rewards: SeasonalEventReward[] }) {
 
   return (
     <div className="flex flex-col gap-1" data-testid="reward-preview">
-      <span className="text-xs font-bold text-neo-white/50 uppercase">
+      <span className="text-xs font-bold text-neo-white uppercase">
         {t('seasonalEvent.rewards')}
       </span>
       <div className="flex gap-2">
@@ -50,7 +50,7 @@ function RewardPreview({ rewards }: { rewards: SeasonalEventReward[] }) {
             className={cn(
               'flex items-center gap-1 px-2 py-1 rounded-neo',
               'bg-neo-white/5 border border-neo-white/10',
-              'text-xs text-neo-white/70'
+              'text-xs text-neo-white'
             )}
           >
             <span aria-hidden="true">
@@ -112,7 +112,7 @@ export const SeasonalEventCard: React.FC = memo(function SeasonalEventCard() {
         </div>
         <div
           data-testid="event-countdown"
-          className="flex items-center gap-1 text-xs text-neo-white/50"
+          className="flex items-center gap-1 text-xs text-neo-white"
         >
           <Clock className="w-3 h-3" aria-hidden="true" />
           {timeRemaining}
@@ -120,13 +120,13 @@ export const SeasonalEventCard: React.FC = memo(function SeasonalEventCard() {
       </div>
 
       {/* Description */}
-      <p className="text-sm text-neo-white/70">{activeEvent.description}</p>
+      <p className="text-sm text-neo-white">{activeEvent.description}</p>
 
       {/* Progress bar (if joined) */}
       {hasJoined && (
         <div className="flex flex-col gap-1">
           <div className="flex justify-between text-xs">
-            <span className="text-neo-white/60">
+            <span className="text-neo-white">
               {t('seasonalEvent.score')}: {participation.score.toLocaleString()}
             </span>
             {participation.rank != null && (

@@ -269,7 +269,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
 
             {/* Progress Text */}
             <div className="flex justify-between items-center mt-1">
-              <span className="text-xs font-bold text-neo-cream">
+              <span className="text-xs font-bold text-neo-white">
                 {progress.current}/{progress.target}
               </span>
               <span className="text-xs font-bold text-neo-lime">

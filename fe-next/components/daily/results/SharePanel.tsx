@@ -76,7 +76,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">
                   {t('wordHunt.results.previewImage')}
                 </p>
-                <div className="relative w-full rounded-neo border-3 border-neo-black overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <div className="relative w-full rounded-neo border-3 border-neo-black overflow-hidden bg-gray-100 dark:bg-neo-navy-light">
                   {!imageLoaded && (
                     <div className="aspect-1200/630 flex items-center justify-center">
                       <Loader size="sm" />
@@ -107,7 +107,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
 
               <Button
                 onClick={onTwitter}
-                className="py-3 bg-black text-white border-3 border-gray-700 rounded-neo hover:bg-gray-900"
+                className="py-3 bg-black text-white border-3 border-gray-700 rounded-neo hover:bg-neo-navy"
               >
                 <XTwitterIcon className="me-2 w-5 h-5" />
                 X / Twitter
@@ -168,7 +168,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
 
                     <Button
                       onClick={onEmail}
-                      className="py-3 bg-gray-600 text-white border-3 border-neo-black rounded-neo hover:bg-gray-700"
+                      className="py-3 bg-gray-600 text-white border-3 border-neo-black rounded-neo hover:bg-neo-navy-elevated"
                     >
                       <Mail className="me-2 w-5 h-5" />
                       {t('share.email')}
@@ -184,7 +184,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
 
                     <Button
                       onClick={onCopy}
-                      className="py-3 bg-slate-700 dark:bg-slate-600 text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-slate-800 dark:hover:bg-slate-500"
+                      className="py-3 bg-neo-navy-elevated dark:bg-slate-600 text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-neo-navy-light dark:hover:bg-slate-500"
                     >
                       {copied ? (
                         <>

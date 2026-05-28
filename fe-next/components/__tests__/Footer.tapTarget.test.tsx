@@ -42,8 +42,8 @@ describe('Footer — tap-target audit (WCAG 2.5.8 AA)', () => {
 
     const navLinks = links.filter((a) => {
       const cls = a.className;
-      // Pick out the footer/legal link styles (text-sm + neo-cream/70 hover-color)
-      return /text-sm/.test(cls) && /text-neo-cream\/70/.test(cls);
+      // Pick out the footer/legal link styles (text-sm + neo-white hover-color)
+      return /text-sm/.test(cls) && /text-neo-white/.test(cls);
     });
 
     expect(navLinks.length).toBeGreaterThan(5);

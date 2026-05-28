@@ -32,7 +32,7 @@ function PartCard({ label, children }: { label: string; children: React.ReactNod
       <div className="border-2 border-neo-white/10 rounded-neo overflow-hidden bg-neo-navy/50 hover:border-neo-cyan/40 transition-colors">
         {children}
       </div>
-      <p className="text-neo-white/50 text-[10px] mt-1 truncate">{label}</p>
+      <p className="text-neo-white text-[10px] mt-1 truncate">{label}</p>
     </div>
   );
 }

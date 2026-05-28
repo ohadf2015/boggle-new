@@ -216,11 +216,11 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                 className="flex justify-center mb-3"
               >
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-black/50 border-2 border-neo-white/20 rounded-neo">
-                  <span className="text-neo-white/60 text-sm font-bold uppercase">
+                  <span className="text-neo-white text-sm font-bold uppercase">
                     {t('adventure.worldLabel')} {worldNumber}
                   </span>
-                  <span className="text-neo-white/30">|</span>
-                  <span className="text-neo-white/80 text-sm font-bold">
+                  <span className="text-neo-white">|</span>
+                  <span className="text-neo-white text-sm font-bold">
                     {t('adventure.level')} {levelNumber}
                   </span>
                 </div>
@@ -276,7 +276,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                         'w-12 h-12 md:w-14 md:h-14',
                         i < stars
                           ? 'text-neo-yellow fill-neo-yellow'
-                          : 'text-neo-white/50 fill-neo-white/10'
+                          : 'text-neo-white fill-neo-white/10'
                       )}
                     />
                   </AdaptiveMotion.div>
@@ -291,7 +291,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 25 }}
                   className="flex justify-center items-center gap-1.5 -mt-2 mb-4"
                 >
-                  <span className="text-neo-white/50 text-xs font-bold uppercase">
+                  <span className="text-neo-white text-xs font-bold uppercase">
                     {t('adventure.bestStars')}:
                   </span>
                   {[0, 1, 2].map((i) => (
@@ -301,7 +301,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                         'w-4 h-4',
                         i < previousBestStars
                           ? 'text-neo-yellow/60 fill-neo-yellow/60'
-                          : 'text-neo-white/20 fill-neo-white/5'
+                          : 'text-neo-white fill-neo-white/5'
                       )}
                     />
                   ))}

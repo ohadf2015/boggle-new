@@ -96,10 +96,10 @@ export default function ShiritoriView({
             data-active={!finished && currentPlayer === p.username}
             className={`rounded-neo border-neo border-black px-3 py-1 font-neo-display text-sm shadow-hard ${
               p.eliminated
-                ? 'bg-neo-navy-light text-neo-cream/40 line-through'
+                ? 'bg-neo-navy-light text-neo-white line-through'
                 : !finished && currentPlayer === p.username
                   ? 'bg-neo-lime text-black'
-                  : 'bg-neo-navy-light text-neo-cream'
+                  : 'bg-neo-navy-light text-neo-white'
             }`}
           >
             {p.username}
@@ -110,7 +110,7 @@ export default function ShiritoriView({
       {/* Required head prompt */}
       {!finished && (
         <div className="text-center">
-          <p className="font-neo-body text-sm text-neo-cream/70">{t('shiritori.nextStartsWith')}</p>
+          <p className="font-neo-body text-sm text-neo-white">{t('shiritori.nextStartsWith')}</p>
           <p className="font-neo-display text-5xl font-bold text-neo-cyan" data-testid="required-head">
             {requiredHead ?? '—'}
           </p>

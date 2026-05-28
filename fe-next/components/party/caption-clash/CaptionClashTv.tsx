@@ -149,7 +149,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
         {/* Round info */}
         <div className="mb-4 flex items-center gap-4">
-          <span className="font-neo-body text-neo-cream/50 text-sm uppercase">
+          <span className="font-neo-body text-neo-white text-sm uppercase">
             {t('party.round') || 'Round'} {imageData.round}/{imageData.totalRounds}
           </span>
           {imageData.isSpeedRound && (
@@ -183,12 +183,12 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
         </AdaptiveMotion.div>
 
         {/* Timer */}
-        <div className={`font-neo-display text-4xl mb-4 ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+        <div className={`font-neo-display text-4xl mb-4 ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {timeRemaining}s
         </div>
 
         {/* Submission counter */}
-        <div className="font-neo-body text-neo-cream/60 mb-4">
+        <div className="font-neo-body text-neo-white mb-4">
           {submissionCount.count}/{submissionCount.total} {t('party.submitted') || 'submitted'}
         </div>
 
@@ -230,7 +230,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
           transition={{ type: 'spring', damping: 15 }}
           className="bg-neo-navy-elevated border-4 border-neo-pink rounded-neo-lg shadow-hard-pink p-6 max-w-2xl"
         >
-          <p className="font-neo-display text-neo-cream text-2xl text-center leading-relaxed">
+          <p className="font-neo-display text-neo-white text-2xl text-center leading-relaxed">
             &ldquo;{revealedCaption.submission.text}&rdquo;
           </p>
         </AdaptiveMotion.div>
@@ -245,11 +245,11 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
               transition={{ type: 'spring', damping: 20 }}
             />
           </div>
-          <span className="font-neo-display text-neo-cream text-lg">{laughCount}</span>
+          <span className="font-neo-display text-neo-white text-lg">{laughCount}</span>
         </div>
 
         {/* Caption index */}
-        <p className="mt-4 text-neo-cream/30 font-neo-body text-sm">
+        <p className="mt-4 text-neo-white font-neo-body text-sm">
           {revealedCaption.index + 1}/{revealedCaption.total}
         </p>
       </div>
@@ -263,10 +263,10 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
         <h2 className="font-neo-display text-neo-pink text-3xl uppercase mb-4">
           {t('party.vote') || 'Vote!'}
         </h2>
-        <div className={`font-neo-display text-2xl mb-6 ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream/60'}`}>
+        <div className={`font-neo-display text-2xl mb-6 ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {timeRemaining}s
         </div>
-        <p className="text-neo-cream/40 font-neo-body">
+        <p className="text-neo-white font-neo-body">
           {t('party.voteOnPhone') || 'Vote on your phone!'}
         </p>
       </div>
@@ -289,10 +289,10 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
               className="flex items-center gap-4"
             >
               <div className="w-1/3 text-right">
-                <p className={`font-neo-body text-sm truncate ${result.isWinner ? 'text-neo-pink font-bold' : 'text-neo-cream/70'}`}>
+                <p className={`font-neo-body text-sm truncate ${result.isWinner ? 'text-neo-pink font-bold' : 'text-neo-white'}`}>
                   &ldquo;{result.submission.text}&rdquo;
                 </p>
-                <p className="text-neo-cream/40 text-xs">{result.submission.username}</p>
+                <p className="text-neo-white text-xs">{result.submission.username}</p>
               </div>
               <div className="flex-1 bg-neo-navy-elevated border-3 border-neo-cream/20 rounded-neo h-8 overflow-hidden">
                 <AdaptiveMotion.div
@@ -302,7 +302,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
                   className={`h-full rounded-neo ${result.isWinner ? 'bg-neo-pink' : 'bg-neo-cream/20'}`}
                 />
               </div>
-              <span className="w-16 font-neo-display text-neo-cream text-sm text-center">
+              <span className="w-16 font-neo-display text-neo-white text-sm text-center">
                 {result.percentage}%
               </span>
             </AdaptiveMotion.div>
@@ -321,7 +321,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
             <p className="font-neo-display text-neo-pink text-xl uppercase">
               {winner.submission.username}
             </p>
-            <p className="font-neo-body text-neo-cream/50 text-sm mt-1">
+            <p className="font-neo-body text-neo-white text-sm mt-1">
               +{winner.points} pts
             </p>
           </AdaptiveMotion.div>
@@ -336,7 +336,7 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
       <div className="text-center">
         <div className="text-6xl mb-4">🖼️</div>
         <h1 className="font-neo-display text-neo-pink text-3xl uppercase">Caption Clash</h1>
-        <p className="text-neo-cream/40 font-neo-body mt-2 animate-pulse">
+        <p className="text-neo-white font-neo-body mt-2 animate-pulse">
           {t('party.starting') || 'Starting...'}
         </p>
       </div>

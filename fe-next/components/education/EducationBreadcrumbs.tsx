@@ -155,7 +155,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
               {!isFirst && (
                 <ChevronRight
                   className={cn(
-                    'w-4 h-4 text-neo-white/40 shrink-0',
+                    'w-4 h-4 text-neo-white shrink-0',
                     isRTL && 'rotate-180'
                   )}
                   aria-hidden="true"
@@ -183,7 +183,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
                 <Link
                   href={item.href}
                   className={cn(
-                    'text-neo-white/70 hover:text-neo-white',
+                    'text-neo-white hover:text-neo-white',
                     'transition-colors duration-100',
                     'truncate max-w-[100px] sm:max-w-none',
                     'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 focus:ring-offset-neo-navy rounded-sm'

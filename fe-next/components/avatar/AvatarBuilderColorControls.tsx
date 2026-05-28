@@ -32,7 +32,7 @@ export function ColorStrip<T extends string>({ label, colors, selected, onSelect
     : colors;
   return (
     <div>
-      <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">{label}</p>
+      <p className="text-neo-white text-xs font-bold uppercase mb-2">{label}</p>
       <div className="flex flex-wrap gap-2">
         {visibleColors.map(color => {
           const isLocked = premiumCategory && premium
@@ -85,7 +85,7 @@ export interface GenderToggleProps {
 export function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <p className="text-neo-white/60 text-[11px] font-bold uppercase tracking-wide shrink-0">{t('avatarBuilder.gender')}</p>
+      <p className="text-neo-white text-[11px] font-bold uppercase tracking-wide shrink-0">{t('avatarBuilder.gender')}</p>
       <div className="inline-flex gap-1 p-1 rounded-neo bg-neo-navy-light/60 border border-neo-white/10">
         {AVATAR_GENDERS.map(gender => (
           <AdaptiveMotion.button
@@ -97,7 +97,7 @@ export function GenderToggle({ selected, onSelect, t }: GenderToggleProps) {
             className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-[6px] transition-colors ${
               selected === gender
                 ? 'bg-neo-lime text-neo-black shadow-hard-sm'
-                : 'text-neo-white/70 hover:text-neo-white'
+                : 'text-neo-white hover:text-neo-white'
             }`}
           >
             <span className="text-base leading-none">{gender === 'male' ? '\u2642' : '\u2640'}</span>

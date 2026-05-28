@@ -104,11 +104,11 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
     return (
       <div className={cn('max-w-4xl mx-auto p-6', className)}>
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-          <Swords className="w-16 h-16 text-neo-white/30 mb-4" />
+          <Swords className="w-16 h-16 text-neo-white mb-4" />
           <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-2">
             {t('duels.noDuelsYet')}
           </h2>
-          <p className="text-neo-white/70">{t('duels.challengeClassmate')}</p>
+          <p className="text-neo-white">{t('duels.challengeClassmate')}</p>
         </div>
       </div>
     );
@@ -128,7 +128,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         {/* Wins */}
         <div className="p-4 bg-green-600 border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+          <p className="text-xs text-white uppercase tracking-wide mb-1">
             {t('duels.wins')}
           </p>
           <p className="text-3xl font-neo-display font-bold text-white">{stats.wins}</p>
@@ -136,7 +136,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
 
         {/* Losses */}
         <div className="p-4 bg-red-600 border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+          <p className="text-xs text-white uppercase tracking-wide mb-1">
             {t('duels.losses')}
           </p>
           <p className="text-3xl font-neo-display font-bold text-white">{stats.losses}</p>
@@ -144,7 +144,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
 
         {/* Draws */}
         <div className="p-4 bg-yellow-500 border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+          <p className="text-xs text-white uppercase tracking-wide mb-1">
             {t('duels.draws')}
           </p>
           <p className="text-3xl font-neo-display font-bold text-white">{stats.draws}</p>
@@ -152,7 +152,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
 
         {/* Win Streak */}
         <div className="p-4 bg-neo-pink border-neo rounded-neo shadow-hard">
-          <p className="text-xs text-white/70 uppercase tracking-wide mb-1">
+          <p className="text-xs text-white uppercase tracking-wide mb-1">
             {t('duels.winStreak')}
           </p>
           <div className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
                   <p className="text-neo-white font-neo-body font-bold mb-1">
                     {t('duels.vs')} {opponent.display_name}
                   </p>
-                  <p className="text-sm text-neo-white/70">
+                  <p className="text-sm text-neo-white">
                     {t('duels.you')}: {studentScore} {t('duels.vs')} {opponent.display_name}:{' '}
                     {opponentScore}
                   </p>

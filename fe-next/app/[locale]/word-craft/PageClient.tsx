@@ -719,7 +719,7 @@ export default function WordCraftPageClient() {
         {!dict ? (
           <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
             <PageLoader size="sm" />
-            <span className="text-xs text-neo-cream">{t('wordcraft.loadingDict')}</span>
+            <span className="text-xs text-neo-white">{t('wordcraft.loadingDict')}</span>
           </div>
         ) : null}
 
@@ -910,7 +910,7 @@ export default function WordCraftPageClient() {
           role="status"
           className={cn(
             'absolute left-1/2 -translate-x-1/2 top-[calc(72px+40px)] z-40 px-3 py-1.5 border-neo-thick border-black rounded-neo shadow-hard-lg font-neo-display font-black text-sm uppercase tracking-wider animate-neo-pop',
-            captureToast.by === 'player' ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-pink text-neo-cream',
+            captureToast.by === 'player' ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-pink text-neo-white',
           )}
         >
           {captureToast.by === 'player'

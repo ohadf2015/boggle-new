@@ -60,7 +60,7 @@ export function LandingBlogSection() {
               href={`/${locale}/blog/${post.slug}`}
               className={cn(
                 'group block rounded-neo border-3 border-neo-black overflow-hidden',
-                'bg-slate-800 hover:bg-slate-700 shadow-hard hover:shadow-hard-lg',
+                'bg-neo-navy-light hover:bg-neo-navy-elevated shadow-hard hover:shadow-hard-lg',
                 'transition-all hover:scale-[1.02]'
               )}
             >

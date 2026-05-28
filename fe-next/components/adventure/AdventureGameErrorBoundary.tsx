@@ -40,7 +40,7 @@ function GameErrorFallback({ onExit, onRetry, error }: { onExit: () => void; onR
         <h2 className="text-neo-white font-neo-display font-black text-lg mb-2">
           {t('adventure.gameError.title')}
         </h2>
-        <p className="text-neo-white/60 text-sm mb-6">
+        <p className="text-neo-white text-sm mb-6">
           {t('adventure.gameError.description')}
         </p>
 

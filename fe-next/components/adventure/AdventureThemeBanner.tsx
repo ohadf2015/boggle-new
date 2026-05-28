@@ -41,21 +41,21 @@ const AdventureThemeBanner = memo(function AdventureThemeBanner({
       </span>
 
       {/* Game mode badge */}
-      <span className="px-1.5 py-0.5 rounded border border-white/20 bg-white/10 text-neo-white/70 font-bold uppercase tracking-wide shrink-0">
+      <span className="px-1.5 py-0.5 rounded border border-white/20 bg-white/10 text-neo-white font-bold uppercase tracking-wide shrink-0">
         {t(gameModeDisplayKey)}
       </span>
 
-      <span className="text-neo-white/50 shrink-0">·</span>
+      <span className="text-neo-white shrink-0">·</span>
 
       {/* Themed bonus */}
       <span className="text-neo-lime font-bold shrink-0">
         🌿 +{bonusPercent}% {t('adventure.theme.bonus')}
       </span>
 
-      <span className="text-neo-white/50 shrink-0">·</span>
+      <span className="text-neo-white shrink-0">·</span>
 
       {/* Found counter */}
-      <span className="text-neo-white/60 shrink-0">
+      <span className="text-neo-white shrink-0">
         {themedWordsFound}/{themedWordCount} {t('adventure.theme.found')}
       </span>
     </div>

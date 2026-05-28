@@ -192,7 +192,7 @@ export function DailyChallengeLanding({
               }
             </m.div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
+              <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
                 {t('daily.wordHunt.title')}
               </h2>
               <span className={cn(
@@ -283,7 +283,7 @@ export function DailyChallengeLanding({
               <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
             </m.div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-neo-display font-black text-neo-cream leading-none">
+              <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
                 {t('wordWheel.hub.wordWheelQuest')}
               </h2>
               <span className="inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-cyan/20 text-neo-cyan border-neo-cyan/40">

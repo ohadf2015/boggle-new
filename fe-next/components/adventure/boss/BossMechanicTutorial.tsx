@@ -92,7 +92,7 @@ export const BossMechanicTutorial = memo<BossMechanicTutorialProps>(({
           </div>
 
           {/* Description */}
-          <p className="text-neo-white/80 text-sm font-bold mb-3 leading-relaxed">
+          <p className="text-neo-white text-sm font-bold mb-3 leading-relaxed">
             {t(`adventure.bosses.twist.${twistType}.desc`)}
           </p>
 

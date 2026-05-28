@@ -108,7 +108,7 @@ const SkillCheckpoint = memo<{
         isCompleted
           ? 'border-neo-lime bg-neo-lime/10 dark:bg-neo-lime/20'
           : isDarkMode
-            ? 'border-slate-600 bg-slate-700/50'
+            ? 'border-slate-600 bg-neo-navy-elevated/50'
             : 'border-gray-200 bg-gray-50'
       )}
     >
@@ -225,7 +225,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
           isComplete
             ? 'bg-neo-lime border-neo-lime text-neo-black'
             : isDarkMode
-              ? 'bg-slate-700 border-slate-500 text-white'
+              ? 'bg-neo-navy-elevated border-slate-500 text-white'
               : 'bg-white border-neo-black text-neo-black'
         )}
       >
@@ -294,7 +294,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
       className={cn(
         'rounded-xl border-2 overflow-hidden shadow-hard-sm',
         isDarkMode
-          ? 'bg-slate-800/90 border-slate-600'
+          ? 'bg-neo-navy-light/90 border-slate-600'
           : 'bg-white/95 border-neo-black',
         compact ? 'p-3' : 'p-4',
         compact && onToggleExpand && 'cursor-pointer'
@@ -317,7 +317,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
               }}
               className={cn(
                 'text-xs px-3 py-2 min-h-[36px] rounded border',
-                isDarkMode ? 'border-slate-500 text-gray-400 hover:bg-slate-700' : 'border-gray-300 text-gray-500 hover:bg-gray-100'
+                isDarkMode ? 'border-slate-500 text-gray-400 hover:bg-neo-navy-elevated' : 'border-gray-300 text-gray-500 hover:bg-gray-100'
               )}
             >
               {t('common.collapse')}

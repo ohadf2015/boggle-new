@@ -110,7 +110,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
   const isPerfect = breakdown.total >= 1000;
 
   return (
-    <div className="rounded-neo border-3 border-neo-black bg-slate-900 overflow-hidden shadow-hard">
+    <div className="rounded-neo border-3 border-neo-black bg-neo-navy overflow-hidden shadow-hard">
       {/* Header with total score */}
       <div className="p-4 bg-linear-to-r from-purple-900/50 to-indigo-900/50 border-b-3 border-neo-black">
         <div className="text-center">
@@ -135,7 +135,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
           </m.div>
 
           {/* Overall progress bar */}
-          <div className="mt-3 h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
+          <div className="mt-3 h-2 bg-neo-navy-light rounded-full overflow-hidden border border-gray-700">
             <m.div
               initial={{ width: 0 }}
               animate={{ width: `${(breakdown.total / 1000) * 100}%` }}
@@ -182,7 +182,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
               </div>
 
               {/* Progress bar with overshoot spring */}
-              <div className="h-2 bg-gray-800 rounded-full overflow-hidden relative">
+              <div className="h-2 bg-neo-navy-light rounded-full overflow-hidden relative">
                 <m.div
                   initial={{ width: 0 }}
                   animate={{ width: `${(category.score / category.maxScore) * 100}%` }}

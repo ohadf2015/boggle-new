@@ -72,7 +72,7 @@ export function SharePanelModal({
 
           <Button
             onClick={onCopy}
-            className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white border-3 border-neo-black rounded-neo"
+            className="w-full py-3 bg-gray-200 dark:bg-neo-navy-elevated text-gray-800 dark:text-white border-3 border-neo-black rounded-neo"
           >
             {copied ? (
               <>

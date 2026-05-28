@@ -107,7 +107,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
               <p className="text-neo-white font-bold mb-1">
                 {t('challengeReceived')}
               </p>
-              <p className="text-neo-white/80 text-sm">
+              <p className="text-neo-white text-sm">
                 {t('challengedYou', { name: challenge.challengerName })}
               </p>
             </div>
@@ -115,7 +115,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
             {/* Dismiss button */}
             <button
               onClick={handleDismiss}
-              className="shrink-0 text-neo-white/50 hover:text-neo-white transition-colors"
+              className="shrink-0 text-neo-white hover:text-neo-white transition-colors"
               aria-label={t('common.dismiss', 'Dismiss')}
             >
               <X className="w-5 h-5" />

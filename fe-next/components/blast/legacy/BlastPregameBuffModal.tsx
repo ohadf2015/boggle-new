@@ -60,10 +60,10 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
           </div>
 
           <div className="flex flex-col items-center gap-4 text-center">
-            <h2 className="font-neo-display text-3xl font-black text-neo-cream">
+            <h2 className="font-neo-display text-3xl font-black text-neo-white">
               {t('blast.pregameBuff.title')}
             </h2>
-            <p className="font-neo-body text-sm text-neo-cream/70">
+            <p className="font-neo-body text-sm text-neo-white">
               {t('blast.pregameBuff.body')}
             </p>
 
@@ -92,8 +92,8 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
               data-testid="blast-pregame-buff-desc"
               className={`min-h-[3.5rem] w-full rounded-neo border-2 border-dashed px-4 py-3 font-neo-body text-sm transition-colors ${
                 selected
-                  ? 'border-neo-cream/40 bg-neo-cream/5 text-neo-cream'
-                  : 'border-neo-cream/15 text-neo-cream/40'
+                  ? 'border-neo-cream/40 bg-neo-cream/5 text-neo-white'
+                  : 'border-neo-cream/15 text-neo-white'
               }`}
             >
               {selected && <span className="font-black uppercase tracking-wider">{selectedLabel}: </span>}
@@ -117,7 +117,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
               <button
                 data-testid="blast-pregame-buff-skip"
                 onClick={onSkip}
-                className="flex items-center justify-center gap-2 rounded-neo border-neo border-black/40 bg-transparent px-4 py-2 font-neo-body text-sm text-neo-cream/60 hover:text-neo-cream hover:border-black"
+                className="flex items-center justify-center gap-2 rounded-neo border-neo border-black/40 bg-transparent px-4 py-2 font-neo-body text-sm text-neo-white hover:text-neo-white hover:border-black"
               >
                 <X className="h-4 w-4" />
                 {t('blast.pregameBuff.skip')}

@@ -95,7 +95,7 @@ export function RewardAmountInput({
             max={MAX_XP_AMOUNT}
             value={xpAmount}
             onChange={(e) => handleXpChange(e.target.value)}
-            className="bg-white dark:bg-slate-800"
+            className="bg-white dark:bg-neo-navy-light"
           />
           <p className="text-xs text-slate-500">Max: {MAX_XP_AMOUNT.toLocaleString()}</p>
         </div>
@@ -112,7 +112,7 @@ export function RewardAmountInput({
             max={MAX_COIN_AMOUNT}
             value={coinAmount}
             onChange={(e) => handleCoinChange(e.target.value)}
-            className="bg-white dark:bg-slate-800"
+            className="bg-white dark:bg-neo-navy-light"
           />
           <p className="text-xs text-slate-500">Max: {MAX_COIN_AMOUNT.toLocaleString()}</p>
         </div>
@@ -120,7 +120,7 @@ export function RewardAmountInput({
 
       {/* Preview */}
       {(xpAmount > 0 || coinAmount > 0) && (
-        <div className="p-3 bg-slate-100 dark:bg-slate-900 rounded-lg">
+        <div className="p-3 bg-slate-100 dark:bg-neo-navy rounded-lg">
           <p className="text-sm font-medium mb-2">Reward Preview:</p>
           <div className="flex gap-4">
             {xpAmount > 0 && (

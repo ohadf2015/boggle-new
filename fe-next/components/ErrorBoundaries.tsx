@@ -220,7 +220,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, onReset }) 
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-sm text-neo-cream/80">
+        <p className="text-sm text-neo-white">
           {t('errors.unexpectedError', "Tiny hiccup - but your game's totally safe!")}
         </p>
         {process.env.NODE_ENV === 'development' && error && (
@@ -310,7 +310,7 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-neo-cream/80">
+              <p className="text-sm text-neo-white">
                 {t('errors.updateMessage', "Cool new stuff just dropped! Quick refresh and you're back in.")}
               </p>
               <p className="text-xs text-neo-lime/80 flex items-center gap-1">
@@ -342,7 +342,7 @@ export class FeatureErrorBoundary extends Component<FeatureErrorBoundaryProps, E
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-neo-cream/80">
+            <p className="text-sm text-neo-white">
               {isConnectionError
                 ? t('errors.connectionLost', 'Lost connection - reconnecting')
                 : t('errors.errorMessage', "Quick glitch, but don't worry - your words are safe!")}

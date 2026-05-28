@@ -37,7 +37,7 @@ export const ChapterQuestPanel = memo(function ChapterQuestPanel({
         <div className="w-6 h-6 rounded-neo bg-neo-yellow/20 border-2 border-neo-yellow/40 flex items-center justify-center">
           <BookOpen className="w-3.5 h-3.5 text-neo-yellow" />
         </div>
-        <h3 className="text-xs font-black text-neo-white/80 uppercase tracking-wide">
+        <h3 className="text-xs font-black text-neo-white uppercase tracking-wide">
           {t('adventure.quests.chapter.panelTitle')}
         </h3>
       </div>

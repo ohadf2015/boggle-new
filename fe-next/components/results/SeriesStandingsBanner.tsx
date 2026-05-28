@@ -51,11 +51,11 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Trophy className="w-4 h-4 text-neo-yellow" />
-          <span className="text-xs font-black uppercase tracking-widest text-neo-cream/70">
+          <span className="text-xs font-black uppercase tracking-widest text-neo-white">
             {t('results.series.title')}
           </span>
         </div>
-        <span className="text-xs font-bold text-neo-cream/50">
+        <span className="text-xs font-bold text-neo-white">
           {totalGames
             ? t('results.series.gameXofY', { current: roundNumber, total: totalGames })
             : t('results.series.gameCount', { count: roundNumber })}
@@ -84,7 +84,7 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
               <span
                 className={cn(
                   'w-5 text-center font-black text-sm',
-                  isTopThree ? RANK_COLORS[index] : 'text-neo-cream/50'
+                  isTopThree ? RANK_COLORS[index] : 'text-neo-white'
                 )}
               >
                 {player.currentRank}
@@ -103,7 +103,7 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
                   <span
                     className={cn(
                       'text-sm font-bold truncate',
-                      isCurrentUser ? 'text-neo-cyan' : 'text-neo-cream'
+                      isCurrentUser ? 'text-neo-cyan' : 'text-neo-white'
                     )}
                   >
                     {player.username}
@@ -135,8 +135,8 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
                       <span
                         key={`round-${i}`}
                         className={cn(
-                          'text-[10px] px-1 py-0 rounded bg-neo-white/10 text-neo-cream/60',
-                          i === player.roundScores.length - 1 && 'bg-neo-white/20 text-neo-cream/90 font-bold'
+                          'text-[10px] px-1 py-0 rounded bg-neo-white/10 text-neo-white',
+                          i === player.roundScores.length - 1 && 'bg-neo-white/20 text-neo-white font-bold'
                         )}
                         title={`${t('results.series.round', { num: i + 1 }) || `R${i + 1}`}: ${score}`}
                       >
@@ -157,7 +157,7 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
                 <span
                   className={cn(
                     'text-sm font-black',
-                    isCurrentUser ? 'text-neo-cyan' : 'text-neo-cream',
+                    isCurrentUser ? 'text-neo-cyan' : 'text-neo-white',
                     seriesLeader === player.username && 'text-neo-lime'
                   )}
                 >

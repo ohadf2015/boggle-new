@@ -200,7 +200,7 @@ export function KeyboardShortcutsOverlay({
                 'text-sm'
               )}>
                 <span className="font-bold text-neo-cyan">TIP: </span>
-                <span className="text-neo-white/90">
+                <span className="text-neo-white">
                   {t('keyboardShortcuts.tip')}
                 </span>
               </div>
@@ -259,7 +259,7 @@ function ShortcutRow({ keys, description }: ShortcutRowProps) {
           </kbd>
         ))}
       </div>
-      <span className="text-sm text-neo-white/80">{description}</span>
+      <span className="text-sm text-neo-white">{description}</span>
     </div>
   );
 }

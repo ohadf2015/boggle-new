@@ -146,7 +146,7 @@ export const CelebrationHero = memo(function CelebrationHero({
               className={cn(
                 'inline-block px-6 py-2 text-xs sm:text-sm font-black uppercase',
                 'border-4 border-neo-black rounded-full shadow-hard-lg mb-4',
-                isWinner ? 'bg-neo-pink text-neo-cream' : 'bg-purple-800 text-neo-cream',
+                isWinner ? 'bg-neo-pink text-neo-white' : 'bg-purple-800 text-neo-white',
               )}
             >
               {message}
@@ -199,7 +199,7 @@ export const CelebrationHero = memo(function CelebrationHero({
               </div>
               <div className="text-start">
                 <span className="text-sm sm:text-base font-black text-white block leading-tight">{wordCount}</span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/70">
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white">
                   {t('results.words')}
                 </span>
               </div>
@@ -214,7 +214,7 @@ export const CelebrationHero = memo(function CelebrationHero({
                 <span className="text-sm sm:text-base font-black text-white block leading-tight">
                   {totalWords != null ? `${wordCount}/${totalWords}` : `${accuracy}%`}
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/70 hidden sm:block">
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white hidden sm:block">
                   {t('results.accuracy')}
                 </span>
               </div>
@@ -230,7 +230,7 @@ export const CelebrationHero = memo(function CelebrationHero({
                   <span className="text-sm sm:text-base font-black text-white block leading-tight">
                     +{coinReward.awarded}
                   </span>
-                  <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white/70 hidden sm:block">
+                  <span className="text-[9px] sm:text-[10px] font-bold uppercase text-white hidden sm:block">
                     {t('results.coinsEarned')}
                   </span>
                 </div>

@@ -56,7 +56,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   // Error state with no data
   if (error && !data) {
     return (
-      <div className="text-center py-12 bg-slate-800/30 rounded-neo border-neo border-black">
+      <div className="text-center py-12 bg-neo-navy-light/30 rounded-neo border-neo border-black">
         <p className="text-red-400 mb-4">{error}</p>
         <Button onClick={refresh} variant="outline">
           {t('admin.todayGames.retry')}

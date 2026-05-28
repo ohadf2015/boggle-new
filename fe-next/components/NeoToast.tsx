@@ -163,7 +163,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
                 initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
-                className="px-2 py-1 bg-linear-to-r from-neo-red to-neo-pink border-2 border-neo-black rounded font-black text-xs text-neo-cream"
+                className="px-2 py-1 bg-linear-to-r from-neo-red to-neo-pink border-2 border-neo-black rounded font-black text-xs text-neo-white"
               >
                 🔥 ×2
               </m.span>
@@ -319,7 +319,7 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions & {
               <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
                 {applyHebrewFinalLetters(word)}
               </span>
-              <span dir="auto" className="text-xs font-bold text-neo-white/80 uppercase">
+              <span dir="auto" className="text-xs font-bold text-neo-white uppercase">
                 {displayMessage}
               </span>
             </div>

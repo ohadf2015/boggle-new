@@ -55,7 +55,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
         'flex flex-col gap-1 py-4 px-2',
         'w-56 shrink-0',
         'border-e border-slate-700/50',
-        'bg-slate-900/50',
+        'bg-neo-navy/50',
         // Tablet: icon-only
         'md:w-56 sm:w-14',
         // Mobile: hidden (use bottom tabs via AdminBottomNav)
@@ -73,7 +73,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
             onClick={() => router.push(`${basePath}${item.path}`)}
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-neo text-sm font-medium transition-colors',
-              'hover:bg-slate-800 hover:text-neo-white',
+              'hover:bg-neo-navy-light hover:text-neo-white',
               'focus-visible:outline-2 focus-visible:outline-neo-lime focus-visible:outline-offset-2',
               active
                 ? 'bg-neo-lime/10 text-neo-lime border border-neo-lime/20'

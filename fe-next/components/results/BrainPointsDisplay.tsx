@@ -47,7 +47,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
         : 'bg-linear-to-r from-neo-red to-red-400';
     
     const textColor = isPositive ? 'text-neo-black' : 'text-white';
-    const subTextColor = isPositive ? 'text-neo-black/90' : 'text-white/90';
+    const subTextColor = isPositive ? 'text-neo-black/90' : 'text-white';
     const iconColor = isPositive ? 'text-neo-black' : 'text-white';
 
     // Inline variant - small badge for landscape mode

@@ -192,7 +192,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
         className="mb-5 text-center"
       >
         <div className="inline-block px-3 py-1.5 rounded-full border-2 border-dashed border-neo-cream/30">
-          <span className="text-[11px] font-bold text-neo-cream/70 uppercase tracking-[0.15em] font-neo-body">
+          <span className="text-[11px] font-bold text-neo-white uppercase tracking-[0.15em] font-neo-body">
             {t('onboarding.ftue.v2.tomorrowBonus')}
           </span>
         </div>
@@ -219,13 +219,13 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
 
       {/* Footer row — score (tiny) + skip */}
       <div className="flex items-center justify-between mt-3 px-1">
-        <div className="text-[10px] font-bold text-neo-cream/35 uppercase tracking-[0.2em] tabular-nums font-neo-body">
+        <div className="text-[10px] font-bold text-neo-white uppercase tracking-[0.2em] tabular-nums font-neo-body">
           {t('onboarding.ftue.v2.scoreFooter', { score: String(score) })}
         </div>
         {onSkip && (
           <button
             onClick={onSkip}
-            className="text-[10px] font-bold text-neo-cream/35 hover:text-neo-cream/70 uppercase tracking-[0.2em] underline-offset-2 hover:underline transition-colors font-neo-body"
+            className="text-[10px] font-bold text-neo-white hover:text-neo-white uppercase tracking-[0.2em] underline-offset-2 hover:underline transition-colors font-neo-body"
           >
             {t('onboarding.ftue.v2.skipForNow')}
           </button>

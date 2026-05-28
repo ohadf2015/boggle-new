@@ -29,7 +29,7 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, classNa
         font-black transition-all ${className}`}
       aria-label={label}
     >
-      <DoorOpen className="w-4 h-4 text-neo-cream/80" aria-hidden="true" />
+      <DoorOpen className="w-4 h-4 text-neo-white" aria-hidden="true" />
     </Button>
   );
 };

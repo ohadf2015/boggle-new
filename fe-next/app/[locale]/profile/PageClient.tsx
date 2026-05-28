@@ -194,20 +194,20 @@ export default function ProfilePageClient(): React.JSX.Element {
         <div className="max-w-4xl mx-auto px-4 py-6 w-full">
           {/* Profile header skeleton */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-slate-700 animate-pulse" />
+            <div className="w-20 h-20 rounded-full bg-gray-200 dark:bg-neo-navy-elevated animate-pulse" />
             <div className="flex-1 space-y-2">
-              <div className="h-6 w-32 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
-              <div className="h-4 w-24 bg-gray-200 dark:bg-slate-700 rounded animate-pulse" />
+              <div className="h-6 w-32 bg-gray-200 dark:bg-neo-navy-elevated rounded animate-pulse" />
+              <div className="h-4 w-24 bg-gray-200 dark:bg-neo-navy-elevated rounded animate-pulse" />
             </div>
           </div>
           {/* Stats grid skeleton */}
           <div className="grid grid-cols-3 gap-3 mb-6">
             {['a', 'b', 'c'].map((id) => (
-              <div key={`stat-skel-${id}`} className="h-24 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+              <div key={`stat-skel-${id}`} className="h-24 bg-gray-200 dark:bg-neo-navy-elevated rounded-xl animate-pulse" />
             ))}
           </div>
           {/* Content skeleton */}
-          <div className="h-64 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse" />
+          <div className="h-64 bg-gray-200 dark:bg-neo-navy-elevated rounded-xl animate-pulse" />
         </div>
       </div>
     );
@@ -254,13 +254,13 @@ export default function ProfilePageClient(): React.JSX.Element {
                     isActive
                       ? 'bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard-sm scale-[1.02]'
                       : isDarkMode
-                        ? 'bg-neo-white/8 text-neo-white/80 border-2 border-neo-white/20 active:scale-95'
+                        ? 'bg-neo-white/8 text-neo-white border-2 border-neo-white/20 active:scale-95'
                         : 'bg-neo-black/5 text-neo-black/80 border-2 border-neo-black/20 active:scale-95'
                   )}
                   aria-selected={isActive}
                   role="tab"
                 >
-                  <Icon className={cn('w-5 h-5', isActive ? 'text-neo-black' : isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')} />
+                  <Icon className={cn('w-5 h-5', isActive ? 'text-neo-black' : isDarkMode ? 'text-neo-white' : 'text-neo-black/70')} />
                   <span>{t(`profile.sections.${section}`)}</span>
                 </button>
               );

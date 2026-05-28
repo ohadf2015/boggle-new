@@ -326,7 +326,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
             onClick={(e) => e.stopPropagation()}
             dir="rtl"
           >
-            <p className="font-rubik text-base leading-relaxed text-white/90">{activeHotspot.loreHe}</p>
+            <p className="font-rubik text-base leading-relaxed text-white">{activeHotspot.loreHe}</p>
             {activeHotspot.shardHe && (
               <div className="mt-3 flex items-center justify-center gap-2">
                 <span className="font-fredoka text-[10px] uppercase tracking-widest text-amber-200/55">שבר אות</span>
@@ -429,7 +429,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
         type="button"
         onClick={onExit}
         aria-label="חזרה"
-        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white/30 hover:text-white/60"
+        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white hover:text-white"
       >
         ←
       </button>
@@ -448,7 +448,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
             <h2 className="mt-2 font-fredoka text-3xl font-black text-cyan-200" style={{ textShadow: '2px 2px 0 #000' }}>
               ארבע צנצנות. תוויותיהן התערבבו.
             </h2>
-            <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
+            <p className="mt-4 font-rubik text-base leading-relaxed text-white">
               אורי ערבב תוויות לפני שהקור התפשט.
               חידה אחת על כל צנצנת — וקצת אותיות נוספות שלא שייכות.
               קרא, חשוב, בחר.
@@ -473,7 +473,7 @@ export function CipherPantryScene({ onSolved, onExit }: Props) {
             animation: 'wv-bloom 1.4s ease-out forwards',
           }}
         >
-          <p className="font-rubik text-sm tracking-wide text-white/70" dir="rtl">
+          <p className="font-rubik text-sm tracking-wide text-white" dir="rtl">
             כל הצנצנות פתוחות.
           </p>
           <div className="flex flex-wrap justify-center gap-3" dir="rtl">

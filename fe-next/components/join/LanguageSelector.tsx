@@ -54,7 +54,7 @@ export const LanguageSelector = memo<LanguageSelectorProps>(({
         </Label>
       )}
       <Select value={selectedLanguage} onValueChange={(val) => onLanguageChange(val as Language)}>
-        <SelectTrigger className="h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white">
+        <SelectTrigger className="h-10 bg-slate-100 dark:bg-neo-navy-elevated/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white">
           <SelectValue>
             <div className="flex items-center justify-center gap-2">
               <span className="text-lg leading-none">{selectedOption?.flag}</span>

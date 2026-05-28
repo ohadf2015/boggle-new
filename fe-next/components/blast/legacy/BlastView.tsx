@@ -271,7 +271,7 @@ export function BlastView() {
           <h1 className="text-4xl font-black uppercase text-white font-neo-display">
             {t('blast.ready.title')}
           </h1>
-          <p className="text-sm text-white/60 text-center max-w-xs">
+          <p className="text-sm text-white text-center max-w-xs">
             {t('blast.ready.subtitle')}
           </p>
           {checkpoint.checkpoint && checkpoint.resumeFromWave > 1 ? (
@@ -289,7 +289,7 @@ export function BlastView() {
                 size="sm"
                 variant="ghost"
                 onClick={handleStart}
-                className="min-h-[40px] w-full max-w-xs font-bold text-sm uppercase text-white/70 hover:text-white underline underline-offset-4 decoration-white/40 hover:bg-transparent"
+                className="min-h-[40px] w-full max-w-xs font-bold text-sm uppercase text-white hover:text-white underline underline-offset-4 decoration-white/40 hover:bg-transparent"
               >
                 {t('blast.ready.play')}
               </Button>
@@ -389,7 +389,7 @@ export function BlastView() {
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.3 + i * 0.2 }}
                 >
-                  <Star className={`h-10 w-10 ${i < stars ? 'text-amber-400 fill-amber-400' : 'text-white/20 fill-white/10'}`} />
+                  <Star className={`h-10 w-10 ${i < stars ? 'text-amber-400 fill-amber-400' : 'text-white fill-white/10'}`} />
                 </AdaptiveMotion.div>
               ))}
             </div>
@@ -398,7 +398,7 @@ export function BlastView() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="text-white/80 text-center space-y-1"
+              className="text-white text-center space-y-1"
             >
               <p className="text-lg font-bold tabular-nums">{lastWaveStats.score} {t('common.points')}</p>
               <p className="text-sm">{lastWaveStats.words} {t('blast.wordsFound')} · {Math.round(lastWaveStats.clearPct)}% {t('blast.cleared')}</p>

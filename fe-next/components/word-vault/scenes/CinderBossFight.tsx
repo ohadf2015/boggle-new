@@ -354,7 +354,7 @@ function MercyEnding({ onContinue }: { onContinue: () => void }) {
       <h2 className="font-fredoka text-4xl font-black text-amber-100 drop-shadow-[3px_3px_0_#000]">
         קאל
       </h2>
-      <p className="max-w-md font-rubik text-lg leading-relaxed text-white/90">
+      <p className="max-w-md font-rubik text-lg leading-relaxed text-white">
         הלבה מתקררת. הסדקים נסגרים. רגע אחד הוא חוזר להיות הוא — חם, רך, מחבק.
         “תודה, מלו… זכרת אותי.” ואז הוא נעלם, משאיר אחריו ספר מתכונים וקסם של אותיות.
       </p>
@@ -382,7 +382,7 @@ function DamageEnding({ onContinue }: { onContinue: () => void }) {
       <h2 className="font-fredoka text-3xl font-black text-pink-300 drop-shadow-[3px_3px_0_#000]">
         הוא לא הספיק לזכור
       </h2>
-      <p className="max-w-md font-rubik text-lg leading-relaxed text-white/80">
+      <p className="max-w-md font-rubik text-lg leading-relaxed text-white">
         ניצחת. הלבה כבתה. אבל הוא היה אחיך. אולי בפעם הבאה תקשיבי לפני שתכי.
       </p>
       <button
@@ -409,7 +409,7 @@ function DefeatEnding({ onContinue }: { onContinue: () => void }) {
       <h2 className="font-fredoka text-3xl font-black text-orange-300 drop-shadow-[3px_3px_0_#000]">
         סינדר ניצח
       </h2>
-      <p className="max-w-md font-rubik text-lg leading-relaxed text-white/80">
+      <p className="max-w-md font-rubik text-lg leading-relaxed text-white">
         מילים לא הספיקו. אולי תנסי שוב — עם אוצר מילים גדול יותר.
       </p>
       <button
@@ -506,7 +506,7 @@ function CinderHpBar({ pct, phase }: { pct: number; phase: Phase }) {
     <div className="flex w-full max-w-md flex-col items-center gap-1 px-4">
       <div className="flex w-full items-center justify-between text-xs">
         <span className="font-fredoka font-bold text-orange-300">סינדר</span>
-        <span className="font-rubik text-white/60">
+        <span className="font-rubik text-white">
           {phase === 'rage' ? 'רותח' : phase === 'desperate' ? 'נלחץ' : 'מבולבל'}
         </span>
       </div>
@@ -528,7 +528,7 @@ function MeloHpBar({ pct }: { pct: number }) {
     <div className="flex w-full max-w-md flex-col items-center gap-1 self-center">
       <div className="flex w-full items-center justify-between text-xs">
         <span className="font-fredoka font-bold text-lime-200">מלו</span>
-        <span className="font-rubik text-white/60">{Math.round(pct * 100)}%</span>
+        <span className="font-rubik text-white">{Math.round(pct * 100)}%</span>
       </div>
       <div className="h-3 w-full overflow-hidden rounded-full border-2 border-lime-300 bg-[#0b1220]">
         <div

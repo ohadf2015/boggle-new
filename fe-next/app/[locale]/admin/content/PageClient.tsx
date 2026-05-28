@@ -65,7 +65,7 @@ export default function ContentPageClient() {
                 <button
                   key={link.path}
                   onClick={() => router.push(link.path)}
-                  className="bg-slate-800/50 rounded-neo border-neo border-black p-4 flex items-center gap-3 hover:bg-slate-700/50 transition-colors text-start"
+                  className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 flex items-center gap-3 hover:bg-neo-navy-elevated/50 transition-colors text-start"
                 >
                   <Icon className={cn('w-6 h-6 shrink-0', link.color)} />
                   <span className="text-sm font-medium text-neo-white">{link.label}</span>

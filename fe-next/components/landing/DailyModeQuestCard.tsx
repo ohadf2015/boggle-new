@@ -71,11 +71,11 @@ export function DailyModeQuestCard() {
     >
       {/* Collapsed bar */}
       <div className="px-4 py-3 flex items-center justify-between">
-        <span className="font-neo-display text-neo-cream text-sm">
+        <span className="font-neo-display text-neo-white text-sm">
           {t('dailyQuest.title')}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-neo-cream/70 text-xs">
+          <span className="text-neo-white text-xs">
             {t('dailyQuest.modesPlayed', { count: modesPlayed })}
           </span>
           <div className="flex gap-1">
@@ -101,7 +101,7 @@ export function DailyModeQuestCard() {
           <ModeRow label={t('dailyQuest.daily')} done={progress.daily} emoji="&#x1F4C5;" />
           <ModeRow label={t('dailyQuest.classicMp')} done={progress.classicMp} emoji="&#x2694;&#xFE0F;" />
           <ModeRow label={t('dailyQuest.wordHuntMp')} done={progress.wordHuntMp} emoji="&#x1F3AF;" />
-          <p className="text-neo-cream/50 text-xs mt-1">{t('dailyQuest.playAllModes')}</p>
+          <p className="text-neo-white text-xs mt-1">{t('dailyQuest.playAllModes')}</p>
         </div>
       )}
     </div>
@@ -112,7 +112,7 @@ function ModeRow({ label, done, emoji }: { label: string; done: boolean; emoji: 
   return (
     <div className="flex items-center gap-2 text-sm pt-1">
       <span>{emoji}</span>
-      <span className={done ? 'text-neo-lime line-through' : 'text-neo-cream/70'}>{label}</span>
+      <span className={done ? 'text-neo-lime line-through' : 'text-neo-white'}>{label}</span>
       {done && <span className="text-neo-lime">&#x2713;</span>}
     </div>
   );

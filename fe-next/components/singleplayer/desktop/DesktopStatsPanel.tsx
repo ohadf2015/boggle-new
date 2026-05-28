@@ -119,14 +119,14 @@ export const DesktopStatsPanel: React.FC<DesktopStatsPanelProps> = ({
           "flex items-center justify-between px-3 py-2.5 rounded-neo",
           "bg-neo-black/20"
         )}>
-          <div className="flex items-center gap-2 text-neo-cream/70">
+          <div className="flex items-center gap-2 text-neo-white">
             <Target className="w-4 h-4 text-neo-cyan" />
             <span className="text-xs font-medium">{t('singlePlayer.wordsFound')}</span>
           </div>
           <div className="font-bold text-neo-cyan tabular-nums">
             {wordsFound}
             {totalBoardWords && (
-              <span className="text-neo-cream/50 text-xs ms-1">/ {totalBoardWords}</span>
+              <span className="text-neo-white text-xs ms-1">/ {totalBoardWords}</span>
             )}
           </div>
         </div>

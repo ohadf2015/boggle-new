@@ -309,7 +309,7 @@ export function LevelUpCelebration({
               {t('levelUp.title')}
             </h2>
 
-            <p className="level-title text-neo-white/80 text-lg mb-4">
+            <p className="level-title text-neo-white text-lg mb-4">
               {t('levelUp.reached', { level }) || `You reached level ${level}!`}
             </p>
 
@@ -355,7 +355,7 @@ export function LevelUpCelebration({
 
             {/* Tap to continue */}
             <m.p
-              className="text-neo-white/50 text-sm mt-6"
+              className="text-neo-white text-sm mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2 }}

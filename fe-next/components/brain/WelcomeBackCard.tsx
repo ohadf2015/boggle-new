@@ -163,7 +163,7 @@ export default function WelcomeBackCard({
                 className={cn(
                   'p-1.5 rounded-neo border-2 border-neo-black',
                   'transition-all hover:bg-neo-red/20',
-                  isDarkMode ? 'bg-slate-700' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-elevated' : 'bg-white'
                 )}
               >
                 <X className="w-4 h-4" />
@@ -173,7 +173,7 @@ export default function WelcomeBackCard({
             {/* Welcome message */}
             <p className={cn(
               'text-sm mb-4',
-              isDarkMode ? 'text-neo-white/80' : 'text-neo-black/80'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/80'
             )}>
               {getWelcomeMessage()}
             </p>
@@ -183,11 +183,11 @@ export default function WelcomeBackCard({
               {/* Current Score */}
               <div className={cn(
                 'p-2 rounded-neo border-2 border-neo-black text-center',
-                isDarkMode ? 'bg-slate-700/50' : 'bg-white'
+                isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-white'
               )}>
                 <p className={cn(
                   'text-[10px] font-bold uppercase mb-0.5',
-                  isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                  isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                 )}>
                   {t('brain.welcomeBack.currentScore')}
                 </p>
@@ -209,7 +209,7 @@ export default function WelcomeBackCard({
                     <Trophy className="w-3 h-3 text-neo-lime" />
                     <p className={cn(
                       'text-[10px] font-bold uppercase',
-                      isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                     )}>
                       {t('brain.welcomeBack.personalBest')}
                     </p>
@@ -225,7 +225,7 @@ export default function WelcomeBackCard({
               {/* Longest Streak */}
               <div className={cn(
                 'p-2 rounded-neo border-2 border-neo-black text-center',
-                isDarkMode ? 'bg-slate-700/50' : 'bg-white'
+                isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-white'
               )}>
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Flame className={cn(
@@ -234,7 +234,7 @@ export default function WelcomeBackCard({
                   )} />
                   <p className={cn(
                     'text-[10px] font-bold uppercase',
-                    isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                    isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                   )}>
                     {t('brain.welcomeBack.bestStreak')}
                   </p>
@@ -266,11 +266,11 @@ export default function WelcomeBackCard({
             <div className="flex items-center justify-center gap-1.5 mt-3">
               <Clock className={cn(
                 'w-3 h-3',
-                isDarkMode ? 'text-neo-white/40' : 'text-neo-black/40'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/40'
               )} />
               <p className={cn(
                 'text-[10px]',
-                isDarkMode ? 'text-neo-white/40' : 'text-neo-black/40'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/40'
               )}>
                 {t('brain.welcomeBack.daysAway', { days: daysSinceLastActivity })}
               </p>

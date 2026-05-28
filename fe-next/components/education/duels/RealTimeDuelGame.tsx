@@ -473,7 +473,7 @@ export function RealTimeDuelGame({
           <div className="bg-neo-navy border-neo rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
             <AdaptiveAnimatePresence>
               {words.length === 0 ? (
-                <p className="text-neo-white/50 text-sm text-center py-8">
+                <p className="text-neo-white text-sm text-center py-8">
                   {t('duels.typeWord')}
                 </p>
               ) : (
@@ -504,7 +504,7 @@ export function RealTimeDuelGame({
           <button
             onClick={() => setShowForfeitDialog(true)}
             data-testid="forfeit-btn"
-            className="text-neo-white/50 hover:text-neo-white text-sm underline"
+            className="text-neo-white hover:text-neo-white text-sm underline"
           >
             {t('duels.forfeitConfirm')}
           </button>

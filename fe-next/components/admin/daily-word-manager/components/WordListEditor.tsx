@@ -56,7 +56,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
   return (
     <div className="lg:col-span-2 space-y-3 sm:space-y-4">
       {/* Add Word + Search Row */}
-      <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 text-gray-900 dark:text-gray-100">
+      <div className="bg-white dark:bg-neo-navy-light/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 text-gray-900 dark:text-gray-100">
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Add Word Input */}
           <div className="flex gap-2 flex-1">
@@ -66,7 +66,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
               onChange={e => setNewWord(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleAddWord()}
               placeholder="Add word (3+ letters)"
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg font-mono text-sm sm:text-base bg-white dark:bg-slate-700 min-w-0"
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg font-mono text-sm sm:text-base bg-white dark:bg-neo-navy-elevated min-w-0"
             />
             <Button
               onClick={handleAddWord}
@@ -86,14 +86,14 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
               value={searchQuery}
               onChange={e => onSearchChange(e.target.value)}
               placeholder="Search..."
-              className="w-full ps-9 pe-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700"
+              className="w-full ps-9 pe-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-neo-navy-elevated"
             />
           </div>
         </div>
       </div>
 
       {/* Words Grid */}
-      <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 text-gray-900 dark:text-gray-100">
+      <div className="bg-white dark:bg-neo-navy-light/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 text-gray-900 dark:text-gray-100">
         <h2 className="font-bold text-sm sm:text-base mb-3">
           Words <span className="text-gray-500">({filteredWords.length})</span>
         </h2>
@@ -105,7 +105,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(idx * 0.005, 0.2) }}
-              className="flex items-center justify-between p-1.5 sm:p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600 group hover:border-red-300 dark:hover:border-red-500 transition-colors"
+              className="flex items-center justify-between p-1.5 sm:p-2 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded-lg border border-gray-200 dark:border-slate-600 group hover:border-red-300 dark:hover:border-red-500 transition-colors"
             >
               <span className="font-mono text-xs sm:text-sm truncate flex-1">{word}</span>
               <button

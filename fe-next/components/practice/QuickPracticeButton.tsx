@@ -226,7 +226,7 @@ export function QuickPracticeButton({
                       {getModeLabel(option.type)}
                     </span>
                     {sessionCount > 0 && (
-                      <span className="block text-xs text-neo-white/50">
+                      <span className="block text-xs text-neo-white">
                         {sessionCount} {sessionCount === 1 ? 'session' : 'sessions'}
                       </span>
                     )}

@@ -20,7 +20,7 @@ const DailyOfflineFallback: React.FC<Props> = ({ onRetry }) => {
         <h2 className="font-neo-display text-2xl font-bold text-neo-white">
           {t('offline.daily.title')}
         </h2>
-        <p className="font-neo-body text-neo-white/70 text-base max-w-xs">
+        <p className="font-neo-body text-neo-white text-base max-w-xs">
           {t('offline.daily.body')}
         </p>
       </div>

@@ -81,7 +81,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
     return (
       <div className={cn(
         'flex flex-col items-center justify-center py-12 rounded-neo border-2',
-        isDark ? 'bg-slate-800/50 border-white/10' : 'bg-gray-50 border-gray-200',
+        isDark ? 'bg-neo-navy-light/50 border-white/10' : 'bg-gray-50 border-gray-200',
         className
       )}>
         <MessageCircle className="w-12 h-12 text-gray-400 mb-3" />
@@ -121,7 +121,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
             'w-full rounded-neo border-2 border-neo-black shadow-hard p-3',
             'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all',
             'flex items-center gap-3 text-left',
-            isDark ? 'bg-slate-800' : 'bg-white'
+            isDark ? 'bg-neo-navy-light' : 'bg-white'
           )}
         >
           {/* Avatar with online indicator */}

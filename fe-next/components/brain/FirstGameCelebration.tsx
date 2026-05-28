@@ -115,7 +115,7 @@ export default function FirstGameCelebration({
           transition={{ type: "spring", damping: 20 }}
           className={cn(
             'relative max-w-md w-full rounded-neo border-4 border-neo-black shadow-hard-lg p-8',
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
+            isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
           )}
           onClick={(e) => e.stopPropagation()}
         >
@@ -126,7 +126,7 @@ export default function FirstGameCelebration({
             className={cn(
               'absolute top-3 right-3 p-2 rounded-neo border-2 border-neo-black',
               'transition-all hover:translate-y-[-2px] hover:shadow-hard-sm',
-              isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-neo-cream text-neo-black'
+              isDarkMode ? 'bg-neo-navy-elevated text-neo-white' : 'bg-neo-cream text-neo-black'
             )}
           >
             <X className="w-4 h-4" />
@@ -170,7 +170,7 @@ export default function FirstGameCelebration({
             transition={{ delay: 0.3 }}
             className={cn(
               'text-center mb-6 text-sm',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}
           >
             {t('brain.baselineEstablished')}
@@ -183,12 +183,12 @@ export default function FirstGameCelebration({
             transition={{ delay: 0.4, type: "spring" }}
             className={cn(
               'mb-6 p-4 rounded-neo border-3 border-neo-black text-center',
-              isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream'
             )}
           >
             <p className={cn(
               'text-sm font-bold uppercase mb-1',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.overallScore')}
             </p>
@@ -206,7 +206,7 @@ export default function FirstGameCelebration({
               </m.span>
               <span className={cn(
                 'text-2xl font-bold',
-                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
               )}>
                 /100
               </span>
@@ -234,7 +234,7 @@ export default function FirstGameCelebration({
                 transition={{ delay: 0.8 + index * 0.05, type: 'spring', stiffness: 300, damping: 25 }}
                 className={cn(
                   'flex items-center justify-between p-2 rounded-neo border-2 border-neo-black',
-                  isDarkMode ? 'bg-slate-700/50' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-white'
                 )}
               >
                 <span className={cn(

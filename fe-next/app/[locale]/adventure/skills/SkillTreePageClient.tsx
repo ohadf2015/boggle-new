@@ -62,7 +62,7 @@ export function SkillTreePageClient() {
           href="/adventure"
           className={cn(
             'inline-flex items-center gap-2',
-            'text-neo-white/70 hover:text-neo-white',
+            'text-neo-white hover:text-neo-white',
             'mb-6 transition-colors'
           )}
         >

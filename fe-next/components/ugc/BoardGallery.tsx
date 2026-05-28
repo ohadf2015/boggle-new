@@ -108,7 +108,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
                 'border-2 border-black transition-all duration-100',
                 sort === tab.key
                   ? 'bg-neo-yellow text-black shadow-hard-sm'
-                  : 'bg-neo-navy text-neo-white/60 shadow-hard-sm hover:text-neo-white hover:bg-neo-white/5'
+                  : 'bg-neo-navy text-neo-white shadow-hard-sm hover:text-neo-white hover:bg-neo-white/5'
               )}
             >
               <span className="text-sm" aria-hidden>{tab.icon}</span>
@@ -119,7 +119,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
 
         {/* Difficulty chips */}
         <div className="flex items-center gap-1.5">
-          <Filter className="w-3.5 h-3.5 text-neo-white/30 shrink-0" />
+          <Filter className="w-3.5 h-3.5 text-neo-white shrink-0" />
           {DIFFICULTY_CHIPS.map(chip => (
             <button
               key={chip.key}
@@ -129,7 +129,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
                 'border transition-all duration-100',
                 difficulty === chip.key
                   ? cn(chip.color, 'border-current shadow-hard-sm')
-                  : 'border-neo-white/10 text-neo-white/40 hover:text-neo-white/60'
+                  : 'border-neo-white/10 text-neo-white hover:text-neo-white'
               )}
             >
               {t(chip.label)}
@@ -140,7 +140,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
 
       {/* ── Board count ── */}
       {total > 0 && (
-        <p className="text-neo-white/40 font-neo-body text-xs mb-4">
+        <p className="text-neo-white font-neo-body text-xs mb-4">
           {total} {t('ugc.gallery.boardCount')}
         </p>
       )}
@@ -149,14 +149,14 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
       {!loading && boards.length === 0 ? (
         <div className="flex flex-col items-center gap-4 py-20 text-center">
           <div className="relative">
-            <Layout size={52} className="text-neo-white/10" />
-            <Search size={20} className="text-neo-white/20 absolute -bottom-1 -inset-e-1" />
+            <Layout size={52} className="text-neo-white" />
+            <Search size={20} className="text-neo-white absolute -bottom-1 -inset-e-1" />
           </div>
           <div>
-            <p className="font-neo-display font-bold text-neo-white/60 text-lg mb-1">
+            <p className="font-neo-display font-bold text-neo-white text-lg mb-1">
               {t('ugc.gallery.empty')}
             </p>
-            <p className="text-neo-white/30 font-neo-body text-sm max-w-xs mx-auto">
+            <p className="text-neo-white font-neo-body text-sm max-w-xs mx-auto">
               {t('ugc.gallery.emptyHint')}
             </p>
           </div>

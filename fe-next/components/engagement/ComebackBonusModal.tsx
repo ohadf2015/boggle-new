@@ -118,7 +118,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
               <button
                 aria-label={t('comebackBonus.close')}
                 onClick={onClose}
-                className="absolute top-2.5 inset-e-2.5 z-30 p-1.5 rounded-full text-neo-white/40 hover:text-neo-white hover:bg-neo-white/10 transition-colors"
+                className="absolute top-2.5 inset-e-2.5 z-30 p-1.5 rounded-full text-neo-white hover:text-neo-white hover:bg-neo-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -151,7 +151,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
 
                 {/* Player name */}
                 {playerName && (
-                  <p className="text-neo-white/60 text-xs font-bold mt-1.5 mb-0">
+                  <p className="text-neo-white text-xs font-bold mt-1.5 mb-0">
                     {playerName}
                   </p>
                 )}
@@ -160,7 +160,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                 <h2 id="comeback-title" className="text-lg font-black font-neo-display text-neo-white uppercase tracking-wide mt-1">
                   {t('comebackBonus.title')}
                 </h2>
-                <p className="text-neo-white/40 text-xs">
+                <p className="text-neo-white text-xs">
                   {t('comebackBonus.daysAway', { days: String(daysAway) })}
                 </p>
 
@@ -175,7 +175,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                     <span className="text-3xl font-black font-neo-display text-neo-white drop-shadow-lg leading-none">
                       {multiplierDisplay}
                     </span>
-                    <span className="block text-[9px] font-bold uppercase tracking-[0.2em] text-neo-white/90 text-center mt-0.5">
+                    <span className="block text-[9px] font-bold uppercase tracking-[0.2em] text-neo-white text-center mt-0.5">
                       {t('comebackBonus.xpBonus')}
                     </span>
                   </div>
@@ -242,7 +242,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                 </AdaptiveMotion.div>
 
                 {claimState === 'error' && (
-                  <p className="text-neo-white/50 text-xs text-center mt-2">
+                  <p className="text-neo-white text-xs text-center mt-2">
                     {t('comebackBonus.tapToRetry')}
                   </p>
                 )}

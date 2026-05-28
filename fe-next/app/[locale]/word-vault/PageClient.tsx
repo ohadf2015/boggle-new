@@ -52,7 +52,7 @@ export function PageClient({ locale }: PageClientProps) {
     return (
       <div className="flex min-h-[70vh] flex-col items-center justify-center bg-[#0b1220] p-8 text-center text-white">
         <h1 className="font-fredoka mb-4 text-4xl font-bold text-lime-300">Word Vault</h1>
-        <p className="max-w-md text-lg text-white/80">
+        <p className="max-w-md text-lg text-white">
           Hebrew-only Book 1 demo. English coming in v1.5.
         </p>
         <Link
@@ -236,7 +236,7 @@ function PauseMenuButton({ onPause }: { onPause: () => void }) {
       type="button"
       onClick={onPause}
       aria-label="תפריט"
-      className="fixed left-3 bottom-3 z-30 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-black/30 text-white/40 backdrop-blur transition hover:text-white/80"
+      className="fixed left-3 bottom-3 z-30 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-black/30 text-white backdrop-blur transition hover:text-white"
     >
       ☰
     </button>
@@ -305,7 +305,7 @@ function BookEndCinematic({ onContinue }: { onContinue: () => void }) {
 
       {/* Story closure */}
       <p
-        className="mt-6 max-w-md font-rubik text-base leading-relaxed text-white/90 sm:text-lg"
+        className="mt-6 max-w-md font-rubik text-base leading-relaxed text-white sm:text-lg"
         style={{ animation: 'wv-fadeUp 1.8s ease-out 1.4s both' }}
       >
         הלבה התקררה. הסדקים נסגרו. רגע אחד הוא חזר —

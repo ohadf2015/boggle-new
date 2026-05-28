@@ -138,7 +138,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             aria-invalid={showGameCodeError ? 'true' : undefined}
             aria-describedby={showGameCodeError ? 'gameCode-error' : undefined}
             className={cn(
-              "h-10 pe-12 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
+              "h-10 pe-12 bg-slate-100 dark:bg-neo-navy-elevated/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
               getValidationClasses(
                 gameCodeError ? 'invalid' : gameCodeValidation.state,
                 showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
@@ -208,13 +208,13 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
               </div>
             </button>
             <div className="flex-1">
-              <p className="text-xs text-neo-cream/70 font-bold uppercase tracking-wide">
+              <p className="text-xs text-neo-white font-bold uppercase tracking-wide">
                 {t('joinView.joiningAs')}
               </p>
               <p className="text-sm text-neo-cyan font-black">
                 {displayName}
               </p>
-              <p className="text-xs text-neo-cream/50 mt-0.5">
+              <p className="text-xs text-neo-white mt-0.5">
                 {t('profile.connectedAccount')}
               </p>
             </div>
@@ -254,7 +254,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                 aria-invalid={showUsernameError ? 'true' : undefined}
                 aria-describedby={showUsernameError ? 'username-error' : undefined}
                 className={cn(
-                  "h-10 pe-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
+                  "h-10 pe-10 bg-slate-100 dark:bg-neo-navy-elevated/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
                   getValidationClasses(
                     usernameError ? 'invalid' : usernameValidation.state,
                     showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""

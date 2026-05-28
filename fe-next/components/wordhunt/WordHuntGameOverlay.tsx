@@ -84,7 +84,7 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
             transition={{ delay: 0.4 }}
             className="mt-6 w-full max-w-xs space-y-1 px-4"
           >
-            <span className="text-xs font-bold text-neo-white/50 uppercase tracking-wide">
+            <span className="text-xs font-bold text-neo-white uppercase tracking-wide">
               {t('wordHunt.mp.playerStatus')}
             </span>
             {Object.entries(playerLives).map(([name, life]) => {
@@ -127,7 +127,7 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-4 text-xs text-neo-cream/50 animate-pulse"
+            className="mt-4 text-xs text-neo-white animate-pulse"
           >
             {t('wordHunt.mp.gameEnding')}
           </AdaptiveMotion.p>
@@ -178,7 +178,7 @@ export const WordHuntGameOverlay = memo<WordHuntGameOverlayProps>(({
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.7 }}
               transition={{ delay: 0.5 }}
-              className="mt-2 text-sm text-neo-cream/60"
+              className="mt-2 text-sm text-neo-white"
             >
               {t('wordHunt.mp.watchOthers')}
             </AdaptiveMotion.p>

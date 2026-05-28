@@ -328,7 +328,7 @@ function AdventureView(): React.JSX.Element {
           <p className="text-neo-white font-bold text-lg">
             {t('adventure.guestTitle')}
           </p>
-          <p className="text-neo-white/60 text-sm">
+          <p className="text-neo-white text-sm">
             {t('adventure.guestHint')}
           </p>
           {!isOnCrazyGamesPlatform && (
@@ -345,7 +345,7 @@ function AdventureView(): React.JSX.Element {
           )}
           <Link
             href="/"
-            className="text-neo-white/40 text-sm underline hover:text-neo-white/60 transition-colors"
+            className="text-neo-white text-sm underline hover:text-neo-white transition-colors"
           >
             {t('common.back')}
           </Link>
@@ -381,12 +381,12 @@ function AdventureView(): React.JSX.Element {
             {isAuthError ? t('adventure.sessionExpired') : t('adventure.loadError')}
           </p>
           {process.env.NODE_ENV === 'development' && error && !isAuthError && (
-            <p className="text-neo-white/40 text-xs max-w-xs font-mono break-all">
+            <p className="text-neo-white text-xs max-w-xs font-mono break-all">
               {error.message}
             </p>
           )}
           {isAuthError && (
-            <p className="text-neo-white/60 text-sm max-w-xs">
+            <p className="text-neo-white text-sm max-w-xs">
               {t('adventure.sessionExpiredHint')}
             </p>
           )}
@@ -603,7 +603,7 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
     >
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-2 inset-e-2 p-1 text-neo-white/60 hover:text-neo-white"
+        className="absolute top-2 inset-e-2 p-1 text-neo-white hover:text-neo-white"
         aria-label={t('common.close')}
       >
         <X className="w-4 h-4" />
@@ -614,7 +614,7 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
           <h3 className="font-neo-display font-bold text-neo-white text-sm uppercase">
             {t('adventure.welcome.title')}
           </h3>
-          <p className="text-xs text-neo-white/80 mt-1 font-medium">
+          <p className="text-xs text-neo-white mt-1 font-medium">
             {t('adventure.welcome.description')}
           </p>
           <button

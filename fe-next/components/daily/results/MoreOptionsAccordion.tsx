@@ -44,7 +44,7 @@ export const MoreOptionsAccordion: React.FC<MoreOptionsAccordionProps> = ({
 
   return (
     <div className="rounded-neo border-2 border-slate-700/50 overflow-hidden">
-      <div className="p-4 space-y-3 bg-slate-900/50">
+      <div className="p-4 space-y-3 bg-neo-navy/50">
         {/* Create Your Own Puzzle - Winners only, authenticated only */}
         {solved && isAuthenticated && (
           <button
@@ -76,7 +76,7 @@ export const MoreOptionsAccordion: React.FC<MoreOptionsAccordionProps> = ({
               <button
                 key={lang.code}
                 onClick={() => onGameLanguageChange?.(lang.code)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 rounded-lg border border-slate-700 hover:border-neo-cyan/50 hover:bg-slate-700/80 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-navy-light rounded-lg border border-slate-700 hover:border-neo-cyan/50 hover:bg-neo-navy-elevated/80 transition-colors"
               >
                 <span className="text-base">{lang.flag}</span>
                 <span className="text-xs font-medium text-slate-300">{lang.name}</span>

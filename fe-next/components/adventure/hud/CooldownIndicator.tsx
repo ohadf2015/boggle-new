@@ -192,7 +192,7 @@ export const CooldownIndicator = memo<CooldownIndicatorProps>(
           <span
             data-testid="cooldown-label"
             className={cn(
-              'text-xs font-neo-body font-bold text-neo-white/80'
+              'text-xs font-neo-body font-bold text-neo-white'
             )}
           >
             {label}

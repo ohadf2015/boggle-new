@@ -66,7 +66,7 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
 
   return (
     <div className="mt-4 space-y-2">
-      <h3 className="text-sm font-bold text-neo-cream/70 uppercase tracking-wider text-center">
+      <h3 className="text-sm font-bold text-neo-white uppercase tracking-wider text-center">
         {t('results.sessionStats.title')}
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -95,16 +95,16 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
                 <IconComponent className="w-5 h-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-neo-cream truncate">
+                <p className="text-sm font-bold text-neo-white truncate">
                   {fact.playerName}
                   {fact.playerName2 && (
-                    <span className="font-bold text-neo-cream/70">
+                    <span className="font-bold text-neo-white">
                       {' '}
                       vs {fact.playerName2}
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-neo-cream/60">
+                <p className="text-xs text-neo-white">
                   {t(fact.translationKey, fact.translationParams)}
                 </p>
               </div>
@@ -112,7 +112,7 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
-                className="shrink-0 text-lg font-black text-neo-cream"
+                className="shrink-0 text-lg font-black text-neo-white"
               >
                 {fact.type === 'improvement' ? `+${fact.value}%` : fact.value}
               </m.span>

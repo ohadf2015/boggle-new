@@ -169,7 +169,7 @@ export default function LootChestReveal({
                     <span className="mt-1 font-neo-display text-lg text-neo-white">
                       {drop.quantity > 1 ? `×${drop.quantity}` : ''}
                     </span>
-                    <span className="text-xs text-neo-white/70">
+                    <span className="text-xs text-neo-white">
                       {t(DROP_NAME_KEYS[drop.type])}
                     </span>
                   </AdaptiveMotion.div>

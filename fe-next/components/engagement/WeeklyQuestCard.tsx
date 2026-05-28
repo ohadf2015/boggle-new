@@ -56,14 +56,14 @@ function ActiveQuestView({
       </div>
 
       {/* Quest description */}
-      <p className="text-sm text-neo-white/90 font-medium">
+      <p className="text-sm text-neo-white font-medium">
         {t(quest.description, { target: quest.displayTarget ?? quest.target })}
       </p>
 
       {/* Progress bar */}
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-neo-white/70 font-bold">
+          <span className="text-neo-white font-bold">
             {t('weeklyQuest.progress', { current: quest.current, target: quest.target })}
           </span>
           <span className="text-neo-cyan font-black">
@@ -106,7 +106,7 @@ function CompletedQuestView({
       <span className="text-sm font-black text-neo-cyan">
         {t('weeklyQuest.xpReward', { xp: xpReward })}
       </span>
-      <p className="text-xs text-neo-white/50 font-medium">
+      <p className="text-xs text-neo-white font-medium">
         {t('weeklyQuest.newQuestMonday')}
       </p>
     </div>
@@ -146,7 +146,7 @@ export const WeeklyQuestCard: React.FC = memo(() => {
         <ActiveQuestView quest={activeQuest} />
       ) : (
         <div className="flex flex-col gap-3">
-          <p className="text-sm text-neo-white/70 font-medium">
+          <p className="text-sm text-neo-white font-medium">
             {t('weeklyQuest.choose')}
           </p>
           <QuestSelector quests={availableQuests} onSelect={handleSelect} />

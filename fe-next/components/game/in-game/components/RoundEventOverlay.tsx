@@ -243,7 +243,7 @@ export const RoundEventOverlay = memo<RoundEventOverlayProps>(function RoundEven
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.18, duration: 0.25, ease: 'easeOut' }}
-                className="text-sm sm:text-base font-medium text-white/90 text-center max-w-xs drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
+                className="text-sm sm:text-base font-medium text-white text-center max-w-xs drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]"
               >
                 {t(config.effectText)}
               </AdaptiveMotion.span>

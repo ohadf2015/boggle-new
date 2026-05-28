@@ -223,7 +223,7 @@ const DesktopWordInput = memo<DesktopWordInputProps>(({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-[10px] text-neo-white/50 text-center mt-1 font-bold"
+              className="text-[10px] text-neo-white text-center mt-1 font-bold"
             >
               {t('desktopInput.hint') || 'Type letters to find words · Enter to submit · Esc to clear'}
             </m.p>

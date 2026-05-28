@@ -136,7 +136,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
         {/* Body */}
         <div className="p-4 max-h-[60vh] overflow-y-auto">
           {loading && (
-            <div className="py-8 text-center text-neo-cream/70 font-bold text-sm">
+            <div className="py-8 text-center text-neo-white font-bold text-sm">
               {t('common.loading') || 'Loading…'}
             </div>
           )}
@@ -162,7 +162,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
 
               {/* Word list */}
               {sortedWords.length === 0 ? (
-                <p className="py-6 text-center text-neo-cream/60 text-sm font-medium">
+                <p className="py-6 text-center text-neo-white text-sm font-medium">
                   {diffMode && allWords.length > 0
                     ? (t('wordWheel.youFoundEverything') || 'You found every word they did. Nice.')
                     : t('wordWheel.noWordsSubmitted')}
@@ -211,7 +211,7 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
 
 const StatBox: React.FC<{ icon: React.ReactNode; label: string; value: React.ReactNode }> = ({ icon, label, value }) => (
   <div className="rounded-neo border-2 border-neo-black bg-neo-navy-light p-2 text-center shadow-hard-xs">
-    <div className="flex items-center justify-center gap-1 text-neo-cream/60 text-[10px] font-bold uppercase tracking-wide">
+    <div className="flex items-center justify-center gap-1 text-neo-white text-[10px] font-bold uppercase tracking-wide">
       {icon}
       <span className="truncate">{label}</span>
     </div>

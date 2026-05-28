@@ -104,7 +104,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
       transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
       className={cn(
         'rounded-neo border-2 border-neo-black shadow-hard overflow-hidden',
-        'bg-slate-800/90 backdrop-blur-xs'
+        'bg-neo-navy-light/90 backdrop-blur-xs'
       )}
     >
       {/* Header */}
@@ -163,7 +163,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
                     </div>
                     {/* Progress label */}
                     <div className="flex justify-between mt-1">
-                      <span className="text-[10px] font-bold text-white/60">
+                      <span className="text-[10px] font-bold text-white">
                         {nearMiss.current} / {nearMiss.target}
                       </span>
                       <span className={cn(
@@ -194,7 +194,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
                   )}>
                     {nearMiss.remaining}
                   </span>
-                  <p className="text-[10px] text-white/60 uppercase font-bold">
+                  <p className="text-[10px] text-white uppercase font-bold">
                     {t('nearMiss.more')}
                   </p>
                 </div>

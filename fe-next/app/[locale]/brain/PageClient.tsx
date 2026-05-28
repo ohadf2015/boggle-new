@@ -21,7 +21,7 @@ const CognitiveRadarChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 bg-slate-800/50 rounded-neo border-3 border-neo-black animate-pulse" />
+      <div className="h-64 bg-neo-navy-light/50 rounded-neo border-3 border-neo-black animate-pulse" />
     )
   }
 );
@@ -31,7 +31,7 @@ const BrainScoreHistoryChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-48 bg-slate-800/50 rounded-neo border-3 border-neo-black animate-pulse" />
+      <div className="h-48 bg-neo-navy-light/50 rounded-neo border-3 border-neo-black animate-pulse" />
     )
   }
 );
@@ -208,7 +208,7 @@ export default function BrainTrainingPageClient() {
             animate={{ opacity: 1, y: 0 }}
             className={cn(
               'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             <Brain className="w-16 h-16 mx-auto mb-4 text-red-500" />
@@ -220,7 +220,7 @@ export default function BrainTrainingPageClient() {
             </h2>
             <p className={cn(
               'text-sm mb-6',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {error}
             </p>
@@ -260,7 +260,7 @@ export default function BrainTrainingPageClient() {
             animate={{ opacity: 1, y: 0 }}
             className={cn(
               'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             <Brain className="w-16 h-16 mx-auto mb-4 text-neo-cyan" />
@@ -272,7 +272,7 @@ export default function BrainTrainingPageClient() {
             </h2>
             <p className={cn(
               'text-sm mb-6',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.guestView.description')}
             </p>
@@ -341,7 +341,7 @@ export default function BrainTrainingPageClient() {
             animate={{ opacity: 1, y: 0 }}
             className={cn(
               'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             <Brain className="w-16 h-16 mx-auto mb-4 text-neo-cyan" />
@@ -353,7 +353,7 @@ export default function BrainTrainingPageClient() {
             </h2>
             <p className={cn(
               'text-sm mb-6',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.empty.description')}
             </p>
@@ -498,7 +498,7 @@ export default function BrainTrainingPageClient() {
             animate={{ opacity: 1, y: 0 }}
             className={cn(
               'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             <Brain className="w-16 h-16 mx-auto mb-4 text-neo-cyan" />
@@ -510,7 +510,7 @@ export default function BrainTrainingPageClient() {
             </h2>
             <p className={cn(
               'text-sm',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.empty.description')}
             </p>

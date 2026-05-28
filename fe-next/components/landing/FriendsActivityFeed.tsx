@@ -48,7 +48,7 @@ export function FriendsActivityFeed() {
             {t('friendsActivity.title')}
           </h2>
         </div>
-        <p className="text-neo-white/50 text-xs text-center py-3">
+        <p className="text-neo-white text-xs text-center py-3">
           {t('friendsActivity.empty')}
         </p>
         <Link

@@ -46,7 +46,7 @@ const DevPlaceholder: React.FC<{ zone: AdZoneType; className?: string }> = ({ zo
         'min-h-[100px] p-4 rounded-neo border-3 border-dashed',
         'flex flex-col items-center justify-center gap-2',
         isDarkMode
-          ? 'bg-slate-800/50 border-slate-600 text-slate-400'
+          ? 'bg-neo-navy-light/50 border-slate-600 text-slate-400'
           : 'bg-gray-100 border-gray-300 text-gray-500',
         className
       )}

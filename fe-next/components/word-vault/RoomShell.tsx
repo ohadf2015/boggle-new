@@ -261,7 +261,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
         <span className="w-16" />
       </header>
 
-      <p className="relative z-10 px-6 pt-4 font-rubik text-sm leading-relaxed text-white/80">
+      <p className="relative z-10 px-6 pt-4 font-rubik text-sm leading-relaxed text-white">
         {room.storyBeat.he}
       </p>
 
@@ -351,7 +351,7 @@ function StoryOnlyRoom({ title, beat, onContinue, onExit, isSolved }: StoryOnlyR
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-6 bg-gradient-to-b from-[#0e1a2b] to-[#0b1220] p-8 text-center">
       <h1 className="font-fredoka text-3xl font-bold text-cyan-300">{title}</h1>
-      <p className="max-w-md font-rubik text-lg leading-relaxed text-white/80">{beat}</p>
+      <p className="max-w-md font-rubik text-lg leading-relaxed text-white">{beat}</p>
       <div className="flex gap-3">
         <button
           type="button"

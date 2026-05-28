@@ -69,11 +69,11 @@ export function AuthButtonDropdownMenu({
   const menuItemClass = cn(
     'w-full justify-start gap-3',
     isDarkMode
-      ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+      ? 'text-gray-300 hover:bg-neo-navy-elevated hover:text-gray-300'
       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
   );
 
-  const dividerClass = cn('my-1 h-px', isDarkMode ? 'bg-slate-700' : 'bg-gray-200');
+  const dividerClass = cn('my-1 h-px', isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200');
 
   return (
     <AnimatePresence>
@@ -89,7 +89,7 @@ export function AuthButtonDropdownMenu({
         className={cn(
           'min-w-[180px] rounded-lg shadow-xl z-80',
           isDarkMode
-            ? 'bg-slate-800 border border-slate-700'
+            ? 'bg-neo-navy-light border border-slate-700'
             : 'bg-white border border-gray-200'
         )}
         style={{
@@ -179,7 +179,7 @@ export function AuthButtonDropdownMenu({
                 className={cn(
                   'w-full justify-start gap-3',
                   isDarkMode
-                    ? 'text-neo-pink hover:bg-slate-700 hover:text-neo-pink'
+                    ? 'text-neo-pink hover:bg-neo-navy-elevated hover:text-neo-pink'
                     : 'text-neo-pink hover:bg-gray-50 hover:text-neo-pink'
                 )}
               >
@@ -201,7 +201,7 @@ export function AuthButtonDropdownMenu({
             variant="ghost"
             onClick={(e) => { e.stopPropagation(); setIsLanguageExpanded(!isLanguageExpanded); }}
             className={cn('w-full justify-between gap-3', isDarkMode
-              ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+              ? 'text-gray-300 hover:bg-neo-navy-elevated hover:text-gray-300'
               : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
             )}
           >
@@ -236,7 +236,7 @@ export function AuthButtonDropdownMenu({
                       className={cn(
                         'w-full justify-start gap-3 ps-8',
                         isDarkMode
-                          ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                          ? 'text-gray-300 hover:bg-neo-navy-elevated hover:text-gray-300'
                           : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                       )}
                     >
@@ -259,7 +259,7 @@ export function AuthButtonDropdownMenu({
           disabled={isSigningOut}
           className={cn(
             'w-full justify-start gap-3 rounded-b-lg text-red-500 hover:text-red-600',
-            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-50'
+            isDarkMode ? 'hover:bg-neo-navy-elevated' : 'hover:bg-gray-50'
           )}
         >
           {isSigningOut ? <Loader size="sm" /> : <LogOut size={14} aria-hidden="true" />}

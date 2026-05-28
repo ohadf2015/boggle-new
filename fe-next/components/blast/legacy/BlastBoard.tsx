@@ -334,7 +334,7 @@ export const BlastBoard = memo(function BlastBoard({
           <span className="text-[0.7rem] font-neo-display text-neo-lime whitespace-nowrap">
             {singleTileTooltip.icon} {singleTileTooltip.name}
           </span>
-          <span className="block text-[0.6rem] font-neo-body text-neo-cream/80 leading-tight">
+          <span className="block text-[0.6rem] font-neo-body text-neo-white leading-tight">
             {singleTileTooltip.desc}
           </span>
         </div>

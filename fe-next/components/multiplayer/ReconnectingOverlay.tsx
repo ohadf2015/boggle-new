@@ -29,7 +29,7 @@ export function ReconnectingOverlay({ attempt, maxAttempts, onGiveUp }: Props){
           <p className="font-neo-display text-xl font-bold text-neo-white">
             {t('mp.reconnect.title')}
           </p>
-          <p className="font-neo-body text-neo-white/60 text-sm">
+          <p className="font-neo-body text-neo-white text-sm">
             {t('mp.reconnect.attempt')} {attempt}/{maxAttempts}
           </p>
         </div>
@@ -37,7 +37,7 @@ export function ReconnectingOverlay({ attempt, maxAttempts, onGiveUp }: Props){
           <button
             onClick={onGiveUp}
             aria-label={t('mp.reconnect.giveUp')}
-            className="px-5 py-2 font-neo-body text-sm text-neo-white/60 border border-neo-white/20 rounded-neo hover:border-neo-white/40 transition-colors"
+            className="px-5 py-2 font-neo-body text-sm text-neo-white border border-neo-white/20 rounded-neo hover:border-neo-white/40 transition-colors"
           >
             {t('mp.reconnect.giveUp')}
           </button>

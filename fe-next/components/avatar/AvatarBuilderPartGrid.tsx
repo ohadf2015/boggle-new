@@ -122,7 +122,7 @@ export default function PartPreviewGrid<T extends string>({
 
   return (
     <div>
-      <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">{label}</p>
+      <p className="text-neo-white text-xs font-bold uppercase mb-2">{label}</p>
       <AdaptiveMotion.div
         variants={gridContainerVariants}
         initial="hidden"
@@ -170,7 +170,7 @@ export default function PartPreviewGrid<T extends string>({
               {/* Part preview */}
               <div className={`w-12 h-12 flex items-center justify-center ${isLocked ? 'opacity-40 grayscale-30' : ''}`}>
                 {option === 'none' ? (
-                  <span className="text-neo-white/40 text-xs font-bold">{noneLabel ?? '—'}</span>
+                  <span className="text-neo-white text-xs font-bold">{noneLabel ?? '—'}</span>
                 ) : (
                   <PartPreview partType={partType} partName={option} config={config} size={48} />
                 )}
@@ -194,7 +194,7 @@ export default function PartPreviewGrid<T extends string>({
               {/* Part name — always visible, never overlapped */}
               {!isLocked && (
                 <span className={`text-[10px] font-bold capitalize truncate w-full text-center mt-0.5 ${
-                  selected === option ? 'text-neo-lime' : 'text-neo-white/50'
+                  selected === option ? 'text-neo-lime' : 'text-neo-white'
                 }`}>
                   {option === 'none' ? (noneLabel ?? option) : option}
                 </span>
@@ -231,7 +231,7 @@ export default function PartPreviewGrid<T extends string>({
               {/* Close button */}
               <button
                 onClick={() => setConfirmPurchase(null)}
-                className="absolute top-2 inset-e-2 text-neo-white/50 hover:text-neo-white p-1"
+                className="absolute top-2 inset-e-2 text-neo-white hover:text-neo-white p-1"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -285,8 +285,8 @@ export default function PartPreviewGrid<T extends string>({
 
               {/* Current balance */}
               {premium && (
-                <p className="text-center text-xs text-neo-white/50 mb-4">
-                  Balance: <span className="text-neo-yellow font-bold tabular-nums">{premium.coins}</span> → <span className="text-neo-white/70 font-bold tabular-nums">{premium.coins - confirmPurchase.price}</span>
+                <p className="text-center text-xs text-neo-white mb-4">
+                  Balance: <span className="text-neo-yellow font-bold tabular-nums">{premium.coins}</span> → <span className="text-neo-white font-bold tabular-nums">{premium.coins - confirmPurchase.price}</span>
                 </p>
               )}
 
@@ -294,7 +294,7 @@ export default function PartPreviewGrid<T extends string>({
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirmPurchase(null)}
-                  className="flex-1 px-4 py-2.5 text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/15 hover:border-neo-white/30 transition-colors"
+                  className="flex-1 px-4 py-2.5 text-neo-white font-bold rounded-neo border-2 border-neo-white/15 hover:border-neo-white/30 transition-colors"
                 >
                   {_t?.('avatarBuilder.cancel') || 'Cancel'}
                 </button>

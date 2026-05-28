@@ -10,7 +10,7 @@ interface Props {
 }
 
 const statusClass: Record<PendingWordStatus, string> = {
-  pending: 'opacity-50 animate-pulse border-neo-white/30 text-neo-white/60',
+  pending: 'opacity-50 animate-pulse border-neo-white/30 text-neo-white',
   confirmed: 'opacity-100 border-neo-cyan/60 text-neo-cyan',
   rejected: 'opacity-80 border-neo-red/60 text-neo-red line-through animate-neo-shake',
 };

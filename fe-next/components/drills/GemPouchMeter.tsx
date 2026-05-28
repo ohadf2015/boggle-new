@@ -36,7 +36,7 @@ export default function GemPouchMeter({
       {/* Pouch fill bar */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-neo-white/90">
+          <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-neo-white">
             <Gem className="w-3.5 h-3.5 text-neo-purple" />
             {t('brain.drills.gemPouch')}
           </span>
@@ -53,7 +53,7 @@ export default function GemPouchMeter({
           data-full={full ? 'true' : 'false'}
           className={cn(
             'relative h-4 w-full rounded-neo border-2 border-neo-black overflow-hidden',
-            'bg-slate-900',
+            'bg-neo-navy',
           )}
         >
           <div
@@ -76,7 +76,7 @@ export default function GemPouchMeter({
       <div
         className={cn(
           'flex items-center gap-1 px-2 py-1 rounded border-2 border-neo-black shrink-0',
-          'bg-slate-700',
+          'bg-neo-navy-elevated',
         )}
         title={t('brain.drills.gemsCollected')}
       >

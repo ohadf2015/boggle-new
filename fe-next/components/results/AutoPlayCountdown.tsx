@@ -98,7 +98,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
         </button>
         <button
           onClick={handleCancel}
-          className="text-neo-white/60 hover:text-neo-white text-sm font-bold uppercase transition-colors"
+          className="text-neo-white hover:text-neo-white text-sm font-bold uppercase transition-colors"
         >
           {t('autoPlay.exit')}
         </button>
@@ -173,7 +173,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
       </button>
 
       {/* Label */}
-      <span className="text-neo-white/60 text-xs sm:text-sm font-bold uppercase tracking-wider">
+      <span className="text-neo-white text-xs sm:text-sm font-bold uppercase tracking-wider">
         {t('autoPlay.playAgain')}
       </span>
 
@@ -182,7 +182,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
         onClick={handleCancel}
         className={cn(
           'flex items-center gap-1.5',
-          'text-neo-white/40 hover:text-neo-white/80',
+          'text-neo-white hover:text-neo-white',
           'text-xs font-bold uppercase',
           'transition-colors duration-150',
         )}

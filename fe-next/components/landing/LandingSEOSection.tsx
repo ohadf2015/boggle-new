@@ -44,7 +44,7 @@ export function ScrollIndicator() {
         animate={{ y: [0, 6, 0] }}
         transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <ChevronDown className="w-5 h-5 text-neo-black/30 dark:text-neo-white/30" />
+        <ChevronDown className="w-5 h-5 text-neo-black/30 dark:text-neo-white" />
       </AdaptiveMotion.div>
     </AdaptiveMotion.div>
   );
@@ -92,9 +92,9 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
           className="shrink-0"
         >
           {open ? (
-            <Minus className="w-4 h-4 text-neo-white/60" />
+            <Minus className="w-4 h-4 text-neo-white" />
           ) : (
-            <Plus className="w-4 h-4 text-neo-white/60" />
+            <Plus className="w-4 h-4 text-neo-white" />
           )}
         </AdaptiveMotion.span>
       </button>
@@ -105,7 +105,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
           open ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
         )}
       >
-        <p className="px-3 sm:px-4 pb-3 sm:pb-4 text-sm text-neo-white/60 leading-relaxed">
+        <p className="px-3 sm:px-4 pb-3 sm:pb-4 text-sm text-neo-white leading-relaxed">
           {answer}
         </p>
       </div>
@@ -138,7 +138,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-neo-white mb-4 neo-title">
           {c.whatIsTitle}
         </h2>
-        <p className="text-sm sm:text-base text-neo-white/60 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base text-neo-white leading-relaxed max-w-2xl mx-auto">
           {c.whatIsShort}
         </p>
       </AdaptiveMotion.div>
@@ -182,7 +182,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 <div className={cn('p-2', STEP_COLORS[i])}>
                   <StepIcon className="w-5 h-5" aria-hidden="true" />
                 </div>
-                <span className="text-xs sm:text-sm font-bold text-neo-white/80 leading-tight max-w-[140px]">
+                <span className="text-xs sm:text-sm font-bold text-neo-white leading-tight max-w-[140px]">
                   {step}
                 </span>
               </AdaptiveMotion.div>
@@ -215,7 +215,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
                 {c.educationTitle}
               </h2>
             </div>
-            <p className="text-sm sm:text-base text-neo-white/60 leading-relaxed mb-6">
+            <p className="text-sm sm:text-base text-neo-white leading-relaxed mb-6">
               {c.educationContent}
             </p>
             {/* Stats row */}
@@ -223,7 +223,7 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
               {c.educationStats.map((stat) => (
                 <div key={stat.label} className="text-center">
                   <div className="text-2xl sm:text-3xl font-black text-neo-purple">{stat.value}</div>
-                  <div className="text-[10px] sm:text-xs font-bold text-neo-white/40 uppercase tracking-wider">{stat.label}</div>
+                  <div className="text-[10px] sm:text-xs font-bold text-neo-white uppercase tracking-wider">{stat.label}</div>
                 </div>
               ))}
             </div>

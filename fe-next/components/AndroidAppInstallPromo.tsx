@@ -120,7 +120,7 @@ export default function AndroidAppInstallPromo() {
 
         <DialogBody className="text-center">
           <DialogTitle className="text-neo-lime">{t('androidAppPromo.title')}</DialogTitle>
-          <p dir="auto" className="mt-2 text-sm sm:text-base font-medium text-neo-cream/90">
+          <p dir="auto" className="mt-2 text-sm sm:text-base font-medium text-neo-white">
             {t('androidAppPromo.subtitle')}
           </p>
         </DialogBody>
@@ -137,7 +137,7 @@ export default function AndroidAppInstallPromo() {
           <button
             type="button"
             onClick={handleDismiss}
-            className="w-full px-4 py-2 text-sm font-bold uppercase tracking-wide text-neo-cream/70 transition-colors hover:text-neo-cream"
+            className="w-full px-4 py-2 text-sm font-bold uppercase tracking-wide text-neo-white transition-colors hover:text-neo-white"
           >
             {t('androidAppPromo.dismiss')}
           </button>

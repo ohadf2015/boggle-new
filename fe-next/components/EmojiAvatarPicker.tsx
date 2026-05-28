@@ -169,7 +169,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
                   priority
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-slate-700">
+                <div className="w-full h-full flex items-center justify-center bg-neo-navy-elevated">
                   <User className="w-10 h-10 text-slate-500" />
                 </div>
               )}

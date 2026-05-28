@@ -161,7 +161,7 @@ export function SpellingChallengePractice({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-white/70 hover:text-neo-white hover:bg-neo-white/10"
+            className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
           >
             <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
           </Button>
@@ -171,7 +171,7 @@ export function SpellingChallengePractice({
               {t('education.practice.spellTheWord')}
             </h2>
             <div className="flex flex-col items-center gap-1">
-              <p className="text-neo-white/70 font-neo-body" data-testid="progress-text">
+              <p className="text-neo-white font-neo-body" data-testid="progress-text">
                 {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
               </p>
               <div className="h-1 w-20 bg-neo-black/30 rounded-neo overflow-hidden">
@@ -302,7 +302,7 @@ export function SpellingChallengePractice({
                 </AdaptiveMotion.span>
               </div>
               {!feedback.correct && (
-                <p className="text-neo-white/70 font-neo-body">
+                <p className="text-neo-white font-neo-body">
                   {t('education.practice.correctAnswer')}{' '}
                   <span className="text-neo-white font-bold">{feedback.correctWord}</span>
                 </p>

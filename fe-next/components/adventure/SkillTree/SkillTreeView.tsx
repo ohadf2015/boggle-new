@@ -184,7 +184,7 @@ function SkillTreeCanvas({ onSkillUnlock, className }: SkillTreeViewProps) {
         <h2 className="text-2xl font-black text-neo-white mb-2">
           {t('adventure.skills.title')}
         </h2>
-        <p className="text-neo-white/70">
+        <p className="text-neo-white">
           {t('adventure.skills.points')}:{' '}
           <span className="text-neo-lime font-bold">{availablePoints}</span>
         </p>

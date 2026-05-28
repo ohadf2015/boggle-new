@@ -31,7 +31,7 @@ export function StreakMilestoneCelebration({ milestone, t }: StreakMilestoneCele
           <div className="font-black text-sm text-neo-orange uppercase tracking-wider">
             {t(milestone.titleKey)}
           </div>
-          <div className="text-neo-white/60 text-xs mt-0.5">
+          <div className="text-neo-white text-xs mt-0.5">
             {milestone.days} {t('adventure.streak.days')}
           </div>
         </div>

@@ -12,7 +12,7 @@ export function ModesShowcase() {
       <h2 className="mb-2 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
         Modos para Jugar Scrabble Online Gratis<span className="text-neo-cyan">.</span>
       </h2>
-      <p className="mb-6 max-w-xl font-neo-body text-sm text-neo-white/65 sm:text-base">
+      <p className="mb-6 max-w-xl font-neo-body text-sm text-neo-white sm:text-base">
         Salta entre modos con un clic. Cada uno cambia el ritmo, la rejilla y la forma de ganar.
       </p>
 

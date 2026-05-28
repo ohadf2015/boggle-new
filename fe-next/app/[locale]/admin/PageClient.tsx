@@ -131,7 +131,7 @@ export default function AdminPageClient() {
               <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
               <TodayGamesHistory authToken={authToken} />
 
-              <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
+              <div className="mt-8 bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
                 <GamesDiagnostic authToken={authToken} />
               </div>
 
@@ -148,7 +148,7 @@ export default function AdminPageClient() {
               </div>
             </>
           ) : (
-            <div className="bg-slate-800/50 rounded-neo border-neo border-black p-12 text-center">
+            <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-12 text-center">
               <Loader size="md" text={t('admin.loadingDashboard')} />
               <p className="text-slate-400 mt-4 text-sm">{t('admin.preparingTools')}</p>
             </div>

@@ -52,10 +52,10 @@ export function LandscapeBanner({
   }
 
   const backgroundClass = hasNoWords
-    ? 'bg-neo-cream dark:bg-slate-700'
+    ? 'bg-neo-cream dark:bg-neo-navy-elevated'
     : (isWinner || isNewHighScore)
       ? 'bg-linear-to-r from-tier-gold to-yellow-300'
-      : 'bg-neo-cream dark:bg-slate-700';
+      : 'bg-neo-cream dark:bg-neo-navy-elevated';
 
   return (
     <div className={cn(

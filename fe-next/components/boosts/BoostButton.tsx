@@ -47,7 +47,7 @@ export function BoostButton({ mode, sessionId, disabled, open: openProp, onOpenC
         onClick={() => setOpen(true)}
         disabled={isDisabled}
         aria-label={t('boosts.openPickerAria', { n: remaining })}
-        className="inline-flex items-center gap-2 rounded-neo border-neo bg-neo-pink px-4 py-2 font-neo-display text-neo-cream shadow-hard hover:active:shadow-hard-pressed disabled:opacity-50"
+        className="inline-flex items-center gap-2 rounded-neo border-neo bg-neo-pink px-4 py-2 font-neo-display text-neo-white shadow-hard hover:active:shadow-hard-pressed disabled:opacity-50"
       >
         <Zap data-boost-button-icon aria-hidden="true" className="h-5 w-5" strokeWidth={2.75} />
         <span>{t('boosts.cta')}</span>

@@ -46,7 +46,7 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
               </h2>
               <button
                 onClick={onClose}
-                className="text-white/40 hover:text-white transition-colors"
+                className="text-white hover:text-white transition-colors"
                 aria-label={t('common.close')}
               >
                 <X className="h-5 w-5" />
@@ -75,7 +75,7 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
                         <span className="block font-neo-display font-bold text-neo-white text-sm capitalize">
                           {t(`blast.tileGuide.${type}.name`)}
                         </span>
-                        <span className="block font-neo-body text-white/60 text-xs">
+                        <span className="block font-neo-body text-white text-xs">
                           {t(`blast.tileGuide.${type}.desc`)}
                         </span>
                       </div>

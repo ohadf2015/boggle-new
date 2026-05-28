@@ -79,7 +79,7 @@ const PlayerLifeRow = memo<{
 
       {/* Health bar */}
       <div
-        className={`relative flex-1 h-2.5 rounded-full bg-gray-800/80 border border-black/40 overflow-hidden transition-shadow duration-500 ${
+        className={`relative flex-1 h-2.5 rounded-full bg-neo-navy-light/80 border border-black/40 overflow-hidden transition-shadow duration-500 ${
           lowHealthGlow ? 'shadow-[0_0_6px_rgba(239,68,68,0.5)]' : ''
         }`}
       >
@@ -106,7 +106,7 @@ const PlayerLifeRow = memo<{
       {/* Percentage label */}
       <span
         className={`text-[10px] font-bold tabular-nums w-7 text-end transition-colors duration-300 ${
-          isEliminated ? 'text-gray-500' : percentage <= 30 ? 'text-red-400' : 'text-neo-cream/70'
+          isEliminated ? 'text-gray-500' : percentage <= 30 ? 'text-red-400' : 'text-neo-white'
         }`}
       >
         {isEliminated ? '✕' : `${Math.round(percentage)}`}

@@ -60,7 +60,7 @@ const RANK_ACCENTS: Record<number, RankAccent> = {
 };
 
 const DEFAULT_ACCENT: RankAccent = {
-  borderColor: 'border-slate-700/30', textColor: 'text-slate-400', rankBg: 'bg-slate-700', rankText: 'text-slate-300',
+  borderColor: 'border-slate-700/30', textColor: 'text-slate-400', rankBg: 'bg-neo-navy-elevated', rankText: 'text-slate-300',
 };
 
 // ============================================================
@@ -107,7 +107,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
       {/* Avatar */}
       <div className={cn(
         'rounded-full border-2 overflow-hidden shrink-0 w-9 h-9',
-        rank === 1 ? 'border-neo-lime/40 bg-neo-cream' : 'border-slate-700 bg-slate-800',
+        rank === 1 ? 'border-neo-lime/40 bg-neo-cream' : 'border-slate-700 bg-neo-navy-light',
       )}>
         <Avatar
           customAvatar={participant.avatar?.customAvatar}
@@ -120,13 +120,13 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
       <div className="flex-1 min-w-0">
         <p className={cn(
           'font-neo-display uppercase leading-none truncate text-xs sm:text-sm',
-          isCurrentPlayer ? 'text-white' : eliminated ? 'text-white/40' : 'text-neo-cream/80',
+          isCurrentPlayer ? 'text-white' : eliminated ? 'text-white' : 'text-neo-white',
         )}>
           {isCurrentPlayer ? t('results.you').replace(/[()]/g, '') : participant.name}
         </p>
         {/* Word Hunt: life bar */}
         {showProgressBar && participant.lifeRemaining !== undefined && (
-          <div className="w-full h-1 bg-slate-800 mt-1 rounded-full overflow-hidden">
+          <div className="w-full h-1 bg-neo-navy-light mt-1 rounded-full overflow-hidden">
             <m.div
               className={cn('h-full rounded-full', isCurrentPlayer ? 'bg-neo-cyan' : 'bg-neo-lime')}
               initial={{ width: 0 }}
@@ -140,7 +140,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
       {/* Score */}
       <span className={cn(
         'shrink-0 font-neo-display font-black tabular-nums text-sm sm:text-base',
-        rank === 1 ? accent.textColor : isCurrentPlayer ? 'text-white' : 'text-neo-cream/40',
+        rank === 1 ? accent.textColor : isCurrentPlayer ? 'text-white' : 'text-neo-white',
       )}>
         {(rank === 1 || isCurrentPlayer) ? (
           <ScoreCountUp to={participant.score} duration={1000} delay={reducedMotion ? 0 : 60 * index + 200} />
@@ -233,12 +233,12 @@ const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b-2 border-slate-700/30">
         <div className="flex items-center gap-1.5">
-          <Trophy className="w-3.5 h-3.5 text-neo-cream/30" />
-          <h2 className="font-black text-[10px] uppercase tracking-[0.15em] text-neo-cream/40">
+          <Trophy className="w-3.5 h-3.5 text-neo-white" />
+          <h2 className="font-black text-[10px] uppercase tracking-[0.15em] text-neo-white">
             {t('results.battleRankings')}
           </h2>
         </div>
-        <span className="text-[9px] font-bold text-neo-cream/30">
+        <span className="text-[9px] font-bold text-neo-white">
           {participants.length} {t('results.players')}
         </span>
       </div>
@@ -258,7 +258,7 @@ const FightCardLeaderboard: React.FC<FightCardLeaderboardProps> = memo(({
         {shouldDefer && hiddenCount > 0 && (
           <button
             onClick={() => setExpanded(true)}
-            className="w-full py-2 rounded-neo border-2 border-dashed border-slate-700/40 text-[10px] font-black uppercase tracking-wider text-neo-cream/30 hover:text-neo-cream/60 hover:border-neo-cream/20 transition-colors flex items-center justify-center gap-1"
+            className="w-full py-2 rounded-neo border-2 border-dashed border-slate-700/40 text-[10px] font-black uppercase tracking-wider text-neo-white hover:text-neo-white hover:border-neo-cream/20 transition-colors flex items-center justify-center gap-1"
           >
             <ChevronDown className="w-3 h-3" />
             {t('results.showAllRankings', { count: hiddenCount })}

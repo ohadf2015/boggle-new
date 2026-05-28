@@ -34,7 +34,7 @@ export const StatsBlurb: React.FC<StatsBlurbProps> = ({ stats, solved, t }) => {
       );
 
   return (
-    <p className="text-center text-sm text-neo-cream/70 font-neo-body px-2">
+    <p className="text-center text-sm text-neo-white font-neo-body px-2">
       {text}
     </p>
   );

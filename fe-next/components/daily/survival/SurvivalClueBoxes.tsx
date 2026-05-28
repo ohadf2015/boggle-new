@@ -88,7 +88,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
                 ? "text-neo-red"
                 : triesRemaining <= 4
                   ? "text-neo-yellow"
-                  : "text-neo-cream/80"
+                  : "text-neo-white"
             )}>
               {triesRemaining}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft')}
             </span>
@@ -223,8 +223,8 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
               sizeClass,
               letterFb.feedback === 'green' && "bg-neo-lime border-neo-black text-neo-black ring-1 ring-neo-lime/50",
               letterFb.feedback === 'yellow' && "bg-neo-yellow border-neo-black text-neo-black ring-1 ring-neo-yellow/50",
-              isGray && showGrayLetter && "bg-neo-navy-light border-neo-cream/30 text-neo-cream/70",
-              isGray && !showGrayLetter && "bg-neo-black border-neo-black text-neo-cream"
+              isGray && showGrayLetter && "bg-neo-navy-light border-neo-cream/30 text-neo-white",
+              isGray && !showGrayLetter && "bg-neo-black border-neo-black text-neo-white"
             )}
           >
             {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
@@ -313,7 +313,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
             : "bg-neo-yellow border-neo-black text-neo-black";
         } else {
           displayChar = '?';
-          bgClass = "bg-neo-black border-neo-black text-neo-cream";
+          bgClass = "bg-neo-black border-neo-black text-neo-white";
         }
 
         const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;
@@ -355,15 +355,15 @@ const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
   >
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-lime rounded border border-neo-black"></span>
-      <span className="text-neo-cream/70">{t('wordHunt.feedback.correct')}</span>
+      <span className="text-neo-white">{t('wordHunt.feedback.correct')}</span>
     </span>
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-yellow rounded border border-neo-black"></span>
-      <span className="text-neo-cream/70">{t('wordHunt.feedback.wrongPlace')}</span>
+      <span className="text-neo-white">{t('wordHunt.feedback.wrongPlace')}</span>
     </span>
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-neo-navy-light rounded border border-neo-cream/30"></span>
-      <span className="text-neo-cream/70">{t('wordHunt.feedback.notInWord')}</span>
+      <span className="text-neo-white">{t('wordHunt.feedback.notInWord')}</span>
     </span>
   </AdaptiveMotion.div>
 );

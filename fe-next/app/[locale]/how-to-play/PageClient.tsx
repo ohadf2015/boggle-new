@@ -30,7 +30,7 @@ function GameModeSection({
             >
                 {data.title}
             </h2>
-            <p className="text-neo-cream/80 mb-5 text-base leading-relaxed" data-speakable="true">
+            <p className="text-neo-white mb-5 text-base leading-relaxed" data-speakable="true">
                 {data.description}
             </p>
             <ol className="space-y-4">
@@ -38,7 +38,7 @@ function GameModeSection({
                     <li
                         key={`${modeKey}-step-${i}-${step.title}`}
                         id={`${modeKey}-step-${i + 1}`}
-                        className="flex gap-4 items-start bg-slate-800/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm"
+                        className="flex gap-4 items-start bg-neo-navy-light/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm"
                     >
                         <span
                             className="shrink-0 w-8 h-8 flex items-center justify-center bg-neo-cyan text-neo-black font-bold rounded-full border-2 border-neo-black text-sm"
@@ -50,7 +50,7 @@ function GameModeSection({
                             <h3 className="font-bold text-white text-base mb-1" data-speakable="true">
                                 {step.title}
                             </h3>
-                            <p className="text-neo-cream/70 text-sm leading-relaxed" data-speakable="true">
+                            <p className="text-neo-white text-sm leading-relaxed" data-speakable="true">
                                 {step.description}
                             </p>
                         </div>
@@ -94,16 +94,16 @@ function ScoringTable({
                     </thead>
                     <tbody>
                         {rows.map((row, i) => (
-                            <tr key={`row-${row.length}`} className={cn('border-b border-neo-black/30', i % 2 === 0 ? 'bg-slate-800/40' : 'bg-slate-800/20')}>
+                            <tr key={`row-${row.length}`} className={cn('border-b border-neo-black/30', i % 2 === 0 ? 'bg-neo-navy-light/40' : 'bg-neo-navy-light/20')}>
                                 <td className="px-4 py-2.5 font-medium text-white">{row.length}</td>
                                 <td className="px-4 py-2.5 text-neo-cyan font-bold">{row.points}</td>
-                                <td className="px-4 py-2.5 text-neo-cream/60">{row.example}</td>
+                                <td className="px-4 py-2.5 text-neo-white">{row.example}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
-            <p className="mt-3 text-sm text-neo-cream/60 italic" data-speakable="true">{comboNote}</p>
+            <p className="mt-3 text-sm text-neo-white italic" data-speakable="true">{comboNote}</p>
         </section>
     );
 }
@@ -120,9 +120,9 @@ function FAQSection({ title, items }: { title: string; items: FAQItem[] }) {
             </h2>
             <dl className="space-y-3">
                 {items.map((item, i) => (
-                    <div key={`faq-${i}-${item.question}`} className="bg-slate-800/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm">
+                    <div key={`faq-${i}-${item.question}`} className="bg-neo-navy-light/50 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm">
                         <dt className="font-bold text-white mb-1" data-speakable="true">{item.question}</dt>
-                        <dd className="text-neo-cream/70 text-sm leading-relaxed" data-speakable="true">{item.answer}</dd>
+                        <dd className="text-neo-white text-sm leading-relaxed" data-speakable="true">{item.answer}</dd>
                     </div>
                 ))}
             </dl>
@@ -155,7 +155,7 @@ export default function HowToPlayPageClient({ locale }: HowToPlayPageClientProps
                     >
                         {c.pageTitle}
                     </h1>
-                    <p className="text-lg text-neo-cream/80 leading-relaxed max-w-3xl" data-speakable="true">
+                    <p className="text-lg text-neo-white leading-relaxed max-w-3xl" data-speakable="true">
                         {c.introText}
                     </p>
                 </header>
@@ -181,7 +181,7 @@ export default function HowToPlayPageClient({ locale }: HowToPlayPageClientProps
 
                 {/* CTA section */}
                 <section
-                    className="text-center bg-slate-800/60 border-3 border-neo-black rounded-neo p-8 shadow-hard"
+                    className="text-center bg-neo-navy-light/60 border-3 border-neo-black rounded-neo p-8 shadow-hard"
                     aria-labelledby="cta-heading"
                 >
                     <h2
@@ -191,7 +191,7 @@ export default function HowToPlayPageClient({ locale }: HowToPlayPageClientProps
                     >
                         {c.cta.title}
                     </h2>
-                    <p className="text-neo-cream/70 mb-6">{c.cta.subtitle}</p>
+                    <p className="text-neo-white mb-6">{c.cta.subtitle}</p>
                     <div className="flex flex-wrap justify-center gap-3">
                         <Link
                             href={`/${locale}/singleplayer`}

@@ -44,7 +44,7 @@ export function MemoryHuntCompletePhase({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className={cn('p-4 rounded-neo border-3 border-neo-black space-y-3', isDarkMode ? 'bg-slate-800' : 'bg-white')}
+        className={cn('p-4 rounded-neo border-3 border-neo-black space-y-3', isDarkMode ? 'bg-neo-navy-light' : 'bg-white')}
       >
         <AdaptiveMotion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -61,13 +61,13 @@ export function MemoryHuntCompletePhase({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.9 }}
-            className={cn('p-3 rounded-neo border-2 border-neo-black', isDarkMode ? 'bg-slate-700' : 'bg-neo-cream')}
+            className={cn('p-3 rounded-neo border-2 border-neo-black', isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream')}
           >
             <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
             <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
               {results.wordsFound}/{results.totalWords}
             </p>
-            <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+            <p className={cn('text-xs', isDarkMode ? 'text-neo-white' : 'text-neo-black/70')}>
               {t('brain.drills.wordsFound')}
             </p>
           </AdaptiveMotion.div>
@@ -75,13 +75,13 @@ export function MemoryHuntCompletePhase({
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1 }}
-            className={cn('p-3 rounded-neo border-2 border-neo-black', isDarkMode ? 'bg-slate-700' : 'bg-neo-cream')}
+            className={cn('p-3 rounded-neo border-2 border-neo-black', isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream')}
           >
             <Clock className="w-6 h-6 mx-auto text-neo-cyan mb-1" />
             <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-cyan' : 'text-neo-purple')}>
               {results.timeSpent}s
             </p>
-            <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+            <p className={cn('text-xs', isDarkMode ? 'text-neo-white' : 'text-neo-black/70')}>
               {t('brain.drills.timeSpent')}
             </p>
           </AdaptiveMotion.div>

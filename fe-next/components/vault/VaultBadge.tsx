@@ -42,15 +42,15 @@ const VaultBadge: React.FC<VaultBadgeProps> = ({
           <span className="text-xs font-bold text-neo-yellow truncate">
             {vaultName}
           </span>
-          <span className="text-xs font-mono text-white/80 font-bold">
+          <span className="text-xs font-mono text-white font-bold">
             #{rank}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] text-white/50">
+          <span className="text-[10px] text-white">
             {t('vault.badge')}
           </span>
-          <span className="text-[10px] text-white/40">
+          <span className="text-[10px] text-white">
             {date}
           </span>
         </div>

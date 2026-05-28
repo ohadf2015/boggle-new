@@ -87,13 +87,13 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
                 key={rank}
                 className="flex items-center gap-3 bg-white/50 dark:bg-white/5 rounded-lg p-2"
               >
-                <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold">
+                <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-neo-navy-elevated flex items-center justify-center text-xs font-bold">
                   {rank}
                 </div>
                 <div className="flex-1">
-                  <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-3 w-20 bg-gray-200 dark:bg-neo-navy-elevated rounded" />
                 </div>
-                <div className="h-3 w-10 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-3 w-10 bg-gray-200 dark:bg-neo-navy-elevated rounded" />
               </div>
             ))}
           </div>

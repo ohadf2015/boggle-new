@@ -50,7 +50,7 @@ function WordCraftPendingStripImpl({
     return (
       <div
         data-wc-pending-strip="empty"
-        className="flex items-center justify-center min-h-[32px] px-2 text-xs text-neo-cream/50 italic font-neo-body shrink-0"
+        className="flex items-center justify-center min-h-[32px] px-2 text-xs text-neo-white italic font-neo-body shrink-0"
       >
         {labels.headerEmpty}
       </div>
@@ -86,7 +86,7 @@ function WordCraftPendingStripImpl({
                 'relative inline-flex items-center justify-center',
                 'w-8 h-9 rounded-neo border-2 border-black bg-neo-lime text-neo-navy',
                 'shadow-hard-sm font-neo-display font-black text-base',
-                'transition-transform active:scale-90 hover:-translate-y-0.5 hover:bg-neo-pink hover:text-neo-cream',
+                'transition-transform active:scale-90 hover:-translate-y-0.5 hover:bg-neo-pink hover:text-neo-white',
               )}
             >
               {p.letter === '_' ? '·' : p.letter}

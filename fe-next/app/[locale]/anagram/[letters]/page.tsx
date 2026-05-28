@@ -177,15 +177,15 @@ export default async function AnagramPage({ params }: PageParams) {
           {/* Stats bar */}
           {totalWords > 0 && (
             <div className="flex flex-wrap gap-4 mb-8">
-              <div className="bg-slate-900 border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
+              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
                 <span className="text-neo-cyan font-bold text-lg">{totalWords}</span>
                 <span className="text-slate-400 text-sm">total words</span>
               </div>
-              <div className="bg-slate-900 border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
+              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
                 <span className="text-neo-lime font-bold text-lg">{sortedLengths.length}</span>
                 <span className="text-slate-400 text-sm">word lengths</span>
               </div>
-              <div className="bg-slate-900 border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
+              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
                 <span className="text-neo-cyan font-bold text-lg">{sortedLengths[0]}–{sortedLengths[sortedLengths.length - 1]}</span>
                 <span className="text-slate-400 text-sm">letters</span>
               </div>
@@ -194,7 +194,7 @@ export default async function AnagramPage({ params }: PageParams) {
 
           {/* Empty state */}
           {totalWords === 0 && (
-            <div className="bg-slate-900 border-2 border-neo-cyan rounded-neo p-6 shadow-hard mb-8">
+            <div className="bg-neo-navy border-2 border-neo-cyan rounded-neo p-6 shadow-hard mb-8">
               <p className="text-neo-white font-bold mb-4">
                 Hmm, no words found from these letters. Try:
               </p>
@@ -257,12 +257,12 @@ export default async function AnagramPage({ params }: PageParams) {
                       <Link
                         key={word}
                         href={`/${locale}/words/${word}`}
-                        className="group flex items-center justify-between bg-slate-900 border border-slate-700 hover:border-neo-cyan hover:shadow-[0_0_12px_rgba(0,255,255,0.15)] rounded-neo px-3 py-2 transition-all duration-200"
+                        className="group flex items-center justify-between bg-neo-navy border border-slate-700 hover:border-neo-cyan hover:shadow-[0_0_12px_rgba(0,255,255,0.15)] rounded-neo px-3 py-2 transition-all duration-200"
                       >
                         <span className="font-bold text-sm text-neo-white group-hover:text-neo-lime transition-colors uppercase tracking-wide">
                           {word}
                         </span>
-                        <span className="text-xs font-bold text-neo-cyan bg-slate-800 rounded px-1.5 py-0.5 ms-1 shrink-0">
+                        <span className="text-xs font-bold text-neo-cyan bg-neo-navy-light rounded px-1.5 py-0.5 ms-1 shrink-0">
                           {calculateWordScore(word)}pt
                         </span>
                       </Link>
@@ -281,7 +281,7 @@ export default async function AnagramPage({ params }: PageParams) {
               Frequently Asked Questions
             </h2>
             <div className="space-y-4">
-              <details className="bg-slate-900 border-2 border-slate-700 rounded-neo p-4 group" open>
+              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group" open>
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   What words can I make from {upper}?
                   <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
@@ -294,7 +294,7 @@ export default async function AnagramPage({ params }: PageParams) {
                   </p>
                 </div>
               </details>
-              <details className="bg-slate-900 border-2 border-slate-700 rounded-neo p-4 group">
+              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group">
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   Is this a Scrabble word finder?
                   <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
@@ -305,7 +305,7 @@ export default async function AnagramPage({ params }: PageParams) {
                   </p>
                 </div>
               </details>
-              <details className="bg-slate-900 border-2 border-slate-700 rounded-neo p-4 group">
+              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group">
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   How is the score calculated?
                   <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
@@ -334,19 +334,19 @@ export default async function AnagramPage({ params }: PageParams) {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 href={`/${locale}/tools/word-solver`}
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
+                className="flex-1 bg-neo-navy-light border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
               >
                 Word Solver →
               </Link>
               <Link
                 href={`/${locale}/singleplayer`}
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
+                className="flex-1 bg-neo-navy-light border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
               >
                 Play Solo →
               </Link>
               <Link
                 href={`/${locale}/multiplayer`}
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
+                className="flex-1 bg-neo-navy-light border border-slate-700 rounded-neo px-4 py-3 hover:border-neo-cyan transition-colors text-sm font-bold"
               >
                 Multiplayer →
               </Link>

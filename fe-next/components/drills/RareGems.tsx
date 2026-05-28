@@ -246,13 +246,13 @@ export default function RareGems({
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        'bg-slate-800'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Timer */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            'bg-slate-700'
+            'bg-neo-navy-elevated'
           )}>
             <Clock className={cn(
               'w-4 h-4',
@@ -274,7 +274,7 @@ export default function RareGems({
 
       {/* Gem Pouch — the felt-progress meter (replaces the old tiny count chip) */}
       {phase === 'playing' && (
-        <div className="px-4 py-2 border-b-2 border-neo-black bg-slate-800">
+        <div className="px-4 py-2 border-b-2 border-neo-black bg-neo-navy-light">
           <GemPouchMeter
             rareCount={rareWordsFound}
             target={levelConfig.targetRare}
@@ -290,12 +290,12 @@ export default function RareGems({
         <div className={cn(
           'flex items-center justify-center gap-3 py-2 text-xs',
           'border-b-2 border-neo-black',
-          'bg-slate-800'
+          'bg-neo-navy-light'
         )}>
           {Object.entries(RARITY_COLORS).map(([rarity, color]) => (
             <div key={rarity} className="flex items-center gap-1">
               <div className={cn('w-3 h-3 rounded border border-neo-black', color)} />
-              <span className={'text-neo-white/70'}>
+              <span className={'text-neo-white'}>
                 {t(`brain.drills.rarity.${rarity}`)} (+{GEM_POINTS[rarity as keyof typeof GEM_POINTS]})
               </span>
             </div>
@@ -320,13 +320,13 @@ export default function RareGems({
             </h2>
             <p className={cn(
               'text-sm max-w-xs',
-              'text-neo-white/70'
+              'text-neo-white'
             )}>
               {t('brain.drills.rare-gems.description')}
             </p>
             <div className={cn(
               'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-slate-800'
+              'bg-neo-navy-light'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.timeSpent')}: {levelConfig.timeLimit}s</p>
@@ -349,7 +349,7 @@ export default function RareGems({
               <div className="flex justify-center">
                 <div className={cn(
                   'px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-lg',
-                  'bg-slate-700 text-neo-white'
+                  'bg-neo-navy-elevated text-neo-white'
                 )}>
                   {keyboard.typedWord.toUpperCase()}
                 </div>
@@ -398,11 +398,11 @@ export default function RareGems({
               data-testid="drill-found-words"
               className={cn(
                 'flex flex-wrap gap-2 justify-center content-start p-3 rounded-neo border-2 border-neo-black h-32 overflow-y-auto',
-                'bg-slate-800'
+                'bg-neo-navy-light'
               )}
             >
               {wordsFound.length === 0 ? (
-                <span className="self-center text-xs text-neo-white/40">
+                <span className="self-center text-xs text-neo-white">
                   {t('brain.drills.foundWordsHint')}
                 </span>
               ) : (
@@ -446,7 +446,7 @@ export default function RareGems({
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
                 'transition-all hover:-translate-y-px',
-                'bg-slate-700 text-neo-white'
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
               {t('brain.drills.finishGame')}

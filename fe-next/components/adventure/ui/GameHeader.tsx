@@ -106,7 +106,7 @@ export const GameHeader = memo(function GameHeader({
           className={cn(
             'p-1.5 rounded-neo',
             'min-w-10 min-h-10 flex items-center justify-center',
-            'bg-neo-white/5 text-neo-white/40',
+            'bg-neo-white/5 text-neo-white',
             'hover:bg-neo-red/15 hover:text-neo-red/80',
             'transition-colors duration-200'
           )}
@@ -164,10 +164,10 @@ export const GameHeader = memo(function GameHeader({
         {isBossLevel ? (
           <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-red/15 rounded-neo border border-neo-red/30">
             <Swords className="w-3.5 h-3.5 text-neo-red" />
-            <span className="text-[10px] font-mono font-bold text-neo-white/60 tabular-nums">
+            <span className="text-[10px] font-mono font-bold text-neo-white tabular-nums">
               W{worldNumber}·L{levelNumber}
             </span>
-            <span className="text-[10px] text-neo-white/20">|</span>
+            <span className="text-[10px] text-neo-white">|</span>
             <span className="text-xs font-mono font-bold text-neo-white tabular-nums">
               {Math.floor(elapsedTime / 60)}:{String(elapsedTime % 60).padStart(2, '0')}
             </span>
@@ -254,7 +254,7 @@ export const GameHeader = memo(function GameHeader({
             'transition-colors duration-200',
             isPaused
               ? 'bg-neo-lime text-neo-black'
-              : 'bg-neo-white/8 text-neo-white/70 hover:bg-neo-white/15'
+              : 'bg-neo-white/8 text-neo-white hover:bg-neo-white/15'
           )}
           aria-label={isPaused ? t('common.resume') : t('common.pause')}
         >

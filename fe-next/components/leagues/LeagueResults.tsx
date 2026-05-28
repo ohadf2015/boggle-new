@@ -58,13 +58,13 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
           <p className={`font-neo-display text-3xl font-bold ${ZONE_COLORS[zone]}`}>
             {t(ZONE_MESSAGES[zone])}
           </p>
-          <p className="text-neo-white/60 mt-1">
+          <p className="text-neo-white mt-1">
             #{position} in {t(`league.${tier}`)}
           </p>
         </div>
 
         <div className="border-3 border-black rounded-neo bg-neo-navy/50 p-4 text-center mb-4">
-          <p className="text-sm text-neo-white/60">{t('league.coinsEarned')}</p>
+          <p className="text-sm text-neo-white">{t('league.coinsEarned')}</p>
           <p className="font-neo-display text-2xl font-bold text-neo-yellow">{coinsEarned}</p>
         </div>
 

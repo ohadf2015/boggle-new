@@ -51,7 +51,7 @@ const RARITY_BG: Record<CollectibleRarity, string> = {
 };
 
 const RARITY_LABEL_COLOR: Record<CollectibleRarity, string> = {
-  common: 'text-neo-white/50',
+  common: 'text-neo-white',
   rare: 'text-neo-cyan',
   epic: 'text-neo-pink',
   legendary: 'text-neo-yellow',
@@ -109,7 +109,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
             <h2 className="font-neo-display text-xl text-neo-white uppercase tracking-tight">
               {t('adventure.collection.title')}
             </h2>
-            <p className="text-xs text-neo-white/50 font-bold mt-0.5">
+            <p className="text-xs text-neo-white font-bold mt-0.5">
               {totalCollected}/{totalItems} {t('adventure.collection.collected')}
             </p>
           </div>
@@ -135,7 +135,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                   'flex-1 py-3 flex flex-col items-center gap-1 transition-all',
                   isActive
                     ? `bg-${color}/15 border-b-3 border-${color} text-${color}`
-                    : 'text-neo-white/40 hover:text-neo-white/60 hover:bg-neo-white/5'
+                    : 'text-neo-white hover:text-neo-white hover:bg-neo-white/5'
                 )}
               >
                 <Icon className="w-5 h-5" />
@@ -150,7 +150,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
         {/* Category Progress */}
         <div className="px-4 py-2 bg-neo-white/5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-neo-white/60">
+            <span className="text-xs font-bold text-neo-white">
               {ownedCount}/{categoryItems.length}
             </span>
             <div className="flex-1 mx-3 h-1.5 bg-neo-black/40 rounded-full overflow-hidden">
@@ -194,14 +194,14 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                       {owned ? (
                         <span>{item.icon}</span>
                       ) : (
-                        <Lock className="w-5 h-5 text-neo-white/30" />
+                        <Lock className="w-5 h-5 text-neo-white" />
                       )}
                     </div>
 
                     {/* Name */}
                     <span className={cn(
                       'text-[11px] font-bold text-center leading-tight',
-                      owned ? 'text-neo-white' : 'text-neo-white/30'
+                      owned ? 'text-neo-white' : 'text-neo-white'
                     )}>
                       {owned ? t(item.nameKey) : '???'}
                     </span>
@@ -209,14 +209,14 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                     {/* Rarity badge */}
                     <span className={cn(
                       'text-[9px] font-black uppercase mt-1',
-                      owned ? RARITY_LABEL_COLOR[item.rarity] : 'text-neo-white/20'
+                      owned ? RARITY_LABEL_COLOR[item.rarity] : 'text-neo-white'
                     )}>
                       {t(`adventure.collection.rarity.${item.rarity}`)}
                     </span>
 
                     {/* Quantity for stackable items */}
                     {owned && invItem && invItem.quantity > 1 && (
-                      <span className="text-[10px] font-mono text-neo-white/60 mt-0.5">
+                      <span className="text-[10px] font-mono text-neo-white mt-0.5">
                         ×{invItem.quantity}
                       </span>
                     )}

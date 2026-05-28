@@ -364,7 +364,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             showCreateCTA
             minToShow={1}
           />
-          <Button variant="ghost" className="w-full border-2 border-white/20 text-white/70 hover:text-white hover:border-white/40" onClick={handleBackToLobby}>
+          <Button variant="ghost" className="w-full border-2 border-white/20 text-white hover:text-white hover:border-white/40" onClick={handleBackToLobby}>
             <ArrowLeft className="me-2 w-4 h-4 rtl:rotate-180" />{t('nextStep.backToLobby')}
           </Button>
         </>
@@ -376,7 +376,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <div className="space-y-3">
       <div className="flex items-center gap-2 md:gap-3">
         <div className="w-1 md:w-1.5 h-6 md:h-8 bg-neo-lime rounded-full" />
-        <h3 className="text-[10px] sm:text-xs font-black text-white/60 uppercase tracking-wider md:tracking-[0.2em]">
+        <h3 className="text-[10px] sm:text-xs font-black text-white uppercase tracking-wider md:tracking-[0.2em]">
           {t('results.detailedAnalysis')}
         </h3>
         {isDesktop && <div className="flex-1 h-px bg-white/10" />}

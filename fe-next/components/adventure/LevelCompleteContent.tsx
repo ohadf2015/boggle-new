@@ -85,7 +85,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
       >
         {/* Score */}
         <div className="bg-neo-black/60 backdrop-blur-xs border-3 border-neo-white/20 rounded-neo p-3">
-          <div className="text-neo-white/60 text-xs font-bold mb-1 uppercase">{t('common.score')}</div>
+          <div className="text-neo-white text-xs font-bold mb-1 uppercase">{t('common.score')}</div>
           <RollingNumber value={score} variant="white" className="text-xl md:text-2xl" />
         </div>
         {/* XP */}
@@ -164,7 +164,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
 
       {/* Objectives Summary */}
       <div className="mb-6">
-        <p className="text-neo-white/60 text-sm font-bold mb-2">
+        <p className="text-neo-white text-sm font-bold mb-2">
           {t('adventure.game.objectives')}: {completedCount}/{objectives.length}
         </p>
         <ul className="space-y-2">
@@ -174,7 +174,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
               data-testid={objective.isComplete ? 'objective-complete' : 'objective-incomplete'}
               className={cn(
                 'flex items-center gap-2 text-sm font-bold',
-                objective.isComplete ? 'text-neo-lime' : 'text-neo-white/50'
+                objective.isComplete ? 'text-neo-lime' : 'text-neo-white'
               )}
             >
               {objective.isComplete ? (
@@ -211,7 +211,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
           transition={{ delay: 0.9 }}
           className="mb-4 p-3 rounded-neo bg-neo-white/5 border border-neo-white/10"
         >
-          <p className="text-xs text-neo-white/70 italic leading-relaxed">{storyBeatText}</p>
+          <p className="text-xs text-neo-white italic leading-relaxed">{storyBeatText}</p>
         </AdaptiveMotion.div>
       )}
 
@@ -239,7 +239,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
             <ul className="space-y-2 mb-3">
               {objectives.map((obj) => (
                 <li key={obj.type} className="flex items-center justify-between text-sm font-bold">
-                  <span className={obj.isComplete ? 'text-neo-lime' : 'text-neo-white/60'}>
+                  <span className={obj.isComplete ? 'text-neo-lime' : 'text-neo-white'}>
                     {obj.isComplete ? <Check className="w-3 h-3 inline me-1" /> : <X className="w-3 h-3 inline me-1" />}
                     {t(OBJECTIVE_TRANSLATION_KEYS[obj.type], { target: obj.target })}
                   </span>
@@ -253,7 +253,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
               ))}
             </ul>
             {worstObjective && (
-              <p className="text-neo-white/70 text-xs italic border-t border-neo-red/30 pt-2">
+              <p className="text-neo-white text-xs italic border-t border-neo-red/30 pt-2">
                 💡 {t(`adventure.defeatExplainer.tip.${worstObjective.type}`)}
               </p>
             )}
@@ -277,7 +277,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
             </p>
             <div className="space-y-1.5">
               {nearMisses.map((msg, i) => (
-                <div key={`miss-${i}-${msg.translationKey}`} className="text-sm text-neo-white/80 font-bold">
+                <div key={`miss-${i}-${msg.translationKey}`} className="text-sm text-neo-white font-bold">
                   {t(msg.translationKey, msg.params)}
                 </div>
               ))}
@@ -299,11 +299,11 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
           </p>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-neo-white/60">{t('adventure.game.words')}: </span>
+              <span className="text-neo-white">{t('adventure.game.words')}: </span>
               <span className="font-bold text-neo-white">{bestAttempt.bestWords}</span>
             </div>
             <div>
-              <span className="text-neo-white/60">{t('common.score')}: </span>
+              <span className="text-neo-white">{t('common.score')}: </span>
               <span className="font-bold text-neo-white">{bestAttempt.bestScore.toLocaleString()}</span>
             </div>
           </div>
@@ -330,7 +330,7 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
             {t('adventure.level')} {nextLevelPreview.levelNumber} — {nextLevelPreview.worldName}
           </p>
           {nextLevelPreview.mechanic && (
-            <p className="text-neo-white/60 text-xs mt-0.5">{t(nextLevelPreview.mechanic)}</p>
+            <p className="text-neo-white text-xs mt-0.5">{t(nextLevelPreview.mechanic)}</p>
           )}
         </AdaptiveMotion.div>
       )}
@@ -475,7 +475,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
             'py-2.5 px-4 flex items-center justify-center gap-2',
             isFailed
               ? 'flex-1 bg-neo-white/10 text-neo-white font-black text-base border-3 border-neo-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'
-              : 'bg-transparent text-neo-white/60 font-bold text-base border-2 border-neo-white/10',
+              : 'bg-transparent text-neo-white font-bold text-base border-2 border-neo-white/10',
             'hover:text-neo-white hover:bg-neo-white/10',
             'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
             'rounded-neo transition-all duration-200'

@@ -119,7 +119,7 @@ export function DailyAvatarPartCard() {
           <p className="font-neo-body text-sm font-semibold text-neo-white truncate">
             {granted ? t('avatar.dailyPart.justClaimed') : t('avatar.dailyPart.title')}
           </p>
-          <p className="font-neo-body text-xs text-neo-white/60 truncate">
+          <p className="font-neo-body text-xs text-neo-white truncate">
             {exhausted
               ? t('avatar.dailyPart.exhausted')
               : status.cooldownActive && remaining

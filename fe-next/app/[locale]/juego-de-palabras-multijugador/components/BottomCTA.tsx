@@ -42,7 +42,7 @@ export function BottomCTA({ locale }: BottomCTAProps) {
       <h2 className="relative mt-4 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-4xl">
         Tus amigos. Tu sala. <span className="text-neo-pink">Tus palabras.</span>
       </h2>
-      <p className="relative mx-auto mt-3 max-w-lg font-neo-body text-sm text-neo-white/65 sm:text-base">
+      <p className="relative mx-auto mt-3 max-w-lg font-neo-body text-sm text-neo-white sm:text-base">
         Crea la sala, pega el enlace en WhatsApp y empieza a competir antes de leer esta frase.
       </p>
 

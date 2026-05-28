@@ -162,7 +162,7 @@ const Step1SwipeAndColors: React.FC<{ isRTL: boolean; t: (key: string) => string
                 'w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-base sm:text-lg',
                 highlightedIndices.includes(idx)
                   ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]'
-                  : 'bg-neo-cream dark:bg-gray-700 text-neo-black dark:text-white'
+                  : 'bg-neo-cream dark:bg-neo-navy-elevated text-neo-black dark:text-white'
               )}
               animate={highlightedIndices.includes(idx) ? {
                 scale: [1, 1.1, 1],

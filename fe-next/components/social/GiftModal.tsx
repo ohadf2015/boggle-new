@@ -53,7 +53,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-slate-800 border-3 border-neo-black rounded-neo p-5 shadow-hard-xl w-full max-w-md mx-4"
+        className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-5 shadow-hard-xl w-full max-w-md mx-4"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -94,8 +94,8 @@ const GiftModal: React.FC<GiftModalProps> = ({
                   isSelected
                     ? 'bg-neo-lime scale-105'
                     : canAfford
-                      ? 'bg-slate-700 hover:bg-slate-600'
-                      : 'bg-slate-900 opacity-50 cursor-not-allowed'
+                      ? 'bg-neo-navy-elevated hover:bg-slate-600'
+                      : 'bg-neo-navy opacity-50 cursor-not-allowed'
                 )}
               >
                 <Icon className={cn('w-6 h-6 mb-1', isSelected ? 'text-neo-black' : 'text-white')} />
@@ -112,7 +112,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
 
         {/* Coin amount slider (shown when coins selected) */}
         {selectedType === 'coins' && (
-          <div className="mb-4 p-3 bg-slate-700 border-2 border-neo-black rounded-neo">
+          <div className="mb-4 p-3 bg-neo-navy-elevated border-2 border-neo-black rounded-neo">
             <label className="text-xs font-bold text-white block mb-2">
               {t('socialGift.amount', 'Amount')}: {coinAmount} {t('socialGift.coins', 'coins')}
             </label>
@@ -145,7 +145,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
             'w-full py-3 border-3 border-neo-black rounded-neo font-black text-lg uppercase shadow-hard transition-all',
             selectedType && giftsRemaining > 0
               ? 'bg-neo-lime text-neo-black hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5'
-              : 'bg-slate-700 text-gray-500 cursor-not-allowed'
+              : 'bg-neo-navy-elevated text-gray-500 cursor-not-allowed'
           )}
         >
           {t('socialGift.send', 'Send Gift')}

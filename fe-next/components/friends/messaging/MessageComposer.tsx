@@ -163,7 +163,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
     <div className={cn('p-3', className)}>
       <div className={cn(
         'flex gap-2 items-end p-3 rounded-neo border-2 border-neo-black',
-        isDark ? 'bg-slate-700' : 'bg-white'
+        isDark ? 'bg-neo-navy-elevated' : 'bg-white'
       )}>
         {/* Text input */}
         <textarea

@@ -38,7 +38,7 @@ export function ImagePreviewModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 10 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-slate-900 rounded-xl border-2 border-slate-700 p-5 max-w-lg w-full shadow-2xl"
+        className="bg-neo-navy rounded-xl border-2 border-slate-700 p-5 max-w-lg w-full shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -55,7 +55,7 @@ export function ImagePreviewModal({
         </div>
 
         {/* Image preview */}
-        <div className="relative rounded-lg overflow-hidden border border-slate-600 mb-4 bg-slate-800">
+        <div className="relative rounded-lg overflow-hidden border border-slate-600 mb-4 bg-neo-navy-light">
           <div className="absolute inset-0 bg-linear-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -78,7 +78,7 @@ export function ImagePreviewModal({
 
           <Button
             onClick={onDownload}
-            className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-lg font-medium text-sm transition-all"
+            className="w-full py-3 bg-neo-navy-elevated hover:bg-slate-600 text-white border border-slate-600 rounded-lg font-medium text-sm transition-all"
           >
             <ImageDown className="me-2 w-4 h-4" />
             {t('daily.download')}

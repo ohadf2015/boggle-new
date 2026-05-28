@@ -63,7 +63,7 @@ export function AuthSessionsPanel({ authToken }: Props) {
 
   if (error) {
     return (
-      <div data-testid="auth-sessions-error" className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+      <div data-testid="auth-sessions-error" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
         <div className="flex items-center gap-2 text-sm text-red-400">
           <AlertTriangle className="w-4 h-4" />
           <span>{t('admin.authSessions.error')}: {error}</span>
@@ -74,7 +74,7 @@ export function AuthSessionsPanel({ authToken }: Props) {
 
   if (data === null) {
     return (
-      <div data-testid="auth-sessions-skeleton" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 mb-6 animate-pulse h-48" />
+      <div data-testid="auth-sessions-skeleton" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 mb-6 animate-pulse h-48" />
     );
   }
 
@@ -82,7 +82,7 @@ export function AuthSessionsPanel({ authToken }: Props) {
 
   if (stats.totalGames === 0) {
     return (
-      <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+      <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
         <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2 mb-2">
           <Users className="w-4 h-4 text-neo-lime" />
           {t('admin.authSessions.title')}
@@ -98,7 +98,7 @@ export function AuthSessionsPanel({ authToken }: Props) {
   const maxLang = stats.byLanguage[0]?.count ?? 1;
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2 mb-3">
         <Users className="w-4 h-4 text-neo-lime" />
         {t('admin.authSessions.title')}
@@ -122,7 +122,7 @@ export function AuthSessionsPanel({ authToken }: Props) {
 
 function Stat({ testId, label, value, subtitle }: { testId: string; label: string; value: string; subtitle?: string }) {
   return (
-    <div data-testid={testId} className="bg-slate-700/30 rounded-neo border border-slate-700 p-2">
+    <div data-testid={testId} className="bg-neo-navy-elevated/30 rounded-neo border border-slate-700 p-2">
       <div className="text-[10px] text-slate-400 uppercase tracking-wider">{label}</div>
       <div className="text-lg font-neo-display text-neo-white">{value}</div>
       {subtitle && <div className="text-[10px] text-slate-500">{subtitle}</div>}
@@ -138,10 +138,10 @@ function MiniBars({ label, items, max, barClass }: { label: string; items: { nam
         {items.slice(0, 6).map((row) => (
           <div key={row.name} className="flex items-center gap-2 text-xs">
             <span className="text-neo-white truncate w-24 shrink-0">{row.name}</span>
-            <div className="flex-1 h-4 bg-slate-700/50 rounded-sm overflow-hidden">
+            <div className="flex-1 h-4 bg-neo-navy-elevated/50 rounded-sm overflow-hidden">
               <div className={cn('h-full', barClass)} style={{ width: `${(row.count / max) * 100}%` }} />
             </div>
-            <span className="font-mono text-neo-white/70 w-12 text-right">{row.count.toLocaleString()}</span>
+            <span className="font-mono text-neo-white w-12 text-right">{row.count.toLocaleString()}</span>
           </div>
         ))}
       </div>

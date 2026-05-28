@@ -418,7 +418,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
       <>
         <div className={cn(
           'p-4 rounded-neo border-2 text-center space-y-3',
-          isDark ? 'bg-slate-800 border-white/10' : 'bg-gray-50 border-gray-200',
+          isDark ? 'bg-neo-navy-light border-white/10' : 'bg-gray-50 border-gray-200',
           className
         )}>
           <Users className="w-8 h-8 mx-auto text-gray-400" />
@@ -460,7 +460,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
     return (
       <div className={cn(
         'p-4 rounded-neo border-2 space-y-3',
-        isDark ? 'bg-slate-800 border-white/10' : 'bg-gray-50 border-gray-200',
+        isDark ? 'bg-neo-navy-light border-white/10' : 'bg-gray-50 border-gray-200',
         className
       )}>
         <div className="flex gap-2 mb-4">
@@ -735,7 +735,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
               </div>
             )}
             {outgoingRequests.length > 0 && (
-              <div className={cn('p-3 rounded-neo border-2', isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200')}>
+              <div className={cn('p-3 rounded-neo border-2', isDark ? 'bg-neo-navy-elevated/50 border-white/10' : 'bg-gray-50 border-gray-200')}>
                 <p className={cn('text-xs font-bold mb-2', isDark ? 'text-gray-300' : 'text-gray-600')}>
                   {t('friends.sentRequests')}
                 </p>

@@ -59,7 +59,7 @@ export default function SystemPageClient() {
           {/* Web Vitals link */}
           <button
             onClick={() => router.push(`/${language}/admin/web-vitals`)}
-            className="w-full bg-slate-800/50 rounded-neo border-neo border-black p-4 flex items-center gap-3 hover:bg-slate-700/50 transition-colors text-start mb-6"
+            className="w-full bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 flex items-center gap-3 hover:bg-neo-navy-elevated/50 transition-colors text-start mb-6"
           >
             <Activity className="w-5 h-5 text-purple-500" />
             <span className="text-sm font-medium text-neo-white">{t('admin.nav.webVitals')}</span>
@@ -67,11 +67,11 @@ export default function SystemPageClient() {
 
           {authToken && (
             <>
-              <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+              <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
                 <GamesDiagnostic authToken={authToken} />
               </div>
 
-              <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+              <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Mail className="w-4 h-4 text-neo-pink" />
                   <h3 className="text-sm font-neo-display text-neo-white">{t('admin.nav.email')}</h3>

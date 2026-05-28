@@ -113,8 +113,8 @@ export default function GameplayPanel({ mode, isRTL }: { mode: Mode; isRTL: bool
         <span className={`s3-pcopy inline-block rounded-neo border-neo-thick border-black px-3 py-1 font-neo-display text-sm font-bold text-black shadow-hard ${mode.accent}`}>
           {mode.tag}
         </span>
-        <h3 className="s3-pcopy mt-4 font-neo-display text-3xl font-bold leading-tight text-neo-cream sm:text-4xl">{mode.title}</h3>
-        <p className="s3-pcopy mt-3 max-w-[42ch] font-neo-body text-lg text-neo-cream/75">{mode.body}</p>
+        <h3 className="s3-pcopy mt-4 font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">{mode.title}</h3>
+        <p className="s3-pcopy mt-3 max-w-[42ch] font-neo-body text-lg text-neo-white">{mode.body}</p>
       </div>
 
       <div className="grid place-items-center" style={{ perspective: 1100 }}>

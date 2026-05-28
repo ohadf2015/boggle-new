@@ -146,7 +146,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
                 'text-center'
               )}
             >
-              <p className="text-neo-white/80 text-xs md:text-sm italic leading-relaxed">
+              <p className="text-neo-white text-xs md:text-sm italic leading-relaxed">
                 {t(boss.storylineIntro)}
               </p>
             </AdaptiveMotion.div>
@@ -178,7 +178,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
               className={cn(
-                'text-center text-neo-white/80 italic font-bold',
+                'text-center text-neo-white italic font-bold',
                 'text-sm md:text-base mb-6',
                 'px-4'
               )}
@@ -222,7 +222,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
                 onClick={onSkip}
                 className={cn(
                   'w-full py-2 px-4',
-                  'bg-transparent text-neo-white/60',
+                  'bg-transparent text-neo-white',
                   'font-bold text-base',
                   'hover:text-neo-white hover:bg-neo-white/5',
                   'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',

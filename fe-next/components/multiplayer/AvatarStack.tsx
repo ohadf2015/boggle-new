@@ -77,7 +77,7 @@ const AvatarStack = memo<AvatarStackProps>(({
         <div
           className={cn(
             'relative rounded-full shrink-0 flex items-center justify-center',
-            'bg-neo-navy border-2 border-white/20 font-black text-white/70',
+            'bg-neo-navy border-2 border-white/20 font-black text-white',
             config.overflow,
             config.overlap,
           )}

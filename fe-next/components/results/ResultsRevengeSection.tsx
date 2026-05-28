@@ -155,12 +155,12 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           {/* Text Content */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-white leading-tight">{prompt.title}</p>
-            <p className="text-[10px] font-bold text-white/40 uppercase mt-0.5 tracking-wide">
+            <p className="text-[10px] font-bold text-white uppercase mt-0.5 tracking-wide">
               {prompt.subtitle}
             </p>
             {/* Solvable words hint */}
             {solvableWords.length > 0 && solvableWords.length <= 4 && (
-              <p className="text-[9px] font-bold text-white/30 mt-0.5">
+              <p className="text-[9px] font-bold text-white mt-0.5">
                 {t('results.findingWouldHaveTied', {
                   words: solvableWords.map(w => w.word.toUpperCase()).join(` ${t('common.and')} `),
                 })}
@@ -235,7 +235,7 @@ export const ResultsRevengeSection: React.FC<ResultsRevengeSectionProps> = ({
           {/* Text Content */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-white leading-tight">{prompt.title}</p>
-            <p className="text-[10px] font-bold text-white/40 uppercase mt-0.5 tracking-wide">
+            <p className="text-[10px] font-bold text-white uppercase mt-0.5 tracking-wide">
               {prompt.subtitle}
             </p>
             {dominanceMargin > 0 && runnerUp && (

@@ -95,7 +95,7 @@ function QuestOption({
       </div>
 
       {/* Description */}
-      <p className="text-sm text-neo-white/90 font-medium">
+      <p className="text-sm text-neo-white font-medium">
         {t(quest.description, { target: quest.displayTarget ?? quest.target })}
       </p>
 

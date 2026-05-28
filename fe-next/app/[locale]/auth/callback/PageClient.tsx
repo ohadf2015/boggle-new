@@ -85,14 +85,14 @@ function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIPr
         <PageLoader size="lg" text={t('auth.callback.completingSignIn')} />
 
         {!showRetry && secondsRemaining > 0 && (
-          <p className="text-neo-white/60 text-sm">
+          <p className="text-neo-white text-sm">
             {secondsRemaining}...
           </p>
         )}
 
         {showRetry && (
           <div className="flex flex-col items-center gap-3 animate-neo-pop">
-            <p className="text-neo-white/80 text-sm text-center max-w-xs">
+            <p className="text-neo-white text-sm text-center max-w-xs">
               {t('auth.callback.takingTooLong')}
             </p>
             <button

@@ -304,7 +304,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
-            className="text-center text-neo-white/80 text-sm"
+            className="text-center text-neo-white text-sm"
           >
             {normalized.description}
           </m.p>

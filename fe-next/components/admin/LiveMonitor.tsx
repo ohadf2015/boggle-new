@@ -205,7 +205,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
   return (
     <div className="space-y-6">
       {/* Stats Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-800/50 rounded-neo border-neo border-black p-4 shadow-hard">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 shadow-hard">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
           {/* Live Indicator */}
           <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto">
@@ -279,7 +279,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center py-16 bg-slate-800/30 rounded-neo border-neo border-black"
+          className="flex flex-col items-center justify-center py-16 bg-neo-navy-light/30 rounded-neo border-neo border-black"
         >
           <Gamepad2 className="w-16 h-16 text-slate-500 mb-4" />
           <h3 className="text-xl font-neo-display text-slate-400 mb-2">
@@ -313,9 +313,9 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
               <h2 className="text-lg font-neo-display text-neo-white mb-4">
                 {t('admin.live.singlePlayerLive')}
               </h2>
-              <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
+              <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
                 <table className="w-full min-w-[600px]">
-                  <thead className="bg-slate-700/50">
+                  <thead className="bg-neo-navy-elevated/50">
                     <tr>
                       <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
                         {t('admin.live.player')}
@@ -350,9 +350,9 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
               <h2 className="text-lg font-neo-display text-neo-white mb-4">
                 {t('admin.live.connectedPlayers')}
               </h2>
-              <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
+              <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
                 <table className="w-full min-w-[600px]">
-                  <thead className="bg-slate-700/50">
+                  <thead className="bg-neo-navy-elevated/50">
                     <tr>
                       <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">
                         {t('admin.live.player')}
@@ -411,7 +411,7 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="bg-slate-800/50 rounded-neo border-neo border-black p-4 shadow-hard hover:translate-y-[-2px] transition-transform"
+      className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 shadow-hard hover:translate-y-[-2px] transition-transform"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
@@ -487,7 +487,7 @@ function PlayerRow({
   const flag = LANGUAGE_FLAGS[language] || '🌐';
 
   return (
-    <tr className="hover:bg-slate-700/30 transition-colors">
+    <tr className="hover:bg-neo-navy-elevated/30 transition-colors">
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           {player.isHost && <Crown className="w-4 h-4 text-neo-lime" />}
@@ -539,7 +539,7 @@ function SinglePlayerRow({
   const flag = LANGUAGE_FLAGS[session.language] || '🌐';
 
   return (
-    <tr className="hover:bg-slate-700/30 transition-colors">
+    <tr className="hover:bg-neo-navy-elevated/30 transition-colors">
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           <PlayerIdentityLink

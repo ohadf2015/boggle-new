@@ -45,7 +45,7 @@ const ROLE_CONFIG: Record<ShadowRole, { emoji: string; color: string; nameKey: s
   'shadow': { emoji: '🐺', color: 'text-neo-red', nameKey: 'party.roleShadow', bgGlow: 'bg-neo-red/10 border-neo-red' },
   seer: { emoji: '👁️', color: 'text-neo-purple', nameKey: 'party.roleSeer', bgGlow: 'bg-neo-purple/10 border-neo-purple' },
   medic: { emoji: '🛡️', color: 'text-neo-lime', nameKey: 'party.roleMedic', bgGlow: 'bg-neo-lime/10 border-neo-lime' },
-  citizen: { emoji: '👤', color: 'text-neo-cream', nameKey: 'party.roleCitizen', bgGlow: 'bg-neo-cream/5 border-neo-cream/30' },
+  citizen: { emoji: '👤', color: 'text-neo-white', nameKey: 'party.roleCitizen', bgGlow: 'bg-neo-cream/5 border-neo-cream/30' },
 };
 
 // ==================== Props ====================
@@ -180,7 +180,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
           <h2 className={`font-neo-display text-2xl uppercase ${roleConfig.color}`}>
             {t(roleConfig.nameKey) || myRole.role}
           </h2>
-          <p className="font-neo-body text-neo-cream/50 text-sm mt-3">
+          <p className="font-neo-body text-neo-white text-sm mt-3">
             {myRole.role === 'shadow' && (t('party.shadowDesc') || 'Eliminate citizens without being caught')}
             {myRole.role === 'seer' && (t('party.seerDesc') || 'Investigate one player each night')}
             {myRole.role === 'medic' && (t('party.medicDesc') || 'Protect one player each night')}
@@ -196,7 +196,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
           )}
         </AdaptiveMotion.div>
 
-        <p className="mt-6 text-neo-cream/30 font-neo-body text-xs">
+        <p className="mt-6 text-neo-white font-neo-body text-xs">
           {t('party.dontShowAnyone') || "Don't show anyone!"}
         </p>
       </div>
@@ -215,7 +215,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
           </span>
         </div>
 
-        <p className="font-neo-body text-neo-cream/60 mb-4">
+        <p className="font-neo-body text-neo-white mb-4">
           {nightAction.message}
         </p>
 
@@ -235,7 +235,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
                   'hover:border-neo-lime/50'}
               `}
             >
-              <span className="font-neo-display text-neo-cream">{target}</span>
+              <span className="font-neo-display text-neo-white">{target}</span>
             </button>
           ))}
         </div>
@@ -249,7 +249,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
       <div className="min-h-screen bg-[#0a0a15] flex items-center justify-center p-4">
         <div className="text-center">
           <div className="text-4xl mb-3">✅</div>
-          <p className="font-neo-body text-neo-cream/50">
+          <p className="font-neo-body text-neo-white">
             {t('party.choiceMade') || 'Choice made. Wait for dawn...'}
           </p>
         </div>
@@ -263,7 +263,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
       <div className="min-h-screen bg-[#0a0a15] flex items-center justify-center p-4">
         <div className="text-center">
           <div className="text-4xl mb-3 animate-pulse">🌙</div>
-          <p className="font-neo-body text-neo-cream/30 italic">
+          <p className="font-neo-body text-neo-white italic">
             {t('party.nightIsDark') || 'The night is dark...'}
           </p>
           {/* Fake activity indicator so nobody can tell who's acting */}
@@ -293,11 +293,11 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
           className="text-center"
         >
           <div className="text-5xl mb-3">{isEvil ? '🔴' : '🔵'}</div>
-          <p className="font-neo-display text-lg text-neo-cream uppercase">{seerResult.target}</p>
+          <p className="font-neo-display text-lg text-neo-white uppercase">{seerResult.target}</p>
           <p className={`font-neo-display text-2xl uppercase mt-2 ${isEvil ? 'text-neo-red' : 'text-neo-cyan'}`}>
             {isEvil ? (t('party.isShadow') || 'SHADOW!') : (t('party.isCitizen') || 'Not a Shadow')}
           </p>
-          <p className="font-neo-body text-neo-cream/30 text-xs mt-4">
+          <p className="font-neo-body text-neo-white text-xs mt-4">
             {t('party.keepItSecret') || 'Use this wisely during discussion...'}
           </p>
         </AdaptiveMotion.div>
@@ -318,14 +318,14 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
         )}
 
         <div className="text-5xl mb-4">💬</div>
-        <h2 className="font-neo-display text-neo-cream text-xl uppercase">
+        <h2 className="font-neo-display text-neo-white text-xl uppercase">
           {t('party.discussFaceToFace') || 'Discuss!'}
         </h2>
-        <p className="font-neo-body text-neo-cream/40 text-sm mt-1">
+        <p className="font-neo-body text-neo-white text-sm mt-1">
           {t('party.talkToEachOther') || 'Talk to each other — face to face!'}
         </p>
 
-        <div className={`mt-6 font-neo-display text-3xl ${timeRemaining <= 10 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream/50'}`}>
+        <div className={`mt-6 font-neo-display text-3xl ${timeRemaining <= 10 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
         </div>
 
@@ -354,7 +354,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
             {phase === 'voted' ? (t('party.voted') || 'Vote locked!') : (t('party.whoToEliminate') || 'Who to eliminate?')}
           </h2>
           {phase === 'voting' && (
-            <span className={`font-neo-display ${timeRemaining <= 5 ? 'text-neo-red' : 'text-neo-cream/60'}`}>
+            <span className={`font-neo-display ${timeRemaining <= 5 ? 'text-neo-red' : 'text-neo-white'}`}>
               {timeRemaining}s
             </span>
           )}
@@ -375,10 +375,10 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
                   ${isSelected
                     ? 'bg-neo-red text-neo-black shadow-hard'
                     : phase === 'voted'
-                      ? 'bg-neo-navy-elevated text-neo-cream/30'
+                      ? 'bg-neo-navy-elevated text-neo-white'
                       : isSkip
-                        ? 'bg-neo-navy-elevated text-neo-cream/50 border-neo-cream/20 shadow-hard hover:border-neo-cream/40'
-                        : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px active:shadow-hard-pressed'
+                        ? 'bg-neo-navy-elevated text-neo-white border-neo-cream/20 shadow-hard hover:border-neo-cream/40'
+                        : 'bg-neo-navy-elevated text-neo-white shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-px active:translate-y-px active:shadow-hard-pressed'
                   }
                 `}
               >
@@ -407,7 +407,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
               You were: {roleConfig.emoji} {myRole?.role}
             </p>
           )}
-          <p className="font-neo-body text-neo-cream/30 text-sm mt-4">
+          <p className="font-neo-body text-neo-white text-sm mt-4">
             {t('party.watchFromBeyond') || 'Watch from beyond...'}
           </p>
         </div>
@@ -432,7 +432,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   // Default
   return (
     <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-      <div className="animate-pulse text-neo-cream/50 font-neo-display">
+      <div className="animate-pulse text-neo-white font-neo-display">
         {t('party.starting') || 'Starting...'}
       </div>
     </div>

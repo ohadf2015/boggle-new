@@ -45,7 +45,7 @@ export default function GlossaryPageClient(): React.ReactElement {
             size="sm"
             className={cn(
               'mb-6 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-white text-neo-black hover:bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -69,7 +69,7 @@ export default function GlossaryPageClient(): React.ReactElement {
         <nav
           className={cn(
             'mb-8 p-4 rounded-neo border-3 border-neo-black shadow-hard flex flex-wrap gap-2 justify-center',
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
+            isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
           )}
           aria-label="Alphabetical navigation"
         >
@@ -81,7 +81,7 @@ export default function GlossaryPageClient(): React.ReactElement {
                 'w-8 h-8 flex items-center justify-center rounded font-bold text-sm',
                 'border-2 border-neo-black transition-colors',
                 isDarkMode
-                  ? 'bg-slate-700 text-white hover:bg-neo-yellow hover:text-neo-black'
+                  ? 'bg-neo-navy-elevated text-white hover:bg-neo-yellow hover:text-neo-black'
                   : 'bg-neo-cream text-neo-black hover:bg-neo-yellow'
               )}
             >
@@ -112,7 +112,7 @@ export default function GlossaryPageClient(): React.ReactElement {
                       key={item.term}
                       className={cn(
                         'p-4 rounded-neo border-3 border-neo-black shadow-hard',
-                        isDarkMode ? 'bg-slate-800' : 'bg-white'
+                        isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                       )}
                     >
                       <dt className={cn(

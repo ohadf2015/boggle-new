@@ -56,7 +56,7 @@ export function EducationHeroBanner({ title, subtitle, cta }: Props) {
         </h2>
 
         {subtitle && (
-          <p className="mt-3 text-base sm:text-lg text-neo-white/90 max-w-xl">
+          <p className="mt-3 text-base sm:text-lg text-neo-white max-w-xl">
             {subtitle}
           </p>
         )}

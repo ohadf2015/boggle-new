@@ -228,7 +228,7 @@ export const SeasonAnnouncementModal: React.FC = () => {
 
             <m.h2
               id="season-announcement-title"
-              className="font-neo-display font-black text-2xl text-neo-cream tracking-tight"
+              className="font-neo-display font-black text-2xl text-neo-white tracking-tight"
               initial={reduceMotion ? false : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={reduceMotion ? { duration: 0 } : { delay: 0.4 }}
@@ -298,10 +298,10 @@ export const SeasonAnnouncementModal: React.FC = () => {
                   >
                     {tile.icon}
                   </span>
-                  <p className="font-neo-display font-black text-lg text-neo-cream leading-none mt-1 tabular-nums">
+                  <p className="font-neo-display font-black text-lg text-neo-white leading-none mt-1 tabular-nums">
                     {tile.value}
                   </p>
-                  <p className="text-[10px] text-neo-cream/70 uppercase tracking-wider mt-0.5 font-bold">
+                  <p className="text-[10px] text-neo-white uppercase tracking-wider mt-0.5 font-bold">
                     {tile.label}
                   </p>
                 </m.div>

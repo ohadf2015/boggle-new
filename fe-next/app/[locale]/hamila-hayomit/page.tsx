@@ -155,7 +155,7 @@ export default async function HamilaHayomitPage({ params }: PageProps) {
         <h1 className="font-neo-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
           המילה היומית — מה זה, ואיך משחקים את מילת היום
         </h1>
-        <p className="mt-5 text-lg leading-relaxed text-neo-cream/90">
+        <p className="mt-5 text-lg leading-relaxed text-neo-white">
           מחפשים את <strong>המילה היומית</strong>? ב-LexiClash מחכה לכם <strong>מילת היום</strong> בפאזל
           חדש מדי בוקר. כל שחקן בעולם מקבל בדיוק את אותו הלוח — מפצחים, שומרים על הרצף ומשתפים את התוצאה.
           ללא הרשמה, ללא הורדה, חינם לגמרי.
@@ -178,7 +178,7 @@ export default async function HamilaHayomitPage({ params }: PageProps) {
 
         <section className="mt-14">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">מה זה &quot;המילה היומית&quot;?</h2>
-          <p className="mt-4 text-lg leading-relaxed text-neo-cream/90">
+          <p className="mt-4 text-lg leading-relaxed text-neo-white">
             <strong>המילה היומית</strong> היא פאזל מילים יומי שבו כל השחקנים מקבלים את אותו אתגר בדיוק.
             ב-LexiClash היא מגיעה בשתי גרסאות: <strong>ציד המילים</strong> — שילוב של וורדל ובוגל שבו
             מאתרים מילה נסתרת ב-10 ניסיונות, ו<strong>גלגל המילים</strong> — שבו מרכיבים כמה שיותר מילים
@@ -196,7 +196,7 @@ export default async function HamilaHayomitPage({ params }: PageProps) {
               >
                 <div className="text-2xl" aria-hidden="true">{f.icon}</div>
                 <h3 className="mt-2 font-neo-display text-lg font-bold">{f.title}</h3>
-                <p className="mt-1 text-neo-cream/80">{f.text}</p>
+                <p className="mt-1 text-neo-white">{f.text}</p>
               </div>
             ))}
           </div>
@@ -204,7 +204,7 @@ export default async function HamilaHayomitPage({ params }: PageProps) {
 
         <section className="mt-14">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">איך משחקים — צעד אחר צעד</h2>
-          <ol className="mt-4 list-decimal space-y-2 pe-6 text-lg leading-relaxed text-neo-cream/90">
+          <ol className="mt-4 list-decimal space-y-2 pe-6 text-lg leading-relaxed text-neo-white">
             <li>נכנסים ל<Link href="/he/daily" className="font-bold text-neo-lime underline">עמוד האתגר היומי</Link>.</li>
             <li>בוחרים בין ציד המילים לגלגל המילים.</li>
             <li>מפצחים את מילת היום במספר הניסיונות המותר.</li>
@@ -221,7 +221,7 @@ export default async function HamilaHayomitPage({ params }: PageProps) {
                 className="rounded-neo border-neo border-neo-black bg-neo-navy-light p-4 shadow-hard-sm"
               >
                 <summary className="cursor-pointer font-neo-display text-lg font-bold">{f.q}</summary>
-                <p className="mt-2 leading-relaxed text-neo-cream/85">{f.a}</p>
+                <p className="mt-2 leading-relaxed text-neo-white">{f.a}</p>
               </details>
             ))}
           </div>
@@ -229,7 +229,7 @@ export default async function HamilaHayomitPage({ params }: PageProps) {
 
         <section className="mt-14 rounded-neo border-neo-thick border-neo-black bg-neo-navy-light p-6 shadow-hard">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">מוכנים לפצח את מילת היום?</h2>
-          <p className="mt-3 text-lg leading-relaxed text-neo-cream/90">
+          <p className="mt-3 text-lg leading-relaxed text-neo-white">
             המילה היומית מחכה. הצטרפו לשחקנים מכל העולם, התחילו רצף ותראו עד לאן תגיעו בטבלת המובילים.
           </p>
           <Link

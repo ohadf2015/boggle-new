@@ -31,7 +31,7 @@ function getDifficultyLabel(wordLength: number, t: (key: string) => string): str
 function getDifficultyColor(wordLength: number): string {
   if (wordLength <= 4) return 'bg-neo-lime text-neo-black';
   if (wordLength <= 6) return 'bg-neo-orange text-neo-black';
-  return 'bg-neo-pink text-neo-cream';
+  return 'bg-neo-pink text-neo-white';
 }
 
 function timeAgo(dateStr: string, t: (key: string) => string): string {
@@ -84,16 +84,16 @@ const PuzzleBrowse: React.FC = () => {
       <div className="max-w-4xl mx-auto w-full mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-neo-cream font-neo-display">
+            <h1 className="text-3xl font-black text-neo-white font-neo-display">
               {t('puzzleBrowse.title')}
             </h1>
-            <p className="text-neo-cream/60 mt-1">
+            <p className="text-neo-white mt-1">
               {t('puzzleBrowse.subtitle')}
             </p>
           </div>
           <Button
             onClick={() => setShowCreator(true)}
-            className="bg-linear-to-r from-neo-pink to-neo-orange text-neo-cream border-3 border-neo-black rounded-neo shadow-hard font-bold hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
+            className="bg-linear-to-r from-neo-pink to-neo-orange text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
           >
             <Plus className="w-5 h-5 me-2" />
             {t('puzzleBrowse.createYourOwn')}
@@ -107,7 +107,7 @@ const PuzzleBrowse: React.FC = () => {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all ${
               sort === 'newest'
                 ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
-                : 'bg-neo-navy-light text-neo-cream/70 hover:bg-neo-navy-light/80'
+                : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy-light/80'
             }`}
           >
             <Clock className="w-4 h-4" />
@@ -118,7 +118,7 @@ const PuzzleBrowse: React.FC = () => {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all ${
               sort === 'popular'
                 ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
-                : 'bg-neo-navy-light text-neo-cream/70 hover:bg-neo-navy-light/80'
+                : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy-light/80'
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -137,7 +137,7 @@ const PuzzleBrowse: React.FC = () => {
 
         {error && !loading && (
           <div className="text-center py-16">
-            <p className="text-neo-cream/60 mb-4">{error}</p>
+            <p className="text-neo-white mb-4">{error}</p>
             <Button variant="outline" onClick={() => fetchPuzzles(sort)}>
               {t('common.retry')}
             </Button>
@@ -146,16 +146,16 @@ const PuzzleBrowse: React.FC = () => {
 
         {!loading && !error && puzzles.length === 0 && (
           <div className="text-center py-16">
-            <Sparkles className="w-12 h-12 text-neo-cream/30 mx-auto mb-4" />
-            <p className="text-neo-cream/60 text-lg mb-2">
+            <Sparkles className="w-12 h-12 text-neo-white mx-auto mb-4" />
+            <p className="text-neo-white text-lg mb-2">
               {t('puzzleBrowse.empty')}
             </p>
-            <p className="text-neo-cream/40 text-sm mb-6">
+            <p className="text-neo-white text-sm mb-6">
               {t('puzzleBrowse.emptyHint')}
             </p>
             <Button
               onClick={() => setShowCreator(true)}
-              className="bg-neo-pink text-neo-cream border-3 border-neo-black rounded-neo shadow-hard font-bold"
+              className="bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo shadow-hard font-bold"
             >
               <Plus className="w-5 h-5 me-2" />
               {t('puzzleBrowse.createFirst')}

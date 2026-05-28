@@ -247,7 +247,7 @@ export default function AiFanfareDemoClient() {
           </button>
         </div>
 
-        <p className="max-w-xl text-center text-sm text-white/60">
+        <p className="max-w-xl text-center text-sm text-white">
           100% AI-generated: mascot motion via <strong className="text-white">fal-ai Kling 2.5 Turbo Pro</strong> (image-to-video) ·
           confetti, BINGO type, score count-up & screen flash via <strong className="text-white">animate-ai MCP</strong>{' '}
           (pattern <code className="text-white">micro-confetti-burst</code>) composed in your neo-brutalist palette.

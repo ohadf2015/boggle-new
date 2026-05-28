@@ -501,7 +501,7 @@ export const BlastStage = memo(function BlastStage({
           <WordFormingArea word={formedWord} letterCount={formedWord.length} feedback={currentFeedback} compact />
           <BlastWordRewardPreview wordLength={formedWord.length} />
           {formedWord && (
-            <span className="text-[10px] font-bold text-white/50 tabular-nums">
+            <span className="text-[10px] font-bold text-white tabular-nums">
               {formedWord.length}
             </span>
           )}

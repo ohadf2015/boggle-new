@@ -173,7 +173,7 @@ export function ProfileHeader({
               <Input
                 value={editDisplayName}
                 onChange={(e) => setEditDisplayName(e.target.value)}
-                className="h-10 text-lg font-bold bg-slate-700 border-slate-600"
+                className="h-10 text-lg font-bold bg-neo-navy-elevated border-slate-600"
                 maxLength={20}
                 
               />
@@ -202,7 +202,7 @@ export function ProfileHeader({
               <span className="truncate">{profile?.display_name || profile?.username || 'Player'}</span>
               <button
                 onClick={startEditingName}
-                className="p-1 rounded hover:bg-slate-700 transition-colors shrink-0 text-gray-400"
+                className="p-1 rounded hover:bg-neo-navy-elevated transition-colors shrink-0 text-gray-400"
                 title={t('profile.editName')}
                 aria-label={t('profile.editName')}
               >
@@ -238,7 +238,7 @@ export function ProfileHeader({
             ) : (
               <button
                 onClick={() => setIsEditingCountry(true)}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-700/60 text-sm text-gray-300 hover:bg-slate-600/60 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-neo-navy-elevated/60 text-sm text-gray-300 hover:bg-slate-600/60 transition-colors"
                 title={t('profile.changeCountry')}
               >
                 {profile?.country_code ? (
@@ -256,7 +256,7 @@ export function ProfileHeader({
               </button>
             )}
 
-            <span className="px-3 py-1 rounded-full bg-slate-700/60 text-sm text-gray-400">
+            <span className="px-3 py-1 rounded-full bg-neo-navy-elevated/60 text-sm text-gray-400">
               {t('profile.memberSince')} {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
             </span>
           </div>

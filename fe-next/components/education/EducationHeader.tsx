@@ -325,7 +325,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                 <div className="flex flex-col gap-3 p-4">
                   {/* Language Section */}
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white/80 uppercase tracking-wide">
+                    <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
                       {t('settings.language')}
                     </span>
                     <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-neo-cream dark:bg-neo-navy">
@@ -337,7 +337,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
 
                   {/* Navigation Section */}
                   <div className="flex flex-col gap-2">
-                    <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white/80 uppercase tracking-wide">
+                    <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
                       {t('education.header.navigation')}
                     </span>
 
@@ -418,7 +418,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
 
                       {/* Account Section */}
                       <div className="flex flex-col gap-2">
-                        <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white/80 uppercase tracking-wide">
+                        <span className="text-xs font-bold text-neo-black/80 dark:text-neo-white uppercase tracking-wide">
                           {t('common.account')}
                         </span>
 

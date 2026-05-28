@@ -123,7 +123,7 @@ export default async function WordsHubPage({ params }: PageParams) {
               <Link
                 key={n}
                 href={`/${locale}/words/${n}-letter-words`}
-                className="bg-slate-900 border-3 border-neo-black rounded-neo p-4 shadow-hard-sm hover:shadow-hard hover:border-neo-cyan transition-all text-center group"
+                className="bg-neo-navy border-3 border-neo-black rounded-neo p-4 shadow-hard-sm hover:shadow-hard hover:border-neo-cyan transition-all text-center group"
               >
                 <span className="text-2xl font-neo-display font-black text-neo-yellow group-hover:text-neo-white transition-colors">
                   {n}
@@ -150,7 +150,7 @@ export default async function WordsHubPage({ params }: PageParams) {
               <Link
                 key={letter}
                 href={`/${locale}/words/starting-with/${letter}`}
-                className="bg-slate-900 border-2 border-neo-black rounded-neo p-3 shadow-hard-sm hover:shadow-hard hover:border-neo-yellow transition-all text-center"
+                className="bg-neo-navy border-2 border-neo-black rounded-neo p-3 shadow-hard-sm hover:shadow-hard hover:border-neo-yellow transition-all text-center"
               >
                 <span className="text-lg font-neo-display font-black text-neo-white">
                   {letter.toUpperCase()}
@@ -173,7 +173,7 @@ export default async function WordsHubPage({ params }: PageParams) {
               <Link
                 key={letters}
                 href={`/${locale}/anagram/${letters}`}
-                className="bg-slate-900 border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
+                className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-all text-center"
               >
                 <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
                   {letters}

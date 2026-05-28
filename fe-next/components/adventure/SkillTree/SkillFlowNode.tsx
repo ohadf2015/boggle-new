@@ -96,7 +96,7 @@ function SkillFlowNodeComponent({ data }: SkillFlowNodeProps) {
             'text-xs font-bold text-center leading-tight line-clamp-2 px-1',
             isUnlocked && 'text-neo-white',
             isAvailable && 'text-neo-yellow',
-            isLocked && 'text-neo-white/50',
+            isLocked && 'text-neo-white',
           )}
         >
           {t(skill.nameKey)}
@@ -117,7 +117,7 @@ function SkillFlowNodeComponent({ data }: SkillFlowNodeProps) {
 
         {/* Locked overlay */}
         {isLocked && (
-          <span className="absolute top-1 right-1 text-neo-white/30">
+          <span className="absolute top-1 right-1 text-neo-white">
             🔒
           </span>
         )}

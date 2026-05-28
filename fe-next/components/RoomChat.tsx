@@ -306,7 +306,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 className="relative"
               >
                 {/* Decorative background shapes - smaller */}
-                <div className="absolute -top-1 -right-1 w-10 h-10 bg-neo-pink text-neo-cream border-2 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -top-1 -right-1 w-10 h-10 bg-neo-pink text-neo-white border-2 border-neo-black rotate-12 -z-10" />
                 <div className="absolute -bottom-1 -left-1 w-8 h-8 bg-neo-cyan text-neo-black border-2 border-neo-black -rotate-6 -z-10" />
 
                 {/* Main icon container - smaller */}
@@ -325,7 +325,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 <div className="bg-neo-black text-neo-white px-3 py-1 font-black uppercase text-xs tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
                   {t('chat.noMessages')}
                 </div>
-                <p className={`font-bold text-[10px] mt-2 uppercase tracking-wide ${variant === 'embedded' ? 'text-neo-cream/70' : 'text-neo-black/75'}`}>
+                <p className={`font-bold text-[10px] mt-2 uppercase tracking-wide ${variant === 'embedded' ? 'text-neo-white' : 'text-neo-black/75'}`}>
                   {t('chat.startChatting')}
                 </p>
               </AdaptiveMotion.div>
@@ -369,7 +369,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                         >
                           {msg.username}
                         </Badge>
-                        <span className={`text-xs font-medium ${variant === 'embedded' ? 'text-neo-cream/50' : 'text-neo-black/70'}`}>
+                        <span className={`text-xs font-medium ${variant === 'embedded' ? 'text-neo-white' : 'text-neo-black/70'}`}>
                           {formatTime(msg.timestamp)}
                         </span>
                       </div>
@@ -379,7 +379,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                           variant === 'embedded'
                             ? isOwnMessage
                               ? 'bg-neo-cyan/20 text-neo-cyan border-neo-cyan/30'
-                              : 'bg-neo-white/10 text-neo-cream border-neo-white/20'
+                              : 'bg-neo-white/10 text-neo-white border-neo-white/20'
                             : isOwnMessage
                               ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm'
                               : 'bg-neo-white text-neo-black border-neo-black shadow-hard-sm'
@@ -428,7 +428,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             variant="cyan"
             className={`shrink-0 ${
               inputMessage.length === 0 || !socket
-                ? 'bg-neo-navy-light text-neo-cream/40 grayscale opacity-50'
+                ? 'bg-neo-navy-light text-neo-white grayscale opacity-50'
                 : ''
             }`}
             aria-label={t('chat.send')}

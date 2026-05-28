@@ -178,10 +178,10 @@ export function EmailCaptureModal() {
               <div className="inline-block p-4 bg-neo-lime text-neo-black border-3 border-neo-black rounded-full mb-4">
                 <Mail size={48} className="text-neo-black" />
               </div>
-              <h3 className="font-black text-neo-cream text-2xl mb-2">
+              <h3 className="font-black text-neo-white text-2xl mb-2">
                 {t('email.successTitle')}
               </h3>
-              <p className="text-neo-cream opacity-90">
+              <p className="text-neo-white opacity-90">
                 {t('email.successMessage') ||
                   "We'll send you daily challenges and streak reminders. Check your inbox!"}
               </p>
@@ -198,11 +198,11 @@ export function EmailCaptureModal() {
                     <Calendar size={32} className="text-neo-black" />
                   </div>
                 </div>
-                <h3 className="font-black text-neo-cream text-2xl md:text-3xl mb-2">
+                <h3 className="font-black text-neo-white text-2xl md:text-3xl mb-2">
                   {t('email.title')}
                 </h3>
                 {/* Compact benefits inline */}
-                <div className="flex justify-center gap-4 text-neo-cream/80 text-sm">
+                <div className="flex justify-center gap-4 text-neo-white text-sm">
                   <span>🔥 {t('email.benefitShort1')}</span>
                   <span>🎯 {t('email.benefitShort2')}</span>
                 </div>
@@ -248,7 +248,7 @@ export function EmailCaptureModal() {
                   </button>
                 </div>
 
-                <p className="text-neo-cream text-xs opacity-70 text-center">
+                <p className="text-neo-white text-xs opacity-70 text-center">
                   {t('email.privacy') ||
                     "We respect your privacy. Unsubscribe anytime. No spam, we promise."}
                 </p>

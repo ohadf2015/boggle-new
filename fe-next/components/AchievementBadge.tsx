@@ -137,7 +137,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             {/* Lock icon for locked achievements */}
             {locked && (
               <span
-                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-gray-700 shadow-xs"
+                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-neo-navy-elevated shadow-xs"
                 title={t('profile.locked')}
               >
                 🔒
@@ -184,7 +184,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                   <span className="text-neo-lime font-bold">
                     {tierIcon} {getTierName(tier)}
                   </span>
-                  <span className="text-neo-white/70">
+                  <span className="text-neo-white">
                     ({t('achievementTiers.earned')} {count}x)
                   </span>
                 </div>
@@ -192,7 +192,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 {/* Progress to next tier */}
                 {!tierProgress.isMaxTier && tierProgress.nextTier && (
                   <div className="mt-1">
-                    <div className="flex justify-between text-[11px] sm:text-xs text-neo-white/75 mb-0.5">
+                    <div className="flex justify-between text-[11px] sm:text-xs text-neo-white mb-0.5">
                       <span>{tierProgress.currentCount}/{tierProgress.nextThreshold}</span>
                       <span>{TIER_ICONS[tierProgress.nextTier]} {getTierName(tierProgress.nextTier)}</span>
                     </div>
@@ -215,7 +215,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
 
             {/* Hint for locked achievements */}
             {locked && (
-              <p className="text-[11px] sm:text-xs text-neo-white/60 mt-2 italic">
+              <p className="text-[11px] sm:text-xs text-neo-white mt-2 italic">
                 {t('profile.earnThisAchievement')}
               </p>
             )}

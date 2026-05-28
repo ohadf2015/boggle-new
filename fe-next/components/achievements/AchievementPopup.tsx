@@ -181,7 +181,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
-                  className="text-xs font-bold text-neo-white/90 line-clamp-1"
+                  className="text-xs font-bold text-neo-white line-clamp-1"
                 >
                   {localizedAchievement.description}
                 </m.p>

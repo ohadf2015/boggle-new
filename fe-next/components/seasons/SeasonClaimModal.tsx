@@ -103,8 +103,8 @@ const StatTile: React.FC<{
           {icon}
         </span>
       </div>
-      <p className="text-[10px] text-neo-cream/70 uppercase tracking-widest font-bold">{label}</p>
-      <p className="font-neo-display font-black text-xl text-neo-cream leading-none mt-1">{value}</p>
+      <p className="text-[10px] text-neo-white uppercase tracking-widest font-bold">{label}</p>
+      <p className="font-neo-display font-black text-xl text-neo-white leading-none mt-1">{value}</p>
     </m.div>
   );
 };

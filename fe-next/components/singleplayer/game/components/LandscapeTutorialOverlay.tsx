@@ -50,7 +50,7 @@ export function LandscapeTutorialOverlay({
             </div>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-neo-red border-2 border-neo-black rounded-neo flex items-center justify-center">
-                <ArrowLeft className="text-neo-cream rtl:rotate-180" />
+                <ArrowLeft className="text-neo-white rtl:rotate-180" />
               </div>
               <span>{t('landscape.tutorialQuit')}</span>
             </div>

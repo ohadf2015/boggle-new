@@ -152,8 +152,8 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
         {/* Percentile Badge */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-white/60" />
-            <span className="text-white/80 text-sm font-medium">
+            <Users className="w-4 h-4 text-white" />
+            <span className="text-white text-sm font-medium">
               {t('leaderboard.percentile')}
             </span>
           </div>
@@ -174,7 +174,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-neo-lime" />
-                <span className="text-white/80 text-sm font-medium">
+                <span className="text-white text-sm font-medium">
                   {t('leaderboard.nextRank')}
                 </span>
               </div>
@@ -192,7 +192,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
               </span>
             </div>
             {playerAbove && (
-              <div className="mt-2 flex items-center gap-2 text-xs text-white/70">
+              <div className="mt-2 flex items-center gap-2 text-xs text-white">
                 <span>{t('leaderboard.beat')}:</span>
                 <div className="w-7 h-7 rounded-full overflow-hidden border border-white/30 shrink-0">
                   <Avatar
@@ -205,7 +205,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                 <span className="font-medium truncate">
                   {playerAbove.display_name || playerAbove.username}
                 </span>
-                <span className="text-white/60">
+                <span className="text-white">
                   ({playerAbove.total_score?.toLocaleString()})
                 </span>
               </div>
@@ -220,7 +220,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
             <div className="font-black text-neo-lime text-sm uppercase">
               {t('leaderboard.youAreFirst')}
             </div>
-            <div className="text-white/60 text-xs mt-1">
+            <div className="text-white text-xs mt-1">
               {t('leaderboard.keepItUp')}
             </div>
           </div>
@@ -231,10 +231,10 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
           <div className="bg-white/5 border-2 border-white/10 rounded-neo p-3">
             <div className="flex items-center gap-2 mb-3">
               <Users className="w-4 h-4 text-neo-purple" />
-              <span className="text-white/80 text-sm font-medium">
+              <span className="text-white text-sm font-medium">
                 {t('leaderboard.nearbyPlayers')}
               </span>
-              <span className="text-xs text-white/60 ms-auto">
+              <span className="text-xs text-white ms-auto">
                 ±{nearbyRange} {t('leaderboard.points')}
               </span>
             </div>
@@ -259,7 +259,7 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                         : 'bg-emerald-500/10 border border-emerald-500/30'
                     )}
                   >
-                    <span className="text-xs font-bold text-white/60 w-8">
+                    <span className="text-xs font-bold text-white w-8">
                       #{playerRank}
                     </span>
                     <div className="w-8 h-8 shrink-0 rounded-full overflow-hidden border-2 border-white/20">

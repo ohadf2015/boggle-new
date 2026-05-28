@@ -57,12 +57,12 @@ function PackCard({
             <h4 className="text-lg font-neo-display font-black text-neo-white">
               {t(pack.nameKey)}
             </h4>
-            <span className="text-xs text-neo-white/50 font-neo-body font-bold uppercase">
+            <span className="text-xs text-neo-white font-neo-body font-bold uppercase">
               {t('teacher.lesson.words', { count: pack.words.length })}
             </span>
           </div>
         </div>
-        <p className="text-sm text-neo-white/70 font-neo-body leading-relaxed">
+        <p className="text-sm text-neo-white font-neo-body leading-relaxed">
           {t(pack.descriptionKey)}
         </p>
       </div>
@@ -105,7 +105,7 @@ export const StarterPacksSection = memo<StarterPacksSectionProps>(({ onSelectPac
         <h3 className="text-xl font-neo-display font-black text-neo-white">
           {t('education.starterPacks.title')}
         </h3>
-        <p className="text-sm text-neo-white/60 font-neo-body">
+        <p className="text-sm text-neo-white font-neo-body">
           {t('education.starterPacks.subtitle')}
         </p>
       </div>

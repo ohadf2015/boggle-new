@@ -260,7 +260,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
           </AnimatePresence>
 
           {/* Swipe hint indicator - only shown on mobile */}
-          <div className="block sm:hidden text-center text-xs text-neo-white/70 mt-2">
+          <div className="block sm:hidden text-center text-xs text-neo-white mt-2">
             {t('onboarding.swipeHint')}
           </div>
         </DialogBody>

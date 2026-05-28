@@ -22,7 +22,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
       {onShowHelp ? (
         <button
           onClick={onShowHelp}
-          className="w-10 h-10 [@media(max-height:560px)]:w-8 [@media(max-height:560px)]:h-8 flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream/60 shadow-hard-sm hover:text-neo-cream hover:shadow-hard active:shadow-hard-pressed transition-all"
+          className="w-10 h-10 [@media(max-height:560px)]:w-8 [@media(max-height:560px)]:h-8 flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:text-neo-white hover:shadow-hard active:shadow-hard-pressed transition-all"
           aria-label={t('wordHuntRules.quickTipsTitle')}
           data-testid="wh-help-button"
         >
@@ -44,7 +44,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
       {/* Quit Button */}
       <button
         onClick={onQuit}
-        className="w-10 h-10 [@media(max-height:560px)]:w-8 [@media(max-height:560px)]:h-8 flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-red text-neo-cream shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-shadow"
+        className="w-10 h-10 [@media(max-height:560px)]:w-8 [@media(max-height:560px)]:h-8 flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-red text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-shadow"
         aria-label={t('common.quit')}
       >
         <X size={20} strokeWidth={3} />

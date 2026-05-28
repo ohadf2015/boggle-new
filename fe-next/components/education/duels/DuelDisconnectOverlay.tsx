@@ -68,7 +68,7 @@ export function DuelDisconnectOverlay({
           <div className="text-6xl font-neo-display font-bold text-neo-lime mb-2">
             {secondsRemaining}
           </div>
-          <p className="text-neo-white/70 text-sm">
+          <p className="text-neo-white text-sm">
             {t('duels.autoForfeitMessage')}
           </p>
         </div>

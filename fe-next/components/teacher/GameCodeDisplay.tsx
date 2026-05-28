@@ -85,7 +85,7 @@ export default function GameCodeDisplay({
     >
       {/* Game Code Display */}
       <div className="text-center mb-4">
-        <p className="text-sm text-neo-white/70 font-neo-body mb-2">
+        <p className="text-sm text-neo-white font-neo-body mb-2">
           {t('education.classroomGame.shareCode')}
         </p>
         <div className="flex items-center justify-center gap-4">

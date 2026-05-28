@@ -192,7 +192,7 @@ export default function LessonBuilder() {
             <h3 className="text-xl font-neo-display text-neo-white mb-2 text-balance">
               {t('teacher.lesson.noLessons')}
             </h3>
-            <p className="text-neo-white/60 mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
+            <p className="text-neo-white mb-6 text-pretty">{t('teacher.lesson.createFirst')}</p>
             <Button
               onClick={() => setIsCreateDialogOpen(true)}
               className="bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
@@ -218,9 +218,9 @@ export default function LessonBuilder() {
                     {lesson.name}
                   </CardTitle>
                   {lesson.description && (
-                    <p className="text-sm text-neo-white/75 mt-1">{lesson.description}</p>
+                    <p className="text-sm text-neo-white mt-1">{lesson.description}</p>
                   )}
-                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-neo-white/75">
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-neo-white">
                     <span className="font-bold">
                       {lesson.language.toUpperCase()} •{' '}
                       {lesson.words.length === 1
@@ -234,7 +234,7 @@ export default function LessonBuilder() {
                           ? 'text-neo-cyan bg-neo-cyan/15'
                           : defCount > 0
                             ? 'text-neo-lime bg-neo-lime/15'
-                            : 'text-neo-white/70 bg-neo-white/10'
+                            : 'text-neo-white bg-neo-white/10'
                       )}
                     >
                       {t('teacher.lesson.definitionCoverage', { count: defCount, total: totalWords })}
@@ -261,14 +261,14 @@ export default function LessonBuilder() {
                         )}
                         <span className="text-neo-white font-neo-body">{word.word}</span>
                         {word.definition && (
-                          <span className="text-xs text-neo-white/70 truncate max-w-[120px]">
+                          <span className="text-xs text-neo-white truncate max-w-[120px]">
                             — {word.definition}
                           </span>
                         )}
                       </div>
                     ))}
                     {lesson.words.length > 5 && (
-                      <p className="text-xs text-neo-white/70 mt-2 font-bold">
+                      <p className="text-xs text-neo-white mt-2 font-bold">
                         {t('teacher.lesson.moreWords', { count: lesson.words.length - 5 })}
                       </p>
                     )}

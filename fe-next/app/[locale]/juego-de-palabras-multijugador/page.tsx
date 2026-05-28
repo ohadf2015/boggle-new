@@ -158,7 +158,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
           <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
             Sobre la alternativa a Scrabble online
           </h2>
-          <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white/70 sm:text-base">
+          <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
             <p>
               LexiClash es la alternativa moderna al Scrabble online en español: combina la profundidad estratégica de Scrabble, la velocidad en tiempo real de Boggle y el formato social de Apalabrados (también conocido como Cruzaletras). Diseñada para amantes de las palabras, jugadores casuales y competitivos por igual.
             </p>

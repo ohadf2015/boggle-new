@@ -44,7 +44,7 @@ export function CreatorAttribution({
 
         size={avatarSize}
       />
-      <span className={cn('font-neo-body text-neo-white/80', text)}>
+      <span className={cn('font-neo-body text-neo-white', text)}>
         {label}
       </span>
     </div>

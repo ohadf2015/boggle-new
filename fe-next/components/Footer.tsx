@@ -17,8 +17,8 @@ const KofiIcon = ({ className }: { className?: string }) => (
 // `inline-block py-2` raises the tappable area to ~30px (14px text + 16px
 // padding), clearing WCAG 2.5.8 Target Size Minimum (AA, 24×24). Audit
 // 2026-05-02 (M1) — footer links were 19px tall sitewide.
-const footerLinkClass = 'inline-block py-2 text-sm text-neo-cream/70 hover:text-neo-cyan transition-colors duration-100';
-const legalLinkClass = 'inline-block py-2 text-sm text-neo-cream/70 hover:text-neo-lime transition-colors duration-100';
+const footerLinkClass = 'inline-block py-2 text-sm text-neo-white hover:text-neo-cyan transition-colors duration-100';
+const legalLinkClass = 'inline-block py-2 text-sm text-neo-white hover:text-neo-lime transition-colors duration-100';
 
 interface FooterProps {
   className?: string;
@@ -40,7 +40,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
         {/* On CrazyGames: minimal legal strip (Privacy + Terms required by CrazyGames QA) */}
         {isOnCrazyGamesPlatform ? (
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-center">
-            <p className="text-xs text-neo-cream/50">
+            <p className="text-xs text-neo-white">
               {t('legal.copyright', { year: new Date().getFullYear() })}
             </p>
             <nav aria-label={t('legal.title')} className="flex items-center gap-4">
@@ -109,7 +109,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Instagram (${t('common.opensInNewTab')})`}
-                  className="inline-flex items-center gap-2 py-2 text-sm text-neo-cream/70 hover:text-neo-pink transition-colors duration-100"
+                  className="inline-flex items-center gap-2 py-2 text-sm text-neo-white hover:text-neo-pink transition-colors duration-100"
                 >
                   <InstagramIcon size="1.1em" />
                   <span>Instagram</span>
@@ -134,7 +134,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
 
         {/* Bottom bar */}
         <div className="border-t border-neo-cream/20 pt-4">
-          <p className="text-xs text-neo-cream/50">
+          <p className="text-xs text-neo-white">
             {t('legal.copyright', { year: new Date().getFullYear() })}
           </p>
         </div>

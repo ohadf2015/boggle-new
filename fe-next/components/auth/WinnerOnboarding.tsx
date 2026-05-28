@@ -226,7 +226,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                   <div className={cn(
                     'absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full border-2 text-xs font-bold whitespace-nowrap',
                     isDarkMode
-                      ? 'bg-slate-800 border-amber-400 text-amber-300'
+                      ? 'bg-neo-navy-light border-amber-400 text-amber-300'
                       : 'bg-white border-amber-500 text-amber-700'
                   )}>
                     {selectedAvatar.name}
@@ -237,7 +237,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
               {/* Avatar Grid */}
               <div className={cn(
                 'grid grid-cols-6 gap-3 p-4 rounded-xl border-2 max-h-64 overflow-y-auto',
-                isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-white/50 border-gray-300'
+                isDarkMode ? 'bg-neo-navy-elevated/50 border-slate-600' : 'bg-white/50 border-gray-300'
               )}>
 
                 {/* Regular Character Avatars */}
@@ -294,7 +294,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 className={cn(
                   'w-full px-4 py-3 text-lg font-bold border-3 border-neo-black rounded-xl transition-all',
                   isDarkMode
-                    ? 'bg-slate-700 text-white placeholder-gray-500 focus:ring-4 focus:ring-amber-400/50'
+                    ? 'bg-neo-navy-elevated text-white placeholder-gray-500 focus:ring-4 focus:ring-amber-400/50'
                     : 'bg-white text-neo-black placeholder-gray-400 focus:ring-4 focus:ring-amber-400/50',
                   error ? 'border-red-500' : ''
                 )}

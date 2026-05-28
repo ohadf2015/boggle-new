@@ -383,7 +383,7 @@ const WordWheelChallenge: React.FC = () => {
               <h1 className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white mb-2">
                 {t('wordWheel.title')}
               </h1>
-              <span className="text-neo-cream/60 text-sm">
+              <span className="text-neo-white text-sm">
                 {t('daily.puzzleNumber', { number: puzzleNumber })}
               </span>
             </div>
@@ -394,19 +394,19 @@ const WordWheelChallenge: React.FC = () => {
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-lime/60 bg-neo-lime/15 text-neo-lime">
                   <Star className="h-4 w-4" strokeWidth={2.5} aria-hidden />
                 </span>
-                <span className="text-neo-cream/80 text-sm">{t('wordWheel.centerLetterRule')}</span>
+                <span className="text-neo-white text-sm">{t('wordWheel.centerLetterRule')}</span>
               </div>
               <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cyan/60 bg-neo-cyan/15 text-neo-cyan">
                   <Type className="h-4 w-4" strokeWidth={2.5} aria-hidden />
                 </span>
-                <span className="text-neo-cream/80 text-sm">{t('wordWheel.minLetters', { min: '3' })}</span>
+                <span className="text-neo-white text-sm">{t('wordWheel.minLetters', { min: '3' })}</span>
               </div>
               <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-pink/60 bg-neo-pink/15 text-neo-pink">
                   <Timer className="h-4 w-4" strokeWidth={2.5} aria-hidden />
                 </span>
-                <span className="text-neo-cream/80 text-sm">{t('wordWheel.timeLimit')}</span>
+                <span className="text-neo-white text-sm">{t('wordWheel.timeLimit')}</span>
               </div>
             </div>
 

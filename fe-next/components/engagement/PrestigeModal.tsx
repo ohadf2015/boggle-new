@@ -25,11 +25,11 @@ interface PrestigeModalProps {
 
 /** Tailwind classes for prestige tiers (extends PRESTIGE_CONFIG.DISPLAY) */
 const PRESTIGE_STYLES = {
-  1: { bg: 'bg-neo-pink-muted', text: 'text-neo-cream', border: 'border-neo-pink-muted', gradient: 'from-neo-pink-dark to-neo-pink-muted' },
+  1: { bg: 'bg-neo-pink-muted', text: 'text-neo-white', border: 'border-neo-pink-muted', gradient: 'from-neo-pink-dark to-neo-pink-muted' },
   2: { bg: 'bg-neo-cream/40', text: 'text-neo-black', border: 'border-neo-cream/30', gradient: 'from-neo-cream/50 to-neo-cream/30' },
   3: { bg: 'bg-neo-lime', text: 'text-neo-black', border: 'border-neo-lime-light', gradient: 'from-neo-lime-dark to-neo-lime' },
   4: { bg: 'bg-neo-cyan', text: 'text-neo-black', border: 'border-neo-cyan-light', gradient: 'from-neo-cyan to-neo-cyan-light' },
-  5: { bg: 'bg-neo-purple', text: 'text-neo-cream', border: 'border-neo-purple-light', gradient: 'from-neo-purple to-neo-pink' },
+  5: { bg: 'bg-neo-purple', text: 'text-neo-white', border: 'border-neo-purple-light', gradient: 'from-neo-purple to-neo-pink' },
 } as const;
 
 export const PrestigeModal: React.FC<PrestigeModalProps> = ({
@@ -145,7 +145,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   <p className={cn('text-2xl font-black', colors.text.replace('text-', 'text-'))}>
                     {t('xp.prestigeModal.prestigeAchievedLevel', { level: toRoman(nextPrestigeLevel) })}
                   </p>
-                  <p className="text-neo-cream/70 text-sm mt-1">
+                  <p className="text-neo-white text-sm mt-1">
                     {pm('rewardsUnlocked')}
                   </p>
                 </div>
@@ -179,7 +179,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     <p className="font-bold text-neo-lime">
                       {pm('warning')}
                     </p>
-                    <p className="text-sm text-neo-cream/80 mt-1">
+                    <p className="text-sm text-neo-white mt-1">
                       {pm('warningText')}
                     </p>
                   </div>
@@ -198,7 +198,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     className={cn(
                       'flex-1 p-3 rounded-neo border-2 border-white/30',
                       'font-bold uppercase text-sm',
-                      'bg-neo-cream/10 text-neo-cream hover:bg-neo-cream/20',
+                      'bg-neo-cream/10 text-neo-white hover:bg-neo-cream/20',
                       'transition-all',
                       'disabled:opacity-50'
                     )}
@@ -241,27 +241,27 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 {/* Current Status */}
                 <div className="flex items-center justify-between p-4 rounded-neo bg-neo-cream/5 border-2 border-white/10">
                   <div>
-                    <p className="text-xs text-neo-cream/70 uppercase tracking-wide">
+                    <p className="text-xs text-neo-white uppercase tracking-wide">
                       {pm('currentLevel')}
                     </p>
-                    <p className="text-2xl font-black text-neo-cream">{currentLevel}</p>
+                    <p className="text-2xl font-black text-neo-white">{currentLevel}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs text-neo-cream/70 uppercase tracking-wide">
+                    <p className="text-xs text-neo-white uppercase tracking-wide">
                       {pm('prestige')}
                     </p>
                     <p className="text-2xl font-black">
                       {currentPrestige > 0 ? (
-                        <span className={cn(PRESTIGE_STYLES[currentPrestige as keyof typeof PRESTIGE_STYLES]?.text || 'text-neo-cream')}>
+                        <span className={cn(PRESTIGE_STYLES[currentPrestige as keyof typeof PRESTIGE_STYLES]?.text || 'text-neo-white')}>
                           {PRESTIGE_CONFIG.DISPLAY[currentPrestige]?.icon || '⭐'} {toRoman(currentPrestige)}
                         </span>
                       ) : (
-                        <span className="text-neo-cream/70">-</span>
+                        <span className="text-neo-white">-</span>
                       )}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-neo-cream/70 uppercase tracking-wide">
+                    <p className="text-xs text-neo-white uppercase tracking-wide">
                       {pm('xpMultiplier')}
                     </p>
                     <p className="text-2xl font-black text-neo-lime">
@@ -277,7 +277,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     <p className="text-xl font-black text-neo-purple">
                       {pm('maxPrestige')}
                     </p>
-                    <p className="text-neo-cream/60 text-sm mt-1">
+                    <p className="text-neo-white text-sm mt-1">
                       {pm('maxPrestigeText')}
                     </p>
                   </div>
@@ -285,7 +285,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                   <>
                     {/* Next Prestige Rewards Preview */}
                     <div className="space-y-2">
-                      <p className="text-xs text-neo-cream/70 uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-xs text-neo-white uppercase tracking-wide flex items-center gap-1">
                         <Star className="w-3 h-3" />
                         {t('xp.prestigeModal.rewardsFor', { level: toRoman(nextPrestigeLevel) })}
                       </p>
@@ -305,16 +305,16 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                           >
                             <span className="text-2xl">{reward.icon}</span>
                             <div className="flex-1 min-w-0">
-                              <p className={cn('font-bold text-sm', canPrestige ? colors.text.replace('text-', 'text-') : 'text-neo-cream')}>
+                              <p className={cn('font-bold text-sm', canPrestige ? colors.text.replace('text-', 'text-') : 'text-neo-white')}>
                                 {reward.displayName}
                               </p>
-                              <p className="text-xs text-neo-cream/70 truncate">{reward.description}</p>
+                              <p className="text-xs text-neo-white truncate">{reward.description}</p>
                             </div>
                             {reward.type === 'multiplier' && (
-                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-cream/60')} />
+                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-white')} />
                             )}
                             {reward.type === 'title' && (
-                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-cream/60')} />
+                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-white')} />
                             )}
                           </m.div>
                         ))}
@@ -341,10 +341,10 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       </m.button>
                     ) : (
                       <div className="p-4 rounded-neo bg-neo-cream/5 border-2 border-white/10 text-center">
-                        <p className="text-neo-cream/70 text-sm">
+                        <p className="text-neo-white text-sm">
                           {pm('reachLevel')}
                         </p>
-                        <p className="text-neo-cream/60 text-xs mt-1">
+                        <p className="text-neo-white text-xs mt-1">
                           {t('xp.prestigeModal.levelsRemaining', { count: 100 - currentLevel })}
                         </p>
                       </div>

@@ -148,7 +148,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
       {/* Banner header */}
       <div className="relative z-10 flex items-center justify-center gap-1.5 pt-3 pb-1">
         <Sparkles className="w-3.5 h-3.5 text-neo-cyan" />
-        <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-neo-cream/80">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-neo-white">
           {t('wheelRush.results.sceneTitle') || 'Wheel Settles'}
         </h3>
         <Sparkles className="w-3.5 h-3.5 text-neo-cyan" />
@@ -175,13 +175,13 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
             />
           </div>
           <div className="mt-1.5 text-center">
-            <div className={`text-sm font-black truncate max-w-[140px] ${winner[0] === currentUsername ? 'text-neo-white underline decoration-neo-lime/50 underline-offset-2' : 'text-neo-cream'}`}>
+            <div className={`text-sm font-black truncate max-w-[140px] ${winner[0] === currentUsername ? 'text-neo-white underline decoration-neo-lime/50 underline-offset-2' : 'text-neo-white'}`}>
               {winner[0]}
             </div>
             <div className="text-2xl font-black text-neo-cyan tabular-nums leading-none drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">
               <ScoreCountUp to={winner[1].totalScore} duration={1400} delay={prefersReduced ? 0 : 700} />
             </div>
-            <div className="flex items-center justify-center gap-1 text-[10px] uppercase tracking-wider text-neo-cream/55 mt-0.5">
+            <div className="flex items-center justify-center gap-1 text-[10px] uppercase tracking-wider text-neo-white mt-0.5">
               <Lock className="w-3 h-3 text-neo-lime" />
               <span className="tabular-nums">{winner[1].wordsLocked}</span>
               <span className="opacity-50">·</span>
@@ -223,10 +223,10 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
                 </span>
               </div>
               <div className="mt-0.5 text-center">
-                <div className={`text-[10px] font-bold truncate max-w-[80px] ${isMe ? 'text-neo-white underline decoration-neo-lime/50 underline-offset-2' : 'text-neo-cream/80'}`}>
+                <div className={`text-[10px] font-bold truncate max-w-[80px] ${isMe ? 'text-neo-white underline decoration-neo-lime/50 underline-offset-2' : 'text-neo-white'}`}>
                   {uname}
                 </div>
-                <div className="text-[11px] font-black tabular-nums text-neo-cream/90">
+                <div className="text-[11px] font-black tabular-nums text-neo-white">
                   {stats.totalScore}
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
             >
               <div className="flex items-center gap-1 mb-0.5">
                 <span className={award.tone}>{award.icon}</span>
-                <span className="text-[9px] font-bold uppercase tracking-wider text-neo-cream/60 truncate">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-neo-white truncate">
                   {t(award.titleKey) || award.key}
                 </span>
               </div>
@@ -286,7 +286,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
                   <span className="truncate block">{award.value}</span>
                 )}
               </div>
-              <div className="text-[9px] text-neo-cream/55 truncate">
+              <div className="text-[9px] text-neo-white truncate">
                 {award.username}
               </div>
             </div>
@@ -323,7 +323,7 @@ function StatTile({ icon, label, value, tone, countUp, delay = 0 }: StatTileProp
           )}
         </span>
       </div>
-      <span className="text-[9px] uppercase tracking-wider text-neo-cream/55 text-center leading-tight">
+      <span className="text-[9px] uppercase tracking-wider text-neo-white text-center leading-tight">
         {label}
       </span>
     </div>

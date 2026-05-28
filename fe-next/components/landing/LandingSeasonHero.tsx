@@ -90,7 +90,7 @@ export const LandingSeasonHero: React.FC = () => {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-1">
               <span
-                className="inline-block text-[10px] font-neo-display uppercase tracking-[0.22em] leading-none text-neo-cream/55"
+                className="inline-block text-[10px] font-neo-display uppercase tracking-[0.22em] leading-none text-neo-white"
               >
                 Season
               </span>
@@ -103,7 +103,7 @@ export const LandingSeasonHero: React.FC = () => {
                 className={`inline-flex items-center rounded-sm px-1.5 py-[3px] text-[10px] font-neo-display uppercase tracking-wider leading-none border-2 border-black ${
                   isEndingSoon
                     ? 'bg-neo-pink text-black animate-pulse'
-                    : 'bg-neo-navy text-neo-cream/85'
+                    : 'bg-neo-navy text-neo-white'
                 }`}
                 style={{ boxShadow: '1.5px 1.5px 0 #000' }}
               >
@@ -114,7 +114,7 @@ export const LandingSeasonHero: React.FC = () => {
                 </span>
               </span>
             </div>
-            <h2 className="font-neo-display text-base sm:text-lg text-neo-cream leading-tight break-words line-clamp-2">
+            <h2 className="font-neo-display text-base sm:text-lg text-neo-white leading-tight break-words line-clamp-2">
               {seasonLabel}
             </h2>
           </div>

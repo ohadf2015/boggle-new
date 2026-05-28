@@ -175,7 +175,7 @@ export default function PersonalizedDrillRecommendation({
       {/* Recommendation Card */}
       <div className={cn(
         'rounded-neo border-2 border-neo-black p-3',
-        isDarkMode ? 'bg-slate-700/50' : 'bg-white'
+        isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-white'
       )}>
         {/* Domain Status */}
         <div className="flex items-center gap-2 mb-3">
@@ -184,7 +184,7 @@ export default function PersonalizedDrillRecommendation({
           )}
           <p className={cn(
             'text-xs',
-            isDarkMode ? 'text-neo-white/80' : 'text-neo-black/80'
+            isDarkMode ? 'text-neo-white' : 'text-neo-black/80'
           )}>
             {getMessage()}
           </p>
@@ -208,7 +208,7 @@ export default function PersonalizedDrillRecommendation({
               </p>
               <p className={cn(
                 'text-[10px] uppercase tracking-wide',
-                isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
               )}>
                 {t(`brain.domains.${recommendedDomain}`)} • {domainData.score}/100
               </p>
@@ -237,7 +237,7 @@ export default function PersonalizedDrillRecommendation({
             )}>
               <p className={cn(
                 'text-[10px] font-bold',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
               )}>
                 {t('brain.recommendation.unlock', { games: gamesUntilUnlock })}
               </p>
@@ -249,7 +249,7 @@ export default function PersonalizedDrillRecommendation({
       {/* Scientific backing hint */}
       <p className={cn(
         'text-[10px] mt-2 text-center',
-        isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+        isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
       )}>
         {t('brain.recommendation.scienceHint')}
       </p>

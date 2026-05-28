@@ -17,11 +17,11 @@ export function RunResultScene({ cleared, runTotal, activeCards, onRestart }: Ru
       <h2 className={`text-3xl font-neo-display ${cleared ? 'text-neo-lime' : 'text-neo-red'}`}>
         {t(cleared ? 'wordcraft.run.runResult.cleared' : 'wordcraft.run.runResult.failed')}
       </h2>
-      <p className="font-neo-body text-neo-white/80">{t('wordcraft.run.runResult.total')}</p>
+      <p className="font-neo-body text-neo-white">{t('wordcraft.run.runResult.total')}</p>
       <p className="text-5xl font-neo-display text-neo-yellow">{runTotal}</p>
       {activeCards.length > 0 && (
         <div className="flex flex-col items-center gap-1">
-          <span className="text-sm font-neo-body text-neo-white/70">
+          <span className="text-sm font-neo-body text-neo-white">
             {t('wordcraft.run.runResult.cardsTaken')}
           </span>
           <div className="flex flex-wrap justify-center gap-1">

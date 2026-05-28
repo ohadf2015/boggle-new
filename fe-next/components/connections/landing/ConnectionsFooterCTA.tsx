@@ -21,7 +21,7 @@ export default function ConnectionsFooterCTA({ locale, copy }: Props): React.JSX
         <h2 className="mb-2 font-neo-display text-2xl font-black text-neo-white sm:text-3xl">
           {copy.heading}
         </h2>
-        <p className="mb-6 text-base text-neo-cream">{copy.body}</p>
+        <p className="mb-6 text-base text-neo-white">{copy.body}</p>
         <Link
           href={`/${locale}/connections/play`}
           onClick={handleClick}

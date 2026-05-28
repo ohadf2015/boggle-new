@@ -95,7 +95,7 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({
           </DialogTitle>
         </DialogHeader>
         <div className="px-5 py-4 space-y-3">
-          <p className="text-sm text-neo-cream/85">
+          <p className="text-sm text-neo-white">
             {reason && REASON_TO_KEY[reason]
               ? t(REASON_TO_KEY[reason])
               : t('multiplayerFlow.hostLeftModal.body')}

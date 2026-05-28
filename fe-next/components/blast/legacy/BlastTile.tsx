@@ -422,7 +422,7 @@ export const BlastTile = memo(function BlastTile({
             })()
           ) : (
             <span className="blast-lock-hint flex flex-col items-center">
-              <Lock className="w-[clamp(10px,2.6cqw,16px)] h-[clamp(10px,2.6cqw,16px)] text-white/90" strokeWidth={2.5} />
+              <Lock className="w-[clamp(10px,2.6cqw,16px)] h-[clamp(10px,2.6cqw,16px)] text-white" strokeWidth={2.5} />
               {type === 'frozen' && innerType ? (
                 (() => {
                   const InnerIcon = TILE_VISUALS[innerType]?.indicator;

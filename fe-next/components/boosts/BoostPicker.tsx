@@ -91,10 +91,10 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
         ref={dialogRef}
         className="mx-2 my-4 w-full max-w-[calc(100vw-1rem)] sm:max-w-md rounded-neo border-neo-thick bg-neo-navy p-4 sm:p-6 shadow-hard-lg motion-safe:animate-neo-pop"
       >
-        <h2 id="boost-picker-title" className="font-neo-display text-2xl text-neo-cream">
+        <h2 id="boost-picker-title" className="font-neo-display text-2xl text-neo-white">
           {t('boosts.title')}
         </h2>
-        <p className="mt-1 text-sm text-neo-cream/70">
+        <p className="mt-1 text-sm text-neo-white">
           {t('boosts.remaining', { n: String(remaining), cap: String(cap) })}
         </p>
         <div className="mt-4 grid gap-3">

@@ -23,7 +23,7 @@ export function HubWelcomeBanner({ t, onDismiss }: HubWelcomeBannerProps) {
     >
       <button
         onClick={onDismiss}
-        className="absolute top-2 inset-e-2 p-1 text-neo-white/60 hover:text-neo-white"
+        className="absolute top-2 inset-e-2 p-1 text-neo-white hover:text-neo-white"
         aria-label={t('common.close')}
       >
         <X className="w-4 h-4" />
@@ -34,7 +34,7 @@ export function HubWelcomeBanner({ t, onDismiss }: HubWelcomeBannerProps) {
           <h3 className="font-neo-display font-bold text-neo-white text-sm uppercase">
             {t('adventure.hubWelcome.title')}
           </h3>
-          <p className="text-xs text-neo-white/80 mt-1 font-medium">
+          <p className="text-xs text-neo-white mt-1 font-medium">
             {t('adventure.hubWelcome.description')}
           </p>
           <button

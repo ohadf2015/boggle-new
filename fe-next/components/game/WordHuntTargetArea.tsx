@@ -70,7 +70,7 @@ export function WordHuntTargetArea({
           <div
             key={`target-blank-${i}`}
             data-testid={`target-blank-${i}`}
-            className="w-7 h-7 sm:w-8 sm:h-8 border-neo border-black rounded bg-gray-700 flex items-center justify-center text-neo-white font-neo-display text-base sm:text-lg"
+            className="w-7 h-7 sm:w-8 sm:h-8 border-neo border-black rounded bg-neo-navy-elevated flex items-center justify-center text-neo-white font-neo-display text-base sm:text-lg"
           >
             ?
           </div>
@@ -124,7 +124,7 @@ export function WordHuntTargetArea({
           onKeyDown={handleKeyDown}
           disabled={found}
           maxLength={targetLength}
-          className="border-neo border-black rounded-neo px-2 py-1 bg-gray-800 text-neo-white font-neo-body uppercase w-32 text-center"
+          className="border-neo border-black rounded-neo px-2 py-1 bg-neo-navy-light text-neo-white font-neo-body uppercase w-32 text-center"
           placeholder={t('wordHunt.guessTarget')}
         />
         <button

@@ -172,7 +172,7 @@ export function PlayerGiftDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value.slice(0, MAX_TITLE_LENGTH))}
               placeholder="Title..."
-              className="bg-white dark:bg-slate-800"
+              className="bg-white dark:bg-neo-navy-light"
             />
             <div className="flex justify-end">
               <span className="text-xs text-slate-500">{title.length}/{MAX_TITLE_LENGTH}</span>
@@ -182,7 +182,7 @@ export function PlayerGiftDialog({
               onChange={(e) => setMessage(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
               placeholder="Message to player(s)..."
               rows={4}
-              className="bg-white dark:bg-slate-800 resize-none"
+              className="bg-white dark:bg-neo-navy-light resize-none"
             />
             <div className="flex justify-end">
               <span className="text-xs text-slate-500">{message.length}/{MAX_MESSAGE_LENGTH}</span>
@@ -228,7 +228,7 @@ export function PlayerGiftDialog({
           </section>
         </div>
 
-        <div className="sticky bottom-0 -mx-6 px-6 pt-3 pb-1 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+        <div className="sticky bottom-0 -mx-6 px-6 pt-3 pb-1 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-neo-navy">
           <div className="flex items-center justify-between gap-3">
             <div className="text-xs text-slate-600 dark:text-slate-400 flex flex-wrap items-center gap-x-3 gap-y-1">
               <span><strong>{selectedPlayers.length}</strong> recipient(s)</span>

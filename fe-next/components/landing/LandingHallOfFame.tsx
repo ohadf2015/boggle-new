@@ -158,7 +158,7 @@ export function LandingHallOfFame({ champions, loading }: LandingHallOfFameProps
               )}>
                 {champ.totalScore.toLocaleString()}
               </p>
-              <p className="text-neo-white/60 text-[10px] font-bold uppercase tracking-wider">
+              <p className="text-neo-white text-[10px] font-bold uppercase tracking-wider">
                 {t('landing.careerPoints')}
               </p>
             </m.div>

@@ -500,7 +500,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                         <AdaptiveMotion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 0.5 }}
-                          className="text-[10px] text-neo-cream/70 text-end leading-tight max-w-[70px]"
+                          className="text-[10px] text-neo-white text-end leading-tight max-w-[70px]"
                         >
                           <span className="text-neo-cyan/60">⚡</span>{' '}
                           {t('game.comboHint')}

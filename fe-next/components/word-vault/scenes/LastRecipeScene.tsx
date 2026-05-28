@@ -220,7 +220,7 @@ export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) 
         <div className="flex w-full max-w-md flex-col items-center gap-1 px-4">
           <div className="flex w-full items-center justify-between text-xs">
             <span className="font-fredoka font-bold text-orange-300">גחלת</span>
-            <span className="font-rubik text-white/60">
+            <span className="font-rubik text-white">
               {transformed ? 'נרגעת' : `עולה ${Math.round((1 - cinderHpPct) * 100)}%`}
             </span>
           </div>
@@ -332,7 +332,7 @@ export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) 
         type="button"
         onClick={onExit}
         aria-label="חזרה"
-        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white/30 hover:text-white/60"
+        className="absolute left-3 top-3 z-30 rounded border border-white/10 px-2 py-1 text-xs text-white hover:text-white"
       >
         ←
       </button>
@@ -349,12 +349,12 @@ export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) 
             <h2 className="mt-2 font-fredoka text-3xl font-black text-orange-200" style={{ textShadow: '2px 2px 0 #000' }}>
               גחלת זעומה.
             </h2>
-            <p className="mt-4 font-rubik text-base leading-relaxed text-white/85">
+            <p className="mt-4 font-rubik text-base leading-relaxed text-white">
               הרחוק מן האש. הפנס שלך, הברז, התצלום, הספר.
               <br/>
               ארבע דברים. סדר אחד. <strong>הסדר של אורי.</strong>
             </p>
-            <p className="mt-3 font-rubik text-sm text-white/65">
+            <p className="mt-3 font-rubik text-sm text-white">
               רק אש זוכרת את הסדר הזה.
             </p>
             <button
@@ -394,7 +394,7 @@ export function LastRecipeScene({ onSolved, onExit, isRevisit = false }: Props) 
             אורי
           </h2>
           <p
-            className="max-w-md font-rubik text-lg leading-relaxed text-white/95"
+            className="max-w-md font-rubik text-lg leading-relaxed text-white"
             dir="rtl"
           >
             הלבה התקררה. הסדקים נסגרו. רגע אחד הוא חזר —

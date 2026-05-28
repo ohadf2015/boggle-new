@@ -58,7 +58,7 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.quickTips.title')}
         </h2>
-        <p className="text-xs sm:text-sm text-neo-white/70">
+        <p className="text-xs sm:text-sm text-neo-white">
           {t('onboarding.quickTips.subtitle')}
         </p>
       </m.div>

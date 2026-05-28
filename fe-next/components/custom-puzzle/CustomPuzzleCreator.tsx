@@ -297,7 +297,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 transition={{ delay: 0.4 }}
                 className="bg-neo-navy border-3 border-neo-black rounded-neo p-3 flex items-center gap-2 shadow-hard-sm"
               >
-                <code className="flex-1 text-sm truncate text-neo-cream font-mono">
+                <code className="flex-1 text-sm truncate text-neo-white font-mono">
                   {buildPuzzleShareUrl(puzzleCode, language)}
                 </code>
                 <AdaptiveMotion.button
@@ -312,7 +312,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   {copied ? (
                     <Check className="w-5 h-5 text-neo-black" strokeWidth={3} />
                   ) : (
-                    <Copy className="w-5 h-5 text-neo-cream" />
+                    <Copy className="w-5 h-5 text-neo-white" />
                   )}
                 </AdaptiveMotion.button>
               </AdaptiveMotion.div>
@@ -326,7 +326,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
               >
                 <Button
                   onClick={handleShare}
-                  className="w-full py-4 text-lg font-black uppercase bg-linear-to-r from-neo-pink to-neo-orange text-neo-cream border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                  className="w-full py-4 text-lg font-black uppercase bg-linear-to-r from-neo-pink to-neo-orange text-neo-white border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
                 >
                   <Share2 className="w-5 h-5 me-2" />
                   {t('customPuzzle.share')}

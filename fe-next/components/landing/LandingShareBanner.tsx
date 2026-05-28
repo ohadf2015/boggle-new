@@ -46,7 +46,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
           <div className="font-black text-neo-white text-sm sm:text-base uppercase leading-tight">
             {t('landing.shareTitle')}
           </div>
-          <div data-testid="banner-subtitle" className="text-xs text-neo-white/60 font-medium mt-1">
+          <div data-testid="banner-subtitle" className="text-xs text-neo-white font-medium mt-1">
             {isAuthenticated
               ? (t('landing.shareSubtitle'))
               : (t('landing.shareSubtitleGuest'))}

@@ -96,7 +96,7 @@ export function StatCard({ icon, label, value, color, index = 0 }: StatCardProps
         </div>
 
         {/* Label — small, mono-track, separated from value */}
-        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-neo-white/55 mb-1.5">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-neo-white mb-1.5">
           {label}
         </p>
 
@@ -112,7 +112,7 @@ export function StatCard({ icon, label, value, color, index = 0 }: StatCardProps
         {/* Bottom-end index marker — tabular slop-killer detail */}
         <div className="mt-3 flex items-end justify-between">
           <span
-            className="font-mono text-[10px] tracking-tight text-neo-white/30 tabular-nums"
+            className="font-mono text-[10px] tracking-tight text-neo-white tabular-nums"
             aria-hidden
           >
             {indexLabel} / 04

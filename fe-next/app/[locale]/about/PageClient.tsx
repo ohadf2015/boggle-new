@@ -24,7 +24,7 @@ function FeatureCard({
     <div
       className={cn(
         'p-5 rounded-neo border-3 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
+        isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard'
       )}
     >
       <div className="flex items-center gap-3 mb-3">
@@ -169,7 +169,7 @@ export default function AboutPageClient(): React.ReactElement {
               key={data.title}
               className={cn(
                 'p-4 rounded-neo border-3 border-neo-black text-center',
-                isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
+                isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard'
               )}
             >
               <div
@@ -208,7 +208,7 @@ export default function AboutPageClient(): React.ReactElement {
             className={cn(
               'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
               isDarkMode
-                ? 'bg-slate-800 hover:bg-slate-700'
+                ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                 : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
             )}
           >
@@ -232,7 +232,7 @@ export default function AboutPageClient(): React.ReactElement {
             className={cn(
               'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
               isDarkMode
-                ? 'bg-slate-800 hover:bg-slate-700'
+                ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                 : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
             )}
           >
@@ -259,7 +259,7 @@ export default function AboutPageClient(): React.ReactElement {
         <h2 className={sectionHeadingClass}>{c.businessInfo.title}</h2>
         <div className={cn(
           'p-6 rounded-neo border-3 border-neo-black',
-          isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
+          isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard'
         )}>
           <dl className="space-y-4">
             {([

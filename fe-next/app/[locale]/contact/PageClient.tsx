@@ -88,7 +88,7 @@ export default function ContactPageClient(): React.JSX.Element {
             onClick={() => router.push(`/${language}`)}
             className={cn(
               'rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700 hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -126,7 +126,7 @@ export default function ContactPageClient(): React.JSX.Element {
               className={cn(
                 'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
                 isDarkMode
-                  ? 'bg-slate-800 hover:bg-slate-700'
+                  ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                   : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
               )}
             >
@@ -152,7 +152,7 @@ export default function ContactPageClient(): React.JSX.Element {
               className={cn(
                 'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
                 isDarkMode
-                  ? 'bg-slate-800 hover:bg-slate-700'
+                  ? 'bg-neo-navy-light hover:bg-neo-navy-elevated'
                   : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
               )}
             >
@@ -193,7 +193,7 @@ export default function ContactPageClient(): React.JSX.Element {
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
                 'p-6 rounded-neo border-3 border-neo-black text-center',
-                isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
+                isDarkMode ? 'bg-neo-navy-light' : 'bg-white shadow-hard'
               )}
             >
               <CheckCircle className="w-12 h-12 mx-auto mb-3 text-neo-lime" />
@@ -278,7 +278,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   className={cn(
                     'flex w-full px-4 py-3 text-sm font-medium resize-none',
                     'rounded-neo border-3 border-neo-black dark:border-slate-500',
-                    'bg-neo-cream dark:bg-slate-700 text-slate-900 dark:text-white',
+                    'bg-neo-cream dark:bg-neo-navy-elevated text-slate-900 dark:text-white',
                     'shadow-[inset_2px_2px_0px_rgba(0,0,0,0.1)]',
                     'placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:font-normal',
                     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',

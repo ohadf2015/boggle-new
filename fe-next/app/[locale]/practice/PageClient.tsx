@@ -100,7 +100,7 @@ export default function PracticeHubClient({ locale }: Props) {
             data-testid="practice-hub-back"
             onClick={handleTileTap}
             aria-label={t('common.home')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-neo-cream/30 text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 text-xs font-neo-display font-bold uppercase tracking-wide transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-neo-cream/30 text-neo-white hover:text-neo-white hover:border-neo-cream/60 text-xs font-neo-display font-bold uppercase tracking-wide transition-colors"
           >
             <Home className="w-3.5 h-3.5" aria-hidden />
             <span>{t('common.home')}</span>
@@ -175,10 +175,10 @@ export default function PracticeHubClient({ locale }: Props) {
                 </div>
 
                 <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                  <h2 className="text-base sm:text-lg font-neo-display font-black text-neo-cream truncate">
+                  <h2 className="text-base sm:text-lg font-neo-display font-black text-neo-white truncate">
                     {t(`gameModes.${mode}.name`)}
                   </h2>
-                  <p className="text-[0.72rem] sm:text-xs font-neo-body text-neo-cream/90 leading-snug line-clamp-2 pe-8">
+                  <p className="text-[0.72rem] sm:text-xs font-neo-body text-neo-white leading-snug line-clamp-2 pe-8">
                     {t(`gameModes.${mode}.description`)}
                   </p>
                 </div>

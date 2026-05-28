@@ -211,7 +211,7 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
         aria-label={t('common.exit')}
         className={cn(
           'absolute top-2 start-2 z-20 p-2 rounded-neo',
-          'bg-neo-white/8 text-neo-white/70 hover:bg-neo-red/20 hover:text-neo-red',
+          'bg-neo-white/8 text-neo-white hover:bg-neo-red/20 hover:text-neo-red',
           'transition-colors duration-200'
         )}
       >
@@ -226,7 +226,7 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
       </div>
 
       {isLoading ? (
-        <div className="flex-1 flex items-center justify-center gap-3 text-neo-white/60">
+        <div className="flex-1 flex items-center justify-center gap-3 text-neo-white">
           <Loader2 className="w-6 h-6 animate-spin" />
           <span className="font-neo-body text-sm">{t('adventure.hunt.preparingPuzzle')}</span>
         </div>

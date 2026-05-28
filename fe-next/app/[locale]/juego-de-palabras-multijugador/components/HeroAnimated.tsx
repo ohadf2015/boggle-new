@@ -41,7 +41,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
           </div>
 
           <h1 className="mb-5 font-neo-display text-4xl font-black leading-[1.05] sm:text-6xl lg:text-7xl">
-            <span className="block text-neo-white/90">Alternativa a</span>
+            <span className="block text-neo-white">Alternativa a</span>
             <span className="relative inline-block">
               <span className="bg-gradient-to-br from-neo-pink via-neo-pink to-neo-cyan bg-clip-text text-transparent">
                 Scrabble online
@@ -80,7 +80,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
             </span>
           </h1>
 
-          <p className="mb-8 max-w-2xl font-neo-body text-base leading-relaxed text-neo-white/75 sm:text-lg">
+          <p className="mb-8 max-w-2xl font-neo-body text-base leading-relaxed text-neo-white sm:text-lg">
             Crea una sala, comparte el enlace y compite en tiempo real. <strong className="text-neo-white">Más de 10.000 palabras</strong> en español, sin descargas, sin registro, sin esperas.
           </p>
 
@@ -148,7 +148,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
             <dt className={cn('font-neo-display text-2xl font-black sm:text-3xl', stat.color)}>
               {stat.num}
             </dt>
-            <dd className="mt-0.5 font-neo-body text-[11px] font-bold uppercase tracking-wider text-neo-white/60 sm:text-xs">
+            <dd className="mt-0.5 font-neo-body text-[11px] font-bold uppercase tracking-wider text-neo-white sm:text-xs">
               {stat.label}
             </dd>
           </m.div>

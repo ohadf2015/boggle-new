@@ -86,7 +86,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
                     +{challenge.rewardCoins}
                   </span>
                   {!isComplete && (
-                    <span className="text-[10px] font-mono font-bold text-neo-white/50">{timeLeft}s</span>
+                    <span className="text-[10px] font-mono font-bold text-neo-white">{timeLeft}s</span>
                   )}
                   {isComplete && (
                     <Check data-testid="challenge-complete-badge" className="w-3 h-3 text-neo-black" strokeWidth={3} />

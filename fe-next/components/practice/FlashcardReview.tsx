@@ -211,7 +211,7 @@ export default function FlashcardReview({
                       {xpSessionData.sessionMasteryMessage}
                     </p>
                   )}
-                  <p className="text-neo-white/80 font-neo-body">
+                  <p className="text-neo-white font-neo-body">
                     +{xpSessionData.sessionXpEarned} {t('education.xp.xpGained')}
                   </p>
                 </div>
@@ -454,7 +454,7 @@ export default function FlashcardReview({
                         partOfSpeech={enrichedWords[currentIndex]?.partOfSpeech}
                         example={enrichedWords[currentIndex]?.examples?.[0]?.text}
                       />
-                      <p className="text-sm text-neo-white/40 mt-4 font-neo-body">
+                      <p className="text-sm text-neo-white mt-4 font-neo-body">
                         {t('education.practice.tapToFlip')}
                       </p>
                     </div>
@@ -502,7 +502,7 @@ export default function FlashcardReview({
         </div>
 
         {/* Navigation hint */}
-        <p className="text-center text-xs text-neo-white/40 font-neo-body mt-4">
+        <p className="text-center text-xs text-neo-white font-neo-body mt-4">
           {isFlipped
             ? t('education.practice.chooseAnswer')
             : t('education.practice.tapCard')}

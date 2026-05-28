@@ -68,7 +68,7 @@ export function AcquisitionSources({ authToken }: Props) {
 
   if (error) {
     return (
-      <div data-testid="sources-error" className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+      <div data-testid="sources-error" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
         <div className="flex items-center gap-2 text-sm text-red-400">
           <AlertTriangle className="w-4 h-4" />
           <span>{t('admin.acquisition.error')}: {error}</span>
@@ -79,12 +79,12 @@ export function AcquisitionSources({ authToken }: Props) {
 
   if (data === null) {
     return (
-      <div data-testid="sources-skeleton" className="bg-slate-800/50 rounded-neo border-neo border-black p-6 mb-6 animate-pulse h-48" />
+      <div data-testid="sources-skeleton" className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-6 mb-6 animate-pulse h-48" />
     );
   }
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4 mb-6">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 mb-6">
       <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
         <h3 className="text-sm font-neo-display text-neo-white flex items-center gap-2">
           <Megaphone className="w-4 h-4 text-neo-pink" />
@@ -101,7 +101,7 @@ export function AcquisitionSources({ authToken }: Props) {
                 'px-2 py-0.5 text-xs font-bold rounded-neo border border-black transition-colors',
                 dim === d.key
                   ? 'bg-neo-pink text-black'
-                  : 'bg-slate-700 text-neo-white/60 hover:bg-slate-600'
+                  : 'bg-neo-navy-elevated text-neo-white hover:bg-slate-600'
               )}
             >
               {t(d.labelKey)}
@@ -121,10 +121,10 @@ export function AcquisitionSources({ authToken }: Props) {
             return (
               <div key={row.name} data-testid="source-row" className="flex items-center gap-3 text-xs">
                 <span className="text-neo-white truncate w-32 shrink-0" title={row.name}>{row.name}</span>
-                <div className="flex-1 h-5 bg-slate-700/50 rounded-sm overflow-hidden">
+                <div className="flex-1 h-5 bg-neo-navy-elevated/50 rounded-sm overflow-hidden">
                   <div className="h-full bg-neo-pink/70" style={{ width: `${pct}%` }} />
                 </div>
-                <span className="font-mono text-neo-white/70 w-12 text-right">{row.count}</span>
+                <span className="font-mono text-neo-white w-12 text-right">{row.count}</span>
               </div>
             );
           })}

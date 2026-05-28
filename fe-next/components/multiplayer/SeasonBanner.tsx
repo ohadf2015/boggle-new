@@ -109,7 +109,7 @@ export const SeasonBanner: React.FC = () => {
           )}
           <div className="flex flex-col min-w-0 gap-0.5">
             <span
-              className="font-neo-display text-sm sm:text-base text-neo-cream truncate leading-tight"
+              className="font-neo-display text-sm sm:text-base text-neo-white truncate leading-tight"
               style={{ textShadow: '2px 2px 0 rgba(0,0,0,0.6)' }}
             >
               {t('season.name', { number: currentSeason.id, theme: currentSeason.theme })}
@@ -123,7 +123,7 @@ export const SeasonBanner: React.FC = () => {
               </span>
             )}
             <span
-              className={`text-xs sm:hidden ${isEndingSoon ? 'text-neo-pink font-neo-display' : 'text-neo-cream/80'}`}
+              className={`text-xs sm:hidden ${isEndingSoon ? 'text-neo-pink font-neo-display' : 'text-neo-white'}`}
             >
               {isEndingSoon
                 ? t('season.endingSoon')

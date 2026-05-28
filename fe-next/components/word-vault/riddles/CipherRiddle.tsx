@@ -97,7 +97,7 @@ export function CipherRiddle({ riddle, store: _store, onSolved }: Props) {
 
       {activeJarId && activeJar && (
         <div className="flex w-full max-w-sm flex-col gap-3 rounded-md border-2 border-cyan-300 bg-[#111a2c] p-4">
-          <p className="font-rubik text-sm text-white/70">פענח את התווית:</p>
+          <p className="font-rubik text-sm text-white">פענח את התווית:</p>
           {activeJar.hint && (
             <p className="rounded border-2 border-orange-300/60 bg-orange-300/10 px-3 py-2 font-rubik text-sm text-orange-200">
               💡 {activeJar.hint.he}

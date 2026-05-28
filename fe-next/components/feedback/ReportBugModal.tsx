@@ -82,11 +82,11 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent noDescription className="max-w-md" dir={dir}>
         <DialogHeader className="bg-linear-to-r from-neo-pink via-neo-pink to-neo-purple text-neo-white p-4 sm:p-5 relative overflow-hidden">
-          <Bug className="absolute top-2 right-3 rtl:right-auto rtl:left-3 w-5 h-5 text-neo-white/30" aria-hidden="true" />
+          <Bug className="absolute top-2 right-3 rtl:right-auto rtl:left-3 w-5 h-5 text-neo-white" aria-hidden="true" />
           <DialogTitle className="text-xl sm:text-2xl font-black uppercase tracking-tight">
             {t('bugReport.title')}
           </DialogTitle>
-          <p className="text-sm text-neo-white/80 mt-1">{t('bugReport.description')}</p>
+          <p className="text-sm text-neo-white mt-1">{t('bugReport.description')}</p>
         </DialogHeader>
 
         {status === 'success' ? (
@@ -114,7 +114,7 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
                 placeholder={t('bugReport.placeholder')}
                 rows={5}
                 dir={dir}
-                className="w-full p-3 bg-neo-navy-light text-neo-white border-2 border-neo-black/60 rounded-neo resize-none focus:outline-none focus:border-neo-pink placeholder:text-neo-white/40"
+                className="w-full p-3 bg-neo-navy-light text-neo-white border-2 border-neo-black/60 rounded-neo resize-none focus:outline-none focus:border-neo-pink placeholder:text-neo-white"
               />
 
               {status === 'error' && (
@@ -128,7 +128,7 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
                 <button
                   type="button"
                   onClick={() => setShowDetails((v) => !v)}
-                  className="flex items-center gap-1 text-xs text-neo-white/60 hover:text-neo-white"
+                  className="flex items-center gap-1 text-xs text-neo-white hover:text-neo-white"
                 >
                   <ChevronDown
                     className={cn('w-3.5 h-3.5 transition-transform', showDetails && 'rotate-180')}
@@ -137,7 +137,7 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
                   {t('bugReport.sessionInfo')}
                 </button>
                 {showDetails && (
-                  <dl className="mt-2 text-xs text-neo-white/70 space-y-1 bg-neo-navy/60 rounded-neo p-2.5 border border-neo-black/40">
+                  <dl className="mt-2 text-xs text-neo-white space-y-1 bg-neo-navy/60 rounded-neo p-2.5 border border-neo-black/40">
                     <div className="flex gap-2">
                       <dt className="font-bold shrink-0">{t('bugReport.currentPage')}:</dt>
                       <dd className="truncate">{page || '—'}</dd>
@@ -159,7 +159,7 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2.5 bg-transparent text-neo-white/70 font-bold uppercase text-sm hover:text-neo-white"
+                className="px-4 py-2.5 bg-transparent text-neo-white font-bold uppercase text-sm hover:text-neo-white"
               >
                 {t('bugReport.cancel')}
               </button>

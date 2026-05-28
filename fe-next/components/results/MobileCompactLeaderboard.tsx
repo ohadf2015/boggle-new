@@ -152,7 +152,7 @@ const MobileCompactLeaderboard: React.FC<MobileCompactLeaderboardProps> = memo((
             </div>
             <span className={cn(
               'font-black text-sm tabular-nums flex items-center gap-1',
-              participant.isCurrentPlayer ? 'text-neo-cyan' : 'text-white/80'
+              participant.isCurrentPlayer ? 'text-neo-cyan' : 'text-white'
             )}>
               {isWinner && <span className="text-xs">🔥</span>}
               <ScoreCountUp

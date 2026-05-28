@@ -45,7 +45,7 @@ export default function PracticeModeNav({ current, step }: Props) {
         href={`/${language}/practice`}
         data-testid="practice-back-to-hub"
         aria-label={t('practiceHub.backToHub')}
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-cream/80 hover:text-neo-cream hover:border-neo-cream/60 shrink-0 transition-colors ${
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-cream/30 text-xs font-neo-display font-black text-neo-white hover:text-neo-white hover:border-neo-cream/60 shrink-0 transition-colors ${
           step === 'active' ? 'opacity-60 hover:opacity-100' : ''
         }`}
       >

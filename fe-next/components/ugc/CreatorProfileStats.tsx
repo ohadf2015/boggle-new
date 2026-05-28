@@ -71,7 +71,7 @@ function StatCell({ value, labelKey }: StatCellProps) {
   return (
     <div className="flex flex-col items-center gap-0.5 p-2 rounded-neo border-2 border-neo-black bg-neo-navy">
       <span className="text-xl font-black text-neo-yellow leading-none">{value}</span>
-      <span className="text-[10px] font-bold uppercase tracking-wide text-neo-white/60 text-center">
+      <span className="text-[10px] font-bold uppercase tracking-wide text-neo-white text-center">
         {t(labelKey)}
       </span>
     </div>

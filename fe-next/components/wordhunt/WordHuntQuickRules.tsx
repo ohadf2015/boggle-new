@@ -78,7 +78,7 @@ const WordHuntQuickRules = memo<WordHuntQuickRulesProps>(({ onDismiss, t }) => {
           <button
             type="button"
             onClick={onDismiss}
-            className="p-0.5 rounded text-neo-white/50 hover:text-neo-white transition-colors"
+            className="p-0.5 rounded text-neo-white hover:text-neo-white transition-colors"
             data-testid="rules-dismiss"
             aria-label={t('wordHuntRules.gotIt')}
           >
@@ -95,7 +95,7 @@ const WordHuntQuickRules = memo<WordHuntQuickRulesProps>(({ onDismiss, t }) => {
               data-testid={`tip-${i}`}
             >
               <span className={cn('shrink-0', tip.accent)}>{tip.icon}</span>
-              <span className="text-[11px] font-neo-body text-neo-cream/80 leading-tight">
+              <span className="text-[11px] font-neo-body text-neo-white leading-tight">
                 {t(tip.textKey)}
               </span>
             </li>

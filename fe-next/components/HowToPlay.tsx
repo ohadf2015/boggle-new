@@ -182,7 +182,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                 </div>
 
                 {/* Card */}
-                <div className={`flex-1 bg-slate-800/80 border-2 ${item.accentBorder}/30 rounded-xl p-3.5 backdrop-blur-xs`}>
+                <div className={`flex-1 bg-neo-navy-light/80 border-2 ${item.accentBorder}/30 rounded-xl p-3.5 backdrop-blur-xs`}>
                   <h4 className="font-neo-display font-black text-white text-base uppercase leading-tight">
                     {item.title}
                   </h4>
@@ -250,7 +250,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       )}
 
       {/* Tip card */}
-      <div className="bg-slate-800/60 border-2 border-slate-600/40 rounded-xl p-3.5">
+      <div className="bg-neo-navy-light/60 border-2 border-slate-600/40 rounded-xl p-3.5">
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 bg-neo-lime/20 border-2 border-neo-lime/40 rounded-lg shrink-0 flex items-center justify-center">
             <Lightbulb className="w-4 h-4 text-neo-lime" />
@@ -267,7 +267,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
   const renderScoringContent = (): React.ReactNode => (
     <div className="space-y-4">
       {/* Scoring table */}
-      <div className="bg-slate-800/80 border-2 border-neo-pink/30 rounded-xl p-4 overflow-hidden relative">
+      <div className="bg-neo-navy-light/80 border-2 border-neo-pink/30 rounded-xl p-4 overflow-hidden relative">
         <h4 className="font-neo-display font-black text-neo-pink text-base uppercase mb-3 flex items-center gap-2">
           <Zap className="w-4 h-4" />
           {t('howToPlay.scoreMultipliers')}
@@ -283,7 +283,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               initial={{ x: isRTL ? 20 : -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: i * 0.08 }}
-              className="relative bg-slate-900/60 rounded-lg overflow-hidden"
+              className="relative bg-neo-navy/60 rounded-lg overflow-hidden"
             >
               {/* Fill bar behind */}
               <div
@@ -304,7 +304,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       </div>
 
       {/* Combo bonus */}
-      <div className="bg-slate-800/80 border-2 border-neo-cyan/30 rounded-xl p-4 flex gap-3.5 items-center">
+      <div className="bg-neo-navy-light/80 border-2 border-neo-cyan/30 rounded-xl p-4 flex gap-3.5 items-center">
         <div className="w-11 h-11 bg-neo-cyan/20 border-2 border-neo-cyan/40 rounded-lg flex items-center justify-center shrink-0">
           <Flame className="w-6 h-6 text-neo-cyan animate-pulse" />
         </div>
@@ -323,7 +323,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="bg-slate-800/40 border-2 border-slate-600/30 rounded-xl p-4"
+        className="bg-neo-navy-light/40 border-2 border-slate-600/30 rounded-xl p-4"
       >
         <h4 className="text-slate-300 font-black uppercase text-xs mb-3 flex items-center gap-2 tracking-wider">
           <Lightbulb className="w-3.5 h-3.5 text-neo-lime" />
@@ -385,7 +385,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 bg-slate-800 border-2 border-slate-600 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
+            className="w-8 h-8 bg-neo-navy-light border-2 border-slate-600 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
             aria-label={t('common.close')}
           >
             <X className="w-4 h-4" strokeWidth={2.5} />
@@ -497,7 +497,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       <div className="h-px bg-linear-to-r from-transparent via-slate-600/50 to-transparent" />
       <div
         data-testid="nav-footer"
-        className="flex justify-between items-center px-5 py-4 bg-slate-900/50"
+        className="flex justify-between items-center px-5 py-4 bg-neo-navy/50"
       >
         {/* Back button */}
         <button
@@ -505,7 +505,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           disabled={currentStep === 0}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-3 border-neo-black font-bold uppercase text-sm transition-all
             disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:border-slate-700
-            bg-slate-800 text-white shadow-hard-sm
+            bg-neo-navy-light text-white shadow-hard-sm
             hover:enabled:-translate-x-0.5 hover:enabled:-translate-y-0.5 hover:enabled:shadow-hard
             active:enabled:translate-x-0.5 active:enabled:translate-y-0.5 active:enabled:shadow-hard-pressed"
         >

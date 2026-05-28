@@ -59,12 +59,12 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
       case 3:
         return 'bg-neo-lime text-neo-black';
       default:
-        return 'bg-neo-pink text-neo-cream';
+        return 'bg-neo-pink text-neo-white';
     }
   };
 
   return (
-    <Card className="bg-neo-navy text-neo-cream p-4 sm:p-6 rounded-neo shadow-hard-lg border-neo-thick border-neo-black">
+    <Card className="bg-neo-navy text-neo-white p-4 sm:p-6 rounded-neo shadow-hard-lg border-neo-thick border-neo-black">
       <div className="space-y-4">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -146,7 +146,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                               {player.roundScores.map((score, i) => (
                                 <span
                                   key={`round-${i + 1}`}
-                                  className="text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded"
+                                  className="text-xs bg-slate-200 dark:bg-neo-navy-elevated px-1.5 py-0.5 rounded"
                                   title={`Round ${i + 1}: ${score}`}
                                 >
                                   {score}

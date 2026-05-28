@@ -189,7 +189,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
       </div>
 
       {/* Distribution histogram */}
-      <div className="bg-slate-800/60 rounded-neo border-2 border-neo-black p-3 space-y-2 relative overflow-hidden">
+      <div className="bg-neo-navy-light/60 rounded-neo border-2 border-neo-black p-3 space-y-2 relative overflow-hidden">
         {/* Dot grid background */}
         <div
           className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -232,7 +232,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                 </span>
 
                 {/* Bar track */}
-                <div className="flex-1 h-5 bg-slate-700/50 rounded-sm overflow-hidden relative">
+                <div className="flex-1 h-5 bg-neo-navy-elevated/50 rounded-sm overflow-hidden relative">
                   {/* Animated fill */}
                   <m.div
                     initial={{ width: 0 }}
@@ -253,7 +253,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.9 + i * 0.08 }}
-                        className="text-[10px] font-black text-white/90 tabular-nums drop-shadow-xs"
+                        className="text-[10px] font-black text-white tabular-nums drop-shadow-xs"
                       >
                         {count}
                       </m.span>

@@ -32,7 +32,7 @@ const CTA_BG: Record<PracticeMode, string> = {
 const CTA_TEXT: Record<PracticeMode, string> = {
   classic: 'text-neo-black',
   wordHunt: 'text-neo-black',
-  wheelRush: 'text-neo-cream',
+  wheelRush: 'text-neo-white',
 };
 
 interface Props {
@@ -135,7 +135,7 @@ export default function PracticeCompletePopup({ open, mode, onDismiss }: Props) 
                 data-testid="practice-complete-popup-dismiss"
                 onClick={handleDismiss}
                 aria-label={t('practice.keepPracticing')}
-                className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-cream/70 hover:text-neo-cream hover:bg-neo-cream/10 transition-colors"
+                className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-white hover:text-neo-white hover:bg-neo-cream/10 transition-colors"
               >
                 <X className="w-4 h-4" aria-hidden />
               </button>

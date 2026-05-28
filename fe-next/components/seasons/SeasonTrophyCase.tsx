@@ -57,11 +57,11 @@ export const SeasonTrophyCase: React.FC<SeasonTrophyCaseProps> = ({
         </div>
       ) : count === 0 ? (
         emptyVariant === 'compact' ? (
-          <p className="text-sm text-neo-cream/60 italic">{t('seasonBadges.section.empty')}</p>
+          <p className="text-sm text-neo-white italic">{t('seasonBadges.section.empty')}</p>
         ) : (
           <div className="text-center py-8">
-            <Trophy className="mx-auto w-10 h-10 text-neo-cream/30 mb-3" />
-            <p className="text-sm text-neo-cream/70">{t('seasonBadges.section.empty')}</p>
+            <Trophy className="mx-auto w-10 h-10 text-neo-white mb-3" />
+            <p className="text-sm text-neo-white">{t('seasonBadges.section.empty')}</p>
           </div>
         )
       ) : (

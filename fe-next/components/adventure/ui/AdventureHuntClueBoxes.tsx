@@ -18,7 +18,7 @@ interface AdventureHuntClueBoxesProps {
 const feedbackClass: Record<LetterFeedback, string> = {
   correct: 'bg-neo-lime text-neo-navy',
   present: 'bg-neo-yellow text-neo-navy',
-  absent: 'bg-neo-navy-light text-neo-white/40',
+  absent: 'bg-neo-navy-light text-neo-white',
 };
 
 export default function AdventureHuntClueBoxes({
@@ -51,7 +51,7 @@ export default function AdventureHuntClueBoxes({
       </div>
       <div
         data-testid="hunt-tries-counter"
-        className="text-xs font-neo-body text-neo-white/70"
+        className="text-xs font-neo-body text-neo-white"
       >
         {t('adventure.mode.huntTriesLeft', { count: triesLeft, max: HUNT_MAX_ATTEMPTS })}
       </div>

@@ -75,14 +75,14 @@ export function GameHud({ store }: Props) {
               <button
                 type="button"
                 onClick={() => setShowInventory(false)}
-                className="rounded border-2 border-white/30 px-2 py-0.5 text-sm text-white/70"
+                className="rounded border-2 border-white/30 px-2 py-0.5 text-sm text-white"
               >
                 סגור
               </button>
             </div>
 
             {items.length === 0 ? (
-              <p className="text-center font-rubik text-white/60">המלאי ריק. עוד לא מצאת כלום.</p>
+              <p className="text-center font-rubik text-white">המלאי ריק. עוד לא מצאת כלום.</p>
             ) : (
               <ul className="flex flex-col gap-2">
                 {items.map((id) => {
@@ -96,7 +96,7 @@ export function GameHud({ store }: Props) {
                       <span className="text-2xl leading-none">{ITEM_GLYPH[id]}</span>
                       <div className="flex flex-col">
                         <span className="font-fredoka text-base font-black text-amber-200">{def.name.he}</span>
-                        <span className="font-rubik text-xs text-white/65">{def.description.he}</span>
+                        <span className="font-rubik text-xs text-white">{def.description.he}</span>
                       </div>
                     </li>
                   );

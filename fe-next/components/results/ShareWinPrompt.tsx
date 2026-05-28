@@ -337,7 +337,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             aria-label={t('common.close')}
             className={cn(
               'absolute top-2 right-2 p-1.5 rounded-full transition-colors',
-              'hover:bg-neo-cream/10 text-neo-cream/60'
+              'hover:bg-neo-cream/10 text-neo-white'
             )}
           >
             <X size={14} />
@@ -363,7 +363,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             </h3>
             <p className={cn(
               'text-sm font-bold italic',
-              'text-neo-cream/80'
+              'text-neo-white'
             )}>
               &ldquo;{wittyMessage}&rdquo;
             </p>
@@ -425,7 +425,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         {/* Viral prompt */}
         <p className={cn(
           'mt-3 text-center text-sm font-bold',
-          'text-neo-cream/60'
+          'text-neo-white'
         )}>
           {t('results.challengeFriends')}
         </p>

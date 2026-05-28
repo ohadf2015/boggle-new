@@ -199,7 +199,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               onClick={() => refetch()}
               className={cn(
                 'h-7 w-7 p-0 rounded-full',
-                isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-gray-100'
+                isDarkMode ? 'hover:bg-neo-navy-elevated' : 'hover:bg-gray-100'
               )}
               title="Refresh"
               haptic
@@ -401,7 +401,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             className={cn(
               'rounded-xl overflow-hidden',
               isDarkMode
-                ? 'bg-slate-800/50 border border-slate-700'
+                ? 'bg-neo-navy-light/50 border border-slate-700'
                 : 'bg-white border border-gray-200 shadow-lg'
             )}
           >
@@ -409,7 +409,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             <div
               className={cn(
                 'hidden sm:grid grid-cols-10 gap-3 px-3 py-2 text-sm font-semibold',
-                isDarkMode ? 'bg-slate-700/50 text-gray-300' : 'bg-gray-50 text-gray-600'
+                isDarkMode ? 'bg-neo-navy-elevated/50 text-gray-300' : 'bg-gray-50 text-gray-600'
               )}
             >
               <div className="col-span-1 text-center">{t('leaderboard.rank')}</div>
@@ -434,7 +434,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                           ? 'bg-cyan-900/20'
                           : 'bg-cyan-50'
                         : isDarkMode
-                          ? 'hover:bg-slate-700/30'
+                          ? 'hover:bg-neo-navy-elevated/30'
                           : 'hover:bg-gray-50'
                     )}
                   >

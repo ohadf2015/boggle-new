@@ -208,7 +208,7 @@ export function FlashcardSwipeStack({
                     <span className="text-neo-white text-3xl font-neo-display block mb-2">
                       {currentWord.word}
                     </span>
-                    <span className="text-neo-white/60 text-lg animate-pulse">
+                    <span className="text-neo-white text-lg animate-pulse">
                       {t('education.lesson.tapToReveal')}
                     </span>
                   </div>
@@ -221,14 +221,14 @@ export function FlashcardSwipeStack({
 
       {/* Progress indicator */}
       <div className="absolute bottom-0 left-0 right-0 text-center py-2">
-        <span className="text-neo-white/60 text-sm">
+        <span className="text-neo-white text-sm">
           {currentIndex + 1} / {words.length}
         </span>
       </div>
 
       {/* Keyboard hints */}
       {showDefinition && (
-        <div className="absolute -bottom-12 left-0 right-0 flex justify-center gap-8 text-neo-white/40 text-xs">
+        <div className="absolute -bottom-12 left-0 right-0 flex justify-center gap-8 text-neo-white text-xs">
           <span>{isRTL ? '← ' + t('education.lesson.gotIt') : t('education.lesson.dontKnow') + ' ←'}</span>
           <span>{isRTL ? t('education.lesson.dontKnow') + ' →' : '→ ' + t('education.lesson.gotIt')}</span>
         </div>

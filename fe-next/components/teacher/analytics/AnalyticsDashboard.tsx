@@ -169,7 +169,7 @@ export function AnalyticsDashboard({
             <h2 className="text-2xl font-neo-display font-black text-neo-white">
               {t('education.analytics.title')}
             </h2>
-            <p className="text-neo-white/70 text-sm font-bold">{t('education.analytics.subtitle')}</p>
+            <p className="text-neo-white text-sm font-bold">{t('education.analytics.subtitle')}</p>
           </div>
         </div>
       </div>
@@ -251,11 +251,11 @@ export function AnalyticsDashboard({
             <table className="w-full">
               <thead>
                 <tr className="bg-neo-navy/60 border-b-2 border-black/30">
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white/70">{t('education.analytics.student')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white/70">{t('education.analytics.level')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white/70">{t('education.analytics.mastery')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white/70">{t('education.analytics.accuracy')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white/70">{t('education.analytics.streak')}</th>
+                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
+                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.level')}</th>
+                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
+                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.accuracy')}</th>
+                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.streak')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -266,17 +266,17 @@ export function AnalyticsDashboard({
                     className="border-b border-black/10 hover:bg-neo-white/5 cursor-pointer"
                   >
                     <td className="px-3 py-2 text-sm font-bold text-neo-white">{student.displayName}</td>
-                    <td className="px-3 py-2 text-sm text-neo-white/80">{student.currentLevel}</td>
-                    <td className="px-3 py-2 text-sm text-neo-white/80">{student.vocabularyMastery}%</td>
-                    <td className="px-3 py-2 text-sm text-neo-white/80">{student.overallAccuracy}%</td>
-                    <td className="px-3 py-2 text-sm text-neo-white/80">{student.currentStreak}</td>
+                    <td className="px-3 py-2 text-sm text-neo-white">{student.currentLevel}</td>
+                    <td className="px-3 py-2 text-sm text-neo-white">{student.vocabularyMastery}%</td>
+                    <td className="px-3 py-2 text-sm text-neo-white">{student.overallAccuracy}%</td>
+                    <td className="px-3 py-2 text-sm text-neo-white">{student.currentStreak}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <p className="text-sm text-neo-white/60">{t('education.analytics.noStudents')}</p>
+          <p className="text-sm text-neo-white">{t('education.analytics.noStudents')}</p>
         )}
       </div>
 

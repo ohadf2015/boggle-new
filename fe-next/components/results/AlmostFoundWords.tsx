@@ -38,11 +38,11 @@ const AlmostFoundWords = memo<AlmostFoundWordsProps>(({
       transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
       className={cn('w-full', className)}
     >
-      <div className="rounded-neo-lg border-2 border-dashed border-white/30 overflow-hidden bg-slate-800/60">
+      <div className="rounded-neo-lg border-2 border-dashed border-white/30 overflow-hidden bg-neo-navy-light/60">
         {/* Header */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-slate-700/50 border-b border-dashed border-white/20">
-          <Ghost className="w-4 h-4 text-white/60" />
-          <span className="font-bold text-xs uppercase text-white/80">
+        <div className="flex items-center gap-2 px-3 py-2 bg-neo-navy-elevated/50 border-b border-dashed border-white/20">
+          <Ghost className="w-4 h-4 text-white" />
+          <span className="font-bold text-xs uppercase text-white">
             {t('almostFound.title')}
           </span>
         </div>
@@ -61,7 +61,7 @@ const AlmostFoundWords = memo<AlmostFoundWordsProps>(({
                 className={cn(
                   'inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo text-sm',
                   'border-2 border-dashed border-white/30',
-                  'bg-slate-700/40 hover:bg-slate-600/50',
+                  'bg-neo-navy-elevated/40 hover:bg-slate-600/50',
                   'cursor-pointer hover:scale-105 transition-all duration-150'
                 )}
               >
@@ -70,7 +70,7 @@ const AlmostFoundWords = memo<AlmostFoundWordsProps>(({
                   {Math.round(word.matchPercentage)}%
                 </span>
                 {/* Word */}
-                <span className="font-bold uppercase text-white/70">
+                <span className="font-bold uppercase text-white">
                   {word.word}
                 </span>
                 {/* Score */}

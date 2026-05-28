@@ -233,7 +233,7 @@ const LevelEntryOverlay = memo<LevelEntryOverlayProps>(
               <AdaptiveMotion.span
                 className={cn(
                   'text-lg font-bold uppercase tracking-widest',
-                  'text-neo-white/80'
+                  'text-neo-white'
                 )}
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}

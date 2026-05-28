@@ -62,7 +62,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
     >
       <div className="flex items-center gap-2 px-1">
         <Users className="w-3.5 h-3.5 text-neo-cyan" />
-        <h2 className="font-neo-display text-[11px] text-neo-cream/80 uppercase tracking-[0.2em]">
+        <h2 className="font-neo-display text-[11px] text-neo-white uppercase tracking-[0.2em]">
           {t('multiplayerFlow.crazyGamesFriends', 'Friends on CrazyGames')}
         </h2>
       </div>
@@ -110,7 +110,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
                   </div>
                 )}
               </div>
-              <span className="font-neo-body text-[11px] font-bold text-neo-cream/85 truncate w-full text-center">
+              <span className="font-neo-body text-[11px] font-bold text-neo-white truncate w-full text-center">
                 {friend.username}
               </span>
             </button>

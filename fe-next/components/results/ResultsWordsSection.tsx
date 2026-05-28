@@ -68,7 +68,7 @@ export const ResultsWordsSection: React.FC<ResultsWordsSectionProps> = ({
           transition={{ type: 'spring', stiffness: 250, damping: 16, delay: statsDelay + 0.18 }}
           className="flex items-center gap-2 flex-wrap justify-center py-2"
         >
-          <span className="text-[10px] font-black uppercase tracking-widest text-neo-cream/40 w-full text-center mb-0.5">
+          <span className="text-[10px] font-black uppercase tracking-widest text-neo-white w-full text-center mb-0.5">
             {t('results.badges')}
           </span>
           {gameAchievements.map((ach, i) => (

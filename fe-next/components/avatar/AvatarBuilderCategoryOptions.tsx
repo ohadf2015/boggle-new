@@ -137,7 +137,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
         <div className="space-y-3">
           {/* Expression Presets — one-click emotion combos */}
           <div>
-            <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
+            <p className="text-neo-white text-xs font-bold uppercase mb-2">
               {t('avatarBuilder.expressions') || 'Expressions'}
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -153,7 +153,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
                   title={t(preset.labelKey) || preset.name}
                 >
                   <span className="text-base">{preset.emoji}</span>
-                  <span className="text-neo-white/70 text-xs font-bold capitalize">
+                  <span className="text-neo-white text-xs font-bold capitalize">
                     {t(preset.labelKey) || preset.name}
                   </span>
                 </button>
@@ -269,7 +269,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
         <div className="space-y-4">
           {/* Color Theme Presets */}
           <div>
-            <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
+            <p className="text-neo-white text-xs font-bold uppercase mb-2">
               {t('avatarBuilder.colorTheme') || 'Color Theme'}
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -294,7 +294,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
                       <span key={role} className="w-3 h-3 rounded-full border border-black/40" style={{ backgroundColor: c }} />
                     ))}
                   </span>
-                  <span className="text-neo-white/70 text-xs font-bold capitalize">
+                  <span className="text-neo-white text-xs font-bold capitalize">
                     {t(theme.labelKey) || theme.name}
                   </span>
                 </button>
@@ -325,7 +325,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
           />
           {/* Body/Clothing Style */}
           <div>
-            <p className="text-neo-white/60 text-xs font-bold uppercase mb-2">
+            <p className="text-neo-white text-xs font-bold uppercase mb-2">
               {t('avatarBuilder.bodyStyle') || 'Outfit'}
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -336,7 +336,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
                   className={`px-3 py-1.5 rounded-neo border-2 text-xs font-bold capitalize transition-colors ${
                     (config.bodyStyle || 'default') === style
                       ? 'border-neo-yellow bg-neo-yellow/20 text-neo-yellow'
-                      : 'border-neo-white/15 text-neo-white/60 hover:border-neo-white/40'
+                      : 'border-neo-white/15 text-neo-white hover:border-neo-white/40'
                   }`}
                 >
                   {t(`avatarBuilder.bodyStyles.${style}`) || style}

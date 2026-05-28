@@ -59,7 +59,7 @@ export function WordHuntCategoryHint({
   return (
     <span
       data-testid="category-hint"
-      className="animate-fade-in font-neo-display text-neo-cream text-base inline-flex items-center gap-1"
+      className="animate-fade-in font-neo-display text-neo-white text-base inline-flex items-center gap-1"
     >
       {label}
       {emoji && (

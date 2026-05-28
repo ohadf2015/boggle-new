@@ -185,7 +185,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                     {player.username}
                   </h3>
                   {isCurrentPlayer && !showWinnerMessage && (
-                    <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold">
+                    <span className="text-xs bg-neo-black text-neo-white px-1.5 py-0.5 rounded-neo font-bold">
                       ({t('playerView.me')})
                     </span>
                   )}
@@ -194,7 +194,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                       initial={{ scale: 0, opacity: 0, rotate: -5 }}
                       animate={{ scale: 1, opacity: 1, rotate: 3 }}
                       transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
-                      className="text-xs font-black bg-neo-pink text-neo-cream px-1.5 py-0.5 rounded-neo border-2 border-neo-black"
+                      className="text-xs font-black bg-neo-pink text-neo-white px-1.5 py-0.5 rounded-neo border-2 border-neo-black"
                     >
                       {t('results.youWon')}
                     </m.span>
@@ -222,7 +222,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                           side="bottom"
                           className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
                         >
-                          <p className="text-xs font-bold text-neo-cream">{player.title.description}</p>
+                          <p className="text-xs font-bold text-neo-white">{player.title.description}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -257,7 +257,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                   initial={{ scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: 3 }}
                   transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 26 }}
-                  className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
+                  className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-white flex items-center gap-1"
                 >
                   <span className="text-xs font-black">🔥 +{totalFireRoundBonus}</span>
                 </m.div>
@@ -271,7 +271,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
         <div className="mb-2 relative z-10">
           <button
             onClick={handleToggleExpand}
-            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-cream dark:bg-slate-700 shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
+            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-cream dark:bg-neo-navy-elevated shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
           >
             <span>{t('hostView.words')}: ({player.allWords?.length || 0})</span>
             {isWordsExpanded ? (
@@ -304,7 +304,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-                      className="bg-slate-800 border-2 border-neo-cyan rounded-neo p-2"
+                      className="bg-neo-navy-light border-2 border-neo-cyan rounded-neo p-2"
                     >
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
@@ -373,7 +373,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             <button
               onClick={() => setShowAchievements(!showAchievements)}
               aria-expanded={showAchievements}
-              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
+              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
             >
               <span className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-neo-pink" />

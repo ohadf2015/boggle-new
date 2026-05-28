@@ -73,7 +73,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     // ancestor has overflow/flex-centering (which breaks `sticky`).
                     // Flow space is reserved by the sibling spacer div above.
                     "fixed top-0 left-0 right-0",
-                    "z-[60] bg-slate-50 dark:bg-slate-900",
+                    "z-[60] bg-slate-50 dark:bg-neo-navy",
                     "min-h-[60px] sm:min-h-[70px] md:min-h-[114px] lg:min-h-[124px] short:min-h-[44px] medium-short:min-h-[52px] md:short:min-h-[48px] lg:short:min-h-[52px] desktop-short:lg:min-h-[56px] desktop-medium-short:lg:min-h-[80px]",
                     className
                 )}

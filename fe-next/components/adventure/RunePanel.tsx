@@ -48,7 +48,7 @@ const RARITY_BG: Record<RuneRarity, string> = {
 };
 
 const RARITY_LABEL: Record<RuneRarity, string> = {
-  common: 'text-neo-white/50',
+  common: 'text-neo-white',
   rare: 'text-neo-cyan',
   epic: 'text-neo-pink',
   legendary: 'text-neo-yellow',
@@ -195,7 +195,7 @@ const RuneCard = memo<RuneCardProps>(({
       {/* Name */}
       <span className={cn(
         'text-xs font-bold text-center leading-tight',
-        owned ? 'text-neo-white' : 'text-neo-white/40'
+        owned ? 'text-neo-white' : 'text-neo-white'
       )}>
         {owned ? t(def.nameKey) : t('adventure.runes.unknown')}
       </span>
@@ -210,7 +210,7 @@ const RuneCard = memo<RuneCardProps>(({
 
       {/* Description (owned only) */}
       {owned && (
-        <span className="text-[10px] text-neo-white/50 text-center mt-1 leading-tight">
+        <span className="text-[10px] text-neo-white text-center mt-1 leading-tight">
           {t(def.descriptionKey)}
         </span>
       )}
@@ -226,7 +226,7 @@ const RuneCard = memo<RuneCardProps>(({
               'w-full py-1.5 text-[10px] font-black uppercase rounded-neo border-2 transition-colors',
               canAfford
                 ? 'border-neo-purple/40 bg-neo-purple/20 text-neo-purple hover:bg-neo-purple/30'
-                : 'border-neo-white/10 bg-neo-white/5 text-neo-white/30 cursor-not-allowed'
+                : 'border-neo-white/10 bg-neo-white/5 text-neo-white cursor-not-allowed'
             )}
           >
             {t('adventure.runes.forge')} ({RUNE_FORGE_COSTS[def.rarity]})
@@ -248,7 +248,7 @@ const RuneCard = memo<RuneCardProps>(({
             className={cn(
               'w-full py-1.5 text-[10px] font-black uppercase rounded-neo border-2 transition-colors flex items-center justify-center gap-1',
               slotsFull
-                ? 'border-neo-white/10 bg-neo-white/5 text-neo-white/30 cursor-not-allowed'
+                ? 'border-neo-white/10 bg-neo-white/5 text-neo-white cursor-not-allowed'
                 : 'border-neo-lime/40 bg-neo-lime/20 text-neo-lime hover:bg-neo-lime/30'
             )}
           >

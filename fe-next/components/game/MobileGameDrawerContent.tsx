@@ -203,16 +203,16 @@ export function MobileGameDrawerContent({
               item.highlight && 'border-neo-lime/40 bg-neo-lime/10'
             )}
           >
-            <span className={cn('shrink-0', item.color || 'text-neo-cream/70')}>
+            <span className={cn('shrink-0', item.color || 'text-neo-white')}>
               {item.icon}
             </span>
             <div className="min-w-0 flex-1">
-              <div className="text-[9px] text-neo-cream/50 font-medium uppercase truncate">
+              <div className="text-[9px] text-neo-white font-medium uppercase truncate">
                 {item.label}
               </div>
               <div className={cn(
                 'text-xs font-black truncate',
-                item.color || 'text-neo-cream'
+                item.color || 'text-neo-white'
               )}>
                 {item.value}
               </div>
@@ -224,7 +224,7 @@ export function MobileGameDrawerContent({
       {/* Word length distribution */}
       {totalDistribution > 0 && (
         <div className="px-1">
-          <div className="text-[9px] text-neo-cream/50 font-medium uppercase mb-0.5">
+          <div className="text-[9px] text-neo-white font-medium uppercase mb-0.5">
             {t('results.wordLengths')}
           </div>
           <div className="flex h-2 rounded-full overflow-hidden border border-neo-black/20">
@@ -250,7 +250,7 @@ export function MobileGameDrawerContent({
               />
             )}
           </div>
-          <div className="flex justify-between text-[8px] text-neo-cream/40 mt-0.5">
+          <div className="flex justify-between text-[8px] text-neo-white mt-0.5">
             <span>≤4: {stats.shortWords}</span>
             <span>5-6: {stats.mediumWords}</span>
             <span>7+: {stats.longWords}</span>

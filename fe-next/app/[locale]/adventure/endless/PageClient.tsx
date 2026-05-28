@@ -140,7 +140,7 @@ export default function EndlessPageClient(): React.JSX.Element {
             >
               <Link
                 href={`/${language}/adventure`}
-                className="absolute top-4 inset-s-4 flex items-center gap-2 text-neo-white/60 hover:text-neo-white transition-colors"
+                className="absolute top-4 inset-s-4 flex items-center gap-2 text-neo-white hover:text-neo-white transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 rtl:scale-x-[-1]" />
                 <span className="text-sm font-bold">{t('common.back')}</span>
@@ -157,7 +157,7 @@ export default function EndlessPageClient(): React.JSX.Element {
               <h1 className="text-3xl sm:text-4xl font-black text-neo-white font-neo-display uppercase tracking-tight">
                 {t('adventure.endlessMode.title')}
               </h1>
-              <p className="text-neo-white/60 text-lg font-neo-body">
+              <p className="text-neo-white text-lg font-neo-body">
                 {t('adventure.endlessMode.subtitle')}
               </p>
 
@@ -204,7 +204,7 @@ export default function EndlessPageClient(): React.JSX.Element {
                 </div>
                 <button
                   onClick={handleExit}
-                  className="text-neo-white/50 hover:text-neo-white text-xs font-bold uppercase transition-colors"
+                  className="text-neo-white hover:text-neo-white text-xs font-bold uppercase transition-colors"
                 >
                   {t('adventure.endlessMode.quit')}
                 </button>
@@ -239,7 +239,7 @@ export default function EndlessPageClient(): React.JSX.Element {
                 {t('adventure.endlessMode.floorCleared')}
               </AdaptiveMotion.div>
 
-              <p className="text-neo-white/70 text-lg">
+              <p className="text-neo-white text-lg">
                 {t('adventure.endlessMode.floor', { floor: endless.currentFloor })} — {lastScore} pts
               </p>
 
@@ -257,7 +257,7 @@ export default function EndlessPageClient(): React.JSX.Element {
               )}
 
               {/* Next floor preview */}
-              <div className="flex items-center gap-4 text-neo-white/50 text-sm mt-2">
+              <div className="flex items-center gap-4 text-neo-white text-sm mt-2">
                 <span className="flex items-center gap-1">
                   <Zap className="w-4 h-4" />
                   {t('adventure.endlessMode.gridSize', { size: diff.gridSize })}
@@ -277,7 +277,7 @@ export default function EndlessPageClient(): React.JSX.Element {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleExit}
-                  className="px-6 py-3 bg-neo-navy-light text-neo-white/70 font-bold uppercase rounded-neo border-3 border-neo-black shadow-hard-sm active:shadow-hard-pressed active:translate-y-[2px] transition-shadow"
+                  className="px-6 py-3 bg-neo-navy-light text-neo-white font-bold uppercase rounded-neo border-3 border-neo-black shadow-hard-sm active:shadow-hard-pressed active:translate-y-[2px] transition-shadow"
                 >
                   {t('adventure.endlessMode.quit')}
                 </AdaptiveMotion.button>
@@ -306,7 +306,7 @@ export default function EndlessPageClient(): React.JSX.Element {
                 {t('adventure.endlessMode.runOver')}
               </h2>
 
-              <p className="text-neo-white/60 text-lg">
+              <p className="text-neo-white text-lg">
                 {t('adventure.endlessMode.floor', { floor: endless.currentFloor })}
               </p>
 
@@ -320,7 +320,7 @@ export default function EndlessPageClient(): React.JSX.Element {
               )}
 
               {endless.highFloor > 0 && (
-                <div className="flex items-center gap-2 text-neo-white/50">
+                <div className="flex items-center gap-2 text-neo-white">
                   <Trophy className="w-4 h-4" />
                   <span className="font-bold text-sm">
                     {t('adventure.endlessMode.highFloor', { floor: endless.highFloor })}
@@ -331,7 +331,7 @@ export default function EndlessPageClient(): React.JSX.Element {
               <div className="flex gap-4 mt-4">
                 <button
                   onClick={handleBackToLobby}
-                  className="px-6 py-3 bg-neo-navy-light text-neo-white/70 font-bold uppercase rounded-neo border-3 border-neo-black shadow-hard-sm active:shadow-hard-pressed active:translate-y-[2px] transition-shadow"
+                  className="px-6 py-3 bg-neo-navy-light text-neo-white font-bold uppercase rounded-neo border-3 border-neo-black shadow-hard-sm active:shadow-hard-pressed active:translate-y-[2px] transition-shadow"
                 >
                   {t('common.back')}
                 </button>

@@ -71,7 +71,7 @@ export function ProfileRankedProgress({
               <span className="w-7 h-7 shrink-0 flex items-center justify-center bg-neo-pink/20 text-neo-pink border border-neo-pink rounded">
                 <Lock className="w-3.5 h-3.5" />
               </span>
-              <span className="text-xs font-bold uppercase tracking-wide text-neo-white/70 truncate">
+              <span className="text-xs font-bold uppercase tracking-wide text-neo-white truncate">
                 {t('ranked.unlockProgress', { current: profile?.casual_games || 0, required: 10 })}
               </span>
             </div>

@@ -377,7 +377,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           transition={{ delay: 0.6 }}
           className="py-3"
         >
-          <p className="text-xs text-neo-cream/50 font-bold uppercase tracking-wider">
+          <p className="text-xs text-neo-white font-bold uppercase tracking-wider">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
         </m.div>
@@ -413,7 +413,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                         className={`px-2 py-1 text-xs font-medium rounded-md ${
                           word === longestWord
                             ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm font-black'
-                            : 'bg-neo-navy text-neo-cream border border-neo-black/30 rounded-neo'
+                            : 'bg-neo-navy text-neo-white border border-neo-black/30 rounded-neo'
                         }`}
                       >
                         {word}

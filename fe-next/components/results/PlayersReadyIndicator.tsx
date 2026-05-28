@@ -100,7 +100,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                   <Hourglass className="text-neo-lime w-3.5 h-3.5" />
                 )}
               </m.div>
-              <span className="font-black text-[11px] uppercase tracking-wide text-neo-cream/80">
+              <span className="font-black text-[11px] uppercase tracking-wide text-neo-white">
                 {allReady ? t('results.everyoneReady') : t('results.waitingForPlayers')}
               </span>
             </div>
@@ -183,11 +183,11 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
               shrink-0 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black
               ${allReady
                 ? 'bg-neo-lime/20 text-neo-lime'
-                : 'bg-neo-navy-light/50 text-neo-cream/60'
+                : 'bg-neo-navy-light/50 text-neo-white'
               }
             `}>
               <span className={allReady ? 'text-neo-lime' : 'text-neo-lime'}>{effectiveReadyCount}</span>
-              <span className="text-neo-cream/30">/</span>
+              <span className="text-neo-white">/</span>
               <span>{totalPlayers}</span>
             </div>
           </div>

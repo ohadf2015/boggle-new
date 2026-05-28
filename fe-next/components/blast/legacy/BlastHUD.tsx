@@ -170,7 +170,7 @@ export function BlastHUD({
                   data-consumed={buffConsumed ? 'true' : 'false'}
                   className={cn(
                     'shrink-0 inline-flex items-center gap-1.5 rounded-lg border-2 border-black px-2.5 py-1 text-xs font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all animate-neo-pop',
-                    buffConsumed ? 'bg-white/20 text-white/40 line-through opacity-60 shadow-none' : `${meta.bg} blast-heartbeat`,
+                    buffConsumed ? 'bg-white/20 text-white line-through opacity-60 shadow-none' : `${meta.bg} blast-heartbeat`,
                   )}
                   style={NO_TEXT_SHADOW_STYLE}
                   aria-label={(t(meta.label) || activeBuff) + (buffConsumed ? ` (${t('common.used') || 'used'})` : '')}
@@ -188,7 +188,7 @@ export function BlastHUD({
           {onShowHelp && (
             <button
               onClick={onShowHelp}
-              className="text-white/30 hover:text-white/60 transition-colors"
+              className="text-white hover:text-white transition-colors"
               aria-label={t('blast.help')}
             >
               <HelpCircle className="h-4 w-4" />
@@ -196,7 +196,7 @@ export function BlastHUD({
           )}
           <button
             onClick={onQuit}
-            className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/8 hover:bg-neo-red/25 text-white/50 hover:text-neo-red transition-colors"
+            className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/8 hover:bg-neo-red/25 text-white hover:text-neo-red transition-colors"
             aria-label={t('common.quit')}
             data-testid="blast-quit-btn"
           >
@@ -217,7 +217,7 @@ export function BlastHUD({
           <span className="text-amber-400 text-base shrink-0">★</span>
           <span
             className={cn(
-              'text-2xl font-black tabular-nums truncate transition-transform duration-150 text-neo-cream',
+              'text-2xl font-black tabular-nums truncate transition-transform duration-150 text-neo-white',
               scorePulse && 'scale-[1.15]',
             )}
             style={{ minWidth: '5ch' }}
@@ -240,16 +240,16 @@ export function BlastHUD({
                   {movesRemaining}
                 </span>
               </div>
-              <span className={cn('text-[9px] font-bold uppercase tracking-wider leading-none', movesRemaining <= 3 ? 'text-neo-red' : 'text-white/50')}>
+              <span className={cn('text-[9px] font-bold uppercase tracking-wider leading-none', movesRemaining <= 3 ? 'text-neo-red' : 'text-white')}>
                 {t('blast.movesLeft')}
               </span>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-0.5 w-[56px]">
-              <span className="text-2xl font-black text-neo-cream tabular-nums">
+              <span className="text-2xl font-black text-neo-white tabular-nums">
                 {wordsFoundCount}
               </span>
-              <span className="text-[9px] font-bold uppercase tracking-wider text-white/50">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-white">
                 {t('blast.words')}
               </span>
             </div>
@@ -271,8 +271,8 @@ export function BlastHUD({
             data-testid="blast-progress-label"
             className="text-sm font-black tabular-nums whitespace-nowrap"
           >
-            <span className={goalMet ? 'text-neo-lime' : 'text-neo-cream'}>{clearPct}%</span>
-            <span className="text-white/45"> / {BLAST_WAVE_GOAL_PCT}%</span>
+            <span className={goalMet ? 'text-neo-lime' : 'text-neo-white'}>{clearPct}%</span>
+            <span className="text-white"> / {BLAST_WAVE_GOAL_PCT}%</span>
           </span>
           <div className="relative w-full h-3.5 bg-white/10 rounded-full overflow-hidden border border-white/10">
             <div
@@ -300,7 +300,7 @@ export function BlastHUD({
               style={{ left: `${BLAST_WAVE_GOAL_PCT}%` }}
             />
           </div>
-          <span className="text-[9px] font-bold uppercase tracking-wider text-white/40 tabular-nums">
+          <span className="text-[9px] font-bold uppercase tracking-wider text-white tabular-nums">
             {tilesCleared}/{totalTiles} {t('blast.cleared')}
           </span>
         </div>

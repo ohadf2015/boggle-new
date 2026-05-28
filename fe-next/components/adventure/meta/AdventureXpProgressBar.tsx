@@ -121,25 +121,25 @@ const AdventureXpProgressBar = memo<AdventureXpProgressBarProps>(({
         {!progress.isMaxLevel && (
           <div className="flex items-center gap-1">
             <span className={cn(
-              'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70',
+              'font-neo-body font-bold text-neo-black/70 dark:text-neo-white',
               sizeConfig.xpText
             )}>
               {progress.xpInCurrentLevel}
             </span>
             <span className={cn(
-              'font-neo-body text-neo-black/50 dark:text-neo-white/50',
+              'font-neo-body text-neo-black/50 dark:text-neo-white',
               sizeConfig.xpText
             )}>
               /
             </span>
             <span className={cn(
-              'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70',
+              'font-neo-body font-bold text-neo-black/70 dark:text-neo-white',
               sizeConfig.xpText
             )}>
               {progress.xpNeededForNextLevel}
             </span>
             <span className={cn(
-              'font-neo-body text-neo-black/50 dark:text-neo-white/50',
+              'font-neo-body text-neo-black/50 dark:text-neo-white',
               sizeConfig.xpText
             )}>
               {t('adventure.xp.label')}

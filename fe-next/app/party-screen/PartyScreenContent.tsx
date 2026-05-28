@@ -24,7 +24,7 @@ export default function PartyScreenContent() {
   };
 
   return (
-    <div className="min-h-dvh bg-neo-navy text-neo-cream p-6 flex flex-col items-center justify-center">
+    <div className="min-h-dvh bg-neo-navy text-neo-white p-6 flex flex-col items-center justify-center">
       {/* Halftone texture */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.06]"
@@ -43,7 +43,7 @@ export default function PartyScreenContent() {
               {t('partyScreen.title')}
             </h1>
           </div>
-          <p className="text-lg text-neo-cream/80">
+          <p className="text-lg text-neo-white">
             {t('partyScreen.subtitle')}
           </p>
         </div>
@@ -54,14 +54,14 @@ export default function PartyScreenContent() {
             <QrCode className="w-6 h-6 text-neo-cyan shrink-0 mt-0.5" />
             <div>
               <h3 className="font-bold text-neo-lime">{t('partyScreen.qrJoin')}</h3>
-              <p className="text-sm text-neo-cream/70">{t('partyScreen.qrJoinDesc')}</p>
+              <p className="text-sm text-neo-white">{t('partyScreen.qrJoinDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3 bg-neo-cream/10 p-4 rounded-neo border-2 border-neo-cream/20">
             <Users className="w-6 h-6 text-neo-pink shrink-0 mt-0.5" />
             <div>
               <h3 className="font-bold text-neo-lime">{t('partyScreen.liveLeaderboard')}</h3>
-              <p className="text-sm text-neo-cream/70">{t('partyScreen.liveLeaderboardDesc')}</p>
+              <p className="text-sm text-neo-white">{t('partyScreen.liveLeaderboardDesc')}</p>
             </div>
           </div>
         </div>
@@ -69,7 +69,7 @@ export default function PartyScreenContent() {
         {/* Join Form */}
         <form onSubmit={handleJoinRoom} className="space-y-4">
           <div>
-            <label htmlFor="roomCode" className="block text-sm font-bold text-neo-cream/80 mb-2">
+            <label htmlFor="roomCode" className="block text-sm font-bold text-neo-white mb-2">
               {t('partyScreen.enterRoomCode')}
             </label>
             <input
@@ -92,7 +92,7 @@ export default function PartyScreenContent() {
         </form>
 
         {/* Tip */}
-        <p className="text-xs text-neo-cream/50">
+        <p className="text-xs text-neo-white">
           {t('partyScreen.tip')}
         </p>
       </div>

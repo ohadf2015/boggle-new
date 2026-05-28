@@ -132,7 +132,7 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
           <h3 className="font-black text-base text-neo-white leading-tight">
             {t('wordHuntAnnouncement.title')}
           </h3>
-          <p className="text-[11px] text-neo-white/60 mt-0.5 leading-snug line-clamp-2">
+          <p className="text-[11px] text-neo-white mt-0.5 leading-snug line-clamp-2">
             {t('wordHuntAnnouncement.subtitle')}
           </p>
         </div>

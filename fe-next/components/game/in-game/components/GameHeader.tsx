@@ -49,7 +49,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
               className="w-11 h-11 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center"
               aria-label={t('help.viewTutorial')}
             >
-              <HelpCircle className="w-5 h-5 text-neo-cream" />
+              <HelpCircle className="w-5 h-5 text-neo-white" />
             </AdaptiveMotion.button>
           )}
         </div>
@@ -92,7 +92,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
           className="w-9 h-9 md:w-10 md:h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
           aria-label={t('help.viewTutorial')}
         >
-          <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-neo-cream" />
+          <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-neo-white" />
         </AdaptiveMotion.button>
       )}
       {hints && hints.isSinglePlayer && (

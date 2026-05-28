@@ -38,7 +38,7 @@ const CreateBoardCTA = memo<CreateBoardCTAProps>(({ gamesPlayed, className }) =>
         <p className="text-sm font-neo-display font-bold text-neo-white">
           {t('ugc.creator.makeYourOwn')}
         </p>
-        <p className="text-xs text-neo-white/50 font-neo-body">
+        <p className="text-xs text-neo-white font-neo-body">
           {t('ugc.createBoard')}
         </p>
       </div>

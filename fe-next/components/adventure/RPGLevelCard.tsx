@@ -121,9 +121,9 @@ const RPGLevelCard = memo(function RPGLevelCard({
           {/* Level Number or Lock */}
           {isLocked ? (
             <div className="flex flex-col items-center">
-              <Lock data-testid="lock-icon" className="w-7 h-7 text-neo-white/40 mb-1" />
+              <Lock data-testid="lock-icon" className="w-7 h-7 text-neo-white mb-1" />
               {levelNum > 1 && (
-                <span className="text-[9px] text-neo-white/30 font-neo-body text-center leading-tight">
+                <span className="text-[9px] text-neo-white font-neo-body text-center leading-tight">
                   {t('adventure.unlockRequirement', { level: String(levelNum - 1) })}
                 </span>
               )}
@@ -134,7 +134,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
               className={cn(
                 'font-neo-display font-black leading-none mb-2',
                 isBoss ? 'text-5xl' : 'text-4xl sm:text-5xl',
-                isCurrent ? 'text-neo-white' : isCompleted ? 'text-neo-white/90' : 'text-neo-white/70',
+                isCurrent ? 'text-neo-white' : isCompleted ? 'text-neo-white' : 'text-neo-white',
               )}
               style={{
                 textShadow: isCurrent
@@ -158,7 +158,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
                     'transition-all duration-300',
                     isFilled
                       ? 'w-5 h-5 text-neo-yellow fill-neo-yellow'
-                      : 'w-4 h-4 text-neo-white/20 fill-neo-white/5'
+                      : 'w-4 h-4 text-neo-white fill-neo-white/5'
                   )}
                   style={isFilled ? { filter: 'drop-shadow(0 0 5px rgba(255,225,53,0.5))' } : undefined}
                 />
@@ -194,12 +194,12 @@ const RPGLevelCard = memo(function RPGLevelCard({
           data-testid="reward-tokens"
           className="flex items-center justify-center gap-2.5 py-1.5 border-t border-neo-white/5"
         >
-          <Coins className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white/10' : 'text-neo-yellow/60')} />
+          <Coins className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-yellow/60')} />
           {(levelNum % 3 === 0 || isBoss) && (
-            <Gem className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white/10' : isBoss ? 'text-neo-purple/80' : 'text-neo-cyan/60')} />
+            <Gem className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : isBoss ? 'text-neo-purple/80' : 'text-neo-cyan/60')} />
           )}
           {isBoss && (
-            <Zap className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white/10' : 'text-neo-lime/60')} />
+            <Zap className={cn('w-3.5 h-3.5', isLocked ? 'text-neo-white' : 'text-neo-lime/60')} />
           )}
         </div>
 

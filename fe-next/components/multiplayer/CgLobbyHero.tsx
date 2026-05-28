@@ -175,7 +175,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.15 }}
-              className="font-neo-body text-base sm:text-lg text-neo-cream/85"
+              className="font-neo-body text-base sm:text-lg text-neo-white"
             >
               {sub}
             </m.p>
@@ -260,7 +260,7 @@ const CgLobbyHero: React.FC<CgLobbyHeroProps> = ({ variant, displayName, onPlay,
             transition={{ duration: 0.35, delay: 0.4 }}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.97 }}
-            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-neo border-neo-thick border-black bg-neo-navy text-neo-cream font-neo-display text-sm uppercase tracking-tight shadow-hard-sm hover:bg-neo-cyan hover:text-black hover:shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-[background,box-shadow,color] duration-150 motion-reduce:!transform-none"
+            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-neo border-neo-thick border-black bg-neo-navy text-neo-white font-neo-display text-sm uppercase tracking-tight shadow-hard-sm hover:bg-neo-cyan hover:text-black hover:shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-[background,box-shadow,color] duration-150 motion-reduce:!transform-none"
           >
             <span>{t('cg.hero.browseRooms')}</span>
           </m.button>

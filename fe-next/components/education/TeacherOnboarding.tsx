@@ -179,7 +179,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
             onClick={handleSkip}
             className={cn(
               'absolute top-4 p-2',
-              'text-neo-white/50 hover:text-neo-white',
+              'text-neo-white hover:text-neo-white',
               'transition-colors',
               isRTL ? 'left-4' : 'right-4'
             )}
@@ -234,7 +234,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
               </h2>
 
               {/* Description */}
-              <p className="text-neo-white/70 font-neo-body text-base sm:text-lg leading-relaxed max-w-sm mx-auto">
+              <p className="text-neo-white font-neo-body text-base sm:text-lg leading-relaxed max-w-sm mx-auto">
                 {t(step.descriptionKey) || step.descriptionKey}
               </p>
 
@@ -243,7 +243,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
                 <span className={cn('text-sm font-bold', step.color)}>
                   {t('education.onboarding.step')} {currentStep + 1}
                 </span>
-                <span className="text-neo-white/50">
+                <span className="text-neo-white">
                   {t('education.onboarding.of')} {ONBOARDING_STEPS.length}
                 </span>
               </div>

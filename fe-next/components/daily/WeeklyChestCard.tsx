@@ -140,7 +140,7 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
       {/* Header: title + day counter pill */}
       <div className="flex items-center justify-between mb-3 relative">
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-neo-cream/60" />
+          <Calendar className="w-4 h-4 text-neo-white" />
           <span className="font-neo-display font-black text-sm text-neo-white uppercase tracking-wider">
             {t('daily.weeklyChest.title')}
           </span>
@@ -204,12 +204,12 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
           </div>
 
           {/* Status line: X of 7 + days remaining */}
-          <p className="mt-2 text-xs text-neo-cream/70 font-bold">
+          <p className="mt-2 text-xs text-neo-white font-bold">
             <span className="text-neo-white">
               {t('daily.weeklyChest.dayProgress').replace('{day}', String(safeDays))}
             </span>
             {!isClaimable && (
-              <span className="ms-2 text-neo-cream/50">
+              <span className="ms-2 text-neo-white">
                 · {t('daily.weeklyChest.daysRemaining')
                     .replace('{n}', String(remaining))
                     .replace('{tier}', tierLabel)}

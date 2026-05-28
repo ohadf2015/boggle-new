@@ -66,7 +66,7 @@ const WordMarqueeTicker: React.FC<WordMarqueeTickerProps> = memo(({
               <React.Fragment key={`${copy}-${i}`}>
                 <span className="text-neo-lime drop-shadow-[0_0_4px_rgba(191,255,0,0.3)]">{w.word.toUpperCase()}</span>
                 {' '}
-                <span className="text-white/40 text-[9px]">+{w.score}</span>
+                <span className="text-white text-[9px]">+{w.score}</span>
                 {i < tickerWords.length - 1 && (
                   <span className="text-neo-lime/20 mx-3">◆</span>
                 )}

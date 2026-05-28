@@ -152,10 +152,10 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
           🐺
         </AdaptiveMotion.div>
         <h1 className="font-neo-display text-neo-purple text-4xl uppercase">Shadow Clash</h1>
-        <p className="font-neo-body text-neo-cream/50 mt-3 animate-pulse">
+        <p className="font-neo-body text-neo-white mt-3 animate-pulse">
           {t('party.dealingRoles') || 'Dealing roles...'}
         </p>
-        <p className="font-neo-body text-neo-cream/30 text-sm mt-1">
+        <p className="font-neo-body text-neo-white text-sm mt-1">
           {t('party.checkYourPhone') || 'Check your phone!'}
         </p>
 
@@ -169,7 +169,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               transition={{ delay: i * 0.2 }}
               className="bg-neo-navy-elevated border-3 border-neo-purple/40 rounded-neo-lg px-4 py-2 shadow-hard"
             >
-              <span className="font-neo-display text-neo-cream">{name}</span>
+              <span className="font-neo-display text-neo-white">{name}</span>
             </AdaptiveMotion.div>
           ))}
         </div>
@@ -191,7 +191,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
           <h2 className="font-neo-display text-neo-purple text-3xl uppercase">
             {t('party.nightFalls') || 'Night Falls...'}
           </h2>
-          <p className="font-neo-body text-neo-cream/40 mt-2">
+          <p className="font-neo-body text-neo-white mt-2">
             Round {round}
           </p>
 
@@ -201,7 +201,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
-              className="font-neo-body text-neo-cream/60 italic text-lg"
+              className="font-neo-body text-neo-white italic text-lg"
             >
               {t('party.shadowsAwaken') || 'Shadows awaken... choose your victim.'}
             </AdaptiveMotion.p>
@@ -209,7 +209,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 8 }}
-              className="font-neo-body text-neo-cream/60 italic text-lg"
+              className="font-neo-body text-neo-white italic text-lg"
             >
               {t('party.seerInvestigates') || 'The Seer opens their eyes...'}
             </AdaptiveMotion.p>
@@ -217,13 +217,13 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 15 }}
-              className="font-neo-body text-neo-cream/60 italic text-lg"
+              className="font-neo-body text-neo-white italic text-lg"
             >
               {t('party.medicProtects') || 'The Medic extends their protection...'}
             </AdaptiveMotion.p>
           </div>
 
-          <div className="mt-8 font-neo-display text-neo-cream/30 text-xl">
+          <div className="mt-8 font-neo-display text-neo-white text-xl">
             {timeRemaining}s
           </div>
         </div>
@@ -246,7 +246,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
             <h2 className="font-neo-display text-neo-lime text-3xl uppercase">
               {t('party.someoneWasSaved') || 'Someone was saved!'}
             </h2>
-            <p className="font-neo-body text-neo-cream/50 mt-2">
+            <p className="font-neo-body text-neo-white mt-2">
               🛡️ {t('party.medicSaved') || 'The Medic protected their target.'}
             </p>
           </AdaptiveMotion.div>
@@ -275,7 +275,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
             </AdaptiveMotion.div>
           </AdaptiveMotion.div>
         ) : (
-          <h2 className="font-neo-display text-neo-cream text-2xl uppercase">
+          <h2 className="font-neo-display text-neo-white text-2xl uppercase">
             {t('party.peacefulNight') || 'A peaceful night...'}
           </h2>
         )}
@@ -287,15 +287,15 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
   if (phase === 'discussion') {
     return (
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
-        <h2 className="font-neo-display text-neo-cream text-3xl uppercase mb-2">
+        <h2 className="font-neo-display text-neo-white text-3xl uppercase mb-2">
           {t('party.discuss') || 'Discuss!'}
         </h2>
-        <p className="font-neo-body text-neo-cream/40 mb-6">
+        <p className="font-neo-body text-neo-white mb-6">
           {t('party.whoIsTheShadow') || 'Who is the Shadow among you?'}
         </p>
 
         {/* Timer */}
-        <div className={`font-neo-display text-5xl mb-8 ${timeRemaining <= 10 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+        <div className={`font-neo-display text-5xl mb-8 ${timeRemaining <= 10 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
         </div>
 
@@ -306,7 +306,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               key={name}
               className="bg-neo-navy-elevated border-3 border-neo-cream/30 rounded-neo-lg px-4 py-2 shadow-hard"
             >
-              <span className="font-neo-display text-neo-cream">{name}</span>
+              <span className="font-neo-display text-neo-white">{name}</span>
             </div>
           ))}
         </div>
@@ -314,7 +314,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
         {/* Eliminated history */}
         {eliminatedHistory.length > 0 && (
           <div className="mt-8 text-center">
-            <p className="text-neo-cream/30 font-neo-body text-xs uppercase mb-2">Eliminated</p>
+            <p className="text-neo-white font-neo-body text-xs uppercase mb-2">Eliminated</p>
             <div className="flex gap-2 justify-center">
               {eliminatedHistory.map((e, i) => (
                 <span key={`${e.username}-${i}`} className="text-neo-red/50 font-neo-body text-sm line-through">
@@ -335,10 +335,10 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
         <h2 className="font-neo-display text-neo-red text-3xl uppercase mb-4">
           {t('party.vote') || 'Vote!'}
         </h2>
-        <div className={`font-neo-display text-4xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-cream'}`}>
+        <div className={`font-neo-display text-4xl ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
           {timeRemaining}s
         </div>
-        <p className="font-neo-body text-neo-cream/40 mt-4">
+        <p className="font-neo-body text-neo-white mt-4">
           {t('party.voteOnPhone') || 'Cast your vote on your phone!'}
         </p>
       </div>
@@ -350,7 +350,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
     const voteEntries = Object.entries(voteData.votes);
     return (
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
-        <h2 className="font-neo-display text-neo-cream text-2xl uppercase mb-6">
+        <h2 className="font-neo-display text-neo-white text-2xl uppercase mb-6">
           {t('party.theVotes') || 'The votes are in...'}
         </h2>
 
@@ -364,9 +364,9 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               transition={{ delay: i * 0.5 }}
               className="flex items-center justify-between bg-neo-navy-elevated border-2 border-neo-cream/20 rounded-neo px-4 py-2"
             >
-              <span className="font-neo-body text-neo-cream/60 text-sm">{voter}</span>
-              <span className="text-neo-cream/30">→</span>
-              <span className={`font-neo-display text-sm ${target === 'skip' ? 'text-neo-cream/30' : 'text-neo-red'}`}>
+              <span className="font-neo-body text-neo-white text-sm">{voter}</span>
+              <span className="text-neo-white">→</span>
+              <span className={`font-neo-display text-sm ${target === 'skip' ? 'text-neo-white' : 'text-neo-red'}`}>
                 {target === 'skip' ? '⏭️ Skip' : target}
               </span>
             </AdaptiveMotion.div>
@@ -392,7 +392,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               </div>
             </>
           ) : (
-            <h3 className="font-neo-display text-neo-cream/50 text-xl">
+            <h3 className="font-neo-display text-neo-white text-xl">
               {t('party.noConsensus') || 'No consensus. No one eliminated.'}
             </h3>
           )}
@@ -438,11 +438,11 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
                   ${wasEliminated ? 'opacity-50' : ''}
                 `}
               >
-                <p className="font-neo-display text-neo-cream text-sm">{username}</p>
+                <p className="font-neo-display text-neo-white text-sm">{username}</p>
                 <p className={`font-neo-display text-xs mt-1 ${isShadow ? 'text-neo-red' : 'text-neo-purple'}`}>
                   {role === 'shadow' ? '🐺 Shadow' : role === 'seer' ? '👁️ Seer' : role === 'medic' ? '🛡️ Medic' : '👤 Citizen'}
                 </p>
-                {wasEliminated && <p className="text-neo-cream/30 text-xs mt-0.5">💀</p>}
+                {wasEliminated && <p className="text-neo-white text-xs mt-0.5">💀</p>}
               </AdaptiveMotion.div>
             );
           })}
@@ -457,7 +457,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
       <div className="text-center">
         <div className="text-6xl mb-4">🐺</div>
         <h1 className="font-neo-display text-neo-purple text-3xl uppercase">Shadow Clash</h1>
-        <p className="text-neo-cream/40 font-neo-body mt-2 animate-pulse">
+        <p className="text-neo-white font-neo-body mt-2 animate-pulse">
           {t('party.starting') || 'Starting...'}
         </p>
       </div>

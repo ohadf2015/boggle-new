@@ -45,7 +45,7 @@ export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onC
             <h2 className="text-xl font-black text-center" style={{ color: modeColor }}>
               {t('blast.undoAdGate.title', 'More undos?')}
             </h2>
-            <p className="text-sm text-white/80 text-center leading-relaxed">
+            <p className="text-sm text-white text-center leading-relaxed">
               {t(
                 'blast.undoAdGate.body',
                 'Watch a short ad to keep reversing moves. Your first two undos each level are always free.',
@@ -63,7 +63,7 @@ export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onC
               <button
                 data-testid="blast-undo-ad-cancel"
                 onClick={onCancel}
-                className="w-full px-5 py-2 rounded-lg font-medium text-white/70 hover:text-white transition-colors"
+                className="w-full px-5 py-2 rounded-lg font-medium text-white hover:text-white transition-colors"
               >
                 {t('blast.undoAdGate.cancel', 'Not now')}
               </button>

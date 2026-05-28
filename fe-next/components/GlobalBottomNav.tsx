@@ -366,7 +366,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                 "px-3 py-2 short:py-1 medium-short:py-1.5",
                                 "transition-all duration-150",
                                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded",
-                                isActive ? tab.color : "text-neo-white/40"
+                                isActive ? tab.color : "text-neo-white"
                             )}
                             aria-label={t(tab.labelKey)}
                             aria-current={isActive ? 'page' : undefined}
@@ -464,7 +464,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                             <m.span
                                 className={cn(
                                     "text-[10px] short:text-[9px] font-bold uppercase tracking-wide relative z-10 short:hidden medium-short:text-[9px]",
-                                    isActive ? tab.color : "text-neo-white/40"
+                                    isActive ? tab.color : "text-neo-white"
                                 )}
                                 animate={{
                                     opacity: isActive ? 1 : 0.6,

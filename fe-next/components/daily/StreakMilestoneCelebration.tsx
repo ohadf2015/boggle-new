@@ -214,7 +214,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
               className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard mb-4"
             >
               <span className="text-4xl font-black text-white">{streak}</span>
-              <span className="text-lg font-bold text-white/90">DAYS</span>
+              <span className="text-lg font-bold text-white">DAYS</span>
             </m.div>
 
             {/* Subtitle */}

@@ -137,7 +137,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         </div>
         <Link
           href={`/${language}/leaderboard`}
-          className="flex items-center justify-center gap-1 mt-2 pt-2 border-t border-neo-white/10 text-neo-white/60 hover:text-neo-white text-xs font-bold transition-colors"
+          className="flex items-center justify-center gap-1 mt-2 pt-2 border-t border-neo-white/10 text-neo-white hover:text-neo-white text-xs font-bold transition-colors"
         >
           {t('landing.viewFullLeaderboard')}
           <ArrowIcon className="w-3 h-3" />
@@ -170,7 +170,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
           >
             <span className={cn(
               'font-black text-sm w-7 h-7 rounded-full flex items-center justify-center shrink-0 border-2 border-neo-black',
-              i < 3 ? `${RANK_BG[i]} ${RANK_TEXT[i]}` : 'bg-neo-white/10 text-neo-white/50'
+              i < 3 ? `${RANK_BG[i]} ${RANK_TEXT[i]}` : 'bg-neo-white/10 text-neo-white'
             )}>
               {i + 1}
             </span>
@@ -211,7 +211,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         className={cn(
           'flex items-center justify-center gap-1.5 mt-3 pt-3',
           'border-t border-neo-white/10',
-          'text-neo-white/60 hover:text-neo-white text-sm font-bold',
+          'text-neo-white hover:text-neo-white text-sm font-bold',
           'transition-colors'
         )}
       >

@@ -77,14 +77,14 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
               className="p-1.5 rounded-neo hover:bg-neo-white/10 transition-colors"
               aria-label={t('common.close')}
             >
-              <X className="w-5 h-5 text-neo-white/60" />
+              <X className="w-5 h-5 text-neo-white" />
             </button>
           </div>
 
           {/* Word Count */}
           <div className="text-center mb-6 p-3 bg-neo-cyan/10 border border-neo-cyan/20 rounded-neo">
             <span className="text-3xl font-black text-neo-cyan tabular-nums">{words.length}</span>
-            <p className="text-sm text-neo-white/60 font-bold">{t('adventure.album.uniqueWords')}</p>
+            <p className="text-sm text-neo-white font-bold">{t('adventure.album.uniqueWords')}</p>
           </div>
 
           {/* Milestones */}
@@ -108,7 +108,7 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
                 )}>
                   {m.isClaimed ? <Check className="w-4 h-4 text-neo-black" /> :
                    m.isUnlocked ? <Star className="w-4 h-4 text-neo-black" /> :
-                   <Lock className="w-4 h-4 text-neo-white/40" />}
+                   <Lock className="w-4 h-4 text-neo-white" />}
                 </div>
 
                 {/* Info */}
@@ -117,7 +117,7 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
                     'text-sm font-bold',
                     m.isClaimed ? 'text-neo-lime' :
                     m.isUnlocked ? 'text-neo-yellow' :
-                    'text-neo-white/50'
+                    'text-neo-white'
                   )}>
                     {t(m.nameKey)} — {m.target} {t('adventure.album.uniqueWords')}
                   </p>
@@ -154,14 +154,14 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
           {/* Word Grid */}
           {words.length > 0 && (
             <>
-              <h3 className="text-sm font-bold text-neo-white/60 uppercase mb-2">
+              <h3 className="text-sm font-bold text-neo-white uppercase mb-2">
                 {t('adventure.album.uniqueWords')}
               </h3>
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {displayWords.map((word) => (
                   <span
                     key={word}
-                    className="px-2 py-0.5 text-xs font-mono font-bold text-neo-white/70 bg-neo-white/5 border border-neo-white/10 rounded"
+                    className="px-2 py-0.5 text-xs font-mono font-bold text-neo-white bg-neo-white/5 border border-neo-white/10 rounded"
                   >
                     {word}
                   </span>

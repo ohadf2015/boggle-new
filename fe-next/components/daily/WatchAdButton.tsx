@@ -153,7 +153,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
                 {content.text}
               </div>
               {content.subtext && (
-                <div className="text-xs mt-0.5 text-white/80">
+                <div className="text-xs mt-0.5 text-white">
                   {content.subtext}
                 </div>
               )}

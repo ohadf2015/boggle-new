@@ -367,7 +367,7 @@ export function PortraitGameLayout({
               transition={{ type: 'spring', stiffness: 100, damping: 20 }}
             />
           </div>
-          <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider tabular-nums">
+          <span className="text-[10px] font-bold text-white uppercase tracking-wider tabular-nums">
             {validWordCount}/{totalBoardWords}
           </span>
         </div>
@@ -482,7 +482,7 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
             ? 'bg-linear-to-r from-neo-lime to-lime-300 border-neo-lime'
             : score === targetHighScore
               ? 'bg-linear-to-r from-neo-lime to-yellow-300 border-neo-lime'
-              : 'bg-neo-cream dark:bg-slate-700 border-neo-black dark:border-slate-500'
+              : 'bg-neo-cream dark:bg-neo-navy-elevated border-neo-black dark:border-slate-500'
         )}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1 md:gap-2">
@@ -503,7 +503,7 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
               ) : (
                 <>
                   <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-lime" />
-                  <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white/70">
+                  <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white">
                     {t('challenge.recordToBeat')}: <span className="font-black text-neo-black dark:text-neo-white">{targetHighScore}</span>
                   </span>
                 </>
@@ -520,7 +520,7 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
                   +{score - targetHighScore}
                 </AdaptiveMotion.span>
               ) : score < targetHighScore ? (
-                <span className="font-bold text-xs md:text-sm text-neo-black/75 dark:text-neo-white/75">
+                <span className="font-bold text-xs md:text-sm text-neo-black/75 dark:text-neo-white">
                   {targetHighScore - score} {t('challenge.toGo')}
                 </span>
               ) : null}
@@ -541,7 +541,7 @@ function ChallengeProgressTracker({ score, targetHighScore, t }: ChallengeProgre
       ) : (
         <div className="flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-1 md:py-2 bg-neo-cyan/20 text-neo-black dark:bg-neo-cyan/10 dark:text-white rounded-neo border-2 border-dashed border-neo-cyan">
           <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-cyan" />
-          <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white/70">
+          <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white">
             {t('challenge.settingFirst')}
           </span>
         </div>

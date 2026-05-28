@@ -24,7 +24,7 @@ export function MPGameAbortedModal({ wordCount, onContinueSolo, onReturnToLobby 
           <p className="font-neo-display text-xl font-bold text-neo-white">
             {t('mp.abort.title')}
           </p>
-          <p className="font-neo-body text-neo-white/60 text-sm">
+          <p className="font-neo-body text-neo-white text-sm">
             {t('mp.abort.body')} {wordCount}
           </p>
         </div>
@@ -39,7 +39,7 @@ export function MPGameAbortedModal({ wordCount, onContinueSolo, onReturnToLobby 
           <button
             onClick={onReturnToLobby}
             aria-label={t('mp.abort.returnToLobby')}
-            className="w-full px-5 py-3 font-neo-body text-sm text-neo-white/60 border border-neo-white/20 rounded-neo hover:border-neo-white/40 transition-colors"
+            className="w-full px-5 py-3 font-neo-body text-sm text-neo-white border border-neo-white/20 rounded-neo hover:border-neo-white/40 transition-colors"
           >
             {t('mp.abort.returnToLobby')}
           </button>

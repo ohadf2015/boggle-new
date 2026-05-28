@@ -452,7 +452,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.25, delay: 0.5 }}
             onClick={handleSkipOnboarding}
-            className="absolute top-4 end-4 z-20 min-h-[44px] px-3 py-2 text-xs font-bold uppercase tracking-wide text-neo-cream/70 hover:text-neo-cream bg-neo-navy/60 border-2 border-neo-cream/20 hover:border-neo-cream/40 rounded-neo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan transition-colors"
+            className="absolute top-4 end-4 z-20 min-h-[44px] px-3 py-2 text-xs font-bold uppercase tracking-wide text-neo-white hover:text-neo-white bg-neo-navy/60 border-2 border-neo-cream/20 hover:border-neo-cream/40 rounded-neo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan transition-colors"
           >
             {t('onboarding.skipTutorial')}
           </m.button>

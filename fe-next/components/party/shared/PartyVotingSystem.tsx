@@ -47,7 +47,7 @@ function PhoneBallotInner({ options, onVote, voted, timeRemaining, accentColor =
 
   return (
     <div className="flex flex-col gap-3 p-4">
-      <p className="font-neo-display text-neo-cream text-center uppercase text-sm mb-2">
+      <p className="font-neo-display text-neo-white text-center uppercase text-sm mb-2">
         {voted ? (t('party.voted') || 'Vote locked!') : (t('party.vote') || 'Pick your favorite!')}
       </p>
       {options.map((option) => {
@@ -65,8 +65,8 @@ function PhoneBallotInner({ options, onVote, voted, timeRemaining, accentColor =
               ${isSelected
                 ? `bg-${accentColor} text-neo-black shadow-hard`
                 : option.isOwn
-                  ? 'bg-neo-navy-elevated text-neo-cream/30 border-neo-cream/15 cursor-not-allowed'
-                  : 'bg-neo-navy-elevated text-neo-cream shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed'
+                  ? 'bg-neo-navy-elevated text-neo-white border-neo-cream/15 cursor-not-allowed'
+                  : 'bg-neo-navy-elevated text-neo-white shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed'
               }
             `}
           >
@@ -101,11 +101,11 @@ function TvResultsInner({ results, accentColor = 'neo-lime' }: TvResultsProps) {
         >
           {/* Label */}
           <div className="w-1/3 text-right">
-            <p className={`font-neo-display text-lg uppercase truncate ${result.isWinner ? `text-${accentColor}` : 'text-neo-cream'}`}>
+            <p className={`font-neo-display text-lg uppercase truncate ${result.isWinner ? `text-${accentColor}` : 'text-neo-white'}`}>
               {result.label}
             </p>
             {result.sublabel && (
-              <p className="font-neo-body text-neo-cream/50 text-xs">{result.sublabel}</p>
+              <p className="font-neo-body text-neo-white text-xs">{result.sublabel}</p>
             )}
           </div>
 
@@ -123,7 +123,7 @@ function TvResultsInner({ results, accentColor = 'neo-lime' }: TvResultsProps) {
           </div>
 
           {/* Vote count */}
-          <span className="w-12 text-center font-neo-display text-neo-cream/50 text-sm">
+          <span className="w-12 text-center font-neo-display text-neo-white text-sm">
             {result.votes}
           </span>
         </AdaptiveMotion.div>

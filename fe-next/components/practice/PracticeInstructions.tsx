@@ -148,7 +148,7 @@ export default function PracticeInstructions({ mode, autoOpen = true }: Props) {
           data-testid="practice-instructions-dismiss"
           onClick={dismiss}
           aria-label="dismiss"
-          className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-cream/70 hover:text-neo-cream hover:bg-neo-cream/10 transition-colors"
+          className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-white hover:text-neo-white hover:bg-neo-cream/10 transition-colors"
         >
           <X className="w-4 h-4" aria-hidden />
         </button>
@@ -167,7 +167,7 @@ export default function PracticeInstructions({ mode, autoOpen = true }: Props) {
             />
           </div>
 
-          <div className="flex flex-col gap-3 text-neo-cream">
+          <div className="flex flex-col gap-3 text-neo-white">
             <h2
               className={`text-base font-neo-display font-black uppercase tracking-wider ${ACCENT_TEXT[mode]}`}
             >

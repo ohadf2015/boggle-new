@@ -57,7 +57,7 @@ export function IndexNowPanel() {
   };
 
   return (
-    <div className="bg-slate-800/50 rounded-neo border-neo border-black p-4">
+    <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
       <div className="flex items-center gap-2 mb-4">
         <Globe className="w-5 h-5 text-cyan-400" />
         <h2 className="text-lg font-neo-display text-neo-white">IndexNow</h2>
@@ -76,7 +76,7 @@ export function IndexNowPanel() {
             'px-3 py-1.5 text-sm rounded-md transition-colors',
             mode === 'all'
               ? 'bg-cyan-600 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              : 'bg-neo-navy-elevated text-slate-300 hover:bg-slate-600'
           )}
         >
           All pages ({routesLoading ? '...' : allUrls.length})
@@ -87,7 +87,7 @@ export function IndexNowPanel() {
             'px-3 py-1.5 text-sm rounded-md transition-colors',
             mode === 'custom'
               ? 'bg-cyan-600 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              : 'bg-neo-navy-elevated text-slate-300 hover:bg-slate-600'
           )}
         >
           Custom URLs
@@ -99,12 +99,12 @@ export function IndexNowPanel() {
           value={customUrls}
           onChange={(e) => setCustomUrls(e.target.value)}
           placeholder={`https://www.lexiclash.live/en/daily\nhttps://www.lexiclash.live/he/daily`}
-          className="w-full bg-slate-900 border border-slate-600 rounded-md p-3 text-sm text-slate-200 placeholder:text-slate-500 mb-4 min-h-[100px] font-mono"
+          className="w-full bg-neo-navy border border-slate-600 rounded-md p-3 text-sm text-slate-200 placeholder:text-slate-500 mb-4 min-h-[100px] font-mono"
         />
       )}
 
       {mode === 'all' && (
-        <div className="bg-slate-900/50 rounded-md p-3 mb-4 max-h-32 overflow-y-auto">
+        <div className="bg-neo-navy/50 rounded-md p-3 mb-4 max-h-32 overflow-y-auto">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
             {allUrls.map(url => (
               <span key={url} className="text-xs text-slate-400 truncate">

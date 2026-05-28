@@ -224,7 +224,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
           <div className="flex items-center justify-center h-full">
             <div className={cn(
               'text-sm font-bold',
-              isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
             )}>
               {t('common.loading')}
             </div>

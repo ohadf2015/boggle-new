@@ -157,7 +157,7 @@ export function CountrySelector({
           'text-sm font-medium',
           disabled && 'opacity-50 cursor-not-allowed',
           isDarkMode
-            ? 'bg-slate-700 border-slate-600 text-gray-200 hover:bg-slate-600'
+            ? 'bg-neo-navy-elevated border-slate-600 text-gray-200 hover:bg-slate-600'
             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50',
           isOpen && (isDarkMode ? 'ring-2 ring-cyan-500/50' : 'ring-2 ring-cyan-500/30')
         )}
@@ -189,7 +189,7 @@ export function CountrySelector({
           className={cn(
             'absolute z-50 mt-1 w-full rounded-lg border shadow-lg overflow-hidden',
             isDarkMode
-              ? 'bg-slate-800 border-slate-700'
+              ? 'bg-neo-navy-light border-slate-700'
               : 'bg-white border-gray-200'
           )}
         >
@@ -215,7 +215,7 @@ export function CountrySelector({
                   'w-full ps-8 pe-8 py-2 text-sm rounded-md border',
                   'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                   isDarkMode
-                    ? 'bg-slate-700 border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'
+                    ? 'bg-neo-navy-elevated border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'
                     : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-cyan-500'
                 )}
               />
@@ -244,7 +244,7 @@ export function CountrySelector({
               className={cn(
                 'w-full px-3 py-2 text-sm text-left border-b flex items-center gap-2',
                 isDarkMode
-                  ? 'border-slate-700 text-red-400 hover:bg-slate-700'
+                  ? 'border-slate-700 text-red-400 hover:bg-neo-navy-elevated'
                   : 'border-gray-200 text-red-600 hover:bg-gray-50'
               )}
             >
@@ -275,7 +275,7 @@ export function CountrySelector({
                         ? 'bg-cyan-900/30 text-cyan-400'
                         : 'bg-cyan-50 text-cyan-700'
                       : isDarkMode
-                        ? 'text-gray-200 hover:bg-slate-700'
+                        ? 'text-gray-200 hover:bg-neo-navy-elevated'
                         : 'text-gray-700 hover:bg-gray-50'
                   )}
                 >

@@ -44,7 +44,7 @@ export default function MostPopularWordGamesPageClient(): React.ReactElement {
             size="sm"
             className={cn(
               'mb-6 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-white text-neo-black hover:bg-neo-cream'
+              isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
@@ -176,7 +176,7 @@ export default function MostPopularWordGamesPageClient(): React.ReactElement {
                   key={`faq-${i}`}
                   className={cn(
                     'rounded-neo border-3 border-neo-black p-4 shadow-hard',
-                    isDarkMode ? 'bg-slate-800' : 'bg-white'
+                    isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                   )}
                 >
                   <h3 className={cn(

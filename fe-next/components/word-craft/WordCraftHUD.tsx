@@ -13,7 +13,7 @@ interface Props {
 
 export function WordCraftHUD({ t, playerScore, botScore, currentTurn, tilesInBag }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-neo rounded-neo bg-neo-navy text-neo-cream">
+    <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-neo rounded-neo bg-neo-navy text-neo-white">
       <div
         data-wc-score-chip
         className={cn(
@@ -26,7 +26,7 @@ export function WordCraftHUD({ t, playerScore, botScore, currentTurn, tilesInBag
       <div
         className={cn(
           'px-3 py-1 rounded-neo border-neo font-neo-display text-xl',
-          currentTurn === 'bot' ? 'bg-neo-pink text-neo-cream' : 'bg-neo-navy-light',
+          currentTurn === 'bot' ? 'bg-neo-pink text-neo-white' : 'bg-neo-navy-light',
         )}
       >
         {t('wordcraft.bot')}: {botScore}

@@ -24,10 +24,10 @@ const CalmModeChoice: React.FC<CalmModeChoiceProps> = ({ onChoose }) => {
 
   return (
     <div data-testid="calm-mode-choice" className="flex flex-col items-center text-center">
-      <h1 className="font-neo-display text-3xl sm:text-4xl font-black text-neo-cream uppercase tracking-tight">
+      <h1 className="font-neo-display text-3xl sm:text-4xl font-black text-neo-white uppercase tracking-tight">
         {t('onboarding.calmMode.title')}
       </h1>
-      <p className="mt-3 font-neo-body text-neo-cream/70 max-w-md">
+      <p className="mt-3 font-neo-body text-neo-white max-w-md">
         {t('onboarding.calmMode.subtitle')}
       </p>
 
@@ -63,7 +63,7 @@ const CalmModeChoice: React.FC<CalmModeChoiceProps> = ({ onChoose }) => {
         </button>
       </div>
 
-      <p className="mt-6 font-neo-body text-xs text-neo-cream/50">
+      <p className="mt-6 font-neo-body text-xs text-neo-white">
         {t('onboarding.calmMode.changeLater')}
       </p>
     </div>

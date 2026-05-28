@@ -116,7 +116,7 @@ function MissionRow({
         )}
       >
         <Icon
-          className={cn('w-5 h-5', completed ? 'text-neo-lime' : 'text-neo-white/60')}
+          className={cn('w-5 h-5', completed ? 'text-neo-lime' : 'text-neo-white')}
           aria-hidden="true"
         />
       </div>
@@ -124,7 +124,7 @@ function MissionRow({
       <span
         className={cn(
           'flex-1 font-neo-body text-sm font-semibold',
-          completed ? 'text-neo-white/50 line-through' : 'text-neo-white',
+          completed ? 'text-neo-white line-through' : 'text-neo-white',
         )}
       >
         {t(config.translationKey)}
@@ -159,7 +159,7 @@ function GrandSlamBadge({ t }: { t: (key: string) => string }) {
         <p className="font-neo-display text-sm font-bold text-neo-yellow">
           {t('dailyMissions.grandSlam')}
         </p>
-        <p className="font-neo-body text-xs text-neo-white/70">
+        <p className="font-neo-body text-xs text-neo-white">
           {t('dailyMissions.grandSlamBonus')}
         </p>
       </div>
@@ -208,7 +208,7 @@ export function DailyMissionsHub() {
           {t('dailyMissions.title')}
         </h2>
         <div className="flex items-center gap-2">
-          <span className="font-neo-body text-xs text-neo-white/60">
+          <span className="font-neo-body text-xs text-neo-white">
             {t('dailyMissions.progress', { current: String(completedCount) })}
           </span>
           <ProgressDots missions={missions} configs={MISSION_CONFIGS} />
@@ -217,7 +217,7 @@ export function DailyMissionsHub() {
 
       {/* Grand Slam description */}
       {!isGrandSlam && (
-        <p className="font-neo-body text-xs text-neo-white/40 mb-3">
+        <p className="font-neo-body text-xs text-neo-white mb-3">
           {t('dailyMissions.grandSlamDesc')}
         </p>
       )}

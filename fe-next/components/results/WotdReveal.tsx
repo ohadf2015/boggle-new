@@ -125,25 +125,25 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
           >
             {word}
           </p>
-          <p className="text-sm text-neo-white/70 mb-3">
+          <p className="text-sm text-neo-white mb-3">
             {t('wotd.foundPercent', { percent })}
           </p>
         </>
       ) : (
         <>
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Eye className="w-5 h-5 text-white/50" />
-            <span className="text-sm font-neo-display font-bold text-white/60 uppercase tracking-wide">
+            <Eye className="w-5 h-5 text-white" />
+            <span className="text-sm font-neo-display font-bold text-white uppercase tracking-wide">
               {t('wotd.missed')}
             </span>
           </div>
           <p
             data-testid="wotd-word"
-            className="text-2xl font-neo-display font-bold text-white/40 mb-1 uppercase tracking-widest"
+            className="text-2xl font-neo-display font-bold text-white mb-1 uppercase tracking-widest"
           >
             {word}
           </p>
-          <p className="text-xs text-white/30 mb-3">
+          <p className="text-xs text-white mb-3">
             {t('wotd.missedHint')}
           </p>
         </>
@@ -157,7 +157,7 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
           'border-2 border-neo-black transition-all',
           found
             ? 'bg-neo-yellow/20 text-neo-yellow hover:bg-neo-yellow/30'
-            : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70',
+            : 'bg-white/5 text-white hover:bg-white/10 hover:text-white',
         )}
       >
         {copied ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}

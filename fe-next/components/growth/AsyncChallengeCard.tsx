@@ -53,7 +53,7 @@ function ChallengeRow({
         <p className="text-sm font-bold text-neo-white truncate">
           {challenge.challengerName ?? t('asyncChallenge.unknown')}
         </p>
-        <p className="text-xs text-neo-white/50">
+        <p className="text-xs text-neo-white">
           {t(`asyncChallenge.mode.${challenge.gameMode}`)}
         </p>
       </div>
@@ -128,7 +128,7 @@ function HistoryRow({
         <p className="text-sm font-bold text-neo-white truncate">
           {row.opponentName ?? t('asyncChallenge.unknown')}
         </p>
-        <p className="text-xs text-neo-white/60 truncate">{label}</p>
+        <p className="text-xs text-neo-white truncate">{label}</p>
       </div>
     </button>
   );
@@ -227,7 +227,7 @@ export const AsyncChallengeCard: React.FC = memo(function AsyncChallengeCard() {
             />
           ))}
           {pendingChallenges!.length > MAX_VISIBLE && (
-            <p className="text-xs text-neo-white/40 text-center">
+            <p className="text-xs text-neo-white text-center">
               {t('asyncChallenge.moreCount', {
                 count: String(pendingChallenges!.length - MAX_VISIBLE),
               })}
@@ -236,7 +236,7 @@ export const AsyncChallengeCard: React.FC = memo(function AsyncChallengeCard() {
         </div>
       ) : (
         <>
-          <p className="text-sm text-neo-white/70">
+          <p className="text-sm text-neo-white">
             {t('asyncChallenge.emptyDesc')}
           </p>
           <button
@@ -258,7 +258,7 @@ export const AsyncChallengeCard: React.FC = memo(function AsyncChallengeCard() {
       {/* Recent results — surfaces completed challenges so user can review outcomes. */}
       {completedRows.length > 0 && (
         <div className="flex flex-col gap-1.5 mt-1">
-          <p className="text-xs font-bold uppercase tracking-wider text-neo-white/50">
+          <p className="text-xs font-bold uppercase tracking-wider text-neo-white">
             {t('asyncChallenge.recentResults')}
           </p>
           {completedRows.map((row) => (

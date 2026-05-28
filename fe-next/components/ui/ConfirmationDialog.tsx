@@ -49,7 +49,7 @@ const variantStyles: Record<ConfirmationDialogVariant, {
 }> = {
   danger: {
     content: 'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm',
-    confirm: 'flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110',
+    confirm: 'flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-white hover:brightness-110',
   },
   warning: {
     content: 'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm',

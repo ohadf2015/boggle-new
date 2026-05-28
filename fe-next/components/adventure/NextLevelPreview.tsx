@@ -47,14 +47,14 @@ export function NextLevelPreview({
               <h3 className="font-neo-display font-bold text-lg text-neo-yellow">
                 {t('adventure.nextLevel')} {nextLevel}
               </h3>
-              <div className="flex items-center gap-1 text-neo-white/60 text-sm">
+              <div className="flex items-center gap-1 text-neo-white text-sm">
                 <Grid3X3 className="w-3.5 h-3.5" />
                 <span>{gridSize}×{gridSize}</span>
               </div>
             </div>
 
             {objectives.length > 0 && (
-              <ul className="text-sm text-neo-white/70 space-y-1 mb-3">
+              <ul className="text-sm text-neo-white space-y-1 mb-3">
                 {objectives.map((key, i) => (
                   <li key={`obj-${i}-${key}`} className="flex items-center gap-1.5">
                     <ChevronRight className="w-3 h-3 text-neo-cyan rtl:scale-x-[-1]" />
@@ -67,7 +67,7 @@ export function NextLevelPreview({
             <div className="flex items-center justify-between">
               <button
                 onClick={onDismiss}
-                className="text-xs text-neo-white/40 hover:text-neo-white/60 px-3 py-2 min-h-11 min-w-11"
+                className="text-xs text-neo-white hover:text-neo-white px-3 py-2 min-h-11 min-w-11"
               >
                 {t('adventure.later')}
               </button>

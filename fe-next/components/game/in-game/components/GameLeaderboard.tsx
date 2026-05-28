@@ -83,7 +83,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
     >
       {/* Rank badge with change indicator */}
       <div className="relative shrink-0">
-        <div className="w-9 h-9 rounded-neo flex items-center justify-center font-black text-base bg-neo-black text-neo-cream border-2 border-neo-black">
+        <div className="w-9 h-9 rounded-neo flex items-center justify-center font-black text-base bg-neo-black text-neo-white border-2 border-neo-black">
           {player.rankDisplay}
         </div>
         {/* Rank change arrow */}
@@ -134,7 +134,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
             </span>
           )}
           {player.isMe && (
-            <span className="text-[10px] bg-neo-black text-neo-cream px-1 py-0.5 rounded-neo font-bold shrink-0">
+            <span className="text-[10px] bg-neo-black text-neo-white px-1 py-0.5 rounded-neo font-bold shrink-0">
               {t('playerView.me')}
             </span>
           )}
@@ -241,10 +241,10 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
     >
       {/* Header */}
       <div className="py-2.5 px-4 border-b-4 border-neo-black bg-neo-pink text-white">
-        <h3 className="flex items-center gap-2 text-neo-cream text-sm uppercase tracking-widest font-black">
+        <h3 className="flex items-center gap-2 text-neo-white text-sm uppercase tracking-widest font-black">
           <Trophy className="w-4 h-4 text-neo-lime" />
           {t('playerView.leaderboard')}
-          <span className="ms-auto text-[10px] font-bold text-neo-cream/60 tabular-nums">
+          <span className="ms-auto text-[10px] font-bold text-neo-white tabular-nums">
             {leaderboard.length} {leaderboard.length === 1 ? 'player' : 'players'}
           </span>
         </h3>

@@ -47,7 +47,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
             className={`px-3 py-2 rounded-neo border-neo font-neo-body text-sm whitespace-nowrap transition-colors ${
               activeTab === tab.key
                 ? 'bg-neo-lime text-black shadow-hard-sm'
-                : 'bg-neo-navy-light text-neo-cream hover:bg-neo-navy'
+                : 'bg-neo-navy-light text-neo-white hover:bg-neo-navy'
             }`}
           >
             {t(tab.label)}
@@ -74,7 +74,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
               </div>
 
               {/* Name */}
-              <p className="text-sm font-neo-body text-neo-cream truncate">{t(item.name)}</p>
+              <p className="text-sm font-neo-body text-neo-white truncate">{t(item.name)}</p>
 
               {/* Rarity */}
               <p className={`text-xs ${rarityClass}`}>
@@ -90,7 +90,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
               {!item.isUnlocked && (() => {
                 const hint = formatUnlockHint(item);
                 return (
-                  <span className="text-xs text-neo-cream/70 mt-1 block font-neo-body">
+                  <span className="text-xs text-neo-white mt-1 block font-neo-body">
                     {hint ? t(hint.key, hint.params) : t('cosmetics.locked')}
                   </span>
                 );

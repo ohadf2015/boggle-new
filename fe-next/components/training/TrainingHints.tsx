@@ -177,7 +177,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
               <div
                 className={cn(
                   'relative rounded-xl border-3 border-neo-black p-3 shadow-hard-lg',
-                  isDarkMode ? 'bg-slate-800' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                 )}
               >
                 {/* Close button - appears after delay, less prominent */}
@@ -188,8 +188,8 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                     onClick={handleDismiss}
                     className={cn(
                       'absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center',
-                      'bg-white/80 dark:bg-slate-700/80 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600',
-                      'hover:bg-white dark:hover:bg-slate-700 hover:scale-110 transition-all'
+                      'bg-white/80 dark:bg-neo-navy-elevated/80 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600',
+                      'hover:bg-white dark:hover:bg-neo-navy-elevated hover:scale-110 transition-all'
                     )}
                   >
                     <X size={12} />

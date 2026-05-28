@@ -41,12 +41,12 @@ export default function BattlePassTrack() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Crown className="w-6 h-6 text-neo-yellow" />
-            <h2 className="font-black text-lg text-neo-cream">
+            <h2 className="font-black text-lg text-neo-white">
               {t('battlePass.title')}
             </h2>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-neo-cream/80 text-sm">
+            <div className="flex items-center gap-1 text-neo-white text-sm">
               <Clock className="w-4 h-4" />
               <span>
                 {daysRemaining} {t('battlePass.daysLeft')}
@@ -63,7 +63,7 @@ export default function BattlePassTrack() {
 
         {/* XP progress */}
         <div className="mt-3 space-y-1">
-          <div className="flex justify-between text-xs font-bold text-neo-cream/70">
+          <div className="flex justify-between text-xs font-bold text-neo-white">
             <span>
               {t('battlePass.tier')} {currentTier}/{season.totalTiers}
             </span>

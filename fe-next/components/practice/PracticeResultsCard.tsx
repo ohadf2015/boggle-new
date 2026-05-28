@@ -137,7 +137,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
                   ? 'text-neo-yellow'
                   : percentage >= 50
                     ? 'text-neo-cyan'
-                    : 'text-neo-white/60'
+                    : 'text-neo-white'
               )}
             />
           </div>
@@ -162,7 +162,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
           >
             {percentage}%
           </p>
-          <p className="text-neo-white/70 font-neo-body mt-1">
+          <p className="text-neo-white font-neo-body mt-1">
             {correct} / {total}{' '}
             {t('education.practice.correctCount')}
           </p>
@@ -189,7 +189,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="mt-4 text-neo-white/80 font-neo-body"
+          className="mt-4 text-neo-white font-neo-body"
         >
           {encouragementMessage}
         </AdaptiveMotion.p>
@@ -204,7 +204,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
           >
             {timeSpent !== undefined && timeSpent > 0 && (
               <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
-                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.time')}</p>
+                <p className="text-xs text-neo-white font-neo-body">{t('education.practice.time')}</p>
                 <p className="text-lg text-neo-cyan font-neo-display">
                   {Math.floor(timeSpent / 60)}:{(timeSpent % 60).toString().padStart(2, '0')}
                 </p>
@@ -212,13 +212,13 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
             )}
             {maxStreak !== undefined && maxStreak > 1 && (
               <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
-                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.maxStreak')}</p>
+                <p className="text-xs text-neo-white font-neo-body">{t('education.practice.maxStreak')}</p>
                 <p className="text-lg text-neo-yellow font-neo-display">{maxStreak}x</p>
               </div>
             )}
             {hintsUsed !== undefined && hintsUsed > 0 && (
               <div className="p-3 bg-neo-navy/50 border-neo border-neo-black rounded-neo">
-                <p className="text-xs text-neo-white/60 font-neo-body">{t('education.practice.hintsUsed')}</p>
+                <p className="text-xs text-neo-white font-neo-body">{t('education.practice.hintsUsed')}</p>
                 <p className="text-lg text-neo-purple font-neo-display">{hintsUsed}</p>
               </div>
             )}

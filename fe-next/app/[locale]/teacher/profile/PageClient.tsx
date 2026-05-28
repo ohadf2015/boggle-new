@@ -172,7 +172,7 @@ function TeacherProfileInner() {
             <div className="flex items-center gap-3">
               <GraduationCap className="w-5 h-5 text-neo-cyan shrink-0" />
               <div>
-                <p className="text-neo-white/60 text-xs font-bold uppercase mb-0.5">
+                <p className="text-neo-white text-xs font-bold uppercase mb-0.5">
                   {t('common.email')}
                 </p>
                 <p className="text-neo-white font-bold">{user.email}</p>

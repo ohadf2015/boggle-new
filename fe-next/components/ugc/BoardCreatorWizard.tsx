@@ -213,7 +213,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
       {/* Stats HUD */}
       <div className="border-neo border-black bg-neo-navy/80 rounded-neo p-4 flex gap-6 flex-wrap shadow-hard">
         <div data-testid="word-count-stat" className="flex flex-col">
-          <span className="font-neo-body text-xs text-neo-white/60">
+          <span className="font-neo-body text-xs text-neo-white">
             {t('ugc.board.wordsFound', { count: generatedBoard.totalFindableWords })}
           </span>
           <span className={cn(
@@ -242,7 +242,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
 
       {/* Title */}
       <div className="flex flex-col gap-2">
-        <label className="font-neo-body text-sm text-neo-white/80">
+        <label className="font-neo-body text-sm text-neo-white">
           {t('ugc.board.title')}
         </label>
         <input
@@ -255,7 +255,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           className={cn(
             'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2',
-            'placeholder:text-neo-white/40 focus:outline-hidden focus:border-neo-cyan',
+            'placeholder:text-neo-white focus:outline-hidden focus:border-neo-cyan',
             'focus:shadow-[0_0_0_1px_--theme(--color-neo-cyan/40)] transition-colors'
           )}
         />
@@ -263,7 +263,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
 
       {/* Description */}
       <div className="flex flex-col gap-2">
-        <label className="font-neo-body text-sm text-neo-white/80">
+        <label className="font-neo-body text-sm text-neo-white">
           {t('ugc.board.description')}
         </label>
         <textarea
@@ -276,7 +276,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           className={cn(
             'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2 resize-none',
-            'placeholder:text-neo-white/40 focus:outline-hidden focus:border-neo-cyan',
+            'placeholder:text-neo-white focus:outline-hidden focus:border-neo-cyan',
             'focus:shadow-[0_0_0_1px_--theme(--color-neo-cyan/40)] transition-colors'
           )}
         />
@@ -284,7 +284,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
 
       {/* Cover Image Upload */}
       <div className="flex flex-col gap-2">
-        <label className="font-neo-body text-sm text-neo-white/80">
+        <label className="font-neo-body text-sm text-neo-white">
           {t('ugc.board.coverImage')}
         </label>
         <input
@@ -326,7 +326,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
             className={cn(
               'w-full h-32 border-2 border-dashed border-neo-white/30 rounded-neo',
               'flex flex-col items-center justify-center gap-2',
-              'text-neo-white/50 hover:text-neo-white/70 hover:border-neo-white/50',
+              'text-neo-white hover:text-neo-white hover:border-neo-white/50',
               'transition-colors cursor-pointer'
             )}
           >
@@ -408,7 +408,7 @@ function PublishedStep({ creator }: { creator: UseBoardCreatorReturn }) {
 
       {/* Board code */}
       <div className="border-neo border-black bg-neo-navy shadow-hard rounded-neo p-6">
-        <p className="font-neo-body text-sm text-neo-white/60 mb-2">
+        <p className="font-neo-body text-sm text-neo-white mb-2">
           {t('ugc.board.code')}
         </p>
         <p

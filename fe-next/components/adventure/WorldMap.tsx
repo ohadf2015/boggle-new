@@ -263,7 +263,7 @@ const WorldNode = memo(function WorldNode({
               )}
               {!isUnlocked && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-neo-black/50">
-                  <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-neo-white/60" />
+                  <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-neo-white" />
                   {showStarGate && (() => {
                     const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
                     return starsNeeded > 0 ? (
@@ -358,7 +358,7 @@ const WorldNode = memo(function WorldNode({
               className={cn(
                 'font-neo-display font-black text-sm sm:text-base uppercase tracking-tight leading-tight',
                 'line-clamp-2',
-                isUnlocked ? 'text-neo-white' : 'text-neo-white/40'
+                isUnlocked ? 'text-neo-white' : 'text-neo-white'
               )}
               title={worldName}
             >
@@ -371,16 +371,16 @@ const WorldNode = memo(function WorldNode({
                 <div className="flex items-center gap-1">
                   <Star className={cn(
                     'w-3.5 h-3.5 shrink-0',
-                    currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white/30 fill-neo-white/10'
+                    currentStars > 0 ? 'text-neo-yellow fill-neo-yellow' : 'text-neo-white fill-neo-white/10'
                   )} />
                   <span className={cn(
                     'text-xs font-mono font-bold tabular-nums',
-                    isUnlocked ? 'text-neo-yellow' : 'text-neo-white/40'
+                    isUnlocked ? 'text-neo-yellow' : 'text-neo-white'
                   )}>
                     {currentStars}/{totalWorldStars}
                   </span>
                 </div>
-                <span className={cn('text-[10px] font-mono tabular-nums', isUnlocked ? 'text-neo-white/40' : 'text-neo-white/25')}>
+                <span className={cn('text-[10px] font-mono tabular-nums', isUnlocked ? 'text-neo-white' : 'text-neo-white')}>
                   {completedLevels}/{LEVELS_PER_WORLD} {t('adventure.lvl')}
                 </span>
               </div>
@@ -404,7 +404,7 @@ const WorldNode = memo(function WorldNode({
             const starsNeeded = Math.max(0, unlockRequirement - playerTotalStars);
             return (
               <div className="px-3 pb-3 space-y-1">
-                <div className="flex items-center gap-1.5 text-[11px] text-neo-white/40 font-mono">
+                <div className="flex items-center gap-1.5 text-[11px] text-neo-white font-mono">
                   <Lock className="w-3 h-3 shrink-0" />
                   <span>{unlockRequirement}</span>
                   <Star className="w-3 h-3 shrink-0 text-neo-yellow/40" />

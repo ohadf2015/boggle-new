@@ -131,7 +131,7 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
           >
             <Trophy className="w-7 h-7 text-black" />
           </m.div>
-          <p className="text-neo-white/60 font-neo-body font-bold">
+          <p className="text-neo-white font-neo-body font-bold">
             {t('challenges.noChallenges')}
           </p>
         </m.div>

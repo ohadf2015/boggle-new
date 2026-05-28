@@ -34,7 +34,7 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
   onSaveWord,
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
+    <div className="bg-white dark:bg-neo-navy-light/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Calendar className="w-5 h-5 text-purple-500" />
@@ -65,8 +65,8 @@ export const ScheduleManager: React.FC<ScheduleManagerProps> = ({
                 isToday
                   ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
                   : isPast
-                    ? 'border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800 opacity-60'
-                    : 'border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700'
+                    ? 'border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-neo-navy-light opacity-60'
+                    : 'border-gray-300 bg-white dark:border-slate-600 dark:bg-neo-navy-elevated'
               )}
             >
               <div className="flex justify-between items-start">

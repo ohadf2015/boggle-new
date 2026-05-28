@@ -38,7 +38,7 @@ export function KPICards({ stats }: KPICardsProps) {
           <div
             key={`kpi-skel-${i}`}
             data-testid="kpi-skeleton"
-            className="bg-slate-800/50 rounded-neo border-neo border-black p-4 animate-pulse h-24"
+            className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 animate-pulse h-24"
           />
         ))}
       </div>
@@ -98,7 +98,7 @@ export function KPICards({ stats }: KPICardsProps) {
         return (
           <div
             key={card.labelKey}
-            className="bg-slate-800/50 rounded-neo border-neo border-black p-3 sm:p-4"
+            className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-3 sm:p-4"
           >
             <div className="flex items-center gap-2 mb-1">
               <Icon className={cn('w-4 h-4', card.color)} />

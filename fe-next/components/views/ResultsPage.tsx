@@ -257,7 +257,7 @@ function DesktopResultsLayout({
               className="flex flex-col items-center gap-0.5"
             >
               <div className="w-6 h-6 rounded-full bg-neo-white/10 backdrop-blur-xs flex items-center justify-center border border-neo-white/20">
-                <svg className="w-3 h-3 text-neo-white/60" viewBox="0 0 12 12" fill="none">
+                <svg className="w-3 h-3 text-neo-white" viewBox="0 0 12 12" fill="none">
                   <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
@@ -970,7 +970,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   if (sortedScores.length === 0) {
     return (
       <div
-        className="flex-1 flex flex-col items-center justify-center min-h-0 bg-neo-navy text-neo-cream relative"
+        className="flex-1 flex flex-col items-center justify-center min-h-0 bg-neo-navy text-neo-white relative"
         style={{ background: 'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)' }}
         data-testid="results-empty-state"
       >
@@ -1159,7 +1159,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             it into `absolute` (which caused the bar to scroll mid-page on
             Android and let the DailyChallengeInvite render below it). */}
         {gameCode && onReturnToRoom && !isDesktopViewport && typeof document !== 'undefined' && createPortal(
-          <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] text-neo-cream pointer-events-none">
+          <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] text-neo-white pointer-events-none">
             <m.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -1229,7 +1229,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens.
           Portaled for the same ancestor-transform reason as mobile. */}
       {gameCode && onReturnToRoom && isDesktopViewport && typeof document !== 'undefined' && createPortal(
-        <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-pb">
+        <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] bg-neo-navy text-neo-white border-t-4 border-neo-black safe-area-pb">
           <div className="max-w-6xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}

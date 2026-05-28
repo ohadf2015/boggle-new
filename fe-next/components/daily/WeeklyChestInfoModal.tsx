@@ -51,7 +51,7 @@ export default function WeeklyChestInfoModal({ projectedTier, weekScore, onClose
           type="button"
           onClick={onClose}
           aria-label={t('common.close')}
-          className="absolute top-3 end-3 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy text-neo-cream/70 hover:text-neo-cream shadow-hard-xs"
+          className="absolute top-3 end-3 w-8 h-8 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy text-neo-white hover:text-neo-white shadow-hard-xs"
         >
           <X className="w-4 h-4" />
         </button>
@@ -62,14 +62,14 @@ export default function WeeklyChestInfoModal({ projectedTier, weekScore, onClose
 
         <div className="flex items-start gap-2.5">
           <Calendar className="w-5 h-5 text-neo-cyan shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-neo-cream/80 font-bold leading-snug">
+          <p className="text-sm text-neo-white font-bold leading-snug">
             {t('daily.weeklyChest.info.howItWorks')}
           </p>
         </div>
 
         <div className="flex items-start gap-2.5">
           <AlertTriangle className="w-5 h-5 text-neo-orange shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-neo-cream/80 font-bold leading-snug">
+          <p className="text-sm text-neo-white font-bold leading-snug">
             {t('daily.weeklyChest.info.streakReset')}
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function WeeklyChestInfoModal({ projectedTier, weekScore, onClose
                 >
                   {t(`daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`)}
                 </span>
-                <p className="text-xs text-neo-cream/70 font-bold leading-snug">{t(descKey)}</p>
+                <p className="text-xs text-neo-white font-bold leading-snug">{t(descKey)}</p>
               </div>
             </div>
           ))}
@@ -105,7 +105,7 @@ export default function WeeklyChestInfoModal({ projectedTier, weekScore, onClose
 
         <div className="flex items-start gap-2.5">
           <TrendingUp className="w-5 h-5 text-neo-lime shrink-0 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-neo-cream/80 font-bold leading-snug">
+          <p className="text-sm text-neo-white font-bold leading-snug">
             {t('daily.weeklyChest.info.betterChest')}
           </p>
         </div>
@@ -114,9 +114,9 @@ export default function WeeklyChestInfoModal({ projectedTier, weekScore, onClose
           data-testid="chest-info-projection"
           className="text-sm font-black text-center rounded-neo border-2 border-neo-black bg-neo-navy py-2 px-3"
         >
-          <span className="text-neo-cream/70">{t('daily.weeklyChest.info.projection')}</span>{' '}
+          <span className="text-neo-white">{t('daily.weeklyChest.info.projection')}</span>{' '}
           <span className={cn('uppercase', TIER_TEXT[projectedTier])}>{tierLabel}</span>
-          <span className="ms-1 text-neo-cream/50">({weekScore}/100)</span>
+          <span className="ms-1 text-neo-white">({weekScore}/100)</span>
         </p>
 
         <button

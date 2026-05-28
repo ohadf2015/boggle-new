@@ -137,7 +137,7 @@ export function QuestCard({
           }
         }}
         className={cn(
-          'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black',
+          'relative w-full bg-neo-navy/95 rounded-xl border-3 border-neo-black',
           'shadow-hard overflow-hidden cursor-pointer',
           isSecondary
             ? 'flex flex-row items-center gap-3 p-3'
@@ -259,7 +259,7 @@ export function QuestCard({
                 )}
 
                 {isLoadingStatus && (
-                  <div className="absolute -top-1 -inset-s-1 p-0.5 rounded-full bg-slate-700 border border-slate-600">
+                  <div className="absolute -top-1 -inset-s-1 p-0.5 rounded-full bg-neo-navy-elevated border border-slate-600">
                     <Loader2 className="w-3 h-3 animate-spin text-slate-400" />
                   </div>
                 )}
@@ -321,7 +321,7 @@ function UnavailableButton({ requestState }: { requestState: string }) {
       'flex items-center justify-center gap-2',
       requestState === 'sent'
         ? 'bg-neo-lime/20 text-neo-lime border-2 border-neo-lime'
-        : 'bg-slate-700 text-slate-200 border-2 border-slate-600',
+        : 'bg-neo-navy-elevated text-slate-200 border-2 border-slate-600',
       'shadow-hard-sm transition-all'
     )}>
       {requestState === 'loading' ? (

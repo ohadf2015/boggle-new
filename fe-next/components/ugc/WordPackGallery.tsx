@@ -157,7 +157,7 @@ export default function WordPackGallery() {
             className={`px-4 py-2 text-sm font-neo-display border-neo border-black rounded-neo transition-colors ${
               sort === tab.value
                 ? 'bg-neo-yellow text-black shadow-hard-sm'
-                : 'bg-neo-navy text-neo-white/70 hover:bg-neo-navy/80'
+                : 'bg-neo-navy text-neo-white hover:bg-neo-navy/80'
             }`}
           >
             {t(tab.labelKey)}
@@ -212,7 +212,7 @@ export default function WordPackGallery() {
           <p className="font-neo-display text-xl text-neo-white mb-2">
             {t('ugc.gallery.emptyTitle')}
           </p>
-          <p className="text-sm text-neo-white/60 font-neo-body mb-6">
+          <p className="text-sm text-neo-white font-neo-body mb-6">
             {t('ugc.gallery.emptySubtitle')}
           </p>
           <button

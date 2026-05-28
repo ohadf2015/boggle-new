@@ -78,7 +78,7 @@ export function WizardStep({
       <div className="space-y-3">
         {/* Step Counter */}
         <div className="text-center">
-          <span className="text-sm font-neo-body text-neo-white/70">
+          <span className="text-sm font-neo-body text-neo-white">
             {t('common.step')} {currentStep} {t('common.of')} {totalSteps}
           </span>
         </div>
@@ -114,7 +114,7 @@ export function WizardStep({
 
         {/* Description */}
         {description && (
-          <p className="text-neo-white/70 font-neo-body mb-6">{description}</p>
+          <p className="text-neo-white font-neo-body mb-6">{description}</p>
         )}
 
         {/* Step Content */}

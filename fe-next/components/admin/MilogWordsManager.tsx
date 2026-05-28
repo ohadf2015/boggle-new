@@ -219,7 +219,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-slate-500/20 rounded-lg">
@@ -232,7 +232,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-500/20 rounded-lg">
@@ -245,7 +245,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-red-500/20 rounded-lg">
@@ -258,7 +258,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-neo-yellow/20 rounded-lg">
@@ -271,7 +271,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-500/20 rounded-lg">
@@ -284,7 +284,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
+          <Card className="bg-neo-navy-light border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-500/20 rounded-lg">
@@ -301,7 +301,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
       )}
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 bg-slate-800 text-white p-4 rounded-lg border border-slate-700">
+      <div className="flex flex-col md:flex-row gap-4 bg-neo-navy-light text-white p-4 rounded-lg border border-slate-700">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
@@ -311,14 +311,14 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
               setSearchQuery(e.target.value);
               setOffset(0);
             }}
-            className="pl-9 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+            className="pl-9 bg-neo-navy-elevated border-slate-600 text-white placeholder:text-slate-400"
             dir="rtl"
           />
         </div>
 
         <div className="flex gap-2 w-full md:w-auto">
           <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setOffset(0); }}>
-            <SelectTrigger className="w-full sm:w-[160px] bg-slate-700 border-slate-600">
+            <SelectTrigger className="w-full sm:w-[160px] bg-neo-navy-elevated border-slate-600">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -356,7 +356,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                 exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
               >
                 <Card className={cn(
-                  "bg-slate-800 border-slate-700 transition-all",
+                  "bg-neo-navy-light border-slate-700 transition-all",
                   word.approved_at && "ring-2 ring-neo-yellow"
                 )}>
                   <CardContent className="p-4 space-y-3">
@@ -482,7 +482,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
       {/* Revoke Confirmation Dialog */}
       {revokeWord && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <Card className="bg-slate-800 border-slate-600 max-w-md w-full">
+          <Card className="bg-neo-navy-light border-slate-600 max-w-md w-full">
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-red-500/20 rounded-lg">
@@ -511,7 +511,7 @@ export function MilogWordsManager({ authToken }: MilogWordsManagerProps) {
                   placeholder="Reason (optional)"
                   value={revokeReason}
                   onChange={(e) => setRevokeReason(e.target.value)}
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                  className="bg-neo-navy-elevated border-slate-600 text-white placeholder:text-slate-400"
                 />
               </div>
 

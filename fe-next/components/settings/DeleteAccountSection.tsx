@@ -65,7 +65,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
 
       <div className={cn(
         'p-4 rounded-neo border-3 border-neo-red/50',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
       )}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -129,7 +129,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                   className={cn(
                     'w-full px-3 py-2 rounded-neo border-3 font-mono text-sm mb-3',
                     isDarkMode
-                      ? 'bg-slate-700 border-slate-600 text-white placeholder:text-slate-500'
+                      ? 'bg-neo-navy-elevated border-slate-600 text-white placeholder:text-slate-500'
                       : 'bg-white border-gray-300 text-neo-black placeholder:text-gray-400'
                   )}
                 />
@@ -156,7 +156,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                     disabled={isDeleting}
                     className={cn(
                       'px-4 py-2 rounded-neo border-3 border-neo-black font-bold text-sm min-h-[44px]',
-                      isDarkMode ? 'bg-slate-700 text-white' : 'bg-white text-neo-black'
+                      isDarkMode ? 'bg-neo-navy-elevated text-white' : 'bg-white text-neo-black'
                     )}
                   >
                     <X className="w-4 h-4" />

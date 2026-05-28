@@ -45,7 +45,7 @@ export function LeagueBanner({ standings, myUserId, tier }: LeagueBannerProps) {
                 data-is-me={isMe ? 'true' : undefined}
               >
                 <div className="flex items-center gap-3">
-                  <span className="w-8 text-center text-neo-white/50 font-mono text-sm">
+                  <span className="w-8 text-center text-neo-white font-mono text-sm">
                     {s.position}
                   </span>
                   <span className={`text-sm ${isMe ? 'text-neo-yellow' : 'text-neo-white'}`}>
@@ -59,7 +59,7 @@ export function LeagueBanner({ standings, myUserId, tier }: LeagueBannerProps) {
         </AdaptiveAnimatePresence>
       </div>
 
-      <div className="p-2 border-t-3 border-black bg-neo-navy/50 flex justify-between text-xs text-neo-white/40">
+      <div className="p-2 border-t-3 border-black bg-neo-navy/50 flex justify-between text-xs text-neo-white">
         <span className="text-green-400">{t('league.promotionZone')}</span>
         <span>{t('league.safeZone')}</span>
         <span className="text-red-400">{t('league.relegationZone')}</span>

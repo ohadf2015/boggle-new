@@ -25,7 +25,7 @@ export function BulkActions({
   if (totalWords === 0) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-3 sm:gap-4 bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-xs">
+    <div className="flex flex-wrap items-center gap-3 sm:gap-4 bg-white dark:bg-neo-navy-light text-black dark:text-white p-4 rounded-lg shadow-xs">
       <input
         type="checkbox"
         checked={selectedCount === totalWords && totalWords > 0}

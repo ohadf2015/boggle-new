@@ -71,10 +71,10 @@ export const SeasonBadgeCard: React.FC<SeasonBadgeCardProps> = ({
       </div>
       {showSubtitle && (
         <div className="text-center">
-          <p className="font-neo-display text-sm text-neo-cream uppercase tracking-wide">
+          <p className="font-neo-display text-sm text-neo-white uppercase tracking-wide">
             {title}
           </p>
-          <p className="text-[10px] font-neo-body text-neo-cream/70 mt-0.5">
+          <p className="text-[10px] font-neo-body text-neo-white mt-0.5">
             {subtitle}
           </p>
           <p

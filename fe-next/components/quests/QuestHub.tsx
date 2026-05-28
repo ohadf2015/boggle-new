@@ -175,7 +175,7 @@ function GrandSlamBanner({ t }: { t: (key: string) => string }) {
           {t('quests.grandSlam')}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
-          <p className="font-neo-body text-sm text-neo-white/80 font-medium">
+          <p className="font-neo-body text-sm text-neo-white font-medium">
             {t('quests.grandSlamBonus')}
           </p>
           <span className="inline-flex items-center gap-1 text-xs font-black text-neo-cyan">
@@ -233,7 +233,7 @@ function WeeklyQuestSection() {
                 </span>
               )}
             </div>
-            <p className="font-neo-body text-xs text-neo-white/50">
+            <p className="font-neo-body text-xs text-neo-white">
               {t('weeklyQuest.newQuestMonday')}
             </p>
           </div>
@@ -254,7 +254,7 @@ function WeeklyQuestSection() {
                 {t(`weeklyQuest.${activeQuest.difficulty}`)}
               </span>
             </div>
-            <p className="font-neo-body text-sm text-neo-white/90 font-medium">
+            <p className="font-neo-body text-sm text-neo-white font-medium">
               {t(activeQuest.description, { target: activeQuest.displayTarget ?? activeQuest.target })}
             </p>
             {/* Reward preview */}
@@ -274,7 +274,7 @@ function WeeklyQuestSection() {
             {/* Progress bar */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-neo-body font-bold text-neo-white/70">
+                <span className="font-neo-body font-bold text-neo-white">
                   {t('weeklyQuest.progress', {
                     current: activeQuest.current,
                     target: activeQuest.target,
@@ -301,7 +301,7 @@ function WeeklyQuestSection() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            <p className="font-neo-body text-xs text-neo-white/60 leading-relaxed">
+            <p className="font-neo-body text-xs text-neo-white leading-relaxed">
               {t('weeklyQuest.intro')}
             </p>
             <p className="font-neo-body text-sm font-bold text-neo-white">
@@ -346,7 +346,7 @@ function WeeklyQuestSection() {
                       >
                         {t(`weeklyQuest.${quest.difficulty}`)}
                       </span>
-                      <span className="font-neo-body text-sm text-neo-white/80 text-start">
+                      <span className="font-neo-body text-sm text-neo-white text-start">
                         {t(quest.description, { target: quest.displayTarget ?? quest.target })}
                       </span>
                     </div>
@@ -399,7 +399,7 @@ function AllQuestsCompleteBanner({ t }: { t: (key: string) => string }) {
           <p className="font-neo-display text-lg font-black text-neo-lime">
             {t('quests.allComplete')}
           </p>
-          <p className="font-neo-body text-sm text-neo-white/80 font-medium mt-0.5">
+          <p className="font-neo-body text-sm text-neo-white font-medium mt-0.5">
             {t('quests.allCompleteDesc')}
           </p>
         </div>

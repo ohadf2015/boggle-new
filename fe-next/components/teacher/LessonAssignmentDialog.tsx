@@ -71,7 +71,7 @@ export default function LessonAssignmentDialog({
           <Dialog.Title className="text-2xl font-neo-display text-neo-white mb-2">
             {t('teacher.lessons.assign.title')}
           </Dialog.Title>
-          <Dialog.Description className="text-sm text-neo-white/60 mb-6">
+          <Dialog.Description className="text-sm text-neo-white mb-6">
             {t('teacher.lessons.assign.lessonLabel')}: <span className="text-neo-cyan font-bold">{lessonName}</span>
           </Dialog.Description>
 
@@ -106,13 +106,13 @@ export default function LessonAssignmentDialog({
                         'text-left font-neo-body',
                         selectedClassroomId === classroom.id
                           ? 'bg-neo-cyan/20 border-neo-cyan text-neo-white shadow-hard-sm'
-                          : 'bg-neo-navy/50 border-neo-black text-neo-white/80 hover:bg-neo-navy/80'
+                          : 'bg-neo-navy/50 border-neo-black text-neo-white hover:bg-neo-navy/80'
                       )}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="font-bold text-base">{classroom.name}</div>
-                          <div className="text-xs text-neo-white/60 mt-1">
+                          <div className="text-xs text-neo-white mt-1">
                             {classroom.language.toUpperCase()} •{' '}
                             {classroom.member_count === 1
                               ? t('teacher.classroom.member')
@@ -151,7 +151,7 @@ export default function LessonAssignmentDialog({
 
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 text-neo-white/60 hover:text-neo-white"
+              className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label="Close"
               disabled={isAssigning}
             >

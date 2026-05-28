@@ -126,13 +126,13 @@ export default function DrillResearchIntro({ drillType }: DrillResearchIntroProp
               </p>
               <p className={cn(
                 'text-xs leading-snug',
-                isDarkMode ? 'text-neo-white/90' : 'text-neo-black/90'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/90'
               )}>
                 {copy.blurb}
               </p>
               <p className={cn(
                 'mt-1 text-[10px] italic',
-                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
               )}>
                 {copy.source}
               </p>

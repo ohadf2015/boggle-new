@@ -68,7 +68,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
     >
       {/* Header: mechanic name + bonus multiplier */}
       <div className="flex items-center justify-between mb-1.5">
-        <span className="font-neo-display text-xs font-bold text-neo-white/90 uppercase tracking-wide truncate">
+        <span className="font-neo-display text-xs font-bold text-neo-white uppercase tracking-wide truncate">
           {t(mechanicName) || mechanicName}
         </span>
         {showMultiplier && (
@@ -100,7 +100,7 @@ const BossMechanicWidget = memo<BossMechanicWidgetProps>(({
 
       {/* Count display */}
       <div className="flex justify-end mt-1">
-        <span className="font-mono text-xs font-bold text-neo-white/60 tabular-nums">
+        <span className="font-mono text-xs font-bold text-neo-white tabular-nums">
           {current} / {target}
         </span>
       </div>

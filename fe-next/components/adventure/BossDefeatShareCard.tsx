@@ -261,7 +261,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
 
       {/* Boss name + world */}
       <div className="relative mb-3">
-        <div className="text-neo-white/40 text-[10px] font-bold uppercase tracking-wider mb-0.5">
+        <div className="text-neo-white text-[10px] font-bold uppercase tracking-wider mb-0.5">
           {worldName}
         </div>
         <div className="text-neo-white font-black text-2xl tracking-tight leading-tight">
@@ -278,7 +278,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
       >
         <Sword className={cn('w-5 h-5 shrink-0', theme.accentColor)} />
         <div className="min-w-0">
-          <div className="text-neo-white/40 text-[10px] font-bold uppercase tracking-wider">
+          <div className="text-neo-white text-[10px] font-bold uppercase tracking-wider">
             {t('adventure.share.killingWord')}
           </div>
           <div className={cn('font-black text-xl tracking-widest uppercase truncate', theme.accentColor)}>
@@ -292,7 +292,7 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="text-neo-white/60 text-xs font-bold italic mb-3 leading-relaxed"
+        className="text-neo-white text-xs font-bold italic mb-3 leading-relaxed"
       >
         &ldquo;{taunt}&rdquo;
       </AdaptiveMotion.p>
@@ -319,12 +319,12 @@ export function BossDefeatShareCard(props: BossDefeatShareCardProps) {
           className="text-neo-white font-black text-base tabular-nums"
         >
           {score.toLocaleString()}{' '}
-          <span className="text-neo-white/30 font-normal text-xs">{t('common.pts')}</span>
+          <span className="text-neo-white font-normal text-xs">{t('common.pts')}</span>
         </AdaptiveMotion.div>
       </div>
 
       {/* Domain */}
-      <div className="text-neo-white/20 text-[10px] font-mono tracking-wider mb-4">
+      <div className="text-neo-white text-[10px] font-mono tracking-wider mb-4">
         lexiclash.live
       </div>
 

@@ -99,7 +99,7 @@ export function WordCard({
             </div>
           </div>
         </CardContent>
-        <CardFooter className="pt-2 flex justify-between gap-2 border-t bg-slate-50/50 dark:bg-slate-900/50">
+        <CardFooter className="pt-2 flex justify-between gap-2 border-t bg-slate-50/50 dark:bg-neo-navy/50">
           <Button
             size="sm"
             variant="ghost"

@@ -207,16 +207,16 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
                 <div className="text-3xl font-black text-white">
                   {challengeData.solved ? challengeData.attemptsUsed : 'X'}/10
                 </div>
-                <div className="text-xs text-white/80">{t('wordHunt.results.attempts')}</div>
+                <div className="text-xs text-white">{t('wordHunt.results.attempts')}</div>
               </div>
               {challengeData.wordsDiscovered > 0 && (
                 <div className="text-center">
                   <div className="text-2xl font-black text-white">{challengeData.wordsDiscovered}</div>
-                  <div className="text-xs text-white/80">{t('wordHunt.survival.wordsLabel')}</div>
+                  <div className="text-xs text-white">{t('wordHunt.survival.wordsLabel')}</div>
                 </div>
               )}
             </div>
-            <div className="text-center mt-2 text-white/90 text-sm font-bold">
+            <div className="text-center mt-2 text-white text-sm font-bold">
               {t('wordHunt.results.beatTheirScore')}
             </div>
           </m.div>

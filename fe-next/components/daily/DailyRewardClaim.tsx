@@ -61,7 +61,7 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="text-sm text-neo-cream/60"
+        className="text-sm text-neo-white"
       >
         {interpolateTranslation(t('daily.comeBackTomorrow'), { coins: tomorrowCoins })}
       </m.p>

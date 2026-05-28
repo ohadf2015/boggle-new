@@ -246,7 +246,7 @@ export default function WebVitalsPageClient() {
   }
 
   return (
-    <div className={cn("flex-1 flex flex-col w-full overflow-x-hidden min-h-screen", isDark ? "bg-gray-900" : "bg-gray-50")}>
+    <div className={cn("flex-1 flex flex-col w-full overflow-x-hidden min-h-screen", isDark ? "bg-neo-navy" : "bg-gray-50")}>
       <Header />
       <AdminSubNav />
 
@@ -271,7 +271,7 @@ export default function WebVitalsPageClient() {
         </div>
 
         {/* Filters */}
-        <div className={cn("p-4 rounded-lg mb-6 border", isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200")}>
+        <div className={cn("p-4 rounded-lg mb-6 border", isDark ? "bg-neo-navy-light border-gray-700" : "bg-white border-gray-200")}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className={cn("block text-sm font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
@@ -282,7 +282,7 @@ export default function WebVitalsPageClient() {
                 onChange={(e) => setTimeRange(e.target.value as any)}
                 className={cn(
                   "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"
+                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
                 )}
               >
                 <option value="1h">Last Hour</option>
@@ -301,7 +301,7 @@ export default function WebVitalsPageClient() {
                 onChange={(e) => setSelectedMetric(e.target.value)}
                 className={cn(
                   "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"
+                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
                 )}
               >
                 <option value="all">All Metrics</option>
@@ -320,7 +320,7 @@ export default function WebVitalsPageClient() {
                 onChange={(e) => setSelectedDevice(e.target.value)}
                 className={cn(
                   "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"
+                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
                 )}
               >
                 <option value="all">All Devices</option>
@@ -339,7 +339,7 @@ export default function WebVitalsPageClient() {
                 onChange={(e) => setSelectedRating(e.target.value)}
                 className={cn(
                   "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"
+                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
                 )}
               >
                 <option value="all">All Ratings</option>
@@ -365,7 +365,7 @@ export default function WebVitalsPageClient() {
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                   "p-6 rounded-lg border",
-                  isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+                  isDark ? "bg-neo-navy-light border-gray-700" : "bg-white border-gray-200"
                 )}
               >
                 <div className="flex items-center justify-between mb-4">
@@ -424,7 +424,7 @@ export default function WebVitalsPageClient() {
         </div>
 
         {/* Recent Vitals Table */}
-        <div className={cn("rounded-lg border overflow-hidden", isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200")}>
+        <div className={cn("rounded-lg border overflow-hidden", isDark ? "bg-neo-navy-light border-gray-700" : "bg-white border-gray-200")}>
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className={cn("font-bold text-lg", isDark ? "text-white" : "text-gray-900")}>
               Recent Measurements ({vitals.length})
@@ -433,7 +433,7 @@ export default function WebVitalsPageClient() {
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className={cn("text-sm", isDark ? "bg-gray-700" : "bg-gray-50")}>
+              <thead className={cn("text-sm", isDark ? "bg-neo-navy-elevated" : "bg-gray-50")}>
                 <tr>
                   <th className="px-3 sm:px-4 py-3 text-left font-medium">Metric</th>
                   <th className="px-3 sm:px-4 py-3 text-left font-medium">Value</th>
@@ -456,7 +456,7 @@ export default function WebVitalsPageClient() {
                       className={cn(
                         "text-sm",
                         isPoor && "bg-red-50 dark:bg-red-900/10",
-                        isDark ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                        isDark ? "hover:bg-neo-navy-elevated" : "hover:bg-gray-50"
                       )}
                     >
                       <td className={cn("px-3 sm:px-4 py-3 font-medium", isDark ? "text-white" : "text-gray-900")}>

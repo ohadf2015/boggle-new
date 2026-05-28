@@ -124,25 +124,25 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           {!progress.isMaxLevel && (
             <div className="flex items-center gap-1">
               <span className={cn(
-                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70 tabular-nums',
+                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpInCurrentLevel}
               </span>
               <span className={cn(
-                'font-neo-body text-neo-black/50 dark:text-neo-white/50',
+                'font-neo-body text-neo-black/50 dark:text-neo-white',
                 sizeConfig.xpText
               )}>
                 /
               </span>
               <span className={cn(
-                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white/70 tabular-nums',
+                'font-neo-body font-bold text-neo-black/70 dark:text-neo-white tabular-nums',
                 sizeConfig.xpText
               )}>
                 {progress.xpNeededForNextLevel}
               </span>
               <span className={cn(
-                'font-neo-body text-neo-black/50 dark:text-neo-white/50',
+                'font-neo-body text-neo-black/50 dark:text-neo-white',
                 sizeConfig.xpText
               )}>
                 {t('education.xp.xpLabel')}
@@ -224,13 +224,13 @@ const XpProgressBar = memo<XpProgressBarProps>(({
       {showNextLevel && !progress.isMaxLevel && (
         <div className="flex items-center justify-between mt-2">
           <span className={cn(
-            'font-neo-body text-neo-black/60 dark:text-neo-white/60',
+            'font-neo-body text-neo-black/60 dark:text-neo-white',
             sizeConfig.xpText
           )}>
             {t('education.xp.nextLevel')}: {progress.currentLevel + 1}
           </span>
           <span className={cn(
-            'font-neo-body text-neo-black/50 dark:text-neo-white/50',
+            'font-neo-body text-neo-black/50 dark:text-neo-white',
             sizeConfig.xpText
           )}>
             {t('education.xp.keepGoing')}

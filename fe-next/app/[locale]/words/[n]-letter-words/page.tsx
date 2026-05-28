@@ -154,22 +154,22 @@ export default async function NLetterWordsPage({ params }: PageParams) {
 
           {/* Stats bar */}
           <div className="flex flex-wrap gap-4 mb-8">
-            <div className="bg-slate-900 border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
+            <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
               <span className="text-neo-cyan font-bold text-lg">{totalWords}</span>
               <span className="text-slate-400 text-sm">words</span>
             </div>
-            <div className="bg-slate-900 border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
+            <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
               <span className="text-neo-lime font-bold text-lg">{getWordScore('x'.repeat(n))}</span>
               <span className="text-slate-400 text-sm">base pts each</span>
             </div>
-            <div className="bg-slate-900 border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
+            <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
               <span className="text-neo-pink font-bold text-lg">{getWordScore('x'.repeat(n)) * 2}</span>
               <span className="text-slate-400 text-sm">fire round pts</span>
             </div>
           </div>
 
           {/* CTA */}
-          <div className="bg-slate-900 border-neo border-neo-black rounded-neo p-4 shadow-hard mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="bg-neo-navy border-neo border-neo-black rounded-neo p-4 shadow-hard mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="flex-1">
               <p className="font-bold text-neo-white mb-1">Think you know your {n}-letter words?</p>
               <p className="text-slate-400 text-sm">
@@ -186,8 +186,8 @@ export default async function NLetterWordsPage({ params }: PageParams) {
 
           {/* Strategy section */}
           {WORD_LENGTH_CONTENT[n] && (
-            <section className="mb-8 border-neo border-neo-black rounded-neo shadow-hard bg-slate-900 overflow-hidden">
-              <div className="px-5 py-3 border-b-2 border-neo-black bg-slate-800">
+            <section className="mb-8 border-neo border-neo-black rounded-neo shadow-hard bg-neo-navy overflow-hidden">
+              <div className="px-5 py-3 border-b-2 border-neo-black bg-neo-navy-light">
                 <h2 className="text-xl font-neo-display font-black text-neo-cyan">
                   Strategy for {n}-Letter Words
                 </h2>
@@ -204,7 +204,7 @@ export default async function NLetterWordsPage({ params }: PageParams) {
                     {WORD_LENGTH_CONTENT[n].funFact}
                   </p>
                 </div>
-                <div className="flex items-start gap-3 bg-slate-800 rounded-neo px-4 py-3">
+                <div className="flex items-start gap-3 bg-neo-navy-light rounded-neo px-4 py-3">
                   <span className="text-neo-pink font-black text-xs uppercase tracking-wider shrink-0 mt-0.5">Difficulty</span>
                   <p className="text-slate-300 text-sm leading-relaxed">
                     {WORD_LENGTH_CONTENT[n].difficulty}
@@ -228,12 +228,12 @@ export default async function NLetterWordsPage({ params }: PageParams) {
                     <Link
                       key={word}
                       href={`/${locale}/words/${word}`}
-                      className="group flex items-center justify-between bg-slate-900 border border-slate-700 hover:border-neo-cyan rounded-neo px-3 py-2 transition-colors"
+                      className="group flex items-center justify-between bg-neo-navy border border-slate-700 hover:border-neo-cyan rounded-neo px-3 py-2 transition-colors"
                     >
                       <span className="font-bold text-sm text-neo-white group-hover:text-neo-lime transition-colors uppercase tracking-wide">
                         {word}
                       </span>
-                      <span className="text-xs font-bold text-neo-cyan bg-slate-800 rounded px-1.5 py-0.5 ms-1 shrink-0">
+                      <span className="text-xs font-bold text-neo-cyan bg-neo-navy-light rounded px-1.5 py-0.5 ms-1 shrink-0">
                         {getWordScore(word)}pt
                       </span>
                     </Link>
@@ -245,8 +245,8 @@ export default async function NLetterWordsPage({ params }: PageParams) {
           </div>
 
           {/* FAQ section */}
-          <section className="mt-10 border-neo border-neo-black rounded-neo shadow-hard bg-slate-900 overflow-hidden">
-            <div className="px-5 py-3 border-b-2 border-neo-black bg-slate-800">
+          <section className="mt-10 border-neo border-neo-black rounded-neo shadow-hard bg-neo-navy overflow-hidden">
+            <div className="px-5 py-3 border-b-2 border-neo-black bg-neo-navy-light">
               <h2 className="text-xl font-neo-display font-black text-neo-cyan">
                 Frequently Asked Questions
               </h2>
@@ -301,7 +301,7 @@ export default async function NLetterWordsPage({ params }: PageParams) {
                 <Link
                   key={l}
                   href={`/${locale}/words/${l}-letter-words`}
-                  className="text-sm bg-slate-800 border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
+                  className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
                 >
                   {l}-letter words
                 </Link>
@@ -317,7 +317,7 @@ export default async function NLetterWordsPage({ params }: PageParams) {
                 <Link
                   key={letter}
                   href={`/${locale}/words/starting-with/${letter}`}
-                  className="w-8 h-8 flex items-center justify-center bg-slate-800 border border-slate-700 rounded-neo text-sm font-bold uppercase hover:border-neo-cyan hover:text-neo-lime transition-colors"
+                  className="w-8 h-8 flex items-center justify-center bg-neo-navy-light border border-slate-700 rounded-neo text-sm font-bold uppercase hover:border-neo-cyan hover:text-neo-lime transition-colors"
                 >
                   {letter}
                 </Link>

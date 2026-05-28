@@ -54,11 +54,11 @@ export function BlastRetryWaveModal({
               <Trophy className="h-8 w-8 text-neo-navy" strokeWidth={3} />
             </div>
 
-            <h2 className="font-neo-display text-2xl font-black text-neo-cream">
+            <h2 className="font-neo-display text-2xl font-black text-neo-white">
               {t('blast.retryWaveModal.title', { wave: waveNumber })}
             </h2>
 
-            <p className="font-neo-body text-sm text-neo-cream/80">
+            <p className="font-neo-body text-sm text-neo-white">
               {t('blast.retryWaveModal.body', { wave: waveNumber, percent: Math.round(clearPct) })}
             </p>
 
@@ -76,7 +76,7 @@ export function BlastRetryWaveModal({
               <button
                 data-testid="blast-retry-wave-decline"
                 onClick={onDecline}
-                className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy px-4 py-2 font-neo-body text-sm text-neo-cream/70 hover:text-neo-cream"
+                className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy px-4 py-2 font-neo-body text-sm text-neo-white hover:text-neo-white"
               >
                 <RotateCcw className="h-4 w-4" />
                 {t('blast.retryWaveModal.decline')}

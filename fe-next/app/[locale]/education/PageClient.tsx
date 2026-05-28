@@ -104,7 +104,7 @@ export function PageClient() {
             >
               <div className="mx-auto max-w-3xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm text-neo-white/70">
+                  <p className="text-sm text-neo-white">
                     {t('education.landing.welcomeBack')}
                   </p>
                   <p className="text-neo-white font-neo-display text-lg font-bold">
@@ -168,7 +168,7 @@ export function PageClient() {
               <h3 className="text-2xl font-neo-display font-black text-neo-pink">
                 {t('education.landing.teacher')}
               </h3>
-              <p className="mt-3 text-neo-white/70">
+              <p className="mt-3 text-neo-white">
                 {t('education.landing.teacherCta')}
               </p>
             </div>
@@ -177,7 +177,7 @@ export function PageClient() {
               <h3 className="text-2xl font-neo-display font-black text-neo-cyan">
                 {t('education.landing.student')}
               </h3>
-              <p className="mt-3 text-neo-white/70">
+              <p className="mt-3 text-neo-white">
                 {t('education.landing.studentCta')}
               </p>
             </div>
@@ -188,7 +188,7 @@ export function PageClient() {
       {/* Social proof for unauthenticated users */}
       {!hasTeacherAccess && (
         <section className="mx-auto max-w-3xl px-4 py-8 text-center">
-          <p className="text-neo-white/70">
+          <p className="text-neo-white">
             {t('education.landing.socialProof')}
           </p>
         </section>
@@ -200,7 +200,7 @@ export function PageClient() {
             <h2 className="text-3xl font-neo-display font-black text-neo-white">
               {t('education.landing.trust.title')}
             </h2>
-            <ul className="mt-4 space-y-3 text-neo-white/70">
+            <ul className="mt-4 space-y-3 text-neo-white">
               <li className="flex items-start gap-3">
                 <span className="text-neo-lime font-bold">✓</span>
                 <span>{t('education.landing.trust.bullet1')}</span>

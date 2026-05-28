@@ -201,7 +201,7 @@ export default function LessonTemplateEditor({
                 ))}
               </div>
               {selectedDifficulty && (
-                <p className="text-xs text-neo-white/60">
+                <p className="text-xs text-neo-white">
                   {t('education.template.boardPreview')} {selectedDifficulty.rows}x{selectedDifficulty.cols}
                 </p>
               )}
@@ -241,7 +241,7 @@ export default function LessonTemplateEditor({
                   <Label className="text-sm font-neo-body text-neo-white">
                     {t('education.template.allowLateJoin')}
                   </Label>
-                  <p className="text-xs text-neo-white/60">
+                  <p className="text-xs text-neo-white">
                     {t('education.template.allowLateJoinDesc')}
                   </p>
                 </div>
@@ -258,7 +258,7 @@ export default function LessonTemplateEditor({
                 <Label className="text-sm font-neo-body text-neo-white">
                   {t('education.template.setDefault')}
                 </Label>
-                <p className="text-xs text-neo-white/60">
+                <p className="text-xs text-neo-white">
                   {t('education.template.setDefaultDesc')}
                 </p>
               </div>
@@ -297,7 +297,7 @@ export default function LessonTemplateEditor({
           <Dialog.Close asChild>
             <button
               className={cn(
-                'absolute top-4 text-neo-white/60 hover:text-neo-white',
+                'absolute top-4 text-neo-white hover:text-neo-white',
                 isRTL ? 'left-4' : 'right-4'
               )}
               aria-label="Close"

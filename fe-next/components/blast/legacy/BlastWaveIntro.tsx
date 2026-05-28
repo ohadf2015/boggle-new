@@ -14,7 +14,7 @@ interface BlastWaveIntroProps {
 const INTRO_DISPLAY_MS = 1500;
 
 const ARCHETYPE_ACCENT: Record<BlastWaveArchetype, string> = {
-  normal: 'text-neo-cream',
+  normal: 'text-neo-white',
   scoreRush: 'text-neo-lime',
   treasureHunt: 'text-yellow-300',
   survival: 'text-neo-pink',

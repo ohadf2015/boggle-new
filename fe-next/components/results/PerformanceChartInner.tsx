@@ -396,7 +396,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
 
             {/* Overlay with message */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/60 text-white">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-neo-navy/60 text-white">
               <m.div
                 initial={{ scale: 0.8, rotate: -5 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -416,7 +416,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                     ? (t('chart.oneMoreGame'))
                     : (t('chart.needMoreGames'))}
                 </h4>
-                <p className="text-white/60 text-xs px-4">
+                <p className="text-white text-xs px-4">
                   {t('chart.needMoreGamesDesc')}
                 </p>
               </m.div>
@@ -621,7 +621,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                 </div>
               </div>
               <div className="text-lg font-black text-white">{trend.bestScore}</div>
-              <div className="text-[9px] font-bold uppercase text-white/60">
+              <div className="text-[9px] font-bold uppercase text-white">
                 {t('chart.bestScore')}
               </div>
             </div>
@@ -632,7 +632,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                 </div>
               </div>
               <div className="text-lg font-black text-white">{trend.averageScore}</div>
-              <div className="text-[9px] font-bold uppercase text-white/60">
+              <div className="text-[9px] font-bold uppercase text-white">
                 {t('chart.average')}
               </div>
             </div>
@@ -643,7 +643,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                 </div>
               </div>
               <div className="text-lg font-black text-white">{trend.totalGames}</div>
-              <div className="text-[9px] font-bold uppercase text-white/60">
+              <div className="text-[9px] font-bold uppercase text-white">
                 {t('chart.games')}
               </div>
             </div>

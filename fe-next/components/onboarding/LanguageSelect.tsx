@@ -73,7 +73,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.25 }}
-          className="text-neo-cream/60 text-sm lg:text-base font-neo-body mt-1 lg:mt-2"
+          className="text-neo-white text-sm lg:text-base font-neo-body mt-1 lg:mt-2"
         >
           {t('onboarding.ftue.chooseLanguage', 'Choose your language')}
         </m.p>
@@ -99,8 +99,8 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
                 'relative flex flex-col items-center gap-1.5 px-3 py-4 rounded-neo border-3',
                 'font-neo-body transition-all overflow-hidden',
                 isSelected
-                  ? 'bg-neo-lime/15 border-neo-lime text-neo-cream shadow-hard-sm'
-                  : 'bg-neo-navy-light border-neo-cream/15 text-neo-cream/60 hover:border-neo-cream/30'
+                  ? 'bg-neo-lime/15 border-neo-lime text-neo-white shadow-hard-sm'
+                  : 'bg-neo-navy-light border-neo-cream/15 text-neo-white hover:border-neo-cream/30'
               )}
             >
               {/* Selection check badge */}
@@ -120,7 +120,7 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
               </span>
               <span className={cn(
                 'text-sm font-bold',
-                isSelected && 'text-neo-cream'
+                isSelected && 'text-neo-white'
               )}>
                 {config.nativeName}
               </span>

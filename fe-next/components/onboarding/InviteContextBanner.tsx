@@ -29,7 +29,7 @@ const InviteContextBanner: React.FC<Props> = ({ roomCode, hostName, onSkip }) =>
       <p className="font-neo-display font-black text-sm uppercase tracking-wide truncate min-w-0">
         <span aria-hidden>👋 </span>
         {t('invite.banner.host', { hostName: displayName })}{' '}
-        <span className="font-mono bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo">
+        <span className="font-mono bg-neo-black text-neo-white px-1.5 py-0.5 rounded-neo">
           {roomCode}
         </span>
       </p>

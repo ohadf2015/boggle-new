@@ -236,7 +236,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
 
             {/* Badge Display */}
             <div className="mb-6">
-              <p className="text-neo-white/70 font-bold text-lg mb-2">{badgeText}</p>
+              <p className="text-neo-white font-bold text-lg mb-2">{badgeText}</p>
               <m.div
                 className={cn(
                   'inline-flex items-center justify-center',

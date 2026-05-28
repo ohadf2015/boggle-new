@@ -200,7 +200,7 @@ const ChallengeButton: React.FC<ChallengeButtonProps> = ({
 
       {/* Subtitle hint */}
       {!isCompact && !challengeUrl && !isCreating && (
-        <p className="text-center text-xs text-white/60 font-medium">
+        <p className="text-center text-xs text-white font-medium">
           {t('challenge.shareHint')}
         </p>
       )}

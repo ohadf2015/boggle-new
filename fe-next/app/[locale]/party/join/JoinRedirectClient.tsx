@@ -73,7 +73,7 @@ export default function JoinRedirectClient() {
           <p className="text-neo-red font-neo-display uppercase mb-2">{error}</p>
           <button
             onClick={() => { setJoined(false); window.location.reload(); }}
-            className="text-neo-cream/50 text-sm underline"
+            className="text-neo-white text-sm underline"
           >
             Try again
           </button>
@@ -86,7 +86,7 @@ export default function JoinRedirectClient() {
   if (!roomCode && !room) {
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
-        <h1 className="font-neo-display text-neo-cream text-2xl uppercase mb-4">
+        <h1 className="font-neo-display text-neo-white text-2xl uppercase mb-4">
           {t('party.joinRoom')}
         </h1>
         <input
@@ -97,9 +97,9 @@ export default function JoinRedirectClient() {
           maxLength={6}
           className="
             bg-neo-navy-elevated border-3 border-neo-cyan/50 rounded-neo
-            px-4 py-3 text-neo-cream font-neo-display text-xl text-center
+            px-4 py-3 text-neo-white font-neo-display text-xl text-center
             uppercase tracking-[0.3em] mb-4 w-48
-            placeholder:text-neo-cream/30
+            placeholder:text-neo-white
             focus:outline-hidden focus:border-neo-cyan
           "
         />
@@ -115,7 +115,7 @@ export default function JoinRedirectClient() {
           {t('party.join')}
         </button>
         {!connected && (
-          <p className="text-neo-cream/30 text-xs mt-2 animate-pulse">Connecting...</p>
+          <p className="text-neo-white text-xs mt-2 animate-pulse">Connecting...</p>
         )}
       </div>
     );
@@ -126,10 +126,10 @@ export default function JoinRedirectClient() {
     return (
       <div className="min-h-screen bg-neo-navy flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-pulse text-neo-cream font-neo-display text-lg">
+          <div className="animate-pulse text-neo-white font-neo-display text-lg">
             {t('party.joining')}
           </div>
-          <div className="mt-2 text-neo-cream/50 font-neo-body text-sm">
+          <div className="mt-2 text-neo-white font-neo-body text-sm">
             Room: {roomCode || manualCode}
           </div>
         </div>
@@ -145,16 +145,16 @@ export default function JoinRedirectClient() {
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
         <div className="text-6xl mb-4">{gameDef?.icon || '🎮'}</div>
-        <h1 className="font-neo-display text-neo-cream text-2xl uppercase">
+        <h1 className="font-neo-display text-neo-white text-2xl uppercase">
           {gameDef ? t(gameDef.nameKey) : room.gameId}
         </h1>
         <div className="mt-4 bg-neo-navy-elevated border-3 border-neo-cream/30 rounded-neo p-4 text-center">
-          <p className="text-neo-cream font-neo-display text-lg">{room.roomCode}</p>
-          <p className="text-neo-cream/50 font-neo-body text-sm mt-1">
+          <p className="text-neo-white font-neo-display text-lg">{room.roomCode}</p>
+          <p className="text-neo-white font-neo-body text-sm mt-1">
             {playerCount} {t('party.playersJoined')}
           </p>
         </div>
-        <div className="mt-6 animate-pulse text-neo-cream/40 font-neo-body text-sm">
+        <div className="mt-6 animate-pulse text-neo-white font-neo-body text-sm">
           {isSpectator
             ? t('party.spectating')
             : t('party.waitingForHost')}
@@ -198,7 +198,7 @@ export default function JoinRedirectClient() {
   // Fallback
   return (
     <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
-      <p className="text-neo-cream font-neo-display uppercase">{room.phase}</p>
+      <p className="text-neo-white font-neo-display uppercase">{room.phase}</p>
     </div>
   );
 }

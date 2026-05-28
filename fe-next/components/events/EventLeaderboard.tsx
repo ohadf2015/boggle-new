@@ -65,7 +65,7 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
 
       {/* Empty state */}
       {participants.length === 0 ? (
-        <div className="p-6 text-center text-white/70 text-sm">
+        <div className="p-6 text-center text-white text-sm">
           {t('events.noParticipants')}
         </div>
       ) : (
@@ -92,7 +92,7 @@ const EventLeaderboard: React.FC<EventLeaderboardProps> = ({
                   )}
                 >
                   {/* Position */}
-                  <div className="w-8 text-center font-bold text-white/80">
+                  <div className="w-8 text-center font-bold text-white">
                     {Icon ? (
                       <Icon
                         size={18}

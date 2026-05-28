@@ -65,7 +65,7 @@ const RANK_ACCENTS: Record<number, RankAccent> = {
 };
 
 const DEFAULT_ACCENT: RankAccent = {
-  text: 'text-neo-cream',
+  text: 'text-neo-white',
   bg: 'bg-neo-cream',
   border: 'border-neo-cream',
   glow: 'drop-shadow-[0_0_35px_rgba(255,254,240,0.35)]',
@@ -284,7 +284,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 initial={reducedMotion ? undefined : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2 }}
-                className="text-[10px] font-bold text-white/40 uppercase tracking-widest"
+                className="text-[10px] font-bold text-white uppercase tracking-widest"
               >
                 {t('results.totalPoints')}
               </m.p>
@@ -294,7 +294,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             {isWordHunt && (
               <div className="flex items-center gap-2 sm:gap-4 mt-4">
                 <div className="bg-neo-black/40 border-2 border-white/10 px-3 sm:px-4 py-1.5 rounded-neo">
-                  <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
+                  <p className="text-[9px] font-black text-white uppercase tracking-[0.2em] mb-0.5">
                     {t('results.target')}
                   </p>
                   <p className="text-xl font-neo-display font-black text-white uppercase">
@@ -302,7 +302,7 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                   </p>
                 </div>
                 <div className="bg-neo-black/40 border-2 border-white/10 px-3 sm:px-4 py-1.5 rounded-neo">
-                  <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-0.5">
+                  <p className="text-[9px] font-black text-white uppercase tracking-[0.2em] mb-0.5">
                     {t('results.wordsFound')}
                   </p>
                   <p className={cn('text-xl font-neo-display font-black uppercase', displayAccent.text)}>

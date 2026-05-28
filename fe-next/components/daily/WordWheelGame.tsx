@@ -663,7 +663,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
                 )}
               </AnimatePresence>
             </div>
-            <span className="text-neo-cream/60 text-xs sm:text-sm font-semibold truncate">
+            <span className="text-neo-white text-xs sm:text-sm font-semibold truncate">
               {t('wordWheel.wordsFound', { count: wordsFound.length })}
             </span>
             <m.span
@@ -722,7 +722,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             {builtLetters.length === 0 ? (
               <m.span
                 key="placeholder"
-                className="text-neo-cream/30 font-neo-display text-base sm:text-lg"
+                className="text-neo-white font-neo-display text-base sm:text-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -760,7 +760,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
                   'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
                   builtWord.length >= 3
                     ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[2px_2px_0px_black,0_0_14px_rgba(191,255,0,0.5)]'
-                    : 'bg-neo-navy-light text-neo-cream/40 shadow-hard-xs',
+                    : 'bg-neo-navy-light text-neo-white shadow-hard-xs',
                 )}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -820,7 +820,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         <AnimatePresence>
           {nextRival && (
             <m.div
-              className="max-w-full px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-cream/80 font-semibold flex items-center gap-1.5 whitespace-nowrap"
+              className="max-w-full px-2.5 py-1 rounded-neo border-2 border-neo-cream/20 bg-neo-navy-light/60 text-[11px] sm:text-xs text-neo-white font-semibold flex items-center gap-1.5 whitespace-nowrap"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -883,7 +883,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         className="h-[14px] sm:h-[16px] flex items-center justify-center"
       >
         {builtLetters.length > 0 && (
-          <p className="text-neo-cream/40 text-[10px] sm:text-xs text-center">
+          <p className="text-neo-white text-[10px] sm:text-xs text-center">
             {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
           </p>
         )}
@@ -954,7 +954,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       </div>
 
       {/* ── Center letter rule hint ── */}
-      <p className="text-neo-cream/40 text-xs text-center">
+      <p className="text-neo-white text-xs text-center">
         {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters', { min: '3' })}
       </p>
 
@@ -969,7 +969,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           onClick={handleClear}
           disabled={builtLetters.length === 0}
           className={cn(
-            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
+            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
@@ -988,7 +988,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg',
             builtWord.length >= 3
               ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
-              : 'bg-neo-navy-light text-neo-cream/40 shadow-hard-lg',
+              : 'bg-neo-navy-light text-neo-white shadow-hard-lg',
             'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:cursor-not-allowed',
           )}
@@ -1008,7 +1008,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           onClick={handleBackspace}
           disabled={builtLetters.length === 0}
           className={cn(
-            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-cream shadow-hard',
+            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard',
             'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
@@ -1031,7 +1031,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         <h3
           className={cn(
             'text-xs font-bold uppercase mb-1.5 shrink-0 transition-opacity',
-            wordsFound.length > 0 ? 'text-neo-cream/50 opacity-100' : 'opacity-0',
+            wordsFound.length > 0 ? 'text-neo-white opacity-100' : 'opacity-0',
           )}
           aria-hidden={wordsFound.length === 0}
         >
@@ -1042,7 +1042,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             <m.span
               key={word}
               className={cn(
-                'px-2.5 py-1 rounded-neo border-2 text-neo-cream text-xs font-semibold shadow-hard-xs h-fit',
+                'px-2.5 py-1 rounded-neo border-2 text-neo-white text-xs font-semibold shadow-hard-xs h-fit',
                 word === lastFoundWord
                   ? 'bg-neo-lime/20 border-neo-lime ring-1 ring-neo-lime/40'
                   : 'bg-neo-navy-light border-neo-black',

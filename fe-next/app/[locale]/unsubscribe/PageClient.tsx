@@ -47,13 +47,13 @@ export default function UnsubscribePageClient() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-neo-navy text-neo-cream items-center justify-center p-4">
+    <div className="flex-1 flex flex-col bg-neo-navy text-neo-white items-center justify-center p-4">
       <m.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-md w-full"
       >
-        <div className="bg-slate-800/50 border-4 border-neo-black rounded-neo shadow-hard-lg p-8 text-center">
+        <div className="bg-neo-navy-light/50 border-4 border-neo-black rounded-neo shadow-hard-lg p-8 text-center">
           {status === 'loading' ? (
             <PageLoader size="md" text={t('unsubscribe.processing')} />
           ) : status === 'success' ? (
@@ -62,11 +62,11 @@ export default function UnsubscribePageClient() {
                 <CheckCircle className="w-10 h-10" />
               </div>
 
-              <h1 className="text-2xl font-black text-neo-cream mb-4">
+              <h1 className="text-2xl font-black text-neo-white mb-4">
                 {t('unsubscribe.successTitle')}
               </h1>
 
-              <p className="text-neo-cream/80 mb-6">
+              <p className="text-neo-white mb-6">
                 {t('unsubscribe.successMessage') ||
                   "You won't receive any more daily challenge emails from us. We hope to see you in the game!"}
               </p>
@@ -92,7 +92,7 @@ export default function UnsubscribePageClient() {
                     'flex-1 px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
                     'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-                    'bg-slate-700 text-neo-cream hover:bg-slate-600'
+                    'bg-neo-navy-elevated text-neo-white hover:bg-slate-600'
                   )}
                 >
                   <Mail className="me-2" />
@@ -106,11 +106,11 @@ export default function UnsubscribePageClient() {
                 <XCircle className="w-10 h-10 text-neo-white" />
               </div>
 
-              <h1 className="text-2xl font-black text-neo-cream mb-4">
+              <h1 className="text-2xl font-black text-neo-white mb-4">
                 {t('unsubscribe.errorTitle')}
               </h1>
 
-              <p className="text-neo-cream/80 mb-6">
+              <p className="text-neo-white mb-6">
                 {t('unsubscribe.errorMessage') ||
                   "We couldn't process your unsubscribe request. The link may have expired or already been used."}
               </p>

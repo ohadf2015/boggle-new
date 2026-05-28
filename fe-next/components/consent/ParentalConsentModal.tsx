@@ -201,7 +201,7 @@ export function ParentalConsentModal({
                   >
                     {t('consent.modal.title')}
                   </h2>
-                  <p className="text-sm text-white/80 mt-0.5">
+                  <p className="text-sm text-white mt-0.5">
                     {t('consent.modal.subtitle')}
                   </p>
                 </div>

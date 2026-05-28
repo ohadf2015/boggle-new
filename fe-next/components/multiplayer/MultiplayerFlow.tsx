@@ -408,7 +408,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   if (isClassroomMode) {
     return (
       <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="flex flex-col items-center gap-3 text-neo-white/85 font-neo-body">
+        <div className="flex flex-col items-center gap-3 text-neo-white font-neo-body">
           <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
           <p className="text-sm sm:text-base">{t('education.classroomGame.waitingForPlayers')}</p>
         </div>

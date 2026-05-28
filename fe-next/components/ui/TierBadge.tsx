@@ -105,7 +105,7 @@ export const TierProgressBar = memo<TierProgressBarProps>(
           )}
           {isMaxTier && <span className="text-purple-400">Max tier!</span>}
         </div>
-        <div className="h-1.5 rounded-full bg-slate-700 overflow-hidden">
+        <div className="h-1.5 rounded-full bg-neo-navy-elevated overflow-hidden">
           <div
             className={`h-full rounded-full bg-linear-to-r ${tier.gradient} transition-all duration-500`}
             style={{ width: `${isMaxTier ? 100 : pct}%` }}

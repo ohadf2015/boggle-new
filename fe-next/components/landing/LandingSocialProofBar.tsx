@@ -119,7 +119,7 @@ export function LandingSocialProofBar({
             </div>
             <div className="flex flex-col">
               <AnimatedNumber value={pill.value} className="font-black text-lg sm:text-xl lg:text-2xl text-neo-white leading-tight" />
-              <span className="text-[10px] sm:text-xs font-bold text-neo-white/60 uppercase tracking-wider leading-tight">
+              <span className="text-[10px] sm:text-xs font-bold text-neo-white uppercase tracking-wider leading-tight">
                 {pill.label}
               </span>
             </div>

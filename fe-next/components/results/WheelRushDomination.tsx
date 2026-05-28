@@ -155,14 +155,14 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
         <div className="relative">
           <div className="flex items-center gap-1.5 mb-2">
             <Zap className="w-4 h-4 text-neo-cyan" />
-            <h3 className="text-xs font-black uppercase tracking-wider text-neo-cream/80">
+            <h3 className="text-xs font-black uppercase tracking-wider text-neo-white">
               {t('wheelRush.results.matchRecap') || 'Wheel Rush Recap'}
             </h3>
           </div>
 
           <div className="flex items-end justify-between gap-3 mb-2">
             <div className="min-w-0">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-neo-cream/50">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-neo-white">
                 {t('wheelRush.results.totalLocks') || 'Words Locked'}
               </div>
               <div className="text-4xl font-black text-neo-cyan tabular-nums leading-none drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]">
@@ -170,7 +170,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
               </div>
             </div>
             <div className="shrink-0 flex flex-col items-end gap-1">
-              <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-neo-cream/50">
+              <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-neo-white">
                 <Swords className="w-3 h-3" />
                 {t('wheelRush.results.stealRate') || 'Steal Rate'}
               </div>
@@ -182,7 +182,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                   transition={{ duration: 1.1, delay: 0.4 }}
                 />
               </div>
-              <span className="text-[10px] tabular-nums text-neo-cream/60">{matchRecap.stealRate}%</span>
+              <span className="text-[10px] tabular-nums text-neo-white">{matchRecap.stealRate}%</span>
             </div>
           </div>
 
@@ -194,7 +194,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                   <ScoreCountUp to={matchRecap.totalLocks} duration={900} delay={prefersReduced ? 0 : 500} />
                 </span>
               </div>
-              <span className="text-[9px] uppercase tracking-wider text-neo-cream/50">
+              <span className="text-[9px] uppercase tracking-wider text-neo-white">
                 {t('wheelRush.results.locks') || 'Locks'}
               </span>
             </div>
@@ -205,7 +205,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                   <ScoreCountUp to={matchRecap.totalSteals} duration={900} delay={prefersReduced ? 0 : 600} />
                 </span>
               </div>
-              <span className="text-[9px] uppercase tracking-wider text-neo-cream/50">
+              <span className="text-[9px] uppercase tracking-wider text-neo-white">
                 {t('wheelRush.results.steals') || 'Steals'}
               </span>
             </div>
@@ -216,7 +216,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
       {/* ── Section header ── */}
       <m.div variants={v} className="flex items-center gap-2 px-1">
         <Sparkles className="w-4 h-4 text-neo-cyan" />
-        <h3 className="text-sm font-black uppercase tracking-wider text-neo-cream/80">
+        <h3 className="text-sm font-black uppercase tracking-wider text-neo-white">
           {t('wheelRush.results.boardDomination') || 'Wheel Domination'}
         </h3>
       </m.div>
@@ -240,10 +240,10 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                       <Crown className="w-3.5 h-3.5 text-neo-yellow" />
                     </m.div>
                   )}
-                  <span className={`text-xs font-bold ${isMe ? 'text-neo-white underline decoration-neo-lime/40 underline-offset-2' : 'text-neo-cream/80'}`}>
+                  <span className={`text-xs font-bold ${isMe ? 'text-neo-white underline decoration-neo-lime/40 underline-offset-2' : 'text-neo-white'}`}>
                     {username}
                   </span>
-                  <span className="text-[10px] text-neo-cream/50 ml-auto tabular-nums">
+                  <span className="text-[10px] text-neo-white ml-auto tabular-nums">
                     {stats.totalScore} {t('wheelRush.results.pts') || 'pts'} · {stats.wordsLocked}🔒 · {stats.wordsStolen}⚔
                   </span>
                 </div>
@@ -277,7 +277,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
               <div className="relative">
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <span className={award.color}>{award.icon}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-neo-cream/60">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neo-white">
                     {t(award.titleKey)}
                   </span>
                 </div>
@@ -291,8 +291,8 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                   </span>
                 </div>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <Sword className="w-2.5 h-2.5 text-neo-cream/40" />
-                  <span className={`text-[10px] ${award.username === currentUsername ? 'text-neo-white font-bold' : 'text-neo-cream/60'}`}>
+                  <Sword className="w-2.5 h-2.5 text-neo-white" />
+                  <span className={`text-[10px] ${award.username === currentUsername ? 'text-neo-white font-bold' : 'text-neo-white'}`}>
                     {award.username}
                   </span>
                 </div>

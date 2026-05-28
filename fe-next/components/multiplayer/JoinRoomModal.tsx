@@ -167,7 +167,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                 aria-invalid={!!nameError}
                 aria-describedby={nameError ? 'join-username-error' : undefined}
                 className={cn(
-                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white/30 focus-visible:ring-neo-pink',
+                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white focus-visible:ring-neo-pink',
                   nameError && 'border-red-500 animate-neo-shake'
                 )}
                 placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
@@ -184,7 +184,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
         <DialogFooter className="sticky bottom-0 bg-inherit z-10 flex flex-col gap-2" style={{ paddingBottom: 'calc(max(0.75rem, env(safe-area-inset-bottom, 0.75rem)) + var(--admob-banner-height, 0px))' }}>
           {room.maxPlayers && room.playerCount >= room.maxPlayers ? (
             <>
-              <p className="text-xs text-center text-neo-white/50 font-bold">
+              <p className="text-xs text-center text-neo-white font-bold">
                 {t('multiplayerFlow.joinModal.roomFullSpectate')}
               </p>
               <Button
