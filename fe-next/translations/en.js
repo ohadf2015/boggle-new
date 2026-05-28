@@ -12900,6 +12900,22 @@ const en = {
     "titleStreak": "ON FIRE!",
     "titleExplorer": "NICE FIND!",
     "titleMissionComplete": "ALL CLEAR!"
+  },
+  "mpModeBreakdown": {
+    "title": "Round Breakdown",
+    "emptyState": "No rounds yet — start a game!",
+    "roundLabel": "Round {n}",
+    "scoreLabel": "{score} points",
+    "wordCountLabel": "{count} words",
+    "topScore": "Top score"
+  },
+  "mpModeBreakdown": {
+    "title": "Round Breakdown",
+    "emptyState": "No rounds yet — start a game!",
+    "roundLabel": "Round {n}",
+    "scoreLabel": "{score} points",
+    "wordCountLabel": "{count} words",
+    "topScore": "Top score"
   }
 };
 

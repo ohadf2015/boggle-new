@@ -12495,6 +12495,14 @@ const ja = {
     "titleStreak": "絶好調！",
     "titleExplorer": "ナイス！",
     "titleMissionComplete": "全クリ！"
+  },
+  "mpModeBreakdown": {
+    "title": "ラウンド内訳",
+    "emptyState": "ラウンドがありません — ゲームを開始してください！",
+    "roundLabel": "ラウンド {n}",
+    "scoreLabel": "{score} ポイント",
+    "wordCountLabel": "{count} 単語",
+    "topScore": "最高スコア"
   }
 };
 

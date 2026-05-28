@@ -12483,6 +12483,14 @@ const sv = {
     titleStreak: "PÅ ELD!",
     titleExplorer: "BRA FYND!",
     titleMissionComplete: "ALLT KLART!"
+  },
+  "mpModeBreakdown": {
+    "title": "Omgångsöversikt",
+    "emptyState": "Inga omgångar ännu — starta ett spel!",
+    "roundLabel": "Omgång {n}",
+    "scoreLabel": "{score} poäng",
+    "wordCountLabel": "{count} ord",
+    "topScore": "Högsta poäng"
   }
 };
 

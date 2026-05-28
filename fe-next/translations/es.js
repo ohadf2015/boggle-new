@@ -12606,6 +12606,14 @@ const es = {
     "titleStreak": "¡EN LLAMAS!",
     "titleExplorer": "¡QUÉ HALLAZGO!",
     "titleMissionComplete": "¡TODO LISTO!"
+  },
+  "mpModeBreakdown": {
+    "title": "Desglose de rondas",
+    "emptyState": "Sin rondas aún — ¡comienza un juego!",
+    "roundLabel": "Ronda {n}",
+    "scoreLabel": "{score} puntos",
+    "wordCountLabel": "{count} palabras",
+    "topScore": "Puntuación más alta"
   }
 };
 

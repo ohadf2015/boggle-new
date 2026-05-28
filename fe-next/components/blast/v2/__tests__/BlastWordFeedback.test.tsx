@@ -40,7 +40,7 @@ describe('BlastWordFeedback', () => {
     expect(pill.textContent?.toLowerCase()).toContain('quartz');
   });
 
-  it('renders nothing for a theme-word match (handled by the celebration FX)', () => {
+  it('celebrates a theme-word match with a distinct "TARGET" toast carrying the word', () => {
     render(
       <BlastWordFeedback
         dictCheckPending={false}
@@ -50,8 +50,30 @@ describe('BlastWordFeedback', () => {
         t={t}
       />,
     );
+    const pill = screen.getByTestId('blast-feedback-target');
+    expect(pill).toBeInTheDocument();
+    expect(pill.textContent?.toUpperCase()).toContain('CAT');
+    // The target toast is its own thing — not the bonus pill.
     expect(screen.queryByTestId('blast-feedback-bonus')).not.toBeInTheDocument();
     expect(screen.queryByTestId('blast-feedback-checking')).not.toBeInTheDocument();
+  });
+
+  it('auto-hides the target toast after visibleMs', () => {
+    render(
+      <BlastWordFeedback
+        dictCheckPending={false}
+        lastValidation={{ kind: 'theme_match', word: 'CAT' }}
+        eventKey={1}
+        modeColor="#00FFFF"
+        visibleMs={1200}
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId('blast-feedback-target')).toBeInTheDocument();
+    act(() => {
+      vi.advanceTimersByTime(1300);
+    });
+    expect(screen.queryByTestId('blast-feedback-target')).not.toBeInTheDocument();
   });
 
   it('renders nothing when idle', () => {

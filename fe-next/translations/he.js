@@ -12915,6 +12915,14 @@ const he = {
     "titleStreak": "באש!",
     "titleExplorer": "כל הכבוד!",
     "titleMissionComplete": "סיימת הכל!"
+  },
+  "mpModeBreakdown": {
+    "title": "פירוט הסבבים",
+    "emptyState": "עדיין אין סבבים — התחל משחק!",
+    "roundLabel": "סבב {n}",
+    "scoreLabel": "{score} נקודות",
+    "wordCountLabel": "{count} מילים",
+    "topScore": "הציון הגבוה ביותר"
   }
 };
 
