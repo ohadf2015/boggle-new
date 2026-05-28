@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-    description: 'Spela scrabble online på svenska gratis mot vänner — 2-20 spelare i realtid, ingen registrering, ingen nedladdning. Starta ett rum och bjud in med en länk!',
+    title: 'Scrabble Online Svenska Gratis — Spela Nu, Utan Registrering | LexiClash',
+    description: 'Spela Scrabble online på svenska gratis med vänner — ingen registrering, ingen nedladdning. Skapa rum, bjud in med länk. 2-20 spelare i realtid.',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
-      title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-      description: 'Spela scrabble online på svenska med vänner i realtid. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
+      title: 'Scrabble Online Svenska Gratis — Spela Nu, Utan Registrering | LexiClash',
+      description: 'Spela Scrabble online på svenska gratis med vänner. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-      description: 'Spela scrabble online på svenska: skapa rum, bjud in med länk, tävla i realtid. Gratis, ingen registrering.',
+      title: 'Scrabble Online Svenska Gratis — Spela Nu, Utan Registrering | LexiClash',
+      description: 'Spela Scrabble online på svenska gratis: skapa rum, bjud in med länk, tävla i realtid. Ingen registrering.',
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {
