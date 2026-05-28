@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -298,6 +298,37 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
   const status = getStatus();
   const copy = connectionBannerCopy(status, !!isServerUpdating);
 
+  // Retry double-tap guard + pending feedback. `manualReconnect` fires an async
+  // socket round-trip; without an immediate disabled/label change the tap looks
+  // ignored, so users hammer it (PostHog rage data, he/es/ja). `pendingRetry`
+  // is an optimistic bridge that flips the button to "reconnecting…" the instant
+  // it's clicked, then auto-clears so a genuinely failed retry can be retried.
+  const [pendingRetry, setPendingRetry] = useState(false);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Visual "we're on it" state: spinner + "reconnecting…" label while EITHER a
+  // tap is being absorbed OR socket.io is auto-retrying.
+  const showReconnecting = pendingRetry || status === 'reconnecting';
+
+  useEffect(() => {
+    // Reconnected → drop any pending bridge (banner is unmounting anyway).
+    if (status === 'connected' && pendingRetry) setPendingRetry(false);
+  }, [status, pendingRetry]);
+
+  useEffect(() => () => {
+    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    if (pendingRetry) return; // absorb the rapid-fire mash (a rageclick is many taps in ~1s)
+    setPendingRetry(true);
+    manualReconnect();
+    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    // 2s cooldown only: kills the mash but still lets a bad-network user
+    // deliberately force another retry (reset the backoff) during a slow
+    // auto-reconnect. Never sticks disabled.
+    retryTimerRef.current = setTimeout(() => setPendingRetry(false), 2000);
+  }, [pendingRetry, manualReconnect]);
+
   // Graduated UX: delay banner appearance to avoid anxiety during brief drops.
   // Phase 1 (0-5s): Silent reconnection — most mobile dropouts resolve here.
   // Phase 2 (5s+): Show full banner with progress and retry button.
@@ -419,7 +450,9 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
 
             {/* Retry button */}
             <button
-              onClick={manualReconnect}
+              onClick={handleRetry}
+              disabled={pendingRetry}
+              aria-busy={showReconnecting}
               className={cn(
                 'px-4 py-2 rounded-neo',
                 'bg-neo-lime text-neo-black',
@@ -427,19 +460,20 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
                 'border-2 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard hover:-translate-x-px hover:-translate-y-px',
                 'active:shadow-none active:translate-x-px active:translate-y-px',
+                'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-hard-sm',
                 'transition-all duration-100',
                 'flex items-center gap-2'
               )}
-              aria-label={t('connection.retry')}
+              aria-label={t(showReconnecting ? 'connection.reconnecting' : 'connection.retry')}
             >
               <m.span
-                animate={status === 'reconnecting' ? { rotate: 360 } : {}}
-                transition={{ duration: 1, repeat: status === 'reconnecting' ? Infinity : 0, ease: 'linear' }}
+                animate={showReconnecting ? { rotate: 360 } : {}}
+                transition={{ duration: 1, repeat: showReconnecting ? Infinity : 0, ease: 'linear' }}
                 className="text-base"
               >
                 ↻
               </m.span>
-              <span>{t('connection.retryNow')}</span>
+              <span>{t(showReconnecting ? 'connection.reconnecting' : 'connection.retryNow')}</span>
             </button>
 
             {/* Leave Game escape hatch — visible after 3+ failed attempts */}
