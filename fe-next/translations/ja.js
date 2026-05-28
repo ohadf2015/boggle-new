@@ -9264,6 +9264,8 @@ const ja = {
     "progress": "クリア済み",
     "complete": {
       "title": "レベルクリア！",
+      "titlePartial": "ボードクリア！",
+      "skip": "結果を表示",
       "boardCleared": "ボードクリア！",
       "bonusLabel": "ボーナス",
       "best": "自己ベスト",

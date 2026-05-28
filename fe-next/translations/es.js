@@ -9309,6 +9309,8 @@ const es = {
     "progress": "Limpiado",
     "complete": {
       "title": "¡Nivel completado!",
+      "titlePartial": "¡Tablero limpio!",
+      "skip": "Mostrar resultados",
       "boardCleared": "¡Tablero limpio!",
       "bonusLabel": "Extra",
       "best": "Récord",

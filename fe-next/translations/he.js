@@ -9500,6 +9500,8 @@ const he = {
     "progress": "נוקה",
     "complete": {
       "title": "השלב הושלם!",
+      "titlePartial": "הלוח נוקה!",
+      "skip": "הצג תוצאות",
       "boardCleared": "הלוח נוקה!",
       "bonusLabel": "בונוס",
       "best": "שיא",

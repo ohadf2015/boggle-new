@@ -9238,6 +9238,8 @@ const sv = {
     "progress": "Rensat",
     "complete": {
       "title": "Nivå klar!",
+      "titlePartial": "Brädet rensat!",
+      "skip": "Visa resultat",
       "boardCleared": "Brädet rensat!",
       "bonusLabel": "Bonus",
       "best": "Rekord",
