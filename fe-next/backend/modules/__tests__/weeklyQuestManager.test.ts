@@ -31,10 +31,11 @@ const createChain = () => {
 };
 
 let currentChain = createChain();
-const { mockFrom, mockSupabase } = vi.hoisted(() => {
+const { mockFrom, mockRpc, mockSupabase } = vi.hoisted(() => {
   const mockFrom = vi.fn().mockImplementation(() => currentChain);
-  const mockSupabase = { from: mockFrom };
-  return { mockFrom, mockSupabase };
+  const mockRpc = vi.fn().mockResolvedValue({ error: null });
+  const mockSupabase = { from: mockFrom, rpc: mockRpc };
+  return { mockFrom, mockRpc, mockSupabase };
 });
 
 vi.mock('../supabaseServer', () => ({
@@ -57,6 +58,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   currentChain = createChain();
   mockFrom.mockImplementation(() => currentChain);
+  mockRpc.mockResolvedValue({ error: null });
   mockChainResult = { data: null, error: null };
 });
 
@@ -297,5 +299,167 @@ describe('updateQuestProgress', () => {
     // Pass unrelated stat
     const result = await updateQuestProgress(PLAYER_ID, { wordsFound: 5 });
     expect(result).toBeNull();
+  });
+
+  describe('B8: Race condition fix — XP/avatar double-grant', () => {
+    it('grants XP only when THIS call completes the quest (race-safe)', async () => {
+      const getChain = createChain();
+      getChain.single.mockResolvedValue({
+        data: {
+          id: 'quest-uuid',
+          quest_type: 'play_games',
+          title: 'Play 3 games',
+          description: 'Play 3 games this week',
+          requirements: JSON.stringify({ target: 3, type: 'play_games' }),
+          current_progress: JSON.stringify({ current: 2 }),
+          xp_reward: 500,
+          completed: false,
+          week_start: getWeekStart(),
+        },
+        error: null,
+      });
+
+      // Update chain: select() must resolve as a promise with {data, error}
+      const updateChain = createChain();
+      updateChain.select = vi.fn().mockResolvedValue({
+        data: [{ id: 'quest-uuid' }], // 1 row affected = THIS call did the transition
+        error: null,
+      });
+      updateChain.eq = vi.fn().mockReturnValue(updateChain);
+
+      let callCount = 0;
+      mockFrom.mockImplementation((table: string) => {
+        callCount++;
+        if (callCount === 1) return getChain;
+        if (callCount === 2) return updateChain;
+        return createChain();
+      });
+
+      const result = await updateQuestProgress(PLAYER_ID, { gamesPlayed: 1 });
+
+      expect(result).not.toBeNull();
+      expect(result!.completed).toBe(true);
+      // XP should be granted when this call completed the quest
+      expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', {
+        p_player_id: PLAYER_ID,
+        p_xp_amount: 500,
+      });
+    });
+
+    it('skips XP grant when another concurrent call already completed quest', async () => {
+      const getChain = createChain();
+      getChain.single.mockResolvedValue({
+        data: {
+          id: 'quest-uuid',
+          quest_type: 'play_games',
+          title: 'Play 3 games',
+          description: 'Play 3 games this week',
+          requirements: JSON.stringify({ target: 3, type: 'play_games' }),
+          current_progress: JSON.stringify({ current: 2 }),
+          xp_reward: 500,
+          completed: false,
+          week_start: getWeekStart(),
+        },
+        error: null,
+      });
+
+      // Update chain where select() returns 0 rows (already completed by concurrent call)
+      const updateChain = createChain();
+      updateChain.select = vi.fn().mockResolvedValue({
+        data: [], // 0 rows affected = another call already completed
+        error: null,
+      });
+      updateChain.eq = vi.fn().mockReturnValue(updateChain);
+
+      let callCount = 0;
+      mockFrom.mockImplementation((table: string) => {
+        callCount++;
+        if (callCount === 1) return getChain;
+        if (callCount === 2) return updateChain;
+        return createChain();
+      });
+
+      const result = await updateQuestProgress(PLAYER_ID, { gamesPlayed: 1 });
+
+      expect(result).not.toBeNull();
+      expect(result!.completed).toBe(true);
+      // XP should NOT be granted — another call did the transition
+      expect(mockRpc).not.toHaveBeenCalled();
+    });
+
+    it('progress-only update does not throw on select', async () => {
+      const getChain = createChain();
+      getChain.single.mockResolvedValue({
+        data: {
+          id: 'quest-uuid',
+          quest_type: 'play_games',
+          title: 'Play 3 games',
+          description: 'Play 3 games this week',
+          requirements: JSON.stringify({ target: 5, type: 'play_games' }),
+          current_progress: JSON.stringify({ current: 1 }),
+          xp_reward: 200,
+          completed: false,
+          week_start: getWeekStart(),
+        },
+        error: null,
+      });
+
+      // Update chain for progress-only: select() returns normally
+      const updateChain = createChain();
+      updateChain.select = vi.fn().mockResolvedValue({
+        data: [{ id: 'quest-uuid' }],
+        error: null,
+      });
+      updateChain.eq = vi.fn().mockReturnValue(updateChain);
+
+      let callCount = 0;
+      mockFrom.mockImplementation((table: string) => {
+        callCount++;
+        if (callCount === 1) return getChain;
+        if (callCount === 2) return updateChain;
+        return createChain();
+      });
+
+      const result = await updateQuestProgress(PLAYER_ID, { gamesPlayed: 1 });
+
+      expect(result).not.toBeNull();
+      expect(result!.current).toBe(2);
+      expect(result!.completed).toBe(false);
+    });
+
+    it('returns null when getActiveQuest returns null (existing guard)', async () => {
+      const getChain = createChain();
+      getChain.single.mockResolvedValue({ data: null, error: null });
+
+      mockFrom.mockReturnValue(getChain);
+
+      const result = await updateQuestProgress(PLAYER_ID, { gamesPlayed: 1 });
+
+      expect(result).toBeNull();
+    });
+
+    it('returns null when quest already completed (existing guard)', async () => {
+      const getChain = createChain();
+      getChain.single.mockResolvedValue({
+        data: {
+          id: 'quest-uuid',
+          quest_type: 'play_games',
+          title: 'Play 3 games',
+          description: 'Play 3 games this week',
+          requirements: JSON.stringify({ target: 3, type: 'play_games' }),
+          current_progress: JSON.stringify({ current: 3 }),
+          xp_reward: 200,
+          completed: true, // Already completed
+          week_start: getWeekStart(),
+        },
+        error: null,
+      });
+
+      mockFrom.mockReturnValue(getChain);
+
+      const result = await updateQuestProgress(PLAYER_ID, { gamesPlayed: 1 });
+
+      expect(result).toBeNull();
+    });
   });
 });

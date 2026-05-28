@@ -97,6 +97,60 @@ describe('wordTowerHandler', () => {
     expect(broadcastToRoom).not.toHaveBeenCalled();
   });
 
+  it('records accepted words into playerWords[username][]', () => {
+    const game = { ...gameBase, playerWords: undefined };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: true,
+      result: { meters: 7, tier: 'tower' },
+    });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'HELLO' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO'] });
+  });
+
+  it('does NOT record rejected words into playerWords', () => {
+    const game = { ...gameBase, playerWords: { p1: ['HELLO'] } };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: false,
+      error: 'bad_chain',
+    });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'XYZ' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO'] });
+  });
+
+  it('accumulates words in order for same player', () => {
+    const game = { ...gameBase, playerWords: { p1: ['HELLO'] } };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: true,
+      result: { meters: 5, tier: 'highRise' },
+    });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'WORLD' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO', 'WORLD'] });
+  });
+
+  it('separates words by player', () => {
+    const game = { ...gameBase, playerWords: { p1: ['HELLO'] } };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: true,
+      result: { meters: 3, tier: 'skyrise' },
+    });
+    const sock = mkSocket();
+    // Socket for p2
+    (require('../../modules/gameStateManager').getUsernameBySocketId as unknown as Mock).mockReturnValue('p2');
+    handleSubmitTowerWord(mkIo(), sock, { word: 'GOODBYE' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO'], p2: ['GOODBYE'] });
+  });
+
   // requestTowerState is a benign PULL: a client may poll before the per-player
   // match is initialized (during the pre-game countdown). It must NOT surface a
   // user-facing 'error' for that race — the server pushes 'towerMatchReady'.

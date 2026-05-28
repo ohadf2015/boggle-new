@@ -71,7 +71,14 @@ export function handleSubmitTowerWord(io: Server, socket: Socket, data: SubmitTo
   }
 
   // Mirror height into the generic score so end-game/leaderboard reflect it.
-  if (outcome.result) updatePlayerScore(gameCode, username, Math.round(outcome.result.meters), true);
+  if (outcome.result) {
+    updatePlayerScore(gameCode, username, Math.round(outcome.result.meters), true);
+
+    // Record the word into playerWords so end-game recorder captures it for weekly-quest + XP.
+    if (!game.playerWords) game.playerWords = {};
+    if (!game.playerWords[username]) game.playerWords[username] = [];
+    game.playerWords[username].push(data.word);
+  }
 
   socket.emit('towerWordResult', {
     accepted: true,

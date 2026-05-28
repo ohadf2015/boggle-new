@@ -116,23 +116,47 @@ export async function updateQuestProgress(
   const newCurrent = Math.min(quest.current + delta, quest.target);
   const completed = newCurrent >= quest.target;
 
-  const { error } = await supabase
-    .from('weekly_quests')
-    .update({
-      current_progress: JSON.stringify({ current: newCurrent }),
-      completed,
-      ...(completed ? { completed_at: new Date().toISOString() } : {}),
-    })
-    .eq('id', quest.id)
-    .single();
+  let affectedByThisCall = true;
 
-  if (error) {
-    logger.error('weeklyQuest', `Failed to update quest progress for ${playerId}: ${error.message}`);
-    return null;
+  if (completed) {
+    // When completing: use conditional update to detect race conditions.
+    // Only grant XP if THIS call actually completed the quest (not a concurrent call).
+    const { data, error } = await supabase
+      .from('weekly_quests')
+      .update({
+        current_progress: JSON.stringify({ current: newCurrent }),
+        completed: true,
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', quest.id)
+      .eq('completed', false) // Only update if NOT already completed
+      .select('id');
+
+    if (error) {
+      logger.error('weeklyQuest', `Failed to update quest progress for ${playerId}: ${error.message}`);
+      return null;
+    }
+
+    // Check if THIS call did the transition (data is non-empty array)
+    affectedByThisCall = Array.isArray(data) && data.length > 0;
+  } else {
+    // Progress-only update (not completing): simple update, no race-condition guard needed
+    const { error } = await supabase
+      .from('weekly_quests')
+      .update({
+        current_progress: JSON.stringify({ current: newCurrent }),
+      })
+      .eq('id', quest.id)
+      .select('id');
+
+    if (error) {
+      logger.error('weeklyQuest', `Failed to update quest progress for ${playerId}: ${error.message}`);
+      return null;
+    }
   }
 
-  // Grant XP + avatar part reward on completion
-  if (completed) {
+  // Grant XP + avatar part reward ONLY if THIS call completed the quest
+  if (completed && affectedByThisCall) {
     // Grant XP reward
     try {
       const xpReward = quest.xpReward ?? 0;
