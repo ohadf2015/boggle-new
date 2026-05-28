@@ -23,6 +23,9 @@ import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
 import WordTowerCrane, { type WordTowerCraneHandle } from './WordTowerCrane';
 import { useCraneDrop } from './useCraneDrop';
+import { useWordTowerPerks } from './useWordTowerPerks';
+import { WordTowerPerkDraft } from './WordTowerPerkDraft';
+import { perkMilestoneAt, reducedTopple, PERKS } from '@/lib/wordTower/perks';
 import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
@@ -41,6 +44,15 @@ interface PlayProps {
   onOpenLeaderboard: () => void;
   /** Other players' records to climb past (empty = no rail). */
   rivals?: RivalMarker[];
+  /** Daily Tower run — gates the endless progress POST so a daily (perk-eligible)
+   *  climb NEVER writes to the shared monotonic board. */
+  daily?: boolean;
+  /** Fires once when the player first engages the daily run (first floor placed) —
+   *  the wrapper uses it to grow the daily streak. */
+  onDailyEngaged?: () => void;
+  /** Seed for the daily perk draft (the shared daily game code) — perks only
+   *  appear in daily mode, so this is unused when `daily` is false. */
+  perkSeed?: string;
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -51,7 +63,7 @@ function usePrefersReducedMotion(): boolean {
   return ref.current;
 }
 
-export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [] }: PlayProps) {
+export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [], daily = false, onDailyEngaged, perkSeed = '' }: PlayProps) {
   const { t, dir } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
@@ -164,8 +176,14 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const haptics = useHaptics();
   const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
 
-  // Crane Stack — cosy reward-amplifier; logic in useCraneDrop.
-  const crane = useCraneDrop(tower.commitPlacement, tower.hazard);
+  // Roguelike perk draft — daily-run only. Boons fold into one modifier object
+  // the crane + hazard sites read. Segregated from the endless board (daily gates
+  // the progress POST), so height-boosting perks never inflate records.
+  const perks = useWordTowerPerks(daily, perkSeed);
+
+  // Crane Stack — cosy reward-amplifier; logic in useCraneDrop. Perk modifiers
+  // tune the perfect bonus, height, brink forgiveness, and wobble cushioning.
+  const crane = useCraneDrop(tower.commitPlacement, tower.hazard, perks.modifiers);
 
   // Imperative handle on the crane so the bottom HUD's swapped-in DROP CTA
   // can fire drop() — the player's thumb stays on the same button instead of
@@ -185,9 +203,21 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     prevHazardH.current = game.heightM;
     const crossed = hazardsCrossed(prev, game.heightM, game.firedHazards);
     if (crossed.length === 0) return;
-    const floors = crossed.reduce((s, h) => s + h.floors, 0);
+    // featherfall (perk) softens the blow — but the hazard ids still fire so it
+    // never re-triggers, even if 0 floors are lost.
+    const floors = reducedTopple(crossed.reduce((s, h) => s + h.floors, 0), perks.modifiers);
     tower.hazard(floors, crossed[crossed.length - 1]!.kind, crossed.map((h) => h.id));
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Perk draft — offered each 100m of new altitude in daily mode (pick 1 of 3).
+  const prevPerkH = useRef(game.heightM);
+  useEffect(() => {
+    if (!daily) return;
+    const prev = prevPerkH.current;
+    prevPerkH.current = game.heightM;
+    const idx = perkMilestoneAt(prev, game.heightM);
+    if (idx !== null) perks.offerDraft(idx);
+  }, [game.heightM, daily]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // "Your tower was ruined" banner + FX — never silent (founder ask).
   const [hazardText, setHazardText] = useState<string | null>(null);
@@ -200,6 +230,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const id = setTimeout(() => setHazardText(null), 2900);
     return () => clearTimeout(id);
   }, [tower.state.hazardKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // CLUTCH SAVE banner — a clean drop pulled the tower back from a critical lean.
+  // The biggest single beat in the climb (a fumble instead routes through the
+  // hazard "ruined" banner above, so we only celebrate the save here).
+  const [clutchText, setClutchText] = useState<string | null>(null);
+  useEffect(() => {
+    if (!crane.clutch || crane.clutch.outcome !== 'save') return;
+    setClutchText(t('wordTower.clutch.save'));
+    const id = setTimeout(() => setClutchText(null), 1600);
+    return () => clearTimeout(id);
+  }, [crane.clutch?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Hide the global bottom nav for the duration of gameplay (full-screen mode).
   const setIsInGame = useHideNavigation();
@@ -229,6 +270,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   }), []);
 
   const save = useCallback((beacon = false) => {
+    // Daily runs are perk-eligible and bounded — they must NEVER touch the shared
+    // endless best-height board, or a boosted climb would inflate it. Hard gate.
+    if (daily) return;
     const g = gameRef.current;
     if (g.floors.length === lastSavedFloors.current) return;
     lastSavedFloors.current = g.floors.length;
@@ -243,13 +287,19 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       body,
       keepalive: true,
     }).catch(() => { /* best-effort */ });
-  }, [buildPayload]);
+  }, [buildPayload, daily]);
 
   // Save cadence: every 10 floors + on biome crossing (rare, high-signal).
   const floorsCount = game.floors.length;
   useEffect(() => {
     if (floorsCount > 0 && floorsCount % 10 === 0) save();
   }, [floorsCount, save]);
+
+  // Daily engagement → grow the streak. Fires once the first floor lands (a real
+  // attempt, not a mount), and is idempotent downstream so repeats are harmless.
+  useEffect(() => {
+    if (daily && floorsCount >= 1) onDailyEngaged?.();
+  }, [daily, floorsCount, onDailyEngaged]);
   useEffect(() => { if (game.heightM > 0) save(); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Always flush when the tab is hidden / page unloads.
@@ -324,6 +374,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         bottomInsetPx={deckHeight}
         personalBestM={personalBest}
         leanDeg={crane.leanDeg}
+        clutchSaveKey={crane.clutch?.outcome === 'save' ? crane.clutch.key : 0}
+        toppleKey={tower.state.hazardKey}
         t={t}
         onViewAltChange={setViewAlt}
       />
@@ -422,6 +474,46 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           {hazardText}
         </div>
       )}
+
+      {/* CRITICAL-lean warning — the tower is one shaky drop from falling.
+          Telegraphs the clutch stake: land THIS drop cleanly. */}
+      {crane.critical && tower.state.pendingWord && !clutchText && (
+        <div
+          className={`pointer-events-none absolute left-1/2 top-[12%] z-30 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-orange px-3 py-1.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-pulse'}`}
+          aria-live="assertive"
+        >
+          ⚠ {t('wordTower.clutch.critical')}
+        </div>
+      )}
+
+      {/* CLUTCH SAVE banner — the do-or-die payoff. Lime = triumph. */}
+      {clutchText && (
+        <div
+          className={`pointer-events-none absolute left-1/2 top-[12%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          aria-live="assertive"
+        >
+          {clutchText}
+        </div>
+      )}
+
+      {/* Owned perks — small badge row (daily run) so the player sees their build. */}
+      {daily && perks.owned.length > 0 && (
+        <div className="pointer-events-none fixed left-2 top-12 z-40 flex flex-col gap-1" dir={dir}>
+          {perks.owned.map((id) => (
+            <span
+              key={id}
+              className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-purple px-1.5 py-0.5 font-neo-body text-[10px] font-black text-neo-white shadow-hard-sm"
+              title={t(PERKS[id].descKey)}
+            >
+              <span aria-hidden>{PERKS[id].icon}</span>
+              {t(PERKS[id].nameKey)}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Roguelike perk draft — pick 1 of 3 at each daily milestone. */}
+      <WordTowerPerkDraft choices={perks.draft} onChoose={perks.choose} onSkip={perks.skip} t={t} dir={dir} />
 
       {/* Achievement unlock toast */}
       {achToast && (

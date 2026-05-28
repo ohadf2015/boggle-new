@@ -53,6 +53,12 @@ interface SceneProps {
    *  crane drops. 0 = upright. Applied to the Pixi tower container's angle so the
    *  player SEES instability accumulate before the topple lands. */
   leanDeg?: number;
+  /** Bumps when a CLUTCH SAVE lands (a clean drop pulled back from a critical
+   *  lean) — fires the triumphant snap-back burst + bass-thud shake. */
+  clutchSaveKey?: number;
+  /** Bumps on every hazard/topple strike — fires the jolt screen shake so a
+   *  collapse is FELT, not just announced by the banner. */
+  toppleKey?: number;
 }
 
 /** Shared camera-pan state between the DOM gesture layer and the Pixi layer. */
@@ -113,7 +119,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -275,6 +281,14 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     if (c) shakeX(c);
   }, [errorKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Jolt the whole view when a hazard/topple strikes — the collapse is FELT, not
+  // just read off the banner. Heavier than the rejected-word stack wobble.
+  useEffect(() => {
+    if (toppleKey === 0 || reducedMotion) return;
+    engine.shake.shake({ intensity: 16, duration: 0.5, decay: 'exponential' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toppleKey]);
+
   // Visible instability lean — recent-weighted from crane drops, clamped small.
   // Pixi container.angle is in degrees; pivot at the base so the tower leans
   // FROM the ground rather than rotating around its centre.
@@ -314,6 +328,19 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultKey]);
+
+  // CLUTCH SAVE — a clean drop pulled the tower back from the brink. The lean
+  // snaps to upright (driven by leanDeg → 0); here we add the triumphant payoff:
+  // a gold burst from the build line and a punchy "bass-thud" shake.
+  useEffect(() => {
+    if (clutchSaveKey === 0 || reducedMotion) return;
+    const { width: W, height: H } = engine;
+    engine.particles.burst(GOLD_STARS, W / 2, H * 0.32, 56);
+    engine.particles.burst(CONFETTI_BURST, W / 2, H * 0.32, 28);
+    engine.flash.flash({ color: 0xbfff00, duration: 0.35, intensity: 0.4 });
+    engine.shake.shake({ intensity: 14, duration: 0.45, decay: 'exponential' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clutchSaveKey]);
 
   return null;
 }
