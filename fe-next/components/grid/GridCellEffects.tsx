@@ -91,9 +91,13 @@ const GridCellEffects = memo<GridCellEffectsProps>(function GridCellEffects({
 
   return (
     <>
-      {/* Primary ripple — color compounds from both systems */}
+      {/* Primary ripple — color compounds from both systems. Decorative only:
+          pointer-events-none (like every sibling layer) so it never captures a
+          tap. It has no exit/loop, so after the ~0.5s tween it stays mounted at
+          the final keyframe (scale 3, opacity 0) for the whole selection — a
+          persistent invisible hit-target if left interactive. */}
       <m.div
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{ borderRadius: '6px', background: rippleGradient }}
         initial={{ scale: 0.3, opacity: 1 }}
         animate={{ scale: 3, opacity: 0 }}

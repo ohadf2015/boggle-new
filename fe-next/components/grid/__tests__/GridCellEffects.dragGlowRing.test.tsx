@@ -78,3 +78,27 @@ describe('GridCellEffects glow ring drag suppression', () => {
     expect(container.querySelector('.absolute')).not.toBeNull();
   });
 });
+
+describe('GridCellEffects decorative layers are not pointer targets', () => {
+  // Every effect layer is purely decorative. None must capture pointer events:
+  // the primary ripple has no `exit`/loop, so after its ~0.5s tween it stays
+  // mounted at the final keyframe (scale 3, opacity 0) for as long as the cell
+  // is selected — a persistent invisible hit-target that autocapture records
+  // (showed up as a textless rageclick element on the grid). It must mirror its
+  // sibling layers, which all set `pointer-events-none`.
+  it('gives the primary ripple (first .absolute layer) pointer-events-none', () => {
+    const { container } = renderEffects(false);
+    const ripple = container.querySelector('.absolute');
+    expect(ripple).not.toBeNull();
+    expect(ripple?.className).toContain('pointer-events-none');
+  });
+
+  it('marks every absolute effect layer pointer-events-none', () => {
+    const { container } = renderEffects(false);
+    const layers = container.querySelectorAll('.absolute');
+    expect(layers.length).toBeGreaterThan(0);
+    layers.forEach((layer) => {
+      expect(layer.className).toContain('pointer-events-none');
+    });
+  });
+});
