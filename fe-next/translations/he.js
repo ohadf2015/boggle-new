@@ -5265,6 +5265,7 @@ const he = {
     "allDone": "סיימת!",
     "classic": {
       "notAWord": "לא מילה",
+      "bailoutCta": "דלג למשחק האמיתי",
       "playRealCta": "שחק קלאסי עכשיו"
     },
     "coach": {
@@ -5337,6 +5338,7 @@ const he = {
       "reset": "אפס",
       "scoreChip": "+{score}",
       "shuffle": "ערבב",
+      "bailoutCta": "דלג למשחק האמיתי",
       "playRealCta": "שחק ריצת גלגל עכשיו"
     },
     "wordHunt": {

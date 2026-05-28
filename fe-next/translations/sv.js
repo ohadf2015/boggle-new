@@ -5261,6 +5261,7 @@ const sv = {
       "notAWord": "Inte på den här tavlan — prova en annan väg.",
       "duplicate": "Redan hittat.",
       "foundWordsLabel": "Hittade ({count})",
+      "bailoutCta": "Hoppa till riktiga spelet",
       "playRealCta": "Spela klassiskt nu →"
     },
     "wordHunt": {
@@ -5311,6 +5312,7 @@ const sv = {
       "duplicate": "Redan hittat.",
       "foundWordsLabel": "Hittade ({count})",
       "scoreChip": "{score} p",
+      "bailoutCta": "Hoppa till riktiga spelet",
       "playRealCta": "Spela Wheel Rush nu →"
     },
     "mistakeCoach": {

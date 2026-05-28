@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Heart, Lightbulb, Search } from 'lucide-react';
+import { ArrowLeft, Lightbulb, Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
+import PracticeBailoutCta from './PracticeBailoutCta';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
@@ -53,9 +54,6 @@ const TARGETS: Record<string, string> = {
   ja: 'さくら',
   es: 'CASA',
 };
-
-// Mirrors live `MAX_ATTEMPTS` shown in the educational tries pill.
-const REAL_GAME_MAX_TRIES = 7;
 
 const SHORT_TIP_DURATION_MS = 3200;
 
@@ -355,7 +353,9 @@ export default function PracticeWordHuntSandbox() {
         </div>
       )}
 
-      {/* HUD strip — back-to-hub + educational tries pill. */}
+      {/* HUD strip — back-to-hub only. The goal + remaining tries live in the
+          clue-box row below; a second tries chip here just confused players
+          (it showed the *real-game* try count next to practice's own). */}
       <div className="w-full flex items-center justify-between gap-2">
         <Link
           href={`/${language}/practice`}
@@ -366,14 +366,6 @@ export default function PracticeWordHuntSandbox() {
           <ArrowLeft className="w-3 h-3 rtl:rotate-180" aria-hidden />
           <span>{t('practiceHub.backToHub')}</span>
         </Link>
-        <div
-          data-testid="practice-tries-chip"
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neo-navy/60 border-2 border-neo-cream/15 text-neo-white text-[10px] sm:text-xs font-neo-display font-black whitespace-nowrap"
-          title={t('practice.wordHunt.livesNote', { max: REAL_GAME_MAX_TRIES })}
-        >
-          <Heart className="w-3 h-3 text-neo-pink fill-neo-pink" aria-hidden />
-          <span>∞ · {REAL_GAME_MAX_TRIES} {t('practice.wordHunt.realGameLabel')}</span>
-        </div>
       </div>
 
       {/* Learn by doing: drop straight onto the board with an inline tip that
@@ -409,9 +401,6 @@ export default function PracticeWordHuntSandbox() {
               matchesTargetLength={!solved && currentSelectionLength === target.length}
             />
           </div>
-          <p className="text-[10px] sm:text-xs text-neo-white text-center max-w-xs px-2 mt-1">
-            {t('practice.wordHunt.livesNote', { max: REAL_GAME_MAX_TRIES })}
-          </p>
         </div>
 
         <div className="min-h-[2rem] flex items-center justify-center w-full">
@@ -462,17 +451,10 @@ export default function PracticeWordHuntSandbox() {
         )}
       </div>
 
-      {/* Bail-out CTA — pinned bottom, ALWAYS visible. Players must always
-          have a one-tap escape to the real game, even after solving (the
-          celebration popup is a chain CTA, not the only forward path). */}
+      {/* Quiet escape to the real game — always available, never the loudest
+          thing on screen. The celebration popup carries the loud forward CTA. */}
       <div className="mt-auto w-full">
-        <Link
-          href={liveHref}
-          data-testid="practice-bailout-cta"
-          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
-        >
-          {t(solved ? 'practice.wordHunt.playRealCta' : 'practice.wordHunt.bailoutCta')}
-        </Link>
+        <PracticeBailoutCta mode="wordHunt" done={solved} href={liveHref} />
       </div>
 
       <PracticeCompletePopup

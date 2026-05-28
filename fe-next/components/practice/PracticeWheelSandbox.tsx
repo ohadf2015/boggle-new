@@ -9,6 +9,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import PracticeCompletePopup from './PracticeCompletePopup';
 import PracticePostCompleteChip from './PracticePostCompleteChip';
+import PracticeBailoutCta from './PracticeBailoutCta';
+import { practiceTargetUrl } from '@/lib/practice/practiceRoute';
 import PracticeInstructions from './PracticeInstructions';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
@@ -376,15 +378,17 @@ export default function PracticeWheelSandbox() {
           <span>{t('practiceHub.backToHub')}</span>
         </Link>
         <div className="flex items-center gap-2">
+          {/* Decorative score — muted so it doesn't compete with the goal. */}
           <div
             data-testid="practice-wheel-score"
-            className="px-2.5 py-1 rounded-full bg-neo-purple/20 border border-neo-purple text-neo-white text-xs font-neo-display font-black whitespace-nowrap"
+            className="px-2.5 py-1 rounded-full bg-neo-cream/10 border border-neo-cream/20 text-neo-white/70 text-xs font-neo-display font-black whitespace-nowrap"
           >
             {t('practice.wheelRush.scoreChip', { score: previewScore })}
           </div>
+          {/* Goal + progress — the one number that matters, made prominent. */}
           <div
             data-testid="practice-goal-indicator"
-            className="px-2.5 py-1 rounded-full bg-neo-cream/10 border border-neo-cream/30 text-neo-white text-xs font-neo-display font-black whitespace-nowrap"
+            className="px-2.5 py-1 rounded-full bg-neo-purple/25 border-2 border-neo-purple text-neo-white text-xs font-neo-display font-black whitespace-nowrap"
           >
             {foundWords.length}/{PRACTICE_GOALS.wheelRush}
           </div>
@@ -599,16 +603,14 @@ export default function PracticeWheelSandbox() {
         )}
       </AnimatePresence>
 
-      {/* Always-visible bailout — players must always have a one-tap escape
-          to the real game, regardless of practice progress. */}
+      {/* Quiet escape to the real game — always available, never the loudest
+          element. The celebration popup carries the loud forward CTA. */}
       <div className="mt-auto w-full">
-        <Link
-          href={`/${language}/daily/word-wheel`}
-          data-testid="practice-bailout-cta"
-          className="inline-flex items-center justify-center w-full bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo py-3 px-4 font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
-        >
-          {t(isComplete ? 'practice.wordHunt.playRealCta' : 'practice.wordHunt.bailoutCta')}
-        </Link>
+        <PracticeBailoutCta
+          mode="wheelRush"
+          done={isComplete}
+          href={practiceTargetUrl('wheelRush', language)}
+        />
       </div>
 
       <PracticeCompletePopup

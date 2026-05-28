@@ -5246,6 +5246,7 @@ const ja = {
       "notAWord": "このボードにはありません — 別の道を試してください。",
       "duplicate": "すでに見つけました。",
       "foundWordsLabel": "発見 ({count})",
+      "bailoutCta": "本番のゲームへ",
       "playRealCta": "クラシックを今すぐプレイ →"
     },
     "wordHunt": {
@@ -5296,6 +5297,7 @@ const ja = {
       "duplicate": "すでに見つけました。",
       "foundWordsLabel": "発見 ({count})",
       "scoreChip": "{score}点",
+      "bailoutCta": "本番のゲームへ",
       "playRealCta": "ウィールラッシュを今すぐプレイ →"
     },
     "mistakeCoach": {

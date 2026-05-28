@@ -5232,6 +5232,7 @@ const en = {
     "allDone": "All done!",
     "classic": {
       "notAWord": "Not a word",
+      "bailoutCta": "Skip to real game",
       "playRealCta": "Play Classic now"
     },
     "coach": {
@@ -5304,6 +5305,7 @@ const en = {
       "reset": "Reset",
       "scoreChip": "+{score}",
       "shuffle": "Shuffle",
+      "bailoutCta": "Skip to real game",
       "playRealCta": "Play Wheel Rush now"
     },
     "wordHunt": {

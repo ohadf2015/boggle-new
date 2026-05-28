@@ -5300,6 +5300,7 @@ const es = {
       "notAWord": "No está en este tablero — prueba otro camino.",
       "duplicate": "Ya encontrada.",
       "foundWordsLabel": "Encontradas ({count})",
+      "bailoutCta": "Saltar al juego real",
       "playRealCta": "Jugar clásico ahora →"
     },
     "wordHunt": {
@@ -5350,6 +5351,7 @@ const es = {
       "tooShort": "Mínimo 2 letras.",
       "foundWordsLabel": "Encontradas ({count})",
       "scoreChip": "{score} pts",
+      "bailoutCta": "Saltar al juego real",
       "playRealCta": "Jugar Wheel Rush ahora →"
     },
     "mistakeCoach": {
