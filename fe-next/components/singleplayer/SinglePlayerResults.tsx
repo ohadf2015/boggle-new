@@ -4,7 +4,7 @@ import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import GameFeedback from '@/components/feedback/GameFeedback';
-import { TrendingUp, ArrowLeft } from 'lucide-react';
+import { TrendingUp, ArrowLeft, RotateCcw } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { AchievementBadge } from '@/components/AchievementBadge';
@@ -34,6 +34,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { displayScore } from '@/utils/scoreDisplay';
 import { useUnfinishedBoard } from '@/hooks/useUnfinishedBoard';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { useExperiment } from '@/hooks/useExperiment';
 import { Button } from '@/components/ui/button';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import {
@@ -95,6 +96,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const handleBackToLobby = useCallback(() => {
     setShowTomorrowPreview(true);
   }, []);
+
+  const handleQuickReplay = useCallback(() => {
+    trackGrowthEvent('results_cta_clicked', { cta: 'quick_replay', mode });
+    onPlayAgain();
+  }, [onPlayAgain, mode]);
 
   const handleTomorrowDismiss = useCallback(() => {
     setShowTomorrowPreview(false);
@@ -173,6 +179,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   });
 
   useWinStreakTracking({ isGameComplete: true });
+
+  // exp-results-replay-cta-v1: prominent "Run it back?" button above NextStepPrompt
+  const { variant: replayCTAVariant, trackExposure: trackReplayCTAExposure } =
+    useExperiment('exp-results-replay-cta-v1');
+
+  // Funnel anchor: fire once on mount so PostHog can measure results-page drop-off
+  useEffect(() => {
+    trackGrowthEvent('results_viewed', { mode, score: results.playerScore });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save unfinished board for carry-over feature
   const { saveUnfinishedBoard } = useUnfinishedBoard();
@@ -325,6 +340,16 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         />
       ) : (
         <>
+          {replayCTAVariant === 'quick-replay' && (
+            <Button
+              className="w-full border-neo border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard hover:bg-neo-cyan/90 active:shadow-hard-pressed active:translate-y-px"
+              onClick={() => { trackReplayCTAExposure(); handleQuickReplay(); }}
+              data-testid="quick-replay-btn"
+            >
+              <RotateCcw className="me-2 w-4 h-4" />
+              {t('results.playAgainQuestion')}
+            </Button>
+          )}
           <NextStepPrompt currentMode={nextStepMode} onBackToLobby={handleBackToLobby} variant={isDesktop ? 'desktop' : 'mobile'} />
           {results.grid && (
             <ChallengeButton grid={results.grid} score={results.playerScore} words={results.playerWords}

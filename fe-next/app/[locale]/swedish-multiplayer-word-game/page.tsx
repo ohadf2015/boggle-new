@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-    description: 'Spela scrabble online på svenska gratis mot 2-20 spelare i realtid — utan registrering, utan nedladdning. Skapa rum, bjud in med länk. Prova även dagligt ordhjul och Ordjakt.',
+    description: 'Spela scrabble online på svenska gratis mot vänner — 2-20 spelare i realtid, ingen registrering, ingen nedladdning. Starta ett rum och bjud in med en länk!',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
       title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
@@ -93,6 +93,10 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
     {
       q: 'Vilka spellägen finns?',
       a: 'Spela multiplayer-rum, dagliga utmaningar (ordhjul och ordjakt), ordletare, blastläge och mer. Varje läge har unika regler och poängberäkning. Ordhjulet är en daglig pussel där alla bokstäver ska inkludera mittenbokstaven.',
+    },
+    {
+      q: 'Var kan man spela Scrabble online på svenska gratis?',
+      a: 'LexiClash är det bästa gratis alternativet till Scrabble och Wordfeud på svenska. Spela direkt i webbläsaren — ingen app, ingen registrering. Skapa ett rum, bjud in upp till 20 vänner via länk, och tävla i realtid med över 10 000 svenska ord.',
     },
   ];
 

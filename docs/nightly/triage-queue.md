@@ -171,3 +171,29 @@ Items deferred from automated nightly triage. Human review required.
   - status: deferred (same recurring pattern as 2026-05-26 entry)
   - why: transient CDN/Edge WASM load failure; no repro, no source maps for stack attribution
   - recommended owner: infra (verify WASM MIME type + CSP on practice pages; add retry error boundary)
+
+## 2026-05-28
+
+- [Flag] `show-signup-after-first-win` (PostHog id 163655, created 2026-03-31 — 58 days)
+  - description: A/B show signup prompt after first win vs after 3rd game
+  - status: inconclusive, >14 days, no stats engine result linked — retire or conclude
+  - exposures: ~43 (per memory log 2026-05-27); far below 1 000/arm threshold for significance
+  - how it works: `usePostHogFlag('show-signup-after-first-win', 'after-first-win')` in `useSignupPrompt.ts:61` — raw flag, not wired to `useExperiment`; no typed exposure tracking
+  - variants: `after-first-win` (control/default) · `after-third-game`
+  - recommended action: if no clear signal needed, keep `after-first-win` path (emotional peak), delete the flag + conditional in `useSignupPrompt.ts`; or wire via `useExperiment` + add to experiments registry before concluding
+  - recommended owner: growth
+
+- [Flag] `share-prompt-timing` (PostHog id 163656, created 2026-03-31 — 58 days)
+  - description: A/B show share prompt immediately after win vs on results page
+  - status: inconclusive, >14 days, 0 `share_win_prompt_shown` events in last 7 days — data gap
+  - how it works: `usePostHogFlag('share-prompt-timing', 'results-page')` in `SinglePlayerResults.tsx:167`; raw flag, no typed exposure tracking
+  - variants: `results-page` (default) · `immediate`
+  - recommended action: if share prompt is rarely triggered (0 events/7d), the experiment can't conclude; decide whether to retire the feature or add minimum traffic gate; delete flag + dead `showShareImmediate` branch if retiring
+  - recommended owner: growth
+
+- [Flag] `mp-signup-nudge-copy-v1` (PostHog id 183230, created 2026-05-08 — 49 days)
+  - description: MP signup nudge copy + toast gate; control = sheet+toast; toast-disabled = sheet only; value-prop/social-proof = alternate copy
+  - status: inconclusive — flag description notes 0/77 converts in 28d across all variants; no stats engine result linked
+  - how it works: `usePostHogFlag` or `useFeatureFlag` in `useMultiplayerSignupNudge.ts`
+  - recommended action: low-volume game makes 77 total exposures insufficient for significance; decision: pick control (current sheet+toast) and delete flag + variant branches, OR keep running and target 300/arm minimum first
+  - recommended owner: growth

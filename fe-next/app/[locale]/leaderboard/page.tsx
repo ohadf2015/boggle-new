@@ -23,13 +23,13 @@ const seoContent: Record<string, {
   en: {
     title: 'Best Competitive Word Games — Global Leaderboards & Live Rankings',
     description:
-      'See who tops the best competitive word games with global leaderboards in 2026. LexiClash tracks daily, weekly, and all-time top scorers across all 8 game modes. Climb the ranks by playing consistently, finding long words, and mastering combo chains.',
+      'Comparing the best competitive word games with global leaderboards in 2026. LexiClash runs real-time multiplayer across Classic, Blast, Word Hunt, and Daily Challenge modes in five languages. No signup required — browser-based, instant play. Global score rankings are in live testing.',
     features: [
-      'Daily, weekly, and all-time rankings updated in real time',
-      'Separate leaderboards for Classic, Blast, Word Hunt, and Daily Challenge modes',
-      'Profile badges and streak indicators for top performers',
-      'Filter by language and region to see local champions',
-      'Click any player to view their stats, favorite words, and match history',
+      'Real-time multiplayer in Classic, Blast, Word Hunt, and Daily Challenge modes',
+      'Play against opponents in five languages: English, Hebrew, Spanish, Swedish, Japanese',
+      'Daily shared puzzles — same board for all players, scores compared globally',
+      'Combo multipliers and bonus tiles that reward fast, strategic word play',
+      'Browser-based — no signup, no download, compete in under 30 seconds',
     ],
     faq: [
       {
@@ -67,11 +67,11 @@ const seoContent: Record<string, {
   he: {
     title: 'טבלת המובילים של LexiClash — דירוגים עולמיים ושחקנים מובילים',
     description:
-      'ראו מי שולט ב-LexiClash. טבלת המובילים עוקבת אחר מובילי הניקוד היומיים, השבועיים וכל הזמנים בכל מצבי המשחק.',
+      'השוואת משחקי המילים התחרותיים הטובים ביותר עם דירוגים גלובליים ב-2026. LexiClash מציע מולטיפלייר בזמן אמת בחמש שפות — ללא הרשמה, ישירות מהדפדפן.',
     features: [
-      'דירוגים יומיים, שבועיים וכלליים מעודכנים בזמן אמת',
-      'טבלאות נפרדות לקלאסי, בלאסט, ציד מילים ואתגר יומי',
-      'תגים ומדדי רצף לשחקנים מובילים',
+      'מולטיפלייר בזמן אמת — קלאסי, בלאסט, ציד מילים ואתגר יומי',
+      'תמיכה בחמש שפות: עברית, אנגלית, ספרדית, שוודית ויפנית',
+      'לוחות יומיים משותפים — ניקוד מושווה עם שחקנים ברחבי העולם',
     ],
     faq: [
       {
@@ -87,11 +87,11 @@ const seoContent: Record<string, {
   sv: {
     title: 'LexiClash Topplista — Globala Rankningar & Toppspelare',
     description:
-      'Se vem som dominerar LexiClash. Topplistan spårar dagliga, veckovisa och alltime-toppspelare i alla spellägen.',
+      'En jämförelse av de bästa konkurrensinriktade ordspelen med globala topplistor 2026. LexiClash erbjuder realtidsmultiplayer i fem språk — inget konto krävs, direkt i webbläsaren.',
     features: [
-      'Dagliga, veckovisa och alltime-rankningar uppdaterade i realtid',
-      'Separata topplistor för Klassiskt, Blast, Word Hunt och daglig utmaning',
-      'Profilmärken och streak-indikatorer för toppspelare',
+      'Realtidsmultiplayer — Klassiskt, Blast, Word Hunt och Daglig Utmaning',
+      'Stöd för fem språk: engelska, hebreiska, spanska, svenska och japanska',
+      'Dagliga delade bräden — alla spelar samma pussel, poäng jämförs globalt',
     ],
     faq: [
       {
@@ -103,11 +103,11 @@ const seoContent: Record<string, {
   ja: {
     title: 'LexiClash リーダーボード — グローバルランキング＆トッププレイヤー',
     description:
-      'LexiClashで誰が上位にいるか確認。リーダーボードは全ゲームモードでデイリー、ウィークリー、オールタイムのトップスコアラーを追跡します。',
+      '2026年のグローバルリーダーボードを持つ最高の競争的ワードゲームの比較。LexiClashは5言語でのリアルタイム対戦を提供。登録不要、ブラウザで即プレイ。',
     features: [
-      'デイリー、ウィークリー、オールタイムランキングがリアルタイム更新',
-      'クラシック、ブラスト、ワードハント、デイリーチャレンジ別リーダーボード',
-      'トッププレイヤー向けプロフィールバッジと連続記録表示',
+      'リアルタイム対戦 — クラシック、ブラスト、ワードハント、デイリーチャレンジ',
+      '5言語対応：英語、ヘブライ語、スペイン語、スウェーデン語、日本語',
+      '毎日の共有ボード — 全プレイヤーが同じパズルでスコアを世界比較',
     ],
     faq: [
       {
@@ -119,12 +119,12 @@ const seoContent: Record<string, {
   es: {
     title: 'Tabla de Clasificación LexiClash — Rankings Globales y Mejores Jugadores',
     description:
-      'Mira quién domina LexiClash. La tabla de clasificación rastrea a los mejores jugadores diarios, semanales y de todos los tiempos en todos los modos de juego.',
+      'Los mejores juegos de palabras competitivos con clasificaciones globales en 2026. LexiClash ofrece multijugador en tiempo real en cinco idiomas. Sin registro, directo desde el navegador.',
     features: [
-      'Rankings diarios, semanales y de todos los tiempos actualizados en tiempo real',
-      'Tablas separadas para Clásico, Blast, Word Hunt y Desafío Diario',
-      'Insignias de perfil e indicadores de racha para los mejores jugadores',
-      'Filtrar por idioma y región para ver campeones locales',
+      'Multijugador en tiempo real — Clásico, Blast, Word Hunt y Desafío Diario',
+      'Juega en cinco idiomas: inglés, hebreo, español, sueco o japonés',
+      'Tableros diarios compartidos — puntuaciones comparadas globalmente',
+      'Sin registro, sin descarga — juega de inmediato desde el navegador',
     ],
     faq: [
       {

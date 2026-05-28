@@ -117,6 +117,9 @@ export type GrowthEvent =
   | 'landing_cta_clicked'
   // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel)
   | 'cross_promo_click'
+  // Results-page CTA tracking — experiment conversion funnel (exp-results-replay-cta-v1)
+  // Properties: { cta: 'quick_replay' | 'back_to_lobby' | 'next_step', mode?: string }
+  | 'results_cta_clicked'
   // CrazyGames portal short-flow funnel
   | 'cg_welcome_view'
   | 'cg_welcome_play'
