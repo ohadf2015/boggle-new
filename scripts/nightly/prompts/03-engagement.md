@@ -12,6 +12,14 @@ Let this steer your work: a low-avg or bad-heavy surface (mp_round / singleplaye
 candidate hypothesis. If it says "No player feedback in the window", fall back to
 the PostHog funnel-gap analysis below.
 
+═══ Tonight's intelligence brief — ACT ON THIS FIRST ═══
+
+Phase 0 already queried every data source over REST and ranked the highest-leverage opportunities for THIS lane. Your targets (PostHog funnel drops + rage clicks + feature flag status + instrumentation gaps):
+
+__BRIEF__
+
+**Brief-first contract:** Pick the top funnel gap and the flagged experiments (won or stalled) from the brief above and act on them this run. The data was already collected — do NOT re-run broad funnel queries or flag-list enumeration. ONLY if the brief slice above is empty or marked STALE may you do ONE quick targeted query (e.g., last 24h funnel vs 7d baseline), then act. Use code changes and flag management (delete winning variants, implement new experiments) to fix, not to re-explore.
+
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 03 engagement** unless they conflict with this lane's hard rules. Skip "none yet" rows.
 

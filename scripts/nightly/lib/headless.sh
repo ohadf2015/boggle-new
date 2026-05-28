@@ -85,13 +85,22 @@ headless_run() {
   # Path is exported as FEEDBACK_SUMMARY_FILE; fall back to the conventional path.
   local feedback_file="${FEEDBACK_SUMMARY_FILE:-$PROJECT_DIR/docs/nightly/feedback/summary-$today.md}"
 
+  # Per-lane intelligence brief slice (Phase 0 wrote brief.json; spec §6). The
+  # brief-slice helper prints this lane's top scored items, or the brief-first /
+  # bounded-fallback contract text when the lane has none. Path is exported as
+  # BRIEF_JSON_FILE; fall back to the conventional path.
+  local brief_json_file="${BRIEF_JSON_FILE:-$PROJECT_DIR/docs/nightly/intel/$today/brief.json}"
+  local brief_file
+  brief_file=$(mktemp -t "lane-${lane_id}-brief.XXXXXX")
+  bash "$(dirname "${BASH_SOURCE[0]}")/intel/brief-slice.sh" "$brief_json_file" "$lane_id" > "$brief_file" 2>/dev/null || true
+
   local rendered
   rendered=$(mktemp -t "lane-${lane_id}-prompt.XXXXXX")
   # Python: handles multi-line learnings cleanly (awk -v chokes on newlines,
   # sed chokes on special chars in the content).
-  /usr/bin/env python3 - "$today" "8" "${learnings_file}" "${feedback_file}" "$prompt_file" > "$rendered" <<'PY'
+  /usr/bin/env python3 - "$today" "8" "${learnings_file}" "${feedback_file}" "$prompt_file" "${brief_file}" > "$rendered" <<'PY'
 import sys, os
-today, cap, learnings_path, feedback_path, prompt_path = sys.argv[1:6]
+today, cap, learnings_path, feedback_path, prompt_path, brief_path = sys.argv[1:7]
 learnings = ''
 if learnings_path and os.path.exists(learnings_path):
     with open(learnings_path, encoding='utf-8') as f:
@@ -100,15 +109,21 @@ feedback = ''
 if feedback_path and os.path.exists(feedback_path):
     with open(feedback_path, encoding='utf-8') as f:
         feedback = f.read()
+brief = ''
+if brief_path and os.path.exists(brief_path):
+    with open(brief_path, encoding='utf-8') as f:
+        brief = f.read()
 with open(prompt_path, encoding='utf-8') as f:
     text = f.read()
 text = (text
         .replace('__TODAY__', today)
         .replace('__PER_LANE_CAP__', cap)
         .replace('__LEARNINGS__', learnings)
-        .replace('__FEEDBACK_SUMMARY__', feedback.strip() or 'No player feedback in the window. Proceed normally.'))
+        .replace('__FEEDBACK_SUMMARY__', feedback.strip() or 'No player feedback in the window. Proceed normally.')
+        .replace('__BRIEF__', brief.strip() or 'No intelligence brief available this run. Proceed with a standard scan.'))
 sys.stdout.write(text)
 PY
+  rm -f "$brief_file" 2>/dev/null || true
 
   # Prepend the Mandatory-Minimum-Artifact contract so every lane has a shippable
   # floor even on timeout (the "never give up on a lane" guarantee). Goes above the

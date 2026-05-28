@@ -11,6 +11,14 @@ treat it as a first-class triage item: reproduce and ROOT-CAUSE fix it under thi
 lane's hard rules (never silence, never touch auth-adjacent code). If it says
 "No player feedback in the window", proceed normally with the error inventory.
 
+═══ Tonight's intelligence brief — ACT ON THIS FIRST ═══
+
+Phase 0 already queried every data source over REST and ranked the highest-leverage opportunities for THIS lane. Your targets (Sentry errors + Supabase advisor warnings + PostHog exceptions):
+
+__BRIEF__
+
+**Brief-first contract:** Pick the top 1–3 items above and fix/ship them this run. The data was already collected — do NOT re-run broad Sentry/Supabase/PostHog discovery. ONLY if the brief slice above is empty or marked STALE may you do ONE quick targeted query (e.g., "last 24h Sentry errors for project lexiclash"), then act. Use MCP to *apply* a fix (Supabase migrations, error boundaries, null guards), not to re-explore.
+
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 01 triage** unless they conflict with this lane's hard rules. Skip "none yet" rows.
 

@@ -3,6 +3,14 @@ You are running the nightly performance lane for LexiClash. Today: __TODAY__. Wo
 ═══ LEARNINGS FROM PRIOR RUNS ═══
 __LEARNINGS__
 
+═══ Tonight's intelligence brief — ACT ON THIS FIRST ═══
+
+Phase 0 already queried every data source over REST and ranked the highest-leverage opportunities for THIS lane. Your targets (Supabase slow queries + advisor warnings + PostHog Core Web Vitals regressions):
+
+__BRIEF__
+
+**Brief-first contract:** Pick the top 1–2 backend items and top 1–2 frontend items from the brief above and fix them this run. The data was already collected — do NOT re-run `db_perf_top_query_audit` or `pg_stat_statements` discovery or broad PostHog Web Vitals queries. ONLY if the brief slice above is empty or marked STALE may you do ONE quick targeted query (e.g., top-5 queries by exec_time, or p75 LCP by route), then act. Use `EXPLAIN ANALYZE` and code changes to apply fixes, not to re-explore.
+
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 02 perf** unless they conflict with this lane's hard rules. `superpowers:systematic-debugging` is preferred for backend slow-query diagnosis; `web-interface-guidelines` for frontend Core Web Vitals review.
 

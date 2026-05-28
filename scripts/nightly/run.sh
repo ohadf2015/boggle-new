@@ -68,6 +68,11 @@ export PROJECT_DIR LIB_DIR LANES_DIR LOG_DIR RUN_LOG REPORT TODAY DATE_TAG
 export TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID
 export POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID POSTHOG_HOST
 export SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY
+# Optional intel-collector tokens (Phase 0). Absent → that source degrades to a
+# stale/empty snapshot with a TOKEN_MISSING note; never an error. Set in
+# ~/.config/lexi-nightly/env to unlock the source over REST. See spec §4.1.
+export SENTRY_AUTH_TOKEN SENTRY_ORG_SLUG SENTRY_PROJECT_SLUG SENTRY_HOST
+export SUPABASE_ACCESS_TOKEN BING_WMT_API_KEY RAILWAY_TOKEN
 export NIGHTLY_DISABLED
 
 # Per-MCP-call watchdogs — see lib/headless.sh for the full rationale. Set here
@@ -193,6 +198,42 @@ export FEEDBACK_SUMMARY_FILE
 if [ -n "${FEEDBACK_SUMMARY_FILE:-}" ] && [ -s "$FEEDBACK_SUMMARY_FILE" ]; then
   log "player feedback digest written: $FEEDBACK_SUMMARY_FILE"
   echo "**Player feedback digest:** \`$FEEDBACK_SUMMARY_FILE\` (injected into triage + engagement lanes)" >> "$REPORT"
+fi
+
+# --- Phase 0: intelligence brief -------------------------------------------
+# Query EVERY data source ONCE over direct REST/CLI (no MCP) and write a ranked
+# brief the lanes consume via the __BRIEF__ placeholder. This moves data discovery
+# OUT of the timed lanes (the #1 timeout cause) and into a hardened phase: a hung
+# or unconfigured source costs only its own per-collector timeout → stale fallback
+# to last-good → never blocks the run. The brief is ALWAYS produced (deterministic
+# scorer, even if the LLM enrichment is skipped). Writes only under
+# docs/nightly/intel/ (gate-immune). See docs/specs/nightly-intelligence-suite.md.
+log "Phase 0: collecting intelligence brief (all sources, REST/CLI, hardened timeouts)..."
+if bash "$LIB_DIR/intel/run-intel.sh" >>"$RUN_LOG" 2>&1; then
+  TODAY_INTEL_DIR="$PROJECT_DIR/docs/nightly/intel/$TODAY"
+  export BRIEF_JSON_FILE="$TODAY_INTEL_DIR/brief.json"
+  export BRIEF_FILE="$TODAY_INTEL_DIR/brief.md"
+  if [ -f "$BRIEF_JSON_FILE" ]; then
+    BRIEF_N=$(jq '.items|length' "$BRIEF_JSON_FILE" 2>/dev/null || echo 0)
+    BRIEF_STALE=$(jq -rc '(._meta.sources_stale // [])|join(", ")' "$BRIEF_JSON_FILE" 2>/dev/null)
+    # Per-source signal counts: makes a source silently dropping to zero VISIBLE.
+    # `source_ok:true` + 0 signals reads identically to "quiet night" otherwise — a
+    # broken query would hide for days. Surfaced in both the run log and the digest.
+    SRC_COUNTS=""
+    for f in "$TODAY_INTEL_DIR"/*.json; do
+      b=$(basename "$f" .json); [ "$b" = "brief" ] && continue
+      n=$(jq '.signals|length' "$f" 2>/dev/null || echo 0)
+      st=$(jq -r 'if ._meta.stale then "·stale" else "" end' "$f" 2>/dev/null)
+      SRC_COUNTS="${SRC_COUNTS}${b}=${n}${st} "
+    done
+    log "Phase 0: brief ready ($BRIEF_N ranked signals; stale sources: ${BRIEF_STALE:-none})"
+    log "Phase 0: per-source signals: ${SRC_COUNTS}"
+    echo "**Intelligence brief:** $BRIEF_N ranked signals${BRIEF_STALE:+ (stale: $BRIEF_STALE)} — injected per-lane via \`__BRIEF__\`" >> "$REPORT"
+    echo "**Intel sources:** \`${SRC_COUNTS}\`" >> "$REPORT"
+  fi
+else
+  # Phase 0 must never abort the run — lanes degrade to their own in-lane discovery.
+  log "Phase 0: run-intel failed/absent — lanes fall back to in-lane discovery (brief-first contract still applies)"
 fi
 
 # --- WIP snapshot + dirty baseline ----------------------------------------
