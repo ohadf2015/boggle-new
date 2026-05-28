@@ -21,7 +21,10 @@ export function WordTowerPageClient() {
   const { isAdmin, loading } = useAuth();
   const { trackExposure } = useExperiment('word-tower');
   const gameEnabled = useWordTowerEnabled();
-  const allowed = isAdmin || gameEnabled;
+  // Dev bypass so the game is reachable locally (incl. /he RTL playtest) without
+  // an admin session. Production still requires admin or the live feature flag.
+  const isDev = process.env.NODE_ENV === 'development';
+  const allowed = isAdmin || gameEnabled || isDev;
 
   useEffect(() => {
     if (allowed) trackExposure();

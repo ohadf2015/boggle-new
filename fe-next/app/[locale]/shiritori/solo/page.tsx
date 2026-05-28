@@ -27,6 +27,7 @@ import {
   type SpState,
 } from '@/lib/shiritori/sp/spEngine';
 import { botPoolForDifficulty } from '@/lib/shiritori/sp/botDict';
+import { HowToPlayCard } from '@/components/common/HowToPlayCard';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -143,7 +144,9 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
   }, [input, state, pending, playSound, t]);
 
   // Admin gate — hooks above this run on every render so order stays stable.
-  if (!isAdmin) {
+  // Dev bypass lets the game be reached locally (incl. /he RTL playtest).
+  const isDev = process.env.NODE_ENV === 'development';
+  if (!isAdmin && !isDev) {
     return (
       <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
         <p className="font-neo-body text-neo-white/60 text-center max-w-sm">
@@ -158,6 +161,13 @@ export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale
 
   return (
     <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-8">
+      <HowToPlayCard
+        storageKey="shiritori-solo"
+        title={t('shiritori.solo.howTo.title')}
+        steps={[0, 1, 2].map((i) => t(`shiritori.solo.howTo.steps.${i}`))}
+        cta={t('shiritori.solo.howTo.cta')}
+        accent="lime"
+      />
       <div className="mx-auto w-full max-w-2xl space-y-5">
         <header className="flex items-center justify-between">
           <Link href={`/${locale}/shiritori`} className="inline-flex items-center gap-1.5 font-neo-body text-sm text-neo-white/60 hover:text-neo-white">

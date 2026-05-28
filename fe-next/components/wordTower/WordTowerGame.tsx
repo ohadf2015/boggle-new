@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { HowToPlayCard } from '@/components/common/HowToPlayCard';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import {
@@ -126,6 +127,13 @@ export function WordTowerGame() {
 
   return (
     <>
+      <HowToPlayCard
+        storageKey="word-tower"
+        title={t('wordTower.howTo.title')}
+        steps={[0, 1, 2].map((i) => t(`wordTower.howTo.steps.${i}`))}
+        cta={t('wordTower.howTo.cta')}
+        accent="cyan"
+      />
       <WordTowerPlay
         key={playKey}
         language={language}

@@ -9,6 +9,8 @@ import {
   type PlacementOutcome,
 } from '@/lib/wordTower/cranePlacement';
 import { beamWidthFor } from '@/lib/wordTower/craneBeam';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 /** Imperative handle so a parent CTA (e.g. the bottom HUD) can trigger the
  *  drop — keeps the player's finger pinned to one button rather than chasing
@@ -118,8 +120,12 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
 
   useImperativeHandle(ref, () => ({ drop }), [drop]);
 
+  const { language } = useLanguage();
   const trolleyX = pos * TROLLEY_RANGE_PX;
   const beamW = beamWidthFor(word.length);
+  // Hebrew: show the word-final letter in its sofit form and lay the beam RTL.
+  // Width still keys off the raw length (same glyph count).
+  const beamWord = language === 'he' ? applyHebrewFinalLetters(word) : word;
 
   // Instability dots — 0, 1, 2, 3 (3 = next miss topples a floor).
   const dots = Array.from({ length: TOPPLE_AFTER_SLOPPY + 1 }, (_, i) => i < consecutiveSloppy);
@@ -199,8 +205,9 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
               !reducedMotion && !falling && 'animate-neo-pop',
             )}
             style={{ width: `${beamW}px`, height: '38px' }}
+            dir={language === 'he' ? 'rtl' : 'ltr'}
           >
-            {word}
+            {beamWord}
           </div>
         </div>
 

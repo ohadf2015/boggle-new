@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useWordForgeRun } from '@/hooks/useWordForgeRun';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { Language } from '@/shared/types/game';
 import { Button } from '@/components/ui/button';
 import { RuneBar } from './RuneBar';
@@ -31,8 +32,27 @@ import { WordForgeGrid } from './WordForgeGrid';
 export default function WordForgeGame(): React.JSX.Element {
   const { t, language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
-  const run = useWordForgeRun();
+  const run = useWordForgeRun(language as Language);
   const { checkWord, isLoaded: dictLoaded } = useDictionaryCache(language as Language);
+  const { playSound } = useSoundEffects();
+
+  // Specific rejection feedback — tells the player *why* a word bounced
+  // instead of the prototype "nothing happened". Driven by the hook's
+  // rejection channel (constraint/duplicate/oath) and the grid's own
+  // dictionary check (notWord).
+  const [rejectMsg, setRejectMsg] = useState<string | null>(null);
+  const rejectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashReject = React.useCallback((reasonKey: string) => {
+    setRejectMsg(t(`wordForge.reject.${reasonKey}`));
+    playSound('wordRejected');
+    if (rejectTimerRef.current) clearTimeout(rejectTimerRef.current);
+    rejectTimerRef.current = setTimeout(() => setRejectMsg(null), 1600);
+  }, [t, playSound]);
+  useEffect(() => {
+    if (run.lastRejection) flashReject(run.lastRejection.reason);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [run.lastRejection]);
+  useEffect(() => () => { if (rejectTimerRef.current) clearTimeout(rejectTimerRef.current); }, []);
 
   // Track triggered rune IDs for glow effect
   const [triggeredRuneIds, setTriggeredRuneIds] = useState<string[]>([]);
@@ -76,7 +96,7 @@ export default function WordForgeGame(): React.JSX.Element {
 
         {/* How it works — 3 short lines, staggered */}
         <div className="flex flex-col gap-1.5 text-sm text-neo-cream/50 font-neo-body text-center max-w-xs">
-          {['🔤 Spell words on a Boggle grid', '🃏 Collect rune modifiers between rounds', '💥 Stack multipliers to break the score'].map((line, i) => (
+          {[0, 1, 2].map((i) => t(`wordForge.howTo.${i}`)).map((line, i) => (
             <m.span
               key={line}
               initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
@@ -196,10 +216,24 @@ export default function WordForgeGame(): React.JSX.Element {
       <div className="flex-1 flex items-center justify-center px-4 py-2">
         <WordForgeGrid
           grid={run.state.grid}
+          language={language as Language}
           onWordFound={run.submitWord}
           bossConstraintId={run.state.bossConstraint?.def.id ?? null}
           checkWord={dictLoaded ? checkWord : undefined}
+          dictReady={dictLoaded}
+          onReject={() => flashReject('notWord')}
         />
+      </div>
+
+      {/* Why-it-bounced chip + dictionary-loading hint */}
+      <div className="h-6 flex items-center justify-center" aria-live="polite">
+        {rejectMsg ? (
+          <span className="px-3 py-0.5 rounded-neo bg-neo-red/15 border-2 border-neo-red/40 text-neo-red text-xs font-black uppercase font-neo-body motion-safe:animate-neo-pop">
+            {rejectMsg}
+          </span>
+        ) : !dictLoaded ? (
+          <span className="text-neo-cream/40 text-xs font-neo-body">{t('wordForge.dictLoading')}</span>
+        ) : null}
       </div>
 
       {/* Score Feedback (ephemeral) */}

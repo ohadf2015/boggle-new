@@ -8,6 +8,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import type { Language } from '@/types';
 import type {
   WordForgeRunState,
   WordForgeProgress,
@@ -57,10 +58,21 @@ function createInitialState(): WordForgeRunState {
 
 // ─── Hook ──────────────────────────────────────────────────
 
+/** Why a submitted word was bounced — surfaced so the player learns the rule. */
+export type WordForgeRejectReason = 'duplicate' | 'constraint' | 'oath';
+
+export interface WordForgeRejection {
+  reason: WordForgeRejectReason;
+  word: string;
+  /** Monotonic so identical consecutive rejections still re-trigger feedback. */
+  nonce: number;
+}
+
 export interface UseWordForgeRunReturn {
   state: WordForgeRunState;
   progress: WordForgeProgress | null;
   lastWordScore: WordScoreResult | null;
+  lastRejection: WordForgeRejection | null;
   startRun: () => void;
   startRound: () => void;
   submitWord: (word: string) => void;
@@ -70,9 +82,14 @@ export interface UseWordForgeRunReturn {
   exitToMenu: () => void;
 }
 
-export function useWordForgeRun(): UseWordForgeRunReturn {
+export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunReturn {
   const [state, setState] = useState<WordForgeRunState>(createInitialState);
   const [progress, setProgress] = useState<WordForgeProgress | null>(null);
+
+  // Latest active language, read inside callbacks without re-creating them.
+  // Drives the per-language letter pool so Hebrew players get Hebrew tiles.
+  const languageRef = useRef<Language>(language);
+  languageRef.current = language;
 
   // Load progress from API on mount
   useEffect(() => {
@@ -90,6 +107,12 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
     loadProgress();
   }, []);
   const [lastWordScore, setLastWordScore] = useState<WordScoreResult | null>(null);
+  const [lastRejection, setLastRejection] = useState<WordForgeRejection | null>(null);
+  // Mirror latest state so submitWord can pre-validate (reject reason) outside
+  // the setState updater, keeping the updater side-effect free.
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const rejectNonceRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const comboRef = useRef(0);
   const lastWordTimeRef = useRef(0);
@@ -204,7 +227,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
     newState.round = 1;
     newState.phase = 'playing';
     newState.roundTarget = getRoundTarget(1);
-    newState.grid = pickRichestBoardClient(() => generateWordForgeGrid(5), 'en', 4);
+    newState.grid = pickRichestBoardClient(() => generateWordForgeGrid(5, languageRef.current), languageRef.current, 4);
     newState.timerDuration = 60;
     newState.timeRemaining = 60;
     newState.runSeed = Math.floor(Math.random() * 100000);
@@ -246,7 +269,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
         skipBonus: 0,
         wordsThisRound: [],
         bannedLetters: new Set(),
-        grid: pickRichestBoardClient(() => generateWordForgeGrid(finalGridSize), 'en', 4),
+        grid: pickRichestBoardClient(() => generateWordForgeGrid(finalGridSize, languageRef.current), languageRef.current, 4),
         gridSize: finalGridSize,
         timerDuration: withTimeWarp,
         timeRemaining: withTimeWarp,
@@ -261,26 +284,39 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
 
   // ─── Submit Word ───────────────────────────────────────
 
+  const reject = useCallback((reason: WordForgeRejectReason, word: string) => {
+    rejectNonceRef.current += 1;
+    setLastRejection({ reason, word: word.toUpperCase(), nonce: rejectNonceRef.current });
+  }, []);
+
   const submitWord = useCallback((word: string) => {
-    setState(prev => {
-      if (prev.phase !== 'playing') return prev;
+    // Pre-validate against the latest state so we can tell the player *why* a
+    // word bounced instead of silently swallowing it (the #1 prototype smell).
+    const cur = stateRef.current;
+    if (cur.phase !== 'playing') return;
 
-      // Check boss constraint validity
-      const constraintId = prev.bossConstraint?.def.id ?? null;
-      if (constraintId && !isWordAllowedByConstraint(constraintId, word)) {
-        return prev; // Word rejected by constraint
-      }
-
-      // Check duplicate
-      if (prev.wordsThisRound.includes(word.toUpperCase())) return prev;
-
-      // oathOfSilence cursed rune: reject word if it shares letters with last word (CRIT-3)
-      if (prev.bannedLetters.size > 0) {
-        const upper = word.toUpperCase();
-        for (const ch of upper) {
-          if (prev.bannedLetters.has(ch)) return prev;
+    const constraintId = cur.bossConstraint?.def.id ?? null;
+    if (constraintId && !isWordAllowedByConstraint(constraintId, word)) {
+      reject('constraint', word);
+      return;
+    }
+    if (cur.wordsThisRound.includes(word.toUpperCase())) {
+      reject('duplicate', word);
+      return;
+    }
+    if (cur.bannedLetters.size > 0) {
+      const upper = word.toUpperCase();
+      for (const ch of upper) {
+        if (cur.bannedLetters.has(ch)) {
+          reject('oath', word);
+          return;
         }
       }
+    }
+
+    setState(prev => {
+      if (prev.phase !== 'playing') return prev;
+      const constraintId = prev.bossConstraint?.def.id ?? null;
 
       const now = Date.now();
       const wordFindTime = (now - lastWordTimeRef.current) / 1000;
@@ -358,7 +394,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
 
       return updated;
     });
-  }, [handleRoundEnd]);
+  }, [handleRoundEnd, reject]);
 
   // ─── Continue from Round Result to Rune Pick ───────────
 
@@ -412,7 +448,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
       bossConstraint: null,
       wordsThisRound: [],
       bannedLetters: new Set(),
-      grid: pickRichestBoardClient(() => generateWordForgeGrid(5), 'en', 4),
+      grid: pickRichestBoardClient(() => generateWordForgeGrid(5, languageRef.current), languageRef.current, 4),
       gridSize: 5,
       timerDuration: 60,
       timeRemaining: 60,
@@ -514,6 +550,7 @@ export function useWordForgeRun(): UseWordForgeRunReturn {
     state,
     progress,
     lastWordScore,
+    lastRejection,
     startRun,
     startRound,
     submitWord,

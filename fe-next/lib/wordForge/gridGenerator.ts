@@ -5,17 +5,28 @@
  * Reuses letter frequency logic from adventure grid generator.
  */
 
-import { RARE_CONSONANTS } from '@/lib/adventure/gridGenerator';
+import { RARE_CONSONANTS, generateAdventureGrid } from '@/lib/adventure/gridGenerator';
+import type { GridSize } from '@/lib/adventure/gridConstants';
+import type { Language } from '@/types';
 
 /**
  * Generate a Boggle-style letter grid for Word Forge.
  *
- * Ensures good letter distribution:
+ * English keeps its hand-tuned distribution (below). Every other language
+ * delegates to the shared `generateAdventureGrid`, which has per-language
+ * letter generators (Hebrew matres-lectionis clustering, Japanese hiragana,
+ * Swedish) so a Hebrew player gets Hebrew tiles instead of English ones.
+ *
+ * Ensures good English letter distribution:
  * - ~35-40% vowels (7-8 of 25 tiles)
  * - Common consonants weighted higher
  * - At least 1 rare consonant for scoring opportunities
  */
-export function generateWordForgeGrid(size: number = 5): string[][] {
+export function generateWordForgeGrid(size: number = 5, language: Language = 'en'): string[][] {
+  if (language !== 'en') {
+    return generateAdventureGrid(size as GridSize, undefined, language);
+  }
+
   const totalTiles = size * size;
   const vowelCount = Math.round(totalTiles * 0.36); // ~9 for 5×5
   const rareCount = Math.max(1, Math.floor(totalTiles * 0.08)); // ~2 for 5×5

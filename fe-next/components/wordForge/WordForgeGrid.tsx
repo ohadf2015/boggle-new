@@ -3,6 +3,8 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import type { Language } from '@/shared/types/game';
 
 type WordFeedback = 'none' | 'valid' | 'invalid' | 'duplicate';
 
@@ -11,6 +13,12 @@ interface WordForgeGridProps {
   onWordFound: (word: string) => void;
   bossConstraintId: string | null; // Used by boss constraint UI effects in v2
   checkWord?: (word: string) => boolean; // Dictionary check
+  /** Active locale — drives Hebrew sofit display + RTL on the word preview. */
+  language?: Language;
+  /** Whether the dictionary has finished loading (gates word acceptance). */
+  dictReady?: boolean;
+  /** Called when the grid itself rejects a word (e.g. not in dictionary). */
+  onReject?: (reason: 'notWord') => void;
 }
 
 interface TilePos {
@@ -30,6 +38,9 @@ export function WordForgeGrid({
   onWordFound,
   bossConstraintId,
   checkWord,
+  language = 'en',
+  dictReady = true,
+  onReject,
 }: WordForgeGridProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const [path, setPath] = useState<TilePos[]>([]);
@@ -82,7 +93,11 @@ export function WordForgeGrid({
     if (path.length >= 3) {
       const word = getCurrentWord();
       if (word.length >= 3) {
-        if (!checkWord || checkWord(word.toLowerCase())) {
+        // While the dictionary is still loading, don't blindly accept (or
+        // blindly reject) — just shake; the parent shows a "loading" hint.
+        if (!dictReady || !checkWord) {
+          showFeedback('invalid');
+        } else if (checkWord(word.toLowerCase())) {
           onWordFound(word);
           showFeedback('valid');
           // Flash validated tiles green
@@ -93,12 +108,13 @@ export function WordForgeGrid({
           }
         } else {
           showFeedback('invalid');
+          onReject?.('notWord');
         }
       }
     }
     setPath([]);
     setIsDragging(false);
-  }, [path, onWordFound, checkWord, showFeedback, prefersReducedMotion, getCurrentWord]);
+  }, [path, onWordFound, checkWord, dictReady, onReject, showFeedback, prefersReducedMotion, getCurrentWord]);
 
   // Touch handlers for mobile
   const getTileFromTouch = (touch: React.Touch): TilePos | null => {
@@ -125,19 +141,24 @@ export function WordForgeGrid({
   };
 
   const currentWord = getCurrentWord();
+  // Hebrew shows the word-final letter in its sofit form (e.g. כ→ך). The board
+  // tiles keep their regular form (the bag holds regular); only this linear
+  // preview gets the end-of-word glyph.
+  const displayWord = language === 'he' ? applyHebrewFinalLetters(currentWord) : currentWord;
+  const wordDir = language === 'he' ? 'rtl' : 'ltr';
 
   return (
     <div className="flex flex-col items-center gap-3">
       {/* Current word preview — grows with word length */}
       <div className="h-10 flex items-center justify-center">
         {currentWord.length > 0 && (
-          <span className={cn(
+          <span dir={wordDir} className={cn(
             'font-black uppercase font-neo-display tracking-wider px-3 py-1',
             'bg-neo-cream/10 border-2 border-neo-cyan/30 rounded-neo text-neo-cyan',
             currentWord.length >= 3 ? 'opacity-100' : 'opacity-50',
             currentWord.length >= 7 ? 'text-xl' : currentWord.length >= 5 ? 'text-lg' : 'text-base',
           )}>
-            {currentWord}
+            {displayWord}
           </span>
         )}
       </div>

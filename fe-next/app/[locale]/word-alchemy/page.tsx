@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { HowToPlayCard } from '@/components/common/HowToPlayCard';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -219,7 +220,9 @@ export default function WordAlchemyPage() {
 
   // Admin gate — Word Alchemy stays an admin-only preview per project scope.
   // Render after hooks so order is stable across admin/non-admin renders.
-  if (!isAdmin) {
+  // Dev bypass lets the game be reached locally for /he playtest.
+  const isDev = process.env.NODE_ENV === 'development';
+  if (!isAdmin && !isDev) {
     return (
       <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
         <p className="font-neo-body text-neo-white/60 text-center max-w-sm">
@@ -235,6 +238,13 @@ export default function WordAlchemyPage() {
 
   return (
     <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-8 sm:py-12">
+      <HowToPlayCard
+        storageKey="word-alchemy"
+        title={t('wordAlchemy.howTo.title')}
+        steps={[0, 1, 2].map((i) => t(`wordAlchemy.howTo.steps.${i}`))}
+        cta={t('wordAlchemy.howTo.cta')}
+        accent="purple"
+      />
       <div className="mx-auto w-full max-w-2xl space-y-6 animate-[fadeInUp_0.4s_ease-out_both] motion-reduce:animate-none">
         {/* Header */}
         <header className="text-center space-y-3">

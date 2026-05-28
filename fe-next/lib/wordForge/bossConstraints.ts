@@ -29,7 +29,9 @@ export const BOSS_CONSTRAINTS: BossConstraintDef[] = [
   { id: 'theMirror', name: 'The Mirror', descriptionKey: 'wordForge.boss.theMirror', icon: '🪞' },
 ];
 
-const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
+// Latin vowels + Hebrew matres lectionis (א ה ו י) so the "censor" boss still
+// bites in Hebrew instead of being a silent no-op against Hebrew letters.
+const VOWELS = new Set(['A', 'E', 'I', 'O', 'U', 'א', 'ה', 'ו', 'י']);
 
 /**
  * Check if a word is valid under a boss constraint.
