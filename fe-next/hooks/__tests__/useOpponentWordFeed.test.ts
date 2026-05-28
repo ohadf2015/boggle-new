@@ -5,6 +5,7 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useOpponentWordFeed } from '../useOpponentWordFeed';
+import { useSelectionStore, resetSelection } from '../useSelectionStore';
 
 // Mock socket
 const mockOn = vi.fn();
@@ -16,10 +17,12 @@ describe('useOpponentWordFeed', () => {
     vi.useFakeTimers();
     vi.clearAllMocks();
     localStorage.clear();
+    resetSelection();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    resetSelection();
   });
 
   it('should return empty feedItems initially', () => {
@@ -181,6 +184,53 @@ describe('useOpponentWordFeed', () => {
     });
 
     expect(result.current.feedItems).toHaveLength(0);
+  });
+
+  it('should NOT add items while the player is mid-drag building a word (letterCount > 0)', () => {
+    const { result } = renderHook(() =>
+      useOpponentWordFeed({ socket: mockSocket, currentPlayerName: 'me' })
+    );
+
+    const handler = mockOn.mock.calls.find(
+      (c: any[]) => c[0] === 'opponentWordFound'
+    )?.[1];
+
+    // Player starts building a word — opponent flood must not steal paint budget
+    act(() => {
+      useSelectionStore.getState().setSelection('CA', 2);
+    });
+
+    act(() => {
+      handler({
+        playerId: 'p1',
+        playerName: 'Alice',
+        wordLength: 5,
+        firstLetter: 'H',
+        lastLetter: 'O',
+        score: 4,
+      });
+    });
+
+    // Suppressed while selecting
+    expect(result.current.feedItems).toHaveLength(0);
+
+    // Once the selection clears, opponent words resume
+    act(() => {
+      resetSelection();
+    });
+    act(() => {
+      handler({
+        playerId: 'p2',
+        playerName: 'Bob',
+        wordLength: 4,
+        firstLetter: 'A',
+        lastLetter: 'B',
+        score: 3,
+      });
+    });
+
+    expect(result.current.feedItems).toHaveLength(1);
+    expect(result.current.feedItems[0].playerName).toBe('Bob');
   });
 
   it('should clean up listener on unmount', () => {

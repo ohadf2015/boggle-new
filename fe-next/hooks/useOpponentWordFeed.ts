@@ -5,6 +5,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
+import { useSelectionStore } from './useSelectionStore';
 
 export interface OpponentWordFeedItem {
   id: string;
@@ -61,6 +62,14 @@ export function useOpponentWordFeed({ socket, currentPlayerName }: UseOpponentWo
     const handler = (data: OpponentWordFeedEvent) => {
       if (!isEnabled()) return;
       if (data.playerName === currentPlayerName) return;
+      // Suppress the opponent-word flood while the player is mid-drag building a
+      // word. In busy MP classic rooms (esp. with bots) opponentWordFound fires
+      // several times/sec; each enqueue re-renders the feed + runs framer-motion
+      // enter/exit animations, and that paint steals the drag's frame budget
+      // ("MP classic feels slow when selecting"). The feed is ephemeral
+      // (auto-removes in 3s) so opponent pops dropped during a sub-2s drag are
+      // imperceptible. Mirrors useFrozenWhileSelecting for the leaderboard.
+      if (useSelectionStore.getState().letterCount > 0) return;
 
       const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       const item: OpponentWordFeedItem = {
