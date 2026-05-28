@@ -14,6 +14,15 @@ const sv = {
     "yourTurn": "Din tur – skriv ett ord",
     "youWin": "Du vinner!",
     "solo": {
+      "howTo": {
+        "title": "Så spelar du",
+        "cta": "Uppfattat!",
+        "steps": [
+          "🔤 Skriv ett hiragana-ord som börjar på det markerade kana-tecknet",
+          "⛓️ Varje ord måste börja på föregående ords sista kana",
+          "🚫 Du förlorar om du slutar på ん (n) – och inga upprepningar!"
+        ]
+      },
       "title": "Shiritori Solo",
       "tagline": "Kedja hiragana-ord mot boten.",
       "back": "Tillbaka till Shiritori",
@@ -46,6 +55,15 @@ const sv = {
     }
   },
   "wordAlchemy": {
+    "howTo": {
+      "title": "Så spelar du",
+      "cta": "Uppfattat!",
+      "steps": [
+        "🔤 Förvandla ett ord till nästa, ett steg i taget",
+        "💡 Varje ledtråd visar ändringen – lägg till, byt ut eller ta bort en bokstav",
+        "🏆 Slutför hela kedjan för att lösa pusslet"
+      ]
+    },
     "badge": "Ordalkemi",
     "title": "Ordalkemi",
     "instructions": "Förvandla ett ord till nästa genom att följa varje ledtråd (innehåll på engelska).",
@@ -77,6 +95,15 @@ const sv = {
   },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {
+    "howTo": {
+      "title": "Så spelar du",
+      "cta": "Uppfattat!",
+      "steps": [
+        "🏗️ Tryck på knappen för att släppa ordblocket på tornet",
+        "🎯 Landa mitt på — slarviga släpp får tornet att luta",
+        "🔤 Varje giltigt ord staplar en ny våning. Bygg så högt du kan!"
+      ]
+    },
     "cardTitle": "Ordtorn",
     "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",
     "loading": "Laddar ordlista…",
@@ -89,7 +116,7 @@ const sv = {
     "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "mountainTop": "Bergstopp", "jetStream": "Jetström", "stormTops": "Stormtoppar", "weatherBalloon": "Väderballong", "earthCurve": "Jordens krökning", "karman": "Rymdens kant", "meteorBelt": "Meteorbälte", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
     "hazard": { "bomb": "Bomb", "hurricane": "Orkan", "wobble": "Vingel", "sabotage": "Sabotage", "lost": "{kind}! −{n} våningar" },
     "clutch": { "save": "Räddning i sista stund!", "critical": "Vacklar — landa rent!" },
-    "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig" },
+    "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig", "newBest": "Nytt dagsrekord!" },
     "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
     "crane": { "place": "Placera ditt ord", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet" },
     "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "{n} perfekta släpp i rad" },

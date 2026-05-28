@@ -14,6 +14,15 @@ const ja = {
     "yourTurn": "あなたの番です — 言葉を入力",
     "youWin": "あなたの勝ち！",
     "solo": {
+      "howTo": {
+        "title": "遊び方",
+        "cta": "OK！",
+        "steps": [
+          "🔤 ハイライトされた仮名で始まるひらがなの単語を入力",
+          "⛓️ 各単語は前の単語の最後の仮名で始めること",
+          "🚫 「ん」で終わると負け。同じ単語の繰り返しも禁止！"
+        ]
+      },
       "title": "しりとり ソロ",
       "tagline": "ボット相手にひらがなでしりとり。",
       "back": "しりとりに戻る",
@@ -46,6 +55,15 @@ const ja = {
     }
   },
   "wordAlchemy": {
+    "howTo": {
+      "title": "遊び方",
+      "cta": "OK！",
+      "steps": [
+        "🔤 一語ずつ単語を次の単語へ変化させよう",
+        "💡 各ヒントが変化を示す — 文字の追加・交換・削除",
+        "🏆 連鎖をすべて完成させてパズルを解こう"
+      ]
+    },
     "badge": "ワードアルケミー",
     "title": "ワードアルケミー",
     "instructions": "ヒントに従って、言葉を次の言葉へと変えていきましょう（内容は英語）。",
@@ -77,6 +95,15 @@ const ja = {
   },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {
+    "howTo": {
+      "title": "遊び方",
+      "cta": "OK！",
+      "steps": [
+        "🏗️ ボタンをタップして単語ブロックをタワーに落とそう",
+        "🎯 中央に着地 — 雑な落下はタワーを傾けます",
+        "🔤 有効な単語ごとに階が積み上がる。できるだけ高く積もう！"
+      ]
+    },
     "cardTitle": "ワードタワー",
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
     "loading": "辞書を読み込み中…",
@@ -89,7 +116,7 @@ const ja = {
     "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "mountainTop": "山頂", "jetStream": "ジェット気流", "stormTops": "雷雲の頂", "weatherBalloon": "気象観測気球", "earthCurve": "地球の弧", "karman": "宇宙の境界", "meteorBelt": "流星帯", "aurora": "オーロラ", "deepSpace": "深宇宙" },
     "hazard": { "bomb": "爆弾", "hurricane": "ハリケーン", "wobble": "ぐらつき", "sabotage": "妨害", "lost": "{kind}！{n}階崩落" },
     "clutch": { "save": "ギリギリセーフ！", "critical": "ぐらぐら — きれいに着地！" },
-    "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス" },
+    "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス", "newBest": "デイリー自己ベスト更新！" },
     "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
     "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定" },
     "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト" },

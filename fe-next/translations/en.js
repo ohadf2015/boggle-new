@@ -42,6 +42,11 @@ const en = {
         "player-invalid": "Invalid word — the bot wins.",
         "bot-no-move": "The bot ran out of words — you win!",
         "bot-ends-n": "The bot ended in ん — you win!"
+      },
+      "howTo": {
+        "title": "How to play",
+        "cta": "Got it!",
+        "steps": ["🔤 Type a hiragana word starting with the highlighted kana", "⛓️ Each word must begin with the last kana of the previous word", "🚫 You lose if you end on ん (n) — and no repeats!"]
       }
     }
   },
@@ -73,12 +78,22 @@ const en = {
       "p2s1": "A bloom, not a baking ingredient.",
       "p5s1": "Speedy, in one word.",
       "p6s1": "Family relation, not the sky."
+    },
+    "howTo": {
+      "title": "How to play",
+      "cta": "Got it!",
+      "steps": ["🔤 Transform one word into the next, one step at a time", "💡 Each clue tells you the change — add, swap, or remove a letter", "🏆 Finish the whole chain to solve the puzzle"]
     }
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {
     "cardTitle": "Word Tower",
     "cardDesc": "Stack words sky-high — admin preview",
+    "howTo": {
+      "title": "How to play",
+      "cta": "Got it!",
+      "steps": ["🏗️ Tap the button to drop the word block onto the tower", "🎯 Land it centered — sloppy drops make the tower lean", "🔤 Every valid word stacks a new floor. Build as high as you can!"]
+    },
     "loading": "Loading dictionary…",
     "biome": { "city": "Ground", "sky": "Sky", "stratosphere": "Stratosphere", "orbit": "Orbit", "nebula": "Nebula", "galaxy": "Galaxy" },
     "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart", "restartConfirm": "Sure?", "best": "Best {m} m", "possible": "{n} words", "clue": "Clue", "collapse": "Collapse", "expand": "Expand", "rivalPassed": "Passed {name}!", "stuck": "Stuck? New letter", "backToTop": "Top", "pickLetters": "Pick letters" },
@@ -89,7 +104,7 @@ const en = {
     "landmark": { "skyscraper": "Skyscraper top", "cloudBase": "Cloud base", "mountainTop": "Mountain peak", "jetStream": "Jet stream", "stormTops": "Storm tops", "weatherBalloon": "Weather balloon", "earthCurve": "Earth's curve", "karman": "Edge of space", "meteorBelt": "Meteor belt", "aurora": "Aurora", "deepSpace": "Deep space" },
     "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "wobble": "Wobble", "sabotage": "Sabotage", "lost": "{kind}! −{n} floors" },
     "clutch": { "save": "Clutch save!", "critical": "Wobbling — land it clean!" },
-    "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless" },
+    "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless", "newBest": "New daily best!" },
     "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
     "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability" },
     "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "{n} perfect drops in a row" },
@@ -11911,7 +11926,19 @@ const en = {
       "escalator": "Target increases 5% per word",
       "nullifier": "Your first 2 rune slots are disabled",
       "inverter": "Chip runes disabled, only mult works"
-    }
+    },
+    "howTo": [
+      "🔤 Spell words on a Boggle grid",
+      "🃏 Collect rune modifiers between rounds",
+      "💥 Stack multipliers to break the score"
+    ],
+    "reject": {
+      "duplicate": "Already used this round",
+      "constraint": "Blocked by the boss rule",
+      "oath": "Oath of Silence — can't reuse those letters",
+      "notWord": "Not in the dictionary"
+    },
+    "dictLoading": "Loading dictionary…"
   },
   "wheel": {
     "rush": {

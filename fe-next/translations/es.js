@@ -42,6 +42,11 @@ const es = {
         "player-invalid": "Palabra no válida — gana el bot.",
         "bot-no-move": "El bot se quedó sin palabras — ¡ganas tú!",
         "bot-ends-n": "El bot terminó en ん — ¡ganas tú!"
+      },
+      "howTo": {
+        "title": "Cómo jugar",
+        "cta": "¡Entendido!",
+        "steps": ["🔤 Escribe una palabra en hiragana que empiece con el kana resaltado", "⛓️ Cada palabra debe empezar con el último kana de la anterior", "🚫 Pierdes si terminas en ん (n), ¡y nada de repetir palabras!"]
       }
     }
   },
@@ -73,12 +78,22 @@ const es = {
       "p2s1": "Una flor, no un ingrediente de repostería.",
       "p5s1": "Rápido, en una palabra.",
       "p6s1": "Un familiar, no el cielo."
+    },
+    "howTo": {
+      "title": "Cómo jugar",
+      "cta": "¡Entendido!",
+      "steps": ["🔤 Transforma una palabra en la siguiente, paso a paso", "💡 Cada pista indica el cambio: añadir, cambiar o quitar una letra", "🏆 Completa toda la cadena para resolver el puzle"]
     }
   },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {
     "cardTitle": "Torre de Palabras",
     "cardDesc": "Apila palabras hasta el cielo — vista de admin",
+    "howTo": {
+      "title": "Cómo jugar",
+      "cta": "¡Entendido!",
+      "steps": ["🏗️ Toca el botón para soltar el bloque de palabra sobre la torre", "🎯 Aterriza centrado: las caídas descuidadas inclinan la torre", "🔤 Cada palabra válida apila un piso. ¡Construye lo más alto posible!"]
+    },
     "loading": "Cargando diccionario…",
     "biome": { "city": "Suelo", "sky": "Cielo", "stratosphere": "Estratosfera", "orbit": "Órbita", "nebula": "Nebulosa", "galaxy": "Galaxia" },
     "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar", "restartConfirm": "¿Seguro?", "best": "Mejor {m} m", "possible": "{n} palabras", "clue": "Pista", "collapse": "Contraer", "expand": "Expandir", "rivalPassed": "¡Superaste a {name}!", "stuck": "¿Atascado? Nueva letra", "backToTop": "Arriba", "pickLetters": "Elige letras" },
@@ -89,7 +104,7 @@ const es = {
     "landmark": { "skyscraper": "Cima del rascacielos", "cloudBase": "Base de nubes", "mountainTop": "Pico de montaña", "jetStream": "Corriente en chorro", "stormTops": "Cima de tormenta", "weatherBalloon": "Globo meteorológico", "earthCurve": "Curvatura terrestre", "karman": "Borde del espacio", "meteorBelt": "Cinturón de meteoros", "aurora": "Aurora", "deepSpace": "Espacio profundo" },
     "hazard": { "bomb": "Bomba", "hurricane": "Huracán", "wobble": "Tambaleo", "sabotage": "Sabotaje", "lost": "¡{kind}! −{n} pisos" },
     "clutch": { "save": "¡Salvada increíble!", "critical": "¡Tambalea — aterriza limpio!" },
-    "daily": { "badge": "Diario · {date}", "streak": "racha de {n} días", "toDaily": "Diario", "toEndless": "Infinito" },
+    "daily": { "badge": "Diario · {date}", "streak": "racha de {n} días", "toDaily": "Diario", "toEndless": "Infinito", "newBest": "¡Nuevo récord diario!" },
     "perk": { "title": "Elige un don", "subtitle": "Elige uno — dura toda la escalada", "skip": "Saltar por ahora", "masterCrane": { "name": "Grúa maestra", "desc": "Mayor recompensa en caídas perfectas" }, "tallTimber": { "name": "Madera alta", "desc": "+12% de altura en cada piso" }, "featherfall": { "name": "Caída de pluma", "desc": "Los derrumbes cuestan un piso menos" }, "reinforced": { "name": "Reforzado", "desc": "Más tambaleo antes del abismo" }, "cushion": { "name": "Cojín de seguridad", "desc": "El vaivén de la grúa nunca tira un piso" } },
     "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad" },
     "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas" },
