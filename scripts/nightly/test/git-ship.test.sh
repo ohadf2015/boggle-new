@@ -106,19 +106,23 @@ assert "NEW_SHA == baseline"     "[ \"$NEW_SHA\" = \"$START_SHA\" ]"
 assert "origin unchanged"        "[ \"\$(origin_head)\" = \"$START_SHA\" ]"
 assert "tree clean (restored)"   "local_clean"
 
-echo "Scenario 5 — origin & nightly modify the SAME source file → fail visibly + recoverably"
+echo "Scenario 5 — origin & nightly modify the SAME source file → saved to ref + master reset (non-blocking)"
 setup
 printf 'export const x = 2; // nightly\n' > fe-next/app/page.tsx
 echo "lane work" > docs/nightly/reports/2026-01-01.md
 advance_origin "fe-next/app/page.tsx=export const x = 3; // origin"
-local_commit_before=""  # captured after ship
 ship_nightly_commit; rc=$?
-nightly_sha_msg="$(git log -1 --pretty=%s)"
 assert "returns 1 (unrecoverable, human needed)" "[ $rc -eq 1 ]"
-assert "local commit PRESERVED"   "[ \"\$nightly_sha_msg\" = 'chore(nightly): autonomous improvement loop test' ]"
+# NEW CONTRACT: the commit is NOT left on local master (that stranded it and
+# bricked the next preflight). It is saved to a recovery ref and master is reset
+# to origin/master so the next run is never blocked.
+assert "local master == origin/master (NOT stranded ahead)" "[ \"\$(git rev-parse HEAD)\" = \"\$(origin_head)\" ]"
+assert "commit recoverable via refs/nightly-pending/\$TODAY" "git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+assert "recovery ref holds the nightly commit" "[ \"\$(git log -1 --pretty=%s refs/nightly-pending/2026-01-01)\" = 'chore(nightly): autonomous improvement loop test' ]"
 assert "tree CLEAN (rebase aborted, no markers)" "local_clean"
 assert "no unmerged paths"        "[ -z \"\$(git diff --name-only --diff-filter=U)\" ]"
 assert "alert names the conflict file" "printf '%s' \"\$ALERTS\" | grep -q 'page.tsx'"
+assert "alert gives a recovery hint"   "printf '%s' \"\$ALERTS\" | grep -qi 'nightly-pending'"
 assert "origin NOT advanced by nightly" "git show origin/master:fe-next/app/page.tsx | grep -q '// origin'"
 assert "nightly's page.tsx NOT on origin" "! git show origin/master:fe-next/app/page.tsx | grep -q '// nightly'"
 
@@ -156,7 +160,8 @@ advance_origin "docs/nightly/reports/2026-01-01.md=ORIGIN report v1" \
                "fe-next/app/page.tsx=export const x = 3; // origin"
 ship_nightly_commit; rc=$?
 assert "returns 1 (mixed conflict → human)"       "[ $rc -eq 1 ]"
-assert "local commit PRESERVED"                   "[ \"\$(git log -1 --pretty=%s)\" = 'chore(nightly): autonomous improvement loop test' ]"
+assert "local master == origin/master (NOT stranded)" "[ \"\$(git rev-parse HEAD)\" = \"\$(origin_head)\" ]"
+assert "commit recoverable via recovery ref"      "[ \"\$(git log -1 --pretty=%s refs/nightly-pending/2026-01-01)\" = 'chore(nightly): autonomous improvement loop test' ]"
 assert "tree CLEAN (rebase aborted)"              "local_clean"
 assert "no unmerged paths"                        "[ -z \"\$(git diff --name-only --diff-filter=U)\" ]"
 assert "alert names the code conflict"            "printf '%s' \"\$ALERTS\" | grep -q 'page.tsx'"
@@ -213,6 +218,26 @@ assert "returns 0 (no-change)"                "[ $rc -eq 0 ]"
 assert "NO_CHANGE_MODE=1"                     "[ \"$NO_CHANGE_MODE\" = 1 ]"
 assert "origin unchanged"                     "[ \"\$(origin_head)\" = \"$START_SHA\" ]"
 assert "founder WIP still dirty (kept)"       "git status --porcelain | grep -q '^ M base.txt'"
+
+echo "Scenario 12 — push conflict with founder WIP present → WIP survives the reset, commit saved to ref"
+# On the unrecoverable-conflict path we reset master to origin/master. That reset
+# must NOT discard the founder's uncommitted WIP — it is stashed across the reset
+# and restored. Prove tracked + untracked WIP both survive AND the nightly commit
+# is recoverable AND master == origin.
+setup
+printf 'FOUNDER mid-run edit\n' > base.txt              # founder tracked WIP (clean at run start in real life; here just present)
+printf 'founder scratch\n'      > founder-draft.txt     # founder untracked WIP
+printf 'export const x = 2; // nightly\n' > fe-next/app/page.tsx
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+WIP_LIST=$(mktemp); printf 'base.txt\nfounder-draft.txt\n' > "$WIP_LIST"
+advance_origin "fe-next/app/page.tsx=export const x = 3; // origin"
+NIGHTLY_WIP_PROTECT="$WIP_LIST" ship_nightly_commit; rc=$?
+assert "returns 1"                                "[ $rc -eq 1 ]"
+assert "local master == origin/master"            "[ \"\$(git rev-parse HEAD)\" = \"\$(origin_head)\" ]"
+assert "commit saved to recovery ref"             "git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+assert "founder tracked WIP survived reset"       "[ -f base.txt ] && grep -q 'FOUNDER mid-run edit' base.txt"
+assert "founder untracked WIP survived reset"     "[ -f founder-draft.txt ]"
+assert "no unmerged paths"                        "[ -z \"\$(git diff --name-only --diff-filter=U)\" ]"
 
 echo
 echo "──────────────────────────────────────────"

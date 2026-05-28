@@ -4,10 +4,14 @@
 #
 # THE GUARANTEE (proven by scripts/nightly/test/git-ship.test.sh):
 #   ship_nightly_commit either succeeds (return 0, pushed or no-change) or fails
-#   VISIBLY AND RECOVERABLY (return 1, Telegram alert, local commit preserved,
-#   working tree CLEAN so the next run's preflight passes). It NEVER silently
-#   dies and NEVER leaves a poisoned tree. A genuine same-file conflict with
-#   concurrent origin work stops for a human — that is correct, not a failure.
+#   VISIBLY AND RECOVERABLY (return 1, Telegram alert). On unrecoverable failure
+#   it SAVES the commit to refs/nightly-pending/$TODAY and RESETS master back to
+#   origin/master — so the INVARIANT "local master == origin/master after every
+#   run" always holds and the next run's preflight can NEVER be blocked by a
+#   stranded commit (the 2026-05-27 brick). Founder WIP is preserved across the
+#   reset. It NEVER silently dies and NEVER leaves a poisoned tree. A genuine
+#   same-file conflict with concurrent origin work stops for a human (the work is
+#   saved + a recovery command is texted) — that is correct, not a failure.
 #
 # Required env (run.sh sets these; the test sets them explicitly per scenario):
 #   MSG_FILE   path to commit-message file (removed on commit / no-change)
@@ -177,14 +181,40 @@ ship_nightly_commit() {
     fi
   fi
 
-  # Genuine conflict (origin and a lane edited the same source file). Abort the
-  # rebase to restore a clean tree + the intact local commit, then fail visibly.
-  # Backtick-wrap the path: tg uses parse_mode=Markdown and most repo paths have
+  # Genuine conflict (origin and a lane edited the same source file), or the
+  # rebased push otherwise failed. Leaving the commit on local master STRANDS it:
+  # the next run's preflight aborts on any unpushed non-docs commit, so a single
+  # conflict would BRICK every subsequent night until a human intervened (the
+  # 2026-05-27 brick — 05-28 only ran because the founder cleared it by hand).
+  #
+  # Instead we hold the INVARIANT "local master == origin/master after every run":
+  #   1. save the commit to refs/nightly-pending/$TODAY so it is never lost,
+  #   2. reset master back to origin/master so preflight can never be blocked,
+  #   3. preserve any founder WIP across the reset (stash → reset → pop).
+  # We do NOT auto-resurrect the ref later: a non-docs conflict means a human
+  # edited the same source, and silently auto-merging concurrent human work is
+  # unsafe. The ref + the texted cherry-pick command make recovery a 30s human op.
+  # Backtick-wrap paths: tg uses parse_mode=Markdown and repo paths often carry
   # `_` (__tests__, snake_case) which would 400 the send and DROP the alert.
   local conflict
   conflict=$(git diff --name-only --diff-filter=U 2>/dev/null | head -3 | tr '\n' ' ')
   git rebase --abort 2>/dev/null || true
-  log "push failed after rebase retry (conflict: ${conflict:-unknown})"
-  tg_alert "nightly $TODAY: push failed — rebase conflicted on \`${conflict:-unknown}\`. Local commit \`$NEW_SHA\` kept. See \`$RUN_LOG\`."
+  local pending_ref="refs/nightly-pending/$TODAY" pending_sha
+  pending_sha=$(git rev-parse HEAD)
+  git update-ref "$pending_ref" "$pending_sha" 2>>"$RUN_LOG" || true
+  # Reset master to origin/master without discarding founder WIP. A bare
+  # `git reset --hard` would nuke uncommitted WIP, so stash it first (-u includes
+  # untracked). On a pop conflict the stash ENTRY is kept (recoverable via
+  # `git stash list`), so founder work is never lost.
+  local _stashed=0
+  if [ -n "$(git status --porcelain)" ]; then
+    git stash push -u -q -m "nightly-wip-rescue-$TODAY" >>"$RUN_LOG" 2>&1 && _stashed=1
+  fi
+  git reset --hard origin/master >>"$RUN_LOG" 2>&1 || true
+  if [ "$_stashed" = 1 ]; then
+    git stash pop >>"$RUN_LOG" 2>&1 || log "stash pop conflicted — founder WIP kept in 'git stash list'"
+  fi
+  log "push blocked (conflict: ${conflict:-unknown}) — saved $pending_sha to $pending_ref, reset master to origin/master"
+  tg_alert "nightly $TODAY: push blocked by conflict on \`${conflict:-unknown}\`. Work SAVED to \`$pending_ref\` (recover: \`git cherry-pick $pending_sha\`). master reset to origin so tomorrow runs clean. See \`$RUN_LOG\`."
   return 1
 }

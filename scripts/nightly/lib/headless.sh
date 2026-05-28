@@ -36,6 +36,33 @@ PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
 export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
 
+# --- Mandatory-Minimum-Artifact contract -------------------------------------
+# Prepended to EVERY lane prompt so a lane can never "give up" / produce nothing.
+# The lane writes docs/nightly/artifacts/lane-<id>-<date>.md as its FIRST action
+# and updates it last. Because docs/ lives outside fe-next/ (where lint/test/build
+# run) the artifact is gate-clean by construction, so even a lane that times out
+# after writing only this file still ships it (with KEEP_TIMEOUT_PARTIALS=1) — the
+# floor is "a reviewable artifact every run", not "a perfect deliverable".
+nightly_artifact_contract() { # <lane_id> <today>
+  local lane_id="$1" today="$2"
+  cat <<EOF
+═══ MANDATORY MINIMUM ARTIFACT (non-negotiable — do this FIRST, before any heavy work) ═══
+Your FIRST action this lane: create docs/nightly/artifacts/lane-${lane_id}-${today}.md
+(mkdir -p the dir if missing) containing at least:
+    status: planned
+    attempted: <one line — what you intend to do tonight>
+Then do the lane's work. Just before you finish — OR the moment you sense the time
+budget is nearly spent — UPDATE that file to:
+    status: shipped | partial | research-only | blocked
+    files_touched: <list, or none>
+    next_steps: <what tomorrow's run should pick up>
+NEVER exit having produced nothing. A timed-out lane that leaves only this artifact
+still counts as a successful-but-degraded run: the artifact is gate-clean (docs/ is
+outside fe-next/) and ships, so the lane is never a total loss. This is your floor.
+
+EOF
+}
+
 headless_run() {
   local lane_id="$1"
   local prompt_file="$2"
@@ -82,6 +109,13 @@ text = (text
         .replace('__FEEDBACK_SUMMARY__', feedback.strip() or 'No player feedback in the window. Proceed normally.'))
 sys.stdout.write(text)
 PY
+
+  # Prepend the Mandatory-Minimum-Artifact contract so every lane has a shippable
+  # floor even on timeout (the "never give up on a lane" guarantee). Goes above the
+  # lane body; the founder-directives block below still lands on top of it.
+  local with_contract
+  with_contract=$(mktemp -t "lane-${lane_id}-contract.XXXXXX")
+  { nightly_artifact_contract "$lane_id" "$today"; cat "$rendered"; } > "$with_contract" && mv "$with_contract" "$rendered"
 
   # Prepend the founder's directives (texted to the bot) at the TOP of the
   # prompt — higher priority than the carried-forward learnings playbook.

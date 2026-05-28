@@ -4,6 +4,11 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 
 > **Sample caveat (2026-05-28):** 6 data nights in window (05-23 thru 05-28). Fleet ship rate: 30/46 lane-runs (65%); 16 timed out (35%); 0 cap-reverted; 0 skipped. Tier: 04 = 100% (6/6); 07 = 83% (5/6); 06 = 83% (5/6); 03 = 67% (4/6); 01 = 50% (3/6); 08 = 60% (3/5 confirmed); 02 = 33% (2/6); 05 = 17% (1/6, only ship = 05-24).
 
+## Active watches (2026-05-29 hardening — see docs/specs/nightly-hardening-2026-05-28.md)
+- **git-ship now preserves+resets on push-conflict** — a blocked push saves the commit to `refs/nightly-pending/<date>` and resets master to origin/master (was: stranded the commit → bricked next preflight, the 05-27 manual-recovery cause). Invariant: local master == origin/master after every run. Recover stranded work: `git cherry-pick <ref>`.
+- **`KEEP_TIMEOUT_PARTIALS` now defaults ON** — timed-out lanes keep partial work (gate still validates). WATCH: if docs-only-salvage nights tick UP, a half-written file is poisoning the gate past drop-and-re-gate's 2 rounds → escalate P2 validated-slice salvage.
+- **Mandatory-Minimum-Artifact contract** prepended to every lane (`docs/nightly/artifacts/lane-NN-<date>.md`) — best-effort floor so a lane never produces nothing. WATCH lane 05: still SIGKILL-prone; confirm the artifact appears even on timeout.
+
 ## What works (validated this week)
 - **Direct-to-master, single end-of-run commit** — one rollback target, one Railway deploy. Held 10 nights. (kept)
 - **WIP-safe scoped revert** — per-lane revert never flushes concurrent founder work. Proven 8+ nights. (kept)

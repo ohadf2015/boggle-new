@@ -35,10 +35,14 @@ command -v caffeinate >/dev/null 2>&1 && caffeinate -i -w "$$" >/dev/null 2>&1 &
 
 # --- flags -----------------------------------------------------------------
 DRY_RUN=0; NO_PUSH=0; NO_MONITOR=0; NO_GATE=0; ONLY=""; SKIP=""
-# Keep a timed-out lane's partial work (within the file cap) instead of reverting
-# it. Default OFF — the integration gate validates everything, and docs-only
-# salvage backstops a broken partial, but enabling this is the owner's call.
-KEEP_TIMEOUT_PARTIALS="${NIGHTLY_KEEP_TIMEOUT_PARTIALS:-0}"
+# Keep a timed-out lane's partial work instead of reverting it. Default ON
+# (2026-05-28): the goal is "a lane never gives up / never produces nothing", and
+# 35% of lane-runs hit the time ceiling. The isolated gate + drop-and-re-gate
+# still validate every kept file before anything ships, so a broken half-written
+# partial is dropped and docs-only salvage backstops the rest — keeping partials
+# can only ADD shippable work, never ship something the gate rejects. Set
+# NIGHTLY_KEEP_TIMEOUT_PARTIALS=0 to restore the old revert-on-timeout behavior.
+KEEP_TIMEOUT_PARTIALS="${NIGHTLY_KEEP_TIMEOUT_PARTIALS:-1}"
 for arg in "$@"; do
   case "$arg" in
     --dry-run)    DRY_RUN=1; NO_PUSH=1; NO_MONITOR=1 ;;

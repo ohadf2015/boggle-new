@@ -21,6 +21,11 @@ From the **Specialized Skills** table above, invoke the skills listed for **lane
 ═══ GOAL ═══
 Default: pick the WORST-converting landing page with ≥200 sessions in the last 14d and ship ONE variant behind a typed flag `landing_variant_<slug>_v1`. Goal = lift sign-up or game-start conversion.
 
+**SCOPE CEILING (this lane timed out 5/5 nights on over-scope — read this).** Ship the SMALLEST coherent slice that is shippable TONIGHT, not a perfect/complete deliverable:
+- Landing variant = change the SINGLE highest-leverage element (hero headline OR the primary CTA OR one above-fold proof line) + its 5-locale strings + the flag wiring. NOT a full-page rewrite, NOT multiple sections.
+- Experimental mode (STEP 0) = one route + minimal client logic + the admin hub tile + one test. If you can't finish a whole mode, ship a working vertical slice and record `status: partial` + `next_steps` in your artifact so tomorrow continues it. A partial mode behind an admin-only tile harms nobody.
+- A larger timeout is NOT the answer (already tried 1500→600→1200s). Finishing a small slice and writing the artifact beats a half-built big thing that the gate reverts.
+
 **ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, skip the landing variant and consider STEP 0 instead.
 
 ═══ STEP 0 — Experimental game mode OR polish (DEFAULT path — try this FIRST) ═══
@@ -81,8 +86,8 @@ The old "for each landing route" loop is what made this lane 0/6 for six nights 
 
 **Never** invoke `mcp__posthog__exec` more than 2 times in this lane. If a fix genuinely needs more data, log a follow-up in `docs/nightly/triage-queue.md` and exit cleanly — don't burn the budget chasing it.
 
-═══ STEP 2 — Design the variant ═══
-Invoke the `frontend-design` skill (or `impeccable:craft`) with the existing page as context. Generate ONE variant. Areas to consider:
+═══ STEP 2 — Design the variant (ONE element, per the SCOPE CEILING) ═══
+Invoke the `frontend-design` skill (or `impeccable:craft`) with the existing page as context. Change exactly ONE of the elements below (the highest-leverage one) — not all of them:
   • Hero copy (front-load value prop in user's language)
   • CTA clarity ("Play free, no signup" beats "Get started")
   • Above-fold proof (real evidence — supported languages, modes — not fabricated)
