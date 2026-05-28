@@ -56,6 +56,21 @@ vi.mock('../../utils/logger', () => ({
   },
 }));
 
+// Mock weeklyQuestManager.getActiveQuest (used by checkAndClaimAllQuestsComplete).
+// Must be top-level so the vi.hoisted()/vi.mock() pair hoists deterministically.
+const { mockGetActiveQuest } = vi.hoisted(() => {
+  const mockGetActiveQuest = vi.fn();
+  return { mockGetActiveQuest };
+});
+
+vi.mock('../weeklyQuestManager', async () => {
+  const actual = await vi.importActual<typeof import('../weeklyQuestManager')>('../weeklyQuestManager');
+  return {
+    ...actual,
+    getActiveQuest: (...args: unknown[]) => mockGetActiveQuest(...args),
+  };
+});
+
 const PLAYER_ID = 'player-123';
 
 const EMPTY_ROW = {
@@ -429,20 +444,6 @@ describe('markCelebrated', () => {
 });
 
 describe('checkAndClaimAllQuestsComplete', () => {
-  // Mock weeklyQuestManager.getActiveQuest
-  const { mockGetActiveQuest } = vi.hoisted(() => {
-    const mockGetActiveQuest = vi.fn();
-    return { mockGetActiveQuest };
-  });
-
-  vi.mock('../weeklyQuestManager', async () => {
-    const actual = await vi.importActual<typeof import('../weeklyQuestManager')>('../weeklyQuestManager');
-    return {
-      ...actual,
-      getActiveQuest: (...args: unknown[]) => mockGetActiveQuest(...args),
-    };
-  });
-
   beforeEach(() => {
     mockGetActiveQuest.mockClear();
   });
