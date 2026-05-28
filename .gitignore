@@ -58,3 +58,7 @@ dump.rdb
 *.keystore
 *.jks
 supabase/.temp/
+
+# Nightly Intelligence Suite — operational data (regenerated nightly; read locally
+# by stale-fallback + Pass-2 attribution). Briefs feed lanes via env, not via git.
+docs/nightly/intel/
