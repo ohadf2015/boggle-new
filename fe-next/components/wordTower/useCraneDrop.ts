@@ -86,8 +86,10 @@ export function useCraneDrop(
       // `reinforced` can hold it back, and `cushion`/`featherfall` make the crane
       // wobble harmless (0 floors lost, still a recovery).
       let topples = o.topples || verdict === 'topple';
-      if (topples && verdict !== 'topple' && sloppyRef.current < TOPPLE_AFTER_SLOPPY + m.brinkExtra) {
-        topples = false; // reinforced: not on the brink yet
+      // reinforced (brinkExtra > 0) holds back a normal topple until enough extra
+      // bad drops stack. With no perk this is a no-op (original behaviour).
+      if (m.brinkExtra > 0 && topples && verdict !== 'topple' && sloppyRef.current < TOPPLE_AFTER_SLOPPY + m.brinkExtra) {
+        topples = false;
       }
       const wobbleFloors = m.wobbleImmune ? 0 : reducedTopple(1, m);
       sloppyRef.current = topples ? 0 : nextConsecutiveSloppy(sloppyRef.current, o.quality);
