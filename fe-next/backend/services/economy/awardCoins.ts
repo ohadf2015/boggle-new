@@ -15,7 +15,7 @@ import logger from '../../utils/logger';
 
 export const MAX_SERVER_COIN_AWARD = 2000;
 
-export type AwardCoinsReason = 'duel_win' | 'wotd_complete' | 'grand_slam' | 'blast_v2_level_clear' | 'blast_v2_chest_open' | 'daily_weekly_chest';
+export type AwardCoinsReason = 'duel_win' | 'wotd_complete' | 'grand_slam' | 'blast_v2_level_clear' | 'blast_v2_chest_open' | 'daily_weekly_chest' | 'all_quests_complete';
 
 export interface AwardCoinsResult {
   success: boolean;

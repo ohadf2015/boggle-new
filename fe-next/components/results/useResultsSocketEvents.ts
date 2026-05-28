@@ -175,6 +175,7 @@ export function useResultsSocketEvents({
         showQuestCompletionToast({
           questName: t(data.description),
           xpReward: data.xpReward,
+          dedupKey: `weekly:${data.questType}`,
           t,
         });
       });

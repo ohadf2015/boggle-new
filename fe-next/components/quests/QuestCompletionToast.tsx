@@ -40,6 +40,9 @@ interface QuestCompletionOptions {
 const recentToasts = new Set<string>();
 const DEDUP_WINDOW_MS = 2000;
 
+// Track quest toast IDs to dismiss only quest toasts, not all app toasts
+let lastQuestToastId: string | null = null;
+
 /**
  * Show a satisfying quest completion celebration.
  * Call this when a quest/mission is completed.
@@ -61,10 +64,12 @@ export function showQuestCompletionToast({
   recentToasts.add(key);
   setTimeout(() => recentToasts.delete(key), DEDUP_WINDOW_MS);
 
-  // Dismiss any already-visible celebration toasts so only one shows at a
+  // Dismiss only the previous quest toast (if any) so only one shows at a
   // time — prevents the stacked-toast bug when multiple missions complete
-  // near-simultaneously.
-  toast.dismiss();
+  // near-simultaneously. Don't use bare toast.dismiss() which dismisses ALL toasts.
+  if (lastQuestToastId) {
+    toast.dismiss(lastQuestToastId);
+  }
 
   onComplete?.();
 
@@ -109,6 +114,9 @@ export function showQuestCompletionToast({
 
   const rewardColor = isAllComplete ? 'text-neo-lime' : isGrandSlam ? 'text-neo-pink' : 'text-neo-lime';
 
+  // Generate a stable toast ID
+  const toastId = `quest-toast-${dedupKey || key}-${Date.now()}`;
+
   toast.custom(
     (toastInstance) => (
       <div
@@ -132,7 +140,7 @@ export function showQuestCompletionToast({
         <button
           onClick={() => toast.dismiss(toastInstance.id)}
           className="absolute top-2 inset-e-2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-neo-black/40 hover:bg-neo-black/60 text-neo-white/70 hover:text-neo-white transition-colors"
-          aria-label="Close"
+          aria-label={t('common.close')}
         >
           <X className="w-4 h-4" />
         </button>
@@ -195,7 +203,7 @@ export function showQuestCompletionToast({
               )}
             >
               <Star className="w-4 h-4" aria-hidden="true" />
-              +{xpReward} XP
+              {t('quests.completion.xpReward', { xp: xpReward })}
             </div>
             {/* Gold reward */}
             {goldReward && goldReward > 0 && (
@@ -209,7 +217,7 @@ export function showQuestCompletionToast({
                 )}
               >
                 <Coins className="w-4 h-4" aria-hidden="true" />
-                +{goldReward} gold
+                {t('quests.completion.goldReward', { gold: goldReward })}
               </div>
             )}
           </div>
@@ -217,8 +225,12 @@ export function showQuestCompletionToast({
       </div>
     ),
     {
+      id: toastId,
       duration: isAllComplete ? 6000 : isGrandSlam ? 5000 : 4000,
       position: 'top-center',
     },
   );
+
+  // Remember this toast ID so next call can dismiss it specifically
+  lastQuestToastId = toastId;
 }

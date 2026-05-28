@@ -115,8 +115,9 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
     if (isTransition) {
       import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
         showQuestCompletionToast({
-          questName: activeQuest.title || t('weeklyQuest.title'),
+          questName: activeQuest.title ? t(activeQuest.title) : t('weeklyQuest.title'),
           xpReward: activeQuest.xpReward,
+          dedupKey: `weekly:${activeQuest.questType}`,
           t,
           onComplete: playQuestCompleteSound,
         });

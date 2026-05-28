@@ -50,6 +50,14 @@ const GRAND_SLAM_XP = 500;
 /** Coins granted alongside XP when player completes all 3 daily missions. */
 export const GRAND_SLAM_COIN_REWARD = 200;
 
+/** XP grant per individual mission completion (idempotent via conditional update). */
+export const PER_MISSION_XP = 100;
+
+/** All-quests-complete reward: XP granted when daily + weekly both done. */
+export const ALL_QUESTS_COMPLETE_XP = 250;
+/** All-quests-complete reward: coins granted alongside XP. */
+export const ALL_QUESTS_COMPLETE_COIN_REWARD = 200;
+
 function getTodayDate(date?: string): string {
   return date || new Date().toISOString().split('T')[0];
 }
@@ -144,7 +152,9 @@ const COLUMN_MAP: Record<MissionType, string> = {
 };
 
 /**
- * Mark a mission as complete. Returns updated missions.
+ * Mark a mission as complete and grant XP if this is the first completion.
+ * Uses conditional update (column = false) so XP is awarded at most once.
+ * Returns updated missions.
  */
 export async function completeMission(
   playerId: string,
@@ -163,14 +173,30 @@ export async function completeMission(
   // Ensure row exists first
   await getDailyMissions(playerId, date);
 
-  const { error } = await supabase
+  // Conditional update: only flip false→true. If already true, affected=0.
+  const { data, error } = await supabase
     .from('player_daily_missions')
     .update({ [column]: true })
     .eq('player_id', playerId)
-    .eq('mission_date', today);
+    .eq('mission_date', today)
+    .eq(column, false)
+    .select(column);
 
   if (error) {
     logger.error('DAILY_MISSIONS', `Complete failed for ${playerId}/${missionType}: ${error.message}`);
+    return getDailyMissions(playerId, date);
+  }
+
+  // Grant XP only if this was a genuine false→true transition (affected > 0)
+  if (Array.isArray(data) && data.length > 0) {
+    const { error: xpError } = await supabase.rpc('increment_player_xp', {
+      p_player_id: playerId,
+      p_xp_amount: PER_MISSION_XP,
+    });
+
+    if (xpError) {
+      logger.error('DAILY_MISSIONS', `Per-mission XP grant failed for ${playerId}/${missionType}: ${xpError.message}`);
+    }
   }
 
   return getDailyMissions(playerId, date);
@@ -227,6 +253,72 @@ export async function checkAndClaimGrandSlam(
 
   logger.info('DAILY_MISSIONS', `Grand Slam claimed by ${playerId}: ${GRAND_SLAM_XP} XP + ${GRAND_SLAM_COIN_REWARD} coins`);
   return { claimed: true, reward: GRAND_SLAM_XP };
+}
+
+/**
+ * Check and claim all-quests-complete reward (daily + weekly both done).
+ * Awards 250 XP + 200 coins idempotently behind all_quests_complete_celebrated flag.
+ */
+export async function checkAndClaimAllQuestsComplete(
+  playerId: string,
+  date?: string,
+): Promise<{ claimed: boolean; xpReward: number; coinReward: number }> {
+  const missions = await getDailyMissions(playerId, date);
+
+  // Must have all 3 daily missions complete
+  if (missions.completedCount < 3) {
+    return { claimed: false, xpReward: 0, coinReward: 0 };
+  }
+
+  // Must have weekly quest complete
+  const { getActiveQuest } = await import('./weeklyQuestManager');
+  const weekly = await getActiveQuest(playerId);
+  if (!weekly?.completed) {
+    return { claimed: false, xpReward: 0, coinReward: 0 };
+  }
+
+  const supabase = getSupabase()!;
+  const today = getTodayDate(date);
+
+  // Atomic flip: only grant reward if flag transitions false→true
+  const { data, error } = await supabase
+    .from('player_daily_missions')
+    .update({ all_quests_complete_celebrated: true })
+    .eq('player_id', playerId)
+    .eq('mission_date', today)
+    .eq('all_quests_complete_celebrated', false)
+    .select('all_quests_complete_celebrated');
+
+  if (error) {
+    logger.error('DAILY_MISSIONS', `All-quests-complete claim failed for ${playerId}: ${error.message}`);
+    return { claimed: false, xpReward: 0, coinReward: 0 };
+  }
+
+  // If no rows affected, already claimed or error
+  if (!Array.isArray(data) || data.length === 0) {
+    return { claimed: false, xpReward: 0, coinReward: 0 };
+  }
+
+  // Genuine claim: grant XP (best-effort)
+  const { error: xpError } = await supabase.rpc('increment_player_xp', {
+    p_player_id: playerId,
+    p_xp_amount: ALL_QUESTS_COMPLETE_XP,
+  });
+
+  if (xpError) {
+    logger.error('DAILY_MISSIONS', `All-quests-complete XP grant failed for ${playerId}: ${xpError.message}`);
+  }
+
+  // Grant coins (best-effort)
+  await awardCoinsServer(playerId, ALL_QUESTS_COMPLETE_COIN_REWARD, 'all_quests_complete', {
+    date: today,
+  });
+
+  logger.info(
+    'DAILY_MISSIONS',
+    `All quests complete claimed by ${playerId}: ${ALL_QUESTS_COMPLETE_XP} XP + ${ALL_QUESTS_COMPLETE_COIN_REWARD} coins`,
+  );
+  return { claimed: true, xpReward: ALL_QUESTS_COMPLETE_XP, coinReward: ALL_QUESTS_COMPLETE_COIN_REWARD };
 }
 
 const CELEBRATED_COLUMN_MAP: Record<CelebrationKey, string> = {

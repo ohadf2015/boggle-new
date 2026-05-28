@@ -20,7 +20,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { addCoins, GRAND_SLAM_BONUS } from '@/utils/coinManager';
 import {
   getDailyQuestModes,
   QUEST_MODE_HREFS,
@@ -91,18 +90,18 @@ function getModeToCelebration(): Record<DailyQuestMode, CelebrationKey> {
   return result;
 }
 
-async function requestCelebration(key: CelebrationKey): Promise<boolean> {
+async function requestCelebration(key: CelebrationKey): Promise<{ ok: boolean; newlyCelebrated: boolean }> {
   try {
     const res = await fetch('/api/daily-missions/celebrate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key }),
     });
-    if (!res.ok) return false;
+    if (!res.ok) return { ok: false, newlyCelebrated: false };
     const json = await res.json();
-    return Boolean(json?.newlyCelebrated);
+    return { ok: true, newlyCelebrated: Boolean(json?.newlyCelebrated) };
   } catch {
-    return false;
+    return { ok: false, newlyCelebrated: false };
   }
 }
 
@@ -133,10 +132,13 @@ export function useDailyMissions(): UseDailyMissionsReturn {
       if (celebratedRef.current[key]) return;
       if (inFlightRef.current.has(key)) return;
       inFlightRef.current.add(key);
-      const newlyCelebrated = await requestCelebration(key);
+      const { ok, newlyCelebrated } = await requestCelebration(key);
       inFlightRef.current.delete(key);
       if (!isMounted.current) return;
-      celebratedRef.current[key] = true;
+      // Only mark celebrated if the request succeeded (ok=true)
+      if (ok) {
+        celebratedRef.current[key] = true;
+      }
       if (newlyCelebrated) show(true);
     },
     [],
@@ -242,7 +244,8 @@ export function useDailyMissions(): UseDailyMissionsReturn {
       return;
     }
     void tryCelebrate('grand_slam', () => {
-      addCoins(GRAND_SLAM_BONUS, 'Grand Slam');
+      // Grand slam coin grant is server-side (via checkAndClaimGrandSlam).
+      // This toast fires on newlyCelebrated only (i.e., first mount after completion).
       import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
         showQuestCompletionToast({
           questName: '',

@@ -490,6 +490,7 @@ const DailyChallenge: React.FC = () => {
               showQuestCompletionToast({
                 questName: t(data.questUpdate.description),
                 xpReward: data.questUpdate.xpReward,
+                dedupKey: `weekly:${data.questUpdate.questType ?? data.questUpdate.description}`,
                 t,
               });
             });

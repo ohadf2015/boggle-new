@@ -24,6 +24,13 @@ import PartPreview from '@/components/avatar/PartPreview';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 import type { AvatarPartReward } from '@/shared/weeklyQuestTemplates';
 
+interface AllCompleteClaimResponse {
+  success: boolean;
+  claimed: boolean;
+  xpReward: number;
+  coinReward: number;
+}
+
 // --- Stagger animation variants (spring: stiffness 300, damping 24 = snappy bounce) ---
 const containerVariants = {
   hidden: {},
@@ -406,30 +413,42 @@ export function QuestHub() {
   const { missions, isGrandSlam, loading } =
     useDailyMissions();
   const { isComplete: weeklyComplete } = useWeeklyQuest();
-  const { addCoins } = useCoinsFromContext();
-  const prevAllCompleteRef = useRef<boolean | null>(null);
+  const { refreshCoins } = useCoinsFromContext();
+  const claimAttemptedRef = useRef<boolean>(false);
 
-  // Show "All Quests Complete" celebration when both daily + weekly TRANSITION to done.
-  // Only fires on false→true transition, not on mount when already complete.
+  // Show "All Quests Complete" celebration when both daily + weekly are done.
+  // Server idempotency (all_quests_complete_celebrated flag) ensures reward fires at most once,
+  // so we can gate on the steady-state condition without worrying about transitions.
   const allComplete = isGrandSlam && weeklyComplete;
   useEffect(() => {
-    if (!loading) {
-      if (allComplete && prevAllCompleteRef.current === false) {
-        // Actually grant the gold reward
-        addCoins(200, 'all_quests_complete');
-        import('./QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-          showQuestCompletionToast({
-            questName: '',
-            xpReward: 250,
-            goldReward: 200,
-            isAllComplete: true,
-            t,
-          });
+    if (!loading && allComplete && !claimAttemptedRef.current) {
+      claimAttemptedRef.current = true;
+      // POST to server endpoint for idempotent reward claim
+      fetch('/api/quests/all-complete-claim', {
+        method: 'POST',
+      })
+        .then(res => res.json() as Promise<AllCompleteClaimResponse>)
+        .then(json => {
+          if (json.success && json.claimed) {
+            // Reward was genuinely claimed — update coin balance and show toast
+            refreshCoins();
+            import('./QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+              showQuestCompletionToast({
+                questName: '',
+                xpReward: json.xpReward,
+                goldReward: json.coinReward,
+                isAllComplete: true,
+                t,
+              });
+            });
+          }
+        })
+        .catch(() => {
+          // Network error — leave claimAttemptedRef true to avoid infinite retries
+          // (mount was tainted; user can reload to retry)
         });
-      }
-      prevAllCompleteRef.current = allComplete;
     }
-  }, [allComplete, loading, t, addCoins]);
+  }, [allComplete, loading, t, refreshCoins]);
 
   // Today's 3 quest configs from the daily rotation
   const dailyQuestConfigs = useMemo(

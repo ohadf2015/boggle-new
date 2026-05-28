@@ -575,6 +575,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
             showQuestCompletionToast({
               questName: data.questUpdate.description,
               xpReward: data.questUpdate.xpReward,
+              dedupKey: `weekly:${data.questUpdate.questType ?? data.questUpdate.description}`,
               t: (key: string) => key,
             });
           });

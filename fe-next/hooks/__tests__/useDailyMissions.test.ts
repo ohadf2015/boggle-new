@@ -190,7 +190,9 @@ describe('useDailyMissions', () => {
     });
   });
 
-  it('awards GRAND_SLAM_BONUS coins when Grand Slam fires', async () => {
+  it('shows Grand Slam toast (XP is server-granted, not client-side)', async () => {
+    // Grand Slam coin grant is server-side via checkAndClaimGrandSlam RPC.
+    // This test verifies the toast still fires for UX, but NOT the client-side coin grant.
     mockSingle.mockResolvedValueOnce({
       data: {
         ...FULL_DATA,
@@ -204,8 +206,15 @@ describe('useDailyMissions', () => {
     renderHook(() => useDailyMissions());
 
     await waitFor(() => {
-      expect(mockAddCoins).toHaveBeenCalledWith(GRAND_SLAM_BONUS, expect.any(String));
+      expect(showQuestCompletionToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          isGrandSlam: true,
+          xpReward: 500,
+        }),
+      );
     });
+    // Should NOT call addCoins (coins are server-granted)
+    expect(mockAddCoins).not.toHaveBeenCalled();
   });
 
   it('does NOT show Grand Slam toast when missions are incomplete', async () => {
