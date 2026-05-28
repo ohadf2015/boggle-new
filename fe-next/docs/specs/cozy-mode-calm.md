@@ -43,9 +43,14 @@ Elder users + people who dislike confetti/effects. They want: legibility, calm m
 - Cozy motion: transition durations ≈350–450ms ease-in-out; neutralize bounce/spring/wobble keyframes under cozy.
 - Update `calmPalette.contract.test.ts` to assert AA on muted + border contrast.
 
-### Phase 3 — Semantic Big-5 token layer + migrate breaking hex
-- Introduce semantic tokens: `--surface`, `--surface-elevated`, `--ink`, `--ink-muted`, `--accent`, `--edge`, `--shadow-intensity` mapped per theme.
-- Migrate component hex that renders wrong in cozy to these tokens. Leave brand/avatar/tier fixed.
+### Phase 3 — Deep surface theming (DEFERRED — its own pass)
+**Root cause found (2026-05-28, Playwriter):** cozy is only skin-deep. The `--neo-*` token overrides work (body bg resolves to sand `#dbd3c2`), but ~750 surfaces use **raw Tailwind palette classes** (`bg-slate-800`=346, `bg-slate-700`=283, `bg-slate-900`=75, `bg-gray-*`=45) + ~120 `dark:bg-*` variants that bypass the tokens entirely → header, nav, and most cards stay DARK in cozy.
+
+**Two hard constraints discovered (why this is its own pass, not a tail step):**
+1. **Not monotonic-safe.** A bg-only flip (`bg-slate-800`→cream) inverts contrast with every foreground on it (`text-slate-300/400` secondary text, colored text, icon fills, `border-slate-*`, `hover:` inversion). The fix MUST be contrast-complete: every surface flip paired with fg/border/hover flips, verified on rendered output LTR+RTL across ≥3 screens. (Removing the `dark` class globally → light-text-on-light-header bug, observed.)
+2. **Turbopack drops `[class*=]` circuit-breaker rules.** A `html[data-cosy] [class*='bg-slate-800']{…!important}` block works when injected at runtime (verified: card→`rgb(244,240,230)`, secondary text→11:1) but is STRIPPED by Turbopack/Lightning-CSS compilation (same rule from globals.css leaves the card dark `oklch(0.279)`). So the breaker approach needs a compilation-safe mechanism — explicit class selectors, a PostCSS-safe transform, or (best) actual migration of palette classes → semantic tokens.
+
+**Recommended approach for the pass:** introduce semantic tokens (`--surface`, `--surface-elevated`, `--ink`, `--ink-muted`, `--edge`) and migrate the dark palette classes (`bg-slate-*` etc.) to them at the component level (the council's mapping-layer; also retires the override-stack p0 debt). Leave brand/avatar/tier-medal colors fixed. Verify each screen LTR+RTL with contrast sampled on rendered output.
 
 ### Phase 4 — Anti-rot guardrail
 - Vitest test scanning `components/**`, `app/**` for raw `#hex` in className/style and bare `text-white`, failing with an allowlist for intentional brand/identity colors.
