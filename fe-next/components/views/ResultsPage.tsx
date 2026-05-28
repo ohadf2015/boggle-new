@@ -1035,6 +1035,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         isOpen={activeNudge === 'sheet'}
         onClose={dismissNudge}
         stats={mpNudgeStats}
+        bottomOffset={stickyBarHeight}
       />
       <SignupToast
         isVisible={activeNudge === 'toast'}

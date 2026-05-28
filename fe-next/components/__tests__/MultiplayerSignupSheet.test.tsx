@@ -128,4 +128,34 @@ describe('MultiplayerSignupSheet', () => {
 
     expect(screen.getByRole('dialog')).toBeTruthy();
   });
+
+  it('sits above the sticky ready bar using the measured bottomOffset', () => {
+    render(
+      <MultiplayerSignupSheet
+        isOpen={true}
+        onClose={vi.fn()}
+        stats={defaultStats}
+        bottomOffset={150}
+      />
+    );
+
+    // Sheet must clear the fixed sticky bar — bottom = offset + gap (8px).
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.style.bottom).toBe('158px');
+  });
+
+  it('falls back to a CSS-class offset before the bar height is measured', () => {
+    render(
+      <MultiplayerSignupSheet
+        isOpen={true}
+        onClose={vi.fn()}
+        stats={defaultStats}
+        bottomOffset={0}
+      />
+    );
+
+    // No inline bottom → Tailwind fallback class governs the pre-measure frame.
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.style.bottom).toBe('');
+  });
 });
