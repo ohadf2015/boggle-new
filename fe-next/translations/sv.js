@@ -12257,6 +12257,8 @@ const sv = {
     "gemsModeDesc": "Jaga gömda ädelstenar på brädet, stapla bonusar och överlista boten för max byte!",
     "cardsModeTitle": "WordCraft: Kortrunda",
     "cardsModeDesc": "Spela tidsbestämda rundor, dra ett kraftkort mellan varje och jaga en enorm totalpoäng!",
+    "passPlayModeTitle": "WordCraft: Turas om",
+    "passPlayModeDesc": "Två spelare, en enhet — turas om, dölj ditt ställ vid överlämning, högst poäng vinner!",
     "betaLocked": "Kräver betatillgång",
     "heatLabel": "Värme",
     "overdrive": "ÖVERDRIFT!",

@@ -12345,6 +12345,8 @@ const es = {
     "gemsModeDesc": "Caza gemas ocultas en el tablero, acumula bonificaciones y supera al bot para el máximo botín.",
     "cardsModeTitle": "WordCraft: Ronda de Cartas",
     "cardsModeDesc": "¡Juega rondas cronometradas, elige una carta de poder entre cada una y persigue una puntuación enorme!",
+    "passPlayModeTitle": "WordCraft: Por turnos",
+    "passPlayModeDesc": "Dos jugadores, un dispositivo: turnaos, oculta tu atril al pasar y ¡gana la mayor puntuación!",
     "betaLocked": "Requiere acceso beta",
     "heatLabel": "Calor",
     "overdrive": "¡SOBREMARCHA!",

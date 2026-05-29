@@ -108,6 +108,15 @@ describe('LandingChallengeCards — Word Craft public (territory + Card Run)', (
     expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 
+  it('renders the public Pass & Play card with the ?vs=human href', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-wordcraft.passPlayModeTitle');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/word-craft?vs=human');
+  });
+
   it('does NOT render the wordCraft Gem Hunt card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);

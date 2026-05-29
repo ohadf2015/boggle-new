@@ -12231,6 +12231,8 @@ const ja = {
     "gemsModeDesc": "盤面に隠された宝石を狩り、ボーナスを積み重ね、ボットを出し抜いて最大の戦利品を！",
     "cardsModeTitle": "WordCraft: カードラン",
     "cardsModeDesc": "制限時間のラウンドをプレイし、各ラウンドの合間にパワーカードを選んで、最高のランスコアを狙え！",
+    "passPlayModeTitle": "WordCraft: 交代プレイ",
+    "passPlayModeDesc": "2人で1台 — 交代でプレイし、引き継ぎ時にラックを隠そう。高得点が勝ち！",
     "betaLocked": "ベータアクセスが必要です",
     "heatLabel": "ヒート",
     "overdrive": "オーバードライブ！",

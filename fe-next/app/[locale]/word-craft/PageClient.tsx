@@ -732,7 +732,7 @@ export default function WordCraftPageClient() {
       />
 
       <main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
-        {/* Topbar: back · title · BETA · How to play · loading */}
+        {/* Topbar: back · title · How to play · loading (public — no beta badge) */}
         <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
             <ArrowLeft className="w-4 h-4" />
@@ -746,9 +746,6 @@ export default function WordCraftPageClient() {
           <h1 className="text-lg font-neo-display font-black text-neo-white tracking-tight">
             {t('wordcraft.title')}
           </h1>
-          <span className="px-1.5 py-0.5 text-[9px] font-neo-display font-black uppercase tracking-widest bg-neo-yellow text-neo-navy rounded border-2 border-black shadow-hard-sm rotate-[3deg]">
-            BETA
-          </span>
           <div className="flex-1" />
           <WordCraftTutor
             isRTL={isRTL}

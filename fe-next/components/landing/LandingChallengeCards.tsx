@@ -53,6 +53,7 @@ type LandingCardKey =
   | 'wordCraft'
   | 'wordCraftGems'
   | 'wordCraftCards'
+  | 'wordCraftPassPlay'
   | 'wordTower'
   | 'blastClassic'
   | 'wordForge'
@@ -72,7 +73,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft', 'wordCraftCards', 'wordCraftGems', 'wordTower', 'blastClassic',
+  'connections', 'brainGym', 'wordCraft', 'wordCraftCards', 'wordCraftPassPlay', 'wordCraftGems', 'wordTower', 'blastClassic',
   'wordForge', 'wordVault',
   'party', 'wordAlchemy', 'shiritori', 'sealedBid',
 ]);
@@ -155,6 +156,7 @@ export function LandingChallengeCards({
     // WordCraft is public — territory + Card Run surface on the hub for everyone.
     if (!next.includes('wordCraft')) next.push('wordCraft');
     if (!next.includes('wordCraftCards')) next.push('wordCraftCards');
+    if (!next.includes('wordCraftPassPlay')) next.push('wordCraftPassPlay');
     if (isAdmin && !next.includes('wordCraftGems')) next.push('wordCraftGems');
     if (isAdmin && !next.includes('wordTower')) next.push('wordTower');
     // Blast Classic (legacy V1 engine) — admin-only card so both V1 + V2 (the
@@ -381,6 +383,23 @@ export function LandingChallengeCards({
         );
       }
 
+      case 'wordCraftPassPlay': {
+        return (
+          <div key="wordCraftPassPlay" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('wordcraft.passPlayModeTitle')}
+              description={t('wordcraft.passPlayModeDesc')}
+              href={`/${language}/word-craft?vs=human`}
+              icon={<Swords className="w-6 h-6" />}
+              modeImage="/modes/word-craft.png"
+              variant="pink"
+              badge="NEW"
+              onClick={() => { trackModeSelected('wordCraftPassPlay' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraftPassPlay', variant: 'pink' }); }}
+            />
+          </div>
+        );
+      }
+
       case 'wordCraftGems': {
         return (
           <div key="wordCraftGems" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
@@ -494,7 +513,7 @@ export function LandingChallengeCards({
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftCards', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftCards', 'wordCraftPassPlay', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

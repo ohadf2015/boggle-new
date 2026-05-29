@@ -12242,6 +12242,8 @@ const en = {
     "gemsModeDesc": "Hunt buried gems on the grid, stack bonuses, and outsmart the bot for max loot!",
     "cardsModeTitle": "WordCraft: Card Run",
     "cardsModeDesc": "Play timed rounds, draft a power card between each, and chase a monster run total!",
+    "passPlayModeTitle": "WordCraft: Pass & Play",
+    "passPlayModeDesc": "Two players, one device — take turns, hide your rack on hand-off, highest score wins!",
     "betaLocked": "Beta access required",
     "heatLabel": "Heat",
     "overdrive": "OVERDRIVE!",
