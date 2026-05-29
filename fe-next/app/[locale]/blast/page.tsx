@@ -4,6 +4,7 @@ import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-sour
 import { todayUtcVariant } from '@/lib/blast/v2/dailyVariant';
 import { BlastV2PageClient } from './v2/BlastV2PageClient';
 import BlastLegacyPageClient from './legacy/PageClient';
+import { resolveBlastVersion } from '@/lib/blast/blastVersionSelect';
 
 const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
@@ -21,11 +22,10 @@ export default async function BlastPage({
   }
   const locale = rawLocale as Locale;
 
-  // V2 is now the default. `?v2=off` opts back into legacy V1.
-  // (Previously gated by a Supabase auth allowlist — removed for perf: 50-200ms
-  // network roundtrip per page-load just to check a 1-email list.)
-  const explicitOptOut = resolvedSearch?.v2 === 'off';
-  const useV2 = !explicitOptOut;
+  // V1 (legacy) is the ONLY Blast version shown to players — it is also the
+  // version used in multiplayer, so SP and MP stay in parity. V2 is an opt-in
+  // single-player preview reachable only via `?v2=on`.
+  const useV2 = resolveBlastVersion(resolvedSearch) === 'v2';
 
   if (useV2) {
     const registry = buildRegistry();
