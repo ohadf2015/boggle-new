@@ -110,6 +110,22 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
   }, [syncText]);
 
   /**
+   * Handle composition update — fires per-keystroke DURING composition,
+   * carrying the composing text. This keeps React text state in sync with the
+   * DOM even when onChange doesn't fire (Android GBoard with Hebrew).
+   */
+  const handleCompositionUpdate = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
+    syncText(e.currentTarget.value);
+  }, [syncText]);
+
+  /**
+   * Handle keyup — backstop to sync text when composition bypasses input events.
+   */
+  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    syncText(e.currentTarget.value);
+  }, [syncText]);
+
+  /**
    * Handle send — reads the DOM value directly because React state can be stale
    * mid-IME composition (Android GBoard with Hebrew doesn't always fire input
    * events until the word commits).
@@ -171,7 +187,9 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           value={text}
           onChange={handleChange}
           onInput={handleInput}
+          onCompositionUpdate={handleCompositionUpdate}
           onCompositionEnd={handleCompositionEnd}
+          onKeyUp={handleKeyUp}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || t('friends.typeMessage')}
           disabled={disabled}

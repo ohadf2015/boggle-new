@@ -29,6 +29,38 @@ vi.mock('@/utils/ThemeContext', () => ({
 }));
 
 describe('MessageComposer — Hebrew/IME composition', () => {
+  it('REGRESSION: send button stays visually disabled during Hebrew composition (BUG)', () => {
+    // Given: A composer with onSend handler
+    const onSend = vi.fn();
+    render(<MessageComposer onSend={onSend} />);
+
+    const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+    const sendButton = screen.getByLabelText('Send') as HTMLButtonElement;
+
+    // Initial state: send disabled
+    expect(sendButton).toHaveAttribute('aria-disabled', 'true');
+
+    // When: Simulate Android GBoard composing Hebrew text without onChange
+    // firing until the word commits (the REAL Android GBoard composition
+    // behavior that breaks the button visual state)
+    fireEvent.compositionStart(textarea);
+    // Mutate DOM value as if IME buffered text during composition
+    Object.defineProperty(textarea, 'value', {
+      configurable: true,
+      writable: true,
+      value: 'שלום',
+    });
+    // Fire compositionUpdate (mid-composition, before compositionEnd)
+    fireEvent.compositionUpdate(textarea);
+
+    // Then: REGRESSION — send button should NOW be visually enabled because
+    // text is in the DOM (user can see it), but it stays disabled because
+    // React text state is empty (onChange never fired).
+    // This test MUST FAIL until we add onCompositionUpdate={handleInput}.
+    expect(sendButton).toHaveAttribute('aria-disabled', 'false',
+      'Button should be enabled during composition when DOM has text');
+  });
+
   it('enables send button and sends text after IME composition ends (Android GBoard Hebrew)', () => {
     // Given: A composer with onSend handler
     const onSend = vi.fn();
