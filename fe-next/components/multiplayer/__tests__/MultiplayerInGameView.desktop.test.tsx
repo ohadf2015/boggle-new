@@ -8,6 +8,7 @@ vi.mock('../../../hooks/useDesktopShellEnabled', () => ({
 
 vi.mock('../../../hooks/gameState/store', () => ({
   useGameMode: vi.fn(() => 'classic'),
+  useGameStore: (sel: (s: { setBlastBoardClearedByLocal: () => void }) => unknown) => sel({ setBlastBoardClearedByLocal: () => {} }),
 }));
 
 vi.mock('../../../components/blast/legacy/hooks/useBlastMultiplayerBridge', () => ({

@@ -24,7 +24,10 @@ vi.mock('framer-motion', () => {
 
 const t = (key: string) => key;
 
-describe('BattleModeCard — Blast gating', () => {
+describe('BattleModeCard — Blast visibility', () => {
+  // Blast is offered to ALL players now (gate removed after MP-blast parity —
+  // BattleModeCard.tsx). These assert the public contract; isAdmin no longer
+  // gates Blast (it only gates the Word Tower preview).
   const baseProps = {
     selectedGameMode: 'random' as const,
     setSelectedGameMode: vi.fn(),
@@ -33,20 +36,17 @@ describe('BattleModeCard — Blast gating', () => {
 
   it('shows Blast in the picker for admins', () => {
     render(<BattleModeCard {...baseProps} isAdmin={true} />);
-    const blastButton = screen.getByTestId('game-mode-blast');
-    expect(blastButton).toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
   });
 
-  it('hides Blast from the picker for non-admins', () => {
+  it('shows Blast in the picker for non-admins too', () => {
     render(<BattleModeCard {...baseProps} isAdmin={false} />);
-    const blastButton = screen.queryByTestId('game-mode-blast');
-    expect(blastButton).not.toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
   });
 
-  it('hides Blast when isAdmin is undefined', () => {
+  it('shows Blast when isAdmin is undefined', () => {
     render(<BattleModeCard {...baseProps} />);
-    const blastButton = screen.queryByTestId('game-mode-blast');
-    expect(blastButton).not.toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
   });
 
   it('shows other modes regardless of admin status', () => {

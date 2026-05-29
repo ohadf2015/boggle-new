@@ -27,6 +27,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => 'classic',
   useGameModeConfirmed: () => true,
+  useGameStore: (sel: (s: { setBlastBoardClearedByLocal: () => void }) => unknown) => sel({ setBlastBoardClearedByLocal: () => {} }),
 }));
 
 vi.mock('@/components/game/InGameScreen', () => ({

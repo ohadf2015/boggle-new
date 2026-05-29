@@ -30,6 +30,7 @@ const mockGameMode = { value: 'wheel-rush' as string | null };
 vi.mock('@/hooks/gameState/store', () => ({
   useGameMode: () => mockGameMode.value,
   useGameModeConfirmed: () => true,
+  useGameStore: (sel: (s: { setBlastBoardClearedByLocal: () => void }) => unknown) => sel({ setBlastBoardClearedByLocal: () => {} }),
 }));
 
 vi.mock('../../components/game/InGameScreen', () => ({

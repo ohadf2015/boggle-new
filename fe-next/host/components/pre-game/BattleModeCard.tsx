@@ -11,9 +11,9 @@ interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
   t: (path: string, params?: Record<string, string | number>) => string;
-  /** When false, blast mode is hidden from the mode selector */
+  /** When true, surfaces the admin-only Word Tower preview. (Blast is public — no longer gated.) */
   isAdmin?: boolean;
-  /** When true, blast mode is visible (granted by admin) */
+  /** @deprecated Blast is offered to all players now; this no longer affects visibility. */
   hasBlastAccess?: boolean;
 }
 
