@@ -5,8 +5,14 @@ import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/shared/types/game';
+import { tileFromPoint, stepPath, type TilePos } from '@/lib/wordForge/tileHitTest';
+import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 
 type WordFeedback = 'none' | 'valid' | 'invalid' | 'duplicate';
+
+/** Container padding + inter-cell gap (px) — kept in sync with the grid style below. */
+const GRID_PADDING = 8;
+const GRID_GAP = 4;
 
 interface WordForgeGridProps {
   grid: string[][];
@@ -19,11 +25,6 @@ interface WordForgeGridProps {
   dictReady?: boolean;
   /** Called when the grid itself rejects a word (e.g. not in dictionary). */
   onReject?: (reason: 'notWord') => void;
-}
-
-interface TilePos {
-  row: number;
-  col: number;
 }
 
 /**
@@ -43,6 +44,7 @@ export function WordForgeGrid({
   onReject,
 }: WordForgeGridProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion();
+  const { customHaptic } = useHapticFeedback();
   const [path, setPath] = useState<TilePos[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [feedback, setFeedback] = useState<WordFeedback>('none');
@@ -54,9 +56,9 @@ export function WordForgeGrid({
 
   const gridSize = grid.length;
 
-  const isAdjacent = (a: TilePos, b: TilePos): boolean => {
+  const isAdjacent = useCallback((a: TilePos, b: TilePos): boolean => {
     return Math.abs(a.row - b.row) <= 1 && Math.abs(a.col - b.col) <= 1;
-  };
+  }, []);
 
   const isInPath = (row: number, col: number): boolean => {
     return path.some(p => p.row === row && p.col === col);
@@ -71,17 +73,20 @@ export function WordForgeGrid({
     setPath([{ row, col }]);
   };
 
-  const handleTileEnter = (row: number, col: number) => {
+  const handleTileEnter = useCallback((row: number, col: number) => {
     if (!isDragging) return;
-    if (isInPath(row, col)) return;
-
-    const last = path[path.length - 1];
-    if (!last || !isAdjacent(last, { row, col })) return;
-
-    setPath(prev => [...prev, { row, col }]);
-    setRecentlyAdded(`${row}-${col}`);
-    setTimeout(() => setRecentlyAdded(null), 200);
-  };
+    setPath(prev => {
+      const next = stepPath(prev, { row, col }, isAdjacent);
+      // Pop the entrance animation + a light haptic tick only when the path
+      // actually grew (extend), not on a backtrack or an ignored move.
+      if (next.length > prev.length) {
+        setRecentlyAdded(`${row}-${col}`);
+        setTimeout(() => setRecentlyAdded(null), 200);
+        customHaptic(GAME_HAPTICS.letterSelect);
+      }
+      return next;
+    });
+  }, [isDragging, isAdjacent, customHaptic]);
 
   const showFeedback = useCallback((type: WordFeedback) => {
     if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
@@ -100,6 +105,7 @@ export function WordForgeGrid({
         } else if (checkWord(word.toLowerCase())) {
           onWordFound(word);
           showFeedback('valid');
+          customHaptic(GAME_HAPTICS.validWord);
           // Flash validated tiles green
           if (!prefersReducedMotion) {
             setValidatedPath([...path]);
@@ -108,25 +114,27 @@ export function WordForgeGrid({
           }
         } else {
           showFeedback('invalid');
+          customHaptic(GAME_HAPTICS.invalidWord);
           onReject?.('notWord');
         }
       }
     }
     setPath([]);
     setIsDragging(false);
-  }, [path, onWordFound, checkWord, dictReady, onReject, showFeedback, prefersReducedMotion, getCurrentWord]);
+  }, [path, onWordFound, checkWord, dictReady, onReject, showFeedback, prefersReducedMotion, getCurrentWord, customHaptic]);
 
-  // Touch handlers for mobile
+  // Touch handlers for mobile. Maps the touch point to a logical cell,
+  // accounting for container padding, inter-cell gaps, and — critically —
+  // RTL column mirroring (Hebrew), which the old left-origin math got wrong.
   const getTileFromTouch = (touch: React.Touch): TilePos | null => {
     if (!gridRef.current) return null;
     const rect = gridRef.current.getBoundingClientRect();
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
-    const tileSize = rect.width / gridSize;
-    const col = Math.floor(x / tileSize);
-    const row = Math.floor(y / tileSize);
-    if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) return null;
-    return { row, col };
+    return tileFromPoint(touch.clientX, touch.clientY, rect, {
+      gridSize,
+      padding: GRID_PADDING,
+      gap: GRID_GAP,
+      rtl: language === 'he',
+    });
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -174,8 +182,8 @@ export function WordForgeGrid({
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-          gap: '4px',
-          padding: '8px',
+          gap: `${GRID_GAP}px`,
+          padding: `${GRID_PADDING}px`,
         }}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
