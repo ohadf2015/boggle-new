@@ -2898,6 +2898,10 @@ const sv = {
     "finish": "Fattar!",
     "tapToContinue": "Tryck eller svep för att navigera",
     "wordHunt": {
+      "bonusWordsTitle": "Gratis bonusord",
+      "step1ImageAlt": "En maskot granskar lysande bokstavsbrickor med ett förstoringsglas",
+      "step2ImageAlt": "En maskot jublar när ett hjärta och ett mynt sprutar ut ur ordbrickor",
+      "step3ImageAlt": "En maskot firar med en pokal och en jordglob",
       "welcome": {
         "title": "Word Hunt",
         "description": "Knäck det dolda ordet på 10 försök eller mindre.",

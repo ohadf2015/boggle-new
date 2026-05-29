@@ -2967,6 +2967,10 @@ const en = {
     "finish": "Got It!",
     "tapToContinue": "Tap or swipe",
     "wordHunt": {
+      "bonusWordsTitle": "Free Bonus Words",
+      "step1ImageAlt": "A mascot inspects glowing letter tiles with a magnifying glass",
+      "step2ImageAlt": "A mascot cheers as a heart and a coin burst out of word tiles",
+      "step3ImageAlt": "A mascot celebrates with a trophy and a globe",
       "welcome": {
         "title": "Word Hunt",
         "description": "Crack the hidden word in 10 tries or less.",

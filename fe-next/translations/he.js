@@ -3004,6 +3004,10 @@ const he = {
     "stepLabel": "שלב {current} מתוך {total}",
     "tapToContinue": "הקש או החלק לניווט",
     "wordHunt": {
+      "bonusWordsTitle": "מילות בונוס חינם",
+      "step1ImageAlt": "קמע בוחן אריחי אותיות זוהרים עם זכוכית מגדלת",
+      "step2ImageAlt": "קמע חוגג כשלב ומטבע מתפרצים מאריחי המילים",
+      "step3ImageAlt": "קמע חוגג עם גביע וכדור הארץ",
       "welcome": {
         "title": "Word Hunt",
         "description": "פצח את המילה הסודית ב-10 ניסיונות או פחות.",

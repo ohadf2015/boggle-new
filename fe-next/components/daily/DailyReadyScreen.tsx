@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyIntroCarousel from './DailyIntroCarousel';
@@ -300,6 +300,13 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               <Trophy className="w-4 h-4" />
               {t('daily.todaysPlayers')}
             </button>
+            <button
+              onClick={onShowTutorial}
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              {t('daily.howToPlay')}
+            </button>
           </m.div>
         ) : (
           <>
@@ -323,6 +330,12 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
                 className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
               >
                 <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
+              </button>
+              <button
+                onClick={onShowTutorial}
+                className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+              >
+                <HelpCircle className="w-3 h-3" /> {t('daily.howToPlay')}
               </button>
             </m.div>
           </>

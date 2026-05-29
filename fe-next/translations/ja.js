@@ -2887,6 +2887,10 @@ const ja = {
     "tapToContinue": "タップまたはスワイプで移動",
     "stepLabel": "ステップ{current}/{total}",
     "wordHunt": {
+      "bonusWordsTitle": "無料ボーナスワード",
+      "step1ImageAlt": "虫眼鏡で光る文字タイルを調べるマスコット",
+      "step2ImageAlt": "ワードタイルからハートとコインが飛び出して喜ぶマスコット",
+      "step3ImageAlt": "トロフィーと地球儀と一緒に喜ぶマスコット",
       "welcome": {
         "title": "ワードハント",
         "description": "隠された単語を10回以内で解読せよ。",

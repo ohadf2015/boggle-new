@@ -4326,6 +4326,10 @@ const es = {
     "tapToContinue": "Toca o desliza para navegar",
     "stepLabel": "Paso {current} de {total}",
     "wordHunt": {
+      "bonusWordsTitle": "Palabras bonus gratis",
+      "step1ImageAlt": "Una mascota examina fichas de letras brillantes con una lupa",
+      "step2ImageAlt": "Una mascota celebra mientras un corazón y una moneda salen de las fichas de palabras",
+      "step3ImageAlt": "Una mascota celebra con un trofeo y un globo terráqueo",
       "welcome": {
         "title": "Word Hunt",
         "description": "Descifra la palabra oculta en 10 intentos o menos.",
