@@ -2723,6 +2723,9 @@ const es = {
       },
       "combo": {
         "description": "¡Envía palabras rápidamente para construir multiplicadores de combo! Cuanto más rápido encuentres palabras, mayor será tu bonus."
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
     "demo": {
@@ -5115,6 +5118,9 @@ const es = {
         "title": "Palabras que perdiste",
         "showMore": "Mostrar más",
         "count": "{found} de {total} palabras encontradas"
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
     "maxCombo": "Combo máximo",
@@ -6002,6 +6008,9 @@ const es = {
           "toNext": "{points} para {next}",
           "progressLabel": "Progreso de rango"
         }
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
     "desktop": {
@@ -6107,6 +6116,9 @@ const es = {
         "platinumFlavor": "Intocable",
         "toNext": "{points} para {next}",
         "maxed": "Legendario · al máximo"
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
     "ad": {
@@ -6984,6 +6996,14 @@ const es = {
   },
   "admin": {
     "gameModePopularity": "Popularidad de modos",
+    "mpModeBreakdown": {
+      "title": "Desglose de modos multijugador",
+      "classic": "Clásico",
+      "blast": "Ráfaga",
+      "wordHunt": "Caza de palabras",
+      "wheelRush": "Rueda de velocidad",
+      "totalGames": "Total"
+    },
     "totalGames": "Total",
     "landingCardOrder": "Orden de tarjetas",
     "noData": "Sin datos disponibles",
@@ -9220,6 +9240,9 @@ const es = {
         "title": "¡Bienvenido de nuevo!",
         "body": "Blast se ha rediseñado. ¡Disfruta de los nuevos niveles!",
         "cta": "Vamos"
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
     "continueModal": {
@@ -9452,6 +9475,9 @@ const es = {
         "shareRank": "Top {pct}% esta semana",
         "copied": "¡Copiado al portapapeles!",
         "copyFailed": "No se pudo copiar — intenta de nuevo"
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
     "badges": {
@@ -11073,6 +11099,9 @@ const es = {
         "tilesCleared": "Fichas despejadas",
         "bestWord": "Mejor palabra",
         "rank": "Posición"
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
     "wordHunt": {

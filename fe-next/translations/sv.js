@@ -2815,6 +2815,9 @@ const sv = {
       },
       "combo": {
         "description": "Skicka ord snabbt för att bygga kombomultiplikatorer! Ju snabbare du hittar ord, desto större bonus."
+      },
+      "mpResults": {
+        "boardCleared": "BORD RENSAT!"
       }
     },
     "demo": {
@@ -5082,6 +5085,9 @@ const sv = {
         "title": "Ord du missade",
         "showMore": "Visa fler",
         "count": "{found} av {total} ord hittade"
+      },
+      "mpResults": {
+        "boardCleared": "BORD RENSAT!"
       }
     },
     "maxCombo": "Max kombo",
@@ -6037,6 +6043,9 @@ const sv = {
           "toNext": "{points} till {next}",
           "progressLabel": "Nivåframsteg"
         }
+      },
+      "mpResults": {
+        "boardCleared": "BORD RENSAT!"
       }
     },
     "desktop": {
@@ -6142,6 +6151,9 @@ const sv = {
         "platinumFlavor": "Oslagbar",
         "toNext": "{points} till {next}",
         "maxed": "Legendarisk · max"
+      },
+      "mpResults": {
+        "boardCleared": "BORD RENSAT!"
       }
     },
     "ad": {
@@ -6953,6 +6965,14 @@ const sv = {
   },
   "admin": {
     "gameModePopularity": "Spelläges popularitet",
+    "mpModeBreakdown": {
+      "title": "Uppdelning av multiplayer-lägen",
+      "classic": "Klassisk",
+      "blast": "Blast",
+      "wordHunt": "Ordjakt",
+      "wheelRush": "Hjulrusning",
+      "totalGames": "Totalt"
+    },
     "totalGames": "Totalt",
     "landingCardOrder": "Ordning på landningskort",
     "noData": "Ingen data tillgänglig",
@@ -9149,6 +9169,9 @@ const sv = {
         "title": "Välkommen tillbaka!",
         "body": "Blast har gjorts om. Njut av de nya nivåerna!",
         "cta": "Kör"
+      },
+      "mpResults": {
+        "boardCleared": "BORD RENSAT!"
       }
     },
     "continueModal": {
@@ -9383,6 +9406,9 @@ const sv = {
         "shareRank": "Topp {pct}% denna vecka",
         "copied": "Kopierat till urklipp!",
         "copyFailed": "Kunde inte kopiera — försök igen"
+      },
+      "mpResults": {
+        "boardCleared": "BORD RENSAT!"
       }
     },
     "badges": {

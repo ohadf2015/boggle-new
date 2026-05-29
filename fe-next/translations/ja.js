@@ -2803,6 +2803,9 @@ const ja = {
       },
       "combo": {
         "description": "素早く単語を送信してコンボ倍率を構築しましょう！単語を見つけるのが速いほど、ボーナスが大きくなります。"
+      },
+      "mpResults": {
+        "boardCleared": "ボード クリア!"
       }
     },
     "demo": {
@@ -5067,6 +5070,9 @@ const ja = {
         "title": "見逃した単語",
         "showMore": "もっと見る",
         "count": "{total}語中{found}語発見"
+      },
+      "mpResults": {
+        "boardCleared": "ボード クリア!"
       }
     },
     "maxCombo": "最大コンボ",
@@ -6068,6 +6074,9 @@ const ja = {
           "toNext": "次のランクまで{points}",
           "progressLabel": "ランク進捗"
         }
+      },
+      "mpResults": {
+        "boardCleared": "ボード クリア!"
       }
     },
     "desktop": {
@@ -6173,6 +6182,9 @@ const ja = {
         "platinumFlavor": "無敵",
         "toNext": "{next}まで{points}",
         "maxed": "伝説級・MAX"
+      },
+      "mpResults": {
+        "boardCleared": "ボード クリア!"
       }
     },
     "ad": {
@@ -7050,6 +7062,14 @@ const ja = {
   },
   "admin": {
     "gameModePopularity": "ゲームモード人気",
+    "mpModeBreakdown": {
+      "title": "マルチプレイヤーモード内訳",
+      "classic": "クラシック",
+      "blast": "ブラスト",
+      "wordHunt": "ワードハント",
+      "wheelRush": "ホイールラッシュ",
+      "totalGames": "合計"
+    },
     "totalGames": "合計",
     "landingCardOrder": "ランディングカード順",
     "noData": "データなし",
@@ -9175,6 +9195,9 @@ const ja = {
         "title": "おかえりなさい！",
         "body": "ブラストが新しくなりました。新ステージをお楽しみください！",
         "cta": "はじめる"
+      },
+      "mpResults": {
+        "boardCleared": "ボード クリア!"
       }
     },
     "continueModal": {
@@ -9409,6 +9432,9 @@ const ja = {
         "shareRank": "今週上位{pct}%",
         "copied": "クリップボードにコピーしました！",
         "copyFailed": "コピーできませんでした — もう一度"
+      },
+      "mpResults": {
+        "boardCleared": "ボード クリア!"
       }
     },
     "badges": {

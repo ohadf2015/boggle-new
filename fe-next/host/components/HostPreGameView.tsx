@@ -130,8 +130,12 @@ function HostPreGameView({
   isQuickPlay = false,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
-  const { isAdmin, isAuthenticated, updateProfile, profile } = useAuth();
-  const hasBlastAccess = !!(profile?.blast_access || isAdmin);
+  const { isAdmin, isAuthenticated, updateProfile } = useAuth();
+  // Blast is enabled for all players — the prior blast_access/admin gate was
+  // removed once MP blast reached parity (shared-board clear ends room, bots
+  // play the live board, blast-specific results screen). Kept as a constant so
+  // the existing child props keep working without a wider refactor.
+  const hasBlastAccess = true;
   const { isOnCrazyGamesPlatform: _isOnCrazyGamesPlatform } = useCrazyGames();
 
 

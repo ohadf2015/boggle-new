@@ -282,32 +282,13 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     const rawTimer = parseInt(String(timerSeconds), 10);
 
-    // Resolve host blast access up-front so we can both filter the random pool
-    // (avoids rolling a mode the host can't start) AND gate explicit blast picks.
-    // Only hit Supabase when blast is actually a candidate.
+    // Blast is now enabled for all players (the prior is_admin/blast_access gate
+    // was removed once MP blast reached parity: shared-board clear ends the room,
+    // bots play the live board, and a blast-specific results screen ships). It
+    // stays in the random rotation pool and any host can pick it explicitly.
     const isRandomRoll = !gameMode || gameMode === 'random';
-    const isExplicitBlast = gameMode === 'blast';
-    let blastAllowed = false;
-    if (isRandomRoll || isExplicitBlast) {
-      const hostUser = Object.values(game.users).find((u) => u.isHost);
-      const hostAuthId = hostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
-      const supabase = getSupabase();
-      // Dev/test (no Supabase) → allow. Prod → require is_admin or blast_access.
-      if (!supabase) {
-        blastAllowed = true;
-      } else if (hostAuthId) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin, blast_access')
-          .eq('id', hostAuthId)
-          .single();
-        blastAllowed = !!(profile?.is_admin || profile?.blast_access);
-      }
-    }
 
-    const enabledModes = blastAllowed
-      ? ALL_GAME_MODES
-      : ALL_GAME_MODES.filter((m) => m !== 'blast');
+    const enabledModes = ALL_GAME_MODES;
 
     let resolvedMode: GameMode = isRandomRoll
       ? selectNextGameMode(game.modeHistory || [], enabledModes)
@@ -323,15 +304,6 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       resolvedMode === 'wheel-rush' ? WHEEL_RUSH_DURATION_SEC :
       DEFAULT_TIMER;
     let validTimer = Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || timerFallback));
-
-    // Defense-in-depth: explicit blast pick (or any path that bypassed the pool
-    // filter) must still pass the access gate. blastAllowed was resolved above.
-    if (resolvedMode === 'blast' && !blastAllowed) {
-      gamesStarting.delete(gameCode);
-      logger.debug('SOCKET', `Rejected blast mode for ${gameCode}: host lacks blast_access`);
-      emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Blast mode requires special access' });
-      return;
-    }
 
     // Word Tower is admin-only during development. UI hides it from non-admins;
     // this server gate enforces it even if a client crafts the startGame emit

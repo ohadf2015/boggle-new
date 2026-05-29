@@ -10,6 +10,7 @@ import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
 import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
 import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 const BlastGame = dynamic(
   () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
@@ -34,6 +35,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
   useGameModeConfirmed,
+  useGameStore,
 } from '@/hooks/gameState/store';
 import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
 import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
@@ -148,9 +150,13 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
+  // Sound effects for MP Blast board cleared celebration
+  const { playEpicVictorySound } = useSoundEffects();
+
   // Only gameMode at root — mode-overlay state subscribed by InGameScreen.
   const gameMode = useGameMode();
   const gameModeConfirmed = useGameModeConfirmed();
+  const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
 
   const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
 
@@ -204,6 +210,12 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     if (!socket) return;
     socket.emit('submitTargetWord', { guess });
   }, [socket]);
+
+  // Blast multiplayer: local player cleared the shared board
+  const handleMPBoardCleared = useCallback(() => {
+    setBlastBoardClearedByLocal(true);
+    playEpicVictorySound();
+  }, [setBlastBoardClearedByLocal, playEpicVictorySound]);
 
   // Stop game with confirmation
   const handleStopGameClick = useCallback(() => {
@@ -309,6 +321,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           username={username}
           onGameEnd={() => {/* Server controls game end in multiplayer */}}
           onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
+          onMPBoardCleared={handleMPBoardCleared}
           onQuit={handleStopGameClick}
           onWordWithComboType={handleBlastWordWithCombo}
           initialTileStates={blastBridge.initialTileStates}

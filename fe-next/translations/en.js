@@ -11233,6 +11233,9 @@ const en = {
         "tilesCleared": "Tiles Cleared",
         "bestWord": "Best Word",
         "rank": "Rank"
+      },
+      "mpResults": {
+        "boardCleared": "BOARD CLEARED!"
       }
     },
     "wordHunt": {
@@ -12547,6 +12550,14 @@ const en = {
       "title": "Email"
     },
     "gameModePopularity": "Game Mode Popularity",
+    "mpModeBreakdown": {
+      "title": "MP Mode Breakdown",
+      "classic": "Classic",
+      "blast": "Blast",
+      "wordHunt": "Word Hunt",
+      "wheelRush": "Wheel Rush",
+      "totalGames": "Total"
+    },
     "geo": {
       "empty": "No geographic data",
       "error": "Failed to load geographic data",

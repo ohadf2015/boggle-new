@@ -13,8 +13,13 @@ import TvResultsControls from './TvResultsControls';
 import TournamentStandings from '../../../components/TournamentStandings';
 import PlayersReadyIndicator from '../../../components/results/PlayersReadyIndicator';
 import { HostWordSelector } from '../../../components/multiplayer/HostWordSelector';
+import BlastMpResults from '../../../components/blast/legacy/BlastMpResults';
+import MpModeBreakdown from '../../../components/multiplayer/MpModeBreakdown';
 import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
 import { useTvFullscreen } from '../../hooks/useTvFullscreen';
+import { useGameMode } from '@/hooks/gameState/store';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { aggregateRoundsFromResults } from '@/lib/multiplayer/mpRoundAggregation';
 import { cn } from '../../../lib/utils';
 import { DJMascotWithEntrance } from '../../../components/ui/DJMascot';
 import { useSoundEffects } from '../../../contexts/SoundEffectsContext';
@@ -68,6 +73,8 @@ interface TvResultsViewProps {
   isTeacher?: boolean;
   /** All words found during the game */
   allWords?: Array<{ word: string; score: number; foundBy?: string[] }>;
+  /** Current game mode (from store) */
+  gameMode?: string;
 }
 
 /**
@@ -91,7 +98,10 @@ const TvResultsView = memo<TvResultsViewProps>(({
   language = 'en',
   isTeacher = false,
   allWords = [],
+  gameMode: gameModeOverride,
 }) => {
+  const storeGameMode = useGameMode();
+  const gameMode = gameModeOverride || storeGameMode;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { sfxMuted, sfxVolume } = useSoundEffects();
   const { isMuted: musicMuted, audioUnlocked } = useMusic();
@@ -299,6 +309,37 @@ const TvResultsView = memo<TvResultsViewProps>(({
                 )}
               </div>
             </m.div>
+          ) : gameMode === 'blast' ? (
+            // Blast Results View
+            <div className="h-full overflow-y-auto space-y-6 max-w-4xl mx-auto py-4">
+              {/* Blast Results */}
+              <m.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              >
+                <BlastMpResults
+                  results={filteredScores.map(p => ({
+                    username: p.username,
+                    score: p.score,
+                    wordsFoundCount: p.wordsFoundCount ?? 0,
+                    tilesCleared: 0,
+                    bestCombo: 0,
+                    boardCleared: (p as { boardCleared?: boolean }).boardCleared,
+                  }))}
+                  gameMode="blast"
+                />
+              </m.div>
+
+              {/* MP Mode Breakdown */}
+              <m.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.1 }}
+              >
+                <MpModeBreakdown rounds={[]} />
+              </m.div>
+            </div>
           ) : (
             // Regular Results View
             <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">

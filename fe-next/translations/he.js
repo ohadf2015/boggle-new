@@ -2920,6 +2920,9 @@ const he = {
       },
       "combo": {
         "description": "מצאו מילים מהר לבונוסי קומבו! שמרו על הרצף!"
+      },
+      "mpResults": {
+        "boardCleared": "לוח נוקה!"
       }
     },
     "demo": {
@@ -5166,6 +5169,9 @@ const he = {
         "title": "מילים שפספסת",
         "showMore": "הצג עוד",
         "count": "מצאת {found} מתוך {total} מילים"
+      },
+      "mpResults": {
+        "boardCleared": "לוח נוקה!"
       }
     },
     "maxCombo": "קומבו מקסימלי",
@@ -6087,6 +6093,9 @@ const he = {
           "toNext": "עוד {points} ל{next}",
           "progressLabel": "התקדמות בדרגה"
         }
+      },
+      "mpResults": {
+        "boardCleared": "לוח נוקה!"
       }
     },
     "desktop": {
@@ -6193,6 +6202,9 @@ const he = {
         "platinumFlavor": "בלתי נגיעים",
         "toNext": "{points} ל{next}",
         "maxed": "אגדי · מקסימום"
+      },
+      "mpResults": {
+        "boardCleared": "לוח נוקה!"
       }
     },
     "ad": {
@@ -6973,6 +6985,14 @@ const he = {
   },
   "admin": {
     "gameModePopularity": "פופולריות מצבי משחק",
+    "mpModeBreakdown": {
+      "title": "פירוק מצבי משחק ריבוי שחקנים",
+      "classic": "קלאסי",
+      "blast": "בלסט",
+      "wordHunt": "ציד מילים",
+      "wheelRush": "גלגל מרוץ",
+      "totalGames": "סה״כ"
+    },
     "totalGames": "סה״כ",
     "landingCardOrder": "סדר כרטיסים בדף נחיתה",
     "noData": "אין נתונים זמינים",
@@ -9268,6 +9288,9 @@ const he = {
         "shareRank": "{pct}% העליונים השבוע",
         "copied": "הועתק ללוח!",
         "copyFailed": "ההעתקה נכשלה — נסה שוב"
+      },
+      "mpResults": {
+        "boardCleared": "לוח נוקה!"
       }
     },
     "intro": {
@@ -11535,6 +11558,9 @@ const he = {
         "tilesCleared": "אריחים שנוקו",
         "bestWord": "המילה הטובה ביותר",
         "rank": "דירוג"
+      },
+      "mpResults": {
+        "boardCleared": "לוח נוקה!"
       }
     },
     "wordHunt": {

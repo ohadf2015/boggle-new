@@ -37,6 +37,8 @@ interface GameEndDeps {
   onGameEnd: (results: BlastResultsData) => void;
   /** MP only: called after Sugar Crush animation — signal server to end game early on dead-end. */
   onMPDeadEnd?: () => void;
+  /** MP only: the shared board was fully cleared — fire a win-flavored local celebration before results. */
+  onMPBoardCleared?: () => void;
   onWaveComplete?: (score: number, words: string[], clearPct: number) => void;
   /** Fires when board is cleared and highlight phase should start (SP only). */
   onHighlightStart?: (finalScore: number) => void;
@@ -75,6 +77,17 @@ export function useBlastGameEnd(deps: GameEndDeps) {
   // recreate the engine object, cancel the async loop via cleanup, and restart it infinitely.
   useEffect(() => {
     const { onGameEnd, onWaveComplete, onHighlightStart, maxCombo, sounds, setExplosionShake, explosionShakeTimerRef, recorder } = depsRef.current;
+
+    // Board cleared in MP — the shared board is exhausted for everyone. Signal the
+    // server to end the room (idempotent endGame) and fire the win-flavored celebration.
+    // The plain `!isMultiplayer` block below never runs for MP, so without this the room
+    // would sit idle until the timer expired even though the board was fully cleared.
+    if (isMultiplayer && engine.gameState.isComplete) {
+      depsRef.current.recorder?.recordEnd('cleared', engine.gameState.score);
+      depsRef.current.onMPBoardCleared?.();
+      depsRef.current.onMPDeadEnd?.();
+      return undefined;
+    }
 
     // Board cleared — all tiles gone (SP only)
     if (!isMultiplayer && engine.gameState.isComplete) {

@@ -55,6 +55,7 @@ import {
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
+import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 
 import type { Player, WordToVote, PlayerViewProps } from './types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -283,7 +284,29 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   useGameStartTelemetry({
     mode: gameMode ?? 'multiplayer',
     isGameActive: gameActive,
-    extras: { gameCode, role: 'player' },
+    extras: {
+      gameCode, role: 'player', isMultiplayer: true,
+      engineMode: 'multiplayer', gameMode: gameMode ?? 'classic',
+      playerCount: humanPlayerCount,
+    },
+  });
+
+  // Paired MP end emit (game_completed) so the nightly job sees MP outcomes per
+  // mode, not just starts. resultsShown = the player reached the results phase.
+  const mpValidWords = useMemo(
+    () => foundWords.filter(w => w.validated !== false),
+    [foundWords],
+  );
+  useGameEndTelemetry({
+    mode: gameMode ?? 'multiplayer',
+    resultsShown: waitingForResults,
+    score: mpValidWords.reduce((s, w) => s + (w.score ?? 0), 0),
+    wordCount: mpValidWords.length,
+    extras: {
+      gameCode, role: 'player', isMultiplayer: true,
+      engineMode: 'multiplayer', gameMode: gameMode ?? 'classic',
+      playerCount: humanPlayerCount,
+    },
   });
   const [tournamentStandings, _setTournamentStandings] = useState<TournamentStanding[]>([]);
   const [showTournamentStandings, setShowTournamentStandings] = useState<boolean>(false);

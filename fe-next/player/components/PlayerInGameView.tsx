@@ -10,6 +10,7 @@ import dynamic from 'next/dynamic';
 import InGameScreen from '../../components/game/InGameScreen';
 import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 const BlastGame = dynamic(
   () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
@@ -35,6 +36,7 @@ import {
   useGameMode,
   useGameModeConfirmed,
   useGameStore,
+  useBlastBoardClearedByLocal,
 } from '@/hooks/gameState/store';
 import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
 import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
@@ -218,10 +220,14 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Get player's game history for trail display logic
   const { profile } = useAuth();
 
+  // Sound effects for MP Blast board cleared celebration
+  const { playEpicVictorySound } = useSoundEffects();
+
   // Game mode state from Zustand
   const gameMode = useGameMode();
   const gameModeConfirmed = useGameModeConfirmed();
   const gameDuration = useGameStore((s) => s.gameDuration);
+  const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
 
   // Mode-overlay state subscribed inside InGameScreen — keeps this view
   // from re-rendering on irrelevant store updates when gameMode isn't classic.
@@ -280,6 +286,12 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     if (!socket) return;
     socket.emit('submitTargetWord', { guess });
   }, [socket]);
+
+  // Blast multiplayer: local player cleared the shared board
+  const handleMPBoardCleared = useCallback(() => {
+    setBlastBoardClearedByLocal(true);
+    playEpicVictorySound();
+  }, [setBlastBoardClearedByLocal, playEpicVictorySound]);
 
   // Memoized handler for closing tournament standings
   const handleCloseTournamentStandings = useCallback(() => {
@@ -348,6 +360,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             username={username}
             onGameEnd={() => {/* Server controls game end in multiplayer */}}
             onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
+            onMPBoardCleared={handleMPBoardCleared}
             onQuit={onExitRoom}
             onWordWithComboType={handleBlastWordWithCombo}
             initialTileStates={blastBridge.initialTileStates}

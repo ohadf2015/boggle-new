@@ -218,7 +218,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
           <LandingChallengeCards
             language={language}
             isAdmin={isAdmin}
-            hasBlastAccess={!!profile?.blast_access}
+            hasBlastAccess={true}
             activePlayers={liveRoomStats.activePlayers}
             openRooms={liveRoomStats.openRooms}
             totalPlayers={liveRoomStats.totalPlayers}

@@ -62,6 +62,8 @@ interface BlastGameProps {
   onWaveComplete?: (waveScore: number, waveWords: string[], clearPct: number) => void;
   onGameEnd: (results: BlastResultsData) => void;
   onMPDeadEnd?: () => void;
+  /** MP only: local player cleared the shared board — parent fires the win celebration / special results. */
+  onMPBoardCleared?: () => void;
   onHighlightStart?: (finalScore: number) => void;
   onQuit: () => void;
   onComboDetected?: (combos: SpecialCombo[]) => void;
@@ -91,6 +93,7 @@ export function BlastGame({
   onWaveComplete,
   onGameEnd,
   onMPDeadEnd,
+  onMPBoardCleared,
   onHighlightStart,
   onQuit,
   onComboDetected,
@@ -519,7 +522,7 @@ export function BlastGame({
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({
     engine, isMultiplayer, gridSize: config.gridSize,
-    waveConfig, objectives, onGameEnd: handleGameEnd, onMPDeadEnd, onWaveComplete,
+    waveConfig, objectives, onGameEnd: handleGameEnd, onMPDeadEnd, onMPBoardCleared, onWaveComplete,
     onHighlightStart,
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,

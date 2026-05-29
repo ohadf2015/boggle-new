@@ -77,14 +77,12 @@ export function BattleModeCard({
     setSelectedGameMode(mode);
   }, [setSelectedGameMode]);
 
-  // Blast is admin-gated in the picker (UI gate only; server still allows
-  // is_admin OR blast_access). Non-admins never see it offered.
-  // Word Tower is admin-only AND behind the `word-tower` experiment (mirrors
-  // the solo gating; server enforces admin too). Blast stays admin-gated.
+  // Blast is now offered to ALL players (gate removed after MP-blast parity).
+  // Word Tower stays admin-only AND behind the `word-tower` experiment (mirrors
+  // the solo gating; server enforces admin too).
   const { variant: wordTowerVariant } = useExperiment('word-tower');
   const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
   const visibleModes = MODES.filter((m) => {
-    if (m.mode === 'blast') return isAdmin;
     if (m.mode === 'word-tower') return wordTowerEnabled;
     return true;
   });

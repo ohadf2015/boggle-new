@@ -40,6 +40,7 @@ import type { BotSubmission } from './types';
 import type { Bot } from '../../modules/botBehavior';
 import { startBotsForWordHunt } from './botWordHunt';
 import { startBotsForWheelRush } from './botWheelRush';
+import { startBotsForBlast } from './botBlast';
 import { restoreLife, getLifeBonus } from '../../modules/wordHuntManager';
 import { makePositionsMap } from '../../modules/wordValidator';
 
@@ -197,6 +198,14 @@ export function startBotsForGame(
   if (game?.gameMode === 'wheel-rush' && game.wheelRushState) {
     markBotScoringStart(gameCode);
     startBotsForWheelRush(io, gameCode, bots, game.wheelRushState, language, timerSeconds);
+    return;
+  }
+
+  // Blast mode: dispatch to dedicated bot driver. Bots solve CURRENT shared board,
+  // not a static grid, and submissions mutate the board via the human validation path.
+  if (game?.gameMode === 'blast' && game.blastModeState) {
+    markBotScoringStart(gameCode);
+    startBotsForBlast(io, gameCode, bots, game.blastModeState, language, timerSeconds);
     return;
   }
 

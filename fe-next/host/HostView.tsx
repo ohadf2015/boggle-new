@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, memo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, memo, useRef, useMemo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
 import { useSocket } from '../utils/SocketContext';
@@ -49,6 +49,7 @@ import {
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
+import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
 import { useTimerStallWatchdog } from '../hooks/useTimerStallWatchdog';
 import { addGameBreadcrumb } from '../utils/sentry';
@@ -462,7 +463,28 @@ const HostView: React.FC<HostViewProps> = memo(({
   useGameStartTelemetry({
     mode: currentGameMode ?? 'multiplayer',
     isGameActive: runtime.gameStarted && !runtime.waitingForResults,
-    extras: { gameCode, role: 'host' },
+    extras: {
+      gameCode, role: 'host', isMultiplayer: true,
+      engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
+      playerCount: tournament.finalScores?.players?.length ?? 0,
+    },
+  });
+
+  // Paired MP end emit (game_completed) so the nightly job sees MP outcomes per mode.
+  const hostResultRow = useMemo(() => {
+    const rows = (tournament.finalScores?.players ?? []) as unknown as PlayerResult[];
+    return rows.find(p => p.isHost) ?? null;
+  }, [tournament.finalScores]);
+  useGameEndTelemetry({
+    mode: currentGameMode ?? 'multiplayer',
+    resultsShown: !!tournament.finalScores,
+    score: hostResultRow?.score ?? 0,
+    wordCount: hostResultRow?.wordsFoundCount ?? 0,
+    extras: {
+      gameCode, role: 'host', isMultiplayer: true,
+      engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
+      playerCount: tournament.finalScores?.players?.length ?? 0,
+    },
   });
 
   // Navigation guard - prevent accidental navigation during active game
@@ -586,6 +608,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           allWords={((tournament.finalScores?.players ?? []) as unknown as PlayerResult[]).flatMap((p) =>
             (p.allWords ?? []).map(w => ({ word: w.word, score: w.score ?? 0, foundBy: [p.username] }))
           )}
+          gameMode={currentGameMode}
         />
       )}
 

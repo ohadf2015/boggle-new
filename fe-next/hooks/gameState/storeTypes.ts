@@ -91,6 +91,9 @@ export interface GameState {
   wordHuntEliminatedPlayers: string[];
   wordHuntDiscoveryClues: Array<{ position: number; letter: string }>;
   wordHuntKnownLetters: string[];
+
+  // Blast multiplayer: local player board cleared flag
+  blastBoardClearedByLocal: boolean;
 }
 
 // ==========================================
@@ -158,6 +161,7 @@ export interface GameActions {
   setBlastPlayerStats: (value: Record<string, BlastPlayerStats> | ((prev: Record<string, BlastPlayerStats>) => Record<string, BlastPlayerStats>)) => void;
   setWheelRushPlayerStats: (value: Record<string, WheelRushPlayerStats> | ((prev: Record<string, WheelRushPlayerStats>) => Record<string, WheelRushPlayerStats>)) => void;
   setBlastBoardUpdate: (value: { grid: string[][]; tileStates: BlastTileState[][]; clearedBy: string; word: string; clearedCount: number; totalMoves: number } | null) => void;
+  setBlastBoardClearedByLocal: (value: boolean | ((prev: boolean) => boolean)) => void;
 
   // Word Hunt multiplayer actions
   setWordHuntTargetLength: (value: number | ((prev: number) => number)) => void;

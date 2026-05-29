@@ -53,9 +53,10 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useGameKeyboardShortcuts } from '@/hooks/useGameKeyboardShortcuts';
 import type { GameModeOption } from '@/components/GameModeSelector';
-import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions } from '@/hooks/gameState/store';
+import { useGameMode, useHostSelectedGameMode, useWordHuntPlayerLives, useWordHuntEliminatedPlayers, useBlastPlayerStats, useWheelRushPlayerStats, useGameActions, useBlastBoardClearedByLocal } from '@/hooks/gameState/store';
 import type { BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
 import { resolveWheelRushStats } from '@/lib/results/wheelRushStatsFallback';
+import BlastMpResults, { buildBlastMpResults } from '@/components/blast/legacy/BlastMpResults';
 const WordHuntResultsSummary = dynamic(() => import('@/components/results/WordHuntResultsSummary'), { ssr: false });
 const BlastResultsScene = dynamic(() => import('@/components/results/BlastResultsScene'), { ssr: false });
 const WheelRushResultsScene = dynamic(() => import('@/components/results/WheelRushResultsScene'), { ssr: false });
@@ -79,6 +80,7 @@ interface DesktopResultsLayoutProps {
   wordHuntResultsData: WordHuntResultsSummaryProps | undefined;
   blastPlayerStats: Record<string, BlastPlayerStats>;
   blastResultScores: Record<string, number>;
+  blastMpResults: any[];
   wheelRushPlayerStats: Record<string, WheelRushPlayerStats>;
   currentUsername?: string;
   gameCode?: string;
@@ -101,6 +103,7 @@ function DesktopResultsLayout({
   wordHuntResultsData,
   blastPlayerStats,
   blastResultScores,
+  blastMpResults,
   wheelRushPlayerStats,
   currentUsername,
   gameCode,
@@ -185,6 +188,13 @@ function DesktopResultsLayout({
             ) : null}
           </ResultsSectionReveal>
         </ResultsHeroTilt>
+
+        {/* Blast MP Results — renders ranked player list above standard content */}
+        {resolvedGameMode === 'blast' && Array.isArray(blastMpResults) && blastMpResults.length > 0 && (
+          <ResultsSectionReveal index={1.5} flat className="w-full max-w-5xl mx-auto mb-6 relative z-10">
+            <BlastMpResults results={blastMpResults} gameMode="blast" />
+          </ResultsSectionReveal>
+        )}
 
         {/* Two-column area below the cinematic hero */}
         <div className="w-full max-w-5xl mx-auto mt-6 medium-short:mt-3 desktop-medium-short:mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 medium-short:gap-3 desktop-medium-short:gap-4 relative z-10">
@@ -359,6 +369,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
   const blastPlayerStats = useBlastPlayerStats();
   const wheelRushPlayerStats = useWheelRushPlayerStats();
+  const blastBoardClearedByLocal = useBlastBoardClearedByLocal();
 
   // Socket events for word feedback, XP, engagement features, and player ready state
   const {
@@ -905,6 +916,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentUsername: username,
   }, [resolvedGameMode, wordHuntSummary, sortedScores, wordHuntEliminatedPlayers, wordHuntPlayerLives, username]);
 
+  // Map sorted scores to BlastMpPlayerResult for MP Blast view
+  const blastMpResults = useMemo(() => {
+    if (resolvedGameMode !== 'blast') return [];
+    return buildBlastMpResults(sortedScores, {
+      boardClearedByLocal: blastBoardClearedByLocal,
+      localUsername: username,
+    });
+  }, [sortedScores, resolvedGameMode, blastBoardClearedByLocal, username]);
+
   // Render Results Tab Content using shared component.
   // Wheel-rush gets a radial wheel-themed hero scene rendered ABOVE the
   // standard cinematic content — it owns the visual identity for that mode
@@ -918,6 +938,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             scores={sortedScores}
             currentUsername={username}
           />
+        </div>
+      )}
+      {resolvedGameMode === 'blast' && blastMpResults.length > 0 && (
+        <div className="mb-4">
+          <BlastMpResults results={blastMpResults} gameMode="blast" />
         </div>
       )}
       <ResultsMainContent
@@ -1214,6 +1239,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         wordHuntResultsData={wordHuntResultsData}
         blastPlayerStats={blastPlayerStats}
         blastResultScores={blastResultScores}
+        blastMpResults={blastMpResults}
         wheelRushPlayerStats={effectiveWheelRushStats}
         currentUsername={username}
         gameCode={gameCode}

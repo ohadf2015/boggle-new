@@ -24,6 +24,7 @@ import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { KPICards } from '@/components/admin/overview/KPICards';
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
+import { MpModeBreakdown } from '@/components/admin/overview/MpModeBreakdown';
 import { DailyActivityChart } from '@/components/admin/overview/DailyActivityChart';
 
 export default function AdminPageClient() {
@@ -123,6 +124,9 @@ export default function AdminPageClient() {
             <SystemHealth health={health} />
             <GameModePopularity />
           </div>
+
+          {/* MP Mode Breakdown */}
+          <MpModeBreakdown />
 
           {/* Dashboard content */}
           {authToken ? (

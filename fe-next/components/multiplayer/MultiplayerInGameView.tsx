@@ -59,7 +59,8 @@ import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { OpponentWordFeedConnected } from '@/components/multiplayer/OpponentWordFeedConnected';
-import { useGameMode } from '@/hooks/gameState/store';
+import { useGameMode, useGameStore } from '@/hooks/gameState/store';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 // ==================== Types ====================
 
@@ -330,6 +331,16 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     (onStopGame ?? onExitRoom)?.();
   }, [onStopGame, onExitRoom]);
 
+  // Sound effects for MP Blast board cleared celebration
+  const { playEpicVictorySound } = useSoundEffects();
+  const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
+
+  // Blast multiplayer: local player cleared the shared board
+  const handleMPBoardCleared = useCallback(() => {
+    setBlastBoardClearedByLocal(true);
+    playEpicVictorySound();
+  }, [setBlastBoardClearedByLocal, playEpicVictorySound]);
+
   // Wheel Rush mode — no letter grid; render before grid placeholder guard.
   // Mobile-only fallback: desktop path is handled by WheelRushDesktopAdapter below.
   if (gameMode === 'wheel-rush' && !shellEnabled) {
@@ -517,6 +528,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         leaderboard={leaderboard}
         username={username}
         onGameEnd={noop} /* Server controls game end */
+        onMPBoardCleared={handleMPBoardCleared}
         onQuit={handleQuit}
         onWordWithComboType={handleBlastWordWithCombo}
         initialTileStates={blastBridge.initialTileStates}

@@ -74,6 +74,7 @@ const initialState: GameState = {
   wordHuntEliminatedPlayers: [],
   wordHuntDiscoveryClues: [],
   wordHuntKnownLetters: [],
+  blastBoardClearedByLocal: false,
 };
 
 // ==========================================
@@ -351,6 +352,10 @@ export const useGameStore = create<GameStore>()(
 
     setBlastBoardUpdate: (value) => set({ blastBoardUpdate: value }),
 
+    setBlastBoardClearedByLocal: (value) => set((state) => ({
+      blastBoardClearedByLocal: applySetState(value, state.blastBoardClearedByLocal)
+    })),
+
     // ==========================================
     // Word Hunt Multiplayer Actions
     // ==========================================
@@ -483,6 +488,7 @@ export const useGameStore = create<GameStore>()(
         wordHuntEliminatedPlayers: [],
         wordHuntDiscoveryClues: [],
         wordHuntKnownLetters: [],
+        blastBoardClearedByLocal: false,
       });
     },
 
@@ -533,6 +539,7 @@ export {
   useBlastPlayerStats,
   useGameModeConfirmed,
   useWheelRushPlayerStats,
+  useBlastBoardClearedByLocal,
   useWordHuntTargetLength,
   useWordHuntTargetCategory,
   useWordHuntMyLife,
