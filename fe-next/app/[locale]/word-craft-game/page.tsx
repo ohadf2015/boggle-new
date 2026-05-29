@@ -39,10 +39,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'WordCraft — Free Word Strategy Grid Game | LexiClash',
       description: 'Build words, claim territory, outscore rivals. Free online, no download.',
-      images: [`${BASE_URL}/og-image-${isEn ? 'en' : 'en'}.webp`],
+      images: [`${BASE_URL}/og-image-${isEn ? 'en' : locale}.webp`],
     },
     alternates: {
-      canonical: pageUrl,
+      // Non-EN variants serve English copy → consolidate ranking signal onto the
+      // EN canonical (hreflang below still advertises the locale URLs).
+      canonical: isEn ? pageUrl : `${BASE_URL}/en/word-craft-game`,
       languages: {
         'x-default': `${BASE_URL}/en/word-craft-game`,
         en: `${BASE_URL}/en/word-craft-game`,
