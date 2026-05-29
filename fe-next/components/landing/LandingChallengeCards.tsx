@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -51,9 +51,6 @@ type LandingCardKey =
   | 'connections'
   | 'brainGym'
   | 'wordCraft'
-  | 'wordCraftGems'
-  | 'wordCraftCards'
-  | 'wordCraftPassPlay'
   | 'wordTower'
   | 'blastClassic'
   | 'wordForge'
@@ -73,7 +70,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft', 'wordCraftCards', 'wordCraftPassPlay', 'wordCraftGems', 'wordTower', 'blastClassic',
+  'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic',
   'wordForge', 'wordVault',
   'party', 'wordAlchemy', 'shiritori', 'sealedBid',
 ]);
@@ -82,7 +79,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
 const cardDelay = (index: number) => `${index * 0.07}s`;
 
 /** Modes with no content for Japanese locale — hidden from hub */
-const JA_HIDDEN_MODES = new Set<LandingCardKey>(['connections', 'wordCraftGems']);
+const JA_HIDDEN_MODES = new Set<LandingCardKey>(['connections']);
 
 export function LandingChallengeCards({
   language,
@@ -153,11 +150,8 @@ export function LandingChallengeCards({
     const next = [...baseOrder];
     if (!next.includes('connections')) next.push('connections');
     if (!next.includes('brainGym')) next.push('brainGym');
-    // WordCraft is public — territory + Card Run surface on the hub for everyone.
+    // WordCraft is public — territory surfaces on the hub for everyone.
     if (!next.includes('wordCraft')) next.push('wordCraft');
-    if (!next.includes('wordCraftCards')) next.push('wordCraftCards');
-    if (!next.includes('wordCraftPassPlay')) next.push('wordCraftPassPlay');
-    if (isAdmin && !next.includes('wordCraftGems')) next.push('wordCraftGems');
     if (isAdmin && !next.includes('wordTower')) next.push('wordTower');
     // Blast Classic (legacy V1 engine) — admin-only card so both V1 + V2 (the
     // public 'blast' card) are reachable. /blast?v2=off opts into the V1 engine.
@@ -366,57 +360,6 @@ export function LandingChallengeCards({
         );
       }
 
-      case 'wordCraftCards': {
-        return (
-          <div key="wordCraftCards" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
-            <ModeCard
-              title={t('wordcraft.cardsModeTitle')}
-              description={t('wordcraft.cardsModeDesc')}
-              href={`/${language}/word-craft?mode=cards`}
-              icon={<Sparkles className="w-6 h-6" />}
-              modeImage="/modes/word-craft.png"
-              variant="cyan"
-              badge="NEW"
-              onClick={() => { trackModeSelected('wordCraftCards' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraftCards', variant: 'cyan' }); }}
-            />
-          </div>
-        );
-      }
-
-      case 'wordCraftPassPlay': {
-        return (
-          <div key="wordCraftPassPlay" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
-            <ModeCard
-              title={t('wordcraft.passPlayModeTitle')}
-              description={t('wordcraft.passPlayModeDesc')}
-              href={`/${language}/word-craft?vs=human`}
-              icon={<Swords className="w-6 h-6" />}
-              modeImage="/modes/word-craft.png"
-              variant="pink"
-              badge="NEW"
-              onClick={() => { trackModeSelected('wordCraftPassPlay' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraftPassPlay', variant: 'pink' }); }}
-            />
-          </div>
-        );
-      }
-
-      case 'wordCraftGems': {
-        return (
-          <div key="wordCraftGems" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
-            <ModeCard
-              title={t('wordcraft.gemsModeTitle')}
-              description={t('wordcraft.gemsModeDesc')}
-              href={`/${language}/word-craft?mode=gems`}
-              icon={<Gem className="w-6 h-6" />}
-              modeImage="/modes/word-craft.png"
-              variant="purple"
-              badge="BETA"
-              onClick={() => { trackModeSelected('wordCraftGems' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraftGems', variant: 'purple' }); }}
-            />
-          </div>
-        );
-      }
-
       case 'wordForge':
         return (
           <div key="wordForge" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
@@ -513,7 +456,7 @@ export function LandingChallengeCards({
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftCards', 'wordCraftPassPlay', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

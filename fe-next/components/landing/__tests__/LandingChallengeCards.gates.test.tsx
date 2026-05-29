@@ -83,21 +83,14 @@ const baseProps = {
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
 };
 
-describe('LandingChallengeCards — Word Craft public (territory + Card Run)', () => {
-  it('renders the wordCraft territory card for a non-admin user (now public)', () => {
+describe('LandingChallengeCards — Word Craft consolidated to ONE public card', () => {
+  it('renders the single wordCraft territory card → /word-craft for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
-  });
-
-  it('renders the wordCraft Card Run card for a non-admin with ?mode=cards href', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-wordcraft.cardsModeTitle');
+    const card = screen.getByTestId('mode-wordcraft.modeTitle');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-craft?mode=cards');
+    expect(card.getAttribute('data-href')).toBe('/en/word-craft');
   });
 
   it('renders the wordCraft card when signed out (public)', () => {
@@ -108,29 +101,17 @@ describe('LandingChallengeCards — Word Craft public (territory + Card Run)', (
     expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 
-  it('renders the public Pass & Play card with the ?vs=human href', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-wordcraft.passPlayModeTitle');
-    expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-craft?vs=human');
-  });
-
-  it('does NOT render the wordCraft Gem Hunt card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-wordcraft.gemsModeTitle')).toBeNull();
-  });
-
-  it('renders the wordCraft Gem Hunt card for an admin with ?mode=gems href', () => {
+  it('surfaces NO separate Card Run / Pass & Play / Gem Hunt hub cards (consolidated)', () => {
+    // Cards & Gems are admin-only URL sub-modes (see gateWordCraftMode); pass-and-play
+    // is an in-game option. None get their own hub card anymore — even for an admin.
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-wordcraft.gemsModeTitle');
-    expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-craft?mode=gems');
+    expect(screen.queryByTestId('mode-wordcraft.cardsModeTitle')).toBeNull();
+    expect(screen.queryByTestId('mode-wordcraft.passPlayModeTitle')).toBeNull();
+    expect(screen.queryByTestId('mode-wordcraft.gemsModeTitle')).toBeNull();
+    // and exactly one wordcraft card remains
+    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 });
 
@@ -263,7 +244,7 @@ describe('LandingChallengeCards — Blast Classic admin gate', () => {
 });
 
 describe('LandingChallengeCards — full admin dev-preview roster', () => {
-  it('renders ALL 9 admin-gated dev preview cards for a post-newbie admin', () => {
+  it('renders ALL 8 admin-gated dev preview cards for a post-newbie admin', () => {
     mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('admin@example.com');
     // Past newbie + first-timer + newcomer-by-games gates → no collapse expander,
@@ -273,8 +254,8 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
     render(<LandingChallengeCards {...baseProps} />);
     const expected = [
-      // Word Craft territory + Card Run are now PUBLIC (not in this admin roster).
-      'mode-wordcraft.gemsModeTitle',      // Word Craft Gem Hunt (still admin)
+      // WordCraft consolidated to ONE public card; Cards/Gems are URL sub-modes
+      // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
       'mode-wordTower.cardTitle',          // Word Tower
       'mode-landing.blastClassic',         // Blast Classic V1
       'mode-landing.wordForgeMode',        // Word Forge
@@ -297,7 +278,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
     render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
-      'mode-wordcraft.gemsModeTitle',
       'mode-wordTower.cardTitle',
       'mode-landing.blastClassic',
       'mode-landing.wordForgeMode',

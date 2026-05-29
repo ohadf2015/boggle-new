@@ -23,3 +23,13 @@ export function useWordCraftMode(): WordCraftMode {
     return 'territory';
   }, []);
 }
+
+/**
+ * Public-mode gate. Only **Territory** (and its legacy `classic` toggle) is
+ * public; the Cards Run and Gem Hunt sub-modes stay reachable solely as
+ * admin-only dev previews. Non-admins requesting them fall back to Territory.
+ */
+export function gateWordCraftMode(mode: WordCraftMode, isAdmin: boolean): WordCraftMode {
+  if (!isAdmin && (mode === 'cards' || mode === 'gems')) return 'territory';
+  return mode;
+}

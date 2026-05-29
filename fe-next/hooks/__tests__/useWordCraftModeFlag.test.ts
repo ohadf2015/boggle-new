@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useWordCraftMode } from '../useWordCraftModeFlag';
+import { useWordCraftMode, gateWordCraftMode } from '../useWordCraftModeFlag';
 
 function withSearch(search: string) {
   vi.stubGlobal('window', { location: { search } } as unknown as Window & typeof globalThis);
@@ -31,5 +31,23 @@ describe('useWordCraftMode', () => {
     expect(renderHook(() => useWordCraftMode()).result.current).toBe('classic');
     withSearch('?classic=1');
     expect(renderHook(() => useWordCraftMode()).result.current).toBe('classic');
+  });
+});
+
+describe('gateWordCraftMode (only Territory is public)', () => {
+  it('keeps Cards & Gems for admins', () => {
+    expect(gateWordCraftMode('cards', true)).toBe('cards');
+    expect(gateWordCraftMode('gems', true)).toBe('gems');
+  });
+
+  it('redirects non-admins from Cards & Gems to Territory', () => {
+    expect(gateWordCraftMode('cards', false)).toBe('territory');
+    expect(gateWordCraftMode('gems', false)).toBe('territory');
+  });
+
+  it('always allows Territory and legacy Classic for everyone', () => {
+    expect(gateWordCraftMode('territory', false)).toBe('territory');
+    expect(gateWordCraftMode('classic', false)).toBe('classic');
+    expect(gateWordCraftMode('classic', true)).toBe('classic');
   });
 });

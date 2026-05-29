@@ -254,9 +254,6 @@ export default function GemHuntPageClient() {
           <h1 className="text-lg font-neo-display font-black text-neo-white tracking-tight">
             {t('wordcraft.gems.title')}
           </h1>
-          <span className="px-1.5 py-0.5 text-[9px] font-neo-display font-black uppercase tracking-widest bg-neo-yellow text-neo-navy rounded border-2 border-black shadow-hard-sm rotate-[3deg]">
-            BETA
-          </span>
         </div>
 
         {!dict ? (

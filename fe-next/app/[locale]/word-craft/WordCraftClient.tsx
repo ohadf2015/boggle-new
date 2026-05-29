@@ -2,7 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import { useWordCraftMode } from '@/hooks/useWordCraftModeFlag';
+import { useWordCraftMode, gateWordCraftMode } from '@/hooks/useWordCraftModeFlag';
+import { useAuth } from '@/contexts/AuthContext';
 
 // `ssr: false` is only legal inside a Client Component. Keeping it in
 // page.tsx (which exports `metadata` and is therefore a Server Component)
@@ -22,11 +23,15 @@ const RunPageClient = dynamic(
 
 export function WordCraftClient() {
   const mode = useWordCraftMode();
+  const { isAdmin } = useAuth();
+  // Only Territory is public. Cards & Gems remain reachable as admin-only dev
+  // previews via ?mode=cards / ?mode=gems; everyone else lands on Territory.
+  const effectiveMode = gateWordCraftMode(mode, isAdmin);
   return (
     <Suspense>
-      {mode === 'gems' ? (
+      {effectiveMode === 'gems' ? (
         <GemHuntPageClient />
-      ) : mode === 'cards' ? (
+      ) : effectiveMode === 'cards' ? (
         <RunPageClient />
       ) : (
         <WordCraftPageClient />
