@@ -10,6 +10,57 @@ LOCK_FILE="${LOCK_FILE:-$HOME/.cache/lexi-nightly/lock}"
 LAST_RUN_FILE="${LAST_RUN_FILE:-$HOME/.cache/lexi-nightly/last-run}"
 PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 
+# --- stranded pending-ref recovery -------------------------------------
+# git-ship saves a docs-only nightly commit to refs/nightly-pending/$DATE and
+# resets master to origin/master when a push fails (the 2026-05-29 cause: the
+# pre-push hook's `tsc --noEmit` tripped on an UNRELATED pre-existing error — a
+# stale .next validator referencing a founder-WIP page that never existed). The
+# strand mechanism worked, but the ref then sat forever — "resolve manually"
+# never happened. Recover automatically on every run: for each DOCS-ONLY pending
+# ref, cherry-pick it onto the LATEST origin/master in a throwaway worktree
+# (isolated from the founder's dirty tree, robust even when origin advanced
+# since the strand), and push. Non-docs strands are left for manual review — we
+# never auto-reship code we can't re-gate. --no-verify is safe here: the commit
+# was already gate-vetted when first created, and it is docs-only.
+recover_stranded_pending_refs() {
+  local refs pref psha base non_docs wtbase wt
+  refs=$(git for-each-ref refs/nightly-pending/ --format='%(refname)' 2>/dev/null)
+  [ -z "$refs" ] && return 0
+  git fetch origin master --quiet 2>/dev/null \
+    || { echo "preflight: pending-ref recovery skipped (fetch failed)"; return 0; }
+  while IFS= read -r pref; do
+    [ -z "$pref" ] && continue
+    psha=$(git rev-parse "$pref" 2>/dev/null) || continue
+    # Already on origin (a prior run or a human pushed it)? Just drop the ref.
+    if git merge-base --is-ancestor "$psha" origin/master 2>/dev/null; then
+      echo "preflight: pending ref $pref already on origin/master — dropping"
+      git update-ref -d "$pref" 2>/dev/null || true
+      continue
+    fi
+    base=$(git merge-base "$psha" origin/master 2>/dev/null) || continue
+    non_docs=$(git diff --name-only "$base" "$psha" 2>/dev/null | grep -vE '^docs/' || true)
+    if [ -n "$non_docs" ]; then
+      echo "preflight: WARN — stranded $pref touches non-docs paths; leaving for manual recovery:"
+      echo "$non_docs" | sed 's/^/    /'
+      continue
+    fi
+    # `git worktree add` needs a non-existent leaf path, so nest under mktemp's dir.
+    wtbase=$(mktemp -d -t nightly-recover.XXXXXX); wt="$wtbase/wt"
+    if git worktree add --detach --quiet "$wt" origin/master 2>/dev/null \
+       && git -C "$wt" cherry-pick --allow-empty "$psha" >/dev/null 2>&1 \
+       && git -C "$wt" push --no-verify origin HEAD:master >/dev/null 2>&1; then
+      echo "preflight: ✓ recovered stranded docs ref $pref → pushed to origin/master"
+      git update-ref -d "$pref" 2>/dev/null || true
+    else
+      echo "preflight: WARN — could not auto-recover $pref (cherry-pick/push failed); will retry next run"
+      git -C "$wt" cherry-pick --abort 2>/dev/null || true
+    fi
+    git worktree remove --force "$wt" 2>/dev/null || true
+    rm -rf "$wtbase" 2>/dev/null || true
+  done <<< "$refs"
+  return 0
+}
+
 preflight_check() {
   mkdir -p "$(dirname "$LOCK_FILE")"
 
@@ -80,6 +131,13 @@ preflight_check() {
     echo "preflight: ABORT — not on master (on $branch)"
     return 1
   fi
+
+  # Auto-recover any docs-only commit a prior run failed to push (so it never
+  # strands indefinitely). Runs BEFORE the ff-pull below so the clean-tree
+  # ff-pull then fast-forwards local master onto the just-pushed commit,
+  # preserving the local==origin invariant. Worktree-isolated → safe on a dirty
+  # tree too. Never aborts the run.
+  recover_stranded_pending_refs
 
   # ff-pull is an OPTIMIZATION, not a correctness requirement: git-ship rebases
   # the nightly commit onto origin/master at push time. Both `git pull --ff-only`

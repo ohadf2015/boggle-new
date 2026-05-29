@@ -185,6 +185,53 @@ assert "  …does NOT log unpushed-non-docs abort"         '! printf "%s" "$OUTF
 ( cd "$REPO"; git reset --hard origin/master -q )
 rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
 
+# ── stranded pending-ref auto-recovery (2026-05-29 regression) ────────────
+# git-ship saves a docs-only commit to refs/nightly-pending/$DATE + resets master
+# when a push fails (that night: pre-push tsc tripped on an unrelated stale-.next
+# error). The ref then stranded forever. preflight must now auto-recover it:
+# cherry-pick docs-only strands onto the LATEST origin/master (even after origin
+# advanced) and push. Non-docs strands are left for manual review.
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; git reset --hard origin/master -q )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+echo
+echo "stranded docs-only pending ref → auto-recovered (non-FF: origin advanced)"
+( cd "$REPO"
+  # Build the stranded commit on the CURRENT origin/master, park it in a ref.
+  git checkout -q -b _pending origin/master
+  mkdir -p docs/nightly/reports
+  echo stranded > docs/nightly/reports/2099-12-31.md
+  git add docs/
+  git -c user.email=t@t -c user.name=t commit -qm "docs(nightly): stranded salvage"
+  git update-ref refs/nightly-pending/2099-12-31 HEAD
+  git checkout -q master; git branch -qD _pending
+  # Advance origin so recovery is forced through cherry-pick (not a trivial FF).
+  echo advance > base2.txt; git add base2.txt
+  git -c user.email=t@t -c user.name=t commit -qm "origin advances during the day"
+  git push -q origin master )
+OUTG=$(preflight_check 2>&1); rcG=$?
+assert "recovery runs without aborting (return 0)"        "[ $rcG -eq 0 ]"
+assert "  …logs the recovery"                             'printf "%s" "$OUTG" | grep -q "recovered stranded docs ref"'
+assert "  …pending ref is deleted after recovery"         '! (cd "$REPO" && git show-ref --verify --quiet refs/nightly-pending/2099-12-31)'
+assert "  …doc is now TRACKED on origin/master"           '(cd "$REPO" && git fetch -q origin master && git cat-file -e origin/master:docs/nightly/reports/2099-12-31.md 2>/dev/null)'
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+
+echo
+echo "stranded NON-docs pending ref → left for manual review (never auto-reshipped)"
+( cd "$REPO"
+  git checkout -q -b _pending2 origin/master
+  echo "rogue code" > rogue.ts
+  git add rogue.ts
+  git -c user.email=t@t -c user.name=t commit -qm "feat: un-re-gated code strand"
+  git update-ref refs/nightly-pending/2099-11-30 HEAD
+  git checkout -q master; git branch -qD _pending2 )
+OUTH=$(preflight_check 2>&1); rcH=$?
+assert "non-docs strand does NOT abort the run (return 0)"  "[ $rcH -eq 0 ]"
+assert "  …WARNs it touches non-docs paths"                 'printf "%s" "$OUTH" | grep -q "touches non-docs paths"'
+assert "  …leaves the pending ref intact for manual fix"    '(cd "$REPO" && git show-ref --verify --quiet refs/nightly-pending/2099-11-30)'
+( cd "$REPO"; git update-ref -d refs/nightly-pending/2099-11-30 2>/dev/null || true )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+
 rm -rf "$ROOT"
 echo
 echo "──────────────────────────────────────────"

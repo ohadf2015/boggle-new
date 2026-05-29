@@ -21,6 +21,16 @@ LINT_FILES=$(echo "$CHANGED" | sed 's|^fe-next/||' | while IFS= read -r f; do [ 
 BACKEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/backend/' | sed 's|^fe-next/||' || true)
 FRONTEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/' | grep -v '^fe-next/backend/' | sed 's|^fe-next/||' || true)
 
+# Type-relevant changes: any .ts/.tsx/.js/.jsx/.mjs/.cjs, or a tsconfig/package.json.
+# A push that touches NONE of these (e.g. a docs-only nightly commit) cannot
+# introduce a type error, so the whole-project `tsc --noEmit` below is skipped.
+# Running it unconditionally was the 2026-05-29 strand: a docs-only nightly push
+# was blocked by an UNRELATED pre-existing type error (a stale .next validator
+# pointing at a founder-WIP page that never existed) → push failed → commit
+# stranded in refs/nightly-pending/. Code pushes still run the full type-check.
+TYPE_RELEVANT=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null \
+  | grep -E '\.(ts|tsx|js|jsx|mjs|cjs)$|(^|/)tsconfig[^/]*\.json$|(^|/)package\.json$' || true)
+
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
@@ -41,7 +51,9 @@ PID_LINT=$!
 
 # Type check
 (
-  if ./node_modules/.bin/tsc --noEmit; then
+  if [ -z "$TYPE_RELEVANT" ]; then
+    echo "ℹ️  Type check: no type-relevant files changed — skipped"
+  elif ./node_modules/.bin/tsc --noEmit; then
     echo "✅ Type check passed"
   else
     echo "❌ Type check failed"
