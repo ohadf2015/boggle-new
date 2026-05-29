@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { BlastV2PageClient } from '../BlastV2PageClient';
 import type { BlastLevel } from '@/lib/blast/v2/types';
@@ -13,11 +14,12 @@ const mkLevel = (n: number): BlastLevel => ({
 const level1 = mkLevel(1);
 
 vi.mock('@/components/blast/v2/BlastGame', () => ({
-  BlastGame: ({ level, onAdvance, unlocksSeen }: { level: BlastLevel; onAdvance: () => void; unlocksSeen?: Record<string, boolean> }) => (
+  BlastGame: ({ level, onAdvance, onLevelCleared, unlocksSeen }: { level: BlastLevel; onAdvance: () => void; onLevelCleared?: (nextLevel: number) => void; unlocksSeen?: Record<string, boolean> }) => (
     <div>
       <span data-testid="level-number">{level.levelNumber}</span>
       <span data-testid="unlocks">{JSON.stringify(unlocksSeen ?? {})}</span>
       <button data-testid="advance" onClick={onAdvance}>advance</button>
+      <button data-testid="level-cleared" onClick={() => onLevelCleared?.(level.levelNumber + 1)}>level-cleared</button>
     </div>
   ),
 }));
@@ -179,5 +181,32 @@ describe('BlastV2PageClient — resume + boot gate (Plan 3b)', () => {
     await waitFor(() => expect(screen.getByTestId('level-number').textContent).toBe('2'));
 
     expect(localStorage.getItem(GUEST_PROGRESS_KEY)).toBeNull();
+  });
+
+  it('guest: onLevelCleared callback persists progress WITHOUT clicking Next', async () => {
+    // This integration test verifies that when a guest completes a level,
+    // BlastGame calls onLevelCleared, which triggers writeGuestProgress before
+    // the player clicks "Next". This is the bug fix: guests no longer lose progress
+    // if they close the tab immediately after completing a level.
+
+    global.fetch = routeFetch({
+      level: (n) => ({ ok: true, status: 200, json: async () => mkLevel(n) }),
+    }) as unknown as typeof fetch;
+
+    renderClient();
+    await waitFor(() => expect(screen.getByTestId('level-number').textContent).toBe('1'));
+
+    // Guest at level 1, no progress saved yet
+    expect(readGuestProgress()).toBeNull();
+
+    // Simulate the game completing level 1 (triggering the onLevelCleared callback)
+    // by clicking the mocked "level-cleared" button. In the real app, this is called
+    // by BlastGame's levelComplete useEffect when state.status === 'levelComplete'.
+    screen.getByTestId('level-cleared').click();
+
+    // Now the guest should have progress saved (currentLevel: 2) without clicking Next
+    await waitFor(() => {
+      expect(readGuestProgress()).toEqual({ currentLevel: 2, locale: 'en' });
+    });
   });
 });

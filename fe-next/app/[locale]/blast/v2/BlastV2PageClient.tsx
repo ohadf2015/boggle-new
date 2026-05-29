@@ -70,6 +70,20 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
     };
   }, [progressLoaded, currentLevel, initialLevel]);
 
+  const handleLevelCleared = useCallback(
+    (nextLevel: number) => {
+      // Paint fast-path hint for next visit (all users).
+      writeResumeHint(nextLevel);
+      // Guests persist their progress immediately when a level completes
+      // (not waiting for the Next button to be clicked). Authed players are
+      // persisted server-side by clear-level RPC in BlastGame.
+      if (isGuest) {
+        writeGuestProgress({ currentLevel: nextLevel, locale: level.locale });
+      }
+    },
+    [isGuest, level.locale],
+  );
+
   const handleAdvance = useCallback(async () => {
     if (advancingRef.current) return;
     advancingRef.current = true;
@@ -164,6 +178,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
       unlocksSeen={unlocksSeen}
       isVeteranPlayer={isVeteran}
       onAdvance={handleAdvance}
+      onLevelCleared={handleLevelCleared}
       onUpdateUnlocks={(updated) => setUnlocksSeen(updated)}
     />
   );

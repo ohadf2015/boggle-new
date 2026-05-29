@@ -44,6 +44,7 @@ type Props = {
   isVeteranPlayer?: boolean;
   onAdvance: () => void;
   onUpdateUnlocks?: (unlocks: UnlocksSeen) => void;
+  onLevelCleared?: (nextLevel: number) => void;
 };
 
 // Mode color map
@@ -88,6 +89,7 @@ export function BlastGame({
   isVeteranPlayer = false,
   onAdvance,
   onUpdateUnlocks,
+  onLevelCleared,
 }: Props) {
   const [introDismissed, setIntroDismissed] = useState(false);
   const [levelStartTime] = useState(() => Date.now());
@@ -401,7 +403,10 @@ export function BlastGame({
     });
 
     clearLevel(submission, state.coins, gemsCollected, unlocksSeen);
-  }, [state.status, introDismissed, level, levelStartTime, state.foundWords, state.hintsUsed, state.wrongAttempts, state.bonusWordCount, state.cascadeCount, state.coins, state.chestProgress, clearLevel, unlocksSeen]);
+    // Notify parent (typically BlastV2PageClient) of level completion so guests
+    // can persist their progress immediately (before the Next button is clicked).
+    onLevelCleared?.(level.levelNumber + 1);
+  }, [state.status, introDismissed, level, levelStartTime, state.foundWords, state.hintsUsed, state.wrongAttempts, state.bonusWordCount, state.cascadeCount, state.coins, state.chestProgress, clearLevel, unlocksSeen, onLevelCleared]);
 
   const handleFtueComplete = () => {
     const updated = completeFtue(unlocksSeen);
