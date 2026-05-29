@@ -21,7 +21,18 @@ const LETTER_VALUES: Record<string, number> = {
   K: 5,
   J: 8, X: 8,
   Q: 10, Z: 10,
+  // Hebrew base letters. Sofit forms (ך ם ן ף ץ) are normalized to their base
+  // letter before they ever reach the engine, so only base letters are scored.
+  'א': 1, 'ה': 1, 'ו': 1, 'י': 1, 'ל': 1, 'מ': 1, 'נ': 1, 'ר': 1, 'ש': 1, 'ת': 1,
+  'ב': 2, 'ד': 2, 'כ': 2, 'ס': 2, 'ע': 2, 'פ': 2, 'ק': 2,
+  'ג': 3, 'ח': 3, 'ט': 3, 'צ': 3,
+  'ז': 4,
 };
+
+/** Per-tile value for a single character (0 if unknown), case-insensitive. */
+export function letterValue(ch: string): number {
+  return LETTER_VALUES[ch.toUpperCase()] ?? 0;
+}
 
 /** Scrabble letter-value sum (A–Z only, case-insensitive). */
 export function letterScore(word: string): number {

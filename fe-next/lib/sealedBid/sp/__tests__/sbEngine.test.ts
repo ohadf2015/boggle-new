@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   letterScore,
+  letterValue,
   canFormFromRack,
   resolveRound,
   initialSbState,
@@ -9,7 +10,7 @@ import {
   MIN_WORD_LEN,
   type SbRound,
 } from '../sbEngine';
-import { SEALED_BID_ROUNDS, pickRounds, ROUNDS_PER_GAME } from '../rounds';
+import { SEALED_BID_ROUNDS, SEALED_BID_ROUNDS_HE, pickRounds, ROUNDS_PER_GAME } from '../rounds';
 
 const ROUNDS: SbRound[] = [
   { rack: 'TRAINED', botPick: 'TRAIN' },
@@ -29,6 +30,26 @@ describe('letterScore', () => {
     expect(letterScore('CA T')).toBe(5);
     expect(letterScore('')).toBe(0);
   });
+
+  it('scores Hebrew base letters (sofit forms are normalized to base upstream)', () => {
+    // ש1+ל1+ו1+מ1 = 4 (all common letters worth 1)
+    expect(letterScore('שלומ')).toBe(4);
+    // every base letter contributes, none score 0
+    expect(letterScore('כלבימ')).toBeGreaterThan(0);
+  });
+});
+
+describe('letterValue', () => {
+  it('returns the per-tile value for a single character (case-insensitive)', () => {
+    expect(letterValue('Q')).toBe(10);
+    expect(letterValue('a')).toBe(1);
+    expect(letterValue('ש')).toBe(1);
+    expect(letterValue('ז')).toBe(4);
+  });
+  it('returns 0 for an unknown / empty character', () => {
+    expect(letterValue('')).toBe(0);
+    expect(letterValue(' ')).toBe(0);
+  });
 });
 
 describe('canFormFromRack', () => {
@@ -45,6 +66,15 @@ describe('canFormFromRack', () => {
 
   it('rejects words using letters not in the rack', () => {
     expect(canFormFromRack('ZEBRA', 'TRAINED')).toBe(false);
+  });
+
+  it('handles Hebrew base letters (multiset) without treating them as stray chars', () => {
+    // שלומ formable from rack שלומחת
+    expect(canFormFromRack('שלומ', 'שלומחת')).toBe(true);
+    // word needs a letter the rack lacks → false (must not pass vacuously)
+    expect(canFormFromRack('דגים', 'שלומחת')).toBe(false);
+    // needs מ twice but rack has one
+    expect(canFormFromRack('ממש', 'שלומחת')).toBe(false);
   });
 });
 
@@ -159,5 +189,28 @@ describe('curated rounds integrity', () => {
     const picked = pickRounds(ROUNDS_PER_GAME);
     expect(picked).toHaveLength(ROUNDS_PER_GAME);
     expect(new Set(picked.map((r) => r.rack)).size).toBe(ROUNDS_PER_GAME);
+  });
+
+  it('every Hebrew botPick is formable from its (base-form) rack and long enough', () => {
+    expect(SEALED_BID_ROUNDS_HE.length).toBeGreaterThanOrEqual(ROUNDS_PER_GAME);
+    for (const { rack, botPick } of SEALED_BID_ROUNDS_HE) {
+      expect(canFormFromRack(botPick, rack), `${botPick} from ${rack}`).toBe(true);
+      expect(botPick.length, `botPick ${botPick}`).toBeGreaterThanOrEqual(MIN_WORD_LEN);
+      // base form only — no sofit letters stored in the engine layer
+      expect(/[ךםןףץ]/.test(rack + botPick), `${rack}/${botPick} has sofit`).toBe(false);
+    }
+  });
+
+  it('pickRounds(count, "he") draws from the Hebrew pool', () => {
+    const picked = pickRounds(ROUNDS_PER_GAME, 'he');
+    expect(picked).toHaveLength(ROUNDS_PER_GAME);
+    const heRacks = new Set(SEALED_BID_ROUNDS_HE.map((r) => r.rack));
+    for (const r of picked) expect(heRacks.has(r.rack), `${r.rack} is Hebrew`).toBe(true);
+  });
+
+  it('pickRounds defaults to English for unsupported locales', () => {
+    const picked = pickRounds(ROUNDS_PER_GAME, 'sv');
+    const enRacks = new Set(SEALED_BID_ROUNDS.map((r) => r.rack));
+    for (const r of picked) expect(enRacks.has(r.rack), `${r.rack} is English`).toBe(true);
   });
 });

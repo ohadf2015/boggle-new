@@ -444,7 +444,7 @@ export function LandingChallengeCards({
             <ModeCard
               title={t('landing.shiritoriMode')}
               description={t('landing.shiritoriModeDesc')}
-              href={`/${language}/shiritori`}
+              href={`/${language}/shiritori/solo`}
               icon={<ScrollText className="w-6 h-6" />}
               variant="cyan"
               badge="ADMIN"

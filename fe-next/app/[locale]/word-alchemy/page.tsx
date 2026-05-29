@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { FlaskConical, ArrowRight, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { HowToPlayCard } from '@/components/common/HowToPlayCard';
+import { applyHebrewFinalLetters, HEBREW_FINAL_TO_REGULAR } from '@/shared/utils/wordNormalization';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -50,9 +52,21 @@ export interface AlchemyPuzzle {
   steps: AlchemyStep[];
 }
 
-/** Uppercase + strip everything that isn't an A–Z letter. */
+/**
+ * Normalize a guess to the canonical answer form, language-agnostically:
+ * English letters are uppercased and kept; Hebrew letters are kept as-is (no
+ * case) with sofit/final forms folded to their base letter (ם→מ, ן→נ, …) so a
+ * player can type either form; everything else (spaces, punctuation, niqqud) is
+ * stripped. Curated answers are stored in this same base form.
+ */
 export function normalizeGuess(input: string): string {
-  return input.toUpperCase().replace(/[^A-Z]/g, '');
+  let out = '';
+  for (const ch of input.toUpperCase()) {
+    if (ch >= 'A' && ch <= 'Z') out += ch;                       // English A–Z
+    else if (HEBREW_FINAL_TO_REGULAR[ch]) out += HEBREW_FINAL_TO_REGULAR[ch]; // sofit → base
+    else if (ch >= 'א' && ch <= 'ת') out += ch;        // Hebrew base letters
+  }
+  return out;
 }
 
 /** Exact-match a player's guess against a step's curated answer. */
@@ -136,12 +150,77 @@ export const PUZZLES: AlchemyPuzzle[] = [
   },
 ];
 
+/**
+ * Hebrew chains for the /he playtest. Stored in BASE-letter form (no sofit) so
+ * `normalizeGuess` matches them whether the player types base or final letters;
+ * the UI applies sofit only for display. Every op genuinely maps the prior word
+ * to the answer (reverse/anagram/add/remove/change — the mechanical ops, which
+ * transfer cleanly to Hebrew; synonym/homophone are skipped here since Hebrew
+ * phonetics make homophones unreliable). All words verified against the he list.
+ */
+export const PUZZLES_HE: AlchemyPuzzle[] = [
+  {
+    id: 'h1',
+    start: 'רוח', // wind
+    steps: [
+      { op: 'reverse', answer: 'חור' },       // hole — רוח reversed
+      { op: 'changeLetter', answer: 'חול' },   // sand — ר→ל
+    ],
+  },
+  {
+    id: 'h2',
+    start: 'ספר', // book
+    steps: [
+      { op: 'anagram', answer: 'פרס' },        // prize — same letters
+      { op: 'addLetter', answer: 'פרסה' },     // hoof — +ה
+    ],
+  },
+  {
+    id: 'h3',
+    start: 'כלב', // dog
+    steps: [
+      { op: 'changeLetter', answer: 'כלא' },   // prison — ב→א
+      { op: 'changeLetter', answer: 'מלא' },   // full — כ→מ
+    ],
+  },
+  {
+    id: 'h4',
+    start: 'שמלה', // dress
+    steps: [
+      { op: 'removeLetter', answer: 'מלה' },   // word — −ש
+      { op: 'anagram', answer: 'להמ' },        // "to them" (להם) — same letters
+    ],
+  },
+  {
+    id: 'h5',
+    start: 'אור', // light
+    steps: [
+      { op: 'addLetter', answer: 'אורז' },     // rice — +ז
+      { op: 'changeLetter', answer: 'אורח' },  // guest — ז→ח
+    ],
+  },
+  {
+    id: 'h6',
+    start: 'חתול', // cat
+    steps: [
+      { op: 'removeLetter', answer: 'חול' },   // sand — −ת
+      { op: 'reverse', answer: 'לוח' },        // board — חול reversed
+    ],
+  },
+];
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function WordAlchemyPage() {
   const { t } = useLanguage();
   const { isAdmin } = useAuth();
   const { playSound } = useSoundEffects();
+  const routeParams = useParams<{ locale: string }>();
+  const isHe = (routeParams?.locale ?? 'en') === 'he';
+  const puzzles = isHe ? PUZZLES_HE : PUZZLES;
+  const dir = isHe ? 'rtl' : 'ltr';
+  // Hebrew words are stored base-form; show final (sofit) letters in the UI.
+  const display = (w: string) => (isHe ? applyHebrewFinalLetters(w) : w);
 
   const [puzzleIdx, setPuzzleIdx] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
@@ -152,7 +231,7 @@ export default function WordAlchemyPage() {
   const flaskRef = useRef<HTMLSpanElement>(null);
   const wonFxFiredRef = useRef(false);
 
-  const puzzle = PUZZLES[puzzleIdx];
+  const puzzle = puzzles[puzzleIdx];
   const won = stepIdx >= puzzle.steps.length;
   const step = won ? null : puzzle.steps[stepIdx];
 
@@ -267,26 +346,26 @@ export default function WordAlchemyPage() {
             {t('wordAlchemy.instructions')}
           </p>
           <p className="font-neo-body text-xs text-neo-white">
-            {t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: PUZZLES.length })}
+            {t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: puzzles.length })}
           </p>
         </header>
 
-        {/* Chain so far — word tokens stay LTR even in Hebrew */}
+        {/* Chain so far — flows with the locale's direction (RTL for Hebrew). */}
         <div
-          dir="ltr"
+          dir={dir}
           className="flex flex-wrap items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard"
         >
           {chain.map((word, i) => (
             <span key={`${word}-${i}`} className="flex items-center gap-2">
-              {i > 0 && <ArrowRight className="h-4 w-4 text-neo-purple-light" strokeWidth={3} aria-hidden="true" />}
+              {i > 0 && <ArrowRight className="h-4 w-4 text-neo-purple-light rtl:rotate-180" strokeWidth={3} aria-hidden="true" />}
               <span className="rounded-neo border-2 border-black bg-neo-cyan px-3 py-1.5 font-neo-display font-black text-lg uppercase tracking-wide text-neo-navy shadow-hard-sm">
-                {word}
+                {display(word)}
               </span>
             </span>
           ))}
           {!won && (
             <span className="flex items-center gap-2">
-              <ArrowRight className="h-4 w-4 text-neo-purple-light" strokeWidth={3} aria-hidden="true" />
+              <ArrowRight className="h-4 w-4 text-neo-purple-light rtl:rotate-180" strokeWidth={3} aria-hidden="true" />
               <span className="rounded-neo border-2 border-dashed border-neo-white/40 px-3 py-1.5 font-neo-display font-black text-lg uppercase tracking-[0.3em] text-neo-white">
                 {showHint ? revealHint(step!.answer, wrongCount) : '?'}
               </span>
@@ -303,7 +382,7 @@ export default function WordAlchemyPage() {
             <p className="font-neo-body text-sm text-neo-navy/80">{t('wordAlchemy.wonSubtitle')}</p>
             <button
               type="button"
-              onClick={() => resetPuzzle((puzzleIdx + 1) % PUZZLES.length)}
+              onClick={() => resetPuzzle((puzzleIdx + 1) % puzzles.length)}
               className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:animate-neo-press motion-reduce:active:animate-none"
             >
               <ArrowRight className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
@@ -318,7 +397,7 @@ export default function WordAlchemyPage() {
                 {t('wordAlchemy.stepProgress', { n: stepIdx + 1, total: puzzle.steps.length })}
               </p>
               <p className="font-neo-display font-black text-lg text-neo-white">
-                <span dir="ltr" className="text-neo-cyan">{prevWord}</span>
+                <span dir={dir} className="text-neo-cyan">{display(prevWord)}</span>
                 <span className="mx-2 text-neo-white">·</span>
                 <span className="text-neo-purple-light">{opLabel}</span>
               </p>
@@ -328,7 +407,7 @@ export default function WordAlchemyPage() {
             <input
               ref={inputRef}
               type="text"
-              dir="ltr"
+              dir={dir}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               autoFocus

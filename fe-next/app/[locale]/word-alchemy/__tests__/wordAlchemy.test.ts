@@ -5,6 +5,7 @@ import {
   revealHint,
   ALCHEMY_OPS,
   PUZZLES,
+  PUZZLES_HE,
 } from '../page';
 
 /**
@@ -31,6 +32,31 @@ describe('checkGuess', () => {
   it('rejects wrong words', () => {
     expect(checkGuess('beer', 'BEAR')).toBe(false);
     expect(checkGuess('', 'BEAR')).toBe(false);
+  });
+});
+
+describe('normalizeGuess — Hebrew', () => {
+  it('keeps Hebrew letters and strips non-letters', () => {
+    expect(normalizeGuess('חתול')).toBe('חתול');
+    expect(normalizeGuess(' חור! ')).toBe('חור');
+  });
+
+  it('normalizes sofit (final) letters to their base form so either typed form matches', () => {
+    // ם → מ, ן → נ, etc. — the answer is stored base-form.
+    expect(normalizeGuess('שלום')).toBe('שלומ');
+    expect(normalizeGuess('להם')).toBe('להמ');
+  });
+
+  it('does not mangle English when mixed casing is used (regression guard)', () => {
+    expect(normalizeGuess('Re-Bar')).toBe('REBAR');
+  });
+});
+
+describe('checkGuess — Hebrew', () => {
+  it('matches a sofit-typed guess against a base-form answer', () => {
+    expect(checkGuess('שלום', 'שלומ')).toBe(true); // player types final mem
+    expect(checkGuess('חול', 'חול')).toBe(true);
+    expect(checkGuess('חור', 'חול')).toBe(false);
   });
 });
 
@@ -81,5 +107,45 @@ describe('PUZZLES integrity', () => {
   it('puzzle ids are unique', () => {
     const ids = PUZZLES.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe('PUZZLES_HE integrity (Hebrew content)', () => {
+  it('ships at least four hand-authored Hebrew puzzles', () => {
+    expect(PUZZLES_HE.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('stores only base-form Hebrew (no sofit letters) so normalizeGuess is a no-op on answers', () => {
+    const sofit = /[ךםןףץ]/;
+    for (const p of PUZZLES_HE) {
+      expect(sofit.test(p.start), `start ${p.start} has sofit`).toBe(false);
+      for (const step of p.steps) {
+        expect(sofit.test(step.answer), `answer ${step.answer} has sofit`).toBe(false);
+        // answer is already normalized (no stray chars, no case change)
+        expect(normalizeGuess(step.answer)).toBe(step.answer);
+      }
+    }
+  });
+
+  it('every Hebrew step uses a known op and an answer that differs from the prior word', () => {
+    for (const p of PUZZLES_HE) {
+      expect(p.id).toBeTruthy();
+      expect(p.steps.length).toBeGreaterThanOrEqual(2);
+      let prev = normalizeGuess(p.start);
+      for (const step of p.steps) {
+        expect(ALCHEMY_OPS).toContain(step.op);
+        const answer = normalizeGuess(step.answer);
+        expect(answer.length).toBeGreaterThan(0);
+        expect(answer).not.toBe(prev);
+        prev = answer;
+      }
+    }
+  });
+
+  it('Hebrew puzzle ids are unique and distinct from English ids', () => {
+    const heIds = PUZZLES_HE.map((p) => p.id);
+    expect(new Set(heIds).size).toBe(heIds.length);
+    const enIds = new Set(PUZZLES.map((p) => p.id));
+    for (const id of heIds) expect(enIds.has(id), `${id} collides with English`).toBe(false);
   });
 });

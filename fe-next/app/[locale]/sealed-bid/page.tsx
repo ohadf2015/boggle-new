@@ -1,33 +1,46 @@
 'use client';
 
 /**
- * Sealed Bid single-player — admin-gated preview. Each round shows a 7-letter
- * rack; the player secretly bids a word, the bot bids the obvious high-value
- * word. Unique bid = double points, clash = half, pass/invalid = zero. Rules
- * live in the pure `sbEngine`; player words go through /api/dictionary/check
- * (lang=en) so we don't ship the full dictionary to the browser.
+ * Sealed Bid single-player — admin-gated preview. Each round shows a letter
+ * rack; the player secretly bids a word by TAPPING tiles (no typing), the bot
+ * bids the obvious high-value word. Unique bid = double points, clash = half,
+ * pass/invalid = zero. Rules live in the pure `sbEngine`; player words go
+ * through /api/dictionary/check (lang follows the locale) so we don't ship the
+ * full dictionary to the browser.
+ *
+ * Hebrew: the engine, rack, and dictionary all work in BASE-letter form (sofit
+ * forms are normalized away in the he word list); we apply final letters only
+ * for display via `toDisplay`, and flip text direction to RTL.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Bot, Gavel, RotateCcw, Send, Sparkles, Trophy, User } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { ArrowLeft, ArrowRight, Bot, Delete, Gavel, RotateCcw, Send, Sparkles, Trophy, User, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import {
   advanceRound,
-  canFormFromRack,
   commitBid,
   initialSbState,
+  letterValue,
   MIN_WORD_LEN,
   type SbState,
 } from '@/lib/sealedBid/sp/sbEngine';
-import { pickRounds } from '@/lib/sealedBid/sp/rounds';
+import { pickRounds, poolForLang, ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
+import { toDisplay, wordFromChosen } from '@/lib/sealedBid/sp/rackBuilder';
 
-async function dictCheckEn(word: string): Promise<boolean> {
+async function dictCheck(word: string, lang: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/dictionary/check?lang=en&word=${encodeURIComponent(word)}`);
+    // The route is POST-only and reads { word, language } from the JSON body —
+    // a GET with query params 405s (which silently rejected every bid before).
+    const res = await fetch('/api/dictionary/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word, language: lang }),
+    });
     if (!res.ok) return false;
     const data: { isValid?: boolean } = await res.json();
     return !!data.isValid;
@@ -36,25 +49,41 @@ async function dictCheckEn(word: string): Promise<boolean> {
   }
 }
 
-export default function SealedBidPage({ params }: { params: Promise<{ locale: string }> }) {
+export default function SealedBidPage() {
   const { t } = useLanguage();
   const { isAdmin } = useAuth();
   const { playSound } = useSoundEffects();
-  const [locale, setLocale] = useState<string>('en');
-  useEffect(() => { params.then(({ locale: l }) => setLocale(l)); }, [params]);
+  const params = useParams<{ locale: string }>();
+  const locale = params?.locale ?? 'en';
+  const isHe = locale === 'he';
+  const dir = isHe ? 'rtl' : 'ltr';
+  const dictLang = isHe ? 'he' : 'en';
 
-  const [state, setState] = useState<SbState>(() => initialSbState(pickRounds()));
-  const [input, setInput] = useState('');
+  // SSR-safe init: a DETERMINISTIC slice (no Math.random in render → no
+  // hydration mismatch). We shuffle to a random draw in a mount effect below.
+  const [state, setState] = useState<SbState>(() => initialSbState(poolForLang(locale).slice(0, ROUNDS_PER_GAME)));
+  const [chosen, setChosen] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const builtRef = useRef<HTMLDivElement>(null);
   const revealRef = useRef<HTMLDivElement>(null);
+  const didShuffleRef = useRef(false);
+
+  // Randomize the round order once, on the client only (post-hydration).
+  useEffect(() => {
+    if (didShuffleRef.current) return;
+    didShuffleRef.current = true;
+    setState(initialSbState(pickRounds(ROUNDS_PER_GAME, locale)));
+    setChosen([]);
+  }, [locale]);
 
   const round = state.rounds[state.index];
   const result = state.lastResult;
+  const word = useMemo(() => wordFromChosen(round?.rack ?? '', chosen), [round, chosen]);
+  const canLock = word.length >= MIN_WORD_LEN && !pending;
 
-  const shakeInput = useCallback(() => {
-    const el = inputRef.current;
+  const shakeBuilt = useCallback(() => {
+    const el = builtRef.current;
     const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (el && !reduce) {
       el.classList.remove('animate-neo-shake');
@@ -85,40 +114,42 @@ export default function SealedBidPage({ params }: { params: Promise<{ locale: st
   }, [state.phase, playSound]);
 
   const newGame = useCallback(() => {
-    setState(initialSbState(pickRounds()));
-    setInput('');
+    setState(initialSbState(pickRounds(ROUNDS_PER_GAME, locale)));
+    setChosen([]);
     setError(null);
-  }, []);
+  }, [locale]);
+
+  const tapTile = useCallback((i: number) => {
+    if (state.phase !== 'bidding' || pending) return;
+    setChosen((c) => (c.includes(i) ? c : [...c, i]));
+    if (error) setError(null);
+  }, [state.phase, pending, error]);
+
+  const backspace = useCallback(() => setChosen((c) => c.slice(0, -1)), []);
+  const clear = useCallback(() => { setChosen([]); setError(null); }, []);
 
   const lockIn = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (state.phase !== 'bidding' || pending) return;
-    const word = input.trim();
-    if (!word) return;
+    if (word.length < MIN_WORD_LEN) return; // guarded by canLock; defensive
     setError(null);
-    if (word.length < MIN_WORD_LEN || !canFormFromRack(word, round.rack)) {
-      setError(t('sealedBid.err.notInRack'));
-      playSound('wordRejected');
-      shakeInput();
-      return;
-    }
     setPending(true);
-    const ok = await dictCheckEn(word);
+    const ok = await dictCheck(word, dictLang);
     setPending(false);
     if (!ok) {
       setError(t('sealedBid.err.notWord'));
       playSound('wordRejected');
-      shakeInput();
+      shakeBuilt();
       return;
     }
     setState((s) => commitBid(s, word, true));
-    setInput('');
-  }, [input, state.phase, pending, round, t, playSound, shakeInput]);
+    setChosen([]);
+  }, [word, dictLang, state.phase, pending, t, playSound, shakeBuilt]);
 
   const pass = useCallback(() => {
     if (state.phase !== 'bidding' || pending) return;
     setState((s) => commitBid(s, null, false));
-    setInput('');
+    setChosen([]);
     setError(null);
   }, [state.phase, pending]);
 
@@ -141,12 +172,14 @@ export default function SealedBidPage({ params }: { params: Promise<{ locale: st
         : 'sealedBid.resultNone'
     : '';
 
+  const usedTiles = new Set(chosen);
+
   return (
     <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-8">
       <div className="mx-auto w-full max-w-2xl space-y-5">
         <header className="flex items-center justify-between">
           <Link href={`/${locale}`} className="inline-flex items-center gap-1.5 font-neo-body text-sm text-neo-white">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             {t('sealedBid.title')}
           </Link>
           <span className="inline-flex items-center gap-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white">
@@ -169,16 +202,30 @@ export default function SealedBidPage({ params }: { params: Promise<{ locale: st
           </span>
         </div>
 
-        {/* The rack */}
-        <div dir="ltr" className="flex flex-wrap items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard">
-          {round.rack.split('').map((ch, i) => (
-            <span
-              key={`${ch}-${i}`}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-neo border-2 border-black bg-neo-cream font-neo-display font-black text-2xl text-neo-navy shadow-hard-sm"
-            >
-              {ch}
-            </span>
-          ))}
+        {/* The rack — tappable tiles. Used tiles dim out. */}
+        <div dir={dir} className="flex flex-wrap items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard">
+          {round.rack.split('').map((ch, i) => {
+            const used = usedTiles.has(i);
+            const disabled = used || state.phase !== 'bidding' || pending;
+            return (
+              <button
+                key={`${ch}-${i}`}
+                type="button"
+                onClick={() => tapTile(i)}
+                disabled={disabled}
+                aria-label={ch}
+                className={`relative inline-flex h-12 w-12 items-center justify-center rounded-neo border-2 border-black font-neo-display font-black text-2xl shadow-hard-sm transition-transform ${
+                  used ? 'bg-neo-navy text-neo-white/30' : 'bg-neo-cream text-neo-navy hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed'
+                } disabled:cursor-default`}
+              >
+                {/* Tiles show the BASE glyph — sofit forms only appear at word end (built strip / reveal). */}
+                {ch}
+                <span className="absolute -top-1.5 ltr:-right-1.5 rtl:-left-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-black bg-neo-cyan px-1 font-neo-body text-[10px] font-bold leading-none text-neo-navy">
+                  {letterValue(ch)}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {state.phase === 'done' ? (
@@ -200,14 +247,14 @@ export default function SealedBidPage({ params }: { params: Promise<{ locale: st
         ) : state.phase === 'revealed' && result ? (
           <div ref={revealRef} className="rounded-neo border-3 border-black bg-neo-navy-light p-5 text-center shadow-hard-lg space-y-3">
             <p className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">{t('sealedBid.revealPhase')}</p>
-            <div dir="ltr" className="flex items-center justify-center gap-4">
+            <div dir={dir} className="flex items-center justify-center gap-4">
               <div className="space-y-1">
                 <p className="inline-flex items-center gap-1 font-neo-body text-xs text-neo-white/80"><User className="h-3.5 w-3.5" />{t('sealedBid.youPicked')}</p>
-                <p className="rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm">{result.playerWord || '—'}</p>
+                <p className="rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm">{result.playerWord ? toDisplay(result.playerWord) : '—'}</p>
               </div>
               <div className="space-y-1">
                 <p className="inline-flex items-center gap-1 font-neo-body text-xs text-neo-white/80"><Bot className="h-3.5 w-3.5" />{t('sealedBid.botPicked')}</p>
-                <p className="rounded-neo border-2 border-black bg-neo-pink px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm">{result.botWord}</p>
+                <p className="rounded-neo border-2 border-black bg-neo-pink px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm">{toDisplay(result.botWord)}</p>
               </div>
             </div>
             <p className={`inline-flex items-center justify-center gap-1.5 font-neo-display font-black text-lg uppercase ${result.outcome === 'unique' ? 'text-neo-lime' : result.outcome === 'clash' ? 'text-neo-orange' : 'text-neo-white/70'}`}>
@@ -221,30 +268,48 @@ export default function SealedBidPage({ params }: { params: Promise<{ locale: st
               className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-cyan px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
             >
               {t('sealedBid.nextRound')}
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </button>
           </div>
         ) : (
           <form onSubmit={lockIn} className="space-y-3">
             <p className="text-center font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">{t('sealedBid.sealPhase')}</p>
-            <input
-              ref={inputRef}
-              type="text"
-              dir="ltr"
-              value={input}
-              onChange={(e) => { setInput(e.target.value.toUpperCase()); if (error) setError(null); }}
-              placeholder={t('sealedBid.timerLabel')}
-              aria-label={t('sealedBid.timerLabel')}
-              autoComplete="off"
-              spellCheck={false}
-              disabled={pending}
-              className="w-full rounded-neo border-3 border-black bg-neo-cream px-4 py-3 text-center font-neo-display font-black text-xl uppercase tracking-widest text-neo-navy shadow-hard outline-none focus:border-neo-cyan disabled:opacity-50"
-            />
+
+            {/* Built word — a single bidi-correct run (so Hebrew reads RTL) with a backspace + clear. */}
+            <div className="flex items-center gap-2">
+              <div
+                ref={builtRef}
+                dir={dir}
+                aria-live="polite"
+                className="flex min-h-[56px] flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-cream px-4 py-3 font-neo-display font-black text-2xl tracking-widest text-neo-navy shadow-hard"
+              >
+                {word ? toDisplay(word) : <span className="font-neo-body text-sm font-normal tracking-normal text-neo-navy/50">{t('sealedBid.tapHint')}</span>}
+              </div>
+              <button
+                type="button"
+                onClick={backspace}
+                disabled={chosen.length === 0 || pending}
+                aria-label={t('sealedBid.backspace')}
+                className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
+              >
+                <Delete className="h-5 w-5 rtl:rotate-180" />
+              </button>
+              <button
+                type="button"
+                onClick={clear}
+                disabled={chosen.length === 0 || pending}
+                aria-label={t('sealedBid.clear')}
+                className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
             {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
             <div className="flex gap-2">
               <button
                 type="submit"
-                disabled={pending}
+                disabled={!canLock}
                 className="flex flex-1 items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard disabled:opacity-50"
               >
                 <Send className="h-4 w-4" />

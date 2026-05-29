@@ -221,13 +221,15 @@ describe('LandingChallengeCards — Shiritori admin dev-preview gate', () => {
     expect(screen.queryByTestId('mode-landing.shiritoriMode')).toBeNull();
   });
 
-  it('renders the Shiritori card for an admin with /shiritori href', () => {
+  it('renders the Shiritori card for an admin linking to the playable solo route', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
     const card = screen.getByTestId('mode-landing.shiritoriMode');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/shiritori');
+    // Card must start the game, not dump the user on the /shiritori marketing
+    // page whose primary CTA bounces to /multiplayer.
+    expect(card.getAttribute('data-href')).toBe('/en/shiritori/solo');
   });
 });
 

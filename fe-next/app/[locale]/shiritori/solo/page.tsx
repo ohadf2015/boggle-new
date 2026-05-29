@@ -44,7 +44,13 @@ function pickSeed(d: Difficulty): string {
 
 async function dictCheckJa(word: string): Promise<boolean> {
   try {
-    const res = await fetch(`/api/dictionary/check?lang=ja&word=${encodeURIComponent(word)}`);
+    // POST-only route reading { word, language } from the body — a GET 405s and
+    // silently rejected every player word.
+    const res = await fetch('/api/dictionary/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word, language: 'ja' }),
+    });
     if (!res.ok) return false;
     const data: { isValid?: boolean } = await res.json();
     return !!data.isValid;
