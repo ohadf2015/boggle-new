@@ -34,6 +34,7 @@ import { mountAmbientSparkles, type PremiumCellRef } from '@/lib/word-craft/pixi
 import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
 import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleCommit';
 import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
+import { recordBest } from '@/lib/word-craft/bestScore';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { classifyHeat, detectHeatTransition, type HeatBeat } from '@/lib/word-craft/celebration/heatTransition';
 import { WordCraftHeatStamp } from '@/components/word-craft/WordCraftHeatStamp';
@@ -152,7 +153,13 @@ export default function WordCraftPageClient() {
   // Audio: activates the SFX gate + in-game music on mount, fires heat-beat /
   // capture / game-over sounds as state transitions, and exposes playCommit for
   // the per-word celebration. WordCraft was silent before this.
-  const { playCommit: playCommitSound } = useWordCraftSound(
+  const {
+    playCommit: playCommitSound,
+    playOpponentScored,
+    playPass: playPassSound,
+    playSwap: playSwapSound,
+    playNewBest,
+  } = useWordCraftSound(
     {
       heat: game.state.heat,
       overdrive: game.state.overdrive,
@@ -433,6 +440,8 @@ export default function WordCraftPageClient() {
           // Pixi animations can fail on low-end devices; silently continue
         });
       }
+      // Audio twin of the bot reveal — the opponent scoring was silent before.
+      if (newest.score > 0) playOpponentScored();
     }
     if (newest.who === 'player' && placedEls.length > 0) {
       juice.playerCommitReveal(placedEls);
@@ -510,7 +519,7 @@ export default function WordCraftPageClient() {
         setScoreFloat((prev) => prev ? { ...prev, overdrive: true } : prev);
       }
     }
-  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode, playCommitSound]);
+  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode, playCommitSound, playOpponentScored]);
 
   // --- Overdrive enter ---
   const prevOverdriveRef = useRef(false);
@@ -598,6 +607,8 @@ export default function WordCraftPageClient() {
   }, []);
 
   // --- Game over ---
+  const [newBest, setNewBest] = useState(false);
+  const recordedBestRef = useRef(false);
   useEffect(() => {
     if (game.state.turn === 'over') {
       setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
@@ -607,8 +618,21 @@ export default function WordCraftPageClient() {
           // Pixi animations can fail on low-end devices; silently continue
         });
       }
+      // Personal best (SP vs bot only — hotseat has two human seats, no "mine").
+      if (!hotseat && !recordedBestRef.current) {
+        recordedBestRef.current = true;
+        const mode = territoryEnabled ? 'territory' : 'classic';
+        const { isNewBest } = recordBest(mode, game.state.player.score);
+        if (isNewBest) {
+          setNewBest(true);
+          playNewBest();
+        }
+      }
+    } else {
+      recordedBestRef.current = false;
+      setNewBest(false);
     }
-  }, [game.state.turn, sceneCtx]);
+  }, [game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, playNewBest]);
 
   // --- Error shake ---
   const lastErrorRef = useRef<string | null>(null);
@@ -888,9 +912,13 @@ export default function WordCraftPageClient() {
           disabled={!canInteract || !dict || game.state.burnout}
           onSubmit={submitMoveWithTelemetry}
           onRecall={recallAllPending}
-          onPass={game.pass}
+          onPass={() => {
+            playPassSound();
+            game.pass();
+          }}
           onSwap={() => {
             const toReturn = activeRack.filter((tile) => !pendingIds.has(tile.id));
+            playSwapSound();
             game.swap(toReturn);
           }}
           labels={{
@@ -954,6 +982,7 @@ export default function WordCraftPageClient() {
           botScore={game.state.bot.score}
           playerName={hotseat ? t('wordcraft.player1') : undefined}
           botName={hotseat ? t('wordcraft.player2') : undefined}
+          isNewBest={newBest}
         />
       ) : null}
     </div>

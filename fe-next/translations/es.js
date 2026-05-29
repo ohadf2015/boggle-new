@@ -12312,6 +12312,7 @@ const es = {
     },
     "gameOver": "Fin del juego",
     "winnerLabel": "¡{{name}} gana!",
+    "newBest": "¡Nuevo récord!",
     "bagRemaining": "Bolsa",
     "yourRack": "Tu atril",
     "submit": "Jugar",

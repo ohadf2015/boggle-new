@@ -12203,6 +12203,7 @@ const en = {
     },
     "gameOver": "Game over",
     "winnerLabel": "{{name}} wins!",
+    "newBest": "New Best!",
     "bagRemaining": "Bag",
     "yourRack": "Your rack",
     "submit": "Submit",

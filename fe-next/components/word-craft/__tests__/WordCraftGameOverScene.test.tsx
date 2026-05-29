@@ -60,7 +60,7 @@ describe('WordCraftGameOverScene', () => {
     expect(banner?.textContent).not.toContain('wordcraft.bot');
   });
 
-  it('has proper positioning and z-index', () => {
+  it('has proper positioning and z-index (on the floating wrapper)', () => {
     const { container } = render(
       <WordCraftGameOverScene
         t={t}
@@ -68,8 +68,21 @@ describe('WordCraftGameOverScene', () => {
         botScore={50}
       />
     );
-    const banner = container.querySelector('[role="status"]');
-    expect(banner?.className).toContain('z-40');
-    expect(banner?.className).toContain('bottom-');
+    const wrapper = container.firstElementChild;
+    expect(wrapper?.className).toContain('z-40');
+    expect(wrapper?.className).toContain('bottom-');
+  });
+
+  it('shows the New Best badge only when isNewBest is set', () => {
+    const without = render(
+      <WordCraftGameOverScene t={t} playerScore={120} botScore={80} />
+    );
+    expect(without.queryByText(/wordcraft.newBest/)).toBeNull();
+    without.unmount();
+
+    render(
+      <WordCraftGameOverScene t={t} playerScore={120} botScore={80} isNewBest />
+    );
+    expect(screen.getByText(/wordcraft.newBest/)).toBeTruthy();
   });
 });

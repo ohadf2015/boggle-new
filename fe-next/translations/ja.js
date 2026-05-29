@@ -12198,6 +12198,7 @@ const ja = {
     },
     "gameOver": "ゲーム終了",
     "winnerLabel": "{{name}}の勝ち!",
+    "newBest": "自己ベスト更新!",
     "bagRemaining": "袋",
     "yourRack": "あなたのラック",
     "submit": "決定",

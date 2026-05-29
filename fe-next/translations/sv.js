@@ -12224,6 +12224,7 @@ const sv = {
     },
     "gameOver": "Spelet är slut",
     "winnerLabel": "{{name}} vinner!",
+    "newBest": "Nytt rekord!",
     "bagRemaining": "Påse",
     "yourRack": "Ditt ställ",
     "submit": "Skicka",

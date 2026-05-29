@@ -107,5 +107,14 @@ export function useWordCraftSound(state: WordCraftSoundState, cosyMode: boolean)
     [cosyMode, playSound],
   );
 
-  return { playCommit };
+  // --- discrete feedback for moments that were silent before --------------
+  const playOpponentScored = useCallback(() => playSound('opponentScored', {}), [playSound]);
+  const playPass = useCallback(() => playSound('menuClose', {}), [playSound]);
+  const playSwap = useCallback(() => playSound('boardShuffle', {}), [playSound]);
+  const playNewBest = useCallback(
+    () => playSound('achievement', { requiresGameActive: false }),
+    [playSound],
+  );
+
+  return { playCommit, playOpponentScored, playPass, playSwap, playNewBest };
 }

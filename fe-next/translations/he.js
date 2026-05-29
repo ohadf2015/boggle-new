@@ -12605,6 +12605,7 @@ const he = {
     },
     "gameOver": "המשחק נגמר",
     "winnerLabel": "{{name}} ניצח!",
+    "newBest": "שיא חדש!",
     "bagRemaining": "שק",
     "yourRack": "האותיות שלך",
     "submit": "שלח",

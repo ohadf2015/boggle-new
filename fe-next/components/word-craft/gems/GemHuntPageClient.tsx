@@ -25,6 +25,9 @@ import type { AbilityCard, AbilityKind } from '@/lib/word-craft/gems/types';
 import { planGemDrama, clampGemDramaForCosy } from '@/lib/word-craft/celebration/gemDrama';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useMusic } from '@/contexts/MusicContext';
+import type { SoundEffectKey } from '@/lib/audio/soundEffectsConfig';
 
 export default function GemHuntPageClient() {
   const router = useRouter();
@@ -59,6 +62,29 @@ export default function GemHuntPageClient() {
   const { state } = hunt;
   const { cosyMode } = useAccessibility();
 
+  // Audio: Gem Hunt was fully silent — no music, no collect rings, no win sting.
+  const { playSound, setGameActive } = useSoundEffects();
+  const { fadeToTrack, stopMusic, TRACKS } = useMusic();
+  useEffect(() => {
+    setGameActive(true);
+    fadeToTrack(TRACKS.IN_GAME, 600, 600);
+    return () => {
+      setGameActive(false);
+      stopMusic(500);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Win / loss sting (drama.soundKey handles per-gem collect rings below).
+  const prevOutcomeRef = useRef<typeof state.outcome>(null);
+  useEffect(() => {
+    if (state.outcome && state.outcome !== prevOutcomeRef.current) {
+      playSound(state.outcome === 'won' ? 'crownVictory' : 'defeatSting', { requiresGameActive: false });
+      stopMusic(500);
+    }
+    prevOutcomeRef.current = state.outcome;
+  }, [state.outcome, playSound, stopMusic]);
+
   // GSAP collect burst: when state.lastCollection updates, fly each collected
   // gem's icon from its board cell to its matching inventory chip. Clone the
   // node so the original (now off-board) doesn't disrupt React's children.
@@ -76,6 +102,9 @@ export default function GemHuntPageClient() {
       // the crown down to a shard-equivalent (no freeze, sparkle only).
       const dramaRaw = planGemDrama({ rarity: gem.rarity });
       const drama = cosyMode ? clampGemDramaForCosy(dramaRaw) : dramaRaw;
+      // Rarity-scaled collect ring — the gemDrama plan already names the key
+      // (coinCollect for shards, achievement for crowns); it was never played.
+      if (drama.soundKey) playSound(drama.soundKey as SoundEffectKey, {});
       if (drama.sharedFxPreset && SharedFxApp.isInitialized()) {
         const dstCenter = targetEl.getBoundingClientRect();
         SharedFxApp.spawnBurst(
@@ -122,7 +151,7 @@ export default function GemHuntPageClient() {
         },
       });
     }
-  }, [state.lastCollection, state.turnIndex, cosyMode]);
+  }, [state.lastCollection, state.turnIndex, cosyMode, playSound]);
 
   const tilesRemaining = state.bag.tiles.length;
 
