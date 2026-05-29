@@ -50,6 +50,32 @@ const en = {
       }
     }
   },
+  "sealedBid": {
+    "badge": "Sealed Bid",
+    "title": "Sealed Bid",
+    "instructions": "Pick a word nobody else will — unique bids score double!",
+    "roundLabel": "Round {n} of {total}",
+    "totalScore": "Score: {score}",
+    "timerLabel": "Type your word…",
+    "sealPhase": "Seal your bid",
+    "revealPhase": "Reveal",
+    "lockIn": "Lock in",
+    "skip": "Pass",
+    "youPicked": "You picked",
+    "botPicked": "Bot picked",
+    "resultUnique": "Unique! Double points",
+    "resultShared": "Clash — half points",
+    "resultNone": "No bid — 0 points",
+    "pointsEarned": "+{pts} pts",
+    "nextRound": "Next round →",
+    "finalScore": "Final score",
+    "playAgain": "Play again",
+    "adminOnly": "Sealed Bid is an admin-only preview.",
+    "err": {
+      "notInRack": "Use only the rack letters",
+      "notWord": "Not in the dictionary"
+    }
+  },
   "wordAlchemy": {
     "badge": "Word Alchemy",
     "title": "Word Alchemy",
@@ -4938,6 +4964,8 @@ const en = {
     "wordAlchemyModeDesc": "Transform one word into the next",
     "shiritoriMode": "Shiritori",
     "shiritoriModeDesc": "Japanese word chain — last letter starts next",
+    "sealedBidMode": "Sealed Bid",
+    "sealedBidModeDesc": "Pick a word nobody else will — unique bids score double",
     "dailyChallenge": "Daily Challenge",
     "education": "Education",
     "educationDesc": "For teachers & students",

@@ -54,6 +54,32 @@ const ja = {
       }
     }
   },
+  "sealedBid": {
+    "badge": "シールドビッド",
+    "title": "シールドビッド",
+    "instructions": "誰も選ばない単語を選べ — ユニークな入札で得点2倍！",
+    "roundLabel": "ラウンド {n} / {total}",
+    "totalScore": "スコア: {score}",
+    "timerLabel": "単語を入力…",
+    "sealPhase": "入札を封印",
+    "revealPhase": "公開",
+    "lockIn": "確定",
+    "skip": "スキップ",
+    "youPicked": "あなたの選択",
+    "botPicked": "ボットの選択",
+    "resultUnique": "ユニーク！得点2倍",
+    "resultShared": "かぶった — 半分の得点",
+    "resultNone": "未入札 — 0点",
+    "pointsEarned": "+{pts}点",
+    "nextRound": "次のラウンド →",
+    "finalScore": "最終スコア",
+    "playAgain": "もう一度",
+    "adminOnly": "シールドビッドは管理者限定プレビューです。",
+    "err": {
+      "notInRack": "ラックの文字だけを使ってください",
+      "notWord": "辞書にありません"
+    }
+  },
   "wordAlchemy": {
     "howTo": {
       "title": "遊び方",
@@ -4877,6 +4903,8 @@ const ja = {
     "wordAlchemyModeDesc": "1つの単語を次の単語へ変えよう",
     "shiritoriMode": "しりとり",
     "shiritoriModeDesc": "最後の文字で次の単語をつなごう",
+    "sealedBidMode": "シールドビッド",
+    "sealedBidModeDesc": "誰も選ばない単語を選べ — ユニークな入札で得点2倍",
     "dailyChallenge": "デイリーチャレンジ",
     "education": "教育",
     "educationDesc": "教師と生徒向け",

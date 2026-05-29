@@ -54,6 +54,32 @@ const he = {
       }
     }
   },
+  "sealedBid": {
+    "badge": "הצעה חתומה",
+    "title": "הצעה חתומה",
+    "instructions": "בחרו מילה שאף אחד לא יבחר — הצעה ייחודית מכפילה ניקוד!",
+    "roundLabel": "סבב {n} מתוך {total}",
+    "totalScore": "ניקוד: {score}",
+    "timerLabel": "הקלידו מילה…",
+    "sealPhase": "חתמו על הצעתכם",
+    "revealPhase": "חשיפה",
+    "lockIn": "נעל",
+    "skip": "דלג",
+    "youPicked": "בחרתם",
+    "botPicked": "הבוט בחר",
+    "resultUnique": "ייחודי! ניקוד כפול",
+    "resultShared": "התנגשות — חצי ניקוד",
+    "resultNone": "ללא הצעה — 0 ניקוד",
+    "pointsEarned": "+{pts} נקודות",
+    "nextRound": "סבב הבא →",
+    "finalScore": "ניקוד סופי",
+    "playAgain": "שחק שוב",
+    "adminOnly": "הצעה חתומה הוא תצוגה מקדימה למנהלים בלבד.",
+    "err": {
+      "notInRack": "השתמשו רק באותיות מהמאגר",
+      "notWord": "לא נמצא במילון"
+    }
+  },
   "wordAlchemy": {
     "howTo": {
       "title": "איך משחקים",
@@ -4978,6 +5004,8 @@ const he = {
     "wordAlchemyModeDesc": "הפכו מילה אחת למילה הבאה",
     "shiritoriMode": "שיריטורי",
     "shiritoriModeDesc": "שרשרת מילים יפנית — האות האחרונה מתחילה את הבאה",
+    "sealedBidMode": "הצעה חתומה",
+    "sealedBidModeDesc": "בחרו מילה שאף אחד לא יבחר — הצעה ייחודית מכפילה ניקוד",
     "dailyChallenge": "אתגר יומי",
     "education": "חינוך",
     "educationDesc": "למורים ותלמידים",

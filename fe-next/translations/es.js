@@ -50,6 +50,32 @@ const es = {
       }
     }
   },
+  "sealedBid": {
+    "badge": "Puja secreta",
+    "title": "Puja secreta",
+    "instructions": "Elige la palabra que nadie más elegirá — ¡las pujas únicas dan el doble de puntos!",
+    "roundLabel": "Ronda {n} de {total}",
+    "totalScore": "Puntuación: {score}",
+    "timerLabel": "Escribe tu palabra…",
+    "sealPhase": "Sella tu puja",
+    "revealPhase": "Revelación",
+    "lockIn": "Confirmar",
+    "skip": "Pasar",
+    "youPicked": "Elegiste",
+    "botPicked": "El bot eligió",
+    "resultUnique": "¡Única! El doble de puntos",
+    "resultShared": "Choque — la mitad de puntos",
+    "resultNone": "Sin puja — 0 puntos",
+    "pointsEarned": "+{pts} pts",
+    "nextRound": "Siguiente ronda →",
+    "finalScore": "Puntuación final",
+    "playAgain": "Jugar de nuevo",
+    "adminOnly": "Puja secreta es una vista previa solo para administradores.",
+    "err": {
+      "notInRack": "Usa solo las letras del atril",
+      "notWord": "No está en el diccionario"
+    }
+  },
   "wordAlchemy": {
     "badge": "Alquimia de palabras",
     "title": "Alquimia de palabras",
@@ -4926,6 +4952,8 @@ const es = {
     "wordAlchemyModeDesc": "Transforma una palabra en la siguiente",
     "shiritoriMode": "Shiritori",
     "shiritoriModeDesc": "Cadena de palabras japonesa — última letra inicia la siguiente",
+    "sealedBidMode": "Puja secreta",
+    "sealedBidModeDesc": "Elige la palabra que nadie más elegirá — pujas únicas dan el doble",
     "dailyChallenge": "Desafío Diario",
     "education": "Educación",
     "educationDesc": "Para profesores y estudiantes",

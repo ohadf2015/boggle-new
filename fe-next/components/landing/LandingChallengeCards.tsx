@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Gem, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -58,7 +58,8 @@ type LandingCardKey =
   | 'wordVault'
   | 'party'
   | 'wordAlchemy'
-  | 'shiritori';
+  | 'shiritori'
+  | 'sealedBid';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
@@ -72,7 +73,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic',
   'wordForge', 'wordVault',
-  'party', 'wordAlchemy', 'shiritori',
+  'party', 'wordAlchemy', 'shiritori', 'sealedBid',
 ]);
 
 /** CSS stagger delay for each card index */
@@ -167,6 +168,7 @@ export function LandingChallengeCards({
     if (isAdmin && !next.includes('party')) next.push('party');
     if (isAdmin && !next.includes('wordAlchemy')) next.push('wordAlchemy');
     if (isAdmin && !next.includes('shiritori')) next.push('shiritori');
+    if (isAdmin && !next.includes('sealedBid')) next.push('sealedBid');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -451,13 +453,28 @@ export function LandingChallengeCards({
           </div>
         );
 
+      case 'sealedBid':
+        return (
+          <div key="sealedBid" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.sealedBidMode')}
+              description={t('landing.sealedBidModeDesc')}
+              href={`/${language}/sealed-bid`}
+              icon={<Gavel className="w-6 h-6" />}
+              variant="blue"
+              badge="ADMIN"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'sealedBid', variant: 'blue' }); }}
+            />
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordCraftGems', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

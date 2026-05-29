@@ -250,7 +250,7 @@ describe('LandingChallengeCards — Blast Classic admin gate', () => {
 });
 
 describe('LandingChallengeCards — full admin dev-preview roster', () => {
-  it('renders ALL 9 admin-gated dev preview cards for a post-newbie admin', () => {
+  it('renders ALL 10 admin-gated dev preview cards for a post-newbie admin', () => {
     mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('admin@example.com');
     // Past newbie + first-timer + newcomer-by-games gates → no collapse expander,
@@ -269,6 +269,7 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       'mode-landing.partyMode',            // Party Games
       'mode-landing.wordAlchemyMode',      // Word Alchemy
       'mode-landing.shiritoriMode',        // Shiritori
+      'mode-landing.sealedBidMode',        // Sealed Bid
     ];
     for (const id of expected) {
       expect(screen.getByTestId(id), `missing admin card: ${id}`).toBeInTheDocument();
@@ -292,10 +293,29 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       'mode-landing.partyMode',
       'mode-landing.wordAlchemyMode',
       'mode-landing.shiritoriMode',
+      'mode-landing.sealedBidMode',
     ];
     for (const id of adminOnly) {
       expect(screen.queryByTestId(id), `leaked admin card to non-admin: ${id}`).toBeNull();
     }
+  });
+});
+
+describe('LandingChallengeCards — Sealed Bid admin dev-preview gate', () => {
+  it('does NOT render the Sealed Bid card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-landing.sealedBidMode')).toBeNull();
+  });
+
+  it('renders the Sealed Bid card for an admin with the /sealed-bid href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-landing.sealedBidMode');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/sealed-bid');
   });
 });
 

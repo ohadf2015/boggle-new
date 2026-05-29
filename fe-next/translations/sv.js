@@ -54,6 +54,32 @@ const sv = {
       }
     }
   },
+  "sealedBid": {
+    "badge": "Förseglat bud",
+    "title": "Förseglat bud",
+    "instructions": "Välj ett ord ingen annan väljer — unikt bud ger dubbla poäng!",
+    "roundLabel": "Runda {n} av {total}",
+    "totalScore": "Poäng: {score}",
+    "timerLabel": "Skriv ditt ord…",
+    "sealPhase": "Försegla ditt bud",
+    "revealPhase": "Avslöjning",
+    "lockIn": "Lås in",
+    "skip": "Hoppa över",
+    "youPicked": "Du valde",
+    "botPicked": "Boten valde",
+    "resultUnique": "Unikt! Dubbla poäng",
+    "resultShared": "Krock — halva poäng",
+    "resultNone": "Inget bud — 0 poäng",
+    "pointsEarned": "+{pts} poäng",
+    "nextRound": "Nästa runda →",
+    "finalScore": "Slutpoäng",
+    "playAgain": "Spela igen",
+    "adminOnly": "Förseglat bud är en admin-förhandsvisning.",
+    "err": {
+      "notInRack": "Använd bara bokstäverna i racket",
+      "notWord": "Inte i ordlistan"
+    }
+  },
   "wordAlchemy": {
     "howTo": {
       "title": "Så spelar du",
@@ -4892,6 +4918,8 @@ const sv = {
     "wordAlchemyModeDesc": "Förvandla ett ord till nästa",
     "shiritoriMode": "Shiritori",
     "shiritoriModeDesc": "Japansk ordkedja — sista bokstaven startar nästa",
+    "sealedBidMode": "Förseglat bud",
+    "sealedBidModeDesc": "Välj ett ord ingen annan väljer — unikt bud ger dubbla poäng",
     "dailyChallenge": "Daglig Utmaning",
     "education": "Utbildning",
     "educationDesc": "För lärare och elever",
