@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { Bug, Send, ChevronDown, CheckCircle2 } from 'lucide-react';
 import {
@@ -39,6 +39,8 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<SubmitStatus>('idle');
   const [showDetails, setShowDetails] = useState(false);
+  const [rewarded, setRewarded] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const trimmed = message.trim();
   const canSubmit = trimmed.length >= MIN_MESSAGE_LENGTH && status !== 'submitting';
@@ -50,18 +52,52 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
     setMessage('');
     setStatus('idle');
     setShowDetails(false);
+    setRewarded(false);
     onClose();
   }, [onClose]);
 
+  /**
+   * Sync state from a raw value (shared by change/input/compositionEnd handlers).
+   * Android GBoard in Hebrew buffers composition; onChange alone can leave React
+   * state empty while the DOM value already has text.
+   */
+  const syncMessage = useCallback((raw: string) => {
+    setMessage(raw.slice(0, MAX_MESSAGE_LENGTH));
+  }, []);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    syncMessage(e.target.value);
+  }, [syncMessage]);
+
+  const handleInput = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
+    syncMessage(e.currentTarget.value);
+  }, [syncMessage]);
+
+  const handleCompositionEnd = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
+    syncMessage(e.currentTarget.value);
+  }, [syncMessage]);
+
+  const handleCompositionUpdate = useCallback((e: React.CompositionEvent<HTMLTextAreaElement>) => {
+    syncMessage(e.currentTarget.value);
+  }, [syncMessage]);
+
+  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    syncMessage(e.currentTarget.value);
+  }, [syncMessage]);
+
   const handleSubmit = useCallback(async () => {
-    if (trimmed.length < MIN_MESSAGE_LENGTH) return;
+    // Read DOM value directly — it is the source of truth during IME composition
+    const raw = textareaRef.current?.value ?? message;
+    const textTrimmed = raw.trim();
+    if (textTrimmed.length < MIN_MESSAGE_LENGTH) return;
+
     setStatus('submitting');
     try {
       const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: trimmed,
+          message: textTrimmed,
           page,
           userAgent: browser,
           userId: user?.id ?? null,
@@ -72,11 +108,13 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
         }),
       });
       if (!res.ok) throw new Error('request failed');
+      const data = await res.json().catch(() => ({}));
+      setRewarded(data.rewarded ?? false);
       setStatus('success');
     } catch {
       setStatus('error');
     }
-  }, [trimmed, page, browser, user, language]);
+  }, [message, page, browser, user, language]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -93,6 +131,11 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
           <DialogBody className="px-4 sm:px-5 py-8 text-center">
             <CheckCircle2 className="w-14 h-14 mx-auto text-neo-lime mb-3" aria-hidden="true" />
             <p className="text-base font-bold text-neo-white">{t('bugReport.success')}</p>
+            {rewarded && (
+              <p className="text-sm text-neo-yellow mt-2">
+                {t('bugReport.rewardEarned', { xp: 100 })}
+              </p>
+            )}
             <button
               type="button"
               onClick={handleClose}
@@ -108,14 +151,23 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
                 {t('bugReport.whatHappened')}
               </label>
               <textarea
+                ref={textareaRef}
                 id="bug-report-message"
                 value={message}
-                onChange={(e) => setMessage(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+                onChange={handleChange}
+                onInput={handleInput}
+                onCompositionEnd={handleCompositionEnd}
+                onCompositionUpdate={handleCompositionUpdate}
+                onKeyUp={handleKeyUp}
                 placeholder={t('bugReport.placeholder')}
                 rows={5}
                 dir={dir}
                 className="w-full p-3 bg-neo-navy-light text-neo-white border-2 border-neo-black/60 rounded-neo resize-none focus:outline-none focus:border-neo-pink placeholder:text-neo-white"
               />
+
+              {message.trim().length > 0 && message.trim().length < MIN_MESSAGE_LENGTH && (
+                <p className="text-xs text-neo-white">{t('bugReport.minLengthHint')}</p>
+              )}
 
               {status === 'error' && (
                 <p role="alert" className="text-sm font-bold text-neo-red">

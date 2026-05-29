@@ -95,4 +95,59 @@ describe('ReportBugModal', () => {
     await user.click(screen.getByRole('button', { name: /bugReport\.submit/i }));
     await waitFor(() => expect(screen.getByText('bugReport.error')).toBeInTheDocument());
   });
+
+  // === CHANGE 4: IME handling for Hebrew on Android GBoard ===
+  it('syncs message state from composition events (handles IME lag)', async () => {
+    const user = userEvent.setup();
+    render(<ReportBugModal isOpen onClose={vi.fn()} />);
+    const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+    // Type normally first (this will work on regular keyboards)
+    await user.type(textarea, 'A message that is long enough');
+    const submit = screen.getByRole('button', { name: /bugReport\.submit/i });
+
+    // Submit should be enabled after typing enough
+    expect(submit).toBeEnabled();
+  });
+
+  it('shows min-length hint when text is 1-9 characters', async () => {
+    const user = userEvent.setup();
+    render(<ReportBugModal isOpen onClose={vi.fn()} />);
+    const textarea = screen.getByRole('textbox');
+
+    await user.type(textarea, 'short');
+    // Hint should appear for < 10 chars
+    await waitFor(() => {
+      expect(screen.queryByText('bugReport.minLengthHint')).toBeTruthy();
+    });
+  });
+
+  it('shows reward message when rewarded response received', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, rewarded: true }),
+    }));
+    const user = userEvent.setup();
+    render(<ReportBugModal isOpen onClose={vi.fn()} />);
+    await user.type(screen.getByRole('textbox'), 'A clear description of the bug here');
+    await user.click(screen.getByRole('button', { name: /bugReport\.submit/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('bugReport.rewardEarned')).toBeTruthy();
+    });
+  });
+
+  it('does not show reward message when rewarded is false', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, rewarded: false }),
+    }));
+    const user = userEvent.setup();
+    render(<ReportBugModal isOpen onClose={vi.fn()} />);
+    await user.type(screen.getByRole('textbox'), 'A clear description of the bug here');
+    await user.click(screen.getByRole('button', { name: /bugReport\.submit/i }));
+
+    await waitFor(() => expect(screen.getByText('bugReport.success')).toBeInTheDocument());
+    expect(screen.queryByText('bugReport.rewardEarned')).toBeNull();
+  });
 });

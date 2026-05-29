@@ -6727,7 +6727,9 @@ const he = {
     "browserInfo": "דפדפן",
     "currentPage": "עמוד",
     "userId": "מזהה שחקן",
-    "sessionRecorded": "הקלטת הפעלה מצורפת"
+    "sessionRecorded": "הקלטת הפעלה מצורפת",
+    "minLengthHint": "פרטים נוספים עוזרים — לפחות 10 תווים.",
+    "rewardEarned": "תודה! הרווחת +{xp} XP 🎉"
   },
   "brain": {
     "title": "חדר כושר למוח",

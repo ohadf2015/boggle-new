@@ -19,8 +19,28 @@ vi.mock('next/server', () => ({
 
 // Supabase admin client
 const mockInsert = vi.fn();
+const mockSelect = vi.fn();
+const mockEq = vi.fn();
+const mockSingle = vi.fn();
+const mockSelectCount = vi.fn();
+const mockEqUser = vi.fn();
+const mockEqReward = vi.fn();
+const mockGte = vi.fn();
+const mockRpc = vi.fn();
+
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ from: () => ({ insert: mockInsert }) }),
+  createClient: () => ({
+    from: (table: string) => {
+      if (table === 'profiles') {
+        return { select: mockSelect };
+      }
+      if (table === 'feedback_reports') {
+        return { insert: mockInsert, select: mockSelectCount };
+      }
+      return { insert: mockInsert };
+    },
+    rpc: mockRpc,
+  }),
 }));
 
 // Telegram helper
@@ -86,6 +106,14 @@ describe('POST /api/feedback', () => {
     vi.clearAllMocks();
     mockCheckRateLimit.mockReturnValue({ success: true, remaining: 4, resetAt: Date.now() });
     mockInsert.mockResolvedValue({ error: null });
+    mockSelect.mockReturnValue({ eq: mockEq });
+    mockEq.mockReturnValue({ single: mockSingle });
+    mockSingle.mockResolvedValue({ data: null, error: null });
+    mockSelectCount.mockReturnValue({ eq: mockEqUser });
+    mockEqUser.mockReturnValue({ eq: mockEqReward });
+    mockEqReward.mockReturnValue({ gte: mockGte });
+    mockGte.mockResolvedValue({ count: 0, error: null });
+    mockRpc.mockResolvedValue({ data: [{}], error: null });
     mockSendTelegram.mockResolvedValue(true);
     mockEmailSend.mockResolvedValue({ error: null });
   });
@@ -147,5 +175,87 @@ describe('POST /api/feedback', () => {
     expect(json.success).toBe(true);
     const inserted = mockInsert.mock.calls[0][0];
     expect(inserted.user_id ?? null).toBeNull();
+  });
+
+  // === CHANGE 1: Username lookup & storage ===
+  it('looks up and stores the username from profiles for authenticated reporters', async () => {
+    mockSingle.mockResolvedValue({
+      data: { username: 'alice_wonder' },
+      error: null,
+    });
+
+    const res = await POST(makeRequest(validBody));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(mockSelect).toHaveBeenCalledWith('username');
+    expect(mockEq).toHaveBeenCalledWith('id', validBody.userId);
+    const inserted = mockInsert.mock.calls[0][0];
+    expect(inserted.username).toBe('alice_wonder');
+  });
+
+  it('stores null username when profiles lookup returns no data', async () => {
+    mockSingle.mockResolvedValue({
+      data: null,
+      error: null,
+    });
+
+    const res = await POST(makeRequest(validBody));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    const inserted = mockInsert.mock.calls[0][0];
+    expect(inserted.username).toBeNull();
+  });
+
+  // === CHANGE 2: Reward granted & XP/coins ===
+  it('grants XP + coins to authenticated reporter on first report of the day', async () => {
+    mockSingle.mockResolvedValue({
+      data: { username: 'bob_builder' },
+      error: null,
+    });
+    mockGte.mockResolvedValue({
+      count: 0,
+      error: null,
+    });
+
+    const res = await POST(makeRequest(validBody));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.rewarded).toBe(true);
+    const inserted = mockInsert.mock.calls[0][0];
+    expect(inserted.reward_granted).toBe(true);
+    expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', expect.any(Object));
+  });
+
+  it('does not grant reward on second report same UTC day', async () => {
+    mockSingle.mockResolvedValue({
+      data: { username: 'charlie_day' },
+      error: null,
+    });
+    // Already rewarded today
+    mockGte.mockResolvedValue({
+      count: 1,
+      error: null,
+    });
+
+    const res = await POST(makeRequest(validBody));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.rewarded).toBe(false);
+    const inserted = mockInsert.mock.calls[0][0];
+    expect(inserted.reward_granted).toBe(false);
+  });
+
+  it('does not attempt reward for anonymous reports', async () => {
+    const { userId, ...anon } = validBody;
+    void userId;
+    const res = await POST(makeRequest(anon));
+    const json = await res.json();
+
+    expect(json.success).toBe(true);
+    expect(json.rewarded).toBe(false);
   });
 });

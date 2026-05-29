@@ -6,6 +6,7 @@ import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib/apiRateLimit';
 import { withTimeout, EMAIL_COLORS } from '@/lib/email';
 import { sendTelegramMessage, escapeTelegramMarkdownV2, isTelegramConfigured } from '@/lib/telegram';
+import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
 
 /**
  * Feedback / Bug-Report API
@@ -26,6 +27,10 @@ const FEEDBACK_RATE_LIMIT = {
   windowMs: 60 * 60 * 1000, // 1 hour
   blockDurationMs: 6 * 60 * 60 * 1000, // 6 hour block for abuse
 };
+
+// Bug report rewards (1 per UTC day per user)
+const BUG_REPORT_XP = 100;
+const BUG_REPORT_COINS = 25;
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -50,6 +55,7 @@ interface FeedbackFields {
   page: string;
   userAgent: string;
   userId: string | null;
+  username: string | null;
   email: string | null;
   locale: string;
   viewport: string;
@@ -59,13 +65,14 @@ interface FeedbackFields {
 /** Build the founder-facing Telegram message (MarkdownV2, all dynamic parts escaped). */
 function buildTelegramMessage(f: FeedbackFields): string {
   const esc = escapeTelegramMarkdownV2;
+  const userDisplay = f.username ? `${esc(f.username)} (${esc(f.userId || '')})` : (f.userId ? esc(f.userId) : '_anonymous_');
   const lines = [
     '🐞 *New Bug Report / Feedback*',
     '',
     esc(f.message),
     '',
     `*Page:* ${esc(f.page) || '_unknown_'}`,
-    `*User:* ${f.userId ? esc(f.userId) : '_anonymous_'}`,
+    `*User:* ${userDisplay}`,
     `*Locale:* ${esc(f.locale) || '_?_'}`,
     `*Browser:* ${esc(f.userAgent.slice(0, 180)) || '_?_'}`,
   ];
@@ -82,6 +89,7 @@ async function sendEmail(f: FeedbackFields): Promise<boolean> {
     return false;
   }
   const c = EMAIL_COLORS as Record<string, string>;
+  const userDisplay = f.username ? `${f.username} (${f.userId})` : (f.userId || 'anonymous');
   try {
     const result = await withTimeout(
       resend.emails.send({
@@ -89,7 +97,7 @@ async function sendEmail(f: FeedbackFields): Promise<boolean> {
         to: FEEDBACK_EMAIL,
         ...(f.email ? { replyTo: f.email } : {}),
         subject: `[LexiClash Bug] ${f.message.slice(0, 60)}`,
-        text: `Bug report:\n\n${f.message}\n\nPage: ${f.page}\nUser: ${f.userId || 'anonymous'}\nEmail: ${f.email || 'n/a'}\nLocale: ${f.locale}\nViewport: ${f.viewport}\nApp: ${f.appVersion}\nBrowser: ${f.userAgent}`,
+        text: `Bug report:\n\n${f.message}\n\nPage: ${f.page}\nUser: ${userDisplay}\nEmail: ${f.email || 'n/a'}\nLocale: ${f.locale}\nViewport: ${f.viewport}\nApp: ${f.appVersion}\nBrowser: ${f.userAgent}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: ${c.navy || '#1a1a2e'}; padding: 24px; border-radius: 12px;">
             <h2 style="color: ${c.lime || '#BFFF00'};">🐞 New Bug Report</h2>
@@ -97,7 +105,7 @@ async function sendEmail(f: FeedbackFields): Promise<boolean> {
             <hr style="border-color: ${c.grayDark || '#333'};" />
             <p style="color: ${c.gray || '#aaa'}; font-size: 13px;">
               Page: ${escapeHtml(f.page)}<br/>
-              User: ${escapeHtml(f.userId || 'anonymous')}<br/>
+              User: ${escapeHtml(userDisplay)}<br/>
               Reply: ${f.email ? escapeHtml(f.email) : 'n/a'}<br/>
               Locale: ${escapeHtml(f.locale)} · Viewport: ${escapeHtml(f.viewport)} · App: ${escapeHtml(f.appVersion)}<br/>
               Browser: ${escapeHtml(f.userAgent)}
@@ -147,27 +155,50 @@ export async function POST(request: NextRequest) {
       page: str(body.page, 300),
       userAgent: str(body.userAgent, 500),
       userId: typeof body.userId === 'string' && body.userId.trim() ? body.userId.trim().slice(0, 64) : null,
+      username: null,
       email: rawEmail && emailRegex.test(rawEmail) ? rawEmail : null,
       locale: str(body.locale, 8),
       viewport: str(body.viewport, 24),
       appVersion: str(body.appVersion, 32),
     };
 
-    // 1. Durable record
-    let dbStored = false;
+    // Look up username server-side (do not trust client)
     const supabase = getSupabaseAdmin();
+    if (fields.userId && supabase) {
+      const { data: prof } = await supabase.from('profiles').select('username').eq('id', fields.userId).single();
+      fields.username = prof?.username ?? null;
+    }
+
+    // 1. Durable record + reward tracking
+    let dbStored = false;
+    let shouldReward = false;
     if (supabase) {
+      // Check if already rewarded today (UTC)
+      if (fields.userId) {
+        const todayStart = new Date();
+        todayStart.setUTCHours(0, 0, 0, 0);
+        const { count } = await supabase
+          .from('feedback_reports')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', fields.userId)
+          .eq('reward_granted', true)
+          .gte('created_at', todayStart.toISOString());
+        shouldReward = (count ?? 0) === 0;
+      }
+
       const { error } = await supabase.from('feedback_reports').insert({
         message: fields.message,
         page: fields.page || null,
         user_agent: fields.userAgent || null,
         user_id: fields.userId,
+        username: fields.username,
         email: fields.email,
         locale: fields.locale || null,
         viewport: fields.viewport || null,
         app_version: fields.appVersion || null,
         source: 'web',
         status: 'new',
+        reward_granted: shouldReward,
         created_at: new Date().toISOString(),
       });
       if (error) {
@@ -175,6 +206,20 @@ export async function POST(request: NextRequest) {
         captureApiError(new Error(error.message), '/api/feedback', { method: 'POST', statusCode: 500 });
       } else {
         dbStored = true;
+      }
+    }
+
+    // Grant reward if qualified (best-effort, never block the response)
+    if (dbStored && shouldReward && fields.userId) {
+      try {
+        await supabase?.rpc('increment_player_xp', { p_player_id: fields.userId, p_xp_amount: BUG_REPORT_XP });
+      } catch (err) {
+        logger.error('[Feedback] XP grant failed:', err instanceof Error ? err.message : String(err));
+      }
+      try {
+        await awardCoinsServer(fields.userId, BUG_REPORT_COINS, 'bug_report', { source: 'feedback' });
+      } catch (err) {
+        logger.error('[Feedback] Coin grant failed:', err instanceof Error ? err.message : String(err));
       }
     }
 
@@ -191,7 +236,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true, rewarded: dbStored && shouldReward });
     return addRateLimitHeaders(response, rateLimit, FEEDBACK_RATE_LIMIT.maxRequests);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

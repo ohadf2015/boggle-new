@@ -6707,7 +6707,9 @@ const sv = {
     "browserInfo": "Webbläsare",
     "currentPage": "Sida",
     "userId": "Spelar-ID",
-    "sessionRecorded": "Sessionsinspelning bifogad"
+    "sessionRecorded": "Sessionsinspelning bifogad",
+    "minLengthHint": "Mer detaljer hjälper — minst 10 tecken.",
+    "rewardEarned": "Tack! Du tjänade +{xp} XP 🎉"
   },
   "brain": {
     "title": "Hjärngym",

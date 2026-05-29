@@ -6741,7 +6741,9 @@ const en = {
     "browserInfo": "Browser",
     "currentPage": "Page",
     "userId": "Your ID",
-    "sessionRecorded": "Session attached"
+    "sessionRecorded": "Session attached",
+    "minLengthHint": "A little more detail helps — at least 10 characters.",
+    "rewardEarned": "Thanks! You earned +{xp} XP 🎉"
   },
   "brain": {
     "title": "Brain Gym",

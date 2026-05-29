@@ -6738,7 +6738,9 @@ const es = {
     "browserInfo": "Navegador",
     "currentPage": "Página",
     "userId": "ID de jugador",
-    "sessionRecorded": "Grabación de sesión adjunta"
+    "sessionRecorded": "Grabación de sesión adjunta",
+    "minLengthHint": "Más detalle ayuda — al menos 10 caracteres.",
+    "rewardEarned": "¡Gracias! Ganaste +{xp} XP 🎉"
   },
   "brain": {
     "title": "Gimnasio Mental",

@@ -6734,7 +6734,9 @@ const ja = {
     "browserInfo": "ブラウザ",
     "currentPage": "ページ",
     "userId": "プレイヤーID",
-    "sessionRecorded": "セッション録画添付済み"
+    "sessionRecorded": "セッション録画添付済み",
+    "minLengthHint": "詳しい情報がお役立ちです — 最低10文字でお願い。",
+    "rewardEarned": "ありがとう！+{xp} XPを獲得しました 🎉"
   },
   "brain": {
     "title": "ブレインジム",
