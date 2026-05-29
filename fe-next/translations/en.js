@@ -12422,6 +12422,19 @@ const en = {
       "captureYou": "Captured {{count}} — +{{bonus}}!",
       "captureBot": "Bot captured {{count}} — +{{bonus}}!"
     },
+    "duel": {
+      "playFriend": "Play vs a friend",
+      "passPlay": "Same device — Pass & Play",
+      "challengeFriend": "Challenge a friend",
+      "shareText": "I scored {{score}} in WordCraft — can you beat my board?",
+      "shareTitleChallenge": "Challenge me at WordCraft",
+      "linkCopied": "Invite link copied!",
+      "vsChallenger": "vs {{name}}",
+      "youWin": "You win!",
+      "youLose": "They win",
+      "tie": "Tied!",
+      "unnamedChallenger": "A challenger"
+    },
     "gems": {
       "title": "Gem Hunt",
       "hud": {

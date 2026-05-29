@@ -12402,6 +12402,19 @@ const sv = {
       "captureYou": "Erövrade {{count}} — +{{bonus}}!",
       "captureBot": "Boten erövrade {{count}} — +{{bonus}}!"
     },
+    "duel": {
+      "playFriend": "Spela mot en vän",
+      "passPlay": "Samma enhet — Skicka och blockera",
+      "challengeFriend": "Utmana en vän",
+      "shareText": "Jag fick {{score}} poäng i WordCraft — kan du slå min bräda?",
+      "shareTitleChallenge": "Utmana mig på WordCraft",
+      "linkCopied": "Inbjudningslänk kopierad!",
+      "vsChallenger": "mot {{name}}",
+      "youWin": "Du vinner!",
+      "youLose": "De vinner",
+      "tie": "Oavgjort!",
+      "unnamedChallenger": "En utmanare"
+    },
     "gems": {
       "title": "Ädelstensjakt",
       "hud": {

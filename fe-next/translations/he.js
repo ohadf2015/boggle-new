@@ -12818,6 +12818,19 @@ const he = {
       "captureYou": "כבשת {{count}} — +{{bonus}}!",
       "captureBot": "הבוט כבש {{count}} — +{{bonus}}!"
     },
+    "duel": {
+      "playFriend": "שחק נגד חבר",
+      "passPlay": "באותה התקן — העבר וחסום",
+      "challengeFriend": "אתגר חבר",
+      "shareText": "ניקדתי {{score}} ב-WordCraft — הצלחת להכניע את הלוח שלי?",
+      "shareTitleChallenge": "אתגור אותי ב-WordCraft",
+      "linkCopied": "קישור הזמנה הועתק!",
+      "vsChallenger": "מול {{name}}",
+      "youWin": "ניצחת!",
+      "youLose": "הם ניצחו",
+      "tie": "תיקו!",
+      "unnamedChallenger": "מתחרה"
+    },
     "gems": {
       "title": "ציד אבני חן",
       "hud": {

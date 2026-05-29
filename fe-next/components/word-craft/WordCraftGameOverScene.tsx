@@ -1,7 +1,9 @@
 'use client';
 
+import { WordCraftDuelResult } from './WordCraftDuelResult';
+
 interface Props {
-  t: (k: string) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
   playerScore: number;
   botScore: number;
   /** Seat names — override the default You/WordBot (e.g. hot-seat Player 1/2). */
@@ -9,9 +11,20 @@ interface Props {
   botName?: string;
   /** Player just set a new single-player personal best this game. */
   isNewBest?: boolean;
+  /** Duel result when playing vs a remote challenger via a duel link */
+  duelOutcome?: { outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number };
+  /** Current game seed for building outgoing duel links */
+  currentSeed?: number;
+  /** Current locale for building outgoing duel links */
+  currentLocale?: string;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale }: Props) {
+  // If in a duel, show duel result instead of vs-bot result
+  if (duelOutcome) {
+    return <WordCraftDuelResult t={t} playerScore={playerScore} duelOutcome={duelOutcome} currentSeed={currentSeed} currentLocale={currentLocale} />;
+  }
+
   const isTie = playerScore === botScore;
   const winnerName = playerScore > botScore
     ? (playerName ?? t('wordcraft.you'))

@@ -12376,6 +12376,19 @@ const ja = {
       "captureYou": "{{count}} 占領 — +{{bonus}}!",
       "captureBot": "ボットが {{count}} 占領 — +{{bonus}}!"
     },
+    "duel": {
+      "playFriend": "友達と対戦する",
+      "passPlay": "同じ端末 — パス＆プレイ",
+      "challengeFriend": "友達をチャレンジ",
+      "shareText": "WordCraft で {{score}} ポイント獲得しました — あなたも同じボードで遊べます！",
+      "shareTitleChallenge": "WordCraft で対戦しよう",
+      "linkCopied": "招待リンクをコピーしました！",
+      "vsChallenger": "vs {{name}}",
+      "youWin": "勝利！",
+      "youLose": "敗北",
+      "tie": "同点！",
+      "unnamedChallenger": "チャレンジャー"
+    },
     "gems": {
       "title": "ジェムハント",
       "hud": {

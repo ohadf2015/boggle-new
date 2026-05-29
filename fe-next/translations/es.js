@@ -12490,6 +12490,19 @@ const es = {
       "captureYou": "¡Capturaste {{count}} — +{{bonus}}!",
       "captureBot": "¡El bot capturó {{count}} — +{{bonus}}!"
     },
+    "duel": {
+      "playFriend": "Juega contra un amigo",
+      "passPlay": "Mismo dispositivo — Pasa y bloquea",
+      "challengeFriend": "Reta a un amigo",
+      "shareText": "¡Obtuve {{score}} puntos en WordCraft — ¿puedes superar mi tablero?",
+      "shareTitleChallenge": "Retame en WordCraft",
+      "linkCopied": "¡Enlace de invitación copiado!",
+      "vsChallenger": "vs {{name}}",
+      "youWin": "¡Ganaste!",
+      "youLose": "Ellos ganan",
+      "tie": "¡Empate!",
+      "unnamedChallenger": "Un retador"
+    },
     "gems": {
       "title": "Caza de Gemas",
       "hud": {

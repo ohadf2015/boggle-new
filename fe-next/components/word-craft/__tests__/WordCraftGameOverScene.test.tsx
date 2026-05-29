@@ -2,8 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { WordCraftGameOverScene } from '../WordCraftGameOverScene';
 
-const t = (k: string) => {
-  if (k === 'wordcraft.winnerLabel') return 'Winner: {{name}}';
+const t = (k: string, vars?: Record<string, unknown>) => {
+  if (k === 'wordcraft.winnerLabel') {
+    const template = 'Winner: {{name}}';
+    if (vars?.name) return template.replace('{{name}}', String(vars.name));
+    return template;
+  }
+  if (k === 'wordcraft.you') return 'You';
+  if (k === 'wordcraft.duel.youWin') return 'You win!';
+  if (k === 'wordcraft.duel.youLose') return 'They win';
+  if (k === 'wordcraft.duel.tie') return 'Tied!';
+  if (k === 'wordcraft.duel.vsChallenger') return `vs ${String(vars?.name ?? '')}`;
   return `[${k}]`;
 };
 
@@ -84,5 +93,90 @@ describe('WordCraftGameOverScene', () => {
       <WordCraftGameOverScene t={t} playerScore={120} botScore={80} isNewBest />
     );
     expect(screen.getByText(/wordcraft.newBest/)).toBeTruthy();
+  });
+
+  describe('duel result', () => {
+    it('renders duel result when duelOutcome is present', () => {
+      const { container } = render(
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={150}
+          botScore={100}
+          duelOutcome={{
+            outcome: 'win',
+            challengerName: 'Alice',
+            challengerScore: 120,
+          }}
+        />
+      );
+      // Should render the duel result component (shows challenger name and scores)
+      expect(container.textContent).toContain('Alice');
+      expect(container.textContent).toContain('150');
+      expect(container.textContent).toContain('120');
+    });
+
+    it('shows win outcome when player scores higher than challenger', () => {
+      render(
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={200}
+          botScore={100}
+          duelOutcome={{
+            outcome: 'win',
+            challengerName: 'Bob',
+            challengerScore: 150,
+          }}
+        />
+      );
+      expect(screen.getByText(/You win!/)).toBeTruthy();
+    });
+
+    it('shows lose outcome when player scores lower than challenger', () => {
+      render(
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={100}
+          botScore={100}
+          duelOutcome={{
+            outcome: 'lose',
+            challengerName: 'Charlie',
+            challengerScore: 200,
+          }}
+        />
+      );
+      expect(screen.getByText(/They win/)).toBeTruthy();
+    });
+
+    it('shows tie outcome when scores are equal', () => {
+      render(
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={150}
+          botScore={100}
+          duelOutcome={{
+            outcome: 'tie',
+            challengerName: 'Dave',
+            challengerScore: 150,
+          }}
+        />
+      );
+      expect(screen.getByText(/Tied!/)).toBeTruthy();
+    });
+
+    it('displays challenger name in vs header', () => {
+      render(
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={100}
+          botScore={100}
+          duelOutcome={{
+            outcome: 'win',
+            challengerName: 'Eve',
+            challengerScore: 80,
+          }}
+        />
+      );
+      expect(screen.getByText(/vs Eve/)).toBeTruthy();
+    });
   });
 });

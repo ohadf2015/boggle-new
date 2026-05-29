@@ -15,6 +15,7 @@ import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
 import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
+import { WordCraftPlayFriendControl } from '@/components/word-craft/WordCraftPlayFriendControl';
 import { WordCraftCelebration, type CelebrationKind } from '@/components/word-craft/WordCraftCelebration';
 import { HeatMeter } from '@/components/word-craft/HeatMeter';
 import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
@@ -54,6 +55,7 @@ import {
 import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
 import { cn } from '@/lib/utils';
+import { parseDuel, compareDuel } from '@/lib/word-craft/duel';
 
 const ENCOURAGEMENT_COUNT = 8;
 const LINGUIST_STORAGE_KEY = 'wc_locales_played';
@@ -125,11 +127,18 @@ export default function WordCraftPageClient() {
     recordLocale(locale);
   }, [locale]);
 
+  const duel = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    return parseDuel(new URLSearchParams(window.location.search));
+  }, []);
+
   const seed = useMemo(() => {
     if (typeof window === 'undefined') return 1;
+    // Prefer duel seed if present; otherwise read from URL or generate
+    if (duel) return duel.seed;
     const fromUrl = new URLSearchParams(window.location.search).get('seed');
     return fromUrl ? Number(fromUrl) : Math.floor(Math.random() * 1_000_000);
-  }, []);
+  }, [duel]);
 
   // Territory mode is the default twist. Opt-out: ?classic=1 returns the
   // legacy Scrabble-alt feel (no claims, no capture bonus, no endgame bonus).
@@ -609,6 +618,7 @@ export default function WordCraftPageClient() {
   // --- Game over ---
   const [newBest, setNewBest] = useState(false);
   const recordedBestRef = useRef(false);
+  const [duelOutcome, setDuelOutcome] = useState<{ outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number } | null>(null);
   useEffect(() => {
     if (game.state.turn === 'over') {
       setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
@@ -616,6 +626,15 @@ export default function WordCraftPageClient() {
       if (sceneCtx) {
         playGameOverBurst(sceneCtx).catch(() => {
           // Pixi animations can fail on low-end devices; silently continue
+        });
+      }
+      // Duel outcome: compare player score vs challenger score
+      if (duel && !recordedBestRef.current) {
+        const outcome = compareDuel(game.state.player.score, duel.score);
+        setDuelOutcome({
+          outcome,
+          challengerName: duel.name || t('wordcraft.duel.unnamedChallenger'),
+          challengerScore: duel.score,
         });
       }
       // Personal best (SP vs bot only — hotseat has two human seats, no "mine").
@@ -631,8 +650,9 @@ export default function WordCraftPageClient() {
     } else {
       recordedBestRef.current = false;
       setNewBest(false);
+      setDuelOutcome(null);
     }
-  }, [game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, playNewBest]);
+  }, [game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, playNewBest, duel, t]);
 
   // --- Error shake ---
   const lastErrorRef = useRef<string | null>(null);
@@ -900,6 +920,17 @@ export default function WordCraftPageClient() {
           locale={locale}
         />
 
+        {/* Play vs a friend control — both Pass & Play and invite-a-friend paths */}
+        {!hotseat && !duel ? (
+          <WordCraftPlayFriendControl
+            t={t}
+            seed={seed}
+            playerScore={game.state.player.score}
+            locale={locale}
+            disabled={!dict}
+          />
+        ) : null}
+
         <WordCraftControls
           canSubmit={game.state.pendingPlacements.length > 0 && !!dict && canInteract && !game.state.burnout}
           canRecall={game.state.pendingPlacements.length > 0}
@@ -978,6 +1009,9 @@ export default function WordCraftPageClient() {
           playerName={hotseat ? t('wordcraft.player1') : undefined}
           botName={hotseat ? t('wordcraft.player2') : undefined}
           isNewBest={newBest}
+          duelOutcome={duelOutcome ?? undefined}
+          currentSeed={seed}
+          currentLocale={locale}
         />
       ) : null}
     </div>
