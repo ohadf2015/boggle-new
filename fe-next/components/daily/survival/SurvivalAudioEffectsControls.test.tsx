@@ -95,7 +95,9 @@ describe('SurvivalAudioEffectsControls', () => {
       expect(sfxState.toggleSfxMute).toHaveBeenCalledTimes(1);
     });
 
-    it('unlocks audio first (and toggles nothing) when audio is not unlocked', () => {
+    // Locked entry moves toward audible — the enable tap is never swallowed
+    // (web-only bug; native boots unlocked). Both audible → just unlock.
+    it('unlocks audio (toggles nothing) when locked and both audible', () => {
       musicState.audioUnlocked = false;
 
       render(<SurvivalAudioEffectsControls t={t} />);
@@ -104,6 +106,19 @@ describe('SurvivalAudioEffectsControls', () => {
       expect(musicState.unlockAudio).toHaveBeenCalledTimes(1);
       expect(musicState.toggleMute).not.toHaveBeenCalled();
       expect(sfxState.toggleSfxMute).not.toHaveBeenCalled();
+    });
+
+    it('unlocks AND unmutes both when locked and both muted (toward audible)', () => {
+      musicState.audioUnlocked = false;
+      musicState.isMuted = true;
+      sfxState.sfxMuted = true;
+
+      render(<SurvivalAudioEffectsControls t={t} />);
+      fireEvent.click(audioButton());
+
+      expect(musicState.unlockAudio).toHaveBeenCalledTimes(1);
+      expect(musicState.toggleMute).toHaveBeenCalledTimes(1);
+      expect(sfxState.toggleSfxMute).toHaveBeenCalledTimes(1);
     });
 
     it('shows a distinct muted label/icon when both channels are muted', () => {

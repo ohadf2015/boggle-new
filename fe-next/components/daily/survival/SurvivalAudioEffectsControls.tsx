@@ -5,6 +5,7 @@ import { Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
+import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
 
 export interface SurvivalAudioEffectsControlsProps {
   t: (key: string, fallback?: string) => string;
@@ -29,21 +30,13 @@ export const SurvivalAudioEffectsControls = memo<SurvivalAudioEffectsControlsPro
 
   const allMuted = isMuted && sfxMuted;
 
-  // Coherent target (mirrors MusicControls): any channel audible → mute both;
-  // both muted → unmute both. Never flip a channel against the chosen direction.
+  // Mirrors MusicControls: locked → unlock + move toward audible (the enable
+  // tap is never swallowed and never mutes); unlocked → silence-wins toggle.
   const handleAudioClick = useCallback(() => {
-    if (!audioUnlocked) {
-      unlockAudio();
-      return;
-    }
-    const anyAudible = !isMuted || !sfxMuted;
-    if (anyAudible) {
-      if (!isMuted) toggleMute();
-      if (!sfxMuted) toggleSfxMute();
-    } else {
-      if (isMuted) toggleMute();
-      if (sfxMuted) toggleSfxMute();
-    }
+    const action = resolveMasterMuteClick({ audioUnlocked, isMuted, sfxMuted });
+    if (action.unlock) unlockAudio();
+    if (action.toggleMusic) toggleMute();
+    if (action.toggleSfx) toggleSfxMute();
   }, [audioUnlocked, unlockAudio, isMuted, sfxMuted, toggleMute, toggleSfxMute]);
 
   const audioLabel = allMuted ? t('music.unmute', 'Unmute') : t('music.mute', 'Mute');

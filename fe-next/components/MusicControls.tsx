@@ -9,6 +9,7 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
 import { useHapticsConfig } from '../contexts/HapticsContext';
+import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
 
 /**
  * MusicControls - Neo-Brutalist styled volume controls with separate music and SFX sliders
@@ -80,22 +81,14 @@ const MusicControls: React.FC = memo(() => {
     setSfxVolume(parseFloat(e.target.value));
   }, [setSfxVolume]);
 
+  // Master mute: locked tab → unlock + move toward audible (never swallow the
+  // click, never mute on the enable tap); unlocked → silence-wins coherent
+  // toggle. See resolveMasterMuteClick for the full decision table.
   const handleClick = useCallback(() => {
-    if (!audioUnlocked) {
-      unlockAudio();
-      return;
-    }
-    // Coherent target: any audible → mute both; both already muted → unmute
-    // both. We never flip a channel against the chosen direction (which would
-    // happen if states had drifted apart and we toggled each independently).
-    const anyAudible = !isMuted || !sfxMuted;
-    if (anyAudible) {
-      if (!isMuted) toggleMute();
-      if (!sfxMuted) toggleSfxMute();
-    } else {
-      if (isMuted) toggleMute();
-      if (sfxMuted) toggleSfxMute();
-    }
+    const action = resolveMasterMuteClick({ audioUnlocked, isMuted, sfxMuted });
+    if (action.unlock) unlockAudio();
+    if (action.toggleMusic) toggleMute();
+    if (action.toggleSfx) toggleSfxMute();
   }, [audioUnlocked, unlockAudio, isMuted, sfxMuted, toggleMute, toggleSfxMute]);
 
   const handleMouseEnter = useCallback(() => setShowSlider(true), []);

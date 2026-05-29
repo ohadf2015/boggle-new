@@ -177,14 +177,45 @@ describe('MusicControls — mute behavior', () => {
       expect(sfxState.toggleSfxMute).not.toHaveBeenCalled();
     });
 
-    it('when audio not unlocked, click calls unlockAudio and does not toggle mute', () => {
+    // Locked-tab entry (web autoplay policy): the click must NOT be swallowed.
+    // It moves TOWARD audible — unlock + unmute anything muted, mute nothing.
+    // Native apps boot already-unlocked, so the old swallow only broke web.
+    it('when audio locked and both audible, click only unlocks (no mute on enable)', () => {
       musicState.audioUnlocked = false;
+      musicState.isMuted = false;
+      sfxState.sfxMuted = false;
 
       render(<MusicControls />);
       fireEvent.click(screen.getByRole('button', { name: /mute|unmute|sound/i }));
 
       expect(musicState.unlockAudio).toHaveBeenCalledTimes(1);
       expect(musicState.toggleMute).not.toHaveBeenCalled();
+      expect(sfxState.toggleSfxMute).not.toHaveBeenCalled();
+    });
+
+    it('when audio locked and both muted, click unlocks AND unmutes both (toward audible)', () => {
+      musicState.audioUnlocked = false;
+      musicState.isMuted = true;
+      sfxState.sfxMuted = true;
+
+      render(<MusicControls />);
+      fireEvent.click(screen.getByRole('button', { name: /mute|unmute|sound/i }));
+
+      expect(musicState.unlockAudio).toHaveBeenCalledTimes(1);
+      expect(musicState.toggleMute).toHaveBeenCalledTimes(1);
+      expect(sfxState.toggleSfxMute).toHaveBeenCalledTimes(1);
+    });
+
+    it('when audio locked and only music muted, click unlocks AND unmutes music', () => {
+      musicState.audioUnlocked = false;
+      musicState.isMuted = true;
+      sfxState.sfxMuted = false;
+
+      render(<MusicControls />);
+      fireEvent.click(screen.getByRole('button', { name: /mute|unmute|sound/i }));
+
+      expect(musicState.unlockAudio).toHaveBeenCalledTimes(1);
+      expect(musicState.toggleMute).toHaveBeenCalledTimes(1);
       expect(sfxState.toggleSfxMute).not.toHaveBeenCalled();
     });
   });
