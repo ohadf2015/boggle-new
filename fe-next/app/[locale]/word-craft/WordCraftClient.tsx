@@ -15,12 +15,22 @@ const GemHuntPageClient = dynamic(
   () => import('@/components/word-craft/gems/GemHuntPageClient'),
   { ssr: false },
 );
+const RunPageClient = dynamic(
+  () => import('./RunPageClient').then((m) => m.RunPageClient),
+  { ssr: false },
+);
 
 export function WordCraftClient() {
   const mode = useWordCraftMode();
   return (
     <Suspense>
-      {mode === 'gems' ? <GemHuntPageClient /> : <WordCraftPageClient />}
+      {mode === 'gems' ? (
+        <GemHuntPageClient />
+      ) : mode === 'cards' ? (
+        <RunPageClient />
+      ) : (
+        <WordCraftPageClient />
+      )}
     </Suspense>
   );
 }

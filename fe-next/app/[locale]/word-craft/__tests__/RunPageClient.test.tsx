@@ -6,6 +6,17 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 vi.mock('@/contexts/NavigationContext', () => ({ useHideNavigation: () => vi.fn() }));
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playWordAcceptedSound: vi.fn(),
+    playPerfectWordSound: vi.fn(),
+    playSound: vi.fn(),
+    setGameActive: vi.fn(),
+  }),
+}));
+vi.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({ fadeToTrack: vi.fn(), stopMusic: vi.fn(), TRACKS: { IN_GAME: 'inGame' } }),
+}));
 vi.mock('@/lib/word-craft/dictionary', () => ({
   loadWordCraftDictionary: () => Promise.resolve(new Set(['cat', 'cats'])),
 }));

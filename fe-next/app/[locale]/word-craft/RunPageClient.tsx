@@ -61,6 +61,20 @@ export function RunPageClient() {
     prevErrorRef.current = e;
   }, [state.lastError, playSound]);
 
+  // Phase-transition ceremony — card reveal, round + run results were silent.
+  const prevPhaseRef = useRef(state.phase);
+  useEffect(() => {
+    if (state.phase === prevPhaseRef.current) return;
+    prevPhaseRef.current = state.phase;
+    if (state.phase === 'cardPick') {
+      playSound('powerUp', {});
+    } else if (state.phase === 'roundResult') {
+      playSound(state.roundPassed ? 'achievement' : 'wordRejected', { requiresGameActive: false });
+    } else if (state.phase === 'runResult') {
+      playSound(state.cleared ? 'crownVictory' : 'defeatSting', { requiresGameActive: false });
+    }
+  }, [state.phase, state.roundPassed, state.cleared, playSound]);
+
   const [wordPop, setWordPop] = useState<RunWordPopData | null>(null);
   const popKeyRef = useRef(0);
   useEffect(() => {
@@ -95,7 +109,15 @@ export function RunPageClient() {
   }
 
   if (state.phase === 'cardPick' && state.cardChoice) {
-    return <CardPickScreen cards={state.cardChoice} onPick={run.pickCard} />;
+    return (
+      <CardPickScreen
+        cards={state.cardChoice}
+        onPick={(id) => {
+          playSound('coinCollect', {});
+          run.pickCard(id);
+        }}
+      />
+    );
   }
 
   if (state.phase === 'roundResult') {

@@ -54,8 +54,6 @@ import {
 import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
 import { cn } from '@/lib/utils';
-import { useWordCraftRunFlag } from '@/hooks/useWordCraftRunFlag';
-import { RunPageClient } from './RunPageClient';
 
 const ENCOURAGEMENT_COUNT = 8;
 const LINGUIST_STORAGE_KEY = 'wc_locales_played';
@@ -649,11 +647,9 @@ export default function WordCraftPageClient() {
     juice.invalidShake(cellEls);
   }, [game.state.lastError, game.state.pendingPlacements, juice]);
 
-  // Gate run-mode behind feature flag; fall back to legacy PageClient if disabled
-  const runModeEnabled = useWordCraftRunFlag();
-  if (runModeEnabled) {
-    return <RunPageClient />;
-  }
+  // Card (power-card Run) mode now has its own stable entry — ?mode=cards is
+  // routed straight to RunPageClient by WordCraftClient, so PageClient no
+  // longer hijacks the territory view behind a feature flag.
 
   if (authLoading) {
     return (
