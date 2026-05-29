@@ -80,14 +80,15 @@ describe('useWordCraftSound', () => {
     expect(playSound).toHaveBeenCalledWith('powerUp', expect.anything());
   });
 
-  it('exposes opponent / pass / swap feedback sounds', () => {
+  it('exposes opponent / pass / swap / handoff feedback sounds', () => {
     const { result } = renderHook(() => useWordCraftSound(idle, false));
     playSound.mockClear();
     act(() => result.current.playOpponentScored());
     act(() => result.current.playPass());
     act(() => result.current.playSwap());
+    act(() => result.current.playHandoff());
     const keys = playSound.mock.calls.map((c) => c[0]);
-    expect(keys).toEqual(['opponentScored', 'menuClose', 'boardShuffle']);
+    expect(keys).toEqual(['opponentScored', 'menuClose', 'boardShuffle', 'swipeTransition']);
   });
 
   it('plays an achievement flourish for a new personal best', () => {

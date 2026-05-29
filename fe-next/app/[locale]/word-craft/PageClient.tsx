@@ -157,6 +157,7 @@ export default function WordCraftPageClient() {
     playPass: playPassSound,
     playSwap: playSwapSound,
     playNewBest,
+    playHandoff,
   } = useWordCraftSound(
     {
       heat: game.state.heat,
@@ -187,9 +188,10 @@ export default function WordCraftPageClient() {
     if (!hotseat) return;
     if (game.state.turn !== prevTurnRef.current && game.state.turn !== 'over') {
       setShowHandoff(true);
+      playHandoff();
     }
     prevTurnRef.current = game.state.turn;
-  }, [hotseat, game.state.turn]);
+  }, [hotseat, game.state.turn, playHandoff]);
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
   const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);

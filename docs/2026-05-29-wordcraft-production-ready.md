@@ -49,14 +49,39 @@ Finish WordCraft and make it production-ready:
 - Landing card for Card Mode; i18n ×5.
 - Tests: card pick flow, effect application already covered — add UI/sound-trigger tests.
 
-### Phase 4 — Turn-based multiplayer (server-authoritative)
-- Add `'wordcraft'` to `GameMode` (`shared/types/game.ts`); weight 0 in selector (opt-in, not auto-rotated) initially.
-- `backend/modules/wordCraftManager.ts`: pure turn state — players[], currentPlayerIndex, shared board, bag/rack-per-player or shared pool, scores, passesInARow, finished/winner. Reuse SP scoring (`lib/word-craft/scoring.ts`) where shareable; validation mirrors SP `moveValidator`. Functions: `initWordCraftMpState`, `currentPlayer`, `validateMpMove`, `applyMpMove`, `passTurn`, `isGameOver`, `finalScores`.
-- `backend/handlers/wordCraftHandler.ts`: `submitWordCraftMove` (reject if `currentPlayer!==username`), `passWordCraftTurn`; broadcast `wordCraftMoveAccepted`/`Rejected`/`turnChanged`/`gameOver`. Mirror shiritoriHandler.
-- Bot fill: `backend/services/gameLifecycle/botWordCraft.ts` — schedule bot move on its turn using SP `findBestBotMove`.
-- Reconnect branch + results recording (`recordGameResultsToSupabase`, already mode-agnostic).
-- Client: turn-based MP play surface (reuse board/rack components; "your turn / waiting" state; opponent move reveal via existing `botMoveReveal` scene). Lobby mode entry.
-- Tests: manager (turn advance, out-of-turn reject, scoring, game-over), handler (turn enforcement, pass, bot), client turn-state.
+### Phase 4 — Turn-based with other players  ✅ REVISED (decision 2026-05-29)
+
+**Decision:** Ship **local pass-and-play (hotseat)** as a first-class, discoverable
+turn-based mode — NOT remote netcode this session.
+
+**Why** (advisor + investigation):
+- WordCraft engine modules are React/DOM-free (server-importable) ✔, BUT:
+- The production async-challenge infra (`async_board_challenges` + API + push) has
+  **no per-mode play renderer** — its only play surface is the homepage classic game
+  fed via `sessionStorage`. Hosting WordCraft async = a net-new challenged-player play
+  path + landing route-by-mode + invite wiring + a **prod DB CHECK-constraint migration**.
+  Each probe surfaced *more* net-new work → the proper version is multi-session.
+- Live socket (Shiritori model) loses state on disconnect → wrong for correspondence.
+- Brand is "phones + TV/party screens, Jackbox party energy" → same-screen alternating
+  turns is *on-brand*, not a consolation. Hotseat already exists (`?vs=human`,
+  `WordCraftHandoff` curtain, `useWordCraftGame.hotseat.test.ts`).
+
+**Shipped:** expose hotseat as first-class — discoverable entry (landing card, Phase 5),
+clear "whose turn" framing + handoff curtain verified. Low-risk, tested, in-session.
+
+**Deferred (next increment, fully specced below):** remote **async correspondence**
+WordCraft on the existing `async_board_challenges` infra, using **Card/Run mode** as the
+seeded score-attack ("beat my run on this seed"). Integration map:
+1. Migration: `ALTER … async_board_challenges` CHECK to add `'wordcraft'`.
+2. `app/api/growth/async-challenge/route.ts` (POST type+validation) + `shared/types/growth.ts` union: add `'wordcraft'`.
+3. Build the missing per-mode play renderer: `FriendChallengeLandingClient` routes
+   wordcraft challenges to `/word-craft?mode=cards&challenge={id}` instead of homepage.
+4. `RunPageClient`: read `?challenge={id}` → seed run from `grid_seed`, show target,
+   on finish submit result via `useAsyncChallengeProducer` (PUT phase=challenged).
+5. Challenger: run-result "Challenge a friend" → `pendingAsyncChallenge` (gameMode
+   `'wordcraft'`, gridSeed, runTotal) → existing invite dialog POSTs.
+6. i18n `asyncChallenge.mode.wordcraft` ×5.
+   (Pure seed→run-config + result-submission helpers are unit-testable; run engine is deterministic.)
 
 ### Phase 5 — SEO/GEO landing page + go public
 - Un-gate WordCraft landing card (drop `isAdmin &&`), badge BETA→NEW (Card Mode → NEW).

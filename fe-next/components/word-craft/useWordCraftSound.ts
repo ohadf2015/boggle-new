@@ -115,6 +115,11 @@ export function useWordCraftSound(state: WordCraftSoundState, cosyMode: boolean)
     () => playSound('achievement', { requiresGameActive: false }),
     [playSound],
   );
+  // Pass-and-play device hand-off — the curtain was silent.
+  const playHandoff = useCallback(
+    () => playSound('swipeTransition', { requiresGameActive: false }),
+    [playSound],
+  );
 
-  return { playCommit, playOpponentScored, playPass, playSwap, playNewBest };
+  return { playCommit, playOpponentScored, playPass, playSwap, playNewBest, playHandoff };
 }
