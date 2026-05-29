@@ -6,6 +6,16 @@
 
 const BASE_URL = 'https://www.lexiclash.live';
 const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const LOCALES = ['en', 'he', 'sv', 'ja', 'es'];
+
+// Real, existing LexiClash profiles — used as sameAs for entity verification.
+// NEVER add placeholder/non-existent URLs here: an invalid sameAs hurts more
+// than a missing one. Mirrors the canonical set in app/[locale]/layout.tsx.
+const SAME_AS = [
+  'https://www.instagram.com/lexi.clash',
+  'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+  'https://www.crazygames.com/game/lexiclash',
+];
 
 interface FaqItem {
   question: string;
@@ -52,7 +62,13 @@ export function buildEducationOrgJsonLd(locale: string) {
     url: `${BASE_URL}/${lang}/education`,
     description: ORG_DESCRIPTION[lang] ?? ORG_DESCRIPTION.en,
     inLanguage: lang,
-    sameAs: [`${BASE_URL}`],
+    logo: {
+      '@type': 'ImageObject' as const,
+      url: `${BASE_URL}/logo.png`,
+      width: 1024,
+      height: 1024,
+    },
+    sameAs: SAME_AS,
     audience: {
       '@type': 'EducationalAudience',
       educationalRole: 'teacher',
@@ -124,5 +140,89 @@ export function buildEducationBreadcrumbJsonLd(locale: string) {
       { '@type': 'ListItem' as const, position: 1, name: 'Home', item: `${BASE_URL}/${lang}` },
       { '@type': 'ListItem' as const, position: 2, name: 'Education', item: `${BASE_URL}/${lang}/education` },
     ],
+  };
+}
+
+// WebApplication is the schema type AI engines (ChatGPT, Perplexity, Google AI
+// Overviews) match for product-comparison queries like "free word games for
+// classroom", "Quizlet alternative no signup", "vocabulary game online free".
+// The zero-price Offer + isAccessibleForFree is the decisive "free" signal.
+// provider references the canonical EducationalOrganization @id so crawlers
+// resolve one entity, not a parallel org node.
+const WEBAPP_FEATURES: Record<string, string[]> = {
+  en: [
+    'No student signup — join a class with a 4-digit code',
+    'Multiplayer vocabulary duels (1v1) and live whole-class games',
+    'Teacher dashboard: custom word lists, progress tracking, class analytics',
+    '5 languages including Hebrew (RTL) and Japanese, each with its own dictionary',
+    'Curriculum-aligned difficulty for primary, secondary, and ESL/EFL learners',
+    'Runs in any browser — no downloads, no paywalls, no premium tier',
+  ],
+  he: [
+    'בלי הרשמת תלמידים — הצטרפות לכיתה עם קוד בן 4 ספרות',
+    'דואלי אוצר מילים רב-משתתפים (1v1) ומשחקים חיים לכל הכיתה',
+    'לוח מחוונים למורה: רשימות מילים מותאמות, מעקב התקדמות, אנליטיקת כיתה',
+    '5 שפות כולל עברית (RTL) ויפנית, לכל אחת מילון משלה',
+    'רמת קושי מותאמת תכנית לימודים ליסודי, על-יסודי ולומדי אנגלית כשפה שנייה',
+    'פועל בכל דפדפן — בלי הורדות, בלי חומות תשלום, בלי שכבת פרימיום',
+  ],
+  sv: [
+    'Ingen elevregistrering — gå med i en klass med en 4-siffrig kod',
+    'Ordförrådsdueller för flera spelare (1v1) och live-spel för hela klassen',
+    'Lärarpanel: anpassade ordlistor, framstegsspårning, klassanalys',
+    '5 språk inklusive hebreiska (RTL) och japanska, var och en med egen ordbok',
+    'Läroplansanpassad svårighetsgrad för grundskola, gymnasium och ESL/EFL',
+    'Körs i valfri webbläsare — inga nedladdningar, inga betalspärrar',
+  ],
+  ja: [
+    '生徒の登録不要 — 4桁のコードでクラスに参加',
+    'マルチプレイヤー語彙デュエル（1対1）とクラス全体のライブゲーム',
+    '教師ダッシュボード：カスタム単語リスト、進捗追跡、クラス分析',
+    'ヘブライ語（RTL）と日本語を含む5言語、それぞれ独自の辞書',
+    '小学校・中等教育・ESL/EFL学習者向けのカリキュラム準拠の難易度',
+    'あらゆるブラウザで動作 — ダウンロード不要、ペイウォールなし',
+  ],
+  es: [
+    'Sin registro de estudiantes — únete a una clase con un código de 4 dígitos',
+    'Duelos de vocabulario multijugador (1v1) y juegos en vivo para toda la clase',
+    'Panel del profesor: listas personalizadas, seguimiento de progreso, análisis de clase',
+    '5 idiomas incluyendo hebreo (RTL) y japonés, cada uno con su propio diccionario',
+    'Dificultad alineada al currículo para primaria, secundaria y ESL/EFL',
+    'Funciona en cualquier navegador — sin descargas, sin muros de pago',
+  ],
+};
+
+export function buildEducationWebApplicationJsonLd(locale: string) {
+  const lang = safeLocale(locale);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication' as const,
+    '@id': `${BASE_URL}/${lang}/education#webapp`,
+    name: 'LexiClash Education',
+    url: `${BASE_URL}/${lang}/education`,
+    description: ORG_DESCRIPTION[lang] ?? ORG_DESCRIPTION.en,
+    applicationCategory: 'EducationalApplication',
+    operatingSystem: 'Web browser (Chrome, Safari, Firefox, Edge)',
+    browserRequirements: 'Requires JavaScript. Works on phone, tablet, and desktop.',
+    inLanguage: LOCALES,
+    isAccessibleForFree: true,
+    offers: {
+      '@type': 'Offer' as const,
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+    featureList: WEBAPP_FEATURES[lang] ?? WEBAPP_FEATURES.en,
+    audience: {
+      '@type': 'EducationalAudience',
+      educationalRole: ['teacher', 'student'],
+    },
+    provider: {
+      '@type': 'EducationalOrganization' as const,
+      '@id': `${BASE_URL}/${lang}/education#org`,
+      name: 'LexiClash Education',
+      url: `${BASE_URL}/${lang}/education`,
+    },
+    sameAs: SAME_AS,
   };
 }

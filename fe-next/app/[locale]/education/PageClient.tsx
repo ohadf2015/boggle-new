@@ -12,11 +12,7 @@ import { ComparisonStrip } from '@/components/education/ComparisonStrip';
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
 import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
-import {
-  educationOrganizationJsonLd,
-  breadcrumbJsonLd,
-  speakableJsonLd,
-} from '@/lib/seo/educationStructuredData';
+import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
 
 /**
  * Education Landing - Master page rebuilt with scroll reveals
@@ -64,11 +60,8 @@ export function PageClient() {
     return null;
   }
 
-  const orgLd = educationOrganizationJsonLd(language);
-  const breadcrumbLd = breadcrumbJsonLd([
-    { name: 'Home', url: `https://lexiclash.com/${language}` },
-    { name: 'Education', url: `https://lexiclash.com/${language}/education` },
-  ]);
+  // Organization + BreadcrumbList JSON-LD are emitted server-side in page.tsx
+  // (canonical .live entity). Only the speakable WebPage hint is client-unique.
   const speakLd = speakableJsonLd([
     'h1',
     '.education-hero-sub',
@@ -221,20 +214,6 @@ export function PageClient() {
         </>
       )}
 
-      <Script
-        id="education-org-ld"
-        type="application/ld+json"
-        strategy="afterInteractive"
-      >
-        {JSON.stringify(orgLd)}
-      </Script>
-      <Script
-        id="education-breadcrumb-ld"
-        type="application/ld+json"
-        strategy="afterInteractive"
-      >
-        {JSON.stringify(breadcrumbLd)}
-      </Script>
       <Script
         id="education-speakable-ld"
         type="application/ld+json"

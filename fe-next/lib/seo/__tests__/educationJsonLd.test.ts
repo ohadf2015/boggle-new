@@ -4,6 +4,7 @@ import {
   buildEducationOrgJsonLd,
   buildEducationBreadcrumbJsonLd,
   buildEducationCourseJsonLd,
+  buildEducationWebApplicationJsonLd,
 } from '../educationJsonLd';
 
 describe('educationJsonLd', () => {
@@ -49,6 +50,85 @@ describe('educationJsonLd', () => {
 
     it('uses locale in url', () => {
       expect(buildEducationOrgJsonLd('he').url).toBe('https://www.lexiclash.live/he/education');
+    });
+
+    it('exposes a stable @id so other schemas can reference the same entity', () => {
+      expect(buildEducationOrgJsonLd('en')['@id']).toBe('https://www.lexiclash.live/en/education#org');
+    });
+
+    it('links real external profiles via sameAs (entity verification for AI/search)', () => {
+      const schema = buildEducationOrgJsonLd('en');
+      expect(Array.isArray(schema.sameAs)).toBe(true);
+      // Must include the three real, existing LexiClash profiles — no placeholders.
+      expect(schema.sameAs).toContain('https://www.instagram.com/lexi.clash');
+      expect(schema.sameAs).toContain('https://play.google.com/store/apps/details?id=live.lexiclash.app');
+      expect(schema.sameAs).toContain('https://www.crazygames.com/game/lexiclash');
+      // No stray self-reference to a non-canonical domain.
+      expect(schema.sameAs).not.toContain('https://www.lexiclash.live');
+      expect(schema.sameAs.every((u: string) => !u.includes('lexiclash.com'))).toBe(true);
+    });
+
+    it('declares a square brand logo as an ImageObject', () => {
+      const schema = buildEducationOrgJsonLd('en');
+      expect(schema.logo).toMatchObject({
+        '@type': 'ImageObject',
+        url: 'https://www.lexiclash.live/logo.png',
+      });
+    });
+
+    it('marks the organization as free to use', () => {
+      expect(buildEducationOrgJsonLd('en').isAccessibleForFree).toBe(true);
+    });
+  });
+
+  describe('buildEducationWebApplicationJsonLd', () => {
+    it('returns a free EducationalApplication WebApplication', () => {
+      const schema = buildEducationWebApplicationJsonLd('en');
+      expect(schema['@context']).toBe('https://schema.org');
+      expect(schema['@type']).toBe('WebApplication');
+      expect(schema['@id']).toBe('https://www.lexiclash.live/en/education#webapp');
+      expect(schema.applicationCategory).toBe('EducationalApplication');
+      expect(schema.url).toBe('https://www.lexiclash.live/en/education');
+      expect(schema.operatingSystem).toMatch(/web|browser/i);
+      expect(schema.isAccessibleForFree).toBe(true);
+    });
+
+    it('declares a zero-price Offer (the GEO signal for "free" / "no paywall" queries)', () => {
+      const schema = buildEducationWebApplicationJsonLd('en');
+      expect(schema.offers).toMatchObject({
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      });
+    });
+
+    it('lists concrete differentiating features', () => {
+      const schema = buildEducationWebApplicationJsonLd('en');
+      expect(Array.isArray(schema.featureList)).toBe(true);
+      expect(schema.featureList.length).toBeGreaterThanOrEqual(4);
+      // Answer-dense facts that AI engines extract for comparison queries.
+      const joined = schema.featureList.join(' ').toLowerCase();
+      expect(joined).toContain('no');
+      expect(joined).toMatch(/signup|sign-up|account/);
+    });
+
+    it('references the canonical Organization @id as provider (no duplicate org entity)', () => {
+      const schema = buildEducationWebApplicationJsonLd('he');
+      expect(schema.provider).toMatchObject({
+        '@id': 'https://www.lexiclash.live/he/education#org',
+      });
+    });
+
+    it('declares supported locales and a teacher+student audience', () => {
+      const schema = buildEducationWebApplicationJsonLd('en');
+      expect(schema.inLanguage).toEqual(expect.arrayContaining(['en', 'he', 'sv', 'ja', 'es']));
+      expect(schema.audience['@type']).toBe('EducationalAudience');
+    });
+
+    it('uses locale in url + @id', () => {
+      const schema = buildEducationWebApplicationJsonLd('es');
+      expect(schema.url).toBe('https://www.lexiclash.live/es/education');
+      expect(schema['@id']).toBe('https://www.lexiclash.live/es/education#webapp');
     });
   });
 

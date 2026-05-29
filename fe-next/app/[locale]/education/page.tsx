@@ -7,6 +7,7 @@ import {
   buildEducationOrgJsonLd,
   buildEducationBreadcrumbJsonLd,
   buildEducationCourseJsonLd,
+  buildEducationWebApplicationJsonLd,
 } from '@/lib/seo/educationJsonLd';
 import { PageClient as EducationPageClient } from './PageClient';
 
@@ -138,12 +139,14 @@ export default async function EducationPage({ params }: { params: Promise<{ loca
   const orgSchema = buildEducationOrgJsonLd(locale);
   const breadcrumbSchema = buildEducationBreadcrumbJsonLd(locale);
   const courseSchema = buildEducationCourseJsonLd(locale);
+  const webAppSchema = buildEducationWebApplicationJsonLd(locale);
   // Safe: schemas built from static seoContent + locale enum, not user input.
   // JSON.stringify escapes content for <script> context; same pattern as
   // app/[locale]/guides/page.tsx:73 and lib/seo/homepageFaqJsonLd.ts.
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {faqSchema && (

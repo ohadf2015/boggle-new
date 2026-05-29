@@ -1,10 +1,23 @@
+// Canonical site is www.lexiclash.live (matches metadataBase + lib/seo/educationJsonLd.ts).
+// Using a second domain here previously fragmented the org entity for AI/search.
+const BASE_URL = 'https://www.lexiclash.live';
+
+// Real, existing LexiClash profiles (mirrors educationJsonLd.ts SAME_AS + layout.tsx).
+const SAME_AS = [
+  'https://www.instagram.com/lexi.clash',
+  'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+  'https://www.crazygames.com/game/lexiclash',
+];
+
 export function educationOrganizationJsonLd(locale: string) {
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
+    // Same @id as buildEducationOrgJsonLd so both emissions resolve to one entity.
+    '@id': `${BASE_URL}/${locale}/education#org`,
     name: 'LexiClash Education',
-    url: `https://lexiclash.com/${locale}/education`,
-    sameAs: ['https://lexiclash.com'],
+    url: `${BASE_URL}/${locale}/education`,
+    sameAs: SAME_AS,
     description: 'Classroom word games with native multilingual support, ad-free for students.',
     inLanguage: [locale],
   };
@@ -29,7 +42,7 @@ export function educationCourseJsonLd(args: { name: string; description: string;
     name: args.name,
     description: args.description,
     url: args.url,
-    provider: { '@type': 'Organization', name: 'LexiClash', url: 'https://lexiclash.com' },
+    provider: { '@type': 'Organization', name: 'LexiClash', url: BASE_URL },
     inLanguage: args.locale,
   };
 }
