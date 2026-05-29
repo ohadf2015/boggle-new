@@ -99,15 +99,19 @@ export function useAdMob() {
 
         (async () => {
           try {
-            await whenReady();
             // Bound the load: a cold/no-fill prepare can otherwise block the UI
             // for AdMob's full ~30s internal load timeout (the "stuck 30s" bug).
             // If we hit the cap, settle with a retry message; the in-flight
             // prepare keeps warming the cache for the next tap.
+            // Arm BEFORE whenReady(): if AdMob init never resolves (a hung
+            // `whenReady()`), the old order left this await with NO timer armed,
+            // freezing the UI in status='showing' forever. Capping it here frees
+            // the UI on a stalled init too.
             prepareTimer = setTimeout(
               () => finishRef(false, 'Ad not ready — please try again'),
               REWARD_PREPARE_TIMEOUT_MS,
             );
+            await whenReady();
             await AdMob.prepareRewardVideoAd({ adId });
             // Bailed out (prepare timeout fired, or a Failed* event already
             // settled us). Do NOT show: the listeners are gone, so a shown ad

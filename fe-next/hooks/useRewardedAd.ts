@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -15,6 +15,17 @@ export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 const PLACEHOLDER_TIMESTAMPS_KEY = 'lexiclash_placeholder_ad_timestamps';
 const MAX_PLACEHOLDER_PER_HOUR = 3;
 const ONE_HOUR = 60 * 60 * 1000;
+
+// Hook-level stuck-state backstop. Each ad provider is trusted to fire a
+// terminal callback (reward / error / dismiss). If a provider's SDK hangs and
+// fires NOTHING, `status` would stick at 'showing' forever and the in-flight
+// guard would permanently disable the watch-ad button — the "reward ads timer
+// stuck" bug. This is a LONG backstop, deliberately set ABOVE AdMob's own
+// worst-case legit path (≈12s prepare + 90s show-safety ≈ 102s) so it only
+// catches genuine infinite-hangs and NEVER preempts a late-but-real reward.
+// Covers every path uniformly — including CrazyGames / H5, which have no
+// timeout of their own, and a hung AdMob `whenReady()` the native layer misses.
+const REWARD_STUCK_WATCHDOG_MS = 120000;
 
 // Daily ad view tracking
 const DAILY_AD_VIEWS_KEY = 'lexiclash_daily_ad_views';
@@ -171,6 +182,17 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(() => isPlaceholderCapped());
   const [dailyViewCount, setDailyViewCount] = useState(() => getDailyViewCount());
 
+  // Timers held in refs so a single showAd session can clear its own watchdog
+  // and so unmount can sweep any pending timer (hygiene — no setState on a
+  // dead component). watchdogRef = the stuck-state backstop; idleResetRef =
+  // the short completed/error → idle reset.
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    if (idleResetRef.current) clearTimeout(idleResetRef.current);
+  }, []);
+
   // Use unified CoinContext for all coin operations
   const { awardWatchedAd, rewards } = useCoinContext();
 
@@ -255,10 +277,39 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
 
+    // Single idempotent settle guard for this showAd session. The FIRST
+    // terminal outcome — reward, error, or the stuck-state watchdog — wins;
+    // every later callback (a late real reward, a duplicate provider event, a
+    // watchdog that outlived a normal ad) is ignored. Generalizes the
+    // CrazyGames `settleCg` pattern to ALL paths so the watchdog can never
+    // double-fire with a real callback.
+    let sessionSettled = false;
+    const clearWatchdog = () => {
+      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
+    };
+
+    // Error transition, split from the settle guard so the in-flight
+    // coin-grant-failure path (already inside a settled session) can reuse it
+    // without tripping the guard a second time.
+    const applyError = (errorMsg: string) => {
+      setStatus('error');
+      setError(errorMsg);
+      trackRewardedAdDeclined(errorMsg, platform, telemetrySurface);
+      onAdError?.(errorMsg);
+      // Reset to idle after showing error
+      idleResetRef.current = setTimeout(() => {
+        setStatus('idle');
+        setError(null);
+      }, 3000);
+    };
+
     // Award coins helper - uses unified CoinContext for auth/guest sync.
     // For rewardKind='feature' we skip awardWatchedAd so feature unlocks
     // (retry, extra life, streak freeze, etc.) don't silently also pay coins.
     const awardCoinsAndNotify = async () => {
+      if (sessionSettled) return;
+      sessionSettled = true;
+      clearWatchdog();
       if (isPlaceholder) {
         recordPlaceholderView();
         setPlaceholderCooldownFlag(isPlaceholderCapped());
@@ -270,7 +321,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         const result = await awardWatchedAd(platform);
         if (!result) {
           // DB write failed — don't report false success to analytics or caller
-          handleAdError('Failed to grant coins — please try again');
+          applyError('Failed to grant coins — please try again');
           return;
         }
         awarded = result.awarded;
@@ -280,22 +331,29 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       await onRewardEarned?.(awarded);
 
       // Reset to idle after a short delay
-      setTimeout(() => setStatus('idle'), 1500);
+      idleResetRef.current = setTimeout(() => setStatus('idle'), 1500);
     };
 
     // Handle ad error
     const handleAdError = (errorMsg: string) => {
-      setStatus('error');
-      setError(errorMsg);
-      trackRewardedAdDeclined(errorMsg, platform, telemetrySurface);
-      onAdError?.(errorMsg);
-
-      // Reset to idle after showing error
-      setTimeout(() => {
-        setStatus('idle');
-        setError(null);
-      }, 3000);
+      if (sessionSettled) return;
+      sessionSettled = true;
+      clearWatchdog();
+      applyError(errorMsg);
     };
+
+    // Arm the stuck-state backstop for the whole loading→showing→reward window.
+    // If NO provider callback fires within the long window (hung SDK), force
+    // the state machine back to idle so the watch-ad button re-enables.
+    // Synchronous paths (immediate placeholder grant) settle first and clear
+    // this instantly; real ads settle well within REWARD_STUCK_WATCHDOG_MS.
+    clearWatchdog();
+    watchdogRef.current = setTimeout(() => {
+      if (sessionSettled) return;
+      sessionSettled = true;
+      watchdogRef.current = null;
+      applyError('Ad timed out — please try again');
+    }, REWARD_STUCK_WATCHDOG_MS);
 
     if (shouldUseCrazyGames) {
       // Priority 1: CrazyGames SDK for rewarded ads
