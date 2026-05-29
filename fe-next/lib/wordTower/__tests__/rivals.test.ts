@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rivalScreenY, rivalsPassed, visibleRivalMarkers, rivalsFromLeaderboard, type RivalMarker } from '../rivals';
+import { rivalScreenY, rivalsPassed, visibleRivalMarkers, rivalsFromLeaderboard, nearestRivalAbove, type RivalMarker } from '../rivals';
 
 const PX = 5;
 const BUILD = 200; // build-line y
@@ -42,6 +42,28 @@ describe('visibleRivalMarkers', () => {
   it('brings a high record into view as the viewer climbs toward it', () => {
     const vis = visibleRivalMarkers(280, rivals, BUILD, 600, PX); // near Cy(300)
     expect(vis.map((m) => m.id)).toContain('c');
+  });
+});
+
+describe('nearestRivalAbove', () => {
+  // rivals: Ann 40, Bo 100, Cy 300
+  it('returns the closest record still above the viewer, with the gap to it', () => {
+    const r = nearestRivalAbove(50, rivals)!;
+    expect(r.id).toBe('b'); // Bo(100) is the next one up from 50 (Ann 40 already passed)
+    expect(r.gapM).toBe(50);
+  });
+  it('skips records the viewer has already reached (height >= rival is passed)', () => {
+    expect(nearestRivalAbove(100, rivals)!.id).toBe('c'); // exactly at Bo → chase Cy next
+    expect(nearestRivalAbove(110, rivals)!.id).toBe('c');
+  });
+  it('returns null once every rival is below (nothing left to chase)', () => {
+    expect(nearestRivalAbove(500, rivals)).toBeNull();
+  });
+  it('returns null for an empty rival set', () => {
+    expect(nearestRivalAbove(10, [])).toBeNull();
+  });
+  it('rounds the gap up so "+0m" never shows while a rival is still ahead', () => {
+    expect(nearestRivalAbove(99.4, rivals)!.gapM).toBe(1); // 0.6m to Bo → ceil → 1
   });
 });
 

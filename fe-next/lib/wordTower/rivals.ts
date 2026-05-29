@@ -72,6 +72,30 @@ export function rivalScreenY(rivalHeightM: number, viewerHeightM: number, buildL
   return buildLineY + (viewerHeightM - rivalHeightM) * pxPerM;
 }
 
+/** The next rival record still above the viewer, plus the metres left to pass it. */
+export interface ChaseTarget extends RivalMarker {
+  /** Metres the viewer still needs to climb to overtake this rival (≥ 1, rounded up). */
+  gapM: number;
+}
+
+/**
+ * The closest rival the viewer has NOT yet passed — the live chase target. The
+ * rail only draws rivals whose record line is on-screen, so a record far above
+ * is invisible; this surfaces it as a "↑ Ann +8m" goal that never leaves the HUD
+ * until you overtake it. A rival at exactly the viewer's height counts as
+ * already reached (chase the next one up), and the gap is rounded UP so it never
+ * reads "+0m" while the rival is still in front. Returns null once nothing is left.
+ */
+export function nearestRivalAbove(viewerHeightM: number, rivals: ReadonlyArray<RivalMarker>): ChaseTarget | null {
+  let best: RivalMarker | null = null;
+  for (const r of rivals) {
+    if (r.heightM <= viewerHeightM) continue; // already reached / overtaken
+    if (best === null || r.heightM < best.heightM) best = r;
+  }
+  if (best === null) return null;
+  return { ...best, gapM: Math.max(1, Math.ceil(best.heightM - viewerHeightM)) };
+}
+
 /** Rivals overtaken as the viewer climbs from `prevHeightM` to `curHeightM`. */
 export function rivalsPassed(prevHeightM: number, curHeightM: number, rivals: ReadonlyArray<RivalMarker>): RivalMarker[] {
   if (curHeightM <= prevHeightM) return [];

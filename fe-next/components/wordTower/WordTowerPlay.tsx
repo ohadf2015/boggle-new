@@ -34,6 +34,8 @@ import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
+import { WordTowerStatHud } from './WordTowerStatHud';
+import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
 
 interface PlayProps {
   language: Language;
@@ -405,6 +407,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* Rival rail — heights include local sabotage hits so the targeted ghost shrinks. */}
       <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
+      {/* Persistent chase chip — the closest record still ABOVE you (the rail only
+          draws on-screen ghosts, so the real target is usually off-screen up).
+          Keyed off the live climb height, not the panned view. */}
+      <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
+
       {/* Next-zone tease — quiet anticipation chip in the approach window. Hidden
           while the NEW ZONE banner is paying off the arrival. */}
       {tease && !zoneText && (
@@ -525,7 +532,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
       {/* Owned perks — small badge row (daily run) so the player sees their build. */}
       {daily && perks.owned.length > 0 && (
-        <div className="pointer-events-none fixed left-2 top-12 z-40 flex flex-col gap-1" dir={dir}>
+        <div className="pointer-events-none fixed left-2 top-[76px] z-40 flex flex-col gap-1" dir={dir}>
           {perks.owned.map((id) => (
             <span
               key={id}
@@ -553,15 +560,34 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         </div>
       )}
 
-      <div className="pointer-events-auto absolute inset-x-0 top-0 z-10 flex items-center justify-between p-3">
+      {/* Top bar — three flex columns: [back] · [altitude readout] · [actions].
+          The altitude HUD shares this row, so it can NEVER sit behind the back
+          button (the old corner card overlapped it once the label wrapped in a
+          longer locale). The container is inert; only the buttons take taps. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-3">
         <Link
           href={`/${language}`}
           onClick={() => save(true)}
-          className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
+          aria-label={t('common.backToHome')}
+          className="pointer-events-auto flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
         >
-          <ArrowLeft className="h-4 w-4" /> {t('common.backToHome')}
+          <ArrowLeft className="h-4 w-4" />
+          <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
         </Link>
-        <div className="flex items-center gap-2">
+        {/* Dropped below the top-centre mode-toggle badge row (Daily/Endless, a
+            fixed full-width strip ~y8–37) so the height line isn't hidden behind
+            it. Back button (left) + actions (right) stay pinned to the top. */}
+        <div className="pointer-events-none mt-8">
+          <WordTowerStatHud
+            heightM={game.heightM}
+            biomeId={biomeId}
+            floorsCount={game.floors.length}
+            personalBestM={personalBest}
+            combo={game.combo}
+            t={t}
+          />
+        </div>
+        <div className="pointer-events-auto flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={shareTower}
@@ -600,14 +626,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           selected={tower.state.selected}
           word={tower.word}
           heightM={game.heightM}
-          personalBestM={personalBest}
           combo={game.combo}
           scramblesLeft={game.scramblesLeft}
-          floorsCount={game.floors.length}
           possibleWords={possibleWords}
           clueWord={clueWord}
           onReroll={reroll}
-          biomeId={biomeId}
           lastError={tower.state.lastError}
           errorKey={tower.state.errorKey}
           lastResult={tower.state.lastResult}

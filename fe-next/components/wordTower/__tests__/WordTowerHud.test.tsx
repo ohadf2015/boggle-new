@@ -15,8 +15,6 @@ function makeProps(over: Partial<WordTowerHudProps> = {}): WordTowerHudProps {
     heightM: 12,
     combo: 0,
     scramblesLeft: 3,
-    floorsCount: 4,
-    biomeId: 'city',
     lastError: null,
     errorKey: 0,
     lastResult: null,

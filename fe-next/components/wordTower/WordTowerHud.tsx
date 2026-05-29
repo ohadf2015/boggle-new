@@ -5,7 +5,6 @@ import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp, RotateCw, 
 import { cn } from '@/lib/utils';
 import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import { useTimedReveal } from '@/lib/wordTower/useTimedReveal';
-import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 
 export interface WordTowerHudProps {
   anchorLetter: string;
@@ -13,17 +12,14 @@ export interface WordTowerHudProps {
   selected: number[];
   word: string;
   heightM: number;
-  personalBestM: number;
   combo: number;
   scramblesLeft: number;
-  floorsCount: number;
   /** How many dictionary words are buildable from the current anchor + tray. */
   possibleWords?: number | null;
   /** A sample buildable word for the clue reveal (canonical form). */
   clueWord?: string | null;
   /** Re-anchor to a fresh viable letter when the chain dead-ends. */
   onReroll?: () => void;
-  biomeId: WordTowerBiomeId;
   lastError: ValidationError | null;
   errorKey: number;
   lastResult: ApplyResult | null;
@@ -59,8 +55,8 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
-    anchorLetter, tray, selected, word, heightM, personalBestM, combo, scramblesLeft, floorsCount,
-    possibleWords, clueWord, onReroll, biomeId, lastError, errorKey, lastResult, resultKey,
+    anchorLetter, tray, selected, word, heightM, combo, scramblesLeft,
+    possibleWords, clueWord, onReroll, lastError, errorKey, lastResult, resultKey,
     pendingWord, onCraneDrop,
     onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t,
   } = props;
@@ -109,8 +105,11 @@ export function WordTowerHud(props: WordTowerHudProps) {
     return '';
   }, [resultKey, lastResult, heightM, combo, t]);
 
+  // justify-END (not -between): the altitude readout moved to the header, so the
+  // deck is the only in-flow child (the sr-only live region is position:absolute)
+  // — pin it to the bottom of the screen.
   return (
-    <div className="pointer-events-none relative flex h-full flex-col justify-between">
+    <div className="pointer-events-none relative flex h-full flex-col justify-end">
       {/* Floating reward popup on each accepted word — pops in, holds, fades. */}
       {showReward && lastResult && (
         <div
@@ -128,24 +127,9 @@ export function WordTowerHud(props: WordTowerHudProps) {
           </div>
         </div>
       )}
-      {/* Top: a compact altitude HUD pinned to the start side (display-only),
-          sitting under the back button so it never crowds the centre — the
-          tower owns the centre of the screen. */}
-      <div className="pointer-events-none flex justify-start px-3 pt-14">
-        <div className="flex flex-col items-start rounded-neo border-neo border-black bg-neo-navy/80 px-2.5 py-1 shadow-hard-sm backdrop-blur-sm">
-          <span className="font-neo-display text-xl font-bold leading-none text-neo-white tabular-nums">
-            {heightM.toFixed(0)}<span className="text-xs text-neo-cyan">m</span>
-          </span>
-          <span className="font-neo-body text-[10px] uppercase leading-tight tracking-wider text-neo-cyan">
-            {t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}
-          </span>
-          {personalBestM > 0 && (
-            <span className="font-neo-body text-[10px] font-bold leading-tight text-neo-yellow">
-              {t('wordTower.hud.best', { m: Math.round(personalBestM) })}
-            </span>
-          )}
-        </div>
-      </div>
+      {/* Altitude readout now lives in the top-bar's centre column (see
+          WordTowerStatHud in WordTowerPlay) so it can never sit behind the back
+          button. This deck owns only the builder + controls. */}
 
       {/* Screen-reader live announcements */}
       <div aria-live="polite" className="sr-only">{liveText}</div>

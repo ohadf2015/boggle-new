@@ -5,7 +5,29 @@ import {
   craneOffsetAt,
   nextPerfectStreak,
   perfectStreakBonus,
+  alignmentBand,
+  PERFECT_MAX,
+  GOOD_MAX,
+  SLOPPY_MAX,
 } from '../cranePlacement';
+
+describe('alignmentBand — live drop-quality preview (matches the scorer)', () => {
+  it('classifies the absolute offset into the same bands evaluatePlacement scores', () => {
+    expect(alignmentBand(0)).toBe('perfect');
+    expect(alignmentBand(PERFECT_MAX)).toBe('perfect');
+    expect(alignmentBand(PERFECT_MAX + 0.01)).toBe('good');
+    expect(alignmentBand(GOOD_MAX)).toBe('good');
+    expect(alignmentBand(GOOD_MAX + 0.01)).toBe('sloppy');
+    expect(alignmentBand(SLOPPY_MAX)).toBe('sloppy');
+    expect(alignmentBand(SLOPPY_MAX + 0.01)).toBe('miss');
+    expect(alignmentBand(1)).toBe('miss');
+  });
+  it('agrees with the verdict evaluatePlacement actually returns (single source of truth)', () => {
+    for (const e of [0, 0.05, 0.08, 0.2, 0.25, 0.4, 0.6, 0.8, 1]) {
+      expect(alignmentBand(e)).toBe(evaluatePlacement(e, 0).quality);
+    }
+  });
+});
 
 describe('evaluatePlacement — cosy reward amplifier (never a fail-gate)', () => {
   it('dead-centre drop is PERFECT: full block, height bonus, no topple', () => {

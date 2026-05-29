@@ -33,6 +33,22 @@ export const TOPPLE_AFTER_SLOPPY = 2;
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 
 /**
+ * Classify a (clamped) drop error into its quality band — WITHOUT the streak /
+ * topple context. This is the single source of truth for the band edges; the
+ * crane reads it live (while the trolley sweeps) so the player can SEE whether
+ * the current position would land perfect/good/sloppy/miss, and
+ * {@link evaluatePlacement} reuses it so the live preview can never disagree with
+ * the verdict that follows the drop.
+ */
+export function alignmentBand(offset: number): PlacementQuality {
+  const e = clamp01(offset);
+  if (e <= PERFECT_MAX) return 'perfect';
+  if (e <= GOOD_MAX) return 'good';
+  if (e <= SLOPPY_MAX) return 'sloppy';
+  return 'miss';
+}
+
+/**
  * Evaluate a drop. `offset` is the normalised horizontal error (0 = centre,
  * 1 = fully off, clamped). `consecutiveSloppy` is how many bad drops preceded
  * this one (for the recoverable topple rule).
@@ -43,23 +59,23 @@ export function evaluatePlacement(
 ): PlacementOutcome {
   const e = clamp01(offset);
 
-  if (e <= PERFECT_MAX) {
-    return { quality: 'perfect', overlap: 1, heightMultiplier: 1.4, perfect: true, topples: false };
+  switch (alignmentBand(e)) {
+    case 'perfect':
+      return { quality: 'perfect', overlap: 1, heightMultiplier: 1.4, perfect: true, topples: false };
+    case 'good':
+      return { quality: 'good', overlap: 1 - e, heightMultiplier: 1, perfect: false, topples: false };
+    case 'sloppy':
+      return { quality: 'sloppy', overlap: 1 - e, heightMultiplier: 0.6, perfect: false, topples: false };
+    default:
+      // Miss — cosy catch at a minimum width; topple only after enough instability.
+      return {
+        quality: 'miss',
+        overlap: Math.max(MIN_CAUGHT_OVERLAP, 1 - e),
+        heightMultiplier: 0.3,
+        perfect: false,
+        topples: consecutiveSloppy >= TOPPLE_AFTER_SLOPPY,
+      };
   }
-  if (e <= GOOD_MAX) {
-    return { quality: 'good', overlap: 1 - e, heightMultiplier: 1, perfect: false, topples: false };
-  }
-  if (e <= SLOPPY_MAX) {
-    return { quality: 'sloppy', overlap: 1 - e, heightMultiplier: 0.6, perfect: false, topples: false };
-  }
-  // Miss — cosy catch at a minimum width; topple only after enough instability.
-  return {
-    quality: 'miss',
-    overlap: Math.max(MIN_CAUGHT_OVERLAP, 1 - e),
-    heightMultiplier: 0.3,
-    perfect: false,
-    topples: consecutiveSloppy >= TOPPLE_AFTER_SLOPPY,
-  };
 }
 
 /** Next instability count: clean drop resets it, a bad drop bumps it. */

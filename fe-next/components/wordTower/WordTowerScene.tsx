@@ -13,6 +13,7 @@ import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
+import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
   makeTile, paintTile, placeInstant, dropIn, popOut, recolor, bumpScale, shakeX, squashLand, impactRing,
   type TileSprite,
@@ -362,10 +363,17 @@ export function WordTowerScene(props: SceneProps) {
   // the back-to-top button. Reset whenever a committed word snaps us back up.
   const [pannedDown, setPannedDown] = useState(false);
   const rafRef = useRef<number | null>(null);
+  // Inertial fling: a flicked drag keeps gliding after release (momentumRaf) so a
+  // tall tower scrolls fast + feels alive, instead of a 1:1 finger-drag slog.
+  const momentumRaf = useRef<number | null>(null);
+  const stopMomentum = useCallback(() => {
+    if (momentumRaf.current != null) { cancelAnimationFrame(momentumRaf.current); momentumRaf.current = null; }
+  }, []);
   // Pulled out so the pan callbacks close over specific values (the React
   // Compiler can't preserve a `useCallback` that reads `props.*` directly).
   const { heightM, onViewAltChange } = props;
   useEffect(() => {
+    stopMomentum(); // a commit yanks the camera to the build line — kill any fling
     setPanAltitude(null);
     setPannedDown(false);
     onViewAltChange?.(heightM); // snap sibling rails back to the live height
@@ -389,7 +397,7 @@ export function WordTowerScene(props: SceneProps) {
   // dedicated catcher div (in the render) with React pointer handlers + pointer
   // capture, so the gesture is owned outright instead of relying on pass-through
   // to the Pixi canvas (which silently swallowed it on mobile).
-  const drag = useRef<{ y: number; pan: number } | null>(null);
+  const drag = useRef<{ y: number; pan: number; prevY: number; prevT: number; vel: number } | null>(null);
   const applyPan = (next: number) => {
     pan.current.y = clampPan(next, pan.current.panMin);
     const c = pan.current.container;
@@ -408,10 +416,33 @@ export function WordTowerScene(props: SceneProps) {
       });
     }
   };
-  useEffect(() => () => { if (rafRef.current != null) cancelAnimationFrame(rafRef.current); }, []);
+  // Launch an inertial glide from a release velocity (px/ms). Each frame decays
+  // the velocity (framerate-independent) and pans by it, stopping when it slows
+  // below the cutoff or hits a bound (no overscroll). Reuses applyPan so the
+  // backdrop + rails track the glide exactly like a manual drag.
+  const startMomentum = (v0: number) => {
+    stopMomentum();
+    if (pan.current.panMin === 0) return; // tower fits → nothing to fling
+    let vel = v0;
+    let last = performance.now();
+    const tick = (now: number) => {
+      const step = stepMomentum(pan.current.y, vel, now - last, pan.current.panMin, 0);
+      last = now;
+      vel = step.v;
+      applyPan(step.y);
+      if (step.done) { momentumRaf.current = null; return; }
+      momentumRaf.current = requestAnimationFrame(tick);
+    };
+    momentumRaf.current = requestAnimationFrame(tick);
+  };
+  useEffect(() => () => {
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    if (momentumRaf.current != null) cancelAnimationFrame(momentumRaf.current);
+  }, []);
 
   // Glide the camera back to the build line (back-to-top button + minimap tap).
   const scrollToTop = useCallback(() => {
+    stopMomentum(); // the snap owns the camera now — drop any in-flight fling
     const ps = pan.current;
     ps.y = 0;
     const c = ps.container;
@@ -421,7 +452,7 @@ export function WordTowerScene(props: SceneProps) {
     setPanAltitude(null);
     setPannedDown(false);
     onViewAltChange?.(heightM); // rails snap back to the live top with the camera
-  }, [heightM, onViewAltChange]);
+  }, [heightM, onViewAltChange, stopMomentum]);
 
   const config = useMemo(
     () => (size ? { width: size.w, height: size.h, background: 0x000000, backgroundAlpha: 0 } : null),
@@ -492,14 +523,27 @@ export function WordTowerScene(props: SceneProps) {
         className="absolute inset-0 touch-none"
         onPointerDown={(e) => {
           if (pan.current.panMin === 0) return;
+          stopMomentum(); // grabbing the tower halts any glide in progress
           try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* */ }
           pan.current.dragging = true;
-          drag.current = { y: e.clientY, pan: pan.current.y };
+          drag.current = { y: e.clientY, pan: pan.current.y, prevY: e.clientY, prevT: e.timeStamp, vel: 0 };
         }}
-        onPointerMove={(e) => { if (drag.current) applyPan(drag.current.pan + (e.clientY - drag.current.y)); }}
-        onPointerUp={() => { pan.current.dragging = false; drag.current = null; }}
+        onPointerMove={(e) => {
+          const d = drag.current;
+          if (!d) return;
+          applyPan(d.pan + (e.clientY - d.y));
+          // Track release velocity (px/ms) from the last move for the fling.
+          const dt = e.timeStamp - d.prevT;
+          if (dt > 0) { d.vel = (e.clientY - d.prevY) / dt; d.prevY = e.clientY; d.prevT = e.timeStamp; }
+        }}
+        onPointerUp={() => {
+          const d = drag.current;
+          pan.current.dragging = false;
+          drag.current = null;
+          if (d && Math.abs(d.vel) > 0) startMomentum(clampFlickVelocity(d.vel)); // let go with speed → glide
+        }}
         onPointerCancel={() => { pan.current.dragging = false; drag.current = null; }}
-        onWheel={(e) => { if (pan.current.panMin !== 0) applyPan(pan.current.y - e.deltaY); }}
+        onWheel={(e) => { if (pan.current.panMin !== 0) { stopMomentum(); applyPan(pan.current.y - e.deltaY * WHEEL_SCALE); } }}
       />
     </div>
   );

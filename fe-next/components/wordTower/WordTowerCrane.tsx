@@ -5,8 +5,10 @@ import { cn } from '@/lib/utils';
 import {
   evaluatePlacement,
   craneOffsetAt,
+  alignmentBand,
   TOPPLE_AFTER_SLOPPY,
   type PlacementOutcome,
+  type PlacementQuality,
 } from '@/lib/wordTower/cranePlacement';
 import { beamWidthFor } from '@/lib/wordTower/craneBeam';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -43,6 +45,24 @@ const QUALITY_STYLE: Record<string, string> = {
   good: 'bg-neo-cyan text-neo-black',
   sloppy: 'bg-neo-yellow text-neo-black',
   miss: 'bg-neo-red text-neo-white',
+};
+
+/** Live beam tint by the band the CURRENT sweep position would score — turns the
+ *  blind tap into a readable skill shot. Perfect gets a glowing ring to nail the
+ *  "stop it here" feedback loop. */
+const BAND_BEAM: Record<PlacementQuality, string> = {
+  perfect: 'bg-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
+  good: 'bg-neo-cyan',
+  sloppy: 'bg-neo-yellow',
+  miss: 'bg-neo-red text-neo-white',
+};
+/** Landing-shadow fill (CSS colour) matching the live band — projected on the
+ *  drop guide so the player sees WHERE + HOW WELL the beam will land. */
+const BAND_SHADOW: Record<PlacementQuality, string> = {
+  perfect: 'rgba(191,255,0,0.55)',
+  good: 'rgba(0,255,255,0.4)',
+  sloppy: 'rgba(255,225,53,0.4)',
+  miss: 'rgba(255,51,102,0.4)',
 };
 
 /** How far the trolley carriage slides along the jib (px from centre). */
@@ -123,6 +143,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const { language } = useLanguage();
   const trolleyX = pos * TROLLEY_RANGE_PX;
   const beamW = beamWidthFor(word.length);
+  // The band the CURRENT sweep position would score — drives the live beam tint
+  // + landing shadow so the drop is a readable skill shot, not a blind tap.
+  const liveBand = alignmentBand(Math.abs(pos));
+  const aiming = !falling && !result;
   // Hebrew: show the word-final letter in its sofit form and lay the beam RTL.
   // Width still keys off the raw length (same glyph count).
   const beamWord = language === 'he' ? applyHebrewFinalLetters(word) : word;
@@ -178,40 +202,59 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
             <span>▲▼▲▼▲▼</span>
           </div>
         </div>
-        {/* Trolley + cable + hook + held beam — slides along the jib */}
+        {/* Trolley sweep wrapper — translateX only. The landing shadow lives in
+            here too, so it shares the EXACT horizontal offset + centring as the
+            beam and stays glued under it (no abspos-in-flex drift). The inner div
+            owns the vertical fall so the ground shadow doesn't drop with it. */}
         <div
           className="absolute top-[20px] z-20 will-change-transform"
-          style={{
-            transform: `translateX(${trolleyX}px) translateY(${falling ? 80 : 0}px)`,
-            transition: falling ? 'transform 240ms cubic-bezier(0.5,0,0.75,0)' : 'none',
-            transformOrigin: 'top center',
-          }}
+          style={{ transform: `translateX(${trolleyX}px)` }}
         >
-          {/* Trolley carriage */}
-          <div className="mx-auto h-3 w-9 rounded-sm border border-black bg-neo-navy-light shadow-hard" aria-hidden />
-          {/* Cable */}
           <div
-            className="mx-auto w-[2px] bg-black"
-            style={{ height: `${CABLE_LEN_PX}px` }}
-            aria-hidden
-          />
-          {/* Hook */}
-          <div className="mx-auto -mt-1 h-3 w-4 rounded-b-full border-[1.5px] border-t-0 border-black bg-neo-yellow-light shadow-hard" aria-hidden />
-          {/* Held WORD BEAM — width scales with word length */}
-          <div
-            data-testid="crane-block"
-            className={cn(
-              'mx-auto mt-0.5 flex items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cyan font-neo-display text-base font-black uppercase tracking-wide text-neo-black shadow-hard',
-              !reducedMotion && !falling && 'animate-neo-pop',
-            )}
-            style={{ width: `${beamW}px`, height: '38px' }}
-            dir={language === 'he' ? 'rtl' : 'ltr'}
+            style={{
+              transform: `translateY(${falling ? 80 : 0}px)`,
+              transition: falling ? 'transform 240ms cubic-bezier(0.5,0,0.75,0)' : 'none',
+              transformOrigin: 'top center',
+            }}
           >
-            {beamWord}
+            {/* Trolley carriage */}
+            <div className="mx-auto h-3 w-9 rounded-sm border border-black bg-neo-navy-light shadow-hard" aria-hidden />
+            {/* Cable */}
+            <div
+              className="mx-auto w-[2px] bg-black"
+              style={{ height: `${CABLE_LEN_PX}px` }}
+              aria-hidden
+            />
+            {/* Hook */}
+            <div className="mx-auto -mt-1 h-3 w-4 rounded-b-full border-[1.5px] border-t-0 border-black bg-neo-yellow-light shadow-hard" aria-hidden />
+            {/* Held WORD BEAM — width scales with word length */}
+            <div
+              data-testid="crane-block"
+              className={cn(
+                'mx-auto mt-0.5 flex items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-base font-black uppercase tracking-wide text-neo-black shadow-hard transition-colors duration-100',
+                BAND_BEAM[liveBand],
+                !reducedMotion && !falling && 'animate-neo-pop',
+              )}
+              style={{ width: `${beamW}px`, height: '38px' }}
+              dir={language === 'he' ? 'rtl' : 'ltr'}
+            >
+              {beamWord}
+            </div>
           </div>
+          {/* Predictive landing shadow — centred under the beam (shares this
+              wrapper's translateX), parked on the drop guide; recolours by the
+              live band so the player SEES where + how cleanly the beam will land.
+              Sibling of the faller, so it stays on the ground. */}
+          {aiming && (
+            <div
+              className="absolute left-1/2 top-[132px] z-0 h-2 w-14 -translate-x-1/2 rounded-[50%] blur-[1px]"
+              style={{ backgroundColor: BAND_SHADOW[liveBand], transition: 'background-color 100ms linear' }}
+              aria-hidden
+            />
+          )}
         </div>
 
-        {/* Centre drop guide — the place the beam should land */}
+        {/* Centre drop guide — the bullseye the beam should land on */}
         <div
           className="absolute bottom-2 z-0 h-1.5 w-20 rounded-full border border-dashed border-neo-lime/60 bg-neo-lime/15"
           aria-hidden
