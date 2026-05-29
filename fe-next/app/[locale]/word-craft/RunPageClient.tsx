@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { useWordCraftRun } from '@/lib/word-craft/run/useWordCraftRun';
 import { wordFeedbackTier } from '@/lib/word-craft/run/feedbackTiers';
@@ -37,7 +38,29 @@ export function RunPageClient() {
   const { state } = run;
 
   // Per-word commit ceremony — fills the "submit → nothing happens" dead zone.
-  const { playWordAcceptedSound, playPerfectWordSound } = useSoundEffects();
+  const { playWordAcceptedSound, playPerfectWordSound, playSound, setGameActive } = useSoundEffects();
+  const { fadeToTrack, stopMusic, TRACKS } = useMusic();
+
+  // Audio lifecycle: activate the SFX gate + start in-game music while the run
+  // is mounted; tear both down on exit. (Run/Card mode was silent before.)
+  useEffect(() => {
+    setGameActive(true);
+    fadeToTrack(TRACKS.IN_GAME, 600, 600);
+    return () => {
+      setGameActive(false);
+      stopMusic(500);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Invalid submission feedback — a quick rejection sting.
+  const prevErrorRef = useRef<string | null>(null);
+  useEffect(() => {
+    const e = state.lastError ?? null;
+    if (e && e !== prevErrorRef.current) playSound('wordRejected', {});
+    prevErrorRef.current = e;
+  }, [state.lastError, playSound]);
+
   const [wordPop, setWordPop] = useState<RunWordPopData | null>(null);
   const popKeyRef = useRef(0);
   useEffect(() => {

@@ -33,6 +33,7 @@ import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
 import { mountAmbientSparkles, type PremiumCellRef } from '@/lib/word-craft/pixi/ambientSparkles';
 import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
 import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleCommit';
+import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { classifyHeat, detectHeatTransition, type HeatBeat } from '@/lib/word-craft/celebration/heatTransition';
 import { WordCraftHeatStamp } from '@/components/word-craft/WordCraftHeatStamp';
@@ -147,6 +148,29 @@ export default function WordCraftPageClient() {
 
   const game = useWordCraftGame({ seed, dict, locale, territoryEnabled, hotseat });
   const { cosyMode } = useAccessibility();
+
+  // Audio: activates the SFX gate + in-game music on mount, fires heat-beat /
+  // capture / game-over sounds as state transitions, and exposes playCommit for
+  // the per-word celebration. WordCraft was silent before this.
+  const { playCommit: playCommitSound } = useWordCraftSound(
+    {
+      heat: game.state.heat,
+      overdrive: game.state.overdrive,
+      burnout: game.state.burnout,
+      captureTurnIndex: game.state.lastCapture?.turnIndex ?? null,
+      captureCount: game.state.lastCapture?.cells.length ?? 0,
+      isOver: game.state.turn === 'over',
+      result:
+        game.state.turn !== 'over'
+          ? null
+          : game.state.player.score === game.state.bot.score
+            ? 'draw'
+            : game.state.player.score > game.state.bot.score
+              ? 'win'
+              : 'lose',
+    },
+    cosyMode,
+  );
 
   // Pass-and-play hand-off curtain: when the turn flips between the two human
   // seats, cover the screen so the incoming player can't see the outgoing
@@ -441,22 +465,25 @@ export default function WordCraftPageClient() {
             }
           }
         }
+        const commitCtx = {
+          scoreThisTurn: newest.score,
+          tilesPlaced: newest.placedTileIds.length,
+          bingo: isBingo,
+          streak: game.state.streaks.player,
+          hasRareTile,
+          premiumTriggered,
+          heatLevel: game.state.heat,
+        };
         playSpectacleCommit(sceneCtx, {
-          ctx: {
-            scoreThisTurn: newest.score,
-            tilesPlaced: newest.placedTileIds.length,
-            bingo: isBingo,
-            streak: game.state.streaks.player,
-            hasRareTile,
-            premiumTriggered,
-            heatLevel: game.state.heat,
-          },
+          ctx: commitCtx,
           placements,
           word: newest.words[0] ?? '',
           cosyMode,
         }).catch(() => {
           // Pixi animations can fail on low-end devices; silently continue
         });
+        // Audio twin of the Pixi spectacle — confirm + tier flourish + rare sparkle.
+        playCommitSound(commitCtx);
       }
 
       // Achievement: first word
@@ -483,7 +510,7 @@ export default function WordCraftPageClient() {
         setScoreFloat((prev) => prev ? { ...prev, overdrive: true } : prev);
       }
     }
-  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode]);
+  }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode, playCommitSound]);
 
   // --- Overdrive enter ---
   const prevOverdriveRef = useRef(false);
