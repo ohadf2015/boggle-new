@@ -50,6 +50,21 @@ Sitemap: https://www.lexiclash.live/sitemap.xml
 - Unique juice effects and animations
 - URL: https://www.lexiclash.live/en/singleplayer
 
+### WordCraft
+- Word-strategy grid game (Scrabble-adjacent) with a territory-claiming twist: tiles you play claim cells, and crossing a rival's word captures their cells
+- Heat / overdrive momentum system rewards consecutive scoring streaks
+- Four modes:
+  - Territory (default): claim and capture ground, highest score when the bag empties wins
+  - Card Run: roguelike timed rounds, draft one power card (vowel boosts, multipliers, extra tiles) between rounds for a high run total
+  - Gem Hunt: words uncover buried gems to collect for a combo score
+  - Pass & Play: turn-based on one device with a privacy curtain on hand-off — good for phones and party/TV screens
+- Free, instant, no download; plays in English, Hebrew (RTL), Swedish, Japanese, Spanish
+- Marketing/landing: https://www.lexiclash.live/en/word-craft-game
+- Play: https://www.lexiclash.live/en/word-craft
+  - Card Run: https://www.lexiclash.live/en/word-craft?mode=cards
+  - Gem Hunt: https://www.lexiclash.live/en/word-craft?mode=gems
+  - Pass & Play: https://www.lexiclash.live/en/word-craft?vs=human
+
 ### Word Bridge (rosh-zanav / ראש זנב)
 - Word-association puzzle: two words shown, find the single word that bridges them
 - NOT to be confused with NYT Connections (different mechanic — that game asks you to sort 16 words into 4 groups)

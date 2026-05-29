@@ -1,7 +1,7 @@
 /**
  * LandingChallengeCards — visibility gates
  *
- * 1. Word Craft is admin-only. Non-admin players must NOT see the card.
+ * 1. Word Craft (territory + Card Run) is PUBLIC; Gem Hunt stays admin-only.
  * 2. After a player has finished even one multiplayer round, the "More Game
  *    Modes" expander must not collapse extras — surface every mode directly.
  */
@@ -83,27 +83,29 @@ const baseProps = {
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
 };
 
-describe('LandingChallengeCards — Word Craft admin gate', () => {
-  it('does NOT render the wordCraft card for a non-admin user', () => {
+describe('LandingChallengeCards — Word Craft public (territory + Card Run)', () => {
+  it('renders the wordCraft territory card for a non-admin user (now public)', () => {
     mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
-  });
-
-  it('renders the wordCraft card for an admin', () => {
-    mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
     expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 
-  it('does NOT render the wordCraft card when signed out', () => {
+  it('renders the wordCraft Card Run card for a non-admin with ?mode=cards href', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-wordcraft.cardsModeTitle');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/word-craft?mode=cards');
+  });
+
+  it('renders the wordCraft card when signed out (public)', () => {
     mockIsAdmin.mockReturnValue(false);
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
+    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
   });
 
   it('does NOT render the wordCraft Gem Hunt card for a non-admin', () => {
@@ -252,7 +254,7 @@ describe('LandingChallengeCards — Blast Classic admin gate', () => {
 });
 
 describe('LandingChallengeCards — full admin dev-preview roster', () => {
-  it('renders ALL 10 admin-gated dev preview cards for a post-newbie admin', () => {
+  it('renders ALL 9 admin-gated dev preview cards for a post-newbie admin', () => {
     mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('admin@example.com');
     // Past newbie + first-timer + newcomer-by-games gates → no collapse expander,
@@ -262,8 +264,8 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
     render(<LandingChallengeCards {...baseProps} />);
     const expected = [
-      'mode-wordcraft.modeTitle',          // Word Craft
-      'mode-wordcraft.gemsModeTitle',      // Word Craft Gem Hunt
+      // Word Craft territory + Card Run are now PUBLIC (not in this admin roster).
+      'mode-wordcraft.gemsModeTitle',      // Word Craft Gem Hunt (still admin)
       'mode-wordTower.cardTitle',          // Word Tower
       'mode-landing.blastClassic',         // Blast Classic V1
       'mode-landing.wordForgeMode',        // Word Forge
@@ -286,7 +288,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
     render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
-      'mode-wordcraft.modeTitle',
       'mode-wordcraft.gemsModeTitle',
       'mode-wordTower.cardTitle',
       'mode-landing.blastClassic',
@@ -361,10 +362,18 @@ describe('LandingChallengeCards — Japanese locale gates', () => {
     expect(screen.getByTestId('mode-landing.wordChainMode')).toBeInTheDocument();
   });
 
-  it('hides wordCraft card for Japanese locale even for beta users', () => {
+  it('shows the public wordCraft territory card for Japanese locale (ja tile bag + dictionary)', () => {
+    mockUserEmail.mockReturnValue(undefined);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} language="ja" />);
+    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
+  });
+
+  it('still hides the wordCraft Gem Hunt card for Japanese locale', () => {
+    mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('ohadf2015@gmail.com');
     mockGamesCompleted.mockReturnValue(10);
     render(<LandingChallengeCards {...baseProps} language="ja" />);
-    expect(screen.queryByTestId('mode-wordcraft.modeTitle')).toBeNull();
+    expect(screen.queryByTestId('mode-wordcraft.gemsModeTitle')).toBeNull();
   });
 });

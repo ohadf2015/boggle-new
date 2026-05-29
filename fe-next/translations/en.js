@@ -257,6 +257,12 @@ const en = {
       "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
       "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
     },
+    "wordCraft": {
+      "title": "WordCraft - Free Word Strategy Grid Game Online",
+      "description": "Play WordCraft free online — build words on a grid, claim territory, and capture rivals. Card runs, Gem Hunt, and pass-and-play with friends. No download, no signup.",
+      "ogTitle": "WordCraft - Build Words, Claim Territory, Win",
+      "ogDescription": "A word-strategy grid game with a territory twist. Free, instant, no download. Card runs, Gem Hunt, and pass-and-play."
+    },
     "blast": {
       "title": "Blast Mode - Chain Words Into Explosive Combos | LexiClash",
       "description": "Play Blast Mode in LexiClash! Chain words to trigger explosive combos, clear tiles, and chase high scores. Fast-paced puzzle action — free, no download needed.",
@@ -12234,6 +12240,8 @@ const en = {
     "modeDesc": "A crafty word grid battle — score big, trigger Overdrive, and outwit the bot!",
     "gemsModeTitle": "WordCraft: Gem Hunt",
     "gemsModeDesc": "Hunt buried gems on the grid, stack bonuses, and outsmart the bot for max loot!",
+    "cardsModeTitle": "WordCraft: Card Run",
+    "cardsModeDesc": "Play timed rounds, draft a power card between each, and chase a monster run total!",
     "betaLocked": "Beta access required",
     "heatLabel": "Heat",
     "overdrive": "OVERDRIVE!",

@@ -12229,6 +12229,8 @@ const ja = {
     "modeDesc": "戦略的な言葉の対決—得点を積み、オーバードライブを発動してボットを倒せ！",
     "gemsModeTitle": "ワードクラフト：宝石ハント",
     "gemsModeDesc": "盤面に隠された宝石を狩り、ボーナスを積み重ね、ボットを出し抜いて最大の戦利品を！",
+    "cardsModeTitle": "WordCraft: カードラン",
+    "cardsModeDesc": "制限時間のラウンドをプレイし、各ラウンドの合間にパワーカードを選んで、最高のランスコアを狙え！",
     "betaLocked": "ベータアクセスが必要です",
     "heatLabel": "ヒート",
     "overdrive": "オーバードライブ！",
