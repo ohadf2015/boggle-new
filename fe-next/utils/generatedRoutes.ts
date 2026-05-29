@@ -139,6 +139,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/unsubscribe",
   "/word-alchemy",
   "/word-craft",
+  "/word-craft-game",
   "/word-forge",
   "/word-games-online-free",
   "/word-of-the-day",
