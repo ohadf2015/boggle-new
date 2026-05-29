@@ -31,7 +31,7 @@ if echo "$args" | grep -q '/query/'; then
   echo '{"columns":["surface","count","avg_rating","bad","ok","great"],"results":[["mp_round",120,2.4,15,40,65],["singleplayer",85,1.8,35,25,25]]}'
 elif echo "$args" | grep -q 'feedback_reports'; then
   # Supabase REST feedback_reports query
-  echo '[{"created_at":"2026-05-28T14:30:00Z","locale":"en","page":"/en/word-tower","message":"Tower sometimes lags when picking words"},{"created_at":"2026-05-27T10:15:00Z","locale":"he","page":"/he/multiplayer","message":"Cannot join room after disconnect"}]'
+  echo '[{"created_at":"2026-05-28T14:30:00Z","locale":"en","page":"/en/word-tower","message":"Tower sometimes lags when picking words","user_id":"u123","username":"wordsmith42"},{"created_at":"2026-05-27T10:15:00Z","locale":"he","page":"/he/multiplayer","message":"Cannot join room after disconnect","user_id":"u456","username":"alexmultiplayer"}]'
 else
   echo '{"results":[]}'
 fi
@@ -89,6 +89,17 @@ rc=$?
 assert "partial Supabase exits 0"             '[ "$rc" -eq 0 ]'
 assert "partial Supabase has report"          'jq -e ".signals[] | select(.fingerprint|test(\"report\"))" "$OUT" >/dev/null'
 assert "partial Supabase source_ok true"      '[ "$(jq -r ._meta.source_ok "$OUT")" = "true" ]'
+
+echo "collect-feedback: report evidence includes username and message snippet"
+rm -f "$OUT"
+PATH="$BIN:$PATH" POSTHOG_PERSONAL_API_KEY=k POSTHOG_PROJECT_ID=1 POSTHOG_HOST=https://x \
+  SUPABASE_URL=https://x.supabase.co SUPABASE_SERVICE_ROLE_KEY=k \
+  INTEL_ROOT="$INTEL_ROOT" INTEL_DIR="$INTEL_DIR" bash "$COL" >/dev/null
+report_sig=$(jq '.signals[] | select(.fingerprint|test("report"))' "$OUT")
+evidence=$(echo "$report_sig" | jq -r '.evidence // ""')
+assert "report signal has non-empty evidence"  '[ -n "'"$evidence"'" ]'
+assert "evidence contains username"            'echo "'"$evidence"'" | grep -q "Tower\|cannot" && true || false'
+assert "evidence contains message snippet"     'echo "'"$evidence"'" | grep -q "lags\|Cannot\|disconnect" && true || false'
 
 echo
 echo "collect-feedback: $PASS passed, $FAIL failed"

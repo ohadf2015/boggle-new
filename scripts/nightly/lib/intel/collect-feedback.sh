@@ -47,7 +47,7 @@ sb_reports() {
   local since
   since=$(date -u -v-7d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null)
   curl -sS --max-time 30 \
-    "$SB_URL/rest/v1/feedback_reports?select=created_at,locale,page,message&created_at=gte.${since}&order=created_at.desc&limit=10" \
+    "$SB_URL/rest/v1/feedback_reports?select=created_at,locale,page,message,user_id,username&created_at=gte.${since}&order=created_at.desc&limit=10" \
     -H "apikey: $SB_KEY" \
     -H "Authorization: Bearer $SB_KEY" \
     2>/dev/null | jq -c '.' 2>/dev/null || echo '[]'
@@ -77,9 +77,11 @@ fi
 REPS=$(sb_reports)
 if [ -n "$(echo "$REPS" | jq -r '.[]?' 2>/dev/null)" ]; then
   total_reports=$(echo "$REPS" | jq 'length')
+  # Build evidence string from top ~5 reports: "username: <first 80 chars of message> | ..."
+  evidence=$(echo "$REPS" | jq -r '[.[0:5][] | ((.username // "anon") + ": " + ((.message // "") | .[0:80]))] | join(" | ")' 2>/dev/null || echo "")
   # Emit one aggregated report signal, severity scaled by count (floor 0.2)
   severity=$(sev_of "$total_reports" "10")
-  add "$(emit_signal feedback feedback "Bug reports (recent 7d)" feedback_reports "$total_reports" "$total_reports" "$severity" 01-triage "feedback:report:all" "" M "feedback:report:all")"
+  add "$(emit_signal feedback feedback "Bug reports (recent 7d)" feedback_reports "$total_reports" "$total_reports" "$severity" 01-triage "feedback:report:all" "$evidence" M "feedback:report:all")"
 fi
 
 intel_write "$ID" "$SIGNALS" true ""
