@@ -130,7 +130,7 @@ interface EmailRecipient {
  * Map country code to app locale for email links.
  * Falls back to 'en' for unknown countries.
  */
-function getLocaleFromCountry(countryCode: string | null): string {
+export function getLocaleFromCountry(countryCode: string | null): string {
   if (!countryCode) return 'en';
   const cc = countryCode.toUpperCase();
   if (cc === 'IL') return 'he';

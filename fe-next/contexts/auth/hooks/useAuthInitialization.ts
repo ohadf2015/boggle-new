@@ -16,6 +16,7 @@ import { linkSessionToUser } from '@/utils/sessionTracking';
 import { registerPushToken, unregisterPushToken } from '@/utils/pushNotifications/tokenRegistration';
 import { broadcastSessionRefreshed } from '@/utils/crossTabAuthSync';
 import { captureBackgroundError } from '@/utils/sentry';
+import { triggerWelcomeEmail } from '@/lib/welcome/triggerWelcomeEmail';
 import logger from '@/utils/logger';
 import {
   isRefreshTokenError,
@@ -141,6 +142,13 @@ export function useAuthInitialization({
       // Listen for auth changes (including cross-tab events)
       const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (!isMountedRef.current) return;
+
+        // New-signup welcome email. Fire-and-forget — server is idempotent and
+        // NEW-signups-only, so calling on any SIGNED_IN is safe and covers every
+        // signup method (OAuth, email/password, magic-link, OTP).
+        if (event === 'SIGNED_IN' && session) {
+          void triggerWelcomeEmail(session.access_token);
+        }
 
         await handleAuthStateChange(
           event,

@@ -72,9 +72,9 @@ const MODES: ModeDef[] = [
   { key: 'multiplayer', label: 'Multiplayer', emoji: '🥊', accent: 'pink', path: 'multiplayer' },
   { key: 'blast', label: 'Blast', emoji: '💥', accent: 'cyan', path: 'blast' },
   { key: 'daily', label: 'Daily Word Hunt', emoji: '🎯', accent: 'lime', path: 'daily' },
-  { key: 'wordTower', label: 'Word Tower', emoji: '🗼', accent: 'purple', path: 'word-tower' },
-  { key: 'connections', label: 'Connections', emoji: '🧩', accent: 'cyan', path: 'connections' },
-  { key: 'adventure', label: 'Adventure', emoji: '🗺️', accent: 'lime', path: 'adventure' },
+  { key: 'connections', label: 'Connections', emoji: '🧩', accent: 'purple', path: 'connections' },
+  { key: 'adventure', label: 'Adventure', emoji: '🗺️', accent: 'pink', path: 'adventure' },
+  { key: 'wordCraft', label: 'Word Craft', emoji: '🏰', accent: 'cyan', path: 'word-craft' },
 ];
 
 /* ───────────────────────── Copy — per language ───────────────────────── */
@@ -83,16 +83,16 @@ const COPY: Record<string, WelcomeCopy> = {
   en: {
     heading: (n) => `Hi ${n} 👋`,
     intro: "You're in. Pick a mode, pick a fight 👇",
-    videoLabel: 'See it move (40 sec)',
-    videoSub: "Spoiler: it's chaos",
+    videoLabel: 'See it in action',
+    videoSub: "↑ yep, that's the game",
     modesHeader: 'PICK YOUR FIGHT',
     taglines: {
       multiplayer: 'Live brawls, real people',
       blast: 'Combo till it pops',
       daily: 'One puzzle. Everyone.',
-      wordTower: "Stack high, don't fall",
       connections: 'Spot the hidden links',
       adventure: 'Solo quest, weird worlds',
+      wordCraft: 'Claim turf with words',
     },
     cta: 'Play now',
     ps: "Fair warning: it's addictive.",
@@ -103,16 +103,16 @@ const COPY: Record<string, WelcomeCopy> = {
   he: {
     heading: (n) => `היי ${n} 👋`,
     intro: 'יאללה, את/ה בפנים. בחר/י מצב, בחר/י קרב 👇',
-    videoLabel: 'תראו איך זה זז (40 שניות)',
-    videoSub: 'ספוילר: בלאגן',
+    videoLabel: 'ככה זה נראה',
+    videoSub: '↑ זה המשחק עצמו',
     modesHeader: 'בחרו את הקרב',
     taglines: {
       multiplayer: 'קרבות חיים מול אנשים',
       blast: 'קומבו עד שמתפוצץ',
       daily: 'חידה אחת. כולם.',
-      wordTower: 'לבנות גבוה, בלי ליפול',
       connections: 'למצוא את הקשרים',
       adventure: 'מסע יחיד, עולמות מוזרים',
+      wordCraft: 'לכבוש שטח עם מילים',
     },
     cta: 'יאללה, משחקים',
     ps: 'אזהרה: זה ממכר.',
@@ -123,16 +123,16 @@ const COPY: Record<string, WelcomeCopy> = {
   sv: {
     heading: (n) => `Hej ${n} 👋`,
     intro: 'Du är med. Välj ett läge och kör 👇',
-    videoLabel: 'Se det i rörelse (40 sek)',
-    videoSub: 'Spoiler: rena kaoset',
+    videoLabel: 'Se det i rörelse',
+    videoSub: '↑ så ser spelet ut',
     modesHeader: 'VÄLJ DIN MATCH',
     taglines: {
       multiplayer: 'Live mot riktiga spelare',
       blast: 'Kedja tills det smäller',
       daily: 'Ett pussel. Alla.',
-      wordTower: 'Stapla högt, ramla inte',
       connections: 'Hitta dolda kopplingar',
       adventure: 'Soloäventyr, skumma världar',
+      wordCraft: 'Erövra mark med ord',
     },
     cta: 'Spela nu',
     ps: 'Varning: beroendeframkallande.',
@@ -143,16 +143,16 @@ const COPY: Record<string, WelcomeCopy> = {
   ja: {
     heading: (n) => `${n}さん、こんにちは 👋`,
     intro: 'ようこそ。モードを選んで、さあ一戦 👇',
-    videoLabel: '動きを見る（40秒）',
-    videoSub: 'ネタバレ：大騒ぎ',
+    videoLabel: '実際のプレイ',
+    videoSub: '↑ これが本物',
     modesHeader: '勝負を選べ',
     taglines: {
       multiplayer: '生バトル、相手は本物',
       blast: '連鎖で大爆発',
       daily: '一つの問題、みんなで',
-      wordTower: '高く積め、崩すな',
       connections: '隠れた繋がりを探せ',
       adventure: 'ひとり旅、奇妙な世界',
+      wordCraft: '言葉で陣地を奪え',
     },
     cta: '今すぐ遊ぶ',
     ps: '注意：ハマります。',
@@ -163,16 +163,16 @@ const COPY: Record<string, WelcomeCopy> = {
   es: {
     heading: (n) => `Hola ${n} 👋`,
     intro: 'Ya estás dentro. Elige modo y a jugar 👇',
-    videoLabel: 'Míralo en acción (40 s)',
-    videoSub: 'Spoiler: puro caos',
+    videoLabel: 'Míralo en acción',
+    videoSub: '↑ así se juega',
     modesHeader: 'ELIGE TU BATALLA',
     taglines: {
       multiplayer: 'Duelos en vivo, gente real',
       blast: 'Combos hasta reventar',
       daily: 'Un reto. Todos.',
-      wordTower: 'Apila alto, no caigas',
       connections: 'Halla los grupos ocultos',
       adventure: 'Aventura sola, mundos raros',
+      wordCraft: 'Conquista con palabras',
     },
     cta: 'Jugar ya',
     ps: 'Aviso: engancha.',
@@ -242,11 +242,11 @@ export default function WelcomeEmail({
   const arrow = rtl ? '◀' : '▶';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `${baseUrl}/${locale}/privacy`;
-  // Dev preview server serves from emails/static; production serves from public/email.
-  const heroUrl = baseUrl ? `${baseUrl}/email/welcome-hero.jpg` : '/static/welcome-hero.jpg';
-  const posterUrl = baseUrl
-    ? `${baseUrl}/email/welcome-video-poster.jpg`
-    : '/static/welcome-video-poster.jpg';
+  // Animated GIF — the only thing that actually plays inside an inbox.
+  // Outlook desktop shows frame 1 only (it's the hero mosaic, so it reads fine).
+  const videoGifUrl = baseUrl
+    ? `${baseUrl}/email/welcome-video.gif`
+    : '/static/welcome-video.gif';
   const logoLang = rtl ? 'he' : 'en';
   const logoUrl = baseUrl
     ? `${baseUrl}/email-assets/email-logo-${logoLang}.png`
@@ -348,36 +348,8 @@ export default function WelcomeEmail({
                         <tr>
                           <td style={{ padding: '24px 24px 28px' }}>
 
-                            {/* ── Hero image ── */}
-                            <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
-                              style={{ marginBottom: '20px' }}>
-                              <tr>
-                                <td align="center" style={{
-                                  backgroundColor: C.cardInner,
-                                  borderRadius: '14px',
-                                  border: `3px solid ${C.black}`,
-                                  padding: '10px',
-                                }}>
-                                  <Img
-                                    src={heroUrl}
-                                    alt="Welcome to LexiClash — a party of word games"
-                                    width="486"
-                                    className="hero-img"
-                                    style={{
-                                      display: 'block',
-                                      width: '100%',
-                                      maxWidth: '486px',
-                                      height: 'auto',
-                                      borderRadius: '10px',
-                                      border: 0,
-                                      outline: 'none',
-                                    }}
-                                  />
-                                </td>
-                              </tr>
-                            </table>
-
-                            {/* ── "Hi {name}" heading ── */}
+                            {/* ── "Hi {name}" heading (top of card — no separate hero;
+                                 the animated GIF below is the single visual) ── */}
                             <Heading
                               as="h1"
                               className="h1"
@@ -407,15 +379,16 @@ export default function WelcomeEmail({
                               {t.intro}
                             </Text>
 
-                            {/* ── Video card: clickable poster (play button baked into the image —
-                                 email clients can't embed <video> or reliably overlay a button) ── */}
+                            {/* ── Animated GIF: plays inline in most clients (Gmail/Apple/iOS).
+                                 Email clients can't embed <video>, so a looping GIF is the real
+                                 in-inbox motion. Clickable through to the live game. ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
                               style={{ marginBottom: '24px' }}>
                               <tr>
                                 <td align="center">
                                   <Link href={videoUrl} target="_blank" style={{ textDecoration: 'none' }}>
                                     <Img
-                                      src={posterUrl}
+                                      src={videoGifUrl}
                                       alt={t.videoLabel}
                                       width="486"
                                       className="hero-img"
@@ -437,7 +410,7 @@ export default function WelcomeEmail({
                                 <td align="center" style={{ paddingTop: '10px', direction: dir }}>
                                   <Link href={videoUrl} target="_blank" style={{ textDecoration: 'none' }}>
                                     <span style={{ color: C.white, fontSize: '15px', fontWeight: 700 }}>
-                                      {arrow}&nbsp;&nbsp;{t.videoLabel}
+                                      {t.videoLabel}
                                     </span>
                                   </Link>
                                   <div style={{ color: C.grayLight, fontSize: '13px', lineHeight: 1.4, marginTop: '3px' }}>
