@@ -44,11 +44,34 @@ export interface UnifiedGame {
   life_gained?: number;
   guest_first_visit_at?: string | null;
   guest_last_visit_at?: string | null;
+  // Source of the row — lets the UI distinguish the comprehensive analytics feed
+  // (includes non-registered players) from the per-product result tables.
+  source?: 'analytics' | 'game_results' | 'game_sessions' | 'word_hunt' | 'daily_challenge' | 'drill' | 'blast' | 'word_wheel' | 'practice';
+  // Multiplayer detail (populated for analytics-source MP rounds)
+  is_multiplayer?: boolean;
+  is_winner?: boolean | null;
+  role?: string | null;
+  bot_count?: number | null;
+  os?: string | null;
+  user_agent?: string | null;
+  guest_name?: string | null;
+  game_mode?: string | null;
+}
+
+export type GameLogSource = 'analytics' | 'tables';
+
+export interface ModeBreakdownEntry {
+  key: string;
+  labelKey: string;
+  label: string;
+  count: number;
 }
 
 // API response structure
 export interface GamesResponse {
   success: boolean;
+  source?: GameLogSource;
+  modeBreakdown?: ModeBreakdownEntry[];
   games: UnifiedGame[];
   pagination: {
     page: number;

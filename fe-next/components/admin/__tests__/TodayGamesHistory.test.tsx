@@ -358,9 +358,11 @@ describe('TodayGamesHistory', () => {
       expect(screen.getByText('Word Hunter')).toBeInTheDocument();
     });
 
-    // Check game type labels are displayed (use getAllByText as Word Hunt appears in stats too)
-    expect(screen.getByText('Ranked')).toBeInTheDocument();
-    expect(screen.getByText('Casual')).toBeInTheDocument();
+    // Check game type labels are displayed. Each row renders its mode label in both a
+    // mobile and a desktop variant (responsive; only one is visible per breakpoint, but
+    // jsdom applies no CSS so both are in the DOM) — hence getAllByText.
+    expect(screen.getAllByText('Ranked').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Casual').length).toBeGreaterThan(0);
     const wordHuntElements = screen.getAllByText('Word Hunt');
     expect(wordHuntElements.length).toBeGreaterThan(0);
   });

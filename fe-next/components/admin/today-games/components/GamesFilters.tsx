@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Filter } from 'lucide-react';
-import type { GameTypeFilter } from '../types';
+import type { GameTypeFilter, GameLogSource } from '../types';
 import { DATE_RANGES, type DateRange } from '../constants';
 
 interface GamesFiltersProps {
@@ -10,10 +10,12 @@ interface GamesFiltersProps {
   gameTypeFilter: GameTypeFilter;
   rankedFilter: string;
   dateRange: DateRange;
+  logSource: GameLogSource;
   onLanguageChange: (value: string) => void;
   onGameTypeChange: (value: GameTypeFilter) => void;
   onRankedChange: (value: string) => void;
   onDateRangeChange: (value: DateRange) => void;
+  onLogSourceChange: (value: GameLogSource) => void;
   t: (key: string, fallback?: string) => string;
 }
 
@@ -30,10 +32,12 @@ export function GamesFilters({
   gameTypeFilter,
   rankedFilter,
   dateRange,
+  logSource,
   onLanguageChange,
   onGameTypeChange,
   onRankedChange,
   onDateRangeChange,
+  onLogSourceChange,
   t,
 }: GamesFiltersProps) {
   return (
@@ -61,7 +65,9 @@ export function GamesFilters({
       <select
         value={languageFilter}
         onChange={(e) => onLanguageChange(e.target.value)}
-        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
+        disabled={logSource === 'analytics'}
+        title={logSource === 'analytics' ? t('admin.todayGames.source.noLanguage', 'Language is not recorded per play in the all-plays source') : undefined}
+        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         <option value="all">{t('admin.todayGames.allLanguages')}</option>
         <option value="en">🇺🇸 English</option>
@@ -94,6 +100,18 @@ export function GamesFilters({
         <option value="all">{t('admin.todayGames.allModes')}</option>
         <option value="true">{t('admin.todayGames.rankedOnly')}</option>
         <option value="false">{t('admin.todayGames.casualOnly')}</option>
+      </select>
+
+      {/* Data source toggle — placed last so existing filter ordering is preserved. */}
+      <select
+        value={logSource}
+        onChange={(e) => onLogSourceChange(e.target.value as GameLogSource)}
+        className="ms-auto bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
+        aria-label={t('admin.todayGames.source.label', 'Data source')}
+        title={t('admin.todayGames.source.hint', 'Analytics = every play incl. anonymous; Tables = per-product records')}
+      >
+        <option value="analytics">{t('admin.todayGames.source.analyticsAll', 'All plays (incl. guests)')}</option>
+        <option value="tables">{t('admin.todayGames.source.productTables', 'Product tables')}</option>
       </select>
     </div>
   );

@@ -10,6 +10,7 @@ import {
   ShieldAlert,
   BookOpen,
   Users,
+  GraduationCap,
   Settings,
 } from 'lucide-react';
 
@@ -42,6 +43,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
     { key: 'moderation', icon: ShieldAlert, label: t('admin.sidebar.moderation'), path: '/moderation', badge: moderationCount },
     { key: 'content', icon: BookOpen, label: t('admin.sidebar.content'), path: '/content' },
     { key: 'players', icon: Users, label: t('admin.sidebar.players'), path: '/players' },
+    { key: 'teacherAccess', icon: GraduationCap, label: t('admin.nav.teacherAccess', 'Teachers'), path: '/teacher-access' },
     { key: 'system', icon: Settings, label: t('admin.sidebar.system'), path: '/system' },
   ];
 

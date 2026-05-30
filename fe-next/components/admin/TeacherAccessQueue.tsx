@@ -41,7 +41,7 @@ export function TeacherAccessQueue() {
   return (
     <div className="mx-auto max-w-6xl p-6">
       <h1 className="text-3xl font-extrabold text-neo-white">{t('admin.teacherAccess.title')}</h1>
-      <div className="mt-4 grid grid-cols-4 gap-3">
+      <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
         {(['pending', 'approved', 'declined', 'total'] as const).map((k) => (
           <div key={k} className="rounded-neo border-neo border-2 bg-neo-navy-light p-3">
             <div className="text-xs uppercase text-slate-400">{t(`admin.teacherAccess.count.${k}`)}</div>
@@ -78,7 +78,40 @@ export function TeacherAccessQueue() {
         </button>
       </div>
 
-      <div className="mt-4 overflow-x-auto">
+      {/* Mobile: card list (the table scrolls awkwardly on phones) */}
+      <div className="mt-4 grid gap-2 sm:hidden">
+        {loading ? (
+          <div className="p-6 text-center text-slate-400">…</div>
+        ) : rows.length === 0 ? (
+          <div className="p-6 text-center text-slate-400">{t('admin.teacherAccess.empty', 'No requests')}</div>
+        ) : (
+          rows.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => setOpen(r)}
+              className="w-full text-left rounded-neo border-2 border-slate-700 bg-neo-navy-light p-3 hover:border-neo-lime focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-neo-white truncate">{r.full_name}</span>
+                <span className={`shrink-0 rounded px-2 py-0.5 text-xs font-bold ${
+                  r.status === 'pending' ? 'bg-neo-cyan text-neo-navy' :
+                  r.status === 'approved' ? 'bg-neo-lime text-neo-navy' : 'bg-neo-pink text-neo-white'
+                }`}>{r.status}</span>
+              </div>
+              <div className="mt-1 text-sm text-slate-300 truncate">{r.email}</div>
+              <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-400">
+                <span>{r.role}</span>
+                <span>{r.locale}</span>
+                {r.country && <span>{r.country}</span>}
+                <span>{new Date(r.created_at).toLocaleDateString()}</span>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+
+      {/* Desktop: full table */}
+      <div className="mt-4 overflow-x-auto hidden sm:block">
         <table className="w-full text-sm text-neo-white">
           <thead><tr className="border-b-2 border-slate-600 text-left">
             <th className="p-2">{t('admin.teacherAccess.col.name')}</th>

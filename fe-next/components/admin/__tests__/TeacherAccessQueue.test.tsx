@@ -23,21 +23,21 @@ import { TeacherAccessQueue } from '../TeacherAccessQueue';
 describe('<TeacherAccessQueue>', () => {
   it('renders rows from API', async () => {
     render(<TeacherAccessQueue />);
-    await waitFor(() => expect(screen.getByText('a@x.com')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('a@x.com')[0]).toBeInTheDocument());
   });
 
   it('opens drawer on row click', async () => {
     const user = userEvent.setup();
     render(<TeacherAccessQueue />);
-    await waitFor(() => screen.getByText('a@x.com'));
-    await user.click(screen.getByText('a@x.com'));
+    await waitFor(() => screen.getAllByText('a@x.com')[0]);
+    await user.click(screen.getAllByText('a@x.com')[0]);
     expect(screen.getByText(/admin\.teacherAccess\.drawer_title/)).toBeInTheDocument();
   });
 
   describe('keyboard navigation', () => {
     it('rows have keyboard-navigable attributes', async () => {
       render(<TeacherAccessQueue />);
-      await waitFor(() => screen.getByText('a@x.com'));
+      await waitFor(() => screen.getAllByText('a@x.com')[0]);
 
       const row = screen.getByRole('button', { name: /admin\.teacherAccess\.row_open/ });
       expect(row).toHaveAttribute('tabIndex', '0');
@@ -48,7 +48,7 @@ describe('<TeacherAccessQueue>', () => {
     it('opens drawer on Enter key press', async () => {
       const user = userEvent.setup();
       render(<TeacherAccessQueue />);
-      await waitFor(() => screen.getByText('a@x.com'));
+      await waitFor(() => screen.getAllByText('a@x.com')[0]);
 
       const row = screen.getByRole('button', { name: /admin\.teacherAccess\.row_open/ });
       row.focus();
@@ -60,7 +60,7 @@ describe('<TeacherAccessQueue>', () => {
     it('opens drawer on Space key press', async () => {
       const user = userEvent.setup();
       render(<TeacherAccessQueue />);
-      await waitFor(() => screen.getByText('a@x.com'));
+      await waitFor(() => screen.getAllByText('a@x.com')[0]);
 
       const row = screen.getByRole('button', { name: /admin\.teacherAccess\.row_open/ });
       row.focus();
@@ -71,7 +71,7 @@ describe('<TeacherAccessQueue>', () => {
 
     it('aria-label includes teacher name', async () => {
       render(<TeacherAccessQueue />);
-      await waitFor(() => screen.getByText('a@x.com'));
+      await waitFor(() => screen.getAllByText('a@x.com')[0]);
 
       // Get the row by finding the element that contains the teacher name in its row
       const rows = screen.getAllByRole('button', { name: /admin\.teacherAccess\.row_open/ });

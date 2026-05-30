@@ -35,8 +35,11 @@ export function trackMpGameStart(args: {
   roundIndex: number;
   playerCount: number;
   gameCode: string;
+  /** Number of bot players in the room (humans = playerCount). Optional; enables
+   *  the admin game log to report human-vs-bot composition going forward. */
+  botCount?: number;
 }): void {
-  const { gameMode, roundIndex, playerCount, gameCode } = args;
+  const { gameMode, roundIndex, playerCount, gameCode, botCount } = args;
 
   trackGameStartBase('multiplayer', {
     gameMode,
@@ -45,6 +48,7 @@ export function trackMpGameStart(args: {
     roundIndex,
     playerCount,
     gameCode,
+    ...(typeof botCount === 'number' ? { botCount } : {}),
   });
 }
 
@@ -63,8 +67,10 @@ export function trackMpGameEnd(args: {
   wordCount: number;
   durationSec: number;
   isWinner: boolean;
+  /** Number of bot players in the room. Optional; surfaced in the admin game log. */
+  botCount?: number;
 }): void {
-  const { gameMode, roundIndex, playerCount, gameCode, score, wordCount, durationSec, isWinner } = args;
+  const { gameMode, roundIndex, playerCount, gameCode, score, wordCount, durationSec, isWinner, botCount } = args;
 
   trackGameEndBase('multiplayer', score, wordCount, true, durationSec, {
     gameMode,
@@ -74,5 +80,6 @@ export function trackMpGameEnd(args: {
     playerCount,
     gameCode,
     isWinner,
+    ...(typeof botCount === 'number' ? { botCount } : {}),
   });
 }

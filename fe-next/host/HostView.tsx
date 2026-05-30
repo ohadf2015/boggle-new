@@ -457,6 +457,12 @@ const HostView: React.FC<HostViewProps> = memo(({
     roundKey: tournament.tournamentData?.currentRound ?? 0,
   });
 
+  // Bot count for the admin game log's human-vs-bot composition (forward capture).
+  const botPlayerCount = useMemo(() => {
+    const rows = (tournament.finalScores?.players ?? []) as unknown as PlayerResult[];
+    return rows.filter(p => p.isBot).length;
+  }, [tournament.finalScores]);
+
   // PostHog funnel parity: emit `growth:game_started` once when the host's
   // game becomes active. Without this, MP `game_completed` events have no
   // matching `game_started`, blinding started→finished funnels.
@@ -467,6 +473,7 @@ const HostView: React.FC<HostViewProps> = memo(({
       gameCode, role: 'host', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
       playerCount: tournament.finalScores?.players?.length ?? 0,
+      botCount: botPlayerCount,
     },
   });
 
@@ -484,6 +491,7 @@ const HostView: React.FC<HostViewProps> = memo(({
       gameCode, role: 'host', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
       playerCount: tournament.finalScores?.players?.length ?? 0,
+      botCount: botPlayerCount,
     },
   });
 

@@ -8,6 +8,7 @@ import type {
   SortField,
   SortOrder,
   GamesStats,
+  GameLogSource,
 } from '../types';
 import {
   DEFAULT_PAGE_SIZE,
@@ -33,10 +34,12 @@ interface UseTodayGamesReturn {
   gameTypeFilter: GameTypeFilter;
   rankedFilter: string;
   dateRange: DateRange;
+  logSource: GameLogSource;
   setLanguageFilter: (filter: string) => void;
   setGameTypeFilter: (filter: GameTypeFilter) => void;
   setRankedFilter: (filter: string) => void;
   setDateRange: (range: DateRange) => void;
+  setLogSource: (source: GameLogSource) => void;
 
   sortField: SortField;
   sortOrder: SortOrder;
@@ -59,6 +62,7 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
   const [gameTypeFilter, setGameTypeFilter] = useState<GameTypeFilter>('all');
   const [rankedFilter, setRankedFilter] = useState<string>('all');
   const [dateRange, setDateRangeState] = useState<DateRange>('7d');
+  const [logSource, setLogSourceState] = useState<GameLogSource>('analytics');
 
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -88,6 +92,7 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
       if (gameTypeFilter !== 'all') {
         params.set('gameType', gameTypeFilter);
       }
+      params.set('source', logSource);
 
       const response = await fetch(`/api/admin/game-logs?${params.toString()}`, {
         headers: {
@@ -108,7 +113,7 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     } finally {
       setLoading(false);
     }
-  }, [authToken, page, pageSize, sortField, sortOrder, languageFilter, rankedFilter, gameTypeFilter, dateRange]);
+  }, [authToken, page, pageSize, sortField, sortOrder, languageFilter, rankedFilter, gameTypeFilter, dateRange, logSource]);
 
   useEffect(() => {
     setLoading(true);
@@ -159,6 +164,11 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     setPage(1);
   }, []);
 
+  const handleSetLogSource = useCallback((source: GameLogSource) => {
+    setLogSourceState(source);
+    setPage(1);
+  }, []);
+
   // Server already applied gameType filter — no client-side narrowing needed.
   const filteredGames = useMemo(() => data?.games ?? [], [data?.games]);
 
@@ -167,16 +177,20 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
       return { total: 0, multiplayer: 0, wordHunt: 0, daily: 0, drills: 0, blast: 0, wordWheel: 0, practice: 0 };
     }
     const b = data.breakdown;
+    const summed =
+      b.authenticatedGames +
+      b.guestGames +
+      b.wordHuntGames +
+      b.dailyChallengeGames +
+      b.drillGames +
+      (b.blastGames ?? 0) +
+      (b.wordWheelGames ?? 0) +
+      (b.practiceGames ?? 0);
     return {
-      total:
-        b.authenticatedGames +
-        b.guestGames +
-        b.wordHuntGames +
-        b.dailyChallengeGames +
-        b.drillGames +
-        (b.blastGames ?? 0) +
-        (b.wordWheelGames ?? 0) +
-        (b.practiceGames ?? 0),
+      // The analytics source's per-mode buckets overlap (a game has an identity AND a
+      // mode), so summing them double-counts. Trust the exact paginated totalCount when
+      // present; only fall back to the disjoint-table sum for the legacy 'tables' source.
+      total: data.pagination?.totalCount ?? summed,
       multiplayer: b.authenticatedGames + b.guestGames,
       wordHunt: b.wordHuntGames,
       daily: b.dailyChallengeGames,
@@ -185,7 +199,7 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
       wordWheel: b.wordWheelGames ?? 0,
       practice: b.practiceGames ?? 0,
     };
-  }, [data?.breakdown]);
+  }, [data?.breakdown, data?.pagination?.totalCount]);
 
   return {
     data,
@@ -200,10 +214,12 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
     gameTypeFilter,
     rankedFilter,
     dateRange,
+    logSource,
     setLanguageFilter: handleSetLanguageFilter,
     setGameTypeFilter: handleSetGameTypeFilter,
     setRankedFilter: handleSetRankedFilter,
     setDateRange: handleSetDateRange,
+    setLogSource: handleSetLogSource,
 
     sortField,
     sortOrder,

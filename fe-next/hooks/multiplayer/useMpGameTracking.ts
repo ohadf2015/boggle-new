@@ -15,6 +15,8 @@ interface UseMpGameTrackingArgs {
   gameMode: GameMode;
   roundIndex: number;
   playerCount: number;
+  /** Bot players in the room — surfaced in the admin game log when present. */
+  botCount?: number;
 }
 
 export function useMpGameTracking(args: UseMpGameTrackingArgs) {
@@ -30,6 +32,7 @@ export function useMpGameTracking(args: UseMpGameTrackingArgs) {
       roundIndex: args.roundIndex,
       playerCount: args.playerCount,
       gameCode: args.gameCode,
+      botCount: args.botCount,
     });
   }, [args]);
 
@@ -47,6 +50,7 @@ export function useMpGameTracking(args: UseMpGameTrackingArgs) {
       wordCount,
       durationSec,
       isWinner,
+      botCount: args.botCount,
     });
   }, [args]);
 

@@ -14,11 +14,10 @@ import type { TodayGamesHistoryProps } from './types';
 import { useTodayGames } from './hooks';
 
 // Components
-import { StatsBar, GamesFilters, GamesTable, EmptyState } from './components';
+import { StatsBar, GamesFilters, VirtualGamesList, EmptyState } from './components';
 
 export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
-  const { t, language: uiLanguage } = useLanguage();
-  const isRTL = uiLanguage === 'he';
+  const { t } = useLanguage();
 
   const {
     data,
@@ -31,13 +30,12 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
     gameTypeFilter,
     rankedFilter,
     dateRange,
+    logSource,
     setLanguageFilter,
     setGameTypeFilter,
     setRankedFilter,
     setDateRange,
-    sortField,
-    sortOrder,
-    handleSort,
+    setLogSource,
     page,
     pageSize,
     setPage,
@@ -92,7 +90,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
       </div>
 
       {/* Stats Bar */}
-      <StatsBar stats={stats} t={t} />
+      <StatsBar stats={stats} total={stats.total} modeBreakdown={data?.modeBreakdown} t={t} />
 
       {/* Filters */}
       <GamesFilters
@@ -100,26 +98,24 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
         gameTypeFilter={gameTypeFilter}
         rankedFilter={rankedFilter}
         dateRange={dateRange}
+        logSource={logSource}
         onLanguageChange={setLanguageFilter}
         onGameTypeChange={setGameTypeFilter}
         onRankedChange={setRankedFilter}
         onDateRangeChange={setDateRange}
+        onLogSourceChange={setLogSource}
         t={t}
       />
 
-      {/* Games Table or Empty State */}
+      {/* Games list (virtualized + expandable) or Empty State */}
       {filteredGames.length === 0 ? (
         <EmptyState t={t} />
       ) : (
-        <GamesTable
+        <VirtualGamesList
           games={filteredGames}
           pagination={data?.pagination || null}
-          sortField={sortField}
-          sortOrder={sortOrder}
           page={page}
           pageSize={pageSize}
-          isRTL={isRTL}
-          onSort={handleSort}
           onPageChange={setPage}
           t={t}
         />

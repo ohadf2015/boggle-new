@@ -200,6 +200,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
 
   // Calculate human player count (exclude bots)
   const humanPlayerCount = playersReady.filter(p => !p.isBot && !p.disconnected).length;
+  // Bot count — recorded on MP telemetry so the admin game log can report
+  // human-vs-bot composition (previously never captured anywhere).
+  const botPlayerCount = playersReady.filter(p => p.isBot).length;
 
   // Enable hints for single-player mode
   const hints = useHints({
@@ -287,7 +290,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     extras: {
       gameCode, role: 'player', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: gameMode ?? 'classic',
-      playerCount: humanPlayerCount,
+      playerCount: humanPlayerCount, botCount: botPlayerCount,
     },
   });
 
@@ -305,7 +308,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     extras: {
       gameCode, role: 'player', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: gameMode ?? 'classic',
-      playerCount: humanPlayerCount,
+      playerCount: humanPlayerCount, botCount: botPlayerCount,
     },
   });
   const [tournamentStandings, _setTournamentStandings] = useState<TournamentStanding[]>([]);

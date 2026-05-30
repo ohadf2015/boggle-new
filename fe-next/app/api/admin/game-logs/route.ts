@@ -8,6 +8,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import { mapAnalyticsEventToGame, type AnalyticsEventRow } from '@/lib/admin/gameLog/analyticsEventMapper';
+import { CANONICAL_MODE_BUCKETS } from '@/lib/admin/gameLog/modeBuckets';
+import type { GameProfile } from '@/components/admin/today-games/types';
 
 type ProfileEmbed = unknown;
 
@@ -23,6 +26,7 @@ interface GameResultRow {
   language: string | null;
   time_played: number | null;
   created_at: string;
+  game_mode: string | null;
   profiles: ProfileEmbed;
 }
 
@@ -216,6 +220,17 @@ export async function GET(request: NextRequest) {
 
     const ascending = sortOrder === 'asc';
 
+    // Source selection. 'analytics' (default) reads the comprehensive analytics_events
+    // game_completed stream — the ONLY source that captures non-registered players with
+    // mode + attribution + device. 'tables' keeps the legacy per-product-table merge.
+    const source = searchParams.get('source') === 'tables' ? 'tables' : 'analytics';
+
+    if (source === 'analytics') {
+      return await fetchFromAnalyticsEvents({
+        supabase, page, pageSize, offset, ascending, language, gameType, startDate, endDate,
+      });
+    }
+
     // Build query for game results with player profiles (authenticated users)
     let authGames: Array<Record<string, unknown>> = [];
     let authCount = 0;
@@ -234,6 +249,7 @@ export async function GET(request: NextRequest) {
           language,
           time_played,
           created_at,
+          game_mode,
           profiles:player_id (
             username,
             display_name,
@@ -265,7 +281,12 @@ export async function GET(request: NextRequest) {
       authGames = ((authData as unknown as GameResultRow[]) || []).map((game) => ({
         ...game,
         is_guest: false,
-        mode: game.is_ranked ? 'ranked' : 'casual',
+        // Prefer the real recorded game mode (classic/word-hunt/blast/wheel-rush/…).
+        // Fall back to ranked/casual only when game_mode is absent on legacy rows.
+        mode: game.game_mode || (game.is_ranked ? 'ranked' : 'casual'),
+        game_mode: game.game_mode ?? null,
+        is_multiplayer: true,
+        source: 'game_results',
       }));
     }
 
@@ -887,4 +908,154 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+type SupabaseAdmin = NonNullable<ReturnType<typeof getSupabaseAdmin>>;
+
+// PostgREST filter builder surface we use — avoids leaking Supabase's huge generic types.
+interface PgFilter {
+  gte(col: string, val: string): PgFilter;
+  lte(col: string, val: string): PgFilter;
+  eq(col: string, val: unknown): PgFilter;
+  ilike(col: string, val: string): PgFilter;
+  in(col: string, vals: readonly string[]): PgFilter;
+  or(filters: string): PgFilter;
+}
+
+/** Map the UI gameType filter to an analytics_events metadata filter. */
+function applyGameTypeFilter(q: PgFilter, gameType: string): PgFilter {
+  switch (gameType) {
+    // Match the MP stat bucket exactly: flagged MP OR the flagless gameMode='multiplayer' rows.
+    case 'multiplayer': return q.or('metadata->>isMultiplayer.eq.true,metadata->>gameMode.eq.multiplayer');
+    case 'word_hunt': return q.eq('metadata->>gameMode', 'word-hunt');
+    case 'blast': return q.eq('metadata->>gameMode', 'blast');
+    case 'word_wheel': return q.eq('metadata->>gameMode', 'wheel-rush');
+    case 'daily_challenge': return q.ilike('metadata->>gameMode', '%daily%');
+    case 'drill': return q.ilike('metadata->>gameMode', '%drill%');
+    case 'practice': return q.ilike('metadata->>gameMode', '%practice%');
+    default: return q;
+  }
+}
+
+/**
+ * Comprehensive game log built from analytics_events (event_type='game_completed').
+ * Single-table → correct server-side range() + exact count pagination, and it is the
+ * only source that contains non-registered players with mode/attribution/device.
+ */
+async function fetchFromAnalyticsEvents(opts: {
+  supabase: SupabaseAdmin;
+  page: number;
+  pageSize: number;
+  offset: number;
+  ascending: boolean;
+  language: string | null;
+  gameType: string;
+  startDate: string | null;
+  endDate: string | null;
+}): Promise<NextResponse> {
+  // `language` is intentionally omitted — analytics_events has no per-game language.
+  const { supabase, page, pageSize, offset, ascending, gameType, startDate, endDate } = opts;
+
+  const applyCommon = (q: PgFilter): PgFilter => {
+    let out = q.eq('event_type', 'game_completed');
+    if (startDate) out = out.gte('created_at', startDate);
+    if (endDate) out = out.lte('created_at', `${endDate}T23:59:59.999Z`);
+    // NOTE: analytics_events does not record a per-game language (no `language`
+    // column or metadata key), so the language filter is intentionally NOT applied
+    // here — applying it would match zero rows and blank the default log. The UI
+    // disables the language control for this source.
+    out = applyGameTypeFilter(out, gameType);
+    return out;
+  };
+
+  // Main paginated query — exact count gives an accurate totalCount (no phantom pages).
+  const mainBuilder = supabase
+    .from('analytics_events')
+    .select('id, event_type, player_id, session_id, country_code, utm_source, utm_medium, utm_campaign, referrer, created_at, metadata', { count: 'exact' });
+  applyCommon(mainBuilder as unknown as PgFilter);
+  const { data, error, count } = await mainBuilder
+    .order('created_at', { ascending })
+    .range(offset, offset + pageSize - 1);
+  if (error) {
+    console.error('[admin/game-logs] analytics query error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  const rows = (data as unknown as AnalyticsEventRow[]) || [];
+
+  // Batch-join profiles for any rows that resolve to a registered player.
+  const playerIds = Array.from(
+    new Set(
+      rows
+        .map((r) => r.player_id ?? (typeof r.metadata?.userId === 'string' ? (r.metadata.userId as string) : null))
+        .filter((id): id is string => Boolean(id)),
+    ),
+  );
+  const profileById: Record<string, GameProfile> = {};
+  if (playerIds.length > 0) {
+    const { data: profs } = await supabase
+      .from('profiles')
+      .select('id, username, display_name, avatar_emoji, avatar_color, avatar_config')
+      .in('id', playerIds);
+    ((profs as unknown as Array<GameProfile & { id: string }>) || []).forEach((p) => {
+      profileById[p.id] = p;
+    });
+  }
+
+  const games = rows.map((r) => {
+    const pid = r.player_id ?? (typeof r.metadata?.userId === 'string' ? (r.metadata.userId as string) : null);
+    return mapAnalyticsEventToGame(r, pid ? profileById[pid] ?? null : null);
+  });
+
+  const totalCount = count ?? games.length;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  // Accurate per-bucket counts via head counts (one query per canonical bucket, parallel).
+  const headCount = async (extra: (q: PgFilter) => PgFilter): Promise<number> => {
+    const builder = supabase.from('analytics_events').select('id', { count: 'exact', head: true });
+    const filter = applyCommon(builder as unknown as PgFilter);
+    extra(filter);
+    const { count: c } = await builder;
+    return c ?? 0;
+  };
+
+  const bucketCounts = await Promise.all(
+    CANONICAL_MODE_BUCKETS.map((b) =>
+      headCount((q) =>
+        b.multiplayer
+          // MP is tracked two ways: an isMultiplayer flag, OR gameMode='multiplayer'
+          // (older mpSession path that never set the flag). Count both.
+          ? q.or('metadata->>isMultiplayer.eq.true,metadata->>gameMode.eq.multiplayer')
+          : q.in('metadata->>gameMode', b.modes),
+      ).then((count) => ({ key: b.key, labelKey: b.labelKey, label: b.label, count })),
+    ),
+  );
+
+  const mpBucket = bucketCounts.find((b) => b.key === 'multiplayer');
+
+  return NextResponse.json({
+    success: true,
+    source: 'analytics',
+    games,
+    pagination: {
+      page,
+      pageSize,
+      totalCount,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    },
+    // Accurate, dynamic per-mode counts (the "correct" stats the admin wants).
+    modeBreakdown: bucketCounts,
+    // Legacy shape kept for back-compat consumers; multiplayer card = real MP count.
+    breakdown: {
+      authenticatedGames: mpBucket?.count ?? 0,
+      guestGames: 0,
+      wordHuntGames: bucketCounts.find((b) => b.key === 'wordHunt')?.count ?? 0,
+      dailyChallengeGames: 0,
+      drillGames: 0,
+      blastGames: bucketCounts.find((b) => b.key === 'blast')?.count ?? 0,
+      wordWheelGames: bucketCounts.find((b) => b.key === 'wordWheel')?.count ?? 0,
+      practiceGames: 0,
+    },
+  });
 }
