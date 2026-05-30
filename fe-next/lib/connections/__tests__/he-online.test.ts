@@ -1,10 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { HE_ONLINE } from '../puzzles/he-online';
 import { getPuzzlesForLocale } from '../puzzles';
-
-// Sofit/final Hebrew letters — a bridge must NOT contain these (the on-screen
-// keyboard only emits base letters; see lib/connections/keyboard.ts).
-const SOFIT = /[ךםןףץ]/;
+import { checkGuess } from '../gameLogic';
+import { normalizeHebrewWord } from '../../../shared/utils/wordNormalization';
 
 describe('HE_ONLINE — curated online-harvested riddles (3-judge verified)', () => {
   it('is a non-empty set', () => {
@@ -19,9 +17,13 @@ describe('HE_ONLINE — curated online-harvested riddles (3-judge verified)', ()
     }
   });
 
-  it('every bridge is base-letter typable (no sofit finals)', () => {
+  it('is solvable from the base-letter keyboard (bridge accepted even with natural sofit)', () => {
+    // The keyboard emits base letters; checkGuess normalizes both sides, so a
+    // bridge stored with a natural final letter (e.g. ים, חורף) must still match
+    // its base-letter typing.
     for (const p of HE_ONLINE) {
-      expect(SOFIT.test(p.bridge), `bridge "${p.bridge}" has a sofit letter`).toBe(false);
+      const typed = normalizeHebrewWord(p.bridge); // what the base keyboard produces
+      expect(checkGuess(typed, p).correct, `bridge "${p.bridge}" not solvable as "${typed}"`).toBe(true);
     }
   });
 
