@@ -5309,6 +5309,9 @@ const en = {
       "title": "How to play"
     },
     "keepPracticing": "Keep practicing",
+    "tutorial": {
+      "drag": "Drag"
+    },
     "mistakeCoach": {
       "ariaLabel": "Coaching tip",
       "cta": "Got it",
@@ -9250,6 +9253,9 @@ const en = {
     "gridLabel": "Letter grid",
     "helpTitle": "How to Play",
     "helpDrag": "Drag across letters to form words. Words must be at least 2 letters long.",
+    "mpResults": {
+      "boardCleared": "Board Cleared!"
+    },
     "helpGold": "3x score multiplier for the word.",
     "helpBomb": "Clears all 8 surrounding tiles.",
     "helpRainbow": "+5 bonus points.",
@@ -10208,6 +10214,10 @@ const en = {
       "newBadge": "New Badge Unlocked!",
       "pin": "Pin to Profile",
       "pinLimit": "{{current}}/{{max}} pinned. Unpin one to pin another",
+      "exploration": "Exploration",
+      "consistency": "Consistency",
+      "skill": "Skill",
+      "all": "All",
       "progress": "{{current}}/{{next}}",
       "secret": "Secret Achievement",
       "secretRemaining": "{{count}} secrets left",
@@ -11806,6 +11816,10 @@ const en = {
   "reengagement": {
     "ariaLabel": "Welcome back bonus",
     "bonusMessage": "{{days}} days off? Here — take this. Good to see you.",
+    "welcomeBack": "Welcome back!",
+    "missedYou": "We missed you! Here's a bonus to get you back in the game.",
+    "longTimeNoSee": "Long time no see!",
+    "goodToSeeYou": "Good to see you!",
     "rewardsAriaLabel": "Bonus rewards",
     "claimBonus": "Claim Bonus",
     "dismiss": "Maybe later"

@@ -670,6 +670,11 @@ const he = {
     "lightMode": "מצב בהיר",
     "darkMode": "מצב כהה",
     "goToHome": "LexiClash - חזרה לדף הבית",
+    "toClose": "לסגירה",
+    "searchPlaceholder": "חפש...",
+    "search": "חיפוש",
+    "noResults": "אין תוצאות",
+    "navigation": "ניווט",
     "pending": "בודק...",
     "selected": "נבחר",
     "xpGained": "XP",
@@ -1425,6 +1430,7 @@ const he = {
     },
     "hostTransferredAnnouncement": "{previousHost} עזב. {newHost} הוא המארח החדש.",
     "hostTransferredAfterGrace": "{previousHost} לא חזר. {newHost} הוא המארח החדש.",
+    "inviteFriend": "הזמן חבר",
     "hostLeftModal": {
       "title": "המארח עזב",
       "body": "החדר נסגר. חוזרים ללובי תוך כמה שניות — או הקש כאן כדי לצאת עכשיו.",
@@ -1571,7 +1577,10 @@ const he = {
     "youEliminated": "הודחת מהמשחק!",
     "playerLastLife": "בחיים האחרונים!",
     "yourLastLife": "חיים אחרונים!",
-    "botsJoined": "{{count}} יריבים הצטרפו — אין אנשים אמיתיים, אז קיבלתם בוטים!"
+    "botsJoined": "{{count}} יריבים הצטרפו — אין אנשים אמיתיים, אז קיבלתם בוטים!",
+    "winStreak": "{{count}} ניצחונות ברצף!",
+    "oneMoreWin": "עוד ניצחון אחד!",
+    "nearRank": "כל כך קרוב לעלייה בדרגה!"
   },
   "stats": {
     "games": "משחקים",
@@ -3696,6 +3705,8 @@ const he = {
       "sendCode": "שלחו לי קוד",
       "noPassword": "לא צריך סיסמה",
       "codeSentTo": "הקוד נשלח אל",
+      "enterCode": "הזן את הקוד",
+      "codeSent": "הקוד נשלח!",
       "verify": "אימות קוד",
       "changeEmail": "שינוי אימייל",
       "resend": "שליחה מחדש"
@@ -5342,6 +5353,9 @@ const he = {
       "title": "איך משחקים"
     },
     "keepPracticing": "המשך לתרגל",
+    "tutorial": {
+      "drag": "גרור."
+    },
     "mistakeCoach": {
       "ariaLabel": "טיפ אימון",
       "cta": "הבנתי",
@@ -5564,6 +5578,10 @@ const he = {
     "questPlayedSubtitle": "כבר שיחקתם היום",
     "questPlayedCta": "לעמוד האתגר",
     "quitConfirm": "ההתקדמות שלך לא תישמר. תצטרך לצפות בפרסומת כדי לשחק שוב היום.",
+    "streakFreezeEarned": "זכית בהקפאת רצף!",
+    "rewardClaimed": "קיבלת את התגמול!",
+    "milestoneReached": "הגעת לאבן דרך!",
+    "comeBackTomorrow": "חזרו מחר!",
     "quitConfirmTitle": "לצאת באמצע המשחק?",
     "imSure": "צא בכל זאת",
     "wordsFound": "נמצאו {count} מילים",
@@ -5981,6 +5999,8 @@ const he = {
     "eliminatedAlert": "הודחת!",
     "lastStanding": "האחרון שנשאר!",
     "lowLifeSelf": "החיים אוזלים! מצאו מילים כדי להחלים.",
+    "play": "שחק ציד מילים",
+    "categoryHint": "קטגוריה: {{category}}",
     "welcome": {
       "title": "ציד מילים יומי"
     },
@@ -7979,6 +7999,9 @@ const he = {
     },
     "share": {
       "bossDefeated": "ניצחתי את {{boss}} ב{{world}}!",
+      "wordsFound": "מילים שמצאת",
+      "perfectClear": "ניצחון מושלם",
+      "bestWord": "המילה הטובה ביותר",
       "shareCard": "שתף ניצחון",
       "killingWord": "מילת הנצחון"
     },
@@ -8353,6 +8376,10 @@ const he = {
       "shuffleWithCount": "ערבוב (×{count})",
       "detonate": "פיצוץ",
       "gemDetectorActive": "גלאי אבני חן פעיל — אריחים נדירים מודגשים!",
+      "wordsYouMissed": "מילים שפספסת",
+      "showMore": "הצג עוד",
+      "showLess": "הצג פחות",
+      "missedWordsSummary": "{{count}} מילים שיכולת למצוא",
       "shuffleBoard": "ערבוב לוח",
       "shuffleUsed": "הלוח עורבב! ({remaining} נותרו)",
       "freezeTimer": "הקפאת טיימר",
@@ -8583,6 +8610,8 @@ const he = {
       "nearMissDesc": "נשארו רק {{hp}}% חיים! כמעט הצלחת!",
       "fragmentCollected": "שבר הלקסיקון שוחזר!",
       "fragmentCount": "שבר {{current}} מתוך {{total}} נאסף",
+      "tutorialGotIt": "הבנתי!",
+      "newMechanic": "מכניקה חדשה נפתחה!",
       "twistMechanic": "טוויסט הבוס",
       "skipIntro": "דלג",
       "readyToFight": "קדימה!",
@@ -9614,6 +9643,9 @@ const he = {
     "gridLabel": "לוח אותיות",
     "helpTitle": "איך לשחק",
     "helpDrag": "גרור על אותיות כדי ליצור מילים. מילים חייבות להיות באורך 2 אותיות לפחות.",
+    "mpResults": {
+      "boardCleared": "הלוח נוקה!"
+    },
     "helpGold": "מכפיל ניקוד x3 למילה.",
     "helpBomb": "מנקה את כל 8 האריחים הסמוכים.",
     "helpRainbow": "+5 נקודות בונוס.",
@@ -10581,6 +10613,10 @@ const he = {
       "newBadge": "תג חדש נפתח! 🏅",
       "pin": "נעצו לפרופיל",
       "pinLimit": "{{current}}/{{max}} נעוצים. שחררו אחד כדי לנעוץ חדש",
+      "exploration": "חקר",
+      "consistency": "עקביות",
+      "skill": "כישורים",
+      "all": "הכל",
       "progress": "{{current}}/{{next}}",
       "secret": "הישג סודי 🤫",
       "secretRemaining": "נותרו עוד {{count}} סודות",
@@ -11935,6 +11971,7 @@ const he = {
     "teaser": "מילת היום",
     "found": "מצאתם את זה!",
     "foundPercent": "רק {{percent}}% מהשחקנים מצאו את זה!",
+    "title": "המילה של היום",
     "missed": "מילת היום",
     "missedHint": "נסו שוב מחר!",
     "share": "שתפו את הגילוי",
@@ -12070,6 +12107,7 @@ const he = {
     "playNow": "שחק עכשיו",
     "challengeFriend": "אתגר חבר",
     "challengeFriendDesc": "שחק על לוח, ואז שלח לחבר לנסות לנצח",
+    "recentResults": "תוצאות אחרונות",
     "sendChallenge": "שלח אתגר",
     "selectFriend": "בחר יריב",
     "yourScore": "הניקוד שלך: {{score}}",
@@ -12220,6 +12258,8 @@ const he = {
     "lossAversion": "הדירוג שלך יורד! משחק מהיר יעזור.",
     "incentive": "ברוך שובך! הנה {{coins}} מטבעות ושמירת רצף במתנה.",
     "majorIncentive": "שמרנו את ההתקדמות שלך! חזור ל-3 ימים של פרימיום בחינם.",
+    "longTimeNoSee": "מזמן לא התראינו!",
+    "goodToSeeYou": "כמה טוב לראות אותך!",
     "emailOnly": "בדוק את המייל שלך להצעה מיוחדה!",
     "claimBonus": "קבל בונוס",
     "daysAway": "{{count}} ימים בחוץ",
