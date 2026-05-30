@@ -28,6 +28,11 @@ export interface UseWordCraftJuice {
   drawFromSack: (sackEl: JuiceTarget, rackTileEls: JuiceTarget[]) => void;
   /** A joker just got its letter — pop the tile and scatter a few sparkles. */
   jokerSparkle: (target: JuiceTarget) => void;
+  /**
+   * Territory capture: the flipped cells pop + flash in the capturer's color
+   * with a shower of particles, so claiming ground actually feels like a win.
+   */
+  captureBurst: (cellEls: JuiceTarget[], color: string) => void;
 }
 
 export function useWordCraftJuice(): UseWordCraftJuice {
@@ -272,6 +277,63 @@ export function useWordCraftJuice(): UseWordCraftJuice {
     }
   }, []);
 
+  const captureBurst = useCallback((cellEls: JuiceTarget[], color: string) => {
+    const cells = cellEls.filter(Boolean) as Element[];
+    if (cells.length === 0) return;
+    if (isReducedMotionPreferred()) return;
+
+    // Each flipped cell pops in place (testable timeline on the real cell).
+    const tl = gsap.timeline();
+    cells.forEach((el, i) => {
+      tl.fromTo(
+        el,
+        { scale: 0.85 },
+        { scale: 1.18, duration: 0.16, ease: 'back.out(3)', yoyo: true, repeat: 1 },
+        i * 0.04,
+      );
+    });
+
+    if (typeof document === 'undefined') return;
+    // Particle shower from the cells, capped so a big multi-cell capture stays
+    // celebratory instead of a frame-killing confetti storm.
+    const maxParticles = 18;
+    const perCell = Math.max(1, Math.floor(maxParticles / cells.length));
+    const sparkTl = gsap.timeline();
+    cells.forEach((el) => {
+      const rect = (el as HTMLElement).getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      for (let i = 0; i < perCell; i++) {
+        const dot = document.createElement('div');
+        dot.setAttribute('aria-hidden', 'true');
+        dot.dataset.wcCaptureSpark = 'true';
+        dot.style.cssText = [
+          'position:fixed',
+          `left:${cx}px`,
+          `top:${cy}px`,
+          'width:7px',
+          'height:7px',
+          'border-radius:9999px',
+          'border:2px solid #000',
+          `background:${color}`,
+          'pointer-events:none',
+          'z-index:55',
+          'transform:translate(-50%,-50%)',
+        ].join(';');
+        document.body.appendChild(dot);
+        const angle = (Math.PI * 2 * i) / perCell + (perCell > 1 ? 0.3 : 0);
+        const dist = 22 + (i % 3) * 9;
+        sparkTl.fromTo(
+          dot,
+          { x: 0, y: 0, scale: 1, opacity: 1 },
+          { x: Math.cos(angle) * dist, y: Math.sin(angle) * dist - 8, scale: 0.2, opacity: 0, duration: 0.55, ease: 'power2.out' },
+          0,
+        );
+        window.setTimeout(() => dot.remove(), 650);
+      }
+    });
+  }, []);
+
   return {
     tilePlace,
     invalidShake,
@@ -282,5 +344,6 @@ export function useWordCraftJuice(): UseWordCraftJuice {
     arcTilePlace,
     drawFromSack,
     jokerSparkle,
+    captureBurst,
   };
 }

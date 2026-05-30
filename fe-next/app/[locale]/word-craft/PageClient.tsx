@@ -445,9 +445,16 @@ export default function WordCraftPageClient() {
     if (cap.turnIndex === lastCaptureTurnRef.current) return;
     lastCaptureTurnRef.current = cap.turnIndex;
     setCaptureToast({ by: cap.by, count: cap.cells.length, bonus: cap.bonus, key: cap.turnIndex });
+    // Burst the flipped cells in the capturer's color — cyan when you take
+    // ground, pink when the bot takes yours.
+    if (typeof document !== 'undefined') {
+      const color = cap.by === 'player' ? '#00FFFF' : '#FF1493';
+      const cellEls = cap.cells.map((c) => document.querySelector(`[data-board-cell="${c.row},${c.col}"]`));
+      requestAnimationFrame(() => juice.captureBurst(cellEls, color));
+    }
     const timer = setTimeout(() => setCaptureToast(null), 1800);
     return () => clearTimeout(timer);
-  }, [game.state.lastCapture]);
+  }, [game.state.lastCapture, juice]);
 
   // --- Juice: tile place ---
   const prevPendingIdsRef = useRef<Set<string>>(new Set());

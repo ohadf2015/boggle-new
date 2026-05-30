@@ -69,6 +69,34 @@ describe('useWordCraftJuice', () => {
     expect(typeof result.current.rackSelect).toBe('function');
     expect(typeof result.current.drawFromSack).toBe('function');
     expect(typeof result.current.jokerSparkle).toBe('function');
+    expect(typeof result.current.captureBurst).toBe('function');
+  });
+
+  describe('captureBurst', () => {
+    it('pops each captured cell', () => {
+      const a = document.createElement('div');
+      const b = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.captureBurst([a, b], '#00FFFF');
+      expect(timelines.length).toBeGreaterThanOrEqual(1);
+      const targets = timelines.flatMap((t) => t.fromToCalls.map((c) => c.target));
+      expect(targets).toContain(a);
+      expect(targets).toContain(b);
+    });
+
+    it('no-ops on an empty cell list', () => {
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.captureBurst([], '#FF1493');
+      expect(timelines).toHaveLength(0);
+    });
+
+    it('no-ops when prefers-reduced-motion is set', () => {
+      reducedMotionMock.mockReturnValue(true);
+      const a = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.captureBurst([a], '#00FFFF');
+      expect(timelines).toHaveLength(0);
+    });
   });
 
   describe('drawFromSack', () => {
