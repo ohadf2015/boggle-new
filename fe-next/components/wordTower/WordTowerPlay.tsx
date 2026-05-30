@@ -23,6 +23,10 @@ import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
 import WordTowerCrane, { type WordTowerCraneHandle } from './WordTowerCrane';
 import { useCraneDrop } from './useCraneDrop';
+import { sweepPeriodMs } from '@/lib/wordTower/craneSweep';
+import { swayInstability } from '@/lib/wordTower/towerSway';
+import { buildDropVerdict, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
+import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
 import { perkMilestoneAt, reducedTopple, PERKS } from '@/lib/wordTower/perks';
@@ -36,6 +40,14 @@ import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 import { WordTowerStatHud } from './WordTowerStatHud';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
+
+/** Verdict-pop colour by band — mirrors the swinging-beam tint families. */
+const VERDICT_TONE_CLASS: Record<VerdictTone, string> = {
+  lime: 'bg-neo-lime text-neo-black',
+  cyan: 'bg-neo-cyan text-neo-black',
+  yellow: 'bg-neo-yellow text-neo-black',
+  red: 'bg-neo-red text-neo-white',
+};
 
 interface PlayProps {
   language: Language;
@@ -196,6 +208,33 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // chasing the swinging beam to the top of the screen.
   const craneRef = useRef<WordTowerCraneHandle | null>(null);
   const triggerCraneDrop = useCallback(() => craneRef.current?.drop(), []);
+
+  // Sweep period RAMPS with tower height (slow + learnable near the ground,
+  // faster the taller you climb) — escalating challenge, not a flat speed.
+  const sweepMs = sweepPeriodMs(game.floors.length);
+  // How shaky the tower is (0..1) — drives the continuous SWING and, via the
+  // crane's matching offset, makes placing on an unstable tower genuinely harder.
+  const instability = swayInstability(crane.consecutiveSloppy, crane.leanDeg);
+
+  // Unmistakable verdict pop — one big, band-coloured beat on every drop telling
+  // the player exactly how they did + the metres gained. Keyed off the placement
+  // result; the height delta is read after commit settles into `game.heightM`.
+  const lastOutcomeRef = useRef<PlacementOutcome | null>(null);
+  const handleCraneDrop = useCallback(
+    (o: PlacementOutcome) => { lastOutcomeRef.current = o; crane.onDrop(o); },
+    [crane.onDrop], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const [verdict, setVerdict] = useState<{ v: DropVerdict; key: number } | null>(null);
+  const prevVerdictHeight = useRef(game.heightM);
+  useEffect(() => {
+    const o = lastOutcomeRef.current;
+    if (!o || tower.state.resultKey === 0) return;
+    const gain = game.heightM - prevVerdictHeight.current;
+    prevVerdictHeight.current = game.heightM;
+    setVerdict({ v: buildDropVerdict(o, gain), key: tower.state.resultKey });
+    const id = setTimeout(() => setVerdict(null), 1300);
+    return () => clearTimeout(id);
+  }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Wrecking ball — perfect drops earn tokens; spend on a rival to topple a
   // floor off their ghost tower. Includes the receiver-side simulator
@@ -393,8 +432,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         bottomInsetPx={deckHeight}
         personalBestM={personalBest}
         leanDeg={crane.leanDeg}
+        instability={instability}
         clutchSaveKey={crane.clutch?.outcome === 'save' ? crane.clutch.key : 0}
         toppleKey={tower.state.hazardKey}
+        toppleFloors={tower.state.lastHazard?.removed ?? 1}
         t={t}
         onViewAltChange={setViewAlt}
       />
@@ -465,12 +506,37 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           ref={craneRef}
           word={tower.state.pendingWord}
           consecutiveSloppy={crane.consecutiveSloppy}
-          onDrop={crane.onDrop}
+          onDrop={handleCraneDrop}
           onSignedDrop={crane.pushSignedOffset}
           t={t}
           reducedMotion={reducedMotion}
+          periodMs={sweepMs}
+          instability={instability}
           hideOwnButton
         />
+      )}
+
+      {/* Unmistakable DROP VERDICT — the single big beat that answers "did I nail
+          it?". Band-coloured headline (PERFECT/NICE/SLOPPY/MISSED) + the metres
+          actually gained, popped centre-stage so it can't be missed. */}
+      {verdict && (
+        <div
+          key={verdict.key}
+          className="pointer-events-none absolute left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
+          aria-live="assertive"
+          role="status"
+        >
+          <div
+            className={`rounded-neo border-neo-thick border-black px-6 py-3 text-center font-neo-display text-3xl font-black uppercase tracking-wide shadow-hard ${VERDICT_TONE_CLASS[verdict.v.tone]} ${reducedMotion ? '' : verdict.v.toppled ? 'animate-neo-shake' : 'animate-neo-pop'}`}
+          >
+            {t(verdict.v.labelKey)}
+          </div>
+          {verdict.v.gainText !== '+0m' && (
+            <div className="rounded-neo border-neo border-black bg-neo-navy/85 px-3 py-1 font-neo-display text-lg font-black text-neo-white shadow-hard backdrop-blur-sm">
+              {verdict.v.gainText}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Wrecking-ball UI: chip + earn toast + rival picker + hit animation. */}

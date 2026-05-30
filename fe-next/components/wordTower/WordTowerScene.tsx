@@ -12,6 +12,9 @@ import { gradeBlockColor, blockSurface, type BlockSurface } from '@/lib/wordTowe
 import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
+import { swayAngleAt } from '@/lib/wordTower/towerSway';
+import { impactParams } from '@/lib/wordTower/fallProfile';
+import { toppleCrashFx } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
@@ -57,9 +60,16 @@ interface SceneProps {
   /** Bumps when a CLUTCH SAVE lands (a clean drop pulled back from a critical
    *  lean) — fires the triumphant snap-back burst + bass-thud shake. */
   clutchSaveKey?: number;
-  /** Bumps on every hazard/topple strike — fires the jolt screen shake so a
-   *  collapse is FELT, not just announced by the banner. */
+  /** Bumps on every hazard/topple strike — fires the crash FX so a collapse is
+   *  SEEN + FELT, not just announced by the banner. */
   toppleKey?: number;
+  /** Floors lost in the latest topple — scales the crash (shake/debris/flash). */
+  toppleFloors?: number;
+  /** How unstable the tower is (0..1). Above the sway gate the whole tower
+   *  SWINGS continuously around its base — felt as menace, and (via the crane's
+   *  matching offset) it moves the landing target so placing is genuinely harder.
+   *  0 = rock-steady, no sway. */
+  instability?: number;
 }
 
 /** Shared camera-pan state between the DOM gesture layer and the Pixi layer. */
@@ -120,7 +130,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -230,10 +240,16 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
           // squash, a bigger shockwave ring, and more impact particles.
           const depth = l.pending ? Math.max(0, l.pos - C) : 0;
           const fx = letterPlacementFx(depth);
+          // Gravity WEIGHT: the further the block fell, the harder it lands —
+          // a depth-scaled screen-shake + dust debris so the impact is felt.
+          const impact = impactParams(depth);
           dropIn(tile, y, 0, () => {
             squashLand(tile);
             impactRing(c, centerX, y + half, half, l.color, fx.ringScale);
-            engine.particles.burst(COMBO_FLASH, centerX, y + half, fx.particles); // puff at the impact point
+            engine.particles.burst(COMBO_FLASH, centerX, y + half, fx.particles + impact.debris); // puff + dust at impact
+            if (impact.shakePx > 0.5) {
+              engine.shake.shake({ intensity: impact.shakePx, duration: 0.18, decay: 'exponential' });
+            }
           });
         }
       } else {
@@ -284,21 +300,52 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
 
   // Jolt the whole view when a hazard/topple strikes — the collapse is FELT, not
   // just read off the banner. Heavier than the rejected-word stack wobble.
+  const toppleFloorsRef = useRef(toppleFloors);
+  toppleFloorsRef.current = toppleFloors;
   useEffect(() => {
     if (toppleKey === 0 || reducedMotion) return;
-    engine.shake.shake({ intensity: 16, duration: 0.5, decay: 'exponential' });
+    // A floor gave way — a real CRASH: hard camera shake + a shower of rubble
+    // raining from the build line + a danger flash + a violent stack wobble, all
+    // scaled by how many floors were lost.
+    const fx = toppleCrashFx(toppleFloorsRef.current);
+    const { width: W, height: H } = engine;
+    engine.shake.shake({ intensity: fx.shakePx, duration: fx.durationS, decay: 'exponential' });
+    engine.particles.burst(CONFETTI_BURST, W / 2, H * 0.22, fx.debris); // tumbling rubble
+    engine.particles.burst(COMBO_FLASH, W / 2, H * 0.24, Math.round(fx.debris / 2)); // dust puff
+    engine.flash.flash({ color: 0xff3366, duration: fx.durationS, intensity: fx.flashAlpha }); // danger jolt
+    const c = containerRef.current;
+    if (c) shakeX(c); // the whole stack lurches, not just the camera
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toppleKey]);
 
-  // Visible instability lean — recent-weighted from crane drops, clamped small.
-  // Pixi container.angle is in degrees; pivot at the base so the tower leans
-  // FROM the ground rather than rotating around its centre.
+  // Visible instability — a static recent-weighted LEAN plus, once the tower is
+  // unstable, a continuous SWING that oscillates around the base. The swing is
+  // driven by a rAF clock so it never freezes between drops; `instability` 0
+  // means a dead-steady tower (no swing, just the lean). The crane feeds the
+  // SAME sway offset into its landing target, so what you see is what you place.
+  // Pixi container.angle is in degrees; pivot at the base so it pivots from the
+  // ground rather than spinning about its centre. Reduced-motion → upright.
+  const leanRef = useRef(leanDeg);
+  leanRef.current = leanDeg;
+  const instabilityRef = useRef(instability);
+  instabilityRef.current = instability;
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
     if (reducedMotion) { c.angle = 0; return; }
-    c.angle = leanDeg;
-  }, [leanDeg, reducedMotion]);
+    let raf = 0;
+    // Use the ABSOLUTE rAF timestamp (not a per-mount epoch) so this swing stays
+    // phase-locked with the crane's target-guide swing — both read the same clock
+    // + the same instability, so the visible tower lean and the landing target
+    // always point the SAME way at the same instant (the headline of the feature).
+    const tick = (now: number) => {
+      const cc = containerRef.current;
+      if (cc) cc.angle = leanRef.current + swayAngleAt(now, instabilityRef.current);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [reducedMotion]);
 
   // Full-screen flash when crossing into a new biome.
   const prevBiome = useRef(biomeId);

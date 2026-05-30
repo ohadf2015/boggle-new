@@ -103,11 +103,11 @@ export function perfectStreakBonus(streak: number): number {
 }
 
 /**
- * Crane sweep position at `elapsedMs`, as a signed value in [-1, 1] (0 = centre).
- * A full sweep takes `periodMs`. The UI maps this to pixels; the drop error fed
- * to {@link evaluatePlacement} is its absolute value.
+ * Crane sweep position at `elapsedMs`, signed in [-1, 1] (0 = centre).
+ *
+ * Re-exported from {@link module:craneSweep} — the body moved there when the
+ * sweep switched from an (unfair, centre-fastest) sine to a constant-velocity
+ * triangle wave. Kept here so existing imports / the live-band preview keep
+ * working unchanged.
  */
-export function craneOffsetAt(elapsedMs: number, periodMs: number): number {
-  if (periodMs <= 0) return 0;
-  return Math.sin((2 * Math.PI * elapsedMs) / periodMs);
-}
+export { craneOffsetAt } from './craneSweep';

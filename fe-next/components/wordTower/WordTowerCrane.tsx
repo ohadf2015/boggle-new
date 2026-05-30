@@ -11,6 +11,7 @@ import {
   type PlacementQuality,
 } from '@/lib/wordTower/cranePlacement';
 import { beamWidthFor } from '@/lib/wordTower/craneBeam';
+import { swayAngleAt, swayNormalizedOffset, effectiveDropError } from '@/lib/wordTower/towerSway';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
@@ -33,6 +34,10 @@ interface WordTowerCraneProps {
   reducedMotion?: boolean;
   /** Sweep period (ms). */
   periodMs?: number;
+  /** Tower instability (0..1). Above the sway gate the LANDING TARGET swings —
+   *  the player must time the drop against a moving top. WYSIWYG: the target
+   *  guide + landing shadow track the same offset that scores the drop. */
+  instability?: number;
   /** Test/override seam: returns the signed offset [-1,1] at drop time. */
   getOffset?: () => number;
   /** When true, the crane chrome renders without its own drop button — the
@@ -97,6 +102,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     t,
     reducedMotion = false,
     periodMs = 1800,
+    instability = 0,
     getOffset,
     hideOwnButton = false,
   },
@@ -104,6 +110,12 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
 ) {
   const [pos, setPos] = useState(0);
   const posRef = useRef(0);
+  // Sway offset of the landing target (signed, crane [-1,1] space). 0 when the
+  // tower is steady; oscillates once unstable so the target swings under the beam.
+  const [sway, setSway] = useState(0);
+  const swayRef = useRef(0);
+  const instabilityRef = useRef(instability);
+  instabilityRef.current = instability;
   const droppedRef = useRef(false);
   const [result, setResult] = useState<PlacementOutcome | null>(null);
   // Detach animation: once dropped, the beam drops straight down before the
@@ -115,9 +127,17 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     let raf = 0;
     const start = performance.now();
     const tick = (now: number) => {
-      const x = craneOffsetAt(now - start, periodMs);
+      const elapsed = now - start;
+      const x = craneOffsetAt(elapsed, periodMs);
       posRef.current = x;
       setPos(x);
+      // Swing the landing target when the tower is unstable (0 = steady). Uses the
+      // ABSOLUTE timestamp (not `elapsed`, which resets each floor when periodMs
+      // changes) so it stays phase-locked with the Pixi tower's visible swing —
+      // the swaying tower IS the moving target the player aims at.
+      const s = swayNormalizedOffset(swayAngleAt(now, instabilityRef.current));
+      swayRef.current = s;
+      setSway(s);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -128,8 +148,12 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     if (droppedRef.current) return;
     droppedRef.current = true;
     const signedOffset = getOffset ? getOffset() : posRef.current;
-    onSignedDrop?.(signedOffset);
-    const outcome = evaluatePlacement(Math.abs(signedOffset), consecutiveSloppy);
+    const swayOffset = swayRef.current;
+    // Residual misalignment vs the (possibly swaying) top — drives both the lean
+    // tracker and the verdict, so tracking a swinging tower lands clean.
+    const residual = signedOffset - swayOffset;
+    onSignedDrop?.(residual);
+    const outcome = evaluatePlacement(effectiveDropError(signedOffset, swayOffset), consecutiveSloppy);
     setFalling(true);
     // Short fall, then settle the verdict — keeps the impact felt.
     setTimeout(() => {
@@ -143,9 +167,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const { language } = useLanguage();
   const trolleyX = pos * TROLLEY_RANGE_PX;
   const beamW = beamWidthFor(word.length);
-  // The band the CURRENT sweep position would score — drives the live beam tint
-  // + landing shadow so the drop is a readable skill shot, not a blind tap.
-  const liveBand = alignmentBand(Math.abs(pos));
+  // The band the CURRENT sweep position would score AGAINST THE SWAYING TOP —
+  // drives the live beam tint + landing shadow so the drop is a readable skill
+  // shot even while the target swings (WYSIWYG).
+  const liveBand = alignmentBand(effectiveDropError(pos, sway));
   const aiming = !falling && !result;
   // Hebrew: show the word-final letter in its sofit form and lay the beam RTL.
   // Width still keys off the raw length (same glyph count).
@@ -254,14 +279,21 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
           )}
         </div>
 
-        {/* Centre drop guide — the bullseye the beam should land on */}
+        {/* Drop-target guide — the bullseye the beam should land on. It SWINGS
+            with the unstable tower-top (same offset that scores the drop), so the
+            player aims the beam at where the top actually is. Brighter ring makes
+            it a clear reticle, not just a faint dash. */}
         <div
-          className="absolute bottom-2 z-0 h-1.5 w-20 rounded-full border border-dashed border-neo-lime/60 bg-neo-lime/15"
+          className="absolute bottom-2 z-0 h-2 w-20 rounded-full border-neo border-dashed border-neo-lime/70 bg-neo-lime/20 will-change-transform"
+          style={{ transform: `translateX(${sway * TROLLEY_RANGE_PX}px)`, transition: reducedMotion ? 'none' : 'transform 60ms linear' }}
           aria-hidden
         />
       </div>
 
-      {result ? (
+      {/* When the parent drives the drop (hideOwnButton), it also OWNS the
+          verdict — the big center pop — so the crane shows neither button nor
+          its own small pill here (avoids a double verdict + double SR announce). */}
+      {hideOwnButton ? null : result ? (
         <div
           role="status"
           aria-live="assertive"
@@ -273,7 +305,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
         >
           {t(`wordTower.crane.${result.quality}`)}
         </div>
-      ) : hideOwnButton ? null : (
+      ) : (
         <button
           type="button"
           data-testid="crane-drop"
