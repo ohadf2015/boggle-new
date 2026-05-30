@@ -59,15 +59,13 @@ export function readGuestId(request: NextRequest): string | null {
   return verifyGuestToken(request.cookies.get(GUEST_COOKIE)?.value);
 }
 
-/**
- * Ensure the response carries a valid guest cookie. Returns the guest id to use.
- * If the request already has a valid one, reuses it; otherwise mints a new one
- * and sets it on the response.
- */
-export function ensureGuestCookie(request: NextRequest, response: NextResponse): string {
-  const existing = readGuestId(request);
-  if (existing) return existing;
-  const uuid = randomUUID();
+/** A fresh opaque guest id (unsigned UUID). */
+export function newGuestId(): string {
+  return randomUUID();
+}
+
+/** Set the signed guest cookie for `uuid` on `response`. */
+export function setGuestCookie(response: NextResponse, uuid: string): void {
   response.cookies.set(GUEST_COOKIE, makeToken(uuid), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -75,5 +73,22 @@ export function ensureGuestCookie(request: NextRequest, response: NextResponse):
     path: '/',
     maxAge: ONE_YEAR_S,
   });
+}
+
+/**
+ * Ensure the response carries a valid guest cookie. Returns the guest id to use.
+ * If the request already has a valid one, reuses it; otherwise mints a new one
+ * and sets it on the response.
+ *
+ * NOTE: the cookie is set on the EXACT response object passed — callers must
+ * return that same response (copying `response.headers` onto a different
+ * NextResponse drops Set-Cookie). For the build-body-last pattern, use
+ * readGuestId + newGuestId + setGuestCookie on the final response instead.
+ */
+export function ensureGuestCookie(request: NextRequest, response: NextResponse): string {
+  const existing = readGuestId(request);
+  if (existing) return existing;
+  const uuid = newGuestId();
+  setGuestCookie(response, uuid);
   return uuid;
 }

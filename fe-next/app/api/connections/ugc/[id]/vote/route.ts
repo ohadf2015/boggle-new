@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { ensureGuestCookie } from '@/lib/auth/guestCookie';
+import { readGuestId, newGuestId, setGuestCookie } from '@/lib/auth/guestCookie';
 import { captureApiError } from '@/utils/sentry';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -44,9 +44,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'not found' }, { status: 404 });
     }
 
-    // Build the response first so a guest cookie (if minted) rides on it.
-    const res = NextResponse.json({ success: true });
-    const guestId = user ? null : ensureGuestCookie(request, res);
+    // Resolve guest identity up-front. A new guest gets a freshly minted id; the
+    // signed cookie is set on the SINGLE response we return (setting it on a
+    // throwaway response and copying headers drops Set-Cookie → dedup breaks).
+    const existingGuest = user ? null : readGuestId(request);
+    const guestId = user ? null : (existingGuest ?? newGuestId());
 
     const { error: voteErr } = await admin.from('connections_ugc_votes').insert({
       puzzle_id: id,
@@ -64,7 +66,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const upvotes = count ?? 0;
     await admin.from('connections_ugc_puzzles').update({ upvotes }).eq('id', id);
 
-    return NextResponse.json({ success: true, alreadyVoted, upvotes }, { headers: res.headers });
+    const out = NextResponse.json({ success: true, alreadyVoted, upvotes });
+    if (guestId && !existingGuest) setGuestCookie(out, guestId);
+    return out;
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/connections/ugc/vote', {
       method: 'POST',
