@@ -33,6 +33,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params;
   const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
   const c = getSpellingBeeContent(locale);
+  // EN-only indexing: the page body (hero/drills/training plan/FAQ) is
+  // hardcoded English in this file — only the meta is localized. Indexing the
+  // non-EN routes would put English-bodied pages under /he|/es|/sv|/ja, a
+  // weak-localization/near-duplicate signal. noindex them until the body is
+  // localized (the rich-content siblings index all 5 because their bodies are).
+  const isEnglish = locale === 'en';
   const ogImage = `${BASE_URL}/images/${OG_IMAGE[locale] ?? OG_IMAGE.en}`;
   const ogLocale = OG_LOCALE[locale] ?? 'en_US';
   return {
@@ -64,7 +70,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         es: `${BASE_URL}/es${PAGE_PATH}`,
       },
     },
-    robots: { index: true, follow: true },
+    robots: isEnglish ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
 
