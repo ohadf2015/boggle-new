@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Flame, Crosshair } from 'lucide-react';
 import CircularTimer from '../../../components/CircularTimer';
+import { tvModeLabel } from '../../../lib/tvBroadcast/modeLabel';
 
 type UrgencyLevel = 'normal' | 'urgent' | 'critical' | 'extreme';
 
@@ -31,12 +32,6 @@ const MODE_COLORS: Record<string, string> = {
   classic: 'bg-neo-cyan text-neo-black',
   blast: 'bg-neo-orange text-neo-black',
   'word-hunt': 'bg-neo-pink text-neo-cream',
-};
-
-const MODE_KEYS: Record<string, string> = {
-  classic: 'tvBroadcast.modeClassic',
-  blast: 'tvBroadcast.modeBlast',
-  'word-hunt': 'tvBroadcast.modeWordHunt',
 };
 
 /**
@@ -101,7 +96,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
               animate={{ scale: 1 }}
               className={`px-3 py-1 rounded-neo border-2 border-neo-black shadow-hard-sm font-bold text-sm uppercase ${MODE_COLORS[gameMode] || 'bg-neo-navy text-neo-cream'}`}
             >
-              {t(MODE_KEYS[gameMode] || `tvBroadcast.mode.${gameMode}`)}
+              {tvModeLabel(gameMode, t)}
             </m.div>
           )}
         </m.div>
