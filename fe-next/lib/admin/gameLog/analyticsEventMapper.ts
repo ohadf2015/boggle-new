@@ -52,6 +52,16 @@ export function mapAnalyticsEventToGame(
 
   const guestName = str(meta.guest_name);
 
+  // Prefer the joined profile; else fall back to the username stamped on the
+  // event (forward-only) so an authed player isn't rendered as "Guest" when the
+  // profiles join misses (deleted profile, race, etc.).
+  const metaUsername = str(meta.username);
+  const resolvedProfile: GameProfile | null =
+    profile ??
+    (metaUsername
+      ? { username: metaUsername, display_name: null, avatar_emoji: null, avatar_color: null }
+      : null);
+
   return {
     id: row.id,
     event_type: row.event_type,
@@ -70,7 +80,7 @@ export function mapAnalyticsEventToGame(
     time_played: num(meta.durationSec) ?? 0,
     created_at: row.created_at,
     completed_at: row.created_at,
-    profiles: profile,
+    profiles: resolvedProfile,
     // attribution
     country: row.country_code,
     referrer_source: row.referrer,

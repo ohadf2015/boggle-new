@@ -292,6 +292,24 @@ export const trackGrowthEvent = (event: GrowthEvent, data: GrowthEventData = {})
 };
 
 /**
+ * Authenticated identity for analytics, set from AuthContext when a user +
+ * profile resolve, cleared on logout. analytics_events events are otherwise
+ * fully anonymous (session-keyed only) — without this, even logged-in players
+ * are recorded with no player_id and render as "Guest" in the admin game log.
+ */
+let analyticsIdentity: { userId: string; username: string | null } | null = null;
+
+export const setAnalyticsIdentity = (
+  userId: string | null,
+  username?: string | null,
+): void => {
+  analyticsIdentity = userId ? { userId, username: username ?? null } : null;
+};
+
+export const getAnalyticsIdentity = (): { userId: string; username: string | null } | null =>
+  analyticsIdentity;
+
+/**
  * Persist event to Supabase analytics_events table via API
  * Fire-and-forget — never blocks the UI
  */
@@ -308,11 +326,16 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
   // Build metadata from event data (exclude fields stored as top-level columns)
   const { sessionId: _sid, referralSource: _ref, timestamp: _ts, ...metadata } = data;
 
-  // Enrich metadata with platform and guest_name (forward-only, permanent)
+  // Enrich metadata with platform, guest_name + authed identity (forward-only).
+  // username/userId let the admin log show real names for logged-in players
+  // (analytics_events is otherwise anonymous → everyone rendered as "Guest").
+  const identity = analyticsIdentity;
   const enrichedMetadata = {
     ...metadata,
     platform: getPlatform(),
     guest_name: getGuestName(),
+    username: identity?.username ?? (typeof metadata.username === 'string' ? metadata.username : null),
+    userId: identity?.userId ?? (typeof metadata.userId === 'string' ? metadata.userId : null),
   };
 
   fetch('/api/analytics/track', {
@@ -321,6 +344,7 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
     body: JSON.stringify({
       event_type: event,
       session_id: guestSessionId || data.sessionId || null,
+      player_id: identity?.userId ?? null,
       utm_source: utmData?.utm_source || utmData?.ref || null,
       utm_medium: utmData?.utm_medium || null,
       utm_campaign: utmData?.utm_campaign || null,

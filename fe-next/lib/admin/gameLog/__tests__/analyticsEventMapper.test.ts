@@ -118,4 +118,27 @@ describe('mapAnalyticsEventToGame', () => {
     expect(g.guest_name).toBe('Wily Wolf');
     expect(g.profiles).toBeNull();
   });
+
+  it('carries the authed player_id from the event column', () => {
+    const g = mapAnalyticsEventToGame(row({ player_id: 'user-123', metadata: { gameMode: 'classic' } }));
+    expect(g.player_id).toBe('user-123');
+  });
+
+  it('synthesizes a profile from metadata.username when the join misses', () => {
+    // Forward-only: events now stamp the authed username; show it even if the
+    // profiles join returned nothing.
+    const g = mapAnalyticsEventToGame(
+      row({ player_id: 'user-9', metadata: { gameMode: 'classic', username: 'RealPlayer' } }),
+      null,
+    );
+    expect(g.profiles?.username).toBe('RealPlayer');
+  });
+
+  it('prefers the joined profile over metadata.username', () => {
+    const g = mapAnalyticsEventToGame(
+      row({ player_id: 'user-9', metadata: { gameMode: 'classic', username: 'StaleName' } }),
+      { username: 'JoinedName', display_name: null, avatar_emoji: null, avatar_color: null },
+    );
+    expect(g.profiles?.username).toBe('JoinedName');
+  });
 });

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
-import { consumePendingSignupCompletion, maybeTrackSignupCompleted } from '@/utils/growthTracking';
+import { consumePendingSignupCompletion, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
 
 // Import hooks from auth module (types are re-exported separately below)
 import {
@@ -99,6 +99,9 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
   useEffect(() => {
     if (user && profile) {
       setSentryUser(user, profile);
+      // Stamp authed identity onto analytics events so the admin game log shows
+      // real player names (analytics_events is anonymous without this).
+      setAnalyticsIdentity(user.id, profile.display_name ?? profile.username);
       const docLang = typeof document !== 'undefined' ? document.documentElement.lang : '';
       const navLang =
         typeof navigator !== 'undefined' ? navigator.language?.split('-')[0] ?? '' : '';
@@ -169,6 +172,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         })();
       }
     } else {
+      setAnalyticsIdentity(null);
       if (wasAuthenticatedRef.current) {
         clearSentryUser();
       }

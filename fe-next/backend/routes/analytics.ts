@@ -19,6 +19,7 @@ interface TrackRequest extends Request {
   body: Request['body'] & {
     event_type?: string;
     session_id?: string;
+    player_id?: string;
     guest_name?: string;
     utm_source?: string;
     utm_medium?: string;
@@ -38,6 +39,7 @@ interface TrackResponse {
 interface AnalyticsEventInsert {
   event_type: string;
   session_id: string | null;
+  player_id: string | null;
   country_code: string | null;
   utm_source: string | null;
   utm_medium: string | null;
@@ -67,6 +69,7 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
     const {
       event_type,
       session_id,
+      player_id,
       guest_name,
       utm_source,
       utm_medium,
@@ -93,6 +96,9 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
     const insertData: AnalyticsEventInsert = {
       event_type,
       session_id: session_id || null,
+      // Authed user id (client-provided). Lets the admin game log resolve real
+      // player names instead of rendering every authed player as "Guest".
+      player_id: player_id || null,
       country_code,
       utm_source: utm_source || null,
       utm_medium: utm_medium || null,
