@@ -10970,7 +10970,9 @@ const en = {
     }
   },
   "system": {
-    "updatingToNewVersion": "Updating to new version..."
+    "updatingToNewVersion": "Updating to new version...",
+    "newVersionAvailable": "New version available",
+    "refreshToUpdate": "Refresh"
   },
   "duels": {
     "addWord": "Add Word",

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, act } from '@testing-library/react';
+import { render, act, screen, fireEvent } from '@testing-library/react';
 import { useState, type ReactNode } from 'react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -27,7 +27,9 @@ function NavWrapper({ isInGame, children }: { isInGame: boolean; children: React
   );
 }
 
-describe('VersionChecker mid-game defer', () => {
+const REFRESH_BTN = { name: /refreshToUpdate/i };
+
+describe('VersionChecker manual refresh', () => {
   const originalBuildTime = process.env.NEXT_PUBLIC_BUILD_TIME;
   const reloadSpy = vi.fn();
 
@@ -68,39 +70,87 @@ describe('VersionChecker mid-game defer', () => {
     process.env.NEXT_PUBLIC_BUILD_TIME = originalBuildTime;
   });
 
-  it('defers reload while user is in-game', async () => {
+  // Advance past the initial 10s poll + flush the fetch microtask chain so the
+  // new-version flag is set.
+  async function detectUpdate() {
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_500);
+    });
+  }
+
+  it('never auto-reloads when a new version is detected outside a game', async () => {
+    render(
+      <NavWrapper isInGame={false}>
+        <VersionChecker />
+      </NavWrapper>,
+    );
+
+    await detectUpdate();
+    // Plenty of idle time — the old code reloaded after 1.5s; new code must not.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it('shows a refresh button when an update is detected and not in-game', async () => {
+    render(
+      <NavWrapper isInGame={false}>
+        <VersionChecker />
+      </NavWrapper>,
+    );
+
+    await detectUpdate();
+
+    expect(screen.getByRole('button', REFRESH_BTN)).toBeTruthy();
+  });
+
+  it('reloads ONLY when the user clicks the refresh button', async () => {
+    render(
+      <NavWrapper isInGame={false}>
+        <VersionChecker />
+      </NavWrapper>,
+    );
+
+    await detectUpdate();
+    expect(reloadSpy).not.toHaveBeenCalled();
+
+    const btn = screen.getByRole('button', REFRESH_BTN);
+    await act(async () => {
+      fireEvent.click(btn);
+      // forceUpdate awaits caches/serviceWorker before reload — flush microtasks
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    expect(reloadSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('hides the refresh button while in-game and never reloads', async () => {
     render(
       <NavWrapper isInGame={true}>
         <VersionChecker />
       </NavWrapper>,
     );
 
-    // Run initial 10s check + flush microtasks for the fetch chain
+    await detectUpdate();
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(10_500);
-    });
-    // 1.5s "auto-update" delay window
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(2_000);
+      await vi.advanceTimersByTimeAsync(10_000);
     });
 
+    expect(screen.queryByRole('button', REFRESH_BTN)).toBeNull();
     expect(reloadSpy).not.toHaveBeenCalled();
   });
 
-  it('reloads once user exits the game', async () => {
+  it('reveals the button after the user leaves the game (still no auto-reload)', async () => {
     const { rerender } = render(
       <NavWrapper isInGame={true}>
         <VersionChecker />
       </NavWrapper>,
     );
 
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(10_500);
-    });
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(2_000);
-    });
-    expect(reloadSpy).not.toHaveBeenCalled();
+    await detectUpdate();
+    expect(screen.queryByRole('button', REFRESH_BTN)).toBeNull();
 
     // User leaves the game → context flips false
     rerender(
@@ -108,28 +158,11 @@ describe('VersionChecker mid-game defer', () => {
         <VersionChecker />
       </NavWrapper>,
     );
-
     await act(async () => {
       await vi.advanceTimersByTimeAsync(2_000);
     });
 
-    expect(reloadSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it('reloads immediately when update detected outside any game', async () => {
-    render(
-      <NavWrapper isInGame={false}>
-        <VersionChecker />
-      </NavWrapper>,
-    );
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(10_500);
-    });
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(2_000);
-    });
-
-    expect(reloadSpy).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('button', REFRESH_BTN)).not.toBeNull();
+    expect(reloadSpy).not.toHaveBeenCalled();
   });
 });

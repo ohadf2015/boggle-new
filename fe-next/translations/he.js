@@ -11289,7 +11289,9 @@ const he = {
     }
   },
   "system": {
-    "updatingToNewVersion": "מעדכן לגרסה חדשה..."
+    "updatingToNewVersion": "מעדכן לגרסה חדשה...",
+    "newVersionAvailable": "גרסה חדשה זמינה",
+    "refreshToUpdate": "רענון"
   },
   "accept": "קבל",
   "availableOpponents": "יריבים זמינים",

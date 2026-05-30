@@ -11059,7 +11059,9 @@ const es = {
     }
   },
   "system": {
-    "updatingToNewVersion": "Actualizando a nueva versión..."
+    "updatingToNewVersion": "Actualizando a nueva versión...",
+    "newVersionAvailable": "Nueva versión disponible",
+    "refreshToUpdate": "Actualizar"
   },
   "duels": {
     "addWord": "Agregar palabra",

@@ -11055,7 +11055,9 @@ const ja = {
     "forfeitCancel": "キャンセル"
   },
   "system": {
-    "updatingToNewVersion": "新しいバージョンに更新中..."
+    "updatingToNewVersion": "新しいバージョンに更新中...",
+    "newVersionAvailable": "新しいバージョンがあります",
+    "refreshToUpdate": "更新する"
   },
 
   // チャレンジシステム（デイリー＋ウィークリー）

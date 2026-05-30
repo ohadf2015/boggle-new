@@ -11064,7 +11064,9 @@ const sv = {
     }
   },
   "system": {
-    "updatingToNewVersion": "Uppdaterar till ny version..."
+    "updatingToNewVersion": "Uppdaterar till ny version...",
+    "newVersionAvailable": "Ny version tillgänglig",
+    "refreshToUpdate": "Uppdatera"
   },
   "duels": {
     "addWord": "Lägg till ord",

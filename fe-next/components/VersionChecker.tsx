@@ -7,18 +7,18 @@ import NavigationContext from '@/contexts/NavigationContext';
 /**
  * VersionChecker Component
  *
- * Aggressively clears cache when a new version is deployed:
+ * Surfaces a new deployment WITHOUT ever interrupting the player:
  * 1. Checks build time on server every 5 minutes
- * 2. If build time differs, clears ALL caches
- * 3. Unregisters service worker
- * 4. Forces page reload (only ONCE to avoid loops)
+ * 2. If build time differs, raises a "new version available" flag
+ * 3. Shows a manual "Refresh" button — NEVER auto-reloads
+ * 4. On click: clears ALL caches, unregisters the service worker, reloads
  *
- * Mid-gameplay guard: when NavigationContext reports `isInGame`, the auto
- * reload is deferred — the version flag is held and forceUpdate is triggered
- * the moment `isInGame` flips back to false (user exits the game).
+ * Mid-gameplay guard: when NavigationContext reports `isInGame`, the refresh
+ * button is hidden entirely so an active round (e.g. a multiplayer game) is
+ * never disrupted by an update prompt. The button reappears the moment
+ * `isInGame` flips back to false (user exits the game).
  *
- * This ensures users ALWAYS get the latest version after deployment without
- * destroying an in-progress round.
+ * The reload is always user-initiated — players decide when to update.
  */
 export function VersionChecker() {
   const [newVersionAvailable, setNewVersionAvailable] = useState(false);
@@ -114,36 +114,32 @@ export function VersionChecker() {
     };
   }, [checkForUpdates]);
 
-  // Auto-update almost immediately - brief flash so user knows why page reloaded.
-  // Mid-gameplay: defer entirely. Once isInGame flips false the dep change
-  // re-runs this effect and the reload fires (with the same 1.5s grace).
-  useEffect(() => {
-    if (!newVersionAvailable) return undefined;
-    if (isInGame) {
-      console.log('[Version] Update available but user is in-game — deferring reload');
-      return undefined;
-    }
-    const timeout = setTimeout(forceUpdate, 1500);
-    return () => clearTimeout(timeout);
-  }, [newVersionAvailable, forceUpdate, isInGame]);
-
-  // Stay silent unless we're about to reload. Hiding the banner mid-game keeps
-  // players from being distracted by a notification they can't act on.
+  // No auto-reload. Stay silent unless there's an update AND the player is not
+  // mid-game — hiding the prompt during gameplay keeps an active round (e.g. a
+  // multiplayer game) completely undisturbed. When `isInGame` flips false the
+  // dep change re-renders and the button appears for the user to act on.
   if (!newVersionAvailable || isInGame) {
     return null;
   }
 
-  // Show brief notification before auto-reload
+  // Manual refresh prompt — the reload only happens when the user clicks.
   return (
     <div
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-999 pointer-events-none"
+      className="fixed top-[calc(env(safe-area-inset-top,0px)+2.5rem)] left-1/2 -translate-x-1/2 z-999"
       role="status"
       aria-live="polite"
     >
-      <div className="bg-neo-purple border-3 border-neo-black rounded-neo px-6 py-3 shadow-hard animate-neo-pop">
+      <div className="flex items-center gap-3 bg-neo-purple border-3 border-neo-black rounded-neo px-5 py-3 shadow-hard animate-neo-pop">
         <p className="text-neo-white font-bold text-sm">
-          {t('system.updatingToNewVersion')}
+          {t('system.newVersionAvailable')}
         </p>
+        <button
+          type="button"
+          onClick={forceUpdate}
+          className="min-h-[44px] bg-neo-lime text-neo-black font-bold text-sm px-4 py-2 border-3 border-neo-black rounded-neo shadow-hard active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-transform"
+        >
+          {t('system.refreshToUpdate')}
+        </button>
       </div>
     </div>
   );
