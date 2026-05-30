@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useCallback } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getRandomScoreFlyPath, type ScoreFlyPath } from './blastEffectVariations';
 import { pickHypePrefix } from './scoreFlyHype';
@@ -71,6 +71,8 @@ const TILE_TYPE_GLOW: Record<string, string> = {
 const TARGET_X = typeof window !== 'undefined' ? Math.min(120, window.innerWidth * 0.3) : 120;
 const TARGET_Y = 8;
 const MAX_FLIES = 3;
+/** Absolute ceiling on how long a "+N" popup may live before forced removal. */
+const MAX_FLY_LIFETIME_MS = 4000;
 
 function hashId(s: string): number {
   let h = 0;
@@ -90,6 +92,25 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
   // then apply deltas from the percentage-positioned element.
   const xKeys = path.x(0, TARGET_X);
   const yKeys = path.y(0, TARGET_Y);
+
+  // Idempotent completion — onAnimationComplete and the timeout fallback can
+  // both fire (in MP, a mid-flight re-render interrupts the animation so
+  // onAnimationComplete may NEVER fire, orphaning the "+N" popup on screen).
+  // The fallback guarantees removal; the guard prevents a double-remove.
+  const completedRef = useRef(false);
+  const complete = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    onComplete(fly.id);
+  }, [onComplete, fly.id]);
+
+  // Hard backstop: remove the fly a beat after its animation should have ended,
+  // regardless of whether Framer Motion reported completion.
+  useEffect(() => {
+    const ttl = Math.min(path.duration * 1000 + 1200, MAX_FLY_LIFETIME_MS);
+    const timer = setTimeout(complete, ttl);
+    return () => clearTimeout(timer);
+  }, [complete, path.duration]);
 
   return (
     <AdaptiveMotion.div
@@ -125,7 +146,7 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
         ease: 'easeInOut',
         times: path.times,
       }}
-      onAnimationComplete={() => onComplete(fly.id)}
+      onAnimationComplete={complete}
     >
       {((fly.tileType && TILE_TYPE_GLOW[fly.tileType]) || TIER_GLOW[fly.tier]) && (
         <span

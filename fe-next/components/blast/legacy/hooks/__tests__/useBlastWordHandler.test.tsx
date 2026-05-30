@@ -114,10 +114,13 @@ describe('useBlastWordHandler', () => {
       await result.current.handleWordAccepted({ word: 'cat', score: 5 });
     });
     expect(sequencer.animateWordClear).toHaveBeenCalled();
+    // Score passed to the engine folds in the deterministic letter-value bonus:
+    // 5 (incoming) + getBasePoints('cat') (C3+A1+T1 = 5) = 10. Keeps SP + MP totals
+    // organic/non-round and identical to the server's computation.
     expect(engine.submitWord).toHaveBeenCalledWith(
       expect.any(Array),
       'cat',
-      5,
+      10,
     );
     expect(runCascade).toHaveBeenCalledWith(3);
     expect(lastPathRef.current).toEqual([]);

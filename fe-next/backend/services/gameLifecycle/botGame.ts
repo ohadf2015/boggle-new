@@ -20,13 +20,9 @@ import {
   calculateBlastTileBonus,
   getTilesOnPath,
   recordBlastMove,
-  recordBlastBoardClear,
-  regenerateBlastBoard,
   getWordPath,
-  isBlastBoardCleared,
-  tryBeginWaveAdvance,
-  endWaveAdvance,
 } from '../../modules/blastModeManager';
+import { regenerateBlastBoardIfExhausted } from '../../modules/blastBoardRegen';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
@@ -42,7 +38,6 @@ import { startBotsForWordHunt } from './botWordHunt';
 import { startBotsForWheelRush } from './botWheelRush';
 import { startBotsForBlast } from './botBlast';
 import { restoreLife, getLifeBonus } from '../../modules/wordHuntManager';
-import { makePositionsMap } from '../../modules/wordValidator';
 
 /** Score target ratios per difficulty — bots aim for this % of best human score */
 const BOT_SCORE_TARGET: Record<string, number> = {
@@ -277,7 +272,7 @@ export function startBotsForGame(
                 blastState.grid, processResult.next, gridSize,
                 language, BLAST_SPECIAL_TILE_CHANCE,
                 undefined, 0, rng,
-                true, // refill=true: parity with human path so board stays alive through timer
+                false, // refill=false: parity with human path — board shrinks until cleared
               );
 
               blastState.grid = gravityResult.newGrid;
@@ -305,46 +300,19 @@ export function startBotsForGame(
                 );
               }
 
-              // MP board-clear parity with human path (wordValidationHandler):
-              // regenerate in place, never end the game on clear (timer-era Blast).
-              if (isBlastBoardCleared(gravityResult.newTileStates) && tryBeginWaveAdvance(gameCode)) {
-                try {
-                  recordBlastBoardClear(blastState, username);
-                  const next = regenerateBlastBoard(blastState, gameCode, gravityResult.newGrid);
-                  const nextGrid = next.grid ?? gravityResult.newGrid;
-                  Object.assign(blastState, {
-                    overlay: next.overlay,
-                    overlayMap: next.overlayMap,
-                    tileStates: next.tileStates,
-                    seed: next.seed,
-                    grid: nextGrid,
-                    refillCount: next.refillCount,
-                  });
-                  if (currentGame) {
-                    currentGame.letterGrid = nextGrid;
-                    currentGame.letterPositions = makePositionsMap(nextGrid, (currentGame.language || 'en'));
-                  }
-                  logger.info('BLAST', `Board cleared in ${gameCode} by bot ${username} — regenerating board (refill #${next.refillCount})`);
-                  broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
-                    grid: nextGrid,
-                    tileStates: next.tileStates,
-                    overlay: next.overlay,
-                    seed: next.seed,
-                    clearedBy: '__board_regenerated__',
-                    word: '',
-                    clearedCount: 0,
-                    totalMoves: blastState.totalMoves ?? 0,
-                  });
-                  void botManager.resyncBotsForNewGrid(
-                    botManager.getGameBots(gameCode),
-                    nextGrid,
-                    language,
-                  );
-                  // Reset throttle so the next per-word resync window opens immediately
-                  // after the full regeneration
+              // MP board refresh parity with human path: shrink-until-clear,
+              // regenerate a fresh full board on full/near clear (shared helper).
+              if (currentGame) {
+                const regenerated = regenerateBlastBoardIfExhausted({
+                  io,
+                  gameCode,
+                  game: currentGame,
+                  username,
+                  newTileStates: gravityResult.newTileStates,
+                });
+                if (regenerated) {
+                  // Reopen the per-word resync window immediately after a refresh.
                   lastBotResyncAt.set(gameCode, Date.now());
-                } finally {
-                  endWaveAdvance(gameCode);
                 }
               }
             }

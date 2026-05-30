@@ -329,7 +329,7 @@ describe('startBotsForBlast', () => {
     expect(playerFound![3]).toMatchObject({ isFirstFinder: true });
   });
 
-  it('uses computeGravityResult with refill=true for MP parity with the human path', async () => {
+  it('uses computeGravityResult with refill=false for MP parity with the human path (shrink-until-clear)', async () => {
     mocks.findAllWords.mockReturnValue(['HELLO']);
     const bot = makeBot();
     const blastState = makeBlastState();
@@ -344,7 +344,7 @@ describe('startBotsForBlast', () => {
 
     expect(mocks.computeGravityResult).toHaveBeenCalled();
     const lastArg = mocks.computeGravityResult.mock.calls.at(-1)!.at(-1);
-    expect(lastArg).toBe(true); // refill flag
+    expect(lastArg).toBe(false); // refill flag — shrink-until-clear, no per-word regeneration
   });
 
   it('records the board clear (recordBlastBoardClear) when the bot empties the shared board', async () => {

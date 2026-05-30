@@ -14,6 +14,7 @@ import { detectNearMiss } from '../utils/blastNearMiss';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { hasGemLetter } from '@/lib/blast/gemLetters';
+import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
@@ -114,8 +115,11 @@ export function useBlastWordHandler({
       row: c.row, col: c.col, type: c.type as BlastTileType,
     })));
 
-    // 2. Submit to engine — apply pregame-buff score multiplier (combo2x) before scoring
-    const multipliedScore = scoreMultiplier !== 1 ? Math.round(data.score * scoreMultiplier) : data.score;
+    // 2. Submit to engine — fold in the deterministic letter-value bonus (organic,
+    // non-round totals; matches the server's MP total exactly), then apply the
+    // pregame-buff score multiplier (combo2x).
+    const scoreWithLetters = data.score + blastLetterBonus(data.word);
+    const multipliedScore = scoreMultiplier !== 1 ? Math.round(scoreWithLetters * scoreMultiplier) : scoreWithLetters;
     const result = engine.submitWord(path, data.word, multipliedScore);
 
     // 2a. Capture post-grid snapshot after engine processing

@@ -212,11 +212,12 @@ describe('wordHandler - Blast tile bonus in stored word details', () => {
     // WHEN: Player submits a word
     await handlers['submitWord']({ word: 'test' });
 
-    // THEN: addPlayerWord should store score = wordScore(5) + tileBonus(10) = 15
+    // THEN: addPlayerWord stores wordScore(5) + tileBonus(10) + letterBonus(4) = 19
+    // letterBonus = deterministic letter-value sum of 'TEST' (T1+E1+S1+T1).
     const addCall = (addPlayerWord as Mock).mock.calls[0];
     expect(addCall).toBeDefined();
     const options = addCall[3]; // 4th arg is options
-    expect(options.score).toBe(15); // 5 (word) + 10 (tile bonus)
+    expect(options.score).toBe(19); // 5 (word) + 10 (tile) + 4 (letter value)
   });
 
   it('should call updatePlayerScore with word score + tile bonus', async () => {
@@ -224,10 +225,10 @@ describe('wordHandler - Blast tile bonus in stored word details', () => {
     // WHEN: Player submits a word
     await handlers['submitWord']({ word: 'test' });
 
-    // THEN: updatePlayerScore called with 15 (5 + 10)
+    // THEN: updatePlayerScore called with 19 (5 word + 10 tile + 4 letter value)
     const scoreCall = (updatePlayerScore as Mock).mock.calls[0];
     expect(scoreCall).toBeDefined();
-    expect(scoreCall[2]).toBe(15); // score = wordScore + tileBonus
+    expect(scoreCall[2]).toBe(19); // score = wordScore + tileBonus + letterBonus
     expect(scoreCall[3]).toBe(true); // isDelta
   });
 
@@ -242,8 +243,9 @@ describe('wordHandler - Blast tile bonus in stored word details', () => {
     const emitCall = (mockSocket.emit as Mock).mock.calls.find((c: unknown[]) => c[0] === 'wordAccepted');
     expect(emitCall).toBeDefined();
     const payload = emitCall![1] as { score: number; blast?: { tileBonus: number } };
-    expect(payload.score).toBe(15); // 5 (word) + 10 (tile bonus)
-    // Breakdown is still available for any UI that wants to itemise it.
+    expect(payload.score).toBe(19); // 5 (word) + 10 (tile) + 4 (letter value)
+    // Breakdown is still available for any UI that wants to itemise it — the
+    // tile bonus stays reported on its own (letter value rides in the total).
     expect(payload.blast?.tileBonus).toBe(10);
   });
 });

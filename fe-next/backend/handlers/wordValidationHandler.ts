@@ -14,24 +14,25 @@ import {
   getLeaderboard,
   recordFirstFinder,
   removePeerRejectedWordScore,
-  getGame,
 } from '../modules/gameStateManager.js';
 
 import { broadcastToRoom, broadcastToRoomExceptSender, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
-import { addWordToBlacklist, getGameBots, resyncBotsForNewGrid } from '../modules/botManager.js';
+import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, isBlastBoardCleared, regenerateBlastBoard, recordBlastBoardClear, tryBeginWaveAdvance, endWaveAdvance } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath } from '../modules/blastModeManager.js';
+import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
 import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
+import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 
@@ -79,6 +80,11 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Calculate blast mode tile bonus BEFORE storing word details so the stored
   // score includes tile bonuses (used by scoringEngine for final results).
   let blastTileBonus = 0;
+  // Deterministic per-word letter-value bonus — organic, non-round totals that
+  // reward rare letters. MUST match the client's optimistic fly (same pure fn,
+  // lib/blast/blastLetterBonus) so the "+N" popup and the authoritative total
+  // never disagree.
+  const blastLetterValueBonus = game.gameMode === 'blast' ? blastLetterBonus(normalizedWord) : 0;
   let blastTilesCleared: string[] = [];
   let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
 
@@ -118,8 +124,11 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
         // it broadcast blank tiles + a board the next word couldn't validate against.
         blastState.grid = applyVortexLetterSwaps(blastState.grid, processResult.vortexLetterSwaps);
 
-        // 2. Apply gravity WITH refill — timer-era Blast keeps the board alive
-        // for the whole countdown; tiles cascade and refill continuously.
+        // 2. Apply gravity WITHOUT refill — the board SHRINKS as words are
+        // cleared and only repopulates when fully cleared (or near-empty; see
+        // step 5). Continuous per-word refill (the old refill=true) made it feel
+        // like tiles "keep generating" and made a full clear unreachable, so the
+        // clear-reward below was dead code. Mirrors singleplayer 'shrink' mode.
         const gravityResult = computeGravityResult(
           blastState.grid,
           processResult.next,
@@ -129,7 +138,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           undefined,
           0,
           rng,
-          true, // refill=true: continuous board for fixed-timer play
+          false, // refill=false: shrink-until-clear, regenerate only on full/near clear
         );
 
         // 3. Update authoritative state
@@ -155,44 +164,17 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
           totalMoves,
         });
 
-        // 5. MP board-clear (timer era): rare with refill on, but if a player
-        // fully clears the board, award a clear-bonus, regenerate overlay in
-        // place, and keep playing. The game ends ONLY on the shared timer.
-        if (isBlastBoardCleared(gravityResult.newTileStates) && tryBeginWaveAdvance(gameCode)) {
-          try {
-            recordBlastBoardClear(blastState, username);
-            const next = regenerateBlastBoard(blastState, gameCode, gravityResult.newGrid);
-            Object.assign(blastState, {
-              overlay: next.overlay,
-              overlayMap: next.overlayMap,
-              tileStates: next.tileStates,
-              seed: next.seed,
-              grid: next.grid,
-              refillCount: next.refillCount,
-            });
-            const nextGrid = next.grid ?? gravityResult.newGrid;
-            game.letterGrid = nextGrid;
-            game.letterPositions = makePositionsMap(nextGrid, (game.language || 'en'));
-            logger.info('BLAST', `Board cleared in ${gameCode} by ${username} — regenerating board (refill #${next.refillCount})`);
-            broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
-              grid: nextGrid,
-              tileStates: next.tileStates,
-              overlay: next.overlay,
-              seed: next.seed,
-              clearedBy: '__board_regenerated__',
-              word: '',
-              clearedCount: 0,
-              totalMoves: blastState.totalMoves ?? 0,
-            });
-            void resyncBotsForNewGrid(
-              getGameBots(gameCode),
-              nextGrid,
-              (game.language || 'en') as import('@/shared/types').Language,
-            );
-          } finally {
-            endWaveAdvance(gameCode);
-          }
-        }
+        // 5. MP board refresh: with refill off the board shrinks, so a full
+        // clear (or a near-empty soft-freeze on a shared board) is now a real
+        // event. The shared helper regenerates a fresh full board and broadcasts
+        // it — same rule for human + bot words so they can never disagree.
+        regenerateBlastBoardIfExhausted({
+          io,
+          gameCode,
+          game,
+          username,
+          newTileStates: gravityResult.newTileStates,
+        });
       }
     } catch (err: unknown) {
       const error = err as Error;
@@ -209,7 +191,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
 
   addPlayerWord(gameCode, username, normalizedWord, {
     autoValidated: true,
-    score: wordScore + blastTileBonus,
+    score: wordScore + blastTileBonus + blastLetterValueBonus,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
     fireRoundMultiplier: fireRoundMultiplier,
@@ -287,9 +269,10 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   }
   const specialBonus = isSpecialWord ? specialWordBonus : 0;
 
-  // Single atomic score update: word score + blast tile bonus + word-hunt board bonus + bonuses
+  // Single atomic score update: word score + blast tile bonus + blast letter-value
+  // bonus + word-hunt board bonus + bonuses
   const preScore = game.playerScores?.[username] ?? 0;
-  const totalDelta = wordScore + blastTileBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + specialBonus;
+  const totalDelta = wordScore + blastTileBonus + blastLetterValueBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + specialBonus;
   updatePlayerScore(gameCode, username, totalDelta, true);
   game.serverSeq = (game.serverSeq ?? 0) + 1;
 
@@ -299,9 +282,9 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   socket.emit('wordAccepted', {
     word: normalizedWord,
     // Full per-word delta the player earned, so their live total (which the
-    // server credits with the tile bonus too) reconciles with the sum of their
-    // per-word chips. blastTileBonus is 0 outside Blast mode.
-    score: wordScore + blastTileBonus,
+    // server credits with the tile + letter-value bonus too) reconciles with the
+    // sum of their per-word chips. Both blast bonuses are 0 outside Blast mode.
+    score: wordScore + blastTileBonus + blastLetterValueBonus,
     baseScore: baseScore,
     comboBonus: comboBonus,
     comboLevel: safeComboLevel,
@@ -406,7 +389,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     wordLength: normalizedWord.length,
     firstLetter: normalizedWord[0]?.toUpperCase() ?? '',
     lastLetter: normalizedWord[normalizedWord.length - 1]?.toUpperCase() ?? '',
-    score: wordScore + blastTileBonus,
+    score: wordScore + blastTileBonus + blastLetterValueBonus,
   });
 
   // Check achievements

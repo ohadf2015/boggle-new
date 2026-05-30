@@ -20,13 +20,9 @@ import {
   calculateBlastTileBonus,
   getTilesOnPath,
   recordBlastMove,
-  recordBlastBoardClear,
-  regenerateBlastBoard,
   getWordPath,
-  isBlastBoardCleared,
-  tryBeginWaveAdvance,
-  endWaveAdvance,
 } from '../../modules/blastModeManager';
+import { regenerateBlastBoardIfExhausted } from '../../modules/blastBoardRegen';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
 import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
@@ -178,7 +174,7 @@ function submitBlastWord(
       undefined,
       0,
       rng,
-      true // refill=true for parity with human path
+      false // refill=false: parity with human path — board shrinks until cleared
     );
 
     state.grid = gravityResult.newGrid;
@@ -198,6 +194,16 @@ function submitBlastWord(
       word,
       clearedCount: processResult.newlyClearedCount,
       totalMoves,
+    });
+
+    // Board refresh parity with human path: shrink-until-clear, regenerate a
+    // fresh full board on full/near clear (shared helper — same rule for all).
+    regenerateBlastBoardIfExhausted({
+      io,
+      gameCode,
+      game,
+      username: bot.username,
+      newTileStates: gravityResult.newTileStates,
     });
 
     // Record clear for anti-grief
@@ -244,40 +250,7 @@ function submitBlastWord(
     volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
 
     logger.info('BOT_BLAST', `Bot "${bot.username}" submitted "${word}" (+${totalScore}) in ${gameCode}`);
-
-    // Board clear → regenerate + resync
-    if (isBlastBoardCleared(gravityResult.newTileStates) && tryBeginWaveAdvance(gameCode)) {
-      try {
-        recordBlastBoardClear(state, bot.username);
-        const next = regenerateBlastBoard(state, gameCode, gravityResult.newGrid);
-        const nextGrid = next.grid ?? gravityResult.newGrid;
-        Object.assign(state, {
-          overlay: next.overlay,
-          overlayMap: next.overlayMap,
-          tileStates: next.tileStates,
-          seed: next.seed,
-          grid: nextGrid,
-          refillCount: next.refillCount,
-        });
-        if (game) {
-          game.letterGrid = nextGrid;
-          game.letterPositions = makePositionsMap(nextGrid, language);
-        }
-        logger.info('BLAST', `Board cleared in ${gameCode} by bot ${bot.username} — regenerating (refill #${next.refillCount})`);
-        broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
-          grid: nextGrid,
-          tileStates: next.tileStates,
-          overlay: next.overlay,
-          seed: next.seed,
-          clearedBy: '__board_regenerated__',
-          word: '',
-          clearedCount: 0,
-          totalMoves: state.totalMoves ?? 0,
-        });
-      } finally {
-        endWaveAdvance(gameCode);
-      }
-    }
+    // Board refresh handled by regenerateBlastBoardIfExhausted above (shared path).
   } catch (err) {
     logger.error('BOT_BLAST', `Bot "${bot.username}" submission failed: ${(err as Error).message}`);
   }

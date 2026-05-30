@@ -248,6 +248,19 @@ describe('wordHandler - Blast board sync', () => {
     expect(game.blastModeState.grid).toBe(SENTINEL_GRID);
   });
 
+  it('runs gravity WITHOUT refill so the board shrinks until cleared (no per-word tile generation)', async () => {
+    const game = makeBlastGame();
+    (getGame as Mock).mockReturnValue(game);
+
+    await handlers['submitWord']({ word: 'test', comboType: null });
+
+    expect(computeGravityResult as Mock).toHaveBeenCalled();
+    // 9th positional arg (index 8) is `refill`. MP blast must pass false:
+    // tiles only repopulate when the whole board is cleared, never per-word.
+    const refillArg = (computeGravityResult as Mock).mock.calls[0][8];
+    expect(refillArg).toBe(false);
+  });
+
   it('applies vortex/magnet letter swaps to the grid BEFORE gravity so the board the next word validates against matches what the player sees', async () => {
     const game = makeBlastGame();
     game.blastModeState.grid = [['A', 'B'], ['C', 'D']];
