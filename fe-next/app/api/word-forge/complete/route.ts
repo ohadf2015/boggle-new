@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { calculateRunXp, getUnlockTier } from '@/lib/wordForge/scoring';
 import { captureApiError } from '@/utils/sentry';
 
@@ -35,11 +36,20 @@ export async function POST(request: NextRequest) {
     });
     if (!rateLimitResult.success) return rateLimitResponse(rateLimitResult);
 
-    // Auth
+    // Auth (user-scoped client — identity only)
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Progression writes use the service-role client: word_forge_progress RLS
+    // blocks direct client writes so users can't self-grant total_xp /
+    // unlock_tier (which gate rune unlocks). Server owns XP authority.
+    const db = createAdminClient();
+    if (!db) {
+      captureApiError(new Error('Service role client unavailable'), 'word-forge-complete-noadmin');
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Parse body
@@ -58,7 +68,7 @@ export async function POST(request: NextRequest) {
     const xpEarned = calculateRunXp(highestRound, totalWords, totalScore, won);
 
     // Get or create progression record
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from('word_forge_progress')
       .select('*')
       .eq('user_id', user.id)
@@ -71,7 +81,7 @@ export async function POST(request: NextRequest) {
       const newTotalXp = existing.total_xp + xpEarned;
       const newUnlockTier = getUnlockTier(newTotalXp);
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await db
         .from('word_forge_progress')
         .update({
           total_xp: newTotalXp,
@@ -102,7 +112,7 @@ export async function POST(request: NextRequest) {
       // Create new record
       const unlockTier = getUnlockTier(xpEarned);
 
-      const { error: insertError } = await supabase
+      const { error: insertError } = await db
         .from('word_forge_progress')
         .insert({
           user_id: user.id,
