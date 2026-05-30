@@ -13,6 +13,9 @@ export interface ReconnectFlowApi {
   isReconnecting: boolean;
   reconnectAttempt: number;
   maxReconnectAttempts: number;
+  /** True during a planned server restart (deploy) — drives a calm, non-blocking
+   *  reconnect banner instead of the full-screen "you went offline" modal. */
+  isServerUpdating: boolean;
   showAbortModal: boolean;
   lastServerSeq: number;
   triggerAbort: () => void;
@@ -24,7 +27,8 @@ export function useReconnectFlow({
   username,
   gameActive,
 }: ReconnectFlowOptions): ReconnectFlowApi {
-  const { socket, isReconnecting, getReconnectAttempt, maxReconnectAttempts } = useSocket();
+  const { socket, isReconnecting, getReconnectAttempt, maxReconnectAttempts, isServerUpdating } =
+    useSocket();
   const [showAbortModal, setShowAbortModal] = useState(false);
   const [lastServerSeq, setLastServerSeq] = useState(0);
   const wasDisconnectedWhileActive = useRef(false);
@@ -75,6 +79,7 @@ export function useReconnectFlow({
     isReconnecting,
     reconnectAttempt: getReconnectAttempt(),
     maxReconnectAttempts,
+    isServerUpdating: isServerUpdating ?? false,
     showAbortModal,
     lastServerSeq,
     triggerAbort,

@@ -242,7 +242,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   const router = useRouter();
   const params = useParams();
-  const { isReconnecting, reconnectAttempt, maxReconnectAttempts, showAbortModal, triggerAbort } =
+  const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
     useReconnectFlow({ gameCode, username, gameActive });
 
   const handleContinueSolo = useCallback(() => {
@@ -478,7 +478,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
       </Dialog>
 
       {isReconnecting && gameActive && (
-        <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />
+        <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />
       )}
       {showAbortModal && (
         <MPGameAbortedModal wordCount={foundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onExitRoom} />

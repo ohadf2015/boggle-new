@@ -40,6 +40,26 @@ describe('ReconnectingOverlay', () => {
     render(<ReconnectingOverlay attempt={1} maxAttempts={30} onGiveUp={vi.fn()} />);
     expect(screen.getByRole('dialog').textContent).toContain('mp.reconnect.title');
   });
+
+  describe('planned server update (isServerUpdating)', () => {
+    it('renders a NON-blocking status banner, not a blocking dialog', () => {
+      render(<ReconnectingOverlay attempt={1} maxAttempts={30} onGiveUp={vi.fn()} isServerUpdating />);
+      // No modal dialog → board stays visible & interactive during the brief deploy
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      const status = screen.getByRole('status');
+      expect(status.textContent).toContain('connection.serverUpdating');
+    });
+
+    it('does not show a give-up button during a planned update even past the threshold', () => {
+      render(<ReconnectingOverlay attempt={5} maxAttempts={30} onGiveUp={vi.fn()} isServerUpdating />);
+      expect(screen.queryByRole('button', { name: /mp\.reconnect\.giveUp/ })).not.toBeInTheDocument();
+    });
+
+    it('still renders the blocking dialog for a genuine drop (isServerUpdating false)', () => {
+      render(<ReconnectingOverlay attempt={1} maxAttempts={30} onGiveUp={vi.fn()} isServerUpdating={false} />);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
 });
 
 describe('MPGameAbortedModal', () => {

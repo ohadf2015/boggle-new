@@ -188,6 +188,44 @@ describe('useReconnectFlow', () => {
     expect(result.current.maxReconnectAttempts).toBe(20);
   });
 
+  it('forwards isServerUpdating from socket context (planned deploy)', () => {
+    vi.mocked(useSocket).mockReturnValue({
+      socket: mockSocket as any,
+      isConnected: false,
+      isReconnecting: true,
+      isServerUpdating: true,
+      connectionError: null,
+      getReconnectAttempt: mockGetReconnectAttempt,
+      maxReconnectAttempts: 30,
+      manualReconnect: vi.fn(),
+    });
+
+    const { result } = renderHook(() =>
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
+    );
+    expect(result.current.isServerUpdating).toBe(true);
+  });
+
+  it('defaults isServerUpdating to false when the context omits it', () => {
+    // Context with NO isServerUpdating key → hook must coerce to false, never
+    // undefined. Set explicitly (clearAllMocks does not reset prior
+    // mockReturnValue implementations, so we can't rely on the factory default).
+    vi.mocked(useSocket).mockReturnValue({
+      socket: mockSocket as any,
+      isConnected: true,
+      isReconnecting: false,
+      connectionError: null,
+      getReconnectAttempt: mockGetReconnectAttempt,
+      maxReconnectAttempts: 30,
+      manualReconnect: vi.fn(),
+    });
+
+    const { result } = renderHook(() =>
+      useReconnectFlow({ gameCode: 'G1', username: 'alice', gameActive: true })
+    );
+    expect(result.current.isServerUpdating).toBe(false);
+  });
+
   it('dismissAbortModal clears showAbortModal', () => {
     const handlers: Record<string, ((...args: unknown[]) => void)[]> = {};
     mockSocket.on.mockImplementation((event: string, handler: (...args: unknown[]) => void) => {

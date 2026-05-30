@@ -160,7 +160,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
   const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
 
-  const { isReconnecting, reconnectAttempt, maxReconnectAttempts, showAbortModal, triggerAbort } =
+  const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
     useReconnectFlow({ gameCode, username, gameActive: true });
 
   const handleContinueSolo = useCallback(() => {
@@ -276,7 +276,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           t={t}
           remainingTime={remainingTime}
         />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
@@ -302,7 +302,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     return (
       <>
         <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
       </>
     );
@@ -327,7 +327,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           initialTileStates={blastBridge.initialTileStates}
           blastSeed={blastBridge.blastSeed}
         />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
@@ -366,7 +366,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           socket={socket}
           foundWords={foundWords}
         />
-        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
@@ -443,7 +443,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         ))}
       </div>
     )}
-    {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} />}
+    {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
     {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
     {showStopConfirm && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
