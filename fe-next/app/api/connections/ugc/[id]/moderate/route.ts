@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { isSameOrigin } from '@/lib/auth/sameOrigin';
 import { captureApiError } from '@/utils/sentry';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -15,6 +16,15 @@ interface RouteParams {
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    // CSRF defense: this is a state-changing POST that can authenticate via an
+    // ambient admin cookie session, so require a same-origin request + JSON body.
+    if (!isSameOrigin(request)) {
+      return NextResponse.json({ error: 'cross-origin request rejected' }, { status: 403 });
+    }
+    if (!request.headers.get('content-type')?.includes('application/json')) {
+      return NextResponse.json({ error: 'content-type must be application/json' }, { status: 415 });
+    }
+
     const auth = await verifyAdminAuth(request);
     if (!auth.success) return auth.response ?? NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 

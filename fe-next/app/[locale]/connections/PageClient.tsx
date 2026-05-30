@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Suspense, useEffect } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
@@ -63,6 +64,22 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
       <TopBackLink className="mb-4" />
       <ConnectionsHero locale={locale} copy={copy} />
+
+      {/* Competitive hooks surfaced right on the landing */}
+      <div className="mx-auto mb-6 flex max-w-md flex-wrap justify-center gap-3 px-4">
+        <Link
+          href={`/${locale}/connections/daily`}
+          className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-yellow bg-neo-yellow/15 px-4 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        >
+          🏆 {t('connections.daily.cta')}
+        </Link>
+        <Link
+          href={`/${locale}/connections/community`}
+          className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-pink bg-neo-pink/15 px-4 py-2 font-neo-display text-sm font-black text-neo-pink shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        >
+          👥 {t('connections.community.cta')}
+        </Link>
+      </div>
       <ConnectionsSampleStrip locale={locale} copy={copy.samples} />
       <ConnectionsWhyPlay copy={copy.why} />
       {locale === 'he' && copy.heClassic && <ConnectionsHEClassic copy={copy.heClassic} />}
