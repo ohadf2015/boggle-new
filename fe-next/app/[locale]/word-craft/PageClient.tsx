@@ -288,6 +288,26 @@ export default function WordCraftPageClient() {
   );
   const jokerAlphabet = useMemo(() => alphabetForLocale(locale), [locale]);
 
+  // Refill flourish: when the bag deals new tiles into the rack (after a commit
+  // or swap), fly them in from the sack icon. Detect "new" by tile id vs the
+  // previous rack. Skip the very first deal (prev empty) so page-load is calm.
+  // Kept up here in the hooks region (before any early return) per rules-of-hooks.
+  const prevRackIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const currentIds = game.activePlayer.rack.map((tile) => tile.id);
+    const prev = prevRackIdsRef.current;
+    const freshIds = currentIds.filter((id) => !prev.has(id));
+    prevRackIdsRef.current = new Set(currentIds);
+    if (prev.size === 0 || freshIds.length === 0) return;
+    if (typeof document === 'undefined') return;
+    const sackEl = document.querySelector('[data-wc-sack]');
+    if (!sackEl) return;
+    requestAnimationFrame(() => {
+      const tileEls = freshIds.map((id) => document.querySelector(`[data-rack-tile-id="${id}"]`));
+      juice.drawFromSack(sackEl, tileEls);
+    });
+  }, [game.activePlayer.rack, juice]);
+
   // Fire axis_locked exactly once when pending tiles transition from 1→2
   // and form a valid line. Resets when pending shrinks back to <2.
   const axisLockEmittedRef = useRef(false);
@@ -1059,7 +1079,13 @@ export default function WordCraftPageClient() {
         open={!!pendingBlank}
         letters={jokerAlphabet}
         onPick={(letter) => {
-          if (pendingBlank) game.assignBlank(pendingBlank.rackTileId, letter);
+          if (!pendingBlank) return;
+          game.assignBlank(pendingBlank.rackTileId, letter);
+          // Celebrate the wildcard becoming a real letter.
+          const cellEl = document.querySelector(
+            `[data-board-cell="${pendingBlank.row},${pendingBlank.col}"]`,
+          );
+          requestAnimationFrame(() => juice.jokerSparkle(cellEl));
         }}
         onCancel={() => {
           if (pendingBlank) game.recallTile(pendingBlank.rackTileId);

@@ -145,6 +145,7 @@ function WordCraftScoreboardImpl({
             src="/word-craft/tile-sack.png"
             alt=""
             aria-hidden
+            data-wc-sack=""
             width={20}
             height={23}
             className={cn(

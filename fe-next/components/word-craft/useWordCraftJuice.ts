@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { gsap } from 'gsap';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
+import { JOKER_GLYPH } from '@/lib/word-craft/blankAssign';
 
 export type JuiceTarget = Element | null | undefined;
 
@@ -20,6 +21,13 @@ export interface UseWordCraftJuice {
    * of two-tap placement by visualising the actual motion.
    */
   arcTilePlace: (fromEl: JuiceTarget, toEl: JuiceTarget, letter: string, value: number) => void;
+  /**
+   * Refill flourish: newly-drawn rack tiles fly in from the sack icon, so the
+   * bag visibly "feeds" your hand instead of tiles blinking into existence.
+   */
+  drawFromSack: (sackEl: JuiceTarget, rackTileEls: JuiceTarget[]) => void;
+  /** A joker just got its letter — pop the tile and scatter a few sparkles. */
+  jokerSparkle: (target: JuiceTarget) => void;
 }
 
 export function useWordCraftJuice(): UseWordCraftJuice {
@@ -146,7 +154,7 @@ export function useWordCraftJuice(): UseWordCraftJuice {
       ].join(';');
 
       const glyph = document.createElement('span');
-      glyph.textContent = letter === '_' ? '·' : letter;
+      glyph.textContent = letter === '_' ? JOKER_GLYPH : letter;
       ghost.appendChild(glyph);
 
       const valueChip = document.createElement('span');
@@ -181,5 +189,98 @@ export function useWordCraftJuice(): UseWordCraftJuice {
     [],
   );
 
-  return { tilePlace, invalidShake, scorePop, botReveal, rackSelect, playerCommitReveal, arcTilePlace };
+  const drawFromSack = useCallback((sackEl: JuiceTarget, rackTileEls: JuiceTarget[]) => {
+    if (!sackEl) return;
+    const tiles = rackTileEls.filter(Boolean) as Element[];
+    if (tiles.length === 0) return;
+    if (isReducedMotionPreferred()) return;
+
+    const sackRect = (sackEl as HTMLElement).getBoundingClientRect();
+    const sackCx = sackRect.left + sackRect.width / 2;
+    const sackCy = sackRect.top + sackRect.height / 2;
+
+    // Animate the REAL rack tiles in from the sack's position (no ghosts):
+    // each tile starts shifted toward the sack, tiny + spun, then snaps home.
+    const tl = gsap.timeline();
+    tiles.forEach((el, i) => {
+      const r = (el as HTMLElement).getBoundingClientRect();
+      const dx = sackCx - (r.left + r.width / 2);
+      const dy = sackCy - (r.top + r.height / 2);
+      tl.fromTo(
+        el,
+        { x: dx, y: dy, scale: 0.3, rotation: -20, opacity: 0 },
+        { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, duration: 0.34, ease: 'back.out(1.7)' },
+        i * 0.07,
+      );
+    });
+  }, []);
+
+  const jokerSparkle = useCallback((target: JuiceTarget) => {
+    if (!target) return;
+    if (isReducedMotionPreferred()) return;
+
+    // Pop the assigned tile (testable timeline on the real element).
+    const tl = gsap.timeline();
+    tl.fromTo(
+      target,
+      { scale: 0.7, rotation: -8 },
+      { scale: 1.18, rotation: 0, duration: 0.16, ease: 'back.out(3)' },
+    ).to(target, { scale: 1, duration: 0.14, ease: 'power2.out' });
+
+    // Best-effort sparkle particles around the tile. Transient DOM, cleaned up
+    // on a timer so it never leaks even if the tween is interrupted.
+    if (typeof document === 'undefined') return;
+    const rect = (target as HTMLElement).getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const colors = ['#BFFF00', '#00FFFF', '#FF1493', '#FFE135'];
+    const sparkTl = gsap.timeline();
+    for (let i = 0; i < 6; i++) {
+      const dot = document.createElement('div');
+      dot.setAttribute('aria-hidden', 'true');
+      dot.dataset.wcJokerSpark = 'true';
+      dot.style.cssText = [
+        'position:fixed',
+        `left:${cx}px`,
+        `top:${cy}px`,
+        'width:8px',
+        'height:8px',
+        'border-radius:9999px',
+        'border:2px solid #000',
+        `background:${colors[i % colors.length]}`,
+        'pointer-events:none',
+        'z-index:61',
+        'transform:translate(-50%,-50%)',
+      ].join(';');
+      document.body.appendChild(dot);
+      const angle = (Math.PI * 2 * i) / 6;
+      const dist = 26 + (i % 2) * 10;
+      sparkTl.fromTo(
+        dot,
+        { x: 0, y: 0, scale: 1, opacity: 1 },
+        {
+          x: Math.cos(angle) * dist,
+          y: Math.sin(angle) * dist,
+          scale: 0.2,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+        },
+        0,
+      );
+      window.setTimeout(() => dot.remove(), 600);
+    }
+  }, []);
+
+  return {
+    tilePlace,
+    invalidShake,
+    scorePop,
+    botReveal,
+    rackSelect,
+    playerCommitReveal,
+    arcTilePlace,
+    drawFromSack,
+    jokerSparkle,
+  };
 }

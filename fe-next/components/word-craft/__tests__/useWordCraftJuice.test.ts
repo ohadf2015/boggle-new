@@ -67,6 +67,73 @@ describe('useWordCraftJuice', () => {
     expect(typeof result.current.scorePop).toBe('function');
     expect(typeof result.current.botReveal).toBe('function');
     expect(typeof result.current.rackSelect).toBe('function');
+    expect(typeof result.current.drawFromSack).toBe('function');
+    expect(typeof result.current.jokerSparkle).toBe('function');
+  });
+
+  describe('drawFromSack', () => {
+    it('flies each newly-drawn rack tile in from the sack', () => {
+      const sack = document.createElement('div');
+      const a = document.createElement('div');
+      const b = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.drawFromSack(sack, [a, b]);
+      expect(timelines).toHaveLength(1);
+      const targets = timelines[0].fromToCalls.map((c) => c.target);
+      expect(targets).toContain(a);
+      expect(targets).toContain(b);
+    });
+
+    it('no-ops when the sack element is missing', () => {
+      const a = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.drawFromSack(null, [a]);
+      expect(timelines).toHaveLength(0);
+    });
+
+    it('no-ops on an empty tile list', () => {
+      const sack = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.drawFromSack(sack, []);
+      expect(timelines).toHaveLength(0);
+    });
+
+    it('no-ops when prefers-reduced-motion is set', () => {
+      reducedMotionMock.mockReturnValue(true);
+      const sack = document.createElement('div');
+      const a = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.drawFromSack(sack, [a]);
+      expect(timelines).toHaveLength(0);
+    });
+  });
+
+  describe('jokerSparkle', () => {
+    it('pops the assigned joker tile', () => {
+      const el = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.jokerSparkle(el);
+      expect(timelines.length).toBeGreaterThanOrEqual(1);
+      const targets = [
+        ...timelines[0].fromToCalls.map((c) => c.target),
+        ...timelines[0].toCalls.map((c) => c.target),
+      ];
+      expect(targets).toContain(el);
+    });
+
+    it('no-ops on a null target', () => {
+      const { result } = renderHook(() => useWordCraftJuice());
+      expect(() => result.current.jokerSparkle(null)).not.toThrow();
+      expect(timelines).toHaveLength(0);
+    });
+
+    it('no-ops when prefers-reduced-motion is set', () => {
+      reducedMotionMock.mockReturnValue(true);
+      const el = document.createElement('div');
+      const { result } = renderHook(() => useWordCraftJuice());
+      result.current.jokerSparkle(el);
+      expect(timelines).toHaveLength(0);
+    });
   });
 
   describe('tilePlace', () => {
