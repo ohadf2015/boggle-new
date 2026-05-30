@@ -6,6 +6,9 @@ import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye } from 'l
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
+import ConnectionsKeyboard from './ConnectionsKeyboard';
+import { getKeyboardLetters, appendLetter, backspace } from '@/lib/connections/keyboard';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 interface PuzzleCardProps {
   puzzle: ConnectionPuzzle;
@@ -71,7 +74,6 @@ export default function PuzzleCard({
   const isRTL = language === 'he';
   const shakeControls = useAnimationControls();
   const prevStatus = useRef(state.status);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const borderColor = STATUS_BORDER[state.status] ?? STATUS_BORDER.playing;
   const bgColor = STATUS_BG[state.status] ?? STATUS_BG.playing;
@@ -111,22 +113,12 @@ export default function PuzzleCard({
     prevStatus.current = state.status;
   }, [state.status, state.wrongAttempts, shakeControls]);
 
-  const commitAndSubmit = () => {
-    const el = inputRef.current;
-    if (el) {
-      el.blur();
-      const buffered = el.value;
-      if (buffered !== state.input) onInputChange(buffered);
-    }
-    onSubmit();
-  };
-
-  const handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter') return;
-    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
-    e.preventDefault();
-    commitAndSubmit();
-  };
+  const keyboardLetters = getKeyboardLetters(language);
+  const handleLetter = (letter: string) => onInputChange(appendLetter(state.input, letter));
+  const handleBackspace = () => onInputChange(backspace(state.input));
+  // WYSIWYG buffer: render the typed base letters, applying the sofit/final
+  // glyph at word-end for Hebrew (the value compared against the bridge stays base).
+  const bufferDisplay = isRTL ? applyHebrewFinalLetters(state.input) : state.input;
 
   return (
     <AnimatePresence mode="wait">
@@ -294,40 +286,39 @@ export default function PuzzleCard({
           )}
         </AnimatePresence>
 
-        <div className="flex gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
-          <input
-            ref={inputRef}
-            type="text"
-            value={state.input}
-            onChange={e => onInputChange(e.target.value)}
-            onCompositionEnd={e => onInputChange(e.currentTarget.value)}
-            onKeyDown={handleKey}
-            placeholder={t('connections.placeholder')}
-            disabled={isDisabled}
+        <div className="flex flex-col gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
+          {/* Typed-buffer display — tappable on-screen keys feed this (no IME). */}
+          <div
+            aria-live="polite"
+            aria-label={t('connections.placeholder')}
             className={[
-              'flex-1 min-w-0 rounded-neo border-neo bg-neo-navy text-neo-white font-neo-body',
-              'px-4 py-3 text-lg outline-none transition-colors duration-200',
-              'placeholder:text-neo-white shadow-hard',
-              isRTL ? 'text-right' : 'text-left',
-              isCorrect ? 'border-neo-lime' : 'border-neo-white/20 focus:border-neo-cyan',
-            ].join(' ')}
-            autoComplete="off"
-            autoCapitalize="none"
-            spellCheck={false}
-          />
-          <m.button
-            onClick={commitAndSubmit}
-            disabled={isDisabled}
-            whileHover={{ scale: 1.04, y: -1 }}
-            whileTap={{ scale: 0.96, y: 1 }}
-            className={[
-              'rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan text-neo-navy',
-              'font-neo-display font-bold px-6 py-3 shadow-hard transition-colors',
-              'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none',
+              'min-h-[3.25rem] rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
+              'flex items-center font-neo-display font-bold tracking-[0.2em]',
+              isRTL ? 'justify-end text-right' : 'justify-start text-left',
+              isCorrect ? 'border-neo-lime' : 'border-neo-white/20',
             ].join(' ')}
           >
-            {t('connections.submit')}
-          </m.button>
+            {bufferDisplay ? (
+              <span className="text-neo-white">{bufferDisplay}</span>
+            ) : (
+              <span className="text-neo-white/40 font-neo-body font-normal tracking-normal">
+                {t('connections.placeholder')}
+              </span>
+            )}
+          </div>
+          {!isDisabled && (
+            <ConnectionsKeyboard
+              letters={keyboardLetters}
+              dir={isRTL ? 'rtl' : 'ltr'}
+              onLetter={handleLetter}
+              onBackspace={handleBackspace}
+              onSubmit={onSubmit}
+              backspaceLabel={t('connections.backspace')}
+              submitLabel={t('connections.submit')}
+              canSubmit={state.input.trim().length > 0}
+              disabled={isDisabled}
+            />
+          )}
         </div>
 
         {/* Reveal-hint + reveal-answer / give-up row — active play only */}

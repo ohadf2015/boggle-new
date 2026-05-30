@@ -12425,6 +12425,7 @@ const he = {
     "subtitle": "מצא את המילה המקשרת!",
     "placeholder": "הקלד את מילת הגשר...",
     "submit": "שלח",
+    "backspace": "מחק אות",
     "correct": "נכון!",
     "wrong": "תשובה שגויה",
     "lives": "חיים",

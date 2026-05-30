@@ -1,3 +1,4 @@
+import { normalizeHebrewWord } from '../../shared/utils/wordNormalization';
 import type { ConnectionPuzzle, GameState, GuessResult } from './types';
 
 export const INITIAL_LIVES = 3;
@@ -34,7 +35,10 @@ function depluralize(s: string): string {
 }
 
 function canonicalize(s: string): string {
-  return depluralize(stripPunctuation(normalizeGuess(s)));
+  // normalizeHebrewWord folds sofit/final letters → base forms so the
+  // base-only on-screen keyboard can match sofit-stored bridges (no-op on
+  // non-Hebrew text).
+  return depluralize(normalizeHebrewWord(stripPunctuation(normalizeGuess(s))));
 }
 
 export function checkGuess(input: string, puzzle: ConnectionPuzzle): GuessResult {

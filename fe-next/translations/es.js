@@ -12601,6 +12601,7 @@ const es = {
     "subtitle": "¡Encuentra la palabra que conecta ambas!",
     "placeholder": "Escribe la palabra puente...",
     "submit": "Enviar",
+    "backspace": "Borrar letra",
     "correct": "¡Correcto!",
     "wrong": "Respuesta incorrecta",
     "lives": "Vidas",

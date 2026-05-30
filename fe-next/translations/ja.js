@@ -12536,6 +12536,7 @@ const ja = {
     "subtitle": "両方をつなぐ言葉を見つけよう！",
     "placeholder": "つなぐ言葉を入力...",
     "submit": "送信",
+    "backspace": "1文字削除",
     "correct": "正解！",
     "wrong": "不正解",
     "lives": "ライフ",

@@ -12022,6 +12022,7 @@ const en = {
     "subtitle": "Find the word that connects both!",
     "placeholder": "Type the bridge word...",
     "submit": "Submit",
+    "backspace": "Delete letter",
     "correct": "Correct!",
     "wrong": "Wrong answer",
     "lives": "Lives",
