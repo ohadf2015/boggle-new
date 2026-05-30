@@ -2,7 +2,9 @@
  * HeaderBackButton — desktop-only back affordance in shared Header.
  * - Renders on non-home routes (desktop breakpoint).
  * - Hidden on home routes (`/`, `/[locale]`).
- * - Clicking calls router.back(); if no history, falls back to `/[locale]`.
+ * - Clicking navigates ONE level up the URL hierarchy (via useBackOneLevel):
+ *   pushes the computed parent; uses router.back() only when the referrer is
+ *   that parent. No more over-shooting to home on deep-link/refresh.
  */
 
 import React from 'react';
@@ -22,10 +24,19 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
+function setReferrer(value: string) {
+  Object.defineProperty(document, 'referrer', { configurable: true, value });
+}
+
 describe('HeaderBackButton', () => {
   beforeEach(() => {
     pushMock.mockReset();
     backMock.mockReset();
+    setReferrer('');
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { origin: 'https://lexiclash.live' },
+    });
   });
 
   it('renders on a non-home desktop route', () => {
@@ -46,25 +57,27 @@ describe('HeaderBackButton', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('calls router.back on click when history exists', () => {
+  it('pushes the hierarchical parent (one level up), not home, for a nested route', () => {
+    currentPath = '/en/daily/archive';
+    render(<HeaderBackButton />);
+    fireEvent.click(screen.getByRole('button', { name: /common\.back/i }));
+    expect(pushMock).toHaveBeenCalledWith('/en/daily');
+    expect(backMock).not.toHaveBeenCalled();
+  });
+
+  it('pushes localized home for a top-level section', () => {
     currentPath = '/en/settings';
-    const originalLength = window.history.length;
-    Object.defineProperty(window.history, 'length', { configurable: true, value: 3 });
+    render(<HeaderBackButton />);
+    fireEvent.click(screen.getByRole('button', { name: /common\.back/i }));
+    expect(pushMock).toHaveBeenCalledWith('/en');
+  });
+
+  it('uses router.back() when arriving from the parent', () => {
+    currentPath = '/en/daily/archive';
+    setReferrer('https://lexiclash.live/en/daily');
     render(<HeaderBackButton />);
     fireEvent.click(screen.getByRole('button', { name: /common\.back/i }));
     expect(backMock).toHaveBeenCalledTimes(1);
     expect(pushMock).not.toHaveBeenCalled();
-    Object.defineProperty(window.history, 'length', { configurable: true, value: originalLength });
-  });
-
-  it('falls back to localized home when no history', () => {
-    currentPath = '/en/settings';
-    const originalLength = window.history.length;
-    Object.defineProperty(window.history, 'length', { configurable: true, value: 1 });
-    render(<HeaderBackButton />);
-    fireEvent.click(screen.getByRole('button', { name: /common\.back/i }));
-    expect(pushMock).toHaveBeenCalledWith('/en');
-    expect(backMock).not.toHaveBeenCalled();
-    Object.defineProperty(window.history, 'length', { configurable: true, value: originalLength });
   });
 });

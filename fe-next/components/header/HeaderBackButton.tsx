@@ -1,25 +1,19 @@
 'use client';
 
-import { memo, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { memo } from 'react';
+import { usePathname } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import { cn } from '@/lib/utils';
 
 const HOME_PATH_RE = /^\/?(?:en|he|sv|ja|es)?\/?$/;
 
 export const HeaderBackButton = memo(function HeaderBackButton() {
-  const router = useRouter();
   const pathname = usePathname() || '/';
-  const { t, language } = useLanguage();
-
-  const onClick = useCallback(() => {
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      router.back();
-      return;
-    }
-    router.push(`/${language}`);
-  }, [router, language]);
+  const { t } = useLanguage();
+  // Navigate one level up the URL hierarchy (push parent), not blind history.back().
+  const onClick = useBackOneLevel();
 
   if (HOME_PATH_RE.test(pathname)) return null;
 

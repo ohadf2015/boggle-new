@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import { cn } from '@/lib/utils';
 
 interface LegalPageLayoutProps {
@@ -28,6 +29,7 @@ export default function LegalPageLayout({
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const router = useRouter();
+  const goBack = useBackOneLevel();
   const isDarkMode = theme === 'dark';
 
   return (
@@ -94,7 +96,7 @@ export default function LegalPageLayout({
         <div className="mt-8 text-center">
           <Button
             variant="outline"
-            onClick={() => router.push(`/${language}`)}
+            onClick={goBack}
             className={cn(
               'rounded-full font-bold',
               isDarkMode

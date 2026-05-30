@@ -19,6 +19,7 @@
 import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { isNative } from '../utils/platform';
+import { parentRoute } from '../lib/navigation/parentRoute';
 
 const ROOT_PATH_PATTERNS: RegExp[] = [
   /^\/[a-z]{2}\/?$/,
@@ -82,7 +83,9 @@ export function useAndroidBackButton(): void {
           router.back();
           return;
         }
-        AppPlugin.exitApp?.().catch(() => {});
+        // Deep-link / refresh on a non-root route: no history to pop. Go one
+        // level up the URL hierarchy instead of exiting the app outright.
+        router.push(parentRoute(pathRef.current || '/'));
       } catch (err) {
         console.error('[useAndroidBackButton] handler error:', err);
       }
