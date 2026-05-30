@@ -504,10 +504,10 @@ const sv = {
       "ogDescription": "Spela ordspel från din telefon i realtid!"
     },
     "educationHub": {
-      "title": "LexiClash för lärare — Klassrumscenter",
-      "description": "Skapa lektioner, starta live-spel, spåra elevernas framsteg. All ordförrådsinlärning på ett ställe — helt utan annonser.",
-      "ogTitle": "Klassrumscenter — LexiClash",
-      "ogDescription": "För lärare som vill göra ordförrådsinlärningen engagerande och rolig."
+      "title": "Gratis ordförrådsspel för klassrummet — utan elevkonton",
+      "description": "Gratis ord- och ordförrådsspel för klassen — inga elevkonton, inga annonser, inga nedladdningar. Använd egna ordlistor, kör multiplayer för hela klassen, på 5 språk.",
+      "ogTitle": "Gratis ordförrådsspel för klassrummet",
+      "ogDescription": "Inga elevkonton, inga annonser — egna ordlistor och ordspel för hela klassen på 5 språk."
     },
     "educationDuels": {
       "title": "Orddueller — Elev mot elev | LexiClash",
@@ -4816,7 +4816,12 @@ const sv = {
     "explore": "Utforska",
     "resources": "Resurser",
     "connect": "Kontakt",
-    "sitemap": "Webbkarta"
+    "sitemap": "Webbkarta",
+    "forTeachers": "För lärare",
+    "educationHub": "Utbildningshub",
+    "vocabularyGames": "Ordförrådsspel",
+    "gamesForTeachers": "Ordspel för lärare",
+    "eslWordGames": "Ordspel för engelska"
   },
   "sitemap": {
     "title": "Webbkarta",
@@ -10441,8 +10446,8 @@ const sv = {
       "startGame": "Starta spel",
       "hero": {
         "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska och spanska",
-        "h1": "Ordspel byggt för ditt språk, inte översatt från engelska.",
-        "sub": "6 spellägen, multiplayer, hjärnövningar. Noll annonser för eleverna. Gratis för verifierade lärare.",
+        "h1": "Gratis ordförrådsspel för ditt klassrum — utan elevkonton.",
+        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk, gratis för lärare.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo"
       },

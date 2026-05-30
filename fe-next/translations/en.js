@@ -498,10 +498,10 @@ const en = {
       "ogDescription": "Play party word games from your phone in real time!"
     },
     "educationHub": {
-      "title": "Education Hub — Word Games for Classrooms & Teachers",
-      "description": "Use LexiClash in your classroom! Create word game lessons, track student vocabulary progress, and make learning fun with multiplayer word battles.",
-      "ogTitle": "LexiClash Education Hub",
-      "ogDescription": "Word games for classrooms — create lessons, track progress, make learning fun!"
+      "title": "Free Vocabulary Games for the Classroom — No Student Logins",
+      "description": "Free word and vocabulary games for your class — no student accounts, no ads, no downloads. Bring your own word lists, run whole-class multiplayer, in 5 languages.",
+      "ogTitle": "Free Vocabulary Games for the Classroom",
+      "ogDescription": "No student logins, no ads — bring your own word lists and run whole-class word games in 5 languages."
     },
     "educationDuels": {
       "title": "Vocabulary Duels — Student vs Student Word Battles",
@@ -4870,7 +4870,12 @@ const en = {
     "explore": "Explore",
     "resources": "Resources",
     "connect": "Connect",
-    "sitemap": "Sitemap"
+    "sitemap": "Sitemap",
+    "forTeachers": "For Teachers",
+    "educationHub": "Education Hub",
+    "vocabularyGames": "Vocabulary Games",
+    "gamesForTeachers": "Games for Teachers",
+    "eslWordGames": "ESL Word Games"
   },
   "sitemap": {
     "title": "Sitemap",
@@ -10368,8 +10373,8 @@ const en = {
       "startGame": "Start Game",
       "hero": {
         "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
-        "h1": "The word-game platform built for your language — not translated to it.",
-        "sub": "Live multiplayer, brain drills, and 6 game modes. Ad-free for students. Free for teachers — request access in 60 seconds.",
+        "h1": "Free vocabulary games for your classroom — no student logins.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages, free for teachers.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action"
       },

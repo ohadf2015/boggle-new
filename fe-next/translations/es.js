@@ -492,10 +492,10 @@ const es = {
       "ogDescription": "¡Juega juegos de palabras de fiesta desde tu teléfono en tiempo real!"
     },
     "educationHub": {
-      "title": "Centro de Educación — Juegos Multiidioma para Docentes",
-      "description": "Plataforma nativa para docentes de inglés, hebreo, sueco, japonés y español. Crea lecciones de vocabulario, inicia juegos en vivo para toda la clase, monitorea progreso estudiantil. Sin anuncios garantizado.",
-      "ogTitle": "Centro de Educación LexiClash",
-      "ogDescription": "Juegos de palabras para docentes. 5 idiomas nativos. Multijugador en vivo + analytics. Gratis + sin anuncios."
+      "title": "Juegos de vocabulario gratis para el aula — sin cuentas de estudiantes",
+      "description": "Juegos de palabras y vocabulario gratis para tu clase — sin cuentas de estudiantes, sin anuncios, sin descargas. Usa tus propias listas de palabras, juega multijugador con toda la clase, en 5 idiomas.",
+      "ogTitle": "Juegos de vocabulario gratis para el aula",
+      "ogDescription": "Sin cuentas de estudiantes, sin anuncios — usa tus listas de palabras y juega con toda la clase en 5 idiomas."
     },
     "educationDuels": {
       "title": "Duelos de Vocabulario — Estudiante vs Estudiante",
@@ -4850,7 +4850,12 @@ const es = {
     "explore": "Explorar",
     "resources": "Recursos",
     "connect": "Conectar",
-    "sitemap": "Mapa del sitio"
+    "sitemap": "Mapa del sitio",
+    "forTeachers": "Para docentes",
+    "educationHub": "Centro de Educación",
+    "vocabularyGames": "Juegos de vocabulario",
+    "gamesForTeachers": "Juegos para docentes",
+    "eslWordGames": "Juegos de inglés"
   },
   "sitemap": {
     "title": "Mapa del sitio",
@@ -10512,8 +10517,8 @@ const es = {
       "startGame": "Iniciar juego",
       "hero": {
         "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés y español",
-        "h1": "Juegos de palabras nativos — no traducidos. Multijugador en vivo directo en el navegador.",
-        "sub": "6 modos de juego, entrenamientos cerebrales, lecciones personalizadas. Cero anuncios. Gratis para docentes verificados. Acceso en menos de 60 segundos.",
+        "h1": "Juegos de vocabulario gratis para tu aula — sin cuentas de estudiantes.",
+        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas, gratis para docentes.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo"
       },

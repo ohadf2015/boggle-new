@@ -55,7 +55,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
         ) : (
         <>
         {/* Link columns */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
           {/* Explore */}
           <nav aria-label={t('footer.explore', 'Explore')}>
             <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
@@ -67,6 +67,23 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               <li><Link href={`/${language}/blog`} className={footerLinkClass}>{t('footer.blog')}</Link></li>
               <li><Link href={`/${language}/faq`} className={footerLinkClass}>{t('footer.faq')}</Link></li>
               <li><Link href={`/${language}/contact`} className={footerLinkClass}>{t('footer.contact')}</Link></li>
+            </ul>
+          </nav>
+
+          {/* For Teachers — sitewide links into the /education landings.
+              These pages were crawl-orphaned (linked only from the rarely
+              crawled hub); sitewide footer links flow crawl equity from every
+              page so Google discovers + ranks them. See
+              docs/2026-05-30-education-teacher-seo-intent.md. */}
+          <nav aria-label={t('footer.forTeachers', 'For Teachers')}>
+            <h3 className="text-xs font-black uppercase tracking-widest text-neo-lime mb-3">
+              {t('footer.forTeachers', 'For Teachers')}
+            </h3>
+            <ul className="space-y-2">
+              <li><Link href={`/${language}/education`} className={footerLinkClass}>{t('footer.educationHub', 'Education Hub')}</Link></li>
+              <li><Link href={`/${language}/education/vocabulary-games-classroom`} className={footerLinkClass}>{t('footer.vocabularyGames', 'Vocabulary Games')}</Link></li>
+              <li><Link href={`/${language}/education/games-for-teachers`} className={footerLinkClass}>{t('footer.gamesForTeachers', 'Games for Teachers')}</Link></li>
+              <li><Link href={`/${language}/education/esl-word-games`} className={footerLinkClass}>{t('footer.eslWordGames', 'ESL Word Games')}</Link></li>
             </ul>
           </nav>
 
