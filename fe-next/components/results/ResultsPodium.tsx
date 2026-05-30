@@ -8,6 +8,8 @@ import type { PlayerScore } from '@/hooks/useResultsData';
 import Avatar from '../Avatar';
 import { REACTIONS } from '@/components/game/QuickReactions';
 import { AddFriendBadge } from '@/components/results/ResultsFriendStatus';
+import { canSendReaction } from '@/lib/results/reactionThrottle';
+import { triggerHaptic } from '@/utils/hapticFeedback';
 
 /** Emoji bubble that floats above a targeted podium player */
 interface PodiumBubble {
@@ -89,8 +91,6 @@ function formatScore(score: number): string {
 
 // Sequenced reveal delays: 2nd place, 1st place (dramatic), 3rd place
 const REVEAL_DELAYS = [0.1, 0.35, 0.2] as const;
-
-const THROTTLE_MS = 2000;
 
 /** Emoji speech bubble above a targeted podium player */
 function PodiumEmojiBubbleLocal({ emoji, onDone }: { emoji: string; onDone: () => void }) {
@@ -181,10 +181,16 @@ export default function ResultsPodium({
 
   const handleEmojiSelect = useCallback((reactionId: string, targetUsername: string) => {
     const now = Date.now();
-    if (now - lastReactionRef.current < THROTTLE_MS) return;
+    if (!canSendReaction(now, lastReactionRef.current)) {
+      // Throttled — close the picker so the tap still feels acknowledged
+      // instead of silently doing nothing.
+      setOpenPicker(null);
+      return;
+    }
     lastReactionRef.current = now;
 
-    // Show local bubble on the targeted player's podium
+    // Confirm the send: haptic tick + local bubble on the targeted podium.
+    triggerHaptic('light');
     const reaction = REACTIONS.find(r => r.id === reactionId);
     if (reaction) {
       const id = `pb-${++bubbleIdRef.current}`;

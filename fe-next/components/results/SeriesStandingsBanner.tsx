@@ -173,6 +173,7 @@ const SeriesStandingsBanner: React.FC<SeriesStandingsBannerProps> = ({
       <SessionStatsCard
         standings={sessionStandings}
         currentRound={roundNumber}
+        currentUsername={currentUsername}
         t={t}
       />
     </m.div>

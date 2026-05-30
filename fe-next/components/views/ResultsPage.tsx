@@ -43,8 +43,8 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntResultsSummary';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
-import { MascotCelebrationVideo } from '@/components/mascot/MascotCelebrationVideo';
-import { pickCelebrationKind, celebrationTitleFor } from '@/components/mascot/celebrationKind';
+import { MascotCelebrationVideo, type MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
+import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -92,6 +92,7 @@ interface DesktopResultsLayoutProps {
   currentPlayerRank: number;
   sortedScores: any[];
   marginToNext: number | null;
+  celebrationKind: MascotCelebrationKind | null;
 }
 
 function DesktopResultsLayout({
@@ -115,6 +116,7 @@ function DesktopResultsLayout({
   currentPlayerRank,
   sortedScores,
   marginToNext,
+  celebrationKind,
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -175,6 +177,18 @@ function DesktopResultsLayout({
             as the player scrolls further into the page. */}
         <ResultsHeroTilt scrollRef={scrollRef} className="w-full max-w-5xl mx-auto relative z-10">
           <ResultsSectionReveal index={1} flat>
+{/* Position-relevant celebration, inline (not a popup) */}
+            {celebrationKind && (
+              <div className="flex justify-center mb-1">
+                <MascotCelebrationVideo
+                  kind={celebrationKind}
+                  title={null}
+                  overlay={false}
+                  autoDismissMs={0}
+                  size="clamp(150px, 34vmin, 240px)"
+                />
+              </div>
+            )}
             <ResultsMainContent
               {...mainContentProps}
               hideInlineCta={!!gameCode && !isBotsOnlyGame}
@@ -445,7 +459,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         }),
     [sortedScores.length, currentPlayerRank, hadBingo],
   );
-  const [showCelebration, setShowCelebration] = useState(true);
 
   // Build blast result scores map from sortedScores
   const blastResultScores = useMemo(() => {
@@ -945,6 +958,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <BlastMpResults results={blastMpResults} gameMode="blast" />
         </div>
       )}
+{/* Position-relevant celebration, inline (not a popup) */}
+      {celebrationKind && (
+        <div className="flex justify-center mb-1">
+          <MascotCelebrationVideo
+            kind={celebrationKind}
+            title={null}
+            overlay={false}
+            autoDismissMs={0}
+            size="clamp(150px, 34vmin, 240px)"
+          />
+        </div>
+      )}
       <ResultsMainContent
         {...mainContentProps}
         hideInlineCta={!isBotsOnlyGame}
@@ -1070,17 +1095,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
       {/* What you missed during your round — drains MidRoundEventQueue */}
       <PostRoundSummary />
-
-      {/* AI-generated mascot celebration overlay — appears for ~2.8s before the
-          scoreboard lands. Variant picked by placement + bingo signal. */}
-      {showCelebration && celebrationKind && (
-        <MascotCelebrationVideo
-          kind={celebrationKind}
-          title={celebrationTitleFor(celebrationKind, t)}
-          autoDismissMs={2800}
-          onDone={() => setShowCelebration(false)}
-        />
-      )}
 
       <div
         className="flex-1 flex flex-col min-h-0 bg-neo-navy transition-colors duration-300 relative"
@@ -1251,6 +1265,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         currentPlayerRank={currentPlayerRank}
         sortedScores={sortedScores}
         marginToNext={marginToNext}
+        celebrationKind={celebrationKind}
       />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens.

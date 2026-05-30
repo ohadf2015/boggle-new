@@ -6,13 +6,15 @@
  */
 
 export interface SessionFact {
-  type: 'improvement' | 'consistency' | 'comeback' | 'rivalry' | 'record';
+  type: 'improvement' | 'consistency' | 'comeback' | 'rivalry' | 'record' | 'placement';
   playerName: string;
   playerName2?: string;
   value: number;
   translationKey: string;
   translationParams: Record<string, string | number>;
   icon: string;
+  /** True when this fact is about the viewer — card renders "You" instead of the name. */
+  isCurrentUser?: boolean;
 }
 
 interface StandingWithScores {
@@ -236,18 +238,205 @@ export function getBiggestSingleRound(
 }
 
 /**
- * Aggregate all session facts, filter nulls, return up to 4.
+ * Best personal insight for ONE player (the viewer), in priority order:
+ * comeback (climbed) → improvement → consistency (top-3) → record (best round).
+ * Returns null only if the player has no flattering stat at all.
+ */
+function getPersonalInsight(
+  standings: StandingWithScores[],
+  username: string
+): SessionFact | null {
+  const me = standings.find((s) => s.username === username);
+  if (!me) return null;
+  const scores = me.roundScores ?? [];
+
+  // Comeback: climbed positions from round-1 placement to current total.
+  if (scores.length >= 2) {
+    const ranked = (key: (s: StandingWithScores) => number) =>
+      [...standings]
+        .filter((s) => (s.roundScores?.length ?? 0) >= 1)
+        .sort((a, b) => key(b) - key(a))
+        .findIndex((s) => s.username === username) + 1;
+    const round1Rank = ranked((s) => s.roundScores?.[0] ?? 0);
+    const currentRank = ranked((s) => s.totalScore);
+    const climb = round1Rank - currentRank;
+    if (climb > 0) {
+      return {
+        type: 'comeback',
+        playerName: username,
+        value: climb,
+        translationKey: 'results.sessionStats.comeback',
+        translationParams: { player: username, positions: climb },
+        icon: 'ArrowUp',
+        isCurrentUser: true,
+      };
+    }
+  }
+
+  // Improvement: grew from round 1 to the latest round.
+  if (scores.length >= 2 && scores[0] > 0) {
+    const improvement = ((scores[scores.length - 1] - scores[0]) / scores[0]) * 100;
+    if (improvement > 0) {
+      return {
+        type: 'improvement',
+        playerName: username,
+        value: Math.round(improvement),
+        translationKey: 'results.sessionStats.improved',
+        translationParams: { player: username, percent: Math.round(improvement) },
+        icon: 'TrendingUp',
+        isCurrentUser: true,
+      };
+    }
+  }
+
+  // Consistency: top-3 finishes across rounds.
+  if (scores.length >= 2) {
+    let top3 = 0;
+    for (let r = 0; r < scores.length; r++) {
+      const rank =
+        [...standings]
+          .filter((s) => s.roundScores?.[r] !== undefined)
+          .sort((a, b) => (b.roundScores![r]) - (a.roundScores![r]))
+          .findIndex((s) => s.username === username) + 1;
+      if (rank >= 1 && rank <= 3) top3++;
+    }
+    if (top3 >= 2) {
+      return {
+        type: 'consistency',
+        playerName: username,
+        value: top3,
+        translationKey: 'results.sessionStats.consistent',
+        translationParams: { player: username, count: top3 },
+        icon: 'Target',
+        isCurrentUser: true,
+      };
+    }
+  }
+
+  // Record: the viewer's own biggest single round.
+  if (scores.length >= 1) {
+    let best = 0;
+    let bestRound = 0;
+    for (let i = 0; i < scores.length; i++) {
+      if (scores[i] > best) {
+        best = scores[i];
+        bestRound = i + 1;
+      }
+    }
+    if (best > 0) {
+      return {
+        type: 'record',
+        playerName: username,
+        value: best,
+        translationKey: 'results.sessionStats.bigRound',
+        translationParams: { player: username, score: best, round: bestRound },
+        icon: 'Zap',
+        isCurrentUser: true,
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Fallback when the viewer has no flattering stat: show their current placement.
+ * Never renders someone else's name on the viewer's card.
+ */
+function getPlacementFact(
+  standings: StandingWithScores[],
+  username: string
+): SessionFact | null {
+  const sorted = [...standings].sort((a, b) => b.totalScore - a.totalScore);
+  const rank = sorted.findIndex((s) => s.username === username) + 1;
+  if (rank < 1) return null;
+  return {
+    type: 'placement',
+    playerName: username,
+    value: rank,
+    translationKey: 'results.sessionStats.placement',
+    translationParams: { player: username, rank },
+    icon: 'Flag',
+    isCurrentUser: true,
+  };
+}
+
+/**
+ * The viewer's NEAREST rival: the score-adjacent neighbour in the standings
+ * (not the global closest pair). "Its closer rival."
+ */
+function getNeighbourRival(
+  standings: StandingWithScores[],
+  username: string
+): SessionFact | null {
+  const sorted = [...standings].sort((a, b) => b.totalScore - a.totalScore);
+  const idx = sorted.findIndex((s) => s.username === username);
+  if (idx < 0 || sorted.length < 2) return null;
+
+  const above = idx > 0 ? sorted[idx - 1] : null;
+  const below = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+  const me = sorted[idx];
+
+  const candidates = [above, below].filter(
+    (c): c is StandingWithScores => c !== null
+  );
+  if (candidates.length === 0) return null;
+
+  let rival = candidates[0];
+  let bestDiff = Math.abs(me.totalScore - rival.totalScore);
+  for (const c of candidates.slice(1)) {
+    const diff = Math.abs(me.totalScore - c.totalScore);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      rival = c;
+    }
+  }
+
+  return {
+    type: 'rivalry',
+    playerName: username,
+    playerName2: rival.username,
+    value: bestDiff,
+    translationKey: 'results.sessionStats.rivalry',
+    translationParams: { player1: username, player2: rival.username, diff: bestDiff },
+    icon: 'Swords',
+    isCurrentUser: true,
+  };
+}
+
+/**
+ * Aggregate session facts, capped at 2 rows.
+ *
+ * Player surface (currentUsername present & in standings): row 1 = the viewer's
+ * own best insight (placement fallback), row 2 = the viewer's nearest rival.
+ * Host / TV surface (no currentUsername): session-MVP framing — the most
+ * impressive stat across all players + the global closest pair, named.
  */
 export function getAllSessionFacts(
-  standings: StandingWithScores[]
+  standings: StandingWithScores[],
+  currentUsername?: string
 ): SessionFact[] {
-  const facts = [
-    getImprovementTrends(standings),
-    getConsistencyStats(standings),
-    getComebackDetection(standings),
-    getRivalries(standings),
-    getBiggestSingleRound(standings),
-  ].filter((f): f is SessionFact => f !== null);
+  if (standings.length === 0) return [];
 
-  return facts.slice(0, 4);
+  const isViewer =
+    !!currentUsername && standings.some((s) => s.username === currentUsername);
+
+  if (isViewer) {
+    const row1 =
+      getPersonalInsight(standings, currentUsername!) ??
+      getPlacementFact(standings, currentUsername!);
+    const row2 = getNeighbourRival(standings, currentUsername!);
+    return [row1, row2].filter((f): f is SessionFact => f !== null).slice(0, 2);
+  }
+
+  // Host / MVP mode — most impressive across the room + global rivalry.
+  const mvp = [
+    getImprovementTrends(standings),
+    getComebackDetection(standings),
+    getConsistencyStats(standings),
+    getBiggestSingleRound(standings),
+  ].find((f): f is SessionFact => f !== null);
+  const rivalry = getRivalries(standings);
+
+  return [mvp, rivalry].filter((f): f is SessionFact => f !== null).slice(0, 2);
 }

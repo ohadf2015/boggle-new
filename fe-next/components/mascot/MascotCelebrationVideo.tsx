@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { MascotHaloGlow, type HaloIntensity, type HaloTone } from './MascotHaloGlow';
+import { pickCelebrationSrc } from '@/lib/results/celebrationVariant';
 
 export type MascotCelebrationKind =
   | 'champion'        // MP 1st place
@@ -14,7 +15,12 @@ export type MascotCelebrationKind =
   | 'mission-complete'; // daily all-done
 
 interface VariantConfig {
-  src: string;
+  /**
+   * One or more clips for this kind. One is picked per mount (seeded, stable
+   * across re-renders) so repeat plays feel fresh. Add more clips to make a
+   * kind randomly vary — until then a 1-element list is a stable no-op.
+   */
+  srcs: string[];
   tone: HaloTone;
   intensity: HaloIntensity;
   /** Default celebration title rendered above the video. Callers can override with the `title` prop. */
@@ -29,7 +35,7 @@ interface VariantConfig {
 
 const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
   champion: {
-    src: '/mascots/celebration-champion.mp4',
+    srcs: ['/mascots/celebration-champion.mp4'],
     tone: 'yellow-orange',
     intensity: 'bold',
     defaultTitle: 'CHAMPION!',
@@ -38,7 +44,7 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#FFE135', '#FF6B35', '#FFFFFF'],
   },
   'runner-up': {
-    src: '/mascots/celebration-runner-up.mp4',
+    srcs: ['/mascots/celebration-runner-up.mp4'],
     tone: 'pink-cyan',
     intensity: 'medium',
     defaultTitle: 'PODIUM!',
@@ -47,7 +53,7 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#00FFFF', '#FF1493', '#FFFFFF'],
   },
   defeat: {
-    src: '/mascots/celebration-defeat.mp4',
+    srcs: ['/mascots/celebration-defeat.mp4'],
     tone: 'purple-pink',
     intensity: 'subtle',
     defaultTitle: 'GG',
@@ -58,7 +64,7 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
   bingo: {
     // Swapped from celebration-bingo.mp4 → celebration-bingo.mp4 stays; bingo
     // is already the most production-grade celebration.
-    src: '/mascots/celebration-bingo.mp4',
+    srcs: ['/mascots/celebration-bingo.mp4'],
     tone: 'pink-cyan',
     intensity: 'bold',
     defaultTitle: 'BINGO!',
@@ -67,7 +73,7 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#FF1493', '#00FFFF', '#FFE135', '#FFFFFF'],
   },
   knight: {
-    src: '/mascots/celebration-knight.mp4',
+    srcs: ['/mascots/celebration-knight.mp4'],
     tone: 'pink-cyan',
     intensity: 'medium',
     defaultTitle: 'VICTORY!',
@@ -76,7 +82,7 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#FF1493', '#00FFFF', '#FFFFFF'],
   },
   streak: {
-    src: '/mascots/celebration-streak.mp4',
+    srcs: ['/mascots/celebration-streak.mp4'],
     tone: 'lime-cyan',
     intensity: 'bold',
     defaultTitle: 'ON FIRE!',
@@ -89,7 +95,7 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     // the first-daily-of-the-day beat). celebration-knight.mp4 is the more
     // dynamic generic-victory render and lands better as the player's first
     // celebration of the day.
-    src: '/mascots/celebration-knight.mp4',
+    srcs: ['/mascots/celebration-knight.mp4'],
     tone: 'pink-cyan',
     intensity: 'bold',
     defaultTitle: 'NICE FIND!',
@@ -98,7 +104,7 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#00FFFF', '#FF1493', '#BFFF00', '#FFFFFF'],
   },
   'mission-complete': {
-    src: '/mascots/celebration-mission-complete.mp4',
+    srcs: ['/mascots/celebration-mission-complete.mp4'],
     tone: 'yellow-orange',
     intensity: 'bold',
     defaultTitle: 'ALL CLEAR!',
@@ -168,6 +174,14 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   title,
 }: MascotCelebrationVideoProps) {
   const variant = VARIANTS[kind];
+  // Pick a clip ONCE per mount. The results page re-renders frequently
+  // (countdowns, score reveals); seeding from a mount-time random keeps the
+  // same clip for the life of this celebration instead of reshuffling.
+  const [clipSeed] = useState(() => Math.floor(Math.random() * 1e9));
+  const src = useMemo(
+    () => pickCelebrationSrc(variant.srcs, clipSeed),
+    [variant.srcs, clipSeed]
+  );
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   // Keep the latest onDone in a ref so the auto-dismiss timer below depends only
@@ -361,7 +375,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
             <div style={{ ...wrapperStyle, animation: 'lcMcvVideoIn 620ms cubic-bezier(0.34, 1.56, 0.64, 1) both', position: 'relative' }}>
               <video
                 ref={videoRef}
-                src={variant.src}
+                src={src}
                 autoPlay
                 loop
                 muted

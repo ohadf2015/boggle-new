@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { m } from 'framer-motion';
-import { TrendingUp, Target, ArrowUp, Swords, Zap, LucideIcon } from 'lucide-react';
+import { TrendingUp, Target, ArrowUp, Swords, Zap, Flag, LucideIcon } from 'lucide-react';
 import { getAllSessionFacts, type SessionFact } from '../../utils/sessionStatsCalculator';
 import { cn } from '../../lib/utils';
 
@@ -15,6 +15,8 @@ interface StandingWithScores {
 interface SessionStatsCardProps {
   standings: StandingWithScores[];
   currentRound: number;
+  /** When set, the card is player-centric: viewer facts render as "You". */
+  currentUsername?: string;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -24,6 +26,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   ArrowUp,
   Swords,
   Zap,
+  Flag,
 };
 
 const TYPE_STYLES: Record<SessionFact['type'], { bg: string; border: string; iconBg: string }> = {
@@ -52,14 +55,23 @@ const TYPE_STYLES: Record<SessionFact['type'], { bg: string; border: string; ico
     border: 'border-neo-yellow',
     iconBg: 'bg-neo-yellow text-neo-black',
   },
+  placement: {
+    bg: 'bg-neo-purple/20',
+    border: 'border-neo-purple',
+    iconBg: 'bg-neo-purple text-neo-black',
+  },
 };
 
 const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
   standings,
   currentRound,
+  currentUsername,
   t,
 }) => {
-  const facts = useMemo(() => getAllSessionFacts(standings), [standings]);
+  const facts = useMemo(
+    () => getAllSessionFacts(standings, currentUsername),
+    [standings, currentUsername]
+  );
 
   // Need at least 2 rounds for meaningful stats
   if (currentRound < 2 || facts.length === 0) return null;
@@ -96,11 +108,11 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-neo-white truncate">
-                  {fact.playerName}
+                  {fact.isCurrentUser ? t('results.sessionStats.you') : fact.playerName}
                   {fact.playerName2 && (
                     <span className="font-bold text-neo-white">
                       {' '}
-                      vs {fact.playerName2}
+                      {t('results.sessionStats.versus')} {fact.playerName2}
                     </span>
                   )}
                 </p>
@@ -114,7 +126,11 @@ const SessionStatsCard: React.FC<SessionStatsCardProps> = ({
                 transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 400 }}
                 className="shrink-0 text-lg font-black text-neo-white"
               >
-                {fact.type === 'improvement' ? `+${fact.value}%` : fact.value}
+                {fact.type === 'improvement'
+                  ? `+${fact.value}%`
+                  : fact.type === 'placement'
+                    ? `#${fact.value}`
+                    : fact.value}
               </m.span>
             </m.div>
           );
