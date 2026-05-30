@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { readGuestId, newGuestId, setGuestCookie } from '@/lib/auth/guestCookie';
 import { captureApiError } from '@/utils/sentry';
 import { validateDailySubmission, resolveDailySubmission } from '@/lib/connections/dailyScore';
 import { maxDailyScore } from '@/lib/connections/daily';
@@ -31,7 +32,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'invalid body' }, { status: 400 });
     }
     const today = todayUTC();
-    const guestFingerprint = typeof body.guestFingerprint === 'string' ? body.guestFingerprint : null;
 
     // Clamp ceiling depends on the (date, locale) the client claims; validate
     // the rest of the body against it.
@@ -46,15 +46,19 @@ export async function POST(request: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user && !guestFingerprint) {
-      return NextResponse.json({ error: 'identity required' }, { status: 400 });
-    }
+
+    // Identity is server-authoritative: the authed user, else a signed guest cookie.
+    // We NEVER trust a client-supplied fingerprint (it would let an attacker write
+    // to another guest's leaderboard row / inflate any identity). A new guest gets a
+    // freshly minted id whose signed cookie is set on the final response.
+    const existingGuest = user ? null : readGuestId(request);
+    const guestId = user ? null : (existingGuest ?? newGuestId());
 
     const admin = createAdminClient();
     if (!admin) return NextResponse.json({ error: 'service unavailable' }, { status: 503 });
 
     const idCol = user ? 'player_id' : 'guest_fingerprint';
-    const idVal = user ? user.id : (guestFingerprint as string);
+    const idVal = user ? user.id : (guestId as string);
 
     const { data: profile } = user
       ? await admin.from('profiles').select('avatar_emoji, avatar_color, avatar_image').eq('id', user.id).single()
@@ -84,7 +88,7 @@ export async function POST(request: NextRequest) {
     const rowData = {
       puzzle_date: sub.puzzleDate,
       player_id: user?.id ?? null,
-      guest_fingerprint: user ? null : guestFingerprint,
+      guest_fingerprint: user ? null : guestId,
       display_name: sub.displayName,
       avatar_emoji: (typeof body.avatarEmoji === 'string' && body.avatarEmoji) || profile?.avatar_emoji || '🎯',
       avatar_color: (typeof body.avatarColor === 'string' && body.avatarColor) || profile?.avatar_color || '#6366f1',
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', sub.puzzleDate);
 
-    return NextResponse.json({
+    const out = NextResponse.json({
       success: true,
       action: decision.action,
       streak,
@@ -127,6 +131,9 @@ export async function POST(request: NextRequest) {
       currentRank: (better ?? 0) + 1,
       totalPlayers: totalPlayers ?? 1,
     });
+    // Issue the signed cookie for a freshly minted guest (set on the SAME response).
+    if (guestId && !existingGuest) setGuestCookie(out, guestId);
+    return out;
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/connections/daily/score', {
       method: 'POST',
