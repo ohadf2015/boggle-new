@@ -87,7 +87,19 @@ export default function AnchoredNativeBanner() {
     };
 
     const applyBanner = async (margin: number) => {
-      if (cancelled || margin === lastMargin) return;
+      if (cancelled) return;
+      // Keep the banner BEHIND the open mobile side menu. A native banner always
+      // composites above the WebView, so the drawer can't cover it with z-index —
+      // HeaderMobileMenu flags <html>.mobile-drawer-open while open and the
+      // MutationObserver below re-runs us. Hide while open; reset lastMargin so the
+      // banner is force-re-shown when the drawer closes (class removed → re-run).
+      if (document.documentElement.classList.contains('mobile-drawer-open')) {
+        await hideBanner();
+        document.documentElement.style.setProperty('--admob-banner-height', '0px');
+        lastMargin = -1;
+        return;
+      }
+      if (margin === lastMargin) return;
       lastMargin = margin;
       await hideBanner();
       if (cancelled) return;

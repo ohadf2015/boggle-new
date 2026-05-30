@@ -126,6 +126,17 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         }
     }, [showMobileMenu, isAuthenticated]);
 
+    // Keep the native AdMob banner BEHIND the open side menu. The banner is a
+    // native platform view that composites above the WebView, so no z-index can
+    // cover it — instead we flag <html> while the drawer is open. AnchoredNativeBanner
+    // observes this class and hides the banner, restoring it when the drawer closes.
+    useEffect(() => {
+        if (typeof document === 'undefined') return;
+        const root = document.documentElement;
+        root.classList.toggle('mobile-drawer-open', showMobileMenu);
+        return () => { root.classList.remove('mobile-drawer-open'); };
+    }, [showMobileMenu]);
+
     const handleStartEditGuestName = useCallback(() => {
         setEditGuestNameValue(guestName);
         setIsEditingGuestName(true);

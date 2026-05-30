@@ -56,8 +56,12 @@ describe('AnchoredNativeBanner', () => {
     mockPathname.current = '/';
     mockPlatform.current = 'ios';
     mockSafeArea.current = { top: 0, bottom: 0, left: 0, right: 0 };
+    document.documentElement.classList.remove('mobile-drawer-open');
   });
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    document.documentElement.classList.remove('mobile-drawer-open');
+  });
 
   it('shows banner on home route', async () => {
     render(<AnchoredNativeBanner />);
@@ -107,6 +111,34 @@ describe('AnchoredNativeBanner', () => {
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24, { variant: 'content' });
+  });
+
+  it('keeps banner behind the open side menu — hides while .mobile-drawer-open, never shows', async () => {
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    document.documentElement.classList.add('mobile-drawer-open');
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(showBanner).not.toHaveBeenCalled();
+    expect(hideBanner).toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
+  });
+
+  it('restores the banner when the side menu closes (class removed → observer re-shows)', async () => {
+    mockPathname.current = '/';
+    mockPlatform.current = 'android';
+    document.documentElement.classList.add('mobile-drawer-open');
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(showBanner).not.toHaveBeenCalled();
+
+    // Close the drawer — the MutationObserver on <html> re-runs applyBanner.
+    document.documentElement.classList.remove('mobile-drawer-open');
+    // MutationObserver callbacks are microtask-scheduled; flush a couple of turns.
+    await new Promise((r) => setTimeout(r, 0));
+    await Promise.resolve();
+    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
   });
 
   it('shows banner on locale-prefixed home', async () => {
