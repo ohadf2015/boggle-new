@@ -4964,6 +4964,8 @@ const en = {
     "blastModeDesc": "Clear the board!",
     "blastClassic": "Blast Classic",
     "blastClassicDesc": "The original V1 engine",
+    "blastV2": "Blast V2",
+    "blastV2Desc": "Preview the new solo engine",
     "wordChainMode": "Word Chain",
     "wordChainModeDesc": "Bridge two words with one",
     "wordForgeMode": "Word Forge",

@@ -4946,6 +4946,8 @@ const es = {
     "blastModeDesc": "¡Limpia el tablero!",
     "blastClassic": "Blast Clásico",
     "blastClassicDesc": "El motor original V1",
+    "blastV2": "Blast V2",
+    "blastV2Desc": "Prueba el nuevo motor en solitario",
     "wordChainMode": "Cadena de Palabras",
     "wordChainModeDesc": "Conecta dos palabras con una",
     "wordForgeMode": "Forja de Palabras",

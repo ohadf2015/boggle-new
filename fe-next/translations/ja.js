@@ -4897,6 +4897,8 @@ const ja = {
     "blastModeDesc": "ボードをクリアしよう！",
     "blastClassic": "ブラスト クラシック",
     "blastClassicDesc": "オリジナルのV1エンジン",
+    "blastV2": "ブラスト V2",
+    "blastV2Desc": "新しいソロエンジンをプレビュー",
     "wordChainMode": "ワードチェーン",
     "wordChainModeDesc": "1つの言葉で2つの言葉をつなごう",
     "wordForgeMode": "ワードフォージ",

@@ -4998,6 +4998,8 @@ const he = {
     "blastModeDesc": "נקו את הלוח!",
     "blastClassic": "בלאסט קלאסי",
     "blastClassicDesc": "מנוע V1 המקורי",
+    "blastV2": "בלאסט V2",
+    "blastV2Desc": "הצצה למנוע היחיד החדש",
     "wordChainMode": "ראש זנב",
     "wordChainModeDesc": "חברו שתי מילים באמצעות מילה אחת",
     "wordForgeMode": "מסדת המילים",

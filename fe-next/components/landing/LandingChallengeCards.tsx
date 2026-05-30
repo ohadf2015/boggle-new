@@ -53,6 +53,7 @@ type LandingCardKey =
   | 'wordCraft'
   | 'wordTower'
   | 'blastClassic'
+  | 'blastV2'
   | 'wordForge'
   | 'wordVault'
   | 'party'
@@ -70,7 +71,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 
  */
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
-  'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic',
+  'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic', 'blastV2',
   'wordForge', 'wordVault',
   'party', 'wordAlchemy', 'shiritori', 'sealedBid',
 ]);
@@ -156,6 +157,9 @@ export function LandingChallengeCards({
     // Blast Classic (legacy V1 engine) — admin-only card so both V1 + V2 (the
     // public 'blast' card) are reachable. /blast?v2=off opts into the V1 engine.
     if (isAdmin && !next.includes('blastClassic')) next.push('blastClassic');
+    // Blast V2 (new SP engine) — admin-only card, its own standalone route.
+    // Public 'blast' stays V1; /blast/v2 is a separate mode, not a toggle.
+    if (isAdmin && !next.includes('blastV2')) next.push('blastV2');
     // Admin-only dev previews of modes not yet surfaced on the public hub.
     if (isAdmin && !next.includes('wordForge')) next.push('wordForge');
     if (isAdmin && !next.includes('wordVault')) next.push('wordVault');
@@ -277,6 +281,21 @@ export function LandingChallengeCards({
               variant="orange"
               badge="V1"
               onClick={() => { trackLandingCtaClick('mode_card', { mode: 'blastClassic', variant: 'orange' }); }}
+            />
+          </div>
+        );
+
+      case 'blastV2':
+        return (
+          <div key="blastV2" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('landing.blastV2')}
+              description={t('landing.blastV2Desc')}
+              href={`/${language}/blast/v2`}
+              icon={<Bomb className="w-6 h-6" />}
+              variant="purple"
+              badge="V2"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'blastV2', variant: 'purple' }); }}
             />
           </div>
         );
@@ -456,7 +475,7 @@ export function LandingChallengeCards({
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic', 'blastV2', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

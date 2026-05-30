@@ -4912,6 +4912,8 @@ const sv = {
     "blastModeDesc": "Rensa brädet!",
     "blastClassic": "Blast Classic",
     "blastClassicDesc": "Den ursprungliga V1-motorn",
+    "blastV2": "Blast V2",
+    "blastV2Desc": "Förhandsvisa den nya enspelarmotorn",
     "wordChainMode": "Ordkedja",
     "wordChainModeDesc": "Länka två ord med ett ord",
     "wordForgeMode": "Ordsmedjan",
