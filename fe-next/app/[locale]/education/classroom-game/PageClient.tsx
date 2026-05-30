@@ -44,7 +44,7 @@ function ClassroomGameInner() {
   }, [isAuthenticated, authLoading, router, language]);
 
   const handleBack = useCallback(() => {
-    router.push(`/${language}/teacher`);
+    router.push(`/${language}/education`);
   }, [router, language]);
 
   if (isChecking || authLoading) {

@@ -167,8 +167,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
   // Handle quit
   const handleQuit = useCallback(() => {
-    // Return to home or daily challenge
-    window.location.href = `/${language}/daily`;
+    // Return to custom puzzle browser
+    window.location.href = `/${language}/custom`;
   }, [language]);
 
   // Share puzzle
@@ -200,7 +200,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
         {error ? (
           <div className="text-center p-8">
             <h2 className="text-xl font-bold text-red-500 mb-4">{error}</h2>
-            <Link href={`/${language}/daily`}>
+            <Link href={`/${language}/custom`}>
               <Button variant="outline">
                 <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
                 {t('common.back')}
@@ -260,7 +260,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             {t('customPuzzle.play')}
           </Button>
 
-          <Link href={`/${language}/daily`} className="block mt-4">
+          <Link href={`/${language}/custom`} className="block mt-4">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
               {t('common.back')}

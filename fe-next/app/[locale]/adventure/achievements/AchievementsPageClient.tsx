@@ -20,7 +20,7 @@ import {
 } from '@/utils/adventureAchievementUtils';
 
 export function AchievementsPageClient() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { achievementCounts } = useAdventureAchievements();
   const [selectedAchievement, setSelectedAchievement] = useState<{
     achievement: typeof ADVENTURE_ACHIEVEMENTS[AdventureAchievementId];
@@ -50,7 +50,7 @@ export function AchievementsPageClient() {
       <div className="max-w-6xl mx-auto">
         {/* Back Navigation */}
         <Link
-          href="/adventure"
+          href={`/${language}/adventure`}
           className={cn(
             'inline-flex items-center gap-2',
             'text-neo-white hover:text-neo-white',

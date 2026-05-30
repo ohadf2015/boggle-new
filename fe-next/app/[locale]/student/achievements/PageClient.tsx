@@ -124,7 +124,7 @@ export default function StudentAchievementsPageClient() {
       <div className="w-full max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
         {/* Back Navigation */}
         <Link
-          href={`/${language}/student/profile`}
+          href={`/${language}/student`}
           className="inline-flex items-center gap-2 text-neo-white hover:text-neo-white mb-6 transition-colors"
         >
           <ArrowLeft className={cn('w-4 h-4', isRTL && 'rotate-180')} />

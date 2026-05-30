@@ -19,7 +19,7 @@ import { SKILL_CATALOG } from '@/utils/skillTreeUtils';
 import type { SkillNode } from '@/types/adventure';
 
 export function SkillTreePageClient() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { progression } = useProgressionData();
   const hydrateFromDB = useSkillTreeStore((s) => s.hydrateFromDB);
   const { earnAchievement } = useAdventureAchievements();
@@ -59,7 +59,7 @@ export function SkillTreePageClient() {
       <div className="max-w-6xl mx-auto">
         {/* Back Navigation */}
         <Link
-          href="/adventure"
+          href={`/${language}/adventure`}
           className={cn(
             'inline-flex items-center gap-2',
             'text-neo-white hover:text-neo-white',
