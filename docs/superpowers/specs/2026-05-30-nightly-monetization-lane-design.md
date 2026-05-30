@@ -96,17 +96,26 @@ The nightly run is **unattended at 00:00**; Playwriter needs a live logged-in Ch
    Skip-graceful when extension offline. Founder runs ad-hoc — NOT in the 00:00 run.
 
 ### Setup — enable unattended revenue (one-time, founder-only)
-```bash
-# 1. Enable the APIs in the GCP project (AdMob API must also be linked to the AdMob acct)
-gcloud services enable admob.googleapis.com adsense.googleapis.com
-# 2. Re-login ADC WITH the report scopes (keep cloud-platform so GSC/lane-06 still works)
-gcloud auth application-default login \
-  --scopes=https://www.googleapis.com/auth/admob.readonly,https://www.googleapis.com/auth/adsense.readonly,https://www.googleapis.com/auth/cloud-platform
-```
-Or set `ADMOB_API_TOKEN` in `~/.config/lexi-nightly/env` to a token minted from a
-dedicated service account with those scopes. Verify: `curl -H "Authorization: Bearer
-$(gcloud auth application-default print-access-token)" https://admob.googleapis.com/v1/accounts`
-returns 200.
+- **STEP 1 — DONE (2026-05-30):** AdMob API + AdSense Management API are ENABLED on GCP
+  project `lexiclash` (#921426916910), done via Service Usage REST `services:batchEnable`
+  with the ADC token (the `:enable` colon-verb 404s on dotted service names — use
+  `batchEnable`). Both report `state: ENABLED`.
+- **STEP 2 — founder browser action (REQUIRED, interactive):** re-scope ADC. An existing
+  refresh token can't self-broaden scopes, so this needs OAuth re-consent:
+  ```bash
+  gcloud auth application-default login \
+    --scopes=https://www.googleapis.com/auth/admob.readonly,https://www.googleapis.com/auth/adsense.readonly,https://www.googleapis.com/auth/cloud-platform
+  ```
+  (keep `cloud-platform` so GSC/lane-06 keeps working).
+- **STEP 3 — link AdMob/AdSense to the GCP project (likely required):** the AdMob
+  Management API only returns an account if the AdMob account is linked to a GCP project
+  (AdMob console → Settings → "Link to a Google Cloud project" → pick `lexiclash`). Same
+  pattern for AdSense. If `GET /v1/accounts` returns `{}` after step 2, this is why.
+- **Verify:** `curl -H "Authorization: Bearer $(gcloud auth application-default
+  print-access-token)" https://admob.googleapis.com/v1/accounts` → 200 with an account.
+
+Alternative to step 2: set `ADMOB_API_TOKEN` in `~/.config/lexi-nightly/env` to a token
+from a dedicated service account carrying those scopes.
 
 ## Files
 
