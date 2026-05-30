@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { formatScore } from '@/utils/scoreDisplay';
 import { GameOverlays } from './GameOverlays';
+import { CalmSessionBadge } from '@/components/cosy/CalmSessionBadge';
 import { HintPromptButton } from './HintPromptButton';
 import { DynamicEnergyBackground } from './DynamicEnergyBackground';
 import TimeLowAdPrompt from '@/components/ads/TimeLowAdPrompt';
@@ -223,6 +224,11 @@ export function PortraitGameLayout({
           </Button>
         )}
       </header>
+
+      {/* Calm-session cue (cosy only; collapses to nothing otherwise). */}
+      <div className="flex justify-center shrink-0 relative z-30 empty:hidden">
+        <CalmSessionBadge />
+      </div>
 
       {/* Combo Display Row - Fixed height container to prevent layout shift */}
       {!isPracticeMode && (

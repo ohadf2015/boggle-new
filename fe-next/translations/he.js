@@ -1,7 +1,8 @@
 // HE translations
 const he = {
   "cosy": {
-    "wellDone": "כל הכבוד"
+    "wellDone": "כל הכבוד",
+    "noRush": "רוגע · בלי לחץ"
   },
   "shiritori": {
     "chain": "שרשרת מילים",

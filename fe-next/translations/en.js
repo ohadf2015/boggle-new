@@ -1,7 +1,8 @@
 // EN translations
 const en = {
   "cosy": {
-    "wellDone": "Well done"
+    "wellDone": "Well done",
+    "noRush": "Calm · no rush"
   },
   "shiritori": {
     "chain": "Word chain",

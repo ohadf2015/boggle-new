@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCosyMode, useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
@@ -35,6 +36,7 @@ import {
   type SinglePlayerAchievement,
 } from '@/utils/singlePlayerAchievements';
 import { getComboBonus as calculateComboBonus, calculateWordScore as canonicalWordScore } from '@/shared/utils/scoring';
+import { shouldPlayCountdownBeep } from '@/lib/cosy/cosyGameplay';
 import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
@@ -67,6 +69,10 @@ export function useSinglePlayerCore({
   settings, targetHighScore, onGameEnd, onQuit,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
+  // Cozy / Calm Mode (single-player only): calmer bot pacing + no urgency cues.
+  // Reward-neutral — neither changes how many words the player can find.
+  const cosyMode = useCosyMode();
+  const suppressTimerUrgency = useSuppressTimerUrgency();
   const {
     playWordAcceptedSound, playWordRejectedSound, playComboSound, playCountdownBeep,
     playEarthquakeRumble, playEarthquakeShake, playFireRoundStart, startFireCrackleLoop,
@@ -133,6 +139,7 @@ export function useSinglePlayerCore({
 
   const { botScores, botWords, resetBots, initializeBotUsedWords } = useBotSimulation({
     mode: settings.mode, bots: settings.bots, isPaused, isGameOver, availableWords,
+    calmPacing: cosyMode,
   });
   const { checkSubmission, resetSpamDetection } = useSpamDetection();
   const wordPace = useWordPace();
@@ -193,12 +200,12 @@ export function useSinglePlayerCore({
 
   const gameActive = !!grid && !isPaused && !isGameOver && timer.remainingTime > 0;
 
-  // Countdown beep in last 10 seconds
+  // Countdown beep in last 10 seconds — silenced under cosy (no panic cue).
   useEffect(() => {
-    if (gameActive && timer.remainingTime <= 10 && timer.remainingTime > 0) {
+    if (shouldPlayCountdownBeep({ gameActive, remainingTime: timer.remainingTime, suppressUrgency: suppressTimerUrgency })) {
       playCountdownBeep(timer.remainingTime);
     }
-  }, [timer.remainingTime, gameActive, playCountdownBeep]);
+  }, [timer.remainingTime, gameActive, playCountdownBeep, suppressTimerUrgency]);
 
   useAutoScrollOnGameStart(gameStatsRef, { gameActive, isLandscape: false });
   useCrazyGamesLifecycle({ isGameActive: gameActive, isGameOver, score, maxCombo: combo.maxCombo });
@@ -228,6 +235,7 @@ export function useSinglePlayerCore({
     phase: 'playing', remainingTime: timer.remainingTime, totalTime: settings.timerSeconds,
     isPaused: isPaused || isGameOver || settings.mode === 'practice',
     enabled: settings.mode !== 'practice', earthquakeState,
+    suppressUrgentMusic: suppressTimerUrgency,
   });
 
   const calculateWordScoreLocal = useCallback((word: string, currentComboLevel: number): number => {

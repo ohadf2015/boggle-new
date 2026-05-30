@@ -13,6 +13,7 @@ import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { cn } from '@/lib/utils';
 import { GameOverlays } from './GameOverlays';
+import { CalmSessionBadge } from '@/components/cosy/CalmSessionBadge';
 import { HintPromptButton } from './HintPromptButton';
 import TimeLowAdPrompt from '@/components/ads/TimeLowAdPrompt';
 import type { LetterGrid, Language } from '@/shared/types/game';
@@ -211,6 +212,8 @@ export function LandscapeGameLayout({
                 size="lg"
               />
             )}
+
+            <CalmSessionBadge />
 
             <div className="flex flex-col items-center">
               <AdaptiveMotion.div

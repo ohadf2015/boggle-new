@@ -19,6 +19,11 @@ interface UseGameMusicOptions {
   enabled?: boolean;
   /** Earthquake state for special music during earthquake phases */
   earthquakeState?: EarthquakeState;
+  /**
+   * Cozy / Calm Mode: hold the in-game bed and never escalate to the urgent
+   * "almost out of time" ramp. Reward-neutral — music doesn't gate word-count.
+   */
+  suppressUrgentMusic?: boolean;
 }
 
 /**
@@ -41,6 +46,7 @@ export function useGameMusic({
   isPaused = false,
   enabled = true,
   earthquakeState = 'idle',
+  suppressUrgentMusic = false,
 }: UseGameMusicOptions) {
   const { fadeToTrack, playTrack, TRACKS } = useMusic();
 
@@ -106,6 +112,8 @@ export function useGameMusic({
   // Handle urgent music after 33% of game time has elapsed
   useEffect(() => {
     if (!enabled || phase !== 'playing' || isPaused) return;
+    // Cozy / Calm Mode: never escalate to the urgent panic track.
+    if (suppressUrgentMusic) return;
     if (remainingTime === null || remainingTime === undefined) return;
 
     // Calculate threshold: 33% elapsed = 67% remaining
@@ -131,6 +139,7 @@ export function useGameMusic({
     totalTime,
     isPaused,
     enabled,
+    suppressUrgentMusic,
     fadeToTrack,
     TRACKS,
   ]);

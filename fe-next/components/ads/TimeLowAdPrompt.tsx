@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Clock, Play, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCosyMode } from '@/contexts/AccessibilityContext';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
@@ -38,6 +39,9 @@ export const TimeLowAdPrompt: React.FC<TimeLowAdPromptProps> = ({
   className,
 }) => {
   const { t } = useLanguage();
+  // Cozy / Calm Mode deliberately removes this loss-aversion nag — it is the
+  // opposite of a calm, no-rush session. Reward-neutral (a prompt, not a grant).
+  const cosyMode = useCosyMode();
   const [used, setUsed] = useState(false);
 
   const { showAd, status, canShowAd } = useRewardedAd({
@@ -50,7 +54,7 @@ export const TimeLowAdPrompt: React.FC<TimeLowAdPromptProps> = ({
   });
 
   const timeLow = timeRemaining > 0 && timeRemaining <= threshold;
-  const visible = timeLow && canShowAd && !used;
+  const visible = timeLow && canShowAd && !used && !cosyMode;
 
   useEffect(() => {
     if (visible) trackRewardedAdOffered('time_low_extend', { timeRemaining, bonusSeconds });

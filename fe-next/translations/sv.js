@@ -1,7 +1,8 @@
 // Sv translations
 const sv = {
   "cosy": {
-    "wellDone": "Bra jobbat"
+    "wellDone": "Bra jobbat",
+    "noRush": "Lugnt · ingen brådska"
   },
   "shiritori": {
     "chain": "Ordkedja",

@@ -1,7 +1,8 @@
 // Ja translations
 const ja = {
   "cosy": {
-    "wellDone": "おみごと"
+    "wellDone": "おみごと",
+    "noRush": "のんびり・焦らずに"
   },
   "shiritori": {
     "chain": "言葉のチェーン",

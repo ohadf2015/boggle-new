@@ -47,6 +47,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
   } }),
 }));
 
+let mockCosy = false;
+vi.mock('@/contexts/AccessibilityContext', () => ({
+  useCosyMode: () => mockCosy,
+}));
+
 import TimeLowAdPrompt from '../TimeLowAdPrompt';
 
 describe('TimeLowAdPrompt', () => {
@@ -54,6 +59,16 @@ describe('TimeLowAdPrompt', () => {
     showAdMock.mockClear();
     trackOfferedMock.mockClear();
     mockReturn = { status: 'idle', canShowAd: true };
+    mockCosy = false;
+  });
+
+  it('does not render under Cozy / Calm Mode — the loss-aversion nag is suppressed', () => {
+    mockCosy = true;
+    const { container } = render(
+      <TimeLowAdPrompt timeRemaining={6} threshold={10} bonusSeconds={30} onExtend={vi.fn()} />,
+    );
+    expect(container.firstChild).toBeNull();
+    expect(trackOfferedMock).not.toHaveBeenCalled();
   });
 
   it('does not render when timeRemaining is above threshold', () => {

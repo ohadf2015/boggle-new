@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { calculateWordScoreByLength as canonicalWordScoreByLength } from '@/shared/utils/scoring';
+import { applyCalmBotPacing } from '@/lib/cosy/cosyGameplay';
 import type { BotOpponent } from '../../../singleplayer/SinglePlayerView';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -23,6 +24,11 @@ interface UseBotSimulationOptions {
   isGameOver: boolean;
   /** Available words from grid solver */
   availableWords: AvailableWords | null;
+  /**
+   * Cozy / Calm Mode: stretch bot think-time so the player is never chased.
+   * Reward-neutral — bot scores never feed the player's progression.
+   */
+  calmPacing?: boolean;
 }
 
 interface UseBotSimulationReturn {
@@ -46,6 +52,7 @@ export function useBotSimulation({
   isPaused,
   isGameOver,
   availableWords,
+  calmPacing = false,
 }: UseBotSimulationOptions): UseBotSimulationReturn {
   // Bot state
   const [botScores, setBotScores] = useState<Record<string, number>>({});
@@ -85,10 +92,11 @@ export function useBotSimulation({
       hard: 1200,   // +0-1.2s random
     };
 
-    const interval = baseIntervals[difficulty] + Math.random() * randomFactors[difficulty];
+    const rawInterval = baseIntervals[difficulty] + Math.random() * randomFactors[difficulty];
+    const interval = applyCalmBotPacing(rawInterval, calmPacing);
     botIntervalsDataRef.current.set(botId, interval);
     return interval;
-  }, []);
+  }, [calmPacing]);
 
   /**
    * Simulate a bot finding a word
