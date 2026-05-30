@@ -5,6 +5,7 @@
 
 import logger from '@/utils/logger';
 import { getStoredUtmData } from './utmCapture';
+import { getSession } from '@/lib/supabase';
 import { getGuestSessionId, getGuestName } from './guestManager';
 import { getPlatform } from '@/utils/platform';
 import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
@@ -310,6 +311,25 @@ export const getAnalyticsIdentity = (): { userId: string; username: string | nul
   analyticsIdentity;
 
 /**
+ * Best-effort bearer header for analytics writes.
+ *
+ * The server (backend/routes/analytics.ts) derives the player identity ONLY from
+ * a verified token — it ignores any client-sent player_id and strips client
+ * userId/username (those are spoofable). So without this header an authed player
+ * is recorded anonymously and renders as "Guest" in the admin game log. Reads the
+ * locally-cached session (no network round-trip); guests get no header.
+ */
+const getAnalyticsAuthHeaders = async (): Promise<Record<string, string>> => {
+  try {
+    const { data } = await getSession();
+    const token = data?.session?.access_token;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+};
+
+/**
  * Persist event to Supabase analytics_events table via API
  * Fire-and-forget — never blocks the UI
  */
@@ -338,22 +358,27 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
     userId: identity?.userId ?? (typeof metadata.userId === 'string' ? metadata.userId : null),
   };
 
-  fetch('/api/analytics/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      event_type: event,
-      session_id: guestSessionId || data.sessionId || null,
-      player_id: identity?.userId ?? null,
-      utm_source: utmData?.utm_source || utmData?.ref || null,
-      utm_medium: utmData?.utm_medium || null,
-      utm_campaign: utmData?.utm_campaign || null,
-      referrer: utmData?.referrer || null,
-      metadata: enrichedMetadata,
-    }),
-  }).catch(() => {
-    // Silently fail — analytics should never break the game
-  });
+  // Attach the verified bearer token (when signed in) so the server can resolve
+  // the real player identity; the body player_id is a hint the server re-verifies.
+  void (async () => {
+    const authHeaders = await getAnalyticsAuthHeaders();
+    fetch('/api/analytics/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders },
+      body: JSON.stringify({
+        event_type: event,
+        session_id: guestSessionId || data.sessionId || null,
+        player_id: identity?.userId ?? null,
+        utm_source: utmData?.utm_source || utmData?.ref || null,
+        utm_medium: utmData?.utm_medium || null,
+        utm_campaign: utmData?.utm_campaign || null,
+        referrer: utmData?.referrer || null,
+        metadata: enrichedMetadata,
+      }),
+    }).catch(() => {
+      // Silently fail — analytics should never break the game
+    });
+  })();
 };
 
 /**
@@ -701,10 +726,12 @@ export const trackAnalyticsEvent = async (
       metadata,
     };
 
-    // Fire and forget - don't block on response
+    // Fire and forget - don't block on response. Attach the verified bearer
+    // token (when signed in) so the server can resolve real player identity.
+    const authHeaders = await getAnalyticsAuthHeaders();
     fetch('/api/analytics/track', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders },
       body: JSON.stringify(payload),
     }).catch((err) => {
       logger.warn('[ANALYTICS] Failed to track event:', err);

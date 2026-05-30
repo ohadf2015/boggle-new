@@ -4,11 +4,43 @@
  */
 
 import express, { Request, Response, Router } from 'express';
- 
-const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
 import logger from '../utils/logger';
 
 const router: Router = express.Router();
+
+/**
+ * Resolve the authenticated user from the request's bearer token, server-side.
+ *
+ * SECURITY: player identity must NEVER be trusted from the request body — this is
+ * a public, unauthenticated telemetry endpoint, so a client-supplied player_id
+ * (or metadata.userId/username) lets anyone forge analytics events attributed to
+ * another account and inject arbitrary "player names" into the admin game log.
+ * We only attribute an event to a real account when its bearer token verifies.
+ *
+ * Returns null for guests (no/invalid token) — they are recorded anonymously.
+ * Mirrors the getAuthUser helper in routes/ugcBoards.ts. Only runs the verify
+ * round-trip when an Authorization header is present, so the anonymous-traffic
+ * hot path stays free of an auth call.
+ */
+async function getAuthUserId(
+  req: Request,
+  supabase: SupabaseClient,
+): Promise<string | null> {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+  const token = authHeader.slice(7);
+  if (!token) return null;
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return null;
+    return user.id;
+  } catch {
+    return null;
+  }
+}
 
 interface GeoData {
   countryCode?: string | null;
@@ -66,10 +98,13 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
     }
 
     const supabase = getSupabase();
+    if (!supabase) {
+      send(200, { success: false, error: 'Analytics service not available' });
+      return;
+    }
     const {
       event_type,
       session_id,
-      player_id,
       guest_name,
       utm_source,
       utm_medium,
@@ -83,12 +118,23 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
       return;
     }
 
+    // SECURITY: derive the player identity server-side from a verified bearer
+    // token — NEVER from the request body. A client-supplied player_id /
+    // metadata.userId / metadata.username is spoofable and would forge admin-log
+    // attribution + inject arbitrary names. Guests verify to null (anonymous).
+    const authedUserId = await getAuthUserId(req, supabase);
+
     // Get country from geolocation if available
     const country_code = req.geoData?.countryCode || req.headers['x-country-code'] as string || null;
 
-    // Include guest_name in metadata for tracking
+    // Strip any client-claimed identity from metadata, then re-stamp the trusted
+    // one. The admin game log resolves the display name from the server-side
+    // profiles join on player_id; it does NOT depend on a client-sent username.
+    const { userId: _spoofedUserId, username: _spoofedUsername, ...safeMetadata } =
+      (metadata ?? {}) as Record<string, unknown>;
     const enrichedMetadata: Record<string, unknown> = {
-      ...metadata,
+      ...safeMetadata,
+      userId: authedUserId,
       guest_name: guest_name || null,
       user_agent: req.headers['user-agent'] || null,
     };
@@ -96,9 +142,9 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
     const insertData: AnalyticsEventInsert = {
       event_type,
       session_id: session_id || null,
-      // Authed user id (client-provided). Lets the admin game log resolve real
-      // player names instead of rendering every authed player as "Guest".
-      player_id: player_id || null,
+      // Authed user id derived from the verified token (null for guests). Lets the
+      // admin game log resolve real player names without trusting the client.
+      player_id: authedUserId,
       country_code,
       utm_source: utm_source || null,
       utm_medium: utm_medium || null,
@@ -139,6 +185,10 @@ router.get('/active-players', async (req: Request, res: Response): Promise<void>
     }
 
     const supabase = getSupabase();
+    if (!supabase) {
+      res.json({ count: 0, error: 'Analytics service not available' });
+      return;
+    }
 
     // Count unique sessions in the last 5 minutes
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();

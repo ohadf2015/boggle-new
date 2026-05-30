@@ -325,4 +325,47 @@ describe('Analytics Metadata Enrichment', () => {
       expect(callBody).toContain('"errorReason":"disconnected"');
     });
   });
+
+  describe('Auth header — server verifies identity, not the body', () => {
+    it('attaches the bearer token when a session exists', async () => {
+      vi.doMock('@/utils/platform', () => ({
+        getPlatform: vi.fn(() => 'web'),
+        isNative: vi.fn(() => false),
+      }));
+      vi.doMock('@/lib/supabase', () => ({
+        getSession: vi.fn(async () => ({ data: { session: { access_token: 'jwt-abc' } } })),
+      }));
+
+      const { trackGameEnd } = await import('../growthTracking');
+      const mockFetch = vi.fn().mockResolvedValue({ ok: true });
+      global.fetch = mockFetch;
+
+      trackGameEnd('singleplayer', 100, 5, true);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const headers = mockFetch.mock.calls[0][1]?.headers as Record<string, string>;
+      expect(headers.Authorization).toBe('Bearer jwt-abc');
+    });
+
+    it('omits the Authorization header for guests (no session)', async () => {
+      vi.doMock('@/utils/platform', () => ({
+        getPlatform: vi.fn(() => 'web'),
+        isNative: vi.fn(() => false),
+      }));
+      vi.doMock('@/lib/supabase', () => ({
+        getSession: vi.fn(async () => ({ data: { session: null } })),
+      }));
+
+      const { trackGameEnd } = await import('../growthTracking');
+      const mockFetch = vi.fn().mockResolvedValue({ ok: true });
+      global.fetch = mockFetch;
+
+      trackGameEnd('singleplayer', 100, 5, true);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const headers = mockFetch.mock.calls[0][1]?.headers as Record<string, string>;
+      expect(headers.Authorization).toBeUndefined();
+      expect(headers['Content-Type']).toBe('application/json');
+    });
+  });
 });
