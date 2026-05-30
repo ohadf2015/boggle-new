@@ -125,4 +125,36 @@ export const HE_ONLINE: ConnectionPuzzle[] = [
   { id: "he-o-109", word1: "כלי", word2: "קלאסית", bridge: "נגינה", difficulty: "medium" }, // כלי נגינה + נגינה קלאסית
   { id: "he-o-110", word1: "מנורת", word2: "גולמי", bridge: "נפט", difficulty: "hard" }, // מנורת נפט + נפט גולמי
   { id: "he-o-111", word1: "מסמר", word2: "מחוסמת", bridge: "פלדה", difficulty: "hard" }, // מסמר פלדה + פלדה מחוסמת
+  // Round 5 — themed council (anatomy/tools/kitchen/sports), 3-reviewer everyday+uniqueness-vetted
+  { id: "he-o-112", word1: "פעימות", word2: "שבור", bridge: "לב", difficulty: "medium" }, // פעימות לב + לב שבור
+  { id: "he-o-113", word1: "חור", word2: "סול", bridge: "מפתח", difficulty: "medium" }, // חור מפתח + מפתח סול
+  { id: "he-o-114", word1: "קצה", word2: "מטוס", bridge: "כנף", difficulty: "medium" }, // קצה כנף + כנף מטוס
+  { id: "he-o-115", word1: "ראש", word2: "חלוד", bridge: "מסמר", difficulty: "medium" }, // ראש מסמר + מסמר חלוד
+  { id: "he-o-116", word1: "מספור", word2: "שדרה", bridge: "עמוד", difficulty: "medium" }, // מספור עמוד + עמוד שדרה
+  { id: "he-o-117", word1: "אבזם", word2: "שחורה", bridge: "חגורה", difficulty: "hard" }, // אבזם חגורה + חגורה שחורה
+  { id: "he-o-118", word1: "סידור", word2: "ספרים", bridge: "מדף", difficulty: "easy" }, // סידור מדף + מדף ספרים
+  { id: "he-o-119", word1: "הזמנת", word2: "ארוך", bridge: "תור", difficulty: "medium" }, // הזמנת תור + תור ארוך
+  { id: "he-o-120", word1: "אהיל", word2: "לילה", bridge: "מנורה", difficulty: "easy" }, // אהיל מנורה + מנורה לילה
+  { id: "he-o-121", word1: "ידית", word2: "שיער", bridge: "מברשת", difficulty: "easy" }, // ידית מברשת + מברשת שיער
+  { id: "he-o-122", word1: "ייבוש", word2: "פנים", bridge: "מגבת", difficulty: "easy" }, // ייבוש מגבת + מגבת פנים
+  { id: "he-o-123", word1: "תחתית", word2: "חרס", bridge: "עציץ", difficulty: "medium" }, // תחתית עציץ + עציץ חרס
+  { id: "he-o-124", word1: "פתיחת", word2: "אוכל", bridge: "שקית", difficulty: "easy" }, // פתיחת שקית + שקית אוכל
+  { id: "he-o-125", word1: "קופסת", word2: "עץ", bridge: "גפרור", difficulty: "medium" }, // קופסת גפרור + גפרור עץ
+  { id: "he-o-126", word1: "מילוי", word2: "מים", bridge: "דלי", difficulty: "easy" }, // מילוי דלי + דלי מים
+  { id: "he-o-127", word1: "שעון", word2: "תומך", bridge: "קיר", difficulty: "easy" }, // שעון קיר + קיר תומך
+  { id: "he-o-128", word1: "מגן", word2: "מחשב", bridge: "מסך", difficulty: "medium" }, // מגן מסך + מסך מחשב
+  { id: "he-o-129", word1: "קצה", word2: "הליכה", bridge: "מקל", difficulty: "medium" }, // קצה מקל + מקל הליכה
+  { id: "he-o-130", word1: "נשיאת", word2: "גב", bridge: "תיק", difficulty: "easy" }, // נשיאת תיק + תיק גב
+  { id: "he-o-131", word1: "מריחת", word2: "מגע", bridge: "דבק", difficulty: "medium" }, // מריחת דבק + דבק מגע
+  { id: "he-o-132", word1: "השתקפות", word2: "צד", bridge: "מראה", difficulty: "easy" }, // השתקפות מראה + מראה צד
+  { id: "he-o-133", word1: "זוג", word2: "ציפורניים", bridge: "מספריים", difficulty: "medium" }, // זוג מספריים + מספריים ציפורניים
+  { id: "he-o-134", word1: "כתיבת", word2: "נובע", bridge: "עט", difficulty: "easy" }, // כתיבת עט + עט נובע
+  { id: "he-o-135", word1: "רגל", word2: "גלגלים", bridge: "כיסא", difficulty: "easy" }, // רגל כיסא + כיסא גלגלים
+  { id: "he-o-136", word1: "פתיחת", word2: "בגדים", bridge: "ארון", difficulty: "easy" }, // פתיחת ארון + ארון בגדים
+  { id: "he-o-137", word1: "ראש", word2: "ממולא", bridge: "כרוב", difficulty: "medium" }, // ראש כרוב + כרוב ממולא
+  { id: "he-o-138", word1: "קישוא", word2: "אורז", bridge: "ממולא", difficulty: "medium" }, // קישוא ממולא + ממולא אורז
+  { id: "he-o-139", word1: "עגבנייה", word2: "אורז", bridge: "ממולאת", difficulty: "medium" }, // עגבנייה ממולאת + ממולאת אורז
+  { id: "he-o-140", word1: "מכנסי", word2: "קיץ", bridge: "קצר", difficulty: "medium" }, // מכנסי קצר + קצר קיץ
+  { id: "he-o-141", word1: "חצאית", word2: "קיץ", bridge: "קצרה", difficulty: "medium" }, // חצאית קצרה + קצרה קיץ
+  { id: "he-o-142", word1: "גרב", word2: "ארוך", bridge: "ברך", difficulty: "medium" }, // גרב ברך + ברך ארוך
 ];
