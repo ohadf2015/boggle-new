@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import NativePageEnhancements from "@/components/landing/NativePageEnhancements";
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 
 interface PageProps {
@@ -133,6 +134,7 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
       />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <TopBackLink className="mb-4" />
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
           Multiplayer Ordspel Online - Spela Boggle & Scrabble på Svenska
         </h1>

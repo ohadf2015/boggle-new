@@ -3,6 +3,7 @@ import Link from 'next/link';
 import NativePageEnhancements from '@/components/landing/NativePageEnhancements';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { HeroAnimated } from './components/HeroAnimated';
 import { FeatureGrid } from './components/FeatureGrid';
 import { StepsSection } from './components/StepsSection';
@@ -147,6 +148,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
       <PageScrollFx />
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <TopBackLink className="mb-4" />
         <HeroAnimated locale={locale} />
         <FeatureGrid />
         <StepsSection />

@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { HowToPlayCard } from '@/components/common/HowToPlayCard';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { applyHebrewFinalLetters, HEBREW_FINAL_TO_REGULAR } from '@/shared/utils/wordNormalization';
 import AlchemyKeyboard from '@/components/wordAlchemy/AlchemyKeyboard';
 import { getKeyboardLetters, appendLetter, backspace } from '@/lib/wordAlchemy/keyboard';
@@ -321,6 +322,7 @@ export default function WordAlchemyPage() {
 
   return (
     <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-8 sm:py-12">
+      <TopBackLink className="mb-4" />
       <HowToPlayCard
         storageKey="word-alchemy"
         title={t('wordAlchemy.howTo.title')}

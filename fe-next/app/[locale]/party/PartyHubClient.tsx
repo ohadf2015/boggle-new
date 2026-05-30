@@ -10,6 +10,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { PARTY_GAMES, type PartyGameId } from '@/shared/types/partyGame';
 
 const GAME_LIST = Object.values(PARTY_GAMES);
@@ -83,6 +84,7 @@ export default function PartyHubClient() {
   return (
     <div className="min-h-screen bg-neo-navy p-4 sm:p-8">
       <div className="max-w-4xl mx-auto">
+        <TopBackLink className="mb-4" />
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="font-neo-display text-4xl sm:text-5xl text-neo-white uppercase tracking-tight">

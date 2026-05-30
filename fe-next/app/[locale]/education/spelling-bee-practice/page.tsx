@@ -5,6 +5,7 @@ import { getSpellingBeeContent, type EducationLocale } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -164,6 +165,8 @@ export default async function Page({ params }: PageProps) {
       <Script id="ld-sb-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <TopBackLink className="mb-4" />
+
         {/* Hero banner with per-locale image */}
         <EducationHeroBanner
           title="Spelling Bee Practice Online. Free."

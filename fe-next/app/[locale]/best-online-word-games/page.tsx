@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -323,6 +324,7 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <TopBackLink className="mb-4" />
         <span className="mb-4 inline-block rotate-[-2deg] rounded-neo border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-white shadow-hard">★ The 2026 Word Game Index ★</span>
         <h1 className="mb-3 font-neo-display text-4xl font-black leading-tight sm:text-5xl">
           We played every major word game<br /><span className="bg-neo-lime px-3 text-neo-navy shadow-hard inline-block rotate-[-1deg]">so you don&apos;t have to.</span>

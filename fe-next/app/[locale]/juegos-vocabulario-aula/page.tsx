@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -129,6 +130,7 @@ export default async function Page({ params }: PageProps) {
       <Script id="ld-es-jva-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <TopBackLink className="mb-4" />
 
         <section className="grid items-center gap-10 lg:grid-cols-12">
           <div className="lg:col-span-8">

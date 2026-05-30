@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { calculateWordScore, getComboBonus } from '@/shared/utils/scoring';
 import { InlineBannerAd } from '@/components/ads';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -166,6 +167,8 @@ export default async function WordExplorerPage({ params }: PageParams) {
 
       <div className="min-h-screen bg-neo-navy text-neo-white">
         <div className="max-w-2xl mx-auto px-4 py-8">
+          <TopBackLink className="mb-4" />
+
           {/* Navigation */}
           <div className="mb-6">
             <Link href={`/${locale}/tools/word-solver`} className="text-neo-cyan text-sm hover:underline">

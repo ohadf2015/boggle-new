@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DuelLobby, DuelHistory, DuelNotification } from '@/components/education/duels';
 import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getStudentClassroom, getLessons, getClassroomStudents, type Classroom, type VocabularyLesson, type ClassroomStudent } from '@/lib/supabase/education';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -74,6 +75,7 @@ function DuelsPageClientInner() {
 
   return (
     <div className="min-h-dvh bg-neo-navy p-4 sm:p-6">
+      <TopBackLink className="mb-4" />
       <DuelNotification classroomId={classroom.id} />
 
       <div className="flex gap-1 mb-6 border-b-2 border-neo-white/10" role="tablist">

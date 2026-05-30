@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import GameplayPanel, { type Mode } from '@/components/showcase3d/GameplayPanel';
 import Split3DHeading from '@/components/showcase3d/Split3DHeading';
 import FloatingCTA from '@/components/showcase3d/FloatingCTA';
@@ -212,6 +213,8 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       <div aria-hidden className="fixed inset-x-0 top-0 z-50 h-1 bg-neo-navy-light">
         <div ref={barRef} className="h-full origin-left bg-neo-lime" style={{ transform: 'scaleX(0)' }} />
       </div>
+
+      <TopBackLink className="mb-4" />
 
       {/* ── PINNED MULTI-CHAPTER SCROLL-SCRUB HERO ───────────── */}
       <section ref={section} className="relative">

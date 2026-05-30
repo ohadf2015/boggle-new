@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -107,6 +108,8 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
       <Script id="ld-videogame-competitive" type="application/ld+json">{videoGameJsonLd}</Script>
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <TopBackLink className="mb-4" />
+
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
           The Best Competitive Word Games with Global Leaderboards
         </h1>

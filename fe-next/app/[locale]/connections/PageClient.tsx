@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import ConnectionsGame from '@/components/connections/ConnectionsGame';
 import ConnectionsHero from '@/components/connections/landing/ConnectionsHero';
 import ConnectionsSampleStrip from '@/components/connections/landing/ConnectionsSampleStrip';
@@ -60,6 +61,7 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+      <TopBackLink className="mb-4" />
       <ConnectionsHero locale={locale} copy={copy} />
       <ConnectionsSampleStrip locale={locale} copy={copy.samples} />
       <ConnectionsWhyPlay copy={copy.why} />

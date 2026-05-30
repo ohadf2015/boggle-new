@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,6 +96,7 @@ export default async function LexiClashVsScrabblePage({ params }: PageProps) {
       />
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <TopBackLink className="mb-4" />
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
           LexiClash vs Scrabble GO — No Interruptions, No Bots, Real Competition
         </h1>

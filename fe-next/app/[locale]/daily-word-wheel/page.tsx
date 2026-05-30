@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { AnimatedLanding } from './AnimatedLanding';
 
 export const dynamic = 'force-dynamic';
@@ -186,10 +187,11 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-neo-navy text-neo-white">
+      <TopBackLink className="mb-4" />
       {/* Static JSON-LD — all content from translation constants, no user input, safe */}
       <script
         type="application/ld+json"
-         
+
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataPayload) }}
       />
 

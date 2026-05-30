@@ -14,6 +14,7 @@ import { usePartySocket } from '@/hooks/usePartySocket';
 import { PARTY_GAMES, type PartyGameId, type PartyInput } from '@/shared/types/partyGame';
 import dynamic from 'next/dynamic';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 const CaptionClashPhone = dynamic(() => import('@/components/party/caption-clash/CaptionClashPhone'), { ssr: false, loading: () => <GameLoadingFallback /> });
 const PixelClashPhone = dynamic(() => import('@/components/party/pixel-clash/PixelClashPhone'), { ssr: false, loading: () => <GameLoadingFallback /> });
@@ -86,6 +87,7 @@ export default function JoinRedirectClient() {
   if (!roomCode && !room) {
     return (
       <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
+        <TopBackLink className="mb-4" />
         <h1 className="font-neo-display text-neo-white text-2xl uppercase mb-4">
           {t('party.joinRoom')}
         </h1>

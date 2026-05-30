@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { EducationHero } from '@/components/education/EducationHero';
 import { MoatTrifectaSection } from '@/components/education/MoatTrifectaSection';
 import { SixModeTour } from '@/components/education/SixModeTour';
@@ -74,6 +75,8 @@ export function PageClient() {
 
   return (
     <main className="min-h-screen bg-neo-navy">
+      <TopBackLink className="mb-4" />
+
       {/* Teacher view: cascading shortcut bars + relevant redesign content */}
       {hasTeacherAccess && (
         <>

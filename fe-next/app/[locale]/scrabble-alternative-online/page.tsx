@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -145,6 +146,7 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
       <Script id="ld-breadcrumb" type="application/ld+json">{breadcrumbJsonLd}</Script>
 
       <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <TopBackLink className="mb-4" />
         <section className="mb-12">
           <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
             ★ Free · Real-Time · 2-20 Players ★

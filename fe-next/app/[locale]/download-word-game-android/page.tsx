@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
 import PlayStoreCTA from '@/components/PlayStoreCTA';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { PLAY_STORE_URL } from '@/utils/androidApp';
 import { getDownloadLandingCopy } from './content';
 
@@ -149,6 +150,8 @@ export default async function DownloadWordGameAndroidPage({ params }: PageProps)
       </div>
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <TopBackLink className="mb-4" />
+
         {/* HERO */}
         <span className="mb-4 inline-block rotate-[-2deg] rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">{copy.badge}</span>
         <h1 className="mb-6 font-neo-display text-4xl font-black leading-tight sm:text-5xl">

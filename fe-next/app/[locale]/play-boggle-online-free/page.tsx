@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -198,6 +199,7 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
       </div>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+        <TopBackLink className="mb-4" />
 
         {/* HERO */}
         <section className="relative grid items-center gap-10 lg:grid-cols-12">

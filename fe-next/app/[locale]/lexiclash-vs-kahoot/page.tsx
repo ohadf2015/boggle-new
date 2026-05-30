@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 
 export const revalidate = 86400;
 
@@ -100,6 +101,7 @@ export default async function Page({ params }: PageProps) {
       <Script id="ld-vs-kahoot-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
 
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <TopBackLink className="mb-4" />
         <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
           Kahoot is fun. For vocabulary, LexiClash is faster, freer, and word-game native.
         </h1>

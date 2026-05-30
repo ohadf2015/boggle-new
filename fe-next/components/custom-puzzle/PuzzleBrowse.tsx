@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { TopBackLink } from '@/components/navigation/TopBackLink';
 import CustomPuzzleCreator from './CustomPuzzleCreator';
 
 interface BrowsePuzzle {
@@ -80,6 +81,7 @@ const PuzzleBrowse: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-neo-navy p-4 sm:p-6">
+      <TopBackLink className="mb-4" />
       {/* Header */}
       <div className="max-w-4xl mx-auto w-full mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
