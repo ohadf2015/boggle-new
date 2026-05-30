@@ -92,4 +92,37 @@ export const HE_ONLINE: ConnectionPuzzle[] = [
   { id: "he-o-077", word1: "חלון", word2: "פתוח", bridge: "מטבח", difficulty: "easy" }, // חלון מטבח + מטבח פתוח
   { id: "he-o-078", word1: "שער", word2: "חירום", bridge: "יציאה", difficulty: "medium" }, // שער יציאה + יציאה חירום
   { id: "he-o-079", word1: "דיסק", word2: "חיצוני", bridge: "קשיח", difficulty: "medium" }, // דיסק קשיח + קשיח חיצוני
+  // Round 4 — claude-council (gemini+grok) + authored, 3-reviewer uniqueness-vetted
+  { id: "he-o-080", word1: "נורת", word2: "מוקדמת", bridge: "אזהרה", difficulty: "medium" }, // נורת אזהרה + אזהרה מוקדמת
+  { id: "he-o-081", word1: "עונת", word2: "חצייה", bridge: "מעבר", difficulty: "medium" }, // עונת מעבר + מעבר חצייה
+  { id: "he-o-082", word1: "קרם", word2: "עצמית", bridge: "הגנה", difficulty: "medium" }, // קרם הגנה + הגנה עצמית
+  { id: "he-o-083", word1: "כתב", word2: "פלילי", bridge: "אישום", difficulty: "medium" }, // כתב אישום + אישום פלילי
+  { id: "he-o-084", word1: "חמצן", word2: "כפיים", bridge: "נקי", difficulty: "medium" }, // חמצן נקי + נקי כפיים
+  { id: "he-o-085", word1: "חתימת", word2: "שכירות", bridge: "חוזה", difficulty: "medium" }, // חתימת חוזה + חוזה שכירות
+  { id: "he-o-086", word1: "תמרור", word2: "פתאומית", bridge: "עצירה", difficulty: "medium" }, // תמרור עצירה + עצירה פתאומית
+  { id: "he-o-087", word1: "לוח", word2: "מסחריות", bridge: "מודעות", difficulty: "medium" }, // לוח מודעות + מודעות מסחריות
+  { id: "he-o-088", word1: "מחנה", word2: "מפרכים", bridge: "אימונים", difficulty: "medium" }, // מחנה אימונים + אימונים מפרכים
+  { id: "he-o-089", word1: "נסיעת", word2: "פתע", bridge: "מבחן", difficulty: "medium" }, // נסיעת מבחן + מבחן פתע
+  { id: "he-o-090", word1: "רשימת", word2: "ישיר", bridge: "שידור", difficulty: "medium" }, // רשימת שידור + שידור ישיר
+  { id: "he-o-091", word1: "שק", word2: "תאילנדי", bridge: "איגרוף", difficulty: "medium" }, // שק איגרוף + איגרוף תאילנדי
+  { id: "he-o-092", word1: "צינור", word2: "עמוקה", bridge: "נשימה", difficulty: "medium" }, // צינור נשימה + נשימה עמוקה
+  { id: "he-o-093", word1: "פינת", word2: "ממושכת", bridge: "ישיבה", difficulty: "medium" }, // פינת ישיבה + ישיבה ממושכת
+  { id: "he-o-094", word1: "סימן", word2: "נרגשת", bridge: "קריאה", difficulty: "medium" }, // סימן קריאה + קריאה נרגשת
+  { id: "he-o-095", word1: "פקק", word2: "טבעי", bridge: "שעם", difficulty: "medium" }, // פקק שעם + שעם טבעי
+  { id: "he-o-096", word1: "מדד", word2: "גבוהים", bridge: "מחירים", difficulty: "medium" }, // מדד מחירים + מחירים גבוהים
+  { id: "he-o-097", word1: "עמוד", word2: "מוסרית", bridge: "שדרה", difficulty: "medium" }, // עמוד שדרה + שדרה מוסרית
+  { id: "he-o-098", word1: "מגדל", word2: "נפש", bridge: "פיקוח", difficulty: "medium" }, // מגדל פיקוח + פיקוח נפש
+  { id: "he-o-099", word1: "נמל", word2: "אזרחית", bridge: "תעופה", difficulty: "medium" }, // נמל תעופה + תעופה אזרחית
+  { id: "he-o-100", word1: "בית", word2: "עליון", bridge: "משפט", difficulty: "medium" }, // בית משפט + משפט עליון
+  { id: "he-o-101", word1: "תחנת", word2: "אש", bridge: "כיבוי", difficulty: "medium" }, // תחנת כיבוי + כיבוי אש
+  { id: "he-o-102", word1: "מכון", word2: "מדעי", bridge: "מחקר", difficulty: "medium" }, // מכון מחקר + מחקר מדעי
+  { id: "he-o-103", word1: "לשכת", word2: "ממשלתית", bridge: "תעסוקה", difficulty: "medium" }, // לשכת תעסוקה + תעסוקה ממשלתית
+  { id: "he-o-104", word1: "עמותת", word2: "האדם", bridge: "זכויות", difficulty: "medium" }, // עמותת זכויות + זכויות האדם
+  { id: "he-o-105", word1: "בריכת", word2: "טריים", bridge: "דגים", difficulty: "easy" }, // בריכת דגים + דגים טריים
+  { id: "he-o-106", word1: "חוג", word2: "בטן", bridge: "ריקוד", difficulty: "medium" }, // חוג ריקוד + ריקוד בטן
+  { id: "he-o-107", word1: "בועת", word2: "נוזלי", bridge: "סבון", difficulty: "easy" }, // בועת סבון + סבון נוזלי
+  { id: "he-o-108", word1: "מד", word2: "שיא", bridge: "מהירות", difficulty: "medium" }, // מד מהירות + מהירות שיא
+  { id: "he-o-109", word1: "כלי", word2: "קלאסית", bridge: "נגינה", difficulty: "medium" }, // כלי נגינה + נגינה קלאסית
+  { id: "he-o-110", word1: "מנורת", word2: "גולמי", bridge: "נפט", difficulty: "hard" }, // מנורת נפט + נפט גולמי
+  { id: "he-o-111", word1: "מסמר", word2: "מחוסמת", bridge: "פלדה", difficulty: "hard" }, // מסמר פלדה + פלדה מחוסמת
 ];
