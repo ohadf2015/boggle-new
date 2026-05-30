@@ -61,3 +61,21 @@ on Reddit being down — it just degrades to WebSearch.
 - No creds, or a failed exchange → it falls back to the legacy UA curl against
   `www.reddit.com` (currently 403, but graceful).
 - Rate limit on OAuth: 100 requests/minute — far above lane 04's handful of calls.
+
+## Interactive alternative — browser scrape (works today, no API)
+
+Reddit's Data API now requires manual approval (a "valid moderation use case"), so the OAuth
+path above may be unobtainable. The path that works **right now** is reading old.reddit through
+your real logged-in browser via Playwriter — Reddit blocks the API/crawlers/datacenter IPs, but
+an authenticated browser session is normal browsing.
+
+```bash
+# needs Chrome open + Playwriter extension enabled on a tab + logged-in reddit.
+# Reuse an active Playwriter session by exporting its id; standalone it opens its own.
+PLAYWRITER_SESSION=<id> scripts/nightly/lib/reddit-browser-fetch.sh feed wordgames top week 10
+PLAYWRITER_SESSION=<id> scripts/nightly/lib/reddit-browser-fetch.sh search "wordle alternative" relevance month 10
+```
+
+Emits the same compact JSON array as `reddit-fetch.sh`. **Interactive only** — it needs a live
+browser session, so it is NOT available in the unattended 02:00 run (the nightly keeps WebSearch
+for non-Reddit competitor research). Use it on-demand for Reddit intel.
