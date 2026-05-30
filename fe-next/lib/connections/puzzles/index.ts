@@ -6,10 +6,11 @@ import { HE_EASY } from './he-easy';
 import { HE_MEDIUM } from './he-medium';
 import { HE_HARD } from './he-hard';
 import { HE_GENERATED } from './generated/he-hard.generated';
+import { HE_ONLINE } from './he-online';
 
 const PUZZLES_BY_LOCALE: Record<PuzzleLocale, ConnectionPuzzle[]> = {
   en: [...EN_EASY, ...EN_MEDIUM, ...EN_HARD],
-  he: [...HE_EASY, ...HE_MEDIUM, ...HE_HARD, ...HE_GENERATED],
+  he: [...HE_EASY, ...HE_MEDIUM, ...HE_HARD, ...HE_GENERATED, ...HE_ONLINE],
 };
 
 /**
