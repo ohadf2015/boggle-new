@@ -87,6 +87,7 @@
     "@9am/fire-flame-react": "^0.3.2",
     "@arvidbt/swedish-words": "^1.0.6",
     "@capacitor-community/admob": "^8.0.0",
+    "@capacitor-community/in-app-review": "^8.0.0",
     "@capacitor-community/sqlite": "^8.1.0",
     "@capacitor-firebase/crashlytics": "^8.2.0",
     "@capacitor/android": "^8.0.1",

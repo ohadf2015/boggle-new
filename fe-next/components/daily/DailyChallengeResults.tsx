@@ -38,6 +38,7 @@ import {
   generateDailyShareImage,
   downloadDailyShareImage,
 } from '@/utils/dailyShareImage';
+import { maybeRequestReview, trackPositiveMoment } from '@/lib/reviews/requestReview';
 
 interface DailyChallengeResultsProps {
   result: DailyChallengeResult;
@@ -77,6 +78,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const { submitLeaderboardScore } = useCrazyGames();
 
   const hasMarkedQuestRef = useRef(false);
+  const hasRequestedReviewRef = useRef(false);
   useEffect(() => {
     showInterstitial('daily-complete');
     if (result.score > 0) {
@@ -85,6 +87,13 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     if (!hasMarkedQuestRef.current) {
       markModePlayedLogic('daily');
       hasMarkedQuestRef.current = true;
+    }
+    // Track positive moment + maybe request review — only on a real result (score > 0),
+    // so abandoned/zero attempts don't count toward the review-prompt engagement gate.
+    if (result.score > 0 && !hasRequestedReviewRef.current) {
+      trackPositiveMoment();
+      maybeRequestReview('dailyStreak');
+      hasRequestedReviewRef.current = true;
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
