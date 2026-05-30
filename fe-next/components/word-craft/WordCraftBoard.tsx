@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import type { Board } from '@/lib/word-craft/board';
 import type { PlacedTile, PremiumKind } from '@/lib/word-craft/types';
 import { hebrewDisplayLetter } from '@/lib/word-craft/hebrewDisplay';
+import { JOKER_GLYPH, isUnassignedBlank } from '@/lib/word-craft/blankAssign';
 import { scoreDotTier, TIER_COLOR_CLASS } from '@/lib/word-craft/scoreDotTier';
 import { cn } from '@/lib/utils';
 
@@ -198,9 +199,18 @@ function WordCraftBoardImpl({
             >
               {placedTile ? (
                 <>
+                  {placedTile.isBlank && (
+                    <span
+                      data-joker-badge
+                      aria-hidden
+                      className="absolute top-[6%] start-[6%] text-neo-purple text-[clamp(6px,2.4cqi,11px)] leading-none"
+                    >
+                      {JOKER_GLYPH}
+                    </span>
+                  )}
                   <span className={cn('wc-tile-glyph font-bold', 'text-[clamp(14px,5cqi,32px)]')}>
-                    {placedTile.letter === '_'
-                      ? '·'
+                    {isUnassignedBlank(placedTile)
+                      ? JOKER_GLYPH
                       : hebrewDisplayLetter({
                           board,
                           pending: pendingPlacements,
@@ -220,9 +230,18 @@ function WordCraftBoardImpl({
                   />
                 </>
               ) : pending ? (
-                <span className={cn('wc-tile-glyph', tileFontClass)}>
-                  {pending.letter === '_'
-                    ? '·'
+                <span className={cn('wc-tile-glyph relative', tileFontClass)}>
+                  {pending.isBlank && (
+                    <span
+                      data-joker-badge
+                      aria-hidden
+                      className="absolute -top-1 -start-1 text-neo-purple text-[0.5em] leading-none"
+                    >
+                      {JOKER_GLYPH}
+                    </span>
+                  )}
+                  {isUnassignedBlank(pending)
+                    ? JOKER_GLYPH
                     : hebrewDisplayLetter({
                         board,
                         pending: pendingPlacements,

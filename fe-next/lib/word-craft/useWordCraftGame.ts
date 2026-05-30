@@ -8,6 +8,7 @@ import { findBestBotMove } from './botMove';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims } from './boardDimensions';
 import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
+import { assignBlankLetter, hasUnassignedBlank } from './blankAssign';
 import type { PlacedTile, PlayerState, RackTile } from './types';
 
 export type Turn = 'player' | 'bot' | 'over';
@@ -61,6 +62,7 @@ type Action =
   | { type: 'SELECT_RACK_TILE'; id: string | null }
   | { type: 'PLACE_PENDING'; placement: PlacedTile }
   | { type: 'RECALL_PENDING'; rackTileId: string }
+  | { type: 'ASSIGN_BLANK'; rackTileId: string; letter: string }
   | { type: 'CLEAR_PENDING' }
   | { type: 'COMMIT_PLAYER'; placements: PlacedTile[]; score: number; words: string[]; wordCells?: Coord[][] }
   | { type: 'COMMIT_BOT'; placements: PlacedTile[]; score: number; words: string[]; wordCells?: Coord[][] }
@@ -207,6 +209,14 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
         pendingPlacements: state.pendingPlacements.filter(
           (p) => p.rackTileId !== action.rackTileId,
         ),
+      };
+    case 'ASSIGN_BLANK':
+      return {
+        ...state,
+        pendingPlacements: state.pendingPlacements.map((p) =>
+          p.rackTileId === action.rackTileId ? assignBlankLetter(p, action.letter) : p,
+        ),
+        lastError: null,
       };
     case 'CLEAR_PENDING':
       return { ...state, pendingPlacements: [], selectedRackTileId: null };
@@ -434,10 +444,21 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
 
   const recallAll = useCallback(() => dispatch({ type: 'CLEAR_PENDING' }), []);
 
+  const assignBlank = useCallback(
+    (rackTileId: string, letter: string) => dispatch({ type: 'ASSIGN_BLANK', rackTileId, letter }),
+    [],
+  );
+
   const submitMove = useCallback(() => {
     if (hotseat ? state.turn === 'over' : state.turn !== 'player') return;
     if (!dict) {
       dispatch({ type: 'SET_ERROR', message: 'DICT_LOADING' });
+      return;
+    }
+    // A joker (blank) must carry a chosen letter before it can play, otherwise
+    // the validator would build the word with a literal '_' and always reject.
+    if (hasUnassignedBlank(state.pendingPlacements)) {
+      dispatch({ type: 'SET_ERROR', message: 'BLANK_UNASSIGNED' });
       return;
     }
     const result = validateAndScoreMove(state.board, state.pendingPlacements, isWordValid);
@@ -533,6 +554,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     placeTileOnBoard,
     recallTile,
     recallAll,
+    assignBlank,
     submitMove,
     pass,
     burnoutSkip,

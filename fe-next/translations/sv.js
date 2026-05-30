@@ -12285,7 +12285,8 @@ const sv = {
       "disconnected": "Ordet måste ansluta till en befintlig bricka.",
       "outOfBounds": "Brickan placerad utanför brädet.",
       "noTiles": "Lägg minst en bricka för att spela.",
-      "bagTooSmallToSwap": "Inte tillräckligt med brickor i påsen för att byta."
+      "bagTooSmallToSwap": "Inte tillräckligt med brickor i påsen för att byta.",
+      "blankUnassigned": "Välj en bokstav för din joker först."
     },
     "modeTitle": "WordCraft",
     "modeDesc": "Strategisk ordstrid — bygg poäng, aktivera Överdrift och slå boten!",
@@ -12343,7 +12344,13 @@ const sv = {
     "axis": {
       "horizontal": "Vågrätt",
       "vertical": "Lodrätt",
-      "flipAria": "byt ordriktning"
+      "flipAria": "byt ordriktning",
+      "hint": "Tryck för att välja riktning"
+    },
+    "joker": {
+      "pickTitle": "Välj en bokstav",
+      "pickHint": "Din joker blir denna bokstav (0 poäng).",
+      "cancel": "Avbryt"
     },
     "zoomLabel": "Nyp för att zooma in på brädet",
     "zoomReset": "Återställ zoom",

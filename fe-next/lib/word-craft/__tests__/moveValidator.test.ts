@@ -299,3 +299,48 @@ describe('validateAndScoreMove — scoring', () => {
     expect(r.score).toBe(66);
   });
 });
+
+describe('validateAndScoreMove — assigned joker (blank) through-line', () => {
+  const blank = (row: number, col: number, letter: string): PlacedTile => ({
+    row,
+    col,
+    letter,
+    value: 0,
+    isBlank: true,
+    rackTileId: `blank-${row}-${col}`,
+  });
+
+  it('a blank carrying an assigned letter forms and validates the word', () => {
+    const board = createBoard();
+    // C A T across the center, where A is a joker assigned the letter 'A'.
+    const r = validateAndScoreMove(
+      board,
+      [place(7, 7, 'C'), blank(7, 8, 'A'), place(7, 9, 'T')],
+      isValid,
+    );
+    expect(r.ok).toBe(true);
+    expect(r.words?.[0].word).toBe('CAT');
+  });
+
+  it('scores the joker tile as 0 even though its letter counts in the word', () => {
+    const board = createBoard();
+    const r = validateAndScoreMove(
+      board,
+      [place(7, 7, 'C'), blank(7, 8, 'A'), place(7, 9, 'T')],
+      isValid,
+    );
+    const tiles = r.words?.[0].tiles ?? [];
+    const aTile = tiles.find((t) => t.letter === 'A');
+    expect(aTile?.value).toBe(0);
+  });
+
+  it('an unassigned blank ("_") cannot form a real word', () => {
+    const board = createBoard();
+    const r = validateAndScoreMove(
+      board,
+      [place(7, 7, 'C'), blank(7, 8, '_'), place(7, 9, 'T')],
+      isValid,
+    );
+    expect(r.ok).toBe(false);
+  });
+});

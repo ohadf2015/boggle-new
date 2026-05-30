@@ -2,8 +2,10 @@
 
 import { memo } from 'react';
 import { Hourglass } from 'lucide-react';
+import Avatar from '@/components/Avatar';
 import type { PlayerState } from '@/lib/word-craft/types';
 import type { Turn } from '@/lib/word-craft/useWordCraftGame';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
 
 export interface WordCraftScoreboardProps {
@@ -11,6 +13,11 @@ export interface WordCraftScoreboardProps {
   bot: PlayerState;
   turn: Turn;
   tilesRemaining: number;
+  /** Avatar + seed for each side — the opponent always has a face, never a bare "WordBot". */
+  playerAvatar?: CustomAvatarConfig | null;
+  playerSeed?: string;
+  opponentAvatar?: CustomAvatarConfig | null;
+  opponentSeed?: string;
   labels: {
     you: string;
     bot: string;
@@ -35,7 +42,17 @@ export interface WordCraftScoreboardProps {
  * No card grid, no border-left stripes, no gradient text. Reads in any locale
  * (numbers + bag count are tabular).
  */
-function WordCraftScoreboardImpl({ player, bot, turn, tilesRemaining, labels }: WordCraftScoreboardProps) {
+function WordCraftScoreboardImpl({
+  player,
+  bot,
+  turn,
+  tilesRemaining,
+  playerAvatar,
+  playerSeed,
+  opponentAvatar,
+  opponentSeed,
+  labels,
+}: WordCraftScoreboardProps) {
   const total = player.score + bot.score;
   // Smoothed split: dampen at low totals so opening moves don't whip the bar.
   const rawPct = total === 0 ? 50 : (player.score / total) * 100;
@@ -52,17 +69,24 @@ function WordCraftScoreboardImpl({ player, bot, turn, tilesRemaining, labels }: 
         : 'text-neo-pink';
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       {/* Score numbers + names */}
-      <div className="flex items-end justify-between gap-3 px-1">
-        <div className="flex items-baseline gap-2">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar
+            customAvatar={playerAvatar ?? null}
+            userId={playerSeed || labels.you}
+            size="sm"
+            mode="singleplayer"
+            disableEffects
+          />
           <span
             data-score-value="player"
-            className="font-neo-display font-black text-4xl sm:text-5xl text-neo-lime leading-none tabular-nums origin-bottom-left inline-block"
+            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-lime leading-none tabular-nums origin-bottom-left inline-block"
           >
             {player.score}
           </span>
-          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white">
+          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white truncate">
             {labels.you}
           </span>
         </div>
@@ -70,14 +94,21 @@ function WordCraftScoreboardImpl({ player, bot, turn, tilesRemaining, labels }: 
           {/* No "VS" word — let the bar do the work */}
           —
         </div>
-        <div className="flex items-baseline gap-2 flex-row-reverse">
+        <div className="flex items-center gap-2 flex-row-reverse min-w-0">
+          <Avatar
+            customAvatar={opponentAvatar ?? null}
+            userId={opponentSeed || labels.bot}
+            size="sm"
+            mode="multiplayer"
+            disableEffects
+          />
           <span
             data-score-value="bot"
-            className="font-neo-display font-black text-4xl sm:text-5xl text-neo-pink leading-none tabular-nums origin-bottom-right inline-block"
+            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-pink leading-none tabular-nums origin-bottom-right inline-block"
           >
             {bot.score}
           </span>
-          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white">
+          <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white truncate">
             {labels.bot}
           </span>
         </div>

@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import type { RackTile } from '@/lib/word-craft/types';
+import { displayTileLetter } from '@/lib/word-craft/blankAssign';
 import { cn } from '@/lib/utils';
 
 export interface WordCraftRackProps {
@@ -134,8 +135,10 @@ function WordCraftRackImpl({
             )}
           >
             <span aria-hidden className="absolute inset-x-1.5 top-1 h-px bg-white/70" />
-            <span className="wc-tile-glyph relative text-3xl sm:text-4xl">
-              {tile.letter === '_' ? '·' : tile.letter}
+            <span
+              className={cn('wc-tile-glyph relative text-3xl sm:text-4xl', tile.isBlank && 'text-neo-purple')}
+            >
+              {displayTileLetter(tile)}
             </span>
             <span
               className="absolute bottom-1 end-1.5 text-[10px] sm:text-[11px] opacity-60 font-neo-body font-bold tabular-nums"

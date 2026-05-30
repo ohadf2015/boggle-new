@@ -12259,7 +12259,8 @@ const ja = {
       "disconnected": "単語は既存のタイルとつながっている必要があります。",
       "outOfBounds": "タイルがボードの外に置かれています。",
       "noTiles": "プレイするには少なくとも1つのタイルを置いてください。",
-      "bagTooSmallToSwap": "袋に交換するための十分なタイルがありません。"
+      "bagTooSmallToSwap": "袋に交換するための十分なタイルがありません。",
+      "blankUnassigned": "先にジョーカーの文字を選んでください。"
     },
     "modeTitle": "ワードクラフト",
     "modeDesc": "戦略的な言葉の対決—得点を積み、オーバードライブを発動してボットを倒せ！",
@@ -12317,7 +12318,13 @@ const ja = {
     "axis": {
       "horizontal": "横",
       "vertical": "縦",
-      "flipAria": "単語の向きを切り替える"
+      "flipAria": "単語の向きを切り替える",
+      "hint": "タップして方向を選択"
+    },
+    "joker": {
+      "pickTitle": "文字を選ぶ",
+      "pickHint": "ジョーカーはこの文字になります（0点）。",
+      "cancel": "キャンセル"
     },
     "zoomLabel": "ピンチで盤を拡大",
     "zoomReset": "拡大をリセット",

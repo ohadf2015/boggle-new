@@ -80,18 +80,37 @@ function tileToPlacement(rackTile: RackTile, row: number, col: number): PlacedTi
   };
 }
 
-export function resolveTap(rackTile: RackTile, pending: PlacedTile[], board: Board): ResolveResult {
+export function resolveTap(
+  rackTile: RackTile,
+  pending: PlacedTile[],
+  board: Board,
+  chosenAxis: Axis = 'h',
+): ResolveResult {
   if (pending.length === 0) return { reason: 'no-axis-yet' };
 
-  // One pending tile: no axis is locked yet, so default to building the word
-  // horizontally — drop the tap in the first empty cell to the right, falling
-  // back leftward at the board edge. This lets the player keep tapping rack
-  // letters to extend a word from the very first tile instead of dragging
-  // each one. Once a second tile lands, inferAxis takes over below.
+  // One pending tile: no axis is locked yet, so honor the player's pre-selected
+  // direction (default horizontal). Drop the tap in the first empty cell along
+  // that axis, scanning forward then falling back at the board edge. This lets
+  // the player keep tapping rack letters to extend a word — in either
+  // orientation — from the very first tile instead of dragging each one. Once a
+  // second tile lands, inferAxis takes over below and chosenAxis is ignored.
   if (pending.length === 1) {
     const { row, col } = pending[0];
     const size = board.cells.length;
     const pendingSet = buildPendingPositionSet(pending);
+    if (chosenAxis === 'v') {
+      for (let r = row + 1; r < size; r++) {
+        if (!isCellOccupied(board, pendingSet, r, col)) {
+          return { placement: tileToPlacement(rackTile, r, col) };
+        }
+      }
+      for (let r = row - 1; r >= 0; r--) {
+        if (!isCellOccupied(board, pendingSet, r, col)) {
+          return { placement: tileToPlacement(rackTile, r, col) };
+        }
+      }
+      return { reason: 'no-empty-on-axis' };
+    }
     for (let c = col + 1; c < size; c++) {
       if (!isCellOccupied(board, pendingSet, row, c)) {
         return { placement: tileToPlacement(rackTile, row, c) };

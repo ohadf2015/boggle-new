@@ -4,6 +4,7 @@ import { memo, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import type { PlacedTile } from '@/lib/word-craft/types';
 import type { Axis } from '@/lib/word-craft/placement';
+import { displayTileLetter } from '@/lib/word-craft/blankAssign';
 import { WordCraftAxisChip } from './WordCraftAxisChip';
 
 export interface WordCraftPendingStripProps {
@@ -80,16 +81,18 @@ function WordCraftPendingStripImpl({
             <button
               type="button"
               onClick={() => onRecallOne(p.rackTileId)}
-              aria-label={`${labels.recallOne}: ${p.letter}`}
+              aria-label={`${labels.recallOne}: ${displayTileLetter(p)}`}
               data-wc-pending-tile={p.rackTileId}
+              data-joker={p.isBlank ? 'true' : undefined}
               className={cn(
                 'relative inline-flex items-center justify-center',
-                'w-8 h-9 rounded-neo border-2 border-black bg-neo-lime text-neo-navy',
+                'w-8 h-9 rounded-neo border-2 border-black text-neo-navy',
+                p.isBlank ? 'bg-neo-purple-light text-neo-white' : 'bg-neo-lime',
                 'shadow-hard-sm font-neo-display font-black text-base',
                 'transition-transform active:scale-90 hover:-translate-y-0.5 hover:bg-neo-pink hover:text-neo-white',
               )}
             >
-              {p.letter === '_' ? '·' : p.letter}
+              {displayTileLetter(p)}
             </button>
           </li>
         ))}

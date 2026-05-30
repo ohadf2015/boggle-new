@@ -128,7 +128,7 @@ describe('WordCraftBoard chrome', () => {
     expect(dot?.className).toMatch(/bg-neo-purple/);
   });
 
-  it('blank tile renders as dot glyph with score-dot', () => {
+  it('unassigned joker tile renders the wildcard glyph (not a dot) with score-dot', () => {
     const board = createBoard(11);
     placeTiles(board, [
       { row: 5, col: 5, letter: '_', value: 0, isBlank: true, rackTileId: 't-blank' },
@@ -136,8 +136,9 @@ describe('WordCraftBoard chrome', () => {
     const { container } = renderBoard(board);
 
     const cell = container.querySelector('[data-board-cell="5,5"]');
-    // Blank = '·' glyph
-    expect(cell?.textContent).toContain('·');
+    // Blank/joker renders the wildcard glyph '?', never the old confusing '·'.
+    expect(cell?.textContent).toContain('?');
+    expect(cell?.textContent).not.toContain('·');
 
     // Score-dot still exists for the 0-point blank
     const dot = cell?.querySelector('[data-score-dot]');

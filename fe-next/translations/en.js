@@ -12258,7 +12258,8 @@ const en = {
       "disconnected": "Word must connect to an existing tile.",
       "outOfBounds": "Tile placed off the board.",
       "noTiles": "Place at least one tile to play.",
-      "bagTooSmallToSwap": "Not enough tiles in the bag to swap."
+      "bagTooSmallToSwap": "Not enough tiles in the bag to swap.",
+      "blankUnassigned": "Pick a letter for your joker first."
     },
     "modeTitle": "WordCraft",
     "modeDesc": "A crafty word grid battle — score big, trigger Overdrive, and outwit the bot!",
@@ -12316,7 +12317,13 @@ const en = {
     "axis": {
       "horizontal": "Across",
       "vertical": "Down",
-      "flipAria": "flip word direction"
+      "flipAria": "flip word direction",
+      "hint": "Tap to set Across / Down"
+    },
+    "joker": {
+      "pickTitle": "Choose a letter",
+      "pickHint": "Your joker becomes this letter (worth 0 points).",
+      "cancel": "Cancel"
     },
     "zoomLabel": "Pinch to zoom into the board",
     "zoomReset": "Reset zoom",

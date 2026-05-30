@@ -42,7 +42,12 @@ import { WordCraftHeatStamp } from '@/components/word-craft/WordCraftHeatStamp';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
 import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
-import { inferAxis, resolveTap } from '@/lib/word-craft/placement';
+import { inferAxis, resolveTap, type Axis } from '@/lib/word-craft/placement';
+import { resolveScoreboardOpponent } from '@/lib/word-craft/opponentIdentity';
+import { alphabetForLocale } from '@/lib/word-craft/wordCraftAlphabet';
+import { isUnassignedBlank } from '@/lib/word-craft/blankAssign';
+import { WordCraftBlankPicker } from '@/components/word-craft/WordCraftBlankPicker';
+import { WordCraftAxisChip } from '@/components/word-craft/WordCraftAxisChip';
 import {
   trackWordCraftAxisLocked,
   trackWordCraftFastTapUsed,
@@ -249,6 +254,40 @@ export default function WordCraftPageClient() {
 
   const axis = useMemo(() => inferAxis(game.state.pendingPlacements), [game.state.pendingPlacements]);
 
+  // Player-chosen direction for building a word, honored before a 2nd tile
+  // locks the line. Default 'across'. Persistent so the player can pre-pick the
+  // orientation and keep tapping rack letters without dragging.
+  const [chosenAxis, setChosenAxis] = useState<Axis>('h');
+  // The axis actually in effect: a committed 2+ tile line wins; otherwise the
+  // player's pick. Never null, so the toggle is always meaningful.
+  const effectiveAxis: Axis = axis ?? chosenAxis;
+  const flipAxis = useCallback(() => {
+    // A locked line can't be re-oriented mid-word; only flip the free pick.
+    if (axis) return;
+    setChosenAxis((a) => (a === 'v' ? 'h' : 'v'));
+  }, [axis]);
+
+  // Scoreboard opponent identity. In a duel the friend's name + avatar own the
+  // slot (the score is their target); otherwise the on-board bot, with a seeded
+  // mascot face so it's never a faceless "WordBot".
+  const scoreboardOpponent = useMemo(
+    () =>
+      resolveScoreboardOpponent({
+        hotseat,
+        botLabel: hotseat ? t('wordcraft.player2') : t('wordcraft.bot'),
+        hotseatLabel: t('wordcraft.player2'),
+      }),
+    [hotseat, t],
+  );
+
+  // Joker assignment: when an unassigned blank is sitting in pending, open the
+  // letter picker. The submit guard in the hook also blocks until it's named.
+  const pendingBlank = useMemo(
+    () => game.state.pendingPlacements.find(isUnassignedBlank) ?? null,
+    [game.state.pendingPlacements],
+  );
+  const jokerAlphabet = useMemo(() => alphabetForLocale(locale), [locale]);
+
   // Fire axis_locked exactly once when pending tiles transition from 1→2
   // and form a valid line. Resets when pending shrinks back to <2.
   const axisLockEmittedRef = useRef(false);
@@ -272,7 +311,7 @@ export default function WordCraftPageClient() {
     (tile: { id: string }) => {
       const rackTile = game.activePlayer.rack.find((t) => t.id === tile.id);
       if (!rackTile) return;
-      const result = resolveTap(rackTile, game.state.pendingPlacements, game.state.board);
+      const result = resolveTap(rackTile, game.state.pendingPlacements, game.state.board, chosenAxis);
       if ('placement' in result) {
         inputCountsRef.current.fastTap += 1;
         trackWordCraftFastTapUsed({
@@ -287,7 +326,7 @@ export default function WordCraftPageClient() {
         game.placeTileOnBoard(rackTile.id, result.placement.row, result.placement.col);
       }
     },
-    [game, juice],
+    [game, juice, chosenAxis],
   );
 
   // Wrap raw recall handlers so the strip / board cells share the same
@@ -727,6 +766,7 @@ export default function WordCraftPageClient() {
     if (e === 'OUT_OF_BOUNDS') return t('wordcraft.error.outOfBounds');
     if (e === 'NO_TILES') return t('wordcraft.error.noTiles');
     if (e === 'BAG_TOO_SMALL_TO_SWAP') return t('wordcraft.error.bagTooSmallToSwap');
+    if (e === 'BLANK_UNASSIGNED') return t('wordcraft.error.blankUnassigned');
     return e;
   })();
 
@@ -801,6 +841,10 @@ export default function WordCraftPageClient() {
           bot={game.state.bot}
           turn={game.state.turn}
           tilesRemaining={game.tilesRemaining}
+          playerAvatar={challengerIdentity.avatar ?? null}
+          playerSeed={challengerIdentity.name}
+          opponentAvatar={scoreboardOpponent.avatar}
+          opponentSeed={scoreboardOpponent.seed}
           labels={{
             you: hotseat ? t('wordcraft.player1') : t('wordcraft.you'),
             bot: hotseat ? t('wordcraft.player2') : t('wordcraft.bot'),
@@ -909,9 +953,10 @@ export default function WordCraftPageClient() {
         {showPendingStrip ? (
           <WordCraftPendingStrip
             pending={game.state.pendingPlacements}
-            axis={axis}
+            axis={effectiveAxis}
             onRecallOne={recallFromStrip}
             onRecallAll={recallAllPending}
+            onFlipAxis={flipAxis}
             locale={locale}
             labels={{
               headerEmpty: t('wordcraft.pending.empty'),
@@ -922,6 +967,19 @@ export default function WordCraftPageClient() {
               axisFlipAria: t('wordcraft.axis.flipAria'),
             }}
           />
+        ) : canInteract ? (
+          // Persistent direction toggle, available before the first tile lands so
+          // the player can pre-pick across/down and just keep tapping letters.
+          <div className="flex items-center justify-center gap-2 py-0.5 shrink-0">
+            <WordCraftAxisChip
+              axis={effectiveAxis}
+              onFlip={flipAxis}
+              labelHorizontal={t('wordcraft.axis.horizontal')}
+              labelVertical={t('wordcraft.axis.vertical')}
+              ariaLabel={t('wordcraft.axis.flipAria')}
+            />
+            <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>
+          </div>
         ) : null}
 
         <WordCraftRack
@@ -995,6 +1053,24 @@ export default function WordCraftPageClient() {
 
       {/* Drag ghost — follows pointer over the whole viewport */}
       <WordCraftDragGhost drag={drag} locale={locale} />
+
+      {/* Joker letter picker — opens whenever a placed blank still needs a letter */}
+      <WordCraftBlankPicker
+        open={!!pendingBlank}
+        letters={jokerAlphabet}
+        onPick={(letter) => {
+          if (pendingBlank) game.assignBlank(pendingBlank.rackTileId, letter);
+        }}
+        onCancel={() => {
+          if (pendingBlank) game.recallTile(pendingBlank.rackTileId);
+        }}
+        locale={locale}
+        labels={{
+          title: t('wordcraft.joker.pickTitle'),
+          hint: t('wordcraft.joker.pickHint'),
+          cancel: t('wordcraft.joker.cancel'),
+        }}
+      />
 
       {/* Floating toast — error doesn't reflow the layout, just overlays. */}
       {errorMessage ? (

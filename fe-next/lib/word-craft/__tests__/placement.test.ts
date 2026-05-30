@@ -148,6 +148,41 @@ describe('resolveTap (fast-path)', () => {
   });
 });
 
+describe('resolveTap with chosenAxis (pre-selected direction)', () => {
+  it('with one pending tile + vertical axis, places the next tap downward', () => {
+    const board = createBoard(15);
+    const result = resolveTap(rackTile('Z', 'r1'), [p(7, 7)], board, 'v');
+    expect('placement' in result && result.placement.row).toBe(8);
+    expect('placement' in result && result.placement.col).toBe(7);
+  });
+
+  it('with one pending tile at the bottom edge + vertical axis, falls back upward', () => {
+    const board = createBoard(15);
+    const result = resolveTap(rackTile('Z', 'r1'), [p(14, 7)], board, 'v');
+    expect('placement' in result && result.placement.row).toBe(13);
+    expect('placement' in result && result.placement.col).toBe(7);
+  });
+
+  it('still defaults to horizontal when chosenAxis is "h" or omitted', () => {
+    const board = createBoard(15);
+    expect(resolveTap(rackTile('Z', 'r1'), [p(7, 7)], board, 'h')).toEqual({
+      placement: { row: 7, col: 8, letter: 'Z', value: 1, isBlank: false, rackTileId: 'r1' },
+    });
+    expect(resolveTap(rackTile('Z', 'r1'), [p(7, 7)], board)).toEqual({
+      placement: { row: 7, col: 8, letter: 'Z', value: 1, isBlank: false, rackTileId: 'r1' },
+    });
+  });
+
+  it('lets the inferred axis win once 2+ tiles lock a line (chosenAxis ignored)', () => {
+    const board = createBoard(15);
+    // Two tiles share a row → locked horizontal; a stale vertical preference
+    // must not override the committed line.
+    const result = resolveTap(rackTile('Z', 'r1'), [p(7, 7), p(7, 8)], board, 'v');
+    expect('placement' in result && result.placement.row).toBe(7);
+    expect('placement' in result && result.placement.col).toBe(9);
+  });
+});
+
 describe('resolveDrag', () => {
   it('rejects drop on occupied cell', () => {
     const board = createBoard(15);

@@ -12373,7 +12373,8 @@ const es = {
       "disconnected": "La palabra debe conectar con una ficha existente.",
       "outOfBounds": "Ficha colocada fuera del tablero.",
       "noTiles": "Coloca al menos una ficha para jugar.",
-      "bagTooSmallToSwap": "No hay suficientes fichas en la bolsa para cambiar."
+      "bagTooSmallToSwap": "No hay suficientes fichas en la bolsa para cambiar.",
+      "blankUnassigned": "Primero elige una letra para tu comodín."
     },
     "modeTitle": "WordCraft",
     "modeDesc": "Batalla de palabras estratégica — acumula puntos, activa el Sobremarcha y vence al bot.",
@@ -12431,7 +12432,13 @@ const es = {
     "axis": {
       "horizontal": "Horizontal",
       "vertical": "Vertical",
-      "flipAria": "cambiar dirección de la palabra"
+      "flipAria": "cambiar dirección de la palabra",
+      "hint": "Toca para elegir dirección"
+    },
+    "joker": {
+      "pickTitle": "Elige una letra",
+      "pickHint": "Tu comodín se convierte en esta letra (0 puntos).",
+      "cancel": "Cancelar"
     },
     "zoomLabel": "Pellizca para ampliar el tablero",
     "zoomReset": "Restablecer zoom",
