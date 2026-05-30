@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       siteName: 'LexiClash',
       images: [
         {
-          url: `${BASE_URL}/og-image-${isEn ? 'en' : locale}.webp`,
+          url: `${BASE_URL}/og-wordcraft.webp`,
           width: 1200,
           height: 630,
           alt: 'WordCraft — Free Word Strategy Grid Game',
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'WordCraft — Free Word Strategy Grid Game | LexiClash',
       description: 'Build words, claim territory, outscore rivals. Free online, no download.',
-      images: [`${BASE_URL}/og-image-${isEn ? 'en' : locale}.webp`],
+      images: [`${BASE_URL}/og-wordcraft.webp`],
     },
     alternates: {
       // Non-EN variants serve English copy → consolidate ranking signal onto the
