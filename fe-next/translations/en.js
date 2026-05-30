@@ -85,7 +85,8 @@ const en = {
     "instructions": "Transform one word into the next by following each clue.",
     "puzzleProgress": "Puzzle {n} of {total}",
     "stepProgress": "Step {n} of {total}",
-    "inputPlaceholder": "Type your word",
+    "inputPlaceholder": "Tap the letters below",
+    "backspace": "Delete letter",
     "hintLabel": "Hint:",
     "submit": "Transmute",
     "next": "Next puzzle",
@@ -136,6 +137,7 @@ const en = {
     "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless", "newBest": "New daily best!" },
     "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
     "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability" },
+    "verdict": { "perfect": "Perfect!", "good": "Nice!", "sloppy": "Sloppy", "miss": "Missed!" },
     "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "{n} perfect drops in a row" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
@@ -11990,6 +11992,16 @@ const en = {
       "🃏 Collect rune modifiers between rounds",
       "💥 Stack multipliers to break the score"
     ],
+    "howToCard": {
+      "title": "How Word Forge works",
+      "steps": [
+        "Drag adjacent letters to spell words (3+ letters) before the timer runs out.",
+        "Beat the round's target score to advance — miss it and the run ends.",
+        "Between rounds, pick a rune that boosts your scoring. Stack them up.",
+        "Every 3rd round a boss adds a twist — read its rule and adapt."
+      ],
+      "cta": "Got it"
+    },
     "reject": {
       "duplicate": "Already used this round",
       "constraint": "Blocked by the boss rule",

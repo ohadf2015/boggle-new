@@ -98,7 +98,8 @@ const ja = {
     "instructions": "ヒントに従って、言葉を次の言葉へと変えていきましょう（内容は英語）。",
     "puzzleProgress": "パズル {n} / {total}",
     "stepProgress": "ステップ {n} / {total}",
-    "inputPlaceholder": "言葉を入力",
+    "inputPlaceholder": "下の文字をタップ",
+    "backspace": "1文字削除",
     "hintLabel": "ヒント：",
     "submit": "変える",
     "next": "次のパズル",
@@ -148,6 +149,7 @@ const ja = {
     "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス", "newBest": "デイリー自己ベスト更新！" },
     "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
     "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定" },
+    "verdict": { "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらっ", "miss": "ミス！" },
     "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
@@ -12044,6 +12046,28 @@ const ja = {
   },
   "wordForge": {
     "title": "ワードフォージ",
+    "howTo": [
+      "🔤 Boggleグリッドで単語を綴ろう",
+      "🃏 ラウンドの合間にルーン修飾を集めよう",
+      "💥 倍率を重ねてスコアを打ち破ろう"
+    ],
+    "howToCard": {
+      "title": "ワードフォージの遊び方",
+      "steps": [
+        "時間切れになる前に、隣り合う文字をドラッグして単語（3文字以上）を綴ろう。",
+        "ラウンドの目標スコアを超えれば次へ進める。届かなければランは終了。",
+        "ラウンドの合間に、スコアを高めるルーンを選ぼう。重ねがけしよう。",
+        "3ラウンドごとにボスが仕掛けを追加する。ルールを読んで対応しよう。"
+      ],
+      "cta": "わかった"
+    },
+    "reject": {
+      "duplicate": "このラウンドで使用済み",
+      "constraint": "ボスのルールでブロック",
+      "oath": "沈黙の誓い — その文字は再利用できない",
+      "notWord": "辞書にありません"
+    },
+    "dictLoading": "辞書を読み込み中…",
     "subtitle": "単語を綴れ。ルーンを集めろ。スコアを打ち破れ。",
     "go": "GO！",
     "startRun": "ラン開始",

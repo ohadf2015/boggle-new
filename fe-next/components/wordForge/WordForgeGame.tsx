@@ -9,6 +9,7 @@ import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { Language } from '@/shared/types/game';
 import { Button } from '@/components/ui/button';
+import { HowToPlayCard } from '@/components/common/HowToPlayCard';
 import { RuneBar } from './RuneBar';
 import { RunePicker } from './RunePicker';
 import { BossReveal } from './BossReveal';
@@ -85,6 +86,15 @@ export default function WordForgeGame(): React.JSX.Element {
   if (run.state.phase === 'idle') {
     return (
       <div className="min-h-screen bg-[#0A0A1A] flex flex-col items-center justify-center gap-6 p-4">
+        {/* First-run rules overlay — the loop (timer, target, runes, bosses) is
+            heavy, so spell it out once before the first run. */}
+        <HowToPlayCard
+          storageKey="word-forge"
+          title={t('wordForge.howToCard.title')}
+          steps={[0, 1, 2, 3].map((i) => t(`wordForge.howToCard.steps.${i}`))}
+          cta={t('wordForge.howToCard.cta')}
+          accent="cyan"
+        />
         {/* Title with fire icon */}
         <div className="text-6xl animate-float">🔥</div>
         <h1 className="text-4xl sm:text-5xl font-black uppercase text-neo-cream font-neo-display tracking-tight text-center">

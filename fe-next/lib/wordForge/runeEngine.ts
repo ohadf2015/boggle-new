@@ -6,6 +6,12 @@
  */
 
 import type { RuneCardDef, RuneEffect, ScoringContext } from '@/types/wordForge';
+import {
+  LETTER_POINTS,
+  isAlphaLetter,
+  VOWELS,
+  RARE_LETTERS,
+} from './letterValues';
 
 /** Registry of rune evaluator functions keyed by rune ID */
 type RuneEvaluator = (context: ScoringContext) => RuneEffect | null;
@@ -37,23 +43,22 @@ export function evaluateRune(
 
 // ─── Helper Utils ──────────────────────────────────────────
 
-// Inline letter points for echo rune (avoids circular import with scoring.ts)
-const ECHO_LETTER_POINTS: Record<string, number> = {
-  A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4,
-  I: 1, J: 8, K: 5, L: 1, M: 3, N: 1, O: 1, P: 3,
-  Q: 10, R: 1, S: 1, T: 1, U: 1, V: 4, W: 4, X: 8,
-  Y: 4, Z: 10,
-};
-
-const VOWELS = new Set(['A', 'E', 'I', 'O', 'U']);
-const RARE_LETTERS = new Set(['J', 'K', 'Q', 'X', 'Z']);
+// Letter points + vowel/rare sets come from the shared letterValues module so
+// English and Hebrew score consistently (the inline English-only tables here
+// were the cause of Hebrew words scoring 0). ECHO_LETTER_POINTS now aliases the
+// shared (English u Hebrew) table; existing direct lookups keep working.
+const ECHO_LETTER_POINTS = LETTER_POINTS;
 
 export function countVowels(word: string): number {
   return word.toUpperCase().split('').filter(ch => VOWELS.has(ch)).length;
 }
 
 export function countConsonants(word: string): number {
-  return word.toUpperCase().split('').filter(ch => !VOWELS.has(ch) && /[A-Z]/.test(ch)).length;
+  // A letter that is alphabetic (English or Hebrew) but not a vowel.
+  return word
+    .toUpperCase()
+    .split('')
+    .filter(ch => !VOWELS.has(ch) && isAlphaLetter(ch)).length;
 }
 
 export function countRareLetters(word: string): number {

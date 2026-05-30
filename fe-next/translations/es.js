@@ -85,7 +85,8 @@ const es = {
     "instructions": "Transforma una palabra en la siguiente siguiendo cada pista (contenido en inglés).",
     "puzzleProgress": "Puzle {n} de {total}",
     "stepProgress": "Paso {n} de {total}",
-    "inputPlaceholder": "Escribe tu palabra",
+    "inputPlaceholder": "Toca las letras de abajo",
+    "backspace": "Borrar letra",
     "hintLabel": "Pista:",
     "submit": "Transmutar",
     "next": "Siguiente puzle",
@@ -136,6 +137,7 @@ const es = {
     "daily": { "badge": "Diario · {date}", "streak": "racha de {n} días", "toDaily": "Diario", "toEndless": "Infinito", "newBest": "¡Nuevo récord diario!" },
     "perk": { "title": "Elige un don", "subtitle": "Elige uno — dura toda la escalada", "skip": "Saltar por ahora", "masterCrane": { "name": "Grúa maestra", "desc": "Mayor recompensa en caídas perfectas" }, "tallTimber": { "name": "Madera alta", "desc": "+12% de altura en cada piso" }, "featherfall": { "name": "Caída de pluma", "desc": "Los derrumbes cuestan un piso menos" }, "reinforced": { "name": "Reforzado", "desc": "Más tambaleo antes del abismo" }, "cushion": { "name": "Cojín de seguridad", "desc": "El vaivén de la grúa nunca tira un piso" } },
     "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad" },
+    "verdict": { "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Flojo", "miss": "¡Fallo!" },
     "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
@@ -12158,6 +12160,28 @@ const es = {
   },
   "wordForge": {
     "title": "Forja de Palabras",
+    "howTo": [
+      "🔤 Deletrea palabras en una cuadrícula Boggle",
+      "🃏 Reúne runas modificadoras entre rondas",
+      "💥 Acumula multiplicadores para romper el récord"
+    ],
+    "howToCard": {
+      "title": "Cómo se juega a Forja de Palabras",
+      "steps": [
+        "Arrastra letras adyacentes para formar palabras (3+ letras) antes de que acabe el tiempo.",
+        "Supera la puntuación objetivo de la ronda para avanzar; si no, la partida termina.",
+        "Entre rondas, elige una runa que aumente tu puntuación. Acumúlalas.",
+        "Cada 3 rondas un jefe añade un giro: lee su regla y adáptate."
+      ],
+      "cta": "Entendido"
+    },
+    "reject": {
+      "duplicate": "Ya usada en esta ronda",
+      "constraint": "Bloqueada por la regla del jefe",
+      "oath": "Voto de silencio: no puedes reutilizar esas letras",
+      "notWord": "No está en el diccionario"
+    },
+    "dictLoading": "Cargando diccionario…",
     "subtitle": "Deletrea palabras. Reúne runas. Rompe el récord.",
     "go": "¡Adelante!",
     "startRun": "Iniciar partida",

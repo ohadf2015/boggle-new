@@ -9,6 +9,8 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { HowToPlayCard } from '@/components/common/HowToPlayCard';
 import { applyHebrewFinalLetters, HEBREW_FINAL_TO_REGULAR } from '@/shared/utils/wordNormalization';
+import AlchemyKeyboard from '@/components/wordAlchemy/AlchemyKeyboard';
+import { getKeyboardLetters, appendLetter, backspace } from '@/lib/wordAlchemy/keyboard';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -227,8 +229,10 @@ export default function WordAlchemyPage() {
   const [input, setInput] = useState('');
   const [wrongCount, setWrongCount] = useState(0);
   const [streak, setStreak] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  // The built-word display (was a text input); kept as a ref for shake + burst.
+  const inputRef = useRef<HTMLDivElement>(null);
   const flaskRef = useRef<HTMLSpanElement>(null);
+  const keyboardLetters = getKeyboardLetters(isHe ? 'he' : 'en');
   const wonFxFiredRef = useRef(false);
 
   const puzzle = puzzles[puzzleIdx];
@@ -404,19 +408,30 @@ export default function WordAlchemyPage() {
               {clue && <p className="font-neo-body text-sm text-neo-white italic">{clue}</p>}
             </div>
 
-            <input
+            {/* Built-word display — fed by the on-screen keyboard, no typing. */}
+            <div
               ref={inputRef}
-              type="text"
               dir={dir}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              autoFocus
               aria-label={t('wordAlchemy.inputPlaceholder')}
-              placeholder={t('wordAlchemy.inputPlaceholder')}
-              autoComplete="off"
-              autoCapitalize="characters"
-              spellCheck={false}
-              className="w-full rounded-neo border-3 border-black bg-neo-cream px-4 py-3 text-center font-neo-display font-black text-2xl uppercase tracking-[0.2em] text-neo-navy shadow-hard outline-none focus:border-neo-purple"
+              aria-live="polite"
+              className="flex min-h-[3.5rem] w-full items-center justify-center rounded-neo border-3 border-black bg-neo-cream px-4 py-3 text-center font-neo-display font-black text-2xl uppercase tracking-[0.2em] text-neo-navy shadow-hard"
+            >
+              {input ? (
+                display(input)
+              ) : (
+                <span className="text-neo-navy/30 normal-case tracking-normal text-base">
+                  {t('wordAlchemy.inputPlaceholder')}
+                </span>
+              )}
+            </div>
+
+            {/* On-screen letter keyboard — taps build the word above. */}
+            <AlchemyKeyboard
+              letters={keyboardLetters}
+              dir={dir}
+              onLetter={(ch) => setInput((sv) => appendLetter(sv, ch))}
+              onBackspace={() => setInput((sv) => backspace(sv))}
+              backspaceLabel={t('wordAlchemy.backspace')}
             />
 
             {showHint && (

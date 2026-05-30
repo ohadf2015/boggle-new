@@ -98,7 +98,8 @@ const sv = {
     "instructions": "Förvandla ett ord till nästa genom att följa varje ledtråd (innehåll på engelska).",
     "puzzleProgress": "Pussel {n} av {total}",
     "stepProgress": "Steg {n} av {total}",
-    "inputPlaceholder": "Skriv ditt ord",
+    "inputPlaceholder": "Tryck på bokstäverna nedan",
+    "backspace": "Radera bokstav",
     "hintLabel": "Ledtråd:",
     "submit": "Förvandla",
     "next": "Nästa pussel",
@@ -148,6 +149,7 @@ const sv = {
     "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig", "newBest": "Nytt dagsrekord!" },
     "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
     "crane": { "place": "Placera ditt ord", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet" },
+    "verdict": { "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Slarvigt", "miss": "Miss!" },
     "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "{n} perfekta släpp i rad" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
@@ -12071,6 +12073,28 @@ const sv = {
   "wordForge": {
     "go": "Kör!",
     "title": "Ordsmedjan",
+    "howTo": [
+      "🔤 Stava ord på ett Boggle-rutnät",
+      "🃏 Samla runmodifierare mellan rundorna",
+      "💥 Stapla multiplikatorer för att slå rekordet"
+    ],
+    "howToCard": {
+      "title": "Så funkar Ordsmedjan",
+      "steps": [
+        "Dra intilliggande bokstäver för att stava ord (3+ bokstäver) innan tiden tar slut.",
+        "Slå rundans målpoäng för att gå vidare — annars är körningen slut.",
+        "Mellan rundorna väljer du en runa som höjer din poäng. Stapla dem.",
+        "Var tredje runda lägger en boss till en twist — läs regeln och anpassa dig."
+      ],
+      "cta": "Uppfattat"
+    },
+    "reject": {
+      "duplicate": "Redan använt den här rundan",
+      "constraint": "Blockerad av bossregeln",
+      "oath": "Tystnadens ed — kan inte återanvända de bokstäverna",
+      "notWord": "Inte i ordlistan"
+    },
+    "dictLoading": "Laddar ordlista…",
     "subtitle": "Stava ord. Samla runor. Slå rekordet.",
     "startRun": "Starta körning",
     "round": "Runda",

@@ -16,27 +16,15 @@ import type {
 import { evaluateRune } from './runeEngine';
 import { applyConstraintToScore } from './bossConstraints';
 
-// ─── Letter Point Values (Scrabble-inspired) ──────────────
-
-export const LETTER_POINTS: Record<string, number> = {
-  A: 1, B: 3, C: 3, D: 2, E: 1, F: 4, G: 2, H: 4,
-  I: 1, J: 8, K: 5, L: 1, M: 3, N: 1, O: 1, P: 3,
-  Q: 10, R: 1, S: 1, T: 1, U: 1, V: 4, W: 4, X: 8,
-  Y: 4, Z: 10,
-};
-
-/** Get point value for a single letter */
-export function getLetterPoints(letter: string): number {
-  return LETTER_POINTS[letter.toUpperCase()] ?? 0;
-}
-
-/** Sum of all letter points in a word */
-export function getBasePoints(word: string): number {
-  return word
-    .toUpperCase()
-    .split('')
-    .reduce((sum, ch) => sum + getLetterPoints(ch), 0);
-}
+// Letter point values live in the shared leaf module so scoring.ts and
+// runeEngine.ts agree (and Hebrew scores correctly). Re-exported here for
+// back-compat with existing importers.
+export {
+  LETTER_POINTS,
+  getLetterPoints,
+  getBasePoints,
+} from './letterValues';
+import { getBasePoints } from './letterValues';
 
 // ─── Length Bonus ──────────────────────────────────────────
 
