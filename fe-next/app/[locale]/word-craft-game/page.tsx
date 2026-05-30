@@ -217,6 +217,18 @@ export default async function WordCraftGameLandingPage({ params }: PageProps) {
             Pass &amp; Play with a friend
           </Link>
         </div>
+        <div className="mx-auto mt-10 max-w-3xl animate-neo-pop">
+          <picture>
+            <source srcSet="/word-craft/landing-hero.webp" type="image/webp" />
+            <img
+              src="/word-craft/landing-hero.jpg"
+              alt="WordCraft: cream letter tiles spelling WORDCRAFT glowing in lime, cyan and pink on a dark navy board, with a drawstring sack spilling more tiles"
+              width={1280}
+              height={714}
+              className="w-full rounded-neo border-neo-thick border-black shadow-hard-lg"
+            />
+          </picture>
+        </div>
       </section>
 
       {/* Modes */}
