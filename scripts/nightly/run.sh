@@ -283,7 +283,7 @@ NIGHTLY_AUTHORED_FILE="$(dirname "$RUN_LOG")/authored-${DATE_TAG}.list"
 export NIGHTLY_AUTHORED="$NIGHTLY_AUTHORED_FILE"
 
 # --- run lanes -------------------------------------------------------------
-LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense)
+LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense 09-monetization)
 LANE_RESULTS=()
 
 should_run() {

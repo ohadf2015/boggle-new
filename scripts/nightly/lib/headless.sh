@@ -64,6 +64,16 @@ SPEED: code search is your dominant wall-clock cost. ALWAYS use \`rg\` (ripgrep 
 over \`grep -r\`/\`find\` (10× faster on the fe-next/ tree). Trust the intelligence brief
 below: act on its ranked signals; do NOT re-run broad discovery the brief already did.
 
+REVENUE (standing priority): earning money is a MAIN goal of this loop — ad revenue
+(Android AdMob live; web H5/AdSense pending approval) AND education-institution upsell.
+When a change you are ALREADY making has a revenue angle (a CTA that could convert, a
+page that could capture a school lead, an ad surface that could fill), prefer the
+revenue-positive option — as long as it stays truthful and does not harm the core
+experience. HARD LINE: never change coin-award amounts, ad-reward values, the coin
+economy, or payment/billing logic — human-queue-only, NEVER an autonomous change in
+ANY lane (including Lane 09). Lane 09 owns the OTHER dedicated monetization work:
+ad-UX (flagged), education upsell, and demand experiments — not the economy itself.
+
 EOF
 }
 

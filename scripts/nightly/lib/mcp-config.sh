@@ -19,6 +19,7 @@ _lane_mcp_servers() {
     02|02-perf)       echo "supabase posthog" ;;
     03|03-engagement) echo "posthog" ;;
     05|05-landing)    echo "posthog mcp-image" ;;
+    09|09-monetization) echo "posthog" ;;
     *)                echo "" ;;
   esac
 }

@@ -3,9 +3,11 @@
 Status: **shipping** · Owner: ohadfisher · Triggers: macOS launchd 00:00 local
 
 ## Goal
-Every night, autonomously improve LexiClash across error-rate, engagement, UX, content, and SEO — push to master, alert via Telegram. Get better at this over time.
+Every night, autonomously improve LexiClash across error-rate, engagement, UX, content, SEO, and **revenue/monetization** — push to master, alert via Telegram. Get better at this over time.
 
-## Scope (7 lanes, sequential)
+**Revenue is a MAIN goal, not an afterthought.** Two channels: ads (Android AdMob live; web H5/AdSense pending approval) and education-institution upsell. Made first-class two ways: (a) a *standing-priority preamble* in `nightly_artifact_contract()` (`lib/headless.sh`) prepended to EVERY lane, so all lanes weigh a revenue angle; (b) the dedicated **Lane 09 — Monetization** below. See `docs/superpowers/specs/2026-05-30-nightly-monetization-lane-design.md`.
+
+## Scope (9 lanes, sequential)
 
 | # | Lane | Model | Inputs (read) | Outputs (write) | Per-lane diff cap |
 |---|---|---|---|---|---|
@@ -16,8 +18,10 @@ Every night, autonomously improve LexiClash across error-rate, engagement, UX, c
 | 5 | **Landing/CVR** | opus | posthog landing conversion 14d; ground-truth audit (sitemap, llms.txt) | one landing variant behind `landing_variant_v{n}`, 5 locales, `frontend-design` + `animate-ai` skills | 8 files |
 | 6 | **SEO/GEO** | sonnet | GSC + Bing WMT 28d | invokes existing `seo-daily` skill `--no-pr` | 8 files |
 | 7 | **Self-learn** | opus | last 7 reports + commit outcomes | rewrites (not appends) `docs/nightly/learnings.md` ≤200 lines | 1 file |
+| 8 | **AdSense approval** | sonnet | GSC traffic + live page audit | informational-page thinness/SSR/structure fixes toward AdSense re-submit; never game pages, never bloat | 8 files |
+| 9 | **Monetization / Revenue** | sonnet | `revenue` intel brief (AdMob/AdSense snapshot + PostHog ad events) | ad-UX/placement (flagged), education-institution upsell lead-gen, IAP/sub experiments; **NEVER** coin-economy/payment logic (human queue) | 8 files |
 
-Sequential because lanes 1/2/4/5 all touch `fe-next/**`. Parallel = file stomps (memory: `feedback-parallel-agents-overlap`).
+Sequential because lanes 1/2/4/5/9 all touch `fe-next/**`. Parallel = file stomps (memory: `feedback-parallel-agents-overlap`). **08 vs 09 boundary:** 08 = AdSense-approval content depth on informational pages; 09 = ad-UX + education upsell + IAP/sub + revenue data. 09 must not edit 08's pages.
 
 ## Integration step (after all lanes)
 1. Total diff sanity cap **30 files** (each lane already ≤8).

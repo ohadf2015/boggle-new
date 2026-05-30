@@ -18,6 +18,7 @@ INTEL_SOURCES=(
   "search:collect-search.sh:90"
   "sentry:collect-sentry.sh:60"
   "supabase:collect-supabase.sh:60"
+  "revenue:collect-revenue.sh:60"
 )
 
 # Validate the registry: every entry must be "id:script:timeout" with a numeric
