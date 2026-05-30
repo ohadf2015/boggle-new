@@ -12538,6 +12538,35 @@ const ja = {
     }
   },
   "connections": {
+    "daily": {
+      "title": "デイリーチャレンジ",
+      "complete": "デイリー完了！",
+      "solved": "{count}/{total} 正解",
+      "share": "結果をシェア",
+      "copied": "コピーしました！",
+      "guestName": "プレイヤー",
+      "leaderboard": "本日のランキング",
+      "loading": "読み込み中…",
+      "empty": "今日の最初のプレイヤーになろう！",
+      "players": "本日{count}人がプレイ",
+      "yourRank": "あなた: #{rank}",
+      "cta": "デイリーチャレンジ"
+    },
+    "community": {
+      "title": "コミュニティの謎",
+      "suggest": "謎を提案",
+      "suggestHint": "2つの単語＋両方をつなぐ橋の言葉。公開前に確認します。",
+      "word1": "単語",
+      "word2": "単語",
+      "bridge": "橋",
+      "submitBtn": "謎を送信",
+      "submitted": "確認のため送信しました — ありがとう！",
+      "submitFailed": "送信できませんでした。単語を確認してください。",
+      "top": "人気のコミュニティの謎",
+      "empty": "まだコミュニティの謎がありません — 最初に提案しよう！",
+      "upvote": "投票",
+      "cta": "コミュニティ"
+    },
     "title": "ワードブリッジ",
     "subtitle": "両方をつなぐ言葉を見つけよう！",
     "placeholder": "つなぐ言葉を入力...",

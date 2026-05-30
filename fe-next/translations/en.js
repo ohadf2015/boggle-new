@@ -12023,6 +12023,35 @@ const en = {
     }
   },
   "connections": {
+    "daily": {
+      "title": "Daily Challenge",
+      "complete": "Daily complete!",
+      "solved": "{count}/{total} solved",
+      "share": "Share result",
+      "copied": "Copied!",
+      "guestName": "Player",
+      "leaderboard": "Today's Leaderboard",
+      "loading": "Loading…",
+      "empty": "Be the first to play today!",
+      "players": "{count} players today",
+      "yourRank": "You: #{rank}",
+      "cta": "Daily Challenge"
+    },
+    "community": {
+      "title": "Community Riddles",
+      "suggest": "Suggest a riddle",
+      "suggestHint": "Two words + a bridge word that links both. We review before it goes live.",
+      "word1": "word",
+      "word2": "word",
+      "bridge": "bridge",
+      "submitBtn": "Submit riddle",
+      "submitted": "Sent for review — thanks!",
+      "submitFailed": "Couldn't submit. Check the words and try again.",
+      "top": "Top community riddles",
+      "empty": "No community riddles yet — be the first to suggest one!",
+      "upvote": "Upvote",
+      "cta": "Community"
+    },
     "title": "Word Chain",
     "subtitle": "Find the word that connects both!",
     "placeholder": "Type the bridge word...",

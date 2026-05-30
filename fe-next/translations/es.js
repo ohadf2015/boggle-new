@@ -12603,6 +12603,35 @@ const es = {
     }
   },
   "connections": {
+    "daily": {
+      "title": "Desafío diario",
+      "complete": "¡Desafío diario completado!",
+      "solved": "{count}/{total} resueltos",
+      "share": "Compartir resultado",
+      "copied": "¡Copiado!",
+      "guestName": "Jugador",
+      "leaderboard": "Clasificación de hoy",
+      "loading": "Cargando…",
+      "empty": "¡Sé el primero en jugar hoy!",
+      "players": "{count} jugadores hoy",
+      "yourRank": "Tú: #{rank}",
+      "cta": "Desafío diario"
+    },
+    "community": {
+      "title": "Acertijos de la comunidad",
+      "suggest": "Sugiere un acertijo",
+      "suggestHint": "Dos palabras + una palabra puente que conecta ambas. Revisamos antes de publicar.",
+      "word1": "palabra",
+      "word2": "palabra",
+      "bridge": "puente",
+      "submitBtn": "Enviar acertijo",
+      "submitted": "Enviado para revisión, ¡gracias!",
+      "submitFailed": "No se pudo enviar. Revisa las palabras e intenta de nuevo.",
+      "top": "Mejores acertijos de la comunidad",
+      "empty": "Aún no hay acertijos — ¡sé el primero en sugerir uno!",
+      "upvote": "Votar",
+      "cta": "Comunidad"
+    },
     "title": "Cadena de Palabras",
     "subtitle": "¡Encuentra la palabra que conecta ambas!",
     "placeholder": "Escribe la palabra puente...",

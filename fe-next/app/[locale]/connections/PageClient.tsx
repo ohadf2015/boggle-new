@@ -71,13 +71,13 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
           href={`/${locale}/connections/daily`}
           className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-yellow bg-neo-yellow/15 px-4 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
-          🏆 {t('connections.daily.cta')}
+          🏆 {t('connections.daily.cta', locale === 'he' ? 'אתגר יומי' : 'Daily Challenge')}
         </Link>
         <Link
           href={`/${locale}/connections/community`}
           className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-pink bg-neo-pink/15 px-4 py-2 font-neo-display text-sm font-black text-neo-pink shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
-          👥 {t('connections.community.cta')}
+          👥 {t('connections.community.cta', locale === 'he' ? 'קהילה' : 'Community')}
         </Link>
       </div>
       <ConnectionsSampleStrip locale={locale} copy={copy.samples} />
