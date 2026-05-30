@@ -62,7 +62,7 @@ function PlayerRow({ player, t }: { player: GamePlayer; t: (key: string, fallbac
   return (
     <div className="bg-neo-navy-light/30 rounded border border-slate-700/50 p-2.5 text-xs">
       <div className="flex items-start gap-2.5 mb-2">
-        <PlayerAvatar customAvatar={!player.isGuest ? player.profile?.avatar_config : null} userId={player.playerId ?? undefined} />
+        <PlayerAvatar customAvatar={!player.isGuest ? player.profile?.avatar_config : null} userId={player.playerId ?? player.guestSessionId ?? undefined} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1 flex-wrap">
             <span className="font-neo-display text-slate-100">

@@ -319,6 +319,26 @@ export const getAnalyticsIdentity = (): { userId: string; username: string | nul
  * is recorded anonymously and renders as "Guest" in the admin game log. Reads the
  * locally-cached session (no network round-trip); guests get no header.
  */
+/**
+ * Current UI locale for analytics, read outside React. game_started call sites
+ * passed `{ language }` but game_completed sites did not, so the terminal event
+ * the admin game log displays had no language and every game rendered as English.
+ * Stamping this centrally guarantees EVERY event carries the locale.
+ */
+const getCurrentLanguage = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = window.localStorage.getItem('boggle_language');
+    if (stored) return stored;
+  } catch {
+    /* localStorage unavailable (private mode / SSR) — fall through */
+  }
+  if (typeof document !== 'undefined' && document.documentElement.lang) {
+    return document.documentElement.lang;
+  }
+  return null;
+};
+
 const getAnalyticsAuthHeaders = async (): Promise<Record<string, string>> => {
   try {
     const { data } = await getSession();
@@ -354,6 +374,8 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
     ...metadata,
     platform: getPlatform(),
     guest_name: getGuestName(),
+    // Prefer a language a caller passed explicitly; else the current UI locale.
+    language: (typeof metadata.language === 'string' && metadata.language) || getCurrentLanguage(),
     username: identity?.username ?? (typeof metadata.username === 'string' ? metadata.username : null),
     userId: identity?.userId ?? (typeof metadata.userId === 'string' ? metadata.userId : null),
   };

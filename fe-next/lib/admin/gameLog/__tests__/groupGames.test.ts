@@ -214,3 +214,35 @@ describe('groupGames — group ordering & aggregates', () => {
     expect(r5.topScore).toBe(20);
   });
 });
+
+describe('groupGames — language recovery', () => {
+  // Real data: a solo game emits game_started (carries metadata.language) and
+  // game_completed (does NOT). groupGames drops the solo game_started row, so the
+  // only language-bearing event is gone before the flag is read — every solo game
+  // rendered as English. Recover the language from the dropped start event via the
+  // shared session id.
+  it("recovers a solo game's language from its dropped game_started row", () => {
+    const rows = [
+      game({ id: 'start', event_type: 'game_started', is_multiplayer: false, guest_session_id: 'guest_1_he', language: 'he' }),
+      game({ id: 'end', event_type: 'game_completed', is_multiplayer: false, guest_session_id: 'guest_1_he', language: 'en' }),
+    ];
+    const groups = groupGames(rows);
+    // Solo groups by terminal event id → exactly one group (the start row is dropped).
+    expect(groups).toHaveLength(1);
+    expect(groups[0].language).toBe('he');
+  });
+
+  it('keeps a non-en language carried directly on the terminal event', () => {
+    const rows = [
+      game({ id: 'end', event_type: 'game_completed', is_multiplayer: false, guest_session_id: 's', language: 'sv' }),
+    ];
+    expect(groupGames(rows)[0].language).toBe('sv');
+  });
+
+  it("defaults to 'en' when no event of the session carries a non-en language", () => {
+    const rows = [
+      game({ id: 'end', event_type: 'game_completed', is_multiplayer: false, guest_session_id: 's', language: 'en' }),
+    ];
+    expect(groupGames(rows)[0].language).toBe('en');
+  });
+});

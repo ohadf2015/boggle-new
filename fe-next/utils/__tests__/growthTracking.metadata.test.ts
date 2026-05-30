@@ -368,4 +368,46 @@ describe('Analytics Metadata Enrichment', () => {
       expect(headers['Content-Type']).toBe('application/json');
     });
   });
+
+  describe('Language stamping — every event carries the UI locale', () => {
+    // The admin game log reads metadata.language for the flag. game_started call
+    // sites passed { language }; game_completed call sites did NOT, so completed
+    // events (the terminal row the log displays) had no language and rendered as
+    // English. Stamp the current UI locale centrally so ALL events carry it.
+    it('injects the stored UI language into metadata for game_completed', async () => {
+      vi.doMock('@/utils/platform', () => ({
+        getPlatform: vi.fn(() => 'web'),
+        isNative: vi.fn(() => false),
+      }));
+      window.localStorage.setItem('boggle_language', 'he');
+
+      const { trackGameEnd } = await import('../growthTracking');
+      const mockFetch = vi.fn().mockResolvedValue({ ok: true });
+      global.fetch = mockFetch;
+
+      trackGameEnd('singleplayer', 100, 5, true);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const body = mockFetch.mock.calls[0][1]?.body as string;
+      expect(body).toContain('"language":"he"');
+    });
+
+    it('prefers an explicit language passed by the caller over the stored locale', async () => {
+      vi.doMock('@/utils/platform', () => ({
+        getPlatform: vi.fn(() => 'web'),
+        isNative: vi.fn(() => false),
+      }));
+      window.localStorage.setItem('boggle_language', 'en');
+
+      const { trackGameEnd } = await import('../growthTracking');
+      const mockFetch = vi.fn().mockResolvedValue({ ok: true });
+      global.fetch = mockFetch;
+
+      trackGameEnd('singleplayer', 100, 5, true, 60, { language: 'ja' });
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      const body = mockFetch.mock.calls[0][1]?.body as string;
+      expect(body).toContain('"language":"ja"');
+    });
+  });
 });

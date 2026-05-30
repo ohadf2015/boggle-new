@@ -165,7 +165,7 @@ function GameGroupListRow({
 
       <span className="flex items-center gap-2 min-w-0">
         <span className="relative inline-flex flex-shrink-0">
-          <PlayerAvatar customAvatar={group.host?.profile?.avatar_config} userId={group.host?.playerId ?? undefined} />
+          <PlayerAvatar customAvatar={group.host?.profile?.avatar_config} userId={group.host?.playerId ?? group.host?.guestSessionId ?? undefined} />
           {group.isMultiplayer && <span className="absolute -top-1.5 -end-1.5 text-xs">👥</span>}
         </span>
         <span className="flex flex-col min-w-0">

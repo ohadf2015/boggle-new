@@ -181,7 +181,30 @@ function buildPlayer(acc: PlayerAccumulator): GamePlayer {
   };
 }
 
-function buildGroup(key: string, rows: UnifiedGame[]): GameGroup {
+/**
+ * The group's UI language for the flag. game_started carries metadata.language
+ * but is dropped from solo groups (see groupGames), and completed events
+ * historically default to 'en'. A non-'en' language is only ever set explicitly,
+ * so prefer it; otherwise recover it from another event of the same session.
+ */
+function pickGroupLanguage(
+  rows: UnifiedGame[],
+  langBySession: Map<string, string>,
+): string {
+  const explicit = rows.find((r) => r.language && r.language !== 'en')?.language;
+  if (explicit) return explicit;
+  for (const r of rows) {
+    const recovered = r.guest_session_id ? langBySession.get(r.guest_session_id) : undefined;
+    if (recovered) return recovered;
+  }
+  return rows.find((r) => r.language)?.language ?? 'en';
+}
+
+function buildGroup(
+  key: string,
+  rows: UnifiedGame[],
+  langBySession: Map<string, string>,
+): GameGroup {
   // Merge rows into players.
   const byPlayer = new Map<string, PlayerAccumulator>();
   for (const r of rows) {
@@ -241,7 +264,7 @@ function buildGroup(key: string, rows: UnifiedGame[]): GameGroup {
     isRanked: rows.some((r) => r.is_ranked),
     modeRaw,
     typeBucket: bucketForMode(modeRaw),
-    language: rows.find((r) => r.language)?.language ?? 'en',
+    language: pickGroupLanguage(rows, langBySession),
     createdAt,
     endedAt,
     status,
@@ -257,6 +280,15 @@ function buildGroup(key: string, rows: UnifiedGame[]): GameGroup {
 }
 
 export function groupGames(rows: UnifiedGame[]): GameGroup[] {
+  // Recover language per session BEFORE grouping drops solo game_started rows —
+  // those start rows are the only ones that carry a non-'en' metadata.language.
+  const langBySession = new Map<string, string>();
+  for (const r of rows) {
+    if (r.language && r.language !== 'en' && r.guest_session_id && !langBySession.has(r.guest_session_id)) {
+      langBySession.set(r.guest_session_id, r.language);
+    }
+  }
+
   const byGroup = new Map<string, UnifiedGame[]>();
   for (const r of rows) {
     const mp = isMpRow(r);
@@ -273,6 +305,6 @@ export function groupGames(rows: UnifiedGame[]): GameGroup[] {
     else byGroup.set(k, [r]);
   }
   return [...byGroup.entries()]
-    .map(([k, gs]) => buildGroup(k, gs))
+    .map(([k, gs]) => buildGroup(k, gs, langBySession))
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0));
 }
