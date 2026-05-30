@@ -151,6 +151,11 @@ export function GameCanvas({
 
     return () => {
       destroyed = true;
+      // Stop Pixi's render ticker BEFORE tearing down subsystems. Otherwise the
+      // internal render listener traverses a half-destroyed stage (flash/particle
+      // Graphics already .destroy()'d) and calls .clear() on a nulled context →
+      // "Cannot read properties of null (reading 'clear')" (Sentry 1CK).
+      try { app.ticker?.stop(); } catch { /* */ }
       const eng = engineRef.current;
       if (eng) {
         try { eng.particles.destroy(); } catch { /* */ }
