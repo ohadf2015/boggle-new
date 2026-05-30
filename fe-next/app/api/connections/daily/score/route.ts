@@ -98,7 +98,10 @@ export async function POST(request: NextRequest) {
     };
 
     if (decision.action === 'insert') {
-      await admin.from('connections_daily_scores').insert(rowData);
+      const { error: insErr } = await admin.from('connections_daily_scores').insert(rowData);
+      // 23505 = unique violation from a concurrent double-submit; the row now
+      // exists, so fall through to ranking rather than 500.
+      if (insErr && insErr.code !== '23505') throw insErr;
     } else if (decision.action === 'update') {
       await admin.from('connections_daily_scores').update(rowData).eq('id', existing!.id);
     }
