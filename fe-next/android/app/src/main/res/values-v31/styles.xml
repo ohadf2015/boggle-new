@@ -4,25 +4,28 @@
 
   On API 31+ the platform draws its OWN splash and reads ONLY android:-prefixed
   attributes here (the androidx non-prefixed ones in values/styles.xml don't apply
-  on 31+). Without this, the OS masks the launcher adaptive-icon into a circle on
-  every cold start — that's the "navy bg with a circle of the old logo" that flashes
-  when the backgrounded process is evicted and the user re-opens the app.
+  on 31+). By default the OS masks the LAUNCHER adaptive-icon into a circle on every
+  cold start — that was the original "navy bg with a circle of the stale wordmark"
+  that flashed when the evicted process is re-opened.
 
-  We force navy background + a navy-on-navy blank icon so the system splash is a
-  seamless navy flash with no visible logo. All values point at the same neo-navy
-  (#1a1a2e) as the launch + post-splash window backgrounds, so this can never
-  conflict with values/styles.xml.
+  We now show an INTENTIONAL brand splash: @drawable/splash_icon is the current LEXI
+  tile mark, pre-padded to ~60% so it sits inside the circle safe-zone and never gets
+  clipped. windowSplashScreenIconBackgroundColor + background are both neo-navy
+  (#1a1a2e) — matching the launch + post-splash window backgrounds — so the mark reads
+  as a clean brand badge on seamless navy, and the navy→app handoff stays invisible.
+  This is the splash users expect, NOT the broken clipped flash.
 
-  NOTE (honest caveat): a few OEM skins (e.g. older Samsung One UI) don't fully
-  honor icon suppression on the system splash — navy-blend is the best achievable
-  there, not an absolute guarantee.
+  NOTE (honest caveat): a few OEM skins (e.g. older Samsung One UI) render the system
+  splash icon at slightly different scale/margins — the safe-zone padding makes that a
+  cosmetic difference, not a clipped logo.
 
-  ⚠️ DO NOT run `npx capacitor-assets generate` — it can rewrite these themes.
+  ⚠️ DO NOT run `npx capacitor-assets generate` — it can rewrite these themes back to
+  the full-wordmark @drawable/splash and reintroduce the flash.
 -->
 <resources>
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:windowSplashScreenBackground">#FF1A1A2E</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_blank</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
         <item name="android:windowSplashScreenIconBackgroundColor">#FF1A1A2E</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
