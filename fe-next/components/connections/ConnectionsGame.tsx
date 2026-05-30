@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, m } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -513,6 +514,14 @@ export default function ConnectionsGame() {
           </div>
         </div>
       </m.div>
+
+      {/* Daily Challenge entry — same puzzles for everyone today + leaderboard */}
+      <Link
+        href={`/${language}/connections/daily`}
+        className="mb-3 flex items-center justify-center gap-2 rounded-neo border-neo border-neo-yellow/60 bg-neo-yellow/10 px-4 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+      >
+        🏆 {t('connections.daily.cta')}
+      </Link>
 
       {/* XP earned this session */}
       {xpEarned > 0 && (
