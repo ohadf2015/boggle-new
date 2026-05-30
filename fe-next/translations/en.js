@@ -2628,11 +2628,14 @@ const en = {
     },
     "sessionStats": {
       "title": "Session Highlights",
-      "improved": "Improved {percent}% from round 1!",
-      "consistent": "Top 3 in {count} rounds!",
-      "comeback": "Climbed {positions} positions!",
+      "you": "You",
+      "versus": "vs",
+      "improved": "Up {percent}% since round 1!",
+      "consistent": "Top 3, {count} rounds running!",
+      "comeback": "Climbed {positions} spots!",
       "rivalry": "Only {diff} pts apart!",
-      "bigRound": "{score} pts in round {round}!"
+      "bigRound": "Best round: {score} pts in R{round}!",
+      "placement": "Sitting at #{rank} — keep swinging!"
     },
     "series": {
       "title": "Session Standings",
@@ -12797,6 +12800,7 @@ const en = {
     "sidebar": {
       "analytics": "Analytics",
       "content": "Content",
+      "puzzleReview": "Puzzle Review",
       "moderation": "Moderation",
       "overview": "Overview",
       "players": "Players",

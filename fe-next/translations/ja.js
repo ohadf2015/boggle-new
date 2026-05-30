@@ -2547,11 +2547,14 @@ const ja = {
     },
     "sessionStats": {
       "title": "セッションハイライト",
-      "improved": "ラウンド1から{percent}%向上！",
-      "consistent": "{count}ラウンドでトップ3！",
-      "comeback": "{positions}ポジション上昇！",
-      "rivalry": "わずか{diff}ポイント差！",
-      "bigRound": "ラウンド{round}で{score}ポイント！"
+      "you": "自分",
+      "versus": "対",
+      "improved": "ラウンド1から{percent}%アップ！",
+      "consistent": "{count}ラウンド連続トップ3！",
+      "comeback": "{positions}つ順位アップ！",
+      "rivalry": "わずか{diff}点差！",
+      "bigRound": "最高はラウンド{round}の{score}点！",
+      "placement": "現在{rank}位。まだまだこれから！"
     },
     "series": {
       "title": "セッション順位",
@@ -7168,6 +7171,7 @@ const ja = {
       "analytics": "分析",
       "moderation": "モデレーション",
       "content": "コンテンツ",
+      "puzzleReview": "パズルレビュー",
       "players": "プレイヤー",
       "guests": "ゲスト",
       "system": "システム",

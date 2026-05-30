@@ -2633,11 +2633,14 @@ const sv = {
     },
     "sessionStats": {
       "title": "Sessionhöjdpunkter",
-      "improved": "Förbättrade {percent}% från omgång 1!",
-      "consistent": "Topp 3 i {count} omgångar!",
+      "you": "Du",
+      "versus": "mot",
+      "improved": "Upp {percent}% sen omgång 1!",
+      "consistent": "Topp 3, {count} omgångar i rad!",
       "comeback": "Klättrade {positions} platser!",
-      "rivalry": "Bara {diff} poäng emellan!",
-      "bigRound": "{score} poäng i omgång {round}!"
+      "rivalry": "Bara {diff} poäng isär!",
+      "bigRound": "Bästa omgången: {score} poäng i omgång {round}!",
+      "placement": "På plats {rank} — ge inte upp!"
     },
     "series": {
       "title": "Sammanlagd ställning",
@@ -7145,6 +7148,7 @@ const sv = {
       "analytics": "Analys",
       "moderation": "Moderering",
       "content": "Innehåll",
+      "puzzleReview": "Pusselgranskning",
       "players": "Spelare",
       "guests": "Gäster",
       "system": "System",

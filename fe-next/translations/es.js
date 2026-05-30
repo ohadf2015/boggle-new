@@ -2466,11 +2466,14 @@ const es = {
     },
     "sessionStats": {
       "title": "Momentos de la Sesión",
-      "improved": "¡Mejoraste {percent}% desde la ronda 1!",
-      "consistent": "¡Top 3 en {count} rondas!",
-      "comeback": "¡Subiste {positions} posiciones!",
+      "you": "Tú",
+      "versus": "vs",
+      "improved": "¡+{percent}% desde la ronda 1!",
+      "consistent": "¡Top 3 en {count} rondas seguidas!",
+      "comeback": "¡{positions} posiciones arriba!",
       "rivalry": "¡Solo {diff} pts de diferencia!",
-      "bigRound": "¡{score} pts en la ronda {round}!"
+      "bigRound": "¡Mejor ronda: {score} pts en la {round}!",
+      "placement": "En el puesto {rank}. ¡Aún hay juego!"
     },
     "series": {
       "title": "Tabla de la Sesión",
@@ -7102,6 +7105,7 @@ const es = {
       "analytics": "Análisis",
       "moderation": "Moderación",
       "content": "Contenido",
+      "puzzleReview": "Revisión de acertijos",
       "players": "Jugadores",
       "guests": "Invitados",
       "system": "Sistema",

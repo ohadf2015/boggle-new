@@ -2661,11 +2661,14 @@ const he = {
     },
     "sessionStats": {
       "title": "נקודות עיקריות מהסשן",
-      "improved": "השתפר/ה ב-{percent}% מהסיבוב הראשון!",
-      "consistent": "טופ 3 ב-{count} סיבובים!",
-      "comeback": "טיפס/ה {positions} מקומות!",
+      "you": "את/ה",
+      "versus": "נגד",
+      "improved": "זינוק של {percent}% מהסיבוב הראשון!",
+      "consistent": "טופ 3 ב-{count} סיבובים ברצף!",
+      "comeback": "קפיצה של {positions} מקומות!",
       "rivalry": "רק {diff} נקודות הפרש!",
-      "bigRound": "{score} נקודות בסיבוב {round}!"
+      "bigRound": "הסיבוב הכי חזק: {score} נקודות בסיבוב {round}!",
+      "placement": "במקום {rank} — יש עוד הרבה משחק!"
     },
     "series": {
       "title": "דירוג מצטבר",
@@ -7114,6 +7117,7 @@ const he = {
       "analytics": "אנליטיקה",
       "moderation": "מודרציה",
       "content": "תוכן",
+      "puzzleReview": "סקירת חידות",
       "players": "שחקנים",
       "guests": "אורחים",
       "system": "מערכת",
