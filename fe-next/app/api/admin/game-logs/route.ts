@@ -9,7 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { mapAnalyticsEventToGame, type AnalyticsEventRow } from '@/lib/admin/gameLog/analyticsEventMapper';
-import { CANONICAL_MODE_BUCKETS } from '@/lib/admin/gameLog/modeBuckets';
+import { CANONICAL_MODE_BUCKETS, unbucketedModes } from '@/lib/admin/gameLog/modeBuckets';
+import { groupGames, type GameGroup } from '@/lib/admin/gameLog/groupGames';
 import type { GameProfile } from '@/components/admin/today-games/types';
 
 type ProfileEmbed = unknown;
@@ -937,10 +938,22 @@ function applyGameTypeFilter(q: PgFilter, gameType: string): PgFilter {
   }
 }
 
+/** Max analytics rows pulled into memory for grouping (date-windowed view ≈ a few k). */
+const MAX_ANALYTICS_ROWS = 12000;
+const FETCH_BATCH = 1000;
+
 /**
- * Comprehensive game log built from analytics_events (event_type='game_completed').
- * Single-table → correct server-side range() + exact count pagination, and it is the
- * only source that contains non-registered players with mode/attribution/device.
+ * Comprehensive game log built from analytics_events, GROUPED into one row per game.
+ *
+ * Why grouped + multi-event: a single game emits one row PER PLAYER PER lifecycle
+ * event. The founder wants to investigate a game as a unit (all players, host
+ * acquisition, status), so we fetch the date-windowed rows for
+ * game_started/game_completed/game_abandoned, map + group them in memory
+ * (`groupGames`), then paginate over GROUPS. Host acquisition (`utm_source`,
+ * role='host') lives on game_started, and abandonment = started-without-terminal —
+ * neither is visible in a completed-only query, which is why we broaden the event
+ * set here. At ~15k total rows, in-memory grouping is fine; a Postgres RPC with
+ * JSON-path GROUP BY is the 100x scale path (not built).
  */
 async function fetchFromAnalyticsEvents(opts: {
   supabase: SupabaseAdmin;
@@ -957,30 +970,38 @@ async function fetchFromAnalyticsEvents(opts: {
   const { supabase, page, pageSize, offset, ascending, gameType, startDate, endDate } = opts;
 
   const applyCommon = (q: PgFilter): PgFilter => {
-    let out = q.eq('event_type', 'game_completed');
+    // Lifecycle events that define a play. game_started carries host attribution;
+    // game_abandoned carries error/quit reasons; game_completed is the terminal.
+    let out = q.in('event_type', ['game_started', 'game_completed', 'game_abandoned']);
     if (startDate) out = out.gte('created_at', startDate);
     if (endDate) out = out.lte('created_at', `${endDate}T23:59:59.999Z`);
-    // NOTE: analytics_events does not record a per-game language (no `language`
-    // column or metadata key), so the language filter is intentionally NOT applied
-    // here — applying it would match zero rows and blank the default log. The UI
-    // disables the language control for this source.
     out = applyGameTypeFilter(out, gameType);
     return out;
   };
 
-  // Main paginated query — exact count gives an accurate totalCount (no phantom pages).
-  const mainBuilder = supabase
-    .from('analytics_events')
-    .select('id, event_type, player_id, session_id, country_code, utm_source, utm_medium, utm_campaign, referrer, created_at, metadata', { count: 'exact' });
-  applyCommon(mainBuilder as unknown as PgFilter);
-  const { data, error, count } = await mainBuilder
-    .order('created_at', { ascending })
-    .range(offset, offset + pageSize - 1);
-  if (error) {
-    console.error('[admin/game-logs] analytics query error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  // Pull the windowed rows in batches (Supabase caps a single response at 1000).
+  const rows: AnalyticsEventRow[] = [];
+  let truncated = false;
+  for (let start = 0; start < MAX_ANALYTICS_ROWS; start += FETCH_BATCH) {
+    const builder = supabase
+      .from('analytics_events')
+      .select('id, event_type, player_id, session_id, country_code, utm_source, utm_medium, utm_campaign, referrer, created_at, metadata');
+    applyCommon(builder as unknown as PgFilter);
+    const { data, error } = await builder
+      .order('created_at', { ascending: false })
+      .range(start, start + FETCH_BATCH - 1);
+    if (error) {
+      console.error('[admin/game-logs] analytics query error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    const batch = (data as unknown as AnalyticsEventRow[]) || [];
+    rows.push(...batch);
+    if (batch.length < FETCH_BATCH) break;
+    if (start + FETCH_BATCH >= MAX_ANALYTICS_ROWS) truncated = true;
   }
-  const rows = (data as unknown as AnalyticsEventRow[]) || [];
+  if (truncated) {
+    console.warn(`[admin/game-logs] analytics fetch hit ${MAX_ANALYTICS_ROWS}-row cap; narrow the date range for complete coverage.`);
+  }
 
   // Batch-join profiles for any rows that resolve to a registered player.
   const playerIds = Array.from(
@@ -991,11 +1012,12 @@ async function fetchFromAnalyticsEvents(opts: {
     ),
   );
   const profileById: Record<string, GameProfile> = {};
-  if (playerIds.length > 0) {
+  for (let i = 0; i < playerIds.length; i += FETCH_BATCH) {
+    const slice = playerIds.slice(i, i + FETCH_BATCH);
     const { data: profs } = await supabase
       .from('profiles')
       .select('id, username, display_name, avatar_emoji, avatar_color, avatar_config')
-      .in('id', playerIds);
+      .in('id', slice);
     ((profs as unknown as Array<GameProfile & { id: string }>) || []).forEach((p) => {
       profileById[p.id] = p;
     });
@@ -1006,36 +1028,33 @@ async function fetchFromAnalyticsEvents(opts: {
     return mapAnalyticsEventToGame(r, pid ? profileById[pid] ?? null : null);
   });
 
-  const totalCount = count ?? games.length;
-  const totalPages = Math.ceil(totalCount / pageSize);
+  // Collapse per-player/per-event rows into one group per game.
+  let groups: GameGroup[] = groupGames(games);
+  if (ascending) groups = [...groups].reverse(); // groupGames sorts createdAt desc
 
-  // Accurate per-bucket counts via head counts (one query per canonical bucket, parallel).
-  const headCount = async (extra: (q: PgFilter) => PgFilter): Promise<number> => {
-    const builder = supabase.from('analytics_events').select('id', { count: 'exact', head: true });
-    const filter = applyCommon(builder as unknown as PgFilter);
-    extra(filter);
-    const { count: c } = await builder;
-    return c ?? 0;
-  };
+  const totalCount = groups.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const pageGroups = groups.slice(offset, offset + pageSize);
 
-  const bucketCounts = await Promise.all(
-    CANONICAL_MODE_BUCKETS.map((b) =>
-      headCount((q) =>
-        b.multiplayer
-          // MP is tracked two ways: an isMultiplayer flag, OR gameMode='multiplayer'
-          // (older mpSession path that never set the flag). Count both.
-          ? q.or('metadata->>isMultiplayer.eq.true,metadata->>gameMode.eq.multiplayer')
-          : q.in('metadata->>gameMode', b.modes),
-      ).then((count) => ({ key: b.key, labelKey: b.labelKey, label: b.label, count })),
-    ),
-  );
-
+  // Per-type counts at the GROUP level (the "correct" stats the founder wants).
+  const bucketCounts = CANONICAL_MODE_BUCKETS.map((b) => {
+    const count = b.multiplayer
+      ? groups.filter((g) => g.isMultiplayer).length
+      : groups.filter((g) => !g.isMultiplayer && g.typeBucket === b.key).length;
+    return { key: b.key, labelKey: b.labelKey, label: b.label, count };
+  });
   const mpBucket = bucketCounts.find((b) => b.key === 'multiplayer');
+
+  // Gap guard: surface raw modes that have no type bucket so new modes can't rot silently.
+  const unbucketed = unbucketedModes(games.map((g) => g.mode));
 
   return NextResponse.json({
     success: true,
     source: 'analytics',
-    games,
+    grouped: true,
+    gameGroups: pageGroups,
+    unbucketedModes: unbucketed,
+    truncated,
     pagination: {
       page,
       pageSize,
@@ -1044,9 +1063,7 @@ async function fetchFromAnalyticsEvents(opts: {
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
     },
-    // Accurate, dynamic per-mode counts (the "correct" stats the admin wants).
     modeBreakdown: bucketCounts,
-    // Legacy shape kept for back-compat consumers; multiplayer card = real MP count.
     breakdown: {
       authenticatedGames: mpBucket?.count ?? 0,
       guestGames: 0,

@@ -78,6 +78,7 @@ export interface DetailedGame {
   isPrivate: boolean;
   createdAt: number;
   timerSeconds: number;
+  gameMode?: GameMode;
   players: DetailedGamePlayer[];
 }
 
@@ -147,6 +148,7 @@ export function getDetailedGames(games: Record<string, QueryGameBase>): Detailed
       isPrivate: game.isPrivate,
       createdAt: game.createdAt,
       timerSeconds: game.timerSeconds,
+      gameMode: game.gameMode,
       players,
     };
   });

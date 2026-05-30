@@ -54,6 +54,7 @@ export function mapAnalyticsEventToGame(
 
   return {
     id: row.id,
+    event_type: row.event_type,
     player_id: playerId,
     guest_session_id: row.session_id,
     game_code: str(meta.gameCode) ?? 'solo',
@@ -88,6 +89,8 @@ export function mapAnalyticsEventToGame(
     os,
     user_agent: ua,
     guest_name: guestName,
+    platform: str(meta.platform),
+    error_reason: str(meta.error_reason) ?? str(meta.reason),
     source: 'analytics',
   };
 }

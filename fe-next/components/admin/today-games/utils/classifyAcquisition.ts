@@ -36,6 +36,10 @@ const PORTAL = [
   'y8', 'armorgames', 'addictinggames', 'silvergames', 'lagged', 'coolmathgames',
 ];
 const MAIL = ['gmail', 'mail.google', 'outlook', 'hotmail', 'yahoo mail', 'mail.yahoo', 'mail.ru', 'proton', 'protonmail'];
+// Internal app navigation / share tokens that leak into utm_source — NOT acquisition
+// channels. Verified live (2026-05-30): mobile-lobby / solo-confirm / copy. Collapse
+// to 'direct' so the host-acquisition view stays a clean channel breakdown.
+const INTERNAL = ['mobile-lobby', 'lobby', 'solo-confirm', 'copy', 'in-app', 'app', 'mobile-app', 'player_invite'];
 
 function host(value: string): string {
   if (!/^https?:\/\//i.test(value)) return value.toLowerCase();
@@ -73,6 +77,11 @@ export function classifyAcquisition(input: ClassifyInput): AcquisitionTag {
   }
   if (['cpc', 'paid', 'ppc', 'ads', 'display', 'cpm', 'adwords'].includes(medium)) {
     return { kind: 'ads', rawLabel: campaign || utm || null, tooltip };
+  }
+
+  // Internal app navigation / share tokens are not acquisition channels → direct.
+  if (utm && INTERNAL.includes(utm)) {
+    return { kind: 'direct', rawLabel: null, tooltip };
   }
 
   // Source / referrer host classification.

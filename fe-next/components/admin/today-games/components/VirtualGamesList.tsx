@@ -2,17 +2,18 @@
 
 import React, { useRef, useState, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { ChevronDown, ChevronRight, Crown, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronRight, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { UnifiedGame, GamesResponse } from '../types';
+import type { GamesResponse } from '../types';
+import type { GameGroup } from '@/lib/admin/gameLog/groupGames';
 import { LANGUAGE_FLAGS, GAME_TYPE_ICONS, formatDuration, formatTime } from '../constants';
 import { PlayerAvatar } from './PlayerAvatar';
-import { GameDetailPanel } from './GameDetailPanel';
+import { GameGroupDetailPanel } from './GameGroupDetailPanel';
 import { gameModeLabel } from '@/lib/admin/gameLog/gameDisplay';
-import { classifyAcquisition, ACQUISITION_TONE } from '../utils/classifyAcquisition';
+import { ACQUISITION_TONE } from '../utils/classifyAcquisition';
 
 interface Props {
-  games: UnifiedGame[];
+  gameGroups: GameGroup[];
   pagination: GamesResponse['pagination'] | null;
   page: number;
   pageSize: number;
@@ -22,33 +23,33 @@ interface Props {
 
 const ROW_ESTIMATE = 56;
 
-export function VirtualGamesList({ games, pagination, page, pageSize, onPageChange, t }: Props) {
+export function VirtualGamesList({ gameGroups, pagination, page, pageSize, onPageChange, t }: Props) {
   const parentRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
-  const toggle = useCallback((id: string) => {
+  const toggle = useCallback((key: string) => {
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   }, []);
 
   const virtualizer = useVirtualizer({
-    count: games.length,
+    count: gameGroups.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ROW_ESTIMATE,
     overscan: 8,
     // Re-measure when a row expands/collapses.
-    getItemKey: (index) => games[index]?.id ?? index,
+    getItemKey: (index) => gameGroups[index]?.key ?? index,
   });
 
   const items = virtualizer.getVirtualItems();
   // When the scroll container cannot be measured (jsdom/SSR, or no ResizeObserver),
   // the virtualizer yields 0 items. Fall back to rendering every row so the list is
   // never blank. Real browsers measure fine and use the windowed path above.
-  const useFallback = items.length === 0 && games.length > 0;
+  const useFallback = items.length === 0 && gameGroups.length > 0;
 
   return (
     <>
@@ -70,12 +71,12 @@ export function VirtualGamesList({ games, pagination, page, pageSize, onPageChan
       >
         {useFallback ? (
           <div>
-            {games.map((game) => {
-              const isOpen = expanded.has(game.id);
+            {gameGroups.map((group) => {
+              const isOpen = expanded.has(group.key);
               return (
-                <div key={game.id} className="border-b border-slate-700/70">
-                  <GameListRow game={game} isOpen={isOpen} onToggle={() => toggle(game.id)} t={t} />
-                  {isOpen && <GameDetailPanel game={game} t={t} />}
+                <div key={group.key} className="border-b border-slate-700/70">
+                  <GameGroupListRow group={group} isOpen={isOpen} onToggle={() => toggle(group.key)} t={t} />
+                  {isOpen && <GameGroupDetailPanel group={group} t={t} />}
                 </div>
               );
             })}
@@ -83,9 +84,9 @@ export function VirtualGamesList({ games, pagination, page, pageSize, onPageChan
         ) : (
           <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
             {items.map((vi) => {
-              const game = games[vi.index];
-              if (!game) return null;
-              const isOpen = expanded.has(game.id);
+              const group = gameGroups[vi.index];
+              if (!group) return null;
+              const isOpen = expanded.has(group.key);
               return (
                 <div
                   key={vi.key}
@@ -94,8 +95,8 @@ export function VirtualGamesList({ games, pagination, page, pageSize, onPageChan
                   className="absolute left-0 w-full border-b border-slate-700/70"
                   style={{ transform: `translateY(${vi.start}px)` }}
                 >
-                  <GameListRow game={game} isOpen={isOpen} onToggle={() => toggle(game.id)} t={t} />
-                  {isOpen && <GameDetailPanel game={game} t={t} />}
+                  <GameGroupListRow group={group} isOpen={isOpen} onToggle={() => toggle(group.key)} t={t} />
+                  {isOpen && <GameGroupDetailPanel group={group} t={t} />}
                 </div>
               );
             })}
@@ -124,34 +125,34 @@ export function VirtualGamesList({ games, pagination, page, pageSize, onPageChan
   );
 }
 
-function GameListRow({
-  game,
+function GameGroupListRow({
+  group,
   isOpen,
   onToggle,
   t,
 }: {
-  game: UnifiedGame;
+  group: GameGroup;
   isOpen: boolean;
   onToggle: () => void;
   t: (key: string, fallback?: string) => string;
 }) {
-  const flag = LANGUAGE_FLAGS[game.language] || '🌐';
-  const typeIcon = GAME_TYPE_ICONS[game.mode] || null;
-  const playerName =
-    game.profiles?.display_name ||
-    game.profiles?.username ||
-    game.guest_name ||
-    (game.is_guest ? t('admin.todayGames.guest', 'Guest') : 'Unknown');
-  const seedId = game.player_id || game.guest_session_id || undefined;
+  const flag = LANGUAGE_FLAGS[group.language] || '🌐';
+  const typeIcon = GAME_TYPE_ICONS[group.modeRaw] || null;
+  const hostName = group.host?.displayName || 'Unknown';
+  const hostAcq = group.hostAcquisition;
+  const showAcqChip = hostAcq && (hostAcq.kind !== 'unknown' || !!hostAcq.rawLabel);
 
-  const acq = classifyAcquisition({
-    utm_source: game.utm_source,
-    utm_medium: game.utm_medium,
-    utm_campaign: game.utm_campaign,
-    referrer_source: game.referrer_source,
-    is_guest: !!game.is_guest,
-  });
-  const showChip = acq.kind !== 'unknown' || !!acq.rawLabel;
+  // Status badge styling
+  const statusStyles: Record<string, string> = {
+    completed: 'bg-neo-lime/20 text-neo-lime border-neo-lime/40',
+    abandoned: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+    errored: 'bg-neo-red/20 text-neo-red border-neo-red/40',
+  };
+  const statusLabels: Record<string, string> = {
+    completed: t('admin.todayGames.status.completed', 'Completed'),
+    abandoned: t('admin.todayGames.status.abandoned', 'Abandoned'),
+    errored: t('admin.todayGames.status.errored', 'Error'),
+  };
 
   return (
     <button
@@ -160,46 +161,38 @@ function GameListRow({
       aria-expanded={isOpen}
       className="w-full text-left px-3 py-2.5 grid grid-cols-[auto_1fr_auto] sm:grid-cols-[70px_1fr_140px_70px_70px_80px_24px] gap-2 items-center hover:bg-neo-navy-elevated/30 transition-colors"
     >
-      <span className="text-xs text-slate-400">{formatTime(game.created_at)}</span>
+      <span className="text-xs text-slate-400">{formatTime(group.createdAt)}</span>
 
       <span className="flex items-center gap-2 min-w-0">
         <span className="relative inline-flex flex-shrink-0">
-          <PlayerAvatar customAvatar={game.is_guest ? null : game.profiles?.avatar_config} userId={seedId} />
-          {game.placement === 1 && <Crown className="absolute -top-1.5 -end-1.5 w-3 h-3 text-neo-lime" />}
+          <PlayerAvatar customAvatar={group.host?.profile?.avatar_config} userId={group.host?.playerId ?? undefined} />
+          {group.isMultiplayer && <span className="absolute -top-1.5 -end-1.5 text-xs">👥</span>}
         </span>
         <span className="flex flex-col min-w-0">
           <span className="text-sm text-neo-white truncate max-w-[160px] flex items-center gap-1.5">
-            {playerName}
-            {game.is_guest && (
-              <span className="text-[10px] bg-slate-600 text-slate-300 px-1 rounded">{t('admin.todayGames.guest', 'Guest')}</span>
-            )}
-            {game.is_first_game && <Sparkles className="w-3 h-3 text-neo-lime" />}
+            {hostName}
           </span>
-          {/* Mode + source chip on mobile (where the mode column is hidden) */}
-          <span className="flex items-center gap-1.5 sm:hidden text-[11px] text-slate-400">
-            {gameModeLabel(game.game_mode || game.mode, t)}
-            {showChip && (
-              <span className={`inline-flex items-center gap-0.5 border rounded-full px-1 leading-none ${ACQUISITION_TONE[acq.kind]}`}>
-                {t(`admin.todayGames.source.${acq.kind}`, acq.kind)}
-              </span>
-            )}
+          {/* Mode + badges on mobile */}
+          <span className="flex items-center gap-1.5 sm:hidden text-[11px] text-slate-400 flex-wrap">
+            {gameModeLabel(group.modeRaw, t)}
+            {group.isMultiplayer && <span className="text-[9px] bg-slate-600 text-slate-300 px-1 rounded">{t('admin.todayGames.multiplayer', 'MP')}</span>}
+            {group.isRanked && <span className="text-[9px] bg-slate-600 text-slate-300 px-1 rounded">{t('admin.todayGames.ranked', 'Ranked')}</span>}
           </span>
         </span>
       </span>
 
       <span className="hidden sm:flex items-center gap-1.5 min-w-0">
         {typeIcon}
-        <span className="text-sm text-slate-300 truncate">{gameModeLabel(game.game_mode || game.mode, t)}</span>
-        {showChip && (
-          <span className={`inline-flex items-center border rounded-full px-1 text-[10px] leading-none ${ACQUISITION_TONE[acq.kind]}`} title={acq.tooltip}>
-            {t(`admin.todayGames.source.${acq.kind}`, acq.kind)}
-          </span>
-        )}
+        <span className="text-sm text-slate-300 truncate">{gameModeLabel(group.modeRaw, t)}</span>
+        {group.isMultiplayer && <span className="text-[9px] bg-slate-600 text-slate-300 px-1 rounded">{t('admin.todayGames.multiplayer', 'MP')}</span>}
+        {group.isRanked && <span className="text-[9px] bg-slate-600 text-slate-300 px-1 rounded">{t('admin.todayGames.ranked', 'Ranked')}</span>}
       </span>
 
-      <span className="hidden sm:block text-right font-mono text-sm text-neo-white">{game.score}</span>
-      <span className="hidden sm:block text-right font-mono text-sm text-slate-300">{game.word_count}</span>
-      <span className="hidden sm:block text-right text-sm text-slate-300">{formatDuration(game.time_played)}</span>
+      <span className="hidden sm:block text-right font-mono text-sm text-slate-300">
+        {group.playerCount}{group.botCount ? ` +${group.botCount}b` : ''}
+      </span>
+      <span className="hidden sm:block text-right font-mono text-sm text-neo-white">{group.topScore}</span>
+      <span className="hidden sm:block text-right font-mono text-sm text-slate-300">{group.totalWords}</span>
 
       <span className="hidden sm:flex justify-center items-center text-slate-400">
         {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}

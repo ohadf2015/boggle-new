@@ -6,6 +6,7 @@
 import logger from '@/utils/logger';
 import { getStoredUtmData } from './utmCapture';
 import { getGuestSessionId, getGuestName } from './guestManager';
+import { getPlatform } from '@/utils/platform';
 import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
 import {
   getJsonFromLocalStorage,
@@ -307,6 +308,13 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
   // Build metadata from event data (exclude fields stored as top-level columns)
   const { sessionId: _sid, referralSource: _ref, timestamp: _ts, ...metadata } = data;
 
+  // Enrich metadata with platform and guest_name (forward-only, permanent)
+  const enrichedMetadata = {
+    ...metadata,
+    platform: getPlatform(),
+    guest_name: getGuestName(),
+  };
+
   fetch('/api/analytics/track', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -317,7 +325,7 @@ const persistToSupabase = (event: GrowthEvent, data: GrowthEventData): void => {
       utm_medium: utmData?.utm_medium || null,
       utm_campaign: utmData?.utm_campaign || null,
       referrer: utmData?.referrer || null,
-      metadata,
+      metadata: enrichedMetadata,
     }),
   }).catch(() => {
     // Silently fail — analytics should never break the game
@@ -859,6 +867,27 @@ export const trackGameEnd = (
     // Rage-quit: abandoned a game within 15s — strong onboarding-friction signal.
     trackRageQuit({ mode, durationMs: durationSec * 1000, wordsFound: wordCount });
   }
+};
+
+/**
+ * Track game end due to error/crash/disconnect.
+ * Emits game_abandoned with error_reason recorded in metadata.
+ * Intended for catastrophic client-side errors that terminate a session.
+ *
+ * @param mode - Game mode
+ * @param errorReason - Human-readable error reason (e.g. 'connection_lost', 'crash_detected')
+ * @param extras - Optional additional metadata (merged into event data)
+ */
+export const trackGameError = (
+  mode: string,
+  errorReason: string,
+  extras: Record<string, unknown> = {}
+): void => {
+  trackGameEnd(mode, 0, 0, false, undefined, {
+    ...extras,
+    errorReason,
+    error_reason: errorReason, // Alias for backend clarity
+  });
 };
 
 /**

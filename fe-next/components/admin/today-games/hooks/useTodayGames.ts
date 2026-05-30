@@ -24,6 +24,9 @@ interface UseTodayGamesOptions {
 interface UseTodayGamesReturn {
   data: GamesResponse | null;
   filteredGames: UnifiedGame[];
+  filteredGameGroups: import('@/lib/admin/gameLog/groupGames').GameGroup[];
+  unbucketedModes: string[];
+  truncated: boolean;
   stats: GamesStats;
   lastRefresh: number;
 
@@ -171,6 +174,9 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
 
   // Server already applied gameType filter — no client-side narrowing needed.
   const filteredGames = useMemo(() => data?.games ?? [], [data?.games]);
+  const filteredGameGroups = useMemo(() => data?.gameGroups ?? [], [data?.gameGroups]);
+  const unbucketedModes = useMemo(() => data?.unbucketedModes ?? [], [data?.unbucketedModes]);
+  const truncated = useMemo(() => data?.truncated ?? false, [data?.truncated]);
 
   const stats = useMemo((): GamesStats => {
     if (!data?.breakdown) {
@@ -204,6 +210,9 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
   return {
     data,
     filteredGames,
+    filteredGameGroups,
+    unbucketedModes,
+    truncated,
     stats,
     lastRefresh,
 

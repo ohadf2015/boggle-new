@@ -79,4 +79,23 @@ describe('classifyAcquisition', () => {
   it('handles non-URL referrer string', () => {
     expect(classifyAcquisition({ referrer_source: 'reddit' }).kind).toBe('social');
   });
+
+  // Internal app-navigation / share tokens leak into utm_source (verified live
+  // 2026-05-30: mobile-lobby, solo-confirm, copy). They are NOT acquisition
+  // channels — they must collapse to 'direct', not surface as "unknown: copy".
+  it('classifies internal navigation tokens as direct', () => {
+    expect(classifyAcquisition({ utm_source: 'mobile-lobby' }).kind).toBe('direct');
+    expect(classifyAcquisition({ utm_source: 'solo-confirm' }).kind).toBe('direct');
+    expect(classifyAcquisition({ utm_source: 'copy' }).kind).toBe('direct');
+    expect(classifyAcquisition({ utm_source: 'lobby' }).kind).toBe('direct');
+  });
+
+  it('does not surface an internal token as a misleading rawLabel', () => {
+    expect(classifyAcquisition({ utm_source: 'mobile-lobby' }).rawLabel).toBeNull();
+  });
+
+  it('still classifies real channels that ride alongside internal traffic', () => {
+    expect(classifyAcquisition({ utm_source: 'chatgpt.com' }).kind).toBe('ai');
+    expect(classifyAcquisition({ utm_source: 'whatsapp' }).kind).toBe('social');
+  });
 });

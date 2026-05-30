@@ -3,13 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { m, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User } from 'lucide-react';
+import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import Avatar from '@/components/Avatar';
+import { presenceBreakdown, isStalled, hostName } from '@/lib/admin/liveMonitor/liveGameInsights';
+import { gameModeLabel } from '@/lib/admin/gameLog/gameDisplay';
 
 // Types matching backend DetailedGame and DetailedGamePlayer
 interface LivePlayer {
@@ -42,8 +44,10 @@ interface LiveGame {
   language: string;
   gameState: 'waiting' | 'in-progress' | 'validating' | 'finished';
   isRanked: boolean;
+  isPrivate: boolean;
   createdAt: number;
   timerSeconds: number;
+  gameMode?: string;
   players: LivePlayer[];
 }
 
@@ -110,6 +114,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<number>(Date.now());
+  const [now, setNow] = useState<number>(Date.now());
 
   // Use ref for token to prevent callback recreation on token changes
   // This prevents interval accumulation bug
@@ -170,6 +175,14 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
     const interval = setInterval(() => fetchRef.current(), 5000);
     return () => clearInterval(interval);
   }, []); // Empty deps - stable interval
+
+  // Update "now" timestamp for stalled detection every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleManualRefresh = () => {
     setLoading(true);
@@ -300,7 +313,7 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <AnimatePresence mode="popLayout">
                   {games.map((game) => (
-                    <GameCard key={game.gameCode} game={game} t={t} />
+                    <GameCard key={game.gameCode} game={game} t={t} now={now} />
                   ))}
                 </AnimatePresence>
               </div>
@@ -400,10 +413,22 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
 }
 
 // Game Card Component
-function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
+function GameCard({
+  game,
+  t,
+  now,
+}: {
+  game: LiveGame;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
+  now: number;
+}) {
   const flag = LANGUAGE_FLAGS[game.language] || '🌐';
   const stateColor = STATE_COLORS[game.gameState] || 'bg-gray-500';
   const stateLabel = game.gameState.replace('-', ' ');
+  const stalledFlag = isStalled(game, now);
+  const host = hostName(game.players);
+  const breakdown = presenceBreakdown(game.players);
+  const modeLabel = gameModeLabel(game.gameMode, t);
 
   return (
     <m.div
@@ -417,19 +442,45 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xl">{flag}</span>
-          <span className="font-mono font-bold text-neo-white">{game.gameCode}</span>
+          <div className="flex flex-col">
+            <span className="font-mono font-bold text-neo-white text-sm">{game.gameCode}</span>
+            {host && <span className="text-xs text-slate-400">{t('admin.live.host', 'Host')}: {host}</span>}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {game.isRanked && (
             <span className="px-2 py-0.5 text-xs bg-neo-lime text-black rounded font-bold">
               {t('admin.live.ranked')}
             </span>
           )}
+          {game.isPrivate && (
+            <span className="px-2 py-0.5 text-xs bg-slate-600 text-slate-200 rounded font-bold">
+              {t('admin.live.private', 'Private')}
+            </span>
+          )}
           <span className={cn('px-2 py-0.5 text-xs rounded font-bold text-white capitalize', stateColor)}>
             {stateLabel}
           </span>
+          {stalledFlag && (
+            <span className="px-2 py-0.5 text-xs bg-neo-red text-white rounded font-bold flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {t('admin.live.stalled', 'Stalled?')}
+            </span>
+          )}
         </div>
       </div>
+
+      {/* Game Mode and Disconnected Count */}
+      {(modeLabel !== '—' || breakdown.disconnected > 0) && (
+        <div className="flex items-center justify-between text-xs text-slate-400 mb-3 pb-3 border-b border-slate-700">
+          {modeLabel !== '—' && <span className="text-slate-300">{modeLabel}</span>}
+          {breakdown.disconnected > 0 && (
+            <span className="text-neo-red font-bold">
+              {breakdown.disconnected}/{breakdown.total} {t('admin.live.disconnected', 'disconnected')}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Players */}
       <div className="space-y-2 mb-3 border-t border-b border-slate-700 py-3">
@@ -457,16 +508,23 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-slate-400">
-        <div className="flex items-center gap-1">
-          <Clock className="w-3 h-3" />
-          {game.gameState === 'in-progress' ? (
-            <span>{formatTimeLeft(game.timerSeconds)} {t('admin.live.left')}</span>
-          ) : (
-            <span>{t('admin.live.started')} {formatTimeAgo(game.createdAt)}</span>
-          )}
+      <div className="flex flex-col gap-2 text-xs text-slate-400">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {game.gameState === 'in-progress' ? (
+              <span>{formatTimeLeft(game.timerSeconds)} {t('admin.live.left')}</span>
+            ) : (
+              <span>{t('admin.live.started')} {formatTimeAgo(game.createdAt)}</span>
+            )}
+          </div>
+          <span className="text-slate-500">{game.roomName}</span>
         </div>
-        <span className="text-slate-500">{game.roomName}</span>
+        {game.gameState !== 'in-progress' && (
+          <div className="text-xs text-slate-500">
+            {new Date(game.createdAt).toLocaleTimeString()}
+          </div>
+        )}
       </div>
     </m.div>
   );
@@ -482,7 +540,7 @@ function PlayerRow({
   player: LivePlayer;
   gameCode: string;
   language: string;
-  t: (key: string) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
 }) {
   const flag = LANGUAGE_FLAGS[language] || '🌐';
 
@@ -534,7 +592,7 @@ function SinglePlayerRow({
   t,
 }: {
   session: LiveSinglePlayerSession;
-  t: (key: string) => string;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
 }) {
   const flag = LANGUAGE_FLAGS[session.language] || '🌐';
 

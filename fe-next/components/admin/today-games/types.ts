@@ -56,6 +56,13 @@ export interface UnifiedGame {
   user_agent?: string | null;
   guest_name?: string | null;
   game_mode?: string | null;
+  // Raw analytics event type (game_started | game_completed | game_abandoned) —
+  // needed to merge a player's lifecycle events and derive game status.
+  event_type?: string;
+  // Runtime platform stamped on the event: 'web' | 'ios' | 'android' (forward-only).
+  platform?: string | null;
+  // Error/abandon reason captured at game end (forward-only).
+  error_reason?: string | null;
 }
 
 export type GameLogSource = 'analytics' | 'tables';
@@ -72,6 +79,14 @@ export interface GamesResponse {
   success: boolean;
   source?: GameLogSource;
   modeBreakdown?: ModeBreakdownEntry[];
+  /** Present when source='analytics': one entry per GAME (players grouped). */
+  grouped?: boolean;
+  gameGroups?: import('@/lib/admin/gameLog/groupGames').GameGroup[];
+  /** Raw gameMode values seen with no type bucket (gap guard for admins). */
+  unbucketedModes?: string[];
+  /** True when the analytics fetch hit its row cap — narrow the date range. */
+  truncated?: boolean;
+  /** Legacy per-row feed (still used by source='tables'). */
   games: UnifiedGame[];
   pagination: {
     page: number;

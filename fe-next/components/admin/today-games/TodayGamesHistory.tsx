@@ -22,6 +22,9 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   const {
     data,
     filteredGames,
+    filteredGameGroups,
+    unbucketedModes,
+    truncated,
     stats,
     lastRefresh,
     loading,
@@ -107,18 +110,38 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
         t={t}
       />
 
+      {/* Unclassified modes warning */}
+      {unbucketedModes.length > 0 && (
+        <div className="bg-amber-500/10 border border-amber-500/40 rounded-neo px-3 py-2 text-xs text-amber-200">
+          <span className="font-semibold">{t('admin.todayGames.unclassifiedModes', 'Unclassified modes')}:</span>
+          <span className="ml-2">{unbucketedModes.join(', ')}</span>
+        </div>
+      )}
+
+      {/* Truncated results note */}
+      {truncated && (
+        <div className="bg-slate-700/30 border border-slate-600/40 rounded-neo px-3 py-2 text-xs text-slate-400">
+          {t('admin.todayGames.truncated', 'Results capped — narrow the date range for details')}
+        </div>
+      )}
+
       {/* Games list (virtualized + expandable) or Empty State */}
-      {filteredGames.length === 0 ? (
+      {filteredGameGroups && filteredGameGroups.length === 0 && !filteredGames.length ? (
         <EmptyState t={t} />
-      ) : (
+      ) : filteredGameGroups && filteredGameGroups.length > 0 ? (
         <VirtualGamesList
-          games={filteredGames}
+          gameGroups={filteredGameGroups}
           pagination={data?.pagination || null}
           page={page}
           pageSize={pageSize}
           onPageChange={setPage}
           t={t}
         />
+      ) : (
+        // Fallback for legacy 'tables' source (no grouping)
+        <div className="text-center py-8 text-slate-400">
+          {t('admin.todayGames.noData', 'No games found')}
+        </div>
       )}
 
       {/* Last Updated */}
