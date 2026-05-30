@@ -147,3 +147,12 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(validatorCheck).not.toHaveBeenCalled();
   });
 });
+
+describe('PracticeWheelSandbox layout', () => {
+  it('fills its parent (h-full) instead of hardcoding 100dvh — prevents in-game scroll', () => {
+    const { container } = render(<PracticeWheelSandbox />);
+    const root = container.firstChild as HTMLElement;
+    expect(root.className).toContain('h-full');
+    expect(root.className).not.toContain('100dvh');
+  });
+});

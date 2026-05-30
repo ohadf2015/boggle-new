@@ -96,3 +96,17 @@ describe('PracticeClassicSandbox redesigned', () => {
     expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
   });
 });
+
+describe('PracticeClassicSandbox layout', () => {
+  // The sandbox is a flex child of the locked, 100dvh, overflow-hidden game
+  // body. Hardcoding `h-[calc(100dvh-...)]` double-counted the viewport (plus a
+  // phantom bottom-nav subtraction while the nav is hidden in-game) and pushed
+  // the surface past one screen → unwanted scroll. It must instead FILL its
+  // parent like `.game-view-container`.
+  it('fills its parent (h-full) instead of hardcoding 100dvh', () => {
+    const { container } = render(<PracticeClassicSandbox />);
+    const root = container.firstChild as HTMLElement;
+    expect(root.className).toContain('h-full');
+    expect(root.className).not.toContain('100dvh');
+  });
+});

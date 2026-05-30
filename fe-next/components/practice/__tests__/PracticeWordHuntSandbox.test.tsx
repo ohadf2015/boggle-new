@@ -115,3 +115,12 @@ describe('PracticeWordHuntSandbox redesigned', () => {
     });
   });
 });
+
+describe('PracticeWordHuntSandbox layout', () => {
+  it('fills its parent (h-full) instead of hardcoding 100dvh — prevents in-game scroll', () => {
+    const { container } = render(<PracticeWordHuntSandbox />);
+    const root = container.firstChild as HTMLElement;
+    expect(root.className).toContain('h-full');
+    expect(root.className).not.toContain('100dvh');
+  });
+});

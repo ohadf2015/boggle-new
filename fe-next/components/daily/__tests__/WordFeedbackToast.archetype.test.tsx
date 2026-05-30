@@ -298,6 +298,24 @@ describe('WordFeedbackToast — Cross-Archetype', () => {
   });
 });
 
+describe('WordFeedbackToast — overlay positioning (floats above the board)', () => {
+  it('renders as a fixed-position overlay, NOT an in-flow relative element', () => {
+    // Bug: the root carried both `fixed` and `relative`; Tailwind emits
+    // `.relative` after `.fixed`, so at equal specificity `relative` won and
+    // the toast dropped into normal flow — landing *behind* the game board.
+    render(<WordFeedbackToast type="valid-word" message="FOUND" />);
+    const el = getToastEl('FOUND');
+    expect(el?.className).toContain('fixed');
+    expect(el?.className).not.toContain('relative');
+  });
+
+  it('keeps a high stacking layer (z-50) so it floats above the board', () => {
+    render(<WordFeedbackToast type="valid-word" message="FOUND" />);
+    const el = getToastEl('FOUND');
+    expect(el?.className).toContain('z-50');
+  });
+});
+
 describe('WordFeedbackToast — Reduced Motion', () => {
   beforeEach(() => {
     Object.defineProperty(window, 'matchMedia', {

@@ -177,7 +177,7 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
           exit={{ opacity: 0, y: -20, scale: 0.9 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            'fixed top-20 left-1/2 -translate-x-1/2 z-50 relative',
+            'fixed top-20 left-1/2 -translate-x-1/2 z-50',
             'max-h-[640px]:top-12',
             'flex items-center gap-2 px-3 rounded-neo',
             style.morePadding ? 'py-3' : 'py-2',

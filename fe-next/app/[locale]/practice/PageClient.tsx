@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ArrowRight, Check, Home, Pencil, Search, Disc3, type LucideIcon } from 'lucide-react';
+import { ArrowRight, Check, Home, Pencil, Search, Disc3, Trophy, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
@@ -20,12 +20,49 @@ import PracticeHubHeader from '@/components/practice/PracticeHubHeader';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
-// Per-mode tinted background — gentle color wash that hints at the mode
-// theme without competing with the hero thumbnail's saturated palette.
-const MODE_TINT: Record<PracticeMode, string> = {
-  classic: 'bg-linear-to-br from-neo-navy-light to-neo-cyan/5',
-  wordHunt: 'bg-linear-to-br from-neo-navy-light to-neo-lime/5',
-  wheelRush: 'bg-linear-to-br from-neo-navy-light to-neo-purple/5',
+// Per-mode color identity — each game mode owns one of the brand families
+// (classic = cyan / single-player, wordHunt = lime / primary, wheelRush =
+// purple / brain-training). The hub wears these colors boldly so it reads as
+// "our game", and the same mapping is mirrored in PracticeCompletePopup +
+// PracticeDesktopWelcome so the whole practice surface stays coherent.
+interface ModeAccent {
+  /** Card background wash — stronger for finished tiles (a claimed trophy). */
+  tile: string;
+  doneTile: string;
+  /** Top accent bar — the mode-color signature stripe across each card. */
+  bar: string;
+  /** Icon chip on the hero thumbnail. */
+  icon: string;
+  /** Hover "go" arrow on incomplete tiles. */
+  arrow: string;
+  /** Next-up focus ring. */
+  ring: string;
+  /** RGB triple for the finished-tile color glow (layered over hard shadow). */
+  glowRgb: string;
+}
+
+const MODE_ACCENT: Record<PracticeMode, ModeAccent> = {
+  classic: {
+    tile: 'bg-linear-to-br from-neo-navy-light to-neo-cyan/10',
+    doneTile: 'bg-linear-to-br from-neo-cyan/20 to-neo-navy-light',
+    bar: 'bg-neo-cyan', icon: 'bg-neo-cyan text-neo-black',
+    arrow: 'bg-neo-cyan text-neo-black', ring: 'ring-neo-cyan',
+    glowRgb: '0, 255, 255',
+  },
+  wordHunt: {
+    tile: 'bg-linear-to-br from-neo-navy-light to-neo-lime/10',
+    doneTile: 'bg-linear-to-br from-neo-lime/20 to-neo-navy-light',
+    bar: 'bg-neo-lime', icon: 'bg-neo-lime text-neo-black',
+    arrow: 'bg-neo-lime text-neo-black', ring: 'ring-neo-lime',
+    glowRgb: '191, 255, 0',
+  },
+  wheelRush: {
+    tile: 'bg-linear-to-br from-neo-navy-light to-neo-purple/10',
+    doneTile: 'bg-linear-to-br from-neo-purple/20 to-neo-navy-light',
+    bar: 'bg-neo-purple', icon: 'bg-neo-purple text-neo-white',
+    arrow: 'bg-neo-purple text-neo-white', ring: 'ring-neo-purple',
+    glowRgb: '139, 92, 246',
+  },
 };
 
 // Hero thumbnails — same images as the tutorial help modal so visual
@@ -138,29 +175,34 @@ export default function PracticeHubClient({ locale }: Props) {
             const isDone = completed.has(mode);
             const isNext = mode === nextMode;
             const ModeIcon = MODE_ICON[mode];
+            const accent = MODE_ACCENT[mode];
             const baseClass =
-              'group relative flex items-stretch gap-4 rounded-neo border-2 border-neo-black p-4 shadow-hard overflow-hidden transition focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cozy';
+              'group relative flex items-stretch gap-4 rounded-neo border-2 border-neo-black p-4 pt-5 shadow-hard overflow-hidden transition focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cozy';
 
             const inner = (
               <>
+                {/* Mode-color signature stripe — the hub wears each mode's brand
+                    color so it reads unmistakably as "our game". */}
+                <span aria-hidden className={`absolute top-0 inset-x-0 h-1.5 ${accent.bar}`} />
+
                 {/* Stage number — makes the 1 → 2 → 3 path through the
-                    tutorial obvious. Flips to a check once the stage is done. */}
+                    tutorial obvious. Flips to a gold trophy once it's done. */}
                 <span
                   aria-hidden
-                  className={`absolute top-1.5 start-1.5 z-10 inline-flex items-center justify-center w-6 h-6 rounded-full border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm ${
-                    isDone ? 'bg-neo-cozy text-neo-black' : 'bg-neo-cream text-neo-navy'
+                  className={`absolute top-2.5 start-1.5 z-10 inline-flex items-center justify-center w-6 h-6 rounded-full border-2 border-neo-black font-neo-display font-black text-xs shadow-hard-sm ${
+                    isDone ? 'bg-neo-yellow text-neo-black' : 'bg-neo-cream text-neo-navy'
                   }`}
                 >
-                  {isDone ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : idx + 1}
+                  {isDone ? <Trophy className="w-3.5 h-3.5" strokeWidth={2.5} /> : idx + 1}
                 </span>
 
-                <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-neo border-2 border-neo-black overflow-hidden bg-neo-navy">
+                <div className={`relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 self-center rounded-neo border-2 border-neo-black overflow-hidden bg-neo-navy ${isDone ? 'shadow-hard-sm' : ''}`}>
                   <Image
                     src={MODE_HERO[mode]}
                     alt=""
                     fill
                     sizes="(min-width: 768px) 96px, 80px"
-                    className={`object-cover transition-transform duration-500 ${isDone ? 'saturate-50' : 'md:group-hover:scale-110'}`}
+                    className={`object-cover transition-transform duration-500 ${isDone ? '' : 'md:group-hover:scale-110'}`}
                   />
                   <span
                     aria-hidden
@@ -168,7 +210,7 @@ export default function PracticeHubClient({ locale }: Props) {
                   />
                   <span
                     aria-hidden
-                    className="absolute bottom-1 start-1 inline-flex items-center justify-center w-6 h-6 rounded-md border-2 border-neo-black bg-neo-cream text-neo-navy shadow-hard-sm"
+                    className={`absolute bottom-1 start-1 inline-flex items-center justify-center w-6 h-6 rounded-md border-2 border-neo-black shadow-hard-sm ${accent.icon}`}
                   >
                     <ModeIcon className="w-3.5 h-3.5" strokeWidth={2.5} />
                   </span>
@@ -183,19 +225,23 @@ export default function PracticeHubClient({ locale }: Props) {
                   </p>
                 </div>
 
-                {/* Right-edge status. Completed → a settled "Completed" badge
-                    (no arrow, nothing to tap). Next-up → a gently bobbing
-                    "Start here" cue. Otherwise → the usual hover arrow. */}
+                {/* Right-edge status. Completed → a proud gold trophy ribbon
+                    (celebratory, not a dimmed "disabled" look). Next-up → a
+                    gently bobbing "Start here" cue. Otherwise → the hover arrow
+                    in the mode's own color. */}
                 {isDone ? (
-                  <span className="absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-black bg-neo-cozy text-neo-black font-neo-display font-black text-[0.6rem] uppercase tracking-wide shadow-hard-sm">
-                    <Check className="w-3 h-3" strokeWidth={3} aria-hidden />
+                  <span
+                    data-testid={`practice-tile-trophy-${mode}`}
+                    className="absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-black bg-neo-yellow text-neo-black font-neo-display font-black text-[0.6rem] uppercase tracking-wide shadow-hard-sm"
+                  >
+                    <Trophy className="w-3 h-3" strokeWidth={2.5} aria-hidden />
                     {t('practiceHub.completedBadge')}
                   </span>
                 ) : isNext ? (
                   <AdaptiveMotion.span
                     animate={{ y: [0, -2, 0] }}
                     transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-                    className="absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-black bg-neo-cream text-neo-navy font-neo-display font-black text-[0.6rem] uppercase tracking-wide shadow-hard-sm"
+                    className={`absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center gap-1 px-2 py-1 rounded-full border-2 border-neo-black font-neo-display font-black text-[0.6rem] uppercase tracking-wide shadow-hard-sm ${accent.arrow}`}
                   >
                     {t('practiceHub.welcome.startHere')}
                     <ArrowRight className="w-3 h-3 rtl:rotate-180" strokeWidth={3} aria-hidden />
@@ -203,7 +249,7 @@ export default function PracticeHubClient({ locale }: Props) {
                 ) : (
                   <span
                     aria-hidden
-                    className="absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center justify-center w-7 h-7 rounded-full border-2 border-neo-black bg-neo-cream/95 text-neo-navy shadow-hard-sm transition-transform duration-300 md:opacity-0 md:translate-x-2 md:group-hover:opacity-100 md:group-hover:translate-x-0"
+                    className={`absolute top-1/2 end-2 -translate-y-1/2 inline-flex items-center justify-center w-7 h-7 rounded-full border-2 border-neo-black shadow-hard-sm transition-transform duration-300 md:opacity-0 md:translate-x-2 md:group-hover:opacity-100 md:group-hover:translate-x-0 ${accent.arrow}`}
                   >
                     <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" strokeWidth={3} />
                   </span>
@@ -212,7 +258,10 @@ export default function PracticeHubClient({ locale }: Props) {
             );
 
             // Finished stages are status, not navigation — render them as a
-            // non-interactive card so they read as "done", not "tap me again".
+            // non-interactive card. But make that "done" state feel *earned*:
+            // full-saturation art, a gold trophy ribbon, and a soft mode-color
+            // glow layered over the hard shadow — a claimed badge, not a
+            // greyed-out dead tile.
             if (isDone) {
               return (
                 <div
@@ -221,7 +270,8 @@ export default function PracticeHubClient({ locale }: Props) {
                   data-complete="true"
                   data-next="false"
                   aria-label={`${t(`gameModes.${mode}.name`)} — ${t('practiceHub.completedBadge')}`}
-                  className={`${baseClass} ${MODE_TINT[mode]} cursor-default opacity-80`}
+                  className={`${baseClass} ${accent.doneTile} cursor-default`}
+                  style={{ boxShadow: `2px 2px 0 #000, 0 0 18px rgba(${accent.glowRgb}, 0.28)` }}
                 >
                   {inner}
                 </div>
@@ -236,8 +286,8 @@ export default function PracticeHubClient({ locale }: Props) {
                 data-testid={`practice-tile-${mode}`}
                 data-complete="false"
                 data-next={isNext ? 'true' : 'false'}
-                className={`${baseClass} ${MODE_TINT[mode]} active:translate-y-px md:hover:shadow-hard-lg md:hover:-translate-y-1 ${
-                  isNext ? 'ring-2 ring-neo-cozy ring-offset-2 ring-offset-neo-navy' : ''
+                className={`${baseClass} ${accent.tile} active:translate-y-px md:hover:shadow-hard-lg md:hover:-translate-y-1 ${
+                  isNext ? `ring-2 ${accent.ring} ring-offset-2 ring-offset-neo-navy` : ''
                 }`}
               >
                 {inner}

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import PracticeHubClient from '@/app/[locale]/practice/PageClient';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { savePendingRoomInvite } from '@/utils/onboardingStorage';
@@ -81,6 +81,20 @@ describe('PracticeHubClient tutorial simplification', () => {
     wrap(<PracticeHubClient locale="en" />);
     expect(screen.getByTestId('practice-tile-wordHunt')).toHaveAttribute('data-next', 'true');
     expect(screen.getByTestId('practice-tile-classic')).toHaveAttribute('data-next', 'false');
+  });
+});
+
+describe('PracticeHubClient completed-tile celebration', () => {
+  it('renders a finished mode as a celebratory trophy card — not a dimmed/disabled tile', () => {
+    mockCompleted.current = new Set(['classic']);
+    wrap(<PracticeHubClient locale="en" />);
+    const tile = screen.getByTestId('practice-tile-classic');
+    // Still a non-interactive status card (deliberate: status, not navigation).
+    expect(tile.tagName).not.toBe('A');
+    expect(tile).toHaveAttribute('data-complete', 'true');
+    // Satisfying, not greyed-out: no dimming, and a trophy badge celebrates it.
+    expect(tile.className).not.toContain('opacity-80');
+    expect(within(tile).getByTestId('practice-tile-trophy-classic')).toBeInTheDocument();
   });
 });
 
