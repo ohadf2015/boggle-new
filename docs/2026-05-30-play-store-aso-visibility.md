@@ -82,6 +82,110 @@ Create one localized store listing per language in Play Console → Store presen
 
 ---
 
+## 4b. Localized listing copy (native, not literal; short desc obeys no-price/no-rank rule)
+
+### Hebrew (he-IL) — RTL
+- **Name:** `LexiClash: משחק מילים` (≤30)
+- **Short (≤80):** `משחק מילים רב-משתתפים בזמן אמת — בנו מילים, התחרו בחברים ונצחו את השעון.`
+- **Full:**
+```
+משחק מילים רב-משתתפים בזמן אמת. בנו מילים, התחרו בחברים ותטפסו בלוחות התוצאות — בלי לחכות לתור.
+
+החליקו על האותיות, בנו מילים והשיגו ניקוד גבוה מכולם — הכול קורה בשידור חי, מול יריבים אמיתיים.
+
+5 שפות, מילונים אמיתיים
+שחקו באנגלית, עברית, שוודית, יפנית או ספרדית — לא רק תפריט מתורגם, אלא מילון מלא לכל שפה.
+
+מצבי משחק
+• זירת מילים — קרבות מילים חיים מול שחקנים אמיתיים או בוטים.
+• אתגר יומי — אותו פאזל לכולם, כל יום.
+• הרפתקה — 100+ שלבים בעולמות עם חוקים משתנים.
+• Blast — שרשראות קומבו לניקוי משבצות.
+• גשר מילים — חידות היגיון של חיבור מילים.
+• אימון מוח — חמישה תרגילים קוגניטיביים.
+• WordCraft — כיבוש טריטוריה דרך בניית מילים.
+• תרגול — מצב יחיד, בלי לחץ זמן.
+
+עיצוב נֵאוֹ-ברוטליסטי: רקע כהה, צבעים עזים, מסגרות עבות. בלי חומות תשלום — כל המשחק פתוח.
+```
+
+### Swedish (sv-SE)
+- **Name:** `LexiClash: Ordspel`
+- **Short (≤80):** `Ordspel för flera spelare i realtid – bygg ord, utmana vänner, slå klockan.`
+- **Full:**
+```
+Ordspel för flera spelare i realtid. Bygg ord, utmana vänner och klättra på topplistorna – utan att vänta på din tur.
+
+Svep över bokstäverna, bygg ord och pressa alla andra – allt händer live, mot riktiga motståndare.
+
+5 SPRÅK, RIKTIGA ORDLISTOR
+Spela på engelska, hebreiska, svenska, japanska eller spanska – inte bara översatta menyer, utan en komplett ordlista för varje språk.
+
+SPELLÄGEN
+• Ordarena – live ordstrider mot riktiga spelare eller bottar.
+• Daglig utmaning – samma pussel för alla, varje dag.
+• Äventyr – 100+ nivåer med nya regler i varje värld.
+• Blast – snabba kombokedjor som rensar brickor.
+• Ordbro – logikpussel där du länkar ord.
+• Hjärnträning – fem kognitiva övningar.
+• WordCraft – erövra territorium genom att bygga ord.
+• Träning – ensam, utan tidspress.
+
+Neo-brutalistisk design: mörkt tema, djärva färger, tjocka kanter. Inga betalväggar – hela spelet är öppet.
+```
+
+### Japanese (ja-JP)
+- **Name:** `LexiClash: 単語ゲーム`
+- **Short (≤80):** `リアルタイム対戦の単語ゲーム。文字をなぞって単語を作り、友達と勝負しよう。`
+- **Full:**
+```
+リアルタイム対戦の単語ゲーム。文字をつないで単語を作り、友達と競い合おう——順番待ちはなし。
+
+文字をなぞって単語を作り、ライバルより高いスコアを狙う。すべてがライブで進行します。
+
+5言語、本格辞書搭載
+英語・ヘブライ語・スウェーデン語・日本語・スペイン語でプレイ。メニューだけでなく、各言語に本物の辞書を搭載。
+
+ゲームモード
+• ワードアリーナ — リアルタイムの対戦バトル。
+• デイリーチャレンジ — 毎日、全員同じパズル。
+• アドベンチャー — ルールが変わる100以上のステージ。
+• Blast — タイルを消すコンボチェイン。
+• ワードブリッジ — 単語をつなぐ論理パズル。
+• 脳トレ — 5種類の認知トレーニング。
+• WordCraft — 単語で陣地を広げる。
+• 練習 — 時間制限なしのソロモード。
+
+ネオブルータリズムのデザイン。ダークテーマ、大胆な色、太い枠線。課金の壁なし——全モードが無料で遊べます。
+```
+
+### Spanish (es-ES / es-419)
+- **Name:** `LexiClash: Juego de palabras`
+- **Short (≤80):** `Juego de palabras multijugador en tiempo real: forma palabras y reta a amigos.`
+- **Full:**
+```
+Juego de palabras multijugador en tiempo real. Forma palabras, reta a tus amigos y escala en las clasificaciones, sin esperar turnos.
+
+Desliza las letras, forma palabras y supera a todos: todo sucede en vivo, contra rivales reales.
+
+5 IDIOMAS, DICCIONARIOS REALES
+Juega en inglés, hebreo, sueco, japonés o español: no solo menús traducidos, sino un diccionario completo para cada idioma.
+
+MODOS DE JUEGO
+• Arena de palabras — batallas en vivo contra jugadores reales o bots.
+• Reto diario — el mismo puzle para todos, cada día.
+• Aventura — más de 100 niveles con reglas nuevas en cada mundo.
+• Blast — cadenas de combos para limpiar fichas.
+• Puente de palabras — puzles de lógica que enlazan palabras.
+• Entrenamiento mental — cinco ejercicios cognitivos.
+• WordCraft — conquista territorio formando palabras.
+• Práctica — modo en solitario, sin presión de tiempo.
+
+Diseño neo-brutalista: tema oscuro, colores intensos, bordes gruesos. Sin muros de pago: el juego completo está abierto.
+```
+
+> Per-locale short descriptions intentionally avoid price words ("gratis/free") and rank words ("mejor/#1/topp"). Hebrew short uses "נצחו את השעון" (beat the clock), not leaderboard, to stay clear of the ranking rule.
+
 ## Action plan by leverage (highest first)
 
 1. ✅ **Dev name → FishGameStudio** — DONE live.
@@ -91,13 +195,22 @@ Create one localized store listing per language in Play Console → Store presen
 5. **Localized listings** he/sv/ja/es — biggest untapped reach.
 6. **Smart web→install** — add localized install CTAs; consider deferred-deep-link attribution.
 
-## ⚠️ Listing changes saved but NOT sent for review (blocked on in-flight review)
+## ✅ SENT FOR REVIEW (2026-05-30)
 
-The short + full description edits are **saved as draft** in Play Console. Attempting "Send 2 changes for review" surfaced: *"You've had a review in progress since 29 May. Sending this now will cancel and restart this review, which adds to your waiting time."* — i.e. the **Production 0.1.0 release review is already in flight**. Sending the listing edits now would restart that review clock (no data loss, release not cancelled — just delayed). Left the decision to the owner:
-- **Option A (recommended):** wait for the current review to finish + publish, then send the listing edits (they ride the next review, no disruption).
-- **Option B:** restart now to get the promotion-block fix live sooner, accepting added wait on the production review.
+All listing changes — en-GB short+full description + **5 localized listings** (he-IL/iw-IL, ja-JP, sv-SE, es-419, es-ES) — were sent for review as **11 changes**. This required confirming a "Restart review?" prompt (a review had been in progress since 29 May; restarting added to its wait time — owner authorized). Status: **"Changes in review"**, quick checks running.
 
-Managed publishing is ON → after approval, changes must be published manually.
+**Managed publishing is ON** → after Google approves, the owner must **manually publish** from Publishing overview. The Production 0.1.0 release rollout was left untouched (separate "Start full rollout").
+
+### Localized listings filled (saved + in review)
+| Locale | App name | Short desc (chars) |
+|---|---|---|
+| Hebrew (iw-IL) | LexiClash: משחק מילים | 72 |
+| Japanese (ja-JP) | LexiClash: 単語ゲーム | 37 |
+| Swedish (sv-SE) | LexiClash: Ordspel | 75 |
+| Spanish LatAm (es-419) | LexiClash: Juego de palabras | 78 |
+| Spanish Spain (es-ES) | LexiClash: Juego de palabras | 78 |
+
+Graphics (icon, feature graphic, 7/8 phone screenshots) **inherit from the en-GB default** — no per-locale image upload needed. GOTCHA: a newly-added locale shows a stale "Required fields / error" banner even when all text is filled + graphics inherited; it **clears on Save** (no real missing field).
 
 ## What needs Play Console (cannot be done from code)
 - Apply short + full description (review ~hours–days).
