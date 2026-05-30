@@ -33,7 +33,9 @@ sb_get() {
     -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY" 2>/dev/null | jq -c '.' 2>/dev/null || echo '[]'
 }
 
-ADMIN=$(sb_get "connections_puzzle_reviews?verdict=eq.bad&select=puzzle_id,language,word1,word2,bridge,note&limit=200")
+# Only OPEN (unresolved) admin-bad verdicts — the nightly PATCHes resolved_at
+# after regenerating a puzzle, so the loop converges instead of re-flagging nightly.
+ADMIN=$(sb_get "connections_puzzle_reviews?verdict=eq.bad&resolved_at=is.null&select=puzzle_id,language,word1,word2,bridge,note&limit=200")
 PLAYER=$(sb_get "connections_puzzle_feedback_stats?dislikes=gte.2&select=puzzle_id,likes,dislikes,gaveups,total&order=dislikes.desc&limit=200")
 [ -z "$ADMIN" ] && ADMIN='[]'
 [ -z "$PLAYER" ] && PLAYER='[]'

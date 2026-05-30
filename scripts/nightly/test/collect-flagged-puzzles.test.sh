@@ -20,9 +20,11 @@ mkdir -p "$INTEL_DIR"
 BIN="$ROOT/bin"; mkdir -p "$BIN"
 trap 'rm -rf "$ROOT"' EXIT
 
+export CURL_LOG="$ROOT/curl-args.log"
 cat > "$BIN/curl" <<'STUB'
 #!/bin/bash
 args="$*"
+echo "$args" >> "${CURL_LOG:-/dev/null}"
 if echo "$args" | grep -q 'connections_puzzle_reviews'; then
   echo '[{"puzzle_id":"he-o-006","language":"he","word1":"כלב","word2":"תיכון","bridge":"ים","note":"forced"}]'
 elif echo "$args" | grep -q 'connections_puzzle_feedback_stats'; then
@@ -46,6 +48,7 @@ assert "detail artifact written" "[ -f '$DETAIL' ]"
 assert "detail has the admin-flagged puzzle words" "[ \$(jq -r '.admin_flagged[0].bridge' '$DETAIL') = 'ים' ]"
 assert "player flag excludes likes>=dislikes (he-x dropped)" "[ \$(jq '.player_flagged | length' '$DETAIL') -eq 1 ]"
 assert "player-flagged kept the high-dislike puzzle" "[ \$(jq -r '.player_flagged[0].puzzle_id' '$DETAIL') = 'he-g-1' ]"
+assert "admin query skips resolved (resolved_at=is.null) — loop converges" "grep -q 'resolved_at=is.null' '$ROOT/curl-args.log'"
 
 echo "collect-flagged-puzzles: degrade path (no keys)"
 ROOT2=$(mktemp -d -t colfp2.XXXXXX)
