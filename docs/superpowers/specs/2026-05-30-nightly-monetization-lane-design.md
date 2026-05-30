@@ -69,22 +69,44 @@ The nightly run is **unattended at 00:00**; Playwriter needs a live logged-in Ch
 
 1. **`lib/intel/collect-revenue.sh`** (unattended, registered in `registry.sh`):
    token-aware, degrades to `stale_fallback`, never errors. Sources, best-to-none:
-   - **AdMob Management API** (REST) — *if* `ADMOB_API_TOKEN` present (user provisions
-     GCP OAuth; emit a one-line "provision token → auto revenue" hint when absent).
-   - **revenue snapshot file** `docs/nightly/intel/revenue-latest.json` — written by (2);
-     read + staleness-checked here.
-   - **PostHog ad events** — `rewarded_ad_watched/offered/declined` 24h vs 7d (already
-     reachable via existing POSTHOG token) → ad-engagement signal even with zero revenue
-     API.
-   - Emits signals routed to lane `09-monetization` (revenue/ad-engagement) so the brief
-     carries them; pure signal builder unit-tested without network.
-   - Does NOT try to scrape Play *revenue* from the Play Developer API — it isn't exposed
-     there.
+   - **AdMob + AdSense Management APIs (REST)** — the PRIMARY unattended feed. One bearer
+     token (scopes `admob.readonly` + `adsense.readonly`) serves both:
+     - AdMob: `GET /v1/accounts` → `POST /v1/{account}/networkReport:generate` with a
+       7-day `NetworkReportSpec` (`ESTIMATED_EARNINGS`, `IMPRESSIONS`, `IMPRESSION_RPM`).
+       **Money is in micros** (÷1e6 → USD). Response is a `[{header},{row}…,{footer}]`
+       array; pure `admob_report_signals()` sums earnings/impressions, means eCPM.
+     - AdSense v2: `GET /v2/accounts` → `GET /v2/{account}/reports:generate?…metrics=EARNINGS&metrics=IMPRESSIONS`.
+       Earnings is a DECIMAL string (not micros); pure `adsense_report_signals()` maps
+       columns by header name and reads the totals row.
+     - Token: `ADMOB_API_TOKEN` env if set, else `gcloud auth application-default
+       print-access-token`. **VERIFIED 2026-05-30:** the repo's existing ADC returns
+       **403 `ACCESS_TOKEN_SCOPE_INSUFFICIENT`** (default scope = cloud-platform only), so
+       a one-time re-scoped login is required (see Setup below). Until then the collector
+       notes the scope gap and falls back to (2)/(3).
+   - **revenue snapshot file** `docs/nightly/intel/revenue-latest.json` — written by the
+     interactive scraper (2); read + staleness-checked. FALLBACK when no API token.
+   - **PostHog ad events** — `rewarded_ad_watched` 24h vs 7d daily avg (existing POSTHOG
+     token) → ad-engagement signal even with zero revenue API.
+   - All signals route to lane `09-monetization`; pure builders unit-tested without
+     network (26 cases). Does NOT scrape Play *revenue* — no API exposes it (Play only
+     has installs/vitals; revenue is GCS `gs://pubsite_prod_rev_*/earnings/` export only).
 2. **`lib/pull-revenue-snapshot.sh`** (interactive Playwriter — mirrors
-   `bing-ai-perf-scrape.sh`): the founder's "automate via playwriter" ask, done right.
-   Drives AdMob console + Play Console + AdSense console in the logged-in browser, writes
-   `revenue-latest.json`. Skip-graceful when extension offline. Run by founder ad-hoc or
-   a daytime cron when logged in — NOT wired into the 00:00 run.
+   `bing-ai-perf-scrape.sh`): FALLBACK for when the API token isn't provisioned. Drives
+   AdMob/AdSense/Play consoles in the logged-in browser, writes `revenue-latest.json`.
+   Skip-graceful when extension offline. Founder runs ad-hoc — NOT in the 00:00 run.
+
+### Setup — enable unattended revenue (one-time, founder-only)
+```bash
+# 1. Enable the APIs in the GCP project (AdMob API must also be linked to the AdMob acct)
+gcloud services enable admob.googleapis.com adsense.googleapis.com
+# 2. Re-login ADC WITH the report scopes (keep cloud-platform so GSC/lane-06 still works)
+gcloud auth application-default login \
+  --scopes=https://www.googleapis.com/auth/admob.readonly,https://www.googleapis.com/auth/adsense.readonly,https://www.googleapis.com/auth/cloud-platform
+```
+Or set `ADMOB_API_TOKEN` in `~/.config/lexi-nightly/env` to a token minted from a
+dedicated service account with those scopes. Verify: `curl -H "Authorization: Bearer
+$(gcloud auth application-default print-access-token)" https://admob.googleapis.com/v1/accounts`
+returns 200.
 
 ## Files
 

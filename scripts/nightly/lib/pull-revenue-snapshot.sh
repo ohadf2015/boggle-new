@@ -2,11 +2,13 @@
 # pull-revenue-snapshot.sh — capture real revenue numbers from the AdMob, AdSense, and
 # Play Console UIs via Playwriter (the founder's logged-in Chrome session).
 #
-# WHY interactive (not in the 00:00 run): these consoles have NO unattended revenue API
-# (Play Developer API exposes installs/crashes but NOT revenue; AdMob/AdSense need GCP
-# OAuth the founder must provision). Playwriter drives the REAL logged-in session, so it
-# only works while Chrome + the extension are connected. Run it yourself, or from a
-# DAYTIME cron when you're logged in — NOT at midnight.
+# WHY this exists / when to use it: AdMob + AdSense DO have unattended REST report APIs
+# (collect-revenue.sh uses them) — but only once a GCP OAuth token with admob.readonly +
+# adsense.readonly scopes is provisioned (see the lane-09 spec "Setup"). This Playwriter
+# scraper is the FALLBACK for before that setup is done, and the only path for Play
+# revenue (Play has NO revenue API — GCS earnings export only). Playwriter drives the
+# REAL logged-in session, so it only works while Chrome + the extension are connected.
+# Run it yourself, or from a DAYTIME cron when logged in — NOT at midnight.
 #
 # Writes docs/nightly/intel/revenue-latest.json. The unattended collector
 # (lib/intel/collect-revenue.sh) reads that file on the next nightly run and flags it

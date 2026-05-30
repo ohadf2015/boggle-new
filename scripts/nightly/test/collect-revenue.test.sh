@@ -64,10 +64,47 @@ assert "posthog signal is one object"       'echo "$PS" | jq -e "type==\"object\
 assert "posthog signal lane=09-monetization" '[ "$(echo "$PS" | jq -r .lane)" = "09-monetization" ]'
 assert "posthog signal kind=monetization"   '[ "$(echo "$PS" | jq -r .kind)" = "monetization" ]'
 
+echo "collect-revenue: AdMob networkReport (REST array, micros) → signals"
+ADMOB_REP=$(cat <<'JSON'
+[
+  {"header":{"dateRange":{"startDate":{"year":2026,"month":5,"day":24}},"localizationSettings":{"currencyCode":"USD"}}},
+  {"row":{"dimensionValues":{"DATE":{"value":"20260529"}},"metricValues":{"ESTIMATED_EARNINGS":{"microsValue":"6500000"},"IMPRESSIONS":{"integerValue":"100000"},"IMPRESSION_RPM":{"microsValue":"3100000"}}}},
+  {"row":{"dimensionValues":{"DATE":{"value":"20260530"}},"metricValues":{"ESTIMATED_EARNINGS":{"microsValue":"5900000"},"IMPRESSIONS":{"integerValue":"90000"},"IMPRESSION_RPM":{"microsValue":"3000000"}}}},
+  {"footer":{"matchingRowCount":"2"}}
+]
+JSON
+)
+AM=$(admob_report_signals "$ADMOB_REP")
+assert "admob signals is array"             'echo "$AM" | jq -e "type==\"array\"" >/dev/null'
+assert "admob emits >=2 signals"            '[ "$(echo "$AM" | jq length)" -ge 2 ]'
+assert "admob all lane=09-monetization"     '[ "$(echo "$AM" | jq "[.[]|select(.lane!=\"09-monetization\")]|length")" = "0" ]'
+# earnings: (6.5 + 5.9) = 12.4 USD from micros
+assert "admob earnings 7d = 12.4 USD"       '[ "$(echo "$AM" | jq "[.[]|select(.metric==\"admob_earnings_usd_7d\")][0].magnitude")" = "12.4" ]'
+# impressions summed = 190000 (carried as reach on the earnings signal)
+assert "admob earnings reach = 190000 imp"  '[ "$(echo "$AM" | jq "[.[]|select(.metric==\"admob_earnings_usd_7d\")][0].reach")" = "190000" ]'
+# eCPM = mean(3.10, 3.00) = 3.05 USD from micros
+assert "admob ecpm = 3.05 USD"              '[ "$(echo "$AM" | jq "[.[]|select(.metric==\"admob_ecpm_usd\")][0].magnitude")" = "3.05" ]'
+assert "admob empty report → empty array"   '[ "$(admob_report_signals "[]" | jq length)" = "0" ]'
+
+echo "collect-revenue: AdSense v2 report (header-mapped totals) → signals"
+ADSENSE_REP=$(cat <<'JSON'
+{
+  "headers":[{"name":"DATE","type":"DIMENSION"},{"name":"EARNINGS","type":"MONEY"},{"name":"IMPRESSIONS","type":"INTEGER"}],
+  "rows":[{"cells":[{"value":"2026-05-29"},{"value":"1.25"},{"value":"5000"}]}],
+  "totals":{"cells":[{"value":""},{"value":"1.25"},{"value":"5000"}]}
+}
+JSON
+)
+AS=$(adsense_report_signals "$ADSENSE_REP")
+assert "adsense signals is array"           'echo "$AS" | jq -e "type==\"array\"" >/dev/null'
+assert "adsense all lane=09-monetization"   '[ "$(echo "$AS" | jq "[.[]|select(.lane!=\"09-monetization\")]|length")" = "0" ]'
+assert "adsense earnings = 1.25"            '[ "$(echo "$AS" | jq "[.[]|select(.metric==\"adsense_earnings_usd_7d\")][0].magnitude")" = "1.25" ]'
+assert "adsense impressions reach = 5000"   '[ "$(echo "$AS" | jq "[.[]|select(.metric==\"adsense_earnings_usd_7d\")][0].reach")" = "5000" ]'
+
 echo "collect-revenue: no-source path degrades (never errors)"
 # Run the REAL main in a clean env: no token, no snapshot file present.
 ( unset ADMOB_API_TOKEN POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID
-  export INTEL_ROOT INTEL_DIR PROJECT_DIR="$TMP/repo"
+  export INTEL_ROOT INTEL_DIR PROJECT_DIR="$TMP/repo" REVENUE_NO_ADC=1
   mkdir -p "$PROJECT_DIR"
   unset COLLECT_REVENUE_TEST
   bash "$INTEL_LIB_DIR/collect-revenue.sh" >/dev/null 2>&1 )
