@@ -60,6 +60,10 @@ NEVER exit having produced nothing. A timed-out lane that leaves only this artif
 still counts as a successful-but-degraded run: the artifact is gate-clean (docs/ is
 outside fe-next/) and ships, so the lane is never a total loss. This is your floor.
 
+SPEED: code search is your dominant wall-clock cost. ALWAYS use \`rg\` (ripgrep — installed)
+over \`grep -r\`/\`find\` (10× faster on the fe-next/ tree). Trust the intelligence brief
+below: act on its ranked signals; do NOT re-run broad discovery the brief already did.
+
 EOF
 }
 
@@ -175,9 +179,26 @@ PY
   stream_sidecar="$(dirname "$log_file")/stream-${lane_id}-$(date +%H%M%S).ndjson"
   timeline="$(dirname "${BASH_SOURCE[0]}")/stream-timeline.py"
 
+  # Per-lane MCP scoping: boot ONLY the servers this lane uses (lib/mcp-config.sh)
+  # instead of all ~23 global+plugin servers. Lanes needing none get an empty config →
+  # zero MCP boot. On any build failure we DROP the flags and fall back to the full set
+  # (today's behavior) so a lane is never stranded without a server it needs.
+  local mcp_args=() lane_mcp_cfg=""
+  # shellcheck source=/dev/null
+  . "$(dirname "${BASH_SOURCE[0]}")/mcp-config.sh"
+  lane_mcp_cfg=$(mktemp -t "lane-${lane_id}-mcp.XXXXXX")
+  if build_lane_mcp_config "$lane_id" "$lane_mcp_cfg"; then
+    mcp_args=(--mcp-config "$lane_mcp_cfg" --strict-mcp-config)
+    echo "headless: lane=$lane_id MCP scoped → $(jq -rc '.mcpServers|keys|join(",")|if .=="" then "(none)" else . end' "$lane_mcp_cfg" 2>/dev/null)" | tee -a "$log_file"
+  else
+    rm -f "$lane_mcp_cfg" 2>/dev/null || true; lane_mcp_cfg=""
+    echo "headless: lane=$lane_id MCP scope build failed → falling back to full MCP set" | tee -a "$log_file"
+  fi
+
   "${timeout_cmd[@]}" \
     claude -p "$(cat "$rendered")" \
       --allowedTools '*' \
+      ${mcp_args[@]+"${mcp_args[@]}"} \
       --dangerously-skip-permissions \
       --output-format stream-json \
       --verbose \
@@ -189,6 +210,7 @@ PY
   local rc=${PIPESTATUS[0]}
   echo "headless: lane=$lane_id rc=$rc — full stream-json sidecar: $stream_sidecar" | tee -a "$log_file"
 
+  [ -n "$lane_mcp_cfg" ] && rm -f "$lane_mcp_cfg" 2>/dev/null || true
   rm -f "$rendered"
   return "$rc"
 }

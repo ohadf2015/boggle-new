@@ -73,6 +73,11 @@ export SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY
 # ~/.config/lexi-nightly/env to unlock the source over REST. See spec §4.1.
 export SENTRY_AUTH_TOKEN SENTRY_ORG_SLUG SENTRY_PROJECT_SLUG SENTRY_HOST
 export SUPABASE_ACCESS_TOKEN BING_WMT_API_KEY RAILWAY_TOKEN
+# Reddit OAuth (lane 04). Absent → reddit-fetch.sh degrades to legacy UA curl (now 403).
+# See docs/nightly/reddit-oauth-setup.md. PASSWORD grant needs all four; app-only needs
+# just CLIENT_ID+SECRET. The `set -a` source above already exports these if present — the
+# explicit re-export keeps them visible across the lane subshells.
+export REDDIT_CLIENT_ID REDDIT_CLIENT_SECRET REDDIT_USERNAME REDDIT_PASSWORD REDDIT_USER_AGENT
 export NIGHTLY_DISABLED
 
 # Per-MCP-call watchdogs — see lib/headless.sh for the full rationale. Set here
@@ -199,6 +204,16 @@ if [ -n "${FEEDBACK_SUMMARY_FILE:-}" ] && [ -s "$FEEDBACK_SUMMARY_FILE" ]; then
   log "player feedback digest written: $FEEDBACK_SUMMARY_FILE"
   echo "**Player feedback digest:** \`$FEEDBACK_SUMMARY_FILE\` (injected into triage + engagement lanes)" >> "$REPORT"
 fi
+
+# --- Phase 0 prelude: backfill collector tokens from ~/.claude.json ----------
+# The Sentry + Supabase collectors gate on env tokens that are NOT in the nightly
+# env file; without them the brief comes back empty for those sources and the lanes
+# fall back to expensive broad rediscovery → timeout. The working tokens already
+# live in ~/.claude.json (MCP server defs). Backfill is pure env export, never
+# overrides a set value, no-ops if the file/jq/key is absent. See lib/intel/backfill-tokens.sh.
+# shellcheck disable=SC1091
+. "$LIB_DIR/intel/backfill-tokens.sh"
+backfill_intel_tokens || true
 
 # --- Phase 0: intelligence brief -------------------------------------------
 # Query EVERY data source ONCE over direct REST/CLI (no MCP) and write a ranked

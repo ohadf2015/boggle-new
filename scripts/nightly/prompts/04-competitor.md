@@ -35,11 +35,10 @@ Surface (a) viral word-game concepts worth borrowing, (b) Reddit threads where L
 
 ═══ TOOLS — use these (NO external API key needed) ═══
 
-**Reddit access — use the LOCAL Bash helper, NOT WebFetch.** Reddit's block is
-User-Agent based, not IP based: WebFetch (Anthropic IP, no UA control) gets
-403/429 — that's the 5-night "Reddit is dead" history (05-19→23). A local `curl`
-with a descriptive UA returns HTTP 200 + real JSON. So fetch Reddit through the
-maintained helper via the **Bash** tool:
+**Reddit access — use the LOCAL Bash helper, NOT WebFetch.** As of 2026-05-30 the
+unauthenticated JSON gate is closed (403 + HTML for every UA), so the helper now uses
+**OAuth** (oauth.reddit.com) when credentials are configured. You do NOT manage that —
+just call the helper through the **Bash** tool; it handles tokens internally:
 
 ```bash
 # Subreddit feed → compact JSON array [{title,score,num_comments,permalink,author,selftext(500)}]
@@ -49,13 +48,17 @@ scripts/nightly/lib/reddit-fetch.sh search "indie word game launch 2026" relevan
 ```
 
 - It ALWAYS exits 0; on failure it prints `{"error":...}` — just move on, never block.
+- If EVERY call returns `{"error":...}`, the OAuth creds are probably unset on this host.
+  **Do NOT try to fix OAuth or build a token flow yourself** — note "Reddit creds not
+  configured (see docs/nightly/reddit-oauth-setup.md)" in your artifact, fall back to
+  `WebSearch`, and move on. Setup is a one-time human step, not lane work.
 - **DO NOT** `WebFetch` reddit.com / `.json` / old.reddit / pullpush.io — that's
   the dead path. Use the helper.
 - `WebSearch` SERP is still fine as a SUPPLEMENT for discovery, but the helper is
-  the primary source now (real titles/scores/bodies, not just snippets).
+  the primary source when creds are present (real titles/scores/bodies, not just snippets).
 
 **Tools available:**
-- **`reddit-fetch.sh` (Bash)** — PRIMARY Reddit source. Local curl + descriptive UA → real JSON, works unattended. See above for usage. (WebFetch on reddit is blocked — don't.)
+- **`reddit-fetch.sh` (Bash)** — PRIMARY Reddit source. OAuth (oauth.reddit.com) under the hood; transparent to you. See above for usage. (WebFetch on reddit is blocked — don't.)
 - **`WebSearch`** — broad discovery for NON-reddit signal + supplemental reddit thread-finding: "indie word game launch 2026", "viral wordle clone 2026".
 - **`WebFetch`** — pull competitor sites / portals / articles (NOT reddit). For JSON/HTML, state the fields to extract in the prompt.
 - **Fallbacks if a source still resists** (use only if the above fail, max twice/run): the `agent-browser` skill, or the `browsing-skills` skill's `reddit.com` actions via Playwriter — both drive a real browser. NOTE: Playwriter/agent-browser need an interactive browser session and generally WON'T be available in the unattended 02:00 run, so they're best-effort only; `reddit-fetch.sh` is the one that always works at 02:00.
