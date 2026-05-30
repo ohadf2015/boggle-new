@@ -12023,6 +12023,12 @@ const en = {
     "placeholder": "Type the bridge word...",
     "submit": "Submit",
     "backspace": "Delete letter",
+    "momentum": {
+      "start": "Solve {goal} in a row for a bonus",
+      "toReward": "{count} more to a bonus!",
+      "rewardEarned": "Bonus unlocked — keep going!",
+      "onFire": "🔥 {streak} in a row — don't stop!"
+    },
     "correct": "Correct!",
     "wrong": "Wrong answer",
     "lives": "Lives",

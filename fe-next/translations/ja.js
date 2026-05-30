@@ -12537,6 +12537,12 @@ const ja = {
     "placeholder": "つなぐ言葉を入力...",
     "submit": "送信",
     "backspace": "1文字削除",
+    "momentum": {
+      "start": "{goal}問連続で解いてボーナス",
+      "toReward": "あと{count}問でボーナス！",
+      "rewardEarned": "ボーナス獲得 — その調子！",
+      "onFire": "🔥 {streak}問連続 — 止まらないで！"
+    },
     "correct": "正解！",
     "wrong": "不正解",
     "lives": "ライフ",

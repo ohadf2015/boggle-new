@@ -12602,6 +12602,12 @@ const es = {
     "placeholder": "Escribe la palabra puente...",
     "submit": "Enviar",
     "backspace": "Borrar letra",
+    "momentum": {
+      "start": "Resuelve {goal} seguidas para un bono",
+      "toReward": "¡{count} más para un bono!",
+      "rewardEarned": "¡Bono desbloqueado, sigue así!",
+      "onFire": "🔥 ¡{streak} seguidas, no pares!"
+    },
     "correct": "¡Correcto!",
     "wrong": "Respuesta incorrecta",
     "lives": "Vidas",

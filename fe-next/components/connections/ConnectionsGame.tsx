@@ -25,7 +25,12 @@ import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connection
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
 import { fetchBannedPuzzleIds, getCachedBannedIds } from '@/lib/connections/bannedPuzzles';
 import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
+import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { fireStreakConfetti, fireLevelUpConfetti } from '@/utils/confettiUtils';
+import { momentumState, isStreakMilestone } from '@/lib/connections/momentum';
 import PuzzleCard from './PuzzleCard';
+import ConnectionsMomentumChip from './ConnectionsMomentumChip';
 import OutOfLivesModal from './OutOfLivesModal';
 
 const ConnectionsEffectsCanvas = dynamic(() => import('./ConnectionsEffectsCanvas'), { ssr: false });
@@ -97,7 +102,10 @@ export default function ConnectionsGame() {
   const prevLivesRef = useRef<number>(state.lives);
   const [sessionScore, setSessionScore] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
+  const [solvedThisSession, setSolvedThisSession] = useState(0);
   const xpAwardedIdsRef = useRef<Set<string>>(new Set());
+  const { haptic, customHaptic } = useHapticFeedback();
+  const sfx = useSoundEffects();
 
   // Funnel parity: emit growth:game_started once on mount. Was missing →
   // PostHog showed 18 connections mode_selected with 0 game_starts
@@ -180,21 +188,26 @@ export default function ConnectionsGame() {
     const prev = prevLivesRef.current;
     if (state.lives !== prev) {
       setCurrentLives(language, state.lives);
-      if (!prefersReducedMotion) {
-        if (state.lives < prev) {
+      if (state.lives < prev) {
+        haptic('warning');
+        if (!prefersReducedMotion) {
           const rect = heartsRef.current?.getBoundingClientRect();
           const containerRect = containerRef.current?.getBoundingClientRect();
           const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
           const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
           window.dispatchEvent(new CustomEvent('connections:lifeLost', { detail: { x, y } }));
         }
-        if (state.lives === 0 && prev > 0) {
+      }
+      if (state.lives === 0 && prev > 0) {
+        sfx.playDefeatSound();
+        customHaptic([50, 100, 50]);
+        if (!prefersReducedMotion) {
           window.dispatchEvent(new CustomEvent('connections:gameOver'));
         }
       }
       prevLivesRef.current = state.lives;
     }
-  }, [state.lives, language, prefersReducedMotion]);
+  }, [state.lives, language, prefersReducedMotion, sfx, haptic, customHaptic]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -218,6 +231,17 @@ export default function ConnectionsGame() {
     const puzzle = state.puzzles[state.currentIndex];
     if (puzzle && !xpAwardedIdsRef.current.has(puzzle.id)) {
       xpAwardedIdsRef.current.add(puzzle.id);
+      // Satisfying feedback: chime + tap on every solve; a bigger burst on
+      // streak milestones makes the next puzzle feel worth chasing.
+      sfx.playMatchFoundSound();
+      if (isStreakMilestone(state.streak)) {
+        sfx.playComboMilestoneSound(state.streak);
+        customHaptic(GAME_HAPTICS.comboLevelUp);
+        if (!prefersReducedMotion) fireStreakConfetti();
+      } else {
+        customHaptic(GAME_HAPTICS.validWord);
+      }
+      setSolvedThisSession((prev) => prev + 1);
       const xp = xpForPuzzle(puzzle.difficulty, state.streak);
       setXpEarned((prev) => prev + xp);
       setSessionScore((prev) => prev + state.score);
@@ -227,13 +251,17 @@ export default function ConnectionsGame() {
         body: JSON.stringify({ xpAmount: xp, lessonId: 'connections-game', activityType: 'connections' }),
       }).catch(() => {});
     }
-  }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score, prefersReducedMotion]);
+  }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score, prefersReducedMotion, sfx, customHaptic]);
 
   useEffect(() => {
-    if (state.status === 'wrong' && !prefersReducedMotion) {
+    if (state.status !== 'wrong') return;
+    if (!prefersReducedMotion) {
       window.dispatchEvent(new CustomEvent('connections:wrong'));
     }
-  }, [state.status, state.wrongAttempts, prefersReducedMotion]);
+    // Audible + tactile miss (independent of motion settings).
+    sfx.playErrorSound();
+    haptic('error');
+  }, [state.status, state.wrongAttempts, prefersReducedMotion, sfx, haptic]);
 
   const advanceToNextLevel = useCallback(() => {
     const nextLevel = level + 1;
@@ -244,14 +272,18 @@ export default function ConnectionsGame() {
       // Carry surviving lives across levels so they actually gate progress.
       dispatch({ type: 'RESET', puzzles: [puzzle], initialLives: state.lives });
     }
+    // Level-up fanfare: a clear payoff for clearing a puzzle.
+    sfx.playLevelUpSound();
+    customHaptic(GAME_HAPTICS.achievement);
     if (!prefersReducedMotion) {
+      fireLevelUpConfetti();
       const rect = levelBadgeRef.current?.getBoundingClientRect();
       const containerRect = containerRef.current?.getBoundingClientRect();
       const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
       const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
       window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: nextLevel } }));
     }
-  }, [language, level, state.lives, prefersReducedMotion, bannedIds]);
+  }, [language, level, state.lives, prefersReducedMotion, bannedIds, sfx, customHaptic]);
 
   const handleInput = useCallback((value: string) => {
     dispatch({ type: 'SET_INPUT', input: value });
@@ -488,6 +520,11 @@ export default function ConnectionsGame() {
           +{xpEarned} {t('connections.xpEarned')}
         </p>
       )}
+
+      {/* Momentum: dangle the next reward / hype the streak — pulls into the next puzzle */}
+      <div className="mb-3">
+        <ConnectionsMomentumChip state={momentumState({ solvedThisSession, streak: state.streak })} />
+      </div>
 
       <PuzzleCard
         puzzle={currentPuzzle}

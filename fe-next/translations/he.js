@@ -12426,6 +12426,12 @@ const he = {
     "placeholder": "הקלד את מילת הגשר...",
     "submit": "שלח",
     "backspace": "מחק אות",
+    "momentum": {
+      "start": "פתרו {goal} ברצף לבונוס",
+      "toReward": "עוד {count} לבונוס!",
+      "rewardEarned": "בונוס נפתח — תמשיכו!",
+      "onFire": "🔥 {streak} ברצף — אל תעצרו!"
+    },
     "correct": "נכון!",
     "wrong": "תשובה שגויה",
     "lives": "חיים",
