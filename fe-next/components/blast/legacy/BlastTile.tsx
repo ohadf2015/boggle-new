@@ -167,18 +167,22 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
 }
 
 /**
- * Compute progressive selection scale: first tile 1.05x, last tile 1.12x.
+ * Compute progressive selection scale: first tile 1.10x, last tile 1.22x.
+ * Larger than the old 1.05–1.12 so the current word visibly "lifts" off the
+ * board — selection should read at a glance, even on a busy TV/party screen.
  */
 function getSelectionScale(selectionIndex?: number, selectionTotal?: number): number {
-  if (selectionIndex == null || !selectionTotal || selectionTotal <= 1) return 1.05;
+  if (selectionIndex == null || !selectionTotal || selectionTotal <= 1) return 1.1;
   const t = selectionIndex / (selectionTotal - 1);
   // Round to 3 decimals to avoid floating point noise
-  return Math.round((1.05 + t * 0.07) * 1000) / 1000;
+  return Math.round((1.1 + t * 0.12) * 1000) / 1000;
 }
 
 function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
   if (phase === 'selected' || (phase === 'idle' && isSelected)) {
-    return `ring-3 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-hard-lime blast-tile-select-pop`;
+    // Thicker ring + lime glow (added inline below) so selected tiles pop hard
+    // against the dark board and the active word is unmistakable.
+    return `ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-hard-lime brightness-110 blast-tile-select-pop`;
   }
   return '';
 }
@@ -194,11 +198,17 @@ function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
   return colorMap[colorTag] || '';
 }
 
-/** Inline styles for selected tiles: progressive scale */
+/** Inline styles for selected tiles: progressive scale + lime glow + lift above neighbors */
 function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
   if (!isSelected) return {};
   const scale = getSelectionScale(selectionIndex, selectionTotal);
-  return { transform: `scale(${scale})` };
+  return {
+    transform: `scale(${scale})`,
+    // Lime glow halo + raise selected tiles above their neighbors so the
+    // active word never hides behind an adjacent tile's scaled edge.
+    filter: 'drop-shadow(0 0 10px rgba(191,255,0,0.75))',
+    zIndex: 20,
+  };
 }
 
 

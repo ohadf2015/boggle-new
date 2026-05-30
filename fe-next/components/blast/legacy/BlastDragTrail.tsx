@@ -23,7 +23,7 @@ export function BlastDragTrail({
   gridSize,
   containerWidth,
   padding,
-  strokeColor = '#00FFFF',
+  strokeColor = '#BFFF00',
 }: BlastDragTrailProps) {
   const points = useMemo(() => {
     if (selectedCells.length < 2 || containerWidth <= 0 || gridSize <= 0) return null;
@@ -46,18 +46,30 @@ export function BlastDragTrail({
       height={containerWidth}
       viewBox={`0 0 ${containerWidth} ${containerWidth}`}
       className="absolute inset-0 z-[5] motion-safe:animate-neo-pop"
-      style={{ pointerEvents: 'none' }}
+      style={{ pointerEvents: 'none', filter: `drop-shadow(0 0 6px ${strokeColor})` }}
     >
       {points && (
-        <polyline
-          points={points}
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={6}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={0.55}
-        />
+        <>
+          {/* Soft wide underlay = glow halo; crisp bright line on top. */}
+          <polyline
+            points={points}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth={14}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.25}
+          />
+          <polyline
+            points={points}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth={8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.9}
+          />
+        </>
       )}
     </svg>
   );

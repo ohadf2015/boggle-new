@@ -233,20 +233,20 @@ describe('BlastTile', () => {
   });
 
   describe('progressive selection scale', () => {
-    it('scales first tile at 1.05x (selectionIndex=0)', () => {
+    it('scales first tile at 1.1x (selectionIndex=0)', () => {
       const { container } = render(
         <BlastTile {...baseProps} type="standard" isSelected selectionIndex={0} selectionTotal={5} />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(1.05)');
+      expect(button?.style.transform).toContain('scale(1.1)');
     });
 
-    it('scales last tile at 1.12x (selectionIndex=total-1)', () => {
+    it('scales last tile at 1.22x (selectionIndex=total-1)', () => {
       const { container } = render(
         <BlastTile {...baseProps} type="standard" isSelected selectionIndex={4} selectionTotal={5} />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scale(1.12)');
+      expect(button?.style.transform).toContain('scale(1.22)');
     });
 
     it('interpolates scale for middle tiles', () => {
@@ -254,8 +254,8 @@ describe('BlastTile', () => {
         <BlastTile {...baseProps} type="standard" isSelected selectionIndex={2} selectionTotal={5} />
       );
       const button = container.querySelector('button');
-      // midpoint: 1.05 + (2/4) * 0.07 = 1.085
-      expect(button?.style.transform).toContain('scale(1.085)');
+      // midpoint: 1.10 + (2/4) * 0.12 = 1.16
+      expect(button?.style.transform).toContain('scale(1.16)');
     });
   });
 
