@@ -85,42 +85,14 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'חורף',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-14',
-    word1: 'כלי',
-    bridge: 'מקלדת',
-    word2: 'אלקטרונית',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-15',
-    word1: 'כוסות',
-    bridge: 'רוח',
-    word2: 'ספורטיבית',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-16',
-    word1: 'נייר',
-    bridge: 'זכוכית',
-    word2: 'אקרילית',
-    difficulty: 'hard',
-  },
-  {
+        {
     id: 'he-g-17',
     word1: 'מכונת',
     bridge: 'תופים',
     word2: 'אלקטרוניים',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-18',
-    word1: 'כלי',
-    bridge: 'קשת',
-    word2: 'חשמלית',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-19',
     word1: 'מרוץ',
     bridge: 'אופניים',
@@ -442,21 +414,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'שפיר',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-72',
-    word1: 'תצלום',
-    bridge: 'לוויין',
-    word2: 'צילום',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-73',
-    word1: 'בדק',
-    bridge: 'בית',
-    word2: 'מטבחיים',
-    difficulty: 'hard',
-  },
-  {
+      {
     id: 'he-g-74',
     word1: 'איבר',
     bridge: 'מין',
@@ -491,14 +449,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'חופשית',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-81',
-    word1: 'דלדול',
-    bridge: 'עצם',
-    word2: 'העצה',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-82',
     word1: 'תסמונת',
     bridge: 'דאון',
@@ -519,14 +470,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'אישי',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-85',
-    word1: 'וידאו',
-    bridge: 'ארט',
-    word2: 'רוק',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-86',
     word1: 'מיצב',
     bridge: 'וידאו',
@@ -764,21 +708,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'תרבותית',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-124',
-    word1: 'ארץ',
-    bridge: 'עיר',
-    word2: 'תעשייה',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-125',
-    word1: 'אולם',
-    bridge: 'תיאטרון',
-    word2: 'מוזיקה',
-    difficulty: 'hard',
-  },
-  {
+      {
     id: 'he-g-126',
     word1: 'טחנת',
     bridge: 'קמח',
@@ -813,63 +743,21 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'מתמטי',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-132',
-    word1: 'טין',
-    bridge: 'פופ',
-    word2: 'אופראי',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-133',
     word1: 'כלי',
     bridge: 'קיבול',
     word2: 'חום',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-134',
-    word1: 'סדר',
-    bridge: 'כוחות',
-    word2: 'מילואים',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-135',
-    word1: 'פקודת',
-    bridge: 'יום',
-    word2: 'הקופסאות',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-136',
-    word1: 'חיל',
-    bridge: 'מצב',
-    word2: 'שימור',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-137',
-    word1: 'יחידת',
-    bridge: 'השתלטות',
-    word2: 'עוינת',
-    difficulty: 'hard',
-  },
-  {
+          {
     id: 'he-g-138',
     word1: 'קצין',
     bridge: 'מודיעין',
     word2: 'עסקי',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-139',
-    word1: 'חרך',
-    bridge: 'ירי',
-    word2: 'ספורטיבי',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-140',
     word1: 'קטע',
     bridge: 'כלי',
@@ -897,14 +785,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'טלוויזיה',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-145',
-    word1: 'דמויי',
-    bridge: 'חזיר',
-    word2: 'יבלות',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-147',
     word1: 'אגירת',
     bridge: 'אנרגיה',
@@ -974,14 +855,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'קדושים',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-158',
-    word1: 'מילות',
-    bridge: 'שיר',
-    word2: 'נולד',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-159',
     word1: 'כאב',
     bridge: 'ראש',
@@ -1002,14 +876,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'יוני',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-162',
-    word1: 'ועד',
-    bridge: 'בית',
-    word2: 'קדרות',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-163',
     word1: 'עיסת',
     bridge: 'נייר',
@@ -1072,21 +939,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'רחוב',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-172',
-    word1: 'מוזיקת',
-    bridge: 'פופ',
-    word2: 'ראפ',
-    difficulty: 'hard',
-  },
-  {
-    id: 'he-g-174',
-    word1: 'שיחור',
-    bridge: 'מזון',
-    word2: 'בסיסי',
-    difficulty: 'hard',
-  },
-  {
+      {
     id: 'he-g-175',
     word1: 'מועדון',
     bridge: 'ספורט',
@@ -1121,14 +974,7 @@ export const HE_GENERATED: ConnectionPuzzle[] = [
     word2: 'המונים',
     difficulty: 'hard',
   },
-  {
-    id: 'he-g-182',
-    word1: 'דרים',
-    bridge: 'פופ',
-    word2: 'רוק',
-    difficulty: 'hard',
-  },
-  {
+    {
     id: 'he-g-183',
     word1: 'פסטיבל',
     bridge: 'מוזיקה',

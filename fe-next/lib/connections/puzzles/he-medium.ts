@@ -11,8 +11,6 @@ export const HE_MEDIUM: ConnectionPuzzle[] = [
   { id: 'he-m-008', word1: 'קוביית', word2: 'צהובה', bridge: 'גבינה', difficulty: 'medium' },
   { id: 'he-m-009', word1: 'פרוסת', word2: 'לבן', bridge: 'לחם', difficulty: 'medium' },
   { id: 'he-m-010', word1: 'חנות', word2: 'ירקות', bridge: 'פירות', difficulty: 'medium' },
-  { id: 'he-m-011', word1: 'שוק', word2: 'יהודה', bridge: 'מחנה', difficulty: 'medium' },
-  { id: 'he-m-012', word1: 'כיכר', word2: 'אביב', bridge: 'תל', difficulty: 'medium' },
   { id: 'he-m-014', word1: 'ברז', word2: 'חמים', bridge: 'מים', difficulty: 'medium' },
   { id: 'he-m-015', word1: 'ארון', word2: 'חדשים', bridge: 'בגדים', difficulty: 'medium' },
   { id: 'he-m-016', word1: 'מכונת', word2: 'יבשה', bridge: 'כביסה', difficulty: 'medium' },
