@@ -76,7 +76,7 @@ Sitemap: https://www.lexiclash.live/sitemap.xml
 
 ## Education (Classrooms, Teachers, Students)
 
-LexiClash Education turns word games into a classroom learning tool. Free, browser-based, no downloads, no accounts required for students. Built around word-formation gameplay (Boggle-style grids, anagrams, word wheels) — not flashcards or quizzes.
+LexiClash Education turns word games into a classroom learning tool. Free, browser-based, no downloads, no student logins. Runs on Chromebooks, tablets, phones, and desktops — no app, plugin, or install. Teachers bring their own word lists; students join with a 4-digit code. Built around word-formation gameplay (Boggle-style grids, anagrams, word wheels) — not flashcards or quizzes.
 
 - Education Hub: https://www.lexiclash.live/en/education
 - Vocabulary Duels (1v1 student battles): https://www.lexiclash.live/en/education/duels
