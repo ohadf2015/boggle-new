@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ (API 31) SYSTEM splash override.
+
+  On API 31+ the platform draws its OWN splash and reads ONLY android:-prefixed
+  attributes here (the androidx non-prefixed ones in values/styles.xml don't apply
+  on 31+). Without this, the OS masks the launcher adaptive-icon into a circle on
+  every cold start — that's the "navy bg with a circle of the old logo" that flashes
+  when the backgrounded process is evicted and the user re-opens the app.
+
+  We force navy background + a navy-on-navy blank icon so the system splash is a
+  seamless navy flash with no visible logo. All values point at the same neo-navy
+  (#1a1a2e) as the launch + post-splash window backgrounds, so this can never
+  conflict with values/styles.xml.
+
+  NOTE (honest caveat): a few OEM skins (e.g. older Samsung One UI) don't fully
+  honor icon suppression on the system splash — navy-blend is the best achievable
+  there, not an absolute guarantee.
+
+  ⚠️ DO NOT run `npx capacitor-assets generate` — it can rewrite these themes.
+-->
+<resources>
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">#FF1A1A2E</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_blank</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#FF1A1A2E</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>

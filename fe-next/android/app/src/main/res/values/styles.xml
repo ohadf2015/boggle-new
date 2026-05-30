@@ -29,13 +29,36 @@
     </style>
 
 
+    <!--
+      LAUNCH / SPLASH THEME — intentionally LOGO-FREE.
+
+      Previously this used @drawable/splash (navy + the LEXI logo). That image was
+      repainted by the OS on EVERY cold start, and because this is a remote-URL
+      Capacitor app, Android's low-memory killer evicts the backgrounded process,
+      so simply re-opening the app = cold start = a stray old-logo flash before
+      React can call SplashScreen.hide(). It also bled through native-overlay holes
+      (see MainActivity.onCreate). We now paint the launch window seamless navy so
+      there is nothing to flash; the post-splash theme + runtime setBackgroundDrawable
+      already provide the same navy, so the handoff is invisible.
+
+      For the Android 12+ (API 31) SYSTEM splash — which otherwise masks the launcher
+      adaptive-icon into a circle — see values-v31/styles.xml (platform android:*
+      attributes). The non-prefixed windowSplashScreen* items below cover the
+      androidx core-splashscreen backport on API < 31.
+
+      ⚠️ DO NOT run `npx capacitor-assets generate` — it rewrites this style back to
+      @drawable/splash and regenerates the logo PNGs, silently reintroducing the bug.
+    -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+        <!-- Seamless navy launch window — no logo. Must stay opaque (not @null) so
+             nothing bleeds through the edge-to-edge top inset. -->
+        <item name="android:background">#FF1A1A2E</item>
+        <!-- androidx core-splashscreen backport (API < 31): navy bg, blank navy icon. -->
+        <item name="windowSplashScreenBackground">#FF1A1A2E</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_blank</item>
         <!--
           Hand off to a normal theme once the splash is dismissed. Without this, the
-          activity stays on Theme.SplashScreen and @drawable/splash remains the window
-          background for the whole session — which, under edge-to-edge transparent bars,
-          showed as a stuck logo strip in the top inset over the loaded app (ed536b23a).
+          activity stays on Theme.SplashScreen for the whole session.
         -->
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
     </style>
