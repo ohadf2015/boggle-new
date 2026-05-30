@@ -26,11 +26,11 @@ describe('useWordCraftMode', () => {
     expect(renderHook(() => useWordCraftMode()).result.current).toBe('cards');
   });
 
-  it('reads classic (explicit + legacy ?classic=1)', () => {
+  it('resolves retired classic links to Territory', () => {
     withSearch('?mode=classic');
-    expect(renderHook(() => useWordCraftMode()).result.current).toBe('classic');
+    expect(renderHook(() => useWordCraftMode()).result.current).toBe('territory');
     withSearch('?classic=1');
-    expect(renderHook(() => useWordCraftMode()).result.current).toBe('classic');
+    expect(renderHook(() => useWordCraftMode()).result.current).toBe('territory');
   });
 });
 
@@ -45,9 +45,8 @@ describe('gateWordCraftMode (only Territory is public)', () => {
     expect(gateWordCraftMode('gems', false)).toBe('territory');
   });
 
-  it('always allows Territory and legacy Classic for everyone', () => {
+  it('always allows Territory for everyone', () => {
     expect(gateWordCraftMode('territory', false)).toBe('territory');
-    expect(gateWordCraftMode('classic', false)).toBe('classic');
-    expect(gateWordCraftMode('classic', true)).toBe('classic');
+    expect(gateWordCraftMode('territory', true)).toBe('territory');
   });
 });

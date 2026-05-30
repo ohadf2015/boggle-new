@@ -12512,7 +12512,11 @@ const es = {
       "youWin": "¡Ganaste!",
       "youLose": "Ellos ganan",
       "tie": "¡Empate!",
-      "unnamedChallenger": "Un retador"
+      "unnamedChallenger": "Un retador",
+      "aheadBy": "¡Ganas por {{n}}!",
+      "toGo": "Faltan {{n}}",
+      "tiedNow": "¡Empate!",
+      "theirScore": "su puntuación"
     },
     "gems": {
       "title": "Caza de Gemas",

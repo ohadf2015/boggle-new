@@ -1,6 +1,7 @@
 'use client';
 
 import { WordCraftDuelResult } from './WordCraftDuelResult';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Props {
   t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
@@ -12,17 +13,20 @@ interface Props {
   /** Player just set a new single-player personal best this game. */
   isNewBest?: boolean;
   /** Duel result when playing vs a remote challenger via a duel link */
-  duelOutcome?: { outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number };
+  duelOutcome?: { outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number; challengerAvatar?: CustomAvatarConfig };
   /** Current game seed for building outgoing duel links */
   currentSeed?: number;
   /** Current locale for building outgoing duel links */
   currentLocale?: string;
+  /** This player's identity for outgoing re-challenge links (from auth profile). */
+  challengerName?: string;
+  challengerAvatar?: CustomAvatarConfig;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar }: Props) {
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
-    return <WordCraftDuelResult t={t} playerScore={playerScore} duelOutcome={duelOutcome} currentSeed={currentSeed} currentLocale={currentLocale} />;
+    return <WordCraftDuelResult t={t} playerScore={playerScore} duelOutcome={duelOutcome} currentSeed={currentSeed} currentLocale={currentLocale} challengerName={challengerName} challengerAvatar={challengerAvatar} />;
   }
 
   const isTie = playerScore === botScore;

@@ -12424,7 +12424,11 @@ const sv = {
       "youWin": "Du vinner!",
       "youLose": "De vinner",
       "tie": "Oavgjort!",
-      "unnamedChallenger": "En utmanare"
+      "unnamedChallenger": "En utmanare",
+      "aheadBy": "Leder med {{n}}!",
+      "toGo": "{{n}} kvar",
+      "tiedNow": "Lika!",
+      "theirScore": "deras poäng"
     },
     "gems": {
       "title": "Ädelstensjakt",

@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
+import Avatar from '@/components/Avatar';
 import { buildDuelUrl } from '@/lib/word-craft/duel';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Props {
   t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
@@ -13,14 +15,20 @@ interface Props {
     outcome: 'win' | 'lose' | 'tie';
     challengerName: string;
     challengerScore: number;
+    /** The challenger's avatar, decoded from the duel link (seeded fallback if absent). */
+    challengerAvatar?: CustomAvatarConfig;
   };
   /** Current game seed for building the outgoing duel link */
   currentSeed?: number;
   /** Current locale for building the outgoing duel link */
   currentLocale?: string;
+  /** This player's display name for the outgoing re-challenge link (from auth profile). */
+  challengerName?: string;
+  /** This player's avatar for the outgoing re-challenge link. */
+  challengerAvatar?: CustomAvatarConfig;
 }
 
-export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, currentLocale }: Props) {
+export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar }: Props) {
   const [sharing, setSharing] = useState(false);
 
   const outcomeColor = {
@@ -40,10 +48,11 @@ export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, 
     setSharing(true);
 
     try {
-      // Get username from localStorage or use generic challenger name
-      const username = typeof window !== 'undefined'
-        ? localStorage.getItem('wordcraft-duel-name') || t('wordcraft.duel.unnamedChallenger')
-        : t('wordcraft.duel.unnamedChallenger');
+      // Prefer the authenticated profile identity; fall back to the legacy
+      // localStorage name, then the generic challenger label.
+      const username = challengerName
+        || (typeof window !== 'undefined' ? localStorage.getItem('wordcraft-duel-name') : null)
+        || t('wordcraft.duel.unnamedChallenger');
 
       // Build the duel URL using the actual current game seed
       const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live';
@@ -54,6 +63,7 @@ export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, 
         seed,
         name: username,
         score: playerScore,
+        avatar: challengerAvatar,
       });
 
       const shareText = t('wordcraft.duel.shareText', { score: playerScore });
@@ -109,6 +119,12 @@ export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, 
         </div>
         <div className="text-neo-white/40">vs</div>
         <div className="flex flex-col items-center gap-1">
+          <Avatar
+            customAvatar={duelOutcome.challengerAvatar ?? null}
+            userId={duelOutcome.challengerName || 'challenger'}
+            size="md"
+            disableEffects
+          />
           <div className="text-2xl font-neo-display font-black text-neo-white/70">{duelOutcome.challengerScore}</div>
           <div className="text-xs font-neo-body text-neo-white/60">{duelOutcome.challengerName}</div>
         </div>

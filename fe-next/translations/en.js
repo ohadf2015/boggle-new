@@ -12444,7 +12444,11 @@ const en = {
       "youWin": "You win!",
       "youLose": "They win",
       "tie": "Tied!",
-      "unnamedChallenger": "A challenger"
+      "unnamedChallenger": "A challenger",
+      "aheadBy": "Ahead by {{n}}!",
+      "toGo": "{{n}} to go",
+      "tiedNow": "All tied!",
+      "theirScore": "their score"
     },
     "gems": {
       "title": "Gem Hunt",

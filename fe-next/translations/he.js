@@ -12840,7 +12840,11 @@ const he = {
       "youWin": "ניצחת!",
       "youLose": "הם ניצחו",
       "tie": "תיקו!",
-      "unnamedChallenger": "מתחרה"
+      "unnamedChallenger": "מתחרה",
+      "aheadBy": "מוביל ב-{{n}}!",
+      "toGo": "עוד {{n}}",
+      "tiedNow": "תיקו!",
+      "theirScore": "הניקוד שלהם"
     },
     "gems": {
       "title": "ציד אבני חן",

@@ -12398,7 +12398,11 @@ const ja = {
       "youWin": "勝利！",
       "youLose": "敗北",
       "tie": "同点！",
-      "unnamedChallenger": "チャレンジャー"
+      "unnamedChallenger": "チャレンジャー",
+      "aheadBy": "{{n}}点リード！",
+      "toGo": "あと{{n}}点",
+      "tiedNow": "同点！",
+      "theirScore": "相手のスコア"
     },
     "gems": {
       "title": "ジェムハント",

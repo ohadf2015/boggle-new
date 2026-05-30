@@ -5,6 +5,7 @@ import { Users, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { buildDuelUrl } from '@/lib/word-craft/duel';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -14,9 +15,13 @@ interface Props {
   locale: string;
   /** Disable the control (e.g., during gameplay before game-over) */
   disabled?: boolean;
+  /** Challenger display name to embed in the invite (from the auth profile). */
+  challengerName?: string;
+  /** Challenger avatar to embed, so the invitee sees who they're dueling. */
+  challengerAvatar?: CustomAvatarConfig;
 }
 
-export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disabled }: Props) {
+export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disabled, challengerName, challengerAvatar }: Props) {
   const [sharing, setSharing] = useState(false);
 
   const handlePassAndPlay = () => {
@@ -32,9 +37,11 @@ export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disab
     setSharing(true);
 
     try {
-      const username = typeof window !== 'undefined'
-        ? localStorage.getItem('wordcraft-duel-name') || t('wordcraft.duel.unnamedChallenger')
-        : t('wordcraft.duel.unnamedChallenger');
+      // Prefer the authenticated profile identity (passed from PageClient); fall
+      // back to the legacy localStorage name, then the generic challenger label.
+      const username = challengerName
+        || (typeof window !== 'undefined' ? localStorage.getItem('wordcraft-duel-name') : null)
+        || t('wordcraft.duel.unnamedChallenger');
 
       const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live';
 
@@ -42,6 +49,7 @@ export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disab
         seed,
         name: username,
         score: playerScore,
+        avatar: challengerAvatar,
       });
 
       const shareText = t('wordcraft.duel.shareText', { score: playerScore });

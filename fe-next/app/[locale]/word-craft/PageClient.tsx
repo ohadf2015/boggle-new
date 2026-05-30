@@ -56,6 +56,9 @@ import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
 import { cn } from '@/lib/utils';
 import { parseDuel, compareDuel } from '@/lib/word-craft/duel';
+import { resolveChallengerIdentity } from '@/lib/word-craft/challengerIdentity';
+import { WordCraftDuelTargetStrip } from '@/components/word-craft/WordCraftDuelTargetStrip';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 const ENCOURAGEMENT_COUNT = 8;
 const LINGUIST_STORAGE_KEY = 'wc_locales_played';
@@ -83,8 +86,15 @@ function recordLocale(locale: string) {
 export default function WordCraftPageClient() {
   const router = useRouter();
   const { t, language } = useLanguage();
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, profile } = useAuth();
   const isRTL = language === 'he';
+
+  // Identity embedded in outgoing duel invites — sourced from the auth profile
+  // (display name + avatar), not the legacy unset localStorage key.
+  const challengerIdentity = useMemo(
+    () => resolveChallengerIdentity(profile, t('wordcraft.duel.unnamedChallenger')),
+    [profile, t],
+  );
   const locale = (language ?? 'en') as SupportedLocale;
 
   // Compact multiplier labels painted inside empty premium cells. Built once
@@ -140,13 +150,10 @@ export default function WordCraftPageClient() {
     return fromUrl ? Number(fromUrl) : Math.floor(Math.random() * 1_000_000);
   }, [duel]);
 
-  // Territory mode is the default twist. Opt-out: ?classic=1 returns the
-  // legacy Scrabble-alt feel (no claims, no capture bonus, no endgame bonus).
-  const territoryEnabled = useMemo(() => {
-    if (typeof window === 'undefined') return true;
-    const classic = new URLSearchParams(window.location.search).get('classic');
-    return classic !== '1' && classic !== 'true';
-  }, []);
+  // Territory is the one WordCraft ruleset — claims, capture bonus, and the
+  // endgame territory payout are always on. The legacy ?classic=1 Scrabble-alt
+  // opt-out was retired.
+  const territoryEnabled = true;
 
   // Hot-seat (pass-and-play) human vs human on one device: ?vs=human.
   const hotseat = useMemo(() => {
@@ -618,7 +625,7 @@ export default function WordCraftPageClient() {
   // --- Game over ---
   const [newBest, setNewBest] = useState(false);
   const recordedBestRef = useRef(false);
-  const [duelOutcome, setDuelOutcome] = useState<{ outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number } | null>(null);
+  const [duelOutcome, setDuelOutcome] = useState<{ outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number; challengerAvatar?: CustomAvatarConfig } | null>(null);
   useEffect(() => {
     if (game.state.turn === 'over') {
       setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
@@ -635,13 +642,13 @@ export default function WordCraftPageClient() {
           outcome,
           challengerName: duel.name || t('wordcraft.duel.unnamedChallenger'),
           challengerScore: duel.score,
+          challengerAvatar: duel.avatar,
         });
       }
       // Personal best (SP vs bot only — hotseat has two human seats, no "mine").
       if (!hotseat && !recordedBestRef.current) {
         recordedBestRef.current = true;
-        const mode = territoryEnabled ? 'territory' : 'classic';
-        const { isNewBest } = recordBest(mode, game.state.player.score);
+        const { isNewBest } = recordBest('territory', game.state.player.score);
         if (isNewBest) {
           setNewBest(true);
           playNewBest();
@@ -804,6 +811,19 @@ export default function WordCraftPageClient() {
           }}
         />
 
+        {/* Duel target: keeps the challenger's avatar + name + score-to-beat
+            visible for the whole async duel (the bot stays as the live board
+            opponent that keeps Territory contested and fair). */}
+        {duel ? (
+          <WordCraftDuelTargetStrip
+            t={t}
+            friendName={duel.name || t('wordcraft.duel.unnamedChallenger')}
+            friendScore={duel.score}
+            playerScore={game.state.player.score}
+            friendAvatar={duel.avatar}
+          />
+        ) : null}
+
         {territoryEnabled ? (
           <WordCraftTerritoryStrip
             playerCount={countClaimed(game.state.board, 'player')}
@@ -928,6 +948,8 @@ export default function WordCraftPageClient() {
             playerScore={game.state.player.score}
             locale={locale}
             disabled={!dict}
+            challengerName={challengerIdentity.name}
+            challengerAvatar={challengerIdentity.avatar}
           />
         ) : null}
 
@@ -1012,6 +1034,8 @@ export default function WordCraftPageClient() {
           duelOutcome={duelOutcome ?? undefined}
           currentSeed={seed}
           currentLocale={locale}
+          challengerName={challengerIdentity.name}
+          challengerAvatar={challengerIdentity.avatar}
         />
       ) : null}
     </div>
