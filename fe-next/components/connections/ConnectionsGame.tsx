@@ -515,13 +515,21 @@ export default function ConnectionsGame() {
         </div>
       </m.div>
 
-      {/* Daily Challenge entry — same puzzles for everyone today + leaderboard */}
-      <Link
-        href={`/${language}/connections/daily`}
-        className="mb-3 flex items-center justify-center gap-2 rounded-neo border-neo border-neo-yellow/60 bg-neo-yellow/10 px-4 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
-      >
-        🏆 {t('connections.daily.cta')}
-      </Link>
+      {/* Daily Challenge + Community entries */}
+      <div className="mb-3 flex gap-2">
+        <Link
+          href={`/${language}/connections/daily`}
+          className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo border-neo-yellow/60 bg-neo-yellow/10 px-3 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        >
+          🏆 {t('connections.daily.cta')}
+        </Link>
+        <Link
+          href={`/${language}/connections/community`}
+          className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo border-neo-pink/60 bg-neo-pink/10 px-3 py-2 font-neo-display text-sm font-black text-neo-pink shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        >
+          👥 {t('connections.community.cta')}
+        </Link>
+      </div>
 
       {/* XP earned this session */}
       {xpEarned > 0 && (
