@@ -1,7 +1,6 @@
 'use client';
 
 import { memo } from 'react';
-import { Hourglass } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import type { PlayerState } from '@/lib/word-craft/types';
 import type { Turn } from '@/lib/word-craft/useWordCraftGame';
@@ -137,7 +136,22 @@ function WordCraftScoreboardImpl({
           {status}
         </span>
         <span className="inline-flex items-center gap-1 text-neo-white">
-          <Hourglass className="w-3 h-3" aria-hidden />
+          {/* The tile sack — letters left to draw. Gives the bag count a
+              physical object instead of a generic hourglass; it wobbles on the
+              final rack to signal the bag is nearly empty. Static export →
+              plain <img>, not next/image. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/word-craft/tile-sack.png"
+            alt=""
+            aria-hidden
+            width={20}
+            height={23}
+            className={cn(
+              'w-5 h-auto select-none -my-1 drop-shadow-[1px_1px_0_rgba(0,0,0,0.6)]',
+              tilesRemaining > 0 && tilesRemaining <= 7 && 'animate-neo-wobble',
+            )}
+          />
           <span className="font-neo-body">{labels.bagRemaining}</span>
           <span className="font-neo-display font-black tabular-nums text-neo-cyan ms-0.5">
             {tilesRemaining}
