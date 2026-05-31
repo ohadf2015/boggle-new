@@ -77,7 +77,7 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
           onClick={onClose}
           className="w-full border-3 border-black rounded-neo bg-neo-yellow text-black font-bold py-3 shadow-hard-sm active:shadow-hard-pressed active:translate-y-[2px] transition-all"
         >
-          OK
+          {t('common.continue')}
         </button>
       </AdaptiveMotion.div>
     </div>

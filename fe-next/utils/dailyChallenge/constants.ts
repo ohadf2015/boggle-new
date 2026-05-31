@@ -40,14 +40,21 @@ export const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
   'ץ': 'צ', // final tsade → tsade
 };
 
+// Precompiled once at module load — avoids recompiling a RegExp on every
+// normalizeHebrewFinalLetters() call (was `new RegExp(...)` inside the loop).
+const HEBREW_FINAL_REPLACERS: ReadonlyArray<readonly [RegExp, string]> =
+  Object.entries(HEBREW_FINAL_TO_REGULAR).map(
+    ([final, regular]) => [new RegExp(final, 'g'), regular] as const
+  );
+
 /**
  * Normalize Hebrew final letters to regular forms for grid display
  * Final letters (ך, ם, ן, ף, ץ) are replaced with their regular forms
  */
 export function normalizeHebrewFinalLetters(text: string): string {
   let normalized = text;
-  for (const [final, regular] of Object.entries(HEBREW_FINAL_TO_REGULAR)) {
-    normalized = normalized.replace(new RegExp(final, 'g'), regular);
+  for (const [pattern, regular] of HEBREW_FINAL_REPLACERS) {
+    normalized = normalized.replace(pattern, regular);
   }
   return normalized;
 }

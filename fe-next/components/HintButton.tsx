@@ -140,11 +140,11 @@ const HintButton = memo<HintButtonProps>(({
                 <span className="font-black text-neo-black uppercase text-sm">
                   {t('hints.hint')}
                 </span>
-                {wordLength && (
+                {wordLength ? (
                   <span className="ms-auto text-xs bg-neo-pink text-white px-2 py-0.5 rounded-neo font-bold">
                     {wordLength} {t('hints.letters')}
                   </span>
-                )}
+                ) : null}
               </div>
 
               {/* Hint Text */}

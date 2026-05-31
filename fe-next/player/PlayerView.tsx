@@ -57,7 +57,7 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 
-import type { Player, WordToVote, PlayerViewProps } from './types';
+import type { WordToVote, PlayerViewProps } from './types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // ==========================================
@@ -195,8 +195,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     },
   });
 
-  // Player state
-  const [playersReady, setPlayersReady] = useState<Player[]>(initialPlayers);
+  // Player roster is driven entirely by the initialPlayers prop (parent owns the
+  // source of truth), so read it directly — no mirrored state/effect needed.
+  const playersReady = initialPlayers;
 
   // Calculate human player count (exclude bots)
   const humanPlayerCount = playersReady.filter(p => !p.isBot && !p.disconnected).length;
@@ -422,11 +423,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       }
     };
   }, [setFoundWords]);
-
-  // Update players from props
-  useEffect(() => {
-    setPlayersReady(initialPlayers);
-  }, [initialPlayers]);
 
   // Handle pending game start
   useEffect(() => {

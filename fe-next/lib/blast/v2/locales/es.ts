@@ -13,6 +13,12 @@ const ACCENT_MAP: Record<string, string> = {
   'Ü': 'U', 'ü': 'U',
 };
 
+// Precompiled once — avoids recompiling a RegExp on every normalize() call.
+const ACCENT_REPLACERS: ReadonlyArray<readonly [RegExp, string]> =
+  Object.entries(ACCENT_MAP).map(
+    ([accented, base]) => [new RegExp(accented, 'g'), base] as const
+  );
+
 // Spanish corpus letter frequencies
 const LETTER_FREQ_ES: Record<string, number> = {
   'E': 0.137, 'A': 0.124, 'O': 0.087, 'S': 0.074, 'R': 0.069,
@@ -65,9 +71,8 @@ export const ES_CONFIG: LocaleConfig = {
   rtl: false,
   normalize: (s) => {
     let out = s.toUpperCase();
-    for (const [accented, base] of Object.entries(ACCENT_MAP)) {
-      const regex = new RegExp(accented, 'g');
-      out = out.replace(regex, base);
+    for (const [pattern, base] of ACCENT_REPLACERS) {
+      out = out.replace(pattern, base);
     }
     return out;
   },

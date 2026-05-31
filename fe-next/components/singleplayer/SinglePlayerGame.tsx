@@ -141,8 +141,11 @@ function SinglePlayerGame({
       allClearedRef.current = true;
       fireVictoryConfetti();
       // End the run after confetti fires so player lands on the results page.
-      setTimeout(() => core.handleFinishPractice(), 1200);
+      // Clear on unmount so a mid-confetti navigation doesn't route post-unmount.
+      const finishId = setTimeout(() => core.handleFinishPractice(), 1200);
+      return () => clearTimeout(finishId);
     }
+    return undefined;
   }, [core.foundWords.length, core.totalBoardWords, settings.mode, core]);
 
   // Practice-mode continue prompt — fires once when score crosses threshold.
