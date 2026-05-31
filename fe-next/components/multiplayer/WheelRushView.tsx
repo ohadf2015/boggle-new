@@ -520,10 +520,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
   return (
     <div className="relative flex-1 flex flex-col items-center min-h-0 bg-neo-navy p-3 md:p-4 gap-2 overflow-hidden">
-      {/* Inner column caps width on desktop so the lime self-badge + game body
-          don't stretch edge-to-edge on a 1440px viewport (mobile-tree fallback
-          when desktop shell isn't mounted). bg stays full-bleed on outer. */}
-      <div className="w-full max-w-2xl flex-1 flex flex-col min-h-0 gap-2">
+      {/* Inner column caps width to match the daily-challenge wheel (max-w-lg)
+          so the play area has the same proportions on desktop instead of
+          stretching edge-to-edge. bg stays full-bleed on outer. */}
+      <div className="w-full max-w-lg mx-auto flex-1 flex flex-col min-h-0 gap-2">
       {/* Top bar: opponent progress rail + prominent self score + timer + quit
           — hidden in desktop shell (handled by side rails). */}
       {!isDesktopCanvas && (
@@ -546,9 +546,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </div>
       )}
 
-      {/* Word builder (shared shake + motion) */}
+      {/* Word builder (shared shake + motion). Fixed height (not min-h) mirrors
+          the daily challenge so the row never grows as tiles wrap. */}
       <m.div
-        className="relative w-full min-h-[52px] sm:min-h-[72px] flex items-center justify-center"
+        className="relative w-full h-[52px] sm:h-[72px] flex items-center justify-center"
         animate={
           wordBuilderShake && !prefersReduced
             ? { x: [-4, 4, -3, 3, -1, 0] }
@@ -585,6 +586,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         <AnimatePresence>
           {feedback && (
             <m.div
+              // dir="auto" so localized feedback (Hebrew messages like "מילה
+              // קצרה מדי") renders RTL while score strings like "+45" stay LTR.
+              dir="auto"
               className={cn(
                 'absolute -bottom-7 left-1/2 -translate-x-1/2 px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold whitespace-nowrap z-20',
                 feedback.type === 'ok' ? 'bg-neo-lime text-neo-black' : 'bg-neo-red text-neo-white',
@@ -633,20 +637,28 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       {/* Wheel + actions cluster — kept tight together, vertically centered.
           container-type:size lets the wheel's max-* height cap (below) read the
           cluster's block size via cqb. */}
-      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center min-h-0 gap-3">
+      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1" data-testid="wheel-cluster">
+        {/* Tap-to-remove + double-tap-to-submit hint — reserved-height slot
+            (mirrors the daily challenge) so the wheel never shifts when the
+            hint text mounts/unmounts. */}
+        <div data-testid="tap-hint-slot" className="h-[14px] sm:h-[16px] flex items-center justify-center">
+          {builtLetters.length > 0 && (
+            <p className="text-neo-white text-[10px] sm:text-xs text-center">
+              {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
+            </p>
+          )}
+        </div>
         <div
           ref={wheelContainerRef}
           className={cn(
             "relative flex items-center justify-center touch-none shrink-0",
             // Height-cap binds only when smaller than the fixed size → tall screens
-            // unchanged, short/landscape ones shrink to fit. Reserve ~148px (action
-            // bar + MyWordsChips + gaps, both inside the cluster); floor 176px.
+            // unchanged, short/landscape ones shrink to fit. Sizing + reserve
+            // (~116px: tap-hint + rule hint + action bar + gaps) match the daily
+            // challenge wheel for visual parity; floor 176px.
             isDesktopCanvas
               ? "w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
-              // Mobile-tree path is also rendered on desktop when the desktop
-              // shell isn't mounted — bump md/lg to the solo WordWheel sizes
-              // so the wheel doesn't look small inside a 1440px viewport.
-              : "w-52 h-52 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 max-w-[max(176px,calc(100cqb-148px))] max-h-[max(176px,calc(100cqb-148px))]",
+              : "w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))]",
           )}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -704,7 +716,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
         {/* Actions (Clear / Submit / Remove-last) — sit directly under the wheel
             so the player's thumb stays in the wheel's gravity well. */}
-        <div className="flex items-center justify-center gap-3 shrink-0 mt-1">
+        <div data-testid="word-wheel-action-bar" className="w-full flex items-center justify-center gap-3 shrink-0 mt-1">
         <m.button
           type="button"
           onClick={handleClear}
@@ -756,11 +768,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </m.button>
         </div>
 
-        {/* Found-word chips ride directly under the actions inside the centered
-            cluster — keeps them in the wheel's gravity well instead of stranded
-            at the screen bottom. Fixed-height slot so the cluster never reflows. */}
-        {!isDesktopCanvas && <MyWordsChips words={myWords} dir={wordDir} />}
       </div>
+
+      {/* Found words — sit below the wheel cluster, mirroring the daily
+          challenge's found-words slot (fixed-height slot inside MyWordsChips
+          keeps the layout from reflowing). */}
+      {!isDesktopCanvas && <MyWordsChips words={myWords} dir={wordDir} />}
 
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={!!prefersReduced} />
       </div>

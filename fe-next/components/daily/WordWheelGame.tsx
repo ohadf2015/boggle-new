@@ -777,6 +777,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         <AnimatePresence>
           {feedback && (
             <m.div
+              // dir="auto" so localized feedback (e.g. Hebrew validation
+              // messages) renders RTL while score strings like "+45" stay LTR.
+              dir="auto"
               className={cn(
                 'absolute -bottom-7 left-1/2 -translate-x-1/2 px-3 py-1 rounded-neo border-2 border-neo-black text-sm font-bold whitespace-nowrap z-20',
                 feedback.type === 'success'

@@ -61,10 +61,18 @@ function uniqueChars(word: string, language: Language = 'en'): string[] {
   return out;
 }
 
-/** Generate a deterministic wheel puzzle for an MP game (seeded on gameCode). */
-export function generateWheelPuzzle(gameCode: string, language: Language = 'en'): WheelPuzzle {
+/**
+ * Generate a deterministic wheel puzzle for an MP game.
+ *
+ * Seeded on gameCode + language + `seedSalt`. The salt is the per-round
+ * `gameSessionId`, which increments on every "play again" / new round — so a
+ * rematch in the same room gets a fresh wheel instead of repeating the same
+ * letters every round. Omitting the salt keeps the legacy deterministic
+ * behaviour (same gameCode → same puzzle).
+ */
+export function generateWheelPuzzle(gameCode: string, language: Language = 'en', seedSalt: string | number = ''): WheelPuzzle {
   const sources = NINE_LETTER_SOURCES[language] || NINE_LETTER_SOURCES.en;
-  const rng = mulberry32(hashString(`wheel-rush-${gameCode}-${language}`));
+  const rng = mulberry32(hashString(`wheel-rush-${gameCode}-${language}-${seedSalt}`));
   const src = sources[Math.floor(rng() * sources.length)];
   let letters = uniqueChars(src, language);
   if (letters.length > 7) letters = letters.slice(0, 7);
