@@ -284,6 +284,21 @@ describe('RoomChat', () => {
       }));
     });
 
+    it('clears aria-disabled via keyup when GBoard buffers composition (Hebrew)', () => {
+      // Android GBoard with Hebrew can leave onChange/onInput from firing, so
+      // the controlled `inputMessage` state stays empty and the Send button
+      // looks disabled. keyup carries the committed DOM value as a backstop.
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...') as HTMLInputElement;
+      const sendButton = screen.getByRole('button', { name: 'Send message' });
+
+      // DOM has text but no change/input event fired
+      input.value = 'שלום';
+      fireEvent.keyUp(input, { key: 'ם' });
+
+      expect(sendButton).toHaveAttribute('aria-disabled', 'false');
+    });
+
     it('sends Enter after Hebrew compositionEnd', () => {
       render(<RoomChat {...defaultProps} />);
       const input = screen.getByPlaceholderText('Type a message...');
