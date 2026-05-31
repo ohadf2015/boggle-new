@@ -93,4 +93,65 @@ describe('kickWebViewRepaint', () => {
 
     expect(doc.documentElement.style.transform).toBe('rotate(2deg)');
   });
+
+  // REGRESSION (side-menu unscrollable on native): showBanner now kicks a
+  // repaint. Bringing a banner UP composites a fresh native SurfaceView over
+  // the WebView, which can throttle or DROP the WebView's requestAnimationFrame.
+  // The restore was scheduled ONLY via rAF — so a dropped rAF leaves
+  // translateZ(0) stuck on <html>. A stuck transform makes <html> the
+  // containing block for every position:fixed element: the side-menu drawer
+  // (fixed top-0 bottom-0) then sizes to DOCUMENT height instead of viewport,
+  // so its overflow-y-auto content never overflows → the menu can't scroll.
+  // The default scheduler must therefore ALSO arm a timer fallback that fires
+  // even while rAF is paused.
+  it('restores the transform via a timer fallback when rAF never fires (paused WebView)', () => {
+    vi.useFakeTimers();
+    // rAF that NEVER invokes its callback — models a dropped/throttled frame loop.
+    const rafSpy = vi
+      .spyOn(globalThis, 'requestAnimationFrame')
+      .mockImplementation(() => 0 as unknown as number);
+    try {
+      const doc = makeFakeDoc();
+      // No injected schedule → uses the real default scheduler (rAF + fallback).
+      kickWebViewRepaint({ doc });
+
+      // rAF dropped the restore → layer still promoted.
+      expect(doc.documentElement.style.transform).toBe('translateZ(0)');
+
+      // The timer fallback fires even though rAF never did → transform restored.
+      vi.runAllTimers();
+      expect(doc.documentElement.style.transform).toBe('');
+    } finally {
+      rafSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not restore twice when both rAF and the timer fallback fire', () => {
+    vi.useFakeTimers();
+    // rAF that DOES invoke its callback synchronously on the next microtask flush.
+    const rafCbs: Array<() => void> = [];
+    const rafSpy = vi
+      .spyOn(globalThis, 'requestAnimationFrame')
+      .mockImplementation((cb: FrameRequestCallback) => {
+        rafCbs.push(() => cb(0));
+        return rafCbs.length as unknown as number;
+      });
+    try {
+      const doc = makeFakeDoc();
+      doc.documentElement.style.transform = 'rotate(2deg)';
+      kickWebViewRepaint({ doc });
+
+      // rAF fires first and restores the true original.
+      rafCbs.forEach((fn) => fn());
+      expect(doc.documentElement.style.transform).toBe('rotate(2deg)');
+
+      // Later the fallback timer fires too — it must be a no-op, not re-clobber.
+      vi.runAllTimers();
+      expect(doc.documentElement.style.transform).toBe('rotate(2deg)');
+    } finally {
+      rafSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
 });

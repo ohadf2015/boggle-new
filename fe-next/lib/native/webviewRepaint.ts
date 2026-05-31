@@ -28,11 +28,43 @@ export interface RepaintOptions {
   schedule?: (cb: () => void) => void;
 }
 
+/**
+ * Delay (ms) after which the timer fallback force-restores the transform if rAF
+ * hasn't already. translateZ(0) is visually invisible (a layer hint, no
+ * movement), so a brief stuck window is imperceptible — this only needs to be
+ * short enough to un-stick the layout well before it's noticed.
+ */
+const RESTORE_FALLBACK_MS = 100;
+
+/**
+ * Schedule the restore. We arm BOTH rAF and a timer, and the restore runs
+ * whichever fires first (idempotent).
+ *
+ * WHY the timer fallback: when a native ad SurfaceView (banner / interstitial /
+ * rewarded) composites over the WebView, the WebView's requestAnimationFrame can
+ * be throttled or DROPPED. An rAF-only restore then never fires, leaving
+ * translateZ(0) permanently on <html>. A stuck transform makes <html> the
+ * containing block for every `position: fixed` element — the side-menu drawer
+ * (fixed top-0 bottom-0) sizes to DOCUMENT height instead of the viewport, so
+ * its overflow-y-auto content never overflows and the menu can't scroll (same
+ * failure class as the bottom-nav reparenting). A setTimeout fires even while
+ * rAF is paused, so the transform is always restored.
+ */
 function defaultSchedule(cb: () => void): void {
+  let done = false;
+  const run = () => {
+    if (done) return;
+    done = true;
+    cb();
+  };
   if (typeof requestAnimationFrame === 'function') {
-    requestAnimationFrame(cb);
-  } else {
-    setTimeout(cb, 0);
+    requestAnimationFrame(run);
+  }
+  if (typeof setTimeout === 'function') {
+    setTimeout(run, RESTORE_FALLBACK_MS);
+  } else if (typeof requestAnimationFrame !== 'function') {
+    // No scheduler at all — restore synchronously so we never leave it stuck.
+    run();
   }
 }
 
