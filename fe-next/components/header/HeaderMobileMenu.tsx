@@ -1,6 +1,6 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { LazyMotion, domAnimation, m, AnimatePresence, type PanInfo } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil, Bug } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -254,12 +254,28 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const handleSignUp = useCallback(() => { closeMenu(); onSignUp(); }, [closeMenu, onSignUp]);
     const handleOpenGift = useCallback(() => { closeMenu(); onOpenGiftModal(); }, [closeMenu, onOpenGiftModal]);
 
-    // Swipe-to-close handler (RTL-aware)
-    const handleDragEnd = useCallback((_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-        const shouldClose = isRtl
-            ? info.offset.x < -SWIPE_CLOSE_THRESHOLD
-            : info.offset.x > SWIPE_CLOSE_THRESHOLD;
-        if (shouldClose) setShowMobileMenu(false);
+    // Swipe-to-close (RTL-aware) — passive touch tracking, NOT framer `drag`.
+    // A framer drag gesture on the drawer fights vertical scrolling: any
+    // diagonal movement engages the elastic horizontal drag, so the menu
+    // shakes / springs back instead of scrolling. We instead detect a
+    // deliberate horizontal swipe on touchend and never translate the element,
+    // leaving native vertical scrolling completely untouched.
+    const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+    const handleTouchStart = useCallback((e: ReactTouchEvent) => {
+        const touch = e.touches[0];
+        swipeStartRef.current = touch ? { x: touch.clientX, y: touch.clientY } : null;
+    }, []);
+    const handleTouchEnd = useCallback((e: ReactTouchEvent) => {
+        const start = swipeStartRef.current;
+        swipeStartRef.current = null;
+        const touch = e.changedTouches[0];
+        if (!start || !touch) return;
+        const dx = touch.clientX - start.x;
+        const dy = touch.clientY - start.y;
+        // Vertical-dominant or short gestures are scrolls — ignore them.
+        if (Math.abs(dx) < SWIPE_CLOSE_THRESHOLD || Math.abs(dx) <= Math.abs(dy)) return;
+        const closing = isRtl ? dx < 0 : dx > 0;
+        if (closing) setShowMobileMenu(false);
     }, [isRtl]);
 
     const storedAvatar = getStoredCustomAvatar();
@@ -383,25 +399,20 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 animate={{ x: 0 }}
                                 exit={{ x: isRtl ? '-100%' : '100%' }}
                                 transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-                                drag="x"
-                                dragConstraints={{ left: isRtl ? -200 : 0, right: isRtl ? 0 : 200 }}
-                                dragElastic={0.15}
-                                onDragEnd={handleDragEnd}
+                                onTouchStart={handleTouchStart}
+                                onTouchEnd={handleTouchEnd}
                                 data-testid="mobile-menu-drawer"
                                 className={cn(
                                     "fixed top-0 bottom-0 w-[320px] sm:w-[360px] max-w-[88vw] z-80",
                                     "bg-neo-navy border-neo-black",
-                                    // The drag layer must NOT scroll: a framer-motion drag gesture
-                                    // sitting on the scroll container arbitrates touch and swallows
-                                    // vertical scrolling, making the menu feel unscrollable. We keep
-                                    // swipe-to-close here and delegate scrolling to the inner body
-                                    // below (same separation MobileGameDrawer uses).
+                                    // Non-scrolling shell. Vertical scrolling lives on the inner
+                                    // body below; swipe-to-close is handled by the passive touch
+                                    // handlers above (no framer `drag`, so nothing fights scroll).
                                     "shadow-hard-xl overflow-hidden flex flex-col",
                                     isRtl
                                         ? "left-0 border-r-4 rounded-r-neo-lg"
                                         : "right-0 border-l-4 rounded-l-neo-lg"
                                 )}
-                                style={{ touchAction: 'pan-y' }}
                             >
                               {/* ── Scrollable body — owns vertical scroll, decoupled from the
                                   swipe-to-close drag layer so native touch scroll works. ── */}
