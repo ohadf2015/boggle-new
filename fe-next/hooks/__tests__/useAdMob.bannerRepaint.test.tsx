@@ -81,3 +81,36 @@ describe('useAdMob hideBanner → WebView repaint (white-screen fix)', () => {
     expect(kickSpy).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('useAdMob showBanner → WebView repaint (black-screen-on-exit fix)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    Object.keys(listeners).forEach((k) => delete listeners[k]);
+  });
+
+  // Bringing a banner UP on a game→content exit (Daily word-hunt → /daily)
+  // composites a fresh native SurfaceView over the WebView. Like teardown, that
+  // surface flip can leave the WebView's GPU surface unrepainted — a solid
+  // navy/black frame on the destination (the "exit mid-daily-challenge → black
+  // screen" report). showBanner was the only surface-flipping path NOT kicking
+  // a repaint; hideBanner / interstitial / rewarded all do.
+  it('kicks a WebView repaint after the native banner is shown', async () => {
+    const { result } = renderHook(() => useAdMob(), { wrapper: Wrapper });
+    await act(async () => {
+      await result.current.showBanner();
+    });
+    expect(AdMob.showBanner).toHaveBeenCalled();
+    expect(kickSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('still kicks a repaint when the show call throws (surface may have flipped regardless)', async () => {
+    vi.mocked(AdMob.showBanner).mockRejectedValueOnce({ message: 'internal SDK failure' });
+    const { result } = renderHook(() => useAdMob(), { wrapper: Wrapper });
+    await act(async () => {
+      await result.current.showBanner();
+    });
+    expect(kickSpy).toHaveBeenCalledTimes(1);
+  });
+});

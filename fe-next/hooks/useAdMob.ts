@@ -255,6 +255,16 @@ export function useAdMob() {
       bannerShownRef.current = false;
       // warn (not error) — Sentry captureConsole treats error-level as errors.
       console.warn('[AdMob] showBanner failed', err);
+    } finally {
+      // Bringing the banner UP composites a fresh native SurfaceView over the
+      // WebView. On a game→content exit (e.g. Daily word-hunt → /daily, where
+      // AnchoredNativeBanner shows the 'content' banner) that surface flip can
+      // leave the WebView's GPU surface unrepainted = a solid navy/black frame
+      // on the destination — the "exit mid-daily-challenge → black screen"
+      // report. Symmetric with hideBanner's teardown kick: force a repaint after
+      // every surface flip, show or hide. Cheap one-frame layer toggle,
+      // native-gated no-op on web.
+      kickWebViewRepaint();
     }
   }, [hasNoAds, getConfig, isDev, whenReady]);
 
