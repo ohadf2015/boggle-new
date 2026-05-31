@@ -54,15 +54,17 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
 
     res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
 
+    // Skip a poisoned cache entry (empty grid/targetWord) — serving it blanks
+    // the client. Falling through regenerates and overwrites it below.
     const cached = await getCachedDailyPuzzle(date, language);
-    if (cached) {
+    if (cached && isUsableDailyPuzzle(cached)) {
       res.json(cached);
       return;
     }
 
     const result = await coalesce(`daily:puzzle:${language}:${date}`, async () => {
       const recheck = await getCachedDailyPuzzle(date, language);
-      if (recheck) return recheck;
+      if (recheck && isUsableDailyPuzzle(recheck)) return recheck;
 
       const puzzle = await generateDailyPuzzleAsync(date, language as Language);
       const payload = {
@@ -72,6 +74,23 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
         puzzleNumber: puzzle.puzzleNumber,
         language: puzzle.language,
       };
+
+      // Never cache an empty puzzle — regenerate synchronously as a last resort
+      // so we cache and serve a usable board instead of poisoning every client.
+      if (!isUsableDailyPuzzle(payload)) {
+        const fallback = generateDailyPuzzle(date, language as Language);
+        const fallbackPayload = {
+          grid: fallback.grid,
+          targetWord: fallback.targetWord,
+          puzzleDate: fallback.puzzleDate,
+          puzzleNumber: fallback.puzzleNumber,
+          language: fallback.language,
+        };
+        if (isUsableDailyPuzzle(fallbackPayload)) {
+          await cacheDailyPuzzle(date, language, fallbackPayload);
+        }
+        return fallbackPayload;
+      }
 
       await cacheDailyPuzzle(date, language, payload);
       return payload;

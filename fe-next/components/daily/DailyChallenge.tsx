@@ -47,6 +47,7 @@ import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
 import { markWordHuntTutorialSeen } from './tutorial/markWordHuntTutorialSeen';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
+import { isUsableDailyPuzzle } from '@/utils/dailyChallenge/puzzlePayload';
 import { useRetryChallenge } from './useRetryChallenge';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
@@ -249,12 +250,13 @@ const DailyChallenge: React.FC = () => {
       try {
         const response = await fetch(`/api/daily-challenge/puzzle/${date}/${gameLanguage}`);
         if (!isMounted) return;
-        if (response.ok) {
-          const puzzleData = await response.json();
-          if (!isMounted) return;
+        const puzzleData = response.ok ? await response.json().catch(() => null) : null;
+        if (!isMounted) return;
+        if (isUsableDailyPuzzle(puzzleData)) {
           setGrid(puzzleData.grid);
           setTargetWord(puzzleData.targetWord);
         } else {
+          // ok-but-empty body, non-ok status, or unparseable JSON → generate locally
           const puzzle = generateDailyPuzzle(date, gameLanguage);
           if (!isMounted) return;
           setGrid(puzzle.grid);
@@ -275,6 +277,19 @@ const DailyChallenge: React.FC = () => {
     return () => { isMounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameLanguage, wasReset, isAuthenticated, profile?.id, catchupDate]);
+
+  // Safety net: the only render branch for `playing` requires both grid AND
+  // targetWord; entering `playing` without them renders nothing (blank screen).
+  // If that ever happens (empty payload that slipped through, offline cache miss,
+  // an ad-callback start before data settled), self-heal by generating locally
+  // so the player always gets a real puzzle instead of a blank screen.
+  useEffect(() => {
+    if (phase === 'playing' && (!grid || !targetWord)) {
+      const puzzle = generateDailyPuzzle(puzzleDate || getDailyChallengeDate(), gameLanguage);
+      setGrid(puzzle.grid);
+      setTargetWord(puzzle.targetWord);
+    }
+  }, [phase, grid, targetWord, puzzleDate, gameLanguage]);
 
   // Countdown timer
   useInterval(() => {
