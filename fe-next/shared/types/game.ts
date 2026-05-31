@@ -428,10 +428,33 @@ export interface BlastPlayerStats {
 }
 
 /** Blast mode state tracked per game */
+/**
+ * One player's INDEPENDENT blast board. In MP blast every player gets their own
+ * board (same starting layout via the shared seed, but evolving independently),
+ * so one player's tile clears never affect another's. Cloned lazily from the
+ * BlastModeState template by getOrInitPlayerBoard.
+ */
+export interface BlastPlayerBoard {
+  grid: string[][];
+  tileStates: BlastTileState[][];
+  overlay: BlastTileOverlay[];
+  overlayMap: Map<string, BlastTileType>;
+  seed: number;
+  totalMoves: number;
+  refillCount: number;
+}
+
 export interface BlastModeState {
   overlay: BlastTileOverlay[];
   /** Pre-built lookup map from "row,col" → tile type for O(1) path queries */
   overlayMap: Map<string, BlastTileType>;
+  /**
+   * Per-player independent boards (MP). Keyed by username. Lazily populated by
+   * getOrInitPlayerBoard from the shared template fields below. The top-level
+   * grid/tileStates/overlay/seed act as the immutable STARTING template every
+   * player's board is cloned from.
+   */
+  playerBoards?: Record<string, BlastPlayerBoard>;
   playerMoves: Record<string, number>;
   playerBonusMoves: Record<string, number>;
   /** Rich per-player stats for results page */

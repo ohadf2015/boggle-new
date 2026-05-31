@@ -4,7 +4,7 @@
  * for multiplayer blast games.
  */
 
-import type { BlastTileOverlay, BlastModeState, BlastPlayerStats } from '@/shared/types/game';
+import type { BlastTileOverlay, BlastModeState, BlastPlayerStats, BlastPlayerBoard } from '@/shared/types/game';
 
 import type { BlastTileType, BlastTileState } from '@/shared/types/blast';
 
@@ -170,7 +170,32 @@ export function initBlastModeState(
   // Build server-authoritative tileStates from overlay
   const tileStates = buildTileStatesFromOverlay(overlay, grid.length, seed);
 
-  return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed, grid, tileStates, totalMoves: 0, wave };
+  return { overlay, overlayMap, playerMoves, playerBonusMoves, playerStats, seed, grid, tileStates, totalMoves: 0, wave, playerBoards: {} };
+}
+
+/**
+ * Get (or lazily create) a player's INDEPENDENT blast board. The first call for
+ * a username clones the shared template (grid/tileStates/overlay/seed) so every
+ * player STARTS with the identical board but evolves it independently — one
+ * player's clears never touch another's. Subsequent calls return the same
+ * evolving board reference. Handles late-joiners (cloned from the same template).
+ */
+export function getOrInitPlayerBoard(state: BlastModeState, username: string): BlastPlayerBoard {
+  if (!state.playerBoards) state.playerBoards = {};
+  const existing = state.playerBoards[username];
+  if (existing) return existing;
+  const board: BlastPlayerBoard = {
+    // Deep-clone the template so mutations stay isolated per player.
+    grid: (state.grid ?? []).map((row) => [...row]),
+    tileStates: (state.tileStates ?? []).map((row) => row.map((t) => ({ ...t }))),
+    overlay: (state.overlay ?? []).map((o) => ({ ...o })),
+    overlayMap: new Map(state.overlayMap ?? []),
+    seed: state.seed ?? 0,
+    totalMoves: 0,
+    refillCount: 0,
+  };
+  state.playerBoards[username] = board;
+  return board;
 }
 
 /**
