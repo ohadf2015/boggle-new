@@ -51,4 +51,13 @@ describe('ConnectionsKeyboard', () => {
     expect(screen.getByRole('button', { name: 'Delete letter' })).toHaveProperty('disabled', true);
     expect(screen.getByRole('button', { name: 'Submit' })).toHaveProperty('disabled', true);
   });
+
+  it('grows letter keys to fill the row width (flex-1, not fixed width)', () => {
+    render(<ConnectionsKeyboard {...baseProps} letters={getKeyboardLetters('en')} canSubmit />);
+    const a = screen.getByRole('button', { name: 'A' });
+    // Letters must flex-grow to use the full screen width rather than a fixed width.
+    expect(a.className).toContain('flex-1');
+    // No fixed-width utility (a min-w floor is fine; a hard w-9/w-10 is not).
+    expect(a.className).not.toMatch(/(?<![a-z-])w-(?:9|10)\b/);
+  });
 });

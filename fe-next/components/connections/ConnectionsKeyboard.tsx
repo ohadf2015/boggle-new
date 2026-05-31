@@ -46,7 +46,7 @@ export default function ConnectionsKeyboard({
   return (
     <div
       dir={dir}
-      className="flex flex-wrap items-center justify-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light p-3 shadow-hard"
+      className="flex flex-wrap items-stretch justify-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light p-2 shadow-hard"
     >
       {letters.map((ch) => (
         <button
@@ -55,7 +55,7 @@ export default function ConnectionsKeyboard({
           onClick={() => onLetter(ch)}
           disabled={disabled}
           aria-label={ch}
-          className={`${KEY_BASE} h-10 w-9 bg-neo-cream text-xl uppercase text-neo-navy sm:h-11 sm:w-10`}
+          className={`${KEY_BASE} h-10 flex-1 basis-9 min-w-[2.25rem] max-w-[3.25rem] bg-neo-cream text-xl uppercase text-neo-navy sm:h-11`}
         >
           {ch}
         </button>
@@ -65,7 +65,7 @@ export default function ConnectionsKeyboard({
         onClick={onBackspace}
         disabled={disabled}
         aria-label={backspaceLabel}
-        className={`${KEY_BASE} h-10 w-12 bg-neo-pink text-neo-navy sm:h-11 sm:w-14`}
+        className={`${KEY_BASE} h-10 w-14 shrink-0 bg-neo-pink text-neo-navy sm:h-11 sm:w-16`}
       >
         <Delete className="h-5 w-5 rtl:rotate-180" strokeWidth={2.5} aria-hidden="true" />
       </button>
@@ -74,7 +74,7 @@ export default function ConnectionsKeyboard({
         onClick={onSubmit}
         disabled={disabled || !canSubmit}
         aria-label={submitLabel}
-        className={`${KEY_BASE} h-10 gap-1.5 px-4 bg-neo-cyan text-sm uppercase text-neo-navy sm:h-11`}
+        className={`${KEY_BASE} h-10 flex-1 basis-24 gap-1.5 px-4 bg-neo-cyan text-sm uppercase text-neo-navy sm:h-11`}
       >
         <CornerDownLeft className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
         {submitLabel}
