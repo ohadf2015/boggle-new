@@ -30,6 +30,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useFriends } from '@/hooks/useFriends';
 import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { queryKeys } from '@/lib/queryKeys';
+import { notificationListScrollClass } from '@/lib/header/notificationScroll';
 
 interface HeaderMobileMenuProps {
     unclaimedCount: number;
@@ -620,7 +621,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 <div className={cn(
                                                     "rounded-neo border-2 border-neo-white/10",
                                                     "bg-neo-white/5",
-                                                    "max-h-72 overflow-y-auto overscroll-contain"
+                                                    notificationListScrollClass(
+                                                        showAllNotifications ? filteredNotifications.length : Math.min(3, filteredNotifications.length),
+                                                        "max-h-72"
+                                                    )
                                                 )}>
                                                     {(showAllNotifications
                                                         ? filteredNotifications
@@ -676,7 +680,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             <div className={cn(
                                                 "mt-1 rounded-neo border-2 border-neo-white/10",
                                                 "bg-neo-white/5",
-                                                "max-h-64 overflow-y-auto overscroll-contain"
+                                                notificationListScrollClass(previousNotifications.length, "max-h-64")
                                             )}>
                                                 {isLoadingPrevious ? (
                                                     <div className="text-[10px] text-neo-white text-center py-2">
