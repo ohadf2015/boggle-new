@@ -30,6 +30,14 @@ vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({ unlockAudio: vi.fn() }),
 }));
 
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    showAd: vi.fn(),
+    isAdAvailable: false,
+    isPlaceholderCooldown: false,
+  }),
+}));
+
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
