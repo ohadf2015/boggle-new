@@ -24,7 +24,7 @@ import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, cascadeBlastWord } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
@@ -91,89 +91,46 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   if (game.gameMode === 'blast' && game.blastModeState) {
     try {
       const blastState = game.blastModeState;
-      const tilesOnPath = getTilesOnPath(normalizedWord, game.letterPositions || new Map(), blastState.overlay, blastState.overlayMap);
+      // PER-PLAYER board: each player evolves their OWN board independently, so
+      // one player's tile-clears never sync to another's. Validate/score/cascade
+      // against THIS player's board, not the shared template.
+      const board = getOrInitPlayerBoard(blastState, username);
+      const lang = (game.language || 'en') as import('@/shared/types').Language;
+      const boardPositions = makePositionsMap(board.grid, lang);
+      const tilesOnPath = getTilesOnPath(normalizedWord, boardPositions, board.overlay, board.overlayMap);
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
       blastTilesCleared = tilesOnPath;
       const gemCount = tilesOnPath.filter(t => t === 'gem').length;
       blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount, blastTileBonus);
 
-      // Server-side board mutation: process tile clears + gravity on authoritative state
-      if (blastState.grid && blastState.tileStates) {
-        const wordPath = getWordPath(normalizedWord, game.letterPositions || new Map());
-        const gridSize = blastState.grid.length;
-        const totalMoves = (blastState.totalMoves ?? 0) + 1;
-        blastState.totalMoves = totalMoves;
+      // Server-side board mutation on THIS player's board (real cascade in
+      // cascadeBlastWord; refill=false → shrink-until-clear).
+      if (board.grid && board.tileStates) {
+        const wordPath = getWordPath(normalizedWord, boardPositions);
+        const { clearedCount, totalMoves } = cascadeBlastWord(board, wordPath, normalizedWord, blastState.wave ?? 1, lang);
 
-        // Seeded RNG for deterministic processing
-        const rng = createSeededRandom((blastState.seed ?? 0) + totalMoves);
-
-        // 1. Process tile clears (bomb explosions, lightning, prism, etc.)
-        const processResult = processTilesForWord({
-          prev: blastState.tileStates,
-          path: wordPath,
-          word: normalizedWord,
-          baseScore: normalizedWord.length - 1,
-          gridSize,
-          currentWave: blastState.wave ?? 1,
-          rng,
-        });
-
-        // 1b. Apply vortex/magnet letter swaps to the authoritative grid so it
-        // stays aligned with the (already-swapped) tileStates in processResult.next.
-        // The server skipped this before, so its grid and tileStates disagreed and
-        // it broadcast blank tiles + a board the next word couldn't validate against.
-        blastState.grid = applyVortexLetterSwaps(blastState.grid, processResult.vortexLetterSwaps);
-
-        // 2. Apply gravity WITHOUT refill — the board SHRINKS as words are
-        // cleared and only repopulates when fully cleared (or near-empty; see
-        // step 5). Continuous per-word refill (the old refill=true) made it feel
-        // like tiles "keep generating" and made a full clear unreachable, so the
-        // clear-reward below was dead code. Mirrors singleplayer 'shrink' mode.
-        const gravityResult = computeGravityResult(
-          blastState.grid,
-          processResult.next,
-          gridSize,
-          (game.language || 'en') as import('@/shared/types').Language,
-          BLAST_SPECIAL_TILE_CHANCE,
-          undefined,
-          0,
-          rng,
-          false, // refill=false: shrink-until-clear, regenerate only on full/near clear
-        );
-
-        // 3. Update authoritative state
-        blastState.grid = gravityResult.newGrid;
-        blastState.tileStates = gravityResult.newTileStates;
-
-        // Keep the authoritative board refs in sync with the live cascading
-        // board so the NEXT word's on-board validation (wordHandler
-        // isWordOnBoardAsync) and tile-path lookup run against the current
-        // grid — not the stale start-of-round grid. The board-clear branch
-        // below already does this; cascades need it every move too, otherwise
-        // every blast word after the first fails validation and never scores.
-        game.letterGrid = gravityResult.newGrid;
-        game.letterPositions = makePositionsMap(gravityResult.newGrid, (game.language || 'en'));
-
-        // 4. Broadcast board update to ALL players
-        broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
-          grid: gravityResult.newGrid,
-          tileStates: gravityResult.newTileStates,
+        // UNICAST the player's new board to that player only — boards are
+        // independent, so broadcasting would re-sync them (the bug). Use safeEmit
+        // on the submitting socket.
+        safeEmit(socket, 'blastBoardUpdate', {
+          grid: board.grid,
+          tileStates: board.tileStates,
           clearedBy: username,
           word: normalizedWord,
-          clearedCount: processResult.newlyClearedCount,
+          clearedCount,
           totalMoves,
         });
 
-        // 5. MP board refresh: with refill off the board shrinks, so a full
-        // clear (or a near-empty soft-freeze on a shared board) is now a real
-        // event. The shared helper regenerates a fresh full board and broadcasts
-        // it — same rule for human + bot words so they can never disagree.
+        // Per-player board refresh on exhaust → a player can clear multiple
+        // boards in one round; the game only ends on the round timer.
         regenerateBlastBoardIfExhausted({
           io,
           gameCode,
           game,
           username,
-          newTileStates: gravityResult.newTileStates,
+          board,
+          newTileStates: board.tileStates,
+          socket,
         });
       }
     } catch (err: unknown) {

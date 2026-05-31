@@ -147,17 +147,15 @@ vi.mock('../modules/wordValidator', () => ({
   makePositionsMap: vi.fn(() => new Map()),
 }));
 
-// Setup blast mode manager mock — all functions needed by wordValidationHandler
-vi.mock('../modules/blastModeManager', () => ({
+// Partial mock: keep the REAL per-player board functions (getOrInitPlayerBoard,
+// cascadeBlastWord) so we actually exercise the per-player cascade, but stub the
+// scoring helpers we want to control. processTilesForWord/computeGravityResult
+// are mocked above (cascadeBlastWord imports them from the same @/components path).
+vi.mock('../modules/blastModeManager', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../modules/blastModeManager')>()),
   calculateBlastTileBonus: vi.fn().mockReturnValue(10),
   getTilesOnPath: vi.fn().mockReturnValue(['gold', 'standard']),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 1, bonusMove: false }),
-  getWordPath: vi.fn(() => [{row:0,col:0}]),
-  isBlastBoardCleared: vi.fn(() => false),
-  regenerateBlastBoard: vi.fn(),
-  recordBlastBoardClear: vi.fn(),
-  tryBeginWaveAdvance: vi.fn(() => false),
-  endWaveAdvance: vi.fn(),
 }));
 
 import { getGame, getGameBySocketId, getUsernameBySocketId, addPlayerWord, getFirstFinder } from '../modules/gameStateManager';
@@ -237,15 +235,15 @@ describe('wordHandler - Blast board sync', () => {
     (isWordValidForScoring as Mock).mockReturnValue(false);
   });
 
-  it('syncs game.letterGrid to the post-cascade blast board so the next word validates', async () => {
+  it("advances the SUBMITTING player's own board to the cascaded grid (per-player)", async () => {
     const game = makeBlastGame();
     (getGame as Mock).mockReturnValue(game);
 
     await handlers['submitWord']({ word: 'test', comboType: null });
 
-    // After a blast word, the authoritative grid must equal the cascaded grid
-    expect(game.letterGrid).toBe(SENTINEL_GRID);
-    expect(game.blastModeState.grid).toBe(SENTINEL_GRID);
+    // Per-player boards: the submitter's board advances to the cascaded grid.
+    // The shared template (game.letterGrid) is NOT mutated — boards are isolated.
+    expect(game.blastModeState.playerBoards.testUser.grid).toBe(SENTINEL_GRID);
   });
 
   it('runs gravity WITHOUT refill so the board shrinks until cleared (no per-word tile generation)', async () => {

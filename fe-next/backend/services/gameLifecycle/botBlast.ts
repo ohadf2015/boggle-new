@@ -21,6 +21,8 @@ import {
   getTilesOnPath,
   recordBlastMove,
   getWordPath,
+  getOrInitPlayerBoard,
+  cascadeBlastWord,
 } from '../../modules/blastModeManager';
 import { regenerateBlastBoardIfExhausted } from '../../modules/blastBoardRegen';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
@@ -122,8 +124,17 @@ function submitBlastWord(
       return;
     }
 
-    // Calculate blast tile bonus
-    const tilesOnPath = getTilesOnPath(word, positions, state.overlay, state.overlayMap);
+    // Bot plays on its OWN independent board (per-player), so bot clears never
+    // sync onto human players' boards.
+    const board = getOrInitPlayerBoard(state, bot.username);
+    if (!board.grid || !board.tileStates) {
+      logger.warn('BOT_BLAST', `Invalid blast board for ${gameCode}`);
+      return;
+    }
+    const boardPositions = makePositionsMap(board.grid, language);
+
+    // Calculate blast tile bonus against the bot's board
+    const tilesOnPath = getTilesOnPath(word, boardPositions, board.overlay, board.overlayMap);
     const blastTileBonus = calculateBlastTileBonus(tilesOnPath);
     const gemCount = tilesOnPath.filter((t: string) => t === 'gem').length;
 
@@ -136,78 +147,30 @@ function submitBlastWord(
     }
 
     // Anti-grief: if this word will clear tiles, check cap
-    const wordPath = getWordPath(word, positions);
+    const wordPath = getWordPath(word, boardPositions);
     if (wordPath.length > 0 && !canBotClear(bot.username, bot.difficulty)) {
       logger.debug('BOT_BLAST', `Bot "${bot.username}" clear cap hit, skipping "${word}"`);
       return;
     }
 
-    // Record move + apply board mutation (same as human path)
+    // Record move + apply board mutation on the bot's OWN board. NO broadcast —
+    // a bot's board is private (no client renders it).
     recordBlastMove(state, bot.username, (bot.comboLevel || 0), word, tilesOnPath.length, gemCount, blastTileBonus);
 
-    if (!state.grid || !state.tileStates) {
-      logger.warn('BOT_BLAST', `Invalid blast state for ${gameCode}`);
-      return;
-    }
+    const processClearedCount = cascadeBlastWord(board, wordPath, word, state.wave ?? 1, language).clearedCount;
 
-    const gridSize = state.grid.length;
-    const totalMoves = (state.totalMoves ?? 0) + 1;
-    state.totalMoves = totalMoves;
-    const rng = createSeededRandom((state.seed ?? 0) + totalMoves);
-
-    const processResult = processTilesForWord({
-      prev: state.tileStates,
-      path: wordPath,
-      word,
-      baseScore: word.length - 1,
-      gridSize,
-      currentWave: state.wave ?? 1,
-      rng,
-    });
-
-    const gravityResult = computeGravityResult(
-      state.grid,
-      processResult.next,
-      gridSize,
-      language,
-      BLAST_SPECIAL_TILE_CHANCE,
-      undefined,
-      0,
-      rng,
-      false // refill=false: parity with human path — board shrinks until cleared
-    );
-
-    state.grid = gravityResult.newGrid;
-    state.tileStates = gravityResult.newTileStates;
-
-    // Update game's letter grid for next solve
-    if (game.gameMode === 'blast') {
-      game.letterGrid = gravityResult.newGrid;
-      game.letterPositions = makePositionsMap(gravityResult.newGrid, language);
-    }
-
-    // Broadcast board update
-    broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
-      grid: gravityResult.newGrid,
-      tileStates: gravityResult.newTileStates,
-      clearedBy: bot.username,
-      word,
-      clearedCount: processResult.newlyClearedCount,
-      totalMoves,
-    });
-
-    // Board refresh parity with human path: shrink-until-clear, regenerate a
-    // fresh full board on full/near clear (shared helper — same rule for all).
+    // Per-player board refresh (silent: no socket → bots don't emit).
     regenerateBlastBoardIfExhausted({
       io,
       gameCode,
       game,
       username: bot.username,
-      newTileStates: gravityResult.newTileStates,
+      board,
+      newTileStates: board.tileStates,
     });
 
     // Record clear for anti-grief
-    if (processResult.newlyClearedCount > 0) {
+    if (processClearedCount > 0) {
       recordClear(bot.username);
     }
 

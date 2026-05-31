@@ -168,6 +168,17 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
   recordBlastBoardClear: vi.fn(),
   tryBeginWaveAdvance: vi.fn(() => true),
   endWaveAdvance: vi.fn(),
+  // Per-player board model.
+  getOrInitPlayerBoard: vi.fn(() => ({
+    grid: [['A']],
+    tileStates: [[{ letter: 'A', type: 'standard', isCleared: false }]],
+    overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0,
+  })),
+  cascadeBlastWord: vi.fn((board: any) => {
+    board.totalMoves = (board.totalMoves ?? 0) + 1;
+    return { clearedCount: 1, totalMoves: board.totalMoves };
+  }),
+  regeneratePlayerBoard: vi.fn(),
 }));
 
 vi.mock('../../../backend/services/gameLifecycle/gameEnd', () => ({
@@ -197,7 +208,7 @@ import { getGame, getGameBySocketId, getUsernameBySocketId, getFirstFinder, reco
 import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
-import { broadcastToRoom } from '../../../backend/utils/socketHelpers';
+import { broadcastToRoom, safeEmit } from '../../../backend/utils/socketHelpers';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, isBlastBoardCleared, advanceBlastWave, regenerateBlastBoard, recordBlastBoardClear } from '../../../backend/modules/blastModeManager';
 import { endGame } from '../../../backend/services/gameLifecycle/gameEnd';
 import timerManager from '../../../backend/utils/timerManager';
@@ -361,18 +372,18 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       expect(username).toBe('testUser');
     });
 
-    it('broadcasts blastBoardUpdate (not blastWaveAdvance) on timer-era clear', async () => {
+    it('UNICASTS blastBoardUpdate to the player (per-player boards) on timer-era clear', async () => {
       (isBlastBoardCleared as Mock).mockReturnValue(true);
       (getGame as Mock).mockReturnValue(makeBlastGame({ blastModeState: makeBlastStateNearClear() }));
 
       await handlers['submitWord']({ word: 'test' });
 
-      const calls = (broadcastToRoom as Mock).mock.calls;
-      const boardUpdateCall = calls.find((c: any[]) => c[2] === 'blastBoardUpdate');
-      const waveAdvanceCall = calls.find((c: any[]) => c[2] === 'blastWaveAdvance');
-
-      expect(boardUpdateCall).toBeDefined();
-      expect(waveAdvanceCall).toBeUndefined();
+      // Per-player boards: the regenerated board is unicast to the submitting
+      // socket via safeEmit, NOT broadcastToRoom (which would re-sync everyone).
+      const emitCall = (safeEmit as Mock).mock.calls.find((c: any[]) => c[1] === 'blastBoardUpdate');
+      expect(emitCall).toBeDefined();
+      const broadcastBoard = (broadcastToRoom as Mock).mock.calls.find((c: any[]) => c[2] === 'blastBoardUpdate');
+      expect(broadcastBoard).toBeUndefined();
     });
 
     it('never schedules endGame on timer-era board clear', async () => {

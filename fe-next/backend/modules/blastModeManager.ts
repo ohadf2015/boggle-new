@@ -18,6 +18,10 @@ import {
 import { getWaveConfig, getWaveDistribution } from '@/components/blast/legacy/utils/blastWaveConfig';
 import { rollSpecialType, createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
 import { overlayToTileStates } from '@/components/blast/legacy/utils/blastOverlayToTileStates';
+import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
+import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
+import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
+import type { Language } from '@/shared/types';
 
 // H2: per-game mutex set guarding the check→advance→broadcast sequence so a
 // second concurrent caller cannot double-advance on the same cleared snapshot.
@@ -199,6 +203,51 @@ export function getOrInitPlayerBoard(state: BlastModeState, username: string): B
 }
 
 /**
+ * Apply a played word's tile-clears + gravity to ONE player's board, in place.
+ * Extracted from wordValidationHandler so it operates on a per-player board (not
+ * the shared state) and is unit-testable with the real cascade. refill=false:
+ * the board SHRINKS until cleared (regeneration handled separately on exhaust).
+ */
+export function cascadeBlastWord(
+  board: BlastPlayerBoard,
+  wordPath: Array<{ row: number; col: number }>,
+  word: string,
+  wave: number,
+  language: Language,
+): { clearedCount: number; totalMoves: number } {
+  const gridSize = board.grid.length;
+  const totalMoves = (board.totalMoves ?? 0) + 1;
+  board.totalMoves = totalMoves;
+  const rng = createSeededRandom((board.seed ?? 0) + totalMoves);
+  const processResult = processTilesForWord({
+    prev: board.tileStates,
+    path: wordPath,
+    word,
+    baseScore: word.length - 1,
+    gridSize,
+    currentWave: wave,
+    rng,
+  });
+  // Apply vortex/magnet swaps to the grid so it stays aligned with the swapped
+  // tileStates, then run gravity WITHOUT refill (shrink-until-clear).
+  board.grid = applyVortexLetterSwaps(board.grid, processResult.vortexLetterSwaps);
+  const gravityResult = computeGravityResult(
+    board.grid,
+    processResult.next,
+    gridSize,
+    language,
+    BLAST_SPECIAL_TILE_CHANCE,
+    undefined,
+    0,
+    rng,
+    false,
+  );
+  board.grid = gravityResult.newGrid;
+  board.tileStates = gravityResult.newTileStates;
+  return { clearedCount: processResult.newlyClearedCount, totalMoves };
+}
+
+/**
  * Record a blast move for a player.
  * Increments moves and grants bonus move if combo is high enough.
  */
@@ -330,6 +379,28 @@ export function regenerateBlastBoard(
   fresh.playerStats = state.playerStats; // preserve cumulative stats
   fresh.refillCount = refillCount;
   return fresh;
+}
+
+/**
+ * Regenerate ONE player's board in place with a fresh full grid (per-player
+ * refill on exhaust). Same start-recipe as init, seeded per player+refill so it
+ * stays deterministic. Mutates `board`; preserves cumulative totalMoves.
+ */
+export function regeneratePlayerBoard(
+  board: BlastPlayerBoard,
+  gameCode: string,
+  username: string,
+  freshGrid: string[][],
+): void {
+  const refillCount = (board.refillCount ?? 0) + 1;
+  const overlaySeed = hashStringToSeed(`${gameCode}:${username}:refill${refillCount}`);
+  const fresh = initBlastModeState(freshGrid, [username], 1, overlaySeed);
+  board.grid = fresh.grid as string[][];
+  board.overlay = fresh.overlay;
+  board.overlayMap = fresh.overlayMap;
+  board.tileStates = fresh.tileStates as BlastPlayerBoard['tileStates'];
+  board.seed = fresh.seed as number;
+  board.refillCount = refillCount;
 }
 
 /**

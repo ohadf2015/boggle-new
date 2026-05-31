@@ -12,21 +12,20 @@
  * of desync when each site hardcoded its own refill flag.
  */
 
-import type { Server } from 'socket.io';
+import type { Server, Socket } from 'socket.io';
 import type { GameState } from './gameState/types.js';
 import type { BlastTileState } from '@/shared/types/blast';
-import type { LetterGrid, Language } from '@/shared/types';
+import type { BlastPlayerBoard, Language } from '@/shared/types/game';
+import type { LetterGrid } from '@/shared/types';
 
-import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
-import { getGameBots, resyncBotsForNewGrid } from './botManager.js';
+import { safeEmit } from '../utils/socketHelpers.js';
 import {
   isBlastBoardCleared,
-  regenerateBlastBoard,
+  regeneratePlayerBoard,
   recordBlastBoardClear,
   tryBeginWaveAdvance,
   endWaveAdvance,
 } from './blastModeManager.js';
-import { makePositionsMap } from './wordValidator.js';
 import { generateRandomTable } from '../utils/gameUtils.js';
 import { generateRichBoard } from '../utils/boardSelection.js';
 import logger from '../utils/logger.js';
@@ -61,35 +60,40 @@ export function isBlastBoardExhausted(
 }
 
 /**
- * If the board is exhausted, regenerate a fresh full letter board in place and
- * broadcast it to the room. Returns true if a regeneration happened.
+ * If THIS player's board is exhausted, regenerate a fresh full board for that
+ * player and (for humans) unicast it to them. Returns true if regenerated.
  *
- * `blastState` is mutated in place (Object.assign) and `game.letterGrid` /
- * `letterPositions` are synced so the next word validates against the new board.
+ * Per-player: boards are independent, so the regen touches only `board` and is
+ * sent only to the owning `socket` (humans) — bots regen silently (no socket).
+ * Because the game ends only on the round timer, a player can clear and refill
+ * MANY boards in one round.
  */
 export function regenerateBlastBoardIfExhausted(params: {
   io: Server;
   gameCode: string;
   game: GameState;
   username: string;
+  board: BlastPlayerBoard;
   newTileStates: BlastTileState[][];
+  socket?: Socket;
 }): boolean {
-  const { io, gameCode, game, username, newTileStates } = params;
+  const { gameCode, game, username, board, newTileStates, socket } = params;
   const blastState = game.blastModeState;
   if (!blastState) return false;
 
   const minWordLength = game.minWordLength ?? DEFAULT_MIN_WORD_LENGTH;
   if (!isBlastBoardExhausted(newTileStates, minWordLength)) return false;
-  if (!tryBeginWaveAdvance(gameCode)) return false;
+  // Per-player lock (boards are independent → no cross-player race; this only
+  // guards a same-player double-fire).
+  const lockKey = `${gameCode}:${username}`;
+  if (!tryBeginWaveAdvance(lockKey)) return false;
 
   try {
-    recordBlastBoardClear(blastState, username);
+    recordBlastBoardClear(blastState, username); // bumps playerStats[username].boardClears
 
-    // Fresh full board of letters — anti-cheat server-side generation, same
-    // recipe as game start. The cleared grid is all-empty, so we cannot reuse
-    // it. Broadcast below carries the new grid to peers (no seed reproduction).
+    // Fresh full board of letters — anti-cheat server-side generation.
     const lang = (game.language || 'en') as Language;
-    const gridSize = (blastState.grid?.length ?? game.letterGrid?.length ?? 6);
+    const gridSize = (board.grid?.length ?? 6);
     const freshGrid = generateRichBoard(
       () => generateRandomTable(gridSize, gridSize, lang),
       lang,
@@ -97,35 +101,26 @@ export function regenerateBlastBoardIfExhausted(params: {
       gridSize,
     ) as LetterGrid;
 
-    const next = regenerateBlastBoard(blastState, gameCode, freshGrid);
-    const nextGrid = next.grid ?? freshGrid;
-    Object.assign(blastState, {
-      overlay: next.overlay,
-      overlayMap: next.overlayMap,
-      tileStates: next.tileStates,
-      seed: next.seed,
-      grid: nextGrid,
-      refillCount: next.refillCount,
-    });
-    game.letterGrid = nextGrid;
-    game.letterPositions = makePositionsMap(nextGrid, lang);
+    regeneratePlayerBoard(board, gameCode, username, freshGrid);
 
-    logger.info('BLAST', `Board exhausted in ${gameCode} by ${username} — fresh board (refill #${next.refillCount})`);
+    logger.info('BLAST', `Board exhausted in ${gameCode} by ${username} — fresh board (refill #${board.refillCount})`);
 
-    broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
-      grid: nextGrid,
-      tileStates: next.tileStates,
-      overlay: next.overlay,
-      seed: next.seed,
-      clearedBy: '__board_regenerated__',
-      word: '',
-      clearedCount: 0,
-      totalMoves: blastState.totalMoves ?? 0,
-    });
+    // Unicast to the owning player only (bots have no socket → silent regen).
+    if (socket) {
+      safeEmit(socket, 'blastBoardUpdate', {
+        grid: board.grid,
+        tileStates: board.tileStates,
+        overlay: board.overlay,
+        seed: board.seed,
+        clearedBy: '__board_regenerated__',
+        word: '',
+        clearedCount: 0,
+        totalMoves: board.totalMoves ?? 0,
+      });
+    }
 
-    void resyncBotsForNewGrid(getGameBots(gameCode), nextGrid, lang);
     return true;
   } finally {
-    endWaveAdvance(gameCode);
+    endWaveAdvance(lockKey);
   }
 }

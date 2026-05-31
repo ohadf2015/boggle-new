@@ -39,7 +39,10 @@ import {
   getTilesOnPath,
   recordBlastMove,
   getWordPath,
+  getOrInitPlayerBoard,
+  cascadeBlastWord,
 } from '../../modules/blastModeManager';
+import { makePositionsMap } from '../../modules/wordValidator';
 import { regenerateBlastBoardIfExhausted } from '../../modules/blastBoardRegen';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
@@ -258,80 +261,44 @@ export function startBotsForGame(
         if (currentGame?.gameMode === 'blast' && currentGame.blastModeState) {
           try {
             const blastState = currentGame.blastModeState;
-            const tilesOnPath = getTilesOnPath(
-              word,
-              currentGame.letterPositions || new Map(),
-              blastState.overlay,
-              blastState.overlayMap
-            );
+            // Bot plays on its OWN independent board (per-player), so bot clears
+            // never sync onto human players' boards.
+            const board = getOrInitPlayerBoard(blastState, username);
+            const boardPositions = makePositionsMap(board.grid, language);
+            const tilesOnPath = getTilesOnPath(word, boardPositions, board.overlay, board.overlayMap);
             blastTileBonus = calculateBlastTileBonus(tilesOnPath);
             const gemCount = tilesOnPath.filter((t: string) => t === 'gem').length;
             recordBlastMove(blastState, username, comboLevel || 0, word, tilesOnPath.length, gemCount, blastTileBonus);
 
-            // Mutate board state + broadcast (same as human words in wordValidationHandler)
-            if (blastState.grid && blastState.tileStates) {
-              const wordPath = getWordPath(word, currentGame.letterPositions || new Map());
-              const gridSize = blastState.grid.length;
-              const totalMoves = (blastState.totalMoves ?? 0) + 1;
-              blastState.totalMoves = totalMoves;
-              const rng = createSeededRandom((blastState.seed ?? 0) + totalMoves);
+            // Mutate the bot's own board. NO broadcast — a bot's board is private
+            // (no client renders it); broadcasting would corrupt humans' boards.
+            if (board.grid && board.tileStates) {
+              const wordPath = getWordPath(word, boardPositions);
+              cascadeBlastWord(board, wordPath, word, blastState.wave ?? 1, language);
 
-              const processResult = processTilesForWord({
-                prev: blastState.tileStates,
-                path: wordPath,
-                word,
-                baseScore: word.length - 1,
-                gridSize,
-                currentWave: blastState.wave ?? 1,
-                rng,
-              });
-
-              const gravityResult = computeGravityResult(
-                blastState.grid, processResult.next, gridSize,
-                language, BLAST_SPECIAL_TILE_CHANCE,
-                undefined, 0, rng,
-                false, // refill=false: parity with human path — board shrinks until cleared
-              );
-
-              blastState.grid = gravityResult.newGrid;
-              blastState.tileStates = gravityResult.newTileStates;
-
-              broadcastToRoom(io, getGameRoom(gameCode), 'blastBoardUpdate', {
-                grid: gravityResult.newGrid,
-                tileStates: gravityResult.newTileStates,
-                clearedBy: username,
-                word,
-                clearedCount: processResult.newlyClearedCount,
-                totalMoves,
-              });
-
-              // Throttled per-update resync — bots' word pools drift as the
-              // Blast grid mutates; refresh at most every 2s per game so they
-              // never go dry, without running the grid solver on every word.
+              // Throttled resync of bots' word pools against the bot's own grid so
+              // they never go dry as it mutates.
               const nowTs = Date.now();
               if (nowTs - (lastBotResyncAt.get(gameCode) ?? 0) >= 2000) {
                 lastBotResyncAt.set(gameCode, nowTs);
                 void botManager.resyncBotsForNewGrid(
                   botManager.getGameBots(gameCode),
-                  gravityResult.newGrid,
+                  board.grid,
                   language,
                 );
               }
 
-              // MP board refresh parity with human path: shrink-until-clear,
-              // regenerate a fresh full board on full/near clear (shared helper).
-              if (currentGame) {
-                const regenerated = regenerateBlastBoardIfExhausted({
-                  io,
-                  gameCode,
-                  game: currentGame,
-                  username,
-                  newTileStates: gravityResult.newTileStates,
-                });
-                if (regenerated) {
-                  // Reopen the per-word resync window immediately after a refresh.
-                  lastBotResyncAt.set(gameCode, Date.now());
-                }
+              // Per-player board refresh (silent: no socket → bots don't emit).
+              const regenerated = regenerateBlastBoardIfExhausted({
+                io,
+                gameCode,
+                game: currentGame,
+                username,
+                board,
+                newTileStates: board.tileStates,
+              });
+              if (regenerated) {
+                lastBotResyncAt.set(gameCode, Date.now());
               }
             }
           } catch (err) {

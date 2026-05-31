@@ -144,6 +144,18 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
   calculateBlastTileBonus: vi.fn().mockReturnValue(10),
   getTilesOnPath: vi.fn().mockReturnValue(['bomb', 'gold']),
   recordBlastMove: vi.fn().mockReturnValue({ movesUsed: 4, bonusMove: true }),
+  // Per-player board model.
+  getOrInitPlayerBoard: vi.fn(() => ({
+    grid: [['A', 'B'], ['C', 'D']], tileStates: [[{}, {}], [{}, {}]],
+    overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0,
+  })),
+  getWordPath: vi.fn(() => [{ row: 0, col: 0 }]),
+  cascadeBlastWord: vi.fn(() => ({ clearedCount: 1, totalMoves: 1 })),
+}));
+
+vi.mock('../../../backend/modules/blastBoardRegen', () => ({
+  regenerateBlastBoardIfExhausted: vi.fn(() => false),
+  isBlastBoardExhausted: vi.fn(() => false),
 }));
 
 import { getGame, getGameBySocketId, getUsernameBySocketId, getFirstFinder } from '../../../backend/modules/gameStateManager';

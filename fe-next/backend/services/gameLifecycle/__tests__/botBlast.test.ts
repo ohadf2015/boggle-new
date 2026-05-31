@@ -51,8 +51,20 @@ const mocks = vi.hoisted(() => ({
   isBlastBoardCleared: vi.fn(() => false),
   recordBlastBoardClear: vi.fn(),
   regenerateBlastBoard: vi.fn(),
+  regeneratePlayerBoard: vi.fn(),
   tryBeginWaveAdvance: () => true,
   endWaveAdvance: () => {},
+  // Per-player board model: bot plays on its own board.
+  getOrInitPlayerBoard: vi.fn(() => ({
+    grid: [['A', 'B'], ['C', 'D']],
+    tileStates: [[{ isCleared: false }, { isCleared: false }], [{ isCleared: false }, { isCleared: false }]],
+    overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0,
+  })),
+  cascadeBlastWord: vi.fn((board: any) => {
+    board.totalMoves = (board.totalMoves ?? 0) + 1;
+    return { clearedCount: 1, totalMoves: board.totalMoves };
+  }),
+  makePositionsMap: vi.fn(() => new Map()),
   getBotBots: vi.fn(() => []),
   getGameBots: vi.fn(() => []),
   startBot: vi.fn(),
@@ -94,8 +106,11 @@ vi.mock('../../../modules/blastModeManager', () => ({
   isBlastBoardCleared: mocks.isBlastBoardCleared,
   recordBlastBoardClear: mocks.recordBlastBoardClear,
   regenerateBlastBoard: mocks.regenerateBlastBoard,
+  regeneratePlayerBoard: mocks.regeneratePlayerBoard,
   tryBeginWaveAdvance: mocks.tryBeginWaveAdvance,
   endWaveAdvance: mocks.endWaveAdvance,
+  getOrInitPlayerBoard: mocks.getOrInitPlayerBoard,
+  cascadeBlastWord: mocks.cascadeBlastWord,
 }));
 
 vi.mock('@/components/blast/legacy/utils/clearTilesProcessor', () => ({
@@ -331,7 +346,7 @@ describe('startBotsForBlast', () => {
     expect(playerFound![3]).toMatchObject({ isFirstFinder: true });
   });
 
-  it('uses computeGravityResult with refill=false for MP parity with the human path (shrink-until-clear)', async () => {
+  it('cascades the played word on the bot\'s OWN board (per-player; refill=false is enforced inside cascadeBlastWord)', async () => {
     mocks.findAllWords.mockReturnValue(['HELLO']);
     const bot = makeBot();
     const blastState = makeBlastState();
@@ -344,9 +359,11 @@ describe('startBotsForBlast', () => {
     startBotsForBlast(mockIo, gameCode, [bot], blastState, 'en', 120);
     await new Promise(resolve => setTimeout(resolve, 60));
 
-    expect(mocks.computeGravityResult).toHaveBeenCalled();
-    const lastArg = mocks.computeGravityResult.mock.calls.at(-1)!.at(-1);
-    expect(lastArg).toBe(false); // refill flag — shrink-until-clear, no per-word regeneration
+    // The bot uses the per-player cascade (which runs gravity with refill=false
+    // internally — verified directly in blastModeManager.cascade.test.ts) on a
+    // board obtained via getOrInitPlayerBoard, NOT the shared board.
+    expect(mocks.getOrInitPlayerBoard).toHaveBeenCalled();
+    expect(mocks.cascadeBlastWord).toHaveBeenCalled();
   });
 
   it('records the board clear (recordBlastBoardClear) when the bot empties the shared board', async () => {

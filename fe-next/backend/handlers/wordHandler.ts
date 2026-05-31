@@ -22,6 +22,8 @@ import {
 
 import { volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { isWordOnBoardAsync } from '../modules/wordValidatorPool.js';
+import { getOrInitPlayerBoard } from '../modules/blastModeManager.js';
+import { makePositionsMap } from '../modules/wordValidator.js';
 import { isProfane } from '../utils/profanityFilter.js';
 import { isDictionaryWord, isValidWordCached } from '../dictionary.js';
 import { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager.js';
@@ -311,13 +313,22 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Validate word on board (skip if no grid - shouldn't happen in normal gameplay)
-      if (!game.letterGrid) {
+      // Validate word on board. Blast is PER-PLAYER: validate against THIS
+      // player's independent board, not the shared template (boards diverge as
+      // each player clears tiles).
+      let validationGrid = game.letterGrid;
+      let validationPositions = game.letterPositions;
+      if (game.gameMode === 'blast' && game.blastModeState) {
+        const board = getOrInitPlayerBoard(game.blastModeState, username);
+        validationGrid = board.grid;
+        validationPositions = makePositionsMap(board.grid, (game.language || 'en'));
+      }
+      if (!validationGrid) {
         logger.warn('WORD', 'No letter grid available for word validation', { gameCode });
         await releaseGraceLockIfNeeded();
         return;
       }
-      const isOnBoard = await isWordOnBoardAsync(normalizedWord, game.letterGrid, game.letterPositions);
+      const isOnBoard = await isWordOnBoardAsync(normalizedWord, validationGrid, validationPositions);
       if (!isOnBoard) {
         inc('wordNotOnBoard');
         incPerGame(gameCode, 'wordNotOnBoard');
@@ -328,8 +339,13 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Check if someone else already found this word (first-to-find scoring)
-      const firstFinder = getFirstFinder(gameCode, normalizedWord, username);
+      // Check if someone else already found this word (first-to-find scoring).
+      // SKIP for blast: boards are per-player and independent, so two players
+      // legitimately clearing the same word each deserve FULL credit (no 50%
+      // confirmation penalty).
+      const firstFinder = game.gameMode === 'blast'
+        ? null
+        : getFirstFinder(gameCode, normalizedWord, username);
       if (firstFinder) {
         // Catch-up mechanic: give 50% partial credit for confirmation finds
         // This rewards word knowledge without devaluing first-find

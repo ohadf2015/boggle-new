@@ -143,6 +143,14 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
   tryBeginWaveAdvance: vi.fn().mockReturnValue(false),
   endWaveAdvance: vi.fn(),
   resyncBotsForNewGrid: vi.fn(),
+  // Per-player board model — must resolve a board before the (throwing)
+  // getTilesOnPath, so the thrown error is the intended overlay-corruption one.
+  getOrInitPlayerBoard: vi.fn(() => ({
+    grid: [['A']], tileStates: [[{ letter: 'A', type: 'standard', isCleared: false }]],
+    overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0,
+  })),
+  getWordPath: vi.fn(() => [{ row: 0, col: 0 }]),
+  cascadeBlastWord: vi.fn(() => ({ clearedCount: 0, totalMoves: 1 })),
 }));
 
 const { loggerErrorMock } = vi.hoisted(() => ({ loggerErrorMock: vi.fn() }));
