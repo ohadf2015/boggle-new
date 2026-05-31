@@ -122,7 +122,9 @@ const ja = {
       "p2s1": "花であって、製菓材料ではない。",
       "p5s1": "速い、ひと言で。",
       "p6s1": "家族の繋がりで、空ではない。"
-    }
+    },
+    "wildcardFound": "賢者の石発見！",
+    "wildcardSkip": "一段階スキップ — 錬金術の奇跡"
   },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {

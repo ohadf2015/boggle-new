@@ -114,7 +114,9 @@ const en = {
       "title": "How to play",
       "cta": "Got it!",
       "steps": ["🔤 Transform one word into the next, one step at a time", "💡 Each clue tells you the change — add, swap, or remove a letter", "🏆 Finish the whole chain to solve the puzzle"]
-    }
+    },
+    "wildcardFound": "Philosopher's Stone!",
+    "wildcardSkip": "A step was transmuted — magic happens"
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {

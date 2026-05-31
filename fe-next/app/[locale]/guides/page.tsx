@@ -34,28 +34,65 @@ const guidesSeoContent: Record<string, {
   he: {
     title: 'מדריכי אסטרטגיה — שלטו בכל מצב משחק',
     description: 'מדריכי אסטרטגיה מומחים ל-LexiClash. טכניקות מתקדמות לקלאסי, בלאסט וציד מילים.',
-    features: ['אסטרטגיית מצב קלאסי — סריקת לוח ומציאת מילים ארוכות', 'שליטה בבלאסט — תזמון קומבו ושרשרות', 'טיפים לציד מילים — פירוש רמזי צבע'],
-    faq: [{ question: 'מה האסטרטגיה הטובה ביותר למצב קלאסי?', answer: 'סרקו את הלוח בשיטתיות — התחילו מפינות וקצוות. חפשו תחיליות וסיומות נפוצות למציאת מילים ארוכות.' }],
+    features: [
+      'אסטרטגיית מצב קלאסי — סריקת לוח ומציאת מילים ארוכות',
+      'שליטה בבלאסט — תזמון קומבו ושרשרות',
+      'טיפים לציד מילים — פירוש רמזי צבע',
+      'טכניקות כלליות למציאת מילים — תחיליות, סיומות ותבניות אותיות נפוצות',
+      'אופטימיזציית ניקוד — מתי ללכת על אורך מול מהירות מול קומבו',
+    ],
+    faq: [
+      { question: 'מה האסטרטגיה הטובה ביותר למצב קלאסי?', answer: 'סרקו את הלוח בשיטתיות — התחילו מפינות וקצוות. חפשו תחיליות וסיומות נפוצות למציאת מילים ארוכות.' },
+      { question: 'איך עובדים הקומבו במצב בלאסט?', answer: 'מציאת מילים ברצף מהיר בונה מכפיל קומבו. ככל שמשרשרים מהר יותר, המכפיל עולה. התמקדו במילים קצרות של 3-4 אותיות כדי לשמור על הקומבו, ואז הכו במילה ארוכה לניקוד מקסימלי.' },
+      { question: 'האם יש מדריכים למתחילים?', answer: 'כן — המדריכים שלנו מכסים מהבסיסי ועד המתקדם. התחילו עם מדריך מצב קלאסי ללמידת סריקת לוח, ואז התקדמו לאסטרטגיות בלאסט וציד מילים.' },
+    ],
   },
   sv: {
     title: 'Strategiguider — Bemästra Varje Spelmod',
     description: 'Expertstrategiguider för LexiClash. Avancerade tekniker för Klassiskt, Blast och Word Hunt.',
-    features: ['Klassisk strategi — rutnätsskanning och höga ordmål', 'Blast-mästerskap — kombotiming och kedjeeffekter', 'Word Hunt-tips — ledtrådsanalys'],
-    faq: [{ question: 'Vad är den bästa strategin för Klassiskt läge?', answer: 'Skanna rutnätet systematiskt — börja från hörn och kanter. Leta efter vanliga prefix och suffix.' }],
+    features: [
+      'Klassisk strategi — rutnätsskanning och höga ordmål',
+      'Blast-mästerskap — kombotiming och kedjeeffekter',
+      'Word Hunt-tips — ledtrådsanalys',
+      'Allmänna ordletningstekniker — prefix, suffix och vanliga bokstavsmönster',
+      'Poängoptimering — när du ska gå för längd vs. hastighet vs. kombos',
+    ],
+    faq: [
+      { question: 'Vad är den bästa strategin för Klassiskt läge?', answer: 'Skanna rutnätet systematiskt — börja från hörn och kanter. Leta efter vanliga prefix och suffix.' },
+      { question: 'Hur fungerar kombos i Blast-läge?', answer: 'Att hitta ord i snabb följd bygger en kombomultiplikator. Ju snabbare du kedjar ord, desto högre klättrar multiplikatorn. Fokusera på korta 3-4 bokstavsord för att hålla kombon igång, slå sedan ett långt ord för maxpoäng.' },
+      { question: 'Finns det guider för nybörjare?', answer: 'Ja — guiderna täcker allt från grunderna till avancerat. Börja med guiden för Klassiskt läge för att lära dig rutnätsskanning, gå sedan vidare till Blast och Word Hunt.' },
+    ],
   },
   ja: {
     title: '攻略ガイド — すべてのゲームモードをマスター',
     description: 'LexiClashのエキスパート攻略ガイド。クラシック、ブラスト、ワードハントの上級テクニック。',
-    features: ['クラシック戦略 — グリッドスキャンと高得点ワード', 'ブラストマスター — コンボタイミングとチェーン', 'ワードハントのコツ — 色ヒント解釈'],
-    faq: [{ question: 'クラシックモードの最良の戦略は？', answer: 'グリッドを体系的にスキャン — 角と端から始めましょう。一般的な接頭辞と接尾辞を探して長い単語を見つけましょう。' }],
+    features: [
+      'クラシック戦略 — グリッドスキャンと高得点ワード',
+      'ブラストマスター — コンボタイミングとチェーン',
+      'ワードハントのコツ — 色ヒント解釈',
+      '単語発見の一般テクニック — 接頭辞、接尾辞、よく出る文字パターン',
+      'スコア最適化 — 長さ・速さ・コンボのどれを優先すべきか',
+    ],
+    faq: [
+      { question: 'クラシックモードの最良の戦略は？', answer: 'グリッドを体系的にスキャン — 角と端から始めましょう。一般的な接頭辞と接尾辞を探して長い単語を見つけましょう。' },
+      { question: 'ブラストモードのコンボはどう機能しますか？', answer: '素早く連続して単語を見つけることでコンボマルチプライヤーが積み上がります。連鎖が速いほど倍率が上がります。3〜4文字の短い単語でコンボをつなぎ、長い単語でポイントを最大化しましょう。' },
+      { question: '初心者向けのガイドはありますか？', answer: 'はい — 初心者から上級者まで対応しています。まずクラシックモードのガイドでグリッドスキャンを学び、次にブラストとワードハントの戦略へ進みましょう。' },
+    ],
   },
   es: {
     title: 'Guías de Estrategia — Domina Cada Modo de Juego',
     description: 'Guías de estrategia experta para LexiClash. Técnicas avanzadas para Clásico, Blast y Word Hunt.',
-    features: ['Estrategia Clásica — patrones de escaneo y palabras de alto valor', 'Dominio de Blast — sincronización de combos y cadenas', 'Consejos de Word Hunt — interpretación de pistas'],
+    features: [
+      'Estrategia Clásica — patrones de escaneo y palabras de alto valor',
+      'Dominio de Blast — sincronización de combos y cadenas',
+      'Consejos de Word Hunt — interpretación de pistas',
+      'Técnicas generales de búsqueda de palabras — prefijos, sufijos y patrones de letras',
+      'Optimización de puntuación — cuándo elegir longitud vs. velocidad vs. combos',
+    ],
     faq: [
       { question: '¿Cuál es la mejor estrategia para el modo Clásico?', answer: 'Escanea la cuadrícula sistemáticamente — comienza por esquinas y bordes. Busca prefijos y sufijos comunes para encontrar palabras largas.' },
-      { question: '¿Hay guías para principiantes?', answer: 'Sí — nuestras guías cubren desde lo básico hasta lo avanzado. Comienza con la guía del modo Clásico.' },
+      { question: '¿Cómo funcionan los combos en el modo Blast?', answer: 'Encontrar palabras en rápida sucesión construye un multiplicador de combo. Cuanto más rápido encadenas palabras, más alto sube el multiplicador. Enfócate en palabras cortas de 3-4 letras para mantener el combo activo, luego golpea con una palabra larga para máximos puntos.' },
+      { question: '¿Hay guías para principiantes?', answer: 'Sí — nuestras guías cubren desde lo básico hasta lo avanzado. Comienza con la guía del modo Clásico para aprender a escanear la cuadrícula, luego avanza a las estrategias de Blast y Word Hunt.' },
     ],
   },
 };

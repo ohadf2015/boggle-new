@@ -12,6 +12,8 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { applyHebrewFinalLetters, HEBREW_FINAL_TO_REGULAR } from '@/shared/utils/wordNormalization';
 import AlchemyKeyboard from '@/components/wordAlchemy/AlchemyKeyboard';
 import { getKeyboardLetters, appendLetter, backspace } from '@/lib/wordAlchemy/keyboard';
+import { getWildcardCatalyst } from '@/lib/wordAlchemy/wildcardCatalyst';
+import { WildcardFoundModal } from '@/components/wordAlchemy/WildcardFoundModal';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -230,6 +232,7 @@ export default function WordAlchemyPage() {
   const [input, setInput] = useState('');
   const [wrongCount, setWrongCount] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [wildcardFound, setWildcardFound] = useState(false);
   // The built-word display (was a text input); kept as a ref for shake + burst.
   const inputRef = useRef<HTMLDivElement>(null);
   const flaskRef = useRef<HTMLSpanElement>(null);
@@ -239,6 +242,8 @@ export default function WordAlchemyPage() {
   const puzzle = puzzles[puzzleIdx];
   const won = stepIdx >= puzzle.steps.length;
   const step = won ? null : puzzle.steps[stepIdx];
+  // Wildcard catalyst — deterministic per puzzle; ~1/3 of puzzles have one.
+  const catalyst = useMemo(() => getWildcardCatalyst(puzzle.id), [puzzle.id]);
 
   const chain = useMemo(
     () => [puzzle.start, ...puzzle.steps.slice(0, stepIdx).map((s) => s.answer)],
@@ -264,6 +269,7 @@ export default function WordAlchemyPage() {
     setInput('');
     setWrongCount(0);
     setStreak(0);
+    setWildcardFound(false);
     wonFxFiredRef.current = false;
   };
 
@@ -276,6 +282,25 @@ export default function WordAlchemyPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!step) return;
+
+    // Wildcard Catalyst — hidden skip mechanic (~1/3 of puzzles).
+    // Typing the catalyst word on the trigger step skips it entirely.
+    if (
+      catalyst.active &&
+      catalyst.wildWord !== null &&
+      stepIdx === catalyst.triggerStepIdx &&
+      input.toUpperCase().trim() === catalyst.wildWord
+    ) {
+      setStepIdx((s) => s + 1);
+      setInput('');
+      setWrongCount(0);
+      setStreak((s) => s + 1);
+      setWildcardFound(true);
+      playSound('wordAccepted');
+      burstAt('sparkle-gold', inputRef.current, 24);
+      return;
+    }
+
     if (checkGuess(input, step.answer)) {
       setStepIdx((s) => s + 1);
       setInput('');
@@ -463,6 +488,7 @@ export default function WordAlchemyPage() {
           </form>
         )}
       </div>
+      {wildcardFound && <WildcardFoundModal onDismiss={() => setWildcardFound(false)} />}
     </main>
   );
 }

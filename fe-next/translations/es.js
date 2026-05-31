@@ -114,7 +114,9 @@ const es = {
       "title": "Cómo jugar",
       "cta": "¡Entendido!",
       "steps": ["🔤 Transforma una palabra en la siguiente, paso a paso", "💡 Cada pista indica el cambio: añadir, cambiar o quitar una letra", "🏆 Completa toda la cadena para resolver el puzle"]
-    }
+    },
+    "wildcardFound": "¡La Piedra Filosofal!",
+    "wildcardSkip": "¡Un paso transmutar — la magia ocurre!"
   },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {

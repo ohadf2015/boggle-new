@@ -17,11 +17,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-    description: 'Spela scrabble online på svenska gratis mot vänner — 2-20 spelare i realtid, ingen registrering, ingen nedladdning. Starta ett rum och bjud in med en länk!',
+    description: 'Scrabble på svenska i realtid — inte tur och ordning. Skapa rum, bjud in med länk, tävla direkt. Gratis, ingen app, ingen registrering.',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
       title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-      description: 'Spela scrabble online på svenska med vänner i realtid. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
+      description: 'Scrabble på svenska i realtid — inte tur och ordning. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-      description: 'Spela scrabble online på svenska: skapa rum, bjud in med länk, tävla i realtid. Gratis, ingen registrering.',
+      description: 'Scrabble på svenska i realtid — inte tur och ordning. Skapa rum, bjud in med länk, tävla direkt. Gratis.',
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {

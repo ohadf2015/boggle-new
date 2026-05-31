@@ -13,12 +13,14 @@ const guidesContent: Record<string, {
   title: string;
   subtitle: string;
   quickStart: string;
+  generalTips: string;
   guides: Array<{ slug: string; title: string; description: string; icon: 'classic' | 'blast' | 'wordHunt' }>;
 }> = {
   en: {
     title: 'LexiClash Strategy Guides',
     subtitle: 'Master every game mode with expert strategies, tips, and techniques.',
     quickStart: 'New to LexiClash? Start with Classic mode. It\'s the quickest way to pick up grid scanning, and the time pressure builds good habits fast. Blast makes more sense after a few Classic games — the combo system clicks once you already know how to find words. Word Hunt runs on different logic; it rewards patience over speed. Each guide covers specific scoring patterns for that mode.',
+    generalTips: 'Across every mode, the letters S, R, T, L, N, and E appear most often — train your eye to spot them first. Quick -ING and -ED endings are easy points off any root word. If you\'re stuck after 30 seconds, check the center of the grid. Most players scan the edges first and miss words hiding in the middle.',
     guides: [
       { slug: 'classic-strategy', title: 'Classic Mode Strategy', description: 'Learn scanning patterns, time management, and scoring strategies to find more words and score higher.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Blast Mode Mastery', description: 'Unlock the combo system, master tile effects, and chain your way to massive scores.', icon: 'blast' },
@@ -29,6 +31,7 @@ const guidesContent: Record<string, {
     title: 'מדריכי אסטרטגיה של לקסיקלאש',
     subtitle: 'שלטו בכל מצב משחק עם אסטרטגיות מומחים, טיפים וטכניקות.',
     quickStart: 'חדשים ב-LexiClash? התחילו במצב קלאסי. הוא הדרך המהירה ביותר ללמוד סריקת לוח תחת לחץ זמן. בלאסט כדאי לקרוא שנייה — מערכת הקומבו מובנת הרבה יותר לאחר כמה משחקי קלאסי. ציד מילים פועל לפי היגיון שונה לגמרי ומתגמל סבלנות על פני מהירות. כל מדריך מכסה תבניות ניקוד ספציפיות למצב המשחק שלו.',
+    generalTips: 'בכל מצב משחק, האותיות הנפוצות ביותר בלוח הן מ, ל, ו, ב, ה, ש — אמנו את העין לאתרן ראשונות. סיומות נפוצות הן נקודות מהירות. אם נתקעתם אחרי 30 שניות, בדקו את מרכז הלוח — רוב השחקנים מתרכזים בקצוות ומפספסים מילים במרכז.',
     guides: [
       { slug: 'classic-strategy', title: 'אסטרטגיית מצב קלאסי', description: 'למדו תבניות סריקה, ניהול זמן ואסטרטגיות ניקוד למציאת יותר מילים וניקוד גבוה יותר.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'שליטה במצב בלאסט', description: 'פענחו את מערכת הקומבו, שלטו באפקטי אריחים ושרשרו לניקוד מסיבי.', icon: 'blast' },
@@ -39,6 +42,7 @@ const guidesContent: Record<string, {
     title: 'LexiClash Strategiguider',
     subtitle: 'Bemestra varje spelmod med expertstrategier, tips och tekniker.',
     quickStart: 'Ny på LexiClash? Börja med Klassiskt. Det är det snabbaste sättet att lära sig rutnätsskanning under tidspress. Blast är mer meningsfullt efter några Klassiska spel — kombosystemet faller på plats när du redan vet hur man hittar ord. Word Hunt följer en annan logik; det belönar tålamod framför hastighet. Varje guide täcker specifika poängmönster för det läget.',
+    generalTips: 'I alla lägen förekommer bokstäverna E, A, R, S, T och N oftast — träna ögat att hitta dem snabbt. Vanliga -ING och -ER ändelser ger snabba poäng. Kör du fast efter 30 sekunder, kolla mitten av rutnätet. De flesta spelare skannar kanterna och missar ord som gömmer sig i mitten.',
     guides: [
       { slug: 'classic-strategy', title: 'Klassisk Strategi', description: 'Lar dig skanningsmonster, tidshantering och poangstrategier for att hitta fler ord.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Blast-lage Mesterskap', description: 'Las upp kombosystemet, bemestra platteffekter och kedja till massiva poang.', icon: 'blast' },
@@ -49,6 +53,7 @@ const guidesContent: Record<string, {
     title: 'LexiClash 攻略ガイド',
     subtitle: 'エキスパートの戦略、ヒント、テクニックですべてのゲームモードをマスター。',
     quickStart: 'LexiClashが初めて？クラシックモードから始めましょう。タイムプレッシャーの中でグリッドスキャンをすばやく身につけられます。ブラストはクラシックを数回プレイした後に読むと理解しやすい — 単語の見つけ方がわかると、コンボシステムがすっと入ってきます。ワードハントはまた別のロジックで動いていて、速さより粘り強さが大事です。各ガイドはそのモード固有のスコアパターンをカバーしています。',
+    generalTips: 'どのモードでも使えるコツ: 短い単語(3〜4文字)でコンボをつなぎながら、長い単語を探しましょう。30秒後も詰まっているなら、グリッドの中央付近を確認してください。端から探すことに慣れると、中央を見落としがちです。',
     guides: [
       { slug: 'classic-strategy', title: 'クラシックモード攻略', description: 'スキャンパターン、時間管理、スコアリング戦略を学んでもっと単語を見つけよう。', icon: 'classic' },
       { slug: 'blast-strategy', title: 'ブラストモード攻略', description: 'コンボシステムを解き明かし、タイルエフェクトをマスターしてハイスコアを狙おう。', icon: 'blast' },
@@ -59,6 +64,7 @@ const guidesContent: Record<string, {
     title: 'Guias de Estrategia LexiClash',
     subtitle: 'Domina cada modo de juego con estrategias expertas, consejos y tecnicas.',
     quickStart: '¿Nuevo en LexiClash? Empieza con el modo Clásico. Es la forma más rápida de aprender el escaneo de cuadrícula bajo presión de tiempo. Blast tiene más sentido después de algunas partidas Clásicas — el sistema de combos encaja en cuanto ya sabes encontrar palabras. Word Hunt funciona con una lógica distinta; recompensa la paciencia sobre la velocidad. Cada guía cubre patrones de puntuación específicos para ese modo.',
+    generalTips: 'En todos los modos, las letras E, A, O, S, R y N son las más frecuentes — entrena el ojo para detectarlas primero. Los sufijos -AR, -ER, -ANDO y -CIÓN son puntos rápidos sobre cualquier raíz. Si te quedas bloqueado después de 30 segundos, revisa el centro del tablero. La mayoría de jugadores escanea los bordes primero y pierde palabras en el medio.',
     guides: [
       { slug: 'classic-strategy', title: 'Estrategia Modo Clasico', description: 'Aprende patrones de escaneo, gestion del tiempo y estrategias de puntuacion.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Dominio Modo Blast', description: 'Desbloquea el sistema de combos, domina efectos de fichas y encadena puntajes masivos.', icon: 'blast' },
@@ -143,6 +149,13 @@ export default function GuidesIndexPageClient(): React.ReactElement {
             );
           })}
         </div>
+
+        <p className={cn(
+          'mt-8 text-sm leading-relaxed max-w-2xl mx-auto text-center',
+          isDarkMode ? 'text-gray-400' : 'text-gray-600'
+        )}>
+          {content.generalTips}
+        </p>
 
         <InlineBannerAd webZone="content-page" className="mt-8" />
       </main>

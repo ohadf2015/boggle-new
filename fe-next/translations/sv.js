@@ -196,7 +196,9 @@ const sv = {
       "p2s1": "En blomma, inte en bakingrediens.",
       "p5s1": "Snabbt, i ett ord.",
       "p6s1": "En släkting, inte himlen."
-    }
+    },
+    "wildcardFound": "Filosofens sten!",
+    "wildcardSkip": "Ett steg förvandlades — magi sker"
   },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {
