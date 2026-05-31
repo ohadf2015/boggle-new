@@ -158,6 +158,7 @@ vi.mock('@/utils/accessibility', () => ({
 }));
 
 vi.mock('@/contexts/AccessibilityContext', () => ({
+  useCosyMode: () => false,
   useSuppressTimerUrgency: () => false,
   useAccessibility: () => ({
     isScreenReaderEnabled: false,

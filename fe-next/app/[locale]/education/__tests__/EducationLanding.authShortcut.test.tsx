@@ -12,6 +12,7 @@ const mockReplace = vi.fn();
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, replace: mockReplace }),
+  usePathname: () => '/en/education',
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({

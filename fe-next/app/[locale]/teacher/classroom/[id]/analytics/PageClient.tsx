@@ -92,7 +92,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   // ==================== NAVIGATION HANDLERS ====================
 
   const handleBackToClassroom = () => {
-    router.push(`/${locale}/teacher`);
+    router.push(`/${locale}/teacher/classroom/${classroomId}`);
   };
 
   const handleViewStudents = (_filter: 'struggling') => {

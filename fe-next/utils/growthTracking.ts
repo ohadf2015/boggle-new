@@ -881,14 +881,15 @@ export const trackGameStart = (
   extras: Record<string, unknown> = {}
 ): void => {
   sessionGameCount += 1;
-  // Defaults first, extras last: MP callers pass an explicit engineMode:'multiplayer'
-  // + gameMode:'<resolved>' that MUST override the single-arg defaults so the nightly
-  // job can split MP rounds by mode. (Previously extras spread first → engineMode clobbered.)
+  // gameMode/engineMode defaults first so MP callers' explicit engineMode:'multiplayer'
+  // + gameMode:'<resolved>' override them (nightly splits MP rounds by mode). The
+  // canonical `mode` goes LAST so extras can never clobber it — matches trackGameEnd's
+  // ordering and the mode-property contract test.
   trackGrowthEvent('game_started', {
-    mode,
     gameMode: mode,
     engineMode: mode,
     ...extras,
+    mode,
   });
   trackSessionDepth(sessionGameCount);
   markGameActive(mode);

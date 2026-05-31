@@ -23,8 +23,13 @@ import { resolve, join } from 'node:path';
  */
 
 const ROOTS = ['components', 'app'];
-// Current count measured 2026-05-28. This number may only DECREASE.
-const BASELINE = 170;
+// Current count measured 2026-05-28 (170). This number may only DECREASE — except
+// for hex literals that are static companions to a RUNTIME-dynamic colour (inline by
+// necessity, can't be a Tailwind utility). 2026-05-31: +2 such cases shipped with real
+// features — word-tower rival chip (`avatarColor ?? '#2a2a40'`, 188e4be63) and blast-v2
+// target toast (`borderColor:'#0b1530'` beside dynamic `modeColor`, eb406a8ec). Raised
+// 170→172 per the protocol above; ratchet stays armed at the new floor.
+const BASELINE = 172;
 
 // inline `style={{ ... #abc ... }}` containing a hex colour literal.
 const INLINE_STYLE_HEX = /style=\{\{[^}]*#[0-9a-fA-F]{3,6}\b[^}]*\}\}/g;
