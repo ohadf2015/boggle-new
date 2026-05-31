@@ -18,29 +18,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// Mock framer-motion so AnimatePresence renders children synchronously (no
-// mode="wait" exit-animation gating) and any m.<tag> is a plain element. A
-// Proxy covers every tag the tree might use (div, button, span, p, ...).
-vi.mock('framer-motion', () => {
-  const stripMotionProps = (props: Record<string, unknown>) => {
-    const {
-      initial: _i, animate: _a, exit: _e, transition: _t, variants: _v,
-      whileHover: _wh, whileTap: _wt, whileInView: _wi, layout: _l,
-      ...rest
-    } = props;
-    return rest;
-  };
-  const m = new Proxy(
-    {},
-    {
-      get: (_t, tag: string) =>
-        ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
-          React.createElement(tag, stripMotionProps(props), children),
-    }
-  );
+// Keep real framer-motion (so m.<tag>, useMotionValue, etc. all work in jsdom)
+// but make AnimatePresence pass children through synchronously — mode="wait"
+// otherwise gates the phase swap behind an exit animation that never fires here.
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
   return {
-    m,
-    motion: m,
+    ...actual,
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
   };
 });
@@ -62,6 +46,7 @@ vi.mock('@/contexts/MusicContext', () => ({
 // AutoHideHeader pulls in NavigationProvider; irrelevant to this test.
 vi.mock('@/components/AutoHideHeader', () => ({
   default: () => null,
+  AutoHideHeader: () => null,
 }));
 
 vi.mock('@/hooks/useRewardedAd', () => ({
