@@ -88,9 +88,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const [hostUsername, setHostUsername] = useState<string>('');
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHost, setIsHost] = useState<boolean>(false);
-  // Quick-play and classroom flows create rooms with `isPrivate=true`. The
-  // server echoes that flag in `joined` — we plumb it through so the lobby
-  // can hide invite/share UI for rooms that are not meant to be discovered.
+  // Classroom flows create rooms with `isPrivate=true` (quick-play rooms are
+  // now public so they surface in the lobby). The server echoes the flag in
+  // `joined` — we plumb it through so the lobby can hide invite/share UI for
+  // rooms that are not meant to be discovered.
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
@@ -470,7 +471,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             onShowResults={handleShowResults} pendingGameStart={pendingGameStart}
             onGameStartConsumed={handleGameStartConsumed} lessonData={lessonData}
             onUsernameChange={setUsername} autoStart={false}
-            isPrivate={isPrivate || quickPlay}
+            isPrivate={isPrivate}
             isQuickPlay={quickPlay}
           />
         </FeatureErrorBoundary>

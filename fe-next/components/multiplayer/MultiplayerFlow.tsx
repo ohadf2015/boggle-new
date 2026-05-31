@@ -331,15 +331,17 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setHostUsername(quickPlayUsername);
     setUsername(quickPlayUsername);
 
-    // Quick Play creates a PRIVATE room (not discoverable in the public lobby
-    // and no invite/share affordances surfaced). Players who tap Quick Play
-    // want to drop in fast against bots, not host a friends-night session.
-    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true, isPrivate: true });
+    // Quick Play creates a PUBLIC room so it surfaces in the lobby rooms list
+    // and other players can drop in. `quickPlay` still skips the alone-timer
+    // and auto-fills bots so a solo player starts fast. Only explicitly
+    // private flows (classroom) stay hidden / invite-only.
+    handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true });
 
-    // Intentionally NOT calling cgShowInvite — quick games are solo-vs-bots
-    // sessions and the CrazyGames invite chip would mislead.
+    // Surface the CrazyGames invite button — quick games are now discoverable,
+    // so inviting friends to join is a valid affordance.
+    cgShowInvite(gameCode);
 
-  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
+  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite]);
 
   // Landing Quick Play auto-fire: when the user arrives via
   // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on
