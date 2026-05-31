@@ -2278,6 +2278,27 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "modeTease": {
+      "nextUp": "次は",
+      "label": {
+        "classic": "クラシック",
+        "blast": "ブラスト",
+        "wordHunt": "ワードハント",
+        "wheelRush": "ホイールラッシュ",
+        "wordTower": "ワードタワー",
+        "shiritori": "しりとり",
+        "random": "サプライズモード"
+      },
+      "hook": {
+        "classic": "全部の単語を探そう",
+        "blast": "タイルを爆破しよう",
+        "wordHunt": "隠れた単語を狩ろう",
+        "wheelRush": "回して単語を奪え",
+        "wordTower": "タワーを積もう",
+        "shiritori": "単語をつなげよう",
+        "random": "お楽しみに"
+      }
+    },
     "results": "バトルレポート",
     "share": "自慢する",
     "yourProgress": "今回の成績",
@@ -11785,7 +11806,7 @@ const ja = {
     "questComplete": "クエスト完了！",
     "rewardEarned": "+{{coins}} コイン獲得！",
     "modesPlayed": "{{count}}/3",
-    "daily": "デイリーチャレンジ",
+    "blast": "ブラストをプレイ",
     "classicMp": "クラシックマルチプレイヤー",
     "wordHuntMp": "ワードハントマルチプレイヤー",
     "playAllModes": "3つのモードすべてをプレイしてクエストを完了しよう"

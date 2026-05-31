@@ -2358,6 +2358,27 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "modeTease": {
+      "nextUp": "Nästa",
+      "label": {
+        "classic": "Klassisk",
+        "blast": "Blast",
+        "wordHunt": "Ordjakt",
+        "wheelRush": "Hjulrush",
+        "wordTower": "Ordtorn",
+        "shiritori": "Shiritori",
+        "random": "Överraskningsläge"
+      },
+      "hook": {
+        "classic": "Hitta varje ord",
+        "blast": "Spräng brickorna",
+        "wordHunt": "Jaga det dolda ordet",
+        "wheelRush": "Snurra & stjäl ord",
+        "wordTower": "Bygg tornet",
+        "shiritori": "Kedja orden",
+        "random": "En överraskning väntar"
+      }
+    },
     "results": "Stridsrapport",
     "share": "Skryt",
     "yourProgress": "Hur det gick",
@@ -11859,7 +11880,7 @@ const sv = {
     "questComplete": "Uppdraget klart!",
     "rewardEarned": "+{{coins}} mynt!",
     "modesPlayed": "{{count}}/3",
-    "daily": "Daglig utmaning",
+    "blast": "Spela Blast",
     "classicMp": "Klassiskt flerspelare",
     "wordHuntMp": "Ordjakt flerspelare",
     "playAllModes": "Spela alla 3 lägen för att slutföra uppdraget"

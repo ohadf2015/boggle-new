@@ -2192,6 +2192,27 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "modeTease": {
+      "nextUp": "A continuación",
+      "label": {
+        "classic": "Clásico",
+        "blast": "Blast",
+        "wordHunt": "Caza de Palabras",
+        "wheelRush": "Rueda Rápida",
+        "wordTower": "Torre de Palabras",
+        "shiritori": "Shiritori",
+        "random": "Modo Sorpresa"
+      },
+      "hook": {
+        "classic": "Encuentra cada palabra",
+        "blast": "Explota las fichas",
+        "wordHunt": "Caza la palabra oculta",
+        "wheelRush": "Gira y roba palabras",
+        "wordTower": "Apila la torre",
+        "shiritori": "Encadena las palabras",
+        "random": "Te espera una sorpresa"
+      }
+    },
     "results": "Reporte de Batalla",
     "share": "Presumir",
     "yourProgress": "Tu Progreso",
@@ -11873,7 +11894,7 @@ const es = {
     "questComplete": "¡Misión completada!",
     "rewardEarned": "+{{coins}} monedas!",
     "modesPlayed": "{{count}}/3",
-    "daily": "Desafío diario",
+    "blast": "Juega Blast",
     "classicMp": "Multijugador clásico",
     "wordHuntMp": "Caza de palabras multijugador",
     "playAllModes": "Juega los 3 modos para completar la misión"

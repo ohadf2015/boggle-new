@@ -2381,6 +2381,27 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "modeTease": {
+      "nextUp": "Next up",
+      "label": {
+        "classic": "Classic",
+        "blast": "Blast",
+        "wordHunt": "Word Hunt",
+        "wheelRush": "Wheel Rush",
+        "wordTower": "Word Tower",
+        "shiritori": "Shiritori",
+        "random": "Surprise Mode"
+      },
+      "hook": {
+        "classic": "Spot every word",
+        "blast": "Explode the tiles",
+        "wordHunt": "Hunt the hidden word",
+        "wheelRush": "Spin & steal words",
+        "wordTower": "Stack the tower",
+        "shiritori": "Chain the words",
+        "random": "A surprise awaits"
+      }
+    },
     "results": "Battle Report",
     "share": "Brag",
     "yourProgress": "How You Did",
@@ -11743,7 +11764,7 @@ const en = {
     "questComplete": "Quest Complete!",
     "rewardEarned": "+{{coins}} coins earned!",
     "modesPlayed": "{{count}}/3",
-    "daily": "Daily Challenge",
+    "blast": "Play Blast",
     "classicMp": "Classic Multiplayer",
     "wordHuntMp": "Word Hunt Multiplayer",
     "playAllModes": "Play all 3 modes to complete the quest"

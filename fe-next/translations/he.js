@@ -2423,6 +2423,27 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
+    "modeTease": {
+      "nextUp": "הבא בתור",
+      "label": {
+        "classic": "קלאסי",
+        "blast": "בלאסט",
+        "wordHunt": "ציד מילים",
+        "wheelRush": "גלגל מהיר",
+        "wordTower": "מגדל מילים",
+        "shiritori": "שירִיטורי",
+        "random": "מצב הפתעה"
+      },
+      "hook": {
+        "classic": "מצאו כל מילה",
+        "blast": "פוצצו את האריחים",
+        "wordHunt": "צודו את המילה הנסתרת",
+        "wheelRush": "סובבו וגנבו מילים",
+        "wordTower": "בנו את המגדל",
+        "shiritori": "שרשרו את המילים",
+        "random": "הפתעה מחכה"
+      }
+    },
     "results": "דו״ח קרב",
     "share": "תתגאו",
     "yourProgress": "ההתקדמות שלך",
@@ -12089,7 +12110,7 @@ const he = {
     "questComplete": "המשימה הושלמה!",
     "rewardEarned": "+{{coins}} מטבעות!",
     "modesPlayed": "{{count}}/3",
-    "daily": "אתגר יומי",
+    "blast": "שחקו בריצוף",
     "classicMp": "מרובה משתתפים קלאסי",
     "wordHuntMp": "ציד מילים מרובה משתתפים",
     "playAllModes": "שחקו בכל 3 המצבים כדי להשלים את המשימה"
