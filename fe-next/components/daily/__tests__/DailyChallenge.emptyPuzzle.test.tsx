@@ -19,16 +19,31 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Mock framer-motion so AnimatePresence renders children synchronously (no
-// mode="wait" exit-animation gating) and m.div is a plain div.
-vi.mock('framer-motion', () => ({
-  m: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
-      const { initial: _i, animate: _a, exit: _e, transition: _t, variants: _v, ...rest } = props as Record<string, unknown>;
-      return <div {...rest}>{children}</div>;
-    },
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+// mode="wait" exit-animation gating) and any m.<tag> is a plain element. A
+// Proxy covers every tag the tree might use (div, button, span, p, ...).
+vi.mock('framer-motion', () => {
+  const stripMotionProps = (props: Record<string, unknown>) => {
+    const {
+      initial: _i, animate: _a, exit: _e, transition: _t, variants: _v,
+      whileHover: _wh, whileTap: _wt, whileInView: _wi, layout: _l,
+      ...rest
+    } = props;
+    return rest;
+  };
+  const m = new Proxy(
+    {},
+    {
+      get: (_t, tag: string) =>
+        ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
+          React.createElement(tag, stripMotionProps(props), children),
+    }
+  );
+  return {
+    m,
+    motion: m,
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
 
 import DailyChallenge from '../DailyChallenge';
 
