@@ -94,4 +94,17 @@ describe('useHostGameActions - leaving flag (black-screen-on-exit fix)', () => {
     act(() => { result.current.confirmExitRoom(); });
     expect(result.current.leaving).toBe(true);
   });
+
+  it('emits leaveRoom (graceful host migration), NOT closeRoom (nuke everyone)', () => {
+    // Room-centric: host exit should migrate host to a successor so remaining
+    // players keep playing, not delete the room out from under them.
+    const { result } = renderHook(() => useHostGameActions(baseOptions));
+    act(() => { result.current.confirmExitRoom(); });
+
+    const leaveCall = mockEmit.mock.calls.find((c: any[]) => c[0] === 'leaveRoom');
+    expect(leaveCall).toBeDefined();
+    expect(leaveCall![1]).toEqual({ gameCode: 'TEST', username: 'host' });
+    const closeCall = mockEmit.mock.calls.find((c: any[]) => c[0] === 'closeRoom');
+    expect(closeCall).toBeUndefined();
+  });
 });

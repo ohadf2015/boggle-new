@@ -324,7 +324,12 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     // Persist the intentional-exit flag in sessionStorage so the post-reload
     // boot path skips auto-rejoin. The ref alone is gone after reload.
     try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
-    socket?.emit('closeRoom', { gameCode });
+    // Room-centric exit: the host LEAVES (like any player) rather than nuking the
+    // room. The server's leaveRoom MIGRATES host to an eligible successor (or
+    // closes only if no one remains) — the same graceful path a host disconnect
+    // already takes. closeRoom unconditionally deleted the room, kicking everyone
+    // even mid-game. ("Stop Game" / endGame is the separate end-for-all action.)
+    socket?.emit('leaveRoom', { gameCode, username });
     setTimeout(() => {
       socket?.disconnect();
       window.location.reload();
