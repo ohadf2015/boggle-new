@@ -195,6 +195,27 @@ describe('useHostGameActions - gameMode in handleStartNewGame', () => {
     expect(generateRandomTable).toHaveBeenCalledWith(6, 6, 'en', []);
   });
 
+  it('does NOT show the start animation optimistically on click (sync with players)', () => {
+    // GIVEN: a spy on setShowStartAnimation. The host countdown must be driven
+    // by the server `startGame` broadcast (same trigger as players) so host and
+    // players see 3-2-1-GO at the same time. Starting it optimistically on click
+    // put the host a full network round-trip ahead — the reported desync.
+    (useGameMode as any).mockReturnValue('classic');
+    const setShowStartAnimation = vi.fn();
+    const { result } = renderHook(() =>
+      useHostGameActions({ ...baseOptions, setShowStartAnimation })
+    );
+
+    // WHEN: host clicks Start (multiplayer: 2 players)
+    act(() => {
+      result.current.startGame();
+    });
+
+    // THEN: startGame is emitted, but the animation is NOT triggered yet
+    expect(mockEmit.mock.calls.find((c: any[]) => c[0] === 'startGame')).toBeDefined();
+    expect(setShowStartAnimation).not.toHaveBeenCalledWith(true);
+  });
+
   it('should use difficulty-based grid size for non-blast modes', () => {
     // GIVEN
     (useGameMode as any).mockReturnValue('classic');
