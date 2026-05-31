@@ -23,6 +23,33 @@ const TIER_COLORS: Record<number, number> = {
   5: 0xff44ff,
 };
 
+/** Per-tier TextStyle cache. Style is a pure function of tier (≤5 values), so
+ *  build each once and share it — a TextStyle is safely reusable across many
+ *  Text instances and ScoreFly never mutates it. Avoids allocating + resolving
+ *  a fresh TextStyle on every score popup (a frequent in-play event). */
+const styleCache = new Map<number, TextStyle>();
+
+export function getScoreFlyStyle(tier: number): TextStyle {
+  const clamped = Math.min(Math.max(tier, 1), 5);
+  const cached = styleCache.get(clamped);
+  if (cached) return cached;
+
+  const style = new TextStyle({
+    fontFamily: 'Geist Mono, monospace',
+    fontSize: 16 + clamped * 4,
+    fontWeight: 'bold',
+    fill: TIER_COLORS[clamped] ?? 0xffffff,
+    dropShadow: {
+      color: 0x000000,
+      blur: 4,
+      distance: 2,
+      angle: Math.PI / 4,
+    },
+  });
+  styleCache.set(clamped, style);
+  return style;
+}
+
 export class ScoreFlyManager {
   readonly container: Container;
   private flies: FlyingScore[] = [];
@@ -45,23 +72,10 @@ export class ScoreFlyManager {
     if (this.flies.length >= this.maxConcurrent) return;
 
     const tier = opts.tier ?? 1;
-    const color = TIER_COLORS[Math.min(tier, 5)] ?? 0xffffff;
-    const fontSize = 16 + tier * 4;
 
     const text = new Text({
       text: `+${opts.score}`,
-      style: new TextStyle({
-        fontFamily: 'Geist Mono, monospace',
-        fontSize,
-        fontWeight: 'bold',
-        fill: color,
-        dropShadow: {
-          color: 0x000000,
-          blur: 4,
-          distance: 2,
-          angle: Math.PI / 4,
-        },
-      }),
+      style: getScoreFlyStyle(tier),
     });
     text.anchor.set(0.5);
     text.x = opts.from.x;
