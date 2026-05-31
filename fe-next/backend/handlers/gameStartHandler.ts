@@ -668,8 +668,23 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     if (humanUsernames.length === 0) {
       startGameTimer(io, gameCode, validTimer);
     } else {
-      gameStartCoordinator.setCountdownCompleteTimeout(gameCode, 8000, () => {
+      gameStartCoordinator.setCountdownCompleteTimeout(gameCode, 8000, (stats) => {
         startGameTimer(io, gameCode, validTimer);
+        // "Host starts while others still loading": the fallback fired because
+        // some players never reported countdownComplete (slow load / dropped
+        // event). Force-sync each still-missing player into the NOW-RUNNING game
+        // so they land on the board immediately instead of waiting for their own
+        // timer-stall watchdog. reconnect:true → the client resumes silently (no
+        // 3-2-1 replay; see usePlayerGameEvents). Does not change WHEN the timer
+        // starts — purely a catch-up resend.
+        for (const missingUser of stats.missing) {
+          const sid = getSocketIdByUsername(gameCode, missingUser);
+          if (!sid) continue;
+          const missingSock = getSocketById(io, sid);
+          if (!missingSock) continue;
+          const payload = buildStartGamePayload(gameCode, letterGrid, validTimer, gameLang, effectiveMinWordLength, messageId, game.gameSessionId, boardTheme, resolvedMode, true);
+          safeEmit(missingSock, 'startGame', { ...payload, reconnect: true });
+        }
       });
     }
 

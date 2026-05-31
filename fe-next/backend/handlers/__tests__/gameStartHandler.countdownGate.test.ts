@@ -23,6 +23,17 @@ describe('gameStartHandler — countdown gate', () => {
     // The old ack-based timer-start fallback must be gone:
     expect(source).not.toMatch(/setAcknowledgmentTimeout\(\s*gameCode\s*,\s*\d+\s*,\s*\(\)\s*=>\s*\{[\s\S]{0,80}startGameTimer/);
   });
+
+  it('force-syncs still-loading players when the countdown fallback fires (host-starts-early catch-up)', () => {
+    // The fallback callback must iterate the missing players and resend startGame
+    // with reconnect:true (silent resume) so a slow-loading client lands on the
+    // running board instead of being stuck "waiting for the game to load".
+    const idx = source.indexOf('setCountdownCompleteTimeout(');
+    expect(idx).toBeGreaterThan(0);
+    const block = source.slice(idx, idx + 1500);
+    expect(block).toMatch(/stats\.missing/);
+    expect(block).toMatch(/safeEmit\([\s\S]{0,160}reconnect:\s*true/);
+  });
 });
 
 describe('gameLifecycleHandler — countdownComplete handler', () => {
