@@ -13,9 +13,8 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/.next-nightly/
+# next.js (covers .next, .next-nightly, .next-verify + any future verify-build dir)
+/.next*/
 /out/
 
 # production
