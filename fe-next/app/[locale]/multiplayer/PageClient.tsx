@@ -172,6 +172,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // (no server resolves the route); flipping showResults/isActive off renders the
   // lobby instantly within the live SPA instead.
   const handleExitToLobby = useCallback(() => {
+    // Tell the server we left BEFORE resetting local state, so the room drops us
+    // from its roster (and migrates host if we were it) instead of keeping a
+    // ghost player around for the next round. socketRef is used because the
+    // `socket`/`signalIntentionalLeave` from useMultiplayerSocket are declared
+    // after this callback. Mirrors the ConnectionBanner onLeaveGame path.
+    if (gameCode) {
+      try { socketRef.current?.emit('leaveRoom', { gameCode, username }); } catch { /* socket gone */ }
+    }
     clearSessionPreservingUsername(username);
     setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
     setShowResults(false); setResultsData(null);
@@ -182,7 +190,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         window.history.replaceState({}, '', stripped);
       }
     }
-  }, [username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
+  }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData]);
 
   // Hide global footer only when in a game room or viewing results (not the lobby)
   useEffect(() => {
