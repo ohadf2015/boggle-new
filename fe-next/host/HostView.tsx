@@ -500,6 +500,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   // Hosts in spectator/broadcast mode still need confirmation before leaving
   useNavigationGuard({
     enabled: runtime.gameStarted,
+    leaving: actions.leaving,
     message: t('playerView.exitWarning'),
     onNavigationAttempt: () => {
       // Show the exit confirmation dialog

@@ -9,7 +9,7 @@
  * - Cancel tournament
  */
 
-import React, { useCallback, useRef, type RefObject } from 'react';
+import React, { useCallback, useRef, useState, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
 import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '@/components/NeoToast';
 import { clearSessionPreservingUsername } from '@/utils/session';
@@ -80,6 +80,8 @@ export interface UseHostGameActionsReturn {
   handleCancelTournamentDialog: () => void;
   handleHostWordSubmit: (word: string) => void;
   regenerateBoard: () => void;
+  /** True once the host confirms exit; fed to useNavigationGuard to skip the go(-1) teardown race. */
+  leaving: boolean;
 }
 
 export function useHostGameActions(options: UseHostGameActionsOptions): UseHostGameActionsReturn {
@@ -299,12 +301,21 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     neoInfoToast(t('hostView.gameStopped'), { icon: TOAST_ICONS.stopCircle });
   }, [socket, gameCode, t, setRemainingTime, setGameStarted]);
 
+  // True once the host confirms exit — passed to useNavigationGuard so its
+  // teardown skips the go(-1) that races the reload and blanks the WebView.
+  const [leaving, setLeaving] = useState(false);
+
   const handleExitRoom = useCallback(() => {
     setShowExitConfirm(true);
   }, [setShowExitConfirm]);
 
   const confirmExitRoom = useCallback(() => {
     intentionalExitRef.current = true;
+
+    // Signal the navigation guard we're leaving (batched with setGameStarted(false)
+    // → one commit where the guard's render-time leavingRef is true at teardown, so
+    // it skips the go(-1) that races the reload and blanks the native WebView).
+    setLeaving(true);
 
     // Disable navigation guard BEFORE navigation to prevent native browser prompt
     setGameStarted(false);
@@ -460,6 +471,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     handleCancelTournamentDialog,
     handleHostWordSubmit,
     regenerateBoard,
+    leaving,
   };
 }
 

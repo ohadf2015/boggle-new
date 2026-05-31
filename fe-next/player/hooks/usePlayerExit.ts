@@ -25,6 +25,10 @@ export function usePlayerExit({
   intentionalExitRef,
 }: UsePlayerExitParams) {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  // True the instant the player confirms exit. Passed to useNavigationGuard so
+  // its teardown skips the phantom history.go(-1) — that pop would race the
+  // window.location.reload below and blank the native WebView to BLACK.
+  const [leaving, setLeaving] = useState(false);
 
   const handleExitRoom = useCallback((e?: React.MouseEvent) => {
     if (e) {
@@ -38,6 +42,11 @@ export function usePlayerExit({
     logger.log('[PLAYER] Exit confirmed, closing connection');
     // Use Object.defineProperty to bypass readonly RefObject
     Object.defineProperty(intentionalExitRef, 'current', { value: true, writable: true });
+
+    // Signal the navigation guard we're leaving (batched with setGameActive(false)
+    // below → one commit where the guard's render-time leavingRef is already true
+    // when its teardown runs, so it skips the go(-1) that blanks the WebView).
+    setLeaving(true);
 
     // Disable navigation guard BEFORE navigation
     setGameActive(false);
@@ -107,5 +116,5 @@ export function usePlayerExit({
     };
   }, [gameCode, username]);
 
-  return { showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom };
+  return { showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom, leaving };
 }

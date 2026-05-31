@@ -229,7 +229,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [showQR, setShowQR] = useState<boolean>(false);
 
   // Exit handlers (confirmation, room leave, custom event listener)
-  const { showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom } = usePlayerExit({
+  const { showExitConfirm, setShowExitConfirm, handleExitRoom, confirmExitRoom, leaving } = usePlayerExit({
     socket,
     gameCode,
     username,
@@ -242,6 +242,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Navigation guard - prevent accidental navigation during active game
   useNavigationGuard({
     enabled: gameActive,
+    leaving,
     message: t('playerView.exitWarning'),
     onNavigationAttempt: () => {
       // Show the exit confirmation dialog
