@@ -41,9 +41,17 @@ run_isolated_gate() {
   # Apply ONLY the lane-authored files onto the clean checkout. A path present in
   # the main working tree is copied; a path the lane DELETED (absent now) is
   # removed in the worktree so the gate sees the deletion too.
-  local p
+  local p _skipped_ignored=0
   while IFS= read -r p; do
     [ -z "$p" ] && continue
+    # Never gate a gitignored path. A lane's verify-build can emit build
+    # artifacts (e.g. fe-next/.next-verify/**) that slip into the authored list;
+    # copying thousands of 500KB+ chunks into the worktree wedged eslint for 75
+    # min on 2026-05-31. These are never shippable (git add skips them), so they
+    # must never enter the gate either. Defense independent of .gitignore edits.
+    if git -C "$PROJECT_DIR" check-ignore -q "$p" 2>/dev/null; then
+      _skipped_ignored=$(( _skipped_ignored + 1 )); continue
+    fi
     if [ -e "$PROJECT_DIR/$p" ]; then
       mkdir -p "$wt/$(dirname "$p")" 2>/dev/null || true
       cp -p "$PROJECT_DIR/$p" "$wt/$p" 2>>"$RUN_LOG" || true
@@ -65,6 +73,7 @@ run_isolated_gate() {
     [ -f "$PROJECT_DIR/$envf" ] && { mkdir -p "$wt/$(dirname "$envf")"; cp -p "$PROJECT_DIR/$envf" "$wt/$envf" 2>/dev/null || true; }
   done
 
+  [ "$_skipped_ignored" -gt 0 ] && log "isolated-gate: skipped $_skipped_ignored gitignored path(s) (build artifacts — never gated/shipped)"
   log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)"
   # Capture the gate's combined output to a file the caller can parse (the
   # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
@@ -80,11 +89,20 @@ run_isolated_gate() {
     # worktree has no dist/ yet, so 12 handler-test suites fail with "Cannot find
     # module" — that's what reverted every CODE lane on 2026-05-26. Cheap (~3s
     # tsc), then build:fast for the final next build (skip dicts/routes regen).
-    ( cd "$wt/fe-next" \
+    #
+    # TIMEOUT: lanes get a gtimeout ceiling; the gate must too. A hung lint/test/
+    # build (the .next-verify eslint wedge on 2026-05-31 ran 75min) otherwise
+    # stalls the whole run with no upper bound. Default 30min, env-overridable.
+    local _gto=()
+    if command -v gtimeout >/dev/null 2>&1; then _gto=(gtimeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s")
+    elif command -v timeout >/dev/null 2>&1; then _gto=(timeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s"); fi
+    "${_gto[@]}" bash -c 'cd "$1/fe-next" \
         && npm run lint \
         && npm run build:schemas \
         && npm run test \
-        && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; } ) > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=1
+        && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; }' _ "$wt" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
+    [ "${rc:-0}" = "124" ] && log "isolated-gate: TIMED OUT after ${NIGHTLY_GATE_TIMEOUT:-1800}s — killed (treated as gate fail)"
+    [ "${rc:-0}" != "0" ] && rc=1
   fi
   cat "$NIGHTLY_LAST_GATE_OUTPUT" >> "$RUN_LOG" 2>/dev/null || true
 

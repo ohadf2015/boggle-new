@@ -79,6 +79,24 @@ run_isolated_gate "$AUTH"; rc=$?
 assert "gate sees the authored deletion (file absent in worktree)" "[ $rc -eq 0 ]"
 unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
 
+echo "── gate-isolated: gitignored build artifacts are skipped (never gated) ──"
+setup
+# A lane's verify-build emitted .next-verify artifacts that slipped into the
+# authored list. They're gitignored → must never be copied into the gate
+# worktree (copying thousands of 500KB chunks wedged eslint 75min on 2026-05-31).
+( cd "$PROJECT_DIR"
+  printf '/fe-next/.next-verify/\n' >> .gitignore
+  git add .gitignore && git commit -qm "ignore .next-verify" )
+mkdir -p "$PROJECT_DIR/fe-next/.next-verify/chunks"
+printf 'JUNK BUILD ARTIFACT\n'             > "$PROJECT_DIR/fe-next/.next-verify/chunks/big.js"
+printf 'export const v = "LANE_REAL";\n'   > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); printf 'fe-next/.next-verify/chunks/big.js\nfe-next/app/lane.ts\n' > "$AUTH"
+# Worktree must contain the REAL authored file but NOT the gitignored artifact.
+export NIGHTLY_GATE_CMD='grep -q LANE_REAL app/lane.ts && ! test -e .next-verify/chunks/big.js'
+run_isolated_gate "$AUTH"; rc=$?
+assert "gate PASSES: gitignored artifact skipped, real file applied" "[ $rc -eq 0 ]"
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+
 echo "── gate-isolated: empty authored list is a no-op pass ──"
 setup
 EMPTY=$(mktemp); : > "$EMPTY"
