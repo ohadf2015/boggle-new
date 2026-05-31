@@ -44,6 +44,11 @@ vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({ unlockAudio: vi.fn() }),
 }));
 
+// AutoHideHeader pulls in NavigationProvider; irrelevant to this test.
+vi.mock('@/components/AutoHideHeader', () => ({
+  default: () => null,
+}));
+
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({
     showAd: vi.fn(),
