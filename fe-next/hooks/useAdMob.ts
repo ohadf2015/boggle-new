@@ -297,6 +297,16 @@ export function useAdMob() {
         const msg = String((err as { message: unknown }).message);
         if (!/no banner|never shown|not shown|not.*display/i.test(msg)) console.warn('[AdMob] hideBanner failed', err);
       }
+    } finally {
+      // The native banner is an overlay SurfaceView composited over the WebView.
+      // Tearing it down (e.g. exiting the results page → ResultsBannerSlot
+      // unmounts) can leave the WebView's GPU surface unrepainted = a white band
+      // / blank frame on the destination (lobby). This is the "stop game → exit
+      // results → white screen" path (no interstitial fires on stop). Force a
+      // repaint after every hide attempt so the WebView redraws the revealed
+      // region — cheap one-frame layer toggle, harmless on the benign no-banner
+      // path, and we always want a redraw during teardown.
+      kickWebViewRepaint();
     }
   }, [getConfig, whenReady]);
 
