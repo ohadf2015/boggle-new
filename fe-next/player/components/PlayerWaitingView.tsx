@@ -331,8 +331,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   }, [gameMode]);
 
   const renderModeTips = (): React.ReactElement | null => {
-    if (!gameMode || !GAME_INSTRUCTIONS[gameMode]) return null;
-    const { icon, barClass, iconBgClass, dotClass, steps } = GAME_INSTRUCTIONS[gameMode];
+    // Always show How-to-Play tips to non-host players in the lobby. The host
+    // may not have locked in a mode yet (gameMode null/'random'), so fall back
+    // to the classic instructions rather than hiding the panel entirely.
+    const tips = (gameMode && GAME_INSTRUCTIONS[gameMode]) || GAME_INSTRUCTIONS.classic;
+    const { icon, barClass, iconBgClass, dotClass, steps } = tips;
     const step = steps[instructionStep] ?? steps[0];
 
     return (

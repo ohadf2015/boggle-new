@@ -405,6 +405,11 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             // when `onChange` doesn't fire mid-composition. Mirror DOM → state.
             onInput={(e: React.FormEvent<HTMLInputElement>) => setInputMessage(e.currentTarget.value)}
             onKeyDown={handleKeyDown}
+            // Backstop: sync React state from the DOM on keyup. Android GBoard
+            // with Hebrew/RTL can buffer IME composition so onChange/onInput
+            // don't fire, leaving `inputMessage` empty and the Send button
+            // stuck looking disabled. keyup carries the committed DOM value.
+            onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => setInputMessage(e.currentTarget.value)}
             onFocus={handleInputFocus}
             onCompositionUpdate={(e: React.CompositionEvent<HTMLInputElement>) => {
               setInputMessage(e.currentTarget.value);

@@ -52,6 +52,22 @@ describe('wheelRushManager', () => {
       expect(a).not.toEqual(b);
     });
 
+    it('is deterministic for the same round salt', () => {
+      const a = generateWheelPuzzle('GAME1', 'en', 3);
+      const b = generateWheelPuzzle('GAME1', 'en', 3);
+      expect(a).toEqual(b);
+    });
+
+    it('produces fresh letters across rounds (different salt)', () => {
+      // Same gameCode, successive rounds (gameSessionId) must not repeat the
+      // same wheel — players reported "same letters every round".
+      const puzzles = [0, 1, 2, 3, 4].map(r => generateWheelPuzzle('GAME1', 'en', r));
+      const signatures = new Set(puzzles.map(p => p.allLetters.join('')));
+      // At least most rounds differ — a deterministic seed must not collapse
+      // every round to one puzzle.
+      expect(signatures.size).toBeGreaterThan(1);
+    });
+
     // Sofit parity with SP wordWheelGeneration: Hebrew wheel never carries final forms.
     // 4 of 6 he sources end in ם (sofit mem); without normalization the wheel renders ם/ן/ך/ף/ץ.
     it('Hebrew puzzle never contains sofit final forms', () => {

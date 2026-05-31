@@ -43,8 +43,6 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import type { WordHuntResultsSummaryProps } from '@/components/results/WordHuntResultsSummary';
 const StickyReadyBar = dynamic(() => import('@/components/results/StickyReadyBar'), { ssr: false });
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
-import { MascotCelebrationVideo, type MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
-import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -92,7 +90,6 @@ interface DesktopResultsLayoutProps {
   currentPlayerRank: number;
   sortedScores: any[];
   marginToNext: number | null;
-  celebrationKind: MascotCelebrationKind | null;
 }
 
 function DesktopResultsLayout({
@@ -116,7 +113,6 @@ function DesktopResultsLayout({
   currentPlayerRank,
   sortedScores,
   marginToNext,
-  celebrationKind,
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -177,18 +173,6 @@ function DesktopResultsLayout({
             as the player scrolls further into the page. */}
         <ResultsHeroTilt scrollRef={scrollRef} className="w-full max-w-5xl mx-auto relative z-10">
           <ResultsSectionReveal index={1} flat>
-{/* Position-relevant celebration, inline (not a popup) */}
-            {celebrationKind && (
-              <div className="flex justify-center mb-1">
-                <MascotCelebrationVideo
-                  kind={celebrationKind}
-                  title={null}
-                  overlay={false}
-                  autoDismissMs={0}
-                  size="clamp(150px, 34vmin, 240px)"
-                />
-              </div>
-            )}
             <ResultsMainContent
               {...mainContentProps}
               hideInlineCta={!!gameCode && !isBotsOnlyGame}
@@ -441,24 +425,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     currentPlayerRank > 1 && currentPlayerData
       ? sortedScores[currentPlayerRank - 2].score - currentPlayerData.score
       : null;
-
-  // AI mascot celebration overlay — picks the variant based on placement +
-  // whether the viewer landed a 7+-letter "bingo" word. Shows briefly before
-  // the scoreboard reads.
-  const hadBingo = useMemo(
-    () => (currentPlayerValidWords ?? []).some((w: { word?: string }) => (w.word?.length ?? 0) >= 7),
-    [currentPlayerValidWords],
-  );
-  const celebrationKind = useMemo(
-    () => sortedScores.length === 0
-      ? null
-      : pickCelebrationKind({
-          rank: currentPlayerRank,
-          totalPlayers: sortedScores.length,
-          hadBingo,
-        }),
-    [sortedScores.length, currentPlayerRank, hadBingo],
-  );
 
   // Build blast result scores map from sortedScores
   const blastResultScores = useMemo(() => {
@@ -958,18 +924,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <BlastMpResults results={blastMpResults} gameMode="blast" />
         </div>
       )}
-{/* Position-relevant celebration, inline (not a popup) */}
-      {celebrationKind && (
-        <div className="flex justify-center mb-1">
-          <MascotCelebrationVideo
-            kind={celebrationKind}
-            title={null}
-            overlay={false}
-            autoDismissMs={0}
-            size="clamp(150px, 34vmin, 240px)"
-          />
-        </div>
-      )}
       <ResultsMainContent
         {...mainContentProps}
         hideInlineCta={!isBotsOnlyGame}
@@ -1265,7 +1219,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         currentPlayerRank={currentPlayerRank}
         sortedScores={sortedScores}
         marginToNext={marginToNext}
-        celebrationKind={celebrationKind}
       />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens.

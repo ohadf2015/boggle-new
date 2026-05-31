@@ -105,7 +105,6 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     tournamentData,
     setTableData,
     setRemainingTime,
-    setShowStartAnimation,
     setPlayerWordCounts,
     setPlayerScores,
     setHostFoundWords,
@@ -191,7 +190,12 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       ? WHEEL_RUSH_DURATION_SEC
       : timerValue * 60;
     setRemainingTime(seconds);
-    setShowStartAnimation(true);
+    // NOTE: Do NOT trigger the start animation optimistically here. The host's
+    // 3-2-1-GO countdown is driven by the server `startGame` broadcast (see
+    // useHostGameEvents.handleStartGame) — the exact same trigger players use.
+    // Starting it on click put the host a full network round-trip ahead of the
+    // players, so the game appeared to start at different times. Letting the
+    // broadcast drive both keeps host and players in sync.
     setPlayerWordCounts({});
     setPlayerScores({});
     setHostFoundWords([]);
@@ -247,7 +251,6 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     tournamentRounds,
     setTableData,
     setRemainingTime,
-    setShowStartAnimation,
     setPlayerWordCounts,
     setPlayerScores,
     setHostFoundWords,
@@ -362,7 +365,9 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           ? WHEEL_RUSH_DURATION_SEC
           : timerValue * 60;
         setRemainingTime(seconds);
-        setShowStartAnimation(true);
+        // Animation is driven by the server `startGame` broadcast (same as
+        // players) — see the sync note in executeStartGame. Don't start it
+        // optimistically or the host runs ahead of the players.
         setPlayerWordCounts({});
         setPlayerScores({});
         setHostFoundWords([]);
@@ -395,7 +400,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   }, [
     socket, t, setFinalScores, setGameType, difficulty, timerValue, roomLanguage,
     wordsForBoard, hostPlaying, minWordLength, boardTheme, gameMode, hostSelectedGameMode, gameCode,
-    setTableData, setRemainingTime, setShowStartAnimation,
+    setTableData, setRemainingTime,
     setPlayerWordCounts, setPlayerScores, setHostFoundWords, setHostAchievements
   ]);
 

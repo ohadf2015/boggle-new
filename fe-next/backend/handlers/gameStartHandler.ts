@@ -523,9 +523,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // NOTE: Do NOT broadcast wheelRushInit here — client hasn't mounted WheelRushView yet
     // (it only mounts after receiving startGame). Broadcast happens after startGame below.
     if (resolvedMode === 'wheel-rush') {
-      const puzzle = generateWheelPuzzle(gameCode, gameLang);
-      const wheelState = initWheelRushState(puzzle, playerUsernames);
       const currentGame = getGame(gameCode);
+      // Salt the puzzle with gameSessionId (increments each round) so a rematch
+      // in the same room produces a fresh wheel instead of the same letters.
+      const puzzle = generateWheelPuzzle(gameCode, gameLang, currentGame?.gameSessionId ?? '');
+      const wheelState = initWheelRushState(puzzle, playerUsernames);
       if (currentGame) {
         currentGame.wheelRushState = wheelState;
       }
