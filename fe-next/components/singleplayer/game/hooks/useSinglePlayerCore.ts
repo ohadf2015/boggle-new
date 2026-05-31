@@ -94,6 +94,11 @@ export function useSinglePlayerCore({
 
   // UI state
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+  // True once the player confirms a quit and we start navigating away (onQuit →
+  // router push). Disarms the nav guard AND tells its teardown not to pop the
+  // phantom history entry — a go(-1) racing the in-flight nav blanks the
+  // Capacitor WebView (black screen on exit). See useNavigationGuard `leaving`.
+  const [quitting, setQuitting] = useState(false);
   const [showHintPrompt, setShowHintPrompt] = useState(false);
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
@@ -193,7 +198,8 @@ export function useSinglePlayerCore({
   });
 
   useNavigationGuard({
-    enabled: !!grid && !isGameOver && score > 0,
+    enabled: !!grid && !isGameOver && score > 0 && !quitting,
+    leaving: quitting,
     message: t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?',
     onNavigationAttempt: () => { setShowQuitConfirm(true); return false; },
   });
@@ -465,6 +471,10 @@ export function useSinglePlayerCore({
     if (settings.mode === 'practice') { setIsGameOver(true); return; }
     score > 0 ? setShowQuitConfirm(true) : onQuit();
   }, [score, onQuit, settings.mode]);
+  // Confirm path: disarm the guard (leaving) BEFORE the exit nav so its teardown
+  // doesn't race-cancel the router push (black screen on native). The score===0
+  // path above skips this — the guard is already disabled (enabled needs score>0).
+  const confirmQuit = useCallback(() => { setQuitting(true); onQuit(); }, [onQuit]);
   const handlePauseToggle = useCallback(() => { setIsPaused(prev => !prev); }, []);
   const handleCoinAnimationComplete = useCallback(() => { setComboCoinReward(null); }, []);
   const handleToggleProgressBar = useCallback(() => { setProgressBarExpanded(prev => !prev); }, []);
@@ -527,7 +537,7 @@ export function useSinglePlayerCore({
     totalBoardWords, targetHighScore, liveAchievements,
     lastWordFoundTimeRef: effects.lastWordFoundTimeRef, gameStatsRef,
     handleWordSubmit, handlePathSubmit, handleWordChange,
-    handlePauseToggle, handleFinishPractice, handleQuitRequest, onQuit, t,
+    handlePauseToggle, handleFinishPractice, handleQuitRequest, onQuit, confirmQuit, t,
     wordPace,
   };
 }

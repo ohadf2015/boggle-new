@@ -241,7 +241,7 @@ function SinglePlayerGame({
       onPauseToggle: core.handlePauseToggle,
       onFinishPractice: core.handleFinishPractice,
       onQuitRequest: core.handleQuitRequest,
-      onConfirmQuit: core.onQuit,
+      onConfirmQuit: core.confirmQuit,
       showQuitConfirm: core.showQuitConfirm,
       setShowQuitConfirm: core.setShowQuitConfirm,
       onExtendTime: (seconds: number) =>
@@ -287,7 +287,7 @@ function SinglePlayerGame({
     core.handlePauseToggle,
     core.handleFinishPractice,
     core.handleQuitRequest,
-    core.onQuit,
+    core.confirmQuit,
     core.showQuitConfirm,
     core.setShowQuitConfirm,
     core.timer,

@@ -163,6 +163,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Navigation guard
   useNavigationGuard({
     enabled: !state.isGameOver && !quitting,
+    // `leaving` tells the guard's teardown NOT to pop its phantom history entry:
+    // confirming quit fires router.push('/daily') in the same handler, and a
+    // go(-1) cleanup would race-cancel that push — black screen on native exit.
+    leaving: quitting,
     message: t('wordHunt.quitConfirmMessage'),
     onNavigationAttempt: () => {
       actions.setShowQuitConfirm(true);
