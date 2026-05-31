@@ -130,6 +130,24 @@ describe('Side-menu vertical scroll', () => {
     );
   });
 
+  it('caps the drawer to the viewport height so a transformed <html> ancestor cannot make it unscrollable', async () => {
+    // Root cause of "can't scroll the side menu": the drawer is `position: fixed
+    // top-0 bottom-0`, so it sizes to its containing block. A native WebView
+    // repaint hack briefly sets `transform: translateZ(0)` on <html>; if that
+    // transform lingers (rAF dropped under native ad compositing), <html> becomes
+    // the containing block and the drawer sizes to the DOCUMENT height instead of
+    // the viewport. Its overflow-y-auto body then fits all content without
+    // overflowing — so it can't scroll, while the menu still looks full.
+    // An explicit viewport-relative max-height keeps the drawer bounded to the
+    // visible viewport regardless of which element is its containing block.
+    const user = userEvent.setup();
+    render(<Header />);
+    await user.click(screen.getByRole('button', { name: /common.openMenu/i }));
+
+    const drawer = await screen.findByTestId('mobile-menu-drawer');
+    expect(drawer.className).toContain('max-h-[100dvh]');
+  });
+
   it('does NOT close on a vertical scroll gesture (the regression)', async () => {
     const user = userEvent.setup();
     render(<Header />);

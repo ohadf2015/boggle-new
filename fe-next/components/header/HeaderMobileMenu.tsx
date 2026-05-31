@@ -404,6 +404,17 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 data-testid="mobile-menu-drawer"
                                 className={cn(
                                     "fixed top-0 bottom-0 w-[320px] sm:w-[360px] max-w-[88vw] z-80",
+                                    // Viewport-relative height cap. The drawer is `fixed top-0
+                                    // bottom-0`, so it sizes to its containing block — normally the
+                                    // viewport. But the native WebView repaint hack briefly sets
+                                    // `transform: translateZ(0)` on <html>; if that transform lingers
+                                    // (rAF starved under native-ad compositing), <html> becomes the
+                                    // containing block and the drawer grows to the DOCUMENT height.
+                                    // Its overflow-y-auto body then fits all content without
+                                    // overflowing, so the menu can't scroll while still looking full.
+                                    // `max-h-[100dvh]` keeps it bounded to the visible viewport
+                                    // regardless of which ancestor is the containing block.
+                                    "max-h-[100dvh]",
                                     "bg-neo-navy border-neo-black",
                                     // Non-scrolling shell. Vertical scrolling lives on the inner
                                     // body below; swipe-to-close is handled by the passive touch
