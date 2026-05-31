@@ -15,6 +15,11 @@ import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
+// Shared how-to-play source — host renders the same component, so players and
+// host see IDENTICAL instructions (all modes incl. wheel-rush, localized images,
+// a11y). Previously the player inlined a degraded 3-mode/no-image copy.
+import { GameInstructions } from '../../host/components/pre-game/GameInstructions';
+import type { GameModeOption } from '@/components/GameModeSelector';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
@@ -287,127 +292,20 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   );
 
   // ==================== Interactive Game Instructions ====================
-  const [instructionStep, setInstructionStep] = useState(0);
-
-  const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: string; iconBgClass: string; dotClass: string; steps: { titleKey: string; descKey: string }[] }> = {
-    classic: {
-      icon: <Grid3X3 className="w-5 h-5" />,
-      barClass: 'bg-neo-cyan',
-      iconBgClass: 'bg-neo-cyan',
-      dotClass: 'bg-neo-cyan',
-      steps: [
-        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
-        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
-        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
-      ],
-    },
-    blast: {
-      icon: <Zap className="w-5 h-5" />,
-      barClass: 'bg-neo-pink',
-      iconBgClass: 'bg-neo-pink',
-      dotClass: 'bg-neo-pink',
-      steps: [
-        { titleKey: 'gameModes.blast.name', descKey: 'gameModes.blast.description' },
-        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
-        { titleKey: 'howToPlay.comboBonus', descKey: 'help.comboExplanation' },
-      ],
-    },
-    'word-hunt': {
-      icon: <Crosshair className="w-5 h-5" />,
-      barClass: 'bg-neo-lime',
-      iconBgClass: 'bg-neo-lime',
-      dotClass: 'bg-neo-lime',
-      steps: [
-        { titleKey: 'gameModes.wordHunt.name', descKey: 'gameModes.wordHunt.description' },
-        { titleKey: 'howToPlay.steps.basics.title', descKey: 'help.swipeLetters' },
-        { titleKey: 'howToPlay.steps.grid.title', descKey: 'help.diagonalWorks' },
-      ],
-    },
-  };
-
-  // Reset step when mode changes
-  useEffect(() => {
-    setInstructionStep(0);
-  }, [gameMode]);
-
+  // Render the SHARED GameInstructions component (same one the host uses) so the
+  // host and every player see IDENTICAL how-to-play content for every mode —
+  // including wheel-rush + localized step images that the old inline copy lacked.
   const renderModeTips = (): React.ReactElement | null => {
-    // Always show How-to-Play tips to non-host players in the lobby. The host
-    // may not have locked in a mode yet (gameMode null/'random'), so fall back
-    // to the classic instructions rather than hiding the panel entirely.
-    const tips = (gameMode && GAME_INSTRUCTIONS[gameMode]) || GAME_INSTRUCTIONS.classic;
-    const { icon, barClass, iconBgClass, dotClass, steps } = tips;
-    const step = steps[instructionStep] ?? steps[0];
-
+    // Always show How-to-Play to non-host players in the lobby. The host may not
+    // have locked in a mode yet (null/'random'), so fall back to classic rather
+    // than hiding the panel entirely.
+    const mode = (gameMode || 'classic') as GameModeOption;
     return (
-      <m.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
-        className="rounded-neo-lg border-3 border-neo-black bg-slate-800/60 shadow-hard overflow-hidden"
-      >
-        <div className={cn('h-1', barClass)} />
-        <div className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className={cn('w-8 h-8 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black', iconBgClass)}>
-              {icon}
-            </div>
-            <h3 className="text-sm font-black uppercase text-neo-cream flex items-center gap-1.5">
-              <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
-              {t('help.howToPlay')}
-            </h3>
-          </div>
-
-          {/* Interactive step content */}
-          <AnimatePresence mode="wait">
-            <m.div
-              key={instructionStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="min-h-[48px] flex items-start gap-2 text-sm text-slate-300"
-            >
-              <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
-              <div>
-                <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
-                <p>{t(step.descKey)}</p>
-              </div>
-            </m.div>
-          </AnimatePresence>
-
-          {/* Step navigation */}
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <button
-              onClick={() => setInstructionStep(s => Math.max(0, s - 1))}
-              disabled={instructionStep === 0}
-              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
-              aria-label={t('common.previous')}
-            >
-              <ChevronLeft className="w-4 h-4 text-neo-cream" />
-            </button>
-            <div className="flex gap-1.5">
-              {steps.map((step, i) => (
-                <button
-                  key={step.titleKey}
-                  onClick={() => setInstructionStep(i)}
-                  className={cn(
-                    'w-2 h-2 rounded-full transition-colors',
-                    i === instructionStep ? dotClass : 'bg-neo-white/20'
-                  )}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => setInstructionStep(s => Math.min(steps.length - 1, s + 1))}
-              disabled={instructionStep === steps.length - 1}
-              className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
-              aria-label={t('common.next')}
-            >
-              <ChevronRight className="w-4 h-4 text-neo-cream" />
-            </button>
-          </div>
-        </div>
-      </m.div>
+      <GameInstructions
+        selectedGameMode={mode}
+        t={t}
+        lang={gameLanguage ?? 'en'}
+      />
     );
   };
 
