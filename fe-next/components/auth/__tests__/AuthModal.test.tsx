@@ -106,11 +106,20 @@ vi.mock('../../../utils/guestManager', () => ({
 // Mock framer-motion to render immediately
 vi.mock('framer-motion', async () => {
   const React = await vi.importActual<typeof import('react')>('react');
-  const MotionDiv = React.forwardRef(function MotionDiv({ children, ...props }: any, ref: any) {
-    return React.createElement('div', { ref, ...props }, children);
-  });
+  const motionEl = (tag: string) =>
+    // Strip motion-only props so they don't leak onto the DOM node as attributes.
+    React.forwardRef(function MotionEl(
+      { children, initial, animate, exit, transition, ...props }: any,
+      ref: any,
+    ) {
+      return React.createElement(tag, { ref, ...props }, children);
+    });
   function AnimatePresence({ children }: any) { return children; }
-  return { m: { div: MotionDiv }, AnimatePresence };
+  return {
+    m: { div: motionEl('div'), p: motionEl('p'), span: motionEl('span') },
+    AnimatePresence,
+    useAnimationControls: () => ({ start: () => Promise.resolve() }),
+  };
 });
 
 // Mock next/link

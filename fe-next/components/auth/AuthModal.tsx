@@ -18,6 +18,14 @@ import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useErrorShake } from '@/hooks/useErrorShake';
+
+/** Quick fade+slide entrance for a validation error appearing under a field. */
+const ERROR_ENTER = {
+  initial: { opacity: 0, y: -4 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.15 },
+} as const;
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -60,6 +68,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Modal-level `error` is only set on a failed submit (server rejection / invalid
+  // credentials), never per-keystroke — so shaking on it is the canonical
+  // "login rejected" feedback without firing while the user types.
+  const errorShake = useErrorShake(error);
   const [success, setSuccess] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
@@ -518,7 +530,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                               spellCheck={false}
                             />
                             {emailError && (
-                              <p id="otp-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
+                              <m.p id="otp-email-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{emailError}</m.p>
                             )}
                           </div>
                           <Button
@@ -624,7 +636,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           spellCheck={false}
                         />
                         {emailError && (
-                          <p id="magic-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
+                          <m.p id="magic-email-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{emailError}</m.p>
                         )}
                       </div>
 
@@ -682,7 +694,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           spellCheck={false}
                         />
                         {emailError && (
-                          <p id="pwd-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
+                          <m.p id="pwd-email-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{emailError}</m.p>
                         )}
                       </div>
 
@@ -715,7 +727,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           </button>
                         </div>
                         {passwordError && (
-                          <p id="pwd-password-error" role="alert" className="mt-1 text-xs text-red-400">{passwordError}</p>
+                          <m.p id="pwd-password-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{passwordError}</m.p>
                         )}
                       </div>
 
@@ -764,10 +776,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
-                    className="mt-4 p-3 rounded-neo border-2 border-red-500/50 bg-red-500/10 text-sm text-red-300 flex items-center gap-2"
+                    className="mt-4 p-3 rounded-neo border-2 border-red-500/50 bg-red-500/10 text-sm text-red-300"
                     role="alert"
                   >
-                    <AlertCircle className="w-4 h-4 shrink-0" />{error}
+                    <m.span className="flex items-center gap-2" animate={errorShake}>
+                      <AlertCircle className="w-4 h-4 shrink-0" />{error}
+                    </m.span>
                   </m.div>
                 )}
               </AnimatePresence>
