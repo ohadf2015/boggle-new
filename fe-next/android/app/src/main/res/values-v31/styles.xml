@@ -8,9 +8,10 @@
   cold start — that was the original "navy bg with a circle of the stale wordmark"
   that flashed when the evicted process is re-opened.
 
-  We now show an INTENTIONAL brand splash: @drawable/splash_icon is the current LEXI
-  tile mark, pre-padded to ~60% so it sits inside the circle safe-zone and never gets
-  clipped. windowSplashScreenIconBackgroundColor + background are both neo-navy
+  We now show an INTENTIONAL brand splash: @drawable/splash_icon is the colorful
+  LEXI CLASH brand art (same master as the launcher icon, resources/icon-only.png),
+  recolored to a navy bg and pre-padded to ~62% so it sits inside the circle safe-zone
+  and never gets clipped. windowSplashScreenIconBackgroundColor + background are both neo-navy
   (#1a1a2e) — matching the launch + post-splash window backgrounds — so the mark reads
   as a clean brand badge on seamless navy, and the navy→app handoff stays invisible.
   This is the splash users expect, NOT the broken clipped flash.

@@ -41,8 +41,9 @@
 
       Now we restore an INTENTIONAL brand splash that does NOT reintroduce the flash,
       because @drawable/splash_icon is purpose-built for this slot:
-        • it is the CURRENT LEXI tile mark (not the stale wordmark), and
-        • the mark is scaled to ~60% and centered with transparent padding, so it sits
+        • it is the colorful LEXI CLASH brand art (same master as the launcher icon,
+          resources/icon-only.png, recolored to a navy bg), and
+        • the art is scaled to ~62% and centered with transparent padding, so it sits
           well inside the Android 12 circle safe-zone (central ~2/3) and is never clipped.
       The window background stays seamless navy (#1a1a2e), matching the post-splash
       theme + runtime setBackgroundDrawable, so the only thing that appears/fades is the
