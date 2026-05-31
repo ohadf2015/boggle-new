@@ -387,17 +387,33 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 dragConstraints={{ left: isRtl ? -200 : 0, right: isRtl ? 0 : 200 }}
                                 dragElastic={0.15}
                                 onDragEnd={handleDragEnd}
+                                data-testid="mobile-menu-drawer"
                                 className={cn(
                                     "fixed top-0 bottom-0 w-[320px] sm:w-[360px] max-w-[88vw] z-80",
                                     "bg-neo-navy border-neo-black",
-                                    "shadow-hard-xl overflow-y-auto overflow-x-hidden",
-                                    "pb-[max(env(safe-area-inset-bottom),1rem)]",
+                                    // The drag layer must NOT scroll: a framer-motion drag gesture
+                                    // sitting on the scroll container arbitrates touch and swallows
+                                    // vertical scrolling, making the menu feel unscrollable. We keep
+                                    // swipe-to-close here and delegate scrolling to the inner body
+                                    // below (same separation MobileGameDrawer uses).
+                                    "shadow-hard-xl overflow-hidden flex flex-col",
                                     isRtl
                                         ? "left-0 border-r-4 rounded-r-neo-lg"
                                         : "right-0 border-l-4 rounded-l-neo-lg"
                                 )}
                                 style={{ touchAction: 'pan-y' }}
                             >
+                              {/* ── Scrollable body — owns vertical scroll, decoupled from the
+                                  swipe-to-close drag layer so native touch scroll works. ── */}
+                              <div
+                                data-testid="mobile-menu-scroll"
+                                className={cn(
+                                    "relative flex-1 min-h-0",
+                                    "overflow-y-auto overflow-x-hidden overscroll-contain",
+                                    "pb-[max(env(safe-area-inset-bottom),1rem)]"
+                                )}
+                                style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+                              >
                                 {/* ── Close button (top corner) ── */}
                                 <div
                                     className={cn(
@@ -963,6 +979,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         </span>
                                     </m.div>
                                 </m.div>
+                              </div>
                             </m.div>
                         </>
                     )}
