@@ -12,6 +12,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { ArrowLeft, Bot, RotateCcw, Send, User, Trophy, Skull } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -59,12 +60,11 @@ async function dictCheckJa(word: string): Promise<boolean> {
   }
 }
 
-export default function ShiritoriSoloPage({ params }: { params: Promise<{ locale: string }> }) {
+export default function ShiritoriSoloPage() {
   const { t } = useLanguage();
   const { isAdmin } = useAuth();
   const { playSound } = useSoundEffects();
-  const [locale, setLocale] = useState<string>('en');
-  useEffect(() => { params.then(({ locale: l }) => setLocale(l)); }, [params]);
+  const { locale } = useParams<{ locale: string }>();
 
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [state, setState] = useState<SpState>(() => initialSpState(pickSeed('medium')));
