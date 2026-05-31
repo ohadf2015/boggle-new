@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
+import { kickWebViewRepaint } from '@/lib/native/webviewRepaint';
 
 // Module-level so every useAdMob() consumer observes the same banner state.
 // Prevents hideBanner calls when no banner was ever shown (Sentry #120).
@@ -93,6 +94,10 @@ export function useAdMob() {
           if (settled) return;
           settled = true;
           cleanup();
+          // The rewarded video is a fullscreen native Activity over the WebView.
+          // On teardown the WebView can fail to repaint its GPU surface (blank
+          // white frame). Force a repaint before handing control back to React.
+          kickWebViewRepaint();
           if (ok) onReward(); else onError?.(errMsg || 'Ad dismissed without reward');
           resolve();
         };
@@ -180,6 +185,11 @@ export function useAdMob() {
         if (timer) { clearTimeout(timer); timer = null; }
         handles.forEach((h) => { try { h.remove(); } catch {} });
         handles.length = 0;
+        // Interstitial is a fullscreen native Activity over the WebView. On
+        // dismiss the WebView can fail to repaint its GPU surface, leaving a
+        // blank white frame on top of the still-mounted results page (the
+        // "exit MP results → white screen in the app" report). Force a repaint.
+        kickWebViewRepaint();
         resolve();
       };
 
