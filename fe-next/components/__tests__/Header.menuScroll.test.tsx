@@ -15,7 +15,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Header from '../Header';
@@ -95,10 +95,51 @@ describe('Side-menu vertical scroll', () => {
     expect(scroller.className).toContain('overflow-y-auto');
     expect(scroller).toHaveStyle({ touchAction: 'pan-y' });
 
-    // The swipe-to-close drag layer must NOT be the scroll container —
-    // a framer drag gesture on the scroller swallows vertical touch scroll.
+    // The scroll body must NOT be the swipe-to-close target.
     const drawer = screen.getByTestId('mobile-menu-drawer');
     expect(drawer.className).not.toContain('overflow-y-auto');
     expect(drawer).not.toBe(scroller);
+  });
+
+  it('does not attach a framer-motion drag gesture to the drawer', async () => {
+    // A framer `drag` gesture engages on the horizontal component of any
+    // diagonal scroll and elastically translates the drawer — the menu
+    // "shakes" / springs back instead of scrolling. Swipe-to-close must be
+    // implemented WITHOUT framer drag so native vertical scroll is untouched.
+    const user = userEvent.setup();
+    render(<Header />);
+    await user.click(screen.getByRole('button', { name: /common.openMenu/i }));
+
+    const drawer = await screen.findByTestId('mobile-menu-drawer');
+    expect(drawer).not.toHaveAttribute('drag');
+    expect(drawer).not.toHaveAttribute('dragelastic');
+  });
+
+  it('closes on a deliberate horizontal swipe toward the edge', async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+    await user.click(screen.getByRole('button', { name: /common.openMenu/i }));
+
+    const drawer = await screen.findByTestId('mobile-menu-drawer');
+    // LTR: swipe right (dx dominant, > threshold) closes the drawer.
+    fireEvent.touchStart(drawer, { touches: [{ clientX: 300, clientY: 200 }] });
+    fireEvent.touchEnd(drawer, { changedTouches: [{ clientX: 395, clientY: 206 }] });
+
+    await waitFor(() =>
+      expect(screen.queryByTestId('mobile-menu-scroll')).not.toBeInTheDocument()
+    );
+  });
+
+  it('does NOT close on a vertical scroll gesture (the regression)', async () => {
+    const user = userEvent.setup();
+    render(<Header />);
+    await user.click(screen.getByRole('button', { name: /common.openMenu/i }));
+
+    const drawer = await screen.findByTestId('mobile-menu-drawer');
+    // A downward scroll: small dx, large dy → must be treated as scroll, not close.
+    fireEvent.touchStart(drawer, { touches: [{ clientX: 300, clientY: 400 }] });
+    fireEvent.touchEnd(drawer, { changedTouches: [{ clientX: 306, clientY: 120 }] });
+
+    expect(screen.getByTestId('mobile-menu-scroll')).toBeInTheDocument();
   });
 });
