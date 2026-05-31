@@ -10,6 +10,7 @@ import { coalesce } from '../utils/requestCoalescing';
 import logger from '../utils/logger';
 import { generateDailyPuzzle } from '../../utils/dailyChallenge';
 import { generateDailyPuzzleAsync } from '../../utils/dailyChallenge/gridGeneration.server';
+import { isUsableDailyPuzzle } from '../../utils/dailyChallenge/puzzlePayload';
 import { COIN_COSTS } from '../../utils/coinManager';
 import type { Language } from '../../types';
 import wordHuntRouter from './dailyChallenge/wordHuntRoutes';

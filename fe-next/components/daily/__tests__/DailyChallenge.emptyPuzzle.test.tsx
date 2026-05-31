@@ -13,9 +13,23 @@
  * is always available before play begins.
  */
 
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+// Mock framer-motion so AnimatePresence renders children synchronously (no
+// mode="wait" exit-animation gating) and m.div is a plain div.
+vi.mock('framer-motion', () => ({
+  m: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial: _i, animate: _a, exit: _e, transition: _t, variants: _v, ...rest } = props as Record<string, unknown>;
+      return <div {...rest}>{children}</div>;
+    },
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
 import DailyChallenge from '../DailyChallenge';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -38,6 +52,24 @@ vi.mock('@/hooks/useRewardedAd', () => ({
   }),
 }));
 
+// DailyReadyScreen preloads music via useGameMusic (needs MusicProvider); the
+// game uses it too. Stub to a no-op so the tree renders without providers.
+vi.mock('@/hooks/useGameMusic', () => ({
+  useGameMusic: () => {},
+}));
+
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playErrorSound: vi.fn(),
+    setGameActive: vi.fn(),
+    playSound: vi.fn(),
+    isMuted: false,
+    toggleMute: vi.fn(),
+  }),
+}));
+
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
@@ -54,9 +86,18 @@ vi.mock('@/utils/dailyChallenge', async () => {
   };
 });
 
+// Ready screen stub — exposes only the Start button so we don't drag in its
+// music/sound provider tree. The bug under test lives in DailyChallenge's
+// puzzle-load + phase logic, not the ready screen.
+vi.mock('@/components/daily/DailyReadyScreen', () => ({
+  default: ({ onStart }: { onStart: () => void }) => (
+    <button onClick={onStart}>daily.start</button>
+  ),
+}));
+
 // Survival game stub — its presence proves a real grid+targetWord reached the
 // game, i.e. the screen is NOT blank.
-vi.mock('../DailyWordHuntSurvival', () => ({
+vi.mock('@/components/daily/DailyWordHuntSurvival', () => ({
   default: ({ grid, targetWord }: { grid: unknown[]; targetWord: string }) => (
     <div data-testid="survival-game" data-target={targetWord} data-rows={grid?.length ?? 0}>
       Game
@@ -64,7 +105,7 @@ vi.mock('../DailyWordHuntSurvival', () => ({
   ),
 }));
 
-vi.mock('../DailyWordHuntResults', () => ({
+vi.mock('@/components/daily/DailyWordHuntResults', () => ({
   default: () => <div data-testid="results-screen">Results</div>,
 }));
 
