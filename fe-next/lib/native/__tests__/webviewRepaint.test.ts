@@ -61,4 +61,36 @@ describe('kickWebViewRepaint', () => {
     kickWebViewRepaint({ doc, schedule });
     expect(schedule).toHaveBeenCalledTimes(1);
   });
+
+  it('does not leave a stuck transform when two kicks overlap before restore', () => {
+    // REGRESSION: exiting MP results can fire an interstitial-teardown kick and a
+    // hideBanner kick in the same frame. A 2nd kick must not capture the 1st kick's
+    // own `translateZ(0)` as the "previous" value — otherwise its restore re-applies
+    // translateZ(0), leaving <html> with a permanent transform. A transform on <html>
+    // reparents every `position: fixed` element (the bottom nav) → nav stops sticking.
+    const doc = makeFakeDoc();
+    const queue: Array<() => void> = [];
+    const schedule = (cb: () => void) => { queue.push(cb); };
+
+    kickWebViewRepaint({ doc, schedule }); // kick A
+    kickWebViewRepaint({ doc, schedule }); // kick B, before A's restore runs
+
+    // Flush both restores in scheduling order (rAF semantics).
+    queue.forEach((cb) => cb());
+
+    expect(doc.documentElement.style.transform).toBe('');
+  });
+
+  it('restores the true original after overlapping kicks (not a kick artifact)', () => {
+    const doc = makeFakeDoc();
+    doc.documentElement.style.transform = 'rotate(2deg)';
+    const queue: Array<() => void> = [];
+    const schedule = (cb: () => void) => { queue.push(cb); };
+
+    kickWebViewRepaint({ doc, schedule });
+    kickWebViewRepaint({ doc, schedule });
+    queue.forEach((cb) => cb());
+
+    expect(doc.documentElement.style.transform).toBe('rotate(2deg)');
+  });
 });

@@ -36,6 +36,19 @@ function defaultSchedule(cb: () => void): void {
   }
 }
 
+const KICK_TRANSFORM = 'translateZ(0)';
+
+/**
+ * Remembers the *true* pre-kick transform of an element while a kick is in
+ * flight. WHY: two kicks can overlap (e.g. an interstitial teardown and a
+ * hideBanner both fire on exiting MP results). Without this, the 2nd kick reads
+ * the 1st kick's own `translateZ(0)` as "previous" and its restore re-applies it
+ * — leaving `<html>` permanently transformed, which reparents every
+ * `position: fixed` element (the bottom nav) so it scrolls away instead of
+ * sticking. Keying on the element preserves any genuine prior transform.
+ */
+const pendingOriginal = new WeakMap<object, string>();
+
 /**
  * Kick the WebView into repainting. Returns true if the kick was applied,
  * false if there was no document to operate on (SSR / non-DOM environments).
@@ -51,14 +64,20 @@ export function kickWebViewRepaint(opts: RepaintOptions = {}): boolean {
   if (!el) return false;
 
   const schedule = opts.schedule ?? defaultSchedule;
-  const prev = el.style.transform;
+  // If a kick is already in flight, the real original is the one we stashed —
+  // NOT the translateZ(0) a prior kick applied and hasn't restored yet.
+  const original = pendingOriginal.has(el)
+    ? (pendingOriginal.get(el) as string)
+    : el.style.transform;
+  pendingOriginal.set(el, original);
 
-  el.style.transform = 'translateZ(0)';
+  el.style.transform = KICK_TRANSFORM;
   // Force a synchronous reflow so the layer promotion is flushed before restore.
   void el.offsetHeight;
 
   schedule(() => {
-    el.style.transform = prev;
+    el.style.transform = original;
+    pendingOriginal.delete(el);
   });
 
   return true;
