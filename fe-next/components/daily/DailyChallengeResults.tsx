@@ -34,10 +34,8 @@ import {
   shareImageWithNativeShare,
   type ShareImageResult,
 } from '@/utils/shareImageGenerator';
-import {
-  generateDailyShareImage,
-  downloadDailyShareImage,
-} from '@/utils/dailyShareImage';
+// dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
+// image handlers so it stays out of the results-screen chunk — it only runs on share/download tap.
 import { maybeRequestReview, trackPositiveMoment } from '@/lib/reviews/requestReview';
 
 interface DailyChallengeResultsProps {
@@ -154,6 +152,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
     setIsGeneratingImage(true);
     try {
+      const { generateDailyShareImage } = await import('@/utils/dailyShareImage');
       const imageResult = await generateDailyShareImage({
         gameType: 'puzzle',
         rank: currentUserRank,
@@ -200,8 +199,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   }, [shareImage, shareText, handleGenerateImage, t]);
 
   // Download share image
-  const handleDownloadImage = useCallback(() => {
+  const handleDownloadImage = useCallback(async () => {
     if (shareImage) {
+      const { downloadDailyShareImage } = await import('@/utils/dailyShareImage');
       downloadDailyShareImage(shareImage, 'puzzle', result.puzzleNumber);
     }
   }, [shareImage, result.puzzleNumber]);

@@ -9,10 +9,8 @@ import {
   type WordHuntResult,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
-import {
-  generateDailyShareImage,
-  downloadDailyShareImage,
-} from '@/utils/dailyShareImage';
+// dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
+// share handler so it stays out of the results-screen chunk — it only runs on share-tap.
 import type { Language } from '@/types';
 import type { WordHuntStats } from './types';
 
@@ -216,6 +214,7 @@ export function useShareHandlers({
 
     setIsGeneratingImage(true);
     try {
+      const { generateDailyShareImage, downloadDailyShareImage } = await import('@/utils/dailyShareImage');
       const imageResult = await generateDailyShareImage({
         gameType: 'wordHunt',
         rank: stats?.yourStats?.rank || null,
