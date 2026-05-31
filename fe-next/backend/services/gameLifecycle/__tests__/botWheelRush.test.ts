@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   addPlayerWord: vi.fn(),
   getGame: vi.fn(),
   getLeaderboard: vi.fn(() => []),
+  getLeaderboardThrottled: vi.fn(),
   broadcastToRoom: vi.fn(),
   timerSetTimeout: vi.fn(),
   getCachedTrie: vi.fn(),
@@ -28,6 +29,7 @@ vi.mock('../../../modules/gameStateManager', () => ({
   addPlayerWord: mocks.addPlayerWord,
   getGame: mocks.getGame,
   getLeaderboard: mocks.getLeaderboard,
+  getLeaderboardThrottled: mocks.getLeaderboardThrottled,
 }));
 vi.mock('../../../utils/socketHelpers', () => ({
   broadcastToRoom: mocks.broadcastToRoom,

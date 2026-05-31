@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapAnalyticsEventToGame, type AnalyticsEventRow } from '../analyticsEventMapper';
+import { mapAnalyticsEventToGame, isNudgePhantomRow, type AnalyticsEventRow } from '../analyticsEventMapper';
 
 const MP_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36';
@@ -140,5 +140,36 @@ describe('mapAnalyticsEventToGame', () => {
       { username: 'JoinedName', display_name: null, avatar_emoji: null, avatar_color: null },
     );
     expect(g.profiles?.username).toBe('JoinedName');
+  });
+});
+
+describe('isNudgePhantomRow', () => {
+  // The MP signup nudge historically emitted `game_completed` carrying a
+  // `mpSessionGame` counter but NO score/wordCount/isMultiplayer. Those rows
+  // become phantom solo 0/0 games in the admin log. Filter them out so the
+  // game log word/score counts are correct, including for historical data
+  // written before the nudge stopped hijacking `game_completed`.
+  it('flags a game_completed row that carries mpSessionGame (the nudge phantom)', () => {
+    expect(
+      isNudgePhantomRow(row({ event_type: 'game_completed', metadata: { mode: 'classic', mpSessionGame: 3 } })),
+    ).toBe(true);
+  });
+
+  it('does NOT flag a real game_completed row (has score, no mpSessionGame)', () => {
+    expect(
+      isNudgePhantomRow(row({ event_type: 'game_completed', metadata: { gameMode: 'classic', score: 87, wordCount: 11 } })),
+    ).toBe(false);
+  });
+
+  it('does NOT flag a real 0-score completion (genuine miss, no mpSessionGame)', () => {
+    expect(
+      isNudgePhantomRow(row({ event_type: 'game_completed', metadata: { gameMode: 'wheel-rush', score: 0, wordCount: 0 } })),
+    ).toBe(false);
+  });
+
+  it('only targets game_completed — never game_started even if mpSessionGame leaks in', () => {
+    expect(
+      isNudgePhantomRow(row({ event_type: 'game_started', metadata: { mode: 'classic', mpSessionGame: 1 } })),
+    ).toBe(false);
   });
 });

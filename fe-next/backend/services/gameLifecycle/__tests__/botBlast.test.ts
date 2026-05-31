@@ -34,6 +34,7 @@ const mocks = vi.hoisted(() => ({
   recordFirstFinder: vi.fn(),
   trackBotWord: vi.fn(),
   getLeaderboard: vi.fn(() => []),
+  getLeaderboardThrottled: vi.fn(),
   broadcastToRoom: vi.fn(),
   volatileBroadcastToRoom: vi.fn(),
   getGameRoom: (code: string) => `room:${code}`,
@@ -76,6 +77,7 @@ vi.mock('../../../modules/gameStateManager', () => ({
   recordFirstFinder: mocks.recordFirstFinder,
   trackBotWord: mocks.trackBotWord,
   getLeaderboard: mocks.getLeaderboard,
+  getLeaderboardThrottled: mocks.getLeaderboardThrottled,
 }));
 
 vi.mock('../../../utils/socketHelpers', () => ({

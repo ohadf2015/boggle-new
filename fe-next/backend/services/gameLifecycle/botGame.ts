@@ -12,10 +12,28 @@ import {
   updatePlayerScore,
   trackBotWord,
   getLeaderboard,
+  getLeaderboardThrottled,
   getGame,
   recordFirstFinder,
 } from '../../modules/gameStateManager';
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
+
+/**
+ * Broadcast the leaderboard after a bot word — THROTTLED.
+ *
+ * Each bot word previously emitted a full, unthrottled `updateLeaderboard`
+ * (the heaviest MP payload). With 3 bots scoring several words/sec this floods
+ * the room and the residual volume is what the client must JSON-parse +
+ * dispatch ("MP classic feels stuck on the frontend"). Humans never emit a
+ * per-word leaderboard. Routing through the SHARED per-gameCode throttled
+ * broadcaster caps total leaderboard broadcasts (humans + bots) at ~2/sec while
+ * preserving leading + trailing edges, so the leaderboard never goes stale.
+ */
+export function emitBotLeaderboard(io: Server, gameCode: string): void {
+  getLeaderboardThrottled(gameCode, (leaderboard) => {
+    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
+  });
+}
 import {
   calculateBlastTileBonus,
   getTilesOnPath,
@@ -387,10 +405,7 @@ export function startBotsForGame(
           isFirstFinder,
         });
 
-        const leaderboard = getLeaderboard(gameCode);
-        volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', {
-          leaderboard,
-        });
+        emitBotLeaderboard(io, gameCode);
         return totalScore;
       },
       timerSeconds,

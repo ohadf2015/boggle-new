@@ -35,6 +35,23 @@ function bool(v: unknown): boolean | null {
   return typeof v === 'boolean' ? v : null;
 }
 
+/**
+ * The MP signup nudge (useMultiplayerSignupNudge) historically emitted a
+ * `game_completed` event carrying an `mpSessionGame` counter but NO score,
+ * wordCount, or isMultiplayer flag. Each one becomes a phantom solo 0-word/
+ * 0-score game group in the admin log. Detect those rows so they can be
+ * filtered out before mapping — covers historical data already in the table
+ * (the nudge now emits `mp_session_game` instead). `mpSessionGame` is set ONLY
+ * by the nudge, so this is a precise, zero-false-positive discriminator.
+ */
+export function isNudgePhantomRow(row: AnalyticsEventRow): boolean {
+  return (
+    row.event_type === 'game_completed' &&
+    row.metadata != null &&
+    row.metadata.mpSessionGame !== undefined
+  );
+}
+
 export function mapAnalyticsEventToGame(
   row: AnalyticsEventRow,
   profile: GameProfile | null = null,

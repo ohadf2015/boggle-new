@@ -22,6 +22,7 @@ vi.mock('../../../modules/gameStateManager', () => ({
   updatePlayerScore: vi.fn(),
   trackBotWord: vi.fn(),
   getLeaderboard: vi.fn(() => []),
+  getLeaderboardThrottled: vi.fn(),
   getGame: vi.fn(() => ({
     gameMode: 'word-hunt',
     letterGrid: [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'U', 'N']],

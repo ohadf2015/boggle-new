@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
-import { mapAnalyticsEventToGame, type AnalyticsEventRow } from '@/lib/admin/gameLog/analyticsEventMapper';
+import { mapAnalyticsEventToGame, isNudgePhantomRow, type AnalyticsEventRow } from '@/lib/admin/gameLog/analyticsEventMapper';
 import { CANONICAL_MODE_BUCKETS, unbucketedModes } from '@/lib/admin/gameLog/modeBuckets';
 import { groupGames, type GameGroup } from '@/lib/admin/gameLog/groupGames';
 import type { GameProfile } from '@/components/admin/today-games/types';
@@ -1023,10 +1023,15 @@ async function fetchFromAnalyticsEvents(opts: {
     });
   }
 
-  const games = rows.map((r) => {
-    const pid = r.player_id ?? (typeof r.metadata?.userId === 'string' ? (r.metadata.userId as string) : null);
-    return mapAnalyticsEventToGame(r, pid ? profileById[pid] ?? null : null);
-  });
+  // Drop MP signup-nudge phantom `game_completed` rows (no score/wordCount/MP
+  // flag) — they would otherwise render as phantom solo 0/0 games and corrupt
+  // the game-log word/score counts. Covers historical data already in the table.
+  const games = rows
+    .filter((r) => !isNudgePhantomRow(r))
+    .map((r) => {
+      const pid = r.player_id ?? (typeof r.metadata?.userId === 'string' ? (r.metadata.userId as string) : null);
+      return mapAnalyticsEventToGame(r, pid ? profileById[pid] ?? null : null);
+    });
 
   // Collapse per-player/per-event rows into one group per game.
   let groups: GameGroup[] = groupGames(games);

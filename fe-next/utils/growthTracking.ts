@@ -44,6 +44,9 @@ export type GrowthEvent =
   | 'mode_selected'
   | 'results_viewed'
   | 'replay_countdown_shown'
+  // MP signup-nudge session counter. Distinct from `game_completed` so it never
+  // pollutes the game-log lifecycle query (see useMultiplayerSignupNudge).
+  | 'mp_session_game'
   // Retention
   | 'return_visit'
   | 'streak_continued'

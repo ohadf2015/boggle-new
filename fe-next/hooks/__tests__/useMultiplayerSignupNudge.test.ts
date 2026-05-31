@@ -134,7 +134,12 @@ describe('useMultiplayerSignupNudge', () => {
     expect(result.current.activeNudge).toBeNull();
   });
 
-  it('tracks PostHog game_completed event on recordMpGame', () => {
+  it('tracks a dedicated mp_session_game event on recordMpGame (NOT game_completed)', () => {
+    // The nudge counts MP games per session for its signup threshold. It must
+    // emit its OWN event name — emitting `game_completed` (a reserved lifecycle
+    // event) here forged a phantom solo 0-word/0-score row in the admin game
+    // log for every MP game, because this emit carries no score/wordCount and
+    // no isMultiplayer flag. The real MP completion is emitted by PlayerView.
     const { result } = renderHook(() =>
       useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
     );
@@ -142,18 +147,18 @@ describe('useMultiplayerSignupNudge', () => {
     act(() => { result.current.recordMpGame(); });
 
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
-      'game_completed',
+      'mp_session_game',
       expect.objectContaining({ isGuest: true })
+    );
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
+      'game_completed',
+      expect.anything()
     );
   });
 
-  it('propagates MP submode (word-hunt/classic/wheel-rush) into game_completed `mode`', () => {
-    // PostHog data 30d showed 130 `game_completed` rows with mode='multiplayer'
-    // and 0 with mode='word-hunt'/'classic'/'wheel-rush' even though
-    // `useGameStartTelemetry` correctly tagged 44/31/7 starts under those
-    // submodes. Cause: recordMpGame hardcoded mode='multiplayer'. Fix: accept
-    // submode arg and forward it as `mode` so MP submode funnels become
-    // computable.
+  it('propagates MP submode (word-hunt/classic/wheel-rush) into mp_session_game `mode`', () => {
+    // PostHog submode funnels still need the submode on the nudge event; only
+    // the event NAME changed (game_completed → mp_session_game).
     const { result } = renderHook(() =>
       useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
     );
@@ -161,7 +166,7 @@ describe('useMultiplayerSignupNudge', () => {
     act(() => { result.current.recordMpGame('word-hunt'); });
 
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
-      'game_completed',
+      'mp_session_game',
       expect.objectContaining({ mode: 'word-hunt', gameMode: 'word-hunt' })
     );
   });
@@ -174,7 +179,7 @@ describe('useMultiplayerSignupNudge', () => {
     act(() => { result.current.recordMpGame(); });
 
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
-      'game_completed',
+      'mp_session_game',
       expect.objectContaining({ mode: 'multiplayer', gameMode: 'multiplayer' })
     );
   });
