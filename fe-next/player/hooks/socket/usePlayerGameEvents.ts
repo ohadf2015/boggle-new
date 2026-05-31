@@ -12,6 +12,7 @@ import { resetComboState as resetComboStateUtil } from '@/shared/utils/comboUtil
 
 import {
   sendStartGameAck,
+  sendCountdownComplete,
   stashStartGameMessageId,
   markStartGameHandled,
   wasStartGameHandled,
@@ -402,9 +403,22 @@ export function usePlayerGameEvents({
           storeUpdates.wordHuntKnownLetters = [];
         }
       }
-      if (data.lateJoin) {
+      if (data.lateJoin || isReconnect) {
+        // Late-join AND reconnect/recovery RESUME the in-progress game directly.
+        // They must NOT replay the 3-2-1 countdown: the requestGameState recovery
+        // re-emits startGame with reconnect:true + a fresh `recovery-<ts>`
+        // messageId (which bypasses the messageId dedup), so without this the
+        // countdown re-ran mid-game and yanked the player back ("game starts more
+        // than once with the countdown" / "auto-resume"). Only a genuinely fresh
+        // start (below) shows the countdown.
         storeUpdates.gameActive = true;
         gameActiveRef.current = true;
+        // Because we skip GoRipplesAnimation here, it can't emit countdownComplete.
+        // Report it directly so a player who reconnects DURING the pre-game
+        // countdown window doesn't stall the room's timer-start until the 8s
+        // fallback. Safe no-op when the timer is already running (the coordinator
+        // guards on messageId match + timerStarted + expectedPlayers).
+        sendCountdownComplete(socket, data.messageId, 'PLAYER');
       } else {
         storeUpdates.showStartAnimation = true;
       }
