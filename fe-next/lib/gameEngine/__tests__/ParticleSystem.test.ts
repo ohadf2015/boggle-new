@@ -1,23 +1,49 @@
 // ─── ParticleSystem Tests ─────────────────────────────────────────────
-// Tests for particle shapes, emitter lifecycle, and burst behavior.
+// Tests emitter/pool lifecycle and the ParticleContainer render wiring.
+// Rendering moved from per-frame Graphics tessellation to Particle sprites in
+// a ParticleContainer (see docs/2026-05-31-pixi-particlecontainer-migration.md);
+// the behavioral contracts (lifecycle, maxParticles cap, dead-particle removal,
+// pool auto-cleanup, destroyed-parent race guard) are unchanged.
 
 import { ParticleEmitter, ParticlePool } from '../ParticleSystem';
 import type { ParticleConfig } from '../types';
-import { Container } from 'pixi.js';
+import { Container, ParticleContainer } from 'pixi.js';
 
-// Mock PixiJS — use class-based mocks so `new Container()` / `new Graphics()` work
+// Mock PixiJS — class-based so `new Container()` / `new ParticleContainer()` /
+// `new Particle()` work without a renderer. ParticleContainer records added
+// particle handles so tests can assert on them.
 vi.mock('pixi.js', () => {
-  class MockGraphics {
-    clear = vi.fn().mockReturnThis();
-    circle = vi.fn().mockReturnThis();
-    rect = vi.fn().mockReturnThis();
-    moveTo = vi.fn().mockReturnThis();
-    lineTo = vi.fn().mockReturnThis();
-    closePath = vi.fn().mockReturnThis();
-    fill = vi.fn().mockReturnThis();
-    stroke = vi.fn().mockReturnThis();
-    destroy = vi.fn();
+  class MockParticle {
+    x = 0;
+    y = 0;
+    scaleX = 1;
+    scaleY = 1;
+    rotation = 0;
+    anchorX = 0;
+    anchorY = 0;
+    tint = 0xffffff;
+    alpha = 1;
+    texture: unknown;
+    constructor(opts: Record<string, unknown> = {}) {
+      Object.assign(this, opts);
+    }
+  }
+  class MockParticleContainer {
+    particles: MockParticle[] = [];
+    destroyed = false;
     blendMode = 'normal';
+    constructor(_opts?: unknown) {}
+    addParticle = vi.fn((p: MockParticle) => {
+      this.particles.push(p);
+    });
+    removeParticle = vi.fn((p: MockParticle) => {
+      const i = this.particles.indexOf(p);
+      if (i >= 0) this.particles.splice(i, 1);
+    });
+    update = vi.fn();
+    destroy = vi.fn(() => {
+      this.destroyed = true;
+    });
   }
   class MockContainer {
     addChild = vi.fn();
@@ -26,7 +52,9 @@ vi.mock('pixi.js', () => {
   }
   return {
     Container: MockContainer,
-    Graphics: MockGraphics,
+    ParticleContainer: MockParticleContainer,
+    Particle: MockParticle,
+    Texture: { WHITE: { __white: true }, from: vi.fn(() => ({ __from: true })) },
   };
 });
 
@@ -46,6 +74,15 @@ function makeConfig(overrides: Partial<ParticleConfig> = {}): ParticleConfig {
   };
 }
 
+/** Access the emitter's ParticleContainer (with recorded particle handles). */
+function getContainer(emitter: ParticleEmitter) {
+  return (
+    emitter as unknown as {
+      container: { particles: unknown[]; blendMode: string; update: { mock: { calls: unknown[] } } };
+    }
+  ).container;
+}
+
 describe('ParticleEmitter', () => {
   let parent: Container;
 
@@ -53,60 +90,86 @@ describe('ParticleEmitter', () => {
     parent = new Container();
   });
 
-  describe('particle shapes', () => {
-    it('should default to circle shape when no shape specified', () => {
-      const config = makeConfig();
-      const emitter = new ParticleEmitter(parent, config);
+  describe('ParticleContainer rendering', () => {
+    it('adds one particle handle per spawned particle', () => {
+      const emitter = new ParticleEmitter(parent, makeConfig());
       emitter.burst(100, 100, 5);
-      emitter.update(0.016);
-
-      // Graphics.circle should be called (default shape)
-      const gfx = (emitter as unknown as { graphics: { circle: jest.Mock } }).graphics;
-      expect(gfx.circle).toHaveBeenCalled();
+      expect(getContainer(emitter).particles).toHaveLength(5);
     });
 
-    it('should draw star shapes when shape is star', () => {
-      const config = makeConfig({ shape: 'star' });
-      const emitter = new ParticleEmitter(parent, config);
-      emitter.burst(100, 100, 3);
-      emitter.update(0.016);
+    it('calls container.update() after the particle list changes (GPU buffer resync)', () => {
+      // Pixi v8: per-frame property edits auto-upload, but list add/remove needs
+      // container.update() or new particles never render. Regression guard.
+      const emitter = new ParticleEmitter(parent, makeConfig({ lifetime: { min: 0.1, max: 0.1 } }));
+      const container = getContainer(emitter);
 
-      // Stars use moveTo/lineTo pattern
-      const gfx = (emitter as unknown as { graphics: { moveTo: jest.Mock } }).graphics;
-      expect(gfx.moveTo).toHaveBeenCalled();
+      emitter.burst(100, 100, 3); // spawn → list changed → must flush
+      expect(container.update).toHaveBeenCalled();
+
+      (container.update as unknown as { mockClear: () => void }).mockClear();
+      emitter.update(0.2); // particles die → list changed → must flush again
+      expect(container.update).toHaveBeenCalled();
     });
 
-    it('should draw diamond shapes when shape is diamond', () => {
-      const config = makeConfig({ shape: 'diamond' });
-      const emitter = new ParticleEmitter(parent, config);
-      emitter.burst(100, 100, 3);
-      emitter.update(0.016);
+    it('does NOT call container.update() on a frame with no list change', () => {
+      const emitter = new ParticleEmitter(parent, makeConfig({ frequency: 999, emitterLifetime: 0 }));
+      emitter.burst(100, 100, 2);
+      const container = getContainer(emitter);
+      (container.update as unknown as { mockClear: () => void }).mockClear();
 
-      const gfx = (emitter as unknown as { graphics: { moveTo: jest.Mock } }).graphics;
-      expect(gfx.moveTo).toHaveBeenCalled();
+      emitter.update(0.016); // no spawn (frequency huge), no death (long life) → no flush
+      expect(container.update).not.toHaveBeenCalled();
     });
 
-    it('should draw rect shapes when shape is rect', () => {
-      const config = makeConfig({ shape: 'rect' });
-      const emitter = new ParticleEmitter(parent, config);
-      emitter.burst(100, 100, 3);
-      emitter.update(0.016);
+    it('removes the particle handle when a particle dies', () => {
+      const emitter = new ParticleEmitter(parent, makeConfig({ lifetime: { min: 0.1, max: 0.1 } }));
+      emitter.burst(100, 100, 5);
+      expect(getContainer(emitter).particles).toHaveLength(5);
 
-      const gfx = (emitter as unknown as { graphics: { rect: jest.Mock } }).graphics;
-      expect(gfx.rect).toHaveBeenCalled();
+      emitter.update(0.2); // all dead
+      expect(getContainer(emitter).particles).toHaveLength(0);
     });
 
-    it('should draw ring-3 shapes when shape is ring-3', () => {
-      const config = makeConfig({ shape: 'ring-3' });
-      const emitter = new ParticleEmitter(parent, config);
-      emitter.burst(100, 100, 3);
+    it('syncs sprite tint, alpha, scale and position from particle state on update', () => {
+      const emitter = new ParticleEmitter(parent, makeConfig({ colors: ['ff0000'] }));
+      emitter.burst(100, 100, 1);
       emitter.update(0.016);
 
-      // Rings use circle + stroke (not fill)
-      const gfx = (emitter as unknown as { graphics: { circle: jest.Mock; stroke: jest.Mock } }).graphics;
-      expect(gfx.circle).toHaveBeenCalled();
-      expect(gfx.stroke).toHaveBeenCalled();
+      const sprite = getContainer(emitter).particles[0] as {
+        tint: number;
+        alpha: number;
+        scaleX: number;
+        scaleY: number;
+        anchorX: number;
+        anchorY: number;
+      };
+      expect(sprite.tint).toBe(0xff0000); // single-color stop
+      expect(sprite.alpha).toBeGreaterThan(0);
+      expect(sprite.scaleX).toBeGreaterThan(0);
+      expect(sprite.scaleX).toBe(sprite.scaleY); // uniform scale
+      expect(sprite.anchorX).toBe(0.5); // centered → matches old center-draw
+      expect(sprite.anchorY).toBe(0.5);
     });
+
+    it("sets container blendMode to 'add' for additive presets", () => {
+      const emitter = new ParticleEmitter(parent, makeConfig({ blendMode: 'add' }));
+      expect(getContainer(emitter).blendMode).toBe('add');
+    });
+
+    it('leaves blendMode normal when none specified', () => {
+      const emitter = new ParticleEmitter(parent, makeConfig());
+      expect(getContainer(emitter).blendMode).toBe('normal');
+    });
+
+    it.each(['circle', 'star', 'diamond', 'rect', 'ring-3'] as const)(
+      'renders %s shape without error',
+      (shape) => {
+        const emitter = new ParticleEmitter(parent, makeConfig({ shape }));
+        emitter.burst(100, 100, 3);
+        expect(() => emitter.update(0.016)).not.toThrow();
+        expect(getContainer(emitter).particles.length).toBeGreaterThan(0);
+      },
+    );
   });
 
   describe('emitter lifecycle', () => {
@@ -127,7 +190,6 @@ describe('ParticleEmitter', () => {
       expect(emitter.active).toBe(true);
 
       emitter.update(0.06);
-      // Emitter stopped but particles may still be alive
       expect(emitter.particleCount).toBeGreaterThanOrEqual(0);
     });
 
@@ -172,7 +234,6 @@ describe('ParticlePool', () => {
     pool.burst(config, 100, 100, 3);
 
     pool.update(0.1); // All particles dead → emitter cleaned up
-    // Pool should have cleaned up
     pool.destroy();
   });
 
@@ -184,13 +245,12 @@ describe('ParticlePool', () => {
     // No errors thrown = success
   });
 
-  it('emitter update bails when underlying Graphics was destroyed by parent', () => {
+  it('emitter update bails when underlying ParticleContainer was destroyed by parent', () => {
     const pool = new ParticlePool(parent);
     const emitter = pool.create(makeConfig());
-    // Simulate parent.destroy({ children: true }) flipping Graphics.destroyed
-    // before ParticleEmitter.destroy() — guards the post-unmount tick race
-    // that produced "Cannot read properties of null (reading 'clear')".
-    (emitter as unknown as { graphics: { destroyed: boolean } }).graphics.destroyed = true;
+    // Simulate parent.destroy({ children: true }) flipping container.destroyed
+    // before ParticleEmitter.destroy() — guards the post-unmount tick race.
+    (emitter as unknown as { container: ParticleContainer }).container.destroyed = true;
     expect(() => emitter.update(0.016)).not.toThrow();
     pool.destroy();
   });

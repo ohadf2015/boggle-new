@@ -1,9 +1,24 @@
 // ─── Particle System ──────────────────────────────────────────────────
-// Custom GPU-accelerated particle system using PixiJS v8 Graphics.
-// No external particle library dependency — full control over effects.
+// GPU-batched particle system using PixiJS v8 ParticleContainer + Particle.
+// Each shape is a module-cached white texture, tinted per-particle. This
+// replaced a per-frame Graphics.clear()+redraw path whose CPU cost (re-
+// tessellating every particle's geometry each frame, ~680 shapes across ~26
+// emitters at a Blast mega-cascade peak) was the dominant render expense.
+// Now per-frame work is just transform/tint buffer writes.
+// See docs/2026-05-31-pixi-particlecontainer-migration.md.
 
-import { Container, Graphics } from 'pixi.js';
-import type { ParticleConfig, ActiveParticle, Vector2 } from './types';
+import { Container, ParticleContainer, Particle, type Texture } from 'pixi.js';
+import type { ParticleConfig, ActiveParticle, Vector2, ParticleShape } from './types';
+import {
+  getParticleTexture,
+  particleScaleForSize,
+  shouldRotateParticle,
+} from './particleTextures';
+
+/** Active particle physics state plus its renderable sprite handle. */
+interface EmitterParticle extends ActiveParticle {
+  sprite: Particle;
+}
 
 // Pixi v8 Color.set() throws "Unable to convert color -N" on any negative input.
 // Every helper that produces a numeric color MUST stay in 0..0xFFFFFF.
@@ -59,28 +74,40 @@ export function lerpColor(colors: number[], t: number): number {
 }
 
 export class ParticleEmitter {
-  readonly container: Container;
-  private particles: ActiveParticle[] = [];
-  private graphics: Graphics;
+  readonly container: ParticleContainer;
+  private particles: EmitterParticle[] = [];
+  private texture: Texture;
+  private shape: ParticleShape;
+  private rotates: boolean;
   private config: ParticleConfig;
   private colorNums: number[];
   private emitTimer = 0;
   private lifeTimer = 0;
   private _active = false;
   private _destroyed = false;
+  /** Set whenever the particle LIST changes (add/remove). Per-frame property
+   *  edits auto-upload, but list-membership changes require container.update()
+   *  to resync the GPU buffer (Pixi v8) — otherwise new particles never render. */
+  private _listDirty = false;
   private position: Vector2 = { x: 0, y: 0 };
 
   constructor(parent: Container, config: ParticleConfig) {
     this.config = config;
-    this.container = new Container();
-    this.graphics = new Graphics();
-    this.container.addChild(this.graphics);
+    this.shape = config.shape ?? 'circle';
+    // All four dynamic groups change every frame (move, scale-fade, rotate, tint+alpha).
+    this.container = new ParticleContainer({
+      dynamicProperties: { position: true, vertex: true, rotation: true, color: true },
+    });
+    // blendMode is a per-container property — keeping one container per emitter
+    // preserves each preset's blend (24 presets are additive).
+    if (config.blendMode === 'add' || config.blendMode === 'screen') {
+      this.container.blendMode = config.blendMode;
+    }
+    this.texture = getParticleTexture(this.shape);
+    this.rotates = shouldRotateParticle(this.shape);
     parent.addChild(this.container);
 
     this.colorNums = config.colors.map(hexToNum);
-    if (config.blendMode === 'add') {
-      this.graphics.blendMode = 'add';
-    }
   }
 
   // ─── Controls ───────────────────────────────────────────────────
@@ -99,6 +126,9 @@ export class ParticleEmitter {
     for (let i = 0; i < n; i++) {
       this.spawnParticle();
     }
+    // Burst can be fired between ticks — flush so the new particles render even
+    // if a frame draws before the next update().
+    this.flushList();
   }
 
   stop(): void {
@@ -116,11 +146,10 @@ export class ParticleEmitter {
   // ─── Update Loop ────────────────────────────────────────────────
 
   update(deltaSec: number): void {
-    // Also bail when our underlying Graphics was destroyed by a parent
-    // (children:true) destroy that ran before our own destroy() — calling
-    // graphics.clear() on a destroyed Graphics throws "Cannot read
-    // properties of null (reading 'clear')".
-    if (this._destroyed || this.graphics?.destroyed) return;
+    // Also bail when our ParticleContainer was destroyed by a parent
+    // (children:true) destroy that ran before our own destroy() — touching a
+    // destroyed container throws in Pixi v8.
+    if (this._destroyed || this.container?.destroyed) return;
 
     // Emission
     if (this._active) {
@@ -154,7 +183,9 @@ export class ParticleEmitter {
       p.age += deltaSec;
 
       if (p.age >= p.maxAge) {
+        this.container.removeParticle(p.sprite);
         this.particles.splice(i, 1);
+        this._listDirty = true;
         continue;
       }
 
@@ -174,10 +205,34 @@ export class ParticleEmitter {
       p.scale = lerp(p.startScale, p.endScale, t);
       p.alpha = lerp(p.startAlpha, p.endAlpha, t);
       p.color = lerpColor(this.colorNums, t);
+
+      this.syncSprite(p);
     }
 
-    // Redraw
-    this.draw();
+    this.flushList();
+  }
+
+  /** Resync the GPU particle buffer after the list changed. Cheap relative to
+   *  the old per-frame geometry re-tessellation; no-op when nothing changed. */
+  private flushList(): void {
+    if (this._listDirty && !this.container.destroyed) {
+      this.container.update();
+      this._listDirty = false;
+    }
+  }
+
+  /** Push physics state onto the renderable sprite (cheap GPU buffer write). */
+  private syncSprite(p: EmitterParticle): void {
+    const size = 4 * p.scale;
+    const s = particleScaleForSize(size);
+    p.sprite.x = p.x;
+    p.sprite.y = p.y;
+    p.sprite.scaleX = s;
+    p.sprite.scaleY = s;
+    p.sprite.rotation = this.rotates ? p.rotation : 0;
+    p.sprite.tint = p.color;
+    // Old draw skipped near-invisible particles; replicate by hiding via alpha.
+    p.sprite.alpha = size < 0.5 || p.alpha < 0.01 ? 0 : p.alpha;
   }
 
   // ─── Cleanup ────────────────────────────────────────────────────
@@ -186,8 +241,8 @@ export class ParticleEmitter {
     this._destroyed = true;
     this._active = false;
     this.particles = [];
-    this.graphics.destroy();
-    this.container.destroy({ children: true });
+    // Do NOT destroy the texture — it's module-cached and shared across emitters.
+    this.container.destroy();
   }
 
   // ─── Internal ───────────────────────────────────────────────────
@@ -222,6 +277,24 @@ export class ParticleEmitter {
       ? rand(rotationSpeed.min, rotationSpeed.max) * (Math.PI / 180)
       : 0;
 
+    const startScale = scale.start;
+    const initialScale = particleScaleForSize(4 * startScale);
+    const sprite = new Particle({
+      texture: this.texture,
+      x: spawnX,
+      y: spawnY,
+      scaleX: initialScale,
+      scaleY: initialScale,
+      tint: this.colorNums[0] ?? 0xffffff,
+      alpha: alpha.start,
+    });
+    // Center the sprite so position/scale/rotation pivot on the particle's
+    // center — matching the old circle(p.x, p.y, …) center-draw.
+    sprite.anchorX = 0.5;
+    sprite.anchorY = 0.5;
+    this.container.addParticle(sprite);
+    this._listDirty = true;
+
     this.particles.push({
       x: spawnX,
       y: spawnY,
@@ -229,77 +302,17 @@ export class ParticleEmitter {
       vy: Math.sin(angle) * spd,
       age: 0,
       maxAge: rand(lifetime.min, lifetime.max),
-      scale: scale.start,
+      scale: startScale,
       alpha: alpha.start,
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: rot,
       color: this.colorNums[0],
-      startScale: scale.start,
+      startScale,
       endScale: scale.end,
       startAlpha: alpha.start,
       endAlpha: alpha.end,
+      sprite,
     });
-  }
-
-  private draw(): void {
-    this.graphics.clear();
-    const shape = this.config.shape ?? 'circle';
-
-    for (const p of this.particles) {
-      const size = 4 * p.scale;
-      if (size < 0.5 || p.alpha < 0.01) continue;
-
-      switch (shape) {
-        case 'star':
-          this.drawStar(p.x, p.y, size, 5, p.color, p.alpha, p.rotation);
-          break;
-        case 'diamond':
-          this.drawDiamond(p.x, p.y, size, p.color, p.alpha);
-          break;
-        case 'rect':
-          this.graphics
-            .rect(p.x - size, p.y - size * 0.5, size * 2, size)
-            .fill({ color: p.color, alpha: p.alpha });
-          break;
-        case 'ring-3':
-          this.graphics
-            .circle(p.x, p.y, size)
-            .stroke({ color: p.color, alpha: p.alpha, width: Math.max(1, size * 0.3) });
-          break;
-        default:
-          this.graphics
-            .circle(p.x, p.y, size)
-            .fill({ color: p.color, alpha: p.alpha });
-          break;
-      }
-    }
-  }
-
-  /** Draw a star polygon at (cx, cy) with given radius and point count */
-  private drawStar(cx: number, cy: number, radius: number, points: number, color: number, alpha: number, rotation: number): void {
-    const innerR = radius * 0.45;
-    const step = Math.PI / points;
-    this.graphics.moveTo(
-      cx + Math.cos(rotation) * radius,
-      cy + Math.sin(rotation) * radius,
-    );
-    for (let i = 1; i < points * 2; i++) {
-      const angle = rotation + i * step;
-      const r = i % 2 === 0 ? radius : innerR;
-      this.graphics.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
-    }
-    this.graphics.closePath().fill({ color, alpha });
-  }
-
-  /** Draw a diamond (rotated square) at (cx, cy) */
-  private drawDiamond(cx: number, cy: number, size: number, color: number, alpha: number): void {
-    this.graphics
-      .moveTo(cx, cy - size)
-      .lineTo(cx + size * 0.7, cy)
-      .lineTo(cx, cy + size)
-      .lineTo(cx - size * 0.7, cy)
-      .closePath()
-      .fill({ color, alpha });
   }
 }
 
