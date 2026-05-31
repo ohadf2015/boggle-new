@@ -26,6 +26,7 @@ import { useNetworkState } from '@/hooks/useNetworkState';
 import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { getOfflineStore } from '@/lib/offline';
 import { enqueueScore } from '@/lib/offline/scoreQueue';
+import { safeRandomUUID } from '@/lib/safeRandomUUID';
 import { useAchievementQueue } from '@/components/achievements';
 import { useSinglePlayerConfig } from './useSinglePlayerConfig';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
@@ -110,7 +111,7 @@ const SinglePlayerView: React.FC = () => {
   const offlineFlag = useOfflineModeFlag();
   const { queueAchievement } = useAchievementQueue();
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
-  const [sessionId] = useState(() => `sp_${crypto.randomUUID()}`);
+  const [sessionId] = useState(() => `sp_${safeRandomUUID()}`);
 
   // Show feature unlock notifications when user reaches milestones
   useFeatureUnlockNotifications();

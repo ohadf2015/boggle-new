@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { trackGameEnd } from '@/utils/growthTracking';
+import { safeRandomUUID } from '@/lib/safeRandomUUID';
 import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
@@ -134,7 +135,7 @@ export function useGameEnd({
       );
 
       // Generate unique session ID for vote tracking
-      const gameSessionId = crypto.randomUUID();
+      const gameSessionId = safeRandomUUID();
 
       // Collect words for validation modal (community dictionary building)
       const allBotWords = settings.bots.flatMap(bot => {

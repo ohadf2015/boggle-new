@@ -1,4 +1,5 @@
 import type { OfflineStore } from './storage';
+import { safeRandomUUID } from '@/lib/safeRandomUUID';
 
 export type ScoreMode = 'sp' | 'wotd' | 'daily-survival' | 'daily-wordhunt' | 'brain' | 'adventure';
 
@@ -27,7 +28,7 @@ export async function enqueueScore(
   mode: ScoreMode,
   payload: unknown,
 ): Promise<string> {
-  const id = crypto.randomUUID();
+  const id = safeRandomUUID();
   const createdAt = Date.now();
   await store.sql.run(
     'INSERT INTO score_queue(id, mode, payload, created_at, attempts) VALUES (?, ?, ?, ?, 0)',

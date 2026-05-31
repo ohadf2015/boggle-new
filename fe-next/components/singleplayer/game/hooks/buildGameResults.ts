@@ -10,6 +10,7 @@ import {
   type WordData as AchievementWordData,
 } from '@/utils/singlePlayerAchievements';
 import { trackGameEnd } from '@/utils/growthTracking';
+import { safeRandomUUID } from '@/lib/safeRandomUUID';
 import type { SinglePlayerResultsData, BotOpponent } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import type { FoundWord } from '../types';
@@ -68,7 +69,7 @@ export function buildGameResults(params: BuildResultsParams): SinglePlayerResult
   }));
 
   const finalAchievements = calculateFinalAchievements(validWordData, allWordData, actualGameDuration, maxCombo);
-  const gameSessionId = crypto.randomUUID();
+  const gameSessionId = safeRandomUUID();
 
   // Collect words for validation modal
   const allBotWords = bots.flatMap(bot => {
@@ -128,7 +129,7 @@ export function buildFallbackResults(params: BuildResultsParams): SinglePlayerRe
     ? Math.max(1, Math.floor((Date.now() - gameStartTime) / 1000))
     : timerSeconds;
 
-  const fallbackSessionId = crypto.randomUUID();
+  const fallbackSessionId = safeRandomUUID();
   const fallbackBotWords = bots.flatMap(bot => {
     const words = botWords[bot.id] || [];
     return words.filter(word => !word.match(/^word\d+$/));
