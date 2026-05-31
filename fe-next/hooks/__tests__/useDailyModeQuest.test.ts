@@ -38,22 +38,22 @@ describe('useDailyModeQuest', () => {
 
   it('returns initial state with all modes false and not completed', () => {
     const progress = getQuestProgressLogic();
-    expect(progress.daily).toBe(false);
+    expect(progress.blast).toBe(false);
     expect(progress.classicMp).toBe(false);
     expect(progress.wordHuntMp).toBe(false);
     expect(progress.completed).toBe(false);
   });
 
   it('marks a single mode as played', () => {
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     const progress = getQuestProgressLogic();
-    expect(progress.daily).toBe(true);
+    expect(progress.blast).toBe(true);
     expect(progress.classicMp).toBe(false);
     expect(progress.completed).toBe(false);
   });
 
   it('completes quest when all 3 modes played', () => {
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     markModePlayedLogic('classicMp');
     markModePlayedLogic('wordHuntMp');
     expect(isQuestCompletedLogic()).toBe(true);
@@ -61,7 +61,7 @@ describe('useDailyModeQuest', () => {
   });
 
   it('auto-resets at next UTC day', () => {
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     markModePlayedLogic('classicMp');
     markModePlayedLogic('wordHuntMp');
     expect(isQuestCompletedLogic()).toBe(true);
@@ -69,19 +69,19 @@ describe('useDailyModeQuest', () => {
     // Advance to next day
     vi.setSystemTime(new Date('2026-04-01T00:00:01Z'));
     const progress = getQuestProgressLogic();
-    expect(progress.daily).toBe(false);
+    expect(progress.blast).toBe(false);
     expect(progress.completed).toBe(false);
   });
 
   it('returns deterministic reward seeded by date', () => {
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     markModePlayedLogic('classicMp');
     markModePlayedLogic('wordHuntMp');
     const reward1 = claimRewardLogic();
 
     // Clear and redo - same date same reward
     localStorageMock.clear();
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     markModePlayedLogic('classicMp');
     markModePlayedLogic('wordHuntMp');
     const reward2 = claimRewardLogic();
@@ -92,7 +92,7 @@ describe('useDailyModeQuest', () => {
   });
 
   it('cannot claim reward twice on same day', () => {
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     markModePlayedLogic('classicMp');
     markModePlayedLogic('wordHuntMp');
 
@@ -104,13 +104,13 @@ describe('useDailyModeQuest', () => {
   });
 
   it('cannot claim reward if quest not completed', () => {
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     const reward = claimRewardLogic();
     expect(reward).toBeNull();
   });
 
   it('reward claimed state persists via localStorage', () => {
-    markModePlayedLogic('daily');
+    markModePlayedLogic('blast');
     markModePlayedLogic('classicMp');
     markModePlayedLogic('wordHuntMp');
     claimRewardLogic();
@@ -118,5 +118,19 @@ describe('useDailyModeQuest', () => {
     // Verify from fresh read
     expect(getQuestProgressLogic().completed).toBe(true);
     expect(claimRewardLogic()).toBeNull();
+  });
+
+  // New test: blast mode is included in the quest set
+  it('includes blast mode in the quest set', () => {
+    const progress = getQuestProgressLogic();
+    expect(progress).toHaveProperty('blast');
+    expect(typeof progress.blast).toBe('boolean');
+  });
+
+  // New test: completing blast game credits the blast quest
+  it('credits blast quest when blast mode is played', () => {
+    expect(getQuestProgressLogic().blast).toBe(false);
+    markModePlayedLogic('blast');
+    expect(getQuestProgressLogic().blast).toBe(true);
   });
 });

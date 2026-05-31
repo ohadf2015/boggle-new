@@ -339,12 +339,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
             */}
             {mounted && !isCrazyGames && (
                 <button
-                    onClick={() => {
+                    onClick={async () => {
                         if (!showMobileMenu) {
-                            markBadgeSeen(badgeCount);
                             if (notificationCount > 0) {
-                                markAllAsRead();
+                                await markAllAsRead();
                             }
+                            markBadgeSeen(badgeCount);
                         }
                         setShowMobileMenu(!showMobileMenu);
                     }}

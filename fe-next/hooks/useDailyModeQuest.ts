@@ -1,16 +1,16 @@
 import { useState, useCallback } from 'react';
 
-export type GameMode = 'daily' | 'classicMp' | 'wordHuntMp';
+export type GameMode = 'blast' | 'classicMp' | 'wordHuntMp';
 
 export interface QuestProgress {
-  daily: boolean;
+  blast: boolean;
   classicMp: boolean;
   wordHuntMp: boolean;
   completed: boolean;
 }
 
 export interface QuestData {
-  daily: boolean;
+  blast: boolean;
   classicMp: boolean;
   wordHuntMp: boolean;
   claimed: boolean;
@@ -32,7 +32,7 @@ export function loadQuestData(): QuestData {
     const raw = localStorage.getItem(key);
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
-  return { daily: false, classicMp: false, wordHuntMp: false, claimed: false };
+  return { blast: false, classicMp: false, wordHuntMp: false, claimed: false };
 }
 
 export function saveQuestData(data: QuestData): void {
@@ -59,21 +59,21 @@ export function markModePlayedLogic(mode: GameMode): QuestData {
 export function getQuestProgressLogic(): QuestProgress {
   const d = loadQuestData();
   return {
-    daily: d.daily,
+    blast: d.blast,
     classicMp: d.classicMp,
     wordHuntMp: d.wordHuntMp,
-    completed: d.daily && d.classicMp && d.wordHuntMp,
+    completed: d.blast && d.classicMp && d.wordHuntMp,
   };
 }
 
 export function isQuestCompletedLogic(): boolean {
   const d = loadQuestData();
-  return d.daily && d.classicMp && d.wordHuntMp;
+  return d.blast && d.classicMp && d.wordHuntMp;
 }
 
 export function claimRewardLogic(): number | null {
   const d = loadQuestData();
-  if (!d.daily || !d.classicMp || !d.wordHuntMp) return null;
+  if (!d.blast || !d.classicMp || !d.wordHuntMp) return null;
   if (d.claimed) return null;
   const reward = getDateReward();
   saveQuestData({ ...d, claimed: true });

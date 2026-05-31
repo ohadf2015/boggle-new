@@ -19,7 +19,7 @@ export function DailyModeQuestCard() {
   const [rewardAmount, setRewardAmount] = useState<number | null>(null);
 
   const progress = getQuestProgress();
-  const modesPlayed = [progress.daily, progress.classicMp, progress.wordHuntMp].filter(Boolean).length;
+  const modesPlayed = [progress.blast, progress.classicMp, progress.wordHuntMp].filter(Boolean).length;
   const claimed = data.claimed;
 
   const handleClaim = () => {
@@ -80,7 +80,7 @@ export function DailyModeQuestCard() {
           </span>
           <div className="flex gap-1">
             {[
-              { id: 'daily', done: progress.daily },
+              { id: 'blast', done: progress.blast },
               { id: 'classicMp', done: progress.classicMp },
               { id: 'wordHuntMp', done: progress.wordHuntMp },
             ].map(({ id, done }) => (
@@ -98,7 +98,7 @@ export function DailyModeQuestCard() {
       {/* Expanded detail */}
       {expanded && (
         <div className="px-4 pb-3 flex flex-col gap-1 border-t border-neo-cream/10">
-          <ModeRow label={t('dailyQuest.daily')} done={progress.daily} emoji="&#x1F4C5;" />
+          <ModeRow label={t('dailyQuest.blast')} done={progress.blast} emoji="&#x1F4A5;" />
           <ModeRow label={t('dailyQuest.classicMp')} done={progress.classicMp} emoji="&#x2694;&#xFE0F;" />
           <ModeRow label={t('dailyQuest.wordHuntMp')} done={progress.wordHuntMp} emoji="&#x1F3AF;" />
           <p className="text-neo-white text-xs mt-1">{t('dailyQuest.playAllModes')}</p>

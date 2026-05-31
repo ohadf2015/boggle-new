@@ -405,6 +405,9 @@ export function useResultsSideEffects({
       markModePlayedLogic('wordHuntMp');
     } else if (mpGameMode === 'classic') {
       markModePlayedLogic('classicMp');
+    } else if (gameMode === 'blast') {
+      // Single-player Blast game
+      markModePlayedLogic('blast');
     }
 
     // Track MP win streak
