@@ -390,6 +390,26 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResults]);
 
+  // Sound: roster changes — a join/leave cue when the player set changes (party
+  // lobby feel). Diff against the previous username set so it fires ONCE per real
+  // change, never on the initial population (null sentinel) or on presence/focus-
+  // only updateUsers pings (same members → no diff). mpSounds callbacks are
+  // useCallback-stable so depending only on playersInRoom is correct.
+  const prevRosterRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    const current = new Set(playersInRoom.map(p => p.username));
+    const prev = prevRosterRef.current;
+    prevRosterRef.current = current;
+    if (!prev) return; // first population — don't replay a burst of joins
+    let added = false;
+    let removed = false;
+    for (const u of current) if (!prev.has(u)) { added = true; break; }
+    for (const u of prev) if (!current.has(u)) { removed = true; break; }
+    if (added) mpSounds.onPlayerJoined();
+    if (removed) mpSounds.onPlayerLeft();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playersInRoom]);
+
   // Series tracking
   useEffect(() => {
     if (showResults && resultsData?.scores) seriesTracker.recordRound(resultsData.scores);
