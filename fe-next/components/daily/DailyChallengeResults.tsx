@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import GameFeedback from '@/components/feedback/GameFeedback';
-import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { m, AnimatePresence } from 'framer-motion';
 import WatchAdButton from './WatchAdButton';
 import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
@@ -83,7 +82,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       submitLeaderboardScore(result.score);
     }
     if (!hasMarkedQuestRef.current) {
-      markModePlayedLogic('daily');
+      // Daily Challenge is no longer tracked in the daily quest system
+      // The quest now focuses on Blast, Classic MP, and Word Hunt MP
       hasMarkedQuestRef.current = true;
     }
     // Track positive moment + maybe request review — only on a real result (score > 0),
