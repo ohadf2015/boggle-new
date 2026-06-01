@@ -59,12 +59,13 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
   SID="${PLAYWRITER_SESSION:-}"
   [ -n "$SID" ] || SID=$("$PW" session new 2>/dev/null | tail -1)
   [ -n "$SID" ] || _emit_err "could not open a playwriter session (is Chrome + the extension running?)"
-  OUT=$(mktemp -t reddit-browser.XXXXXX.json)
 
   # JS scrapes old.reddit's #siteTable rows. No backticks (avoid bash interpolation hazards);
-  # path + limit injected by string concat. Writes the JSON array to OUT via fs.
-  JS='const fs=require("fs");
-try{
+  # path + limit injected by string concat. Emits the JSON array on a MARKER line to stdout
+  # — Playwriter sandboxes `fs` to allowed dirs only, so writing to $TMPDIR fails with EPERM
+  # (the old "no output" misdiagnosis). console.log is the sandbox-free channel (same pattern
+  # as pull-revenue-snapshot.sh); we grep the marker out of any Playwriter banner noise.
+  JS='try{
   state.p = (state.p && !state.p.isClosed()) ? state.p : await context.newPage();
   await state.p.goto("'"$URL"'", {waitUntil:"domcontentloaded"});
   await state.p.waitForTimeout(1200);
@@ -98,16 +99,29 @@ try{
       selftext:""
     };
   }));
-  fs.writeFileSync("'"$OUT"'", JSON.stringify(rows));
-  console.log("ok:"+rows.length);
-}catch(err){ fs.writeFileSync("'"$OUT"'", JSON.stringify({error:String(err).slice(0,160)})); }'
+  console.log("REDDIT_B64:"+Buffer.from(JSON.stringify(rows)).toString("base64"));
+}catch(err){ console.log("REDDIT_B64:"+Buffer.from(JSON.stringify({error:String(err).slice(0,160)})).toString("base64")); }'
 
-  "$PW" -s "$SID" --timeout 40000 -e "$JS" >"${REDDIT_BROWSER_LOG:-/dev/null}" 2>&1 || true
-
-  if [ -s "$OUT" ]; then
-    cat "$OUT"; echo
+  # Playwriter wraps console output as `[log] '<value>'`; JSON has its own quotes, so we
+  # emit base64 (only [A-Za-z0-9+/=], survives the wrapper) and decode here.
+  # Playwriter wraps console output as `[log] '<value>'`; JSON has its own quotes, so we
+  # emit base64 (only [A-Za-z0-9+/=], survives the wrapper) and decode here.
+  _eval_b64() {
+    "$PW" -s "$SID" --timeout 40000 -e "$JS" 2>"${REDDIT_BROWSER_LOG:-/dev/null}" \
+      | grep -oE 'REDDIT_B64:[A-Za-z0-9+/=]+' | tail -1 | sed 's/^REDDIT_B64://'
+  }
+  B64=$(_eval_b64 || true)
+  if [ -z "$B64" ]; then
+    # No output usually means Playwriter's single CDP connection is bound to ANOTHER
+    # session (many can linger). `session reset` re-binds THIS one; brief settle + retry.
+    "$PW" session reset "$SID" >/dev/null 2>&1 || true
+    sleep 2
+    B64=$(_eval_b64 || true)
+  fi
+  LINE=$([ -n "$B64" ] && printf '%s' "$B64" | base64 -d 2>/dev/null)
+  if [ -n "$LINE" ] && printf '%s' "$LINE" | jq empty 2>/dev/null; then
+    printf '%s\n' "$LINE"
   else
     _emit_err "browser fetch produced no output (extension not connected, or not logged in)"
   fi
-  rm -f "$OUT" 2>/dev/null || true
 fi

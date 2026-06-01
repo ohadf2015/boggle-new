@@ -47,22 +47,36 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
   command -v "$PW" >/dev/null 2>&1 \
     || { echo "reddit-snapshot: playwriter CLI not found — skipping (install: npm i -g playwriter@latest)"; exit 0; }
 
-  # One shared browser session reused across every fetch (reddit-browser-fetch.sh reads
-  # PLAYWRITER_SESSION; without it each call would open its own tab).
-  SID=$("$PW" session new 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tr -d '[:space:]')
+  # One shared browser session reused across every fetch. Honour a caller-provided
+  # PLAYWRITER_SESSION (a session already holding the CDP connection is most reliable —
+  # Playwriter binds ONE connection at a time, and a brand-new `session new` can fail to
+  # grab it when others linger). Otherwise create one.
+  SID="${PLAYWRITER_SESSION:-}"
+  if [ -z "$SID" ]; then
+    SID=$("$PW" session new 2>&1 | sed 's/\x1b\[[0-9;]*m//g' | tr -d '[:space:]')
+  fi
   if [ -z "$SID" ] || ! [[ "$SID" =~ ^[0-9]+$ ]]; then
     echo "reddit-snapshot: playwriter session start failed — Chrome/extension offline? Skipping."
     exit 0
   fi
   echo "reddit-snapshot: session=$SID"
+  # Bind the CDP connection to THIS session before fetching, then let it settle.
+  "$PW" session reset "$SID" >/dev/null 2>&1 || true
+  sleep 2
   export PLAYWRITER_SESSION="$SID"
 
-  RESULTS=()
+  # Space out fetches: Reddit throttles rapid sequential loads in one session (a burst
+  # of 7 returned empty listings + only noisy site-wide search hits). REDDIT_FETCH_DELAY
+  # seconds between calls keeps every feed populated.
+  DELAY="${REDDIT_FETCH_DELAY:-4}"
+  RESULTS=(); _first=1
   for sub in "${FEEDS[@]}"; do
+    [ "$_first" = 1 ] || sleep "$DELAY"; _first=0
     echo "reddit-snapshot: feed r/$sub"
     RESULTS+=("$("$LIB_DIR/reddit-browser-fetch.sh" feed "$sub" top week 25)")
   done
   for q in "${SEARCHES[@]}"; do
+    sleep "$DELAY"
     echo "reddit-snapshot: search \"$q\""
     RESULTS+=("$("$LIB_DIR/reddit-browser-fetch.sh" search "$q" relevance month 25)")
   done

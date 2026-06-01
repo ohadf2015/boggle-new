@@ -35,6 +35,12 @@ chmod +x "$BIN/curl"
 
 echo "  reddit-fetch (oauth):"
 
+# Isolate the network-path tests from any real primed snapshot in the repo
+# (docs/nightly/intel/reddit-latest.json) — these assert OAuth/UA network behaviour,
+# which only runs when NO fresh snapshot is served. The snapshot tests below set
+# REDDIT_SNAPSHOT per-call, overriding this.
+export REDDIT_SNAPSHOT="$ROOT/no-such-snapshot.json"
+
 # 1 — password grant + oauth.reddit.com query
 CALLS="$ROOT/calls1.log"; : > "$CALLS"
 OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" \
