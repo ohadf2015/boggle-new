@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
+import { getCurrentSeasonDynamic } from '@/lib/seasons';
 import {
   Dialog,
   DialogContent,
@@ -575,12 +576,13 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     );
   }
 
-  // Classic mode — InGameScreen
+  // Classic mode — InGameScreen. Subtle seasonal ambience on the wrapper bg.
   return (
     <div
       className={cn(
         'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
         'bg-neo-cream dark:bg-neo-navy p-0 md:p-4',
+        getCurrentSeasonDynamic().gridSkinClass,
       )}
     >
       <div className="relative flex-1 flex flex-col min-h-0">

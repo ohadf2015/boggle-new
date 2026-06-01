@@ -1,5 +1,6 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import type { ShellSlots } from './types';
+import { getCurrentSeasonDynamic } from '@/lib/seasons';
 
 interface MultiplayerDesktopShellProps {
   slots: ShellSlots;
@@ -25,8 +26,11 @@ interface MultiplayerDesktopShellProps {
  * the rest automatically when `dir="rtl"` is set on `<html>`.
  */
 export const MultiplayerDesktopShell = memo<MultiplayerDesktopShellProps>(({ slots }) => {
+  // Subtle seasonal ambience behind the desktop match shell (transparent root,
+  // so the accent wash shows over the page background for every desktop MP mode).
+  const seasonSkin = useMemo(() => getCurrentSeasonDynamic().gridSkinClass, []);
   return (
-    <div className="@container w-full h-full" data-mp-shell-root>
+    <div className={`@container w-full h-full ${seasonSkin}`} data-mp-shell-root>
       <div
         data-mp-shell
         className="grid gap-4 p-4 h-full grid-cols-1 @[960px]:grid-cols-[minmax(200px,1fr)_minmax(500px,720px)_minmax(200px,1fr)]"
