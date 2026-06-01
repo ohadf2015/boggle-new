@@ -1,8 +1,25 @@
 diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
-index c629139..492425c 100644
+index c629139..e037e0f 100644
 --- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
 +++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
-@@ -44,7 +44,20 @@ public class BannerExecutor extends Executor {
+@@ -33,6 +33,16 @@ public class BannerExecutor extends Executor {
+     private RelativeLayout mAdViewLayout;
+     private AdView mAdView;
+     private ViewGroup mViewGroup;
++    // True once the CURRENT AdView has successfully loaded at least one ad.
++    // AdMob auto-refresh (~30-60s, configured server-side) re-invokes this
++    // AdView's AdListener on every refresh; a refresh no-fill fires
++    // onAdFailedToLoad. Upstream tears the AdView down on ANY failure, which
++    // destroys a perfectly-good displayed banner on the first refresh no-fill
++    // (the "banner disappears after a while" bug). Google's own contract keeps
++    // the last good ad on a refresh failure — this flag lets us honor that:
++    // destroy ONLY when no ad was ever shown (initial no-fill). Reset to false
++    // only in createNewAdView (a fresh AdView + fresh listener).
++    private boolean bannerHasLoaded = false;
+ 
+     public BannerExecutor(
+         Supplier<Context> contextSupplier,
+@@ -44,7 +54,20 @@ public class BannerExecutor extends Executor {
      }
  
      public void initialize() {
@@ -24,7 +41,7 @@ index c629139..492425c 100644
      }
  
      public void showBanner(final PluginCall call) {
-@@ -84,10 +97,29 @@ public class BannerExecutor extends Executor {
+@@ -84,10 +107,29 @@ public class BannerExecutor extends Executor {
              mAdViewLayout = new RelativeLayout(contextSupplier.get());
              mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
              mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
@@ -56,7 +73,7 @@ index c629139..492425c 100644
              );
  
              // TODO: Make an enum like the AdSizeEnum?
-@@ -107,13 +139,23 @@ public class BannerExecutor extends Executor {
+@@ -107,13 +149,23 @@ public class BannerExecutor extends Executor {
              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
                  View rootView = activitySupplier.get().getWindow().getDecorView();
                  rootView.setOnApplyWindowInsetsListener((v, insets) -> {
@@ -84,7 +101,7 @@ index c629139..492425c 100644
                      }
  
                      mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
-@@ -205,7 +247,7 @@ public class BannerExecutor extends Executor {
+@@ -205,7 +257,7 @@ public class BannerExecutor extends Executor {
                      .get()
                      .runOnUiThread(() -> {
                          if (mAdView != null) {
@@ -93,7 +110,7 @@ index c629139..492425c 100644
                              mAdViewLayout.removeView(mAdView);
                              mAdView.destroy();
                              mAdView = null;
-@@ -226,6 +268,10 @@ public class BannerExecutor extends Executor {
+@@ -226,6 +278,10 @@ public class BannerExecutor extends Executor {
          activitySupplier
              .get()
              .runOnUiThread(() -> {
@@ -104,7 +121,7 @@ index c629139..492425c 100644
                  final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                  mAdView.loadAd(adRequest);
              });
-@@ -245,6 +291,27 @@ public class BannerExecutor extends Executor {
+@@ -245,12 +301,36 @@ public class BannerExecutor extends Executor {
                  AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
                  // Add the AdView to the view hierarchy.
                  mAdViewLayout.addView(mAdView);
@@ -129,19 +146,40 @@ index c629139..492425c 100644
 +                    mAdViewLayout.setClipChildren(true);
 +                    mAdViewLayout.setClipToPadding(true);
 +                } catch (Exception ignored) {}
++                // Fresh AdView + fresh listener: no ad displayed yet.
++                bannerHasLoaded = false;
                  // Start loading the ad.
                  mAdView.loadAd(adRequest);
                  mAdView.setAdListener(
-@@ -261,7 +328,7 @@ public class BannerExecutor extends Executor {
+                     new AdListener() {
+                         @Override
+                         public void onAdLoaded() {
++                            bannerHasLoaded = true;
+                             final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
+ 
+                             notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
+@@ -260,8 +340,19 @@ public class BannerExecutor extends Executor {
+ 
                          @Override
                          public void onAdFailedToLoad(@NonNull LoadAdError adError) {
++                            // Refresh no-fill on an already-displayed banner: keep the
++                            // last good ad on screen (Google's default contract) and emit
++                            // NOTHING. Emitting FailedToLoad would trip the JS resetVar()
++                            // listener and collapse --admob-banner-height to 0, reflowing
++                            // page content OVER the still-visible ad. Only the INITIAL
++                            // load failure (nothing shown yet) tears down + collapses.
++                            if (bannerHasLoaded) {
++                                super.onAdFailedToLoad(adError);
++                                return;
++                            }
++
                              if (mAdView != null) {
 -                                mViewGroup.removeView(mAdViewLayout);
 +                                if (mViewGroup != null) mViewGroup.removeView(mAdViewLayout);
                                  mAdViewLayout.removeView(mAdView);
                                  mAdView.destroy();
                                  mAdView = null;
-@@ -297,7 +364,12 @@ public class BannerExecutor extends Executor {
+@@ -297,7 +388,12 @@ public class BannerExecutor extends Executor {
                  );
  
                  // Add AdViewLayout top of the WebView
@@ -155,3 +193,55 @@ index c629139..492425c 100644
              });
      }
  }
+diff --git a/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift b/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
+index 70081af..08efed3 100644
+--- a/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
++++ b/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
+@@ -7,6 +7,14 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+     var bannerView: BannerView!
+     var adPosition: String = ""
+     var Margin: Int = 0
++    // True once the CURRENT bannerView has successfully loaded at least one ad.
++    // AdMob auto-refresh re-invokes the delegate on every refresh; a refresh
++    // no-fill fires didFailToReceiveAdWithError. Upstream removes the banner on
++    // ANY failure, tearing down a perfectly-good displayed banner on the first
++    // refresh no-fill (the "banner disappears after a while" bug). Keep the last
++    // good ad on a refresh failure (Google's contract); remove ONLY on the
++    // initial no-fill (nothing shown yet).
++    var bannerHasLoaded = false
+ 
+     func showBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
+         if let rootViewController = plugin?.getRootVC() {
+@@ -41,6 +49,8 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+             }
+ 
+             self.bannerView = BannerView(adSize: bannerSize)
++            // Fresh bannerView: no ad displayed yet.
++            self.bannerHasLoaded = false
+             self.addBannerViewToView(self.bannerView, adPosition, adMargin)
+             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
+             self.bannerView.adUnitID = adUnitID
+@@ -119,6 +129,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+     /// Tells the delegate an ad request loaded an ad.
+     func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+         NSLog("bannerViewDidReceiveAd")
++        self.bannerHasLoaded = true
+         if let rootViewController = plugin?.getRootVC() {
+             rootViewController.view.addSubview(bannerView)
+             rootViewController.view.addConstraints(
+@@ -150,6 +161,15 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+     func bannerView(_ bannerView: BannerView,
+                     didFailToReceiveAdWithError error: Error) {
+         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
++        // Refresh no-fill on an already-displayed banner: keep the last good ad
++        // on screen (Google's default contract) and emit NOTHING. Emitting
++        // FailedToLoad would trip the JS resetVar() listener and collapse
++        // --admob-banner-height to 0, reflowing page content OVER the still-
++        // visible ad. Only the INITIAL load failure (nothing shown yet) removes
++        // the banner + collapses the reserved strip.
++        if self.bannerHasLoaded {
++            return
++        }
+         self.removeBannerViewToView()
+         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
+             "width": 0,
