@@ -5983,7 +5983,9 @@ const ja = {
       "tapPlayerHint": "プレイヤーをタップして見逃した単語を確認",
       "showLess": "閉じる",
       "showMoreCount": "すべて表示 (+{count}件)",
-      "perfectBanner": "言葉の達人!"
+      "perfectBanner": "言葉の達人!",
+      "onlyYouFound": "今のところ、見つけたのはあなただけ！",
+      "rareFind": "レアな発見 · {count}人しか見つけていません"
     },
     "hub": {
       "wordWheelQuest": "ワードホイール",
@@ -12639,6 +12641,11 @@ const ja = {
         "oneAway": "惜しい！あと橋ひとつ。",
         "solid": "橋を架けたよ。超えられる？",
         "tough": "今日は手強い。次は君だ 😤"
+      },
+      "medal": {
+        "gold": "金 — 完璧！",
+        "silver": "銀 — 惜しい！",
+        "bronze": "銅 — よくやった"
       }
     },
     "community": {

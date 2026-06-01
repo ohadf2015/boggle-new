@@ -28,6 +28,9 @@ import {
   type LeaderboardRow,
 } from '@/lib/connections/dailyClient';
 import { buildDailyBridgeGrid, gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
+import { earnedMedal } from '@/lib/connections/progressTrack';
+import ConnectionsProgressTrack from './ConnectionsProgressTrack';
+import { MedalArt } from './ConnectionsRewardArt';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsLeaderboard from './ConnectionsLeaderboard';
 
@@ -93,6 +96,8 @@ export default function ConnectionsDailyChallenge() {
   const submittedRef = useRef(false);
   const [results, setResults] = useState<Results | null>(null);
   const [copied, setCopied] = useState(false);
+  // Bumped when a puzzle is solved so the (ref-backed) progress track re-renders.
+  const [solvedVersion, setSolvedVersion] = useState(0);
 
   const isTerminal = state.status === 'finished' || state.status === 'outOfLives';
   const solvedCount = solvedRef.current.size;
@@ -107,6 +112,7 @@ export default function ConnectionsDailyChallenge() {
     const idx = state.currentIndex;
     if (state.status === 'correct' && prevStatusRef.current !== 'correct') {
       solvedRef.current.add(idx);
+      setSolvedVersion((v) => v + 1);
       outcomesRef.current.set(idx, {
         reached: true,
         solved: true,
@@ -221,6 +227,18 @@ export default function ConnectionsDailyChallenge() {
           transition={{ type: 'spring', stiffness: 320, damping: 22 }}
           className="rounded-neo border-neo-thick border-neo-lime bg-neo-navy-light p-5 text-center shadow-hard"
         >
+          {(() => {
+            const medal = earnedMedal(solvedCount, total);
+            if (medal === 'none') return null;
+            return (
+              <div className="mb-2 flex flex-col items-center">
+                <MedalArt medal={medal} size={104} />
+                <span className="-mt-1 font-neo-display text-sm font-black uppercase tracking-[0.15em] text-neo-yellow">
+                  {t(`connections.daily.medal.${medal}`)}
+                </span>
+              </div>
+            );
+          })()}
           <h1 className="font-neo-display text-2xl font-black text-neo-white">{t('connections.daily.complete')}</h1>
           <div className="mt-3 flex items-center justify-center gap-4">
             <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-cyan">
@@ -262,11 +280,19 @@ export default function ConnectionsDailyChallenge() {
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4">
-      <header className="flex items-center justify-between">
-        <h1 className="font-neo-display text-lg font-black text-neo-white">{t('connections.daily.title')}</h1>
-        <span data-testid="daily-progress" className="font-mono text-sm font-bold text-neo-cyan tabular-nums">
-          {state.currentIndex + 1} / {total}
-        </span>
+      <header className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h1 className="font-neo-display text-lg font-black text-neo-white">{t('connections.daily.title')}</h1>
+          <span data-testid="daily-progress" className="font-mono text-sm font-bold text-neo-cyan tabular-nums">
+            {state.currentIndex + 1} / {total}
+          </span>
+        </div>
+        <ConnectionsProgressTrack
+          key={solvedVersion}
+          total={total}
+          currentIndex={state.currentIndex}
+          solvedIndices={solvedRef.current}
+        />
       </header>
       <PuzzleCard
         puzzle={currentPuzzle}

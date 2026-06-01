@@ -6008,7 +6008,9 @@ const he = {
       "tapPlayerHint": "לחץ על שחקן כדי לראות מה פספסת",
       "showLess": "הצג פחות",
       "showMoreCount": "הצג הכול (+{count} נוספות)",
-      "perfectBanner": "אלוף המילים!"
+      "perfectBanner": "אלוף המילים!",
+      "onlyYouFound": "רק אתם מצאתם — בינתיים!",
+      "rareFind": "מציאה נדירה · רק {count} מצאו"
     },
     "hub": {
       "wordWheelQuest": "גלגל מילים",
@@ -12532,6 +12534,11 @@ const he = {
         "oneAway": "כמעט! גשר אחד נשאר.",
         "solid": "בניתי גשרים. תצליחו לעקוף?",
         "tough": "אכזרי היום. תורכם 😤"
+      },
+      "medal": {
+        "gold": "זהב — מושלם!",
+        "silver": "כסף — כמעט!",
+        "bronze": "ארד — כל הכבוד"
       }
     },
     "community": {

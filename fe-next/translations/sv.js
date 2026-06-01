@@ -31,6 +31,11 @@ const sv = {
         "oneAway": "Så nära — en bro kvar!",
         "solid": "Broar byggda. Slår du mig?",
         "tough": "Brutal idag. Din tur 😤"
+      },
+      "medal": {
+        "gold": "Guld — Felfritt!",
+        "silver": "Silver — Så nära",
+        "bronze": "Brons — Bra jobbat"
       }
     },
     "community": {
@@ -6020,7 +6025,9 @@ const sv = {
       "tapPlayerHint": "Tryck på en spelare för att se vad du missade",
       "showLess": "Visa mindre",
       "showMoreCount": "Visa alla (+{count} till)",
-      "perfectBanner": "Ordmästare!"
+      "perfectBanner": "Ordmästare!",
+      "onlyYouFound": "Bara du hittade detta — hittills!",
+      "rareFind": "Sällsynt fynd · bara {count} hittade detta"
     },
     "hub": {
       "wordWheelQuest": "Ordhjul",

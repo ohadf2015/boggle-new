@@ -5972,7 +5972,9 @@ const en = {
       "tapPlayerHint": "Tap a player to see what you missed",
       "showLess": "Show less",
       "showMoreCount": "Show all (+{count} more)",
-      "perfectBanner": "Word Wizard!"
+      "perfectBanner": "Word Wizard!",
+      "onlyYouFound": "Only you found this — so far!",
+      "rareFind": "Rare find · only {count} got this"
     },
     "hub": {
       "wordWheelQuest": "Word Wheel",
@@ -12102,6 +12104,11 @@ const en = {
         "oneAway": "So close — one bridge away!",
         "solid": "Bridges built. Can you beat me?",
         "tough": "Brutal one today. Your turn 😤"
+      },
+      "medal": {
+        "gold": "Gold — Flawless!",
+        "silver": "Silver — So close",
+        "bronze": "Bronze — Solid run"
       }
     },
     "community": {

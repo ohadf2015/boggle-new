@@ -368,12 +368,11 @@ export default function PuzzleCard({
                 <m.button
                   type="button"
                   onClick={revealHintAd.offer}
-                  whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}
                   disabled={revealHintAd.status === 'loading' || revealHintAd.status === 'showing'}
-                  className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-yellow/70 bg-transparent text-neo-yellow font-neo-body text-sm px-4 py-2 hover:bg-neo-yellow/10 transition-colors disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 text-neo-white/55 font-neo-body text-xs px-2 py-1 hover:text-neo-yellow underline-offset-4 hover:underline transition-colors disabled:opacity-60"
                 >
-                  <Lightbulb className="w-4 h-4" aria-hidden="true" />
+                  <Lightbulb className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('connections.revealHintAd')}
                 </m.button>
               ) : null
@@ -395,12 +394,11 @@ export default function PuzzleCard({
               <m.button
                 type="button"
                 onClick={revealAnswerAd.offer}
-                whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
                 disabled={revealAnswerAd.status === 'loading' || revealAnswerAd.status === 'showing'}
-                className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-purple/70 bg-transparent text-neo-purple font-neo-body text-sm px-4 py-2 hover:bg-neo-purple/10 transition-colors disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 text-neo-white/55 font-neo-body text-xs px-2 py-1 hover:text-neo-purple underline-offset-4 hover:underline transition-colors disabled:opacity-60"
               >
-                <Eye className="w-4 h-4" aria-hidden="true" />
+                <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                 {t('connections.revealAnswerAd')}
               </m.button>
             ) : null}

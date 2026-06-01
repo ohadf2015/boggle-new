@@ -5968,7 +5968,9 @@ const es = {
       "tapPlayerHint": "Toca un jugador para ver lo que te perdiste",
       "showLess": "Ver menos",
       "showMoreCount": "Ver todas (+{count} más)",
-      "perfectBanner": "¡Mago de palabras!"
+      "perfectBanner": "¡Mago de palabras!",
+      "onlyYouFound": "Solo tú lo encontraste — ¡por ahora!",
+      "rareFind": "Hallazgo raro · solo {count} lo encontraron"
     },
     "hub": {
       "wordWheelQuest": "Rueda de palabras",
@@ -12678,6 +12680,11 @@ const es = {
         "oneAway": "¡Casi! Un puente de nada.",
         "solid": "Puentes tendidos. ¿Me superas?",
         "tough": "Hoy tocó duro. Te toca 😤"
+      },
+      "medal": {
+        "gold": "Oro — ¡Impecable!",
+        "silver": "Plata — ¡Casi!",
+        "bronze": "Bronce — Buen intento"
       }
     },
     "community": {
