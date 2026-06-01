@@ -97,10 +97,13 @@ describe('getCurrentSeasonDynamic', () => {
     }
   });
 
-  it('falls back to default art for unknown seasons (id > 6)', () => {
+  it('cycles future seasons through the identity catalog (no season-1 fallback)', () => {
     const future = getCurrentSeasonDynamic(new Date('2027-06-15T00:00:00Z'));
-    expect(future.id).toBeGreaterThan(6);
-    expect(future.imageUrl).toBe('/seasons/season-1-word-warriors.jpg');
-    expect(future.accentColor).toBe('#BFFF00');
+    expect(future.id).toBeGreaterThan(12);
+    // Future seasons get a real cycled identity, not the old season-1 fallback.
+    expect(future.imageUrl).toMatch(/^\/seasons\/season-\d+-/);
+    expect(future.accentColor).toMatch(/^#[0-9A-Fa-f]{6}$/);
+    expect(future.twist.key).toBeTruthy();
+    expect(future.gridSkinClass).toMatch(/^season-skin-/);
   });
 });

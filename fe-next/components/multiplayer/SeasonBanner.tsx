@@ -35,6 +35,7 @@ export const SeasonBanner: React.FC = () => {
         relative mx-4 mt-3 overflow-hidden
         rounded-neo border-neo-thick
         bg-neo-navy-light shadow-hard
+        ${currentSeason.gridSkinClass ?? ''}
         ${isCritical
           ? 'border-neo-pink animate-neo-pop'
           : isEndingSoon
@@ -122,6 +123,22 @@ export const SeasonBanner: React.FC = () => {
                 {tagline}
               </span>
             )}
+            {/* Season twist — the month's flavor/atmosphere. */}
+            <span
+              className="mt-0.5 inline-flex items-center gap-1 self-start max-w-full px-1.5 py-0.5 rounded-neo border border-black/60 bg-neo-navy/70 text-[10px] sm:text-[11px] font-neo-display leading-none"
+              style={{ color: accent }}
+              title={t(`season.twist.${currentSeason.twist.key}.blurb`) !== `season.twist.${currentSeason.twist.key}.blurb`
+                ? t(`season.twist.${currentSeason.twist.key}.blurb`)
+                : currentSeason.twist.blurb}
+              data-testid="season-banner-twist"
+            >
+              <span aria-hidden="true">{currentSeason.twist.emoji}</span>
+              <span className="truncate">
+                {t(`season.twist.${currentSeason.twist.key}.title`) !== `season.twist.${currentSeason.twist.key}.title`
+                  ? t(`season.twist.${currentSeason.twist.key}.title`)
+                  : currentSeason.twist.title}
+              </span>
+            </span>
             <span
               className={`text-xs sm:hidden ${isEndingSoon ? 'text-neo-pink font-neo-display' : 'text-neo-white'}`}
             >

@@ -5,6 +5,20 @@
  * season-end rewards, and countdown timers.
  */
 
+/**
+ * A season's "twist" — the flavor + atmosphere that makes each month feel
+ * distinct. Currently atmospheric (drives the banner badge + grid skin); the
+ * `scoreMultiplier` hook is wired for future seasonal scoring events and is
+ * kept >= 1 so a twist can never punish players.
+ */
+export interface SeasonTwist {
+  key: string;
+  emoji: string;
+  title: string;
+  blurb: string;
+  scoreMultiplier: number;
+}
+
 export interface Season {
   id: number;
   name: string;
@@ -15,6 +29,9 @@ export interface Season {
   imageUrl: string;
   accentColor: string;
   tagline: string;
+  twist: SeasonTwist;
+  /** CSS class applied to season-themed surfaces (board/banner) for "feeling". */
+  gridSkinClass: string;
 }
 
 export interface SeasonReward {
@@ -36,34 +53,96 @@ export interface TimeRemaining {
   totalMs: number;
 }
 
-const SEASON_THEMES = [
-  'Word Warriors',
-  'Letter Legends',
-  'Vocab Victors',
-  'Syllable Champions',
-  'Phonic Phenoms',
-  'Lexicon Lords',
-];
-
-interface SeasonArt {
-  imageUrl: string;
-  accentColor: string;
+interface SeasonCatalogEntry {
+  theme: string;
   tagline: string;
+  accentColor: string;
+  imageUrl: string;
+  gridSkinClass: string;
+  twist: SeasonTwist;
 }
 
-const SEASON_ART: Record<number, SeasonArt> = {
-  1: { imageUrl: '/seasons/season-1-word-warriors.jpg',     accentColor: '#BFFF00', tagline: 'Forge your legacy, one word at a time' },
-  2: { imageUrl: '/seasons/season-2-letter-legends.jpg',    accentColor: '#FF1493', tagline: 'Crowns earned, not inherited' },
-  3: { imageUrl: '/seasons/season-3-vocab-victors.jpg',     accentColor: '#00FFFF', tagline: 'Knowledge is your sharpest blade' },
-  4: { imageUrl: '/seasons/season-4-syllable-champions.jpg', accentColor: '#8B5CF6', tagline: 'Rhythm wins rounds' },
-  5: { imageUrl: '/seasons/season-5-phonic-phenoms.jpg',    accentColor: '#FFE135', tagline: 'Sound is the new strategy' },
-  6: { imageUrl: '/seasons/season-6-lexicon-lords.jpg',     accentColor: '#FF6B35', tagline: 'Rule the dictionary' },
-};
+/**
+ * The rotating identity catalog. Seasons cycle through these in order
+ * ((id - 1) % length), so every month gets a distinct theme, accent, twist,
+ * and grid skin — and the set repeats yearly. Entries 1-6 preserve the
+ * original launched seasons (names/taglines/accents unchanged); 7-12 are new.
+ */
+const SEASON_CATALOG: SeasonCatalogEntry[] = [
+  {
+    theme: 'Word Warriors', tagline: 'Forge your legacy, one word at a time', accentColor: '#BFFF00',
+    imageUrl: '/seasons/season-1-word-warriors.jpg', gridSkinClass: 'season-skin-warrior',
+    twist: { key: 'double-down', emoji: '⚔️', title: 'Double Down', blurb: 'Long words flex the hardest this season.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Letter Legends', tagline: 'Crowns earned, not inherited', accentColor: '#FF1493',
+    imageUrl: '/seasons/season-2-letter-legends.jpg', gridSkinClass: 'season-skin-legend',
+    twist: { key: 'crown-rush', emoji: '👑', title: 'Crown Rush', blurb: 'Every letter is a weapon. Claim the throne.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Vocab Victors', tagline: 'Knowledge is your sharpest blade', accentColor: '#00FFFF',
+    imageUrl: '/seasons/season-3-vocab-victors.jpg', gridSkinClass: 'season-skin-vocab',
+    twist: { key: 'rare-find', emoji: '💎', title: 'Rare Find', blurb: 'Dust off the rare words — this is their month.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Syllable Champions', tagline: 'Rhythm wins rounds', accentColor: '#8B5CF6',
+    imageUrl: '/seasons/season-4-syllable-champions.jpg', gridSkinClass: 'season-skin-syllable',
+    twist: { key: 'combo-beat', emoji: '🥁', title: 'Combo Beat', blurb: 'Stack syllables, ride the combo, keep the tempo.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Phonic Phenoms', tagline: 'Sound is the new strategy', accentColor: '#FFE135',
+    imageUrl: '/seasons/season-5-phonic-phenoms.jpg', gridSkinClass: 'season-skin-phonic',
+    twist: { key: 'sound-wave', emoji: '🎧', title: 'Sound Wave', blurb: 'Mix beats and letters into chart-topping plays.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Lexicon Lords', tagline: 'Rule the dictionary', accentColor: '#FF6B35',
+    imageUrl: '/seasons/season-6-lexicon-lords.jpg', gridSkinClass: 'season-skin-lexicon',
+    twist: { key: 'throne-climb', emoji: '🏰', title: 'Throne Climb', blurb: 'Build your throne from every word you know.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Frost Lexicon', tagline: 'Cool letters, hot streaks', accentColor: '#7DD3FC',
+    imageUrl: '/seasons/season-7-frost-lexicon.jpg', gridSkinClass: 'season-skin-frost',
+    twist: { key: 'frostbite', emoji: '❄️', title: 'Frostbite', blurb: 'Keep your streak warm while the board freezes over.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Neon Nights', tagline: 'The board comes alive after dark', accentColor: '#E040FB',
+    imageUrl: '/seasons/season-8-neon-nights.jpg', gridSkinClass: 'season-skin-neon',
+    twist: { key: 'afterglow', emoji: '🌃', title: 'Afterglow', blurb: 'Neon trails follow every word you find.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Solar Surge', tagline: 'Burn bright, score brighter', accentColor: '#FF8A00',
+    imageUrl: '/seasons/season-9-solar-surge.jpg', gridSkinClass: 'season-skin-solar',
+    twist: { key: 'heatwave', emoji: '☀️', title: 'Heatwave', blurb: 'The longer your run, the hotter the board glows.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Verdant Vault', tagline: 'Grow your lead, word by word', accentColor: '#34D399',
+    imageUrl: '/seasons/season-10-verdant-vault.jpg', gridSkinClass: 'season-skin-verdant',
+    twist: { key: 'bloom', emoji: '🌿', title: 'Bloom', blurb: 'Every find plants the next. Watch your score blossom.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Cosmic Cipher', tagline: 'Decode the stars', accentColor: '#818CF8',
+    imageUrl: '/seasons/season-11-cosmic-cipher.jpg', gridSkinClass: 'season-skin-cosmic',
+    twist: { key: 'stardust', emoji: '🪐', title: 'Stardust', blurb: 'Letters drift like constellations across the grid.', scoreMultiplier: 1 },
+  },
+  {
+    theme: 'Crimson Crown', tagline: 'The final ascent', accentColor: '#FB7185',
+    imageUrl: '/seasons/season-12-crimson-crown.jpg', gridSkinClass: 'season-skin-crimson',
+    twist: { key: 'final-bell', emoji: '🔔', title: 'Final Bell', blurb: 'The year closes — every point writes the record books.', scoreMultiplier: 1 },
+  },
+];
 
-const DEFAULT_ART: SeasonArt = SEASON_ART[1];
+/** Number of distinct season identities before the catalog repeats. */
+export const SEASON_CATALOG_SIZE = SEASON_CATALOG.length;
 
-function artForSeason(id: number): SeasonArt {
-  return SEASON_ART[id] ?? DEFAULT_ART;
+function catalogForSeason(id: number): SeasonCatalogEntry {
+  // ids are 1-based; wrap so every future season still gets an identity.
+  const index = ((id - 1) % SEASON_CATALOG_SIZE + SEASON_CATALOG_SIZE) % SEASON_CATALOG_SIZE;
+  return SEASON_CATALOG[index];
+}
+
+/** The twist (flavor + atmosphere) for a given season id. */
+export function getSeasonTwist(id: number): SeasonTwist {
+  return catalogForSeason(id).twist;
 }
 
 /** Season 1 starts Q1 2026 */
@@ -101,20 +180,24 @@ function getSeasonBounds(date: Date): { id: number; start: Date; end: Date } {
 export function getCurrentSeason(now?: Date): Season {
   const date = now ?? new Date();
   const { id, start, end } = getSeasonBounds(date);
-  const themeIndex = (id - 1) % SEASON_THEMES.length;
-  const theme = SEASON_THEMES[themeIndex];
-  const art = artForSeason(id);
+  return buildSeason(id, start, end);
+}
 
+/** Assemble a full Season object from its id + bounds via the identity catalog. */
+function buildSeason(id: number, start: Date, end: Date): Season {
+  const entry = catalogForSeason(id);
   return {
     id,
-    name: `Season ${id}: ${theme}`,
-    theme,
+    name: `Season ${id}: ${entry.theme}`,
+    theme: entry.theme,
     startDate: start,
     endDate: end,
     rewards: buildSeasonRewards(id),
-    imageUrl: art.imageUrl,
-    accentColor: art.accentColor,
-    tagline: art.tagline,
+    imageUrl: entry.imageUrl,
+    accentColor: entry.accentColor,
+    tagline: entry.tagline,
+    twist: entry.twist,
+    gridSkinClass: entry.gridSkinClass,
   };
 }
 
@@ -244,21 +327,7 @@ export function getMonthlySeasonBounds(date: Date): { id: number; start: Date; e
 export function getCurrentSeasonDynamic(now?: Date): Season {
   const date = now ?? new Date();
   const { id, start, end } = getMonthlySeasonBounds(date);
-  const themeIndex = (id - 1) % SEASON_THEMES.length;
-  const theme = SEASON_THEMES[themeIndex];
-  const art = artForSeason(id);
-
-  return {
-    id,
-    name: `Season ${id}: ${theme}`,
-    theme,
-    startDate: start,
-    endDate: end,
-    rewards: buildSeasonRewards(id),
-    imageUrl: art.imageUrl,
-    accentColor: art.accentColor,
-    tagline: art.tagline,
-  };
+  return buildSeason(id, start, end);
 }
 
 function buildSeasonRewards(seasonId: number): SeasonReward[] {

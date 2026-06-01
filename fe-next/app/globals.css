@@ -4080,3 +4080,20 @@ html[data-cosy='true'] .animate-neo-reject-flash {
 @media (prefers-reduced-motion: reduce) {
   .animate-cosy-quiet-in { animation: none; }
 }
+
+/* === Season identity skins ===
+   Subtle per-season atmosphere applied via Season.gridSkinClass on themed
+   surfaces (e.g. SeasonBanner). Low-opacity accent washes so each month "feels"
+   distinct without fighting the neo-brutalist chrome. */
+.season-skin-warrior  { background-image: linear-gradient(135deg, rgba(191,255,0,0.10), transparent 60%); }
+.season-skin-legend   { background-image: linear-gradient(135deg, rgba(255,20,147,0.10), transparent 60%); }
+.season-skin-vocab    { background-image: linear-gradient(135deg, rgba(0,255,255,0.10), transparent 60%); }
+.season-skin-syllable { background-image: linear-gradient(135deg, rgba(139,92,246,0.12), transparent 60%); }
+.season-skin-phonic   { background-image: linear-gradient(135deg, rgba(255,225,53,0.10), transparent 60%); }
+.season-skin-lexicon  { background-image: linear-gradient(135deg, rgba(255,107,53,0.12), transparent 60%); }
+.season-skin-frost    { background-image: linear-gradient(135deg, rgba(125,211,252,0.16), transparent 60%); }
+.season-skin-neon     { background-image: linear-gradient(135deg, rgba(224,64,251,0.16), transparent 55%); }
+.season-skin-solar    { background-image: radial-gradient(circle at 85% 12%, rgba(255,138,0,0.20), transparent 55%); }
+.season-skin-verdant  { background-image: linear-gradient(135deg, rgba(52,211,153,0.14), transparent 60%); }
+.season-skin-cosmic   { background-image: radial-gradient(circle at 80% 18%, rgba(129,140,248,0.18), transparent 60%); }
+.season-skin-crimson  { background-image: linear-gradient(135deg, rgba(251,113,133,0.16), transparent 55%); }
