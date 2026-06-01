@@ -1,2 +1,44 @@
-# Pre-commit: Quick checks only (translations)
-cd fe-next && npm run check:translations
+#!/bin/sh
+# Pre-commit gate — fast + STAGED-scoped, so it's cheap enough that nobody is
+# tempted to `git commit --no-verify`. (Routine --no-verify is how master's test
+# baseline rotted: 5 stale tests landed because the gate was skipped. See
+# 2026-06-01.) The heavier suite (vitest --changed, whole-project tsc) runs in
+# pre-push, where it gates the diff being pushed.
+#
+# WHY core.hooksPath=.husky needs this file executable: git runs it as a native
+# hook and SILENTLY SKIPS it if it isn't +x. It was 0644 from 2026-04-18 until
+# 2026-06-01, so check:translations below ran for NO ONE that whole time.
+#
+# Nightly BYPASS (NIGHTLY_RUN=1, exported by scripts/nightly/run.sh): the nightly
+# loop runs its OWN authoritative gate — a full lint+test+build on a clean-HEAD
+# worktree (scripts/nightly/lib/gate-isolated.sh) — and its working tree holds
+# concurrent founder WIP that a whole-tree check here would wrongly trip. So it
+# legitimately skips this hook; it is NOT an ungated committer.
+[ "${NIGHTLY_RUN:-}" = "1" ] && exit 0
+
+cd fe-next || exit 1
+
+# 1) Translation-key integrity — ADVISORY only (never blocks). check:translations
+#    exits non-zero on noise (it scans .next build artifacts + dynamic template
+#    keys), so as a HARD gate it blocked EVERY commit — which is exactly why this
+#    whole hook was disabled (chmod -x) and the --no-verify habit took hold, which
+#    in turn skipped the real test gate in pre-push and let stale tests rot master.
+#    A gate people trust is one they don't bypass: show the report, don't block.
+npm run check:translations 2>&1 | tail -3 || true
+
+# 2) Lint ONLY the staged JS/TS files — the RELIABLE signal (clean=0, errors=1,
+#    verified). Staged-scoped keeps it fast AND immune to unrelated broken WIP
+#    elsewhere on disk. Errors block; warnings don't.
+STAGED=$(git diff --cached --name-only --diff-filter=d \
+  | grep -E '^fe-next/.*\.(ts|tsx|js|jsx)$' \
+  | sed 's|^fe-next/||' || true)
+if [ -n "$STAGED" ]; then
+  # shellcheck disable=SC2086
+  if ! ./node_modules/.bin/eslint $STAGED; then
+    echo ""
+    echo "❌ pre-commit: eslint errors above. Fix them before committing."
+    echo "   (Avoid routine 'git commit --no-verify' — bypassing the gate is what"
+    echo "    rotted master's test baseline. Use it only with an equivalent gate.)"
+    exit 1
+  fi
+fi

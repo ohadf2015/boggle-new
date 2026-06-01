@@ -88,6 +88,13 @@ export NIGHTLY_DISABLED
 export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
 export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
 
+# Tell the husky pre-commit hook to BYPASS itself for the nightly. The nightly
+# is NOT an ungated committer — it runs a full lint+test+build on a clean-HEAD
+# worktree (lib/gate-isolated.sh) before shipping. But its working tree holds
+# concurrent founder WIP, so the whole-tree checks a pre-commit hook would run
+# could wrongly block the commit. Its push still runs the pre-push gate.
+export NIGHTLY_RUN=1
+
 # --- helpers ---------------------------------------------------------------
 log() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$RUN_LOG"; }
 TG="$LIB_DIR/telegram.sh"
