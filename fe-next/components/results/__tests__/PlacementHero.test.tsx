@@ -53,7 +53,7 @@ vi.mock('@/utils/confettiUtils', () => ({
 
 vi.mock('../../Avatar', () => ({
   __esModule: true,
-  default: ({ size, className }: { size: string; className?: string }) => <div data-testid="avatar" data-size={size} className={className} />,
+  default: ({ size, className, mood }: { size: string; className?: string; mood?: string }) => <div data-testid="avatar" data-size={size} data-mood={mood ?? 'none'} className={className} />,
 }));
 
 describe('PlacementHero — Clean Compact Layout', () => {
@@ -139,6 +139,21 @@ describe('PlacementHero — Clean Compact Layout', () => {
 
     rerender(<PlacementHero {...defaultProps} rank={4} />);
     expect(screen.getByText(/common\.ordinalN/)).toBeInTheDocument();
+  });
+
+  it('gives the winner a celebratory win mood', () => {
+    render(<PlacementHero {...defaultProps} rank={1} />);
+    expect(screen.getByTestId('avatar')).toHaveAttribute('data-mood', 'win');
+  });
+
+  it('celebrates any podium finish (rank<=3) — matches the confetti gate', () => {
+    render(<PlacementHero {...defaultProps} rank={3} />);
+    expect(screen.getByTestId('avatar')).toHaveAttribute('data-mood', 'win');
+  });
+
+  it('non-podium avatar stays neutral (no demoralising face vs upbeat copy)', () => {
+    render(<PlacementHero {...defaultProps} rank={5} />);
+    expect(screen.getByTestId('avatar')).toHaveAttribute('data-mood', 'none');
   });
 
   it('renders Word Hunt target word when wordHuntData provided', () => {

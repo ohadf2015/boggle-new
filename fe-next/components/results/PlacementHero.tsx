@@ -178,6 +178,7 @@ const PlacementHero = memo<PlacementHeroProps>(({
                   userId={username}
                   size="xl"
                   className="w-16 h-16 sm:w-20 sm:h-20"
+                  mood={isPodium ? 'win' : undefined}
                 />
               </div>
               {/* Rank pip */}
