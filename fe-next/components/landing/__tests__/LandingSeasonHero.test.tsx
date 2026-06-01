@@ -59,6 +59,8 @@ const baseSeason = {
     imageUrl: '/seasons/season-5-phonic-phenoms.jpg',
     accentColor: '#FFE135',
     tagline: 'Sound is the new strategy',
+    gridSkinClass: 'season-skin-phonic',
+    twist: { key: 'sound-wave', emoji: '🎧', title: 'Sound Wave', blurb: 'Mix beats and letters into chart-topping plays.', scoreMultiplier: 1 },
   },
   timeRemaining: { days: 12, hours: 4, totalMs: 0 },
   peakTier: 'Unranked',
@@ -116,6 +118,18 @@ describe('LandingSeasonHero', () => {
     const title = screen.getByText('Season 5: Phonic Phenoms');
     expect(title.className).toMatch(/line-clamp-2/);
     expect(title.className).not.toMatch(/\btruncate\b/);
+  });
+
+  it('surfaces the season twist (emoji + title)', () => {
+    render(<LandingSeasonHero />);
+    expect(screen.getByText('Sound Wave')).toBeInTheDocument();
+  });
+
+  it('does not crash if a season has no twist (defensive)', () => {
+    const { currentSeason, ...rest } = baseSeason;
+    const { twist: _omit, ...seasonNoTwist } = currentSeason;
+    mockUseSeason.mockReturnValue({ ...rest, currentSeason: seasonNoTwist });
+    expect(() => render(<LandingSeasonHero />)).not.toThrow();
   });
 
   it('returns null on the CrazyGames platform', () => {

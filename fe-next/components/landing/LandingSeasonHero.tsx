@@ -21,6 +21,14 @@ export const LandingSeasonHero: React.FC = () => {
   const seasonLabel = t('season.name', { number: currentSeason.id, theme: currentSeason.theme });
   const ctaLabel = t('season.viewLeaderboard');
   const seasonNumeral = String(currentSeason.id).padStart(2, '0');
+  // Localized twist title with the in-config English as graceful fallback.
+  // Guarded — resilient if a season object ever lacks a twist.
+  const twist = currentSeason.twist;
+  const twistTitleKey = twist ? `season.twist.${twist.key}.title` : '';
+  const twistTitleLocalized = twist ? t(twistTitleKey) : '';
+  const twistTitle = twist
+    ? (twistTitleLocalized !== twistTitleKey ? twistTitleLocalized : twist.title)
+    : '';
 
   return (
     <section
@@ -117,6 +125,16 @@ export const LandingSeasonHero: React.FC = () => {
             <h2 className="font-neo-display text-base sm:text-lg text-neo-white leading-tight break-words line-clamp-2">
               {seasonLabel}
             </h2>
+            {/* Season twist — the month's flavor/atmosphere. */}
+            {twist && (
+              <p
+                className="mt-0.5 text-[11px] sm:text-xs font-neo-display leading-tight truncate"
+                style={{ color: accent }}
+              >
+                <span aria-hidden className="me-1">{twist.emoji}</span>
+                {twistTitle}
+              </p>
+            )}
           </div>
         </div>
 
