@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { getCurrentSeasonDynamic } from '@/lib/seasons';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useInterval } from '@/hooks/useSafeTimeout';
 import { m, AnimatePresence } from 'framer-motion';
@@ -541,9 +542,13 @@ const DailyChallenge: React.FC = () => {
     router.push(`/${language}/daily`);
   }, [isPractice, gameLanguage, router, language]);
 
+  // Subtle seasonal ambience washes the whole daily screen — atmosphere only,
+  // behind all content (relative wrapper), no readability impact.
+  const seasonSkin = useMemo(() => getCurrentSeasonDynamic().gridSkinClass, []);
+
   return (
     <div
-      className="flex-1 flex flex-col min-h-0 h-dvh max-h-dvh bg-gray-100 dark:bg-neo-navy relative overflow-x-clip overflow-hidden"
+      className={`flex-1 flex flex-col min-h-0 h-dvh max-h-dvh bg-gray-100 dark:bg-neo-navy relative overflow-x-clip overflow-hidden ${seasonSkin}`}
     >
       <AutoHideHeader />
 
