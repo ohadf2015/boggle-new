@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickRivalReminderCopy, RIVAL_TEMPLATE_COUNT_PER_DIRECTION } from '../rivalReminderCopy';
+import { pickRivalReminderCopy, composeRivalBody, RIVAL_TEMPLATE_COUNT_PER_DIRECTION } from '../rivalReminderCopy';
 import {
   RIVAL_REMINDER_TEMPLATES_BY_LOCALE,
 } from '../rivalReminderTemplates';
@@ -309,6 +309,85 @@ describe('pickRivalReminderCopy', () => {
         expect(blob).not.toContain('⁩');
         expect(blob).toContain('Maya');
       }
+    });
+  });
+
+  describe('no recoverable name → localized generic rival noun', () => {
+    it('en: empty username renders "a rival", never a leftover {rival} or bare gap', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: '', direction: 'above', scoreGap: 100,
+      });
+      const blob = `${c.title} ${c.body}`;
+      expect(blob).toContain('a rival');
+      expect(blob).not.toContain('{rival}');
+      // no doubled spaces from an empty interpolation
+      expect(c.body).not.toMatch(/ {2,}/);
+      expect(c.title).not.toMatch(/ {2,}/);
+    });
+
+    it('he: empty username renders the generic noun "יריב" (bidi-wrapped)', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'he',
+        rivalUsername: '', direction: 'above', scoreGap: 100,
+      });
+      expect(`${c.title} ${c.body}`).toContain('יריב');
+    });
+
+    it('still genericizes if a placeholder slipped through to the copy layer', () => {
+      const c = pickRivalReminderCopy({
+        userId: 'u1', date: '2026-05-10', hoursLeft: 8, locale: 'en',
+        rivalUsername: 'Player_00952ce3', direction: 'above', scoreGap: 100,
+      });
+      expect(`${c.title} ${c.body}`).not.toContain('Player_00952ce3');
+      expect(`${c.title} ${c.body}`).toContain('a rival');
+    });
+  });
+
+  describe('composeRivalBody (no double-time, clean sentence boundaries)', () => {
+    it('drops the urgency suffix when the body already states the hours', () => {
+      // This is the exact screenshot bug: "...8 שעות לעקוף." + "נשארו 8 שעות."
+      const out = composeRivalBody({
+        bodyBase: 'Maya pulled even. 8h to pull ahead.',
+        othersClause: '',
+        urgencySuffix: '8h left today.',
+        bodyHasHours: true,
+      });
+      expect(out).toBe('Maya pulled even. 8h to pull ahead.');
+    });
+
+    it('appends the urgency suffix when the body does NOT mention hours', () => {
+      const out = composeRivalBody({
+        bodyBase: 'Maya matched your score.',
+        othersClause: '',
+        urgencySuffix: '8h left today.',
+        bodyHasHours: false,
+      });
+      expect(out).toBe('Maya matched your score. 8h left today.');
+    });
+
+    it('places the multi-rival clause as its own sentence, never glued mid-run', () => {
+      const out = composeRivalBody({
+        bodyBase: 'Maya matched your score.',
+        othersClause: '+3 more in range.',
+        urgencySuffix: '8h left today.',
+        bodyHasHours: false,
+      });
+      expect(out).toBe('Maya matched your score. +3 more in range. 8h left today.');
+      // never the run-on the user reported ("…3 more 8h left…"): a clause
+      // count is never directly followed by the next clause's hour figure.
+      expect(out).not.toMatch(/\d+\s+\d+h/);
+      expect(out).not.toMatch(/\S\.\S/); // a period is always followed by space/end
+    });
+
+    it('collapses to clean single spacing and trims', () => {
+      const out = composeRivalBody({
+        bodyBase: '  Maya played.  ',
+        othersClause: '',
+        urgencySuffix: '',
+        bodyHasHours: true,
+      });
+      expect(out).toBe('Maya played.');
     });
   });
 });

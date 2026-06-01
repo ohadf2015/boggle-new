@@ -211,6 +211,42 @@ describe('findDailyChallengeRivals', () => {
     expect(result.get('user-1')!.username).toBe('R1');
   });
 
+  it('prefers leaderboard.display_name over a placeholder username (Player_<hex>)', async () => {
+    // The reported bug: lb.username is the DB default placeholder, the real
+    // name lives in lb.display_name — push must surface the real name.
+    leaderboardResult.data = [
+      { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 1000 },
+      {
+        player_id: 'rival-ziv',
+        username: 'Player_00952ce3',
+        display_name: 'Ziv Benista',
+        avatar_image: null,
+        total_score: 1100,
+      },
+    ];
+    puzzleAttemptsResult.data = [{ player_id: 'rival-ziv', solved: true }];
+
+    const result = await findDailyChallengeRivals(['user-1']);
+    expect(result.get('user-1')!.username).toBe('Ziv Benista');
+  });
+
+  it('passes an empty username through when display_name AND username are both placeholders (copy genericizes per-locale)', async () => {
+    leaderboardResult.data = [
+      { player_id: 'user-1', username: 'Me', avatar_image: null, total_score: 1000 },
+      {
+        player_id: 'rival-anon',
+        username: 'Player_deadbeef',
+        display_name: 'Player_deadbeef',
+        avatar_image: null,
+        total_score: 1100,
+      },
+    ];
+    puzzleAttemptsResult.data = [{ player_id: 'rival-anon', solved: true }];
+
+    const result = await findDailyChallengeRivals(['user-1']);
+    expect(result.get('user-1')!.username).toBe('');
+  });
+
   it('legacy character-ID avatar_image (e.g. "broccoli-bob") resolves to null — modern path is avatar_config + mascot fallback', async () => {
     // Character avatars are deprecated; the live system uses JSONB avatar_config
     // which we cannot render to a hosted PNG yet. Rival still picked, image null,

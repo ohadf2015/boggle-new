@@ -29,18 +29,25 @@ const mockPushAddListener = vi.fn(async (event: string, cb: PushListener) => {
 });
 const mockSchedule = vi.fn(async () => ({ notifications: [] }));
 
+const localListeners: Record<string, PushListener> = {};
+const mockLocalAddListener = vi.fn(async (event: string, cb: PushListener) => {
+  localListeners[event] = cb;
+  return { remove: vi.fn() };
+});
+
 describe('setupPushListeners — foreground display bridge', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     trackGrowthEvent.mockClear();
     for (const k of Object.keys(pushListeners)) delete pushListeners[k];
+    for (const k of Object.keys(localListeners)) delete localListeners[k];
 
     (globalThis as any).Capacitor = {
       isNativePlatform: () => true,
       getPlatform: () => 'android',
       Plugins: {
         PushNotifications: { addListener: mockPushAddListener },
-        LocalNotifications: { schedule: mockSchedule },
+        LocalNotifications: { schedule: mockSchedule, addListener: mockLocalAddListener },
       },
     };
   });
@@ -119,6 +126,40 @@ describe('setupPushListeners — foreground display bridge', () => {
     expect(trackGrowthEvent).toHaveBeenCalledWith(
       'notification_clicked',
       expect.objectContaining({ type: 'gift', campaign: 'gift_received' }),
+    );
+  });
+
+  // A push received while the app is FOREGROUND is re-displayed via
+  // LocalNotifications.schedule (with the data copied into `extra`). Tapping
+  // THAT notification fires `localNotificationActionPerformed`, NOT
+  // `pushNotificationActionPerformed` — so without this listener the deep link
+  // is silently dropped and the tap "doesn't redirect" (the reported bug).
+  it('routes a tapped foreground-bridged (local) notification through onNotificationTapped', async () => {
+    const onTapped = vi.fn();
+    await setupPushListeners(undefined, onTapped);
+
+    const localTap = localListeners['localNotificationActionPerformed'];
+    expect(localTap).toBeDefined();
+
+    localTap({
+      notification: { extra: { type: 'daily_challenge', deepLink: '/daily?src=push&kind=rival' } },
+    });
+    await Promise.resolve();
+
+    expect(onTapped).toHaveBeenCalledWith({ type: 'daily_challenge', deepLink: '/daily?src=push&kind=rival' });
+  });
+
+  it('emits notification_clicked for a local-notification tap too', async () => {
+    await setupPushListeners();
+
+    localListeners['localNotificationActionPerformed']({
+      notification: { extra: { type: 'daily_challenge', campaign: 'smart_reminder_v1' } },
+    });
+    await Promise.resolve();
+
+    expect(trackGrowthEvent).toHaveBeenCalledWith(
+      'notification_clicked',
+      expect.objectContaining({ type: 'daily_challenge', campaign: 'smart_reminder_v1' }),
     );
   });
 });

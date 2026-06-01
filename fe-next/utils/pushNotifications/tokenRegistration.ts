@@ -28,6 +28,12 @@ interface PushNotificationsPlugin {
   addListener: <T = unknown>(event: string, handler: (data: T) => void) => Promise<{ remove: () => void }>;
 }
 
+interface LocalNotificationActionPerformed {
+  notification: {
+    extra?: Record<string, string>;
+  };
+}
+
 interface LocalNotificationsPlugin {
   schedule: (opts: {
     notifications: Array<{
@@ -37,6 +43,7 @@ interface LocalNotificationsPlugin {
       extra?: Record<string, string>;
     }>;
   }) => Promise<void>;
+  addListener?: <T = unknown>(event: string, handler: (data: T) => void) => Promise<{ remove: () => void }>;
 }
 
 interface CapacitorGlobal {
@@ -308,10 +315,39 @@ export async function setupPushListeners(
       }
     );
 
+    // Handle taps on the LOCAL notification we scheduled to make a
+    // foreground-received push visible. Capacitor routes these through
+    // `localNotificationActionPerformed` (with the payload in `extra`), NOT
+    // `pushNotificationActionPerformed` — so without this listener a push that
+    // arrived while the app was open silently fails to deep-link on tap.
+    let localActionListener: { remove: () => void } | null = null;
+    if (LocalNotifications?.addListener) {
+      localActionListener = await LocalNotifications.addListener(
+        'localNotificationActionPerformed',
+        (action: LocalNotificationActionPerformed) => {
+          const data = action.notification?.extra;
+          try {
+            trackGrowthEvent('notification_clicked', {
+              type: data?.type ?? 'unknown',
+              campaign: data?.campaign,
+              actionUrl: data?.actionUrl,
+            });
+          } catch {
+            // analytics never blocks tap handling
+          }
+
+          if (onNotificationTapped && data) {
+            onNotificationTapped(data);
+          }
+        }
+      );
+    }
+
     // Return cleanup function
     return () => {
       receivedListener.remove();
       actionListener.remove();
+      localActionListener?.remove();
     };
   } catch (error) {
     console.debug('Error setting up push listeners:', error);

@@ -29,6 +29,7 @@ import {
 } from './rivalReminderTemplates';
 import type { PushLocale } from '@/backend/utils/pushTranslations';
 import type { RivalDirection, RivalMode } from './dailyChallengeRivals';
+import { resolveRivalDisplayName } from './pushDisplayName';
 
 export { RIVAL_TEMPLATE_COUNT_PER_DIRECTION };
 export type { RivalReminderTemplate };
@@ -104,21 +105,47 @@ export function currentUrgencyTier(hoursLeft: number): UrgencyTier {
 }
 
 /**
- * Locale-aware "and N more" tail. Returns '' when count <= 0 so the body
- * trims cleanly. Leading space included so callers can concat without
- * having to think about whitespace.
+ * Locale-aware multi-rival clause. Returns '' when count <= 0. Unlike the old
+ * `othersTail`, this is a SELF-CONTAINED sentence (terminal punctuation
+ * included) so it composes cleanly between the body and the urgency suffix
+ * instead of gluing mid-run ("…3 more 8h left…" — the reported bug).
  */
-function othersTail(locale: PushLocale, n: number): string {
+function othersClause(locale: PushLocale, n: number): string {
   if (n <= 0) return '';
   switch (locale) {
-    case 'he': return ` ועוד ${n} כאלה`;
-    case 'sv': return ` och ${n} till`;
-    case 'ja': return ` 他${n}人も`;
-    case 'es': return ` y ${n} más`;
+    case 'he': return `ועוד ${n} בטווח.`;
+    case 'sv': return `+${n} till i jakten.`;
+    case 'ja': return `他に${n}人が接近中。`;
+    case 'es': return `+${n} más al acecho.`;
     case 'en':
     default:
-      return ` and ${n} more`;
+      return `+${n} more in range.`;
   }
+}
+
+/**
+ * Join the body fragments into one clean string. Two invariants fixed here:
+ *  1. **No double-time** — the urgency suffix is skipped when the chosen
+ *     template body already states the hours (most do), so we never render
+ *     "…8h to pull ahead. 8h left today." as in the screenshot.
+ *  2. **Clean sentence boundaries** — each fragment is already terminally
+ *     punctuated; we join with a single space and collapse any stray runs so
+ *     the multi-rival clause reads as its own sentence, never glued on.
+ */
+export function composeRivalBody(input: {
+  bodyBase: string;
+  othersClause: string;
+  urgencySuffix: string;
+  bodyHasHours: boolean;
+}): string {
+  const parts = [input.bodyBase, input.othersClause];
+  if (!input.bodyHasHours) parts.push(input.urgencySuffix);
+  return parts
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
 
 /**
@@ -185,7 +212,10 @@ export function pickRivalReminderCopy(input: RivalReminderInput): RivalReminderC
     if (VARIANT_TIERS[i] === tier) tierIndices.push(i);
   }
   const safeTierIndices = tierIndices.length > 0 ? tierIndices : [0, 1, 2, 3, 4, 5];
-  const hashed = hashString(`${userId}|${date}|${direction}`);
+  // Hash also folds in `mode` so a user who has both a puzzle-rival and a
+  // word-hunt-rival context across days sees more template spread (one line,
+  // no new mechanism — addresses "same push over and over").
+  const hashed = hashString(`${userId}|${date}|${direction}|${mode}`);
   const variant = safeTierIndices[hashed % safeTierIndices.length];
 
   const localeKey: PushLocale =
@@ -199,26 +229,32 @@ export function pickRivalReminderCopy(input: RivalReminderInput): RivalReminderC
   const table = isTied ? set.tied : set[direction];
   const t = table[variant] ?? table[0];
 
+  // Resolve a presentable rival name: real name when one survived the lookup,
+  // otherwise a localized generic noun ("a rival" / "יריב" / …). Guards the
+  // copy layer even if a raw placeholder ("Player_<hex>") slips through.
+  const displayName = resolveRivalDisplayName([rivalUsername], localeKey);
   const vars = {
-    rival: bidiWrap(rivalUsername, localeKey),
+    rival: bidiWrap(displayName, localeKey),
     gap,
     hoursLeft: hours,
     mode: MODE_LABEL[localeKey][mode],
     rivalScore,
     rankDelta: Math.abs(rankDelta),
-    // {others} placeholder optional inside templates; if absent, tail is
-    // appended below.
-    others: othersTail(localeKey, additionalCount).trim(),
   };
 
   const bodyBase = fill(t.body, vars);
-  const tail =
-    bodyBase.includes(vars.others) || additionalCount <= 0
-      ? ''
-      : othersTail(localeKey, additionalCount);
   const urgencySuffix = fill(URGENCY_SUFFIX[localeKey][tier], vars);
+  // The template's own copy already states the hours whenever it embeds
+  // {hoursLeft} — only then do we suppress the urgency suffix to avoid the
+  // double-time run-on from the screenshot.
+  const bodyHasHours = /\{hoursLeft\}/.test(t.body);
 
-  const body = `${bodyBase}${tail} ${urgencySuffix}`.trim();
+  const body = composeRivalBody({
+    bodyBase,
+    othersClause: othersClause(localeKey, additionalCount),
+    urgencySuffix,
+    bodyHasHours,
+  });
   const title = fill(t.title, vars);
 
   const deepLink =

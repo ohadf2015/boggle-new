@@ -35,6 +35,7 @@
 
 import logger from '@/backend/utils/logger';
 import { getSupabaseAdmin, getTodayDate } from './email';
+import { isPlaceholderName } from './pushDisplayName';
 
 export type RivalDirection = 'above' | 'below';
 export type RivalMode = 'puzzle' | 'wordHunt' | 'both';
@@ -91,9 +92,23 @@ export function resolveRivalAvatarUrl(
 interface LeaderboardRow {
   player_id: string;
   username: string | null;
+  display_name: string | null;
   avatar_image: string | null;
   avatar_config: unknown;
   rank_position: number | null;
+}
+
+/**
+ * Best real name for a rival, preferring `display_name` over the (often
+ * placeholder) `username`. Returns '' when BOTH are placeholders — the copy
+ * layer (which knows the recipient's locale) substitutes a localized generic
+ * rival noun. See `lib/pushDisplayName.ts` for the placeholder rules and the
+ * 2026-05-04 migration that created the `Player_<hex>` defaults.
+ */
+function bestRivalName(displayName: string | null, username: string | null): string {
+  if (!isPlaceholderName(displayName)) return (displayName as string).trim();
+  if (!isPlaceholderName(username)) return (username as string).trim();
+  return '';
 }
 
 export async function findDailyChallengeRivals(
@@ -200,7 +215,7 @@ export async function findDailyChallengeRivals(
   }
   const lbRes = await supabase
     .from('leaderboard')
-    .select('player_id, username, avatar_image, avatar_config, rank_position')
+    .select('player_id, username, display_name, avatar_image, avatar_config, rank_position')
     .in('player_id', lbIds);
 
   if (lbRes.error) {
@@ -265,7 +280,7 @@ export async function findDailyChallengeRivals(
     const mode: RivalMode = inPuzzle && inHunt ? 'both' : inPuzzle ? 'puzzle' : 'wordHunt';
     rivalPool.push({
       id,
-      username: row.username || 'Rival',
+      username: bestRivalName(row.display_name, row.username),
       avatar: resolveRivalAvatarUrl(row.avatar_image, row.avatar_config, id),
       score: seasonScore,
       rank: typeof row.rank_position === 'number' ? row.rank_position : null,
