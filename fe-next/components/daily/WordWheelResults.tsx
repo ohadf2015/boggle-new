@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { m, animate as fmAnimate } from 'framer-motion';
-import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type, Home, Sparkles } from 'lucide-react';
+import { Star, ArrowRight, ArrowLeft, Flame, Crown, Zap, Type, Home, Sparkles, Gem } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import { selectRareFindCelebration, type RareFind } from '@/lib/wordWheel/wordRarity';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
@@ -124,6 +125,27 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const isExceptional = result.score >= EXCELLENT_SCORE || result.wordsFound.length >= EXCELLENT_WORD_COUNT;
   const [showConfetti, setShowConfetti] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
+  const [rareFind, setRareFind] = useState<RareFind | null>(null);
+
+  // Rarest-find celebration: pull the day's distinct-player count per word and
+  // surface the player's rarest find ("only you found X — so far" / "rare find").
+  // Skipped in practice (no shared field to compare against). Best-effort: any
+  // fetch/parse failure simply yields no card.
+  useEffect(() => {
+    if (isPractice || result.wordsFound.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/daily-challenge/word-wheel/word-rarity/${puzzleDate}/${gameLang}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        const counts = (json?.counts ?? {}) as Record<string, number>;
+        const find = selectRareFindCelebration(result.wordsFound, counts);
+        if (!cancelled && find) setRareFind(find);
+      } catch { /* rarity is best-effort */ }
+    })();
+    return () => { cancelled = true; };
+  }, [isPractice, result.wordsFound, puzzleDate, gameLang]);
 
   // Animate score counting up with natural deceleration
   useEffect(() => {
@@ -262,6 +284,35 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             {t('wordWheel.results.perfectBanner', 'Word Wizard!')}
           </span>
           <Sparkles className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+        </m.div>
+      )}
+
+      {/* Rarest-find celebration — "only you found X (so far)" or a rare-but-
+          shared find. Honesty gates live in selectRareFindCelebration. */}
+      {rareFind && (
+        <m.div
+          data-testid="word-wheel-rare-find"
+          data-exclusive={rareFind.isExclusive ? 'true' : 'false'}
+          className={cn(
+            'z-10 flex flex-col items-center gap-0.5 px-4 py-2.5 rounded-neo border-3 border-neo-black shadow-hard-lg',
+            rareFind.isExclusive
+              ? 'bg-neo-yellow text-neo-black shadow-[3px_3px_0px_black,0_0_24px_rgba(255,225,53,0.5)]'
+              : 'bg-neo-purple text-neo-white',
+          )}
+          initial={{ scale: 0, y: -6 }}
+          animate={{ scale: [0, 1.15, 1], y: 0 }}
+          transition={{ delay: 1.1, duration: 0.5, type: 'spring', stiffness: 360, damping: 16 }}
+        >
+          <span className="flex items-center gap-1.5 font-neo-display font-black text-xs sm:text-sm tracking-wide uppercase">
+            <Gem className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+            {rareFind.isExclusive
+              ? t('wordWheel.results.onlyYouFound', 'Only you found this — so far!')
+              : t('wordWheel.results.rareFind', { count: rareFind.playerCount })}
+            <Gem className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+          </span>
+          <span dir="auto" className="font-neo-body font-black text-lg tracking-widest">
+            {gameLang === 'he' ? applyHebrewFinalLetters(rareFind.word) : rareFind.word}
+          </span>
         </m.div>
       )}
 

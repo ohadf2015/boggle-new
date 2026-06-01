@@ -19,6 +19,12 @@ import { updateDailyProfileStats } from './profileStats';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
+import { aggregateWordPlayerCounts, type RarityRow } from '../../../lib/wordWheel/wordRarity';
+
+// Upper bound on attempts scanned for the rarity aggregate. A daily puzzle's
+// attempts are date+language scoped (indexed), so this caps a popular day's
+// read without an unbounded table scan.
+const RARITY_ROW_CAP = 5000;
 
 const router: Router = express.Router();
 
@@ -498,6 +504,64 @@ router.get('/words/:date/:language/:playerId', async (req: Request<WordsRoutePar
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Wheel words fetch error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ==========================================
+// GET /api/daily-challenge/word-wheel/word-rarity/:date/:language
+// ==========================================
+// Distinct-player count per word across the day's attempts. Powers the
+// results-screen "rarest find / only you found X (so far)" celebration.
+// NOTE: daily play is async — counts are a point-in-time snapshot, never final.
+
+router.get('/word-rarity/:date/:language', async (req: Request<{ date: string; language: string }>, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Service not available' });
+      return;
+    }
+
+    const { date, language } = req.params;
+    if (!isValidDateFormat(date)) {
+      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+      return;
+    }
+    if (!isValidLanguage(language)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('daily_word_wheel_attempts')
+      .select('player_id, guest_fingerprint, words_found')
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .limit(RARITY_ROW_CAP);
+
+    if (error) {
+      logger.error('API', `Word Wheel rarity fetch error: ${error.message}`);
+      res.status(500).json({ error: 'Failed to fetch rarity' });
+      return;
+    }
+
+    const rows: RarityRow[] = (data ?? []).map((row) => ({
+      id: (row.player_id as string | null) ?? (row.guest_fingerprint as string | null) ?? null,
+      words: Array.isArray(row.words_found)
+        ? (row.words_found as unknown[]).filter((w): w is string => typeof w === 'string')
+        : [],
+    }));
+
+    res.json({ counts: aggregateWordPlayerCounts(rows) });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Word Wheel rarity fetch error: ${err.message}`);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
