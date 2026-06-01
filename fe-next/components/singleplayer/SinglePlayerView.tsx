@@ -20,6 +20,7 @@ import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { markBotsGamePlayed } from '@/utils/onboardingStorage';
 import { awardCreatorCoins } from '@/utils/creatorRewards';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
+import { getCurrentSeasonDynamic } from '@/lib/seasons';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNetworkState } from '@/hooks/useNetworkState';
@@ -285,9 +286,13 @@ const SinglePlayerView: React.FC = () => {
     setPhase('results');
 }, [gameState.mode, gameState.difficulty, gameState.timerSeconds, gameState.language, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement, isPractice, online, offlineFlag, t]);
 
+  // Subtle seasonal ambience behind the board during play — atmosphere only,
+  // sits below the grid (relative children) and never touches tile readability.
+  const seasonSkin = useMemo(() => getCurrentSeasonDynamic().gridSkinClass, []);
+
   return (
     <div
-      className={`flex flex-col bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${phase === 'playing' ? 'h-full overflow-hidden' : 'min-h-full'}`}
+      className={`flex flex-col bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${phase === 'playing' ? `h-full overflow-hidden ${seasonSkin}` : 'min-h-full'}`}
       {...pullToRefreshHandlers}
     >
       {phase === 'results' && (
