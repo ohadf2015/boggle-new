@@ -43,8 +43,11 @@ export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
 # run) the artifact is gate-clean by construction, so even a lane that times out
 # after writing only this file still ships it (with KEEP_TIMEOUT_PARTIALS=1) — the
 # floor is "a reviewable artifact every run", not "a perfect deliverable".
-nightly_artifact_contract() { # <lane_id> <today>
-  local lane_id="$1" today="$2"
+nightly_artifact_contract() { # <lane_id> <today> <timeout_sec>
+  local lane_id="$1" today="$2" timeout_sec="${3:-900}"
+  local budget_min=$(( timeout_sec / 60 ))
+  # 80% of budget, floored, is the "stop starting new edits, finalize now" mark.
+  local finalize_min=$(( (timeout_sec * 8 / 10) / 60 )); [ "$finalize_min" -lt 1 ] && finalize_min=1
   cat <<EOF
 ═══ MANDATORY MINIMUM ARTIFACT (non-negotiable — do this FIRST, before any heavy work) ═══
 Your FIRST action this lane: create docs/nightly/artifacts/lane-${lane_id}-${today}.md
@@ -59,6 +62,25 @@ budget is nearly spent — UPDATE that file to:
 NEVER exit having produced nothing. A timed-out lane that leaves only this artifact
 still counts as a successful-but-degraded run: the artifact is gate-clean (docs/ is
 outside fe-next/) and ships, so the lane is never a total loss. This is your floor.
+
+═══ TIME BUDGET & SCOPE DISCIPLINE (the #1 reason lanes ship nothing) ═══
+You have ~${budget_min} MINUTES of wall-clock. At ~${finalize_min} min you are HARD-KILLED
+(SIGTERM) — anything you have not finished is left HALF-WRITTEN, and a half-written
+file (broken import, unclosed JSX, dangling edit) FAILS the lint/build gate and gets
+your code DROPPED. On 2026-06-01 five of six code lanes were killed mid-edit and shipped
+ZERO code this way. Avoid that:
+  • Make ONE focused, COMPLETE, gate-clean change — not three half-finished ones.
+    One small correct shipped change beats a sprawling broken one every time.
+  • NEVER begin an edit you cannot FINISH **and self-verify** within budget. Before a
+    large multi-file change, ask: "can I land + tsc/lint-check this in the time left?"
+    If not, pick a smaller change.
+  • By ~${finalize_min} min: STOP starting new work. Finish the edit in flight, run a
+    quick \`cd fe-next && npx tsc --noEmit\` (or \`npx eslint <your changed files>\`) on
+    ONLY your changed files to confirm they are clean, then update the artifact and END.
+    A lane that voluntarily finishes clean at ${finalize_min} min ships; one that sprawls
+    to the kill at ${budget_min} min ships nothing.
+  • Leaving a file mid-edit is WORSE than not touching it: it poisons the gate. If you
+    are out of time, REVERT any incomplete edit (\`git checkout -- <file>\`) before ending.
 
 SPEED: code search is your dominant wall-clock cost. ALWAYS use \`rg\` (ripgrep — installed)
 over \`grep -r\`/\`find\` (10× faster on the fe-next/ tree). Trust the intelligence brief
@@ -144,7 +166,7 @@ PY
   # lane body; the founder-directives block below still lands on top of it.
   local with_contract
   with_contract=$(mktemp -t "lane-${lane_id}-contract.XXXXXX")
-  { nightly_artifact_contract "$lane_id" "$today"; cat "$rendered"; } > "$with_contract" && mv "$with_contract" "$rendered"
+  { nightly_artifact_contract "$lane_id" "$today" "$timeout_sec"; cat "$rendered"; } > "$with_contract" && mv "$with_contract" "$rendered"
 
   # Prepend the founder's directives (texted to the bot) at the TOP of the
   # prompt — higher priority than the carried-forward learnings playbook.

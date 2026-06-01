@@ -293,7 +293,12 @@ should_run() {
   return 0
 }
 
-for i in 1 2 3 4 5 6 7 8; do
+# Iterate EVERY defined lane (derived from the array length, not a hardcoded
+# range). 2026-06-01: the loop was `1..8` while LANES had a 9th entry
+# (09-monetization) — so the monetization lane was defined, executable, and
+# carried a brief, yet NEVER RAN. Deriving the bound from ${#LANES[@]} makes a
+# lane impossible to silently strand again when one is appended.
+for i in $(seq 1 "${#LANES[@]}"); do
   lane="${LANES[$((i-1))]}"
   if ! should_run "$i"; then
     log "lane $i ($lane) — skipped via flag"
@@ -467,7 +472,23 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
   # never left as half-state WIP.
   NIGHTLY_AUTHORED_ORIGINAL="$(dirname "$NIGHTLY_AUTHORED_FILE")/authored-original-${DATE_TAG}.list"
   cp "$NIGHTLY_AUTHORED_FILE" "$NIGHTLY_AUTHORED_ORIGINAL" 2>/dev/null || : > "$NIGHTLY_AUTHORED_ORIGINAL"
-  for _round in 1 2; do
+  # CONVERGE, don't cap at 2. 2026-06-01: round 1 dropped BlastBoard + 3 i18n
+  # files; round 2's re-gate then surfaced a SECOND lane's broken file
+  # (leaderboard/PageClient.tsx — lane 03's half-written "Cannot modify local
+  # variables after render"), but the loop was out of rounds → it collapsed to
+  # docs-only and threw away EVERY other lane's clean code. A 3rd round would
+  # have dropped that one file and shipped the rest. Each round either drops ≥1
+  # authored file (strictly shrinking a finite set) or breaks via the `-z $_bad`
+  # / setup-fail paths below, so this terminates; the round cap is only a
+  # runaway backstop, generous enough to peel one bad file per lane.
+  # grep -c always prints a count (0 on empty) even when it exits 1, so capture it
+  # plainly — never `|| echo N` (that would append a 2nd value → arithmetic error).
+  _authored_n=$(grep -c . "$NIGHTLY_AUTHORED_ORIGINAL" 2>/dev/null); _authored_n=${_authored_n:-0}
+  _MAX_REGATE_ROUNDS=$(( _authored_n + 1 ))
+  [ "$_MAX_REGATE_ROUNDS" -lt 4 ] && _MAX_REGATE_ROUNDS=4
+  _round=0
+  while [ "$_round" -lt "$_MAX_REGATE_ROUNDS" ]; do
+    _round=$(( _round + 1 ))
     _bad_raw=$(nightly_parse_gate_failures "${NIGHTLY_LAST_GATE_OUTPUT:-}")
     rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
     # Intersect with authored allowlist — never drop a file the nightly didn't
