@@ -4715,6 +4715,20 @@ const ja = {
     }
   },
   "season": {
+    "twist": {
+      "double-down": { "title": "ダブルダウン", "blurb": "長い単語が一番輝く季節。" },
+      "crown-rush": { "title": "クラウンラッシュ", "blurb": "どの文字も武器。王座をつかめ。" },
+      "rare-find": { "title": "レアな一語", "blurb": "珍しい言葉の出番。眠った語彙を呼び覚ませ。" },
+      "combo-beat": { "title": "コンボビート", "blurb": "音節を積み、コンボに乗り、テンポを刻め。" },
+      "sound-wave": { "title": "サウンドウェーブ", "blurb": "ビートと文字を混ぜてヒットを飛ばせ。" },
+      "throne-climb": { "title": "玉座への階段", "blurb": "知る言葉すべてで玉座を築け。" },
+      "frostbite": { "title": "フロストバイト", "blurb": "盤が凍りつく中、連勝の熱を絶やすな。" },
+      "afterglow": { "title": "アフターグロウ", "blurb": "見つけた単語をネオンの軌跡が追う。" },
+      "heatwave": { "title": "ヒートウェーブ", "blurb": "連勝が続くほど、盤は熱く輝く。" },
+      "bloom": { "title": "ブルーム", "blurb": "ひと言ごとに次が芽吹く。スコアを咲かせろ。" },
+      "stardust": { "title": "スターダスト", "blurb": "文字が星座のように盤を漂う。" },
+      "final-bell": { "title": "ファイナルベル", "blurb": "一年の締め。すべての得点が記録に残る。" }
+    },
     "name": "シーズン{{number}}: {{theme}}",
     "endingSoon": "シーズンまもなく終了！",
     "endsIn": "残り{{days}}日",

@@ -4776,6 +4776,20 @@ const en = {
     "season": "Season"
   },
   "season": {
+    "twist": {
+      "double-down": { "title": "Double Down", "blurb": "Long words flex the hardest this season." },
+      "crown-rush": { "title": "Crown Rush", "blurb": "Every letter is a weapon. Claim the throne." },
+      "rare-find": { "title": "Rare Find", "blurb": "Dust off the rare words — this is their month." },
+      "combo-beat": { "title": "Combo Beat", "blurb": "Stack syllables, ride the combo, keep the tempo." },
+      "sound-wave": { "title": "Sound Wave", "blurb": "Mix beats and letters into chart-topping plays." },
+      "throne-climb": { "title": "Throne Climb", "blurb": "Build your throne from every word you know." },
+      "frostbite": { "title": "Frostbite", "blurb": "Keep your streak warm while the board freezes over." },
+      "afterglow": { "title": "Afterglow", "blurb": "Neon trails follow every word you find." },
+      "heatwave": { "title": "Heatwave", "blurb": "The longer your run, the hotter the board glows." },
+      "bloom": { "title": "Bloom", "blurb": "Every find plants the next. Watch your score blossom." },
+      "stardust": { "title": "Stardust", "blurb": "Letters drift like constellations across the grid." },
+      "final-bell": { "title": "Final Bell", "blurb": "The year closes — every point writes the record books." }
+    },
     "name": "Season {{number}}: {{theme}}",
     "endingSoon": "Season ending soon!",
     "endsIn": "Ends in {{days}} days",

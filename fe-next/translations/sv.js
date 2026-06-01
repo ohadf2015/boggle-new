@@ -4809,6 +4809,20 @@ const sv = {
     }
   },
   "season": {
+    "twist": {
+      "double-down": { "title": "Dubbel insats", "blurb": "Långa ord ger som mest den här säsongen." },
+      "crown-rush": { "title": "Kronjakt", "blurb": "Varje bokstav är ett vapen. Ta tronen." },
+      "rare-find": { "title": "Sällsynt fynd", "blurb": "Damma av de ovanliga orden – det här är deras månad." },
+      "combo-beat": { "title": "Combo-takt", "blurb": "Stapla stavelser, rid på combon, håll takten." },
+      "sound-wave": { "title": "Ljudvåg", "blurb": "Blanda beats och bokstäver till listettor." },
+      "throne-climb": { "title": "Tronbestigning", "blurb": "Bygg din tron av varje ord du kan." },
+      "frostbite": { "title": "Frostbett", "blurb": "Håll din svit varm medan brädet fryser till." },
+      "afterglow": { "title": "Efterglöd", "blurb": "Neonspår följer varje ord du hittar." },
+      "heatwave": { "title": "Värmebölja", "blurb": "Ju längre svit, desto hetare glöder brädet." },
+      "bloom": { "title": "Blomning", "blurb": "Varje fynd sår nästa. Se din poäng blomstra." },
+      "stardust": { "title": "Stjärnstoft", "blurb": "Bokstäver driver som stjärnbilder över brädet." },
+      "final-bell": { "title": "Sista klockan", "blurb": "Året tar slut – varje poäng skrivs in i rekordböckerna." }
+    },
     "name": "Säsong {{number}}: {{theme}}",
     "endingSoon": "Säsongen slutar snart!",
     "endsIn": "Slutar om {{days}} dagar",

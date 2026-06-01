@@ -4756,6 +4756,20 @@ const es = {
     "season": "Temporada"
   },
   "season": {
+    "twist": {
+      "double-down": { "title": "Doble o nada", "blurb": "Las palabras largas brillan más esta temporada." },
+      "crown-rush": { "title": "Fiebre de coronas", "blurb": "Cada letra es un arma. Conquista el trono." },
+      "rare-find": { "title": "Hallazgo raro", "blurb": "Desempolva las palabras raras: este es su mes." },
+      "combo-beat": { "title": "Ritmo combo", "blurb": "Apila sílabas, monta el combo, marca el ritmo." },
+      "sound-wave": { "title": "Onda sonora", "blurb": "Mezcla ritmos y letras en jugadas de éxito." },
+      "throne-climb": { "title": "Ascenso al trono", "blurb": "Construye tu trono con cada palabra que sabes." },
+      "frostbite": { "title": "Mordida de hielo", "blurb": "Mantén tu racha caliente mientras el tablero se congela." },
+      "afterglow": { "title": "Resplandor", "blurb": "Estelas de neón siguen cada palabra que encuentras." },
+      "heatwave": { "title": "Ola de calor", "blurb": "Cuanto más larga tu racha, más arde el tablero." },
+      "bloom": { "title": "Floración", "blurb": "Cada hallazgo siembra el siguiente. Mira florecer tu puntaje." },
+      "stardust": { "title": "Polvo de estrellas", "blurb": "Las letras flotan como constelaciones por el tablero." },
+      "final-bell": { "title": "Campana final", "blurb": "El año cierra: cada punto entra en los libros de récords." }
+    },
     "name": "Temporada {{number}}: {{theme}}",
     "endingSoon": "¡La temporada termina pronto!",
     "endsIn": "Termina en {{days}} días",
