@@ -129,6 +129,26 @@ describe('setupPushListeners — foreground display bridge', () => {
     );
   });
 
+  // Cold-start contract: the native plugin fires `pushNotificationActionPerformed`
+  // with retainUntilConsumed=true (PushNotificationsPlugin.java:74 /
+  // PushNotificationsHandler.swift:75), so a tap on a killed-app push is BUFFERED
+  // by Capacitor and replayed to the first listener `addListener` registers
+  // (Plugin.java addEventListener → sendRetainedArgumentsForEvent). This test
+  // locks the JS side of that contract: our listener must forward the tapped
+  // payload (incl. deepLink) to onNotificationTapped so the replay actually
+  // routes. If this regresses, cold-start deep links silently stop working.
+  it('forwards a tapped (background/cold-start) push payload to onNotificationTapped', async () => {
+    const onTapped = vi.fn();
+    await setupPushListeners(undefined, onTapped);
+
+    pushListeners['pushNotificationActionPerformed']({
+      notification: { data: { type: 'daily_challenge', deepLink: '/daily?src=push&kind=rival&dir=above' } },
+    });
+    await Promise.resolve();
+
+    expect(onTapped).toHaveBeenCalledWith({ type: 'daily_challenge', deepLink: '/daily?src=push&kind=rival&dir=above' });
+  });
+
   // A push received while the app is FOREGROUND is re-displayed via
   // LocalNotifications.schedule (with the data copied into `extra`). Tapping
   // THAT notification fires `localNotificationActionPerformed`, NOT

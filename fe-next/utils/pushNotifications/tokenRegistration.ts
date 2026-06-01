@@ -295,7 +295,15 @@ export async function setupPushListeners(
       }
     );
 
-    // Handle notification tap (app was in background)
+    // Handle notification tap (app was in background OR killed/cold-start).
+    // The native plugin fires `pushNotificationActionPerformed` with
+    // retainUntilConsumed=true, so a cold-start tap that fires during
+    // BridgeActivity.onCreate — before the WebView/JS has loaded — is BUFFERED
+    // by Capacitor and replayed to this listener the moment `addListener`
+    // registers it (Plugin.java addEventListener → sendRetainedArgumentsForEvent;
+    // verified Android PushNotificationsPlugin.java:74 + iOS
+    // PushNotificationsHandler.swift:75). So there is NO cold-start race to guard
+    // here — the only requirement is that we register this listener, which we do.
     const actionListener = await PushNotifications.addListener(
       'pushNotificationActionPerformed',
       (action: ActionPerformed) => {
