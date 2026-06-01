@@ -75,6 +75,30 @@ describe('checkGuess', () => {
     expect(checkGuess('worm', multi).correct).toBe(true);
     expect(checkGuess('nope', multi).correct).toBe(false);
   });
+
+  // Latin-script locales (es/sv) ride the A–Z keyboard: the player types base
+  // letters and diacritics are forgiven on both sides (NFD fold).
+  it('folds Spanish diacritics — "anos" matches stored "años", "n" matches "ñ"', () => {
+    const es: ConnectionPuzzle = { ...puzzle, bridge: 'años' };
+    expect(checkGuess('anos', es).correct).toBe(true);
+    expect(checkGuess('años', es).correct).toBe(true);
+    const ene: ConnectionPuzzle = { ...puzzle, bridge: 'uñas' };
+    expect(checkGuess('unas', ene).correct).toBe(true);
+  });
+
+  it('folds Swedish å/ä/ö — "blabar" matches stored "blåbär"', () => {
+    const sv: ConnectionPuzzle = { ...puzzle, bridge: 'blåbär' };
+    expect(checkGuess('blabar', sv).correct).toBe(true);
+    expect(checkGuess('blåbär', sv).correct).toBe(true);
+    const ros: ConnectionPuzzle = { ...puzzle, bridge: 'ros' };
+    expect(checkGuess('ros', ros).correct).toBe(true);
+  });
+
+  it('does not regress plain ASCII or Hebrew matching', () => {
+    expect(checkGuess('worm', puzzle).correct).toBe(true);
+    const he: ConnectionPuzzle = { ...puzzle, bridge: 'שוקולד' };
+    expect(checkGuess('שוקולד', he).correct).toBe(true);
+  });
 });
 
 describe('initGameState', () => {

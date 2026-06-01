@@ -79,6 +79,11 @@ const ja = {
     "finalScore": "最終スコア",
     "playAgain": "もう一度",
     "adminOnly": "シールドビッドは管理者限定プレビューです。",
+    "shareCard": {
+      "title": "あなたのブラフ記録",
+      "cta": "結果をシェア",
+      "copied": "コピーしました！"
+    },
     "err": {
       "notInRack": "ラックの文字だけを使ってください",
       "notWord": "辞書にありません"
@@ -10663,6 +10668,11 @@ const ja = {
         "body": "先生アクセスを申請。60秒で完了。通常24時間以内に使い始められます。",
         "button": "先生アクセスを申請する"
       },
+      "districtCta": {
+        "title": "学校・学区向け",
+        "body": "5クラス以上をお持ちですか？一括・学区割引についてお問い合わせください。",
+        "button": "学区向け料金をお問い合わせ"
+      },
       "esl-word-games": {
         "course_name": "ESL 英語クラス用ワードゲーム",
         "course_desc": "ESL・EFL教室向け。語彙・綴り・リアルタイム対戦。5言語対応で多国籍クラスに最適。"
@@ -11417,7 +11427,20 @@ const ja = {
     "safeZone": "安全ゾーン",
     "relegationZone": "降格ゾーン",
     "finalResults": "最終結果",
-    "coinsEarned": "獲得コイン"
+    "coinsEarned": "獲得コイン",
+    "bronze": "ブロンズ",
+    "silver": "シルバー",
+    "gold": "ゴールド",
+    "diamond": "ダイヤ",
+    "ruby": "ルビー",
+    "promoted": "昇格！",
+    "relegated": "降格",
+    "stayed": "残留",
+    "yourLeague": "あなたのリーグ",
+    "viewFullStandings": "順位表",
+    "holdingPromotion": "昇格圏内です！",
+    "inDropZone": "降格圏内です。巻き返そう！",
+    "spotsFromPromotion": "昇格まであと{n}人"
   },
   "leagueRivals": {
     "title": "ウィークリーリーグ",
@@ -12609,7 +12632,14 @@ const ja = {
       "empty": "今日の最初のプレイヤーになろう！",
       "players": "本日{count}人がプレイ",
       "yourRank": "あなた: #{rank}",
-      "cta": "デイリーチャレンジ"
+      "cta": "デイリーチャレンジ",
+      "shareCallout": {
+        "perfect": "完璧な連鎖！⚡ ミスゼロ。",
+        "flawless": "すべての橋を架けた。🌉",
+        "oneAway": "惜しい！あと橋ひとつ。",
+        "solid": "橋を架けたよ。超えられる？",
+        "tough": "今日は手強い。次は君だ 😤"
+      }
     },
     "community": {
       "title": "コミュニティの謎",
@@ -12652,6 +12682,7 @@ const ja = {
     "wordChain": "単語1 + ? + 単語2",
     "giveUp": "ギブアップ",
     "solutionIs": "答え",
+    "whyItWorks": "なぜつながる？",
     "like": "いいね",
     "dislike": "よくない",
     "next": "次へ",

@@ -25,9 +25,9 @@ import {
   submitDailyScore,
   fetchDailyLeaderboard,
   advanceClientStreak,
-  dailyShareText,
   type LeaderboardRow,
 } from '@/lib/connections/dailyClient';
+import { buildDailyBridgeGrid, gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsLeaderboard from './ConnectionsLeaderboard';
 
@@ -85,6 +85,10 @@ export default function ConnectionsDailyChallenge() {
 
   const startRef = useRef<number>(0);
   const solvedRef = useRef<Set<number>>(new Set());
+  // Per-bridge share-grid data. wrongAttempts is zeroed by the engine on the
+  // correct/give-up transition, so we tally 'wrong' transitions ourselves.
+  const wrongByIndexRef = useRef<Record<number, number>>({});
+  const outcomesRef = useRef<Map<number, BridgeOutcome>>(new Map());
   const prevStatusRef = useRef(state.status);
   const submittedRef = useRef(false);
   const [results, setResults] = useState<Results | null>(null);
@@ -100,16 +104,36 @@ export default function ConnectionsDailyChallenge() {
 
   // Per-answer feedback (sound + haptic).
   useEffect(() => {
+    const idx = state.currentIndex;
     if (state.status === 'correct' && prevStatusRef.current !== 'correct') {
-      solvedRef.current.add(state.currentIndex);
+      solvedRef.current.add(idx);
+      outcomesRef.current.set(idx, {
+        reached: true,
+        solved: true,
+        wrongAttempts: wrongByIndexRef.current[idx] ?? 0,
+        hintUsed: state.hintRevealed,
+      });
       sfx.playMatchFoundSound();
       customHaptic(GAME_HAPTICS.validWord);
     } else if (state.status === 'wrong' && prevStatusRef.current !== 'wrong') {
+      wrongByIndexRef.current[idx] = (wrongByIndexRef.current[idx] ?? 0) + 1;
       sfx.playErrorSound();
       haptic('error');
+    } else if (
+      (state.status === 'gaveUp' || state.status === 'outOfLives') &&
+      prevStatusRef.current !== state.status &&
+      !outcomesRef.current.has(idx)
+    ) {
+      // Reached but not solved (skipped or lost the last life here).
+      outcomesRef.current.set(idx, {
+        reached: true,
+        solved: false,
+        wrongAttempts: wrongByIndexRef.current[idx] ?? 0,
+        hintUsed: state.hintRevealed,
+      });
     }
     prevStatusRef.current = state.status;
-  }, [state.status, state.currentIndex, sfx, haptic, customHaptic]);
+  }, [state.status, state.currentIndex, state.hintRevealed, sfx, haptic, customHaptic]);
 
   // On finish: submit the result (once) and load the leaderboard.
   useEffect(() => {
@@ -162,13 +186,19 @@ export default function ConnectionsDailyChallenge() {
   }, [state.puzzles, state.currentIndex]);
 
   const handleShare = useCallback(async () => {
-    const text = dailyShareText({
+    // Build the spoiler-free "story of the chain" grid from per-bridge outcomes.
+    const outcomes: BridgeOutcome[] = Array.from({ length: total }, (_, i) =>
+      outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
+    );
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/connections/daily` : undefined;
+    const text = buildDailyBridgeGrid({
       title: t('connections.title'),
       dateISO: today,
-      puzzlesSolved: solvedRef.current.size,
-      total,
+      outcomes,
       streak: results?.streak ?? 0,
       rank: results?.rank ?? null,
+      callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),
+      url,
     });
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {

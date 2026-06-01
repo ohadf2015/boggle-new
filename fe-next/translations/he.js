@@ -79,6 +79,11 @@ const he = {
     "finalScore": "ניקוד סופי",
     "playAgain": "שחק שוב",
     "adminOnly": "הצעה חתומה הוא תצוגה מקדימה למנהלים בלבד.",
+    "shareCard": {
+      "title": "הסיפור שלך",
+      "cta": "שתף תוצאה",
+      "copied": "הועתק!"
+    },
     "err": {
       "notInRack": "השתמשו רק באותיות מהמאגר",
       "notWord": "לא נמצא במילון"
@@ -10939,6 +10944,11 @@ const he = {
         "body": "טופס קצר — דקה אחת. אישור בדרך כלל באותו היום.",
         "button": "בקשו גישה"
       },
+      "districtCta": {
+        "title": "לבתי ספר ומחוזות",
+        "body": "מנהלים 5 כיתות ומעלה? דברו איתנו על מחירים מוסדיים.",
+        "button": "צרו קשר לגבי מחיר מוסדי"
+      },
       "esl-word-games": {
         "course_name": "משחקי מילים ESL של LexiClash",
         "course_desc": "משחקי אוצר מילים, איות, וריבוי משתתפים חיים לכיתות ESL ב-5 שפות."
@@ -11801,7 +11811,20 @@ const he = {
     "safeZone": "אזור בטוח",
     "relegationZone": "אזור ירידה",
     "finalResults": "תוצאות סופיות",
-    "coinsEarned": "מטבעות שהרווחת"
+    "coinsEarned": "מטבעות שהרווחת",
+    "bronze": "ארד",
+    "silver": "כסף",
+    "gold": "זהב",
+    "diamond": "יהלום",
+    "ruby": "אודם",
+    "promoted": "עלית ליגה!",
+    "relegated": "ירדת ליגה",
+    "stayed": "שמרת על הליגה",
+    "yourLeague": "הליגה שלך",
+    "viewFullStandings": "טבלה",
+    "holdingPromotion": "אתה במקום עולה!",
+    "inDropZone": "באזור הירידה — טפס מעלה!",
+    "spotsFromPromotion": "{n} מקומות מהעלייה"
   },
   "leagueRivals": {
     "title": "היריבים שלך בליגה",
@@ -12502,7 +12525,14 @@ const he = {
       "empty": "היו הראשונים לשחק היום!",
       "players": "{count} שחקנים היום",
       "yourRank": "אתם: #{rank}",
-      "cta": "אתגר יומי"
+      "cta": "אתגר יומי",
+      "shareCallout": {
+        "perfect": "שרשרת מושלמת! ⚡ בלי פספוס.",
+        "flawless": "כל הגשרים נבנו. 🌉",
+        "oneAway": "כמעט! גשר אחד נשאר.",
+        "solid": "בניתי גשרים. תצליחו לעקוף?",
+        "tough": "אכזרי היום. תורכם 😤"
+      }
     },
     "community": {
       "title": "חידות הקהילה",
@@ -12545,6 +12575,7 @@ const he = {
     "wordChain": "מילה1 + ? + מילה2",
     "giveUp": "אני מוותר",
     "solutionIs": "הפתרון",
+    "whyItWorks": "למה זה עובד",
     "like": "אהבתי",
     "dislike": "לא אהבתי",
     "next": "הבא",

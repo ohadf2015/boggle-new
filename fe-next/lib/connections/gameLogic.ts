@@ -28,6 +28,16 @@ function stripPunctuation(s: string): string {
   return s.replace(/[^\p{L}\p{N}]/gu, '');
 }
 
+/**
+ * Fold diacritics so Latin-script locales (es/sv) play on the base A–Z
+ * keyboard: the player types plain letters and accents are forgiven on both
+ * sides. NFD decomposes å/ä/ö/ñ/á… into base-letter + combining mark; we then
+ * drop the marks. No-op on ASCII and Hebrew (base Hebrew carries no marks).
+ */
+function foldDiacritics(s: string): string {
+  return s.normalize('NFD').replace(/\p{M}/gu, '');
+}
+
 function depluralize(s: string): string {
   if (s.length > 3 && s.endsWith('es')) return s.slice(0, -2);
   if (s.length > 2 && s.endsWith('s')) return s.slice(0, -1);
@@ -38,7 +48,7 @@ function canonicalize(s: string): string {
   // normalizeHebrewWord folds sofit/final letters → base forms so the
   // base-only on-screen keyboard can match sofit-stored bridges (no-op on
   // non-Hebrew text).
-  return depluralize(normalizeHebrewWord(stripPunctuation(normalizeGuess(s))));
+  return depluralize(foldDiacritics(normalizeHebrewWord(stripPunctuation(normalizeGuess(s)))));
 }
 
 export function checkGuess(input: string, puzzle: ConnectionPuzzle): GuessResult {

@@ -8,10 +8,21 @@ import { HE_HARD } from './he-hard';
 import { HE_GENERATED } from './generated/he-hard.generated';
 import { HE_ONLINE } from './he-online';
 import { EN_ONLINE } from './en-online';
+import { ES_PUZZLES } from './generated/es.generated';
+import { SV_PUZZLES } from './generated/sv.generated';
 
-const PUZZLES_BY_LOCALE: Record<PuzzleLocale, ConnectionPuzzle[]> = {
+/**
+ * Locales with a materialized native pool. Authored in the DB
+ * (public.connections_puzzles), materialized to static .ts via
+ * scripts/connections/materialize-puzzles.mjs. A locale with no entry here
+ * (e.g. 'ja' — kanji needs an IME the on-screen keyboard can't provide yet)
+ * falls back to 'en' via resolveLocale, exactly as before.
+ */
+const PUZZLES_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {
   en: [...EN_EASY, ...EN_MEDIUM, ...EN_HARD, ...EN_ONLINE],
   he: [...HE_EASY, ...HE_MEDIUM, ...HE_HARD, ...HE_GENERATED, ...HE_ONLINE],
+  es: ES_PUZZLES,
+  sv: SV_PUZZLES,
 };
 
 /**
@@ -87,10 +98,10 @@ function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
  * are interleaved so the same category does not appear back-to-back. Built once
  * at module load — pools are import-time constants.
  */
-const ORDERED_BY_LOCALE: Record<PuzzleLocale, ConnectionPuzzle[]> = (() => {
-  const out = {} as Record<PuzzleLocale, ConnectionPuzzle[]>;
+const ORDERED_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = (() => {
+  const out: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {};
   for (const locale of Object.keys(PUZZLES_BY_LOCALE) as PuzzleLocale[]) {
-    const all = PUZZLES_BY_LOCALE[locale];
+    const all = PUZZLES_BY_LOCALE[locale] ?? [];
     out[locale] = [
       ...interleaveByBridge(all.filter((p) => p.difficulty === 'easy')),
       ...interleaveByBridge(all.filter((p) => p.difficulty === 'medium')),
@@ -100,16 +111,17 @@ const ORDERED_BY_LOCALE: Record<PuzzleLocale, ConnectionPuzzle[]> = (() => {
   return out;
 })();
 
+/** Map a UI locale to a locale we have a native pool for; otherwise fall back to 'en'. */
 function resolveLocale(locale: string): PuzzleLocale {
   return locale in PUZZLES_BY_LOCALE ? (locale as PuzzleLocale) : 'en';
 }
 
 export function getPuzzlesForLocale(locale: string): ConnectionPuzzle[] {
-  return PUZZLES_BY_LOCALE[resolveLocale(locale)];
+  return PUZZLES_BY_LOCALE[resolveLocale(locale)] ?? PUZZLES_BY_LOCALE.en ?? [];
 }
 
 function activeOrdered(locale: PuzzleLocale, banned?: ReadonlySet<string>): ConnectionPuzzle[] {
-  const ordered = ORDERED_BY_LOCALE[locale];
+  const ordered = ORDERED_BY_LOCALE[locale] ?? ORDERED_BY_LOCALE.en ?? [];
   if (!banned || banned.size === 0) return ordered;
   return ordered.filter((p) => !banned.has(p.id));
 }

@@ -75,6 +75,11 @@ const en = {
     "finalScore": "Final score",
     "playAgain": "Play again",
     "adminOnly": "Sealed Bid is an admin-only preview.",
+    "shareCard": {
+      "title": "Your bluffing story",
+      "cta": "Share result",
+      "copied": "Copied!"
+    },
     "err": {
       "notInRack": "Use only the rack letters",
       "notWord": "Not in the dictionary"
@@ -10540,6 +10545,11 @@ const en = {
         "body": "Apply for free teacher access — takes 60 seconds, typically approved within 24 hours.",
         "button": "Request Teacher Access"
       },
+      "districtCta": {
+        "title": "For schools & districts",
+        "body": "Running 5+ classrooms? Ask us about bulk & district pricing.",
+        "button": "Contact for District Pricing"
+      },
       "esl-word-games": {
         "course_name": "LexiClash ESL Word Games",
         "course_desc": "Vocabulary, spelling, and live multiplayer games for ESL classrooms in 5 languages."
@@ -11455,7 +11465,20 @@ const en = {
     "safeZone": "Safe Zone",
     "relegationZone": "Relegation Zone",
     "finalResults": "Final Results",
-    "coinsEarned": "Coins Earned"
+    "coinsEarned": "Coins Earned",
+    "bronze": "Bronze",
+    "silver": "Silver",
+    "gold": "Gold",
+    "diamond": "Diamond",
+    "ruby": "Ruby",
+    "promoted": "Promoted!",
+    "relegated": "Relegated",
+    "stayed": "Held your tier",
+    "yourLeague": "Your League",
+    "viewFullStandings": "Standings",
+    "holdingPromotion": "Holding a promotion spot!",
+    "inDropZone": "In the drop zone — climb out!",
+    "spotsFromPromotion": "{n} spots from promotion"
   },
   "leagueRivals": {
     "title": "Your League Rivals",
@@ -12072,7 +12095,14 @@ const en = {
       "empty": "Be the first to play today!",
       "players": "{count} players today",
       "yourRank": "You: #{rank}",
-      "cta": "Daily Challenge"
+      "cta": "Daily Challenge",
+      "shareCallout": {
+        "perfect": "Perfect chain! ⚡ Not one slip.",
+        "flawless": "Every bridge built. 🌉",
+        "oneAway": "So close — one bridge away!",
+        "solid": "Bridges built. Can you beat me?",
+        "tough": "Brutal one today. Your turn 😤"
+      }
     },
     "community": {
       "title": "Community Riddles",
@@ -12115,6 +12145,7 @@ const en = {
     "wordChain": "WORD1 + ? + WORD2",
     "giveUp": "Give up",
     "solutionIs": "Solution",
+    "whyItWorks": "Why it works",
     "like": "Like",
     "dislike": "Dislike",
     "next": "Next",

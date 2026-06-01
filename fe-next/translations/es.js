@@ -75,6 +75,11 @@ const es = {
     "finalScore": "Puntuación final",
     "playAgain": "Jugar de nuevo",
     "adminOnly": "Puja secreta es una vista previa solo para administradores.",
+    "shareCard": {
+      "title": "Tu historia de engaños",
+      "cta": "Compartir resultado",
+      "copied": "¡Copiado!"
+    },
     "err": {
       "notInRack": "Usa solo las letras del atril",
       "notWord": "No está en el diccionario"
@@ -10682,6 +10687,11 @@ const es = {
         "body": "Solicita acceso gratis. 60 segundos. Aprobado en menos de 24 horas.",
         "button": "Solicitar acceso como docente"
       },
+      "districtCta": {
+        "title": "Para escuelas y distritos",
+        "body": "¿Gestionas 5 o más aulas? Pregúntanos sobre precios por volumen.",
+        "button": "Contactar para precios por distrito"
+      },
       "esl-word-games": {
         "course_name": "Juegos de palabras ESL de LexiClash",
         "course_desc": "Vocabulario, ortografía y multijugador en vivo para aulas ESL — 5 idiomas nativos."
@@ -11435,7 +11445,20 @@ const es = {
     "safeZone": "Zona segura",
     "relegationZone": "Zona de descenso",
     "finalResults": "Resultados finales",
-    "coinsEarned": "Monedas ganadas"
+    "coinsEarned": "Monedas ganadas",
+    "bronze": "Bronce",
+    "silver": "Plata",
+    "gold": "Oro",
+    "diamond": "Diamante",
+    "ruby": "Rubí",
+    "promoted": "¡Ascendido!",
+    "relegated": "Descendido",
+    "stayed": "Mantuviste tu liga",
+    "yourLeague": "Tu liga",
+    "viewFullStandings": "Clasificación",
+    "holdingPromotion": "¡Estás en puesto de ascenso!",
+    "inDropZone": "En zona de descenso, ¡remonta!",
+    "spotsFromPromotion": "{n} puestos del ascenso"
   },
   "leagueRivals": {
     "title": "Liga Semanal",
@@ -12648,7 +12671,14 @@ const es = {
       "empty": "¡Sé el primero en jugar hoy!",
       "players": "{count} jugadores hoy",
       "yourRank": "Tú: #{rank}",
-      "cta": "Desafío diario"
+      "cta": "Desafío diario",
+      "shareCallout": {
+        "perfect": "¡Cadena perfecta! ⚡ Sin fallos.",
+        "flawless": "Todos los puentes, tendidos. 🌉",
+        "oneAway": "¡Casi! Un puente de nada.",
+        "solid": "Puentes tendidos. ¿Me superas?",
+        "tough": "Hoy tocó duro. Te toca 😤"
+      }
     },
     "community": {
       "title": "Acertijos de la comunidad",
@@ -12691,6 +12721,7 @@ const es = {
     "wordChain": "PALABRA1 + ? + PALABRA2",
     "giveUp": "Rendirse",
     "solutionIs": "Solución",
+    "whyItWorks": "Por qué funciona",
     "like": "Me gusta",
     "dislike": "No me gusta",
     "next": "Siguiente",

@@ -1,5 +1,14 @@
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
+/** A real attested compound pair shown after the solve ("why it works"). */
+export interface PuzzleExample {
+  w1: string;
+  bridge: string;
+  w2: string;
+}
+
+export type PuzzleSource = 'authored' | 'online' | 'generated' | 'council-seed' | 'ugc';
+
 export interface ConnectionPuzzle {
   id: string;
   word1: string;
@@ -10,9 +19,13 @@ export interface ConnectionPuzzle {
   /** Human-readable hint shown after the player spends an ad/coin to reveal */
   hint?: string;
   difficulty: Difficulty;
+  /** Real compound examples that demonstrate both bridges (teach-moment / share). */
+  examples?: PuzzleExample[];
+  /** Provenance — where this puzzle came from. */
+  source?: PuzzleSource;
 }
 
-export type PuzzleLocale = 'en' | 'he';
+export type PuzzleLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 export type GameStatus =
   | 'playing'

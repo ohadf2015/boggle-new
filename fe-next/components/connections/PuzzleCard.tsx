@@ -8,6 +8,7 @@ import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import ConnectionsKeyboard from './ConnectionsKeyboard';
 import { getKeyboardLetters, appendLetter, backspace } from '@/lib/connections/keyboard';
+import { whyItWorks } from '@/lib/connections/whyItWorks';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 interface PuzzleCardProps {
@@ -284,6 +285,32 @@ export default function PuzzleCard({
               {t('connections.solutionIs')}: <span className="text-neo-white">{puzzle.bridge}</span>
             </m.p>
           )}
+
+          {bridgeRevealed && (() => {
+            const { left, right } = whyItWorks(puzzle);
+            return (
+              <m.div
+                key="why"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 22, delay: 0.15 }}
+                className="mb-4 flex flex-col items-center gap-1.5"
+              >
+                <span className="text-neo-white/50 text-[0.65rem] font-neo-body uppercase tracking-[0.18em]">
+                  {t('connections.whyItWorks')}
+                </span>
+                <div className="flex flex-wrap items-center justify-center gap-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                  <span className="rounded-neo border border-neo-lime/40 bg-neo-lime/10 px-2.5 py-1 font-neo-display font-bold text-sm text-neo-lime">
+                    {left}
+                  </span>
+                  <span className="text-neo-white/40 text-sm select-none" aria-hidden="true">·</span>
+                  <span className="rounded-neo border border-neo-lime/40 bg-neo-lime/10 px-2.5 py-1 font-neo-display font-bold text-sm text-neo-lime">
+                    {right}
+                  </span>
+                </div>
+              </m.div>
+            );
+          })()}
         </AnimatePresence>
 
         <div className="flex flex-col gap-3" dir={isRTL ? 'rtl' : 'ltr'}>

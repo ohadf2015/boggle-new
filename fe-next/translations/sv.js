@@ -24,7 +24,14 @@ const sv = {
       "empty": "Var först att spela idag!",
       "players": "{count} spelare idag",
       "yourRank": "Du: #{rank}",
-      "cta": "Dagens utmaning"
+      "cta": "Dagens utmaning",
+      "shareCallout": {
+        "perfect": "Perfekt kedja! ⚡ Inte ett snedsteg.",
+        "flawless": "Alla broar byggda. 🌉",
+        "oneAway": "Så nära — en bro kvar!",
+        "solid": "Broar byggda. Slår du mig?",
+        "tough": "Brutal idag. Din tur 😤"
+      }
     },
     "community": {
       "title": "Community-gåtor",
@@ -56,6 +63,7 @@ const sv = {
     "wordChain": "ORD1 + ? + ORD2",
     "giveUp": "Ge upp",
     "solutionIs": "Lösning",
+    "whyItWorks": "Varför det funkar",
     "like": "Gilla",
     "dislike": "Ogilla",
     "next": "Nästa",
@@ -153,6 +161,11 @@ const sv = {
     "finalScore": "Slutpoäng",
     "playAgain": "Spela igen",
     "adminOnly": "Förseglat bud är en admin-förhandsvisning.",
+    "shareCard": {
+      "title": "Din bluffhistoria",
+      "cta": "Dela resultat",
+      "copied": "Kopierat!"
+    },
     "err": {
       "notInRack": "Använd bara bokstäverna i racket",
       "notWord": "Inte i ordlistan"
@@ -10685,6 +10698,11 @@ const sv = {
         "body": "Två minuter att ansöka. Svar oftast samma dag. Sedan får du tillgång till alla lärarverktyg.",
         "button": "Ansök nu"
       },
+      "districtCta": {
+        "title": "För skolor och distrikt",
+        "body": "Hanterar du 5+ klassrum? Kontakta oss för volympriser.",
+        "button": "Kontakta oss för distriktspris"
+      },
       "esl-word-games": {
         "course_name": "Ordspel för ESL och språkundervisning",
         "course_desc": "Ordförråd, stavning och live-multiplayer på 5 språk — för ESL-klassrum."
@@ -11491,7 +11509,20 @@ const sv = {
     "safeZone": "Säker zon",
     "relegationZone": "Nedflyttningszon",
     "finalResults": "Slutresultat",
-    "coinsEarned": "Intjänade mynt"
+    "coinsEarned": "Intjänade mynt",
+    "bronze": "Brons",
+    "silver": "Silver",
+    "gold": "Guld",
+    "diamond": "Diamant",
+    "ruby": "Rubin",
+    "promoted": "Uppflyttad!",
+    "relegated": "Nedflyttad",
+    "stayed": "Behöll din liga",
+    "yourLeague": "Din liga",
+    "viewFullStandings": "Tabell",
+    "holdingPromotion": "Du ligger på uppflyttningsplats!",
+    "inDropZone": "I nedflyttningszonen — kämpa dig upp!",
+    "spotsFromPromotion": "{n} platser från uppflyttning"
   },
   "leagueRivals": {
     "title": "Veckoliga",
