@@ -25,9 +25,23 @@ NIGHTLY_GATE_ENV_FILES=(
   "fe-next/.env.production.local"
 )
 
-# run_isolated_gate <authored_list_file>
+# _gate_npm_chain <skip_lint> → the bash -c body that runs the gate inside fe-next.
+# skip_lint=1 OMITS `npm run lint`. Used by the baseline-poison salvage: when every
+# gate-failing file is NON-authored (a pre-existing lint error on the untouched
+# baseline), the authored files are already known lint-clean, so we re-gate them with
+# lint skipped to PROVE they are test+build clean — without being blocked by a lint
+# error the nightly didn't introduce. build:schemas runs FIRST: `npm run test` imports
+# ../dist via the compiled bridge (backend/utils/socketValidation.ts), and a fresh
+# worktree has no dist/ yet (this reverted every code lane on 2026-05-26).
+_gate_npm_chain() {
+  local skip_lint="${1:-0}" chain=""
+  [ "$skip_lint" = "1" ] || chain="npm run lint && "
+  printf '%s' "${chain}npm run build:schemas && npm run test && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; }"
+}
+
+# run_isolated_gate <authored_list_file> [skip_lint=0]
 run_isolated_gate() {
-  local authored="$1"
+  local authored="$1" skip_lint="${2:-0}"
   [ -n "$authored" ] && [ -s "$authored" ] || { log "isolated-gate: empty authored list — nothing to gate"; return 0; }
 
   local wt; wt=$(mktemp -d -t nightly-gate.XXXXXX)
@@ -74,7 +88,7 @@ run_isolated_gate() {
   done
 
   [ "$_skipped_ignored" -gt 0 ] && log "isolated-gate: skipped $_skipped_ignored gitignored path(s) (build artifacts — never gated/shipped)"
-  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)"
+  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')"
   # Capture the gate's combined output to a file the caller can parse (the
   # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
   # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
@@ -96,18 +110,20 @@ run_isolated_gate() {
     local _gto=()
     if command -v gtimeout >/dev/null 2>&1; then _gto=(gtimeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s")
     elif command -v timeout >/dev/null 2>&1; then _gto=(timeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s"); fi
-    "${_gto[@]}" bash -c 'cd "$1/fe-next" \
-        && npm run lint \
-        && npm run build:schemas \
-        && npm run test \
-        && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; }' _ "$wt" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
+    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint")"
+    "${_gto[@]}" bash -c "$_body" _ "$wt" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
     [ "${rc:-0}" = "124" ] && log "isolated-gate: TIMED OUT after ${NIGHTLY_GATE_TIMEOUT:-1800}s — killed (treated as gate fail)"
     [ "${rc:-0}" != "0" ] && rc=1
   fi
   cat "$NIGHTLY_LAST_GATE_OUTPUT" >> "$RUN_LOG" 2>/dev/null || true
 
   _isolated_gate_cleanup "$wt"
-  [ "$rc" = "0" ] && log "isolated-gate: PASS" || log "isolated-gate: FAIL (lane code broke lint/test/build)"
+  if [ "$skip_lint" = "1" ]; then
+    [ "$rc" = "0" ] && log "isolated-gate(no-lint): PASS — authored set is test+build clean" \
+                    || log "isolated-gate(no-lint): FAIL — authored set breaks test/build (not just baseline lint)"
+  else
+    [ "$rc" = "0" ] && log "isolated-gate: PASS" || log "isolated-gate: FAIL (lane code broke lint/test/build)"
+  fi
   return $rc
 }
 

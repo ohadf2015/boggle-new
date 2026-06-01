@@ -104,6 +104,39 @@ run_isolated_gate "$EMPTY"; rc=$?
 assert "empty authored list returns 0 (nothing to gate)" "[ $rc -eq 0 ]"
 rm -f "$EMPTY"; teardown
 
+echo "── gate-isolated: _gate_npm_chain (baseline-poison lint-skip builder) ──"
+# Pure command-builder: skip_lint=1 must DROP `npm run lint` but keep test + build,
+# so the baseline-poison salvage verifies the authored set's test/build effect while
+# ignoring a pre-existing baseline lint error.
+CHAIN_FULL=$(_gate_npm_chain 0)
+CHAIN_NOLINT=$(_gate_npm_chain 1)
+assert "full chain (skip=0) runs lint"                "[[ \"$CHAIN_FULL\"   == *'npm run lint'* ]]"
+assert "no-lint chain (skip=1) DROPS lint"            "[[ \"$CHAIN_NOLINT\" != *'npm run lint'* ]]"
+assert "no-lint chain still runs build:schemas"       "[[ \"$CHAIN_NOLINT\" == *'npm run build:schemas'* ]]"
+assert "no-lint chain still runs test"                "[[ \"$CHAIN_NOLINT\" == *'npm run test'* ]]"
+assert "no-lint chain still runs build:fast"          "[[ \"$CHAIN_NOLINT\" == *'build:fast'* ]]"
+assert "build:schemas precedes test (dist bridge)"    "[[ \"$CHAIN_NOLINT\" == *'build:schemas'*'npm run test'* ]]"
+
+echo "── gate-isolated: lint-skipped re-gate still gates the AUTHORED worktree ──"
+# The baseline-poison ship decision rides on run_isolated_gate <auth> 1 passing only
+# when the authored set is test+build clean. Prove the skip_lint path still applies
+# authored files + reflects their pass/fail (the seam stands in for the npm chain).
+setup
+printf 'export const v = "LANE_OK";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='grep -q LANE_OK app/lane.ts'   # authored applied → pass
+run_isolated_gate "$AUTH" 1; rc=$?
+assert "skip_lint re-gate PASSES when authored set is clean (test+build proxy)" "[ $rc -eq 0 ]"
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+
+setup
+printf 'export const v = "LANE_BROKEN_TEST";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='! grep -q LANE_BROKEN_TEST app/lane.ts'   # authored breaks test → fail
+run_isolated_gate "$AUTH" 1; rc=$?
+assert "skip_lint re-gate FAILS when authored set breaks test/build → docs-only salvage" "[ $rc -eq 1 ]"
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+
 echo "── gate-isolated: nightly_parse_gate_failures (drop-and-re-gate salvage) ──"
 
 # Realistic mixed eslint (absolute worktree path header) + tsc (relative) output,

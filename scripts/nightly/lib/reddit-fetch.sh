@@ -44,6 +44,32 @@ _parse() {
     end' 2>/dev/null || echo '{"error":"jq parse failed"}'
 }
 
+# _snapshot_fresh <iso8601 captured_at> <max_days> → rc 0 fresh · rc 1 stale/bad.
+_snapshot_fresh() {
+  local cap="$1" max="${2:-3}" caps now
+  [ -n "$cap" ] || return 1
+  caps=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$cap" +%s 2>/dev/null || date -d "$cap" +%s 2>/dev/null || echo 0)
+  now=$(date +%s 2>/dev/null || echo 0)
+  [ "$caps" -gt 0 ] && [ "$now" -ge "$caps" ] && [ $(( now - caps )) -lt $(( max * 86400 )) ]
+}
+
+# _snapshot_slice <snapshot_json> <mode> <selector> <limit> → compact JSON array.
+# feed → posts in the named subreddit; search → posts whose title/selftext contain
+# any (>2-char) query word. Same field shape as the live _parse output.
+_snapshot_slice() {
+  jq -c --arg mode "$2" --arg sel "$3" --argjson lim "${4:-25}" '
+    (.reddit // []) as $posts
+    | ( if $mode == "feed" then
+          [ $posts[] | select((.subreddit // "" | ascii_downcase) == ($sel | ascii_downcase)) ]
+        elif $mode == "search" then
+          ( $sel | ascii_downcase | split(" ") | map(select(length > 2)) ) as $terms
+          | [ $posts[]
+              | ((((.title // "") + " " + (.selftext // "")) | ascii_downcase)) as $hay
+              | select( ($terms | length) == 0 or any($terms[]; . as $t | $hay | contains($t))) ]
+        else $posts end )
+    | .[0:$lim]' <<<"$1" 2>/dev/null || printf '[]'
+}
+
 # Obtain (or reuse a cached) OAuth bearer token. Echoes the token on success, empty on
 # failure. Needs REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET.
 _get_token() {
@@ -82,26 +108,45 @@ _get() { # $1=url ; uses $BEARER if set (oauth host), else UA-only (legacy host)
   fi
 }
 
-# Pick host: authenticated oauth.reddit.com when we have a token, else legacy www host.
-BEARER=""
-if BEARER=$(_get_token); then HOST="https://oauth.reddit.com"; else BEARER=""; HOST="https://www.reddit.com"; fi
-
+# --- parse args (needed by BOTH the snapshot slice and the network query) ---
 MODE="${1:-}"; shift || true
 case "$MODE" in
   feed)
     SUB="${1:?usage: reddit-fetch.sh feed <subreddit> [sort] [t] [limit]}"
-    SORT="${2:-top}"; T="${3:-week}"; LIMIT="${4:-25}"
-    URL="${HOST}/r/${SUB}/${SORT}.json?t=${T}&limit=${LIMIT}&raw_json=1"
+    SORT="${2:-top}"; T="${3:-week}"; LIMIT="${4:-25}"; SEL="$SUB"
     ;;
   search)
     Q="${1:?usage: reddit-fetch.sh search <query> [sort] [t] [limit]}"
-    SORT="${2:-relevance}"; T="${3:-week}"; LIMIT="${4:-25}"
-    QENC=$(printf '%s' "$Q" | jq -sRr @uri)
-    URL="${HOST}/search.json?q=${QENC}&sort=${SORT}&t=${T}&limit=${LIMIT}&raw_json=1"
+    SORT="${2:-relevance}"; T="${3:-week}"; LIMIT="${4:-25}"; SEL="$Q"
     ;;
   *)
     _emit_err "usage: reddit-fetch.sh feed|search ..."
     ;;
+esac
+
+# --- PREFER a fresh founder-primed browser snapshot ----------------------------
+# Reddit's anonymous JSON gate is 403 and the Data API needs manual moderation
+# approval, so the only path that works UNATTENDED is a snapshot the founder primed
+# from a real logged-in browser (lib/pull-reddit-snapshot.sh → docs/nightly/intel/
+# reddit-latest.json). When it exists, is fresh, and has matching posts, serve from
+# it and skip the (likely-403) network entirely. Otherwise fall through to OAuth/UA.
+SNAP_FILE="${REDDIT_SNAPSHOT:-$(cd "$(dirname "$0")/../../.." 2>/dev/null && pwd)/docs/nightly/intel/reddit-latest.json}"
+if [ -f "$SNAP_FILE" ] && jq empty "$SNAP_FILE" 2>/dev/null; then
+  _cap=$(jq -r '.captured_at // ""' "$SNAP_FILE" 2>/dev/null)
+  if _snapshot_fresh "$_cap" "${REDDIT_SNAPSHOT_MAX_DAYS:-3}"; then
+    _slice=$(_snapshot_slice "$(cat "$SNAP_FILE")" "$MODE" "$SEL" "$LIMIT")
+    if [ "$(printf '%s' "$_slice" | jq -r 'length' 2>/dev/null || echo 0)" -gt 0 ]; then
+      printf '%s\n' "$_slice"; exit 0
+    fi
+  fi
+fi
+
+# --- network path: oauth.reddit.com when we have a token, else legacy www host ---
+BEARER=""
+if BEARER=$(_get_token); then HOST="https://oauth.reddit.com"; else BEARER=""; HOST="https://www.reddit.com"; fi
+case "$MODE" in
+  feed)   URL="${HOST}/r/${SUB}/${SORT}.json?t=${T}&limit=${LIMIT}&raw_json=1" ;;
+  search) QENC=$(printf '%s' "$Q" | jq -sRr @uri); URL="${HOST}/search.json?q=${QENC}&sort=${SORT}&t=${T}&limit=${LIMIT}&raw_json=1" ;;
 esac
 
 RESP=$(_get "$URL")

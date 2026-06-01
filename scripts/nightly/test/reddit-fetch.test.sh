@@ -79,5 +79,49 @@ OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" \
        REDDIT_TOKEN_CACHE="$ROOT/tok5" bash "$SCRIPT" search "word game" relevance week 5 )
 assert "search: hit oauth.reddit.com/search" "grep -q 'oauth.reddit.com/search' '$CALLS'"
 
-echo; echo "  reddit-fetch (oauth): $PASS passed, $FAIL failed"
+echo "  reddit-fetch (snapshot):"
+
+NOW_ISO=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+OLD_ISO="2020-01-01T00:00:00Z"
+mk_snap() {  # $1=captured_at → writes a snapshot fixture, echoes its path
+  local f="$ROOT/snap-$RANDOM.json"
+  cat > "$f" <<EOF
+{"captured_at":"$1","source":"playwriter-reddit-snapshot","reddit":[
+ {"title":"SNAP_WG","score":9,"num_comments":3,"permalink":"https://www.reddit.com/r/wordgames/comments/a","author":"z","subreddit":"wordgames","created_utc":1,"selftext":"looking for a wordle alternative game"},
+ {"title":"SNAP_PUZ","score":4,"num_comments":1,"permalink":"https://www.reddit.com/r/puzzles/comments/b","author":"y","subreddit":"puzzles","created_utc":2,"selftext":"daily crossword help"}
+]}
+EOF
+  printf '%s' "$f"
+}
+
+# 6 — fresh snapshot present → feed served from snapshot, NO network (no curl) at all.
+CALLS="$ROOT/calls6.log"; : > "$CALLS"; SNAP=$(mk_snap "$NOW_ISO")
+OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" REDDIT_SNAPSHOT="$SNAP" \
+       REDDIT_TOKEN_CACHE="$ROOT/tok6" bash "$SCRIPT" feed wordgames top week 5 )
+rc=$?
+assert "fresh snapshot: feed returns the snapshot post (SNAP_WG)" "echo '$OUT' | jq -e '.[0].title==\"SNAP_WG\"' >/dev/null"
+assert "fresh snapshot: filtered to the requested subreddit only" "echo '$OUT' | jq -e 'length==1' >/dev/null"
+assert "fresh snapshot: NO curl/network call at all" "[ ! -s '$CALLS' ]"
+assert "fresh snapshot: exit 0" "[ $rc -eq 0 ]"
+
+# 7 — STALE snapshot → ignored, falls through to the network path (curl called).
+CALLS="$ROOT/calls7.log"; : > "$CALLS"; SNAP=$(mk_snap "$OLD_ISO")
+OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" REDDIT_SNAPSHOT="$SNAP" \
+       REDDIT_TOKEN_CACHE="$ROOT/tok7" bash "$SCRIPT" feed wordgames top week 5 )
+assert "stale snapshot: falls through to network (www.reddit.com hit)" "grep -q 'www.reddit.com/r/' '$CALLS'"
+
+# 8 — fresh snapshot but requested subreddit absent → empty slice → network fallthrough.
+CALLS="$ROOT/calls8.log"; : > "$CALLS"; SNAP=$(mk_snap "$NOW_ISO")
+OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" REDDIT_SNAPSHOT="$SNAP" \
+       REDDIT_TOKEN_CACHE="$ROOT/tok8" bash "$SCRIPT" feed crosswords top week 5 )
+assert "snapshot miss (no matching sub): falls through to network" "grep -q 'www.reddit.com/r/' '$CALLS'"
+
+# 9 — fresh snapshot + search → keyword-matched posts served from snapshot, no network.
+CALLS="$ROOT/calls9.log"; : > "$CALLS"; SNAP=$(mk_snap "$NOW_ISO")
+OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" REDDIT_SNAPSHOT="$SNAP" \
+       REDDIT_TOKEN_CACHE="$ROOT/tok9" bash "$SCRIPT" search "wordle alternative" relevance week 5 )
+assert "snapshot search: matches post by keyword (SNAP_WG)" "echo '$OUT' | jq -e 'any(.[]; .title==\"SNAP_WG\")' >/dev/null"
+assert "snapshot search: no network call" "[ ! -s '$CALLS' ]"
+
+echo; echo "  reddit-fetch (oauth+snapshot): $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

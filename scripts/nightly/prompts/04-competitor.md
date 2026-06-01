@@ -48,10 +48,16 @@ scripts/nightly/lib/reddit-fetch.sh search "indie word game launch 2026" relevan
 ```
 
 - It ALWAYS exits 0; on failure it prints `{"error":...}` — just move on, never block.
-- If EVERY call returns `{"error":...}`, the OAuth creds are probably unset on this host.
-  **Do NOT try to fix OAuth or build a token flow yourself** — note "Reddit creds not
-  configured (see docs/nightly/reddit-oauth-setup.md)" in your artifact, fall back to
-  `WebSearch`, and move on. Setup is a one-time human step, not lane work.
+- It transparently PREFERS a fresh founder-primed browser snapshot
+  (`docs/nightly/intel/reddit-latest.json`, written by `lib/pull-reddit-snapshot.sh`), so
+  real threads can come back even at 02:00 without OAuth. You don't manage this — just call
+  the helper as below; a fresh snapshot is served automatically when present.
+- If EVERY call returns `{"error":...}` (or an empty array), neither a fresh snapshot nor
+  OAuth creds are configured on this host. **Do NOT try to fix OAuth or build a token flow
+  yourself** — note "Reddit unreachable: no fresh snapshot + OAuth unset (founder: run
+  `scripts/nightly/lib/pull-reddit-snapshot.sh` while logged in, or set OAuth — see
+  docs/nightly/reddit-oauth-setup.md)" in your artifact, fall back to `WebSearch`, move on.
+  Setup is a one-time human step, not lane work.
 - **DO NOT** `WebFetch` reddit.com / `.json` / old.reddit / pullpush.io — that's
   the dead path. Use the helper.
 - `WebSearch` SERP is still fine as a SUPPLEMENT for discovery, but the helper is

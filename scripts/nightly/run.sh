@@ -486,7 +486,38 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
       log "drop-and-re-gate: parser returned $(printf '%s' "$_ignored" | grep -c .) non-authored path(s) — ignoring (not in authored allowlist):"
       printf '%s\n' "$_ignored" | while IFS= read -r f; do [ -n "$f" ] && log "  ignore: $f"; done
     fi
-    [ -n "$_bad" ] || { log "drop-and-re-gate: no authored offending files to drop — using docs-only salvage"; break; }
+    if [ -z "$_bad" ]; then
+      if [ -n "$_bad_raw" ]; then
+        # Every gate-failing file is NON-authored. The isolated worktree is exactly
+        # (clean HEAD + our authored files), so a non-authored file in it is
+        # byte-identical to committed HEAD — the error lives on master ALREADY, not
+        # in lane code (e.g. a concurrent/founder commit poisoned HEAD mid-run, the
+        # 2026-06-01 PageClient.tsx case that sank 8 lanes).
+        #
+        # We already know NO authored file has a lint/tsc error (else $_bad would be
+        # non-empty). But the full gate is `lint && … && test && build`, so a lint
+        # failure on the baseline short-circuits BEFORE test/build — we have NOT yet
+        # proven the authored set passes test+build. So re-gate (clean HEAD + authored)
+        # with LINT SKIPPED: skipping lint ignores only the baseline's pre-existing
+        # lint error, never an authored one. Ship IFF that passes — then the authored
+        # contribution is proven test+build clean and the failure was purely a baseline
+        # lint error the nightly didn't introduce. If it fails (baseline broken at
+        # test/build, or an authored file genuinely breaks test/build), fall to the
+        # docs-only salvage — conservative, never ships build-breaking code.
+        log "drop-and-re-gate: all $(printf '%s' "$_bad_raw" | grep -c .) gate-failing file(s) are non-authored — re-gating the authored set WITHOUT lint to verify it is test+build clean (a pre-existing baseline lint error is not the nightly's fault)"
+        run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 1; _nl_rc=$?
+        if [ "$_nl_rc" = "0" ]; then
+          gate_ok=1
+          log "baseline-poisoned gate: failing file(s) are non-authored (pre-existing/concurrent lint error on clean HEAD) AND the authored set passes test+build with lint skipped — shipping the nightly's authored work, which introduced no new failure"
+          echo -e "\n**Outcome (baseline-poisoned):** the gate failure was a pre-existing/concurrent lint error on the clean baseline (not lane code); the authored set passed test+build with lint skipped, so shipped it unchanged." >> "$REPORT"
+        else
+          log "drop-and-re-gate: authored set still fails with lint skipped (rc=$_nl_rc) — not a clean baseline-poison; using docs-only salvage"
+        fi
+      else
+        log "drop-and-re-gate: gate output had no parseable offenders — using docs-only salvage"
+      fi
+      break
+    fi
     log "drop-and-re-gate round $_round: dropping $(printf '%s' "$_bad" | grep -c .) gate-failing file(s) from the commit set, re-gating the rest:"
     printf '%s\n' "$_bad" | while IFS= read -r f; do [ -n "$f" ] && log "  drop: $f"; done
     _kept=$(mktemp)
