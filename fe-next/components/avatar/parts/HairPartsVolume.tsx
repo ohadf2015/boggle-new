@@ -1,6 +1,6 @@
 /** Back hair variants — see hairShared.tsx for props + helpers. */
 import { useAvatarUid } from '../AvatarUidContext';
-import { HairPartProps, HairPolishDefs, HairPolish, S } from './hairShared';
+import { HairPartProps, HairPolishDefs, HairPolish, S, CrownHighlight } from './hairShared';
 
 function Afro({ fill }: HairPartProps) {
   const u = useAvatarUid();
@@ -24,8 +24,8 @@ function Afro({ fill }: HairPartProps) {
       <circle cx="90" cy="34" r="6" fill={fill} stroke="#000" strokeWidth={1.5} />
       <circle cx="10" cy="50" r="5" fill={fill} stroke="#000" strokeWidth={1.5} />
       <circle cx="90" cy="50" r="5" fill={fill} stroke="#000" strokeWidth={1.5} />
-      {/* Highlights */}
-      <path d="M30 8 Q42 2 50 2 Q58 2 70 8" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.18" />
+      {/* Highlights — crown via shared for systemic consistency */}
+      <CrownHighlight opacity={0.18} strokeWidth={1.5} />
       <ellipse cx="30" cy="14" rx="6" ry="4" fill="#fff" opacity="0.06" />
     </g>
   );

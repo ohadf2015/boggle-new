@@ -18,7 +18,7 @@ import { BODY_PARTS } from './parts/BodyParts';
 
 const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ponytail']);
 const BACK_ACCESSORY_STYLES = new Set(['monkeyEars']);
-const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'diamond', 'shield', 'triangle', 'catFace']);
+const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'catFace']);
 const SKIP_NOSE_BASES = new Set(['skull', 'dragonHead']);
 const SKIP_FEMALE_LASHES_EYES = new Set(['none', 'lashes', 'monocleEye', 'crossEyed', 'wingedLiner', 'smokyEye']);
 const CIRCULAR_BASES = new Set(['round', 'blob']);

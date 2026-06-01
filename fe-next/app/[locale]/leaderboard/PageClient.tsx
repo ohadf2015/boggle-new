@@ -162,7 +162,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
       <div className={cn('py-4')}>
         {/* Page Title */}
         <m.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-6"
         >

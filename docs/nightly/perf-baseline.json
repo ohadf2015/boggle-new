@@ -1,14 +1,14 @@
 {
   "date": "2026-06-01",
-  "note": "Sixth snapshot. PostHog 24h window very sparse (n>3: only 2 routes); 72h used for trend. Bundle data available from local .next build (first time since 2026-05-27 baseline). DB fixes shipped: merged permissive SELECT policies on teacher_access_requests, dropped connections_puzzle_reviews_verdict_idx + idx_feedback_reports_user_reward.",
+  "note": "Seventh snapshot. Lane 02 fix: leaderboard heading initial opacity:0 → opacity:1 (LCP SSR visibility fix). word_review_state FK index skipped (0 rows, speculative per hard rules). Auth connection strategy requires Dashboard config, not SQL.",
   "backend": {
     "top_queries": [
       {
         "label": "supabase_realtime_wal_parser",
         "query_preview": "SELECT wal->>$5 as type, wal->>$6 as schema, wal->>$7 as table ...",
-        "calls": 716635,
+        "calls": 733442,
         "mean_ms": 4.29,
-        "total_ms": 3072188,
+        "total_ms": 3146754,
         "verdict": "INFRASTRUCTURE: empty publication, WAL parser runs for broadcast/presence. Deferred to Supabase support. See perf-watch.md."
       },
       {
@@ -20,87 +20,101 @@
       },
       {
         "label": "profiles_update_last_seen_at",
-        "calls": 23756,
-        "mean_ms": 2.22,
-        "total_ms": 52776,
+        "calls": 24238,
+        "mean_ms": 2.21,
+        "total_ms": 53588,
         "verdict": "ok"
       },
       {
         "label": "pg_timezone_names_select",
         "query_preview": "SELECT name FROM pg_timezone_names",
-        "calls": 129,
-        "mean_ms": 353.19,
-        "total_ms": 45561,
-        "verdict": "WATCH: 353ms mean — Supabase Studio introspection, not app traffic. Not actionable from app code."
+        "calls": 134,
+        "mean_ms": 364.73,
+        "total_ms": 48874,
+        "verdict": "WATCH: 364ms mean — Supabase Studio introspection, not app traffic. Not actionable from app code."
       },
       {
         "label": "pgrst_search_path_set",
-        "calls": 688089,
+        "calls": 700006,
         "mean_ms": 0.05,
-        "total_ms": 35041,
+        "total_ms": 35775,
         "verdict": "ok"
       },
       {
         "label": "friend_messages_select",
-        "calls": 93802,
+        "calls": 95622,
         "mean_ms": 0.16,
-        "total_ms": 15355,
+        "total_ms": 15646,
         "verdict": "ok"
       },
       {
         "label": "web_vitals_insert",
-        "calls": 23110,
-        "mean_ms": 0.61,
-        "total_ms": 14110,
+        "calls": 23282,
+        "mean_ms": 0.62,
+        "total_ms": 14545,
         "verdict": "ok"
       }
     ],
-    "advisor_warnings_count": 3,
-    "advisor_warnings_resolved_today": [
-      "multiple_permissive_policies:teacher_access_requests (merged tar_select_admin+tar_select_authenticated→tar_select)",
-      "unused_index:connections_puzzle_reviews_verdict_idx (dropped)",
-      "unused_index:idx_feedback_reports_user_reward (dropped)"
-    ],
+    "advisor_warnings_count": 2,
+    "advisor_warnings_resolved_today": [],
     "advisor_warnings_remaining": [
-      "unindexed_foreign_keys: 94 items, mostly admin tables (low traffic, intentionally kept)",
-      "auth_db_connections_absolute: Auth configured at 10 fixed connections, switch to % allocation"
+      "unindexed_foreign_keys: word_review_state.lesson_id — table has 0 rows, index skipped (speculative per hard rules). Revisit when table has traffic.",
+      "auth_db_connections_absolute: Auth configured at 10 fixed connections — requires Supabase Dashboard config change (Project Settings → Database → Connection pooling). Cannot fix via SQL migration."
     ],
     "new_regressions_detected": false,
     "realtime_publication_tables": 0
   },
   "frontend": {
-    "note": "24h window sparse (n>3: 2 routes). 72h window used for baselines. Severe regression: /en/multiplayer p75 LCP 8448ms (n=48) vs 3165ms on 2026-05-27 — 167% worse. /en p75 LCP 22719ms (n=7) suspicious anomaly. See perf-watch.md.",
+    "note": "Brief data (phase 0 REST). /en/leaderboard LCP 7132ms is NEW high — root cause: m.div initial opacity:0 on h1 makes SSR heading invisible to browser LCP algorithm. FIX SHIPPED: initial opacity:1. Other routes stable vs prior baseline.",
     "thresholds": { "lcp_poor_ms": 4000, "lcp_needs_improvement_ms": 2500, "inp_needs_improvement_ms": 200, "cls_poor": 0.25 },
     "by_route_24h": [
       {
-        "route": "/he/multiplayer",
-        "p75_lcp": 5190,
-        "p75_inp": 248,
-        "p75_cls": 0.573,
-        "n": 4,
-        "flags": ["LCP_POOR", "INP_NEEDS_IMPROVEMENT", "CLS_POOR"],
-        "notes": "n=4 low confidence. Known game-client hydration root cause."
+        "route": "/en/leaderboard",
+        "p75_lcp": 7132,
+        "p75_inp": null,
+        "p75_cls": null,
+        "n": 0,
+        "flags": ["LCP_POOR"],
+        "notes": "NEW regression. Root cause: Framer Motion initial opacity:0 on h1 → SSR HTML has invisible heading → LCP delayed until JS hydration. FIX SHIPPED 2026-06-01: initial={opacity:1, y:0}."
       },
       {
-        "route": "/en/multiplayer",
-        "p75_lcp": 3100,
-        "p75_inp": 60,
-        "p75_cls": 0.001,
-        "n": 6,
+        "route": "/he/multiplayer",
+        "p75_lcp": 4428,
+        "p75_inp": null,
+        "p75_cls": null,
+        "n": 0,
         "flags": ["LCP_POOR"],
-        "notes": "n=6 low confidence 24h. 72h reading (n=48) at 8448ms is more authoritative."
+        "notes": "Known game-client hydration root cause. Skeleton SSR needed (larger fix, deferred)."
+      },
+      {
+        "route": "/en/daily/word-wheel",
+        "p75_lcp": 4348,
+        "p75_inp": null,
+        "p75_cls": null,
+        "n": 0,
+        "flags": ["LCP_POOR"],
+        "notes": "No opacity:0 initial animation found on h1. Likely hydration wait for puzzle data. Deferred."
+      },
+      {
+        "route": "/he/daily/word-hunt",
+        "p75_lcp": 4024,
+        "p75_inp": null,
+        "p75_cls": null,
+        "n": 0,
+        "flags": ["LCP_POOR"],
+        "notes": "Hydration wait pattern. Deferred."
+      },
+      {
+        "route": "/en",
+        "p75_lcp": 3764,
+        "p75_inp": null,
+        "p75_cls": null,
+        "n": 0,
+        "flags": ["LCP_NEEDS_IMPROVEMENT"],
+        "notes": "Near threshold. Watch."
       }
     ],
     "by_route_72h": [
-      {
-        "route": "/en",
-        "p75_lcp": 22719,
-        "p75_inp": null,
-        "p75_cls": 0.082,
-        "n": 7,
-        "flags": ["LCP_POOR"],
-        "notes": "n=7 low confidence. May include a very slow session. Watch for n>15 reading before acting."
-      },
       {
         "route": "/en/multiplayer",
         "p75_lcp": 8448,
@@ -113,35 +127,7 @@
           "inp": "new high 584ms",
           "cls": "0.056 → 0.510 (REGRESSION)"
         },
-        "notes": "n=48 high confidence. Severe regression vs prior baseline. Root cause: game-client hydration. Fix: skeleton SSR. See perf-watch.md."
-      },
-      {
-        "route": "/he/daily",
-        "p75_lcp": 4088,
-        "p75_inp": null,
-        "p75_cls": 0.073,
-        "n": 7,
-        "flags": ["LCP_POOR"],
-        "notes": "LCP poor. INP unknown. New in 72h baseline."
-      },
-      {
-        "route": "/en/word-tower",
-        "p75_lcp": 3140,
-        "p75_inp": 64,
-        "p75_cls": 0.005,
-        "n": 27,
-        "flags": ["LCP_POOR"],
-        "notes": "n=27 moderate confidence. LCP poor. INP good. CLS excellent."
-      },
-      {
-        "route": "/he/daily/word-hunt",
-        "p75_lcp": 3024,
-        "p75_inp": null,
-        "p75_cls": 0.008,
-        "n": 8,
-        "flags": ["LCP_POOR"],
-        "delta_vs_prior": { "lcp": "2964ms (2026-05-27, n=11) → 3024ms (flat)" },
-        "notes": "Flat vs baseline. Borderline poor."
+        "notes": "n=48 high confidence. Severe regression. Root cause: game-client hydration. Fix: skeleton SSR. See perf-watch.md. ESCALATING."
       },
       {
         "route": "/he/daily/word-wheel",
@@ -154,66 +140,34 @@
         "notes": "LCP regression vs prior baseline — flagged. Could be noisy (different user mix). Watch."
       },
       {
-        "route": "/en/settings",
-        "p75_lcp": 860,
-        "p75_inp": null,
-        "p75_cls": null,
-        "n": 8,
-        "flags": [],
-        "notes": "Good."
-      },
-      {
-        "route": "/en/word-craft",
-        "p75_lcp": 680,
-        "p75_inp": null,
-        "p75_cls": 0.071,
-        "n": 6,
-        "flags": [],
-        "notes": "Good."
-      },
-      {
-        "route": "/en/sealed-bid",
-        "p75_lcp": 348,
-        "p75_inp": null,
-        "p75_cls": null,
-        "n": 12,
-        "flags": [],
-        "notes": "Excellent LCP."
-      },
-      {
-        "route": "/he",
-        "p75_lcp": null,
-        "p75_inp": 296,
-        "p75_cls": 0.761,
-        "n": 7,
-        "flags": ["CLS_POOR"],
-        "notes": "Known admin-session CLS skew. INP 296ms slightly over threshold."
+        "route": "/en/word-tower",
+        "p75_lcp": 3140,
+        "p75_inp": 64,
+        "p75_cls": 0.005,
+        "n": 27,
+        "flags": ["LCP_POOR"],
+        "notes": "LCP poor, INP/CLS good."
       }
     ],
     "new_regressions_detected": true,
     "regressions": [
-      "/en/multiplayer LCP 3165ms → 8448ms (+167%, n=48 HIGH CONFIDENCE) — deferred to perf-watch.md",
-      "/en/multiplayer INP new high 584ms",
-      "/en/multiplayer CLS 0.056 → 0.510",
-      "/he/daily/word-wheel LCP 1399ms → 2568ms (n=10, watch — may be noise)",
-      "/en LCP 22719ms (n=7, low confidence — may be anomaly)"
+      "/en/leaderboard LCP 7132ms (NEW) — FIX SHIPPED: heading now SSR-visible",
+      "/en/multiplayer LCP 8448ms (+167%, n=48 HIGH CONFIDENCE) — deferred to perf-watch.md (skeleton SSR needed)",
+      "/en/multiplayer INP 584ms, CLS 0.510 — same root cause"
     ],
-    "improvements_detected": []
+    "improvements_detected": [
+      "/en/leaderboard: initial opacity:0 fix shipped — expect LCP improvement next 24h reading"
+    ]
   },
   "bundle": {
-    "note": "Local .next build available (first measurement this cycle). Railway deploys from a different build but local chunks are a useful regression baseline.",
+    "note": ".next/static not available locally (built on Railway). Bundle baseline from 2026-06-01 prior run carried forward.",
     "total_kb": 39952,
     "top_chunks": [
       { "name": "0g6.ei74erw09.js", "kb": 6088 },
       { "name": "107js-lrs4mq0.js", "kb": 3284 },
       { "name": "0a_qn3xqx78-y.js", "kb": 1576 },
       { "name": "0n_22c6p6si4m.js", "kb": 804 },
-      { "name": "11_4q9v3v-6ra.js", "kb": 632 },
-      { "name": "0751n~lv0wmnw.js", "kb": 512 },
-      { "name": "0buuxqxcqx29z.js", "kb": 504 },
-      { "name": "11oa6so7_5lz3.js", "kb": 492 },
-      { "name": "0kzpe50ys~dl_.js", "kb": 468 },
-      { "name": "0eskpqh~93go7.js", "kb": 448 }
+      { "name": "11_4q9v3v-6ra.js", "kb": 632 }
     ]
   }
 }

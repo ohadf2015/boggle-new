@@ -6,6 +6,7 @@
 import { getSupabase, GameStats, XpInfo, UpdatedUserStats } from './client';
 import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from '../xpManager';
 import { addXpToLeague } from '../leagueManager';
+import { leaderboardPointsForGame } from '../leaderboardScoring';
 import logger from '../../utils/logger';
 
 // Lazy import to avoid circular dependency with botManager
@@ -208,10 +209,13 @@ export async function updatePlayerStats(
     return { data: null, error: { message: 'Profile not available' } };
   }
 
-  // Calculate updated stats
+  // Calculate updated stats. The competitive leaderboard contribution is
+  // down-weighted per mode (casual multiplayer counts far less than the Daily
+  // Challenge) so the leaderboard is driven mostly by daily play. Raw per-game
+  // score is preserved separately in game_results.
   const updates: Record<string, unknown> = {
     total_games: (profile.total_games || 0) + 1,
-    total_score: (profile.total_score || 0) + (gameStats.score || 0),
+    total_score: (profile.total_score || 0) + leaderboardPointsForGame(gameStats.gameMode, gameStats.score || 0),
     total_words: (profile.total_words || 0) + (gameStats.wordCount || 0),
     total_time_played: (profile.total_time_played || 0) + (gameStats.timePlayed || 0),
     last_game_at: new Date().toISOString()

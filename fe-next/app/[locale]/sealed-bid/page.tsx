@@ -27,8 +27,10 @@ import {
   initialSbState,
   letterValue,
   MIN_WORD_LEN,
+  type RoundResult,
   type SbState,
 } from '@/lib/sealedBid/sp/sbEngine';
+import { SealedBidShareCard } from '@/components/sealedBid/SealedBidShareCard';
 import { pickRounds, poolForLang, ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
 import { toDisplay, wordFromChosen } from '@/lib/sealedBid/sp/rackBuilder';
 
@@ -65,6 +67,7 @@ export default function SealedBidPage() {
   const [chosen, setChosen] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [history, setHistory] = useState<RoundResult[]>([]);
   const builtRef = useRef<HTMLDivElement>(null);
   const revealRef = useRef<HTMLDivElement>(null);
   const didShuffleRef = useRef(false);
@@ -92,6 +95,14 @@ export default function SealedBidPage() {
     }
   }, []);
 
+  // Accumulate completed rounds for the share card.
+  useEffect(() => {
+    if (state.phase === 'revealed' && state.lastResult) {
+      setHistory((h) => [...h, state.lastResult!]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.lastResult]);
+
   // Reveal ceremony — fire once whenever a round flips to revealed.
   useEffect(() => {
     if (state.phase !== 'revealed' || !result) return;
@@ -117,6 +128,7 @@ export default function SealedBidPage() {
     setState(initialSbState(pickRounds(ROUNDS_PER_GAME, locale)));
     setChosen([]);
     setError(null);
+    setHistory([]);
   }, [locale]);
 
   const tapTile = useCallback((i: number) => {
@@ -229,20 +241,25 @@ export default function SealedBidPage() {
         </div>
 
         {state.phase === 'done' ? (
-          <div className="rounded-neo border-3 border-black bg-neo-cyan p-6 text-center shadow-hard-lg space-y-4">
-            <h2 className="inline-flex items-center justify-center gap-2 font-neo-display font-black text-2xl uppercase text-neo-navy">
-              <Trophy className="h-6 w-6" />
-              {t('sealedBid.finalScore')}
-            </h2>
-            <p className="font-neo-display font-black text-5xl text-neo-navy">{state.totalScore}</p>
-            <button
-              type="button"
-              onClick={newGame}
-              className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
-            >
-              <RotateCcw className="h-4 w-4" />
-              {t('sealedBid.playAgain')}
-            </button>
+          <div className="space-y-4">
+            <div className="rounded-neo border-3 border-black bg-neo-cyan p-6 text-center shadow-hard-lg space-y-4">
+              <h2 className="inline-flex items-center justify-center gap-2 font-neo-display font-black text-2xl uppercase text-neo-navy">
+                <Trophy className="h-6 w-6" />
+                {t('sealedBid.finalScore')}
+              </h2>
+              <p className="font-neo-display font-black text-5xl text-neo-navy">{state.totalScore}</p>
+              <button
+                type="button"
+                onClick={newGame}
+                className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
+              >
+                <RotateCcw className="h-4 w-4" />
+                {t('sealedBid.playAgain')}
+              </button>
+            </div>
+            {history.length > 0 && (
+              <SealedBidShareCard history={history} totalScore={state.totalScore} />
+            )}
           </div>
         ) : state.phase === 'revealed' && result ? (
           <div ref={revealRef} className="rounded-neo border-3 border-black bg-neo-navy-light p-5 text-center shadow-hard-lg space-y-3">

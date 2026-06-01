@@ -8,21 +8,21 @@ Items deferred from automated nightly triage. Human review required.
 
 ### [Flags] Stalled A/B experiments — human decision needed
 
-- **`show-signup-after-first-win`** (PostHog flag #163655, active, 70+ days, ~43 exposures)
+- **`show-signup-after-first-win`** (PostHog flag #163655, active, 62+ days, **26 after-first-win / 22 after-third-game** per 90d $feature_flag_called query 2026-06-01)
   - Status: Active but stalled — far below 1000/arm threshold for statistical inference
-  - Context: Tests whether prompting guests after first-win vs 3rd game lifts signup CVR. Code reads variant via `usePostHogFlag` in `useSignupPrompt.ts`. Default = `after-first-win`.
-  - Decision needed: (a) widen rollout to gather data faster, (b) declare stale + retire to `after-first-win` (the default), or (c) keep running
-  - Note: 43 exposures in 70 days = ~0.6/day. Very few guests ever reach the threshold. Consider lowering threshold or adding cohort.
+  - Context: Tests whether prompting guests after first-win vs 3rd game lifts signup CVR. Code searches found **no usages in fe-next/** — flag is orphaned (no call sites). Default = `after-first-win`.
+  - Decision needed: **Recommend retire** — 48 exposures in 62 days, no code call sites found, zero conversion data. Keep `after-first-win` behavior (no code change needed since flag not wired).
+  - Action: Delete flag in PostHog UI.
 
-- **`share-prompt-timing`** (PostHog flag #163656, active, 62+ days)
-  - Status: Active, no conversion data visible via REST — no `share_prompt_timing` variant events in PostHog
-  - Decision needed: (a) check if flag is actually being read anywhere (grep shows it IS in `useSharePromptImpression.ts`), (b) if no exposures → retire, (c) if exposures exist in PostHog UI → extract winner and unwire
-  - Note: Flag appears in code but no experiment_exposed events visible in 90d window.
+- **`share-prompt-timing`** (PostHog flag #163656, active, 62+ days, **2 exposures** per 90d $feature_flag_called query 2026-06-01)
+  - Status: Near-dead — 2 total exposures in 90 days. Code searches found **no usages in fe-next/** — flag is orphaned.
+  - Decision needed: **Recommend retire** — clearly dead experiment, no code call sites.
+  - Action: Delete flag in PostHog UI.
 
-- **`mp-signup-nudge-copy-v1`** (PostHog flag #183230, active, 24 days, 77 total impressions — 0 conversions)
-  - Status: Conversion = 0/77 across all variants in 28d. Clear failure on conversion, but below 1000/arm for statistical retirement.
-  - Decision needed: (a) declare `toast-disabled` the winner (removing the toast = minimal downside, confirmed 0 uplift from toast), (b) pause the experiment, (c) keep running to 1000/arm
-  - Advisory: 0/77 is strong evidence the nudge mechanics are broken regardless of copy. Suggest user-research before iterating on copy.
+- **`mp-signup-nudge-copy-v1`** (PostHog flag #183230, active, 29 days, **42 toast-disabled / 27 control** per 90d $feature_flag_called query 2026-06-01 — 0 conversions)
+  - Status: Conversion = 0/69 exposures across arms. Clear failure on conversion, below 1000/arm but 0/69 is statistically meaningful.
+  - Decision needed: (a) declare `toast-disabled` the winner (removing the toast = minimal downside, confirmed 0 uplift), (b) keep running to gather more data
+  - Advisory: 0/69 is strong evidence the nudge mechanics are broken regardless of copy. Suggest user-research before iterating on copy.
 
 ---
 
@@ -219,3 +219,31 @@ Items deferred from automated nightly triage. Human review required.
   - how it works: `usePostHogFlag` or `useFeatureFlag` in `useMultiplayerSignupNudge.ts`
   - recommended action: low-volume game makes 77 total exposures insufficient for significance; decision: pick control (current sheet+toast) and delete flag + variant branches, OR keep running and target 300/arm minimum first
   - recommended owner: growth
+
+## 2026-06-01
+
+- [Supabase] upsert_push_token SECURITY DEFINER callable by authenticated
+  - advisor: authenticated_security_definer_function_executable
+  - status: deferred (reviewed — intentional)
+  - why: function body uses cross-user UPDATE (`WHERE user_id != auth.uid()`) to deactivate tokens on account switch. SECURITY INVOKER would break that under RLS. SECURITY DEFINER is load-bearing. Only callsite is server-side route `app/api/player/push-token/route.ts:48` (not raw client RPC). Mild risk: authenticated users can call via `/rest/v1/rpc/upsert_push_token` directly and deactivate another user's token if they know the token value — acceptable given token opacity.
+  - recommended owner: review-by-eod
+
+- [Supabase] web_vitals RLS INSERT policy always true
+  - advisor: rls_policy_always_true
+  - status: deferred (intentional)
+  - why: public web vitals collection is intentional — anyone can INSERT performance data. No PII in the table. No fix needed.
+  - recommended owner: self
+
+- [Sentry JAVASCRIPT-NEXTJS-13Y] TypeError: Cannot read properties of null (reading 'x') on /he/blast
+  - first/last seen: 2026-05-06 (same day), count: 500, users: 1
+  - link: https://lexiclash.sentry.io/issues/118046477/
+  - status: deferred (stale, 1 user)
+  - why: null read is inside Pixi v8 render loop (not our RAF tick). Our `useBlastDebris.ts:170` already guards `d.graphic.position`. Fix requires `ticker.stop()` before `destroy()` or Pixi upgrade. Has not recurred in 25 days.
+  - recommended owner: review-by-eod
+
+- [Sentry JAVASCRIPT-NEXTJS-1JR] Error: relation "profiles" does not exist on POST /api/coins
+  - first/last seen: 2026-05-27, count: 18, users: 5
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred (already resolved)
+  - why: `profiles` table confirmed to exist in DB. Error stopped 2026-05-27 after migration `20260527230753`. No code change needed.
+  - recommended owner: self

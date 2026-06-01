@@ -11,6 +11,7 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from '@/backend/modules/xpManager';
 import { checkLifetimeAchievements, type UserStats } from '@/backend/modules/achievementManager';
+import { isDailyMode, awardsLeaderboardPoints, leaderboardPointsForGame } from '@/backend/modules/leaderboardScoring';
 import { captureApiError } from '@/utils/sentry';
 
 interface RecordGameRequest {
@@ -92,17 +93,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { score, wordCount, longestWord, timePlayed, achievementCount, maxCombo, isDailyChallenge, longWordsFound } = validation.data;
+    const { score, wordCount, longestWord, timePlayed, achievementCount, mode, maxCombo, isDailyChallenge, longWordsFound } = validation.data;
     const userId = user.id;
     let questUpdate: { completed: boolean; questType: string; xpReward: number; description: string } | null = null;
 
+    // Daily challenge competitive stats are owned by the validated, idempotent
+    // /api/daily-challenge/word-hunt/submit route — recording total_score /
+    // total_games / unique_days here too would DOUBLE-COUNT them. So for daily we
+    // skip the stat increments and only award XP / quests / achievements (which
+    // submit does not). Feature-gated modes award nothing.
+    const isDaily = isDailyMode(mode) || isDailyChallenge === true;
+    const eligibleForAward = awardsLeaderboardPoints(mode);
+
     // Calculate XP (singleplayer = no win bonus, playerCount=1)
-    const xpResult = calculateGameXp({
-      score,
-      isWinner: false,
-      achievementCount: achievementCount ?? 0,
-      playerCount: 1,
-    });
+    const xpResult = eligibleForAward
+      ? calculateGameXp({
+          score,
+          isWinner: false,
+          achievementCount: achievementCount ?? 0,
+          playerCount: 1,
+        })
+      : { totalXp: 0, breakdown: {} as ReturnType<typeof calculateGameXp>['breakdown'] };
 
     // Fetch current profile
     const { data: profile, error: profileError } = await supabase
@@ -115,32 +126,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
 
-    // Build stat updates
+    // Build stat updates. The competitive leaderboard contribution is
+    // down-weighted per mode (casual single-player counts far less than the
+    // Daily Challenge) so the leaderboard is driven mostly by daily play.
+    // Daily games skip stat increments entirely (owned by the submit route).
     const updates: Record<string, unknown> = {
-      total_games: (profile?.total_games || 0) + 1,
-      total_score: (profile?.total_score || 0) + score,
-      total_words: (profile?.total_words || 0) + wordCount,
-      casual_games: (profile?.total_games || 0) + 1, // singleplayer counts as casual
       last_game_at: new Date().toISOString(),
     };
 
-    if (timePlayed) {
-      updates.total_time_played = (profile?.total_time_played || 0) + timePlayed;
-    }
+    if (!isDaily) {
+      updates.total_games = (profile?.total_games || 0) + 1;
+      updates.total_score = (profile?.total_score || 0) + leaderboardPointsForGame(mode, score);
+      updates.total_words = (profile?.total_words || 0) + wordCount;
+      updates.casual_games = (profile?.total_games || 0) + 1; // singleplayer counts as casual
 
-    // Track longest word
-    if (longestWord && longestWord.length > (profile?.longest_word_length || 0)) {
-      updates.longest_word = longestWord;
-      updates.longest_word_length = longestWord.length;
-    }
+      if (timePlayed) {
+        updates.total_time_played = (profile?.total_time_played || 0) + timePlayed;
+      }
 
-    // Track unique days played
-    const today = new Date().toISOString().split('T')[0];
-    const lastGameDate = profile?.last_game_at
-      ? new Date(profile.last_game_at).toISOString().split('T')[0]
-      : null;
-    if (lastGameDate !== today) {
-      updates.unique_days_played = (profile?.unique_days_played || 0) + 1;
+      // Track longest word
+      if (longestWord && longestWord.length > (profile?.longest_word_length || 0)) {
+        updates.longest_word = longestWord;
+        updates.longest_word_length = longestWord.length;
+      }
+
+      // Track unique days played
+      const today = new Date().toISOString().split('T')[0];
+      const lastGameDate = profile?.last_game_at
+        ? new Date(profile.last_game_at).toISOString().split('T')[0]
+        : null;
+      if (lastGameDate !== today) {
+        updates.unique_days_played = (profile?.unique_days_played || 0) + 1;
+      }
     }
 
     // Update profile stats
@@ -197,10 +214,12 @@ export async function POST(request: NextRequest) {
     let newLifetimeAchievements: { key: string; icon: string }[] = [];
     try {
       const profileAchievementCounts = (profile?.achievement_counts || {}) as Record<string, number>;
+      // For daily games these `updates.*` fields are intentionally absent (the
+      // submit route owns daily stats), so fall back to the current profile.
       const userStats: UserStats = {
-        gamesPlayed: updates.total_games as number,
-        totalWordsFound: updates.total_words as number,
-        totalScore: updates.total_score as number,
+        gamesPlayed: (updates.total_games as number | undefined) ?? profile?.total_games ?? 0,
+        totalWordsFound: (updates.total_words as number | undefined) ?? profile?.total_words ?? 0,
+        totalScore: (updates.total_score as number | undefined) ?? profile?.total_score ?? 0,
         uniqueDaysPlayed: (updates.unique_days_played as number | undefined) ?? profile?.unique_days_played ?? 0,
       };
       newLifetimeAchievements = checkLifetimeAchievements(

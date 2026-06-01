@@ -15,6 +15,8 @@ import { FACIAL_HAIR_PARTS } from "./parts/FacialHairParts";
 import { NOSE_PARTS } from './parts/NoseParts';
 import { BODY_PARTS } from './parts/BodyParts';
 import AvatarTierEffects, { type Tier } from './AvatarTierEffects';
+import { applyMood, getMoodAnimationClass, type AvatarMood } from '@/lib/avatar/avatarMood';
+import '@/styles/avatar-mood-animations.css';
 
 /** Game-mode color frame around avatar — matches brand palette */
 export type AvatarMode = 'multiplayer' | 'singleplayer' | 'brain' | 'practice';
@@ -38,6 +40,13 @@ interface AvatarRendererProps {
   circular?: boolean;
   /** Game-mode color frame: pink/cyan/purple/lime ring around avatar */
   mode?: AvatarMode;
+  /**
+   * Transient reaction. Temporarily overrides eyes/eyebrows/mouth + plays a short
+   * wrapper animation. Undefined/`idle` renders identically to a moodless avatar.
+   * Independent of `disableEffects` — an expression swap is one cheap element, so
+   * moods fire even in perf-sensitive rosters.
+   */
+  mood?: AvatarMood;
 }
 
 /**
@@ -53,7 +62,7 @@ const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails',
 const BACK_ACCESSORY_STYLES = new Set(['monkeyEars']);
 
 /** Non-human bases that skip cheek blush & face depth effects */
-const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'diamond', 'shield', 'triangle', 'catFace']);
+const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'catFace']);
 
 /** Bases with their own nose anatomy — skip NosePart overlay */
 const SKIP_NOSE_BASES = new Set(['skull', 'dragonHead']);
@@ -86,17 +95,21 @@ const SKIP_FEMALE_LASHES_EYES = new Set([
   'none', 'lashes', 'monocleEye', 'crossEyed', 'wingedLiner', 'smokyEye',
 ]);
 
-const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode }) => {
+const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood }) => {
   const uid = useId();
   const faceShadowId = `fs${uid}`;
   const halftoneId = `ht${uid}`;
+  // Mood layers a transient expression over the stored config. Identity when
+  // idle/undefined, so a moodless avatar renders byte-identical to before.
+  const eff = applyMood(config, mood);
+  const moodClass = getMoodAnimationClass(mood);
   const BasePart = BASE_PARTS[config.base] ?? BASE_PARTS.round;
-  const EyePart = EYE_PARTS[config.eyes] ?? EYE_PARTS.round;
-  const MouthPart = MOUTH_PARTS[config.mouth] ?? MOUTH_PARTS.smile;
+  const EyePart = EYE_PARTS[eff.eyes] ?? EYE_PARTS.round;
+  const MouthPart = MOUTH_PARTS[eff.mouth] ?? MOUTH_PARTS.smile;
   const HairPart = HAIR_PARTS[config.hair] ?? HAIR_PARTS.none;
   const HairFrontPart = HAIR_FRONT_PARTS[config.hair] ?? null;
   const AccessoryPart = ACCESSORY_PARTS[config.accessory] ?? ACCESSORY_PARTS.none;
-  const EyebrowPart = EYEBROW_PARTS[config.eyebrows ?? 'none'] ?? EYEBROW_PARTS.none;
+  const EyebrowPart = EYEBROW_PARTS[eff.eyebrows ?? 'none'] ?? EYEBROW_PARTS.none;
   const FacialHairPart = FACIAL_HAIR_PARTS[config.facialHair ?? 'none'] ?? FACIAL_HAIR_PARTS.none;
   const NosePart = NOSE_PARTS[config.noseStyle ?? 'kawaii'] ?? NOSE_PARTS.kawaii;
   const bodyKey = config.bodyStyle && config.bodyStyle !== 'default'
@@ -108,7 +121,7 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const blushColor = getBlushColor(config.skinColor);
   const showDepth = !SKIP_BLUSH_BASES.has(config.base);
   const skinShadow = darken(config.skinColor, 0.3);
-  const canBlink = !SKIP_BLINK_EYES.has(config.eyes) && !disableEffects;
+  const canBlink = !SKIP_BLINK_EYES.has(eff.eyes) && !disableEffects;
 
   const svgElement = (
     <AvatarUidContext.Provider value={uid}>
@@ -117,10 +130,11 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       viewBox="0 0 100 100"
       width={size}
       height={size}
-      className={className}
+      className={`${className} ${moodClass}`.trim()}
       role="img"
-      aria-label={`Avatar: ${config.base} face, ${config.eyes} eyes, ${config.hair} hair`}
+      aria-label={`Avatar: ${config.base} face, ${eff.eyes} eyes, ${config.hair} hair`}
       data-testid="custom-avatar"
+      data-mood={mood ?? 'idle'}
     >
       {/* Shared filter definitions — neo-brutalist hard offset shadow (NO blur) */}
       <defs>
@@ -197,10 +211,10 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       {config.eyebrows && config.eyebrows !== 'none' && <EyebrowPart fill={config.hairColor} />}
 
       {/* Eyes */}
-      {config.eyes !== 'none' && <EyePart />}
+      {eff.eyes !== 'none' && <EyePart />}
 
       {/* Blink — skin-colored ellipses grow over each eye at cy=42 */}
-      {canBlink && config.eyes !== 'none' && (
+      {canBlink && eff.eyes !== 'none' && (
         <g>
           <ellipse cx="38" cy="42" rx="8.5" ry="0" fill={config.skinColor}>
             <animate attributeName="ry" values="0;0;0;7.5;0;0;0;0;0;0;0;0;0;0;7.5;0;0;0;0;0" dur="6s" repeatCount="indefinite" />
@@ -218,14 +232,14 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
       )}
 
       {/* Female lashes overlay — skip misaligned styles */}
-      {config.gender === 'female' && config.eyes !== 'none' && (
-        config.eyes === 'cyclops' ? (
+      {config.gender === 'female' && eff.eyes !== 'none' && (
+        eff.eyes === 'cyclops' ? (
           <g>
             <line x1="46" y1="34" x2="44" y2="31" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
             <line x1="50" y1="33" x2="50" y2="30" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
             <line x1="54" y1="34" x2="56" y2="31" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
           </g>
-        ) : !SKIP_FEMALE_LASHES_EYES.has(config.eyes) ? (
+        ) : !SKIP_FEMALE_LASHES_EYES.has(eff.eyes) ? (
           <g>
             <line x1="35" y1="37" x2="33" y2="34" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
             <line x1="38" y1="36" x2="37" y2="33" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />

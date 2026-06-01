@@ -5,6 +5,7 @@ import { contentByLocale } from './content';
 export const revalidate = 86400;
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 
 function buildFaqJsonLd(locale: string): string {
   const data = contentByLocale[locale] ?? contentByLocale.en;
@@ -213,6 +214,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
     <>
       <script type="application/ld+json">{faqJsonLd}</script>
       <FAQPageClient />
+      <GuidesCalloutLink locale={locale} />
       <GamePageSeoContent
         title={content.title}
         description={content.description}

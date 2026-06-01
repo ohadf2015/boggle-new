@@ -3,6 +3,7 @@
 import { useMemo, memo } from 'react';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarRenderer, { type AvatarMode } from '@/components/avatar/AvatarRenderer';
+import type { AvatarMood } from '@/lib/avatar/avatarMood';
 import { cn } from '@/lib/utils';
 import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
 
@@ -41,6 +42,12 @@ interface AvatarProps {
    * `filter: drop-shadow` keyframes are paint-bound and stack into significant jank.
    */
   disableEffects?: boolean;
+  /**
+   * Transient reaction (correct/wrong/streak/win/…). Temporarily swaps the
+   * eyes/eyebrows/mouth + plays a short animation. Undefined renders normally.
+   * Drive with the `useAvatarMood` hook from game events.
+   */
+  mood?: AvatarMood;
 }
 
 /** Map a profile-frame cosmetic id to its avatar wrapper class. Returns null for no frame. */
@@ -72,6 +79,7 @@ const Avatar = memo<AvatarProps>((props) => {
     mode,
     frame,
     disableEffects,
+    mood,
   } = props;
   // Back-compat: legacy callers still pass `avatarImage`. Read via prop access
   // so this component does not surface its own deprecation diagnostic.
@@ -117,7 +125,7 @@ const Avatar = memo<AvatarProps>((props) => {
         data-avatar-type="custom"
         {...frameAttr}
       >
-        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} />
+        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} />
       </div>
     );
   }
@@ -131,7 +139,7 @@ const Avatar = memo<AvatarProps>((props) => {
       data-avatar-type="generated"
       {...frameAttr}
     >
-      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} />
+      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} />
     </div>
   );
 });

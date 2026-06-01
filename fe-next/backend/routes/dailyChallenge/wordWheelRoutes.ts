@@ -16,6 +16,7 @@ import {
   isValidLanguage,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
+import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
 
@@ -164,7 +165,9 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
     // daily-challenge-only players can unlock DEDICATION (7d) / LOYAL_PLAYER (30d).
     if (playerId) {
       try {
-        await updateDailyProfileStats({ supabase, playerId, scoreToAdd: score });
+        // Daily challenge is the dominant competitive event — weight its
+        // leaderboard contribution above casual play (DAILY_LEADERBOARD_WEIGHT).
+        await updateDailyProfileStats({ supabase, playerId, scoreToAdd: leaderboardPointsForGame('daily', score) });
       } catch (scoreError) {
         logger.error('API', `[WordWheel] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
       }

@@ -138,6 +138,8 @@ export interface GameStats {
   isRanked?: boolean;
   totalPlayers?: number;
   timePlayed?: number;
+  /** Game mode — used to down-weight casual leaderboard (total_score) contributions. */
+  gameMode?: string;
 }
 
 export interface GameResultInput {

@@ -425,3 +425,55 @@ export function trackDailySignupRank(data: {
 }): void {
   safe(() => (posthog.capture as PHFn)('daily_signup_rank_revealed', data));
 }
+
+// ---------- Leaderboard engagement (exp-leaderboard-play-cta-v1) ----------
+
+/**
+ * Leaderboard play-CTA shown. Fire when the experiment variant renders
+ * the "Play to rank up" banner. Used to compute show→click conversion.
+ */
+export function trackLeaderboardPlayCtaShown(args: { variant: string }): void {
+  safe(() =>
+    (posthog.capture as PHFn)('leaderboard_play_cta_shown', {
+      experiment: 'exp-leaderboard-play-cta-v1',
+      variant: args.variant,
+    })
+  );
+}
+
+/**
+ * Leaderboard play-CTA clicked. Pair with game_started to compute
+ * leaderboard → game funnel from the experiment variant.
+ */
+export function trackLeaderboardPlayCtaClicked(args: { variant: string }): void {
+  safe(() =>
+    (posthog.capture as PHFn)('leaderboard_play_cta_clicked', {
+      experiment: 'exp-leaderboard-play-cta-v1',
+      variant: args.variant,
+    })
+  );
+}
+
+// ---------- Results screen (funnel instrumentation gap) ----------
+
+/**
+ * Results screen viewed — fills the gap between game_completed and the
+ * next user action. Fires once per results-screen mount.
+ * Properties allow slicing by mode, outcome, and session game count so
+ * we can measure how results-screen dwell time correlates with replay rate.
+ */
+export function trackResultsScreenViewed(args: {
+  mode: string;
+  outcome: 'win' | 'loss' | 'timeout' | 'other';
+  gamesThisSession: number;
+  scoreRank?: number | null;
+}): void {
+  safe(() =>
+    (posthog.capture as PHFn)('results_screen_viewed', {
+      mode: args.mode,
+      outcome: args.outcome,
+      games_this_session: args.gamesThisSession,
+      score_rank: args.scoreRank ?? null,
+    })
+  );
+}

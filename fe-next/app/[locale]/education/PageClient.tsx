@@ -12,6 +12,7 @@ import { SixModeTour } from '@/components/education/SixModeTour';
 import { ComparisonStrip } from '@/components/education/ComparisonStrip';
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
 
@@ -214,6 +215,7 @@ export function PageClient() {
 
           <EducationFAQ />
           <TeacherAccessCTA />
+          <DistrictUpsellStrip />
         </>
       )}
 

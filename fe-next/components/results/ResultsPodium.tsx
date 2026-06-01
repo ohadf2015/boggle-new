@@ -306,6 +306,7 @@ export default function ResultsPodium({
                     customAvatar={player.avatar?.customAvatar}
                     size={isFirst ? 'lg' : 'md'}
                     className={cn('w-full h-full rounded-full')}
+                    mood={isFirst ? 'win' : undefined}
                   />
                 </div>
 

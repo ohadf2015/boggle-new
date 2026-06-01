@@ -97,8 +97,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 <div className="flex items-center gap-2 min-w-0">
                     <HeaderBackButton />
                     <HeaderLogo />
-                    {/* Compact league badge — constant awareness without clutter */}
-                    <div className="hidden sm:block"><LeaguePositionBadge /></div>
+                    {/* Compact league badge — constant awareness on every device.
+                        Self-hides for guests / players not yet in a league. */}
+                    <div className="block min-w-0"><LeaguePositionBadge /></div>
                 </div>
 
                 {/* Right cluster: desktop strip (sm+) + side-menu trigger.

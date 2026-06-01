@@ -1,12 +1,6 @@
----
 status: shipped
-attempted: word-count audit of all informational pages + add internal links from FAQ to strategy guides
+attempted: word-count audit of informational pages, wire GuidesCalloutLink to glossary + faq for internal-link boost to thin guides index
 files_touched:
-  - fe-next/app/[locale]/faq/PageClient.tsx
-next_steps: |
-  - Verify new Guides CTA renders in all 5 locales (especially Hebrew RTL)
-  - Get native review for he/sv/ja/es guide CTA strings before treating as final
-  - /en/guides at 490 words is thinnest real page; consider bolstering on a future run
-  - Consider adding guide links from /en/about or /en/education for additional crawl paths
-  - GSC data unavailable tonight (no lane 6 run); check /guides traffic before next content adds
----
+  - fe-next/app/[locale]/glossary/page.tsx
+  - fe-next/app/[locale]/faq/page.tsx
+next_steps: fix GSC ADC scope (webmasters.readonly) to enable traffic-based noindex decisions; consider adding 150-200 words of genuine "cross-mode tips" prose to guides/PageClient.tsx to push guides index from 490w to ~700w; Article JSON-LD on 3 sub-guide pages (they have HowTo+FAQ+Breadcrumb but no Article schema)

@@ -13,6 +13,7 @@ import { validateBlastResult, calculatePersonalBests, type PersonalBests } from 
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
 import { addToWeeklyLeaderboard, getLeaderboardPercentile } from '@/lib/blastLeaderboard';
+import { leaderboardPointsForGame } from '@/backend/modules/leaderboardScoring';
 
 // Lazy-init to avoid crash on missing env vars
 function getSupabaseConfig() {
@@ -161,10 +162,13 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (profile) {
+        // Blast is casual free-play: its leaderboard contribution is down-weighted
+        // so the Daily Challenge stays the dominant point source. Raw score is
+        // preserved in blast_results / personal bests above.
         await supabase
           .from('profiles')
           .update({
-            total_score: (profile.total_score || 0) + data.score,
+            total_score: (profile.total_score || 0) + leaderboardPointsForGame('blast', data.score),
             total_games: (profile.total_games || 0) + 1,
             total_words: (profile.total_words || 0) + data.wordsFound.length,
             last_game_at: new Date().toISOString(),

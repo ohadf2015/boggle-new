@@ -1,6 +1,18 @@
 /**
  * Avatar Base (Face Shape) Parts
- * 12 face shapes, all centered on viewBox 0 0 100 100
+ * 15 face shapes (viewBox 0 0 100 100).
+ *
+ * DESIGN RULE (from avatar audit): Cute kawaii/neo-brutalist heads MUST read as
+ * heads, not abstract objects. All "good" shapes share:
+ *   - Small ear bumps (ellipse rx~4 ry~6 at ~cx19/81, cy~48-54)
+ *   - Forehead shine arc (white low-opacity path near y22-30)
+ *   - Soft chin/jaw treatment
+ * Weird ones (pre-fix triangle/diamond/hexagon/shield) lacked ears + had hard points
+ * or literal object details (gold cross/rivets). Fixed 2026-06: now all 4 include ears,
+ * rounded Q curves, and consistent cute furniture. Non-human specials (skull/dragon/cat)
+ * intentionally exempt.
+ *
+ * Anchors preserved: eyes cy=42 cx38/62, mouth ~cy60, face cy52.
  */
 
 import { STROKE_OUTER } from './avatarDesignConstants';
@@ -100,14 +112,29 @@ function Heart({ fill }: BasePartProps) {
 function Diamond({ fill }: BasePartProps) {
   return (
     <g>
-      {/* Wider diamond to contain eyes at x=38/62 */}
-      <path d="M50 14 L82 50 L50 86 L18 50Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Facet lines */}
-      <path d="M50 14 L34 50 M50 14 L66 50" stroke="#fff" strokeWidth={0.7} opacity="0.2" />
-      <path d="M18 50 L34 50 L50 86 M82 50 L66 50 L50 86" stroke="#fff" strokeWidth={0.7} opacity="0.15" />
-      <path d="M34 50 L66 50" stroke="#fff" strokeWidth={0.5} opacity="0.12" />
-      {/* Top facet highlight */}
-      <ellipse cx="42" cy="40" rx="5" ry="7" fill="#fff" opacity="0.08" />
+      {/* Ear bumps — critical: prevents "floating gem" read. Positioned at equator of softened diamond. */}
+      <ellipse cx="16" cy="50" rx="4" ry="5.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="84" cy="50" rx="4" ry="5.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="16.5" cy="51" rx="2" ry="3.2" fill="#000" opacity="0.08" />
+      <ellipse cx="83.5" cy="51" rx="2" ry="3.2" fill="#000" opacity="0.08" />
+
+      {/* Softened diamond / "faceted head" — all 4 points converted to gentle Q curves.
+         Still reads as premium angular silhouette but now clearly a stylized cute head (not loose crystal).
+         Eyes (cy42) and mouth (cy60) framed safely inside the wider mid-section. */}
+      <path
+        d="M50 16 Q82 20 84 50 Q82 80 50 84 Q18 80 16 50 Q18 20 50 16Z"
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+      {/* Subtle facet contours (now read as cheek/forehead planes, not hard gem cuts) */}
+      <path d="M50 20 Q36 48 50 80" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+      <path d="M50 20 Q64 48 50 80" fill="none" stroke="#fff" strokeWidth={0.6} opacity="0.12" />
+      {/* Soft top highlight (replaces hard facet ellipse) */}
+      <path d="M38 28 Q50 20 62 28" fill="none" stroke="#fff" strokeWidth={1.4} opacity="0.16" strokeLinecap="round" />
+      {/* Gentle chin softness for head-like finish */}
+      <path d="M42 76 Q50 84 58 76" fill="#fff" opacity="0.05" />
 
     </g>
   );
@@ -116,10 +143,26 @@ function Diamond({ fill }: BasePartProps) {
 function Hexagon({ fill }: BasePartProps) {
   return (
     <g>
-      {/* Wider hexagon to fully contain eyes (x=30-70) and mouth (y=58) */}
-      <polygon points="50,14 82,30 82,72 50,88 18,72 18,30" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <polygon points="50,19 77,33 77,69 50,83 23,69 23,33" fill="none" stroke="#fff" strokeWidth={1} opacity="0.12" />
-      <polygon points="50,24 72,36 72,66 50,78 28,66 28,36" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.06" />
+      {/* Ear bumps on the vertical side flats — turns stop-sign/hex into cute geometric head */}
+      <ellipse cx="14" cy="51" rx="4" ry="5.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="86" cy="51" rx="4" ry="5.5" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="14.5" cy="52" rx="2" ry="3.2" fill="#000" opacity="0.08" />
+      <ellipse cx="85.5" cy="52" rx="2" ry="3.2" fill="#000" opacity="0.08" />
+
+      {/* Rounded hexagon (converted from polygon) — all corners softened with Q.
+         Still bold geometric personality, now reads as intentional stylized head with ears.
+         Inner strokes kept for facet depth but no longer define hard object. */}
+      <path
+        d="M50 15 Q80 25 82 32 Q82 70 50 87 Q18 70 18 32 Q20 25 50 15Z"
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+      {/* Inner highlight ring (soft) */}
+      <path d="M50 20 Q76 29 78 36 Q78 66 50 81 Q22 66 22 36 Q24 29 50 20Z" fill="none" stroke="#fff" strokeWidth={0.9} opacity="0.11" />
+      {/* Subtle mid ring for depth */}
+      <path d="M50 26 Q70 34 72 42 Q72 60 50 74 Q28 60 28 42 Q30 34 50 26Z" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.07" />
 
     </g>
   );
@@ -175,19 +218,30 @@ function Skull({ fill }: BasePartProps) {
 function Shield({ fill }: BasePartProps) {
   return (
     <g>
-      {/* Shield wider at top to contain eyes at x=38/62 */}
-      <path d="M16 20 L50 14 L84 20 L84 56 Q84 80 50 90 Q16 80 16 56Z"
-        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      {/* Gold border */}
-      <path d="M21 24 L50 19 L79 24 L79 54 Q79 76 50 85 Q21 76 21 54Z"
-        fill="none" stroke="#FFD700" strokeWidth={1.5} />
-      {/* Cross lines */}
-      <path d="M50 26 L50 80" stroke="#FFD700" strokeWidth={0.7} />
-      <path d="M26 42 L74 42" stroke="#FFD700" strokeWidth={0.7} />
-      {/* Corner rivets */}
-      <circle cx="26" cy="28" r="2.5" fill="#FFD700" />
-      <circle cx="74" cy="28" r="2.5" fill="#FFD700" />
-      <circle cx="50" cy="80" r="2.5" fill="#FFD700" />
+      {/* Ear bumps on upper wide section — turns heraldic object into heroic rounded-crest head */}
+      <ellipse cx="15" cy="44" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="85" cy="44" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="15.5" cy="45" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="84.5" cy="45" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+
+      {/* Rounded crest-head (ex-shield) — NO gold border, NO cross, NO rivets.
+         Top softened from sharp points into gentle dome. Still premium/epic silhouette
+         but now reads as stylized brave head, not a literal shield you stuck eyes on.
+         Eyes (42) and mouth (60) perfectly framed in the classic heraldic proportions. */}
+      <path
+        d="M18 22 Q50 10 82 22 Q84 48 80 58 Q62 80 50 90 Q38 80 20 58 Q16 48 18 22Z"
+        fill={fill}
+        stroke="#000"
+        strokeWidth={S}
+        strokeLinejoin="round"
+      />
+      {/* Soft inner crest contour (no more gold) */}
+      <path d="M24 26 Q50 16 76 26 Q78 46 74 54 Q58 74 50 82 Q42 74 26 54 Q22 46 24 26Z"
+        fill="none" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
+      {/* Forehead shine (consistent cute-head language) */}
+      <path d="M32 24 Q50 16 68 24" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.16" strokeLinecap="round" />
+      {/* Chin softness */}
+      <path d="M40 78 Q50 86 60 78" fill="#fff" opacity="0.06" />
 
     </g>
   );
@@ -257,23 +311,31 @@ function DragonHead({ fill }: BasePartProps) {
 function Triangle({ fill }: BasePartProps) {
   return (
     <g>
-      {/* Inverted triangle — wide forehead, pointed chin */}
+      {/* Ear bumps — turns hard geometric triangle into intentional cute head */}
+      <ellipse cx="17" cy="48" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="83" cy="48" rx="4" ry="6" fill={fill} stroke="#000" strokeWidth={2} />
+      <ellipse cx="17.5" cy="49" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+      <ellipse cx="82.5" cy="49" rx="2" ry="3.5" fill="#000" opacity="0.08" />
+
+      {/* Soft rounded inverted triangle (wide forehead + rounded cheeks + soft pointed chin).
+         Replaces hard L-points with Q curves so it reads as stylized kawaii head, not warning sign.
+         Eyes at cy=42 / mouth ~60 remain comfortably framed inside. */}
       <path
-        d="M14 24 L86 24 L50 86Z"
+        d="M22 24 H78 Q84 24 82 30 L54 82 Q50 88 46 82 L18 30 Q16 24 22 24Z"
         fill={fill}
         stroke="#000"
         strokeWidth={S}
         strokeLinejoin="round"
       />
-      {/* Inner highlight contour */}
-      <path d="M20 28 L80 28 L50 80Z" fill="none" stroke="#fff" strokeWidth={1} opacity="0.1" />
-      {/* Forehead shine */}
-      <ellipse cx="50" cy="32" rx="16" ry="4" fill="#fff" opacity="0.08" />
-      {/* Cheekbone lines */}
-      <path d="M24 30 Q32 38 36 48" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      <path d="M76 30 Q68 38 64 48" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
-      {/* Chin shadow */}
-      <path d="M40 70 L50 82 L60 70" fill="#000" opacity="0.06" />
+      {/* Inner highlight (softened) */}
+      <path d="M22 36 Q18 42 24 48 Q50 28 76 48 Q82 42 78 36" fill="none" stroke="#fff" strokeWidth={0.9} opacity="0.12" />
+      {/* Forehead shine arc (consistent with round/square family) */}
+      <path d="M30 28 Q50 22 70 28" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.14" strokeLinecap="round" />
+      {/* Soft cheek contours */}
+      <ellipse cx="26" cy="50" rx="3.5" ry="5" fill="#000" opacity="0.03" />
+      <ellipse cx="74" cy="50" rx="3.5" ry="5" fill="#000" opacity="0.03" />
+      {/* Chin softness */}
+      <path d="M42 78 Q50 86 58 78" fill="#fff" opacity="0.06" />
 
     </g>
   );

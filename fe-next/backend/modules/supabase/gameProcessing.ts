@@ -17,6 +17,7 @@ import { recordGameResult } from './gameResults';
 import { updatePlayerStats, ensureProfileExists } from './playerStats';
 import { updateLeaderboardEntry, updateRankedProgress } from './leaderboard';
 import { updateGuestStats } from './guestTokens';
+import { awardsLeaderboardPoints } from '../leaderboardScoring';
 
 import logger from '../../utils/logger';
 
@@ -77,7 +78,8 @@ async function processPlayerResult(
     achievements: playerScore.achievements || [],
     isRanked: gameInfo.isRanked || false,
     totalPlayers,
-    timePlayed: gameInfo.timePlayed || 0
+    timePlayed: gameInfo.timePlayed || 0,
+    gameMode: gameInfo.gameMode
   };
 
   let xpResult: XpResultWithSocket | null = null;
@@ -97,6 +99,15 @@ async function processPlayerResult(
         // Continue anyway - stats update will also try to create the profile
       }
 
+      // Feature-gated / preview modes (admin-only word-tower, coming-soon
+      // shiritori) must NOT award leaderboard points or XP — they would pollute
+      // the season + global leaderboard. We still record the game_result row for
+      // analytics history; only the profile stats / XP / leaderboard writes skip.
+      const eligibleForAward = awardsLeaderboardPoints(gameInfo.gameMode);
+      if (!eligibleForAward) {
+        logger.info('SUPABASE', `Mode '${gameInfo.gameMode}' is feature-gated — skipping leaderboard/XP award for ${playerScore.username}`);
+      }
+
       // Phase 1: Record game result and update profile stats in parallel
       // Now safe because profile is guaranteed to exist (or we're in error recovery mode)
       const [gameResultRes, statsRes] = await Promise.all([
@@ -107,7 +118,9 @@ async function processPlayerResult(
           language: gameInfo.language,
           gameMode: gameInfo.gameMode
         }),
-        updatePlayerStats(authInfo.authUserId, gameStats)
+        eligibleForAward
+          ? updatePlayerStats(authInfo.authUserId, gameStats)
+          : Promise.resolve({ data: null, error: null } as Awaited<ReturnType<typeof updatePlayerStats>>)
       ]);
 
       if (gameResultRes.error) {
@@ -163,22 +176,26 @@ async function processPlayerResult(
         }
       }
 
-      // Phase 2: Update leaderboard and ranked progress in parallel
-      const secondaryOps: Promise<{ data: unknown; error: { message: string } | null }>[] = [
-        updateLeaderboardEntry(authInfo.authUserId)
-      ];
+      // Phase 2: Update leaderboard and ranked progress in parallel.
+      // Skipped entirely for feature-gated modes — their results never reach
+      // the competitive leaderboard or ranked progression.
+      if (eligibleForAward) {
+        const secondaryOps: Promise<{ data: unknown; error: { message: string } | null }>[] = [
+          updateLeaderboardEntry(authInfo.authUserId)
+        ];
 
-      if (!gameInfo.isRanked) {
-        secondaryOps.push(updateRankedProgress(authInfo.authUserId));
-      }
+        if (!gameInfo.isRanked) {
+          secondaryOps.push(updateRankedProgress(authInfo.authUserId));
+        }
 
-      const secondaryResults = await Promise.all(secondaryOps);
+        const secondaryResults = await Promise.all(secondaryOps);
 
-      if (secondaryResults[0]?.error) {
-        logger.debug('SUPABASE', `updateLeaderboardEntry error for ${playerScore.username}`, secondaryResults[0].error.message);
-      }
-      if (secondaryResults[1]?.error) {
-        logger.error('SUPABASE', `updateRankedProgress error for ${playerScore.username}`, secondaryResults[1].error.message);
+        if (secondaryResults[0]?.error) {
+          logger.debug('SUPABASE', `updateLeaderboardEntry error for ${playerScore.username}`, secondaryResults[0].error.message);
+        }
+        if (secondaryResults[1]?.error) {
+          logger.error('SUPABASE', `updateRankedProgress error for ${playerScore.username}`, secondaryResults[1].error.message);
+        }
       }
 
     } else if (authInfo.guestTokenHash) {

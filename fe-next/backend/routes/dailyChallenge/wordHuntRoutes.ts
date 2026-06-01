@@ -29,6 +29,7 @@ import {
 } from './utils';
 import { completeMissionForMode } from '../../modules/dailyMissionsManager';
 import { updateDailyProfileStats } from './profileStats';
+import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import {
   computeCycleProgress,
   computeChestTierForCycle,
@@ -336,8 +337,12 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     // daily-challenge-only players never unlocked the 7-day title.
     // Skip on retry: first attempt already counted; second attempt would double-count.
     if (playerId && !isRetry) {
+      // The daily challenge is the headline competitive event: its leaderboard
+      // contribution is weighted far above casual play (DAILY_LEADERBOARD_WEIGHT)
+      // so the season + global leaderboard is driven mostly by daily play. This
+      // is the SINGLE owner of daily total_score (record-game adds 0 for daily).
       const scoreToAdd = solved && efficiencyScore !== undefined && efficiencyScore > 0
-        ? Math.round(efficiencyScore)
+        ? leaderboardPointsForGame('daily', efficiencyScore)
         : 0;
       try {
         await updateDailyProfileStats({ supabase, playerId, scoreToAdd });

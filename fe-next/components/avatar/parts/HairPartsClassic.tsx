@@ -1,6 +1,6 @@
 /** Back hair variants — see hairShared.tsx for props + helpers. */
 import { useAvatarUid } from '../AvatarUidContext';
-import { HairPartProps, HairPolishDefs, HairPolish, S } from './hairShared';
+import { HairPartProps, HairPolishDefs, HairPolish, S, CrownHighlight } from './hairShared';
 
 function Spiky({ fill }: HairPartProps) {
   const u = useAvatarUid();
@@ -17,8 +17,8 @@ function Spiky({ fill }: HairPartProps) {
       <path d="M22 30 Q50 20 78 30 Q80 34 80 36 Q50 22 20 36 Q20 34 22 30Z" fill={fill} stroke="none" />
       {/* Faux-3D polish */}
       <HairPolish uid={u} keyName="spiky" d={cap} />
-      {/* Highlight */}
-      <path d="M38 20 Q50 14 62 20" fill="none" stroke="#fff" strokeWidth={1.2} opacity="0.18" />
+      {/* SYSTEMIC: shared crown highlight for consistency */}
+      <CrownHighlight opacity={0.18} />
     </g>
   );
 }
@@ -144,8 +144,8 @@ function Ponytail({ fill }: HairPartProps) {
       {/* Baby hairs at temples */}
       <path d="M18 34 C16 38 17 42 20 44" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" />
       <path d="M82 34 C84 38 83 42 80 44" fill="none" stroke={fill} strokeWidth={1.5} strokeLinecap="round" />
-      {/* Crown highlight */}
-      <path d="M34 12 C42 8 58 8 66 12" fill="none" stroke="#fff" strokeWidth={1.4} opacity="0.2" strokeLinecap="round" />
+      {/* Crown highlight — SYSTEMIC shared primitive */}
+      <CrownHighlight opacity={0.2} strokeWidth={1.4} />
     </g>
   );
 }

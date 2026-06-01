@@ -281,6 +281,30 @@ export const EXPERIMENTS = {
     description:
       'Post-game quick-replay CTA on SP results page. quick-replay = adds "Run it back?" primary button above NextStepPrompt. control = no change. Conversion = game_started within 10min of game_completed.',
   }),
+
+  /**
+   * Leaderboard play-now CTA banner. Targets the rage-click signal on
+   * /en/leaderboard (users repeatedly clicking on elements that don't
+   * respond). Hypothesis: a sticky "Play to rank up" CTA pinned above the
+   * leaderboard table funnels engaged spectators (those who browse the
+   * leaderboard without playing) into a game start, lifting
+   * leaderboard → game_started same-session CVR.
+   *
+   * Control = current leaderboard (no additional CTA).
+   * play-cta = a slim "Play games to get ranked!" banner with "Play Now"
+   *   button pinned above the leaderboard table, visible to all users.
+   *
+   * Conversion: leaderboard_play_cta_clicked → game_started within 5min.
+   * Ship to PostHog: flag key = 'exp-leaderboard-play-cta-v1', 50/50 rollout.
+   * Wire: app/[locale]/leaderboard/PageClient.tsx — blocked until file is
+   *   refactored below 500 lines (currently 519). See docs/nightly/reports/2026-06-01.md.
+   */
+  'exp-leaderboard-play-cta-v1': defineExperiment({
+    variants: ['control', 'play-cta'] as const,
+    default: 'control',
+    description:
+      'Leaderboard play-now CTA banner. play-cta = slim "Play to rank up" strip above leaderboard table. control = current. Targets rage-click frustration on /leaderboard. Conversion = leaderboard_play_cta_clicked → game_started.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

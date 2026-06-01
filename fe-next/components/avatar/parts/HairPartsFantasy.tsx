@@ -1,6 +1,6 @@
 /** Back hair variants — see hairShared.tsx for props + helpers. */
 import { useAvatarUid } from '../AvatarUidContext';
-import { HairPartProps, HairPolishDefs, HairPolish, S } from './hairShared';
+import { HairPartProps, HairPolishDefs, HairPolish, S, CrownHighlight } from './hairShared';
 
 function FlameHair({ fill }: HairPartProps) {
   const u = useAvatarUid();
@@ -32,6 +32,8 @@ function FlameHair({ fill }: HairPartProps) {
           <animate attributeName="opacity" values="0.6;0.25;0;0.6" dur={`${e.d}s`} begin={`${i*0.8}s`} repeatCount="indefinite" />
         </circle>
       ))}
+      {/* SYSTEMIC shared crown highlight — adds readable top pop even on wild flame gradient */}
+      <CrownHighlight opacity={0.25} strokeWidth={1.2} />
     </g>
   );
 }
