@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import ConnectionsKeyboard from './ConnectionsKeyboard';
-import { getKeyboardLetters, appendLetter, backspace } from '@/lib/connections/keyboard';
+import { getKeyboardLetters, appendLetter, backspace, localeNeedsIME, MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { whyItWorks } from '@/lib/connections/whyItWorks';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
@@ -115,6 +115,7 @@ export default function PuzzleCard({
   }, [state.status, state.wrongAttempts, shakeControls]);
 
   const keyboardLetters = getKeyboardLetters(language);
+  const needsIME = localeNeedsIME(language);
   const handleLetter = (letter: string) => onInputChange(appendLetter(state.input, letter));
   const handleBackspace = () => onInputChange(backspace(state.input));
   // WYSIWYG buffer: render the typed base letters, applying the sofit/final
@@ -314,37 +315,83 @@ export default function PuzzleCard({
         </AnimatePresence>
 
         <div className="flex flex-col gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
-          {/* Typed-buffer display — tappable on-screen keys feed this (no IME). */}
-          <div
-            aria-live="polite"
-            aria-label={t('connections.placeholder')}
-            className={[
-              'min-h-[3.25rem] rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
-              'flex items-center font-neo-display font-bold tracking-[0.2em]',
-              isRTL ? 'justify-end text-right' : 'justify-start text-left',
-              isCorrect ? 'border-neo-lime' : 'border-neo-white/20',
-            ].join(' ')}
-          >
-            {bufferDisplay ? (
-              <span className="text-neo-white">{bufferDisplay}</span>
-            ) : (
-              <span className="text-neo-white/40 font-neo-body font-normal tracking-normal">
-                {t('connections.placeholder')}
-              </span>
-            )}
-          </div>
-          {!isDisabled && (
-            <ConnectionsKeyboard
-              letters={keyboardLetters}
-              dir={isRTL ? 'rtl' : 'ltr'}
-              onLetter={handleLetter}
-              onBackspace={handleBackspace}
-              onSubmit={onSubmit}
-              backspaceLabel={t('connections.backspace')}
-              submitLabel={t('connections.submit')}
-              canSubmit={state.input.trim().length > 0}
-              disabled={isDisabled}
-            />
+          {needsIME ? (
+            /* Scripts like Japanese can't fit an on-screen keyboard — use the
+               device's native IME via a real text input. */
+            !isDisabled && (
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  lang={language}
+                  inputMode="text"
+                  enterKeyHint="done"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  aria-label={t('connections.placeholder')}
+                  value={state.input}
+                  onChange={(e) => onInputChange(e.target.value.slice(0, MAX_GUESS_LEN))}
+                  onKeyDown={(e) => {
+                    // Don't submit mid-IME-composition (e.key === 'Process'/229).
+                    if (e.key === 'Enter' && !e.nativeEvent.isComposing && state.input.trim().length > 0) {
+                      e.preventDefault();
+                      onSubmit();
+                    }
+                  }}
+                  placeholder={t('connections.placeholder')}
+                  className={[
+                    'min-h-[3.25rem] w-full rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
+                    'font-neo-display font-bold text-neo-white placeholder:text-neo-white/40 placeholder:font-neo-body placeholder:font-normal',
+                    'outline-none focus:border-neo-cyan',
+                    isCorrect ? 'border-neo-lime' : 'border-neo-white/20',
+                  ].join(' ')}
+                />
+                <m.button
+                  type="button"
+                  onClick={onSubmit}
+                  whileTap={{ scale: 0.97 }}
+                  disabled={state.input.trim().length === 0}
+                  className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-4 py-2.5 font-neo-display font-black text-neo-navy shadow-hard disabled:opacity-40"
+                >
+                  {t('connections.submit')}
+                </m.button>
+              </div>
+            )
+          ) : (
+            <>
+              {/* Typed-buffer display — tappable on-screen keys feed this (no IME). */}
+              <div
+                aria-live="polite"
+                aria-label={t('connections.placeholder')}
+                className={[
+                  'min-h-[3.25rem] rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
+                  'flex items-center font-neo-display font-bold tracking-[0.2em]',
+                  isRTL ? 'justify-end text-right' : 'justify-start text-left',
+                  isCorrect ? 'border-neo-lime' : 'border-neo-white/20',
+                ].join(' ')}
+              >
+                {bufferDisplay ? (
+                  <span className="text-neo-white">{bufferDisplay}</span>
+                ) : (
+                  <span className="text-neo-white/40 font-neo-body font-normal tracking-normal">
+                    {t('connections.placeholder')}
+                  </span>
+                )}
+              </div>
+              {!isDisabled && (
+                <ConnectionsKeyboard
+                  letters={keyboardLetters}
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                  onLetter={handleLetter}
+                  onBackspace={handleBackspace}
+                  onSubmit={onSubmit}
+                  backspaceLabel={t('connections.backspace')}
+                  submitLabel={t('connections.submit')}
+                  canSubmit={state.input.trim().length > 0}
+                  disabled={isDisabled}
+                />
+              )}
+            </>
           )}
         </div>
 

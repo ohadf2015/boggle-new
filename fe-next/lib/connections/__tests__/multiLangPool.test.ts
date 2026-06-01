@@ -20,8 +20,11 @@ describe('multi-language native pools (es/sv) + ja fallback', () => {
     expect(sv.some((p) => p.bridge === 'boll')).toBe(true);
   });
 
-  it('Japanese (no IME yet) falls back to English — no broken kanji-on-Latin mode', () => {
-    expect(getPuzzlesForLocale('ja')).toBe(getPuzzlesForLocale('en'));
+  it('Japanese resolves to a native kanji pool (played via device IME, not the A-Z keyboard)', () => {
+    const ja = getPuzzlesForLocale('ja');
+    expect(ja.length).toBeGreaterThan(0);
+    expect(ja).not.toBe(getPuzzlesForLocale('en'));
+    expect(ja.every((p) => p.id.startsWith('ja-'))).toBe(true);
   });
 
   it('a Spanish bridge is solvable typing base letters on the A–Z keyboard', () => {

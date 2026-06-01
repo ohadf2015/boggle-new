@@ -7,19 +7,21 @@ import { HE_ONLINE } from './he-online';
 import { EN_PUZZLES } from './generated/en.generated';
 import { ES_PUZZLES } from './generated/es.generated';
 import { SV_PUZZLES } from './generated/sv.generated';
+import { JA_PUZZLES } from './generated/ja.generated';
 
 /**
  * Locales with a materialized native pool. Authored in the DB
  * (public.connections_puzzles), materialized to static .ts via
  * scripts/connections/materialize-puzzles.mjs. A locale with no entry here
- * (e.g. 'ja' — kanji needs an IME the on-screen keyboard can't provide yet)
- * falls back to 'en' via resolveLocale, exactly as before.
+ * falls back to 'en' via resolveLocale, exactly as before. ('ja' uses the
+ * device IME — see localeNeedsIME / PuzzleCard.)
  */
 const PUZZLES_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {
   en: EN_PUZZLES,
   he: [...HE_EASY, ...HE_MEDIUM, ...HE_HARD, ...HE_GENERATED, ...HE_ONLINE],
   es: ES_PUZZLES,
   sv: SV_PUZZLES,
+  ja: JA_PUZZLES,
 };
 
 /**
