@@ -39,15 +39,32 @@ export async function updateLeaderboardEntry(playerId: string, retries = 1): Pro
     .lt('season_id', seasonId);
 
   const priors = priorSnapshots ?? [];
+  const finalBySeason = new Map<number, number>(priors.map(r => [r.season_id, r.total_score ?? 0]));
   const sumAllPriorFinals = priors.reduce((sum, row) => sum + (row.total_score ?? 0), 0);
   const sumPriorGames     = priors.reduce((sum, row) => sum + (row.games_played ?? 0), 0);
   const sumPriorWins      = priors.reduce((sum, row) => sum + (row.games_won ?? 0), 0);
-  const previousSeasonFinal = priors.find(r => r.season_id === seasonId - 1)?.total_score ?? 0;
+  // Each archived final already bakes in that season's 10% soft carry:
+  //   final_N = carry_N + real_earnings_N,  carry_N = 10% × final_(N-1)
+  // `lifetime` (profiles.total_score) only ever counts REAL earnings — the
+  // carry is a leaderboard-display bonus, never added to lifetime. So to
+  // recover THIS season's new earnings we must subtract REAL prior earnings,
+  // not the carry-inflated finals. Subtracting raw finals understates every
+  // multi-season player by Σ(prior carries) and compounds each season.
+  const sumPriorCarries = priors.reduce(
+    (sum, row) => sum + Math.floor(0.10 * (finalBySeason.get(row.season_id - 1) ?? 0)),
+    0,
+  );
+  const realPriorEarnings = sumAllPriorFinals - sumPriorCarries;
+  const previousSeasonFinal = finalBySeason.get(seasonId - 1) ?? 0;
   const carry = Math.floor(0.10 * previousSeasonFinal);
   const lifetime      = profile.total_score || 0;
   const lifetimeGames = profile.total_games || 0;
   const lifetimeWins  = (profile.casual_wins || 0) + (profile.ranked_wins || 0);
-  const seasonScore       = Math.max(0, lifetime      - sumAllPriorFinals + carry);
+  // season_score = this season's real new earnings + the soft carry head-start.
+  // max(0, …) guards an inactive player whose prior real earnings already
+  // account for all of lifetime (new-earnings 0) — they keep just the carry,
+  // never a negative.
+  const seasonScore       = carry + Math.max(0, lifetime - realPriorEarnings);
   const seasonGamesPlayed = Math.max(0, lifetimeGames - sumPriorGames);
   // Clamp wins ≤ games to neutralise pre-fix snapshot gaps where
   // games_won captured only ranked_wins (missing casual_wins). Without

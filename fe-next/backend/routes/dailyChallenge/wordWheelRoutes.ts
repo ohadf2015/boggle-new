@@ -16,6 +16,7 @@ import {
   isValidLanguage,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
+import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
@@ -177,6 +178,12 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       } catch (scoreError) {
         logger.error('API', `[WordWheel] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
       }
+      // Re-derive the season-scoped leaderboard row from the freshly bumped
+      // lifetime total. Daily play owns most of the season score, so without
+      // this the season + all-time leaderboards lag profiles.total_score. Non-fatal.
+      await updateLeaderboardEntry(playerId).catch((err) => {
+        logger.warn('API', `[WordWheel] updateLeaderboardEntry failed for ${playerId}: ${(err as Error).message}`);
+      });
     }
 
     // Credit the `daily_challenges` weekly quest — non-fatal. This path only runs

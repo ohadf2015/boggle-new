@@ -20,6 +20,7 @@ interface PastSeason {
 interface SeasonRow {
   player_id: string;
   username: string | null;
+  display_name: string | null;
   total_score: number;
   games_played: number;
   games_won: number;
@@ -121,7 +122,7 @@ export const PastSeasonsLeaderboard: React.FC = () => {
                   {row.rank_position === 1 ? '🥇' : row.rank_position === 2 ? '🥈' : row.rank_position === 3 ? '🥉' : `#${row.rank_position}`}
                 </div>
                 <div className="col-span-5 truncate font-neo-body text-sm text-neo-white">
-                  {row.username ?? '—'}
+                  {row.display_name || row.username || '—'}
                 </div>
                 <div className="col-span-3 text-right font-neo-display text-sm text-neo-white">
                   {row.total_score.toLocaleString()}

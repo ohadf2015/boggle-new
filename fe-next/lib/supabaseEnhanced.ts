@@ -266,11 +266,12 @@ export const leaderboardOperations = {
   },
 
   /**
-   * Get user's rank using RPC function
+   * Get user's rank using RPC function.
+   * seasonId omitted = player's current season row; 0 = all-time lifetime rank.
    */
-  async getUserRank(userId: string) {
+  async getUserRank(userId: string, seasonId?: number) {
     return withRetry(
-      async () => supabase!.rpc('get_user_rank', { p_user_id: userId }),
+      async () => supabase!.rpc('get_user_rank', { p_user_id: userId, p_season_id: seasonId ?? null }),
       { context: 'getUserRank' }
     );
   },

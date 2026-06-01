@@ -19,6 +19,7 @@ export async function getTopPlayersByScore(
     .select({
       playerId: leaderboard.playerId,
       username: leaderboard.username,
+      displayName: leaderboard.displayName,
       avatarEmoji: leaderboard.avatarEmoji,
       avatarColor: leaderboard.avatarColor,
       totalScore: leaderboard.totalScore,

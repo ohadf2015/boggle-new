@@ -87,6 +87,7 @@ export const leaderboard = pgTable(
       .default(1)
       .references(() => seasons.id),
     username: text('username').notNull(),
+    displayName: text('display_name'),
     avatarEmoji: text('avatar_emoji'),
     avatarColor: text('avatar_color'),
     totalScore: integer('total_score').default(0),

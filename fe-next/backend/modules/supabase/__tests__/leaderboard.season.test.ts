@@ -103,11 +103,15 @@ describe('updateLeaderboardEntry — season aware', () => {
     expect(row.total_score).toBe(500);
   });
 
-  it('subtracts prior season finals and adds 10% carry from previous season', async () => {
-    // Lifetime 12000 = s1 final 8000 + s2 final 3000 + actual play in s7 of 1000
-    // (s2-s6 missing means the player skipped them — sum prior = 8000 + 3000 = 11000)
-    // No previous-season carry because seasonId-1 (=6) has no snapshot.
-    // Expected season_score = 12000 − 11000 + 0 = 1000
+  it('subtracts REAL prior earnings (finals minus their baked-in carries)', async () => {
+    // Archived finals already include each season's 10% carry:
+    //   s1 final 8000 → real 8000 (no s0, so carry 0)
+    //   s2 final 3000 → carry_s2 = floor(0.1×8000)=800 → real 2200
+    // real prior earnings = 8000 + 2200 = 10200.
+    // lifetime 12000 only counts real earnings, so s7 new = 12000 − 10200 = 1800.
+    // seasonId-1 (=6) has no snapshot → current carry 0. Expected = 1800.
+    // (The naive "lifetime − Σfinals" would wrongly give 1000 — understated by
+    // the 800 carry that s2's final baked in.)
     const capture: any = {};
     (getSupabase as any).mockReturnValue(
       buildClient({
@@ -122,7 +126,54 @@ describe('updateLeaderboardEntry — season aware', () => {
     await updateLeaderboardEntry('player-1');
 
     const row = capture.upsertSpy.mock.calls[0][0];
-    expect(row.total_score).toBe(1000);
+    expect(row.total_score).toBe(1800);
+  });
+
+  it('credits a contiguous multi-season player without carry-inflation understatement', async () => {
+    // Contiguous chain ending at the previous season (id=6):
+    //   s5 final 1000 → real 1000 (no s4 → carry 0)
+    //   s6 final  600 → carry_s6 = floor(0.1×1000)=100 → real 500
+    // real prior earnings = 1500. lifetime 1800 → s7 new = 300.
+    // current carry = floor(0.1 × s6 final 600) = 60. Expected = 300 + 60 = 360.
+    // The pre-fix formula gave 260 (60 + max(0, 1800 − 1600)) — short by the
+    // 100 carry baked into s6.
+    const capture: any = {};
+    (getSupabase as any).mockReturnValue(
+      buildClient({
+        lifetime: 1800,
+        priors: [
+          { season_id: 5, total_score: 1000 },
+          { season_id: 6, total_score: 600 },
+        ],
+        capture,
+      }),
+    );
+    await updateLeaderboardEntry('player-1');
+
+    const row = capture.upsertSpy.mock.calls[0][0];
+    expect(row.total_score).toBe(360);
+  });
+
+  it('keeps only the soft carry for an inactive multi-season player (no underflow to zero)', async () => {
+    // Player earned everything in prior seasons, nothing in s7.
+    //   s5 final 1000 → real 1000;  s6 final 600 → real 500 (carry 100)
+    // real prior earnings = 1500 = lifetime → s7 new earnings 0.
+    // current carry = floor(0.1 × 600) = 60. Expected = 60 (not 0).
+    const capture: any = {};
+    (getSupabase as any).mockReturnValue(
+      buildClient({
+        lifetime: 1500,
+        priors: [
+          { season_id: 5, total_score: 1000 },
+          { season_id: 6, total_score: 600 },
+        ],
+        capture,
+      }),
+    );
+    await updateLeaderboardEntry('player-1');
+
+    const row = capture.upsertSpy.mock.calls[0][0];
+    expect(row.total_score).toBe(60);
   });
 
   it('adds 10% carry when previous season (seasonId-1) snapshot exists', async () => {

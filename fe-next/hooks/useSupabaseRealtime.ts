@@ -193,8 +193,14 @@ export function useLeaderboard<T = LeaderboardRow>(options: LeaderboardOptions =
  * @param userId - User ID
  * @returns { rank, loading, error, refetch }
  */
-export function useUserRank<T = Record<string, unknown>>(userId: string | null | undefined): UserRankResult<T> {
-  const cachedRank = userId ? userRankCache.get(userId) : null;
+export function useUserRank<T = Record<string, unknown>>(
+  userId: string | null | undefined,
+  seasonId?: number,
+): UserRankResult<T> {
+  // Namespace the cache by season so the "all-time" (0) and current-season
+  // ranks for the same user never clobber each other.
+  const rankKey = userId ? `${userId}:${seasonId ?? 'current'}` : null;
+  const cachedRank = rankKey ? userRankCache.get(rankKey) : null;
   const isCachedRankFresh = () => cachedRank && (Date.now() - cachedRank.timestamp) < CACHE_TTL_MS;
 
   const [rank, setRank] = useState<UserRank<T>>((cachedRank?.data as T | null) || null);
@@ -205,16 +211,16 @@ export function useUserRank<T = Record<string, unknown>>(userId: string | null |
   const isMountedRef = useMounted();
 
   const fetchRank = useCallback(async () => {
-    if (!userId) {
+    if (!userId || !rankKey) {
       setRank(null);
       setLoading(false);
       return;
     }
 
-    if (!userRankCache.has(userId)) {
+    if (!userRankCache.has(rankKey)) {
       setLoading(true);
     }
-    const result = await leaderboardOperations.getUserRank(userId);
+    const result = await leaderboardOperations.getUserRank(userId, seasonId);
 
     if (!isMountedRef.current) return;
 
@@ -224,10 +230,10 @@ export function useUserRank<T = Record<string, unknown>>(userId: string | null |
       const freshRank = (result.data as T[] | null)?.[0] || null;
       setRank(freshRank);
       setError(null);
-      userRankCache.set(userId, { data: freshRank as Record<string, unknown> | null, timestamp: Date.now() });
+      userRankCache.set(rankKey, { data: freshRank as Record<string, unknown> | null, timestamp: Date.now() });
     }
     setLoading(false);
-  }, [userId, isMountedRef]);
+  }, [userId, rankKey, seasonId, isMountedRef]);
 
   // Debounced refetch for realtime updates (500ms default)
   const debouncedRefetch = useDebouncedCallback(fetchRank, 500);

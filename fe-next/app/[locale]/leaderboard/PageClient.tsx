@@ -93,7 +93,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
     seasonId: querySeasonId,
   });
 
-  const { rank: userRank } = useUserRank<{ total_score?: number; rank_position?: number }>(user?.id);
+  const { rank: userRank } = useUserRank<{ total_score?: number; rank_position?: number }>(user?.id, querySeasonId);
 
   // Compute current user's tier for promotion detection
   const currentUserTier = userRank?.total_score != null

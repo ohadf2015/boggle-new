@@ -50,6 +50,7 @@ export const leaderboardRouter = router({
           entries = drizzleData.map(row => ({
             player_id: row.playerId,
             username: row.username,
+            display_name: row.displayName,
             avatar_emoji: row.avatarEmoji,
             avatar_color: row.avatarColor,
             total_score: row.totalScore,

@@ -29,6 +29,7 @@ import {
 } from './utils';
 import { completeMissionForMode } from '../../modules/dailyMissionsManager';
 import { updateDailyProfileStats } from './profileStats';
+import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import {
   computeCycleProgress,
@@ -349,6 +350,12 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       } catch (scoreError) {
         logger.error('API', `[WordHunt] Failed to update profile stats for ${playerId}: ${(scoreError as Error).message}`);
       }
+      // Re-derive the season-scoped leaderboard row from the freshly bumped
+      // lifetime total. Daily play owns most of the season score, so without
+      // this the season + all-time leaderboards lag profiles.total_score. Non-fatal.
+      await updateLeaderboardEntry(playerId).catch((err) => {
+        logger.warn('API', `[WordHunt] updateLeaderboardEntry failed for ${playerId}: ${(err as Error).message}`);
+      });
     }
 
     // Credit the `daily_challenges` weekly quest on the submission that
