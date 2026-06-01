@@ -70,6 +70,11 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   LazyMotion: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   domAnimation: {},
+  // Header.tsx calls useAnimationControls(); this inline mock omitted it (the
+  // global vitest.setup.ts mock has it) → vitest threw on the missing export,
+  // which blocked the drawer from rendering (mobile-menu-drawer testid missing +
+  // swipe/scroll tests failed downstream).
+  useAnimationControls: () => ({ start: vi.fn(), set: vi.fn(), stop: vi.fn() }),
 }));
 
 vi.mock('../MusicControls', () => ({ __esModule: true, default: () => <div data-testid="music-controls">Music</div> }));

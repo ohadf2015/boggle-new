@@ -144,7 +144,11 @@ describe('POST /api/stats/record-game', () => {
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         total_games: 6,
-        total_score: 1200,
+        // total_score is leaderboard-weighted since 52a19ced3 (daily-dominant
+        // leaderboard): solo-bots is a casual mode → leaderboardPointsForGame
+        // applies CASUAL_LEADERBOARD_WEIGHT 0.25, so 1000 + round(200*0.25) = 1050
+        // (was 1200 when raw score was added directly).
+        total_score: 1050,
         total_words: 65,
       })
     );

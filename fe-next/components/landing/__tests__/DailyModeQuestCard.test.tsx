@@ -25,7 +25,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 // Mock useDailyModeQuest
 const mockMarkModePlayed = vi.fn();
 const mockClaimReward = vi.fn();
-let mockProgress = { daily: false, classicMp: false, wordHuntMp: false, completed: false };
+let mockProgress = { blast: false, classicMp: false, wordHuntMp: false, completed: false };
 let mockClaimed = false;
 
 vi.mock('@/hooks/useDailyModeQuest', () => ({
@@ -40,13 +40,13 @@ vi.mock('@/hooks/useDailyModeQuest', () => ({
 
 describe('DailyModeQuestCard', () => {
   beforeEach(() => {
-    mockProgress = { daily: false, classicMp: false, wordHuntMp: false, completed: false };
+    mockProgress = { blast: false, classicMp: false, wordHuntMp: false, completed: false };
     mockClaimed = false;
     mockClaimReward.mockReturnValue(100);
   });
 
   it('renders collapsed bar with quest title and progress', () => {
-    mockProgress = { daily: true, classicMp: false, wordHuntMp: false, completed: false };
+    mockProgress = { blast: true, classicMp: false, wordHuntMp: false, completed: false };
     render(<DailyModeQuestCard />);
     expect(screen.getByText('Daily Quest')).toBeTruthy();
     expect(screen.getByText('1/3 modes played')).toBeTruthy();
@@ -58,13 +58,13 @@ describe('DailyModeQuestCard', () => {
   });
 
   it('shows claim button when all modes completed', () => {
-    mockProgress = { daily: true, classicMp: true, wordHuntMp: true, completed: true };
+    mockProgress = { blast: true, classicMp: true, wordHuntMp: true, completed: true };
     render(<DailyModeQuestCard />);
     expect(screen.getByText('Claim Reward!')).toBeTruthy();
   });
 
   it('shows completion message after claiming', () => {
-    mockProgress = { daily: true, classicMp: true, wordHuntMp: true, completed: true };
+    mockProgress = { blast: true, classicMp: true, wordHuntMp: true, completed: true };
     mockClaimed = true;
     mockClaimReward.mockReturnValue(null);
     render(<DailyModeQuestCard />);
@@ -72,7 +72,7 @@ describe('DailyModeQuestCard', () => {
   });
 
   it('calls claimReward and shows coins when claim button clicked', () => {
-    mockProgress = { daily: true, classicMp: true, wordHuntMp: true, completed: true };
+    mockProgress = { blast: true, classicMp: true, wordHuntMp: true, completed: true };
     mockClaimReward.mockReturnValue(100);
     render(<DailyModeQuestCard />);
     fireEvent.click(screen.getByText('Claim Reward!'));

@@ -24,6 +24,14 @@ vi.mock('@/hooks/useSeason', () => ({
       startDate: new Date('2026-01-01'),
       endDate: new Date('2026-04-01'),
       rewards: [],
+      // Full Season shape — the real useSeason() hook always populates these
+      // from SEASON_CATALOG (lib/seasons.ts:72-76). The mock previously omitted
+      // them, so SeasonBanner.tsx:130 crashed on currentSeason.twist.key.
+      imageUrl: '/seasons/season-1-word-warriors.jpg',
+      accentColor: '#BFFF00',
+      tagline: 'Forge your legacy, one word at a time',
+      twist: { key: 'double-down', emoji: '⚔️', title: 'Double Down', blurb: 'Long words flex the hardest this season.', scoreMultiplier: 1 },
+      gridSkinClass: 'season-skin-warrior',
     },
     timeRemaining: { days: 45, hours: 12, totalMs: 45 * 86400000 },
     peakTier: 'Gold',

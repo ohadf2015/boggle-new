@@ -45,10 +45,37 @@ vi.mock('pixi.js', () => {
     init = vi.fn().mockResolvedValue(undefined);
     destroy = vi.fn();
   }
+  // SharedFxApp imports ParticlePool from ../gameEngine/ParticleSystem, which
+  // does `import { Container, ParticleContainer, Particle, Texture } from 'pixi.js'`.
+  // This inline mock predated the ParticleContainer migration and omitted those
+  // three exports, so vitest threw "No ParticleContainer export …" on import.
+  // Mirrors the proven mock in ParticleSystem.test.ts.
+  class MockParticle {
+    x = 0; y = 0; scaleX = 1; scaleY = 1; rotation = 0;
+    anchorX = 0; anchorY = 0; tint = 0xffffff; alpha = 1;
+    texture: unknown;
+    constructor(opts: Record<string, unknown> = {}) { Object.assign(this, opts); }
+  }
+  class MockParticleContainer {
+    particles: MockParticle[] = [];
+    destroyed = false;
+    blendMode = 'normal';
+    constructor(_opts?: unknown) {}
+    addParticle = vi.fn((p: MockParticle) => { this.particles.push(p); });
+    removeParticle = vi.fn((p: MockParticle) => {
+      const i = this.particles.indexOf(p);
+      if (i >= 0) this.particles.splice(i, 1);
+    });
+    update = vi.fn();
+    destroy = vi.fn(() => { this.destroyed = true; });
+  }
   return {
     Application: MockApplication,
     Container: MockContainer,
     Graphics: MockGraphics,
+    ParticleContainer: MockParticleContainer,
+    Particle: MockParticle,
+    Texture: { WHITE: { __white: true }, from: vi.fn(() => ({ __from: true })) },
   };
 });
 
