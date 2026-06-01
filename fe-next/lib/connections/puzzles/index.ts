@@ -1,13 +1,10 @@
 import type { ConnectionPuzzle, PuzzleLocale } from '../types';
-import { EN_EASY } from './en-easy';
-import { EN_MEDIUM } from './en-medium';
-import { EN_HARD } from './en-hard';
 import { HE_EASY } from './he-easy';
 import { HE_MEDIUM } from './he-medium';
 import { HE_HARD } from './he-hard';
 import { HE_GENERATED } from './generated/he-hard.generated';
 import { HE_ONLINE } from './he-online';
-import { EN_ONLINE } from './en-online';
+import { EN_PUZZLES } from './generated/en.generated';
 import { ES_PUZZLES } from './generated/es.generated';
 import { SV_PUZZLES } from './generated/sv.generated';
 
@@ -19,7 +16,7 @@ import { SV_PUZZLES } from './generated/sv.generated';
  * falls back to 'en' via resolveLocale, exactly as before.
  */
 const PUZZLES_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {
-  en: [...EN_EASY, ...EN_MEDIUM, ...EN_HARD, ...EN_ONLINE],
+  en: EN_PUZZLES,
   he: [...HE_EASY, ...HE_MEDIUM, ...HE_HARD, ...HE_GENERATED, ...HE_ONLINE],
   es: ES_PUZZLES,
   sv: SV_PUZZLES,
