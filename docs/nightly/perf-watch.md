@@ -141,3 +141,40 @@ PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Re
 ---
 
 *Last updated: 2026-05-27 by Lane 02 (perf)*
+
+---
+
+## [FRONTEND] Multiplayer LCP — SEVERE REGRESSION 2026-06-01
+
+**Severity:** Critical  
+**Route:** `/en/multiplayer`  
+**Metric:** p75 LCP: **3165ms (2026-05-27, n=40) → 8448ms (2026-06-01, n=48)** — +167%  
+**Also:** p75 INP 584ms (new high), CLS 0.056 → 0.510  
+**Cause:** Game-client hydration (Pixi.js + GSAP + Socket.IO). No skeleton SSR. LCP element is behind full game-client load.  
+**Fix needed (medium effort):**
+- Server-render a lightweight lobby/waiting skeleton — make it the LCP target.
+- The game canvas + socket connection loads behind it.
+- Same pattern applies to `/he/multiplayer`, `/he/daily`, `/en/word-tower`.
+
+---
+
+## [FRONTEND] Leaderboard LCP — Server-Side Data Prefetch Needed
+
+**Severity:** High  
+**Route:** `/en/leaderboard`  
+**Metric:** p75 LCP 7132ms (Phase 0 brief, historical)  
+**Cause:** `LeaderboardPageClient` is fully client-rendered. Server component delegates all rendering to a `'use client'` component. Public leaderboard data is the same for all users — could be prefetched in the server component at ISR time (revalidate=300) and passed as `initialData`.  
+**Fix needed (medium effort):**
+- In `page.tsx`: add `getData()` calling `word_hunt_alltime_leaderboard` view (already fast: 0.671ms)
+- Pass result as `initialLeaderboard` prop to `PageClient`
+- In `useLeaderboard`: accept `initialData` option from React Query
+- Only the user's own rank card still needs client-side auth fetch
+
+---
+
+## [FRONTEND] `/he/daily/word-wheel` LCP Regression — Watch
+
+**Severity:** Low (low confidence)  
+**Route:** `/he/daily/word-wheel`  
+**Metric:** p75 LCP 1399ms (2026-05-27, n=11) → 2568ms (2026-06-01, n=10)  
+**Note:** +83% but low n. May be different user mix. Watch for 3 nights before acting.

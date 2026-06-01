@@ -4,6 +4,28 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-06-01
+
+### [Flags] Stalled A/B experiments — human decision needed
+
+- **`show-signup-after-first-win`** (PostHog flag #163655, active, 70+ days, ~43 exposures)
+  - Status: Active but stalled — far below 1000/arm threshold for statistical inference
+  - Context: Tests whether prompting guests after first-win vs 3rd game lifts signup CVR. Code reads variant via `usePostHogFlag` in `useSignupPrompt.ts`. Default = `after-first-win`.
+  - Decision needed: (a) widen rollout to gather data faster, (b) declare stale + retire to `after-first-win` (the default), or (c) keep running
+  - Note: 43 exposures in 70 days = ~0.6/day. Very few guests ever reach the threshold. Consider lowering threshold or adding cohort.
+
+- **`share-prompt-timing`** (PostHog flag #163656, active, 62+ days)
+  - Status: Active, no conversion data visible via REST — no `share_prompt_timing` variant events in PostHog
+  - Decision needed: (a) check if flag is actually being read anywhere (grep shows it IS in `useSharePromptImpression.ts`), (b) if no exposures → retire, (c) if exposures exist in PostHog UI → extract winner and unwire
+  - Note: Flag appears in code but no experiment_exposed events visible in 90d window.
+
+- **`mp-signup-nudge-copy-v1`** (PostHog flag #183230, active, 24 days, 77 total impressions — 0 conversions)
+  - Status: Conversion = 0/77 across all variants in 28d. Clear failure on conversion, but below 1000/arm for statistical retirement.
+  - Decision needed: (a) declare `toast-disabled` the winner (removing the toast = minimal downside, confirmed 0 uplift from toast), (b) pause the experiment, (c) keep running to 1000/arm
+  - Advisory: 0/77 is strong evidence the nudge mechanics are broken regardless of copy. Suggest user-research before iterating on copy.
+
+---
+
 ## 2026-05-21
 
 - [Sentry] `InvalidStateError: Failed to start the audio device`
