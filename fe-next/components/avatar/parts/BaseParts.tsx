@@ -122,7 +122,7 @@ function Diamond({ fill }: BasePartProps) {
          Still reads as premium angular silhouette but now clearly a stylized cute head (not loose crystal).
          Eyes (cy42) and mouth (cy60) framed safely inside the wider mid-section. */}
       <path
-        d="M50 16 Q82 20 84 50 Q82 80 50 84 Q18 80 16 50 Q18 20 50 16Z"
+        d="M44 21 Q50 16 56 21 L82 47 Q84 50 82 53 L56 79 Q50 84 44 79 L18 53 Q16 50 18 47 L44 21Z"
         fill={fill}
         stroke="#000"
         strokeWidth={S}
