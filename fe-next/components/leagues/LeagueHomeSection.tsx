@@ -13,11 +13,12 @@
  */
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { ChevronRight, Trophy, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLeague, type LeagueTier } from '@/hooks/useLeague';
 import { getLeagueStandingSummary } from '@/lib/league/standingSummary';
+import { formatLeagueResetCountdown } from '@/lib/league/resetCountdown';
 import { LeagueRivalsCard } from './LeagueRivalsCard';
 
 const TIER_EMOJI: Record<LeagueTier, string> = {
@@ -45,7 +46,7 @@ function interpolate(template: string, vars: Record<string, string | number>): s
 export function LeagueHomeSection() {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
-  const { tier, standings, myPosition, isLoading } = useLeague(profile?.id ?? null);
+  const { tier, standings, myPosition, weekEnd, isLoading } = useLeague(profile?.id ?? null);
 
   const summary = useMemo(
     () =>
@@ -54,6 +55,8 @@ export function LeagueHomeSection() {
         : null,
     [myPosition, standings.length]
   );
+
+  const countdown = useMemo(() => formatLeagueResetCountdown(weekEnd, Date.now()), [weekEnd]);
 
   // Guests and players not in a league get nothing (no skeleton flash for guests).
   if (!isAuthenticated) return null;
@@ -104,10 +107,10 @@ export function LeagueHomeSection() {
           </span>
         </Link>
 
-        {/* Status line: zone pressure */}
-        {statusText && (
-          <div className="px-4 py-2 border-b-2 border-black/20 bg-neo-navy/40">
-            <p className={`font-neo-body text-sm font-bold ${statusColor}`}>
+        {/* Status line: zone pressure + reset countdown */}
+        {(statusText || countdown) && (
+          <div className="px-4 py-2 border-b-2 border-black/20 bg-neo-navy/40 flex items-center justify-between gap-3">
+            <p className={`font-neo-body text-sm font-bold ${statusColor} min-w-0`}>
               {myPosition && (
                 <span className="text-neo-white/80 me-2">
                   {interpolate(t('league.positionOf') || '#{position} of {total}', {
@@ -118,6 +121,18 @@ export function LeagueHomeSection() {
               )}
               {statusText}
             </p>
+            {countdown && (
+              <span
+                className={`shrink-0 inline-flex items-center gap-1 text-xs font-bold font-mono px-2 py-1 rounded-neo border-2 border-black ${
+                  countdown.urgent ? 'bg-neo-red/20 text-red-300' : 'bg-neo-navy/60 text-neo-white/80'
+                }`}
+              >
+                <Timer className="w-3.5 h-3.5" aria-hidden="true" />
+                {interpolate(t('league.resetsIn') || 'Resets in {time}', {
+                  time: countdown.days > 0 ? `${countdown.days}d ${countdown.hours}h` : `${countdown.hours}h`,
+                })}
+              </span>
+            )}
           </div>
         )}
 

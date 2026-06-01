@@ -26,6 +26,8 @@ export interface LeagueData {
   myXp: number;
   promotionZone: number; // Top N positions that promote
   relegationZone: number; // Bottom N positions that relegate
+  /** ISO timestamp when the current weekly league closes (promotion/relegation). */
+  weekEnd: string | null;
   isLoading: boolean;
   error: string | null;
   refresh: () => void;
@@ -38,6 +40,7 @@ export function useLeague(userId: string | null): LeagueData {
   const [leagueId, setLeagueId] = useState<string>('');
   const [tier, setTier] = useState<LeagueTier>('bronze');
   const [standings, setStandings] = useState<LeagueStanding[]>([]);
+  const [weekEnd, setWeekEnd] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +61,7 @@ export function useLeague(userId: string | null): LeagueData {
       setLeagueId(data.leagueId ?? '');
       setTier(data.tier ?? 'bronze');
       setStandings(data.standings ?? []);
+      setWeekEnd(data.weekEnd ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -79,6 +83,7 @@ export function useLeague(userId: string | null): LeagueData {
     myXp: myStanding?.weeklyXp ?? 0,
     promotionZone: PROMOTION_COUNT,
     relegationZone: RELEGATION_COUNT,
+    weekEnd,
     isLoading,
     error,
     refresh: fetchLeague,

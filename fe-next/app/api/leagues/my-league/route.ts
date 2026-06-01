@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { enrichLeagueStandings, type RawStandingRow } from '@/lib/league/enrichStandings';
 
 /**
  * GET /api/leagues/my-league?userId=<uuid>
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
     // Find player's current league membership
     const { data: membership } = await supabase
       .from('league_members')
-      .select('league_id, weekly_xp, leagues!inner(id, tier, week_start)')
+      .select('league_id, weekly_xp, leagues!inner(id, tier, week_start, week_end)')
       .eq('user_id', userId)
       .gte('leagues.week_start', weekStartStr)
       .order('joined_at', { ascending: false })
@@ -33,25 +34,28 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (!membership) {
-      return NextResponse.json({ leagueId: null, tier: null, standings: [] });
+      return NextResponse.json({ leagueId: null, tier: null, weekEnd: null, standings: [] });
     }
 
     const leagueId = membership.league_id;
-    const tier = (membership as Record<string, unknown>).leagues
-      ? ((membership as Record<string, unknown>).leagues as Record<string, unknown>).tier
-      : null;
+    const leagueRow = (membership as Record<string, unknown>).leagues as Record<string, unknown> | undefined;
+    const tier = leagueRow ? leagueRow.tier : null;
+    const weekEnd = leagueRow ? (leagueRow.week_end as string | null) : null;
 
-    // Get standings for this league
+    // Get standings for this league (ordered so position derives from rank)
     const { data: standings } = await supabase
       .from('league_members')
-      .select('user_id, weekly_xp, profiles!inner(username, avatar_image)')
+      .select('user_id, weekly_xp, profiles!inner(username, display_name, avatar_image)')
       .eq('league_id', leagueId)
       .order('weekly_xp', { ascending: false });
 
+    // Enrich into the ranked, camelCase shape the client hook indexes by
+    // (position + zone). Without this the badge's myPosition was always null.
     return NextResponse.json({
       leagueId,
       tier,
-      standings: standings ?? [],
+      weekEnd,
+      standings: enrichLeagueStandings((standings ?? []) as RawStandingRow[]),
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
