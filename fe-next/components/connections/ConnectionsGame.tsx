@@ -404,7 +404,7 @@ export default function ConnectionsGame() {
   }
 
   return (
-    <div ref={containerRef} className="relative flex flex-col gap-3 w-full max-w-xl mx-auto py-4 px-4">
+    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative flex flex-col gap-2 w-full max-w-xl mx-auto py-3 px-4">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
       {/* Back to home */}
@@ -516,7 +516,7 @@ export default function ConnectionsGame() {
       </m.div>
 
       {/* Daily Challenge + Community entries */}
-      <div className="mb-3 flex gap-2">
+      <div className="flex gap-2">
         <Link
           href={`/${language}/connections/daily`}
           className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo border-neo-yellow/60 bg-neo-yellow/10 px-3 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
@@ -539,7 +539,7 @@ export default function ConnectionsGame() {
       )}
 
       {/* Momentum: dangle the next reward / hype the streak — pulls into the next puzzle */}
-      <div className="mb-3">
+      <div>
         <ConnectionsMomentumChip state={momentumState({ solvedThisSession, streak: state.streak })} />
       </div>
 

@@ -46,7 +46,7 @@ export default function ConnectionsKeyboard({
   return (
     <div
       dir={dir}
-      className="flex flex-wrap items-stretch justify-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light p-2 shadow-hard"
+      className="flex w-full flex-wrap items-stretch justify-stretch gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light p-1.5 shadow-hard"
     >
       {letters.map((ch) => (
         <button
@@ -55,7 +55,7 @@ export default function ConnectionsKeyboard({
           onClick={() => onLetter(ch)}
           disabled={disabled}
           aria-label={ch}
-          className={`${KEY_BASE} h-10 flex-1 basis-9 min-w-[2.25rem] max-w-[3.25rem] bg-neo-cream text-xl uppercase text-neo-navy sm:h-11`}
+          className={`${KEY_BASE} h-11 flex-1 basis-9 min-w-[2.25rem] bg-neo-cream text-xl uppercase text-neo-navy sm:h-12`}
         >
           {ch}
         </button>

@@ -136,7 +136,7 @@ export default function PuzzleCard({
           'relative rounded-neo border-neo-thick shadow-hard',
           borderColor,
           bgColor,
-          'px-6 pb-6 pt-10 transition-colors duration-200',
+          'px-4 pb-5 pt-9 transition-colors duration-200',
         ].join(' ')}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
@@ -154,7 +154,7 @@ export default function PuzzleCard({
         )}
 
         <AnimatePresence mode="wait">
-          <div key={`chain-${puzzle.id}`} className="flex items-center justify-center gap-3 mb-6 flex-wrap">
+          <div key={`chain-${puzzle.id}`} className="flex items-center justify-center gap-2 mb-4 flex-wrap">
             <m.span
               custom={0}
               variants={WORD_CHIP_VARIANTS}
@@ -295,7 +295,7 @@ export default function PuzzleCard({
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 22, delay: 0.15 }}
-                className="mb-4 flex flex-col items-center gap-1.5"
+                className="mb-6 flex flex-col items-center gap-1.5 border-b border-neo-white/10 pb-5"
               >
                 <span className="text-neo-white/50 text-[0.65rem] font-neo-body uppercase tracking-[0.18em]">
                   {t('connections.whyItWorks')}
@@ -457,36 +457,30 @@ export default function PuzzleCard({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 22 }}
-            className="mt-5 flex flex-col items-center gap-3"
+            className="mt-4 flex flex-col items-center gap-2"
           >
             {!hasRated ? (
-              <>
-                <p className="text-neo-white text-xs uppercase tracking-widest">
+              <div className="flex items-center gap-2">
+                <span className="text-neo-white/45 text-[0.7rem] font-neo-body">
                   {t('connections.rateThis')}
-                </p>
-                <div className="flex gap-3">
-                  <m.button
-                    onClick={() => onRate('like')}
-                    whileHover={{ scale: 1.08, y: -1 }}
-                    whileTap={{ scale: 0.94 }}
-                    aria-label={t('connections.like')}
-                    className="rounded-neo border-neo-thick border-neo-lime bg-neo-lime/15 text-neo-lime font-neo-display font-bold px-5 py-2 shadow-hard-sm hover:bg-neo-lime/25 transition-colors inline-flex items-center gap-2"
-                  >
-                    <ThumbsUp className="w-4 h-4" aria-hidden="true" />
-                    {t('connections.like')}
-                  </m.button>
-                  <m.button
-                    onClick={() => onRate('dislike')}
-                    whileHover={{ scale: 1.08, y: -1 }}
-                    whileTap={{ scale: 0.94 }}
-                    aria-label={t('connections.dislike')}
-                    className="rounded-neo border-neo-thick border-neo-red bg-neo-red/15 text-neo-red font-neo-display font-bold px-5 py-2 shadow-hard-sm hover:bg-neo-red/25 transition-colors inline-flex items-center gap-2"
-                  >
-                    <ThumbsDown className="w-4 h-4" aria-hidden="true" />
-                    {t('connections.dislike')}
-                  </m.button>
-                </div>
-              </>
+                </span>
+                <m.button
+                  onClick={() => onRate('like')}
+                  whileTap={{ scale: 0.9 }}
+                  aria-label={t('connections.like')}
+                  className="inline-flex items-center justify-center rounded-neo border border-neo-lime/40 bg-transparent text-neo-lime/80 p-1.5 hover:bg-neo-lime/10 hover:text-neo-lime transition-colors"
+                >
+                  <ThumbsUp className="w-4 h-4" aria-hidden="true" />
+                </m.button>
+                <m.button
+                  onClick={() => onRate('dislike')}
+                  whileTap={{ scale: 0.9 }}
+                  aria-label={t('connections.dislike')}
+                  className="inline-flex items-center justify-center rounded-neo border border-neo-red/40 bg-transparent text-neo-red/80 p-1.5 hover:bg-neo-red/10 hover:text-neo-red transition-colors"
+                >
+                  <ThumbsDown className="w-4 h-4" aria-hidden="true" />
+                </m.button>
+              </div>
             ) : (
               <p className="text-neo-cyan text-sm inline-flex items-center gap-2">
                 <Check className="w-4 h-4" aria-hidden="true" />
