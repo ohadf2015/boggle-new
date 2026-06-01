@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import {
   AVATAR_MOODS,
   MOOD_EXPRESSIONS,
@@ -8,7 +7,13 @@ import {
   getMoodAnimationClass,
   type AvatarMood,
 } from '@/lib/avatar/avatarMood';
-import { AVATAR_EYE_STYLES, AVATAR_EYEBROW_STYLES, AVATAR_MOUTH_STYLES } from '@/shared/types/customAvatar';
+// Single import from customAvatar (was split across two lines → no-duplicate-imports).
+import {
+  AVATAR_EYE_STYLES,
+  AVATAR_EYEBROW_STYLES,
+  AVATAR_MOUTH_STYLES,
+  type CustomAvatarConfig,
+} from '@/shared/types/customAvatar';
 
 // Representative config — mapper only reads/overrides eyes/eyebrows/mouth + spreads the rest.
 const baseConfig = {

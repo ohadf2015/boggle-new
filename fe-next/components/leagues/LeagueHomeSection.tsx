@@ -11,7 +11,7 @@
  *
  * Self-hides for guests and players not yet in a league.
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronRight, Trophy, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -56,7 +56,13 @@ export function LeagueHomeSection() {
     [myPosition, standings.length]
   );
 
-  const countdown = useMemo(() => formatLeagueResetCountdown(weekEnd, Date.now()), [weekEnd]);
+  // `Date.now()` can't be called during render (React purity rule, enforced by
+  // the React-compiler eslint rule). Snapshot it once at mount via a lazy
+  // useState initializer — React invokes `Date.now` internally, so there's no
+  // impure call in the render body. Behaviour-identical: the countdown only ever
+  // re-memoised on weekEnd and never ticked live, so a mount-time `now` matches.
+  const [now] = useState(Date.now);
+  const countdown = useMemo(() => formatLeagueResetCountdown(weekEnd, now), [weekEnd, now]);
 
   // Guests and players not in a league get nothing (no skeleton flash for guests).
   if (!isAuthenticated) return null;
