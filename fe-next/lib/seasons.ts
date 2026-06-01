@@ -145,6 +145,16 @@ export function getSeasonTwist(id: number): SeasonTwist {
   return catalogForSeason(id).twist;
 }
 
+/** The display theme name for a given season id (cycles the catalog). */
+export function getSeasonTheme(id: number): string {
+  return catalogForSeason(id).theme;
+}
+
+/** The accent color for a given season id (cycles the catalog). */
+export function getSeasonAccent(id: number): string {
+  return catalogForSeason(id).accentColor;
+}
+
 /** Season 1 starts Q1 2026 */
 const SEASON_EPOCH = new Date('2026-01-01T00:00:00Z');
 

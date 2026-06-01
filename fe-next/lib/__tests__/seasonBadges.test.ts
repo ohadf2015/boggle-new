@@ -72,10 +72,12 @@ describe('seasonBadges registry', () => {
       expect(getRankBadge(1, 0)).toBeNull();
     });
 
-    it('cycles theme for seasons > 6', () => {
-      const s7 = getRankBadge(7, 1);
+    it('cycles theme through the 12-season catalog (s7 distinct from s1, wraps at 12)', () => {
       const s1 = getRankBadge(1, 1);
-      expect(s7?.theme).toBe(s1?.theme);
+      const s7 = getRankBadge(7, 1);
+      const s13 = getRankBadge(13, 1);
+      expect(s7?.theme).not.toBe(s1?.theme); // 7 is its own identity now (Frost Lexicon)
+      expect(s13?.theme).toBe(s1?.theme); // wraps after 12
     });
   });
 });

@@ -7,23 +7,7 @@
  * scripts/generate-season-badges.ts and lives in /public/badges/.
  */
 
-const SEASON_THEMES = [
-  'Word Warriors',
-  'Letter Legends',
-  'Vocab Victors',
-  'Syllable Champions',
-  'Phonic Phenoms',
-  'Lexicon Lords',
-];
-
-const SEASON_ACCENT: Record<number, string> = {
-  1: '#BFFF00',
-  2: '#FF1493',
-  3: '#00FFFF',
-  4: '#8B5CF6',
-  5: '#FFE135',
-  6: '#FF6B35',
-};
+import { getSeasonTheme, getSeasonAccent } from './seasons';
 
 export const SEASON_BADGE_MAX_RANK = 5;
 
@@ -59,29 +43,19 @@ export function rankBadgeRarity(rank: number): RankBadgeRarity {
   return 'uncommon';
 }
 
-function themeForSeason(seasonId: number): string {
-  const idx = ((seasonId - 1) % SEASON_THEMES.length + SEASON_THEMES.length) % SEASON_THEMES.length;
-  return SEASON_THEMES[idx];
-}
-
-function accentForSeason(seasonId: number): string {
-  if (SEASON_ACCENT[seasonId]) return SEASON_ACCENT[seasonId];
-  // Cycle accents in lockstep with theme cycle for unmapped seasons.
-  const cycleId = ((seasonId - 1) % 6 + 6) % 6 + 1;
-  return SEASON_ACCENT[cycleId] ?? '#BFFF00';
-}
-
 export function getRankBadge(seasonId: number, rank: number): SeasonRankBadge | null {
   if (!isTopFiveRank(rank)) return null;
   if (!Number.isFinite(seasonId) || seasonId < 1) return null;
+  // Theme + accent come from the single season identity catalog (lib/seasons.ts)
+  // so badge metadata stays consistent with the banner/leaderboard for all seasons.
   return {
     seasonId,
     rank,
     titleKey: rankTitleKey(rank),
     imagePath: seasonBadgeImagePath(seasonId, rank),
-    accentColor: accentForSeason(seasonId),
+    accentColor: getSeasonAccent(seasonId),
     rarity: rankBadgeRarity(rank),
-    theme: themeForSeason(seasonId),
+    theme: getSeasonTheme(seasonId),
   };
 }
 
