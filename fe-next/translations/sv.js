@@ -12733,6 +12733,7 @@ const sv = {
     cap3Title: "Ta kronan",
     cap3Body: "Klättra till toppen — och skryt om det.",
     scrollHint: "Rulla för att spela",
+    loading: "Laddar brädet",
     scoreLabel: "Poäng",
     rail0: "Dra",
     rail1: "Kedja",

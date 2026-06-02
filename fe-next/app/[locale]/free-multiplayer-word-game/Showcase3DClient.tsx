@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -12,6 +12,7 @@ import Split3DHeading from '@/components/showcase3d/Split3DHeading';
 import FloatingCTA from '@/components/showcase3d/FloatingCTA';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import FaqAccordion from '@/components/showcase3d/FaqAccordion';
+import { loadPercent, isPlayable } from '@/lib/showcase3d/loadProgress';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -51,6 +52,11 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
   const isRTL = locale === 'he';
   const playHref = `/${locale}`;
 
+  // frame-sequence preload progress -> branded loader over the canvas
+  const [framesLoaded, setFramesLoaded] = useState(0);
+  const ready = isPlayable(framesLoaded, TOTAL);
+  const percent = loadPercent(framesLoaded, TOTAL);
+
   const main = useRef<HTMLElement>(null);
   const section = useRef<HTMLElement>(null);
   const pinWrap = useRef<HTMLDivElement>(null);
@@ -77,6 +83,16 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
     { title: t('showcase3d.cap3Title', 'Take the crown'), body: t('showcase3d.cap3Body', 'Top the scoreboard and claim the win — out loud.'), window: [0.77, 0.99] },
   ];
 
+  // Per-chapter side flares: a punchy HUD chip slams in from alternating edges
+  // (left/right/left/right) as each chapter scrubs, echoing the chapter rail
+  // word. Symbols are language-neutral; the label reuses the rail i18n key.
+  const sideAccents = [
+    { side: 'left' as const, bg: 'bg-neo-cyan', big: '+10', window: captions[0].window },
+    { side: 'right' as const, bg: 'bg-neo-pink', big: '×3', window: captions[1].window },
+    { side: 'left' as const, bg: 'bg-neo-purple', big: '1v3', window: captions[2].window },
+    { side: 'right' as const, bg: 'bg-neo-yellow', big: '★', window: captions[3].window },
+  ];
+
   const modes: Mode[] = [
     { side: 'left', accent: 'bg-neo-cyan', tag: t('showcase3d.mode1Tag', 'Solo · Daily'), title: t('showcase3d.mode1', 'One board. One shot.'), body: t('showcase3d.mode1Body', 'The same daily grid for everyone. Climb the global rank before midnight.'), video: '/videos/reddit-gameplay-demo.mp4', poster: '/showcase3d/poster-reddit-gameplay-demo.jpg' },
     { side: 'right', accent: 'bg-neo-pink', tag: t('showcase3d.mode2Tag', 'Up to 1v3'), title: t('showcase3d.mode2', 'Real-time party versus'), body: t('showcase3d.mode2Body', 'Four cubes, one live board, zero mercy. The loudest scoreboard wins.'), video: '/videos/reddit-vs-battle.mp4', poster: '/showcase3d/poster-reddit-vs-battle.jpg' },
@@ -92,11 +108,6 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       if (!ctx) return;
 
       const playhead = { frame: 0 };
-      const images: HTMLImageElement[] = FRAMES.map((url) => {
-        const img = new window.Image();
-        img.src = url;
-        return img;
-      });
       const draw = () => {
         const img = images[Math.round(playhead.frame)];
         if (img && img.complete && img.naturalWidth) {
@@ -107,13 +118,38 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
       };
-      if (images[0].complete) draw();
-      else images[0].onload = draw;
+
+      // Preload every frame; count each decode (and each failure, so the loader
+      // can never hang) to drive the branded progress overlay. Paint frame 0 the
+      // instant it lands so the hero reveals the moment it's playable.
+      let loadedCount = 0;
+      const bumpLoaded = () => setFramesLoaded((loadedCount += 1));
+      const images: HTMLImageElement[] = FRAMES.map((url, i) => {
+        const img = new window.Image();
+        const onDone = () => {
+          bumpLoaded();
+          // paint whichever frame the playhead currently points at the moment it
+          // lands — covers frame 0 (normal) AND the last frame (reduced-motion,
+          // where playhead is parked at TOTAL-1) so the canvas is never blank.
+          if (i === Math.round(playhead.frame)) draw();
+        };
+        if (img.complete && img.naturalWidth) {
+          queueMicrotask(onDone); // already cached — `images` is assigned by then
+        } else {
+          img.onload = onDone;
+          img.onerror = bumpLoaded;
+        }
+        img.src = url;
+        return img;
+      });
 
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         playhead.frame = TOTAL - 1;
         draw();
-        gsap.set('.s3-cap', { autoAlpha: 1, position: 'static' });
+        // no scrub → show only the final caption (matches the WINNER end frame)
+        // instead of stacking all four on top of each other.
+        gsap.set('.s3-cap', { autoAlpha: 0 });
+        gsap.set(`.s3-cap-${captions.length - 1}`, { autoAlpha: 1, position: 'static' });
         return;
       }
 
@@ -152,6 +188,22 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
         );
         tl.to(sel, { rotationX: -10, rotationY: sign * 6, duration: Math.max(0.01, exit - enter - 0.12), ease: 'none' }, enter + 0.06);
         tl.to(sel, { autoAlpha: 0, yPercent: -42, rotationX: -78, z: -260, duration: 0.06, ease: 'power2.in' }, exit - 0.06);
+      });
+
+      // side flares: slam in from the matching edge, drift + counter-rotate while
+      // held, then rocket back off-screen — alternating sides keep the eye moving.
+      sideAccents.forEach((a, i) => {
+        const [enter, exit] = a.window;
+        const sel = `.s3-side-${i}`;
+        const dir = a.side === 'left' ? -1 : 1; // off-screen direction (physical L/R)
+        tl.fromTo(
+          sel,
+          { autoAlpha: 0, x: dir * 220, rotation: dir * 16, scale: 0.6, transformPerspective: 600 },
+          { autoAlpha: 1, x: 0, rotation: dir * -4, scale: 1, duration: 0.06, ease: 'back.out(2.2)' },
+          enter + 0.03,
+        );
+        tl.to(sel, { y: '-=18', rotation: dir * 5, duration: Math.max(0.01, exit - enter - 0.16), ease: 'sine.inOut' }, enter + 0.09);
+        tl.to(sel, { autoAlpha: 0, x: dir * 220, scale: 0.6, duration: 0.06, ease: 'power2.in' }, exit - 0.04);
       });
     },
     { scope: section },
@@ -220,6 +272,37 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       <section ref={section} className="relative">
         <div ref={pinWrap} className="texture-halftone relative h-[100svh] w-full overflow-hidden bg-neo-navy">
           <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover" />
+
+          {/* branded loading overlay — covers the blank canvas while the frame
+              sequence decodes, then fades out the instant it's playable */}
+          <div
+            aria-hidden={ready}
+            className={`absolute inset-0 z-30 flex flex-col items-center justify-center gap-7 bg-neo-navy px-6 text-center transition-opacity duration-700 ${ready ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+          >
+            <div className="flex gap-2" aria-hidden>
+              {['L', 'E', 'X', 'I'].map((ch, i) => (
+                <span
+                  key={ch}
+                  className="grid h-12 w-12 animate-bounce place-items-center rounded-neo border-neo-thick border-black bg-neo-lime font-neo-display text-2xl font-bold text-black shadow-hard sm:h-14 sm:w-14"
+                  style={{ animationDelay: `${i * 0.12}s` }}
+                >
+                  {ch}
+                </span>
+              ))}
+            </div>
+            <div className="w-full max-w-xs">
+              <div className="h-4 w-full overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard">
+                <div
+                  className="h-full origin-left bg-neo-lime transition-transform duration-200 ease-out"
+                  style={{ transform: `scaleX(${percent / 100})` }}
+                />
+              </div>
+              <p className="mt-3 font-neo-body text-sm font-bold uppercase tracking-widest text-neo-white">
+                {t('showcase3d.loading', 'Loading the board')} · {percent}%
+              </p>
+            </div>
+          </div>
+
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-neo-navy via-neo-navy/40 to-neo-navy/15" />
           {/* right-edge fade so the score + chapter rail stay legible above the video */}
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-64 bg-gradient-to-l from-neo-navy/90 via-neo-navy/45 to-transparent lg:block" />
@@ -229,12 +312,12 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
             LexiClash
           </p>
 
-          {/* live score — counts up as you scrub */}
-          <div className="absolute right-4 top-5 z-20 hidden items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard sm:flex">
-            <span className="font-neo-body text-[10px] font-bold uppercase tracking-widest text-neo-white">
+          {/* live score — counts up as you scrub (compact on mobile, fuller on sm+) */}
+          <div className="absolute right-3 top-4 z-20 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2.5 py-1 shadow-hard sm:right-4 sm:top-5 sm:gap-2 sm:px-3 sm:py-1.5">
+            <span className="font-neo-body text-[9px] font-bold uppercase tracking-widest text-neo-white sm:text-[10px]">
               {t('showcase3d.scoreLabel', 'Score')}
             </span>
-            <span ref={scoreRef} className="font-neo-display text-lg font-bold leading-none text-neo-lime tabular-nums">0</span>
+            <span ref={scoreRef} className="font-neo-display text-base font-bold leading-none text-neo-lime tabular-nums sm:text-lg">0</span>
           </div>
 
           {/* chapter rail — active highlights with scrub; click to jump */}
@@ -254,7 +337,24 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
               </button>
             ))}
           </div>
-          <div className="absolute inset-x-0 bottom-[14%] flex justify-center px-6">
+          {/* alternating side flares — a chapter chip punches in from the matching
+              edge as you scrub. Small + edge-hugging on mobile, bigger on sm+. */}
+          {sideAccents.map((a, i) => (
+            <div
+              key={a.big}
+              aria-hidden
+              className={`s3-side s3-side-${i} pointer-events-none absolute top-[20%] z-20 opacity-0 ${a.side === 'left' ? 'left-2 sm:left-6' : 'right-2 sm:right-6'}`}
+            >
+              <div className={`flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black ${a.bg} px-2.5 py-2 shadow-hard sm:gap-1 sm:px-4 sm:py-3`}>
+                <span className="font-neo-display text-xl font-bold leading-none text-black sm:text-3xl">{a.big}</span>
+                <span className="font-neo-display text-[9px] font-bold uppercase tracking-widest text-black sm:text-xs">
+                  {t(`showcase3d.rail${i}`, RAIL[i])}
+                </span>
+              </div>
+            </div>
+          ))}
+
+          <div className="absolute inset-x-0 bottom-[14%] flex justify-center px-5 sm:px-6">
             <div className="relative h-52 w-full max-w-2xl">
               {captions.map((cap, i) => (
                 <div key={cap.title} className={`s3-cap s3-cap-${i} absolute inset-0 text-center`}>
@@ -269,9 +369,15 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
               ))}
             </div>
           </div>
-          <p className="pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 animate-bounce font-neo-body text-xs uppercase tracking-widest text-neo-white">
-            ↓ {t('showcase3d.scrollHint', 'Scroll to play')}
-          </p>
+          {/* scroll cue — a loud pill + bouncing arrow so it reads as "keep going down" */}
+          <div className="pointer-events-none absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2">
+            <span className="rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-1.5 font-neo-display text-sm font-bold uppercase tracking-widest text-black shadow-hard">
+              {t('showcase3d.scrollHint', 'Scroll to play')}
+            </span>
+            <span aria-hidden className="animate-bounce font-neo-display text-3xl font-bold leading-none text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)]">
+              ↓
+            </span>
+          </div>
         </div>
       </section>
 

@@ -12173,6 +12173,7 @@ const ja = {
       "notWord": "辞書にありません"
     },
     "dictLoading": "辞書を読み込み中…",
+    "perfectCraft": "完璧な一撃！",
     "subtitle": "単語を綴れ。ルーンを集めろ。スコアを打ち破れ。",
     "go": "GO！",
     "startRun": "ラン開始",
@@ -12733,6 +12734,7 @@ const ja = {
     "cap3Title": "王冠をつかむ",
     "cap3Body": "ランキングトップに立つ — そして勝利を叫ぼう。",
     "scrollHint": "スクロールしてプレイ",
+    "loading": "ボードを読み込み中",
     "scoreLabel": "スコア",
     "rail0": "なぞる",
     "rail1": "つなぐ",

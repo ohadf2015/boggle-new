@@ -12821,6 +12821,7 @@ const es = {
     "cap3Title": "Toma la corona",
     "cap3Body": "Llega a la cima — y que se note.",
     "scrollHint": "Desplázate para jugar",
+    "loading": "Cargando el tablero",
     "scoreLabel": "Puntos",
     "rail0": "Traza",
     "rail1": "Encadena",

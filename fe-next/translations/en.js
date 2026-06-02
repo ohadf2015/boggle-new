@@ -13095,6 +13095,7 @@ const en = {
     "cap3Title": "Take the crown",
     "cap3Body": "Top the scoreboard and claim the win — out loud.",
     "scrollHint": "Scroll to play",
+    "loading": "Loading the board",
     "scoreLabel": "Score",
     "rail0": "Trace",
     "rail1": "Chain",
