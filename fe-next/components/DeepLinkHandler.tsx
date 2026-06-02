@@ -29,9 +29,9 @@ function detectLocaleFromCookie(): string | undefined {
 
 /**
  * Resolve the locale for a deep link. Shortcut/App-Link URLs carry no ?locale=,
- * so falling straight back to defaultLocale ('he') sends every non-Hebrew player
- * to a Hebrew page. Prefer an explicit param, then the on-screen path, then the
- * language cookie, and only then the default.
+ * so prefer an explicit param, then the on-screen path, then the language
+ * cookie, and only then defaultLocale ('en' since 066d75006 — defaulting to
+ * 'he' had been routing every non-Hebrew player to a Hebrew page).
  */
 function resolvePreferredLocale(explicit: string | null): string {
   if (isValidLocale(explicit)) return explicit;

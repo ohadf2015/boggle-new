@@ -169,7 +169,7 @@ describe('Deep Link OAuth Callback Handler', () => {
     });
   });
 
-  it('should default to Hebrew locale if none specified in deep link', async () => {
+  it('should default to English locale if none specified in deep link', async () => {
     // GIVEN: Deep link without locale parameter
     const deepLinkUrl = 'lexiclash://auth/callback?code=test-code';
 
@@ -188,10 +188,11 @@ describe('Deep Link OAuth Callback Handler', () => {
       (appUrlOpenCallback as (event: { url: string }) => void)({ url: deepLinkUrl });
     }
 
-    // THEN: Should default to Hebrew locale (defaultLocale = 'he')
+    // THEN: Should default to English locale (defaultLocale = 'en' since
+    // 066d75006 — defaulting to 'he' routed every non-Hebrew player to Hebrew).
     await waitFor(() => {
       expect(mockRouter.replace).toHaveBeenCalledWith(
-        '/he/auth/callback?code=test-code'
+        '/en/auth/callback?code=test-code'
       );
     });
   });
@@ -242,10 +243,10 @@ describe('Deep Link OAuth Callback Handler', () => {
       (appUrlOpenCallback as (event: { url: string }) => void)({ url: deepLinkUrl });
     }
 
-    // THEN: Should redirect to the correct route (defaults to Hebrew locale)
+    // THEN: Should redirect to the correct route (defaults to English locale)
     await waitFor(() => {
       expect(mockRouter.replace).toHaveBeenCalledWith(
-        '/he/multiplayer/room/test-room'
+        '/en/multiplayer/room/test-room'
       );
     });
   });
@@ -454,10 +455,10 @@ describe('Deep Link OAuth Callback Handler', () => {
         await (appUrlOpenCallback as (event: { url: string }) => Promise<void>)({ url: httpsAppLink });
       }
 
-      // THEN: Should default to Hebrew locale
+      // THEN: Should default to English locale (defaultLocale = 'en')
       await waitFor(() => {
         expect(mockRouter.replace).toHaveBeenCalledWith(
-          '/he/auth/callback?code=test-code'
+          '/en/auth/callback?code=test-code'
         );
       });
     });
