@@ -29,6 +29,19 @@ export const REWARD_PREPARE_TIMEOUT_MS = 12000;
 // well before it fires.
 export const REWARD_SAFETY_TIMEOUT_MS = 90000;
 
+// Show rewarded ads in immersive mode (system bars hidden, ad owns the full
+// screen). SPECULATIVE fix for the "tap the X, ad won't close" report: the app
+// runs edge-to-edge (MainActivity EdgeToEdge.enable, transparent system bars),
+// and with immersiveMode off the ad's close button can land in/under the
+// translucent status-bar / display-cutout region and miss taps. Immersive mode
+// is also Google's recommended setting for fullscreen ads. JS-only: the native
+// plugin reads `immersiveMode` from the prepare call (shipped since v8.0.0), so
+// this reaches installed apps via the web deploy — no new Android release, and
+// trivially reversible. Does NOT address the "no reward" half (reward is driven
+// by the Rewarded event); a Rewarded-Interstitial-vs-Rewarded ad-unit mismatch
+// remains the prime suspect for that — verify in the AdMob dashboard.
+const REWARD_IMMERSIVE_MODE = true;
+
 export interface ShowBannerOptions {
   variant?: BannerVariant;
 }
@@ -134,7 +147,7 @@ export function useAdMob() {
             );
             await whenReady();
             trackRewardedLifecycle('prepare_start', surface);
-            await AdMob.prepareRewardVideoAd({ adId });
+            await AdMob.prepareRewardVideoAd({ adId, immersiveMode: REWARD_IMMERSIVE_MODE });
             trackRewardedLifecycle('prepare_resolved', surface);
             // Bailed out (prepare timeout fired, or a Failed* event already
             // settled us). Do NOT show: the listeners are gone, so a shown ad
@@ -177,7 +190,7 @@ export function useAdMob() {
     // the same stall. Only on success: the consumed ad is gone, so there's no
     // concurrent in-flight prepare to collide with. Fire-and-forget.
     if (rewarded) {
-      void AdMob.prepareRewardVideoAd({ adId }).catch(() => {});
+      void AdMob.prepareRewardVideoAd({ adId, immersiveMode: REWARD_IMMERSIVE_MODE }).catch(() => {});
     }
   }, [hasNoAds, getConfig, whenReady]);
 
@@ -308,7 +321,7 @@ export function useAdMob() {
     const adId = config.rewardedUnits?.[surface] ?? config.rewardedAdId;
     try {
       await whenReady();
-      await AdMob.prepareRewardVideoAd({ adId });
+      await AdMob.prepareRewardVideoAd({ adId, immersiveMode: REWARD_IMMERSIVE_MODE });
     } catch {
       // Silent: subsequent showRewarded path will retry + report.
     }

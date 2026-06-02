@@ -137,6 +137,11 @@ describe('useAdMob.showRewarded — prepare-phase stall guard', () => {
     expect(showRewardVideoAd).toHaveBeenCalledTimes(1);
     // no premature error from the prepare-timeout path
     expect(onError).not.toHaveBeenCalled();
+    // prepared in immersive mode so the close button isn't lost under the
+    // edge-to-edge system bars ("tap X won't close" mitigation)
+    expect(prepareRewardVideoAd).toHaveBeenCalledWith(
+      expect.objectContaining({ immersiveMode: true }),
+    );
   });
 
   it('breadcrumbs the lifecycle stages (surface-tagged) for the stuck-ad diagnosis', async () => {
