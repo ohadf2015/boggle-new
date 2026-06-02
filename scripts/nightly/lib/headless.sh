@@ -64,6 +64,14 @@ still counts as a successful-but-degraded run: the artifact is gate-clean (docs/
 outside fe-next/) and ships, so the lane is never a total loss. This is your floor.
 
 ═══ TIME BUDGET & SCOPE DISCIPLINE (the #1 reason lanes ship nothing) ═══
+LIVE ENFORCEMENT (not advice — a hook acts before each tool call): you cannot feel
+time pass, so a guard injects your remaining minutes before every edit/Bash, and it
+will BLOCK (deny) any NEW file edit once you pass the ~${finalize_min}-min finalize
+cutoff or exceed your working-set file cap. When you see such a deny, do
+NOT retry it — it means "stop opening new work": finish + tsc/lint-verify the files you
+already changed (or \`git checkout -- <file>\` to revert an incomplete one), update your
+artifact, and END the turn. Plan so this never bites: pick a change small enough to land
+AND self-verify well before the cutoff.
 You have ~${budget_min} MINUTES of wall-clock. At ~${finalize_min} min you are HARD-KILLED
 (SIGTERM) — anything you have not finished is left HALF-WRITTEN, and a half-written
 file (broken import, unclosed JSX, dangling edit) FAILS the lint/build gate and gets
@@ -227,9 +235,40 @@ PY
     echo "headless: lane=$lane_id MCP scope build failed → falling back to full MCP set" | tee -a "$log_file"
   fi
 
+  # --- Mechanical time + scope enforcement (PreToolUse hook) -------------------
+  # ROOT-CAUSE fix for the recurring exit-124 epidemic. Forensics (2026-06-02)
+  # proved the lane agent is CLOCK-BLIND — across every timed-out AND every
+  # successful lane it ran `date` zero times — so the relative "you have ~N min"
+  # prompt budget was physically unactionable. Successful lanes weren't better at
+  # time-telling; they just made small (1–5 edit) changes and exited naturally,
+  # while losers sprawled (10 files, repeated full-repo tsc) until the invisible
+  # SIGTERM fell mid-edit. Three weeks of PROMPT-layer fixes failed because the
+  # agent can ignore prose. A PreToolUse hook fires OUTSIDE its control: even
+  # under --dangerously-skip-permissions a `deny` blocks the edit. We write this
+  # lane's deadline epochs + a fresh file-set scratch, then inject the guard via
+  # --settings (which MERGES — existing user/project hooks still fire). The hook
+  # is inert when LEXI_LANE_DEADLINE_FILE is unset, so it never affects normal use.
+  local now_epoch finalize_epoch hard_epoch deadline_file fileset_file hook_settings hook_path
+  now_epoch=$(date +%s)
+  hard_epoch=$(( now_epoch + timeout_sec ))
+  finalize_epoch=$(( now_epoch + timeout_sec * 8 / 10 ))   # 80% → leave a wrap-up window
+  deadline_file=$(mktemp -t "lane-${lane_id}-deadline.XXXXXX")
+  printf '%s %s %s\n' "$now_epoch" "$finalize_epoch" "$hard_epoch" > "$deadline_file"
+  fileset_file=$(mktemp -t "lane-${lane_id}-fileset.XXXXXX"); : > "$fileset_file"
+  export LEXI_LANE_DEADLINE_FILE="$deadline_file" \
+         LEXI_LANE_FILESET_FILE="$fileset_file" \
+         LEXI_LANE_FILE_CAP="${LANE_FILE_CAP:-8}"
+  hook_path="$(dirname "${BASH_SOURCE[0]}")/hooks/lane-time-guard.sh"
+  hook_settings=$(mktemp -t "lane-${lane_id}-hooks.XXXXXX")
+  jq -nc --arg cmd "$hook_path" \
+    '{hooks:{PreToolUse:[{matcher:"Edit|Write|MultiEdit|NotebookEdit|Bash",hooks:[{type:"command",command:("bash "+$cmd),timeout:10}]}]}}' \
+    > "$hook_settings"
+  echo "headless: lane=$lane_id time-guard armed → finalize @ +$(( timeout_sec*8/10/60 ))m, hard @ +$(( timeout_sec/60 ))m, file-cap=${LANE_FILE_CAP:-8}" | tee -a "$log_file"
+
   "${timeout_cmd[@]}" \
     claude -p "$(cat "$rendered")" \
       --allowedTools '*' \
+      --settings "$hook_settings" \
       ${mcp_args[@]+"${mcp_args[@]}"} \
       --dangerously-skip-permissions \
       --output-format stream-json \
@@ -243,7 +282,8 @@ PY
   echo "headless: lane=$lane_id rc=$rc — full stream-json sidecar: $stream_sidecar" | tee -a "$log_file"
 
   [ -n "$lane_mcp_cfg" ] && rm -f "$lane_mcp_cfg" 2>/dev/null || true
-  rm -f "$rendered"
+  rm -f "$rendered" "$deadline_file" "$fileset_file" "$hook_settings" 2>/dev/null || true
+  unset LEXI_LANE_DEADLINE_FILE LEXI_LANE_FILESET_FILE LEXI_LANE_FILE_CAP
   return "$rc"
 }
 
