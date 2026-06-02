@@ -38,6 +38,14 @@ export interface UseBlastEngineOptions {
   isMultiplayer?: boolean;
   blastSeed?: number | null;
   initialTileStates?: BlastTileState[][] | null;
+  /**
+   * Multiplayer ONLY: the server-authoritative letter grid (from the `startGame`
+   * payload, already in the client store as `letterGrid`). When present the engine
+   * uses THIS grid instead of generating its own via useGridInit — so the board the
+   * player sees/validates matches the per-player board the server scores against.
+   * Without it, client letters were locally random → every word mis-scored server-side.
+   */
+  mpInitialGrid?: LetterGrid | null;
   /** Minimum word length for dead-end detection (defaults to 2) */
   minWordLength?: number;
 }
@@ -126,8 +134,12 @@ export function useBlastEngine(
     cols: gridSize,
   });
 
-  // Mutable grid — updated after each cascade
-  const [currentGrid, setCurrentGrid] = useState<LetterGrid | null>(null);
+  // Mutable grid — updated after each cascade. In multiplayer, seed from the
+  // server-authoritative grid so the board never starts on a divergent local grid.
+  const mpInitialGrid = options?.mpInitialGrid;
+  const [currentGrid, setCurrentGrid] = useState<LetterGrid | null>(
+    () => (mpInitialGrid && mpInitialGrid.length > 0 ? mpInitialGrid : null),
+  );
   const effectiveGrid = currentGrid || initialGrid;
   const effectiveGridRef = useRef(effectiveGrid);
   // NOTE: Do NOT sync ref from state on every render (effectiveGridRef.current = effectiveGrid)
@@ -138,6 +150,17 @@ export function useBlastEngine(
       effectiveGridRef.current = initialGrid;
     }
   }, [initialGrid, currentGrid]);
+
+  // MP: if the server grid wasn't ready on first render (store populated a tick
+  // later), adopt it as soon as it arrives. Guarded on !currentGrid so a later
+  // server board-update (applyServerBoard) or cascade result is never clobbered.
+  useEffect(() => {
+    if (mpInitialGrid && mpInitialGrid.length > 0 && !currentGrid) {
+      effectiveGridRef.current = mpInitialGrid;
+      setCurrentGrid(mpInitialGrid);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- seed once on first availability; !currentGrid guard prevents clobbering live board state
+  }, [mpInitialGrid]);
 
   // Tile states
   const [tileStates, setTileStates] = useState<BlastTileState[][]>(() => {

@@ -534,6 +534,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         onWordWithComboType={handleBlastWordWithCombo}
         initialTileStates={blastBridge.initialTileStates}
         blastSeed={blastBridge.blastSeed}
+        serverGrid={blastBridge.serverGrid}
       />
     );
     if (shellEnabled) {

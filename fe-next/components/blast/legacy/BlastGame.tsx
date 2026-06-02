@@ -73,6 +73,8 @@ interface BlastGameProps {
   discoveredCombos?: Set<BlastComboType>;
   initialTileStates?: BlastTileState[][] | null;
   blastSeed?: number | null;
+  /** MP only: server-authoritative letter grid (from `startGame`/store `letterGrid`). */
+  serverGrid?: LetterGrid | null;
   remainingTime?: number | null;
   totalTime?: number;
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
@@ -103,6 +105,7 @@ export function BlastGame({
   discoveredCombos: _discoveredCombos,
   initialTileStates,
   blastSeed,
+  serverGrid,
   remainingTime: _remainingTime,
   totalTime: _totalTime,
   leaderboard,
@@ -139,6 +142,7 @@ export function BlastGame({
     isMultiplayer,
     blastSeed: isMultiplayer ? blastSeed : undefined,
     initialTileStates: isMultiplayer ? initialTileStates : undefined,
+    mpInitialGrid: isMultiplayer ? serverGrid : undefined,
     minWordLength,
   });
 

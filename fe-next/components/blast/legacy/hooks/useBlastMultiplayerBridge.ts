@@ -20,6 +20,8 @@ interface UseBlastMultiplayerBridgeReturn {
   config: BlastGameConfig;
   initialTileStates: BlastTileState[][] | null;
   blastSeed: number | null;
+  /** Server-authoritative letter grid — fed to the engine so client board == server board. */
+  serverGrid: LetterGrid | null;
 }
 
 export function useBlastMultiplayerBridge({
@@ -43,5 +45,5 @@ export function useBlastMultiplayerBridge({
     return overlayToTileStates(blastTileOverlay, gridSize, blastSeed);
   }, [blastTileOverlay, gridSize, letterGrid, blastSeed]);
 
-  return { config, initialTileStates, blastSeed };
+  return { config, initialTileStates, blastSeed, serverGrid: letterGrid };
 }
