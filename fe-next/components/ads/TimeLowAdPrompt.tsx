@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCosyMode } from '@/contexts/AccessibilityContext';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
-import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
 interface TimeLowAdPromptProps {
@@ -48,24 +47,15 @@ export const TimeLowAdPrompt: React.FC<TimeLowAdPromptProps> = ({
   const { showAd, status, canShowAd } = useRewardedAd({
     rewardKind: 'feature',
     surface: 'timeLow',
-    // Freeze the game clock while the fullscreen ad is up. Without this the
-    // timer keeps counting behind the native ad, hits zero, ends the game, and
-    // the +bonus arrives too late — the player is stuck on a finished game with
-    // no reward. Routed through the useGameTimer `isExternallyPaused` channel
-    // (not user-pause) so the prompt stays mounted mid-ad. Every set(true) has
-    // a matching set(false) on the two terminal outcomes below.
-    onAdStarted: () => emitRewardAdActive(true),
+    // The game clock is frozen for the whole ad lifecycle by useRewardedAd
+    // itself (it emits rewardAdActiveChange → useGameTimer.isExternallyPaused),
+    // so the timer can't tick to zero behind the ad. Here we just apply the
+    // bonus once the reward lands.
     onRewardEarned: () => {
-      emitRewardAdActive(false);
       setUsed(true);
       onExtend(bonusSeconds);
     },
-    onAdError: () => emitRewardAdActive(false),
   });
-
-  // Safety: if the prompt unmounts mid-ad (e.g. navigation), never leave the
-  // clock frozen. Idempotent — a stray false just confirms the default.
-  useEffect(() => () => emitRewardAdActive(false), []);
 
   const timeLow = timeRemaining > 0 && timeRemaining <= threshold;
   const visible = timeLow && canShowAd && !used && !cosyMode;

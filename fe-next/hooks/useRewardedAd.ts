@@ -7,6 +7,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useH5GamesAds } from '@/hooks/useH5GamesAds';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 import type { RewardedSurface } from '@/lib/admob-config';
 
@@ -188,9 +189,18 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   // the short completed/error → idle reset.
   const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const idleResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // True only while THIS instance's ad is live. The game-clock pause is a
+  // global, non-refcounted boolean, so an unconditional unmount emit(false)
+  // from one rewarded consumer would clear a DIFFERENT consumer's active pause
+  // (resuming the timer behind its ad). Gate the unmount backstop on our own
+  // ad so we only release a pause we ourselves set.
+  const adActiveRef = useRef(false);
   useEffect(() => () => {
     if (watchdogRef.current) clearTimeout(watchdogRef.current);
     if (idleResetRef.current) clearTimeout(idleResetRef.current);
+    // Unmounted mid-ad (e.g. navigation) with no terminal callback fired —
+    // release our own pause so a listening game clock isn't frozen forever.
+    if (adActiveRef.current) emitRewardAdActive(false);
   }, []);
 
   // Use unified CoinContext for all coin operations
@@ -267,8 +277,23 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       return;
     }
 
+    // Sweep any pending completed→idle / error→idle reset from a PRIOR session
+    // before starting a new one — otherwise that stale timer fires mid-session
+    // and flips the live status back to 'idle' (re-enabling the button under a
+    // running ad).
+    if (idleResetRef.current) { clearTimeout(idleResetRef.current); idleResetRef.current = null; }
+
     setStatus('loading');
     setError(null);
+
+    // Freeze any listening game clock for the whole ad lifecycle. Emitting here
+    // — after the early returns, before any provider shows — means EVERY
+    // rewarded surface pauses a live timer (not just the one component that
+    // used to wire this by hand), and the early-return paths above never set
+    // it true, so they can't strand the clock frozen. Paired with the two
+    // terminal emits below (reward + error) and the unmount safety above.
+    adActiveRef.current = true;
+    emitRewardAdActive(true);
 
     // Determine platform for logging
     const platform = shouldUseCrazyGames ? 'crazygames'
@@ -292,6 +317,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // coin-grant-failure path (already inside a settled session) can reuse it
     // without tripping the guard a second time.
     const applyError = (errorMsg: string) => {
+      adActiveRef.current = false;
+      emitRewardAdActive(false); // resume the game clock on any failure path
       setStatus('error');
       setError(errorMsg);
       trackRewardedAdDeclined(errorMsg, platform, telemetrySurface);
@@ -310,6 +337,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       if (sessionSettled) return;
       sessionSettled = true;
       clearWatchdog();
+      adActiveRef.current = false;
+      emitRewardAdActive(false); // ad done — resume the game clock before granting
       if (isPlaceholder) {
         recordPlaceholderView();
         setPlaceholderCooldownFlag(isPlaceholderCapped());
