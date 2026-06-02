@@ -29,6 +29,13 @@ interface AdMobContextValue {
 // from compounding into ad fatigue within a single session.
 const MAX_INTERSTITIALS_PER_SESSION = 4;
 
+// AdMob interstitials expire ~1h after load (Google: "reload every hour").
+// Treat a preloaded ad older than this as not-ready so it cold-reloads before
+// showing — otherwise a stale-but-"ready" ad would be consumed + recorded, then
+// fail to render, burning a session slot via the expiry door. 50min < 60min
+// gives margin for the show to complete before the SDK's own expiry.
+const INTERSTITIAL_TTL_MS = 50 * 60 * 1000;
+
 const AdMobContext = createContext<AdMobContextValue | null>(null);
 
 export function AdMobProvider({ children }: { children: ReactNode }) {
@@ -46,6 +53,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // Interstitial preload state (app-scoped, resets per provider). A "warm" ad
   // shows with zero latency; `inFlight` dedupes concurrent prepares.
   const interstitialReady = useRef(false);
+  const interstitialReadyAt = useRef(0);
   const interstitialInFlight = useRef<Promise<void> | null>(null);
 
   if (initPromise.current === null) {
@@ -124,7 +132,9 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   function isInterstitialReady(): boolean {
-    return interstitialReady.current;
+    // Warm AND fresh — a preloaded ad older than the TTL is treated as not-ready
+    // so the show path cold-reloads it before consuming a slot.
+    return interstitialReady.current && Date.now() - interstitialReadyAt.current < INTERSTITIAL_TTL_MS;
   }
 
   function consumeInterstitial(): void {
@@ -133,7 +143,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
 
   function prepareInterstitial(): Promise<void> {
     if (!shouldPreloadInterstitial()) return Promise.resolve();
-    if (interstitialReady.current) return Promise.resolve();
+    if (isInterstitialReady()) return Promise.resolve(); // fresh & warm — skip (stale falls through to reload)
     if (interstitialInFlight.current) return interstitialInFlight.current;
     const config = getConfig();
     if (!config) return Promise.resolve();
@@ -142,6 +152,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
         await whenReady();
         await AdMob.prepareInterstitial({ adId: config.interstitialAdId });
         interstitialReady.current = true;
+        interstitialReadyAt.current = Date.now();
       } catch {
         // No fill / load error — leave un-warmed; showInterstitial will retry
         // a cold load and, failing that, skip showing without burning a slot.

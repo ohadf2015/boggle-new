@@ -30,7 +30,9 @@ The integration is **mature and battle-tested** — bounded load/show timeouts, 
 - Preload state (`ready` flag + in-flight promise) moved into `AdMobContext` (per-provider, app-scoped, resets cleanly in tests).
 - New `prepareInterstitial()` — idempotent, dedupes concurrent prepares, gated by `shouldPreloadInterstitial()` (ads on AND under session cap AND past warmup).
 - `showInterstitial` uses the warm ad when ready (zero-latency show); cold-loads only as a fallback; **records the slot only on a confirmed show** (no-fill no longer burns a slot); re-warms after each dismiss; warms during play on the not-eligible path so the *first* eligible interstitial is also instant.
+- **TTL on the warm flag (50 min < AdMob's ~1h expiry).** `isInterstitialReady()` ages out a stale preload so an idle-session ad is cold-reloaded *before* it's consumed/recorded — closes the expiry-door variant of the slot-burn (matches Google's "reload every hour"). Verified by a test that asserts the reload happens *before* the show (not via the always-fires post-dismiss re-warm).
 - `await`-dismiss contract preserved (MP host still gates next-round emit on `showInterstitial()`).
+- The slot-preservation claim is asserted *behaviorally*: a test makes the first eligible games no-fill, restores fill, and proves the full 4 impressions still land (a burned slot would trip the cap early at <4).
 
 ### Report-only — App Tracking Transparency (iOS) — revenue, but native + unverified ship
 

@@ -353,6 +353,64 @@ describe('useAdMob', () => {
     }
   });
 
+  it('no-fills do not consume session slots — full 4 shows still delivered later', async () => {
+    // The headline contract: a show-time no-fill must NOT burn a slot. Make the
+    // first eligible games (6, 9) no-fill, then restore fill; we must still get
+    // the full 4 shows. If no-fills burned slots, the cap would trip early (<4).
+    vi.mocked(AdMob.prepareInterstitial).mockRejectedValue(new Error('no fill'));
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      await act(async () => {
+        // ends 1-9: eligible at 6 and 9, both no-fill → 0 shows, 0 slots used.
+        await drainInterstitial(() => result.current.showInterstitial(), 9);
+      });
+      expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+
+      vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined);
+      await act(async () => {
+        // ends 10-21: eligible at 12,15,18,21 → fill restored → 4 shows.
+        await drainInterstitial(() => result.current.showInterstitial(), 12);
+      });
+      // Slots survived the no-fills → the cap delivers the full 4 impressions.
+      expect(AdMob.showInterstitial).toHaveBeenCalledTimes(4);
+    } finally {
+      vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined);
+    }
+  });
+
+  it('reloads a stale preloaded ad before showing (AdMob ~1h expiry)', async () => {
+    // A warm ad expires after ~1h. Without a TTL the stale flag is reused: the
+    // show consumes + records the slot, then the expired ad fails to render —
+    // burning a slot via the expiry door. The warm flag must age out.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      await act(async () => {
+        // ends 1-5: ad warmed during play (at end 3).
+        await drainInterstitial(() => result.current.showInterstitial(), 5);
+      });
+      vi.clearAllMocks();
+      // Idle past the TTL so the warm ad goes stale.
+      await act(async () => { await vi.advanceTimersByTimeAsync(60 * 60 * 1000); });
+      await act(async () => {
+        const p = result.current.showInterstitial(); // end 6 — eligible
+        await flush();
+        // Assert BEFORE dismiss: the stale ad must be reloaded as part of the
+        // show pipeline. (Without a TTL the stale flag is reused and prepare
+        // only fires later via the post-dismiss re-warm — so this discriminates
+        // the TTL behavior rather than the always-true re-warm.)
+        expect(AdMob.prepareInterstitial).toHaveBeenCalled();
+        expect(AdMob.showInterstitial).toHaveBeenCalledTimes(1);
+        fireEvent('interstitialAdDismissed');
+        await p;
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('showInterstitial caps confirmed shows at the session limit (4)', async () => {
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
