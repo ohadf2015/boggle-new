@@ -4,6 +4,57 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-06-02 (lane-03 engagement)
+
+### [Flags] Prior entries corrected — call sites ARE present
+
+- **`show-signup-after-first-win`** (prior entries 05-26, 05-28, 06-01 all said "no call sites found") — **CORRECTION**: call site exists at `fe-next/components/singleplayer/results/hooks/useSignupPrompt.ts:61` via `usePostHogFlag('show-signup-after-first-win', 'after-first-win')`. 63d old, 34 exposures last 30d (19 after-first-win / 15 after-third-game). Still inconclusive; decision needed.
+
+- **`share-prompt-timing`** (prior entries 05-26, 05-28 said "no call sites found") — **CORRECTION**: call site exists at `fe-next/components/singleplayer/SinglePlayerResults.tsx:173` via `usePostHogFlag('share-prompt-timing', 'results-page')` + `useSharePromptImpression.ts`. 63d old, 0 PostHog exposures last 30d = flag evaluates but SDK may not fire `$feature_flag_called` at the right moment. Recommend retire.
+
+### [Experiment] `exp-results-replay-cta-v1` — activated in PostHog
+
+- **PostHog flag id 197044** created 2026-06-02 — 50/50 split `control` vs `quick-replay`
+- Code was already fully wired in `SinglePlayerResults.tsx:183-352` (`useExperiment` + conditional CTA button + `results_cta_clicked {cta: 'quick_replay'}` tracking)
+- Experiment is now LIVE. Measure: `results_cta_clicked {cta: 'quick_replay'}` → `game_started` within 10min per person.
+
+---
+
+## 2026-06-02
+
+- [Sentry] TypeError: Cannot read properties of null (reading 'x') — JAVASCRIPT-NEXTJS-13Y
+  - first seen: 2026-05-06, last seen: 2026-05-06, count: 500, userCount: 1
+  - link: https://lexiclash.sentry.io/issues/118046477/
+  - status: deferred
+  - why: minified Pixi rAF stack in /he/blast; last seen 4 weeks ago, pre-dates MP Blast sync fixes (05-30). 1 user. Likely self-resolved. Unactionable without source map — needs source map upload to Sentry or local repro.
+  - recommended owner: review-by-eod (resolve in Sentry if no recurrence after 05-30 fixes)
+
+- [Sentry] Error: relation "profiles" does not exist — JAVASCRIPT-NEXTJS-1JR
+  - first seen: 2026-05-27, last seen: 2026-05-27, count: 18, userCount: 5
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred (already fixed — migration 20260527230753 per prior memory)
+  - why: DB-layer fix already shipped same day. Sentry issue stale. Resolve in UI.
+  - recommended owner: review-by-eod (mark resolved in Sentry)
+
+- [Sentry] [CoinContext] Failed to add coins — JAVASCRIPT-NEXTJS-1JP
+  - first seen: 2026-05-27, last seen: 2026-05-27, count: 6, userCount: 5
+  - link: https://lexiclash.sentry.io/issues/123033015/
+  - status: deferred (downstream of 1JR — profiles table missing caused coin transaction failure)
+  - why: Same incident as 1JR. Already fixed. Resolve in UI.
+  - recommended owner: review-by-eod (mark resolved in Sentry alongside 1JR)
+
+- [Supabase] Authenticated SECURITY DEFINER: upsert_push_token
+  - status: deferred (intentional design)
+  - why: function body uses auth.uid() and must UPDATE other users' tokens WHERE user_id != auth.uid() — requires elevated privileges. Only authenticated role has execute (no anon). Design is correct.
+  - recommended owner: self (no action needed)
+
+- [Supabase] RLS always-true INSERT on web_vitals
+  - status: deferred (intentional design)
+  - why: Telemetry collection. Any user (anon+auth) should be able to submit web vitals. Open INSERT is by design; SELECT is admin-only. No narrowing possible without breaking collection.
+  - recommended owner: self (no action needed)
+
+---
+
 ## 2026-06-01
 
 ### [Flags] Stalled A/B experiments — human decision needed
