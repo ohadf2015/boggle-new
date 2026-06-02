@@ -23,6 +23,12 @@ vi.mock('@capacitor-community/admob', () => ({
   BannerAdPosition: {},
 }));
 
+// --- Telemetry mock --------------------------------------------------------
+const trackRewardedLifecycle = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackRewardedLifecycle: (...args: unknown[]) => trackRewardedLifecycle(...args),
+}));
+
 // --- Context mock ----------------------------------------------------------
 vi.mock('@/contexts/AdMobContext', () => ({
   useAdMobContext: () => ({
@@ -45,7 +51,10 @@ describe('useAdMob.showRewarded — prepare-phase stall guard', () => {
     prepareRewardVideoAd.mockReset();
     showRewardVideoAd.mockReset();
     addListener.mockClear();
+    trackRewardedLifecycle.mockClear();
   });
+
+  const stages = () => trackRewardedLifecycle.mock.calls.map((c) => c[0]);
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -128,5 +137,37 @@ describe('useAdMob.showRewarded — prepare-phase stall guard', () => {
     expect(showRewardVideoAd).toHaveBeenCalledTimes(1);
     // no premature error from the prepare-timeout path
     expect(onError).not.toHaveBeenCalled();
+  });
+
+  it('breadcrumbs the lifecycle stages (surface-tagged) for the stuck-ad diagnosis', async () => {
+    prepareRewardVideoAd.mockResolvedValue(undefined);
+    showRewardVideoAd.mockResolvedValue(undefined);
+
+    const { result } = renderHook(() => useAdMob());
+    result.current.showRewarded(vi.fn(), vi.fn(), { surface: 'timeLow' });
+
+    for (let i = 0; i < 6; i++) await flush();
+
+    expect(stages()).toEqual(
+      expect.arrayContaining(['prepare_start', 'prepare_resolved', 'show_called', 'show_resolved']),
+    );
+    // every breadcrumb carries the surface so PostHog can segment stalls
+    expect(trackRewardedLifecycle).toHaveBeenCalledWith('show_called', 'timeLow');
+  });
+
+  it('records safety_timeout when the show phase hangs with no event', async () => {
+    prepareRewardVideoAd.mockResolvedValue(undefined);
+    showRewardVideoAd.mockReturnValue(new Promise<void>(() => {}));
+
+    const { result } = renderHook(() => useAdMob());
+    result.current.showRewarded(vi.fn(), vi.fn());
+
+    await flush();
+    await flush();
+    await flush();
+    await flush();
+    await vi.advanceTimersByTimeAsync(REWARD_SAFETY_TIMEOUT_MS + 10);
+
+    expect(stages()).toContain('safety_timeout');
   });
 });

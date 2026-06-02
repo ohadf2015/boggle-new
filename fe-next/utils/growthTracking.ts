@@ -44,6 +44,7 @@ export type GrowthEvent =
   | 'mode_selected'
   | 'results_viewed'
   | 'replay_countdown_shown'
+  | 'results_autoplay_cancelled'
   // MP signup-nudge session counter. Distinct from `game_completed` so it never
   // pollutes the game-log lifecycle query (see useMultiplayerSignupNudge).
   | 'mp_session_game'
@@ -106,6 +107,12 @@ export type GrowthEvent =
   | 'rewarded_ad_offered'
   | 'rewarded_ad_watched'
   | 'rewarded_ad_declined'
+  // Native rewarded-ad lifecycle breadcrumb. One event per stage transition in
+  // useAdMob.showRewarded, tagged { stage, surface }. Diagnoses the "ad won't
+  // close / no reward" report: production traffic shows whether sessions reach
+  // `rewarded`, then `dismissed` (X tapped, ad torn down), or stall at
+  // `safety_timeout` / never fire `dismissed`. NOT a funnel step.
+  | 'rewarded_ad_lifecycle'
   // Preference
   | 'language_changed'
   // Onboarding funnel
@@ -1064,6 +1071,32 @@ export const trackRewardedAdDeclined = (
   surface?: string,
 ): void => {
   trackGrowthEvent('rewarded_ad_declined', { reason, platform, surface });
+};
+
+/** Stages of the native rewarded-ad lifecycle (useAdMob.showRewarded). */
+export type RewardedLifecycleStage =
+  | 'prepare_start'
+  | 'prepare_resolved'
+  | 'show_called'
+  | 'show_resolved'
+  | 'rewarded'
+  | 'dismissed'
+  | 'failed_to_show'
+  | 'failed_to_load'
+  | 'prepare_timeout'
+  | 'safety_timeout';
+
+/**
+ * Breadcrumb one stage of the native rewarded-ad lifecycle. Fires on every
+ * transition so production traffic can pinpoint where a "stuck ad / no reward"
+ * session stalls — e.g. reaches `rewarded` but never `dismissed` (the X tap
+ * isn't tearing the ad down), or hits `safety_timeout` (nothing fired at all).
+ */
+export const trackRewardedLifecycle = (
+  stage: RewardedLifecycleStage,
+  surface: string,
+): void => {
+  trackGrowthEvent('rewarded_ad_lifecycle', { stage, surface });
 };
 
 /**

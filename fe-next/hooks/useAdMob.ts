@@ -3,6 +3,7 @@ import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, Interstiti
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 import { kickWebViewRepaint } from '@/lib/native/webviewRepaint';
+import { trackRewardedLifecycle } from '@/utils/growthTracking';
 
 // Module-level so every useAdMob() consumer observes the same banner state.
 // Prevents hideBanner calls when no banner was ever shown (Sentry #120).
@@ -69,17 +70,29 @@ export function useAdMob() {
 
     const pendingHandles = [
       AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
+        trackRewardedLifecycle('rewarded', surface);
         rewarded = true;
         finishRef(true);
       }),
       AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+        // Breadcrumb BEFORE the guard — when the player taps X, Dismissed
+        // should fire and tear the ad down. A `rewarded` with no following
+        // `dismissed` in telemetry = the close tap isn't reaching the SDK
+        // (native ad won't close — the reported symptom).
+        trackRewardedLifecycle('dismissed', surface);
         if (rewarded || settled) return;
         dismissGraceTimer = setTimeout(() => {
           if (!rewarded) finishRef(false);
         }, REWARD_GRACE_MS);
       }),
-      AdMob.addListener(RewardAdPluginEvents.FailedToShow, (e: { message?: string } | undefined) => finishRef(false, e?.message || 'Ad failed to show')),
-      AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (e: { message?: string } | undefined) => finishRef(false, e?.message || 'Ad failed to load')),
+      AdMob.addListener(RewardAdPluginEvents.FailedToShow, (e: { message?: string } | undefined) => {
+        trackRewardedLifecycle('failed_to_show', surface);
+        finishRef(false, e?.message || 'Ad failed to show');
+      }),
+      AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (e: { message?: string } | undefined) => {
+        trackRewardedLifecycle('failed_to_load', surface);
+        finishRef(false, e?.message || 'Ad failed to load');
+      }),
     ];
     // Await registration before we fire `prepareRewardVideoAd`, otherwise a fast plugin
     // could emit Rewarded before our listener is attached on the native side.
@@ -113,11 +126,16 @@ export function useAdMob() {
             // freezing the UI in status='showing' forever. Capping it here frees
             // the UI on a stalled init too.
             prepareTimer = setTimeout(
-              () => finishRef(false, 'Ad not ready — please try again'),
+              () => {
+                trackRewardedLifecycle('prepare_timeout', surface);
+                finishRef(false, 'Ad not ready — please try again');
+              },
               REWARD_PREPARE_TIMEOUT_MS,
             );
             await whenReady();
+            trackRewardedLifecycle('prepare_start', surface);
             await AdMob.prepareRewardVideoAd({ adId });
+            trackRewardedLifecycle('prepare_resolved', surface);
             // Bailed out (prepare timeout fired, or a Failed* event already
             // settled us). Do NOT show: the listeners are gone, so a shown ad
             // would grant no reward. Leave the prepared ad cached for retry.
@@ -133,10 +151,15 @@ export function useAdMob() {
             // and finishRef is idempotent so the watchdog is harmless if it
             // outlives a normal ad.
             safetyTimer = setTimeout(
-              () => finishRef(false, 'Ad timed out — please try again'),
+              () => {
+                trackRewardedLifecycle('safety_timeout', surface);
+                finishRef(false, 'Ad timed out — please try again');
+              },
               REWARD_SAFETY_TIMEOUT_MS,
             );
+            trackRewardedLifecycle('show_called', surface);
             await AdMob.showRewardVideoAd();
+            trackRewardedLifecycle('show_resolved', surface);
           } catch (err) {
             const msg = err instanceof Error ? err.message : 'Ad failed';
             finishRef(false, msg);
