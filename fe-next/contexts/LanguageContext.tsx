@@ -29,6 +29,13 @@ interface LanguageContextValue {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
+// Fallback flags used only until the active language's translation bundle
+// (which carries its own `flag`) finishes loading. Keyed by language so a
+// non-Hebrew user never briefly sees the Israeli flag as the default.
+const FLAG_BY_LANGUAGE: Record<string, string> = {
+    en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸',
+};
+
 const parseLocaleFromPath = (pathname: string): Language | null => {
     if (!pathname) return null;
     const segments = pathname.split('/');
@@ -150,7 +157,14 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
     useEffect(() => {
         mountedRef.current = true;
 
-        const urlLocale = pathname ? parseLocaleFromPath(pathname) : null;
+        // The server already resolved the locale (redirect → /[locale] → initialLanguage).
+        // Treat that as authoritative even if usePathname() is momentarily empty on the
+        // first client render. Without this, a falsy pathname dropped us into the
+        // browser-language branch below and flipped Hebrew-browser users to /he on a
+        // correct /en URL — the "everyone gets Hebrew" regression.
+        const urlLocale =
+            (initialLanguage && locales.includes(initialLanguage) ? initialLanguage : null)
+            ?? (pathname ? parseLocaleFromPath(pathname) : null);
         const savedLanguage = localStorage.getItem('boggle_language');
         const explicit = localStorage.getItem('boggle_language_explicit') === '1';
         const currentLang = languageRef.current;
@@ -354,7 +368,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         setLanguage,
         t,
         dir: (translationsRef.current?.direction as 'rtl' | 'ltr') || (language === 'he' ? 'rtl' : 'ltr'),
-        currentFlag: (translationsRef.current?.flag as string) || '🇮🇱'
+        currentFlag: (translationsRef.current?.flag as string) || FLAG_BY_LANGUAGE[language] || '🇺🇸'
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }), [language, setLanguage, t, translationsReady]);
 
