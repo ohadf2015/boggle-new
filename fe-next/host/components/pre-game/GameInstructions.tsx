@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
 import { Grid3X3, Zap, Crosshair, Disc3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+import { useAutoAdvanceStep } from '../../hooks/useAutoAdvanceStep';
+import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { Language } from '@/shared/types/game';
 
@@ -83,11 +85,19 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
 };
 
 export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpen = true, lang = 'en' }: GameInstructionsProps): React.ReactElement | null {
-  const [instructionStep, setInstructionStep] = useState(0);
-
-  useEffect(() => { setInstructionStep(0); }, [selectedGameMode]);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const reduceMotion = useShouldReduceMotion();
 
   const config = GAME_INSTRUCTIONS[selectedGameMode];
+  const stepCount = config?.steps.length ?? 0;
+  // Auto-advance slides; pause on hover/keyboard-focus, and disable for reduced-motion.
+  const [instructionStep, setInstructionStep] = useAutoAdvanceStep({
+    count: stepCount,
+    paused: hovered || focused || reduceMotion,
+    resetKey: selectedGameMode,
+  });
+
   if (!config) return null;
   const { icon, barClass, iconBgClass, dotClass, steps } = config;
   const step = steps[instructionStep] ?? steps[0];
@@ -98,6 +108,10 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 24 }}
       className="rounded-neo-lg border-3 border-neo-black bg-neo-navy-light shadow-hard overflow-hidden"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setFocused(false); }}
     >
       <div className={cn('h-1', barClass)} />
       <div className="w-full p-2.5 flex items-center gap-2">
@@ -144,7 +158,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
         </AnimatePresence>
         <div className="flex items-center justify-center gap-2 mt-3" role="group">
           <button
-            onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.max(0, s - 1)); }}
+            onClick={(e) => { e.stopPropagation(); setInstructionStep(Math.max(0, instructionStep - 1)); }}
             disabled={instructionStep === 0}
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             aria-label={t('common.previous')}
@@ -170,7 +184,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
             })}
           </div>
           <button
-            onClick={(e) => { e.stopPropagation(); setInstructionStep(s => Math.min(steps.length - 1, s + 1)); }}
+            onClick={(e) => { e.stopPropagation(); setInstructionStep(Math.min(steps.length - 1, instructionStep + 1)); }}
             disabled={instructionStep === steps.length - 1}
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             aria-label={t('common.next')}
