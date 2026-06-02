@@ -249,6 +249,13 @@ describe('useAdMob', () => {
     expect(onReward).not.toHaveBeenCalled();
   });
 
+  // Flush enough microtasks for the (now multi-await) show pipeline to reach
+  // AdMob.showInterstitial before we fire the terminal event. The pipeline is
+  // longer than before: whenReady → (maybe prepare) → consume → show.
+  const flush = async (n = 10): Promise<void> => {
+    for (let i = 0; i < n; i++) await Promise.resolve();
+  };
+
   // Drive showInterstitial through its event-gated promise: the call awaits
   // Dismissed (or FailedToShow/FailedToLoad). Fire Dismissed after each
   // attempt so the loop doesn't hang on the 15s safety timeout.
@@ -258,11 +265,12 @@ describe('useAdMob', () => {
   ): Promise<void> => {
     for (let i = 0; i < count; i++) {
       const p = fn();
-      // Two microtask flushes: one for listener registration, one for prepare/show.
-      await Promise.resolve();
-      await Promise.resolve();
+      await flush();
       fireEvent('interstitialAdDismissed');
       await p;
+      // Let the fire-and-forget re-warm (settle → prepareInterstitial) run so
+      // the next iteration sees a warm ad, mirroring real play.
+      await flush();
     }
   };
 
@@ -277,27 +285,92 @@ describe('useAdMob', () => {
     await act(async () => {
       await drainInterstitial(() => result.current.showInterstitial(), 1);
     });
-    expect(AdMob.prepareInterstitial).toHaveBeenCalled();
+    // Contract: an ad is shown on the eligible game. (The prepare may have
+    // happened ahead of time via preload — it's no longer pinned to show time.)
     expect(AdMob.showInterstitial).toHaveBeenCalled();
   });
 
-  it('showInterstitial stops calling prepare/show after session cap (4) reached', async () => {
+  it('eligible interstitial shows a preloaded ad with no cold load at show time', async () => {
+    // Revenue/stability: by show time the ad was already warmed during play, so
+    // the show is zero-latency and a show-time no-fill can't burn a session slot.
     const wrapper = makeWrapper(true);
     const { result } = renderHook(() => useAdMob(), { wrapper });
-    // Drive 4 successful interstitial cycles: warmup (3) + 4*(3 cycles) = 15 game-ends.
+    // ends 1-5: warmup ends at 3, ad warmed during play.
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
+    });
+    vi.clearAllMocks();
+    await act(async () => {
+      const p = result.current.showInterstitial(); // end 6 — eligible
+      await flush();
+      // Warm ad reused: shown immediately, NO prepare at show time (pre-dismiss).
+      expect(AdMob.showInterstitial).toHaveBeenCalledTimes(1);
+      expect(AdMob.prepareInterstitial).not.toHaveBeenCalled();
+      fireEvent('interstitialAdDismissed');
+      await p;
+    });
+  });
+
+  it('re-warms the next interstitial after a show is dismissed', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    await act(async () => {
+      await drainInterstitial(() => result.current.showInterstitial(), 5);
+    });
+    vi.clearAllMocks();
+    await act(async () => {
+      const p = result.current.showInterstitial(); // end 6 — eligible, consumes warm ad
+      await flush();
+      fireEvent('interstitialAdDismissed');
+      await p;
+      await flush(); // let fire-and-forget re-warm run
+    });
+    // The consumed slot is re-warmed so the next eligible interstitial is instant.
+    expect(AdMob.prepareInterstitial).toHaveBeenCalled();
+  });
+
+  it('no-fill interstitial does not show, still resolves, and preserves the slot', async () => {
+    // Preload (and cold-fallback) fail → we must NOT call show on an unprepared
+    // unit, must resolve so the MP host isn't blocked, and must NOT record a
+    // shown impression (which would silently burn one of 4 session slots).
+    vi.mocked(AdMob.prepareInterstitial).mockRejectedValue(new Error('no fill'));
+    try {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      let resolved = false;
+      await act(async () => {
+        await drainInterstitial(() => result.current.showInterstitial(), 5); // ends 1-5
+        const p = result.current
+          .showInterstitial()
+          .then(() => { resolved = true; }); // end 6 — eligible but no fill
+        await flush();
+        await p;
+      });
+      expect(resolved).toBe(true);
+      expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+    } finally {
+      vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined);
+    }
+  });
+
+  it('showInterstitial caps confirmed shows at the session limit (4)', async () => {
+    const wrapper = makeWrapper(true);
+    const { result } = renderHook(() => useAdMob(), { wrapper });
+    // warmup (3) + 4 eligible cycles every 3rd game = 15 game-ends.
     await act(async () => {
       await drainInterstitial(() => result.current.showInterstitial(), 15);
     });
-    expect(AdMob.prepareInterstitial).toHaveBeenCalledTimes(4);
+    // The cap bounds *shown impressions* (loads may be more due to preloading).
     expect(AdMob.showInterstitial).toHaveBeenCalledTimes(4);
 
-    // 5th eligible cycle (game-ends 16-18) — must be blocked by cap.
+    // 5th eligible cycle (game-ends 16-18) — must be blocked by cap: no show,
+    // and no wasteful preload of an ad the cap forbids.
     vi.clearAllMocks();
     await act(async () => {
       await drainInterstitial(() => result.current.showInterstitial(), 3);
     });
-    expect(AdMob.prepareInterstitial).not.toHaveBeenCalled();
     expect(AdMob.showInterstitial).not.toHaveBeenCalled();
+    expect(AdMob.prepareInterstitial).not.toHaveBeenCalled();
   });
 
   it('showInterstitial resolves on Dismissed event (gates next-round emits)', async () => {

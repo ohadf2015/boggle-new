@@ -12,6 +12,17 @@ interface AdMobContextValue {
   hasNoAds: () => boolean;
   getConfig: () => AdmobConfig | null;
   whenReady: () => Promise<void>;
+  /**
+   * Warm the next interstitial so `showInterstitial` is zero-latency.
+   * Idempotent, dedupes concurrent loads, and is a no-op when ads are
+   * unavailable, the session cap is reached, or we're still in warmup.
+   * AdMob interstitials expire (~1h); callers re-warm after each show.
+   */
+  prepareInterstitial: () => Promise<void>;
+  /** True when a preloaded interstitial is ready to show without a cold load. */
+  isInterstitialReady: () => boolean;
+  /** Mark the warm interstitial consumed (call right before showing it). */
+  consumeInterstitial: () => void;
 }
 
 // Defensive cap. Prevents new interstitial trigger sites (mission-claim, streak-save, etc.)
@@ -32,6 +43,10 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   const totalGameEnds = useRef(0);
   const interstitialsShown = useRef(0);
   const initPromise = useRef<Promise<void> | null>(null);
+  // Interstitial preload state (app-scoped, resets per provider). A "warm" ad
+  // shows with zero latency; `inFlight` dedupes concurrent prepares.
+  const interstitialReady = useRef(false);
+  const interstitialInFlight = useRef<Promise<void> | null>(null);
 
   if (initPromise.current === null) {
     // EU/GDPR: gather UMP consent BEFORE initialize. The plugin itself geo-gates
@@ -99,8 +114,48 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     return getAdmobConfig(platform);
   }
 
+  // Whether it's worth holding a warm interstitial right now: ads on, under the
+  // session cap, and past warmup (the first eligible interstitial is game 6, so
+  // warming at the warmup edge — game 3 — keeps that first one instant too).
+  function shouldPreloadInterstitial(): boolean {
+    if (hasNoAds()) return false;
+    if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
+    return totalGameEnds.current >= 3;
+  }
+
+  function isInterstitialReady(): boolean {
+    return interstitialReady.current;
+  }
+
+  function consumeInterstitial(): void {
+    interstitialReady.current = false;
+  }
+
+  function prepareInterstitial(): Promise<void> {
+    if (!shouldPreloadInterstitial()) return Promise.resolve();
+    if (interstitialReady.current) return Promise.resolve();
+    if (interstitialInFlight.current) return interstitialInFlight.current;
+    const config = getConfig();
+    if (!config) return Promise.resolve();
+    const p = (async () => {
+      try {
+        await whenReady();
+        await AdMob.prepareInterstitial({ adId: config.interstitialAdId });
+        interstitialReady.current = true;
+      } catch {
+        // No fill / load error — leave un-warmed; showInterstitial will retry
+        // a cold load and, failing that, skip showing without burning a slot.
+        interstitialReady.current = false;
+      } finally {
+        interstitialInFlight.current = null;
+      }
+    })();
+    interstitialInFlight.current = p;
+    return p;
+  }
+
   return (
-    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady }}>
+    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial, isInterstitialReady, consumeInterstitial }}>
       {children}
     </AdMobContext.Provider>
   );

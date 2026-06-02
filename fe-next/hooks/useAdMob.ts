@@ -47,7 +47,7 @@ export interface ShowBannerOptions {
 }
 
 export function useAdMob() {
-  const { recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady } = useAdMobContext();
+  const { recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial: prepareInterstitialAd, isInterstitialReady, consumeInterstitial } = useAdMobContext();
   const isDev = process.env.NODE_ENV !== 'production';
 
   const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void, opts?: ShowRewardedOptions) => {
@@ -203,12 +203,15 @@ export function useAdMob() {
   const INTERSTITIAL_SAFETY_TIMEOUT_MS = 15000;
   const showInterstitial = useCallback(async (): Promise<void> => {
     recordGameEnd();
-    if (!shouldShowInterstitial()) return;
+    if (!shouldShowInterstitial()) {
+      // Not eligible this game — keep an ad warm for the next eligible slot so
+      // the first/next interstitial shows with zero latency. No-op until warmup
+      // ends and while under the session cap (gated inside prepareInterstitial).
+      void prepareInterstitialAd();
+      return;
+    }
     const config = getConfig();
     if (!config) return;
-    // Record before show — gate uses this counter, recording after a thrown
-    // showInterstitial would let a broken plugin re-fire indefinitely.
-    recordInterstitialShown();
 
     const handles: Array<{ remove: () => void | Promise<void> }> = [];
     let settled = false;
@@ -227,6 +230,10 @@ export function useAdMob() {
         // "exit MP results → white screen in the app" report). Force a repaint.
         kickWebViewRepaint();
         resolve();
+        // Re-warm the next interstitial (mirrors the rewarded re-warm at line
+        // 192). Fire-and-forget; gated + deduped inside prepareInterstitial, so
+        // it's a no-op once the session cap is reached.
+        void prepareInterstitialAd();
       };
 
       // Register listeners BEFORE prepare so a fast plugin can't fire
@@ -250,14 +257,31 @@ export function useAdMob() {
       (async () => {
         try {
           await whenReady();
-          await AdMob.prepareInterstitial({ adId: config.interstitialAdId });
+          // Prefer the preloaded ad (zero latency). Cold-load only as a
+          // fallback when the warm slot is empty (preload not yet finished or
+          // a prior no-fill).
+          if (!isInterstitialReady()) {
+            await prepareInterstitialAd();
+          }
+          if (!isInterstitialReady()) {
+            // No fill — never call show on an unprepared unit (it would render
+            // nothing yet count an impression). Settle so awaiting callers (MP
+            // host) aren't blocked, and DON'T record a shown impression so the
+            // no-fill doesn't burn one of the 4 session slots.
+            settle();
+            return;
+          }
+          consumeInterstitial();
+          // Record only confirmed impressions. (Previously recorded before the
+          // show, when fill was unknown — a no-fill silently burned a slot.)
+          recordInterstitialShown();
           await AdMob.showInterstitial();
         } catch {
           settle();
         }
       })();
     });
-  }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady]);
+  }, [recordGameEnd, shouldShowInterstitial, recordInterstitialShown, getConfig, whenReady, prepareInterstitialAd, isInterstitialReady, consumeInterstitial]);
 
   const showBanner = useCallback(async (position = BannerAdPosition.BOTTOM_CENTER, margin?: number, opts?: ShowBannerOptions) => {
     if (hasNoAds()) return;
@@ -356,7 +380,7 @@ export function useAdMob() {
     }
   }, [getConfig, whenReady]);
 
-  return { showRewarded, prepareRewarded, showInterstitial, showBanner, hideBanner };
+  return { showRewarded, prepareRewarded, prepareInterstitial: prepareInterstitialAd, showInterstitial, showBanner, hideBanner };
 }
 
 export default useAdMob;
