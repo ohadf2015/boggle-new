@@ -20,11 +20,19 @@ let mockReturn: {
   status: string;
   canShowAd: boolean;
   _captured?: () => void | Promise<void>;
+  _started?: () => void;
+  _error?: (msg: string) => void;
 };
 
 vi.mock('@/hooks/useRewardedAd', () => ({
-  useRewardedAd: (opts: { onRewardEarned?: () => void | Promise<void> } = {}) => {
+  useRewardedAd: (opts: {
+    onRewardEarned?: () => void | Promise<void>;
+    onAdStarted?: () => void;
+    onAdError?: (msg: string) => void;
+  } = {}) => {
     mockReturn._captured = opts.onRewardEarned;
+    mockReturn._started = opts.onAdStarted;
+    mockReturn._error = opts.onAdError;
     return {
       status: mockReturn.status,
       canShowAd: mockReturn.canShowAd,
@@ -123,6 +131,50 @@ describe('TimeLowAdPrompt', () => {
       'time_low_extend',
       expect.any(Object),
     );
+  });
+
+  it('pauses the game clock (emits rewardAdActiveChange:true) when the ad starts', () => {
+    const events: boolean[] = [];
+    const listener = (e: Event) => events.push((e as CustomEvent<{ active: boolean }>).detail.active);
+    window.addEventListener('rewardAdActiveChange', listener);
+
+    render(
+      <TimeLowAdPrompt timeRemaining={6} threshold={10} bonusSeconds={30} onExtend={vi.fn()} />,
+    );
+    act(() => { mockReturn._started?.(); });
+    window.removeEventListener('rewardAdActiveChange', listener);
+
+    expect(events).toContain(true);
+  });
+
+  it('resumes the clock (emits rewardAdActiveChange:false) when the ad errors without reward', () => {
+    const events: boolean[] = [];
+    const listener = (e: Event) => events.push((e as CustomEvent<{ active: boolean }>).detail.active);
+    window.addEventListener('rewardAdActiveChange', listener);
+
+    render(
+      <TimeLowAdPrompt timeRemaining={6} threshold={10} bonusSeconds={30} onExtend={vi.fn()} />,
+    );
+    act(() => { mockReturn._started?.(); });
+    act(() => { mockReturn._error?.('Ad dismissed without reward'); });
+    window.removeEventListener('rewardAdActiveChange', listener);
+
+    expect(events[events.length - 1]).toBe(false);
+  });
+
+  it('resumes the clock (emits rewardAdActiveChange:false) on reward before extending', async () => {
+    const events: boolean[] = [];
+    const listener = (e: Event) => events.push((e as CustomEvent<{ active: boolean }>).detail.active);
+    window.addEventListener('rewardAdActiveChange', listener);
+
+    render(
+      <TimeLowAdPrompt timeRemaining={6} threshold={10} bonusSeconds={30} onExtend={vi.fn()} />,
+    );
+    act(() => { mockReturn._started?.(); });
+    await act(async () => { await mockReturn._captured?.(); });
+    window.removeEventListener('rewardAdActiveChange', listener);
+
+    expect(events[events.length - 1]).toBe(false);
   });
 
   it('invokes onExtend with bonusSeconds on reward and disappears afterward', async () => {
