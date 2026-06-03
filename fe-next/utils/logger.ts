@@ -35,7 +35,25 @@ class FrontendLogger {
    */
   warn(...args: unknown[]): void {
     if (isProduction) {
-      // Send to Sentry but don't show in console
+      // Send to Sentry but don't show in console.
+      // Like error(), a common pattern is `logger.warn('msg:', err)`. Capture
+      // the Error so its stack survives instead of becoming "{}".
+      const errorArg = args.find((arg): arg is Error => arg instanceof Error);
+
+      if (errorArg) {
+        Sentry.captureException(errorArg, {
+          level: 'warning',
+          contexts: {
+            warning_details: {
+              additional_args: args
+                .filter(arg => arg !== errorArg)
+                .map(arg => String(arg))
+            }
+          }
+        });
+        return;
+      }
+
       const message = args.map(arg =>
         typeof arg === 'string' ? arg : JSON.stringify(arg)
       ).join(' ');
@@ -60,15 +78,22 @@ class FrontendLogger {
    */
   error(...args: unknown[]): void {
     if (isProduction) {
-      // Send to Sentry but don't show in console
-      const firstArg = args[0];
+      // Send to Sentry but don't show in console.
+      // Scan ALL args for an Error — the dominant call pattern is
+      // `logger.error('some message:', err)`, where the Error is NOT the
+      // first argument. JSON.stringify-ing an Error yields "{}" (its fields
+      // are non-enumerable), so funnelling these through captureMessage
+      // silently drops the stack and real message. captureException keeps
+      // both and groups correctly.
+      const errorArg = args.find((arg): arg is Error => arg instanceof Error);
 
-      if (firstArg instanceof Error) {
-        // If it's an Error object, capture it properly
-        Sentry.captureException(firstArg, {
+      if (errorArg) {
+        Sentry.captureException(errorArg, {
           contexts: {
             error_details: {
-              additional_args: args.slice(1).map(arg => String(arg))
+              additional_args: args
+                .filter(arg => arg !== errorArg)
+                .map(arg => String(arg))
             }
           }
         });
