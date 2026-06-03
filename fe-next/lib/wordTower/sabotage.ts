@@ -51,3 +51,13 @@ export function canSabotage(tokens: number, rivalCount: number): boolean {
 export function sabotageFloorsFor(): number {
   return SABOTAGE_FLOORS_PER_HIT;
 }
+
+/** True when watching a reward ad would result in a new token (i.e. under cap). */
+export function canEarnViaAd(currentTokens: number): boolean {
+  return currentTokens < SABOTAGE_TOKEN_CAP;
+}
+
+/** Grant one token earned via a reward-ad watch. Same cap ceiling as streak earn. */
+export function awardSabotageTokenViaAd(currentTokens: number): number {
+  return Math.min(SABOTAGE_TOKEN_CAP, currentTokens + 1);
+}

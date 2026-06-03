@@ -33,6 +33,8 @@ import { perkMilestoneAt, reducedTopple, PERKS } from '@/lib/wordTower/perks';
 import { beatsDailyBest } from '@/lib/wordTower/dailyBest';
 import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
+import { SABOTAGE_TOKEN_CAP } from '@/lib/wordTower/sabotage';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
@@ -240,6 +242,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // floor off their ghost tower. Includes the receiver-side simulator
   // (?sim_sabotage=1) and the rail-display math.
   const { sab: sabotage, displayRivals } = useSabotageIntegration(crane.perfectStreak, rivals, tower.hazard);
+  const adForSabotage = useRewardedAd({
+    rewardKind: 'feature',
+    surface: 'generic',
+    analyticsSurface: 'sabotage_token',
+    onRewardEarned: () => { sabotage.earnTokenViaAd(); },
+  });
 
   // Environmental hazards strike at fixed altitudes → topple floors; firedHazards guards re-fire.
   const prevHazardH = useRef(game.heightM);
@@ -551,6 +559,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         onDismissHit={sabotage.dismissHit}
         earnedToast={sabotage.earnedToast}
         onDismissEarned={sabotage.dismissEarned}
+        onWatchAdForToken={adForSabotage.canShowAd && sabotage.tokens < SABOTAGE_TOKEN_CAP ? adForSabotage.showAd : undefined}
+        adLoading={adForSabotage.status === 'loading' || adForSabotage.status === 'showing'}
+        adEarnedToast={sabotage.adEarnedToast}
+        onDismissAdEarned={sabotage.dismissAdEarned}
         t={t}
         reducedMotion={reducedMotion}
       />

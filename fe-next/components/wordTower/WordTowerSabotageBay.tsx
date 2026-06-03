@@ -16,6 +16,11 @@ interface Props {
   onDismissHit: () => void;
   earnedToast: number | null;
   onDismissEarned: () => void;
+  /** Reward-ad path: defined when a watch-ad CTA is available. */
+  onWatchAdForToken?: () => void;
+  adLoading?: boolean;
+  adEarnedToast?: boolean;
+  onDismissAdEarned?: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   reducedMotion?: boolean;
 }
@@ -42,6 +47,10 @@ export function WordTowerSabotageBay({
   onDismissHit,
   earnedToast,
   onDismissEarned,
+  onWatchAdForToken,
+  adLoading,
+  adEarnedToast,
+  onDismissAdEarned,
   t,
   reducedMotion,
 }: Props) {
@@ -59,6 +68,13 @@ export function WordTowerSabotageBay({
     const id = setTimeout(onDismissHit, 2200);
     return () => clearTimeout(id);
   }, [lastHit, onDismissHit]);
+
+  // Auto-dismiss the ad-earn toast.
+  useEffect(() => {
+    if (!adEarnedToast) return;
+    const id = setTimeout(() => onDismissAdEarned?.(), 2600);
+    return () => clearTimeout(id);
+  }, [adEarnedToast, onDismissAdEarned]);
 
   const hasTokens = tokens > 0;
 
@@ -90,6 +106,44 @@ export function WordTowerSabotageBay({
           {tokens}
         </span>
       </button>
+
+      {/* Watch-Ad CTA — cyan secondary action, only when ad is available and
+          tokens are below cap. Sits just below the spend chip so it reads as
+          a recharge option, not a primary action. */}
+      {onWatchAdForToken && (
+        <button
+          type="button"
+          onClick={adLoading ? undefined : onWatchAdForToken}
+          disabled={adLoading}
+          aria-label={t('wordTower.sabotage.watchAd')}
+          className={cn(
+            'pointer-events-auto absolute start-3 bottom-[190px] z-40 flex items-center gap-1 rounded-neo border-neo border-black px-2 py-1 font-neo-display text-xs font-bold uppercase shadow-hard transition-transform',
+            adLoading
+              ? 'bg-neo-navy/60 text-neo-white/40'
+              : 'bg-neo-cyan text-black hover:scale-105 active:translate-y-px',
+            !adLoading && !reducedMotion && 'animate-neo-pop',
+          )}
+        >
+          <span aria-hidden>{adLoading ? '⏳' : '📺'}</span>
+          <span>{t('wordTower.sabotage.watchAd')}</span>
+        </button>
+      )}
+
+      {/* AD-EARN toast — token just granted via reward ad. */}
+      {adEarnedToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={cn(
+            'pointer-events-none absolute start-3 bottom-[240px] z-40 rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1.5 text-start shadow-hard',
+            !reducedMotion && 'animate-neo-pop',
+          )}
+        >
+          <div className="font-neo-display text-sm font-black text-black">
+            {t('wordTower.sabotage.adEarned')}
+          </div>
+        </div>
+      )}
 
       {/* EARN toast — a token just dropped in. Pops above the chip. */}
       {earnedToast != null && (

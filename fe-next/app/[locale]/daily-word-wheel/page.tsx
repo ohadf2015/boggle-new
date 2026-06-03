@@ -26,10 +26,10 @@ const KEYWORDS: Record<Locale, string> = {
 // Per-locale metadata fallbacks — kills cross-locale dup-title flagging when translation keys missing
 const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitle: string; ogDescription: string }> = {
   en: {
-    title: 'Daily Express Word Wheel Alternative — Free Daily Puzzle | LexiClash',
-    description: 'Daily Express Word Wheel alternative — spin the letter wheel and find every hidden word. Free, no signup, no download. New puzzle every day with global leaderboards.',
-    ogTitle: 'Daily Express Word Wheel — Free Puzzle',
-    ogDescription: 'Spin the daily word wheel and find all possible words. New puzzle every day — free, no download!',
+    title: 'Daily Express Word Wheel — Free Online Puzzle Today | LexiClash',
+    description: "Play today's Daily Express Word Wheel free — spin the letter wheel, find every hidden word. New puzzle every day, no signup, no download. Global leaderboards.",
+    ogTitle: 'Daily Express Word Wheel — Free Puzzle Today',
+    ogDescription: "Spin today's word wheel and find all hidden words. New puzzle every day — free, no download!",
   },
   he: {
     title: 'גלגל מילים יומי — פאזל מילים חינם אונליין | LexiClash',

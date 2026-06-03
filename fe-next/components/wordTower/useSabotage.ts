@@ -6,6 +6,7 @@ import type { HazardKind } from '@/lib/wordTower/hazards';
 import {
   SABOTAGE_PERFECT_THRESHOLD,
   awardSabotageToken,
+  awardSabotageTokenViaAd,
   canSabotage,
   sabotageFloorsFor,
   spendSabotageToken,
@@ -40,6 +41,7 @@ export function useSabotage(perfectStreak: number) {
   /** rivalId → floors-dropped, used to render the local ghost tower shrunk. */
   const [hitsByRival, setHitsByRival] = useState<Record<string, number>>({});
   const [earnedToast, setEarnedToast] = useState<number | null>(null);
+  const [adEarnedToast, setAdEarnedToast] = useState(false);
   const lastEarnedRef = useRef(0);
 
   // Token earn driven by the perfect-streak; idempotent.
@@ -57,6 +59,11 @@ export function useSabotage(perfectStreak: number) {
   }, [perfectStreak]);
 
   const dismissEarned = useCallback(() => setEarnedToast(null), []);
+  const dismissAdEarned = useCallback(() => setAdEarnedToast(false), []);
+  const earnTokenViaAd = useCallback(() => {
+    setTokens((t) => awardSabotageTokenViaAd(t));
+    setAdEarnedToast(true);
+  }, []);
   const openPicker = useCallback(() => setPickerOpen(true), []);
   const closePicker = useCallback(() => setPickerOpen(false), []);
   const dismissHit = useCallback(() => setLastHit(null), []);
@@ -91,6 +98,9 @@ export function useSabotage(perfectStreak: number) {
     hitsByRival,
     earnedToast,
     dismissEarned,
+    adEarnedToast,
+    dismissAdEarned,
+    earnTokenViaAd,
     canSabotageNow: (rivalCount: number) => canSabotage(tokens, rivalCount),
     /** Public for tests: how many perfects until the next token. */
     perfectsPerToken: SABOTAGE_PERFECT_THRESHOLD,

@@ -15,8 +15,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/en/words-with-friends-alternative`;
 
   return {
-    title: 'Words With Friends Alternative — Free Multiplayer Word Game | LexiClash',
-    description: 'The free Words With Friends alternative everyone can play together. Real-time multiplayer for 2-20+ friends in your browser. 8 game modes, no download, no signup, no pay-to-win. Play in 30 seconds.',
+    title: 'Words With Friends Free Online — Real-Time Multiplayer | LexiClash',
+    description: 'Free online word game with friends — real-time multiplayer for 2-20+ players, not turn-based. No download, no signup. 8 game modes, start in 30 seconds.',
     keywords: 'words with friends multiplayer free online, words with friends alternative, free word game with friends online, online multiplayer word games like words with friends, word games multiplayer free, word battle online free, word game like words with friends, online word games with friends free, web word games with friends, spell game with friends online, free multiplayer word games',
     openGraph: {
       title: 'Words With Friends Alternative — Real-Time Multiplayer | LexiClash',

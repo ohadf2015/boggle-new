@@ -7,6 +7,8 @@ import {
   canSabotage,
   sabotageFloorsFor,
   SABOTAGE_FLOORS_PER_HIT,
+  canEarnViaAd,
+  awardSabotageTokenViaAd,
 } from '../sabotage';
 
 describe('awardSabotageToken — perfect-streak earn rule', () => {
@@ -51,5 +53,31 @@ describe('sabotageFloorsFor — anti-grief cap', () => {
   it('always returns SABOTAGE_FLOORS_PER_HIT (currently 1)', () => {
     expect(sabotageFloorsFor()).toBe(SABOTAGE_FLOORS_PER_HIT);
     expect(SABOTAGE_FLOORS_PER_HIT).toBe(1); // anti-grief: cap at one floor
+  });
+});
+
+describe('canEarnViaAd', () => {
+  it('true when tokens below cap', () => {
+    expect(canEarnViaAd(0)).toBe(true);
+    expect(canEarnViaAd(SABOTAGE_TOKEN_CAP - 1)).toBe(true);
+  });
+
+  it('false at or above cap', () => {
+    expect(canEarnViaAd(SABOTAGE_TOKEN_CAP)).toBe(false);
+  });
+});
+
+describe('awardSabotageTokenViaAd', () => {
+  it('grants exactly 1 token from zero', () => {
+    expect(awardSabotageTokenViaAd(0)).toBe(1);
+  });
+
+  it('increments by 1 when below cap', () => {
+    expect(awardSabotageTokenViaAd(1)).toBe(2);
+  });
+
+  it('clamps at cap — no over-grant', () => {
+    expect(awardSabotageTokenViaAd(SABOTAGE_TOKEN_CAP)).toBe(SABOTAGE_TOKEN_CAP);
+    expect(awardSabotageTokenViaAd(SABOTAGE_TOKEN_CAP - 1)).toBe(SABOTAGE_TOKEN_CAP);
   });
 });

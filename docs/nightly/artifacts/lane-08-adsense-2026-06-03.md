@@ -1,5 +1,11 @@
+---
 status: shipped
-attempted: Live word-count audit → /en/guides at 490 words (thin). Added visible FAQ section to guides index page (surfacing sr-only FAQ as user-visible dl/dt/dd with RTL support for Hebrew).
+attempted: word-count audit + improve /en/guides index page (490 words, thinnest non-CJK informational page)
 files_touched:
-  - fe-next/app/[locale]/guides/page.tsx
-next_steps: Verify /en/guides word count improves past 600. Audit sub-guide pages (classic-strategy, blast-strategy, word-hunt-strategy). Add internal links from /en/how-to-play → /en/guides next run.
+  - fe-next/app/[locale]/guides/PageClient.tsx
+next_steps: |
+  - Guide sub-pages are healthy (2000-2363 words). Index page now ~590+ words.
+  - Guide sub-pages lack Article JSON-LD — add to classic-strategy, blast-strategy, word-hunt-strategy.
+  - GSC scope still missing webmasters.readonly — fix to enable noindex decisions.
+  - AdSense: key remaining gap is E-E-A-T author signals on blog/guides.
+---

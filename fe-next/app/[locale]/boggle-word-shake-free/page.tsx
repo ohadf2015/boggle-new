@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Boggle WordShake Free Online — Play Boggle Shake | LexiClash',
-    description: 'Play Boggle WordShake free online — shake the letter grid, find words, score combos. Free boggle shake game, no download, no signup. Solo or multiplayer with 2-20 friends.',
+    description: 'Shake the letter grid, find hidden words, score combos. Play Boggle Word Shake free — instant browser play, no download, no signup. Solo or challenge 2–20 friends live.',
     keywords: 'boggle wordshake, boggle shake, boggle shake free, wordshake boggle, play boggle shake online, free boggle online no download, boggle word shake free no download, boggle word shake online, word shake game free, boggle shake free online, word scramble game free no download, boggle word game free, word shake multiplayer',
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {

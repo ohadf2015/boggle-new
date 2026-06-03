@@ -310,3 +310,24 @@ Items deferred from automated nightly triage. Human review required.
   - status: already fixed — SharedFxApp.ts generation+live guards (comments cite these Sentry IDs)
 - [Sentry] 1JR/1JP (profiles/coins)
   - status: already fixed — mig 20260527230753 (per memory)
+
+## 2026-06-03 (Lane 01)
+- [Supabase security] upsert_push_token — SECURITY DEFINER callable by `authenticated`
+  - function: public.upsert_push_token(p_token, p_platform, p_device_id)
+  - status: deferred — intentional by design
+  - why: function body does cross-user token deactivation (`user_id != auth.uid()`) which REQUIRES SECURITY DEFINER to bypass RLS. `anon` is already excluded from ACL (proacl only has postgres/authenticated/service_role). Switching to SECURITY INVOKER would silently break token rotation for users who switch accounts on the same device.
+  - recommended owner: review-by-eod — confirm cross-user UPDATE is desired scope or refactor to service-role server call
+- [Supabase security] web_vitals RLS INSERT always true — policy "Anyone can insert web vitals"
+  - table: public.web_vitals
+  - status: deferred — intentional by design
+  - why: policy name explicitly states intent (anonymous telemetry collection). Restricting would break CWV metric ingestion from unauthenticated users. Low-harm table (write-only telemetry, no PII).
+  - recommended owner: self — accept as intentional or add row-level rate limit if spam becomes concern
+- [Sentry] 14R — game_sessions check_player_id constraint violation
+  - first/last seen: 2026-05-12 (3 weeks ago), 56 occurrences, 0 users
+  - status: deferred — likely self-resolved post Blast per-player board redesign (2026-05-31)
+  - why: call path was endGame → recordGameResultsToSupabase → processPlayerResult → logGameSession; the redesign reworked this entire path. If constraint violations resume after 2026-05-31 release, root cause = bot/guest player_id bypassing UUID check_player_id constraint.
+  - recommended owner: backend — monitor post next MP session; add null/UUID guard in logGameSession if recurs
+- [Sentry] 1JR/1JP — profiles + CoinContext (re-confirm stale)
+  - status: previously documented as fixed (mig 20260527230753 per prior triage)
+  - last seen: 2026-05-27 — no recurrence in 7 days, profiles table verified EXISTS
+  - recommended owner: self — auto-close if no recurrence by 2026-06-10
