@@ -1,62 +1,64 @@
 {
-  "date": "2026-06-02",
-  "note": "Eighth snapshot. No code changes shipped this run — only baseline update. Backend: WAL parser still #1 at 82.81% DB CPU (infrastructure, not app-fixable). word_review_state 0 rows → FK index still speculative, skipped. Frontend: only /en/multiplayer had enough PostHog samples (n=16). CLS 0.512 is a candidate fix but root cause (SSR→hydration height shift vs AdMob vs other) requires visual verification before safe change.",
+  "date": "2026-06-03",
+  "note": "Ninth snapshot. No code changes shipped — new routes now measured (homepage, free-multiplayer landing, blast). Key findings: /en homepage LCP 7107ms (first measurement, n=12, catastrophic — needs dedicated investigation); /en/free-multiplayer-word-game CLS 1.0 (GSAP ScrollTrigger pin likely cause — deferred to perf-watch.md); /en/multiplayer LCP regressed 3010→3616ms (+20%). Backend stable — WAL parser steady growth (+149K ms total vs prior). friend_messages at 97K calls is organic DM usage (0.163ms mean, indexed). Founder directive (tower daily letters) = feature lane, not perf.",
   "backend": {
     "top_queries": [
       {
         "label": "supabase_realtime_wal_parser",
-        "query_preview": "SELECT wal->>$5 as type, wal->>$6 as schema, wal->>$7 as table ...",
-        "calls": 740798,
+        "query_preview": "SELECT wal->>$5 as type, wal->>$6 as schema ...",
+        "calls": 775433,
         "mean_ms": 4.29,
-        "total_ms": 3178988,
-        "verdict": "INFRASTRUCTURE: empty publication, WAL parser runs for broadcast/presence. Elevated from 3.08M to 3.18M total_ms vs prior baseline. Deferred to Supabase support. See perf-watch.md."
+        "total_ms": 3328006,
+        "verdict": "INFRASTRUCTURE: up 149K ms vs prior baseline (3178988→3328006). Steady growth. Still deferred to Supabase support."
       },
       {
         "label": "sync_coins_rpc",
         "calls": 18761,
         "mean_ms": 7.30,
         "total_ms": 136907,
-        "verdict": "WATCH: Stable vs prior baseline. Endpoint may be idle."
+        "verdict": "STABLE: identical to prior baseline."
       },
       {
         "label": "profiles_update_last_seen_at",
-        "calls": 24451,
-        "mean_ms": 2.20,
-        "total_ms": 53888,
+        "calls": 24846,
+        "mean_ms": 2.19,
+        "total_ms": 54322,
         "verdict": "ok"
       },
       {
         "label": "pg_timezone_names_select",
-        "query_preview": "SELECT name FROM pg_timezone_names",
-        "calls": 146,
-        "mean_ms": 344,
-        "total_ms": 50258,
-        "verdict": "WATCH: 344ms mean — Supabase Studio introspection, not app traffic. Not actionable from app code."
+        "calls": 158,
+        "mean_ms": 331,
+        "total_ms": 52437,
+        "verdict": "WATCH: 331ms mean — Studio introspection, not app traffic. Slightly improved from 344ms."
       },
       {
-        "label": "pgrst_search_path_set",
-        "calls": 705376,
-        "mean_ms": 0.05,
-        "total_ms": 36096,
-        "verdict": "ok"
+        "label": "friend_messages_dm_thread",
+        "query_preview": "SELECT message, created_at, sender_id FROM friend_messages WHERE (sender_id=$1 AND recipient_id=$2) OR ...",
+        "calls": 97624,
+        "mean_ms": 0.163,
+        "total_ms": 15941,
+        "verdict": "NEW ENTRY: 97K DM fetches at 0.163ms = properly indexed. Organic DM usage. Monitor call volume trend."
+      },
+      {
+        "label": "web_vitals_insert",
+        "calls": 23820,
+        "mean_ms": 0.66,
+        "total_ms": 15683,
+        "verdict": "ok — our own telemetry collector."
       }
     ],
-    "advisor_warnings_count": 2,
+    "advisor_warnings_count": "10+",
     "advisor_warnings": [
       {
-        "id": "auth_db_connections_absolute",
-        "description": "Auth server configured to use at most 10 connections (not percentage-based). Dashboard config only — not SQL-fixable.",
-        "status": "deferred"
-      },
-      {
         "id": "unindexed_foreign_keys",
-        "description": "word_review_state.lesson_id FK has no covering index. Table has 0 rows — speculative per hard rules.",
-        "status": "skipped_zero_rows"
+        "description": "Multiple unindexed FKs on lower-traffic tables (analytics_events, assignment_completions, async_board_challenges, etc). No high-traffic table FKs flagged this run.",
+        "status": "low_priority — none on top-10 query tables"
       }
     ]
   },
   "frontend": {
-    "note": "Only /en/multiplayer had n>10 in last 24h PostHog data. Low-traffic baseline — treat as indicative not authoritative.",
+    "note": "Using own web_vitals table (more samples than PostHog for low-traffic routes). All data from last 24h.",
     "thresholds": {
       "lcp_poor_ms": 4000,
       "lcp_needs_improvement_ms": 2500,
@@ -65,23 +67,90 @@
     },
     "by_route_24h": [
       {
+        "route": "/en",
+        "p75_lcp": 7107,
+        "n_lcp": 12,
+        "p75_cls": 0.170,
+        "n_cls": 11,
+        "flags": ["LCP_CATASTROPHIC"],
+        "delta_vs_prior": "NEW — not measured before",
+        "notes": "Homepage LCP 7107ms at n=12 is statistically meaningful and catastrophic. LandingHero mascot GIF has priority set. Likely LCP element = something else above fold (leaderboard avatars? large text block?). Needs Chrome DevTools LCP attribution. Deferred to perf-watch.md."
+      },
+      {
+        "route": "/he",
+        "p75_lcp": 5337,
+        "n_lcp": 12,
+        "flags": ["LCP_CATASTROPHIC"],
+        "delta_vs_prior": "NEW — not measured before",
+        "notes": "Same homepage, Hebrew locale. Slightly better than /en (RTL users may be on different devices/network)."
+      },
+      {
+        "route": "/en/free-multiplayer-word-game",
+        "p75_lcp": 1000,
+        "p75_cls": 1.0,
+        "p75_inp": 52,
+        "n": 7,
+        "flags": ["CLS_CATASTROPHIC"],
+        "delta_vs_prior": "NEW — not measured before",
+        "notes": "CLS=1.0 catastrophic. Showcase3D page: GSAP ScrollTrigger pin creates pin-spacer div height after paint. Canvas is absolute-positioned so canvas.width/height changes are not the CLS cause. Fix = reserve pin-spacer height before GSAP initializes (complex, needs visual verification). Deferred to perf-watch.md."
+      },
+      {
+        "route": "/he/daily/word-hunt",
+        "p75_lcp": 3918,
+        "n_lcp": 7,
+        "p75_cls": 0.237,
+        "n_cls": 7,
+        "flags": ["LCP_NEEDS_IMPROVEMENT", "CLS_POOR"],
+        "delta_vs_prior": "open watch from prior run",
+        "notes": "Consistent with prior watch. LCP and CLS both poor. Daily mode — likely heavy above-fold content."
+      },
+      {
+        "route": "/he/daily",
+        "p75_lcp": 3777,
+        "n_lcp": 8,
+        "p75_cls": 0.143,
+        "n_cls": 7,
+        "flags": ["LCP_NEEDS_IMPROVEMENT"],
+        "delta_vs_prior": "NEW — not measured before"
+      },
+      {
+        "route": "/es/multiplayer",
+        "p75_lcp": 3751,
+        "p75_inp": 536,
+        "p75_cls": 0.120,
+        "n": 8,
+        "flags": ["LCP_NEEDS_IMPROVEMENT", "INP_POOR"],
+        "delta_vs_prior": "NEW — not measured before (PostHog showed 4557ms, DB web_vitals shows 3751ms — different populations)",
+        "notes": "ES multiplayer tracking independently from EN now. Same code, likely similar root cause."
+      },
+      {
         "route": "/en/multiplayer",
-        "p75_lcp": 3010,
-        "p75_inp": 528,
-        "p75_cls": 0.5117,
-        "n": 16,
+        "p75_lcp": 3616,
+        "p75_inp": 488,
+        "p75_cls": 0.113,
+        "n": 10,
         "flags": ["LCP_NEEDS_IMPROVEMENT", "INP_POOR", "CLS_POOR"],
         "delta_vs_prior": {
-          "lcp": -377,
-          "inp": -56,
-          "cls": "unknown_prior_null"
+          "lcp": "+606ms vs prior 3010 (REGRESSION +20%)",
+          "inp": "-40ms vs prior 528 (improved)",
+          "cls": "+0.113 vs prior 0.512 (improved — note: DB vs PostHog populations differ)"
         },
-        "notes": "LCP improved 377ms vs prior baseline brief (3387→3010). INP improved 56ms (584→528). CLS 0.512 = HIGH. Root cause unclear: candidates are (1) PageClient SSR skeleton height ≠ hydrated lobby height pushing GamePageSeoContent down, (2) AdMob banner appear/disappear on web (unlikely — web has no AdMob), (3) dynamic connection-status banners. Needs visual verification before fixing. See perf-watch.md."
+        "notes": "LCP regressed 20% vs prior baseline. INP improved. CLS appears improved (may be population difference). LCP regression cause unknown — no deployment in last 24h evident from git log."
+      },
+      {
+        "route": "/en/blast",
+        "p75_lcp": 410,
+        "p75_inp": null,
+        "p75_cls": 0.008,
+        "n": 8,
+        "flags": [],
+        "delta_vs_prior": "NEW — not measured before",
+        "notes": "Blast is fast — LCP 410ms excellent. Game canvas loaded efficiently."
       }
     ]
   },
   "bundle": {
-    "note": "Build artifacts not present in local checkout (.next/ exists but du returned empty). Bundle delta skipped this run.",
+    "note": "Build artifacts not present in local checkout. Bundle delta skipped again.",
     "top_chunks": []
   }
 }

@@ -178,3 +178,22 @@ PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Re
 **Route:** `/he/daily/word-wheel`  
 **Metric:** p75 LCP 1399ms (2026-05-27, n=11) → 2568ms (2026-06-01, n=10)  
 **Note:** +83% but low n. May be different user mix. Watch for 3 nights before acting.
+
+## 2026-06-03 additions
+
+### /en homepage LCP 7107ms (n=12, CATASTROPHIC — new first measurement)
+- LandingHero mascot GIF has `priority` set, so not the LCP element
+- Likely candidate: leaderboard sidebar avatars without `priority`, or large text block
+- Action needed: Chrome DevTools LCP attribution to identify element
+- Owner: human — needs visual verification
+
+### /en/free-multiplayer-word-game CLS 1.0 (n=7, CATASTROPHIC — new first measurement)
+- Showcase3D page: GSAP ScrollTrigger `pin: true` creates a `.pin-spacer` div whose height is computed after first paint → layout shift
+- Canvas is `position: absolute` — canvas.width/height JS assignments are NOT the CLS cause
+- Fix direction: pre-reserve section height matching `h-[100svh]` before GSAP init, or use `anticipatePin: 1` ScrollTrigger option
+- Owner: human — needs visual + GSAP testing before change
+
+### /en/multiplayer LCP regression 3010→3616ms (+20%)
+- No deployment in last 24h explains this — likely traffic/sample variation
+- INP improved (528→488ms). CLS improved.
+- Watch next 2 nights to confirm regression vs noise.

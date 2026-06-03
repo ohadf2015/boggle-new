@@ -2,82 +2,87 @@
 
 Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All lane prompts inject this file as preamble.
 
-> **Sample (2026-06-02):** 7 report nights in window (05-27..06-02; 05-31 = run log only, no formal report). Code ship rate: 3/6 completed nights (50%). **Two distinct failure modes emerged:** (1) timeouts kill lanes mid-edit → half-written files poison gate (4/7 nights), (2) all lanes complete but authored code breaks tests/build → gate rejects (06-01 evening, all 9 lanes finished <10min each, gate failed 3 rounds). Solving timeouts alone won't reach 100% — lanes must self-verify. Per-lane 7-night completion: 07=7/7 (100%); 04=7/7 (100%); 08=6/7 (86%); 03=4/7 (57%); 06=4/7 (57%); 01=3/7 (43%); 02=3/7 (43%); 05=2/7 (29%).
+> **Sample (2026-06-03):** 6 report nights in window (05-28..06-03). Gate pass rate: 1/6 (17%) — only 05-28 passed cleanly; others docs-only salvage. **Two failure modes persist:** (1) timeouts kill lanes mid-edit (4/6 nights), (2) gate rejects authored code on quality (3/6 nights). The evening run (06-01 19:05) proved all 9 lanes CAN complete in <7min each when scoped — total 53min vs typical 2-4h. Per-lane 6-night completion: 07=6/6 (100%); 04=6/6 (100%); 03=4/6 (67%); 02=3/6 (50%); 08=3/6 (50%); 06=3/6 (50%); 01=2/6 (33%); 05=1/6 (17%); 09=0/2 (0%, new lane).
 
-## Active watches (2026-06-02)
-- **NEW failure mode: gate rejects clean-timed lanes.** 06-01 evening: all 9 lanes completed, gate failed 3 rounds (lint+test+build). Timeouts are #1 by frequency (4/7 nights), but code-quality gate failure is #2 and UNSOLVED. Each lane should run `npx tsc --noEmit` on changed files before finishing.
-- **`/en/multiplayer` CWV improving but still poor** — LCP 3010ms (was 8448ms), INP 528ms (was 584ms), CLS 0.512. Trending right direction but CLS needs SSR skeleton. Status: improving.
-- **Phase 0 intel sources** — sentry/supabase/posthog/revenue/railway healthy; **search collector dead 8+ nights** (0 signals — retire it).
-- **Gate pass rate: 3/6 = 50%.** Half of completed nights fail to ship code. Flip this by addressing both failure modes.
-- **KEEP_TIMEOUT_PARTIALS = stable** — 6th night, zero gate poisoning from partials specifically.
+## Active watches (2026-06-03)
+- **Homepage LCP 7107ms — catastrophic NEW regression.** First appeared 06-03. Likely ScrollTrigger/showcase3D hero. CLS 1.0 on same page. Highest-priority perf fix.
+- **Gate pass rate: 1/6 = 17%.** Down from 50% last window. Timeout + code-quality double failure. Every lane MUST self-verify (`npx tsc --noEmit` on changed files).
+- **Phase 0 intel sources** — sentry/supabase/posthog/revenue/railway healthy; **search collector dead 9+ nights** (retire it).
+- **KEEP_TIMEOUT_PARTIALS = stable** — 7th night, zero gate poisoning from partials.
+- **Founder directive: Word Tower daily letter pool** — `dailyLetterPool.ts` + 14 TDD tests SHIPPED 06-03 (module only, wiring deferred). Ad-refill integration next.
 
 ## What works (validated this week)
-- **Phase 0 intel brief + scoped MCP** — 06-01 evening: 9/9 lanes completed (0 timeouts). 05-31 run also succeeded. Front-loaded ranked signals eliminate blind MCP fan-out. (validated, 3+ nights)
-- **Direct-to-master, single end-of-run commit** — one rollback target, one Railway deploy. 17+ nights. (stable)
-- **WIP-safe scoped revert** — per-lane revert never flushes concurrent founder work. 16+ nights. (stable)
+- **Phase 0 intel brief + scoped MCP** — 06-01 evening: 9/9 completed (0 timeouts). Front-loaded ranked signals eliminate blind MCP fan-out. (validated, 4+ nights)
+- **Direct-to-master, single end-of-run commit** — one rollback target, one Railway deploy. 18+ nights. (stable)
+- **WIP-safe scoped revert** — per-lane revert never flushes concurrent founder work. 17+ nights. (stable)
 - **Ground-truth audit before edits** — zero fabricated-feature bugs across window. (stable)
-- **`npm run build:fast` gate** — 3x faster, same signal. 17+ nights. (stable)
+- **`npm run build:fast` gate** — 3x faster, same signal. 18+ nights. (stable)
 - **Autonomy matrix** — reversible+small→ship; policy/auth/irreversible→queue. 0 reverted. (stable)
-- **PostHog REST helper** — eliminates PostHog MCP hangs for data queries. 12+ nights. (stable)
+- **PostHog REST helper** — eliminates PostHog MCP hangs for data queries. 13+ nights. (stable)
 - **Isolated worktree gate** — build validation can't race a dev server. (stable)
 - **Failure digest on kill/abort** — Telegram notifies even on no-ship runs. (stable)
 - **Anti-repetition idea ledger** — lane 4 stopped re-pitching. (stable)
-- **Lightweight lanes dominate** — 07 (100%), 04 (100%), 08 (86%). Low/zero MCP dependency = no timeout. (stable)
-- **Docs-only salvage path** — recovers docs value when code gate fails. 11+ nights. (stable)
+- **Lightweight lanes dominate** — 07=100%, 04=100%. Low/zero MCP dependency = no timeout. (stable)
+- **Docs-only salvage path** — recovers docs value when code gate fails. 12+ nights. (stable)
 - **Mandatory-Minimum-Artifact** — every lane writes artifact file. Floor never zero. (stable)
-- **Founder-directive fast path** — sealed-bid directive shipped 05-29; `polish:try` sealed-bid share card shipped 06-01. (validated 3x)
+- **Founder-directive fast path** — sealed-bid 05-29, share-card 06-01, word-tower-pool 06-03. (validated 4x)
 - **Baseline-poison salvage** — re-gates authored set lint-skipped when non-authored file fails on HEAD. (stable)
+- **PreToolUse time guard hook** — mechanical deny past 80% budget. Shipped 06-02 `a2334a3b3`. Prevents runaway edits. (validated 2 nights)
+- **TDD on new modules** — dailyLetterPool 06-03 shipped 14 tests + pure module, gate-clean. Word-wheel rarity 06-01 same pattern. Pure-module TDD = highest ship rate for new code.
 
 ## What to avoid (failed this week)
-- **Over-scoped lane work = #1 ship-killer by frequency** (4/7 nights). One complete gate-clean change ships; three half-finished edits ship nothing. Lanes must pick smallest correct change.
-- **Gate code-quality failure = #2 ship-killer** (NEW). 06-01 evening: all lanes completed, gate rejected authored code 3 rounds. Lanes must self-verify with tsc/lint on changed files.
-- **Lane 05 (landing) = 2/7 (29%).** Worst lane. Ships only with founder directive or pre-built code. "Build from scratch" always exceeds budget. Cap to title+meta+CTA or pre-built only.
-- **Lane 01 (triage) = 3/7 (43%).** MCP-heavy (Sentry+Supabase) + migration scope. Succeeds when scoped to 1 fix.
-- **Lane 02 (perf) = 3/7 (43%).** Improved from 1/7 last window. Still struggles with multiplayer CWV (large-scope investigation).
-- **Reddit JSON API blocked (7+ consecutive nights).** OAuth not configured. Lane 04 compensates via WebSearch; native Reddit drafts = 0 since 05-27.
-- **Search collector dead** — 0 signals 8+ nights. Pure waste. Remove.
-- **05-31 preflight abort** — dirty HEAD (unpushed founder commits) rejected. Stash-or-branch handler still missing.
+- **Over-scoped lane work = #1 ship-killer** (4/6 nights). One complete gate-clean change ships; three half-finished edits ship nothing. Lanes must pick smallest correct change.
+- **Gate code-quality failure = #2 ship-killer** (3/6 nights). Lanes finish but authored code fails lint/test/build. Every lane MUST run tsc on changed files before ending.
+- **Lane 05 (landing) = 1/6 (17%).** Worst lane. Timeout 4/5 runs (40-42min vs 1200s budget). "Build from scratch" always exceeds budget. Cap to title+meta+CTA or pre-built component wiring only.
+- **Lane 01 (triage) = 2/6 (33%).** Timeout 4/5 runs (15-55min). MCP-heavy (Sentry+Supabase). Succeeds ONLY when scoped to 1 small fix (UUID guard on 06-03 shipped).
+- **Lane 09 (monetization) = 0/2.** New lane, timeout on every run (59min vs 600s). Needs scope reduction or timeout increase.
+- **Reddit JSON API blocked (9+ consecutive nights).** OAuth not configured. Lane 04 compensates via WebSearch. Retire or migrate.
+- **Search collector dead** — 0 signals 9+ nights. Pure waste. Remove.
+- **05-31 preflight abort** — dirty HEAD (unpushed founder commits) rejected. Still no handler.
 - Per-lane commits — banned. (kept)
 - Auto-rollback on KPI dip — Railway deploy lag = false positives. (kept)
 - Headless Claude creating realtime tables — hard-ban per Supabase perf rule. (kept)
 - Demoting `logger.warn→debug` to clean Sentry — root-cause or queue, never silence. (kept)
-- **Self-summarizing wrong root cause** — prior learnings framed 06-01 as "worst night" from morning run only. Always check ALL runs for a date + the actual log.
+- **Self-summarizing wrong root cause** — always check ALL runs for a date + the actual log, not prior summaries.
 
 ## Open watches (carry forward)
-- **Gate code-quality failure** — 06-01 evening: all lanes done, gate failed. Self-verify needed. Status: NEW, high priority.
-- **MCP cumulative timeout** — sequential calls sum past lane budget. MAX_MCP_CALLS=3 proposed. Status: open (7 nights).
-- **`/en/multiplayer` LCP 3010ms / INP 528ms / CLS 0.512** — improving (was 8448/584/0.510). SSR skeleton needed. Status: improving.
-- **`/he/word-tower` CLS 0.797** — inconclusive since 05-27, predates crane commit. Status: open.
-- **`/he/daily/word-wheel` LCP 2568ms** (was 1399ms, +84%). Status: open.
-- **`PageClient.tsx` line bloat** — leaderboard 519→600+ lines, blocking lane 03 experiment wiring. Status: open.
-- **Reddit OAuth migration** — JSON API blocked 7+ nights. Spec at `docs/nightly/reddit-oauth-setup.md`. Status: open.
-- **Search collector dead** — 0 signals 8+ nights. Recommend remove. Status: open.
-- **GSC token scope** — `webmasters.readonly` missing from ADC. Blocks live GSC pulls. 6+ nights. Status: open.
+- **Homepage LCP 7107ms + CLS 1.0** — NEW 06-03. Catastrophic. Likely showcase3D/ScrollTrigger hero. Status: critical, new.
+- **Gate code-quality failure** — 3/6 nights. Self-verify needed in every lane. Status: high priority.
+- **MCP cumulative timeout** — sequential calls sum past lane budget. MAX_MCP_CALLS=3 proposed. Status: open (8 nights).
+- **`/en/multiplayer` LCP 3010ms / INP 528ms / CLS 0.512** — improving (was 8448/584). SSR skeleton needed. Status: improving.
+- **`/he/word-tower` CLS 0.797** — inconclusive since 05-27. Status: open.
+- **`/he/daily/word-wheel` LCP 2568ms** — regressed +84%. Status: open.
+- **`/he/free-multiplayer-word-game` LCP 5337ms** — NEW 06-03. Status: new.
+- **`PageClient.tsx` line bloat** — 519→600+ lines. Status: open.
+- **Reddit OAuth migration** — blocked 9+ nights. Spec at `docs/nightly/reddit-oauth-setup.md`. Status: open.
+- **Search collector dead** — 0 signals 9+ nights. Recommend remove. Status: open.
+- **GSC token scope** — `webmasters.readonly` missing from ADC. 7+ nights. Status: open.
 - **Admin-session perf noise** — filter admin player_ids from HogQL. Status: open.
-- **`show-signup-after-first-win` flag** — 06-01 confirmed IS wired (prior "no callsite" was wrong). Monitor exposure count. Status: corrected.
-- **Fading Grid Sprint** — `idea:build` tapped by founder 05-29. No implementation. Status: open (4 nights).
-- **Survival Rounds** — `idea:build` tapped 05-26. No implementation. Status: open (7 nights).
-- **Word Detective daily** — `idea:build` tapped 06-01. New entry. Status: open (1 night).
+- **Fading Grid Sprint** — `idea:build` tapped by founder 05-29. No implementation. Status: open (5 nights).
+- **Survival Rounds** — `idea:build` tapped 05-26. No implementation. Status: open (8 nights).
+- **Word Detective daily** — `idea:build` tapped 06-01. Status: open (2 nights).
+- **Word Heist MP** — `idea:build` tapped this window. Status: open (new).
+- **Word Tower daily-letter wiring** — module shipped 06-03, hook+UI integration next. Status: open (new).
 
 ## Telegram-button feedback (last 7d)
-- `polish:try` x6 — sealed-bid x2, blast x1, word-alchemy x1, word-vault x1, word-forge x1
-- `idea:build` x3 — survival rounds, fading grid sprint, word detective
+- `polish:try` x8 — sealed-bid x2, blast x1, word-alchemy x1, word-vault x1, word-forge x1, party/caption-clash x1, word-tower x1
+- `idea:build` x3 — sealed-bid, word-detective, word-heist
 - `idea:pass` x1 — language family classification
 - `night:good/meh` x0 ; `reddit:*` x0 ; `mode:*` x0
-- **11 taps in 7d (up from 8). `polish:try` dominant (55%) and BROADENING — now hitting word-vault + word-forge beyond sealed-bid. 3 `idea:build` taps = founder wants new SP modes (survival, fading grid, word detective). Zero run-quality taps = no strong steer on loop health.**
+- **12 taps in 7d (up from 11). `polish:try` dominant (67%) and BROADENING — now hitting word-vault, word-forge, party, word-tower beyond sealed-bid. 3 `idea:build` = founder wants new SP/MP modes (sealed-bid, word-detective, word-heist). Zero run-quality taps = no strong steer on loop health.**
 
 ## Specialized Skills (maintained by lane 7)
 
 | Lane | Recommended skills | Evidence |
 |---|---|---|
-| 01 triage | `superpowers:systematic-debugging` | 3/7; succeeds scoped to 1 fix |
-| 02 perf | `superpowers:systematic-debugging` | 3/7; improved from 1/7, multiplayer CWV open |
-| 03 engagement | none | 4/7; prompt-driven |
-| 04 competitor | `humanizer` | 7/7; applied to idea drafts |
-| 05 landing | `frontend-design` (mandatory) | 2/7; ships only with directive or pre-built |
-| 06 seo | `seo-daily` (mandatory) | 4/7; reliable when scoped |
-| 07 self-learn | none — prompt-only | 7/7 |
-| 08 adsense | `humanizer` | 6/7; improved, reliable this window |
+| 01 triage | `superpowers:systematic-debugging` | 2/6; succeeds scoped to 1 fix |
+| 02 perf | `superpowers:systematic-debugging` | 3/6; perf baseline expansion shipped 2 nights |
+| 03 engagement | none | 4/6; prompt-driven, word-tower pool shipped w/o skill |
+| 04 competitor | `humanizer` | 6/6; applied to idea drafts, 0 timeouts |
+| 05 landing | `frontend-design` (mandatory) | 1/6; needs scope cap, not more skills |
+| 06 seo | `seo-daily` (mandatory) | 3/6; reliable when scoped to title/meta |
+| 07 self-learn | none — prompt-only | 6/6 |
+| 08 adsense | `humanizer` | 3/6; dropped from 6/7 — timeout regression |
 
 **Rules for lane 7 updating this table:**
 - Add a skill if invoking it correlated with a shipped (not reverted) outcome in ≥2 nights.
@@ -91,7 +96,7 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 - Skip strict self-promo subs (r/AskReddit, r/woahdude). Prefer r/wordgames, r/dailygames, r/Anagrams, r/Scrabble, r/languagelearning.
 - Two drafts per thread: (a) pure-value, (b) value + one-line product mention. User picks.
 - Use older account (fresh 0-karma = spam-flagged).
-- **Reddit JSON API blocked since 05-27.** 7+ consecutive nights. OAuth needed or retire Reddit research.
+- **Reddit JSON API blocked since 05-27.** 9+ consecutive nights. OAuth needed or retire Reddit research.
 
 ## Stat-framing reminders (memory anchors — DO NOT EDIT)
 - Never write "0 downloads" / "0 ads" / "no rating yet" — use "browser-based", "ad-free", "free".

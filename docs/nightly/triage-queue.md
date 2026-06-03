@@ -298,3 +298,15 @@ Items deferred from automated nightly triage. Human review required.
   - status: deferred (already resolved)
   - why: `profiles` table confirmed to exist in DB. Error stopped 2026-05-27 after migration `20260527230753`. No code change needed.
   - recommended owner: self
+
+## 2026-06-03
+- [Sentry] 14R/14S game_sessions check_player_id constraint violation
+  - first: 2026-05-12, last: 2026-05-12, count: 56, userCount: 0
+  - link: https://lexiclash.sentry.io/issues/119434883/
+  - status: shipped (UUID guard in gameSessionLogger.ts:136)
+  - why: bot IDs like "bot_abc123" passed !userId guard, reached INSERT, failed UUID constraint
+  - recommended owner: review-by-eod — add test in gameSessionLogger.test.ts
+- [Sentry] 13Y (null 'x' Blast rAF), 15B/15E (_cancelResize Blast)
+  - status: already fixed — SharedFxApp.ts generation+live guards (comments cite these Sentry IDs)
+- [Sentry] 1JR/1JP (profiles/coins)
+  - status: already fixed — mig 20260527230753 (per memory)
