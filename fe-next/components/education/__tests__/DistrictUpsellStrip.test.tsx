@@ -35,4 +35,9 @@ describe('DistrictUpsellStrip', () => {
     fireEvent.click(link);
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'district_upsell' });
   });
+
+  it('tracks impression on mount', () => {
+    render(<DistrictUpsellStrip />);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('education_upsell_impression', { cta: 'district_upsell' });
+  });
 });

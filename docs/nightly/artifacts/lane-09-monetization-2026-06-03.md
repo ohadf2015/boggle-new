@@ -1,18 +1,23 @@
 status: shipped
-attempted: Wire dailyLetterPool into Word Tower via useWordTowerAdRewards hook (founder directive)
 files_touched:
-  - fe-next/lib/wordTower/useWordTowerAdRewards.ts (NEW - hook bridging useRewardedAd to refillViaAd)
-  - fe-next/lib/wordTower/__tests__/useWordTowerAdRewards.test.ts (NEW - 6 TDD tests)
-next_steps:
-  - Verify tests pass (background process running at finalize cutoff)
-  - Wire hook into Word Tower PageClient: show CTA banner when isPoolExhausted=true
-  - Add i18n keys for "Watch ad to get +15 letters" in 5 locales
-  - Add word-tower surface to RewardedSurface in lib/admob-config.ts
-  - Pass dailyPool from generateDailyLetterPool into useWordTower opts in PageClient
-  - Sabotage rival + hint rewarded surfaces = founder directive phase 2
-notes:
-  - Pure layer complete: dailyLetterPool.ts (14 tests, shipped 06-03)
-  - Manager layer complete: refillPoolViaAd + isDailyPoolExhausted in wordTowerManager.ts
-  - Hook layer complete: useWordTower already has dailyPool/refillViaAd/isPoolExhausted
-  - This lane adds missing AD BRIDGE layer only - no UI yet
-  - rewardKind=feature prevents double-reward (letters AND coins)
+  - fe-next/components/education/DistrictUpsellStrip.tsx
+  - fe-next/components/education/__tests__/DistrictUpsellStrip.test.tsx
+  - fe-next/utils/growthTracking.ts
+
+## What shipped
+Added `education_upsell_impression` PostHog event on mount of `DistrictUpsellStrip`.
+Previously: only click tracked (`landing_cta_clicked`). Now view-through rate measurable.
+Added event to `GrowthEvent` union type. 1 TDD test added (impression fires on mount).
+
+## Revenue analysis
+- `rewarded_ad_watched = 0` (7d) — STRUCTURAL. H5 gated OFF pending AdSense approval.
+  AdMob native-only; tiny Android user base. No code fix possible — unblock = AdSense approval.
+- `DistrictUpsellStrip` already deployed on /education with click tracking + mailto CTA.
+  Gap: no impression data → CTR unknown. Fixed tonight.
+
+## next_steps
+1. After a few days of data: query PostHog `education_upsell_impression` vs `landing_cta_clicked`
+   cta=district_upsell. High impressions + low clicks = copy/placement problem.
+2. Enable `NEXT_PUBLIC_H5_ADS_ENABLED=true` once AdSense approved — biggest revenue unlock.
+3. IAP demand probe: `iap_viewed` banner on daily results behind `NEXT_PUBLIC_IAP_PROBE_ENABLED`.
+4. DistrictUpsellStrip on sub-pages (games-for-teachers, esl-word-games) — hand-off to Lane 08.

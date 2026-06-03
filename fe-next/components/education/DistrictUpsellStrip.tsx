@@ -1,4 +1,5 @@
 'use client';
+import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -7,6 +8,10 @@ const DISTRICT_MAILTO =
 
 export function DistrictUpsellStrip() {
   const { t } = useLanguage();
+
+  useEffect(() => {
+    trackGrowthEvent('education_upsell_impression', { cta: 'district_upsell' });
+  }, []);
 
   return (
     <aside className="mx-auto my-8 max-w-3xl rounded-neo border-neo border-neo-purple/60 bg-neo-navy-light px-6 py-5 shadow-hard">
