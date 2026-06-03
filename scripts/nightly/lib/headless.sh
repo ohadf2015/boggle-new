@@ -80,11 +80,17 @@ ZERO code this way. Avoid that:
   • Make ONE focused, COMPLETE, gate-clean change — not three half-finished ones.
     One small correct shipped change beats a sprawling broken one every time.
   • NEVER begin an edit you cannot FINISH **and self-verify** within budget. Before a
-    large multi-file change, ask: "can I land + tsc/lint-check this in the time left?"
+    large multi-file change, ask: "can I land + eslint-check this in the time left?"
     If not, pick a smaller change.
-  • By ~${finalize_min} min: STOP starting new work. Finish the edit in flight, run a
-    quick \`cd fe-next && npx tsc --noEmit\` (or \`npx eslint <your changed files>\`) on
-    ONLY your changed files to confirm they are clean, then update the artifact and END.
+  • DO NOT run full-repo \`npx tsc --noEmit\`, \`npm run build\`, or \`npm run test\` to
+    self-check — each is ~60s+ and the nightly GATE runs the FULL lint+type+test+build
+    AUTHORITATIVELY after your lane (a half-written file is caught and dropped there).
+    Re-running them yourself is the #1 timeout cause: a build kicked off near the
+    deadline gets your lane SIGKILLed mid-run with nothing shipped. A live hook now
+    CAPS these and BLOCKS them past the finalize cutoff — don't fight it. For a quick
+    self-check, \`npx eslint <only your changed files>\` is fast and enough.
+  • By ~${finalize_min} min: STOP starting new work. Finish the edit in flight, eslint
+    ONLY your changed files to confirm they're clean, then update the artifact and END.
     A lane that voluntarily finishes clean at ${finalize_min} min ships; one that sprawls
     to the kill at ${budget_min} min ships nothing.
   • Leaving a file mid-edit is WORSE than not touching it: it poisons the gate. If you
@@ -260,11 +266,22 @@ PY
          LEXI_LANE_FILE_CAP="${LANE_FILE_CAP:-8}"
   hook_path="$(dirname "${BASH_SOURCE[0]}")/hooks/lane-time-guard.sh"
   hook_settings=$(mktemp -t "lane-${lane_id}-hooks.XXXXXX")
+  # Matcher also covers WebSearch/WebFetch + all mcp__ tools so the guard can bound
+  # runaway research (read-only intel MCP + web) past the research window — the
+  # remaining timeout sink after edit-sprawl was already capped. The hook no-ops for
+  # non-research mcp tools, so write-capable servers (supabase/railway) stay ungated.
   jq -nc --arg cmd "$hook_path" \
-    '{hooks:{PreToolUse:[{matcher:"Edit|Write|MultiEdit|NotebookEdit|Bash",hooks:[{type:"command",command:("bash "+$cmd),timeout:10}]}]}}' \
+    '{hooks:{PreToolUse:[{matcher:"Edit|Write|MultiEdit|NotebookEdit|Bash|WebSearch|WebFetch|mcp__.*",hooks:[{type:"command",command:("bash "+$cmd),timeout:10}]}]}}' \
     > "$hook_settings"
   echo "headless: lane=$lane_id time-guard armed → finalize @ +$(( timeout_sec*8/10/60 ))m, hard @ +$(( timeout_sec/60 ))m, file-cap=${LANE_FILE_CAP:-8}" | tee -a "$log_file"
 
+  # Write claude's stream straight to the sidecar FILE — NOT a live `| tee | python3
+  # | tee` pipe. A long-lived MCP server is a child of claude and inherits its
+  # stdout fd; on a live pipe that fd keeps the downstream tee/python from ever
+  # seeing EOF, so AFTER the agent emits its final `result` the lane sat idle until
+  # the gtimeout SIGTERM — a FALSE exit-124 (lane 05 hung 5m45s post-completion on
+  # 2026-06-03). A file redirect never blocks on a child fd: gtimeout returns the
+  # instant claude itself exits, and we render the timeline from the file afterwards.
   "${timeout_cmd[@]}" \
     claude -p "$(cat "$rendered")" \
       --allowedTools '*' \
@@ -274,15 +291,16 @@ PY
       --output-format stream-json \
       --verbose \
       --model "$model" \
-      < /dev/null 2>&1 \
-    | tee "$stream_sidecar" \
-    | python3 "$timeline" \
-    | tee -a "$log_file"
-  local rc=${PIPESTATUS[0]}
+      < /dev/null > "$stream_sidecar" 2>&1
+  local rc=$?
+  # Render the compact wall-clock timeline from the captured sidecar into the run log
+  # (post-hoc, not live — observability is preserved; the hang is not).
+  python3 "$timeline" < "$stream_sidecar" 2>/dev/null | tee -a "$log_file" \
+    || tail -40 "$stream_sidecar" >> "$log_file" 2>/dev/null || true
   echo "headless: lane=$lane_id rc=$rc — full stream-json sidecar: $stream_sidecar" | tee -a "$log_file"
 
   [ -n "$lane_mcp_cfg" ] && rm -f "$lane_mcp_cfg" 2>/dev/null || true
-  rm -f "$rendered" "$deadline_file" "$fileset_file" "$hook_settings" 2>/dev/null || true
+  rm -f "$rendered" "$deadline_file" "${deadline_file}.heavy" "$fileset_file" "$hook_settings" 2>/dev/null || true
   unset LEXI_LANE_DEADLINE_FILE LEXI_LANE_FILESET_FILE LEXI_LANE_FILE_CAP
   return "$rc"
 }

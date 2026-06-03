@@ -117,6 +117,40 @@ assert "no-lint chain still runs test"                "[[ \"$CHAIN_NOLINT\" == *
 assert "no-lint chain still runs build:fast"          "[[ \"$CHAIN_NOLINT\" == *'build:fast'* ]]"
 assert "build:schemas precedes test (dist bridge)"    "[[ \"$CHAIN_NOLINT\" == *'build:schemas'*'npm run test'* ]]"
 
+# build_only=1 → DROP lint AND test, keep build:schemas + build:fast. Used by the
+# baseline-aware ship path to prove the authored set builds clean despite a red TEST
+# baseline (test short-circuited, so the build was never verified).
+CHAIN_BUILD=$(_gate_npm_chain 0 1)
+assert "build-only chain DROPS lint"            "[[ \"$CHAIN_BUILD\" != *'npm run lint'* ]]"
+assert "build-only chain DROPS test"            "[[ \"$CHAIN_BUILD\" != *'npm run test'* ]]"
+assert "build-only chain keeps build:schemas"   "[[ \"$CHAIN_BUILD\" == *'build:schemas'* ]]"
+assert "build-only chain keeps build:fast"      "[[ \"$CHAIN_BUILD\" == *'build:fast'* ]]"
+
+echo "── gate-isolated: nightly_baseline_ship_decision (baseline-aware verdict) ──"
+_AF=$(mktemp); _BF=$(mktemp); _ALLOW=$(mktemp)
+# Baseline gate PASSED (rc=0) → clean HEAD is green → lanes at fault → fallthrough.
+printf 'fe-next/a.test.ts\n' > "$_AF"; : > "$_BF"; : > "$_ALLOW"
+assert "brc=0 (HEAD green) → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 0 $_BF $_ALLOW)\" = fallthrough ]"
+# Authored fails a.test; baseline also fails a.test (+b) → authored ⊆ baseline → ship.
+printf 'fe-next/a.test.ts\n' > "$_AF"; printf 'fe-next/a.test.ts\nfe-next/b.test.ts\n' > "$_BF"; printf 'fe-next/x.tsx\n' > "$_ALLOW"
+assert "authored failing ⊆ baseline failing → ship" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = ship ]"
+# Authored fails a+b; baseline fails only a; b is authored → peel b.
+printf 'fe-next/a.test.ts\nfe-next/b.test.ts\n' > "$_AF"; printf 'fe-next/a.test.ts\n' > "$_BF"; printf 'fe-next/b.test.ts\n' > "$_ALLOW"
+_DOUT=$(nightly_baseline_ship_decision "$_AF" 1 "$_BF" "$_ALLOW")
+assert "NEW authored failing test → peel verdict"      "[[ \"$_DOUT\" == peel* ]]"
+assert "peel lists the new authored file"              "[[ \"$_DOUT\" == *'fe-next/b.test.ts'* ]]"
+# Authored fails a+b; baseline fails only a; b NOT authored → fallthrough (never peel non-authored).
+printf 'fe-next/a.test.ts\nfe-next/b.test.ts\n' > "$_AF"; printf 'fe-next/a.test.ts\n' > "$_BF"; : > "$_ALLOW"
+assert "NEW but non-authored failing test → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = fallthrough ]"
+# Baseline red (rc=1) but NO parseable test failures (failed at lint/build) → no comparable
+# test baseline → fallthrough (don't ship on an undecidable baseline).
+printf 'fe-next/a.test.ts\n' > "$_AF"; : > "$_BF"; : > "$_ALLOW"
+assert "red baseline w/ no test-fail list → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = fallthrough ]"
+# No authored failing tests → nothing to compare → fallthrough.
+: > "$_AF"; printf 'fe-next/a.test.ts\n' > "$_BF"; : > "$_ALLOW"
+assert "no authored failing tests → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = fallthrough ]"
+rm -f "$_AF" "$_BF" "$_ALLOW"
+
 echo "── gate-isolated: lint-skipped re-gate still gates the AUTHORED worktree ──"
 # The baseline-poison ship decision rides on run_isolated_gate <auth> 1 passing only
 # when the authored set is test+build clean. Prove the skip_lint path still applies
@@ -192,6 +226,49 @@ rm -f "$CLEAN"
 
 # Empty/missing → no output, no error.
 assert "missing file → empty, no crash" "[ -z \"\$(nightly_parse_gate_failures /nonexistent-xyz)\" ]"
+
+echo "── gate-isolated: nightly_parse_test_failures (baseline-aware salvage) ──"
+# Vitest prints a per-failure header " FAIL  <path>.test.tsx > describe > it",
+# ANSI-coloured, path relative to fe-next (the gate cwd) or absolute in the worktree.
+# The baseline-aware salvage compares these failing TEST files against a clean-HEAD
+# baseline; the lint/tsc parser above can't see test failures, which is how a
+# pre-existing red test on master sank the 2026-06-02/03 runs to docs-only.
+TOUT=$(mktemp)
+printf '%b' '\033[41m\033[1m FAIL \033[22m\033[49m __tests__/chatHandler.test.js\033[2m > \033[22mChat Handler > broadcasts\n' > "$TOUT"
+printf '%b' ' FAIL  handlers/__tests__/friendsHandler.test.ts > friendsHandler > sends\n' >> "$TOUT"
+printf '%b' ' FAIL  /private/var/folders/x/T/nightly-gate.ABCD/fe-next/components/__tests__/Foo.test.tsx > Foo > renders\n' >> "$TOUT"
+printf '%b' ' FAIL  app/api/x/__tests__/route.test.ts > POST > does\n' >> "$TOUT"
+printf 'AssertionError: expected foo at node_modules/vitest/dist/chunks/base.js:101\n' >> "$TOUT"
+TGOT=$(nightly_parse_test_failures "$TOUT" | tr '\n' ',')
+assert "parses ANSI-coloured FAIL line (relative path → fe-next/)" "[[ \"$TGOT\" == *'fe-next/__tests__/chatHandler.test.js'* ]]"
+assert "parses plain FAIL line (.test.ts)"                         "[[ \"$TGOT\" == *'fe-next/handlers/__tests__/friendsHandler.test.ts'* ]]"
+assert "normalises ABSOLUTE worktree path → repo-relative"        "[[ \"$TGOT\" == *'fe-next/components/__tests__/Foo.test.tsx'* ]]"
+assert "parses app/api route.test.ts"                             "[[ \"$TGOT\" == *'fe-next/app/api/x/__tests__/route.test.ts'* ]]"
+assert "does NOT emit node_modules/vitest as a failing test file" "[[ \"$TGOT\" != *'node_modules'* ]]"
+rm -f "$TOUT"
+assert "clean test output → no failing tests parsed" "[ -z \"\$(printf 'all green\\n' > /tmp/_clean_t.$$; nightly_parse_test_failures /tmp/_clean_t.$$; rm -f /tmp/_clean_t.$$)\" ]"
+assert "missing file → empty, no crash"              "[ -z \"\$(nightly_parse_test_failures /nonexistent-xyz)\" ]"
+
+echo "── gate-isolated: run_baseline_gate gates CLEAN HEAD (ignores working-tree mods) ──"
+# The baseline gate must see committed HEAD, NOT the founder's working-tree edits —
+# that's what lets it tell "master is already red" from "the lane broke it".
+setup
+# Working tree diverges from HEAD; baseline gate must see the COMMITTED value.
+printf 'export const v = "WORKTREE_LANE_EDIT";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+export NIGHTLY_GATE_CMD='grep -q COMMITTED app/lane.ts && ! grep -q WORKTREE_LANE_EDIT app/lane.ts'
+run_baseline_gate 0; rc=$?
+assert "baseline gate PASSES gating clean HEAD (committed content, working-tree edit excluded)" "[ $rc -eq 0 ]"
+assert "main tree untouched by baseline gate" "grep -q WORKTREE_LANE_EDIT \"\$PROJECT_DIR/fe-next/app/lane.ts\""
+unset NIGHTLY_GATE_CMD; teardown
+
+setup
+# A pre-existing failure on HEAD itself → baseline gate FAILS (this is the signal
+# that proves "master is red", licensing the ship-anyway path in run.sh).
+( cd "$PROJECT_DIR" && printf 'export const broken = (\n' > fe-next/app/lane.ts && git commit -qam "red on HEAD" )
+export NIGHTLY_GATE_CMD='! grep -q "broken = (" app/lane.ts'   # committed HEAD is broken → fail
+run_baseline_gate 0; rc=$?
+assert "baseline gate FAILS when HEAD itself is broken (red-master signal)" "[ $rc -eq 1 ]"
+unset NIGHTLY_GATE_CMD; teardown
 
 echo
 echo "gate-isolated: $PASS passed, $FAIL failed"

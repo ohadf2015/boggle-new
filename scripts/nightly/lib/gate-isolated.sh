@@ -34,15 +34,63 @@ NIGHTLY_GATE_ENV_FILES=(
 # ../dist via the compiled bridge (backend/utils/socketValidation.ts), and a fresh
 # worktree has no dist/ yet (this reverted every code lane on 2026-05-26).
 _gate_npm_chain() {
-  local skip_lint="${1:-0}" chain=""
+  local skip_lint="${1:-0}" build_only="${2:-0}" chain=""
+  # build_only=1 → skip lint AND test, run ONLY build:schemas + build:fast. Used by
+  # the baseline-aware ship path: when every failing test already fails on clean
+  # master (red baseline), `test` short-circuited so the authored set's BUILD was
+  # never verified — proving it builds clean before shipping keeps the old "never
+  # ship build-breaking code" guarantee even when we deliberately ignore the tests.
+  if [ "$build_only" = "1" ]; then
+    printf '%s' "npm run build:schemas && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; }"
+    return 0
+  fi
   [ "$skip_lint" = "1" ] || chain="npm run lint && "
   printf '%s' "${chain}npm run build:schemas && npm run test && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; }"
 }
 
-# run_isolated_gate <authored_list_file> [skip_lint=0]
+# nightly_baseline_ship_decision <authored_fail_file> <baseline_rc> <baseline_fail_file> <authored_allowlist_file>
+# Pure decision for the baseline-aware salvage when the gate failed but no authored
+# file was pinned as a lint/tsc offender. The three list files hold repo-relative
+# failing TEST paths (from nightly_parse_test_failures). Prints ONE verdict:
+#   ship          — baseline (clean HEAD) is red on test(s) AND the authored set adds
+#                   no NEW failing test → not the nightly's fault; ship (caller does a
+#                   build-only re-gate first, so build-breakage is still caught).
+#   peel\n<files> — authored set introduced NEW failing test file(s) that ARE authored
+#                   → drop just those and re-gate (same as a broken lane lint/tsc file).
+#   fallthrough   — undecidable here (HEAD clean, or no comparable test baseline) →
+#                   caller uses the existing lint-skip / docs-only salvage (no regression).
+nightly_baseline_ship_decision() {
+  local af="$1" brc="$2" bf="$3" allow="$4"
+  # Baseline gate PASSED → clean HEAD is green → the failure is the lanes' own.
+  [ "$brc" = "0" ] && { printf 'fallthrough\n'; return 0; }
+  local authored_n baseline_n
+  authored_n=$(grep -c . "$af" 2>/dev/null); authored_n=${authored_n:-0}
+  baseline_n=$(grep -c . "$bf" 2>/dev/null); baseline_n=${baseline_n:-0}
+  # No authored failing tests, or no comparable test-failure baseline (baseline failed
+  # at lint/build, not test) → can't conclude "pre-existing" → conservative fallthrough.
+  [ "$authored_n" -gt 0 ] || { printf 'fallthrough\n'; return 0; }
+  [ "$baseline_n" -gt 0 ] || { printf 'fallthrough\n'; return 0; }
+  # NEW failing tests introduced by the authored set = authored − baseline.
+  local newf new_n
+  newf=$(grep -vxF -f "$bf" "$af" 2>/dev/null || true)
+  new_n=$(printf '%s' "$newf" | grep -c . 2>/dev/null); new_n=${new_n:-0}
+  if [ "$new_n" -eq 0 ]; then printf 'ship\n'; return 0; fi
+  # Some new failures — peel the ones WE authored (never touch non-authored paths).
+  local newauth
+  newauth=$(printf '%s\n' "$newf" | grep -xF -f "$allow" 2>/dev/null || true)
+  if [ -n "$newauth" ]; then printf 'peel\n%s\n' "$newauth"; return 0; fi
+  printf 'fallthrough\n'; return 0
+}
+
+# run_isolated_gate <authored_list_file> [skip_lint=0] [baseline=0]
+# baseline=1 gates a CLEAN HEAD checkout with NO authored files applied (the
+# authored list is ignored / may be empty) — used by run_baseline_gate to learn
+# whether master ITSELF is red independent of any lane code.
 run_isolated_gate() {
-  local authored="$1" skip_lint="${2:-0}"
-  [ -n "$authored" ] && [ -s "$authored" ] || { log "isolated-gate: empty authored list — nothing to gate"; return 0; }
+  local authored="$1" skip_lint="${2:-0}" baseline="${3:-0}" build_only="${4:-0}"
+  if [ "$baseline" != "1" ]; then
+    [ -n "$authored" ] && [ -s "$authored" ] || { log "isolated-gate: empty authored list — nothing to gate"; return 0; }
+  fi
 
   local wt; wt=$(mktemp -d -t nightly-gate.XXXXXX)
   rm -rf "$wt"   # 'git worktree add' wants a non-existent path
@@ -88,7 +136,7 @@ run_isolated_gate() {
   done
 
   [ "$_skipped_ignored" -gt 0 ] && log "isolated-gate: skipped $_skipped_ignored gitignored path(s) (build artifacts — never gated/shipped)"
-  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')"
+  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')$([ "$build_only" = "1" ] && printf ' [build-only — verifying authored set builds despite red test baseline]')"
   # Capture the gate's combined output to a file the caller can parse (the
   # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
   # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
@@ -110,7 +158,7 @@ run_isolated_gate() {
     local _gto=()
     if command -v gtimeout >/dev/null 2>&1; then _gto=(gtimeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s")
     elif command -v timeout >/dev/null 2>&1; then _gto=(timeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s"); fi
-    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint")"
+    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only")"
     "${_gto[@]}" bash -c "$_body" _ "$wt" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
     [ "${rc:-0}" = "124" ] && log "isolated-gate: TIMED OUT after ${NIGHTLY_GATE_TIMEOUT:-1800}s — killed (treated as gate fail)"
     [ "${rc:-0}" != "0" ] && rc=1
@@ -162,6 +210,43 @@ nightly_parse_gate_failures() {
       | sed -E 's#^#fe-next/#' \
       | grep -v '/node_modules/'
   } 2>/dev/null | sort -u
+}
+
+# nightly_parse_test_failures <gate_output_file> → repo-relative TEST FILE paths
+# (fe-next/...) that vitest reported as FAIL. The drop-and-re-gate parser above
+# only catches lint/tsc errors (`file(line,col): error`); a failing TEST emits no
+# such line, so a test that ALREADY fails on untouched master left `_bad` empty,
+# the lint-skip re-gate reran the same red test, and the run collapsed to docs-only
+# (the 2026-06-02/03 zero-code nights). This parser feeds the baseline-aware salvage:
+# compare the authored gate's failing tests against a clean-HEAD baseline's — a test
+# red on master is NOT the nightly's fault.
+#
+# Vitest prints a per-failure header:  " FAIL  <path>.test.tsx > describe > it"
+# (ANSI-coloured; path relative to fe-next, the gate's cwd, or absolute inside the
+# worktree). Strip ANSI, pull the path token, normalise to fe-next/…, drop
+# node_modules. Best-effort: prints nothing if unparseable (caller stays safe).
+nightly_parse_test_failures() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 0
+  sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null \
+    | grep -oE 'FAIL +[A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
+    | sed -E 's/^FAIL +//' \
+    | awk '{ if ($0 ~ /\/fe-next\//) sub(/^.*\/fe-next\//,"fe-next/"); else if ($0 !~ /^fe-next\//) $0="fe-next/"$0; print }' \
+    | grep -v '/node_modules/' \
+    | sort -u
+}
+
+# run_baseline_gate [skip_lint=0] — gate a CLEAN HEAD checkout with NO authored
+# files applied, to learn whether master ITSELF is red (a pre-existing failing
+# test/lint that no lane introduced). Output is left in NIGHTLY_LAST_GATE_OUTPUT
+# for the caller to parse (same contract as run_isolated_gate). Returns the gate rc.
+run_baseline_gate() {
+  local skip_lint="${1:-0}" _empty rc
+  _empty=$(mktemp -t nightly-baseline-empty.XXXXXX); : > "$_empty"
+  log "baseline-gate: gating CLEAN HEAD (no authored files) to detect pre-existing master breakage"
+  run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?
+  rm -f "$_empty" 2>/dev/null || true
+  return $rc
 }
 
 _isolated_gate_cleanup() {

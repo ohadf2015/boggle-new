@@ -497,6 +497,12 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
   while [ "$_round" -lt "$_MAX_REGATE_ROUNDS" ]; do
     _round=$(( _round + 1 ))
     _bad_raw=$(nightly_parse_gate_failures "${NIGHTLY_LAST_GATE_OUTPUT:-}")
+    # Preserve the failing authored gate output before it is removed — the
+    # baseline-aware salvage below parses failing TEST files from it (the lint/tsc
+    # parser above can't see test failures, which is how a pre-existing red test
+    # on master sank the 2026-06-02/03 runs to docs-only).
+    _authored_out=$(mktemp -t nightly-authored-out.XXXXXX)
+    cp "${NIGHTLY_LAST_GATE_OUTPUT:-/dev/null}" "$_authored_out" 2>/dev/null || : > "$_authored_out"
     rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
     # Intersect with authored allowlist — never drop a file the nightly didn't
     # author. The parser is best-effort and on 2026-05-27 returned 27 paths of
@@ -514,6 +520,76 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
       log "drop-and-re-gate: parser returned $(printf '%s' "$_ignored" | grep -c .) non-authored path(s) — ignoring (not in authored allowlist):"
       printf '%s\n' "$_ignored" | while IFS= read -r f; do [ -n "$f" ] && log "  ignore: $f"; done
     fi
+    if [ -z "$_bad" ]; then
+      # ── Baseline-aware salvage ────────────────────────────────────────────────
+      # The lint/tsc parser pinned no authored offender, but the gate may have failed
+      # on a TEST that ALREADY fails on untouched master — a prior PR shipped a red
+      # test it only scoped-tested, poisoning every nightly gate identically (the
+      # 2026-06-02/03 zero-code nights). Gate a clean HEAD; if it fails the SAME test
+      # file(s) with NO lane code applied, the lanes are not at fault. This is the
+      # safety net that turns "someone re-reds master" from a multi-night outage into
+      # a loud alert + shipped code (it can never silently drop all lane work again).
+      _authored_fail_tests=$(nightly_parse_test_failures "$_authored_out")
+      if [ -n "$_authored_fail_tests" ]; then
+        log "baseline-aware: authored gate failed on test file(s) — gating clean HEAD to check for pre-existing master breakage:"
+        printf '%s\n' "$_authored_fail_tests" | while IFS= read -r f; do [ -n "$f" ] && log "  authored-fail-test: $f"; done
+        run_baseline_gate 0; _bl_rc=$?
+        _baseline_out=$(mktemp -t nightly-baseline-out.XXXXXX)
+        cp "${NIGHTLY_LAST_GATE_OUTPUT:-/dev/null}" "$_baseline_out" 2>/dev/null || : > "$_baseline_out"
+        rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
+        # Pure verdict (unit-tested: nightly_baseline_ship_decision).
+        _af_file=$(mktemp); printf '%s\n' "$_authored_fail_tests" > "$_af_file"
+        _bf_file=$(mktemp); nightly_parse_test_failures "$_baseline_out" > "$_bf_file"
+        _decision=$(nightly_baseline_ship_decision "$_af_file" "$_bl_rc" "$_bf_file" "$NIGHTLY_AUTHORED_FILE")
+        case "$(printf '%s\n' "$_decision" | head -n1)" in
+          ship)
+            # Every failing test ALSO fails on clean master → not the nightly's fault.
+            # `test` short-circuited the gate chain, so the authored set's BUILD was never
+            # verified — run a build-only re-gate first (keeps "never ship build-breaking
+            # code"), then ship + shout so the baseline gets fixed.
+            log "baseline-aware: every failing test also fails on clean HEAD — master is RED independent of the nightly. Build-verifying the authored set before shipping…"
+            run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 1; _bo_rc=$?
+            rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
+            if [ "$_bo_rc" = "0" ]; then
+              gate_ok=1
+              log "baseline-aware: authored set BUILDS clean — shipping it unchanged (introduced no new test failure; the pre-existing red baseline is the problem)."
+              mkdir -p docs/nightly 2>/dev/null || true
+              {
+                echo "# Nightly BASELINE-RED alert — ${TODAY}"
+                echo
+                echo "The nightly gate failed, but a clean-HEAD baseline gate (NO lane code) fails the SAME test file(s):"
+                printf '%s\n' "$_authored_fail_tests" | sed 's/^/  - /'
+                echo
+                echo "These tests are red on master itself. The nightly build-verified its authored work and shipped it anyway (it introduced no NEW failure), but the gate runs at reduced strength until the baseline is green. FIX THESE TESTS on master."
+              } > "docs/nightly/BASELINE-RED-${TODAY}.md" 2>/dev/null || true
+              echo "docs/nightly/BASELINE-RED-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
+              echo -e "\n**Outcome (baseline-red):** the gate's failing test file(s) already fail on clean master ($(printf '%s' "$_authored_fail_tests" | tr '\n' ' ')); the authored set build-verified clean and introduced no new failure, so it shipped. See docs/nightly/BASELINE-RED-${TODAY}.md." >> "$REPORT"
+              tg_alert "nightly $TODAY: master baseline RED on $(printf '%s' "$_authored_fail_tests" | tr '\n' ' '). Build-verified + shipped authored code anyway (no new failure). FIX BASELINE — see docs/nightly/BASELINE-RED-${TODAY}.md."
+              rm -f "$_af_file" "$_bf_file" "$_baseline_out" "$_authored_out"
+              break
+            else
+              log "baseline-aware: authored set BUILD-fails (rc=$_bo_rc) despite a red TEST baseline — NOT shipping; falling through to docs-only salvage (never ship build-breaking code)."
+            fi
+            ;;
+          peel)
+            # Authored set introduced NEW failing test file(s) not red on HEAD — drop just
+            # those (intersected with the allowlist by the decision fn) and re-gate.
+            _bad=$(printf '%s\n' "$_decision" | tail -n +2)
+            log "baseline-aware: $(printf '%s' "$_bad" | grep -c .) NEW failing test file(s) introduced by the authored set (clean on HEAD) — peeling them like a broken lane file:"
+            printf '%s\n' "$_bad" | while IFS= read -r f; do [ -n "$f" ] && log "  new-fail-test: $f"; done
+            ;;
+          *)
+            log "baseline-aware: not a decidable pre-existing baseline (HEAD clean or no comparable test baseline) — continuing normal salvage"
+            ;;
+        esac
+        rm -f "$_af_file" "$_bf_file" "$_baseline_out" 2>/dev/null || true
+      fi
+    fi
+
+    rm -f "$_authored_out" 2>/dev/null || true
+
+    # Existing lint-skip re-gate / docs-only salvage — reached only if neither the
+    # lint/tsc parser nor the baseline-aware test comparison pinned an authored offender.
     if [ -z "$_bad" ]; then
       if [ -n "$_bad_raw" ]; then
         # Every gate-failing file is NON-authored. The isolated worktree is exactly

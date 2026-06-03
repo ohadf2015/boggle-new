@@ -34,12 +34,27 @@ DEADLINE_FILE="${LEXI_LANE_DEADLINE_FILE:-}"
 input=$(cat)
 tool=$(printf '%s' "$input" | jq -r '.tool_name // ""' 2>/dev/null || echo "")
 fpath=$(printf '%s' "$input" | jq -r '.tool_input.file_path // ""' 2>/dev/null || echo "")
+cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // ""' 2>/dev/null || echo "")
 
 # deadline file: "START_EPOCH FINALIZE_EPOCH HARD_EPOCH"
 read -r START FINALIZE HARD _rest < "$DEADLINE_FILE" 2>/dev/null || exit 0
 [ -n "${FINALIZE:-}" ] && [ -n "${HARD:-}" ] || exit 0
 
 now="${LEXI_FAKE_NOW:-$(date +%s)}"
+# Research window closes EARLIER than the edit-finalize cutoff. Pure-research tools
+# (web search/fetch + read-only intel MCP: Sentry/Ahrefs/PostHog) past this point
+# are the #1 remaining timeout cause — on 2026-06-03 lane 01 made 12 sequential
+# Sentry calls and lane 05 ran repeated full-repo tsc, both burning the whole
+# budget on non-shipping work. 60% of wall-clock; the last 40% is for landing +
+# verifying ONE change. START may be absent in older deadline files → default 0.
+_start="${START:-0}"; [ -n "$_start" ] || _start=0
+RESEARCH=$(( _start + (HARD - _start) * 6 / 10 ))
+# Heavy full-repo Bash (tsc --noEmit / npm run build|test|build:schemas / next build /
+# vitest run) costs ~60s each and is the OTHER sink. The nightly GATE runs
+# lint+type+test+build authoritatively AFTER the lane, so a lane re-running them
+# just burns budget. Cap how many a lane may run, and forbid them past finalize.
+HEAVY_FILE="${DEADLINE_FILE}.heavy"
+HEAVY_CAP="${LEXI_LANE_HEAVY_CAP:-2}"
 cap="${LEXI_LANE_FILE_CAP:-8}"
 fileset="${LEXI_LANE_FILESET_FILE:-}"
 
@@ -96,16 +111,68 @@ case "$tool" in
     ;;
 
   Bash)
-    # Never deny Bash — the agent needs git/tsc/revert to converge. Nudge on time;
-    # keep pre-finalize noise low (only nudge in the last 5 min or after cutoff).
+    # Long-running / backgrounded commands leak the run's output fd → the lane can't
+    # exit after finishing and hangs to a FALSE exit-124 timeout (lane 05, 06-03).
+    # Lanes are short-lived: no dev servers, no daemons, no backgrounding.
+    case "$cmd" in
+      *"npm run dev"*|*"next dev"*|*"npm start"*|*"yarn dev"*|*"pnpm dev"*|*"vercel dev"*|*"redis-server"*|*"npm run start"*)
+        deny "⛔ Dev-server / daemon blocked in a nightly lane. It keeps the run's output stream open so the lane cannot exit after you finish — it then hangs until SIGTERM (a false timeout). Lanes make ONE focused code change and exit: verify statically (\`npx eslint <your changed files>\`) and let the gate build. Do NOT start a server." ;;
+    esac
+    if [ "$(printf '%s' "$input" | jq -r '.tool_input.run_in_background // false' 2>/dev/null || echo false)" = "true" ]; then
+      deny "⛔ Backgrounded Bash (run_in_background) blocked in a nightly lane — a detached child keeps the run's output stream open so the lane cannot exit and hangs to a false timeout. Run short FOREGROUND commands only."
+    fi
+
+    # Heavy full-repo command? (~60s each). The nightly GATE runs lint+type+test+
+    # build authoritatively after the lane, so these are self-verification the lane
+    # does NOT need — and they are the time-sink that killed lanes 05/06/01.
+    is_heavy=0
+    case "$cmd" in
+      *"tsc --noEmit"*|*"npm run build"*|*"npm run test"*|*"npm test"*|*"vitest run"*|*"next build"*|*"npm run build:fast"*|*"npm run build:schemas"*|*"yarn build"*|*"pnpm build"*)
+        is_heavy=1 ;;
+    esac
+
+    if [ "$is_heavy" = "1" ]; then
+      # Past finalize a 60s+ build/test/tsc cannot complete before SIGTERM — it would
+      # get the lane killed mid-run. Forbid it outright; the gate verifies.
+      if [ "$now" -ge "$FINALIZE" ]; then
+        deny "⛔ Finalize cutoff ($hhmm) passed — a full-repo build/test/tsc (~60s+) will NOT finish before the hard SIGTERM and will get your whole lane killed mid-run with nothing shipped. The nightly GATE runs lint+type+test+build authoritatively AFTER you finish — trust it. To sanity-check ONLY your changes, \`npx eslint <your changed files>\` is fast. Otherwise just \`git\`-verify, update your artifact, and END."
+      fi
+      heavy_n=0; [ -f "$HEAVY_FILE" ] && heavy_n=$(grep -c . "$HEAVY_FILE" 2>/dev/null || echo 0)
+      heavy_n=$(printf '%s' "$heavy_n" | tr -dc '0-9'); heavy_n=${heavy_n:-0}
+      if [ "$heavy_n" -ge "$HEAVY_CAP" ]; then
+        deny "⛔ Full-repo build/test/tsc cap reached ($heavy_n/$HEAVY_CAP). Each run is ~60s+ of your budget and the nightly GATE already runs the FULL lint+type+test+build after your lane — re-running it yourself just burns wall-clock and risks the SIGTERM guillotine. STOP self-checking the whole repo; if you must, \`npx eslint <only your changed files>\`. Finish your one change and END."
+      fi
+      printf '%s\n' "$now" >> "$HEAVY_FILE" 2>/dev/null || true
+      allow_with_context "⏰ ~${rem_min}m ${rem_sec}s to finalize ($hhmm). Heads-up: this full-repo command is ~60s+ and the nightly GATE re-verifies lint+type+test+build after you — run it at most ${HEAVY_CAP}×, prefer \`npx eslint <changed files>\` for a quick check, and don't start one you can't afford."
+    fi
+
+    # Non-heavy Bash is never denied — the agent needs git/eslint/revert to converge.
     if [ "$now" -ge "$FINALIZE" ]; then
-      allow_with_context "⛔ Finalize cutoff ($hhmm) passed. Use Bash ONLY to verify/revert/finalize (tsc on changed files, git checkout -- <file>, artifact update) — do NOT start new work. END this turn soon."
+      allow_with_context "⛔ Finalize cutoff ($hhmm) passed. Use Bash ONLY to verify/revert/finalize (eslint on changed files, git checkout -- <file>, artifact update) — do NOT start new work or full-repo builds. END this turn soon."
     fi
     if [ "$rem" -le 300 ]; then
-      allow_with_context "⏰ ~${rem_min}m ${rem_sec}s until finalize ($hhmm); ${distinct}/${cap} files changed. Avoid slow full-repo commands — run \`tsc --noEmit\` scoped to your changed files, not the whole project — and don't begin work you can't finish in time."
+      allow_with_context "⏰ ~${rem_min}m ${rem_sec}s until finalize ($hhmm); ${distinct}/${cap} files changed. Don't run full-repo tsc/build/test (the gate does that after you) — \`npx eslint <your changed files>\` is the fast self-check. Don't begin work you can't finish in time."
     fi
     exit 0
     ;;
+
+  WebSearch|WebFetch)
+    # Pure research — never needed to SHIP. Past the research window it only eats the
+    # time left to implement + verify, so deny it (force convergence).
+    if [ "$now" -ge "$RESEARCH" ]; then
+      deny "⛔ Research window closed — you have spent 60%+ of the lane budget; more web research will not leave time to land AND verify a change before SIGTERM. STOP researching: act on the intelligence brief + what you already found, make ONE small gate-clean change, and finalize."
+    fi
+    exit 0 ;;
+
+  mcp__sentry__*|mcp__ahrefs__*|mcp__posthog__*|mcp__plugin_atlassian_*)
+    # Read-only intel MCP. On 2026-06-03 lane 01 made 12 sequential Sentry calls and
+    # shipped nothing. Past the research window, deny — these never ship code; the
+    # write-capable servers (supabase/railway/…) are intentionally NOT gated here so
+    # a lane can still apply a migration to finalize.
+    if [ "$now" -ge "$RESEARCH" ]; then
+      deny "⛔ Research window closed — read-only intel queries (Sentry/Ahrefs/PostHog) past 60% of budget are the #1 timeout cause (a lane once made 12 Sentry calls and shipped zero). STOP querying; act on the brief + what you have, implement ONE change, and finalize."
+    fi
+    exit 0 ;;
 
   *)
     exit 0 ;;
