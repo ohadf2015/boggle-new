@@ -5,6 +5,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
@@ -35,6 +36,7 @@ export function LandingAvatarTeaser({ onBuilderOpenChange }: LandingAvatarTeaser
   const { profile, updateProfile } = useAuth();
 
   const openBuilder = () => {
+    trackLandingCtaClick('avatar_builder_teaser');
     setIsBuilderOpen(true);
     onBuilderOpenChange?.(true);
   };

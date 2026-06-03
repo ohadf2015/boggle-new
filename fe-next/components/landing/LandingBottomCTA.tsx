@@ -5,6 +5,7 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { haptics } from '@/utils/haptics';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 
 interface LandingBottomCTAProps {
   onPlayClick: () => void;
@@ -16,6 +17,9 @@ export function LandingBottomCTA({ onPlayClick }: LandingBottomCTAProps) {
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   const handleClick = () => {
+    // Below-fold final CTA into onboarding — instrument it to see the visitor →
+    // onboarding_started funnel leak (most drop pre-onboarding).
+    trackLandingCtaClick('bottom_cta');
     haptics.success();
     onPlayClick();
   };

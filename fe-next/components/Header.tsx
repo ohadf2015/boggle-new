@@ -4,6 +4,7 @@ import { memo, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { useGiftNotifications } from './header/useGiftNotifications';
 import HeaderLogo from './header/HeaderLogo';
@@ -44,6 +45,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     }, []);
 
     const openSignUp = useCallback(() => {
+        // Persistent header sign-up CTA — track by placement so the signup funnel
+        // is attributable (header vs hero vs bottom), not silent.
+        trackLandingCtaClick('header_signup');
         setAuthModalMode('signup');
         setShowAuthModal(true);
     }, []);
