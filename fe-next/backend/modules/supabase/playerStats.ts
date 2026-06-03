@@ -4,7 +4,7 @@
  */
 
 import { getSupabase, GameStats, XpInfo, UpdatedUserStats } from './client';
-import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from '../xpManager';
+import { calculateGameXp, hasRealOpponent, getLevelFromXp, checkLevelUp, getTitleForLevel } from '../xpManager';
 import { addXpToLeague } from '../leagueManager';
 import { leaderboardPointsForGame } from '../leaderboardScoring';
 import logger from '../../utils/logger';
@@ -274,15 +274,24 @@ export async function updatePlayerStats(
     updates.achievement_counts = currentCounts;
   }
 
-  // Calculate XP earned this game
-  const isWinner = gameStats.placement === 1 && (gameStats.totalPlayers || 0) > 1;
+  // Calculate XP earned this game.
+  //
+  // This path is multiplayer-only (single-player XP is awarded separately in
+  // app/api/stats/record-game). `totalPlayers` here is the count of REAL
+  // (non-bot) players — bots are filtered out upstream in gameResults.ts. So a
+  // game with fewer than two real players means the human played only against
+  // bots and earns NO XP. Stats (games_played etc.) still update.
+  const realPlayerCount = gameStats.totalPlayers || 1;
+  const isWinner = gameStats.placement === 1 && realPlayerCount > 1;
   const achievementCount = gameStats.achievements?.length || 0;
-  const xpResult = calculateGameXp({
-    score: gameStats.score || 0,
-    isWinner,
-    achievementCount,
-    playerCount: gameStats.totalPlayers || 1,
-  });
+  const xpResult = hasRealOpponent(realPlayerCount)
+    ? calculateGameXp({
+        score: gameStats.score || 0,
+        isWinner,
+        achievementCount,
+        playerCount: realPlayerCount,
+      })
+    : { totalXp: 0, breakdown: { gameCompletion: 0, scoreXp: 0, winBonus: 0, achievementXp: 0 } };
 
   // Apply comeback XP multiplier if active
   const { data: engagement } = await client
@@ -292,6 +301,7 @@ export async function updatePlayerStats(
     .single();
 
   if (
+    xpResult.totalXp > 0 &&
     engagement?.comeback_xp_multiplier &&
     engagement.comeback_xp_multiplier > 1 &&
     engagement.comeback_bonus_expires_at &&

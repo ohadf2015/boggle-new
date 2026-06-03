@@ -12,6 +12,8 @@ vi.mock('../client', () => ({
 
 vi.mock('../../xpManager', () => ({
   calculateGameXp: vi.fn(),
+  // Real behavior: a multiplayer game needs >= 2 real players to earn XP.
+  hasRealOpponent: (n: number | null | undefined) => (n ?? 0) >= 2,
   getLevelFromXp: vi.fn(),
   checkLevelUp: vi.fn(),
   getTitleForLevel: vi.fn(),
@@ -427,7 +429,50 @@ describe('updatePlayerStats', () => {
       expect(rpcCall[1].p_stats.practice_graduated_at).toEqual(expect.any(String));
     });
 
-    test('should NOT count solo game as win', async () => {
+    test('should award NO XP when there was no real opponent (only bots)', async () => {
+      // GIVEN: Player exists. This path is multiplayer-only and totalPlayers is
+      // the real (non-bot) player count, so totalPlayers=1 means the human played
+      // only against bots.
+      const playerId = 'user-123';
+      const currentProfile = {
+        id: playerId,
+        username: 'TestPlayer',
+        total_xp: 500,
+        current_level: 5,
+        total_games: 10,
+        total_score: 5000,
+        total_words: 100,
+        ranked_games: 5,
+        casual_games: 5,
+        ranked_wins: 2,
+        casual_wins: 3,
+        achievement_counts: {},
+      };
+
+      mockClient.single.mockResolvedValueOnce({
+        data: currentProfile,
+        error: null,
+      });
+
+      // WHEN: Player places 1st but only bots were present (totalPlayers = 1)
+      const gameStats: GameStats = {
+        score: 1000,
+        wordCount: 15,
+        placement: 1,
+        totalPlayers: 1, // lone human, rest were bots
+      };
+
+      await updatePlayerStats(playerId, gameStats);
+
+      // THEN: XP is not even computed, and the stats RPC is told to grant 0 XP.
+      expect(calculateGameXp).not.toHaveBeenCalled();
+      expect(mockClient.rpc).toHaveBeenCalledWith(
+        'update_player_stats_and_xp',
+        expect.objectContaining({ p_xp_amount: 0 })
+      );
+    });
+
+    test('should award XP when at least one real opponent was present', async () => {
       // GIVEN: Player exists
       const playerId = 'user-123';
       const currentProfile = {
@@ -450,28 +495,27 @@ describe('updatePlayerStats', () => {
         error: null,
       });
 
-      mockClient.single.mockResolvedValueOnce({
-        data: currentProfile,
-        error: null,
-      });
-
-      // WHEN: Player places 1st but in solo game (totalPlayers = 1)
+      // WHEN: Two real players (totalPlayers = 2), this player wins
       const gameStats: GameStats = {
         score: 1000,
         wordCount: 15,
         placement: 1,
-        totalPlayers: 1, // Solo game
+        totalPlayers: 2,
       };
 
       await updatePlayerStats(playerId, gameStats);
 
-      // THEN: Should NOT count as win
+      // THEN: XP is computed (real opponent present) and the win counts.
       expect(calculateGameXp).toHaveBeenCalledWith({
         score: 1000,
-        isWinner: false, // NOT a winner (solo game)
+        isWinner: true,
         achievementCount: 0,
-        playerCount: 1,
+        playerCount: 2,
       });
+      expect(mockClient.rpc).toHaveBeenCalledWith(
+        'update_player_stats_and_xp',
+        expect.objectContaining({ p_xp_amount: 100 })
+      );
     });
   });
 });

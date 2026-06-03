@@ -13,11 +13,31 @@ import {
   getLevelFromXp,
   getXpProgress,
   calculateGameXp,
+  hasRealOpponent,
   getDiminishingReturnsFactor,
   getDailyXpCap,
   PRESTIGE_CONFIG,
   XP_CONFIG,
 } from '../xpManager';
+
+// ===== hasRealOpponent =====
+describe('hasRealOpponent', () => {
+  it('is true only when at least two real (non-bot) players were present', () => {
+    expect(hasRealOpponent(2)).toBe(true);
+    expect(hasRealOpponent(3)).toBe(true);
+    expect(hasRealOpponent(8)).toBe(true);
+  });
+
+  it('is false for a lone human (everyone else was a bot)', () => {
+    expect(hasRealOpponent(1)).toBe(false);
+    expect(hasRealOpponent(0)).toBe(false);
+  });
+
+  it('treats missing/invalid counts as no real opponent', () => {
+    expect(hasRealOpponent(null)).toBe(false);
+    expect(hasRealOpponent(undefined)).toBe(false);
+  });
+});
 
 // ===== toRoman =====
 describe('toRoman', () => {

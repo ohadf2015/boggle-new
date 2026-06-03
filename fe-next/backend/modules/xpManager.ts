@@ -163,6 +163,19 @@ export function calculateGameXp(gameStats: GameStats): XpResult {
 }
 
 /**
+ * Whether a multiplayer game had a real opponent to play against.
+ *
+ * Multiplayer XP is only granted when at least one OTHER real (non-bot) player
+ * was in the game — a lobby filled out with bots (a lone human) grants no XP.
+ * `realPlayerCount` is the number of non-bot participants (bots already filtered
+ * out upstream in gameResults.ts). This does NOT govern single-player play,
+ * which awards XP through a separate path.
+ */
+export function hasRealOpponent(realPlayerCount: number | null | undefined): boolean {
+  return (realPlayerCount ?? 0) >= 2;
+}
+
+/**
  * Get diminishing returns factor based on player level.
  * Higher-level players earn progressively less XP per game,
  * making progression harder over time.

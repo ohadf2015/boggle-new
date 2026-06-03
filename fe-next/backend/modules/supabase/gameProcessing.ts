@@ -130,8 +130,10 @@ async function processPlayerResult(
         logger.error('SUPABASE', `updatePlayerStats error for ${playerScore.username}`, statsRes.error.message);
       }
 
-      // Store XP info for socket emission (only if stats were saved successfully)
-      if (!statsRes.error && statsRes.xpInfo) {
+      // Store XP info for socket emission (only if stats were saved successfully
+      // AND XP was actually earned — a multiplayer game played only against bots
+      // grants 0 XP, so we suppress the event entirely rather than flash "0 XP").
+      if (!statsRes.error && statsRes.xpInfo && statsRes.xpInfo.xpEarned > 0) {
         xpResult = {
           ...statsRes.xpInfo,
           socketId: authInfo.socketId,
