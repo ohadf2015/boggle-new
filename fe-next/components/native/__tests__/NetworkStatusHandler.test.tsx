@@ -10,7 +10,14 @@ import { NetworkStatusHandler } from '../NetworkStatusHandler';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { isNative } from '@/utils/platform';
 
+const { mockPathname } = vi.hoisted(() => ({
+  mockPathname: { current: '/en' },
+}));
+
 // Mock dependencies
+vi.mock('next/navigation', () => ({
+  usePathname: () => mockPathname.current,
+}));
 vi.mock('@/hooks/useOnlineStatus');
 vi.mock('@/utils/platform');
 vi.mock('../OfflineFallback', () => ({
@@ -29,6 +36,8 @@ const mockIsNative = isNative as jest.MockedFunction<typeof isNative>;
 describe('NetworkStatusHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default route is a non-offline-capable page (locale home).
+    mockPathname.current = '/en';
     // Reset window.location.reload mock
     delete (window as any).location;
     window.location = { reload: vi.fn() } as any;
@@ -71,10 +80,11 @@ describe('NetworkStatusHandler', () => {
   });
 
   describe('offline scenarios', () => {
-    it('should render OfflineFallback when offline and native', () => {
+    it('should render OfflineFallback when offline and native on a non-capable route', () => {
       // GIVEN
       mockUseOnlineStatus.mockReturnValue(false);
       mockIsNative.mockReturnValue(true);
+      mockPathname.current = '/en/multiplayer'; // server-only
 
       // WHEN
       render(
@@ -86,6 +96,24 @@ describe('NetworkStatusHandler', () => {
       // THEN
       expect(screen.queryByTestId('content')).not.toBeInTheDocument();
       expect(screen.getByTestId('offline-fallback')).toBeInTheDocument();
+    });
+
+    it('should render the game (children) when offline and native on an offline-capable route', () => {
+      // GIVEN — offline-capable modes must remain playable with no network
+      mockUseOnlineStatus.mockReturnValue(false);
+      mockIsNative.mockReturnValue(true);
+
+      for (const path of ['/en/blast', '/he/connections', '/es/daily']) {
+        mockPathname.current = path;
+        const { unmount } = render(
+          <NetworkStatusHandler>
+            <div data-testid="content">App Content</div>
+          </NetworkStatusHandler>
+        );
+        expect(screen.getByTestId('content')).toBeInTheDocument();
+        expect(screen.queryByTestId('offline-fallback')).not.toBeInTheDocument();
+        unmount();
+      }
     });
 
     it('should render children when offline and web (browser handles offline)', () => {

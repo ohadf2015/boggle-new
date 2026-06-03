@@ -216,6 +216,24 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     images: [`${BASE_URL}/og-image-he.webp`],
   });
 
+  // ─── Hebrew competitor-comparison landing (targets "Wordwall/Quizlet חלופה", "השוואת משחקים לכיתה") ───
+  // Hebrew-only by intent; self-referencing he cluster, x-default → /en education landing.
+  routes.push({
+    url: `${BASE_URL}/he/lexiclash-vs-wordwall-kahoot-quizlet`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'monthly',
+    priority: 0.8,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/en/education/vocabulary-games-classroom`,
+        en: `${BASE_URL}/en/education/vocabulary-games-classroom`,
+        he: `${BASE_URL}/he/lexiclash-vs-wordwall-kahoot-quizlet`,
+        'he-IL': `${BASE_URL}/he/lexiclash-vs-wordwall-kahoot-quizlet`,
+      },
+    },
+    images: [`${BASE_URL}/og-image-he.webp`],
+  });
+
   // ─── Hebrew dedicated daily-word landing (targets "המילה היומית" / מילת היום) ───
   // Hebrew-only by intent; self-referencing he cluster, x-default → /en/daily.
   routes.push({

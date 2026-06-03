@@ -2,9 +2,20 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { WifiOff, RefreshCw } from 'lucide-react';
+
+/**
+ * Modes that stay playable with no network (bundled data + offline dict +
+ * queued score sync). Mirrors OFFLINE_CAPABLE_MODES; labels are i18n keys.
+ */
+const PLAYABLE_OFFLINE_MODES = [
+  { mode: 'blast', labelKey: 'native.offline.playBlast' },
+  { mode: 'connections', labelKey: 'native.offline.playConnections' },
+  { mode: 'daily', labelKey: 'native.offline.playDaily' },
+] as const;
 
 interface OfflineFallbackProps {
   /** Callback when retry button is clicked */
@@ -26,7 +37,7 @@ interface OfflineFallbackProps {
  * />
  */
 export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallbackProps): React.ReactElement {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
 
   return (
     <div
@@ -83,6 +94,32 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
         />
         {isRetrying ? t('native.offline.retrying') : t('native.offline.retry')}
       </button>
+
+      {/* Offline launcher — modes that work with no network */}
+      <div className="mt-10 w-full max-w-xs">
+        <p className="mb-3 text-center text-sm font-neo-body text-neo-cream/80">
+          {t('native.offline.playablePrompt')}
+        </p>
+        <div className="flex flex-col gap-3">
+          {PLAYABLE_OFFLINE_MODES.map(({ mode, labelKey }) => (
+            <Link
+              key={mode}
+              href={`/${language}/${mode}`}
+              className="
+                flex items-center justify-center px-6 py-3
+                font-neo-body font-bold
+                rounded-neo border-neo border-black
+                bg-neo-cyan text-black
+                shadow-hard hover:shadow-hard-pressed
+                active:translate-x-[2px] active:translate-y-[2px]
+                transition-all duration-150
+              "
+            >
+              {t(labelKey)}
+            </Link>
+          ))}
+        </div>
+      </div>
 
       {/* Subtle version info */}
       <p className="mt-auto pt-8 text-xs text-neo-white">

@@ -45,6 +45,28 @@
         document.getElementById("retry").textContent = s.retry;
         document.getElementById("hint").textContent = s.hint;
         document.title = "LexiClash — " + s.title;
+
+        // Auto-recover: the moment connectivity returns, reload straight into
+        // the app instead of making the user tap Retry. Guarded so we only fire
+        // once. (The app itself handles offline play once it has loaded; this
+        // screen only appears when the WebView couldn't reach the host at all.)
+        var HOME = "https://www.lexiclash.live";
+        var recovered = false;
+        function recover() {
+          if (recovered) return;
+          recovered = true;
+          location.href = HOME;
+        }
+        window.addEventListener("online", recover);
+        // Belt-and-suspenders: poll, since the 'online' event is unreliable in
+        // some WebViews. Cheap HEAD probe; navigate on first success.
+        var pollTimer = setInterval(function () {
+          if (recovered) { clearInterval(pollTimer); return; }
+          if (navigator.onLine === false) return;
+          fetch(HOME + "/api/ping", { method: "HEAD", cache: "no-store" })
+            .then(function (r) { if (r && (r.ok || r.status === 204)) { clearInterval(pollTimer); recover(); } })
+            .catch(function () {});
+        }, 4000);
       })();
     </script>
   </body>

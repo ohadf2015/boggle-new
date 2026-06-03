@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OfflineFallback } from '../OfflineFallback';
 
+const { mockLang } = vi.hoisted(() => ({ mockLang: { current: 'en', dir: 'ltr' as 'ltr' | 'rtl' } }));
+
 // Mock useLanguage
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -11,11 +13,15 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'native.offline.message': "We can't reach the game server.",
         'native.offline.retry': 'Try Again',
         'native.offline.retrying': 'Connecting...',
+        'native.offline.playablePrompt': 'No internet? You can still play:',
+        'native.offline.playBlast': 'Blast',
+        'native.offline.playConnections': 'Connections',
+        'native.offline.playDaily': 'Daily Word Hunt',
       };
       return translations[key] || key;
     },
-    language: 'en',
-    dir: 'ltr',
+    language: mockLang.current,
+    dir: mockLang.dir,
   }),
 }));
 
@@ -69,5 +75,40 @@ describe('OfflineFallback', () => {
     // Main container should have dir attribute
     const mainDiv = container.querySelector('[dir]');
     expect(mainDiv).toHaveAttribute('dir', 'ltr');
+  });
+
+  describe('offline-playable mode CTAs', () => {
+    it('offers links to the offline-capable modes with the current locale', () => {
+      mockLang.current = 'en';
+      mockLang.dir = 'ltr';
+      render(<OfflineFallback onRetry={() => {}} />);
+
+      const blast = screen.getByRole('link', { name: 'Blast' });
+      const connections = screen.getByRole('link', { name: 'Connections' });
+      const daily = screen.getByRole('link', { name: 'Daily Word Hunt' });
+
+      expect(blast).toHaveAttribute('href', '/en/blast');
+      expect(connections).toHaveAttribute('href', '/en/connections');
+      expect(daily).toHaveAttribute('href', '/en/daily');
+    });
+
+    it('prefixes mode links with the active (non-en) locale', () => {
+      mockLang.current = 'he';
+      mockLang.dir = 'rtl';
+      render(<OfflineFallback onRetry={() => {}} />);
+
+      expect(screen.getByRole('link', { name: 'Blast' })).toHaveAttribute('href', '/he/blast');
+      expect(screen.getByRole('link', { name: 'Connections' })).toHaveAttribute(
+        'href',
+        '/he/connections',
+      );
+    });
+
+    it('shows the playable prompt', () => {
+      mockLang.current = 'en';
+      mockLang.dir = 'ltr';
+      render(<OfflineFallback onRetry={() => {}} />);
+      expect(screen.getByText('No internet? You can still play:')).toBeInTheDocument();
+    });
   });
 });
