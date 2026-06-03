@@ -4,8 +4,9 @@
  *
  * Requirements under test:
  *  - Feature-gated modes (word-tower, shiritori) award ZERO leaderboard points.
- *  - The Daily Challenge is the dominant point source (weighted far above casual).
- *  - Casual / single-player modes contribute reduced leaderboard points.
+ *  - Daily and multiplayer/casual play are weighted EQUALLY (1x): the leaderboard
+ *    is the sum of raw earned points, so multiplayer counts as much per point as
+ *    daily (daily still ranks high via its larger raw scores, not a multiplier).
  *  - XP is a separate track and is NOT governed by these functions.
  */
 import { describe, it, expect } from 'vitest';
@@ -66,14 +67,14 @@ describe('leaderboardScoring policy', () => {
       expect(leaderboardPointsForGame('shiritori', 500)).toBe(0);
     });
 
-    it('weights the daily challenge above casual so daily dominates', () => {
+    it('weights daily and multiplayer equally — equal raw score yields equal points', () => {
       const daily = leaderboardPointsForGame('daily-challenge', 100);
       const casual = leaderboardPointsForGame('classic', 100);
       expect(daily).toBe(Math.round(100 * DAILY_LEADERBOARD_WEIGHT));
       expect(casual).toBe(Math.round(100 * CASUAL_LEADERBOARD_WEIGHT));
-      expect(daily).toBeGreaterThan(casual);
-      // a single daily must out-earn many casual games of equal raw score
-      expect(daily).toBeGreaterThan(casual * 8);
+      // No multiplier favoritism: a multiplayer point is worth a daily point.
+      expect(daily).toBe(casual);
+      expect(casual).toBe(100);
     });
 
     it('applies the casual weight to all non-daily public modes', () => {
@@ -89,9 +90,10 @@ describe('leaderboardScoring policy', () => {
       expect(Number.isInteger(leaderboardPointsForGame('daily', 77))).toBe(true);
     });
 
-    it('keeps daily strictly the heaviest weight', () => {
-      expect(DAILY_LEADERBOARD_WEIGHT).toBeGreaterThan(CASUAL_LEADERBOARD_WEIGHT);
-      expect(CASUAL_LEADERBOARD_WEIGHT).toBeGreaterThan(0);
+    it('uses neutral (1x) weights so multiplayer counts as much as daily per point', () => {
+      expect(DAILY_LEADERBOARD_WEIGHT).toBe(1);
+      expect(CASUAL_LEADERBOARD_WEIGHT).toBe(1);
+      expect(CASUAL_LEADERBOARD_WEIGHT).toBe(DAILY_LEADERBOARD_WEIGHT);
     });
   });
 });

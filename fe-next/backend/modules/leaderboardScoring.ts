@@ -6,24 +6,38 @@
  * leaderboard project from and rank by).
  *
  * Design goals (see docs/2026-06-01-points-economy-audit.md):
- *  - The Daily Challenge is the dominant leaderboard source; casual free-play
- *    contributes far less, so standings are driven mostly by daily play.
+ *  - Daily and multiplayer/casual play are weighted EQUALLY (1x). The leaderboard
+ *    is the sum of raw earned points; we do NOT amplify daily or attenuate
+ *    multiplayer. Daily still tends to rank high because its raw per-game scores
+ *    are larger, but multiplayer now counts fully and compounds across games.
  *  - Feature-gated / preview modes (admin-only `word-tower`, coming-soon
  *    `shiritori`) contribute NOTHING — they must not pollute the leaderboard.
  *  - XP / progression is a SEPARATE track and is intentionally NOT governed
  *    here (we don't punish players for playing casually; we only re-weight the
  *    competitive currency).
  *
+ * NOTE: these weights are duplicated in SQL inside the
+ * `recompute_current_season_leaderboard` Postgres function (the authoritative
+ * source for the displayed `leaderboard.total_score`). If you change a weight
+ * here, ship a matching migration redefining that function, or the live board
+ * will silently desync from this per-game tally.
+ *
  * Gating derives from the existing rotation weights (`GAME_MODE_WEIGHTS`) so it
  * cannot drift from the start-gate: a known mode with weight 0 is gated.
  */
 import { GAME_MODE_WEIGHTS } from './gameModeSelector';
 
-/** Multiplier on a daily game's raw score when crediting the leaderboard. */
-export const DAILY_LEADERBOARD_WEIGHT = 3;
+/**
+ * Multiplier on a daily game's raw score when crediting the leaderboard.
+ * 1x — daily is no longer amplified; raw points count as-is.
+ */
+export const DAILY_LEADERBOARD_WEIGHT = 1;
 
-/** Multiplier on a casual / single-player game's raw score. < 1 so daily wins. */
-export const CASUAL_LEADERBOARD_WEIGHT = 0.25;
+/**
+ * Multiplier on a casual / multiplayer game's raw score.
+ * 1x — multiplayer now counts the same per point as daily (was 0.25).
+ */
+export const CASUAL_LEADERBOARD_WEIGHT = 1;
 
 const DAILY_MODE_ALIASES = new Set(['daily', 'daily-challenge']);
 
