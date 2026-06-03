@@ -35,6 +35,10 @@ command -v caffeinate >/dev/null 2>&1 && caffeinate -i -w "$$" >/dev/null 2>&1 &
 
 # --- flags -----------------------------------------------------------------
 DRY_RUN=0; NO_PUSH=0; NO_MONITOR=0; NO_GATE=0; ONLY=""; SKIP=""
+# Count of changed files for the digest. Never computed elsewhere, so initialise it —
+# under `set -u` the no-change / summary-fallback paths (which reference it) otherwise
+# abort with "DIRTY_COUNT: unbound variable" (surfaced by a --only run with no lane edits).
+DIRTY_COUNT=0
 # Keep a timed-out lane's partial work instead of reverting it. Default ON
 # (2026-05-28): the goal is "a lane never gives up / never produces nothing", and
 # 35% of lane-runs hit the time ceiling. The isolated gate + drop-and-re-gate
@@ -309,7 +313,10 @@ should_run() {
 # lane impossible to silently strand again when one is appended.
 for i in $(seq 1 "${#LANES[@]}"); do
   lane="${LANES[$((i-1))]}"
-  if ! should_run "$i"; then
+  # Pass the lane NAME (not the index $i) — should_run compares against $ONLY/$SKIP
+  # which are lane names (e.g. "09-monetization"). Passing $i made every --only/--skip
+  # match fail ("09-monetization" = "9" is always false) → ALL lanes skipped.
+  if ! should_run "$lane"; then
     log "lane $i ($lane) — skipped via flag"
     LANE_RESULTS+=("⏭️  lane $i — skipped")
     continue
@@ -395,6 +402,7 @@ log "──────── integration ────────"
 # assignment, NOT inside $(...): `$(grep -c . f || echo 0)` would print "0\n0"
 # on an empty file — grep prints 0 AND exits 1 — corrupting the count.)
 AUTHORED_COUNT=$(grep -c . "$NIGHTLY_AUTHORED_FILE" 2>/dev/null) || AUTHORED_COUNT=0
+DIRTY_COUNT="$AUTHORED_COUNT"   # the digest's "N files" = files this nightly authored
 log "nightly authored $AUTHORED_COUNT file(s) this run (whole tree: $(git status --porcelain | wc -l | tr -d ' ') dirty incl. founder WIP)"
 
 if [ "$AUTHORED_COUNT" = "0" ]; then
