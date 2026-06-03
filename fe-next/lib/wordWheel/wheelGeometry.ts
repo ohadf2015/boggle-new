@@ -22,15 +22,22 @@ export const WHEEL_LETTER_ALLOWANCE_PX = 60;
  * @param containerWidthPx rendered wheel width (getBoundingClientRect)
  * @param maxRadius        upper bound (96 mobile, 136/140 desktop)
  * @param minRadius        lower bound; keeps a tiny wheel usable
+ * @param letterAllowance  rim space reserved for one outer letter. Defaults to
+ *                         {@link WHEEL_LETTER_ALLOWANCE_PX}; pass a smaller value
+ *                         on short/landscape viewports where the `short:` variant
+ *                         shrinks the letters, so the orbit isn't over-reserved
+ *                         (which would otherwise floor a small wheel onto its
+ *                         center letter).
  */
 export function computeWheelRadius(
   containerWidthPx: number,
   maxRadius: number,
   minRadius = 52,
+  letterAllowance = WHEEL_LETTER_ALLOWANCE_PX,
 ): number {
   if (!Number.isFinite(containerWidthPx) || containerWidthPx <= 0) {
     return minRadius;
   }
-  const fitInsideRim = (containerWidthPx - WHEEL_LETTER_ALLOWANCE_PX) / 2;
+  const fitInsideRim = (containerWidthPx - letterAllowance) / 2;
   return Math.round(Math.max(minRadius, Math.min(maxRadius, fitInsideRim)));
 }
