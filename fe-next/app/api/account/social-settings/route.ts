@@ -9,13 +9,14 @@ import {
 } from '@/lib/families/socialPolicy';
 
 /**
- * Families Policy — adult management of social features.
+ * Families Policy — adult management of social features (self-service).
  *
- * Lets an adult enable/disable specific social capabilities (or pick a level of
- * functionality) for the account. Gated by an "adult action": the caller must
- * supply a birth year that resolves to an adult, per the policy's accepted
- * mechanisms (birthdate). The override is stored on the profile and re-applied
- * by the capability resolver everywhere.
+ * Lets an adult enable/disable specific social capabilities for THEIR OWN
+ * account. Authorization is derived from the caller's server-stored
+ * `profiles.birth_year` — never from the request body — so a child account
+ * cannot self-elevate by declaring an adult birth year. A child's social
+ * features must instead be managed through the verified guardian flow
+ * (parental controls), not this self-service endpoint.
  */
 const CAP_KEYS = Object.keys(ADULT_CAPABILITIES) as (keyof SocialCapabilities)[];
 
@@ -25,7 +26,6 @@ const bodySchema = z.object({
     .refine((o) => Object.keys(o).length > 0 && Object.keys(o).every((k) => CAP_KEYS.includes(k as keyof SocialCapabilities)), {
       message: 'override must contain only known capability keys',
     }),
-  adultBirthYear: z.number().int(),
 });
 
 export async function POST(request: Request) {
@@ -48,8 +48,21 @@ export async function POST(request: Request) {
 
     const currentYear = new Date().getUTCFullYear();
 
-    // Adult-action gate: the manager must prove they are an adult.
-    if (computeSocialTier(parsed.data.adultBirthYear, currentYear) !== 'adult') {
+    // Authorize from the caller's SERVER-STORED identity, never the request body.
+    // (Trusting a body-supplied birth year let a child self-elevate to adult.)
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('birth_year')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.error('Failed to read profiles.birth_year:', profileError);
+      return NextResponse.json({ error: 'Failed to load account' }, { status: 500 });
+    }
+
+    const tier = computeSocialTier(profile?.birth_year ?? null, currentYear);
+    if (tier !== 'adult') {
       return NextResponse.json({ error: 'Adult verification required' }, { status: 403 });
     }
 
@@ -66,13 +79,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 });
     }
 
-    // Re-resolve the account's effective capabilities for the client.
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('birth_year')
-      .eq('id', user.id)
-      .single();
-    const tier = computeSocialTier(profile?.birth_year ?? null, currentYear);
     const capabilities = resolveSocialCapabilities(tier, override);
 
     return NextResponse.json({ success: true, tier, capabilities });
