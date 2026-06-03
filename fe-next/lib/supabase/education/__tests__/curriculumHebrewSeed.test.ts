@@ -1,15 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * Validates the Hebrew language-arts curriculum seed migration.
  * Guards seed integrity (real Hebrew words + definitions, valid enums) AND
  * the honesty rule: no `MOE-` standard codes (we have no Ministry sign-off).
  */
-const MIGRATION = path.join(
-  process.cwd(),
-  'supabase/migrations/20260603160000_curriculum_hebrew_lists.sql',
+// Resolve relative to THIS file (not process.cwd()) so the test passes whether
+// vitest runs from fe-next or the repo root.
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const MIGRATION = path.resolve(
+  HERE,
+  '../../../../supabase/migrations/20260603160000_curriculum_hebrew_lists.sql',
 );
 
 const GRADE_LEVELS = ['grade_1', 'grade_2', 'grade_3', 'grade_4', 'grade_5', 'grade_6'];

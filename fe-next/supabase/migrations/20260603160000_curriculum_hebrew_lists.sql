@@ -5,6 +5,11 @@
 -- code: we make no official endorsement claim. These are grade-appropriate general
 -- Hebrew vocabulary lists.
 -- word_count is a GENERATED column and is intentionally omitted from the INSERT.
+-- Idempotent: re-running refreshes the HE-G% lists instead of duplicating them
+-- (PKs are random UUIDs, so ON CONFLICT can't dedup). Safe whether applied via the
+-- Supabase MCP now AND/OR by the deploy migration pipeline later.
+
+DELETE FROM curriculum_word_lists WHERE curriculum_standard LIKE 'HE-G%';
 
 INSERT INTO curriculum_word_lists (name, description, language, grade_level, subject, curriculum_standard, words, is_active)
 VALUES
