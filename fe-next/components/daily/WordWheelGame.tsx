@@ -628,18 +628,36 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
 
-  // Responsive wheel radius based on the wheel div width (not the game container).
-  // The container is height-capped on short viewports (max-w/max-h below), so the
-  // measured width shrinks there and the orbit pulls inward to stay inside the rim.
+  // Responsive wheel radius measured from the wheel div's *smaller* dimension.
+  // The container is height-capped on short/landscape viewports (max-w/max-h
+  // below), so the measured box shrinks there and the orbit pulls inward to stay
+  // inside the rim. Using min(w,h) keeps letters inside even if the box ends up
+  // non-square (e.g. a viewport cap binds height but not width).
+  // On short viewports the `short:` variant shrinks the letters too, so we feed a
+  // smaller maxRadius / minRadius / letterAllowance to match — otherwise the orbit
+  // would floor onto the (still-large) center letter.
   const [wheelRadius, setWheelRadius] = useState(96);
   useEffect(() => {
     const el = wheelContainerRef.current;
     if (!el) return;
-    const update = () => setWheelRadius(computeWheelRadius(el.getBoundingClientRect().width, 136));
+    const shortVp = typeof window !== 'undefined' ? window.matchMedia('(max-height: 600px)') : null;
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      const size = Math.min(rect.width, rect.height);
+      setWheelRadius(
+        shortVp?.matches
+          ? computeWheelRadius(size, 88, 40, 44)
+          : computeWheelRadius(size, 136),
+      );
+    };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    shortVp?.addEventListener?.('change', update);
+    return () => {
+      ro.disconnect();
+      shortVp?.removeEventListener?.('change', update);
+    };
   }, []);
 
   // ── Keyboard input ──
@@ -748,7 +766,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           (flex-1 + justify-center sibling below) to re-center. */}
       <m.div
         data-testid="word-builder"
-        className="relative w-full h-[52px] sm:h-[72px] flex items-center justify-center"
+        className="relative w-full h-[52px] sm:h-[72px] short:h-[44px] flex items-center justify-center"
         animate={
           wordBuilderShake
             ? { x: [-4, 4, -3, 3, -1, 0] }
@@ -919,7 +937,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           left a 100–250px gap between the wheel and Submit. The inline-submit
           chip near the word-builder still serves as the primary CTA when the
           found-words list grows past viewport. */}
-      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1" data-testid="wheel-cluster">
+      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1 short:gap-0.5 short:py-0" data-testid="wheel-cluster">
       {/* Tap-to-remove + double-tap-to-submit hint — fixed-height reserved
           slot (h-*, not min-h-*) so even font/locale ascender variance can't
           grow the slot when builtLetters mounts/unmounts the hint text. */}
@@ -937,11 +955,19 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       {/* ── The Wheel ── */}
       <div
         ref={wheelContainerRef}
+        data-testid="wheel-orbit"
         // Height-cap (max-*) only binds when smaller than the fixed size, so tall
         // screens are unchanged while short/landscape ones shrink the wheel to fit
         // the cluster instead of overlapping the pills above / buttons below.
         // Reserve ~116px (tap-hint + rule-hint + action bar + gaps); floor 176px.
-        className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))] shrink-0 flex items-center justify-center touch-none"
+        //
+        // short: (≤600px tall, incl. desktop 1136×473) adds a *viewport* cap
+        // (svh) so the wheel can never exceed the viewport even when the flex /
+        // cqb height-chain fails to propagate a bounded height — the prior
+        // cqb-only cap left it stuck at the fixed h-96 (384px) and the orbit
+        // collided with the instruction text above and the action bar below.
+        // Lower reserve (72px, chrome is tightened on short) and floor (132px).
+        className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))] short:max-w-[max(132px,min(calc(100cqb-72px),46svh))] short:max-h-[max(132px,min(calc(100cqb-72px),46svh))] shrink-0 flex items-center justify-center touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -998,15 +1024,17 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         ))}
       </div>
 
-      {/* ── Center letter rule hint ── */}
-      <p className="text-neo-white text-xs text-center">
+      {/* ── Center letter rule hint ── (hidden on short viewports to reclaim
+          vertical room for the wheel; the same rule is shown on the intro/ready
+          screen, so no information is lost mid-game). */}
+      <p className="text-neo-white text-xs text-center short:hidden">
         {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters', { min: '3' })}
       </p>
 
       {/* ── Action Buttons (inline below wheel, glued via flex cluster) ── */}
       <div
         data-testid="word-wheel-action-bar"
-        className="w-full flex items-center justify-center gap-3 mt-1"
+        className="w-full flex items-center justify-center gap-3 mt-1 short:mt-0"
       >
         {/* Clear */}
         <m.button

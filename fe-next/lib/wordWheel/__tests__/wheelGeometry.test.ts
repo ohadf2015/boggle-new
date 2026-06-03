@@ -34,4 +34,24 @@ describe('computeWheelRadius', () => {
   it('returns an integer (px transforms should not be sub-pixel)', () => {
     expect(Number.isInteger(computeWheelRadius(257, 136))).toBe(true);
   });
+
+  it('accepts a smaller letter allowance so a height-capped short wheel keeps letters inside', () => {
+    // GIVEN a short/landscape wheel where the box is shrunk to ~140px and the
+    // letters are also shrunk (short: variant → 48px outer letters)
+    // WHEN computing the radius with a reduced allowance matching the small letters
+    // THEN the orbit is larger than it would be with the default 60px allowance,
+    //      because less rim space is reserved for the (now smaller) letters.
+    const tightAllowance = computeWheelRadius(140, 88, 40, 44);
+    const defaultAllowance = computeWheelRadius(140, 88, 40);
+    expect(tightAllowance).toBe(Math.round((140 - 44) / 2)); // 48
+    expect(defaultAllowance).toBe(Math.round((140 - WHEEL_LETTER_ALLOWANCE_PX) / 2)); // 40
+    expect(tightAllowance).toBeGreaterThan(defaultAllowance);
+  });
+
+  it('still clamps to the short min/max bounds with a custom allowance', () => {
+    // Tiny box → floored to the (lower) short minRadius, not the default 52.
+    expect(computeWheelRadius(60, 88, 40, 44)).toBe(40);
+    // Large box → capped to the (lower) short maxRadius.
+    expect(computeWheelRadius(400, 88, 40, 44)).toBe(88);
+  });
 });

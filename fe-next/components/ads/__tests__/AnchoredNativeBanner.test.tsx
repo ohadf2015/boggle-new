@@ -194,6 +194,31 @@ describe('AnchoredNativeBanner', () => {
     expect(hideBanner).toHaveBeenCalled();
   });
 
+  it('keeps --admob-banner-height reserved until the banner actually hides on a blocked route', async () => {
+    // Repro for the daily ready-screen Play CTA being covered "sometimes":
+    // navigating from a banner-allowed route (banner showing, var=90px) into a
+    // blocked /daily route. The native banner composites ABOVE the WebView, so
+    // zeroing the reservation synchronously drops bottom-anchored CTAs into the
+    // band the still-painted banner occupies until hideBanner() resolves.
+    document.documentElement.style.setProperty('--admob-banner-height', '90px');
+    let resolveHide!: () => void;
+    hideBanner.mockReturnValueOnce(new Promise<void>((r) => { resolveHide = () => r(); }));
+    mockPathname.current = '/daily/word-hunt';
+
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+
+    // WHILE the hide is in flight the reservation must persist (CTA stays lifted).
+    expect(hideBanner).toHaveBeenCalled();
+    expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('90px');
+
+    // WHEN the native overlay is actually gone, the reservation collapses.
+    resolveHide();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
+  });
+
   it('registers SizeChanged listener on mount', async () => {
     render(<AnchoredNativeBanner />);
     await Promise.resolve();

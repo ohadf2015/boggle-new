@@ -96,3 +96,6 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/README.md
 public/dicts/
+
+# Lighthouse CI report output (npm run lighthouse:ci)
+.lighthouseci/
