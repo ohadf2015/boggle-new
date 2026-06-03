@@ -114,7 +114,17 @@ Shipped (TDD, all gates green — verified in-browser where possible):
 
 **What does NOT work yet — and why:** cold-start offline and offline navigation *between* modes both need the service worker to serve cached route shells + RSC. In-browser verification (Chromium, prod-ish server) revealed the SW layer is currently broken — see §9b. So the launcher CTAs and cold-start are forward-compatible groundwork, gated on the SW fix.
 
-## 9b. Critical discovery — the service worker layer is broken (the true cold-start blocker)
+## 9b. SW-delivery fix — SHIPPED + verified (master `fe3ea4baf`)
+
+The infrastructure bugs below were **fixed** and verified in a real production build (Chromium): `/sw.js` now serves `200 application/javascript`; the SW registers and controls (`controller:true`); cache holds all 15 mode routes + 5 locale homes + static assets; **offline reload of `/` and `/en/blast` both return `200 fromServiceWorker`** — i.e. a cold offline launch boots from cache at the web layer.
+
+- Single source `lib/sw/swSource.ts` (v4 logic; precache routes injected from `offlineCapableRoutes()` so they can't drift; emits valid JS — `swSource.test.ts` compile-checks it).
+- `app/sw.js/route.ts` imports + serves it; **`public/sw.js` deleted** → `/sw.js` conflict (500) gone, v1/v4 divergence gone.
+- Resilient per-route precache of mode shells + locale homes; **navigation fallback** serves a cached locale shell when a page navigation fails and misses exact cache (covers the uncacheable `/`→`/{locale}` entry).
+
+**Only remaining unknown: R1** — whether the native Capacitor WebView grants the SW the same first-navigation interception offline as Chromium did. Requires an on-device build to confirm. If it does, cold-start offline is fully solved; if not, the web mechanism still benefits every already-loaded session and the fallback is `error.html` auto-recover.
+
+### Original diagnosis (for reference)
 
 In-browser verification (offline reload + cache inspection) surfaced pre-existing infrastructure bugs that block *all* offline-shell behavior, independent of this feature:
 
