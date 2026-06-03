@@ -8,12 +8,13 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { postWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
 
 const STORAGE_KEY = 'lexiclash_churn_signals';
 const REPORT_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+const ENDPOINT = '/api/growth/churn-signals';
 
 interface StoredSignals {
   sessionStartedAt: number;
@@ -65,6 +66,16 @@ function saveSignals(signals: StoredSignals): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(signals));
 }
 
+function buildPayload(userId: string, signals: StoredSignals) {
+  return {
+    userId,
+    avgSessionLengthSeconds: Math.floor((Date.now() - signals.sessionStartedAt) / 1000),
+    gamesPerSession: signals.gamesPlayed,
+    socialInteractions: signals.socialInteractions,
+    notificationDismissals: signals.notificationDismissals,
+  };
+}
+
 export function useChurnSignals(): UseChurnSignalsReturn {
   const { user } = useAuth();
   const userId = user?.id ?? null;
@@ -72,47 +83,36 @@ export function useChurnSignals(): UseChurnSignalsReturn {
   const signalsRef = useRef<StoredSignals>(getStoredSignals());
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const reportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Guards against overlapping in-flight reports. A failed/slow request must
+  // never queue up a backlog of concurrent POSTs.
+  const inFlightRef = useRef(false);
 
-  const reportMutation = useMutation({
-    mutationFn: async (payload: {
-      userId: string;
-      avgSessionLengthSeconds: number;
-      gamesPerSession: number;
-      socialInteractions: number;
-      notificationDismissals: number;
-    }) => {
-      await fetch('/api/growth/churn-signals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    },
-    onSuccess: () => {
-      signalsRef.current = {
-        ...signalsRef.current,
-        lastReportedAt: Date.now(),
-      };
-      saveSignals(signalsRef.current);
-    },
-    onError: (err) => {
-      logger.error('useChurnSignals: failed to report signals', err);
-    },
-  });
-
+  // Stable across renders (depends only on userId). Previously this depended on
+  // the react-query mutation object, whose identity changed on every render —
+  // and because the 1Hz session-length tick re-renders the component, the
+  // report interval below was torn down and recreated every second (so it
+  // never actually fired, and the constant timer churn degraded the app).
   const reportSignals = useCallback(async () => {
     if (!userId) return;
+    if (inFlightRef.current) return;
 
+    inFlightRef.current = true;
     const signals = signalsRef.current;
-    const sessionLengthSeconds = Math.floor((Date.now() - signals.sessionStartedAt) / 1000);
-
-    reportMutation.mutate({
-      userId,
-      avgSessionLengthSeconds: sessionLengthSeconds,
-      gamesPerSession: signals.gamesPlayed,
-      socialInteractions: signals.socialInteractions,
-      notificationDismissals: signals.notificationDismissals,
-    });
-  }, [userId, reportMutation]);
+    try {
+      const response = await postWithAuth(ENDPOINT, buildPayload(userId, signals));
+      if (!response.ok) {
+        throw new Error(`churn-signals report failed with status ${response.status}`);
+      }
+      signalsRef.current = { ...signalsRef.current, lastReportedAt: Date.now() };
+      saveSignals(signalsRef.current);
+    } catch (err) {
+      // Pass the Error as an argument so Sentry captures the stack (the logger
+      // scans all args for an Error) instead of serialising it to "{}".
+      logger.error('useChurnSignals: failed to report signals', err);
+    } finally {
+      inFlightRef.current = false;
+    }
+  }, [userId]);
 
   const trackGamePlayed = useCallback(() => {
     signalsRef.current.gamesPlayed += 1;
@@ -147,7 +147,8 @@ export function useChurnSignals(): UseChurnSignalsReturn {
     };
   }, []);
 
-  // Report every 5 minutes
+  // Report every 5 minutes. reportSignals is stable, so this interval is set up
+  // once per session (not rebuilt on every render).
   useEffect(() => {
     if (!userId) return;
 
@@ -160,25 +161,16 @@ export function useChurnSignals(): UseChurnSignalsReturn {
     };
   }, [userId, reportSignals]);
 
-  // Report on session end (beforeunload)
+  // Report on session end (beforeunload). sendBeacon is best-effort and cannot
+  // carry an Authorization header, so it is purely supplementary to the
+  // authenticated periodic report above.
   useEffect(() => {
     if (!userId || typeof window === 'undefined') return;
 
     const handleUnload = () => {
-      const signals = signalsRef.current;
-      const sessionLengthSeconds = Math.floor((Date.now() - signals.sessionStartedAt) / 1000);
-
-      // Use sendBeacon for reliable delivery on unload
-      const payload = JSON.stringify({
-        userId,
-        avgSessionLengthSeconds: sessionLengthSeconds,
-        gamesPerSession: signals.gamesPlayed,
-        socialInteractions: signals.socialInteractions,
-        notificationDismissals: signals.notificationDismissals,
-      });
-
+      const payload = JSON.stringify(buildPayload(userId, signalsRef.current));
       if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-        navigator.sendBeacon('/api/growth/churn-signals', new Blob([payload], { type: 'application/json' }));
+        navigator.sendBeacon(ENDPOINT, new Blob([payload], { type: 'application/json' }));
       }
     };
 
