@@ -73,7 +73,9 @@ export SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY
 # ~/.config/lexi-nightly/env to unlock the source over REST. See spec §4.1.
 export SENTRY_AUTH_TOKEN SENTRY_ORG_SLUG SENTRY_PROJECT_SLUG SENTRY_HOST
 export SUPABASE_ACCESS_TOKEN BING_WMT_API_KEY RAILWAY_TOKEN
-# Reddit OAuth (lane 04). Absent → reddit-fetch.sh degrades to legacy UA curl (now 403).
+# Reddit OAuth (lane 04). Absent → reddit-fetch.sh falls back to Reddit RSS (a different
+# gate that still serves 200 from this residential IP — autonomous, no creds; the legacy
+# UA JSON curl is 403). OAuth, when set, adds score/comment counts the RSS path lacks.
 # See docs/nightly/reddit-oauth-setup.md. PASSWORD grant needs all four; app-only needs
 # just CLIENT_ID+SECRET. The `set -a` source above already exports these if present — the
 # explicit re-export keeps them visible across the lane subshells.

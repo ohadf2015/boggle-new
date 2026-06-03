@@ -108,6 +108,32 @@ _get() { # $1=url ; uses $BEARER if set (oauth host), else UA-only (legacy host)
   fi
 }
 
+# Reddit RSS still returns HTTP 200 to a BROWSER UA from a residential IP (a different
+# gate than the 403'd JSON API — verified 2026-06-03: JSON 403/189KB, RSS 200). RSS is
+# the only fully-autonomous Reddit signal needing no OAuth app. Reddit serves RSS to
+# feed-readers/browsers; the descriptive API UA can be throttled, so use a browser UA.
+RSS_UA="${REDDIT_RSS_UA:-Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36}"
+
+# _reddit_rss → compact JSON array (same shape as _parse) from the RSS endpoint for
+# the current MODE/args, or empty on failure. score/num_comments come back null (RSS
+# omits them). Honors REDDIT_RSS_CMD as a test seam (stands in for the curl).
+_reddit_rss() {
+  local rssurl
+  case "$MODE" in
+    feed)   rssurl="https://www.reddit.com/r/${SUB}/${SORT}.rss?t=${T}&limit=${LIMIT}" ;;
+    search) rssurl="https://www.reddit.com/search.rss?q=$(printf '%s' "$Q" | jq -sRr @uri)&sort=${SORT}&t=${T}&limit=${LIMIT}" ;;
+    *) return 1 ;;
+  esac
+  local xml
+  if [ -n "${REDDIT_RSS_CMD:-}" ]; then
+    xml=$(eval "$REDDIT_RSS_CMD" 2>/dev/null)
+  else
+    xml=$(curl -s -m 20 -A "$RSS_UA" "$rssurl" 2>/dev/null)
+  fi
+  [ -n "$xml" ] || return 1
+  printf '%s' "$xml" | python3 "$(dirname "${BASH_SOURCE[0]}")/reddit-rss-parse.py" "${LIMIT}" 2>/dev/null
+}
+
 # --- parse args (needed by BOTH the snapshot slice and the network query) ---
 MODE="${1:-}"; shift || true
 case "$MODE" in
@@ -150,6 +176,25 @@ case "$MODE" in
 esac
 
 RESP=$(_get "$URL")
+
+# If the unauthenticated JSON host gave nothing usable (403 block page / empty / error
+# body / unexpected shape) AND we have no OAuth bearer, fall back to Reddit RSS — a
+# different gate that still serves 200. RSS lacks score/comments (→ null) but yields the
+# real titles/permalinks/authors/content lanes need. Only when NOT on the oauth host (a
+# valid bearer already returns full JSON). Skipped when REDDIT_RSS_CMD is unset in tests
+# whose curl stub returns a valid listing (the JSON path stays the tested happy path).
+_json_usable=1
+if [ -z "$RESP" ]; then _json_usable=0
+elif echo "$RESP" | jq -e '.error' >/dev/null 2>&1; then _json_usable=0
+elif ! echo "$RESP" | jq -e '(.data.children | type) == "array"' >/dev/null 2>&1; then _json_usable=0
+fi
+if [ "$_json_usable" = "0" ] && [ -z "${BEARER:-}" ]; then
+  _rss=$(_reddit_rss)
+  if [ -n "$_rss" ] && [ "$(printf '%s' "$_rss" | jq -r 'length' 2>/dev/null || echo 0)" -gt 0 ]; then
+    printf '%s\n' "$_rss"; exit 0
+  fi
+fi
+
 [ -z "$RESP" ] && _emit_err "empty response from reddit (network/blocked) for: $URL"
 # Reddit error bodies are JSON too; surface them rather than crashing.
 if echo "$RESP" | jq -e '.error' >/dev/null 2>&1; then

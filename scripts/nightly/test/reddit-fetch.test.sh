@@ -28,7 +28,8 @@ if [[ "$args" == *"access_token"* ]]; then
   if [ "${TOKEN_FAIL:-0}" = "1" ]; then echo '{"error":"invalid_grant"}'; else
     echo '{"access_token":"TOKABC","token_type":"bearer","expires_in":3600}'; fi
 elif [[ "$args" == *"reddit.com/r/"* ]] || [[ "$args" == *"reddit.com/search"* ]]; then
-  echo '{"data":{"children":[{"data":{"title":"T1","score":5,"num_comments":2,"permalink":"/r/x/1","author":"a","subreddit":"wordgames","created_utc":1,"selftext":"hi"}}]}}'
+  if [ "${LISTING_403:-0}" = "1" ]; then echo '<html><body>403 blocked</body></html>'; else
+  echo '{"data":{"children":[{"data":{"title":"T1","score":5,"num_comments":2,"permalink":"/r/x/1","author":"a","subreddit":"wordgames","created_utc":1,"selftext":"hi"}}]}}'; fi
 else echo ''; fi
 STUB
 chmod +x "$BIN/curl"
@@ -84,6 +85,36 @@ OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" \
        REDDIT_CLIENT_ID=cid REDDIT_CLIENT_SECRET=sec \
        REDDIT_TOKEN_CACHE="$ROOT/tok5" bash "$SCRIPT" search "word game" relevance week 5 )
 assert "search: hit oauth.reddit.com/search" "grep -q 'oauth.reddit.com/search' '$CALLS'"
+
+echo "  reddit-fetch (rss fallback — autonomous, no creds):"
+# 5b — no creds + JSON host returns a 403 block page → fall back to Reddit RSS (the
+# residential-IP path that still serves 200). REDDIT_RSS_CMD stands in for the RSS curl.
+cat > "$ROOT/rss.xml" <<'RSSXML'
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><category term="wordgames" label="r/wordgames"/>
+<entry><title>RSS Post One</title>
+<link href="https://www.reddit.com/r/wordgames/comments/abc/rss_post_one/"/>
+<author><name>/u/rssuser</name></author>
+<published>2026-06-01T10:00:00+00:00</published>
+<content type="html">&lt;p&gt;body text&lt;/p&gt; submitted by /u/rssuser</content></entry></feed>
+RSSXML
+CALLS="$ROOT/calls_rss.log"; : > "$CALLS"
+OUT=$( CALLS_LOG="$CALLS" LISTING_403=1 PATH="$BIN:$PATH" REDDIT_TOKEN_CACHE="$ROOT/tokrss" \
+       REDDIT_RSS_CMD="cat $ROOT/rss.xml" REDDIT_SNAPSHOT="$ROOT/no-such-snapshot.json" \
+       bash "$SCRIPT" feed wordgames top week 5 )
+rc=$?
+assert "rss fallback: JSON 403 → RSS parsed into compact array" "echo '$OUT' | jq -e '.[0].title==\"RSS Post One\"' >/dev/null"
+assert "rss fallback: permalink preserved"                      "echo '$OUT' | jq -e '.[0].permalink|test(\"rss_post_one\")' >/dev/null"
+assert "rss fallback: author normalised (no /u/)"               "echo '$OUT' | jq -e '.[0].author==\"rssuser\"' >/dev/null"
+assert "rss fallback: score null (RSS omits it)"                "echo '$OUT' | jq -e '.[0].score==null' >/dev/null"
+assert "rss fallback: created_utc parsed to epoch"              "echo '$OUT' | jq -e '.[0].created_utc|type==\"number\"' >/dev/null"
+assert "rss fallback: still exit 0"                             "[ $rc -eq 0 ]"
+# A valid JSON listing must NOT trigger RSS (the tested happy path stays JSON).
+CALLS="$ROOT/calls_nojson.log"; : > "$CALLS"
+OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" REDDIT_TOKEN_CACHE="$ROOT/toknj" \
+       REDDIT_RSS_CMD="echo SHOULD_NOT_RUN" REDDIT_SNAPSHOT="$ROOT/no-such-snapshot.json" \
+       bash "$SCRIPT" feed wordgames top week 5 )
+assert "rss NOT used when JSON listing is usable" "echo '$OUT' | jq -e '.[0].title==\"T1\"' >/dev/null"
 
 echo "  reddit-fetch (snapshot):"
 
