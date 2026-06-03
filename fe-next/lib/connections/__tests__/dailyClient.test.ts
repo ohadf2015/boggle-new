@@ -1,5 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { dailyShareText } from '../dailyClient';
+import { describe, it, expect, beforeEach } from 'vitest';
+import {
+  dailyShareText,
+  todayUTC,
+  markConnectionsPlayedToday,
+  hasPlayedConnectionsToday,
+} from '../dailyClient';
 
 describe('dailyShareText — shareable daily result', () => {
   it('includes title, date, solved/total, streak and rank', () => {
@@ -29,5 +34,33 @@ describe('dailyShareText — shareable daily result', () => {
     });
     expect(txt).not.toContain('#');
     expect(txt).toContain('5/5');
+  });
+});
+
+describe('connections played-today marker — unconditional, works for authed + guest', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it('is false before the daily is played', () => {
+    expect(hasPlayedConnectionsToday()).toBe(false);
+  });
+
+  it('is true after marking today', () => {
+    markConnectionsPlayedToday();
+    expect(hasPlayedConnectionsToday()).toBe(true);
+  });
+
+  it('is false when the stored marker is for a previous day', () => {
+    markConnectionsPlayedToday('2020-01-01');
+    expect(hasPlayedConnectionsToday()).toBe(false);
+  });
+
+  it('marks the current UTC day when no date is passed', () => {
+    markConnectionsPlayedToday();
+    expect(hasPlayedConnectionsToday()).toBe(true);
+    // sanity: the helper agrees with todayUTC()
+    markConnectionsPlayedToday(todayUTC());
+    expect(hasPlayedConnectionsToday()).toBe(true);
   });
 });

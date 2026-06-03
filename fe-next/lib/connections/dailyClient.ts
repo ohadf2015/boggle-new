@@ -28,6 +28,33 @@ export function todayUTC(): string {
 
 const FP_KEY = 'connections-guest-fp';
 const STREAK_KEY = 'connections-daily-streak';
+const PLAYED_KEY = 'connections-daily-played';
+
+/**
+ * Record that the player finished today's Word Bridge daily. Written
+ * unconditionally on completion (NOT gated on server-submit success), so it is
+ * a reliable "played today" signal for BOTH authed and guest players — unlike
+ * the streak, which authed players resolve server-side and never persist
+ * locally. Read by cross-promo cards to avoid nudging a mode already played.
+ */
+export function markConnectionsPlayedToday(dateISO: string = todayUTC()): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(PLAYED_KEY, dateISO);
+  } catch {
+    /* quota / private mode — non-fatal */
+  }
+}
+
+/** True if the player already completed today's Word Bridge daily. */
+export function hasPlayedConnectionsToday(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(PLAYED_KEY) === todayUTC();
+  } catch {
+    return false;
+  }
+}
 
 /** A stable per-device guest id (for unauthenticated leaderboard entries). */
 export function getGuestFingerprint(): string {

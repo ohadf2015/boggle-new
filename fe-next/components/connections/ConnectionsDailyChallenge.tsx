@@ -25,6 +25,7 @@ import {
   submitDailyScore,
   fetchDailyLeaderboard,
   advanceClientStreak,
+  markConnectionsPlayedToday,
   type LeaderboardRow,
 } from '@/lib/connections/dailyClient';
 import { buildDailyBridgeGrid, gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
@@ -145,6 +146,11 @@ export default function ConnectionsDailyChallenge() {
   useEffect(() => {
     if (!isTerminal || submittedRef.current) return;
     submittedRef.current = true;
+
+    // Reliable "played today" marker for cross-promo gating — written for both
+    // authed and guest players (the streak alone is server-resolved for authed
+    // players and never persisted locally). See hasPlayedConnectionsToday.
+    markConnectionsPlayedToday(today);
 
     const timeTakenSeconds = startRef.current ? Math.max(0, Math.floor((Date.now() - startRef.current) / 1000)) : 0;
     const puzzlesSolved = solvedRef.current.size;

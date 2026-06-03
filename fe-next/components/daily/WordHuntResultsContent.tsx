@@ -21,6 +21,7 @@ import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
+import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
@@ -136,8 +137,16 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   const [wordWheelPlayed, setWordWheelPlayed] = useState(() =>
     typeof window === 'undefined' ? false : hasPlayedWordWheelToday(language),
   );
+  // Mirror for the Word Bridge (Connections) cross-promo — don't nudge a mode
+  // the player already finished today. Lazy-init avoids a first-paint flash.
+  const [connectionsPlayed, setConnectionsPlayed] = useState(() =>
+    typeof window === 'undefined' ? false : hasPlayedConnectionsToday(),
+  );
   useEffect(() => {
-    const refresh = () => setWordWheelPlayed(hasPlayedWordWheelToday(language));
+    const refresh = () => {
+      setWordWheelPlayed(hasPlayedWordWheelToday(language));
+      setConnectionsPlayed(hasPlayedConnectionsToday());
+    };
     refresh();
     const onVis = () => { if (!document.hidden) refresh(); };
     document.addEventListener('visibilitychange', onVis);
@@ -193,7 +202,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           </div>
           <m.div
             animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: 1.2, repeat: 3, repeatDelay: 0.4, ease: 'easeInOut' }}
           >
             <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
           </m.div>
@@ -456,8 +465,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </m.div>
     )}
 
-    {/* Word Bridge (Connections) cross-promo — EN/HE only, after daily complete */}
-    {wordWheelPlayed && (language === 'en' || language === 'he') && (
+    {/* Word Bridge (Connections) cross-promo — EN/HE only, after daily complete.
+        Hidden once today's Connections is itself played (no already-played nag). */}
+    {wordWheelPlayed && !connectionsPlayed && (language === 'en' || language === 'he') && (
       <m.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
