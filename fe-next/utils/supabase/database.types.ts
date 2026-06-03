@@ -3761,7 +3761,6 @@ export type Database = {
           profile_picture_url: string | null
           rank_position: number | null
           ranked_mmr: number | null
-          score: number
           total_score: number | null
           total_xp: number | null
           username: string
@@ -3782,7 +3781,6 @@ export type Database = {
           profile_picture_url?: string | null
           rank_position?: number | null
           ranked_mmr?: number | null
-          score?: number
           total_score?: number | null
           total_xp?: number | null
           username: string
@@ -3803,7 +3801,6 @@ export type Database = {
           profile_picture_url?: string | null
           rank_position?: number | null
           ranked_mmr?: number | null
-          score?: number
           total_score?: number | null
           total_xp?: number | null
           username?: string
