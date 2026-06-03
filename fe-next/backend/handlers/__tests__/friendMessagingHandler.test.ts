@@ -33,6 +33,28 @@ vi.mock('../../modules/pushNotificationTriggers', () => ({
   __esModule: true,
   notifyDirectMessage: vi.fn().mockResolvedValue(undefined),
 }));
+vi.mock('../../utils/socialPolicyServer', () => ({
+  __esModule: true,
+  ensureSocialCapability: vi.fn().mockResolvedValue(true),
+  getSocialCapabilities: vi.fn().mockResolvedValue({
+    publicRoomChat: true,
+    friendMessaging: true,
+    friendManagement: true,
+    customDisplayName: true,
+    emojiReactions: true,
+  }),
+  resolveSocketSocialContext: vi.fn().mockResolvedValue({
+    tier: 'adult',
+    caps: {
+      publicRoomChat: true,
+      friendMessaging: true,
+      friendManagement: true,
+      customDisplayName: true,
+      emojiReactions: true,
+    },
+  }),
+  clearSocketSocialContextCache: vi.fn(),
+}));
 
 import { vi, type Mock, type MockInstance } from 'vitest';
 import { registerFriendMessagingHandlers } from '../friendMessagingHandler';

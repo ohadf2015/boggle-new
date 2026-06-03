@@ -78,6 +78,12 @@ export async function resolveSocketSocialContext(socket: Socket): Promise<Socket
   const tier = computeSocialTier(birthYear, currentYear());
   const caps = resolveSocialCapabilities(tier, override);
   const ctx: SocketSocialContext = { tier, caps };
+  // socket.data defaults to {} in real Socket.IO, but guard the memo write so a
+  // socket-like object without `.data` (e.g. a lightweight test/mock socket)
+  // can never throw "Cannot set properties of undefined" and abort the suite.
+  if (!socket.data || typeof socket.data !== 'object') {
+    (socket as { data: Record<string, unknown> }).data = {};
+  }
   (socket.data as Record<string, unknown>)[CACHE_KEY] = ctx;
   return ctx;
 }

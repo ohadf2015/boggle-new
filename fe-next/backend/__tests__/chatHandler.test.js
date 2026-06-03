@@ -18,6 +18,27 @@ vi.mock('../utils/sanitize', () => ({
 vi.mock('../middleware/rateLimiterRedis', () => ({
   checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
 }));
+vi.mock('../utils/socialPolicyServer', () => ({
+  ensureSocialCapability: vi.fn().mockResolvedValue(true),
+  getSocialCapabilities: vi.fn().mockResolvedValue({
+    publicRoomChat: true,
+    friendMessaging: true,
+    friendManagement: true,
+    customDisplayName: true,
+    emojiReactions: true,
+  }),
+  resolveSocketSocialContext: vi.fn().mockResolvedValue({
+    tier: 'adult',
+    caps: {
+      publicRoomChat: true,
+      friendMessaging: true,
+      friendManagement: true,
+      customDisplayName: true,
+      emojiReactions: true,
+    },
+  }),
+  clearSocketSocialContextCache: vi.fn(),
+}));
 
 import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { registerChatHandlers } from '../handlers/chatHandler';

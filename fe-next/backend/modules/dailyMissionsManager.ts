@@ -7,6 +7,11 @@
 import { getSupabase } from './supabase/client';
 import { awardCoinsServer } from '../services/economy/awardCoins';
 import { getDailyQuestModes, type DailyQuestMode } from '../../shared/dailyQuestPool';
+// Static import (not dynamic await import) so vi.mock('../weeklyQuestManager')
+// deterministically intercepts it in tests — a dynamic import slipped past the
+// mock and ran the real getActiveQuest against an unmocked supabase, aborting
+// the suite (and the nightly gate) with an undefined-destructure crash.
+import { getActiveQuest } from './weeklyQuestManager';
 // Dynamic import may produce nested { default: { default: ... } } due to CJS/ESM interop.
 // Unwrap until we find the actual Logger instance with .info().
 import _loggerImport from '../utils/logger';
@@ -271,7 +276,6 @@ export async function checkAndClaimAllQuestsComplete(
   }
 
   // Must have weekly quest complete
-  const { getActiveQuest } = await import('./weeklyQuestManager');
   const weekly = await getActiveQuest(playerId);
   if (!weekly?.completed) {
     return { claimed: false, xpReward: 0, coinReward: 0 };

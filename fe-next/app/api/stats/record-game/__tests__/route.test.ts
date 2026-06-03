@@ -146,10 +146,17 @@ describe('POST /api/stats/record-game', () => {
         total_games: 6,
         // total_score is leaderboard-weighted since 52a19ced3 (daily-dominant
         // leaderboard): solo-bots is a casual mode → leaderboardPointsForGame
-        // applies CASUAL_LEADERBOARD_WEIGHT 0.25, so 1000 + round(200*0.25) = 1050
-        // (was 1200 when raw score was added directly).
-        total_score: 1050,
+        // applies CASUAL_LEADERBOARD_WEIGHT. As of a5b276806, weights are 1x
+        // (was 0.25), so 1000 + round(200*1) = 1200.
+        total_score: 1200,
         total_words: 65,
+        // Route also sends these additional tracked stats:
+        casual_games: 6,
+        last_game_at: expect.any(String),
+        longest_word: 'TESTING',
+        longest_word_length: 7,
+        total_time_played: 720,
+        unique_days_played: 4,
       })
     );
   });
