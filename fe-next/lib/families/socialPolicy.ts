@@ -80,17 +80,23 @@ export function computeSocialTier(
 
 /**
  * Resolve effective capabilities for a tier.
- * - adult: always full (override ignored — adults need no raising).
- * - child/unknown: safe default, then merged with an adult-set override. The
- *   "a child cannot raise their own caps" invariant is enforced at the write
- *   path (the override is only writable behind an adult-action gate), not here.
+ * - base: adult → full; child/unknown → safe default.
+ * - then merge an adult-set override on top.
+ *
+ * The override is only writable behind an adult-action gate (server-side, from
+ * the caller's stored age), so:
+ *  - a CHILD cannot raise their own caps (they can't write the override), and
+ *  - an ADULT may voluntarily REDUCE their own functionality (e.g. turn their
+ *    own chat off) — "select different levels of functionality" per the policy.
+ * An override can never elevate beyond the adult baseline, so applying it to an
+ * adult is always safe.
  */
 export function resolveSocialCapabilities(
   tier: SocialTier,
   adultOverride?: Partial<SocialCapabilities> | null,
 ): SocialCapabilities {
-  if (tier === 'adult') return { ...ADULT_CAPABILITIES };
-  return { ...CHILD_CAPABILITIES_DEFAULT, ...(adultOverride ?? {}) };
+  const base = tier === 'adult' ? ADULT_CAPABILITIES : CHILD_CAPABILITIES_DEFAULT;
+  return { ...base, ...(adultOverride ?? {}) };
 }
 
 /**

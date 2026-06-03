@@ -13186,7 +13186,10 @@ const en = {
     "pcFriendMgmtLabel": "Add friends & search for players",
     "pcSave": "Save settings",
     "pcSaved": "Settings saved.",
-    "pcSaveError": "Couldn't save. Please try again."
+    "pcSaveError": "Couldn't save. Please try again.",
+    "pcDisplayNameLabel": "Custom display name",
+    "pcAdultOnly": "Only an adult account can change these settings.",
+    "nameLockedNote": "An adult can turn on a custom name in parental controls."
   }
 };
 

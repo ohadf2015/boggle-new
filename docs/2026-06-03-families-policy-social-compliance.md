@@ -119,9 +119,13 @@ ALTER TABLE public.profiles
 
 - **Play Console "Target Audience & Content" declaration must be made consistent** with this in-app behaviour. If the business does NOT want under-13 users, also correct the declaration. In-app fix + declaration must agree or review bounces again. **Not a code change — owner must do this in Play Console.**
 - **Child Safety Standards policy** (separate from this Families "Social Apps & Features" fix): the Social category also requires a *published* CSAE standards page + an in-app child-safety point of contact. Cannot be satisfied in code here — track separately.
-- **`customDisplayName` enforcement (write path).** The capability exists in the policy object and is resolved/managed, but no server check yet blocks a child from setting a freeform display name (onboarding `ProfileCustomizationModal` + the profile write path). Display name is a lower-risk personal-info surface than chat/DM (the channels Google flagged). **Follow-up:** gate the display-name write (assign a safe auto-handle for children) — see `socialPolicy.ts` note on `customDisplayName`.
-- **Safety reminder on the friend-DM path.** Currently the reminder fires in `RoomChat` only. DMs are OFF by default for children (only an adult can enable `friendMessaging` via parental controls), and the ack is a single global flag (localStorage `lc_safety_ack` + `profiles.safety_ack_at`), so a child who used room chat is already acked. **Follow-up:** also trigger `SafetyReminderModal` from `MessageComposer`/the DM thread for full coverage when DM is the first freeform surface.
 - Full third-party verifiable parental consent, parental remote dashboard, user-reporting/moderation queue.
+
+## Follow-up fixes shipped (2nd pass)
+
+- **`customDisplayName` now gated.** `ProfileCustomizationModal` locks the freeform name input (read-only + note) for a **known child** (`tier==='child' && !caps.customDisplayName`) — NOT for `unknown` age, so new users mid-onboarding (before the age screen) aren't all blocked. Adults can re-enable it via the parental panel. NOTE: the display-name write is a client-direct Supabase call (RLS) so this is a UI gate; a DB trigger restricted to known-children would be the belt-and-braces server enforcement (deferred — risks OAuth/admin name-sync edge cases).
+- **Safety reminder now on the DM path too.** `MessageThread` defers the first DM send to `SafetyReminderModal` (shares the global ack with room chat).
+- **Adult panel reconciled with the security fix.** `social-settings` route authorizes from the caller's **server-stored** `birth_year` (not a body field — prevents child self-elevation). `PageClient` aligned: adult-only self-service (non-adults see a message), no `adultBirthYear` in the body, added a `customDisplayName` toggle. `resolveSocialCapabilities` now applies the override for **all** tiers so an adult can voluntarily *reduce* their own surfaces (the override can never elevate past the adult baseline, and only adults can write it).
 
 ## Test plan (TDD, all phases)
 

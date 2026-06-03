@@ -12817,7 +12817,10 @@ const ja = {
     "pcFriendMgmtLabel": "フレンドの追加とプレイヤー検索",
     "pcSave": "設定を保存",
     "pcSaved": "設定を保存しました。",
-    "pcSaveError": "保存できませんでした。もう一度お試しください。"
+    "pcSaveError": "保存できませんでした。もう一度お試しください。",
+    "pcDisplayNameLabel": "カスタム表示名",
+    "pcAdultOnly": "これらの設定は大人のアカウントでのみ変更できます。",
+    "nameLockedNote": "大人が保護者設定でカスタム表示名を有効にできます。"
   }
 };
 

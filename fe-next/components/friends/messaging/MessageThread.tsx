@@ -9,6 +9,8 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { MessageComposer } from './MessageComposer';
+import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
+import { SafetyReminderModal } from '@/components/families/SafetyReminderModal';
 import type { Message, MessageThread as MessageThreadType } from '@/shared/types/friends';
 
 interface MessageThreadProps {
@@ -57,6 +59,22 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const isRTL = language === 'he';
+
+  // Families Policy: show the online-safety reminder before the first freeform
+  // DM exchange, then deliver the buffered message. Uses the same global ack as
+  // room chat, so a user only ever sees it once.
+  const { safetyAcknowledged, acknowledgeSafety } = useSocialCapabilities();
+  const [showSafety, setShowSafety] = useState(false);
+  const pendingDmTextRef = useRef<string>('');
+
+  const handleSend = (text: string) => {
+    if (!safetyAcknowledged) {
+      pendingDmTextRef.current = text;
+      setShowSafety(true);
+      return;
+    }
+    onSendMessage(text);
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -383,12 +401,24 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
             isDark ? 'bg-neo-navy-light' : 'bg-gray-50'
           )}>
             <MessageComposer
-              onSend={onSendMessage}
+              onSend={handleSend}
               onTyping={onTyping}
               disabled={isLoading}
               placeholder={t('friends.typeMessage')}
             />
           </div>
+
+          <SafetyReminderModal
+            isOpen={showSafety}
+            onClose={() => setShowSafety(false)}
+            onAcknowledge={() => {
+              acknowledgeSafety();
+              setShowSafety(false);
+              const txt = pendingDmTextRef.current;
+              pendingDmTextRef.current = '';
+              if (txt) onSendMessage(txt);
+            }}
+          />
         </m.div>
       )}
     </AnimatePresence>

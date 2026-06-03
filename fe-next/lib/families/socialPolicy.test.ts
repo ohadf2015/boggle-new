@@ -47,9 +47,12 @@ describe('resolveSocialCapabilities', () => {
     expect(resolveSocialCapabilities('adult')).toEqual(ADULT_CAPABILITIES);
   });
 
-  it('ignores any override for adults (adults are already full)', () => {
+  it('lets an adult voluntarily REDUCE their own functionality via override', () => {
+    // The adult-action gate means only an adult can write their own override;
+    // it can only restrict (never elevate beyond the adult baseline).
     const caps = resolveSocialCapabilities('adult', { publicRoomChat: false });
-    expect(caps).toEqual(ADULT_CAPABILITIES);
+    expect(caps.publicRoomChat).toBe(false);
+    expect(caps.friendMessaging).toBe(true); // untouched keys stay full
   });
 
   it('restricts children to the safe default (no stranger/freeform surfaces)', () => {

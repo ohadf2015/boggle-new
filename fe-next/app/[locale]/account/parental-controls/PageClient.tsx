@@ -3,59 +3,41 @@
 /**
  * Families Policy — adult management of social features.
  *
- * Satisfies "provide a method for adults to manage social features for child
- * users, including enabling/disabling the social feature or selecting different
- * levels of functionality". The toggles are locked behind an adult-action gate
- * (enter an adult's birth year — a policy-accepted mechanism) and persist the
- * per-capability override via /api/account/social-settings, which the server
- * re-applies everywhere through the shared capability resolver.
+ * Satisfies "provide a method for adults to manage social features … enabling/
+ * disabling the social feature or selecting different levels of functionality".
+ *
+ * Authorization is server-side: /api/account/social-settings derives the
+ * caller's tier from their STORED birth_year (never a body field), so a child
+ * cannot self-elevate. This screen therefore only exposes the toggles to an
+ * adult account; a non-adult sees an explanatory message (and the age screen if
+ * their age is unknown). The override can only reduce an adult's own surfaces.
  */
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
-import { computeSocialTier } from '@/lib/families/socialPolicy';
+import { AgeGateModal } from '@/components/families/AgeGateModal';
 
-type ManagedKey = 'publicRoomChat' | 'friendMessaging' | 'friendManagement';
+type ManagedKey = 'publicRoomChat' | 'friendMessaging' | 'friendManagement' | 'customDisplayName';
 
 export default function ParentalControlsPageClient() {
   const { t } = useLanguage();
   const { refreshProfile } = useAuth();
-  const { caps } = useSocialCapabilities();
+  const { tier, caps, needsAgeGate } = useSocialCapabilities();
 
-  const [unlocked, setUnlocked] = useState(false);
-  const [adultYear, setAdultYear] = useState('');
-  const [gateError, setGateError] = useState(false);
-
+  const [showAgeGate, setShowAgeGate] = useState(false);
   const [values, setValues] = useState<Record<ManagedKey, boolean>>({
     publicRoomChat: caps.publicRoomChat,
     friendMessaging: caps.friendMessaging,
     friendManagement: caps.friendManagement,
+    customDisplayName: caps.customDisplayName,
   });
   const [saving, setSaving] = useState(false);
   const [saveState, setSaveState] = useState<'idle' | 'saved' | 'error'>('idle');
 
-  const currentYear = new Date().getFullYear();
-  const years = useMemo(() => {
-    const list: number[] = [];
-    for (let y = currentYear; y >= currentYear - 100; y -= 1) list.push(y);
-    return list;
-  }, [currentYear]);
-
-  const handleUnlock = () => {
-    const year = Number(adultYear);
-    if (computeSocialTier(year, currentYear) !== 'adult') {
-      setGateError(true);
-      return;
-    }
-    setGateError(false);
-    setUnlocked(true);
-  };
-
-  const toggle = (key: ManagedKey) =>
-    setValues((v) => ({ ...v, [key]: !v[key] }));
+  const toggle = (key: ManagedKey) => setValues((v) => ({ ...v, [key]: !v[key] }));
 
   const handleSave = async () => {
     setSaving(true);
@@ -64,7 +46,8 @@ export default function ParentalControlsPageClient() {
       const res = await fetch('/api/account/social-settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ override: values, adultBirthYear: Number(adultYear) }),
+        // No birth year in the body — the server authorizes from stored identity.
+        body: JSON.stringify({ override: values }),
       });
       if (!res.ok) throw new Error('save failed');
       await refreshProfile();
@@ -80,6 +63,7 @@ export default function ParentalControlsPageClient() {
     { key: 'publicRoomChat', label: t('familiesSafety.pcChatLabel') },
     { key: 'friendMessaging', label: t('familiesSafety.pcFriendMsgLabel') },
     { key: 'friendManagement', label: t('familiesSafety.pcFriendMgmtLabel') },
+    { key: 'customDisplayName', label: t('familiesSafety.pcDisplayNameLabel') },
   ];
 
   return (
@@ -89,34 +73,19 @@ export default function ParentalControlsPageClient() {
       </h1>
       <p className="mb-6 text-sm text-neo-cream">{t('familiesSafety.pcIntro')}</p>
 
-      {!unlocked ? (
+      {tier !== 'adult' ? (
         <div className="space-y-3">
-          <label htmlFor="pc-adult-year" className="block text-sm">
-            {t('familiesSafety.pcAdultGateLabel')}
-          </label>
-          <select
-            id="pc-adult-year"
-            value={adultYear}
-            onChange={(e) => setAdultYear(e.target.value)}
-            className="w-full rounded-neo border-neo border-black bg-neo-navy-light p-3 text-neo-white"
-          >
-            <option value="" disabled>
-              {t('familiesSafety.birthYearPlaceholder')}
-            </option>
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-          {gateError && (
-            <p className="text-sm text-neo-red" role="alert">
-              {t('familiesSafety.pcAdultError')}
-            </p>
+          <p className="text-sm text-neo-cream">{t('familiesSafety.pcAdultOnly')}</p>
+          {needsAgeGate && (
+            <Button variant="cyan" className="w-full" onClick={() => setShowAgeGate(true)}>
+              {t('familiesSafety.chatAddAge')}
+            </Button>
           )}
-          <Button variant="cyan" className="w-full" disabled={adultYear === ''} onClick={handleUnlock}>
-            {t('familiesSafety.pcUnlock')}
-          </Button>
+          <AgeGateModal
+            isOpen={showAgeGate}
+            onClose={() => setShowAgeGate(false)}
+            onResolved={() => setShowAgeGate(false)}
+          />
         </div>
       ) : (
         <div className="space-y-4">

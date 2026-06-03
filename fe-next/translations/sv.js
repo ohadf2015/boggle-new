@@ -12816,7 +12816,10 @@ const sv = {
     "pcFriendMgmtLabel": "Lägg till vänner och sök spelare",
     "pcSave": "Spara inställningar",
     "pcSaved": "Inställningarna sparades.",
-    "pcSaveError": "Det gick inte att spara. Försök igen."
+    "pcSaveError": "Det gick inte att spara. Försök igen.",
+    "pcDisplayNameLabel": "Anpassat visningsnamn",
+    "pcAdultOnly": "Endast ett vuxenkonto kan ändra dessa inställningar.",
+    "nameLockedNote": "En vuxen kan aktivera ett anpassat namn i föräldrakontrollerna."
   }
 };
 

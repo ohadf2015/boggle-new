@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFoo
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
+import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
 import { cn } from '@/lib/utils';
 
 interface ProfileCustomizationModalProps {
@@ -31,6 +32,13 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
 }) => {
   const { t, dir } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Families Policy: a KNOWN child may not set a freeform display name visible
+  // to strangers (personal info) unless an adult enabled it. Only gate confirmed
+  // children — `unknown` age (e.g. mid-onboarding, before the age screen) must
+  // still be able to pick a name, or every new user would be locked.
+  const { tier, caps } = useSocialCapabilities();
+  const lockName = tier === 'child' && !caps.customDisplayName;
 
   const [selectedAvatar, setSelectedAvatar] = useState<CustomAvatarConfig>(
     () => initialAvatar ?? getRandomAvatarConfig()
@@ -164,12 +172,15 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                   placeholder={t('profileCustomization.namePlaceholder')}
                   maxLength={maxLength}
                   autoComplete="off"
+                  readOnly={lockName}
+                  aria-disabled={lockName}
                   className={cn(
                     'w-full px-3 py-3 bg-white dark:bg-slate-600 border-3 border-neo-black dark:border-slate-500 rounded-neo',
                     'font-bold text-lg text-neo-black dark:text-white placeholder:text-neo-black/30 dark:placeholder:text-gray-400',
                     'focus:outline-hidden focus:ring-3 focus:ring-neo-cyan',
                     'shadow-hard-sm transition-all',
                     'min-h-[48px]',
+                    lockName && 'opacity-60 cursor-not-allowed',
                     showNameError && 'border-neo-red focus:ring-neo-red',
                     isNameValid && !isEmpty && 'border-neo-lime'
                   )}
@@ -223,6 +234,12 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                 {displayName.length}/{maxLength}
               </div>
             </div>
+
+            {lockName && (
+              <p className="mt-1.5 text-[11px] font-bold text-neo-black/60 dark:text-gray-400">
+                {t('familiesSafety.nameLockedNote')}
+              </p>
+            )}
           </div>
         </DialogBody>
 

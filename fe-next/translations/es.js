@@ -12904,7 +12904,10 @@ const es = {
     "pcFriendMgmtLabel": "Añadir amigos y buscar jugadores",
     "pcSave": "Guardar ajustes",
     "pcSaved": "Ajustes guardados.",
-    "pcSaveError": "No se pudo guardar. Inténtalo de nuevo."
+    "pcSaveError": "No se pudo guardar. Inténtalo de nuevo.",
+    "pcDisplayNameLabel": "Nombre para mostrar personalizado",
+    "pcAdultOnly": "Solo una cuenta de adulto puede cambiar estos ajustes.",
+    "nameLockedNote": "Un adulto puede activar un nombre personalizado en el control parental."
   }
 };
 
