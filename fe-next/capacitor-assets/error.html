@@ -58,6 +58,23 @@
           location.href = HOME;
         }
         window.addEventListener("online", recover);
+
+        // Cold-start offline bootstrap: Capacitor's errorPath can fire before
+        // the registered service worker gets a chance to serve the cached app
+        // shell. If we're offline and a SW is registered for the host origin,
+        // re-navigate to the host ONCE — the SW's navigation fallback then
+        // serves a cached locale shell so offline-capable modes still open.
+        // sessionStorage guards against an error.html -> host -> error.html loop
+        // when the SW genuinely can't serve (then we just show this screen).
+        (function attemptOfflineBootstrap() {
+          try {
+            if (navigator.onLine !== false) return;            // only when offline
+            if (sessionStorage.getItem("lc_offline_boot") === "1") return; // already tried
+            sessionStorage.setItem("lc_offline_boot", "1");
+            recovered = true;                                   // suppress other handlers
+            location.href = HOME;                               // SW (if controlling) serves cache
+          } catch (e) { /* sessionStorage blocked — fall through to manual UI */ }
+        })();
         // Belt-and-suspenders: poll, since the 'online' event is unreliable in
         // some WebViews. Cheap HEAD probe; navigate on first success.
         var pollTimer = setInterval(function () {
