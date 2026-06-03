@@ -39,6 +39,7 @@ import { handleValidatedWord, handleWordBecameValid, handlePeerRejection, type P
 import { ensurePlayerState } from './playerDataInit';
 import { spamDetector, PenaltyTier, InvalidReason, type InvalidReasonValue } from '../modules/spamDetector.js';
 import { acquireGracePeriodLock, releaseGracePeriodLock } from '../services/gracePeriodLock';
+import { WORD_SUBMIT_GRACE_PERIOD_MS } from '../utils/graceWindow.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { isWordShapeWeird } from '@/shared/utils/wordShapeFilter';
 import type { Language } from '@/shared/types';
@@ -201,9 +202,12 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
       const game = getGame(gameCode);
 
-      // Grace period: Allow word submissions for 1.5 seconds after game ends
-      // This handles network latency where client submits before receiving endGame event
-      const GRACE_PERIOD_MS = 1500;
+      // Grace period: Allow word submissions for a short window after the game
+      // ends. This handles network latency where a client submits a last-second
+      // word before it receives the endGame / timeUpdate(0) events (common on
+      // mobile and backgrounded tabs). Centralized in graceWindow.ts so the
+      // distributed grace lock TTL stays in lock-step. Env-overridable.
+      const GRACE_PERIOD_MS = WORD_SUBMIT_GRACE_PERIOD_MS;
       const isWithinGracePeriod = game?.gameEndedAt &&
         (Date.now() - game.gameEndedAt) < GRACE_PERIOD_MS &&
         game.gameState === 'finished';

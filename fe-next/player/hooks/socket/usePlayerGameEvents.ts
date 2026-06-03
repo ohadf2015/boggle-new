@@ -281,8 +281,18 @@ export function usePlayerGameEvents({
 
     const handleStartGame = (data: StartGameBroadcast) => {
       const ext = data as StartGameBroadcastExt;
-      // Validate session - ignore stale events
-      if (gameSessionIdRef.current !== null && ext.gameSessionId !== undefined &&
+      // Validate session - ignore stale events.
+      //
+      // EXCEPTION: reconnect/recovery/late-join emits (reconnect === true) always
+      // carry the server's authoritative CURRENT state. After a server restart or
+      // instance switch the room's gameSessionId resets backwards, so the client's
+      // ref runs ahead of the live server value — and the stale filter would then
+      // silently drop the very recovery startGame that requestGameState fetched to
+      // unstick the player. Letting recovery emits through re-syncs the ref
+      // downward (set below) so subsequent timeUpdates stop being filtered too.
+      const isRecoveryEmit = data.reconnect === true;
+      if (!isRecoveryEmit &&
+          gameSessionIdRef.current !== null && ext.gameSessionId !== undefined &&
           ext.gameSessionId < gameSessionIdRef.current) {
         logger.log('[PLAYER] Ignoring stale startGame from old session');
         return;
