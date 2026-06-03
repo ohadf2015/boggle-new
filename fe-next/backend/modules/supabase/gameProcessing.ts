@@ -116,7 +116,10 @@ async function processPlayerResult(
           gameCode,
           ...gameStats,
           language: gameInfo.language,
-          gameMode: gameInfo.gameMode
+          gameMode: gameInfo.gameMode,
+          // Real (non-bot) player count — bots are filtered upstream in
+          // gameResults.ts, so gameStats.totalPlayers is the human count.
+          realPlayerCount: gameStats.totalPlayers
         }),
         eligibleForAward
           ? updatePlayerStats(authInfo.authUserId, gameStats)

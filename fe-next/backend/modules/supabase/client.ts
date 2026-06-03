@@ -154,6 +154,12 @@ export interface GameResultInput {
   timePlayed?: number;
   /** Landing-page game mode: singleplayer, multiplayer, daily, adventure, blast */
   gameMode?: string;
+  /**
+   * Number of REAL (non-bot) players in the game. Used by the leaderboard to
+   * exclude games with no real opponent (a lone human vs bots). Omit/undefined
+   * when unknown — such rows are treated as legacy and still count.
+   */
+  realPlayerCount?: number;
 }
 
 export interface PlayerScore {
