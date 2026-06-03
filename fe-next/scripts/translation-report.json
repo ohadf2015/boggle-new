@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 5544,
+    "totalKeysInCode": 5543,
     "keyCountByLanguage": {
-      "en": 10300,
-      "he": 10398,
-      "sv": 10401,
-      "ja": 10395,
-      "es": 10427
+      "en": 10303,
+      "he": 10401,
+      "sv": 10404,
+      "ja": 10398,
+      "es": 10430
     },
-    "missingFromEnglish": 101,
+    "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 50,
@@ -20298,15 +20298,6 @@
         {
           "file": ".next-verify2/standalone/.next-verify2/server/chunks/node_modules_0ormcb7._.js",
           "line": 3
-        }
-      ]
-    },
-    {
-      "key": "familiesSafety.nameLockedNote",
-      "usages": [
-        {
-          "file": "components/ProfileCustomizationModal.tsx",
-          "line": 240
         }
       ]
     },
