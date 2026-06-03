@@ -9,10 +9,13 @@
 import { randomUUID } from 'crypto';
 import { LOCK_PREFIX } from '../redis/config';
 import { acquireGameLock, releaseGameLock } from '../redis/locking';
+import { GRACE_PERIOD_LOCK_TTL_MS } from '../utils/graceWindow';
 import logger from '../utils/logger';
 
-// Grace period lock specific configuration
-const GRACE_PERIOD_LOCK_TTL = 2000; // 2 seconds max (grace period is 1.5s)
+// Grace period lock specific configuration. TTL is derived from the shared
+// grace-window constant so it always outlives the submit grace period (see
+// graceWindow.ts) — they previously drifted (lock 2s, grace 1.5s, hardcoded).
+const GRACE_PERIOD_LOCK_TTL = GRACE_PERIOD_LOCK_TTL_MS;
 const GRACE_PERIOD_LOCK_PREFIX = `${LOCK_PREFIX}:graceperiod`;
 
 /**

@@ -104,7 +104,12 @@ vi.mock('../../../backend/modules/botManager', () => ({ isBot: vi.fn(() => false
 
 vi.mock('../../../backend/utils/errorHandler', () => ({
   emitError: vi.fn(),
-  ErrorCodes: { WORD_PROCESSING_ERROR: 'WORD_PROCESSING_ERROR', INVALID_STATE: 'INVALID_STATE' },
+  ErrorCodes: {
+    WORD_PROCESSING_ERROR: 'WORD_PROCESSING_ERROR',
+    INVALID_STATE: 'INVALID_STATE',
+    GAME_NOT_IN_PROGRESS: 'GAME_NOT_IN_PROGRESS',
+    PLAYER_NOT_IN_GAME: 'PLAYER_NOT_IN_GAME',
+  },
 }));
 
 vi.mock('../../../backend/middleware/rateLimiterRedis', () => ({
@@ -302,6 +307,56 @@ describe('wordHandler submitWord error handling', () => {
 
       // WHEN: User submits a word — should handle gracefully without throwing
       await expect(handlers['submitWord']({ word: 'test' })).resolves.not.toThrow();
+    });
+  });
+
+  describe('post-game grace window', () => {
+    // A player's last-second word often arrives just after the server has moved
+    // the round to 'finished'. The grace window must be forgiving enough to
+    // absorb real mobile/laggy latency instead of bouncing the word back as
+    // GAME_NOT_IN_PROGRESS. These tests pin the boundary behaviour.
+    const baseFinishedGame = {
+      gameCode: 'TEST123',
+      gameState: 'finished' as const,
+      language: 'en',
+      minWordLength: 2,
+      letterGrid: [['T', 'E'], ['S', 'T']],
+      letterPositions: new Map(),
+      playerWords: {},
+      playerWordDetails: {},
+      playerScores: {},
+      playerCombos: {},
+      users: { testUser: { isHost: false } },
+    };
+
+    it('accepts a word submitted 2s after the round finished (within the widened grace)', async () => {
+      // GIVEN: round finished 2s ago — beyond the old 1.5s window, within the new one
+      (getGame as Mock).mockReturnValue({
+        ...baseFinishedGame,
+        gameEndedAt: Date.now() - 2000,
+      });
+      (isWordOnBoardAsync as Mock).mockResolvedValue(true);
+
+      // WHEN: the late word arrives
+      await handlers['submitWord']({ word: 'test' });
+
+      // THEN: it is NOT rejected as not-in-progress
+      expect(emitError).not.toHaveBeenCalledWith(expect.anything(), 'GAME_NOT_IN_PROGRESS');
+      expect(emitError).not.toHaveBeenCalledWith(expect.anything(), 'GAME_NOT_IN_PROGRESS', expect.anything());
+    });
+
+    it('rejects a word submitted long after the grace window has closed', async () => {
+      // GIVEN: round finished 5s ago — outside any reasonable grace window
+      (getGame as Mock).mockReturnValue({
+        ...baseFinishedGame,
+        gameEndedAt: Date.now() - 5000,
+      });
+
+      // WHEN: the very-late word arrives
+      await handlers['submitWord']({ word: 'test' });
+
+      // THEN: it is rejected as not-in-progress
+      expect(emitError).toHaveBeenCalledWith(expect.anything(), 'GAME_NOT_IN_PROGRESS');
     });
   });
 });

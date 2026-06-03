@@ -316,6 +316,23 @@ export function useMultiplayerSocket(
 
     socketInstance.on('debugGameStateResponse', (data) => {
       logger.debug('[useMultiplayerSocket] Server game state:', data);
+      // Reconcile a client/server desync surfaced by a GAME_NOT_IN_PROGRESS
+      // rejection. If the server reports anything other than an active round,
+      // the client must stop treating the board as live.
+      const serverState = data?.gameState as string | undefined;
+      if (!serverState || serverState === 'in-progress') return;
+      if (serverState === 'finished' || serverState === 'validating') {
+        // Results exist (or are being computed) — pull them so the client
+        // leaves the dead board and shows the results screen.
+        logger.log('[SOCKET.IO] Server round finished while client active - requesting results');
+        socketInstance.emit('requestGameState');
+      } else if (serverState === 'waiting') {
+        // Round was reset out from under the client (host restarted / new
+        // round). Fall back to the reset path so the board is cleared and the
+        // player lands back in the lobby instead of submitting into the void.
+        logger.log('[SOCKET.IO] Server round reset while client active - clearing stale board');
+        optionsRef.current.onGameReset();
+      }
     });
 
     socketInstance.on('error', (data) => {
@@ -350,7 +367,15 @@ export function useMultiplayerSocket(
       }
 
       if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
-        logger.log('[SOCKET.IO] Game state mismatch - querying server for actual state');
+        // The client's local `gameActive` flag and the server's authoritative
+        // `gameState` have drifted (missed endGame, stale board after reset, or
+        // a gameSessionId desync after a server restart). `requestGameState` is
+        // the real recovery path: the server re-emits startGame (resyncs an
+        // in-progress round) or validatedScores (a finished round). We ALSO emit
+        // debugGameState so the response handler can reconcile the 'waiting'
+        // case (round was reset out from under us) that requestGameState ignores.
+        logger.log('[SOCKET.IO] Game state mismatch - requesting authoritative state to recover');
+        socketInstance.emit('requestGameState');
         socketInstance.emit('debugGameState');
       }
 
