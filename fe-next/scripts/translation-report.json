@@ -1,10 +1,10 @@
 {
   "summary": {
-    "totalKeysInCode": 5543,
+    "totalKeysInCode": 5545,
     "keyCountByLanguage": {
-      "en": 10303,
-      "he": 10401,
-      "sv": 10404,
+      "en": 10305,
+      "he": 10403,
+      "sv": 10406,
       "ja": 10398,
       "es": 10430
     },
@@ -21773,6 +21773,8 @@
       "admin.sendError"
     ],
     "ja": [
+      "wordTower.sabotage.watchAd",
+      "wordTower.sabotage.adEarned",
       "seo.wordCraft.title",
       "seo.wordCraft.description",
       "seo.wordCraft.ogTitle",
@@ -21978,6 +21980,8 @@
       "admin.sendError"
     ],
     "es": [
+      "wordTower.sabotage.watchAd",
+      "wordTower.sabotage.adEarned",
       "seo.wordCraft.title",
       "seo.wordCraft.description",
       "seo.wordCraft.ogTitle",
