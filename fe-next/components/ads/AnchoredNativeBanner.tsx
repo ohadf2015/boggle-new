@@ -63,8 +63,22 @@ export default function AnchoredNativeBanner() {
     const safeBottom = safeArea.bottom || 0;
 
     if (!isAllowedAdBannerRoute(pathname)) {
-      hideBanner();
-      document.documentElement.style.setProperty('--admob-banner-height', '0px');
+      // Hide first, collapse the reservation only AFTER the native overlay is
+      // actually gone. A native banner composites ABOVE the WebView, so zeroing
+      // --admob-banner-height synchronously drops bottom-anchored CTAs (e.g. the
+      // daily ready-screen Play button) into the band the still-painted banner
+      // occupies for the duration of the hide latency — that's the "ad covers
+      // the button sometimes" race on navigation into a blocked route.
+      void (async () => {
+        try {
+          await hideBanner();
+        } finally {
+          if (!cancelled) {
+            document.documentElement.style.setProperty('--admob-banner-height', '0px');
+            try { localStorage.setItem('lc_admob_h', '0'); } catch {}
+          }
+        }
+      })();
       return () => { cancelled = true; };
     }
 
