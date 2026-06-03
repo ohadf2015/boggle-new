@@ -46,6 +46,11 @@ function initPostHog() {
     capture_pageview: false, // We track manually on route change
     capture_pageleave: true,
     capture_exceptions: true, // Capture unhandled JS errors and promise rejections
+    // Enable Web-Vitals ATTRIBUTION so $web_vitals events carry the LCP element
+    // (tag/id/class). Without it the nightly perf-watch sees an LCP number but no
+    // element, so a homepage-LCP regression can't be targeted without guessing
+    // (the 2026-06-03 /en LCP spike had an unknown LCP element for exactly this).
+    capture_performance: { web_vitals: true, web_vitals_attribution: true },
     before_send: filterEmptyException,
     persistence: 'localStorage+cookie',
     loaded: (ph) => {

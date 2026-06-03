@@ -160,6 +160,11 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           start: 'top top',
           end: '+=1000%', // long pin = each frame gets more scroll = no fast-forward feel
           pin: pinWrap.current,
+          // anticipatePin makes ScrollTrigger insert/size the .pin-spacer slightly
+          // BEFORE the pin engages, instead of computing it after first paint — that
+          // post-paint spacer insertion was the CLS-1.0 culprit on this page. Paired
+          // with the section's reserved min-height (below) the layout never jumps.
+          anticipatePin: 1,
           scrub: 0.6,
           invalidateOnRefresh: true,
           // live HUD: progress drives the score counter, top bar, and active chapter
@@ -269,7 +274,10 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
       <TopBackLink className="mb-4" />
 
       {/* ── PINNED MULTI-CHAPTER SCROLL-SCRUB HERO ───────────── */}
-      <section ref={section} className="relative">
+      {/* min-h-[100svh] reserves the pinned hero's box BEFORE GSAP wraps pinWrap in a
+          .pin-spacer, so the spacer's insertion can't shift the sections below it
+          (the CLS-1.0 cause). Pairs with anticipatePin in the ScrollTrigger above. */}
+      <section ref={section} className="relative min-h-[100svh]">
         <div ref={pinWrap} className="texture-halftone relative h-[100svh] w-full overflow-hidden bg-neo-navy">
           <canvas ref={canvasRef} className="absolute inset-0 h-full w-full object-cover" />
 
