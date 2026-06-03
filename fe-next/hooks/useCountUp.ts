@@ -7,6 +7,12 @@ interface UseCountUpOptions {
   duration?: number;
   startDelay?: number;
   easing?: (t: number) => number;
+  /**
+   * Skip the rAF count-up and return `target` immediately. Callers pass this
+   * for reduced-motion / low-end devices so the results page avoids a 60fps
+   * re-render storm (many gauges + stats animate at once on mount).
+   */
+  immediate?: boolean;
 }
 
 // Ease-out cubic for satisfying deceleration (fast start, slow finish)
@@ -17,11 +23,16 @@ export function useCountUp({
   duration = 1200,
   startDelay = 0,
   easing = easeOutCubic,
+  immediate = false,
 }: UseCountUpOptions): number {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(immediate ? target : 0);
   const frameRef = useRef<number>(undefined);
 
   useEffect(() => {
+    if (immediate) {
+      setValue(target);
+      return;
+    }
     if (target === 0) {
       setValue(0);
       return;
@@ -48,7 +59,7 @@ export function useCountUp({
       clearTimeout(timeout);
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
     };
-  }, [target, duration, startDelay, easing]);
+  }, [target, duration, startDelay, easing, immediate]);
 
   return value;
 }

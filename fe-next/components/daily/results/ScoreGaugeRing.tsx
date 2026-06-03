@@ -10,6 +10,7 @@
 import React, { useMemo } from 'react';
 import { m } from 'framer-motion';
 import { useCountUp } from '@/hooks/useCountUp';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 export interface ScoreGaugeRingProps {
   score: number;
@@ -74,10 +75,18 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
   const strokeDashoffset = circumference * (1 - percentage);
   const isLargeRing = size >= 150;
 
+  // Adaptive: drop the ambient glow + sparkles on low-end / reduced-motion
+  // devices, and cap sparkle count. The loops are ALSO made finite below so
+  // even capable devices stop animating after the entrance (the page goes
+  // idle instead of repainting SVG forever — that was the "stuck/slow" cause).
+  const { enableGlowEffects, maxParticles, prefersReducedMotion, isLowEnd } = useDevicePerformance();
+  const showDecorations = isLargeRing && enableGlowEffects;
+
   const animatedScore = useCountUp({
     target: score,
     duration: 1400,
     startDelay: delay * 1000 + 200,
+    immediate: prefersReducedMotion || isLowEnd,
   });
 
   const fillColor = COLOR_MAP[color] || '#BFFF00';
@@ -88,10 +97,10 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
     return generateTicks(20, radius, size / 2, size / 2);
   }, [isLargeRing, radius, size]);
 
-  // Sparkle positions along the filled arc (for large rings)
+  // Sparkle positions along the filled arc (decorations only)
   const sparkles = useMemo(() => {
-    if (!isLargeRing || percentage === 0) return [];
-    const count = Math.max(2, Math.floor(percentage * 5));
+    if (!showDecorations || percentage === 0) return [];
+    const count = Math.min(Math.max(2, Math.floor(percentage * 5)), maxParticles);
     return Array.from({ length: count }, (_, i) => {
       const t = (i + 0.5) / count;
       const angle = t * percentage * 2 * Math.PI - Math.PI / 2;
@@ -101,7 +110,7 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
         delay: delay + 1.2 + i * 0.15,
       };
     });
-  }, [isLargeRing, percentage, radius, size, delay]);
+  }, [showDecorations, maxParticles, percentage, radius, size, delay]);
 
   return (
     <div
@@ -109,13 +118,15 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
       className={`relative inline-flex items-center justify-center ${className}`}
       style={{ width: size, height: size }}
     >
-      {/* Pulsing glow aura behind the ring (large rings only) */}
-      {isLargeRing && percentage > 0 && (
+      {/* Glow aura behind the ring — fades in once and SETTLES to a steady
+          glow (no infinite pulse). A permanent loop here kept the whole
+          results page repainting forever. */}
+      {showDecorations && percentage > 0 && (
         <m.div
           className="absolute inset-0 rounded-full pointer-events-none"
           initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: [0, 0.4, 0.2, 0.35], scale: [0.8, 1.05, 1.02, 1.04] }}
-          transition={{ delay: delay + 0.8, duration: 2.5, repeat: Infinity, repeatType: 'reverse' }}
+          animate={{ opacity: [0, 0.4, 0.3], scale: [0.8, 1.05, 1.02] }}
+          transition={{ delay: delay + 0.8, duration: 1.6, ease: 'easeOut' }}
           style={{
             background: `radial-gradient(circle, ${fillColor}20 0%, ${fillColor}08 50%, transparent 70%)`,
           }}
@@ -206,10 +217,13 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
           }}
         />
 
-        {/* Sparkle particles along the filled arc */}
+        {/* Sparkle particles along the filled arc — twinkle a couple of times
+            then stop (finite repeat). Animating SVG `r` forever was a constant
+            repaint; capped here so the page can go idle after the entrance. */}
         {sparkles.map((s, i) => (
           <m.circle
             key={`sparkle-${i}`}
+            data-testid="gauge-sparkle"
             cx={s.cx}
             cy={s.cy}
             r={3}
@@ -222,8 +236,8 @@ export const ScoreGaugeRing: React.FC<ScoreGaugeRingProps> = ({
             transition={{
               delay: s.delay,
               duration: 1.2,
-              repeat: Infinity,
-              repeatDelay: 2 + i * 0.3,
+              repeat: 2,
+              repeatDelay: 1.5 + i * 0.3,
             }}
           />
         ))}

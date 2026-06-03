@@ -11,6 +11,7 @@ import { m } from 'framer-motion';
 import { Users, Target, TrendingUp, Heart, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { WordHuntStats } from './types';
 import type { WordHuntResult } from '@/utils/dailyChallenge';
 
@@ -28,8 +29,14 @@ const AnimatedStat: React.FC<{
   decimals?: number;
   className?: string;
 }> = ({ value, suffix = '', delay = 0, decimals = 0, className }) => {
+  const { prefersReducedMotion, isLowEnd } = useDevicePerformance();
   const displayTarget = decimals > 0 ? Math.round(value * Math.pow(10, decimals)) : value;
-  const animated = useCountUp({ target: displayTarget, duration: 1200, startDelay: delay });
+  const animated = useCountUp({
+    target: displayTarget,
+    duration: 1200,
+    startDelay: delay,
+    immediate: prefersReducedMotion || isLowEnd,
+  });
   const display = decimals > 0
     ? (animated / Math.pow(10, decimals)).toFixed(decimals)
     : String(animated);
@@ -139,7 +146,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
               <m.div
                 className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
                 animate={{ x: ['-100%', '200%'] }}
-                transition={{ delay: 1.2, duration: 0.8, ease: 'easeInOut', repeat: Infinity, repeatDelay: 4 }}
+                transition={{ delay: 1.2, duration: 0.8, ease: 'easeInOut', repeat: 2, repeatDelay: 2.5 }}
               />
             </m.div>
           </m.div>

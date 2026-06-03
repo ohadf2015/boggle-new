@@ -39,6 +39,24 @@ vi.mock('@/hooks/useCountUp', () => ({
   useCountUp: ({ target }: { target: number }) => target,
 }));
 
+// Controllable device-performance mock — defaults to a capable device so the
+// existing rendering tests are unaffected; individual tests override it.
+const mockDevicePerf = vi.fn(() => ({
+  isLowEnd: false,
+  targetFPS: 60 as const,
+  throttleMs: 16,
+  enableComplexAnimations: true,
+  enableGlowEffects: true,
+  reduceParticles: false,
+  maxParticles: 20,
+  prefersReducedMotion: false,
+  isSlowConnection: false,
+  isMobile: false,
+}));
+vi.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => mockDevicePerf(),
+}));
+
 describe('ScoreGaugeRing', () => {
   it('renders with score and max', () => {
     render(<ScoreGaugeRing score={750} maxScore={1000} />);
@@ -88,5 +106,40 @@ describe('ScoreGaugeRing', () => {
     render(<ScoreGaugeRing score={0} maxScore={0} />);
     const gauge = screen.getByTestId('score-gauge-ring');
     expect(gauge).toBeInTheDocument();
+  });
+
+  describe('adaptive decorations', () => {
+    beforeEach(() => {
+      mockDevicePerf.mockReturnValue({
+        isLowEnd: false, targetFPS: 60, throttleMs: 16, enableComplexAnimations: true,
+        enableGlowEffects: true, reduceParticles: false, maxParticles: 20,
+        prefersReducedMotion: false, isSlowConnection: false, isMobile: false,
+      });
+    });
+
+    it('renders sparkles on a large ring when glow effects are enabled', () => {
+      render(<ScoreGaugeRing score={800} maxScore={1000} size={200} />);
+      expect(screen.getAllByTestId('gauge-sparkle').length).toBeGreaterThan(0);
+    });
+
+    it('renders NO sparkles when glow effects are disabled (low-end / reduced-motion)', () => {
+      mockDevicePerf.mockReturnValue({
+        isLowEnd: true, targetFPS: 30, throttleMs: 33, enableComplexAnimations: false,
+        enableGlowEffects: false, reduceParticles: true, maxParticles: 0,
+        prefersReducedMotion: true, isSlowConnection: false, isMobile: true,
+      });
+      render(<ScoreGaugeRing score={800} maxScore={1000} size={200} />);
+      expect(screen.queryByTestId('gauge-sparkle')).toBeNull();
+    });
+
+    it('caps sparkle count to maxParticles', () => {
+      mockDevicePerf.mockReturnValue({
+        isLowEnd: false, targetFPS: 60, throttleMs: 16, enableComplexAnimations: true,
+        enableGlowEffects: true, reduceParticles: true, maxParticles: 3,
+        prefersReducedMotion: false, isSlowConnection: false, isMobile: true,
+      });
+      render(<ScoreGaugeRing score={1000} maxScore={1000} size={200} />);
+      expect(screen.getAllByTestId('gauge-sparkle').length).toBeLessThanOrEqual(3);
+    });
   });
 });

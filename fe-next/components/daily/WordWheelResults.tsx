@@ -397,7 +397,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
               </div>
               <m.div
                 animate={{ x: [0, 4, 0] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                transition={{ duration: 1.2, repeat: 3, repeatDelay: 0.4, ease: 'easeInOut' }}
               >
                 <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
               </m.div>

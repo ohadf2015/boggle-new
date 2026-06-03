@@ -46,6 +46,22 @@ describe('useCountUp', () => {
     expect(result.current).toBe(0);
   });
 
+  it('returns target instantly when immediate is true (reduced-motion / low-end)', () => {
+    const { result } = renderHook(() => useCountUp({ target: 750, duration: 1000, immediate: true }));
+    // No timers advanced — value is already the final target, no rAF storm.
+    expect(result.current).toBe(750);
+  });
+
+  it('still honors immediate=true after target changes', () => {
+    const { result, rerender } = renderHook(
+      ({ target }) => useCountUp({ target, duration: 1000, immediate: true }),
+      { initialProps: { target: 100 } }
+    );
+    expect(result.current).toBe(100);
+    rerender({ target: 320 });
+    expect(result.current).toBe(320);
+  });
+
   it('updates target when it changes', () => {
     const { result, rerender } = renderHook(
       ({ target }) => useCountUp({ target, duration: 1000 }),
