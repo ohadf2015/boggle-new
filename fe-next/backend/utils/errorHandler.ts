@@ -102,6 +102,8 @@ export const ErrorCodes = {
   AUTH_INVALID_TOKEN: 'AUTH_INVALID_TOKEN',
   AUTH_EXPIRED: 'AUTH_EXPIRED',
   AUTH_FORBIDDEN: 'AUTH_FORBIDDEN',
+  // Families Policy: social surface blocked for child/unknown-age user
+  SOCIAL_RESTRICTED: 'SOCIAL_RESTRICTED',
 
   // Tournament errors (7xxx)
   TOURNAMENT_NOT_FOUND: 'TOURNAMENT_NOT_FOUND',
@@ -269,6 +271,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
   },
   [ErrorCodes.AUTH_FORBIDDEN]: {
     message: 'You do not have permission to perform this action',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 403
+  },
+  [ErrorCodes.SOCIAL_RESTRICTED]: {
+    message: 'This social feature is not available for your account',
     severity: ErrorSeverity.LOW,
     httpStatus: 403
   },

@@ -66,6 +66,10 @@ export interface ProfileData {
   user_role?: 'student' | 'teacher' | 'admin';
   // UI/push notification language preference (5 supported locales)
   language?: 'he' | 'en' | 'sv' | 'ja' | 'es' | null;
+  // Families Policy: self-declared birth year (neutral age screen) → social tier.
+  birth_year?: number | null;
+  // Adult-managed per-capability social override (SocialCapabilities partial).
+  social_features_override?: Record<string, boolean> | null;
 }
 
 // Collectible item from the catalog

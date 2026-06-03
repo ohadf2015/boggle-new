@@ -10,6 +10,7 @@ import logger from '../utils/logger';
 import * as friendsManager from '../modules/friendsManager';
 import { getSupabase } from '../modules/supabaseServer';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
+import { ensureSocialCapability } from '../utils/socialPolicyServer';
 import { notifyFriendRequest, notifyFriendAccepted } from '../modules/pushNotificationTriggers';
 
 // Rate limit weights
@@ -39,6 +40,13 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
     if (!authUserId) {
       emitError(socket, ErrorCodes.AUTH_REQUIRED, { message: 'Must be authenticated to send friend requests' });
+      return;
+    }
+
+    // Families Policy: acquiring new contacts (friend requests) is gated for
+    // child / unknown-age users — open username search is not a "known contact".
+    if (!(await ensureSocialCapability(socket, 'friendManagement'))) {
+      emitError(socket, ErrorCodes.SOCIAL_RESTRICTED, { message: 'Adding friends is turned off for this account' });
       return;
     }
 
@@ -342,6 +350,13 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
     if (!authUserId) {
       emitError(socket, ErrorCodes.AUTH_REQUIRED);
+      return;
+    }
+
+    // Families Policy: user search (stranger discovery) is gated for child /
+    // unknown-age users — prevents acquiring unknown contacts.
+    if (!(await ensureSocialCapability(socket, 'friendManagement'))) {
+      emitError(socket, ErrorCodes.SOCIAL_RESTRICTED, { message: 'Searching for players is turned off for this account' });
       return;
     }
 

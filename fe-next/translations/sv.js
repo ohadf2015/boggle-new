@@ -11133,7 +11133,11 @@ const sv = {
       "title": "Ingen anslutning",
       "message": "Vi kan inte nå spelservern. Kontrollera din internetanslutning.",
       "retry": "Försök igen",
-      "retrying": "Ansluter..."
+      "retrying": "Ansluter...",
+      "playablePrompt": "Ingen internet? Du kan ändå spela:",
+      "playBlast": "Blast",
+      "playConnections": "Connections",
+      "playDaily": "Daglig ordjakt"
     }
   },
   "system": {
@@ -12784,6 +12788,35 @@ const sv = {
     "scoreLabel": "{score} poäng",
     "wordCountLabel": "{count} ord",
     "topScore": "Högsta poäng"
+  },
+  "familiesSafety": {
+    "ageGateTitle": "Hur gammal är du?",
+    "ageGateMessage": "Vi frågar för att hålla yngre spelare trygga. Välj det år du föddes.",
+    "birthYearLabel": "Födelseår",
+    "birthYearPlaceholder": "Välj ett år",
+    "ageGateError": "Något gick fel. Försök igen.",
+    "ageGateConfirm": "Fortsätt",
+    "saving": "Sparar…",
+    "reminderTitle": "Var trygg online",
+    "reminderIntro": "Innan du chattar, en snabb påminnelse:",
+    "tipNoPersonalInfo": "Dela aldrig personlig information — ditt riktiga namn, adress, skola, telefonnummer eller lösenord.",
+    "tipStrangers": "Personer online är inte alltid de som de utger sig för att vara. Var försiktig med dem du inte känner.",
+    "tipReport": "Om något känns fel, sluta chatta och berätta för en vuxen du litar på.",
+    "reminderConfirm": "Jag förstår",
+    "chatNeedsAge": "Ange din ålder för att använda chatten.",
+    "chatRestricted": "Chatten är avstängd för det här kontot. En vuxen kan ändra detta i föräldrakontrollerna.",
+    "chatAddAge": "Lägg till min ålder",
+    "pcTitle": "Föräldrakontroller",
+    "pcIntro": "Välj vilka sociala funktioner som är tillgängliga på det här kontot. Bekräfta att du är vuxen för att göra ändringar.",
+    "pcAdultGateLabel": "En vuxens födelseår",
+    "pcUnlock": "Lås upp inställningar",
+    "pcAdultError": "Ange en vuxens födelseår för att fortsätta.",
+    "pcChatLabel": "Chatt i spelet med andra spelare",
+    "pcFriendMsgLabel": "Direktmeddelanden med vänner",
+    "pcFriendMgmtLabel": "Lägg till vänner och sök spelare",
+    "pcSave": "Spara inställningar",
+    "pcSaved": "Inställningarna sparades.",
+    "pcSaveError": "Det gick inte att spara. Försök igen."
   }
 };
 

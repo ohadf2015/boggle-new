@@ -11115,7 +11115,11 @@ const es = {
       "title": "Sin Conexión",
       "message": "No podemos conectar con el servidor del juego. Por favor, verifica tu conexión a Internet.",
       "retry": "Intentar de Nuevo",
-      "retrying": "Conectando..."
+      "retrying": "Conectando...",
+      "playablePrompt": "¿Sin internet? Aún puedes jugar:",
+      "playBlast": "Blast",
+      "playConnections": "Conexiones",
+      "playDaily": "Caza de Palabras Diaria"
     }
   },
   "system": {
@@ -12872,6 +12876,35 @@ const es = {
     "scoreLabel": "{score} puntos",
     "wordCountLabel": "{count} palabras",
     "topScore": "Puntuación más alta"
+  },
+  "familiesSafety": {
+    "ageGateTitle": "¿Cuántos años tienes?",
+    "ageGateMessage": "Lo preguntamos para proteger a los jugadores más jóvenes. Elige tu año de nacimiento.",
+    "birthYearLabel": "Año de nacimiento",
+    "birthYearPlaceholder": "Selecciona un año",
+    "ageGateError": "Algo salió mal. Inténtalo de nuevo.",
+    "ageGateConfirm": "Continuar",
+    "saving": "Guardando…",
+    "reminderTitle": "Mantente seguro en línea",
+    "reminderIntro": "Antes de chatear, un recordatorio rápido:",
+    "tipNoPersonalInfo": "Nunca compartas información personal: tu nombre real, dirección, escuela, número de teléfono o contraseñas.",
+    "tipStrangers": "Las personas en línea pueden no ser quienes dicen ser. Ten cuidado con quien no conoces.",
+    "tipReport": "Si algo no se siente bien, deja de chatear y díselo a un adulto de confianza.",
+    "reminderConfirm": "Entiendo",
+    "chatNeedsAge": "Dinos tu edad para usar el chat.",
+    "chatRestricted": "El chat está desactivado para esta cuenta. Un adulto puede cambiarlo en el control parental.",
+    "chatAddAge": "Añadir mi edad",
+    "pcTitle": "Control parental",
+    "pcIntro": "Elige qué funciones sociales están disponibles en esta cuenta. Confirma que eres adulto para hacer cambios.",
+    "pcAdultGateLabel": "Año de nacimiento del adulto",
+    "pcUnlock": "Desbloquear ajustes",
+    "pcAdultError": "Introduce el año de nacimiento de un adulto para continuar.",
+    "pcChatLabel": "Chat en el juego con otros jugadores",
+    "pcFriendMsgLabel": "Mensajes directos con amigos",
+    "pcFriendMgmtLabel": "Añadir amigos y buscar jugadores",
+    "pcSave": "Guardar ajustes",
+    "pcSaved": "Ajustes guardados.",
+    "pcSaveError": "No se pudo guardar. Inténtalo de nuevo."
   }
 };
 

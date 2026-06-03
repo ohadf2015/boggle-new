@@ -17,6 +17,9 @@ import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
 import { useCrazyGamesChatDisabled } from '@/hooks/useCrazyGamesSettingsBridge';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
+import { AgeGateModal } from '@/components/families/AgeGateModal';
+import { SafetyReminderModal } from '@/components/families/SafetyReminderModal';
 
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
 
@@ -66,6 +69,10 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const { announce } = useAnnouncer();
   const isChatDisabled = useCrazyGamesChatDisabled();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // Families Policy: gate freeform stranger chat by the user's social tier.
+  const { caps, needsAgeGate, safetyAcknowledged, acknowledgeSafety } = useSocialCapabilities();
+  const [showAgeGate, setShowAgeGate] = useState(false);
+  const [showSafety, setShowSafety] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
@@ -230,6 +237,13 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     const trimmed = raw.trim();
     if (!trimmed) return;
 
+    // Families Policy: show the online-safety reminder before the user's first
+    // freeform exchange. Defer the send until they acknowledge.
+    if (!safetyAcknowledged) {
+      setShowSafety(true);
+      return;
+    }
+
     socket.emit('chatMessage', {
       message: trimmed,
       gameCode,
@@ -267,6 +281,39 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   // Hide chat on CrazyGames platform entirely (child safety, platform policy)
   // Also hide when platform explicitly disables chat via settings
   if (isChatDisabled || isOnCrazyGamesPlatform) return null;
+
+  // Families Policy: child / unknown-age users cannot use freeform stranger
+  // chat. Unknown age → offer the neutral age screen; known child → explain it
+  // is turned off (adults manage it in parental controls).
+  if (!caps.publicRoomChat) {
+    return (
+      <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
+        <CardContent className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
+          <MessageSquare className="text-neo-pink" size={32} aria-hidden />
+          <p className="font-neo-body text-sm text-neo-black">
+            {needsAgeGate
+              ? t('familiesSafety.chatNeedsAge')
+              : t('familiesSafety.chatRestricted')}
+          </p>
+          {needsAgeGate && (
+            <Button variant="cyan" onClick={() => setShowAgeGate(true)}>
+              {t('familiesSafety.chatAddAge')}
+            </Button>
+          )}
+        </CardContent>
+        <AgeGateModal
+          isOpen={showAgeGate}
+          onClose={() => setShowAgeGate(false)}
+          onResolved={() => {
+            setShowAgeGate(false);
+            // Reconnect so the server re-resolves the social tier for this socket.
+            socket?.disconnect();
+            socket?.connect();
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
@@ -453,6 +500,23 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
       >
         {latestAnnouncement}
       </div>
+
+      {/* Families Policy: online-safety reminder before the first message. */}
+      <SafetyReminderModal
+        isOpen={showSafety}
+        onClose={() => setShowSafety(false)}
+        onAcknowledge={() => {
+          acknowledgeSafety();
+          setShowSafety(false);
+          // Deliver the buffered message now that the reminder is acknowledged.
+          const trimmed = (inputRef.current?.value ?? inputMessage).trim();
+          if (trimmed && socket) {
+            socket.emit('chatMessage', { message: trimmed, gameCode, username, isHost });
+            setInputMessage('');
+            if (inputRef.current) inputRef.current.value = '';
+          }
+        }}
+      />
     </div>
   );
 };

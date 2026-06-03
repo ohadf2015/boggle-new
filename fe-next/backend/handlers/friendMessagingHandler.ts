@@ -12,6 +12,7 @@ import { getSupabase } from '../modules/supabaseServer';
 import { cleanProfanity } from '../utils/profanityFilter';
 import { sanitizeHtml } from '../utils/sanitize';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
+import { ensureSocialCapability } from '../utils/socialPolicyServer';
 import { notifyDirectMessage } from '../modules/pushNotificationTriggers';
 
 // Rate limit weights
@@ -43,6 +44,13 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
 
     if (!authUserId) {
       emitError(socket, ErrorCodes.AUTH_REQUIRED, { message: 'Must be authenticated to send messages' });
+      return;
+    }
+
+    // Families Policy: child / unknown-age users may not exchange freeform DMs
+    // unless an adult has explicitly enabled it. Server-side enforcement.
+    if (!(await ensureSocialCapability(socket, 'friendMessaging'))) {
+      emitError(socket, ErrorCodes.SOCIAL_RESTRICTED, { message: 'Messaging is turned off for this account' });
       return;
     }
 

@@ -71,6 +71,42 @@ vi.mock('@tanstack/react-virtual', () => ({
   })
 }));
 
+// Families Policy: mutable social-capability stub. Default = adult, already
+// acknowledged (so the existing chat tests behave as before the gate).
+const ADULT_CAPS = {
+  publicRoomChat: true,
+  friendMessaging: true,
+  friendManagement: true,
+  customDisplayName: true,
+  emojiReactions: true,
+};
+let socialCapsValue: any;
+vi.mock('@/hooks/useSocialCapabilities', () => ({
+  useSocialCapabilities: () => socialCapsValue,
+}));
+// Stub the family modals — render their open state as a simple marker so we can
+// assert visibility without pulling in Radix Dialog portals.
+vi.mock('@/components/families/AgeGateModal', () => ({
+  AgeGateModal: ({ isOpen }: any) => (isOpen ? <div data-testid="age-gate" /> : null),
+}));
+vi.mock('@/components/families/SafetyReminderModal', () => ({
+  SafetyReminderModal: ({ isOpen, onAcknowledge }: any) =>
+    isOpen ? <button data-testid="safety-reminder" onClick={onAcknowledge} /> : null,
+}));
+
+function setSocialCaps(overrides: Record<string, unknown> = {}) {
+  socialCapsValue = {
+    tier: 'adult',
+    caps: { ...ADULT_CAPS },
+    ageKnown: true,
+    needsAgeGate: false,
+    safetyAcknowledged: true,
+    setGuestBirthYear: vi.fn(),
+    acknowledgeSafety: vi.fn(),
+    ...overrides,
+  };
+}
+
 describe('RoomChat', () => {
   const defaultProps = {
     username: 'TestUser',
@@ -80,6 +116,44 @@ describe('RoomChat', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setSocialCaps(); // default adult, acknowledged
+  });
+
+  describe('Families Policy gating', () => {
+    it('hides chat and offers the age screen for an unknown-age user', () => {
+      setSocialCaps({
+        tier: 'unknown',
+        caps: { ...ADULT_CAPS, publicRoomChat: false },
+        ageKnown: false,
+        needsAgeGate: true,
+      });
+      render(<RoomChat {...defaultProps} />);
+      expect(screen.queryByPlaceholderText('Type a message...')).not.toBeInTheDocument();
+      expect(screen.getByText('familiesSafety.chatNeedsAge')).toBeInTheDocument();
+      expect(screen.getByText('familiesSafety.chatAddAge')).toBeInTheDocument();
+    });
+
+    it('hides chat with a restricted message for a known child', () => {
+      setSocialCaps({
+        tier: 'child',
+        caps: { ...ADULT_CAPS, publicRoomChat: false },
+        ageKnown: true,
+        needsAgeGate: false,
+      });
+      render(<RoomChat {...defaultProps} />);
+      expect(screen.queryByPlaceholderText('Type a message...')).not.toBeInTheDocument();
+      expect(screen.getByText('familiesSafety.chatRestricted')).toBeInTheDocument();
+    });
+
+    it('shows the safety reminder before the first message and does not send yet', () => {
+      setSocialCaps({ safetyAcknowledged: false });
+      render(<RoomChat {...defaultProps} />);
+      const input = screen.getByPlaceholderText('Type a message...') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: 'hello' } });
+      fireEvent.click(screen.getByRole('button', { name: 'Send message' }));
+      expect(screen.getByTestId('safety-reminder')).toBeInTheDocument();
+      expect(mockSocket.emit).not.toHaveBeenCalledWith('chatMessage', expect.anything());
+    });
   });
 
   describe('rendering', () => {

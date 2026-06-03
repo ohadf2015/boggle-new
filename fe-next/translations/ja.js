@@ -11098,7 +11098,11 @@ const ja = {
       "title": "接続なし",
       "message": "ゲームサーバーに接続できません。インターネット接続を確認してください。",
       "retry": "再試行",
-      "retrying": "接続中..."
+      "retrying": "接続中...",
+      "playablePrompt": "オフラインでもプレイできます：",
+      "playBlast": "ブラスト",
+      "playConnections": "コネクションズ",
+      "playDaily": "デイリーワードハント"
     }
   },
   "backToLobby": "ロビーに戻る",
@@ -12785,6 +12789,35 @@ const ja = {
     "scoreLabel": "{score} ポイント",
     "wordCountLabel": "{count} 単語",
     "topScore": "最高スコア"
+  },
+  "familiesSafety": {
+    "ageGateTitle": "年齢を教えてください",
+    "ageGateMessage": "若いプレイヤーを守るためにお聞きしています。生まれた年を選んでください。",
+    "birthYearLabel": "生まれた年",
+    "birthYearPlaceholder": "年を選択",
+    "ageGateError": "問題が発生しました。もう一度お試しください。",
+    "ageGateConfirm": "続ける",
+    "saving": "保存中…",
+    "reminderTitle": "オンラインでは安全に",
+    "reminderIntro": "チャットの前に、簡単な注意点です：",
+    "tipNoPersonalInfo": "個人情報は決して共有しないでください — 本名、住所、学校、電話番号、パスワードなど。",
+    "tipStrangers": "オンラインの相手は、本人とは限りません。知らない人には注意しましょう。",
+    "tipReport": "何かおかしいと感じたら、チャットをやめて信頼できる大人に伝えましょう。",
+    "reminderConfirm": "理解しました",
+    "chatNeedsAge": "チャットを使うには年齢を教えてください。",
+    "chatRestricted": "このアカウントではチャットがオフになっています。大人が保護者設定で変更できます。",
+    "chatAddAge": "年齢を追加",
+    "pcTitle": "保護者による管理",
+    "pcIntro": "このアカウントで利用できるソーシャル機能を選びます。変更するには大人であることを確認してください。",
+    "pcAdultGateLabel": "保護者の生まれた年",
+    "pcUnlock": "設定のロックを解除",
+    "pcAdultError": "続けるには保護者の生まれた年を入力してください。",
+    "pcChatLabel": "ゲーム内での他のプレイヤーとのチャット",
+    "pcFriendMsgLabel": "フレンドとのダイレクトメッセージ",
+    "pcFriendMgmtLabel": "フレンドの追加とプレイヤー検索",
+    "pcSave": "設定を保存",
+    "pcSaved": "設定を保存しました。",
+    "pcSaveError": "保存できませんでした。もう一度お試しください。"
   }
 };
 

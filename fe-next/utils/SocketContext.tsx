@@ -5,6 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { sanitizeRoomName } from '@/utils/consts';
 import { computeReconnectDelay } from '@/utils/reconnectDelay';
+import { readGuestBirthYear } from '@/lib/families/guestAge';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
 // Socket.IO Context Value Type
@@ -144,23 +145,26 @@ export function getSharedSocket(): Socket {
       reconnectionDelayMax: SOCKET_CONFIG.reconnectionDelayMax,
       randomizationFactor: 0.7,  // Higher jitter prevents thundering herd on server restart
       timeout: SOCKET_CONFIG.timeout,
-      autoConnect: false, // Connect after setting auth
+      autoConnect: false, // Connect after auth() resolves
       forceNew: false,
+      // `auth` as a FUNCTION so socket.io re-evaluates it on every (re)connection.
+      // This keeps both the JWT (authed users) and the guest's self-declared
+      // birth year (Families Policy social tier) current — never a stale snapshot
+      // taken once at creation. A guest who sets their age mid-session and
+      // reconnects is re-resolved correctly.
+      auth: (cb: (data: Record<string, string>) => void) => {
+        Promise.all([getAuthToken(), getCrazyGamesToken()]).then(([token, cgToken]) => {
+          const declaredBirthYear = !token ? readGuestBirthYear() : null;
+          cb({
+            ...(token ? { token } : {}),
+            ...(cgToken ? { crazyGamesToken: cgToken } : {}),
+            ...(declaredBirthYear ? { declaredBirthYear: String(declaredBirthYear) } : {}),
+          });
+        }).catch(() => cb({}));
+      },
     });
 
-    // Attach auth tokens before connecting (async but non-blocking)
-    Promise.all([getAuthToken(), getCrazyGamesToken()]).then(([token, cgToken]) => {
-      if (sharedSocketInstance) {
-        sharedSocketInstance.auth = {
-          ...(token ? { token } : {}),
-          ...(cgToken ? { crazyGamesToken: cgToken } : {}),
-        };
-      }
-      sharedSocketInstance?.connect();
-    }).catch(() => {
-      // Connect without auth on failure
-      sharedSocketInstance?.connect();
-    });
+    sharedSocketInstance.connect();
   }
   sharedSocketRefCount++;
   syncHMR();
@@ -282,16 +286,9 @@ export function SocketProvider({ children }: SocketProviderProps) {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
       setIsReconnecting(true);
       reconnectAttemptRef.current = attemptNumber;
-
-      // Refresh auth token before each reconnection attempt
-      // Prevents stale JWT from causing silent guest fallback
-      getAuthToken().then(token => {
-        if (token && socketInstance) {
-          socketInstance.auth = { token };
-        }
-      }).catch(() => {
-        // Continue reconnection without fresh token
-      });
+      // The auth() function (set at creation) re-reads a fresh JWT + guest age on
+      // each reconnection attempt — no manual auth refresh needed here. Setting
+      // socket.auth to an object would clobber that function.
     };
 
     const handleReconnectError = (error: Error) => {
@@ -403,13 +400,8 @@ export function SocketProvider({ children }: SocketProviderProps) {
         }
         if (!socketInstance.connected) {
           logger.log('[SOCKET.IO] App foregrounded — reconnecting');
-          // Refresh auth token before reconnecting (may have expired while backgrounded)
-          getAuthToken().then(token => {
-            if (token && socketInstance) {
-              socketInstance.auth = { ...socketInstance.auth, token };
-            }
-            socketInstance.connect();
-          }).catch(() => socketInstance.connect());
+          // auth() re-reads a fresh token (and guest age) on reconnect; just connect.
+          socketInstance.connect();
         }
       }
     };

@@ -16,6 +16,7 @@ import { inc } from '../utils/metrics';
 import logger from '../utils/logger';
 import { isSocketMigrating } from './shared';
 import { validatePayload, chatMessageSchema } from '../utils/socketValidation';
+import { ensureSocialCapability } from '../utils/socialPolicyServer';
 
 // Rate limit weight for chat
 const CHAT_WEIGHT = parseInt(process.env.RATE_WEIGHT_CHAT || '1');
@@ -59,6 +60,13 @@ function registerChatHandlers(io: Server, socket: Socket): void {
     const validation = validatePayload(chatMessageSchema, data);
     if (!validation.success) {
       emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
+      return;
+    }
+
+    // Families Policy: block freeform chat with strangers for child / unknown-age
+    // users. Enforced server-side — the client also hides the UI, but never trust it.
+    if (!(await ensureSocialCapability(socket, 'publicRoomChat'))) {
+      emitError(socket, ErrorCodes.SOCIAL_RESTRICTED);
       return;
     }
 

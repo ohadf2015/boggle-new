@@ -11028,7 +11028,11 @@ const en = {
       "title": "No Connection",
       "message": "We can't reach the game server. Please check your internet connection.",
       "retry": "Try Again",
-      "retrying": "Connecting..."
+      "retrying": "Connecting...",
+      "playablePrompt": "No internet? You can still play:",
+      "playBlast": "Blast",
+      "playConnections": "Connections",
+      "playDaily": "Daily Word Hunt"
     }
   },
   "system": {
@@ -13154,6 +13158,35 @@ const en = {
     "scoreLabel": "{score} points",
     "wordCountLabel": "{count} words",
     "topScore": "Top score"
+  },
+  "familiesSafety": {
+    "ageGateTitle": "How old are you?",
+    "ageGateMessage": "We ask so we can keep younger players safe. Choose the year you were born.",
+    "birthYearLabel": "Year of birth",
+    "birthYearPlaceholder": "Select a year",
+    "ageGateError": "Something went wrong. Please try again.",
+    "ageGateConfirm": "Continue",
+    "saving": "Saving…",
+    "reminderTitle": "Stay safe online",
+    "reminderIntro": "Before you chat, a quick reminder:",
+    "tipNoPersonalInfo": "Never share personal info — your real name, address, school, phone number or passwords.",
+    "tipStrangers": "People online may not be who they say they are. Be careful with anyone you don't know.",
+    "tipReport": "If something feels wrong, stop chatting and tell a trusted adult.",
+    "reminderConfirm": "I understand",
+    "chatNeedsAge": "Tell us your age to use chat.",
+    "chatRestricted": "Chat is turned off for this account. An adult can change this in parental controls.",
+    "chatAddAge": "Add my age",
+    "pcTitle": "Parental controls",
+    "pcIntro": "Choose which social features are available on this account. Confirm you're an adult to make changes.",
+    "pcAdultGateLabel": "Adult's year of birth",
+    "pcUnlock": "Unlock settings",
+    "pcAdultError": "Enter an adult's year of birth to continue.",
+    "pcChatLabel": "In-game chat with other players",
+    "pcFriendMsgLabel": "Direct messages with friends",
+    "pcFriendMgmtLabel": "Add friends & search for players",
+    "pcSave": "Save settings",
+    "pcSaved": "Settings saved.",
+    "pcSaveError": "Couldn't save. Please try again."
   }
 };
 

@@ -213,9 +213,9 @@ export const PROFILE_SELECTS = {
   // Game-related stats for results and stats pages
   stats: 'id, display_name, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, achievement_counts, total_time_played, prestige_level, prestige_multiplier, practice_graduated_at',
   // Auth and settings fields
-  settings: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, has_customized_profile, is_admin, country_code, daily_email_subscribed, timezone',
+  settings: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, has_customized_profile, is_admin, country_code, daily_email_subscribed, timezone, birth_year, social_features_override',
   // Full profile (use sparingly - only when all fields needed)
-  full: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, has_customized_profile, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone, gift_modal_dismissed_at, prestige_level, prestige_multiplier, prestige_unlocks, lifetime_xp, blast_access, practice_graduated_at'
+  full: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, has_customized_profile, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone, gift_modal_dismissed_at, prestige_level, prestige_multiplier, prestige_unlocks, lifetime_xp, blast_access, practice_graduated_at, birth_year, social_features_override'
 } as const;
 
 export type ProfileSelectType = keyof typeof PROFILE_SELECTS;
