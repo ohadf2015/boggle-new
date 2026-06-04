@@ -36,6 +36,8 @@ interface UseResultSubmissionProps {
   guestPlayer: GuestDailyPlayer | null;
   countryCodeReady: boolean;
   onSubmitSuccess: () => void;
+  /** Fired once when the server consumed a Streak Freeze to bridge a missed day */
+  onFreezeBridged?: (info: { freezesRemaining?: number }) => void;
   /** Number of coin-paid retries */
   extraTries?: number;
   /** Translation function for error messages */
@@ -54,6 +56,7 @@ export function useResultSubmission({
   guestPlayer,
   countryCodeReady,
   onSubmitSuccess,
+  onFreezeBridged,
   extraTries = 0,
   t,
 }: UseResultSubmissionProps) {
@@ -252,6 +255,12 @@ export function useResultSubmission({
           // Mark the result as successfully submitted
           markWordHuntResultSubmitted(language);
 
+          // One-shot "streak saved by freeze" signal — fire only on the
+          // server's newly-consumed bridge event, never off steady protection.
+          if (responseData.freezeBridged) {
+            onFreezeBridged?.({ freezesRemaining: responseData.freezesRemaining });
+          }
+
           // Notify parent of successful submission
           onSubmitSuccess();
         } catch (err) {
@@ -276,6 +285,7 @@ export function useResultSubmission({
     guestPlayer,
     countryCodeReady,
     onSubmitSuccess,
+    onFreezeBridged,
     extraTries,
     t,
     online,

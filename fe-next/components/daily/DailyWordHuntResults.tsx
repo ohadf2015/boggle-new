@@ -31,6 +31,7 @@ import {
 } from '@/utils/dailyChallenge';
 import { fireConfetti } from '@/utils/confettiUtils';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
+import StreakSavedCelebration from './StreakSavedCelebration';
 import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
@@ -96,6 +97,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [stats, setStats] = useState<WordHuntStats | null>(null);
   const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
+  const [showStreakSaved, setShowStreakSaved] = useState(false);
+  const [streakSavedFreezesLeft, setStreakSavedFreezesLeft] = useState<number | undefined>(undefined);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [activeTab, setActiveTab] = useState<ResultTab>('results');
   const [_countryCode, setCountryCode] = useState<string | null>(null);
@@ -198,6 +201,11 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     onSubmitSuccess: () => {
       setLeaderboardKey(prev => prev + 1);
       fetchStats();
+    },
+    onFreezeBridged: ({ freezesRemaining }) => {
+      setStreakSavedFreezesLeft(freezesRemaining);
+      // Let the results / win-cinematic settle, then reveal the save.
+      setTimeout(() => setShowStreakSaved(true), 900);
     },
     extraTries: result.extraTries,
     t,
@@ -456,6 +464,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           subtitle={milestoneMessage.subtitle}
         />
       )}
+
+      {/* Streak Saved (freeze bridge) Celebration Modal */}
+      <StreakSavedCelebration
+        isOpen={showStreakSaved}
+        onClose={() => setShowStreakSaved(false)}
+        freezesRemaining={streakSavedFreezesLeft}
+        t={t}
+      />
 
       {/* Custom Puzzle Creator Modal */}
       <CustomPuzzleCreator

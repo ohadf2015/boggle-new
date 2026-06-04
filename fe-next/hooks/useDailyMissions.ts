@@ -244,12 +244,16 @@ export function useDailyMissions(): UseDailyMissionsReturn {
       return;
     }
     void tryCelebrate('grand_slam', () => {
-      // Grand slam coin grant is server-side (via checkAndClaimGrandSlam).
+      // Grand slam XP + coins are granted server-side (via checkAndClaimGrandSlam).
+      // We mirror the server constants here purely for display so the reward
+      // doesn't feel invisible — keep in sync with dailyMissionsManager
+      // GRAND_SLAM_XP (500) + GRAND_SLAM_COIN_REWARD (200).
       // This toast fires on newlyCelebrated only (i.e., first mount after completion).
       import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
         showQuestCompletionToast({
           questName: '',
           xpReward: 500,
+          goldReward: 200,
           isGrandSlam: true,
           dedupKey: 'mission:grand_slam',
           t,

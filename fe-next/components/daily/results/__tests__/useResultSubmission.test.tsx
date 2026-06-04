@@ -452,4 +452,58 @@ describe('useResultSubmission', () => {
       ).toBe(true);
     });
   });
+
+  describe('streak-freeze bridge signal', () => {
+    beforeEach(() => {
+      // The offline describe leaves these mocks flipped; restore online + flag-off
+      // so we exercise the live fetch path. (clearAllMocks keeps return values.)
+      mockUseNetworkState.mockReturnValue({ online: true, slow: false, type: 'wifi', rttMs: 0 });
+      mockUseOfflineModeFlag.mockReturnValue(false);
+    });
+
+    const baseProps = {
+      result: mockResult,
+      puzzleNumber: 100,
+      puzzleDate: '2025-01-19',
+      language: 'en' as const,
+      isNewCompletion: true,
+      guestFingerprint: null,
+      isAuthenticated: true,
+      profile: mockProfile,
+      guestPlayer: null,
+      countryCodeReady: true,
+      onSubmitSuccess: mockOnSubmitSuccess,
+    };
+
+    it('fires onFreezeBridged with freezesRemaining when the server bridged a missed day', async () => {
+      mockFetch.mockImplementation((url: string) => {
+        if (url === '/api/daily-challenge/word-hunt/submit') {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ success: true, data: { id: 'x' }, freezeBridged: true, freezesRemaining: 2 }),
+          });
+        }
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      });
+      const onFreezeBridged = vi.fn();
+
+      renderHook(() => useResultSubmission({ ...baseProps, onFreezeBridged }));
+
+      await waitFor(() => {
+        expect(onFreezeBridged).toHaveBeenCalledWith({ freezesRemaining: 2 });
+      }, { timeout: 3000 });
+    });
+
+    it('does NOT fire onFreezeBridged when no freeze was consumed', async () => {
+      // default mockFetch returns no freezeBridged field
+      const onFreezeBridged = vi.fn();
+
+      renderHook(() => useResultSubmission({ ...baseProps, onFreezeBridged }));
+
+      await waitFor(() => {
+        expect(mockOnSubmitSuccess).toHaveBeenCalled();
+      }, { timeout: 3000 });
+      expect(onFreezeBridged).not.toHaveBeenCalled();
+    });
+  });
 });

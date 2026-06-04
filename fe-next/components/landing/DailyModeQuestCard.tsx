@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyModeQuest } from '@/hooks/useDailyModeQuest';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useCoinContext } from '@/contexts/CoinContext';
 
 /**
  * Compact daily quest progress bar for landing page.
@@ -15,6 +16,7 @@ export function DailyModeQuestCard() {
   const { t } = useLanguage();
   const { getQuestProgress, claimReward, data } = useDailyModeQuest();
   const { playDailyRewardSound } = useSoundEffects();
+  const { addCoins } = useCoinContext();
   const [expanded, setExpanded] = useState(false);
   const [rewardAmount, setRewardAmount] = useState<number | null>(null);
 
@@ -23,10 +25,14 @@ export function DailyModeQuestCard() {
   const claimed = data.claimed;
 
   const handleClaim = () => {
+    // claimReward() flips claimed:true synchronously and returns null on
+    // re-claim, so the grant below is idempotent — a double-click can't
+    // double-credit. Fire-and-forget keeps this handler synchronous.
     const coins = claimReward();
     if (coins !== null) {
       setRewardAmount(coins);
       playDailyRewardSound();
+      void addCoins(coins, t('dailyQuest.title'), { source: 'daily_mode_quest' });
     }
   };
 

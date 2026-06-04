@@ -370,6 +370,10 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     // Weekly chest hook — non-fatal
     let chestReady = false
     let chestTier: string | undefined
+    // Freeze-bridge signal — true only when a freeze was *newly consumed on
+    // this submit* (one-shot event for the "streak saved!" results moment).
+    let freezeBridged = false
+    let freezesRemaining: number | undefined
     if (playerId) {
       try {
         const today = new Date().toISOString().split('T')[0]
@@ -412,6 +416,8 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
                   .update({ streak_freezes_available: freezesAvailable - 1 })
                   .eq('player_id', playerId)
                 frozenDates.push(bridgeDate)
+                freezeBridged = true
+                freezesRemaining = Math.max(0, freezesAvailable - 1)
                 logger.info('API', `[WordHunt] freeze bridged missed daily ${bridgeDate} for ${playerId}`)
               }
             }
@@ -452,7 +458,7 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       }
     }
 
-    res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data, chestReady, chestTier });
+    res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data, chestReady, chestTier, freezeBridged, freezesRemaining });
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Hunt submit error: ${err.message}`);

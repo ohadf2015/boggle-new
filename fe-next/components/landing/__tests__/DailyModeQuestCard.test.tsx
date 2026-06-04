@@ -38,11 +38,25 @@ vi.mock('@/hooks/useDailyModeQuest', () => ({
   }),
 }));
 
+// Mock CoinContext — the actual balance-granting path
+const mockAddCoins = vi.fn(() => Promise.resolve(100));
+vi.mock('@/contexts/CoinContext', () => ({
+  useCoinContext: () => ({ addCoins: mockAddCoins }),
+}));
+
+// Mock SoundEffectsContext
+const mockPlayDailyRewardSound = vi.fn();
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({ playDailyRewardSound: mockPlayDailyRewardSound }),
+}));
+
 describe('DailyModeQuestCard', () => {
   beforeEach(() => {
     mockProgress = { blast: false, classicMp: false, wordHuntMp: false, completed: false };
     mockClaimed = false;
     mockClaimReward.mockReturnValue(100);
+    mockAddCoins.mockClear();
+    mockPlayDailyRewardSound.mockClear();
   });
 
   it('renders collapsed bar with quest title and progress', () => {
@@ -78,5 +92,23 @@ describe('DailyModeQuestCard', () => {
     fireEvent.click(screen.getByText('Claim Reward!'));
     expect(mockClaimReward).toHaveBeenCalled();
     expect(screen.getByText('You earned 100 coins!')).toBeTruthy();
+  });
+
+  it('credits the coins to the balance via addCoins when claimed', () => {
+    mockProgress = { blast: true, classicMp: true, wordHuntMp: true, completed: true };
+    mockClaimReward.mockReturnValue(100);
+    render(<DailyModeQuestCard />);
+    fireEvent.click(screen.getByText('Claim Reward!'));
+    expect(mockAddCoins).toHaveBeenCalledWith(100, expect.any(String), expect.anything());
+  });
+
+  it('does NOT credit coins when claimReward returns null (already claimed)', () => {
+    mockProgress = { blast: true, classicMp: true, wordHuntMp: true, completed: true };
+    mockClaimReward.mockReturnValue(null);
+    render(<DailyModeQuestCard />);
+    // Quest-complete view still renders a claim button; clicking must not grant
+    const btn = screen.queryByText('Claim Reward!');
+    if (btn) fireEvent.click(btn);
+    expect(mockAddCoins).not.toHaveBeenCalled();
   });
 });

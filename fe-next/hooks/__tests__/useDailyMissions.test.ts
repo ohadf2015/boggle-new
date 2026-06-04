@@ -185,6 +185,9 @@ describe('useDailyMissions', () => {
         expect.objectContaining({
           isGrandSlam: true,
           xpReward: 500,
+          // Coins ARE granted server-side (GRAND_SLAM_COIN_REWARD=200); the toast
+          // must surface the amount so the reward doesn't feel invisible.
+          goldReward: 200,
         }),
       );
     });
