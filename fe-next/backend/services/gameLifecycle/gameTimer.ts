@@ -9,8 +9,9 @@ import type { Server } from 'socket.io';
 import { getGame, updateGame } from '../../modules/gameStateManager';
 import { resetGameAIValidationCount } from '../../modules/communityWordManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
-import { clearGameTimer, setGameTimer } from '../../utils/timerManager';
+import { clearGameTimer, setGameTimer, hasGameTimer } from '../../utils/timerManager';
 import { drainLife, areAllPlayersEliminated } from '../../modules/wordHuntManager';
+import { isInProgress } from '../../utils/gameStateMachine';
 import { startBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
 import logger from '../../utils/logger';
@@ -84,6 +85,15 @@ export function startGameTimer(
 
     // Word Hunt: drain life from all non-eliminated players each tick
     const currentGame = getGame(gameCode);
+    if (currentGame?.gameMode === 'word-hunt' && !currentGame.wordHuntState) {
+      // Canary: gameMode says word-hunt but the state object is missing, so the
+      // drain branch below is silently skipped every tick (life frozen). A silent
+      // gate like this hid a real production freeze for a long time — never let it
+      // be invisible again. (Not the restart-timer-drop case, where wordHuntState
+      // IS restored from Redis; this guards the orthogonal "state never initialised"
+      // class, e.g. a round-start path that forgets initWordHuntState.)
+      logger.error('HUNT_DRAIN', `${gameCode}: gameMode='word-hunt' but wordHuntState is NULL — life-drain skipped (state never initialised for this round)`);
+    }
     if (currentGame?.gameMode === 'word-hunt' && currentGame.wordHuntState) {
       const huntState = currentGame.wordHuntState;
       const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
@@ -135,4 +145,38 @@ export function startGameTimer(
   // NOTE: We do NOT broadcast 'startGame' here anymore.
   // The game start has already been broadcast from gameLifecycleHandler with all necessary data.
   // A second broadcast was causing issues with the second game in the same room getting stuck.
+}
+
+/**
+ * Resume the per-second game timer for an in-progress game whose in-memory
+ * interval was lost.
+ *
+ * The game clock (round countdown + word-hunt life drain) and bot loops are
+ * plain in-memory `setInterval`s — a server restart / redeploy destroys them
+ * while Redis still holds the game state. When such a game is rehydrated from
+ * Redis (on player reconnect, `restoreGameFromRedis`), nothing restarts its
+ * timer, so the round is frozen forever: word-hunt life never drains, the round
+ * never ends, and (because `gameMode === 'word-hunt' && wordHuntState` is still
+ * TRUE) no diagnostic fires. Players still see the board and can submit words
+ * (event-driven), which is exactly the "stuck at full life for everyone" report.
+ *
+ * Guarded by `hasGameTimer` so a NORMAL live reconnect (timer still ticking)
+ * never restarts/resets the running clock — this only fires for genuinely
+ * orphaned, rehydrated games.
+ *
+ * @returns true if a timer was resumed, false on no-op.
+ */
+export function resumeGameTimerIfMissing(io: Server, gameCode: string): boolean {
+  const game = getGame(gameCode);
+  if (!game) return false;
+  if (!isInProgress(game.gameState)) return false;
+  if (hasGameTimer(gameCode)) return false;
+
+  const duration = game.gameDuration || game.timerSeconds || 180;
+  logger.info(
+    'TIMER',
+    `Resuming timer for rehydrated in-progress game ${gameCode} (mode=${game.gameMode ?? 'classic'}) — server-restart recovery`,
+  );
+  startGameTimer(io, gameCode, duration);
+  return true;
 }

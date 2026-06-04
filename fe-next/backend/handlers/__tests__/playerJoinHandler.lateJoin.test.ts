@@ -81,8 +81,8 @@ vi.mock('../../utils/timerManager', () => ({
 }));
 
 vi.mock('../../utils/gameStartCoordinator', () => ({ default: { cancel: vi.fn() } }));
-vi.mock('../../services/gameLifecycle/gameTimer.js', () => ({ startGameTimer: vi.fn() }));
-vi.mock('../../services/gameLifecycle/gameTimer', () => ({ startGameTimer: vi.fn() }));
+vi.mock('../../services/gameLifecycle/gameTimer.js', () => ({ startGameTimer: vi.fn(), resumeGameTimerIfMissing: vi.fn() }));
+vi.mock('../../services/gameLifecycle/gameTimer', () => ({ startGameTimer: vi.fn(), resumeGameTimerIfMissing: vi.fn() }));
 
 vi.mock('../../modules/botManager', () => ({ cleanupGameBots: vi.fn() }));
 

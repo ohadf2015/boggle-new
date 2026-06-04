@@ -39,7 +39,7 @@ import { checkRateLimit } from '../utils/rateLimiter.js';
 import timerManager, { clearGameTimer } from '../utils/timerManager.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
-import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
+import { startGameTimer, resumeGameTimerIfMissing } from '../services/gameLifecycle/gameTimer.js';
 import { generateRandomAvatar } from '../utils/gameUtils.js';
 import logger from '../utils/logger.js';
 import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
@@ -116,6 +116,17 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         return;
       }
     }
+
+    // A server restart/redeploy wipes the in-memory setInterval game clock
+    // (round countdown + word-hunt life drain) and bot loops while Redis keeps
+    // the game state. Whichever path rehydrated this game (the sync getGame
+    // above, or an async restore upstream), an in-progress game whose timer was
+    // orphaned must have it resumed — otherwise the round is frozen: word-hunt
+    // life stays pinned at its last value, the round never ends, and players
+    // can still submit words (the "stuck at full life for everyone" report).
+    // No-op for normal live reconnects (a timer is already running) and for
+    // waiting/finished games — see resumeGameTimerIfMissing's guards.
+    resumeGameTimerIfMissing(io, gameCode);
 
     // Handle multi-tab detection and existing auth connection
     if (authUserId) {
