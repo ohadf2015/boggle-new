@@ -26,6 +26,7 @@ import {
   COIN_REWARDS,
 } from '@/utils/coinManager';
 import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
+import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import toast from 'react-hot-toast';
 import * as Sentry from '@sentry/nextjs';
 
@@ -246,13 +247,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     if (amount <= 0) return coins;
 
     // Fire global coin-earned event so GlobalCoinEarnFx can play sound + fly coins
-    const fireCoinEarnedFx = () => {
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(
-          new CustomEvent('lexiclash:coin-earned', { detail: { amount } }),
-        );
-      }
-    };
+    const fireCoinEarnedFx = () => emitCoinEarned(amount);
 
     if (isAuthenticated && user) {
       const result = await syncCoinsToDatabase(user.id, amount, reason, metadata);
@@ -527,17 +522,13 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       const { data: freshProfile } = await getProfile(user.id);
       const newBalance = freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
       coinEarnToast(amount, 'Watched Ad');
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('lexiclash:coin-earned', { detail: { amount } }));
-      }
+      emitCoinEarned(amount);
       return { awarded: amount, breakdown: { base: amount }, newBalance };
     } else {
       const newBalance = addLocalCoins(amount, 'Watched Ad', metadata);
       setLocalCoins(newBalance);
       coinEarnToast(amount, 'Watched Ad');
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('lexiclash:coin-earned', { detail: { amount } }));
-      }
+      emitCoinEarned(amount);
       return { awarded: amount, breakdown: { base: amount }, newBalance };
     }
   }, [isAuthenticated, user, coins, refreshProfile, setLocalCoins]);

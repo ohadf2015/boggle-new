@@ -1,22 +1,25 @@
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { isNative } from '@/utils/platform';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { COIN_EARNED_EVENT, selectCoinFxMode, type CoinEarnedDetail } from '@/utils/coinEarnedFx';
+import { DomCoinBurst } from './DomCoinBurst';
 
-export const COIN_EARNED_EVENT = 'lexiclash:coin-earned';
+// Re-export for back-compat with existing importers.
+export { COIN_EARNED_EVENT };
 
-interface CoinEarnedDetail {
-  amount: number;
-  source?: { x: number; y: number };
-}
+type Point = { x: number; y: number };
 
 const CASCADE_THRESHOLD = 100;
 const MAX_COINS_PER_BURST = 10;
 const MIN_COINS_PER_BURST = 4;
 const COINS_PER_25_GOLD = 25;
 
-function getTargetPosition(): { x: number; y: number } {
+function getTargetPosition(): Point {
   if (typeof document === 'undefined') return { x: 0, y: 0 };
   const target = document.querySelector<HTMLElement>('[data-coin-counter="true"]');
   if (!target) {
@@ -26,18 +29,36 @@ function getTargetPosition(): { x: number; y: number } {
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-function getSourcePosition(detail?: CoinEarnedDetail): { x: number; y: number } {
+function getSourcePosition(detail?: CoinEarnedDetail): Point {
   if (detail?.source) return detail.source;
   if (typeof window === 'undefined') return { x: 0, y: 0 };
   return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 }
 
+interface ActiveBurst {
+  id: number;
+  source: Point;
+  target: Point;
+  count: number;
+}
+
 /**
- * Thin bridge: CoinContext CustomEvent → sound + SharedFxApp.spawnCoinStream.
+ * Bridge: CoinContext / server-grant CustomEvent → sound + coin visuals.
  * Mount once inside SoundEffectsProvider.
+ *
+ * Sound plays on every platform (including reduced motion). The visual is
+ * chosen by selectCoinFxMode: WebGL stream on web, a DOM fallback on native
+ * (where the Pixi canvas is disabled), and nothing under reduced motion.
  */
 export const GlobalCoinEarnFx: React.FC = () => {
   const { playCoinCollectSound, playCoinCascadeSound } = useSoundEffects();
+  const reduced = useReducedMotion();
+  const [bursts, setBursts] = useState<ActiveBurst[]>([]);
+  const idRef = useRef(0);
+
+  const removeBurst = useCallback((id: number) => {
+    setBursts((b) => b.filter((x) => x.id !== id));
+  }, []);
 
   const handleCoinEarned = useCallback(
     (evt: Event) => {
@@ -45,6 +66,7 @@ export const GlobalCoinEarnFx: React.FC = () => {
       const amount = detail?.amount ?? 0;
       if (amount <= 0) return;
 
+      // Sound first — plays everywhere, even under reduced motion.
       if (amount >= CASCADE_THRESHOLD) {
         playCoinCascadeSound();
       } else {
@@ -55,14 +77,23 @@ export const GlobalCoinEarnFx: React.FC = () => {
         MAX_COINS_PER_BURST,
         Math.max(MIN_COINS_PER_BURST, Math.ceil(amount / COINS_PER_25_GOLD)),
       );
+      const source = getSourcePosition(detail);
+      const target = getTargetPosition();
 
-      SharedFxApp.spawnCoinStream({
-        source: getSourcePosition(detail),
-        target: getTargetPosition(),
-        count,
+      const mode = selectCoinFxMode({
+        reduced,
+        fxActive: SharedFxApp.isInitialized(),
+        native: isNative(),
       });
+
+      if (mode === 'webgl') {
+        SharedFxApp.spawnCoinStream({ source, target, count });
+      } else if (mode === 'dom') {
+        const id = (idRef.current += 1);
+        setBursts((b) => [...b, { id, source, target, count }]);
+      }
     },
-    [playCoinCollectSound, playCoinCascadeSound],
+    [playCoinCollectSound, playCoinCascadeSound, reduced],
   );
 
   useEffect(() => {
@@ -70,7 +101,21 @@ export const GlobalCoinEarnFx: React.FC = () => {
     return () => window.removeEventListener(COIN_EARNED_EVENT, handleCoinEarned);
   }, [handleCoinEarned]);
 
-  return null;
+  if (bursts.length === 0 || typeof document === 'undefined') return null;
+  return createPortal(
+    <>
+      {bursts.map((b) => (
+        <DomCoinBurst
+          key={b.id}
+          source={b.source}
+          target={b.target}
+          count={b.count}
+          onDone={() => removeBurst(b.id)}
+        />
+      ))}
+    </>,
+    document.body,
+  );
 };
 
 export default GlobalCoinEarnFx;

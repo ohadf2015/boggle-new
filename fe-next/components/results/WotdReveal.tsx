@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useWordOfTheDay } from '@/hooks/useWordOfTheDay';
 import { addCoins, WOTD_BONUS } from '@/utils/coinManager';
+import { emitCoinEarned } from '@/utils/coinEarnedFx';
 
 interface WotdRevealProps {
   /** Words the player found during the game */
@@ -50,6 +51,9 @@ export function WotdReveal({ playerWords, className }: WotdRevealProps) {
     if (localStorage.getItem(key) === 'true') return;
     localStorage.setItem(key, 'true');
     addCoins(WOTD_BONUS, 'WOTD Found');
+    // coinManager.addCoins writes localStorage only and does NOT fire the FX
+    // event — emit it so the coins fly + sound plays.
+    emitCoinEarned(WOTD_BONUS);
   }, [found, word, loading, language]);
   const percent = stats.foundPercent;
 

@@ -1,6 +1,8 @@
 'use client';
+import { useEffect } from 'react';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
 type Props = {
@@ -11,6 +13,11 @@ type Props = {
 
 export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
   const { t } = useLanguage();
+
+  // Server-granted chest coins — fire the flying-coins + sound FX on open.
+  useEffect(() => {
+    if (isOpen && contents.coins > 0) emitCoinEarned(contents.coins);
+  }, [isOpen, contents.coins]);
 
   if (!isOpen) return null;
   const isMilestone = typeof contents.milestone === 'number' && contents.milestone > 0;

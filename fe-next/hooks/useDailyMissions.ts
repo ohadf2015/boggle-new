@@ -20,6 +20,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import {
   getDailyQuestModes,
   QUEST_MODE_HREFS,
@@ -260,6 +261,8 @@ export function useDailyMissions(): UseDailyMissionsReturn {
           onComplete: playQuestCompleteSound,
         });
       });
+      // Server granted the 200 coins — fire the flying-coins + sound FX.
+      emitCoinEarned(200);
     });
     prevGrandSlamRef.current = true;
   }, [isGrandSlam, loading, t, playQuestCompleteSound, tryCelebrate]);
