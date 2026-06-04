@@ -66,9 +66,17 @@ integrity).
   the single-token board, and anything regional or needing a dropped connector
   ("todo **el** mundo"). Lower validation confidence than en/sv (no dictionary
   gate for phrasal Spanish) → batch kept deliberately small. ids `es-v-001..008`.
-- **Japanese: no new content this round.** Exact-kanji matching with
-  per-compound reading subtleties needs a native judge or a ja-specific
-  validator; held for a follow-up.
+- **Japanese +30** (92 → 122 active). No LLM, no native judge: puzzles are
+  **mined directly from the game's own curated common-word list**
+  (`backend/common_hunt_words_ja.txt`). For every attested pair of two-kanji
+  words (XY, YZ) sharing a middle kanji Y, X·Y·Z is a puzzle whose both
+  compounds the game already recognizes. ~135 candidates were mined, then
+  hand-curated to 30 with diverse bridges (30 distinct) and everyday clarity
+  (入·口·笛 = 入口/口笛, 海·老·人 = 海老/老人, 納·豆·腐 = 納豆/豆腐, 花·火·山 =
+  花火/火山). Builder `scripts/connections/build-ja-variety-batch.mjs`
+  re-validates both compounds ∈ the common set, concat alignment, and dedups vs
+  the existing pool. This sidesteps the hiragana-only-dictionary problem
+  entirely — the common-word list contains kanji 二字熟語.
 
 All content was inserted into `public.connections_puzzles` (source of truth) and
 materialized to the committed `*.generated.ts` snapshots — diffs are purely

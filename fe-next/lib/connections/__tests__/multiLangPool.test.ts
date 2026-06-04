@@ -44,6 +44,24 @@ describe('multi-language native pools (es/sv) + ja fallback', () => {
     expect(ja.every((p) => p.id.startsWith('ja-'))).toBe(true);
   });
 
+  it('Japanese: the mined variety batch has aligned single-kanji compound examples', () => {
+    // ja-v-* (2026-06-04) is mined from the game's own common-word list: each
+    // example compound must equal word1+bridge / bridge+word2 with single-kanji
+    // parts and no separator — the bridge is the same kanji in both attested
+    // 二字熟語. Guards future re-materializations.
+    const batch = getPuzzlesForLocale('ja').filter((p) => p.id.startsWith('ja-v-'));
+    expect(batch.length).toBeGreaterThanOrEqual(30);
+    for (const p of batch) {
+      expect([...p.word1].length, `${p.id} word1 single kanji`).toBe(1);
+      expect([...p.bridge].length, `${p.id} bridge single kanji`).toBe(1);
+      expect([...p.word2].length, `${p.id} word2 single kanji`).toBe(1);
+      const ex = p.examples?.[0];
+      expect(ex, `${p.id} has an example`).toBeDefined();
+      expect(ex!.w1).toBe(p.word1 + p.bridge);
+      expect(ex!.w2).toBe(p.bridge + p.word2);
+    }
+  });
+
   it('a Spanish bridge is solvable typing base letters on the A–Z keyboard', () => {
     const es = getPuzzlesForLocale('es');
     const anos = es.find((p) => p.bridge === 'años');
