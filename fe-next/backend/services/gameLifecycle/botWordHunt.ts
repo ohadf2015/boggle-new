@@ -22,6 +22,7 @@ import { findAllWords, getCachedTrie } from '../../modules/boggleSolver';
 import { endGame } from './gameEnd';
 import { getBestHumanScore } from './botGame';
 import { setBotTimeout } from '../../modules/botLifecycle';
+import { ensureLanguageLoaded } from '../../dictionary';
 import logger from '../../utils/logger';
 
 /** Delay before ending game after bot finds target (ms) */
@@ -155,14 +156,14 @@ export function createBotWordHuntStrategy(
  * Start bots for a Word Hunt game.
  * Each bot runs an independent guess loop with feedback-based filtering.
  */
-export function startBotsForWordHunt(
+export async function startBotsForWordHunt(
   io: Server,
   gameCode: string,
   bots: Bot[],
   huntState: WordHuntModeState,
   language: Language,
   timerSeconds: number
-): void {
+): Promise<void> {
   logger.info('BOT', `Starting ${bots.length} bots for Word Hunt in game ${gameCode}`);
 
   const game = getGame(gameCode);
@@ -170,6 +171,12 @@ export function startBotsForWordHunt(
     logger.error('BOT', `Cannot start word-hunt bots: no grid for ${gameCode}`);
     return;
   }
+
+  // Recovery paths (server restart/reconnect → resumeGameTimerIfMissing) relaunch
+  // bots without the gameStartHandler dictionary pre-load. A cold trie → findAllWords
+  // returns nothing → every bot has 0 candidates → no guesses (frozen leaderboard).
+  // Warm the dict first, like the classic bot driver (botBehavior).
+  await ensureLanguageLoaded(language);
 
   // Find all valid words on the board
   const trie = getCachedTrie(language);

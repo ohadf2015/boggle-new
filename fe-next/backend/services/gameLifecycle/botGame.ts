@@ -223,7 +223,9 @@ export function startBotsForGame(
   // not a static grid, and submissions mutate the board via the human validation path.
   if (game?.gameMode === 'blast' && game.blastModeState) {
     markBotScoringStart(gameCode);
-    startBotsForBlast(io, gameCode, bots, game.blastModeState, language, timerSeconds);
+    // Async (awaits dictionary warmup); fire-and-forget from this sync dispatcher.
+    void startBotsForBlast(io, gameCode, bots, game.blastModeState, language, timerSeconds)
+      .catch(err => logger.error('BOT', `blast bot start failed for ${gameCode}: ${(err as Error).message}`));
     return;
   }
 
@@ -389,7 +391,9 @@ export function startBotsForGame(
     setTimeout(() => {
       const freshBots = botManager.getGameBots(gameCode);
       if (freshBots.length > 0) {
-        startBotsForWordHunt(io, gameCode, freshBots, game!.wordHuntState!, language, timerSeconds);
+        // Async (awaits dictionary warmup); fire-and-forget inside this setTimeout.
+        void startBotsForWordHunt(io, gameCode, freshBots, game!.wordHuntState!, language, timerSeconds)
+          .catch(err => logger.error('BOT', `word-hunt bot start failed for ${gameCode}: ${(err as Error).message}`));
       }
     }, 100);
   }

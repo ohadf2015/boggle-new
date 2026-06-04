@@ -80,6 +80,7 @@ const mocks = vi.hoisted(() => ({
   clearBotResyncThrottle: vi.fn(),
   startBotsForWordHunt: vi.fn(),
   startBotsForWheelRush: vi.fn(),
+  ensureLanguageLoaded: vi.fn(async () => {}),
 }));
 
 vi.mock('../../../modules/gameStateManager', () => ({
@@ -150,6 +151,10 @@ vi.mock('../botWheelRush', () => ({
   startBotsForWheelRush: mocks.startBotsForWheelRush,
 }));
 
+vi.mock('../../../dictionary', () => ({
+  ensureLanguageLoaded: mocks.ensureLanguageLoaded,
+}));
+
 // ==========================================
 // Helpers
 // ==========================================
@@ -206,13 +211,15 @@ describe('startBotsForBlast', () => {
     vi.clearAllMocks();
   });
 
-  it('should initialize with current grid and language trie', () => {
+  it('should initialize with current grid and language trie', async () => {
     const bot = makeBot();
     const blastState = makeBlastState();
     const io = mockIo;
 
-    startBotsForBlast(io, gameCode, [bot], blastState, 'en', 120);
+    await startBotsForBlast(io, gameCode, [bot], blastState, 'en', 120);
 
+    // Warms the dict before reading the trie (cold-dict recovery guard).
+    expect(mocks.ensureLanguageLoaded).toHaveBeenCalledWith('en');
     // Should fetch trie for language
     expect(mocks.getCachedTrie).toHaveBeenCalledWith('en');
   });
@@ -277,28 +284,28 @@ describe('startBotsForBlast', () => {
     });
 
     // Verify that bots are activated (cap can be applied later)
-    startBotsForBlast(mockIo, gameCode, [bot], blastState, 'en', 120);
+    await startBotsForBlast(mockIo, gameCode, [bot], blastState, 'en', 120);
 
     expect(bot.isActive).toBe(true);
   });
 
-  it('should activate bot and schedule submissions', () => {
+  it('should activate bot and schedule submissions', async () => {
     const bot = makeBot({ isActive: false });
     const blastState = makeBlastState();
 
-    startBotsForBlast(mockIo, gameCode, [bot], blastState, 'en', 120);
+    await startBotsForBlast(mockIo, gameCode, [bot], blastState, 'en', 120);
 
     // Bot should be marked active
     expect(bot.isActive).toBe(true);
   });
 
-  it('should handle difficulty-based timing', () => {
+  it('should handle difficulty-based timing', async () => {
     const easyBot = makeBot({ difficulty: 'easy' });
     const hardBot = makeBot({ difficulty: 'hard' });
     const blastState = makeBlastState();
 
-    startBotsForBlast(mockIo, gameCode, [easyBot], blastState, 'en', 120);
-    startBotsForBlast(mockIo, gameCode, [hardBot], blastState, 'en', 120);
+    await startBotsForBlast(mockIo, gameCode, [easyBot], blastState, 'en', 120);
+    await startBotsForBlast(mockIo, gameCode, [hardBot], blastState, 'en', 120);
 
     // Both should have been scheduled
     expect(mocks.setBotTimeout).toHaveBeenCalled();

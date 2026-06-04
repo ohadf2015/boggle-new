@@ -33,6 +33,7 @@ import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultipla
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { findAllWords, getCachedTrie } from '../../modules/boggleSolver';
 import { setBotTimeout } from '../../modules/botLifecycle';
+import { ensureLanguageLoaded } from '../../dictionary';
 import { shouldBotScore } from './botGame';
 import { BOT_CONFIG } from '../../modules/botConfig';
 import { makePositionsMap } from '../../modules/wordValidator';
@@ -287,20 +288,25 @@ function scheduleBlastBot(
  * Start bots for a Blast game. Solves the CURRENT shared board,
  * not a static grid captured once.
  */
-export function startBotsForBlast(
+export async function startBotsForBlast(
   io: Server,
   gameCode: string,
   bots: Bot[],
   blastState: BlastModeState,
   language: Language,
   timerSeconds: number,
-): void {
+): Promise<void> {
   if (!bots || bots.length === 0) return;
 
   if (!blastState.grid || !Array.isArray(blastState.grid) || blastState.grid.length === 0) {
     logger.error('BOT_BLAST', `Cannot start bots for ${gameCode}: invalid blast grid`);
     return;
   }
+
+  // Recovery paths (server restart/reconnect → resumeGameTimerIfMissing) relaunch bots
+  // without the gameStartHandler dictionary pre-load. A cold trie here → bail below →
+  // no blast bots → frozen leaderboard. Warm the dict first, like the classic driver.
+  await ensureLanguageLoaded(language);
 
   const trie = getCachedTrie(language);
   if (!trie) {
