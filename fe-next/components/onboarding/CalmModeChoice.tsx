@@ -47,11 +47,13 @@ const CalmModeChoice: React.FC<CalmModeChoiceProps> = ({ onChoose }) => {
           </span>
         </button>
 
-        {/* Calm — gentler visuals, no time pressure, softer celebrations */}
+        {/* Calm — gentler visuals, no time pressure, softer celebrations. Wears
+            the warm peach of Cosy Mode (not the cool cyan of the loud chrome) so
+            the choice previews the calm experience it unlocks. */}
         <button
           type="button"
           onClick={() => onChoose(true)}
-          className="group flex flex-col items-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-cyan p-6 text-neo-black shadow-hard-lg transition-transform hover:-translate-y-1 active:translate-y-0 active:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan/50"
+          className="group flex flex-col items-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-cozy p-6 text-neo-black shadow-hard-lg transition-transform hover:-translate-y-1 active:translate-y-0 active:shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cozy/50"
         >
           <Coffee className="h-10 w-10" strokeWidth={2.5} aria-hidden />
           <span className="font-neo-display text-2xl font-black uppercase">
