@@ -115,8 +115,6 @@ describe('BlastMultiplayerOverlay', () => {
       { row: 2, col: 4, type: 'magma' },
       { row: 3, col: 0, type: 'crystal' },
       { row: 3, col: 1, type: 'fuse' },
-      { row: 3, col: 2, type: 'locked' },
-      { row: 3, col: 3, type: 'key' },
       { row: 3, col: 4, type: 'anchor' },
     ];
 

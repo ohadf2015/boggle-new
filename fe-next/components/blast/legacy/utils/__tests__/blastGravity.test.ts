@@ -65,18 +65,6 @@ describe('computeGravityResult — tile state preservation', () => {
     expect(result.newTileStates[1][0].isThawed).toBe(true);
   });
 
-  it('preserves isUnlocked on locked tile after fall — regression', () => {
-    const { grid, tileStates } = makeGrid(false, { type: 'locked', isUnlocked: true });
-    const result = noRefill(grid, tileStates);
-    expect(result.newTileStates[1][0].isUnlocked).toBe(true);
-  });
-
-  it('locked tile with isUnlocked=false does not gain isUnlocked after fall', () => {
-    const { grid, tileStates } = makeGrid(false, { type: 'locked', isUnlocked: false });
-    const result = noRefill(grid, tileStates);
-    expect(result.newTileStates[1][0].isUnlocked).toBeFalsy();
-  });
-
   it('preserves portalPairId through gravity', () => {
     const { grid, tileStates } = makeGrid(false, { type: 'portal', portalPairId: 'pair-A' });
     const result = noRefill(grid, tileStates);
@@ -109,8 +97,8 @@ describe('computeGravityResult — tile state preservation', () => {
   });
 
   it('tile stays at bottom and keeps special state after clearing above it', () => {
-    // 3×3 grid: col 0 has rows 0+1 cleared, row 2 has a locked+unlocked tile.
-    // After gravity the locked tile stays at row 2 (already at bottom).
+    // 3×3 grid: col 0 has rows 0+1 cleared, row 2 has a crystal tile carrying
+    // special state. After gravity the tile stays at row 2 (already at bottom).
     const grid = [
       ['A', 'X', 'X'],
       ['B', 'X', 'X'],
@@ -124,10 +112,10 @@ describe('computeGravityResult — tile state preservation', () => {
     const tileStates: BlastTileState[][] = [
       row(0, { isCleared: true }),
       row(1, { isCleared: true }),
-      row(2, { type: 'locked', isUnlocked: true, colorTag: 'pink' }),
+      row(2, { type: 'crystal', crystalMultiplier: 4, colorTag: 'pink' }),
     ];
     const result = computeGravityResult(grid, tileStates, 3, 'en', 0, undefined, 0, undefined, false);
-    expect(result.newTileStates[2][0].isUnlocked).toBe(true);
+    expect(result.newTileStates[2][0].crystalMultiplier).toBe(4);
     expect(result.newTileStates[2][0].colorTag).toBe('pink');
   });
 });

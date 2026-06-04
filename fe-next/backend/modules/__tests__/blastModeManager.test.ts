@@ -286,13 +286,13 @@ describe('blastModeManager', () => {
         'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
         'magnet', 'prism', 'gem', 'frozen', 'diamond',
         'countdown', 'portal', 'catalyst', 'shuffle', 'magma',
-        'crystal', 'fuse', 'locked', 'key', 'anchor',
+        'crystal', 'fuse', 'anchor',
         'chocolate', 'cake',
       ];
       for (const t of canonicalTypes) {
         expect(BLAST_TILE_TYPES).toContain(t);
       }
-      expect(BLAST_TILE_TYPES).toHaveLength(23);
+      expect(BLAST_TILE_TYPES).toHaveLength(21);
     });
 
     it('BLAST_TILE_TYPES should include core advanced types (diamond, prism, frozen)', () => {

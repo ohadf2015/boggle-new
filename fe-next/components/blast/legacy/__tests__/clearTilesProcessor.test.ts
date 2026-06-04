@@ -14,7 +14,6 @@ import {
   PORTAL_WORD_MULTIPLIER,
   FUSE_INITIAL_TIMER,
   FUSE_DEFUSE_MOVES,
-  KEY_UNLOCK_BONUS,
 } from '../types';
 
 // Mock tile generation to avoid randomness
@@ -288,78 +287,6 @@ describe('processTilesForWord — unique tile effects', () => {
       const result = processTilesForWord(makeInput(grid, path, 'AB'));
       expect(result.next[0][0].isCleared).toBe(true);
       expect(result.bonusMoveCount).toBeGreaterThanOrEqual(FUSE_DEFUSE_MOVES);
-    });
-  });
-
-  describe('key tile: unlocks adjacent locked tiles', () => {
-    it('unlocks all 8-directionally adjacent locked tiles when key is cleared', () => {
-      // Center key at (2,2) with locked neighbors at each of 8 directions,
-      // plus one non-adjacent locked that should remain locked.
-      const grid = makeGrid(5, [
-        { row: 2, col: 2, tile: { type: 'key' } },
-        { row: 1, col: 1, tile: { type: 'locked' } },
-        { row: 1, col: 2, tile: { type: 'locked' } },
-        { row: 1, col: 3, tile: { type: 'locked' } },
-        { row: 2, col: 1, tile: { type: 'locked' } },
-        { row: 2, col: 3, tile: { type: 'locked' } },
-        { row: 3, col: 1, tile: { type: 'locked' } },
-        { row: 3, col: 2, tile: { type: 'locked' } },
-        { row: 3, col: 3, tile: { type: 'locked' } },
-        { row: 0, col: 0, tile: { type: 'locked' } }, // far away
-      ]);
-      const path = [{ row: 2, col: 2 }, { row: 2, col: 3 }]; // only clears key
-      // (2,3) is locked in grid but path includes it — to keep path deterministic,
-      // rebuild with only key in path and use a standard tile at (2,3).
-      const grid2 = makeGrid(5, [
-        { row: 2, col: 2, tile: { type: 'key' } },
-        { row: 1, col: 1, tile: { type: 'locked' } },
-        { row: 1, col: 2, tile: { type: 'locked' } },
-        { row: 1, col: 3, tile: { type: 'locked' } },
-        { row: 2, col: 1, tile: { type: 'locked' } },
-        { row: 3, col: 1, tile: { type: 'locked' } },
-        { row: 3, col: 2, tile: { type: 'locked' } },
-        { row: 3, col: 3, tile: { type: 'locked' } },
-        { row: 0, col: 0, tile: { type: 'locked' } }, // far away
-      ]);
-      const path2 = [{ row: 2, col: 2 }, { row: 3, col: 0 }];
-      const result = processTilesForWord(makeInput(grid2, path2, 'AB'));
-
-      // Key cleared
-      expect(result.next[2][2].isCleared).toBe(true);
-      // All 7 adjacent locked tiles flipped to isUnlocked
-      const adjacent = [
-        [1, 1], [1, 2], [1, 3], [2, 1], [3, 1], [3, 2], [3, 3],
-      ] as const;
-      for (const [r, c] of adjacent) {
-        expect(result.next[r][c].type).toBe('locked');
-        expect(result.next[r][c].isUnlocked).toBe(true);
-      }
-      // Far-away locked still gated
-      expect(result.next[0][0].type).toBe('locked');
-      expect(result.next[0][0].isUnlocked).toBeFalsy();
-    });
-
-    it('awards KEY_UNLOCK_BONUS per locked tile unlocked', () => {
-      const grid = makeGrid(4, [
-        { row: 1, col: 1, tile: { type: 'key' } },
-        { row: 0, col: 0, tile: { type: 'locked' } },
-        { row: 0, col: 1, tile: { type: 'locked' } },
-        { row: 2, col: 2, tile: { type: 'locked' } },
-      ]);
-      const path = [{ row: 1, col: 1 }, { row: 3, col: 3 }];
-      const result = processTilesForWord(makeInput(grid, path, 'AB'));
-      // 3 adjacent locked → 3 * KEY_UNLOCK_BONUS minimum
-      expect(result.totalScore).toBeGreaterThanOrEqual(10 + 3 * KEY_UNLOCK_BONUS);
-    });
-
-    it('does nothing to locked tiles when no key is cleared', () => {
-      const grid = makeGrid(4, [
-        { row: 0, col: 0, tile: { type: 'locked' } },
-      ]);
-      const path = [{ row: 1, col: 1 }, { row: 1, col: 2 }];
-      const result = processTilesForWord(makeInput(grid, path, 'AB'));
-      expect(result.next[0][0].type).toBe('locked');
-      expect(result.next[0][0].isUnlocked).toBeFalsy();
     });
   });
 

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   getWaveConfig, getWaveDistribution,
   MAGMA_SHARE, DIAMOND_SHARE, CRYSTAL_SHARE, COUNTDOWN_SHARE,
-  PORTAL_SHARE, CATALYST_SHARE, FUSE_SHARE, LOCKED_SHARE, KEY_SHARE,
+  PORTAL_SHARE, CATALYST_SHARE, FUSE_SHARE,
   SHUFFLE_SHARE, ANCHOR_SHARE,
 } from '../blastWaveConfig';
 
@@ -24,8 +24,6 @@ describe('blast tile revival staircase — wave 8 unlocks', () => {
     expect(c.countdownEnabled).toBe(false);
     expect(c.crystalEnabled).toBe(false);
     expect(c.fuseEnabled).toBe(false);
-    expect(c.lockedEnabled).toBe(false);
-    expect(c.keyEnabled).toBe(false);
   });
 });
 
@@ -46,8 +44,6 @@ describe('blast tile revival staircase — wave 9 unlocks', () => {
     expect(c.countdownEnabled).toBe(false);
     expect(c.fuseEnabled).toBe(false);
     expect(c.crystalEnabled).toBe(false);
-    expect(c.lockedEnabled).toBe(false);
-    expect(c.keyEnabled).toBe(false);
   });
 });
 
@@ -57,24 +53,6 @@ describe('blast tile revival staircase — wave 10 unlocks', () => {
     expect(c.countdownEnabled).toBe(true);
     expect(c.fuseEnabled).toBe(true);
     expect(c.crystalEnabled).toBe(true);
-    // Wave 11+ still off
-    expect(c.lockedEnabled).toBe(false);
-    expect(c.keyEnabled).toBe(false);
-  });
-});
-
-describe('blast tile revival staircase — wave 11 unlocks', () => {
-  it('adds locked + key as a paired gate', () => {
-    const c = getWaveConfig(11);
-    expect(c.lockedEnabled).toBe(true);
-    expect(c.keyEnabled).toBe(true);
-  });
-
-  it('locked and key always flip together (paired gate; mismatched = soft-lock)', () => {
-    for (let w = 1; w <= 15; w++) {
-      const c = getWaveConfig(w);
-      expect(c.lockedEnabled).toBe(c.keyEnabled);
-    }
   });
 });
 
@@ -86,7 +64,6 @@ describe('blast tile revival staircase — wave 12+ inherits everything', () => 
         'diamondEnabled', 'anchorEnabled', 'gemEnabled', 'magmaEnabled',
         'vortexEnabled', 'catalystEnabled', 'portalEnabled', 'shuffleEnabled',
         'countdownEnabled', 'fuseEnabled', 'crystalEnabled',
-        'lockedEnabled', 'keyEnabled',
       ] as const) {
         expect(c[flag]).toBe(true);
       }
@@ -103,8 +80,6 @@ describe('blast tile revival — 2× rare-tile shares', () => {
     expect(PORTAL_SHARE).toBe(0.08);
     expect(CATALYST_SHARE).toBe(0.08);
     expect(FUSE_SHARE).toBe(0.08);
-    expect(LOCKED_SHARE).toBe(0.08);
-    expect(KEY_SHARE).toBe(0.08);
     expect(SHUFFLE_SHARE).toBe(0.08);
     expect(ANCHOR_SHARE).toBe(0.08);
   });

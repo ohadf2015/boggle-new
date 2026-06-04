@@ -30,8 +30,6 @@ const TILE_I18N_KEYS: Partial<Record<BlastTileType, { name: string; desc: string
   catalyst:  { name: 'blast.tile.catalyst.name',  desc: 'blast.tile.catalyst.desc',  icon: '⚗️' },
   crystal:   { name: 'blast.tile.crystal.name',   desc: 'blast.tile.crystal.desc',   icon: '🔮' },
   fuse:      { name: 'blast.tile.fuse.name',      desc: 'blast.tile.fuse.desc',      icon: '🧨' },
-  locked:    { name: 'blast.tile.locked.name',    desc: 'blast.tile.locked.desc',    icon: '🔒' },
-  key:       { name: 'blast.tile.key.name',       desc: 'blast.tile.key.desc',       icon: '🗝️' },
   anchor:    { name: 'blast.tile.anchor.name',    desc: 'blast.tile.anchor.desc',    icon: '⚓' },
 };
 
@@ -54,8 +52,6 @@ const ENGLISH_FALLBACK: Partial<Record<BlastTileType, TileTooltip>> = {
   catalyst:  { name: 'Catalyst',  desc: 'Clears and upgrades adjacent tiles to random specials.',    icon: '⚗️' },
   crystal:   { name: 'Crystal',   desc: 'Grows +1\u00d7 each unused turn (max 5\u00d7). Multiplies your word score when used.', icon: '🔮' },
   fuse:      { name: 'Fuse',      desc: 'Linked pair. Clear one to light its partner — defuse in 3 turns or it detonates!', icon: '🧨' },
-  locked:    { name: 'Locked',    desc: 'Gated tile — cannot be used in words. Clear its paired Key to unlock it.', icon: '🔒' },
-  key:       { name: 'Key',       desc: 'Unlocks adjacent Locked tiles (8-dir) when cleared in a word. +20 pts per unlock.', icon: '🗝️' },
   anchor:    { name: 'Anchor',    desc: 'Rewards long words. +3 points per letter in the word when cleared.',         icon: '⚓' },
 };
 

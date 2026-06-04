@@ -9492,8 +9492,6 @@ const es = {
       "catalyst":  { "name": "Catalizador","desc": "+10 pts. Mejora fichas normales adyacentes a especiales." },
       "crystal":   { "name": "Cristal",    "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo." },
       "fuse":      { "name": "Mecha",      "desc": "Par vinculado. Elimina una para encender su pareja — desactívala en 3 turnos para +15 pts y 2 movimientos, o detona un estallido 3×3 con -50 pts." },
-      "locked":    { "name": "Bloqueada",  "desc": "Ficha cerrada — no se puede usar en palabras. Elimina su Llave emparejada para desbloquearla." },
-      "key":       { "name": "Llave",      "desc": "Desbloquea fichas Bloqueadas adyacentes (8 direcciones) al usarse en una palabra. +20 pts por cada una." },
       "anchor":    { "name": "Ancla",      "desc": "Recompensa palabras largas. Suma +3 puntos por cada letra de la palabra al eliminarse." }
     },
     "title": "Modo Blast",
@@ -9891,8 +9889,6 @@ const es = {
       "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" },
       "crystal": { "name": "Cristal", "desc": "Crece +1× por turno sin usar (máx 5×) — multiplica la puntuación" },
       "fuse": { "name": "Mecha", "desc": "Par vinculado — enciende al eliminar uno, desactívala en 3 turnos o explota" },
-      "locked": { "name": "Bloqueada", "desc": "Cerrada — elimina su Llave emparejada para desbloquear" },
-      "key": { "name": "Llave", "desc": "Desbloquea fichas Bloqueadas adyacentes al usarse (+20 pts cada una)" },
       "anchor": { "name": "Ancla", "desc": "Bonus de palabra larga — +3 pts por cada letra de la palabra al eliminarse" }
     },
     "highlight": {

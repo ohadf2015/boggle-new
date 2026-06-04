@@ -28,7 +28,6 @@ const SPECIAL_TILES = new Set([
   'magma',
   'crystal',
   'fuse',
-  'key',
   'anchor',
 ]);
 
@@ -37,7 +36,6 @@ const OBSTACLE_TILES = new Set([
   'ice',
   'frozen',
   'frost',
-  'locked',
 ]);
 
 /**

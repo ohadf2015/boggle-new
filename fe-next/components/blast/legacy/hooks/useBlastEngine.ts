@@ -259,7 +259,7 @@ export function useBlastEngine(
       return () => clearTimeout(initialTimer);
     }
 
-    // Build display grid (hide cleared + locked tiles)
+    // Build display grid (hide cleared tiles)
     const displayGrid = buildDeadEndGrid(effectiveGrid, tileStates);
 
     const timer = setTimeout(() => {

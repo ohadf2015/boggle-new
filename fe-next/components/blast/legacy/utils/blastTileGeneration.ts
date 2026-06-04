@@ -1,7 +1,6 @@
 import {
   SPECIAL_TILE_DISTRIBUTION,
   COUNTDOWN_INITIAL_MOVES,
-  LOCKED_KEY_MAX_DISTANCE,
   type BlastTileState,
   type BlastTileType,
 } from '../types';
@@ -156,53 +155,6 @@ export function generateTileStates(
     if (!fusePaired.has(i)) {
       fuseTiles[i].type = 'standard';
       fuseTiles[i].hitsRemaining = 0;
-    }
-  }
-
-  // Pair locked tiles with keys — greedy nearest-neighbour (Manhattan ≤ LOCKED_KEY_MAX_DISTANCE).
-  // Unlike fuse, proximity is REQUIRED (key must be reachable in a word for unlock to matter),
-  // so we pair closest-first, not farthest-first.
-  const lockedTiles: BlastTileState[] = [];
-  const keyTiles: BlastTileState[] = [];
-  for (const row of tiles) {
-    for (const tile of row) {
-      if (tile.type === 'locked') lockedTiles.push(tile);
-      else if (tile.type === 'key') keyTiles.push(tile);
-    }
-  }
-  const keyUsed = new Set<number>();
-  const lockedPaired = new Set<number>();
-  for (let i = 0; i < lockedTiles.length; i++) {
-    let bestJ = -1;
-    let bestDist = Infinity;
-    for (let j = 0; j < keyTiles.length; j++) {
-      if (keyUsed.has(j)) continue;
-      const d =
-        Math.abs(lockedTiles[i].row - keyTiles[j].row) +
-        Math.abs(lockedTiles[i].col - keyTiles[j].col);
-      if (d <= LOCKED_KEY_MAX_DISTANCE && d < bestDist) {
-        bestDist = d;
-        bestJ = j;
-      }
-    }
-    if (bestJ !== -1) {
-      keyUsed.add(bestJ);
-      lockedPaired.add(i);
-    }
-  }
-  // Orphan locked (no key within range) → downgrade to standard (otherwise permanently dead)
-  for (let i = 0; i < lockedTiles.length; i++) {
-    if (!lockedPaired.has(i)) {
-      lockedTiles[i].type = 'standard';
-      lockedTiles[i].hitsRemaining = 0;
-      delete lockedTiles[i].isUnlocked;
-    }
-  }
-  // Orphan keys (unused) → downgrade to standard (no locked to open)
-  for (let j = 0; j < keyTiles.length; j++) {
-    if (!keyUsed.has(j)) {
-      keyTiles[j].type = 'standard';
-      keyTiles[j].hitsRemaining = 0;
     }
   }
 

@@ -9313,14 +9313,6 @@ const en = {
         "name": "Fuse",
         "desc": "Linked pair. Clear one to light its partner — defuse within 3 turns for +15 pts and 2 moves, or it detonates a 3×3 blast for -50 pts."
       },
-      "locked": {
-        "name": "Locked",
-        "desc": "Gated tile — can't be used in words. Clear its paired Key to unlock it."
-      },
-      "key": {
-        "name": "Key",
-        "desc": "Unlocks adjacent Locked tiles (8-dir) when cleared in a word. +20 pts per unlock."
-      },
       "anchor": {
         "name": "Anchor",
         "desc": "Rewards long words. Adds +3 points per letter in the word when cleared."
@@ -9727,14 +9719,6 @@ const en = {
       "fuse": {
         "name": "Fuse",
         "desc": "Linked pair — clear one to light its partner, defuse in 3 turns or it blows!"
-      },
-      "locked": {
-        "name": "Locked",
-        "desc": "Gated — clear its paired Key to unlock"
-      },
-      "key": {
-        "name": "Key",
-        "desc": "Unlocks adjacent Locked tiles when cleared (+20 pts each)"
       },
       "anchor": {
         "name": "Anchor",

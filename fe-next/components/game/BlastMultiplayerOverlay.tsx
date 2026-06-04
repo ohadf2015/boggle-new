@@ -30,8 +30,6 @@ const TILE_ICONS: Partial<Record<BlastTileType, string>> = {
   magma: '\uD83C\uDF0B',   // volcano
   crystal: '\uD83D\uDD37', // blue diamond (crystal growth)
   fuse: '\uD83E\uDDE8',    // firecracker (fuse detonation)
-  locked: '\uD83D\uDD12',  // lock
-  key: '\uD83D\uDD11',     // key
   anchor: '\u2693',         // anchor
 };
 

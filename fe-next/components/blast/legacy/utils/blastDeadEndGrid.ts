@@ -24,7 +24,6 @@ export function buildDeadEndGrid(
       const t = tiles[ri]?.[ci];
       if (!t || t.isCleared) return '';
       if (ICE_TYPES.has(t.type) && !t.isThawed) return '';
-      if (t.type === 'locked' && !t.isUnlocked) return '';
       return cell;
     }),
   );

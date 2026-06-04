@@ -12,7 +12,6 @@ const tile = (overrides: Partial<BlastTileState> = {}): BlastTileState => ({
   type: 'standard',
   isCleared: false,
   isThawed: false,
-  isUnlocked: false,
   ...overrides,
 } as BlastTileState);
 
@@ -47,63 +46,6 @@ describe('buildDeadEndGrid', () => {
       const tiles = [[tile({ type: 'ice', isThawed: true }), tile()]];
       const result = buildDeadEndGrid(grid, tiles);
       expect(result[0][0]).toBe('A');
-    });
-  });
-
-  describe('locked tiles — BUG regression', () => {
-    it('masks unselectable locked tiles as empty string', () => {
-      const grid = [['C', 'A', 'T']];
-      const tiles = [
-        [
-          tile({ type: 'locked', isUnlocked: false }),
-          tile(),
-          tile(),
-        ],
-      ];
-      const result = buildDeadEndGrid(grid, tiles);
-      // 'C' under a locked tile must be hidden from DFS
-      expect(result[0][0]).toBe('');
-      expect(result[0][1]).toBe('A');
-      expect(result[0][2]).toBe('T');
-    });
-
-    it('exposes unlocked locked tiles (key was collected)', () => {
-      const grid = [['C', 'A', 'T']];
-      const tiles = [
-        [
-          tile({ type: 'locked', isUnlocked: true }),
-          tile(),
-          tile(),
-        ],
-      ];
-      const result = buildDeadEndGrid(grid, tiles);
-      expect(result[0][0]).toBe('C');
-    });
-
-    it('dead-end: grid where only words traverse locked tiles returns all empty', () => {
-      // 2×2 grid where the only paths for a word go through a locked tile
-      // 'C'=locked, 'A'=normal, 'T'=normal, 'S'=locked
-      // Only possible 2-letter combos: A-T, T-A (not in dict)
-      // "CAT" requires C which is locked → must not count
-      const grid = [
-        ['C', 'A'],
-        ['T', 'S'],
-      ];
-      const tiles = [
-        [
-          tile({ type: 'locked', isUnlocked: false }),
-          tile(),
-        ],
-        [
-          tile(),
-          tile({ type: 'locked', isUnlocked: false }),
-        ],
-      ];
-      const result = buildDeadEndGrid(grid, tiles);
-      expect(result[0][0]).toBe('');
-      expect(result[0][1]).toBe('A');
-      expect(result[1][0]).toBe('T');
-      expect(result[1][1]).toBe('');
     });
   });
 

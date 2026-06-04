@@ -126,7 +126,7 @@ export function computeGravityResult(
 
   for (let col = 0; col < gridSize; col++) {
     // Collect surviving tiles from bottom to top
-    type Survivor = { uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number } & Pick<BlastTileState, 'innerType' | 'isThawed' | 'countdown' | 'portalPairId' | 'crystalMultiplier' | 'fuseGroupId' | 'fuseTimer' | 'isUnlocked' | 'colorTag'>;
+    type Survivor = { uid: string; letter: string; type: BlastTileType; originalRow: number; hitsRemaining: number } & Pick<BlastTileState, 'innerType' | 'isThawed' | 'countdown' | 'portalPairId' | 'crystalMultiplier' | 'fuseGroupId' | 'fuseTimer' | 'colorTag'>;
     const survivors: Survivor[] = [];
     for (let row = gridSize - 1; row >= 0; row--) {
       const t = tileStates[row][col];
@@ -144,7 +144,6 @@ export function computeGravityResult(
           ...(t.crystalMultiplier != null ? { crystalMultiplier: t.crystalMultiplier } : {}),
           ...(t.fuseGroupId != null ? { fuseGroupId: t.fuseGroupId } : {}),
           ...(t.fuseTimer != null ? { fuseTimer: t.fuseTimer } : {}),
-          ...(t.isUnlocked ? { isUnlocked: true } : {}),
           ...(t.colorTag != null ? { colorTag: t.colorTag } : {}),
         });
       }
@@ -169,7 +168,6 @@ export function computeGravityResult(
         ...(survivor.crystalMultiplier != null ? { crystalMultiplier: survivor.crystalMultiplier } : {}),
         ...(survivor.fuseGroupId != null ? { fuseGroupId: survivor.fuseGroupId } : {}),
         ...(survivor.fuseTimer != null ? { fuseTimer: survivor.fuseTimer } : {}),
-        ...(survivor.isUnlocked ? { isUnlocked: true } : {}),
         ...(survivor.colorTag != null ? { colorTag: survivor.colorTag } : {}),
       };
 

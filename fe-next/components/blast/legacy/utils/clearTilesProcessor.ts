@@ -27,7 +27,6 @@ import {
   FUSE_INITIAL_TIMER,
   FUSE_DEFUSE_BONUS,
   FUSE_DEFUSE_MOVES,
-  KEY_UNLOCK_BONUS,
   ANCHOR_LENGTH_BONUS,
   type BlastTileState,
   type BlastTileType,
@@ -388,26 +387,6 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         break;
       }
 
-      case 'key': {
-        newExplosions.push({ id: `key-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
-        // Unlock 8-directionally adjacent locked tiles
-        for (let dr = -1; dr <= 1; dr++) {
-          for (let dc = -1; dc <= 1; dc++) {
-            if (dr === 0 && dc === 0) continue;
-            const r = cell.row + dr;
-            const c = cell.col + dc;
-            if (r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
-            const t = next[r]?.[c];
-            if (!t || t.isCleared) continue;
-            if (t.type === 'locked' && !t.isUnlocked) {
-              t.isUnlocked = true;
-              bonusScore += KEY_UNLOCK_BONUS;
-              newExplosions.push({ id: `key-unlock-${now}-${r}-${c}`, row: r, col: c, type: 'word', intensity: 1, timestamp: now });
-            }
-          }
-        }
-        break;
-      }
     }
   }
 

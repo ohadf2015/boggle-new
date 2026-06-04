@@ -234,13 +234,6 @@ export const FUSE_DEFUSE_BONUS = 15;
 /** Bonus moves awarded for defusing a lit fuse in a word */
 export const FUSE_DEFUSE_MOVES = 2;
 
-// ==================== Locked + Key Constants ====================
-
-/** Score bonus awarded per locked tile unlocked when a key is cleared */
-export const KEY_UNLOCK_BONUS = 20;
-/** Maximum Manhattan distance between a locked tile and its nearest key at generation */
-export const LOCKED_KEY_MAX_DISTANCE = 3;
-
 // ==================== Anchor Constants ====================
 
 /** Bonus score per letter in the word when an anchor tile is cleared in that word.
@@ -348,8 +341,6 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   magma: 0,
   crystal: 0,
   fuse: 0,
-  locked: 0,
-  key: 0,
   anchor: 0,
   chocolate: 0,
   cake: 0,

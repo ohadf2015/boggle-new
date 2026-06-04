@@ -29,8 +29,6 @@ describe('blastWaveConfig — Sprint 1 retired tiles never spawn', () => {
     'catalystEnabled',
     'crystalEnabled',
     'fuseEnabled',
-    'lockedEnabled',
-    'keyEnabled',
     'anchorEnabled',
   ] as const;
 

@@ -36,11 +36,6 @@ export function computeCellFilter(
       return false;
     }
 
-    // Locked: blocked until a cleared key unlocks it (8-dir adjacency)
-    if (tile.type === 'locked' && !tile.isUnlocked) {
-      return false;
-    }
-
     // Gem: requires 2+ tiles already in path (strategic gating)
     // Use currentPathLength from drag ref when available (avoids stale React state)
     const pathLen = currentPathLength ?? currentPath.length;

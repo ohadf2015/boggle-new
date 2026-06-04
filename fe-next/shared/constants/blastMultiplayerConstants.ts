@@ -40,8 +40,6 @@ export const BLAST_TILE_BONUSES: Record<BlastTileType, number> = {
   catalyst: 1.5,   // reward for triggering upgrade effect
   crystal: 1,      // no flat bonus — reward comes from crystalWordMultiplier
   fuse: 1.5,       // reward for defusing linked-pair fuse before detonation
-  locked: 1,       // gated tile — no bonus, reward is through key unlock
-  key: 1.5,        // reward for clearing key (unlocks adjacent locked tiles)
   anchor: 1.5,     // base bonus — length-based bonus applied separately in clearTilesProcessor
   chocolate: 0,    // cc-mechanic: no per-tile bonus; spread is the threat, not the score
   cake: 0,         // cc-mechanic: HP damage is event-driven; destruction bonus paid by engine on kill_cake completion

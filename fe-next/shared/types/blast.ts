@@ -26,8 +26,6 @@ export type BlastTileType =
   | 'magma'
   | 'crystal'
   | 'fuse'
-  | 'locked'
-  | 'key'
   | 'anchor'
   | 'chocolate'
   | 'cake';
@@ -52,8 +50,6 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'magma',
   'crystal',
   'fuse',
-  'locked',
-  'key',
   'anchor',
   'chocolate',
   'cake',
@@ -122,8 +118,6 @@ export interface BlastTileState {
   fuseGroupId?: string;
   /** Fuse tiles: turns remaining before detonation. Undefined = unlit; number = lit countdown. */
   fuseTimer?: number;
-  /** Locked tiles: unlocked by a cleared key tile in 8-directional adjacency. Undefined/false = gated. */
-  isUnlocked?: boolean;
   /** Color tag for color_power objectives (pink/cyan/lime). Applies pulsing glow on board. */
   colorTag?: 'pink' | 'cyan' | 'lime';
   /** Jelly clears: layers remaining beneath this cell. 0 or undefined = no jelly. */

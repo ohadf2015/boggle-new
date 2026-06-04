@@ -397,21 +397,7 @@ export const BlastTile = memo(function BlastTile({
           aria-hidden="true"
         />
       )}
-      {isLocked && type === 'locked' && (
-        /* Corner badge: letter stays fully visible; only a small lock icon hints
-           the tile is unselectable until a nearby key is collected. */
-        <span
-          data-testid="locked-overlay"
-          className="absolute inset-0 rounded-neo pointer-events-none z-20 bg-blue-900/15 border border-blue-400/25"
-          aria-hidden="true"
-        >
-          <Lock
-            className="absolute top-0.5 inset-e-0.5 w-[clamp(7px,1.8cqw,11px)] h-[clamp(7px,1.8cqw,11px)] text-cyan-200/80"
-            strokeWidth={2.5}
-          />
-        </span>
-      )}
-      {isLocked && type !== 'locked' && (
+      {isLocked && (
         /* Full overlay for ice/frozen — legitimately hides inner tile until thawed,
            or reveals it with a diamond glow when the lock is close to breaking. */
         <span

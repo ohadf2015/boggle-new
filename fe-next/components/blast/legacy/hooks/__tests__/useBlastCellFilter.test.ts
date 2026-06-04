@@ -104,37 +104,10 @@ describe('computeCellFilter', () => {
     });
   });
 
-  describe('locked tiles', () => {
-    it('blocks locked tiles from selection by default', () => {
-      const grid = makeGrid(4, {
-        '1-1': { type: 'locked' },
-      });
-      const filter = computeCellFilter(grid, []);
-      expect(filter(1, 1)).toBe(false);
-    });
-
-    it('allows locked tiles once isUnlocked is true', () => {
-      const grid = makeGrid(4, {
-        '1-1': { type: 'locked', isUnlocked: true },
-      });
-      const filter = computeCellFilter(grid, []);
-      expect(filter(1, 1)).toBe(true);
-    });
-
-    it('always allows key tiles (they unlock partners when cleared)', () => {
-      const grid = makeGrid(4, {
-        '2-2': { type: 'key' },
-      });
-      const filter = computeCellFilter(grid, []);
-      expect(filter(2, 2)).toBe(true);
-    });
-  });
-
   describe('other special tiles', () => {
     const alwaysSelectableTypes: BlastTileType[] = [
       'standard', 'gold', 'diamond', 'bomb',
       'lightning', 'prism', 'rainbow', 'magnet',
-      'key',
     ];
 
     it.each(alwaysSelectableTypes)('%s tiles are always selectable', (type) => {
