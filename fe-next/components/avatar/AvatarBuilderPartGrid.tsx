@@ -10,6 +10,7 @@ import {
   isEpicPart,
   isLegendaryPart,
   getPartPrice,
+  isNewPart,
 } from '@/shared/types/customAvatar';
 import type { AvatarPremium } from './AvatarBuilderModal';
 import toast from 'react-hot-toast';
@@ -109,14 +110,16 @@ export default function PartPreviewGrid<T extends string>({
     ? options
     : options.filter(o => o === 'none' || !isPremiumPart(cat, o));
 
-  // Sort: premium/epic/legendary first, then free parts
+  // Sort: 'none' first, then NEW drops (discovery), then other premium, then free.
   const sortedOptions = [...visibleOptions].sort((a, b) => {
-    const aPrem = isPremiumPart(cat, a);
-    const bPrem = isPremiumPart(cat, b);
     if (a === 'none') return -1;
     if (b === 'none') return 1;
-    if (aPrem && !bPrem) return -1;
-    if (!aPrem && bPrem) return 1;
+    const aNew = isNewPart(cat, a);
+    const bNew = isNewPart(cat, b);
+    if (aNew !== bNew) return aNew ? -1 : 1;
+    const aPrem = isPremiumPart(cat, a);
+    const bPrem = isPremiumPart(cat, b);
+    if (aPrem !== bPrem) return aPrem ? -1 : 1;
     return 0;
   });
 
@@ -135,6 +138,7 @@ export default function PartPreviewGrid<T extends string>({
           const isLegendary = isLegendaryPart(cat, option);
           const isLocked = isPremium && premium && !premium.isPartUnlocked(cat, option);
           const price = isPremium ? getPartPrice(cat, option) : 0;
+          const isNew = isNewPart(cat, option);
 
           return (
             <AdaptiveMotion.button
@@ -156,6 +160,13 @@ export default function PartPreviewGrid<T extends string>({
                         : 'bg-neo-navy-light border-neo-white/15 hover:border-neo-white/40 hover:bg-neo-navy-light/80'
               }`}
             >
+              {/* NEW ribbon — top-start corner (opposite the tier badge) */}
+              {isNew && selected !== option && (
+                <div className="absolute top-0.5 inset-s-0.5 z-10">
+                  <span className="text-[7px] font-black text-neo-navy bg-neo-lime px-1 rounded-sm shadow-xs tracking-wide">NEW</span>
+                </div>
+              )}
+
               {/* Tier badge — top corner */}
               {isLocked && (isLegendary || isEpic) && (
                 <div className="absolute top-0.5 inset-e-0.5 z-10">

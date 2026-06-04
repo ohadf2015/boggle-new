@@ -212,7 +212,109 @@ function SpaceBuns({ fill }: HairPartProps) {
 }
 
 
+/** Electric lightning-bolt spikes (Epic, top-layer). */
+function Lightning({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  const c = fill && fill !== '#000000' ? fill : '#FFE135';
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}ltg`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFF59D" />
+          <stop offset="60%" stopColor={c} />
+          <stop offset="100%" stopColor="#FF8F00" />
+        </linearGradient>
+      </defs>
+      <path d="M22 34 L30 10 L34 22 L42 4 L46 20 L50 6 L54 20 L58 4 L66 22 L70 10 L78 34 Q50 26 22 34Z" fill={`url(#${u}ltg)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M34 20 L31 26 L36 25" fill="none" stroke="#00E5FF" strokeWidth={1} opacity="0.85" />
+      <path d="M64 20 L67 26 L62 25" fill="none" stroke="#00E5FF" strokeWidth={1} opacity="0.85" />
+      <CrownHighlight opacity={0.2} />
+    </g>
+  );
+}
+
+/** Rainbow mohawk fin (Epic, top-layer). */
+function RainbowMohawk({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}rbmoh`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#FF1744" />
+          <stop offset="25%" stopColor="#FF9100" />
+          <stop offset="50%" stopColor="#FFEA00" />
+          <stop offset="75%" stopColor="#00E676" />
+          <stop offset="100%" stopColor="#2979FF" />
+        </linearGradient>
+      </defs>
+      <path d="M24 30 Q26 22 32 20 M76 30 Q74 22 68 20" fill="none" stroke="#000" strokeWidth={1} opacity="0.15" />
+      <path d="M40 30 L40 8 L46 18 L46 4 L52 16 L52 2 L58 16 L58 6 L62 18 L60 30 Q50 26 40 30Z" fill={`url(#${u}rbmoh)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M50 8 V28" stroke="#000" strokeWidth={0.8} opacity="0.2" />
+    </g>
+  );
+}
+
+/** Frozen icy spikes with frost sparkles (Epic, top-layer). */
+function IceSpikes({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}icehair`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#E8FCFF" />
+          <stop offset="100%" stopColor="#6FB7D9" />
+        </linearGradient>
+      </defs>
+      <path d="M22 34 L28 12 L34 26 L40 8 L46 24 L50 10 L54 24 L60 8 L66 26 L72 12 L78 34 Q50 26 22 34Z" fill={`url(#${u}icehair)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M40 18 l1 2 2 1 -2 1 -1 2 -1 -2 -2 -1 2 -1Z" fill="#fff" />
+      <circle cx="60" cy="18" r="1.2" fill="#fff" />
+      <CrownHighlight opacity={0.25} />
+    </g>
+  );
+}
+
+/** Fluffy pastel cotton-candy hair (VIP, back-layer). */
+function CottonCandy({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  const c = fill && fill !== '#000000' ? fill : '#FFC1E3';
+  const d = 'M16 40 Q8 22 24 18 Q24 6 42 10 Q50 2 58 10 Q76 6 76 18 Q92 22 84 40 Q88 52 74 52 L26 52 Q12 52 16 40Z';
+  return (
+    <g>
+      <defs><HairPolishDefs uid={u} keyName="cottonCandy" /></defs>
+      <path d={d} fill={c} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d={d} fill={`url(#${u}hair-cottonCandy-shade)`} stroke="none" />
+      <path d={d} fill={`url(#${u}hair-cottonCandy-light)`} stroke="none" />
+      <path d="M26 44 Q50 24 74 44 Q76 36 76 30 Q50 28 24 30 Q24 36 26 44Z" fill={c} stroke="none" />
+      <path d="M30 20 Q40 14 50 18" stroke="#fff" strokeWidth={1.5} opacity="0.4" fill="none" />
+      <circle cx="68" cy="22" r="2" fill="#fff" opacity="0.3" />
+      <CrownHighlight opacity={0.18} />
+    </g>
+  );
+}
+
+/** Flowing vaporwave gradient hair (VIP, back-layer). */
+function Vaporwave({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}vapor`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#FF6AD5" />
+          <stop offset="50%" stopColor="#C774E8" />
+          <stop offset="100%" stopColor="#8795E8" />
+        </linearGradient>
+      </defs>
+      <path d="M18 36 Q14 14 50 10 Q86 14 82 36 L84 72 Q80 64 74 70 L70 50 Q60 30 50 30 Q40 30 30 50 L26 70 Q20 64 16 72Z" fill={`url(#${u}vapor)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M28 44 Q50 26 72 44 Q74 36 72 30 Q50 26 28 30 Q26 36 28 44Z" fill="#C774E8" stroke="none" />
+      <path d="M30 22 Q50 16 70 22" stroke="#fff" strokeWidth={1.2} opacity="0.35" fill="none" />
+      <CrownHighlight opacity={0.18} />
+    </g>
+  );
+}
+
 export const HAIR_PARTS_FANTASY = {
   flame: FlameHair, galaxy: GalaxyHair, neon: NeonHair,
   pixie: Pixie, undercut: Undercut, spaceBuns: SpaceBuns,
+  lightning: Lightning, rainbowMohawk: RainbowMohawk, iceSpikes: IceSpikes,
+  cottonCandy: CottonCandy, vaporwave: Vaporwave,
 } as const;

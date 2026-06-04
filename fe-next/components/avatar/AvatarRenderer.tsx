@@ -56,16 +56,16 @@ interface AvatarRendererProps {
  *   facial hair -> hair(front) -> accessory
  */
 /** Styles that render their main body behind the head */
-const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ponytail']);
+const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ponytail', 'cottonCandy', 'vaporwave']);
 
 /** Accessories that render behind the face (ears, wings, etc.) */
-const BACK_ACCESSORY_STYLES = new Set(['monkeyEars']);
+const BACK_ACCESSORY_STYLES = new Set(['monkeyEars', 'angelWings', 'demonWings', 'butterflyWings']);
 
 /** Non-human bases that skip cheek blush & face depth effects */
-const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'catFace']);
+const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'catFace', 'robotHead', 'alienHead', 'ghostFace']);
 
 /** Bases with their own nose anatomy — skip NosePart overlay */
-const SKIP_NOSE_BASES = new Set(['skull', 'dragonHead']);
+const SKIP_NOSE_BASES = new Set(['skull', 'dragonHead', 'robotHead', 'alienHead']);
 
 /** Bases that use the standard circle shape (get circular depth effects) */
 const CIRCULAR_BASES = new Set(['round', 'blob']);
@@ -88,11 +88,13 @@ const SKIP_BLINK_EYES = new Set([
   'galaxy', 'flame', 'robot', 'void', 'infinity', 'laser',
   'hypno', 'alien', 'crying', 'money', 'hearts', 'star',
   'closed', 'squint',
+  'pixelEyes', 'glitchEyes', 'kawaii', 'thirdEye', 'rainbowEyes', 'targetEyes',
 ]);
 
 /** Eye styles where hardcoded lash positions don't align — skip generic female lashes */
 const SKIP_FEMALE_LASHES_EYES = new Set([
   'none', 'lashes', 'monocleEye', 'crossEyed', 'wingedLiner', 'smokyEye',
+  'pixelEyes', 'glitchEyes', 'thirdEye',
 ]);
 
 const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood }) => {

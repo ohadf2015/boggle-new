@@ -6,7 +6,7 @@
 import { Round, Sleepy, Wink, Happy, Closed, None, Sad, Crying } from './EyePartsBasic';
 import { Angry, Curious, Determined, Doe, Wide, Squint, Confident, Relaxed, Focused } from './EyePartsExpressive';
 import { Cool, Lashes, MonocleEye, CrossEyed, CatPupils, WingedLiner, SmokyEye } from './EyePartsStyled';
-import { Star, Sparkle, Hearts, Dizzy, Cyclops, Laser, Hypno, Money, Alien, Galaxy, FlameEyes, Robot, Void, Infinity } from './EyePartsFantasy';
+import { Star, Sparkle, Hearts, Dizzy, Cyclops, Laser, Hypno, Money, Alien, Galaxy, FlameEyes, Robot, Void, Infinity, PixelEyes, TargetEyes, Kawaii, GlitchEyes, RainbowEyes, ThirdEye } from './EyePartsFantasy';
 
 export const EYE_PARTS = {
   none: None,
@@ -47,6 +47,12 @@ export const EYE_PARTS = {
   confident: Confident,
   relaxed: Relaxed,
   focused: Focused,
+  pixelEyes: PixelEyes,
+  targetEyes: TargetEyes,
+  kawaii: Kawaii,
+  glitchEyes: GlitchEyes,
+  rainbowEyes: RainbowEyes,
+  thirdEye: ThirdEye,
 } as const;
 
 export type EyePart = keyof typeof EYE_PARTS;

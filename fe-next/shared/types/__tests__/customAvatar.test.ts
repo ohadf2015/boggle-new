@@ -14,6 +14,17 @@ import {
   EPIC_PART_PRICES,
   FEMALE_HAIR_STYLES,
   MALE_HAIR_STYLES,
+  PREMIUM_EYE_STYLES,
+  EPIC_EYE_STYLES,
+  PREMIUM_MOUTH_STYLES,
+  EPIC_MOUTH_STYLES,
+  PREMIUM_ACCESSORIES,
+  EPIC_ACCESSORIES,
+  PREMIUM_HAIR_STYLES,
+  EPIC_HAIR_STYLES,
+  PREMIUM_BASES,
+  EPIC_BASES,
+  PREMIUM_BG_COLORS,
 } from '../customAvatar';
 
 describe('customAvatarSchema', () => {
@@ -253,41 +264,26 @@ describe('Premium Parts', () => {
   });
 
   describe('getPremiumParts', () => {
+    // These assert the BEHAVIOR (VIP list then Epic list, in order) against the
+    // source constants — so adding new premium parts updates them automatically
+    // instead of re-breaking a hardcoded snapshot on every catalog change.
     test('returns all premium eye styles (VIP + Epic)', () => {
-      expect(getPremiumParts('eyes')).toEqual([
-        'laser', 'hypno', 'money', 'alien', 'cyclops', 'monocleEye',
-        'confident',
-        'galaxy', 'flame', 'robot', 'void', 'infinity',
-      ]);
+      expect(getPremiumParts('eyes')).toEqual([...PREMIUM_EYE_STYLES, ...EPIC_EYE_STYLES]);
     });
     test('returns all premium mouth styles (VIP + Epic)', () => {
-      expect(getPremiumParts('mouth')).toEqual([
-        'goldTooth', 'pipe', 'vampire', 'zipper', 'blowfish',
-        'dragon', 'diamond', 'glitch',
-      ]);
+      expect(getPremiumParts('mouth')).toEqual([...PREMIUM_MOUTH_STYLES, ...EPIC_MOUTH_STYLES]);
     });
     test('returns all premium accessories (VIP + Epic)', () => {
-      expect(getPremiumParts('accessory')).toEqual([
-        'crown', 'tiara', 'viking', 'devilHorns', 'headphones',
-        'monocle', 'eyepatch', 'mask', 'sombrero',
-        'flowerCrown',
-        'samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown', 'cyberpunkVisor',
-      ]);
+      expect(getPremiumParts('accessory')).toEqual([...PREMIUM_ACCESSORIES, ...EPIC_ACCESSORIES]);
     });
     test('returns all premium hair styles (VIP + Epic)', () => {
-      expect(getPremiumParts('hair')).toEqual([
-        'elvis', 'ramen', 'twintails', 'undercut', 'spaceBuns', 'fadeCurly',
-        'flame', 'galaxy', 'neon',
-      ]);
+      expect(getPremiumParts('hair')).toEqual([...PREMIUM_HAIR_STYLES, ...EPIC_HAIR_STYLES]);
     });
     test('returns premium bg colors', () => {
-      expect(getPremiumParts('bgColor')).toEqual(['#FF0000', '#000000', '#4B0082', '#FFD700']);
+      expect(getPremiumParts('bgColor')).toEqual([...PREMIUM_BG_COLORS]);
     });
     test('returns all premium bases (VIP + Epic)', () => {
-      expect(getPremiumParts('base')).toEqual([
-        'diamond',
-        'skull', 'shield', 'dragonHead',
-      ]);
+      expect(getPremiumParts('base')).toEqual([...PREMIUM_BASES, ...EPIC_BASES]);
     });
     test('returns empty for unknown category', () => {
       expect(getPremiumParts('unknown' as any)).toEqual([]);

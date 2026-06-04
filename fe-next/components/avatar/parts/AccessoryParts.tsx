@@ -884,6 +884,303 @@ function ButterflyClip({ fill }: AccessoryPartProps) {
   );
 }
 
+// ==================== New epic/cool accessories ====================
+
+/** Back-layer: white feathered angel wings spreading behind the head. */
+function AngelWings({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  const c = fill && fill !== '#000000' ? fill : '#FFFFFF';
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}angelW`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff" />
+          <stop offset="100%" stopColor={c} stopOpacity="0.85" />
+        </linearGradient>
+      </defs>
+      <path d="M22 40 Q2 30 4 52 Q6 70 24 64 Q14 58 14 50 Q14 44 22 40Z" fill={`url(#${u}angelW)`} stroke="#000" strokeWidth={S} />
+      <path d="M20 44 Q8 41 8 52 M20 50 Q10 49 9 58" stroke="#000" strokeWidth={0.8} opacity="0.25" fill="none" />
+      <path d="M78 40 Q98 30 96 52 Q94 70 76 64 Q86 58 86 50 Q86 44 78 40Z" fill={`url(#${u}angelW)`} stroke="#000" strokeWidth={S} />
+      <path d="M80 44 Q92 41 92 52 M80 50 Q90 49 91 58" stroke="#000" strokeWidth={0.8} opacity="0.25" fill="none" />
+    </g>
+  );
+}
+
+/** Back-layer: dark bat-style demon wings. */
+function DemonWings({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  const c = fill && fill !== '#000000' ? fill : '#7A1020';
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}demonW`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={c} />
+          <stop offset="100%" stopColor="#3A0810" />
+        </linearGradient>
+      </defs>
+      <path d="M24 38 Q4 32 2 50 L10 48 L6 58 L16 54 L12 64 L24 58Z" fill={`url(#${u}demonW)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M22 42 L9 49 M22 50 L12 57" stroke="#000" strokeWidth={0.8} opacity="0.4" />
+      <path d="M76 38 Q96 32 98 50 L90 48 L94 58 L84 54 L88 64 L76 58Z" fill={`url(#${u}demonW)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M78 42 L91 49 M78 50 L88 57" stroke="#000" strokeWidth={0.8} opacity="0.4" />
+    </g>
+  );
+}
+
+/** Back-layer: colorful butterfly wings (upper + lower lobes). */
+function ButterflyWings({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  const c = fill && fill !== '#000000' ? fill : '#FF1493';
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}flutter`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={c} />
+          <stop offset="100%" stopColor="#8B5CF6" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="14" cy="40" rx="12" ry="10" fill={`url(#${u}flutter)`} stroke="#000" strokeWidth={S} />
+      <ellipse cx="16" cy="61" rx="9" ry="9" fill={`url(#${u}flutter)`} stroke="#000" strokeWidth={S} />
+      <circle cx="12" cy="40" r="2.5" fill="#fff" opacity="0.6" />
+      <circle cx="15" cy="61" r="2" fill="#fff" opacity="0.6" />
+      <ellipse cx="86" cy="40" rx="12" ry="10" fill={`url(#${u}flutter)`} stroke="#000" strokeWidth={S} />
+      <ellipse cx="84" cy="61" rx="9" ry="9" fill={`url(#${u}flutter)`} stroke="#000" strokeWidth={S} />
+      <circle cx="88" cy="40" r="2.5" fill="#fff" opacity="0.6" />
+      <circle cx="85" cy="61" r="2" fill="#fff" opacity="0.6" />
+    </g>
+  );
+}
+
+/** RGB gaming headset — band over head, ear cups, mic boom. */
+function GamerHeadset({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  const c = fill && fill !== '#000000' ? fill : '#1A1A2E';
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}rgb`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#FF1493" />
+          <stop offset="50%" stopColor="#00FFFF" />
+          <stop offset="100%" stopColor="#BFFF00" />
+        </linearGradient>
+      </defs>
+      <path d="M18 38 Q18 8 50 8 Q82 8 82 38" fill="none" stroke={c} strokeWidth={7} strokeLinecap="round" />
+      <path d="M30 11 Q50 6 70 11" fill="none" stroke={`url(#${u}rgb)`} strokeWidth={2.4} strokeLinecap="round" />
+      <rect x="9" y="36" width="14" height="19" rx="5" fill={c} stroke="#000" strokeWidth={SO} />
+      <rect x="77" y="36" width="14" height="19" rx="5" fill={c} stroke="#000" strokeWidth={SO} />
+      <circle cx="16" cy="45.5" r="3" fill="#00FFFF" opacity="0.85" />
+      <circle cx="84" cy="45.5" r="3" fill="#00FFFF" opacity="0.85" />
+      <path d="M77 50 Q60 56 55 63" fill="none" stroke="#000" strokeWidth={2} />
+      <circle cx="54" cy="63.5" r="2.6" fill="#FF1493" stroke="#000" strokeWidth={1} />
+    </g>
+  );
+}
+
+/** Cowboy hat — wide brim + dented crown + gold band stud. */
+function CowboyHat({ fill }: AccessoryPartProps) {
+  const c = fill && fill !== '#000000' ? fill : '#8B5A2B';
+  return (
+    <g>
+      <path d="M8 30 Q50 21 92 30 Q50 41 8 30Z" fill={c} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <path d="M30 31 Q30 10 50 9 Q70 10 70 31 Q50 26 30 31Z" fill={c} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <path d="M44 12 Q50 16 56 12" fill="none" stroke="#000" strokeWidth={1.5} opacity="0.35" />
+      <path d="M31 28 Q50 25 69 28" fill="none" stroke="#5A3A1A" strokeWidth={3.5} />
+      <circle cx="50" cy="27" r="1.6" fill="#FFD700" stroke="#000" strokeWidth={0.6} />
+    </g>
+  );
+}
+
+/** Pirate bicorne with skull & crossbones. */
+function PirateHat({ fill }: AccessoryPartProps) {
+  const c = fill && fill !== '#000000' ? fill : '#1A1A2E';
+  return (
+    <g>
+      <path d="M14 31 Q22 8 50 14 Q78 8 86 31 Q50 24 14 31Z" fill={c} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <circle cx="50" cy="22" r="5" fill="#fff" stroke="#000" strokeWidth={1} />
+      <circle cx="48" cy="21" r="1" fill="#000" />
+      <circle cx="52" cy="21" r="1" fill="#000" />
+      <path d="M46.5 25.5 L53.5 25.5" stroke="#000" strokeWidth={1.6} />
+      <path d="M43 28 L57 18 M43 18 L57 28" stroke="#fff" strokeWidth={1.6} opacity="0.9" />
+    </g>
+  );
+}
+
+/** Classy top hat with red band. */
+function TopHat({ fill }: AccessoryPartProps) {
+  const c = fill && fill !== '#000000' ? fill : '#16213E';
+  return (
+    <g>
+      <ellipse cx="50" cy="29" rx="34" ry="6" fill={c} stroke="#000" strokeWidth={SO} />
+      <path d="M32 29 L34 4 Q50 1 66 4 L68 29Z" fill={c} stroke="#000" strokeWidth={SO} />
+      <ellipse cx="50" cy="4" rx="16" ry="4" fill={c} stroke="#000" strokeWidth={S} />
+      <rect x="33" y="21" width="34" height="5" fill="#C62828" />
+      <path d="M38 26 L40 7" stroke="#fff" strokeWidth={2} opacity="0.2" />
+    </g>
+  );
+}
+
+/** Graduation mortarboard with gold tassel. */
+function GraduationCap({ fill }: AccessoryPartProps) {
+  const c = fill && fill !== '#000000' ? fill : '#1A1A2E';
+  return (
+    <g>
+      <path d="M34 26 Q50 22 66 26 L66 33 Q50 37 34 33Z" fill={c} stroke="#000" strokeWidth={S} />
+      <path d="M18 22 L50 12 L82 22 L50 32Z" fill={c} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <circle cx="50" cy="22" r="2.5" fill="#FFD700" stroke="#000" strokeWidth={1} />
+      <path d="M50 22 Q66 24 68 30" fill="none" stroke="#FFD700" strokeWidth={1.5} />
+      <rect x="66" y="30" width="4.5" height="9" rx="2" fill="#FFD700" stroke="#000" strokeWidth={0.8} />
+    </g>
+  );
+}
+
+/** Tin-foil hat — crinkled cone with a little signal ball. */
+function TinfoilHat({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}foil`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ECECEC" />
+          <stop offset="50%" stopColor="#A9A9A9" />
+          <stop offset="100%" stopColor="#D4D4D4" />
+        </linearGradient>
+      </defs>
+      <path d="M28 32 L50 6 L72 32 Q50 26 28 32Z" fill={`url(#${u}foil)`} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <path d="M42 28 L48 12 M56 28 L52 12 M36 30 L44 18" stroke="#000" strokeWidth={0.7} opacity="0.3" />
+      <line x1="50" y1="6" x2="50" y2="1" stroke="#000" strokeWidth={1.5} />
+      <circle cx="50" cy="1" r="2" fill="#BFFF00" stroke="#000" strokeWidth={1} />
+      <path d="M46 26 L50 9" stroke="#fff" strokeWidth={2} opacity="0.4" />
+    </g>
+  );
+}
+
+/** Rubber duck perched on the head (funny). */
+function DuckHat({ fill }: AccessoryPartProps) {
+  const c = fill && fill !== '#000000' ? fill : '#FFD93B';
+  return (
+    <g>
+      <ellipse cx="48" cy="23" rx="16" ry="11" fill={c} stroke="#000" strokeWidth={SO} />
+      <circle cx="62" cy="14" r="8" fill={c} stroke="#000" strokeWidth={SO} />
+      <path d="M70 13 L79 12 L70 17Z" fill="#FF8C00" stroke="#000" strokeWidth={1.2} strokeLinejoin="round" />
+      <circle cx="63" cy="12" r="1.7" fill="#000" />
+      <circle cx="63.6" cy="11.4" r="0.5" fill="#fff" />
+      <path d="M33 21 Q27 16 30 23" fill={c} stroke="#000" strokeWidth={1.5} />
+      <path d="M44 24 Q52 28 56 23" fill="none" stroke="#000" strokeWidth={1} opacity="0.4" />
+    </g>
+  );
+}
+
+/** VR headset visor over the eyes with cyan lens glow. */
+function VrHeadset({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  const c = fill && fill !== '#000000' ? fill : '#1A1A2E';
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}vr`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#2A2A44" />
+          <stop offset="100%" stopColor={c} />
+        </linearGradient>
+      </defs>
+      <path d="M24 40 Q24 23 50 23 Q76 23 76 40" fill="none" stroke={c} strokeWidth={5} />
+      <rect x="22" y="34" width="56" height="18" rx="6" fill={`url(#${u}vr)`} stroke="#000" strokeWidth={SO} />
+      <rect x="28" y="38" width="16" height="10" rx="3" fill="#00FFFF" opacity="0.55" />
+      <rect x="56" y="38" width="16" height="10" rx="3" fill="#00FFFF" opacity="0.55" />
+      <path d="M48 52 Q50 49 52 52" fill="#000" />
+      <path d="M28 36 L70 36" stroke="#fff" strokeWidth={1.5} opacity="0.22" />
+    </g>
+  );
+}
+
+/** Frog perched on head with bulging eyes (epic, funny). */
+function FrogHat({ fill }: AccessoryPartProps) {
+  const c = fill && fill !== '#000000' ? fill : '#5CB85C';
+  return (
+    <g>
+      <ellipse cx="50" cy="25" rx="20" ry="12" fill={c} stroke="#000" strokeWidth={SO} />
+      <ellipse cx="50" cy="28" rx="11" ry="6" fill="#C8E6A0" opacity="0.6" />
+      <circle cx="40" cy="12" r="6" fill={c} stroke="#000" strokeWidth={SO} />
+      <circle cx="60" cy="12" r="6" fill={c} stroke="#000" strokeWidth={SO} />
+      <circle cx="40" cy="11" r="3" fill="#fff" stroke="#000" strokeWidth={1} />
+      <circle cx="60" cy="11" r="3" fill="#fff" stroke="#000" strokeWidth={1} />
+      <circle cx="40" cy="11.5" r="1.3" fill="#000" />
+      <circle cx="60" cy="11.5" r="1.3" fill="#000" />
+      <path d="M40 29 Q50 35 60 29" fill="none" stroke="#000" strokeWidth={1.5} strokeLinecap="round" />
+      <circle cx="37" cy="23" r="1.4" fill="#3D8B3D" />
+      <circle cx="63" cy="23" r="1.4" fill="#3D8B3D" />
+    </g>
+  );
+}
+
+/** Halo ring wreathed in flame (epic). */
+function FlamingHalo({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}fhalo`} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#FF6B35" />
+          <stop offset="60%" stopColor="#FFD93B" />
+          <stop offset="100%" stopColor="#FFF3B0" />
+        </linearGradient>
+      </defs>
+      <path d="M26 18 Q24 6 30 11 Q31 4 35 11 Q41 4 37 16Z" fill={`url(#${u}fhalo)`} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <path d="M48 10 Q44 -1 51 5 Q53 -2 56 5 Q63 -1 54 12Z" fill={`url(#${u}fhalo)`} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <path d="M74 18 Q76 6 70 11 Q69 4 65 11 Q59 4 63 16Z" fill={`url(#${u}fhalo)`} stroke="#000" strokeWidth={1} strokeLinejoin="round" />
+      <ellipse cx="50" cy="18" rx="22" ry="6" fill="none" stroke="#FFD93B" strokeWidth={4} />
+      <ellipse cx="50" cy="18" rx="22" ry="6" fill="none" stroke="#000" strokeWidth={1} opacity="0.5" />
+    </g>
+  );
+}
+
+/** Jagged frozen ice crown with frost sparkles (epic). */
+function IceCrown({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}ice`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#E0FBFF" />
+          <stop offset="100%" stopColor="#7EC8E3" />
+        </linearGradient>
+      </defs>
+      <path d="M26 31 L30 12 L38 24 L50 6 L62 24 L70 12 L74 31 Q50 27 26 31Z" fill={`url(#${u}ice)`} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <path d="M50 13 l1.4 3 3 1.4 -3 1.4 -1.4 3 -1.4 -3 -3 -1.4 3 -1.4Z" fill="#fff" />
+      <circle cx="34" cy="22" r="1.4" fill="#fff" />
+      <circle cx="66" cy="22" r="1.4" fill="#fff" />
+      <path d="M30 27 Q50 23 70 27" stroke="#fff" strokeWidth={1.2} opacity="0.5" fill="none" />
+    </g>
+  );
+}
+
+/** Legendary gem-encrusted crystal crown with golden glow. */
+function CrystalCrown({ fill }: AccessoryPartProps) {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}crystalG`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFE9A8" />
+          <stop offset="100%" stopColor="#F5B301" />
+        </linearGradient>
+        <radialGradient id={`${u}gemR`}>
+          <stop offset="0%" stopColor="#FF6BD6" />
+          <stop offset="100%" stopColor="#8B2FC9" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="50" cy="22" rx="34" ry="15" fill="#FFD700" opacity="0.16" />
+      <path d="M24 30 L24 21 L34 26 L42 14 L50 24 L58 14 L66 26 L76 21 L76 30 Q50 34 24 30Z" fill={`url(#${u}crystalG)`} stroke="#000" strokeWidth={SO} strokeLinejoin="round" />
+      <circle cx="42" cy="16" r="2.6" fill={`url(#${u}gemR)`} stroke="#000" strokeWidth={0.8} />
+      <circle cx="58" cy="16" r="2.6" fill={`url(#${u}gemR)`} stroke="#000" strokeWidth={0.8} />
+      <circle cx="50" cy="26" r="3.2" fill="#00FFFF" stroke="#000" strokeWidth={0.8} />
+      <circle cx="33" cy="25" r="2" fill="#BFFF00" stroke="#000" strokeWidth={0.6} />
+      <circle cx="67" cy="25" r="2" fill="#BFFF00" stroke="#000" strokeWidth={0.6} />
+      <path d="M50 8 l1 2.5 2.5 1 -2.5 1 -1 2.5 -1 -2.5 -2.5 -1 2.5 -1Z" fill="#fff" />
+      <circle cx="30" cy="17" r="1" fill="#fff" />
+      <circle cx="70" cy="17" r="1" fill="#fff" />
+    </g>
+  );
+}
+
 export const ACCESSORY_PARTS = {
   none: None,
   glasses: Glasses,
@@ -935,6 +1232,21 @@ export const ACCESSORY_PARTS = {
   heartGlasses: HeartGlasses,
   choker: Choker,
   butterflyClip: ButterflyClip,
+  angelWings: AngelWings,
+  demonWings: DemonWings,
+  butterflyWings: ButterflyWings,
+  gamerHeadset: GamerHeadset,
+  cowboyHat: CowboyHat,
+  pirateHat: PirateHat,
+  topHat: TopHat,
+  graduationCap: GraduationCap,
+  tinfoilHat: TinfoilHat,
+  duckHat: DuckHat,
+  vrHeadset: VrHeadset,
+  frogHat: FrogHat,
+  flamingHalo: FlamingHalo,
+  iceCrown: IceCrown,
+  crystalCrown: CrystalCrown,
 } as const;
 
 export type AccessoryPart = keyof typeof ACCESSORY_PARTS;

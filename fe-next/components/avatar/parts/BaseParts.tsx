@@ -450,6 +450,76 @@ function Pear({ fill }: BasePartProps) {
   );
 }
 
+/** Gooey slime blob with drips and gloss (VIP). Honors chosen color. */
+function Slime({ fill }: BasePartProps) {
+  const c = fill && fill !== '#FFDBB4' ? fill : '#7CFC5A';
+  return (
+    <g>
+      <path d="M22 50 Q20 24 50 22 Q80 24 78 50 Q80 66 70 72 Q72 80 66 80 Q64 74 60 76 Q58 82 52 80 Q50 74 46 76 Q44 82 38 80 Q36 74 32 76 Q30 72 30 70 Q20 64 22 50Z" fill={c} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <ellipse cx="40" cy="36" rx="10" ry="6" fill="#fff" opacity="0.25" />
+      <ellipse cx="60" cy="40" rx="4" ry="3" fill="#fff" opacity="0.2" />
+      <circle cx="66" cy="58" r="2.5" fill="#fff" opacity="0.3" />
+      <circle cx="34" cy="60" r="2" fill="#fff" opacity="0.25" />
+    </g>
+  );
+}
+
+/** Boxy metallic robot head with antenna and rivets (Epic). */
+function RobotHead() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}robotF`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#C7D0DA" />
+          <stop offset="100%" stopColor="#8A97A6" />
+        </linearGradient>
+      </defs>
+      <rect x="22" y="26" width="56" height="52" rx="8" fill={`url(#${u}robotF)`} stroke="#000" strokeWidth={S} />
+      <rect x="16" y="44" width="6" height="14" rx="2" fill="#6B7785" stroke="#000" strokeWidth={2} />
+      <rect x="78" y="44" width="6" height="14" rx="2" fill="#6B7785" stroke="#000" strokeWidth={2} />
+      <line x1="50" y1="26" x2="50" y2="16" stroke="#000" strokeWidth={2} />
+      <circle cx="50" cy="15" r="2.6" fill="#FF3366" stroke="#000" strokeWidth={1} />
+      <path d="M26 66 H74" stroke="#000" strokeWidth={1} opacity="0.22" />
+      <circle cx="27" cy="31" r="1" fill="#000" opacity="0.3" />
+      <circle cx="73" cy="31" r="1" fill="#000" opacity="0.3" />
+      <path d="M28 30 L28 52" stroke="#fff" strokeWidth={2} opacity="0.25" />
+    </g>
+  );
+}
+
+/** Classic teardrop alien head (Epic). Honors chosen color, green by default. */
+function AlienHead({ fill }: BasePartProps) {
+  const c = fill && fill !== '#FFDBB4' ? fill : '#9BE36B';
+  return (
+    <g>
+      <path d="M50 20 Q74 22 72 44 Q70 64 50 78 Q30 64 28 44 Q26 22 50 20Z" fill={c} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M36 36 Q34 50 44 62" stroke="#000" strokeWidth={1} opacity="0.12" fill="none" />
+      <path d="M64 36 Q66 50 56 62" stroke="#000" strokeWidth={1} opacity="0.12" fill="none" />
+      <ellipse cx="44" cy="32" rx="8" ry="5" fill="#fff" opacity="0.18" />
+    </g>
+  );
+}
+
+/** Translucent ghost with wavy tail (Epic). */
+function GhostFace() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <radialGradient id={`${u}ghostG`}>
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#D6E4FF" />
+        </radialGradient>
+      </defs>
+      <path d="M24 50 Q22 22 50 22 Q78 22 76 50 L76 76 Q70 70 64 76 Q58 70 52 76 Q46 70 40 76 Q34 70 28 76 L24 50Z" fill={`url(#${u}ghostG)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" opacity="0.92" />
+      <circle cx="36" cy="54" r="4" fill="#B7C9F2" opacity="0.5" />
+      <circle cx="64" cy="54" r="4" fill="#B7C9F2" opacity="0.5" />
+      <path d="M32 30 Q40 26 46 30" stroke="#fff" strokeWidth={1.5} opacity="0.5" fill="none" />
+    </g>
+  );
+}
+
 export const BASE_PARTS = {
   round: Round,
   square: Square,
@@ -466,6 +536,10 @@ export const BASE_PARTS = {
   oblong: Oblong,
   rectangular: Rectangular,
   pear: Pear,
+  slime: Slime,
+  robotHead: RobotHead,
+  alienHead: AlienHead,
+  ghostFace: GhostFace,
 } as const;
 
 export type BasePart = keyof typeof BASE_PARTS;

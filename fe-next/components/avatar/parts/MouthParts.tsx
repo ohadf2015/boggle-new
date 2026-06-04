@@ -603,6 +603,88 @@ function ThinLips() {
 
 function None() { return <g />; }
 
+/** Cute smile with two little vampire fangs (VIP). */
+function Fangs() {
+  return (
+    <g>
+      <path d="M37 59 Q50 68 63 59" fill="#7A1F2B" stroke="#000" strokeWidth={S} strokeLinecap="round" />
+      <path d="M39 60 Q50 66 61 60" fill="#C0394B" opacity="0.6" />
+      <path d="M43 60 L45 66 L47 60Z" fill="#fff" stroke="#000" strokeWidth={0.8} strokeLinejoin="round" />
+      <path d="M53 60 L55 66 L57 60Z" fill="#fff" stroke="#000" strokeWidth={0.8} strokeLinejoin="round" />
+    </g>
+  );
+}
+
+/** Tongue out, striped rainbow (VIP, funny). */
+function RainbowTongue() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}rbtongue`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FF1493" />
+          <stop offset="50%" stopColor="#FFD93B" />
+          <stop offset="100%" stopColor="#00FFE0" />
+        </linearGradient>
+      </defs>
+      <path d="M38 59 Q50 67 62 59" fill="#7A1F2B" stroke="#000" strokeWidth={S} />
+      <path d="M44 62 Q44 74 50 74 Q56 74 56 62Z" fill={`url(#${u}rbtongue)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M50 64 V72" stroke="#000" strokeWidth={0.8} opacity="0.3" />
+    </g>
+  );
+}
+
+/** Mechanical speaker-grille robot mouth (VIP). */
+function RobotMouth() {
+  return (
+    <g>
+      <rect x="40" y="56" width="20" height="9" rx="2" fill="#2A2A3E" stroke="#000" strokeWidth={S} />
+      <path d="M43 58 V63 M47 58 V63 M51 58 V63 M55 58 V63 M59 58 V63" stroke="#00FFE0" strokeWidth={1.4} />
+      <rect x="40" y="56" width="20" height="2" fill="#fff" opacity="0.15" />
+    </g>
+  );
+}
+
+/** Gold grillz with diamond accents (Epic). */
+function Grillz() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}grillz`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFF1A8" />
+          <stop offset="100%" stopColor="#E0A000" />
+        </linearGradient>
+      </defs>
+      <path d="M38 58 Q50 66 62 58 Q50 62 38 58Z" fill="#7A1F2B" stroke="#000" strokeWidth={S} />
+      <rect x="40" y="58" width="20" height="6" rx="1" fill={`url(#${u}grillz)`} stroke="#000" strokeWidth={1} />
+      <path d="M44 58 V64 M48 58 V64 M52 58 V64 M56 58 V64" stroke="#000" strokeWidth={0.6} opacity="0.4" />
+      <path d="M46 60 l1 1.5 -1 1.5 -1 -1.5Z" fill="#fff" />
+      <path d="M54 60 l1 1.5 -1 1.5 -1 -1.5Z" fill="#00FFE0" />
+    </g>
+  );
+}
+
+/** Glowing neon-outline smile (Epic). */
+function NeonSmile() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}neonm`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#00FFE0" />
+          <stop offset="100%" stopColor="#FF1493" />
+        </linearGradient>
+      </defs>
+      <path d="M36 59 Q50 71 64 59" fill="none" stroke={`url(#${u}neonm)`} strokeWidth={5} opacity="0.35" strokeLinecap="round" />
+      <path d="M36 59 Q50 71 64 59" fill="none" stroke={`url(#${u}neonm)`} strokeWidth={2.4} strokeLinecap="round" />
+      <circle cx="44" cy="63.5" r="1" fill="#fff" />
+      <circle cx="50" cy="65" r="1" fill="#fff" />
+      <circle cx="56" cy="63.5" r="1" fill="#fff" />
+    </g>
+  );
+}
+
 export const MOUTH_PARTS = {
   none: None,
   smile: Smile,
@@ -636,6 +718,11 @@ export const MOUTH_PARTS = {
   lipGloss: LipGloss,
   closedSmile: ClosedSmile,
   thinLips: ThinLips,
+  fangs: Fangs,
+  rainbowTongue: RainbowTongue,
+  robotMouth: RobotMouth,
+  grillz: Grillz,
+  neonSmile: NeonSmile,
 } as const;
 
 export type MouthPart = keyof typeof MOUTH_PARTS;

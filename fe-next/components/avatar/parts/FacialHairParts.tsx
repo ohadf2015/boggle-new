@@ -323,6 +323,44 @@ function TrimmedBeard({ fill }: FacialHairProps) {
   );
 }
 
+/** Rainbow-striped beard (Epic). */
+function RainbowBeard() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}rbbeard`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#FF1744" />
+          <stop offset="25%" stopColor="#FF9100" />
+          <stop offset="50%" stopColor="#FFEA00" />
+          <stop offset="75%" stopColor="#00E676" />
+          <stop offset="100%" stopColor="#2979FF" />
+        </linearGradient>
+      </defs>
+      <path d="M30 56 Q32 78 50 82 Q68 78 70 56 Q60 64 50 64 Q40 64 30 56Z" fill={`url(#${u}rbbeard)`} stroke="#000" strokeWidth={S + 0.6} strokeLinejoin="round" />
+      <path d="M40 64 L38 76 M50 66 L50 80 M60 64 L62 76" stroke="#000" strokeWidth={0.6} opacity="0.25" />
+    </g>
+  );
+}
+
+/** Flame-shaped beard with licking tips (Epic). */
+function FlameBeard() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}flbeard`} x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#FFD600" />
+          <stop offset="50%" stopColor="#FF9100" />
+          <stop offset="100%" stopColor="#FF3D00" />
+        </linearGradient>
+      </defs>
+      <path d="M30 56 Q30 70 38 78 L40 70 L46 82 L50 72 L54 82 L60 70 L62 78 Q70 70 70 56 Q60 64 50 64 Q40 64 30 56Z" fill={`url(#${u}flbeard)`} stroke="#000" strokeWidth={S + 0.6} strokeLinejoin="round" />
+      <path d="M44 68 Q46 74 44 78 M56 68 Q54 74 56 78" stroke="#FFF59D" strokeWidth={0.8} opacity="0.6" fill="none" />
+    </g>
+  );
+}
+
 export const FACIAL_HAIR_PARTS: Record<string, React.FC<FacialHairProps> | (() => null)> = {
   none: None,
   stubble: Stubble,
@@ -340,6 +378,8 @@ export const FACIAL_HAIR_PARTS: Record<string, React.FC<FacialHairProps> | (() =
   braidedBeard: BraidedBeard,
   fuManchu: FuManchu,
   trimmedBeard: TrimmedBeard,
+  rainbowBeard: RainbowBeard,
+  flameBeard: FlameBeard,
 };
 
 export type FacialHairPart = keyof typeof FACIAL_HAIR_PARTS;

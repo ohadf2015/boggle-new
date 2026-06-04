@@ -371,3 +371,129 @@ export function Infinity() {
     </g>
   );
 }
+
+/** 8-bit blocky pixel eyes (VIP). */
+export function PixelEyes() {
+  const ec = useEyeColor();
+  return (
+    <g shapeRendering="crispEdges">
+      <rect x="33" y="37" width="10" height="10" fill="#fff" stroke="#000" strokeWidth={S} />
+      <rect x="36" y="40" width="4" height="4" fill={ec} />
+      <rect x="37" y="41" width="2" height="2" fill="#000" />
+      <rect x="57" y="37" width="10" height="10" fill="#fff" stroke="#000" strokeWidth={S} />
+      <rect x="60" y="40" width="4" height="4" fill={ec} />
+      <rect x="61" y="41" width="2" height="2" fill="#000" />
+      <rect x="37" y="38" width="2" height="2" fill="#fff" opacity="0.7" />
+      <rect x="61" y="38" width="2" height="2" fill="#fff" opacity="0.7" />
+    </g>
+  );
+}
+
+/** Crosshair reticle iris — competitive sniper look (VIP). */
+export function TargetEyes() {
+  const ec = useEyeColor();
+  return (
+    <g>
+      <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="38" cy="42" r="4.5" fill="none" stroke={ec} strokeWidth={1.4} />
+      <circle cx="62" cy="42" r="4.5" fill="none" stroke={ec} strokeWidth={1.4} />
+      <circle cx="38" cy="42" r="1.6" fill="#FF3366" />
+      <circle cx="62" cy="42" r="1.6" fill="#FF3366" />
+      <path d="M38 35.5 V38.5 M38 45.5 V48.5 M31.5 42 H34.5 M41.5 42 H44.5" stroke={ec} strokeWidth={1.2} />
+      <path d="M62 35.5 V38.5 M62 45.5 V48.5 M55.5 42 H58.5 M65.5 42 H68.5" stroke={ec} strokeWidth={1.2} />
+    </g>
+  );
+}
+
+/** Big shiny anime/kawaii eyes with sparkle highlights (VIP). */
+export function Kawaii() {
+  const ec = useEyeColor();
+  const ecd = useEyeColorDark();
+  return (
+    <g>
+      <ellipse cx="38" cy="42" rx="7.5" ry="9" fill="#fff" stroke="#000" strokeWidth={S} />
+      <ellipse cx="62" cy="42" rx="7.5" ry="9" fill="#fff" stroke="#000" strokeWidth={S} />
+      <ellipse cx="38" cy="43" rx="5.5" ry="6.5" fill={ec} />
+      <ellipse cx="62" cy="43" rx="5.5" ry="6.5" fill={ec} />
+      <ellipse cx="38" cy="44" rx="4.5" ry="5" fill={ecd} opacity="0.4" />
+      <ellipse cx="62" cy="44" rx="4.5" ry="5" fill={ecd} opacity="0.4" />
+      <circle cx="38" cy="43.5" r="2.4" fill="#000" />
+      <circle cx="62" cy="43.5" r="2.4" fill="#000" />
+      <circle cx="35.5" cy="39.5" r="2.2" fill="#fff" />
+      <circle cx="59.5" cy="39.5" r="2.2" fill="#fff" />
+      <circle cx="40" cy="45" r="1.1" fill="#fff" opacity="0.8" />
+      <circle cx="64" cy="45" r="1.1" fill="#fff" opacity="0.8" />
+    </g>
+  );
+}
+
+/** RGB-split scanline glitch eyes (Epic). */
+export function GlitchEyes() {
+  return (
+    <g>
+      <rect x="31" y="38" width="14" height="8" fill="#FF0040" opacity="0.55" />
+      <rect x="32.5" y="38" width="14" height="8" fill="#00FFE0" opacity="0.55" />
+      <rect x="31.7" y="38" width="14" height="8" fill="none" stroke="#000" strokeWidth={S} />
+      <rect x="55" y="38" width="14" height="8" fill="#FF0040" opacity="0.55" />
+      <rect x="56.5" y="38" width="14" height="8" fill="#00FFE0" opacity="0.55" />
+      <rect x="55.7" y="38" width="14" height="8" fill="none" stroke="#000" strokeWidth={S} />
+      <path d="M32 40.5 H45 M32 43 H45" stroke="#000" strokeWidth={0.5} opacity="0.4" />
+      <path d="M56 40.5 H69 M56 43 H69" stroke="#000" strokeWidth={0.5} opacity="0.4" />
+      <rect x="37" y="40.5" width="3" height="3" fill="#000" />
+      <rect x="61" y="40.5" width="3" height="3" fill="#000" />
+    </g>
+  );
+}
+
+/** Rainbow-gradient iris (Epic). */
+export function RainbowEyes() {
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <linearGradient id={`${u}rbeye`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#FF1493" />
+          <stop offset="33%" stopColor="#FFD93B" />
+          <stop offset="66%" stopColor="#00FFE0" />
+          <stop offset="100%" stopColor="#8B5CF6" />
+        </linearGradient>
+      </defs>
+      <circle cx="38" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="7" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="38" cy="42" r="4.6" fill={`url(#${u}rbeye)`} />
+      <circle cx="62" cy="42" r="4.6" fill={`url(#${u}rbeye)`} />
+      <circle cx="38" cy="42" r="2" fill="#000" />
+      <circle cx="62" cy="42" r="2" fill="#000" />
+      <circle cx="36.5" cy="40.2" r="1.4" fill="#fff" />
+      <circle cx="60.5" cy="40.2" r="1.4" fill="#fff" />
+    </g>
+  );
+}
+
+/** Two eyes + a glowing mystic third eye on the forehead (Legendary). */
+export function ThirdEye() {
+  const ec = useEyeColor();
+  const u = useAvatarUid();
+  return (
+    <g>
+      <defs>
+        <radialGradient id={`${u}thirdGlow`}>
+          <stop offset="0%" stopColor="#E0B3FF" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </radialGradient>
+      </defs>
+      <circle cx="38" cy="44" r="5.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="44" r="5.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="38" cy="44" r="2.8" fill={ec} />
+      <circle cx="62" cy="44" r="2.8" fill={ec} />
+      <circle cx="38" cy="44" r="1.4" fill="#000" />
+      <circle cx="62" cy="44" r="1.4" fill="#000" />
+      <ellipse cx="50" cy="31" rx="7" ry="4.5" fill="#fff" stroke="#000" strokeWidth={S} />
+      <circle cx="50" cy="31" r="3.4" fill={`url(#${u}thirdGlow)`} />
+      <circle cx="50" cy="31" r="1.6" fill="#000" />
+      <circle cx="48.8" cy="29.8" r="0.9" fill="#fff" />
+      <path d="M50 24 V21 M43 28 L41 26 M57 28 L59 26" stroke="#A855F7" strokeWidth={1} opacity="0.7" />
+    </g>
+  );
+}
