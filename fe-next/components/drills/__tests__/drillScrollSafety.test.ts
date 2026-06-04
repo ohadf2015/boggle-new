@@ -50,6 +50,9 @@ describe('drill scroll-safety (CTA reachable under screen-fit-locked)', () => {
         .find((l) => l.includes('flex-1') && l.includes('flex flex-col') && l.includes('items-center'));
       expect(gameAreaLine, `${drill} game-area line`).toBeTruthy();
       expect(gameAreaLine!).toContain('overflow-y-auto');
+      // overflow-y-auto computes overflow-x:auto unless x is explicitly clipped;
+      // without this a stray horizontal scrollbar can appear.
+      expect(gameAreaLine!).toContain('overflow-x-hidden');
       expect(gameAreaLine!).toContain('min-h-0');
       // justify-center clips both ends when content overflows the locked viewport.
       expect(gameAreaLine!).not.toContain('justify-center');

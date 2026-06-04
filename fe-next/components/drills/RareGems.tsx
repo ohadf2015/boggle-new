@@ -305,7 +305,7 @@ export default function RareGems({
       )}
 
       {/* Game Area */}
-      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center justify-start p-4">
+      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4">
         {phase === 'ready' && (
           <DrillBriefing
             drillId="rare-gems"

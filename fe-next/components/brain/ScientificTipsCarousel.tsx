@@ -175,8 +175,11 @@ export default function ScientificTipsCarousel() {
           <Quote className={cn('w-12 h-12', isDarkMode ? 'text-neo-white' : 'text-neo-black')} />
         </div>
 
-        {/* Tip Content */}
-        <div className="relative p-5 min-h-[180px]">
+        {/* Tip Content — FIXED height so the box never changes size between tips
+            or during the mode="wait" transition gap (was the source of the Brain
+            hub jumping every 6s). Longer copy (Hebrew) scrolls inside instead of
+            reflowing the page. min-h kept for the existing UI contract. */}
+        <div className="relative p-5 min-h-[180px] h-[220px] overflow-x-hidden overflow-y-auto">
           <AnimatePresence mode="wait" custom={direction}>
             <m.div
               key={activeIndex}

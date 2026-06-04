@@ -66,6 +66,8 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 vi.mock('@/contexts/AccessibilityContext', () => ({
   useSuppressTimerUrgency: () => false,
   useShouldReduceMotion: () => false,
+  // WordFormingArea (rendered once a drill starts) reads cosy mode — mock parity.
+  useCosyMode: () => false,
 }));
 
 vi.mock('@/components/grid/performanceUtils', () => ({
