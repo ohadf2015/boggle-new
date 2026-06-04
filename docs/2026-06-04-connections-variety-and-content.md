@@ -21,8 +21,13 @@ themes.
   (nature / body / food / structure / tool / clothing / misc).
 - **Code-side lexicon, no DB column.** Precedence word1 → word2 → bridge → misc
   (the player sees word1/word2; the bridge is hidden). Explicit `theme?` on a
-  puzzle overrides. Non-English words fall through to `misc` (graceful — never
-  makes non-en pools worse; lexicon is en-heavy plus a few es/sv stems).
+  puzzle overrides.
+- **All 5 languages classified.** The lexicon carries stems for en + he + es +
+  sv + ja (high-frequency pool tokens per language). This matters because the
+  dispersal was previously a no-op outside English: Hebrew — the largest pool
+  (445) — went from `comparable=0` adjacent theme-pairs (everything `misc`) to
+  88, all dispersed (0% adjacency). Unknown tokens still fall through to `misc`
+  gracefully (a mis-themed word only reorders, never breaks a puzzle).
 
 ### 2. Theme dispersal in the level run — `lib/connections/puzzles/index.ts`
 `interleaveByBridge` rewritten as a deterministic penalty-greedy: bridge penalty

@@ -50,7 +50,11 @@ const THEME_STEMS: Record<Exclude<PuzzleTheme, 'misc'>, readonly string[]> = {
     // es / sv transparent
     'sol', 'mar', 'flor', 'perro', 'gato', 'pez', 'caballo', 'oso', 'ola',
     'hav', 'regn', 'blom', 'träd', 'hund', 'katt', 'häst', 'björn', 'gran',
-    'ros', 'gås',
+    'ros', 'gås', 'rayos', 'piedra',
+    // he — sea/sun/tree/garden/seasons/bird (top-frequency pool tokens)
+    'ים', 'עץ', 'גן', 'שמש', 'לילה', 'חורף', 'קיץ', 'ציפור', 'מים', 'אדמה',
+    // ja — sun/water/mountain/river/tree/fire/fish/flower/rain/sky
+    '日', '水', '山', '川', '木', '火', '魚', '花', '雨', '空', '星', '雪',
   ],
   body: [
     'eye', 'hand', 'foot', 'head', 'hair', 'tooth', 'finger', 'nail', 'brow',
@@ -61,7 +65,11 @@ const THEME_STEMS: Record<Exclude<PuzzleTheme, 'misc'>, readonly string[]> = {
     // es / sv
     'mano', 'ojo', 'pie', 'cabeza', 'uña', 'diente', 'hueso', 'corazon',
     'lengua', 'cara', 'pierna', 'brazo', 'cuello', 'öga', 'huvud', 'tand',
-    'hjärta', 'hår',
+    'hjärta', 'hår', 'manos', 'ojos', 'boca', 'lenguas',
+    // he — head/hand/foot/eye/eyes/mouth/heart
+    'ראש', 'יד', 'רגל', 'עין', 'עיניים', 'פה', 'לב', 'אוזן', 'אף',
+    // ja — hand/body/eye/mouth/head/heart/foot/ear
+    '手', '体', '目', '口', '頭', '心', '足', '耳', '鼻', '歯',
   ],
   food: [
     'apple', 'butter', 'cup', 'cake', 'milk', 'honey', 'corn', 'bread',
@@ -73,8 +81,13 @@ const THEME_STEMS: Record<Exclude<PuzzleTheme, 'misc'>, readonly string[]> = {
     'roll', 'bun', 'pizza', 'pasta', 'noodle', 'curry', 'fork', 'kettle',
     // es / sv
     'pan', 'leche', 'queso', 'carne', 'sopa', 'arroz', 'huevo', 'azucar',
-    'vino', 'cafe', 'fruta', 'manzana', 'bröd', 'mjölk', 'ost', 'kött',
-    'kaka', 'sås', 'ägg', 'socker', 'saft', 'peppar',
+    'vino', 'cafe', 'café', 'fruta', 'manzana', 'bröd', 'mjölk', 'ost', 'kött',
+    'kaka', 'sås', 'ägg', 'socker', 'saft', 'peppar', 'platos', 'plato',
+    'cerveza', 'hielo',
+    // he — coffee/meal/cup/wine/cake(of)/milk/slice(of)/bread
+    'קפה', 'ארוחת', 'כוס', 'יין', 'עוגת', 'חלב', 'פרוסת', 'לחם', 'בשר', 'מאפה',
+    // ja — eat/rice/tea/meat/drink
+    '食', '米', '茶', '肉', '飲',
   ],
   structure: [
     'house', 'ship', 'wall', 'door', 'gate', 'board', 'room', 'port', 'road',
@@ -86,7 +99,11 @@ const THEME_STEMS: Record<Exclude<PuzzleTheme, 'misc'>, readonly string[]> = {
     'temple', 'arch', 'brick', 'tile', 'deck', 'ramp', 'fort', 'home',
     // es / sv
     'casa', 'calle', 'puerta', 'muro', 'torre', 'tienda', 'hus', 'vägg',
-    'dörr', 'väg', 'tak', 'gata', 'torn', 'hylla',
+    'dörr', 'väg', 'tak', 'gata', 'torn', 'hylla', 'mesa',
+    // he — house/station(of)/door/entrance/room/court/train/table
+    'בית', 'תחנת', 'דלת', 'כניסה', 'חדר', 'מגרש', 'רכבת', 'שולחן', 'גשר',
+    // ja — road/path/shop/car/school/city/place/shop/station
+    '道', '路', '屋', '車', '校', '市', '場', '店', '駅', '館',
   ],
   tool: [
     'saw', 'knife', 'screw', 'pick', 'pen', 'hook', 'bell', 'comb', 'key',
@@ -97,6 +114,11 @@ const THEME_STEMS: Record<Exclude<PuzzleTheme, 'misc'>, readonly string[]> = {
     // es / sv
     'clavo', 'llave', 'sierra', 'gancho', 'martillo', 'kniv', 'nyckel',
     'krok', 'hammare', 'spik',
+    // he — computer/bottle/TV/clock/screen/ticket/paper/key/bag/book
+    'מחשב', 'בקבוק', 'טלוויזיה', 'שעון', 'מסך', 'כרטיס', 'נייר', 'מפתח',
+    'שקית', 'ספר', 'מצלמה',
+    // ja — electric/paper/key/machine/pen
+    '電', '紙', '鍵', '機', '筆',
   ],
   clothing: [
     'shoe', 'ring', 'bow', 'tie', 'cap', 'cuff', 'button', 'hat', 'coat',
@@ -105,8 +127,12 @@ const THEME_STEMS: Record<Exclude<PuzzleTheme, 'misc'>, readonly string[]> = {
     'suit', 'jeans', 'cloak', 'mitten', 'slipper', 'sandal', 'zipper', 'lace',
     'pocket', 'hem', 'cape', 'apron', 'helmet', 'crown',
     // es / sv
-    'zapato', 'anillo', 'sombrero', 'bota', 'camisa', 'guante', 'sko',
+    'zapato', 'anillo', 'sombrero', 'bota', 'botas', 'camisa', 'guante', 'sko',
     'hatt', 'mössa', 'skjorta', 'stövel',
+    // he — shoe/hat/shirt/coat/sock
+    'נעל', 'כובע', 'חולצה', 'מעיל', 'גרב',
+    // ja — clothes/hat/shoe
+    '服', '帽', '靴',
   ],
 };
 

@@ -55,7 +55,7 @@ describe('puzzle interleaving by bridge', () => {
   // two nature-ish in a row). The interleave must also disperse themes so the
   // run never feels monotonous. 'misc' is exempt (it's a permissive catch-all,
   // not a felt theme).
-  for (const locale of ['en', 'he'] as const) {
+  for (const locale of ['en', 'he', 'es', 'sv', 'ja'] as const) {
     it(`${locale}: rarely repeats the same non-misc theme in adjacent same-difficulty levels`, () => {
       const total = getTotalLevels(locale);
       let themeRepeats = 0;
@@ -73,6 +73,11 @@ describe('puzzle interleaving by bridge', () => {
       const rate = comparable === 0 ? 0 : themeRepeats / comparable;
       console.log(`[theme-adjacency ${locale}] repeats=${themeRepeats}/${comparable} rate=${rate.toFixed(3)}`);
       expect(rate).toBeLessThan(0.15);
+      // en + he carry rich theme lexicons: a meaningful number of adjacent pairs
+      // must actually CARRY non-misc themes, else the dispersal is a silent no-op
+      // (regression guard — e.g. if the lexicon stopped classifying these locales).
+      if (locale === 'en') expect(comparable).toBeGreaterThan(50);
+      if (locale === 'he') expect(comparable).toBeGreaterThan(40);
     });
   }
 
