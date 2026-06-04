@@ -50,6 +50,35 @@ export default function BannerCoordinatorMount() {
     document.addEventListener('visibilitychange', onVisible);
     removers.push(() => document.removeEventListener('visibilitychange', onVisible));
 
+    // Single drawer-suppress owner. The native banner is a SurfaceView that
+    // composites ABOVE the WebView, so an open side menu can't cover it with
+    // z-index. HeaderMobileMenu flags <html>.mobile-drawer-open; we map that to
+    // a global suppress so BOTH banner owners (anchor + slot) hide uniformly —
+    // previously only the anchor cleared, leaving the slot banner (results
+    // pages) composited on top of the open menu.
+    const syncDrawer = () =>
+      void bannerController.setSuppressed(
+        document.documentElement.classList.contains('mobile-drawer-open'),
+      );
+    syncDrawer(); // reflect any drawer already open at mount
+    const drawerObserver = new MutationObserver(syncDrawer);
+    drawerObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    removers.push(() => drawerObserver.disconnect());
+
+    // Periodic refresh so the banner doesn't sit on one stale creative. AdMob's
+    // own refresh can stall when the WebView is backgrounded/throttled, so we
+    // force a reload every ~45 min (within the 30–60 min ask). reassert()
+    // force-reshows the active request (= a fresh creative) and is a no-op when
+    // no owner wants the banner. Skip while hidden — onForeground re-asserts.
+    const REFRESH_MS = 45 * 60 * 1000;
+    const refreshTimer = setInterval(() => {
+      if (document.visibilityState === 'visible') void bannerController.reassert();
+    }, REFRESH_MS);
+    removers.push(() => clearInterval(refreshTimer));
+
     return () => {
       removers.forEach((r) => r());
       void bannerController.setOps(null);

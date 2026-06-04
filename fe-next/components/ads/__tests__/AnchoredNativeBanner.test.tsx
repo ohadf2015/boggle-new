@@ -126,29 +126,10 @@ describe('AnchoredNativeBanner', () => {
     expect(setRequest).toHaveBeenCalledWith(...anchorReq(24));
   });
 
-  it('keeps banner behind the open side menu — clears anchor while .mobile-drawer-open', async () => {
-    mockPlatform.current = 'android';
-    document.documentElement.classList.add('mobile-drawer-open');
-    render(<AnchoredNativeBanner />);
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(setRequest).not.toHaveBeenCalled();
-    expect(clearRequest).toHaveBeenCalledWith('anchor');
-    expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
-  });
-
-  it('restores the banner when the side menu closes (class removed → observer re-requests)', async () => {
-    mockPlatform.current = 'android';
-    document.documentElement.classList.add('mobile-drawer-open');
-    render(<AnchoredNativeBanner />);
-    await Promise.resolve();
-    expect(setRequest).not.toHaveBeenCalled();
-
-    document.documentElement.classList.remove('mobile-drawer-open');
-    await new Promise((r) => setTimeout(r, 0));
-    await Promise.resolve();
-    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
-  });
+  // NOTE: drawer-suppress moved out of this component into the single
+  // bannerController.setSuppressed path (driven by BannerCoordinatorMount), so
+  // it covers BOTH banner owners (anchor + slot) uniformly. Coverage now lives
+  // in BannerCoordinatorMount.test.tsx + bannerController.test.ts.
 
   it('requests the anchor on locale-prefixed home', async () => {
     mockPathname.current = '/he';
@@ -299,6 +280,59 @@ describe('AnchoredNativeBanner', () => {
     await Promise.resolve();
     expect(setRequest).toHaveBeenCalledWith(...anchorReq(112));
     document.documentElement.style.removeProperty('--bottom-nav-height');
+  });
+
+  it('sticks to the bottom when no nav signal exists — settled path ignores the CSS fallback', async () => {
+    // The CSS-default fallback (`calc(64px + safe)`) is an over-paint guard for
+    // the FIRST synchronous frame only. Once layout has settled (observer/rAF),
+    // an absent inline --bottom-nav-height means there is NO bottom nav at all,
+    // so the banner must collapse to the bottom (Android margin = safeBottom),
+    // not float 64px up forever. Regression for "banner should stick to bottom
+    // when there is no mobile bottom tab".
+    mockPlatform.current = 'android';
+    mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
+    document.documentElement.style.removeProperty('--bottom-nav-height');
+    const style = document.createElement('style');
+    style.textContent = ':root { --bottom-nav-height: 96px; }';
+    document.head.appendChild(style);
+    try {
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      // Sync frame still uses the fallback (over-paint guard) — 96.
+      expect(setRequest).toHaveBeenCalledWith(...anchorReq(96));
+
+      // Settle: fire the <html> observer (no nav effect ever publishes a var).
+      document.documentElement.classList.add('settle-tick');
+      await new Promise((r) => setTimeout(r, 0));
+      await Promise.resolve();
+      // Settled path uses inline-or-zero → navHeight 0 → margin = safeBottom.
+      expect(setRequest).toHaveBeenLastCalledWith(...anchorReq(24));
+    } finally {
+      document.documentElement.classList.remove('settle-tick');
+      document.head.removeChild(style);
+    }
+  });
+
+  it('flags <html>.has-admob-banner while a banner occupies the bottom (SizeChanged > 0)', async () => {
+    document.documentElement.classList.remove('has-admob-banner');
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    const sizeChanged = addListener.mock.calls.find((c) => c[0] === 'bannerAdSizeChanged');
+    expect(sizeChanged).toBeTruthy();
+    (sizeChanged![1] as (i: { height: number }) => void)({ height: 60 });
+    expect(document.documentElement.classList.contains('has-admob-banner')).toBe(true);
+    // Banner gone → flag cleared so content stops reserving the band.
+    (sizeChanged![1] as (i: { height: number }) => void)({ height: 0 });
+    expect(document.documentElement.classList.contains('has-admob-banner')).toBe(false);
+  });
+
+  it('clears has-admob-banner on FailedToLoad / Closed', async () => {
+    document.documentElement.classList.add('has-admob-banner');
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    const failedCall = addListener.mock.calls.find((c) => c[0] === 'bannerAdFailedToLoad');
+    (failedCall![1] as () => void)();
+    expect(document.documentElement.classList.contains('has-admob-banner')).toBe(false);
   });
 
   it('registers FailedToLoad and Closed listeners that reset --admob-banner-height', async () => {

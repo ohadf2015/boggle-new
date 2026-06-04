@@ -3230,10 +3230,18 @@ html {
    Pages whose own scroll container is a descendant of <main> (rare) opt in
    with the .pb-bottom-stack utility on that scroller. */
 @media (max-width: 639px) {
-  html.has-global-bottom-nav body.screen-fit {
+  /* Reserve the bottom stack (nav + banner) so fixed/native chrome never covers
+     content. Keyed off EITHER the nav OR the banner being present: the native
+     AdMob banner composites above the WebView, so on a nav-hidden surface where
+     the banner still shows (has-admob-banner) the band must still be reserved —
+     otherwise the banner covers bottom CTAs. --bottom-stack-height self-zeros
+     when both layers are absent, so this is a no-op on web / nav-less desktop. */
+  html.has-global-bottom-nav body.screen-fit,
+  html.has-admob-banner body.screen-fit {
     padding-bottom: var(--bottom-stack-height);
   }
-  html.has-global-bottom-nav {
+  html.has-global-bottom-nav,
+  html.has-admob-banner {
     scroll-padding-bottom: var(--bottom-stack-height);
   }
 }

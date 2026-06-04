@@ -43,6 +43,7 @@ const setOps = vi.fn();
 const notifyLoaded = vi.fn();
 const notifyFailed = vi.fn();
 const reassert = vi.fn();
+const setSuppressed = vi.fn();
 
 vi.mock('@/lib/native/bannerController', () => ({
   bannerController: {
@@ -50,8 +51,12 @@ vi.mock('@/lib/native/bannerController', () => ({
     notifyLoaded: () => notifyLoaded(),
     notifyFailed: () => notifyFailed(),
     reassert: () => reassert(),
+    setSuppressed: (v: boolean) => setSuppressed(v),
   },
 }));
+
+/** Flush the MutationObserver microtask queue. */
+const flushObserver = () => new Promise((r) => setTimeout(r, 0));
 
 import BannerCoordinatorMount from '../BannerCoordinatorMount';
 
@@ -61,6 +66,7 @@ describe('BannerCoordinatorMount', () => {
     isNative.current = true;
     for (const k of Object.keys(listeners)) delete listeners[k];
     foregroundCb.current = null;
+    document.documentElement.classList.remove('mobile-drawer-open');
   });
 
   it('injects show/hide ops into the coordinator on native mount', () => {
@@ -96,6 +102,82 @@ describe('BannerCoordinatorMount', () => {
     document.dispatchEvent(new Event('visibilitychange'));
     expect(reassert).toHaveBeenCalled();
     spy.mockRestore();
+  });
+
+  it('suppresses the banner when the side menu opens (mobile-drawer-open added)', async () => {
+    render(<BannerCoordinatorMount />);
+    setSuppressed.mockClear();
+    document.documentElement.classList.add('mobile-drawer-open');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(true);
+  });
+
+  it('restores the banner when the side menu closes (mobile-drawer-open removed)', async () => {
+    document.documentElement.classList.add('mobile-drawer-open');
+    render(<BannerCoordinatorMount />);
+    setSuppressed.mockClear();
+    document.documentElement.classList.remove('mobile-drawer-open');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(false);
+  });
+
+  it('reflects the initial drawer state on mount (open before render)', () => {
+    document.documentElement.classList.add('mobile-drawer-open');
+    render(<BannerCoordinatorMount />);
+    expect(setSuppressed).toHaveBeenCalledWith(true);
+  });
+
+  it('does not observe the drawer on web', async () => {
+    isNative.current = false;
+    render(<BannerCoordinatorMount />);
+    document.documentElement.classList.add('mobile-drawer-open');
+    await flushObserver();
+    expect(setSuppressed).not.toHaveBeenCalled();
+  });
+
+  it('refreshes the banner on a ~45-minute interval (fresh creative, not a stale ad)', () => {
+    vi.useFakeTimers();
+    const visSpy = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+    try {
+      render(<BannerCoordinatorMount />);
+      reassert.mockClear();
+      vi.advanceTimersByTime(45 * 60 * 1000);
+      expect(reassert).toHaveBeenCalledTimes(1);
+      vi.advanceTimersByTime(45 * 60 * 1000);
+      expect(reassert).toHaveBeenCalledTimes(2);
+    } finally {
+      visSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('skips the periodic refresh while backgrounded (no wasted reload)', () => {
+    vi.useFakeTimers();
+    const visSpy = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+    try {
+      render(<BannerCoordinatorMount />);
+      reassert.mockClear();
+      vi.advanceTimersByTime(45 * 60 * 1000);
+      expect(reassert).not.toHaveBeenCalled();
+    } finally {
+      visSpy.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('stops the refresh interval on unmount', () => {
+    vi.useFakeTimers();
+    const visSpy = vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible');
+    try {
+      const { unmount } = render(<BannerCoordinatorMount />);
+      unmount();
+      reassert.mockClear();
+      vi.advanceTimersByTime(45 * 60 * 1000);
+      expect(reassert).not.toHaveBeenCalled();
+    } finally {
+      visSpy.mockRestore();
+      vi.useRealTimers();
+    }
   });
 
   it('does not inject ops on web', () => {

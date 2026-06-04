@@ -146,6 +146,57 @@ describe('BannerController', () => {
     expect(ops.hide).not.toHaveBeenCalled();
   });
 
+  it('hides the banner while suppressed even though an owner still wants it (drawer open)', async () => {
+    c.setRequest('slot', slot(200));
+    await c.whenIdle();
+    expect(ops.show).toHaveBeenCalledTimes(1);
+    ops.show.mockClear();
+
+    c.setSuppressed(true); // side menu opened — banner must not composite over it
+    await c.whenIdle();
+    expect(ops.hide).toHaveBeenCalledTimes(1);
+    expect(ops.show).not.toHaveBeenCalled();
+  });
+
+  it('re-shows the active request when suppression is released (drawer closed)', async () => {
+    c.setRequest('slot', slot(200));
+    await c.whenIdle();
+    c.setSuppressed(true);
+    await c.whenIdle();
+    ops.show.mockClear();
+    ops.hide.mockClear();
+
+    c.setSuppressed(false); // drawer closed → banner returns without the owner re-firing
+    await c.whenIdle();
+    expect(ops.show).toHaveBeenCalledWith(200, 'game');
+  });
+
+  it('does nothing on suppress when no owner wants the banner', async () => {
+    c.setSuppressed(true);
+    await c.whenIdle();
+    expect(ops.hide).not.toHaveBeenCalled();
+    expect(ops.show).not.toHaveBeenCalled();
+  });
+
+  it('keeps the banner hidden when a new request arrives while suppressed', async () => {
+    c.setSuppressed(true);
+    await c.whenIdle();
+    c.setRequest('slot', slot(200)); // owner appears while the drawer is still open
+    await c.whenIdle();
+    expect(ops.show).not.toHaveBeenCalled();
+  });
+
+  it('is idempotent — repeated setSuppressed(true) does not re-hide', async () => {
+    c.setRequest('slot', slot(200));
+    await c.whenIdle();
+    c.setSuppressed(true);
+    await c.whenIdle();
+    ops.hide.mockClear();
+    c.setSuppressed(true);
+    await c.whenIdle();
+    expect(ops.hide).not.toHaveBeenCalled();
+  });
+
   it('does not swallow a reassert that arrives while a show is still in flight', async () => {
     // The foreground-recovery failure mode: a reconcile is mid-await on show()
     // when the app foregrounds. A naive "applied = NO_BANNER then schedule"

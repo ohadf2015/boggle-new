@@ -3,7 +3,7 @@ import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, Interstiti
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 import { kickWebViewRepaint } from '@/lib/native/webviewRepaint';
-import { trackRewardedLifecycle } from '@/utils/growthTracking';
+import { trackRewardedLifecycle, trackInterstitialLifecycle } from '@/utils/growthTracking';
 
 // Module-level so every useAdMob() consumer observes the same banner state.
 // Prevents hideBanner calls when no banner was ever shown (Sentry #120).
@@ -213,6 +213,11 @@ export function useAdMob() {
     const config = getConfig();
     if (!config) return;
 
+    // Breadcrumb: this game is eligible and an ad will be attempted. From here
+    // the lifecycle is fully instrumented so production can pinpoint the
+    // "interstitials show blank screens" report — see trackInterstitialLifecycle.
+    trackInterstitialLifecycle('eligible');
+
     const handles: Array<{ remove: () => void | Promise<void> }> = [];
     let settled = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -237,11 +242,22 @@ export function useAdMob() {
       };
 
       // Register listeners BEFORE prepare so a fast plugin can't fire
-      // Dismissed/FailedToShow before we're listening.
+      // Dismissed/FailedToShow before we're listening. Each wraps a breadcrumb
+      // so we capture WHICH terminal event fired (or whether none did and the
+      // safety timeout fired instead).
       Promise.all([
-        AdMob.addListener(InterstitialAdPluginEvents.Dismissed, settle),
-        AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, settle),
-        AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, settle),
+        AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+          trackInterstitialLifecycle('dismissed');
+          settle();
+        }),
+        AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
+          trackInterstitialLifecycle('failed_to_show');
+          settle();
+        }),
+        AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => {
+          trackInterstitialLifecycle('failed_to_load');
+          settle();
+        }),
       ])
         .then((resolved) => {
           if (settled) {
@@ -252,7 +268,12 @@ export function useAdMob() {
         })
         .catch(() => { /* listener registration is best-effort */ });
 
-      timer = setTimeout(settle, INTERSTITIAL_SAFETY_TIMEOUT_MS);
+      timer = setTimeout(() => {
+        // No terminal event arrived in time — the native ad stalled. This
+        // breadcrumb is the tell for a hung show (vs a clean dismiss).
+        trackInterstitialLifecycle('safety_timeout');
+        settle();
+      }, INTERSTITIAL_SAFETY_TIMEOUT_MS);
 
       (async () => {
         try {
@@ -261,13 +282,16 @@ export function useAdMob() {
           // fallback when the warm slot is empty (preload not yet finished or
           // a prior no-fill).
           if (!isInterstitialReady()) {
+            trackInterstitialLifecycle('prepare_start');
             await prepareInterstitialAd();
+            trackInterstitialLifecycle('prepare_resolved');
           }
           if (!isInterstitialReady()) {
             // No fill — never call show on an unprepared unit (it would render
             // nothing yet count an impression). Settle so awaiting callers (MP
             // host) aren't blocked, and DON'T record a shown impression so the
             // no-fill doesn't burn one of the 4 session slots.
+            trackInterstitialLifecycle('no_fill');
             settle();
             return;
           }
@@ -275,8 +299,11 @@ export function useAdMob() {
           // Record only confirmed impressions. (Previously recorded before the
           // show, when fill was unknown — a no-fill silently burned a slot.)
           recordInterstitialShown();
+          trackInterstitialLifecycle('show_called');
           await AdMob.showInterstitial();
+          trackInterstitialLifecycle('show_resolved');
         } catch {
+          trackInterstitialLifecycle('error');
           settle();
         }
       })();

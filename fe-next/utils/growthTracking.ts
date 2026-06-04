@@ -117,6 +117,14 @@ export type GrowthEvent =
   // `rewarded`, then `dismissed` (X tapped, ad torn down), or stall at
   // `safety_timeout` / never fire `dismissed`. NOT a funnel step.
   | 'rewarded_ad_lifecycle'
+  // Native interstitial-ad lifecycle breadcrumb. One event per stage transition
+  // in useAdMob.showInterstitial, tagged { stage }. Diagnoses the "interstitials
+  // show blank screens" report — interstitials previously had ZERO telemetry, so
+  // production couldn't distinguish (a) ad-surface blank (no_fill / failed_to_*)
+  // from (b) a clean show_called→show_resolved→dismissed where the WebView never
+  // repaints, from (c) a native stall that never fires dismissed and hits
+  // safety_timeout. NOT a funnel step.
+  | 'interstitial_ad_lifecycle'
   // Preference
   | 'language_changed'
   // Onboarding funnel
@@ -1110,6 +1118,34 @@ export const trackRewardedLifecycle = (
   surface: string,
 ): void => {
   trackGrowthEvent('rewarded_ad_lifecycle', { stage, surface });
+};
+
+/** Stages of the native interstitial-ad lifecycle (useAdMob.showInterstitial). */
+export type InterstitialLifecycleStage =
+  | 'eligible'        // passed the frequency/cap gate — an ad will be attempted
+  | 'prepare_start'   // warm slot empty → cold-loading at show time
+  | 'prepare_resolved'
+  | 'no_fill'         // still not ready after (cold) prepare → skip show, slot preserved
+  | 'show_called'     // AdMob.showInterstitial() invoked (native Activity about to front)
+  | 'show_resolved'   // showInterstitial() promise resolved (the show call returned)
+  | 'dismissed'       // Dismissed event — user closed the ad, Activity torn down
+  | 'failed_to_show'
+  | 'failed_to_load'
+  | 'safety_timeout'  // no terminal event fired within the safety window
+  | 'error';          // showInterstitial() threw
+
+/**
+ * Breadcrumb one stage of the native interstitial-ad lifecycle. Fires on every
+ * transition so production traffic can pinpoint the "interstitials show blank
+ * screens" report: e.g. reaching `show_called` then `dismissed` cleanly (so a
+ * blank is the WebView failing to repaint after teardown), vs `no_fill` /
+ * `failed_to_show` (the ad surface itself never filled), vs `safety_timeout`
+ * (the native ad stalled and fired nothing). Mirrors trackRewardedLifecycle.
+ */
+export const trackInterstitialLifecycle = (
+  stage: InterstitialLifecycleStage,
+): void => {
+  trackGrowthEvent('interstitial_ad_lifecycle', { stage });
 };
 
 /**

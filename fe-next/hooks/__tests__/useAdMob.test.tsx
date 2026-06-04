@@ -10,6 +10,14 @@ vi.mock('@capacitor/core', () => ({
   },
 }));
 
+// Lifecycle telemetry is the diagnostic surface for the "interstitials show
+// blank screens" report — assert the breadcrumbs fire at each stage. Mock the
+// module so we observe the calls without driving the real analytics pipeline.
+vi.mock('@/utils/growthTracking', () => ({
+  trackRewardedLifecycle: vi.fn(),
+  trackInterstitialLifecycle: vi.fn(),
+}));
+
 type Listener = (payload?: unknown) => void;
 const { listeners, fireEvent } = vi.hoisted(() => {
   const ls: Record<string, Listener[]> = {};
@@ -72,6 +80,7 @@ vi.mock('@capacitor-community/admob', () => ({
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPosition } from '@capacitor-community/admob';
 import { AdMobProvider } from '@/contexts/AdMobContext';
+import { trackInterstitialLifecycle } from '@/utils/growthTracking';
 import { useAdMob } from '../useAdMob';
 
 function makeWrapper(isNative: boolean, platform: string = 'android') {
@@ -709,5 +718,78 @@ describe('useAdMob', () => {
     });
     expect(warnSpy).toHaveBeenCalled();
     warnSpy.mockRestore();
+  });
+
+  // ── Interstitial lifecycle telemetry ──────────────────────────────────
+  // The "interstitials show blank screens" report was undiagnosable because
+  // the interstitial path emitted NO telemetry (rewarded has rich breadcrumbs).
+  // These breadcrumbs discriminate the failure: a clean show_called →
+  // show_resolved → dismissed with a blank still on screen = the WebView didn't
+  // repaint; no_fill / failed_* = the ad surface never filled; safety_timeout =
+  // the native ad stalled with no terminal event.
+  describe('interstitial lifecycle telemetry', () => {
+    const stages = () =>
+      vi.mocked(trackInterstitialLifecycle).mock.calls.map((c) => c[0]);
+
+    it('emits eligible → show_called → show_resolved → dismissed for a served ad', async () => {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      // ends 1-5: warmup ends at 3, ad warmed during play (no eligible show yet).
+      await act(async () => {
+        await drainInterstitial(() => result.current.showInterstitial(), 5);
+      });
+      vi.mocked(trackInterstitialLifecycle).mockClear();
+      await act(async () => {
+        const p = result.current.showInterstitial(); // end 6 — eligible
+        await flush();
+        // Pre-dismiss: the show was attempted on a warm ad.
+        expect(stages()).toContain('eligible');
+        expect(stages()).toContain('show_called');
+        expect(stages()).toContain('show_resolved');
+        expect(stages()).not.toContain('dismissed');
+        fireEvent('interstitialAdDismissed');
+        await p;
+      });
+      // Terminal event recorded — a clean teardown breadcrumb.
+      expect(stages()).toContain('dismissed');
+    });
+
+    it('emits no_fill (and never show_called) when the ad does not fill', async () => {
+      vi.mocked(AdMob.prepareInterstitial).mockRejectedValue(new Error('no fill'));
+      try {
+        const wrapper = makeWrapper(true);
+        const { result } = renderHook(() => useAdMob(), { wrapper });
+        await act(async () => {
+          await drainInterstitial(() => result.current.showInterstitial(), 5);
+        });
+        vi.mocked(trackInterstitialLifecycle).mockClear();
+        await act(async () => {
+          const p = result.current.showInterstitial(); // end 6 — eligible, no fill
+          await flush();
+          await p;
+        });
+        expect(stages()).toContain('eligible');
+        expect(stages()).toContain('no_fill');
+        expect(stages()).not.toContain('show_called');
+      } finally {
+        vi.mocked(AdMob.prepareInterstitial).mockResolvedValue(undefined);
+      }
+    });
+
+    it('emits failed_to_show when the SDK fires FailedToShow', async () => {
+      const wrapper = makeWrapper(true);
+      const { result } = renderHook(() => useAdMob(), { wrapper });
+      await act(async () => {
+        await drainInterstitial(() => result.current.showInterstitial(), 5);
+      });
+      vi.mocked(trackInterstitialLifecycle).mockClear();
+      await act(async () => {
+        const p = result.current.showInterstitial(); // end 6 — eligible
+        await flush();
+        fireEvent('interstitialAdFailedToShow');
+        await p;
+      });
+      expect(stages()).toContain('failed_to_show');
+    });
   });
 });

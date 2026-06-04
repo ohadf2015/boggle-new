@@ -20,6 +20,8 @@ export default function AnchoredNativeBanner() {
     const isAndroid = Capacitor.getPlatform() === 'android';
     const resetVar = () => {
       document.documentElement.style.setProperty('--admob-banner-height', '0px');
+      // Banner no longer occupies the bottom band → content stops reserving it.
+      document.documentElement.classList.remove('has-admob-banner');
       try { localStorage.setItem('lc_admob_h', '0'); } catch {}
     };
 
@@ -31,6 +33,10 @@ export default function AnchoredNativeBanner() {
       // pages with the nav use `has-global-bottom-nav` for their own clearance.
       const total = h > 0 ? h + (isAndroid ? (safeArea.bottom || 0) : 0) : 0;
       document.documentElement.style.setProperty('--admob-banner-height', `${total}px`);
+      // Signal banner presence independent of the bottom nav, so content reserves
+      // the band even when the nav is hidden (the clearance rule keys off
+      // `has-admob-banner` too — banner must never cover bottom CTAs).
+      document.documentElement.classList.toggle('has-admob-banner', total > 0);
       // Cache for next session's CLS-priming script in <head>.
       try { localStorage.setItem('lc_admob_h', String(total)); } catch {}
     })
@@ -79,37 +85,34 @@ export default function AnchoredNativeBanner() {
       return () => { cancelled = true; };
     }
 
-    const computeMargin = (): number => {
+    const computeMargin = (allowCssFallback: boolean): number => {
       // Read --bottom-nav-height published by GlobalBottomNav (single source of truth).
       // The var holds the nav's real offsetHeight (h-16 + safe-area paddingBottom), so:
       //   Android: plugin adds safe-area on top → margin = max(navHeight, safeBottom).
       //   iOS: plugin re-adds safeAreaLayoutGuide → subtract to avoid double-count.
-      // Inline value wins; otherwise fall back to the CSS-declared default
-      // (`calc(64px + env(safe-area-inset-bottom))`) via computed style. Without
-      // this fallback, the banner reads navHeight=0 on first commit — because
-      // GlobalBottomNav's measuring useEffect (sibling subtree) runs AFTER ours
-      // — and would briefly paint OVER the bottom tabs until the MutationObserver
-      // catches up. Inline "0px" (nav explicitly hidden) still wins.
+      // Inline value always wins. The CSS-declared default
+      // (`calc(64px + env(safe-area-inset-bottom))`) is trusted ONLY on the first
+      // synchronous frame (allowCssFallback) — it's purely an over-paint guard
+      // for the commit before GlobalBottomNav's sibling effect publishes the var.
+      // Once settled (rAF + observer), an absent inline value means there is NO
+      // bottom nav at all, so we treat navHeight as 0 and let the banner stick to
+      // the bottom — otherwise it would float 64px up forever on nav-less surfaces.
       const root = document.documentElement;
       const inline = root.style.getPropertyValue('--bottom-nav-height').trim();
-      const raw = inline || getComputedStyle(root).getPropertyValue('--bottom-nav-height').trim();
+      const raw =
+        inline ||
+        (allowCssFallback
+          ? getComputedStyle(root).getPropertyValue('--bottom-nav-height').trim()
+          : '');
       const navHeight = Math.round(parseFloat(raw) || 0);
       return isAndroid ? Math.max(navHeight, safeBottom) : Math.max(0, navHeight - safeBottom);
     };
 
     const applyBanner = (margin: number) => {
       if (cancelled) return;
-      // Keep the banner BEHIND the open mobile side menu. A native banner always
-      // composites above the WebView, so the drawer can't cover it with z-index —
-      // HeaderMobileMenu flags <html>.mobile-drawer-open while open and the
-      // MutationObserver below re-runs us. Withdraw the anchor intent while open;
-      // reset lastMargin so it's force-re-requested when the drawer closes.
-      if (document.documentElement.classList.contains('mobile-drawer-open')) {
-        void bannerController.clearRequest(BANNER_OWNER.anchor.key);
-        document.documentElement.style.setProperty('--admob-banner-height', '0px');
-        lastMargin = -1;
-        return;
-      }
+      // Drawer-suppress (hide behind the open side menu) is owned centrally by
+      // bannerController.setSuppressed via BannerCoordinatorMount — it covers
+      // both banner owners (anchor + slot), so it's not handled here anymore.
       if (margin === lastMargin) return;
       lastMargin = margin;
       // Declare the anchor's intent; the coordinator serializes against the
@@ -124,20 +127,22 @@ export default function AnchoredNativeBanner() {
       });
     };
 
-    // Initial sync call preserves test contract (margin reflects nav present at mount).
-    applyBanner(computeMargin());
+    // Initial sync call: trust the CSS-default fallback (over-paint guard before
+    // GlobalBottomNav's sibling effect publishes --bottom-nav-height).
+    applyBanner(computeMargin(true));
 
     // Re-measure after paint — nav DOM may not be laid out on first effect tick
-    // (sibling render/effect race between essential-providers and layout).
+    // (sibling render/effect race between essential-providers and layout). By now
+    // a real nav has published its var; an absent var means no nav → inline-or-zero.
     const rafId = requestAnimationFrame(() => {
-      if (!cancelled) applyBanner(computeMargin());
+      if (!cancelled) applyBanner(computeMargin(false));
     });
 
     // Single observer on <html>: GlobalBottomNav writes --bottom-nav-height to
     // the inline style attribute, and NavigationContext toggles `has-global-bottom-nav`
     // on the class attribute. Both paths covered here — re-applies banner margin
     // on orientation, font load, safe-area shift, and game-enter/exit transitions.
-    const htmlObserver = new MutationObserver(() => applyBanner(computeMargin()));
+    const htmlObserver = new MutationObserver(() => applyBanner(computeMargin(false)));
     htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style'] });
 
     return () => {

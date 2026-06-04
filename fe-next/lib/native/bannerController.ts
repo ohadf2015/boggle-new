@@ -67,6 +67,12 @@ export class BannerController {
   private requests: Record<string, BannerRequest> = {};
   private ops: BannerOps | null = null;
   private applied: AppliedState = { ...NO_BANNER };
+  // Global hide override, independent of owner intent. The native banner is a
+  // SurfaceView composited ABOVE the WebView, so an open side menu / drawer
+  // can't cover it with z-index — we hide it outright while suppressed and
+  // re-show the active request on release. Owns both banner owners (anchor +
+  // slot) uniformly, so it doesn't matter which one is currently winning.
+  private suppressed = false;
   // Bumped by every "force" (reassert / retry / re-attach). reconcile coalesces
   // only when the applied state was produced at the CURRENT generation — so a
   // force that lands while a show() is mid-await can't be swallowed by that
@@ -108,6 +114,21 @@ export class BannerController {
 
   clearRequest(key: string): Promise<void> {
     return this.setRequest(key, null);
+  }
+
+  /**
+   * Globally hide (true) or restore (false) the banner regardless of owner
+   * intent — e.g. an open side menu / mobile drawer that the native overlay
+   * would otherwise composite on top of. A release force-reconciles so the
+   * active request re-shows without the owner having to re-declare it.
+   */
+  setSuppressed(suppressed: boolean): Promise<void> {
+    if (this.suppressed === suppressed) return this.chain;
+    this.suppressed = suppressed;
+    // Release must re-show even when the active request is unchanged (the hide
+    // left applied=NO_BANNER, but a coalesce on identical margin could still
+    // bite at the same generation) — force it.
+    return suppressed ? this.schedule() : this.forceReconcile();
   }
 
   /** A banner loaded successfully — healthy, drop any retry budget. */
@@ -166,7 +187,8 @@ export class BannerController {
   private async reconcile(): Promise<void> {
     if (!this.ops) return;
     const gen = this.generation;
-    const active = selectActiveBannerRequest(this.requests);
+    // Suppressed → behave as if no owner wants the banner (hide if shown).
+    const active = this.suppressed ? null : selectActiveBannerRequest(this.requests);
 
     if (!active) {
       if (this.applied.visible) {
