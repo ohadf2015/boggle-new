@@ -1,3 +1,5 @@
+import type { PuzzleTheme } from './theme';
+
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 /** A real attested compound pair shown after the solve ("why it works"). */
@@ -23,6 +25,12 @@ export interface ConnectionPuzzle {
   examples?: PuzzleExample[];
   /** Provenance — where this puzzle came from. */
   source?: PuzzleSource;
+  /**
+   * Optional explicit coarse theme. When absent, theme is inferred from the
+   * words (see lib/connections/theme.ts). Used only to disperse same-feel
+   * puzzles in the level order and daily set — never shown to the player.
+   */
+  theme?: PuzzleTheme;
 }
 
 export type PuzzleLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';

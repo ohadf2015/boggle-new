@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { DAILY_PUZZLE_COUNT, dailyPuzzleSet, maxDailyScore } from '../daily';
+import { inferTheme } from '../theme';
+
+/** A spread of UTC dates to exercise selection variety deterministically. */
+const SAMPLE_DATES = Array.from({ length: 30 }, (_, i) => {
+  const day = String(i + 1).padStart(2, '0');
+  return `2026-06-${day}`;
+});
 
 describe('connections daily challenge — deterministic selection', () => {
   it('returns DAILY_PUZZLE_COUNT puzzles', () => {
@@ -32,6 +39,41 @@ describe('connections daily challenge — deterministic selection', () => {
   it('draws from the requested locale pool', () => {
     expect(dailyPuzzleSet('2026-05-30', 'he').every((p) => p.id.startsWith('he-'))).toBe(true);
     expect(dailyPuzzleSet('2026-05-30', 'en').every((p) => p.id.startsWith('en-'))).toBe(true);
+  });
+
+  // Players complained two of the five daily puzzles can "feel near-identical."
+  // The set must spread variety: never two puzzles sharing a bridge, and no two
+  // ADJACENT puzzles sharing a coarse non-misc theme. Deterministic per date.
+  for (const locale of ['en', 'he'] as const) {
+    it(`${locale}: a daily set never repeats a bridge`, () => {
+      for (const date of SAMPLE_DATES) {
+        const set = dailyPuzzleSet(date, locale);
+        const bridges = set.map((p) => p.bridge);
+        expect(new Set(bridges).size, `dup bridge on ${date}`).toBe(bridges.length);
+      }
+    });
+
+    it(`${locale}: a daily set never places two same non-misc themes adjacently`, () => {
+      for (const date of SAMPLE_DATES) {
+        const set = dailyPuzzleSet(date, locale);
+        for (let i = 1; i < set.length; i++) {
+          const a = inferTheme(set[i - 1]);
+          const b = inferTheme(set[i]);
+          if (a === 'misc' || b === 'misc') continue;
+          expect(a === b, `adjacent theme ${a} on ${date} @${i}`).toBe(false);
+        }
+      }
+    });
+  }
+
+  it('en: a daily set draws genuinely varied themes (>=3 distinct buckets incl misc)', () => {
+    // en pool is theme-rich; the picker should surface a varied mix most days.
+    let variedDays = 0;
+    for (const date of SAMPLE_DATES) {
+      const themes = new Set(dailyPuzzleSet(date, 'en').map((p) => inferTheme(p)));
+      if (themes.size >= 3) variedDays++;
+    }
+    expect(variedDays).toBeGreaterThan(SAMPLE_DATES.length * 0.8);
   });
 
   it('maxDailyScore exceeds raw base points (accounts for streak bonus) and is positive', () => {

@@ -1,4 +1,5 @@
 import type { ConnectionPuzzle, PuzzleLocale } from '../types';
+import { inferTheme } from '../theme';
 import { EN_PUZZLES } from './generated/en.generated';
 import { HE_PUZZLES } from './generated/he.generated';
 import { ES_PUZZLES } from './generated/es.generated';
@@ -21,67 +22,66 @@ const PUZZLES_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {
 };
 
 /**
- * Bucket puzzles by bridge, always pull from the largest non-empty bucket
- * whose bridge differs from the previous pick. Within bridges, prefer items
- * whose word1 AND word2 also differ from the previous puzzle — players
- * complained about "many similar riddles in a row" even when bridges varied
- * (e.g. כוס+חלב followed by כוס+קפה: different bridges, identical word1).
+ * Deterministic greedy that spreads consecutive puzzles apart on four axes, in
+ * priority order: exact bridge (hard), coarse semantic theme (soft), and the
+ * word1 / word2 stems (soft). Players complained about "many similar riddles in
+ * a row" even when the bridge varied — sometimes the surrounding words matched
+ * (כוס+חלב then כוס+קפה: different bridges, identical word1), and sometimes the
+ * puzzles merely shared a *feel* (two food-ish, two nature-ish back-to-back).
+ * The theme axis (see ../theme) is what catches the latter.
  *
- * Pick algorithm for the next item:
- *  1. Find candidate buckets where bridge !== lastBridge.
- *  2. From the largest candidates, pick an item whose word1 / word2 also
- *     differ from the previous puzzle. Same-stem items are deferred via
- *     bucket reordering.
- *  3. Fall back to forced bridge repeat only when one bridge dominates the
- *     remaining pool.
+ * For each slot we score every remaining item by a penalty against the previous
+ * pick and take the lowest. The bridge penalty dominates, so the same bridge is
+ * never placed adjacently unless every remaining item shares it (truly forced).
+ * Theme and stem penalties are soft nudges. A tiny "drain the biggest remaining
+ * bridge bucket first" term breaks ties, so a dominant bridge can't pile up at
+ * the end and force a run of repeats. Pure + deterministic (id-sorted base,
+ * integer/rational penalties) — required for reproducible level numbering.
  */
+const BRIDGE_PENALTY = 10000;
+const THEME_PENALTY = 100;
+const STEM_PENALTY = 30;
+
 function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
-  const buckets = new Map<string, ConnectionPuzzle[]>();
-  for (const p of items) {
-    const arr = buckets.get(p.bridge);
-    if (arr) arr.push(p);
-    else buckets.set(p.bridge, [p]);
-  }
-  for (const arr of buckets.values()) arr.sort((a, b) => a.id.localeCompare(b.id));
+  // Stable, deterministic base order; greedy reorders from here.
+  const remaining = [...items].sort((a, b) => a.id.localeCompare(b.id));
+  const themeOf = new Map(remaining.map((p) => [p.id, inferTheme(p)] as const));
 
   const out: ConnectionPuzzle[] = [];
   let lastBridge: string | null = null;
+  let lastTheme: string | null = null;
   let lastWord1: string | null = null;
   let lastWord2: string | null = null;
 
-  while (out.length < items.length) {
-    let pickKey: string | null = null;
-    let pickSize = -1;
-    for (const [key, arr] of buckets) {
-      if (arr.length === 0) continue;
-      if (key === lastBridge) continue;
-      if (arr.length > pickSize) {
-        pickSize = arr.length;
-        pickKey = key;
-      }
-    }
-    if (!pickKey) {
-      for (const [key, arr] of buckets) {
-        if (arr.length > 0) { pickKey = key; break; }
-      }
-    }
-    const arr = buckets.get(pickKey!)!;
+  while (remaining.length > 0) {
+    // Remaining count per bridge — used only as a tie-break toward draining the
+    // dominant bucket first (scaled tiny so it never overrides a real penalty).
+    const bridgeCount = new Map<string, number>();
+    for (const p of remaining) bridgeCount.set(p.bridge, (bridgeCount.get(p.bridge) ?? 0) + 1);
 
-    // Within the chosen bridge bucket, prefer the first item whose word1 +
-    // word2 don't match the previous pick. Falls through to arr[0] if no
-    // non-conflicting item exists in this bucket.
-    let idx = 0;
-    if (lastWord1 || lastWord2) {
-      for (let i = 0; i < arr.length; i++) {
-        if (arr[i].word1 !== lastWord1 && arr[i].word2 !== lastWord2) {
-          idx = i;
-          break;
-        }
+    let bestIdx = 0;
+    let bestScore = Infinity;
+    for (let i = 0; i < remaining.length; i++) {
+      const p = remaining[i];
+      let penalty = 0;
+      if (p.bridge === lastBridge) penalty += BRIDGE_PENALTY;
+      const th = themeOf.get(p.id)!;
+      if (th !== 'misc' && th === lastTheme) penalty += THEME_PENALTY;
+      if (p.word1 === lastWord1) penalty += STEM_PENALTY;
+      if (p.word2 === lastWord2) penalty += STEM_PENALTY;
+      // Prefer draining the largest remaining bridge bucket (tiny weight → pure
+      // tie-break). Among equal penalties the lowest index (id-sorted) wins.
+      penalty -= (bridgeCount.get(p.bridge) ?? 0) * 0.001;
+      if (penalty < bestScore) {
+        bestScore = penalty;
+        bestIdx = i;
       }
     }
-    const picked = arr.splice(idx, 1)[0];
+
+    const picked = remaining.splice(bestIdx, 1)[0];
     out.push(picked);
-    lastBridge = pickKey;
+    lastBridge = picked.bridge;
+    lastTheme = themeOf.get(picked.id)!;
     lastWord1 = picked.word1;
     lastWord2 = picked.word2;
   }
