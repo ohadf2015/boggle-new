@@ -8,7 +8,7 @@
  * of truth; this is presentation only.
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   computeSocialTier,
@@ -21,6 +21,7 @@ import {
   writeGuestBirthYear,
   readSafetyAck,
   writeSafetyAck,
+  GUEST_AGE_CHANGED_EVENT,
 } from '@/lib/families/guestAge';
 
 export interface UseSocialCapabilities {
@@ -44,6 +45,20 @@ export function useSocialCapabilities(): UseSocialCapabilities {
     readGuestBirthYear(),
   );
   const [safetyAcknowledged, setSafetyAcknowledged] = useState<boolean>(() => readSafetyAck());
+
+  // Re-read when ANOTHER instance declares the guest age (same-tab custom event)
+  // or another tab writes it (cross-tab `storage`). Without this, instances that
+  // didn't do the write — notably AdMobProvider's, which gates ads — stay frozen
+  // at their mount-time value and a mid-session under-13 declaration is ignored.
+  useEffect(() => {
+    const resync = () => setGuestBirthYearState(readGuestBirthYear());
+    window.addEventListener(GUEST_AGE_CHANGED_EVENT, resync);
+    window.addEventListener('storage', resync);
+    return () => {
+      window.removeEventListener(GUEST_AGE_CHANGED_EVENT, resync);
+      window.removeEventListener('storage', resync);
+    };
+  }, []);
 
   const currentYear = new Date().getFullYear();
   const birthYear = isAuthenticated ? profile?.birth_year ?? null : guestBirthYear;

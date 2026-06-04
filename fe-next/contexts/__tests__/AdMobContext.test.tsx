@@ -24,6 +24,13 @@ vi.mock('@capacitor-community/admob', () => ({
   },
 }));
 
+// Control the social tier the provider sees. Families Policy: a known child
+// (actual knowledge of under-13) must get NO ads.
+const social = vi.hoisted(() => ({ tier: 'unknown' as 'adult' | 'child' | 'unknown' }));
+vi.mock('@/hooks/useSocialCapabilities', () => ({
+  useSocialCapabilities: () => ({ tier: social.tier }),
+}));
+
 import { Capacitor } from '@capacitor/core';
 import { AdMob } from '@capacitor-community/admob';
 
@@ -36,6 +43,7 @@ function TestConsumer({ onMount }: { onMount: (ctx: ReturnType<typeof useAdMobCo
 describe('AdMobProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    social.tier = 'unknown';
   });
 
   it('does not initialize AdMob on web', async () => {
@@ -155,7 +163,8 @@ describe('AdMobProvider', () => {
     expect(AdMob.requestConsentInfo).not.toHaveBeenCalled();
   });
 
-  it('hasNoAds returns false (stub)', async () => {
+  it('hasNoAds serves ads to unknown-age users (no actual knowledge of a child)', async () => {
+    social.tier = 'unknown';
     let captured: ReturnType<typeof useAdMobContext> | null = null;
     await act(async () => {
       render(
@@ -165,6 +174,32 @@ describe('AdMobProvider', () => {
       );
     });
     expect(captured!.hasNoAds()).toBe(false);
+  });
+
+  it('hasNoAds serves ads to adults', async () => {
+    social.tier = 'adult';
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    expect(captured!.hasNoAds()).toBe(false);
+  });
+
+  it('hasNoAds suppresses ads for a known child (Families Policy / COPPA actual knowledge)', async () => {
+    social.tier = 'child';
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    expect(captured!.hasNoAds()).toBe(true);
   });
 
   it('shouldShowInterstitial returns false during warmup (first 3 game ends)', async () => {

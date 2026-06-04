@@ -4,6 +4,8 @@ import { createContext, useContext, useEffect, useRef, useMemo, type ReactNode }
 import { Capacitor } from '@capacitor/core';
 import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
 import { getAdmobConfig, type AdmobConfig, type AdPlatform } from '@/lib/admob-config';
+import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
+import { shouldSuppressAdsForTier } from '@/lib/families/adPolicy';
 
 interface AdMobContextValue {
   recordGameEnd: () => void;
@@ -47,6 +49,10 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     []
   );
   const platform = useMemo(() => Capacitor.getPlatform() as AdPlatform, []);
+  // Families Policy: once a user self-declares an under-13 age we have actual
+  // knowledge of a child → serve NO ads to them. Mirrors the same tier the
+  // social-feature gates use, so ad gating can't drift from social gating.
+  const { tier } = useSocialCapabilities();
   const totalGameEnds = useRef(0);
   const interstitialsShown = useRef(0);
   const initPromise = useRef<Promise<void> | null>(null);
@@ -98,7 +104,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   function hasNoAds(): boolean {
-    return false;
+    return shouldSuppressAdsForTier(tier);
   }
 
   function recordGameEnd() {
