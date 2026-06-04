@@ -26,16 +26,19 @@ async function getUserFromRequest(req: NextRequest) {
 }
 
 /**
- * Signal weights for churn risk scoring
+ * Signal weights for churn risk scoring. Derived from the raw engagement
+ * metrics the client actually reports (see hooks/useChurnSignals.ts).
  */
-const SIGNAL_WEIGHTS: Record<string, number> = {
-  declining_session_length: 20,
-  low_games_per_session: 15,
-  notification_dismissals: 15,
-  streak_freeze_used: 10,
-  no_social_interactions: 20,
-  score_plateau: 20,
-};
+const SIGNAL_WEIGHTS = {
+  short_session: 20, // avg session length below SHORT_SESSION_SECONDS
+  low_games_per_session: 15, // at most LOW_GAMES games this session
+  notification_dismissals: 15, // more than DISMISSAL_THRESHOLD dismissals
+  no_social_interactions: 20, // zero social interactions
+} as const;
+
+const SHORT_SESSION_SECONDS = 60;
+const LOW_GAMES = 1;
+const DISMISSAL_THRESHOLD = 3;
 
 type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
@@ -46,26 +49,31 @@ function getRiskLevel(score: number): RiskLevel {
   return 'low';
 }
 
+/** Payload reported by useChurnSignals.buildPayload(). */
 interface ChurnSignals {
-  decliningSessionLength?: boolean;
-  lowGamesPerSession?: boolean;
+  userId?: string;
+  avgSessionLengthSeconds?: number;
+  gamesPerSession?: number;
+  socialInteractions?: number;
   notificationDismissals?: number;
-  streakFreezeUsed?: boolean;
-  noSocialInteractionsDays?: number;
-  scorePlateau?: boolean;
+}
+
+/** Coerce an unknown numeric field to a finite number, defaulting to 0. */
+function num(value: unknown): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
 }
 
 /**
  * POST /api/growth/churn-signals
- * Report churn signal data and receive computed risk score
+ * Report session engagement metrics and receive a computed churn risk score.
  *
  * Body: {
- *   decliningSessionLength?: boolean,
- *   lowGamesPerSession?: boolean,
+ *   userId?: string,
+ *   avgSessionLengthSeconds?: number,
+ *   gamesPerSession?: number,
+ *   socialInteractions?: number,
  *   notificationDismissals?: number,
- *   streakFreezeUsed?: boolean,
- *   noSocialInteractionsDays?: number,
- *   scorePlateau?: boolean,
  * }
  */
 export async function POST(req: NextRequest) {
@@ -77,57 +85,47 @@ export async function POST(req: NextRequest) {
 
     const body: ChurnSignals = await req.json();
 
-    // Compute risk score
+    const avgSessionLengthSeconds = num(body.avgSessionLengthSeconds);
+    const gamesPerSession = num(body.gamesPerSession);
+    const socialInteractions = num(body.socialInteractions);
+    const notificationDismissals = num(body.notificationDismissals);
+
+    // Compute risk score from the reported engagement metrics.
     let riskScore = 0;
-
-    if (body.decliningSessionLength) {
-      riskScore += SIGNAL_WEIGHTS.declining_session_length;
+    if (avgSessionLengthSeconds < SHORT_SESSION_SECONDS) {
+      riskScore += SIGNAL_WEIGHTS.short_session;
     }
-
-    if (body.lowGamesPerSession) {
+    if (gamesPerSession <= LOW_GAMES) {
       riskScore += SIGNAL_WEIGHTS.low_games_per_session;
     }
-
-    if (body.notificationDismissals != null && body.notificationDismissals > 3) {
+    if (notificationDismissals > DISMISSAL_THRESHOLD) {
       riskScore += SIGNAL_WEIGHTS.notification_dismissals;
     }
-
-    if (body.streakFreezeUsed) {
-      riskScore += SIGNAL_WEIGHTS.streak_freeze_used;
-    }
-
-    if (body.noSocialInteractionsDays != null && body.noSocialInteractionsDays >= 7) {
+    if (socialInteractions === 0) {
       riskScore += SIGNAL_WEIGHTS.no_social_interactions;
     }
 
-    if (body.scorePlateau) {
-      riskScore += SIGNAL_WEIGHTS.score_plateau;
-    }
-
-    // Cap at 100
     riskScore = Math.min(riskScore, 100);
-
     const riskLevel = getRiskLevel(riskScore);
 
-    // Store the signal
+    // Upsert one row per (user, day). Columns/onConflict must match the
+    // churn_signals table (migration 20260322700000): user_id + signal_date,
+    // not player_id. A column mismatch previously failed every write with 500.
+    const signalDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
     const { error: insertErr } = await getSupabaseAdmin()
       .from('churn_signals')
       .upsert(
         {
-          player_id: user.id,
+          user_id: user.id,
+          signal_date: signalDate,
+          avg_session_length_seconds: Math.round(avgSessionLengthSeconds),
+          games_per_session: gamesPerSession,
+          social_interactions: Math.round(socialInteractions),
+          notification_dismissals: Math.round(notificationDismissals),
           risk_score: riskScore,
           risk_level: riskLevel,
-          signals: {
-            declining_session_length: body.decliningSessionLength ?? false,
-            low_games_per_session: body.lowGamesPerSession ?? false,
-            notification_dismissals: body.notificationDismissals ?? 0,
-            streak_freeze_used: body.streakFreezeUsed ?? false,
-            no_social_interactions_days: body.noSocialInteractionsDays ?? 0,
-            score_plateau: body.scorePlateau ?? false,
-          },
-          updated_at: new Date().toISOString(),
         },
-        { onConflict: 'player_id' }
+        { onConflict: 'user_id,signal_date' }
       );
 
     if (insertErr) {
@@ -139,12 +137,10 @@ export async function POST(req: NextRequest) {
       riskScore,
       riskLevel,
       breakdown: {
-        decliningSessionLength: body.decliningSessionLength ? SIGNAL_WEIGHTS.declining_session_length : 0,
-        lowGamesPerSession: body.lowGamesPerSession ? SIGNAL_WEIGHTS.low_games_per_session : 0,
-        notificationDismissals: (body.notificationDismissals ?? 0) > 3 ? SIGNAL_WEIGHTS.notification_dismissals : 0,
-        streakFreezeUsed: body.streakFreezeUsed ? SIGNAL_WEIGHTS.streak_freeze_used : 0,
-        noSocialInteractions: (body.noSocialInteractionsDays ?? 0) >= 7 ? SIGNAL_WEIGHTS.no_social_interactions : 0,
-        scorePlateau: body.scorePlateau ? SIGNAL_WEIGHTS.score_plateau : 0,
+        shortSession: avgSessionLengthSeconds < SHORT_SESSION_SECONDS ? SIGNAL_WEIGHTS.short_session : 0,
+        lowGamesPerSession: gamesPerSession <= LOW_GAMES ? SIGNAL_WEIGHTS.low_games_per_session : 0,
+        notificationDismissals: notificationDismissals > DISMISSAL_THRESHOLD ? SIGNAL_WEIGHTS.notification_dismissals : 0,
+        noSocialInteractions: socialInteractions === 0 ? SIGNAL_WEIGHTS.no_social_interactions : 0,
       },
     });
   } catch (error) {
