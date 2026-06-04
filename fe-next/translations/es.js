@@ -10578,7 +10578,20 @@ const es = {
         "h1": "Juegos de vocabulario gratis para tu aula — sin cuentas de estudiantes.",
         "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas, gratis para docentes.",
         "cta_primary": "Solicitar acceso como docente",
-        "cta_secondary": "Ver demo"
+        "cta_secondary": "Ver demo",
+        "cta_note": "Gratis para docentes • Aprobado en ~24 h"
+      },
+      "mock": {
+        "tab": "Juego de clase",
+        "live": "En vivo",
+        "join_label": "Código de acceso",
+        "players": "28 jugando",
+        "board_caption": "Toca las letras para formar palabras",
+        "leaderboard_title": "Clasificación en vivo",
+        "caption": "Tu aula en tiempo real: los estudiantes se unen con un código, compiten formando palabras y suben en una clasificación en vivo — sin registros, sin instalaciones.",
+        "s1": "Lucía",
+        "s2": "Mateo",
+        "s3": "Sofía"
       },
       "moat": {
         "title": "¿Por qué docentes multiidiomas eligen LexiClash?",

@@ -10594,7 +10594,20 @@ const sv = {
         "h1": "Gratis ordförrådsspel för ditt klassrum — utan elevkonton.",
         "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk, gratis för lärare.",
         "cta_primary": "Få lärargång",
-        "cta_secondary": "Visa demo"
+        "cta_secondary": "Visa demo",
+        "cta_note": "Gratis för lärare • Godkänd inom ~24 h"
+      },
+      "mock": {
+        "tab": "Klassrumsspel",
+        "live": "Live",
+        "join_label": "Anslutningskod",
+        "players": "28 spelar",
+        "board_caption": "Tryck på bokstäver för att stava ord",
+        "leaderboard_title": "Live-topplista",
+        "caption": "Ditt klassrum i realtid: elever ansluter med en kod, tävlar om att stava ord och klättrar på en live-topplista — inga inloggningar, inga installationer.",
+        "s1": "Astrid",
+        "s2": "Erik",
+        "s3": "Saga"
       },
       "moat": {
         "title": "Varför lärare väljer LexiClash framför Kahoot, Quizlet och Wordwall",
