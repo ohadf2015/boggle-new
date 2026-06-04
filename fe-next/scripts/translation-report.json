@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 5545,
+    "totalKeysInCode": 5574,
     "keyCountByLanguage": {
-      "en": 10305,
-      "he": 10403,
-      "sv": 10406,
-      "ja": 10398,
-      "es": 10430
+      "en": 10409,
+      "he": 10507,
+      "sv": 10510,
+      "ja": 10502,
+      "es": 10534
     },
     "missingFromEnglish": 100,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 50,
+      "templateLiterals": 51,
       "fallbackUsages": 0,
-      "variableKeys": 2349
+      "variableKeys": 2350
     }
   },
   "runtimeRisks": {
@@ -313,6 +313,13 @@
         "type": "template_literal"
       },
       {
+        "pattern": "rank.tier.${tier}",
+        "file": "components/seasons/RankTierChip.tsx",
+        "line": 39,
+        "context": "{t(`rank.tier.${tier}`)}",
+        "type": "template_literal"
+      },
+      {
         "pattern": "wordcraft.run.rarity.${card.rarity}",
         "file": "components/word-craft/run/PowerCardView.tsx",
         "line": 32,
@@ -343,7 +350,7 @@
       {
         "pattern": "dailyMissions.${mission.type}",
         "file": "hooks/useDailyMissions.ts",
-        "line": 225,
+        "line": 226,
         "context": "questName: t(`dailyMissions.${mission.type}`),",
         "type": "template_literal"
       },
@@ -19113,6 +19120,14 @@
         "file": "components/auth/shared/BenefitsList.tsx",
         "line": 42,
         "context": "{t(titleKey)}",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(affirmKey)",
+        "variable": "affirmKey",
+        "file": "components/cosy/QuietCelebrationLayer.tsx",
+        "line": 85,
+        "context": "<span className=\"font-neo-display text-lg\">{t(affirmKey)}</span>",
         "type": "variable_key"
       },
       {

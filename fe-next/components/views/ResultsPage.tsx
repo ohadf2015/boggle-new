@@ -863,6 +863,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     onPodiumReaction: sendReaction,
     coinReward,
     shareCardStats,
+    // Wheel-rush shows placements on the wheel (WheelRushResultsScene); skip the
+    // duplicate generic podium + consolation standings below it.
+    hideStandings: isWheelRush && hasWheelRushStats,
   };
 
   // Word Hunt results data (shared between tabs) — memoized to avoid O(n²) per render

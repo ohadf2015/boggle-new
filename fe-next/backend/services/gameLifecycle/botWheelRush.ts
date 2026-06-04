@@ -26,6 +26,7 @@ import {
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import timerManager from '../../utils/timerManager';
 import { setBotTimeout } from '../../modules/botLifecycle';
+import { ensureLanguageLoaded } from '../../dictionary';
 import { shouldBotScore } from './botGame';
 import { BOT_CONFIG } from '../../modules/botConfig';
 import { WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
@@ -198,15 +199,22 @@ function scheduleBot(
 /**
  * Kick off wheel-rush bot play for every bot in a game.
  */
-export function startBotsForWheelRush(
+export async function startBotsForWheelRush(
   io: Server,
   gameCode: string,
   bots: Bot[],
   state: WheelRushModeState,
   language: Language,
   timerSeconds: number,
-): void {
+): Promise<void> {
   if (!bots || bots.length === 0) return;
+
+  // Recovery paths (server restart/redeploy → resumeGameTimerIfMissing, reconnect,
+  // late-join) relaunch bots WITHOUT the gameStartHandler dictionary pre-load. On a
+  // cold singleton getCachedTrie returns null and we'd bail below — bots flatline at
+  // 0 and the leaderboard freezes for everyone. Warm the dict first, like the classic
+  // bot driver (botBehavior). No-op when already loaded.
+  await ensureLanguageLoaded(language);
 
   const trie = getCachedTrie(language);
   if (!trie) {

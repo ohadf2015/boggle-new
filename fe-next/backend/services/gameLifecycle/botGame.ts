@@ -213,7 +213,9 @@ export function startBotsForGame(
   // Wheel-rush has no grid; dispatch to its dedicated bot driver.
   if (game?.gameMode === 'wheel-rush' && game.wheelRushState) {
     markBotScoringStart(gameCode);
-    startBotsForWheelRush(io, gameCode, bots, game.wheelRushState, language, timerSeconds);
+    // Async (awaits dictionary warmup); fire-and-forget from this sync dispatcher.
+    void startBotsForWheelRush(io, gameCode, bots, game.wheelRushState, language, timerSeconds)
+      .catch(err => logger.error('BOT', `wheel-rush bot start failed for ${gameCode}: ${(err as Error).message}`));
     return;
   }
 

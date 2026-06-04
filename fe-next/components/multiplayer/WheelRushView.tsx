@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { WHEEL_RUSH_FOG_MS, WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { Language } from '@/types';
-import { languageDir } from '@/lib/languageConfig';
+import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
 import Avatar from '@/components/Avatar';
 import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import { WheelRushHeader } from './WheelRushHeader';
@@ -103,9 +103,6 @@ export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
 };
 
 export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, onQuit, t, remainingTime, totalTime, onFogProgressChange, isDesktopCanvas = false, gameLanguage }) => {
-  // Word surfaces follow the GAME language, not the UI locale. A Hebrew-UI
-  // player in an English game must still read words left-to-right.
-  const wordDir = languageDir(gameLanguage);
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playButtonClickSound, playLegendaryWordSound,
@@ -114,6 +111,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const prefersReduced = useReducedMotion();
 
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
+  // Word-row direction follows the LETTERS on screen, not the gameLanguage prop
+  // (which can arrive null at in-game render). Hebrew letters → rtl regardless;
+  // an English game on a Hebrew UI keeps Latin letters L→R. See wheelWordDir.
+  const wordDir = useMemo(() => wheelWordDir(puzzle?.allLetters, gameLanguage), [puzzle, gameLanguage]);
   const [outerLetters, setOuterLetters] = useState<string[]>([]);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [builtLetters, setBuiltLetters] = useState<BuiltLetter[]>([]);

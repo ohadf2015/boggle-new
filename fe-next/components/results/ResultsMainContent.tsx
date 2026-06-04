@@ -81,6 +81,10 @@ export interface ResultsMainContentProps {
   hideInlineCta?: boolean;
   /** Hide the "show details" toggle (e.g. mobile where details are already inline below) */
   hideDetailsToggle?: boolean;
+  /** Suppress the generic Top-3 Podium + Consolation rows. Set for wheel-rush,
+   *  where WheelRushResultsScene already shows every placement on the wheel, so
+   *  the standings here would just duplicate names/scores/avatars/ranks. */
+  hideStandings?: boolean;
   allPlayerWords?: Record<string, WordObject[]>;
   gameDuration?: number;
   /** Callback for podium emoji reactions */
@@ -136,6 +140,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   isAuthenticated,
   isCurrentUserWinner,
   hideDetailsToggle,
+  hideStandings,
   shareCardStats,
   onStartGame: _onStartGame,
 }) {
@@ -298,7 +303,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       )}
 
       {/* 3. TOP 3 PODIUM */}
-      {isMultiplayer && podiumPlayers.length >= 2 && (
+      {!hideStandings && isMultiplayer && podiumPlayers.length >= 2 && (
         <ResultsPodium
           players={podiumPlayers}
           currentUsername={username}
@@ -340,7 +345,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           Keeps the recap focused on the player instead of listing every
           also-ran. startRank carries their TRUE rank since ConsolationRows
           derives rank from list index. */}
-      {currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username) && (
+      {!hideStandings && currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username) && (
         <ConsolationRows
           players={consolationPlayers.filter(p => p.username === username)}
           crowns={consolationCrowns}

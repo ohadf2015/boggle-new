@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => ({
   timerSetTimeout: vi.fn(),
   getCachedTrie: vi.fn(),
   getTrieNode: vi.fn(),
+  ensureLanguageLoaded: vi.fn(async () => {}),
 }));
 
 vi.mock('../../../modules/gameStateManager', () => ({
@@ -42,6 +43,9 @@ vi.mock('../../../utils/timerManager', () => ({
 vi.mock('../../../modules/boggleSolver', () => ({
   getCachedTrie: mocks.getCachedTrie,
   getTrieNode: mocks.getTrieNode,
+}));
+vi.mock('../../../dictionary', () => ({
+  ensureLanguageLoaded: mocks.ensureLanguageLoaded,
 }));
 
 import {
@@ -144,7 +148,7 @@ describe('startBotsForWheelRush', () => {
     vi.useRealTimers();
   });
 
-  it('schedules a bot word submission and broadcasts wheelWordLocked', () => {
+  it('schedules a bot word submission and broadcasts wheelWordLocked', async () => {
     const puzzle = {
       centerLetter: 'C',
       outerLetters: ['A', 'N', 'E', 'S', 'T', 'R'],
@@ -167,7 +171,7 @@ describe('startBotsForWheelRush', () => {
 
     const bot = makeBot();
 
-    startBotsForWheelRush(
+    await startBotsForWheelRush(
       io as unknown as import('socket.io').Server,
       'ABCD',
       [bot],
@@ -187,8 +191,8 @@ describe('startBotsForWheelRush', () => {
     expect(broadcastEvents).toContain('wheelWordLocked');
   });
 
-  it('no-op when bot list empty', () => {
-    startBotsForWheelRush(
+  it('no-op when bot list empty', async () => {
+    await startBotsForWheelRush(
       io as unknown as import('socket.io').Server,
       'ABCD',
       [],
