@@ -9,6 +9,8 @@ import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import type { Avatar as AvatarData } from '@/shared/types/game';
 import { fireFirstWinConfetti } from '@/utils/confettiUtils';
+import { fireEquippedVictoryEffect } from '@/utils/victoryEffects';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 
 // ============================================================
 // TYPES
@@ -127,22 +129,25 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
   }) => {
     const reducedMotion = useReducedMotion();
     const cancelConfettiRef = useRef<(() => void) | null>(null);
+    const equippedEffect = useEquippedCosmetic('victoryEffect');
     const accent = getAccent(rank);
     const isEliminated = isWordHunt && wordHuntStatus === 'eliminated';
 
-    // Cascading confetti burst for winner (rank 1) — short & restrained.
-    // Prior 2.5s cascade overlapped the podium reveal animations and felt
-    // overwhelming on repeated MP wins.
+    // Winner (rank 1) celebration. Honor the player's equipped victory effect;
+    // when nothing premium is equipped, fall back to the SAME short restrained
+    // burst as before (no silent downgrade for the unequipped majority). Prior
+    // 2.5s cascade overlapped the podium reveal and felt overwhelming.
     useEffect(() => {
       if (rank !== 1 || reducedMotion) return;
       const timer = setTimeout(() => {
-        cancelConfettiRef.current = fireFirstWinConfetti(1200);
+        cancelConfettiRef.current =
+          fireEquippedVictoryEffect(rank, equippedEffect, () => fireFirstWinConfetti(1200)) ?? null;
       }, 800);
       return () => {
         clearTimeout(timer);
         cancelConfettiRef.current?.();
       };
-    }, [rank, reducedMotion]);
+    }, [rank, reducedMotion, equippedEffect]);
     const isSurvivedWordHunt = isWordHunt && wordHuntStatus === 'survived';
 
     // For eliminated, override accent to red

@@ -286,6 +286,31 @@ export function formatUnlockHint(
 }
 
 /**
+ * Progress hint toward an unlock — turns a static "Reach Gold rank" into a
+ * felt "you're 23/30 days there". Only grind-based conditions (rank, streak)
+ * return progress; purchase/default/season return null (nothing to chase).
+ */
+export function formatUnlockProgress(
+  cosmetic: Cosmetic,
+  state: { rankTier: string; streakDays: number },
+): { key: string; params?: Record<string, string | number> } | null {
+  const cond = cosmetic.unlockCondition;
+  if (cond.type === 'streak') {
+    return {
+      key: 'cosmetics.progress.streak',
+      params: { current: Math.min(state.streakDays, cond.days), target: cond.days },
+    };
+  }
+  if (cond.type === 'rank') {
+    return {
+      key: 'cosmetics.progress.rank',
+      params: { current: state.rankTier, tier: cond.tier },
+    };
+  }
+  return null;
+}
+
+/**
  * Cosmetics newly unlocked between two player states.
  * Used for awarding/notifying after rank-ups, streak milestones, etc.
  */

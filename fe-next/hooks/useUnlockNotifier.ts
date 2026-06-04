@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { createElement, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { diffNewlyUnlocked, type PlayerCosmeticState } from '@/lib/cosmetics';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -43,7 +43,7 @@ function writeSnapshot(snap: Snapshot): void {
  * having to dig through the cosmetics tab.
  */
 export function useUnlockNotifier(input: NotifierInput): void {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const lastNotifiedRef = useRef<string>('');
   const { rankTier, streakDays, purchasedIds } = input;
 
@@ -80,11 +80,25 @@ export function useUnlockNotifier(input: NotifierInput): void {
     };
 
     const newly = diffNewlyUnlocked(baseState, nextState);
+    const href = `/${language}/profile?tab=collection`;
     for (const c of newly) {
-      toast.success(t('cosmetics.unlockedToast', { name: t(c.name) }));
+      // Clickable toast — deep-links to the collection so the unlock turns into
+      // an equip, instead of a dead-end announcement the player can't act on.
+      toast.success(
+        createElement(
+          'a',
+          {
+            href,
+            className: 'flex flex-col gap-0.5 font-neo-body text-neo-black no-underline',
+          },
+          createElement('span', { className: 'text-sm font-bold' }, t('cosmetics.unlockedToast', { name: t(c.name) })),
+          createElement('span', { className: 'text-xs underline opacity-80' }, t('cosmetics.equipCta')),
+        ),
+        { duration: 6000 },
+      );
     }
 
     writeSnapshot(current);
     lastNotifiedRef.current = currentKey;
-  }, [rankTier, streakDays, purchasedIds, t]);
+  }, [rankTier, streakDays, purchasedIds, t, language]);
 }

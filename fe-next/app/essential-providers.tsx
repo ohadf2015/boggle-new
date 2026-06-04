@@ -31,6 +31,7 @@ import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer'
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
 import { SignupPromptHost } from '@/components/auth/SignupPromptHost';
+import { UnlockNotifierMount } from '@/components/cosmetics/UnlockNotifierMount';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -226,6 +227,9 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 </HomeOnlySeasonGate>
                                                 {/* Global guest signup prompt — fires on first win or 5+ games regardless of mode. MP routes delegate to useMultiplayerSignupNudge. */}
                                                 <SignupPromptHost />
+                                                {/* Cosmetic unlock toast — global so rank-up/streak unlocks surface a
+                                                    tap-to-equip deep-link wherever the player is, not just on profile. */}
+                                                <UnlockNotifierMount />
                                                 {/* Native AdMob banner — single global mount, route-aware.
                                                     BannerCoordinatorMount hosts the single banner coordinator
                                                     (ops + load/fail/foreground signals) the two banner owners

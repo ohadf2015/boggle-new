@@ -5,6 +5,7 @@ import {
   isUnlocked,
   getEquippedCosmetics,
   formatUnlockHint,
+  formatUnlockProgress,
   diffNewlyUnlocked,
   type CosmeticCategory,
   type PlayerCosmeticState,
@@ -166,5 +167,41 @@ describe('getEquippedCosmetics', () => {
   it('returns undefined for unequipped categories', () => {
     const equipped = getEquippedCosmetics(makePlayerState());
     expect(equipped.tileSkin).toBeUndefined();
+  });
+});
+
+describe('formatUnlockProgress', () => {
+  const streakItem = COSMETICS.find((c) => c.unlockCondition.type === 'streak')!;
+  const rankItem = COSMETICS.find((c) => c.unlockCondition.type === 'rank')!;
+  const purchaseItem = COSMETICS.find((c) => c.unlockCondition.type === 'purchase')!;
+  const defaultItem = COSMETICS.find((c) => c.unlockCondition.type === 'default')!;
+
+  it('reports streak progress with current clamped to the target', () => {
+    const target = (streakItem.unlockCondition as { days: number }).days;
+    const progress = formatUnlockProgress(streakItem, { rankTier: 'Bronze', streakDays: 3 });
+    expect(progress).toEqual({
+      key: 'cosmetics.progress.streak',
+      params: { current: 3, target },
+    });
+  });
+
+  it('does not let streak current exceed the target', () => {
+    const target = (streakItem.unlockCondition as { days: number }).days;
+    const progress = formatUnlockProgress(streakItem, { rankTier: 'Bronze', streakDays: target + 99 });
+    expect(progress?.params).toEqual({ current: target, target });
+  });
+
+  it('reports rank progress as current → required tier', () => {
+    const tier = (rankItem.unlockCondition as { tier: string }).tier;
+    const progress = formatUnlockProgress(rankItem, { rankTier: 'Bronze', streakDays: 0 });
+    expect(progress).toEqual({
+      key: 'cosmetics.progress.rank',
+      params: { current: 'Bronze', tier },
+    });
+  });
+
+  it('returns null for purchase and default items (no grind progress to show)', () => {
+    expect(formatUnlockProgress(purchaseItem, { rankTier: 'Bronze', streakDays: 0 })).toBeNull();
+    expect(formatUnlockProgress(defaultItem, { rankTier: 'Bronze', streakDays: 0 })).toBeNull();
   });
 });

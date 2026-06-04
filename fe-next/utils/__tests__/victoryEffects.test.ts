@@ -37,4 +37,33 @@ describe('fireEquippedVictoryEffect', () => {
     fireEquippedVictoryEffect(3, 'unknown-effect');
     expect(confettiUtils.fireRankConfetti).toHaveBeenCalledWith(3, 'light');
   });
+
+  describe('fallback (no premium effect equipped → preserve call-site celebration)', () => {
+    it('runs the provided fallback instead of fireRankConfetti when effect is null', () => {
+      const fallback = vi.fn();
+      fireEquippedVictoryEffect(1, null, fallback);
+      expect(fallback).toHaveBeenCalledTimes(1);
+      // Must NOT downgrade to the generic light confetti when a richer fallback exists.
+      expect(confettiUtils.fireRankConfetti).not.toHaveBeenCalled();
+    });
+
+    it('ignores the fallback when a premium effect IS equipped', () => {
+      const fallback = vi.fn();
+      fireEquippedVictoryEffect(1, 'victory-fireworks', fallback);
+      expect(fallback).not.toHaveBeenCalled();
+      expect(confettiUtils.fireFireworks).toHaveBeenCalled();
+    });
+
+    it('returns the fallback cancel handle so callers can clean up', () => {
+      const cancel = vi.fn();
+      const fallback = vi.fn(() => cancel);
+      const handle = fireEquippedVictoryEffect(1, null, fallback);
+      expect(handle).toBe(cancel);
+    });
+
+    it('returns the fireworks cancel handle when fireworks equipped', () => {
+      const handle = fireEquippedVictoryEffect(1, 'victory-fireworks');
+      expect(typeof handle).toBe('function');
+    });
+  });
 });
