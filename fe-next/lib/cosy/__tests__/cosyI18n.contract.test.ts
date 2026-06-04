@@ -11,7 +11,13 @@ import { ja } from '../../../translations/ja.js';
 import { es } from '../../../translations/es.js';
 
 const LOCALES: Record<string, { cosy?: Record<string, unknown> }> = { en, he, sv, ja, es };
-const COSY_KEYS = ['wellDone', 'noRush'] as const;
+const COSY_KEYS = [
+  'wellDone',
+  'affirmLovely',
+  'affirmNicely',
+  'affirmGoodWord',
+  'noRush',
+] as const;
 
 describe('cosy i18n parity', () => {
   for (const [name, dict] of Object.entries(LOCALES)) {

@@ -22,6 +22,7 @@ import {
   shouldShowQuietFeedback,
   type QuietFeedbackDetail,
 } from '@/lib/cosy/quietFeedback';
+import { selectCalmAffirmationKey } from '@/lib/cosy/calmAffirmations';
 
 /** How long the acknowledgement stays on screen before it fades out. */
 const DWELL_MS = 1400;
@@ -29,7 +30,9 @@ const DWELL_MS = 1400;
 export const QuietCelebrationLayer: React.FC = () => {
   const { t } = useLanguage();
   const [beatId, setBeatId] = useState<number | null>(null);
+  const [affirmKey, setAffirmKey] = useState<string>('cosy.wellDone');
   const lastShownRef = useRef<number | null>(null);
+  const beatCountRef = useRef(0);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -38,6 +41,10 @@ export const QuietCelebrationLayer: React.FC = () => {
       // Collapse a burst loop (fireworks, layered celebration) into one beat.
       if (!shouldShowQuietFeedback(lastShownRef.current, now)) return;
       lastShownRef.current = now;
+      // Rotate the warm phrase so the calm cue varies session to session
+      // instead of repeating one flat line. Deterministic, no Math.random.
+      setAffirmKey(selectCalmAffirmationKey(beatCountRef.current));
+      beatCountRef.current += 1;
       setBeatId(now);
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
       hideTimerRef.current = setTimeout(() => setBeatId(null), DWELL_MS);
@@ -63,10 +70,19 @@ export const QuietCelebrationLayer: React.FC = () => {
         aria-live="polite"
         className="flex flex-col items-center gap-3 rounded-neo-lg border border-border bg-neo-cream px-7 py-6 text-neo-black shadow-md animate-cosy-quiet-in motion-reduce:animate-none"
       >
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-neo-lime-muted text-neo-black">
-          <Check className="h-8 w-8" strokeWidth={2.5} aria-hidden="true" />
+        <span className="relative flex h-14 w-14 items-center justify-center">
+          {/* One-shot warm bloom — a soft peach halo that fades in and out once
+              across the dwell. No loop (would be a vestibular trigger for the
+              effect-averse audience); hidden entirely under reduced-motion. */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-[-45%] rounded-full bg-neo-cozy-light/40 animate-cosy-bloom motion-reduce:hidden"
+          />
+          <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-neo-cozy-light text-neo-black">
+            <Check className="h-8 w-8" strokeWidth={2.5} aria-hidden="true" />
+          </span>
         </span>
-        <span className="font-neo-display text-lg">{t('cosy.wellDone')}</span>
+        <span className="font-neo-display text-lg">{t(affirmKey)}</span>
       </div>
     </div>
   );

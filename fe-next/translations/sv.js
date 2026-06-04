@@ -89,6 +89,9 @@ const sv = {
   },
   "cosy": {
     "wellDone": "Bra jobbat",
+    "affirmLovely": "Fint",
+    "affirmNicely": "Snyggt jobbat",
+    "affirmGoodWord": "Vilket fint ord",
     "noRush": "Lugnt · ingen brådska"
   },
   "shiritori": {
@@ -1350,6 +1353,12 @@ const sv = {
     "saveError": "Det gick inte att spara. Försök igen."
   },
   "avatar": {
+    "nudge": {
+      "title": "Gör avataren till din egen",
+      "body": "Ge den dina färger och din stil – det tar bara en stund.",
+      "cta": "Anpassa",
+      "dismiss": "Inte nu"
+    },
     "dailyPart": {
       "title": "Dagligt Avatardrop",
       "description": "Titta på en kort annons för att låsa upp en slumpmässig premium-avatardel. Ett gratisdrop var 24:e timme.",
@@ -9360,6 +9369,14 @@ const sv = {
       "wordCount": "{count} ord"
     },
     "modifier": {
+      "incoming": "Twist",
+      "goldRush": { "name": "Guldrush", "desc": "Guldbrickor överallt — och högre poäng." },
+      "chainFrenzy": { "name": "Kedjeyra", "desc": "Kedjorna ger dubbelt — länka ihop dem!" },
+      "doubleDown": { "name": "Allt eller inget", "desc": "Varje ord ger 2× — men ett drag mindre." },
+      "featherfall": { "name": "Fjäderfall", "desc": "Ta det lugnt — två extra drag att jobba med." },
+      "bombParty": { "name": "Bombfest", "desc": "Mycket fler bomber i leken." },
+      "luckyVowels": { "name": "Turdrag", "desc": "Färre ishinder och en gnutta extra guld." },
+      "megaCombo": { "name": "Megakombo", "desc": "Kombos slår hårdare för bonuspoäng." },
       "gemRush": { "title": "JUVELRUSH", "sub": "extra juveler på brädet" },
       "coinBonanza": { "title": "MYNTREGN", "sub": "extra mynt denna runda" },
       "bonusStorm": { "title": "BONUSSTORM", "sub": "dubbel-bonus-rutor släppta loss" }

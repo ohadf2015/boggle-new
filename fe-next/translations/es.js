@@ -2,6 +2,9 @@
 const es = {
   "cosy": {
     "wellDone": "Bien hecho",
+    "affirmLovely": "Qué bien",
+    "affirmNicely": "Muy bien hecho",
+    "affirmGoodWord": "Bonita palabra",
     "noRush": "Tranquilo · sin prisa"
   },
   "shiritori": {
@@ -1300,6 +1303,12 @@ const es = {
     "saveError": "No se pudo guardar. Inténtalo de nuevo."
   },
   "avatar": {
+    "nudge": {
+      "title": "Haz que este avatar sea tuyo",
+      "body": "Dale tus colores y tu estilo: solo toma un momento.",
+      "cta": "Personalizar",
+      "dismiss": "Ahora no"
+    },
     "dailyPart": {
       "title": "Caída Diaria de Avatar",
       "description": "Mira un anuncio corto para desbloquear una pieza premium aleatoria. Una entrega gratis cada 24 horas.",
@@ -9344,6 +9353,14 @@ const es = {
       "wordCount": "{count} palabras"
     },
     "modifier": {
+      "incoming": "Modificador",
+      "goldRush": { "name": "Fiebre del Oro", "desc": "Fichas doradas por todas partes — y más puntos." },
+      "chainFrenzy": { "name": "Frenesí de Cadenas", "desc": "Las cadenas pagan el doble — ¡encadénalas!" },
+      "doubleDown": { "name": "Doble o Nada", "desc": "Cada palabra vale 2× — pero un movimiento menos." },
+      "featherfall": { "name": "Caída de Pluma", "desc": "Con calma — dos movimientos extra." },
+      "bombParty": { "name": "Fiesta de Bombas", "desc": "Muchas más bombas en juego." },
+      "luckyVowels": { "name": "Golpe de Suerte", "desc": "Menos obstáculos de hielo y un poco más de oro." },
+      "megaCombo": { "name": "Mega Combo", "desc": "Los combos pegan más fuerte por puntos extra." },
       "gemRush": { "title": "AVALANCHA DE GEMAS", "sub": "más gemas en el tablero" },
       "coinBonanza": { "title": "LLUVIA DE MONEDAS", "sub": "más monedas esta ronda" },
       "bonusStorm": { "title": "TORMENTA BONUS", "sub": "fichas de doble bonus desatadas" }

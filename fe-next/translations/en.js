@@ -2,6 +2,9 @@
 const en = {
   "cosy": {
     "wellDone": "Well done",
+    "affirmLovely": "Lovely",
+    "affirmNicely": "Nicely done",
+    "affirmGoodWord": "That's a good one",
     "noRush": "Calm · no rush"
   },
   "shiritori": {
@@ -1241,6 +1244,12 @@ const en = {
     "saveError": "Failed to save. Please try again."
   },
   "avatar": {
+    "nudge": {
+      "title": "Make this avatar yours",
+      "body": "Give it your colors and style — it only takes a moment.",
+      "cta": "Customize",
+      "dismiss": "Not now"
+    },
     "dailyPart": {
       "title": "Daily Avatar Drop",
       "description": "Watch a quick ad to unlock a random premium avatar part. One free drop every 24 hours.",
@@ -9104,6 +9113,14 @@ const en = {
       "wordCount": "{count} words"
     },
     "modifier": {
+      "incoming": "Modifier",
+      "goldRush": { "name": "Gold Rush", "desc": "Golden tiles everywhere — and bigger scores." },
+      "chainFrenzy": { "name": "Chain Frenzy", "desc": "Cascades pay double — chain them up!" },
+      "doubleDown": { "name": "Double Down", "desc": "Every word scores 2× — but one less move." },
+      "featherfall": { "name": "Featherfall", "desc": "Relax — two extra moves to work with." },
+      "bombParty": { "name": "Bomb Party", "desc": "Way more bombs in the mix." },
+      "luckyVowels": { "name": "Lucky Break", "desc": "Fewer ice obstacles and a glint of extra gold." },
+      "megaCombo": { "name": "Mega Combo", "desc": "Combos hit harder for bonus points." },
       "gemRush": { "title": "GEM RUSH", "sub": "extra gems on the board" },
       "coinBonanza": { "title": "COIN BONANZA", "sub": "extra coins this round" },
       "bonusStorm": { "title": "BONUS STORM", "sub": "double-bonus tiles unleashed" }

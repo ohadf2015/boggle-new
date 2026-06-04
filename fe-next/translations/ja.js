@@ -2,6 +2,9 @@
 const ja = {
   "cosy": {
     "wellDone": "おみごと",
+    "affirmLovely": "いいね",
+    "affirmNicely": "よくできました",
+    "affirmGoodWord": "よい言葉ですね",
     "noRush": "のんびり・焦らずに"
   },
   "shiritori": {
@@ -1262,6 +1265,12 @@ const ja = {
     "saveError": "保存に失敗しました。もう一度お試しください。"
   },
   "avatar": {
+    "nudge": {
+      "title": "アバターを自分らしく",
+      "body": "好きな色やスタイルにしてみよう。すぐにできるよ。",
+      "cta": "カスタマイズ",
+      "dismiss": "あとで"
+    },
     "dailyPart": {
       "title": "デイリーアバタードロップ",
       "description": "短い広告を見てランダムなプレミアムアバターパーツを解放。24時間ごとに1回無料。",
@@ -9325,6 +9334,14 @@ const ja = {
       "wordCount": "{count}単語"
     },
     "modifier": {
+      "incoming": "特殊ルール",
+      "goldRush": { "name": "ゴールドラッシュ", "desc": "ゴールドタイルが大量に出現、スコアもアップ。" },
+      "chainFrenzy": { "name": "チェインフレンジー", "desc": "連鎖ボーナスが2倍、つなげよう！" },
+      "doubleDown": { "name": "ダブルダウン", "desc": "全ての単語が2倍スコア、ただし手数は1つ減少。" },
+      "featherfall": { "name": "フェザーフォール", "desc": "ゆったり——手数が2つ増える。" },
+      "bombParty": { "name": "ボムパーティー", "desc": "ボムが大幅に増加。" },
+      "luckyVowels": { "name": "ラッキーチャンス", "desc": "氷の障害が減り、ゴールドも少し増加。" },
+      "megaCombo": { "name": "メガコンボ", "desc": "コンボの威力が増してボーナス点。" },
       "gemRush": { "title": "ジェムラッシュ", "sub": "ボード上のジェム増加" },
       "coinBonanza": { "title": "コイン大量発生", "sub": "今ラウンドはコイン増" },
       "bonusStorm": { "title": "ボーナスストーム", "sub": "ダブルボーナスタイル解放" }

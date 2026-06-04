@@ -26,6 +26,7 @@ import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
 import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
+import BannerCoordinatorMount from '@/components/ads/BannerCoordinatorMount';
 import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
@@ -41,6 +42,7 @@ import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
 import SharedFxMount from '@/components/animations/SharedFxMount';
 import QuietCelebrationLayer from '@/components/cosy/QuietCelebrationLayer';
+import CosyAmbientBackdrop from '@/components/cosy/CosyAmbientBackdrop';
 import NativeSelectionGuard from '@/components/native/NativeSelectionGuard';
 import EasterEggListener from '@/components/EasterEggListener';
 
@@ -208,6 +210,8 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 <NativeSelectionGuard />
                                                 {/* Mounts the SharedFxApp Pixi singleton once so coin/level-up/firework FX actually render */}
                                                 <SharedFxMount />
+                                                {/* Cosy / Calm Mode: soothing ambient warm-light backdrop (gentle drift; still under reduced-motion) */}
+                                                <CosyAmbientBackdrop />
                                                 {/* Cosy / Calm Mode: dignified quiet acknowledgement that replaces confetti when celebrations are suppressed */}
                                                 <QuietCelebrationLayer />
                                                 {/* Global coin-earn VFX: sound + flying coins on every addCoins */}
@@ -222,7 +226,11 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 </HomeOnlySeasonGate>
                                                 {/* Global guest signup prompt — fires on first win or 5+ games regardless of mode. MP routes delegate to useMultiplayerSignupNudge. */}
                                                 <SignupPromptHost />
-                                                {/* Native AdMob banner — single global mount, route-aware. */}
+                                                {/* Native AdMob banner — single global mount, route-aware.
+                                                    BannerCoordinatorMount hosts the single banner coordinator
+                                                    (ops + load/fail/foreground signals) the two banner owners
+                                                    declare intent into. */}
+                                                <BannerCoordinatorMount />
                                                 <AnchoredNativeBanner />
                                             </NavigationProvider>
                                             </AdMobProvider>

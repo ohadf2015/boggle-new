@@ -33,7 +33,10 @@ export const CalmSessionBadge: React.FC<{ className?: string }> = ({ className }
         className,
       )}
     >
-      <Leaf className="h-3.5 w-3.5" aria-hidden />
+      <Leaf
+        className="h-3.5 w-3.5 animate-cosy-breathe motion-reduce:animate-none"
+        aria-hidden
+      />
       {t('cosy.noRush')}
     </span>
   );

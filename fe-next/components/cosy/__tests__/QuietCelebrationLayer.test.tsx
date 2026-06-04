@@ -47,6 +47,20 @@ describe('QuietCelebrationLayer', () => {
     expect(screen.getAllByRole('status')).toHaveLength(1);
   });
 
+  it('varies the affirmation across separated beats (cozy warmth, not one flat line)', () => {
+    render(<QuietCelebrationLayer />);
+    emit();
+    // First beat keeps the established calm cue.
+    expect(screen.getByRole('status')).toHaveTextContent('Well done');
+    // Clear the dwell + clear the throttle window, then celebrate again.
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    emit();
+    // Second beat rotates to the next warm phrase (mock echoes the raw key).
+    expect(screen.getByRole('status')).toHaveTextContent('cosy.affirmLovely');
+  });
+
   it('clears the acknowledgement after its dwell time (no lingering overlay)', () => {
     render(<QuietCelebrationLayer />);
     emit();
