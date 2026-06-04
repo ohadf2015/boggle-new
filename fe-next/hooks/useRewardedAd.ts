@@ -6,6 +6,8 @@ import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useH5GamesAds } from '@/hooks/useH5GamesAds';
+import { useGameDistributionAds } from '@/hooks/useGameDistributionAds';
+import { getGdGameId } from '@/lib/ads/gameDistributionAds';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
@@ -210,6 +212,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const crazyGames = useCrazyGames();
   const adMob = useAdMob();
   const h5Ads = useH5GamesAds();
+  const gdAds = useGameDistributionAds();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
@@ -226,11 +229,24 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     (window as unknown as { __h5AdsTest?: boolean }).__h5AdsTest === true ||
     (typeof location !== 'undefined' && /[?&]h5ads_test=1/.test(location.search))
   );
-  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
+  // Production web → GameDistribution rewarded (the AdSense-rejection fallback;
+  // see docs/2026-06-04-web-ad-provider-after-adsense-rejection.md). Unlike H5
+  // it fills on our OWN domain without AdSense approval, so this is the live web
+  // path once the env + game id are provisioned. Triple-gated like H5 — explicit
+  // `NEXT_PUBLIC_GD_ADS_ENABLED=true` + a configured game id, prod runtime OR
+  // `?gdads_test=1`, browser env — so it ships dormant and flips by env. Sits
+  // ABOVE the (0-fill) H5 path in priority.
+  const gdEnvEnabled = process.env.NEXT_PUBLIC_GD_ADS_ENABLED === 'true' && getGdGameId() !== '';
+  const hasGdTestFlag = typeof window !== 'undefined' && (
+    (window as unknown as { __gdAdsTest?: boolean }).__gdAdsTest === true ||
+    (typeof location !== 'undefined' && /[?&]gdads_test=1/.test(location.search))
+  );
+  const shouldUseGd = !shouldUseCrazyGames && !shouldUseAdMob && gdAds.isAvailable && gdEnvEnabled && (isProd || hasGdTestFlag);
+  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseGd && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
   // Simulation only in development — never award free gold in production
-  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5;
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseGd && !shouldUseH5;
   // Placeholder: no ad platform available — still grant coins, log for admin
-  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseH5
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseGd && !shouldUseH5
     && !shouldUseSimulation;
 
   // Always available — placeholder grants coins when no real ads exist
@@ -247,6 +263,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // Determine platform early for declined-event tagging
     const platformForDecline = shouldUseCrazyGames ? 'crazygames'
       : shouldUseAdMob ? 'admob'
+      : shouldUseGd ? 'gamedistribution'
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
@@ -298,6 +315,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // Determine platform for logging
     const platform = shouldUseCrazyGames ? 'crazygames'
       : shouldUseAdMob ? 'admob'
+      : shouldUseGd ? 'gamedistribution'
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
@@ -414,6 +432,20 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         (errMsg) => { handleAdError(errMsg || 'Ad dismissed without reward'); },
         { surface },
       );
+    } else if (shouldUseGd) {
+      // Priority 1.7: GameDistribution for production web — own-domain rewarded
+      // fill (no SSV; replay protection is the server-side daily cap in
+      // /api/coins). GD requires game audio muted during the video ad, so mute
+      // Howler around it and restore on both terminal paths.
+      setStatus('showing');
+      onAdStarted?.();
+      try { Howler.mute(true); } catch { /* Howler not initialized */ }
+      const unmuteGd = () => { try { Howler.mute(false); } catch { /* Howler not initialized */ } };
+      gdAds.showRewarded(
+        () => { unmuteGd(); awardCoinsAndNotify(); },
+        (reason) => { unmuteGd(); handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
     } else if (shouldUseH5) {
       // Priority 1.75: H5 Games Ads for production web (no SSV — relies on
       // server-side daily cap in /api/coins for replay protection).
@@ -439,7 +471,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseH5, shouldUseSimulation, crazyGames, adMob, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
