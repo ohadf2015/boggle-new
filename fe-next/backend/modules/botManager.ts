@@ -105,6 +105,40 @@ export function addBot(gameCode: string, difficulty: string = 'medium', existing
   return bot;
 }
 
+/**
+ * Re-register a bot AI instance for a game rehydrated from Redis after a server
+ * restart. The in-memory Bot was lost, but its identity survived on the
+ * `game.users` entry (username key, `playerId`, `avatar`, `botDifficulty`).
+ *
+ * Reconstruct it PRESERVING username / id / avatar so it maps back to the same
+ * player slot — scores (`game.playerScores`) and word-hunt life
+ * (`wordHuntState.playerLives`) are keyed by username, so a fresh random name
+ * would orphan the bot. Behaviour fields (personality, timing) are freshly
+ * randomised; they aren't persisted and don't need to match.
+ *
+ * No-op (returns null) if a bot with this username is already registered, so a
+ * normal live reconnect never double-spawns.
+ */
+export function restoreBotFromUser(
+  gameCode: string,
+  username: string,
+  user: { playerId?: string | null; avatar?: unknown; botDifficulty?: string },
+  language: string = 'en',
+): Bot | null {
+  const bots = initializeGameBots(gameCode);
+  for (const existing of bots.values()) {
+    if (existing.username === username) return null;
+  }
+
+  const bot = createBot(gameCode, user.botDifficulty || 'medium', {}, language);
+  bot.username = username;
+  if (user.playerId) bot.id = String(user.playerId);
+  if (user.avatar) bot.avatar = user.avatar as Bot['avatar'];
+  bots.set(bot.id, bot);
+  logger.info('BOT', `Restored bot "${username}" (${bot.difficulty}) to game ${gameCode} after rehydration`);
+  return bot;
+}
+
 export async function addBotWithAdaptiveDifficulty(
   gameCode: string,
   userId?: string,
@@ -251,6 +285,7 @@ export function clearBotManagerCaches(): void {
 module.exports = {
   addBot,
   addBotWithAdaptiveDifficulty,
+  restoreBotFromUser,
   removeBot,
   getGameBots,
   getBotByUsername,

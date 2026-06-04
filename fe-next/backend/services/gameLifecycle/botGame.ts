@@ -392,3 +392,25 @@ export function startBotsForGame(
     }, 100);
   }
 }
+
+/**
+ * Re-register the bot AI instances for a game rehydrated from Redis after a
+ * server restart. The Bot objects live only in `botManager` (in-memory) and are
+ * lost on restart, but each bot's identity survived on its `game.users` entry.
+ * Rebuild them (preserving username/id/avatar via botManager.restoreBotFromUser)
+ * so a subsequent startBotsForGame finds them instead of an empty registry and
+ * the bots resume playing. Returns the number restored. No-op for bots already
+ * registered (normal live reconnect).
+ */
+export function restoreBotsForGame(gameCode: string): number {
+  const game = getGame(gameCode);
+  if (!game) return 0;
+  let restored = 0;
+  for (const [username, user] of Object.entries(game.users || {})) {
+    const u = user as { isBot?: boolean; playerId?: string | null; avatar?: unknown; botDifficulty?: string };
+    if (u?.isBot && botManager.restoreBotFromUser(gameCode, username, u, game.language || 'en')) {
+      restored++;
+    }
+  }
+  return restored;
+}

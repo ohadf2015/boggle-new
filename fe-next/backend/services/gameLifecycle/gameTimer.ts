@@ -12,7 +12,7 @@ import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { clearGameTimer, setGameTimer, hasGameTimer } from '../../utils/timerManager';
 import { drainLife, areAllPlayersEliminated } from '../../modules/wordHuntManager';
 import { isInProgress } from '../../utils/gameStateMachine';
-import { startBotsForGame } from './botGame';
+import { startBotsForGame, restoreBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
 import logger from '../../utils/logger';
 
@@ -172,10 +172,22 @@ export function resumeGameTimerIfMissing(io: Server, gameCode: string): boolean 
   if (!isInProgress(game.gameState)) return false;
   if (hasGameTimer(gameCode)) return false;
 
+  // Re-register bot AI instances lost on restart. The Bot objects are in-memory
+  // only; their identity survived on game.users. Reconstruct them (preserving
+  // username/id/avatar) BEFORE startGameTimer → startBotsForGame, which reads
+  // botManager and would otherwise find an empty registry and skip every bot,
+  // leaving them frozen at 0. No-op for any bot already registered.
+  let restoredBots = 0;
+  try {
+    restoredBots = restoreBotsForGame(gameCode);
+  } catch (err) {
+    logger.error('TIMER', `bot restore failed for ${gameCode}: ${(err as Error).message}`);
+  }
+
   const duration = game.gameDuration || game.timerSeconds || 180;
   logger.info(
     'TIMER',
-    `Resuming timer for rehydrated in-progress game ${gameCode} (mode=${game.gameMode ?? 'classic'}) — server-restart recovery`,
+    `Resuming timer for rehydrated in-progress game ${gameCode} (mode=${game.gameMode ?? 'classic'}, ${restoredBots} bots restored) — server-restart recovery`,
   );
   startGameTimer(io, gameCode, duration);
   return true;
