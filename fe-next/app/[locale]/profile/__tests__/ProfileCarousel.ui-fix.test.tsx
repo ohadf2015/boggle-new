@@ -65,6 +65,12 @@ vi.mock('@/components/seasons/SeasonTrophyCase', () => ({
   SeasonTrophyCase: () => null,
   default: () => null
 }));
+// SeasonRankCard calls tRPC directly (leaderboard.getCurrentSeasonRank.useQuery)
+// with no provider in this UI test — mock it like the other external-data cards.
+vi.mock('@/components/seasons/SeasonRankCard', () => ({
+  SeasonRankCard: () => null,
+  default: () => null
+}));
 
 vi.mock('@/hooks/usePullToRefresh', () => ({
   usePullToRefresh: () => ({
