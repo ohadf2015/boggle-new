@@ -193,6 +193,150 @@ index c629139..e037e0f 100644
              });
      }
  }
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt
+index a9e37aa..025af2e 100644
+--- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt
+@@ -15,6 +15,8 @@ class FullscreenPluginCallback(private val loadPluginObject: LoadPluginEventName
+     }
+ 
+     override fun onAdFailedToShowFullScreenContent(adError: AdError) {
++        // No-op unless a rewarded ad paused the WebView (see RewardedWebViewGuard).
++        RewardedWebViewGuard.resume()
+         val adMobError = AdMobPluginError(adError)
+         notifyListenersFunction.accept(
+                 loadPluginObject.FailedToShow, adMobError
+@@ -22,6 +24,9 @@ class FullscreenPluginCallback(private val loadPluginObject: LoadPluginEventName
+     }
+ 
+     override fun onAdDismissedFullScreenContent() {
++        // Ad surface is fully gone — safe to resume the WebView. No-op if nothing
++        // was paused (e.g. an interstitial routed through this shared callback).
++        RewardedWebViewGuard.resume()
+         notifyListenersFunction.accept(loadPluginObject.Dismissed, JSObject())
+     }
+ }
+\ No newline at end of file
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/RewardedWebViewGuard.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/RewardedWebViewGuard.java
+new file mode 100644
+index 0000000..3ed2745
+--- /dev/null
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/RewardedWebViewGuard.java
+@@ -0,0 +1,90 @@
++package com.getcapacitor.community.admob.helpers;
++
++import android.app.Activity;
++import android.os.Handler;
++import android.os.Looper;
++import android.webkit.WebView;
++import com.getcapacitor.BridgeActivity;
++
++/**
++ * Pauses the Capacitor WebView while a fullscreen rewarded ad is on screen.
++ *
++ * Why: the native AdMob rewarded ad (its "Reward in X seconds" countdown)
++ * renders on the app's main/UI thread. If the WebView keeps doing work behind
++ * the fullscreen ad — JS timers (setInterval/setTimeout are NOT throttled by
++ * document visibility), layout, compositing — it can starve that thread and the
++ * native countdown freezes. `WebView.onPause()` + `pauseTimers()` stops all of
++ * it for the duration of the ad, then we resume the instant the ad is gone.
++ *
++ * FAIL-SAFE by construction (this is a blind fix shipped without on-device
++ * confirmation, so its worst case must be bounded, never catastrophic):
++ *   - Resume is driven by the ad's own Dismissed / FailedToShow callbacks.
++ *   - A hard backstop force-resumes after MAX_PAUSE_MS regardless, so a missed
++ *     callback can never leave the WebView (and thus the whole game) frozen
++ *     permanently — the worst case is a bounded ≤MAX_PAUSE_MS stall for a user
++ *     whose ad already hung (i.e. no worse than the status quo they hit).
++ *   - Idempotent: double-pause / double-resume are no-ops; resume() called for
++ *     an interstitial (which we never pause) is a no-op because nothing is stored.
++ *   - We deliberately do NOT resume on the Rewarded event: it fires at video-end,
++ *     before the end-card/close is dismissed, so resuming there would re-contend
++ *     the thread while the ad is still fullscreen.
++ */
++public final class RewardedWebViewGuard {
++
++    private RewardedWebViewGuard() {}
++
++    // Hard cap on how long the WebView may stay paused. Must exceed the longest
++    // realistic rewarded ad (video + end-card). 90s is comfortably above that.
++    private static final long MAX_PAUSE_MS = 90_000L;
++
++    private static final Handler MAIN = new Handler(Looper.getMainLooper());
++    private static final Runnable BACKSTOP = RewardedWebViewGuard::resume;
++
++    // The WebView we paused, or null when nothing is paused. Guards idempotency.
++    private static WebView paused;
++
++    /** Pause the Capacitor WebView for the duration of a fullscreen rewarded ad. */
++    public static void pause(Activity activity) {
++        if (paused != null) return; // already paused — keep the original backstop
++        final WebView wv = webViewOf(activity);
++        if (wv == null) return;
++        paused = wv;
++        try {
++            wv.onPause();
++            wv.pauseTimers();
++        } catch (Exception ignored) {
++            paused = null;
++            return;
++        }
++        MAIN.removeCallbacks(BACKSTOP);
++        MAIN.postDelayed(BACKSTOP, MAX_PAUSE_MS);
++    }
++
++    /** Resume a WebView paused by {@link #pause}. Safe no-op if nothing is paused. */
++    public static void resume() {
++        MAIN.removeCallbacks(BACKSTOP);
++        final WebView wv = paused;
++        paused = null;
++        if (wv == null) return;
++        final Runnable doResume = () -> {
++            try {
++                wv.resumeTimers();
++                wv.onResume();
++            } catch (Exception ignored) {}
++        };
++        if (Looper.myLooper() == Looper.getMainLooper()) {
++            doResume.run();
++        } else {
++            MAIN.post(doResume);
++        }
++    }
++
++    private static WebView webViewOf(Activity activity) {
++        if (activity instanceof BridgeActivity) {
++            try {
++                return ((BridgeActivity) activity).getBridge().getWebView();
++            } catch (Exception ignored) {}
++        }
++        return null;
++    }
++}
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java
+index f9ead0c..4f4d3f4 100644
+--- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java
+@@ -8,6 +8,7 @@ import com.getcapacitor.PluginCall;
+ import com.getcapacitor.PluginMethod;
+ import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
+ import com.getcapacitor.community.admob.helpers.RequestHelper;
++import com.getcapacitor.community.admob.helpers.RewardedWebViewGuard;
+ import com.getcapacitor.community.admob.models.AdMobPluginError;
+ import com.getcapacitor.community.admob.models.AdOptions;
+ import com.getcapacitor.community.admob.models.Executor;
+@@ -64,6 +65,11 @@ public class AdRewardExecutor extends Executor {
+             activitySupplier
+                 .get()
+                 .runOnUiThread(() -> {
++                    // Free the main/UI thread the native ad's countdown renders
++                    // on by pausing the WebView for the ad's duration. Resumed on
++                    // Dismissed/FailedToShow (FullscreenPluginCallback) or a hard
++                    // backstop. See RewardedWebViewGuard.
++                    RewardedWebViewGuard.pause(activitySupplier.get());
+                     mRewardedAd.show(
+                         activitySupplier.get(),
+                         RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
 diff --git a/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift b/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
 index 70081af..08efed3 100644
 --- a/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
