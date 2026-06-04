@@ -224,3 +224,47 @@ describe('requestResults — overdue game recovery', () => {
     expect(mockSafeEmit).not.toHaveBeenCalled();
   });
 });
+
+describe('requestResults — orphaned game recovery (missing start stamp)', () => {
+  // A Redis-rehydrated in-progress game can lose gameStartedAt: it is persisted
+  // as `gameStartedAt ?? ''` and restored as `'' ? parseInt : undefined`. With a
+  // falsy startedAt the clock-expiry guard `startedAt && ...` short-circuits, so
+  // the original recovery silently did NOTHING — the exact stuck "Calculating
+  // results" screen it was meant to cure. When such a game ALSO has no in-memory
+  // timer, the round is genuinely orphaned (nothing will ever end it) and the
+  // client only asks after its 15s end-watchdog fired → force-finalize.
+
+  it('force-finalizes an in-progress game with no start stamp AND no server timer', () => {
+    const socket = createSocket();
+    mockHasGameTimer.mockReturnValue(false); // timer dropped (e.g. server restart)
+    mockGetGame.mockReturnValue({
+      gameState: 'in-progress',
+      gameMode: 'word-hunt',
+      timerSeconds: 180,
+      gameStartedAt: undefined, // lost on Redis rehydrate
+    });
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestResults']();
+
+    expect(mockEndGame).toHaveBeenCalledWith(fakeIo, 'ABC');
+  });
+
+  it('does NOT end an in-progress game lacking a stamp but whose timer is still running', () => {
+    // No gameStartedAt but a live interval is ticking → the game is progressing
+    // and will end on its own; a client request must not force-end it early.
+    const socket = createSocket();
+    mockHasGameTimer.mockReturnValue(true);
+    mockGetGame.mockReturnValue({
+      gameState: 'in-progress',
+      gameMode: 'word-hunt',
+      timerSeconds: 180,
+      gameStartedAt: undefined,
+    });
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestResults']();
+
+    expect(mockEndGame).not.toHaveBeenCalled();
+  });
+});

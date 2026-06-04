@@ -602,8 +602,18 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (game.gameState !== 'in-progress') return;
     const durationSec = game.gameDuration || game.timerSeconds || 180;
     const startedAt = game.gameStartedAt;
-    if (startedAt && Date.now() - startedAt >= durationSec * 1000) {
-      logger.warn('SOCKET', `requestResults on overdue in-progress game ${gameCode} — forcing endGame`);
+    const clockExpired = !!startedAt && Date.now() - startedAt >= durationSec * 1000;
+    // A Redis-rehydrated game can lose gameStartedAt (persisted as `?? ''`,
+    // restored as `undefined`). With a falsy startedAt the clock-expiry check
+    // above can never recover it — yet if the game ALSO has no in-memory timer
+    // the round is genuinely orphaned (nothing will ever end it). The client
+    // only asks after its 15s end-watchdog fired, so force-finalize rather than
+    // leave it stuck on "Calculating results" forever. Requiring !hasGameTimer
+    // ensures a live game (timer ticking, merely missing a stamp) is never
+    // ended early.
+    const orphanedNoTimer = !startedAt && !hasGameTimer(gameCode);
+    if (clockExpired || orphanedNoTimer) {
+      logger.warn('SOCKET', `requestResults on ${clockExpired ? 'overdue' : 'orphaned (no start stamp + no timer)'} in-progress game ${gameCode} — forcing endGame`);
       endGame(io, gameCode);
     }
   });
