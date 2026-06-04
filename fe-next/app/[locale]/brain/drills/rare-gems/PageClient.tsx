@@ -119,7 +119,7 @@ export default function RareGemsPageClient() {
 
   return (
     <div dir={dir} className={cn(
-      'flex-1 flex flex-col',
+      'flex-1 flex flex-col min-h-0',
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
       {/* Header */}
@@ -156,7 +156,7 @@ export default function RareGemsPageClient() {
       <DrillResearchIntro drillType="rare-gems" />
 
       {/* Drill Content */}
-      <div className="flex-1">
+      <div className="flex-1 min-h-0">
         <FeatureErrorBoundary featureName="drill-rare-gems">
           <RareGems
             grid={grid}
