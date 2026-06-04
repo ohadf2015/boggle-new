@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw, Lightbulb } from 'lucide-react';
+import { Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
@@ -13,6 +13,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMemoryHuntGame } from './useMemoryHuntGame';
 import { MemoryHuntCompletePhase } from './MemoryHuntCompletePhase';
+import DrillBriefing from '@/components/brain/DrillBriefing';
 
 interface MemoryHuntProps {
   grid: LetterGrid;
@@ -109,50 +110,14 @@ export default function MemoryHunt({
 
       {/* Game Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
-        {/* Ready Phase */}
+        {/* Ready Phase — warm, instantly-legible briefing */}
         {game.phase === 'ready' && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <Brain className={cn(
-              'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
-              'text-neo-purple'
-            )} />
-            <h2 className={cn(
-              'text-2xl font-black',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.memory-hunt.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.memory-hunt.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-neo-navy-light'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.memory-hunt.wordsToRemember')}: {game.levelConfig.wordCount}</p>
-              <p>{t('brain.drills.memory-hunt.studyTime')}: {game.levelConfig.studyTime / 1000}s</p>
-            </div>
-            <AdaptiveMotion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => { playDrillStartSound(); game.startGame(); }}
-              className={cn(
-                'px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-                'font-bold text-lg uppercase',
-                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-green text-neo-black'
-              )}
-            >
-              {t('brain.drills.start')}
-            </AdaptiveMotion.button>
-          </AdaptiveMotion.div>
+          <DrillBriefing
+            drillId="memory-hunt"
+            level={level}
+            goalText={`${t('brain.drills.memory-hunt.wordsToRemember')}: ${game.levelConfig.wordCount} · ${t('brain.drills.memory-hunt.studyTime')}: ${game.levelConfig.studyTime / 1000}s`}
+            onStart={() => { playDrillStartSound(); game.startGame(); }}
+          />
         )}
 
         {/* Study Phase */}
@@ -309,14 +274,23 @@ export default function MemoryHunt({
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
                     className={cn(
-                      "absolute inset-0 flex items-center justify-center rounded-neo",
+                      "absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-neo p-4 text-center",
                       game.lastFeedback === 'correct'
                         ? "bg-neo-green/90"
-                        : "bg-neo-red/90"
+                        : game.lastFeedback === 'free'
+                          ? "bg-neo-purple/90"
+                          : "bg-neo-red/90"
                     )}
                   >
                     {game.lastFeedback === 'correct' ? (
                       <CheckCircle2 className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
+                    ) : game.lastFeedback === 'free' ? (
+                      <>
+                        <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-white drop-shadow-lg" />
+                        <p className="text-sm font-bold text-white max-w-[14rem]">
+                          {t('brain.drills.firstMissFree')}
+                        </p>
+                      </>
                     ) : (
                       <XCircle className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
                     )}
@@ -409,6 +383,8 @@ export default function MemoryHunt({
             isDarkMode={true}
             results={game.results}
             lives={game.lives}
+            level={level}
+            maxLives={game.levelConfig.lives}
             t={t}
             onPlayAgain={() => { game.resetGame(); onPlayAgain?.(); }}
             onExit={onExit}

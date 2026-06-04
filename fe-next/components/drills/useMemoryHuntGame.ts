@@ -57,12 +57,14 @@ export function useMemoryHuntGame({
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [studyCountdown, setStudyCountdown] = useState(0);
-  const [lastFeedback, setLastFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [lastFeedback, setLastFeedback] = useState<'correct' | 'wrong' | 'free' | null>(null);
   const [currentHighlight, setCurrentHighlight] = useState<HighlightedCell[]>([]);
   const [excludedWords, setExcludedWords] = useState<Set<string>>(new Set());
   const [showStudyModal, setShowStudyModal] = useState(false);
   const [hintsRemaining, setHintsRemaining] = useState(2);
   const [isHintActive, setIsHintActive] = useState(false);
+  // Forgiveness: each round grants one free warm-up miss before lives drop.
+  const [firstMissUsedThisRound, setFirstMissUsedThisRound] = useState(false);
 
   // Ref to track study countdown interval for cleanup
   const studyIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -125,6 +127,7 @@ export function useMemoryHuntGame({
 
     const words = selectTargetWords();
     setTargetWords(words);
+    setFirstMissUsedThisRound(false); // fresh free miss each round
     setPhase('study');
     setShowStudyModal(true);
     setStudyCountdown(levelConfig.studyTime / 1000);
@@ -258,6 +261,18 @@ export function useMemoryHuntGame({
         }
       }, 800);
     } else {
+      // First miss of the round is a free warm-up — no life lost, warm tone.
+      if (!firstMissUsedThisRound) {
+        setFirstMissUsedThisRound(true);
+        setLastFeedback('free');
+        setPhase('feedback');
+        setTimeout(() => {
+          setLastFeedback(null);
+          setPhase('recall');
+        }, 800);
+        return;
+      }
+
       setLives(prev => {
         const newLives = prev - 1;
         setTimeout(() => {
@@ -275,7 +290,7 @@ export function useMemoryHuntGame({
       setPhase('feedback');
       playErrorSound?.();
     }
-  }, [phase, targetWords, round, startRound, grid, language, playErrorSound]);
+  }, [phase, targetWords, round, startRound, grid, language, playErrorSound, firstMissUsedThisRound]);
 
   // Calculate final results
   const results = useMemo(() => {

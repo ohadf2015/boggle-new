@@ -210,7 +210,7 @@ describe('MemoryHunt', () => {
         />
       );
 
-      expect(screen.getByText('brain.drills.start')).toBeInTheDocument();
+      expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
     });
 
     it('should display study modal after starting game', async () => {
@@ -227,7 +227,7 @@ describe('MemoryHunt', () => {
       );
 
       // Click start button
-      const startButton = screen.getByText('brain.drills.start');
+      const startButton = screen.getByText('brain.briefing.letsTrain');
       fireEvent.click(startButton);
 
       // Study modal should appear with study phase text
@@ -250,7 +250,7 @@ describe('MemoryHunt', () => {
       );
 
       // Click start button
-      const startButton = screen.getByText('brain.drills.start');
+      const startButton = screen.getByText('brain.briefing.letsTrain');
       fireEvent.click(startButton);
 
       // Ready button should be in the modal

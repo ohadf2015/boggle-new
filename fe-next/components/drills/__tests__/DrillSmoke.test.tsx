@@ -202,7 +202,16 @@ describe('LightningRound (processing speed drill)', () => {
 });
 
 describe('MemoryHunt (working memory drill)', () => {
-  it('renders the intro screen with start button', () => {
+  // MemoryHunt now uses the warm DrillBriefing intro (themed CTA) instead of
+  // the generic "Start" button the other drills still use.
+  const clickBriefingStart = () => {
+    const startBtn = screen.getByText('brain.briefing.letsTrain');
+    act(() => {
+      fireEvent.click(startBtn);
+    });
+  };
+
+  it('renders the briefing intro with mission + themed start CTA', () => {
     render(
       <MemoryHunt
         {...baseProps}
@@ -212,7 +221,8 @@ describe('MemoryHunt (working memory drill)', () => {
       />,
     );
     expect(screen.getByText('brain.drills.memory-hunt.name')).toBeInTheDocument();
-    expect(screen.getByText('brain.drills.start')).toBeInTheDocument();
+    expect(screen.getByText('brain.drills.memory-hunt.mission')).toBeInTheDocument();
+    expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
   });
 
   it('mounts gameplay phase after start without throwing', () => {
@@ -224,7 +234,7 @@ describe('MemoryHunt (working memory drill)', () => {
         onPlayAgain={vi.fn()}
       />,
     );
-    clickStart();
+    clickBriefingStart();
     // MemoryHunt has memorize → recall flow; we only assert no crash on phase advance.
     expect(document.body.textContent).toBeTruthy();
   });
