@@ -4064,7 +4064,17 @@ html[data-cosy='true'] .animate-neo-pop,
 html[data-cosy='true'] .animate-bounce,
 html[data-cosy='true'] .animate-neo-reject-flash,
 html[data-cosy='true'] .animate-pulse-ring,
-html[data-cosy='true'] .animate-pulse {
+html[data-cosy='true'] .animate-pulse,
+/* Decorative celebration twinkles (golden letter tiles on the play board +
+   stray sparkle FX). Perpetual and purely ornamental — the gold tile still
+   reads gold, it just stops sparkling. NOT touched: blast-* (separate game),
+   wc-* (functional play hints), skeleton-pulse (loading affordance),
+   mascot-breath (already a gentle cosy-appropriate breath). */
+html[data-cosy='true'] .golden-tile-sparkle--1,
+html[data-cosy='true'] .golden-tile-sparkle--2,
+html[data-cosy='true'] .golden-tile-sparkle--3,
+html[data-cosy='true'] .animate-sparkle-left,
+html[data-cosy='true'] .animate-sparkle-right {
   animation: none !important;
 }
 
