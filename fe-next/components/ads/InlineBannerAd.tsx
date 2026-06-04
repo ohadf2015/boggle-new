@@ -2,10 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { BannerAdPosition } from '@capacitor-community/admob';
-import { useAdMob } from '@/hooks/useAdMob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { AdPlaceholder } from './AdPlaceholder';
+import { bannerController, BANNER_OWNER } from '@/lib/native/bannerController';
 import type { BannerVariant } from '@/lib/admob-config';
 
 interface InlineBannerAdProps {
@@ -31,7 +30,6 @@ export default function InlineBannerAd({
   className,
 }: InlineBannerAdProps) {
   const slotRef = useRef<HTMLDivElement>(null);
-  const { showBanner, hideBanner } = useAdMob();
   const safeArea = useSafeArea();
 
   useEffect(() => {
@@ -54,31 +52,34 @@ export default function InlineBannerAd({
       return Math.max(0, distanceFromBottom - safeBottom);
     };
 
-    const show = async () => {
+    // Declare the in-flow slot's intent. The coordinator gives the slot priority
+    // over the global AnchoredNativeBanner 'anchor' and serializes show/hide, so
+    // no manual hide-then-show dance and no clobbering the anchor on unmount.
+    const apply = () => {
       if (cancelled) return;
       const margin = computeMargin();
-      if (margin === currentMargin) return;
+      if (margin === currentMargin) return; // cheap local dedup before the coordinator's
       currentMargin = margin;
-      await hideBanner();
-      if (cancelled) return;
-      await showBanner(BannerAdPosition.BOTTOM_CENTER, margin, { variant });
-      // Final reconcile: if cleanup ran during showBanner (route change mid-
-      // flight), explicitly hide. Otherwise the plugin paints the banner on
-      // the destination — visible on game routes that disallow banners.
-      if (cancelled) await hideBanner();
+      void bannerController.setRequest(BANNER_OWNER.slot.key, {
+        margin,
+        variant,
+        priority: BANNER_OWNER.slot.priority,
+      });
     };
 
-    void show();
-    window.addEventListener('resize', show, { passive: true });
-    window.addEventListener('scroll', show, { passive: true });
+    apply();
+    window.addEventListener('resize', apply, { passive: true });
+    window.addEventListener('scroll', apply, { passive: true });
 
     return () => {
       cancelled = true;
-      window.removeEventListener('resize', show);
-      window.removeEventListener('scroll', show);
-      void hideBanner();
+      window.removeEventListener('resize', apply);
+      window.removeEventListener('scroll', apply);
+      // Release the slot — the coordinator falls back to the anchor (if it wants
+      // the banner) instead of leaving the screen blank.
+      void bannerController.clearRequest(BANNER_OWNER.slot.key);
     };
-  }, [showBanner, hideBanner, safeArea.bottom, variant]);
+  }, [safeArea.bottom, variant]);
 
   // Native: reserved slot (banner overlays this div's footprint).
   // Slot gets neo-navy bg so the gap stays brand-themed when:

@@ -3,14 +3,13 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Capacitor } from '@capacitor/core';
-import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-community/admob';
-import { useAdMob } from '@/hooks/useAdMob';
+import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
+import { bannerController, BANNER_OWNER } from '@/lib/native/bannerController';
 
 export default function AnchoredNativeBanner() {
   const pathname = usePathname();
-  const { showBanner, hideBanner } = useAdMob();
   const safeArea = useSafeArea();
 
   useEffect(() => {
@@ -63,22 +62,20 @@ export default function AnchoredNativeBanner() {
     const safeBottom = safeArea.bottom || 0;
 
     if (!isAllowedAdBannerRoute(pathname)) {
-      // Hide first, collapse the reservation only AFTER the native overlay is
-      // actually gone. A native banner composites ABOVE the WebView, so zeroing
-      // --admob-banner-height synchronously drops bottom-anchored CTAs (e.g. the
-      // daily ready-screen Play button) into the band the still-painted banner
-      // occupies for the duration of the hide latency — that's the "ad covers
-      // the button sometimes" race on navigation into a blocked route.
-      void (async () => {
-        try {
-          await hideBanner();
-        } finally {
-          if (!cancelled) {
-            document.documentElement.style.setProperty('--admob-banner-height', '0px');
-            try { localStorage.setItem('lc_admob_h', '0'); } catch {}
-          }
+      // Withdraw the anchor's intent (NOT a global hide — a results page on a
+      // game route may still want its InlineBannerAd 'slot' banner; the
+      // coordinator keeps that one alive). Collapse the reservation only AFTER
+      // the native overlay is actually gone: a native banner composites ABOVE
+      // the WebView, so zeroing --admob-banner-height synchronously drops
+      // bottom-anchored CTAs (e.g. the daily ready-screen Play button) into the
+      // band the still-painted banner occupies for the hide latency — the "ad
+      // covers the button sometimes" race on navigation into a blocked route.
+      void bannerController.clearRequest(BANNER_OWNER.anchor.key).finally(() => {
+        if (!cancelled) {
+          document.documentElement.style.setProperty('--admob-banner-height', '0px');
+          try { localStorage.setItem('lc_admob_h', '0'); } catch {}
         }
-      })();
+      });
       return () => { cancelled = true; };
     }
 
@@ -100,33 +97,31 @@ export default function AnchoredNativeBanner() {
       return isAndroid ? Math.max(navHeight, safeBottom) : Math.max(0, navHeight - safeBottom);
     };
 
-    const applyBanner = async (margin: number) => {
+    const applyBanner = (margin: number) => {
       if (cancelled) return;
       // Keep the banner BEHIND the open mobile side menu. A native banner always
       // composites above the WebView, so the drawer can't cover it with z-index —
       // HeaderMobileMenu flags <html>.mobile-drawer-open while open and the
-      // MutationObserver below re-runs us. Hide while open; reset lastMargin so the
-      // banner is force-re-shown when the drawer closes (class removed → re-run).
+      // MutationObserver below re-runs us. Withdraw the anchor intent while open;
+      // reset lastMargin so it's force-re-requested when the drawer closes.
       if (document.documentElement.classList.contains('mobile-drawer-open')) {
-        await hideBanner();
+        void bannerController.clearRequest(BANNER_OWNER.anchor.key);
         document.documentElement.style.setProperty('--admob-banner-height', '0px');
         lastMargin = -1;
         return;
       }
       if (margin === lastMargin) return;
       lastMargin = margin;
-      await hideBanner();
-      if (cancelled) return;
-      // Re-read after the hide await — GlobalBottomNav's height effect may have
-      // published a corrected nav height during the await (sibling effect race),
-      // and the MutationObserver's follow-up applyBanner could race with this one.
-      // Always show with the freshest value so the banner can't land below the nav.
-      const finalMargin = computeMargin();
-      lastMargin = finalMargin;
-      // AnchoredNativeBanner renders only on non-game surfaces (profile,
-      // leaderboard, blog, glossary, etc.) per isAllowedAdBannerRoute, so
-      // we tag this as the 'content' variant for separate eCPM optimization.
-      await showBanner(BannerAdPosition.BOTTOM_CENTER, finalMargin, { variant: 'content' });
+      // Declare the anchor's intent; the coordinator serializes against the
+      // InlineBannerAd 'slot' owner (slot wins) and dedups identical requests.
+      // No in-call hide-then-reshow: a late nav-height correction re-fires this
+      // via the MutationObserver below with the fresh margin. AnchoredNativeBanner
+      // renders only on non-game surfaces, so we tag the 'content' variant.
+      void bannerController.setRequest(BANNER_OWNER.anchor.key, {
+        margin,
+        variant: 'content',
+        priority: BANNER_OWNER.anchor.priority,
+      });
     };
 
     // Initial sync call preserves test contract (margin reflects nav present at mount).
@@ -150,7 +145,7 @@ export default function AnchoredNativeBanner() {
       cancelAnimationFrame(rafId);
       htmlObserver.disconnect();
     };
-  }, [pathname, showBanner, hideBanner, safeArea.bottom]);
+  }, [pathname, safeArea.bottom]);
 
   return null;
 }

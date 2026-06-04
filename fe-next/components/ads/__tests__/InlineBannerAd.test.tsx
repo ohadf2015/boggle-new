@@ -1,9 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import InlineBannerAd from '../InlineBannerAd';
+import { bannerController } from '@/lib/native/bannerController';
 
-const showBannerMock = vi.fn();
-const hideBannerMock = vi.fn();
 const isNativeMock = vi.fn();
 const getPlatformMock = vi.fn();
 
@@ -12,14 +11,6 @@ vi.mock('@capacitor/core', () => ({
     isNativePlatform: () => isNativeMock(),
     getPlatform: () => getPlatformMock(),
   },
-}));
-
-vi.mock('@capacitor-community/admob', () => ({
-  BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
-}));
-
-vi.mock('@/hooks/useAdMob', () => ({
-  useAdMob: () => ({ showBanner: showBannerMock, hideBanner: hideBannerMock }),
 }));
 
 vi.mock('@/hooks/useSafeArea', () => ({
@@ -31,6 +22,22 @@ vi.mock('../AdPlaceholder', () => ({
     <div data-testid="ad-placeholder" data-zone={props.zone} className={props.className} />
   ),
 }));
+
+vi.mock('@/lib/native/bannerController', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/native/bannerController')>(
+    '@/lib/native/bannerController',
+  );
+  return {
+    ...actual,
+    bannerController: {
+      setRequest: vi.fn().mockResolvedValue(undefined),
+      clearRequest: vi.fn().mockResolvedValue(undefined),
+    },
+  };
+});
+
+const setRequest = bannerController.setRequest as ReturnType<typeof vi.fn>;
+const clearRequest = bannerController.clearRequest as ReturnType<typeof vi.fn>;
 
 describe('InlineBannerAd', () => {
   beforeEach(() => {
@@ -51,54 +58,54 @@ describe('InlineBannerAd', () => {
     expect(screen.getByTestId('ad-placeholder')).toHaveAttribute('data-zone', 'content-page');
   });
 
-  it('does not call AdMob banner APIs on web', () => {
+  it('does not touch the banner coordinator on web', () => {
     render(<InlineBannerAd webZone="menu" />);
-    expect(showBannerMock).not.toHaveBeenCalled();
-    expect(hideBannerMock).not.toHaveBeenCalled();
+    expect(setRequest).not.toHaveBeenCalled();
+    expect(clearRequest).not.toHaveBeenCalled();
   });
 
-  it('renders reserved slot on native and invokes showBanner', async () => {
+  it('renders reserved slot on native and requests the slot banner', async () => {
     isNativeMock.mockReturnValue(true);
     getPlatformMock.mockReturnValue('android');
-    showBannerMock.mockResolvedValue(undefined);
-    hideBannerMock.mockResolvedValue(undefined);
 
     const { container } = render(<InlineBannerAd reservedHeight={72} />);
-    // Reserved slot rendered (no AdPlaceholder on native).
     expect(screen.queryByTestId('ad-placeholder')).toBeNull();
     const slot = container.querySelector('[data-ad-slot="inline-banner"]') as HTMLElement;
     expect(slot).toBeInTheDocument();
     expect(slot.style.height).toBe('72px');
 
-    // Let the effect's async show() resolve.
     await Promise.resolve();
-    await Promise.resolve();
-    expect(showBannerMock).toHaveBeenCalled();
+    expect(setRequest).toHaveBeenCalledWith(
+      'slot',
+      expect.objectContaining({ variant: 'game', priority: 2 }),
+    );
   });
 
-  it('defaults to game banner variant when none specified', async () => {
+  it('defaults to the game banner variant when none specified', async () => {
     isNativeMock.mockReturnValue(true);
     getPlatformMock.mockReturnValue('android');
-    showBannerMock.mockResolvedValue(undefined);
-    hideBannerMock.mockResolvedValue(undefined);
 
     render(<InlineBannerAd />);
     await Promise.resolve();
-    await Promise.resolve();
-    const lastCall = showBannerMock.mock.calls.at(-1);
-    expect(lastCall?.[2]).toEqual({ variant: 'game' });
+    expect(setRequest.mock.calls.at(-1)?.[1]).toMatchObject({ variant: 'game' });
   });
 
-  it('passes variant=content to showBanner when prop set', async () => {
+  it('requests variant=content when the prop is set', async () => {
     isNativeMock.mockReturnValue(true);
     getPlatformMock.mockReturnValue('android');
-    showBannerMock.mockResolvedValue(undefined);
-    hideBannerMock.mockResolvedValue(undefined);
 
     render(<InlineBannerAd variant="content" />);
     await Promise.resolve();
+    expect(setRequest.mock.calls.at(-1)?.[1]).toMatchObject({ variant: 'content' });
+  });
+
+  it('releases the slot on unmount (coordinator falls back to anchor, no blank)', async () => {
+    isNativeMock.mockReturnValue(true);
+    getPlatformMock.mockReturnValue('android');
+
+    const { unmount } = render(<InlineBannerAd />);
     await Promise.resolve();
-    const lastCall = showBannerMock.mock.calls.at(-1);
-    expect(lastCall?.[2]).toEqual({ variant: 'content' });
+    unmount();
+    expect(clearRequest).toHaveBeenCalledWith('slot');
   });
 });

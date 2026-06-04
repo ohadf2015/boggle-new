@@ -1,14 +1,17 @@
 /**
- * AnchoredNativeBanner — shows AdMob anchored banner on non-gameplay hub routes.
- * Gameplay/results skip banner (those fire interstitial — no double-dip).
+ * AnchoredNativeBanner — declares the global 'anchor' banner intent on non-
+ * gameplay hub routes (gameplay/results skip the anchor; results pages drive
+ * their own 'slot' banner via InlineBannerAd). It no longer calls the plugin
+ * directly — it pushes intent to the single bannerController, which serializes
+ * against the higher-priority 'slot' owner. These tests assert the margin math
+ * (the valuable part) via the request it declares.
  */
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
+import { bannerController } from '@/lib/native/bannerController';
 
-const { showBanner, hideBanner, mockPathname, addListener, mockPlatform, mockSafeArea } = vi.hoisted(() => ({
-  showBanner: vi.fn(),
-  hideBanner: vi.fn(),
+const { mockPathname, addListener, mockPlatform, mockSafeArea } = vi.hoisted(() => ({
   mockPathname: { current: '/' },
   addListener: vi.fn(() => Promise.resolve({ remove: vi.fn() })),
   mockPlatform: { current: 'ios' as 'ios' | 'android' | 'web' },
@@ -17,11 +20,6 @@ const { showBanner, hideBanner, mockPathname, addListener, mockPlatform, mockSaf
 
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname.current,
-}));
-
-vi.mock('@/hooks/useAdMob', () => ({
-  useAdMob: () => ({ showBanner, hideBanner, showInterstitial: vi.fn(), showRewarded: vi.fn() }),
-  default: () => ({ showBanner, hideBanner, showInterstitial: vi.fn(), showRewarded: vi.fn() }),
 }));
 
 vi.mock('@/hooks/useSafeArea', () => ({
@@ -46,12 +44,31 @@ vi.mock('@capacitor-community/admob', () => ({
   BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
 }));
 
+vi.mock('@/lib/native/bannerController', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/native/bannerController')>(
+    '@/lib/native/bannerController',
+  );
+  return {
+    ...actual,
+    bannerController: {
+      setRequest: vi.fn().mockResolvedValue(undefined),
+      clearRequest: vi.fn().mockResolvedValue(undefined),
+    },
+  };
+});
+
 import AnchoredNativeBanner from '../AnchoredNativeBanner';
+
+const setRequest = bannerController.setRequest as ReturnType<typeof vi.fn>;
+const clearRequest = bannerController.clearRequest as ReturnType<typeof vi.fn>;
+
+/** Convenience: the anchor request shape with the given margin. */
+const anchorReq = (margin: number) => ['anchor', { margin, variant: 'content', priority: 1 }] as const;
 
 describe('AnchoredNativeBanner', () => {
   beforeEach(() => {
-    showBanner.mockClear();
-    hideBanner.mockClear();
+    setRequest.mockClear().mockResolvedValue(undefined);
+    clearRequest.mockClear().mockResolvedValue(undefined);
     addListener.mockClear();
     mockPathname.current = '/';
     mockPlatform.current = 'ios';
@@ -63,45 +80,41 @@ describe('AnchoredNativeBanner', () => {
     document.documentElement.classList.remove('mobile-drawer-open');
   });
 
-  it('shows banner on home route', async () => {
+  it('requests the anchor banner on home route', async () => {
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledTimes(1);
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
-  it('shows banner flush at bottom on iOS (margin=0, plugin uses safeAreaLayoutGuide)', async () => {
+  it('requests margin=0 on iOS (plugin uses safeAreaLayoutGuide)', async () => {
     mockPathname.current = '/';
     mockPlatform.current = 'ios';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
   it('ignores iOS safe-area in margin (plugin handles home indicator)', async () => {
-    mockPathname.current = '/';
     mockPlatform.current = 'ios';
     mockSafeArea.current = { top: 47, bottom: 34, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
   it('lifts banner above gesture bar on Android (margin=safeArea.bottom)', async () => {
-    mockPathname.current = '/';
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(24));
   });
 
   it('uses margin=0 on Android when safe-area is zero', async () => {
-    mockPathname.current = '/';
     mockPlatform.current = 'android';
-    mockSafeArea.current = { top: 0, bottom: 0, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
   it('margin is route-independent — nav floats via CSS var, not plugin margin', async () => {
@@ -110,110 +123,101 @@ describe('AnchoredNativeBanner', () => {
     mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(24));
   });
 
-  it('keeps banner behind the open side menu — hides while .mobile-drawer-open, never shows', async () => {
-    mockPathname.current = '/';
+  it('keeps banner behind the open side menu — clears anchor while .mobile-drawer-open', async () => {
     mockPlatform.current = 'android';
     document.documentElement.classList.add('mobile-drawer-open');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     await Promise.resolve();
-    expect(showBanner).not.toHaveBeenCalled();
-    expect(hideBanner).toHaveBeenCalled();
+    expect(setRequest).not.toHaveBeenCalled();
+    expect(clearRequest).toHaveBeenCalledWith('anchor');
     expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
   });
 
-  it('restores the banner when the side menu closes (class removed → observer re-shows)', async () => {
-    mockPathname.current = '/';
+  it('restores the banner when the side menu closes (class removed → observer re-requests)', async () => {
     mockPlatform.current = 'android';
     document.documentElement.classList.add('mobile-drawer-open');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).not.toHaveBeenCalled();
+    expect(setRequest).not.toHaveBeenCalled();
 
-    // Close the drawer — the MutationObserver on <html> re-runs applyBanner.
     document.documentElement.classList.remove('mobile-drawer-open');
-    // MutationObserver callbacks are microtask-scheduled; flush a couple of turns.
     await new Promise((r) => setTimeout(r, 0));
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
-  it('shows banner on locale-prefixed home', async () => {
+  it('requests the anchor on locale-prefixed home', async () => {
     mockPathname.current = '/he';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledTimes(1);
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
-  it('shows banner on /leagues hub', async () => {
+  it('requests the anchor on /leagues hub', async () => {
     mockPathname.current = '/en/leagues';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledTimes(1);
+    expect(setRequest).toHaveBeenCalledTimes(1);
   });
 
-  it('shows banner on /settings', async () => {
+  it('requests the anchor on /settings', async () => {
     mockPathname.current = '/settings';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledTimes(1);
+    expect(setRequest).toHaveBeenCalledTimes(1);
   });
 
-  it('hides banner on /singleplayer gameplay', async () => {
+  it('clears the anchor on /singleplayer gameplay', async () => {
     mockPathname.current = '/singleplayer';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).not.toHaveBeenCalled();
-    expect(hideBanner).toHaveBeenCalled();
+    expect(setRequest).not.toHaveBeenCalled();
+    expect(clearRequest).toHaveBeenCalledWith('anchor');
   });
 
-  it('hides banner on /multiplayer', async () => {
+  it('clears the anchor on /multiplayer', async () => {
     mockPathname.current = '/en/multiplayer';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).not.toHaveBeenCalled();
-    expect(hideBanner).toHaveBeenCalled();
+    expect(setRequest).not.toHaveBeenCalled();
+    expect(clearRequest).toHaveBeenCalledWith('anchor');
   });
 
-  it('shows banner on /adventure (real ads during adventure gameplay)', async () => {
+  it('requests the anchor on /adventure (real ads during adventure gameplay)', async () => {
     mockPathname.current = '/adventure/boss-rush';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledTimes(1);
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 0, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
-  it('hides banner on /daily', async () => {
+  it('clears the anchor on /daily', async () => {
     mockPathname.current = '/daily';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).not.toHaveBeenCalled();
-    expect(hideBanner).toHaveBeenCalled();
+    expect(setRequest).not.toHaveBeenCalled();
+    expect(clearRequest).toHaveBeenCalledWith('anchor');
   });
 
-  it('keeps --admob-banner-height reserved until the banner actually hides on a blocked route', async () => {
-    // Repro for the daily ready-screen Play CTA being covered "sometimes":
-    // navigating from a banner-allowed route (banner showing, var=90px) into a
-    // blocked /daily route. The native banner composites ABOVE the WebView, so
-    // zeroing the reservation synchronously drops bottom-anchored CTAs into the
-    // band the still-painted banner occupies until hideBanner() resolves.
+  it('keeps --admob-banner-height reserved until the anchor clear actually resolves on a blocked route', async () => {
+    // Repro for the daily ready-screen Play CTA being covered "sometimes": the
+    // native banner composites ABOVE the WebView, so zeroing the reservation
+    // before the overlay is gone drops bottom-anchored CTAs into the banner band.
     document.documentElement.style.setProperty('--admob-banner-height', '90px');
-    let resolveHide!: () => void;
-    hideBanner.mockReturnValueOnce(new Promise<void>((r) => { resolveHide = () => r(); }));
+    let resolveClear!: () => void;
+    clearRequest.mockReturnValueOnce(new Promise<void>((r) => { resolveClear = () => r(); }));
     mockPathname.current = '/daily/word-hunt';
 
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
 
-    // WHILE the hide is in flight the reservation must persist (CTA stays lifted).
-    expect(hideBanner).toHaveBeenCalled();
+    expect(clearRequest).toHaveBeenCalledWith('anchor');
     expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('90px');
 
-    // WHEN the native overlay is actually gone, the reservation collapses.
-    resolveHide();
+    resolveClear();
     await Promise.resolve();
     await Promise.resolve();
     expect(document.documentElement.style.getPropertyValue('--admob-banner-height')).toBe('0px');
@@ -226,53 +230,42 @@ describe('AnchoredNativeBanner', () => {
   });
 
   it('lifts banner above GlobalBottomNav on Android (margin = navHeight from --bottom-nav-height var)', async () => {
-    mockPathname.current = '/';
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
     document.documentElement.style.setProperty('--bottom-nav-height', '88px');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 88, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(88));
     document.documentElement.style.removeProperty('--bottom-nav-height');
   });
 
   it('lifts banner above GlobalBottomNav on iOS (margin = navHeight − safeArea, plugin re-adds inset)', async () => {
-    mockPathname.current = '/';
     mockPlatform.current = 'ios';
     mockSafeArea.current = { top: 0, bottom: 34, left: 0, right: 0 };
     document.documentElement.style.setProperty('--bottom-nav-height', '98px');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 64, { variant: 'content' });
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(64));
     document.documentElement.style.removeProperty('--bottom-nav-height');
   });
 
   it('falls back to CSS-declared --bottom-nav-height when no inline value yet (Android first-paint race)', async () => {
-    // Repro: GlobalBottomNav's useEffect runs AFTER AnchoredNativeBanner's on first
-    // commit (sibling subtrees), so inline --bottom-nav-height is empty when the
-    // banner is first shown. CSS declares a default of `calc(64px + env(safe-area))`
-    // in :root. Read computed style so the banner clears the nav, not the safe area.
-    mockPathname.current = '/';
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
     document.documentElement.style.removeProperty('--bottom-nav-height');
-    // Simulate CSS-declared default via a stylesheet — getComputedStyle resolves this.
     const style = document.createElement('style');
     style.textContent = ':root { --bottom-nav-height: 96px; }';
     document.head.appendChild(style);
     try {
       render(<AnchoredNativeBanner />);
       await Promise.resolve();
-      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 96, { variant: 'content' });
+      expect(setRequest).toHaveBeenCalledWith(...anchorReq(96));
     } finally {
       document.head.removeChild(style);
     }
   });
 
   it('inline --bottom-nav-height="0px" wins over CSS fallback (nav explicitly hidden)', async () => {
-    // When GlobalBottomNav publishes "0px" inline (nav hidden on /admin), respect
-    // it — don't lift the banner unnecessarily via the CSS fallback.
-    mockPathname.current = '/';
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
     document.documentElement.style.setProperty('--bottom-nav-height', '0px');
@@ -282,44 +275,30 @@ describe('AnchoredNativeBanner', () => {
     try {
       render(<AnchoredNativeBanner />);
       await Promise.resolve();
-      // Inline 0 → navHeight=0 → margin = max(0, safeBottom=24) = 24.
-      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 24, { variant: 'content' });
+      expect(setRequest).toHaveBeenCalledWith(...anchorReq(24));
     } finally {
       document.documentElement.style.removeProperty('--bottom-nav-height');
       document.head.removeChild(style);
     }
   });
 
-  it('re-reads margin after hideBanner so observer-driven updates during the await aren\'t lost', async () => {
-    // Race: applyBanner is mid-await on hideBanner when GlobalBottomNav publishes
-    // --bottom-nav-height. We must show with the latest value, not the stale one
-    // captured at the start of the call.
-    mockPathname.current = '/';
+  it('re-requests with the corrected margin when --bottom-nav-height changes (observer)', async () => {
+    // The in-call hide-then-reshow re-read is gone (declaration is synchronous);
+    // a late nav-height correction now flows through the MutationObserver, which
+    // re-runs applyBanner with the fresh margin.
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
-    // Start with no inline value; CSS fallback below provides the initial reading.
+    document.documentElement.style.setProperty('--bottom-nav-height', '96px');
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(96));
+
+    // GlobalBottomNav publishes a corrected height → <html> style mutation.
+    document.documentElement.style.setProperty('--bottom-nav-height', '112px');
+    await new Promise((r) => setTimeout(r, 0));
+    await Promise.resolve();
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(112));
     document.documentElement.style.removeProperty('--bottom-nav-height');
-    const style = document.createElement('style');
-    style.textContent = ':root { --bottom-nav-height: 96px; }';
-    document.head.appendChild(style);
-    // hideBanner resolves on the next microtask AFTER inline override is published —
-    // simulating GlobalBottomNav writing the var mid-await.
-    hideBanner.mockImplementationOnce(() => {
-      document.documentElement.style.setProperty('--bottom-nav-height', '112px');
-      return Promise.resolve();
-    });
-    try {
-      render(<AnchoredNativeBanner />);
-      await Promise.resolve();
-      await Promise.resolve();
-      // showBanner should be called with the LATEST nav-height (112), not the
-      // initial CSS-fallback reading (96). 112 stays under the 120px clamp so this
-      // asserts the re-read race, not the clamp (covered in bannerMargin.test.ts).
-      expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 112, { variant: 'content' });
-    } finally {
-      document.documentElement.style.removeProperty('--bottom-nav-height');
-      document.head.removeChild(style);
-    }
   });
 
   it('registers FailedToLoad and Closed listeners that reset --admob-banner-height', async () => {
