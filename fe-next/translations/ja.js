@@ -5999,7 +5999,19 @@ const ja = {
       "showMoreCount": "すべて表示 (+{count}件)",
       "perfectBanner": "言葉の達人!",
       "onlyYouFound": "今のところ、見つけたのはあなただけ！",
-      "rareFind": "レアな発見 · {count}人しか見つけていません"
+      "rareFind": "レアな発見 · {count}人しか見つけていません",
+      "streakChip": "{count}日連続"
+    },
+    "signup": {
+      "streakTitle": "{count}日連続記録を守ろう",
+      "boardTitle": "ランキングに名前を残そう",
+      "firstTitle": "最初の結果を保存しよう",
+      "subtitle": "無料登録 — どの端末でもプレイ",
+      "cta": "無料で登録"
+    },
+    "replay": {
+      "title": "練習ホイールを無制限にプレイ",
+      "subtitle": "今日はもう完了 — 連続記録を保とう"
     },
     "hub": {
       "wordWheelQuest": "ワードホイール",

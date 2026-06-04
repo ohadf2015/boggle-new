@@ -133,6 +133,14 @@ export type GrowthEvent =
   // Results-page CTA tracking — experiment conversion funnel (exp-results-replay-cta-v1)
   // Properties: { cta: 'quick_replay' | 'back_to_lobby' | 'next_step', mode?: string }
   | 'results_cta_clicked'
+  // Word Wheel daily post-game signup funnel (experiment wheel-signup-offer-v1).
+  // The wheel bypasses the generic guest-stats signup gate, so these are its own
+  // conversion events. Properties: { experiment, variant, offerType, streakDays, score }.
+  | 'wheel_signup_cta_viewed'
+  | 'wheel_signup_cta_clicked'
+  // Word Wheel already-played dead-end → practice CTA (experiment wheel-replay-cta-v1).
+  // Anti-bounce second-activity hook. Properties: { experiment, variant }.
+  | 'wheel_practice_cta_clicked'
   // CrazyGames portal short-flow funnel
   | 'cg_welcome_view'
   | 'cg_welcome_play'

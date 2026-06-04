@@ -5984,7 +5984,19 @@ const es = {
       "showMoreCount": "Ver todas (+{count} más)",
       "perfectBanner": "¡Mago de palabras!",
       "onlyYouFound": "Solo tú lo encontraste — ¡por ahora!",
-      "rareFind": "Hallazgo raro · solo {count} lo encontraron"
+      "rareFind": "Hallazgo raro · solo {count} lo encontraron",
+      "streakChip": "Racha de {count} días"
+    },
+    "signup": {
+      "streakTitle": "Protege tu racha de {count} días",
+      "boardTitle": "Reclama tu lugar en la tabla",
+      "firstTitle": "Guarda tu primer resultado",
+      "subtitle": "Regístrate gratis — juega en cualquier dispositivo",
+      "cta": "Regístrate gratis"
+    },
+    "replay": {
+      "title": "Juega ruedas de práctica ilimitadas",
+      "subtitle": "Ya jugaste hoy — mantén la racha viva"
     },
     "hub": {
       "wordWheelQuest": "Rueda de palabras",

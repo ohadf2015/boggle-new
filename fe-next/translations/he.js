@@ -6024,7 +6024,19 @@ const he = {
       "showMoreCount": "הצג הכול (+{count} נוספות)",
       "perfectBanner": "אלוף המילים!",
       "onlyYouFound": "רק אתם מצאתם — בינתיים!",
-      "rareFind": "מציאה נדירה · רק {count} מצאו"
+      "rareFind": "מציאה נדירה · רק {count} מצאו",
+      "streakChip": "רצף של {count} ימים"
+    },
+    "signup": {
+      "streakTitle": "שמרו על רצף {count} הימים שלכם",
+      "boardTitle": "תפסו את המקום שלכם בטבלה",
+      "firstTitle": "שמרו את התוצאה הראשונה שלכם",
+      "subtitle": "הרשמה חינם — לשחק מכל מכשיר",
+      "cta": "הרשמה חינם"
+    },
+    "replay": {
+      "title": "לשחק גלגלי תרגול ללא הגבלה",
+      "subtitle": "כבר סיימתם היום — שמרו על הרצף"
     },
     "hub": {
       "wordWheelQuest": "גלגל מילים",

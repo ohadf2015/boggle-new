@@ -16,6 +16,9 @@ import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
 import DailyInsightStack from './DailyInsightStack';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import WordWheelSignupCta from './WordWheelSignupCta';
+import WordWheelReplayCta from './WordWheelReplayCta';
+import { wasSignupModalDismissedRecently } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
 
@@ -34,6 +37,14 @@ interface WordWheelResultsProps {
   hasPlayedWordHunt: boolean;
   currentPlayerId?: string | null;
   currentGuestFingerprint?: string | null;
+  /** Whether the viewer is signed in. Gates the guest signup CTA. */
+  isAuthenticated?: boolean;
+  /** Current daily-streak length (getDailyStreak().currentStreak) — surfaced as a chip + signup hook. */
+  streakDays?: number;
+  /** True on the player's first-ever daily completion (welcome framing). */
+  isFirstCompletion?: boolean;
+  /** True when this is the terminal 'already-played' view (returning player) — enables the practice CTA. */
+  alreadyPlayed?: boolean;
 }
 
 function getResultTier(score: number): {
@@ -116,6 +127,7 @@ const CONFETTI_COLORS = ['#BFFF00', '#00FFFF', '#FF1493', '#8B5CF6', '#FFD700', 
 const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
   currentPlayerId, currentGuestFingerprint,
+  isAuthenticated = false, streakDays = 0, isFirstCompletion = false, alreadyPlayed = false,
 }) => {
   const { t, language } = useLanguage();
   const { submitLeaderboardScore } = useCrazyGames();
@@ -268,6 +280,24 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         {t(tier.key)}
       </m.p>
 
+      {/* Daily streak chip — surfaces the streak that was previously computed and
+          thrown away. The single strongest daily-habit signal; orange = streak
+          semantic. Hidden in practice (no streak persisted). */}
+      {!isPractice && streakDays >= 1 && (
+        <m.div
+          data-testid="word-wheel-streak-chip"
+          className="z-10 flex items-center gap-1.5 px-3 py-1 rounded-neo border-3 border-neo-black bg-neo-orange text-neo-black shadow-hard"
+          initial={{ scale: 0, y: -6 }}
+          animate={{ scale: [0, 1.15, 1], y: 0 }}
+          transition={{ delay: 0.9, duration: 0.45, type: 'spring', stiffness: 360, damping: 16 }}
+        >
+          <Flame className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+          <span className="font-neo-display font-black text-sm tracking-wide uppercase">
+            {t('wordWheel.results.streakChip', { count: streakDays })}
+          </span>
+        </m.div>
+      )}
+
       {/* Exceptional-run banner — only renders for the top tier (almost-all
           words / score ≥ 80). Mass + double Sparkles + spring scale gives it
           the "this was special" feel without competing with the score circle. */}
@@ -344,6 +374,25 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       >
         <DailyInsightStack mode="word_wheel" date={puzzleDate} />
       </m.div>
+
+      {/* Returning-player anti-bounce: terminal 'already-played' view gets a
+          practice-wheel CTA so an engaged returner has an instant next game
+          instead of a dead-end. Experiment-gated (wheel-replay-cta-v1). */}
+      {!isPractice && alreadyPlayed && <WordWheelReplayCta />}
+
+      {/* Guest signup conversion — Word Wheel bypasses the generic guest-stats
+          signup gate, so this restores a value-led signup surface for the mode.
+          Experiment-gated (wheel-signup-offer-v1); framing via selectWheelSignupOffer. */}
+      {!isPractice && (
+        <WordWheelSignupCta
+          isAuthenticated={isAuthenticated}
+          isPractice={isPractice}
+          streakDays={streakDays}
+          isFirstCompletion={isFirstCompletion}
+          dismissedRecently={wasSignupModalDismissedRecently()}
+          score={result.score}
+        />
+      )}
 
       {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the
           player flows from one practice mode to the next without dead-ends. */}

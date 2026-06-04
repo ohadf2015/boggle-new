@@ -5988,7 +5988,19 @@ const en = {
       "showMoreCount": "Show all (+{count} more)",
       "perfectBanner": "Word Wizard!",
       "onlyYouFound": "Only you found this — so far!",
-      "rareFind": "Rare find · only {count} got this"
+      "rareFind": "Rare find · only {count} got this",
+      "streakChip": "{count}-day streak"
+    },
+    "signup": {
+      "streakTitle": "Keep your {count}-day streak safe",
+      "boardTitle": "Claim your spot on the board",
+      "firstTitle": "Save your first result",
+      "subtitle": "Sign up free — play on any device",
+      "cta": "Sign up free"
+    },
+    "replay": {
+      "title": "Play unlimited practice wheels",
+      "subtitle": "Already done today — keep the streak warm"
     },
     "hub": {
       "wordWheelQuest": "Word Wheel",

@@ -34,7 +34,13 @@ const DiscordIcon = ({ className }: { className?: string }) => (
 );
 
 interface DailyChallengeInlineSignupProps {
-  pendingResult: {
+  /**
+   * Word-Hunt daily result to re-save after the OAuth round-trip. Optional:
+   * other daily modes (e.g. Word Wheel) reuse this signup surface but persist
+   * their result server-side by guest fingerprint, so they pass nothing and the
+   * setPendingDailyResult calls are skipped.
+   */
+  pendingResult?: {
     result: WordHuntResult;
     puzzleNumber: number;
     puzzleDate: string;
@@ -93,8 +99,12 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     () => MASCOT_MESSAGES[Math.floor(Math.random() * MASCOT_MESSAGES.length)]
   );
 
+  // Persist the pending daily result before any auth redirect — skipped when the
+  // caller (e.g. Word Wheel) syncs its result server-side and passes nothing.
+  const savePending = () => { if (pendingResult) setPendingDailyResult(pendingResult); };
+
   const { signIn: oauthSignIn } = useOAuthSignIn({
-    onBeforeRedirect: () => setPendingDailyResult(pendingResult),
+    onBeforeRedirect: savePending,
     onError: (msg) => setError(msg),
   });
 
@@ -103,7 +113,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
 
   const handleOAuthSignIn = async (provider: 'google' | 'discord') => {
     setError(null);
-    setPendingDailyResult(pendingResult);
+    savePending();
     await oauthSignIn(provider);
   };
 
@@ -152,7 +162,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
 
     try {
       // Store pending result before auth
-      setPendingDailyResult(pendingResult);
+      savePending();
 
       let result;
       if (authMode === 'signup') {
@@ -196,7 +206,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     setEmailError(null);
 
     try {
-      setPendingDailyResult(pendingResult);
+      savePending();
 
       if (showOtpFlow && otpSent) {
         // Verify OTP code

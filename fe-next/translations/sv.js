@@ -6041,7 +6041,19 @@ const sv = {
       "showMoreCount": "Visa alla (+{count} till)",
       "perfectBanner": "Ordmästare!",
       "onlyYouFound": "Bara du hittade detta — hittills!",
-      "rareFind": "Sällsynt fynd · bara {count} hittade detta"
+      "rareFind": "Sällsynt fynd · bara {count} hittade detta",
+      "streakChip": "{count} dagars svit"
+    },
+    "signup": {
+      "streakTitle": "Behåll din svit på {count} dagar",
+      "boardTitle": "Ta din plats på listan",
+      "firstTitle": "Spara ditt första resultat",
+      "subtitle": "Registrera dig gratis — spela på valfri enhet",
+      "cta": "Registrera dig gratis"
+    },
+    "replay": {
+      "title": "Spela obegränsade övningshjul",
+      "subtitle": "Redan klar idag — håll sviten varm"
     },
     "hub": {
       "wordWheelQuest": "Ordhjul",

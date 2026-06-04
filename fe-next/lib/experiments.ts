@@ -305,6 +305,43 @@ export const EXPERIMENTS = {
     description:
       'Leaderboard play-now CTA banner. play-cta = slim "Play to rank up" strip above leaderboard table. control = current. Targets rage-click frustration on /leaderboard. Conversion = leaderboard_play_cta_clicked → game_started.',
   }),
+
+  /**
+   * Word Wheel daily post-game signup CTA. Word Wheel completions bypass the
+   * generic SP/MP signup gate entirely (useSignupPrompt reads guest game/win
+   * counts the wheel never writes — see useResultsSideEffects), so a wheel-only
+   * SEO visitor is never asked to sign up. This experiment adds a value-led
+   * signup card to WordWheelResults for guests, framed by `selectWheelSignupOffer`
+   * (streak-value / board-spot / first-completion — never loss-aversion, Families
+   * policy). control = no card (status quo). streak-value = render the offer CTA.
+   *
+   * Conversion: wheel_signup_cta_clicked → signup_completed{source:'word_wheel'}.
+   * Guardrail: wheel_results_bounced must not rise (don't tank the experience).
+   * Ship to PostHog: flag key = 'wheel-signup-offer-v1', 50/50 rollout.
+   */
+  'wheel-signup-offer-v1': defineExperiment({
+    variants: ['control', 'streak-value'] as const,
+    default: 'control',
+    description:
+      'Word Wheel daily post-game signup CTA for guests. control = no card. streak-value = value-led signup card (streak/board-spot framing via selectWheelSignupOffer). Conversion = wheel_signup_cta_clicked → signup_completed. Guardrail = wheel_results_bounced.',
+  }),
+
+  /**
+   * Word Wheel "already-played" dead-end → practice-wheel CTA. A returning daily
+   * player who already solved today's wheel currently hits a terminal results
+   * screen with no next game — pure bounce. The `practice-cta` variant adds a
+   * primary "Play unlimited practice wheels" button (→ /daily/word-wheel?practice=1)
+   * so the engaged returner gets an instant second activity in the same mechanic.
+   *
+   * Conversion: wheel_practice_cta_clicked → game_started (practice). Pure-additive
+   * (no guardrail needed). Ship to PostHog: flag key = 'wheel-replay-cta-v1', 50/50.
+   */
+  'wheel-replay-cta-v1': defineExperiment({
+    variants: ['control', 'practice-cta'] as const,
+    default: 'control',
+    description:
+      'Word Wheel already-played dead-end CTA. control = no replay option. practice-cta = "Play unlimited practice wheels" button. Conversion = wheel_practice_cta_clicked → practice game_started. Anti-bounce for returning daily players.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

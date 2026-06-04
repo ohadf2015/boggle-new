@@ -521,6 +521,10 @@ const WordWheelChallenge: React.FC = () => {
               hasPlayedWordHunt={hasPlayedWH}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? (getGuestFingerprint() || null) : null}
+              isAuthenticated={isAuthenticated}
+              streakDays={getDailyStreak().currentStreak}
+              isFirstCompletion={getDailyStreak().totalDailiesCompleted <= 1}
+              alreadyPlayed={phase === 'already-played'}
             />
           </m.div>
         )}
