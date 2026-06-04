@@ -100,10 +100,20 @@ un-bail (TDD-gated). If react-scan shows it's already cheap (manual memo holding
 
 ---
 
-## Bottom line
+## Bottom line — SHIPPED
 
-- **Apply now:** nothing. The score is 93/100 and the one safe micro-fix (L157) nets ≈0 and risks a new flag.
-- **Do NOT:** delete the 15 memoizations (regression trap under compiler bailout).
-- **Schedule (branch + TDD + live verify):** `useEffectEvent` un-bail of WheelRushView L166/L169/L174 — the only
-  finding with a real MP perf payoff. Gate on register-once + reads-latest test; measure with react-scan.
+- **Done (this branch):** un-bailed React Compiler on WheelRushView. The two render-phase ref writes
+  (`latestRef`/`onFogProgressRef`, old L166/L169) moved into a commit-phase `useEffect`. Same latest-value
+  guarantee (socket/fog events are async — always fire after the commit effect), zero behavior change.
+  **react-doctor 93 → 95; 3 errors → 1; both `refs` "cannot access ref during render" errors eliminated.**
+  Gated by a golden-master test (`WheelRushView.socketLatestRef.test.tsx`): listeners register once across
+  prop churn + once-bound handler reads latest props. 37/37 WheelRushView tests green, lint+tsc clean.
+- **Did NOT (deliberate):**
+  - The 15 manual memoizations — left in place. One setState-in-effect error remains (below), so the
+    asymmetry still holds: deleting them is best-case no-op, worst-case regression. Not worth the risk.
+  - The 1 remaining Performance error — `set-state-in-effect` at the fog effect (now L179, `setFogActive`).
+    Legitimate timer→state sync for fog-of-war score masking; deriving it away risks a live-game leak. Left.
+  - L157 `useRef(new Set())`, giant-component, prefer-useReducer — note-only, as before.
 - **Negative scope is itself a result:** every other MP component/hook/backend service is clean per the tool.
+- **Optional follow-up:** react-scan in a live 2-player Wheel Rush to quantify the leaderboard-tick re-render
+  delta now that the compiler optimizes the board. Empirical confirmation, not required.

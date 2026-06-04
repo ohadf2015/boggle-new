@@ -160,13 +160,18 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const builtLettersRef = useRef<BuiltLetter[]>([]);
   const handleSubmitRef = useRef<() => void>(() => {});
 
-  // Latest-value ref for socket handlers — prevents listener re-registration
-  // when consumer-supplied values (t, sound funcs) change reference across renders.
+  // Latest-value refs for socket handlers — prevent listener re-registration when
+  // consumer-supplied values (t, sound funcs) change reference across renders.
+  // Written in a commit-phase effect, NOT during render, so React Compiler can still
+  // optimize this component (a `ref.current = …` in the render body bails the compiler,
+  // "cannot access refs during render"). Socket/fog events fire async — always after
+  // this effect runs — so the latest-value guarantee is unchanged.
   const latestRef = useRef({ t, puzzle, username, playWordAcceptedSound, playWordRejectedSound });
-  latestRef.current = { t, puzzle, username, playWordAcceptedSound, playWordRejectedSound };
-
   const onFogProgressRef = useRef(onFogProgressChange);
-  onFogProgressRef.current = onFogProgressChange;
+  useEffect(() => {
+    latestRef.current = { t, puzzle, username, playWordAcceptedSound, playWordRejectedSound };
+    onFogProgressRef.current = onFogProgressChange;
+  });
 
   // Fog flips off once at expiry. Drives onFogProgressChange every 250ms
   // so the desktop adapter's fog-progress meter stays live.
