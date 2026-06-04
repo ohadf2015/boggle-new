@@ -27,6 +27,7 @@ import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
 import { BlastFxBridge } from './BlastFxBridge';
 import { type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
+import type { BlastWaveModifier } from './utils/blastModifiers';
 import { useJellyEnabled, useCakeEnabled, useChocolateEnabled } from '@/lib/blast/ccMechanicFlags';
 import { validateWaveObjectives } from './utils/blastObjectiveValidator';
 import { getComboMultiplier } from '@/shared/utils/scoring';
@@ -80,6 +81,10 @@ interface BlastGameProps {
   leaderboard?: Array<{ username: string; score: number; wordCount?: number; avatar?: Avatar }>;
   username?: string;
   initialBuff?: BlastPregameBuff | null;
+  /** SP-only: extra word-score multiplier from the active wave modifier (1 = none). */
+  modifierScoreMultiplier?: number;
+  /** SP-only: active wave modifier descriptor — surfaced as a HUD chip. */
+  activeModifier?: BlastWaveModifier | null;
 }
 
 /**
@@ -111,6 +116,8 @@ export function BlastGame({
   leaderboard,
   username,
   initialBuff,
+  modifierScoreMultiplier = 1,
+  activeModifier,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
@@ -264,7 +271,8 @@ export function BlastGame({
     lastPathRef, flyIdRef, explosionShakeTimerRef, nearMissTimerRef,
     onWordWithComboTypeRef, onComboDetected,
     config, t,
-    scoreMultiplier: buffScoreMultiplier,
+    // Compose buff (combo2x) and SP wave-modifier multipliers into one factor.
+    scoreMultiplier: buffScoreMultiplier * modifierScoreMultiplier,
     recorder: highlightRecorderRef.current,
     effects: {
       setLastWordLength, setWordSubmitCount, setWordFoundParticle,
@@ -620,6 +628,7 @@ export function BlastGame({
         onWordChange={handleWordChange}
         onShuffle={handleShuffle}
         onQuit={handleQuit}
+        activeModifier={isMultiplayer ? null : activeModifier}
         noWordsRemaining={engine.noWordsRemaining}
         scoreFlyEvents={scoreFlyEvents}
         onScoreFlyComplete={handleScoreFlyComplete}

@@ -21,6 +21,8 @@ import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { playWaveFailArpeggio } from '@/lib/blast/waveFailArpeggio';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
+import { selectWaveModifier, applyModifierToWaveConfig } from './utils/blastModifiers';
+import { BlastModifierBadge } from './BlastModifierBadge';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
 import { resolveBlastConfig, type BlastPhase, type BlastResultsData, type WaveResult } from './types';
 import { useHighlightStore } from '@/stores/highlightStore';
@@ -66,6 +68,9 @@ export function BlastView() {
   // Wave tracking
   const checkpoint = useBlastCheckpoint();
   const [currentWave, setCurrentWave] = useState(1);
+  // Per-run seed for deterministic SP wave-modifier selection. Regenerated at
+  // the start of every fresh run so each playthrough rolls a different sequence.
+  const [runSeed, setRunSeed] = useState(() => Math.floor(Math.random() * 1_000_000));
   const [totalScore, setTotalScore] = useState(0);
   const [allWordsFound, setAllWordsFound] = useState<string[]>([]);
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
@@ -98,11 +103,22 @@ export function BlastView() {
     };
   }, []);
 
+  // SP-only random wave modifier — pure function of (runSeed, wave). Patches the
+  // wave config (cascade/distribution) and may multiply word score. MP never
+  // reaches this path (server-authoritative), so no desync risk.
+  const activeModifier = useMemo(
+    () => selectWaveModifier(runSeed, currentWave),
+    [runSeed, currentWave],
+  );
+
   // Apply wave-specific overrides.
   // `config` is memoized so BlastGame doesn't see a new object reference on
   // every BlastView render (e.g. phase flips, score ticks). A fresh config
   // prop would invalidate every downstream memo + effect dep that touches it.
-  const waveConfig = getWaveConfig(currentWave);
+  const waveConfig = useMemo(
+    () => applyModifierToWaveConfig(getWaveConfig(currentWave), activeModifier),
+    [currentWave, activeModifier],
+  );
   const config = useMemo(
     () => ({
       ...resolveBlastConfig((language as Language) || 'en', 'medium'),
@@ -209,12 +225,14 @@ export function BlastView() {
   }, [snapshotPreWave, totalScore, allWordsFound, waveHistory]);
 
   const handleStart = useCallback(() => {
+    setRunSeed(Math.floor(Math.random() * 1_000_000));
     setCurrentWave(1);
     snapshotPreWave(1, 0, [], []);
     setPhase('playing');
   }, [snapshotPreWave]);
 
   const handleResume = useCallback(() => {
+    setRunSeed(Math.floor(Math.random() * 1_000_000));
     const wave = checkpoint.resumeFromWave;
     setCurrentWave(wave);
     snapshotPreWave(wave, 0, [], []);
@@ -240,6 +258,7 @@ export function BlastView() {
   }, []);
 
   const handlePlayAgain = useCallback(() => {
+    setRunSeed(Math.floor(Math.random() * 1_000_000));
     setResults(null);
     setCurrentWave(1);
     setTotalScore(0);
@@ -349,6 +368,8 @@ export function BlastView() {
             waveConfig={waveConfig}
             cumulativeScore={totalScore}
             initialBuff={pregameBuff}
+            modifierScoreMultiplier={activeModifier?.scoreMultiplier ?? 1}
+            activeModifier={activeModifier}
             onWaveComplete={handleWaveComplete}
             onGameEnd={handleGameEnd}
             onHighlightStart={handleHighlightStart}
@@ -369,6 +390,8 @@ export function BlastView() {
           Math.round(lastWaveStats.clearPct * config.gridSize * config.gridSize / 100),
           config.gridSize * config.gridSize,
         );
+        // Reveal the modifier the player is about to face on the next wave.
+        const nextModifier = selectWaveModifier(runSeed, currentWave + 1);
         return (
           <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4">
             <AdaptiveMotion.h2
@@ -403,6 +426,8 @@ export function BlastView() {
               <p className="text-lg font-bold tabular-nums">{lastWaveStats.score} {t('common.points')}</p>
               <p className="text-sm">{lastWaveStats.words} {t('blast.wordsFound')} · {Math.round(lastWaveStats.clearPct)}% {t('blast.cleared')}</p>
             </AdaptiveMotion.div>
+
+            {nextModifier && <BlastModifierBadge modifier={nextModifier} variant="banner" t={t} />}
 
             <AdaptiveMotion.div
               initial={{ y: 20, opacity: 0 }}

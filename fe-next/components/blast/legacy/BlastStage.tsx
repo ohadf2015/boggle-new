@@ -31,6 +31,8 @@ import { BlastBackground } from './BlastBackground';
 import { cn } from '@/lib/utils';
 import type { LetterGrid, Language, Avatar } from '@/shared/types/game';
 import { BlastObjectiveBanner } from './BlastObjectiveBanner';
+import { BlastModifierBadge } from './BlastModifierBadge';
+import type { BlastWaveModifier } from './utils/blastModifiers';
 import type { BlastTileState, BlastGameState, BlastObjectiveProgress } from './types';
 import type { SequencerState } from './hooks/useBlastSequencer';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
@@ -95,6 +97,8 @@ interface BlastStageProps {
   objectiveProgress?: BlastObjectiveProgress[];
   // Visible "Lucky Boost" indicator — DDA assist surfacing
   ddaBoostActive?: boolean;
+  // SP-only active wave modifier — surfaced as a persistent chip under the objectives banner
+  activeModifier?: BlastWaveModifier | null;
   // Optional hint button (wave 6+) rendered in HUD controls
   hintSlot?: React.ReactNode;
   // Optional hint toast overlaid above the grid for HINT_HIGHLIGHT_MS
@@ -155,6 +159,7 @@ export const BlastStage = memo(function BlastStage({
   remainingTime,
   totalTime,
   t,
+  activeModifier,
 }: BlastStageProps) {
   const { score, wordsFound, movesRemaining, totalMoves, tilesCleared, totalTiles, isComplete, isDeadEnd } = gameState;
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
@@ -259,6 +264,11 @@ export const BlastStage = memo(function BlastStage({
         t={t}
       />
       <BlastObjectiveBanner objectives={objectiveProgress} t={t} />
+      {activeModifier && (
+        <div className="flex justify-center pt-1.5">
+          <BlastModifierBadge modifier={activeModifier} variant="chip" t={t} />
+        </div>
+      )}
       {hintToast}
       {/* Multiplayer timer — shown to players only */}
       {remainingTime !== null && remainingTime !== undefined && totalTime !== undefined && totalTime > 0 && (
@@ -313,7 +323,7 @@ export const BlastStage = memo(function BlastStage({
         {/* Board frame — neo-brutalist with hard shadow + reactive glow */}
         <div
           className={cn(
-            'relative w-full max-w-[min(92vw,78dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(600px,75dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
+            'relative w-full max-w-[min(94vw,80dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(640px,76dvh)] 2xl:max-w-[min(760px,82dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
             (sequencerState?.chainLevel ?? 0) >= 4
               ? 'border-yellow-400'
               : (sequencerState?.chainLevel ?? 0) >= 2
