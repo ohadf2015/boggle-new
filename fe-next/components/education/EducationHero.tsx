@@ -3,16 +3,21 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
+import { EducationModeMock } from './EducationModeMock';
 
 /**
  * Design tokens (from frontend-design skill):
  * - Hero uses neo-cream/neo-navy gradient for warmth + professional tone
- * - Primary CTA: bg-neo-lime with shadow-hard (pixel-perfect shadow)
- * - Secondary CTA: border-neo + dark navy text
+ * - Single primary CTA: oversized bg-neo-lime button with shadow-hard-xl, an
+ *   animated arrow, and a reassurance note. We deliberately keep ONE CTA so the
+ *   teacher's next action is unmistakable (clicks tracked via growth analytics).
+ * - Right column shows EducationModeMock — a live "see it in action" preview —
+ *   so the page demonstrates the product instead of needing a second CTA.
  * - Decorative dots: neo-lime/neo-pink at low opacity for personality
  *
- * Entry: GSAP timeline cascades eyebrow → h1 → sub → CTAs, then floats the
+ * Entry: GSAP timeline cascades eyebrow → h1 → sub → CTA, then floats the
  * background dots on a slow loop. Decorative only; respects reduced-motion.
  */
 
@@ -78,43 +83,55 @@ export function EducationHero() {
 
       <div
         ref={rootRef}
-        className="relative mx-auto max-w-4xl px-4 py-16 sm:py-20 text-center"
+        className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:py-20 lg:grid-cols-2 lg:gap-12"
       >
-        <p
-          data-hero-item
-          className="text-sm font-bold uppercase tracking-wider text-neo-pink"
-        >
-          {t('education.landing.hero.eyebrow')}
-        </p>
-        <h1
-          data-hero-item
-          className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-navy md:text-6xl"
-        >
-          {t('education.landing.hero.h1')}
-        </h1>
-        <p
-          data-hero-item
-          className="education-hero-sub mt-5 text-base sm:text-lg text-neo-navy/70"
-        >
-          {t('education.landing.hero.sub')}
-        </p>
+        {/* Left column: copy + single CTA */}
+        <div className="text-center lg:text-start">
+          <p
+            data-hero-item
+            className="text-sm font-bold uppercase tracking-wider text-neo-pink"
+          >
+            {t('education.landing.hero.eyebrow')}
+          </p>
+          <h1
+            data-hero-item
+            className="mt-3 text-4xl sm:text-5xl font-neo-display font-black leading-tight text-neo-navy md:text-6xl"
+          >
+            {t('education.landing.hero.h1')}
+          </h1>
+          <p
+            data-hero-item
+            className="education-hero-sub mt-5 text-base sm:text-lg text-neo-navy/70"
+          >
+            {t('education.landing.hero.sub')}
+          </p>
 
-        <div
-          data-hero-item
-          className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center"
-        >
-          <Link
-            href={`/${language}/education/access`}
-            className="rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-6 py-3 font-bold text-neo-navy shadow-hard-lg transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-hard"
+          <div
+            data-hero-item
+            className="mt-8 flex flex-col items-center gap-3 lg:items-start"
           >
-            {t('education.landing.hero.cta_primary')}
-          </Link>
-          <a
-            href="#modes"
-            className="rounded-neo border-neo-thick border-neo-navy bg-neo-cream px-6 py-3 font-bold text-neo-navy transition-all hover:bg-neo-white hover:shadow-hard-sm"
-          >
-            {t('education.landing.hero.cta_secondary')}
-          </a>
+            <Link
+              href={`/${language}/education/access`}
+              onClick={() => trackLandingCtaClick('education_hero')}
+              className="group inline-flex items-center gap-3 rounded-neo border-neo-thick border-neo-navy bg-neo-lime px-8 py-4 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-xl transition-all hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-hard motion-safe:animate-pulse-subtle"
+            >
+              {t('education.landing.hero.cta_primary')}
+              <span
+                aria-hidden
+                className="text-xl transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+              >
+                →
+              </span>
+            </Link>
+            <p className="text-xs font-bold uppercase tracking-wider text-neo-navy/60">
+              {t('education.landing.hero.cta_note')}
+            </p>
+          </div>
+        </div>
+
+        {/* Right column: live product mock */}
+        <div data-hero-item className="order-first lg:order-none">
+          <EducationModeMock />
         </div>
       </div>
     </section>

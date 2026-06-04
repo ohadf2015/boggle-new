@@ -10436,7 +10436,20 @@ const en = {
         "h1": "Free vocabulary games for your classroom — no student logins.",
         "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages, free for teachers.",
         "cta_primary": "Request Teacher Access",
-        "cta_secondary": "See it in action"
+        "cta_secondary": "See it in action",
+        "cta_note": "Free for teachers • Approved in ~24h"
+      },
+      "mock": {
+        "tab": "Class Game",
+        "live": "Live",
+        "join_label": "Join code",
+        "players": "28 playing",
+        "board_caption": "Tap letters to spell words",
+        "leaderboard_title": "Live leaderboard",
+        "caption": "Your classroom in real time: students join with a code, race to spell words, and climb a live leaderboard — no logins, no installs.",
+        "s1": "Maya",
+        "s2": "Leo",
+        "s3": "Aria"
       },
       "moat": {
         "title": "Why teachers in 5 languages choose LexiClash",
