@@ -10,6 +10,10 @@ import { useAvatarUid } from '../AvatarUidContext';
 
 const S = STROKE_DETAIL;
 
+/** Shared fuller mustache silhouette (sits on the upper lip, above the mouth). */
+const MUSTACHE_D =
+  'M39 56 Q43 53.4 47 55.4 Q50 56.9 50 56.9 Q50 56.9 53 55.4 Q57 53.4 61 56 Q61 58.9 56.4 59.3 Q52.4 59.7 50 60.7 Q47.6 59.7 43.6 59.3 Q39 58.9 39 56Z';
+
 interface FacialHairProps {
   fill: string;
 }
@@ -19,43 +23,24 @@ function None() {
 }
 
 function Stubble({ fill }: FacialHairProps) {
+  // Even 5-o'clock-shadow field across cheeks/jaw/chin, hugging the jaw and
+  // skipping the lips so the mouth stays readable (facial hair renders over it).
+  const dots: Array<[number, number]> = [];
+  for (let y = 55; y <= 78; y += 2.3) {
+    const half = 19 - (y - 55) * 0.45; // narrows toward the chin
+    for (let x = 50 - half; x <= 50 + half; x += 2.5) {
+      if (x > 40 && x < 60 && y > 56.5 && y < 64) continue; // lip gap
+      const j = (Math.round(x + y) % 2 === 0) ? 0.55 : -0.5;
+      dots.push([x + j, y]);
+    }
+  }
   return (
-    <g opacity="0.55">
-      <circle cx="34" cy="62" r="1.5" fill={fill} />
-      <circle cx="36" cy="64" r="1.5" fill={fill} />
-      <circle cx="33" cy="66" r="1.5" fill={fill} />
-      <circle cx="35" cy="68" r="1.5" fill={fill} />
-      <circle cx="37" cy="66" r="1.5" fill={fill} />
-      <circle cx="38" cy="63" r="1.5" fill={fill} />
-      <circle cx="36" cy="60" r="1.5" fill={fill} />
-      <circle cx="44" cy="68" r="1.5" fill={fill} />
-      <circle cx="46" cy="70" r="1.5" fill={fill} />
-      <circle cx="48" cy="69" r="1.5" fill={fill} />
-      <circle cx="50" cy="71" r="1.5" fill={fill} />
-      <circle cx="52" cy="69" r="1.5" fill={fill} />
-      <circle cx="54" cy="70" r="1.5" fill={fill} />
-      <circle cx="56" cy="68" r="1.5" fill={fill} />
-      <circle cx="50" cy="67" r="1.5" fill={fill} />
-      <circle cx="47" cy="67" r="1.5" fill={fill} />
-      <circle cx="53" cy="67" r="1.5" fill={fill} />
-      <circle cx="43" cy="58" r="1.2" fill={fill} />
-      <circle cx="45" cy="57" r="1.2" fill={fill} />
-      <circle cx="47" cy="58" r="1.2" fill={fill} />
-      <circle cx="50" cy="57" r="1.2" fill={fill} />
-      <circle cx="53" cy="58" r="1.2" fill={fill} />
-      <circle cx="55" cy="57" r="1.2" fill={fill} />
-      <circle cx="57" cy="58" r="1.2" fill={fill} />
-      <circle cx="66" cy="62" r="1.5" fill={fill} />
-      <circle cx="64" cy="64" r="1.5" fill={fill} />
-      <circle cx="67" cy="66" r="1.5" fill={fill} />
-      <circle cx="65" cy="68" r="1.5" fill={fill} />
-      <circle cx="63" cy="66" r="1.5" fill={fill} />
-      <circle cx="62" cy="63" r="1.5" fill={fill} />
-      <circle cx="64" cy="60" r="1.5" fill={fill} />
-      <circle cx="40" cy="65" r="1.2" fill={fill} />
-      <circle cx="42" cy="67" r="1.2" fill={fill} />
-      <circle cx="58" cy="67" r="1.2" fill={fill} />
-      <circle cx="60" cy="65" r="1.2" fill={fill} />
+    <g>
+      {/* faint shadow mass under the jaw for depth */}
+      <path d="M33 65 Q38 73 50 76 Q62 73 67 65 Q66 71 60 75 Q54 78 50 78.2 Q46 78 40 75 Q34 71 33 65Z" fill={fill} opacity="0.15" />
+      <g fill={fill} opacity="0.5">
+        {dots.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r="0.85" />)}
+      </g>
     </g>
   );
 }
@@ -63,8 +48,8 @@ function Stubble({ fill }: FacialHairProps) {
 function Mustache({ fill }: FacialHairProps) {
   return (
     <g>
-      <path d="M42 57 Q44 55 47 56 Q50 57 50 57 Q50 57 53 56 Q56 55 58 57 Q58 59 55 59 Q52 59 50 60 Q48 59 45 59 Q42 59 42 57Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M44 56.5 Q47 55.5 50 57" fill="none" stroke="#fff" strokeWidth={0.4} opacity="0.2" />
+      <path d={MUSTACHE_D} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M43 56 Q47 54.4 50 56" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.18" />
     </g>
   );
 }
@@ -72,9 +57,11 @@ function Mustache({ fill }: FacialHairProps) {
 function Goatee({ fill }: FacialHairProps) {
   return (
     <g>
-      <path d="M42 57 Q44 55 47 56 Q50 57 50 57 Q50 57 53 56 Q56 55 58 57 Q58 59 55 59 Q52 59 50 60 Q48 59 45 59 Q42 59 42 57Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M44 63 Q44 61 46 61 Q48 62 50 62 Q52 62 54 61 Q56 61 56 63 Q56 68 54 71 Q52 73 50 74 Q48 73 46 71 Q44 68 44 63Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M47 64 Q50 65 53 64" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.15" />
+      <path d={MUSTACHE_D} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Chin tuft — soul patch flowing into a rounded chin beard */}
+      <path d="M45 62.5 Q45 60.5 47.5 60.8 Q50 61.4 52.5 60.8 Q55 60.5 55 62.5 Q55.4 68 53 72 Q51 75 50 75.5 Q49 75 47 72 Q44.6 68 45 62.5Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M48 64 Q50 65 52 64" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.14" />
+      <path d="M50 63 L50 73" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.15" />
     </g>
   );
 }
@@ -82,12 +69,20 @@ function Goatee({ fill }: FacialHairProps) {
 function ShortBeard({ fill }: FacialHairProps) {
   return (
     <g>
-      <path d="M32 56 Q34 54 38 55 Q42 56 44 57 L44 57 Q47 58 50 58 Q53 58 56 57 L56 57 Q58 56 62 55 Q66 54 68 56 Q70 60 68 66 Q66 72 62 74 Q58 76 54 77 Q52 77.5 50 78 Q48 77.5 46 77 Q42 76 38 74 Q34 72 32 66 Q30 60 32 56Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M41 57 Q44 55 47 56 Q50 57.5 50 57.5 Q50 57.5 53 56 Q56 55 59 57" fill="none" stroke="#000" strokeWidth={1} opacity="0.3" />
-      <path d="M38 62 Q40 66 42 70" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.12" />
-      <path d="M50 62 L50 72" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
-      <path d="M62 62 Q60 66 58 70" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.12" />
-      <path d="M40 58 Q44 60 48 59" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.12" />
+      {/* Full jaw-wrapping beard with a real mouth opening (evenodd hole) */}
+      <path
+        fillRule="evenodd"
+        d="M30 54 Q33 51 37 53 Q42 56 47 56.5 Q50 57 53 56.5 Q58 56 63 53 Q67 51 70 54 Q72 61 69 69 Q65 76 57 79 Q53 80.5 50 80.7 Q47 80.5 43 79 Q35 76 31 69 Q28 61 30 54Z M43 59 Q50 57.6 57 59 Q57.6 64 53 67 Q50 68.6 47 67 Q42.4 64 43 59Z"
+        fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round"
+      />
+      {/* Mustache over the upper lip */}
+      <path d={MUSTACHE_D} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Soft strand shading + volume highlights */}
+      <path d="M36 60 Q38 66 41 71" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.12" />
+      <path d="M64 60 Q62 66 59 71" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.12" />
+      <path d="M50 69 L50 78" fill="none" stroke="#000" strokeWidth={0.5} opacity="0.1" />
+      <ellipse cx="36" cy="59" rx="3" ry="4" fill="#fff" opacity="0.07" />
+      <ellipse cx="64" cy="59" rx="3" ry="4" fill="#fff" opacity="0.07" />
     </g>
   );
 }
@@ -119,8 +114,13 @@ function SoulPatch({ fill }: FacialHairProps) {
 function ChinStrap({ fill }: FacialHairProps) {
   return (
     <g>
-      <path d="M30 56 Q32 54 34 56 Q36 60 38 64 Q40 68 44 71 Q47 73 50 74 Q53 73 56 71 Q60 68 62 64 Q64 60 66 56 Q68 54 70 56" fill="none" stroke={fill} strokeWidth={3} strokeLinecap="round" />
-      <path d="M30 56 Q32 54 34 56 Q36 60 38 64 Q40 68 44 71 Q47 73 50 74 Q53 73 56 71 Q60 68 62 64 Q64 60 66 56 Q68 54 70 56" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.3" />
+      {/* Sideburns anchoring the strap at the temples */}
+      <path d="M27 49 Q26 55 29 60 L33 59 Q31 54 31 49Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M73 49 Q74 55 71 60 L67 59 Q69 54 69 49Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Bold jawline band */}
+      <path d="M30 58 Q33 66 39 71 Q45 76 50 77 Q55 76 61 71 Q67 66 70 58" fill="none" stroke={fill} strokeWidth={4.5} strokeLinecap="round" />
+      <path d="M30 58 Q33 66 39 71 Q45 76 50 77 Q55 76 61 71 Q67 66 70 58" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.22" />
+      <path d="M34 62 Q39 70 50 74 Q61 70 66 62" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.12" />
     </g>
   );
 }
@@ -128,10 +128,13 @@ function ChinStrap({ fill }: FacialHairProps) {
 function MuttonChops({ fill }: FacialHairProps) {
   return (
     <g>
-      <path d="M28 48 Q30 44 32 48 Q34 54 34 60 Q34 66 32 70 Q30 74 34 74 Q38 74 40 70 Q42 66 40 60 Q38 54 36 50 Q34 46 30 48Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M72 48 Q70 44 68 48 Q66 54 66 60 Q66 66 68 70 Q70 74 66 74 Q62 74 60 70 Q58 66 60 60 Q62 54 64 50 Q66 46 70 48Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <path d="M32 54 Q33 60 33 66" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
-      <path d="M68 54 Q67 60 67 66" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
+      {/* Bold chops flaring from the temples toward the mouth corners */}
+      <path d="M27 47 Q31 45 33 49 Q35 55 35 61 Q35 67 39 70 Q43 73 47 70 Q45 65 43 60 Q41 54 39 50 Q37 46 32 46Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M73 47 Q69 45 67 49 Q65 55 65 61 Q65 67 61 70 Q57 73 53 70 Q55 65 57 60 Q59 54 61 50 Q63 46 68 46Z" fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Connecting mustache (classic mutton-chop pairing), chin left bare */}
+      <path d={MUSTACHE_D} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <path d="M33 53 Q34 60 35 66" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.12" />
+      <path d="M67 53 Q66 60 65 66" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.12" />
     </g>
   );
 }
@@ -259,66 +262,31 @@ function FuManchu({ fill }: FacialHairProps) {
   );
 }
 
-/** Trimmed beard — short stubble-textured, follows jawline, connected mustache */
+/** Trimmed beard — neat, crisp-edged short beard hugging the jaw, mouth open. */
 function TrimmedBeard({ fill }: FacialHairProps) {
   const uid = useAvatarUid();
   const shadeId = `tbeard-shade-${uid}`;
-  const liftId = `tbeard-lift-${uid}`;
+  const BEARD_D =
+    'M32 55 Q35 52.5 39 54 Q43.5 56.2 47 56.6 Q50 57 53 56.6 Q56.5 56.2 61 54 Q65 52.5 68 55 Q70 61 67.5 68 Q64 74.5 56.5 77.5 Q53 79 50 79.2 Q47 79 43.5 77.5 Q36 74.5 32.5 68 Q30 61 32 55Z';
+  const HOLE_D = 'M43.5 59 Q50 57.8 56.5 59 Q57 63.5 52.8 66.4 Q50 68 47.2 66.4 Q43 63.5 43.5 59Z';
   return (
     <g>
       <defs>
-        {/* Radial shade: darker under jaw, lighter mid-face — reads 3D */}
-        <radialGradient id={shadeId} cx="50%" cy="35%" r="75%">
-          <stop offset="0%" stopColor="#000" stopOpacity="0" />
-          <stop offset="70%" stopColor="#000" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#000" stopOpacity="0.38" />
-        </radialGradient>
-        {/* Linear lift: warm highlight on upper stubble band */}
-        <linearGradient id={liftId} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#fff" stopOpacity="0.28" />
-          <stop offset="60%" stopColor="#fff" stopOpacity="0.06" />
-          <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+        <linearGradient id={shadeId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.18" />
+          <stop offset="45%" stopColor="#000" stopOpacity="0" />
+          <stop offset="100%" stopColor="#000" stopOpacity="0.30" />
         </linearGradient>
       </defs>
-      {/* Mustache — thin strip above the mouth */}
-      <path d="M42 57 Q44 55.5 47 56 Q50 57 50 57 Q50 57 53 56 Q56 55.5 58 57"
-        fill="none" stroke={fill} strokeWidth={2.5} strokeLinecap="round" />
-      <path d="M42 57 Q44 55.5 47 56 Q50 57 50 57 Q50 57 53 56 Q56 55.5 58 57"
-        fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.25" />
-      {/* Cheek stubble — denser dots from mustache to jawline */}
-      <g>
-        {[
-          {x:34,y:58},{x:36,y:59},{x:35,y:61},{x:34,y:63},{x:36,y:65},{x:35,y:67},
-          {x:38,y:58},{x:37,y:60},{x:39,y:62},{x:38,y:64},{x:39,y:66},
-          {x:40,y:59},{x:40,y:61},{x:40,y:63},{x:41,y:65},
-          {x:66,y:58},{x:64,y:59},{x:65,y:61},{x:66,y:63},{x:64,y:65},{x:65,y:67},
-          {x:62,y:58},{x:63,y:60},{x:61,y:62},{x:62,y:64},{x:61,y:66},
-          {x:60,y:59},{x:60,y:61},{x:60,y:63},{x:59,y:65},
-        ].map((p,i) => (
-          <circle key={`ch${i}`} cx={p.x} cy={p.y} r={1.5} fill={fill} opacity={0.5} />
-        ))}
-      </g>
-      {/* Chin beard — dense stubble filling chin area */}
-      <g>
-        {[
-          {x:42,y:63},{x:44,y:64},{x:46,y:65},{x:48,y:66},{x:50,y:66},{x:52,y:66},{x:54,y:65},{x:56,y:64},{x:58,y:63},
-          {x:41,y:65},{x:43,y:66},{x:45,y:67},{x:47,y:68},{x:49,y:68},{x:51,y:68},{x:53,y:67},{x:55,y:66},{x:57,y:65},{x:59,y:65},
-          {x:42,y:67},{x:44,y:68},{x:46,y:69},{x:48,y:70},{x:50,y:70},{x:52,y:70},{x:54,y:69},{x:56,y:68},{x:58,y:67},
-          {x:44,y:71},{x:46,y:72},{x:48,y:72},{x:50,y:73},{x:52,y:72},{x:54,y:72},{x:56,y:71},
-          {x:46,y:74},{x:48,y:74},{x:50,y:75},{x:52,y:74},{x:54,y:74},
-        ].map((p,i) => (
-          <circle key={`cb${i}`} cx={p.x} cy={p.y} r={1.5} fill={fill} opacity={0.65} />
-        ))}
-      </g>
-      {/* Jawline contour — thicker band along the jaw */}
-      <path d="M34 66 Q38 70 42 72 Q46 74 50 75 Q54 74 58 72 Q62 70 66 66"
-        fill="none" stroke={fill} strokeWidth={2.5} strokeLinecap="round" />
-      <path d="M34 66 Q38 70 42 72 Q46 74 50 75 Q54 74 58 72 Q62 70 66 66"
-        fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" opacity="0.15" />
-      {/* Polish overlays — shade under jaw, highlight on upper band. Applied as rects
-          clipped to beard footprint (cheek strip 33..67 × 57..76). */}
-      <rect x="33" y="57" width="34" height="19" fill={`url(#${shadeId})`} pointerEvents="none" />
-      <rect x="33" y="57" width="34" height="10" fill={`url(#${liftId})`} pointerEvents="none" />
+      <path fillRule="evenodd" d={`${BEARD_D} ${HOLE_D}`} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* clean vertical shading for the trimmed 3D look (mouth kept open) */}
+      <path fillRule="evenodd" d={`${BEARD_D} ${HOLE_D}`} fill={`url(#${shadeId})`} stroke="none" />
+      {/* Mustache over the upper lip */}
+      <path d={MUSTACHE_D} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Crisp trimmed-edge highlights */}
+      <path d="M34 58 Q40 60 45 59" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.12" />
+      <path d="M55 59 Q60 60 66 58" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.12" />
+      <path d="M50 68 L50 77" fill="none" stroke="#000" strokeWidth={0.4} opacity="0.1" />
     </g>
   );
 }

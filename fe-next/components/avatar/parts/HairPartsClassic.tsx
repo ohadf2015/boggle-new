@@ -10,11 +10,13 @@ function Spiky({ fill }: HairPartProps) {
       <defs><HairPolishDefs uid={u} keyName="spiky" /></defs>
       {/* Solid cap base */}
       <path d={cap} fill={fill} stroke="#000" strokeWidth={S} />
-      {/* Short chunky spikes — 5 pointed, not too tall */}
-      <path d="M22 30 L30 16 L38 26 L50 12 L62 26 L70 16 L78 30"
+      {/* Sharper, taller spikes — 6 points with a center peak for dynamism */}
+      <path d="M21 31 L29 12 L37 25 L45 10 L50 19 L55 10 L63 25 L71 12 L79 31"
         fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       {/* Fill gap between cap and spikes */}
-      <path d="M22 30 Q50 20 78 30 Q80 34 80 36 Q50 22 20 36 Q20 34 22 30Z" fill={fill} stroke="none" />
+      <path d="M21 31 Q50 20 79 31 Q80 34 80 36 Q50 22 20 36 Q20 34 21 31Z" fill={fill} stroke="none" />
+      {/* Spike-separation shading so individual spikes read */}
+      <path d="M33 24 L29 14 M41 21 L45 12 M59 21 L55 12 M67 24 L71 14" fill="none" stroke="#000" strokeWidth={0.6} opacity="0.12" />
       {/* Faux-3D polish */}
       <HairPolish uid={u} keyName="spiky" d={cap} />
       {/* SYSTEMIC: shared crown highlight for consistency */}
@@ -77,21 +79,23 @@ function Buzz({ fill }: HairPartProps) {
 
 function Mohawk({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const strip = "M38 30 L38 4 Q50 0 62 4 L62 30";
+  // Spiky fin (row of triangular points), tallest in the centre — not a brick.
+  const fin = "M35 33 L39 9 L43 23 L47 4 L50 17 L53 4 L57 23 L61 9 L65 33 Q50 28 35 33Z";
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="mohawk" /></defs>
       {/* Shaved side hints */}
-      <path d="M22 36 Q22 26 34 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
-      <path d="M78 36 Q78 26 66 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
-      {[{x:24,y:32},{x:28,y:28},{x:32,y:26},{x:72,y:28},{x:76,y:32},{x:68,y:26}].map((p) => (
+      <path d="M22 36 Q22 27 33 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
+      <path d="M78 36 Q78 27 67 24" fill="none" stroke={fill} strokeWidth={1} opacity="0.3" />
+      {[{x:25,y:32},{x:29,y:28},{x:33,y:26},{x:71,y:28},{x:75,y:32},{x:67,y:26}].map((p) => (
         <circle key={`${p.x}-${p.y}`} cx={p.x} cy={p.y} r={1.2} fill={fill} opacity={0.25} />
       ))}
-      {/* Mohawk strip — clamped within viewBox */}
-      <path d={strip} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
-      <HairPolish uid={u} keyName="mohawk" d={strip} />
-      <path d="M44 26 L44 6 M50 24 L50 2 M56 26 L56 6" stroke="#000" strokeWidth={0.7} opacity="0.12" />
-      <path d="M48 24 L48 4 M52 22 L52 2" stroke="#fff" strokeWidth={1} opacity="0.15" />
+      {/* Spiky fin */}
+      <path d={fin} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <HairPolish uid={u} keyName="mohawk" d={fin} />
+      {/* Spike separation + highlight */}
+      <path d="M43 21 L43 11 M50 15 L50 7 M57 21 L57 11" stroke="#000" strokeWidth={0.6} opacity="0.12" />
+      <path d="M47 13 L48 6 M53 13 L52 6" stroke="#fff" strokeWidth={1} opacity="0.16" />
     </g>
   );
 }

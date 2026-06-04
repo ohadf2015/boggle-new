@@ -33,27 +33,24 @@ function Shag({ fill }: HairPartProps) {
 
 function FlatTop({ fill }: HairPartProps) {
   const u = useAvatarUid();
-  const block = "M22 34 L20 12 Q20 4 26 4 L74 4 Q80 4 80 12 L78 34Z";
+  // Flat top with faded, tapering sides that hug the head — not a floating brick.
+  const block = "M22 36 Q19 29 22 22 L25 11 Q25 8 29 8 L71 8 Q75 8 75 11 L78 22 Q81 29 78 36 Q50 30 22 36Z";
   return (
     <g>
       <defs><HairPolishDefs uid={u} keyName="flatTop" /></defs>
-      {/* Tall flat-top block — sides overlap face circle at y=34 */}
       <path d={block} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
       <HairPolish uid={u} keyName="flatTop" d={block} />
-      {/* Inner fill to ensure solidity */}
-      <path d="M24 32 L22 14 Q22 6 28 6 L72 6 Q78 6 78 14 L76 32Z" fill={fill} stroke="none" />
-      {/* Flat top edge — bold emphasis */}
-      <line x1="26" y1="4" x2="74" y2="4" stroke="#000" strokeWidth={2} opacity="0.35" />
-      {/* Angular side edges */}
-      <line x1="20" y1="12" x2="22" y2="28" stroke="#000" strokeWidth={1.5} opacity="0.2" />
-      <line x1="80" y1="12" x2="78" y2="28" stroke="#000" strokeWidth={1.5} opacity="0.2" />
-      {/* Vertical texture lines — tight, uniform hair standing up */}
-      {[28,33,38,43,48,53,58,63,68,73].map((x, i) => (
-        <line key={`line-${x}`} x1={x} y1="6" x2={x} y2="26" stroke="#000" strokeWidth={0.6} opacity={0.08+i*0.004} />
+      {/* Bold flat top edge */}
+      <line x1="28" y1="8.5" x2="72" y2="8.5" stroke="#000" strokeWidth={2} opacity="0.3" />
+      {/* Side fade hints — shorter, lighter toward the jaw */}
+      <path d="M23 28 Q21 32 23 35 M77 28 Q79 32 77 35" fill="none" stroke="#000" strokeWidth={1} opacity="0.14" />
+      {/* Vertical texture — hair standing up */}
+      {[30,35,40,45,50,55,60,65,70].map((x) => (
+        <line key={`line-${x}`} x1={x} y1="11" x2={x} y2="23" stroke="#000" strokeWidth={0.6} opacity={0.09} />
       ))}
       {/* Highlights */}
-      <path d="M32 6 Q50 4 68 6" fill="none" stroke="#fff" strokeWidth={1.5} opacity="0.15" />
-      <path d="M26 12 L26 22 M74 12 L74 22" stroke="#fff" strokeWidth={0.8} opacity="0.1" />
+      <path d="M30 10 Q50 8 70 10" fill="none" stroke="#fff" strokeWidth={1.3} opacity="0.16" />
+      <path d="M27 13 L26 21 M73 13 L74 21" stroke="#fff" strokeWidth={0.7} opacity="0.1" />
     </g>
   );
 }
