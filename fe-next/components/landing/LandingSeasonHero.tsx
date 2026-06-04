@@ -128,7 +128,7 @@ export const LandingSeasonHero: React.FC = () => {
             {/* Season twist — the month's flavor/atmosphere. */}
             {twist && (
               <p
-                className="mt-0.5 text-[11px] sm:text-xs font-neo-display leading-tight truncate"
+                className="season-twist-label mt-0.5 text-[11px] sm:text-xs font-neo-display leading-tight truncate"
                 style={{ color: accent }}
               >
                 <span aria-hidden className="me-1">{twist.emoji}</span>

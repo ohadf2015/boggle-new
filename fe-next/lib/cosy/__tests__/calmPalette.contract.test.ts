@@ -180,3 +180,70 @@ describe('cosy structural softening + light-theme circuit-breakers (globals.css)
     expect(guard!).toMatch(/(255\s+255\s+255|#fff|#ffffff|white)/i);
   });
 });
+
+/* Contrast circuit-breakers from the 2026-06-05 cosy audit. The cosy palette
+   flips backdrops to cream but leaves accent TEXT, neo-navy ink, `dark:`-gated
+   light text, and literal slate/gray panel surfaces untouched — all of which
+   fail on the light surface (measured: home 15, how-to-play 17 low-contrast
+   hits → 0 after these rules). Guard them so a future palette edit can't
+   silently regress the readability. */
+describe('cosy contrast circuit-breakers — accent text, ink, dark:, panels (audit 2026-06-05)', () => {
+  const css = readFileSync(CSS_PATH, 'utf8');
+  const block = cosyBlock(css);
+  const sand = tokenValue(block, '--neo-navy')!; // page backdrop
+  const ink = tokenValue(block, '--neo-black')!; // charcoal
+
+  /** Find the cosy rule whose selector matches `needle` and pull its color value. */
+  function ruleColor(needle: RegExp): string | null {
+    const rule = cosyRules(css).find((r) => needle.test(r) && /color\s*:/.test(r));
+    if (!rule) return null;
+    const m = rule.match(/[^-]color\s*:\s*([^;!]+)/); // skip background-color / border-color
+    return m ? m[1].trim() : null;
+  }
+
+  it('darkens every accent-family TEXT utility to clear AA on the cream backdrop', () => {
+    // The fill use of these tokens stays a light tint; only the .text-neo-* CLASS
+    // colour is overridden, so accent text (wordmark, scores, headings) is legible.
+    for (const family of ['lime', 'cyan', 'pink', 'purple', 'yellow', 'orange']) {
+      const color = ruleColor(new RegExp(`\\[class\\*=['"]text-neo-${family}['"]\\]`));
+      expect(color, `cosy must override text-neo-${family} colour`).toBeTruthy();
+      expect(
+        contrastRatio(color!, sand),
+        `text-neo-${family} (${color}) on cream must clear AA`,
+      ).toBeGreaterThanOrEqual(AA);
+    }
+  });
+
+  it('flips neo-navy INK (dark text on colored fills) to charcoal', () => {
+    const color = ruleColor(/\[class\*=['"]text-neo-navy['"]\]/);
+    expect(color, 'cosy must override text-neo-navy (the navy var became light sand)').toBeTruthy();
+    expect(color!, 'text-neo-navy must resolve to charcoal ink').toMatch(/neo-black/);
+  });
+
+  it('flips the always-on dark:text-white / dark:text-neo-white utilities to ink', () => {
+    // `.dark` is force-applied app-wide, so dark:text-* stays active on the light
+    // cosy surface. The class is literally `dark:text-white` — needs an escaped `\:`.
+    const rule = cosyRules(css).find((r) => /\.dark\\?:text-white/.test(r) && /color\s*:/.test(r));
+    expect(rule, 'cosy must override dark:text-white (escaped selector)').toBeTruthy();
+    expect(rule!).toMatch(/neo-black/);
+  });
+
+  it('flips literal slate/gray PANEL surfaces to cream but spares full-screen scrims', () => {
+    const panel = cosyRules(css).find(
+      (r) => /\[class\*=['"]bg-slate-8['"]\]/.test(r) && /background-color\s*:/.test(r),
+    );
+    expect(panel, 'cosy must flip bg-slate-* panels (literal palette, no --neo var)').toBeTruthy();
+    // Must NOT flip modal backdrops / scrims (they dim the page behind a dialog).
+    expect(panel!, 'panel flip must exclude .fixed / .inset-0 scrims').toMatch(
+      /:not\(\.fixed\)|:not\(\.inset-0\)/,
+    );
+    // Flips toward a LIGHT surface, not another dark value.
+    expect(panel!).toMatch(/neo-navy-elevated|neo-cream|neo-navy-light/);
+  });
+
+  it('overrides the season-hero twist label (inline bright accent) to legible ink', () => {
+    const rule = ruleColor(/\.season-twist-label/);
+    expect(rule, 'cosy must override .season-twist-label inline accent colour').toBeTruthy();
+    expect(rule!).toMatch(/neo-black/);
+  });
+});

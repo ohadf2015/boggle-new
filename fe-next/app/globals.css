@@ -4004,6 +4004,97 @@ html[data-cosy='true'] .border-4 {
   border-color: hsl(40 20% 80%) !important;
 }
 
+/* ====================================================================
+   COSY CONTRAST CIRCUIT-BREAKERS (audit 2026-06-05)
+   The cosy palette flips backdrops to warm cream but leaves three classes
+   of color untouched, all of which fail on the light surface:
+     (A) accent TEXT — `.text-neo-{family}` reads the same var as the fill
+         use, which cosy muted to a light tint. Light tint = fine as a fill,
+         invisible as text on cream. Override the TEXT class color to a deep,
+         hue-preserving ink (fills, which read the var, are untouched).
+     (B) `text-neo-navy` — neo-navy is the dark-INK intent, but cosy redefines
+         --neo-navy to light sand (it doubles as the page backdrop) → flip to
+         charcoal so badge/chip ink stays readable on colored fills.
+     (C) `dark:`-prefixed TEXT — `.dark` is force-applied app-wide, so every
+         `dark:text-white` etc. stays active and renders light on cream. The
+         class string is literally `dark:text-…`, so the (A)/text-white rules
+         above can't reach it — escaped selectors required. TEXT ONLY: never
+         touch dark:bg-* here (those may be intentional scrims).
+   Contrast target: cream backdrop luminance ≈ 0.655, so AA-4.5 text needs
+   luminance ≤ ~0.107 → these inks sit at ~26–32% HSL lightness. ==== */
+
+/* (A) Accent-family text → deep, readable, hue-preserving ink on cream.
+   [class*='…'] catches the -light/-muted/-dark text variants too; bg-* /
+   border-* are unaffected (different substrings). */
+html[data-cosy='true'] [class*='text-neo-lime'] {
+  color: hsl(74 60% 22%) !important;
+}
+html[data-cosy='true'] [class*='text-neo-cyan'] {
+  color: hsl(186 64% 21%) !important;
+}
+html[data-cosy='true'] [class*='text-neo-pink'] {
+  color: hsl(330 58% 33%) !important;
+}
+html[data-cosy='true'] [class*='text-neo-purple'] {
+  color: hsl(270 46% 38%) !important;
+}
+html[data-cosy='true'] [class*='text-neo-yellow'],
+html[data-cosy='true'] [class*='text-neo-gold'] {
+  color: hsl(36 78% 26%) !important;
+}
+html[data-cosy='true'] [class*='text-neo-orange'] {
+  color: hsl(20 72% 30%) !important;
+}
+
+/* (B) neo-navy ink (dark text on colored fills) → charcoal, since cosy turned
+   the navy var itself into light sand. */
+html[data-cosy='true'] [class*='text-neo-navy'] {
+  color: rgb(var(--neo-black)) !important;
+}
+
+/* (C) dark:-prefixed light text utilities → charcoal / muted ink. Escaped `:`.
+   Two-class effective specificity (data-cosy + the dark\: class) outweighs
+   Tailwind's `.dark .dark\:text-…` generated rule. */
+html[data-cosy='true'] .dark\:text-white,
+html[data-cosy='true'] .dark\:text-neo-white,
+html[data-cosy='true'] .dark\:text-neo-cream {
+  color: rgb(var(--neo-black)) !important;
+}
+html[data-cosy='true'] .dark\:text-gray-100,
+html[data-cosy='true'] .dark\:text-gray-200,
+html[data-cosy='true'] .dark\:text-gray-300,
+html[data-cosy='true'] .dark\:text-gray-400,
+html[data-cosy='true'] .dark\:text-slate-200,
+html[data-cosy='true'] .dark\:text-slate-300,
+html[data-cosy='true'] .dark\:text-slate-400 {
+  color: var(--muted-foreground) !important;
+}
+
+/* (D) Dark PANEL surfaces — `bg-slate-{600..900}` / `bg-gray-{700..900}` are
+   literal Tailwind palette colors (no --neo var), so cosy never reaches them
+   and they stay dark on the cream page; combined with the text-white→charcoal
+   flip above, white text inside them goes charcoal-on-dark = invisible. Flip
+   the panel families to the elevated cream surface. The [class*='bg-…'] form
+   also catches the `dark:bg-…` and `/opacity` variants of the same colors.
+   EXCLUDE full-screen scrims (.fixed / .inset-0 / backdrop-*) — those are
+   meant to stay dark to dim the page behind a modal. */
+html[data-cosy='true'] [class*='bg-slate-6']:not(.fixed):not(.inset-0):not([class*='backdrop']),
+html[data-cosy='true'] [class*='bg-slate-7']:not(.fixed):not(.inset-0):not([class*='backdrop']),
+html[data-cosy='true'] [class*='bg-slate-8']:not(.fixed):not(.inset-0):not([class*='backdrop']),
+html[data-cosy='true'] [class*='bg-slate-9']:not(.fixed):not(.inset-0):not([class*='backdrop']),
+html[data-cosy='true'] [class*='bg-gray-7']:not(.fixed):not(.inset-0):not([class*='backdrop']),
+html[data-cosy='true'] [class*='bg-gray-8']:not(.fixed):not(.inset-0):not([class*='backdrop']),
+html[data-cosy='true'] [class*='bg-gray-9']:not(.fixed):not(.inset-0):not([class*='backdrop']) {
+  background-color: var(--neo-navy-elevated) !important;
+}
+
+/* Season-hero twist label carries the season's bright accent as an INLINE
+   color (e.g. cyan #00FFFF) — unreadable on cream. !important outweighs the
+   non-important inline style; charcoal keeps it calm + legible. */
+html[data-cosy='true'] .season-twist-label {
+  color: rgb(var(--neo-black)) !important;
+}
+
 /* Rounder, softer corners everywhere (the reference's full-pill feel). */
 html[data-cosy='true'] .rounded-neo {
   border-radius: 18px;
