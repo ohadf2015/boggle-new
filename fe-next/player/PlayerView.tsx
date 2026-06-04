@@ -492,7 +492,13 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     if (data.language) storeUpdates.gameLanguage = data.language;
     storeUpdates.minWordLength = data.minWordLength ?? 2;
     if (data.boardTheme) storeUpdates.boardTheme = data.boardTheme;
-    if (data.gameMode) storeUpdates.gameMode = data.gameMode;
+    if (data.gameMode) {
+      // Authoritative server mode (results-screen → next-round path, where
+      // usePlayerGameEvents' listener isn't mounted). Confirm atomically so the
+      // in-game view never renders a stale mode from the round that just ended.
+      storeUpdates.gameMode = data.gameMode;
+      storeUpdates.gameModeConfirmed = true;
+    }
     if (data.blastTileOverlay) {
       storeUpdates.blastTileOverlay = data.blastTileOverlay;
       storeUpdates.blastMovesUsed = 0;

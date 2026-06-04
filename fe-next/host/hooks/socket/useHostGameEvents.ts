@@ -306,9 +306,11 @@ export function useHostGameEvents({
         useGameStore.getState().setGameLanguage(data.language);
       }
 
-      // Sync resolved game mode from server (handles random → actual mode)
+      // Sync resolved game mode from server (handles random → actual mode) and open
+      // the render gate atomically — tableData (set above) is now in place, so
+      // HostInGameView mounts the correct mode on the first frame, no classic flash.
       if (extData.gameMode) {
-        useGameStore.getState().setGameMode(extData.gameMode);
+        useGameStore.getState().confirmGameMode(extData.gameMode);
       }
 
       // Set blast tile overlay if present (mirrors player handler)

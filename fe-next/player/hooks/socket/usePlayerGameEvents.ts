@@ -384,7 +384,13 @@ export function usePlayerGameEvents({
       if (data.language) storeUpdates.gameLanguage = data.language;
       storeUpdates.minWordLength = data.minWordLength ?? 2;
       if (ext.boardTheme) storeUpdates.boardTheme = ext.boardTheme;
-      if (data.gameMode) storeUpdates.gameMode = data.gameMode;
+      if (data.gameMode) {
+        // Authoritative server mode for this round. Set mode + open the render gate
+        // in the SAME batched setState so PlayerInGameView mounts already on the
+        // correct mode — never the optimistic/stale one that swaps mid-load.
+        storeUpdates.gameMode = data.gameMode;
+        storeUpdates.gameModeConfirmed = true;
+      }
       if (ext.blastTileOverlay) {
         storeUpdates.blastTileOverlay = ext.blastTileOverlay;
         const reconnectMoves = ext.blastPlayerMoves;

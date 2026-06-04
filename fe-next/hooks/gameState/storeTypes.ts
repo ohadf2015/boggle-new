@@ -53,9 +53,11 @@ export interface GameState {
 
   // Game mode
   gameMode: GameModeSelection;
-  /** True once the server has confirmed the concrete mode for the current game.
-   * Stays false until setGameMode or batchStartGame fires, preventing a one-frame
-   * flash of classic mode before the server's mode update arrives. */
+  /** True once the SERVER has confirmed the concrete mode for the current round.
+   * Stays false through tentative client selections (setGameMode); only the server
+   * paths confirmGameMode/batchStartGame open it, and resetForNewRound closes it
+   * again. Gates mode-specific rendering so an optimistic/stale mode can't flash and
+   * swap when the real startGame payload arrives. */
   gameModeConfirmed: boolean;
   /**
    * Host's intended game mode for the next round (can be 'random').
@@ -148,6 +150,9 @@ export interface GameActions {
 
   // Game mode actions
   setGameMode: (value: GameModeSelection | ((prev: GameModeSelection) => GameModeSelection)) => void;
+  /** Authoritative server confirmation: sets the resolved concrete mode and opens the
+   * render gate (gameModeConfirmed) atomically. Called only from startGame socket paths. */
+  confirmGameMode: (mode: GameModeSelection) => void;
   setHostSelectedGameMode: (value: GameModeSelection | ((prev: GameModeSelection) => GameModeSelection)) => void;
 
   // Blast multiplayer actions

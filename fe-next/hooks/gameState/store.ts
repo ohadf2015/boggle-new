@@ -303,8 +303,19 @@ export const useGameStore = create<GameStore>()(
     // Game Mode Actions
     // ==========================================
 
+    // Tentative client-side selection (URL ?mode= param, host lobby picker). Sets the
+    // mode but leaves gameModeConfirmed FALSE — only the server's startGame payload
+    // (confirmGameMode / batchStartGame) may open the in-game render gate. Otherwise an
+    // optimistic/stale mode renders and visibly swaps when the real mode arrives.
     setGameMode: (value) => set((state) => ({
       gameMode: applySetState(value, state.gameMode),
+      gameModeConfirmed: false,
+    })),
+
+    // Authoritative server confirmation: set the resolved concrete mode AND open the
+    // gate in one atomic update, so the mode-specific view mounts already correct.
+    confirmGameMode: (mode) => set(() => ({
+      gameMode: mode,
       gameModeConfirmed: true,
     })),
 
@@ -454,6 +465,10 @@ export const useGameStore = create<GameStore>()(
       }
       set({
         gameActive: false,
+        // Re-gate mode rendering: next round must be re-confirmed by the server's
+        // startGame payload before any mode-specific view mounts, so a stale mode
+        // from the round that just ended can't flash on the next round's load.
+        gameModeConfirmed: false,
         letterGrid: null,
         remainingTime: null,
         gameDuration: null,
