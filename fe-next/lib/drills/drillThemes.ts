@@ -22,6 +22,8 @@ export interface DrillTheme {
   accent: DrillAccent;
   /** An existing mascot variant — keeps the character cast coherent. */
   mascot: MascotVariant;
+  /** Custom neo-brutalist drill emblem (kawaii icon badge) under /public. */
+  emblem: string;
   /** i18n key for the persona name shown big on the briefing (e.g. "Zap"). */
   personaKey: string;
   /** i18n key for the one-line mission ("what you do"). */
@@ -40,6 +42,7 @@ const theme = (
   id,
   accent,
   mascot,
+  emblem: `/brain-drills/${id}-emblem.jpg`,
   personaKey: `brain.drills.${id}.persona`,
   missionKey: `brain.drills.${id}.mission`,
   benefitKey: `brain.drills.${id}.benefit`,

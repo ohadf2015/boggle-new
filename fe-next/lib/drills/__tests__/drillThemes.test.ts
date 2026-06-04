@@ -36,6 +36,9 @@ describe('DRILL_THEMES', () => {
     // Mascot variant must be one the component can actually render.
     expect(theme.mascot in MASCOT_IMAGES).toBe(true);
 
+    // Custom emblem points at the generated neo-brutalist badge asset.
+    expect(theme.emblem).toBe(`/brain-drills/${id}-emblem.jpg`);
+
     // i18n keys are wired (no hardcoded UI strings).
     expect(theme.personaKey).toBe(`brain.drills.${id}.persona`);
     expect(theme.missionKey).toBe(`brain.drills.${id}.mission`);

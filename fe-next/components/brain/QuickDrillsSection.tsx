@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { m } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info, type LucideIcon } from 'lucide-react';
+import { Lock, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { getDrillTheme } from '@/lib/drills/drillThemes';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,7 +16,6 @@ import type { DrillProgress, DrillType } from '@/shared/types/cognitive';
 
 interface Drill {
   id: DrillType;
-  icon: LucideIcon;
   domain: string;
   color: string;
   bgColor: string;
@@ -24,7 +25,6 @@ interface Drill {
 const DRILLS: Drill[] = [
   {
     id: 'lightning-round',
-    icon: Zap,
     domain: 'processingSpeed',
     color: 'text-neo-lime',
     bgColor: 'bg-yellow-400',
@@ -32,7 +32,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'memory-hunt',
-    icon: Brain,
     domain: 'workingMemory',
     color: 'text-neo-purple',
     bgColor: 'bg-purple-400',
@@ -40,7 +39,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'combo-master',
-    icon: Target,
     domain: 'attention',
     color: 'text-neo-orange',
     bgColor: 'bg-orange-400',
@@ -48,7 +46,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'pattern-switcher',
-    icon: Shuffle,
     domain: 'flexibility',
     color: 'text-neo-cyan',
     bgColor: 'bg-cyan-400',
@@ -56,7 +53,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'rare-gems',
-    icon: BookOpen,
     domain: 'vocabulary',
     color: 'text-lime-400',
     bgColor: 'bg-lime-400',
@@ -106,7 +102,6 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
         {/* 2-Column Grid Layout */}
         <div className="grid grid-cols-2 gap-3 md:gap-4">
           {DRILLS.map((drill, index) => {
-            const Icon = drill.icon;
             const isUnlocked = gamesPlayed >= drill.unlockRequirement;
             const gamesRemaining = Math.max(0, drill.unlockRequirement - gamesPlayed);
 
@@ -133,11 +128,14 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = EMP
               >
                 {/* Header row with icon and title */}
                 <div className="flex items-center gap-2 md:gap-4 w-full">
-                  <div className={cn(
-                    'w-10 h-10 md:w-14 md:h-14 rounded-md border-2 border-neo-black flex items-center justify-center relative shrink-0',
-                    drill.bgColor
-                  )}>
-                    <Icon className="w-5 h-5 md:w-7 md:h-7 text-neo-black" />
+                  <div className="w-10 h-10 md:w-14 md:h-14 rounded-md border-2 border-neo-black overflow-hidden relative shrink-0 bg-neo-white">
+                    <Image
+                      src={getDrillTheme(drill.id).emblem}
+                      alt=""
+                      fill
+                      sizes="56px"
+                      className="object-cover"
+                    />
                     {!isUnlocked && (
                       <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
                         <Lock className="w-3 h-3 md:w-4 md:h-4 text-white" />
