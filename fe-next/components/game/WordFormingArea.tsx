@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import Avatar from '@/components/Avatar';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useCosyMode } from '@/contexts/AccessibilityContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // How long the ✓/✗ note stays on screen after it arrives (ms).
@@ -97,6 +98,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   feedback,
 }) => {
   const { t } = useLanguageSafe();
+  // Cozy / Calm Mode swaps the energetic accept burst for one soft warm settle.
+  const cosyMode = useCosyMode();
   const [visibleFeedback, setVisibleFeedback] = useState<WordFeedback | null>(null);
   const [lastWord, setLastWord] = useState<string>('');
   const [lastLetterCount, setLastLetterCount] = useState<number>(0);
@@ -452,8 +455,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               )}
             </AnimatePresence>
 
-            {/* Sparkle particles - for accepted */}
-            {showFeedback && visibleFeedback?.type === 'accepted' && sparklePositions.map((pos, i) => (
+            {/* Sparkle particles - for accepted (loud mode only) */}
+            {!cosyMode && showFeedback && visibleFeedback?.type === 'accepted' && sparklePositions.map((pos, i) => (
               <m.div
                 key={`sparkle-${i}`}
                 className="absolute w-2 h-2 bg-neo-lime rounded-full left-1/2 top-1/2"
@@ -468,14 +471,27 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               />
             ))}
 
-            {/* Burst ring - for accepted */}
-            {showFeedback && visibleFeedback?.type === 'accepted' && (
+            {/* Burst ring - for accepted (loud mode only) */}
+            {!cosyMode && showFeedback && visibleFeedback?.type === 'accepted' && (
               <m.div
                 className="absolute inset-0 rounded-neo pointer-events-none"
                 initial={{ scale: 0.8, opacity: 1 }}
                 animate={{ scale: 1.6, opacity: 0 }}
                 transition={{ duration: 0.5 }}
                 style={{ border: '3px solid var(--neo-lime)' }}
+              />
+            )}
+
+            {/* Cozy / Calm accept — ONE soft warm settle instead of the burst.
+                A gentle peach bloom that breathes once over the pill; satisfying
+                without party noise. One-shot (animate-cosy-bloom) and hidden
+                under reduced-motion. */}
+            {cosyMode && showFeedback && visibleFeedback?.type === 'accepted' && (
+              <m.div
+                key={`cosy-glow-${visibleFeedback?.id}`}
+                data-testid="cosy-accept-glow"
+                aria-hidden="true"
+                className="absolute inset-[-30%] rounded-full pointer-events-none bg-neo-cozy-light/40 animate-cosy-bloom motion-reduce:hidden"
               />
             )}
 

@@ -11,7 +11,6 @@ hon
 vi
 de
 som
-en
 ett
 var
 vad
@@ -58,7 +57,6 @@ tung
 lätt
 mjuk
 hård
-lätt
 smalt
 brett
 högt
@@ -145,3 +143,20 @@ autentisk
 autentisitet
 autentisera
 autentiskhet
+område
+åker
+älska
+älskar
+älskad
+älskling
+älskvär
+älgen
+älskvärd
+älskare
+älskvärdaste
+älskvärdare
+älg
+älgar
+älgarna
+älgbock
+älgflock
