@@ -6924,6 +6924,17 @@ const en = {
     "baselineEstablished": "Your cognitive profile is ready. Play more games to track your improvement!",
     "overallScore": "Overall Score",
     "playAgain": "Play Again",
+    "briefing": {
+      "missionLabel": "Your mission",
+      "goalLabel": "This round",
+      "benefitLabel": "Why it helps",
+      "howToLabel": "How to play",
+      "coachLabel": "Coach tip",
+      "letsTrain": "Let's train!",
+      "participationLabel": "Showing up",
+      "performanceLabel": "Your play",
+      "bonusLabel": "Bonus"
+    },
     "drills": {
       "title": "Brain Drills",
       "brainTraining": "Brain Training",
@@ -6965,6 +6976,13 @@ const en = {
       "gemsCollected": "Gems collected",
       "pouchFull": "Pouch Full!",
       "timeUpHaul": "Time's Up — Nice Haul!",
+      "firstMissFree": "Warm-up miss — no harm done. You've got this!",
+      "badge": {
+        "bronze": { "name": "Bronze", "title": "Reps banked!" },
+        "silver": { "name": "Silver", "title": "Solid work!" },
+        "gold": { "name": "Gold", "title": "On fire!" },
+        "platinum": { "name": "Platinum", "title": "Absolute unit!" }
+      },
       "rarity": {
         "common": "common",
         "uncommon": "uncommon",
@@ -6973,7 +6991,14 @@ const en = {
       },
       "lightning-round": {
         "name": "Lightning Round",
-        "description": "Find words as fast as possible"
+        "description": "Find words as fast as possible",
+        "persona": "Zap",
+        "mission": "Find as many words as you can before the clock runs out.",
+        "benefit": "Words pop into your head faster the more you sprint.",
+        "coachTip": "Short words count too — go for volume, speed beats perfection.",
+        "step1": "Tap or swipe letters to build a word.",
+        "step2": "Submit it and keep hunting — speed is everything.",
+        "step3": "Rack up as many as you can before time's up."
       },
       "memory-hunt": {
         "name": "Memory Hunt",
@@ -6986,21 +7011,49 @@ const en = {
         "remaining": "Remaining",
         "studyTheseWords": "Study these words:",
         "markInvalid": "Replace",
-        "readyToStart": "I'm Ready!"
+        "readyToStart": "I'm Ready!",
+        "persona": "Echo",
+        "mission": "Study the highlighted words, then find them again from memory.",
+        "benefit": "Your short-term memory for details gets sharper every round.",
+        "coachTip": "Whisper the words to yourself while you study — it sticks better.",
+        "step1": "Memorize the highlighted words while you can.",
+        "step2": "The grid resets and the highlights vanish.",
+        "step3": "Find those same words from memory."
       },
       "combo-master": {
         "name": "Combo Master",
         "description": "Maintain combo streaks without breaks",
         "targetCombo": "Target: x{combo} combo",
-        "timerPerWord": "Timer: {time}s per word"
+        "timerPerWord": "Timer: {time}s per word",
+        "persona": "Blaze",
+        "mission": "Chain words back-to-back before the per-word timer runs out.",
+        "benefit": "You get better at staying locked in under pressure.",
+        "coachTip": "Keep your eyes moving — line up your next word before you submit.",
+        "step1": "Find a word to start your chain.",
+        "step2": "Each find resets the timer — be quick.",
+        "step3": "Keep the streak alive to grow your combo."
       },
       "pattern-switcher": {
         "name": "Pattern Switcher",
-        "description": "Find words in required length sequences"
+        "description": "Find words in required length sequences",
+        "persona": "Shift",
+        "mission": "Find a word of the required length — the target keeps changing.",
+        "benefit": "Your brain gets quicker at switching rules on the fly.",
+        "coachTip": "Check the target length first, then scan — don't lock onto one idea.",
+        "step1": "Read the required word length.",
+        "step2": "Find a word of exactly that length.",
+        "step3": "The target shifts — adapt and go again."
       },
       "rare-gems": {
         "name": "Rare Gems",
-        "description": "Fill your gem pouch — the longer the word, the rarer the gem"
+        "description": "Fill your gem pouch — the longer the word, the rarer the gem",
+        "persona": "Glimmer",
+        "mission": "Hunt for longer, rarer words — bigger words are bigger gems.",
+        "benefit": "You start noticing and using fancier words in everyday life.",
+        "coachTip": "Reach for 5+ letter words — they fill your pouch way faster.",
+        "step1": "Find words hidden on the grid.",
+        "step2": "Longer words drop rarer, shinier gems.",
+        "step3": "Fill your pouch before time runs out."
       },
       "locked": "Locked",
       "unlock": "Complete level {{level}} to unlock",

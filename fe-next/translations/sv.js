@@ -6960,6 +6960,17 @@ const sv = {
     "baselineEstablished": "Din kognitiva profil är klar. Spela fler spel för att följa din förbättring!",
     "overallScore": "Totalpoäng",
     "playAgain": "Spela igen",
+    "briefing": {
+      "missionLabel": "Din uppdrag",
+      "goalLabel": "Denna rond",
+      "benefitLabel": "Varför det hjälper",
+      "howToLabel": "Hur man spelar",
+      "coachLabel": "Tränartips",
+      "letsTrain": "Dags att träna!",
+      "participationLabel": "Att visa upp sig",
+      "performanceLabel": "Din spel",
+      "bonusLabel": "Bonus"
+    },
     "drills": {
       "title": "Hjärnövningar",
       "brainTraining": "Hjärnträning",
@@ -6987,7 +6998,14 @@ const sv = {
       "useHint": "Använd Tips",
       "lightning-round": {
         "name": "Blixtrundan",
-        "description": "Hitta ord så snabbt som möjligt"
+        "description": "Hitta ord så snabbt som möjligt",
+        "persona": "Zap",
+        "mission": "Hitta så många ord du kan innan klockan sier av.",
+        "benefit": "Ord dyker upp i huvudet snabbare ju mer du sprintar.",
+        "coachTip": "Korta ord räknas också — gå för volym, hastighet slår perfektion.",
+        "step1": "Tryck eller svep bokstäver för att bygga ett ord.",
+        "step2": "Skicka det och fortsätt jaga — hastighet är allt.",
+        "step3": "Samla så många du kan innan tiden är slut."
       },
       "memory-hunt": {
         "name": "Minnesjakt",
@@ -7000,21 +7018,49 @@ const sv = {
         "remaining": "Återstående",
         "studyTheseWords": "Studera dessa ord:",
         "markInvalid": "Ersätt",
-        "readyToStart": "Jag är redo!"
+        "readyToStart": "Jag är redo!",
+        "persona": "Echo",
+        "mission": "Studera orden som är markerade, hitta dem sedan på nytt från minnet.",
+        "benefit": "Ditt korttidsminne för detaljer blir skarpare varje rond.",
+        "coachTip": "Visca orden för dig själv medan du studerar — det fastnar bättre.",
+        "step1": "Memorera orden som är markerade medan du kan.",
+        "step2": "Rutnätet återställs och markeringarna försvinner.",
+        "step3": "Hitta samma ord från minnet."
       },
       "combo-master": {
         "name": "Kombomästare",
         "description": "Behåll kombinationsserier utan avbrott",
         "targetCombo": "Mål: x{combo} kombo",
-        "timerPerWord": "Timer: {time}s per ord"
+        "timerPerWord": "Timer: {time}s per ord",
+        "persona": "Blaze",
+        "mission": "Kedja ord efter varandra innan timer per ord tar slut.",
+        "benefit": "Du blir bättre på att hålla fokus under press.",
+        "coachTip": "Håll dina ögon på rörelse — ställ upp ditt nästa ord innan du skickar.",
+        "step1": "Hitta ett ord för att starta din kedja.",
+        "step2": "Varje fynd återställer timern — var snabb.",
+        "step3": "Håll serien vid liv för att växa din kombo."
       },
       "pattern-switcher": {
         "name": "Mönsterväxlare",
-        "description": "Hitta ord i krävda längdsekvenser"
+        "description": "Hitta ord i krävda längdsekvenser",
+        "persona": "Shift",
+        "mission": "Hitta ett ord av erforderlig längd — målet ändras hela tiden.",
+        "benefit": "Din hjärna blir snabbare på att byta regler on the fly.",
+        "coachTip": "Kontrollera målängden först, sedan söka — lås inte in en idé.",
+        "step1": "Läs erforderlig ordlängd.",
+        "step2": "Hitta ett ord av exakt den längden.",
+        "step3": "Målet skiftar — anpassa och försök igen."
       },
       "rare-gems": {
         "name": "Sällsynta ädelstenar",
-        "description": "Fyll din ädelstenspåse — ju längre ord, desto sällsyntare ädelsten"
+        "description": "Fyll din ädelstenspåse — ju längre ord, desto sällsyntare ädelsten",
+        "persona": "Glimmer",
+        "mission": "Jaga längre, sällsyntare ord — större ord är större ädelstenar.",
+        "benefit": "Du börjar märka och använda finare ord i ditt dagliga liv.",
+        "coachTip": "Sträva efter ord med 5+ bokstäver — de fyller din påse mycket snabbare.",
+        "step1": "Hitta ord gömda på rutnätet.",
+        "step2": "Längre ord ger sällsyntare, glänsande ädelstenar.",
+        "step3": "Fyll din påse innan tiden tar slut."
       },
       "locked": "Låst",
       "unlock": "Slutför nivå {{level}} för att låsa upp",
@@ -7043,6 +7089,13 @@ const sv = {
       "gemsCollected": "Insamlade ädelstenar",
       "pouchFull": "Påsen är full!",
       "timeUpHaul": "Tiden är ute — fin fångst!",
+      "firstMissFree": "Uppvärmning — ingen skada. Du fixar det här!",
+      "badge": {
+        "bronze": { "name": "Brons", "title": "Rep bankad!" },
+        "silver": { "name": "Silver", "title": "Bra jobbat!" },
+        "gold": { "name": "Guld", "title": "Du brinner!" },
+        "platinum": { "name": "Platina", "title": "En maskin!" }
+      },
       "rarity": {
         "common": "vanlig",
         "uncommon": "ovanlig",

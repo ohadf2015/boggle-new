@@ -6903,6 +6903,17 @@ const es = {
     "baselineEstablished": "Tu perfil cognitivo está listo. ¡Juega más partidas para seguir tu progreso!",
     "overallScore": "Puntuación General",
     "playAgain": "Jugar de Nuevo",
+    "briefing": {
+      "missionLabel": "Tu misión",
+      "goalLabel": "Esta ronda",
+      "benefitLabel": "Por qué ayuda",
+      "howToLabel": "Cómo jugar",
+      "coachLabel": "Consejo del entrenador",
+      "letsTrain": "¡A entrenar!",
+      "participationLabel": "Participación",
+      "performanceLabel": "Tu desempeño",
+      "bonusLabel": "Bonificación"
+    },
     "drills": {
       "title": "Ejercicios Mentales",
       "brainTraining": "Entrena tu Mente",
@@ -6930,7 +6941,14 @@ const es = {
       "useHint": "Usar Pista",
       "lightning-round": {
         "name": "Ronda Relámpago",
-        "description": "Encuentra palabras lo más rápido posible"
+        "description": "Encuentra palabras lo más rápido posible",
+        "persona": "Zap",
+        "mission": "Encuentra tantas palabras como puedas antes de que se agote el tiempo.",
+        "benefit": "Las palabras aparecen en tu cabeza más rápido cuanto más aceleres.",
+        "coachTip": "Las palabras cortas también cuentan — apunta al volumen, la velocidad vence a la perfección.",
+        "step1": "Toca o desliza las letras para construir una palabra.",
+        "step2": "Envíala y continúa cazando — la velocidad es todo.",
+        "step3": "Acumula tantas como puedas antes de que se agote el tiempo."
       },
       "memory-hunt": {
         "name": "Caza de Memoria",
@@ -6943,21 +6961,49 @@ const es = {
         "remaining": "Restantes",
         "studyTheseWords": "Estudia estas palabras:",
         "markInvalid": "Reemplazar",
-        "readyToStart": "¡Estoy listo!"
+        "readyToStart": "¡Estoy listo!",
+        "persona": "Eco",
+        "mission": "Estudia las palabras resaltadas, luego encuéntralas de nuevo de memoria.",
+        "benefit": "Tu memoria a corto plazo para detalles se vuelve más aguda cada ronda.",
+        "coachTip": "Susurra las palabras para ti mientras estudias — se fija mejor.",
+        "step1": "Memoriza las palabras resaltadas mientras puedas.",
+        "step2": "La cuadrícula se reinicia y los resaltados desaparecen.",
+        "step3": "Encuentra esas mismas palabras de memoria."
       },
       "combo-master": {
         "name": "Maestro del Combo",
         "description": "Mantén rachas de combos sin pausas",
         "targetCombo": "Meta: combo x{combo}",
-        "timerPerWord": "Tiempo: {time}s por palabra"
+        "timerPerWord": "Tiempo: {time}s por palabra",
+        "persona": "Llama",
+        "mission": "Encadena palabras una tras otra antes de que se agote el temporizador por palabra.",
+        "benefit": "Te vuelves mejor manteniendo el enfoque bajo presión.",
+        "coachTip": "Mantén los ojos en movimiento — prepara tu siguiente palabra antes de enviar.",
+        "step1": "Encuentra una palabra para iniciar tu encadenamiento.",
+        "step2": "Cada encuentro reinicia el temporizador — sé rápido.",
+        "step3": "Mantén la racha viva para aumentar tu combo."
       },
       "pattern-switcher": {
         "name": "Cambiador de Patrones",
-        "description": "Encuentra palabras en secuencias de longitud requeridas"
+        "description": "Encuentra palabras en secuencias de longitud requeridas",
+        "persona": "Cambio",
+        "mission": "Encuentra una palabra de la longitud requerida — el objetivo sigue cambiando.",
+        "benefit": "Tu cerebro se vuelve más rápido cambiando reglas sobre la marcha.",
+        "coachTip": "Revisa la longitud objetivo primero, luego explora — no te focalices en una idea.",
+        "step1": "Lee la longitud de palabra requerida.",
+        "step2": "Encuentra una palabra de exactamente esa longitud.",
+        "step3": "El objetivo cambia — adapta y continúa."
       },
       "rare-gems": {
         "name": "Gemas Raras",
-        "description": "Llena tu bolsa de gemas — cuanto más larga la palabra, más rara la gema"
+        "description": "Llena tu bolsa de gemas — cuanto más larga la palabra, más rara la gema",
+        "persona": "Brillo",
+        "mission": "Busca palabras más largas y raras — palabras más grandes son gemas más grandes.",
+        "benefit": "Empiezas a notar y usar palabras más sofisticadas en la vida cotidiana.",
+        "coachTip": "Apunta a palabras de 5+ letras — llenan tu bolsa mucho más rápido.",
+        "step1": "Encuentra palabras escondidas en la cuadrícula.",
+        "step2": "Las palabras más largas dejan gemas más raras y brillantes.",
+        "step3": "Llena tu bolsa antes de que se agote el tiempo."
       },
       "locked": "Bloqueado",
       "unlock": "Completa nivel {{level}} para desbloquear",
@@ -6986,6 +7032,13 @@ const es = {
       "gemsCollected": "Gemas recogidas",
       "pouchFull": "¡Bolsa llena!",
       "timeUpHaul": "¡Se acabó el tiempo — buen botín!",
+      "firstMissFree": "Error de calentamiento — no hay problema. ¡Tú puedes!",
+      "badge": {
+        "bronze": { "name": "Bronce", "title": "¡Series acumuladas!" },
+        "silver": { "name": "Plata", "title": "¡Trabajo sólido!" },
+        "gold": { "name": "Oro", "title": "¡En llamas!" },
+        "platinum": { "name": "Platino", "title": "¡Una bestia absoluta!" }
+      },
       "rarity": {
         "common": "común",
         "uncommon": "rara",
