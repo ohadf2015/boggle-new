@@ -17,6 +17,15 @@ import { endGame } from './gameEnd';
 import logger from '../../utils/logger';
 
 /**
+ * Consecutive ticks a word-hunt round may run with a NULL wordHuntState before
+ * we force-end it to recover. >1 so a transient init race (state appears a tick
+ * late) never trips the early-end; ~3s of confirmed-missing state means the
+ * round is genuinely un-runnable (no drain / elimination / round-end will ever
+ * fire) and players are better served by their accumulated scores than a freeze.
+ */
+const WORD_HUNT_NULL_STATE_RECOVERY_TICKS = 3;
+
+/**
  * Start the game timer
  *
  * Uses timestamp-based timing to prevent drift:
@@ -54,6 +63,10 @@ export function startGameTimer(
   // Track last broadcast second to avoid duplicate broadcasts
   let lastBroadcastSecond = timerSeconds;
 
+  // Consecutive ticks observed with gameMode='word-hunt' but wordHuntState NULL.
+  // Reset to 0 on any healthy tick so a late init cancels the self-heal.
+  let nullWordHuntTicks = 0;
+
   // Create interval for time updates
   const timerId = setInterval(() => {
     // Calculate remaining time based on actual elapsed time (prevents drift)
@@ -87,14 +100,33 @@ export function startGameTimer(
     const currentGame = getGame(gameCode);
     if (currentGame?.gameMode === 'word-hunt' && !currentGame.wordHuntState) {
       // Canary: gameMode says word-hunt but the state object is missing, so the
-      // drain branch below is silently skipped every tick (life frozen). A silent
-      // gate like this hid a real production freeze for a long time — never let it
-      // be invisible again. (Not the restart-timer-drop case, where wordHuntState
-      // IS restored from Redis; this guards the orthogonal "state never initialised"
-      // class, e.g. a round-start path that forgets initWordHuntState.)
-      logger.error('HUNT_DRAIN', `${gameCode}: gameMode='word-hunt' but wordHuntState is NULL — life-drain skipped (state never initialised for this round)`);
+      // drain branch below is skipped (life frozen). A silent gate like this hid a
+      // real production freeze for a long time — never let it be invisible again.
+      // (Not the restart-timer-drop case, where wordHuntState IS restored from
+      // Redis; this guards the orthogonal "state never initialised" class, e.g. a
+      // round-start path that forgets initWordHuntState.)
+      //
+      // Self-heal: with no state there is no drain, no elimination, and no
+      // round-end — the board freezes forever. Word scores live on game.users
+      // independently of wordHuntState, so after a few confirmed-NULL ticks we
+      // force-end (idempotent endGame) and players keep their accumulated scores
+      // instead of a stuck screen. Log once on first NULL + once on recovery
+      // (not per-tick) so a frozen game can't spam Sentry every second.
+      nullWordHuntTicks += 1;
+      if (nullWordHuntTicks === 1) {
+        logger.error('HUNT_DRAIN', `${gameCode}: gameMode='word-hunt' but wordHuntState is NULL — life-drain skipped (state never initialised); will self-heal if it persists`);
+      }
+      if (nullWordHuntTicks >= WORD_HUNT_NULL_STATE_RECOVERY_TICKS) {
+        logger.error('HUNT_DRAIN', `${gameCode}: wordHuntState NULL for ${nullWordHuntTicks} consecutive ticks — force-ending round to recover (players keep accumulated word scores instead of a frozen board)`);
+        clearGameTimer(gameCode);
+        endGame(io, gameCode).catch(err => {
+          logger.error('TIMER', `endGame failed (word-hunt null-state recovery) for ${gameCode}: ${(err as Error).message}`);
+        });
+        return;
+      }
     }
     if (currentGame?.gameMode === 'word-hunt' && currentGame.wordHuntState) {
+      nullWordHuntTicks = 0; // healthy tick — cancel any pending self-heal (late init)
       const huntState = currentGame.wordHuntState;
       const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
       const { updatedLives, newlyEliminated } = drainLife(huntState, elapsedSeconds);
