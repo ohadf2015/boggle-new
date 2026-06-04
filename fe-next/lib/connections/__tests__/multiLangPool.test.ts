@@ -20,6 +20,23 @@ describe('multi-language native pools (es/sv) + ja fallback', () => {
     expect(sv.some((p) => p.bridge === 'boll')).toBe(true);
   });
 
+  it('Swedish: every dict-validated variety puzzle has aligned compound examples', () => {
+    // The sv-v-* batch (2026-06-04) is closed-compound validated: each example
+    // compound must equal word1+bridge / bridge+word2 with NO separator, so the
+    // bridge is the same string in both — guards future re-materializations.
+    const norm = (s: string) => s.toLowerCase().replace(/[^a-zà-ÿ]/g, '');
+    const batch = getPuzzlesForLocale('sv').filter((p) => p.id.startsWith('sv-v-'));
+    expect(batch.length).toBeGreaterThanOrEqual(10);
+    for (const p of batch) {
+      const ex = p.examples?.[0];
+      expect(ex, `${p.id} has an example`).toBeDefined();
+      expect(norm(ex!.w1)).toBe(norm(p.word1) + norm(p.bridge));
+      expect(norm(ex!.w2)).toBe(norm(p.bridge) + norm(p.word2));
+      expect(p.word1).not.toBe(p.bridge);
+      expect(p.bridge).not.toBe(p.word2);
+    }
+  });
+
   it('Japanese resolves to a native kanji pool (played via device IME, not the A-Z keyboard)', () => {
     const ja = getPuzzlesForLocale('ja');
     expect(ja.length).toBeGreaterThan(0);

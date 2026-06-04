@@ -70,4 +70,12 @@ export const ES_PUZZLES: ConnectionPuzzle[] = [
   { id: "es-m-005", word1: "corta", bridge: "fuegos", word2: "artificiales", hint: "Barrera contra incendios", examples: [{"w1":"Cortafuegos","w2":"fuegos artificiales","bridge":"fuegos"}], difficulty: "medium", source: "council-seed" },
   { id: "es-m-006", word1: "boca", bridge: "calle", word2: "cortada", hint: "Entrada de una vía", examples: [{"w1":"Bocacalle","w2":"calle cortada","bridge":"calle"}], difficulty: "medium", source: "council-seed" },
   { id: "es-m-007", word1: "saca", bridge: "puntas", word2: "pie", hint: "Útil escolar, o un golpe con el pie", examples: [{"w1":"Sacapuntas","w2":"puntapié","bridge":"puntas"}], difficulty: "medium", source: "council-seed" },
+  { id: "es-v-001", word1: "media", bridge: "luna", word2: "miel", examples: [{"w1":"media luna","w2":"luna de miel","bridge":"luna"}], difficulty: "easy", source: "council-seed" },
+  { id: "es-v-002", word1: "copa", bridge: "vino", word2: "blanco", examples: [{"w1":"copa de vino","w2":"vino blanco","bridge":"vino"}], difficulty: "easy", source: "council-seed" },
+  { id: "es-v-003", word1: "cubo", bridge: "hielo", word2: "seco", examples: [{"w1":"cubo de hielo","w2":"hielo seco","bridge":"hielo"}], difficulty: "easy", source: "council-seed" },
+  { id: "es-v-004", word1: "café", bridge: "leche", word2: "entera", examples: [{"w1":"café con leche","w2":"leche entera","bridge":"leche"}], difficulty: "easy", source: "council-seed" },
+  { id: "es-v-005", word1: "pobre", bridge: "hombre", word2: "lobo", examples: [{"w1":"pobre hombre","w2":"hombre lobo","bridge":"hombre"}], difficulty: "easy", source: "council-seed" },
+  { id: "es-v-006", word1: "llave", bridge: "maestra", word2: "obra", examples: [{"w1":"llave maestra","w2":"obra maestra","bridge":"maestra"}], difficulty: "medium", source: "council-seed" },
+  { id: "es-v-007", word1: "edad", bridge: "piedra", word2: "preciosa", examples: [{"w1":"edad de piedra","w2":"piedra preciosa","bridge":"piedra"}], difficulty: "medium", source: "council-seed" },
+  { id: "es-v-008", word1: "aire", bridge: "libre", word2: "albedrío", examples: [{"w1":"aire libre","w2":"libre albedrío","bridge":"libre"}], difficulty: "medium", source: "council-seed" },
 ];
