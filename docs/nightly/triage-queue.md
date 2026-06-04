@@ -331,3 +331,27 @@ Items deferred from automated nightly triage. Human review required.
   - status: previously documented as fixed (mig 20260527230753 per prior triage)
   - last seen: 2026-05-27 — no recurrence in 7 days, profiles table verified EXISTS
   - recommended owner: self — auto-close if no recurrence by 2026-06-10
+
+## 2026-06-04
+- [Sentry] TypeError: Cannot read properties of null (reading 'x') — JAVASCRIPT-NEXTJS-13Y
+  - first seen: 2026-05-06, last seen: 2026-05-06, count: 500, users: 1
+  - link: https://lexiclash.sentry.io/issues/118046477/
+  - status: deferred
+  - why: minified stack in /he/blast (requestAnimationFrame path), no source maps available; likely Pixi null tile ref in render loop
+  - recommended owner: backend
+
+- [Supabase] RLS policy always true — web_vitals INSERT (Anyone can insert web vitals)
+  - status: deferred
+  - why: policy replacement; failure mode = lock out legitimate web-vitals inserts
+  - recommended owner: review-by-eod
+
+- [Sentry] Error: relation "profiles" does not exist — JAVASCRIPT-NEXTJS-1JR
+  - first seen: recent, count: 5 users
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred (not investigated this run — time budget)
+  - why: reach=5, needs stack trace + schema check; could be migration order issue
+  - recommended owner: backend
+
+## 2026-06-04 — Flag hygiene (lane-03)
+- `share-prompt-timing` (PostHog id 163656, created 2026-03-31): 65 days old, **0 exposures in last 30d**. Flag may not be reaching trigger. Check `useSharePromptImpression` + `SinglePlayerResults` condition `hasMinimumScore`. Either retire or fix trigger.
+- `show-signup-after-first-win` (PostHog id 163655, created 2026-03-31): 65 days old, 35 exposures, **0 signups both arms** (`after-first-win`=17, `after-third-game`=18). Tracking was broken (InlineSignupCard emitted no events). Re-evaluate after `signup_prompt_shown` fix ships. If still 0 conversion after 14d → retire.
