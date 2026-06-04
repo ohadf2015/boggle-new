@@ -253,6 +253,14 @@ export function usePlayerGameEvents({
   // Prevents true duplicates without blocking the initial event (fixes race condition
   // where validatedScores can arrive before endGame sets waitingForResults=true)
   const hasProcessedResultsRef = useRef<number | null>(null);
+  // Tracks the session whose results were only ever shown via the EMPTY
+  // safety fallback (no real scores arrived in time). A later REAL
+  // validatedScores for that session must be allowed to supersede the empty
+  // screen instead of being dropped by the duplicate guard above — otherwise
+  // a player who finished early (common in Blast, where the board can be
+  // cleared/dead-ended well before the shared timer) stays stuck on an empty
+  // "Calculating results" screen forever even though correct results arrived.
+  const emptyResultsFallbackRef = useRef<number | null>(null);
 
   // Fire round interval ref - persists across handler recreations
   // This is critical for ensuring the countdown continues even if useEffect re-runs
@@ -475,6 +483,9 @@ export function usePlayerGameEvents({
             if (hasProcessedResultsRef.current !== gameSessionIdRef.current) {
               logger.log('[PLAYER] Results fallback — forcing transition with empty results');
               hasProcessedResultsRef.current = gameSessionIdRef.current;
+              // Mark this as an EMPTY fallback so a late REAL broadcast can
+              // still replace it (see handleValidatedScores dedup guard).
+              emptyResultsFallbackRef.current = gameSessionIdRef.current;
               setWaitingForResults(false);
               const currentOnShowResults = onShowResultsRef.current;
               if (currentOnShowResults) {
@@ -623,12 +634,21 @@ export function usePlayerGameEvents({
     };
 
     const handleValidatedScores = (data: ValidatedScoresPayload) => {
-      // Deduplicate by game session — prevents processing results twice for the same game
-      if (hasProcessedResultsRef.current === gameSessionIdRef.current) {
-        logger.log('[PLAYER] Ignoring duplicate validatedScores - already processed for session', gameSessionIdRef.current);
+      // Deduplicate by game session — prevents processing results twice for the same game.
+      // EXCEPTION: if results were only shown via the EMPTY safety fallback, a REAL
+      // (non-empty) broadcast for the same session is allowed through so the player is
+      // rescued from the stuck empty "Calculating results" screen.
+      const sessionId = gameSessionIdRef.current;
+      const hasRealScores = Array.isArray(data?.scores) && data.scores.length > 0;
+      const supersedesEmptyFallback =
+        emptyResultsFallbackRef.current === sessionId && hasRealScores;
+      if (hasProcessedResultsRef.current === sessionId && !supersedesEmptyFallback) {
+        logger.log('[PLAYER] Ignoring duplicate validatedScores - already processed for session', sessionId);
         return;
       }
-      hasProcessedResultsRef.current = gameSessionIdRef.current;
+      hasProcessedResultsRef.current = sessionId;
+      // Real results have superseded any prior empty fallback for this session.
+      emptyResultsFallbackRef.current = null;
 
       // Clear the results fallback timeout — we got real results
       if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
@@ -694,6 +714,7 @@ export function usePlayerGameEvents({
       setShowStartAnimation(false);
       waitingStartTimeRef.current = null;
       hasProcessedResultsRef.current = null;
+      emptyResultsFallbackRef.current = null;
 
       // Reset timer for next game
       // Use ref to get latest timer methods (avoids socket listener re-registration)

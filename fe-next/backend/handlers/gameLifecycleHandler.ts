@@ -578,13 +578,33 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (!gameCode) return;
 
     const game = getGame(gameCode);
-    if (!game || game.gameState !== 'finished') return;
+    if (!game) return;
 
-    const cached = game.cachedResultsPayload;
-    if (cached) {
-      logger.info('SOCKET', `Re-sending cached results to reconnected client in ${gameCode}`);
-      safeEmit(socket, 'validatedScores', cached);
-      safeEmit(socket, 'validationComplete', cached);
+    if (game.gameState === 'finished') {
+      const cached = game.cachedResultsPayload;
+      if (cached) {
+        logger.info('SOCKET', `Re-sending cached results to reconnected client in ${gameCode}`);
+        safeEmit(socket, 'validatedScores', cached);
+        safeEmit(socket, 'validationComplete', cached);
+      }
+      return;
+    }
+
+    // The client only asks for results once it believes the game ended (its
+    // 15s "waiting for results" watchdog fired). If the game is still
+    // in-progress but its server clock has genuinely run out, the end-trigger
+    // was lost (dropped in-memory timer / transition race). Force-finalize so
+    // the player isn't stuck on an empty "Calculating results" screen forever.
+    // Only 'in-progress' games are eligible: a 'waiting' (between-rounds lobby)
+    // game keeps a stale gameStartedAt from the prior round and must never be
+    // force-ended by a reconnecting client. Clock-expiry guard prevents ending
+    // a genuinely live game early.
+    if (game.gameState !== 'in-progress') return;
+    const durationSec = game.gameDuration || game.timerSeconds || 180;
+    const startedAt = game.gameStartedAt;
+    if (startedAt && Date.now() - startedAt >= durationSec * 1000) {
+      logger.warn('SOCKET', `requestResults on overdue in-progress game ${gameCode} — forcing endGame`);
+      endGame(io, gameCode);
     }
   });
 
