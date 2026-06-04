@@ -19,6 +19,7 @@ import { MyWordsChips, type WordEntry } from './WheelRushPieces';
 import { WheelRushHeader } from './WheelRushHeader';
 import { WheelRushCelebration, type WheelCelebration } from './WheelRushCelebration';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
+import { selectClosestRival } from '@/lib/wheelRush/closestRival';
 import { computeWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { FloatingReaction } from '@/components/game/QuickReactions';
@@ -132,18 +133,16 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // Hidden while fog-of-war is active so we don't leak masked opponent
   // scores. The slot itself stays mounted (reserved height) to prevent
   // mid-match layout shift when the pill toggles.
-  const nextRival = useMemo(() => {
-    if (fogActive) return null;
-    const me = leaderboard.find(p => p.username === username);
-    const myScore = me?.score ?? 0;
-    return leaderboard
-      .filter(p => p.username !== username && p.score > myScore)
-      .sort((a, b) => a.score - b.score)[0] ?? null;
-  }, [leaderboard, username, fogActive]);
-
-  const pointsToPass = nextRival
-    ? nextRival.score - (leaderboard.find(p => p.username === username)?.score ?? 0)
-    : 0;
+  // Single closest rival — same selection the header uses, so the pill and the
+  // header chip never point at two different people. The pill is a *chase*
+  // prompt, so it only shows when that one rival is ahead of me.
+  const closestRival = useMemo(
+    () => (fogActive ? null : selectClosestRival(leaderboard, username)),
+    [leaderboard, username, fogActive],
+  );
+  const myScore = leaderboard.find(p => p.username === username)?.score ?? 0;
+  const nextRival = closestRival && closestRival.score > myScore ? closestRival : null;
+  const pointsToPass = nextRival ? nextRival.score - myScore : 0;
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -626,7 +625,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
                 userId={nextRival.username}
                 className="shrink-0 rounded-full"
               />
-              <span dir="auto">
+              <span dir="auto" translate="no" className="notranslate">
                 {t('wordWheel.pointsToPass', { count: pointsToPass, name: nextRival.username })}
               </span>
             </m.div>

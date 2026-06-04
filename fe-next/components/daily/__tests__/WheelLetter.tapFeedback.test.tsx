@@ -84,6 +84,23 @@ describe('WheelLetter mobile tap feedback', () => {
     expect(btn.className).toMatch(/before:-inset-2/);
   });
 
+  it('guards each letter from browser auto-translation (e.g. "I" must not become "saya")', () => {
+    render(
+      <WheelLetter
+        letter="I"
+        isCenter={false}
+        angle={0}
+        radius={100}
+        onPress={vi.fn()}
+        isUsed={false}
+        index={1}
+      />
+    );
+    const btn = screen.getByRole('button', { name: 'I' });
+    expect(btn.getAttribute('translate')).toBe('no');
+    expect(btn.className).toContain('notranslate');
+  });
+
   it('used letters expose aria-pressed=true + tapToRemove label', () => {
     render(
       <WheelLetter

@@ -12,6 +12,7 @@ import {
   addPlayerWord,
 } from '../modules/gameStateManager.js';
 import {
+  getLeaderboard,
   getLeaderboardThrottled,
   type LeaderboardPlayer,
   type ScoreGameBase,
@@ -152,6 +153,12 @@ export function handleRequestWheelRushState(socket: Socket): void {
     closed: state.closed ?? [],
     myWords: username ? (state.foundWords?.[username] ?? []) : [],
   });
+  // Also push a fresh leaderboard directly to this socket. Opponent scores
+  // otherwise only refresh on the next score broadcast, so a reconnecting or
+  // late-joining player would stare at a stale (or empty) rival chip until
+  // someone next scores. This is a single-socket emit, not a room broadcast.
+  const leaderboard = getLeaderboard(game as unknown as ScoreGameBase, gameCode);
+  socket.emit('updateLeaderboard', { leaderboard });
 }
 
 export function registerWheelRushHandlers(io: Server, socket: Socket): void {

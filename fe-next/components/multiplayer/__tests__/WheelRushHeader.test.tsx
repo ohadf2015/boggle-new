@@ -30,7 +30,8 @@ describe('WheelRushHeader', () => {
     expect(within(badge).getByTestId('wheel-self-avatar')).toBeTruthy();
   });
 
-  it('renders each opponent with name, score and avatar in the opponent rail', () => {
+  it('renders the rival with name, score and avatar in the opponent rail', () => {
+    // alice=30; bob gap 20 (ahead), carol gap 20 (behind) → tie breaks to bob.
     setup();
     const rail = screen.getByTestId('wheel-opponent-rail');
     const bob = within(rail).getByTestId('wheel-opp-bob');
@@ -45,7 +46,10 @@ describe('WheelRushHeader', () => {
     expect(within(rail).queryByTestId('wheel-opp-alice')).toBeNull();
   });
 
-  it('limits the opponent rail to the top 3 opponents by score', () => {
+  it('shows only the single closest rival — never a crowd of opponents', () => {
+    // alice=5; the nearest opponent by score is erin (60). Everyone else,
+    // including the board leader bob (90), is hidden to keep the player focused
+    // on one head-to-head.
     setup({
       leaderboard: [
         { username: 'alice', score: 5 },
@@ -56,10 +60,10 @@ describe('WheelRushHeader', () => {
       ],
     });
     const rail = screen.getByTestId('wheel-opponent-rail');
-    expect(within(rail).getByTestId('wheel-opp-bob')).toBeTruthy();
-    expect(within(rail).getByTestId('wheel-opp-carol')).toBeTruthy();
-    expect(within(rail).getByTestId('wheel-opp-dave')).toBeTruthy();
-    expect(within(rail).queryByTestId('wheel-opp-erin')).toBeNull();
+    expect(within(rail).getByTestId('wheel-opp-erin')).toBeTruthy();
+    expect(within(rail).queryByTestId('wheel-opp-bob')).toBeNull();
+    expect(within(rail).queryByTestId('wheel-opp-carol')).toBeNull();
+    expect(within(rail).queryByTestId('wheel-opp-dave')).toBeNull();
   });
 
   it('masks opponent scores with ??? while fog is active but keeps the self score visible', () => {
