@@ -4379,7 +4379,14 @@ const he = {
     "freezeShields": "מגן הקפאה {count}",
     "freezeShields_plural": "{count} מגני הקפאה",
     "freezeShieldActive": "הרצף מוגן!",
-    "freezeShieldHint": "המגנים מופעלים אוטומטית אם תפספס יום"
+    "freezeShieldHint": "המגנים מופעלים אוטומטית אם תפספס יום",
+    "saved": {
+      "title": "הרצף ניצל!",
+      "subtitle": "הקפאת רצף כיסתה את היום שפספסת — הרצף שלך ממשיך.",
+      "freezesLeft": "הקפאות שנותרו: {count}",
+      "freezesLeftNone": "זאת הייתה ההקפאה האחרונה שלך",
+      "dismiss": "איזו הקלה! ממשיכים"
+    }
   },
   "partyScreen": {
     "title": "מסך מסיבה",

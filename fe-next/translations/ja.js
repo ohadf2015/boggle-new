@@ -3906,7 +3906,14 @@ const ja = {
     "freezeShields": "フリーズシールド {count}個",
     "freezeShields_plural": "フリーズシールド {count}個",
     "freezeShieldActive": "ストリーク保護中！",
-    "freezeShieldHint": "シールドは欠席した場合に自動で発動します"
+    "freezeShieldHint": "シールドは欠席した場合に自動で発動します",
+    "saved": {
+      "title": "ストリーク復活！",
+      "subtitle": "ストリークフリーズが休んだ日をカバーしました。連続記録は継続中です。",
+      "freezesLeft": "残りフリーズ：{count}個",
+      "freezesLeftNone": "最後のフリーズを使いました",
+      "dismiss": "ふぅ！この調子で"
+    }
   },
   "partyScreen": {
     "title": "パーティースクリーン",

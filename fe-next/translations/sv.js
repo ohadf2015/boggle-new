@@ -4000,7 +4000,14 @@ const sv = {
     "freezeShields": "{count} Frysningssköld",
     "freezeShields_plural": "{count} Frysningssköldar",
     "freezeShieldActive": "Svit skyddad!",
-    "freezeShieldHint": "Sköldar aktiveras automatiskt om du missar en dag"
+    "freezeShieldHint": "Sköldar aktiveras automatiskt om du missar en dag",
+    "saved": {
+      "title": "Sviten räddad!",
+      "subtitle": "En svitfrysning täckte din missade dag — din svit lever vidare.",
+      "freezesLeft": "Frysningar kvar: {count}",
+      "freezesLeftNone": "Det var din sista frysning",
+      "dismiss": "Pust! Fortsätt så"
+    }
   },
   "partyScreen": {
     "title": "Partyskärm",

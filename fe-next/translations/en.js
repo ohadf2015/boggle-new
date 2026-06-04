@@ -4334,7 +4334,14 @@ const en = {
     "freezeShields": "{count} Freeze Shield",
     "freezeShields_plural": "{count} Freeze Shields",
     "freezeShieldActive": "Streak Protected!",
-    "freezeShieldHint": "Shields auto-activate if you miss a day"
+    "freezeShieldHint": "Shields auto-activate if you miss a day",
+    "saved": {
+      "title": "Streak Saved!",
+      "subtitle": "A Streak Freeze covered your missed day — your streak lives on.",
+      "freezesLeft": "Freezes remaining: {count}",
+      "freezesLeftNone": "That was your last freeze",
+      "dismiss": "Phew! Keep it going"
+    }
   },
   "partyScreen": {
     "title": "Party Screen",

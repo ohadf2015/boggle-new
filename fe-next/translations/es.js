@@ -3947,7 +3947,14 @@ const es = {
     "freezeShields": "{count} Escudo de Congelación",
     "freezeShields_plural": "{count} Escudos de Congelación",
     "freezeShieldActive": "¡Racha Protegida!",
-    "freezeShieldHint": "Los escudos se activan automáticamente si pierdes un día"
+    "freezeShieldHint": "Los escudos se activan automáticamente si pierdes un día",
+    "saved": {
+      "title": "¡Racha Salvada!",
+      "subtitle": "Un Congelador de Racha cubrió el día que perdiste — tu racha sigue viva.",
+      "freezesLeft": "Congeladores restantes: {count}",
+      "freezesLeftNone": "Ese era tu último congelador",
+      "dismiss": "¡Uf! Sigue así"
+    }
   },
   "partyScreen": {
     "title": "Pantalla de Fiesta",
