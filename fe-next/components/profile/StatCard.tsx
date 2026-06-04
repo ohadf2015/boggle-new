@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { m, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export type StatColor = 'cyan' | 'pink' | 'lime' | 'purple';
 
@@ -26,7 +27,10 @@ export interface StatCardProps {
 }
 
 function AnimatedValue({ value }: { value: string | number }) {
-  const [display, setDisplay] = useState<string | number>(typeof value === 'number' ? 0 : value);
+  const reduced = useReducedMotion();
+  const [display, setDisplay] = useState<string | number>(
+    reduced || typeof value !== 'number' ? value : 0,
+  );
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
@@ -34,6 +38,8 @@ function AnimatedValue({ value }: { value: string | number }) {
     if (!inView) return;
     if (typeof value !== 'number') { setDisplay(value); return; }
     const target = value;
+    // Reduced motion: skip the rAF count-up (4 cards animate at once on mount).
+    if (reduced) { setDisplay(target); return; }
     if (target === 0) { setDisplay(0); return; }
 
     const duration = 900;
@@ -49,7 +55,7 @@ function AnimatedValue({ value }: { value: string | number }) {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [value, inView]);
+  }, [value, inView, reduced]);
 
   return <span ref={ref}>{typeof display === 'number' ? display.toLocaleString() : display}</span>;
 }

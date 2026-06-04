@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Award } from 'lucide-react';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { isHallOfFameAchievement } from '@/utils/achievementTiers';
 import { getAchievementIcon } from '@/constants/achievementIcons';
@@ -30,8 +31,16 @@ export function ProfileAchievementsPublic({
   if (earned.length === 0) return null;
 
   return (
-    <div className="rounded-neo-xl p-5 bg-neo-navy-light border-2 border-black shadow-hard-lg">
-      <h2 className="font-neo-display text-sm uppercase tracking-wide text-neo-white mb-3">
+    <div className="relative bg-neo-navy-light overflow-hidden mb-4 border-3 border-neo-black rounded-neo shadow-hard-lime p-5">
+      {/* Lime halftone ribbon — top edge (matches the profile section language) */}
+      <div className="absolute top-0 inset-x-0 h-2.5 bg-neo-lime">
+        <div className="absolute inset-0 texture-halftone-comic opacity-30 mix-blend-overlay" aria-hidden />
+      </div>
+
+      <h2 className="mt-3 mb-4 text-2xl font-black font-neo-display uppercase tracking-tight flex items-center gap-2.5 text-neo-white">
+        <span className="w-10 h-10 flex items-center justify-center bg-neo-lime text-neo-black border-2 border-neo-black rounded-neo shadow-hard-sm">
+          <Award strokeWidth={2.75} className="w-5 h-5" />
+        </span>
         {t('profile.achievements')}
       </h2>
       <div className="flex flex-wrap gap-2">
