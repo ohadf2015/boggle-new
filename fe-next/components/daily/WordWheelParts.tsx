@@ -78,8 +78,12 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
     <m.button
       ref={btnRef}
       type="button"
+      // `translate="no"` (+ notranslate) stops browser auto-translation from
+      // rewriting a single letter into a word in the target language — e.g.
+      // Google Translate turning the tile "I" into Indonesian "saya".
+      translate="no"
       className={cn(
-        'absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none touch-manipulation',
+        'notranslate absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none touch-manipulation',
         // Invisible hit-area expander (≥48px WCAG AAA). Fixes rageclicks on Hebrew RTL wheel.
         'before:absolute before:-inset-2 before:content-[""]',
         'border-3 border-neo-black rounded-full transition-colors duration-150',
@@ -152,8 +156,9 @@ export const WordTile: React.FC<WordTileProps> = ({ letter, index, onRemove, isC
   return (
   <m.button
     type="button"
+    translate="no"
     className={cn(
-      'group relative w-8 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center touch-manipulation',
+      'notranslate group relative w-8 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 rounded-neo border-3 border-neo-black flex items-center justify-center touch-manipulation',
       'before:absolute before:-inset-2 before:content-[""]',
       'font-neo-display font-black text-base sm:text-lg md:text-xl cursor-pointer',
       'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',

@@ -19,6 +19,20 @@ interface MyWordsChipsProps {
   dir?: 'rtl' | 'ltr';
 }
 
+// Calm, dark chips that mirror the daily-challenge found-words language
+// (bg-neo-navy-light surface, white text) instead of full-saturation fills.
+// Status is encoded by a subtle tinted border + a small accent on the score
+// so the list reads as a quiet log, not a distracting rave. Each chip is a
+// fixed height so the row never looks ragged. `translate="no"` keeps browser
+// auto-translation (e.g. Indonesian turning the letters "I" into "saya") from
+// rewriting the player's own words.
+const CHIP_TONE: Record<WordEntry['kind'], { chip: string; score: string }> = {
+  locked: { chip: 'bg-neo-lime/15 border-neo-lime', score: 'text-neo-lime' },
+  closed: { chip: 'bg-neo-navy-light border-neo-black', score: 'text-neo-cyan' },
+  stolen: { chip: 'bg-neo-pink/15 border-neo-pink', score: 'text-neo-pink' },
+  'stolen-from-me': { chip: 'bg-neo-red/10 border-neo-red text-neo-white/50 line-through', score: 'text-neo-red/70' },
+};
+
 export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr' }) => {
   // Always render a fixed-height slot so the wheel cluster's `flex-1
   // justify-center` doesn't re-center when the first chip lands. Empty
@@ -26,25 +40,27 @@ export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr' }
   return (
     <div
       dir={dir}
+      translate="no"
       data-testid="my-words-slot"
-      className="h-16 overflow-y-auto flex flex-wrap gap-1.5 justify-center"
+      className="notranslate h-16 overflow-y-auto flex flex-wrap content-start gap-1.5 justify-center"
     >
-      {words.slice(0, 20).map((w, i) => (
-        <span
-          key={`${w.word}-${i}`}
-          data-kind={w.kind}
-          dir={dir}
-          className={cn(
-            'px-2 py-0.5 rounded border-2 border-neo-black text-xs font-neo-body font-bold',
-            w.kind === 'stolen-from-me' ? 'bg-neo-red text-neo-white line-through' :
-            w.kind === 'stolen' ? 'bg-neo-pink text-neo-white' :
-            w.kind === 'closed' ? 'bg-neo-cyan text-neo-black' :
-            'bg-neo-lime text-neo-black',
-          )}
-        >
-          {w.word}{w.score ? ` +${w.score}` : ''}
-        </span>
-      ))}
+      {words.slice(0, 20).map((w, i) => {
+        const tone = CHIP_TONE[w.kind];
+        return (
+          <span
+            key={`${w.word}-${i}`}
+            data-kind={w.kind}
+            dir={dir}
+            className={cn(
+              'inline-flex items-center h-7 px-2.5 rounded-neo border-2 text-neo-white text-xs font-semibold whitespace-nowrap shadow-hard-xs',
+              tone.chip,
+            )}
+          >
+            {w.word}
+            {w.score ? <span className={cn('ms-1 font-black', tone.score)}>+{w.score}</span> : null}
+          </span>
+        );
+      })}
     </div>
   );
 };

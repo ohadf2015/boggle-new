@@ -46,10 +46,16 @@ vi.mock('../../modules/wheelRushManager', () => ({
   reapExpiredLocks: vi.fn(() => []),
 }));
 
+vi.mock('../../modules/scoreManager', () => ({
+  getLeaderboard: vi.fn(() => []),
+  getLeaderboardThrottled: vi.fn(),
+}));
+
 import { handleSubmitWheelWord, handleRequestWheelRushState } from '../wheelRushHandler';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
 import { validateWheelSubmission, applyWheelWord } from '../../modules/wheelRushManager';
+import { getLeaderboard } from '../../modules/scoreManager';
 import timerManager from '../../utils/timerManager';
 
 const mkSocket = () => ({ id: 's1', emit: vi.fn() } as unknown as Socket);
@@ -161,6 +167,24 @@ describe('wheelRushHandler', () => {
       const sock = mkSocket();
       handleRequestWheelRushState(sock);
       expect(sock.emit).not.toHaveBeenCalled();
+    });
+
+    it('also pushes the current leaderboard so a reconnecting player sees fresh opponent scores immediately', () => {
+      // Reconnect/late-join: opponent scores only otherwise refresh on the next
+      // score event, leaving the rival chip stale (or empty) until then.
+      (getGame as unknown as Mock).mockReturnValue(gameBase);
+      (getLeaderboard as unknown as Mock).mockReturnValue([
+        { username: 'p1', score: 30 },
+        { username: 'p2', score: 50 },
+      ]);
+      const sock = mkSocket();
+      handleRequestWheelRushState(sock);
+      expect(sock.emit).toHaveBeenCalledWith('updateLeaderboard', {
+        leaderboard: [
+          { username: 'p1', score: 30 },
+          { username: 'p2', score: 50 },
+        ],
+      });
     });
   });
 
