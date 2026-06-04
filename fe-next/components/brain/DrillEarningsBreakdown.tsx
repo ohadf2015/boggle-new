@@ -59,20 +59,31 @@ export default function DrillEarningsBreakdown({
       animate={{ opacity: 1, scale: 1 }}
       className="text-center space-y-4"
     >
-      {/* Always-colored badge medal */}
-      <AdaptiveMotion.div
-        initial={{ scale: 0, rotate: -12 }}
-        animate={{ scale: 1, rotate: 0 }}
-        transition={{ type: 'spring', damping: 11, delay: 0.15 }}
-        className={cn(
-          'mx-auto w-20 h-20 rounded-full grid place-items-center text-4xl border-neo-thick shadow-hard-lg',
-          style.medal,
-          style.ring
-        )}
-        aria-hidden
-      >
-        {style.emoji}
-      </AdaptiveMotion.div>
+      {/* Always-colored badge medal with a one-shot celebratory pop */}
+      <div className="relative mx-auto w-20 h-20">
+        {/* Expanding ring "ta-da" beat in the badge color */}
+        <AdaptiveMotion.div
+          initial={{ scale: 0.6, opacity: 0.55 }}
+          animate={{ scale: 1.9, opacity: 0 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
+          className={cn('absolute inset-0 rounded-full', style.medal)}
+          aria-hidden
+        />
+        {/* Medal overshoots then settles with a playful wiggle */}
+        <AdaptiveMotion.div
+          initial={{ scale: 0, rotate: -14 }}
+          animate={{ scale: [0, 1.18, 1], rotate: [-14, 8, 0] }}
+          transition={{ duration: 0.55, delay: 0.15, times: [0, 0.62, 1], ease: 'easeOut' }}
+          className={cn(
+            'relative w-20 h-20 rounded-full grid place-items-center text-4xl border-neo-thick shadow-hard-lg',
+            style.medal,
+            style.ring
+          )}
+          aria-hidden
+        >
+          {style.emoji}
+        </AdaptiveMotion.div>
+      </div>
 
       {/* Warm, badge-based title — never "Game Over" */}
       <AdaptiveMotion.h2
