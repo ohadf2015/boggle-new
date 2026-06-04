@@ -140,7 +140,7 @@ beforeEach(() => {
 
 function clickStart() {
   act(() => {
-    fireEvent.click(screen.getByText('brain.drills.start'));
+    fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
   });
 }
 

@@ -140,7 +140,7 @@ beforeEach(() => {
 
 /** Click the drill's intro "Start" button so the gameplay phase mounts. */
 function clickStart() {
-  const startBtn = screen.getByText('brain.drills.start');
+  const startBtn = screen.getByText('brain.briefing.letsTrain');
   act(() => {
     fireEvent.click(startBtn);
   });
@@ -157,7 +157,7 @@ describe('LightningRound (processing speed drill)', () => {
       />,
     );
     expect(screen.getByText('brain.drills.lightning-round.name')).toBeInTheDocument();
-    expect(screen.getByText('brain.drills.start')).toBeInTheDocument();
+    expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
   });
 
   it('renders the grid after start is clicked and accepts submissions', () => {
@@ -251,7 +251,7 @@ describe('PatternSwitcher (cognitive flexibility drill)', () => {
       />,
     );
     expect(screen.getByText('brain.drills.pattern-switcher.name')).toBeInTheDocument();
-    expect(screen.getByText('brain.drills.start')).toBeInTheDocument();
+    expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
   });
 
   it('renders the grid after start and reacts to word submission', () => {
@@ -282,7 +282,7 @@ describe('RareGems (vocabulary depth drill)', () => {
       />,
     );
     expect(screen.getByText('brain.drills.rare-gems.name')).toBeInTheDocument();
-    expect(screen.getByText('brain.drills.start')).toBeInTheDocument();
+    expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
   });
 
   it('renders the grid after start', () => {

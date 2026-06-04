@@ -124,24 +124,26 @@ describe('ComboMaster Drill Gameplay', () => {
     it('starts in ready phase with start button visible', () => {
       render(<ComboMaster {...defaultProps} />);
       expect(screen.getByText('brain.drills.combo-master.name')).toBeInTheDocument();
-      expect(screen.getByText('brain.drills.start')).toBeInTheDocument();
+      expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
     });
 
     it('transitions from ready to playing on start click', () => {
       render(<ComboMaster {...defaultProps} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
       expect(screen.getByTestId('grid-component')).toBeInTheDocument();
-      expect(screen.queryByText('brain.drills.start')).not.toBeInTheDocument();
+      expect(screen.queryByText('brain.briefing.letsTrain')).not.toBeInTheDocument();
     });
 
     it('transitions to complete phase when finish button clicked', () => {
       const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
 
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
       fireEvent.click(screen.getByText('brain.drills.finishGame'));
 
-      expect(screen.getByText('brain.drills.gameOver')).toBeInTheDocument();
+      // Warm results screen (earnings breakdown), not a harsh "Game Over".
+      expect(screen.queryByText('brain.drills.gameOver')).not.toBeInTheDocument();
+      expect(screen.getByText('brain.briefing.participationLabel')).toBeInTheDocument();
       expect(onComplete).toHaveBeenCalledWith(
         expect.objectContaining({
           score: 0,
@@ -158,14 +160,14 @@ describe('ComboMaster Drill Gameplay', () => {
   describe('timer behavior', () => {
     it('shows countdown timer during playing phase', () => {
       render(<ComboMaster {...defaultProps} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
       // Level 1 has comboTimeout=8
       expect(screen.getByRole('status')).toHaveTextContent('8s');
     });
 
     it('combo timer counts down each second', () => {
       render(<ComboMaster {...defaultProps} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
       act(() => { vi.advanceTimersByTime(1000); });
       expect(screen.getByRole('status')).toHaveTextContent('7s');
@@ -176,7 +178,7 @@ describe('ComboMaster Drill Gameplay', () => {
 
     it('combo breaks on timeout and timer resets', () => {
       render(<ComboMaster {...defaultProps} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
       // Submit a word to get combo=1
       fireEvent.click(screen.getByTestId('submit-cat'));
@@ -195,7 +197,7 @@ describe('ComboMaster Drill Gameplay', () => {
     it('calculates score using canonical scoring: calculateWordScore(word,0) * (1 + combo * 0.1)', () => {
       const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
       // Submit 'cat' (length=3): canonical base = 10pts, combo becomes 1, score = round(10 * 1.1) = 11
       fireEvent.click(screen.getByTestId('submit-cat'));
@@ -210,7 +212,7 @@ describe('ComboMaster Drill Gameplay', () => {
     it('accumulates score across multiple words with increasing combo', () => {
       const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
       // Word 1 'cat' (3 letters): canonical base=10, combo=1, score = round(10 * 1.1) = 11
       fireEvent.click(screen.getByTestId('submit-cat'));
@@ -230,7 +232,7 @@ describe('ComboMaster Drill Gameplay', () => {
     it('increments combo on each valid word', () => {
       const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
       fireEvent.click(screen.getByTestId('submit-cat'));
       fireEvent.click(screen.getByTestId('submit-dog'));
@@ -245,7 +247,7 @@ describe('ComboMaster Drill Gameplay', () => {
     it('tracks maxCombo correctly even after combo reset', () => {
       const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
       // Build combo to 2
       fireEvent.click(screen.getByTestId('submit-cat'));
@@ -264,28 +266,32 @@ describe('ComboMaster Drill Gameplay', () => {
     });
   });
 
-  // --- Game Over ---
+  // --- Completion after 3 combo breaks (no harsh "Game Over") ---
 
-  describe('game over on 3 combo breaks', () => {
-    it('ends game after 3 combo breaks (MAX_COMBO_BREAKS)', () => {
+  describe('ends after 3 combo breaks', () => {
+    it('completes the drill after 3 combo breaks (MAX_COMBO_BREAKS) with a warm results screen', () => {
       const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
-      // 3 timeouts = 3 combo breaks = game over
+      // 3 timeouts = 3 combo breaks = drill ends.
       // Level 1 timeout = 8 seconds
       act(() => { vi.advanceTimersByTime(8000); }); // break 1
       act(() => { vi.advanceTimersByTime(8000); }); // break 2
       act(() => { vi.advanceTimersByTime(8000); }); // break 3
 
-      expect(screen.getByText('brain.drills.gameOver')).toBeInTheDocument();
+      // The mechanic is unchanged (drill ends + onComplete fires)...
       expect(onComplete).toHaveBeenCalled();
+      // ...but the harsh "Game Over" framing is gone — the warm earnings
+      // breakdown (always-colored badge + participation) shows instead.
+      expect(screen.queryByText('brain.drills.gameOver')).not.toBeInTheDocument();
+      expect(screen.getByText('brain.briefing.participationLabel')).toBeInTheDocument();
     });
 
     it('does not end game after only 2 combo breaks', () => {
       const onComplete = vi.fn();
       render(<ComboMaster {...defaultProps} onComplete={onComplete} />);
-      fireEvent.click(screen.getByText('brain.drills.start'));
+      fireEvent.click(screen.getByText('brain.briefing.letsTrain'));
 
       act(() => { vi.advanceTimersByTime(8000); }); // break 1
       act(() => { vi.advanceTimersByTime(8000); }); // break 2

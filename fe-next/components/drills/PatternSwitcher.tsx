@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Shuffle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
@@ -12,6 +11,7 @@ import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import PatternSwitcherCompletePhase from './PatternSwitcherCompletePhase';
+import DrillBriefing from '@/components/brain/DrillBriefing';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
 
@@ -324,39 +324,12 @@ export default function PatternSwitcher({
       {/* Game Area */}
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         {phase === 'ready' && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <Shuffle className="w-14 h-14 sm:w-20 sm:h-20 mx-auto text-neo-cyan" />
-            <h2 className={cn(
-              'text-2xl font-black',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.pattern-switcher.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.pattern-switcher.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-neo-navy-light'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.patternLength')}: {levelConfig.patternLength}</p>
-            </div>
-            <AdaptiveMotion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-cyan text-neo-black"
-            >
-              {t('brain.drills.start')}
-            </AdaptiveMotion.button>
-          </AdaptiveMotion.div>
+          <DrillBriefing
+            drillId="pattern-switcher"
+            level={level}
+            goalText={`${t('brain.drills.patternLength')}: ${levelConfig.patternLength} · ${levelConfig.lives} ❤`}
+            onStart={() => { playDrillStartSound(); startGame(); }}
+          />
         )}
 
         {(phase === 'playing' || phase === 'feedback') && (
@@ -421,6 +394,8 @@ export default function PatternSwitcher({
             patternsCompleted={patternsCompleted}
             wordsFoundCount={wordsFound.length}
             lives={lives}
+            level={level}
+            maxLives={levelConfig.lives}
             onPlayAgain={() => { setPhase('ready'); onPlayAgain?.(); }}
             onExit={onExit}
           />

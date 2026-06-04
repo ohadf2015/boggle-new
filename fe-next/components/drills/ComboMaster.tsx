@@ -12,6 +12,7 @@ import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import ComboMasterCompletePhase from './ComboMasterCompletePhase';
+import DrillBriefing from '@/components/brain/DrillBriefing';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
 
@@ -287,44 +288,12 @@ export default function ComboMaster({
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         {/* Ready Phase */}
         {phase === 'ready' && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <Target className="w-14 h-14 sm:w-20 sm:h-20 mx-auto text-neo-orange" />
-            <h2 className={cn(
-              'text-2xl font-black',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.combo-master.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.combo-master.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-neo-navy-light'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.combo-master.targetCombo', { combo: levelConfig.targetCombo })}</p>
-              <p>{t('brain.drills.combo-master.timerPerWord', { time: levelConfig.comboTimeout })}</p>
-            </div>
-            <AdaptiveMotion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className={cn(
-                'px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-                'font-bold text-lg uppercase',
-                'bg-neo-orange text-neo-black'
-              )}
-            >
-              {t('brain.drills.start')}
-            </AdaptiveMotion.button>
-          </AdaptiveMotion.div>
+          <DrillBriefing
+            drillId="combo-master"
+            level={level}
+            goalText={`${t('brain.drills.target')}: x${levelConfig.targetCombo} · ${t('brain.drills.timer')}: ${levelConfig.comboTimeout}s ${t('brain.drills.perWord')}`}
+            onStart={() => { playDrillStartSound(); startGame(); }}
+          />
         )}
 
         {/* Playing Phase */}
@@ -436,6 +405,8 @@ export default function ComboMaster({
             maxCombo={maxCombo}
             wordsFoundCount={wordsFound.length}
             targetCombo={levelConfig.targetCombo}
+            comboBreaks={comboBreaks}
+            level={level}
             onPlayAgain={() => { setPhase('ready'); onPlayAgain?.(); }}
             onExit={onExit}
           />

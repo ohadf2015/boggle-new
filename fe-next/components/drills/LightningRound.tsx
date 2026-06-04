@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Zap, Clock } from 'lucide-react';
+import { Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
@@ -12,8 +12,10 @@ import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import LightningRoundCompletePhase from './LightningRoundCompletePhase';
+import DrillBriefing from '@/components/brain/DrillBriefing';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
+import { calculateForgivingDrillScore } from '@/shared/utils/drillScoring';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -238,47 +240,12 @@ export default function LightningRound({
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         {/* Ready Phase */}
         {phase === 'ready' && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <Zap className={cn(
-              'w-14 h-14 sm:w-20 sm:h-20 mx-auto',
-              'text-neo-lime'
-            )} />
-            <h2 className={cn(
-              'text-2xl font-black',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.lightning-round.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              'text-neo-white'
-            )}>
-              {t('brain.drills.lightning-round.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              'bg-neo-navy-light'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.timeLimit')}: {levelConfig.timeLimit}s</p>
-            </div>
-            <AdaptiveMotion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className={cn(
-                'px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-                'font-bold text-lg uppercase',
-                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-lime text-neo-black'
-              )}
-            >
-              {t('brain.drills.start')}
-            </AdaptiveMotion.button>
-          </AdaptiveMotion.div>
+          <DrillBriefing
+            drillId="lightning-round"
+            level={level}
+            goalText={`${t('brain.drills.timeLimit')}: ${levelConfig.timeLimit}s · ${t('brain.drills.target')}: ${levelConfig.targetWords} ${t('brain.drills.wordsFound')}`}
+            onStart={() => { playDrillStartSound(); startGame(); }}
+          />
         )}
 
         {/* Playing Phase */}
@@ -406,20 +373,31 @@ export default function LightningRound({
         )}
 
         {/* Complete Phase */}
-        {phase === 'complete' && (
-          <LightningRoundCompletePhase
-            score={score}
-            wordsFoundCount={wordsFound.length}
-            wordsPerMinute={getResults().wordsPerMinute}
-            onPlayAgain={() => {
-              setPhase('ready');
-              setWordsFound([]);
-              setScore(0);
-              onPlayAgain?.();
-            }}
-            onExit={onExit}
-          />
-        )}
+        {phase === 'complete' && (() => {
+          const forgiving = calculateForgivingDrillScore({
+            level,
+            rawScore: score,
+            wordsFound: wordsFound.length,
+            target: levelConfig.targetWords,
+            setbacks: 0,
+            maxSetbacks: 1,
+          });
+          return (
+            <LightningRoundCompletePhase
+              level={level}
+              forgivingScore={forgiving}
+              wordsFoundCount={wordsFound.length}
+              wordsPerMinute={getResults().wordsPerMinute}
+              onPlayAgain={() => {
+                setPhase('ready');
+                setWordsFound([]);
+                setScore(0);
+                onPlayAgain?.();
+              }}
+              onExit={onExit}
+            />
+          );
+        })()}
       </div>
     </div>
   );
