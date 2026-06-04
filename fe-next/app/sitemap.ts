@@ -117,23 +117,12 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/daily/word-wheel', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 });
   addForAllLocales(routes, '/daily/archive', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.7 });
 
-  // Per-date archive pages (epoch → yesterday). Each renders unique server-side
-  // stats/leaderboard for one finalized puzzle. Long-tail discovery: queries
-  // like "lexiclash daily challenge #N" or "<date> word hunt results".
-  // Bound: archive page validates date in [DAILY_CHALLENGE_EPOCH, yesterday];
-  // listing today/future would 404 and erode crawl trust.
-  const DAILY_EPOCH = new Date('2025-12-30T00:00:00Z');
-  const yesterday = new Date();
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  yesterday.setUTCHours(0, 0, 0, 0);
-  for (let d = new Date(DAILY_EPOCH); d <= yesterday; d.setUTCDate(d.getUTCDate() + 1)) {
-    const dateStr = d.toISOString().split('T')[0];
-    addForAllLocales(routes, `/daily/archive/${dateStr}`, {
-      lastModified: dateStr + 'T00:00:00.000Z',
-      changeFrequency: 'monthly',
-      priority: 0.55,
-    });
-  }
+  // Per-date archive child pages are intentionally NOT listed here.
+  // They are thin per-puzzle stat/leaderboard snapshots and were dragging the
+  // domain's content-quality average below AdSense's bar (~780 URLs across 5
+  // locales). They are now noindex,follow at the page level and stay fully
+  // playable — we just don't advertise them. The /daily/archive hub (above)
+  // remains the canonical entry point. See docs/2026-06-04-adsense-approval-plan.md.
 
   // ─── Brain training ───
   addForAllLocales(routes, '/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });

@@ -99,7 +99,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         ['es-CO', `${BASE_URL}/es/daily/archive/${date}`],
       ]),
     },
-    robots: { index: true, follow: true },
+    // AdSense low-value-content remediation (2026-06-04): keep the page playable
+    // but out of the search index — these per-date stat snapshots are thin and,
+    // multiplied across 5 locales (~780 URLs), dragged the domain's quality average
+    // below AdSense's bar. follow:true preserves link equity to real pages.
+    robots: { index: false, follow: true },
   };
 }
 

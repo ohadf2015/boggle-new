@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import HomePageClient from './PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
 import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
@@ -244,12 +244,10 @@ export default async function HomePage({ params }: PageProps) {
       <HomePageClient initialData={initialData} />
       <EsScrabbleCrossLink locale={locale} anchorVariant="home" />
       <SvScrabbleCrossLink locale={locale} anchorVariant="home" />
-      <GamePageSeoContent
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
+      {/* Visible publisher content (was sr-only GamePageSeoContent until 2026-06-04).
+          A human AdSense reviewer landing here now sees a real About/FAQ section and
+          links into the editorial surface. See docs/2026-06-04-adsense-approval-plan.md. */}
+      <HomepageContentSection content={content} locale={locale} />
     </>
   );
 }

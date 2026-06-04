@@ -59,17 +59,28 @@ describe('sitemap', () => {
     }
   });
 
-  // Per-date archive pages render unique server-rendered stats + leaderboards
-  // (see app/[locale]/daily/archive/[date]/page.tsx). Each becomes a long-tail
-  // landing page for queries like "lexiclash daily challenge april 27" once
-  // crawlers can discover them via sitemap.
-  it('includes per-date daily archive URLs for all locales (epoch → yesterday)', () => {
+  // AdSense low-value-content remediation (2026-06-04): per-date archive pages
+  // are thin per-puzzle stat snapshots. They are now noindex,follow at the page
+  // level (app/[locale]/daily/archive/[date]/page.tsx) and are NO LONGER listed
+  // in the sitemap — ~780 URLs across 5 locales were dragging the domain's
+  // content-quality average below AdSense's bar. They stay fully playable; we
+  // just don't advertise them. See docs/2026-06-04-adsense-approval-plan.md.
+  it('does NOT include per-date daily archive URLs (thin, now noindex)', () => {
+    const archiveDateUrls = sitemap()
+      .map((e) => e.url)
+      .filter((u) => /\/daily\/archive\/\d{4}-\d{2}-\d{2}$/.test(u));
+    expect(
+      archiveDateUrls.length,
+      `expected 0 per-date archive URLs, found ${archiveDateUrls.length}`,
+    ).toBe(0);
+  });
+
+  it('still lists the /daily/archive hub (canonical archive entry point)', () => {
     const urls = new Set(sitemap().map((e) => e.url));
-    // Spot-check the epoch first day (2025-12-30) across all 5 locales.
     for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
       expect(
-        urls.has(`https://www.lexiclash.live/${locale}/daily/archive/2025-12-30`),
-        `sitemap missing first archive day for /${locale}`,
+        urls.has(`https://www.lexiclash.live/${locale}/daily/archive`),
+        `sitemap missing archive hub for /${locale}`,
       ).toBe(true);
     }
   });
