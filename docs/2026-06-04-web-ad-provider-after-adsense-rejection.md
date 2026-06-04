@@ -35,7 +35,7 @@ ayeT (rewarded + offerwall) and Mediavine Journey (display) are **complementary 
 ## Critical constraints
 
 1. **Families/COPPA — the decisive lever is a gate we already have.** The Android app is a **Capacitor WebView onto `www.lexiclash.live`**, so anything web-facing also renders inside the Families-program app. Offerwall *offers* (incentivized installs, surveys) are exactly the category Play Families + COPPA restrict. **Resolution:** our web ad paths are gated `!Capacitor.isNativePlatform() && !isOnCrazyGamesPlatform`. Inside the WebView `isNativePlatform()` is `true`, so a correctly-gated offerwall renders **only in real web browsers, never in the Families Android app** — which moots the Play concern entirely. The committed GD adapter already enforces this; the ayeT paths MUST inherit the same gate. (Defense-in-depth: dashboard offer-category exclusions for 13–17 web users not caught by our `<13` `shouldSuppressAdsForTier`; GDPR-K for EU minors.)
-2. **S2S postback is security-critical (and an upgrade).** Coins are minted by *ayeT's* server calling *ours* (`currency_amount`, `external_identifier`, `payout_usd`). Unsigned, anyone could forge the call and mint unlimited coins. The callback endpoint needs **HMAC/signature verification + idempotency on `external_identifier`** + reuse of the existing `/api/coins` daily cap. This is *more* secure than today's client-driven `awardWatchedAd` — frame it as a hardening upgrade, build it carefully.
+2. **S2S postback is security-critical (and an upgrade).** Coins are minted by *ayeT's* server calling *ours* (`transaction_id`, `currency_amount`, `external_identifier`, `payout_usd`, `adslot_id`). ayeT's docs do **not** document an HMAC signature — its security model is **(a) idempotency on `transaction_id`** (mandatory — ayeT resends up to 12× over an hour until it gets HTTP 200, so duplicate credits are a real risk), **(b) a shared-secret token embedded in the callback URL** configured in the dashboard, and **(c) optional IP allowlisting**. The callback endpoint must verify the URL secret, dedup on `transaction_id` (persist consumed ids), credit via the existing coin path under the `/api/coins` daily cap, and return 200. This is *more* secure than today's client-driven `awardWatchedAd` (which the client triggers) — frame it as a hardening upgrade, build it carefully.
 3. **No publisher-account conflict.** ayeT/Torox/Mediavine are independent of our AdSense/AdMob `ca-pub-1896836706464880` — no exclusivity clash with AdMob on native.
 
 ## Recommendation (locked)
@@ -46,14 +46,18 @@ ayeT (rewarded + offerwall) and Mediavine Journey (display) are **complementary 
 4. **Alternates / future:** GameDistribution + GameMonetize (dark adapter already committed) if we want game-portal demand; AdSense H5 (already coded) once the site re-approves post-recrawl (~4–6 weeks).
 5. **Not Ezoic / not AdSense (now):** both gate on the site (250k traffic / "low value content"). Revisit Ezoic only above 250k MAU.
 
-## What's already shipped (committed this session)
-A **dark GameDistribution rewarded adapter**, env-gated, TDD (16 tests, build/lint/tsc green): `lib/ads/gameDistributionAds.ts` + `hooks/useGameDistributionAds.ts` + a `shouldUseGd` branch in `useRewardedAd` above the dead H5 path, gated `NEXT_PUBLIC_GD_ADS_ENABLED` + `NEXT_PUBLIC_GD_GAME_ID` + `?gdads_test=1`. This is the **template** the ayeT rewarded-video path follows (same waterfall slot, same settle-once + `!isNative && !isCG` gating) — not wasted work.
+## What's already shipped (this session)
+Two **dark rewarded-video adapters**, env-gated, TDD, build/lint/tsc green — both off by default, harmless until their env flag + ids are provisioned:
+- **ayeT-Studios** (PRIMARY): `lib/ads/ayetVideoAds.ts` + `hooks/useAyetVideoAds.ts` + a `shouldUseAyet` branch in `useRewardedAd` at the **top** of the web priority (above GD/H5), gated `NEXT_PUBLIC_AYET_ADS_ENABLED` + `NEXT_PUBLIC_AYET_PLACEMENT_ID` + `?ayet_test=1` + `!isNative && !isCG`. Reward iff `callbackRewarded` fires (post fraud-check). Howler muted around the fullscreen video.
+- **GameDistribution** (alternate): `lib/ads/gameDistributionAds.ts` + `hooks/useGameDistributionAds.ts` + `shouldUseGd` branch, gated `NEXT_PUBLIC_GD_ADS_ENABLED` + `NEXT_PUBLIC_GD_GAME_ID` + `?gdads_test=1`.
+
+Both follow the same waterfall slot + settle-once + `!isNative && !isCG` template.
 
 ## Next steps
-**Code (next PR):**
-- ayeT HTML5 Rewarded Video adapter (mirror `useGameDistributionAds`), wired into `useRewardedAd` behind `NEXT_PUBLIC_AYET_ADS_ENABLED` + app key, gated `!isNative && !isCG`.
-- `EarnCoinsOfferwall` modal (iframe to the ayeT/Torox offerwall link with our user id as `external_identifier`).
-- **Secure backend callback** `/api/offerwall/ayet` — verify signature/HMAC, idempotent on `external_identifier`, credit via existing coin path + daily cap.
+**Code (gated on the ayeT account existing — needs `placementId` + offerwall link + callback secret):**
+- `EarnCoinsOfferwall` modal (iframe to the ayeT/Torox offerwall link with our stable user id as `external_identifier`).
+- **Secure backend callback** `/api/offerwall/ayet` — verify the URL secret, **dedup on `transaction_id`** (persist consumed ids), credit via the existing coin path + `/api/coins` daily cap, return HTTP 200. (ayeT has no HMAC; see constraint 2.)
+- Flip `NEXT_PUBLIC_AYET_ADS_ENABLED` + set `NEXT_PUBLIC_AYET_PLACEMENT_ID` once the account is approved.
 
 **Account/ops:**
 - Sign up ayeT-Studios + Torox (offerwall), configure currency + S2S callback URL + offer-category exclusions. Apply to Mediavine Journey (install Grow plugin).

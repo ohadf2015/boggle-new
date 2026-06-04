@@ -4062,7 +4062,9 @@ html[data-cosy='true'] .animate-neo-wobble,
 html[data-cosy='true'] .animate-neo-shake,
 html[data-cosy='true'] .animate-neo-pop,
 html[data-cosy='true'] .animate-bounce,
-html[data-cosy='true'] .animate-neo-reject-flash {
+html[data-cosy='true'] .animate-neo-reject-flash,
+html[data-cosy='true'] .animate-pulse-ring,
+html[data-cosy='true'] .animate-pulse {
   animation: none !important;
 }
 

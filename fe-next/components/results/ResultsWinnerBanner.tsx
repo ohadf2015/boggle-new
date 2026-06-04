@@ -5,6 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { fireEquippedVictoryEffect } from '@/utils/victoryEffects';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import useReducedMotion from '@/hooks/useReducedMotion';
+import { useCosyMode } from '@/contexts/AccessibilityContext';
 import Avatar from '../Avatar';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { MascotWithEntrance, MascotVariant } from '@/components/ui/Mascot';
@@ -130,6 +131,9 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
 }) => {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
+  // Cozy / Calm Mode: an in-app toggle whose audience rarely sets the OS
+  // reduced-motion flag, so quiet the PERPETUAL celebration loops explicitly.
+  const cosyMode = useCosyMode();
   const equippedEffect = useEquippedCosmetic('victoryEffect');
 
   // Determine if confetti should fire (skip in reduced-motion)
@@ -283,9 +287,10 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
           }}
         />
 
-        {/* Animated accent border glow for top 3 */}
-        {rank <= 3 && variant === 'ranking' && !reducedMotion && (
+        {/* Animated accent border glow for top 3 (perpetual — off under cozy) */}
+        {rank <= 3 && variant === 'ranking' && !reducedMotion && !cosyMode && (
           <m.div
+            data-testid="winner-glow-loop"
             className="absolute inset-0 rounded-neo-lg pointer-events-none z-2"
             animate={{
               boxShadow: [
@@ -417,9 +422,10 @@ const ResultsWinnerBanner = memo<ResultsWinnerBannerProps>(({
                 ${compact ? 'px-6 py-2' : 'px-8 py-3 sm:px-12 sm:py-4'}
               `}
             >
-              {/* Score shimmer */}
-              {!reducedMotion && (
+              {/* Score shimmer (perpetual — off under cozy) */}
+              {!reducedMotion && !cosyMode && (
                 <m.div
+                  data-testid="winner-score-shimmer"
                   className="absolute inset-0 pointer-events-none"
                   style={{
                     background: 'linear-gradient(110deg, transparent 30%, rgba(0,0,0,0.06) 50%, transparent 70%)',

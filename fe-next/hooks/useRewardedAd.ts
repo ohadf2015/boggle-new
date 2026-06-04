@@ -8,6 +8,8 @@ import { useAdMob } from '@/hooks/useAdMob';
 import { useH5GamesAds } from '@/hooks/useH5GamesAds';
 import { useGameDistributionAds } from '@/hooks/useGameDistributionAds';
 import { getGdGameId } from '@/lib/ads/gameDistributionAds';
+import { useAyetVideoAds } from '@/hooks/useAyetVideoAds';
+import { getAyetPlacementId } from '@/lib/ads/ayetVideoAds';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
@@ -213,6 +215,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const adMob = useAdMob();
   const h5Ads = useH5GamesAds();
   const gdAds = useGameDistributionAds();
+  const ayetAds = useAyetVideoAds();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
@@ -236,17 +239,29 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   // `NEXT_PUBLIC_GD_ADS_ENABLED=true` + a configured game id, prod runtime OR
   // `?gdads_test=1`, browser env — so it ships dormant and flips by env. Sits
   // ABOVE the (0-fill) H5 path in priority.
+  // Production web → ayeT-Studios rewarded video (the PRIMARY post-AdSense web
+  // path: no traffic minimum, own-domain payout; see
+  // docs/2026-06-04-web-ad-provider-after-adsense-rejection.md). Triple-gated
+  // like the others — explicit `NEXT_PUBLIC_AYET_ADS_ENABLED=true` + a configured
+  // placement id, prod runtime OR `?ayet_test=1`, browser env — so it ships
+  // dormant and flips by env. Sits ABOVE GameDistribution and the dead H5 path.
+  const ayetEnvEnabled = process.env.NEXT_PUBLIC_AYET_ADS_ENABLED === 'true' && getAyetPlacementId() !== '';
+  const hasAyetTestFlag = typeof window !== 'undefined' && (
+    (window as unknown as { __ayetAdsTest?: boolean }).__ayetAdsTest === true ||
+    (typeof location !== 'undefined' && /[?&]ayet_test=1/.test(location.search))
+  );
+  const shouldUseAyet = !shouldUseCrazyGames && !shouldUseAdMob && ayetAds.isAvailable && ayetEnvEnabled && (isProd || hasAyetTestFlag);
   const gdEnvEnabled = process.env.NEXT_PUBLIC_GD_ADS_ENABLED === 'true' && getGdGameId() !== '';
   const hasGdTestFlag = typeof window !== 'undefined' && (
     (window as unknown as { __gdAdsTest?: boolean }).__gdAdsTest === true ||
     (typeof location !== 'undefined' && /[?&]gdads_test=1/.test(location.search))
   );
-  const shouldUseGd = !shouldUseCrazyGames && !shouldUseAdMob && gdAds.isAvailable && gdEnvEnabled && (isProd || hasGdTestFlag);
-  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseGd && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
+  const shouldUseGd = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && gdAds.isAvailable && gdEnvEnabled && (isProd || hasGdTestFlag);
+  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
   // Simulation only in development — never award free gold in production
-  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseGd && !shouldUseH5;
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseH5;
   // Placeholder: no ad platform available — still grant coins, log for admin
-  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseGd && !shouldUseH5
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseH5
     && !shouldUseSimulation;
 
   // Always available — placeholder grants coins when no real ads exist
@@ -263,6 +278,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // Determine platform early for declined-event tagging
     const platformForDecline = shouldUseCrazyGames ? 'crazygames'
       : shouldUseAdMob ? 'admob'
+      : shouldUseAyet ? 'ayet'
       : shouldUseGd ? 'gamedistribution'
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
@@ -315,6 +331,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     // Determine platform for logging
     const platform = shouldUseCrazyGames ? 'crazygames'
       : shouldUseAdMob ? 'admob'
+      : shouldUseAyet ? 'ayet'
       : shouldUseGd ? 'gamedistribution'
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
@@ -432,6 +449,21 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         (errMsg) => { handleAdError(errMsg || 'Ad dismissed without reward'); },
         { surface },
       );
+    } else if (shouldUseAyet) {
+      // Priority 1.6: ayeT-Studios rewarded video — primary production-web path
+      // (no traffic min, own-domain). Client reward via callbackRewarded; the
+      // server-side daily cap in /api/coins is the replay backstop (with the
+      // S2S conversion callback as the secure server credit, wired separately).
+      // Mute Howler around the fullscreen video, restore on both terminal paths.
+      setStatus('showing');
+      onAdStarted?.();
+      try { Howler.mute(true); } catch { /* Howler not initialized */ }
+      const unmuteAyet = () => { try { Howler.mute(false); } catch { /* Howler not initialized */ } };
+      ayetAds.showRewarded(
+        () => { unmuteAyet(); awardCoinsAndNotify(); },
+        (reason) => { unmuteAyet(); handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
     } else if (shouldUseGd) {
       // Priority 1.7: GameDistribution for production web — own-domain rewarded
       // fill (no SSV; replay protection is the server-side daily cap in
@@ -471,7 +503,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
