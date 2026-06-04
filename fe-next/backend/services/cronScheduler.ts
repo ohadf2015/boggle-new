@@ -3,6 +3,12 @@ import { populateWikipediaWords } from './wikipediaWordPopulator';
 import { runDictionaryEnrichment } from '../modules/dictionaryEnrichment';
 import { withCronLock } from '../utils/cronLock';
 import type { Language } from '@/shared/types/game';
+import {
+  rotateTargetLang,
+  runProactiveDiscoveryForLang,
+  runDictionaryMetricsForLang,
+} from '../modules/dictionaryImprovement/runtime';
+import type { LangCode } from '../modules/dictionaryImprovement/types';
 import logger from '../utils/logger';
 
 /**
@@ -618,6 +624,59 @@ export function startReengagementEmailCron() {
  * Start all cron jobs
  * Called from server startup
  */
+/**
+ * Proactive dictionary discovery (01:30 UTC daily).
+ *
+ * Injects a bounded batch of frequency-ranked, novel candidate words for the
+ * day's rotated target language into invalid_word_submissions. They flow through
+ * the EXISTING word-verification cron (02:00) + auto-promotion (every 4h) +
+ * offensive filter — this only fills the funnel proactively so weak languages
+ * (ja/sv/es) stop starving. See docs/2026-06-04-dictionary-extensive-improvement-spec.md.
+ */
+export function startProactiveDiscoveryCron() {
+  const task = cron.schedule('30 1 * * *', async () => {
+    await withCronLock('cron:dict-proactive', 15 * 60 * 1000, async () => {
+      const lang = rotateTargetLang();
+      logger.info('CRON', `Proactive dictionary discovery starting (target=${lang})...`);
+      try {
+        const r = await runProactiveDiscoveryForLang(lang, 200);
+        logger.info('CRON', `Proactive discovery ${lang}: considered=${r.considered} novel=${r.novel} queued=${r.queued}`);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : 'Unknown error';
+        logger.error('CRON', `Proactive discovery ${lang} failed`, { error: msg });
+      }
+    });
+  }, { timezone: 'UTC' });
+  logger.info('CRON', 'Proactive dictionary discovery cron started (daily 01:30 UTC, rotating language)');
+  return task;
+}
+
+/**
+ * Dictionary quality metrics (05:00 UTC daily) — after verification + promotion.
+ *
+ * Records per-language recall@gold + precision@(re-verified sample) into
+ * dictionary_quality_metrics and runs the monotonic-quality gate so a precision
+ * regression surfaces (qualityGate). Read-only w.r.t. the dictionary.
+ */
+export function startDictionaryMetricsCron() {
+  const task = cron.schedule('0 5 * * *', async () => {
+    await withCronLock('cron:dict-metrics', 20 * 60 * 1000, async () => {
+      logger.info('CRON', 'Dictionary quality metrics starting...');
+      for (const lang of LANGUAGES) {
+        try {
+          const m = await runDictionaryMetricsForLang(lang as LangCode, 100);
+          logger.info('CRON', `Metrics ${lang}: recall=${m.recall.toFixed(3)} precision=${m.precision.toFixed(3)} gate=${m.gate.ok ? 'ok' : 'FAIL'}`);
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : 'Unknown error';
+          logger.error('CRON', `Metrics ${lang} failed`, { error: msg });
+        }
+      }
+    });
+  }, { timezone: 'UTC' });
+  logger.info('CRON', 'Dictionary quality metrics cron started (daily 05:00 UTC)');
+  return task;
+}
+
 export function startAllCronJobs(): ScheduledTask[] {
   const tasks: ScheduledTask[] = [];
 
@@ -647,6 +706,12 @@ export function startAllCronJobs(): ScheduledTask[] {
 
   // Season reset (daily 00:05 UTC, no-op when no expired seasons)
   tasks.push(startSeasonResetCron());
+
+  // Proactive dictionary discovery (01:30 UTC) — feeds the verification queue
+  tasks.push(startProactiveDiscoveryCron());
+
+  // Dictionary quality metrics (05:00 UTC) — recall@gold + precision@sample
+  tasks.push(startDictionaryMetricsCron());
 
   logger.info('CRON', `All ${tasks.length} cron jobs started`);
   return tasks;
