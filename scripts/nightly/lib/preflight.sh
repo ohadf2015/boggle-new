@@ -167,35 +167,40 @@ preflight_check() {
         return 1
       fi
     fi
-    # Even when ff-only SUCCEEDED (origin hadn't moved at run-start), abort if
-    # local HEAD carries any unpushed NON-docs commits — building the nightly on
-    # top of unpushed hand-work is a recipe for push-time source conflicts when
-    # origin advances during the 2-3h run. This was the 2026-05-27 root cause:
-    # founder's local `702dc0fa0` (mascot rework) was unpushed at 02:00; origin
-    # ff-only-clean; nightly built docs commit on top; during run, PRs #486/#487
-    # merged the same `MascotCelebrationVideo.tsx`; git-ship's rebase hit a real
-    # source conflict at push time → correct abort, but the night was wasted.
-    # Catch it here BEFORE running 8 lanes.
+    # When local HEAD carries unpushed NON-docs commits (the founder's own hand-work
+    # they haven't pushed yet), we used to ABORT — "push or revert first". That made
+    # the founder's local WIP block the entire nightly (the 2026-06-04 miss: a 6-line
+    # leaderboard refactor sat unpushed and killed the run at preflight in 20s). The
+    # original rationale was push-time source conflict (the 2026-05-27 mascot case),
+    # but git-ship now handles that safely via ISOLATED ship: it cherry-picks only
+    # the nightly's OWN commit onto a fresh origin/master in a throwaway worktree and
+    # resets local back to the founder's HEAD. So instead of aborting, signal the
+    # isolated path — the run proceeds, ships only its own files, and the founder's
+    # commit + working tree are left byte-identical (never published).
     local unpushed_non_docs
     unpushed_non_docs=$(git diff --name-only origin/master..HEAD 2>/dev/null | grep -vE '^docs/' || true)
     if [ -n "$unpushed_non_docs" ]; then
-      echo "preflight: ABORT — HEAD carries unpushed non-docs commits (push or revert first):"
+      echo "preflight: HEAD carries unpushed non-docs commits — enabling isolated ship (founder work left local):"
       echo "$unpushed_non_docs" | sed 's/^/  /'
       git log origin/master..HEAD --oneline | sed 's/^/  /'
-      return 1
+      NIGHTLY_ISOLATED_SHIP=1; export NIGHTLY_ISOLATED_SHIP
+      # Capture the founder's HEAD now (no lane commits yet — lanes only dirty the
+      # tree). git-ship's finalize_isolated_ship collapses local back here at end-of-run.
+      NIGHTLY_FOUNDER_BASE=$(git rev-parse HEAD); export NIGHTLY_FOUNDER_BASE
     fi
   else
     echo "preflight: dirty tree — skipping ff-pull (git-ship rebases onto origin at push time)"
-    # Same guard for the dirty-tree path: unpushed non-docs commits on HEAD are a
-    # latent conflict no matter how clean the working tree is. The dirty-tree
-    # branch above bypassed the ff-pull block entirely, so check here too.
+    # Same handling for the dirty-tree path: unpushed non-docs commits on HEAD no
+    # longer abort — they enable isolated ship (see clean-tree branch above). The
+    # dirty-tree branch bypassed the ff-pull block entirely, so detect it here too.
     local unpushed_non_docs_dirty
     unpushed_non_docs_dirty=$(git diff --name-only origin/master..HEAD 2>/dev/null | grep -vE '^docs/' || true)
     if [ -n "$unpushed_non_docs_dirty" ]; then
-      echo "preflight: ABORT — HEAD carries unpushed non-docs commits (push or revert first):"
+      echo "preflight: HEAD carries unpushed non-docs commits — enabling isolated ship (founder work left local):"
       echo "$unpushed_non_docs_dirty" | sed 's/^/  /'
       git log origin/master..HEAD --oneline | sed 's/^/  /'
-      return 1
+      NIGHTLY_ISOLATED_SHIP=1; export NIGHTLY_ISOLATED_SHIP
+      NIGHTLY_FOUNDER_BASE=$(git rev-parse HEAD); export NIGHTLY_FOUNDER_BASE
     fi
   fi
 

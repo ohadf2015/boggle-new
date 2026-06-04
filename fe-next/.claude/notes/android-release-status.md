@@ -1,11 +1,13 @@
 # Android Release Status — live.lexiclash.app
 
-**Updated:** 2026-04-30
-
-## Current Blocker
-**Production access gate** (Play policy, not technical): need ≥12 closed-test opt-ins × 14 days before "Apply for production access" unlocks. Dashboard: "2 testers currently opted in". No API bypass.
+**Updated:** 2026-06-04
 
 ## Last Release
+versionCode **5713** built + uploaded to **internal** then **promoted to production** 2026-06-04 ~00:49 CEST via `npm run release:android:prod`. Purpose: submit a fresh binary so Google **re-reviews** the corrected Google Families / "Social Apps & Features" policy declaration (chat/DM age-gate + capability enforcement fix `69ae2d905` + `2fdedf2c9`, web-served from `www.lexiclash.live` — remote-URL Capacitor app, fix is NOT in the AAB). Both fastlane lanes returned "Successfully finished the upload to Google Play"; `deactivate_on_promote: true` so 5713 lives on production only. Now in Play review. versionName 0.1.0.
+
+**Production access gate cleared** — the old 12-tester × 14-day blocker no longer applies; `promote_to_production` succeeded with no precondition error.
+
+## Prior Release
 versionCode **4073** uploaded 2026-04-30 ~01:57 to **internal** track. Ships **Blast Sprint 1 + 2** — clarity guards (persistent goal banner, "Just N tiles short" fail card, mid-game toast cleanup, DDA Lucky Boost chip, 14 retired tiles via spawn-flag flip) + new semantic goals (`target_word` Wordscapes-style + `color_power` Royal-Match-style). Solver, deterministic seeding, +50/+30 bonus scoring all wired end-to-end. 1249 tests green. 7 commits: `3254c0b31` → `5bf8f7ac6`.
 
 Prior: 4019 (AdMob Banner Clearance Sweep), 4018 (margin fix patch), 3968 (segmented AdMob units), 3966 (native polish), 3959 (UNIMPLEMENTED plugin re-release), 3766 (launch-crash fix).

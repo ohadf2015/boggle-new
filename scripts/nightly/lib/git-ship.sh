@@ -126,6 +126,18 @@ ship_nightly_commit() {
     return 0
   fi
 
+  # Isolated ship: the founder ran the nightly on top of their own unpushed local
+  # commit(s). A plain `git push origin master` would publish those commits too —
+  # the opposite of "run on my tree but don't touch/publish my work". Instead ship
+  # ONLY this commit's diff onto a fresh origin/master via a throwaway worktree,
+  # then drop it from local so the founder's HEAD + WIP stay byte-identical.
+  # preflight sets NIGHTLY_ISOLATED_SHIP=1 when it detects an unpushed non-docs
+  # commit (replacing the old hard abort).
+  if [ "${NIGHTLY_ISOLATED_SHIP:-0}" = "1" ]; then
+    _ship_isolated "$NEW_SHA"
+    return $?
+  fi
+
   log "pushing master..."
   if git push origin master >> "$RUN_LOG" 2>&1; then
     log "pushed $NEW_SHA"
@@ -217,4 +229,94 @@ ship_nightly_commit() {
   log "push blocked (conflict: ${conflict:-unknown}) — saved $pending_sha to $pending_ref, reset master to origin/master"
   tg_alert "nightly $TODAY: push blocked by conflict on \`${conflict:-unknown}\`. Work SAVED to \`$pending_ref\` (recover: \`git cherry-pick $pending_sha\`). master reset to origin so tomorrow runs clean. See \`$RUN_LOG\`."
   return 1
+}
+
+# Reset local master back to $1 (the founder's pre-nightly HEAD) WITHOUT losing the
+# founder's uncommitted WIP. `git reset --hard` would nuke WIP, so stash (-u =
+# include untracked) → reset → pop. A pop conflict keeps the stash entry (recover
+# via `git stash list`), so founder work is never lost. Used by _ship_isolated to
+# leave the founder's commit + working tree byte-identical after an isolated push.
+_restore_local_to() {
+  local base="$1" _stashed=0
+  if [ -n "$(git status --porcelain)" ]; then
+    git stash push -u -q -m "nightly-iso-rescue-$TODAY" >>"$RUN_LOG" 2>&1 && _stashed=1
+  fi
+  git reset --hard "$base" >>"$RUN_LOG" 2>&1 || true
+  if [ "$_stashed" = 1 ]; then
+    git stash pop >>"$RUN_LOG" 2>&1 || log "stash pop conflicted — founder WIP kept in 'git stash list'"
+  fi
+}
+
+# Ship ONLY the nightly's own commit ($1) onto origin/master, never publishing the
+# founder's unpushed commit(s) it was built on top of. Cherry-picks the commit's
+# diff onto a fresh origin/master inside a throwaway worktree (same isolation
+# pattern as preflight's docs-strand recovery) and pushes. On a cherry-pick/push
+# conflict (concurrent origin work touched the same file) it strands the commit to
+# refs/nightly-pending/$TODAY + alerts — never half-ships, never loses work.
+#
+# CRITICAL: this does NOT reset local master. Resetting mid-run would delete the
+# nightly's just-committed files (the report especially) from the working tree, so
+# the manager-summary (run.sh reads docs/nightly/reports/$TODAY.md from DISK) and
+# the residual ship would operate on a stubbed report. Local stays advanced
+# (founder + nightly commit) through the whole run; run.sh calls
+# finalize_isolated_ship ONCE at end-of-run to collapse back to the founder base
+# with WIP preserved. Sets NEW_SHA to the pushed origin head on success.
+# Returns 0 / 1 like the caller.
+_ship_isolated() {
+  local nightly_sha="$1"
+
+  log "isolated ship: founder has unpushed commits — shipping nightly diff only via worktree"
+  git fetch origin master --quiet 2>>"$RUN_LOG" || { log "isolated ship: fetch failed"; }
+
+  local wtbase wt ok=0
+  wtbase=$(mktemp -d -t nightly-iso.XXXXXX); wt="$wtbase/wt"
+  if git worktree add --detach --quiet "$wt" origin/master 2>>"$RUN_LOG" \
+     && git -C "$wt" cherry-pick "$nightly_sha" >>"$RUN_LOG" 2>&1 \
+     && git -C "$wt" push origin HEAD:master >>"$RUN_LOG" 2>&1; then
+    ok=1
+    NEW_SHA=$(git -C "$wt" rev-parse HEAD)
+  fi
+
+  if [ "$ok" = 1 ]; then
+    git worktree remove --force "$wt" 2>/dev/null || true
+    rm -rf "$wtbase" 2>/dev/null || true
+    log "isolated-shipped $NEW_SHA (local left advanced; founder base restored at end-of-run)"
+    echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\` (isolated worktree — founder's unpushed work kept local)" >> "$REPORT"
+    return 0
+  fi
+
+  # Cherry-pick or push failed — concurrent origin work conflicts with a nightly
+  # file. Save the nightly commit for recovery, clean up. Local stays advanced; the
+  # end-of-run finalize collapses it back to the founder base (the run will be
+  # RUN_FAILED so no residual ship runs, but the summary still reads a full report).
+  local conflict
+  conflict=$(git -C "$wt" diff --name-only --diff-filter=U 2>/dev/null | head -3 | tr '\n' ' ')
+  git -C "$wt" cherry-pick --abort 2>/dev/null || true
+  git worktree remove --force "$wt" 2>/dev/null || true
+  rm -rf "$wtbase" 2>/dev/null || true
+  local pending_ref="refs/nightly-pending/$TODAY"
+  git update-ref "$pending_ref" "$nightly_sha" 2>>"$RUN_LOG" || true
+  log "isolated ship blocked (conflict: ${conflict:-unknown}) — saved $nightly_sha to $pending_ref; local restored to founder base at end-of-run"
+  tg_alert "nightly $TODAY: isolated push blocked by conflict on \`${conflict:-unknown}\`. Work SAVED to \`$pending_ref\` (recover: \`git cherry-pick $nightly_sha\`). Founder's local commit + WIP left untouched. See \`$RUN_LOG\`."
+  return 1
+}
+
+# End-of-run collapse for an isolated-ship run: reset local master back to the
+# founder's pre-run HEAD (captured by preflight as NIGHTLY_FOUNDER_BASE), dropping
+# the nightly commit(s) that were already pushed to origin via worktree, with the
+# founder's WIP preserved. Called ONCE by run.sh after the manager-summary and the
+# residual ship — so every downstream step ran on a tree that still held the
+# nightly's files, and only the FINAL local state honors "don't touch my tree".
+# No-op unless this was an isolated run with a valid base. Skips --no-push (the
+# local commit is intentionally kept for inspection then).
+finalize_isolated_ship() {
+  [ "${NIGHTLY_ISOLATED_SHIP:-0}" = "1" ] || return 0
+  [ "${NO_PUSH:-0}" = "1" ] && { log "isolated finalize: --no-push — keeping local commit, not restoring"; return 0; }
+  local base="${NIGHTLY_FOUNDER_BASE:-}"
+  [ -n "$base" ] || { log "isolated finalize: NIGHTLY_FOUNDER_BASE unset — leaving local as-is"; return 0; }
+  git rev-parse --verify "${base}^{commit}" >/dev/null 2>&1 \
+    || { log "isolated finalize: base $base invalid — leaving local as-is"; return 0; }
+  [ "$(git rev-parse HEAD)" = "$(git rev-parse "$base")" ] && return 0   # already at base
+  log "isolated finalize: restoring local master to founder base $base (commit + WIP byte-identical)"
+  _restore_local_to "$base"
 }

@@ -239,6 +239,95 @@ assert "founder tracked WIP survived reset"       "[ -f base.txt ] && grep -q 'F
 assert "founder untracked WIP survived reset"     "[ -f founder-draft.txt ]"
 assert "no unmerged paths"                        "[ -z \"\$(git diff --name-only --diff-filter=U)\" ]"
 
+echo "Scenario 13 — founder unpushed non-docs commit → isolated ship publishes ONLY nightly diff (founder commit NOT published; local stays advanced for end-of-run finalize)"
+# The founder ran the nightly on top of their own unpushed local commit (+ dirty
+# WIP). NIGHTLY_ISOLATED_SHIP=1 (set by preflight) must ship ONLY the nightly's
+# authored diff to origin via a throwaway worktree — never publishing the founder's
+# commit. Local is left ADVANCED (founder + nightly commit) so the manager-summary
+# + residual ship still see the nightly's files on disk; the founder base is
+# restored once at end-of-run by finalize_isolated_ship (Scenario 15).
+setup
+printf 'export const x = 99; // founder unpushed\n' > fe-next/app/page.tsx
+git add fe-next/app/page.tsx; git commit -qm "founder local wip commit"
+FOUNDER_SHA=$(git rev-parse HEAD)
+printf 'FOUNDER edited base\n' > base.txt            # founder tracked WIP
+printf 'founder scratch\n'     > founder-draft.txt   # founder untracked WIP
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+WIP_LIST=$(mktemp); printf 'base.txt\nfounder-draft.txt\n' > "$WIP_LIST"
+NIGHTLY_ISOLATED_SHIP=1 NIGHTLY_WIP_PROTECT="$WIP_LIST" ship_nightly_commit; rc=$?
+assert "returns 0"                                "[ $rc -eq 0 ]"
+assert "lane doc shipped to origin"               "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
+assert "founder commit NOT published to origin"   "! git show origin/master:fe-next/app/page.tsx | grep -q 'founder unpushed'"
+assert "local advanced (nightly commit on HEAD)"  "[ \"\$(git log -1 --pretty=%s)\" = 'chore(nightly): autonomous improvement loop test' ]"
+assert "founder commit is HEAD's parent"          "[ \"\$(git rev-parse HEAD^)\" = \"$FOUNDER_SHA\" ]"
+assert "nightly's files present on disk"           "[ -f docs/nightly/reports/2026-01-01.md ]"
+assert "founder tracked WIP still dirty"           "grep -q 'FOUNDER edited base' base.txt"
+assert "founder untracked WIP survived"            "[ -f founder-draft.txt ]"
+assert "NEW_SHA points at the pushed origin head"  "[ \"$NEW_SHA\" = \"\$(origin_head)\" ]"
+unset NIGHTLY_ISOLATED_SHIP
+
+echo "Scenario 14 — isolated ship, concurrent origin advanced same file → conflict stranded to ref, origin not clobbered"
+# A cherry-pick conflict (origin advanced a file the nightly also touched) must NOT
+# lose work: save to refs/nightly-pending, alert, never half-ship to origin. Local
+# is collapsed back to the founder base by finalize at end-of-run (asserted here too).
+setup
+printf 'founder code\n' > fe-next/app/newfeature.ts
+git add fe-next/app/newfeature.ts; git commit -qm "founder local wip commit"
+FOUNDER_SHA=$(git rev-parse HEAD)
+echo "nightly edit" > base.txt                       # nightly authors a base.txt change
+advance_origin "base.txt=origin changed base"        # origin advances the SAME file
+NIGHTLY_ISOLATED_SHIP=1 NIGHTLY_FOUNDER_BASE="$FOUNDER_SHA" ship_nightly_commit; rc=$?
+assert "returns 1 (conflict, human needed)"          "[ $rc -eq 1 ]"
+assert "nightly commit saved to recovery ref"        "git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+assert "founder commit still reachable"              "git cat-file -e $FOUNDER_SHA 2>/dev/null"
+assert "origin keeps its version (not clobbered)"    "git show origin/master:base.txt | grep -q 'origin changed base'"
+assert "no nightly content half-shipped to origin"   "! git show origin/master:base.txt | grep -q 'nightly edit'"
+assert "alert gives a recovery hint"                 "printf '%s' \"\$ALERTS\" | grep -qi 'nightly-pending'"
+assert "no leftover worktrees"                        "[ \"\$(git worktree list | wc -l | tr -d ' ')\" = 1 ]"
+# end-of-run finalize collapses local back to the founder base, WIP preserved
+NIGHTLY_ISOLATED_SHIP=1 NIGHTLY_FOUNDER_BASE="$FOUNDER_SHA" finalize_isolated_ship
+assert "finalize → local HEAD == founder commit"     "[ \"\$(git rev-parse HEAD)\" = \"$FOUNDER_SHA\" ]"
+assert "finalize → founder commit content intact"    "git show HEAD:fe-next/app/newfeature.ts | grep -q 'founder code'"
+unset NIGHTLY_ISOLATED_SHIP NIGHTLY_FOUNDER_BASE
+
+echo "Scenario 15 — INTEGRATION: isolated ship survives {main ship → Outcome append → residual ship → finalize} (report NOT stubbed, no spurious strand, founder state byte-identical)"
+# This replays the EXACT run.sh sequence that unit-testing a single ship can't see:
+# the report append + residual ship happen AFTER the main isolated ship. The bug we
+# guard against: resetting local mid-ship would delete the nightly's report from
+# disk → the Outcome append recreates a stub → the residual ship re-adds an
+# already-shipped path → spurious pending-ref strand / stubbed Telegram report.
+setup
+printf 'founder code\n' > fe-next/app/newfeature.ts
+git add fe-next/app/newfeature.ts; git commit -qm "founder local wip commit"
+FOUNDER_SHA=$(git rev-parse HEAD)
+printf 'FOUNDER edited base\n' > base.txt             # founder dirty WIP
+export NIGHTLY_ISOLATED_SHIP=1
+export NIGHTLY_FOUNDER_BASE="$FOUNDER_SHA"
+WIP_LIST=$(mktemp); printf 'base.txt\n' > "$WIP_LIST"
+# (1) main ship — nightly authors a FULL report
+printf 'lane work\nFULL LANE CONTENT LINE\n' > docs/nightly/reports/2026-01-01.md
+NIGHTLY_WIP_PROTECT="$WIP_LIST" ship_nightly_commit; rc1=$?
+# (2) run.sh appends the Outcome line to the report AFTER the main ship
+echo '**Outcome:** shipped' >> docs/nightly/reports/2026-01-01.md
+assert "main isolated ship returned 0"               "[ $rc1 -eq 0 ]"
+assert "report on disk INTACT for summary (not stub)" "grep -q 'FULL LANE CONTENT LINE' docs/nightly/reports/2026-01-01.md"
+# (3) residual ship sweeps the trailing Outcome change (REPORT=/dev/null as run.sh does)
+RES_MSG=$(mktemp); echo "chore(nightly): post-run residue" > "$RES_MSG"
+RES_AUTH=$(mktemp); echo "docs/nightly/reports/2026-01-01.md" > "$RES_AUTH"
+MSG_FILE="$RES_MSG" REPORT=/dev/null NO_CHANGE_MODE=0 NIGHTLY_AUTHORED="$RES_AUTH" ship_nightly_commit; rc2=$?
+assert "residual isolated ship returned 0"           "[ $rc2 -eq 0 ]"
+# (4) end-of-run finalize collapses local back to the founder base
+finalize_isolated_ship
+assert "final local HEAD == founder commit"          "[ \"\$(git rev-parse HEAD)\" = \"$FOUNDER_SHA\" ]"
+assert "founder commit content intact locally"       "git show HEAD:fe-next/app/newfeature.ts | grep -q 'founder code'"
+assert "founder WIP survived whole sequence"         "grep -q 'FOUNDER edited base' base.txt"
+assert "origin report has FULL lane content (not stub)" "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'FULL LANE CONTENT LINE'"
+assert "origin report has the Outcome line"          "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'Outcome'"
+assert "founder code NOT published to origin"         "! git ls-tree -r --name-only origin/master | grep -qx 'fe-next/app/newfeature.ts'"
+assert "NO spurious pending-ref strand"              "! git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+assert "no leftover worktrees"                        "[ \"\$(git worktree list | wc -l | tr -d ' ')\" = 1 ]"
+unset NIGHTLY_ISOLATED_SHIP NIGHTLY_FOUNDER_BASE
+
 echo
 echo "──────────────────────────────────────────"
 echo "PASS=$PASS  FAIL=$FAIL"

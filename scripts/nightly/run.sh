@@ -119,6 +119,15 @@ send_failure_digest() {
 }
 
 cleanup() {
+  # Isolated-ship safety net: if the run exits early or is SIGTERM'd by launchd's
+  # 3600s ceiling AFTER an isolated ship but BEFORE the explicit end-of-run
+  # finalize, local master is still advanced past the founder base — collapse it
+  # here so the founder's commit + WIP are never left with a stray nightly commit
+  # on top. Idempotent (HEAD==base → no-op), so double-firing with the explicit
+  # call is harmless. Guarded: git-ship.sh may not be sourced yet on a very early exit.
+  if declare -F finalize_isolated_ship >/dev/null 2>&1; then
+    RUN_LOG="${RUN_LOG:-/dev/null}" finalize_isolated_ship >> "${RUN_LOG:-/dev/null}" 2>&1 || true
+  fi
   # shellcheck disable=SC1091
   . "$LIB_DIR/preflight.sh"
   preflight_release_lock
@@ -1065,6 +1074,12 @@ EOF
   fi
   rm -f "$RESIDUAL_AUTHORED"
 fi
+
+# Isolated ship: collapse local master back to the founder's pre-run HEAD now that
+# every downstream step (manager summary read the report from disk, residual ship
+# swept trailing doc writes) has run on a tree that STILL held the nightly's files.
+# Leaves the founder's commit + WIP byte-identical. No-op on non-isolated runs.
+finalize_isolated_ship >> "$RUN_LOG" 2>&1 || true
 
 if [ "$RUN_FAILED" = "1" ]; then
   log "nightly-loop finished WITH FAILURES — full digest (summary + buttons + Reddit + ideas) was sent; NOT marking success so dedup stays clear for a retry"

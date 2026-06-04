@@ -149,25 +149,33 @@ assert "diff day, ~22h apart → RUNS"                       "[ $rcD -eq 0 ]"
 unset NIGHTLY_NOW_EPOCH
 rm -f "$LAST_RUN_FILE" "$LOCK_FILE"
 
-# ── unpushed non-docs guard (2026-05-27 regression) ───────────────────────
-# Founder's hand-committed local code on HEAD (unpushed) is a latent push-time
-# conflict if origin advances during the 2-3h run — the actual 2026-05-27 root
-# cause. Preflight must abort BEFORE running 8 lanes, regardless of whether
-# origin has moved yet.
+# ── unpushed non-docs commit → isolated ship (was: ABORT, 2026-06-04) ──────
+# Founder's hand-committed local code on HEAD (unpushed) USED to abort the run
+# ("push or revert first") — but that let a tiny unpushed WIP commit block the
+# whole night (the 2026-06-04 miss). It no longer aborts: preflight PROCEEDS and
+# signals NIGHTLY_ISOLATED_SHIP=1 so git-ship cherry-picks only the nightly's own
+# commit onto a fresh origin/master and leaves the founder's commit + tree local.
+# The old push-time-conflict risk (2026-05-27) is now handled by the isolated
+# worktree path + strand-on-conflict (proven in test/git-ship.test.sh #13/#14).
 ( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
 rm -f "$LOCK_FILE"
+unset NIGHTLY_ISOLATED_SHIP
 echo
-echo "unpushed non-docs commit on HEAD"
+echo "unpushed non-docs commit on HEAD → isolated ship (must NOT abort)"
 ( cd "$REPO"
   echo "hand-edit" >> base.txt
   git add base.txt
   git -c user.email=t@t -c user.name=t commit -qm "hand: local non-docs commit" )
-OUTE=$(preflight_check 2>&1); rcE=$?
-assert "unpushed non-docs commit → ABORT (return 1)"  "[ $rcE -eq 1 ]"
-assert "  …logs the offending path"                   'printf "%s" "$OUTE" | grep -q "base.txt"'
-assert "  …names the unpushed-non-docs reason"        'printf "%s" "$OUTE" | grep -q "unpushed non-docs commits"'
+# Run in the CURRENT shell (file redirect, not $(...) which subshells) so the
+# exported NIGHTLY_ISOLATED_SHIP propagates exactly as it does in run.sh:177.
+_oute=$(mktemp); preflight_check > "$_oute" 2>&1; rcE=$?; OUTE=$(cat "$_oute"); rm -f "$_oute"
+assert "unpushed non-docs commit → PROCEEDS (return 0)"  "[ $rcE -eq 0 ]"
+assert "  …logs the offending path"                      'printf "%s" "$OUTE" | grep -q "base.txt"'
+assert "  …enables isolated ship in the log"             'printf "%s" "$OUTE" | grep -q "enabling isolated ship"'
+assert "  …sets NIGHTLY_ISOLATED_SHIP=1"                 '[ "${NIGHTLY_ISOLATED_SHIP:-0}" = 1 ]'
 # Reset for next case
 ( cd "$REPO"; git reset --hard origin/master -q )
+unset NIGHTLY_ISOLATED_SHIP
 
 # Mirror: unpushed DOCS-only commit must NOT abort (loop's own salvage commits
 # and stranded seo-daily reports are common; ff-pull/rebase paths handle them).
