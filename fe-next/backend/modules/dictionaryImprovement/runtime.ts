@@ -100,6 +100,7 @@ function makeDiscoveryDeps(): DiscoveryDeps {
       const seen = new Set<string>();
       try {
         const supabase = getSupabase();
+        if (!supabase) throw new Error('supabase unavailable');
         for (const table of ['invalid_word_submissions', 'word_scores'] as const) {
           const { data } = await supabase
             .from(table)
@@ -137,6 +138,7 @@ function makeDiscoveryDeps(): DiscoveryDeps {
           ...(lang === 'he' ? { milog_status: 'pending', milog_attempts: 0 } : {}),
         }));
         const supabase = getSupabase();
+        if (!supabase) throw new Error('supabase unavailable');
         const { data, error } = await supabase
           .from('invalid_word_submissions')
           .upsert(rows, { onConflict: 'word,language', ignoreDuplicates: true })
@@ -174,6 +176,7 @@ function makeMetricsDeps(boundLang: LangCode): MetricsDeps {
     sampleAcceptedWords: async (lang, n) => {
       try {
         const supabase = getSupabase();
+        if (!supabase) throw new Error('supabase unavailable');
         const { data } = await supabase
           .from('word_scores')
           .select('word')
@@ -198,6 +201,7 @@ function makeMetricsDeps(boundLang: LangCode): MetricsDeps {
     loadPrevPrecision: async (lang) => {
       try {
         const supabase = getSupabase();
+        if (!supabase) throw new Error('supabase unavailable');
         const { data } = await supabase
           .from('dictionary_quality_metrics')
           .select('precision_sample')
@@ -213,7 +217,9 @@ function makeMetricsDeps(boundLang: LangCode): MetricsDeps {
 
     save: async (row) => {
       try {
-        await getSupabase().from('dictionary_quality_metrics').insert(row);
+        const supabase = getSupabase();
+        if (!supabase) throw new Error('supabase unavailable');
+        await supabase.from('dictionary_quality_metrics').insert(row);
       } catch (e) {
         log(`metrics save failed: ${String(e)}`);
       }

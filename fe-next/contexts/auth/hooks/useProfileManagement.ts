@@ -23,6 +23,7 @@ import { getUtmDataForProfile } from '@/utils/utmCapture';
 import { syncGuestDailyResultsToAccount } from '@/utils/dailyChallenge';
 import { getRandomAvatar, getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getRandomAvatarConfig } from '@/shared/types/customAvatar';
+import { withAvatarCustomizedFlag } from '@/lib/avatar/avatarNudge';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 import { fetchGeolocation, fetchRandomPlayerName, extractOAuthDisplayName } from '../authUtils';
@@ -376,7 +377,11 @@ export function useProfileManagement({
     async (updates: Partial<ProfileData>) => {
       if (!user?.id) return { data: null, error: { message: 'Not authenticated' } };
 
-      const { data, error } = await updateProfile(user.id, updates);
+      // Chokepoint: every deliberate avatar-builder save funnels through this
+      // hook, so an avatar_config write here means the user chose their look.
+      // (The silent auto-assign + signup-insert paths use the lib functions
+      // directly and never reach here.)
+      const { data, error } = await updateProfile(user.id, withAvatarCustomizedFlag(updates));
 
       if (!error && data) {
         setProfile(data);

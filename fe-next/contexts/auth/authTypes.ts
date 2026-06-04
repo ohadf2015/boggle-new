@@ -15,6 +15,11 @@ export interface ProfileData {
   avatar_emoji?: string;
   avatar_color?: string;
   avatar_config?: CustomAvatarConfig | null;
+  // True once the user deliberately saved an avatar from the builder. New
+  // accounts default false (eligible for the "make it yours" nudge); rows
+  // existing at migration time were backfilled true. Set at the
+  // useProfileManagement.updateUserProfile chokepoint.
+  avatar_customized?: boolean;
   total_games?: number;
   total_score?: number;
   total_words?: number;

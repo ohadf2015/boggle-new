@@ -82,6 +82,10 @@ export type GrowthEvent =
   | 'leaderboard_viewed'
   | 'profile_viewed'
   | 'feature_first_use'
+  // Avatar "make it yours" nudge funnel (gentle, authed-only)
+  | 'avatar_nudge_shown'
+  | 'avatar_nudge_clicked'
+  | 'avatar_nudge_dismissed'
   | 'hint_used'
   // Conversion
   | 'signup_prompt_shown'

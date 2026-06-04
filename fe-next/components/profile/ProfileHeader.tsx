@@ -9,6 +9,8 @@ import { Loader } from '@/components/ui/Loader';
 import { Input } from '@/components/ui/input';
 import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
+import { AvatarCustomizeHint } from '@/components/profile/AvatarCustomizeHint';
+import { useAvatarCustomizationNudge } from '@/hooks/useAvatarCustomizationNudge';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { CountrySelector } from '@/components/settings/CountrySelector';
@@ -54,6 +56,7 @@ export function ProfileHeader({
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const equippedFrame = useEquippedCosmetic('profileFrame');
+  const avatarNudge = useAvatarCustomizationNudge();
 
   const startEditingName = (): void => {
     setEditDisplayName(profile?.display_name || profile?.username || '');
@@ -263,6 +266,18 @@ export function ProfileHeader({
 
         </div>
       </div>
+
+      {/* Gentle nudge: invite users still wearing their random starter avatar
+          to make it their own. Authed-only, dismissible, snoozes 30 days. */}
+      {!compact && avatarNudge.show && (
+        <AvatarCustomizeHint
+          onCustomize={() => {
+            avatarNudge.markClicked();
+            setIsAvatarBuilderOpen(true);
+          }}
+          onDismiss={avatarNudge.dismiss}
+        />
+      )}
 
       {/* Creator Stats */}
       {creatorStats.boardsCreated > 0 && (
