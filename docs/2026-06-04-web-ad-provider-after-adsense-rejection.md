@@ -1,61 +1,64 @@
-# Web Ad Provider After Repeated AdSense Rejection — Research & Recommendation
+# Web Monetization After Repeated AdSense Rejection — Research & Recommendation
 
 **Date:** 2026-06-04
-**Context:** AdSense rejected `lexiclash.live` again ("low value content" / low traffic — see `docs/2026-06-04-adsense-approval-plan.md`). The web app currently serves **zero rewarded fill** (Google H5 Games Ads is wired but dark, 0 watches; AdMob is native-only; CrazyGames only pays inside its own portal). We need a provider that (a) accepts our current low traffic, (b) offers **web rewarded** ads, (c) pays on **our own domain** (`lexiclash.live`), and (d) supports the Families/COPPA gate we just shipped.
+**Context:** AdSense rejected `lexiclash.live` again ("low value content" / low traffic). The web app serves **zero rewarded fill** today (Google H5 Games Ads wired but dark, 0 watches; AdMob is native-only; CrazyGames pays only inside its own portal). We need web monetization that (a) approves at our **current low traffic**, (b) delivers **rewarded** ads "and more," (c) pays on **our own domain**, and (d) doesn't break the Families/COPPA compliance we just shipped.
 
-## The selection filter (why eCPM is irrelevant here)
+## The selection filter
 
-AdSense rejected us on **approval**, not payout. So the discriminating filter is: self-serve, instant/no-content-review approval, **no traffic minimum**. At our volume (≈6 native rewarded watches/30d, web 0 fill) the only metric that matters is *will it fill at all* — H5's 0% fill is the failure mode to avoid, not low CPM. We rank by **approval + fill + own-domain + brand-safety**, never by advertised CPM.
+AdSense rejected us on **approval**, not payout. At our volume the only metric that matters is *will it approve + fill at all* — not advertised eCPM. So every candidate is judged on: **no traffic minimum · web rewarded · pays on lexiclash.live · brand-safe/COPPA · self-serve approval.**
 
-**Dropped immediately** (same/worse gate — they manually quality-review, the exact thing we just failed): Mediavine, Raptive/AdThrive, Playwire, Media.net.
+## Answer: ayeT-Studios (rewarded + offerwall), with Mediavine Journey for display
 
-## Candidate gate matrix (verified 2026-06-04, live)
+A word game with a **coin economy** has a better-fitting rewarded surface than banner ads: an **offerwall** — players earn in-game coins by watching a rewarded video *or* completing an offer/survey. This maps 1:1 onto our existing `awardWatchedAd` / `rewards.WATCH_AD` flow, has **no traffic minimum**, approves instantly, runs on web, and pays on our own domain — dodging every gate that's been blocking us.
+
+### Candidate gate matrix (verified 2026-06-04, primary sources)
 
 | Provider | No traffic min | Web rewarded | Pays on lexiclash.live | Brand-safe / COPPA | Approval | Verdict |
 |---|---|---|---|---|---|---|
-| **Ezoic** | ✅ "Access Now" tier (pageview minimum removed) | ✅ `requestAndShow()` / `contentLocker()` | ✅ own-site JS integration | ✅ Google MCM Certified Publishing Partner | ✅ self-serve, light *automated* review (no editorial content gate) | **PRIMARY — lowest approval risk; covers rewarded + display** |
-| **GameDistribution** | ✅ | ✅ `gdsdk.showAd('rewarded')` | ⚠️ self-host mechanism exists (`GD_SDK_REFERRER_URL`) — own-domain payout **unconfirmed** (see constraint 1) | ⚠️ game-ad demand; COPPA flag set in dashboard | ⚠️ self-serve signup **+ per-game "Request Activation" review** before ads pay | **UPSIDE — best game-native rewarded fill IF the two open items confirm** |
-| **GameMonetize** | ✅ | ✅ | ⚠️ own-site embed, same payout question as GD | ✅ "agesafe" certified | ⚠️ manual game review (same gate class as GD) | Alternative to GD if GD payout fails |
-| **Monetag** (ex-PropellerAds) | ✅ | ❌ web gets pop/push/vignette only (rewarded is Telegram-Mini-App only) | ✅ | ❌ aggressive/adult demand — violates Families policy | ✅ instant | **DROP** |
-| **AdinPlay / Venatus** | ❌ has traffic minimums | ✅ | ✅ | ✅ premium | ❌ sales-led onboarding, not instant | Revisit at scale |
+| **ayeT-Studios** | ✅ **T&C: no min** (verified) | ✅ HTML5 Rewarded Video SDK **+** web offerwall + surveywall | ✅ web iframe + **S2S postback** credits coins server-side | ⚠️ offer-category exclusions in dashboard; COPPA via our own `<13` suppression | ✅ open self-serve registration | **PRIMARY — rewarded video + offerwall in one relationship** |
+| **Torox** (ex-OfferToro) | ✅ "no prepayment/commitment, start freely" | ✅ web offerwall (no-code/iframe/API) | ✅ built for "browser games with a virtual-currency economy" | ⚠️ same as ayeT | ✅ self-serve | **CO-PRIMARY offerwall — apply in parallel** |
+| **Mediavine Journey** | ✅ **1,000 sessions/mo** (new tier, eff 2026-01-15) | display/video (not in-game rewarded) | ✅ own site, 70% rev-share | ✅ Google demand, brand-safe | ⚠️ content review (wants original, advertiser-friendly content) | **DISPLAY "and more" — the realistic Ezoic replacement at our size** |
+| **GameDistribution / GameMonetize** | ✅ | ✅ `showAd('rewarded')` | ⚠️ self-host mechanism; own-domain payout unconfirmed | ⚠️ game-ad demand | ⚠️ per-game **Activation review** | **ALTERNATE — code built (dark adapter); use if we want game-portal demand** |
+| **Google AdSense H5 Games Ads** | ✅ | ✅ `adBreak({type:'reward'})` | ✅ own domain | ✅ Google, brand-safe | ❌ needs AdSense approval (rejected; reapply after recrawl) | **FUTURE — already coded; flip when AdSense re-approves (~4–6 wk)** |
+| **Ezoic** | ❌ **250k MAU** (new gate, eff 2026-02-19) | ✅ | ✅ | ✅ | ❌ we don't qualify | **DROP — revisit at 250k MAU** |
+| **Monetag** | ✅ | ❌ web = pop/push/vignette only | ✅ | ❌ aggressive demand vs Families | ✅ | **DROP** |
+| **NitroPay / Snigel / AdinPlay / Playwire / Mediavine main / Raptive / Media.net** | ❌ traffic minimums (100k–500k) or manual quality review | — | — | — | — | **DROP at our traffic** |
 
-### Honest correction (vs. the first draft of this doc)
-The first draft asserted GameDistribution's own-domain payout was "confirmed" and gave it a no-review pass. On reading the sources (Defold self-host writeup; GD publisher terms) that is **not supported**: GD requires a per-game **"Request Activation"** step (a review gate, the same *class* of gate that demotes GameMonetize), and neither the terms excerpt nor the tutorial states you earn on `lexiclash.live` plays **without the game being accepted into GD's catalog**. So GD is reclassified from "primary" to "upside, pending verification." This does not change the *code* we ship (a harmless dark adapter, valuable if GD checks out) — only the confidence of the business recommendation.
+### Why ayeT-Studios is the standout
+One relationship covers **both** surfaces the question asks for, with none of the gates that sank the others:
+- **Rewarded video** via its HTML5 Rewarded Video SDK → drops into the existing `useRewardedAd` web slot, using the *same dark-adapter template* already committed for GameDistribution. No game-catalog Activation gate, no own-domain-payout question (the two things that made GD uncertain).
+- **Offerwall + surveywall** → an "Earn coins" modal (iframe). For a coin economy this is the **highest-value** rewarded surface — an offer completion (signup/trial) pays dollars vs. fractions of a cent for a video CPM.
+- **No traffic minimum** (publisher T&C, primary-source verified — not a blog claim), self-serve, own-domain, secure S2S crediting.
 
-### Why Ezoic and GameDistribution don't conflict
-Ezoic is a **page-level display/interstitial mediation** layer; GameDistribution is an **in-game rewarded-video SDK**. Different surfaces, so they coexist:
-- **Ezoic → the safe floor.** The textbook "AdSense rejected me" replacement: no traffic minimum, no editorial content review, brand-safe Google MCM demand, and you do **not** need AdSense approval (only AdSense-*policy* compliance, which we have). It also offers rewarded (`requestAndShow`/`contentLocker`) + interstitial + banner — so it can cover the rewarded ask *and* "and more" if GD doesn't pan out.
-- **GameDistribution → the upside rewarded bet.** For a *word game*, a game-native rewarded SDK should out-fill Ezoic's content-locker rewarded — but only if (a) the game passes Activation and (b) own-domain plays actually pay. Both are open items below.
+ayeT (rewarded + offerwall) and Mediavine Journey (display) are **complementary surfaces, not competing primaries** — run both. Torox is the offerwall backup so approval isn't single-threaded.
 
-## Critical constraints we must honor
+## Critical constraints
 
-1. **Own-domain payout (the trap) — UNCONFIRMED for GD:** CrazyGames/Poki rewarded SDKs only pay when the game is played *on their portal* — that's why our existing CrazyGames integration earns nothing on `lexiclash.live`. GameDistribution provides a self-host *mechanism* (zip an `index.html` with an iframe carrying `GD_SDK_REFERRER_URL`, or set the referrer in `GD_OPTIONS`), **but the public terms/tutorial do not state whether you earn on your-domain plays without catalog acceptance.** This must be confirmed with GD support before treating GD as a revenue path — the SDK *running* on our domain is not evidence it *pays* for our-domain plays. Ezoic, by contrast, unambiguously monetizes any site you add + verify via `ads.txt`.
-2. **Families / COPPA — unverified per-provider, but mitigated:** Per-provider COPPA support could not be confirmed from public docs (searches returned nothing specific). It is adequately mitigated regardless: we already ship age-gating + ad suppression for under-13 (`shouldSuppressAdsForTier`), so any new provider only ever serves to 13+ users where ads already show. Still set the child-directed/COPPA flag in each dashboard as defense-in-depth.
-3. **No publisher-account conflict:** AdSense + AdMob share `ca-pub-1896836706464880`. Ezoic and GameDistribution are independent third-party networks with no exclusivity clause against running AdMob on native — no conflict.
+1. **Families/COPPA — the decisive lever is a gate we already have.** The Android app is a **Capacitor WebView onto `www.lexiclash.live`**, so anything web-facing also renders inside the Families-program app. Offerwall *offers* (incentivized installs, surveys) are exactly the category Play Families + COPPA restrict. **Resolution:** our web ad paths are gated `!Capacitor.isNativePlatform() && !isOnCrazyGamesPlatform`. Inside the WebView `isNativePlatform()` is `true`, so a correctly-gated offerwall renders **only in real web browsers, never in the Families Android app** — which moots the Play concern entirely. The committed GD adapter already enforces this; the ayeT paths MUST inherit the same gate. (Defense-in-depth: dashboard offer-category exclusions for 13–17 web users not caught by our `<13` `shouldSuppressAdsForTier`; GDPR-K for EU minors.)
+2. **S2S postback is security-critical (and an upgrade).** Coins are minted by *ayeT's* server calling *ours* (`currency_amount`, `external_identifier`, `payout_usd`). Unsigned, anyone could forge the call and mint unlimited coins. The callback endpoint needs **HMAC/signature verification + idempotency on `external_identifier`** + reuse of the existing `/api/coins` daily cap. This is *more* secure than today's client-driven `awardWatchedAd` — frame it as a hardening upgrade, build it carefully.
+3. **No publisher-account conflict.** ayeT/Torox/Mediavine are independent of our AdSense/AdMob `ca-pub-1896836706464880` — no exclusivity clash with AdMob on native.
 
-## Recommendation
+## Recommendation (locked)
 
-1. **Primary — Ezoic Access Now (account-led, lowest risk):** Sign up, add `lexiclash.live`, integrate the Ezoic script + `ads.txt`. This is the de-risked AdSense replacement: it *will* approve us, has no traffic minimum, and covers display/interstitial **and** rewarded. Start here so monetization isn't blocked on GD's unknowns.
-2. **Upside — GameDistribution rewarded (code-ready, pending 2 confirmations):** The dark adapter is built and slotted into `useRewardedAd` behind `NEXT_PUBLIC_GD_ADS_ENABLED` + `NEXT_PUBLIC_GD_GAME_ID` (mirrors the dark H5 path). **Before flipping the env, confirm with GD support: (a) the game passes Activation, and (b) self-hosted own-domain plays pay out.** If both hold, GD becomes the best rewarded path for a game; if either fails, leave the flag off and lean on Ezoic's rewarded.
-3. **Alternative — GameMonetize:** Same game-ad category as GD; use only if GD's Activation or payout fails. Same review-gate class, so no approval advantage over GD.
+1. **Primary — ayeT-Studios:** self-serve signup → integrate (a) the HTML5 Rewarded Video SDK into the existing `useRewardedAd` web slot (mirror the committed GD adapter, gated `!isNative && !isCG`), and (b) the web offerwall as an "Earn coins" modal. Build the **secure S2S callback** (HMAC + idempotency) into the backend coin path. No traffic gate; pays own-domain.
+2. **Co-primary — Torox:** apply in parallel (non-exclusive) as the offerwall backup.
+3. **Display — Mediavine Journey:** apply (1k sessions, Grow plugin, 70% rev-share) for banner/display revenue — the realistic low-traffic Ezoic replacement.
+4. **Alternates / future:** GameDistribution + GameMonetize (dark adapter already committed) if we want game-portal demand; AdSense H5 (already coded) once the site re-approves post-recrawl (~4–6 weeks).
+5. **Not Ezoic / not AdSense (now):** both gate on the site (250k traffic / "low value content"). Revisit Ezoic only above 250k MAU.
 
-## Implementation scope (this PR)
+## What's already shipped (committed this session)
+A **dark GameDistribution rewarded adapter**, env-gated, TDD (16 tests, build/lint/tsc green): `lib/ads/gameDistributionAds.ts` + `hooks/useGameDistributionAds.ts` + a `shouldUseGd` branch in `useRewardedAd` above the dead H5 path, gated `NEXT_PUBLIC_GD_ADS_ENABLED` + `NEXT_PUBLIC_GD_GAME_ID` + `?gdads_test=1`. This is the **template** the ayeT rewarded-video path follows (same waterfall slot, same settle-once + `!isNative && !isCG` gating) — not wasted work.
 
-A **dark GameDistribution rewarded adapter**, env-gated, TDD, mirroring `lib/ads/h5GamesAds.ts` + `hooks/useH5GamesAds.ts`:
-- `lib/ads/gameDistributionAds.ts` — idempotent SDK loader (`GD_OPTIONS` + `main.min.js`) + `showRewardedGd()` promise wrapper. Reward iff `SDK_REWARDED_WATCH_COMPLETE` fired before `gdsdk.showAd('rewarded')` resolves.
-- `hooks/useGameDistributionAds.ts` — `{ initialize, showRewarded(onReward, onError, opts), isAvailable }`, same shape as `useH5GamesAds`.
-- Wire one `else if (shouldUseGd)` branch into `useRewardedAd`, gated `!CG && !native && NEXT_PUBLIC_GD_ADS_ENABLED && getGdGameId() && (isProd || ?gdads_test=1)`. Sits **above** the dead H5 path in priority. Mutes Howler around the video (GD forbids audible background during ads).
-- No multi-provider mediation layer — the traffic doesn't justify it. One adapter, one env flag, off by default.
-
-**Known limitation to fix at activation (not now):** the hook **lazy-inits the GD script on first click**, mirroring H5. GD's docs are explicit that the SDK must be loaded *before* gameplay, "especially not by clicking a button," or the first ad no-fills (too slow to load). When flipping the flag, add a `gdAds.initialize()` effect on a game surface so the first watch preloads — otherwise first-fill testing will misread as "GD is broken." Deferred because there's no account/game-id yet.
-
-## Open items
-**Blocking the GD revenue claim (must verify before flipping the env):**
-- ❗ Confirm with GameDistribution support: do **self-hosted own-domain plays on `lexiclash.live` pay out without catalog acceptance**? Public terms/tutorial don't say. If no → GD is not a viable own-domain path; use Ezoic rewarded instead.
-- ❗ Confirm the game passes GD's per-game **"Request Activation"** review (a content/integration gate, same class as the one that demotes GameMonetize).
+## Next steps
+**Code (next PR):**
+- ayeT HTML5 Rewarded Video adapter (mirror `useGameDistributionAds`), wired into `useRewardedAd` behind `NEXT_PUBLIC_AYET_ADS_ENABLED` + app key, gated `!isNative && !isCG`.
+- `EarnCoinsOfferwall` modal (iframe to the ayeT/Torox offerwall link with our user id as `external_identifier`).
+- **Secure backend callback** `/api/offerwall/ayet` — verify signature/HMAC, idempotent on `external_identifier`, credit via existing coin path + daily cap.
 
 **Account/ops:**
-- Ezoic Access Now signup + `ads.txt` + `lexiclash.live` verification (primary path — start here).
-- If GD confirms: provision publisher account → game ID, enable "Rewarded Ads" flag, set COPPA/child-directed; then add the preload `initialize()` effect above and flip `NEXT_PUBLIC_GD_ADS_ENABLED`.
-- COPPA per-provider support is unverified from public docs but mitigated by `shouldSuppressAdsForTier` (ads reach 13+ only); set each dashboard's child-directed flag as defense-in-depth.
-- After any env flip: watch `growth:rewarded_ad_*` PostHog events for first real web fill (today: 0).
+- Sign up ayeT-Studios + Torox (offerwall), configure currency + S2S callback URL + offer-category exclusions. Apply to Mediavine Journey (install Grow plugin).
+- COPPA mitigated by `shouldSuppressAdsForTier` (`<13` no ads); set dashboard child-directed/category flags as defense-in-depth.
+- After integration: watch `growth:rewarded_ad_*` + new offerwall-conversion events for first real web revenue (today: 0).
+
+---
+*Research log (honest trail): initial draft named Ezoic "safe primary" on a no-minimum tier — that was **stale 2025 info**; Ezoic's own KB + 2026-02-19 press release now require 250k MAU. GameDistribution was briefly called "confirmed own-domain payout" — corrected to unverified (Activation review + catalog-acceptance question). The offerwall direction (ayeT/Torox) emerged last and is the best fit because it matches the coin economy and dodges every approval gate; "no minimum" was verified from ayeT's publisher T&C (primary source), not a blog.*
