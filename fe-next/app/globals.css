@@ -4070,6 +4070,22 @@ html[data-cosy='true'] .dark\:text-slate-400 {
   color: var(--muted-foreground) !important;
 }
 
+/* (C2) PLAIN (non-dark:) light-gray muted text — `text-slate-{200,300}` /
+   `text-gray-{300,400,500}` used as secondary text on dark-default panels that
+   cosy flips to cream (results cards: ResultsInfoCards, ConsolidatedPlayerCard,
+   SharePanel). Without a dark: prefix the existing (C) rule misses them, so the
+   light gray (slate-300 ≈ L0.87) stays unreadable on cream. Flip to warm muted
+   ink. Audited safe: no kept-dark surface (bg-[#hex] game scenes, scrims) pairs
+   these with a literal light-gray, so darkening them can't hide text. */
+html[data-cosy='true'] .text-slate-200,
+html[data-cosy='true'] .text-slate-300,
+html[data-cosy='true'] .text-slate-400,
+html[data-cosy='true'] .text-gray-300,
+html[data-cosy='true'] .text-gray-400,
+html[data-cosy='true'] .text-gray-500 {
+  color: var(--muted-foreground) !important;
+}
+
 /* (D) Dark PANEL surfaces — `bg-slate-{600..900}` / `bg-gray-{700..900}` are
    literal Tailwind palette colors (no --neo var), so cosy never reaches them
    and they stay dark on the cream page; combined with the text-white→charcoal

@@ -246,4 +246,18 @@ describe('cosy contrast circuit-breakers — accent text, ink, dark:, panels (au
     expect(rule, 'cosy must override .season-twist-label inline accent colour').toBeTruthy();
     expect(rule!).toMatch(/neo-black/);
   });
+
+  it('flips PLAIN (non-dark:) light-gray muted text to readable muted ink', () => {
+    // text-slate-300 / text-gray-400 (no dark: prefix) are secondary text on
+    // bg-neo-navy result panels (ResultsInfoCards, ConsolidatedPlayerCard); the
+    // panel flips to cream but the light gray stays unreadable without this.
+    const rule = cosyRules(css).find(
+      (r) => /\.text-slate-300/.test(r) && !/dark\\?:/.test(r) && /color\s*:/.test(r),
+    );
+    expect(rule, 'cosy must override plain .text-slate-300 (not just dark:variant)').toBeTruthy();
+    expect(rule!).toMatch(/muted-foreground/);
+    // and the muted ink it points at must itself clear AA on the cream backdrop
+    const muted = tokenValue(block, '--muted-foreground')!;
+    expect(contrastRatio(muted, sand), 'muted ink on cream').toBeGreaterThanOrEqual(AA);
+  });
 });
