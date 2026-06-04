@@ -46,12 +46,12 @@ vi.mock('@/hooks/useWordOfTheDay', () => ({
   useWordOfTheDay: (...args: unknown[]) => mockUseWordOfTheDay(...args),
 }));
 
-// Mock coinManager
-const { mockAddCoins } = vi.hoisted(() => ({ mockAddCoins: vi.fn() }));
-vi.mock('@/utils/coinManager', async () => {
-  const actual = await vi.importActual<typeof import('@/utils/coinManager')>('@/utils/coinManager');
-  return { ...actual, addCoins: mockAddCoins };
-});
+// Mock CoinContext — WotD now awards through it so authenticated users get a
+// real DB credit (coinManager.addCoins was localStorage-only = phantom for authed).
+const { mockAddCoins } = vi.hoisted(() => ({ mockAddCoins: vi.fn(() => Promise.resolve(0)) }));
+vi.mock('@/contexts/CoinContext', () => ({
+  useCoinContext: () => ({ addCoins: mockAddCoins }),
+}));
 
 // Real-ish localStorage for idempotency keys
 const localStore: Record<string, string> = {};
