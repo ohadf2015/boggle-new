@@ -177,6 +177,10 @@ vi.mock('@/hooks/useSeasonBadges', () => ({
   })
 }));
 
+vi.mock('@/components/seasons/SeasonRankCard', () => ({
+  SeasonRankCard: () => null,
+  default: () => null
+}));
 vi.mock('@/components/seasons/SeasonTrophyCase', () => ({
   SeasonTrophyCase: () => null,
   default: () => null

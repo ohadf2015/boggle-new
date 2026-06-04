@@ -1,5 +1,19 @@
 // EN translations
 const en = {
+  "rank": {
+    "seasonTitle": "Season Rank",
+    "ofPlayers": "of {count} players",
+    "unranked": "Play a game to join this season's leaderboard",
+    "tier": {
+      "stone": "Stone",
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond",
+      "grandmaster": "Grandmaster"
+    }
+  },
   "cosy": {
     "wellDone": "Well done",
     "affirmLovely": "Lovely",
@@ -4475,6 +4489,11 @@ const en = {
     "purchase": "Buy ({{cost}} gold)",
     "close": "Close",
     "unlockedToast": "✨ New cosmetic unlocked: {{name}}",
+    "equipCta": "Tap to equip it",
+    "progress": {
+      "streak": "{{current}}/{{target}} day streak",
+      "rank": "{{current}} → {{tier}}"
+    },
     "rarity": {
       "common": "Common",
       "rare": "Rare",

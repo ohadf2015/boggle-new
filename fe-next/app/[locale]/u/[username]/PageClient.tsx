@@ -8,6 +8,8 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { SeasonTrophyCase } from '@/components/seasons/SeasonTrophyCase';
+import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
+import { ProfileAchievementsPublic } from '@/components/profile/ProfileAchievementsPublic';
 import { trpc } from '@/lib/trpc';
 import { cn } from '@/lib/utils';
 
@@ -89,6 +91,9 @@ export default function PublicProfilePageClient({ username }: { username: string
           </div>
         </m.div>
 
+        {/* Current-season standing */}
+        <SeasonRankCard playerId={profile.id} />
+
         {/* Season trophies — the marquee feature */}
         <SeasonTrophyCase
           badges={badges}
@@ -96,6 +101,9 @@ export default function PublicProfilePageClient({ username }: { username: string
           delay={0.1}
           emptyVariant="full"
         />
+
+        {/* Earned achievement badges */}
+        <ProfileAchievementsPublic counts={profile.achievementCounts} />
       </div>
     </div>
   );

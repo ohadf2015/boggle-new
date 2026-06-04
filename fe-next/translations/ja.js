@@ -1,5 +1,19 @@
 // Ja translations
 const ja = {
+  "rank": {
+    "seasonTitle": "シーズン順位",
+    "ofPlayers": "{count}人中",
+    "unranked": "プレイしてシーズンランキングに参加しよう",
+    "tier": {
+      "stone": "ストーン",
+      "bronze": "ブロンズ",
+      "silver": "シルバー",
+      "gold": "ゴールド",
+      "platinum": "プラチナ",
+      "diamond": "ダイヤモンド",
+      "grandmaster": "グランドマスター"
+    }
+  },
   "cosy": {
     "wellDone": "おみごと",
     "affirmLovely": "いいね",
@@ -4047,6 +4061,11 @@ const ja = {
     "purchase": "購入（{{cost}}ゴールド）",
     "close": "閉じる",
     "unlockedToast": "✨ 新しいコスメティック解放: {{name}}",
+    "equipCta": "タップして装備",
+    "progress": {
+      "streak": "{{current}}/{{target}}日連続",
+      "rank": "{{current}} → {{tier}}"
+    },
     "rarity": {
       "common": "コモン",
       "rare": "レア",

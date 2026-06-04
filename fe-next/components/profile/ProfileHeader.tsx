@@ -17,6 +17,8 @@ import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LevelBadge from '@/components/LevelBadge';
+import { RankTierChip } from '@/components/seasons/RankTierChip';
+import { scoreTier } from '@/lib/seasons/scoreTier';
 import { getLevelFromXp } from '@/components/XpProgressBar';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
@@ -124,11 +126,16 @@ export function ProfileHeader({
         compact ? 'p-4' : 'p-6'
       )}
     >
-      {/* Level badge — top-right */}
+      {/* Level badge + season tier — top-right */}
       {!compact && (
-        <div className="absolute top-4 inset-e-4 bg-neo-cyan/10 rounded-xl px-3 py-1.5">
-          <span className="text-xl font-black text-neo-cyan leading-none">{level}</span>
-          <span className="block text-[9px] font-bold uppercase tracking-wider text-gray-400">{t('xp.level')}</span>
+        <div className="absolute top-4 inset-e-4 flex flex-col items-end gap-1.5">
+          <div className="bg-neo-cyan/10 rounded-xl px-3 py-1.5 text-center">
+            <span className="text-xl font-black text-neo-cyan leading-none">{level}</span>
+            <span className="block text-[9px] font-bold uppercase tracking-wider text-gray-400">{t('xp.level')}</span>
+          </div>
+          {scoreTier(profile?.total_score) !== 'stone' && (
+            <RankTierChip tier={scoreTier(profile?.total_score)} size="xs" />
+          )}
         </div>
       )}
 

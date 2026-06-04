@@ -279,6 +279,36 @@ export const leaderboardRouter = router({
 
       return result;
     }),
+
+  getCurrentSeasonRank: loggedProcedure
+    .input(z.object({ playerId: z.string().uuid() }))
+    .query(async ({ input }) => {
+      if (!isSupabaseConfigured()) {
+        throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'Leaderboard service not available' });
+      }
+      const supabase = getSupabase();
+      if (!supabase) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+      }
+      const { data, error } = await supabase
+        .rpc('get_user_current_season_rank', { p_player_id: input.playerId });
+      if (error) {
+        logger.warn('TRPC', 'getCurrentSeasonRank RPC error', { error: error.message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `RPC error: ${error.message}` });
+      }
+      const row = data?.[0];
+      if (!row) return { data: null };
+      return {
+        data: {
+          rankPosition: row.rank_position as number,
+          totalScore: row.total_score as number,
+          gamesPlayed: row.games_played as number,
+          seasonId: row.season_id as number,
+          totalPlayers: row.total_players as number,
+          tierId: row.tier_id as string,
+        },
+      };
+    }),
 });
 
 /** Legacy fallback for rank calculation when RPC is not available */

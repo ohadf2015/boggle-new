@@ -1,5 +1,19 @@
 // Sv translations
 const sv = {
+  "rank": {
+    "seasonTitle": "Säsongsrank",
+    "ofPlayers": "av {count} spelare",
+    "unranked": "Spela en match för att gå med i säsongens topplista",
+    "tier": {
+      "stone": "Sten",
+      "bronze": "Brons",
+      "silver": "Silver",
+      "gold": "Guld",
+      "platinum": "Platina",
+      "diamond": "Diamant",
+      "grandmaster": "Stormästare"
+    }
+  },
   "connections": {
     "title": "Ordkedja",
     "subtitle": "Hitta ordet som kopplar ihop båda!",
@@ -4141,6 +4155,11 @@ const sv = {
     "purchase": "Köp ({{cost}} guld)",
     "close": "Stäng",
     "unlockedToast": "✨ Ny kosmetik upplåst: {{name}}",
+    "equipCta": "Tryck för att utrusta",
+    "progress": {
+      "streak": "{{current}}/{{target}} dagar i rad",
+      "rank": "{{current}} → {{tier}}"
+    },
     "rarity": {
       "common": "Vanlig",
       "rare": "Sällsynt",

@@ -1,5 +1,19 @@
 // Es translations
 const es = {
+  "rank": {
+    "seasonTitle": "Rango de temporada",
+    "ofPlayers": "de {count} jugadores",
+    "unranked": "Juega una partida para entrar en la clasificación de la temporada",
+    "tier": {
+      "stone": "Piedra",
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino",
+      "diamond": "Diamante",
+      "grandmaster": "Gran maestro"
+    }
+  },
   "cosy": {
     "wellDone": "Bien hecho",
     "affirmLovely": "Qué bien",
@@ -4088,6 +4102,11 @@ const es = {
     "purchase": "Comprar ({{cost}} oro)",
     "close": "Cerrar",
     "unlockedToast": "✨ Nuevo cosmético desbloqueado: {{name}}",
+    "equipCta": "Toca para equiparlo",
+    "progress": {
+      "streak": "Racha de {{current}}/{{target}} días",
+      "rank": "{{current}} → {{tier}}"
+    },
     "rarity": {
       "common": "Común",
       "rare": "Raro",

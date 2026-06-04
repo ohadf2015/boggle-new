@@ -14,6 +14,7 @@ import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
+import { navTierForPath, tierDotClass } from '@/lib/seasons/scoreTier';
 import { useSafeArea } from '../hooks/useSafeArea';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyMissions } from '../hooks/useDailyMissions';
@@ -169,7 +170,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const safeArea = useSafeArea();
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const { missions } = useDailyMissions();
     const { pendingRequests, pendingChallenges, friends } = useFriends();
@@ -230,6 +231,12 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const dynamicSpec = useMemo<DynamicSpec | null>(
         () => resolveDynamic(cleanPath),
         [cleanPath]
+    );
+
+    // Season tier dot on the profile/account (dynamic) tab — null off-route or for newcomers.
+    const navTier = useMemo(
+        () => navTierForPath(cleanPath, profile?.total_score),
+        [cleanPath, profile?.total_score],
     );
 
     const activeTab = useMemo((): TabId | null => {
@@ -457,6 +464,18 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                                     >
                                         {socialBadgeCount > 9 ? '9+' : socialBadgeCount}
                                     </span>
+                                )}
+
+                                {/* Season tier dot — profile/account tab */}
+                                {tab.id === 'dynamic' && navTier && (
+                                    <span
+                                        className={cn(
+                                            'absolute -top-1 -inset-e-1.5 w-2.5 h-2.5 rounded-full border-2 border-neo-navy',
+                                            tierDotClass(navTier),
+                                        )}
+                                        aria-label={t(`rank.tier.${navTier}`)}
+                                        data-testid="profile-tier-dot"
+                                    />
                                 )}
                             </m.div>
 

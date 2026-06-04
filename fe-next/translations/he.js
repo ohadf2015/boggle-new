@@ -1,5 +1,19 @@
 // HE translations
 const he = {
+  "rank": {
+    "seasonTitle": "דירוג העונה",
+    "ofPlayers": "מתוך {count} שחקנים",
+    "unranked": "שחקו משחק כדי להצטרף לטבלת העונה",
+    "tier": {
+      "stone": "אבן",
+      "bronze": "ארד",
+      "silver": "כסף",
+      "gold": "זהב",
+      "platinum": "פלטינה",
+      "diamond": "יהלום",
+      "grandmaster": "רב-אמן"
+    }
+  },
   "cosy": {
     "wellDone": "כל הכבוד",
     "affirmLovely": "יפה מאוד",
@@ -4520,6 +4534,11 @@ const he = {
     "purchase": "קנה ({{cost}} זהב)",
     "close": "סגור",
     "unlockedToast": "✨ קוסמטיקה חדשה נפתחה: {{name}}",
+    "equipCta": "הקישו כדי לצייד",
+    "progress": {
+      "streak": "{{current}}/{{target}} ימי רצף",
+      "rank": "כעת {{current}} · יעד {{tier}}"
+    },
     "rarity": {
       "common": "נפוץ",
       "rare": "נדיר",
