@@ -66,7 +66,23 @@ export function getDrillTheme(id: DrillType): DrillTheme {
   return DRILL_THEMES[id] ?? FALLBACK_THEME;
 }
 
-/** Convenience: Tailwind class helpers derived from an accent token. */
-export const accentText = (t: DrillTheme): string => `text-${t.accent}`;
-export const accentBg = (t: DrillTheme): string => `bg-${t.accent}`;
-export const accentBorder = (t: DrillTheme): string => `border-${t.accent}`;
+/**
+ * Full literal Tailwind classes per accent.
+ *
+ * CRITICAL: Tailwind only generates classes it sees as complete literal
+ * strings at build time. Interpolated `bg-${accent}` is NOT seen and may not
+ * be emitted — so every themed surface MUST consume these static strings,
+ * never build class names by interpolation.
+ */
+export const ACCENT_CLASSES: Record<DrillAccent, { text: string; bg: string; border: string }> = {
+  'neo-lime': { text: 'text-neo-lime', bg: 'bg-neo-lime', border: 'border-neo-lime' },
+  'neo-purple': { text: 'text-neo-purple', bg: 'bg-neo-purple', border: 'border-neo-purple' },
+  'neo-orange': { text: 'text-neo-orange', bg: 'bg-neo-orange', border: 'border-neo-orange' },
+  'neo-cyan': { text: 'text-neo-cyan', bg: 'bg-neo-cyan', border: 'border-neo-cyan' },
+  'neo-pink': { text: 'text-neo-pink', bg: 'bg-neo-pink', border: 'border-neo-pink' },
+};
+
+/** Convenience: static Tailwind class helpers for an accent token. */
+export const accentText = (t: DrillTheme): string => ACCENT_CLASSES[t.accent].text;
+export const accentBg = (t: DrillTheme): string => ACCENT_CLASSES[t.accent].bg;
+export const accentBorder = (t: DrillTheme): string => ACCENT_CLASSES[t.accent].border;

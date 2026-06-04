@@ -15,7 +15,7 @@
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { getDrillTheme } from '@/lib/drills/drillThemes';
+import { getDrillTheme, ACCENT_CLASSES } from '@/lib/drills/drillThemes';
 import type { DrillType } from '@/shared/types/cognitive';
 import type { DrillBadge } from '@/shared/utils/drillScoring';
 
@@ -50,6 +50,7 @@ export default function DrillEarningsBreakdown({
 }: DrillEarningsBreakdownProps) {
   const { t } = useLanguage();
   const theme = getDrillTheme(drillId);
+  const accentCls = ACCENT_CLASSES[theme.accent];
   const style = BADGE_STYLE[badge];
 
   return (
@@ -87,7 +88,7 @@ export default function DrillEarningsBreakdown({
       <span
         className={cn(
           'inline-block px-3 py-1 rounded-neo border-neo border-neo-black text-xs font-black uppercase tracking-wide text-neo-black',
-          `bg-${theme.accent}`
+          accentCls.bg
         )}
       >
         {t(`brain.drills.badge.${badge}.name`)}
@@ -106,19 +107,19 @@ export default function DrillEarningsBreakdown({
 
       {/* Transparent breakdown */}
       <div className="p-3 rounded-neo border-neo border-neo-black bg-neo-navy-light text-left space-y-1.5 max-w-xs mx-auto">
-        <Row label={t('brain.briefing.participationLabel')} value={participation} accent={theme.accent} />
-        <Row label={t('brain.briefing.performanceLabel')} value={performance} accent={theme.accent} />
-        {bonus > 0 && <Row label={t('brain.briefing.bonusLabel')} value={bonus} accent={theme.accent} />}
+        <Row label={t('brain.briefing.participationLabel')} value={participation} textClass={accentCls.text} />
+        <Row label={t('brain.briefing.performanceLabel')} value={performance} textClass={accentCls.text} />
+        {bonus > 0 && <Row label={t('brain.briefing.bonusLabel')} value={bonus} textClass={accentCls.text} />}
       </div>
     </AdaptiveMotion.div>
   );
 }
 
-function Row({ label, value, accent }: { label: string; value: number; accent: string }) {
+function Row({ label, value, textClass }: { label: string; value: number; textClass: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <span className="text-xs text-neo-white/80">{label}</span>
-      <span className={cn('text-sm font-black', `text-${accent}`)}>+{value}</span>
+      <span className={cn('text-sm font-black', textClass)}>+{value}</span>
     </div>
   );
 }

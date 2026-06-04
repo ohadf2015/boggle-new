@@ -18,7 +18,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Mascot } from '@/components/ui/Mascot';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { getDrillTheme } from '@/lib/drills/drillThemes';
+import { getDrillTheme, ACCENT_CLASSES } from '@/lib/drills/drillThemes';
 import type { DrillType } from '@/shared/types/cognitive';
 
 interface DrillBriefingProps {
@@ -34,7 +34,7 @@ interface DrillBriefingProps {
 export default function DrillBriefing({ drillId, level, goalText, onStart }: DrillBriefingProps) {
   const { t } = useLanguage();
   const theme = getDrillTheme(drillId);
-  const accent = theme.accent;
+  const accentCls = ACCENT_CLASSES[theme.accent];
 
   const steps = [
     t(`brain.drills.${drillId}.step1`),
@@ -58,7 +58,7 @@ export default function DrillBriefing({ drillId, level, goalText, onStart }: Dri
         >
           <Mascot variant={theme.mascot} size="lg" animated />
         </AdaptiveMotion.div>
-        <p className={cn('text-xs font-black uppercase tracking-wide', `text-${accent}`)}>
+        <p className={cn('text-xs font-black uppercase tracking-wide', accentCls.text)}>
           {t(theme.personaKey)}
         </p>
         <h2 className="text-2xl font-black text-neo-white font-neo-display">
@@ -67,7 +67,7 @@ export default function DrillBriefing({ drillId, level, goalText, onStart }: Dri
       </div>
 
       {/* Mission banner — the single most important "what do I do" line */}
-      <div className={cn('p-3 rounded-neo border-neo-thick border-neo-black', `bg-${accent}`)}>
+      <div className={cn('p-3 rounded-neo border-neo-thick border-neo-black', accentCls.bg)}>
         <p className="text-[10px] font-black uppercase tracking-wide text-neo-black/70">
           {t('brain.briefing.missionLabel')}
         </p>
@@ -107,7 +107,7 @@ export default function DrillBriefing({ drillId, level, goalText, onStart }: Dri
               <span
                 className={cn(
                   'flex-shrink-0 w-6 h-6 rounded-neo border-neo border-neo-black grid place-items-center text-xs font-black text-neo-black',
-                  `bg-${accent}`
+                  accentCls.bg
                 )}
               >
                 {i + 1}
@@ -135,7 +135,7 @@ export default function DrillBriefing({ drillId, level, goalText, onStart }: Dri
           'w-full px-8 py-3.5 rounded-neo border-neo-thick border-neo-black shadow-hard-lg',
           'font-black text-lg uppercase text-neo-black',
           'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-0',
-          `bg-${accent}`
+          accentCls.bg
         )}
       >
         {t('brain.briefing.letsTrain')}

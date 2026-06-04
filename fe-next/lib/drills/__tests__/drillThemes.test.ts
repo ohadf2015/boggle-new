@@ -9,7 +9,7 @@
  * @module lib/drills/__tests__/drillThemes.test
  */
 
-import { DRILL_THEMES, getDrillTheme } from '../drillThemes';
+import { DRILL_THEMES, getDrillTheme, ACCENT_CLASSES } from '../drillThemes';
 import { MASCOT_IMAGES } from '@/components/ui/Mascot';
 import type { DrillType } from '@/shared/types/cognitive';
 
@@ -54,6 +54,21 @@ describe('DRILL_THEMES', () => {
   it('gives each drill a distinct mascot so personas feel different', () => {
     const mascots = ALL_DRILLS.map((id) => DRILL_THEMES[id].mascot);
     expect(new Set(mascots).size).toBe(mascots.length);
+  });
+});
+
+describe('ACCENT_CLASSES (Tailwind-JIT safety)', () => {
+  // Tailwind only emits classes it sees as COMPLETE LITERAL strings. These must
+  // be full literals (never `bg-${accent}`), or themed surfaces render colorless.
+  it('maps every accent to full literal text/bg/border classes', () => {
+    for (const theme of Object.values(DRILL_THEMES)) {
+      const cls = ACCENT_CLASSES[theme.accent];
+      expect(cls.text).toBe(`text-${theme.accent}`);
+      expect(cls.bg).toBe(`bg-${theme.accent}`);
+      expect(cls.border).toBe(`border-${theme.accent}`);
+      // Literal, not a fragment to be interpolated later.
+      expect(cls.bg.startsWith('bg-neo-')).toBe(true);
+    }
   });
 });
 
