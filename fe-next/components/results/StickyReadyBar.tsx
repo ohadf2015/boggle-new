@@ -40,7 +40,7 @@ interface StickyReadyBarProps {
   isClassroom?: boolean;
 }
 
-const ALL_MODES: GameModeOption[] = ['word-hunt', 'classic', 'wheel-rush', 'random'];
+const ALL_MODES: GameModeOption[] = ['word-hunt', 'classic', 'wheel-rush', 'blast', 'random'];
 const AUTO_SECONDS_DEFAULT = 35;
 // CG sessions are short and impulsive — trim result pause so more matches
 // fit per session, lifting CG's average-playtime metric. 20s leaves room

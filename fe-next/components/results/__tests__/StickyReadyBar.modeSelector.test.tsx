@@ -93,9 +93,9 @@ describe('StickyReadyBar mode selector', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders buttons for all four selectable modes (classic, word-hunt, wheel-rush, random)', () => {
+  it('renders buttons for all selectable modes (classic, word-hunt, wheel-rush, blast, random)', () => {
     render(<StickyReadyBar {...hostWithModeSelectorProps} />);
-    for (const mode of ['classic', 'word-hunt', 'wheel-rush', 'random']) {
+    for (const mode of ['classic', 'word-hunt', 'wheel-rush', 'blast', 'random']) {
       expect(
         screen.getByRole('button', { name: new RegExp(`label-${mode}`, 'i') })
       ).toBeInTheDocument();

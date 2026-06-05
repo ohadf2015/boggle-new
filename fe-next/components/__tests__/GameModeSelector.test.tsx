@@ -14,7 +14,7 @@ const mockT = (key: string) => {
 };
 
 describe('GameModeSelector', () => {
-  it('should render random + classic + word-hunt when showRandom is true', () => {
+  it('should render random + classic + word-hunt + wheel-rush + blast when showRandom is true', () => {
     render(
       <GameModeSelector
         selectedMode="random"
@@ -27,7 +27,9 @@ describe('GameModeSelector', () => {
     expect(screen.getByTestId('game-mode-random')).toBeInTheDocument();
     expect(screen.getByTestId('game-mode-classic')).toBeInTheDocument();
     expect(screen.getByTestId('game-mode-word-hunt')).toBeInTheDocument();
-    expect(screen.queryByTestId('game-mode-blast')).not.toBeInTheDocument();
+    expect(screen.getByTestId('game-mode-wheel-rush')).toBeInTheDocument();
+    // Blast is a first-class rematch option on the results selector (was missing).
+    expect(screen.getByTestId('game-mode-blast')).toBeInTheDocument();
   });
 
   it('should render classic + word-hunt when showRandom is false', () => {
@@ -90,9 +92,10 @@ describe('GameModeSelector', () => {
       />
     );
 
-    // Lucide icons render as SVG elements (one per visible mode)
+    // Lucide icons render as SVG elements (one per visible mode):
+    // random + classic + word-hunt + wheel-rush + blast = 5
     const svgs = container.querySelectorAll('svg');
-    expect(svgs.length).toBe(4);
+    expect(svgs.length).toBe(5);
 
     const buttons = screen.getAllByRole('button');
     buttons.forEach((button) => {

@@ -92,14 +92,14 @@ export function GameModeSelector({
   showRandom = true,
   compact = false,
 }: GameModeSelectorProps) {
-  const baseModes: GameModeOption[] = ['classic', 'word-hunt', 'wheel-rush'];
+  const baseModes: GameModeOption[] = ['classic', 'word-hunt', 'wheel-rush', 'blast'];
   const modes: GameModeOption[] = showRandom ? ['random', ...baseModes] : baseModes;
   const [tooltipMode, setTooltipMode] = React.useState<GameModeOption | null>(null);
   const activeTooltip = tooltipMode ?? selectedMode;
 
   return (
     <div className="flex flex-col gap-1">
-    <div className={cn('grid gap-1.5', modes.length === 4 ? 'grid-cols-4' : modes.length === 3 ? 'grid-cols-3' : 'grid-cols-2')}>
+    <div className={cn('grid gap-1.5', modes.length >= 5 ? 'grid-cols-5' : modes.length === 4 ? 'grid-cols-4' : modes.length === 3 ? 'grid-cols-3' : 'grid-cols-2')}>
       {modes.map((mode) => {
         const isActive = selectedMode === mode;
         return (
