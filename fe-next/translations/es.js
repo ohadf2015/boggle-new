@@ -13091,6 +13091,40 @@ const es = {
     "toast": {
       "proposeSuccess": "Enviado para revisión — ¡gracias!",
       "proposeError": "No se pudo enviar. Inténtalo de nuevo."
+    },
+    "admin": {
+      "title": "Gestión de curadores",
+      "assign": {
+        "title": "Asignar un curador",
+        "userIdLabel": "ID de usuario",
+        "languageLabel": "Idioma",
+        "tierLabel": "Nivel de confianza",
+        "submit": "Asignar",
+        "success": "Curador asignado",
+        "error": "No se pudo asignar — comprueba el ID de usuario"
+      },
+      "list": {
+        "title": "Curadores activos",
+        "empty": "Sin curadores aún",
+        "points": "{count} pts",
+        "tier": "Nivel {count}",
+        "revoke": "Revocar",
+        "revoked": "Curador revocado"
+      },
+      "inbox": {
+        "title": "Propuestas pendientes",
+        "empty": "Sin propuestas esperando 🎉",
+        "ratify": "Aprobar",
+        "reject": "Rechazar",
+        "ratified": "Aprobado — recompensa otorgada",
+        "rejected": "Propuesta rechazada",
+        "kind": {
+          "word_approve": "Añadir palabra",
+          "word_reject": "Rechazar palabra",
+          "word_flag_invalid": "Marcar como inválido",
+          "puzzle_verdict": "Veredicto del puzle"
+        }
+      }
     }
   },
   "offerwall": { "cta": { "label": "Gana monedas gratis", "aria": "Gana monedas gratis completando ofertas" }, "modal": { "title": "Monedas gratis", "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.", "close": "Cerrar" } },

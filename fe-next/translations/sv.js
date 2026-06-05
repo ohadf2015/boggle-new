@@ -13003,6 +13003,40 @@ const sv = {
     "toast": {
       "proposeSuccess": "Skickat för granskning — tack!",
       "proposeError": "Det gick inte att skicka. Försök igen."
+    },
+    "admin": {
+      "title": "Kuratorhantering",
+      "assign": {
+        "title": "Tilldela en kurator",
+        "userIdLabel": "Användar-ID",
+        "languageLabel": "Språk",
+        "tierLabel": "Förtroendenivå",
+        "submit": "Tilldela",
+        "success": "Kurator tilldelad",
+        "error": "Kunde inte tilldela — kontrollera användar-ID"
+      },
+      "list": {
+        "title": "Aktiva kuratorer",
+        "empty": "Inga kuratorer än",
+        "points": "{count} poäng",
+        "tier": "Nivå {count}",
+        "revoke": "Återkalla",
+        "revoked": "Kurator återkallad"
+      },
+      "inbox": {
+        "title": "Väntande förslag",
+        "empty": "Inga förslag väntar 🎉",
+        "ratify": "Godkänn",
+        "reject": "Avvisa",
+        "ratified": "Godkänd — belöning beviljade",
+        "rejected": "Förslag avvisad",
+        "kind": {
+          "word_approve": "Lägg till ord",
+          "word_reject": "Avvisa ord",
+          "word_flag_invalid": "Flagga som ogiltigt",
+          "puzzle_verdict": "Puzzle-dom"
+        }
+      }
     }
   },
   "offerwall": { "cta": { "label": "Tjäna gratis mynt", "aria": "Tjäna gratis mynt genom att slutföra erbjudanden" }, "modal": { "title": "Gratis mynt", "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.", "close": "Stäng" } },

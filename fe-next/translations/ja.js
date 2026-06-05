@@ -12998,6 +12998,40 @@ const ja = {
     "toast": {
       "proposeSuccess": "レビュー用に送信されました — ありがとうございます！",
       "proposeError": "送信できませんでした。もう一度お試しください。"
+    },
+    "admin": {
+      "title": "キュレーター管理",
+      "assign": {
+        "title": "キュレーターを割り当てる",
+        "userIdLabel": "ユーザーID",
+        "languageLabel": "言語",
+        "tierLabel": "信頼レベル",
+        "submit": "割り当てる",
+        "success": "キュレーターが割り当てられました",
+        "error": "割り当てられませんでした — ユーザーIDを確認してください"
+      },
+      "list": {
+        "title": "アクティブなキュレーター",
+        "empty": "まだキュレーターがいません",
+        "points": "{count}ポイント",
+        "tier": "レベル{count}",
+        "revoke": "取り消し",
+        "revoked": "キュレーターの権限が取り消されました"
+      },
+      "inbox": {
+        "title": "保留中の提案",
+        "empty": "待機中の提案はありません 🎉",
+        "ratify": "承認",
+        "reject": "却下",
+        "ratified": "承認されました — 報酬が付与されました",
+        "rejected": "提案は却下されました",
+        "kind": {
+          "word_approve": "単語を追加",
+          "word_reject": "単語を却下",
+          "word_flag_invalid": "無効としてフラグ",
+          "puzzle_verdict": "パズルの判定"
+        }
+      }
     }
   },
   "offerwall": { "cta": { "label": "無料コインを獲得", "aria": "オファーを完了して無料コインを獲得" }, "modal": { "title": "無料コイン", "subtitle": "オファーを完了すると、コインが自動で追加されます。", "close": "閉じる" } },

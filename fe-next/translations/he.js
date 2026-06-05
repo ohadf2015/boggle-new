@@ -13417,6 +13417,40 @@ const he = {
     "toast": {
       "proposeSuccess": "נשלח לבדיקה — תודה!",
       "proposeError": "לא הצלחנו לשלוח. נסו שוב."
+    },
+    "admin": {
+      "title": "ניהול עורכים",
+      "assign": {
+        "title": "הקצה עורך",
+        "userIdLabel": "מזהה משתמש",
+        "languageLabel": "שפה",
+        "tierLabel": "רמת אמון",
+        "submit": "הקצה",
+        "success": "עורך הוקצה בהצלחה",
+        "error": "לא הצלחנו להקצות — בדוק את מזהה המשתמש"
+      },
+      "list": {
+        "title": "עורכים פעילים",
+        "empty": "אין עדיין עורכים",
+        "points": "{count} נקודות",
+        "tier": "רמה {count}",
+        "revoke": "שלול",
+        "revoked": "הרשאת העורך בוטלה"
+      },
+      "inbox": {
+        "title": "הצעות בהמתנה",
+        "empty": "אין הצעות בהמתנה 🎉",
+        "ratify": "אשר",
+        "reject": "דחה",
+        "ratified": "אושר — פרס הוענק",
+        "rejected": "ההצעה נדחתה",
+        "kind": {
+          "word_approve": "הוסף מילה",
+          "word_reject": "דחה מילה",
+          "word_flag_invalid": "סמן כלא תקין",
+          "puzzle_verdict": "פסק דין פאזל"
+        }
+      }
     }
   },
   "offerwall": { "cta": { "label": "מטבעות חינם", "aria": "צברו מטבעות חינם בהשלמת משימות" }, "modal": { "title": "מטבעות חינם", "subtitle": "השלימו משימה — המטבעות יתווספו אוטומטית.", "close": "סגירה" } },

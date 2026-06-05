@@ -13361,6 +13361,40 @@ const en = {
     "toast": {
       "proposeSuccess": "Sent for review — thank you!",
       "proposeError": "Couldn't send that. Try again."
+    },
+    "admin": {
+      "title": "Curator management",
+      "assign": {
+        "title": "Assign a curator",
+        "userIdLabel": "User ID",
+        "languageLabel": "Language",
+        "tierLabel": "Trust tier",
+        "submit": "Assign",
+        "success": "Curator assigned",
+        "error": "Couldn't assign — check the user ID"
+      },
+      "list": {
+        "title": "Active curators",
+        "empty": "No curators yet",
+        "points": "{count} pts",
+        "tier": "Tier {count}",
+        "revoke": "Revoke",
+        "revoked": "Curator revoked"
+      },
+      "inbox": {
+        "title": "Pending proposals",
+        "empty": "No proposals waiting 🎉",
+        "ratify": "Approve",
+        "reject": "Reject",
+        "ratified": "Approved — reward granted",
+        "rejected": "Proposal rejected",
+        "kind": {
+          "word_approve": "Add word",
+          "word_reject": "Reject word",
+          "word_flag_invalid": "Flag invalid",
+          "puzzle_verdict": "Puzzle verdict"
+        }
+      }
     }
   },
   "offerwall": { "cta": { "label": "Earn free coins", "aria": "Earn free coins by completing offers" }, "modal": { "title": "Free Coins", "subtitle": "Complete an offer — your coins are added automatically.", "close": "Close" } },
