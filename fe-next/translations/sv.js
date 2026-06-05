@@ -11646,6 +11646,7 @@ const sv = {
     "noParticipants": "Inga deltagare ännu"
   },
   "league": {
+    "resetsIn": "Återställs om {time}",
     "standings": "Ställning",
     "yourPosition": "Din position",
     "xp": "XP",
@@ -12255,6 +12256,7 @@ const sv = {
     "dismiss": "Kanske senare"
   },
   "party": {
+    "captionGame": "Skriv den roligaste bildtexten för att vinna!",
     "title": "Partyspel",
     "subtitle": "Ta fram telefonerna!",
     "noAccess": "Partyspel är inte tillgängliga ännu.",

@@ -11577,6 +11577,7 @@ const es = {
     "noParticipants": "Sin participantes todavía"
   },
   "league": {
+    "resetsIn": "Se reinicia en {time}",
     "standings": "Clasificación",
     "yourPosition": "Tu posición",
     "xp": "XP",
@@ -12256,6 +12257,7 @@ const es = {
     "dismiss": "Quizás después"
   },
   "party": {
+    "captionGame": "¡Escribe el pie de foto más gracioso para ganar!",
     "title": "Juegos de fiesta",
     "subtitle": "¡Saquen sus teléfonos!",
     "noAccess": "Los juegos de fiesta aún no están disponibles.",

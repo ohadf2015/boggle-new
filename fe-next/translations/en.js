@@ -11585,6 +11585,7 @@ const en = {
     "noParticipants": "No participants yet"
   },
   "league": {
+    "resetsIn": "Resets in {time}",
     "standings": "Standings",
     "yourPosition": "Your Position",
     "xp": "XP",
@@ -12011,6 +12012,7 @@ const en = {
     "memberCount": "{{count}} members"
   },
   "party": {
+    "captionGame": "Write the funniest caption to win!",
     "title": "Party Games",
     "subtitle": "Grab your phones!",
     "noAccess": "Party games are not available yet.",

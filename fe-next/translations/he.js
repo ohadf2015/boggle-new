@@ -11931,6 +11931,7 @@ const he = {
     "noParticipants": "אין משתתפים עדיין"
   },
   "league": {
+    "resetsIn": "מתאפס בעוד {time}",
     "standings": "טבלת דירוג",
     "yourPosition": "המיקום שלך",
     "xp": "XP",
@@ -12447,6 +12448,7 @@ const he = {
     "dismiss": "אולי אחר כך"
   },
   "party": {
+    "captionGame": "כתבו את הכיתוב המצחיק ביותר כדי לנצח!",
     "title": "משחקי מסיבה",
     "subtitle": "תפסו את הטלפונים!",
     "noAccess": "משחקי מסיבה עדיין לא זמינים.",

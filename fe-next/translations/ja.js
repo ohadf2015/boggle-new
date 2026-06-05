@@ -11553,6 +11553,7 @@ const ja = {
     "noParticipants": "まだ参加者がいません"
   },
   "league": {
+    "resetsIn": "{time}でリセット",
     "standings": "順位表",
     "yourPosition": "あなたの順位",
     "xp": "XP",
@@ -12162,6 +12163,7 @@ const ja = {
     "dismiss": "後で"
   },
   "party": {
+    "captionGame": "一番おもしろいキャプションを書いて勝とう！",
     "title": "パーティーゲーム",
     "subtitle": "スマホを手に取ろう！",
     "noAccess": "パーティーゲームはまだ利用できません。",
