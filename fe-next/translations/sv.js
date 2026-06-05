@@ -12971,6 +12971,40 @@ const sv = {
     "pcAdultOnly": "Endast ett vuxenkonto kan ändra dessa inställningar.",
     "nameLockedNote": "En vuxen kan aktivera ett anpassat namn i föräldrakontrollerna."
   },
+  "curator": {
+    "title": "Språkansvarig",
+    "subtitle": "Hjälp till att hålla {language}-innehållet skarpt",
+    "accessRequired": "Detta område är reserverat för språkansvariga.",
+    "backHome": "Tillbaka till spelet",
+    "loading": "Laddar…",
+    "rank": {
+      "label": "Din rang",
+      "apprentice": "Ordlärling",
+      "scribe": "Skrivare",
+      "lexicographer": "Lexikograf",
+      "wordsmith": "Ordmästare",
+      "loremaster": "Sägomästare",
+      "points": "{points} kuratorspoäng",
+      "toNext": "{points} poäng till {rank}",
+      "maxed": "Högsta rang nådd — legend!"
+    },
+    "coins": {
+      "nextMilestone": "{points} poäng → {coins} mynt"
+    },
+    "invalidWords": {
+      "title": "Avvisade ord",
+      "subtitle": "Ord som spelare försökte med och som ännu inte är i ordboken",
+      "empty": "Inget att granska just nu 🎉",
+      "submissions": "{count} förslag",
+      "approve": "Ser giltigt ut",
+      "flag": "Inte ett ord",
+      "sent": "Förslag skickat för granskning"
+    },
+    "toast": {
+      "proposeSuccess": "Skickat för granskning — tack!",
+      "proposeError": "Det gick inte att skicka. Försök igen."
+    }
+  },
   "offerwall": { "cta": { "label": "Tjäna gratis mynt", "aria": "Tjäna gratis mynt genom att slutföra erbjudanden" }, "modal": { "title": "Gratis mynt", "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.", "close": "Stäng" } },
   "offlineDownload": {
     "title": "Ladda ned för offline",

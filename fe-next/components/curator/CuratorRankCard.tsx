@@ -1,0 +1,73 @@
+'use client';
+
+import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  curatorRankForPoints,
+  progressToNextRank,
+  CURATOR_COIN_MILESTONES,
+} from '@/lib/curator/curatorScope';
+
+interface CuratorRankCardProps {
+  /** The curator's lifetime prestige points for the active language. */
+  points: number;
+}
+
+/**
+ * The "fun" surface of the curator role: shows the earned rank, a progress bar
+ * toward the next rank, and the next coin milestone. Prestige only — capability
+ * (trust_tier) lives elsewhere. All copy via t('curator.*').
+ */
+export function CuratorRankCard({ points }: CuratorRankCardProps) {
+  const { t } = useLanguage();
+  const rank = curatorRankForPoints(points);
+  const progress = progressToNextRank(points);
+  const nextMilestone = CURATOR_COIN_MILESTONES.find((m) => m.points > points) ?? null;
+  const widthPct = `${Math.round(progress.ratio * 100)}%`;
+
+  return (
+    <div className="rounded-neo border-neo-thick border-black bg-neo-navy-light p-4 shadow-hard text-neo-white">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs uppercase tracking-wide text-neo-cyan font-neo-body">
+          {t('curator.rank.label')}
+        </span>
+        <span className="text-sm font-neo-body text-neo-cream">
+          {t('curator.rank.points', { points })}
+        </span>
+      </div>
+
+      <h3 className="mt-1 text-2xl font-neo-display text-neo-lime">{t(rank.titleKey)}</h3>
+
+      <div
+        className="mt-3 h-3 w-full overflow-hidden rounded-full border-neo border-black bg-neo-navy"
+        role="progressbar"
+        aria-valuenow={Math.round(progress.ratio * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          data-testid="curator-rank-progress"
+          className="h-full bg-neo-lime transition-[width] duration-500"
+          style={{ width: widthPct }}
+        />
+      </div>
+
+      <p className="mt-2 text-sm font-neo-body text-neo-cream">
+        {progress.next
+          ? t('curator.rank.toNext', {
+              points: progress.pointsNeeded - progress.pointsInto,
+              rank: t(progress.next.titleKey),
+            })
+          : t('curator.rank.maxed')}
+      </p>
+
+      {nextMilestone && (
+        <p className="mt-1 text-xs font-neo-body text-neo-yellow">
+          {t('curator.coins.nextMilestone', {
+            points: nextMilestone.points,
+            coins: nextMilestone.coins,
+          })}
+        </p>
+      )}
+    </div>
+  );
+}

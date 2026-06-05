@@ -12966,6 +12966,40 @@ const ja = {
     "pcAdultOnly": "これらの設定は大人のアカウントでのみ変更できます。",
     "nameLockedNote": "大人が保護者設定でカスタム表示名を有効にできます。"
   },
+  "curator": {
+    "title": "言語キュレーター",
+    "subtitle": "{language}のコンテンツを最高の状態に保つお手伝い",
+    "accessRequired": "このエリアは言語キュレーターのみアクセスできます。",
+    "backHome": "ゲームに戻る",
+    "loading": "読み込み中…",
+    "rank": {
+      "label": "あなたのランク",
+      "apprentice": "言葉の見習い",
+      "scribe": "筆者",
+      "lexicographer": "辞書編集者",
+      "wordsmith": "言葉の職人",
+      "loremaster": "物語の大家",
+      "points": "{points}キュレーターポイント",
+      "toNext": "{rank}まで{points}ポイント",
+      "maxed": "最高ランク到達 — レジェンド！"
+    },
+    "coins": {
+      "nextMilestone": "{points}ポイント → {coins}コイン"
+    },
+    "invalidWords": {
+      "title": "却下された単語",
+      "subtitle": "プレイヤーが試した、辞書にまだない単語",
+      "empty": "今レビューする単語はありません 🎉",
+      "submissions": "{count}件の提案",
+      "approve": "有効そうです",
+      "flag": "単語ではない",
+      "sent": "レビュー用に提案を送信しました"
+    },
+    "toast": {
+      "proposeSuccess": "レビュー用に送信されました — ありがとうございます！",
+      "proposeError": "送信できませんでした。もう一度お試しください。"
+    }
+  },
   "offerwall": { "cta": { "label": "無料コインを獲得", "aria": "オファーを完了して無料コインを獲得" }, "modal": { "title": "無料コイン", "subtitle": "オファーを完了すると、コインが自動で追加されます。", "close": "閉じる" } },
   "offlineDownload": {
     "title": "オフライン用にダウンロード",

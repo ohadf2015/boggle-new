@@ -13059,6 +13059,40 @@ const es = {
     "pcAdultOnly": "Solo una cuenta de adulto puede cambiar estos ajustes.",
     "nameLockedNote": "Un adulto puede activar un nombre personalizado en el control parental."
   },
+  "curator": {
+    "title": "Curador de Idioma",
+    "subtitle": "Ayuda a mantener el contenido de {language} afilado",
+    "accessRequired": "Esta área es solo para Curadores de Idioma.",
+    "backHome": "Volver al juego",
+    "loading": "Cargando…",
+    "rank": {
+      "label": "Tu rango",
+      "apprentice": "Aprendiz de Palabras",
+      "scribe": "Escriba",
+      "lexicographer": "Lexicógrafo",
+      "wordsmith": "Artesano de Palabras",
+      "loremaster": "Maestro de Historias",
+      "points": "{points} puntos de curador",
+      "toNext": "{points} puntos para {rank}",
+      "maxed": "Rango máximo alcanzado — ¡leyenda!"
+    },
+    "coins": {
+      "nextMilestone": "{points} pts → {coins} monedas"
+    },
+    "invalidWords": {
+      "title": "Palabras rechazadas",
+      "subtitle": "Palabras que los jugadores probaron y aún no están en el diccionario",
+      "empty": "Nada que revisar ahora mismo 🎉",
+      "submissions": "{count} propuestas",
+      "approve": "Se ve válida",
+      "flag": "No es una palabra",
+      "sent": "Propuesta enviada para revisión"
+    },
+    "toast": {
+      "proposeSuccess": "Enviado para revisión — ¡gracias!",
+      "proposeError": "No se pudo enviar. Inténtalo de nuevo."
+    }
+  },
   "offerwall": { "cta": { "label": "Gana monedas gratis", "aria": "Gana monedas gratis completando ofertas" }, "modal": { "title": "Monedas gratis", "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.", "close": "Cerrar" } },
   "offlineDownload": {
     "title": "Descargar para usar sin conexión",

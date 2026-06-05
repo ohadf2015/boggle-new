@@ -13385,6 +13385,40 @@ const he = {
     "pcAdultOnly": "רק חשבון של מבוגר יכול לשנות הגדרות אלו.",
     "nameLockedNote": "מבוגר יכול להפעיל שם מותאם אישית בבקרת ההורים."
   },
+  "curator": {
+    "title": "עורך לשון",
+    "subtitle": "עזרו לשמור על תוכן {language} חד וישן",
+    "accessRequired": "אזור זה מיועד לעורכי לשון בלבד.",
+    "backHome": "חזרה למשחק",
+    "loading": "טוען…",
+    "rank": {
+      "label": "דרגתך",
+      "apprentice": "חניך מילים",
+      "scribe": "סופר",
+      "lexicographer": "לקסיקוגרף",
+      "wordsmith": "נגן מילים",
+      "loremaster": "מדריך אגדות",
+      "points": "{points} נקודות עריכה",
+      "toNext": "{points} נקודות עד {rank}",
+      "maxed": "הגעת לדרגה הגבוהה ביותר — אגדה!"
+    },
+    "coins": {
+      "nextMilestone": "{points} נקודות → {coins} מטבעות"
+    },
+    "invalidWords": {
+      "title": "מילים שנדחו",
+      "subtitle": "מילים שחקנים ניסו שעדיין לא במילון",
+      "empty": "אין מה לבדוק עכשיו 🎉",
+      "submissions": "{count} הצעות",
+      "approve": "זו מילה חוקית",
+      "flag": "לא מילה",
+      "sent": "ההצעה נשלחה לבדיקה"
+    },
+    "toast": {
+      "proposeSuccess": "נשלח לבדיקה — תודה!",
+      "proposeError": "לא הצלחנו לשלוח. נסו שוב."
+    }
+  },
   "offerwall": { "cta": { "label": "מטבעות חינם", "aria": "צברו מטבעות חינם בהשלמת משימות" }, "modal": { "title": "מטבעות חינם", "subtitle": "השלימו משימה — המטבעות יתווספו אוטומטית.", "close": "סגירה" } },
   "offlineDownload": {
     "title": "הורדה לשימוש בלא אינטרנט",

@@ -9,6 +9,8 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
+import { shouldSuppressAdsForTier } from '@/lib/families/adPolicy';
 import {
   isAyetOfferwallConfigured,
   hasOfferwallTestFlag,

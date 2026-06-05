@@ -4,6 +4,8 @@ import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
+import { shouldSuppressAdsForTier } from '@/lib/families/adPolicy';
 
 interface RemoveAdsProbeProps {
   isDarkMode: boolean;
@@ -11,11 +13,17 @@ interface RemoveAdsProbeProps {
 
 export function RemoveAdsProbe({ isDarkMode }: RemoveAdsProbeProps) {
   const { t } = useLanguage();
+  const { tier } = useSocialCapabilities();
+  // Families: never surface purchase offers (or their telemetry) to a known child.
+  const suppressed = shouldSuppressAdsForTier(tier);
   const [tapped, setTapped] = useState(false);
 
   useEffect(() => {
+    if (suppressed) return;
     trackGrowthEvent('iap_viewed', { surface: 'settings' });
-  }, []);
+  }, [suppressed]);
+
+  if (suppressed) return null;
 
   function handleTap() {
     if (tapped) return;

@@ -13329,6 +13329,40 @@ const en = {
     "pcAdultOnly": "Only an adult account can change these settings.",
     "nameLockedNote": "An adult can turn on a custom name in parental controls."
   },
+  "curator": {
+    "title": "Language Curator",
+    "subtitle": "Help keep {language} content sharp",
+    "accessRequired": "This area is for Language Curators.",
+    "backHome": "Back to game",
+    "loading": "Loading…",
+    "rank": {
+      "label": "Your rank",
+      "apprentice": "Word Apprentice",
+      "scribe": "Scribe",
+      "lexicographer": "Lexicographer",
+      "wordsmith": "Wordsmith",
+      "loremaster": "Loremaster",
+      "points": "{points} curator points",
+      "toNext": "{points} points to {rank}",
+      "maxed": "Top rank reached — legend!"
+    },
+    "coins": {
+      "nextMilestone": "{points} pts → {coins} coins"
+    },
+    "invalidWords": {
+      "title": "Rejected words",
+      "subtitle": "Words players tried that aren't in the dictionary yet",
+      "empty": "Nothing to review right now 🎉",
+      "submissions": "{count} submissions",
+      "approve": "Looks valid",
+      "flag": "Not a word",
+      "sent": "Proposal sent for review"
+    },
+    "toast": {
+      "proposeSuccess": "Sent for review — thank you!",
+      "proposeError": "Couldn't send that. Try again."
+    }
+  },
   "offerwall": { "cta": { "label": "Earn free coins", "aria": "Earn free coins by completing offers" }, "modal": { "title": "Free Coins", "subtitle": "Complete an offer — your coins are added automatically.", "close": "Close" } },
   "offlineDownload": {
     "title": "Download for Offline",
