@@ -62,6 +62,7 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
 
   return (
     <nav
+      data-desktop-game-nav
       className="hidden md:block relative w-full bg-neo-navy/80 border-b-2 border-neo-white/10 shrink-0 z-55"
       aria-label={t('nav.gameNavigation') || 'Game navigation'}
     >

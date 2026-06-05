@@ -3284,6 +3284,27 @@ html {
   }
 }
 
+/* Landscape PHONE compaction.
+   A phone in landscape is ~360px tall but ~800px WIDE, so it crosses the `md`
+   (768px) breakpoint and renders the DESKTOP header band — the app header bar
+   PLUS the DesktopGameNav game-mode tab strip (~150px combined). On a 360px-tall
+   screen that's a huge empty band at the top of every page. The Tailwind
+   md:short min-height overrides don't reliably beat the md width sizing, so pin
+   it deterministically here: drop the redundant desktop nav (still reachable via
+   the menu + bottom nav) and compact the header bar + its flow spacer to the bar
+   height. The inline safe-area paddingTop is preserved. Scoped to short height +
+   phone width (<=932px = largest phone landscape) so real tablets/desktops in
+   short windows are untouched. */
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 932px) {
+  [data-desktop-game-nav] {
+    display: none !important;
+  }
+  [aria-hidden="true"].h-header,
+  header.fixed {
+    min-height: 48px !important;
+  }
+}
+
 /* Utility for any page that needs to clear the bottom-fixed stack
    (nav + banner). Reactive: updates automatically as either layer resizes. */
 .pb-bottom-stack {
