@@ -5,8 +5,8 @@
 import { BLAST_TILE_TYPE_LIST, type BlastTileType } from '../blast';
 
 describe('BlastTileType canonical definition', () => {
-  it('should contain exactly 23 tile types', () => {
-    expect(BLAST_TILE_TYPE_LIST).toHaveLength(23);
+  it('should contain exactly 21 tile types', () => {
+    expect(BLAST_TILE_TYPE_LIST).toHaveLength(21);
   });
 
   it('should contain chocolate and cake (cc-mechanics 2026-05-10)', () => {
@@ -18,9 +18,9 @@ describe('BlastTileType canonical definition', () => {
     expect(BLAST_TILE_TYPE_LIST).toContain('fuse');
   });
 
-  it('should contain locked and key (cooperative unlock pair)', () => {
-    expect(BLAST_TILE_TYPE_LIST).toContain('locked');
-    expect(BLAST_TILE_TYPE_LIST).toContain('key');
+  it('should NOT contain locked or key (cooperative unlock pair was removed)', () => {
+    expect(BLAST_TILE_TYPE_LIST).not.toContain('locked' as never);
+    expect(BLAST_TILE_TYPE_LIST).not.toContain('key' as never);
   });
 
   it('should contain anchor (long-word length bonus)', () => {
@@ -67,8 +67,6 @@ describe('BlastTileType canonical definition', () => {
       'catalyst',
       'crystal',
       'fuse',
-      'locked',
-      'key',
       'anchor',
       'chocolate',
       'cake',
@@ -76,7 +74,7 @@ describe('BlastTileType canonical definition', () => {
     for (const type of expected) {
       expect(BLAST_TILE_TYPE_LIST).toContain(type);
     }
-    expect(expected).toHaveLength(23);
+    expect(expected).toHaveLength(21);
   });
 
   it('should have no duplicate entries', () => {

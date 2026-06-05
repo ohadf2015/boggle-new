@@ -6,7 +6,7 @@
 
 // ==================== Tile Type ====================
 
-/** All possible blast mode tile types (standard + 22 special) */
+/** All possible blast mode tile types (standard + 20 special) */
 export type BlastTileType =
   | 'standard'
   | 'gold'
@@ -26,8 +26,6 @@ export type BlastTileType =
   | 'magma'
   | 'crystal'
   | 'fuse'
-  | 'locked'
-  | 'key'
   | 'anchor'
   | 'chocolate'
   | 'cake';
@@ -52,8 +50,6 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'magma',
   'crystal',
   'fuse',
-  'locked',
-  'key',
   'anchor',
   'chocolate',
   'cake',

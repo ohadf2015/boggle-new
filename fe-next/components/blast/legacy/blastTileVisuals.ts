@@ -2,7 +2,7 @@ import {
   type LucideIcon,
   Bomb, Zap, Triangle, Rainbow, Snowflake, Gem, Magnet,
   Diamond, Hourglass, Shuffle, Flame, Orbit, FlaskConical,
-  Sparkles, Star, Anchor, Lock, Key,
+  Sparkles, Star, Anchor,
 } from 'lucide-react';
 import type { BlastTileType } from './types';
 
@@ -65,8 +65,6 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
   crystal:   { bg: '', indicator: Sparkles,     text: 'text-white',    style: { background: C.violet,  boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
   fuse:      { bg: '', indicator: Flame,        text: 'text-white',    style: { background: C.amber,   boxShadow: SHADOW, border: BORDER_SPECIAL } },
   anchor:    { bg: '', indicator: Anchor,       text: 'text-white',    style: { background: C.teal,    boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  locked:    { bg: '', indicator: Lock,         text: 'text-white',    style: { background: C.stone,   boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  key:       { bg: '', indicator: Key,          text: 'text-neo-navy', style: { background: C.gold,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
   // chocolate + cake paint via overlays in BlastTile; visual record is intentionally minimal.
   chocolate: { bg: '', text: 'text-white',    style: { background: '#3a1f0e', boxShadow: SHADOW, border: BORDER_SPECIAL } },
   cake:      { bg: '', text: 'text-white',    style: { background: 'transparent', boxShadow: SHADOW, border: BORDER_SPECIAL } },
