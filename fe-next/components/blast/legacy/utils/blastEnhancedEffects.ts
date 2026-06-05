@@ -381,18 +381,28 @@ export function createEnhancedEffects(
   function dissolveTile(x: number, y: number, tileType: string): void {
     if (destroyed) return;
     const sprite = createTileProxy(app, camera, x, y, cellSize * 0.9, tileType);
-    const config = tileType === 'frozen' ? FROZEN_DISSOLVE : ICE_DISSOLVE;
-    try {
-      const effect = new DissolveEffect(sprite, config);
-      trackEffect(effect, sprite, effect.dissolve());
-    } catch {
-      // RenderTexture has no canvas resource — fall back: remove + destroy
+
+    // DissolveEffect samples per-pixel colors by drawing texture.source.resource
+    // (an HTMLCanvas/Image/ImageBitmap) onto a 2D canvas. createTileProxy builds the
+    // proxy from app.renderer.generateTexture(), which yields a GPU RenderTexture with
+    // NO cpu-readable source.resource. In that case DissolveEffect.prepare() bails with
+    // a "Could not find valid resource on texture.source." console warning and produces
+    // zero fragments — a dead, noisy no-op. (The old try/catch here never fired:
+    // prepare() warns + returns, it does not throw.) Detect the unreadable texture up
+    // front, skip the effect, and clean up the orphaned proxy instead.
+    const source = (sprite.texture as { source?: { resource?: unknown } } | undefined)?.source;
+    if (!source?.resource) {
       try { if (sprite.parent) sprite.parent.removeChild(sprite); } catch { /* */ }
       if (sprite.texture && sprite.texture !== RenderTexture.EMPTY) {
         try { sprite.texture.destroy(true); } catch { /* */ }
       }
       try { sprite.destroy(); } catch { /* already cleaned */ }
+      return;
     }
+
+    const config = tileType === 'frozen' ? FROZEN_DISSOLVE : ICE_DISSOLVE;
+    const effect = new DissolveEffect(sprite, config);
+    trackEffect(effect, sprite, effect.dissolve());
   }
 
   /** Helper: track a promise-based effect and clean up when done. */

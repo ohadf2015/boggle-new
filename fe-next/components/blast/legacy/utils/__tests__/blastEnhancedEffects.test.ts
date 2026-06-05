@@ -76,7 +76,8 @@ vi.mock('custom-pixi-particles', () => {
 });
 
 vi.mock('pixi.js', () => {
-  const mockTexture = { destroy: vi.fn() };
+  // A texture with a CPU-readable resource (the normal, healthy case).
+  const mockTexture = { destroy: vi.fn(), source: { resource: { width: 8, height: 8 } } };
 
   class MockGraphics {
     roundRect() { return this; }
@@ -92,7 +93,13 @@ vi.mock('pixi.js', () => {
     y = 0;
     width = 0;
     height = 0;
-    texture = mockTexture;
+    parent: unknown = null;
+    texture: unknown;
+    // Store the texture the proxy was constructed with so tests can model
+    // whether texture.source.resource is present (RenderTexture vs canvas).
+    constructor(texture?: unknown) {
+      this.texture = texture ?? mockTexture;
+    }
   }
 
   class MockContainer {
@@ -104,6 +111,7 @@ vi.mock('pixi.js', () => {
     Container: MockContainer,
     Graphics: MockGraphics,
     Sprite: MockSprite,
+    Texture: { WHITE: { destroy: vi.fn(), source: { resource: { width: 1, height: 1 } } } },
     RenderTexture: { EMPTY: Symbol('EMPTY') },
   };
 });
@@ -115,7 +123,11 @@ import { createEnhancedEffects } from '../blastEnhancedEffects';
 function makeMockApp() {
   return {
     renderer: {
-      generateTexture: vi.fn().mockReturnValue({ destroy: vi.fn() }),
+      // Healthy default: generated texture exposes a CPU-readable source resource.
+      generateTexture: vi.fn().mockReturnValue({
+        destroy: vi.fn(),
+        source: { resource: { width: 8, height: 8 } },
+      }),
     },
   } as any;
 }
@@ -197,6 +209,26 @@ describe('blastEnhancedEffects', () => {
       manager.dissolveTile(100, 200, 'ice');
 
       expect(mockDissolve).not.toHaveBeenCalled();
+    });
+
+    it('skips DissolveEffect (no warning) when the proxy texture has no CPU resource', () => {
+      // GPU RenderTextures from generateTexture() have no texture.source.resource,
+      // so DissolveEffect.prepare() cannot sample pixels and only emits a
+      // "Could not find valid resource on texture.source." console warning before
+      // no-op'ing. Skip constructing the effect entirely and clean up the proxy.
+      const texDestroy = vi.fn();
+      app.renderer.generateTexture = vi.fn().mockReturnValue({
+        destroy: texDestroy,
+        source: { resource: null },
+      });
+
+      const manager = createEnhancedEffects(app, camera, 50);
+      manager.dissolveTile(100, 200, 'ice');
+
+      // Effect must NOT run on an unreadable texture (this is the warning source).
+      expect(mockDissolve).not.toHaveBeenCalled();
+      // The orphaned proxy texture is cleaned up synchronously rather than leaked.
+      expect(texDestroy).toHaveBeenCalled();
     });
   });
 
