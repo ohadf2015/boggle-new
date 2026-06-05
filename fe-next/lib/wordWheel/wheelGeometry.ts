@@ -21,7 +21,15 @@ export const WHEEL_LETTER_ALLOWANCE_PX = 60;
  *
  * @param containerWidthPx rendered wheel width (getBoundingClientRect)
  * @param maxRadius        upper bound (96 mobile, 136/140 desktop)
- * @param minRadius        lower bound; keeps a tiny wheel usable
+ * @param minRadius        lower bound; must clear the center letter so the
+ *                         petals never collapse onto it on a height-capped
+ *                         viewport. The mobile center letter is 80px (radius 40)
+ *                         and outer letters 52px (radius 26), so the orbit needs
+ *                         ≥66px to avoid overlap; the 76px default adds a small
+ *                         gap. A floor below that let a cramped wheel crush the
+ *                         flower into itself (petals overlapping center + each
+ *                         other). Short/landscape passes a smaller floor to match
+ *                         its shrunken `short:` letters.
  * @param letterAllowance  rim space reserved for one outer letter. Defaults to
  *                         {@link WHEEL_LETTER_ALLOWANCE_PX}; pass a smaller value
  *                         on short/landscape viewports where the `short:` variant
@@ -32,7 +40,7 @@ export const WHEEL_LETTER_ALLOWANCE_PX = 60;
 export function computeWheelRadius(
   containerWidthPx: number,
   maxRadius: number,
-  minRadius = 52,
+  minRadius = 76,
   letterAllowance = WHEEL_LETTER_ALLOWANCE_PX,
 ): number {
   if (!Number.isFinite(containerWidthPx) || containerWidthPx <= 0) {

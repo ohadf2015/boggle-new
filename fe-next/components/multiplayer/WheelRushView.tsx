@@ -122,7 +122,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
   const [fogActive, setFogActive] = useState(false);
-  const [wheelRadius, setWheelRadius] = useState(72);
+  // Seed at the center-clearing floor (see computeWheelRadius) so the pre-measure
+  // first paint doesn't briefly collapse the petals onto the center letter.
+  const [wheelRadius, setWheelRadius] = useState(76);
   const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
   const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Ref-bridged so the once-bound socket onResult closure can reach the latest trigger.
