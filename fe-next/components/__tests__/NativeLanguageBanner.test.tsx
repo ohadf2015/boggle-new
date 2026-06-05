@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NativeLanguageBanner } from '../NativeLanguageBanner';
 
 const mockSetLanguage = vi.fn();
@@ -37,6 +37,12 @@ describe('NativeLanguageBanner', () => {
     mockLanguage = 'en';
     localStorage.clear();
     document.documentElement.className = '';
+  });
+
+  afterEach(() => {
+    // Drop our `navigator.languages` override so it can't leak into whatever
+    // test file vitest runs next in this worker (the prototype getter returns).
+    delete (navigator as { languages?: readonly string[] }).languages;
   });
 
   it('offers the native language when the browser prefers a supported one we are not showing', () => {
