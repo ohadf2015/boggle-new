@@ -9404,7 +9404,9 @@ const en = {
     "helpTitle": "How to Play",
     "helpDrag": "Drag across letters to form words. Words must be at least 2 letters long.",
     "mpResults": {
-      "boardCleared": "Board Cleared!"
+      "boardCleared": "Board Cleared!",
+      "yourPosition": "Your Rank",
+      "champion": "Champion"
     },
     "helpGold": "3x score multiplier for the word.",
     "helpBomb": "Clears all 8 surrounding tiles.",

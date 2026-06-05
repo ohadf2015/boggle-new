@@ -863,9 +863,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     onPodiumReaction: sendReaction,
     coinReward,
     shareCardStats,
-    // Wheel-rush shows placements on the wheel (WheelRushResultsScene); skip the
-    // duplicate generic podium + consolation standings below it.
-    hideStandings: isWheelRush && hasWheelRushStats,
+    // Wheel-rush and blast both own their standings (WheelRushResultsScene /
+    // BlastMpResults); skip the duplicate generic podium + consolation below them.
+    hideStandings:
+      (isWheelRush && hasWheelRushStats) ||
+      (resolvedGameMode === 'blast' && sortedScores.length > 1),
   };
 
   // Word Hunt results data (shared between tabs) — memoized to avoid O(n²) per render
@@ -904,8 +906,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return buildBlastMpResults(sortedScores, {
       boardClearedByLocal: blastBoardClearedByLocal,
       localUsername: username,
+      playerStats: blastPlayerStats,
     });
-  }, [sortedScores, resolvedGameMode, blastBoardClearedByLocal, username]);
+  }, [sortedScores, resolvedGameMode, blastBoardClearedByLocal, username, blastPlayerStats]);
 
   // Render Results Tab Content using shared component.
   // Wheel-rush gets a radial wheel-themed hero scene rendered ABOVE the

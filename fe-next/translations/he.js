@@ -9794,7 +9794,9 @@ const he = {
     "helpTitle": "איך לשחק",
     "helpDrag": "גרור על אותיות כדי ליצור מילים. מילים חייבות להיות באורך 2 אותיות לפחות.",
     "mpResults": {
-      "boardCleared": "הלוח נוקה!"
+      "boardCleared": "הלוח נוקה!",
+      "yourPosition": "הדירוג שלך",
+      "champion": "אלוף"
     },
     "helpGold": "מכפיל ניקוד x3 למילה.",
     "helpBomb": "מנקה את כל 8 האריחים הסמוכים.",

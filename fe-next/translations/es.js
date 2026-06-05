@@ -9576,7 +9576,9 @@ const es = {
     "helpTitle": "Cómo jugar",
     "helpDrag": "Arrastra sobre las letras para formar palabras. Las palabras deben tener al menos 2 letras.",
     "mpResults": {
-      "boardCleared": "¡Tablero despejado!"
+      "boardCleared": "¡Tablero despejado!",
+      "yourPosition": "Tu posición",
+      "champion": "Campeón"
     },
     "helpGold": "Multiplicador de puntuación x3 para la palabra.",
     "helpBomb": "Limpia las 8 casillas circundantes.",

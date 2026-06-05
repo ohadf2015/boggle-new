@@ -9592,7 +9592,9 @@ const sv = {
     "helpTitle": "Hur man spelar",
     "helpDrag": "Dra över bokstäver för att bilda ord. Ord måste vara minst 2 bokstäver.",
     "mpResults": {
-      "boardCleared": "Brädet klarat!"
+      "boardCleared": "Brädet klarat!",
+      "yourPosition": "Din placering",
+      "champion": "Mästare"
     },
     "helpGold": "3x poängmultiplikator för ordet.",
     "helpBomb": "Rensar alla 8 omgivande rutor.",

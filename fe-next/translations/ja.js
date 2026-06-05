@@ -9560,7 +9560,9 @@ const ja = {
     "helpPrismLabel": "プリズム",
     "helpPrism": "2つの単語で使用するとクロスクリア（行全体＋列全体）が発動。",
     "mpResults": {
-      "boardCleared": "ボードクリア！"
+      "boardCleared": "ボードクリア！",
+      "yourPosition": "あなたの順位",
+      "champion": "チャンピオン"
     },
     "helpGemLabel": "ジェム",
     "helpGem": "3つの単語で使用して収集。使用ごとに+3、収集時に+8。",

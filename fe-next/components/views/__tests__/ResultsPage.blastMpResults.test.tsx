@@ -13,11 +13,11 @@ describe('buildBlastMpResults (ResultsPage MP blast mapping)', () => {
     { username: 'player2', score: 80, wordsFoundCount: 4 },
   ];
 
-  it('maps scoreboard rows to BlastMpPlayerResult with blast stat placeholders', () => {
+  it('maps scoreboard rows to BlastMpPlayerResult and flags the local player', () => {
     const out = buildBlastMpResults(scores, { boardClearedByLocal: false, localUsername: 'player1' });
     expect(out).toEqual([
-      { username: 'player1', score: 100, wordsFoundCount: 5, tilesCleared: 0, bestCombo: 0, boardCleared: false },
-      { username: 'player2', score: 80, wordsFoundCount: 4, tilesCleared: 0, bestCombo: 0, boardCleared: false },
+      { username: 'player1', score: 100, wordsFoundCount: 5, isCurrentPlayer: true, boardCleared: false },
+      { username: 'player2', score: 80, wordsFoundCount: 4, isCurrentPlayer: false, boardCleared: false },
     ]);
   });
 
