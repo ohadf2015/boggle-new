@@ -6,68 +6,77 @@ import {
 } from 'lucide-react';
 import type { BlastTileType } from './types';
 
-const SHADOW = '2px 2px 0px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.25)';
-const BORDER_SPECIAL = '2px solid rgba(0,0,0,0.4)';
+/* Neo-brutalist tile frame: a hard (blur-free) offset drop shadow + a soft
+ * inner top-highlight for a "physical key" bevel. Shared by every tile so the
+ * standard face and the colourful specials read as siblings of one set. */
+const INK = '#0b1530';
+const HARD_SHADOW = `3px 3px 0 0 ${INK}, inset 0 2px 0 rgba(255,255,255,0.35), inset 0 -3px 0 rgba(0,0,0,0.12)`;
 
-/** Animated gradient shimmer: oversize the background and slide it.
- *  Applied on special tiles to make gradients feel "alive". */
-const SHIMMER_STYLE: React.CSSProperties = {
-  backgroundSize: '200% 200%',
-  animation: 'blast-gradient-travel 3s ease-in-out infinite',
+/** Build a solid special-tile face: one flat brand colour + a thick ink-shade
+ *  border + the shared hard frame. No gradients — the colour + lucide icon
+ *  carry the identity, the hard frame carries the neo-brutalist chunk. */
+function solid(face: string, border: string): React.CSSProperties {
+  return { background: face, boxShadow: HARD_SHADOW, border: `3px solid ${border}` };
+}
+
+/* Single, flat brand-aligned hues. Each special owns one colour; siblings that
+ * share a family (the two reds, the purples, the teals) are separated by icon
+ * and by a darker/lighter step so all 18 stay distinguishable on a packed board. */
+const F = {
+  cream:  '#FFFEF0',                    // standard face — warm, never stark white
+  gold:   '#FFD32A', goldEdge:  '#9A6B00',
+  red:    '#FF3B5C', redEdge:   '#7A0B22',  // bomb
+  magma:  '#E11D48', magmaEdge: '#5C0818',  // magma (deeper red)
+  amber:  '#FFE600', amberEdge: '#8A6B00',  // lightning (electric yellow)
+  fuse:   '#FB923C', fuseEdge:  '#8A3A10',  // fuse (amber-orange)
+  orange: '#FF7A3C', orangeEdge:'#8A3A10',  // countdown
+  cyan:   '#7DE0FF', cyanEdge:  '#155E75',  // ice
+  iceLt:  '#D2F4FF',                         // frozen (paler, "set" ice)
+  pink:   '#FF4DA6', pinkEdge:  '#8A1545',  // gem
+  violet: '#9B6BFF', violetEdge:'#3B1A8A',  // magnet
+  deepV:  '#7C3AED', deepVEdge: '#3B0A8A',  // portal
+  lilac:  '#C084FC', lilacEdge: '#6B21A8',  // crystal
+  orchid: '#E879F9', orchidEdge:'#86198F',  // shuffle
+  aqua:   '#5EE6D0', aquaEdge:  '#0F6E62',  // diamond
+  teal:   '#37D9A0', tealEdge:  '#0B5E45',  // catalyst
+  anchor: '#14B8A6', anchorEdge:'#0B5E45',  // anchor
 };
-const SHIMMER_FAST: React.CSSProperties = {
-  backgroundSize: '300% 300%',
-  animation: 'blast-gradient-travel 2s ease-in-out infinite',
-};
+
+/* Prism/rainbow are inherently multi-colour. Instead of a soft gradient FACE
+ * (banned), they get a SOLID near-white face + a hard-edged 4-colour border so
+ * the multi-hue identity reads as crisp colour blocks, not an airbrush. The
+ * face stays solid (and test-provably gradient-free). */
+const PRISM_BORDER =
+  '3px solid transparent';
+const PRISM_BORDER_IMAGE =
+  'conic-gradient(from 45deg, #FFD32A 0deg 90deg, #00E0FF 90deg 180deg, #9B6BFF 180deg 270deg, #FF4DA6 270deg 360deg) 1';
 
 /** Visual config per tile type.
  *  `indicator` is a lucide-react component — inherits `currentColor` from the
- *  tile's `text-*` class so gold/ice tiles get dark strokes, bombs get white. */
-/* Harmonized multi-hue palette. Every gradient shares the same geometry
- * (radial at 30%/30%, 0→35→75→100 stops) and the same warm yellow hotspot,
- * so distinct hues still read as siblings under a shared light source. */
-const C = {
-  // Pink/rose — jewel / destruction energy
-  rose:    'radial-gradient(circle at 30% 30%, #FFE4A0 0%, #FFB3C8 35%, #E04A82 75%, #8A1545 100%)',
-  crimson: 'radial-gradient(circle at 30% 30%, #FFD890 0%, #FF6A7C 30%, #B01838 70%, #5C0818 100%)',
-  // Amber/gold — electric / value
-  gold:    'radial-gradient(circle at 30% 30%, #FFF6C0 0%, #FFD85A 35%, #D88820 75%, #5E3200 100%)',
-  amber:   'radial-gradient(circle at 30% 30%, #FFF0A8 0%, #FFB040 30%, #B84808 70%, #4C1600 100%)',
-  // Cyan/ice — cold
-  ice:     'radial-gradient(circle at 30% 30%, #FFFAE0 0%, #C8F0FF 35%, #5AB0D8 75%, #1C4A72 100%)',
-  aqua:    'radial-gradient(circle at 30% 30%, #FFF4C8 0%, #8AE0DC 30%, #227A8A 70%, #083642 100%)',
-  // Violet/purple — magic
-  violet:  'radial-gradient(circle at 30% 30%, #FFE4B0 0%, #D8A0E8 35%, #7830C0 75%, #28084E 100%)',
-  orchid:  'radial-gradient(circle at 30% 30%, #FFD8A8 0%, #F090E0 30%, #8C1CAC 70%, #360856 100%)',
-  // Teal/mint — utility / alchemy
-  teal:    'radial-gradient(circle at 30% 30%, #FFF4C0 0%, #98E4BC 35%, #1E8864 75%, #083826 100%)',
-  // Neutral stone — locked
-  stone:   'linear-gradient(165deg, #D8D0C2 0%, #8E8676 45%, #564E42 100%)',
-};
-
+ *  tile's `text-*` class so light tiles get dark strokes, dark tiles get white. */
 export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: LucideIcon; text?: string; style?: React.CSSProperties }> = {
-  standard:  { bg: '', text: 'text-neo-navy', style: { background: '#FFFFFF', boxShadow: SHADOW, border: '2px solid rgba(0,0,0,0.3)' } },
-  gold:      { bg: '', indicator: Star,         text: 'text-neo-navy', style: { background: C.gold,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
-  bomb:      { bg: '', indicator: Bomb,         text: 'text-white',    style: { background: C.crimson, boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
-  lightning: { bg: '', indicator: Zap,          text: 'text-neo-navy', style: { background: C.amber,   boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
-  prism:     { bg: '', indicator: Triangle,     text: 'text-white',    style: { background: 'conic-gradient(from 0deg, #FFD85A, #5AB0D8, #7830C0, #E04A82, #FFD85A)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
-  rainbow:   { bg: '', indicator: Rainbow,      text: 'text-white',    style: { background: 'linear-gradient(135deg, #FFD85A 0%, #E04A82 33%, #7830C0 66%, #227A8A 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
-  ice:       { bg: '', indicator: Snowflake,    text: 'text-neo-navy', style: { background: C.ice,     boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  gem:       { bg: '', indicator: Gem,          text: 'text-white',    style: { background: C.rose,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
-  frozen:    { bg: '', indicator: Snowflake,    text: 'text-neo-navy', style: { background: C.ice,     boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  magnet:    { bg: '', indicator: Magnet,       text: 'text-white',    style: { background: C.violet,  boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  diamond:   { bg: '', indicator: Diamond,      text: 'text-neo-navy', style: { background: C.aqua,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
-  countdown: { bg: '', indicator: Hourglass,    text: 'text-white',    style: { background: C.amber,   boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  shuffle:   { bg: '', indicator: Shuffle,      text: 'text-white',    style: { background: C.orchid,  boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  magma:     { bg: '', indicator: Flame,        text: 'text-white',    style: { background: C.crimson, boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
-  portal:    { bg: '', indicator: Orbit,        text: 'text-white',    style: { background: 'radial-gradient(circle, #D8A0E8 0%, #5820A0 60%, #1A0540 100%)', boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_FAST } },
-  catalyst:  { bg: '', indicator: FlaskConical, text: 'text-neo-navy', style: { background: C.teal,    boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
-  crystal:   { bg: '', indicator: Sparkles,     text: 'text-white',    style: { background: C.violet,  boxShadow: SHADOW, border: BORDER_SPECIAL, ...SHIMMER_STYLE } },
-  fuse:      { bg: '', indicator: Flame,        text: 'text-white',    style: { background: C.amber,   boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  anchor:    { bg: '', indicator: Anchor,       text: 'text-white',    style: { background: C.teal,    boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  standard:  { bg: '', text: 'text-neo-navy', style: { background: F.cream, boxShadow: HARD_SHADOW, border: `2px solid ${INK}` } },
+  gold:      { bg: '', indicator: Star,         text: 'text-neo-navy', style: solid(F.gold,   F.goldEdge) },
+  bomb:      { bg: '', indicator: Bomb,         text: 'text-white',    style: solid(F.red,    F.redEdge) },
+  lightning: { bg: '', indicator: Zap,          text: 'text-neo-navy', style: solid(F.amber,  F.amberEdge) },
+  prism:     { bg: '', indicator: Triangle,     text: 'text-neo-navy', style: { background: '#F6F7FF', boxShadow: HARD_SHADOW, border: PRISM_BORDER, borderImage: PRISM_BORDER_IMAGE } },
+  rainbow:   { bg: '', indicator: Rainbow,      text: 'text-neo-navy', style: { background: '#FFFDF6', boxShadow: HARD_SHADOW, border: PRISM_BORDER, borderImage: PRISM_BORDER_IMAGE } },
+  ice:       { bg: '', indicator: Snowflake,    text: 'text-neo-navy', style: solid(F.cyan,   F.cyanEdge) },
+  gem:       { bg: '', indicator: Gem,          text: 'text-white',    style: solid(F.pink,   F.pinkEdge) },
+  frozen:    { bg: '', indicator: Snowflake,    text: 'text-neo-navy', style: solid(F.iceLt,  F.cyanEdge) },
+  magnet:    { bg: '', indicator: Magnet,       text: 'text-white',    style: solid(F.violet, F.violetEdge) },
+  diamond:   { bg: '', indicator: Diamond,      text: 'text-neo-navy', style: solid(F.aqua,   F.aquaEdge) },
+  countdown: { bg: '', indicator: Hourglass,    text: 'text-white',    style: solid(F.orange, F.orangeEdge) },
+  shuffle:   { bg: '', indicator: Shuffle,      text: 'text-white',    style: solid(F.orchid, F.orchidEdge) },
+  magma:     { bg: '', indicator: Flame,        text: 'text-white',    style: solid(F.magma,  F.magmaEdge) },
+  portal:    { bg: '', indicator: Orbit,        text: 'text-white',    style: solid(F.deepV,  F.deepVEdge) },
+  catalyst:  { bg: '', indicator: FlaskConical, text: 'text-neo-navy', style: solid(F.teal,   F.tealEdge) },
+  crystal:   { bg: '', indicator: Sparkles,     text: 'text-white',    style: solid(F.lilac,  F.lilacEdge) },
+  fuse:      { bg: '', indicator: Flame,        text: 'text-neo-navy', style: solid(F.fuse,   F.fuseEdge) },
+  anchor:    { bg: '', indicator: Anchor,       text: 'text-white',    style: solid(F.anchor, F.anchorEdge) },
   // chocolate + cake paint via overlays in BlastTile; visual record is intentionally minimal.
-  chocolate: { bg: '', text: 'text-white',    style: { background: '#3a1f0e', boxShadow: SHADOW, border: BORDER_SPECIAL } },
-  cake:      { bg: '', text: 'text-white',    style: { background: 'transparent', boxShadow: SHADOW, border: BORDER_SPECIAL } },
+  chocolate: { bg: '', text: 'text-white',    style: { background: '#3a1f0e', boxShadow: HARD_SHADOW, border: `3px solid #1c0e04` } },
+  cake:      { bg: '', text: 'text-white',    style: { background: 'transparent', boxShadow: HARD_SHADOW, border: `3px solid ${INK}` } },
 };
 
 /** Clearing phase background color per tile type — matches the idle hue

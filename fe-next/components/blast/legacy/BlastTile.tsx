@@ -180,9 +180,10 @@ function getSelectionScale(selectionIndex?: number, selectionTotal?: number): nu
 
 function getPhaseClasses(phase: TilePhase, isSelected: boolean): string {
   if (phase === 'selected' || (phase === 'idle' && isSelected)) {
-    // Thicker ring + lime glow (added inline below) so selected tiles pop hard
-    // against the dark board and the active word is unmistakable.
-    return `ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy shadow-hard-lime brightness-110 blast-tile-select-pop`;
+    // The selection ring + lift + hard shadow are applied INLINE
+    // (getSelectionStyles) so they layer over each special tile's own face
+    // instead of replacing it. Here we add only the one-shot "pop" keyframe.
+    return 'blast-tile-select-pop';
   }
   return '';
 }
@@ -198,15 +199,28 @@ function getColorTagGlow(colorTag?: 'pink' | 'cyan' | 'lime'): string {
   return colorMap[colorTag] || '';
 }
 
-/** Inline styles for selected tiles: progressive scale + lime glow + lift above neighbors */
+/**
+ * Inline styles for selected tiles. The selection is an OVERLAY on top of the
+ * tile's own face (so a selected bomb still looks like a bomb), amplified to
+ * read by VALUE contrast:
+ *  - real lift (translateY) + progressive scale → the active word rises,
+ *  - a lime "active" ring wrapped in a thick navy ink ring → the navy gives the
+ *    high value-contrast that makes selection unmistakable against BOTH the
+ *    white standard face (where lime alone is too low-contrast) AND the bright
+ *    special faces,
+ *  - a hard (blur-free) drop shadow → neo-brutalist depth,
+ *  - z-index lift so the scaled tile never hides behind a neighbour.
+ */
 function getSelectionStyles(isSelected: boolean, selectionIndex?: number, selectionTotal?: number): React.CSSProperties {
   if (!isSelected) return {};
   const scale = getSelectionScale(selectionIndex, selectionTotal);
   return {
-    transform: `scale(${scale})`,
-    // Lime glow halo + raise selected tiles above their neighbors so the
-    // active word never hides behind an adjacent tile's scaled edge.
-    filter: 'drop-shadow(0 0 10px rgba(191,255,0,0.75))',
+    transform: `translateY(-6px) scale(${scale})`,
+    boxShadow:
+      '0 0 0 3px #BFFF00, 0 0 0 6px #0b1530, 5px 6px 0 0 rgba(11,21,48,0.92), inset 0 2px 0 rgba(255,255,255,0.35)',
+    // Brightness lift + a small lime energy glow — secondary juice, not the
+    // primary signal (the hard rings above carry that).
+    filter: 'brightness(1.06) drop-shadow(0 0 7px rgba(191,255,0,0.5))',
     zIndex: 20,
   };
 }

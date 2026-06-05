@@ -50,24 +50,36 @@ export function BlastDragTrail({
     >
       {points && (
         <>
-          {/* Soft wide underlay = glow halo; crisp bright line on top. */}
+          {/* Navy ink underlay = VALUE contrast so the rail reads on a busy,
+              brightly-lit board (the accent alone washes out over pale tiles). */}
           <polyline
             points={points}
             fill="none"
-            stroke={strokeColor}
-            strokeWidth={14}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity={0.25}
-          />
-          <polyline
-            points={points}
-            fill="none"
-            stroke={strokeColor}
-            strokeWidth={8}
+            stroke="#0b1530"
+            strokeWidth={17}
             strokeLinecap="round"
             strokeLinejoin="round"
             opacity={0.9}
+          />
+          {/* Accent halo just inside the ink edge. */}
+          <polyline
+            points={points}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth={12}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.35}
+          />
+          {/* Crisp bright accent core on top. */}
+          <polyline
+            points={points}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth={7}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={1}
           />
         </>
       )}

@@ -242,8 +242,11 @@ export const BlastStage = memo(function BlastStage({
       {/* Reactive background */}
       <BlastBackground intensity={sequencerState?.chainLevel ?? 0} />
 
-      {/* 1. HUD — z-40, shown on all sizes */}
-      <div className="relative z-40">
+      {/* 1. HUD — z-40, shown on all sizes. Capped + centred so on desktop/TV
+          the score · moves · progress cluster reads as one console aligned over
+          the board, instead of stretching edge-to-edge across a wide viewport.
+          On phones the cap exceeds the screen, so it stays full-width. */}
+      <div className="relative z-40 w-full max-w-[640px] lg:max-w-[840px] xl:max-w-[920px] mx-auto">
       <BlastHUD
         score={score}
         wordsFoundCount={wordsFound.length}
