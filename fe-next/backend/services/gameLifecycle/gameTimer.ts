@@ -252,7 +252,10 @@ export function scheduleGameStartSafetyNet(io: Server, gameCode: string, delayMs
   timerManager.setTimeout(`gameStartSafety:${gameCode}`, () => {
     const resumed = resumeGameTimerIfMissing(io, gameCode);
     if (resumed) {
-      logger.warn(
+      // info (not warn) — this backstop firing is recovery working as designed,
+      // not an error. warn routes to Sentry (logger.ts) and spammed it with
+      // per-game noise; keep the operational signal in pino logs only.
+      logger.info(
         'GAME_START',
         `Safety net started timer+bots for ${gameCode} ${delayMs}ms after start — client countdownComplete and the coordinator fallback both missed (stale/backgrounded host?). Bots would otherwise have scored 0 for the whole round.`,
       );

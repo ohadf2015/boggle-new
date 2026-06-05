@@ -320,7 +320,10 @@ export function impactRing(parent: Container, x: number, y: number, baseRadius: 
   const from = baseRadius * 0.35;
   const to = baseRadius * 1.6 * scaleMul;
   const tick = () => {
-    if (ring.destroyed) return;
+    // `ring.destroyed` alone is order-dependent: a parent.destroy({children:true})
+    // during the rAF window can null the ring's context while its destroyed flag
+    // still lags. Bail on either to avoid ".clear() on null" (Sentry 1CW).
+    if (ring.destroyed || parent.destroyed) return;
     const k = Math.min(1, (performance.now() - t0) / dur);
     const r = from + (to - from) * easeOutCubic(k);
     ring.clear().circle(0, 0, r).stroke({ color, width: Math.max(2, 4 * (1 - k)), alpha: 0.7 * (1 - k) });

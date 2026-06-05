@@ -99,4 +99,16 @@ describe('TrailRenderer', () => {
     (trail as unknown as { graphics: { destroyed: boolean } }).graphics.destroyed = true;
     expect(() => trail.update(0.016)).not.toThrow();
   });
+
+  it('clear() does not crash if Graphics was destroyed by parent (children:true)', () => {
+    trail.addPoint(10, 10);
+    const gfx = (trail as unknown as { graphics: { clear: jest.Mock; destroyed: boolean } }).graphics;
+    // Reproduce the production null-context throw: a destroyed Graphics whose
+    // internal context is null throws "Cannot read properties of null (reading 'clear')".
+    gfx.clear.mockImplementationOnce(() => {
+      throw new TypeError("Cannot read properties of null (reading 'clear')");
+    });
+    gfx.destroyed = true;
+    expect(() => trail.clear()).not.toThrow();
+  });
 });

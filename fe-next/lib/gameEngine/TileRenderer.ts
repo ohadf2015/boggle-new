@@ -40,6 +40,7 @@ export class TileRenderer {
   private config: TileRenderConfig;
   private themes: Record<string, TileTheme>;
   private textStyle: TextStyle;
+  private _destroyed = false;
 
   constructor(
     parent: Container,
@@ -183,6 +184,9 @@ export class TileRenderer {
 
   update(deltaSec: number): string[] {
     const cleared: string[] = [];
+    // Bail if a parent.destroy({children:true}) tore us down before our own
+    // destroy() ran — a queued rAF tick must not touch a nulled context.
+    if (this._destroyed || this.container?.destroyed) return cleared;
 
     for (const [id, sprite] of this.tiles) {
       if (sprite.container.destroyed || !sprite.container.position) {
@@ -334,6 +338,7 @@ export class TileRenderer {
   // ─── Cleanup ────────────────────────────────────────────────────
 
   destroy(): void {
+    this._destroyed = true;
     for (const sprite of this.tiles.values()) {
       sprite.container.destroy({ children: true });
     }
@@ -419,6 +424,9 @@ export class TileRenderer {
   }
 
   private drawTile(sprite: TileSprite): void {
+    // A state-change redraw can land after teardown destroyed this tile's
+    // Graphics (nulled context) — guard before .clear() (Sentry 1CW/1CK/1KM).
+    if (this._destroyed || sprite.bg?.destroyed) return;
     const { tileSize, cornerRadius } = this.config;
     const theme = this.themes[sprite.data.variant] ?? this.themes.standard;
     const selected = sprite.data.selected ?? false;

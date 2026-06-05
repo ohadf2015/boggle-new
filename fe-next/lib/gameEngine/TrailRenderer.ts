@@ -54,6 +54,10 @@ export class TrailRenderer {
   /** Clear all points */
   clear(): void {
     this.points = [];
+    // Guard the same post-unmount race as update(): a parent.destroy({children:true})
+    // can null this Graphics' context before our destroy() runs, turning .clear()
+    // into "Cannot read properties of null (reading 'clear')" (Sentry 1CW/1KM).
+    if (this._destroyed || this.graphics?.destroyed) return;
     this.graphics.clear();
   }
 
