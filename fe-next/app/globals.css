@@ -3646,6 +3646,17 @@ body.crazygames-embed .game-view-container,
   animation-iteration-count: infinite;
 }
 
+/* Timer-urgency border vignette — steady frame, faint ambient breathe.
+   Opacity-only + constant shadow spread = no grow/shrink of the frame. */
+@keyframes timer-vignette-ambient {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+.animate-timer-vignette-ambient {
+  animation: timer-vignette-ambient 2.4s ease-in-out infinite;
+}
+
 /* ── Round Event Tile Effects ── */
 @keyframes ice-crystal-shimmer {
   0% { background-position: -100% 0; }

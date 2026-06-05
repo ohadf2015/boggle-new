@@ -337,9 +337,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           className={cn(
             'fixed inset-0 pointer-events-none z-30 transition-all duration-500',
             timerUrgencyState === 'critical'
-              ? cn('shadow-[inset_0_0_60px_rgba(255,50,50,0.6)]', !reduceMotion && 'animate-pulse')
+              ? cn('shadow-[inset_0_0_60px_rgba(255,50,50,0.6)]', !reduceMotion && 'animate-timer-vignette-ambient')
               : timerUrgencyState === 'veryLow'
-              ? cn('shadow-[inset_0_0_40px_rgba(255,80,0,0.45)]', !reduceMotion && 'animate-pulse')
+              ? cn('shadow-[inset_0_0_40px_rgba(255,80,0,0.45)]', !reduceMotion && 'animate-timer-vignette-ambient')
               : 'shadow-[inset_0_0_30px_rgba(255,120,0,0.25)]',
           )}
         />
