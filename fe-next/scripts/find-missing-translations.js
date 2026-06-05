@@ -23,7 +23,7 @@ try {
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const TRANSLATIONS_FILE = path.join(PROJECT_ROOT, 'translations/index.js');
 const EXTENSIONS_TO_SCAN = ['.ts', '.tsx', '.js', '.jsx'];
-const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__', '__tests__', '__mocks__', 'e2e', 'playwright'];
+const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__', '__tests__', '__mocks__', 'e2e', 'playwright', 'coverage', '.turbo', 'out'];
 const FILE_PATTERNS_TO_EXCLUDE = [/\.test\.[tj]sx?$/, /\.spec\.[tj]sx?$/, /\.stories\.[tj]sx?$/];
 
 // Track dynamic/risky translation patterns that might fail at runtime
@@ -150,7 +150,11 @@ function getAllFiles(dir, files = []) {
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      if (!DIRS_TO_EXCLUDE.includes(entry.name)) {
+      // Skip build output (`.next`, `.next-verify`, `.next-verify2`, any `.next*`)
+      // and the static exclude list. Scanning minified build chunks produced bogus
+      // "missing keys" like "@", "\+", "=" and node-fetch vars, inflating the
+      // advisory to noise everyone ignored (2026-06-05).
+      if (!DIRS_TO_EXCLUDE.includes(entry.name) && !entry.name.startsWith('.next')) {
         getAllFiles(fullPath, files);
       }
     } else if (entry.isFile()) {
