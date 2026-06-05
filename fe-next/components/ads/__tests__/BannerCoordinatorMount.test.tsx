@@ -180,6 +180,50 @@ describe('BannerCoordinatorMount', () => {
     }
   });
 
+  it('re-asserts (debounced) on orientation change so the adaptive banner re-sizes/re-anchors', () => {
+    vi.useFakeTimers();
+    try {
+      render(<BannerCoordinatorMount />);
+      reassert.mockClear();
+      window.dispatchEvent(new Event('orientationchange'));
+      // debounced — not immediate
+      expect(reassert).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(250);
+      expect(reassert).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('coalesces a burst of resize events into a single reassert (rotation fires many)', () => {
+    vi.useFakeTimers();
+    try {
+      render(<BannerCoordinatorMount />);
+      reassert.mockClear();
+      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event('resize'));
+      vi.advanceTimersByTime(250);
+      expect(reassert).toHaveBeenCalledTimes(1); // debounced to one
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not listen for orientation/resize on web', () => {
+    vi.useFakeTimers();
+    try {
+      isNative.current = false;
+      render(<BannerCoordinatorMount />);
+      reassert.mockClear();
+      window.dispatchEvent(new Event('orientationchange'));
+      vi.advanceTimersByTime(250);
+      expect(reassert).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('does not inject ops on web', () => {
     isNative.current = false;
     render(<BannerCoordinatorMount />);

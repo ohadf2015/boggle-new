@@ -171,10 +171,14 @@ describe('BannerController', () => {
     expect(ops.show).toHaveBeenCalledWith(200, 'game');
   });
 
-  it('does nothing on suppress when no owner wants the banner', async () => {
+  it('calls hide on suppress even when no owner wants the banner (idempotent resilience)', async () => {
+    // When suppressed with no active request, we still call hide() to ensure
+    // the native banner is gone. This is idempotent (hide on nothing is benign)
+    // and provides resilience if prior state got out of sync with reality or
+    // if getConfig() early-return swallowed a prior hide call.
     c.setSuppressed(true);
     await c.whenIdle();
-    expect(ops.hide).not.toHaveBeenCalled();
+    expect(ops.hide).toHaveBeenCalledTimes(1); // Idempotent call
     expect(ops.show).not.toHaveBeenCalled();
   });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-community/admob';
 import { useAdMob } from '@/hooks/useAdMob';
@@ -17,6 +17,20 @@ import { bannerController } from '@/lib/native/bannerController';
 export default function BannerCoordinatorMount() {
   const { showBanner, hideBanner } = useAdMob();
 
+  // Capture showBanner/hideBanner in stable refs so the setup effect runs ONCE
+  // (deps=[]) without churning on each render. This prevents setOps from being
+  // called repeatedly on navigation, which was causing:
+  // - Native listener re-registration (3 add/3 remove cycles)
+  // - setOps(null) + setOps(newOps) churn resetting applied.visible
+  // - MutationObserver teardown leaving drawer unobserved
+  const showRef = useRef(showBanner);
+  const hideRef = useRef(hideBanner);
+
+  useEffect(() => {
+    showRef.current = showBanner;
+    hideRef.current = hideBanner;
+  }, [showBanner, hideBanner]);
+
   // App foreground: a backgrounded WebView can drop the banner's GPU surface —
   // re-assert so it repaints (no-op when no owner currently wants a banner).
   useAppLifecycle({ onForeground: () => void bannerController.reassert() });
@@ -26,8 +40,8 @@ export default function BannerCoordinatorMount() {
 
     bannerController.setOps({
       show: (margin, variant) =>
-        showBanner(BannerAdPosition.BOTTOM_CENTER, margin, { variant }),
-      hide: () => hideBanner(),
+        showRef.current(BannerAdPosition.BOTTOM_CENTER, margin, { variant }),
+      hide: () => hideRef.current(),
     });
 
     const removers: Array<() => void> = [];
@@ -49,6 +63,33 @@ export default function BannerCoordinatorMount() {
     };
     document.addEventListener('visibilitychange', onVisible);
     removers.push(() => document.removeEventListener('visibilitychange', onVisible));
+
+    // Orientation / resize: an adaptive banner is sized to the screen WIDTH at
+    // show time, so on portrait↔landscape rotation it keeps the stale width and
+    // mis-anchors. reassert() bumps the generation so reconcile re-shows the
+    // active request at the current width. Debounced — rotation fires a burst of
+    // resize events. Only the InlineBannerAd 'slot' self-heals on resize today;
+    // the anchor never re-asserted on rotation, so anchor-only surfaces stayed
+    // stale. NOTE: full WIDTH re-negotiation also needs the native patch to
+    // recreate (not reuse) the AdView on a width change — that's release-gated;
+    // this JS reassert is necessary but not sufficient until the native rebuild
+    // ships. It still fixes the margin/anchor + CSS-band (--admob-banner-height
+    // re-reported via SizeChanged) on rotation.
+    let orientationTimer: ReturnType<typeof setTimeout> | null = null;
+    const onOrientationOrResize = () => {
+      if (orientationTimer) clearTimeout(orientationTimer);
+      orientationTimer = setTimeout(() => {
+        orientationTimer = null;
+        void bannerController.reassert();
+      }, 250);
+    };
+    window.addEventListener('orientationchange', onOrientationOrResize);
+    window.addEventListener('resize', onOrientationOrResize, { passive: true });
+    removers.push(() => {
+      if (orientationTimer) clearTimeout(orientationTimer);
+      window.removeEventListener('orientationchange', onOrientationOrResize);
+      window.removeEventListener('resize', onOrientationOrResize);
+    });
 
     // Single drawer-suppress owner. The native banner is a SurfaceView that
     // composites ABOVE the WebView, so an open side menu can't cover it with
@@ -83,7 +124,7 @@ export default function BannerCoordinatorMount() {
       removers.forEach((r) => r());
       void bannerController.setOps(null);
     };
-  }, [showBanner, hideBanner]);
+  }, []);
 
   return null;
 }

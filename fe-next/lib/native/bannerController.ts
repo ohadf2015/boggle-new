@@ -98,9 +98,14 @@ export class BannerController {
   /** Inject the plugin ops (native mount) or null (web / teardown). */
   setOps(ops: BannerOps | null): Promise<void> {
     this.ops = ops;
-    // Re-paint from scratch on (re)attach: the previous native surface (if any)
-    // is gone, so force a reconcile rather than trusting cached applied state.
-    this.applied = { ...NO_BANNER };
+    // DO NOT reset applied state when re-wiring ops. The native SurfaceView
+    // survives a JS effect churn / re-render (e.g. BannerCoordinatorMount
+    // re-running due to callback identity changes). Falsely claiming
+    // "applied=NO_BANNER" causes suppress to skip hide() later because
+    // reconcile() sees applied.visible===false and believes nothing is shown.
+    // Instead, force a reconcile (which bumps generation so coalescing fails,
+    // genuinely re-showing the active request) — the forceReconcile will
+    // restore applied state to match reality per the active request.
     return ops ? this.forceReconcile() : Promise.resolve();
   }
 
@@ -191,7 +196,15 @@ export class BannerController {
     const active = this.suppressed ? null : selectActiveBannerRequest(this.requests);
 
     if (!active) {
-      if (this.applied.visible) {
+      // When suppressed (drawer open), always call hide() to be sure the native
+      // banner is gone, even if applied.visible===false (e.g. after a churn).
+      // If applied already claimed nothing shown, hide() is idempotent (plugin
+      // returns benign "no banner" error which useAdMob swallows). This resilience
+      // ensures suppress works even if:
+      // - setOps churn left applied={visible:false} despite native showing
+      // - getConfig() early-return in ops.hide() swallows the call last time
+      // - A prior reconcile's applied state got out of sync with native reality
+      if (this.applied.visible || this.suppressed) {
         await this.ops.hide();
         this.applied = { ...NO_BANNER };
       }
