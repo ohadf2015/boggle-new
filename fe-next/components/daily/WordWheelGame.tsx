@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Clock, Delete, RotateCcw, Sparkles, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
+import { Clock, Delete, RotateCcw, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { computeWheelRadius } from '@/lib/wordWheel/wheelGeometry';
@@ -786,7 +786,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             {builtLetters.length === 0 ? (
               <m.span
                 key="placeholder"
-                className="text-neo-white font-neo-display text-base sm:text-lg"
+                className="text-neo-white/55 font-medium text-sm sm:text-base"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -950,7 +950,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         className="h-[14px] sm:h-[16px] flex items-center justify-center"
       >
         {builtLetters.length > 0 && (
-          <p className="text-neo-white text-[10px] sm:text-xs text-center">
+          <p className="text-neo-white/45 text-[10px] sm:text-xs text-center">
             {t('wordWheel.tapToRemove')} &middot; {t('wordWheel.doubleTapToSubmit')}
           </p>
         )}
@@ -1028,12 +1028,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         ))}
       </div>
 
-      {/* ── Center letter rule hint ── (hidden on short viewports to reclaim
-          vertical room for the wheel; the same rule is shown on the intro/ready
-          screen, so no information is lost mid-game). */}
-      <p className="text-neo-white text-xs text-center short:hidden">
-        {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters', { min: '3' })}
-      </p>
+      {/* The center-letter + min-length rule was removed from the live board to
+          cut mid-game clutter — it's still presented on the intro/ready screen
+          and surfaced on demand via the "too short" / "missing center" toasts. */}
 
       {/* ── Action Buttons (inline below wheel, glued via flex cluster) ── */}
       <div
@@ -1073,10 +1070,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           animate={isValidating ? { opacity: [1, 0.6, 1] } : {}}
           transition={isValidating ? { duration: 0.6, repeat: Infinity } : {}}
         >
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            {t('wordWheel.submit')}
-          </div>
+          {t('wordWheel.submit')}
         </m.button>
 
         {/* Remove last letter */}
