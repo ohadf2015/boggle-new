@@ -19,7 +19,6 @@ import {
   hasPlayedWordWheelToday,
   getTodaysWordWheelResult,
   saveWordWheelResult,
-  hasPlayedWordHuntToday,
   getDailyStreak,
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
@@ -30,6 +29,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 
 // Lazy-load PixiJS effects canvas (no SSR)
@@ -74,10 +74,19 @@ const WordWheelChallenge: React.FC = () => {
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
   const [gameResult, setGameResult] = useState<WordWheelGameResult | null>(null);
   const [puzzleNumber, setPuzzleNumber] = useState(0);
-  const [hasPlayedWH, setHasPlayedWH] = useState(false);
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+
+  // Cross-promo gate: has the player finished today's Word Hunt (this language)?
+  // Resolved localStorage-first, then server-of-record (cross-device) — so the
+  // CTA flips to "Back to Daily Hub" even when this device never stored it.
+  const hasPlayedWH = useDailyModePlayed('word-hunt', language as Language, {
+    isAuthenticated,
+    playerId: profile?.id,
+    guestFingerprint,
+    isPractice,
+  });
 
   useEffect(() => {
     setGuestFingerprint(getGuestFingerprint());
@@ -104,26 +113,11 @@ const WordWheelChallenge: React.FC = () => {
   }, []);
 
   // Initialize puzzle
-  // Refresh hasPlayedWH whenever this tab regains focus so a wordhunt
-  // completion in another tab/route is reflected without remount.
-  useEffect(() => {
-    const refresh = () => setHasPlayedWH(hasPlayedWordHuntToday(language as Language));
-    refresh();
-    const onVis = () => { if (!document.hidden) refresh(); };
-    document.addEventListener('visibilitychange', onVis);
-    window.addEventListener('focus', refresh);
-    return () => {
-      document.removeEventListener('visibilitychange', onVis);
-      window.removeEventListener('focus', refresh);
-    };
-  }, [language, phase]);
-
   useEffect(() => {
     let isMounted = true;
     const date = getDailyChallengeDate();
     const number = getPuzzleNumber(date);
     setPuzzleNumber(number);
-    setHasPlayedWH(hasPlayedWordHuntToday(language as Language));
 
     const gameLang = language as Language;
 

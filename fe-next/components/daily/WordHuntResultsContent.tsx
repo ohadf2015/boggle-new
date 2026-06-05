@@ -20,8 +20,8 @@ import CatchUpSuggestion from './CatchUpSuggestion';
 import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
-import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
+import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
@@ -131,22 +131,22 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isStreakProtected = false,
   t,
 }) => {
-  // Lazy-init from localStorage so the cross-promo CTA doesn't flash on mount.
-  // If the player already finished the wheel, we want to show "Back to Daily Hub"
-  // on the very first paint, not after a useEffect fires.
-  const [wordWheelPlayed, setWordWheelPlayed] = useState(() =>
-    typeof window === 'undefined' ? false : hasPlayedWordWheelToday(language),
-  );
+  // Word Wheel completion gate: localStorage-first (no first-paint flash) then
+  // server-of-record cross-device check — so a player who finished the wheel on
+  // another device sees "Back to Daily Hub", not a nag to replay it.
+  const wordWheelPlayed = useDailyModePlayed('word-wheel', language, {
+    isAuthenticated,
+    playerId: profile?.id,
+    guestFingerprint,
+  });
   // Mirror for the Word Bridge (Connections) cross-promo — don't nudge a mode
   // the player already finished today. Lazy-init avoids a first-paint flash.
+  // (localStorage-only is fine here: Connections is a separate daily system.)
   const [connectionsPlayed, setConnectionsPlayed] = useState(() =>
     typeof window === 'undefined' ? false : hasPlayedConnectionsToday(),
   );
   useEffect(() => {
-    const refresh = () => {
-      setWordWheelPlayed(hasPlayedWordWheelToday(language));
-      setConnectionsPlayed(hasPlayedConnectionsToday());
-    };
+    const refresh = () => setConnectionsPlayed(hasPlayedConnectionsToday());
     refresh();
     const onVis = () => { if (!document.hidden) refresh(); };
     document.addEventListener('visibilitychange', onVis);
@@ -155,7 +155,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       document.removeEventListener('visibilitychange', onVis);
       window.removeEventListener('focus', refresh);
     };
-  }, [language]);
+  }, []);
 
   // A/B: cross-promo wheel-CTA placement vs leaderboard order.
   const { variant: crossPromoOrder, trackExposure: trackCrossPromoExposure } =
