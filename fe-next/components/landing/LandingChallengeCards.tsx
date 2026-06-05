@@ -13,7 +13,6 @@ import { useUserStats } from '@/hooks/useUserStats';
 import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';
-import { LeagueHomeSection } from '@/components/leagues/LeagueHomeSection';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -509,10 +508,6 @@ export function LandingChallengeCards({
 
   return (
     <div className="w-full max-w-5xl mx-auto xl:max-w-6xl space-y-5 md:space-y-6">
-      {/* "You vs your league" — prominent on every device; self-hides for guests
-          and players not yet in a league. */}
-      <LeagueHomeSection />
-
       {heroCards.length > 0 && (
         <div className="grid grid-cols-1 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto">
           {heroCards.map((mode) => renderCard(mode, nextIndex()))}
