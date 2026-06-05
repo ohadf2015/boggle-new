@@ -128,10 +128,41 @@ describe('PlayerWaitingView', () => {
     mockIsAuthenticated = false;
   });
 
-  describe('Ready Button', () => {
-    it('should not render ready button in lobby (ready only on results page)', () => {
+  describe('Ready Button (lobby)', () => {
+    it('renders the ready button when onToggleReady is provided', () => {
+      render(<PlayerWaitingView {...defaultProps} onToggleReady={vi.fn()} />);
+      // Rendered in both desktop + mobile layouts → at least one
+      expect(screen.getAllByTestId('ready-button').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('omits the ready button when no toggle handler (e.g. spectator)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
       expect(screen.queryByTestId('ready-button')).not.toBeInTheDocument();
+    });
+
+    it('calls onToggleReady when tapped', () => {
+      const onToggleReady = vi.fn();
+      render(<PlayerWaitingView {...defaultProps} onToggleReady={onToggleReady} />);
+      fireEvent.click(screen.getAllByTestId('ready-button')[0]);
+      expect(onToggleReady).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows confirmed label + aria-pressed when ready', () => {
+      render(<PlayerWaitingView {...defaultProps} onToggleReady={vi.fn()} isReady />);
+      const btn = screen.getAllByTestId('ready-button')[0];
+      expect(btn).toHaveAttribute('aria-pressed', 'true');
+      expect(screen.getAllByText('playerView.readyConfirmed').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('renders a ready badge for each ready roster player', () => {
+      render(
+        <PlayerWaitingView
+          {...defaultProps}
+          onToggleReady={vi.fn()}
+          readyUsernames={['Player2']}
+        />,
+      );
+      expect(screen.getAllByTestId('roster-ready-badge').length).toBeGreaterThanOrEqual(1);
     });
   });
 

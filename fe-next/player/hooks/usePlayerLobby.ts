@@ -7,12 +7,14 @@ interface UsePlayerLobbyParams {
   gameActive: boolean;
   showModeReveal: boolean;
   showStartAnimation: boolean;
+  /** Own username — used to derive whether self is in the ready list */
+  username?: string;
   onUsernameChange?: (newName: string) => void;
 }
 
 /**
  * Manages lobby-phase socket listeners and state:
- * - playersReadyUpdate tracking
+ * - playersReadyUpdate tracking + ready toggle (emits `lobbyReady`)
  * - gameStarting loading indicator
  * - Guest name change flow
  */
@@ -21,22 +23,38 @@ export function usePlayerLobby({
   gameActive,
   showModeReveal,
   showStartAnimation,
+  username,
   onUsernameChange,
 }: UsePlayerLobbyParams) {
   const [isGameLoading, setIsGameLoading] = useState(false);
   const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
+  const [readyUsernames, setReadyUsernames] = useState<string[]>([]);
 
-  // Lobby ready: listen for playersReadyUpdate during waiting state
+  // Whoever's name is in the server's ready list is ready (host is never listed).
+  const isReady = username ? readyUsernames.includes(username) : false;
+
+  // Optimistic toggle — emit the OPPOSITE of current state. Server echoes the
+  // authoritative `playersReadyUpdate`, so we don't locally mutate the list.
+  const toggleReady = useCallback(() => {
+    socket?.emit('lobbyReady', { ready: !isReady });
+  }, [socket, isReady]);
+
+  // Lobby ready: mirror the server's ready list during the waiting state, and
+  // clear it on resetGame so a fresh round's lobby never shows stale entries.
   useEffect(() => {
     if (!socket || gameActive) return;
 
     const handleLobbyReadyUpdate = (data: { readyCount: number; totalPlayers: number; readyUsernames?: string[] }) => {
-      // readyUsernames tracked for potential future UI display
-      void data;
+      setReadyUsernames(data?.readyUsernames ?? []);
     };
+    const handleResetGame = () => { setReadyUsernames([]); };
 
     socket.on('playersReadyUpdate', handleLobbyReadyUpdate);
-    return () => { socket.off('playersReadyUpdate', handleLobbyReadyUpdate); };
+    socket.on('resetGame', handleResetGame);
+    return () => {
+      socket.off('playersReadyUpdate', handleLobbyReadyUpdate);
+      socket.off('resetGame', handleResetGame);
+    };
   }, [socket, gameActive]);
 
   // Listen for gameStarting — lightweight pre-notification before heavy server processing
@@ -76,5 +94,5 @@ export function usePlayerLobby({
     return () => { socket.off('guestNameUpdated', handleNameUpdated); };
   }, [socket, onUsernameChange]);
 
-  return { isGameLoading, gameLanguage, setGameLanguage, handleNameChange };
+  return { isGameLoading, gameLanguage, setGameLanguage, handleNameChange, readyUsernames, isReady, toggleReady };
 }

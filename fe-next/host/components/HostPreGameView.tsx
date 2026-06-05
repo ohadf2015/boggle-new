@@ -84,6 +84,8 @@ interface HostPreGameViewProps {
   hostPlaying: boolean;
   setHostPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   playersReady: (string | PlayerData)[];
+  /** Usernames the server reports as lobby-ready (non-host). */
+  readyUsernames?: string[];
   playerWordCounts: Record<string, number>;
   shufflingGrid: LetterGrid | null;
   highlightedCells: { row: number; col: number }[];
@@ -120,6 +122,7 @@ function HostPreGameView({
   hostPlaying,
   setHostPlaying,
   playersReady,
+  readyUsernames = [],
   onStartGame,
   onExitRoom,
   tournamentCreating,
@@ -447,6 +450,7 @@ function HostPreGameView({
                     gameCode={gameCode}
                     maxPlayers={maxPlayers}
                     hostLabel={t('hostView.wonderhostLeader')}
+                    readyUsernames={readyUsernames}
                     t={t}
                     onSelfAvatarClick={handleOpenAvatarBuilder}
                     onSelfNameChange={handleSelfNameChange}
@@ -507,6 +511,7 @@ function HostPreGameView({
                 gameCode={gameCode}
                 maxPlayers={maxPlayers}
                 hostLabel={t('hostView.wonderhostLeader')}
+                readyUsernames={readyUsernames}
                 t={t}
                 compact
                 onSelfAvatarClick={handleOpenAvatarBuilder}

@@ -12,6 +12,7 @@ import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
+import { LobbyReactions } from '../../components/lobby/LobbyReactions';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
@@ -55,6 +56,12 @@ interface PlayerWaitingViewProps {
   onConfirmExit: () => void;
   onNameChange?: (newName: string) => void;
   onAvatarChange?: (config: CustomAvatarConfig) => void;
+  /** Usernames the server reports as ready (non-host). Drives roster badges. */
+  readyUsernames?: string[];
+  /** Whether the local player is ready. */
+  isReady?: boolean;
+  /** Toggle local ready state (emits `lobbyReady`). Absent on host/spectator. */
+  onToggleReady?: () => void;
 }
 
 const MAX_PLAYERS = 8;
@@ -73,6 +80,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onConfirmExit,
   onNameChange,
   onAvatarChange,
+  readyUsernames = [],
+  isReady = false,
+  onToggleReady,
 }): React.ReactElement => {
   const { isAuthenticated, updateProfile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -92,6 +102,21 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   const nonHostPlayers = playersReady;
   const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
+
+  // Ready-state lookups for roster badges + the "N/M ready" status line.
+  // Bots auto-count as ready; host clicks Start (never "Ready") so is excluded.
+  const readySet = new Set(readyUsernames);
+  const readyTotal = nonHostPlayers.filter((p) => {
+    const o = typeof p === 'object' ? p : null;
+    return !o?.isHost && !o?.isBot;
+  }).length;
+  const readyCount = nonHostPlayers.filter((p) => {
+    const o = typeof p === 'object' ? p : null;
+    const nm = typeof p === 'string' ? p : p.username;
+    // Match server `getPlayersReadyCount`: humans only, host + bots excluded.
+    if (o?.isHost || o?.isBot) return false;
+    return readySet.has(nm);
+  }).length;
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState(username);
@@ -186,11 +211,38 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             </div>
           )}
 
-          <div className="flex items-center gap-2 mt-1.5">
-            <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse" />
-            <p className="text-sm text-slate-400">
-              {t('playerView.hostWillStart')}
-            </p>
+          {/* Ready toggle — lets a non-host signal the host they're set to go.
+              Advisory only: the host can still start whenever they like. */}
+          {onToggleReady ? (
+            <m.button
+              type="button"
+              data-testid="ready-button"
+              onClick={onToggleReady}
+              whileTap={{ scale: 0.96 }}
+              aria-pressed={isReady}
+              className={cn(
+                'mt-3 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide shadow-hard transition-colors',
+                isReady
+                  ? 'bg-neo-lime text-neo-black'
+                  : 'bg-neo-navy-light text-neo-cream hover:bg-white/10',
+              )}
+            >
+              {isReady ? <Check className="w-4 h-4 stroke-[3]" /> : <Zap className="w-4 h-4" />}
+              <span>{isReady ? t('playerView.readyConfirmed') : t('playerView.readyUp')}</span>
+            </m.button>
+          ) : null}
+
+          <div className="flex items-center justify-between gap-2 mt-1.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse shrink-0" />
+              <p className="text-sm text-slate-400 truncate">
+                {readyCount > 0
+                  ? `${readyCount}/${readyTotal} ${t('hostView.playersReady')}`
+                  : t('playerView.hostWillStart')}
+              </p>
+            </div>
+            {/* Ambient social toy — fling emoji while waiting (reuses quickReaction) */}
+            <LobbyReactions username={username} />
           </div>
 
           <div className="mt-3">
@@ -265,6 +317,16 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                   {isBot && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-cyan border-2 border-neo-black rounded-full flex items-center justify-center">
                       <Bot className="w-3 h-3 text-neo-black" />
+                    </div>
+                  )}
+                  {/* Ready badge — non-host humans the server marked ready */}
+                  {!isHostPlayer && !isBot && readySet.has(name) && (
+                    <div
+                      data-testid="roster-ready-badge"
+                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
+                      aria-label={t('playerView.readyConfirmed')}
+                    >
+                      <Check className="w-3 h-3 text-neo-black stroke-[3]" />
                     </div>
                   )}
                 </div>

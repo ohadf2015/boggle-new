@@ -693,6 +693,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           hostPlaying={settings.hostPlaying}
           setHostPlaying={state.setHostPlaying}
           playersReady={players.playersReady as any}
+          readyUsernames={playersReadyData?.readyUsernames ?? []}
           playerWordCounts={players.playerWordCounts}
           shufflingGrid={animation.shufflingGrid}
           highlightedCells={animation.highlightedCells}

@@ -38,6 +38,8 @@ interface PlayerRosterProps {
   canEditSelfName?: boolean;
   /** Optional element rendered on the right side of the header row (e.g., TV/projector toggle) */
   headerExtra?: React.ReactNode;
+  /** Usernames the server reports as lobby-ready (non-host). Shows check badges + a count. */
+  readyUsernames?: string[];
 }
 
 const AVATAR_RING_COLORS = ['ring-neo-cyan/40', 'ring-neo-pink/40', 'ring-purple-400/40', 'ring-neo-lime/40', 'ring-neo-yellow/40', 'ring-orange-400/40', 'ring-teal-400/40', 'ring-rose-400/40'];
@@ -86,8 +88,23 @@ const reducedMotionVariants = {
   exit: { opacity: 0, transition: { duration: 0 } },
 };
 
-export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false, headerExtra }: PlayerRosterProps): React.ReactElement {
+export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false, headerExtra, readyUsernames = [] }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
+
+  // Ready lookups — bots auto-count as ready; host clicks Start (never "Ready").
+  const readySet = new Set(readyUsernames);
+  const rosterReadyEligible = players.filter((p) => {
+    const o = typeof p === 'object' ? p : null;
+    return !o?.isHost && !o?.isBot;
+  }).length;
+  const rosterReadyCount = players.filter((p) => {
+    const o = typeof p === 'object' ? p : null;
+    const nm = typeof p === 'string' ? p : p.username;
+    // Match server `getPlayersReadyCount`: humans only, host + bots excluded.
+    if (o?.isHost || o?.isBot) return false;
+    return readySet.has(nm);
+  }).length;
+  const showReadyCount = rosterReadyEligible > 0;
 
   const [isEditingSelfName, setIsEditingSelfName] = useState(false);
   const [selfNameDraft, setSelfNameDraft] = useState(username);
@@ -140,8 +157,21 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
     <section className={cn(compact ? 'space-y-1' : 'space-y-3', 'overflow-visible')}>
       {/* Header row — title left, optional extra (e.g. TV toggle) right */}
       <div className="flex items-center justify-between gap-2 px-1">
-        <h2 className={cn('font-bold uppercase tracking-widest text-slate-500', compact ? 'text-[10px]' : 'text-xs')}>
+        <h2 className={cn('font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2', compact ? 'text-[10px]' : 'text-xs')}>
           {t('hostView.playersInRoom')}
+          {showReadyCount ? (
+            <span
+              data-testid="roster-ready-count"
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-1.5 py-0.5 font-black leading-none',
+                compact ? 'text-[9px]' : 'text-[10px]',
+                rosterReadyCount >= rosterReadyEligible ? 'bg-neo-lime text-neo-black' : 'bg-white/10 text-neo-cream',
+              )}
+            >
+              <Check className={cn('stroke-[3]', compact ? 'w-2.5 h-2.5' : 'w-3 h-3')} />
+              {rosterReadyCount}/{rosterReadyEligible} {t('hostView.playersReady')}
+            </span>
+          ) : null}
         </h2>
         {headerExtra ? <div className="shrink-0">{headerExtra}</div> : null}
       </div>
@@ -263,6 +293,17 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                   {isBot && diffConfig && (
                     <span className="absolute -bottom-1 -inset-e-1 text-sm" aria-label={t('hostView.bot')}>
                       {diffConfig.emoji}
+                    </span>
+                  )}
+
+                  {/* Ready badge — non-host humans the server marked ready */}
+                  {!isHostPlayer && !isBot && readySet.has(name) && (
+                    <span
+                      data-testid="roster-ready-badge"
+                      className="absolute -bottom-1 -inset-e-1 w-5 h-5 rounded-full bg-neo-lime border-2 border-neo-black flex items-center justify-center shadow-hard-sm"
+                      aria-label={t('playerView.readyConfirmed')}
+                    >
+                      <Check className="w-3 h-3 text-neo-black stroke-3" />
                     </span>
                   )}
                 </div>

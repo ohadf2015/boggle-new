@@ -51,6 +51,7 @@ import {
   useGameActions,
   useGameMode,
   useGameStore,
+  useGameLanguage,
 } from '@/hooks/gameState';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -212,14 +213,23 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     gameActive,
   });
 
-  // Lobby state (loading indicator, name change, game language)
-  const { isGameLoading, gameLanguage, setGameLanguage, handleNameChange } = usePlayerLobby({
+  // Lobby state (loading indicator, name change, ready-up)
+  const { isGameLoading, handleNameChange, readyUsernames, isReady, toggleReady } = usePlayerLobby({
     socket,
     gameActive,
     showModeReveal,
     showStartAnimation,
+    username,
     onUsernameChange,
   });
+
+  // Authoritative game language lives in the Zustand store (written by
+  // usePlayerGameEvents on the startGame socket event). usePlayerLobby's old
+  // local `gameLanguage` useState was never set → in-game it stayed null →
+  // useWordSubmission's `|| 'en'` fallback rejected valid Spanish accented
+  // words (á é í ó ú ü ñ). Read the store; roomLanguage is the lobby fallback.
+  const storeGameLanguage = useGameLanguage();
+  const resolvedGameLanguage = storeGameLanguage || roomLanguage || null;
 
   // Avatar change handler — emits socket event so other players see the update
   const handleAvatarChange = useCallback((config: CustomAvatarConfig) => {
@@ -467,7 +477,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         timerSetTime(pendingGameStart.timerSeconds);
       }
       setMinWordLength(pendingGameStart.minWordLength ?? 2);
-      if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
+      // Reassert the authoritative language in the store on reconnect (in-game
+      // validation reads the store via resolvedGameLanguage, not a local).
+      if (pendingGameStart.language) useGameStore.setState({ gameLanguage: pendingGameStart.language });
       onGameStartConsumed();
       return;
     }
@@ -526,8 +538,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     const isLateJoin = pendingGameStart.messageId?.startsWith('late-join-');
     const delay = isLateJoin ? 1500 : 0; // 1.5 second delay for late joins to show room code
 
-    // Set game language immediately so waiting screen shows correct language
-    if (pendingGameStart.language) setGameLanguage(pendingGameStart.language);
+    // Game language already written to the store above (storeUpdates.gameLanguage);
+    // the waiting + in-game views read it via resolvedGameLanguage.
 
     const startGame = () => {
       // Set game data and start animation
@@ -573,7 +585,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       startGame();
       return;
     }
-  }, [pendingGameStart, socket, onGameStartConsumed, handleGameStartMusic, timerReset, timerSetTime, setFoundWords, setLetterGrid, setGameLanguage]);
+  }, [pendingGameStart, socket, onGameStartConsumed, handleGameStartMusic, timerReset, timerSetTime, setFoundWords, setLetterGrid]);
 
 
   // Word submission handler - adds word with pending validation state
@@ -642,7 +654,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     return (
       <PlayerWaitingView
           gameCode={gameCode}
-          gameLanguage={gameLanguage || roomLanguage || null}
+          gameLanguage={resolvedGameLanguage}
           username={username}
           t={t}
           playersReady={playersReady}
@@ -654,6 +666,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           onConfirmExit={confirmExitRoom}
           onNameChange={handleNameChange}
           onAvatarChange={handleAvatarChange}
+          readyUsernames={readyUsernames}
+          isReady={isReady}
+          onToggleReady={toggleReady}
         />
     );
   }
@@ -733,7 +748,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         gameActive={gameActive}
         showStartAnimation={showModeReveal || showStartAnimation}
         remainingTime={remainingTime}
-        gameLanguage={gameLanguage}
+        gameLanguage={resolvedGameLanguage}
         minWordLength={minWordLength}
         comboLevel={comboLevel}
         comboLevelRef={comboLevelRef}
