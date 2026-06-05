@@ -13,6 +13,7 @@ import {
   getSocketURL,
 } from '@/utils/SocketContext';
 import { saveSession, clearSessionPreservingUsername, getSession } from '@/utils/session';
+import { setGuestName } from '@/utils/guestManager';
 import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
@@ -245,6 +246,14 @@ export function useMultiplayerSocket(
     // Game events
     socketInstance.on('joined', (data) => {
       logger.log('[SOCKET.IO] ✅ Joined successfully:', data);
+      // Forward-only: persist a GUEST's chosen room name so it reaches analytics
+      // (game_completed metadata.guest_name via getGuestName). Without this the
+      // admin game log can only show a guest's session-id fragment, never their
+      // name. Authed players carry their identity separately — skip them.
+      const isGuest = !(socketInstance.auth as Record<string, unknown> | undefined)?.token;
+      if (isGuest && data.username) {
+        setGuestName(data.username);
+      }
       addGameBreadcrumb('room_joined', {
         gameCode: data.gameCode,
         isHost: data.isHost,

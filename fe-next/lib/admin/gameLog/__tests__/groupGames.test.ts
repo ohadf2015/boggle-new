@@ -201,6 +201,55 @@ describe('groupGames — display name & per-player fields', () => {
   });
 });
 
+describe('groupGames — robust identity resolution', () => {
+  it('resolves the name from ANY row when the terminal (stat) row has no profile', () => {
+    // Real-world: the route attaches a profile per player_id, but a race / mixed
+    // batch can leave the terminal row without it while the started row has it.
+    // Identity must be decoupled from the terminal-preferred stat row.
+    const rows = [
+      game({ id: 's', event_type: 'game_started', is_multiplayer: true, game_code: 'RID', player_id: 'p1',
+        profiles: { username: 'Sara', display_name: null, avatar_emoji: null, avatar_color: null } }),
+      game({ id: 'c', event_type: 'game_completed', is_multiplayer: true, game_code: 'RID', player_id: 'p1',
+        profiles: null, score: 30 }),
+    ];
+    const p = groupGames(rows)[0].players[0];
+    expect(p.score).toBe(30); // stats still from terminal row
+    expect(p.displayName).toBe('Sara'); // identity scanned from the started row
+    expect(p.profile?.username).toBe('Sara');
+  });
+
+  it('resolves a guest name from any row carrying guest_name', () => {
+    const rows = [
+      game({ id: 's', event_type: 'game_started', is_multiplayer: true, game_code: 'RG', guest_session_id: 'guest_1_x', guest_name: 'CleverFox' }),
+      game({ id: 'c', event_type: 'game_completed', is_multiplayer: true, game_code: 'RG', guest_session_id: 'guest_1_x', guest_name: null, score: 12 }),
+    ];
+    const p = groupGames(rows)[0].players[0];
+    expect(p.displayName).toBe('CleverFox');
+  });
+});
+
+describe('groupGames — invited-by (non-host MP players)', () => {
+  it('sets invitedByName to the host display name for a non-host multiplayer player', () => {
+    const rows = [
+      game({ id: 'h', event_type: 'game_completed', is_multiplayer: true, game_code: 'INV', player_id: 'host1', role: 'host', score: 10,
+        profiles: { username: 'Maya', display_name: null, avatar_emoji: null, avatar_color: null } }),
+      game({ id: 'g', event_type: 'game_completed', is_multiplayer: true, game_code: 'INV', guest_session_id: 's2', role: 'player', guest_name: 'Joiner', score: 5 }),
+    ];
+    const g = groupGames(rows)[0];
+    const host = g.players.find((p) => p.isHost)!;
+    const joiner = g.players.find((p) => !p.isHost)!;
+    expect(host.invitedByName).toBeNull();
+    expect(joiner.invitedByName).toBe('Maya');
+  });
+
+  it('leaves invitedByName null for solo plays', () => {
+    const rows = [
+      game({ id: 'a', is_multiplayer: false, player_id: 'p1' }),
+    ];
+    expect(groupGames(rows)[0].players[0].invitedByName).toBeNull();
+  });
+});
+
 describe('groupGames — group ordering & aggregates', () => {
   it('sorts groups by createdAt descending and computes top score', () => {
     const rows = [

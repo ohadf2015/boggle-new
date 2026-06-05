@@ -37,6 +37,12 @@ export interface GamePlayer {
   profile: GameProfile | null;
   isHost: boolean;
   role: string | null;
+  /**
+   * Display name of the host whose room this (non-host) player joined. Today every
+   * non-host multiplayer player joined via the host's room code (matchmaking is not
+   * UI-wired), so this reads as "invited by". Null for hosts and solo plays.
+   */
+  invitedByName: string | null;
   score: number;
   wordCount: number;
   isWinner: boolean | null;
@@ -110,6 +116,27 @@ function displayNameFor(g: UnifiedGame): string {
   return shortGuest(g.guest_session_id);
 }
 
+/**
+ * Resolve a player's identity (display name + profile) by scanning ALL of their
+ * rows, NOT just the terminal-preferred stat row. A player's profile / guest_name
+ * can live on a different event than the one chosen for score (e.g. profile on the
+ * game_started row, terminal row's join missed) — decoupling identity from the
+ * stat row stops the log rendering a real player as "Player {id8}" / "Guest {id}".
+ */
+function resolveIdentity(
+  rows: UnifiedGame[],
+  best: UnifiedGame,
+): { displayName: string; profile: GameProfile | null } {
+  const withProfile = rows.find((r) => r.profiles?.username || r.profiles?.display_name);
+  const profile = withProfile?.profiles ?? best.profiles ?? null;
+  if (profile?.username) return { displayName: profile.username, profile };
+
+  const named = rows.find((r) => r.guest_name);
+  if (named?.guest_name) return { displayName: named.guest_name, profile };
+
+  return { displayName: displayNameFor(best), profile };
+}
+
 function errorReasonOf(g: UnifiedGame): string | null {
   return g.error_reason ?? null;
 }
@@ -155,15 +182,18 @@ function buildPlayer(acc: PlayerAccumulator): GamePlayer {
       ? 'completed'
       : 'abandoned';
 
+  const identity = resolveIdentity(rows, best);
+
   return {
     key: acc.key,
     playerId: best.player_id,
     guestSessionId: best.guest_session_id,
     isGuest: isGuestPlayer(best),
-    displayName: displayNameFor(best),
-    profile: best.profiles,
+    displayName: identity.displayName,
+    profile: identity.profile,
     isHost,
     role,
+    invitedByName: null, // set in buildGroup once the host is known
     score: best.score ?? 0,
     wordCount: best.word_count ?? 0,
     isWinner: best.is_winner ?? null,
@@ -254,6 +284,16 @@ function buildGroup(
 
   const host = players.find((p) => p.isHost) ?? players[0] ?? null;
   const hostAcquisition = host?.acquisition ?? null;
+
+  // "Invited by" — a non-host player in a multiplayer room joined via the host's
+  // code. Only attribute when a TRUE host (role=host) exists; a fallback-earliest
+  // host isn't a real inviter. Mutates the just-built player objects in place.
+  const realHost = players.find((p) => p.isHost);
+  if (isMultiplayer && realHost) {
+    for (const p of players) {
+      if (!p.isHost) p.invitedByName = realHost.displayName;
+    }
+  }
 
   const botCounts = rows.map((r) => r.bot_count).filter((n): n is number => typeof n === 'number');
 

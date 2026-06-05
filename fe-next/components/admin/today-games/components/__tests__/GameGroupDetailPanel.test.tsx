@@ -14,6 +14,7 @@ const mockGamePlayer = (overrides?: Partial<GamePlayer>): GamePlayer => ({
   profile: null,
   isHost: true,
   role: 'host',
+  invitedByName: null,
   score: 100,
   wordCount: 5,
   isWinner: null,
@@ -105,6 +106,29 @@ describe('GameGroupDetailPanel', () => {
     render(<GameGroupDetailPanel group={group} t={mockT} />);
 
     expect(screen.getByText('Winner', { exact: false })).toBeInTheDocument();
+  });
+
+  it('shows a "Left mid-game" badge for an abandoned player (explains 0/0)', () => {
+    const group = mockGameGroup({
+      players: [
+        mockGamePlayer({ status: 'abandoned', displayName: 'Alice', score: 0, wordCount: 0 }),
+      ],
+    });
+    render(<GameGroupDetailPanel group={group} t={mockT} />);
+
+    expect(screen.getByText('Left mid-game', { exact: false })).toBeInTheDocument();
+  });
+
+  it('shows who invited a non-host multiplayer player', () => {
+    const group = mockGameGroup({
+      players: [
+        mockGamePlayer({ key: 'p2', displayName: 'Bob', isHost: false, invitedByName: 'Alice' }),
+      ],
+    });
+    const { container } = render(<GameGroupDetailPanel group={group} t={mockT} />);
+
+    expect(container.textContent).toContain('Invited by');
+    expect(container.textContent).toContain('Alice');
   });
 
   it('shows error status badge for errored player', () => {

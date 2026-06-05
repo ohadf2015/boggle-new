@@ -78,7 +78,15 @@ function PlayerRow({ player, t }: { player: GamePlayer; t: (key: string, fallbac
             {player.status === 'errored' && (
               <span className="text-[9px] bg-neo-red/20 text-neo-red px-1 rounded">{t('admin.todayGames.status.errored', 'Error')}</span>
             )}
+            {player.status === 'abandoned' && (
+              <span className="text-[9px] bg-neo-orange/20 text-neo-orange px-1 rounded">{t('admin.todayGames.status.left', 'Left mid-game')}</span>
+            )}
           </div>
+          {player.invitedByName && (
+            <div className="text-[10px] text-slate-500 mt-0.5">
+              {t('admin.todayGames.detail.invitedBy', 'Invited by')} <span className="text-slate-300">{player.invitedByName}</span>
+            </div>
+          )}
         </div>
       </div>
 
