@@ -115,6 +115,10 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
     socket.on('party:phaseChange', onPhaseChange);
     socket.on('party:caption:voteResults', onVoteResults);
 
+    // Ask the server to replay current state — covers mounting on the start
+    // transition (or a late join), where the one-shot imageReady was missed.
+    socket.emit('party:requestState');
+
     return () => {
       socket.off('party:caption:imageReady', onImageReady);
       socket.off('party:caption:revealCaption', onRevealCaption);

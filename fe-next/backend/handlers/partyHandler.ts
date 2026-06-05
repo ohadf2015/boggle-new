@@ -16,6 +16,7 @@ import {
   submitLaugh,
   submitVote as submitCaptionVote,
   cleanupCaptionClash,
+  resendCaptionState,
 } from '../modules/party/captionClashEngine.js';
 import {
   initPixelClash,
@@ -397,6 +398,18 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
     room.settings.custom.solo = true;
     room.lastActivity = Date.now();
     broadcastToRoom(io, room.roomCode, 'party:gameUpdate', getPublicRoomState(room));
+  });
+
+  // ---- Request Current State (state-on-demand) ----
+  // A game view mounting on the start transition can miss one-shot phase events
+  // (e.g. caption imageReady). The view requests state on mount and we replay
+  // the current view to just that socket. No-op if not in a room.
+  socket.on('party:requestState', () => {
+    const room = getPlayerRoom(socket.id);
+    if (!room) return;
+    if (room.gameId === 'caption-clash') {
+      resendCaptionState(io, room.roomCode, socket.id);
+    }
   });
 
   // ---- Start Game ----

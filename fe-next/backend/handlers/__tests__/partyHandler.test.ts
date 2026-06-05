@@ -7,7 +7,7 @@ import {
 } from '../partyHandler';
 import { canAccessFeature } from '../../utils/featureFlags';
 import { makeBotPlayers, startPartyBotDriver } from '../../modules/party/partyBots';
-import { initCaptionClash } from '../../modules/party/captionClashEngine';
+import { initCaptionClash, resendCaptionState } from '../../modules/party/captionClashEngine';
 import { initPixelClash } from '../../modules/party/pixelClashEngine';
 
 // Mock all party-engine modules so tests don't depend on engine internals.
@@ -27,6 +27,7 @@ vi.mock('../../modules/party/captionClashEngine', () => ({
   submitLaugh: vi.fn(),
   submitVote: vi.fn(),
   cleanupCaptionClash: vi.fn(),
+  resendCaptionState: vi.fn(),
 }));
 vi.mock('../../modules/party/pixelClashEngine', () => ({
   initPixelClash: vi.fn(),
@@ -457,6 +458,30 @@ describe('partyHandler', () => {
       handlers['party:startGame']();
 
       expect(vi.mocked(initPixelClash).mock.calls[0]?.[2]).toBe('showdown');
+    });
+  });
+
+  describe('party:requestState', () => {
+    it('replays current caption state to the requesting socket (fixes round-1 stall)', async () => {
+      const { socket, handlers } = createMockSocket('host');
+      const { io } = createMockIo();
+      registerPartyHandlers(io, socket);
+      await handlers['party:create']({ gameId: 'caption-clash', roomName: 'R', username: 'Host', avatar: {} });
+      const room = Array.from(partyRooms.values())[0];
+
+      handlers['party:requestState']();
+
+      expect(resendCaptionState).toHaveBeenCalledWith(io, room.roomCode, 'host');
+    });
+
+    it('is a no-op when the socket is not in a room', () => {
+      const { socket, handlers } = createMockSocket('orphan');
+      const { io } = createMockIo();
+      registerPartyHandlers(io, socket);
+
+      handlers['party:requestState']();
+
+      expect(resendCaptionState).not.toHaveBeenCalled();
     });
   });
 });

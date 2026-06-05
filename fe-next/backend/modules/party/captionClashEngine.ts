@@ -483,3 +483,29 @@ export function cleanupCaptionClash(roomCode: string): void {
 export function getCaptionGameState(roomCode: string): CaptionGameState | undefined {
   return activeGames.get(roomCode);
 }
+
+/**
+ * Re-send the current round's image to ONE socket (state-on-demand).
+ * Fixes the round-1 "Starting..." race: party:caption:imageReady is a one-shot
+ * broadcast at round start, so a phone that mounts on the start transition (or
+ * a late joiner) misses it. The client requests state on mount and we replay
+ * the image just to that socket.
+ */
+export function resendCaptionState(io: Server, roomCode: string, socketId: string): void {
+  const game = activeGames.get(roomCode);
+  if (!game) return;
+  const round = game.rounds[game.rounds.length - 1];
+  if (!round) return;
+  if (round.phase === 'writing' || round.phase === 'speed-writing') {
+    io.to(socketId).emit('party:caption:imageReady', {
+      imageUrl: round.imageUrl,
+      imageId: round.imageId,
+      round: round.roundNumber,
+      totalRounds: game.totalRounds,
+      isSpeedRound: round.isSpeedRound,
+      isRoastRound: round.isRoastRound,
+      roastTarget: round.roastTarget,
+      writeTimeSeconds: round.isSpeedRound ? 15 : 45,
+    });
+  }
+}
