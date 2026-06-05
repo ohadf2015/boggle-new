@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { validateWordLocally, couldBeOnBoard } from '@/utils/clientWordValidator';
+import { reportUnresolvedGameLanguage } from '@/utils/languageTelemetry';
 import { useWordHuntMultiplayerBridge } from './hooks/useWordHuntMultiplayerBridge';
 import { WordHuntGameLayout } from './WordHuntGameLayout';
 import { WordHuntDangerToast } from './WordHuntDangerToast';
@@ -138,6 +139,15 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
 
   // Handle word submission — validate locally, emit to server, dual submission
   function handleWordSubmit(word: string) {
+    // Tripwire: live submission with no resolved language → `|| 'en'` fallback
+    // would reject valid accented words. Report a recurrence (see PlayerView fix).
+    if (!gameLanguage) {
+      reportUnresolvedGameLanguage({
+        where: 'wordhunt-submit',
+        hasBoard: Array.isArray(grid) && grid.length > 0,
+      });
+    }
+
     const lang = gameLanguage || 'en';
 
     // Client-side validation

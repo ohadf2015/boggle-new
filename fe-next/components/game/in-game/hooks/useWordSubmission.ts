@@ -6,6 +6,7 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 import type { FoundWord } from '@/shared/types/view';
 import type { WordFeedback } from '../../WordFormingArea';
 import { validateWordLocally, couldBeOnBoard, normalizeWord } from '@/utils/clientWordValidator';
+import { reportUnresolvedGameLanguage } from '@/utils/languageTelemetry';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import type { TranslationFn } from '../types';
 
@@ -84,6 +85,16 @@ export function useWordSubmission(
 
   const handleGridWordSubmit = useCallback((formedWord: string, meta?: { inputMethod: 'kb' | 'drag' }): void => {
     if (!isPlaying) return;
+
+    // Tripwire: a live submission with no resolved language means the language
+    // wasn't threaded here → the `|| 'en'` fallback would reject valid accented
+    // words. Healthy games always have a language, so report a recurrence.
+    if (!gameLanguage) {
+      reportUnresolvedGameLanguage({
+        where: 'mp-word-submit',
+        hasBoard: Array.isArray(letterGrid) && letterGrid.length > 0,
+      });
+    }
 
     const currentLang = gameLanguage || 'en';
 
