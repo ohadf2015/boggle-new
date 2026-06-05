@@ -156,7 +156,11 @@ async function checkIsAdmin(userId: string): Promise<boolean> {
       .from('profiles')
       .select('is_admin')
       .eq('id', userId)
-      .single();
+      // maybeSingle() tolerates 0 rows (returns {data:null,error:null}); .single()
+      // throws PGRST116 "Cannot coerce…" for users without a profile row — e.g. the
+      // all-zeros sentinel UUID probed via curl (Sentry JAVASCRIPT-NEXTJS-1M8).
+      // No profile simply means "not admin", never an error-level log.
+      .maybeSingle();
 
     if (error) {
       const errorMessage = error.message || 'Unknown error';
