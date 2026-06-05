@@ -53,7 +53,7 @@ export function CuratorInvalidWords({ language }: CuratorInvalidWordsProps) {
       try {
         const {
           data: { session },
-        } = await supabase.auth.getSession();
+        } = (await supabase?.auth.getSession()) ?? { data: { session: null } };
         const res = await fetch('/api/curator/propose', {
           method: 'POST',
           headers: {

@@ -8,7 +8,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
     dir: 'rtl',
   }),
 }));
-const toast = { success: vi.fn(), error: vi.fn() };
+const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: toast }));
 vi.mock('@/lib/supabase', () => ({
   supabase: { auth: { getSession: async () => ({ data: { session: { access_token: 'tok' } } }) } },

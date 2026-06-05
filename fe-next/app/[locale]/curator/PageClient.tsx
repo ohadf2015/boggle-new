@@ -1,0 +1,78 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useCuratorStatus } from '@/lib/curator/useCuratorStatus';
+import { CuratorRankCard } from '@/components/curator/CuratorRankCard';
+import { CuratorInvalidWords } from '@/components/curator/CuratorInvalidWords';
+import { Button } from '@/components/ui/button';
+import Header from '@/components/Header';
+
+/**
+ * Language Curator dashboard. Gates on useCuratorStatus (non-curators see an
+ * access-required message). For curators it shows their prestige rank card and
+ * the rejected-word review list, scoped to the active language. Multi-language
+ * curators get a language switcher.
+ */
+export default function CuratorPageClient() {
+  const router = useRouter();
+  const { t, language } = useLanguage();
+  const { isCurator, languages, assignments, isLoading } = useCuratorStatus();
+  const [active, setActive] = useState<string | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen flex-1 items-center justify-center bg-neo-navy text-neo-white">
+        <p className="font-neo-body">{t('curator.loading')}</p>
+      </div>
+    );
+  }
+
+  if (!isCurator) {
+    return (
+      <div className="flex min-h-screen flex-1 flex-col items-center justify-center gap-4 bg-neo-navy px-4 text-center text-neo-white">
+        <h1 className="text-2xl font-neo-display">{t('curator.accessRequired')}</h1>
+        <Button variant="outline" onClick={() => router.push(`/${language}`)}>
+          {t('curator.backHome')}
+        </Button>
+      </div>
+    );
+  }
+
+  const activeLang = active ?? languages[0];
+  const points = assignments.find((a) => a.language === activeLang)?.curator_points ?? 0;
+
+  return (
+    <div className="flex min-h-screen flex-1 flex-col bg-neo-navy">
+      <Header />
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+        <h1 className="text-3xl font-neo-display text-neo-white">{t('curator.title')}</h1>
+        <p className="mb-4 font-neo-body text-neo-cream">
+          {t('curator.subtitle', { language: activeLang })}
+        </p>
+
+        {languages.length > 1 && (
+          <div role="tablist" className="mb-4 flex flex-wrap gap-2">
+            {languages.map((l) => (
+              <Button
+                key={l}
+                size="sm"
+                variant={l === activeLang ? 'default' : 'outline'}
+                onClick={() => setActive(l)}
+              >
+                {l}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        <div className="mb-6">
+          <CuratorRankCard points={points} />
+        </div>
+
+        <CuratorInvalidWords key={activeLang} language={activeLang} />
+      </main>
+    </div>
+  );
+}
