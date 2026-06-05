@@ -37,6 +37,21 @@ import {
 
 type SupabaseLike = any;
 
+/**
+ * Award-handler failure that carries retry intent. A `retryable` failure
+ * (transient — 5xx, DB blip) must NOT delete the queued row: setting
+ * accepted=false makes the client retry on the next sync instead of silently
+ * losing the score. A non-retryable failure (4xx business rejection — level
+ * locked, puzzle expired) keeps accepted=true so the row is dropped rather than
+ * retried forever. An unexpected (non-AwardError) throw defaults to retryable.
+ */
+class AwardError extends Error {
+  constructor(message: string, public readonly retryable: boolean) {
+    super(message);
+    this.name = 'AwardError';
+  }
+}
+
 interface AwardHandlerArgs {
   sub: ServerSubmission;
   userId: string;
@@ -78,12 +93,12 @@ function isPuzzleDateFresh(puzzleDate: string | undefined): boolean {
 async function dispatchAdventure({ sub, userId, supabase }: AwardHandlerArgs): Promise<Record<string, unknown>> {
   const validation = validateAdventureBody(sub.payload as Record<string, unknown>);
   if (!validation.valid || !validation.data) {
-    throw new Error(`adventure payload invalid: ${validation.error}`);
+    throw new AwardError(`adventure payload invalid: ${validation.error}`, false);
   }
   const ctx: ProcessAdventureContext = { supabase, source: 'offline-sync' };
   const result = await processAdventureCompletion(validation.data, userId, ctx);
   if (!result.ok) {
-    throw new Error(`adventure handler ${result.status}: ${result.error}`);
+    throw new AwardError(`adventure handler ${result.status}: ${result.error}`, result.status >= 500);
   }
   return {
     xpEarned: result.body.xpEarned,
@@ -102,7 +117,7 @@ async function dispatchBrain({ sub, userId, supabase }: AwardHandlerArgs): Promi
   const ctx: ProcessDrillContext = { supabase, source: 'offline-sync' };
   const result = await processBrainDrillCompletion(body, userId, sub.id, ctx);
   if (!result.ok) {
-    throw new Error(`brain handler ${result.status}: ${result.error}`);
+    throw new AwardError(`brain handler ${result.status}: ${result.error}`, result.status >= 500);
   }
   return {
     xpAwarded: result.body.xpAwarded,
@@ -280,6 +295,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             }
           } catch (err) {
             result.awardError = err instanceof Error ? err.message : 'unknown_award_error';
+            // Transient failures (5xx, unexpected throws) must retry, not drop:
+            // flip accepted=false so the client keeps the queued row. Permanent
+            // 4xx rejections stay accepted=true (drop — retry can't help).
+            const retryable = err instanceof AwardError ? err.retryable : true;
+            if (retryable) {
+              result.accepted = false;
+              result.reason = result.reason ?? 'award_failed';
+            }
             captureApiError(
               err instanceof Error ? err : new Error(String(err)),
               'scores-sync.award',

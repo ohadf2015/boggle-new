@@ -202,7 +202,9 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
     expect((evt.properties as Record<string, unknown>).mode).toBe('adventure');
   });
 
-  it('handler failure flags awardError but still returns accepted submission', async () => {
+  it('PERMANENT failure (4xx) flags awardError but keeps accepted=true (drop, do not retry)', async () => {
+    // "Level not unlocked" will never succeed on retry — dropping the row is
+    // correct, not a silent loss.
     mockProcessAdventure.mockResolvedValue({
       ok: false, status: 403, error: 'Level not unlocked — cannot skip ahead',
     });
@@ -214,6 +216,27 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
     expect(json.results[0].awardError).toMatch(/Level not unlocked/);
     expect(mockAwardLogInsert).not.toHaveBeenCalled();
     expect(mockPosthogCapture).not.toHaveBeenCalled();
+  });
+
+  it('TRANSIENT failure (5xx) sets accepted=false so the client RETRIES (no silent loss)', async () => {
+    mockProcessAdventure.mockResolvedValue({
+      ok: false, status: 503, error: 'database temporarily unavailable',
+    });
+    const sub = adventureSubmission();
+    const res = await POST(makeRequest({ submissions: [sub] }) as never);
+    const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
+    expect(json.results[0].accepted).toBe(false);
+    expect(json.results[0].awardError).toMatch(/database temporarily unavailable/);
+    expect(mockAwardLogInsert).not.toHaveBeenCalled();
+  });
+
+  it('UNEXPECTED throw (e.g. DB exception) is treated as transient → accepted=false (retry)', async () => {
+    mockProcessAdventure.mockRejectedValue(new Error('connection reset'));
+    const sub = adventureSubmission();
+    const res = await POST(makeRequest({ submissions: [sub] }) as never);
+    const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
+    expect(json.results[0].accepted).toBe(false);
+    expect(json.results[0].awardError).toMatch(/connection reset/);
   });
 
   it('unhandled mode (sp) returns awards: null', async () => {
