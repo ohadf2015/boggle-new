@@ -91,7 +91,9 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Validate payload
     const validation = validatePayload(joinGameSchema, data);
     if (!validation.success) {
-      emitError(socket, `Invalid request: ${validation.error}`);
+      // Typed (LOW severity → debug, not Sentry) — bad username is expected user
+      // input, not a fault. Sentry JAVASCRIPT-NEXTJS-1MB/1MC/1MD.
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
       return;
     }
 

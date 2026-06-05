@@ -164,7 +164,9 @@ function registerWordHandlers(io: Server, socket: Socket): void {
     // Validate payload
     const validation = validatePayload(submitWordSchema, data);
     if (!validation.success) {
-      emitError(socket, `Invalid request: ${validation.error}`);
+      // Typed (LOW severity → debug, not Sentry) — matches the sibling emits
+      // below; an invalid word payload is user input, not a server fault.
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
       return;
     }
 
