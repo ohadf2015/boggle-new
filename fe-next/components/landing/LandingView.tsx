@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -73,6 +74,15 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const { playTrack, TRACKS } = useMusic();
   const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
   const isMobilePortrait = useMobilePortrait();
+  // The in-content InlineBannerAd below is a WEB monetization slot. On native it
+  // would register a banner-coordinator 'slot' (priority > the bottom anchor),
+  // hijacking the single native banner to this mid-page DOM position — so on a
+  // landscape phone the banner floats into the middle of the home page instead
+  // of sticking to the bottom. Gate the whole web-ad block off on native; the
+  // global AnchoredNativeBanner keeps the banner pinned to the bottom there.
+  // Mounted flag (not a bare Capacitor call) keeps SSR/hydration consistent.
+  const [isNativeApp, setIsNativeApp] = useState(false);
+  useEffect(() => { setIsNativeApp(Capacitor.isNativePlatform()); }, []);
 
   // Auth-flicker gate: if a Supabase token exists in localStorage we KNOW the user
   // will resolve to authed. Render skeleton until profile lands instead of paint-
@@ -251,7 +261,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
 
       <ScrollIndicator />
 
-      {!isMobilePortrait && (
+      {!isMobilePortrait && !isNativeApp && (
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <InlineBannerAd webZone="menu" className="my-4" />
           {/* B2 — CrazyGames home banner */}
