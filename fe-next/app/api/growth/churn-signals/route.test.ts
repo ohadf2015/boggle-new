@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-vi.mock('@supabase/supabase-js', () => ({ createClient: vi.fn() }));
+vi.mock('@/lib/auth/getBearerUser', () => ({ getBearerUser: vi.fn() }));
 vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: vi.fn() }));
 
-import { createClient } from '@supabase/supabase-js';
+import { getBearerUser } from '@/lib/auth/getBearerUser';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { POST } from './route';
 
@@ -39,14 +39,13 @@ const validPayload = {
 describe('POST /api/growth/churn-signals', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Auth seam: any token resolves to user-1. Re-applied after clearAllMocks
-    // (which wipes mock implementations).
-    vi.mocked(createClient).mockReturnValue({
-      auth: { getUser: async () => ({ data: { user: { id: 'user-1' } } }) },
-    } as never);
+    // Auth seam: getBearerUser resolves to user-1 by default. Re-applied after
+    // clearAllMocks (which wipes mock implementations).
+    vi.mocked(getBearerUser).mockResolvedValue({ id: 'user-1' });
   });
 
-  it('returns 401 when no Authorization header', async () => {
+  it('returns 401 when the request is unauthenticated', async () => {
+    vi.mocked(getBearerUser).mockResolvedValue(null);
     mockAdmin();
     const res = await post(validPayload, false);
     expect(res.status).toBe(401);

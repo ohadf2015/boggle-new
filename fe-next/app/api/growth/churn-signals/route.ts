@@ -6,23 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { getBearerUser } from '@/lib/auth/getBearerUser';
 
 function getSupabaseAdmin() {
   return createAdminClient()!;
-}
-
-async function getUserFromRequest(req: NextRequest) {
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader) return null;
-  const token = authHeader.replace('Bearer ', '');
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-  const { data: { user } } = await supabase.auth.getUser(token);
-  return user;
 }
 
 /**
@@ -78,7 +66,7 @@ function num(value: unknown): number {
  */
 export async function POST(req: NextRequest) {
   try {
-    const user = await getUserFromRequest(req);
+    const user = await getBearerUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
