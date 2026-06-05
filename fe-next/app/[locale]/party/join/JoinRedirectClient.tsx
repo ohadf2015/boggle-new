@@ -6,7 +6,7 @@
  * No redirect needed — this page IS the phone controller.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useSearchParams, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -165,9 +165,13 @@ export default function JoinRedirectClient() {
     );
   }
 
-  // Playing — route to game-specific phone view
+  // Playing — route to game-specific phone view. Constrain to a phone-width
+  // column centered on a dark backdrop so the controller stays usable on wide
+  // and landscape screens (a solo player may run it on a laptop), instead of a
+  // textarea stretched edge-to-edge.
+  let phoneView: ReactNode = null;
   if (room.gameId === 'pixel-clash') {
-    return (
+    phoneView = (
       <PixelClashPhone
         socket={socket}
         playerId={playerId}
@@ -175,10 +179,8 @@ export default function JoinRedirectClient() {
         onSendInput={(input) => sendInput(input as PartyInput)}
       />
     );
-  }
-
-  if (room.gameId === 'caption-clash') {
-    return (
+  } else if (room.gameId === 'caption-clash') {
+    phoneView = (
       <CaptionClashPhone
         socket={socket}
         playerId={playerId}
@@ -186,14 +188,20 @@ export default function JoinRedirectClient() {
         onSendInput={(input) => sendInput(input as PartyInput)}
       />
     );
-  }
-
-  if (room.gameId === 'shadow-clash') {
-    return (
+  } else if (room.gameId === 'shadow-clash') {
+    phoneView = (
       <ShadowClashPhone
         socket={socket}
         onSendInput={(input) => sendInput(input as PartyInput)}
       />
+    );
+  }
+
+  if (phoneView) {
+    return (
+      <div className="min-h-screen bg-neo-abyss flex justify-center">
+        <div className="w-full max-w-md">{phoneView}</div>
+      </div>
     );
   }
 
