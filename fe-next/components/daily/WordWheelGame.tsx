@@ -646,7 +646,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       const size = Math.min(rect.width, rect.height);
       setWheelRadius(
         shortVp?.matches
-          ? computeWheelRadius(size, 88, 40, 44)
+          // short: variant shrinks the letters (center 64px, outer 48px), so
+          // the floor only needs to clear 32+24=56px — but it MUST clear it, or
+          // the petals collapse onto the center the way the default 40 floor let
+          // them on a cramped landscape wheel.
+          ? computeWheelRadius(size, 88, 56, 44)
           : computeWheelRadius(size, 136),
       );
     };

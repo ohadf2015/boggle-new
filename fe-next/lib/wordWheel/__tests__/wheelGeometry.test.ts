@@ -15,8 +15,22 @@ describe('computeWheelRadius', () => {
   });
 
   it('never drops below the floor so the wheel stays usable when tiny', () => {
-    expect(computeWheelRadius(120, 136)).toBe(52); // (120-60)/2 = 30 → floored
+    expect(computeWheelRadius(120, 136)).toBe(76); // (120-60)/2 = 30 → floored
     expect(computeWheelRadius(120, 136, 48)).toBe(48); // custom floor
+  });
+
+  it('default floor clears the center letter so petals never overlap on a cramped wheel', () => {
+    // REGRESSION: on height-constrained viewports the container shrinks, so
+    // `(width − allowance)/2` collapses toward the floor. The mobile center
+    // letter is 80px (radius 40) and outer letters 52px (radius 26), so the
+    // orbit must be ≥ 66px or the petals overlap the center (and, at R < 52,
+    // each other). The default floor therefore has to clear that threshold
+    // with a small gap — a 52px floor let the flower collapse into itself.
+    const CENTER_R = 80 / 2;
+    const OUTER_R = 52 / 2;
+    const flooredOnTinyBox = computeWheelRadius(120, 136);
+    expect(flooredOnTinyBox).toBeGreaterThanOrEqual(CENTER_R + OUTER_R); // ≥ 66, no center overlap
+    expect(flooredOnTinyBox).toBeGreaterThanOrEqual(52); // ≥ outer diameter, no petal-petal overlap
   });
 
   it('scales down as the container shrinks (monotonic in width)', () => {
@@ -26,9 +40,9 @@ describe('computeWheelRadius', () => {
   });
 
   it('guards against 0 / negative / NaN widths (pre-measure render)', () => {
-    expect(computeWheelRadius(0, 136)).toBe(52);
-    expect(computeWheelRadius(-10, 136)).toBe(52);
-    expect(computeWheelRadius(Number.NaN, 136)).toBe(52);
+    expect(computeWheelRadius(0, 136)).toBe(76);
+    expect(computeWheelRadius(-10, 136)).toBe(76);
+    expect(computeWheelRadius(Number.NaN, 136)).toBe(76);
   });
 
   it('returns an integer (px transforms should not be sub-pixel)', () => {
