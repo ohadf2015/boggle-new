@@ -1,5 +1,5 @@
 diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
-index c629139..6a278a1 100644
+index c629139..567088f 100644
 --- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
 +++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
 @@ -33,6 +33,16 @@ public class BannerExecutor extends Executor {
@@ -127,7 +127,7 @@ index c629139..6a278a1 100644
                              mAdViewLayout.removeView(mAdView);
                              mAdView.destroy();
                              mAdView = null;
-@@ -226,6 +288,10 @@ public class BannerExecutor extends Executor {
+@@ -226,6 +288,18 @@ public class BannerExecutor extends Executor {
          activitySupplier
              .get()
              .runOnUiThread(() -> {
@@ -135,10 +135,18 @@ index c629139..6a278a1 100644
 +                    Log.d(logTag, "Banner: updateExistingAdView skipped, mAdView is null");
 +                    return;
 +                }
++                // Restore visibility: a prior hideBanner() set the layout GONE +
++                // paused the AdView. The upstream re-show path only reloaded the
++                // ad and never un-hid it, so a suppress→release (side-menu
++                // open→close) cycle left the banner permanently hidden. resume it.
++                if (mAdViewLayout != null) {
++                    mAdViewLayout.setVisibility(View.VISIBLE);
++                }
++                mAdView.resume();
                  final AdRequest adRequest = RequestHelper.createRequest(adOptions);
                  mAdView.loadAd(adRequest);
              });
-@@ -245,12 +311,36 @@ public class BannerExecutor extends Executor {
+@@ -245,12 +319,36 @@ public class BannerExecutor extends Executor {
                  AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
                  // Add the AdView to the view hierarchy.
                  mAdViewLayout.addView(mAdView);
@@ -175,7 +183,7 @@ index c629139..6a278a1 100644
                              final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
  
                              notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
-@@ -260,8 +350,19 @@ public class BannerExecutor extends Executor {
+@@ -260,8 +358,19 @@ public class BannerExecutor extends Executor {
  
                          @Override
                          public void onAdFailedToLoad(@NonNull LoadAdError adError) {
@@ -196,7 +204,7 @@ index c629139..6a278a1 100644
                                  mAdViewLayout.removeView(mAdView);
                                  mAdView.destroy();
                                  mAdView = null;
-@@ -297,7 +398,12 @@ public class BannerExecutor extends Executor {
+@@ -297,7 +406,12 @@ public class BannerExecutor extends Executor {
                  );
  
                  // Add AdViewLayout top of the WebView

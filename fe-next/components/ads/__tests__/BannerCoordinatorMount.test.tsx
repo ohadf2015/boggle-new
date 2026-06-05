@@ -2,9 +2,10 @@ import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
-const { showBanner, hideBanner, isNative, listeners, foregroundCb } = vi.hoisted(() => ({
+const { showBanner, hideBanner, resumeBanner, isNative, listeners, foregroundCb } = vi.hoisted(() => ({
   showBanner: vi.fn().mockResolvedValue(undefined),
   hideBanner: vi.fn().mockResolvedValue(undefined),
+  resumeBanner: vi.fn().mockResolvedValue(undefined),
   isNative: { current: true },
   listeners: {} as Record<string, () => void>,
   foregroundCb: { current: null as null | (() => void) },
@@ -20,6 +21,7 @@ vi.mock('@capacitor-community/admob', () => ({
       listeners[evt] = cb;
       return Promise.resolve({ remove: vi.fn() });
     },
+    resumeBanner: (...a: unknown[]) => resumeBanner(...a),
   },
   BannerAdPluginEvents: {
     Loaded: 'bannerAdLoaded',
@@ -69,14 +71,29 @@ describe('BannerCoordinatorMount', () => {
     document.documentElement.classList.remove('mobile-drawer-open');
   });
 
-  it('injects show/hide ops into the coordinator on native mount', () => {
+  it('injects show/hide ops into the coordinator on native mount', async () => {
     render(<BannerCoordinatorMount />);
     expect(setOps).toHaveBeenCalledTimes(1);
     const ops = setOps.mock.calls[0][0];
-    ops.show(42, 'content');
+    await ops.show(42, 'content');
     expect(showBanner).toHaveBeenCalledWith('BOTTOM_CENTER', 42, { variant: 'content' });
     ops.hide();
     expect(hideBanner).toHaveBeenCalled();
+  });
+
+  it('restores native visibility (resumeBanner) before re-showing — fixes "banner stays hidden after closing the menu"', async () => {
+    render(<BannerCoordinatorMount />);
+    const ops = setOps.mock.calls[0][0];
+    resumeBanner.mockClear();
+    showBanner.mockClear();
+    await ops.show(0, 'content');
+    // resumeBanner must run (native re-show path doesn't restore GONE visibility)
+    expect(resumeBanner).toHaveBeenCalledTimes(1);
+    expect(showBanner).toHaveBeenCalled();
+    // resume must precede the show so the AdView is VISIBLE again
+    expect(resumeBanner.mock.invocationCallOrder[0]).toBeLessThan(
+      showBanner.mock.invocationCallOrder[0],
+    );
   });
 
   it('routes Loaded/SizeChanged → notifyLoaded and FailedToLoad → notifyFailed', () => {

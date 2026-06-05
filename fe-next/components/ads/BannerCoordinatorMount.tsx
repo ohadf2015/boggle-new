@@ -39,8 +39,18 @@ export default function BannerCoordinatorMount() {
     if (!Capacitor.isNativePlatform()) return;
 
     bannerController.setOps({
-      show: (margin, variant) =>
-        showRef.current(BannerAdPosition.BOTTOM_CENTER, margin, { variant }),
+      show: async (margin, variant) => {
+        // The native hideBanner() sets the AdView GONE; the re-show path
+        // (updateExistingAdView) only reloads the ad and does NOT restore
+        // visibility — so a suppress→release (drawer open→close) cycle would
+        // leave the banner permanently hidden. resumeBanner() is the native
+        // inverse (setVisibility(VISIBLE) + resume()) and resolves cleanly; it's
+        // a no-op when no AdView exists, so it's safe on the initial show too.
+        // Restore visibility FIRST, then showBanner() handles create / size /
+        // margin for the fresh + reload cases.
+        await AdMob.resumeBanner().catch(() => {});
+        return showRef.current(BannerAdPosition.BOTTOM_CENTER, margin, { variant });
+      },
       hide: () => hideRef.current(),
     });
 

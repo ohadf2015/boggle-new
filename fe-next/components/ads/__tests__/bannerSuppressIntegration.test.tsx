@@ -1,13 +1,14 @@
 /**
- * Banner Suppress Bug - RED Finding + Verification of Fixes
+ * Banner suppress/restore — end-to-end integration over the REAL bannerController
+ * + BannerCoordinatorMount + AnchoredNativeBanner (only the native plugin +
+ * useAdMob are mocked).
  *
- * ROOT CAUSE: hideBanner has an early-return guard `if (!getConfig()) return;`
- * (hooks/useAdMob.ts:383) that prevents suppress from reaching the native
- * AdMob.hideBanner call. This is independent of the controller; the hook itself
- * short-circuits. However, we can mitigate by:
- * 1. Stabilizing BannerCoordinatorMount effect so it doesn't churn
- * 2. Stopping setOps from falsely claiming applied.visible=false
- * 3. Making suppress always call hide() (idempotent)
+ * Guards the device-confirmed bug chain:
+ * 1. Opening the side menu (html.mobile-drawer-open) must HIDE the banner.
+ * 2. Closing it must bring the banner back — and the re-show must first call
+ *    AdMob.resumeBanner(), because the native re-show path (updateExistingAdView)
+ *    does NOT restore visibility after hideBanner() set the view GONE. Without
+ *    resume, the banner would stay hidden after closing the menu.
  */
 
 import React from 'react';
@@ -16,38 +17,27 @@ import { render, waitFor } from '@testing-library/react';
 
 const showBannerSpy = vi.fn().mockResolvedValue(undefined);
 const hideBannerSpy = vi.fn().mockResolvedValue(undefined);
-
-// Controllable getConfig() guard
-const adMobConfig = { current: { bannerAdId: 'test-ad-id' } };
+const resumeBannerSpy = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('@/hooks/useAdMob', () => ({
   useAdMob: () => ({
-    showBanner: async (...args: any[]) => {
-      if (!adMobConfig.current) return;
-      return showBannerSpy(...args);
-    },
-    hideBanner: async (...args: any[]) => {
-      if (!adMobConfig.current) return;
-      return hideBannerSpy(...args);
-    },
+    showBanner: (...args: unknown[]) => showBannerSpy(...args),
+    hideBanner: (...args: unknown[]) => hideBannerSpy(...args),
   }),
 }));
 
 const admobListeners: Record<string, Array<() => void>> = {};
 vi.mock('@capacitor/core', () => ({
-  Capacitor: {
-    isNativePlatform: () => true,
-    getPlatform: () => 'android',
-  },
+  Capacitor: { isNativePlatform: () => true, getPlatform: () => 'android' },
 }));
 
 vi.mock('@capacitor-community/admob', () => ({
   AdMob: {
     addListener: async (evt: string, cb: () => void) => {
-      if (!admobListeners[evt]) admobListeners[evt] = [];
-      admobListeners[evt].push(cb);
-      return Promise.resolve({ remove: vi.fn() });
+      (admobListeners[evt] ??= []).push(cb);
+      return { remove: vi.fn() };
     },
+    resumeBanner: (...args: unknown[]) => resumeBannerSpy(...args),
   },
   BannerAdPluginEvents: {
     Loaded: 'bannerAdLoaded',
@@ -57,108 +47,56 @@ vi.mock('@capacitor-community/admob', () => ({
   BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
 }));
 
-vi.mock('@/hooks/useAppLifecycle', () => ({
-  useAppLifecycle: () => {},
-}));
+vi.mock('@/hooks/useAppLifecycle', () => ({ useAppLifecycle: () => {} }));
+vi.mock('@/hooks/useSafeArea', () => ({ useSafeArea: () => ({ bottom: 0 }) }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/he' }));
 
-vi.mock('@/hooks/useSafeArea', () => ({
-  useSafeArea: () => ({ bottom: 0 }),
-}));
+const flush = () => new Promise((r) => setTimeout(r, 0));
 
-vi.mock('next/navigation', () => ({
-  usePathname: () => '/he',
-}));
-
-let bannerController: any;
-
-const getController = async () => {
-  const { bannerController: bc } = await import('@/lib/native/bannerController');
-  return bc;
-};
-
-describe('Banner Suppress Bug - Diagnosis & Mitigations', () => {
-  beforeEach(async () => {
+describe('Banner suppress/restore — integration', () => {
+  beforeEach(() => {
     vi.resetModules();
     showBannerSpy.mockClear();
     hideBannerSpy.mockClear();
-    adMobConfig.current = { bannerAdId: 'test-ad-id' };
+    resumeBannerSpy.mockClear();
     document.documentElement.classList.remove('mobile-drawer-open');
-    document.documentElement.style.setProperty('--bottom-nav-height', '64px');
-    for (const key of Object.keys(admobListeners)) {
-      delete admobListeners[key];
-    }
+    document.documentElement.style.setProperty('--bottom-nav-height', '0px');
+    for (const k of Object.keys(admobListeners)) delete admobListeners[k];
   });
 
   afterEach(() => {
     document.documentElement.classList.remove('mobile-drawer-open');
   });
 
-  it('RED: getConfig()=null in hook early-returns before calling native hide', async () => {
+  it('hides on drawer open and restores (resume + show) on drawer close', async () => {
     const BannerCoordinatorMount = (await import('../BannerCoordinatorMount')).default;
     const AnchoredNativeBanner = (await import('../AnchoredNativeBanner')).default;
-    bannerController = await getController();
+    const { bannerController } = await import('@/lib/native/bannerController');
 
-    function TestHarness() {
-      return (
-        <>
-          <BannerCoordinatorMount />
-          <AnchoredNativeBanner />
-        </>
-      );
-    }
+    render(
+      <>
+        <BannerCoordinatorMount />
+        <AnchoredNativeBanner />
+      </>,
+    );
 
-    render(<TestHarness />);
-
-    // Get initial show (config healthy)
-    await waitFor(() => {
-      expect(showBannerSpy).toHaveBeenCalled();
-    });
-
-    showBannerSpy.mockClear();
+    // Initial show fires (anchor registers its request).
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled());
     hideBannerSpy.mockClear();
+    showBannerSpy.mockClear();
+    resumeBannerSpy.mockClear();
 
-    // Set config to null → hook early-returns
-    adMobConfig.current = null;
-
-    // Open drawer → suppress called
+    // Drawer opens → suppress → native hide.
     document.documentElement.classList.add('mobile-drawer-open');
-    await new Promise((r) => setTimeout(r, 0));
+    await flush();
     await bannerController.whenIdle();
+    expect(hideBannerSpy).toHaveBeenCalled();
 
-    // The spy won't be called because the hook early-returns before calling it
-    const hideWasCalled = hideBannerSpy.mock.calls.length > 0;
-
-    // This test documents the ROOT CAUSE: hook early-return is the problem
-    // The controller IS calling hide(), but the hook returns early.
-    // Expected: false (this is the diagnosis)
-    expect(hideWasCalled).toBe(false);
-  });
-
-  it('VERIFY: controller always calls hide() when suppressed (idempotent resilience)', async () => {
-    // Verify that FIX 3 (idempotent hide) is in place:
-    // The controller's reconcile should ALWAYS call hide when suppressed,
-    // even if applied.visible===false, to provide resilience.
-    const { bannerController: bc } = await import('@/lib/native/bannerController');
-
-    const calls: string[] = [];
-    const mockOps = {
-      show: vi.fn(async () => { calls.push('show'); }),
-      hide: vi.fn(async () => { calls.push('hide'); }),
-    };
-
-    await bc.setOps(mockOps);
-    await bc.setRequest('test', { margin: 50, variant: 'content', priority: 1 });
-    await bc.whenIdle();
-
-    calls.length = 0;
-    mockOps.show.mockClear();
-    mockOps.hide.mockClear();
-
-    // Suppress without ever showing (no request) — controller should still call hide()
-    await bc.setSuppressed(true);
-    await bc.whenIdle();
-
-    // With the idempotent fix, hide SHOULD be called (resilience)
-    expect(mockOps.hide).toHaveBeenCalled();
+    // Drawer closes → release → banner returns, visibility restored FIRST.
+    document.documentElement.classList.remove('mobile-drawer-open');
+    await flush();
+    await bannerController.whenIdle();
+    expect(resumeBannerSpy).toHaveBeenCalled(); // un-hide the GONE AdView
+    expect(showBannerSpy).toHaveBeenCalled();
   });
 });
