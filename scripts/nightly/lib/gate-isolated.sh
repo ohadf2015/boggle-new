@@ -194,14 +194,21 @@ nightly_parse_gate_failures() {
   local out="$1"
   [ -n "$out" ] && [ -s "$out" ] || return 0
   {
-    # eslint prints the file path as a header line; in the worktree it's absolute
-    # and contains /fe-next/… — keep from fe-next/ onward. Only count files that
-    # actually have an "error" (not warning-only) somewhere in the run: eslint
-    # groups errors under the path header, so emitting every flagged path is
-    # acceptable (a warning-only file won't fail the gate, so re-gating without
-    # it is still correct).
-    grep -oE '/fe-next/[A-Za-z0-9_./-]+\.(tsx|ts|jsx|js|mjs|cjs)([^A-Za-z0-9]|$)' "$out" \
-      | sed -E 's/[^A-Za-z0-9]$//' \
+    # eslint prints the file path as a HEADER on its own line; in the worktree it's
+    # absolute and contains /fe-next/… — keep from fe-next/ onward. Match ONLY a
+    # whole-line path token (an eslint header), NEVER a path embedded in prose.
+    # An earlier substring scrape (`grep -oE '/fe-next/…\.js…'`) matched any path
+    # ANYWHERE in the output and flagged it as a lint offender, which then got
+    # HARD-REVERTED by drop-and-re-gate. Two real ways that destroyed authored work:
+    #   • Babel: "…deoptimised the styling of …/fe-next/translations/en.js as it
+    #     exceeds the max of 500KB" — emitted whenever the large i18n bundles change;
+    #     nuked en/es/sv.js twice (2026-05-27, 2026-06-05).
+    #   • vitest stack frames: "  at …/fe-next/foo.test.tsx:33".
+    # Anchoring to a whole-line token rejects both. (warning-only headers still
+    # emit — harmless, a warning-only file won't fail the gate.)
+    grep -E '^[[:space:]]*[^[:space:]]+\.(tsx|ts|jsx|js|mjs|cjs)[[:space:]]*$' "$out" \
+      | sed -E 's/^[[:space:]]*//; s/[[:space:]]*$//' \
+      | grep '/fe-next/' \
       | sed -E 's#^.*/(fe-next/)#\1#' \
       | grep -v '/node_modules/'
     # tsc: `components/foo.tsx(12,3): error TS....` (relative to fe-next cwd).

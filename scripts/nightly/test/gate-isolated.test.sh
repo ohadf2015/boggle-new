@@ -216,8 +216,37 @@ GOTN=$(nightly_parse_gate_failures "$NOISY" | tr '\n' ',')
 assert "excludes node_modules/happy-dom paths"   "[[ \"$GOTN\" != *'/node_modules/happy-dom/'* ]]"
 assert "excludes node_modules/vitest paths"      "[[ \"$GOTN\" != *'/node_modules/vitest/'* ]]"
 assert "does NOT match package.js (from package.json truncation)" "[[ \"$GOTN\" != *'fe-next/package.js'* ]]"
-assert "still extracts real authored test file"  "[[ \"$GOTN\" == *'fe-next/components/__tests__/PlayerView.navigation.test.tsx'* ]]"
+# A failing TEST file appears in vitest output only as a " FAIL <path>" header and
+# in stack frames ("  at …/PlayerView.navigation.test.tsx:33") — both PROSE, not an
+# eslint header. The lint/tsc parser must NOT scrape them (that was the same
+# stack-frame/prose false-positive that, via Babel notes, destroyed i18n files);
+# failing TEST files are surfaced by nightly_parse_test_failures + baseline salvage.
+assert "does NOT scrape failing test file from vitest header/stack frame (prose)" "[[ \"$GOTN\" != *'PlayerView.navigation.test.tsx'* ]]"
 rm -f "$NOISY"
+
+# 2026-05-27 + 2026-06-05 regression: Babel emits an informational note naming the
+# large translation bundles by path ("deoptimised the styling of …/fe-next/
+# translations/en.js as it exceeds the max of 500KB") whenever they change. The
+# old substring scrape matched that PROSE path and flagged en/es/sv.js as lint
+# offenders, then drop-and-re-gate HARD-REVERTED them — destroying authored i18n
+# while the real failure was an unrelated test. A lint offender is only ever an
+# eslint HEADER (a whole-line path); prose-embedded paths must be ignored.
+BABEL=$(mktemp)
+cat > "$BABEL" <<'EOF'
+> fe-next@0.1.0 build
+> next build
+
+[BABEL] Note: The code generator has deoptimised the styling of /private/var/folders/dc/x/T/nightly-gate.ABCD/fe-next/translations/en.js as it exceeds the max of 500KB.
+[BABEL] Note: The code generator has deoptimised the styling of /private/var/folders/dc/x/T/nightly-gate.ABCD/fe-next/translations/es.js as it exceeds the max of 500KB.
+
+/private/var/folders/dc/x/T/nightly-gate.ABCD/fe-next/components/blast/RealOffender.tsx
+  10:5  error  'x' is not defined  no-undef
+EOF
+GOTB=$(nightly_parse_gate_failures "$BABEL" | tr '\n' ',')
+assert "ignores Babel deoptimised-note path (en.js prose, not an eslint header)" "[[ \"$GOTB\" != *'fe-next/translations/en.js'* ]]"
+assert "ignores Babel deoptimised-note path (es.js prose)"                       "[[ \"$GOTB\" != *'fe-next/translations/es.js'* ]]"
+assert "still extracts the real eslint header offender"                          "[[ \"$GOTB\" == *'fe-next/components/blast/RealOffender.tsx'* ]]"
+rm -f "$BABEL"
 
 # Clean output → nothing to drop.
 CLEAN=$(mktemp); printf '> lint\n> eslint\n\nNo problems.\n' > "$CLEAN"
