@@ -5,6 +5,7 @@ import {
   getRoom,
   getPublicRoomState,
 } from '../partyHandler';
+import { canAccessFeature } from '../../utils/featureFlags';
 
 // Mock all party-engine modules so tests don't depend on engine internals.
 vi.mock('../../utils/logger', () => ({ default: {
@@ -71,6 +72,9 @@ describe('partyHandler', () => {
     // Reset shared in-memory state between tests
     partyRooms.clear();
     process.env.NODE_ENV = 'test'; // disable dev bypass paths
+    // Default: feature access granted (host/admin). Restored each test because
+    // clearAllMocks() resets call history but NOT implementations.
+    vi.mocked(canAccessFeature).mockResolvedValue(true);
   });
 
   it('registers core party events', () => {
@@ -138,6 +142,25 @@ describe('partyHandler', () => {
       expect(socket.emit).toHaveBeenCalledWith('party:joined', expect.objectContaining({
         playerId: 'socket-host',
       }));
+    });
+
+    it('rejects room creation when feature access is denied (admins-only host gate)', async () => {
+      vi.mocked(canAccessFeature).mockResolvedValue(false);
+      const { socket, handlers } = createMockSocket();
+      const { io } = createMockIo();
+      registerPartyHandlers(io, socket);
+
+      await handlers['party:create']({
+        gameId: 'caption-clash',
+        roomName: 'Locked',
+        username: 'NonAdmin',
+        avatar: {},
+      });
+
+      expect(socket.emit).toHaveBeenCalledWith('party:error', expect.objectContaining({
+        error: 'NO_ACCESS',
+      }));
+      expect(partyRooms.size).toBe(0);
     });
   });
 
@@ -304,6 +327,38 @@ describe('partyHandler', () => {
 
       expect(room.spectators['socket-guest']).toBeDefined();
       expect(room.players['socket-guest']).toBeUndefined();
+    });
+
+    it('admits an invited non-admin player even when feature access is denied (room code is the capability)', async () => {
+      // Host (admin) creates the room — has feature access.
+      const { socket: hostSock, handlers: hostHandlers } = createMockSocket('host');
+      const { io } = createMockIo();
+      registerPartyHandlers(io, hostSock);
+      await hostHandlers['party:create']({
+        gameId: 'caption-clash',
+        roomName: 'Open',
+        username: 'Host',
+        avatar: {},
+      });
+      const room = Array.from(partyRooms.values())[0];
+
+      // The invited friend is NOT an admin → feature flag denies access.
+      vi.mocked(canAccessFeature).mockResolvedValue(false);
+      const guest = createMockSocket('socket-guest');
+      registerPartyHandlers(io, guest.socket);
+
+      await guest.handlers['party:join']({
+        roomCode: room.roomCode,
+        username: 'Friend',
+        avatar: {},
+      });
+
+      // Possessing a valid room code is enough — must NOT be blocked with NO_ACCESS.
+      expect(guest.socket.emit).not.toHaveBeenCalledWith('party:error', expect.objectContaining({
+        error: 'NO_ACCESS',
+      }));
+      expect(room.players['socket-guest']).toBeDefined();
+      expect(guest.socket.emit).toHaveBeenCalledWith('party:joined', expect.any(Object));
     });
   });
 

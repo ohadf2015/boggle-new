@@ -285,14 +285,13 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
         return;
       }
 
+      // Join is gated by possession of a valid room code, NOT the feature flag.
+      // The room can only exist because an admin/host passed the create gate to make
+      // it, so the code itself is the capability. This lets invited non-admin players
+      // (3–5 needed per game) join an admin's playtest room — the feature stays
+      // "admins only" at the creation boundary while remaining actually playable.
       const authUserId = (socket.data?.verifiedUserId as string) ||
         (socket.handshake.auth as Record<string, unknown>)?.userId as string | undefined;
-      const isDev = process.env.NODE_ENV === 'development';
-      const hasAccess = isDev || await canAccessFeature(authUserId || null, 'party_games_alpha');
-      if (!hasAccess) {
-        socket.emit('party:error', { error: 'NO_ACCESS', message: 'Party games not available' });
-        return;
-      }
 
       const playerCount = Object.keys(room.players).length;
       const isSpectator = parsed.asSpectator || room.phase !== 'lobby' || playerCount >= room.settings.maxPlayers;
