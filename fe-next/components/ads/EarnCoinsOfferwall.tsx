@@ -42,6 +42,7 @@ export const EarnCoinsOfferwallButton: React.FC<EarnCoinsOfferwallButtonProps> =
   const { t, language } = useLanguage();
   const { user, isGuest } = useAuth();
   const { refreshCoins } = useCoinContext();
+  const { tier } = useSocialCapabilities();
   const crazyGames = useCrazyGames();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -69,7 +70,8 @@ export const EarnCoinsOfferwallButton: React.FC<EarnCoinsOfferwallButtonProps> =
     void refreshCoins();
   }, [refreshCoins]);
 
-  if (!available) return null;
+  // Families: hide the earn/purchase surface from a known child.
+  if (!available || shouldSuppressAdsForTier(tier)) return null;
 
   const url = user ? getAyetOfferwallUrl(user.id) : '';
 

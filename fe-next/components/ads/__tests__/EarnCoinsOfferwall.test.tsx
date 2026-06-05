@@ -21,10 +21,17 @@ vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({ refreshCoins: mockRefreshCoins }),
 }));
 
+// Families: a known child must not see the offerwall (purchase/earn surface).
+const social = vi.hoisted(() => ({ tier: 'adult' as 'adult' | 'child' | 'unknown' }));
+vi.mock('@/hooks/useSocialCapabilities', () => ({
+  useSocialCapabilities: () => ({ tier: social.tier }),
+}));
+
 import { EarnCoinsOfferwallButton } from '../EarnCoinsOfferwall';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  social.tier = 'adult';
   mockAuth.user = { id: 'user-uuid-42' };
   mockAuth.isGuest = false;
   mockCrazy.isOnCrazyGamesPlatform = false;
@@ -60,6 +67,12 @@ describe('EarnCoinsOfferwallButton', () => {
   it('shows the CTA when configured on web', () => {
     render(<EarnCoinsOfferwallButton />);
     expect(screen.getByText('offerwall.cta.label')).toBeTruthy();
+  });
+
+  it('renders nothing for a known child even when configured (no earn/purchase surface)', () => {
+    social.tier = 'child';
+    const { container } = render(<EarnCoinsOfferwallButton />);
+    expect(container.firstChild).toBeNull();
   });
 
   it('opens the offerwall iframe (dir=ltr) with the user id as external_identifier when authed', () => {

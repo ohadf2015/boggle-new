@@ -11,8 +11,30 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
 }));
 
+// Families: a known child must not see purchase offers. Default 'adult'.
+const social = vi.hoisted(() => ({ tier: 'adult' as 'adult' | 'child' | 'unknown' }));
+vi.mock('@/hooks/useSocialCapabilities', () => ({
+  useSocialCapabilities: () => ({ tier: social.tier }),
+}));
+
 describe('RemoveAdsProbe', () => {
-  beforeEach(() => mockTrackGrowthEvent.mockClear());
+  beforeEach(() => {
+    mockTrackGrowthEvent.mockClear();
+    social.tier = 'adult';
+  });
+
+  it('renders nothing for a known child (no IAP offers to children)', () => {
+    social.tier = 'child';
+    const { container } = render(<RemoveAdsProbe isDarkMode={false} />);
+    expect(container.firstChild).toBeNull();
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalled();
+  });
+
+  it('still renders for undeclared guests (unknown tier)', () => {
+    social.tier = 'unknown';
+    render(<RemoveAdsProbe isDarkMode={false} />);
+    expect(screen.getByText('settings.removeAds.title')).toBeInTheDocument();
+  });
 
   it('renders title and body', () => {
     render(<RemoveAdsProbe isDarkMode={false} />);
