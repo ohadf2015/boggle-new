@@ -2,7 +2,7 @@ import { calculateWordScoreByLength } from '@/shared/utils/scoring';
 
 export interface ServerSubmission {
   id: string;
-  mode: 'sp' | 'wotd' | 'daily-survival' | 'daily-wordhunt' | 'brain' | 'adventure' | 'blast';
+  mode: 'sp' | 'wotd' | 'daily-survival' | 'daily-wordhunt' | 'brain' | 'adventure' | 'blast' | 'connections';
   payload: {
     score: number;
     words?: string[];

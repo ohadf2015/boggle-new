@@ -37,6 +37,9 @@ import {
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { validateBlastResult } from '@/app/api/blast/utils';
 import { processBlastCompletion } from '@/app/api/blast/result/processCompletion';
+import { processConnectionsCompletion } from '@/app/api/connections/daily/score/processCompletion';
+import { validateDailySubmission } from '@/lib/connections/dailyScore';
+import { maxDailyScore } from '@/lib/connections/daily';
 
 type SupabaseLike = any;
 
@@ -164,17 +167,71 @@ async function dispatchBlast({ sub, userId }: AwardHandlerArgs): Promise<Record<
   };
 }
 
+async function dispatchConnections({ sub, userId }: AwardHandlerArgs): Promise<Record<string, unknown>> {
+  // Validate the payload shape.
+  const payload = sub.payload as Record<string, unknown>;
+  const puzzleDate = typeof payload.puzzleDate === 'string' ? payload.puzzleDate : todayUtcDateString();
+  const language = typeof payload.language === 'string' ? payload.language : 'en';
+
+  // Validate submission against server constraints.
+  const max = maxDailyScore(puzzleDate, language);
+  const validation = validateDailySubmission(payload, max, todayUtcDateString());
+  if (!validation.ok) {
+    throw new AwardError(`connections payload invalid: ${validation.error}`, false);
+  }
+
+  const supabase = getBlastServiceClient(); // Reuse the service-role client
+  if (!supabase) {
+    throw new AwardError('connections service unavailable', true);
+  }
+
+  // Fetch the player's profile for avatar defaults.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('avatar_emoji, avatar_color, avatar_image')
+    .eq('id', userId)
+    .single();
+
+  // Delegate to the extracted persistence function. Sync is auth-only, so
+  // always player_id; guests have no session and don't reach the sync endpoint.
+  const result = await processConnectionsCompletion(payload, {
+    sub: validation.value,
+    idCol: 'player_id',
+    idVal: userId,
+    userIdForRow: userId,
+    guestIdForRow: null,
+    profile: profile
+      ? { avatar_emoji: profile.avatar_emoji, avatar_color: profile.avatar_color, avatar_image: profile.avatar_image }
+      : null,
+    avatarOverrides: {},
+    admin: supabase,
+  });
+
+  if (!result.ok) {
+    throw new AwardError(`connections handler ${result.status}: ${result.error}`, result.status >= 500);
+  }
+
+  return {
+    action: result.body.action,
+    streak: result.body.streak,
+    score: result.body.score,
+    currentRank: result.body.currentRank,
+    totalPlayers: result.body.totalPlayers,
+  };
+}
+
 const awardHandlers: Partial<Record<ServerSubmission['mode'], AwardHandler>> = {
   adventure: dispatchAdventure,
   brain: dispatchBrain,
   blast: dispatchBlast,
+  connections: dispatchConnections,
   // sp / wotd / daily-survival / daily-wordhunt: pending Phase 1c (no
   // canonical server completion path exists yet for those modes).
 };
 
 const SubmissionSchema = z.object({
   id: z.string().uuid(),
-  mode: z.enum(['sp', 'wotd', 'daily-survival', 'daily-wordhunt', 'brain', 'adventure', 'blast']),
+  mode: z.enum(['sp', 'wotd', 'daily-survival', 'daily-wordhunt', 'brain', 'adventure', 'blast', 'connections']),
   // Base payload is intentionally loose. Each mode interprets `words`
   // differently — word-validated modes need `string[]` (revalidate.ts),
   // adventure stores `number` (count). Per-mode handlers narrow + validate.

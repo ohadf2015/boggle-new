@@ -115,6 +115,30 @@ export interface SubmitResult {
 
 /** POST a daily result. Returns null on failure (never throws into the UI). */
 export async function submitDailyScore(payload: SubmitPayload): Promise<SubmitResult | null> {
+  // Offline: queue the result so it isn't lost — it syncs (and credits streak /
+  // leaderboard) on reconnect via /api/scores/sync → dispatchConnections. The
+  // sync route is auth-only, so this needs a cached session (getSession is local,
+  // no network); guests have none and fall through to the network attempt.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    try {
+      const { createClient } = await import('@/utils/supabase/client');
+      const { data } = await createClient().auth.getSession();
+      if (data.session?.user) {
+        const [{ getOfflineStore }, { enqueueScore }] = await Promise.all([
+          import('@/lib/offline'),
+          import('@/lib/offline/scoreQueue'),
+        ]);
+        const store = await getOfflineStore();
+        await enqueueScore(store, 'connections', payload);
+        // Optimistic result so the UI proceeds; the real rank/streak arrive when
+        // the queue syncs on reconnect.
+        return { success: true, streak: 0, score: payload.score, currentRank: 0, totalPlayers: 0 };
+      }
+    } catch {
+      // Fall through to the network attempt (which will likely fail → null).
+    }
+  }
+
   try {
     const res = await fetch('/api/connections/daily/score', {
       method: 'POST',

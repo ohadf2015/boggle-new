@@ -4,17 +4,12 @@ import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { readGuestId, newGuestId, setGuestCookie } from '@/lib/auth/guestCookie';
 import { captureApiError } from '@/utils/sentry';
-import { validateDailySubmission, resolveDailySubmission } from '@/lib/connections/dailyScore';
+import { validateDailySubmission } from '@/lib/connections/dailyScore';
 import { maxDailyScore } from '@/lib/connections/daily';
-import { yesterdayISO, nextStreakValue } from '@/lib/connections/streak';
+import { processConnectionsCompletion } from './processCompletion';
 
 function todayUTC(): string {
   return new Date().toISOString().slice(0, 10);
-}
-
-/** Rows strictly ahead of (score, time) for ranking — 1-based rank = better + 1. */
-function betterFilter(score: number, timeTakenSeconds: number): string {
-  return `score.gt.${score},and(score.eq.${score},time_taken_seconds.lt.${timeTakenSeconds})`;
 }
 
 /**
@@ -64,72 +59,36 @@ export async function POST(request: NextRequest) {
       ? await admin.from('profiles').select('avatar_emoji, avatar_color, avatar_image').eq('id', user.id).single()
       : { data: null };
 
-    // Server-authoritative streak: derived from the player's previous-day row.
-    const { data: prevRow } = await admin
-      .from('connections_daily_scores')
-      .select('streak')
-      .eq('puzzle_date', yesterdayISO(sub.puzzleDate))
-      .eq(idCol, idVal)
-      .maybeSingle();
-    const streak = nextStreakValue(prevRow?.streak ?? null);
-
-    const { data: existing } = await admin
-      .from('connections_daily_scores')
-      .select('id, score, time_taken_seconds')
-      .eq('puzzle_date', sub.puzzleDate)
-      .eq(idCol, idVal)
-      .maybeSingle();
-
-    const decision = resolveDailySubmission({
-      existing: existing ? { score: existing.score, timeTakenSeconds: existing.time_taken_seconds } : null,
-      incoming: { score: sub.score, timeTakenSeconds: sub.timeTakenSeconds },
-    });
-
-    const rowData = {
-      puzzle_date: sub.puzzleDate,
-      player_id: user?.id ?? null,
-      guest_fingerprint: user ? null : guestId,
-      display_name: sub.displayName,
-      avatar_emoji: (typeof body.avatarEmoji === 'string' && body.avatarEmoji) || profile?.avatar_emoji || '🎯',
-      avatar_color: (typeof body.avatarColor === 'string' && body.avatarColor) || profile?.avatar_color || '#6366f1',
-      avatar_image: (typeof body.avatarImage === 'string' && body.avatarImage) || profile?.avatar_image || null,
-      score: sub.score,
-      time_taken_seconds: sub.timeTakenSeconds,
-      streak,
-      puzzles_solved: sub.puzzlesSolved,
-      language: sub.language,
-      updated_at: new Date().toISOString(),
+    // Avatar overrides from request body (if supplied).
+    const avatarOverrides = {
+      avatarEmoji: typeof body.avatarEmoji === 'string' ? body.avatarEmoji : undefined,
+      avatarColor: typeof body.avatarColor === 'string' ? body.avatarColor : undefined,
+      avatarImage: typeof body.avatarImage === 'string' ? body.avatarImage : undefined,
     };
 
-    if (decision.action === 'insert') {
-      const { error: insErr } = await admin.from('connections_daily_scores').insert(rowData);
-      // 23505 = unique violation from a concurrent double-submit; the row now
-      // exists, so fall through to ranking rather than 500.
-      if (insErr && insErr.code !== '23505') throw insErr;
-    } else if (decision.action === 'update') {
-      await admin.from('connections_daily_scores').update(rowData).eq('id', existing!.id);
+    // Delegate to the extracted persistence function.
+    const result = await processConnectionsCompletion(body, {
+      sub,
+      idCol,
+      idVal,
+      userIdForRow: user?.id ?? null,
+      guestIdForRow: user ? null : guestId,
+      profile,
+      avatarOverrides,
+      admin,
+    });
+
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
     }
-
-    const finalScore = decision.action === 'keep' && existing ? existing.score : sub.score;
-    const finalTime = decision.action === 'keep' && existing ? existing.time_taken_seconds : sub.timeTakenSeconds;
-
-    const { count: better } = await admin
-      .from('connections_daily_scores')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', sub.puzzleDate)
-      .or(betterFilter(finalScore, finalTime));
-    const { count: totalPlayers } = await admin
-      .from('connections_daily_scores')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', sub.puzzleDate);
 
     const out = NextResponse.json({
       success: true,
-      action: decision.action,
-      streak,
-      score: finalScore,
-      currentRank: (better ?? 0) + 1,
-      totalPlayers: totalPlayers ?? 1,
+      action: result.body.action,
+      streak: result.body.streak,
+      score: result.body.score,
+      currentRank: result.body.currentRank,
+      totalPlayers: result.body.totalPlayers,
     });
     // Issue the signed cookie for a freshly minted guest (set on the SAME response).
     if (guestId && !existingGuest) setGuestCookie(out, guestId);

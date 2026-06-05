@@ -8,7 +8,8 @@ export type ScoreMode =
   | 'daily-wordhunt'
   | 'brain'
   | 'adventure'
-  | 'blast';
+  | 'blast'
+  | 'connections';
 
 export interface QueueRow {
   id: string;

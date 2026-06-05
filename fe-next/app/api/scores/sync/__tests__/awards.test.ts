@@ -64,9 +64,45 @@ vi.mock('@/app/api/blast/result/processCompletion', () => ({
 vi.mock('@/app/api/blast/utils', () => ({
   validateBlastResult: (body: Record<string, unknown>) => ({ valid: true, data: body }),
 }));
-// Blast needs a service-role client; the dispatch creates one.
+
+const mockProcessConnections = vi.fn();
+vi.mock('@/app/api/connections/daily/score/processCompletion', () => ({
+  processConnectionsCompletion: (...args: unknown[]) => mockProcessConnections(...args),
+}));
+vi.mock('@/lib/connections/dailyScore', () => ({
+  validateDailySubmission: (body: Record<string, unknown>) => ({
+    ok: true,
+    value: {
+      puzzleDate: body.puzzleDate as string,
+      language: body.language as string,
+      displayName: body.displayName as string,
+      score: body.score as number,
+      timeTakenSeconds: body.timeTakenSeconds as number,
+      puzzlesSolved: body.puzzlesSolved as number,
+    },
+  }),
+}));
+vi.mock('@/lib/connections/daily', () => ({
+  maxDailyScore: () => 10000,
+}));
+
+// Blast and connections need a service-role client; the dispatch creates one.
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: vi.fn().mockReturnValue({ from: vi.fn(), rpc: vi.fn() }),
+  createClient: vi.fn().mockReturnValue({
+    from: vi.fn((table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: () => ({
+            eq: () => ({
+              single: () => Promise.resolve({ data: { avatar_emoji: '🎯', avatar_color: '#6366f1', avatar_image: null } }),
+            }),
+          }),
+        };
+      }
+      return { from: vi.fn(), rpc: vi.fn() };
+    }),
+    rpc: vi.fn(),
+  }),
 }));
 
 const mockPosthogCapture = vi.fn();
@@ -153,6 +189,20 @@ function blastSubmission(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function connectionsSubmission(overrides: Record<string, unknown> = {}) {
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    id: crypto.randomUUID(),
+    mode: 'connections' as const,
+    payload: {
+      puzzleDate: today, language: 'en', displayName: 'Player', score: 500,
+      timeTakenSeconds: 42, puzzlesSolved: 3,
+    },
+    clientCompletedAt: Date.now(),
+    ...overrides,
+  };
+}
+
 describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
@@ -171,6 +221,10 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
     mockProcessBrain.mockResolvedValue({
       ok: true,
       body: { xpAwarded: 30, brainScore: { overallScore: 72 }, levelPromoted: false, idempotent: false },
+    });
+    mockProcessConnections.mockResolvedValue({
+      ok: true,
+      body: { action: 'insert', streak: 1, score: 500, currentRank: 1, totalPlayers: 1 },
     });
   });
 
@@ -290,6 +344,28 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
     const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
     expect(json.results[0].accepted).toBe(false);
     expect(json.results[0].awardError).toMatch(/Failed to save result/);
+    expect(mockAwardLogInsert).not.toHaveBeenCalled();
+  });
+
+  it('dispatches connections submission to processConnectionsCompletion and logs awards', async () => {
+    const sub = connectionsSubmission();
+    const res = await POST(makeRequest({ submissions: [sub] }) as never);
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as { results: Array<{ accepted: boolean; awards: Record<string, unknown> | null }> };
+    expect(mockProcessConnections).toHaveBeenCalledTimes(1);
+    expect(json.results[0].accepted).toBe(true);
+    expect(json.results[0].awards).toMatchObject({ action: 'insert', streak: 1, score: 500 });
+    expect(mockAwardLogInsert).toHaveBeenCalledTimes(1);
+    expect((mockAwardLogInsert.mock.calls[0][0] as Record<string, unknown>).mode).toBe('connections');
+  });
+
+  it('connections transient failure (status 500) sets accepted=false so it retries', async () => {
+    mockProcessConnections.mockResolvedValue({ ok: false, status: 500, error: 'Failed to save submission: DB error' });
+    const sub = connectionsSubmission();
+    const res = await POST(makeRequest({ submissions: [sub] }) as never);
+    const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
+    expect(json.results[0].accepted).toBe(false);
+    expect(json.results[0].awardError).toMatch(/Failed to save submission/);
     expect(mockAwardLogInsert).not.toHaveBeenCalled();
   });
 
