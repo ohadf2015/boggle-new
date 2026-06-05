@@ -574,3 +574,44 @@ export function cleanupShadowClash(roomCode: string): void {
 export function getShadowGameState(roomCode: string): ShadowGameState | undefined {
   return activeGames.get(roomCode);
 }
+
+/**
+ * Replay current state to ONE socket that missed one-shot events (phone mounted
+ * on the start transition, or a late join). roleAssigned is a private one-shot
+ * that unlocks every downstream phone view, so it MUST go first — then the
+ * current phase prompt (night/trial). State-on-demand via party:requestState.
+ */
+export function resendShadowState(io: Server, roomCode: string, socketId: string): void {
+  const game = activeGames.get(roomCode);
+  if (!game) return;
+  const role = game.roles.get(socketId);
+  if (!role) return; // not a participant
+
+  // 1) Always replay the private role card first (sets myRole on the phone).
+  io.to(socketId).emit('party:shadow:roleAssigned', {
+    role,
+    team: getTeam(role),
+    partnerUsername: role === 'shadow' ? getShadowPartner(game, socketId) : undefined,
+  });
+
+  // 2) Replay the current phase prompt (mirrors startNight / startTrial).
+  if (!game.alivePlayers.has(socketId)) return;
+  const aliveUsernames = Array.from(game.alivePlayers).map((id) => game.playerUsernames.get(id) || 'Unknown');
+
+  if (game.phase === 'night') {
+    const targets = aliveUsernames.filter((u) => u !== game.playerUsernames.get(socketId));
+    if (role === 'shadow') {
+      io.to(socketId).emit('party:shadow:nightAction', { action: 'choose-target', targets, message: 'Choose a player to eliminate' });
+    } else if (role === 'seer') {
+      io.to(socketId).emit('party:shadow:nightAction', { action: 'investigate', targets: aliveUsernames, message: 'Choose a player to investigate' });
+    } else if (role === 'medic') {
+      io.to(socketId).emit('party:shadow:nightAction', { action: 'protect', targets: aliveUsernames, message: 'Choose a player to protect' });
+    } else {
+      io.to(socketId).emit('party:shadow:nightAction', { action: 'wait', targets: [], message: 'The night is dark...' });
+    }
+  } else if (game.phase === 'trial') {
+    const myUsername = game.playerUsernames.get(socketId) || '';
+    const targets = aliveUsernames.filter((u) => u !== myUsername);
+    io.to(socketId).emit('party:shadow:voteStart', { targets: [...targets, 'skip'], timeSeconds: 30 });
+  }
+}

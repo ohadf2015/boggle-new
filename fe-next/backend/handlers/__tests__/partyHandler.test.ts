@@ -8,7 +8,8 @@ import {
 import { canAccessFeature } from '../../utils/featureFlags';
 import { makeBotPlayers, startPartyBotDriver } from '../../modules/party/partyBots';
 import { initCaptionClash, resendCaptionState } from '../../modules/party/captionClashEngine';
-import { initPixelClash } from '../../modules/party/pixelClashEngine';
+import { initPixelClash, resendPixelState } from '../../modules/party/pixelClashEngine';
+import { resendShadowState } from '../../modules/party/shadowClashEngine';
 
 // Mock all party-engine modules so tests don't depend on engine internals.
 vi.mock('../../utils/logger', () => ({ default: {
@@ -40,6 +41,7 @@ vi.mock('../../modules/party/pixelClashEngine', () => ({
   submitRelayArtistDrawing: vi.fn(),
   submitRelayBuilderDrawing: vi.fn(),
   cleanupPixelClash: vi.fn(),
+  resendPixelState: vi.fn(),
 }));
 vi.mock('../../modules/party/shadowClashEngine', () => ({
   initShadowClash: vi.fn(),
@@ -48,6 +50,7 @@ vi.mock('../../modules/party/shadowClashEngine', () => ({
   submitVote: vi.fn(),
   callVoteEarly: vi.fn(),
   cleanupShadowClash: vi.fn(),
+  resendShadowState: vi.fn(),
 }));
 vi.mock('../../modules/party/partyBots', () => ({
   makeBotPlayers: vi.fn((n: number) =>
@@ -472,6 +475,24 @@ describe('partyHandler', () => {
       handlers['party:requestState']();
 
       expect(resendCaptionState).toHaveBeenCalledWith(io, room.roomCode, 'host');
+    });
+
+    it('routes to the pixel + shadow resenders for those games', async () => {
+      const px = createMockSocket('hostP');
+      const { io: ioP } = createMockIo();
+      registerPartyHandlers(ioP, px.socket);
+      await px.handlers['party:create']({ gameId: 'pixel-clash', roomName: 'P', username: 'H', avatar: {} });
+      const roomP = Array.from(partyRooms.values()).find((r) => r.gameId === 'pixel-clash')!;
+      px.handlers['party:requestState']();
+      expect(resendPixelState).toHaveBeenCalledWith(ioP, roomP.roomCode, 'hostP');
+
+      const sh = createMockSocket('hostS');
+      const { io: ioS } = createMockIo();
+      registerPartyHandlers(ioS, sh.socket);
+      await sh.handlers['party:create']({ gameId: 'shadow-clash', roomName: 'S', username: 'H', avatar: {} });
+      const roomS = Array.from(partyRooms.values()).find((r) => r.gameId === 'shadow-clash')!;
+      sh.handlers['party:requestState']();
+      expect(resendShadowState).toHaveBeenCalledWith(ioS, roomS.roomCode, 'hostS');
     });
 
     it('is a no-op when the socket is not in a room', () => {

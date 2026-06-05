@@ -29,6 +29,7 @@ import {
   submitRelayArtistDrawing,
   submitRelayBuilderDrawing,
   cleanupPixelClash,
+  resendPixelState,
   type DrawingData,
 } from '../modules/party/pixelClashEngine.js';
 import {
@@ -38,6 +39,7 @@ import {
   submitVote as submitShadowVote,
   callVoteEarly,
   cleanupShadowClash,
+  resendShadowState,
 } from '../modules/party/shadowClashEngine.js';
 import {
   makeBotPlayers,
@@ -409,6 +411,10 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
     if (!room) return;
     if (room.gameId === 'caption-clash') {
       resendCaptionState(io, room.roomCode, socket.id);
+    } else if (room.gameId === 'pixel-clash') {
+      resendPixelState(io, room.roomCode, socket.id);
+    } else if (room.gameId === 'shadow-clash') {
+      resendShadowState(io, room.roomCode, socket.id);
     }
   });
 

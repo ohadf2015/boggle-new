@@ -654,3 +654,39 @@ export function cleanupPixelClash(roomCode: string): void {
 export function getPixelGameState(roomCode: string): PixelGameState | undefined {
   return activeGames.get(roomCode);
 }
+
+/**
+ * Replay the current showdown phase to ONE socket (state-on-demand).
+ * Fixes the mount-timing stall: phaseUpdate/showdownCanvases are one-shot
+ * broadcasts, so a phone that mounts on the transition (or a late joiner)
+ * misses them and sits on "Starting...". The client requests state on mount.
+ * (Showdown is the only pixel mode solo uses; telephone/relay rely on
+ * per-step assignments and are out of scope here.)
+ */
+export function resendPixelState(io: Server, roomCode: string, socketId: string): void {
+  const game = activeGames.get(roomCode);
+  if (!game || game.mode !== 'showdown') return;
+  const round = game.rounds[game.rounds.length - 1];
+  if (!round) return;
+
+  if (round.phase === 'showdown-draw') {
+    io.to(socketId).emit('party:pixel:phaseUpdate', {
+      mode: 'showdown',
+      phase: 'showdown-draw',
+      prompt: round.prompt,
+      round: game.currentRound,
+      totalRounds: game.totalRounds,
+      timeSeconds: 60,
+    });
+  } else if (round.phase === 'showdown-vote' && round.canvases) {
+    // Re-shuffles canvas order (cosmetic; votes are keyed by socketId).
+    const entries = Array.from(round.canvases.entries())
+      .sort(() => Math.random() - 0.5)
+      .map(([id, strokes], index) => ({ id, strokes, number: index + 1 }));
+    io.to(socketId).emit('party:pixel:showdownCanvases', {
+      canvases: entries,
+      prompt: round.prompt,
+      timeSeconds: 20,
+    });
+  }
+}

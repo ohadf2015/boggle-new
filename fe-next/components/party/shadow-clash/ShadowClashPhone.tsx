@@ -135,6 +135,9 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
     socket.on('party:shadow:youWereEliminated', onEliminated);
     socket.on('party:shadow:gameOver', onGameOver);
 
+    // Replay current state (esp. the private role card) if we mounted mid-phase.
+    socket.emit('party:requestState');
+
     return () => {
       socket.off('party:shadow:roleAssigned', onRoleAssigned);
       socket.off('party:shadow:nightAction', onNightAction);

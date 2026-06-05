@@ -164,6 +164,9 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
     socket.on('party:pixel:relayBuildStart', onRelayBuildStart);
     socket.on('party:pixel:showdownCanvases', onShowdownCanvases);
 
+    // Replay current state if we mounted mid-phase (one-shot events missed).
+    socket.emit('party:requestState');
+
     return () => {
       socket.off('party:pixel:phaseUpdate', onPhaseUpdate);
       socket.off('party:pixel:assignment', onAssignment);
