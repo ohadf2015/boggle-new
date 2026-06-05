@@ -13,6 +13,7 @@ import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
+import { useWebViewRepaintOnResume } from '@/hooks/useWebViewRepaintOnResume';
 import { useAndroidBackButton } from '@/hooks/useAndroidBackButton';
 import { useStatusBarTint } from '@/hooks/useStatusBarTint';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
@@ -38,6 +39,13 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
   // Per-route status bar color so the system bar matches the active mode's
   // brand family (multiplayer=pink, daily=yellow, etc). Applies on every nav.
   useStatusBarTint();
+
+  // Repaint the WebView on resume. After a fullscreen ad Activity (interstitial
+  // / rewarded) dismisses, the WebView can return to the foreground without
+  // re-acquiring its GPU surface — a blank frame over the live React tree ("ad
+  // shows, then blank page"). Kicking a repaint on the actual resume catches the
+  // case the per-ad Dismissed-listener kick can miss (rAF still throttled then).
+  useWebViewRepaintOnResume();
 
   // One-time status bar wiring: WebView extends behind the bar, safe-area CSS
   // vars handle the inset. Color/style set per-route by useStatusBarTint.

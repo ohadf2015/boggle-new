@@ -91,11 +91,19 @@ describe('NativeAppProvider', () => {
         </NativeAppProvider>
       );
 
-      // THEN
-      expect(mockUseAppLifecycle).toHaveBeenCalledTimes(1);
+      // THEN: two independent lifecycle consumers — the socket-reconnect wiring
+      // here, plus useWebViewRepaintOnResume (repaint the WebView after a
+      // fullscreen ad Activity dismisses). Matches the codebase pattern of one
+      // appStateChange listener per concern (cf. BannerCoordinatorMount).
+      expect(mockUseAppLifecycle).toHaveBeenCalledTimes(2);
+      // The socket-reconnect consumer wires both foreground + background.
       expect(mockUseAppLifecycle).toHaveBeenCalledWith({
         onForeground: expect.any(Function),
         onBackground: expect.any(Function),
+      });
+      // The repaint consumer wires foreground only.
+      expect(mockUseAppLifecycle).toHaveBeenCalledWith({
+        onForeground: expect.any(Function),
       });
     });
 
