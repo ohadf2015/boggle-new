@@ -9,7 +9,7 @@ import type { Server } from 'socket.io';
 import { getGame, updateGame } from '../../modules/gameStateManager';
 import { resetGameAIValidationCount } from '../../modules/communityWordManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
-import { clearGameTimer, setGameTimer, hasGameTimer } from '../../utils/timerManager';
+import timerManager, { clearGameTimer, setGameTimer, hasGameTimer } from '../../utils/timerManager';
 import { drainLife, areAllPlayersEliminated } from '../../modules/wordHuntManager';
 import { isInProgress } from '../../utils/gameStateMachine';
 import { startBotsForGame, restoreBotsForGame } from './botGame';
@@ -223,4 +223,39 @@ export function resumeGameTimerIfMissing(io: Server, gameCode: string): boolean 
   );
   startGameTimer(io, gameCode, duration);
   return true;
+}
+
+/**
+ * Server-side safety net guaranteeing the round timer (and thus bot launch)
+ * starts even when no client signal arrives.
+ *
+ * The authoritative timer is normally started when human clients report
+ * `countdownComplete`, with an 8s coordinator fallback (see gameStartHandler).
+ * But when the only human's tab is frozen/backgrounded from before the round
+ * begins, no `countdownComplete` ever arrives AND the coordinator fallback can
+ * miss — the round then runs with NO server timer and the bots never launch
+ * (observed in prod: the FIRST MP game after a deploy, bots stuck at 0). Nothing
+ * recovers it until a client happens to reconnect and trigger the
+ * `requestGameState` orphan-recovery path (which is exactly what rescued the
+ * 2nd/3rd games in the same room).
+ *
+ * This arms a short timeout that proactively runs that SAME idempotent recovery
+ * server-side, so launch never depends on a client signal. Keyed per game so a
+ * rematch in the same room re-arms (cancelling the prior one). No-op if the
+ * timer already started by the time it fires — `resumeGameTimerIfMissing` guards
+ * on `isInProgress` + `hasGameTimer`.
+ *
+ * @param delayMs how long after start to check (default 10s — just past the 8s
+ *        coordinator fallback, so the normal path always gets first chance).
+ */
+export function scheduleGameStartSafetyNet(io: Server, gameCode: string, delayMs = 10000): void {
+  timerManager.setTimeout(`gameStartSafety:${gameCode}`, () => {
+    const resumed = resumeGameTimerIfMissing(io, gameCode);
+    if (resumed) {
+      logger.warn(
+        'GAME_START',
+        `Safety net started timer+bots for ${gameCode} ${delayMs}ms after start — client countdownComplete and the coordinator fallback both missed (stale/backgrounded host?). Bots would otherwise have scored 0 for the whole round.`,
+      );
+    }
+  }, delayMs);
 }

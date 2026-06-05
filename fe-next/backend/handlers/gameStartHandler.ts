@@ -38,6 +38,7 @@ import { ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { validatePayload, startGameSchema } from '../utils/socketValidation.js';
 import { startGameTimer } from './shared.js';
+import { scheduleGameStartSafetyNet } from '../services/gameLifecycle/gameTimer.js';
 import { getCachedTrie } from '../modules/boggleSolver.js';
 import { findAllWordsAsync } from '../modules/wordValidatorPool.js';
 import { stopAllBots } from '../modules/botManager.js';
@@ -686,6 +687,14 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           safeEmit(missingSock, 'startGame', { ...payload, reconnect: true });
         }
       });
+
+      // Server-side launch guarantee: the coordinator fallback above relies on a
+      // healthy client/coordinator handshake. If the only human's tab is frozen
+      // from before start, neither `countdownComplete` nor that fallback starts
+      // the timer — the round runs with no clock and bots score 0 until a client
+      // reconnects (requestGameState orphan recovery). Arm a proactive server-side
+      // recovery so launch never depends on a client signal. No-op once started.
+      scheduleGameStartSafetyNet(io, gameCode, 10000);
     }
 
     logger.info('SOCKET', `Game ${gameCode} starting with ${playerUsernames.length} players`);

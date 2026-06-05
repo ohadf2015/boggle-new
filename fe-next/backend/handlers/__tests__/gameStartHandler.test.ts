@@ -96,7 +96,7 @@ vi.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: moc
 vi.mock('../../../backend/utils/metrics', () => ({ ensureGame: mockEnsureGame }));
 vi.mock('../../../backend/utils/gameUtils', () => ({ generateRandomTable: mockGenerateRandomTable }));
 vi.mock('../../../backend/dictionary', () => ({ ensureLanguageLoaded: mockEnsureLanguageLoaded }));
-vi.mock('../../../backend/utils/timerManager', () => ({ default: { clearGameTimer: mockClearGameTimer }, clearGameTimer: mockClearGameTimer }));
+vi.mock('../../../backend/utils/timerManager', () => ({ default: { clearGameTimer: mockClearGameTimer, setTimeout: vi.fn(), clearTimer: vi.fn() }, clearGameTimer: mockClearGameTimer }));
 vi.mock('../../../backend/utils/gameStartCoordinator', () => ({
   __esModule: true,
   default: mockGameStartCoordinator,

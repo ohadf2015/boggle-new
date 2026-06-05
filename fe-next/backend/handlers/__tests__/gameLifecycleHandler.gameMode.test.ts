@@ -148,6 +148,8 @@ vi.mock('../../../backend/utils/gameStartCoordinator', () => ({
 
 vi.mock('../../../backend/utils/timerManager', () => ({ default: {
   clearGameTimer: vi.fn(),
+  setTimeout: vi.fn(),
+  clearTimer: vi.fn(),
 }, clearGameTimer: vi.fn() }));
 
 vi.mock('../../../backend/redisClient', () => ({
