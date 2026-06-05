@@ -12946,7 +12946,17 @@ const sv = {
     "pcAdultOnly": "Endast ett vuxenkonto kan ändra dessa inställningar.",
     "nameLockedNote": "En vuxen kan aktivera ett anpassat namn i föräldrakontrollerna."
   },
-  "offerwall": { "cta": { "label": "Tjäna gratis mynt", "aria": "Tjäna gratis mynt genom att slutföra erbjudanden" }, "modal": { "title": "Gratis mynt", "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.", "close": "Stäng" } }
+  "offerwall": { "cta": { "label": "Tjäna gratis mynt", "aria": "Tjäna gratis mynt genom att slutföra erbjudanden" }, "modal": { "title": "Gratis mynt", "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.", "close": "Stäng" } },
+  "offlineDownload": {
+    "title": "Ladda ned för offline",
+    "description": "Ladda ned ordlistor för att kunna spela offline. Ordlistorna är offentlig spelinformation.",
+    "downloadButton": "Ladda ned",
+    "deleteButton": "Ta bort",
+    "downloading": "Laddar ned…",
+    "downloaded": "{size} MB · {count} ord",
+    "notDownloaded": "Ej nedladdad",
+    "errorGeneric": "Nedladdningen misslyckades. Försök igen."
+  }
 };
 
 export { sv };

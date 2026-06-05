@@ -13304,7 +13304,17 @@ const en = {
     "pcAdultOnly": "Only an adult account can change these settings.",
     "nameLockedNote": "An adult can turn on a custom name in parental controls."
   },
-  "offerwall": { "cta": { "label": "Earn free coins", "aria": "Earn free coins by completing offers" }, "modal": { "title": "Free Coins", "subtitle": "Complete an offer — your coins are added automatically.", "close": "Close" } }
+  "offerwall": { "cta": { "label": "Earn free coins", "aria": "Earn free coins by completing offers" }, "modal": { "title": "Free Coins", "subtitle": "Complete an offer — your coins are added automatically.", "close": "Close" } },
+  "offlineDownload": {
+    "title": "Download for Offline",
+    "description": "Download language dictionaries to play offline. Dictionary data is public game information.",
+    "downloadButton": "Download",
+    "deleteButton": "Delete",
+    "downloading": "Downloading…",
+    "downloaded": "{size} MB · {count} words",
+    "notDownloaded": "Not downloaded",
+    "errorGeneric": "Download failed. Please try again."
+  }
 };
 
 export { en };

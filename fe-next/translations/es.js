@@ -13034,7 +13034,17 @@ const es = {
     "pcAdultOnly": "Solo una cuenta de adulto puede cambiar estos ajustes.",
     "nameLockedNote": "Un adulto puede activar un nombre personalizado en el control parental."
   },
-  "offerwall": { "cta": { "label": "Gana monedas gratis", "aria": "Gana monedas gratis completando ofertas" }, "modal": { "title": "Monedas gratis", "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.", "close": "Cerrar" } }
+  "offerwall": { "cta": { "label": "Gana monedas gratis", "aria": "Gana monedas gratis completando ofertas" }, "modal": { "title": "Monedas gratis", "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.", "close": "Cerrar" } },
+  "offlineDownload": {
+    "title": "Descargar para usar sin conexión",
+    "description": "Descarga diccionarios de idiomas para jugar sin conexión. Los datos del diccionario son información pública del juego.",
+    "downloadButton": "Descargar",
+    "deleteButton": "Eliminar",
+    "downloading": "Descargando…",
+    "downloaded": "{size} MB · {count} palabras",
+    "notDownloaded": "No descargado",
+    "errorGeneric": "Fallo en la descarga. Intenta de nuevo."
+  }
 };
 
 export { es };

@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { RemoveAdsProbe } from '@/components/ads/RemoveAdsProbe';
 import { NotificationCategoryPreferences } from '@/components/notifications/NotificationCategoryPreferences';
+import { OfflineDownloadManager } from '@/components/offline/OfflineDownloadManager';
 
 // Language options
 const LANGUAGES = [
@@ -468,6 +469,19 @@ export default function SettingsPageClient(): React.JSX.Element {
               <ChevronRight className={cn('w-5 h-5 rtl:rotate-180', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
             </Link>
           <RemoveAdsProbe isDarkMode={isDarkMode} />
+          </m.section>
+
+          {/* Offline Download */}
+          <m.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className={cn(
+              'rounded-neo border-neo p-4',
+              isDarkMode ? 'bg-neo-navy-light border-neo-black' : 'bg-white border-neo-black'
+            )}
+          >
+            <OfflineDownloadManager />
           </m.section>
           </div>{/* end right column */}
         </div>{/* end grid */}
