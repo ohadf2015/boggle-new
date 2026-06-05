@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const prewarmMock = vi.fn();
 
@@ -15,54 +15,24 @@ describe('DictionaryPrewarmer', () => {
     prewarmMock.mockResolvedValue(undefined);
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('schedules prewarm via requestIdleCallback when available', () => {
-    const ricSpy = vi.fn((cb: () => void) => {
-      cb();
-      return 42;
-    });
-    const cicSpy = vi.fn();
-    (window as unknown as { requestIdleCallback: typeof ricSpy }).requestIdleCallback = ricSpy;
-    (window as unknown as { cancelIdleCallback: typeof cicSpy }).cancelIdleCallback = cicSpy;
-
-    const { unmount } = render(<DictionaryPrewarmer lang="en" />);
-
-    expect(ricSpy).toHaveBeenCalledTimes(1);
+  it('prewarms eagerly on mount (no idle/timeout deferral)', () => {
+    // Must fire immediately so the active-locale dictionary is fetched (and thus
+    // SW-cached) before the user can go offline. A short-lived session may never
+    // reach a requestIdleCallback, so deferral would leave the dict cold.
+    render(<DictionaryPrewarmer lang="en" />);
     expect(prewarmMock).toHaveBeenCalledWith('en');
-
-    unmount();
-    expect(cicSpy).toHaveBeenCalledWith(42);
-
-    delete (window as unknown as { requestIdleCallback?: unknown }).requestIdleCallback;
-    delete (window as unknown as { cancelIdleCallback?: unknown }).cancelIdleCallback;
   });
 
-  it('falls back to setTimeout when requestIdleCallback missing', () => {
-    delete (window as unknown as { requestIdleCallback?: unknown }).requestIdleCallback;
-    vi.useFakeTimers();
-
-    render(<DictionaryPrewarmer lang="he" />);
-
-    expect(prewarmMock).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(2000);
+  it('re-prewarms when the language changes', () => {
+    const { rerender } = render(<DictionaryPrewarmer lang="en" />);
+    prewarmMock.mockClear();
+    rerender(<DictionaryPrewarmer lang="he" />);
     expect(prewarmMock).toHaveBeenCalledWith('he');
   });
 
   it('swallows rejection so mount never breaks', async () => {
     prewarmMock.mockRejectedValueOnce(new Error('network dead'));
-    (window as unknown as { requestIdleCallback: (cb: () => void) => number }).requestIdleCallback = (
-      cb: () => void,
-    ) => {
-      cb();
-      return 1;
-    };
-
     expect(() => render(<DictionaryPrewarmer lang="en" />)).not.toThrow();
     await Promise.resolve();
-
-    delete (window as unknown as { requestIdleCallback?: unknown }).requestIdleCallback;
   });
 });

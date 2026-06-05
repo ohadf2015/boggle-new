@@ -17,7 +17,7 @@ import { offlineCapableRoutes } from '@/lib/offline/offlineCapableModes';
 import { locales } from '@/i18n/config';
 
 /** Bump on any behavior/precache change. Format: lexiclash-v{MAJOR}-{YYYYMMDD}. */
-export const SW_CACHE_NAME = 'lexiclash-v5-20260603';
+export const SW_CACHE_NAME = 'lexiclash-v6-20260605';
 
 /**
  * Route shells to precache so a cold (offline) launch has a cached document to
@@ -73,6 +73,14 @@ const NETWORK_ONLY_PATTERNS = [
   /sentry/,
   /_next\\/webpack-hmr/,
 ];
+
+// The word dictionary is an /api/ path, but it must be available offline so
+// Blast/Daily word validation works with no network. Route it offline-first
+// (stale-while-revalidate) — checked BEFORE NETWORK_ONLY_PATTERNS. This kills
+// both the cold-start dict failure and the 24h IndexedDB-TTL re-fetch failure
+// (the hook's re-fetch now succeeds from cache offline). Cached on first fetch,
+// active-locale only (do not precache — Hebrew is ~5MB).
+const DICT_SWR_PATTERN = /\\/api\\/dictionary-words/;
 
 const CACHE_FIRST_PATTERNS = [
   /\\/_next\\/static\\//,
@@ -137,6 +145,27 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin !== self.location.origin) return;
   if (request.method !== 'GET') return;
+
+  // Dictionary: offline-first (cache, revalidate in background). Must precede
+  // the NETWORK_ONLY check (which would otherwise claim this /api/ path).
+  if (DICT_SWR_PATTERN.test(url.pathname)) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(request).then((cached) => {
+          const network = fetch(request)
+            .then((response) => {
+              if (isCacheable(response)) {
+                safeCachePut(cache, request, response.clone());
+              }
+              return response;
+            })
+            .catch(() => cached || Response.error());
+          return cached || network;
+        })
+      )
+    );
+    return;
+  }
 
   if (NETWORK_ONLY_PATTERNS.some((p) => p.test(url.pathname + url.search))) {
     return;

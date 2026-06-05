@@ -10,23 +10,14 @@ interface Props {
 
 export default function DictionaryPrewarmer({ lang }: Props) {
   useEffect(() => {
-    const run = () => {
-      prewarmDictionary(lang).catch(() => {
-        // Silent — mount must never break on flaky dict fetch.
-      });
-    };
-
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      const id = (window as Window & typeof globalThis).requestIdleCallback(run);
-      return () => {
-        if ('cancelIdleCallback' in window) {
-          (window as Window & typeof globalThis).cancelIdleCallback(id);
-        }
-      };
-    }
-
-    const id = setTimeout(run, 2000);
-    return () => clearTimeout(id);
+    // Fire eagerly. The effect already runs after paint, so this can't jank
+    // first render, and firing now (vs. deferring to requestIdleCallback) is
+    // what guarantees the active-locale dictionary is fetched — and therefore
+    // service-worker-cached — before the user can drop offline. The fetch is
+    // off-main-thread (dictionary worker) and fire-and-forget.
+    prewarmDictionary(lang).catch(() => {
+      // Silent — mount must never break on a flaky dict fetch.
+    });
   }, [lang]);
 
   return null;

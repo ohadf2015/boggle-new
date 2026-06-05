@@ -159,6 +159,22 @@ async function fetchViaWorker(language: Language): Promise<Set<string> | null> {
 }
 
 /**
+ * Load an explicitly-downloaded, encrypted dictionary (see lib/offline/
+ * dictionaryDownload). Dynamic import keeps the crypto/IndexedDB code off the
+ * initial bundle and out of SSR. Returns null (never throws) if unavailable.
+ */
+async function loadDownloadedDictionary(language: Language): Promise<Set<string> | null> {
+  try {
+    const { loadOfflineDictionary, createIdbStores } = await import(
+      '@/lib/offline/dictionaryDownload'
+    );
+    return await loadOfflineDictionary(language, createIdbStores());
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Fetch dictionary from API
  */
 async function fetchDictionary(language: Language): Promise<Set<string>> {
@@ -174,6 +190,16 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
 
   // Start loading
   const loadPromise = (async () => {
+    // Explicitly-downloaded (encrypted) dictionary takes precedence: the user
+    // opted into offline for this language, so it's authoritative and permanent
+    // (no 24h TTL). Guarded — degrades to the normal path if storage/crypto is
+    // unavailable (SSR, private browsing).
+    const downloaded = await loadDownloadedDictionary(language);
+    if (downloaded && downloaded.size > 0) {
+      memoryCache.set(language, downloaded);
+      return downloaded;
+    }
+
     // Try IndexedDB cache first
     const cached = await getCachedDictionary(language);
     if (cached) {
