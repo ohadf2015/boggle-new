@@ -30,6 +30,7 @@ import { registerWordTowerHandlers } from './wordTowerHandler.js';
 import { registerWordPackHandler } from './wordPackHandler.js';
 import { registerKickHandler } from './kickHandler.js';
 import { registerReactionHandlers } from './reactionHandler.js';
+import { registerLobbyEmoteHandlers } from './lobbyEmoteHandler.js';
 import { registerGiftHandlers } from './giftHandler.js';
 import { registerPartyHandlers } from './partyHandler.js';
 import { registerBoostHandlers } from './boostHandler.js';
@@ -68,6 +69,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerWordPackHandler(io, socket);
   registerKickHandler(io, socket);
   registerReactionHandlers(io, socket);
+  registerLobbyEmoteHandlers(io, socket);
   registerGiftHandlers(io, socket);
   registerPartyHandlers(io, socket);
   registerBoostHandlers(io, socket);

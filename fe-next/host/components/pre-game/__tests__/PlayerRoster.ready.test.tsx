@@ -26,7 +26,7 @@ vi.mock('framer-motion', () => ({
   useReducedMotion: () => true,
 }));
 vi.mock('../../../../components/Avatar', () => ({ default: () => <div data-testid="avatar" /> }));
-vi.mock('../../../../utils/SocketContext', () => ({ useSocket: () => ({ socket: { emit: vi.fn() } }) }));
+vi.mock('../../../../utils/SocketContext', () => ({ useSocket: () => ({ socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() } }) }));
 vi.mock('../../../../components/ui/ConfirmationDialog', () => ({ ConfirmationDialog: () => null }));
 
 const t = (k: string) => k;

@@ -2076,6 +2076,18 @@ const es = {
       }
     }
   },
+  "lobby": {
+    "emote": {
+      "title": "Reacciona",
+      "laugh": "Risa",
+      "angry": "Enojado",
+      "wink": "Guiño",
+      "silly": "Travieso",
+      "love": "Enamorado",
+      "shock": "Sorpresa",
+      "cool": "Genial"
+    }
+  },
   "playerView": {
     "onlyLanguageWords": "Usa solo letras de este idioma",
     "wordsFound": "Palabras Encontradas",
@@ -12276,6 +12288,8 @@ const es = {
     "host": "Anfitrión",
     "waiting": "...",
     "startGame": "Iniciar juego",
+    "playSolo": "Jugar Solo",
+    "soloHint": "Añade bots y únete con el código desde tu móvil",
     "round": "Ronda",
     "submitted": "enviados",
     "submit": "Enviar",
@@ -12908,6 +12922,15 @@ const es = {
       "wheelRush": "Rueda Loca",
       "wordHunt": "Caza de Palabras",
       "blast": "Estallido"
+    },
+    "rivals": {
+      "header": "Codo a codo",
+      "you": "Tú",
+      "playersCount": "{n} jugadores",
+      "toCatch": "+{n} para alcanzar",
+      "ahead": "{n} por delante",
+      "tie": "Empate",
+      "aria": "Rivales más cercanos"
     },
     "insights": {
       "rosterHeader": "Jugadores",

@@ -1938,6 +1938,18 @@ const ja = {
       }
     }
   },
+  "lobby": {
+    "emote": {
+      "title": "リアクション",
+      "laugh": "笑い",
+      "angry": "怒り",
+      "wink": "ウインク",
+      "silly": "おちゃめ",
+      "love": "ラブ",
+      "shock": "びっくり",
+      "cool": "クール"
+    }
+  },
   "playerView": {
     "onlyLanguageWords": "この言語の文字だけを使ってください",
     "wordsFound": "見つけた単語",
@@ -12182,6 +12194,8 @@ const ja = {
     "host": "ホスト",
     "waiting": "...",
     "startGame": "ゲーム開始",
+    "playSolo": "ひとりで遊ぶ",
+    "soloHint": "ボットを追加して、コードでスマホから参加",
     "round": "ラウンド",
     "submitted": "送信済み",
     "submit": "送信",
@@ -12728,6 +12742,15 @@ const ja = {
       wheelRush: "ホイールラッシュ",
       wordHunt: "ワードハント",
       blast: "ブラスト"
+    },
+    rivals: {
+      header: "接戦",
+      you: "あなた",
+      playersCount: "{n}人",
+      toCatch: "あと{n}",
+      ahead: "{n}リード",
+      tie: "同点",
+      aria: "接戦の相手"
     },
     insights: {
       rosterHeader: "プレイヤー",

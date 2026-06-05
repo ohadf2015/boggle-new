@@ -62,6 +62,7 @@ const mockSocket = {
 };
 vi.mock('../../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: mockSocket }),
+  useSocketOptional: () => ({ socket: mockSocket }),
 }));
 
 // Mock AuthContext

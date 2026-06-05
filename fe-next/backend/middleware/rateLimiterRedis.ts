@@ -41,6 +41,7 @@ function getSocketRateLimiters(): Record<string, RateLimiterAbstract> {
       wordSubmit: createRateLimiter('ws:word', RATE_LIMITS.wordSubmit.points, RATE_LIMITS.wordSubmit.duration),
       chatMessage: createRateLimiter('ws:chat', RATE_LIMITS.chatMessage.points, RATE_LIMITS.chatMessage.duration),
       emojiReaction: createRateLimiter('ws:emoji', RATE_LIMITS.emojiReaction.points, RATE_LIMITS.emojiReaction.duration),
+      lobbyEmote: createRateLimiter('ws:lobbyemote', RATE_LIMITS.lobbyEmote.points, RATE_LIMITS.lobbyEmote.duration),
       roomCreate: createRateLimiter('ws:room', RATE_LIMITS.roomCreate.points, RATE_LIMITS.roomCreate.duration),
       default: createRateLimiter('ws:default', RATE_LIMITS.default.points, RATE_LIMITS.default.duration),
     };

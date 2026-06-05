@@ -21,6 +21,15 @@ export const AVATAR_MOODS = [
   'win',
   'lose',
   'afk',
+  // Lobby emotes — player-triggered (not game-driven). Same transient render
+  // mechanism, separate picker metadata lives in lib/lobby/lobbyEmotes.ts.
+  'emoteLaugh',
+  'emoteAngry',
+  'emoteWink',
+  'emoteSilly',
+  'emoteLove',
+  'emoteShock',
+  'emoteCool',
 ] as const;
 
 export type AvatarMood = (typeof AVATAR_MOODS)[number];
@@ -50,6 +59,14 @@ export const MOOD_EXPRESSIONS: Record<AvatarMood, MoodExpression> = {
   win: { eyes: 'star', eyebrows: 'raised', mouth: 'grin', effect: 'pop' },
   lose: { eyes: 'sad', eyebrows: 'worried', mouth: 'pout', effect: 'shake' },
   afk: { eyes: 'sleepy', eyebrows: 'flat', mouth: 'flat', effect: 'none' },
+  // Lobby emotes — all parts verified against the real CustomAvatarConfig enums.
+  emoteLaugh: { eyes: 'happy', eyebrows: 'raised', mouth: 'grin', effect: 'pop' },
+  emoteAngry: { eyes: 'angry', eyebrows: 'angry', mouth: 'frown', effect: 'shake' },
+  emoteWink: { eyes: 'wink', eyebrows: 'raised', mouth: 'smirk', effect: 'pop' },
+  emoteSilly: { eyes: 'wink', mouth: 'tongue', effect: 'pop' },
+  emoteLove: { eyes: 'hearts', eyebrows: 'raised', mouth: 'grin', effect: 'pulse' },
+  emoteShock: { eyes: 'wide', eyebrows: 'raised', mouth: 'oh', effect: 'pop' },
+  emoteCool: { eyes: 'cool', eyebrows: 'flat', mouth: 'smirk', effect: 'pop' },
 };
 
 /**
@@ -96,4 +113,12 @@ export const MOOD_DURATION_MS: Record<AvatarMood, number> = {
   win: 2200,
   lose: 1600,
   afk: 0,
+  // Lobby emotes — uniform party-length pop; bubble + face-swap share this lifetime.
+  emoteLaugh: 1800,
+  emoteAngry: 1800,
+  emoteWink: 1800,
+  emoteSilly: 1800,
+  emoteLove: 1800,
+  emoteShock: 1800,
+  emoteCool: 1800,
 };

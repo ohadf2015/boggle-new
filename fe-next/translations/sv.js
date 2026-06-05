@@ -2038,6 +2038,18 @@ const sv = {
       }
     }
   },
+  "lobby": {
+    "emote": {
+      "title": "Reagera",
+      "laugh": "Skratt",
+      "angry": "Arg",
+      "wink": "Blinkning",
+      "silly": "Tokig",
+      "love": "Kär",
+      "shock": "Chockad",
+      "cool": "Cool"
+    }
+  },
   "playerView": {
     "onlyLanguageWords": "Använd endast bokstäver från detta språk",
     "wordsFound": "Ord hittade",
@@ -12275,6 +12287,8 @@ const sv = {
     "host": "Värd",
     "waiting": "...",
     "startGame": "Starta spel",
+    "playSolo": "Spela Solo",
+    "soloHint": "Lägg till bottar och gå med via koden på telefonen",
     "round": "Runda",
     "submitted": "skickade",
     "submit": "Skicka",
@@ -12820,6 +12834,15 @@ const sv = {
       wheelRush: "Hjulet",
       wordHunt: "Ordjakt",
       blast: "Blast"
+    },
+    rivals: {
+      header: "Tät kamp",
+      you: "Du",
+      playersCount: "{n} spelare",
+      toCatch: "+{n} att ta",
+      ahead: "{n} före",
+      tie: "Dött lopp",
+      aria: "Närmaste rivaler"
     },
     insights: {
       rosterHeader: "Spelare",

@@ -2047,6 +2047,18 @@ const en = {
       }
     }
   },
+  "lobby": {
+    "emote": {
+      "title": "React",
+      "laugh": "Laugh",
+      "angry": "Angry",
+      "wink": "Wink",
+      "silly": "Silly",
+      "love": "Love",
+      "shock": "Shocked",
+      "cool": "Cool"
+    }
+  },
   "playerView": {
     "onlyLanguageWords": "Use only letters from this language",
     "getReadyHint": "Scan the grid now!",
@@ -12031,6 +12043,8 @@ const en = {
     "host": "Host",
     "waiting": "...",
     "startGame": "Start Game",
+    "playSolo": "Play Solo",
+    "soloHint": "Add bots, then join on your phone via the code",
     "round": "Round",
     "submitted": "submitted",
     "submit": "Submit",
@@ -12781,6 +12795,15 @@ const en = {
       "wheelRush": "Wheel Rush",
       "wordHunt": "Word Hunt",
       "blast": "Blast"
+    },
+    "rivals": {
+      "header": "Close Race",
+      "you": "You",
+      "playersCount": "{n} players",
+      "toCatch": "+{n} to catch",
+      "ahead": "{n} ahead",
+      "tie": "Dead heat",
+      "aria": "Closest rivals"
     },
     "insights": {
       "rosterHeader": "Players",

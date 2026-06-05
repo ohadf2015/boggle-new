@@ -2089,6 +2089,18 @@ const he = {
       }
     }
   },
+  "lobby": {
+    "emote": {
+      "title": "הבעות",
+      "laugh": "צוחק",
+      "angry": "כועס",
+      "wink": "קורץ",
+      "silly": "משעשע",
+      "love": "מאוהב",
+      "shock": "מופתע",
+      "cool": "קול"
+    }
+  },
   "playerView": {
     "onlyLanguageWords": "השתמשו רק באותיות של השפה הזו",
     "wordsFound": "מילים שנמצאו",
@@ -12467,6 +12479,8 @@ const he = {
     "host": "מארח",
     "waiting": "...",
     "startGame": "התחל משחק",
+    "playSolo": "שחק לבד",
+    "soloHint": "הוסיפו בוטים והצטרפו מהטלפון עם הקוד",
     "round": "סיבוב",
     "submitted": "נשלחו",
     "submit": "שלח",
@@ -13218,6 +13232,15 @@ const he = {
       "wheelRush": "גלגל הזמן",
       "wordHunt": "ציד מילים",
       "blast": "פיצוץ"
+    },
+    "rivals": {
+      "header": "מרוץ צמוד",
+      "you": "אני",
+      "playersCount": "{n} שחקנים",
+      "toCatch": "להשיג {n}",
+      "ahead": "מוביל ב-{n}",
+      "tie": "תיקו",
+      "aria": "היריבים הקרובים"
     },
     "insights": {
       "rosterHeader": "שחקנים",

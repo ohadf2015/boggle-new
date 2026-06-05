@@ -13,6 +13,10 @@ import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
 import { LobbyReactions } from '../../components/lobby/LobbyReactions';
+import { EmoteTray } from './lobby/EmoteTray';
+import { AvatarEmoteBubble } from '../../components/avatar/AvatarEmoteBubble';
+import { useSocketOptional } from '@/utils/SocketContext';
+import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
@@ -87,6 +91,14 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const { isAuthenticated, updateProfile } = useAuth();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const gameMode = useGameMode();
+
+  // Lobby emotes — self-contained over the shared socket (no prop threading).
+  // The sender shows their own emote optimistically; the room receives the rest.
+  const socketCtx = useSocketOptional();
+  const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({
+    socket: socketCtx?.socket ?? null,
+    username,
+  });
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
@@ -312,8 +324,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                       pixelSize={64}
                       mode="multiplayer"
                       className="w-full h-full"
+                      mood={emotesByUsername[name]?.emote}
                     />
                   </div>
+                  {/* Lobby emote bubble — pops over the avatar when this player emotes */}
+                  <AvatarEmoteBubble active={emotesByUsername[name]} />
                   {isBot && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-cyan border-2 border-neo-black rounded-full flex items-center justify-center">
                       <Bot className="w-3 h-3 text-neo-black" />
@@ -349,6 +364,14 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Emote tray — tap a face and your own avatar (above) reacts for the room */}
+      <div className="space-y-1.5 pt-1">
+        <h4 className="px-1 text-xs font-bold uppercase tracking-widest text-slate-500">
+          {t('lobby.emote.title')}
+        </h4>
+        <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} />
       </div>
     </section>
   );
