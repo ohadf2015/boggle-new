@@ -1,6 +1,6 @@
 {
-  "date": "2026-06-04",
-  "note": "Tenth snapshot. Frontend fix: mascot added to ViewLoadingSkeleton in multiplayer/PageClient.tsx so LCP fires at first client paint rather than after MultiplayerFlow dynamic import. Backend stable — no actionable slow queries (word_review_state 0 rows; advisor FKs low-traffic; auth connections = platform setting, not SQL).",
+  "date": "2026-06-05",
+  "note": "Eleventh snapshot. Backend fix: idx_web_vitals_player_id applied (EXPLAIN confirmed 3207ms seq scan on 99k rows → index scan). Frontend: /en/multiplayer CLS regressed 0.057→0.29; root cause = AutoHideHeader returns null (not hidden div) when isInGame flips post-hydration, causing ~60px layout shift. Fix deferred — needs placeholder div strategy.",
   "backend": {
     "top_queries": [
       {
@@ -8,7 +8,7 @@
         "calls": 775439,
         "mean_ms": 4.29,
         "total_ms": 3328220,
-        "verdict": "INFRASTRUCTURE: +214ms vs prior 3328006. Deferred to Supabase support."
+        "verdict": "INFRASTRUCTURE: unchanged. Deferred to Supabase support."
       },
       {
         "label": "sync_coins_rpc",
@@ -19,70 +19,65 @@
       },
       {
         "label": "profiles_update_last_seen_at",
-        "calls": 26603,
-        "mean_ms": 2.10,
-        "total_ms": 55871,
+        "calls": 28930,
+        "mean_ms": 2.08,
+        "total_ms": 60138,
         "verdict": "ok"
       },
       {
         "label": "pg_timezone_names_select",
-        "calls": 166,
-        "mean_ms": 332.55,
-        "total_ms": 55203,
-        "verdict": "WATCH: Studio introspection only. Unchanged."
+        "calls": 173,
+        "mean_ms": 334.22,
+        "total_ms": 57821,
+        "verdict": "WATCH: Studio/MCP introspection only. No app caller."
       },
       {
         "label": "friend_messages_dm_thread",
-        "calls": 104538,
+        "calls": 108578,
         "mean_ms": 0.16,
-        "total_ms": 16798,
-        "verdict": "ok: fast, properly indexed."
+        "total_ms": 17389,
+        "verdict": "ok"
       },
       {
         "label": "web_vitals_insert",
-        "calls": 24237,
-        "mean_ms": 0.67,
-        "total_ms": 16281,
-        "verdict": "ok"
+        "calls": 25212,
+        "mean_ms": 0.70,
+        "total_ms": 17637,
+        "verdict": "ok: INSERT fast. player_id FK now indexed (migration applied this run)."
       }
     ],
+    "fix_shipped": "idx_web_vitals_player_id: btree index on web_vitals.player_id. EXPLAIN showed 3207ms seq scan on 99111 rows. Advisor-flagged + EXPLAIN-confirmed.",
     "advisor_warnings_count": 95,
-    "advisor_notes": "94 unindexed FKs — mostly low-traffic admin/analytics. word_review_state has 0 rows. auth_db_connections_absolute requires Supabase Dashboard change."
+    "advisor_notes": "95 advisors: 94 unindexed FKs (web_vitals.player_id now fixed) + auth_db_connections_absolute (Supabase Dashboard change, not SQL). word_review_state has 0 rows — no index needed."
   },
   "frontend": {
-    "fix_shipped": "multiplayer/PageClient.tsx: mascot in ViewLoadingSkeleton with priority. Expected LCP savings: 200-500ms.",
     "by_route_24h": [
       {
         "route": "/en/multiplayer",
-        "p75_lcp": 4237,
-        "p75_inp": 440,
-        "p75_cls": 0.057,
-        "n": 5,
-        "flags": ["LCP_POOR"],
-        "delta_vs_prior": "+621ms vs prior 3616ms (REGRESSION). Fix shipped."
+        "p75_lcp": 4360,
+        "p75_inp": 272,
+        "p75_cls": 0.29,
+        "n": 16,
+        "flags": ["LCP_POOR", "CLS_POOR"],
+        "delta_vs_prior": "LCP +123ms (stable). INP -168ms (improved). CLS 0.057→0.29 (REGRESSION x5). Root: AutoHideHeader null-vs-element toggle post-hydration."
       },
       {
-        "route": "/es/multiplayer",
-        "p75_lcp": 4174,
-        "p75_inp": 652,
-        "p75_cls": 0.065,
-        "n": 4,
-        "flags": ["LCP_POOR", "INP_POOR"],
-        "delta_vs_prior": "NEW"
-      },
-      {
-        "route": "/he",
-        "p75_lcp": 2940,
-        "p75_inp": 256,
-        "p75_cls": 0.067,
-        "n": 5,
-        "flags": ["LCP_NEEDS_IMPROVEMENT"]
+        "route": "/en",
+        "p75_lcp": 2441,
+        "p75_inp": null,
+        "p75_cls": 0.013,
+        "n": 26,
+        "flags": ["LCP_NEEDS_IMPROVEMENT"],
+        "delta_vs_prior": "homepage LCP holding ~2441ms (prior open watch 7107ms was a different URL variant with chatgpt UTM)"
       }
     ],
     "open_watches": [
-      "/en LCP 7107ms — homepage showcase3D/ScrollTrigger. Deferred.",
-      "/he/daily/word-hunt LCP 8188ms — brief top signal. Deferred.",
-      "/en/daily/word-wheel LCP 5244ms. Deferred.",
+      "/en/multiplayer CLS 0.29 REGRESSION — AutoHideHeader returns null not hidden div. Fix = wrap in <div style={{height: headerHeight}}> placeholder. Owner: lane 02 or lane 05.",
+      "/en/multiplayer LCP 4360ms — dynamic import MultiplayerFlow delays LCP. Prior mascot-in-skeleton fix not visible in current code.",
+      "/en/multiplayer?utm_source=chatgpt.com LCP 13036ms — UTM variant, likely cold start.",
+      "/he/daily/word-wheel LCP 7864ms — undiagnosed. High priority.",
+      "/he/daily LCP 5932ms — undiagnosed.",
+      "/en/daily/word-wheel LCP 4384ms — undiagnosed.",
       "/en/free-multiplayer-word-game CLS 1.0 — GSAP pin-spacer. Deferred."
     ]
   },

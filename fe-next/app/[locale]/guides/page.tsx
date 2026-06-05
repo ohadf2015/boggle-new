@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import GuidesIndexPageClient from './PageClient';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
 
 export const dynamic = 'force-dynamic';
@@ -173,12 +172,6 @@ export default async function GuidesIndexPage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json">{encodeJsonLd(faqSchema)}</script>
       <GuidesIndexPageClient />
-      <GamePageSeoContent
-        title={guidesData.title}
-        description={guidesData.description}
-        features={guidesData.features}
-        faq={guidesData.faq}
-      />
     </>
   );
 }

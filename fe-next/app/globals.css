@@ -258,6 +258,38 @@ html.lexi-native [data-selectable] {
   }
 }
 
+@utility shadow-hard-lime {
+  box-shadow: 4px 4px 0px var(--neo-lime);
+
+  [dir='rtl'] & {
+    box-shadow: -4px 4px 0px var(--neo-lime);
+  }
+}
+
+@utility shadow-hard-pink {
+  box-shadow: 4px 4px 0px var(--neo-pink);
+
+  [dir='rtl'] & {
+    box-shadow: -4px 4px 0px var(--neo-pink);
+  }
+}
+
+@utility shadow-hard-cyan {
+  box-shadow: 4px 4px 0px var(--neo-cyan);
+
+  [dir='rtl'] & {
+    box-shadow: -4px 4px 0px var(--neo-cyan);
+  }
+}
+
+@utility shadow-hard-purple {
+  box-shadow: 4px 4px 0px var(--neo-purple);
+
+  [dir='rtl'] & {
+    box-shadow: -4px 4px 0px var(--neo-purple);
+  }
+}
+
 @utility border-neo {
   /* Neo-Brutalist Border */
   border: var(--border-neo) solid rgb(var(--neo-black));
@@ -3236,8 +3268,14 @@ html {
      the banner still shows (has-admob-banner) the band must still be reserved —
      otherwise the banner covers bottom CTAs. --bottom-stack-height self-zeros
      when both layers are absent, so this is a no-op on web / nav-less desktop. */
+  /* Reserve the bottom stack (nav + banner) on both scrollable (screen-fit) and
+     locked (screen-fit-locked) bodies. In-game screens lock the body but the
+     native AdMob banner still composites above the WebView, so locked bodies must
+     reserve the band to prevent the banner from covering bottom CTAs. */
   html.has-global-bottom-nav body.screen-fit,
-  html.has-admob-banner body.screen-fit {
+  html.has-admob-banner body.screen-fit,
+  html.has-global-bottom-nav body.screen-fit-locked,
+  html.has-admob-banner body.screen-fit-locked {
     padding-bottom: var(--bottom-stack-height);
   }
   html.has-global-bottom-nav,

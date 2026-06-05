@@ -5,11 +5,11 @@
  * Shows meme image, typewriter caption reveals, laugh meter, vote results, winner crown.
  */
 
-import { memo, useEffect, useState, useCallback } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePartySounds } from '@/hooks/usePartySounds';
 
 // ==================== Types ====================
@@ -51,7 +51,7 @@ interface CaptionClashTvProps {
 
 // ==================== Component ====================
 
-function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
+function CaptionClashTvInner({ socket }: CaptionClashTvProps) {
   const { t } = useLanguage();
   const partySounds = usePartySounds();
   const [phase, setPhase] = useState<CaptionPhase>('waiting');
@@ -256,90 +256,162 @@ function CaptionClashTvInner({ socket, roomCode }: CaptionClashTvProps) {
     );
   }
 
-  // Voting phase — show all captions
+  // Voting phase — dramatic fullscreen countdown
   if (phase === 'voting' && imageData) {
+    const isUrgent = timeRemaining <= 5;
+    const pctLeft = Math.max(0, timeRemaining / 20) * 100;
     return (
-      <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
-        <h2 className="font-neo-display text-neo-pink text-3xl uppercase mb-4">
-          {t('party.vote') || 'Vote!'}
-        </h2>
-        <div className={`font-neo-display text-2xl mb-6 ${timeRemaining <= 5 ? 'text-neo-red animate-neo-wobble' : 'text-neo-white'}`}>
-          {timeRemaining}s
+      <div className={`min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden transition-colors duration-500 ${isUrgent ? 'bg-neo-black' : 'bg-neo-abyss'}`}>
+        {/* Pulse ring behind timer */}
+        <div className={`absolute rounded-full border-4 opacity-20 transition-all duration-1000 ${isUrgent ? 'w-[600px] h-[600px] border-neo-red animate-ping' : 'w-[500px] h-[500px] border-neo-pink'}`} />
+
+        {/* Vote Now heading */}
+        <AdaptiveMotion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', damping: 10 }}
+          className="text-center mb-8 relative z-10"
+        >
+          <div className={`font-neo-display text-6xl sm:text-8xl uppercase tracking-tight leading-none transition-colors duration-300 ${isUrgent ? 'text-neo-red' : 'text-neo-pink'} ${isUrgent ? 'animate-neo-wobble' : ''}`}>
+            {t('party.vote') || 'Vote!'}
+          </div>
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <span className="text-2xl">📱</span>
+            <span className="font-neo-body text-neo-white/70 text-lg">
+              {t('party.voteOnPhone') || 'Vote on your phone!'}
+            </span>
+            <span className="text-2xl">📱</span>
+          </div>
+        </AdaptiveMotion.div>
+
+        {/* Big countdown */}
+        <div className="relative z-10 flex flex-col items-center gap-4">
+          <div className={`font-neo-display text-[10rem] leading-none transition-colors duration-300 ${isUrgent ? 'text-neo-red' : 'text-neo-white'} ${timeRemaining <= 3 ? 'animate-neo-pop' : ''}`}>
+            {timeRemaining}
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-64 h-3 bg-neo-navy-elevated border-3 border-neo-cream/20 rounded-neo overflow-hidden">
+            <AdaptiveMotion.div
+              animate={{ width: `${pctLeft}%` }}
+              transition={{ duration: 0.5 }}
+              className={`h-full rounded-neo transition-colors duration-500 ${isUrgent ? 'bg-neo-red' : 'bg-neo-pink'}`}
+            />
+          </div>
         </div>
-        <p className="text-neo-white font-neo-body">
-          {t('party.voteOnPhone') || 'Vote on your phone!'}
-        </p>
       </div>
     );
   }
 
-  // Crown phase — show vote results
+  // Crown phase — dramatic winner reveal + results
   if (phase === 'crown' && voteResults.length > 0) {
     const winner = voteResults.find(r => r.isWinner);
+    const revealDelay = voteResults.length * 0.18 + 0.4;
     return (
-      <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
-        {/* Results bar chart */}
-        <div className="w-full max-w-3xl space-y-3 mb-8">
-          {voteResults.map((result, index) => (
-            <AdaptiveMotion.div
-              key={result.submission.id}
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.2, type: 'spring', stiffness: 300, damping: 25 }}
-              className="flex items-center gap-4"
-            >
-              <div className="w-1/3 text-right">
-                <p className={`font-neo-body text-sm truncate ${result.isWinner ? 'text-neo-pink font-bold' : 'text-neo-white'}`}>
-                  &ldquo;{result.submission.text}&rdquo;
-                </p>
-                <p className="text-neo-white text-xs">{result.submission.username}</p>
-              </div>
-              <div className="flex-1 bg-neo-navy-elevated border-3 border-neo-cream/20 rounded-neo h-8 overflow-hidden">
-                <AdaptiveMotion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${result.percentage}%` }}
-                  transition={{ delay: index * 0.2 + 0.3, type: 'spring', stiffness: 200, damping: 20 }}
-                  className={`h-full rounded-neo ${result.isWinner ? 'bg-neo-pink' : 'bg-neo-cream/20'}`}
-                />
-              </div>
-              <span className="w-16 font-neo-display text-neo-white text-sm text-center">
-                {result.percentage}%
-              </span>
-            </AdaptiveMotion.div>
-          ))}
-        </div>
+      <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8 relative overflow-hidden">
+        {/* Decorative corner confetti blobs */}
+        <div className="absolute top-0 left-0 text-7xl opacity-60 -translate-x-4 -translate-y-4 rotate-[-20deg] pointer-events-none">🎉</div>
+        <div className="absolute top-0 right-0 text-7xl opacity-60 translate-x-4 -translate-y-4 rotate-[20deg] pointer-events-none">🎊</div>
+        <div className="absolute bottom-0 left-0 text-5xl opacity-40 -translate-x-2 translate-y-2 rotate-[15deg] pointer-events-none">✨</div>
+        <div className="absolute bottom-0 right-0 text-5xl opacity-40 translate-x-2 translate-y-2 rotate-[-15deg] pointer-events-none">⭐</div>
 
-        {/* Winner crown */}
-        {winner && (
-          <AdaptiveMotion.div
-            initial={{ scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: voteResults.length * 0.2 + 0.5, type: 'spring', damping: 8 }}
-            className="text-center"
-          >
-            <div className="text-5xl mb-2">👑</div>
-            <p className="font-neo-display text-neo-pink text-xl uppercase">
-              {winner.submission.username}
-            </p>
-            <p className="font-neo-body text-neo-white text-sm mt-1">
-              +{winner.points} pts
-            </p>
-          </AdaptiveMotion.div>
-        )}
+        <div className="relative z-10 w-full max-w-3xl">
+          {/* Results bar chart */}
+          <div className="space-y-3 mb-10">
+            {voteResults.map((result, index) => (
+              <AdaptiveMotion.div
+                key={result.submission.id}
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.18, type: 'spring', stiffness: 280, damping: 24 }}
+                className="flex items-center gap-4"
+              >
+                {/* Caption + author */}
+                <div className="w-2/5 text-right shrink-0">
+                  <p className={`font-neo-body text-sm leading-snug ${result.isWinner ? 'text-neo-pink font-bold' : 'text-neo-white/80'}`}>
+                    &ldquo;{result.submission.text}&rdquo;
+                  </p>
+                  <p className={`text-[11px] mt-0.5 ${result.isWinner ? 'text-neo-pink/70' : 'text-neo-white/40'}`}>
+                    {result.submission.username}
+                  </p>
+                </div>
+
+                {/* Bar */}
+                <div className="flex-1 relative">
+                  <div className={`h-9 rounded-neo border-3 overflow-hidden ${result.isWinner ? 'border-neo-pink bg-neo-pink/10' : 'border-neo-cream/15 bg-neo-navy-elevated'}`}>
+                    <AdaptiveMotion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${result.percentage}%` }}
+                      transition={{ delay: index * 0.18 + 0.25, type: 'spring', stiffness: 180, damping: 22 }}
+                      className={`h-full rounded-neo ${result.isWinner ? 'bg-neo-pink' : 'bg-neo-cream/25'}`}
+                    />
+                  </div>
+                  {result.isWinner && (
+                    <span className="absolute right-1 top-1/2 -translate-y-1/2 text-lg leading-none">👑</span>
+                  )}
+                </div>
+
+                {/* Pct */}
+                <span className={`w-12 shrink-0 font-neo-display text-base text-center ${result.isWinner ? 'text-neo-pink' : 'text-neo-white/60'}`}>
+                  {result.percentage}%
+                </span>
+              </AdaptiveMotion.div>
+            ))}
+          </div>
+
+          {/* Winner spotlight */}
+          {winner && (
+            <AdaptiveMotion.div
+              initial={{ scale: 0, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ delay: revealDelay, type: 'spring', damping: 7, stiffness: 200 }}
+              className="text-center border-4 border-neo-pink rounded-neo-lg bg-neo-pink/10 shadow-[0_0_40px_rgba(255,20,147,0.3)] px-8 py-5"
+            >
+              <div className="text-5xl mb-1">👑</div>
+              <p className="font-neo-display text-neo-pink text-3xl uppercase tracking-wide">
+                {winner.submission.username}
+              </p>
+              <p className="font-neo-body text-neo-white/80 text-base mt-1 italic">
+                &ldquo;{winner.submission.text}&rdquo;
+              </p>
+              <p className="font-neo-display text-neo-yellow text-lg mt-2">
+                +{winner.points} pts
+              </p>
+            </AdaptiveMotion.div>
+          )}
+        </div>
       </div>
     );
   }
 
   // Default waiting state
   return (
-    <div className="min-h-screen bg-neo-abyss flex items-center justify-center">
-      <div className="text-center">
-        <div className="text-6xl mb-4">🖼️</div>
-        <h1 className="font-neo-display text-neo-pink text-3xl uppercase">Caption Clash</h1>
-        <p className="text-neo-white font-neo-body mt-2 animate-pulse">
-          {t('party.starting') || 'Starting...'}
+    <div className="min-h-screen bg-neo-abyss flex items-center justify-center relative overflow-hidden">
+      {/* Faint grid */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+        backgroundImage: 'linear-gradient(rgba(255,20,147,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,20,147,0.3) 1px, transparent 1px)',
+        backgroundSize: '48px 48px',
+      }} />
+      <AdaptiveMotion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', damping: 14 }}
+        className="text-center relative z-10"
+      >
+        <div className="text-8xl mb-5">🖼️</div>
+        <h1 className="font-neo-display text-neo-pink text-5xl uppercase tracking-tight leading-none mb-2">
+          Caption Clash
+        </h1>
+        <p className="font-neo-body text-neo-white/60 text-lg mb-6">
+          {t('party.captionGame') || 'Write the funniest caption to win!'}
         </p>
-      </div>
+        <div className="inline-flex items-center gap-2 border-3 border-neo-pink/40 rounded-neo px-5 py-2 animate-pulse">
+          <div className="w-2 h-2 rounded-full bg-neo-pink" />
+          <span className="font-neo-body text-neo-pink text-sm uppercase tracking-widest">
+            {t('party.starting') || 'Starting...'}
+          </span>
+        </div>
+      </AdaptiveMotion.div>
     </div>
   );
 }

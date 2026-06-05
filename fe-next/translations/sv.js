@@ -1168,6 +1168,12 @@ const sv = {
     "notifications": "Aviseringar",
     "support": "Support & Feedback",
     "contactDescription": "Frågor, feedback, eller bara säg hej!",
+    "removeAds": {
+      "title": "Ta bort annonser",
+      "body": "Spela LexiClash annons-fritt. Kommer snart — tryck för att visa intresse.",
+      "button": "Jag är intresserad",
+      "comingSoon": "Tack! Vi hör av oss."
+    },
     "dangerZone": "Riskzon",
     "deleteAccount": "Radera konto",
     "deleteAccountDescription": "Radera ditt konto och all data permanent",

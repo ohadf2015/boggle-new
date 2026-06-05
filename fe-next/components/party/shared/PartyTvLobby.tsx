@@ -31,6 +31,22 @@ const ACCENT_MAP: Record<string, string> = {
   'neo-purple': 'text-neo-purple border-neo-purple',
 };
 
+/** Deterministic color from username — cycles through party palette */
+const AVATAR_COLORS = [
+  'bg-neo-pink text-neo-black',
+  'bg-neo-cyan text-neo-black',
+  'bg-neo-purple text-neo-white',
+  'bg-neo-lime text-neo-black',
+  'bg-neo-orange text-neo-black',
+  'bg-neo-yellow text-neo-black',
+] as const;
+
+function avatarColor(username: string): string {
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) hash = (hash * 31 + username.charCodeAt(i)) & 0xffff;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+
 function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyTvLobbyProps) {
   const { t } = useLanguage();
   const accentClasses = ACCENT_MAP[gameDef.accentColor] || 'text-neo-lime border-neo-lime';
@@ -95,26 +111,30 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
           {players.map((p) => (
             <div
               key={p.socketId}
-              className="bg-neo-navy-elevated border-3 border-neo-cream/30 rounded-neo-lg px-4 py-3 shadow-hard animate-neo-pop"
+              className="flex flex-col items-center gap-2 animate-neo-pop"
             >
-              <span className="font-neo-display text-neo-white text-lg">
-                {p.username}
-              </span>
-              {p.isHost && (
-                <span className="ms-2 text-neo-lime text-xs font-bold uppercase">{t('party.host')}</span>
-              )}
+              {/* Avatar circle */}
+              <div className={`w-16 h-16 rounded-full border-3 border-neo-black shadow-hard flex items-center justify-center font-neo-display text-2xl uppercase ${avatarColor(p.username)}`}>
+                {p.username.slice(0, 2)}
+              </div>
+              <div className="text-center">
+                <span className="font-neo-display text-neo-white text-sm block">
+                  {p.username}
+                </span>
+                {p.isHost && (
+                  <span className="text-neo-lime text-[10px] font-bold uppercase">{t('party.host')}</span>
+                )}
+              </div>
             </div>
           ))}
 
           {/* Empty slots */}
           {Array.from({ length: Math.max(0, gameDef.minPlayers - playerCount) }).map((_, i) => (
-            <div
-              key={`empty-${i}`}
-              className="border-3 border-dashed border-neo-cream/15 rounded-neo-lg px-4 py-3 animate-pulse"
-            >
-              <span className="font-neo-body text-neo-white text-lg">
-                {t('party.waiting')}
-              </span>
+            <div key={`empty-${i}`} className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 rounded-full border-3 border-dashed border-neo-cream/20 flex items-center justify-center animate-pulse">
+                <span className="text-neo-white/30 text-2xl">?</span>
+              </div>
+              <span className="font-neo-body text-neo-white/30 text-xs">{t('party.waiting')}</span>
             </div>
           ))}
         </div>

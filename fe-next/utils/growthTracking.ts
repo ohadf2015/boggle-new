@@ -107,6 +107,7 @@ export type GrowthEvent =
   | 'notification_clicked'
   // Monetization
   | 'iap_viewed'
+  | 'iap_tapped'
   | 'iap_purchased'
   | 'rewarded_ad_offered'
   | 'rewarded_ad_watched'

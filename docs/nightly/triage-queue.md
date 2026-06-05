@@ -355,3 +355,28 @@ Items deferred from automated nightly triage. Human review required.
 ## 2026-06-04 — Flag hygiene (lane-03)
 - `share-prompt-timing` (PostHog id 163656, created 2026-03-31): 65 days old, **0 exposures in last 30d**. Flag may not be reaching trigger. Check `useSharePromptImpression` + `SinglePlayerResults` condition `hasMinimumScore`. Either retire or fix trigger.
 - `show-signup-after-first-win` (PostHog id 163655, created 2026-03-31): 65 days old, 35 exposures, **0 signups both arms** (`after-first-win`=17, `after-third-game`=18). Tracking was broken (InlineSignupCard emitted no events). Re-evaluate after `signup_prompt_shown` fix ships. If still 0 conversion after 14d → retire.
+
+## 2026-06-05
+- [Sentry] TypeError: Cannot read properties of null (reading 'x') — JAVASCRIPT-NEXTJS-13Y
+  - first seen: 2026-05-06, last seen: 2026-05-06, count: 500, users: 1
+  - link: https://lexiclash.sentry.io/issues/118046477/
+  - status: deferred
+  - why: minified stack trace (requestAnimationFrame in Pixi/game engine), needs source maps to pinpoint; only 1 user, 1 day old, no recurrence
+  - recommended owner: backend/game-engine team with source maps
+
+- [Sentry] churn-signals report failed with status 502 — JAVASCRIPT-NEXTJS-1KQ (escalating)
+  - first seen: 2026-06-03, last seen: 2026-06-04, count: 276, users: 3
+  - link: https://lexiclash.sentry.io/issues/124871662/
+  - status: deferred
+  - why: 502 is Railway's reverse proxy timing out before Next.js responds; root cause is getUserFromRequest() creates a new Supabase anon client + network auth.getUser(token) round-trip on every request — auth-adjacent refactor needed (local JWT verify)
+  - recommended owner: review-by-eod; fix = replace getUserFromRequest with local SUPABASE_JWT_SECRET verify
+
+- [Supabase] SECURITY DEFINER upsert_push_token executable by authenticated role
+  - status: deferred
+  - why: authenticated execute is intentional (API route calls rpc as authed user); only risk is authenticated users bypassing API validation; the function uses auth.uid() internally so blast radius is self-scoped
+  - recommended owner: review-by-eod; confirm function body uses auth.uid() and not p_user_id param
+
+- [Supabase] RLS always-true INSERT on web_vitals
+  - status: deferred
+  - why: appears intentional (anon web vital tracking, route passes null player_id for guests); false-positive advisory
+  - recommended owner: confirm intent — if anon inserts are desired, add a comment on the migration explaining the policy is by design

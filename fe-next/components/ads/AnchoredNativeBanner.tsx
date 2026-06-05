@@ -7,6 +7,7 @@ import { AdMob, BannerAdPluginEvents } from '@capacitor-community/admob';
 import { useSafeArea } from '@/hooks/useSafeArea';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import { bannerController, BANNER_OWNER } from '@/lib/native/bannerController';
+import { computeBannerMargin } from '@/lib/native/bannerMargin';
 
 export default function AnchoredNativeBanner() {
   const pathname = usePathname();
@@ -88,8 +89,6 @@ export default function AnchoredNativeBanner() {
     const computeMargin = (allowCssFallback: boolean): number => {
       // Read --bottom-nav-height published by GlobalBottomNav (single source of truth).
       // The var holds the nav's real offsetHeight (h-16 + safe-area paddingBottom), so:
-      //   Android: plugin adds safe-area on top → margin = max(navHeight, safeBottom).
-      //   iOS: plugin re-adds safeAreaLayoutGuide → subtract to avoid double-count.
       // Inline value always wins. The CSS-declared default
       // (`calc(64px + env(safe-area-inset-bottom))`) is trusted ONLY on the first
       // synchronous frame (allowCssFallback) — it's purely an over-paint guard
@@ -105,7 +104,7 @@ export default function AnchoredNativeBanner() {
           ? getComputedStyle(root).getPropertyValue('--bottom-nav-height').trim()
           : '');
       const navHeight = Math.round(parseFloat(raw) || 0);
-      return isAndroid ? Math.max(navHeight, safeBottom) : Math.max(0, navHeight - safeBottom);
+      return computeBannerMargin({ navHeight, safeBottom, isAndroid });
     };
 
     const applyBanner = (margin: number) => {

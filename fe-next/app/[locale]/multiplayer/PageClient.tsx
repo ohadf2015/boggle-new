@@ -523,8 +523,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   return (
     <SocketContext.Provider value={socketContextValue}>
       <ErrorBoundary>
-        <div tabIndex={-1} className="h-dvh flex flex-col min-h-0 w-full overflow-x-clip">
-          {/* Banners inside h-dvh so they participate in flex layout */}
+        <div tabIndex={-1} className="flex-1 flex flex-col min-h-0 w-full overflow-x-clip">
+          {/* Root fills the flex-fit locked body (which reserves banner height via padding-bottom),
+              so the banner never overlaps bottom CTAs / ready indicators. Lobby, results, and
+              in-game states all use this single root — MP-root wraps all MP views. */}
           {isActive ? <ConnectionBanner showScoreSafe onLeaveGame={() => {
             signalIntentionalLeave();
             // Tell the server we're leaving and pass username so the schema

@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 5574,
+    "totalKeysInCode": 5579,
     "keyCountByLanguage": {
-      "en": 10409,
-      "he": 10507,
-      "sv": 10510,
+      "en": 10413,
+      "he": 10511,
+      "sv": 10514,
       "ja": 10502,
-      "es": 10534
+      "es": 10538
     },
-    "missingFromEnglish": 100,
+    "missingFromEnglish": 101,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 51,
@@ -20908,6 +20908,15 @@
       ]
     },
     {
+      "key": "party.captionGame",
+      "usages": [
+        {
+          "file": "components/party/caption-clash/CaptionClashTv.tsx",
+          "line": 406
+        }
+      ]
+    },
+    {
       "key": "partyTada",
       "usages": [
         {
@@ -21795,6 +21804,10 @@
       "seo.wordCraft.ogTitle",
       "seo.wordCraft.ogDescription",
       "common.copiedToClipboard",
+      "settings.removeAds.title",
+      "settings.removeAds.body",
+      "settings.removeAds.button",
+      "settings.removeAds.comingSoon",
       "avatar.builder.expressions",
       "avatar.builder.eyeColor",
       "avatar.builder.nose",

@@ -1050,6 +1050,12 @@ const es = {
     "notifications": "Notificaciones",
     "support": "Soporte y Feedback",
     "contactDescription": "Preguntas, sugerencias, o solo saludar!",
+    "removeAds": {
+      "title": "Quitar anuncios",
+      "body": "Juega LexiClash sin anuncios. Próximamente — toca para expresar interés.",
+      "button": "Me interesa",
+      "comingSoon": "¡Gracias! Te avisaremos."
+    },
     "dangerZone": "Zona de peligro",
     "deleteAccount": "Eliminar cuenta",
     "deleteAccountDescription": "Eliminar permanentemente tu cuenta y todos los datos",

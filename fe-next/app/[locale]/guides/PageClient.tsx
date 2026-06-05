@@ -15,6 +15,8 @@ const guidesContent: Record<string, {
   quickStart: string;
   generalTips: string;
   guides: Array<{ slug: string; title: string; description: string; icon: 'classic' | 'blast' | 'wordHunt' }>;
+  faq: Array<{ question: string; answer: string }>;
+  faqHeading: string;
 }> = {
   en: {
     title: 'LexiClash Strategy Guides',
@@ -25,6 +27,12 @@ const guidesContent: Record<string, {
       { slug: 'classic-strategy', title: 'Classic Mode Strategy', description: 'Learn scanning patterns, time management, and scoring strategies to find more words and score higher.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Blast Mode Mastery', description: 'Unlock the combo system, master tile effects, and chain your way to massive scores.', icon: 'blast' },
       { slug: 'word-hunt-strategy', title: 'Word Hunt Strategy', description: 'Master elimination strategy, vowel placement, and clue interpretation to solve puzzles faster.', icon: 'wordHunt' },
+    ],
+    faqHeading: 'Common Questions',
+    faq: [
+      { question: 'What is the best strategy for Classic mode?', answer: 'Scan the grid systematically — start from corners and edges where longer words tend to hide. Look for common prefixes (UN-, RE-, PRE-) and suffixes (-ING, -TION, -ED) to quickly spot longer words.' },
+      { question: 'How do combos work in Blast mode?', answer: 'Finding words in quick succession builds a combo multiplier. The faster you chain words, the higher the multiplier climbs. Focus on short 3-4 letter words to keep the combo going, then hit a long word for maximum points.' },
+      { question: 'Are there guides for beginners?', answer: 'Yes — our guides cover basics to advanced. Start with the Classic mode guide to learn grid scanning, then progress to Blast and Word Hunt strategies as you improve.' },
     ],
   },
   he: {
@@ -37,6 +45,12 @@ const guidesContent: Record<string, {
       { slug: 'blast-strategy', title: 'שליטה במצב בלאסט', description: 'פענחו את מערכת הקומבו, שלטו באפקטי אריחים ושרשרו לניקוד מסיבי.', icon: 'blast' },
       { slug: 'word-hunt-strategy', title: 'אסטרטגיית ציד מילים', description: 'שלטו באסטרטגיית אלימינציה, מיקום תנועות ופירוש רמזים לפתרון מהיר יותר.', icon: 'wordHunt' },
     ],
+    faqHeading: 'שאלות נפוצות',
+    faq: [
+      { question: 'מה האסטרטגיה הטובה ביותר למצב קלאסי?', answer: 'סרקו את הלוח בשיטתיות — התחילו מפינות וקצוות. חפשו תחיליות וסיומות נפוצות למציאת מילים ארוכות.' },
+      { question: 'איך עובדים הקומבו במצב בלאסט?', answer: 'מציאת מילים ברצף מהיר בונה מכפיל קומבו. ככל שמשרשרים מהר יותר, המכפיל עולה. התמקדו במילים קצרות של 3-4 אותיות ואז הכו במילה ארוכה לניקוד מקסימלי.' },
+      { question: 'האם יש מדריכים למתחילים?', answer: 'כן — המדריכים מכסים מהבסיסי ועד המתקדם. התחילו עם מדריך מצב קלאסי ואז התקדמו לאסטרטגיות בלאסט וציד מילים.' },
+    ],
   },
   sv: {
     title: 'LexiClash Strategiguider',
@@ -47,6 +61,12 @@ const guidesContent: Record<string, {
       { slug: 'classic-strategy', title: 'Klassisk Strategi', description: 'Lar dig skanningsmonster, tidshantering och poangstrategier for att hitta fler ord.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Blast-lage Mesterskap', description: 'Las upp kombosystemet, bemestra platteffekter och kedja till massiva poang.', icon: 'blast' },
       { slug: 'word-hunt-strategy', title: 'Word Hunt Strategi', description: 'Bemestra eliminering, vokalplacering och ledtradstolkning for snabbare losning.', icon: 'wordHunt' },
+    ],
+    faqHeading: 'Vanliga frågor',
+    faq: [
+      { question: 'Vad är den bästa strategin för Klassiskt läge?', answer: 'Skanna rutnätet systematiskt — börja från hörn och kanter. Leta efter vanliga prefix och suffix för att snabbt hitta långa ord.' },
+      { question: 'Hur fungerar kombos i Blast-läge?', answer: 'Att hitta ord i snabb följd bygger en kombomultiplikator. Ju snabbare du kedjar ord, desto högre stiger multiplikatorn. Fokusera på korta 3-4 bokstavsord och slå sedan ett långt ord för maxpoäng.' },
+      { question: 'Finns det guider för nybörjare?', answer: 'Ja — guiderna täcker allt från grunderna till avancerat. Börja med Klassiskt läge för att lära dig rutnätsskanning, gå sedan vidare till Blast och Word Hunt.' },
     ],
   },
   ja: {
@@ -59,6 +79,12 @@ const guidesContent: Record<string, {
       { slug: 'blast-strategy', title: 'ブラストモード攻略', description: 'コンボシステムを解き明かし、タイルエフェクトをマスターしてハイスコアを狙おう。', icon: 'blast' },
       { slug: 'word-hunt-strategy', title: 'ワードハント攻略', description: '消去法、母音配置、ヒントの解釈をマスターしてパズルを速く解こう。', icon: 'wordHunt' },
     ],
+    faqHeading: 'よくある質問',
+    faq: [
+      { question: 'クラシックモードの最良の戦略は？', answer: 'グリッドを体系的にスキャン — 角と端から始めましょう。一般的な接頭辞と接尾辞を探して長い単語を見つけましょう。' },
+      { question: 'ブラストモードのコンボはどう機能しますか？', answer: '素早く連続して単語を見つけることでコンボマルチプライヤーが積み上がります。3〜4文字の短い単語でコンボをつなぎ、長い単語でポイントを最大化しましょう。' },
+      { question: '初心者向けのガイドはありますか？', answer: 'はい — 初心者から上級者まで対応しています。まずクラシックモードのガイドでグリッドスキャンを学び、次にブラストとワードハントの戦略へ進みましょう。' },
+    ],
   },
   es: {
     title: 'Guias de Estrategia LexiClash',
@@ -69,6 +95,12 @@ const guidesContent: Record<string, {
       { slug: 'classic-strategy', title: 'Estrategia Modo Clasico', description: 'Aprende patrones de escaneo, gestion del tiempo y estrategias de puntuacion.', icon: 'classic' },
       { slug: 'blast-strategy', title: 'Dominio Modo Blast', description: 'Desbloquea el sistema de combos, domina efectos de fichas y encadena puntajes masivos.', icon: 'blast' },
       { slug: 'word-hunt-strategy', title: 'Estrategia Word Hunt', description: 'Domina la eliminacion, colocacion de vocales e interpretacion de pistas.', icon: 'wordHunt' },
+    ],
+    faqHeading: 'Preguntas frecuentes',
+    faq: [
+      { question: '¿Cuál es la mejor estrategia para el modo Clásico?', answer: 'Escanea la cuadrícula sistemáticamente — comienza por esquinas y bordes. Busca prefijos y sufijos comunes para encontrar palabras largas rápidamente.' },
+      { question: '¿Cómo funcionan los combos en el modo Blast?', answer: 'Encontrar palabras en rápida sucesión construye un multiplicador de combo. Enfócate en palabras cortas de 3-4 letras para mantener el combo activo, luego golpea con una palabra larga para máximos puntos.' },
+      { question: '¿Hay guías para principiantes?', answer: 'Sí — nuestras guías cubren desde lo básico hasta lo avanzado. Comienza con el modo Clásico para aprender a escanear la cuadrícula, luego avanza a Blast y Word Hunt.' },
     ],
   },
 };
@@ -156,6 +188,30 @@ export default function GuidesIndexPageClient(): React.ReactElement {
         )}>
           {content.generalTips}
         </p>
+
+        <section className="mt-10 max-w-2xl mx-auto">
+          <h2 className={cn(
+            'text-xl font-bold mb-5',
+            isDarkMode ? 'text-white' : 'text-neo-black'
+          )}>
+            {content.faqHeading}
+          </h2>
+          <dl className="space-y-4">
+            {content.faq.map((item) => (
+              <div key={item.question} className={cn(
+                'p-4 rounded-neo border-2 border-neo-black',
+                isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
+              )}>
+                <dt className={cn('font-semibold mb-1', isDarkMode ? 'text-neo-cream' : 'text-neo-black')}>
+                  {item.question}
+                </dt>
+                <dd className={cn('text-sm leading-relaxed', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+                  {item.answer}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
 
         <InlineBannerAd webZone="content-page" className="mt-8" />
       </main>

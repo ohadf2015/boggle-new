@@ -16,7 +16,7 @@ const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
 // SEO keywords per locale
 const KEYWORDS: Record<Locale, string> = {
-  en: 'daily word wheel, word wheel puzzles free online, word wheel puzzle, express word wheel today, daily express word wheel alternative, word wheel game, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle game',
+  en: 'daily word wheel, word wheel puzzles free online, word wheel puzzle, word wheel game free online, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle game online, free word wheel puzzle',
   he: 'גלגל מילים יומי, פאזל מילים, משחק מילים חינם, משחק מילים יומי, אתגר מילים',
   sv: 'dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
   ja: 'デイリーワードホイール, ワードパズル, 無料ワードゲーム, 毎日のワードゲーム',
@@ -26,10 +26,10 @@ const KEYWORDS: Record<Locale, string> = {
 // Per-locale metadata fallbacks — kills cross-locale dup-title flagging when translation keys missing
 const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitle: string; ogDescription: string }> = {
   en: {
-    title: 'Daily Express Word Wheel — Free Online Puzzle Today | LexiClash',
-    description: "Play today's Daily Express Word Wheel free — spin the letter wheel, find every hidden word. New puzzle every day, no signup, no download. Global leaderboards.",
-    ogTitle: 'Daily Express Word Wheel — Free Puzzle Today',
-    ogDescription: "Spin today's word wheel and find all hidden words. New puzzle every day — free, no download!",
+    title: 'Daily Word Wheel Puzzle — Free Online Daily Challenge | LexiClash',
+    description: 'Play the free Daily Word Wheel puzzle — spin the letter wheel, find every hidden word. New challenge every day, streak tracking, global leaderboard. No signup, no download.',
+    ogTitle: 'Daily Word Wheel Puzzle — Free Daily Challenge',
+    ogDescription: 'Spin the word wheel, find all hidden words. New free puzzle every day — streak tracking, global leaderboard!',
   },
   he: {
     title: 'גלגל מילים יומי — פאזל מילים חינם אונליין | LexiClash',

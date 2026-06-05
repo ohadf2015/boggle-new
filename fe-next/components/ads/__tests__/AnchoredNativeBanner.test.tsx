@@ -102,12 +102,15 @@ describe('AnchoredNativeBanner', () => {
     expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
-  it('lifts banner above gesture bar on Android (margin=safeArea.bottom)', async () => {
+  it('lifts banner above gesture bar on Android (margin=safeArea.bottom) WHEN nav is present', async () => {
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
+    // Set nav height so the banner knows there's a nav on screen
+    document.documentElement.style.setProperty('--bottom-nav-height', '88px');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(setRequest).toHaveBeenCalledWith(...anchorReq(24));
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(88));
+    document.documentElement.style.removeProperty('--bottom-nav-height');
   });
 
   it('uses margin=0 on Android when safe-area is zero', async () => {
@@ -121,9 +124,12 @@ describe('AnchoredNativeBanner', () => {
     mockPathname.current = '/glossary';
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 24, bottom: 24, left: 0, right: 0 };
+    // Set nav height so the banner knows there's a nav on screen
+    document.documentElement.style.setProperty('--bottom-nav-height', '88px');
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(setRequest).toHaveBeenCalledWith(...anchorReq(24));
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(88));
+    document.documentElement.style.removeProperty('--bottom-nav-height');
   });
 
   // NOTE: drawer-suppress moved out of this component into the single
@@ -256,7 +262,8 @@ describe('AnchoredNativeBanner', () => {
     try {
       render(<AnchoredNativeBanner />);
       await Promise.resolve();
-      expect(setRequest).toHaveBeenCalledWith(...anchorReq(24));
+      // When navHeight=0 (nav explicitly hidden), margin should be 0, not safeBottom
+      expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
     } finally {
       document.documentElement.style.removeProperty('--bottom-nav-height');
       document.head.removeChild(style);
@@ -286,9 +293,10 @@ describe('AnchoredNativeBanner', () => {
     // The CSS-default fallback (`calc(64px + safe)`) is an over-paint guard for
     // the FIRST synchronous frame only. Once layout has settled (observer/rAF),
     // an absent inline --bottom-nav-height means there is NO bottom nav at all,
-    // so the banner must collapse to the bottom (Android margin = safeBottom),
+    // so the banner must collapse to the bottom (Android margin = 0),
     // not float 64px up forever. Regression for "banner should stick to bottom
-    // when there is no mobile bottom tab".
+    // when there is no mobile bottom tab". The plugin's own safe-area handling
+    // will position the banner correctly.
     mockPlatform.current = 'android';
     mockSafeArea.current = { top: 0, bottom: 24, left: 0, right: 0 };
     document.documentElement.style.removeProperty('--bottom-nav-height');
@@ -305,8 +313,8 @@ describe('AnchoredNativeBanner', () => {
       document.documentElement.classList.add('settle-tick');
       await new Promise((r) => setTimeout(r, 0));
       await Promise.resolve();
-      // Settled path uses inline-or-zero → navHeight 0 → margin = safeBottom.
-      expect(setRequest).toHaveBeenLastCalledWith(...anchorReq(24));
+      // Settled path uses inline-or-zero → navHeight 0 → margin = 0 (let plugin handle safe-area).
+      expect(setRequest).toHaveBeenLastCalledWith(...anchorReq(0));
     } finally {
       document.documentElement.classList.remove('settle-tick');
       document.head.removeChild(style);

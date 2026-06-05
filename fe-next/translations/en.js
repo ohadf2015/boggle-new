@@ -1059,6 +1059,12 @@ const en = {
     "notifications": "Notifications",
     "support": "Support & Feedback",
     "contactDescription": "Questions, feedback, or just say hi!",
+    "removeAds": {
+      "title": "Remove Ads",
+      "body": "Enjoy LexiClash ad-free. Coming soon — tap to express interest.",
+      "button": "I'm Interested",
+      "comingSoon": "Thanks! We'll let you know."
+    },
     "dangerZone": "Danger Zone",
     "deleteAccount": "Delete Account",
     "deleteAccountDescription": "Permanently delete your account and all data",

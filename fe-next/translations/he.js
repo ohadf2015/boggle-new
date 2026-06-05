@@ -1079,6 +1079,12 @@ const he = {
     "notifications": "התראות",
     "support": "תמיכה ומשוב",
     "contactDescription": "שאלות, משוב, או סתם להגיד שלום!",
+    "removeAds": {
+      "title": "הסר פרסומות",
+      "body": "שחק ב-LexiClash ללא פרסומות. בקרוב — לחץ להביע עניין.",
+      "button": "אני מעוניין",
+      "comingSoon": "תודה! נעדכן אותך."
+    },
     "dangerZone": "אזור סכנה",
     "deleteAccount": "מחיקת חשבון",
     "deleteAccountDescription": "מחיקת החשבון וכל הנתונים לצמיתות",
