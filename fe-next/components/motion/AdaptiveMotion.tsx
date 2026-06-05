@@ -59,6 +59,33 @@ interface AdaptiveMotionProps extends MotionProps {
 type AdaptiveMotionComponent = React.FC<AdaptiveMotionProps>;
 
 /**
+ * Static fallback rendered when animations are skipped. Crucially it still
+ * invokes onAnimationComplete ONCE on mount — many callers drive their lifecycle
+ * off that callback (combo flash, score flies, floating coins dismiss themselves
+ * in it). Skipping the animation means it "completes instantly", so firing the
+ * callback on mount is the correct semantic; dropping it (the previous behaviour)
+ * left those elements stuck on screen forever. onAnimationStart fires first for
+ * symmetry. Neither framer handler is forwarded to the DOM element (they would
+ * otherwise trigger React "Unknown event handler property" warnings).
+ */
+const StaticAdaptiveElement: React.FC<{
+  element: string;
+  onAnimationStart?: () => void;
+  onAnimationComplete?: () => void;
+  [key: string]: unknown;
+}> = ({ element, onAnimationStart, onAnimationComplete, ...rest }) => {
+  React.useEffect(() => {
+    onAnimationStart?.();
+    onAnimationComplete?.();
+    // Fire exactly once on mount — a skipped animation is an instantly-complete
+    // one. Intentionally no deps; re-firing on prop changes would be wrong.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const Element = element as React.ElementType;
+  return <Element {...rest} />;
+};
+
+/**
  * Creates an adaptive motion component that falls back to a static element on low-end devices
  */
 function createAdaptiveComponent(
@@ -79,15 +106,26 @@ function createAdaptiveComponent(
       whileInView,
       layout,
       layoutId,
+      // Pulled out of restProps so they are never forwarded to a plain DOM
+      // element on the skip path; re-attached explicitly on the motion path.
+      onAnimationStart,
+      onAnimationComplete,
       ...restProps
     } = props;
 
     const shouldSkip = useSkipAnimations();
 
-    // If animations should be skipped, render static element
+    // If animations should be skipped, render a static element that still
+    // honours the animation lifecycle callbacks (see StaticAdaptiveElement).
     if (shouldSkip || skipAnimation) {
-      const Element = element as React.ElementType;
-      return <Element {...restProps} />;
+      return (
+        <StaticAdaptiveElement
+          element={element}
+          onAnimationStart={onAnimationStart as (() => void) | undefined}
+          onAnimationComplete={onAnimationComplete as (() => void) | undefined}
+          {...restProps}
+        />
+      );
     }
 
     const Component = MotionComponent;
@@ -104,6 +142,8 @@ function createAdaptiveComponent(
         whileInView={whileInView}
         layout={layout}
         layoutId={layoutId}
+        onAnimationStart={onAnimationStart}
+        onAnimationComplete={onAnimationComplete}
         {...restProps}
       />
     );
