@@ -38,26 +38,36 @@ export default function InlineBannerAd({
     if (!el) return;
 
     let cancelled = false;
-    let currentMargin = -1;
+    let currentMargin = -1; // -1 = no active slot request
 
-    const computeMargin = () => {
-      const rect = el.getBoundingClientRect();
-      // Distance from the slot's bottom to the viewport's bottom — plugin's
-      // `margin` lifts the banner by this many px from the webview bottom.
-      const distanceFromBottom = Math.max(0, window.innerHeight - rect.bottom);
-      const isAndroid = Capacitor.getPlatform() === 'android';
-      const safeBottom = isAndroid ? safeArea.bottom || 0 : 0;
-      // Android SDK already adds the safe-area offset, so subtract it so the
-      // banner lines up with the slot rather than sitting above it.
-      return Math.max(0, distanceFromBottom - safeBottom);
-    };
-
-    // Declare the in-flow slot's intent. The coordinator gives the slot priority
-    // over the global AnchoredNativeBanner 'anchor' and serializes show/hide, so
-    // no manual hide-then-show dance and no clobbering the anchor on unmount.
+    // Declare the in-flow slot's intent — BUT only while the slot is actually
+    // on-screen. A native banner paints at BOTTOM_CENTER lifted by `margin`, so
+    // it overlaps the slot's footprint ONLY when that footprint is inside the
+    // viewport. When the slot is below the fold (tall results page) the old
+    // `max(0, innerHeight - bottom)` clamped to 0, degrading the "in-flow" banner
+    // into a viewport-bottom overlay that covered whatever fixed CTA sat there
+    // (the results-screen occlusion). So instead of pinning to the bottom, we
+    // WITHDRAW the slot's request when it isn't visible; the coordinator falls
+    // back to the anchor (if it wants the banner) or shows nothing. The banner
+    // therefore only ever appears where it genuinely reserves space.
     const apply = () => {
       if (cancelled) return;
-      const margin = computeMargin();
+      const rect = el.getBoundingClientRect();
+      // Footprint fully within the viewport: bottom not past the fold, and the
+      // banner's top (bottom − height) not scrolled above the top.
+      const onScreen = rect.bottom <= window.innerHeight && rect.bottom >= reservedHeight;
+      if (!onScreen) {
+        if (currentMargin !== -1) {
+          currentMargin = -1;
+          void bannerController.clearRequest(BANNER_OWNER.slot.key);
+        }
+        return;
+      }
+      const isAndroid = Capacitor.getPlatform() === 'android';
+      // Android SDK already adds the safe-area offset, so subtract it so the
+      // banner lines up with the slot rather than sitting above it.
+      const safeBottom = isAndroid ? safeArea.bottom || 0 : 0;
+      const margin = Math.max(0, window.innerHeight - rect.bottom - safeBottom);
       if (margin === currentMargin) return; // cheap local dedup before the coordinator's
       currentMargin = margin;
       void bannerController.setRequest(BANNER_OWNER.slot.key, {
@@ -79,7 +89,7 @@ export default function InlineBannerAd({
       // the banner) instead of leaving the screen blank.
       void bannerController.clearRequest(BANNER_OWNER.slot.key);
     };
-  }, [safeArea.bottom, variant]);
+  }, [safeArea.bottom, variant, reservedHeight]);
 
   // Native: reserved slot (banner overlays this div's footprint).
   // Slot gets neo-navy bg so the gap stays brand-themed when:

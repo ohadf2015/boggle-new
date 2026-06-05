@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   selectActiveBannerRequest,
+  shouldSuppressBanner,
   BannerController,
   type BannerOps,
   type BannerRequest,
@@ -22,6 +23,31 @@ describe('selectActiveBannerRequest (pure)', () => {
   it('picks the highest-priority request when several are present', () => {
     const active = selectActiveBannerRequest({ anchor: anchor(), slot: slot() });
     expect(active).toEqual(slot()); // slot (2) beats anchor (1)
+  });
+});
+
+describe('shouldSuppressBanner (pure)', () => {
+  it('does not suppress on an idle non-game screen', () => {
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: false })).toBe(false);
+  });
+
+  it('suppresses whenever the side drawer is open (any screen)', () => {
+    expect(shouldSuppressBanner({ drawerOpen: true, inGame: false, allowInGame: false })).toBe(true);
+    expect(shouldSuppressBanner({ drawerOpen: true, inGame: true, allowInGame: true })).toBe(true);
+  });
+
+  it('suppresses during fullscreen gameplay by default (opt-out)', () => {
+    // word-craft / word-tower / any future game: screen-fit-locked, no opt-in.
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: true, allowInGame: false })).toBe(true);
+  });
+
+  it('keeps the banner during gameplay ONLY when the screen opts in', () => {
+    // adventure reserves --admob-banner-height and sets banner-allow-in-game.
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: true, allowInGame: true })).toBe(false);
+  });
+
+  it('ignores the opt-in when not in a game (it is in-game-scoped)', () => {
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: true })).toBe(false);
   });
 });
 

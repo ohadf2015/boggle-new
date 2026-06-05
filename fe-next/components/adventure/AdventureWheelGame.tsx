@@ -10,6 +10,7 @@ import { useChapterQuests } from '@/hooks/useChapterQuests';
 import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { useAdventureAchievements } from '@/hooks/useAdventureAchievements';
 import { fastValidateWord } from '@/hooks/fastValidateWord';
+import { useInGameBannerOptIn } from '@/hooks/useInGameBannerOptIn';
 import { showAchievementToast } from '@/components/achievements/AchievementToast';
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import type { LevelConfig } from '@/types/adventure';
@@ -35,6 +36,10 @@ function computeStars(score: number, target: number): 0 | 1 | 2 | 3 {
 
 const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onExit }) => {
   const { t, language } = useLanguageSafe();
+  // Adventure is the one gameplay surface that intentionally shows the native
+  // banner (commit c0451a6ff) and reserves --admob-banner-height below. Opt back
+  // in past the default in-game suppression so the banner is allowed here.
+  useInGameBannerOptIn();
   const { completeLevel } = useProgressionActions();
   const { progression } = useProgressionData();
   const upgradeEffects = useUpgradeEffects(progression?.upgrades ?? {});

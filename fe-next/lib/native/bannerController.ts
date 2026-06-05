@@ -43,6 +43,27 @@ export function selectActiveBannerRequest(
   return best;
 }
 
+/**
+ * Pure suppression policy — decides whether the native banner must be globally
+ * hidden, independent of which owner currently wants it. Split out so the policy
+ * is unit-testable without the DOM/observer.
+ *
+ * Design: in-game suppression is OPT-OUT. Any fullscreen game (NavigationContext
+ * sets `body.screen-fit-locked` when `isInGame`) hides the banner BY DEFAULT, so a
+ * new game mode can never accidentally composite an ad over its bottom controls —
+ * no route blocklist to keep in sync. A screen that genuinely reserves banner room
+ * (only `/adventure` today, via `--admob-banner-height`) opts back in by flagging
+ * `html.banner-allow-in-game`. The drawer always wins (an open side menu must never
+ * have the SurfaceView banner painted on top of it).
+ */
+export function shouldSuppressBanner(input: {
+  drawerOpen: boolean;
+  inGame: boolean;
+  allowInGame: boolean;
+}): boolean {
+  return input.drawerOpen || (input.inGame && !input.allowInGame);
+}
+
 export interface BannerOps {
   show: (margin: number, variant: BannerVariant) => Promise<void> | void;
   hide: () => Promise<void> | void;

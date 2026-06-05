@@ -5,7 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { AdMob, BannerAdPluginEvents, BannerAdPosition } from '@capacitor-community/admob';
 import { useAdMob } from '@/hooks/useAdMob';
 import { useAppLifecycle } from '@/hooks/useAppLifecycle';
-import { bannerController } from '@/lib/native/bannerController';
+import { bannerController, shouldSuppressBanner } from '@/lib/native/bannerController';
 
 /**
  * Lifecycle host for the single banner coordinator. Rendered once (next to
@@ -101,23 +101,40 @@ export default function BannerCoordinatorMount() {
       window.removeEventListener('resize', onOrientationOrResize);
     });
 
-    // Single drawer-suppress owner. The native banner is a SurfaceView that
-    // composites ABOVE the WebView, so an open side menu can't cover it with
-    // z-index. HeaderMobileMenu flags <html>.mobile-drawer-open; we map that to
-    // a global suppress so BOTH banner owners (anchor + slot) hide uniformly —
-    // previously only the anchor cleared, leaving the slot banner (results
-    // pages) composited on top of the open menu.
-    const syncDrawer = () =>
+    // Single global-suppress owner. The native banner is a SurfaceView that
+    // composites ABOVE the WebView, so neither an open side menu nor in-game
+    // bottom controls can cover it with z-index — we hide it outright instead.
+    // Two independent signals drive a global suppress that covers BOTH banner
+    // owners (anchor + slot) uniformly:
+    //   - <html>.mobile-drawer-open (HeaderMobileMenu) — side menu is open.
+    //   - <body>.screen-fit-locked (NavigationContext, isInGame) — fullscreen
+    //     gameplay. Suppress by DEFAULT (opt-out) so any game — including new
+    //     modes never added to the route blocklist (word-craft, word-tower) —
+    //     never composites an ad over its bottom controls. A screen that truly
+    //     reserves banner room opts back in via <html>.banner-allow-in-game
+    //     (only /adventure today; set by AdventureWheelGame which reserves
+    //     --admob-banner-height).
+    // NOTE: the two classes live on DIFFERENT nodes (drawer/opt-in on <html>,
+    // game-lock on <body>), so we observe both.
+    const syncSuppress = () =>
       void bannerController.setSuppressed(
-        document.documentElement.classList.contains('mobile-drawer-open'),
+        shouldSuppressBanner({
+          drawerOpen: document.documentElement.classList.contains('mobile-drawer-open'),
+          inGame: document.body.classList.contains('screen-fit-locked'),
+          allowInGame: document.documentElement.classList.contains('banner-allow-in-game'),
+        }),
       );
-    syncDrawer(); // reflect any drawer already open at mount
-    const drawerObserver = new MutationObserver(syncDrawer);
-    drawerObserver.observe(document.documentElement, {
+    syncSuppress(); // reflect any drawer/game state already active at mount
+    const suppressObserver = new MutationObserver(syncSuppress);
+    suppressObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class'],
     });
-    removers.push(() => drawerObserver.disconnect());
+    suppressObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    removers.push(() => suppressObserver.disconnect());
 
     // Periodic refresh so the banner doesn't sit on one stale creative. AdMob's
     // own refresh can stall when the WebView is backgrounded/throttled, so we

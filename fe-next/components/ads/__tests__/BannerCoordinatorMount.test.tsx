@@ -55,6 +55,9 @@ vi.mock('@/lib/native/bannerController', () => ({
     reassert: () => reassert(),
     setSuppressed: (v: boolean) => setSuppressed(v),
   },
+  // Mirror the real pure policy so the mount's wiring is exercised end-to-end.
+  shouldSuppressBanner: (i: { drawerOpen: boolean; inGame: boolean; allowInGame: boolean }) =>
+    i.drawerOpen || (i.inGame && !i.allowInGame),
 }));
 
 /** Flush the MutationObserver microtask queue. */
@@ -68,7 +71,8 @@ describe('BannerCoordinatorMount', () => {
     isNative.current = true;
     for (const k of Object.keys(listeners)) delete listeners[k];
     foregroundCb.current = null;
-    document.documentElement.classList.remove('mobile-drawer-open');
+    document.documentElement.classList.remove('mobile-drawer-open', 'banner-allow-in-game');
+    document.body.classList.remove('screen-fit-locked');
   });
 
   it('injects show/hide ops into the coordinator on native mount', async () => {
@@ -150,6 +154,44 @@ describe('BannerCoordinatorMount', () => {
     document.documentElement.classList.add('mobile-drawer-open');
     await flushObserver();
     expect(setSuppressed).not.toHaveBeenCalled();
+  });
+
+  it('suppresses the banner during fullscreen gameplay (body.screen-fit-locked) by default', async () => {
+    // word-craft / word-tower / any future game — no opt-in → no banner over controls.
+    render(<BannerCoordinatorMount />);
+    setSuppressed.mockClear();
+    document.body.classList.add('screen-fit-locked');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(true);
+  });
+
+  it('restores the banner when gameplay exits (screen-fit-locked removed)', async () => {
+    document.body.classList.add('screen-fit-locked');
+    render(<BannerCoordinatorMount />);
+    setSuppressed.mockClear();
+    document.body.classList.remove('screen-fit-locked');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(false);
+  });
+
+  it('keeps the banner during gameplay when the screen opts in (banner-allow-in-game)', async () => {
+    // adventure reserves --admob-banner-height and opts back in.
+    render(<BannerCoordinatorMount />);
+    document.documentElement.classList.add('banner-allow-in-game');
+    document.body.classList.add('screen-fit-locked');
+    await flushObserver();
+    setSuppressed.mockClear();
+    // toggle to force a recompute and assert the last decision is "not suppressed"
+    document.body.classList.toggle('screen-fit-locked');
+    document.body.classList.toggle('screen-fit-locked');
+    await flushObserver();
+    expect(setSuppressed).not.toHaveBeenCalledWith(true);
+  });
+
+  it('reflects the initial in-game state on mount (game active before render)', () => {
+    document.body.classList.add('screen-fit-locked');
+    render(<BannerCoordinatorMount />);
+    expect(setSuppressed).toHaveBeenCalledWith(true);
   });
 
   it('refreshes the banner on a ~45-minute interval (fresh creative, not a stale ad)', () => {
