@@ -25,9 +25,18 @@ vi.mock('@/utils/authFetch', () => ({
   postWithAuth: (...args: unknown[]) => mockPostWithAuth(...args),
 }));
 
-const { mockLoggerError } = vi.hoisted(() => ({ mockLoggerError: vi.fn() }));
+const { mockLoggerError, mockLoggerWarn, mockLoggerDebug } = vi.hoisted(() => ({
+  mockLoggerError: vi.fn(),
+  mockLoggerWarn: vi.fn(),
+  mockLoggerDebug: vi.fn(),
+}));
 vi.mock('@/utils/logger', () => ({
-  default: { error: (...a: unknown[]) => mockLoggerError(...a), warn: vi.fn(), log: vi.fn(), debug: vi.fn() },
+  default: {
+    error: (...a: unknown[]) => mockLoggerError(...a),
+    warn: (...a: unknown[]) => mockLoggerWarn(...a),
+    log: vi.fn(),
+    debug: (...a: unknown[]) => mockLoggerDebug(...a),
+  },
 }));
 
 import { useChurnSignals } from '../useChurnSignals';
@@ -39,6 +48,8 @@ beforeEach(() => {
   mockPostWithAuth.mockReset();
   mockPostWithAuth.mockResolvedValue(okResponse());
   mockLoggerError.mockReset();
+  mockLoggerWarn.mockReset();
+  mockLoggerDebug.mockReset();
   localStorage.clear();
 });
 
@@ -77,7 +88,13 @@ describe('useChurnSignals', () => {
     });
   });
 
-  it('logs a real Error (not an empty object) when the report fails', async () => {
+  // This is a best-effort, fire-and-forget telemetry beacon. A failed report
+  // never affects the user, so transient failures must NOT reach Sentry — only
+  // `error`/`warn` are forwarded (utils/logger.ts); `debug` is console-only.
+  // Sentry JAVASCRIPT-NEXTJS-1KQ was 278 escalating "status 502" events that
+  // were just deploy-churn (the single Railway instance restarting), not a fault.
+
+  it('downgrades a network failure to debug (the Error is preserved, never Sentry error)', async () => {
     mockPostWithAuth.mockRejectedValue(new Error('network down'));
 
     const { result } = renderHook(() => useChurnSignals());
@@ -86,13 +103,17 @@ describe('useChurnSignals', () => {
       await result.current.reportSignals();
     });
 
-    await waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
-    const errArg = mockLoggerError.mock.calls[0].find((a: unknown) => a instanceof Error);
+    await waitFor(() => expect(mockLoggerDebug).toHaveBeenCalled());
+    // The Error is still passed (regression guard against empty "{}" serialisation).
+    const errArg = mockLoggerDebug.mock.calls[0].find((a: unknown) => a instanceof Error);
     expect(errArg).toBeInstanceOf(Error);
+    // ...but it must never hit the Sentry-bound levels.
+    expect(mockLoggerError).not.toHaveBeenCalled();
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
   });
 
-  it('treats a non-ok HTTP response as a failure and logs it', async () => {
-    mockPostWithAuth.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) } as unknown as Response);
+  it('treats a transient 5xx (e.g. 502 during a deploy) as debug, never Sentry', async () => {
+    mockPostWithAuth.mockResolvedValue({ ok: false, status: 502, json: async () => ({}) } as unknown as Response);
 
     const { result } = renderHook(() => useChurnSignals());
 
@@ -100,9 +121,36 @@ describe('useChurnSignals', () => {
       await result.current.reportSignals();
     });
 
-    await waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
-    const errArg = mockLoggerError.mock.calls[0].find((a: unknown) => a instanceof Error);
-    expect(errArg).toBeInstanceOf(Error);
+    await waitFor(() => expect(mockLoggerDebug).toHaveBeenCalled());
+    expect(mockLoggerError).not.toHaveBeenCalled();
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+  });
+
+  it('treats a 401 (token expiry on a beacon) as debug, never Sentry', async () => {
+    mockPostWithAuth.mockResolvedValue({ ok: false, status: 401, json: async () => ({}) } as unknown as Response);
+
+    const { result } = renderHook(() => useChurnSignals());
+
+    await act(async () => {
+      await result.current.reportSignals();
+    });
+
+    await waitFor(() => expect(mockLoggerDebug).toHaveBeenCalled());
+    expect(mockLoggerError).not.toHaveBeenCalled();
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+  });
+
+  it('preserves visibility for a 4xx contract error (warn → Sentry), since that is a real regression', async () => {
+    mockPostWithAuth.mockResolvedValue({ ok: false, status: 400, json: async () => ({}) } as unknown as Response);
+
+    const { result } = renderHook(() => useChurnSignals());
+
+    await act(async () => {
+      await result.current.reportSignals();
+    });
+
+    await waitFor(() => expect(mockLoggerWarn).toHaveBeenCalled());
+    expect(mockLoggerError).not.toHaveBeenCalled();
   });
 
   it('keeps a stable reportSignals identity across re-renders', () => {

@@ -26,6 +26,11 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({ auth: { getUser: mockGetUser } })),
 }));
 
+const mockCaptureMessage = vi.fn();
+vi.mock('@sentry/nextjs', () => ({
+  captureMessage: (...a: unknown[]) => mockCaptureMessage(...a),
+}));
+
 const bearer = (token: string) =>
   new Request('http://x/api', { headers: { authorization: `Bearer ${token}` } });
 
@@ -35,6 +40,7 @@ describe('getBearerUser', () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://supabase.test';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'anon-key';
     mockGetUser.mockReset();
+    mockCaptureMessage.mockReset();
   });
 
   afterEach(() => {
@@ -82,5 +88,45 @@ describe('getBearerUser', () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'invalid' } });
     const user = await getBearerUser(bearer('not.a.jwt'));
     expect(user).toBeNull();
+  });
+
+  // Canary: when the secret is ENTIRELY ABSENT, every bearer call takes the
+  // uncapped remote-auth round-trip that hangs Railway's proxy → the real root of
+  // the churn-signals 502s (JAVASCRIPT-NEXTJS-1KQ). The client beacon no longer
+  // alarms on those 502s, so this server-side warning is the signal that the
+  // provisioned secret has dropped — kept while the client noise is silenced.
+  it('alarms (throttled Sentry warning) when SUPABASE_JWT_SECRET is absent on the fallback path', async () => {
+    delete process.env.SUPABASE_JWT_SECRET;
+    const { getBearerUser } = await import('../getBearerUser?canary=' + Date.now());
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'remote-1' } }, error: null });
+    const token = await makeToken({ sub: 'u-1' });
+
+    await getBearerUser(bearer(token));
+
+    expect(mockCaptureMessage).toHaveBeenCalledTimes(1);
+    expect(String(mockCaptureMessage.mock.calls[0][0])).toMatch(/SUPABASE_JWT_SECRET/);
+    expect(mockCaptureMessage.mock.calls[0][1]).toBe('warning');
+  });
+
+  it('does NOT alarm when the secret is present (local-verify hot path, no fallback)', async () => {
+    const { getBearerUser } = await import('../getBearerUser?present=' + Date.now());
+    const token = await makeToken({ sub: 'u-1' });
+
+    await getBearerUser(bearer(token));
+
+    expect(mockCaptureMessage).not.toHaveBeenCalled();
+  });
+
+  it('throttles the missing-secret alarm to once per window despite repeated calls', async () => {
+    delete process.env.SUPABASE_JWT_SECRET;
+    const { getBearerUser } = await import('../getBearerUser?throttle=' + Date.now());
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'remote-1' } }, error: null });
+    const token = await makeToken({ sub: 'u-1' });
+
+    await getBearerUser(bearer(token));
+    await getBearerUser(bearer(token));
+    await getBearerUser(bearer(token));
+
+    expect(mockCaptureMessage).toHaveBeenCalledTimes(1);
   });
 });

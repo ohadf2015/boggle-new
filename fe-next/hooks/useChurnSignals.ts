@@ -101,14 +101,29 @@ export function useChurnSignals(): UseChurnSignalsReturn {
     try {
       const response = await postWithAuth(ENDPOINT, buildPayload(userId, signals));
       if (!response.ok) {
-        throw new Error(`churn-signals report failed with status ${response.status}`);
+        // Best-effort telemetry beacon — a failed report never affects the user.
+        // 5xx (proxy 502 when the single Railway instance restarts / hangs),
+        // 429 throttling, and 401 token-expiry are transient/expected conditions
+        // for a fire-and-forget beacon: log at debug only (the sole Sentry-excluded
+        // level — see utils/logger.ts). A 400/403 is a real contract/authz
+        // regression worth surfacing, so warn → Sentry. The genuine 502 root
+        // (a missing in-process SUPABASE_JWT_SECRET making remote auth hang) is
+        // alarmed server-side in getBearerUser, so silencing here is not blinding.
+        // Sentry JAVASCRIPT-NEXTJS-1KQ.
+        if (response.status >= 500 || response.status === 429 || response.status === 401) {
+          logger.debug(`useChurnSignals: transient report failure, status ${response.status}`);
+        } else {
+          logger.warn(`useChurnSignals: report rejected, status ${response.status}`);
+        }
+        return;
       }
       signalsRef.current = { ...signalsRef.current, lastReportedAt: Date.now() };
       saveSignals(signalsRef.current);
     } catch (err) {
-      // Pass the Error as an argument so Sentry captures the stack (the logger
-      // scans all args for an Error) instead of serialising it to "{}".
-      logger.error('useChurnSignals: failed to report signals', err);
+      // Network/unexpected failure (fetch rejected, offline). Still best-effort
+      // and never user-facing — keep it out of Sentry. Pass the Error so the
+      // logger records a real stack instead of serialising to "{}".
+      logger.debug('useChurnSignals: report request failed', err);
     } finally {
       inFlightRef.current = false;
     }
