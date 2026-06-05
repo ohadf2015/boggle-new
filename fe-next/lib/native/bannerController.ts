@@ -59,6 +59,20 @@ export interface BannerControllerConfig {
   retryDelaysMs?: number[];
   setTimeoutFn?: (cb: () => void, ms: number) => ReturnType<typeof setTimeout>;
   clearTimeoutFn?: (handle: ReturnType<typeof setTimeout>) => void;
+  /**
+   * Max time a single native show()/hide() may block the serialization chain.
+   * The @capacitor-community/admob native showBanner() does NOT resolve its
+   * PluginCall on the re-show path (mAdView != null → updateExistingAdView →
+   * returns without call.resolve()) — confirmed on-device: showBanner() stays
+   * PENDING forever while the banner DOES render. Without a cap, the first
+   * re-show's `await ops.show()` freezes `this.chain` permanently, so every
+   * later suppress/hide/reassert queues behind it and never runs (the
+   * app-wide "drawer doesn't hide the banner / banner never updates" bug).
+   * On timeout we proceed (the banner is already painted) so the chain keeps
+   * flowing. The proper native fix (resolve the call on the re-show path) is
+   * release-gated; this keeps the web-deployed JS resilient meanwhile.
+   */
+  opTimeoutMs?: number;
 }
 
 const NO_BANNER: AppliedState = { visible: false, margin: -1, variant: null };
@@ -88,11 +102,13 @@ export class BannerController {
   private retryTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly setTimeoutFn: (cb: () => void, ms: number) => ReturnType<typeof setTimeout>;
   private readonly clearTimeoutFn: (handle: ReturnType<typeof setTimeout>) => void;
+  private readonly opTimeoutMs: number;
 
   constructor(config: BannerControllerConfig = {}) {
     this.retryDelays = config.retryDelaysMs ?? [1500, 4000, 10000];
     this.setTimeoutFn = config.setTimeoutFn ?? ((cb, ms) => setTimeout(cb, ms));
     this.clearTimeoutFn = config.clearTimeoutFn ?? ((h) => clearTimeout(h));
+    this.opTimeoutMs = config.opTimeoutMs ?? 4000;
   }
 
   /** Inject the plugin ops (native mount) or null (web / teardown). */
@@ -189,6 +205,43 @@ export class BannerController {
     return this.chain;
   }
 
+  /**
+   * Await a native op but never let it block the chain longer than opTimeoutMs.
+   * The plugin's showBanner() can stay PENDING forever on the re-show path
+   * (native bug — see opTimeoutMs doc), which would otherwise freeze every
+   * subsequent op. A real resolve/reject settles immediately (timer cleared);
+   * a hang resolves on timeout so reconcile can proceed (the banner has already
+   * painted by the time native would have resolved).
+   */
+  private withOpTimeout(op: () => Promise<void> | void): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let settled = false;
+      const timer = this.setTimeoutFn(() => {
+        if (settled) return;
+        settled = true;
+        resolve(); // native call hung — proceed so the chain isn't frozen
+      }, this.opTimeoutMs);
+      const finish = (err?: unknown) => {
+        if (settled) return;
+        settled = true;
+        this.clearTimeoutFn(timer);
+        if (err === undefined) resolve();
+        else reject(err); // a real failure → don't mark applied
+      };
+      // Invoke op() SYNCHRONOUSLY (matches the prior direct `await ops.show()`
+      // call timing — owners rely on the native call firing this tick), then
+      // wrap whatever it returns.
+      let p: Promise<void>;
+      try {
+        p = Promise.resolve(op());
+      } catch (err) {
+        finish(err ?? new Error('banner op threw'));
+        return;
+      }
+      p.then(() => finish(), (err) => finish(err ?? new Error('banner op rejected')));
+    });
+  }
+
   private async reconcile(): Promise<void> {
     if (!this.ops) return;
     const gen = this.generation;
@@ -205,7 +258,7 @@ export class BannerController {
       // - getConfig() early-return in ops.hide() swallows the call last time
       // - A prior reconcile's applied state got out of sync with native reality
       if (this.applied.visible || this.suppressed) {
-        await this.ops.hide();
+        await this.withOpTimeout(() => this.ops!.hide());
         this.applied = { ...NO_BANNER };
       }
       this.appliedGeneration = gen;
@@ -224,7 +277,11 @@ export class BannerController {
       return;
     }
 
-    await this.ops.show(active.margin, active.variant);
+    // showBanner() may never resolve on the native re-show path (see
+    // opTimeoutMs) — bound the await so a hung show can't freeze the chain and
+    // block later suppress/hide/reassert. The banner still paints; we record it
+    // as applied either way.
+    await this.withOpTimeout(() => this.ops!.show(active.margin, active.variant));
     this.applied = { visible: true, margin: active.margin, variant: active.variant };
     this.appliedGeneration = gen;
   }

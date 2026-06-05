@@ -201,6 +201,29 @@ describe('BannerController', () => {
     expect(ops.hide).not.toHaveBeenCalled();
   });
 
+  it('does not let a hung show() freeze the chain — a later suppress still hides (native showBanner never resolves on the re-show path)', async () => {
+    // Device-confirmed native bug: @capacitor-community/admob showBanner() does
+    // NOT resolve its PluginCall when re-showing an existing banner
+    // (updateExistingAdView returns without call.resolve()) — the promise stays
+    // pending forever while the banner DOES render. Without the op timeout, the
+    // first re-show's `await ops.show()` freezes the serialization chain and
+    // every later op (suppress/hide/reassert) queues behind it forever = the
+    // app-wide "drawer doesn't hide the banner / banner never updates" bug.
+    c.setRequest('slot', slot(200));
+    await c.whenIdle();
+    expect(ops.show).toHaveBeenCalledTimes(1);
+    ops.hide.mockClear();
+
+    ops.show.mockReturnValueOnce(new Promise<void>(() => {})); // next show hangs forever
+    c.reassert(); // forces a re-show → hangs natively
+    c.setSuppressed(true); // drawer opens while the hung show is in flight
+
+    await vi.advanceTimersByTimeAsync(4000); // past the op timeout → chain proceeds
+    await c.whenIdle();
+
+    expect(ops.hide).toHaveBeenCalled(); // suppress hid the banner — chain was NOT frozen
+  });
+
   it('does not swallow a reassert that arrives while a show is still in flight', async () => {
     // The foreground-recovery failure mode: a reconcile is mid-await on show()
     // when the app foregrounds. A naive "applied = NO_BANNER then schedule"
