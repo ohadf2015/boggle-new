@@ -21,6 +21,12 @@ describe('LowHPOverlay', () => {
     expect(overlay.getAttribute('data-testid')).toBe('low-hp-overlay');
   });
 
+  it('keeps the ambient vignette class (steady size, no grow/shrink)', () => {
+    const { container } = render(<LowHPOverlay hp={19} />);
+    const overlay = container.firstChild as HTMLElement;
+    expect(overlay.className).toContain('animate-low-hp-pulse');
+  });
+
   it('uses 1s animation cycle at HP 19 (moderate urgency)', () => {
     const { container } = render(<LowHPOverlay hp={19} />);
     const overlay = container.firstChild as HTMLElement;

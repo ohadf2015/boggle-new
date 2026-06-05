@@ -3634,10 +3634,10 @@ body.crazygames-embed .game-view-container,
   }
 }
 
-/* Low HP vignette pulse for Word Hunt */
+/* Low HP vignette for Word Hunt — steady size, gentle ambient drift (no grow/shrink) */
 @keyframes low-hp-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.62; }
 }
 
 .animate-low-hp-pulse {
