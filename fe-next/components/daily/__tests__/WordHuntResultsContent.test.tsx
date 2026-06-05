@@ -105,6 +105,7 @@ const baseProps: WordHuntResultsContentProps = {
 // Mock storage utility so we can control wordWheelPlayed state
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: vi.fn(() => false),
+  hasPlayedWordHuntToday: vi.fn(() => false),
 }));
 
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';

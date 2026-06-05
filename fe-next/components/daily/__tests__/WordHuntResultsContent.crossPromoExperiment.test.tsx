@@ -25,6 +25,7 @@ vi.mock('@/hooks/useExperiment', () => ({
 // hasPlayedWordWheelToday returns false → wheel CTA always renders
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: () => false,
+  hasPlayedWordHuntToday: () => false,
 }));
 
 vi.mock('framer-motion', () => ({

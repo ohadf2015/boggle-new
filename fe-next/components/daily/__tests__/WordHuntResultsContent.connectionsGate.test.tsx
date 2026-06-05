@@ -10,6 +10,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Wheel done → Connections cross-promo is eligible (en/he, after wheel).
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: () => true,
+  hasPlayedWordHuntToday: () => false,
 }));
 
 const mockHasPlayedConnections = vi.fn(() => false);
