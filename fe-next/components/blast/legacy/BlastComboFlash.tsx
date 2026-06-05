@@ -3,7 +3,7 @@
 
 import React, { useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { AdaptiveMotion, AdaptiveAnimatePresence, useSkipAnimations } from '@/components/motion/AdaptiveMotion';
 import { getRandomComboFlash, generateAccentParticles, type ComboFlashVariation } from './blastEffectVariations';
 
 export interface BlastComboFlashProps {
@@ -37,7 +37,17 @@ function buildFlashBg(cfg: { color: string }, isGradient: boolean, variation: Co
 }
 
 export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastComboFlashProps) {
-  const shouldReduceMotion = useReducedMotion();
+  // Dismissal is driven entirely by onAnimationComplete on the animated path.
+  // AdaptiveMotion replaces that path with a static element (no animation, no
+  // onAnimationComplete) whenever useSkipAnimations() is true — cosy mode,
+  // low-end device, or app-level reduced-motion — none of which framer's
+  // useReducedMotion() (OS prefers-reduced-motion only) detects. Without ORing
+  // both signals the overlay renders but never fires onComplete and sticks on
+  // screen forever. OR (not replace) preserves OS-level reduced-motion coverage.
+  // Both hooks are called unconditionally (no short-circuit) per rules-of-hooks.
+  const osReduceMotion = useReducedMotion();
+  const skipAnimations = useSkipAnimations();
+  const shouldReduceMotion = osReduceMotion || skipAnimations;
   const variation = useMemo(() => getRandomComboFlash(), [flash?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   /* eslint-disable react-hooks/preserve-manual-memoization */
   const accentParticles = useMemo(
