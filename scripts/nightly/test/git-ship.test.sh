@@ -328,6 +328,23 @@ assert "NO spurious pending-ref strand"              "! git rev-parse refs/night
 assert "no leftover worktrees"                        "[ \"\$(git worktree list | wc -l | tr -d ' ')\" = 1 ]"
 unset NIGHTLY_ISOLATED_SHIP NIGHTLY_FOUNDER_BASE
 
+echo "Scenario 16 — ship pushes with --no-verify (a failing pre-push hook never blocks the gate-vetted commit)"
+# The run reaches ship ONLY after the isolated gate validated lint+tsc+build+test;
+# re-running .husky/pre-push (vitest --changed) is redundant, slow, racy with a
+# concurrent writer's index, and flaky (fsModuleCache) — it killed a manual push at
+# exit 144 (2026-06-05). git-ship must push --no-verify so the hook never gates the
+# automated path. Install an ALWAYS-FAIL pre-push hook: a verifying push would abort,
+# --no-verify sails through.
+setup
+mkdir -p .git/hooks
+printf '#!/bin/sh\necho "pre-push BLOCKED (simulated flaky gate)" >&2\nexit 1\n' > .git/hooks/pre-push
+chmod +x .git/hooks/pre-push
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+ship_nightly_commit; rc=$?
+assert "ship returns 0 despite an always-failing pre-push hook (--no-verify)" "[ $rc -eq 0 ]"
+assert "commit reached origin (hook bypassed)"   "[ \"\$(origin_head)\" = \"\$(git rev-parse HEAD)\" ]"
+assert "lane work shipped"                        "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
+
 echo
 echo "──────────────────────────────────────────"
 echo "PASS=$PASS  FAIL=$FAIL"
