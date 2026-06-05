@@ -139,9 +139,16 @@ export default defineConfig({
         },
       },
     },
-    // Cache transformed modules to disk for faster reruns
+    // Cache transformed modules to disk for faster reruns.
+    // DISABLED: on large --changed fan-outs (e.g. a hub-file edit pulling ~900
+    // test files) the on-disk cache (node_modules/.experimental-vitest-cache)
+    // races — workers read entries another worker already evicted — producing
+    // phantom `ENOENT .../.experimental-vitest-cache/<hash>` failures (142 file
+    // / 7 test false-failures on 2026-06-05) that fail the pre-push gate even
+    // though every test passes in isolation. --no-file-parallelism + a pre-run
+    // cache wipe did NOT eliminate it. A reliable gate outweighs rerun speed.
     experimental: {
-      fsModuleCache: true,
+      fsModuleCache: false,
     },
     coverage: {
       provider: 'v8',
