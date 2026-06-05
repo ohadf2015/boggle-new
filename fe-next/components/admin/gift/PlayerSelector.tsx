@@ -15,6 +15,7 @@ interface PlayerSelectorProps {
   onSelectionChange: (players: GiftRecipient[]) => void;
   maxSelection?: number;
   initialRecipient?: GiftRecipient;
+  initialRecipients?: GiftRecipient[];
 }
 
 export function PlayerSelector({
@@ -23,6 +24,7 @@ export function PlayerSelector({
   onSelectionChange,
   maxSelection = 50,
   initialRecipient,
+  initialRecipients,
 }: PlayerSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<GiftRecipient[]>([]);
@@ -60,12 +62,20 @@ export function PlayerSelector({
     }
   }, [authToken]);
 
+  // Seed the selection when the dialog opens with pre-chosen recipients. Supports
+  // a single recipient (card Gift button) or many (bulk gift from the list).
+  const seed = initialRecipients && initialRecipients.length > 0
+    ? initialRecipients
+    : initialRecipient
+      ? [initialRecipient]
+      : [];
+  const seedKey = seed.map((p) => p.id).join(',');
   useEffect(() => {
-    if (initialRecipient && selectedPlayers.length === 0) {
-      onSelectionChange([initialRecipient]);
+    if (seed.length > 0 && selectedPlayers.length === 0) {
+      onSelectionChange(seed.slice(0, maxSelection));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialRecipient?.id]);
+  }, [seedKey]);
 
   // Debounced search
   useEffect(() => {

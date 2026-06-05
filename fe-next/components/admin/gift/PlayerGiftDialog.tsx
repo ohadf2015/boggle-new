@@ -34,7 +34,10 @@ interface PlayerGiftDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   authToken: string;
+  /** Pre-select a single recipient (e.g. from a player card's Gift button). */
   initialRecipient?: GiftRecipient;
+  /** Pre-select many recipients at once (bulk gift from the players list). */
+  initialRecipients?: GiftRecipient[];
   onSuccess?: () => void;
 }
 
@@ -54,6 +57,7 @@ export function PlayerGiftDialog({
   onOpenChange,
   authToken,
   initialRecipient,
+  initialRecipients,
   onSuccess,
 }: PlayerGiftDialogProps) {
   const [sending, setSending] = useState(false);
@@ -157,6 +161,7 @@ export function PlayerGiftDialog({
               selectedPlayers={selectedPlayers}
               onSelectionChange={setSelectedPlayers}
               initialRecipient={initialRecipient}
+              initialRecipients={initialRecipients}
             />
           </Section>
 
