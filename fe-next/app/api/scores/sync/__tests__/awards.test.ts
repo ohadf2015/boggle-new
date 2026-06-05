@@ -57,6 +57,18 @@ vi.mock('@/app/api/drills/submit/processCompletion', () => ({
   processBrainDrillCompletion: (...args: unknown[]) => mockProcessBrain(...args),
 }));
 
+const mockProcessBlast = vi.fn();
+vi.mock('@/app/api/blast/result/processCompletion', () => ({
+  processBlastCompletion: (...args: unknown[]) => mockProcessBlast(...args),
+}));
+vi.mock('@/app/api/blast/utils', () => ({
+  validateBlastResult: (body: Record<string, unknown>) => ({ valid: true, data: body }),
+}));
+// Blast needs a service-role client; the dispatch creates one.
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn().mockReturnValue({ from: vi.fn(), rpc: vi.fn() }),
+}));
+
 const mockPosthogCapture = vi.fn();
 vi.mock('@/lib/posthog', () => ({
   getPostHogServer: () => ({ capture: mockPosthogCapture }),
@@ -127,11 +139,31 @@ function brainSubmission(overrides: Record<string, unknown> = {}) {
   };
 }
 
+function blastSubmission(overrides: Record<string, unknown> = {}) {
+  return {
+    id: crypto.randomUUID(),
+    mode: 'blast' as const,
+    payload: {
+      score: 500, tilesCleared: 20, totalTiles: 25, clearPercentage: 80,
+      wordsFound: ['hello', 'world'], bestWord: 'hello', maxCombo: 3, stars: 2,
+      difficulty: 'medium', language: 'en',
+    },
+    clientCompletedAt: Date.now(),
+    ...overrides,
+  };
+}
+
 describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
   beforeEach(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key';
     mockGetUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
     mockAwardLogSelect.mockResolvedValue({ data: null, error: null });
     mockAwardLogInsert.mockResolvedValue({ data: null, error: null });
+    mockProcessBlast.mockResolvedValue({
+      ok: true,
+      body: { isNewBestScore: true, xpAwarded: 40, percentile: 50 },
+    });
     mockProcessAdventure.mockResolvedValue({
       ok: true,
       body: { xpEarned: 50, goldEarned: 25, starsGained: 3, isReplay: false, leveledUp: false },
@@ -237,6 +269,28 @@ describe('POST /api/scores/sync — Phase 1b award dispatch', () => {
     const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
     expect(json.results[0].accepted).toBe(false);
     expect(json.results[0].awardError).toMatch(/connection reset/);
+  });
+
+  it('dispatches blast submission to processBlastCompletion and logs awards', async () => {
+    const sub = blastSubmission();
+    const res = await POST(makeRequest({ submissions: [sub] }) as never);
+    expect(res.status).toBe(200);
+    const json = (await res.json()) as { results: Array<{ accepted: boolean; awards: Record<string, unknown> | null }> };
+    expect(mockProcessBlast).toHaveBeenCalledTimes(1);
+    expect(json.results[0].accepted).toBe(true);
+    expect(json.results[0].awards).toMatchObject({ isNewBestScore: true, xpAwarded: 40 });
+    expect(mockAwardLogInsert).toHaveBeenCalledTimes(1);
+    expect((mockAwardLogInsert.mock.calls[0][0] as Record<string, unknown>).mode).toBe('blast');
+  });
+
+  it('blast transient failure (status 500) sets accepted=false so it retries', async () => {
+    mockProcessBlast.mockResolvedValue({ ok: false, status: 500, error: 'Failed to save result: INTERNAL' });
+    const sub = blastSubmission();
+    const res = await POST(makeRequest({ submissions: [sub] }) as never);
+    const json = (await res.json()) as { results: Array<{ accepted: boolean; awardError?: string }> };
+    expect(json.results[0].accepted).toBe(false);
+    expect(json.results[0].awardError).toMatch(/Failed to save result/);
+    expect(mockAwardLogInsert).not.toHaveBeenCalled();
   });
 
   it('unhandled mode (sp) returns awards: null', async () => {

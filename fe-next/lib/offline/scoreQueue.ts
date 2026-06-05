@@ -1,7 +1,14 @@
 import type { OfflineStore } from './storage';
 import { safeRandomUUID } from '@/lib/safeRandomUUID';
 
-export type ScoreMode = 'sp' | 'wotd' | 'daily-survival' | 'daily-wordhunt' | 'brain' | 'adventure';
+export type ScoreMode =
+  | 'sp'
+  | 'wotd'
+  | 'daily-survival'
+  | 'daily-wordhunt'
+  | 'brain'
+  | 'adventure'
+  | 'blast';
 
 export interface QueueRow {
   id: string;

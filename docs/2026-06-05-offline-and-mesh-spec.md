@@ -47,9 +47,10 @@ Route `/api/dictionary-words*` to **stale-while-revalidate** instead of network-
 - Bump `SW_CACHE_NAME`.
 - Size: don't precache (Hebrew 4.9MB, English ~2.5MB). Cache **on first fetch**, active-locale only.
 
-**A1.2 Queue Blast + Connections scores offline.**
-- Add `'blast'`, `'connections'` to `ScoreMode`.
-- Wire their result submission: if offline (or submit fails network), `enqueueScore` instead of dropping. Server `/api/scores/sync` must accept the new modes (verify/extend the sync route's mode handling).
+**A1.2 Queue Blast + Connections scores offline.** ⚠️ NOT a one-liner — the sync route's `awardHandlers` map silently drops modes without a handler (accepted=true → row deleted). Done carefully, in phases:
+- **Phase 0 (SHIPPED `4970c3fb8`):** `AwardError(retryable)` — a transient (5xx/unexpected) award failure sets `accepted=false` so the client retries instead of silently losing the score; permanent 4xx still drops. Protects every offline mode.
+- **Blast (SHIPPED, this batch):** extracted `processBlastCompletion` (`refactor ecd115ddb`, 43 route tests preserved) → `dispatchBlast` in the sync route (service-role client, idempotent via `offline_award_log`) + `'blast'` added to `ScoreMode`/`ServerSubmission.mode`/`SubmissionSchema` + client `saveBlastResult` enqueues on offline (cached `getSession` for userId, no network). End-to-end, TDD.
+- **Connections (PENDING):** mirror — extract `processConnectionsCompletion` from `/api/connections/daily/score` (naturally idempotent via best-keeps upsert), `dispatchConnections`, add `'connections'` to the 3 enums, client enqueue gated on `isAuthenticated` (guests can't sync — auth-only route).
 
 **A1.3 Prewarm dict eagerly.**
 - `DictionaryPrewarmer`: fire `prewarmDictionary` immediately on mount; keep idle/timeout only as a secondary nudge. Guarantees the active-locale dict is fetched (→ SW-cached) on first interactive load.
