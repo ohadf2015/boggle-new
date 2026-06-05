@@ -36,6 +36,7 @@ export default function PartyHostClient() {
     error,
     createRoom,
     startGame,
+    addBots,
     socket,
   } = usePartySocket(user?.id, hasAccess);
 
@@ -100,6 +101,7 @@ export default function PartyHostClient() {
           gameDef={gameDef}
           isHost={isHost}
           onStartGame={startGame}
+          onAddBots={addBots}
           error={error}
         />
       </>

@@ -649,3 +649,8 @@ export function cleanupPixelClash(roomCode: string): void {
   }
   activeGames.delete(roomCode);
 }
+
+/** Read-only accessor for the live game state (used by the solo bot driver). */
+export function getPixelGameState(roomCode: string): PixelGameState | undefined {
+  return activeGames.get(roomCode);
+}

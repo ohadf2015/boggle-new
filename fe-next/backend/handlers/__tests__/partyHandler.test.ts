@@ -6,6 +6,9 @@ import {
   getPublicRoomState,
 } from '../partyHandler';
 import { canAccessFeature } from '../../utils/featureFlags';
+import { makeBotPlayers, startPartyBotDriver } from '../../modules/party/partyBots';
+import { initCaptionClash } from '../../modules/party/captionClashEngine';
+import { initPixelClash } from '../../modules/party/pixelClashEngine';
 
 // Mock all party-engine modules so tests don't depend on engine internals.
 vi.mock('../../utils/logger', () => ({ default: {
@@ -44,6 +47,14 @@ vi.mock('../../modules/party/shadowClashEngine', () => ({
   submitVote: vi.fn(),
   callVoteEarly: vi.fn(),
   cleanupShadowClash: vi.fn(),
+}));
+vi.mock('../../modules/party/partyBots', () => ({
+  makeBotPlayers: vi.fn((n: number) =>
+    Array.from({ length: n }, (_, i) => ({ socketId: `bot_${i}`, username: `Bot${i}`, isHost: false, isBot: true })),
+  ),
+  SOLO_FILL_TARGET: { 'caption-clash': 4, 'pixel-clash': 4, 'shadow-clash': 6 },
+  startPartyBotDriver: vi.fn(),
+  stopPartyBotDriver: vi.fn(),
 }));
 
 function createMockSocket(id = 'socket-host') {
@@ -379,6 +390,73 @@ describe('partyHandler', () => {
 
     it('returns undefined for unknown code', () => {
       expect(getRoom('NOPE')).toBeUndefined();
+    });
+  });
+
+  describe('party:addBots (solo)', () => {
+    async function hostRoom(gameId: 'caption-clash' | 'pixel-clash' | 'shadow-clash' = 'caption-clash') {
+      const { socket, handlers } = createMockSocket('host');
+      const { io } = createMockIo();
+      registerPartyHandlers(io, socket);
+      await handlers['party:create']({ gameId, roomName: 'Solo', username: 'Host', avatar: {} });
+      return { socket, handlers, io, room: Array.from(partyRooms.values())[0] };
+    }
+
+    it('rejects addBots from a non-host', async () => {
+      const { room, io } = await hostRoom();
+      const guest = createMockSocket('socket-guest');
+      registerPartyHandlers(io, guest.socket);
+      room.players['socket-guest'] = {
+        socketId: 'socket-guest', username: 'Guest', avatar: {},
+        authUserId: null, score: 0, isHost: false, isSpectator: false, connected: true,
+      };
+
+      guest.handlers['party:addBots']();
+
+      expect(guest.socket.emit).toHaveBeenCalledWith('party:error', expect.objectContaining({ error: 'NOT_HOST' }));
+    });
+
+    it('fills non-host participants up to the per-game target with isBot players', async () => {
+      const { handlers, room } = await hostRoom('caption-clash');
+
+      handlers['party:addBots']();
+
+      const bots = Object.values(room.players).filter((p) => (p as { isBot?: boolean }).isBot);
+      expect(bots).toHaveLength(4); // SOLO_FILL_TARGET caption = 4, host doesn't count
+      expect(makeBotPlayers).toHaveBeenCalledWith(4);
+      expect(room.settings.custom.solo).toBe(true);
+    });
+
+    it('excludes the host (TV) from the engine player map on start', async () => {
+      const { handlers, room } = await hostRoom('caption-clash');
+      handlers['party:addBots']();
+
+      handlers['party:startGame']();
+
+      const playersArg = vi.mocked(initCaptionClash).mock.calls[0]?.[1] as Map<string, string>;
+      expect(playersArg.has('host')).toBe(false); // host is the TV, not a participant
+      expect(playersArg.size).toBe(4); // the 4 bots
+    });
+
+    it('starts the bot driver with the bot ids on solo start', async () => {
+      const { handlers } = await hostRoom('caption-clash');
+      handlers['party:addBots']();
+
+      handlers['party:startGame']();
+
+      expect(startPartyBotDriver).toHaveBeenCalledTimes(1);
+      const botIdsArg = vi.mocked(startPartyBotDriver).mock.calls[0]?.[3] as string[];
+      expect(botIdsArg.length).toBe(4);
+      expect(botIdsArg.every((id) => id.startsWith('bot_'))).toBe(true);
+    });
+
+    it('initialises pixel-clash solo in SHOWDOWN mode (bot-playable)', async () => {
+      const { handlers } = await hostRoom('pixel-clash');
+      handlers['party:addBots']();
+
+      handlers['party:startGame']();
+
+      expect(vi.mocked(initPixelClash).mock.calls[0]?.[2]).toBe('showdown');
     });
   });
 });

@@ -38,6 +38,12 @@ import {
   callVoteEarly,
   cleanupShadowClash,
 } from '../modules/party/shadowClashEngine.js';
+import {
+  makeBotPlayers,
+  startPartyBotDriver,
+  stopPartyBotDriver,
+  SOLO_FILL_TARGET,
+} from '../modules/party/partyBots.js';
 
 // ==================== Types (inline to avoid rootDir issues) ====================
 
@@ -54,6 +60,8 @@ interface PartyPlayer {
   isHost: boolean;
   isSpectator: boolean;
   connected: boolean;
+  /** Solo-mode fill player driven server-side (no real socket). */
+  isBot?: boolean;
 }
 
 interface PartyRoom {
@@ -154,7 +162,20 @@ function getPublicRoomState(room: PartyRoom): Record<string, unknown> {
 
 // ==================== Room Lifecycle ====================
 
+/** Minimal avatar for bot players. */
+const BOT_AVATAR: Record<string, unknown> = { base: 'robot', baseColor: 'purple', expression: 'happy' };
+
+/** Evict server-driven bot players so the room can auto-clean once the human leaves. */
+function removeBotsFromRoom(roomCode: string): void {
+  const room = partyRooms.get(roomCode);
+  if (!room) return;
+  for (const id of Object.keys(room.players)) {
+    if (room.players[id].isBot) delete room.players[id];
+  }
+}
+
 function cleanupRoom(roomCode: string, io?: Server): void {
+  stopPartyBotDriver(roomCode);
   const room = partyRooms.get(roomCode);
   if (room?.gameId === 'caption-clash') {
     cleanupCaptionClash(roomCode);
@@ -333,6 +354,51 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
     handlePlayerLeave(io, socket);
   });
 
+  // ---- Add Bots (solo play) ----
+  // Host-only. Fills the empty seats with server-driven bot players so one human
+  // can play. Two-surface model: host = TV, human joins on a phone, bots fill.
+  socket.on('party:addBots', () => {
+    if (!checkRateLimit(socket.id, 5)) {
+      socket.emit('party:error', { error: 'RATE_LIMITED', message: 'Slow down' });
+      return;
+    }
+    const room = getPlayerRoom(socket.id);
+    if (!room) return;
+    if (room.hostSocketId !== socket.id) {
+      socket.emit('party:error', { error: 'NOT_HOST', message: 'Only host can add bots' });
+      return;
+    }
+    if (room.phase !== 'lobby') {
+      socket.emit('party:error', { error: 'ALREADY_STARTED', message: 'Game already in progress' });
+      return;
+    }
+
+    const target = SOLO_FILL_TARGET[room.gameId];
+    const nonHostCount = Object.values(room.players).filter((p) => !p.isHost).length;
+    const capacityLeft = room.settings.maxPlayers - Object.keys(room.players).length;
+    const need = Math.max(0, Math.min(target - nonHostCount, capacityLeft));
+
+    for (const b of makeBotPlayers(need)) {
+      const player: PartyPlayer = {
+        socketId: b.socketId,
+        username: b.username,
+        avatar: BOT_AVATAR,
+        authUserId: null,
+        score: 0,
+        isHost: false,
+        isSpectator: false,
+        connected: true,
+        isBot: true,
+      };
+      room.players[b.socketId] = player;
+      broadcastToRoom(io, room.roomCode, 'party:playerJoined', { player });
+    }
+
+    room.settings.custom.solo = true;
+    room.lastActivity = Date.now();
+    broadcastToRoom(io, room.roomCode, 'party:gameUpdate', getPublicRoomState(room));
+  });
+
   // ---- Start Game ----
   socket.on('party:startGame', () => {
     if (!checkRateLimit(socket.id, 3)) {
@@ -350,11 +416,13 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const playerCount = Object.keys(room.players).length;
+    // The host is the TV screen, not a participant — count & seed the engine from
+    // the non-host players only (fixes phantom-player stalls; enables solo bots).
+    const participants = Object.values(room.players).filter((p) => !p.isHost);
     const gameDef = PARTY_GAME_CONFIG[room.gameId];
     const isDev = process.env.NODE_ENV === 'development';
     const minRequired = isDev ? 1 : gameDef.minPlayers;
-    if (playerCount < minRequired) {
+    if (participants.length < minRequired) {
       socket.emit('party:error', {
         error: 'NOT_ENOUGH_PLAYERS',
         message: `Need at least ${gameDef.minPlayers} players`,
@@ -366,28 +434,30 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
     room.round = 1;
     room.lastActivity = Date.now();
 
+    const players = new Map<string, string>();
+    for (const p of participants) players.set(p.socketId, p.username);
+    const isSolo = room.settings.custom.solo === true;
+
     // Initialize game-specific engine
     if (room.gameId === 'caption-clash') {
-      const players = new Map<string, string>();
-      for (const p of Object.values(room.players)) {
-        players.set(p.socketId, p.username);
-      }
       initCaptionClash(room.roomCode, players, room.totalRounds);
       startCaptionRound(io, room.roomCode);
     } else if (room.gameId === 'pixel-clash') {
-      const players = new Map<string, string>();
-      for (const p of Object.values(room.players)) {
-        players.set(p.socketId, p.username);
-      }
-      initPixelClash(room.roomCode, players, 'telephone', room.totalRounds);
+      // Solo runs SHOWDOWN mode (canvases/votes keyed by socketId, so bots can
+      // play it correctly); multiplayer keeps the default telephone mode.
+      initPixelClash(room.roomCode, players, isSolo ? 'showdown' : 'telephone', room.totalRounds);
       startPixelRound(io, room.roomCode);
     } else if (room.gameId === 'shadow-clash') {
-      const players = new Map<string, string>();
-      for (const p of Object.values(room.players)) {
-        players.set(p.socketId, p.username);
-      }
       initShadowClash(room.roomCode, players, 'standard', room.totalRounds);
       startShadowClash(io, room.roomCode);
+    }
+
+    // Solo: spin up the server-side bot driver to play the fill seats.
+    const botIds = participants.filter((p) => p.isBot).map((p) => p.socketId);
+    if (botIds.length > 0) {
+      startPartyBotDriver(io, room.roomCode, room.gameId, botIds, () => Date.now(), () => {
+        removeBotsFromRoom(room.roomCode);
+      });
     }
 
     broadcastToRoom(io, room.roomCode, 'party:phaseChange', {

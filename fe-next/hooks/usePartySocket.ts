@@ -60,6 +60,8 @@ export interface UsePartySocketReturn {
   leaveRoom: () => void;
   /** Start the game (host only) */
   startGame: () => void;
+  /** Fill empty seats with bots for solo play (host only) */
+  addBots: () => void;
   /** Send player input */
   sendInput: (input: PartyInput) => void;
 }
@@ -183,6 +185,10 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
     socketRef.current?.emit('party:startGame');
   }, []);
 
+  const addBots = useCallback(() => {
+    socketRef.current?.emit('party:addBots');
+  }, []);
+
   const sendInput = useCallback((input: PartyInput) => {
     socketRef.current?.emit('party:input', input);
   }, []);
@@ -205,6 +211,7 @@ export function usePartySocket(authUserId?: string | null, enabled: boolean = tr
     joinRoom,
     leaveRoom,
     startGame,
+    addBots,
     sendInput,
   };
 }

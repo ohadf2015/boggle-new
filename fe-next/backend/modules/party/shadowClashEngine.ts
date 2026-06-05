@@ -569,3 +569,8 @@ export function cleanupShadowClash(roomCode: string): void {
   }
   activeGames.delete(roomCode);
 }
+
+/** Read-only accessor for the live game state (used by the solo bot driver). */
+export function getShadowGameState(roomCode: string): ShadowGameState | undefined {
+  return activeGames.get(roomCode);
+}

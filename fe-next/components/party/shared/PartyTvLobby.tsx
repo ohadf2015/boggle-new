@@ -22,6 +22,8 @@ interface PartyTvLobbyProps {
   gameDef: PartyGameDefinition;
   isHost: boolean;
   onStartGame: () => void;
+  /** Fill empty seats with bots so one human can play solo (host only). */
+  onAddBots?: () => void;
   error: string | null;
 }
 
@@ -47,7 +49,7 @@ function avatarColor(username: string): string {
   return AVATAR_COLORS[hash % AVATAR_COLORS.length];
 }
 
-function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyTvLobbyProps) {
+function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, onAddBots, error }: PartyTvLobbyProps) {
   const { t } = useLanguage();
   const accentClasses = ACCENT_MAP[gameDef.accentColor] || 'text-neo-lime border-neo-lime';
 
@@ -65,6 +67,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
   const spectators = room ? Object.values(room.spectators) : [];
   const playerCount = players.length;
   const canStart = playerCount >= gameDef.minPlayers;
+  const canAddBots = !!onAddBots && playerCount < gameDef.maxPlayers;
 
   return (
     <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8 relative overflow-hidden">
@@ -150,24 +153,49 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, error }: PartyT
           )}
         </p>
 
-        {/* Start Button (host only) */}
+        {/* Host controls */}
         {isHost && (
-          <div className="text-center">
-            <button
-              onClick={onStartGame}
-              disabled={!canStart}
-              className={`
-                bg-neo-lime border-3 border-neo-black rounded-neo-lg shadow-hard-lg
-                px-12 py-4 font-neo-display text-neo-black text-2xl uppercase
-                transition-all duration-100
-                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl
-                active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
-                disabled:opacity-30 disabled:cursor-not-allowed
-                disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-hard-lg
-              `}
-            >
-              {t('party.startGame') || 'Start Game'}
-            </button>
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              {/* Secondary: fill seats with bots for solo play */}
+              {canAddBots && (
+                <button
+                  onClick={onAddBots}
+                  className={`
+                    bg-transparent border-3 ${accentClasses.split(' ')[1]} rounded-neo-lg
+                    px-7 py-4 font-neo-display ${accentClasses.split(' ')[0]} text-xl uppercase
+                    transition-all duration-100
+                    hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard
+                    active:translate-x-[2px] active:translate-y-[2px]
+                  `}
+                >
+                  🤖 {t('party.playSolo') || 'Play Solo'}
+                </button>
+              )}
+
+              {/* Primary: start the game */}
+              <button
+                onClick={onStartGame}
+                disabled={!canStart}
+                className={`
+                  bg-neo-lime border-3 border-neo-black rounded-neo-lg shadow-hard-lg
+                  px-12 py-4 font-neo-display text-neo-black text-2xl uppercase
+                  transition-all duration-100
+                  hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl
+                  active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
+                  disabled:opacity-30 disabled:cursor-not-allowed
+                  disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-hard-lg
+                `}
+              >
+                {t('party.startGame') || 'Start Game'}
+              </button>
+            </div>
+
+            {canAddBots && (
+              <p className="font-neo-body text-neo-cream/50 text-xs uppercase tracking-wider">
+                {t('party.soloHint') || 'Add bots, then join on your phone via the code'}
+              </p>
+            )}
           </div>
         )}
 
