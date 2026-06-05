@@ -1,6 +1,6 @@
 import { vi, type Mock, } from 'vitest';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Header from '@/components/Header';
 import { LanguageProvider } from '@/contexts/LanguageContext';
@@ -18,6 +18,24 @@ import { ThemeProvider } from '@/utils/ThemeContext';
  * 2. Music controls should appear in the mobile header (visible on < sm screens)
  * 3. Music controls should NOT appear in the mobile menu dropdown
  */
+
+// Silence the app logger. The mounted MusicProvider/AuthProvider kick off
+// async work (dynamic `howler` import, auth/session probes) that resolves
+// AFTER the synchronous test body and logs via `logger`. If that log lands
+// while the vitest worker is closing it throws the flaky
+// `EnvironmentTeardownError: Closing rpc while "onUserConsoleLog" was pending`
+// (seen intermittently on this heavy multi-provider test, on master too).
+vi.mock('@/utils/logger', () => ({
+    default: {
+        log: vi.fn(),
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        time: vi.fn(),
+        timeEnd: vi.fn(),
+    },
+}));
 
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
@@ -67,6 +85,17 @@ describe('Header - Music Controls Placement', () => {
     beforeEach(() => {
         // Clear any mocks
         vi.clearAllMocks();
+    });
+
+    afterEach(async () => {
+        // Let provider async effects (dynamic howler import, auth/session
+        // probes, translation load) settle inside act() so their state updates
+        // and any console output happen within the test window — not during
+        // worker teardown, which surfaces as a flaky
+        // "Closing rpc while onUserConsoleLog was pending" error.
+        await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+        });
     });
 
     describe('Desktop View (sm+ screens)', () => {
