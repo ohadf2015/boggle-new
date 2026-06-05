@@ -5,7 +5,11 @@ import { Capacitor } from '@capacitor/core';
 import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
 import { getAdmobConfig, type AdmobConfig, type AdPlatform } from '@/lib/admob-config';
 import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
-import { shouldSuppressAdsForTier } from '@/lib/families/adPolicy';
+import {
+  shouldSuppressAdsForTier,
+  shouldSuppressInterstitialForTier,
+  resolveChildDirectedAdInit,
+} from '@/lib/families/adPolicy';
 
 interface AdMobContextValue {
   recordGameEnd: () => void;
@@ -52,17 +56,28 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // Families Policy: once a user self-declares an under-13 age we have actual
   // knowledge of a child → serve NO ads to them. Mirrors the same tier the
   // social-feature gates use, so ad gating can't drift from social gating.
-  const { tier } = useSocialCapabilities();
+  const { tier, authResolved } = useSocialCapabilities();
   const totalGameEnds = useRef(0);
   const interstitialsShown = useRef(0);
   const initPromise = useRef<Promise<void> | null>(null);
+  const initStarted = useRef(false);
   // Interstitial preload state (app-scoped, resets per provider). A "warm" ad
   // shows with zero latency; `inFlight` dedupes concurrent prepares.
   const interstitialReady = useRef(false);
   const interstitialReadyAt = useRef(0);
   const interstitialInFlight = useRef<Promise<void> | null>(null);
 
-  if (initPromise.current === null) {
+  // Defer init until auth has SETTLED. The child-directed config baked into
+  // AdMob.initialize() depends on `tier`, and `tier` reads 'unknown' until the
+  // profile loads — initializing on first render would child-direct (and
+  // de-personalize) a logged-in adult for the entire session. Gating on
+  // `authResolved` means a known adult inits with the adult config, while a
+  // genuine guest (terminal 'unknown') still inits child-directed. Runs once.
+  useEffect(() => {
+    if (initStarted.current) return;
+    if (!authResolved) return;
+    initStarted.current = true;
+
     // EU/GDPR: gather UMP consent BEFORE initialize. The plugin itself geo-gates
     // (returns NOT_REQUIRED outside EEA), so no client-side EEA check needed.
     // Errors in the consent flow must NOT block ads — fall through to initialize
@@ -84,7 +99,13 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
 
     initPromise.current = consentReady.then(() =>
       isAvailable
-        ? AdMob.initialize({ initializeForTesting: process.env.NODE_ENV !== 'production' })
+        ? AdMob.initialize({
+            initializeForTesting: process.env.NODE_ENV !== 'production',
+            // Families Self-Certified Ads SDK config. JS-deployable on this
+            // remote-URL Capacitor app — the v8 native plugin reads these off
+            // the bridge. Anyone not KNOWN to be an adult is child-directed.
+            ...resolveChildDirectedAdInit(tier),
+          })
             .then(() => undefined)
             .catch((err) => {
               // warn (not error) so Sentry's captureConsole doesn't treat expected
@@ -93,11 +114,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
             })
         : undefined
     );
-  }
-
-  useEffect(() => {
-    void initPromise.current;
-  }, []);
+  }, [authResolved, isAvailable, tier]);
 
   function whenReady(): Promise<void> {
     return initPromise.current ?? Promise.resolve();
@@ -116,7 +133,9 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   function shouldShowInterstitial(): boolean {
-    if (hasNoAds()) return false;
+    // Families Ad Format: interstitials only for KNOWN adults (suppresses child
+    // AND undeclared-guest tiers). This is the v5740 rejection fix.
+    if (shouldSuppressInterstitialForTier(tier)) return false;
     if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
     if (totalGameEnds.current <= 3) return false;
     const postWarmupCount = totalGameEnds.current - 3;
@@ -132,7 +151,8 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   // session cap, and past warmup (the first eligible interstitial is game 6, so
   // warming at the warmup edge — game 3 — keeps that first one instant too).
   function shouldPreloadInterstitial(): boolean {
-    if (hasNoAds()) return false;
+    // Don't even warm an interstitial for non-adults — they can never show one.
+    if (shouldSuppressInterstitialForTier(tier)) return false;
     if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
     return totalGameEnds.current >= 3;
   }

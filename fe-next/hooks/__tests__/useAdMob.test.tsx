@@ -18,6 +18,14 @@ vi.mock('@/utils/growthTracking', () => ({
   trackInterstitialLifecycle: vi.fn(),
 }));
 
+// Interstitials are now adult-only (Families Ad Format). These tests exercise
+// the show/preload mechanics, so default the provider's tier to a known adult.
+const social = vi.hoisted(() => ({ tier: 'adult' as 'adult' | 'child' | 'unknown' }));
+vi.mock('@/hooks/useSocialCapabilities', () => ({
+  // authResolved true so init fires immediately in these flow tests.
+  useSocialCapabilities: () => ({ tier: social.tier, authResolved: true }),
+}));
+
 type Listener = (payload?: unknown) => void;
 const { listeners, fireEvent } = vi.hoisted(() => {
   const ls: Record<string, Listener[]> = {};
@@ -96,6 +104,7 @@ describe('useAdMob', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.keys(listeners).forEach((k) => delete listeners[k]);
+    social.tier = 'adult';
   });
 
   it('showRewarded fires onReward only after Rewarded event (not on resolve)', async () => {

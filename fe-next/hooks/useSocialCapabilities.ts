@@ -27,6 +27,13 @@ import {
 export interface UseSocialCapabilities {
   tier: SocialTier;
   caps: SocialCapabilities;
+  /**
+   * True once auth has SETTLED (profile loaded, or confirmed guest) — i.e. `tier`
+   * can be trusted. Distinct from `ageKnown`: a terminal guest is `authResolved`
+   * but not `ageKnown`. Ad init waits on this so a logged-in adult (whose
+   * birth_year loads async) isn't child-directed for the whole session.
+   */
+  authResolved: boolean;
   /** True once we know the user's age (authed birth_year or guest declaration). */
   ageKnown: boolean;
   /** True when we must show the neutral age screen before any social surface. */
@@ -40,7 +47,7 @@ export interface UseSocialCapabilities {
 }
 
 export function useSocialCapabilities(): UseSocialCapabilities {
-  const { profile, isAuthenticated } = useAuth();
+  const { profile, isAuthenticated, loading } = useAuth();
   const [guestBirthYear, setGuestBirthYearState] = useState<number | null>(() =>
     readGuestBirthYear(),
   );
@@ -86,6 +93,7 @@ export function useSocialCapabilities(): UseSocialCapabilities {
   return {
     tier,
     caps,
+    authResolved: !loading,
     ageKnown,
     needsAgeGate: !ageKnown,
     safetyAcknowledged,

@@ -26,9 +26,15 @@ vi.mock('@capacitor-community/admob', () => ({
 
 // Control the social tier the provider sees. Families Policy: a known child
 // (actual knowledge of under-13) must get NO ads.
-const social = vi.hoisted(() => ({ tier: 'unknown' as 'adult' | 'child' | 'unknown' }));
+const social = vi.hoisted(() => ({
+  tier: 'unknown' as 'adult' | 'child' | 'unknown',
+  // authResolved flips true once auth settles. Init is deferred until then so a
+  // logged-in adult (whose tier resolves async) is not child-directed for the
+  // whole session. Default true so existing tests init synchronously.
+  authResolved: true,
+}));
 vi.mock('@/hooks/useSocialCapabilities', () => ({
-  useSocialCapabilities: () => ({ tier: social.tier }),
+  useSocialCapabilities: () => ({ tier: social.tier, authResolved: social.authResolved }),
 }));
 
 import { Capacitor } from '@capacitor/core';
@@ -44,6 +50,7 @@ describe('AdMobProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     social.tier = 'unknown';
+    social.authResolved = true;
   });
 
   it('does not initialize AdMob on web', async () => {
@@ -69,7 +76,49 @@ describe('AdMobProvider', () => {
         </AdMobProvider>
       );
     });
-    expect(AdMob.initialize).toHaveBeenCalledWith({ initializeForTesting: true });
+    // Families: child-directed init config travels across the bridge to the
+    // native plugin. Default test tier is 'unknown' → treated as child-directed.
+    expect(AdMob.initialize).toHaveBeenCalledWith({
+      initializeForTesting: true,
+      tagForChildDirectedTreatment: true,
+      tagForUnderAgeOfConsent: true,
+      maxAdContentRating: 'General',
+    });
+  });
+
+  it('DEFERS AdMob.initialize until auth resolves, then inits with the real adult tier', async () => {
+    // First render: auth still loading → tier reads 'unknown'. Initializing here
+    // would child-direct a logged-in adult for the whole session.
+    social.authResolved = false;
+    social.tier = 'unknown';
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    let result: ReturnType<typeof render> | null = null;
+    await act(async () => {
+      result = render(
+        <AdMobProvider>
+          <TestConsumer onMount={vi.fn()} />
+        </AdMobProvider>
+      );
+    });
+    expect(AdMob.initialize).not.toHaveBeenCalled();
+
+    // Auth resolves: known adult.
+    social.authResolved = true;
+    social.tier = 'adult';
+    await act(async () => {
+      result!.rerender(
+        <AdMobProvider>
+          <TestConsumer onMount={vi.fn()} />
+        </AdMobProvider>
+      );
+    });
+    expect(AdMob.initialize).toHaveBeenCalledWith({
+      initializeForTesting: true,
+      tagForChildDirectedTreatment: false,
+      tagForUnderAgeOfConsent: false,
+      maxAdContentRating: 'General',
+    });
   });
 
   it('requests UMP consent BEFORE AdMob.initialize on native (EU/GDPR gate)', async () => {
@@ -203,6 +252,7 @@ describe('AdMobProvider', () => {
   });
 
   it('shouldShowInterstitial returns false during warmup (first 3 game ends)', async () => {
+    social.tier = 'adult'; // interstitials are adult-only; isolate the warmup gate
     let captured: ReturnType<typeof useAdMobContext> | null = null;
     await act(async () => {
       render(
@@ -218,6 +268,7 @@ describe('AdMobProvider', () => {
   });
 
   it('shouldShowInterstitial returns true on 3rd game after warmup', async () => {
+    social.tier = 'adult'; // only known adults are eligible for interstitials
     let captured: ReturnType<typeof useAdMobContext> | null = null;
     await act(async () => {
       render(
@@ -236,6 +287,7 @@ describe('AdMobProvider', () => {
   });
 
   it('caps interstitials at MAX_INTERSTITIALS_PER_SESSION (4) regardless of game-end count', async () => {
+    social.tier = 'adult';
     let captured: ReturnType<typeof useAdMobContext> | null = null;
     await act(async () => {
       render(
@@ -258,6 +310,7 @@ describe('AdMobProvider', () => {
   });
 
   it('recordInterstitialShown only blocks after cap reached, not before', async () => {
+    social.tier = 'adult';
     let captured: ReturnType<typeof useAdMobContext> | null = null;
     await act(async () => {
       render(
@@ -273,6 +326,56 @@ describe('AdMobProvider', () => {
     // Cap not reached — gate should still pass on next eligible cycle
     for (let j = 0; j < 3; j++) captured!.recordGameEnd();
     expect(captured!.shouldShowInterstitial()).toBe(true);
+  });
+
+  // Families Ad Format Requirements: interstitials are the cited format and must
+  // not reach anyone we don't KNOW is an adult. These are the v5740 fix.
+  it('shouldShowInterstitial NEVER fires for undeclared guests, even past warmup', async () => {
+    social.tier = 'unknown';
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    // Six game-ends would make an adult eligible; an undeclared guest stays blocked.
+    for (let i = 0; i < 6; i++) captured!.recordGameEnd();
+    expect(captured!.shouldShowInterstitial()).toBe(false);
+  });
+
+  it('shouldShowInterstitial NEVER fires for a known child', async () => {
+    social.tier = 'child';
+    let captured: ReturnType<typeof useAdMobContext> | null = null;
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+        </AdMobProvider>
+      );
+    });
+    for (let i = 0; i < 6; i++) captured!.recordGameEnd();
+    expect(captured!.shouldShowInterstitial()).toBe(false);
+  });
+
+  it('initializes AdMob WITHOUT child-directed tags for a known adult', async () => {
+    social.tier = 'adult';
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+    vi.mocked(Capacitor.getPlatform).mockReturnValue('android');
+    await act(async () => {
+      render(
+        <AdMobProvider>
+          <TestConsumer onMount={vi.fn()} />
+        </AdMobProvider>
+      );
+    });
+    expect(AdMob.initialize).toHaveBeenCalledWith({
+      initializeForTesting: true,
+      tagForChildDirectedTreatment: false,
+      tagForUnderAgeOfConsent: false,
+      maxAdContentRating: 'General',
+    });
   });
 
   it('getConfig returns null on web', async () => {
