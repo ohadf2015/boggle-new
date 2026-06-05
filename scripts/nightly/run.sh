@@ -652,6 +652,12 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
     # start snapshot or remove it if newly added by the lane. Safe because the
     # paths are guaranteed to be in our authored set (intersected above).
     _dropped_list=$(mktemp); printf '%s\n' "$_bad" > "$_dropped_list"
+    # Back up the dropped files' AUTHORED content before reverting — a parser
+    # mis-blame (the 2026-06-05 Babel-note bug nuked en/es/sv.js) is then
+    # recoverable by hand instead of destroyed. Pure cp, can't race a writer.
+    _drop_backup="$LOG_DIR/dropped-${DATE_TAG}"
+    backup_dropped_authored "$_dropped_list" "$_drop_backup"
+    log "drop-and-re-gate: backed up $(grep -c . "$_dropped_list" 2>/dev/null) dropped file(s) → $_drop_backup (recover: cp from there if mis-blamed)"
     revert_authored "$RUN_SNAPSHOT" "$_dropped_list"
     rm -f "$_dropped_list"
     if [ ! -s "$NIGHTLY_AUTHORED_FILE" ]; then log "drop-and-re-gate: nothing left after drops"; break; fi
@@ -685,6 +691,11 @@ if [ "$gate_ok" = "0" ]; then
   _AUTH_SRC="${NIGHTLY_AUTHORED_ORIGINAL:-$NIGHTLY_AUTHORED_FILE}"
   [ -s "$_AUTH_SRC" ] || _AUTH_SRC="$NIGHTLY_AUTHORED_FILE"
   AUTHORED_CODE=$(mktemp); grep -vE '^docs/' "$_AUTH_SRC" > "$AUTHORED_CODE" || true
+  # Same recoverable-backup as the drop step: the docs-only salvage reverts ALL
+  # authored CODE, so preserve it before discarding (recover by hand if needed).
+  _salvage_backup="$LOG_DIR/salvaged-code-${DATE_TAG}"
+  backup_dropped_authored "$AUTHORED_CODE" "$_salvage_backup"
+  [ -s "$AUTHORED_CODE" ] && log "docs-only salvage: backed up $(grep -c . "$AUTHORED_CODE" 2>/dev/null) reverted code file(s) → $_salvage_backup"
   revert_authored "$RUN_SNAPSHOT" "$AUTHORED_CODE"
   rm -f "$AUTHORED_CODE"
 

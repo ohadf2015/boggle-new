@@ -121,6 +121,29 @@ revert_authored() {
   done < "$list"
 }
 
+# backup_dropped_authored <authored_list_file> <dest_dir>
+# Copy each listed path's CURRENT (lane-authored) working-tree content into
+# <dest_dir>, preserving its relative path. Call this BEFORE revert_authored at
+# any site that DISCARDS authored work (drop-and-re-gate, docs-only salvage):
+# revert_authored restores a file to HEAD or the run-start snapshot, but NEITHER
+# holds what the lane just wrote (snapshot = pre-edit content, HEAD = committed
+# content), so a parser mis-blame destroys good work irrecoverably (the 2026-05-27
+# / 2026-06-05 Babel-note bug nuked en/es/sv.js). This copy is a recoverable
+# record alongside the stream-json sidecars. Pure `cp` — it NEVER touches git
+# refs/index/stash, so it cannot race a concurrent writer (unlike `git stash`).
+# Best-effort: a missing path is skipped, all failures swallowed.
+backup_dropped_authored() {
+  local list="$1" dest="$2" rel
+  [ -n "$list" ] && [ -s "$list" ] || return 0
+  [ -n "$dest" ] || return 0
+  while IFS= read -r rel; do
+    [ -z "$rel" ] && continue
+    [ -e "$PROJECT_DIR/$rel" ] || continue
+    mkdir -p "$dest/$(dirname "$rel")" 2>/dev/null || true
+    cp -p "$PROJECT_DIR/$rel" "$dest/$rel" 2>/dev/null || true
+  done < "$list"
+}
+
 # revert_to_pre_lane <snapshot_dir>
 # Restore ONLY the tracked files the lane changed (those that differ from the
 # snapshot), skipping any path protected as founder WIP. Untracked files are

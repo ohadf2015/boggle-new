@@ -102,6 +102,37 @@ revert_to_pre_lane "$SNAP"
 assert "snapshot dir is cleaned up after revert" "[ ! -d \"\$SNAP\" ]"
 teardown
 
+echo "── wip-revert: backup_dropped_authored preserves authored content before drop ──"
+# 8) Drop-and-re-gate must back up a file's LANE-AUTHORED content before reverting,
+# so a parser mis-blame (Babel-note bug) is recoverable, not destructive.
+setup
+printf 'lane authored EDIT\n' > "$PROJECT_DIR/src/tracked.ts"   # edit to a committed file
+printf 'lane authored NEW\n'  > "$PROJECT_DIR/src/lane-added.ts" # brand-new lane file
+DLIST=$(mktemp); printf 'src/tracked.ts\nsrc/lane-added.ts\n' > "$DLIST"
+DEST=$(mktemp -d -t dropbak.XXXXXX); rm -rf "$DEST"   # dest need not pre-exist
+backup_dropped_authored "$DLIST" "$DEST"
+assert "backs up authored EDIT of a committed file (not the HEAD/snapshot version)" \
+  "[ \"\$(cat \"\$DEST/src/tracked.ts\")\" = 'lane authored EDIT' ]"
+assert "backs up a brand-new lane-added file" \
+  "[ \"\$(cat \"\$DEST/src/lane-added.ts\")\" = 'lane authored NEW' ]"
+# backup is a COPY — the working tree is still intact for the subsequent revert
+assert "backup does not disturb the working tree" \
+  "[ \"\$(cat \"\$PROJECT_DIR/src/tracked.ts\")\" = 'lane authored EDIT' ]"
+# and the recovered content survives the destructive revert that follows
+git -C "$PROJECT_DIR" checkout -q HEAD -- src/tracked.ts 2>/dev/null
+rm -f "$PROJECT_DIR/src/lane-added.ts"
+assert "after revert, backup still holds authored content (recoverable)" \
+  "[ \"\$(cat \"\$DEST/src/tracked.ts\")\" = 'lane authored EDIT' ]"
+rm -f "$DLIST"; rm -rf "$DEST"
+teardown
+
+# 9) Missing list / empty dest are no-ops, never crash.
+setup
+backup_dropped_authored /nonexistent-xyz "$(mktemp -d)" && assert "missing list → no-op, rc 0" "true"
+EMPTY=$(mktemp); backup_dropped_authored "$EMPTY" "" && assert "empty dest → no-op, rc 0" "true"
+rm -f "$EMPTY"
+teardown
+
 echo
 echo "wip-revert: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
