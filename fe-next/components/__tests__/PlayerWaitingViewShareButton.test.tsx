@@ -94,6 +94,7 @@ vi.mock('../../contexts/AuthContext', () => ({
 // Mock SocketContext
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() } }),
+  useSocketOptional: () => ({ socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() } }),
 }));
 
 // Mock gameState hooks

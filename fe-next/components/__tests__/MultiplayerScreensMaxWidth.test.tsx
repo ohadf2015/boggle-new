@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Mock hooks that require providers
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
+  useSocketOptional: () => ({ socket: null }),
 }));
 
 vi.mock('@/hooks/gameState', () => ({ useGameMode: () => 'classic', useHostSelectedGameMode: () => 'random', useGameActions: () => ({ setGameActive: vi.fn(), setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }) }));

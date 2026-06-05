@@ -24,6 +24,10 @@ vi.mock('../../utils/SocketContext', () => ({
     socket: null,
     isConnected: true,
   }),
+  useSocketOptional: () => ({
+    socket: null,
+    isConnected: true,
+  }),
 }));
 
 vi.mock('@/hooks/gameState', () => ({ useGameMode: () => 'classic', useHostSelectedGameMode: () => 'random', useGameActions: () => ({ setGameActive: vi.fn(), setGameMode: vi.fn(), setHostSelectedGameMode: vi.fn() }) }));
