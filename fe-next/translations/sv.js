@@ -12943,7 +12943,8 @@ const sv = {
     "pcDisplayNameLabel": "Anpassat visningsnamn",
     "pcAdultOnly": "Endast ett vuxenkonto kan ändra dessa inställningar.",
     "nameLockedNote": "En vuxen kan aktivera ett anpassat namn i föräldrakontrollerna."
-  }
+  },
+  "offerwall": { "cta": { "label": "Tjäna gratis mynt", "aria": "Tjäna gratis mynt genom att slutföra erbjudanden" }, "modal": { "title": "Gratis mynt", "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.", "close": "Stäng" } }
 };
 
 export { sv };

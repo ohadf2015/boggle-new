@@ -13031,7 +13031,8 @@ const es = {
     "pcDisplayNameLabel": "Nombre para mostrar personalizado",
     "pcAdultOnly": "Solo una cuenta de adulto puede cambiar estos ajustes.",
     "nameLockedNote": "Un adulto puede activar un nombre personalizado en el control parental."
-  }
+  },
+  "offerwall": { "cta": { "label": "Gana monedas gratis", "aria": "Gana monedas gratis completando ofertas" }, "modal": { "title": "Monedas gratis", "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.", "close": "Cerrar" } }
 };
 
 export { es };

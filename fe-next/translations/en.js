@@ -13301,7 +13301,8 @@ const en = {
     "pcDisplayNameLabel": "Custom display name",
     "pcAdultOnly": "Only an adult account can change these settings.",
     "nameLockedNote": "An adult can turn on a custom name in parental controls."
-  }
+  },
+  "offerwall": { "cta": { "label": "Earn free coins", "aria": "Earn free coins by completing offers" }, "modal": { "title": "Free Coins", "subtitle": "Complete an offer — your coins are added automatically.", "close": "Close" } }
 };
 
 export { en };

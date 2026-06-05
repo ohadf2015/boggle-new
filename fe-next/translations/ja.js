@@ -12938,7 +12938,8 @@ const ja = {
     "pcDisplayNameLabel": "カスタム表示名",
     "pcAdultOnly": "これらの設定は大人のアカウントでのみ変更できます。",
     "nameLockedNote": "大人が保護者設定でカスタム表示名を有効にできます。"
-  }
+  },
+  "offerwall": { "cta": { "label": "無料コインを獲得", "aria": "オファーを完了して無料コインを獲得" }, "modal": { "title": "無料コイン", "subtitle": "オファーを完了すると、コインが自動で追加されます。", "close": "閉じる" } }
 };
 
 export { ja };

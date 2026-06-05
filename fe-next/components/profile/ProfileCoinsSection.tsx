@@ -4,6 +4,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Coins, Gamepad2, Trophy, BarChart3, Target } from 'lucide-react';
 import { CoinBalance } from '@/components/CoinBalance';
+import { EarnCoinsOfferwallButton } from '@/components/ads/EarnCoinsOfferwall';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
@@ -108,6 +109,9 @@ export function ProfileCoinsSection({
           {(profile?.lifetime_coins_earned || 0).toLocaleString()}
         </span>
       </div>
+
+      {/* Pay-per-action offerwall — self-hides unless configured + web (dark by default). */}
+      <EarnCoinsOfferwallButton size="md" className="mt-3 w-full" />
     </m.div>
   );
 }
