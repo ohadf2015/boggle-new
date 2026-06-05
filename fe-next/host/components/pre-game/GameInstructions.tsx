@@ -136,18 +136,21 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
             {(() => {
               const src = stepImageSrc(lang, step.descKey);
               return src ? (
-                <div className="relative mb-2.5 rounded-neo border-2 border-neo-black overflow-hidden shadow-hard-sm aspect-[4/3] bg-neo-navy">
+                // Capped + centered so the how-to diagram shrinks PROPORTIONALLY
+                // (keeps aspect-[4/3] + object-cover → no letter-grid crop) while
+                // freeing vertical space so the lobby fits without scroll.
+                <div className="relative mb-2 mx-auto w-full max-w-[200px] desktop-tall:max-w-[240px] rounded-neo border-2 border-neo-black overflow-hidden shadow-hard-sm aspect-[4/3] bg-neo-navy">
                   <Image
                     src={src}
                     alt={t(step.titleKey)}
                     fill
-                    sizes="(max-width: 768px) 90vw, 400px"
+                    sizes="(max-width: 768px) 70vw, 240px"
                     className="object-cover"
                   />
                 </div>
               ) : null;
             })()}
-            <div className="min-h-[48px] flex items-start gap-2">
+            <div className="min-h-[40px] flex items-start gap-2">
               <span className={cn('mt-1.5 w-1.5 h-1.5 rounded-full shrink-0', dotClass)} />
               <div>
                 <p className="font-bold text-neo-cream text-xs uppercase mb-0.5">{t(step.titleKey)}</p>
@@ -156,7 +159,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
             </div>
           </m.div>
         </AnimatePresence>
-        <div className="flex items-center justify-center gap-2 mt-3" role="group">
+        <div className="flex items-center justify-center gap-2 mt-2" role="group">
           <button
             onClick={(e) => { e.stopPropagation(); setInstructionStep(Math.max(0, instructionStep - 1)); }}
             disabled={instructionStep === 0}
