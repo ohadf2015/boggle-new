@@ -35,6 +35,14 @@ describe('isAllowedAdBannerRoute', () => {
     expect(isAllowedAdBannerRoute('/he/friends')).toBe(true);
   });
 
+  it('blocks /admin and all admin subroutes (operator console — never monetize)', () => {
+    expect(isAllowedAdBannerRoute('/admin')).toBe(false);
+    expect(isAllowedAdBannerRoute('/admin/users')).toBe(false);
+    expect(isAllowedAdBannerRoute('/admin/games')).toBe(false);
+    expect(isAllowedAdBannerRoute('/he/admin')).toBe(false);
+    expect(isAllowedAdBannerRoute('/es/admin/moderation')).toBe(false);
+  });
+
   it('returns false for null pathname', () => {
     expect(isAllowedAdBannerRoute(null)).toBe(false);
   });

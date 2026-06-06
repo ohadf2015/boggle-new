@@ -3,6 +3,7 @@
 // `/adventure` is intentionally allowed — adventure layout reserves space
 // via the --admob-banner-height CSS var so buttons are never covered.
 // `/profile` and `/friends` allow banner (passive menu/social, safe to monetize).
+// `/admin/*` is blocked — operator console, never monetized.
 const GAME_ROUTES = [
   '/multiplayer',
   '/singleplayer',
@@ -17,6 +18,7 @@ const GAME_ROUTES = [
   '/student',
   '/auth/callback',
   '/hebrew-multiplayer-word-game',
+  '/admin',
 ];
 
 const LOCALE_PREFIX = /^\/(en|he|sv|ja|es)/;
