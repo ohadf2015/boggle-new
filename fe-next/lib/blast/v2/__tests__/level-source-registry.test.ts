@@ -37,12 +37,22 @@ describe('level source registry', () => {
     expect(getLevelSourceForLevel(31, 'en', registry)).toBe(registry.generated);
   });
 
-  it('getLevelSourceForLevel returns generated for sv/ja/es level 1 (no pack files)', () => {
-    // sv/ja/es have no pack dirs — route them to the generator from level 1
-    // so missing curated content does not 404 the API.
+  it('getLevelSourceForLevel returns chain for sv/es level 1-30 (curated packs shipped)', () => {
+    // sv + es now ship generated-and-verified chain packs, so they get the same
+    // hand-tuned onboarding routing as en/he.
     const registry = buildRegistry();
-    expect(getLevelSourceForLevel(1, 'sv', registry)).toBe(registry.generated);
+    expect(getLevelSourceForLevel(1, 'sv', registry)).toBe(registry.chain);
+    expect(getLevelSourceForLevel(30, 'sv', registry)).toBe(registry.chain);
+    expect(getLevelSourceForLevel(1, 'es', registry)).toBe(registry.chain);
+    expect(getLevelSourceForLevel(30, 'es', registry)).toBe(registry.chain);
+  });
+
+  it('getLevelSourceForLevel returns generated for sv/es level 31+ and ja from level 1', () => {
+    // Past the curated range sv/es fall through to the generator; ja has no
+    // pack dir so it routes to the generator from level 1.
+    const registry = buildRegistry();
+    expect(getLevelSourceForLevel(31, 'sv', registry)).toBe(registry.generated);
+    expect(getLevelSourceForLevel(31, 'es', registry)).toBe(registry.generated);
     expect(getLevelSourceForLevel(1, 'ja', registry)).toBe(registry.generated);
-    expect(getLevelSourceForLevel(1, 'es', registry)).toBe(registry.generated);
   });
 });

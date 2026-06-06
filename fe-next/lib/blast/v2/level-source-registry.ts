@@ -7,8 +7,10 @@ import type { Locale } from './types';
 import { resolve } from 'node:path';
 
 // Hand-authored content locales. Adding a locale here without matching pack
-// files in content/blast/packs/<locale>/ will throw at runtime.
-const CHAIN_LOCALES: Locale[] = ['en', 'he'];
+// files in content/blast/packs/<locale>/ will throw at runtime. sv + es ship
+// generated chain packs (scripts/blast/gen-sv-es-chain-packs.ts) verified
+// solvable in all-levels-solvable.test.ts.
+const CHAIN_LOCALES: Locale[] = ['en', 'he', 'sv', 'es'];
 const CURATED_LOCALES: Locale[] = ['en', 'he'];
 const CHAIN_MAX_LEVEL = 30;
 const CURATED_MAX_LEVEL = 30;
@@ -27,9 +29,9 @@ export function buildRegistry(): LevelSourceRegistry {
 }
 
 /**
- * Priority: chain (1-30 for chain locales) → curated (1-30 for curated
- * locales) → generated. sv/ja/es bypass pack lookups entirely so missing
- * pack dirs do not 404 the API.
+ * Priority: chain (1-30 for chain locales en/he/sv/es) → curated (1-30 for
+ * curated locales) → generated. ja (and any unlisted locale) bypasses pack
+ * lookups entirely so missing pack dirs do not 404 the API.
  */
 export function getLevelSourceForLevel(
   levelNumber: number,
