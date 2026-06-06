@@ -10,9 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { LiveMonitor } from '@/components/admin/LiveMonitor';
 import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
-import { GamesDiagnostic } from '@/components/admin/GamesDiagnostic';
-import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
 import { IndexNowPanel } from '@/components/admin/IndexNowPanel';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
@@ -104,24 +103,28 @@ export default function AdminPageClient() {
         {/* Main content area */}
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 pb-20 sm:pb-6">
           {/* Page Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-neo-display text-neo-white">
-                {t('admin.dashboard')}
-              </h1>
-              <p className="text-sm text-slate-400">
-                {authToken ? t('admin.live.subtitle') : t('common.loading')}
-              </p>
-            </div>
-            <span className="text-sm text-slate-400">
-              {profile?.display_name || profile?.username}
-            </span>
-          </div>
+          <AdminPageHeader
+            title={t('admin.dashboard')}
+            subtitle={authToken ? t('admin.live.subtitle') : t('common.loading')}
+            actions={
+              <span className="text-sm text-slate-400">
+                {profile?.display_name || profile?.username}
+              </span>
+            }
+          />
 
-          {/* KPI Cards + System Health + Game Mode Popularity */}
+          {/* KPI Cards + System Health (glanceable, deep tools live in System) */}
           <KPICards stats={stats} />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <SystemHealth health={health} />
+            <div className="flex flex-col gap-2">
+              <SystemHealth health={health} />
+              <button
+                onClick={() => router.push(`/${language}/admin/system`)}
+                className="self-start text-xs font-medium text-neo-lime/80 hover:text-neo-lime transition-colors"
+              >
+                {t('admin.sidebar.system')} →
+              </button>
+            </div>
             <GameModePopularity />
           </div>
 
@@ -135,20 +138,8 @@ export default function AdminPageClient() {
               <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
               <TodayGamesHistory authToken={authToken} />
 
-              <div className="mt-8 bg-neo-navy-light/50 rounded-neo border-neo border-black p-4">
-                <GamesDiagnostic authToken={authToken} />
-              </div>
-
               <div id="indexnow" className="mt-8">
                 <IndexNowPanel />
-              </div>
-
-              <div id="email-testing" className="mt-8">
-                <EmailTestPanel
-                  authToken={authToken}
-                  userEmail={user?.email}
-                  userName={profile?.display_name || profile?.username}
-                />
               </div>
             </>
           ) : (

@@ -13,6 +13,7 @@ import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GamesDiagnostic } from '@/components/admin/GamesDiagnostic';
 import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
+import { AdminPageHeader } from '@/components/admin/AdminPageHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
@@ -52,7 +53,7 @@ export default function SystemPageClient() {
       <div className="flex flex-1">
         <AdminSidebar />
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 pb-20 sm:pb-6">
-          <h1 className="text-2xl font-neo-display text-neo-white mb-6">{t('admin.sidebar.system')}</h1>
+          <AdminPageHeader title={t('admin.sidebar.system')} />
 
           <SystemHealth health={health} />
 
