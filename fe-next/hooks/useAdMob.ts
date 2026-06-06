@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, InterstitialAdPluginEvents } from '@capacitor-community/admob';
+import { AdMob, BannerAdSize, BannerAdPosition, RewardAdPluginEvents, RewardInterstitialAdPluginEvents, InterstitialAdPluginEvents } from '@capacitor-community/admob';
 import { useAdMobContext } from '@/contexts/AdMobContext';
 import type { RewardedSurface, BannerVariant } from '@/lib/admob-config';
 import { kickWebViewRepaint } from '@/lib/native/webviewRepaint';
@@ -58,6 +58,28 @@ export function useAdMob() {
     // Per-surface unit ID lets AdMob waterfall optimize each placement separately.
     const adId = config.rewardedUnits?.[surface] ?? config.rewardedAdId;
 
+    // Some units are configured in the AdMob dashboard as Rewarded INTERSTITIAL
+    // (the "Ad 1 of 2" creative). Those MUST be driven through the
+    // rewarded-interstitial API + its event namespace — showing such a unit via
+    // the rewarded-VIDEO API renders an ad whose terminal events never fire in
+    // the video namespace, stranding the player with no reward (the "stuck at 30s"
+    // report). Default-off, per-surface (set NEXT_PUBLIC_ADMOB_REWARDED_INTERSTITIAL_SURFACES)
+    // so the proven video path is untouched until ops flips the matching surface.
+    const useInterstitial = (config.rewardedInterstitialSurfaces ?? []).includes(surface);
+    // Both are string enums with identical member names; cast to one so the
+    // addListener overloads resolve. Runtime values stay correct (Events.Rewarded
+    // is the interstitial event string when flagged) — our listeners ignore the
+    // event payload, so the per-enum reward-item type difference is irrelevant.
+    const Events = (useInterstitial
+      ? RewardInterstitialAdPluginEvents
+      : RewardAdPluginEvents) as typeof RewardAdPluginEvents;
+    const prepareAd = () =>
+      useInterstitial
+        ? AdMob.prepareRewardInterstitialAd({ adId, immersiveMode: REWARD_IMMERSIVE_MODE })
+        : AdMob.prepareRewardVideoAd({ adId, immersiveMode: REWARD_IMMERSIVE_MODE });
+    const showAd = () =>
+      useInterstitial ? AdMob.showRewardInterstitialAd() : AdMob.showRewardVideoAd();
+
     // Reward must come from the SDK's Rewarded event. @capacitor-community/admob v8 does
     // not guarantee `Rewarded → Dismissed` order on Android — some builds fire Dismissed
     // first and the Rewarded payload lands ~tens-to-hundreds of ms later. Treat Rewarded
@@ -82,12 +104,12 @@ export function useAdMob() {
     let finishRef: (ok: boolean, errMsg?: string) => void = () => {};
 
     const pendingHandles = [
-      AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
+      AdMob.addListener(Events.Rewarded, () => {
         trackRewardedLifecycle('rewarded', surface);
         rewarded = true;
         finishRef(true);
       }),
-      AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+      AdMob.addListener(Events.Dismissed, () => {
         // Breadcrumb BEFORE the guard — when the player taps X, Dismissed
         // should fire and tear the ad down. A `rewarded` with no following
         // `dismissed` in telemetry = the close tap isn't reaching the SDK
@@ -98,11 +120,11 @@ export function useAdMob() {
           if (!rewarded) finishRef(false);
         }, REWARD_GRACE_MS);
       }),
-      AdMob.addListener(RewardAdPluginEvents.FailedToShow, (e: { message?: string } | undefined) => {
+      AdMob.addListener(Events.FailedToShow, (e: { message?: string } | undefined) => {
         trackRewardedLifecycle('failed_to_show', surface);
         finishRef(false, e?.message || 'Ad failed to show');
       }),
-      AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (e: { message?: string } | undefined) => {
+      AdMob.addListener(Events.FailedToLoad, (e: { message?: string } | undefined) => {
         trackRewardedLifecycle('failed_to_load', surface);
         finishRef(false, e?.message || 'Ad failed to load');
       }),
@@ -147,7 +169,7 @@ export function useAdMob() {
             );
             await whenReady();
             trackRewardedLifecycle('prepare_start', surface);
-            await AdMob.prepareRewardVideoAd({ adId, immersiveMode: REWARD_IMMERSIVE_MODE });
+            await prepareAd();
             trackRewardedLifecycle('prepare_resolved', surface);
             // Bailed out (prepare timeout fired, or a Failed* event already
             // settled us). Do NOT show: the listeners are gone, so a shown ad
@@ -171,7 +193,7 @@ export function useAdMob() {
               REWARD_SAFETY_TIMEOUT_MS,
             );
             trackRewardedLifecycle('show_called', surface);
-            await AdMob.showRewardVideoAd();
+            await showAd();
             trackRewardedLifecycle('show_resolved', surface);
           } catch (err) {
             const msg = err instanceof Error ? err.message : 'Ad failed';
@@ -190,7 +212,7 @@ export function useAdMob() {
     // the same stall. Only on success: the consumed ad is gone, so there's no
     // concurrent in-flight prepare to collide with. Fire-and-forget.
     if (rewarded) {
-      void AdMob.prepareRewardVideoAd({ adId, immersiveMode: REWARD_IMMERSIVE_MODE }).catch(() => {});
+      void prepareAd().catch(() => {});
     }
   }, [hasNoAds, getConfig, whenReady]);
 

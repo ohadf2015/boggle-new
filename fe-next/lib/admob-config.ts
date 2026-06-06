@@ -12,6 +12,28 @@ export interface AdmobConfig {
   rewardedUnits: Record<RewardedSurface, string>;
   /** Per-surface banner unit IDs (game vs content browsing). */
   bannerUnits: Record<BannerVariant, string>;
+  /**
+   * Surfaces whose AdMob unit is a Rewarded INTERSTITIAL (the "Ad 1 of 2"
+   * creative) and must be driven through the rewarded-interstitial API instead
+   * of the rewarded-video API. Empty by default — set
+   * NEXT_PUBLIC_ADMOB_REWARDED_INTERSTITIAL_SURFACES (comma list, or "all")
+   * to match the dashboard unit types. See useAdMob.showRewarded.
+   */
+  rewardedInterstitialSurfaces: RewardedSurface[];
+}
+
+const ALL_REWARDED_SURFACES: RewardedSurface[] = [
+  'generic', 'hint', 'doubleGold', 'freeze', 'retry', 'timeLow', 'catchup',
+];
+
+/** Parse the comma-separated surface allowlist; "all" expands to every surface. */
+function parseRewardedInterstitialSurfaces(): RewardedSurface[] {
+  const raw = process.env.NEXT_PUBLIC_ADMOB_REWARDED_INTERSTITIAL_SURFACES;
+  if (typeof raw !== 'string' || raw.trim().length === 0) return [];
+  const valid = new Set<string>(ALL_REWARDED_SURFACES);
+  const tokens = raw.split(',').map((s) => s.trim()).filter(Boolean);
+  if (tokens.includes('all')) return [...ALL_REWARDED_SURFACES];
+  return tokens.filter((t): t is RewardedSurface => valid.has(t));
 }
 
 // Production AdMob unit IDs for publisher ca-pub-1896836706464880.
@@ -125,5 +147,6 @@ export function getAdmobConfig(platform: AdPlatform): AdmobConfig {
     bannerAdId: gameBanner,
     rewardedUnits,
     bannerUnits: { game: gameBanner, content: contentBanner },
+    rewardedInterstitialSurfaces: parseRewardedInterstitialSurfaces(),
   };
 }
