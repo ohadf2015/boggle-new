@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useRef, useState, useEffect } from 'react';
+import { memo, useRef, useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Shuffle, AlertTriangle, Lightbulb } from 'lucide-react';
 import CircularTimer from '@/components/CircularTimer';
@@ -15,6 +15,9 @@ const BlastEffectsCanvas = dynamic(
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
+import { ClosestRivalsPanel } from '@/components/game/in-game/ClosestRivalsPanel';
+import { selectClosestRivals } from '@/lib/leaderboard/selectClosestRivals';
+import { blastEntriesToRivals } from '@/lib/leaderboard/rivalNormalizers';
 import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
 import BlastWaveClearText from './BlastWaveClearText';
@@ -165,6 +168,13 @@ export const BlastStage = memo(function BlastStage({
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
   const isMultiplayer = remainingTime !== null && remainingTime !== undefined;
 
+  // Live "closest rivals" slice for the desktop side rail. Identity is keyed by
+  // username (blast's identity scheme). Returns null in solo blast (no leaderboard).
+  const rivalsView = useMemo(() => {
+    if (!leaderboard || leaderboard.length === 0) return null;
+    return selectClosestRivals(blastEntriesToRivals(leaderboard, username), 3);
+  }, [leaderboard, username]);
+
   const [showTileGuide, setShowTileGuide] = useState(false);
 
   // Measure board container for PixiJS effects canvas
@@ -281,9 +291,10 @@ export const BlastStage = memo(function BlastStage({
       )}
       </div>
 
-      {/* 1b. Live leaderboard strip (MP only) */}
+      {/* 1b. Live leaderboard strip (MP only) — mobile only; desktop uses the
+          closest-rivals rail (see right panel). */}
       {leaderboard && leaderboard.length > 0 && (
-        <div className="relative z-40">
+        <div className="relative z-40 lg:hidden">
           <BlastMPLeaderboard leaderboard={leaderboard} username={username} />
         </div>
       )}
@@ -411,8 +422,9 @@ export const BlastStage = memo(function BlastStage({
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 
-      {/* Right panel — notices on desktop */}
-      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center lg:gap-3 shrink-0">
+      {/* Right panel — closest-rivals rail + notices on desktop */}
+      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-start lg:pt-2 lg:gap-3 shrink-0">
+        {rivalsView && <ClosestRivalsPanel view={rivalsView} className="w-full" />}
         {/* Out of moves (desktop) */}
         <AdaptiveAnimatePresence>
           {movesRemaining <= 0 && isDeadEnd && !isComplete && !noWordsRemaining && (
