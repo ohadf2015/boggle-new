@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { getMascotBgTypeForSrc } from '@/components/ui/Mascot';
+import { getMascotBgTypeForSrc } from '@/components/ui/mascotData';
 
 type SupportedLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
