@@ -9613,6 +9613,10 @@ const sv = {
       "retry": "Försök igen",
       "progressSafe": "Dina framsteg är sparade — nivå {n}"
     },
+    "strikes": {
+      "label": "Gissningar",
+      "aria": "{count} gissningar kvar"
+    },
     "feedback": {
       "checking": "Kollar…",
       "target": "MÅLORD!",

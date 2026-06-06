@@ -31,6 +31,12 @@ type Props = {
   // never get stuck mid-level.
   canUndo?: boolean;
   onUndo?: () => void;
+  // Lose-condition visibility. `strikeBudget` is the max wrong guesses this level
+  // tolerates (null/undefined = unlimited, no indicator shown — chill levels);
+  // `strikesUsed` is how many have been spent. The HUD renders remaining guesses
+  // as pips so a loss is never a surprise (an invisible fail reads as a bug).
+  strikeBudget?: number | null;
+  strikesUsed?: number;
 };
 
 // Animated coin counter — pops to scale 1.18 on increment, eases back to 1.
@@ -97,9 +103,14 @@ export function BlastHud({
   bonusWordCount = 0,
   canUndo = false,
   onUndo,
+  strikeBudget = null,
+  strikesUsed = 0,
 }: Props) {
   const { t } = useLanguage();
   const mech = mechanicsForLevel(levelNumber);
+  const hasStrikes = typeof strikeBudget === 'number' && strikeBudget > 0;
+  const strikesRemaining = hasStrikes ? Math.max(0, strikeBudget - strikesUsed) : 0;
+  const strikeDanger = hasStrikes && strikesRemaining <= 1;
   const [showPreview, setShowPreview] = useState(false);
   const foundSet = useMemo(() => {
     if (!foundWords) return new Set<string>();
@@ -158,6 +169,42 @@ export function BlastHud({
           onPreview={() => setShowPreview(true)}
         />
       </div>
+      {hasStrikes && (
+        <div
+          data-testid="hud-strikes"
+          data-remaining={strikesRemaining}
+          data-danger={strikeDanger ? 'true' : 'false'}
+          className="flex items-center justify-center gap-1.5 px-3 py-1 bg-[#0b1530]/80"
+          aria-label={t('blast.strikes.aria', `${strikesRemaining} guesses left`, {
+            count: String(strikesRemaining),
+          })}
+        >
+          <span className="text-[9px] font-bold uppercase tracking-[0.18em] opacity-55">
+            {t('blast.strikes.label', 'Guesses')}
+          </span>
+          {Array.from({ length: strikeBudget }).map((_, i) => {
+            // Spend pips from the right so the row drains toward empty.
+            const spent = i >= strikesRemaining;
+            const liveColor = strikeDanger ? '#FF6B35' : modeColor;
+            return (
+              <m.span
+                key={i}
+                data-pip
+                data-spent={spent ? 'true' : 'false'}
+                initial={false}
+                animate={{ scale: spent ? [1.5, 1] : 1, opacity: spent ? 0.22 : 1 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                className="inline-block w-3 h-3 rounded-sm"
+                style={{
+                  background: spent ? 'rgba(255,255,255,0.12)' : liveColor,
+                  boxShadow: spent ? 'none' : `0 0 6px ${liveColor}`,
+                  border: '1.5px solid #0b1530',
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
       {chestContents && (
         <BlastChestPreviewModal
           chestNumber={chestNumber}

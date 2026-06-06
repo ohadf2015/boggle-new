@@ -9571,6 +9571,10 @@ const ja = {
       "retry": "もう一度",
       "progressSafe": "進行状況は保存されています — レベル {n}"
     },
+    "strikes": {
+      "label": "チャンス",
+      "aria": "残り{count}回"
+    },
     "feedback": {
       "checking": "確認中…",
       "target": "ターゲット！",

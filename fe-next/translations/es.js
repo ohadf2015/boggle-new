@@ -9597,6 +9597,10 @@ const es = {
       "retry": "Reintentar",
       "progressSafe": "Tu progreso está a salvo — nivel {n}"
     },
+    "strikes": {
+      "label": "Intentos",
+      "aria": "Quedan {count} intentos"
+    },
     "feedback": {
       "checking": "Comprobando…",
       "target": "¡OBJETIVO!",

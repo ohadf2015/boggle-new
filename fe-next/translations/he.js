@@ -9815,6 +9815,10 @@ const he = {
       "retry": "נסו שוב",
       "progressSafe": "ההתקדמות נשמרה — שלב {n}"
     },
+    "strikes": {
+      "label": "ניחושים",
+      "aria": "נותרו {count} ניחושים"
+    },
     "feedback": {
       "checking": "בודק…",
       "target": "מצאת מטרה!",

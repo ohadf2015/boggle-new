@@ -9421,6 +9421,10 @@ const en = {
       "retry": "Try Again",
       "progressSafe": "Your progress is safe — level {n}"
     },
+    "strikes": {
+      "label": "Guesses",
+      "aria": "{count} guesses left"
+    },
     "feedback": {
       "checking": "Checking…",
       "target": "TARGET!",

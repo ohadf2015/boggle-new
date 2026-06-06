@@ -560,6 +560,8 @@ export function BlastGame({
         chestProgress={Math.min(1, progressState.chestProgress + state.chestProgress)}
         chestContents={progressState.chestContents}
         onShuffle={handlers.onShuffle}
+        strikeBudget={state.strikeBudget}
+        strikesUsed={state.strikesUsed}
         modeColor={modeColor}
         theme={level.theme}
         targetWords={level.words}
