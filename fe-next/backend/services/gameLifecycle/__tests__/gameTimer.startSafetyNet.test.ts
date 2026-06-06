@@ -56,6 +56,7 @@ vi.mock('../../../modules/wordHuntManager', () => ({ drainLife: vi.fn(), areAllP
 vi.mock('../botGame', () => ({ startBotsForGame: vi.fn(), restoreBotsForGame: vi.fn().mockReturnValue(0) }));
 vi.mock('../gameEnd', () => ({ endGame: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('../../../utils/gameStateMachine', () => ({ isInProgress: vi.fn() }));
+vi.mock('../../../dictionary', () => ({ ensureLanguageLoaded: vi.fn().mockResolvedValue(undefined) }));
 
 import { vi, type Mock } from 'vitest';
 import { getGame } from '../../../modules/gameStateManager';
@@ -79,7 +80,7 @@ describe('scheduleGameStartSafetyNet', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('starts the timer + bots for an in-progress game with no timer once the delay elapses (frozen-host first game)', () => {
+  it('starts the timer + bots for an in-progress game with no timer once the delay elapses (frozen-host first game)', async () => {
     // gameDuration is guaranteed set to the round timer by gameStartHandler's
     // unconditional updateGame (gameStartHandler.ts:430-438) BEFORE the safety
     // net is armed, so the recovery uses the real duration, not the 180 fallback.
@@ -90,7 +91,9 @@ describe('scheduleGameStartSafetyNet', () => {
     scheduleGameStartSafetyNet(io, 'G1', 10000);
     expect(mSetTimer).not.toHaveBeenCalled(); // nothing fires before the delay
 
-    vi.advanceTimersByTime(10000);
+    // Async: the recovery callback awaits the dictionary warm before launching
+    // the timer/bots, so flush microtasks alongside the fake-timer advance.
+    await vi.advanceTimersByTimeAsync(10000);
 
     expect(mSetTimer).toHaveBeenCalledWith('G1', expect.anything()); // startGameTimer registered the interval
     expect(mStartBots).toHaveBeenCalled(); // bots launched via the recovery path

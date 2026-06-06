@@ -29,9 +29,10 @@ vi.mock('../../../utils/timerManager', () => ({
   hasGameTimer: vi.fn(),
 }));
 vi.mock('../../../modules/wordHuntManager', () => ({ drainLife: vi.fn(), areAllPlayersEliminated: vi.fn() }));
-vi.mock('../botGame', () => ({ startBotsForGame: vi.fn() }));
+vi.mock('../botGame', () => ({ startBotsForGame: vi.fn(), restoreBotsForGame: vi.fn().mockReturnValue(0) }));
 vi.mock('../gameEnd', () => ({ endGame: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('../../../utils/gameStateMachine', () => ({ isInProgress: vi.fn() }));
+vi.mock('../../../dictionary', () => ({ ensureLanguageLoaded: vi.fn().mockResolvedValue(undefined) }));
 
 import { vi, type Mock } from 'vitest';
 import { getGame } from '../../../modules/gameStateManager';
@@ -53,40 +54,40 @@ describe('resumeGameTimerIfMissing', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('resumes the timer for an in-progress game with no running timer (restart recovery)', () => {
+  it('resumes the timer for an in-progress game with no running timer (restart recovery)', async () => {
     mGetGame.mockReturnValue({ gameState: 'in-progress', gameMode: 'word-hunt', wordHuntState: {}, gameDuration: 90 });
     mInProgress.mockReturnValue(true);
     mHasTimer.mockReturnValue(false);
 
-    const resumed = resumeGameTimerIfMissing(io, 'G1');
+    const resumed = await resumeGameTimerIfMissing(io, 'G1');
 
     expect(resumed).toBe(true);
     expect(mSetTimer).toHaveBeenCalledWith('G1', expect.anything()); // startGameTimer registered an interval
   });
 
-  it('does NOT restart the timer when one is already running (normal live reconnect)', () => {
+  it('does NOT restart the timer when one is already running (normal live reconnect)', async () => {
     mGetGame.mockReturnValue({ gameState: 'in-progress', gameMode: 'word-hunt', wordHuntState: {}, gameDuration: 90 });
     mInProgress.mockReturnValue(true);
     mHasTimer.mockReturnValue(true);
 
-    const resumed = resumeGameTimerIfMissing(io, 'G1');
+    const resumed = await resumeGameTimerIfMissing(io, 'G1');
 
     expect(resumed).toBe(false);
     expect(mSetTimer).not.toHaveBeenCalled();
   });
 
-  it('does nothing for a game that is not in progress', () => {
+  it('does nothing for a game that is not in progress', async () => {
     mGetGame.mockReturnValue({ gameState: 'finished', gameMode: 'word-hunt' });
     mInProgress.mockReturnValue(false);
     mHasTimer.mockReturnValue(false);
 
-    expect(resumeGameTimerIfMissing(io, 'G1')).toBe(false);
+    expect(await resumeGameTimerIfMissing(io, 'G1')).toBe(false);
     expect(mSetTimer).not.toHaveBeenCalled();
   });
 
-  it('does nothing when the game is missing', () => {
+  it('does nothing when the game is missing', async () => {
     mGetGame.mockReturnValue(null);
-    expect(resumeGameTimerIfMissing(io, 'G1')).toBe(false);
+    expect(await resumeGameTimerIfMissing(io, 'G1')).toBe(false);
     expect(mSetTimer).not.toHaveBeenCalled();
   });
 });

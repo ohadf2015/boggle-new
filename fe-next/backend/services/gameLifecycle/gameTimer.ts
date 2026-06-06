@@ -14,6 +14,7 @@ import { drainLife, areAllPlayersEliminated } from '../../modules/wordHuntManage
 import { isInProgress } from '../../utils/gameStateMachine';
 import { startBotsForGame, restoreBotsForGame } from './botGame';
 import { endGame } from './gameEnd';
+import { ensureLanguageLoaded } from '../../dictionary';
 import logger from '../../utils/logger';
 
 /**
@@ -198,7 +199,7 @@ export function startGameTimer(
  *
  * @returns true if a timer was resumed, false on no-op.
  */
-export function resumeGameTimerIfMissing(io: Server, gameCode: string): boolean {
+export async function resumeGameTimerIfMissing(io: Server, gameCode: string): Promise<boolean> {
   const game = getGame(gameCode);
   if (!game) return false;
   if (!isInProgress(game.gameState)) return false;
@@ -214,6 +215,19 @@ export function resumeGameTimerIfMissing(io: Server, gameCode: string): boolean 
     restoredBots = restoreBotsForGame(gameCode);
   } catch (err) {
     logger.error('TIMER', `bot restore failed for ${gameCode}: ${(err as Error).message}`);
+  }
+
+  // Warm the dictionary trie BEFORE launching the timer/bots. On restart recovery
+  // the in-memory dict is COLD (only the fresh-start path in gameStartHandler
+  // loads it). The classic/word-hunt bot drivers (botManager.startBot) do NOT
+  // self-load — only wheel-rush/blast do — so without this, a rehydrated
+  // classic/word-hunt game runs cold: bot solvers find nothing (score 0) and
+  // human word validation at endGame rejects valid words. Mirrors gameStartHandler.
+  const gameLang = game.language || 'en';
+  try {
+    await ensureLanguageLoaded(gameLang);
+  } catch (err) {
+    logger.error('TIMER', `dictionary warm failed for ${gameLang} during resume of ${gameCode}: ${(err as Error).message}`);
   }
 
   const duration = game.gameDuration || game.timerSeconds || 180;
@@ -249,8 +263,8 @@ export function resumeGameTimerIfMissing(io: Server, gameCode: string): boolean 
  *        coordinator fallback, so the normal path always gets first chance).
  */
 export function scheduleGameStartSafetyNet(io: Server, gameCode: string, delayMs = 10000): void {
-  timerManager.setTimeout(`gameStartSafety:${gameCode}`, () => {
-    const resumed = resumeGameTimerIfMissing(io, gameCode);
+  timerManager.setTimeout(`gameStartSafety:${gameCode}`, async () => {
+    const resumed = await resumeGameTimerIfMissing(io, gameCode);
     if (resumed) {
       // info (not warn) — this backstop firing is recovery working as designed,
       // not an error. warn routes to Sentry (logger.ts) and spammed it with

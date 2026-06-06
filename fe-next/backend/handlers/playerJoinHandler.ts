@@ -128,7 +128,9 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // can still submit words (the "stuck at full life for everyone" report).
     // No-op for normal live reconnects (a timer is already running) and for
     // waiting/finished games — see resumeGameTimerIfMissing's guards.
-    resumeGameTimerIfMissing(io, gameCode);
+    // Awaited so the dictionary is warm (bot solving + word validation) before
+    // the resumed round runs.
+    await resumeGameTimerIfMissing(io, gameCode);
 
     // Handle multi-tab detection and existing auth connection
     if (authUserId) {

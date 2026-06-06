@@ -28,6 +28,11 @@ import { cleanupPlayerData } from '../../utils/playerCleanup';
 import { cleanupGameBots } from '../../modules/botManager';
 import gameStartCoordinator from '../../utils/gameStartCoordinator';
 
+// PostHog server capture spy — assert the MP-drop telemetry payloads end-to-end
+// (the real builder runs, so this also pins durationSec to disconnectedAt).
+const { mockCapture } = vi.hoisted(() => ({ mockCapture: vi.fn() }));
+vi.mock('@/lib/posthog', () => ({ getPostHogServer: () => ({ capture: mockCapture }) }));
+
 // Logger must be mocked before any module that transitively requires it
 vi.mock('../../utils/logger', () => ({ default: {
   info: vi.fn(),
@@ -933,5 +938,69 @@ describe('connectionHandler', () => {
       // setTimeout called twice (once per disconnect)
       expect(mockTimerManager.setTimeout).toHaveBeenCalledTimes(2);
     });
+  });
+});
+
+// ─── MP-drop telemetry wiring (mp_player_dropped) ───
+describe('mp_player_dropped telemetry', () => {
+  const mockIo = {} as any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(1_000_000));
+    mockGetGameRoom.mockReturnValue('game:GAME1');
+    mockGetActiveRooms.mockReturnValue([]);
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetGameSpectators.mockReturnValue([]);
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('emits a grace-expiry drop whose durationSec is measured from the disconnect moment, not grace-expiry', () => {
+    // Started 30s before the disconnect. The grace callback fires 120s LATER —
+    // if duration were measured at expiry it would read ~150s and hide rage-quits.
+    const game = makeGame({
+      gameState: 'in-progress',
+      gameMode: 'classic',
+      gameStartedAt: 1_000_000 - 30_000,
+      users: { Player1: { socketId: 'socket-p1', isHost: false, disconnected: false, isBot: false } },
+    });
+    const { socket, handlers } = createMockSocket('socket-p1');
+    registerConnectionHandlers(mockIo, socket);
+
+    mockGetGameBySocketId.mockReturnValue('GAME1');
+    mockGetUsernameBySocketId.mockReturnValue('Player1');
+    mockGetGame.mockReturnValue(game);
+    mockIsRoomEmpty.mockReturnValue(false);
+
+    handlers['disconnect']('transport close');
+    vi.advanceTimersByTime(120000); // grace expires
+
+    const dropCall = mockCapture.mock.calls.find((c) => c[0]?.event === 'mp_player_dropped');
+    expect(dropCall).toBeDefined();
+    expect(dropCall[0].distinctId).toBe('Player1');
+    expect(dropCall[0].properties.reason).toBe('transport close');
+    expect(dropCall[0].properties.source).toBe('grace_expiry');
+    expect(dropCall[0].properties.durationSec).toBe(30); // NOT ~150
+  });
+
+  it('emits a host_left drop for each remaining human when the host abandons and the room closes', () => {
+    const game = makeGame({ gameState: 'in-progress', gameMode: 'classic', gameStartedAt: 1_000_000 - 60_000 });
+    const { socket, handlers } = createMockSocket('socket-host');
+    registerConnectionHandlers(mockIo, socket);
+
+    mockGetGameBySocketId.mockReturnValue('GAME1');
+    mockGetUsernameBySocketId.mockReturnValue('Host');
+    mockGetGame.mockReturnValue(game);
+    mockGetNextEligibleHost.mockReturnValue(null); // no transfer target → room closes at grace
+
+    handlers['disconnect']('transport close');
+    vi.advanceTimersByTime(300000); // host grace expires → room closes
+
+    const hostLeftDrops = mockCapture.mock.calls
+      .map((c) => c[0])
+      .filter((e) => e?.event === 'mp_player_dropped' && e.properties.source === 'host_left');
+    expect(hostLeftDrops.map((e) => e.distinctId).sort()).toEqual(['Host', 'Player1']);
+    expect(hostLeftDrops.every((e) => e.properties.reason === 'host_left')).toBe(true);
   });
 });

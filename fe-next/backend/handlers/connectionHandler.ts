@@ -33,6 +33,8 @@ import { cleanupPlayerData } from '../utils/playerCleanup.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
+import { buildMpDropEvent, buildHostLeftDropEvents } from '../utils/mpDropTelemetry.js';
+import { getPostHogServer } from '@/lib/posthog';
 import logger from '../utils/logger.js';
 
 // Configuration
@@ -40,6 +42,10 @@ import logger from '../utils/logger.js';
 // does not tear down the host's room. Periodic empty-room sweep
 // (gameStateManager.cleanupEmptyRooms) reads the same env var to stay in sync.
 const HOST_RECONNECTION_GRACE_PERIOD = parseInt(process.env.HOST_RECONNECTION_GRACE_PERIOD || '300000');
+// Player grace stays at 2 min for now. Extending it (to reduce permanent drops on
+// a mid-game network switch) is deliberately HELD until `mp_player_dropped`
+// telemetry establishes a baseline — changing removal behavior and measuring it in
+// the same release would contaminate the very signal we're adding. Env-overridable.
 const PLAYER_RECONNECTION_GRACE_PERIOD = parseInt(process.env.PLAYER_RECONNECTION_GRACE_PERIOD || '120000');
 
 // Extended GameUser type with reconnection timeout
@@ -258,6 +264,19 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
         logger.info('SOCKET', `Host reconnection timeout for game ${gameCode} - closing room`);
 
+        // Instrument the host-drop cascade BEFORE deleteGame: every remaining
+        // human is kicked here and their own disconnect will find no game, so
+        // this is the ONLY place this "many players leave at once" path is
+        // visible. source='host_left' keeps it in the same funnel as solo drops.
+        // Best-effort: telemetry must never block room teardown.
+        try {
+          const hostLeftDrops = buildHostLeftDropEvents(currentGame as unknown as Game, Date.now());
+          const ph = getPostHogServer();
+          if (ph) for (const drop of hostLeftDrops) ph.capture(drop);
+        } catch (telemetryErr) {
+          logger.warn('SOCKET', `host_left telemetry failed for ${gameCode}: ${(telemetryErr as Error).message}`);
+        }
+
         // Stop timer and bots
         clearGameTimer(gameCode);
         cleanupGameBots(gameCode);
@@ -286,7 +305,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 /**
  * Handle player disconnection
  */
-function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCode: string, username: string, _reason: string): void {
+function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCode: string, username: string, reason: string): void {
   logger.info('SOCKET', `Player ${username} disconnected from game ${gameCode}`);
 
   // Check if user is a bot (bots don't have reconnection handling)
@@ -352,6 +371,23 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
         const currentUserData: GameUserWithTimeout | undefined = currentGame.users?.[username] as unknown as GameUserWithTimeout | undefined;
         if (currentUserData && currentUserData.disconnected) {
           logger.info('SOCKET', `Player ${username} reconnection timeout - removing from game ${gameCode}`);
+
+          // Instrument the mid-game leave BEFORE removal (player still counted in
+          // human seats). This is the only place MP dropout is measurable —
+          // PostHog never fired game_abandoned for MP and server logs are
+          // ephemeral. `reason` (ping timeout / transport close / io client
+          // disconnect) separates a connectivity bug from an intentional leave.
+          // Best-effort: never let telemetry throw into the cleanup path.
+          // Use disconnectedAt — the moment the player actually dropped — NOT now:
+          // this callback fires a full grace period (~2min) later, which would
+          // otherwise inflate every durationSec past the grace and hide rage-quits.
+          try {
+            const droppedAt = currentUserData.disconnectedAt ?? Date.now();
+            const drop = buildMpDropEvent(currentGame as unknown as Game, username, reason, droppedAt);
+            getPostHogServer()?.capture(drop);
+          } catch (telemetryErr) {
+            logger.warn('SOCKET', `mp_player_dropped telemetry failed for ${username} in ${gameCode}: ${(telemetryErr as Error).message}`);
+          }
 
           // Clean up player data
           cleanupPlayerData(currentGame, username);
