@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { LandingView } from '@/components/landing';
@@ -94,6 +94,15 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     if (typeof window === 'undefined') return false;
     if (hasCompletedOnboarding() || hasSupabaseSession()) return false;
     if (pendingNext) return true;
+    // A new user who arrived via a room invite (?room=) must drop straight into
+    // the invite-aware FTUE (OnboardingFlow → name/avatar → teaser → the room),
+    // not the marketing LandingView. Returning users never reach here — they
+    // hit the inviteRedirectUrl branch above. savePendingRoomInvite() already
+    // ran in the initialState initializer above, so the invite is in
+    // sessionStorage by now. Mirrors the `pendingNext` auto-open; without it
+    // invited first-timers were parked on the landing page with no way to pick a
+    // name/avatar (regression from "landing-first UX", 2026-05-08).
+    if (hasPendingRoomInvite()) return true;
     return detectCrazyGamesSync();
   });
   // Defensive route allowlist: FTUE may only render on locale homepage.
