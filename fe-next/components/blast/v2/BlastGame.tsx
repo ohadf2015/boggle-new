@@ -5,6 +5,7 @@ import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
 import { markUnlockSeen, markConceptSeen, completeFtue, setSkipAll, type UnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 import { useBlastV2 } from '@/lib/blast/v2/useBlastV2';
 import { detectAlmostWords, detectAllCascades } from '@/lib/blast/v2/engine';
+import { selectCascadeTelegraph } from '@/lib/blast/v2/engine/cascade-telegraph';
 import { scanFormableThemeWords } from '@/lib/blast/v2/engine/word-scan';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { useChainHaptics } from '@/lib/blast/v2/fx/useChainHaptics';
@@ -183,6 +184,31 @@ export function BlastGame({
       setRevealGlowCells([]);
     }
   }, [state.foundWords, state.level, state.status, level.levelNumber]);
+  // Cascade telegraph — when a clear collapses the board and opens a NEW theme
+  // word, briefly pulse those tiles (anticipation) at ALL levels. Distinct from
+  // the tutorial answer-glow above: transient, reaction-driven, never naming the
+  // word. Reuses the board's revealGlow rendering.
+  const [cascadeGlow, setCascadeGlow] = useState<CellId[]>([]);
+  const cascadeGlowTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (state.status !== 'playing' || state.lastChainDepth <= 0) return;
+    const cells = selectCascadeTelegraph(
+      state.level,
+      state.foundWords,
+      LOCALE_CONFIGS[state.level.locale],
+      state.lastChainDepth,
+    );
+    if (cells.length === 0) return;
+    setCascadeGlow(cells);
+    if (cascadeGlowTimer.current) clearTimeout(cascadeGlowTimer.current);
+    cascadeGlowTimer.current = setTimeout(() => setCascadeGlow([]), 1300);
+    return () => {
+      if (cascadeGlowTimer.current) clearTimeout(cascadeGlowTimer.current);
+    };
+    // Keyed on chainEventKey: one telegraph per committed move.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.chainEventKey]);
+
   const { state: progressState, clearLevel, openChest, openMutation } = progress;
   const [showChestModal, setShowChestModal] = useState(false);
   const [showUndoAdModal, setShowUndoAdModal] = useState(false);
@@ -615,7 +641,7 @@ export function BlastGame({
           modeColor={modeColor}
           almosts={almosts}
           tileIds={state.tileIds}
-          revealGlowCells={revealGlowCells}
+          revealGlowCells={cascadeGlow.length > 0 ? [...revealGlowCells, ...cascadeGlow] : revealGlowCells}
           boardRows={initialBoardRows}
           onCommitSelection={(centers) => {
             clearCentersRef.current = centers;
