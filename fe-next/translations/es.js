@@ -138,7 +138,8 @@ const es = {
       "steps": ["🔤 Transforma una palabra en la siguiente, paso a paso", "💡 Cada pista indica el cambio: añadir, cambiar o quitar una letra", "🏆 Completa toda la cadena para resolver el puzle"]
     },
     "wildcardFound": "¡La Piedra Filosofal!",
-    "wildcardSkip": "¡Un paso transmutar — la magia ocurre!"
+    "wildcardSkip": "¡Un paso transmutar — la magia ocurre!",
+    "heat": {"label": "Calor","rush": "¡Fiebre exotérmica!","rushAria": "¡Medidor lleno — la siguiente palabra correcta gana un bono!"}
   },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {
@@ -10839,6 +10840,11 @@ const es = {
         "title": "¿Listo para traer LexiClash a tu aula?",
         "body": "Solicita acceso gratis. 60 segundos. Aprobado en menos de 24 horas.",
         "button": "Solicitar acceso como docente"
+      },
+      "teacherLeadCta": {
+        "title": "¿Eres profesor?",
+        "body": "LexiClash es gratis para profesores individuales — obtén apoyo y consejos para el aula.",
+        "button": "Acceso gratuito para profesores"
       },
       "districtCta": {
         "title": "Para escuelas y distritos",

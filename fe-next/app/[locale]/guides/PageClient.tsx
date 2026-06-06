@@ -33,6 +33,8 @@ const guidesContent: Record<string, {
       { question: 'What is the best strategy for Classic mode?', answer: 'Scan the grid systematically — start from corners and edges where longer words tend to hide. Look for common prefixes (UN-, RE-, PRE-) and suffixes (-ING, -TION, -ED) to quickly spot longer words.' },
       { question: 'How do combos work in Blast mode?', answer: 'Finding words in quick succession builds a combo multiplier. The faster you chain words, the higher the multiplier climbs. Focus on short 3-4 letter words to keep the combo going, then hit a long word for maximum points.' },
       { question: 'Are there guides for beginners?', answer: 'Yes — our guides cover basics to advanced. Start with the Classic mode guide to learn grid scanning, then progress to Blast and Word Hunt strategies as you improve.' },
+      { question: 'Which LexiClash mode has the best scoring potential?', answer: 'Blast mode has the highest scoring ceiling thanks to its combo multiplier. A sustained combo of 10+ words capped with a long finishing word can score several times more than the same words played in Classic. That said, Classic rewards vocabulary depth — words of 7+ letters score disproportionately well, so strong-vocabulary players are fully competitive there.' },
+      { question: 'How long does it take to get good at LexiClash?', answer: 'Most players notice clear improvement within 5–10 games. The pattern that clicks first: scanning for -ING and -ED endings. After around 20 games, players start anticipating common letter clusters and can survey a full board in under five seconds. Reaching the top 25% on the leaderboard takes most players roughly 50 games — short daily sessions build word recognition faster than longer infrequent ones.' },
     ],
   },
   he: {
@@ -50,6 +52,8 @@ const guidesContent: Record<string, {
       { question: 'מה האסטרטגיה הטובה ביותר למצב קלאסי?', answer: 'סרקו את הלוח בשיטתיות — התחילו מפינות וקצוות. חפשו תחיליות וסיומות נפוצות למציאת מילים ארוכות.' },
       { question: 'איך עובדים הקומבו במצב בלאסט?', answer: 'מציאת מילים ברצף מהיר בונה מכפיל קומבו. ככל שמשרשרים מהר יותר, המכפיל עולה. התמקדו במילים קצרות של 3-4 אותיות ואז הכו במילה ארוכה לניקוד מקסימלי.' },
       { question: 'האם יש מדריכים למתחילים?', answer: 'כן — המדריכים מכסים מהבסיסי ועד המתקדם. התחילו עם מדריך מצב קלאסי ואז התקדמו לאסטרטגיות בלאסט וציד מילים.' },
+      { question: 'איזה מצב משחק מציע את פוטנציאל הניקוד הגבוה ביותר?', answer: 'מצב בלאסט מציע את תקרת הניקוד הגבוהה ביותר הודות למכפיל הקומבו שלו. קומבו מתמשך עם מילה ארוכה בסוף יכול להניב כמה פעמים יותר ממה שניתן להרוויח מאותן מילים במצב קלאסי. עם זאת, קלאסי מתגמל ידע לשוני — מילים של 7 אותיות ומעלה צוברות ניקוד גבוה במיוחד.' },
+      { question: 'כמה זמן לוקח להשתפר ב-LexiClash?', answer: 'רוב השחקנים שמים לב לשיפור ניכר תוך 5–10 משחקים. הדפוס שמתחיל לעבוד ראשון: סריקה אחר סיומות נפוצות. אחרי כ-20 משחקים מתחילים לאתר צברי אותיות ולסרוק לוח שלם תוך פחות מ-5 שניות. להגיע לרבע העליון בטבלה לוקח בממוצע כ-50 משחקים — משחק יומי קצר בונה זיהוי מילים מהר יותר ממפגשים ארוכים ולא תכופים.' },
     ],
   },
   sv: {
@@ -67,6 +71,8 @@ const guidesContent: Record<string, {
       { question: 'Vad är den bästa strategin för Klassiskt läge?', answer: 'Skanna rutnätet systematiskt — börja från hörn och kanter. Leta efter vanliga prefix och suffix för att snabbt hitta långa ord.' },
       { question: 'Hur fungerar kombos i Blast-läge?', answer: 'Att hitta ord i snabb följd bygger en kombomultiplikator. Ju snabbare du kedjar ord, desto högre stiger multiplikatorn. Fokusera på korta 3-4 bokstavsord och slå sedan ett långt ord för maxpoäng.' },
       { question: 'Finns det guider för nybörjare?', answer: 'Ja — guiderna täcker allt från grunderna till avancerat. Börja med Klassiskt läge för att lära dig rutnätsskanning, gå sedan vidare till Blast och Word Hunt.' },
+      { question: 'Vilket spelläge har bäst poängpotential?', answer: 'Blast-läge har det högsta poängtaket tack vare sitt kombomultiplikatorsystem. En ihållande kombo med ett långt avslutningsord kan ge flera gånger mer poäng än samma ord spelade i Klassiskt. Klassiskt belönar ordförrådsdjup — ord på 7+ bokstäver poängsätts oproportionerligt bra.' },
+      { question: 'Hur lång tid tar det att bli bra på LexiClash?', answer: 'De flesta spelare märker tydlig förbättring inom 5–10 spel. Mönstret som brukar klicka in först: att skanna efter vanliga ändelser. Efter ~20 spel börjar man förutse vanliga bokstavskombinationer och kan skanna ett bräde på under fem sekunder. Att nå topp 25% på topplistan tar ungefär 50 spel — korta dagliga sessioner bygger ordigenkänning snabbare än långa ovanliga.' },
     ],
   },
   ja: {
@@ -84,6 +90,8 @@ const guidesContent: Record<string, {
       { question: 'クラシックモードの最良の戦略は？', answer: 'グリッドを体系的にスキャン — 角と端から始めましょう。一般的な接頭辞と接尾辞を探して長い単語を見つけましょう。' },
       { question: 'ブラストモードのコンボはどう機能しますか？', answer: '素早く連続して単語を見つけることでコンボマルチプライヤーが積み上がります。3〜4文字の短い単語でコンボをつなぎ、長い単語でポイントを最大化しましょう。' },
       { question: '初心者向けのガイドはありますか？', answer: 'はい — 初心者から上級者まで対応しています。まずクラシックモードのガイドでグリッドスキャンを学び、次にブラストとワードハントの戦略へ進みましょう。' },
+      { question: 'どのゲームモードが一番得点を稼ぎやすいですか？', answer: 'ブラストモードはコンボマルチプライヤーシステムのおかげで最も高いスコアを狙えます。10単語以上のコンボを維持して長い単語で締めくくると、クラシックモードの何倍もの得点になることがあります。ただし、クラシックは語彙力が直接報われ、7文字以上の単語は特に高得点です。' },
+      { question: 'LexiClashが上手くなるまでどのくらいかかりますか？', answer: 'ほとんどのプレイヤーは5〜10ゲームで明確な上達を感じます。最初に身につくパターンは、よく出る接尾辞への素早い反応です。約20ゲーム後には一般的な文字の組み合わせを予測し、5秒以内にグリッド全体をスキャンできるようになります。上位25%に入るには多くのプレイヤーで約50ゲームかかります — 毎日の短いセッションの方が効果的です。' },
     ],
   },
   es: {
@@ -101,6 +109,8 @@ const guidesContent: Record<string, {
       { question: '¿Cuál es la mejor estrategia para el modo Clásico?', answer: 'Escanea la cuadrícula sistemáticamente — comienza por esquinas y bordes. Busca prefijos y sufijos comunes para encontrar palabras largas rápidamente.' },
       { question: '¿Cómo funcionan los combos en el modo Blast?', answer: 'Encontrar palabras en rápida sucesión construye un multiplicador de combo. Enfócate en palabras cortas de 3-4 letras para mantener el combo activo, luego golpea con una palabra larga para máximos puntos.' },
       { question: '¿Hay guías para principiantes?', answer: 'Sí — nuestras guías cubren desde lo básico hasta lo avanzado. Comienza con el modo Clásico para aprender a escanear la cuadrícula, luego avanza a Blast y Word Hunt.' },
+      { question: '¿Qué modo de juego tiene mayor potencial de puntuación?', answer: 'El modo Blast tiene el mayor techo de puntuación gracias a su sistema de multiplicador de combo. Un combo sostenido con una palabra larga al final puede dar varias veces más puntos que las mismas palabras jugadas en Clásico. Dicho esto, Clásico recompensa el vocabulario — las palabras largas (7+ letras) puntúan especialmente bien.' },
+      { question: '¿Cuánto tiempo tarda uno en mejorar en LexiClash?', answer: 'La mayoría nota una mejora clara en 5–10 partidas. El patrón que suele encajar primero: buscar sufijos comunes como -AR, -ANDO y -CIÓN. Después de ~20 partidas se anticipan combinaciones frecuentes y se puede escanear un tablero en menos de cinco segundos. Llegar al 25% superior del marcador tarda unas 50 partidas — sesiones cortas diarias son más efectivas que sesiones largas ocasionales.' },
     ],
   },
 };

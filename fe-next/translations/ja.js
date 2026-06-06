@@ -146,7 +146,8 @@ const ja = {
       "p6s1": "家族の繋がりで、空ではない。"
     },
     "wildcardFound": "賢者の石発見！",
-    "wildcardSkip": "一段階スキップ — 錬金術の奇跡"
+    "wildcardSkip": "一段階スキップ — 錬金術の奇跡",
+    "heat": {"label": "熱量","rush": "発熱ラッシュ！","rushAria": "熱量満タン — 次の正解でボーナス獲得！"}
   },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {
@@ -10814,6 +10815,11 @@ const ja = {
         "title": "さあ、始めましょう",
         "body": "先生アクセスを申請。60秒で完了。通常24時間以内に使い始められます。",
         "button": "先生アクセスを申請する"
+      },
+      "teacherLeadCta": {
+        "title": "先生ですか？",
+        "body": "LexiClash は個人の先生向けに無料です — サポートとクラスルームのヒントを入手。",
+        "button": "無料の先生アクセスを取得"
       },
       "districtCta": {
         "title": "学校・学区向け",

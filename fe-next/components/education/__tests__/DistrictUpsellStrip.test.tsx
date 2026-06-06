@@ -36,8 +36,36 @@ describe('DistrictUpsellStrip', () => {
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'district_upsell' });
   });
 
-  it('tracks impression on mount', () => {
+  it('tracks district impression on mount', () => {
     render(<DistrictUpsellStrip />);
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('education_upsell_impression', { cta: 'district_upsell' });
+  });
+
+  // Teacher individual lead-gen CTA (RED → GREEN)
+  it('renders teacher lead title, body, and button', () => {
+    render(<DistrictUpsellStrip />);
+    expect(screen.getByText('education.landing.teacherLeadCta.title')).toBeInTheDocument();
+    expect(screen.getByText('education.landing.teacherLeadCta.body')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'education.landing.teacherLeadCta.button' })).toBeInTheDocument();
+  });
+
+  it('teacher button is a mailto link with Teacher subject', () => {
+    render(<DistrictUpsellStrip />);
+    const link = screen.getByRole('link', { name: 'education.landing.teacherLeadCta.button' });
+    const href = link.getAttribute('href') ?? '';
+    expect(href).toContain('mailto:');
+    expect(href).toContain('Teacher');
+  });
+
+  it('tracks teacher CTA impression on mount', () => {
+    render(<DistrictUpsellStrip />);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('education_upsell_impression', { cta: 'teacher_individual' });
+  });
+
+  it('tracks teacher CTA click', () => {
+    render(<DistrictUpsellStrip />);
+    const link = screen.getByRole('link', { name: 'education.landing.teacherLeadCta.button' });
+    fireEvent.click(link);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'teacher_individual' });
   });
 });

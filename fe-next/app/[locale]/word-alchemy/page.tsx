@@ -14,6 +14,8 @@ import AlchemyKeyboard from '@/components/wordAlchemy/AlchemyKeyboard';
 import { getKeyboardLetters, appendLetter, backspace } from '@/lib/wordAlchemy/keyboard';
 import { getWildcardCatalyst } from '@/lib/wordAlchemy/wildcardCatalyst';
 import { WildcardFoundModal } from '@/components/wordAlchemy/WildcardFoundModal';
+import { useAlchemyHeatMeter } from '@/hooks/useAlchemyHeatMeter';
+import { AlchemyHeatBar } from '@/components/wordAlchemy/AlchemyHeatBar';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -227,6 +229,8 @@ export default function WordAlchemyPage() {
   // Hebrew words are stored base-form; show final (sofit) letters in the UI.
   const display = (w: string) => (isHe ? applyHebrewFinalLetters(w) : w);
 
+  const { heat, maxHeat, onCorrectGuess, onWrongGuess, reset: resetHeat } = useAlchemyHeatMeter();
+
   const [puzzleIdx, setPuzzleIdx] = useState(0);
   const [stepIdx, setStepIdx] = useState(0);
   const [input, setInput] = useState('');
@@ -271,6 +275,7 @@ export default function WordAlchemyPage() {
     setStreak(0);
     setWildcardFound(false);
     wonFxFiredRef.current = false;
+    resetHeat();
   };
 
   const burstAt = (preset: string, fallbackEl: HTMLElement | null, extraCount?: number) => {
@@ -304,15 +309,16 @@ export default function WordAlchemyPage() {
     if (checkGuess(input, step.answer)) {
       setStepIdx((s) => s + 1);
       setInput('');
+      const { wasRush } = onCorrectGuess(wrongCount === 0);
       setWrongCount(0);
       const nextStreak = streak + 1;
       setStreak(nextStreak);
-      playSound('wordAccepted');
-      // Tiered burst: bigger preset at 3+ streak.
-      burstAt(nextStreak >= 3 ? 'celebration' : 'sparkle-valid', inputRef.current, nextStreak >= 3 ? 18 : undefined);
+      playSound(wasRush ? 'victoryFanfare' : 'wordAccepted');
+      burstAt(wasRush ? 'celebration' : nextStreak >= 3 ? 'celebration' : 'sparkle-valid', inputRef.current, wasRush ? 32 : nextStreak >= 3 ? 18 : undefined);
     } else {
       setWrongCount((w) => w + 1);
       setStreak(0);
+      onWrongGuess();
       playSound('wordRejected');
       burstAt('sparkle-invalid', inputRef.current, 8);
       const el = inputRef.current;
@@ -380,6 +386,9 @@ export default function WordAlchemyPage() {
             {t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: puzzles.length })}
           </p>
         </header>
+
+        {/* Heat meter — fills on first-try correct guesses; rush at max. */}
+        <AlchemyHeatBar heat={heat} maxHeat={maxHeat} />
 
         {/* Chain so far — flows with the locale's direction (RTL for Hebrew). */}
         <div

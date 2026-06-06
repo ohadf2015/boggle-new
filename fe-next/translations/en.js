@@ -138,7 +138,8 @@ const en = {
       "steps": ["🔤 Transform one word into the next, one step at a time", "💡 Each clue tells you the change — add, swap, or remove a letter", "🏆 Finish the whole chain to solve the puzzle"]
     },
     "wildcardFound": "Philosopher's Stone!",
-    "wildcardSkip": "A step was transmuted — magic happens"
+    "wildcardSkip": "A step was transmuted — magic happens",
+    "heat": {"label": "Heat","rush": "Exothermic Rush!","rushAria": "Heat meter full — next correct word earns a bonus!"}
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {
@@ -10685,6 +10686,11 @@ const en = {
         "title": "Ready to bring LexiClash to your classroom?",
         "body": "Apply for free teacher access — takes 60 seconds, typically approved within 24 hours.",
         "button": "Request Teacher Access"
+      },
+      "teacherLeadCta": {
+        "title": "Are you a teacher?",
+        "body": "LexiClash is free for individual teachers — get classroom support & tips.",
+        "button": "Get Free Teacher Access"
       },
       "districtCta": {
         "title": "For schools & districts",

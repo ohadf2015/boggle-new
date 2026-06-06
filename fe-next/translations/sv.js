@@ -233,7 +233,8 @@ const sv = {
       "p6s1": "En släkting, inte himlen."
     },
     "wildcardFound": "Filosofens sten!",
-    "wildcardSkip": "Ett steg förvandlades — magi sker"
+    "wildcardSkip": "Ett steg förvandlades — magi sker",
+    "heat": {"label": "Värme","rush": "Exoterm Rusning!","rushAria": "Värme full — nästa rätta ord ger bonus!"}
   },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {
@@ -10855,6 +10856,11 @@ const sv = {
         "title": "Redo att börja?",
         "body": "Två minuter att ansöka. Svar oftast samma dag. Sedan får du tillgång till alla lärarverktyg.",
         "button": "Ansök nu"
+      },
+      "teacherLeadCta": {
+        "title": "Är du lärare?",
+        "body": "LexiClash är gratis för enskilda lärare — få support och klassrumstips.",
+        "button": "Få gratis läraråtkomst"
       },
       "districtCta": {
         "title": "För skolor och distrikt",
