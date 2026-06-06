@@ -12,6 +12,10 @@ import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePartySounds } from '@/hooks/usePartySounds';
+import { PartyPhoneShell } from '@/components/party/shared/PartyPhoneShell';
+import { shadowPhaseReducer, type ShadowPhase, type ShadowPhaseEvent } from '@/lib/party/shadowPhase';
+import { shadowRoleName, shadowRoleLabel } from '@/lib/party/shadowRoleLabel';
+import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 
 // ==================== Types ====================
 
@@ -39,8 +43,6 @@ interface VoteStartData {
   timeSeconds: number;
 }
 
-type PhonePhase = 'waiting' | 'role-reveal' | 'night-action' | 'night-waiting' | 'seer-result' | 'discussion' | 'voting' | 'voted' | 'eliminated' | 'watching';
-
 const ROLE_CONFIG: Record<ShadowRole, { emoji: string; color: string; nameKey: string; bgGlow: string }> = {
   'shadow': { emoji: '🐺', color: 'text-neo-red', nameKey: 'party.roleShadow', bgGlow: 'bg-neo-red/10 border-neo-red' },
   seer: { emoji: '👁️', color: 'text-neo-purple', nameKey: 'party.roleSeer', bgGlow: 'bg-neo-purple/10 border-neo-purple' },
@@ -60,7 +62,15 @@ interface ShadowClashPhoneProps {
 function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   const { t } = useLanguage();
   const partySounds = usePartySounds();
-  const [phase, setPhase] = useState<PhonePhase>('waiting');
+  const [phase, setPhase] = useState<ShadowPhase>('waiting');
+  // All phase changes route through the reducer so terminal states (eliminated,
+  // watching) can't be overwritten by room-wide broadcasts. This is the F2 fix.
+  const dispatchPhase = useCallback(
+    (event: ShadowPhaseEvent) => setPhase(prev => shadowPhaseReducer(prev, event)),
+    [],
+  );
+  const nightGuard = useSubmitGuard();
+  const voteGuard = useSubmitGuard();
   const [myRole, setMyRole] = useState<RoleAssignedData | null>(null);
   const [nightAction, setNightAction] = useState<NightActionData | null>(null);
   const [seerResult, setSeerResult] = useState<SeerResultData | null>(null);
@@ -83,7 +93,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
 
     const onRoleAssigned = (data: RoleAssignedData) => {
       setMyRole(data);
-      setPhase('role-reveal');
+      dispatchPhase({ type: 'role-assigned' });
       partySounds.onPhaseStart();
     };
 
@@ -91,39 +101,37 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
       setNightAction(data);
       setNightActionDone(false);
       setSeerResult(null);
-      if (data.action === 'wait') {
-        setPhase('night-waiting');
-      } else {
-        setPhase('night-action');
-      }
+      nightGuard.reset();
+      dispatchPhase({ type: 'night-action', waiting: data.action === 'wait' });
     };
 
     const onSeerResult = (data: SeerResultData) => {
       setSeerResult(data);
-      setPhase('seer-result');
+      dispatchPhase({ type: 'seer-result' });
     };
 
     const onDiscussionStart = (data: { timeSeconds: number }) => {
-      setPhase('discussion');
+      dispatchPhase({ type: 'discussion-start' });
       setTimeRemaining(data.timeSeconds);
       setVotedTarget(null);
       partySounds.onPhaseTransition();
     };
 
     const onVoteStart = (data: VoteStartData) => {
-      setPhase('voting');
+      dispatchPhase({ type: 'vote-start' });
       setVoteTargets(data.targets);
       setTimeRemaining(data.timeSeconds);
       setVotedTarget(null);
+      voteGuard.reset();
       partySounds.onPhaseTransition();
     };
 
     const onEliminated = () => {
-      setPhase('eliminated');
+      dispatchPhase({ type: 'eliminated' });
     };
 
     const onGameOver = () => {
-      setPhase('watching');
+      dispatchPhase({ type: 'game-over' });
       partySounds.onGameOver();
     };
 
@@ -151,17 +159,21 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   }, [socket]);
 
   const handleNightAction = useCallback((targetUsername: string) => {
-    onSendInput({ gameId: 'shadow-clash', action: 'night-action', targetUsername });
-    setNightActionDone(true);
-    partySounds.onSubmit();
-  }, [onSendInput, partySounds]);
+    nightGuard.run(() => {
+      onSendInput({ gameId: 'shadow-clash', action: 'night-action', targetUsername });
+      setNightActionDone(true);
+      partySounds.onSubmit();
+    });
+  }, [onSendInput, partySounds, nightGuard]);
 
   const handleVote = useCallback((targetUsername: string) => {
-    onSendInput({ gameId: 'shadow-clash', action: 'vote', targetUsername });
-    setVotedTarget(targetUsername);
-    setPhase('voted');
-    partySounds.onVote();
-  }, [onSendInput, partySounds]);
+    voteGuard.run(() => {
+      onSendInput({ gameId: 'shadow-clash', action: 'vote', targetUsername });
+      setVotedTarget(targetUsername);
+      dispatchPhase({ type: 'voted' });
+      partySounds.onVote();
+    });
+  }, [onSendInput, partySounds, voteGuard, dispatchPhase]);
 
   const handleCallVote = useCallback(() => {
     onSendInput({ gameId: 'shadow-clash', action: 'call-vote' });
@@ -172,7 +184,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   // ==================== Role Reveal ====================
   if (phase === 'role-reveal' && myRole && roleConfig) {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-6">
+      <PartyPhoneShell className="items-center justify-center">
         <AdaptiveMotion.div
           initial={{ rotateY: 180, opacity: 0 }}
           animate={{ rotateY: 0, opacity: 1 }}
@@ -202,14 +214,14 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
         <p className="mt-6 text-neo-white font-neo-body text-xs">
           {t('party.dontShowAnyone') || "Don't show anyone!"}
         </p>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // ==================== Night Action ====================
   if (phase === 'night-action' && nightAction && roleConfig && !nightActionDone) {
     return (
-      <div className="min-h-screen bg-[#0a0a15] flex flex-col p-4">
+      <PartyPhoneShell bounded className="bg-[#0a0a15]">
         {/* Role badge */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl">{roleConfig.emoji}</span>
@@ -222,13 +234,13 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
           {nightAction.message}
         </p>
 
-        <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+        <div className="flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto">
           {nightAction.targets.map(target => (
             <button
               key={target}
               onClick={() => handleNightAction(target)}
               className={`
-                border-3 border-neo-cream/20 rounded-neo p-3 text-left
+                border-3 border-neo-cream/20 rounded-neo p-3 min-h-11 text-start
                 bg-neo-navy-elevated shadow-hard
                 transition-all duration-100
                 hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
@@ -242,28 +254,28 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
             </button>
           ))}
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Night action done / waiting
   if (phase === 'night-action' && nightActionDone) {
     return (
-      <div className="min-h-screen bg-[#0a0a15] flex items-center justify-center p-4">
+      <PartyPhoneShell className="bg-[#0a0a15] items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3">✅</div>
           <p className="font-neo-body text-neo-white">
             {t('party.choiceMade') || 'Choice made. Wait for dawn...'}
           </p>
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Night waiting (citizens - decoy screen)
   if (phase === 'night-waiting') {
     return (
-      <div className="min-h-screen bg-[#0a0a15] flex items-center justify-center p-4">
+      <PartyPhoneShell className="bg-[#0a0a15] items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3 animate-pulse">🌙</div>
           <p className="font-neo-body text-neo-white italic">
@@ -280,7 +292,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
             ))}
           </div>
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
@@ -288,7 +300,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
   if (phase === 'seer-result' && seerResult) {
     const isEvil = seerResult.team === 'evil';
     return (
-      <div className="min-h-screen bg-[#0a0a15] flex items-center justify-center p-4">
+      <PartyPhoneShell className="bg-[#0a0a15] items-center justify-center">
         <AdaptiveMotion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -304,19 +316,21 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
             {t('party.keepItSecret') || 'Use this wisely during discussion...'}
           </p>
         </AdaptiveMotion.div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // ==================== Discussion ====================
   if (phase === 'discussion') {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
+      <PartyPhoneShell className="items-center justify-center relative">
         {/* Role reminder (small, corner) */}
         {roleConfig && (
-          <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-neo-navy-elevated border-2 border-neo-cream/15 rounded-neo px-2 py-1">
+          <div className="absolute top-4 start-4 flex items-center gap-1.5 bg-neo-navy-elevated border-2 border-neo-cream/15 rounded-neo px-2 py-1">
             <span className="text-sm">{roleConfig.emoji}</span>
-            <span className={`text-xs font-neo-display ${roleConfig.color}`}>{myRole?.role}</span>
+            <span className={`text-xs font-neo-display ${roleConfig.color}`}>
+              {myRole ? shadowRoleName(myRole.role, t) : ''}
+            </span>
           </div>
         )}
 
@@ -344,14 +358,14 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
         >
           {t('party.callVote') || 'Call Vote!'}
         </button>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // ==================== Voting ====================
   if ((phase === 'voting' || phase === 'voted')) {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col p-4">
+      <PartyPhoneShell bounded>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-neo-display text-neo-red uppercase text-lg">
             {phase === 'voted' ? (t('party.voted') || 'Vote locked!') : (t('party.whoToEliminate') || 'Who to eliminate?')}
@@ -363,7 +377,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
           )}
         </div>
 
-        <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+        <div className="flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto">
           {voteTargets.map(target => {
             const isSkip = target === 'skip';
             const isSelected = votedTarget === target;
@@ -373,7 +387,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
                 onClick={() => phase === 'voting' && handleVote(target)}
                 disabled={phase === 'voted'}
                 className={`
-                  border-3 border-neo-black rounded-neo p-3 text-left
+                  border-3 border-neo-black rounded-neo p-3 min-h-11 text-start
                   transition-all duration-100
                   ${isSelected
                     ? 'bg-neo-red text-neo-black shadow-hard'
@@ -386,59 +400,59 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
                 `}
               >
                 <span className="font-neo-display">
-                  {isSkip ? `⏭️ ${t('party.skipVote') || 'Skip'}` : target}
+                  {isSkip ? `⏭️ ${t('party.skip') || 'Skip'}` : target}
                 </span>
               </button>
             );
           })}
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // ==================== Eliminated ====================
   if (phase === 'eliminated') {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+      <PartyPhoneShell className="items-center justify-center">
         <div className="text-center">
           <div className="text-5xl mb-3">💀</div>
           <p className="font-neo-display text-neo-red text-xl uppercase">
             {t('party.youWereEliminated') || 'You were eliminated!'}
           </p>
-          {roleConfig && (
+          {myRole && roleConfig && (
             <p className={`font-neo-body ${roleConfig.color} text-sm mt-2`}>
-              You were: {roleConfig.emoji} {myRole?.role}
+              {t('party.youWere')} {shadowRoleLabel(myRole.role, t)}
             </p>
           )}
           <p className="font-neo-body text-neo-white text-sm mt-4">
             {t('party.watchFromBeyond') || 'Watch from beyond...'}
           </p>
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Watching (game over on TV)
   if (phase === 'watching') {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+      <PartyPhoneShell className="items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3">👀</div>
           <p className="font-neo-display text-neo-purple uppercase">
             {t('party.watchTheTv') || 'Watch the TV!'}
           </p>
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Default
   return (
-    <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+    <PartyPhoneShell className="items-center justify-center">
       <div className="animate-pulse text-neo-white font-neo-display">
         {t('party.starting') || 'Starting...'}
       </div>
-    </div>
+    </PartyPhoneShell>
   );
 }
 

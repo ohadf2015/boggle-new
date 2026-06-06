@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel } from 'lucide-react';
+import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel, Grid3x3 } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
@@ -59,7 +59,8 @@ type LandingCardKey =
   | 'party'
   | 'wordAlchemy'
   | 'shiritori'
-  | 'sealedBid';
+  | 'sealedBid'
+  | 'crossword';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
@@ -73,7 +74,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic', 'blastV2',
   'wordForge', 'wordVault',
-  'party', 'wordAlchemy', 'shiritori', 'sealedBid',
+  'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword',
 ]);
 
 /** CSS stagger delay for each card index */
@@ -172,6 +173,7 @@ export function LandingChallengeCards({
     if (isAdmin && !next.includes('wordAlchemy')) next.push('wordAlchemy');
     if (isAdmin && !next.includes('shiritori')) next.push('shiritori');
     if (isAdmin && !next.includes('sealedBid')) next.push('sealedBid');
+    if (isAdmin && !next.includes('crossword')) next.push('crossword');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -296,6 +298,21 @@ export function LandingChallengeCards({
               variant="purple"
               badge="V2"
               onClick={() => { trackLandingCtaClick('mode_card', { mode: 'blastV2', variant: 'purple' }); }}
+            />
+          </div>
+        );
+
+      case 'crossword':
+        return (
+          <div key="crossword" className="w-full h-full animate-[fadeInUp_0.4s_ease-out_both]" style={style}>
+            <ModeCard
+              title={t('crossword.name')}
+              description={t('crossword.tagline')}
+              href={`/${language}/crossword`}
+              icon={<Grid3x3 className="w-6 h-6" />}
+              variant="cyan"
+              badge="NEW"
+              onClick={() => { trackLandingCtaClick('mode_card', { mode: 'crossword', variant: 'cyan' }); }}
             />
           </div>
         );

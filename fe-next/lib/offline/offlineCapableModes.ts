@@ -11,6 +11,11 @@
  *  - blast        — engine validates against bundled level.words (+ offline dict for bonus)
  *  - connections  — puzzles load from bundled lib/connections/puzzles/generated/*
  *  - daily        — Daily Word Hunt; bundled/prefetched puzzle + offline dict
+ *
+ * NOTE: Crossword is offline-PLAYABLE (bundled puzzles + localStorage resume need no network
+ * once loaded) but is intentionally NOT listed here. It's an admin-only `force-dynamic` route
+ * (server-side gate), so it has no static shell to precache — and precaching it would risk
+ * caching a 404 for non-admins. Same reasoning as the admin-only blast/v2 route.
  */
 
 import { locales } from '@/i18n/config';

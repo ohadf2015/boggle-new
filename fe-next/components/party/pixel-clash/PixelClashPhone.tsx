@@ -13,6 +13,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { DrawingCanvas, type DrawingData, type DrawingCanvasHandle } from './DrawingCanvas';
 import { usePartySounds } from '@/hooks/usePartySounds';
 import { useImeText } from '@/hooks/useImeText';
+import { PartyPhoneShell } from '@/components/party/shared/PartyPhoneShell';
+import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 
 // ==================== Types ====================
 
@@ -85,6 +87,22 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   const [timeRemaining, setTimeRemaining] = useState(0);
   const canvasHandleRef = useRef<DrawingCanvasHandle>(null);
   const strokesRef = useRef<DrawingData>([]);
+  const submitGuard = useSubmitGuard();
+
+  // Canvas size must track the live viewport: a one-shot read froze the canvas
+  // at its mount width, so a rotate/resize left it the wrong size (R3). Cap at
+  // 320 on phones, but let tablets use more width (up to 420).
+  const [canvasSize, setCanvasSize] = useState(320);
+  useEffect(() => {
+    const measure = () => setCanvasSize(Math.min(420, Math.max(200, window.innerWidth - 32)));
+    measure();
+    window.addEventListener('resize', measure);
+    window.addEventListener('orientationchange', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('orientationchange', measure);
+    };
+  }, []);
 
   // Timer
   useEffect(() => {
@@ -100,6 +118,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
     const onPhaseUpdate = (data: PhaseUpdateData) => {
       setTimeRemaining(data.timeSeconds);
+      submitGuard.reset();
       partySounds.onPhaseTransition();
 
       if (data.phase === 'write-prompt') {
@@ -128,6 +147,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
       setAssignment(data);
       setTimeRemaining(data.timeSeconds);
       strokesRef.current = [];
+      submitGuard.reset();
 
       if (data.phase === 'drawing') {
         setPhase('drawing');
@@ -142,6 +162,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
       setRelayPrompt(data.prompt);
       setTimeRemaining(data.timeSeconds);
       strokesRef.current = [];
+      submitGuard.reset();
     };
 
     const onRelayBuildStart = (data: RelayBuildStartData) => {
@@ -149,6 +170,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
       setTimeRemaining(data.timeSeconds);
       setRelayReference(data.referenceStrokes);
       strokesRef.current = [];
+      submitGuard.reset();
     };
 
     const onShowdownCanvases = (data: ShowdownCanvasesData) => {
@@ -156,6 +178,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
       setShowdownCanvases(data);
       setTimeRemaining(data.timeSeconds);
       setShowdownVote({ best: '', funniest: '' });
+      submitGuard.reset();
     };
 
     socket.on('party:pixel:phaseUpdate', onPhaseUpdate);
@@ -193,46 +216,51 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   const handleSubmitPrompt = useCallback(() => {
     const text = getPrompt();
     if (!text) return;
-    onSendInput({ gameId: 'pixel-clash', action: 'submit-prompt', text });
-    setPhase('submitted');
-    partySounds.onSubmit();
-  }, [getPrompt, onSendInput, partySounds]);
+    submitGuard.run(() => {
+      onSendInput({ gameId: 'pixel-clash', action: 'submit-prompt', text });
+      setPhase('submitted');
+      partySounds.onSubmit();
+    });
+  }, [getPrompt, onSendInput, partySounds, submitGuard]);
 
   const handleSubmitDrawing = useCallback(() => {
     const strokes = strokesRef.current;
     if (strokes.length === 0) return;
-
-    if (assignment?.chainId) {
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, chainId: assignment.chainId });
-    } else if (phase === 'relay-draw') {
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, isRelay: true });
-    } else if (phase === 'relay-build') {
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, isRelay: true, isBuilder: true });
-    } else {
-      // Showdown
-      onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes });
-    }
-    setPhase('submitted');
-    partySounds.onSubmit();
-  }, [assignment, phase, onSendInput, partySounds]);
+    submitGuard.run(() => {
+      if (assignment?.chainId) {
+        onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, chainId: assignment.chainId });
+      } else if (phase === 'relay-draw') {
+        onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, isRelay: true });
+      } else if (phase === 'relay-build') {
+        onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes, isRelay: true, isBuilder: true });
+      } else {
+        // Showdown
+        onSendInput({ gameId: 'pixel-clash', action: 'draw', strokes });
+      }
+      setPhase('submitted');
+      partySounds.onSubmit();
+    });
+  }, [assignment, phase, onSendInput, partySounds, submitGuard]);
 
   const handleSubmitGuess = useCallback(() => {
     if (!assignment?.chainId) return;
     const text = getGuess();
     if (!text) return;
-    onSendInput({ gameId: 'pixel-clash', action: 'guess', text, chainId: assignment.chainId });
-    setPhase('submitted');
-    partySounds.onSubmit();
-  }, [getGuess, assignment, onSendInput, partySounds]);
+    submitGuard.run(() => {
+      onSendInput({ gameId: 'pixel-clash', action: 'guess', text, chainId: assignment.chainId });
+      setPhase('submitted');
+      partySounds.onSubmit();
+    });
+  }, [getGuess, assignment, onSendInput, partySounds, submitGuard]);
 
   const handleSubmitVote = useCallback(() => {
     if (!showdownVote.best) return;
-    onSendInput({ gameId: 'pixel-clash', action: 'vote', best: showdownVote.best, funniest: showdownVote.funniest });
-    setPhase('submitted');
-    partySounds.onVote();
-  }, [showdownVote, onSendInput, partySounds]);
-
-  const canvasSize = Math.min(320, typeof window !== 'undefined' ? window.innerWidth - 32 : 320);
+    submitGuard.run(() => {
+      onSendInput({ gameId: 'pixel-clash', action: 'vote', best: showdownVote.best, funniest: showdownVote.funniest });
+      setPhase('submitted');
+      partySounds.onVote();
+    });
+  }, [showdownVote, onSendInput, partySounds, submitGuard]);
 
   // Timer display - inline to avoid component-during-render lint error
   const timerBadge = (
@@ -244,7 +272,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
   // ==================== Write Prompt (Telephone) ====================
   if (phase === 'write-prompt') {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col p-4">
+      <PartyPhoneShell>
         <div className="flex items-center justify-between mb-3">
           <span className="text-neo-white font-neo-body text-xs uppercase">
             {t('party.writePrompt')}
@@ -268,10 +296,10 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
         <button
           onClick={handleSubmitPrompt}
-          aria-disabled={promptEmpty}
+          disabled={promptEmpty}
           className={`
             bg-neo-cyan border-3 border-neo-black rounded-neo shadow-hard
-            px-6 py-3 font-neo-display text-neo-black uppercase font-bold
+            px-6 py-3 min-h-11 font-neo-display text-neo-black uppercase font-bold
             transition-all duration-100
             hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
             active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
@@ -280,7 +308,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         >
           {t('party.submit')}
         </button>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
@@ -293,7 +321,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         : relayPrompt;
 
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col items-center p-3">
+      <PartyPhoneShell className="items-center">
         <div className="flex items-center justify-between w-full mb-2">
           {showPrompt && (
             <span className="font-neo-display text-neo-cyan text-sm uppercase truncate max-w-[60%]">
@@ -332,14 +360,14 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         >
           {t('party.done')}
         </button>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // ==================== Guessing Phase (Telephone) ====================
   if (phase === 'guessing' && assignment) {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col items-center p-4">
+      <PartyPhoneShell className="items-center">
         <div className="flex items-center justify-between w-full mb-3">
           <span className="text-neo-white font-neo-body text-xs uppercase">
             {t('party.whatIsThis')}
@@ -375,24 +403,24 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
         <button
           onClick={handleSubmitGuess}
-          aria-disabled={guessEmpty}
+          disabled={guessEmpty}
           className={`
             bg-neo-cyan border-3 border-neo-black rounded-neo shadow-hard
-            px-6 py-3 font-neo-display text-neo-black uppercase font-bold
+            px-6 py-3 min-h-11 font-neo-display text-neo-black uppercase font-bold
             active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
             ${guessEmpty ? 'opacity-30 cursor-not-allowed' : ''}
           `}
         >
           {t('party.submit')}
         </button>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // ==================== Showdown Vote ====================
   if (phase === 'showdown-vote' && showdownCanvases) {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col p-4">
+      <PartyPhoneShell>
         <div className="flex items-center justify-between mb-3">
           <span className="font-neo-display text-neo-cyan text-sm uppercase">
             {t('party.pickFavorite')}
@@ -433,8 +461,8 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
                   readOnly
                 />
                 <span className="text-neo-white text-xs font-neo-body mt-1 block">#{entry.number}</span>
-                {isBest && <span className="text-neo-lime text-xs font-bold">Best</span>}
-                {isFunniest && <span className="text-neo-pink text-xs font-bold">Funniest</span>}
+                {isBest && <span className="text-neo-lime text-xs font-bold">{t('party.bestLabel') || 'Best'}</span>}
+                {isFunniest && <span className="text-neo-pink text-xs font-bold">{t('party.funniestLabel') || 'Funniest'}</span>}
               </button>
             );
           })}
@@ -452,14 +480,14 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             {t('party.vote')}
           </button>
         )}
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // ==================== Submitted / Watching ====================
   if (phase === 'submitted' || phase === 'watching') {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+      <PartyPhoneShell className="items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-3">{phase === 'submitted' ? '✅' : '👀'}</div>
           <p className="font-neo-display text-neo-cyan uppercase">
@@ -468,17 +496,17 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
               : t('party.watchTheTv')}
           </p>
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Default waiting
   return (
-    <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+    <PartyPhoneShell className="items-center justify-center">
       <div className="animate-pulse text-neo-white font-neo-display">
         {t('party.starting')}
       </div>
-    </div>
+    </PartyPhoneShell>
   );
 }
 

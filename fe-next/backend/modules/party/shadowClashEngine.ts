@@ -585,7 +585,20 @@ export function resendShadowState(io: Server, roomCode: string, socketId: string
   const game = activeGames.get(roomCode);
   if (!game) return;
   const role = game.roles.get(socketId);
-  if (!role) return; // not a participant
+  if (!role) {
+    // Not a participant (e.g. the TV host screen). Send a public phase snapshot
+    // — no private role card — so a TV that refreshed mid-game can recover its
+    // stage instead of hanging on "Starting…".
+    io.to(socketId).emit('party:phaseChange', {
+      phase: game.phase,
+      gameState: {
+        type: 'shadow-clash',
+        phase: game.phase,
+        alivePlayers: Array.from(game.alivePlayers).map((id) => game.playerUsernames.get(id) || 'Unknown'),
+      },
+    });
+    return;
+  }
 
   // 1) Always replay the private role card first (sets myRole on the phone).
   io.to(socketId).emit('party:shadow:roleAssigned', {
@@ -595,7 +608,12 @@ export function resendShadowState(io: Server, roomCode: string, socketId: string
   });
 
   // 2) Replay the current phase prompt (mirrors startNight / startTrial).
-  if (!game.alivePlayers.has(socketId)) return;
+  // A dead player reconnecting must land back on the eliminated screen — not be
+  // left frozen on the role card (they never reach a live prompt below).
+  if (!game.alivePlayers.has(socketId)) {
+    io.to(socketId).emit('party:shadow:youWereEliminated', { yourRole: role });
+    return;
+  }
   const aliveUsernames = Array.from(game.alivePlayers).map((id) => game.playerUsernames.get(id) || 'Unknown');
 
   if (game.phase === 'night') {

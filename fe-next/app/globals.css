@@ -2467,6 +2467,16 @@ html.lexi-native [data-selectable] {
 
 @layer utilities {
 
+  /* Party phone controllers (PartyPhoneShell): keep edge controls clear of the
+     notch / home indicator. Floor at 1rem so non-notched devices still breathe.
+     Relies on the app-wide viewport-fit=cover meta (set in [locale]/layout). */
+  .pt-safe { padding-top: max(1rem, env(safe-area-inset-top, 0px)); }
+  .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)); }
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
   @keyframes golden-sparkle-twinkle {
     0%, 100% { opacity: 0.2; transform: scale(0.6); }
     50% { opacity: 1; transform: scale(1.2); }

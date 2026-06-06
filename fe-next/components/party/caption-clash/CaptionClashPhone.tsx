@@ -12,6 +12,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePartySounds } from '@/hooks/usePartySounds';
 import { useImeText } from '@/hooks/useImeText';
+import { PartyPhoneShell } from '@/components/party/shared/PartyPhoneShell';
+import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 
 // ==================== Types ====================
 
@@ -63,6 +65,8 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
   const [votedId, setVotedId] = useState<string | null>(null);
   const [currentReveal, setCurrentReveal] = useState<CaptionSubmission | null>(null);
   const laughThrottleRef = useRef(0);
+  const submitGuard = useSubmitGuard();
+  const voteGuard = useSubmitGuard();
 
   // Timer countdown
   useEffect(() => {
@@ -86,6 +90,8 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
       setSubmissions([]);
       setCurrentReveal(null);
       setTimeRemaining(data.writeTimeSeconds);
+      submitGuard.reset();
+      voteGuard.reset();
       partySounds.onPhaseStart();
     };
 
@@ -132,10 +138,12 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
     if (phase !== 'writing') return;
     const text = getCaption();
     if (!text) return;
-    onSendInput({ gameId: 'caption-clash', action: 'submit-caption', text });
-    setPhase('submitted');
-    partySounds.onSubmit();
-  }, [getCaption, phase, onSendInput, partySounds]);
+    submitGuard.run(() => {
+      onSendInput({ gameId: 'caption-clash', action: 'submit-caption', text });
+      setPhase('submitted');
+      partySounds.onSubmit();
+    });
+  }, [getCaption, phase, onSendInput, partySounds, submitGuard]);
 
   const handleLaugh = useCallback(() => {
     if (!currentReveal) return;
@@ -147,18 +155,20 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
 
   const handleVote = useCallback((submissionId: string) => {
     if (votedId) return;
-    setVotedId(submissionId);
-    onSendInput({ gameId: 'caption-clash', action: 'vote', submissionId });
-    setPhase('voted');
-    partySounds.onVote();
-  }, [votedId, onSendInput, partySounds]);
+    voteGuard.run(() => {
+      setVotedId(submissionId);
+      onSendInput({ gameId: 'caption-clash', action: 'vote', submissionId });
+      setPhase('voted');
+      partySounds.onVote();
+    });
+  }, [votedId, onSendInput, partySounds, voteGuard]);
 
   // ==================== Render ====================
 
   // Writing phase — text input
   if ((phase === 'writing' || phase === 'submitted') && imageData) {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col p-4">
+      <PartyPhoneShell>
         {/* Round badge */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-neo-white font-neo-body text-xs uppercase">
@@ -179,7 +189,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
         {imageData.isRoastRound && (
           <div className="bg-neo-pink/20 border-2 border-neo-pink rounded-neo p-2 mb-3 text-center">
             <span className="text-neo-pink font-neo-display text-sm uppercase">
-              Roast: {imageData.roastTarget}
+              {t('party.roastPrefix') || 'Roast:'} {imageData.roastTarget}
             </span>
           </div>
         )}
@@ -216,15 +226,15 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
               "
             />
             <div className="flex items-center justify-between mt-2">
-              <span className="text-neo-white text-xs font-neo-body">
+              <span className="text-neo-white text-sm font-neo-body">
                 {captionText.length}/200
               </span>
               <button
                 onClick={handleSubmitCaption}
-                aria-disabled={captionEmpty}
+                disabled={captionEmpty}
                 className={`
                   bg-neo-pink border-3 border-neo-black rounded-neo shadow-hard
-                  px-6 py-3 font-neo-display text-neo-black uppercase font-bold
+                  px-6 py-3 min-h-11 font-neo-display text-neo-black uppercase font-bold
                   transition-all duration-100
                   hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg
                   active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed
@@ -236,26 +246,27 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
             </div>
           </div>
         )}
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Lineup phase — rapid-tap laugh button
   if (phase === 'lineup') {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-4">
+      <PartyPhoneShell className="items-center justify-center">
         <p className="font-neo-display text-neo-white uppercase text-sm mb-6">
           {t('party.tapToLaugh') || 'Tap to laugh!'}
         </p>
         <button
           onPointerDown={handleLaugh}
+          aria-label={t('party.tapToLaugh') || 'Tap to laugh!'}
           className="
-            w-40 h-40 rounded-full
+            w-[min(40vh,16rem)] aspect-square max-w-[80vw] rounded-full
             bg-neo-pink border-4 border-neo-black shadow-hard-lg
-            flex items-center justify-center text-6xl
+            flex items-center justify-center text-[clamp(3rem,18vw,6rem)]
             transition-transform
             active:scale-90 active:shadow-hard-pressed
-            select-none
+            select-none touch-none
           "
         >
           😂
@@ -263,14 +274,14 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
         <p className="mt-4 text-neo-white font-neo-body text-xs">
           {t('party.watchTheTv') || 'Watch the TV!'}
         </p>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Voting phase — show all captions to pick from
   if ((phase === 'voting' || phase === 'voted') && submissions.length > 0) {
     return (
-      <div className="min-h-screen bg-neo-navy flex flex-col p-4">
+      <PartyPhoneShell bounded>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-neo-display text-neo-pink uppercase text-lg">
             {phase === 'voted' ? (t('party.voted') || 'Voted!') : (t('party.pickFavorite') || 'Pick your favorite')}
@@ -282,9 +293,8 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
           )}
         </div>
 
-        <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+        <div className="flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto">
           {submissions.map((sub) => {
-            const isOwn = false; // Server strips socketId, can't determine own — handled server-side
             const isSelected = votedId === sub.id;
             return (
               <button
@@ -292,7 +302,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
                 onClick={() => handleVote(sub.id)}
                 disabled={phase === 'voted'}
                 className={`
-                  border-3 border-neo-black rounded-neo p-3 text-left
+                  border-3 border-neo-black rounded-neo p-3 min-h-11 text-start
                   transition-all duration-100
                   ${isSelected
                     ? 'bg-neo-pink text-neo-black shadow-hard-pink'
@@ -307,14 +317,14 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
             );
           })}
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Crown phase — watch TV
   if (phase === 'crown') {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+      <PartyPhoneShell className="items-center justify-center">
         <div className="text-center">
           <div className="text-5xl mb-3">👑</div>
           <p className="font-neo-display text-neo-pink uppercase">
@@ -324,17 +334,17 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
             {t('party.watchTheTv') || 'Watch the TV!'}
           </p>
         </div>
-      </div>
+      </PartyPhoneShell>
     );
   }
 
   // Default waiting
   return (
-    <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+    <PartyPhoneShell className="items-center justify-center">
       <div className="animate-pulse text-neo-white font-neo-display">
         {t('party.starting') || 'Starting...'}
       </div>
-    </div>
+    </PartyPhoneShell>
   );
 }
 

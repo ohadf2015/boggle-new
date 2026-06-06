@@ -11,6 +11,7 @@ import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { PartyConfettiBurst } from '@/components/party/shared/PartyConfettiBurst';
 import { DrawingDisplay, type DrawingData } from './DrawingCanvas';
 import { usePartySounds } from '@/hooks/usePartySounds';
 
@@ -105,24 +106,16 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
       }
     };
 
-    // Live stroke from relay artist
+    // Live stroke from relay artist — the relay-build phase + artist display are
+    // driven entirely by phaseUpdate + liveStroke. (The old artistStrokes /
+    // relayBands listeners were dead: the backend never emits those events.)
     const onLiveStroke = (data: { paths: DrawingData }) => {
       setArtistStrokes(data.paths);
-    };
-
-    // Full artist strokes update
-    const onArtistStrokes = (data: { strokes: DrawingData }) => {
-      setArtistStrokes(data.strokes);
     };
 
     // Builder canvas update
     const onCanvasUpdate = (data: { playerId: string; strokes: DrawingData }) => {
       setBuilderStrokes(prev => ({ ...prev, [data.playerId]: data.strokes }));
-    };
-
-    const onRelayBands = (data: { bands: Array<Record<string, unknown>>; timeSeconds: number }) => {
-      setPhase('relay-build');
-      setTimeRemaining(data.timeSeconds);
     };
 
     const onMergeReveal = (data: MergeRevealData) => {
@@ -145,9 +138,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
 
     socket.on('party:pixel:phaseUpdate', onPhaseUpdate);
     socket.on('party:pixel:liveStroke', onLiveStroke);
-    socket.on('party:pixel:artistStrokes', onArtistStrokes);
     socket.on('party:pixel:canvasUpdate', onCanvasUpdate);
-    socket.on('party:pixel:relayBands', onRelayBands);
     socket.on('party:pixel:mergeReveal', onMergeReveal);
     socket.on('party:pixel:chainReveal', onChainReveal);
     socket.on('party:pixel:showdownResults', onShowdownResults);
@@ -155,9 +146,7 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
     return () => {
       socket.off('party:pixel:phaseUpdate', onPhaseUpdate);
       socket.off('party:pixel:liveStroke', onLiveStroke);
-      socket.off('party:pixel:artistStrokes', onArtistStrokes);
       socket.off('party:pixel:canvasUpdate', onCanvasUpdate);
-      socket.off('party:pixel:relayBands', onRelayBands);
       socket.off('party:pixel:mergeReveal', onMergeReveal);
       socket.off('party:pixel:chainReveal', onChainReveal);
       socket.off('party:pixel:showdownResults', onShowdownResults);
@@ -352,7 +341,8 @@ function PixelClashTvInner({ socket }: { socket: Socket | null }) {
   // ==================== Showdown: Crown ====================
   if (phase === 'crown' && showdownResults) {
     return (
-      <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8">
+      <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8 relative overflow-hidden">
+        <PartyConfettiBurst accent="neo-cyan" />
         <h2 className="font-neo-display text-neo-white text-2xl uppercase mb-2">
           &ldquo;{showdownResults.prompt}&rdquo;
         </h2>

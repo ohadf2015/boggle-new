@@ -11,6 +11,7 @@ import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePartySounds } from '@/hooks/usePartySounds';
+import { PartyConfettiBurst } from '@/components/party/shared/PartyConfettiBurst';
 
 // ==================== Types ====================
 
@@ -154,12 +155,12 @@ function CaptionClashTvInner({ socket }: CaptionClashTvProps) {
           </span>
           {imageData.isSpeedRound && (
             <span className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 text-neo-black text-xs font-bold uppercase animate-neo-wobble">
-              Speed Round!
+              {t('party.speedRound') || 'Speed Round!'}
             </span>
           )}
           {imageData.isRoastRound && (
             <span className="bg-neo-pink border-2 border-neo-black rounded-neo px-2 py-0.5 text-neo-black text-xs font-bold uppercase">
-              Roast: {imageData.roastTarget}
+              {t('party.roastPrefix') || 'Roast:'} {imageData.roastTarget}
             </span>
           )}
         </div>
@@ -309,6 +310,8 @@ function CaptionClashTvInner({ socket }: CaptionClashTvProps) {
     const revealDelay = voteResults.length * 0.18 + 0.4;
     return (
       <div className="min-h-screen bg-neo-abyss flex flex-col items-center justify-center p-8 relative overflow-hidden">
+        {/* Live confetti cannon (skipped under reduced-motion / cosy / low-end) */}
+        <PartyConfettiBurst accent="neo-pink" />
         {/* Decorative corner confetti blobs */}
         <div className="absolute top-0 left-0 text-7xl opacity-60 -translate-x-4 -translate-y-4 rotate-[-20deg] pointer-events-none">🎉</div>
         <div className="absolute top-0 right-0 text-7xl opacity-60 translate-x-4 -translate-y-4 rotate-[20deg] pointer-events-none">🎊</div>

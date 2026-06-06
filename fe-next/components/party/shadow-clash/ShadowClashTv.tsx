@@ -12,6 +12,8 @@ import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePartySounds } from '@/hooks/usePartySounds';
+import { shadowRoleLabel, shadowRoleEmoji } from '@/lib/party/shadowRoleLabel';
+import { PartyConfettiBurst } from '@/components/party/shared/PartyConfettiBurst';
 
 // ==================== Types ====================
 
@@ -65,12 +67,23 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
   useEffect(() => {
     if (!socket) return;
 
+    // Map any server phase onto a TV screen. Previously this only handled
+    // 'dealing', so a TV that refreshed or joined mid-game stayed stuck on the
+    // "Starting…" spinner. Handling every phase lets the stage recover (F3).
+    const PHASE_TO_TV: Record<string, TvPhase> = {
+      dealing: 'dealing',
+      night: 'night',
+      discussion: 'discussion',
+      trial: 'trial',
+      voting: 'trial',
+      'game-over': 'game-over',
+      results: 'game-over',
+    };
     const onPhaseChange = (data: { phase: string; gameState: Record<string, unknown> | null }) => {
       const gs = data.gameState;
-      if (gs?.phase === 'dealing') {
-        setPhase('dealing');
-        if (gs.alivePlayers) setAliveUsernames(gs.alivePlayers as string[]);
-      }
+      const next = PHASE_TO_TV[(gs?.phase as string) ?? data.phase];
+      if (next) setPhase(next);
+      if (gs?.alivePlayers) setAliveUsernames(gs.alivePlayers as string[]);
     };
 
     const onNightStart = (data: { round: number; aliveCount: number }) => {
@@ -126,6 +139,11 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
     socket.on('party:shadow:trialStart', onTrialStart);
     socket.on('party:shadow:voteReveal', onVoteReveal);
     socket.on('party:shadow:gameOver', onGameOver);
+
+    // Ask the server to replay current state in case this TV mounted mid-game
+    // (refresh / late host screen). The server broadcasts a phaseChange the TV
+    // now maps onto a screen above, so the stage recovers instead of hanging.
+    socket.emit('party:requestState');
 
     return () => {
       socket.off('party:phaseChange', onPhaseChange);
@@ -267,10 +285,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               className="inline-block bg-neo-navy-elevated border-4 border-neo-purple rounded-neo-lg px-6 py-3 shadow-hard-purple"
             >
               <span className="font-neo-display text-neo-purple text-xl uppercase">
-                {dawnData.role === 'shadow' ? '🐺 Shadow' :
-                 dawnData.role === 'seer' ? '👁️ Seer' :
-                 dawnData.role === 'medic' ? '🛡️ Medic' :
-                 '👤 Citizen'}
+                {dawnData.role ? shadowRoleLabel(dawnData.role, t) : ''}
               </span>
             </AdaptiveMotion.div>
           </AdaptiveMotion.div>
@@ -314,11 +329,11 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
         {/* Eliminated history */}
         {eliminatedHistory.length > 0 && (
           <div className="mt-8 text-center">
-            <p className="text-neo-white font-neo-body text-xs uppercase mb-2">Eliminated</p>
+            <p className="text-neo-white font-neo-body text-xs uppercase mb-2">{t('party.eliminatedTitle') || 'Eliminated'}</p>
             <div className="flex gap-2 justify-center">
               {eliminatedHistory.map((e, i) => (
                 <span key={`${e.username}-${i}`} className="text-neo-red/50 font-neo-body text-sm line-through">
-                  {e.username} ({e.role === 'shadow' ? '🐺' : e.role === 'seer' ? '👁️' : e.role === 'medic' ? '🛡️' : '👤'})
+                  {e.username} ({shadowRoleEmoji(e.role)})
                 </span>
               ))}
             </div>
@@ -367,7 +382,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               <span className="font-neo-body text-neo-white text-sm">{voter}</span>
               <span className="text-neo-white">→</span>
               <span className={`font-neo-display text-sm ${target === 'skip' ? 'text-neo-white' : 'text-neo-red'}`}>
-                {target === 'skip' ? '⏭️ Skip' : target}
+                {target === 'skip' ? `⏭️ ${t('party.skip') || 'Skip'}` : target}
               </span>
             </AdaptiveMotion.div>
           ))}
@@ -387,7 +402,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               </h3>
               <div className="mt-3 bg-neo-navy-elevated border-3 border-neo-purple rounded-neo-lg px-5 py-2 inline-block shadow-hard-purple">
                 <span className="font-neo-display text-neo-purple text-lg">
-                  {voteData.role === 'shadow' ? '🐺 Shadow!' : voteData.role === 'seer' ? '👁️ Seer' : voteData.role === 'medic' ? '🛡️ Medic' : '👤 Citizen'}
+                  {voteData.role ? shadowRoleLabel(voteData.role, t) : ''}
                 </span>
               </div>
             </>
@@ -405,7 +420,8 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
   if (phase === 'game-over' && gameOverData) {
     const isGoodWin = gameOverData.winner === 'good';
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center p-8 ${isGoodWin ? 'bg-linear-to-b from-neo-abyss to-[#0a1a0a]' : 'bg-linear-to-b from-neo-abyss to-[#1a0a0a]'}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center p-8 relative overflow-hidden ${isGoodWin ? 'bg-linear-to-b from-neo-abyss to-[#0a1a0a]' : 'bg-linear-to-b from-neo-abyss to-[#1a0a0a]'}`}>
+        <PartyConfettiBurst accent={isGoodWin ? 'neo-lime' : 'neo-purple'} />
         <AdaptiveMotion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -440,7 +456,7 @@ function ShadowClashTvInner({ socket }: { socket: Socket | null }) {
               >
                 <p className="font-neo-display text-neo-white text-sm">{username}</p>
                 <p className={`font-neo-display text-xs mt-1 ${isShadow ? 'text-neo-red' : 'text-neo-purple'}`}>
-                  {role === 'shadow' ? '🐺 Shadow' : role === 'seer' ? '👁️ Seer' : role === 'medic' ? '🛡️ Medic' : '👤 Citizen'}
+                  {shadowRoleLabel(role, t)}
                 </p>
                 {wasEliminated && <p className="text-neo-white text-xs mt-0.5">💀</p>}
               </AdaptiveMotion.div>

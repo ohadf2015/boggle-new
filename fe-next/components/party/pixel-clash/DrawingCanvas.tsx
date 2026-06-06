@@ -106,7 +106,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
     <div className="flex flex-col items-center gap-3">
       {/* Canvas */}
       <div
-        className="border-3 border-neo-black rounded-neo shadow-hard overflow-hidden"
+        className="border-3 border-neo-black rounded-neo shadow-hard overflow-hidden touch-none select-none"
         style={{ width, height }}
       >
         <ReactSketchCanvas
@@ -133,8 +133,9 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
               <button
                 key={hex}
                 onClick={() => { setActiveColor(hex); setIsEraser(false); }}
+                aria-label={hex}
                 className={`
-                  w-8 h-8 rounded-neo border-3 transition-all duration-100
+                  w-11 h-11 rounded-neo border-3 transition-all duration-100
                   ${activeColor === hex && !isEraser
                     ? 'border-neo-cream shadow-hard scale-110'
                     : 'border-neo-black shadow-hard-sm hover:scale-105'
@@ -147,7 +148,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
             <button
               onClick={() => setIsEraser(!isEraser)}
               className={`
-                w-8 h-8 rounded-neo border-3 transition-all duration-100
+                w-11 h-11 rounded-neo border-3 transition-all duration-100
                 flex items-center justify-center
                 ${isEraser
                   ? 'border-neo-cream shadow-hard scale-110 bg-neo-navy-elevated'

@@ -98,15 +98,44 @@ describe('resendShadowState — fixes role-card mount-timing stall', () => {
     expect(events[0].event).toBe('party:shadow:roleAssigned');
   });
 
-  it('does nothing for a socket that has no role (not a participant)', () => {
+  it('replays youWereEliminated so a dead player reconnecting lands on the eliminated screen (not stuck on role-reveal)', () => {
     vi.useFakeTimers();
     const io = createMockIO();
     initShadowClash(ROOM, PLAYERS, 'standard', 4);
     startShadowClash(io as never, ROOM);
+    const game = getShadowGameState(ROOM)!;
+    game.phase = 'discussion';
+    game.alivePlayers.delete('s1'); // Alice was eliminated
 
     const io2 = createMockIO();
-    resendShadowState(io2 as never, ROOM, 'stranger');
+    resendShadowState(io2 as never, ROOM, 's1');
 
-    expect(io2.getEmittedTo('stranger')).toHaveLength(0);
+    const events = io2.getEmittedTo('s1');
+    // Role card still first, then the elimination signal — and NO live prompts.
+    expect(events[0].event).toBe('party:shadow:roleAssigned');
+    expect(events.some((e) => e.event === 'party:shadow:youWereEliminated')).toBe(true);
+    expect(events.some((e) => e.event === 'party:shadow:discussionStart')).toBe(false);
+    expect(events.some((e) => e.event === 'party:shadow:voteStart')).toBe(false);
+  });
+
+  it('sends a phaseChange snapshot to a role-less socket (the TV) so it can recover mid-game', () => {
+    vi.useFakeTimers();
+    const io = createMockIO();
+    initShadowClash(ROOM, PLAYERS, 'standard', 4);
+    startShadowClash(io as never, ROOM);
+    const game = getShadowGameState(ROOM)!;
+    game.phase = 'discussion';
+
+    const io2 = createMockIO();
+    resendShadowState(io2 as never, ROOM, 'tv-host'); // not a player
+
+    const events = io2.getEmittedTo('tv-host');
+    const snap = events.find((e) => e.event === 'party:phaseChange');
+    expect(snap).toBeTruthy();
+    const gs = (snap!.data as { gameState: { phase: string; alivePlayers: string[] } }).gameState;
+    expect(gs.phase).toBe('discussion');
+    expect(Array.isArray(gs.alivePlayers)).toBe(true);
+    // It must NOT leak any private role card to a non-participant.
+    expect(events.some((e) => e.event === 'party:shadow:roleAssigned')).toBe(false);
   });
 });
