@@ -57,6 +57,22 @@ interface OfflineMode {
 Backward-compatible exports retained: `OFFLINE_CAPABLE_MODES` (segments), `isOfflineCapable()`,
 `offlineCapableRoutes()` (now returns full entry hrefs, incl. `?practice=1`).
 
+## Dictionary availability (the load-bearing fix)
+
+A precached *shell* renders a mode offline, but word modes (blast / classic /
+daily / adventure / word-hunt) reject every word unless `/api/dictionary-words`
+is in the SW cache. The worker→IndexedDB load path does **not** populate SW Cache
+Storage, and a warm fetch fired at mount on the first visit races *ahead* of SW
+control (a freshly-installed SW doesn't control its registering page until it
+activates + `clients.claim()`), so it skips the cache.
+
+**Fix:** `lib/offline/warmDictionary.ts` (`warmDictionaryCache`) does a guarded,
+online-only, once-per-locale main-thread `fetch` of the dictionary URL — which
+the SW intercepts + SWR-caches. `DictionaryPrewarmer` runs it on mount AND on
+`serviceWorker.ready` / `controllerchange`, so it lands once the SW is actually
+intercepting. **Verified live:** after a single online home visit, the EN dict
+(2.8 MB) is SW-cached and readable offline.
+
 ## Done-checklist (acceptance, per added mode)
 
 1. `isOfflineCapable('/{locale}/{route}')` → `true` (gate lets warm native render it).
