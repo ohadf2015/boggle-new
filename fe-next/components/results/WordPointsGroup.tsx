@@ -14,7 +14,9 @@
 
 import { memo, useMemo, useState, useCallback } from 'react';
 import { m } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRevealList } from '@/hooks/useRevealList';
 import { getPointColor, getTextColor } from './utils';
 import { WordChip } from './WordChip';
 import type { WordObject } from './types';
@@ -34,6 +36,12 @@ export interface WordPointsGroupProps {
   className?: string;
   /** Whether to animate word entries (simple mode only) */
   animate?: boolean;
+  /**
+   * Max words shown before a "show more" reveal kicks in. Keeps a prolific
+   * game from dumping a wall of words on screen. Highest-value words survive
+   * the trim (we cut the low-point tail). Default 12.
+   */
+  maxVisibleWords?: number;
 }
 
 /**
@@ -116,12 +124,14 @@ SimpleWordSpan.displayName = 'SimpleWordSpan';
 const PointGroupRow = memo<{
   points: number;
   words: WordObject[];
+  /** True number of words in this point tier (badge stays honest while collapsed). */
+  totalCount: number;
   t: (key: string) => string;
   getPlayerCountForWord?: (word: string) => number;
   mode: 'chip' | 'simple';
   animate: boolean;
   groupIndex?: number;
-}>(({ points, words, t, getPlayerCountForWord, mode, animate, groupIndex = 0 }) => (
+}>(({ points, words, totalCount, t, getPlayerCountForWord, mode, animate, groupIndex = 0 }) => (
   <m.div
     initial={{ opacity: 0, x: -12 }}
     animate={{ opacity: 1, x: 0 }}
@@ -129,7 +139,7 @@ const PointGroupRow = memo<{
     className="rounded-neo p-1.5 border-l-4 border-neo-black bg-white/50 text-neo-black dark:bg-neo-navy-elevated/50"
     style={{ borderLeftColor: getPointColor(points) }}
   >
-    <PointsBadge points={points} wordCount={words.length} t={t} />
+    <PointsBadge points={points} wordCount={totalCount} t={t} />
     <div className="flex flex-wrap gap-1">
       {words.map((wordObj, i) => (
         mode === 'chip' ? (
@@ -191,12 +201,36 @@ export const WordPointsGroup = memo<WordPointsGroupProps>(({
   mode = 'chip',
   className,
   animate = false,
+  maxVisibleWords = 12,
 }) => {
-  // Calculate total valid word count
-  const totalWordCount = useMemo(() =>
-    Object.values(wordsByPoints).flat().length,
-    [wordsByPoints]
+  // Flatten in display order (highest points first) so the cap trims the
+  // low-value tail, not the impressive high-scorers.
+  const orderedWords = useMemo(
+    () =>
+      sortedPointGroups.flatMap((points) =>
+        (wordsByPoints[points] ?? []).map((wordObj) => ({ points, wordObj })),
+      ),
+    [sortedPointGroups, wordsByPoints],
   );
+
+  const totalWordCount = orderedWords.length;
+
+  // Show the top N, reveal the rest on tap (shared declutter primitive).
+  const { visible, hasMore, showAll, toggle, hiddenCount } = useRevealList(
+    orderedWords,
+    maxVisibleWords,
+  );
+
+  // Re-group the visible slice back into point rows, preserving order.
+  const visibleGroups = useMemo(() => {
+    const map = new Map<number, WordObject[]>();
+    for (const { points, wordObj } of visible) {
+      const bucket = map.get(points);
+      if (bucket) bucket.push(wordObj);
+      else map.set(points, [wordObj]);
+    }
+    return Array.from(map.entries()); // insertion order = points descending
+  }, [visible]);
 
   if (sortedPointGroups.length === 0) return null;
 
@@ -213,22 +247,41 @@ export const WordPointsGroup = memo<WordPointsGroupProps>(({
 
       {/* Point groups */}
       <div className="space-y-2">
-        {sortedPointGroups.map((points, groupIdx) => {
-          const wordsForPoints = wordsByPoints[points] ?? [];
-          return (
-            <PointGroupRow
-              key={`points-${points}`}
-              points={points}
-              words={wordsForPoints}
-              t={t}
-              getPlayerCountForWord={getPlayerCountForWord}
-              mode={mode}
-              animate={animate}
-              groupIndex={groupIdx}
-            />
-          );
-        })}
+        {visibleGroups.map(([points, words], groupIdx) => (
+          <PointGroupRow
+            key={`points-${points}`}
+            points={points}
+            words={words}
+            totalCount={(wordsByPoints[points] ?? []).length}
+            t={t}
+            getPlayerCountForWord={getPlayerCountForWord}
+            mode={mode}
+            animate={animate}
+            groupIndex={groupIdx}
+          />
+        ))}
       </div>
+
+      {/* Show more / less — keeps a long word list from flooding the screen */}
+      {hasMore && (
+        <button
+          type="button"
+          onClick={toggle}
+          className={cn(
+            'mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-neo',
+            'text-xs font-black uppercase border-2 border-neo-black',
+            'bg-neo-cyan text-neo-black shadow-hard-sm transition-all',
+            'hover:-translate-y-px hover:shadow-hard active:translate-y-0 active:shadow-none',
+          )}
+        >
+          <span>
+            {showAll ? t('common.showLess') : `${t('common.showMore')} (${hiddenCount})`}
+          </span>
+          <ChevronDown
+            className={cn('w-4 h-4 transition-transform', showAll && 'rotate-180')}
+          />
+        </button>
+      )}
     </div>
   );
 });
