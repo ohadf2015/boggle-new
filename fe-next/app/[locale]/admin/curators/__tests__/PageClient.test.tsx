@@ -6,7 +6,10 @@ vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => authState }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/en/admin/curators',
+}));
 vi.mock('@/components/Header', () => ({ default: () => <div data-testid="header" /> }));
 vi.mock('@/components/curator/CuratorAssignForm', () => ({
   CuratorAssignForm: () => <div data-testid="assign-form" />,
@@ -40,7 +43,8 @@ describe('CuratorAdminPageClient', () => {
     authState.user = { id: 'a1' };
     authState.isAdmin = true;
     render(<CuratorAdminPageClient />);
-    expect(screen.getByText('curator.admin.title')).toBeTruthy();
+    // AdminSubNav also renders a "curator.admin.title" tab, so scope to the page heading.
+    expect(screen.getByRole('heading', { name: 'curator.admin.title' })).toBeTruthy();
     expect(screen.getByTestId('assign-form')).toBeTruthy();
     expect(screen.getByTestId('inbox')).toBeTruthy();
   });
