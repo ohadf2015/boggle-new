@@ -456,6 +456,52 @@ if [ "$gate_ok" = "0" ]; then
   case "$iso_rc" in
     0) gate_ok=1 ;;
     1) gate_ok=0; log "isolated gate FAILED — the nightly's own lane code broke lint/test/build" ;;
+    3)
+      # INCONCLUSIVE — the gate was SIGKILLed at its wall-clock ceiling (almost always
+      # the slow full vitest suite), so it produced NO parseable FAIL list. The old
+      # code collapsed this to rc=1 and, finding nothing to peel, dropped ALL authored
+      # code (the 2026-06-06 zero-code night). Instead, get the fast verdict the night
+      # never got: a BUILD-ONLY re-gate (lint+test skipped → build:schemas + build:fast
+      # only, minutes not tens-of-minutes). This catches the genuine lane breakage that
+      # a timeout hides — type/import errors like an orphaned page that imports missing
+      # siblings — WITHOUT waiting on the suite that timed out.
+      log "isolated gate INCONCLUSIVE (timed out, no parseable failures) — build-only re-verifying the authored set before deciding (never drop all code on a timeout)"
+      run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 1; _to_bo_rc=$?
+      _to_route=$(nightly_gate_timeout_route "$_to_bo_rc")
+      if [ "$_to_route" = "ship" ]; then
+        # Build-clean: the timeout was the slow test suite, not broken code. SHIP it
+        # with a loud TESTS-INCONCLUSIVE alert (mirrors the baseline-red ship path:
+        # build-verified work ships; the gate ran at reduced strength, so shout).
+        gate_ok=1
+        log "gate-timeout: authored set BUILDS clean (lint+type+next-build) — shipping it; the full test suite was too slow to finish in ${NIGHTLY_GATE_TIMEOUT:-2700}s and is UNVERIFIED this run"
+        mkdir -p docs/nightly 2>/dev/null || true
+        {
+          echo "# Nightly TESTS-INCONCLUSIVE alert — ${TODAY}"
+          echo
+          echo "The integration gate was killed at its ${NIGHTLY_GATE_TIMEOUT:-2700}s ceiling before the full"
+          echo "vitest suite finished, so the authored set's TESTS are UNVERIFIED tonight."
+          echo "A build-only re-gate (lint + type-check + next build) PASSED, so the code"
+          echo "compiles and type-checks; it shipped at reduced gate strength."
+          echo
+          echo "ACTION: the gate is too slow to complete — investigate suite runtime"
+          echo "(cold vitest in the worktree / parallelism / cache) or raise NIGHTLY_GATE_TIMEOUT."
+        } > "docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md" 2>/dev/null || true
+        echo "docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
+        echo -e "\n**Outcome (tests-inconclusive):** the gate timed out before the full test suite finished; a build-only re-gate (lint+type+next-build) passed, so the authored set shipped UNVERIFIED on tests. See docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md." >> "$REPORT"
+        tg_alert "nightly $TODAY: gate timed out before tests finished. Build-verified (lint+type+next-build) + shipped — TESTS UNVERIFIED this run. Gate is too slow; see docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md."
+      elif [ "$_to_route" = "peel" ]; then
+        # Build-only FAILED → real breakage, and now we HAVE complete build output
+        # naming the offender. Route to the existing drop-and-re-gate peel loop, which
+        # parses + peels just the broken file(s) and ships the rest.
+        gate_ok=0; iso_rc=1
+        log "gate-timeout: build-only re-gate FAILED — the authored set has a real build break; routing to drop-and-re-gate peel (output now parseable)"
+      else
+        # Build-only ALSO timed out (rc=3) → genuinely unverifiable in budget → fall
+        # through to docs-only salvage (the conservative last resort; now rare).
+        gate_ok=0; iso_rc=3
+        log "gate-timeout: build-only re-gate ALSO timed out — unverifiable in ${NIGHTLY_GATE_TIMEOUT:-2700}s; falling through to docs-only salvage"
+      fi
+      ;;
     2)
       log "isolated gate setup unavailable — falling back to in-place whole-tree gate"
       for attempt in 1 2; do

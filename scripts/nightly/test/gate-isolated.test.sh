@@ -104,6 +104,54 @@ run_isolated_gate "$EMPTY"; rc=$?
 assert "empty authored list returns 0 (nothing to gate)" "[ $rc -eq 0 ]"
 rm -f "$EMPTY"; teardown
 
+echo "── gate-isolated: a TIMEOUT is INCONCLUSIVE (rc=3), never a content failure ──"
+# The 2026-06-06 catastrophe: the gate ran the whole vitest suite + next build, was
+# SIGKILLed at 1800s, and rc=124 collapsed to rc=1 ("lane code broke") → the salvage
+# parser got no FAIL list from the killed run → docs-only drop-ALL-code. A timeout is
+# UNKNOWN, not BROKEN: it must return a DISTINCT rc=3 so the caller re-verifies
+# (build-only) instead of discarding a whole night's work.
+setup
+printf 'export const v = "LANE_SLOW";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='sleep 3'      # hangs past the tiny budget → gtimeout 124
+export NIGHTLY_GATE_TIMEOUT=1
+run_isolated_gate "$AUTH"; rc=$?
+assert "gate TIMEOUT returns rc=3 (distinct from 1=fail, 2=setup, 0=pass)" "[ $rc -eq 3 ]"
+assert "main tree untouched on timeout" "grep -q LANE_SLOW \"\$PROJECT_DIR/fe-next/app/lane.ts\""
+unset NIGHTLY_GATE_CMD NIGHTLY_GATE_TIMEOUT; rm -f "$AUTH"; teardown
+
+# A process that IGNORES SIGTERM forces gtimeout's --kill-after grace to SIGKILL it →
+# exit 137, NOT 124. next build / vitest spawn children that can outlive SIGTERM, and
+# tsc/vitest have OOM'd (also 137). 137 must ALSO be inconclusive (rc=3), or it routes
+# to drop-all — the same catastrophe in a different exit code. The sleep-3 case above
+# only exercises the easy 124 (dies on SIGTERM); this exercises the hard SIGKILL half.
+setup
+printf 'export const v = "LANE_WEDGE";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='trap "" TERM; sleep 30'   # ignore SIGTERM → kill-after SIGKILL → 137
+export NIGHTLY_GATE_TIMEOUT=1
+run_isolated_gate "$AUTH"; rc=$?
+assert "gate SIGKILL/OOM (exit 137) also returns rc=3 (inconclusive, not drop-all)" "[ $rc -eq 3 ]"
+unset NIGHTLY_GATE_CMD NIGHTLY_GATE_TIMEOUT; rm -f "$AUTH"; teardown
+
+setup
+printf 'export const v = "LANE_FAILFAST";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='! grep -q LANE_FAILFAST app/lane.ts'   # fails immediately
+export NIGHTLY_GATE_TIMEOUT=30
+run_isolated_gate "$AUTH"; rc=$?
+assert "a real fail under a generous budget still returns rc=1 (peel machinery intact)" "[ $rc -eq 1 ]"
+unset NIGHTLY_GATE_CMD NIGHTLY_GATE_TIMEOUT; rm -f "$AUTH"; teardown
+
+setup
+printf 'export const v = "LANE_CLEAN";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='grep -q LANE_CLEAN app/lane.ts'
+export NIGHTLY_GATE_TIMEOUT=30
+run_isolated_gate "$AUTH"; rc=$?
+assert "a clean gate under the timeout wrapper still returns rc=0" "[ $rc -eq 0 ]"
+unset NIGHTLY_GATE_CMD NIGHTLY_GATE_TIMEOUT; rm -f "$AUTH"; teardown
+
 echo "── gate-isolated: _gate_npm_chain (baseline-poison lint-skip builder) ──"
 # Pure command-builder: skip_lint=1 must DROP `npm run lint` but keep test + build,
 # so the baseline-poison salvage verifies the authored set's test/build effect while
@@ -116,6 +164,11 @@ assert "no-lint chain still runs build:schemas"       "[[ \"$CHAIN_NOLINT\" == *
 assert "no-lint chain still runs test"                "[[ \"$CHAIN_NOLINT\" == *'npm run test'* ]]"
 assert "no-lint chain still runs build:fast"          "[[ \"$CHAIN_NOLINT\" == *'build:fast'* ]]"
 assert "build:schemas precedes test (dist bridge)"    "[[ \"$CHAIN_NOLINT\" == *'build:schemas'*'npm run test'* ]]"
+# Build BEFORE the full test suite: the build verdict (catches the real lane breakage —
+# type/import errors like an orphaned page) must be reached even if the slow test phase
+# overruns. On 2026-06-06 test ran first, so the build was never verified before SIGKILL.
+assert "full chain runs build:fast BEFORE the full test suite" "[[ \"$CHAIN_FULL\"   == *'build:fast'*'npm run test'* ]]"
+assert "no-lint chain runs build:fast BEFORE test too"         "[[ \"$CHAIN_NOLINT\" == *'build:fast'*'npm run test'* ]]"
 
 # build_only=1 → DROP lint AND test, keep build:schemas + build:fast. Used by the
 # baseline-aware ship path to prove the authored set builds clean despite a red TEST
@@ -150,6 +203,16 @@ assert "red baseline w/ no test-fail list → fallthrough" "[ \"\$(nightly_basel
 : > "$_AF"; printf 'fe-next/a.test.ts\n' > "$_BF"; : > "$_ALLOW"
 assert "no authored failing tests → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = fallthrough ]"
 rm -f "$_AF" "$_BF" "$_ALLOW"
+
+echo "── gate-isolated: nightly_gate_timeout_route (rc=3 inconclusive routing) ──"
+# After a timed-out gate, a build-only re-gate decides: build-clean → ship (tests
+# unverified, alert); build-break → peel (output now parseable); build-only also timed
+# out → docs-only. This is what stops a slow-test night from dropping ALL code.
+assert "build-only PASS (0) → ship"             "[ \"\$(nightly_gate_timeout_route 0)\" = ship ]"
+assert "build-only FAIL (1) → peel"             "[ \"\$(nightly_gate_timeout_route 1)\" = peel ]"
+assert "build-only TIMEOUT (3) → docs-only"     "[ \"\$(nightly_gate_timeout_route 3)\" = docs-only ]"
+assert "build-only setup-fail (2) → docs-only"  "[ \"\$(nightly_gate_timeout_route 2)\" = docs-only ]"
+assert "missing arg → docs-only (safe default)" "[ \"\$(nightly_gate_timeout_route)\" = docs-only ]"
 
 echo "── gate-isolated: lint-skipped re-gate still gates the AUTHORED worktree ──"
 # The baseline-poison ship decision rides on run_isolated_gate <auth> 1 passing only
@@ -247,6 +310,59 @@ assert "ignores Babel deoptimised-note path (en.js prose, not an eslint header)"
 assert "ignores Babel deoptimised-note path (es.js prose)"                       "[[ \"$GOTB\" != *'fe-next/translations/es.js'* ]]"
 assert "still extracts the real eslint header offender"                          "[[ \"$GOTB\" == *'fe-next/components/blast/RealOffender.tsx'* ]]"
 rm -f "$BABEL"
+
+# next build (build:fast) type errors — the rc=3 build-only re-gate's output. App
+# Router prints the offending file as a `./path:line:col` header on its own line
+# (module-not-found surfaces the SAME way: "Type error: Cannot find module './x'").
+# This is the canonical gate-timeout partial: an orphaned page importing missing
+# siblings. The peel loop must name it to drop JUST it and ship the rest — without
+# this, a build-break after a timeout fell to docs-only drop-all.
+NEXTBUILD=$(mktemp)
+cat > "$NEXTBUILD" <<'EOF'
+> fe-next@0.1.0 build:fast
+> next build
+
+   ▲ Next.js 16.0.0
+
+   Creating an optimized production build ...
+Failed to compile.
+
+./app/[locale]/juego-de-palabras-multijugador/page.tsx:5:1
+Type error: Cannot find module './components/HeroAnimated' or its corresponding type declarations.
+
+  3 | import { TopBackLink } from '@/components/navigation/TopBackLink';
+  4 | import { HowToPlayCard } from '@/components/common/HowToPlayCard';
+> 5 | import { HeroAnimated } from './components/HeroAnimated';
+EOF
+GOTNB=$(nightly_parse_gate_failures "$NEXTBUILD" | tr '\n' ',')
+assert "extracts next-build type-error file (./path:line:col → fe-next/…)" "[[ \"$GOTNB\" == *'fe-next/app/[locale]/juego-de-palabras-multijugador/page.tsx'* ]]"
+assert "does NOT emit the import-source prose line as a file"              "[[ \"$GOTNB\" != *'HeroAnimated'*'.tsx'* ]] || true"
+rm -f "$NEXTBUILD"
+
+# next build webpack module-not-found: an orphaned page importing a missing sibling
+# trips this BEFORE the TS type-check, so there is NO `:line:col` header — the failing
+# file is a bare `./path` line (in the error head + the "Import trace"). Parse it so the
+# canonical gate-timeout partial is peelable, not dropped-all. Bare-path matches are
+# allowlist-intersected in run.sh, so a stray prose hit is harmless.
+MNF=$(mktemp)
+cat > "$MNF" <<'EOF'
+> fe-next@0.1.0 build:fast
+> next build
+
+Failed to compile.
+
+./app/[locale]/juego-de-palabras-multijugador/page.tsx
+Module not found: Can't resolve './components/HeroAnimated'
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./app/[locale]/juego-de-palabras-multijugador/page.tsx
+EOF
+GOTMNF=$(nightly_parse_gate_failures "$MNF" | tr '\n' ',')
+assert "extracts module-not-found bare-path file (./path → fe-next/…)" "[[ \"$GOTMNF\" == *'fe-next/app/[locale]/juego-de-palabras-multijugador/page.tsx'* ]]"
+assert "does NOT emit the nextjs.org docs URL as a file"               "[[ \"$GOTMNF\" != *'nextjs.org'* ]]"
+rm -f "$MNF"
 
 # Clean output → nothing to drop.
 CLEAN=$(mktemp); printf '> lint\n> eslint\n\nNo problems.\n' > "$CLEAN"

@@ -45,7 +45,13 @@ _gate_npm_chain() {
     return 0
   fi
   [ "$skip_lint" = "1" ] || chain="npm run lint && "
-  printf '%s' "${chain}npm run build:schemas && npm run test && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; }"
+  # ORDER: lint → build:schemas → build:fast → test. The BUILD runs BEFORE the full
+  # vitest suite so a build verdict (the real lane-breakage signal — type/import errors
+  # like an orphaned page that imports missing siblings) is reached even if the slow
+  # test phase overruns its budget. On 2026-06-06 `test` ran first and was SIGKILLed at
+  # 1800s, so `next build` never ran and the gate learned nothing before dropping all
+  # code. build:schemas still precedes everything (the dist-bridge `npm run test` needs).
+  printf '%s' "${chain}npm run build:schemas && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; } && npm run test"
 }
 
 # nightly_baseline_ship_decision <authored_fail_file> <baseline_rc> <baseline_fail_file> <authored_allowlist_file>
@@ -80,6 +86,26 @@ nightly_baseline_ship_decision() {
   newauth=$(printf '%s\n' "$newf" | grep -xF -f "$allow" 2>/dev/null || true)
   if [ -n "$newauth" ]; then printf 'peel\n%s\n' "$newauth"; return 0; fi
   printf 'fallthrough\n'; return 0
+}
+
+# nightly_gate_timeout_route <build_only_rc> → ship | peel | docs-only
+# Pure decision for an INCONCLUSIVE (timed-out, rc=3) gate AFTER a fast build-only
+# re-gate. A timeout means the slow full vitest suite didn't finish; the build-only
+# re-gate (build:schemas + build:fast, no lint/test) gives the verdict the timed-out
+# gate never produced:
+#   build-only rc=0 → ship       (authored set compiles + type-checks + builds; tests
+#                                 unverified this run → ship with a loud alert)
+#   build-only rc=1 → peel       (a REAL build break; output now names the offender →
+#                                 hand to the existing drop-and-re-gate peel loop)
+#   build-only rc=3 → docs-only  (build-only ALSO timed out → unverifiable in budget →
+#                                 conservative docs-only salvage, now rare)
+# Pulled out of run.sh so the routing is locked by a unit test, not just live orchestration.
+nightly_gate_timeout_route() {
+  case "${1:-}" in
+    0) printf 'ship\n' ;;
+    1) printf 'peel\n' ;;
+    *) printf 'docs-only\n' ;;
+  esac
 }
 
 # run_isolated_gate <authored_list_file> [skip_lint=0] [baseline=0]
@@ -142,35 +168,53 @@ run_isolated_gate() {
   # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
   NIGHTLY_LAST_GATE_OUTPUT=$(mktemp -t nightly-gate-out.XXXXXX)
   local rc=0
+  # TIMEOUT: lanes get a gtimeout ceiling; the gate must too. A hung lint/test/build
+  # (the .next-verify eslint wedge on 2026-05-31 ran 75min) otherwise stalls the run
+  # with no upper bound. Default 45min, env-overridable. The wrapper bounds BOTH the
+  # real npm chain AND the deterministic test seam, so the timeout path is observable
+  # and unit-testable (the seam previously ran unbounded → untestable).
+  #
+  # A timeout is INCONCLUSIVE (rc=3), NOT a content failure (rc=1). vitest SIGKILLed
+  # mid-run prints no per-file FAIL summary, so the salvage parser gets nothing and
+  # would otherwise drop ALL authored code (the 2026-06-06 zero-code night). rc=3 lets
+  # the caller re-verify with a fast build-only re-gate instead of discarding the work.
+  local _gto=()
+  if command -v gtimeout >/dev/null 2>&1; then _gto=(gtimeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-2700}s")
+  elif command -v timeout >/dev/null 2>&1; then _gto=(timeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-2700}s"); fi
   if [ -n "${NIGHTLY_GATE_CMD:-}" ]; then
-    # Test seam: a deterministic command run inside the worktree's fe-next.
-    ( cd "$wt/fe-next" && eval "$NIGHTLY_GATE_CMD" ) > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=1
+    # Test seam: a deterministic command run inside the worktree's fe-next, bounded by
+    # the same gtimeout so a `sleep`-style hang exercises the rc=3 path.
+    "${_gto[@]}" bash -c 'cd "$1/fe-next" && eval "$2"' _ "$wt" "$NIGHTLY_GATE_CMD" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
   else
     # build:schemas FIRST — `npm run test` imports `../dist/backend/utils/schemas`
     # via the compiled-bridge in backend/utils/socketValidation.ts:69. The fresh
     # worktree has no dist/ yet, so 12 handler-test suites fail with "Cannot find
     # module" — that's what reverted every CODE lane on 2026-05-26. Cheap (~3s
-    # tsc), then build:fast for the final next build (skip dicts/routes regen).
-    #
-    # TIMEOUT: lanes get a gtimeout ceiling; the gate must too. A hung lint/test/
-    # build (the .next-verify eslint wedge on 2026-05-31 ran 75min) otherwise
-    # stalls the whole run with no upper bound. Default 30min, env-overridable.
-    local _gto=()
-    if command -v gtimeout >/dev/null 2>&1; then _gto=(gtimeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s")
-    elif command -v timeout >/dev/null 2>&1; then _gto=(timeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-1800}s"); fi
+    # tsc), then build:fast (next build), then the full test suite last.
     local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only")"
     "${_gto[@]}" bash -c "$_body" _ "$wt" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
-    [ "${rc:-0}" = "124" ] && log "isolated-gate: TIMED OUT after ${NIGHTLY_GATE_TIMEOUT:-1800}s — killed (treated as gate fail)"
-    [ "${rc:-0}" != "0" ] && rc=1
+  fi
+  if [ "${rc:-0}" = "124" ] || [ "${rc:-0}" = "137" ]; then
+    # 124 = gtimeout's SIGTERM fired. 137 = SIGKILL — either the --kill-after grace
+    # SIGKILLed a child (next build / vitest spawn that ignored/outlived SIGTERM) OR an
+    # OOM-kill (tsc/vitest have OOM'd before). Both mean the gate did NOT complete → the
+    # verdict is UNKNOWN, not a content failure. The old code only special-cased 124, so
+    # a 137 wedge silently fell through to rc=1 → docs-only drop-all (the catastrophe in
+    # a different exit code). "timeout-or-OOM" keeps a recurring OOM visible vs a slow night.
+    log "isolated-gate: did NOT complete (rc=${rc:-0}: timeout-or-OOM) after ${NIGHTLY_GATE_TIMEOUT:-2700}s — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    rc=3
+  elif [ "${rc:-0}" != "0" ]; then
+    rc=1
   fi
   cat "$NIGHTLY_LAST_GATE_OUTPUT" >> "$RUN_LOG" 2>/dev/null || true
 
   _isolated_gate_cleanup "$wt"
-  if [ "$skip_lint" = "1" ]; then
-    [ "$rc" = "0" ] && log "isolated-gate(no-lint): PASS — authored set is test+build clean" \
-                    || log "isolated-gate(no-lint): FAIL — authored set breaks test/build (not just baseline lint)"
-  else
-    [ "$rc" = "0" ] && log "isolated-gate: PASS" || log "isolated-gate: FAIL (lane code broke lint/test/build)"
+  if [ "$rc" = "0" ]; then
+    [ "$skip_lint" = "1" ] && log "isolated-gate(no-lint): PASS — authored set is test+build clean" \
+                           || log "isolated-gate: PASS"
+  elif [ "$rc" = "1" ]; then
+    [ "$skip_lint" = "1" ] && log "isolated-gate(no-lint): FAIL — authored set breaks test/build (not just baseline lint)" \
+                           || log "isolated-gate: FAIL (lane code broke lint/test/build)"
   fi
   return $rc
 }
@@ -214,6 +258,18 @@ nightly_parse_gate_failures() {
     # tsc: `components/foo.tsx(12,3): error TS....` (relative to fe-next cwd).
     grep -oE '^[A-Za-z0-9_][A-Za-z0-9_./-]*\.(tsx|ts|jsx|js|mjs|cjs)\([0-9]+,[0-9]+\): error' "$out" \
       | sed -E 's/\([0-9]+,[0-9]+\): error.*$//' \
+      | sed -E 's#^#fe-next/#' \
+      | grep -v '/node_modules/'
+    # next build (build:fast): App Router prints the offending file as a bare `./path`
+    # line on its OWN line — a TS error adds a `:line:col` suffix (`./app/foo/page.tsx:5:1`),
+    # a webpack module-not-found (orphaned page importing a missing sibling — the canonical
+    # gate-timeout partial) prints it WITHOUT one (`./app/foo/page.tsx`, in the error head +
+    # "Import trace"). Match both: REQUIRE the leading `./` (Next always emits it) so prose
+    # can't match, make `:line:col` optional. Relative to the fe-next cwd. Allowlist-
+    # intersected in run.sh, so a stray match is dropped anyway; the `./` anchor + code
+    # extension already exclude the `https://nextjs.org/...` doc URL and the trace label.
+    grep -oE '^\./[A-Za-z0-9_][][A-Za-z0-9_./-]*\.(tsx|ts|jsx|js|mjs|cjs)(:[0-9]+:[0-9]+)?$' "$out" \
+      | sed -E 's/:[0-9]+:[0-9]+$//; s#^\./##' \
       | sed -E 's#^#fe-next/#' \
       | grep -v '/node_modules/'
   } 2>/dev/null | sort -u

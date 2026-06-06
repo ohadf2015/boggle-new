@@ -5,8 +5,10 @@
 # Sonnet · 15 min cap
 #
 # Budget history: 720s (12 min) was 4/5 (80%) until 2026-05-27 first timeout
-# at npm-test step. 900s adds 3-min safety margin; per-tool MCP_TOOL_TIMEOUT
-# still caps hung MCP calls.
+# at npm-test step. 900s added a 3-min margin.
+# 2026-06-06: timed out mid-CODE (5 sequential edits to a PageClient.tsx) → the lane
+# was implementing real content/SSR fixes, not hanging → 1200s (20 min) lets it land
+# them. Per-tool MCP_TOOL_TIMEOUT still caps hung MCP calls on a genuine hang.
 set -uo pipefail
 LIB_DIR="$(dirname "$0")/../lib"
 # shellcheck disable=SC1091
@@ -22,4 +24,4 @@ if [ ! -f "$HOME/.config/gcloud/application_default_credentials.json" ]; then
   echo "lane-08: gcloud ADC missing — running without GSC traffic data (noindex step skipped)" | tee -a "$LOG"
 fi
 
-headless_run "08-adsense" "$PROMPT" "sonnet" 900 "$LOG"
+headless_run "08-adsense" "$PROMPT" "sonnet" 1200 "$LOG"
