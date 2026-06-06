@@ -503,7 +503,7 @@ export function LandingChallengeCards({
   };
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic', 'blastV2', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'blastClassic', 'blastV2', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

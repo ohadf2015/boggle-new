@@ -332,6 +332,24 @@ describe('LandingChallengeCards — Sealed Bid admin dev-preview gate', () => {
   });
 });
 
+describe('LandingChallengeCards — Crossword admin dev-preview gate', () => {
+  it('does NOT render the Crossword card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    expect(screen.queryByTestId('mode-crossword.name')).toBeNull();
+  });
+
+  it('renders the Crossword card for an admin with the /crossword href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    render(<LandingChallengeCards {...baseProps} />);
+    const card = screen.getByTestId('mode-crossword.name');
+    expect(card).toBeInTheDocument();
+    expect(card.getAttribute('data-href')).toBe('/en/crossword');
+  });
+});
+
 describe('LandingChallengeCards — collapse-after-MP gate', () => {
   it('renders the "More Game Modes" expander for a brand-new player (zero MP games)', () => {
     mockIsNewPlayer.mockReturnValue(true);

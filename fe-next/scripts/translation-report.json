@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 5602,
+    "totalKeysInCode": 5605,
     "keyCountByLanguage": {
-      "en": 10542,
-      "he": 10640,
-      "sv": 10643,
-      "ja": 10631,
-      "es": 10667
+      "en": 10555,
+      "he": 10653,
+      "sv": 10656,
+      "ja": 10644,
+      "es": 10680
     },
-    "missingFromEnglish": 37,
+    "missingFromEnglish": 34,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 23,
+      "templateLiterals": 24,
       "fallbackUsages": 0,
       "variableKeys": 11
     }
@@ -121,6 +121,13 @@
         "file": "components/seasons/RankTierChip.tsx",
         "line": 39,
         "context": "{t(`rank.tier.${tier}`)}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "wordcraft.modifier.desc.${modifier}",
+        "file": "components/word-craft/WordCraftModifierBanner.tsx",
+        "line": 28,
+        "context": "{t(`wordcraft.modifier.desc.${modifier}`)}",
         "type": "template_literal"
       },
       {
@@ -615,33 +622,6 @@
         {
           "file": "components/admin/today-games/TodayGamesHistory.tsx",
           "line": 116
-        }
-      ]
-    },
-    {
-      "key": "wordcraft.clue.adFailed",
-      "usages": [
-        {
-          "file": "app/[locale]/word-craft/PageClient.tsx",
-          "line": 458
-        }
-      ]
-    },
-    {
-      "key": "wordcraft.clue.granted",
-      "usages": [
-        {
-          "file": "app/[locale]/word-craft/PageClient.tsx",
-          "line": 464
-        }
-      ]
-    },
-    {
-      "key": "wordcraft.clue.none",
-      "usages": [
-        {
-          "file": "app/[locale]/word-craft/PageClient.tsx",
-          "line": 451
         }
       ]
     }
