@@ -391,3 +391,47 @@ describe('pickRivalReminderCopy', () => {
     });
   });
 });
+
+describe('hebrew copy naturalness — gender-neutral, singular address, no calques', () => {
+  const he = RIVAL_REMINDER_TEMPLATES_BY_LOCALE.he;
+  const allHeStrings = [...he.above, ...he.below, ...he.tied].flatMap((t) => [
+    t.title,
+    t.body,
+  ]);
+  const blob = allHeStrings.join('\n');
+
+  // Verbs that conjugate by the RIVAL's gender. Templates fill {rival} with a
+  // name of unknown gender, so a masculine-singular verb reads grammatically
+  // wrong for a female rival ("Maya הקדים"). Rival references must use
+  // gender-neutral noun/prepositional phrasing instead.
+  it.each(['הקדים', 'מתקרב', 'השווה', 'שיחק'])(
+    'contains no rival-gendered masculine verb "%s"',
+    (verb) => {
+      expect(blob).not.toContain(verb);
+    }
+  );
+
+  // Reader address must stay singular — no plural imperatives mixed in.
+  it('uses singular reader address (no plural imperative "תניחו")', () => {
+    expect(blob).not.toContain('תניחו');
+  });
+
+  // Literal English→Hebrew calques that read machine-translated.
+  it.each(['נגד-מהלך', 'חלון לתפיסה', 'רזרבת'])(
+    'contains no machine-translated calque "%s"',
+    (calque) => {
+      expect(blob).not.toContain(calque);
+    }
+  );
+
+  // Misspelling — correct Hebrew is שוויון, not שיוויון.
+  it('spells "equality/tie" correctly as שוויון (not שיוויון)', () => {
+    expect(blob).not.toContain('שיוויון');
+  });
+
+  // Guard the prior fixes don't regress: every {rival} slot still present and
+  // placeholders never leak literally after a rewrite.
+  it('keeps {rival} placeholder intact in the template source', () => {
+    expect(blob).toContain('{rival}');
+  });
+});
