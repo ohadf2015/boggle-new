@@ -417,7 +417,12 @@ export default function PracticeWordHuntSandbox() {
         </div>
 
         <div className={`flex-1 min-h-0 flex items-center justify-center w-full relative transition-opacity duration-200 ${isVerifying ? 'opacity-50 pointer-events-none' : ''}`}>
-        <div data-testid="practice-board" className="w-full max-w-xs aspect-square mx-auto">
+        {/* Fill the flex space and let `.game-board-frame`'s
+            `max-height: min(board-size, 100%)` clamp the square to the
+            available height — mirrors the live game's <SurvivalGridSection>.
+            A width-driven `aspect-square` here overflowed downward and painted
+            tiles over the discoveries list when vertical room was tight. */}
+        <div data-testid="practice-board" className="w-full h-full">
           <GridComponent
             grid={board}
             interactive
