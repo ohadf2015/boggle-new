@@ -63,6 +63,13 @@ export default function WordWheelPixiRing({
       const cy = h / 2;
 
       app.ticker.add((ticker) => {
+        // Guard: a ticker tick already queued in the rAF loop can fire AFTER the
+        // unmount cleanup calls app.destroy({children:true}), which nulls each
+        // Graphics' internal context. Touching .clear() then throws
+        // "Cannot read properties of null (reading 'clear')" (Sentry 1CW, route
+        // /daily/word-wheel). Mirrors the post-destroy guards added in a39f63378
+        // for the blast renderers.
+        if (destroyed || orbitGfx.destroyed || lineGfx.destroyed || glowGfx.destroyed) return;
         const dt = ticker.deltaMS / 1000;
         const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef } = stateRef.current;
         angle += dt * 0.5;
