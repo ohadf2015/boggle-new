@@ -9414,6 +9414,13 @@ const en = {
       "timeLabel": "Time",
       "wordsLabel": "Words"
     },
+    "failed": {
+      "title": "Out of guesses!",
+      "subtitle": "So close — give it another shot.",
+      "wordsLabel": "words",
+      "retry": "Try Again",
+      "progressSafe": "Your progress is safe — level {n}"
+    },
     "feedback": {
       "checking": "Checking…",
       "target": "TARGET!",

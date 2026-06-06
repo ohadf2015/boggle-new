@@ -9808,6 +9808,13 @@ const he = {
       "timeLabel": "זמן",
       "wordsLabel": "מילים"
     },
+    "failed": {
+      "title": "נגמרו הניחושים!",
+      "subtitle": "כל כך קרוב — נסו שוב.",
+      "wordsLabel": "מילים",
+      "retry": "נסו שוב",
+      "progressSafe": "ההתקדמות נשמרה — שלב {n}"
+    },
     "feedback": {
       "checking": "בודק…",
       "target": "מצאת מטרה!",

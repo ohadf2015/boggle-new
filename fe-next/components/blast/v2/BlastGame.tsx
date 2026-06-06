@@ -23,6 +23,7 @@ import { BlastBoard } from './BlastBoard';
 import { BlastHud } from './BlastHud';
 import { BlastLevelIntroCard } from './BlastLevelIntroCard';
 import { BlastLevelCompleteCard } from './BlastLevelCompleteCard';
+import { BlastLevelFailedCard } from './BlastLevelFailedCard';
 import { BlastChestOpenModal } from './BlastChestOpenModal';
 import { BlastFxOverlay } from './BlastFxOverlay';
 import { BlastAtmosphereOverlay } from './BlastAtmosphereOverlay';
@@ -43,6 +44,9 @@ type Props = {
   unlocksSeen?: UnlocksSeen;
   isVeteranPlayer?: boolean;
   onAdvance: () => void;
+  // Re-mount the SAME level fresh after a loss (strike budget exhausted). No
+  // campaign advance, no clear-level submit — progress stays exactly where it was.
+  onRetry?: () => void;
   onUpdateUnlocks?: (unlocks: UnlocksSeen) => void;
   onLevelCleared?: (nextLevel: number) => void;
 };
@@ -88,6 +92,7 @@ export function BlastGame({
   unlocksSeen = {},
   isVeteranPlayer = false,
   onAdvance,
+  onRetry,
   onUpdateUnlocks,
   onLevelCleared,
 }: Props) {
@@ -130,6 +135,11 @@ export function BlastGame({
     isNewBonus: boolean;
   } | null>(null);
   useChainHaptics({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
+  // Win-only status for the celebration FX hooks: a loss must NOT fire the
+  // victory haptic or the complete-card settle. The dedicated fail card owns
+  // all loss feedback, so a failed level reads as "still playing" to these hooks.
+  const winStatus: 'playing' | 'levelComplete' =
+    state.status === 'levelComplete' ? 'levelComplete' : 'playing';
   // Selection-count derived from active drag — only counts cells that are
   // currently part of the live trace, so backtracking doesn't double-tick.
   const selectionCount = state.selection.kind === 'active' ? state.selection.cells.length : 0;
@@ -137,14 +147,14 @@ export function BlastGame({
     selectionCount,
     invalidKey: state.invalidShakeKey,
     foundCount: state.foundWords.size,
-    status: state.status,
+    status: winStatus,
   });
   useChainEventBus({ chainEventKey: state.chainEventKey, chainDepth: state.lastChainDepth });
   // Cascade pacing — Royal Match style. The card is gated behind a short settle
   // (max ~800ms even on a deep cascade) so the final chain flash plays out, but
   // an impatient player can tap anywhere to `skip` straight to the result.
   const { show: showCompleteCard, skip: skipCompleteSettle } = useCompleteCardDelay({
-    status: state.status,
+    status: winStatus,
     chainDepth: state.lastChainDepth,
   });
   // Almost-word ghost letters — translucent glowing letters in empty cells
@@ -326,7 +336,8 @@ export function BlastGame({
   // Track abandonment on unmount or when level complete
   useEffect(() => {
     return () => {
-      if (!introDismissed || state.status === 'levelComplete') return; // Only track if playing
+      // Only count a true abandon — a finished level (won OR lost) isn't one.
+      if (!introDismissed || state.status !== 'playing') return;
       trackBlastLevelAbandoned({
         level: level.levelNumber,
         locale: level.locale,
@@ -483,6 +494,19 @@ export function BlastGame({
           setIntroDismissed(false); // Reset for next level
           onAdvance();
         }}
+      />
+    );
+  }
+
+  if (state.status === 'levelFailed') {
+    const foundThemeWordsCount = level.words.filter((w) => state.foundWords.has(w)).length;
+    return (
+      <BlastLevelFailedCard
+        modeColor={modeColor}
+        levelNumber={level.levelNumber}
+        themeWordCount={level.words.length}
+        wordsFound={foundThemeWordsCount}
+        onRetry={() => onRetry?.()}
       />
     );
   }

@@ -9606,6 +9606,13 @@ const sv = {
       "cascadesLabel": "Kaskader",
       "next": "Nästa nivå"
     },
+    "failed": {
+      "title": "Slut på gissningar!",
+      "subtitle": "Så nära — försök igen.",
+      "wordsLabel": "ord",
+      "retry": "Försök igen",
+      "progressSafe": "Dina framsteg är sparade — nivå {n}"
+    },
     "feedback": {
       "checking": "Kollar…",
       "target": "MÅLORD!",

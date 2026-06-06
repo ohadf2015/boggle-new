@@ -8,7 +8,13 @@ import {
   type SelectionState, type SelectionEvent, type ValidationResult, type CompletionReason,
 } from './engine';
 import { mechanicsForLevel } from './mechanic-flags';
+import { computeStrikeBudget } from './strike-budget';
 import { trackBlastWordFound, trackBlastWordRejected, trackBlastHintUsed } from './telemetry';
+
+// Terminal states end interaction: 'levelComplete' is a win (mastered/partial,
+// advances the campaign), 'levelFailed' is the lose condition (strike budget
+// exhausted — retry the same level, campaign progress untouched).
+type GameStatus = 'playing' | 'levelComplete' | 'levelFailed';
 
 // Snapshot of every field a successful submit mutates. Pushed pre-mutation so
 // `undo` can fully restore the prior board, score, found-set, and chain FX
@@ -22,7 +28,7 @@ type HistoryEntry = {
   lastChainDepth: number;
   chainEventKey: number;
   tileIds: string[][];
-  status: 'playing' | 'levelComplete';
+  status: GameStatus;
   completionReason: CompletionReason | null;
 };
 
@@ -37,11 +43,18 @@ type State = {
   foundWords: Set<string>;
   coins: number;
   chestProgress: number;
-  status: 'playing' | 'levelComplete';
+  status: GameStatus;
   // Why the level ended. Snapshotted at the moment status flips to
   // 'levelComplete' so a later cascade/collapse can't retroactively change the
   // headline the result card already showed. Null while playing.
   completionReason: CompletionReason | null;
+  // The lose condition. `strikeBudget` is the max confirmed wrong guesses this
+  // level tolerates (null = unlimited, for chill early levels). `strikesUsed`
+  // ticks up on each confirmed wrong guess; reaching the budget with theme words
+  // still unfound flips status to 'levelFailed'. Provably fair: perfect play
+  // makes zero strikes, so a loss is always self-inflicted, never board RNG.
+  strikeBudget: number | null;
+  strikesUsed: number;
   hintsUsed: number;
   cascadeCount: number;
   invalidShakeKey: number;
@@ -300,6 +313,11 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
 }
 
 function reducer(state: State, action: Action): State {
+  // Once the level has ended (won or lost), interaction is inert. Undo and the
+  // rewarded-ad reset stay reachable; new word submits and force-bonuses do not.
+  if (state.status !== 'playing' && (action.type === 'sel' || action.type === 'forceBonus')) {
+    return state;
+  }
   if (action.type === 'sel') {
     const t = reduceSelection(state.selection, action.event);
     if (t.submit) return applyValidatedSubmit({ ...state, selection: t.state }, t.cells, action.dictionaryCheck);
@@ -321,10 +339,18 @@ function reducer(state: State, action: Action): State {
     // word. NOW fire the shake (it was deferred at submit time) and clear the
     // pending markers so a fresh attempt isn't mistaken for a stale verdict.
     if (!state.dictCheckPending) return state;
+    // A confirmed wrong guess is the ONE thing that burns a strike (structural
+    // mis-drags and duplicates never do — they aren't deliberate guesses).
+    const newStrikes = state.strikesUsed + 1;
+    const allTheme = state.level.words.every((w) => state.foundWords.has(w));
+    const failed =
+      state.strikeBudget !== null && newStrikes >= state.strikeBudget && !allTheme;
     return {
       ...state,
       invalidShakeKey: state.invalidShakeKey + 1,
       wrongAttempts: state.wrongAttempts + 1,
+      strikesUsed: newStrikes,
+      status: failed ? 'levelFailed' : state.status,
       dictCheckPending: false,
       lastRejectedCells: [],
     };
@@ -376,6 +402,8 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
     chestProgress: 0,
     status: 'playing',
     completionReason: null,
+    strikeBudget: computeStrikeBudget(initialLevel.levelNumber),
+    strikesUsed: 0,
     hintsUsed: 0,
     cascadeCount: 0,
     invalidShakeKey: 0,

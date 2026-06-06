@@ -9564,6 +9564,13 @@ const ja = {
       "cascadesLabel": "カスケード",
       "next": "次のレベル"
     },
+    "failed": {
+      "title": "ヒント切れ！",
+      "subtitle": "おしい！もう一度挑戦しよう。",
+      "wordsLabel": "語",
+      "retry": "もう一度",
+      "progressSafe": "進行状況は保存されています — レベル {n}"
+    },
     "feedback": {
       "checking": "確認中…",
       "target": "ターゲット！",

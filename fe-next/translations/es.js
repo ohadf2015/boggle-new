@@ -9590,6 +9590,13 @@ const es = {
       "cascadesLabel": "Cascadas",
       "next": "Siguiente nivel"
     },
+    "failed": {
+      "title": "¡Sin intentos!",
+      "subtitle": "Casi lo logras, ¡inténtalo de nuevo!",
+      "wordsLabel": "palabras",
+      "retry": "Reintentar",
+      "progressSafe": "Tu progreso está a salvo — nivel {n}"
+    },
     "feedback": {
       "checking": "Comprobando…",
       "target": "¡OBJETIVO!",

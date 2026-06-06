@@ -18,6 +18,10 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
   const [unlocksSeen, setUnlocksSeen] = useState<UnlocksSeen>({});
   const [isVeteran] = useState(false);
   const [reachedEnd, setReachedEnd] = useState(false);
+  // Bumped on a level loss to force a fresh BlastGame mount of the SAME level —
+  // the key includes it, so React tears down and rebuilds with reset state
+  // (board, strikes, coins-this-run) while the campaign position is untouched.
+  const [retryToken, setRetryToken] = useState(0);
   // Boot gate — hold the game render until saved progress resolves so a
   // resuming player never sees level 1 flash before snapping to level N. We seed
   // it from a synchronous resume hint: only gate when we have reason to believe a
@@ -113,6 +117,13 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
     }
   }, [level.levelNumber, level.locale, isGuest]);
 
+  // Retry the current level after a loss. No fetch, no advance, no clear-level —
+  // just a fresh mount of the same level. Campaign progress is already safe
+  // because clear-level only runs on a win.
+  const handleRetry = useCallback(() => {
+    setRetryToken((n) => n + 1);
+  }, []);
+
   const handleRestart = useCallback(() => {
     setLevel(initialLevel);
     setReachedEnd(false);
@@ -172,12 +183,13 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
 
   return (
     <BlastGame
-      key={`${level.locale}-${level.levelNumber}`}
+      key={`${level.locale}-${level.levelNumber}-${retryToken}`}
       level={level}
       progress={progress}
       unlocksSeen={unlocksSeen}
       isVeteranPlayer={isVeteran}
       onAdvance={handleAdvance}
+      onRetry={handleRetry}
       onLevelCleared={handleLevelCleared}
       onUpdateUnlocks={(updated) => setUnlocksSeen(updated)}
     />
