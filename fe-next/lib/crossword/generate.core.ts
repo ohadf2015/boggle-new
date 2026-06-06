@@ -38,6 +38,12 @@ export interface FillOptions {
   rng?: () => number;
   /** Safety cap on backtracking placements before giving up. */
   maxSteps?: number;
+  /**
+   * Words to try FIRST at every slot (common/cluable words). Rare dictionary words are only used
+   * as glue when no preferred word fits. Without this, random full-dict fill yields mostly-obscure
+   * grids. Ordering is biased, not restricted — solvability is preserved.
+   */
+  prefer?: ReadonlySet<string>;
 }
 
 interface SlotGeom {
@@ -68,6 +74,17 @@ export function fillGrid(
   const { size, rtl, blocks } = template;
   const rng = options.rng ?? Math.random;
   const maxSteps = options.maxSteps ?? 200_000;
+  const prefer = options.prefer;
+
+  // Preferred (common) words first, rare ones after — each tier shuffled for variety. When no
+  // prefer set is given, this collapses to a plain shuffle (legacy behaviour, tests unchanged).
+  const orderCandidates = (cands: string[]): string[] => {
+    if (!prefer || prefer.size === 0) return shuffle(cands, rng);
+    const top: string[] = [];
+    const rest: string[] = [];
+    for (const w of cands) (prefer.has(w) ? top : rest).push(w);
+    return [...shuffle(top, rng), ...shuffle(rest, rng)];
+  };
 
   const blockSet = new Set(blocks.map(([r, c]) => cellKey(r, c)));
   // Membership set for validating slots completed purely by crossings (see solve()).
@@ -143,8 +160,7 @@ export function fillGrid(
     if (!target) return true; // all slots filled (and all validated above)
     if (targetCands.length === 0) return false;
 
-    shuffle(targetCands, rng);
-    for (const word of targetCands) {
+    for (const word of orderCandidates(targetCands)) {
       // Place, remembering which cells we newly set so we can undo precisely.
       const placed: string[] = [];
       let ok = true;

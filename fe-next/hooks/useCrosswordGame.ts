@@ -38,6 +38,7 @@ export interface UseCrosswordGame {
   revealWord: () => void;
   checkAll: () => void;
   nextSlot: (delta?: 1 | -1) => void;
+  focusSlot: (slotId: string) => void;
   reset: () => void;
 }
 
@@ -136,6 +137,19 @@ export function useCrosswordGame(
     });
   }, []);
 
+  // Jump focus to a specific slot by id (clue-list click). Forces the slot's direction so an
+  // across clue selects across even if a down slot also passes through the start cell.
+  const focusSlot = useCallback((slotId: string) => {
+    setState((s) => {
+      const target = s.puzzle.slots.find((x) => x.id === slotId);
+      if (!target) return s;
+      return {
+        ...focusCellFn({ ...s, dir: target.dir as Direction }, target.row, target.col),
+        dir: target.dir as Direction,
+      };
+    });
+  }, []);
+
   const reset = useCallback(() => {
     clearProgress(puzzle.id);
     baseElapsedRef.current = 0;
@@ -160,6 +174,7 @@ export function useCrosswordGame(
     revealWord,
     checkAll,
     nextSlot,
+    focusSlot,
     reset,
   };
 }

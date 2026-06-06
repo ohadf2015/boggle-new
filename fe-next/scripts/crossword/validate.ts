@@ -1,6 +1,7 @@
 /**
- * Validate hand-authored crossword grids against the real dictionary. Prints every across/down
- * run and flags any that are NOT valid dictionary words. Used while hand-seeding puzzles.
+ * Validate the COMMITTED crossword bank (lib/crossword/puzzles/seed.ts) against the real
+ * dictionary. Prints every across/down entry and flags any that is NOT a valid dictionary word —
+ * the offline guard against authoring/transcription typos. Exits non-zero if anything is invalid.
  *
  * Usage: npx tsx scripts/crossword/validate.ts
  */
@@ -11,62 +12,24 @@ import {
 } from '../../backend/dictionaryLoaders';
 import { buildGrid } from '../../lib/crossword/grid';
 import { normalizeHebrewWord } from '../../shared/utils/wordNormalization';
-import type { PuzzleLocale } from '../../lib/crossword/types';
+import { EN_SEED, HE_SEED, type SeedPuzzle } from '../../lib/crossword/puzzles/seed';
 
-type Grid = (string | null)[][];
-
-// Candidate grids to validate. Edit freely while authoring.
-const EN_GRIDS: Record<string, Grid> = {
-  'en-heart': [
-    ['h', 'e', 'a', 'r', 't'],
-    ['e', 'm', 'b', 'e', 'r'],
-    ['a', 'b', 'u', 's', 'e'],
-    ['r', 'e', 's', 'i', 'n'],
-    ['t', 'r', 'e', 'n', 'd'],
-  ],
-  'en-bread': [
-    ['b', 'r', 'e', 'a', 'd'],
-    ['r', 'a', 'i', 's', 'e'],
-    ['e', 'i', 'g', 'h', 't'],
-    ['a', 's', 'h', 'e', 'n'],
-    ['d', 'e', 't', 'e', 'r'],
-  ],
-};
-
-const HE_GRIDS: Record<string, Grid> = {
-  // Small REAL crosswords (across != down), normalized letters, words cross at one cell.
-  'he-1': [
-    ['ש', 'מ', 'ש'],
-    [null, null, 'ל'],
-    ['מ', 'י', 'מ'],
-  ],
-  'he-2': [
-    ['א', 'ו', 'ר'],
-    [null, null, 'ו'],
-    [null, null, 'ח'],
-  ],
-  'he-3': [
-    ['פ', 'ר', 'י'],
-    [null, null, 'ר'],
-    [null, null, 'ח'],
-  ],
-};
-
-function check(label: string, grid: Grid, locale: PuzzleLocale, dict: Set<string>) {
-  const rtl = locale === 'he';
-  const { slots } = buildGrid({ rtl, solution: grid });
+function check(seed: SeedPuzzle, dict: Set<string>): number {
+  const { slots } = buildGrid({ rtl: seed.rtl, solution: seed.grid });
   let bad = 0;
   const lines: string[] = [];
   for (const s of slots) {
-    const word = locale === 'he' ? normalizeHebrewWord(s.answer) : s.answer;
+    const word = seed.locale === 'he' ? normalizeHebrewWord(s.answer) : s.answer;
     const ok = dict.has(word);
-    if (!ok) bad++;
-    lines.push(`   ${ok ? 'OK ' : 'XX '} ${s.id} ${s.dir} "${s.answer}"`);
+    const clued = (seed.clues[s.id] ?? '').trim().length > 0;
+    if (!ok || !clued) bad++;
+    lines.push(`   ${ok ? 'OK ' : 'XX '}${clued ? '' : '(NO CLUE) '}${s.id} ${s.dir} "${s.answer}"`);
   }
-   
-  console.log(`\n[${label}] ${locale} — ${slots.length} runs, ${bad} invalid`);
-   
+
+  console.log(`\n[${seed.id}] ${seed.locale} — ${slots.length} runs, ${bad} problem(s)`);
+
   console.log(lines.join('\n'));
+  return bad;
 }
 
 async function main() {
@@ -75,8 +38,12 @@ async function main() {
     loadEnglishDictionary(safeRead),
     loadHebrewDictionary(safeRead),
   ]);
-  for (const [label, grid] of Object.entries(EN_GRIDS)) check(label, grid, 'en', en);
-  for (const [label, grid] of Object.entries(HE_GRIDS)) check(label, grid, 'he', he);
+  let problems = 0;
+  for (const seed of EN_SEED) problems += check(seed, en);
+  for (const seed of HE_SEED) problems += check(seed, he);
+
+  console.log(`\n===== ${problems} total problem(s) across ${EN_SEED.length + HE_SEED.length} puzzles =====`);
+  if (problems > 0) process.exit(1);
 }
 
 main().catch((e) => {

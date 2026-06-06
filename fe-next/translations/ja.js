@@ -8,6 +8,8 @@ const ja = {
     "gridLabel": "クロスワードの盤面",
     "cellLabel": "{row}行 {col}列",
     "dir": { "across": "ヨコ", "down": "タテ" },
+    "acrossHeading": "ヨコのカギ",
+    "downHeading": "タテのカギ",
     "prevClue": "前のヒント",
     "nextClue": "次のヒント",
     "noClue": "マスをタップして開始",

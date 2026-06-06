@@ -8,6 +8,8 @@ const en = {
     "gridLabel": "Crossword grid",
     "cellLabel": "Row {row}, column {col}",
     "dir": { "across": "Across", "down": "Down" },
+    "acrossHeading": "Across",
+    "downHeading": "Down",
     "prevClue": "Previous clue",
     "nextClue": "Next clue",
     "noClue": "Tap a square to start",

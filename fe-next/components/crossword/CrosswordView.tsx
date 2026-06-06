@@ -9,6 +9,7 @@ import type { CrosswordPuzzle } from '@/lib/crossword/types';
 import { CrosswordGrid } from './CrosswordGrid';
 import { CrosswordKeyboard } from './CrosswordKeyboard';
 import { ClueBar } from './ClueBar';
+import { CrosswordClueList } from './CrosswordClueList';
 import { CrosswordFx } from './CrosswordFx';
 
 function formatTime(ms: number): string {
@@ -40,6 +41,7 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
     revealWord,
     checkAll,
     nextSlot,
+    focusSlot,
     reset,
   } = game;
 
@@ -134,6 +136,13 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
         onBackspace={backspace}
         disabled={solved}
         backspaceLabel={t('crossword.backspace')}
+      />
+
+      <CrosswordClueList
+        slots={puzzle.slots}
+        activeSlotId={activeSlot?.id ?? null}
+        onSelect={(slot) => focusSlot(slot.id)}
+        t={t}
       />
 
       {solved && (

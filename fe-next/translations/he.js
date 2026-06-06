@@ -8,6 +8,8 @@ const he = {
     "gridLabel": "לוח תשבץ",
     "cellLabel": "שורה {row}, עמודה {col}",
     "dir": { "across": "מאוזן", "down": "מאונך" },
+    "acrossHeading": "מאוזן",
+    "downHeading": "מאונך",
     "prevClue": "רמז קודם",
     "nextClue": "הרמז הבא",
     "noClue": "הקישו על משבצת כדי להתחיל",

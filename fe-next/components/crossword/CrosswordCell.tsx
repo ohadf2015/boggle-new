@@ -41,7 +41,7 @@ function CrosswordCellBase({
     return (
       <div
         aria-hidden
-        className="bg-neo-navy border-neo border-black rounded-[2px]"
+        className="bg-black rounded-[2px]"
         style={{ gridColumn, gridRow }}
       />
     );
