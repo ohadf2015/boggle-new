@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Layers } from 'lucide-react';
+import { ArrowLeft, Layers, Users } from 'lucide-react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -25,7 +25,6 @@ import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingS
 import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftHandoff } from '@/components/word-craft/WordCraftHandoff';
-import { WordCraftTerritoryStrip } from '@/components/word-craft/WordCraftTerritoryStrip';
 import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
@@ -204,6 +203,10 @@ export default function WordCraftPageClient() {
   // player's rack. Shown on every turn change except the very first and the
   // game-over transition.
   const [showHandoff, setShowHandoff] = useState(false);
+  // Play-vs-friend lives in a topbar popover, not a band in the action stack —
+  // keeps the invite/pass-&-play CTA discoverable without wedging marketing
+  // between the rack and the Submit button.
+  const [friendPanelOpen, setFriendPanelOpen] = useState(false);
   const prevTurnRef = useRef(game.state.turn);
   useEffect(() => {
     if (!hotseat) return;
@@ -826,8 +829,8 @@ export default function WordCraftPageClient() {
       />
 
       <main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
-        {/* Topbar: back · title · How to play · loading (public — no beta badge) */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Topbar: back · title · play-friend · How to play · loading (public — no beta badge) */}
+        <div className="relative flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
             <ArrowLeft className="w-4 h-4" />
           </Button>
@@ -841,6 +844,42 @@ export default function WordCraftPageClient() {
             {t('wordcraft.title')}
           </h1>
           <div className="flex-1" />
+          {/* Play-vs-friend — compact topbar affordance + popover. Solo only;
+              hotseat is already pass-&-play and duels already have an opponent. */}
+          {!hotseat && !duel ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFriendPanelOpen((v) => !v)}
+              aria-expanded={friendPanelOpen}
+              aria-label={t('wordcraft.duel.playFriend')}
+              className={cn('shrink-0 h-8 px-2', friendPanelOpen && 'bg-neo-pink text-neo-white border-neo-pink')}
+            >
+              <Users className="w-4 h-4" />
+            </Button>
+          ) : null}
+          {friendPanelOpen && !hotseat && !duel ? (
+            <>
+              <button
+                type="button"
+                aria-hidden
+                tabIndex={-1}
+                onClick={() => setFriendPanelOpen(false)}
+                className="fixed inset-0 z-30 cursor-default"
+              />
+              <div className="absolute top-full inset-e-0 mt-2 z-40 w-[min(20rem,88vw)]">
+                <WordCraftPlayFriendControl
+                  t={t}
+                  seed={seed}
+                  playerScore={game.state.player.score}
+                  locale={locale}
+                  disabled={!dict}
+                  challengerName={challengerIdentity.name}
+                  challengerAvatar={challengerIdentity.avatar}
+                />
+              </div>
+            </>
+          ) : null}
           <WordCraftTutor
             isRTL={isRTL}
             labels={{
@@ -880,6 +919,11 @@ export default function WordCraftPageClient() {
             gameOver: t('wordcraft.gameOver'),
             bagRemaining: t('wordcraft.bagRemaining'),
           }}
+          territory={territoryEnabled ? {
+            playerCount: countClaimed(game.state.board, 'player'),
+            botCount: countClaimed(game.state.board, 'bot'),
+            label: t('wordcraft.territory.label'),
+          } : undefined}
         />
 
         {/* Duel target: keeps the challenger's avatar + name + score-to-beat
@@ -892,19 +936,6 @@ export default function WordCraftPageClient() {
             friendScore={duel.score}
             playerScore={game.state.player.score}
             friendAvatar={duel.avatar}
-          />
-        ) : null}
-
-        {territoryEnabled ? (
-          <WordCraftTerritoryStrip
-            playerCount={countClaimed(game.state.board, 'player')}
-            botCount={countClaimed(game.state.board, 'bot')}
-            labels={{
-              territoryLabel: t('wordcraft.territory.label'),
-              yourTerritory: t('wordcraft.territory.yours'),
-              botTerritory: t('wordcraft.territory.bots'),
-              endgameBonusHint: t('wordcraft.territory.endgameHint'),
-            }}
           />
         ) : null}
 
@@ -1024,19 +1055,6 @@ export default function WordCraftPageClient() {
           hintPick={wantsPick && isFirstMove}
           locale={locale}
         />
-
-        {/* Play vs a friend control — both Pass & Play and invite-a-friend paths */}
-        {!hotseat && !duel ? (
-          <WordCraftPlayFriendControl
-            t={t}
-            seed={seed}
-            playerScore={game.state.player.score}
-            locale={locale}
-            disabled={!dict}
-            challengerName={challengerIdentity.name}
-            challengerAvatar={challengerIdentity.avatar}
-          />
-        ) : null}
 
         <WordCraftControls
           canSubmit={game.state.pendingPlacements.length > 0 && !!dict && canInteract && !game.state.burnout}

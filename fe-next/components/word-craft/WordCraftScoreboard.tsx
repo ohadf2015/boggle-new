@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import { Crown } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import type { PlayerState } from '@/lib/word-craft/types';
 import type { Turn } from '@/lib/word-craft/useWordCraftGame';
@@ -24,6 +25,16 @@ export interface WordCraftScoreboardProps {
     botTurn: string;
     gameOver: string;
     bagRemaining: string;
+  };
+  /**
+   * Claimed-cell counts, folded into the scoreboard meta row so territory is
+   * part of the one score HUD instead of a separate stacked band. Colors track
+   * the scoreboard's own language: lime = you, pink = opponent. Omit to hide.
+   */
+  territory?: {
+    playerCount: number;
+    botCount: number;
+    label: string;
   };
 }
 
@@ -51,6 +62,7 @@ function WordCraftScoreboardImpl({
   opponentAvatar,
   opponentSeed,
   labels,
+  territory,
 }: WordCraftScoreboardProps) {
   const total = player.score + bot.score;
   // Smoothed split: dampen at low totals so opening moves don't whip the bar.
@@ -135,6 +147,21 @@ function WordCraftScoreboardImpl({
           <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-current me-1.5 align-middle" />
           {status}
         </span>
+        {/* Territory, folded in: claimed-cell counts as a compact lime/pink chip
+            so it shares the score HUD instead of a separate stacked band. Only
+            once cells exist (matches the old strip's total>0 gate). */}
+        {territory && territory.playerCount + territory.botCount > 0 ? (
+          <span
+            data-testid="wc-scoreboard-territory"
+            className="inline-flex items-center gap-1.5 font-neo-display font-black tabular-nums"
+            aria-label={`${territory.label}: ${territory.playerCount} · ${territory.botCount}`}
+          >
+            <Crown className="w-3 h-3 text-neo-white/70" aria-hidden />
+            <span className="text-neo-lime">{territory.playerCount}</span>
+            <span aria-hidden className="text-neo-white/30">·</span>
+            <span className="text-neo-pink">{territory.botCount}</span>
+          </span>
+        ) : null}
         <span className="inline-flex items-center gap-1 text-neo-white">
           {/* The tile sack — letters left to draw. Gives the bag count a
               physical object instead of a generic hourglass; it wobbles on the
