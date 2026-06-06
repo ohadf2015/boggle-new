@@ -46,4 +46,14 @@ describe('LobbyReactions', () => {
     // own reaction shows immediately — sender name stamped on the float
     expect(screen.getByText('me')).toBeInTheDocument();
   });
+
+  // receiveOnly = the shared TV/host screen: it DISPLAYS incoming emoji but
+  // shows no send tray (nobody taps the TV). The socket listener still mounts.
+  it('receiveOnly hides the send tray but keeps the floating overlay + subscribes', () => {
+    render(<LobbyReactions username="tv" receiveOnly />);
+    expect(screen.queryByLabelText('reactions.label')).not.toBeInTheDocument();
+    expect(screen.getByTestId('lobby-reactions-overlay')).toBeInTheDocument();
+    // still listening for other players' reactions (host receives them)
+    expect(mockSocket.on).toHaveBeenCalledWith('quickReaction', expect.any(Function));
+  });
 });

@@ -78,6 +78,7 @@ vi.mock('../components/pre-game/desktop', () => ({
   InviteCard: () => null,
   EnhancedPlayerList: () => null,
 }));
+vi.mock('@/components/lobby/LobbyReactions', () => ({ LobbyReactions: () => null }));
 vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
 vi.mock('@/components/boosts/BoostPicker', () => ({ BoostPicker: () => null }));
 vi.mock('../components/HostPreGameView.useAvatarPremium', () => ({ useAvatarPremium: () => ({ allowed: true }) }), { virtual: true });

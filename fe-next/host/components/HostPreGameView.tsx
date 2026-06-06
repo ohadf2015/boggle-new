@@ -22,6 +22,7 @@ import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
 import { GameInstructions } from './pre-game/GameInstructions';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
 import { ChatBubble } from './pre-game/ChatBubble';
+import { LobbyReactions } from '@/components/lobby/LobbyReactions';
 import dynamic from 'next/dynamic';
 const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
@@ -559,6 +560,8 @@ function HostPreGameView({
         premium={avatarPremium}
       />
       <ChatBubble gameCode={gameCode} username={username} isHost t={t} />
+      {/* Receive-only emoji floats — players fling reactions, the host screen shows them. */}
+      <LobbyReactions username={username} receiveOnly />
       {/* Single boost picker mount — survives layout tree swaps. Lazy-mounted
           so the picker's hooks (useBoostStatus, useBoostClaim → AdMobProvider)
           don't run until needed; HostPreGameView root keeps the open flag so

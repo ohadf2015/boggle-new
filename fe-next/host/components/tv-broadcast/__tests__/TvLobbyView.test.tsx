@@ -45,6 +45,12 @@ vi.mock('../../pre-game/BattleModeCard', () => ({
   ),
 }));
 
+// Receive-only emoji overlay — needs a SocketProvider at runtime; stub it out
+// here so TvLobbyView layout logic stays isolated.
+vi.mock('@/components/lobby/LobbyReactions', () => ({
+  LobbyReactions: () => <div data-testid="lobby-reactions" />,
+}));
+
 const mockT = (key: string) => key;
 
 const defaultProps = {

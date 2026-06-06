@@ -7,6 +7,7 @@ import TvJoinBar from './TvJoinBar';
 import { PlayerRoster } from '../pre-game/PlayerRoster';
 import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
+import { LobbyReactions } from '@/components/lobby/LobbyReactions';
 import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { useGameActions } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
@@ -172,6 +173,9 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           )}
         </div>
       </div>
+
+      {/* Receive-only emoji floats — players fling reactions, the TV shows them. */}
+      <LobbyReactions username={username} receiveOnly />
     </div>
   );
 });

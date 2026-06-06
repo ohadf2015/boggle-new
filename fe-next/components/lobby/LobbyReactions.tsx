@@ -10,6 +10,12 @@ interface LobbyReactionsProps {
   username: string;
   /** Layout of the trigger/tray (bar = mobile row, vertical = desktop column). */
   layout?: 'bar' | 'vertical';
+  /**
+   * Display-only mode for the shared screen (TV / host): show incoming emoji
+   * floating over the lobby, but hide the send tray (nobody taps the TV). The
+   * socket listener still mounts, so the host receives every player's reaction.
+   */
+  receiveOnly?: boolean;
   className?: string;
 }
 
@@ -23,7 +29,7 @@ interface LobbyReactionsProps {
  * uses. Pure ambient delight — no scoring, no win condition, and it never gates
  * or competes with the host pressing Start.
  */
-export function LobbyReactions({ username, layout = 'bar', className }: LobbyReactionsProps): React.ReactElement {
+export function LobbyReactions({ username, layout = 'bar', receiveOnly = false, className }: LobbyReactionsProps): React.ReactElement {
   const { socket } = useSocket();
   const { floatingReactions, sendReaction, dismissReaction } = useQuickReactions({ socket, username });
 
@@ -43,7 +49,7 @@ export function LobbyReactions({ username, layout = 'bar', className }: LobbyRea
           />
         ))}
       </div>
-      <QuickReactions onReaction={sendReaction} layout={layout} className={className} />
+      {!receiveOnly && <QuickReactions onReaction={sendReaction} layout={layout} className={className} />}
     </>
   );
 }
