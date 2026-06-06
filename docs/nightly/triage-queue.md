@@ -382,6 +382,19 @@ Items deferred from automated nightly triage. Human review required.
   - recommended owner: confirm intent — if anon inserts are desired, add a comment on the migration explaining the policy is by design
 
 ## 2026-06-06
+
+### ✅ Resolution pass (2026-06-06 followup, founder session)
+
+All 5 items triaged with live evidence (Sentry MCP + Supabase SQL + Railway env):
+
+- **`upsert_push_token` REVOKE — NO ACTION NEEDED.** Live `pg_proc.proacl` shows EXECUTE granted only to `postgres`/`authenticated`/`service_role`. `anon` and `PUBLIC` have NO grant (non-null proacl drops the implicit PUBLIC default). Nothing to revoke; the single callsite is auth-gated. Advisory is a false-positive for this usage. **Closed.**
+- **1JR `relation "profiles" does not exist`** (POST /api/coins) — last seen 2026-05-27, **10 days silent**, 0 new events. Transient (likely a deploy-window PostgREST schema-cache / migration race). **Monitor-only**; re-open only if it recurs.
+- **1CW Pixi null `.clear()`** — **REAL, was still firing 2026-06-06**. NOT the blast surface a39f63378 fixed — it's `WordWheelPixiRing.tsx` (/daily/word-wheel) with its own ticker. **FIXED** `abe2dcd2f`: post-destroy guard at ticker entry.
+- **1KQ churn-502** — **RESOLVED.** Confirmed `SUPABASE_JWT_SECRET` IS present in Railway production env (service `boggle-new`). Secret loaded; canary won't fire. **Closed.**
+- **14R/14S game_sessions check_player_id** — last seen 2026-05-12, **24 days silent**, reach=0 (automated logger only). Stale. Hardening (skip null player_id rows in `logGameSession`) remains optional backlog, not urgent. **Monitor-only.**
+
+---
+
 - [Supabase] `upsert_push_token` SECURITY DEFINER — advisory is LOW RISK (false-positive for authenticated path)
   - score: 0.125; Function `public.upsert_push_token(p_token text, p_platform character varying, p_device_id text)`
   - status: research-complete — single callsite at app/api/player/push-token/route.ts:48, auth-gated (getUser()→401). Authenticated access is INTENTIONAL. Optional hardening: REVOKE EXECUTE ON FUNCTION public.upsert_push_token FROM anon; (prevents direct REST calls from unauthenticated clients)
