@@ -462,9 +462,9 @@ export function registerPartyHandlers(io: Server, socket: Socket): void {
       initCaptionClash(room.roomCode, players, room.totalRounds);
       startCaptionRound(io, room.roomCode);
     } else if (room.gameId === 'pixel-clash') {
-      // Solo runs SHOWDOWN mode (canvases/votes keyed by socketId, so bots can
-      // play it correctly); multiplayer keeps the default telephone mode.
-      initPixelClash(room.roomCode, players, isSolo ? 'showdown' : 'telephone', room.totalRounds);
+      // Solo rotates showdown → telephone → relay per round (bots play all three);
+      // multiplayer keeps the default telephone mode.
+      initPixelClash(room.roomCode, players, isSolo ? 'showdown' : 'telephone', room.totalRounds, isSolo);
       startPixelRound(io, room.roomCode);
     } else if (room.gameId === 'shadow-clash') {
       initShadowClash(room.roomCode, players, 'standard', room.totalRounds);

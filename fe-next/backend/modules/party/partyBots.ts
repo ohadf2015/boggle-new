@@ -19,7 +19,14 @@
 
 import type { Server } from 'socket.io';
 import { getCaptionGameState, submitCaption, submitVote as submitCaptionVote } from './captionClashEngine';
-import { getPixelGameState, submitShowdownCanvas, submitShowdownVote } from './pixelClashEngine';
+import {
+  getPixelGameState,
+  submitShowdownCanvas,
+  submitShowdownVote,
+  submitTelephoneStep,
+  submitRelayArtistDrawing,
+  submitRelayBuilderDrawing,
+} from './pixelClashEngine';
 import { getShadowGameState, submitNightAction, submitVote as submitShadowVote } from './shadowClashEngine';
 
 // Defined locally (backend tsconfig rootDir excludes shared/, matching partyHandler.ts).
@@ -30,6 +37,9 @@ export type BotAction =
   | { kind: 'caption-vote'; submissionId: string }
   | { kind: 'pixel-showdown-draw'; strokes: unknown[] }
   | { kind: 'pixel-showdown-vote'; best: string; funniest: string }
+  | { kind: 'pixel-telephone-step'; chainId: string; content: unknown }
+  | { kind: 'pixel-relay-artist'; strokes: unknown[] }
+  | { kind: 'pixel-relay-builder'; strokes: unknown[] }
   | { kind: 'shadow-night'; targetUsername: string }
   | { kind: 'shadow-vote'; targetUsername: string };
 
@@ -123,32 +133,74 @@ export function decideCaptionBotAction(game: CaptionStateLike, botId: string): B
 
 // ==================== Pixel (showdown) ====================
 
+interface PixelChainLike {
+  id: string;
+  steps: { playerId: string }[];
+}
+interface PixelRelayLike {
+  artistId: string;
+  originalDrawing: unknown[];
+  builderDrawings: Map<string, unknown>;
+}
 interface PixelRoundLike {
   phase: string;
   canvases?: Map<string, unknown>;
   votes?: Map<string, unknown>;
+  chains?: PixelChainLike[];
+  currentStepIndex?: number;
+  relay?: PixelRelayLike;
 }
 interface PixelStateLike {
   playerOrder: string[];
   rounds: PixelRoundLike[];
 }
 
+const GUESSES = ['cat', 'house', 'rocket', 'pizza', 'robot', 'banana', 'ghost', 'dragon', 'tree', 'star'];
+
 export function decidePixelBotAction(game: PixelStateLike, botId: string): BotAction | null {
   const round = game.rounds[game.rounds.length - 1];
   if (!round) return null;
 
+  // ---- Showdown ----
   if (round.phase === 'showdown-draw') {
     if (round.canvases?.has(botId)) return null;
     return { kind: 'pixel-showdown-draw', strokes: stubStrokes(botId) };
   }
-
   if (round.phase === 'showdown-vote') {
     if (round.votes?.has(botId)) return null;
     const others = game.playerOrder.filter((id) => id !== botId);
     if (others.length === 0) return null;
-    const best = pick(others, botId + 'best');
-    const funniest = pick(others, botId + 'funny');
-    return { kind: 'pixel-showdown-vote', best, funniest };
+    return { kind: 'pixel-showdown-vote', best: pick(others, botId + 'best'), funniest: pick(others, botId + 'funny') };
+  }
+
+  // ---- Telephone (chain assignment reconstructed from playerOrder + step) ----
+  if ((round.phase === 'drawing' || round.phase === 'guessing') && round.chains) {
+    const i = game.playerOrder.indexOf(botId);
+    if (i < 0) return null;
+    const step = round.currentStepIndex ?? 1;
+    // Step 1 draws your OWN chain (engine seeds it); later steps rotate by (i+step).
+    const chainIdx = step === 1 ? i : (i + step) % round.chains.length;
+    const chain = round.chains[chainIdx];
+    if (!chain) return null;
+    if (chain.steps.length > step) return null; // already added this step
+    const isDraw = step % 2 === 1;
+    return {
+      kind: 'pixel-telephone-step',
+      chainId: chain.id,
+      content: isDraw ? stubStrokes(botId + step) : pick(GUESSES, botId + step),
+    };
+  }
+
+  // ---- Relay ----
+  if (round.phase === 'relay-artist' && round.relay) {
+    if (round.relay.artistId !== botId) return null; // only the artist draws
+    if ((round.relay.originalDrawing?.length ?? 0) > 0) return null; // already drew
+    return { kind: 'pixel-relay-artist', strokes: stubStrokes(botId + 'artist') };
+  }
+  if (round.phase === 'relay-build' && round.relay) {
+    if (round.relay.artistId === botId) return null; // artist doesn't build
+    if (round.relay.builderDrawings.has(botId)) return null;
+    return { kind: 'pixel-relay-builder', strokes: stubStrokes(botId + 'build') };
   }
 
   return null;
@@ -261,6 +313,9 @@ export function runPartyBotTick(
       if (!action) continue;
       if (action.kind === 'pixel-showdown-draw') submitShowdownCanvas(io, roomCode, botId, action.strokes as never);
       else if (action.kind === 'pixel-showdown-vote') submitShowdownVote(roomCode, botId, action.best, action.funniest);
+      else if (action.kind === 'pixel-telephone-step') submitTelephoneStep(io, roomCode, botId, action.chainId, action.content as never);
+      else if (action.kind === 'pixel-relay-artist') submitRelayArtistDrawing(io, roomCode, botId, action.strokes as never);
+      else if (action.kind === 'pixel-relay-builder') submitRelayBuilderDrawing(io, roomCode, botId, action.strokes as never);
     }
     return false;
   }

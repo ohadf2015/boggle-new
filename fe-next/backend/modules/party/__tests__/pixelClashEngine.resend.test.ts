@@ -80,3 +80,38 @@ describe('resendPixelState (showdown) — fixes mount-timing stall', () => {
     expect(io.emitted).toHaveLength(0);
   });
 });
+
+describe('pixel solo mode rotation', () => {
+  afterEach(() => {
+    cleanupPixelClash(ROOM);
+    vi.clearAllTimers();
+    vi.useRealTimers();
+  });
+
+  it('rotates showdown → telephone → relay across rounds when rotateModes is on', () => {
+    vi.useFakeTimers();
+    const io = createMockIO();
+    initPixelClash(ROOM, PLAYERS, 'showdown', 5, true);
+
+    startPixelRound(io as never, ROOM);
+    expect(getPixelGameState(ROOM)!.mode).toBe('showdown'); // round 1
+
+    getPixelGameState(ROOM)!.currentRound = 1;
+    startPixelRound(io as never, ROOM);
+    expect(getPixelGameState(ROOM)!.mode).toBe('telephone'); // round 2
+
+    getPixelGameState(ROOM)!.currentRound = 2;
+    startPixelRound(io as never, ROOM);
+    expect(getPixelGameState(ROOM)!.mode).toBe('relay'); // round 3
+  });
+
+  it('does NOT rotate when rotateModes is off (multiplayer keeps its mode)', () => {
+    vi.useFakeTimers();
+    const io = createMockIO();
+    initPixelClash(ROOM, PLAYERS, 'telephone', 5, false);
+    startPixelRound(io as never, ROOM);
+    getPixelGameState(ROOM)!.currentRound = 1;
+    startPixelRound(io as never, ROOM);
+    expect(getPixelGameState(ROOM)!.mode).toBe('telephone');
+  });
+});

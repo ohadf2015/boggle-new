@@ -64,10 +64,14 @@ interface PixelGameState {
   currentRound: number;
   totalRounds: number;
   mode: PixelMode;
+  /** Solo: rotate telephone → showdown → relay per round so all modes are testable. */
+  rotateModes: boolean;
   scores: Map<string, number>;
   playerUsernames: Map<string, string>;
   playerOrder: string[];
 }
+
+const PIXEL_MODE_ROTATION: PixelMode[] = ['showdown', 'telephone', 'relay'];
 
 // ==================== Prompt Database ====================
 
@@ -105,12 +109,14 @@ export function initPixelClash(
   players: Map<string, string>,
   mode: PixelMode,
   totalRounds: number,
+  rotateModes = false,
 ): void {
   const state: PixelGameState = {
     rounds: [],
     currentRound: 0,
     totalRounds,
     mode,
+    rotateModes,
     scores: new Map(),
     playerUsernames: players,
     playerOrder: Array.from(players.keys()),
@@ -125,6 +131,10 @@ export function startPixelRound(io: Server, roomCode: string): void {
   if (!game) return;
 
   game.currentRound++;
+  // Solo rotates modes per round so the admin can playtest all three.
+  if (game.rotateModes) {
+    game.mode = PIXEL_MODE_ROTATION[(game.currentRound - 1) % PIXEL_MODE_ROTATION.length];
+  }
   const usedPrompts = game.rounds.map(r => r.prompt);
   const prompt = pickPrompt(usedPrompts);
 
