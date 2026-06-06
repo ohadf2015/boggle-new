@@ -3,36 +3,23 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import {
-  BookOpen, AlertTriangle, BookCheck, Calendar, Globe, Database,
-  Activity,
-} from 'lucide-react';
 import { useRef, useEffect } from 'react';
+import {
+  ADMIN_BUCKET_CHILDREN,
+  getActiveAdminTab,
+  type AdminNavLeaf,
+} from '@/lib/admin/adminNav';
+import { getAdminNavIcon } from './adminNavIcons';
 
-interface SubNavItem {
-  key: string;
-  icon: typeof BookOpen;
-  labelKey: string;
-  path: string;
-}
-
-const CONTENT_ITEMS: SubNavItem[] = [
-  { key: 'dictionary', icon: BookOpen, labelKey: 'admin.nav.dictionary', path: '/dictionary' },
-  { key: 'invalid-words', icon: AlertTriangle, labelKey: 'admin.nav.invalidWords', path: '/invalid-words' },
-  { key: 'milog-words', icon: BookCheck, labelKey: 'admin.nav.milogWords', path: '/milog-words' },
-  { key: 'words', icon: Calendar, labelKey: 'admin.nav.dailyChallenge', path: '/words' },
-  { key: 'wikipedia-words', icon: Globe, labelKey: 'admin.nav.wikipediaWords', path: '/wikipedia-words' },
-  { key: 'word-bank', icon: Database, labelKey: 'admin.nav.wordBank', path: '/word-bank' },
-];
-
-const SYSTEM_ITEMS: SubNavItem[] = [
-  { key: 'web-vitals', icon: Activity, labelKey: 'admin.nav.webVitals', path: '/web-vitals' },
+// Overflow sub-pages (System currently has Web Vitals as its only child).
+const SYSTEM_ITEMS: AdminNavLeaf[] = [
+  { key: 'web-vitals', labelKey: 'admin.nav.webVitals', iconKey: 'Activity', defaultPath: '/web-vitals' },
 ];
 
 /**
- * Horizontal scrollable sub-navigation for admin sections with children.
- * Shows on mobile only (sm:hidden), sits below the page header.
- * Renders when inside /admin/content/* or /admin/system/* sub-pages.
+ * Horizontal scrollable sub-navigation for admin buckets that have children.
+ * Mobile only (sm:hidden), sits below the page header. Driven by the shared
+ * ADMIN_BUCKET_CHILDREN so it never drifts from the sidebar/bottom-nav IA.
  */
 export function AdminSubNav() {
   const pathname = usePathname();
@@ -41,17 +28,28 @@ export function AdminSubNav() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const basePath = `/${language}/admin`;
-  const cleanPath = pathname.replace(basePath, '');
+  const cleanPath = pathname.startsWith(basePath)
+    ? pathname.slice(basePath.length)
+    : pathname;
 
-  // Determine which section we're in
-  let items: SubNavItem[] | null = null;
-  if (cleanPath.startsWith('/content') || CONTENT_ITEMS.some(i => cleanPath === i.path || cleanPath.startsWith(i.path + '/'))) {
-    items = CONTENT_ITEMS;
-  } else if (cleanPath.startsWith('/system') || SYSTEM_ITEMS.some(i => cleanPath === i.path || cleanPath.startsWith(i.path + '/'))) {
+  const activeTab = getActiveAdminTab(cleanPath);
+
+  // Resolve which leaf set to show.
+  let items: AdminNavLeaf[] | null = null;
+  if (activeTab && ADMIN_BUCKET_CHILDREN[activeTab]) {
+    items = ADMIN_BUCKET_CHILDREN[activeTab];
+  } else if (
+    cleanPath === '/system' ||
+    cleanPath.startsWith('/system/') ||
+    cleanPath === '/web-vitals'
+  ) {
     items = SYSTEM_ITEMS;
   }
 
-  // Auto-scroll active item into view
+  const isActive = (itemPath: string) =>
+    cleanPath === itemPath || cleanPath.startsWith(itemPath + '/');
+
+  // Auto-scroll active item into view.
   useEffect(() => {
     if (!scrollRef.current || !items) return;
     const active = scrollRef.current.querySelector('[data-active="true"]');
@@ -62,29 +60,25 @@ export function AdminSubNav() {
 
   if (!items) return null;
 
-  const isActive = (itemPath: string) => {
-    return cleanPath === itemPath || cleanPath.startsWith(itemPath + '/');
-  };
-
   return (
-    <div className="sm:hidden bg-neo-navy/80 border-b border-slate-700/50 sticky top-0 z-40">
+    <div className="sm:hidden bg-neo-navy/80 border-b border-slate-700/50 sticky top-0 z-30">
       <div
         ref={scrollRef}
         className="flex gap-1.5 px-3 py-2 overflow-x-auto scrollbar-hide"
       >
         {items.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
+          const Icon = getAdminNavIcon(item.iconKey);
+          const active = isActive(item.defaultPath);
           return (
             <button
               key={item.key}
               data-active={active}
-              onClick={() => router.push(`${basePath}${item.path}`)}
+              onClick={() => router.push(`${basePath}${item.defaultPath}`)}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors shrink-0',
                 active
                   ? 'bg-neo-lime/20 text-neo-lime border border-neo-lime/40'
-                  : 'bg-neo-navy-light text-slate-400 border border-slate-700 active:bg-neo-navy-elevated'
+                  : 'bg-neo-navy-light text-slate-400 border border-slate-700 active:bg-neo-navy-elevated',
               )}
             >
               <Icon className="w-3.5 h-3.5" />

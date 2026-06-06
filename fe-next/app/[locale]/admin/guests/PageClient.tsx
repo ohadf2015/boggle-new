@@ -14,6 +14,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
+import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 
 export default function GuestsPageClient() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function GuestsPageClient() {
       isRTL && 'rtl',
     )}>
       <Header />
-
+      <AdminSubNav />
       <div className="flex flex-1">
         <AdminSidebar />
 

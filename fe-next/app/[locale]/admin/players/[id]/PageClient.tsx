@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
+import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Loader } from '@/components/ui/Loader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -84,6 +85,7 @@ export default function PlayerDetailPageClient({ playerId }: Props) {
   return (
     <div className={cn('flex-1 flex flex-col bg-neo-navy w-full overflow-x-hidden min-h-screen', isRTL && 'rtl')}>
       <Header />
+      <AdminSubNav />
       <div className="flex flex-1">
         <AdminSidebar />
         <main className="flex-1 min-w-0 px-4 py-6 sm:px-6 lg:px-8 pb-20 sm:pb-6">

@@ -7245,6 +7245,8 @@ const he = {
       "wikipediaWords": "מילות ויקיפדיה",
       "wordBank": "בנק מילים",
       "webVitals": "ביצועי אתר",
+      "guests": "אורחים",
+      "exitToSite": "יציאה לאתר",
       "email": "אימייל",
       "milogWords": "מילים ממילוג",
       "teacherAccess": "גישת מורה"
@@ -7301,6 +7303,8 @@ const he = {
       "moderation": "מודרציה",
       "content": "תוכן",
       "puzzleReview": "סקירת חידות",
+      "people": "אנשים",
+      "more": "עוד",
       "players": "שחקנים",
       "guests": "אורחים",
       "system": "מערכת",

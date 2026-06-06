@@ -18,6 +18,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
+import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 import { Loader } from '@/components/ui/Loader';
 
 interface GuestProfile {
@@ -196,7 +197,7 @@ export default function GuestDetailPageClient() {
       isRTL && 'rtl',
     )}>
       <Header />
-
+      <AdminSubNav />
       <div className="flex flex-1">
         <AdminSidebar />
 

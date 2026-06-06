@@ -10,6 +10,7 @@ import { CuratorAssignForm } from '@/components/curator/CuratorAssignForm';
 import { CuratorProposalsInbox } from '@/components/curator/CuratorProposalsInbox';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
+import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 
 interface CuratorRow {
   curator_id: string;
@@ -84,6 +85,7 @@ export default function CuratorAdminPageClient() {
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-neo-navy">
       <Header />
+      <AdminSubNav />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
         <h1 className="text-3xl font-neo-display text-neo-white">{t('curator.admin.title')}</h1>
 

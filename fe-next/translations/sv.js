@@ -7292,6 +7292,8 @@ const sv = {
       "wikipediaWords": "Wikipedia-ord",
       "wordBank": "Ordbank",
       "webVitals": "Webbprestanda",
+      "guests": "Gäster",
+      "exitToSite": "Lämna adminläget",
       "email": "E-post",
       "milogWords": "Milog-ord",
       "teacherAccess": "Lärargång"
@@ -7325,6 +7327,8 @@ const sv = {
       "moderation": "Moderering",
       "content": "Innehåll",
       "puzzleReview": "Pusselgranskning",
+      "people": "Personer",
+      "more": "Mer",
       "players": "Spelare",
       "guests": "Gäster",
       "system": "System",

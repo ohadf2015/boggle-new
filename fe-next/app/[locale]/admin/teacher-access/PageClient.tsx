@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
 import { AdminSidebar } from '@/components/admin/sidebar/AdminSidebar';
 import { AdminBottomNav } from '@/components/admin/sidebar/AdminBottomNav';
+import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 import { TeacherAccessQueue } from '@/components/admin/TeacherAccessQueue';
 
 export function PageClient() {
@@ -28,6 +29,7 @@ export function PageClient() {
   return (
     <div className={cn('flex-1 flex flex-col w-full overflow-x-hidden min-h-screen bg-neo-navy text-neo-white', isRTL && 'rtl')}>
       <Header />
+      <AdminSubNav />
       <div className="flex flex-1">
         <AdminSidebar />
         <main className="flex-1 min-w-0 pb-20 sm:pb-6">

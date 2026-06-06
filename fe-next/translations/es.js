@@ -7236,6 +7236,8 @@ const es = {
       "wikipediaWords": "Palabras Wikipedia",
       "wordBank": "Banco de Palabras",
       "webVitals": "Rendimiento Web",
+      "guests": "Invitados",
+      "exitToSite": "Salir del panel",
       "email": "Correo",
       "milogWords": "Palabras Milog",
       "teacherAccess": "Acceso de maestro"
@@ -7269,6 +7271,8 @@ const es = {
       "moderation": "Moderación",
       "content": "Contenido",
       "puzzleReview": "Revisión de acertijos",
+      "people": "Personas",
+      "more": "Más",
       "players": "Jugadores",
       "guests": "Invitados",
       "system": "Sistema",

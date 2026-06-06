@@ -13011,6 +13011,8 @@ const en = {
       "invalidWords": "Invalid Words",
       "milogWords": "Milog Words",
       "webVitals": "Web Vitals",
+      "guests": "Guests",
+      "exitToSite": "Exit to site",
       "wikipediaWords": "Wikipedia Words",
       "wordBank": "Word Bank",
       "teacherAccess": "Teacher Access"
@@ -13067,6 +13069,8 @@ const en = {
       "analytics": "Analytics",
       "content": "Content",
       "puzzleReview": "Puzzle Review",
+      "people": "People",
+      "more": "More",
       "moderation": "Moderation",
       "overview": "Overview",
       "players": "Players",

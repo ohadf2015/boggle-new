@@ -7313,6 +7313,8 @@ const ja = {
       "wikipediaWords": "Wikipedia単語",
       "wordBank": "単語バンク",
       "webVitals": "Webパフォーマンス",
+      "guests": "ゲスト",
+      "exitToSite": "サイトに戻る",
       "email": "メール",
       "milogWords": "Milog辞書",
       "teacherAccess": "先生アクセス"
@@ -7346,6 +7348,8 @@ const ja = {
       "moderation": "モデレーション",
       "content": "コンテンツ",
       "puzzleReview": "パズルレビュー",
+      "people": "ユーザー",
+      "more": "その他",
       "players": "プレイヤー",
       "guests": "ゲスト",
       "system": "システム",
