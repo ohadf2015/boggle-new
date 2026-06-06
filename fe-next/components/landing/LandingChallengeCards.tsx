@@ -13,6 +13,8 @@ import { useUserStats } from '@/hooks/useUserStats';
 import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { requiresNetworkToPlay } from '@/lib/offline/landingOfflineAwareness';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 
 interface DailyChallengePreloadedStats {
@@ -93,6 +95,11 @@ export function LandingChallengeCards({
   dailyChallengeStats,
   cardOrder: cardOrderProp,
 }: LandingChallengeCardsProps) {
+  // Offline-aware home: when the device is offline, live-multiplayer cards are
+  // shown locked so a player on a flight doesn't tap into a dead lobby. Every
+  // other landing mode is solo / offline-capable. SSR-safe (true on server).
+  const isOffline = !useOnlineStatus();
+
   // Synchronous init from localStorage — avoids post-mount card reorder CLS
   const [isFirstTimer] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -221,6 +228,8 @@ export function LandingChallengeCards({
               playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
               highlighted={isFirstTimer && !isNewbie && !practiceWinsHighlight}
               highlightLabel={isFirstTimer && !isNewbie && !practiceWinsHighlight ? t('onboarding.welcome.startHere') : undefined}
+              locked={isOffline && requiresNetworkToPlay('arena')}
+              lockedMessage={t('landing.offlineLocked')}
               onClick={() => { trackModeSelected('arena', 'home'); trackLandingCtaClick('mode_card', { mode: 'arena', variant: 'pink' }); }}
             />
           </div>
@@ -436,6 +445,8 @@ export function LandingChallengeCards({
               icon={<PartyPopper className="w-6 h-6" />}
               variant="pink"
               badge="ADMIN"
+              locked={isOffline && requiresNetworkToPlay('party')}
+              lockedMessage={t('landing.offlineLocked')}
               onClick={() => { trackLandingCtaClick('mode_card', { mode: 'party', variant: 'pink' }); }}
             />
           </div>

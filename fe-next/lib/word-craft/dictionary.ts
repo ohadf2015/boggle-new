@@ -32,6 +32,78 @@ function addDictKeys(set: Set<string>, raw: string, locale: SupportedLocale): vo
   }
 }
 
+/** Injectable dependencies — real callers use the browser defaults. */
+export interface WordListDeps {
+  fetchFn?: typeof fetch
+  storage?: Pick<Storage, 'getItem' | 'setItem'>
+}
+
+function wordCacheKey(locale: SupportedLocale): string {
+  return `lex_wc_dict_${locale}`
+}
+
+function defaultStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) return window.localStorage
+  } catch {
+    // localStorage can throw in privacy mode / sandboxed iframes — treat as absent.
+  }
+  return null
+}
+
+function readCachedWordList(
+  storage: Pick<Storage, 'getItem' | 'setItem'> | null,
+  locale: SupportedLocale,
+): string[] {
+  if (!storage) return []
+  try {
+    const raw = storage.getItem(wordCacheKey(locale))
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as string[]) : []
+  } catch {
+    return []
+  }
+}
+
+/**
+ * Fetch the server-hosted wordlist for locales without a bundled npm package
+ * (HE / ES / JA, and SV fallback), with an offline-first localStorage cache:
+ *  - On a successful fetch, the word array is persisted so a later flight works.
+ *  - On a non-OK status, a thrown fetch (offline), or any error, the last cached
+ *    copy is returned instead of an empty Set (which would reject every word).
+ * Returns [] only when offline AND nothing was ever cached.
+ */
+export async function loadServerWordList(
+  locale: SupportedLocale,
+  deps: WordListDeps = {},
+): Promise<string[]> {
+  const fetchFn = deps.fetchFn ?? (typeof fetch !== 'undefined' ? fetch : undefined)
+  const storage = deps.storage ?? defaultStorage()
+
+  if (!fetchFn) return readCachedWordList(storage, locale)
+
+  try {
+    const resp = await fetchFn(`/api/word-craft/wordlist?locale=${locale}`)
+    if (!resp.ok) {
+      console.warn(`[loadWordCraftDictionary] Failed to load ${locale}: ${resp.status} — using cache`)
+      return readCachedWordList(storage, locale)
+    }
+    const words = (await resp.json()) as string[]
+    if (storage && Array.isArray(words)) {
+      try {
+        storage.setItem(wordCacheKey(locale), JSON.stringify(words))
+      } catch {
+        // Quota / privacy mode — caching is best-effort.
+      }
+    }
+    return words
+  } catch {
+    console.warn(`[loadWordCraftDictionary] Network error loading ${locale} — using cache`)
+    return readCachedWordList(storage, locale)
+  }
+}
+
 export async function loadWordCraftDictionary(locale: SupportedLocale): Promise<Set<string>> {
   const out = new Set<string>()
 
@@ -58,13 +130,8 @@ export async function loadWordCraftDictionary(locale: SupportedLocale): Promise<
     }
   }
 
-  // For HE / ES / JA / SV (fallback), fetch from server
-  const resp = await fetch(`/api/word-craft/wordlist?locale=${locale}`)
-  if (!resp.ok) {
-    console.warn(`[loadWordCraftDictionary] Failed to load ${locale}: ${resp.status}`)
-    return out
-  }
-  const words = (await resp.json()) as string[]
+  // For HE / ES / JA / SV (fallback), fetch from server — offline-first (cached).
+  const words = await loadServerWordList(locale)
   for (const w of words) addDictKeys(out, w, locale)
   return out
 }

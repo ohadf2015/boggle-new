@@ -5112,6 +5112,7 @@ const sv = {
     "moreGameModesHint": "Tryck för att utforska",
     "arena": "Multiplayer",
     "arenaDesc": "Spela ensam eller utmana vänner!",
+    "offlineLocked": "Kräver internet",
     "quickPlay": "Snabbspel",
     "quickPlayDesc": "Hoppa in — slumpläge mot bottar",
     "practice": "Träning",
@@ -11304,7 +11305,11 @@ const sv = {
       "playablePrompt": "Ingen internet? Du kan ändå spela:",
       "playBlast": "Blast",
       "playConnections": "Connections",
-      "playDaily": "Daglig ordjakt"
+      "playDaily": "Daglig ordjakt",
+      "playAdventure": "Äventyr",
+      "playBrain": "Hjärnträning",
+      "playClassic": "Klassisk",
+      "playWordCraft": "WordCraft"
     }
   },
   "system": {
@@ -12611,6 +12616,12 @@ const sv = {
     },
     "gameOver": "Spelet är slut",
     "winnerLabel": "{{name}} vinner!",
+    "playAgain": "Spela igen",
+    "home": "Hem",
+    "finalTiles": "Sista brickorna!",
+    "difficulty": { "label": "Svårighetsgrad", "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
+    "clue": { "button": "Ledtråd", "reveal": "Prova: {{word}}", "none": "Inget drag hittat — prova att byta", "granted": "+1 ledtråd!", "adFailed": "Annons otillgänglig — försök igen" },
+    "modifier": { "bingo_bonanza": "Bingo-bonanza", "long_words": "Långa ord", "rich_letters": "Dyra brickor", "none": "", "desc": { "bingo_bonanza": "Bingo ger +90", "long_words": "Ord med 5+ bokstäver +15", "rich_letters": "Sällsynta brickor räknas dubbelt" } },
     "newBest": "Nytt rekord!",
     "bagRemaining": "Påse",
     "yourRack": "Ditt ställ",

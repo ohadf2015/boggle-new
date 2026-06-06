@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { wordCraftReducer, buildInitialState } from '../useWordCraftGame';
+import { remaining } from '../tileBag';
 
 describe('wordCraftReducer RESET', () => {
   it('replaces state with a fresh game in the new locale + board size', () => {
@@ -45,5 +46,24 @@ describe('wordCraftReducer RESET', () => {
     expect(next.pendingPlacements).toEqual([]);
     expect(next.lastError).toBeNull();
     expect(next.heat).toBe(0);
+  });
+
+  it('preserves the viewport-scaled bag size across RESET (play-again keeps the tight solo bag)', () => {
+    // A phone game starts with a 54-tile bag (size 11). After both racks are
+    // drawn (14 tiles) the bag holds 40. A RESET that carried no viewportDims
+    // used to fall back to the full 100-tile default bag — the bug this guards.
+    const start = buildInitialState({ seed: 1, locale: 'en', viewportDims: { size: 11, bagSize: 54 } });
+    expect(remaining(start.bag)).toBe(54 - 14);
+
+    const next = wordCraftReducer(start, {
+      type: 'RESET',
+      seed: 99,
+      locale: 'en',
+      boardSize: 15,
+      viewportDims: { size: 11, bagSize: 54 },
+    });
+
+    expect(next.board.cells.length).toBe(11);
+    expect(remaining(next.bag)).toBe(54 - 14);
   });
 });

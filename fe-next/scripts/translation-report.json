@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 5579,
+    "totalKeysInCode": 5602,
     "keyCountByLanguage": {
-      "en": 10494,
-      "he": 10592,
-      "sv": 10595,
-      "ja": 10583,
-      "es": 10619
+      "en": 10542,
+      "he": 10640,
+      "sv": 10643,
+      "ja": 10631,
+      "es": 10667
     },
-    "missingFromEnglish": 35,
+    "missingFromEnglish": 37,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 23,
@@ -619,11 +619,29 @@
       ]
     },
     {
-      "key": "lobby.emote.title",
+      "key": "wordcraft.clue.adFailed",
       "usages": [
         {
-          "file": "player/components/PlayerWaitingView.tsx",
-          "line": 372
+          "file": "app/[locale]/word-craft/PageClient.tsx",
+          "line": 458
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.clue.granted",
+      "usages": [
+        {
+          "file": "app/[locale]/word-craft/PageClient.tsx",
+          "line": 464
+        }
+      ]
+    },
+    {
+      "key": "wordcraft.clue.none",
+      "usages": [
+        {
+          "file": "app/[locale]/word-craft/PageClient.tsx",
+          "line": 451
         }
       ]
     }

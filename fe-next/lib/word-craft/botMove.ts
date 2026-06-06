@@ -1,6 +1,7 @@
 import type { PlacedTile, RackTile, Direction } from './types';
 import { getCenter, getCell, isFirstMove, isInBounds, type Board } from './board';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
+import type { ScoreModifierSpec } from './scoring';
 
 export interface BotMove {
   placements: PlacedTile[];
@@ -28,6 +29,12 @@ export interface FindBotMoveOptions {
   skillVariance?: number;
   /** Injectable RNG (returns [0,1)) so difficulty selection is testable. */
   rng?: () => number;
+  /**
+   * Active per-game scoring modifier. Passed through to `validateAndScoreMove`
+   * so the bot ranks candidates under the SAME scoring rules the player plays
+   * by — otherwise the bot would mis-value words under a live modifier.
+   */
+  scoreModifier?: ScoreModifierSpec;
 }
 
 // Bot considers permutations of its 7-tile rack up to length 7. Earlier
@@ -143,7 +150,7 @@ export function findBestBotMove(
             if (!coversCenter) continue;
           }
           const placements = placementsFromCandidate(tiles, r, c, direction);
-          const result = validateAndScoreMove(board, placements, isWordValid);
+          const result = validateAndScoreMove(board, placements, isWordValid, options.scoreModifier);
           if (!result.ok || result.score === undefined) continue;
           const bonus = options.extraScore
             ? options.extraScore(placements, result.words?.map((w) => w.cells) ?? [])

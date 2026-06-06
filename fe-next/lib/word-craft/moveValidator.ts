@@ -1,6 +1,6 @@
 import type { PlacedTile, ScoringTile, Direction } from './types';
 import { getCenter, getCell, isFirstMove, isInBounds, type Board } from './board';
-import { scoreWord, scoreTurn, BINGO_THRESHOLD } from './scoring';
+import { scoreWord, scoreTurn, BINGO_THRESHOLD, type ScoreModifierSpec } from './scoring';
 
 export type MoveError =
   | 'NO_TILES'
@@ -180,6 +180,7 @@ export function validateAndScoreMove(
   board: Board,
   placements: PlacedTile[],
   isWordValid: DictionaryCheck,
+  modifier?: ScoreModifierSpec,
 ): MoveResult {
   if (placements.length === 0) return fail('NO_TILES');
   for (const p of placements) {
@@ -253,6 +254,7 @@ export function validateAndScoreMove(
   const score = scoreTurn(
     allWords.map((w) => w.tiles),
     placements.length,
+    modifier,
   );
   const bingo = placements.length >= BINGO_THRESHOLD;
   return { ok: true, words: allWords, score, bingo };

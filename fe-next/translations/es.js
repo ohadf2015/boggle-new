@@ -5059,6 +5059,7 @@ const es = {
     "moreGameModesHint": "Toca para explorar",
     "arena": "Multijugador",
     "arenaDesc": "¡Juega solo o desafía amigos!",
+    "offlineLocked": "Necesita internet",
     "quickPlay": "Juego Rápido",
     "quickPlayDesc": "Entra ya — modo aleatorio vs bots",
     "practice": "Práctica",
@@ -11286,7 +11287,11 @@ const es = {
       "playablePrompt": "¿Sin internet? Aún puedes jugar:",
       "playBlast": "Blast",
       "playConnections": "Conexiones",
-      "playDaily": "Caza de Palabras Diaria"
+      "playDaily": "Caza de Palabras Diaria",
+      "playAdventure": "Aventura",
+      "playBrain": "Entrenamiento Mental",
+      "playClassic": "Clásico",
+      "playWordCraft": "WordCraft"
     }
   },
   "system": {
@@ -12612,6 +12617,12 @@ const es = {
     },
     "gameOver": "Fin del juego",
     "winnerLabel": "¡{{name}} gana!",
+    "playAgain": "Jugar de nuevo",
+    "home": "Inicio",
+    "finalTiles": "¡Últimas fichas!",
+    "difficulty": { "label": "Dificultad", "easy": "Fácil", "medium": "Media", "hard": "Difícil" },
+    "clue": { "button": "Pista", "reveal": "Prueba: {{word}}", "none": "Sin jugada — prueba a cambiar fichas", "granted": "¡+1 pista!", "adFailed": "Anuncio no disponible — reinténtalo" },
+    "modifier": { "bingo_bonanza": "Fiesta de bingos", "long_words": "Palabras largas", "rich_letters": "Fichas valiosas", "none": "", "desc": { "bingo_bonanza": "Los bingos suman +90", "long_words": "Palabras de 5+ letras +15", "rich_letters": "Las fichas raras valen el doble" } },
     "newBest": "¡Nuevo récord!",
     "bagRemaining": "Bolsa",
     "yourRack": "Tu atril",

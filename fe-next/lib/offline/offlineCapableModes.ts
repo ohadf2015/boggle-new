@@ -3,14 +3,23 @@
  *
  * Consumed by:
  *  - NetworkStatusHandler (route-aware offline gate — render game vs. fallback)
- *  - OfflineLauncher (which modes to offer when offline)
+ *  - OfflineFallback       (which modes to offer when offline)
  *  - service-worker precache list (which route shells to cache for cold start)
  *
- * Keep this list conservative: a mode belongs here only if its gameplay needs
- * no live server (bundled data + offline dict + queued score submission).
+ * A mode belongs here only if its gameplay needs no live server: bundled data
+ * (+ offline dict where words are validated) and queued score submission.
+ *
  *  - blast        — engine validates against bundled level.words (+ offline dict for bonus)
  *  - connections  — puzzles load from bundled lib/connections/puzzles/generated/*
- *  - daily        — Daily Word Hunt; bundled/prefetched puzzle + offline dict
+ *  - daily        — Daily Word Hunt / Word Wheel; bundled/prefetched puzzle + offline dict
+ *  - adventure    — bundled level configs (lib/adventure) + cached→default progression +
+ *                   offline completion queue (lib/adventure/offlineCompletionQueue)
+ *  - brain        — 5 drills generate boards client-side; hub degrades gracefully offline
+ *  - singleplayer — classic solo boggle; client-generated board + bundled/offline dict.
+ *                   The BARE route 308-redirects to multiplayer, so the offline entry is
+ *                   the preserved `?practice=1` path (see app/[locale]/singleplayer).
+ *  - word-craft   — client-side tile game; EN/SV dicts bundled, HE/ES/JA dict cached after
+ *                   one online load (see lib/word-craft/dictionary localStorage cache).
  *
  * NOTE: Crossword is offline-PLAYABLE (bundled puzzles + localStorage resume need no network
  * once loaded) but is intentionally NOT listed here. It's an admin-only `force-dynamic` route
@@ -20,7 +29,43 @@
 
 import { locales } from '@/i18n/config';
 
-export const OFFLINE_CAPABLE_MODES = ['blast', 'connections', 'daily'] as const;
+/**
+ * Metadata for one offline-capable mode. `segment` is the first route segment
+ * (after the locale); `entry()` builds the full href used by the launcher and
+ * the SW precache list — it may include a query string (e.g. ?practice=1) when
+ * the bare route would redirect.
+ */
+export interface OfflineMode {
+  /** First route segment after the locale, e.g. 'blast'. */
+  segment: string;
+  /** i18n key for the OfflineFallback launcher button. */
+  labelKey: string;
+  /** Full href to open the mode in a given locale. */
+  entry: (locale: string) => string;
+}
+
+const localePath =
+  (segment: string) =>
+  (locale: string): string =>
+    `/${locale}/${segment}`;
+
+export const OFFLINE_MODES: readonly OfflineMode[] = [
+  { segment: 'blast', labelKey: 'native.offline.playBlast', entry: localePath('blast') },
+  { segment: 'connections', labelKey: 'native.offline.playConnections', entry: localePath('connections') },
+  { segment: 'daily', labelKey: 'native.offline.playDaily', entry: localePath('daily') },
+  { segment: 'adventure', labelKey: 'native.offline.playAdventure', entry: localePath('adventure') },
+  { segment: 'brain', labelKey: 'native.offline.playBrain', entry: localePath('brain') },
+  {
+    segment: 'singleplayer',
+    labelKey: 'native.offline.playClassic',
+    // Bare /singleplayer redirects to multiplayer; ?practice=1 opens the solo game.
+    entry: (locale) => `/${locale}/singleplayer?practice=1`,
+  },
+  { segment: 'word-craft', labelKey: 'native.offline.playWordCraft', entry: localePath('word-craft') },
+] as const;
+
+/** Segment list — preserved for backward compatibility with existing callers. */
+export const OFFLINE_CAPABLE_MODES = OFFLINE_MODES.map((m) => m.segment);
 
 export type OfflineCapableMode = (typeof OFFLINE_CAPABLE_MODES)[number];
 
@@ -50,14 +95,15 @@ export function isOfflineCapable(pathname: string): boolean {
 }
 
 /**
- * Concrete locale-prefixed paths for every offline-capable mode.
- * Used to build the service-worker precache list (locales × modes).
+ * Concrete locale-prefixed entry hrefs for every offline-capable mode.
+ * Used to build the service-worker precache list (locales × modes). Includes
+ * query strings where the bare route would redirect (e.g. singleplayer).
  */
 export function offlineCapableRoutes(): string[] {
   const routes: string[] = [];
   for (const loc of locales) {
-    for (const mode of OFFLINE_CAPABLE_MODES) {
-      routes.push(`/${loc}/${mode}`);
+    for (const mode of OFFLINE_MODES) {
+      routes.push(mode.entry(loc));
     }
   }
   return routes;

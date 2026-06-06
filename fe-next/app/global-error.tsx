@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { Sparkles, RefreshCw } from "lucide-react";
 import type { Language } from "@/types";
 
 function isChunkLoadError(error: Error): boolean {
@@ -36,6 +35,17 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // Detect locale from URL path (e.g. /he/...) or fallback to 'en'
+  const detectedLocale = (() => {
+    try {
+      const match = window.location.pathname.match(/^\/(he|en|sv|ja|es)\b/);
+      return (match?.[1] as Language) || 'en';
+    } catch {
+      return 'en' as Language;
+    }
+  })();
+  const isRTL = detectedLocale === 'he';
+
   useEffect(() => {
     // Auto-refresh on chunk load errors (stale deployment cache)
     if (isChunkLoadError(error)) {
@@ -54,6 +64,9 @@ export default function GlobalError({
         errorBoundary: {
           type: "global-error",
           digest: error.digest,
+          isChunkError: isChunkLoadError(error),
+          locale: detectedLocale,
+          path: (() => { try { return window.location.pathname; } catch { return undefined; } })(),
         },
       });
     });
@@ -64,18 +77,7 @@ export default function GlobalError({
         digest: error.digest ?? "",
       });
     });
-  }, [error]);
-
-  // Detect locale from URL path (e.g. /he/...) or fallback to 'en'
-  const detectedLocale = (() => {
-    try {
-      const match = window.location.pathname.match(/^\/(he|en|sv|ja|es)\b/);
-      return (match?.[1] as Language) || 'en';
-    } catch {
-      return 'en' as Language;
-    }
-  })();
-  const isRTL = detectedLocale === 'he';
+  }, [error, detectedLocale]);
 
   const t = (path: string): string => {
     const fallbacks: Record<string, Record<string, string>> = {
@@ -102,8 +104,11 @@ export default function GlobalError({
       <body className="antialiased">
         <div className="min-h-screen flex items-center justify-center p-6 bg-linear-to-br from-cyan-50 via-lime-50 to-cyan-100">
           <div className="max-w-xl w-full text-center p-8 neo-card bg-neo-cream text-neo-black rotate-[-1deg] animate-neo-pop">
-            {/* Floating icon with gentle animation */}
-            <div className="mb-6 animate-pulse flex justify-center"><Sparkles className="w-16 h-16 text-neo-cyan" /></div>
+            {/* Static emoji — this is the LAST-resort boundary; it must not depend
+                on any lazy/icon chunk that could itself be stale during a chunk error. */}
+            <div className="mb-6 animate-pulse flex justify-center" aria-hidden="true">
+              <span className="text-6xl leading-none select-none">✨</span>
+            </div>
 
             <h1 className="text-3xl font-black mb-4 uppercase tracking-wide text-neo-black font-neo-display">
               {t("errors.somethingWentWrong")}
@@ -119,7 +124,7 @@ export default function GlobalError({
                 className="btn-neo-primary px-6 py-3 text-lg"
                 aria-label={t("errors.refreshPage")}
               >
-                <RefreshCw className="w-5 h-5 inline-block me-1" /> {t("errors.refreshPage")}
+                <span aria-hidden="true" className="me-1">🔄</span> {t("errors.refreshPage")}
               </button>
               <button
                 onClick={() => (window.location.href = "/")}

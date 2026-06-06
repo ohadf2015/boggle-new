@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { translations } from '../../translations';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 
 function isChunkLoadError(error: Error): boolean {
   const message = error.message?.toLowerCase() || '';
@@ -101,9 +100,15 @@ export default function Error({
         type: 'page-error',
         digest: error.digest,
         isChunkError: isChunkLoadError(error),
+        // Tag the locale + route so cross-[locale] navigation failures (the
+        // language-switch "black screen" class) are diagnosable. This effect
+        // only runs because the fallback below is dependency-free and always
+        // renders — a heavy fallback that crashed here would also lose telemetry.
+        locale,
+        path: typeof window !== 'undefined' ? window.location.pathname : undefined,
       },
     });
-  }, [error]);
+  }, [error, locale]);
 
   const handleRefresh = () => {
     // For chunk errors, clear caches before reloading
@@ -119,20 +124,20 @@ export default function Error({
   return (
     <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
       <div className="neo-card max-w-lg w-full p-8 text-center animate-neo-pop rotate-[-1deg] bg-neo-cream border-4 border-neo-black shadow-hard-xl">
-        {/* Interactive Mascot - transparent variants render cleanly on cream card */}
-        <div className="mb-6 flex justify-center">
-          <InteractiveMascot
-            variant={isChunkError ? 'powerup' : 'cryingNobg'}
-            size="xl"
-            priority
-            fetchPriority="high"
-            enableHover
-            enableClick
-            hoverVariant={isChunkError ? 'mindblown' : 'encouraging'}
-            clickVariant={isChunkError ? 'celebration' : 'happy'}
-            clickAnimation={isChunkError ? 'spin' : 'shake'}
-            tooltip={isChunkError ? t('errors.refreshPage') : t('common.retry')}
-          />
+        {/*
+          Static, dependency-free icon. This is an error boundary fallback — it
+          renders precisely when chunks are broken (e.g. a stale-deploy
+          ChunkLoadError surfaced by a cross-[locale] language switch). It must
+          NOT pull a heavy/lazy chunk (the old animated mascot dragged in a
+          motion lib, next/image, video and the mascot data module): if that
+          chunk were also stale the fallback would throw, React cannot re-catch a
+          throw inside a boundary's own fallback, the tree unmounts → blank navy
+          "black screen". A plain emoji always renders.
+        */}
+        <div className="mb-6 flex justify-center" aria-hidden="true">
+          <span className="text-7xl leading-none animate-neo-pop select-none">
+            {isChunkError ? '✨' : '😵‍💫'}
+          </span>
         </div>
 
         <h2 className="text-3xl font-black text-neo-black mb-3 uppercase tracking-wide font-neo-display">

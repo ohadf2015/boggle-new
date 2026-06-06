@@ -5012,6 +5012,7 @@ const ja = {
     "moreGameModesHint": "タップして見る",
     "arena": "マルチプレイヤー",
     "arenaDesc": "ソロでもフレンドとでも！",
+    "offlineLocked": "インターネットが必要",
     "quickPlay": "クイックプレイ",
     "quickPlayDesc": "すぐ開始 — ボットとランダムモード",
     "practice": "練習",
@@ -11262,7 +11263,11 @@ const ja = {
       "playablePrompt": "オフラインでもプレイできます：",
       "playBlast": "ブラスト",
       "playConnections": "コネクションズ",
-      "playDaily": "デイリーワードハント"
+      "playDaily": "デイリーワードハント",
+      "playAdventure": "アドベンチャー",
+      "playBrain": "脳トレ",
+      "playClassic": "クラシック",
+      "playWordCraft": "ワードクラフト"
     }
   },
   "backToLobby": "ロビーに戻る",
@@ -12519,6 +12524,12 @@ const ja = {
     },
     "gameOver": "ゲーム終了",
     "winnerLabel": "{{name}}の勝ち!",
+    "playAgain": "もう一度",
+    "home": "ホーム",
+    "finalTiles": "最後のタイル!",
+    "difficulty": { "label": "難易度", "easy": "やさしい", "medium": "ふつう", "hard": "むずかしい" },
+    "clue": { "button": "ヒント", "reveal": "試して: {{word}}", "none": "手が見つかりません — 交換してみよう", "granted": "ヒント+1!", "adFailed": "広告を利用できません — もう一度" },
+    "modifier": { "bingo_bonanza": "ビンゴ祭り", "long_words": "ロングワード", "rich_letters": "高得点タイル", "none": "", "desc": { "bingo_bonanza": "ビンゴは+90点", "long_words": "5文字以上の語に+15", "rich_letters": "レアタイルは2倍" } },
     "newBest": "自己ベスト更新!",
     "bagRemaining": "袋",
     "yourRack": "あなたのラック",

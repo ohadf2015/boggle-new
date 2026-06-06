@@ -10,11 +10,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
+import { useAdMob } from '@/hooks/useAdMob';
+import { isNative } from '@/utils/platform';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
 import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
+import { WordCraftDifficultySelect } from '@/components/word-craft/WordCraftDifficultySelect';
+import { WordCraftModifierBanner } from '@/components/word-craft/WordCraftModifierBanner';
+import { DEFAULT_BOT_DIFFICULTY, isBotDifficulty, type BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import { WordCraftPlayFriendControl } from '@/components/word-craft/WordCraftPlayFriendControl';
 import { WordCraftCelebration, type CelebrationKind } from '@/components/word-craft/WordCraftCelebration';
 import { HeatMeter } from '@/components/word-craft/HeatMeter';
@@ -41,6 +46,8 @@ import { WordCraftHeatStamp } from '@/components/word-craft/WordCraftHeatStamp';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
 import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
+import { shouldCelebrateEnding } from '@/lib/word-craft/celebration/endingCelebration';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { inferAxis, resolveTap, type Axis } from '@/lib/word-craft/placement';
 import { resolveScoreboardOpponent } from '@/lib/word-craft/opponentIdentity';
 import { alphabetForLocale } from '@/lib/word-craft/wordCraftAlphabet';
@@ -165,8 +172,22 @@ export default function WordCraftPageClient() {
     return new URLSearchParams(window.location.search).get('vs') === 'human';
   }, []);
 
-  const game = useWordCraftGame({ seed, dict, locale, territoryEnabled, hotseat });
+  // Bot difficulty — persisted per device. Defaults to 'easy' (the bot was
+  // "too good"); the player can raise it from the topbar.
+  const [difficulty, setDifficulty] = useState<BotDifficulty>(DEFAULT_BOT_DIFFICULTY);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const saved = window.localStorage.getItem('wordcraft.difficulty');
+    if (isBotDifficulty(saved)) setDifficulty(saved);
+  }, []);
+  const changeDifficulty = useCallback((next: BotDifficulty) => {
+    setDifficulty(next);
+    if (typeof window !== 'undefined') window.localStorage.setItem('wordcraft.difficulty', next);
+  }, []);
+
+  const game = useWordCraftGame({ seed, dict, locale, territoryEnabled, hotseat, difficulty });
   const { cosyMode } = useAccessibility();
+  const prefersReducedMotion = useReducedMotion();
 
   // Audio: activates the SFX gate + in-game music on mount, fires heat-beat /
   // capture / game-over sounds as state transitions, and exposes playCommit for
@@ -408,6 +429,53 @@ export default function WordCraftPageClient() {
       }
     });
   }, [game, resetTurnTelemetry]);
+
+  // ── Clues ────────────────────────────────────────────────────────────────
+  // 2 free clues per game; once spent, watch a rewarded ad for one more (native
+  // only — on web we free-grant so there's never a dead button). A clue reveals
+  // the strongest word the player could play, shown as a transient pill.
+  const { showRewarded } = useAdMob();
+  const [clueReveal, setClueReveal] = useState<{ word: string; row: number; col: number } | null>(null);
+  const [clueMessage, setClueMessage] = useState<string | null>(null);
+  const clueTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showClue = useCallback(
+    (clue: { word: string; row: number; col: number } | null, message?: string) => {
+      if (clueTimerRef.current) clearTimeout(clueTimerRef.current);
+      setClueReveal(clue);
+      setClueMessage(message ?? null);
+      // Sparkle the suggested start cell so the eye is drawn to where to begin.
+      if (clue && !cosyMode && !prefersReducedMotion) {
+        requestAnimationFrame(() => {
+          const cell = document.querySelector(`[data-board-cell="${clue.row},${clue.col}"]`);
+          if (cell) juice.jokerSparkle(cell as Element);
+        });
+      }
+      // Auto-dismiss after a few seconds so it doesn't obscure the board.
+      clueTimerRef.current = setTimeout(() => { setClueReveal(null); setClueMessage(null); }, 6000);
+    },
+    [cosyMode, prefersReducedMotion, juice],
+  );
+  const handleClue = useCallback(() => {
+    if (game.state.cluesRemaining > 0) {
+      const clue = game.requestClue();
+      if (clue) showClue(clue);
+      else showClue(null, t('wordcraft.clue.none'));
+      return;
+    }
+    // Out of clues → earn one more.
+    if (isNative()) {
+      showRewarded(
+        () => game.grantClue(),
+        () => setClueMessage(t('wordcraft.clue.adFailed')),
+        { surface: 'generic' },
+      );
+    } else {
+      // Web has no rewarded inventory; grant directly (wordlists are public).
+      game.grantClue();
+      setClueMessage(t('wordcraft.clue.granted'));
+    }
+  }, [game, showClue, showRewarded, t]);
+  useEffect(() => () => { if (clueTimerRef.current) clearTimeout(clueTimerRef.current); }, []);
 
   // Keyboard shortcuts and arrow-key reticle (declared AFTER the callbacks it consumes)
   const { reticle } = useWordCraftKeyboardShortcuts({
@@ -698,8 +766,18 @@ export default function WordCraftPageClient() {
   useEffect(() => {
     if (game.state.turn === 'over') {
       setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
-      // Fire Pixi game over burst
-      if (sceneCtx) {
+      // Fire Pixi game over burst — only on a WIN (never a loss/tie), and never
+      // under cosy/reduced-motion. Confetti on a loss reads as mocking.
+      if (
+        sceneCtx &&
+        shouldCelebrateEnding({
+          playerScore: game.state.player.score,
+          botScore: game.state.bot.score,
+          hotseat,
+          cosyMode,
+          reducedMotion: prefersReducedMotion,
+        })
+      ) {
         playGameOverBurst(sceneCtx).catch(() => {
           // Pixi animations can fail on low-end devices; silently continue
         });
@@ -728,7 +806,7 @@ export default function WordCraftPageClient() {
       setNewBest(false);
       setDuelOutcome(null);
     }
-  }, [game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, playNewBest, duel, t]);
+  }, [game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, game.state.bot.score, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
 
   // --- Error shake ---
   const lastErrorRef = useRef<string | null>(null);
@@ -844,6 +922,10 @@ export default function WordCraftPageClient() {
             {t('wordcraft.title')}
           </h1>
           <div className="flex-1" />
+          {/* Bot difficulty — only meaningful vs the auto-bot (not hot-seat/duel). */}
+          {!hotseat ? (
+            <WordCraftDifficultySelect value={difficulty} onChange={changeDifficulty} t={t} />
+          ) : null}
           {/* Play-vs-friend — compact topbar affordance + popover. Solo only;
               hotseat is already pass-&-play and duels already have an opponent. */}
           {!hotseat && !duel ? (
@@ -894,6 +976,9 @@ export default function WordCraftPageClient() {
             }}
           />
         </div>
+
+        {/* Per-game twist (scoring modifier). Hidden for the 'none' baseline. */}
+        <WordCraftModifierBanner modifier={game.state.modifier} t={t} />
 
         {!dict ? (
           <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
@@ -1056,6 +1141,17 @@ export default function WordCraftPageClient() {
           locale={locale}
         />
 
+        {(clueReveal || clueMessage) ? (
+          <div
+            role="status"
+            className="self-center mb-1 px-3 py-1.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wide animate-neo-pop text-sm"
+          >
+            {clueReveal
+              ? t('wordcraft.clue.reveal').replace('{{word}}', clueReveal.word)
+              : clueMessage}
+          </div>
+        ) : null}
+
         <WordCraftControls
           canSubmit={game.state.pendingPlacements.length > 0 && !!dict && canInteract && !game.state.burnout}
           canRecall={game.state.pendingPlacements.length > 0}
@@ -1072,11 +1168,14 @@ export default function WordCraftPageClient() {
             playSwapSound();
             game.swap(toReturn);
           }}
+          onClue={hotseat ? undefined : handleClue}
+          cluesRemaining={game.state.cluesRemaining}
           labels={{
             submit: t('wordcraft.submit'),
             recall: t('wordcraft.recall'),
             pass: t('wordcraft.pass'),
             swap: t('wordcraft.swap'),
+            clue: t('wordcraft.clue.button'),
           }}
         />
 
@@ -1163,6 +1262,8 @@ export default function WordCraftPageClient() {
           currentLocale={locale}
           challengerName={challengerIdentity.name}
           challengerAvatar={challengerIdentity.avatar}
+          onPlayAgain={() => game.reset(Math.floor(Math.random() * 1_000_000))}
+          onHome={() => router.push(`/${language}`)}
         />
       ) : null}
     </div>

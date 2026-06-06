@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { WordCraftGameOverScene } from '../WordCraftGameOverScene';
 
 const t = (k: string, vars?: Record<string, unknown>) => {
@@ -93,6 +93,31 @@ describe('WordCraftGameOverScene', () => {
       <WordCraftGameOverScene t={t} playerScore={120} botScore={80} isNewBest />
     );
     expect(screen.getByText(/wordcraft.newBest/)).toBeTruthy();
+  });
+
+  describe('play-again / home closure loop', () => {
+    it('renders Play Again + Home CTAs and fires their handlers (the missing replay loop)', () => {
+      const onPlayAgain = vi.fn();
+      const onHome = vi.fn();
+      render(
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={120}
+          botScore={80}
+          onPlayAgain={onPlayAgain}
+          onHome={onHome}
+        />
+      );
+      fireEvent.click(screen.getByRole('button', { name: /playAgain/i }));
+      expect(onPlayAgain).toHaveBeenCalledTimes(1);
+      fireEvent.click(screen.getByRole('button', { name: /home/i }));
+      expect(onHome).toHaveBeenCalledTimes(1);
+    });
+
+    it('omits the CTAs when no handlers are supplied (e.g. duel/hot-seat contexts)', () => {
+      render(<WordCraftGameOverScene t={t} playerScore={50} botScore={50} />);
+      expect(screen.queryByRole('button', { name: /playAgain/i })).toBeNull();
+    });
   });
 
   describe('duel result', () => {

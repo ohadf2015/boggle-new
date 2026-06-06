@@ -6,16 +6,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { WifiOff, RefreshCw } from 'lucide-react';
-
-/**
- * Modes that stay playable with no network (bundled data + offline dict +
- * queued score sync). Mirrors OFFLINE_CAPABLE_MODES; labels are i18n keys.
- */
-const PLAYABLE_OFFLINE_MODES = [
-  { mode: 'blast', labelKey: 'native.offline.playBlast' },
-  { mode: 'connections', labelKey: 'native.offline.playConnections' },
-  { mode: 'daily', labelKey: 'native.offline.playDaily' },
-] as const;
+import { OFFLINE_MODES } from '@/lib/offline/offlineCapableModes';
 
 interface OfflineFallbackProps {
   /** Callback when retry button is clicked */
@@ -101,10 +92,10 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
           {t('native.offline.playablePrompt')}
         </p>
         <div className="flex flex-col gap-3">
-          {PLAYABLE_OFFLINE_MODES.map(({ mode, labelKey }) => (
+          {OFFLINE_MODES.map(({ segment, labelKey, entry }) => (
             <Link
-              key={mode}
-              href={`/${language}/${mode}`}
+              key={segment}
+              href={entry(language)}
               className="
                 flex items-center justify-center px-6 py-3
                 font-neo-body font-bold

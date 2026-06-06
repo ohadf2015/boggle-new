@@ -5122,6 +5122,7 @@ const he = {
     "sectionSoloSubtitle": "אימון, התקדמות, שיא אישי",
     "arena": "מולטיפלייר",
     "arenaDesc": "שחקו לבד או אתגרו חברים!",
+    "offlineLocked": "דורש אינטרנט",
     "quickPlay": "משחק מהיר",
     "quickPlayDesc": "קפצו פנימה — מצב אקראי נגד בוטים",
     "practice": "תרגול",
@@ -11533,7 +11534,11 @@ const he = {
       "playablePrompt": "אין אינטרנט? אפשר עדיין לשחק:",
       "playBlast": "בלאסט",
       "playConnections": "חיבורים",
-      "playDaily": "ציד מילים יומי"
+      "playDaily": "ציד מילים יומי",
+      "playAdventure": "הרפתקה",
+      "playBrain": "אימון מוח",
+      "playClassic": "קלאסי",
+      "playWordCraft": "וורדקראפט"
     }
   },
   "system": {
@@ -12974,6 +12979,12 @@ const he = {
     },
     "gameOver": "המשחק נגמר",
     "winnerLabel": "{{name}} ניצח!",
+    "playAgain": "שחק שוב",
+    "home": "בית",
+    "finalTiles": "אריחים אחרונים!",
+    "difficulty": { "label": "רמת קושי", "easy": "קל", "medium": "בינוני", "hard": "קשה" },
+    "clue": { "button": "רמז", "reveal": "נסה: {{word}}", "none": "לא נמצא מהלך — נסה להחליף", "granted": "‎+1 רמז!", "adFailed": "הפרסומת לא זמינה — נסה שוב" },
+    "modifier": { "bingo_bonanza": "בונוס בינגו", "long_words": "מילים ארוכות", "rich_letters": "אותיות יקרות", "none": "", "desc": { "bingo_bonanza": "בינגו שווה ‎+90", "long_words": "מילים מ‎-5 אותיות ‎+15", "rich_letters": "אותיות נדירות שוות כפול" } },
     "newBest": "שיא חדש!",
     "bagRemaining": "שק",
     "yourRack": "האותיות שלך",

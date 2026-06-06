@@ -61,6 +61,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/connections/play",
   "/contact",
   "/create/board",
+  "/crossword",
   "/curator",
   "/custom",
   "/daily",

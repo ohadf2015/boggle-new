@@ -236,6 +236,14 @@ export default function BrainTrainingPageClient() {
               {t('brain.errors.retry')}
             </button>
           </m.div>
+
+          {/* Offline graceful-degrade: the score API may be unreachable (e.g. on a
+              flight), but all 5 drills generate their boards client-side and
+              submit scores via the offline queue. Surface them so the hub never
+              dead-ends — the error notice above stays for context + retry. */}
+          <div className="mt-6">
+            <QuickDrillsSection drillProgress={drillProgress} />
+          </div>
         </div>
       </div>
     );

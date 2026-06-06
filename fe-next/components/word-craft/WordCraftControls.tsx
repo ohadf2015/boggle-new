@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Check, Undo2, SkipForward, Repeat } from 'lucide-react';
+import { Check, Undo2, SkipForward, Repeat, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface WordCraftControlsProps {
@@ -13,11 +13,16 @@ export interface WordCraftControlsProps {
   onRecall: () => void;
   onPass: () => void;
   onSwap: () => void;
+  /** Optional clue affordance. Omitted in hot-seat (no bot, no clues). */
+  onClue?: () => void;
+  /** Remaining free clues; 0 means the next tap offers a rewarded ad. */
+  cluesRemaining?: number;
   labels: {
     submit: string;
     recall: string;
     pass: string;
     swap: string;
+    clue?: string;
   };
 }
 
@@ -39,6 +44,8 @@ function WordCraftControlsImpl({
   onRecall,
   onPass,
   onSwap,
+  onClue,
+  cluesRemaining,
   labels,
 }: WordCraftControlsProps) {
   const submitLive = canSubmit && !disabled;
@@ -86,6 +93,36 @@ function WordCraftControlsImpl({
       >
         <Repeat className="w-5 h-5" strokeWidth={3} />
       </IconBtn>
+      {onClue ? (
+        <button
+          type="button"
+          onClick={onClue}
+          // Stays enabled at 0 clues so the tap can offer a rewarded ad.
+          disabled={disabled}
+          aria-label={labels.clue}
+          title={labels.clue}
+          className={cn(
+            'relative w-12 h-12 sm:w-14 sm:h-14 rounded-neo border-neo-thick border-black',
+            'bg-neo-cream text-neo-navy shadow-hard',
+            'flex items-center justify-center transition-all',
+            'active:translate-y-0.5 active:shadow-hard-pressed hover:bg-neo-cyan hover:text-neo-navy',
+            'disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-hard-pressed',
+          )}
+        >
+          <Lightbulb className="w-5 h-5" strokeWidth={3} />
+          <span
+            aria-hidden
+            className={cn(
+              'absolute -top-1.5 -end-1.5 min-w-[18px] h-[18px] px-1 rounded-full',
+              'flex items-center justify-center text-[11px] font-neo-display font-black',
+              'border-2 border-black',
+              (cluesRemaining ?? 0) > 0 ? 'bg-neo-lime text-neo-navy' : 'bg-neo-pink text-white',
+            )}
+          >
+            {(cluesRemaining ?? 0) > 0 ? cluesRemaining : '+'}
+          </span>
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { OfflineFallback } from '../OfflineFallback';
+import { OFFLINE_MODES } from '@/lib/offline/offlineCapableModes';
 
 const { mockLang } = vi.hoisted(() => ({ mockLang: { current: 'en', dir: 'ltr' as 'ltr' | 'rtl' } }));
 
@@ -17,6 +18,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'native.offline.playBlast': 'Blast',
         'native.offline.playConnections': 'Connections',
         'native.offline.playDaily': 'Daily Word Hunt',
+        'native.offline.playAdventure': 'Adventure',
+        'native.offline.playBrain': 'Brain Training',
+        'native.offline.playClassic': 'Classic',
+        'native.offline.playWordCraft': 'Word Craft',
       };
       return translations[key] || key;
     },
@@ -109,6 +114,27 @@ describe('OfflineFallback', () => {
       mockLang.dir = 'ltr';
       render(<OfflineFallback onRetry={() => {}} />);
       expect(screen.getByText('No internet? You can still play:')).toBeInTheDocument();
+    });
+
+    it('offers a link for EVERY offline-capable mode (derived from OFFLINE_MODES)', () => {
+      mockLang.current = 'en';
+      mockLang.dir = 'ltr';
+      const { container } = render(<OfflineFallback onRetry={() => {}} />);
+
+      for (const mode of OFFLINE_MODES) {
+        const href = mode.entry('en');
+        expect(
+          container.querySelector(`a[href="${href}"]`),
+          `expected a launcher link for ${mode.segment} → ${href}`,
+        ).toBeInTheDocument();
+      }
+    });
+
+    it('opens classic boggle via the offline-safe ?practice=1 path', () => {
+      mockLang.current = 'en';
+      mockLang.dir = 'ltr';
+      const { container } = render(<OfflineFallback onRetry={() => {}} />);
+      expect(container.querySelector('a[href="/en/singleplayer?practice=1"]')).toBeInTheDocument();
     });
   });
 });

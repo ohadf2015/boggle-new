@@ -5077,6 +5077,7 @@ const en = {
     "sectionSoloSubtitle": "Train. Climb. Beat your best.",
     "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends!",
+    "offlineLocked": "Needs internet",
     "quickPlay": "Quick Play",
     "quickPlayDesc": "Jump in — random live mode",
     "practice": "Practice",
@@ -11183,7 +11184,11 @@ const en = {
       "playablePrompt": "No internet? You can still play:",
       "playBlast": "Blast",
       "playConnections": "Connections",
-      "playDaily": "Daily Word Hunt"
+      "playDaily": "Daily Word Hunt",
+      "playAdventure": "Adventure",
+      "playBrain": "Brain Training",
+      "playClassic": "Classic",
+      "playWordCraft": "WordCraft"
     }
   },
   "system": {
@@ -12533,6 +12538,12 @@ const en = {
     },
     "gameOver": "Game over",
     "winnerLabel": "{{name}} wins!",
+    "playAgain": "Play again",
+    "home": "Home",
+    "finalTiles": "Final tiles!",
+    "difficulty": { "label": "Bot difficulty", "easy": "Easy", "medium": "Medium", "hard": "Hard" },
+    "clue": { "button": "Clue", "reveal": "Try: {{word}}", "none": "No move found — try swapping", "granted": "+1 clue!", "adFailed": "Ad unavailable — try again" },
+    "modifier": { "bingo_bonanza": "Bingo Bonanza", "long_words": "Long Words", "rich_letters": "Rich Letters", "none": "", "desc": { "bingo_bonanza": "Bingos score +90", "long_words": "5+ letter words +15", "rich_letters": "Rare tiles count double" } },
     "newBest": "New Best!",
     "bagRemaining": "Bag",
     "yourRack": "Your rack",

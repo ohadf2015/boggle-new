@@ -5,6 +5,8 @@ import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from '.
 import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
+import { botTuning, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
+import { rollModifier, toScoreModifier, type WordCraftModifier } from './modifiers';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims } from './boardDimensions';
 import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
@@ -56,7 +58,20 @@ export interface WordCraftState {
    * "on-fire" feedback. Capped at 99 to prevent state runaway.
    */
   streaks: { player: number; bot: number };
+  /**
+   * Remaining player clues. Every game grants {@link STARTING_CLUES} free
+   * clues; once spent, the player can watch a rewarded ad to earn one more.
+   */
+  cluesRemaining: number;
+  /**
+   * Per-game scoring modifier, rolled at init from the seed for variety. Applied
+   * symmetrically to player + bot scoring via {@link toScoreModifier}.
+   */
+  modifier: WordCraftModifier;
 }
+
+/** Free clues granted at the start of every WordCraft game. */
+export const STARTING_CLUES = 2;
 
 type Action =
   | { type: 'SELECT_RACK_TILE'; id: string | null }
@@ -70,8 +85,10 @@ type Action =
   | { type: 'PASS' }
   | { type: 'SWAP'; tilesToReturn: RackTile[]; replacements: RackTile[] }
   | { type: 'END_GAME' }
+  | { type: 'USE_CLUE' }
+  | { type: 'GRANT_CLUE' }
   | { type: 'BURNOUT_SKIP' }
-  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale; territoryEnabled?: boolean; hotseat?: boolean };
+  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale; territoryEnabled?: boolean; hotseat?: boolean; viewportDims?: { size: BoardSize; bagSize: number } };
 
 const BOT_NAME = 'WordBot';
 
@@ -106,6 +123,8 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     lastCapture: null,
     hotseat,
     streaks: { player: 0, bot: 0 },
+    cluesRemaining: STARTING_CLUES,
+    modifier: rollModifier(seed),
   };
 }
 
@@ -298,13 +317,20 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
     }
     case 'END_GAME':
       return { ...state, turn: 'over' };
+    case 'USE_CLUE':
+      return { ...state, cluesRemaining: Math.max(0, state.cluesRemaining - 1) };
+    case 'GRANT_CLUE':
+      return { ...state, cluesRemaining: state.cluesRemaining + 1 };
     // Player skips turn during burnout — heat resets to 40, turn passes to bot.
     case 'BURNOUT_SKIP':
       return { ...state, burnout: false, heat: 40, overdrive: false, overdriveWarns: 0, turn: 'bot' };
     // Used when locale or board size changes mid-session — wipes the game so a
     // Hebrew player who switched from /en doesn't keep the English bag.
     case 'RESET':
-      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat });
+      // viewportDims carries the locked board size + solo bag size so a
+      // play-again (or locale switch) keeps the same tight bag instead of
+      // silently falling back to the full default 100-tile bag.
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims });
     default:
       return state;
   }
@@ -317,9 +343,15 @@ export interface UseWordCraftGameOptions {
   boardSize?: 13 | 15;
   territoryEnabled?: boolean;
   /**
-   * Bot difficulty. 0 = always optimal; higher = picks from a wider pool of
-   * top words so it occasionally plays sub-optimally. Default 0.5 (top-3
-   * words) makes the single-player bot beatable without feeling broken.
+   * Bot difficulty preset. Drives both the max word length the bot considers
+   * (capping bingos) and its skill variance. Defaults to 'easy' so the
+   * out-of-the-box opponent is beatable. See {@link botTuning}.
+   */
+  difficulty?: BotDifficulty;
+  /**
+   * Explicit skill-variance override (tests / tuning). When omitted the value
+   * is derived from `difficulty`. Higher = picks from a wider pool of top
+   * words so it plays sub-optimally more often.
    */
   botSkillVariance?: number;
   /**
@@ -331,7 +363,9 @@ export interface UseWordCraftGameOptions {
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, botSkillVariance = 2.5, hotseat = false }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false }: UseWordCraftGameOptions) {
+  const tuning = botTuning(difficulty);
+  const effectiveVariance = botSkillVariance ?? tuning.skillVariance;
   // Capture viewport dims at initialization and lock them for the game lifetime
   const initialDimsRef = useRef(
     getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)
@@ -340,6 +374,10 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
 
   const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
+
+  // Active per-game scoring modifier, applied symmetrically to player commits,
+  // bot commits, and the bot's internal candidate ranking.
+  const modifierSpec = useMemo(() => toScoreModifier(state.modifier), [state.modifier]);
 
   // Locale-aware dict lookup. Hebrew dict is loaded with sofit→regular
   // normalization (see /api/word-craft/wordlist) but player tiles still carry
@@ -381,8 +419,26 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     const key = `${locale}|${boardSize}|${territoryEnabled}`;
     if (previousResetKeyRef.current === key) return;
     previousResetKeyRef.current = key;
-    dispatch({ type: 'RESET', seed, boardSize, locale, territoryEnabled });
+    dispatch({ type: 'RESET', seed, boardSize, locale, territoryEnabled, viewportDims: initialDimsRef.current });
   }, [locale, boardSize, seed, territoryEnabled]);
+
+  // Public play-again: re-rolls a fresh game (optionally with a new seed so the
+  // board differs), preserving the locked board + tight solo bag. Wired to the
+  // game-over Play Again CTA.
+  const reset = useCallback(
+    (nextSeed?: number) => {
+      dispatch({
+        type: 'RESET',
+        seed: nextSeed ?? seed,
+        boardSize,
+        locale,
+        territoryEnabled,
+        hotseat,
+        viewportDims: initialDimsRef.current,
+      });
+    },
+    [seed, boardSize, locale, territoryEnabled, hotseat],
+  );
 
   const selectRackTile = useCallback(
     (id: string | null) => dispatch({ type: 'SELECT_RACK_TILE', id }),
@@ -461,7 +517,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       dispatch({ type: 'SET_ERROR', message: 'BLANK_UNASSIGNED' });
       return;
     }
-    const result = validateAndScoreMove(state.board, state.pendingPlacements, isWordValid);
+    const result = validateAndScoreMove(state.board, state.pendingPlacements, isWordValid, modifierSpec);
     if (!result.ok) {
       dispatch({
         type: 'SET_ERROR',
@@ -478,9 +534,26 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       words: result.words?.map((w) => w.word) ?? [],
       wordCells: result.words?.map((w) => w.cells) ?? [],
     });
-  }, [hotseat, dict, state.turn, state.board, state.pendingPlacements, isWordValid]);
+  }, [hotseat, dict, state.turn, state.board, state.pendingPlacements, isWordValid, modifierSpec]);
 
   const pass = useCallback(() => dispatch({ type: 'PASS' }), []);
+
+  // Clue: surface the strongest word the PLAYER could play right now (capped at
+  // length 5 so it's a nudge, not a free bingo) plus its starting cell. Spends a
+  // clue only when a playable word actually exists. The reveal is intentionally
+  // hint-not-autoplay — the player still has to place the tiles.
+  const requestClue = useCallback((): { word: string; row: number; col: number } | null => {
+    if (state.cluesRemaining <= 0) return null;
+    if (!dict) return null;
+    const move = findBestBotMove(state.board, state.player.rack, isWordValid, { maxLength: 5 });
+    if (!move) return null;
+    dispatch({ type: 'USE_CLUE' });
+    const start = move.placements[0];
+    return { word: move.word, row: start?.row ?? -1, col: start?.col ?? -1 };
+  }, [state.cluesRemaining, state.board, state.player.rack, dict, isWordValid]);
+
+  // Rewarded-ad outcome (or web free-grant fallback): top up one clue.
+  const grantClue = useCallback(() => dispatch({ type: 'GRANT_CLUE' }), []);
 
   const burnoutSkip = useCallback(() => dispatch({ type: 'BURNOUT_SKIP' }), []);
 
@@ -514,12 +587,15 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
         extraScore: state.territoryEnabled
           ? (placements, wordCells) => resolveCaptures(state.board, placements, wordCells, 'bot').bonus
           : undefined,
-        // Difficulty: pick from the top-N words instead of always the best,
-        // so the bot is beatable. Bingo capability is preserved.
-        skillVariance: botSkillVariance,
+        // Difficulty: cap word length (easy/medium kill bingos) and pick from a
+        // wider, weaker pool so the bot is beatable. Both derived from the
+        // selected difficulty preset (default 'easy').
+        maxLength: tuning.maxLength,
+        skillVariance: effectiveVariance,
+        scoreModifier: modifierSpec,
       });
       if (move) {
-        const result = validateAndScoreMove(state.board, move.placements, isWordValid);
+        const result = validateAndScoreMove(state.board, move.placements, isWordValid, modifierSpec);
         if (result.ok) {
           dispatch({
             type: 'COMMIT_BOT',
@@ -540,7 +616,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       clearTimeout(handle);
       botTurnRunning.current = false;
     };
-  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, botSkillVariance]);
+  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning.maxLength, effectiveVariance, modifierSpec]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);
@@ -559,6 +635,9 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     pass,
     burnoutSkip,
     swap,
+    reset,
+    requestClue,
+    grantClue,
     isFirstMoveOfGame,
     tilesRemaining,
     isHotseat: hotseat,

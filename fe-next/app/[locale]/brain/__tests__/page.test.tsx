@@ -268,5 +268,49 @@ describe('BrainTrainingPage - Loading States', () => {
       // Sign-in CTA still present — drill grid is a supplement, not a replacement.
       expect(screen.getByText('auth.signIn')).toBeInTheDocument();
     });
+
+    it('still surfaces the drill grid when the score fetch fails offline (graceful degrade)', async () => {
+      // On a flight the Supabase score fetch fails. The hub must NOT dead-end on
+      // an error card — the 5 drills are bundled + client-side, so they stay
+      // playable. Pins the offline graceful-degrade: drills render alongside the
+      // (still useful) error notice + retry.
+      mockUseAuth.mockReturnValue({
+        user: { id: 'user-1' } as any,
+        profile: { id: 'user-1', username: 'test' } as any,
+        rankedProgress: null,
+        loading: false,
+        isSupabaseEnabled: true,
+        isAuthenticated: true,
+        isGuest: false,
+        isAdmin: false,
+        isTeacher: false,
+        canPlayRanked: false,
+        gamesUntilRanked: 10,
+        needsProfileCustomization: false,
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
+      });
+
+      mockUseBrainScore.mockReturnValue({
+        brainScore: null,
+        recentGameScores: [],
+        drillProgress: [],
+        brainScoreHistory: [],
+        isLoading: false,
+        error: 'Network request failed',
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
+      });
+
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
+
+      // Drills reachable despite the error.
+      await waitFor(() => {
+        expect(screen.getByText('brain.quickDrills')).toBeInTheDocument();
+      });
+      // Retry affordance is still there for when connectivity returns.
+      expect(screen.getByText('brain.errors.retry')).toBeInTheDocument();
+    });
   });
 });

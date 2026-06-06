@@ -21,9 +21,13 @@ interface Props {
   /** This player's identity for outgoing re-challenge links (from auth profile). */
   challengerName?: string;
   challengerAvatar?: CustomAvatarConfig;
+  /** Play-again closure loop — re-rolls a fresh solo game in place. */
+  onPlayAgain?: () => void;
+  /** Leave to the home/menu screen. */
+  onHome?: () => void;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, onPlayAgain, onHome }: Props) {
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
     return <WordCraftDuelResult t={t} playerScore={playerScore} duelOutcome={duelOutcome} currentSeed={currentSeed} currentLocale={currentLocale} challengerName={challengerName} challengerAvatar={challengerAvatar} />;
@@ -50,6 +54,28 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
       >
         {label}
       </div>
+      {(onPlayAgain || onHome) ? (
+        <div className="flex items-center gap-2 mt-1">
+          {onPlayAgain ? (
+            <button
+              type="button"
+              onClick={onPlayAgain}
+              className="px-4 py-2 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+            >
+              ↻ {t('wordcraft.playAgain')}
+            </button>
+          ) : null}
+          {onHome ? (
+            <button
+              type="button"
+              onClick={onHome}
+              className="px-4 py-2 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+            >
+              {t('wordcraft.home')}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
