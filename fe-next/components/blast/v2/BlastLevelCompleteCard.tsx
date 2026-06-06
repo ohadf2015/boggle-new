@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import type * as React from 'react';
 import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resultCelebration } from '@/lib/blast/v2/celebration';
 
 type Props = {
   coins: number;
@@ -142,6 +143,9 @@ export function BlastLevelCompleteCard({
   const showBest = typeof bestStars === 'number' && bestStars > 0;
 
   const highlight = pickHighlight({ stars, bonusWordsFound, cascadeCount, bestChainDepth, timeSeconds, completionReason });
+  // Celebration intensity scales to the outcome — soft partial / standard win /
+  // epic 3-star. Drives confetti volume, per-star bursts, and the finale flash.
+  const celebration = resultCelebration({ completionReason, stars });
   const isPartial = completionReason === 'partial';
   const titleText = isPartial
     ? t('blast.complete.titlePartial', 'Board Cleared!')
@@ -202,27 +206,31 @@ export function BlastLevelCompleteCard({
     }
 
     if (buttonRef.current) {
-      tl.fromTo(
+      const btn = tl.fromTo(
         buttonRef.current,
         { y: 32, opacity: 0, scale: 0.8 },
         { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(1.8)' },
         '-=0.1',
-      ).to(buttonRef.current, { scale: 1.04, duration: 0.35, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      );
+      // The idle "press me" pulse is for real wins only — a softer partial
+      // shouldn't nag with a looping animation.
+      if (celebration.tier !== 'soft') {
+        btn.to(buttonRef.current, { scale: 1.04, duration: 0.35, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      }
     }
 
-    // Confetti burst — DOM-based so it never depends on Pixi.
+    // Confetti — DOM-based so it never depends on Pixi. Count + extras scale to
+    // the outcome (resultCelebration): soft partial < standard win < epic 3★.
     const container = containerRef.current;
-    if (container) {
-      const colors = [modeColor, '#ffffff', '#fbbf24', '#ec4899', '#00ffff', '#a855f7'];
-      const rect = card.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const cx = rect.left - containerRect.left + rect.width / 2;
-      const cy = rect.top - containerRect.top + rect.height / 3;
-      for (let i = 0; i < 32; i++) {
+    const colors = [modeColor, '#ffffff', '#fbbf24', '#ec4899', '#00ffff', '#a855f7'];
+    const containerRect = container?.getBoundingClientRect();
+    const burst = (cx: number, cy: number, count: number, delay: number, spread = 220) => {
+      if (!container) return;
+      for (let i = 0; i < count; i++) {
         const piece = document.createElement('span');
         const tint = colors[i % colors.length]!;
         const angle = Math.random() * Math.PI * 2;
-        const speed = 180 + Math.random() * 220;
+        const speed = 140 + Math.random() * spread;
         Object.assign(piece.style, {
           position: 'absolute', left: `${cx}px`, top: `${cy}px`,
           width: '8px', height: '12px', marginLeft: '-4px', marginTop: '-6px',
@@ -237,14 +245,53 @@ export function BlastLevelCompleteCard({
           opacity: 0,
           duration: 1.3 + Math.random() * 0.6,
           ease: 'power2.in',
-          delay: 0.25 + (i % 12) * 0.02,
+          delay,
           onComplete: () => piece.remove(),
         });
+      }
+    };
+
+    if (container && containerRect) {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left - containerRect.left + rect.width / 2;
+      const cy = rect.top - containerRect.top + rect.height / 3;
+      burst(cx, cy, celebration.confettiCount, 0.25);
+
+      // Epic only: a small pop as each star lands, timed to the cascade stagger.
+      if (celebration.perStarBurst && starsRef.current) {
+        const starEls = starsRef.current.querySelectorAll<HTMLElement>('[data-star-filled="true"]');
+        starEls.forEach((el, i) => {
+          const r = el.getBoundingClientRect();
+          burst(
+            r.left - containerRect.left + r.width / 2,
+            r.top - containerRect.top + r.height / 2,
+            8,
+            0.55 + i * 0.14,
+            110,
+          );
+        });
+      }
+
+      // Epic finale: a brief screen-wide flash once the beats have landed.
+      if (celebration.finale) {
+        const flash = document.createElement('div');
+        Object.assign(flash.style, {
+          position: 'absolute', inset: '0', pointerEvents: 'none',
+          background: `radial-gradient(circle at 50% 40%, ${modeColor}, transparent 60%)`,
+          opacity: '0', willChange: 'opacity',
+        });
+        container.appendChild(flash);
+        gsap.to(flash, { opacity: 0.5, duration: 0.12, delay: 1.0, ease: 'power2.out',
+          onComplete: () => {
+            gsap.to(flash, { opacity: 0, duration: 0.5, ease: 'power2.in', onComplete: () => flash.remove() });
+          },
+        });
+        burst(containerRect.width / 2, containerRect.height / 3, 24, 1.05, 300);
       }
     }
 
     return () => { tl.kill(); };
-  }, [modeColor, coins]);
+  }, [modeColor, coins, celebration.confettiCount, celebration.perStarBurst, celebration.finale, celebration.tier]);
 
   return (
     <div
