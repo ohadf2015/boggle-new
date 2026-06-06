@@ -479,12 +479,50 @@ describe('MultiplayerFlow', () => {
   });
 
   describe('Quick Play', () => {
-    it('should call handleJoin with quickPlay flag when Quick Play clicked', async () => {
+    it('CONSOLIDATES: joins an existing compatible waiting room instead of spawning a new one', async () => {
+      // defaultProps.activeRooms has ROOM01 (en, waiting, casual) — a compatible
+      // room — so Quick Play must JOIN it rather than host a fresh public lobby.
+      // This is the room-management fix: stops the arena filling with 1/50 ghosts.
       const handleJoin = vi.fn();
       render(<MultiplayerFlow {...defaultProps} handleJoin={handleJoin} />);
 
-      const quickPlayButton = screen.getByRole('button', { name: 'Quick Play' });
-      await userEvent.click(quickPlayButton);
+      await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
+
+      // Join path: not host mode, targets the existing room's code, no quickPlay flag.
+      expect(handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, expect.any(String));
+      const createCalls = handleJoin.mock.calls.filter((call) => call[0] === true);
+      expect(createCalls).toHaveLength(0);
+    });
+
+    it('does NOT hijack a ranked or different-language room', async () => {
+      // ROOM02 is Hebrew + ranked → never a Quick Play target. With it the only
+      // room available, Quick Play must fall back to creating a public room.
+      const handleJoin = vi.fn();
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          handleJoin={handleJoin}
+          activeRooms={[mockActiveRooms[1]]}
+        />,
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
+
+      expect(handleJoin).toHaveBeenCalledWith(
+        true,
+        'en',
+        expect.stringMatching(/^[A-Z0-9]{6}$/),
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({ quickPlay: true }),
+      );
+    });
+
+    it('creates a new public room with the quickPlay flag when no compatible room exists', async () => {
+      const handleJoin = vi.fn();
+      render(<MultiplayerFlow {...defaultProps} handleJoin={handleJoin} activeRooms={[]} />);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
 
       expect(handleJoin).toHaveBeenCalledWith(
         true, // host mode
@@ -498,7 +536,11 @@ describe('MultiplayerFlow', () => {
 
     it('should auto-fire quick play once when quickPlay prop is true', async () => {
       const handleJoin = vi.fn();
-      render(<MultiplayerFlow {...defaultProps} handleJoin={handleJoin} quickPlay />);
+      // Empty room list so the create path (quickPlay flag) is exercised, and the
+      // once-guard against StrictMode double-invoke is what we assert.
+      render(
+        <MultiplayerFlow {...defaultProps} handleJoin={handleJoin} activeRooms={[]} quickPlay />,
+      );
 
       // Wait a microtask so the mount effect runs
       await new Promise((r) => setTimeout(r, 0));

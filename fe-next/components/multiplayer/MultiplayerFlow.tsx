@@ -18,6 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { MatchmakingOverlay } from '@/components/multiplayer/MatchmakingOverlay';
 import { useMatchmaking } from '@/hooks/useMatchmaking';
 import { useCgLobbyHeroVariant } from '@/hooks/useCgLobbyHeroVariant';
+import { selectQuickPlayRoom } from '@/lib/multiplayer/selectQuickPlayRoom';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
@@ -323,6 +324,26 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       ? displayName
       : getStoredUsername() || `Player${Math.floor(Math.random() * 1000)}`;
 
+    // Consolidation (room-management fix): before spawning yet another solo
+    // public lobby, try to drop the player into an EXISTING compatible waiting
+    // room. Without this, every Quick Play click hosted a brand-new room, so
+    // the arena filled with 1/50 ghost rooms that look live but have nobody to
+    // play. selectQuickPlayRoom is race-tolerant: if it picks a room that the
+    // (throttled) activeRooms snapshot already lost, the join simply fails the
+    // same way a normal stale room-card tap does. We only auto-join CASUAL
+    // classic rooms; ranked/blast/other modes are never hijacked.
+    const matchRoom = selectQuickPlayRoom(activeRooms, {
+      language: defaultLanguage,
+      gameMode: 'classic',
+    });
+    if (matchRoom) {
+      setGameCode(matchRoom.gameCode);
+      setUsername(quickPlayUsername);
+      // Join as a player (not host) via the same fast-join path as a room tap.
+      handleJoin(false, null, matchRoom.gameCode, undefined, quickPlayUsername);
+      return;
+    }
+
     const gameCode = generateGameCode();
     const roomName = `${quickPlayUsername} Room`;
 
@@ -331,17 +352,17 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setHostUsername(quickPlayUsername);
     setUsername(quickPlayUsername);
 
-    // Quick Play creates a PUBLIC room so it surfaces in the lobby rooms list
-    // and other players can drop in. `quickPlay` still skips the alone-timer
-    // and auto-fills bots so a solo player starts fast. Only explicitly
-    // private flows (classroom) stay hidden / invite-only.
+    // No compatible room to join → create a PUBLIC room so it surfaces in the
+    // lobby and the next Quick Play player can consolidate into it. `quickPlay`
+    // still skips the alone-timer and auto-fills bots so a solo player starts
+    // fast. Only explicitly private flows (classroom) stay hidden / invite-only.
     handleJoin(true, defaultLanguage, gameCode, roomName, quickPlayUsername, { quickPlay: true });
 
     // Surface the CrazyGames invite button — quick games are now discoverable,
     // so inviting friends to join is a valid affordance.
     cgShowInvite(gameCode);
 
-  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite]);
+  }, [isAuthenticated, displayName, defaultLanguage, activeRooms, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite]);
 
   // Landing Quick Play auto-fire: when the user arrives via
   // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on
