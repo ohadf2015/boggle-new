@@ -21,6 +21,7 @@ import { overlayToTileStates } from '@/components/blast/legacy/utils/blastOverla
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
+import { computeThawedCells } from '@/components/blast/legacy/utils/blastThaw';
 import type { Language } from '@/shared/types';
 
 // H2: per-game mutex set guarding the check→advance→broadcast sequence so a
@@ -228,6 +229,14 @@ export function cascadeBlastWord(
     currentWave: wave,
     rng,
   });
+  // Thaw ice/frozen tiles adjacent to the played path BEFORE gravity (matches the
+  // client's useBlastEngine exactly). Gravity preserves isThawed on survivors, so
+  // the authoritative board the client receives no longer re-locks thawed tiles.
+  const thawedCells = computeThawedCells(processResult.next, wordPath);
+  for (const { row, col } of thawedCells) {
+    const tile = processResult.next[row]?.[col];
+    if (tile) tile.isThawed = true;
+  }
   // Apply vortex/magnet swaps to the grid so it stays aligned with the swapped
   // tileStates, then run gravity WITHOUT refill (shrink-until-clear).
   board.grid = applyVortexLetterSwaps(board.grid, processResult.vortexLetterSwaps);

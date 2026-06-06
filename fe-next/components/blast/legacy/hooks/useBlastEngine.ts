@@ -14,6 +14,7 @@ import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { buildDeadEndGrid } from '../utils/blastDeadEndGrid';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
+import { blastBoardsEqual } from '../utils/blastBoardEquality';
 import { calculateLeftoverMoveBonus, applyRevive } from '../utils/blastMoveUtils';
 import { createDDAState, updateDDA, getDDASpawnModifier, isDDABoostActive } from '../utils/blastDDA';
 import { createSeededRandom, generateBlastLetter } from '../utils/blastLetterGenerator';
@@ -124,6 +125,17 @@ export function useBlastEngine(
   const movesAllowed = options?.movesAllowed ?? Infinity;
   const currentWave = options?.currentWave ?? 1;
   const effectiveBlastSeed = options?.blastSeed ?? null;
+
+  // MP determinism: mirror the server's seeded RNG in optimistic submits so
+  // predicted rng-driven conversions (prism → specials) match the authoritative
+  // board → applyServerBoard's equality guard no-ops → no tile flicker. Read the
+  // seed via a ref so submitWord (deps [gridSize, currentWave]) never closes over
+  // a stale seed after a board regen swaps it (regen sends a new seed).
+  const blastSeedRef = useRef(effectiveBlastSeed);
+  blastSeedRef.current = effectiveBlastSeed;
+  // Counts valid words only (submitWord fires once per accepted word), mirroring
+  // the server's monotonic board.totalMoves used as createSeededRandom(seed + N).
+  const validMovesRef = useRef(0);
 
   // Grid generation via shared hook
   const { grid: initialGrid } = useGridInit({
@@ -308,7 +320,15 @@ export function useBlastEngine(
     setDdaBoostActive(isDDABoostActive(ddaStateRef.current));
 
     const currentTiles = tileStatesRef.current;
-    const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave });
+    // MP: seed the clear RNG to match the server (createSeededRandom(seed + Nth
+    // valid word)) so rng-driven conversions are predicted identically. SP leaves
+    // rng undefined → processTilesForWord defaults to Math.random.
+    let submitRng: (() => number) | undefined;
+    if (options?.isMultiplayer && blastSeedRef.current != null) {
+      validMovesRef.current += 1;
+      submitRng = createSeededRandom(blastSeedRef.current + validMovesRef.current);
+    }
+    const result = processTilesForWord({ prev: currentTiles, path, word, baseScore, gridSize, currentWave, rng: submitRng });
     const { next, totalScore, newlyClearedCount, clearedTypeCounts, explosions: newExplosions, vortexLetterSwaps, detectedCombos, bonusMoveCount, diamondRevealTurns: newDiamondReveal, shuffleTriggered } = result;
 
     if (word.length > bestWordRef.current.length) bestWordRef.current = word;
@@ -412,7 +432,7 @@ export function useBlastEngine(
       bonusMoves: bonusMoveCount,
       countdownExplosions: betweenTurn.countdownExplosions,
     };
-  }, [gridSize, currentWave]);
+  }, [gridSize, currentWave, options?.isMultiplayer]);
 
   // ── startCascade ──
   const startCascade = useCallback((): CascadeResult => {
@@ -562,6 +582,15 @@ export function useBlastEngine(
 
   /** Apply server-authoritative board state (MP sync) */
   const applyServerBoard = useCallback((newGrid: LetterGrid, newTileStates: BlastTileState[][]) => {
+    // Skip the wholesale replacement when the authoritative board already matches
+    // the client's optimistic prediction. Replacing an identical board still
+    // re-renders every tile (positional keys + AnimatePresence) → visible
+    // flicker. Only apply when the server actually diverges (a real correction).
+    const curGrid = effectiveGridRef.current;
+    const curTiles = tileStatesRef.current;
+    if (curGrid && curTiles.length > 0 && blastBoardsEqual(curGrid, curTiles, newGrid, newTileStates)) {
+      return;
+    }
     effectiveGridRef.current = newGrid;
     setCurrentGrid(newGrid);
     tileStatesRef.current = newTileStates;

@@ -12,7 +12,7 @@
  * Fix: in multiplayer, seed the engine grid from the server grid passed via
  * options.mpInitialGrid. Singleplayer keeps the locally generated useGridInit grid.
  */
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useBlastEngine } from '../useBlastEngine';
 import type { BlastGameConfig, BlastTileState } from '../../types';
 import type { LetterGrid } from '@/shared/types/game';
@@ -66,5 +66,54 @@ describe('useBlastEngine — multiplayer grid source', () => {
   it('still uses the local useGridInit grid in singleplayer', () => {
     const { result } = renderHook(() => useBlastEngine(config, { isMultiplayer: false }));
     expect(result.current.grid).toEqual(LOCAL_GRID);
+  });
+});
+
+describe('useBlastEngine — applyServerBoard skips redundant replacements (anti-flicker)', () => {
+  const mkTiles = (): BlastTileState[][] =>
+    Array.from({ length: 6 }, (_, r) =>
+      Array.from({ length: 6 }, (_, c) =>
+        ({ uid: `u-${r}-${c}`, row: r, col: c, type: 'normal', isCleared: false, activationEffect: null, hitsRemaining: 0 } as BlastTileState),
+      ),
+    );
+
+  it('does NOT replace tileStates when the server board equals the current board', () => {
+    const { result } = renderHook(() =>
+      useBlastEngine(config, {
+        isMultiplayer: true,
+        blastSeed: 123,
+        initialTileStates: mkTiles(),
+        mpInitialGrid: SERVER_GRID,
+      }),
+    );
+
+    // Establish a known board, then capture the live array reference.
+    act(() => result.current.applyServerBoard(SERVER_GRID, mkTiles()));
+    const ref1 = result.current.tileStates;
+
+    // An equal board (different array identity, only uids could differ) → no-op.
+    act(() => result.current.applyServerBoard(SERVER_GRID.map((row) => [...row]), mkTiles()));
+    expect(result.current.tileStates).toBe(ref1); // same reference → no re-render churn
+  });
+
+  it('DOES replace tileStates when the server board diverges', () => {
+    const { result } = renderHook(() =>
+      useBlastEngine(config, {
+        isMultiplayer: true,
+        blastSeed: 123,
+        initialTileStates: mkTiles(),
+        mpInitialGrid: SERVER_GRID,
+      }),
+    );
+
+    act(() => result.current.applyServerBoard(SERVER_GRID, mkTiles()));
+    const ref1 = result.current.tileStates;
+
+    const diverged = mkTiles();
+    diverged[2][3] = { ...diverged[2][3], isCleared: true }; // a real correction
+    act(() => result.current.applyServerBoard(SERVER_GRID, diverged));
+
+    expect(result.current.tileStates).not.toBe(ref1);
+    expect(result.current.tileStates[2][3].isCleared).toBe(true);
   });
 });
