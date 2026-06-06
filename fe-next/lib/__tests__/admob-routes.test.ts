@@ -9,15 +9,31 @@ describe('isAllowedAdBannerRoute', () => {
   });
 
   it('blocks gameplay routes', () => {
-    expect(isAllowedAdBannerRoute('/multiplayer')).toBe(false);
     expect(isAllowedAdBannerRoute('/singleplayer')).toBe(false);
     expect(isAllowedAdBannerRoute('/daily')).toBe(false);
     expect(isAllowedAdBannerRoute('/brain')).toBe(false);
   });
 
+  it('allows /multiplayer (lobby is passive; active game/results suppressed via screen-fit-locked, not the route)', () => {
+    // /multiplayer is deliberately NOT denylisted: lobby + gameplay share one
+    // path, so the route gate cannot tell them apart. The lobby (isActive=false)
+    // has no `screen-fit-locked` class → banner shows. Active gameplay/results
+    // add `screen-fit-locked` → bannerController's shouldSuppressBanner hides it.
+    expect(isAllowedAdBannerRoute('/multiplayer')).toBe(true);
+    expect(isAllowedAdBannerRoute('/es/multiplayer')).toBe(true);
+  });
+
+  it('blocks classroom multiplayer lobby (child/education surface — keep ad-free)', () => {
+    const classroom = new URLSearchParams('classroom=true');
+    expect(isAllowedAdBannerRoute('/multiplayer', classroom)).toBe(false);
+    expect(isAllowedAdBannerRoute('/he/multiplayer', classroom)).toBe(false);
+    // non-classroom multiplayer with other params still allowed
+    expect(isAllowedAdBannerRoute('/multiplayer', new URLSearchParams('room=ABC123'))).toBe(true);
+  });
+
   it('strips locale prefix before matching', () => {
     expect(isAllowedAdBannerRoute('/he/leaderboard')).toBe(true);
-    expect(isAllowedAdBannerRoute('/es/multiplayer')).toBe(false);
+    expect(isAllowedAdBannerRoute('/es/singleplayer')).toBe(false);
   });
 
   it('allows adventure (banner runs during adventure mode by design)', () => {

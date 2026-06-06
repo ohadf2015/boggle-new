@@ -166,12 +166,25 @@ describe('AnchoredNativeBanner', () => {
     expect(clearRequest).toHaveBeenCalledWith('anchor');
   });
 
-  it('clears the anchor on /multiplayer', async () => {
+  it('requests the anchor on /multiplayer (lobby shows banner; gameplay/results suppressed via screen-fit-locked, not the route)', async () => {
     mockPathname.current = '/en/multiplayer';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
-    expect(setRequest).not.toHaveBeenCalled();
-    expect(clearRequest).toHaveBeenCalledWith('anchor');
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
+    expect(clearRequest).not.toHaveBeenCalled();
+  });
+
+  it('clears the anchor on the classroom multiplayer lobby (child/education surface — ad-free)', async () => {
+    mockPathname.current = '/en/multiplayer';
+    window.history.replaceState({}, '', '/en/multiplayer?classroom=true');
+    try {
+      render(<AnchoredNativeBanner />);
+      await Promise.resolve();
+      expect(setRequest).not.toHaveBeenCalled();
+      expect(clearRequest).toHaveBeenCalledWith('anchor');
+    } finally {
+      window.history.replaceState({}, '', '/');
+    }
   });
 
   it('requests the anchor on /adventure (real ads during adventure gameplay)', async () => {

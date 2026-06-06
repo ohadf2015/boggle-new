@@ -68,7 +68,11 @@ export default function AnchoredNativeBanner() {
     const isAndroid = Capacitor.getPlatform() === 'android';
     const safeBottom = safeArea.bottom || 0;
 
-    if (!isAllowedAdBannerRoute(pathname)) {
+    // Native-only effect → window is defined; `classroom` is fixed at page entry,
+    // so reading location.search here (vs useSearchParams) keeps this null-render
+    // banner from forcing a client-side-rendering bailout on every static page.
+    const search = new URLSearchParams(window.location.search);
+    if (!isAllowedAdBannerRoute(pathname, search)) {
       // Withdraw the anchor's intent (NOT a global hide — a results page on a
       // game route may still want its InlineBannerAd 'slot' banner; the
       // coordinator keeps that one alive). Collapse the reservation only AFTER
