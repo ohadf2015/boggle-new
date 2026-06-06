@@ -196,7 +196,10 @@ export default function PracticeClassicSandbox() {
       <PracticeMistakeCoach kind={coach.active} mode="classic" onClose={coach.close} />
 
       <div className="flex-1 min-h-0 flex items-center justify-center w-full">
-        <div data-testid="practice-board" className="w-full max-w-xs aspect-square">
+        {/* Fill the flex space; `.game-board-frame` clamps the square to the
+            available height (max-height: min(board-size, 100%)). A width-driven
+            `aspect-square` here overflowed downward on short viewports. */}
+        <div data-testid="practice-board" className="w-full h-full">
           <GridComponent
             grid={board}
             interactive
