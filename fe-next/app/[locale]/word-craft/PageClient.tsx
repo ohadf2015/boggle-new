@@ -1147,7 +1147,7 @@ export default function WordCraftPageClient() {
             className="self-center mb-1 px-3 py-1.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wide animate-neo-pop text-sm"
           >
             {clueReveal
-              ? t('wordcraft.clue.reveal').replace('{{word}}', clueReveal.word)
+              ? t('wordcraft.clue.reveal', { word: clueReveal.word })
               : clueMessage}
           </div>
         ) : null}
