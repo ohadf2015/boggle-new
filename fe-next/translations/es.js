@@ -13074,7 +13074,8 @@ const es = {
       "loremaster": "Maestro de Historias",
       "points": "{points} puntos de curador",
       "toNext": "{points} puntos para {rank}",
-      "maxed": "Rango máximo alcanzado — ¡leyenda!"
+      "maxed": "Rango máximo alcanzado — ¡leyenda!",
+      "rankedUp": "¡Subiste de rango! Ahora eres {rank} 🎉"
     },
     "coins": {
       "nextMilestone": "{points} pts → {coins} monedas"

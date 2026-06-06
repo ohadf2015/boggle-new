@@ -119,6 +119,18 @@ export function curatorRankForPoints(points: number): CuratorRank {
   return rank;
 }
 
+/**
+ * If a points total moved up into a NEW rank, return that new rank — else null.
+ * Drives the one-time rank-up celebration. Only fires on an actual increase, so
+ * a no-op refresh or a decrease never celebrates.
+ */
+export function detectRankUp(previousPoints: number, currentPoints: number): CuratorRank | null {
+  if (currentPoints <= previousPoints) return null;
+  const before = curatorRankForPoints(previousPoints);
+  const after = curatorRankForPoints(currentPoints);
+  return after.key !== before.key ? after : null;
+}
+
 /** The next rank up, or null if already at the top. */
 export function nextCuratorRank(points: number): CuratorRank | null {
   const current = curatorRankForPoints(points);

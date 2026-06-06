@@ -12981,7 +12981,8 @@ const ja = {
       "loremaster": "物語の大家",
       "points": "{points}キュレーターポイント",
       "toNext": "{rank}まで{points}ポイント",
-      "maxed": "最高ランク到達 — レジェンド！"
+      "maxed": "最高ランク到達 — レジェンド！",
+      "rankedUp": "ランクアップ！あなたは今や{rank} 🎉"
     },
     "coins": {
       "nextMilestone": "{points}ポイント → {coins}コイン"

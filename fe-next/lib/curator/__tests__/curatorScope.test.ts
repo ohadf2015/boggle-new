@@ -20,6 +20,7 @@ import {
   nextCuratorRank,
   progressToNextRank,
   coinBonusForCrossing,
+  detectRankUp,
   CURATOR_RANKS,
   type CuratorAssignment,
 } from '../curatorScope';
@@ -126,6 +127,28 @@ describe('curator gamification — rank ladder', () => {
     const p = progressToNextRank(top.minPoints);
     expect(p.next).toBeNull();
     expect(p.ratio).toBe(1);
+  });
+});
+
+describe('curator gamification — rank-up detection', () => {
+  it('returns the new rank when points cross a threshold', () => {
+    // apprentice(0) → scribe(50)
+    const up = detectRankUp(40, 60);
+    expect(up?.key).toBe('scribe');
+  });
+
+  it('returns null when staying within the same rank', () => {
+    expect(detectRankUp(10, 40)).toBeNull(); // both apprentice
+  });
+
+  it('returns null when points do not increase (no-op refresh / decrease)', () => {
+    expect(detectRankUp(60, 60)).toBeNull();
+    expect(detectRankUp(60, 55)).toBeNull();
+  });
+
+  it('reports the highest rank reached when crossing multiple thresholds at once', () => {
+    // 0 → 250 jumps apprentice→scribe→lexicographer
+    expect(detectRankUp(0, 250)?.key).toBe('lexicographer');
   });
 });
 

@@ -13400,7 +13400,8 @@ const he = {
       "loremaster": "מדריך אגדות",
       "points": "{points} נקודות עריכה",
       "toNext": "{points} נקודות עד {rank}",
-      "maxed": "הגעת לדרגה הגבוהה ביותר — אגדה!"
+      "maxed": "הגעת לדרגה הגבוהה ביותר — אגדה!",
+      "rankedUp": "עלית דרגה! עכשיו אתה {rank} 🎉"
     },
     "coins": {
       "nextMilestone": "{points} נקודות → {coins} מטבעות"

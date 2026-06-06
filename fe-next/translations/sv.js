@@ -12986,7 +12986,8 @@ const sv = {
       "loremaster": "Sägomästare",
       "points": "{points} kuratorspoäng",
       "toNext": "{points} poäng till {rank}",
-      "maxed": "Högsta rang nådd — legend!"
+      "maxed": "Högsta rang nådd — legend!",
+      "rankedUp": "Uppflyttad! Du är nu {rank} 🎉"
     },
     "coins": {
       "nextMilestone": "{points} poäng → {coins} mynt"

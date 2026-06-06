@@ -13344,7 +13344,8 @@ const en = {
       "loremaster": "Loremaster",
       "points": "{points} curator points",
       "toNext": "{points} points to {rank}",
-      "maxed": "Top rank reached — legend!"
+      "maxed": "Top rank reached — legend!",
+      "rankedUp": "Ranked up! You're now a {rank} 🎉"
     },
     "coins": {
       "nextMilestone": "{points} pts → {coins} coins"

@@ -5,11 +5,14 @@ import {
   curatorRankForPoints,
   progressToNextRank,
   CURATOR_COIN_MILESTONES,
+  type CuratorRank,
 } from '@/lib/curator/curatorScope';
 
 interface CuratorRankCardProps {
   /** The curator's lifetime prestige points for the active language. */
   points: number;
+  /** When set, a one-time rank-up celebration banner for this newly-reached rank. */
+  celebrateRank?: CuratorRank | null;
 }
 
 /**
@@ -17,7 +20,7 @@ interface CuratorRankCardProps {
  * toward the next rank, and the next coin milestone. Prestige only — capability
  * (trust_tier) lives elsewhere. All copy via t('curator.*').
  */
-export function CuratorRankCard({ points }: CuratorRankCardProps) {
+export function CuratorRankCard({ points, celebrateRank }: CuratorRankCardProps) {
   const { t } = useLanguage();
   const rank = curatorRankForPoints(points);
   const progress = progressToNextRank(points);
@@ -26,6 +29,14 @@ export function CuratorRankCard({ points }: CuratorRankCardProps) {
 
   return (
     <div className="rounded-neo border-neo-thick border-black bg-neo-navy-light p-4 shadow-hard text-neo-white">
+      {celebrateRank && (
+        <div
+          data-testid="curator-rankup"
+          className="animate-neo-pop mb-3 rounded-neo border-neo border-black bg-neo-lime px-3 py-2 text-center text-sm font-neo-display text-neo-navy shadow-hard-sm"
+        >
+          {t('curator.rank.rankedUp', { rank: t(celebrateRank.titleKey) })}
+        </div>
+      )}
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs uppercase tracking-wide text-neo-cyan font-neo-body">
           {t('curator.rank.label')}

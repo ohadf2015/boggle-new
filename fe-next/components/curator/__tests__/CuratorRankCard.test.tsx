@@ -50,4 +50,15 @@ describe('CuratorRankCard', () => {
     // points label is t('curator.rank.points', { points: 42 })
     expect(screen.getByText(/curator\.rank\.points:.*42/)).toBeTruthy();
   });
+
+  it('shows no rank-up celebration by default', () => {
+    render(<CuratorRankCard points={60} />);
+    expect(screen.queryByTestId('curator-rankup')).toBeNull();
+  });
+
+  it('celebrates when a freshly-reached rank is provided', () => {
+    const scribe = { key: 'scribe', titleKey: 'curator.rank.scribe', minPoints: 50, badgeTier: 2 };
+    render(<CuratorRankCard points={60} celebrateRank={scribe} />);
+    expect(screen.getByTestId('curator-rankup')).toBeTruthy();
+  });
 });

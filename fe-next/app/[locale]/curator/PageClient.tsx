@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCuratorStatus } from '@/lib/curator/useCuratorStatus';
+import { detectRankUp, type CuratorRank } from '@/lib/curator/curatorScope';
 import { CuratorRankCard } from '@/components/curator/CuratorRankCard';
 import { CuratorInvalidWords } from '@/components/curator/CuratorInvalidWords';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,21 @@ export default function CuratorPageClient() {
   const { t, language } = useLanguage();
   const { isCurator, languages, assignments, isLoading } = useCuratorStatus();
   const [active, setActive] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState<CuratorRank | null>(null);
+
+  const activeLang = active ?? languages[0];
+  const points = assignments.find((a) => a.language === activeLang)?.curator_points ?? 0;
+
+  // One-time rank-up celebration: compare this language's points to what we last
+  // saw stored locally. Fires only on an actual rank increase.
+  useEffect(() => {
+    if (!activeLang || typeof window === 'undefined') return;
+    const key = `lexiclash:curator_points:${activeLang}`;
+    const prevRaw = window.localStorage.getItem(key);
+    const prev = prevRaw != null ? Number(prevRaw) : points;
+    setCelebrate(detectRankUp(prev, points));
+    window.localStorage.setItem(key, String(points));
+  }, [activeLang, points]);
 
   if (isLoading) {
     return (
@@ -39,9 +55,6 @@ export default function CuratorPageClient() {
       </div>
     );
   }
-
-  const activeLang = active ?? languages[0];
-  const points = assignments.find((a) => a.language === activeLang)?.curator_points ?? 0;
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-neo-navy">
@@ -68,7 +81,7 @@ export default function CuratorPageClient() {
         )}
 
         <div className="mb-6">
-          <CuratorRankCard points={points} />
+          <CuratorRankCard points={points} celebrateRank={celebrate} />
         </div>
 
         <CuratorInvalidWords key={activeLang} language={activeLang} />
