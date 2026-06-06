@@ -380,3 +380,30 @@ Items deferred from automated nightly triage. Human review required.
   - status: deferred
   - why: appears intentional (anon web vital tracking, route passes null player_id for guests); false-positive advisory
   - recommended owner: confirm intent — if anon inserts are desired, add a comment on the migration explaining the policy is by design
+
+## 2026-06-06
+- [Supabase] `upsert_push_token` SECURITY DEFINER — advisory is LOW RISK (false-positive for authenticated path)
+  - score: 0.125; Function `public.upsert_push_token(p_token text, p_platform character varying, p_device_id text)`
+  - status: research-complete — single callsite at app/api/player/push-token/route.ts:48, auth-gated (getUser()→401). Authenticated access is INTENTIONAL. Optional hardening: REVOKE EXECUTE ON FUNCTION public.upsert_push_token FROM anon; (prevents direct REST calls from unauthenticated clients)
+  - why: autonomy matrix requires confirmed no-anon-callsite before REVOKE; couldn't verify tonight
+  - recommended owner: review-by-eod — trivial 1-line migration once confirmed
+
+- [Sentry] 1JR — `relation "profiles" does not exist` (reach=5, 24h)
+  - https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred — root cause undiagnosed; likely search_path mismatch on a SECURITY DEFINER function or edge-function running outside public schema context
+  - why: needs stack trace read + function audit; didn't have time to pull issue details via MCP
+  - recommended owner: backend — check which DB function/route is executing without `SET search_path = public`
+
+- [Sentry] 1CW — Pixi `null (reading 'clear')` (reach=5, 24h)
+  - https://lexiclash.sentry.io/issues/120102540/
+  - status: memory says fix shipped `a39f63378` (PUSHED); 24h reach=5 may be pre-fix events or additional uncovered paths. Likely stale — verify last-seen timestamp in Sentry against commit date.
+  - recommended owner: review-by-eod — if last-seen > a39f63378 deploy time, there are additional destroy paths to guard
+
+- [Sentry] 1KQ — churn-signals 502 (reach=3, 24h)
+  - status: memory says resolved by Railway restart (SUPABASE_JWT_SECRET was absent in-process); canary warning shipped. If still firing, check Railway env dashboard that the secret is present in current deployment.
+  - recommended owner: review-by-eod — verify env vars in Railway console
+
+- [Sentry] 14R/14S — game_sessions check_player_id constraint violation (reach=0, 24h)
+  - https://lexiclash.sentry.io/issues/119434883/ + 119434885/
+  - status: deferred — reach=0 (automated logger, no real users affected); constraint likely rejecting guest/bot sessions with null player_id
+  - recommended owner: backend — determine if bots/guests should be excluded from game_sessions logging entirely or if GAME_SESSION_LOGGER should coerce null to a sentinel UUID

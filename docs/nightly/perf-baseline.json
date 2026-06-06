@@ -1,14 +1,21 @@
 {
-  "date": "2026-06-05",
-  "note": "Eleventh snapshot. Backend fix: idx_web_vitals_player_id applied (EXPLAIN confirmed 3207ms seq scan on 99k rows → index scan). Frontend: /en/multiplayer CLS regressed 0.057→0.29; root cause = AutoHideHeader returns null (not hidden div) when isInGame flips post-hydration, causing ~60px layout shift. Fix deferred — needs placeholder div strategy.",
+  "date": "2026-06-06",
+  "note": "Twelfth snapshot. Research-only run (cutoff hit before migrations). Key findings: (1) idx_web_vitals_player_id flagged UNUSED by advisor — added yesterday but no SELECT queries use player_id filter in production; write overhead only — DROP candidate. (2) word_review_state_lesson_id_fkey still unindexed — migration needed. (3) AutoHideHeader CLS fix still unshipped (0.29 CLS on /en/multiplayer). (4) pg_timezone_names 338ms/call = Studio-only, not app. (5) profiles last_seen_at UPDATE up 33916 calls (from 28930) — stable.",
   "backend": {
     "top_queries": [
       {
-        "label": "supabase_realtime_wal_parser",
+        "label": "supabase_realtime_wal_parser_slot1",
         "calls": 775439,
         "mean_ms": 4.29,
         "total_ms": 3328220,
         "verdict": "INFRASTRUCTURE: unchanged. Deferred to Supabase support."
+      },
+      {
+        "label": "supabase_realtime_wal_parser_slot2",
+        "calls": 136057,
+        "mean_ms": 4.43,
+        "total_ms": 602093,
+        "verdict": "INFRASTRUCTURE: secondary realtime slot."
       },
       {
         "label": "sync_coins_rpc",
@@ -19,36 +26,46 @@
       },
       {
         "label": "profiles_update_last_seen_at",
-        "calls": 28930,
-        "mean_ms": 2.08,
-        "total_ms": 60138,
-        "verdict": "ok"
+        "calls": 33916,
+        "mean_ms": 1.89,
+        "total_ms": 64061,
+        "verdict": "ok — calls up from 28930, mean stable"
       },
       {
         "label": "pg_timezone_names_select",
-        "calls": 173,
-        "mean_ms": 334.22,
-        "total_ms": 57821,
-        "verdict": "WATCH: Studio/MCP introspection only. No app caller."
+        "calls": 176,
+        "mean_ms": 337.99,
+        "total_ms": 59485,
+        "verdict": "WATCH: Studio/MCP introspection only. No app caller. Stable from prior run."
+      },
+      {
+        "label": "supabase_schema_introspection",
+        "calls": 18,
+        "mean_ms": 2481.34,
+        "total_ms": 44664,
+        "verdict": "Studio dashboard heavy introspection. Not actionable."
       },
       {
         "label": "friend_messages_dm_thread",
-        "calls": 108578,
-        "mean_ms": 0.16,
-        "total_ms": 17389,
+        "calls": 127908,
+        "mean_ms": 0.15,
+        "total_ms": 19606,
         "verdict": "ok"
       },
       {
         "label": "web_vitals_insert",
-        "calls": 25212,
-        "mean_ms": 0.70,
-        "total_ms": 17637,
-        "verdict": "ok: INSERT fast. player_id FK now indexed (migration applied this run)."
+        "calls": 26025,
+        "mean_ms": 0.71,
+        "total_ms": 18577,
+        "verdict": "ok — INSERT fast. BUT idx_web_vitals_player_id flagged UNUSED by advisor (no SELECT on player_id). DROP this index to remove write overhead."
       }
     ],
-    "fix_shipped": "idx_web_vitals_player_id: btree index on web_vitals.player_id. EXPLAIN showed 3207ms seq scan on 99111 rows. Advisor-flagged + EXPLAIN-confirmed.",
-    "advisor_warnings_count": 95,
-    "advisor_notes": "95 advisors: 94 unindexed FKs (web_vitals.player_id now fixed) + auth_db_connections_absolute (Supabase Dashboard change, not SQL). word_review_state has 0 rows — no index needed."
+    "advisor_warnings_count": 3,
+    "advisor_notes": "Active advisors: (1) auth_db_connections_absolute — Switch Auth to percentage-based connections (Supabase Dashboard only). (2) word_review_state_lesson_id_fkey unindexed FK — migration needed (add btree index on lesson_id). (3) idx_web_vitals_player_id UNUSED — added 2026-06-05 but no queries use it for reads; DROP saves write cost on 26k/run INSERTs.",
+    "open_migrations": [
+      "DROP INDEX IF EXISTS public.idx_web_vitals_player_id; -- unused, write-overhead only",
+      "CREATE INDEX CONCURRENTLY idx_word_review_state_lesson_id ON public.word_review_state (lesson_id); -- fixes unindexed FK"
+    ]
   },
   "frontend": {
     "by_route_24h": [
@@ -59,7 +76,7 @@
         "p75_cls": 0.29,
         "n": 16,
         "flags": ["LCP_POOR", "CLS_POOR"],
-        "delta_vs_prior": "LCP +123ms (stable). INP -168ms (improved). CLS 0.057→0.29 (REGRESSION x5). Root: AutoHideHeader null-vs-element toggle post-hydration."
+        "delta_vs_prior": "Unchanged from 2026-06-05 baseline. Root: AutoHideHeader null-vs-element toggle post-hydration. Fix STILL unshipped (authored: placeholder div strategy)."
       },
       {
         "route": "/en",
@@ -68,16 +85,15 @@
         "p75_cls": 0.013,
         "n": 26,
         "flags": ["LCP_NEEDS_IMPROVEMENT"],
-        "delta_vs_prior": "homepage LCP holding ~2441ms (prior open watch 7107ms was a different URL variant with chatgpt UTM)"
+        "delta_vs_prior": "Stable. No new data this run."
       }
     ],
     "open_watches": [
-      "/en/multiplayer CLS 0.29 REGRESSION — AutoHideHeader returns null not hidden div. Fix = wrap in <div style={{height: headerHeight}}> placeholder. Owner: lane 02 or lane 05.",
-      "/en/multiplayer LCP 4360ms — dynamic import MultiplayerFlow delays LCP. Prior mascot-in-skeleton fix not visible in current code.",
-      "/en/multiplayer?utm_source=chatgpt.com LCP 13036ms — UTM variant, likely cold start.",
-      "/he/daily/word-wheel LCP 7864ms — undiagnosed. High priority.",
-      "/he/daily LCP 5932ms — undiagnosed.",
-      "/en/daily/word-wheel LCP 4384ms — undiagnosed.",
+      "/en/multiplayer CLS 0.29 REGRESSION (2nd day) — AutoHideHeader returns null, not hidden div. Fix = reserve space with placeholder <div> matching header height during hydration. PRIORITY: ship tomorrow.",
+      "/en/multiplayer LCP 4360ms — dynamic import MultiplayerFlow delays LCP.",
+      "/he/daily LCP 5600ms — undiagnosed, per brief.",
+      "/es/settings LCP 7768ms — undiagnosed, per brief.",
+      "/es/juego-de-palabras-multijugador LCP 6698ms — Spanish multiplayer landing, undiagnosed.",
       "/en/free-multiplayer-word-game CLS 1.0 — GSAP pin-spacer. Deferred."
     ]
   },
