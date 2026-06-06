@@ -4046,6 +4046,30 @@ html[data-cosy='true'] .texture-halftone-comic-light::before {
   display: none !important;
 }
 
+/* ---- Cosy mascot framing.
+   The opaque `dark`-bg mascot WebPs/GIFs carry a navy backdrop baked into the
+   pixels (they were drawn to blend into the dark app). On the cream cosy surface
+   that backdrop reads as a hard dark rectangle. Rather than knock the bg out
+   (luminance masking goes muddy on the dark art), frame it: round + clip the
+   navy box into a portrait, ring it with a warm border, and float it on a soft
+   shadow so it reads as an intentional sticker on cream. `nobg` (transparent)
+   and `white` (already circle-clipped + bordered) variants are left untouched.
+   Exclude callers that already shaped a dark variant (circle / rounded-square
+   clip carry their own border+bg) so the frame can't squircle their shape. */
+html[data-cosy='true'] [data-mascot-bg='dark']:not(.rounded-full):not(.rounded-neo) {
+  border-radius: 1.25rem !important;
+  overflow: hidden !important;
+  border: 3px solid hsl(40 32% 90%) !important;
+  background: #faf8f6 !important;
+  box-shadow: 0 6px 18px rgba(38, 28, 20, 0.16) !important;
+}
+/* Drop the baked-in dark drop-shadow on the media itself — the warm frame now
+   provides the depth, and the navy drop-shadow muddies the cream around it. */
+html[data-cosy='true'] [data-mascot-bg='dark'] img,
+html[data-cosy='true'] [data-mascot-bg='dark'] video {
+  filter: none !important;
+}
+
 /* ---- Light-theme circuit-breaker for the ~1279 literal `text-white` /
    `text-neo-white` utilities. They are hardcoded #fff (not var-backed), so on
    the light sand/cream surfaces they would vanish — flip them to charcoal ink.

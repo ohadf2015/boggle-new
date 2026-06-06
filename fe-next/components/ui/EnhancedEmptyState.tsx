@@ -6,6 +6,7 @@ import { Search, Inbox, FolderOpen, Frown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { EnhancedButton } from './EnhancedButton';
+import { getMascotBgTypeForSrc } from './Mascot';
 
 /**
  * Enhanced Empty State Component
@@ -102,6 +103,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
       {/* Icon or Mascot */}
       {mascotSrc ? (
         <m.div
+          data-mascot-bg={getMascotBgTypeForSrc(mascotSrc)}
           className={cn('mb-6', compact ? 'w-16 h-16' : 'w-24 h-24')}
           variants={reduceMotion ? {} : itemVariants}
         >

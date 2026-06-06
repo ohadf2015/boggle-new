@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { getMascotBgTypeForSrc } from '@/components/ui/Mascot';
 
 type SupportedLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -230,7 +231,7 @@ export default function NativePageEnhancements({ locale }: Props) {
               <span className={`absolute -right-2 -top-3 inline-block rotate-[6deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${accentChip[m.accent]}`}>
                 {m.tag}
               </span>
-              <div className="relative h-16 w-16">
+              <div data-mascot-bg={getMascotBgTypeForSrc(m.mascot)} className="relative h-16 w-16">
                 <Image src={m.mascot} alt="" fill sizes="64px" className="object-contain" />
               </div>
               <h3 className="font-neo-display text-lg font-black leading-tight">{m.mode}</h3>

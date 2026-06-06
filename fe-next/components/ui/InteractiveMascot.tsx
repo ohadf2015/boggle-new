@@ -643,7 +643,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
               transition={{ duration: 0.2, ease: 'easeInOut' }}
               className="w-full h-full"
             >
-              <div className={`w-full h-full ${CLIP_CLASSES[autoStyle.shape]} ${BORDER_CLASSES[autoStyle.border]} ${autoStyle.shape !== 'none' ? autoStyle.bg : ''}`}>
+              <div data-mascot-bg={getMascotBgType(baseVariant)} className={`w-full h-full ${CLIP_CLASSES[autoStyle.shape]} ${BORDER_CLASSES[autoStyle.border]} ${autoStyle.shape !== 'none' ? autoStyle.bg : ''}`}>
                 {isVideo ? (
                   <SilentVideo
                     key={imageSrc}

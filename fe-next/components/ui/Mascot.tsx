@@ -156,6 +156,23 @@ export function getMascotBgType(variant: MascotVariant): MascotBgType {
   return MASCOT_BG_TYPE[variant];
 }
 
+/** Reverse lookup: variant src path → its background type. */
+const SRC_TO_BG_TYPE: Record<string, MascotBgType> = Object.fromEntries(
+  (Object.keys(MASCOT_IMAGES) as MascotVariant[]).map((v) => [MASCOT_IMAGES[v], MASCOT_BG_TYPE[v]]),
+);
+
+/**
+ * Resolve a mascot's background type from a raw asset path (for renderers that
+ * take a `src` string rather than a variant — e.g. EnhancedEmptyState). Falls
+ * back to filename heuristics: `-nobg` → transparent, otherwise opaque dark.
+ * Used to drive the `data-mascot-bg` cosy-framing hook.
+ */
+export function getMascotBgTypeForSrc(src: string): MascotBgType {
+  if (SRC_TO_BG_TYPE[src]) return SRC_TO_BG_TYPE[src];
+  if (src.includes('-nobg')) return 'nobg';
+  return 'dark';
+}
+
 /**
  * Check if a variant is rendered as <video> (opaque MP4).
  * Transparent variants use animated WebP via <Image unoptimized>.
@@ -687,6 +704,7 @@ export const Mascot = memo(function Mascot({
       animate={shouldAnimate ? 'animate' : undefined}
     >
       <div
+        data-mascot-bg={getMascotBgType(variant)}
         className={`w-full h-full ${CLIP_CLASSES[shape]} ${BORDER_CLASSES[border]} ${hasClip ? bg : ''}`}
       >
         {isVideo ? (

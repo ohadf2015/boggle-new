@@ -4,7 +4,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import type { MascotClipShape, MascotBorderColor } from './Mascot';
+import { getMascotBgTypeForSrc, type MascotClipShape, type MascotBorderColor } from './Mascot';
 
 const CLIP_CLASSES: Record<MascotClipShape, string> = {
   none: '',
@@ -126,7 +126,7 @@ export const CelebrationMascot = memo(function CelebrationMascot({
         ease: 'easeInOut',
       }}
     >
-      <div className={`w-full h-full ${CLIP_CLASSES[resolvedShape]} ${BORDER_CLASSES[resolvedBorder]} ${hasClip ? resolvedBg : ''}`}>
+      <div data-mascot-bg={getMascotBgTypeForSrc(imageSrc)} className={`w-full h-full ${CLIP_CLASSES[resolvedShape]} ${BORDER_CLASSES[resolvedBorder]} ${hasClip ? resolvedBg : ''}`}>
         <Image
           src={imageSrc}
           alt={altText}
