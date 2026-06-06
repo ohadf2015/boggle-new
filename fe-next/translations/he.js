@@ -11558,7 +11558,6 @@ const he = {
   "duelsTitle": "דו-קרבות",
   "history": "היסטוריה",
   "joinClassroomToDuel": "הצטרף לכיתה כדי להתחרות! 🎓",
-  "lobby": "לובי",
   "noClassmatesFound": "לא נמצאו חברים לכיתה",
   "noOpponentsOnline": "אין יריבים מחוברים כרגע",
   "noPendingChallenges": "אין אתגרים ממתינים",

@@ -11243,7 +11243,6 @@ const en = {
   "duelsTitle": "Duels",
   "history": "History",
   "joinClassroomToDuel": "Join a classroom to duel classmates!",
-  "lobby": "Lobby",
   "noClassmatesFound": "No classmates found",
   "noOpponentsOnline": "No opponents online right now",
   "noPendingChallenges": "No pending challenges",

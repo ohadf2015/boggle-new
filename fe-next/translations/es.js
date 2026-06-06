@@ -11481,7 +11481,6 @@ const es = {
   "duelsTitle": "Duelos",
   "history": "Historial",
   "joinClassroomToDuel": "¡Únete a un aula para retar a compañeros!",
-  "lobby": "Sala",
   "noClassmatesFound": "No se encontraron compañeros",
   "noOpponentsOnline": "No hay oponentes en línea ahora",
   "noPendingChallenges": "Sin desafíos pendientes",
