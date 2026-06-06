@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-/* eslint-disable react/display-name */
 /**
  * LobbyReactions — pre-game social toy
  *
