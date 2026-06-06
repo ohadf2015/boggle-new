@@ -79,6 +79,25 @@ describe('resendShadowState — fixes role-card mount-timing stall', () => {
     expect(nightIdx).toBeGreaterThan(roleIdx); // role first, then prompt
   });
 
+  it('replays discussionStart so a phone mounting mid-discussion is not frozen on role-reveal', () => {
+    vi.useFakeTimers();
+    const io = createMockIO();
+    initShadowClash(ROOM, PLAYERS, 'standard', 4);
+    startShadowClash(io as never, ROOM);
+    const game = getShadowGameState(ROOM)!;
+    game.phase = 'discussion';
+
+    const io2 = createMockIO();
+    resendShadowState(io2 as never, ROOM, 's1');
+
+    const events = io2.getEmittedTo('s1');
+    const disc = events.filter((e) => e.event === 'party:shadow:discussionStart');
+    expect(disc).toHaveLength(1);
+    expect((disc[0].data as { timeSeconds: number }).timeSeconds).toBeGreaterThan(0);
+    // role card still first
+    expect(events[0].event).toBe('party:shadow:roleAssigned');
+  });
+
   it('does nothing for a socket that has no role (not a participant)', () => {
     vi.useFakeTimers();
     const io = createMockIO();

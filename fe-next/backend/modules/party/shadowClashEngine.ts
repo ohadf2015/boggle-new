@@ -613,5 +613,12 @@ export function resendShadowState(io: Server, roomCode: string, socketId: string
     const myUsername = game.playerUsernames.get(socketId) || '';
     const targets = aliveUsernames.filter((u) => u !== myUsername);
     io.to(socketId).emit('party:shadow:voteStart', { targets: [...targets, 'skip'], timeSeconds: 30 });
+  } else if (game.phase === 'discussion') {
+    io.to(socketId).emit('party:shadow:discussionStart', {
+      alivePlayerUsernames: aliveUsernames,
+      eliminatedHistory: game.eliminated,
+      timeSeconds: game.variant === 'one-night' ? 180 : 120,
+      round: game.round,
+    });
   }
 }
