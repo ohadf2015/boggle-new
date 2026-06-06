@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type { WordObject } from '../types';
 import UniqueWordsSection from '../UniqueWordsSection';
@@ -112,5 +112,59 @@ describe('UniqueWordsSection', () => {
       />,
     );
     expect(screen.getByText(/results\.uniqueWords\.title/)).toBeInTheDocument();
+  });
+
+  describe('declutter: top-3 reveal', () => {
+    const manyUniques = {
+      Alice: [
+        makeWord('strongest'),
+        makeWord('beautiful'),
+        makeWord('elephant'),
+        makeWord('rabbit'),
+        makeWord('panda'),
+      ],
+      Bob: [makeWord('zzz')],
+    };
+
+    it('caps the initial render to the top 3 unique words', () => {
+      render(
+        <UniqueWordsSection allPlayerWords={manyUniques} currentUsername="Alice" t={t} />,
+      );
+      // Sorted longest-first → strongest(9) beautiful(9) elephant(8) shown; rabbit/panda hidden.
+      expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      expect(screen.queryByText('panda')).not.toBeInTheDocument();
+      expect(screen.queryByText('rabbit')).not.toBeInTheDocument();
+    });
+
+    it('shows a reveal toggle when there are more than 3 uniques', () => {
+      render(
+        <UniqueWordsSection allPlayerWords={manyUniques} currentUsername="Alice" t={t} />,
+      );
+      expect(screen.getByRole('button')).toBeInTheDocument();
+    });
+
+    it('reveals every unique word after tapping the toggle', () => {
+      render(
+        <UniqueWordsSection allPlayerWords={manyUniques} currentUsername="Alice" t={t} />,
+      );
+      fireEvent.click(screen.getByRole('button'));
+      expect(screen.getAllByRole('listitem')).toHaveLength(5);
+      expect(screen.getByText('panda')).toBeInTheDocument();
+      expect(screen.getByText('rabbit')).toBeInTheDocument();
+    });
+
+    it('renders no toggle when 3 or fewer uniques', () => {
+      render(
+        <UniqueWordsSection
+          allPlayerWords={{
+            Alice: [makeWord('dog'), makeWord('cat'), makeWord('fox')],
+            Bob: [makeWord('zzz')],
+          }}
+          currentUsername="Alice"
+          t={t}
+        />,
+      );
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
   });
 });

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useMemo, useCallback, memo, useState } from 'react';
+import React, { useMemo, useCallback, memo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Grid3X3, ChevronDown, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useRevealList } from '@/hooks/useRevealList';
 import { cn } from '@/lib/utils';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 
@@ -38,13 +39,12 @@ const getWordLengthColor = (length: number): string => {
  */
 const MissedWords = memo<MissedWordsProps>(({
   missedWords,
-  maxDisplay = 5,
+  maxDisplay = 3,
   className,
   onWordSelect,
   selectedWord,
 }) => {
   const { t, language, dir } = useLanguage();
-  const [showAll, setShowAll] = useState(false);
 
   // Filter to only show high-value words (3+ points)
   const allHighValueWords = useMemo(() =>
@@ -54,13 +54,14 @@ const MissedWords = memo<MissedWordsProps>(({
     [missedWords]
   );
 
-  // Show either top N or all words based on state
-  const displayWords = useMemo(() =>
-    showAll ? allHighValueWords : allHighValueWords.slice(0, maxDisplay),
-    [allHighValueWords, showAll, maxDisplay]
-  );
-
-  const hasMoreWords = allHighValueWords.length > maxDisplay;
+  // Collapse to the top N highlights with a tap-to-reveal toggle (shared logic).
+  const {
+    visible: displayWords,
+    hasMore: hasMoreWords,
+    showAll,
+    toggle,
+    hiddenCount,
+  } = useRevealList(allHighValueWords, maxDisplay);
 
   // Handle word click for path reveal
   const handleWordClick = useCallback((wordData: MissedWord) => {
@@ -171,7 +172,7 @@ const MissedWords = memo<MissedWordsProps>(({
         {hasMoreWords && (
           <div className="px-2 pb-2">
             <button
-              onClick={() => setShowAll(!showAll)}
+              onClick={toggle}
               className={cn(
                 'w-full flex items-center justify-center gap-1.5 py-1.5 rounded-neo',
                 'text-xs font-bold uppercase',
@@ -182,7 +183,7 @@ const MissedWords = memo<MissedWordsProps>(({
               <span>
                 {showAll
                   ? (t('common.showLess'))
-                  : (t('common.showMore') || `Show ${allHighValueWords.length - maxDisplay} More`)
+                  : `${t('common.showMore')} (${hiddenCount})`
                 }
               </span>
               <m.div

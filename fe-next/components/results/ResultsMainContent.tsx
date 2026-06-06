@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, Type, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Player, WordObject } from '@/components/results/types';
 import { assignConsolationCrowns } from '@/utils/consolationCrowns';
+import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 // New cinematic components
@@ -176,18 +177,14 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     return assignConsolationCrowns(playersWithStats, topThree);
   }, [sortedScores, podiumPlayers, allPlayerWords]);
 
-  // Count words only current player found (not found by any opponent)
+  // Count words only current player found. Derived from the SAME selector the
+  // UniqueWordsSection list uses, so the "Only You" badge can't drift from the
+  // chips shown below (the old inline count ignored opponents' isDuplicate flag
+  // and could over/under-count vs the list).
   const uniqueWordsCount = useMemo(() => {
     if (!currentPlayerData || !allPlayerWords || !username) return 0;
-    const otherWords = new Set<string>();
-    Object.entries(allPlayerWords).forEach(([uname, words]) => {
-      if (uname === username) return;
-      words.forEach(w => {
-        if (w.validated) otherWords.add(w.word.toLowerCase());
-      });
-    });
-    return currentPlayerValidWords.filter(w => !otherWords.has(w.word.toLowerCase())).length;
-  }, [currentPlayerData, allPlayerWords, currentPlayerValidWords, username]);
+    return selectUniqueWords(allPlayerWords, username).length;
+  }, [currentPlayerData, allPlayerWords, username]);
 
   // Compute highlights stats
   const highlightStats = useMemo(() => {
