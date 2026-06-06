@@ -560,8 +560,10 @@ function HostPreGameView({
         premium={avatarPremium}
       />
       <ChatBubble gameCode={gameCode} username={username} isHost t={t} />
-      {/* Receive-only emoji floats — players fling reactions, the host screen shows them. */}
-      <LobbyReactions username={username} receiveOnly />
+      {/* The host is a present person on their own device (true cast-to-TV is the
+          separate tv-broadcast/ components), so they can fling emoji whether they
+          play or just run the scoreboard — same ambient delight as every player. */}
+      <LobbyReactions username={username} />
       {/* Single boost picker mount — survives layout tree swaps. Lazy-mounted
           so the picker's hooks (useBoostStatus, useBoostClaim → AdMobProvider)
           don't run until needed; HostPreGameView root keeps the open flag so
