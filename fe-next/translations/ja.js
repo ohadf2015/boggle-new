@@ -1113,6 +1113,8 @@ const ja = {
     "deleteAccountDeleting": "削除中...",
     "deleteAccountError": "アカウントの削除に失敗しました。もう一度お試しください。",
     "changeLanguage": "言語を変更",
+    "firstGamePlayingIn": "{language}でプレイ中",
+    "firstGameDismiss": "OK",
     "moreSettings": "その他の設定",
     "mute": "ミュート",
     "unmute": "ミュート解除",

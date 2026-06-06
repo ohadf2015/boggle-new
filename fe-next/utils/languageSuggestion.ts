@@ -17,23 +17,21 @@
  * access) so they can be unit-tested in isolation; the hook supplies the I/O.
  */
 import type { Language } from '@/shared/types/game';
+import { mapToSupportedLocale } from '@/lib/localeResolution';
 
 /** Locales we ship native, hand-crafted translations for. */
 export const SUPPORTED_SUGGESTION_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 export type SuggestionLanguage = (typeof SUPPORTED_SUGGESTION_LANGUAGES)[number];
 
-const SUPPORTED = new Set<string>(SUPPORTED_SUGGESTION_LANGUAGES);
-
 /**
  * Map a BCP-47 language tag (e.g. `es-MX`, `en-GB`, legacy `iw`) to one of the
- * languages we natively support, or `null` if we don't ship that language.
+ * languages we natively support, or `null` if we ship nothing close. Delegates
+ * to the shared resolver so this matches locale auto-routing exactly — including
+ * proximity, so a Portuguese (`pt`/`pt-BR`) browser is offered our Spanish
+ * bundle rather than being left on English.
  */
 export function mapToSupportedLanguage(tag: string | null | undefined): SuggestionLanguage | null {
-  if (!tag) return null;
-  const primary = tag.toLowerCase().split(/[-_]/)[0];
-  // `iw` is the deprecated ISO code for Hebrew still emitted by some browsers.
-  const normalized = primary === 'iw' ? 'he' : primary;
-  return SUPPORTED.has(normalized) ? (normalized as SuggestionLanguage) : null;
+  return mapToSupportedLocale(tag) as SuggestionLanguage | null;
 }
 
 /**

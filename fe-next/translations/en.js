@@ -1098,6 +1098,8 @@ const en = {
     "deleteAccountDeleting": "Deleting...",
     "deleteAccountError": "Failed to delete account. Please try again.",
     "changeLanguage": "Change Language",
+    "firstGamePlayingIn": "You're playing in {language}",
+    "firstGameDismiss": "Got it",
     "moreSettings": "More Settings",
     "mute": "Mute",
     "unmute": "Unmute",

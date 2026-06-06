@@ -3,6 +3,7 @@
 import { createContext, useState, useContext, useEffect, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { locales, defaultLocale } from '../lib/i18n';
+import { matchLanguageList } from '../lib/localeResolution';
 import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
 import logger from '@/utils/logger';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
@@ -43,24 +44,13 @@ const parseLocaleFromPath = (pathname: string): Language | null => {
     return locales.includes(locale as Language) ? (locale as Language) : null;
 };
 
-// Map browser language codes to supported locales
+// Map browser language codes to supported locales. Uses the shared resolver so
+// close-but-unshipped languages map to a native bundle (e.g. a pt-BR browser
+// resolves to our Spanish bundle, not the English default).
 const getBrowserLanguage = (): Language | null => {
     if (typeof window === 'undefined' || !navigator) return null;
-
-    // Get browser languages (e.g., ['en-US', 'en', 'he'])
     const browserLanguages = navigator.languages || [navigator.language];
-
-    for (const lang of browserLanguages) {
-        // Get the primary language code (e.g., 'en' from 'en-US')
-        const primaryLang = lang.split('-')[0]?.toLowerCase();
-
-        // Check if we support this language
-        if (primaryLang && locales.includes(primaryLang as Language)) {
-            return primaryLang as Language;
-        }
-    }
-
-    return null;
+    return matchLanguageList(browserLanguages) as Language | null;
 };
 
 interface LanguageProviderProps {

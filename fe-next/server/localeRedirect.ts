@@ -6,6 +6,7 @@
 import type { Request, Response } from 'express';
 import type { UrlWithParsedQuery } from 'url';
 import { httpLogger } from './logger';
+import { resolveLocaleFromAcceptLanguage } from '../lib/localeResolution';
 
 /**
  * Extended Request with geo data
@@ -95,17 +96,15 @@ export function determineLocale(req: GeoRequest): string {
     return cookieLocale;
   }
 
-  // Priority 2: Accept-Language header (browser preference)
-  const acceptLanguage = req.headers['accept-language'];
-  if (acceptLanguage) {
-    const browserLang = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
-    if (SUPPORTED_LOCALES.includes(browserLang)) {
-      return browserLang;
-    }
-  }
-
-  // Priority 3: Default locale
-  return DEFAULT_LOCALE;
+  // Priority 2: Accept-Language header (browser preference). Shared resolver
+  // q-sorts the full list AND maps close-but-unshipped languages to a native
+  // bundle (e.g. pt-BR -> es) before falling back to DEFAULT_LOCALE. Previously
+  // this only inspected the first tag and ignored proximity, so Brazilians got
+  // English instead of our (far more intelligible) Spanish bundle.
+  return resolveLocaleFromAcceptLanguage(
+    req.headers['accept-language'],
+    DEFAULT_LOCALE,
+  );
 }
 
 /**

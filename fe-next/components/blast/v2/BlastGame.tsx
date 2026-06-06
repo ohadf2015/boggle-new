@@ -567,7 +567,7 @@ export function BlastGame({
   }
 
   return (
-    <div className="flex flex-col h-dvh overflow-hidden bg-[#0b1530] text-white">
+    <div className="flex flex-col h-dvh overflow-hidden bg-[#0b1530] text-white" translate="no">
       {tutorial.showUnlockCard && (
         <BlastUnlockCard
           mechanic={tutorial.showUnlockCard}

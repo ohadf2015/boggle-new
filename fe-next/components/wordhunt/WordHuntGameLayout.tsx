@@ -132,7 +132,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   gameDir,
 }) => {
   return (
-    <div className="flex-1 flex flex-col min-[720px]:flex-row min-h-0 overflow-x-hidden overflow-y-auto">
+    <div className="flex-1 flex flex-col min-[720px]:flex-row min-h-0 overflow-x-hidden overflow-y-auto" translate="no">
       {/* Main game area — capped width on wider screens, with vertical rhythm between sections */}
       <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto gap-1.5 md:gap-2 [@media(max-height:560px)]:gap-0.5">
         {/* Score + Quit — compact */}

@@ -367,6 +367,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         "flex-1 flex flex-col p-2 sm:p-4 overflow-hidden",
         false &&"flex-row"
       )}
+      translate="no"
     >
       {/* Top bar with quit button - matches multiplayer layout */}
       <div className={cn(

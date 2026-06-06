@@ -159,7 +159,7 @@ export default function SoloPracticeBoard({
   // Completion screen
   if (showComplete) {
     return (
-      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-neo-navy p-4 sm:p-6 flex items-center justify-center" translate="no">
         <m.div
           initial={{ scale: 0.8, opacity: 0, y: 30 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -308,7 +308,7 @@ export default function SoloPracticeBoard({
   }
 
   return (
-    <div className="min-h-screen bg-neo-navy p-4 sm:p-6">
+    <div className="min-h-screen bg-neo-navy p-4 sm:p-6" translate="no">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-4">

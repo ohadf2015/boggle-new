@@ -585,6 +585,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         'bg-neo-cream dark:bg-neo-navy p-0 md:p-4',
         getCurrentSeasonDynamic().gridSkinClass,
       )}
+      translate="no"
     >
       <div className="relative flex-1 flex flex-col min-h-0">
         <OpponentWordFeedConnected socket={socket} currentPlayerName={username} t={t} />

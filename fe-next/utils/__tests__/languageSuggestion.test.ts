@@ -21,6 +21,13 @@ describe('mapToSupportedLanguage', () => {
     expect(mapToSupportedLanguage('iw-IL')).toBe('he');
   });
 
+  it('offers Spanish to close Romance speakers we do not ship natively', () => {
+    // A Brazilian (pt-BR) understands our Spanish bundle far better than English.
+    expect(mapToSupportedLanguage('pt-BR')).toBe('es');
+    expect(mapToSupportedLanguage('pt')).toBe('es');
+    expect(mapToSupportedLanguage('it')).toBe('es');
+  });
+
   it('returns null for unsupported or empty tags', () => {
     expect(mapToSupportedLanguage('fr-FR')).toBeNull();
     expect(mapToSupportedLanguage('de')).toBeNull();

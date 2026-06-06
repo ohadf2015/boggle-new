@@ -17,6 +17,7 @@ import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
 import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
+import { FirstGameLanguageNotice } from '@/components/FirstGameLanguageNotice';
 import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 import type { Language } from '@/shared/types/game';
@@ -609,6 +610,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
                     <NativeLanguageBanner />
+                    <FirstGameLanguageNotice />
                     <OfflineBanner />
                     <OfflineSyncBridge />
                     <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">

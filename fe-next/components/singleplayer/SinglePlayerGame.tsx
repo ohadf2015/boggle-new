@@ -346,7 +346,7 @@ function SinglePlayerGame({
   // Landscape layout
   if (core.isLandscape) {
     return (
-      <div className="relative h-full">
+      <div className="relative h-full" translate="no">
         {encouragementBanner}
         {scorePopupElement}
         {practicePromptElement}
@@ -365,7 +365,7 @@ function SinglePlayerGame({
   // Desktop/TV layout
   if (core.isDesktop || core.isTv) {
     return (
-      <div className="relative h-full">
+      <div className="relative h-full" translate="no">
         {encouragementBanner}
         {scorePopupElement}
         {practicePromptElement}
@@ -384,7 +384,7 @@ function SinglePlayerGame({
 
   // Portrait layout (default)
   return (
-    <div className="relative">
+    <div className="relative" translate="no">
       {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}

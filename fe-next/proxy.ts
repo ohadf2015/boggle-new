@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { matchAcceptLanguage } from './lib/localeResolution';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const DEFAULT_LOCALE = 'en';
@@ -169,38 +170,9 @@ function getLocaleFromRequest(request: NextRequest): string | null {
     return localeCookie.value;
   }
 
-  // Check Accept-Language header
-  const acceptLanguage = request.headers.get('accept-language');
-  if (acceptLanguage) {
-    const preferredLocale = parseAcceptLanguage(acceptLanguage);
-    if (preferredLocale) {
-      return preferredLocale;
-    }
-  }
-
-  return null;
-}
-
-/**
- * Parse Accept-Language header and return matching locale
- */
-function parseAcceptLanguage(acceptLanguage: string): string | null {
-  const languages = acceptLanguage
-    .split(',')
-    .map((lang) => {
-      const [locale, q = 'q=1'] = lang.trim().split(';');
-      const quality = parseFloat(q.replace('q=', ''));
-      return { locale: locale.toLowerCase().split('-')[0], quality };
-    })
-    .sort((a, b) => b.quality - a.quality);
-
-  for (const { locale } of languages) {
-    if (VALID_LOCALES.includes(locale as typeof VALID_LOCALES[number])) {
-      return locale;
-    }
-  }
-
-  return null;
+  // Check Accept-Language header. Returns null when no tag maps (exactly or by
+  // proximity, e.g. pt-BR -> es) so the Express localeRedirect can decide.
+  return matchAcceptLanguage(request.headers.get('accept-language'));
 }
 
 export const config = {

@@ -145,7 +145,7 @@ export function RunPageClient() {
 
   // state.phase === 'playing'
   return (
-    <div className="relative flex flex-col gap-3 p-3">
+    <div className="relative flex flex-col gap-3 p-3" translate="no">
       <RunWordPop pop={wordPop} t={t} />
       <RunHUD
         round={state.round.round}

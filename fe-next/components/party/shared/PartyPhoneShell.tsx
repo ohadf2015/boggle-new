@@ -43,7 +43,7 @@ export function PartyPhoneShell({ children, className = '', bounded = false }: P
     .join(' ');
 
   return (
-    <div dir={dir} className={classes}>
+    <div dir={dir} className={classes} translate="no">
       {children}
     </div>
   );

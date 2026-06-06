@@ -691,6 +691,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         'relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-bottom-stack rounded-neo',
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
+      translate="no"
     >
       {/* Full / near-full wheel-coverage banner (pointer-events disabled). */}
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} />

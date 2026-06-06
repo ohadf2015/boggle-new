@@ -1207,6 +1207,8 @@ const sv = {
     "deleteAccountDeleting": "Raderar...",
     "deleteAccountError": "Kunde inte radera kontot. Försök igen.",
     "changeLanguage": "Byt språk",
+    "firstGamePlayingIn": "Du spelar på {language}",
+    "firstGameDismiss": "Okej",
     "moreSettings": "Fler inställningar",
     "mute": "Tysta",
     "unmute": "Slå på ljud",

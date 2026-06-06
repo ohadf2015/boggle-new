@@ -105,7 +105,7 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
   } = p;
 
   return (
-    <div ref={effects.shakeRef} data-testid="adventure-game" data-adventure-game role="main" aria-label={t('adventure.game.title')} className="h-full w-full overflow-hidden relative" style={{ '--mastery-aura': masteryAura as string } as React.CSSProperties}>
+    <div ref={effects.shakeRef} data-testid="adventure-game" data-adventure-game role="main" aria-label={t('adventure.game.title')} className="h-full w-full overflow-hidden relative" translate="no" style={{ '--mastery-aura': masteryAura as string } as React.CSSProperties}>
       <GameplayBackground className="absolute inset-0 -z-10" />
       {/* A11y audit (2026-05-01): announces newly found words to screen readers */}
       <GameLiveRegion wordsFound={gameState.wordsFound} score={gameState.score} />

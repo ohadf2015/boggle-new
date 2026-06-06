@@ -1089,6 +1089,8 @@ const es = {
     "deleteAccountDeleting": "Eliminando...",
     "deleteAccountError": "No se pudo eliminar la cuenta. Inténtalo de nuevo.",
     "changeLanguage": "Cambiar idioma",
+    "firstGamePlayingIn": "Estás jugando en {language}",
+    "firstGameDismiss": "Entendido",
     "moreSettings": "Más ajustes",
     "mute": "Silenciar",
     "unmute": "Activar sonido",

@@ -236,6 +236,7 @@ export default function GemHuntPageClient() {
         'bg-neo-navy texture-halftone',
         isRTL && 'rtl',
       )}
+      translate="no"
     >
       <div
         aria-hidden

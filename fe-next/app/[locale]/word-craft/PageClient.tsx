@@ -887,6 +887,7 @@ export default function WordCraftPageClient() {
         'bg-neo-navy texture-halftone',
         isRTL && 'rtl',
       )}
+      translate="no"
     >
       {/* Backdrop spotlight echoes the brand purple from the mode tile */}
       <div

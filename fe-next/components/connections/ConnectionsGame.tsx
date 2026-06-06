@@ -404,7 +404,7 @@ export default function ConnectionsGame() {
   }
 
   return (
-    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative flex flex-col gap-2 w-full max-w-xl mx-auto py-3 px-4">
+    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative flex flex-col gap-2 w-full max-w-xl mx-auto py-3 px-4" translate="no">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
       {/* Back to home */}

@@ -1118,6 +1118,8 @@ const he = {
     "deleteAccountDeleting": "מוחק...",
     "deleteAccountError": "מחיקת החשבון נכשלה. נסו שוב.",
     "changeLanguage": "החלף שפה",
+    "firstGamePlayingIn": "אתה משחק ב{language}",
+    "firstGameDismiss": "הבנתי",
     "moreSettings": "הגדרות נוספות",
     "mute": "השתק",
     "unmute": "בטל השתקה",

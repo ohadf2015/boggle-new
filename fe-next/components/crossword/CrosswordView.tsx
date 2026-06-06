@@ -97,7 +97,7 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
   const handleReveal = useCallback(() => revealCell(), [revealCell]);
 
   return (
-    <div className="flex flex-col gap-4 items-stretch w-full max-w-[36rem] mx-auto px-3 py-4">
+    <div className="flex flex-col gap-4 items-stretch w-full max-w-[36rem] mx-auto px-3 py-4" translate="no">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-neo-display font-extrabold text-xl text-neo-cyan">

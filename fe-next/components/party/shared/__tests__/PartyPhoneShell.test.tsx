@@ -54,6 +54,14 @@ describe('PartyPhoneShell', () => {
     expect(boundEl.className).not.toContain('min-h-dvh');
   });
 
+  it('marks the gameplay subtree translate="no" so browsers do not scramble tiles/words', () => {
+    mockDir = 'ltr';
+    const { container } = render(<PartyPhoneShell><span>x</span></PartyPhoneShell>);
+    // Inherited by the whole board subtree — stops Chrome/Edge auto-translation
+    // (which mangles letter tiles and can crash React via DOM mutation).
+    expect(container.firstChild).toHaveAttribute('translate', 'no');
+  });
+
   it('merges caller-supplied className', () => {
     mockDir = 'ltr';
     const { container } = render(
