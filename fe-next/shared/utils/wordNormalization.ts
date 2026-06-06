@@ -126,6 +126,7 @@ export function normalizeSpanishLetter(letter: string): string {
  * Normalize an entire Spanish word - remove accents from vowels
  */
 export function normalizeSpanishWord(word: string): string {
+  if (typeof word !== 'string') return '';
   return word.split('').map(normalizeSpanishLetter).join('');
 }
 
@@ -153,6 +154,10 @@ export function normalizeLetter(letter: string, language: Language): string {
  * This is the primary function to use for cross-language normalization
  */
 export function normalizeWord(word: string, language: Language): string {
+  // Guard against null/undefined board cells reaching here during rAF ticks.
+  // Without this, es threw "null.split" (Sentry 1ME) and en/sv threw
+  // "null.toLowerCase is not a function" (Sentry 1MA). One guard covers all branches.
+  if (typeof word !== 'string') return '';
   switch (language) {
     case 'he':
       return normalizeHebrewWord(word);

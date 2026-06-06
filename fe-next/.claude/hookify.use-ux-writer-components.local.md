@@ -29,7 +29,7 @@ Adding `t('new.key')` without translations means:
 
 1. **Use `/ux-writer` skill first**
 2. **Describe the context** and intent of the text
-3. **Get native translations** for all 4 languages
+3. **Get native translations** for all 5 languages
 4. **Add translations to all language files**
 5. **Then add the `t()` call** to your component
 
@@ -42,11 +42,12 @@ Adding `t('new.key')` without translations means:
 # Step 2: Describe what you need
 "Button text for starting a new game, playful and exciting tone"
 
-# Step 3: Skill provides all 4 translations
+# Step 3: Skill provides all 5 translations
 # en: "Let's Play!"
 # he: "יאללה למשחק!"
 # sv: "Nu kör vi!"
 # ja: "さあ、始めよう！"
+# es: "¡A jugar!"
 
 # Step 4: Add to all translation files
 # Step 5: Use t('game.startButton') in component
@@ -54,10 +55,11 @@ Adding `t('new.key')` without translations means:
 
 ## Required Languages
 
-- 🇺🇸 English (`en.json`)
-- 🇮🇱 Hebrew (`he.json`) - RTL
-- 🇸🇪 Swedish (`sv.json`)
-- 🇯🇵 Japanese (`ja.json`)
+- 🇺🇸 English (`en.js`)
+- 🇮🇱 Hebrew (`he.js`) - RTL
+- 🇸🇪 Swedish (`sv.js`)
+- 🇯🇵 Japanese (`ja.js`)
+- 🇪🇸 Spanish (`es.js`)
 
 ## Project Context
 

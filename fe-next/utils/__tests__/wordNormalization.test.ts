@@ -325,3 +325,34 @@ describe('isValidWordCharacters', () => {
     expect(isValidWordCharacters('日本', 'ja')).toBe(true);
   });
 });
+
+describe('null-safety (Sentry JAVASCRIPT-NEXTJS-1ME / 1MA)', () => {
+  // A null/undefined board cell reached normalizeWord during a rAF tick.
+  // es branch threw "Cannot read properties of null (reading 'split')" (1ME);
+  // en/sv branch threw "toLowerCase is not a function" (1MA). One guard fixes both.
+  describe('normalizeWord returns "" for non-string input in every language', () => {
+    it.each(['en', 'he', 'sv', 'ja', 'es'] as const)('handles null for %s', (lang) => {
+      expect(normalizeWord(null as unknown as string, lang)).toBe('');
+    });
+
+    it.each(['en', 'he', 'sv', 'ja', 'es'] as const)('handles undefined for %s', (lang) => {
+      expect(normalizeWord(undefined as unknown as string, lang)).toBe('');
+    });
+  });
+
+  describe('normalizeSpanishWord matches its Hebrew sibling guard', () => {
+    it('returns "" for null instead of throwing', () => {
+      expect(normalizeSpanishWord(null as unknown as string)).toBe('');
+    });
+
+    it('returns "" for undefined instead of throwing', () => {
+      expect(normalizeSpanishWord(undefined as unknown as string)).toBe('');
+    });
+
+    it('still normalizes real accented words (ñ preserved, vowel accents stripped)', () => {
+      expect(normalizeSpanishWord('niño')).toBe('niño');
+      expect(normalizeSpanishWord('café')).toBe('cafe');
+      expect(normalizeSpanishWord('ácido')).toBe('acido');
+    });
+  });
+});

@@ -6,7 +6,7 @@ action: warn
 conditions:
   - field: file_path
     operator: regex_match
-    pattern: translations/.*\.(json|ts)$
+    pattern: translations/.*\.(js|json|ts)$
   - field: new_text
     operator: regex_match
     pattern: ":\s*[\"'][^\"']{3,}[\"']"
@@ -16,17 +16,18 @@ conditions:
 
 You're adding or modifying user-facing text in translation files. **Use the `/ux-writer` skill** to ensure:
 
-1. **Native-sounding copy** for all 4 languages
+1. **Native-sounding copy** for all 5 languages
 2. **Consistent tone** across the app
 3. **Cultural adaptation** (not just literal translation)
 
 ## Required Languages
 
-This project requires translations in **ALL 4 languages**:
-- 🇺🇸 **English** (`en.json`)
-- 🇮🇱 **Hebrew** (`he.json`) - RTL language
-- 🇸🇪 **Swedish** (`sv.json`)
-- 🇯🇵 **Japanese** (`ja.json`)
+This project requires translations in **ALL 5 languages**:
+- 🇺🇸 **English** (`en.js`)
+- 🇮🇱 **Hebrew** (`he.js`) - RTL language
+- 🇸🇪 **Swedish** (`sv.js`)
+- 🇯🇵 **Japanese** (`ja.js`)
+- 🇪🇸 **Spanish** (`es.js`)
 
 ## How to Use /ux-writer
 
@@ -53,7 +54,7 @@ The skill will generate native-sounding translations for all languages.
 
 1. Call `/ux-writer` skill
 2. Describe: "Welcome message for game lobby, playful tone"
-3. Get native translations for all 4 languages
+3. Get native translations for all 5 languages
 4. Add all translations at once
 
 ## Remember
@@ -61,4 +62,5 @@ The skill will generate native-sounding translations for all languages.
 - **Hebrew is RTL** - text may need different structure
 - **Japanese uses different levels of formality** - match app tone
 - **Swedish has unique idioms** - avoid literal translations
+- **Spanish has gendered nouns/accents** - board generates á é í ó ú ü ñ; keep them
 - **Playful "Jackbox" tone** - keep it fun across all languages!
