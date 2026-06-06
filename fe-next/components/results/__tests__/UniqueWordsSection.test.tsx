@@ -167,4 +167,35 @@ describe('UniqueWordsSection', () => {
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
   });
+
+  describe('reduced motion', () => {
+    const manyUniques = {
+      Alice: [makeWord('strongest'), makeWord('beautiful'), makeWord('elephant'), makeWord('rabbit')],
+      Bob: [makeWord('zzz')],
+    };
+
+    beforeEach(() => {
+      // Simulate prefers-reduced-motion:reduce — the component must still cap to
+      // top-3 and reveal correctly with motion suppressed (no crash, no lost content).
+      vi.stubGlobal('matchMedia', (query: string) => ({
+        matches: query.includes('reduce'),
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      }));
+    });
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('still caps to top-3 and reveals all under reduced motion', () => {
+      render(<UniqueWordsSection allPlayerWords={manyUniques} currentUsername="Alice" t={t} />);
+      expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      fireEvent.click(screen.getByRole('button'));
+      expect(screen.getAllByRole('listitem')).toHaveLength(4);
+      expect(screen.getByText('rabbit')).toBeInTheDocument();
+    });
+  });
 });

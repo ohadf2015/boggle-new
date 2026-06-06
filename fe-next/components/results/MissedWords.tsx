@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback, memo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Grid3X3, ChevronDown, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRevealList } from '@/hooks/useRevealList';
@@ -45,6 +45,9 @@ const MissedWords = memo<MissedWordsProps>(({
   selectedWord,
 }) => {
   const { t, language, dir } = useLanguage();
+  // Accessibility: honor OS "reduce motion" — card + chips appear instantly,
+  // no hover/press transforms. Compositor-only props keep the animated path 60fps.
+  const reduce = useReducedMotion();
 
   // Filter to only show high-value words (3+ points)
   const allHighValueWords = useMemo(() =>
@@ -88,9 +91,9 @@ const MissedWords = memo<MissedWordsProps>(({
 
   return (
     <m.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
+      initial={reduce ? false : { opacity: 0, y: 10 }}
+      animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
       className={cn('w-full', className)}
     >
       <div
@@ -123,13 +126,17 @@ const MissedWords = memo<MissedWordsProps>(({
               return (
                 <m.button
                   key={wordData.word}
-                  layout
-                  initial={{ opacity: 0, scale: 0.7, y: 8, rotate: index % 2 === 0 ? -6 : 6 }}
-                  animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, y: -4 }}
-                  whileHover={{ scale: 1.08, y: -2, rotate: index % 2 === 0 ? 2 : -2 }}
-                  whileTap={{ scale: 0.92 }}
-                  transition={{ type: 'spring', stiffness: 350, damping: 12, delay: index * 0.04 }}
+                  layout={!reduce}
+                  initial={reduce ? false : { opacity: 0, scale: 0.7, y: 8, rotate: index % 2 === 0 ? -6 : 6 }}
+                  animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0, rotate: 0 }}
+                  exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.8, y: -4 }}
+                  whileHover={reduce ? undefined : { scale: 1.08, y: -2, rotate: index % 2 === 0 ? 2 : -2 }}
+                  whileTap={reduce ? undefined : { scale: 0.92 }}
+                  transition={
+                    reduce
+                      ? { duration: 0 }
+                      : { type: 'spring', stiffness: 350, damping: 18, delay: Math.min(index, 6) * 0.04 }
+                  }
                   onClick={() => hasPath && handleWordClick(wordData)}
                   disabled={!hasPath}
                   className={cn(
@@ -171,8 +178,10 @@ const MissedWords = memo<MissedWordsProps>(({
         {/* Show More/Less button */}
         {hasMoreWords && (
           <div className="px-2 pb-2">
-            <button
+            <m.button
               onClick={toggle}
+              whileHover={reduce ? undefined : { scale: 1.02 }}
+              whileTap={reduce ? undefined : { scale: 0.96 }}
               className={cn(
                 'w-full flex items-center justify-center gap-1.5 py-1.5 rounded-neo',
                 'text-xs font-bold uppercase',
@@ -188,11 +197,11 @@ const MissedWords = memo<MissedWordsProps>(({
               </span>
               <m.div
                 animate={{ rotate: showAll ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
+                transition={reduce ? { duration: 0 } : { duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
               >
                 <ChevronDown className="w-4 h-4" />
               </m.div>
-            </button>
+            </m.button>
           </div>
         )}
       </div>

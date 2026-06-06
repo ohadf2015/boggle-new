@@ -57,4 +57,29 @@ describe('MissedWords declutter', () => {
     render(<MissedWords missedWords={sixMisses.slice(0, 3)} />);
     expect(screen.queryByText(/common\.showMore/)).not.toBeInTheDocument();
   });
+
+  describe('reduced motion', () => {
+    beforeEach(() => {
+      vi.stubGlobal('matchMedia', (query: string) => ({
+        matches: query.includes('reduce'),
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      }));
+    });
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('still shows top-3 and reveals all with motion suppressed', () => {
+      render(<MissedWords missedWords={sixMisses} />);
+      expect(screen.getByText('strongest')).toBeInTheDocument();
+      expect(screen.queryByText('rabbit')).not.toBeInTheDocument();
+      fireEvent.click(screen.getByText(/common\.showMore/));
+      expect(screen.getByText('rabbit')).toBeInTheDocument();
+      expect(screen.getByText('crow')).toBeInTheDocument();
+    });
+  });
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Fingerprint, ChevronDown } from 'lucide-react';
 import { useRevealList } from '@/hooks/useRevealList';
 import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
@@ -41,6 +41,12 @@ const UniqueWordsSection: React.FC<UniqueWordsSectionProps> = ({
     initialCount,
   );
 
+  // Accessibility: honor OS "reduce motion" — chips appear instantly with no
+  // hover/press transforms. The animated path uses only transform/opacity
+  // (compositor-only, 60fps); the cyan hover glow is a CSS colour shift (not
+  // motion), so it stays on for everyone.
+  const reduce = useReducedMotion();
+
   if (!uniqueWords) return null;
 
   return (
@@ -55,19 +61,26 @@ const UniqueWordsSection: React.FC<UniqueWordsSectionProps> = ({
         </span>
       </div>
       <ul className="flex flex-wrap gap-1.5">
-        {/* No `initial={false}` — chips play their staggered entrance on mount
-            (matches MissedWords) for a bit of arrival delight, then layout-
-            animate as items reveal/collapse via the toggle. */}
+        {/* Chips play a staggered entrance on mount (matches MissedWords) for a
+            bit of arrival delight, then layout-animate as items reveal/collapse
+            via the toggle. Stagger delay is capped so a long revealed list never
+            crawls in. Reduced motion → instant, no transforms. */}
         <AnimatePresence mode="popLayout">
           {visible.map((word, index) => (
             <m.li
               key={word}
-              layout
-              initial={{ opacity: 0, scale: 0.6, y: 6, rotate: index % 2 === 0 ? -5 : 5 }}
-              animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.7, y: -4 }}
-              transition={{ type: 'spring', stiffness: 360, damping: 16, delay: index * 0.03 }}
-              className="px-2 py-0.5 rounded bg-neo-cyan/20 text-neo-cyan text-xs font-semibold border border-neo-cyan/30 lowercase"
+              layout={!reduce}
+              initial={reduce ? false : { opacity: 0, scale: 0.6, y: 6, rotate: index % 2 === 0 ? -5 : 5 }}
+              animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0, rotate: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.7, y: -4 }}
+              transition={
+                reduce
+                  ? { duration: 0 }
+                  : { type: 'spring', stiffness: 360, damping: 18, delay: Math.min(index, 6) * 0.03 }
+              }
+              whileHover={reduce ? undefined : { y: -2, scale: 1.06 }}
+              whileTap={reduce ? undefined : { scale: 0.94 }}
+              className="px-2 py-0.5 rounded bg-neo-cyan/20 text-neo-cyan text-xs font-semibold border border-neo-cyan/30 lowercase cursor-default transition-colors hover:bg-neo-cyan/30 hover:border-neo-cyan/70 hover:text-neo-cyan-light"
             >
               {word}
             </m.li>
@@ -75,9 +88,11 @@ const UniqueWordsSection: React.FC<UniqueWordsSectionProps> = ({
         </AnimatePresence>
       </ul>
       {hasMore && (
-        <button
+        <m.button
           type="button"
           onClick={toggle}
+          whileHover={reduce ? undefined : { scale: 1.02 }}
+          whileTap={reduce ? undefined : { scale: 0.96 }}
           className="w-full flex items-center justify-center gap-1 py-1 rounded-neo text-[11px] font-bold uppercase tracking-wide text-neo-cyan bg-neo-cyan/10 hover:bg-neo-cyan/20 border border-neo-cyan/30 transition-colors"
         >
           <span>
@@ -87,12 +102,12 @@ const UniqueWordsSection: React.FC<UniqueWordsSectionProps> = ({
           </span>
           <m.span
             animate={{ rotate: showAll ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
+            transition={reduce ? { duration: 0 } : { duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="inline-flex"
           >
             <ChevronDown className="w-3.5 h-3.5" />
           </m.span>
-        </button>
+        </m.button>
       )}
     </div>
   );
