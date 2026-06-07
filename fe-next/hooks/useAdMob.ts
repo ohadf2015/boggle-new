@@ -44,6 +44,20 @@ export const REWARD_SAFETY_TIMEOUT_MS = 90000;
 // apps via the web deploy — no Android release, trivially reversible.
 const REWARD_IMMERSIVE_MODE = false;
 
+// Visibility-reconcile grace. The rewarded ad is a fullscreen native Activity
+// over the WebView; while it's frontmost Android SUSPENDS the WebView's JS, so
+// every JS watchdog (`prepareTimer`, `safetyTimer`, the hook-level 120s
+// backstop) is FROZEN too — confirmed in production telemetry: a 56-minute
+// ad-cover span logged zero `safety_timeout`. The only event that survives the
+// suspension is `visibilitychange`, which fires the instant the ad Activity is
+// torn down and the WebView resumes. The real Rewarded/Dismissed event is
+// queued and flushes ~100 ms after that. So on regaining visibility we wait
+// this grace; if STILL unsettled the native terminal event was dropped and the
+// player would be stranded on a frozen game with the watch button disabled —
+// we settle (no reward, like a skip) to free the UI. Long enough to never
+// preempt the ~100 ms real reward, short enough to unstick the player fast.
+export const VISIBILITY_RECONCILE_GRACE_MS = 2000;
+
 export interface ShowBannerOptions {
   variant?: BannerVariant;
 }
@@ -92,6 +106,13 @@ export function useAdMob() {
     let dismissGraceTimer: ReturnType<typeof setTimeout> | null = null;
     let safetyTimer: ReturnType<typeof setTimeout> | null = null;
     let prepareTimer: ReturnType<typeof setTimeout> | null = null;
+    // Visibility-reconcile state. `adShown` arms the reconcile only once the ad
+    // is actually on screen (so app-switching DURING prepare can't trip it);
+    // `wentHidden` records that the ad Activity covered the WebView; the timer
+    // is the post-foreground grace before we declare the terminal event lost.
+    let adShown = false;
+    let wentHidden = false;
+    let visReconcileTimer: ReturnType<typeof setTimeout> | null = null;
     const REWARD_GRACE_MS = 750;
     const handles: Array<{ remove: () => void | Promise<void> }> = [];
 
@@ -99,6 +120,7 @@ export function useAdMob() {
       if (dismissGraceTimer) { clearTimeout(dismissGraceTimer); dismissGraceTimer = null; }
       if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
       if (prepareTimer) { clearTimeout(prepareTimer); prepareTimer = null; }
+      if (visReconcileTimer) { clearTimeout(visReconcileTimer); visReconcileTimer = null; }
       handles.forEach((h) => { try { h.remove(); } catch {} });
       handles.length = 0;
     };
@@ -137,6 +159,27 @@ export function useAdMob() {
       const resolved = await Promise.all(pendingHandles);
       handles.push(...resolved);
     } catch { /* listener registration is best-effort; ad path still drives outcome */ }
+
+    // Suspension-proof watchdog. While the ad Activity is frontmost the WebView's
+    // JS is paused, so the setTimeout watchdogs above are frozen and can't rescue
+    // a dropped terminal event. `visibilitychange` is the one signal that fires on
+    // resume. When the ad tears down (WebView visible again) after having covered
+    // us, wait a grace for the queued Rewarded/Dismissed to flush; if none does,
+    // settle so the player isn't stranded on a frozen game.
+    if (typeof document !== 'undefined') {
+      const onVisibility = () => {
+        if (settled || !adShown) return;
+        if (document.hidden) { wentHidden = true; return; }
+        if (!wentHidden || visReconcileTimer) return;
+        visReconcileTimer = setTimeout(() => {
+          if (settled) return;
+          trackRewardedLifecycle('visibility_reconcile', surface);
+          finishRef(false, 'Ad closed without a reward signal');
+        }, VISIBILITY_RECONCILE_GRACE_MS);
+      };
+      document.addEventListener('visibilitychange', onVisibility);
+      handles.push({ remove: () => document.removeEventListener('visibilitychange', onVisibility) });
+    }
 
     try {
       await new Promise<void>((resolve) => {
@@ -194,6 +237,9 @@ export function useAdMob() {
               },
               REWARD_SAFETY_TIMEOUT_MS,
             );
+            // Arm the visibility-reconcile window: from here the ad fronts and
+            // suspends the WebView, so app focus changes are ad-related.
+            adShown = true;
             trackRewardedLifecycle('show_called', surface);
             await showAd();
             trackRewardedLifecycle('show_resolved', surface);

@@ -1106,7 +1106,8 @@ export type RewardedLifecycleStage =
   | 'failed_to_show'
   | 'failed_to_load'
   | 'prepare_timeout'
-  | 'safety_timeout';
+  | 'safety_timeout'
+  | 'visibility_reconcile';
 
 /**
  * Breadcrumb one stage of the native rewarded-ad lifecycle. Fires on every
