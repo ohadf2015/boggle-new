@@ -131,6 +131,7 @@ function createGame(gameCode: string, data: GameCreationData): GameState {
     users: {},
     spectators: {},
     playerScores: {},
+    playerEventBonuses: {},
     playerWords: {},
     playerAchievements: {},
     playerCombos: {},
@@ -495,6 +496,11 @@ function updatePlayerScore(gameCode: string, username: string, score: number, is
   persistGameState(gameCode);
 }
 
+function addPlayerEventBonus(gameCode: string, username: string, amount: number): void {
+  scoreManager.addPlayerEventBonus(asBase<ScoreGameBase>(games[gameCode]), username, amount);
+  persistGameState(gameCode);
+}
+
 const getLeaderboard = (gameCode: string): LeaderboardPlayer[] =>
   scoreManager.getLeaderboard(asBase<ScoreGameBase>(games[gameCode]));
 
@@ -636,7 +642,7 @@ export {
   getAllGames, getDetailedGames, getActiveRooms, getEmptyRooms, isRoomEmpty, cleanupEmptyRooms,
   isHost, updateHostSocketId, getNextEligibleHost, transferHost,
   transitionGameState, canTransitionGameState, getValidGameEvents, resetGameForNewRound,
-  addPlayerWord, playerHasWord, updatePlayerScore, getLeaderboard, getLeaderboardThrottled,
+  addPlayerWord, playerHasWord, updatePlayerScore, addPlayerEventBonus, getLeaderboard, getLeaderboardThrottled,
   getFirstFinder, recordFirstFinder, isFirstFinder,
   trackAiApprovedWord, trackBotWord, selectWordForPeerValidation, recordPeerValidationVote, getPeerValidationWord, removePeerRejectedWordScore,
   cleanupStaleGames, clearAllGames,
@@ -657,7 +663,7 @@ const cjsExports = {
   getAllGames, getDetailedGames, getActiveRooms, getEmptyRooms, isRoomEmpty, cleanupEmptyRooms,
   isHost, updateHostSocketId, getNextEligibleHost, transferHost,
   transitionGameState, canTransitionGameState, getValidGameEvents, resetGameForNewRound,
-  addPlayerWord, playerHasWord, updatePlayerScore, getLeaderboard, getLeaderboardThrottled,
+  addPlayerWord, playerHasWord, updatePlayerScore, addPlayerEventBonus, getLeaderboard, getLeaderboardThrottled,
   getFirstFinder, recordFirstFinder, isFirstFinder,
   trackAiApprovedWord, trackBotWord, selectWordForPeerValidation, recordPeerValidationVote, getPeerValidationWord, removePeerRejectedWordScore,
   cleanupStaleGames, clearAllGames,

@@ -207,6 +207,8 @@ export interface Game {
   users: Record<string, GameUser>;
   spectators?: Record<string, Spectator>;
   playerScores: Record<string, number>;
+  /** Per-player accumulator for live-only event bonuses (golden/lightning/special-word/word-hunt board + target finder) that the end-of-game word recompute can't reconstruct. Added back into the final result score so it matches the in-game leaderboard. */
+  playerEventBonuses?: Record<string, number>;
   playerWords: Record<string, string[]>;
   playerWordDetails: Record<string, WordDetail[]>;
   playerAchievements: Record<string, string[]>;

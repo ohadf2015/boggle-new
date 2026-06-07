@@ -7,6 +7,7 @@ import {
   addPlayerWord,
   playerHasWord,
   resetScoresForNewRound,
+  addPlayerEventBonus,
   type ScoreGameBase,
 } from '../scoreManager';
 
@@ -137,6 +138,31 @@ describe('scoreManager - playerWordsSet (O(1) lookup)', () => {
       expect((game as any).playerWordsSet).toBeDefined();
       expect((game as any).playerWordsSet['alice']).toBeInstanceOf(Set);
       expect((game as any).playerWordsSet['alice'].size).toBe(0);
+    });
+  });
+
+  describe('addPlayerEventBonus / round reset', () => {
+    it('accumulates event bonuses per player', () => {
+      const game = makeGame();
+      addPlayerEventBonus(game, 'alice', 5);
+      addPlayerEventBonus(game, 'alice', 3);
+      expect(game.playerEventBonuses?.['alice']).toBe(8);
+    });
+
+    it('ignores zero/undefined amounts (no Redis-thrash, no NaN)', () => {
+      const game = makeGame();
+      addPlayerEventBonus(game, 'alice', 0);
+      expect(game.playerEventBonuses?.['alice']).toBeUndefined();
+    });
+
+    it('clears playerEventBonuses on a new round so bonuses do not bleed across rounds', () => {
+      const game = makeGame();
+      addPlayerEventBonus(game, 'alice', 12);
+      expect(game.playerEventBonuses?.['alice']).toBe(12);
+
+      resetScoresForNewRound(game);
+
+      expect(game.playerEventBonuses?.['alice']).toBeFalsy();
     });
   });
 });

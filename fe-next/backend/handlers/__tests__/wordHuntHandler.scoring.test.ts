@@ -8,6 +8,7 @@ vi.mock('../../../backend/modules/gameStateManager', () => ({
   getGameBySocketId: vi.fn(),
   getUsernameBySocketId: vi.fn(),
   updatePlayerScore: vi.fn(),
+  addPlayerEventBonus: vi.fn(),
 }));
 
 vi.mock('../../../backend/modules/wordHuntManager', () => ({
@@ -33,7 +34,8 @@ import { vi, type Mock, type MockInstance } from 'vitest';
 import { getGame,
   getGameBySocketId,
   getUsernameBySocketId,
-  updatePlayerScore, } from '../../../backend/modules/gameStateManager';
+  updatePlayerScore,
+  addPlayerEventBonus, } from '../../../backend/modules/gameStateManager';
 import { validateTargetGuess,
   recordTargetFound, } from '../../../backend/modules/wordHuntManager';
 import { handleSubmitTargetWord } from '../wordHuntHandler';
@@ -83,6 +85,33 @@ describe('wordHuntHandler - first finder bonus scoring', () => {
 
     // THEN: updatePlayerScore should be called with the 500-point bonus
     expect(updatePlayerScore).toHaveBeenCalledWith('HUNT1', 'player1', 500, true);
+  });
+
+  it('mirrors the finder bonus into the event accumulator so the result page keeps it', () => {
+    // The target-finder bonus is added only to the live score (updatePlayerScore) and
+    // is never stored in per-word details, so the end-of-game word recompute drops it.
+    // It must also land in the event-bonus accumulator to survive into the results.
+    validateTargetGuess.mockReturnValue(['correct', 'correct', 'correct', 'correct', 'correct']);
+    recordTargetFound.mockReturnValue({ isFirstFinder: true, bonus: 500 });
+
+    const socket = makeMockSocket();
+    const io = { on: vi.fn() } as any;
+
+    handleSubmitTargetWord(io, socket as any, { guess: 'apple' });
+
+    expect(addPlayerEventBonus).toHaveBeenCalledWith('HUNT1', 'player1', 500);
+  });
+
+  it('does not touch the accumulator when the finder bonus is 0', () => {
+    validateTargetGuess.mockReturnValue(['correct', 'correct', 'correct', 'correct', 'correct']);
+    recordTargetFound.mockReturnValue({ isFirstFinder: false, bonus: 0 });
+
+    const socket = makeMockSocket();
+    const io = { on: vi.fn() } as any;
+
+    handleSubmitTargetWord(io, socket as any, { guess: 'apple' });
+
+    expect(addPlayerEventBonus).not.toHaveBeenCalled();
   });
 
   it('should NOT call updatePlayerScore when bonus is 0 (not first finder)', () => {

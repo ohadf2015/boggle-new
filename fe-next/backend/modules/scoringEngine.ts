@@ -196,10 +196,18 @@ export function calculateGameScores(
     // Get user data for avatar
     const userData = game.users?.[username];
 
+    // Event bonuses (golden/lightning/special-word/word-hunt board + target finder)
+    // are added to the LIVE running score (game.playerScores) but are NOT baked into
+    // per-word playerWordDetails[].score, so the word-by-word recompute above can't see
+    // them. Add the per-player accumulator back so the result page matches the in-game
+    // leaderboard instead of showing a lower number. See playerEventBonuses.
+    const eventBonus = game.playerEventBonuses?.[username] || 0;
+    const finalTotal = totalScore + eventBonus;
+
     results.push({
       username,
-      score: totalScore, // Frontend expects 'score' not 'totalScore'
-      totalScore, // Keep for backwards compatibility with other usages
+      score: finalTotal, // Frontend expects 'score' not 'totalScore'
+      totalScore: finalTotal, // Keep for backwards compatibility with other usages
       allWords: wordDetails, // Frontend expects 'allWords' not 'wordDetails'
       wordDetails, // Keep for backwards compatibility with other usages
       wordCount: uniqueWords.length,

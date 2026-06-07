@@ -10,6 +10,7 @@ export interface GameStateData {
   usersV2?: Record<string, unknown>;
   spectators?: Record<string, unknown>;
   playerScores: Record<string, number>;
+  playerEventBonuses?: Record<string, number>;
   playerWords: Record<string, string[]>;
   playerAchievements: Record<string, string[]>;
   playerWordDetails: Record<string, unknown[]>;
@@ -106,6 +107,7 @@ export interface GameDataInput {
   users?: Record<string, unknown>;
   spectators?: Record<string, unknown>;
   playerScores?: Record<string, number>;
+  playerEventBonuses?: Record<string, number>;
   playerWords?: Record<string, string[]>;
   playerAchievements?: Record<string, string[]>;
   playerWordDetails?: Record<string, unknown[]>;

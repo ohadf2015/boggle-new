@@ -77,6 +77,7 @@ export interface GameState {
   users: Record<string, GameUser>;
   spectators: Record<string, Spectator>;
   playerScores: Record<string, number>;
+  playerEventBonuses?: Record<string, number>;
   playerWords: Record<string, string[]>;
   playerAchievements: Record<string, PlayerAchievement[]>;
   playerCombos: Record<string, number>;

@@ -12,6 +12,7 @@ import logger from '../utils/logger';
 export interface ScoreGameBase {
   users: Record<string, GameUser>;
   playerScores: Record<string, number>;
+  playerEventBonuses?: Record<string, number>;
   playerWords: Record<string, string[]>;
   /** O(1) lookup set parallel to playerWords — used for duplicate checking */
   playerWordsSet?: Record<string, Set<string>>;
@@ -235,6 +236,28 @@ export function updatePlayerScore(
 }
 
 /**
+ * Accumulate a live-only event bonus for a player.
+ *
+ * Golden/lightning/special-word/word-hunt-board + target-finder bonuses are added
+ * to the running `playerScores` total but are NOT stored in per-word details, so the
+ * end-of-game word recompute (scoringEngine.calculateGameScores) can't reconstruct
+ * them. This separate accumulator survives the recompute and is added back into the
+ * final result score so the result page matches the in-game leaderboard.
+ */
+export function addPlayerEventBonus(
+  game: ScoreGameBase | null,
+  username: string,
+  amount: number
+): void {
+  if (!game || !amount) return;
+
+  if (!game.playerEventBonuses) {
+    game.playerEventBonuses = {};
+  }
+  game.playerEventBonuses[username] = (game.playerEventBonuses[username] || 0) + amount;
+}
+
+/**
  * Get leaderboard for a game
  */
 export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): LeaderboardPlayer[] {
@@ -351,6 +374,7 @@ export function resetScoresForNewRound(game: ScoreGameBase | null): void {
 
   // COMPLETELY clear all game data first to prevent stale data from previous games
   game.playerScores = {};
+  game.playerEventBonuses = {}; // pairs with playerScores — must reset so bonuses don't bleed into the next round
   game.playerWords = {};
   game.playerWordsSet = {};
   game.playerWordDetails = {};

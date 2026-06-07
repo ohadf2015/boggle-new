@@ -75,6 +75,35 @@ describe('Scoring Engine - calculateGameScores', () => {
     const result = calculateGameScores(game, {}, new Set(['hello']));
     expect(result[0].wordCount).toBe(1);
   });
+
+  // Live→final handoff bug: live score (game.playerScores) adds event bonuses
+  // (golden/lightning/special-word/word-hunt board + target finder) that are NOT
+  // baked into per-word playerWordDetails[].score, so the recompute dropped them and
+  // the result page showed a LOWER score than the in-game leaderboard. A per-player
+  // playerEventBonuses accumulator must survive the recompute.
+  describe('event bonus preservation', () => {
+    test('adds per-player event bonus to final totalScore and score', () => {
+      const game = createMockGame({
+        users: { 'P': createTestUser('P') },
+        playerWords: { 'P': ['hello'] },
+        playerWordDetails: { 'P': [{ word: 'hello', score: 50, validated: true }] },
+        playerEventBonuses: { 'P': 25 },
+      });
+      const result = calculateGameScores(game, {}, new Set(['hello']));
+      expect(result[0].totalScore).toBe(75);
+      expect(result[0].score).toBe(75);
+    });
+
+    test('missing accumulator leaves recomputed score unchanged', () => {
+      const game = createMockGame({
+        users: { 'P': createTestUser('P') },
+        playerWords: { 'P': ['hello'] },
+        playerWordDetails: { 'P': [{ word: 'hello', score: 50, validated: true }] },
+      });
+      const result = calculateGameScores(game, {}, new Set(['hello']));
+      expect(result[0].totalScore).toBe(50);
+    });
+  });
 });
 
 describe('Scoring Strategy Scenarios', () => {

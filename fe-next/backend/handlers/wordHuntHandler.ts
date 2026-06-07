@@ -10,6 +10,7 @@ import {
   getGameBySocketId,
   getUsernameBySocketId,
   updatePlayerScore,
+  addPlayerEventBonus,
 } from '../modules/gameStateManager.js';
 import {
   validateTargetGuess,
@@ -127,6 +128,10 @@ export function handleSubmitTargetWord(
     // Apply finder bonus (decreasing: 20/12/8/5 for 1st/2nd/3rd/4th+) to player's score
     if (result.bonus > 0) {
       updatePlayerScore(gameCode, username, result.bonus, true);
+      // The finder bonus is never stored in per-word details, so the end-of-game word
+      // recompute would drop it. Mirror it into the event-bonus accumulator so it
+      // survives into the result page. See playerEventBonuses.
+      addPlayerEventBonus(gameCode, username, result.bonus);
     }
 
     socket.emit('wordHuntTargetResult', {

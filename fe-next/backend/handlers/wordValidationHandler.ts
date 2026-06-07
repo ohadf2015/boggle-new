@@ -11,6 +11,7 @@ import type { LeaderboardPlayer } from '../modules/scoreManager.js';
 import {
   addPlayerWord,
   updatePlayerScore,
+  addPlayerEventBonus,
   getLeaderboard,
   recordFirstFinder,
   removePeerRejectedWordScore,
@@ -231,6 +232,14 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   const preScore = game.playerScores?.[username] ?? 0;
   const totalDelta = wordScore + blastTileBonus + blastLetterValueBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + specialBonus;
   updatePlayerScore(gameCode, username, totalDelta, true);
+  // Mirror the bonuses that are NOT baked into the stored per-word score
+  // (wordScore + blast bonuses are; golden/lightning/special/word-hunt-board are not)
+  // into a per-player accumulator so the end-of-game recompute can add them back and
+  // the result page matches the live leaderboard. See playerEventBonuses.
+  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + specialBonus;
+  if (eventBonusDelta !== 0) {
+    addPlayerEventBonus(gameCode, username, eventBonusDelta);
+  }
   game.serverSeq = (game.serverSeq ?? 0) + 1;
 
   inc('wordAccepted');

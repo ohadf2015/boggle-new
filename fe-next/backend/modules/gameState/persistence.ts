@@ -117,6 +117,7 @@ export async function restoreGameFromRedis(
       users: restoredUsers,
       spectators: restoredSpectators,
       playerScores: persisted.playerScores || {},
+      playerEventBonuses: persisted.playerEventBonuses || {},
       playerWords: persisted.playerWords || {},
       playerAchievements: persisted.playerAchievements || {},
       playerCombos: persisted.playerCombos || {},

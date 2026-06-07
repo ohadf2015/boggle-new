@@ -9,6 +9,7 @@ vi.mock('../../../backend/modules/gameStateManager', () => ({
   getGameBySocketId: vi.fn(),
   getUsernameBySocketId: vi.fn(),
   updatePlayerScore: vi.fn(),
+  addPlayerEventBonus: vi.fn(),
 }));
 
 vi.mock('../../../backend/modules/wordValidatorPool', () => ({
