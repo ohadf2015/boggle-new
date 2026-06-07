@@ -1,13 +1,11 @@
 import { memo, useMemo, type ReactNode } from 'react';
 import type { Socket } from 'socket.io-client';
 import { MultiplayerDesktopShell } from './MultiplayerDesktopShell';
-import { RosterRail, type RosterPlayer } from './RosterRail';
+import { type RosterPlayer } from './RosterRail';
+import { DesktopRivalsRosterRail } from './DesktopRivalsRosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
 import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
-import { ClosestRivalsPanel } from '../../game/in-game/ClosestRivalsPanel';
-import { selectClosestRivals } from '@/lib/leaderboard/selectClosestRivals';
-import { rosterToRivals } from '@/lib/leaderboard/rivalNormalizers';
 import CircularTimer from '../../ui/CircularTimer';
 import { MyStatsCard } from './insights/MyStatsCard';
 import { OpponentInsightFeedConnected } from './insights/OpponentInsightFeedConnected';
@@ -50,30 +48,19 @@ function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
   // ticking each second) don't rebuild the entire ShellSlots graph and
   // re-render every downstream insight component. Each slot only rebuilds
   // when its actual inputs change.
-  // Live "closest rivals" slice — the handful of players nearest me in score.
-  // Identity here is keyed by meId/userId (the shell's identity scheme); the pure
-  // selector stays identity-agnostic and only needs `isMe` flagged.
-  const rivalsView = useMemo(
-    () => selectClosestRivals(rosterToRivals(leaderboard, meId), 3),
-    [leaderboard, meId],
-  );
-
+  // Live "Close Race" rivals + roster, now the SAME shared component used by every
+  // MP desktop mode (blast/wheel-rush/word-hunt) so the rivals panel renders
+  // identically everywhere — see DesktopRivalsRosterRail.
   const rosterSlot = useMemo(
     () => (
-      <div className="flex flex-col gap-3 min-h-0 flex-1">
-        {rivalsView && <ClosestRivalsPanel view={rivalsView} />}
-        <ThemedPanel
-          mode="classic"
-          variant="rail"
-          header={t('mp.insights.rosterHeader')}
-          headerRight={`${leaderboard.length}`}
-          testId="standard-roster"
-        >
-          <RosterRail players={leaderboard} />
-        </ThemedPanel>
-      </div>
+      <DesktopRivalsRosterRail
+        mode="classic"
+        leaderboard={leaderboard}
+        meId={meId}
+        rosterTestId="standard-roster"
+      />
     ),
-    [t, leaderboard, rivalsView],
+    [leaderboard, meId],
   );
 
   const modeBadgeSlot = useMemo(

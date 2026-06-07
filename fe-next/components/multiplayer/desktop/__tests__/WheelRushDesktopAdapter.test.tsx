@@ -50,4 +50,9 @@ describe('WheelRushDesktopAdapter', () => {
     const { container } = render(<WheelRushDesktopAdapter {...mkProps()} />);
     expect(container.querySelector('[data-mp-shell]')).toBeInTheDocument();
   });
+
+  it('shows the unified Close Race rivals panel when "me" is in the lobby', () => {
+    render(<WheelRushDesktopAdapter {...mkProps()} meId="u2" />);
+    expect(screen.getByTestId('closest-rivals-panel')).toBeInTheDocument();
+  });
 });

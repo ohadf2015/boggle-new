@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import type { Socket } from 'socket.io-client';
 import { MultiplayerDesktopShell } from './MultiplayerDesktopShell';
-import { RosterRail, type RosterPlayer } from './RosterRail';
+import { type RosterPlayer } from './RosterRail';
+import { DesktopRivalsRosterRail } from './DesktopRivalsRosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
 import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
@@ -36,15 +37,12 @@ export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
   const slots: ShellSlots = {
     left: {
       roster: (
-        <ThemedPanel
+        <DesktopRivalsRosterRail
           mode="word-hunt"
-          variant="rail"
-          header={t('mp.insights.rosterHeader')}
-          headerRight={`${props.leaderboard.length}`}
-          testId="hunt-roster"
-        >
-          <RosterRail players={props.leaderboard} />
-        </ThemedPanel>
+          leaderboard={props.leaderboard}
+          meId={props.meId}
+          rosterTestId="hunt-roster"
+        />
       ),
       modeBadge: (
         <ThemedPanel mode="word-hunt" variant="badge" testId="hunt-mode-badge">

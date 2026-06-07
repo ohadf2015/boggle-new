@@ -43,4 +43,23 @@ describe('WordHuntDesktopAdapter', () => {
     expect(screen.getByTestId('category-banner')).toBeInTheDocument();
     expect(screen.getByTestId('category-banner-value').textContent).toBe('—');
   });
+
+  it('shows the unified Close Race rivals panel when "me" is in the lobby', () => {
+    render(
+      <WordHuntDesktopAdapter
+        roomId="r1"
+        leaderboard={[
+          { userId: 'u1', username: 'Alpha', score: 100, status: 'connected' as const },
+          { userId: 'u2', username: 'Beta', score: 50, status: 'connected' as const },
+        ]}
+        meId="u2"
+        foundWords={[]}
+        remainingTime={30}
+        totalTime={60}
+        targetCategory="animals"
+        canvas={<div />}
+      />,
+    );
+    expect(screen.getByTestId('closest-rivals-panel')).toBeInTheDocument();
+  });
 });
