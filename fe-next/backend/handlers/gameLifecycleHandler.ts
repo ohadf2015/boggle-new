@@ -57,6 +57,7 @@ import { stopAllBots } from '../modules/botManager.js';
 import { notifyRoomCreated } from '../modules/notificationService.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { registerStartGameHandler } from './gameStartHandler.js';
+import { renamePlayerInGame } from '../modules/playerRename.js';
 
 // Types for payloads
 interface CreateGamePayload {
@@ -660,25 +661,21 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (!trimmedName || !/^[\p{L}\p{N}\p{Emoji} _-]{1,30}$/u.test(trimmedName)) return;
 
     const user = game.users[username];
-    if (!user || user.isHost) return;
+    if (!user) return;
 
     if (trimmedName !== username && game.users[trimmedName]) {
       socket.emit('error', { error: 'NAME_TAKEN', message: 'That name is already in use' });
       return;
     }
 
-    game.users[trimmedName] = { ...user, username: trimmedName };
     if (trimmedName !== username) {
-      // Only delete the old key after confirming the new key was successfully set
-      if (game.users[trimmedName]) {
-        delete game.users[username];
-      }
+      // Re-key every username-keyed structure (users record, host identity,
+      // ready state, lobby chat, …) atomically — hosts included. Pre-fix this
+      // path rejected hosts (`user.isHost` guard) and migrated only a couple of
+      // maps, so a host's rename never broadcast and only applied on the next
+      // reconnect ("name not changed on the spot, takes multiple tries").
+      renamePlayerInGame(game, username, trimmedName);
       updateUsernameMapping(gameCode, username, trimmedName, socket.id);
-      // Migrate ready state under the new name
-      if (game.playersReadyForNextGame[username]) {
-        game.playersReadyForNextGame[trimmedName] = true;
-        delete game.playersReadyForNextGame[username];
-      }
     }
 
     socket.emit('guestNameUpdated', { oldName: username, newName: trimmedName });
