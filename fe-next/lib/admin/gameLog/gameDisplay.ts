@@ -37,6 +37,10 @@ const CANONICAL_MODE_LABELS: Record<string, string> = {
   wordCraft: 'Word Craft',
   wordCraftCards: 'Word Craft · Cards',
   wordCraftGems: 'Word Craft · Gems',
+  // Newly-instrumented modes (2026-06-07).
+  'word-craft': 'Word Craft',
+  crossword: 'Crossword',
+  'brain-drill': 'Brain Drill',
 };
 
 function titleCase(raw: string): string {

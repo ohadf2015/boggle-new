@@ -1,7 +1,9 @@
 /**
- * Blast telemetry must also emit canonical `game_started` / `game_completed`
- * with `mode: 'blast'` so cross-mode funnels & retention cohorts include
- * Blast runs without special-casing.
+ * Blast telemetry must emit canonical cross-mode start/completion through the
+ * shared growthTracking helpers (trackGameStart / trackGameEnd) — NOT raw
+ * posthog.capture. The helpers persist to analytics_events, the admin game
+ * log's source; the prior raw-capture path was PostHog-only, so solo Blast runs
+ * never appeared in the admin log.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -10,23 +12,34 @@ vi.mock('posthog-js', () => ({
   default: { capture: (...args: unknown[]) => captureMock(...args) },
 }));
 
+const trackGameStart = vi.fn();
+const trackGameEnd = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGameStart: (...args: unknown[]) => trackGameStart(...args),
+  trackGameEnd: (...args: unknown[]) => trackGameEnd(...args),
+}));
+
 import {
   trackBlastRunStarted,
   trackBlastRunEnded,
 } from '../blastTelemetry';
 
 describe('blastTelemetry — canonical cross-mode events', () => {
-  beforeEach(() => captureMock.mockClear());
+  beforeEach(() => {
+    captureMock.mockClear();
+    trackGameStart.mockClear();
+    trackGameEnd.mockClear();
+  });
 
-  it('emits canonical game_started with mode=blast on run start', () => {
+  it('routes run start through trackGameStart(mode=blast) so it persists to analytics_events', () => {
     trackBlastRunStarted({ difficulty: 'hard', language: 'en' });
-    expect(captureMock).toHaveBeenCalledWith(
-      'game_started',
-      expect.objectContaining({ mode: 'blast', difficulty: 'hard', language: 'en' }),
+    expect(trackGameStart).toHaveBeenCalledWith(
+      'blast',
+      expect.objectContaining({ difficulty: 'hard', language: 'en' }),
     );
   });
 
-  it('emits canonical game_completed with mode=blast + score + wordCount', () => {
+  it('routes run end through trackGameEnd(blast, score, wordCount, completed=true)', () => {
     trackBlastRunEnded({
       finalScore: 9500,
       wavesCompleted: 3,
@@ -36,13 +49,13 @@ describe('blastTelemetry — canonical cross-mode events', () => {
       bestWordLength: 7,
       difficulty: 'medium',
     });
-    expect(captureMock).toHaveBeenCalledWith(
-      'game_completed',
-      expect.objectContaining({
-        mode: 'blast',
-        score: 9500,
-        wordCount: 20,
-      }),
+    expect(trackGameEnd).toHaveBeenCalledWith(
+      'blast',
+      9500,
+      20,
+      true,
+      undefined,
+      expect.objectContaining({ isWinner: true, difficulty: 'medium', wavesCompleted: 3 }),
     );
   });
 });

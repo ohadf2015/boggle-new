@@ -38,9 +38,13 @@ export const CANONICAL_MODE_BUCKETS: ModeBucket[] = [
   { key: 'adventure', labelKey: 'adventure', label: 'Adventure', modes: ['adventure', 'adventure-boss'] },
   { key: 'connections', labelKey: 'connections', label: 'Connections', modes: ['connections'] },
   { key: 'wordTower', labelKey: 'wordTower', label: 'Word Tower', modes: ['word-tower'] },
-  { key: 'wordCraft', labelKey: 'wordCraft', label: 'Word Craft', modes: ['wordCraft', 'wordCraftCards', 'wordCraftGems'] },
+  { key: 'wordCraft', labelKey: 'wordCraft', label: 'Word Craft', modes: ['wordCraft', 'wordCraftCards', 'wordCraftGems', 'word-craft'] },
+  { key: 'crossword', labelKey: 'crossword', label: 'Crossword', modes: ['crossword'] },
   { key: 'arena', labelKey: 'arena', label: 'Arena', modes: ['arena'] },
   { key: 'brainGym', labelKey: 'brainGym', label: 'Brain Gym', modes: ['brainGym'] },
+  // Brain drills (rare-gems, speed-reader, …) all log under 'brain-drill';
+  // 'drill' is the game_results spelling for the same type.
+  { key: 'brainDrill', labelKey: 'brainDrill', label: 'Brain Drill', modes: ['brain-drill', 'drill'] },
   { key: 'practice', labelKey: 'practice', label: 'Classroom Practice', modes: ['practice'] },
   { key: 'quickPlay', labelKey: 'quickPlay', label: 'Quick Play', modes: ['quickPlay'] },
   { key: 'tutorial', labelKey: 'tutorial', label: 'Tutorial', modes: ['tutorial'] },

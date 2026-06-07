@@ -29,6 +29,14 @@ vi.mock('@/lib/offline', () => ({
   getOfflineStore: () => mockGetOfflineStore(),
 }));
 
+// Completion analytics is a separate, independently-tested concern
+// (lib/brain/__tests__/drillAnalytics.test.ts). Stub it so these tests stay
+// isolated from the growthTracking persistence path.
+const mockEmitBrainDrillGameEnd = vi.fn();
+vi.mock('@/lib/brain/drillAnalytics', () => ({
+  emitBrainDrillGameEnd: (...args: unknown[]) => mockEmitBrainDrillGameEnd(...args),
+}));
+
 import { useSaveDrillResult } from '../useSaveDrillResult';
 
 describe('useSaveDrillResult', () => {

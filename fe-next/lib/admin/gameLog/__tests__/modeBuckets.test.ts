@@ -71,6 +71,12 @@ describe('bucketForMode', () => {
     expect(bucketForMode('tutorial')).toBe('tutorial');
   });
 
+  it('buckets the newly-instrumented modes (word-craft, crossword, brain-drill)', () => {
+    expect(bucketForMode('word-craft')).toBe('wordCraft');
+    expect(bucketForMode('crossword')).toBe('crossword');
+    expect(bucketForMode('brain-drill')).toBe('brainDrill');
+  });
+
   it('leaves NO live gameMode falling through to "other" (except the MP aggregate value)', () => {
     const fellThrough = LIVE_GAME_MODES.filter(
       (m) => m !== 'multiplayer' && bucketForMode(m) === 'other',

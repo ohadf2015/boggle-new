@@ -5,6 +5,7 @@ import { useNetworkState } from '@/hooks/useNetworkState';
 import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { getOfflineStore } from '@/lib/offline';
 import { enqueueScore } from '@/lib/offline/scoreQueue';
+import { emitBrainDrillGameEnd } from '@/lib/brain/drillAnalytics';
 
 interface DrillResult {
   drillType: DrillType;
@@ -53,6 +54,16 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
 
   const saveDrillResult = useCallback(async (result: DrillResult): Promise<SaveDrillResultResponse> => {
     setIsSaving(true);
+    // Record completion to analytics_events so finished drills appear in the
+    // admin game log. Fired before the online/offline branch so both paths log;
+    // trackGameEnd is fire-and-forget and never throws.
+    emitBrainDrillGameEnd({
+      drillType: result.drillType,
+      level: result.level,
+      score: result.score,
+      durationSeconds: result.durationSeconds,
+      wordsFound: result.wordsFound,
+    });
     try {
       // Idempotency: generate per-submission UUID. Server dedupes against this
       // for ~5 min so retries (network blip, double-click) don't double-credit.

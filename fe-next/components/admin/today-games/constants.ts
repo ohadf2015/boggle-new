@@ -27,8 +27,11 @@ export const GAME_TYPE_ICONS: Record<string, React.ReactNode> = {
   daily_word: React.createElement(Target, { className: 'w-4 h-4 text-green-400' }),
   daily_challenge: React.createElement(Puzzle, { className: 'w-4 h-4 text-purple-400' }),
   drill: React.createElement(Brain, { className: 'w-4 h-4 text-amber-400' }),
+  'brain-drill': React.createElement(Brain, { className: 'w-4 h-4 text-amber-400' }),
   blast: React.createElement(Bomb, { className: 'w-4 h-4 text-neo-pink' }),
   word_wheel: React.createElement(CircleDot, { className: 'w-4 h-4 text-neo-cyan' }),
+  crossword: React.createElement(Puzzle, { className: 'w-4 h-4 text-neo-purple' }),
+  'word-craft': React.createElement(Gamepad2, { className: 'w-4 h-4 text-neo-lime' }),
   practice: React.createElement(GraduationCap, { className: 'w-4 h-4 text-sky-400' }),
 };
 

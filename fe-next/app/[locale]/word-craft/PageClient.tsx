@@ -61,6 +61,7 @@ import {
   trackWordCraftPendingRecall,
   trackWordCraftRecallAll,
   trackWordCraftTurnSubmitted,
+  emitWordCraftGameEnd,
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
 import { useAchievementQueue } from '@/components/achievements';
@@ -762,9 +763,16 @@ export default function WordCraftPageClient() {
   // --- Game over ---
   const [newBest, setNewBest] = useState(false);
   const recordedBestRef = useRef(false);
+  // Separate from recordedBestRef (which is SP-only) — analytics must fire once
+  // for EVERY finished game (hotseat + duel included) so it lands in the admin log.
+  const gameEndTrackedRef = useRef(false);
   const [duelOutcome, setDuelOutcome] = useState<{ outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number; challengerAvatar?: CustomAvatarConfig } | null>(null);
   useEffect(() => {
     if (game.state.turn === 'over') {
+      if (!gameEndTrackedRef.current) {
+        gameEndTrackedRef.current = true;
+        emitWordCraftGameEnd(game.state, { hotseat });
+      }
       setCelebration((prev) => ({ kind: 'gameOver', burstId: prev.burstId + 1 }));
       // Fire Pixi game over burst — only on a WIN (never a loss/tie), and never
       // under cosy/reduced-motion. Confetti on a loss reads as mocking.
@@ -803,10 +811,11 @@ export default function WordCraftPageClient() {
       }
     } else {
       recordedBestRef.current = false;
+      gameEndTrackedRef.current = false;
       setNewBest(false);
       setDuelOutcome(null);
     }
-  }, [game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, game.state.bot.score, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
+  }, [game.state, game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, game.state.bot.score, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
 
   // --- Error shake ---
   const lastErrorRef = useRef<string | null>(null);

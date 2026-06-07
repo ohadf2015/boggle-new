@@ -11,6 +11,14 @@ vi.mock('posthog-js', () => ({
   default: { capture: (...args: unknown[]) => captureMock(...args) },
 }));
 
+// Canonical start/completion are routed through growthTracking (separately
+// tested in blastTelemetry.canonical.test.ts). Stub them here so these
+// blast-specific PostHog assertions stay isolated from the persistence path.
+vi.mock('@/utils/growthTracking', () => ({
+  trackGameStart: vi.fn(),
+  trackGameEnd: vi.fn(),
+}));
+
 import {
   trackBlastRunStarted,
   trackBlastWaveCompleted,

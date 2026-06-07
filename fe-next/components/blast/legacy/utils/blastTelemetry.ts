@@ -6,6 +6,7 @@
  * never interrupted by analytics failures.
  */
 import posthog from 'posthog-js';
+import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import type { BlastBadgeId } from './blastBadges';
 
 type Difficulty = 'easy' | 'medium' | 'hard' | string;
@@ -23,9 +24,10 @@ export function trackBlastRunStarted(params: {
   language: string;
 }): void {
   safeCapture('blast_run_started', { ...params });
-  // Canonical cross-mode funnel event so Blast runs appear in unified
-  // `game_started` dashboards without a blast-specific union.
-  safeCapture('game_started', { mode: 'blast', gameMode: 'blast', ...params });
+  // Canonical cross-mode start. Routed through trackGameStart (not raw
+  // posthog.capture) so it ALSO persists to analytics_events — solo Blast was
+  // PostHog-only and therefore invisible in the admin game log.
+  trackGameStart('blast', { ...params });
 }
 
 export function trackBlastWaveCompleted(params: {
@@ -47,11 +49,12 @@ export function trackBlastRunEnded(params: {
   difficulty: Difficulty;
 }): void {
   safeCapture('blast_run_ended', { ...params });
-  safeCapture('game_completed', {
-    mode: 'blast',
-    gameMode: 'blast',
-    score: params.finalScore,
-    wordCount: params.wordCount,
+  // Canonical cross-mode completion. Routed through trackGameEnd so it persists
+  // to analytics_events (the admin game log's source) — not just PostHog.
+  // A finished run is a played game (completed=true) regardless of score; Blast
+  // is solo with no opponent, so isWinner is true on reaching the end.
+  trackGameEnd('blast', params.finalScore, params.wordCount, true, undefined, {
+    isWinner: true,
     difficulty: params.difficulty,
     wavesCompleted: params.wavesCompleted,
     maxCombo: params.maxCombo,

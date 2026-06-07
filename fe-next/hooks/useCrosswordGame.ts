@@ -23,6 +23,7 @@ import {
   loadProgress,
   saveProgress,
 } from '@/lib/crossword/progress';
+import { emitCrosswordGameEnd } from '@/lib/crossword/telemetry';
 import type { CrosswordPuzzle, Direction } from '@/lib/crossword/types';
 
 export interface UseCrosswordGame {
@@ -105,9 +106,12 @@ export function useCrosswordGame(
   useEffect(() => {
     if (state.status === 'solved' && !solvedFiredRef.current) {
       solvedFiredRef.current = true;
+      // Record completion to analytics_events so solved puzzles appear in the
+      // admin game log (read from elapsedRef so the duration is current).
+      emitCrosswordGameEnd(puzzle, elapsedRef.current);
       opts.onSolved?.();
     }
-  }, [state.status, opts]);
+  }, [state.status, opts, puzzle]);
 
   const focusCell = useCallback((row: number, col: number) => {
     setState((s) => focusCellFn(s, row, col));

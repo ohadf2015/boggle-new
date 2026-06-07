@@ -10,6 +10,8 @@
  * = the axis-lock fast-path landed.
  */
 import posthog from 'posthog-js';
+import { trackGameEnd } from '@/utils/growthTracking';
+import type { WordCraftState } from '@/lib/word-craft/useWordCraftGame';
 
 export type WordCraftAxis = 'h' | 'v';
 export type WordCraftInputMethod = 'tap' | 'drag' | 'fast-tap' | 'mixed';
@@ -75,4 +77,27 @@ export function trackWordCraftTurnSubmitted(params: {
   score: number;
 }): void {
   safeCapture('word_craft_turn_submitted', { ...params });
+}
+
+/**
+ * Fired once when a WordCraft game ends. Routed through the shared trackGameEnd
+ * so it persists to analytics_events (the admin game log's source) — WordCraft
+ * previously emitted no completion event and was invisible in the admin log.
+ *
+ * A finished game is a played game regardless of outcome (completed=true); the
+ * win/loss verdict rides in extras.isWinner. wordCount counts only the player's
+ * own words (bot moves excluded).
+ */
+export function emitWordCraftGameEnd(
+  state: WordCraftState,
+  opts: { hotseat: boolean },
+): void {
+  const playerWordCount = state.history.reduce(
+    (sum, h) => sum + (h.who === 'player' ? h.words.length : 0),
+    0,
+  );
+  trackGameEnd('word-craft', state.player.score, playerWordCount, true, undefined, {
+    isWinner: state.player.score > state.bot.score,
+    hotseat: opts.hotseat,
+  });
 }
