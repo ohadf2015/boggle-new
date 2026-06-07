@@ -84,10 +84,18 @@ export function isPlayGamesAvailable(): boolean {
   return isAndroid() && initialized && plugin !== null;
 }
 
-/** Resolve the plugin, lazily initializing. Null when unavailable (web/iOS). */
+/**
+ * Resolve the plugin, lazily initializing. Null when unavailable (web/iOS).
+ * Never rejects — any init/import failure resolves to null, so callers (and the
+ * fire-and-forget award path) can never surface an unhandled rejection.
+ */
 async function ensurePlugin(): Promise<CapacitorGameConnectPlugin | null> {
-  if (!isPlayGamesAvailable()) {
-    await initializePlayGames();
+  try {
+    if (!isPlayGamesAvailable()) {
+      await initializePlayGames();
+    }
+  } catch {
+    return null;
   }
   return isPlayGamesAvailable() ? plugin : null;
 }

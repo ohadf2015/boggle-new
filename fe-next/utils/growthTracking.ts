@@ -9,6 +9,7 @@ import { getSession } from '@/lib/supabase';
 import { getGuestSessionId, getGuestName } from './guestManager';
 import { getPlatform } from '@/utils/platform';
 import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
+import { awardGameEnd } from '@/lib/playGames/awardPlayGames';
 import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
@@ -969,6 +970,10 @@ export const trackGameEnd = (
       wordCount,
       mode,
     });
+
+    // Award Play Games Services leaderboard score + win achievement.
+    // Fire-and-forget; the bridge is a no-op off Android and never throws.
+    void awardGameEnd({ mode, score, isWinner: extras.isWinner === true });
   } else if (durationSec !== undefined && durationSec < 15) {
     // Rage-quit: abandoned a game within 15s — strong onboarding-friction signal.
     trackRageQuit({ mode, durationMs: durationSec * 1000, wordsFound: wordCount });
