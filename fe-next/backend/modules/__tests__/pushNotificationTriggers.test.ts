@@ -18,6 +18,7 @@ import {
   notifyGiftReceived,
   notifyTurnReminder,
   notifySeasonStart,
+  notifyCuratorAssigned,
 } from '../pushNotificationTriggers';
 
 // Mock fcmService
@@ -123,6 +124,40 @@ describe('pushNotificationTriggers', () => {
           deepLink: '/friends?tab=friends',
         },
       }));
+    });
+  });
+
+  describe('notifyCuratorAssigned', () => {
+    it('sends a localized push naming the curated language (by autonym) + deep-links to the dashboard', async () => {
+      // recipient locale defaults to 'en' (mockMaybeSingle → { language: 'en' })
+      await notifyCuratorAssigned('new-curator-id', 'he', 2);
+
+      expect(mockSendToUser).toHaveBeenCalledWith('new-curator-id', expect.objectContaining({
+        title: "🎉 You're a Language Curator!",
+        // {language} is filled with the curated language's autonym, not its code,
+        // so it reads naturally regardless of the recipient's own locale.
+        body: expect.stringContaining('עברית'),
+        data: expect.objectContaining({
+          type: 'curator_assigned',
+          deepLink: '/curator',
+        }),
+      }));
+    });
+
+    it('saves an in-app notification row (system type)', async () => {
+      await notifyCuratorAssigned('new-curator-id', 'es', 1);
+      expect(mockInsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          user_id: 'new-curator-id',
+          notification_type: 'system',
+          action_url: '/curator',
+        })
+      );
+    });
+
+    it('never throws on FCM failure (fire-and-forget)', async () => {
+      mockSendToUser.mockRejectedValue(new Error('FCM down'));
+      await expect(notifyCuratorAssigned('u', 'sv', 3)).resolves.toBeUndefined();
     });
   });
 

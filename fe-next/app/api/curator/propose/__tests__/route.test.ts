@@ -4,7 +4,9 @@ const sameOrigin = { v: true };
 const auth = {
   v: true,
   lastLanguage: undefined as string | undefined,
-  result: { success: true, user: { id: 'cur-1' }, languages: ['he'] } as Record<string, unknown>,
+  // tier 3 = a full-capability curator (covers every proposal kind) by default;
+  // individual tier-gating tests below lower it to assert the gate.
+  result: { success: true, user: { id: 'cur-1' }, languages: ['he'], tier: 3 } as Record<string, unknown>,
 };
 vi.mock('@/lib/auth/sameOrigin', () => ({ isSameOrigin: () => sameOrigin.v }));
 vi.mock('@/lib/auth/curatorAuth', () => ({
@@ -49,7 +51,7 @@ beforeEach(() => {
   sameOrigin.v = true;
   auth.v = true;
   auth.lastLanguage = undefined;
-  auth.result = { success: true, user: { id: 'cur-1' }, languages: ['he'] };
+  auth.result = { success: true, user: { id: 'cur-1' }, languages: ['he'], tier: 3 };
   captured.rows = [];
 });
 
@@ -77,6 +79,43 @@ describe('POST /api/curator/propose', () => {
     const res = await POST(req(good()));
     expect(res.status).toBe(403);
     expect(captured.rows).toHaveLength(0);
+  });
+
+  describe('trust_tier capability gating', () => {
+    it('rejects (403) a tier-1 curator proposing a word_approve (needs tier 2)', async () => {
+      auth.result = { success: true, user: { id: 'cur-1' }, languages: ['he'], tier: 1 };
+      const res = await POST(req(good({ kind: 'word_approve' })));
+      expect(res.status).toBe(403);
+      expect(captured.rows).toHaveLength(0); // gated before any DB write
+    });
+
+    it('allows a tier-1 curator to flag an invalid word (tier-1 capability)', async () => {
+      auth.result = { success: true, user: { id: 'cur-1' }, languages: ['he'], tier: 1 };
+      const res = await POST(req(good({ kind: 'word_flag_invalid' })));
+      expect(res.status).toBe(200);
+      expect(captured.rows).toHaveLength(1);
+    });
+
+    it('rejects (403) a tier-2 curator ruling on a puzzle verdict (needs tier 3)', async () => {
+      auth.result = { success: true, user: { id: 'cur-1' }, languages: ['he'], tier: 2 };
+      const res = await POST(req(good({ kind: 'puzzle_verdict', targetRef: 'puzzle-1', payload: { verdict: 'bad' } })));
+      expect(res.status).toBe(403);
+      expect(captured.rows).toHaveLength(0);
+    });
+
+    it('allows a tier-2 curator to approve a word', async () => {
+      auth.result = { success: true, user: { id: 'cur-1' }, languages: ['he'], tier: 2 };
+      const res = await POST(req(good({ kind: 'word_approve' })));
+      expect(res.status).toBe(200);
+      expect(captured.rows).toHaveLength(1);
+    });
+
+    it('allows a tier-3 curator to rule on a puzzle verdict', async () => {
+      auth.result = { success: true, user: { id: 'cur-1' }, languages: ['he'], tier: 3 };
+      const res = await POST(req(good({ kind: 'puzzle_verdict', targetRef: 'puzzle-1', payload: { verdict: 'good' } })));
+      expect(res.status).toBe(200);
+      expect(captured.rows).toHaveLength(1);
+    });
   });
 
   it('inserts a proposed row owned by the curator and returns its id', async () => {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isSameOrigin } from '@/lib/auth/sameOrigin';
 import { verifyCuratorAuth } from '@/lib/auth/curatorAuth';
 import { validateProposalInput, buildProposalRow, type ProposalInput } from '@/lib/curator/curatorProposal';
+import { canProposeKind } from '@/lib/curator/curatorScope';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
@@ -41,6 +42,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const auth = await verifyCuratorAuth(request, { language: input.language });
   if (!auth.success || !auth.user) {
     return auth.response ?? NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  // Capability gate: trust_tier decides WHICH proposal kinds a curator may open.
+  // tier 1 = flag/reject, tier 2 = +approve, tier 3 = +puzzle verdicts. Admins
+  // resolve to MAX_CURATOR_TIER so they pass. The RLS INSERT policy re-checks
+  // curator-ship but NOT tier, so this is the only place tier is enforced.
+  if (!canProposeKind(auth.tier ?? 0, input.kind)) {
+    return NextResponse.json({ error: 'insufficient_tier' }, { status: 403 });
   }
 
   try {

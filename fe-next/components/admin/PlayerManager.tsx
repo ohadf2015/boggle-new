@@ -18,10 +18,11 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PlayerGiftDialog } from './gift/PlayerGiftDialog';
 import { PlayerCard } from './PlayerCard';
-import type { Player } from './playerManagerTypes';
+import { AccessLevelsInfo } from './AccessLevelsInfo';
+import type { Player, CuratorAssignmentRow } from './playerManagerTypes';
 
 export function PlayerManager({ authToken }: { authToken: string }) {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
@@ -95,6 +96,78 @@ export function PlayerManager({ authToken }: { authToken: string }) {
     }
   }, [authToken]);
 
+  // --- Language Curator (native-speaker) assignments ---------------------
+  // Loaded once for the whole admin; keyed by player id so each card shows the
+  // player's current curator languages + tiers and can assign/revoke inline.
+  const [curatorMap, setCuratorMap] = useState<Record<string, CuratorAssignmentRow[]>>({});
+  const [curatorBusy, setCuratorBusy] = useState<string | null>(null); // `${playerId}:${lang|new}`
+
+  const fetchCurators = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/curators', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const rows: CuratorAssignmentRow[] = data.curators ?? [];
+      const map: Record<string, CuratorAssignmentRow[]> = {};
+      for (const r of rows) (map[r.curator_id] ??= []).push(r);
+      setCuratorMap(map);
+    } catch {
+      /* non-fatal: cards just show "not a curator" until reload */
+    }
+  }, [authToken]);
+
+  useEffect(() => { void fetchCurators(); }, [fetchCurators]);
+
+  const curatorPost = useCallback(async (body: Record<string, unknown>) => {
+    const res = await fetch('/api/admin/curators', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error('curator request failed');
+  }, [authToken]);
+
+  const handleAssignCurator = useCallback(async (player: Player, language: string, tier: number) => {
+    setCuratorBusy(`${player.id}:new`);
+    try {
+      await curatorPost({ userId: player.id, language, trustTier: tier });
+      setCuratorMap((prev) => {
+        const rows = (prev[player.id] ?? []).filter((r) => r.language !== language);
+        const existing = (prev[player.id] ?? []).find((r) => r.language === language);
+        return {
+          ...prev,
+          [player.id]: [
+            ...rows,
+            { curator_id: player.id, language, trust_tier: tier, curator_points: existing?.curator_points ?? 0 },
+          ],
+        };
+      });
+      toast.success(t('curator.assignInline.assigned'));
+    } catch {
+      toast.error(t('curator.assignInline.error'));
+    } finally {
+      setCuratorBusy(null);
+    }
+  }, [curatorPost, t]);
+
+  const handleRevokeCurator = useCallback(async (player: Player, language: string) => {
+    setCuratorBusy(`${player.id}:${language}`);
+    try {
+      await curatorPost({ action: 'revoke', userId: player.id, language });
+      setCuratorMap((prev) => ({
+        ...prev,
+        [player.id]: (prev[player.id] ?? []).filter((r) => r.language !== language),
+      }));
+      toast.success(t('curator.assignInline.revoked'));
+    } catch {
+      toast.error(t('curator.assignInline.error'));
+    } finally {
+      setCuratorBusy(null);
+    }
+  }, [curatorPost, t]);
+
   const fetchPlayers = useCallback(async () => {
     try {
       setLoading(true);
@@ -140,6 +213,9 @@ export function PlayerManager({ authToken }: { authToken: string }) {
 
   return (
     <div className="space-y-4">
+      {/* What each access level grants (admin / teacher / curator tiers + rewards) */}
+      <AccessLevelsInfo />
+
       {/* Toolbar: search + sort + filters toggle (always visible) */}
       <div className="flex flex-col md:flex-row gap-3 bg-white dark:bg-neo-navy-light text-black dark:text-white p-4 rounded-lg shadow-xs">
         <div className="relative flex-1">
@@ -265,6 +341,10 @@ export function PlayerManager({ authToken }: { authToken: string }) {
               onGift={(p) => openGiftDialog([p])}
               onToggleBlast={handleToggleBlastAccess}
               blastLoading={blastAccessLoading === player.id}
+              curatorAssignments={curatorMap[player.id] ?? []}
+              onAssignCurator={handleAssignCurator}
+              onRevokeCurator={handleRevokeCurator}
+              curatorBusyKey={curatorBusy?.startsWith(`${player.id}:`) ? curatorBusy.slice(player.id.length + 1) : null}
             />
           ))}
         </div>

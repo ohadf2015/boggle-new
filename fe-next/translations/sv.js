@@ -12463,6 +12463,11 @@ const sv = {
       "notWord": "Inte i ordlistan"
     },
     "dictLoading": "Laddar ordlista…",
+    "heat": {
+      "label": "Smidesvärme",
+      "masterForge": "MÄSTERSMIDE!",
+      "aria": "{{heat}} av 3 perfekta smiden"
+    },
     "subtitle": "Stava ord. Samla runor. Slå rekordet.",
     "startRun": "Starta körning",
     "round": "Runda",
@@ -13054,6 +13059,53 @@ const sv = {
     },
     "coins": {
       "nextMilestone": "{points} poäng → {coins} mynt"
+    },
+    "tier": {
+      "label": "Behörighetsnivå",
+      "1": { "label": "Moderator", "desc": "Flagga ogiltiga ord och avvisa skräpinlägg för granskning." },
+      "2": { "label": "Redaktör", "desc": "Allt i Moderator, plus godkänna riktiga ord till ordlistan." },
+      "3": { "label": "Ledare", "desc": "Allt i Redaktör, plus avgöra tvister om pusselkvalitet." }
+    },
+    "levels": {
+      "title": "Vad varje åtkomstnivå ger",
+      "subtitle": "Tre oberoende roller — en användare kan ha valfri kombination.",
+      "note": "Kuratorer redigerar aldrig live-innehåll direkt. Varje åtgärd är ett förslag som en admin granskar innan det träder i kraft.",
+      "toggle": "Vad betyder nivåerna?",
+      "admin": {
+        "title": "Admin",
+        "scope": "Global",
+        "desc": "Full kontrollpanel: hantera spelare, innehåll och moderering, och tilldela alla andra roller. Räknas som kurator på högsta nivå för alla språk."
+      },
+      "teacher": {
+        "title": "Lärare",
+        "scope": "Utbildning",
+        "desc": "Klassrumspanel: bygg lektioner, kör live-klasspel och följ elevernas framsteg. Inga kureringsbefogenheter."
+      },
+      "curator": {
+        "title": "Språkkurator",
+        "scope": "Per språk",
+        "desc": "En betrodd modersmålstalare som granskar innehållskvalitet för ett eller flera språk. Makten bestäms av nivå; aktivitet ger prestige."
+      },
+      "capabilityHeading": "Behörighetsnivåer — vad de kan göra",
+      "rewardsHeading": "Prestigebelöningar — vad de tjänar",
+      "rewardsDesc": "Ges endast när en admin ratificerar en kurators förslag, så noggrannhet belönas — inte mängd.",
+      "ranksLabel": "Rang",
+      "coinsLabel": "Myntbonus",
+      "coinMilestone": "{points} p → {coins} mynt"
+    },
+    "assignInline": {
+      "heading": "Språkkurator",
+      "none": "Inte kurator",
+      "make": "Gör till kurator",
+      "assign": "Tilldela",
+      "cancel": "Avbryt",
+      "assigned": "Kurator tilldelad",
+      "revoke": "Återkalla",
+      "revoked": "Kurator återkallad",
+      "error": "Åtgärden misslyckades — försök igen",
+      "current": "Kurerar",
+      "languageLabel": "Språk",
+      "tierLabel": "Nivå"
     },
     "invalidWords": {
       "title": "Avvisade ord",

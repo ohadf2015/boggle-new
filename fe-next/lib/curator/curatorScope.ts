@@ -72,6 +72,62 @@ export function curatorTier(assignments: CuratorAssignment[], language: string):
 }
 
 // ---------------------------------------------------------------------------
+// Capability tiers — the SINGLE source of truth for what each trust_tier may do.
+// The propose route reads this to ENFORCE (canProposeKind), the admin explainer
+// reads it to DESCRIBE, and the tier badge reads it to VISUALISE. One model means
+// the UI can never advertise a power the server doesn't actually gate.
+//
+// Cumulative by design: a tier-3 curator inherits every tier-1/2 capability.
+//   tier 1 → entry moderation (flag invalid / reject a junk word)
+//   tier 2 → + rescue: approve a real word into the dictionary
+//   tier 3 → + dispute resolution: rule on a puzzle's quality
+// Admins resolve to MAX_CURATOR_TIER (see lib/auth/curatorAuth.ts), so they pass
+// every gate.
+// ---------------------------------------------------------------------------
+
+export interface CuratorTierCapability {
+  tier: number;
+  /** Proposal kinds THIS tier unlocks (in addition to all lower tiers). */
+  unlocks: CuratorProposalKind[];
+  /** i18n key for the tier's short name (e.g. "Moderator"). */
+  labelKey: string;
+  /** i18n key for the one-line description of what the tier adds. */
+  descKey: string;
+}
+
+export const CURATOR_TIER_CAPABILITIES: ReadonlyArray<CuratorTierCapability> = [
+  { tier: 1, unlocks: ['word_flag_invalid', 'word_reject'], labelKey: 'curator.tier.1.label', descKey: 'curator.tier.1.desc' },
+  { tier: 2, unlocks: ['word_approve'], labelKey: 'curator.tier.2.label', descKey: 'curator.tier.2.desc' },
+  { tier: 3, unlocks: ['puzzle_verdict'], labelKey: 'curator.tier.3.label', descKey: 'curator.tier.3.desc' },
+];
+
+/**
+ * Minimum capability tier required to OPEN a proposal of this kind. Unknown
+ * kinds fail closed at the most restrictive tier so a new kind can never slip
+ * through ungated.
+ */
+export function minTierForProposalKind(kind: CuratorProposalKind): number {
+  for (const cap of CURATOR_TIER_CAPABILITIES) {
+    if (cap.unlocks.includes(kind)) return cap.tier;
+  }
+  return MAX_CURATOR_TIER;
+}
+
+/** True if a curator at `tier` may open a proposal of `kind` (tier 0 = none). */
+export function canProposeKind(tier: number, kind: CuratorProposalKind): boolean {
+  return tier >= 1 && tier >= minTierForProposalKind(kind);
+}
+
+/** Cumulative list of proposal kinds a tier can perform — for UI display. */
+export function proposalKindsForTier(tier: number): CuratorProposalKind[] {
+  const kinds: CuratorProposalKind[] = [];
+  for (const cap of CURATOR_TIER_CAPABILITIES) {
+    if (tier >= cap.tier) kinds.push(...cap.unlocks);
+  }
+  return kinds;
+}
+
+// ---------------------------------------------------------------------------
 // Gamification — points are awarded ONLY when a proposal is ratified, so spam
 // (un-ratified proposals) earns nothing. Positive contributions weigh highest.
 // ---------------------------------------------------------------------------

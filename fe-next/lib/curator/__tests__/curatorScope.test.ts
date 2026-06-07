@@ -22,6 +22,11 @@ import {
   coinBonusForCrossing,
   detectRankUp,
   CURATOR_RANKS,
+  CURATOR_TIER_CAPABILITIES,
+  MAX_CURATOR_TIER,
+  minTierForProposalKind,
+  canProposeKind,
+  proposalKindsForTier,
   type CuratorAssignment,
 } from '../curatorScope';
 
@@ -149,6 +154,56 @@ describe('curator gamification — rank-up detection', () => {
   it('reports the highest rank reached when crossing multiple thresholds at once', () => {
     // 0 → 250 jumps apprentice→scribe→lexicographer
     expect(detectRankUp(0, 250)?.key).toBe('lexicographer');
+  });
+});
+
+describe('curator capability tiers — what each trust_tier unlocks', () => {
+  it('tiers are 1..MAX, ascending, each unlocking at least one proposal kind', () => {
+    expect(CURATOR_TIER_CAPABILITIES.length).toBe(MAX_CURATOR_TIER);
+    CURATOR_TIER_CAPABILITIES.forEach((cap, i) => {
+      expect(cap.tier).toBe(i + 1);
+      expect(cap.unlocks.length).toBeGreaterThan(0);
+    });
+  });
+
+  it('maps each proposal kind to the minimum tier that unlocks it', () => {
+    // tier 1 = flag/reject (entry moderation), tier 2 = approve (rescue a word),
+    // tier 3 = puzzle verdicts (dispute resolution).
+    expect(minTierForProposalKind('word_flag_invalid')).toBe(1);
+    expect(minTierForProposalKind('word_reject')).toBe(1);
+    expect(minTierForProposalKind('word_approve')).toBe(2);
+    expect(minTierForProposalKind('puzzle_verdict')).toBe(3);
+  });
+
+  it('every proposal kind is unlocked by exactly one tier (no gaps, no dupes)', () => {
+    const unlocked = CURATOR_TIER_CAPABILITIES.flatMap((c) => c.unlocks);
+    expect(new Set(unlocked).size).toBe(unlocked.length);
+    (['word_approve', 'word_reject', 'word_flag_invalid', 'puzzle_verdict'] as const).forEach((k) => {
+      expect(unlocked).toContain(k);
+    });
+  });
+
+  it('canProposeKind gates by tier: higher tiers inherit lower-tier powers', () => {
+    expect(canProposeKind(1, 'word_flag_invalid')).toBe(true);
+    expect(canProposeKind(1, 'word_approve')).toBe(false); // needs tier 2
+    expect(canProposeKind(1, 'puzzle_verdict')).toBe(false); // needs tier 3
+    expect(canProposeKind(2, 'word_approve')).toBe(true);
+    expect(canProposeKind(2, 'puzzle_verdict')).toBe(false);
+    expect(canProposeKind(3, 'puzzle_verdict')).toBe(true);
+    // a max-tier curator (and admins, who resolve to MAX_CURATOR_TIER) can do everything
+    expect(canProposeKind(MAX_CURATOR_TIER, 'puzzle_verdict')).toBe(true);
+  });
+
+  it('tier 0 (not a curator) can propose nothing', () => {
+    expect(canProposeKind(0, 'word_flag_invalid')).toBe(false);
+  });
+
+  it('proposalKindsForTier returns the cumulative kind list for a tier', () => {
+    expect(proposalKindsForTier(1).sort()).toEqual(['word_flag_invalid', 'word_reject'].sort());
+    expect(proposalKindsForTier(2)).toContain('word_approve');
+    expect(proposalKindsForTier(3)).toContain('puzzle_verdict');
+    expect(proposalKindsForTier(3).length).toBe(4); // all kinds
+    expect(proposalKindsForTier(0)).toEqual([]);
   });
 });
 

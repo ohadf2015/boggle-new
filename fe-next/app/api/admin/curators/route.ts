@@ -10,6 +10,7 @@ import {
   type AssignmentInput,
 } from '@/lib/curator/curatorAdmin';
 import { SUPPORTED_LANGUAGES } from '@/lib/curator/curatorScope';
+import { notifyCuratorAssigned } from '@/backend/modules/pushNotificationTriggers';
 
 /**
  * Admin management of Language Curator assignments.
@@ -90,6 +91,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .from('curator_language_assignments')
       .upsert(row, { onConflict: 'curator_id,language' });
     if (error) throw error;
+
+    // Welcome the new curator in their own language. Fire-and-forget: a push/DB
+    // hiccup must never fail the assignment that already committed above.
+    void notifyCuratorAssigned(input.userId, input.language, input.trustTier).catch(() => {});
 
     return NextResponse.json({ ok: true, assigned: true });
   } catch (error) {

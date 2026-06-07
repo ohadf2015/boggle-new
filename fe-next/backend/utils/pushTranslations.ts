@@ -92,6 +92,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'seasonStart.title': '🏆 Season {n} is here!',
     'seasonStart.body': 'Season {prev} ended — claim your rewards now!',
     'seasonStart.bodyNoClaim': 'A new season has begun — climb the ranks!',
+
+    'curatorAssigned.title': '🎉 You\'re a Language Curator!',
+    'curatorAssigned.body': 'You can now help curate {language} content. Tap to open your Curator dashboard.',
   },
   he: {
     'friendRequest.title': 'בקשת חברות',
@@ -144,6 +147,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'seasonStart.title': '!{n} עונה 🏆',
     'seasonStart.body': '!הסתיימה — מהר/י לאסוף את הפרסים {prev} עונה',
     'seasonStart.bodyNoClaim': '!עונה חדשה התחילה — בוא/י לטפס בדירוג',
+
+    'curatorAssigned.title': '!אוצר/ת שפה עכשיו את/ה 🎉',
+    'curatorAssigned.body': 'מעכשיו תוכל/י לאצור תוכן בשפה {language}. הקש/י כדי לפתוח את לוח האוצר/ת.',
   },
   sv: {
     'friendRequest.title': 'Vänförfrågan',
@@ -196,6 +202,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'seasonStart.title': '🏆 Säsong {n} är här!',
     'seasonStart.body': 'Säsong {prev} avslutades — hämta dina belöningar nu!',
     'seasonStart.bodyNoClaim': 'En ny säsong har börjat — klättra i rankningen!',
+
+    'curatorAssigned.title': '🎉 Du är nu språkkurator!',
+    'curatorAssigned.body': 'Du kan nu hjälpa till att kurera innehåll på {language}. Tryck för att öppna din kuratorpanel.',
   },
   ja: {
     'friendRequest.title': 'フレンド申請',
@@ -248,6 +257,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'seasonStart.title': '🏆 シーズン{n}開幕！',
     'seasonStart.body': 'シーズン{prev}が終了 — 報酬を受け取ろう！',
     'seasonStart.bodyNoClaim': '新シーズン開幕 — ランキングを駆け上がろう！',
+
+    'curatorAssigned.title': '🎉 言語キュレーターになりました！',
+    'curatorAssigned.body': '{language}のコンテンツのキュレーションができるようになりました。タップしてキュレーターダッシュボードを開きましょう。',
   },
   es: {
     'friendRequest.title': 'Solicitud de amistad',
@@ -300,6 +312,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'seasonStart.title': '🏆 ¡Llegó la Temporada {n}!',
     'seasonStart.body': '¡La Temporada {prev} terminó — reclama tus recompensas!',
     'seasonStart.bodyNoClaim': '¡Empezó una nueva temporada — sube en la clasificación!',
+
+    'curatorAssigned.title': '🎉 ¡Ahora eres Curador de Idioma!',
+    'curatorAssigned.body': 'Ya puedes ayudar a curar contenido en {language}. Toca para abrir tu panel de curador.',
   },
 };
 

@@ -48,7 +48,8 @@ export type PushNotificationType =
   | 'async_challenge_result'
   | 'gift_received'
   | 'level_up'
-  | 'season_start';
+  | 'season_start'
+  | 'curator_assigned';
 
 /**
  * Map push types to notification_type for user_notifications table (N-7)
@@ -69,6 +70,20 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   daily_challenge: 'system',
   level_up: 'achievement',
   season_start: 'system',
+  curator_assigned: 'system',
+};
+
+/**
+ * Autonyms for the five supported languages — used so a curator-assigned push
+ * names the curated language in its OWN script (e.g. "עברית", "日本語"),
+ * which reads naturally regardless of the recipient's own UI locale.
+ */
+const LANGUAGE_AUTONYMS: Record<string, string> = {
+  en: 'English',
+  he: 'עברית',
+  sv: 'Svenska',
+  ja: '日本語',
+  es: 'Español',
 };
 
 /**
@@ -742,6 +757,34 @@ export async function notifySeasonStart(
     data: {
       type: 'season_start',
       deepLink: '/leaderboard?seasonModal=1',
+    },
+  }, 'both');
+}
+
+/**
+ * Notify a user that an admin just granted them the Language Curator role for a
+ * language. Localized to the recipient's UI language; the curated language is
+ * named by its autonym so it's recognizable in any locale. Deep-links to the
+ * curator dashboard. Fire-and-forget — a push failure never blocks the assign.
+ *
+ * trustTier is accepted for call-site symmetry / future copy, but deliberately
+ * NOT surfaced in the body: tier is admin-facing jargon, and the welcome should
+ * feel like a celebration, not a permissions report.
+ */
+export async function notifyCuratorAssigned(
+  toUserId: string,
+  language: string,
+  _trustTier?: number
+): Promise<void> {
+  const locale = await getUserLocale(toUserId);
+  const languageName = LANGUAGE_AUTONYMS[language] ?? language;
+  return triggerPush(toUserId, 'curator_assigned', {
+    title: translatePush(locale, 'curatorAssigned.title'),
+    body: translatePush(locale, 'curatorAssigned.body', { language: languageName }),
+    imageUrl: mascotImageUrl('celebration'),
+    data: {
+      type: 'curator_assigned',
+      deepLink: '/curator',
     },
   }, 'both');
 }

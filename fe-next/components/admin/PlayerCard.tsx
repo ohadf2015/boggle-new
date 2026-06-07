@@ -7,7 +7,8 @@ import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Avatar from '@/components/Avatar';
-import type { Player } from './playerManagerTypes';
+import type { Player, CuratorAssignmentRow } from './playerManagerTypes';
+import { PlayerCuratorControl } from './PlayerCuratorControl';
 
 interface PlayerCardProps {
   player: Player;
@@ -17,6 +18,10 @@ interface PlayerCardProps {
   onGift: (player: Player) => void;
   onToggleBlast: (player: Player) => void;
   blastLoading: boolean;
+  curatorAssignments: CuratorAssignmentRow[];
+  onAssignCurator: (player: Player, language: string, tier: number) => void;
+  onRevokeCurator: (player: Player, language: string) => void;
+  curatorBusyKey: string | null;
 }
 
 /**
@@ -32,6 +37,10 @@ export function PlayerCard({
   onGift,
   onToggleBlast,
   blastLoading,
+  curatorAssignments,
+  onAssignCurator,
+  onRevokeCurator,
+  curatorBusyKey,
 }: PlayerCardProps) {
   const name = player.display_name || player.username;
   const phUrl = postHogPersonUrl(player.id);
@@ -117,6 +126,17 @@ export function PlayerCard({
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Native-speaker / Language Curator management */}
+        <div className="mt-3 border-t border-dashed border-slate-200 pt-3 dark:border-slate-700">
+          <PlayerCuratorControl
+            isAdmin={player.is_admin}
+            assignments={curatorAssignments}
+            onAssign={(lang, tier) => onAssignCurator(player, lang, tier)}
+            onRevoke={(lang) => onRevokeCurator(player, lang)}
+            busyKey={curatorBusyKey}
+          />
         </div>
       </CardContent>
     </Card>

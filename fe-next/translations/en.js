@@ -12276,7 +12276,12 @@ const en = {
       "oath": "Oath of Silence — can't reuse those letters",
       "notWord": "Not in the dictionary"
     },
-    "dictLoading": "Loading dictionary…"
+    "dictLoading": "Loading dictionary…",
+    "heat": {
+      "label": "Forge Heat",
+      "masterForge": "MASTER FORGE!",
+      "aria": "{{heat}} of 3 perfect crafts"
+    }
   },
   "wheel": {
     "rush": {
@@ -13412,6 +13417,53 @@ const en = {
     },
     "coins": {
       "nextMilestone": "{points} pts → {coins} coins"
+    },
+    "tier": {
+      "label": "Capability tier",
+      "1": { "label": "Moderator", "desc": "Flag invalid words and reject junk submissions for review." },
+      "2": { "label": "Editor", "desc": "Everything in Moderator, plus approve real words into the dictionary." },
+      "3": { "label": "Lead", "desc": "Everything in Editor, plus rule on puzzle-quality disputes." }
+    },
+    "levels": {
+      "title": "What each access level grants",
+      "subtitle": "Three independent roles — a user can hold any combination.",
+      "note": "Curators never edit live content directly. Every action is a proposal an admin reviews before it takes effect.",
+      "toggle": "What do these levels mean?",
+      "admin": {
+        "title": "Admin",
+        "scope": "Global",
+        "desc": "Full dashboard: manage players, content and moderation, and grant every other role. Counts as a top-tier curator for all languages."
+      },
+      "teacher": {
+        "title": "Teacher",
+        "scope": "Education",
+        "desc": "Classroom dashboard: build lessons, run live class games and track student progress. No content-curation powers."
+      },
+      "curator": {
+        "title": "Language Curator",
+        "scope": "Per language",
+        "desc": "A trusted native speaker who reviews content quality for one or more languages. Power is set by tier; activity earns prestige."
+      },
+      "capabilityHeading": "Capability tiers — what they can do",
+      "rewardsHeading": "Prestige rewards — what they earn",
+      "rewardsDesc": "Earned only when an admin ratifies a curator's proposal, so accuracy is rewarded — not volume.",
+      "ranksLabel": "Ranks",
+      "coinsLabel": "Coin bonuses",
+      "coinMilestone": "{points} pts → {coins} coins"
+    },
+    "assignInline": {
+      "heading": "Language Curator",
+      "none": "Not a curator",
+      "make": "Make curator",
+      "assign": "Assign",
+      "cancel": "Cancel",
+      "assigned": "Curator assigned",
+      "revoke": "Revoke",
+      "revoked": "Curator revoked",
+      "error": "Action failed — try again",
+      "current": "Curating",
+      "languageLabel": "Language",
+      "tierLabel": "Tier"
     },
     "invalidWords": {
       "title": "Rejected words",

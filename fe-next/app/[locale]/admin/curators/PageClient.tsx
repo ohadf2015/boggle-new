@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { CuratorAssignForm } from '@/components/curator/CuratorAssignForm';
 import { CuratorProposalsInbox } from '@/components/curator/CuratorProposalsInbox';
+import { AccessLevelsInfo } from '@/components/admin/AccessLevelsInfo';
+import { CuratorTierBadge } from '@/components/admin/CuratorTierBadge';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
@@ -90,6 +92,10 @@ export default function CuratorAdminPageClient() {
         <h1 className="text-3xl font-neo-display text-neo-white">{t('curator.admin.title')}</h1>
 
         <section className="mt-6">
+          <AccessLevelsInfo />
+        </section>
+
+        <section className="mt-6">
           <h2 className="mb-2 text-lg font-neo-display text-neo-white">{t('curator.admin.assign.title')}</h2>
           <CuratorAssignForm onAssigned={loadCurators} />
         </section>
@@ -108,7 +114,7 @@ export default function CuratorAdminPageClient() {
                   <div className="flex items-center gap-2 font-neo-body text-neo-white">
                     <span className="text-xs uppercase text-neo-cyan">{c.language}</span>
                     <span className="font-mono text-xs text-neo-cream">{c.curator_id.slice(0, 8)}…</span>
-                    <span className="text-xs text-neo-cream">{t('curator.admin.list.tier', { count: c.trust_tier })}</span>
+                    <CuratorTierBadge tier={c.trust_tier} />
                     <span className="text-xs text-neo-yellow">{t('curator.admin.list.points', { count: c.curator_points })}</span>
                   </div>
                   <Button

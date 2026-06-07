@@ -12463,6 +12463,11 @@ const es = {
       "notWord": "No está en el diccionario"
     },
     "dictLoading": "Cargando diccionario…",
+    "heat": {
+      "label": "Calor de Forja",
+      "masterForge": "¡GRAN FORJA!",
+      "aria": "{{heat}} de 3 creaciones perfectas"
+    },
     "subtitle": "Deletrea palabras. Reúne runas. Rompe el récord.",
     "go": "¡Adelante!",
     "startRun": "Iniciar partida",
@@ -13142,6 +13147,53 @@ const es = {
     },
     "coins": {
       "nextMilestone": "{points} pts → {coins} monedas"
+    },
+    "tier": {
+      "label": "Nivel de capacidad",
+      "1": { "label": "Moderador", "desc": "Marca palabras no válidas y rechaza envíos basura para revisión." },
+      "2": { "label": "Editor", "desc": "Todo lo de Moderador, y además aprobar palabras reales al diccionario." },
+      "3": { "label": "Responsable", "desc": "Todo lo de Editor, y además resolver disputas de calidad de puzles." }
+    },
+    "levels": {
+      "title": "Qué otorga cada nivel de acceso",
+      "subtitle": "Tres roles independientes — un usuario puede tener cualquier combinación.",
+      "note": "Los curadores nunca editan contenido en vivo directamente. Cada acción es una propuesta que un admin revisa antes de aplicarse.",
+      "toggle": "¿Qué significan los niveles?",
+      "admin": {
+        "title": "Admin",
+        "scope": "Global",
+        "desc": "Panel completo: gestionar jugadores, contenido y moderación, y otorgar cualquier otro rol. Cuenta como curador de máximo nivel en todos los idiomas."
+      },
+      "teacher": {
+        "title": "Profesor",
+        "scope": "Educación",
+        "desc": "Panel de aula: crear lecciones, lanzar partidas en clase en vivo y seguir el progreso del alumnado. Sin permisos de curación."
+      },
+      "curator": {
+        "title": "Curador de idioma",
+        "scope": "Por idioma",
+        "desc": "Un hablante nativo de confianza que revisa la calidad del contenido de uno o más idiomas. El poder lo define el nivel; la actividad gana prestigio."
+      },
+      "capabilityHeading": "Niveles de capacidad — qué pueden hacer",
+      "rewardsHeading": "Recompensas de prestigio — qué ganan",
+      "rewardsDesc": "Se otorgan solo cuando un admin ratifica la propuesta de un curador, así se premia la precisión — no la cantidad.",
+      "ranksLabel": "Rangos",
+      "coinsLabel": "Bonos de monedas",
+      "coinMilestone": "{points} pts → {coins} monedas"
+    },
+    "assignInline": {
+      "heading": "Curador de idioma",
+      "none": "No es curador",
+      "make": "Hacer curador",
+      "assign": "Asignar",
+      "cancel": "Cancelar",
+      "assigned": "Curador asignado",
+      "revoke": "Revocar",
+      "revoked": "Curador revocado",
+      "error": "La acción falló — inténtalo de nuevo",
+      "current": "Curando",
+      "languageLabel": "Idioma",
+      "tierLabel": "Nivel"
     },
     "invalidWords": {
       "title": "Palabras rechazadas",
