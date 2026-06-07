@@ -274,6 +274,8 @@ export function BlastGame({
     // Compose buff (combo2x) and SP wave-modifier multipliers into one factor.
     scoreMultiplier: buffScoreMultiplier * modifierScoreMultiplier,
     recorder: highlightRecorderRef.current,
+    // Variable "treasure roll" reward is SOLO-only — MP scoring is server-authoritative.
+    enableTreasureRoll: !isMultiplayer,
     effects: {
       setLastWordLength, setWordSubmitCount, setWordFoundParticle,
       setClearedTilesForEffects, setScoreFlyEvents,

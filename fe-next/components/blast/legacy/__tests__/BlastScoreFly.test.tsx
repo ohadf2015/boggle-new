@@ -6,7 +6,7 @@
  * guarantee the fly is removed regardless.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, act } from '@testing-library/react';
+import { render, act, screen } from '@testing-library/react';
 import { BlastScoreFly, type ScoreFlyEvent } from '../BlastScoreFly';
 
 // Stub AdaptiveMotion so onAnimationComplete NEVER fires (mirrors the stuck
@@ -45,5 +45,23 @@ describe('BlastScoreFly stuck-popup guard', () => {
     render(<BlastScoreFly flies={[fly]} onComplete={onComplete} />);
     act(() => { vi.advanceTimersByTime(10000); });
     expect(onComplete.mock.calls.filter(c => c[0] === 'fly-1')).toHaveLength(1);
+  });
+});
+
+describe('BlastScoreFly lucky/jackpot bonus tag', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('renders a separate bonus tag showing the lucky upside', () => {
+    const luckyFly: ScoreFlyEvent = { id: 'fly-lucky', score: 52, startX: 50, startY: 50, tier: 3, bonus: 12, luckyTier: 'jackpot' };
+    render(<BlastScoreFly flies={[luckyFly]} onComplete={vi.fn()} />);
+    const tag = screen.getByTestId('score-fly-bonus');
+    expect(tag).toBeTruthy();
+    expect(tag.textContent).toContain('12');
+  });
+
+  it('omits the bonus tag for a plain (common) fly', () => {
+    render(<BlastScoreFly flies={[fly]} onComplete={vi.fn()} />);
+    expect(screen.queryByTestId('score-fly-bonus')).toBeNull();
   });
 });

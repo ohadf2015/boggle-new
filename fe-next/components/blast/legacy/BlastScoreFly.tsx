@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useEffect, useRef, useCallback } from 'react';
+import { Sparkles } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getRandomScoreFlyPath, type ScoreFlyPath } from './blastEffectVariations';
 import { pickHypePrefix } from './scoreFlyHype';
@@ -15,6 +16,10 @@ export interface ScoreFlyEvent {
   tier: 1 | 2 | 3;
   /** Dominant tile type in the cleared word — drives color coding */
   tileType?: string;
+  /** Treasure-roll upside (points added on top of base). Drives the lucky tag. */
+  bonus?: number;
+  /** Treasure-roll tier — colours the lucky tag (gold jackpot / cyan lucky). */
+  luckyTier?: 'lucky' | 'jackpot';
 }
 
 interface BlastScoreFlyProps {
@@ -156,6 +161,22 @@ function ScoreFlyItem({ fly, onComplete }: { fly: ScoreFlyEvent; onComplete: (id
         />
       )}
       {hype && <span className="opacity-90 mr-1 text-[0.85em]">{hype}</span>}+{fly.score}
+      {fly.bonus != null && fly.bonus > 0 && (
+        <span
+          data-testid="score-fly-bonus"
+          className="ms-1 inline-flex items-center gap-0.5 align-super text-[0.6em] font-black"
+          style={{
+            color: fly.luckyTier === 'jackpot' ? '#FFD700' : '#00FFFF',
+            WebkitTextStroke: '1px rgba(0,0,0,0.7)',
+            paintOrder: 'stroke fill',
+            textShadow: fly.luckyTier === 'jackpot'
+              ? '0 0 8px rgba(255,215,0,0.8)'
+              : '0 0 8px rgba(0,255,255,0.7)',
+          }}
+        >
+          <Sparkles className="w-[0.9em] h-[0.9em]" strokeWidth={3} aria-hidden="true" />+{fly.bonus}
+        </span>
+      )}
     </AdaptiveMotion.div>
   );
 }

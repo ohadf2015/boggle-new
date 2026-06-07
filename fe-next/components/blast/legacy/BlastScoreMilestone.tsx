@@ -10,7 +10,7 @@
  * rather than a muted system notification.
  */
 
-import { useState, useEffect, useRef, type ComponentType } from 'react';
+import { useState, useEffect, useRef, useMemo, type ComponentType } from 'react';
 import {
   Sparkles, Flame, Zap, Gem, Trophy, Target, TrendingUp, Rocket, Star,
 } from 'lucide-react';
@@ -18,8 +18,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { getRandomMilestoneEntrance } from './blastEffectVariations';
 import { cn } from '@/lib/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-
-const SCORE_MILESTONES = [100, 250, 500, 750, 1000, 1500, 2000, 3000, 5000];
+import { BLAST_MILESTONE_BASES, jitterMilestones } from '@/lib/blast/blastMilestones';
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
 
@@ -98,11 +97,18 @@ interface MilestoneConfig {
   tier: MilestoneTier;
 }
 
+/**
+ * Build the pill config for the tier at `tierIndex`, displaying the player's
+ * ACTUAL score (organic) rather than the round threshold. The tier (icon/colour
+ * /label) still anchors to the round base so the celebration identity is stable.
+ */
 function getMilestoneConfig(
+  tierIndex: number,
   score: number,
   t?: (key: string) => string | undefined,
 ): MilestoneConfig {
-  const tier = MILESTONE_TIERS.find((m) => score >= m.threshold)
+  const base = BLAST_MILESTONE_BASES[tierIndex];
+  const tier = MILESTONE_TIERS.find((m) => m.key === String(base))
     ?? MILESTONE_TIERS[MILESTONE_TIERS.length - 1];
   const label = t?.(`blast.milestone.${tier.key}`) || `${tier.key}!`;
   return { score, label, tier };
@@ -111,28 +117,35 @@ function getMilestoneConfig(
 interface BlastScoreMilestoneProps {
   score: number;
   t?: (key: string) => string | undefined;
+  /** Optional fixed seed for the per-game jitter (tests / determinism). */
+  seed?: number;
 }
 
-export function BlastScoreMilestone({ score, t }: BlastScoreMilestoneProps) {
+export function BlastScoreMilestone({ score, t, seed }: BlastScoreMilestoneProps) {
   const [activeMilestone, setActiveMilestone] = useState<MilestoneConfig | null>(null);
   const lastMilestoneRef = useRef(0);
   const entranceRef = useRef(getRandomMilestoneEntrance());
   const { playAchievementSound } = useSoundEffects();
 
+  // Per-game jittered thresholds — celebration moments land on organic scores,
+  // not engineered round numbers. Computed once per mount.
+  const seedRef = useRef(seed ?? Math.floor(Math.random() * 0x7fffffff));
+  const thresholds = useMemo(() => jitterMilestones(seedRef.current), []);
+
   const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
-    const crossed = SCORE_MILESTONES.find((m) => score >= m && lastMilestoneRef.current < m);
-    if (crossed) {
-      lastMilestoneRef.current = crossed;
+    const idx = thresholds.findIndex((m) => score >= m && lastMilestoneRef.current < m);
+    if (idx !== -1) {
+      lastMilestoneRef.current = thresholds[idx];
       entranceRef.current = getRandomMilestoneEntrance();
-      setActiveMilestone(getMilestoneConfig(crossed, t));
+      setActiveMilestone(getMilestoneConfig(idx, score, t));
       playAchievementSound();
       clearTimeout(dismissTimerRef.current);
       dismissTimerRef.current = setTimeout(() => setActiveMilestone(null), 1600);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score, playAchievementSound]);
+  }, [score, playAchievementSound, thresholds]);
 
   // Cleanup on unmount
   useEffect(() => () => clearTimeout(dismissTimerRef.current), []);

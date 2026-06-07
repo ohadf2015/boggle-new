@@ -15,6 +15,7 @@ import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/co
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { hasGemLetter } from '@/lib/blast/gemLetters';
 import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
+import { rollTreasure, type TreasureTier } from '@/lib/blast/blastTreasureRoll';
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
@@ -58,6 +59,12 @@ interface UseBlastWordHandlerParams {
   scoreMultiplier?: number;
   /** Highlight recorder for capturing replay moments. Optional for backward compatibility. */
   recorder?: HighlightRecorder;
+  /**
+   * Enable the ethical "treasure roll" variable reward (SOLO only). MP scoring
+   * is server-authoritative, so randomising the client total there would desync
+   * the displayed score — keep it off for multiplayer.
+   */
+  enableTreasureRoll?: boolean;
 }
 
 export function useBlastWordHandler({
@@ -76,6 +83,7 @@ export function useBlastWordHandler({
   effects,
   scoreMultiplier = 1,
   recorder,
+  enableTreasureRoll = false,
 }: UseBlastWordHandlerParams) {
   const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
     if (lastPathRef.current.length === 0) return;
@@ -120,7 +128,25 @@ export function useBlastWordHandler({
     // pregame-buff score multiplier (combo2x).
     const scoreWithLetters = data.score + blastLetterBonus(data.word);
     const multipliedScore = scoreMultiplier !== 1 ? Math.round(scoreWithLetters * scoreMultiplier) : scoreWithLetters;
-    const result = engine.submitWord(path, data.word, multipliedScore);
+
+    // 2a. Ethical "treasure roll" (SOLO) — an upside-only surprise on top of the
+    // deterministic base so identical words don't always feel identical. Seeded
+    // (same word+turn → same roll, can't be re-rolled), floor-guaranteed, capped.
+    let treasureBonus = 0;
+    let treasureTier: TreasureTier = 'common';
+    if (enableTreasureRoll && multipliedScore > 0) {
+      const hasSpecial = clearedInfo.some(c => c.type !== 'standard');
+      const roll = rollTreasure({
+        seed: `${data.word}:${flyIdRef.current}`,
+        base: multipliedScore,
+        comboLevel: detectedCombos.length,
+        hasSpecial,
+      });
+      treasureBonus = roll.bonus;
+      treasureTier = roll.tier;
+    }
+
+    const result = engine.submitWord(path, data.word, multipliedScore + treasureBonus);
 
     // 2a. Capture post-grid snapshot after engine processing
     const postGrid = structuredClone(engine.tileStates);
@@ -129,7 +155,12 @@ export function useBlastWordHandler({
     const avgRow = path.reduce((s, p) => s + p.row, 0) / path.length;
     const avgCol = path.reduce((s, p) => s + p.col, 0) / path.length;
     const flyId = `fly-${++flyIdRef.current}`;
-    const tier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
+    // A jackpot roll always reads as epic (tier 3) regardless of raw score, so the
+    // surprise lands with full juice; lucky bumps at least to tier 2.
+    const baseTier: 1 | 2 | 3 = result.score >= 25 ? 3 : result.score >= 10 ? 2 : 1;
+    const tier: 1 | 2 | 3 = treasureTier === 'jackpot' ? 3
+      : treasureTier === 'lucky' ? (Math.max(baseTier, 2) as 1 | 2 | 3)
+      : baseTier;
     // Single-pass dominant-type frequency count.
     let dominantTileType: string | undefined;
     let dominantCount = 0;
@@ -149,7 +180,17 @@ export function useBlastWordHandler({
       startY: ((avgRow + 0.5) / config.gridSize) * 100,
       tier,
       tileType: dominantTileType,
+      ...(treasureBonus > 0 && treasureTier !== 'common'
+        ? { bonus: treasureBonus, luckyTier: treasureTier }
+        : {}),
     }]);
+
+    // Jackpot juice — a celebratory buzz + extra particle burst so the rare roll
+    // is felt, not just seen. (Decorative; reduced-motion FX gate lives downstream.)
+    if (treasureTier === 'jackpot') {
+      vibrateBlastPrism();
+      effects.setComboParticle(c => c + 1);
+    }
 
     // 4. Combo flash effect
     if (hadCombo && detectedCombos[0]) {
@@ -226,7 +267,7 @@ export function useBlastWordHandler({
       /* mascot is decorative — swallow */
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier]);
+  }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier, enableTreasureRoll]);
 
   return { handleWordAccepted };
 }

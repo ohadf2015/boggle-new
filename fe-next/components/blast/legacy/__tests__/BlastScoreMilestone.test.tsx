@@ -23,7 +23,12 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playAchievementSound }),
 }));
 
-describe('BlastScoreMilestone', () => {
+// Fixed seed → deterministic jittered thresholds. Scores in these tests are
+// chosen OUTSIDE every tier's jitter band so crossings are guaranteed regardless
+// of the exact jitter, and the de-rounded behaviour can be asserted cleanly.
+const SEED = 42;
+
+describe('BlastScoreMilestone (de-rounded)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     playAchievementSound.mockClear();
@@ -34,84 +39,74 @@ describe('BlastScoreMilestone', () => {
   });
 
   it('renders nothing while score is under the first threshold', () => {
-    render(<BlastScoreMilestone score={50} />);
+    render(<BlastScoreMilestone score={40} seed={SEED} />);
     expect(screen.queryByTestId('blast-milestone-pill')).toBeNull();
     expect(playAchievementSound).not.toHaveBeenCalled();
   });
 
-  it('pops a pill + plays sound when crossing the 100 threshold', () => {
-    render(<BlastScoreMilestone score={120} />);
+  it('pops a pill + plays sound when crossing the first tier', () => {
+    render(<BlastScoreMilestone score={140} seed={SEED} />);
     const pill = screen.getByTestId('blast-milestone-pill');
     expect(pill).toBeInTheDocument();
-    // Pops the lowest un-crossed tier (100) with its fallback "100!" label.
+    // Tier label still anchors to the round tier (fallback "100!").
     expect(pill.textContent).toContain('100!');
-    // Shows the tier threshold value (not the raw score) — that's the milestone.
-    expect(pill.textContent).toContain('100');
     expect(playAchievementSound).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the player\'s ACTUAL (organic) score, not the round threshold', () => {
+    render(<BlastScoreMilestone score={137} seed={SEED} />);
+    const pill = screen.getByTestId('blast-milestone-pill');
+    // The displayed number is the real score (137), not a round 100.
+    expect(pill.textContent).toContain('137');
   });
 
   it('uses t() for the tier label when provided', () => {
     const t = (key: string) => `tr:${key}`;
-    render(<BlastScoreMilestone score={120} t={t} />);
+    render(<BlastScoreMilestone score={140} seed={SEED} t={t} />);
     const pill = screen.getByTestId('blast-milestone-pill');
-    // Crosses 100 first — label routes through t().
     expect(pill.textContent).toContain('tr:blast.milestone.100');
   });
 
-  it('formats large milestone values with thousands separator', () => {
-    // Bump lastMilestoneRef past lower tiers by starting just below 1000
-    // then rerendering to 1200 — tier 1000 pops and "1,000" should render.
-    const { rerender } = render(<BlastScoreMilestone score={120} />);
+  it('formats large scores with a thousands separator', () => {
+    const { rerender } = render(<BlastScoreMilestone score={140} seed={SEED} />);
     act(() => { vi.advanceTimersByTime(1700); });
-    rerender(<BlastScoreMilestone score={260} />);
+    rerender(<BlastScoreMilestone score={300} seed={SEED} />);
     act(() => { vi.advanceTimersByTime(1700); });
-    rerender(<BlastScoreMilestone score={520} />);
+    rerender(<BlastScoreMilestone score={600} seed={SEED} />);
     act(() => { vi.advanceTimersByTime(1700); });
-    rerender(<BlastScoreMilestone score={780} />);
+    rerender(<BlastScoreMilestone score={900} seed={SEED} />);
     act(() => { vi.advanceTimersByTime(1700); });
-    rerender(<BlastScoreMilestone score={1200} />);
+    rerender(<BlastScoreMilestone score={1234} seed={SEED} />);
     const pill = screen.getByTestId('blast-milestone-pill');
-    expect(pill.textContent).toContain('1,000');
+    expect(pill.textContent).toContain('1,234');
   });
 
   it('auto-hides the pill after ~1600ms', () => {
-    render(<BlastScoreMilestone score={150} />);
+    render(<BlastScoreMilestone score={150} seed={SEED} />);
     expect(screen.getByTestId('blast-milestone-pill')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(1700); });
     expect(screen.queryByTestId('blast-milestone-pill')).toBeNull();
   });
 
   it('does not re-fire for the same threshold across re-renders', () => {
-    const { rerender } = render(<BlastScoreMilestone score={120} />);
+    const { rerender } = render(<BlastScoreMilestone score={140} seed={SEED} />);
     expect(playAchievementSound).toHaveBeenCalledTimes(1);
     act(() => { vi.advanceTimersByTime(1700); });
-
-    // Score climbs but stays under the next threshold (250).
-    rerender(<BlastScoreMilestone score={200} />);
+    // Score climbs but stays under the next tier (250 band tops out at 268).
+    rerender(<BlastScoreMilestone score={200} seed={SEED} />);
     expect(screen.queryByTestId('blast-milestone-pill')).toBeNull();
     expect(playAchievementSound).toHaveBeenCalledTimes(1);
   });
 
-  it('auto-hides pill even when score changes after milestone', () => {
-    const { rerender } = render(<BlastScoreMilestone score={120} />);
-    expect(screen.getByTestId('blast-milestone-pill')).toBeInTheDocument();
-    // Score changes mid-animation (no new milestone crossed)
-    rerender(<BlastScoreMilestone score={140} />);
-    rerender(<BlastScoreMilestone score={180} />);
-    // Pill should still dismiss after the timer
-    act(() => { vi.advanceTimersByTime(1700); });
-    expect(screen.queryByTestId('blast-milestone-pill')).toBeNull();
-  });
-
-  it('fires a fresh pill when a higher threshold is crossed', () => {
-    const { rerender } = render(<BlastScoreMilestone score={120} />);
+  it('fires a fresh pill when a higher tier is crossed', () => {
+    const { rerender } = render(<BlastScoreMilestone score={140} seed={SEED} />);
     act(() => { vi.advanceTimersByTime(1700); });
     expect(playAchievementSound).toHaveBeenCalledTimes(1);
 
-    rerender(<BlastScoreMilestone score={260} />);
+    rerender(<BlastScoreMilestone score={300} seed={SEED} />);
     const pill = screen.getByTestId('blast-milestone-pill');
-    // Pill now shows the 250 tier threshold, not the raw score.
-    expect(pill.textContent).toContain('250');
+    expect(pill.textContent).toContain('250!');
+    expect(pill.textContent).toContain('300');
     expect(playAchievementSound).toHaveBeenCalledTimes(2);
   });
 });
