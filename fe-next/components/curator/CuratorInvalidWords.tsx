@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import type { CuratorProposalKind } from '@/lib/curator/curatorScope';
+import { canProposeKind, type CuratorProposalKind } from '@/lib/curator/curatorScope';
 
 interface InvalidWord {
   id: string;
@@ -16,6 +16,8 @@ interface InvalidWord {
 
 interface CuratorInvalidWordsProps {
   language: string;
+  /** Caller's capability tier for this language (admins = MAX). Gates actions. */
+  tier: number;
 }
 
 /**
@@ -23,8 +25,13 @@ interface CuratorInvalidWordsProps {
  * and lets them PROPOSE an action (approve as valid, or flag as not-a-word).
  * Each action creates a curator_proposals row via /api/curator/propose — never
  * a direct dictionary write. Optimistically removes the row on success.
+ *
+ * Actions are gated by capability tier so the buttons match what the server
+ * will accept: "approve" (word_approve) needs tier 2; "flag" (word_flag_invalid)
+ * is tier 1. Showing an action the server would 403 would be a dead-end, and
+ * contradict the access-levels explainer — so we hide it instead.
  */
-export function CuratorInvalidWords({ language }: CuratorInvalidWordsProps) {
+export function CuratorInvalidWords({ language, tier }: CuratorInvalidWordsProps) {
   const { t } = useLanguage();
   const [words, setWords] = useState<InvalidWord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,21 +107,25 @@ export function CuratorInvalidWords({ language }: CuratorInvalidWordsProps) {
               </span>
             </div>
             <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => propose(w.word, 'word_approve')}
-                disabled={busyWord === w.word}
-              >
-                {t('curator.invalidWords.approve')}
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => propose(w.word, 'word_flag_invalid')}
-                disabled={busyWord === w.word}
-              >
-                {t('curator.invalidWords.flag')}
-              </Button>
+              {canProposeKind(tier, 'word_approve') && (
+                <Button
+                  size="sm"
+                  onClick={() => propose(w.word, 'word_approve')}
+                  disabled={busyWord === w.word}
+                >
+                  {t('curator.invalidWords.approve')}
+                </Button>
+              )}
+              {canProposeKind(tier, 'word_flag_invalid') && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => propose(w.word, 'word_flag_invalid')}
+                  disabled={busyWord === w.word}
+                >
+                  {t('curator.invalidWords.flag')}
+                </Button>
+              )}
             </div>
           </li>
         ))}

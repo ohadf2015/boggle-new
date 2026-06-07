@@ -48,7 +48,7 @@ function mockFetch(proposeOk = true) {
 describe('CuratorInvalidWords', () => {
   it('loads and lists rejected words for the language', async () => {
     mockFetch();
-    render(<CuratorInvalidWords language="he" />);
+    render(<CuratorInvalidWords language="he" tier={2} />);
     await waitFor(() => expect(screen.getByText('זוז')).toBeTruthy());
     expect(screen.getByText('חיעך')).toBeTruthy();
     expect(screen.getAllByTestId('curator-word-row')).toHaveLength(2);
@@ -56,13 +56,13 @@ describe('CuratorInvalidWords', () => {
 
   it('shows the empty state when there is nothing to review', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true, json: async () => ({ words: [] }) } as Response);
-    render(<CuratorInvalidWords language="he" />);
+    render(<CuratorInvalidWords language="he" tier={2} />);
     await waitFor(() => expect(screen.getByText('curator.invalidWords.empty')).toBeTruthy());
   });
 
   it('proposes approval, posts the right payload, and removes the row on success', async () => {
     const fetchSpy = mockFetch(true);
-    render(<CuratorInvalidWords language="he" />);
+    render(<CuratorInvalidWords language="he" tier={2} />);
     await waitFor(() => expect(screen.getByText('זוז')).toBeTruthy());
 
     fireEvent.click(screen.getAllByText('curator.invalidWords.approve')[0]);
@@ -79,9 +79,25 @@ describe('CuratorInvalidWords', () => {
 
   it('toasts an error when the proposal fails', async () => {
     mockFetch(false);
-    render(<CuratorInvalidWords language="he" />);
+    render(<CuratorInvalidWords language="he" tier={2} />);
     await waitFor(() => expect(screen.getByText('זוז')).toBeTruthy());
     fireEvent.click(screen.getAllByText('curator.invalidWords.approve')[0]);
     await waitFor(() => expect(toast.error).toHaveBeenCalled());
+  });
+
+  it('tier 1 sees only the flag action — approve (tier 2) is hidden, not a 403 dead-end', async () => {
+    mockFetch();
+    render(<CuratorInvalidWords language="he" tier={1} />);
+    await waitFor(() => expect(screen.getByText('זוז')).toBeTruthy());
+    expect(screen.queryByText('curator.invalidWords.approve')).toBeNull();
+    expect(screen.getAllByText('curator.invalidWords.flag').length).toBeGreaterThan(0);
+  });
+
+  it('tier 2 sees both approve and flag', async () => {
+    mockFetch();
+    render(<CuratorInvalidWords language="he" tier={2} />);
+    await waitFor(() => expect(screen.getByText('זוז')).toBeTruthy());
+    expect(screen.getAllByText('curator.invalidWords.approve').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('curator.invalidWords.flag').length).toBeGreaterThan(0);
   });
 });

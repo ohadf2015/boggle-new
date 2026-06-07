@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCuratorStatus } from '@/lib/curator/useCuratorStatus';
-import { detectRankUp, type CuratorRank } from '@/lib/curator/curatorScope';
+import { detectRankUp, curatorTier, MAX_CURATOR_TIER, type CuratorRank } from '@/lib/curator/curatorScope';
 import { CuratorRankCard } from '@/components/curator/CuratorRankCard';
 import { CuratorInvalidWords } from '@/components/curator/CuratorInvalidWords';
 import { Button } from '@/components/ui/button';
@@ -19,12 +19,15 @@ import Header from '@/components/Header';
 export default function CuratorPageClient() {
   const router = useRouter();
   const { t, language } = useLanguage();
-  const { isCurator, languages, assignments, isLoading } = useCuratorStatus();
+  const { isCurator, isAdmin, languages, assignments, isLoading } = useCuratorStatus();
   const [active, setActive] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState<CuratorRank | null>(null);
 
   const activeLang = active ?? languages[0];
   const points = assignments.find((a) => a.language === activeLang)?.curator_points ?? 0;
+  // Capability tier for the active language — drives which review actions show.
+  // Admins hold no assignment rows but curate everything, so treat them as max.
+  const tier = isAdmin ? MAX_CURATOR_TIER : curatorTier(assignments, activeLang);
 
   // One-time rank-up celebration: compare this language's points to what we last
   // saw stored locally. Fires only on an actual rank increase.
@@ -84,7 +87,7 @@ export default function CuratorPageClient() {
           <CuratorRankCard points={points} celebrateRank={celebrate} />
         </div>
 
-        <CuratorInvalidWords key={activeLang} language={activeLang} />
+        <CuratorInvalidWords key={activeLang} language={activeLang} tier={tier} />
       </main>
     </div>
   );
