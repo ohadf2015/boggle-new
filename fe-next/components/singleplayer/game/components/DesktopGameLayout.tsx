@@ -312,7 +312,7 @@ export function DesktopGameLayout({
 
           {/* Game Grid - centered with aspect ratio maintained */}
           <div className="flex-1 flex items-center justify-center w-full min-h-0 overflow-hidden relative" style={{ containerType: 'size' }}>
-            <div className="desktop-grid-container game-board-container" style={{ width: 'min(96cqw, 90cqh)', height: 'min(96cqw, 90cqh)', maxWidth: isPracticeMode ? '560px' : '520px', maxHeight: isPracticeMode ? '560px' : '520px' }}>
+            <div className={`desktop-grid-container game-board-container${isPracticeMode ? '' : ' grid-fill'}`} style={{ width: 'min(96cqw, 90cqh)', height: 'min(96cqw, 90cqh)', maxWidth: isPracticeMode ? '560px' : '760px', maxHeight: isPracticeMode ? '560px' : '760px' }}>
               <GridComponent
                 grid={grid}
                 interactive={!isPaused}

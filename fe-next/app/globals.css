@@ -776,6 +776,31 @@ html.lexi-native [data-selectable] {
   /* Practice sandbox: live game's desktop sizing (`100vw - 500px`) assumes
      side-chrome that practice doesn't have, causing the frame to overflow
      the tight `max-w-xs` parent and clip outer columns. Constrain to parent. */
+  /* grid-fill: let the board grow to fill available space (classic single-player).
+     The frame's default desktop math switches to the sidebar-reserving
+     `100vw - 500px` at 769px, but the React desktop layout (with sidebars) only
+     appears at 1024px — so 769-1023px portrait reserves space for phantom
+     sidebars and shrinks the grid. Align the CSS to the JS breakpoint:
+     no sidebar reservation below 1024px, real reservation at/above it.
+     Keeps the space-aware terms (chrome + sidebar) so the grid never overlaps
+     chrome; only the arbitrary vmin/px throttles are dropped.
+     Declared BEFORE practice-board so practice (equal specificity) still wins
+     its 100%-of-parent constraint. */
+  .grid-fill & {
+    --board-size: min(
+      calc(100vw - 32px),
+      calc(100dvh - var(--game-chrome-height, 280px))
+    );
+  }
+  @media (min-width: 1024px) {
+    .grid-fill & {
+      --board-size: min(
+        calc(100vw - 500px),
+        calc(100dvh - var(--game-chrome-desktop, 240px))
+      );
+    }
+  }
+
   [data-testid='practice-board'] & {
     --board-size: 100%;
     width: 100%;

@@ -412,7 +412,7 @@ export function PortraitGameLayout({
         </AdaptiveAnimatePresence>
 
         <div
-          className="game-board-container relative aspect-square mx-auto"
+          className="game-board-container grid-fill relative aspect-square mx-auto"
           style={{ width: 'min(100cqw, 94cqh)' }}
         >
           <GridComponent
