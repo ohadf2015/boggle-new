@@ -3,6 +3,8 @@
 **Updated:** 2026-06-07
 
 ## Play Games Services (PGS) — native bridge (2026-06-07)
+**PROJECT PUBLISHED 2026-06-07** ("Game published" — live to all users in a few hours; achievements/leaderboards now UN-deletable). Published en-US only (he/sv/ja/es descriptions can be added post-publish, additive). Game-project Properties filled to unblock publish: description, category=Word, game icon + 1024×500 feature graphic (generated, brand-matched, `docs/play-games-icons/lexiclash_*`; swap to exact Play Store assets if desired). All 6 achievements + 2 leaderboards + credentials were "Ready to publish".
+
 Console config done (both Android credentials: app-signing + upload-key; 4/6 setup tasks). JS bridge SHIPPED in-repo, **native half UNVERIFIED here** (no device build).
 
 - **Plugin:** `@openforge/capacitor-game-connect@^5.0.2` (installs under `.npmrc legacy-peer-deps`; peer is `@capacitor/core ^5` vs our **8** — JS imports fine, NATIVE compile under Cap 8 is the open risk a device build must clear).
