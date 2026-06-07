@@ -130,7 +130,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -291,12 +291,11 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, errorKey, l
     prevMaxPos.current = maxPos;
   }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId]);
 
-  // Shake the stack when a word is rejected.
-  useEffect(() => {
-    if (errorKey === 0 || reducedMotion) return;
-    const c = containerRef.current;
-    if (c) shakeX(c);
-  }, [errorKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A rejected WORD is an INPUT mistake, not tower damage — so the error feel
+  // lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on
+  // the building. Shaking the whole tower for a typo read as "the building
+  // shakes for no reason" (founder feel report 2026-06-07); only real structural
+  // events (topple/hazard below, landing impacts above) move the stack now.
 
   // Jolt the whole view when a hazard/topple strikes — the collapse is FELT, not
   // just read off the banner. Heavier than the rejected-word stack wobble.
