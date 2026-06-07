@@ -39,7 +39,9 @@ export async function sendDailyChallengeReminders(): Promise<void> {
   // reminder (mirror of the HTTP cron route).
   let rivalsByUser: Awaited<ReturnType<typeof findDailyChallengeRivals>>;
   try {
-    rivalsByUser = await findDailyChallengeRivals(recipients.map((r) => r.userId));
+    rivalsByUser = await findDailyChallengeRivals(
+      recipients.map((r) => ({ userId: r.userId, locale: r.locale }))
+    );
   } catch (rivalErr) {
     logger.error(
       'DAILY_REMINDER',

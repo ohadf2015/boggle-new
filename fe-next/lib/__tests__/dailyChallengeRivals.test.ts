@@ -540,4 +540,123 @@ describe('findDailyChallengeRivals', () => {
       expect(c.additionalCount).toBe(0);
     });
   });
+
+  // ─── SAME-LANGUAGE MATCHING ────────────────────────────────────────────
+  // A rival is only comparable to the recipient when they play the daily in
+  // the SAME language (words/dictionaries differ → scores aren't comparable
+  // across languages). Gameplay language comes from daily_*_attempts.language.
+  // Rows with no language collapse into one bucket (legacy/back-compat — see
+  // the whole suite above, which omits language and must keep passing).
+  describe('same-language matching', () => {
+    it('excludes a rival who completed today in a DIFFERENT language', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 0 },
+        { player_id: 'r-en', username: 'EnRival', avatar_image: 'https://x/e.png', total_score: 0 },
+      ];
+      // u1 plays Hebrew; the only completer played English → no eligible rival.
+      seasonPuzzleResult.data = [
+        { player_id: 'u1', score: 300, language: 'he' },
+        { player_id: 'r-en', score: 320, language: 'en' },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r-en', solved: true, language: 'en' }];
+
+      const r = await findDailyChallengeRivals(['u1']);
+      expect(r.get('u1')).toBeNull();
+    });
+
+    it('prefers a same-language rival over a closer-by-score different-language one', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 0 },
+        { player_id: 'r-en', username: 'EnRival', avatar_image: 'https://x/e.png', total_score: 0 },
+        { player_id: 'r-he', username: 'HeRival', avatar_image: 'https://x/h.png', total_score: 0 },
+      ];
+      seasonPuzzleResult.data = [
+        { player_id: 'u1', score: 300, language: 'he' },
+        { player_id: 'r-en', score: 310, language: 'en' }, // gap 10 but WRONG language
+        { player_id: 'r-he', score: 360, language: 'he' }, // gap 60 but SAME language
+      ];
+      wordHuntAttemptsResult.data = [
+        { player_id: 'r-en', solved: true, language: 'en' },
+        { player_id: 'r-he', solved: true, language: 'he' },
+      ];
+
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.username).toBe('HeRival');
+      expect(c.scoreGap).toBe(60);
+    });
+
+    it('computes the gap within the recipient language (ignores other-language scores)', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 0 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 0 },
+      ];
+      // u1 only plays he (dominant he, score 300). r1 has a huge EN score that
+      // must be ignored — only the he aggregate (350) counts → gap 50.
+      seasonPuzzleResult.data = [
+        { player_id: 'u1', score: 300, language: 'he' },
+        { player_id: 'r1', score: 350, language: 'he' },
+        { player_id: 'r1', score: 999999, language: 'en' },
+      ];
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true, language: 'he' }];
+
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.scoreGap).toBe(50);
+      expect(c.rivalScore).toBe(350);
+    });
+
+    it("recipient language = the language they earned the most season score in (dominant)", async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 0 },
+        { player_id: 'r-he', username: 'HeRival', avatar_image: 'https://x/h.png', total_score: 0 },
+        { player_id: 'r-en', username: 'EnRival', avatar_image: 'https://x/e.png', total_score: 0 },
+      ];
+      // u1: he 500 vs en 50 → dominant he. Only the he rival should match.
+      seasonPuzzleResult.data = [
+        { player_id: 'u1', score: 400, language: 'he' },
+        { player_id: 'u1', score: 100, language: 'he' },
+        { player_id: 'u1', score: 50, language: 'en' },
+        { player_id: 'r-he', score: 520, language: 'he' },
+        { player_id: 'r-en', score: 60, language: 'en' },
+      ];
+      wordHuntAttemptsResult.data = [
+        { player_id: 'r-he', solved: true, language: 'he' },
+        { player_id: 'r-en', solved: true, language: 'en' },
+      ];
+
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.username).toBe('HeRival');
+    });
+
+    it('falls back to the recipient locale when they have no season attempts', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 0 },
+        { player_id: 'r-he', username: 'HeRival', avatar_image: 'https://x/h.png', total_score: 0 },
+        { player_id: 'r-en', username: 'EnRival', avatar_image: 'https://x/e.png', total_score: 0 },
+      ];
+      // u1 absent from season aggregate → use the carried locale 'he'.
+      seasonPuzzleResult.data = [
+        { player_id: 'r-he', score: 100, language: 'he' },
+        { player_id: 'r-en', score: 110, language: 'en' },
+      ];
+      wordHuntAttemptsResult.data = [
+        { player_id: 'r-he', solved: true, language: 'he' },
+        { player_id: 'r-en', solved: true, language: 'en' },
+      ];
+
+      const c = (await findDailyChallengeRivals([{ userId: 'u1', locale: 'he' }])).get('u1')!;
+      expect(c.username).toBe('HeRival');
+    });
+
+    it('back-compat: rows with no language all share one bucket and still match', async () => {
+      leaderboardResult.data = [
+        { player_id: 'u1', username: 'Me', avatar_image: null, total_score: 1000 },
+        { player_id: 'r1', username: 'R1', avatar_image: 'https://x/r.png', total_score: 1050 },
+      ];
+      // No language anywhere — auto-derived season rows, legacy completer.
+      wordHuntAttemptsResult.data = [{ player_id: 'r1', solved: true }];
+
+      const c = (await findDailyChallengeRivals(['u1'])).get('u1')!;
+      expect(c.username).toBe('R1');
+    });
+  });
 });

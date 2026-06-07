@@ -136,6 +136,55 @@ describe('GhostRivalManager', () => {
       const result = await getOrCreateWeeklyRival('player-1');
       expect(result).toBeNull();
     });
+
+    // ─── same-language preference ──────────────────────────────
+    // Cross-language total_score isn't truly comparable, but at minimum a
+    // ghost rival should be someone who plays the same language. profiles.language
+    // is ~40% populated, so this is a PREFERENCE with a language-agnostic fallback,
+    // never a hard filter (which would starve matching).
+    it('filters candidates to the player own language when known', async () => {
+      chain.single
+        .mockResolvedValueOnce({ data: null, error: null }) // no existing rivalry
+        .mockResolvedValueOnce({ data: { total_score: 1000, language: 'he' }, error: null });
+      chain.limit.mockResolvedValueOnce({
+        data: [{ id: 'r-he', username: 'HeRival', display_name: null, avatar_image: 'a.png', total_score: 1000, language: 'he' }],
+        error: null,
+      });
+
+      const result = await getOrCreateWeeklyRival('player-1');
+      expect(result!.rival.id).toBe('r-he');
+      expect(chain.eq).toHaveBeenCalledWith('language', 'he');
+    });
+
+    it('falls back to language-agnostic matching when no same-language candidate exists', async () => {
+      chain.single
+        .mockResolvedValueOnce({ data: null, error: null })
+        .mockResolvedValueOnce({ data: { total_score: 1000, language: 'sv' }, error: null });
+      chain.limit
+        .mockResolvedValueOnce({ data: [], error: null }) // no sv candidates
+        .mockResolvedValueOnce({ // fallback: any language
+          data: [{ id: 'r-any', username: 'AnyRival', display_name: null, avatar_image: 'a.png', total_score: 1000, language: 'en' }],
+          error: null,
+        });
+
+      const result = await getOrCreateWeeklyRival('player-1');
+      expect(chain.eq).toHaveBeenCalledWith('language', 'sv'); // tried same-language first
+      expect(result!.rival.id).toBe('r-any'); // but still matched via fallback
+    });
+
+    it('does NOT filter by language when the player language is null', async () => {
+      chain.single
+        .mockResolvedValueOnce({ data: null, error: null })
+        .mockResolvedValueOnce({ data: { total_score: 1000, language: null }, error: null });
+      chain.limit.mockResolvedValueOnce({
+        data: [{ id: 'r-any', username: 'AnyRival', display_name: null, avatar_image: 'a.png', total_score: 1000, language: 'en' }],
+        error: null,
+      });
+
+      const result = await getOrCreateWeeklyRival('player-1');
+      expect(result!.rival.id).toBe('r-any');
+      expect(chain.eq).not.toHaveBeenCalledWith('language', expect.anything());
+    });
   });
 
   // ─── updateRivalScore ─────────────────────────────────────

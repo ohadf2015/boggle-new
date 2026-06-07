@@ -243,7 +243,7 @@ describe('sendDailyChallengeReminders', () => {
       expect(genericCall.kind).toBeUndefined();
     });
 
-    it('calls findDailyChallengeRivals once with all recipient user IDs', async () => {
+    it('calls findDailyChallengeRivals once with all recipients (userId + locale for same-language matching)', async () => {
       mockGetRecipients.mockResolvedValue([
         recipient('u1'),
         recipient('u2'),
@@ -253,7 +253,13 @@ describe('sendDailyChallengeReminders', () => {
       await sendDailyChallengeReminders();
 
       expect(mockFindRivals).toHaveBeenCalledTimes(1);
-      expect(mockFindRivals).toHaveBeenCalledWith(['u1', 'u2', 'u3']);
+      // Locale is forwarded so the rival picker can fall back to the recipient's
+      // language when they have no season daily attempts to derive one from.
+      expect(mockFindRivals).toHaveBeenCalledWith([
+        { userId: 'u1', locale: 'en' },
+        { userId: 'u2', locale: 'en' },
+        { userId: 'u3', locale: 'en' },
+      ]);
     });
 
     it('skips rival lookup when no recipients', async () => {

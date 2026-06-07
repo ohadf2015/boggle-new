@@ -59,7 +59,9 @@ export async function POST(request: NextRequest) {
       // must always fire — including when the rival simply didn't play.
       let rivalsByUser: Awaited<ReturnType<typeof findDailyChallengeRivals>>;
       try {
-        rivalsByUser = await findDailyChallengeRivals(recipients.map((r) => r.userId));
+        rivalsByUser = await findDailyChallengeRivals(
+          recipients.map((r) => ({ userId: r.userId, locale: r.locale }))
+        );
       } catch (rivalErr) {
         logger.error(
           `[Push Cron] rival lookup failed, sending general reminders: ${

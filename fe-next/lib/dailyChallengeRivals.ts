@@ -111,11 +111,52 @@ function bestRivalName(displayName: string | null, username: string | null): str
   return '';
 }
 
+/** A push recipient. `locale` is the carried UI language (no extra fetch — see
+ *  dailyChallengeReminder.ts) used as the language fallback when the recipient
+ *  has no season daily attempts to derive a gameplay language from. */
+export type RivalRecipient = { userId: string; locale?: string | null };
+
+/** Language bucket for rows that carry no/empty `language` (legacy attempts).
+ *  Collapsing them into one shared bucket keeps same-language matching a no-op
+ *  where the signal is absent and active where present. */
+const NO_LANG = '__nolang__';
+const langKey = (l: string | null | undefined): string => {
+  if (l == null) return NO_LANG;
+  // Normalize so the gameplay-language codes (daily_*_attempts.language) and the
+  // push-locale fallback (profiles.language) land in the same bucket. Live data
+  // is already clean 2-letter lowercase (en/es/he/ja/sv); this just guards drift.
+  const norm = String(l).trim().toLowerCase();
+  return norm === '' ? NO_LANG : norm;
+};
+
+/** The language a player earned the most season daily score in (their "main"
+ *  daily language). Tie → lexicographically smaller key for determinism. */
+function dominantLanguage(byLang: Map<string, number> | undefined): string | null {
+  if (!byLang || byLang.size === 0) return null;
+  let best: string | null = null;
+  let bestScore = -Infinity;
+  for (const [lang, score] of byLang) {
+    if (score > bestScore || (score === bestScore && best !== null && lang < best)) {
+      best = lang;
+      bestScore = score;
+    }
+  }
+  return best;
+}
+
 export async function findDailyChallengeRivals(
-  recipientIds: string[]
+  recipients: ReadonlyArray<string | RivalRecipient>
 ): Promise<Map<string, RivalCandidate | null>> {
   const out = new Map<string, RivalCandidate | null>();
-  if (recipientIds.length === 0) return out;
+  if (recipients.length === 0) return out;
+
+  // Normalize string[] (legacy callers) and object[] to a single shape.
+  const recips: RivalRecipient[] = recipients.map((r) =>
+    typeof r === 'string' ? { userId: r } : r
+  );
+  const recipientIds = recips.map((r) => r.userId);
+  const localeById = new Map<string, string | null | undefined>();
+  for (const r of recips) localeById.set(r.userId, r.locale ?? null);
 
   const supabase = getSupabaseAdmin();
   if (!supabase) {
@@ -176,12 +217,12 @@ export async function findDailyChallengeRivals(
   const [puzzleRes, wordHuntRes] = await Promise.all([
     supabase
       .from('daily_puzzle_attempts')
-      .select('player_id, score')
+      .select('player_id, score, language')
       .eq('puzzle_date', today)
       .gt('score', 0),
     supabase
       .from('daily_word_hunt_attempts')
-      .select('player_id, solved')
+      .select('player_id, solved, language')
       .eq('puzzle_date', today)
       .eq('solved', true),
   ]);
@@ -193,17 +234,32 @@ export async function findDailyChallengeRivals(
     return out;
   }
 
-  // Track which daily each completer cleared. Lets copy say "scored on the
-  // puzzle" vs "solved the word hunt" instead of generic "cleared the daily".
-  const puzzleCompleters = new Set<string>();
-  const wordHuntCompleters = new Set<string>();
-  for (const r of (puzzleRes.data ?? []) as Array<{ player_id: string | null }>) {
-    if (r.player_id) puzzleCompleters.add(r.player_id);
+  // Track which daily each completer cleared, PER LANGUAGE. A rival is only
+  // eligible for a recipient who plays the SAME language, and the mode
+  // (puzzle/wordHunt/both) is reported for that specific language. Lets copy
+  // say "scored on the puzzle" vs "solved the word hunt" instead of generic.
+  interface TodayFlags { puzzle: boolean; hunt: boolean }
+  const todayByPlayerLang = new Map<string, Map<string, TodayFlags>>();
+  const markToday = (playerId: string, lang: string, which: 'puzzle' | 'hunt') => {
+    let byLang = todayByPlayerLang.get(playerId);
+    if (!byLang) {
+      byLang = new Map<string, TodayFlags>();
+      todayByPlayerLang.set(playerId, byLang);
+    }
+    let flags = byLang.get(lang);
+    if (!flags) {
+      flags = { puzzle: false, hunt: false };
+      byLang.set(lang, flags);
+    }
+    flags[which] = true;
+  };
+  for (const r of (puzzleRes.data ?? []) as Array<{ player_id: string | null; language?: string | null }>) {
+    if (r.player_id) markToday(r.player_id, langKey(r.language), 'puzzle');
   }
-  for (const r of (wordHuntRes.data ?? []) as Array<{ player_id: string | null }>) {
-    if (r.player_id) wordHuntCompleters.add(r.player_id);
+  for (const r of (wordHuntRes.data ?? []) as Array<{ player_id: string | null; language?: string | null }>) {
+    if (r.player_id) markToday(r.player_id, langKey(r.language), 'hunt');
   }
-  const completers = new Set<string>([...puzzleCompleters, ...wordHuntCompleters]);
+  const completers = new Set<string>(todayByPlayerLang.keys());
 
   // Wave 2: leaderboard rows for metadata only (username/avatar/rank) —
   // total_score is NOT used for scoring anymore. Scoped to recipients ∪
@@ -233,7 +289,7 @@ export async function findDailyChallengeRivals(
   // lbIds × season-length-days × 1-attempt-per-day = O(lbIds × ~30).
   const seasonScoresRes = await supabase
     .from('daily_puzzle_attempts')
-    .select('player_id, score')
+    .select('player_id, score, language')
     .gte('puzzle_date', seasonStart)
     .lte('puzzle_date', seasonEnd)
     .in('player_id', lbIds);
@@ -247,21 +303,31 @@ export async function findDailyChallengeRivals(
     return out;
   }
 
-  const seasonScoreByPlayer = new Map<string, number>();
+  // Per-(player, language) season aggregate. Scores across languages are NOT
+  // comparable (different dictionaries/difficulty) so we never sum across them.
+  const seasonByPlayerLang = new Map<string, Map<string, number>>();
   for (const row of (seasonScoresRes.data ?? []) as Array<{
     player_id: string | null;
     score: number | null;
+    language?: string | null;
   }>) {
     if (!row.player_id || typeof row.score !== 'number') continue;
-    seasonScoreByPlayer.set(
-      row.player_id,
-      (seasonScoreByPlayer.get(row.player_id) ?? 0) + row.score
-    );
+    const lk = langKey(row.language);
+    let byLang = seasonByPlayerLang.get(row.player_id);
+    if (!byLang) {
+      byLang = new Map<string, number>();
+      seasonByPlayerLang.set(row.player_id, byLang);
+    }
+    byLang.set(lk, (byLang.get(lk) ?? 0) + row.score);
   }
+  const seasonScoreIn = (playerId: string, lang: string): number =>
+    seasonByPlayerLang.get(playerId)?.get(lang) ?? 0;
 
-  // Pre-build the candidate-rival list once. Score = season-window daily-
-  // puzzle aggregate (NOT leaderboard.total_score). Word-hunt-only completers
-  // get score 0 + their prior puzzle aggregate — typically caught by the cap.
+  // Pre-build candidate-rival lists keyed by LANGUAGE. A completer who cleared
+  // today in language L produces a pool entry under L, scored by their
+  // season aggregate IN L (not total, not other languages). The same player
+  // can appear under multiple languages if they swept more than one today.
+  // Score = season-window daily-puzzle aggregate (NOT leaderboard.total_score).
   interface PoolEntry {
     id: string;
     username: string;
@@ -270,22 +336,27 @@ export async function findDailyChallengeRivals(
     rank: number | null;
     mode: RivalMode;
   }
-  const rivalPool: PoolEntry[] = [];
+  const poolByLang = new Map<string, PoolEntry[]>();
   for (const id of completers) {
     const row = lbByUser.get(id);
     if (!row) continue;
-    const seasonScore = seasonScoreByPlayer.get(id) ?? 0;
-    const inPuzzle = puzzleCompleters.has(id);
-    const inHunt = wordHuntCompleters.has(id);
-    const mode: RivalMode = inPuzzle && inHunt ? 'both' : inPuzzle ? 'puzzle' : 'wordHunt';
-    rivalPool.push({
-      id,
-      username: bestRivalName(row.display_name, row.username),
-      avatar: resolveRivalAvatarUrl(row.avatar_image, row.avatar_config, id),
-      score: seasonScore,
-      rank: typeof row.rank_position === 'number' ? row.rank_position : null,
-      mode,
-    });
+    const byLang = todayByPlayerLang.get(id);
+    if (!byLang) continue;
+    for (const [lang, flags] of byLang) {
+      const mode: RivalMode =
+        flags.puzzle && flags.hunt ? 'both' : flags.puzzle ? 'puzzle' : 'wordHunt';
+      const entry: PoolEntry = {
+        id,
+        username: bestRivalName(row.display_name, row.username),
+        avatar: resolveRivalAvatarUrl(row.avatar_image, row.avatar_config, id),
+        score: seasonScoreIn(id, lang),
+        rank: typeof row.rank_position === 'number' ? row.rank_position : null,
+        mode,
+      };
+      const list = poolByLang.get(lang);
+      if (list) list.push(entry);
+      else poolByLang.set(lang, [entry]);
+    }
   }
 
   // Caps scaled to daily-puzzle range (typical day-score ~50-300, season
@@ -302,7 +373,14 @@ export async function findDailyChallengeRivals(
       out.set(userId, null);
       continue;
     }
-    const myScore = seasonScoreByPlayer.get(userId) ?? 0;
+    // Recipient's daily language: the one they earned the most season score in;
+    // else their carried UI locale; else the no-language bucket. Rivals are
+    // only drawn from this language's pool, and scores compared within it.
+    const myLang =
+      dominantLanguage(seasonByPlayerLang.get(userId)) ?? langKey(localeById.get(userId));
+    const rivalPool = poolByLang.get(myLang) ?? [];
+
+    const myScore = seasonScoreIn(userId, myLang);
     const aboveCap = Math.max(ABOVE_GAP_FLOOR, Math.round(myScore * ABOVE_GAP_MAX_RATIO));
     const belowCap = Math.max(BELOW_GAP_FLOOR, Math.round(myScore * BELOW_GAP_MAX_RATIO));
 

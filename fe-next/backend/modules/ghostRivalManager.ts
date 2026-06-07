@@ -61,33 +61,58 @@ function toDateString(d: Date): string {
 
 const SCORE_TOLERANCE = 0.2; // ±20%
 
+type RivalCandidate = {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_image: string;
+  total_score: number;
+};
+
 /**
  * Find a skill-similar rival for the player.
  * Looks for players with total_score within ±20%, excluding self
  * and anyone already matched this week.
+ *
+ * Language: prefer a rival who plays the SAME language. `profiles.language` is
+ * only ~40% populated, so this is a PREFERENCE with a language-agnostic
+ * fallback — never a hard filter (which would starve the candidate pool). When
+ * the player's own language is unknown, skip the filter entirely.
  */
 async function findSkillSimilarRival(
   playerId: string,
   playerScore: number,
-  weekStartDate: string
-): Promise<{ id: string; username: string; display_name: string | null; avatar_image: string; total_score: number } | null> {
+  weekStartDate: string,
+  playerLang: string | null
+): Promise<RivalCandidate | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
   const minScore = Math.floor(playerScore * (1 - SCORE_TOLERANCE));
   const maxScore = Math.ceil(playerScore * (1 + SCORE_TOLERANCE));
 
-  // Find candidates within score range, not already matched this week
-  const { data: candidates, error } = await supabase
-    .from('profiles')
-    .select('id, username, display_name, avatar_image, total_score')
-    .neq('id', playerId)
-    .gte('total_score', minScore)
-    .lte('total_score', maxScore)
-    .order('total_score', { ascending: false })
-    .limit(20);
+  // Find candidates within score range. Optionally constrained to one language.
+  const queryCandidates = async (lang: string | null): Promise<RivalCandidate[]> => {
+    let q = supabase
+      .from('profiles')
+      .select('id, username, display_name, avatar_image, total_score, language')
+      .neq('id', playerId)
+      .gte('total_score', minScore)
+      .lte('total_score', maxScore);
+    if (lang) q = q.eq('language', lang);
+    const { data, error } = await q.order('total_score', { ascending: false }).limit(20);
+    if (error) return [];
+    return (data ?? []) as RivalCandidate[];
+  };
 
-  if (error || !candidates || candidates.length === 0) {
+  // Same-language first; fall back to any-language when the player's language is
+  // unknown or no same-language candidate is in range.
+  let candidates = playerLang ? await queryCandidates(playerLang) : [];
+  if (candidates.length === 0) {
+    candidates = await queryCandidates(null);
+  }
+
+  if (candidates.length === 0) {
     logger.debug('ghostRival', 'No candidates in score range', { playerId, minScore, maxScore });
     return null;
   }
@@ -147,15 +172,16 @@ export async function getOrCreateWeeklyRival(
     };
   }
 
-  // Get player's total score for matching
+  // Get player's total score + language for matching
   const { data: profile } = await supabase
     .from('profiles')
-    .select('total_score')
+    .select('total_score, language')
     .eq('id', playerId)
     .single();
 
   const playerScore = profile?.total_score ?? 0;
-  const rival = await findSkillSimilarRival(playerId, playerScore, weekStartDate);
+  const playerLang = (profile?.language as string | null | undefined) ?? null;
+  const rival = await findSkillSimilarRival(playerId, playerScore, weekStartDate, playerLang);
 
   if (!rival) {
     logger.debug('ghostRival', 'No rival found for player', { playerId });
