@@ -115,6 +115,7 @@
     "@next/swc-darwin-arm64": "^16.2.1",
     "@next/third-parties": "^16.1.6",
     "@number-flow/react": "^0.6.0",
+    "@openforge/capacitor-game-connect": "^5.0.2",
     "@pixi/react": "^8.0.5",
     "@pixi/sound": "^6.0.1",
     "@qwik.dev/partytown": "^0.13.2",

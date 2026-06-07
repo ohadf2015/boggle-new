@@ -1,6 +1,26 @@
 # Android Release Status — live.lexiclash.app
 
-**Updated:** 2026-06-04
+**Updated:** 2026-06-07
+
+## Play Games Services (PGS) — native bridge (2026-06-07)
+Console config done (both Android credentials: app-signing + upload-key; 4/6 setup tasks). JS bridge SHIPPED in-repo, **native half UNVERIFIED here** (no device build).
+
+- **Plugin:** `@openforge/capacitor-game-connect@^5.0.2` (installs under `.npmrc legacy-peer-deps`; peer is `@capacitor/core ^5` vs our **8** — JS imports fine, NATIVE compile under Cap 8 is the open risk a device build must clear).
+- **Code:** `utils/nativePGS.ts` (Android-only singleton bridge: signIn/submitLeaderboardScore/unlock+incrementAchievement/showLeaderboard/showAchievements, all no-op off Android) + `hooks/usePlayGamesServices.ts`. TDD 17 green, tsc0/lint0/build0.
+- **Verification boundary** — done here: vitest + tsc (typed vs real plugin contract) + `npm run build`. NOT done here ↓.
+
+### Native finish checklist (device required)
+1. `npx cap sync android` — generates the plugin's native module into gitignored `android/`.
+2. Verify gradle compiles the plugin under Cap 8 (the peer-version risk). If it fails, pin/patch or fork the plugin's `android/build.gradle`.
+3. **Define achievements + leaderboards in Play Console** (tabs currently empty) → copy their IDs into a config map; bridge passes IDs through, has NONE hardcoded.
+4. Wire real game-end events → `submitLeaderboardScore` / `unlockAchievement` (follow-up, gated on step 3 IDs). **Gate on sign-in:** call `signInPlayGames()` (or check `available`) and succeed BEFORE submit/unlock — on-device those calls only register for a signed-in player. NB: bridge is currently **inert — no component imports it**, so its plugin runtime JS is not yet in any bundle (proven only to compile + typecheck, not to bundle); first consumer exercises that.
+5. Build a SIGNED build whose cert matches a PGS credential; test sign-in on device (both Play-signed prod download AND upload-key sideload).
+6. PGS sign-in is Games-scoped — kept ORTHOGONAL to Supabase/`nativeOAuth` identity session. Do not route tokens between them.
+7. **Publish PGS project** in Console — outward-facing, parked until explicit go.
+
+Spec: `docs/2026-06-07-play-games-services-native-bridge-spec.md`. Console state memory: `play-games-services-config-2026-06-07`.
+
+---
 
 ## Last Release
 versionCode **5713** built + uploaded to **internal** then **promoted to production** 2026-06-04 ~00:49 CEST via `npm run release:android:prod`. Purpose: submit a fresh binary so Google **re-reviews** the corrected Google Families / "Social Apps & Features" policy declaration (chat/DM age-gate + capability enforcement fix `69ae2d905` + `2fdedf2c9`, web-served from `www.lexiclash.live` — remote-URL Capacitor app, fix is NOT in the AAB). Both fastlane lanes returned "Successfully finished the upload to Google Play"; `deactivate_on_promote: true` so 5713 lives on production only. Now in Play review. versionName 0.1.0.
