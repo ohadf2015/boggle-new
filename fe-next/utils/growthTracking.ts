@@ -971,9 +971,15 @@ export const trackGameEnd = (
       mode,
     });
 
-    // Award Play Games Services leaderboard score + win achievement.
+    // Award Play Games Services leaderboard score + achievements.
     // Fire-and-forget; the bridge is a no-op off Android and never throws.
-    void awardGameEnd({ mode, score, isWinner: extras.isWinner === true });
+    void awardGameEnd({
+      mode,
+      score,
+      wordCount,
+      isWinner: extras.isWinner === true,
+      language: getCurrentLanguage() ?? undefined,
+    });
   } else if (durationSec !== undefined && durationSec < 15) {
     // Rage-quit: abandoned a game within 15s — strong onboarding-friction signal.
     trackRageQuit({ mode, durationMs: durationSec * 1000, wordsFound: wordCount });

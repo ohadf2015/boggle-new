@@ -5,20 +5,27 @@
  * underlying bridge (`utils/nativePGS.ts`) is a no-op off Android and never
  * throws, so this is safe to invoke unconditionally on every platform.
  *
- * Currently wires the two events derivable from game-end alone:
- *   - score → High Score leaderboard (+ Daily Challenge for the daily mode)
- *   - win   → First Victory achievement
+ * Wires every achievement derivable from game-end (+ a little local state):
+ *   - score    → High Score leaderboard (+ Daily Challenge for the daily mode)
+ *   - win      → First Victory
+ *   - words>0  → First Word (once) + Word Smith (incremental, by word count)
+ *   - language → Polyglot (once 2+ distinct languages played)
+ *   - daily    → Daily Devotee (incremental, +1 per completed daily)
  *
- * TODO (need their own event sources, not game-end):
- *   firstWord (first valid word), wordSmith (incremental 500 words),
- *   polyglot (2+ languages), onARoll (7-day streak), dailyDevotee (incremental
- *   30 dailies). IDs + step counts live in `playGamesIds.ts`, helpers in the
- *   bridge — wire from the relevant event sites.
+ * TODO: onARoll (7-day streak) — no clean global play-streak source exists yet
+ * (streak logic is fragmented per-mode), so it is intentionally not wired here.
  */
 
-import { submitLeaderboardScore, unlockAchievement } from '@/utils/nativePGS';
+import { submitLeaderboardScore, unlockAchievement, incrementAchievement } from '@/utils/nativePGS';
 import { isAndroid } from '@/utils/platform';
 import { PLAY_GAMES_LEADERBOARDS, PLAY_GAMES_ACHIEVEMENTS } from './playGamesIds';
+import {
+  hasAwardedFirstWord,
+  markFirstWordAwarded,
+  hasAwardedPolyglot,
+  markPolyglotAwarded,
+  recordLanguagePlayed,
+} from './awardState';
 
 /** Modes whose score should also feed the Daily Challenge leaderboard. */
 const DAILY_MODES = new Set(['daily-challenge']);
@@ -26,10 +33,18 @@ const DAILY_MODES = new Set(['daily-challenge']);
 export interface AwardGameEndArgs {
   mode: string;
   score: number;
+  wordCount?: number;
   isWinner?: boolean;
+  language?: string;
 }
 
-export async function awardGameEnd({ mode, score, isWinner }: AwardGameEndArgs): Promise<void> {
+export async function awardGameEnd({
+  mode,
+  score,
+  wordCount = 0,
+  isWinner,
+  language,
+}: AwardGameEndArgs): Promise<void> {
   // Off Android the bridge is a no-op anyway — skip entirely so non-native
   // callers (web, unit tests) never even reach the lazy plugin import.
   if (!isAndroid()) return;
@@ -45,6 +60,36 @@ export async function awardGameEnd({ mode, score, isWinner }: AwardGameEndArgs):
 
   if (isWinner) {
     tasks.push(unlockAchievement(PLAY_GAMES_ACHIEVEMENTS.firstVictory));
+  }
+
+  if (wordCount > 0) {
+    // First Word: mark awarded only once the native unlock actually succeeds,
+    // so a not-yet-signed-in player retries on a later game instead of skipping.
+    if (!hasAwardedFirstWord()) {
+      tasks.push(
+        unlockAchievement(PLAY_GAMES_ACHIEVEMENTS.firstWord).then((r) => {
+          if (r.success) markFirstWordAwarded();
+        }),
+      );
+    }
+    // Word Smith: server accumulates these increments toward 500.
+    tasks.push(incrementAchievement(PLAY_GAMES_ACHIEVEMENTS.wordSmith, wordCount));
+  }
+
+  if (language && !hasAwardedPolyglot()) {
+    const distinct = recordLanguagePlayed(language);
+    if (distinct >= 2) {
+      tasks.push(
+        unlockAchievement(PLAY_GAMES_ACHIEVEMENTS.polyglot).then((r) => {
+          if (r.success) markPolyglotAwarded();
+        }),
+      );
+    }
+  }
+
+  if (DAILY_MODES.has(mode)) {
+    // Daily Devotee: awardGameEnd is only invoked on a completed game.
+    tasks.push(incrementAchievement(PLAY_GAMES_ACHIEVEMENTS.dailyDevotee, 1));
   }
 
   // allSettled: never reject, even though the bridge already swallows errors.
