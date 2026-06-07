@@ -18,6 +18,7 @@ import DailyInsightStack from './DailyInsightStack';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WordWheelSignupCta from './WordWheelSignupCta';
 import WordWheelReplayCta from './WordWheelReplayCta';
+import CatchUpSuggestion from './CatchUpSuggestion';
 import { wasSignupModalDismissedRecently } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
@@ -45,6 +46,8 @@ interface WordWheelResultsProps {
   isFirstCompletion?: boolean;
   /** True when this is the terminal 'already-played' view (returning player) — enables the practice CTA. */
   alreadyPlayed?: boolean;
+  /** True when this was a catch-up play (past day) — shows catch-up suggestion. */
+  isCatchup?: boolean;
 }
 
 function getResultTier(score: number): {
@@ -128,6 +131,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
   currentPlayerId, currentGuestFingerprint,
   isAuthenticated = false, streakDays = 0, isFirstCompletion = false, alreadyPlayed = false,
+  isCatchup = false,
 }) => {
   const { t, language } = useLanguage();
   const { submitLeaderboardScore } = useCrazyGames();
@@ -392,6 +396,18 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           dismissedRecently={wasSignupModalDismissedRecently()}
           score={result.score}
         />
+      )}
+
+      {/* Catch-up suggestion: nudge the player to replay other missed dailies */}
+      {!isPractice && (
+        <m.div
+          className="w-full z-10"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <CatchUpSuggestion mode="word-wheel" excludeDate={puzzleDate} />
+        </m.div>
       )}
 
       {/* Practice mode: replace cross-promos + leaderboard with chain CTA so the

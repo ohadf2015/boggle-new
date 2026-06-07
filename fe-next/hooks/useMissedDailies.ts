@@ -7,12 +7,16 @@ export interface MissedDaily {
   puzzleNumber: number;
 }
 
+export type DailyMode = 'word-hunt' | 'word-wheel';
+
 /**
- * Fetches the daily Word Hunt challenges the player missed within the catch-up
+ * Fetches the daily challenges (Word Hunt or Word Wheel) the player missed within the catch-up
  * window (last 3 days). Powers the post-results "catch up" suggestion.
  * Fails soft: a network/429/5xx error leaves the list empty rather than throwing.
+ * @param mode - Which daily mode to fetch missed challenges for (default: 'word-hunt')
+ * @param enabled - Whether to fetch (default: true)
  */
-export function useMissedDailies(enabled: boolean = true): { missed: MissedDaily[]; loading: boolean } {
+export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean = true): { missed: MissedDaily[]; loading: boolean } {
   const [missed, setMissed] = useState<MissedDaily[]>([]);
   const [loading, setLoading] = useState(enabled);
   const mountedRef = useRef(true);
@@ -20,7 +24,7 @@ export function useMissedDailies(enabled: boolean = true): { missed: MissedDaily
   const refresh = useCallback(() => {
     if (!enabled) return;
     setLoading(true);
-    fetch('/api/daily/missed')
+    fetch(`/api/daily/missed?mode=${mode}`)
       .then(r => (r.ok ? r.json() : null))
       .then(json => {
         if (!mountedRef.current) return;
@@ -28,7 +32,7 @@ export function useMissedDailies(enabled: boolean = true): { missed: MissedDaily
         setLoading(false);
       })
       .catch(() => { if (mountedRef.current) setLoading(false); });
-  }, [enabled]);
+  }, [enabled, mode]);
 
   useEffect(() => {
     mountedRef.current = true;

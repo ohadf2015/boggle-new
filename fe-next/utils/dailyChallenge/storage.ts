@@ -358,6 +358,22 @@ export function saveWordWheelResult(result: WordWheelResult): void {
   saveJsonToLocalStorage(key, storedResult);
 }
 
+/**
+ * Check if user has played a specific date's Word Wheel (for catch-up)
+ */
+export function hasPlayedWordWheel(language: Language, date: string): boolean {
+  const key = getWordWheelResultKey(language, date);
+  return getFromLocalStorage(key) !== null;
+}
+
+/**
+ * Get stored Word Wheel result for a specific date (for catch-up)
+ */
+export function getWordWheelResultForDate(language: Language, date: string): StoredWordWheelResult | null {
+  const key = getWordWheelResultKey(language, date);
+  return getJsonFromLocalStorage<StoredWordWheelResult | null>(key, null);
+}
+
 // ==========================================
 // Server Result Mapping
 // ==========================================

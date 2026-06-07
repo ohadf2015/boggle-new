@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, m } from 'framer-motion';
 import { Star, Type, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -20,7 +21,10 @@ import {
   getTodaysWordWheelResult,
   saveWordWheelResult,
   getDailyStreak,
+  hasPlayedWordWheel,
+  getWordWheelResultForDate,
 } from '@/utils/dailyChallenge';
+import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fastValidateWord } from '@/hooks/fastValidateWord';
@@ -30,6 +34,8 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { isNative } from '@/utils/platform';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 
 // Lazy-load PixiJS effects canvas (no SSR)
@@ -70,6 +76,12 @@ const WordWheelChallenge: React.FC = () => {
   const { profile, isAuthenticated } = useAuth();
   const setIsInGame = useHideNavigation();
 
+  // Catch-up: `?date=YYYY-MM-DD` launches a past daily within the 3-day window.
+  const searchParams = useSearchParams();
+  const dateParam = searchParams.get('date');
+  const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
+  const isCatchup = !!catchupDate;
+
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
   const [gameResult, setGameResult] = useState<WordWheelGameResult | null>(null);
@@ -77,6 +89,10 @@ const WordWheelChallenge: React.FC = () => {
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+
+  // Catch-up ad gate — mirrors DailyChallenge pattern. Per-date unlock so a
+  // single ad watch covers the whole session for that date.
+  const catchupAdUnlockedRef = useRef(false);
 
   // Cross-promo gate: has the player finished today's Word Hunt (this language)?
   // Resolved localStorage-first, then server-of-record (cross-device) — so the
@@ -115,9 +131,12 @@ const WordWheelChallenge: React.FC = () => {
   // Initialize puzzle
   useEffect(() => {
     let isMounted = true;
-    const date = getDailyChallengeDate();
+    const date = catchupDate || getDailyChallengeDate();
     const number = getPuzzleNumber(date);
     setPuzzleNumber(number);
+
+    // Reset ad unlock when catch-up date changes
+    catchupAdUnlockedRef.current = false;
 
     const gameLang = language as Language;
 
@@ -131,9 +150,15 @@ const WordWheelChallenge: React.FC = () => {
         return;
       }
 
-      // Fast-path: localStorage already has today's result.
-      if (hasPlayedWordWheelToday(gameLang)) {
-        const stored = getTodaysWordWheelResult(gameLang);
+      // Fast-path: localStorage already has this date's result.
+      const hasPlayed = isCatchup
+        ? hasPlayedWordWheel(gameLang, date)
+        : hasPlayedWordWheelToday(gameLang);
+
+      if (hasPlayed) {
+        const stored = isCatchup
+          ? getWordWheelResultForDate(gameLang, date)
+          : getTodaysWordWheelResult(gameLang);
         if (!isMounted) return;
         if (stored) {
           setGameResult({
@@ -220,17 +245,49 @@ const WordWheelChallenge: React.FC = () => {
     init();
     return () => { isMounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language, isAuthenticated, profile?.id, guestFingerprint, isPractice]);
+  }, [language, isAuthenticated, profile?.id, guestFingerprint, isPractice, catchupDate, isCatchup]);
 
   const handleValidateWord = useCallback(
     (word: string) => fastValidateWord(word, language as Language),
     [language]
   );
 
-  const handleStart = useCallback(() => {
+  // Core start — shared by direct play and post-ad-reward callback.
+  const startPlaying = useCallback(() => {
     setGameActive(true);
     setPhase('playing');
   }, [setGameActive]);
+
+  // Rewarded ad for catch-up plays (native only; web degrades to free).
+  const {
+    showAd: showCatchUpAd,
+    isAdAvailable: isCatchUpAdAvailable,
+    isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
+  } = useRewardedAd({
+    rewardKind: 'feature',
+    surface: 'catchup',
+    onRewardEarned: () => {
+      catchupAdUnlockedRef.current = true;
+      startPlaying();
+    },
+  });
+
+  const handleStart = useCallback(() => {
+    // Catch-up ad gate: playing a past day costs a rewarded ad on native.
+    if (
+      shouldGateCatchUpBehindAd({
+        isCatchup,
+        alreadyUnlocked: catchupAdUnlockedRef.current,
+        isNative: isNative(),
+        isAdAvailable: isCatchUpAdAvailable,
+        isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
+      })
+    ) {
+      showCatchUpAd();
+      return;
+    }
+    startPlaying();
+  }, [isCatchup, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
 
   const handleComplete = useCallback((result: WordWheelGameResult) => {
     setGameActive(false);
@@ -243,7 +300,7 @@ const WordWheelChallenge: React.FC = () => {
     }
 
     const gameLang = language as Language;
-    const date = getDailyChallengeDate();
+    const date = catchupDate || getDailyChallengeDate();
     const streak = getDailyStreak();
 
     saveWordWheelResult({
@@ -281,6 +338,7 @@ const WordWheelChallenge: React.FC = () => {
       longestWord: longestWord || undefined,
       timeSeconds: result.timeSeconds,
       centerLetter: puzzle?.centerLetter || undefined,
+      isCatchup,
     };
 
     void (async () => {
@@ -329,7 +387,7 @@ const WordWheelChallenge: React.FC = () => {
     })();
 
     setPhase('completed');
-  }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile, isPractice]);
+  }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile, isPractice, catchupDate, isCatchup]);
 
   const handleEffect = useCallback((effect: WordWheelEffect) => {
     setEffects(prev => [...prev, effect]);
@@ -457,7 +515,7 @@ const WordWheelChallenge: React.FC = () => {
             {/* Tabbed leaderboard — parity with Word Hunt ready screen */}
             <div className="w-full max-w-md mt-2">
               <TabbedDailyLeaderboard
-                puzzleDate={getDailyChallengeDate()}
+                puzzleDate={catchupDate || getDailyChallengeDate()}
                 language={language as Language}
                 currentPlayerId={isAuthenticated && profile ? profile.id : null}
                 currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
@@ -510,7 +568,7 @@ const WordWheelChallenge: React.FC = () => {
             <WordWheelResults
               result={gameResult}
               puzzleNumber={puzzleNumber}
-              puzzleDate={getDailyChallengeDate()}
+              puzzleDate={catchupDate || getDailyChallengeDate()}
               language={language as Language}
               hasPlayedWordHunt={hasPlayedWH}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
@@ -519,6 +577,7 @@ const WordWheelChallenge: React.FC = () => {
               streakDays={getDailyStreak().currentStreak}
               isFirstCompletion={getDailyStreak().totalDailiesCompleted <= 1}
               alreadyPlayed={phase === 'already-played'}
+              isCatchup={isCatchup}
             />
           </m.div>
         )}

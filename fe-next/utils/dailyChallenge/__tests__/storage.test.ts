@@ -4,7 +4,7 @@
  * Tests for localStorage operations, specifically win/loss status tracking
  */
 
-import { getWordHuntStatusToday, getTodaysWordHuntResult, saveWordHuntResult } from '../storage';
+import { getWordHuntStatusToday, getTodaysWordHuntResult, saveWordHuntResult, hasPlayedWordWheel, getWordWheelResultForDate } from '../storage';
 import { getDailyChallengeDate } from '../dateUtils';
 import { WORD_HUNT_STORAGE_KEY } from '../constants';
 import type { WordHuntResult } from '../types';
@@ -33,7 +33,7 @@ vi.mock('../streaks', () => ({
   })),
 }));
 
-import { getJsonFromLocalStorage, saveJsonToLocalStorage } from '@/utils/storageHelpers';
+import { getJsonFromLocalStorage, saveJsonToLocalStorage, getFromLocalStorage } from '@/utils/storageHelpers';
 // vi.mock hoists above, so these are already mocked vi.fn() instances
 
 describe('getWordHuntStatusToday', () => {
@@ -243,5 +243,43 @@ describe('getTodaysWordHuntResult', () => {
 
     // THEN - Should return null
     expect(result).toBeNull();
+  });
+});
+
+describe('hasPlayedWordWheel (date-parameterized)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns false when no result stored for given date', () => {
+    (getFromLocalStorage as ReturnType<typeof vi.fn>).mockReturnValue(null);
+    expect(hasPlayedWordWheel('en' as Language, '2025-01-18')).toBe(false);
+  });
+
+  it('returns true when result exists for given date', () => {
+    (getFromLocalStorage as ReturnType<typeof vi.fn>).mockReturnValue('{}');
+    expect(hasPlayedWordWheel('en' as Language, '2025-01-18')).toBe(true);
+  });
+
+  it('checks correct storage key for the specific date', () => {
+    hasPlayedWordWheel('he' as Language, '2025-01-19');
+    expect(getFromLocalStorage).toHaveBeenCalledWith('lexiclash_word_wheel_he_2025-01-19');
+  });
+});
+
+describe('getWordWheelResultForDate', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns null when no result stored', () => {
+    (getJsonFromLocalStorage as ReturnType<typeof vi.fn>).mockReturnValue(null);
+    expect(getWordWheelResultForDate('en' as Language, '2025-01-18')).toBeNull();
+  });
+
+  it('returns stored result for the given date', () => {
+    const stored = { date: '2025-01-18', puzzleNumber: 20, result: { score: 42 } };
+    (getJsonFromLocalStorage as ReturnType<typeof vi.fn>).mockReturnValue(stored);
+    expect(getWordWheelResultForDate('en' as Language, '2025-01-18')).toEqual(stored);
   });
 });

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMissedDailies } from '@/hooks/useMissedDailies';
+import { useMissedDailies, type DailyMode } from '@/hooks/useMissedDailies';
 import { isNative } from '@/utils/platform';
 
 function daysAgo(date: string, today: string): number {
@@ -16,6 +16,8 @@ function daysAgo(date: string, today: string): number {
 interface CatchUpSuggestionProps {
   /** The date just played — filtered out so we never suggest re-playing it. */
   excludeDate?: string;
+  /** Which daily mode's missed challenges to show. Defaults to 'word-hunt'. */
+  mode?: DailyMode;
 }
 
 /**
@@ -23,9 +25,9 @@ interface CatchUpSuggestionProps {
  * window (last 3 days) and links each to its past puzzle. Renders nothing when
  * there's nothing to catch up. Self-contained — fetches its own data + locale.
  */
-export default function CatchUpSuggestion({ excludeDate }: CatchUpSuggestionProps) {
+export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggestionProps) {
   const { t, language } = useLanguage();
-  const { missed } = useMissedDailies();
+  const { missed } = useMissedDailies(mode || 'word-hunt');
   const today = new Date().toISOString().split('T')[0];
 
   // Native gates catch-up play behind a rewarded ad — flag it here so tapping a
@@ -66,7 +68,7 @@ export default function CatchUpSuggestion({ excludeDate }: CatchUpSuggestionProp
           return (
             <Link
               key={item.date}
-              href={`/${language}/daily/word-hunt?date=${item.date}`}
+              href={`/${language}/daily/${mode || 'word-hunt'}?date=${item.date}`}
               className="flex items-center justify-between rounded-neo border-neo border-neo-black bg-neo-cream px-3 py-2 font-neo-body text-neo-black shadow-hard-sm transition-transform hover:-translate-y-px active:translate-y-px"
             >
               <span className="font-semibold">{label}</span>

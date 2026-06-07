@@ -92,6 +92,8 @@ export {
   getWordWheelStatusToday,
   getTodaysWordWheelResult,
   saveWordWheelResult,
+  hasPlayedWordWheel,
+  getWordWheelResultForDate,
 } from './dailyChallenge/storage';
 export type { ServerWordHuntResult } from './dailyChallenge/storage';
 

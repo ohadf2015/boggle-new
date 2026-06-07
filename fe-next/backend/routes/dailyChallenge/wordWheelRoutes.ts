@@ -50,6 +50,7 @@ interface WordWheelSubmitBody {
   longestWord?: string;
   timeSeconds?: number;
   centerLetter?: string;
+  isCatchup?: boolean;
 }
 
 // ==========================================
@@ -66,7 +67,7 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
     const {
       puzzleDate, puzzleNumber, language, playerId, guestFingerprint,
       displayName, avatarEmoji, avatarColor, avatarImage,
-      countryCode, score, wordCount, wordsFound, longestWord, timeSeconds, centerLetter,
+      countryCode, score, wordCount, wordsFound, longestWord, timeSeconds, centerLetter, isCatchup,
     } = req.body;
 
     if (!puzzleDate || !puzzleNumber || !language || score === undefined) {
@@ -103,6 +104,8 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
       avatar_image: avatarImage || null,
       country_code: countryCode || null,
     };
+
+    insertData.is_catchup = Boolean(isCatchup);
 
     if (playerId) {
       insertData.player_id = playerId;
