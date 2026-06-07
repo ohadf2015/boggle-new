@@ -16,6 +16,15 @@ function chainMultiplierFor(chainDepth: number): number {
   return CHAIN_MULTIPLIER_TABLE[idx]!;
 }
 
+// Bonus (off-theme dictionary) words used to score a flat 10 regardless of
+// length — no reason to hunt for longer finds. Now length-scaled with an
+// escalating tail (3→15, 4→25, 5→35, 6→45, 7→55) so longer discoveries feel
+// rewarding, while always staying below the same-length theme word
+// (theme = len*10, e.g. 5-letter theme 50 > bonus 35) so the theme stays primary.
+function bonusBaseFor(wordLen: number): number {
+  return wordLen * 5 + Math.max(0, wordLen - 3) * 5;
+}
+
 export function scoreForWord(
   level: BlastLevel,
   cells: CellId[],
@@ -23,7 +32,7 @@ export function scoreForWord(
   chainDepth: number = 0,
 ): ScoreOutcome {
   const wordLen = cells.length;
-  let coinsBase = kind === 'theme' ? wordLen * 10 : kind === 'cascade' ? wordLen * 20 : 10;
+  let coinsBase = kind === 'theme' ? wordLen * 10 : kind === 'cascade' ? wordLen * 20 : bonusBaseFor(wordLen);
   let coinsFromOverlays = 0;
   let chestProgressDelta = 0;
   let multiplier: 1 | 2 = 1;
@@ -33,7 +42,7 @@ export function scoreForWord(
     if (flags.includes('gem')) chestProgressDelta += 0.02;
     if (flags.includes('double_bonus')) multiplier = 2;
   }
-  if (multiplier === 2 && kind !== 'bonus') coinsBase *= 2;
+  if (multiplier === 2) coinsBase *= 2;
   const chainMultiplier = kind === 'cascade' ? chainMultiplierFor(chainDepth) : 1;
   if (chainMultiplier !== 1) coinsBase = Math.round(coinsBase * chainMultiplier);
   return { coinsBase, coinsFromOverlays, chestProgressDelta, multiplier, chainMultiplier };

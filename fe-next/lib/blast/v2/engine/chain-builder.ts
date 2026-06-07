@@ -318,6 +318,20 @@ export function buildChainLevel(
   const ceiling = spec.columns <= 5
     ? narrowCeiling
     : Math.max(longest + 1, columnHeightCeiling(spec.chain));
+  // Tower control on phone (≤5 col) boards. The OLD cap `max(longest+2, avg+4)`
+  // let dense chains realize 9–10 tall towers (founder report: a [9,7,3,2]
+  // silhouette on level 17). We TIGHTEN to `max(longest+1, avg+2)` and return
+  // the FIRST build under it — keeping the orientation coin-flip's row/column
+  // variety (don't pancake the board flat, which kills visual interest) and the
+  // original ~few-attempt speed. The legacy loose cap survives only as a
+  // fallback so a hard-to-place dense chain still builds rather than returning
+  // null. A forced tall word (longest≥cols) is height==longest ≤ longest+1, so
+  // the tight cap is always reachable — no full-budget scan.
+  const tightCap = Math.max(longest + 1, avgPerCol + 2);
+  const looseCap = Math.max(longest + 2, avgPerCol + 4);
+  // How long to chase the tight cap before settling for the first loose build.
+  const TIGHT_SEARCH_BUDGET = 60;
+  let looseFallback: BlastLevel | null = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const attemptSeed = Math.floor(rand() * 0xffffffff) || 1;
     const base = floorBoard(spec);
@@ -364,22 +378,29 @@ export function buildChainLevel(
 
     const withDecoys = insertDecoys(board, spec, attemptSeed);
     if (!withDecoys) continue;
-    // Silhouette filter: prevents the permissive narrow-grid ceiling from
-    // collapsing the entire chain into a single tower. Applies to all levels
-    // on cols≤5 WHEN no chain word is wider than the grid — the pre-fix
-    // exemption for level>10 let he-chain-11 stack a 15+ tile column (the
-    // screenshot regression). When a chain word IS wider than cols (e.g.
-    // he-chain-14 ships גלקסיה / 7-letters on cols=5) a tall column is
-    // structurally unavoidable, so we skip the filter and let the placer
-    // succeed within its attempt budget. Cap scales with chain density so
-    // dense late-game chains still place reliably.
-    if (spec.columns <= 5 && longest <= spec.columns) {
-      const towerCap = Math.max(longest + 2, avgPerCol + 4);
-      if (maxColumnHeight(withDecoys) > towerCap) continue;
+
+    // Wider grids (>5 cols) and chains with a word wider than the grid
+    // (longest > cols) keep the original first-valid behavior. Applying the cap
+    // to longest>cols makes those dense chains UNBUILDABLE on 5 cols (he L14/L24
+    // contain גלקסיה/6 letters → no arrangement fits under the cap → null). The
+    // real fix for those is content (shorten the long word so longest ≤ cols,
+    // which then re-engages the cap) — see he pack-chain.json L14/L24.
+    if (spec.columns > 5 || longest > spec.columns) return withDecoys;
+
+    const height = maxColumnHeight(withDecoys);
+    if (height <= tightCap) return withDecoys; // phone-friendly — ship immediately
+    if (height <= looseCap) {
+      // Acceptable under the legacy cap. Hold the FIRST such build (same choice
+      // the original made) and keep looking a little longer for a tighter one;
+      // after the budget, ship it. Bounds work so dense chains never trigger the
+      // full MAX_BUILD_ATTEMPTS scan (the 3-minute regression).
+      if (looseFallback === null) looseFallback = withDecoys;
+      if (attempt >= TIGHT_SEARCH_BUDGET) return looseFallback;
     }
-    return withDecoys;
+    // height > looseCap → reject, exactly like the original tower filter (may end
+    // up returning null and letting the caller fall back to another source).
   }
-  return null;
+  return looseFallback;
 }
 
 /**

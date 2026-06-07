@@ -38,7 +38,9 @@ describe('anti-cheat', () => {
       expect(validation.ok).toBe(true);
     });
 
-    it('rejects word not in level', () => {
+    it('accepts off-theme bonus words (apple in level, orange is a valid bonus find)', () => {
+      // Bonus words are legitimate off-theme dictionary finds; rejecting them
+      // here used to 400 the whole clear, losing all progress.
       const submission: ClearSubmission = {
         levelNumber: 1,
         locale: 'en',
@@ -49,10 +51,7 @@ describe('anti-cheat', () => {
         cascadesTriggered: 0,
       };
       const validation = validateLevelClear(submission, mockLevel);
-      expect(validation.ok).toBe(false);
-      if (!validation.ok) {
-        expect(validation.reason).toContain('not in level');
-      }
+      expect(validation.ok).toBe(true);
     });
 
     it('rejects time too fast (less than 5 seconds per word)', () => {
@@ -287,19 +286,18 @@ describe('anti-cheat', () => {
       difficulty: 1,
     };
 
-    it('rejects when wordsFound contains a word NOT in level.words', () => {
+    it('accepts off-theme bonus words in wordsFound (matches the generated-level path)', () => {
       const sub: ClearSubmission = {
         levelNumber: 1,
         locale: 'en',
-        wordsFound: ['CAT', 'XYZ'], // XYZ phantom
+        wordsFound: ['CAT', 'SUN', 'EGG', 'TREE'], // TREE = off-theme bonus find
         timeSeconds: 60,
         hintsUsed: 0,
         wrongAttempts: 0,
         cascadesTriggered: 1,
       };
       const r = applyAntiCheatCapsWithLevel(sub, 500, levelCAT);
-      expect(r.ok).toBe(false);
-      if (!r.ok) expect(r.reason).toMatch(/word not in level/i);
+      expect(r.ok).toBe(true);
     });
 
     it('rejects when timeSeconds below per-word floor', () => {

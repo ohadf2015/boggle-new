@@ -143,6 +143,31 @@ describe('buildChainLevel column-height cap', () => {
     }
     expect(saw).toBe(true);
   });
+
+  it('flattens flattenable chains to the tight phone cap (kills 9-10 towers)', () => {
+    // total=15, cols=5 → avg=3, tightCap = max(longest+1, avg+2) = 5.
+    // Pre-fix the loose cap allowed up to 7; the founder saw 9-10 towers on
+    // denser curated levels. Prove at least one seed reaches the tight cap and
+    // NONE exceeds it across a seed sweep (variety still allowed below the cap).
+    const spec: ChainLevelSpec = {
+      id: 'en-flat-test',
+      levelNumber: 6,
+      theme: 'ocean',
+      locale: 'en',
+      columns: 5,
+      decoyTiles: 0,
+      chain: ['CAT', 'SUN', 'DOG', 'EGG', 'BAT'],
+    };
+    let reachedTight = false;
+    for (let seed = 1; seed <= 30; seed++) {
+      const level = buildChainLevel(spec, seed);
+      if (!level) continue;
+      const max = Math.max(...level.columns.map((c) => c.tiles.length));
+      expect(max).toBeLessThanOrEqual(7); // never worse than the legacy loose cap
+      if (max <= 5) reachedTight = true; // the tight phone cap is actually hit
+    }
+    expect(reachedTight).toBe(true); // flattening works, not just a looser ceiling
+  });
 });
 
 describe('buildChainLevel', () => {

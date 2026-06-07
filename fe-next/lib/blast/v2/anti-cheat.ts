@@ -17,18 +17,18 @@ export type ClearSubmission = {
 export type ClearValidation = { ok: true } | { ok: false; reason: string };
 
 export function validateLevelClear(submission: ClearSubmission, level: BlastLevel): ClearValidation {
-  const config = LOCALE_CONFIGS[submission.locale];
-  const normWords = new Set(level.words.map(config.normalize));
-  const normFound = new Set(submission.wordsFound.map(config.normalize));
+  // NOTE: `wordsFound` legitimately contains OFF-THEME bonus words (the client
+  // adds them only after /api/dictionary/check confirms they're real). The old
+  // "every found word must be a theme word" reject broke every curated clear the
+  // moment a player found a bonus word → 400 → the whole level clear was lost
+  // (no progress, no coins, no chest). It also made bonus words actively harmful.
+  // The level-less path (applyAntiCheatCaps, generated levels 31+) already accepts
+  // off-theme words; curated levels now match that posture. Coin inflation is still
+  // bounded by the per-letter ceiling (maxPossibleCoins); the only residual is
+  // chest-fill from words, which is intended and requires a tampered client on an
+  // admin-gated single-player mode.
 
-  // Check all found words are in level
-  for (const word of normFound) {
-    if (!normWords.has(word)) {
-      return { ok: false, reason: `word not in level: ${word}` };
-    }
-  }
-
-  // Check time bound
+  // Time floor: keeps curated stricter than generated (which has none).
   const minTime = MIN_TIME_PER_WORD * level.words.length;
   if (submission.timeSeconds < minTime) {
     return { ok: false, reason: `time too fast: ${submission.timeSeconds}s < ${minTime}s` };

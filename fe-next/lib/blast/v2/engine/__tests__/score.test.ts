@@ -34,10 +34,35 @@ describe('score helpers', () => {
     expect(result.coinsBase).toBe(40); // 2 * 20
   });
 
-  it('bonus dict word: flat +10', () => {
-    const cells = [cellId(0, 2)];
-    const result = scoreForWord(baseLevel, cells, 'bonus');
-    expect(result.coinsBase).toBe(10);
+  describe('bonus word: length-scaled (rewards longer off-theme finds)', () => {
+    // Formula: wordLen * 5 + max(0, wordLen - 3) * 5
+    const cellsOfLen = (n: number) => Array.from({ length: n }, (_, i) => cellId(i % 3, Math.floor(i / 3)));
+    it('3-letter bonus → 15', () => {
+      expect(scoreForWord(baseLevel, cellsOfLen(3), 'bonus').coinsBase).toBe(15);
+    });
+    it('4-letter bonus → 25', () => {
+      expect(scoreForWord(baseLevel, cellsOfLen(4), 'bonus').coinsBase).toBe(25);
+    });
+    it('5-letter bonus → 35', () => {
+      expect(scoreForWord(baseLevel, cellsOfLen(5), 'bonus').coinsBase).toBe(35);
+    });
+    it('7-letter bonus → 55', () => {
+      expect(scoreForWord(baseLevel, cellsOfLen(7), 'bonus').coinsBase).toBe(55);
+    });
+    it('stays below the same-length theme word (theme stays primary)', () => {
+      const five = cellsOfLen(5);
+      expect(scoreForWord(baseLevel, five, 'bonus').coinsBase).toBeLessThan(
+        scoreForWord(baseLevel, five, 'theme').coinsBase,
+      );
+    });
+  });
+
+  it('double_bonus tile now multiplies a bonus word too', () => {
+    const level = { ...baseLevel, tileFlags: { [cellId(0, 0)]: ['double_bonus'] as const } };
+    const cells = [cellId(0, 0), cellId(1, 0), cellId(2, 0)]; // 3 letters → 15 base
+    const result = scoreForWord(level, cells, 'bonus');
+    expect(result.coinsBase).toBe(30); // 15 * 2
+    expect(result.multiplier).toBe(2);
   });
 
   it('double_bonus tile multiplies theme word by 2', () => {

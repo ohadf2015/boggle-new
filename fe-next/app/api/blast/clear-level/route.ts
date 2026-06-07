@@ -1,7 +1,9 @@
 import { createClient } from '@/utils/supabase/server';
-import { applyAntiCheatCaps, applyAntiCheatCapsWithLevel, type ClearSubmission } from '@/lib/blast/v2/anti-cheat';
+import { applyAntiCheatCaps, applyAntiCheatCapsWithLevel, starRating, type ClearSubmission } from '@/lib/blast/v2/anti-cheat';
 import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-source-registry';
 import { CURATED_LEVEL_CUTOFF } from '@/lib/blast/v2/level-source';
+import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
+import type { BlastLevel } from '@/lib/blast/v2/types';
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
 import { mergeUnlocksSeen } from '@/lib/blast/v2/mergeUnlocksSeen';
 import { validateUnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
@@ -54,26 +56,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid submission' }, { status: 400 });
   }
 
-  // Anti-cheat: prefer level-aware validation when the level is curated (1..CURATED_LEVEL_CUTOFF).
-  // For generated levels (31+), fall back to the level-less ceiling.
-  let capped;
-  if (submission.levelNumber <= CURATED_LEVEL_CUTOFF) {
-    try {
-      const registry = buildRegistry();
-      const level = await getLevelSourceForLevel(submission.levelNumber, submission.locale, registry).resolve(submission.levelNumber, submission.locale);
-      capped = applyAntiCheatCapsWithLevel(submission, submission.earnedCoins, level);
-    } catch {
-      // Pack missing / load failure — gracefully fall back to level-less caps.
-      capped = applyAntiCheatCaps(submission, submission.earnedCoins);
-    }
-  } else {
-    capped = applyAntiCheatCaps(submission, submission.earnedCoins);
+  // Resolve the level once: needed for level-aware anti-cheat caps AND for the
+  // real star rating. Generated levels (31+) resolve deterministically too.
+  let level: BlastLevel | null = null;
+  try {
+    const registry = buildRegistry();
+    level = await getLevelSourceForLevel(submission.levelNumber, submission.locale, registry).resolve(
+      submission.levelNumber,
+      submission.locale,
+    );
+  } catch (err) {
+    // Pack missing / load failure — anti-cheat falls back to the level-less
+    // ceiling and stars default to 1.
+    console.error('[blast/clear-level] level resolve failed', {
+      level: submission.levelNumber,
+      locale: submission.locale,
+      err,
+    });
   }
+
+  // Anti-cheat: level-aware caps for curated levels (1..CURATED_LEVEL_CUTOFF),
+  // level-less ceiling otherwise — unchanged behavior.
+  const capped =
+    level && submission.levelNumber <= CURATED_LEVEL_CUTOFF
+      ? applyAntiCheatCapsWithLevel(submission, submission.earnedCoins, level)
+      : applyAntiCheatCaps(submission, submission.earnedCoins);
   if (!capped.ok) {
     return NextResponse.json({ error: 'Invalid submission', reason: capped.reason }, { status: 400 });
   }
 
-  const stars = 1; // Default 1-star; real rating from starRating() after level is available
+  // Real star rating (was hardcoded to 1, so every clear persisted 1★). Bonus
+  // words = found words not in the level's theme set, locale-aware normalized.
+  let stars: 1 | 2 | 3 = 1;
+  if (level) {
+    const norm = LOCALE_CONFIGS[submission.locale].normalize;
+    const themeNorm = new Set(level.words.map(norm));
+    const bonusWordsFound = submission.wordsFound.filter((w) => !themeNorm.has(norm(w))).length;
+    stars = starRating(submission, level, bonusWordsFound);
+  }
   const totalCoins = capped.trustedCoins;
   await awardCoinsServer(user.id, totalCoins, 'blast_v2_level_clear', {
     level: String(submission.levelNumber),
@@ -88,15 +108,18 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (!existingProgress) {
-    await supabase.from('blast_progress').insert({
+    const { error: insertErr } = await supabase.from('blast_progress').insert({
       user_id: user.id,
       current_level: submission.levelNumber + 1,
       locale: submission.locale,
     });
+    if (insertErr) {
+      console.error('[blast/clear-level] blast_progress insert failed', { userId: user.id, insertErr });
+    }
   }
 
   // Insert level clear record
-  await supabase.from('blast_level_clears').insert({
+  const { error: clearErr } = await supabase.from('blast_level_clears').insert({
     user_id: user.id,
     level_number: submission.levelNumber,
     locale: submission.locale,
@@ -109,6 +132,9 @@ export async function POST(req: NextRequest) {
     wrong_attempts: submission.wrongAttempts,
     time_seconds: submission.timeSeconds,
   });
+  if (clearErr) {
+    console.error('[blast/clear-level] blast_level_clears insert failed', { userId: user.id, clearErr });
+  }
 
   // Update progress via RPC
   //
@@ -121,12 +147,17 @@ export async function POST(req: NextRequest) {
   const totalLetters = submission.wordsFound.reduce((sum, w) => sum + w.length, 0);
   const wordBase = wordsCount * 0.05 + Math.max(0, totalLetters - wordsCount * 3) * 0.01;
   const chestDelta = submission.earnedGems * 0.02 + wordBase;
-  const { data: updated } = await supabase.rpc('increment_blast_progress', {
+  const { data: updated, error: rpcErr } = await supabase.rpc('increment_blast_progress', {
     p_user_id: user.id,
     p_chest_progress_delta: chestDelta,
     p_next_level: submission.levelNumber + 1,
     p_coins_delta: totalCoins,
   });
+  if (rpcErr) {
+    // Loud: a silent failure here froze progress + chest for ~25 days (PL/pgSQL
+    // column-ambiguity). Never swallow it again.
+    console.error('[blast/clear-level] increment_blast_progress RPC failed', { userId: user.id, rpcErr });
+  }
 
   // Persist the player's seen-tutorial flags so a resume skips FTUE prompts they
   // already cleared. Merge (never replace) to keep the server-owned
@@ -139,12 +170,30 @@ export async function POST(req: NextRequest) {
         submission.unlocksSeen,
       ),
     );
-    await supabase.from('blast_progress').update({ unlocks_seen: mergedUnlocks }).eq('user_id', user.id);
+    const { error: unlocksErr } = await supabase
+      .from('blast_progress')
+      .update({ unlocks_seen: mergedUnlocks })
+      .eq('user_id', user.id);
+    if (unlocksErr) {
+      console.error('[blast/clear-level] unlocks_seen update failed', { userId: user.id, unlocksErr });
+    }
+  }
+
+  // Prefer the RPC's returned row; if the RPC errored, read the row so the client
+  // still sees the true persisted coins/chest instead of a misleading zero.
+  let progressRow = updated?.[0];
+  if (!progressRow) {
+    const { data: fresh } = await supabase
+      .from('blast_progress')
+      .select('total_coins_earned_blast, current_chest_progress, current_chest_number')
+      .eq('user_id', user.id)
+      .single();
+    progressRow = fresh ?? undefined;
   }
 
   return NextResponse.json({
-    coins: updated?.[0]?.total_coins_earned_blast ?? 0,
-    chestProgress: updated?.[0]?.current_chest_progress ?? 0,
-    chestNumber: updated?.[0]?.current_chest_number ?? 1,
+    coins: progressRow?.total_coins_earned_blast ?? 0,
+    chestProgress: progressRow?.current_chest_progress ?? 0,
+    chestNumber: progressRow?.current_chest_number ?? 1,
   });
 }
