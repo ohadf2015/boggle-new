@@ -94,6 +94,27 @@ describe('useSaveDrillResult', () => {
       expect(saveResult!.brainScore?.tier).toBe('intermediate');
     });
 
+    it('records completion analytics so the drill appears in the admin game log', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockBrainScoreResponse,
+      });
+
+      const { result } = renderHook(() => useSaveDrillResult());
+      await act(async () => {
+        await result.current.saveDrillResult(mockDrillResult);
+      });
+
+      expect(mockEmitBrainDrillGameEnd).toHaveBeenCalledTimes(1);
+      expect(mockEmitBrainDrillGameEnd).toHaveBeenCalledWith({
+        drillType: 'combo-master',
+        level: 1,
+        score: 450,
+        durationSeconds: 120,
+        wordsFound: 12,
+      });
+    });
+
     it('should return domain scores in the brainScore response', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
