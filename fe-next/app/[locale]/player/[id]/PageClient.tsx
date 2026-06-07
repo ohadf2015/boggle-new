@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
+import { XpByModeBreakdown } from '@/components/profile/XpByModeBreakdown';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useAuth } from '@/contexts/AuthContext';
@@ -278,6 +279,9 @@ export default function PlayerProfilePageClient() {
           label={t('profile.achievements')}
         />
       </m.div>
+
+      {/* XP by Mode — where this player's XP came from */}
+      <XpByModeBreakdown xpByMode={profile.xpByMode} delay={0.15} />
 
       {/* Achievement Counts */}
       {sortedAchievements.length > 0 && (

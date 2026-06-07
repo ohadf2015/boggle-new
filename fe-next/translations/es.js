@@ -3836,7 +3836,8 @@ const es = {
   "profile": {
     "xpByMode": {
       "title": "XP por modo",
-      "estimateNote": "Estimado a partir de tu historial — tu reparto de XP entre los modos."
+      "estimateNote": "Estimado a partir de tu historial — tu reparto de XP entre los modos.",
+      "other": "Solo y bonus"
     },
     "title": "Tu Cuartel",
     "notFound": "Jugador no encontrado",

@@ -3811,7 +3811,8 @@ const sv = {
   "profile": {
     "xpByMode": {
       "title": "XP per läge",
-      "estimateNote": "Uppskattat från din spelhistorik – din XP-fördelning mellan lägena."
+      "estimateNote": "Uppskattat från din spelhistorik – din XP-fördelning mellan lägena.",
+      "other": "Solo & bonus"
     },
     "title": "Ditt HK",
     "notFound": "Spelaren hittades inte",

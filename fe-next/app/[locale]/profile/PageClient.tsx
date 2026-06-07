@@ -19,6 +19,8 @@ import { usePlayerCollectibles } from '@/hooks/usePlayerCollectibles';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { ReferralCard } from '@/components/profile/ReferralCard';
+import { XpByModeBreakdown } from '@/components/profile/XpByModeBreakdown';
+import { useXpByMode } from '@/hooks/useXpByMode';
 import CreatorProfileStats from '@/components/ugc/CreatorProfileStats';
 import { getCreatorStats } from '@/utils/creatorRewards';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
@@ -50,6 +52,7 @@ export default function ProfilePageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const { user, profile, isAuthenticated, loading, isAdmin, canPlayRanked, gamesUntilRanked, updateProfile, refreshProfile } = useAuth();
+  const xpByMode = useXpByMode(user?.id);
   const router = useRouter();
   const isDarkMode = theme === 'dark';
 
@@ -319,6 +322,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 transition={{ duration: 0.2 }}
               >
                 <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} />
+                <XpByModeBreakdown xpByMode={xpByMode} delay={0.12} />
                 {isAdmin && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />}
               </m.div>
             )}
@@ -391,6 +395,9 @@ export default function ProfilePageClient(): React.JSX.Element {
             <ProfileXpSection profile={profile} isDarkMode={isDarkMode} delay={0.15} onProfileRefresh={refreshProfile} />
             <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} delay={0.18} />
           </div>
+
+          {/* 3b. XP by Mode — where your XP came from */}
+          <XpByModeBreakdown xpByMode={xpByMode} delay={0.19} />
 
           {/* 4. Ranked Progress */}
           {isAdmin && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} delay={0.2} />}

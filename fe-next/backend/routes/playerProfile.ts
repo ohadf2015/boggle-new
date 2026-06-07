@@ -5,6 +5,7 @@
 
 import express, { Request, Response, Router } from 'express';
 import { getSupabase } from '../modules/supabaseServer';
+import { fetchXpByMode } from '../modules/xpByMode';
 import logger from '../utils/logger';
 
 const router: Router = express.Router();
@@ -103,6 +104,9 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     const createdAt = profile.created_at ? new Date(profile.created_at) : new Date();
     const memberSince = `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}`;
 
+    // Estimated XP split across game modes (never throws → [] on any issue)
+    const xpByMode = await fetchXpByMode(supabase, profile.id, profile.total_xp || 0);
+
     const publicProfile = {
       id: profile.id,
       username: profile.username,
@@ -120,6 +124,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
       achievementCounts: profile.achievement_counts || {},
       memberSince,
       percentile,
+      xpByMode,
     };
 
     res.json(publicProfile);

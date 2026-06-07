@@ -4224,7 +4224,8 @@ const en = {
   "profile": {
     "xpByMode": {
       "title": "XP by Mode",
-      "estimateNote": "Estimated from your game history — your share of XP across modes."
+      "estimateNote": "Estimated from your game history — your share of XP across modes.",
+      "other": "Solo & Bonus"
     },
     "title": "Your HQ",
     "notFound": "Player not found",

@@ -4,6 +4,9 @@
  */
 
 import type { CustomAvatarConfig } from './customAvatar';
+import type { ModeXpSlice } from '../../lib/xp/xpByMode';
+
+export type { ModeXpSlice };
 
 /**
  * Public profile data returned by /api/player-profile/:id
@@ -27,6 +30,7 @@ export interface PublicProfile {
   memberSince: string; // Month/year only (e.g., "2025-03")
   percentile: number; // Computed: top X% of players by score
   currentStreak?: number; // Daily challenge streak
+  xpByMode?: ModeXpSlice[]; // Estimated share of total XP per game mode
 }
 
 /**

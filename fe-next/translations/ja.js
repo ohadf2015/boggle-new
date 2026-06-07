@@ -3789,7 +3789,8 @@ const ja = {
   "profile": {
     "xpByMode": {
       "title": "モード別XP",
-      "estimateNote": "プレイ履歴からの推定 — モードごとのXPの内訳です。"
+      "estimateNote": "プレイ履歴からの推定 — モードごとのXPの内訳です。",
+      "other": "ソロ・ボーナス"
     },
     "title": "プロフィール",
     "notFound": "プレイヤーが見つかりません",
