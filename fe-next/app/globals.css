@@ -2142,6 +2142,11 @@ html.lexi-native [data-selectable] {
     --bottom-nav-height: calc(64px + env(safe-area-inset-bottom, 0px));
     /* AdMob banner height (incl. its own safe-area) — published by AnchoredNativeBanner. */
     --admob-banner-height: 0px;
+    /* WEB AdSense anchor-ad band height — published by WebAnchorAdObserver. The
+       AdSense Auto-Ads anchor is injected outside the React tree as a fixed band
+       pinned to the viewport bottom; AdMob's var stays 0 for it. On native AdMob
+       builds this stays 0 (no AdSense anchor), so the clamp/sum below is a no-op. */
+    --web-anchor-ad-height: 0px;
     /* Single composed offset every fixed-bottom-aware page consumes. Avoids
        triple-counting safe-area: each layer's var already includes its own.
        Each component is CLAMPED to a sane max: the Android 15+ safe-area plugin
@@ -2153,7 +2158,8 @@ html.lexi-native [data-selectable] {
        On web both vars are 0px, so the clamps are no-ops there. */
     --bottom-stack-height: calc(
       min(var(--bottom-nav-height, 0px), 120px) +
-        min(var(--admob-banner-height, 0px), 120px)
+        min(var(--admob-banner-height, 0px), 120px) +
+        min(var(--web-anchor-ad-height, 0px), 120px)
     );
 
     /* Snappy Timing Functions */
@@ -3284,12 +3290,15 @@ html {
      reserve the band to prevent the banner from covering bottom CTAs. */
   html.has-global-bottom-nav body.screen-fit,
   html.has-admob-banner body.screen-fit,
+  html.has-web-anchor-ad body.screen-fit,
   html.has-global-bottom-nav body.screen-fit-locked,
-  html.has-admob-banner body.screen-fit-locked {
+  html.has-admob-banner body.screen-fit-locked,
+  html.has-web-anchor-ad body.screen-fit-locked {
     padding-bottom: var(--bottom-stack-height);
   }
   html.has-global-bottom-nav,
-  html.has-admob-banner {
+  html.has-admob-banner,
+  html.has-web-anchor-ad {
     scroll-padding-bottom: var(--bottom-stack-height);
   }
 }

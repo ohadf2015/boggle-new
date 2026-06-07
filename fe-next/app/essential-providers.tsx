@@ -27,6 +27,7 @@ import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
 import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
 import BannerCoordinatorMount from '@/components/ads/BannerCoordinatorMount';
+import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
@@ -236,6 +237,10 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     declare intent into. */}
                                                 <BannerCoordinatorMount />
                                                 <AnchoredNativeBanner />
+                                                {/* WEB AdSense anchor-ad measurer — publishes --web-anchor-ad-height
+                                                    so bottom CTAs (e.g. daily Play button) clear the injected
+                                                    fixed anchor the AdMob var can't see. No-op on native AdMob. */}
+                                                <WebAnchorAdObserver />
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>
