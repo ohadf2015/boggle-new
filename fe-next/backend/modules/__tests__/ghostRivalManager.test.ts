@@ -92,6 +92,37 @@ describe('GhostRivalManager', () => {
       expect(result!.player.score).toBe(100);
     });
 
+    it('prefers a real display_name over a placeholder Player_<hex> username', async () => {
+      // DB default usernames are `Player_<8hex>` placeholders; the chosen name lives
+      // in display_name. The widget must show the real name, never the placeholder.
+      chain.single.mockResolvedValueOnce({
+        data: {
+          player_id: 'player-1',
+          rival_id: 'rival-1',
+          player_score: 100,
+          rival_score: 120,
+          rival: { id: 'rival-1', username: 'Player_0e5fc437', display_name: 'Julian Hulsman', avatar_image: 'av.png', total_score: 500 },
+        },
+        error: null,
+      });
+
+      const result = await getOrCreateWeeklyRival('player-1');
+      expect(result!.rival.username).toBe('Julian Hulsman');
+    });
+
+    it('falls back to "Ghost" when username is a placeholder and display_name is missing', async () => {
+      chain.single.mockResolvedValueOnce({
+        data: {
+          player_id: 'player-1', rival_id: 'rival-1', player_score: 0, rival_score: 0,
+          rival: { id: 'rival-1', username: 'Player_09e0d0a8', display_name: null, avatar_image: '', total_score: 0 },
+        },
+        error: null,
+      });
+
+      const result = await getOrCreateWeeklyRival('player-1');
+      expect(result!.rival.username).toBe('Ghost');
+    });
+
     it('should return null when no candidates found and no existing rival', async () => {
       // First single() = no existing rivalry
       // Second single() = player profile
@@ -171,6 +202,19 @@ describe('GhostRivalManager', () => {
       expect(result!.rival.username).toBe('TestRival');
       expect(result!.player.score).toBe(200);
       expect(result!.rival.score).toBe(180);
+    });
+
+    it('prefers a real display_name over a placeholder username', async () => {
+      chain.single.mockResolvedValueOnce({
+        data: {
+          player_score: 200, rival_score: 180,
+          rival: { id: 'r1', username: 'Player_9662314e', display_name: 'Anja', avatar_image: 'img.png', total_score: 5000 },
+        },
+        error: null,
+      });
+
+      const result = await getWeeklyRivalStatus('player-1');
+      expect(result!.rival.username).toBe('Anja');
     });
 
     it('should return null when no rivalry exists', async () => {

@@ -228,6 +228,58 @@ describe('groupGames — robust identity resolution', () => {
   });
 });
 
+describe('groupGames — placeholder username never leaks (Player_<hex>)', () => {
+  // DB migration 20260504160000 stamped every nameless signup with a placeholder
+  // username `Player_<8hex>`, parking the real chosen name in display_name. Live
+  // data (2026-06-07): 63/81 profiles carry such a placeholder, 62 of those have a
+  // real display_name. The log must show the real name, never the raw placeholder.
+  it('prefers a real display_name over a placeholder Player_<hex> username', () => {
+    const rows = [
+      game({
+        id: 'a', is_multiplayer: false, player_id: '0e5fc437-aaaa', is_guest: false,
+        profiles: { username: 'Player_0e5fc437', display_name: 'Julian Hulsman', avatar_emoji: null, avatar_color: null },
+      }),
+    ];
+    const p = groupGames(rows)[0].players[0];
+    expect(p.displayName).toBe('Julian Hulsman');
+    expect(p.displayName).not.toBe('Player_0e5fc437');
+  });
+
+  it('scans rows: picks the real display_name even if the stat row only has the placeholder', () => {
+    const rows = [
+      game({ id: 's', event_type: 'game_started', is_multiplayer: true, game_code: 'RPH', player_id: 'p9',
+        profiles: { username: 'Player_9662314e', display_name: 'Anja', avatar_emoji: null, avatar_color: null } }),
+      game({ id: 'c', event_type: 'game_completed', is_multiplayer: true, game_code: 'RPH', player_id: 'p9',
+        profiles: null, score: 40 }),
+    ];
+    const p = groupGames(rows)[0].players[0];
+    expect(p.displayName).toBe('Anja');
+  });
+
+  it('falls back to an id-derived handle (not the raw placeholder) when display_name is also missing', () => {
+    // The 1/63 "placeholder-both" case: username placeholder + null display_name.
+    const rows = [
+      game({
+        id: 'a', is_multiplayer: false, player_id: '09e0d0a8-bbbb', is_guest: false,
+        profiles: { username: 'Player_09e0d0a8', display_name: null, avatar_emoji: null, avatar_color: null },
+      }),
+    ];
+    const p = groupGames(rows)[0].players[0];
+    // Must NOT show the raw DB placeholder string; an id-derived "Player 09e0d0a8" is fine.
+    expect(p.displayName).not.toBe('Player_09e0d0a8');
+    expect(p.displayName).toMatch(/09e0d0a8/);
+  });
+
+  it('ignores a placeholder guest_name (Guest_1234) and falls to a short guest id', () => {
+    const rows = [
+      game({ id: 'a', is_multiplayer: false, player_id: null, guest_session_id: 'guest_1780_zzz9', guest_name: 'Guest_1234' }),
+    ];
+    const p = groupGames(rows)[0].players[0];
+    expect(p.displayName).not.toBe('Guest_1234');
+    expect(p.displayName).toMatch(/Guest/i);
+  });
+});
+
 describe('groupGames — invited-by (non-host MP players)', () => {
   it('sets invitedByName to the host display name for a non-host multiplayer player', () => {
     const rows = [

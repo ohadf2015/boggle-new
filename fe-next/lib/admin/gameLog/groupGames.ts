@@ -20,6 +20,7 @@
  */
 import type { UnifiedGame, GameProfile } from '@/components/admin/today-games/types';
 import { bucketForMode } from './modeBuckets';
+import { isPlaceholderName } from '@/lib/pushDisplayName';
 import {
   classifyAcquisition,
   type AcquisitionTag,
@@ -108,10 +109,21 @@ function isGuestPlayer(g: UnifiedGame): boolean {
   return !g.player_id;
 }
 
+/** The trimmed name if it's a real chosen name; null if a system placeholder. */
+function realName(name: string | null | undefined): string | null {
+  return isPlaceholderName(name) ? null : (name as string).trim();
+}
+
 function displayNameFor(g: UnifiedGame): string {
-  if (g.profiles?.username) return g.profiles.username;
-  if (g.guest_name) return g.guest_name;
-  // Authed user whose profile join missed → a Player handle, NOT "Guest".
+  // Migration 20260504160000 parks the real name in display_name and stamps a
+  // placeholder `Player_<hex>` into username — so prefer a real display_name, then
+  // a real username. (Live data: 63/81 usernames are such placeholders.)
+  const fromProfile = realName(g.profiles?.display_name) ?? realName(g.profiles?.username);
+  if (fromProfile) return fromProfile;
+  const guest = realName(g.guest_name);
+  if (guest) return guest;
+  // Authed user whose profile join missed (or whose names are all placeholders) →
+  // an id-derived Player handle, NOT "Guest" and NOT the raw `Player_<hex>` string.
   if (g.player_id) return `Player ${g.player_id.slice(0, 8)}`;
   return shortGuest(g.guest_session_id);
 }
@@ -129,10 +141,14 @@ function resolveIdentity(
 ): { displayName: string; profile: GameProfile | null } {
   const withProfile = rows.find((r) => r.profiles?.username || r.profiles?.display_name);
   const profile = withProfile?.profiles ?? best.profiles ?? null;
-  if (profile?.username) return { displayName: profile.username, profile };
+  // Prefer a real (non-placeholder) name: display_name beats username because the
+  // DB default username is a `Player_<hex>` placeholder while the chosen name lives
+  // in display_name.
+  const realProfileName = realName(profile?.display_name) ?? realName(profile?.username);
+  if (realProfileName) return { displayName: realProfileName, profile };
 
-  const named = rows.find((r) => r.guest_name);
-  if (named?.guest_name) return { displayName: named.guest_name, profile };
+  const named = rows.map((r) => realName(r.guest_name)).find(Boolean);
+  if (named) return { displayName: named, profile };
 
   return { displayName: displayNameFor(best), profile };
 }

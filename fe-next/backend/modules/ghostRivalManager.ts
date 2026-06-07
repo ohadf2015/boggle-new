@@ -7,6 +7,18 @@
 
 import { getSupabase } from './supabaseServer';
 import logger from '../utils/logger';
+import { isPlaceholderName } from '../../lib/pushDisplayName';
+
+/**
+ * Resolve a rival's shown name. The DB default username is a `Player_<hex>`
+ * placeholder (migration 20260504160000) with the real chosen name parked in
+ * display_name — so prefer a real display_name, then a real username, else the
+ * generic "Ghost" noun. Never leaks a raw placeholder to the widget.
+ */
+function rivalName(p: { display_name?: string | null; username?: string | null }): string {
+  const real = (n: string | null | undefined) => (isPlaceholderName(n) ? null : (n as string).trim());
+  return real(p.display_name) ?? real(p.username) ?? 'Ghost';
+}
 
 // ─── TYPES ──────────────────────────────────────────────────
 
@@ -58,7 +70,7 @@ async function findSkillSimilarRival(
   playerId: string,
   playerScore: number,
   weekStartDate: string
-): Promise<{ id: string; username: string; avatar_image: string; total_score: number } | null> {
+): Promise<{ id: string; username: string; display_name: string | null; avatar_image: string; total_score: number } | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
 
@@ -68,7 +80,7 @@ async function findSkillSimilarRival(
   // Find candidates within score range, not already matched this week
   const { data: candidates, error } = await supabase
     .from('profiles')
-    .select('id, username, avatar_image, total_score')
+    .select('id, username, display_name, avatar_image, total_score')
     .neq('id', playerId)
     .gte('total_score', minScore)
     .lte('total_score', maxScore)
@@ -116,7 +128,7 @@ export async function getOrCreateWeeklyRival(
   // Check existing rivalry this week
   const { data: existing } = await supabase
     .from('ghost_rivals')
-    .select('*, rival:profiles!ghost_rivals_rival_id_fkey(id, username, avatar_image, total_score)')
+    .select('*, rival:profiles!ghost_rivals_rival_id_fkey(id, username, display_name, avatar_image, total_score)')
     .eq('player_id', playerId)
     .eq('week_start', weekStartDate)
     .single();
@@ -125,7 +137,7 @@ export async function getOrCreateWeeklyRival(
     return {
       rival: {
         id: existing.rival.id,
-        username: existing.rival.username ?? 'Ghost',
+        username: rivalName(existing.rival),
         avatar: existing.rival.avatar_image ?? '',
         score: existing.rival_score ?? 0,
       },
@@ -169,7 +181,7 @@ export async function getOrCreateWeeklyRival(
   return {
     rival: {
       id: rival.id,
-      username: rival.username ?? 'Ghost',
+      username: rivalName(rival),
       avatar: rival.avatar_image ?? '',
       score: 0,
     },
@@ -260,7 +272,7 @@ export async function getWeeklyRivalStatus(
 
   const { data } = await supabase
     .from('ghost_rivals')
-    .select('*, rival:profiles!ghost_rivals_rival_id_fkey(id, username, avatar_image, total_score)')
+    .select('*, rival:profiles!ghost_rivals_rival_id_fkey(id, username, display_name, avatar_image, total_score)')
     .eq('player_id', playerId)
     .eq('week_start', weekStartDate)
     .single();
@@ -270,7 +282,7 @@ export async function getWeeklyRivalStatus(
   return {
     rival: {
       id: data.rival.id,
-      username: data.rival.username ?? 'Ghost',
+      username: rivalName(data.rival),
       avatar: data.rival.avatar_image ?? '',
       score: data.rival_score ?? 0,
     },
