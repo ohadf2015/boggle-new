@@ -42,6 +42,14 @@ interface WordWheelGameProps {
   paused?: boolean;
   /** Practice mode: suppress countdown timer + show manual "end practice" CTA. */
   practice?: boolean;
+  /**
+   * Hide all competitive chrome — leaderboard fetch, rival pill, pass toasts,
+   * the combo counter, and the game_started funnel event. Lets the practice
+   * hub reuse the real wheel gameplay without the live-game social layer.
+   */
+  hideCompetitive?: boolean;
+  /** Fired with each accepted word + the running found list (practice goal tracking). */
+  onWordFound?: (word: string, wordsFound: string[]) => void;
 }
 
 
@@ -55,6 +63,7 @@ interface RivalScore {
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
+  hideCompetitive = false, onWordFound,
 }) => {
   const { t } = useLanguage();
   // `useReducedMotion` returns `true` when the user has set the OS-level
@@ -107,6 +116,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const passToastIdRef = useRef(0);
 
   useEffect(() => {
+    if (hideCompetitive) return; // practice hub: no leaderboard/rivals layer
     let cancelled = false;
     let interval: ReturnType<typeof setInterval> | null = null;
     const fetchRivals = async () => {
@@ -157,7 +167,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         document.removeEventListener('visibilitychange', handleVisibility);
       }
     };
-  }, [language]);
+  }, [language, hideCompetitive]);
 
   // Closest rival above me + pass detection
   const nextRival = useMemo(
@@ -169,9 +179,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   useEffect(() => { wordsFoundRef.current = wordsFound; }, [wordsFound]);
   useEffect(() => { scoreRef.current = score; }, [score]);
 
-  // Funnel parity: emit game_started once on mount to pair with trackGameEnd('word-wheel', ...)
+  // Funnel parity: emit game_started once on mount to pair with trackGameEnd('word-wheel', ...).
+  // Practice hub (hideCompetitive) is outside the daily funnel, so it stays silent.
   useEffect(() => {
-    trackGameStart('word-wheel', { language });
+    if (!hideCompetitive) trackGameStart('word-wheel', { language });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -179,7 +190,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // simultaneous passes (combo + pangram) all celebrate, plus mini-celebration
   // burst (combo-flash particles + sound + haptic).
   useEffect(() => {
-    if (!rivals.length) return;
+    if (hideCompetitive || !rivals.length) return;
     const cx = gameContainerRef.current
       ? gameContainerRef.current.getBoundingClientRect().width / 2
       : 200;
@@ -204,7 +215,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         }, delay);
       }
     }
-  }, [score, rivals, onEffect, playComboSound]);
+  }, [score, rivals, onEffect, playComboSound, hideCompetitive]);
 
   // ── Drag-to-build support ── (handlers wired after handleLetterPress via the
   // shared useWheelDragSpell hook). Only the pointer-position / dragging refs
@@ -530,7 +541,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       const isValid = await onValidateWord(word);
       if (isValid) {
         const points = scoreWord(word);
-        setWordsFound(prev => [...prev, word]);
+        const nextWordsFound = [...wordsFoundRef.current, word];
+        wordsFoundRef.current = nextWordsFound;
+        setWordsFound(nextWordsFound);
+        // Surface progress to the practice shell (goal tracking) — fires for
+        // every accepted word, competitive or practice.
+        onWordFound?.(word, nextWordsFound);
         setScore(prev => prev + points);
         setLastWordScore(points);
         setTimeout(() => setLastWordScore(null), 1200);
@@ -591,7 +607,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     } finally {
       setIsValidating(false);
     }
-  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner]);
+  }, [builtWord, isValidating, puzzle, wordsFound, onValidateWord, showFeedback, t, onEffect, combo, playWordRejectedSound, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound]);
 
   // Keep submit ref fresh so double-tap handler (created earlier) can reach the latest closure.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
@@ -679,23 +695,26 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             <span className="tabular-nums">{minutes}:{seconds.toString().padStart(2, '0')}</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            {/* Combo counter — reserved slot avoids horizontal layout shift in top bar */}
-            <div data-testid="combo-slot" className="min-w-[56px] sm:min-w-[64px] flex justify-end shrink-0">
-              <AnimatePresence>
-                {combo >= 2 && (
-                  <m.div
-                    className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-linear-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
-                    initial={{ scale: 0, x: 20 }}
-                    animate={{ scale: 1, x: 0 }}
-                    exit={{ scale: 0, x: 20 }}
-                    transition={{ type: 'spring', stiffness: 500 }}
-                  >
-                    <Flame className="w-3.5 h-3.5 text-neo-white" />
-                    <span className="font-neo-display font-black text-neo-white text-xs sm:text-sm">x{combo}</span>
-                  </m.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* Combo counter — reserved slot avoids horizontal layout shift in top bar.
+                Dropped entirely in the practice hub (hideCompetitive) — no combo pressure. */}
+            {!hideCompetitive && (
+              <div data-testid="combo-slot" className="min-w-[56px] sm:min-w-[64px] flex justify-end shrink-0">
+                <AnimatePresence>
+                  {combo >= 2 && (
+                    <m.div
+                      className="flex items-center gap-1 px-1.5 py-0.5 rounded-neo border-2 border-neo-black bg-linear-to-r from-neo-pink to-neo-red shadow-[0_0_10px_rgba(255,20,147,0.4)] shrink-0"
+                      initial={{ scale: 0, x: 20 }}
+                      animate={{ scale: 1, x: 0 }}
+                      exit={{ scale: 0, x: 20 }}
+                      transition={{ type: 'spring', stiffness: 500 }}
+                    >
+                      <Flame className="w-3.5 h-3.5 text-neo-white" />
+                      <span className="font-neo-display font-black text-neo-white text-xs sm:text-sm">x{combo}</span>
+                    </m.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
             <span className="text-neo-white text-xs sm:text-sm font-semibold truncate">
               {t('wordWheel.wordsFound', { count: wordsFound.length })}
             </span>
@@ -849,6 +868,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           locked to one line. pointsToPass derives from score → mutates every
           submit; long HE/JA strings or long player names would otherwise
           wrap the pill and grow the slot, recentering the wheel cluster. */}
+      {!hideCompetitive && (
       <div
         data-testid="next-rival-slot"
         className="w-full mt-1.5 h-[30px] sm:h-[32px] flex items-center justify-center px-2"
@@ -876,9 +896,12 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           )}
         </AnimatePresence>
       </div>
+      )}
 
       {/* Pass notification toast stack — queued so back-to-back passes all
-          celebrate. Each toast stacks vertically with a small offset. */}
+          celebrate. Each toast stacks vertically with a small offset.
+          Suppressed in the practice hub (no rivals to pass). */}
+      {!hideCompetitive && (
       <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none flex flex-col items-center gap-1.5">
         <AnimatePresence>
           {passToasts.map((toast, i) => (
@@ -902,6 +925,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           ))}
         </AnimatePresence>
       </div>
+      )}
 
       {/* ── Centered wheel + actions cluster (absorbs leftover vertical space) ──
           Action bar lives INSIDE the flex-1 cluster so wheel and buttons stay

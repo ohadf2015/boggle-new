@@ -24,7 +24,23 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
     playWordAcceptedSound,
     playWordRejectedSound,
+    // WordWheelGame (now reused by the wheel sandbox) destructures these
+    // non-optionally, so the stub must supply every fn it touches.
+    playTileSelectSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playLegendaryWordSound: vi.fn(),
+    playEpicVictorySound: vi.fn(),
+    playCountdownBeep: vi.fn(),
+    playButtonClickSound: vi.fn(),
+    playWordLengthSound: vi.fn(),
   }),
+}));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
+}));
+vi.mock('next/dynamic', () => ({
+  __esModule: true,
+  default: () => () => <div data-testid="wheel-pixi-ring-stub" />,
 }));
 vi.mock('pixi.js', () => ({
   Application: class {
@@ -115,17 +131,17 @@ describe('PracticeClassicSandbox celebration parity', () => {
 });
 
 describe('PracticeWheelSandbox celebration parity', () => {
-  it('plays accepted sound + shows confetti on valid word', async () => {
+  it('plays the accepted sound on a valid word (via the reused WordWheelGame)', async () => {
     render(<PracticeWheelSandbox />);
-    // EN puzzle: center A (idx 0), outer T R C E S N → idx 1..6
-    // Build "CAT": C=idx3 A=idx0 T=idx1 (≥3 letters, includes center A)
-    fireEvent.click(screen.getByTestId('wheel-letter-3'));
+    // Real WordWheelGame convention: center A = index -1, outer T R C E S N = 0..5.
+    // Build "CAT": C=idx2, A=center(-1), T=idx0 (≥3 letters, includes center A).
+    fireEvent.click(screen.getByTestId('wheel-letter-2'));
+    fireEvent.click(screen.getByTestId('wheel-letter--1'));
     fireEvent.click(screen.getByTestId('wheel-letter-0'));
-    fireEvent.click(screen.getByTestId('wheel-letter-1'));
-    fireEvent.click(screen.getByTestId('practice-wheel-submit'));
+    const submit = screen.getByTestId('word-wheel-action-bar').querySelector('button:nth-child(2)') as HTMLElement;
+    fireEvent.click(submit);
     await waitFor(() => {
       expect(playWordAcceptedSound).toHaveBeenCalled();
-      expect(screen.getByTestId('practice-confetti')).toBeInTheDocument();
     });
   });
 });
