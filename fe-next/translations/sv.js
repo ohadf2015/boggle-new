@@ -1192,6 +1192,14 @@ const sv = {
     "notifications": "Aviseringar",
     "support": "Support & Feedback",
     "contactDescription": "Frågor, feedback, eller bara säg hej!",
+    "playGames": {
+      "title": "Play Games",
+      "subtitle": "Prestationer och topplistor",
+      "signIn": "Logga in",
+      "signedInAs": "Inloggad som {name}",
+      "achievements": "Prestationer",
+      "leaderboards": "Topplistor"
+    },
     "removeAds": {
       "title": "Ta bort annonser",
       "body": "Spela LexiClash annons-fritt. Kommer snart — tryck för att visa intresse.",
@@ -3801,6 +3809,10 @@ const sv = {
     }
   },
   "profile": {
+    "xpByMode": {
+      "title": "XP per läge",
+      "estimateNote": "Uppskattat från din spelhistorik – din XP-fördelning mellan lägena."
+    },
     "title": "Ditt HK",
     "notFound": "Spelaren hittades inte",
     "stats": {

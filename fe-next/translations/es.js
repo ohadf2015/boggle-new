@@ -1074,6 +1074,14 @@ const es = {
     "notifications": "Notificaciones",
     "support": "Soporte y Feedback",
     "contactDescription": "Preguntas, sugerencias, o solo saludar!",
+    "playGames": {
+      "title": "Play Juegos",
+      "subtitle": "Logros y clasificaciones",
+      "signIn": "Iniciar sesión",
+      "signedInAs": "Conectado como {name}",
+      "achievements": "Logros",
+      "leaderboards": "Clasificaciones"
+    },
     "removeAds": {
       "title": "Quitar anuncios",
       "body": "Juega LexiClash sin anuncios. Próximamente — toca para expresar interés.",
@@ -3826,6 +3834,10 @@ const es = {
     }
   },
   "profile": {
+    "xpByMode": {
+      "title": "XP por modo",
+      "estimateNote": "Estimado a partir de tu historial — tu reparto de XP entre los modos."
+    },
     "title": "Tu Cuartel",
     "notFound": "Jugador no encontrado",
     "stats": {

@@ -1083,6 +1083,14 @@ const en = {
     "notifications": "Notifications",
     "support": "Support & Feedback",
     "contactDescription": "Questions, feedback, or just say hi!",
+    "playGames": {
+      "title": "Play Games",
+      "subtitle": "Achievements & leaderboards",
+      "signIn": "Sign in",
+      "signedInAs": "Signed in as {name}",
+      "achievements": "Achievements",
+      "leaderboards": "Leaderboards"
+    },
     "removeAds": {
       "title": "Remove Ads",
       "body": "Enjoy LexiClash ad-free. Coming soon — tap to express interest.",
@@ -4214,6 +4222,10 @@ const en = {
     }
   },
   "profile": {
+    "xpByMode": {
+      "title": "XP by Mode",
+      "estimateNote": "Estimated from your game history — your share of XP across modes."
+    },
     "title": "Your HQ",
     "notFound": "Player not found",
     "stats": {

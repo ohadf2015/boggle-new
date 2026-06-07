@@ -1103,6 +1103,14 @@ const he = {
     "notifications": "התראות",
     "support": "תמיכה ומשוב",
     "contactDescription": "שאלות, משוב, או סתם להגיד שלום!",
+    "playGames": {
+      "title": "Play Games",
+      "subtitle": "הישגים וטבלאות מובילים",
+      "signIn": "התחברות",
+      "signedInAs": "מחובר כ-{name}",
+      "achievements": "הישגים",
+      "leaderboards": "טבלאות מובילים"
+    },
     "removeAds": {
       "title": "הסר פרסומות",
       "body": "שחק ב-LexiClash ללא פרסומות. בקרוב — לחץ להביע עניין.",
@@ -4259,6 +4267,10 @@ const he = {
     }
   },
   "profile": {
+    "xpByMode": {
+      "title": "נק׳ ניסיון לפי מצב",
+      "estimateNote": "הערכה לפי היסטוריית המשחקים שלך — חלוקת הניסיון בין המצבים."
+    },
     "title": "פרופיל",
     "notFound": "השחקן לא נמצא",
     "stats": {

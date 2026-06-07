@@ -1104,6 +1104,14 @@ const ja = {
     "notifications": "通知",
     "support": "サポート＆フィードバック",
     "contactDescription": "質問、フィードバック、またはご挨拶!",
+    "playGames": {
+      "title": "Play ゲーム",
+      "subtitle": "実績とリーダーボード",
+      "signIn": "ログイン",
+      "signedInAs": "{name} としてログイン中",
+      "achievements": "実績",
+      "leaderboards": "リーダーボード"
+    },
     "dangerZone": "危険ゾーン",
     "deleteAccount": "アカウント削除",
     "deleteAccountDescription": "アカウントとすべてのデータを完全に削除します",
@@ -3779,6 +3787,10 @@ const ja = {
     }
   },
   "profile": {
+    "xpByMode": {
+      "title": "モード別XP",
+      "estimateNote": "プレイ履歴からの推定 — モードごとのXPの内訳です。"
+    },
     "title": "プロフィール",
     "notFound": "プレイヤーが見つかりません",
     "stats": {

@@ -19,6 +19,7 @@ import DeleteAccountSection from '@/components/settings/DeleteAccountSection';
 import { RemoveAdsProbe } from '@/components/ads/RemoveAdsProbe';
 import { NotificationCategoryPreferences } from '@/components/notifications/NotificationCategoryPreferences';
 import { OfflineDownloadManager } from '@/components/offline/OfflineDownloadManager';
+import { PlayGamesCard } from '@/components/settings/PlayGamesCard';
 
 // Language options
 const LANGUAGES = [
@@ -469,6 +470,15 @@ export default function SettingsPageClient(): React.JSX.Element {
               <ChevronRight className={cn('w-5 h-5 rtl:rotate-180', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
             </Link>
           <RemoveAdsProbe isDarkMode={isDarkMode} />
+          </m.section>
+
+          {/* Play Games (Android only — self-hides elsewhere) */}
+          <m.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <PlayGamesCard isDarkMode={isDarkMode} />
           </m.section>
 
           {/* Offline Download */}
