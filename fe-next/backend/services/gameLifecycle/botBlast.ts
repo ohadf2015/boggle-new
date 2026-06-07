@@ -87,7 +87,7 @@ function canBotClear(botUsername: string, difficulty: string): boolean {
  * Validates word exists on CURRENT grid, applies mutation + gravity,
  * broadcasts updates, enforces score cap.
  */
-function submitBlastWord(
+export function submitBlastWord(
   io: Server,
   gameCode: string,
   bot: Bot,
@@ -120,7 +120,7 @@ function submitBlastWord(
       trie,
     });
 
-    if (!allWords.includes(word.toUpperCase())) {
+    if (!allWords.includes(word.toLowerCase())) {
       logger.debug('BOT_BLAST', `[${bot.username}] word "${word}" not on current grid, skipping`);
       return;
     }

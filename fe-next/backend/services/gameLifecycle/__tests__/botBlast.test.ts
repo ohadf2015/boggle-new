@@ -9,7 +9,7 @@
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { startBotsForBlast } from '../botBlast';
+import { startBotsForBlast, submitBlastWord } from '../botBlast';
 import { startBotsForGame } from '../botGame';
 import type { Bot } from '../../../modules/botBehavior';
 import type { BlastModeState } from '@/shared/types/game';
@@ -335,7 +335,7 @@ describe('startBotsForBlast', () => {
   // Migrated coverage from the retired botGame.blast.test.ts — these invariants
   // moved verbatim into botBlast.ts when blast got its dedicated driver.
   it('propagates isFirstFinder onto the playerFoundWord/botWordFound broadcasts', async () => {
-    mocks.findAllWords.mockReturnValue(['HELLO']); // solver returns uppercase; submit checks word.toUpperCase()
+    mocks.findAllWords.mockReturnValue(['hello']); // findAllWords returns LOWERCASE; submit checks word.toLowerCase()
     mocks.recordFirstFinder.mockReturnValue(true);
     const bot = makeBot();
     const blastState = makeBlastState();
@@ -354,7 +354,7 @@ describe('startBotsForBlast', () => {
   });
 
   it('cascades the played word on the bot\'s OWN board (per-player; refill=false is enforced inside cascadeBlastWord)', async () => {
-    mocks.findAllWords.mockReturnValue(['HELLO']);
+    mocks.findAllWords.mockReturnValue(['hello']);
     const bot = makeBot();
     const blastState = makeBlastState();
     mocks.getGame.mockReturnValue({
@@ -374,7 +374,7 @@ describe('startBotsForBlast', () => {
   });
 
   it('records the board clear (recordBlastBoardClear) when the bot empties the shared board', async () => {
-    mocks.findAllWords.mockReturnValue(['HELLO']);
+    mocks.findAllWords.mockReturnValue(['hello']);
     mocks.isBlastBoardCleared.mockReturnValue(true);
     const bot = makeBot();
     const blastState = makeBlastState();
@@ -437,6 +437,88 @@ describe('startBotsForGame dispatcher', () => {
 
     // If blast dispatcher is wired, startBot should NOT be called
     // (because dispatch happens before startBot in the chain)
+  });
+});
+
+describe('submitBlastWord - case sensitivity fix (regression test)', () => {
+  let mockIo: any;
+  const gameCode = 'case-sensitive-test';
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockIo = { to: vi.fn().mockReturnValue({ emit: vi.fn() }) };
+  });
+
+  it('should accept a lowercase word when findAllWords returns lowercase words', () => {
+    const bot = makeBot({ isActive: true });
+    const blastState = makeBlastState();
+    const grid = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']];
+
+    // Mock: findAllWords returns LOWERCASE words (as it really does)
+    mocks.findAllWords.mockReturnValue(['hello', 'world', 'test']);
+
+    // Mock getGame to return a valid game state
+    mocks.getGame.mockReturnValue({
+      gameMode: 'blast',
+      blastModeState: blastState,
+      letterGrid: grid,
+      letterPositions: new Map(),
+      playerCombos: {},
+      playerScores: {},
+      playerWords: {},
+    });
+
+    // Mock getOrInitPlayerBoard to return a valid board
+    mocks.getOrInitPlayerBoard.mockReturnValue({
+      grid: grid,
+      tileStates: [[{ isCleared: false }, { isCleared: false }, { isCleared: false }],
+                   [{ isCleared: false }, { isCleared: false }, { isCleared: false }],
+                   [{ isCleared: false }, { isCleared: false }, { isCleared: false }]],
+      overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0,
+    });
+
+    // Bot picks 'hello' from findAllWords (lowercase)
+    const wordToSubmit = 'hello';
+
+    // Submit the word directly to submitBlastWord
+    submitBlastWord(mockIo, gameCode, bot, blastState, wordToSubmit, grid, 'en');
+
+    // EXPECT: updatePlayerScore should have been called (word was accepted)
+    // This proves the word passed the .includes() check
+    expect(mocks.updatePlayerScore).toHaveBeenCalled();
+    expect(mocks.volatileBroadcastToRoom).toHaveBeenCalledWith(
+      mockIo,
+      expect.any(String),
+      'botWordFound',
+      expect.objectContaining({ username: 'BotTest', word: 'hello' })
+    );
+  });
+
+  it('should NOT accept a word when it is not in the lowercase list from findAllWords', () => {
+    const bot = makeBot({ isActive: true });
+    const blastState = makeBlastState();
+    const grid = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']];
+
+    // Mock: findAllWords returns only 'hello' and 'world'
+    mocks.findAllWords.mockReturnValue(['hello', 'world']);
+
+    mocks.getGame.mockReturnValue({
+      gameMode: 'blast',
+      blastModeState: blastState,
+      letterGrid: grid,
+      letterPositions: new Map(),
+      playerCombos: {},
+      playerScores: {},
+      playerWords: {},
+    });
+
+    // Try to submit a word that is NOT in the list
+    const wordToSubmit = 'notinthere';
+
+    submitBlastWord(mockIo, gameCode, bot, blastState, wordToSubmit, grid, 'en');
+
+    // EXPECT: updatePlayerScore should NOT have been called
+    expect(mocks.updatePlayerScore).not.toHaveBeenCalled();
   });
 });
 
