@@ -190,6 +190,10 @@ export function useHostPlayerEvents({
 
     // Register listeners
     socket.on('updateUsers', handleUpdateUsers);
+    // Guest rename re-keys the roster server-side and broadcasts `playerListUpdate`
+    // (same `{ users }` shape). Without this listener the roster kept stale names —
+    // breaking anything keyed by display name (e.g. lobby emote face-swaps).
+    socket.on('playerListUpdate', handleUpdateUsers);
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
     socket.on('playerJoinedLate', handlePlayerJoinedLate);
     socket.on('playerFoundWord', handlePlayerFoundWord);
@@ -207,6 +211,7 @@ export function useHostPlayerEvents({
     return () => {
       throttledApplyLeaderboard.cancel();
       socket.off('updateUsers', handleUpdateUsers);
+      socket.off('playerListUpdate', handleUpdateUsers);
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
       socket.off('playerJoinedLate', handlePlayerJoinedLate);
       socket.off('playerFoundWord', handlePlayerFoundWord);

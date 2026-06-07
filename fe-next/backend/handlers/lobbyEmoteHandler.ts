@@ -32,7 +32,7 @@ interface LobbyEmotePayload {
   emote: unknown;
 }
 
-function registerLobbyEmoteHandlers(_io: Server, socket: Socket): void {
+function registerLobbyEmoteHandlers(io: Server, socket: Socket): void {
   socket.on('lobbyEmote', async (data: LobbyEmotePayload) => {
     if (isSocketMigrating(socket)) return;
 
@@ -67,10 +67,12 @@ function registerLobbyEmoteHandlers(_io: Server, socket: Socket): void {
     const game = getGame(gameCode);
     if (!game || game.gameState !== 'waiting') return;
 
-    // Broadcast to OTHERS — the sender shows their own emote optimistically.
-    socket
-      .to(getGameRoom(gameCode))
-      .emit('lobbyEmoteUpdate', { username, emote });
+    // Broadcast to EVERYONE in the room — sender included. Each client keys the
+    // emote by this server-authoritative `username`, so the sender's own avatar
+    // face-swap uses the same identity as its roster tile (no optimistic local
+    // keying → immune to untrimmed/renamed-guest name drift). The face-swap is
+    // the entire signal; there is no floating emoji bubble.
+    io.to(getGameRoom(gameCode)).emit('lobbyEmoteUpdate', { username, emote });
   });
 }
 

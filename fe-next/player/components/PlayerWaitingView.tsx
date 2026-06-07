@@ -14,7 +14,6 @@ import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
 import { LobbyReactions } from '../../components/lobby/LobbyReactions';
 import { EmoteTray } from './lobby/EmoteTray';
-import { AvatarEmoteBubble } from '../../components/avatar/AvatarEmoteBubble';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -93,11 +92,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const gameMode = useGameMode();
 
   // Lobby emotes — self-contained over the shared socket (no prop threading).
-  // The sender shows their own emote optimistically; the room receives the rest.
+  // The server echoes every emote to the whole room (sender included), so the
+  // sender's own avatar face-swap uses the same canonical username as its tile.
   const socketCtx = useSocketOptional();
   const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({
     socket: socketCtx?.socket ?? null,
-    username,
   });
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
@@ -327,8 +326,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                       mood={emotesByUsername[name]?.emote}
                     />
                   </div>
-                  {/* Lobby emote bubble — pops over the avatar when this player emotes */}
-                  <AvatarEmoteBubble active={emotesByUsername[name]} />
+                  {/* Lobby emote = avatar FACE-SWAP only (eyes/brows/mouth via the
+                      `mood` prop above). No floating emoji bubble — the face is the
+                      whole signal, mirrored to every player in the room. */}
                   {isBot && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-cyan border-2 border-neo-black rounded-full flex items-center justify-center">
                       <Bot className="w-3 h-3 text-neo-black" />

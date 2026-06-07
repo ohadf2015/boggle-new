@@ -26,22 +26,27 @@ describe('useLobbyEmotes', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it('emits lobbyEmote and optimistically shows the sender own emote', () => {
+  it('emits lobbyEmote but does NOT optimistically apply — the sender sees its own emote only when the server echoes it back (keyed by the canonical username)', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
 
     act(() => result.current.sendEmote('emoteAngry'));
 
     expect(socket.emit).toHaveBeenCalledWith('lobbyEmote', { emote: 'emoteAngry' });
-    expect(result.current.emotesByUsername['me']?.emote).toBe('emoteAngry');
+    // No optimistic local keying — avoids local-vs-server name drift.
+    expect(result.current.emotesByUsername['me']).toBeUndefined();
+
+    // Server echoes to everyone incl. sender, with the canonical username.
+    act(() => socket.__fire('lobbyEmoteUpdate', { username: 'Me', emote: 'emoteAngry' }));
+    expect(result.current.emotesByUsername['Me']?.emote).toBe('emoteAngry');
   });
 
   it('cooldown blocks a second immediate send (emit once)', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
 
     act(() => {
@@ -56,7 +61,7 @@ describe('useLobbyEmotes', () => {
   it('cooldown lifts after the cooldown window', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
     act(() => result.current.sendEmote('emoteWink'));
     expect(result.current.cooldownActive).toBe(true);
@@ -67,7 +72,7 @@ describe('useLobbyEmotes', () => {
   it('applies an incoming emote from another player', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
 
     act(() => socket.__fire('lobbyEmoteUpdate', { username: 'alex', emote: 'emoteLove' }));
@@ -79,7 +84,7 @@ describe('useLobbyEmotes', () => {
   it('bumps nonce when the same player repeats an emote (re-trigger)', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
 
     act(() => socket.__fire('lobbyEmoteUpdate', { username: 'alex', emote: 'emoteLove' }));
@@ -91,7 +96,7 @@ describe('useLobbyEmotes', () => {
   it('auto-clears an emote after its mood duration', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
 
     act(() => socket.__fire('lobbyEmoteUpdate', { username: 'alex', emote: 'emoteShock' }));
@@ -104,7 +109,7 @@ describe('useLobbyEmotes', () => {
   it('ignores an invalid / spoofed emote id', () => {
     const socket = makeMockSocket();
     const { result } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
 
     act(() => socket.__fire('lobbyEmoteUpdate', { username: 'alex', emote: 'correct' }));
@@ -117,7 +122,7 @@ describe('useLobbyEmotes', () => {
   it('removes its listener on unmount', () => {
     const socket = makeMockSocket();
     const { unmount } = renderHook(() =>
-      useLobbyEmotes({ socket: socket as never, username: 'me' }),
+      useLobbyEmotes({ socket: socket as never }),
     );
     expect(socket.__count('lobbyEmoteUpdate')).toBe(1);
     unmount();

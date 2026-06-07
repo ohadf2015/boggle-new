@@ -6,7 +6,6 @@ import { Crown, X, Pencil, Check } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { useSocket } from '../../../utils/SocketContext';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
-import { AvatarEmoteBubble } from '../../../components/avatar/AvatarEmoteBubble';
 import { cn } from '../../../lib/utils';
 import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
@@ -95,7 +94,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
 
   // Receive lobby emotes from players and render them on the roster avatars.
   // Host has no tray — the player waiting view owns sending.
-  const { emotesByUsername } = useLobbyEmotes({ socket, username });
+  const { emotesByUsername } = useLobbyEmotes({ socket });
 
   // Ready lookups — bots auto-count as ready; host clicks Start (never "Ready").
   const readySet = new Set(readyUsernames);
@@ -277,8 +276,9 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                       }
                       return tileInner;
                     })()}
-                    {/* Lobby emote bubble — pops when this player emotes from their phone */}
-                    <AvatarEmoteBubble active={emotesByUsername[name]} />
+                    {/* Lobby emote = avatar FACE-SWAP only (eyes/brows/mouth via
+                        the `mood` prop above). No floating emoji bubble — the face
+                        is the whole signal, mirrored to every player in the room. */}
                   </div>
 
                   {/* Remove/kick button — always visible for bots, hover-only for humans */}

@@ -12,8 +12,6 @@ const DEFAULT_EMOTE_MS = 1800;
 
 interface UseLobbyEmotesParams {
   socket: Socket | null;
-  /** Own username — drives the optimistic self-emote (server broadcasts to others). */
-  username?: string;
 }
 
 /** A live emote on a player's avatar. `nonce` bumps so a repeat re-triggers the animation. */
@@ -26,10 +24,12 @@ export interface ActiveEmote {
  * Lobby emote transport — shared by the player waiting view and the host roster.
  *
  * Ephemeral by design: no server persistence. An emote lives for its mood
- * duration then auto-clears. The sender shows their own emote optimistically;
- * everyone else receives `lobbyEmoteUpdate`.
+ * duration then auto-clears. The server echoes `lobbyEmoteUpdate` to EVERYONE in
+ * the room (sender included), so every client — including the sender — keys the
+ * emote by the same server-authoritative username that names its roster tile.
+ * No optimistic self-apply → no local-vs-server name drift.
  */
-export function useLobbyEmotes({ socket, username }: UseLobbyEmotesParams) {
+export function useLobbyEmotes({ socket }: UseLobbyEmotesParams) {
   const [emotesByUsername, setEmotesByUsername] = useState<
     Record<string, ActiveEmote>
   >({});
@@ -64,7 +64,8 @@ export function useLobbyEmotes({ socket, username }: UseLobbyEmotesParams) {
       if (!isLobbyEmoteId(emote)) return;
 
       socket?.emit('lobbyEmote', { emote });
-      if (username) applyEmote(username, emote); // optimistic self
+      // No optimistic self-apply — the server echoes back to the sender too, and
+      // that echo carries the canonical username the roster keys by.
 
       cooldownRef.current = true;
       setCooldownActive(true);
@@ -73,7 +74,7 @@ export function useLobbyEmotes({ socket, username }: UseLobbyEmotesParams) {
         setCooldownActive(false);
       }, EMOTE_COOLDOWN_MS);
     },
-    [socket, username, applyEmote],
+    [socket],
   );
 
   // Receive emotes from other players in the room.

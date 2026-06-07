@@ -40,14 +40,16 @@ function createMockSocket() {
       to: vi.fn(() => ({ emit: toEmit })),
       emit: vi.fn(),
     },
+    // The handler broadcasts via `io.to(room)` (NOT `socket.to`) so the sender
+    // receives the echo too — every client keys the emote by the same
+    // server-authoritative username (mismatch-proof).
+    io: { to: vi.fn(() => ({ emit: toEmit })) } as any,
     handlers,
     toEmit,
   };
 }
 
 describe('lobbyEmoteHandler', () => {
-  const mockIo = {} as any;
-
   beforeEach(() => {
     vi.clearAllMocks();
     mockCheckRateLimit.mockReturnValue(true);
@@ -59,18 +61,18 @@ describe('lobbyEmoteHandler', () => {
   });
 
   it('registers the lobbyEmote handler', () => {
-    const { socket } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+    const { socket, io } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
     expect(socket.on).toHaveBeenCalledWith('lobbyEmote', expect.any(Function));
   });
 
-  it('broadcasts a valid emote to other players with the server username', async () => {
-    const { socket, handlers, toEmit } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+  it('broadcasts a valid emote to everyone in the room (incl. sender) with the server username', async () => {
+    const { socket, io, handlers, toEmit } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
 
     await handlers['lobbyEmote']({ emote: 'emoteAngry' });
 
-    expect(socket.to).toHaveBeenCalledWith('game:GAME1');
+    expect(io.to).toHaveBeenCalledWith('game:GAME1');
     expect(toEmit).toHaveBeenCalledWith('lobbyEmoteUpdate', {
       username: 'Alice',
       emote: 'emoteAngry',
@@ -78,8 +80,8 @@ describe('lobbyEmoteHandler', () => {
   });
 
   it('ignores client-supplied username (anti-spoof)', async () => {
-    const { socket, handlers, toEmit } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+    const { socket, io, handlers, toEmit } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
 
     await handlers['lobbyEmote']({ emote: 'emoteWink', username: 'FakeUser' });
 
@@ -90,8 +92,8 @@ describe('lobbyEmoteHandler', () => {
   });
 
   it('rejects a game-mood id that is not a lobby emote', async () => {
-    const { socket, handlers, toEmit } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+    const { socket, io, handlers, toEmit } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
 
     await handlers['lobbyEmote']({ emote: 'correct' }); // valid AvatarMood, not an emote
     await handlers['lobbyEmote']({ emote: 'nope' });
@@ -101,8 +103,8 @@ describe('lobbyEmoteHandler', () => {
 
   it('skips when rate limited', async () => {
     mockCheckRateLimit.mockReturnValue(false);
-    const { socket, handlers, toEmit } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+    const { socket, io, handlers, toEmit } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
 
     await handlers['lobbyEmote']({ emote: 'emoteLaugh' });
 
@@ -111,8 +113,8 @@ describe('lobbyEmoteHandler', () => {
 
   it('skips when the socket is migrating', async () => {
     mockIsSocketMigrating.mockReturnValue(true);
-    const { socket, handlers, toEmit } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+    const { socket, io, handlers, toEmit } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
 
     await handlers['lobbyEmote']({ emote: 'emoteLaugh' });
 
@@ -121,8 +123,8 @@ describe('lobbyEmoteHandler', () => {
 
   it('skips when the player is not in a game', async () => {
     mockGetGameBySocketId.mockReturnValue(null);
-    const { socket, handlers, toEmit } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+    const { socket, io, handlers, toEmit } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
 
     await handlers['lobbyEmote']({ emote: 'emoteLaugh' });
 
@@ -131,8 +133,8 @@ describe('lobbyEmoteHandler', () => {
 
   it('skips when the game is no longer in the lobby (not waiting)', async () => {
     mockGetGame.mockReturnValue({ gameState: 'playing' });
-    const { socket, handlers, toEmit } = createMockSocket();
-    registerLobbyEmoteHandlers(mockIo, socket as any);
+    const { socket, io, handlers, toEmit } = createMockSocket();
+    registerLobbyEmoteHandlers(io, socket as any);
 
     await handlers['lobbyEmote']({ emote: 'emoteLaugh' });
 
