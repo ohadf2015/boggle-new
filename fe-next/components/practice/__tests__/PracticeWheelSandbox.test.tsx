@@ -1,10 +1,13 @@
 /**
- * Redesigned PracticeWheelSandbox — TAP-BASED to mirror real WheelRush.
- * 7 letters (1 center + 6 outer). Real `<WheelLetter>` component reused.
- * Center-letter rule + 3-letter min match real (WordWheelGame.tsx:455–467).
+ * PracticeWheelSandbox now renders the REAL WordWheelGame
+ * (`components/daily/WordWheelGame.tsx`) in practice + hideCompetitive mode,
+ * wrapped in the practice shell (back-to-hub, goal pill, bailout, completion
+ * popup). These tests verify the integration — wheel presence, goal chrome,
+ * and the suppression of competitive chrome — not WordWheelGame internals
+ * (those have their own suite).
  */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const validatorCheck = vi.fn();
@@ -13,6 +16,13 @@ vi.mock('@/lib/practice/usePracticeValidator', () => ({
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
+}));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
+}));
+vi.mock('next/dynamic', () => ({
+  __esModule: true,
+  default: () => () => <div data-testid="pixi-ring-stub" />,
 }));
 vi.mock('pixi.js', () => ({
   Application: class {
@@ -40,63 +50,24 @@ import PracticeWheelSandbox from '../PracticeWheelSandbox';
 beforeEach(() => {
   validatorCheck.mockReset();
   validatorCheck.mockResolvedValue({ isValid: true, source: 'dictionary' });
+  global.fetch = vi.fn().mockResolvedValue({ ok: false }) as unknown as typeof fetch;
   window.localStorage.clear();
 });
 
-describe('PracticeWheelSandbox redesigned', () => {
-  it('renders one center letter and six outer letters (7 total — real WheelRush parity)', () => {
+describe('PracticeWheelSandbox (real WordWheelGame reuse)', () => {
+  it('renders the real wheel — 1 center (-1) + 6 outer (0..5) letters', () => {
     render(<PracticeWheelSandbox />);
-    // WheelLetter buttons expose data-wheel-index 0..6
-    for (let i = 0; i <= 6; i += 1) {
+    // WordWheelGame convention: center=-1, outer=0..5.
+    expect(document.querySelector('[data-wheel-index="-1"]')).not.toBeNull();
+    for (let i = 0; i <= 5; i += 1) {
       expect(document.querySelector(`[data-wheel-index="${i}"]`)).not.toBeNull();
     }
-    expect(document.querySelector('[data-wheel-index="7"]')).toBeNull();
+    expect(document.querySelector('[data-wheel-index="6"]')).toBeNull();
   });
 
-  it('renders reset + shuffle buttons (real-game parity)', () => {
+  it('reuses the live wheel action bar (word-wheel-action-bar)', () => {
     render(<PracticeWheelSandbox />);
-    expect(screen.getByTestId('practice-wheel-reset')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-wheel-shuffle')).toBeInTheDocument();
-  });
-
-  it('reset clears any built letters', () => {
-    render(<PracticeWheelSandbox />);
-    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
-    const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
-    fireEvent.click(center);
-    fireEvent.click(o1);
-    fireEvent.click(screen.getByTestId('practice-wheel-reset'));
-    // After reset all wheel letters should be unused (no aria-pressed=true).
-    const used = Array.from(document.querySelectorAll('[data-wheel-used="true"]'));
-    expect(used.length).toBe(0);
-  });
-
-  it('shuffle keeps 7 wheel letters and rerenders the outer ring', () => {
-    render(<PracticeWheelSandbox />);
-    const before = Array.from(
-      document.querySelectorAll('[data-wheel-letter]'),
-    ).map((el) => (el as HTMLElement).dataset.wheelLetter);
-    expect(before.length).toBe(7);
-    fireEvent.click(screen.getByTestId('practice-wheel-shuffle'));
-    const after = Array.from(
-      document.querySelectorAll('[data-wheel-letter]'),
-    ).map((el) => (el as HTMLElement).dataset.wheelLetter);
-    expect(after.length).toBe(7);
-    // Center never moves; outer 6 are the same set, possibly reordered.
-    expect(after[0]).toBe(before[0]);
-    expect(new Set(after.slice(1))).toEqual(new Set(before.slice(1)));
-  });
-
-  it('renders the inline PracticeCoachTip so the player learns by doing', () => {
-    render(<PracticeWheelSandbox />);
-    expect(screen.getByTestId('practice-coach-tip')).toBeInTheDocument();
-  });
-
-  it('does NOT render competitive chrome (timer, combo, rivals)', () => {
-    render(<PracticeWheelSandbox />);
-    expect(screen.queryByTestId('combo-slot')).toBeNull();
-    expect(screen.queryByTestId('timer-bar')).toBeNull();
-    expect(screen.queryByTestId('rival-bar')).toBeNull();
+    expect(screen.getByTestId('word-wheel-action-bar')).toBeInTheDocument();
   });
 
   it('renders a goal indicator pill (0/3)', () => {
@@ -106,45 +77,36 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(pill).toHaveTextContent('3');
   });
 
-  it('chain CTA hidden until 3 valid words found', () => {
+  it('does NOT render competitive chrome (combo, rivals, leaderboard fetch)', () => {
+    render(<PracticeWheelSandbox />);
+    expect(screen.queryByTestId('combo-slot')).toBeNull();
+    expect(screen.queryByTestId('next-rival-slot')).toBeNull();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('renders the back-to-hub link', () => {
+    render(<PracticeWheelSandbox />);
+    expect(screen.getByTestId('practice-back-to-hub')).toBeInTheDocument();
+  });
+
+  it('renders the practice bailout CTA', () => {
+    render(<PracticeWheelSandbox />);
+    expect(screen.getByTestId('practice-bailout-cta')).toBeInTheDocument();
+  });
+
+  it('renders the inline PracticeCoachTip so the player learns by doing', () => {
+    render(<PracticeWheelSandbox />);
+    expect(screen.getByTestId('practice-coach-tip')).toBeInTheDocument();
+  });
+
+  it('keeps the chain CTA hidden until the goal is reached', () => {
     render(<PracticeWheelSandbox />);
     expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
   });
 
-  it('submit button hidden until built word reaches 3 letters (real min)', () => {
+  it('shows the practice "end run" CTA instead of a countdown timer', () => {
     render(<PracticeWheelSandbox />);
-    // Tap two letters → still hidden
-    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
-    const outer = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
-    fireEvent.click(center);
-    fireEvent.click(outer);
-    expect(screen.queryByTestId('practice-wheel-submit')).toBeNull();
-  });
-
-  it('shows submit button at 3 letters then validates on tap', async () => {
-    render(<PracticeWheelSandbox />);
-    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
-    const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
-    const o2 = document.querySelector('[data-wheel-index="2"]') as HTMLElement;
-    fireEvent.click(center);
-    fireEvent.click(o1);
-    fireEvent.click(o2);
-    const submit = screen.getByTestId('practice-wheel-submit');
-    fireEvent.click(submit);
-    await waitFor(() => expect(validatorCheck).toHaveBeenCalled());
-  });
-
-  it('does NOT call validator if center letter not used', async () => {
-    render(<PracticeWheelSandbox />);
-    const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
-    const o2 = document.querySelector('[data-wheel-index="2"]') as HTMLElement;
-    const o3 = document.querySelector('[data-wheel-index="3"]') as HTMLElement;
-    fireEvent.click(o1);
-    fireEvent.click(o2);
-    fireEvent.click(o3);
-    fireEvent.click(screen.getByTestId('practice-wheel-submit'));
-    await new Promise((r) => setTimeout(r, 50));
-    expect(validatorCheck).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /practice\.endRun/i })).toBeInTheDocument();
   });
 });
 

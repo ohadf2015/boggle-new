@@ -326,10 +326,18 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         return;
       }
       if (data.kind === 'locked') {
-        setMyWords(prev => [{ word: data.word, kind: 'locked', score: data.score, lockUntil: data.lockUntil, ts: Date.now() }, ...prev]);
+        // Dedup by word: a duplicate result emission, or a buffered accept that
+        // lands right after a reconnect snapshot already hydrated this word,
+        // must not add a second chip. Each word is unique in the list (the
+        // stolen/closed handlers mutate the single matching entry in place).
+        setMyWords(prev => prev.some(w => w.word === data.word)
+          ? prev
+          : [{ word: data.word, kind: 'locked', score: data.score, lockUntil: data.lockUntil, ts: Date.now() }, ...prev]);
         flash('ok', `+${data.score}`);
       } else if (data.kind === 'stolen') {
-        setMyWords(prev => [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
+        setMyWords(prev => prev.some(w => w.word === data.word)
+          ? prev
+          : [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
         flash('ok', tt('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
       }
       const coverage = classifyLetterCoverage(data.word, pz?.allLetters ?? []);

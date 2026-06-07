@@ -26,6 +26,13 @@ vi.mock('@/lib/practice/usePracticeValidator', () => ({
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn() }),
+}));
+vi.mock('next/dynamic', () => ({
+  __esModule: true,
+  default: () => () => <div data-testid="pixi-ring-stub" />,
+}));
 vi.mock('pixi.js', () => ({
   Application: class {
     canvas = document.createElement('canvas');
@@ -71,14 +78,16 @@ const submitGridWord = (word: string) => {
   fireEvent.click(btn);
 };
 
-const tapWheel = (indices: number[]) => {
-  for (const i of indices) {
-    const el = document.querySelector(`[data-wheel-index="${i}"]`) as HTMLElement | null;
-    if (!el) throw new Error(`wheel letter ${i} not found`);
+// Wheel now renders the real WordWheelGame — tap by glyph (center=-1,
+// outer=0..5) and submit via the action-bar Submit button.
+const tapWheel = (letters: string[]) => {
+  for (const ch of letters) {
+    const el = document.querySelector(`[data-wheel-letter="${ch}"]`) as HTMLElement | null;
+    if (!el) throw new Error(`wheel letter ${ch} not found`);
     fireEvent.click(el);
   }
-  const submit = screen.queryByTestId('practice-wheel-submit');
-  if (submit) fireEvent.click(submit);
+  const submit = screen.getByTestId('word-wheel-action-bar').querySelector('button:nth-child(2)') as HTMLElement;
+  fireEvent.click(submit);
 };
 
 beforeEach(() => {
@@ -140,12 +149,16 @@ describe('practice sandbox telemetry', () => {
       expect.objectContaining({ mode: 'wheelRush' }),
     );
 
-    // EN wheel: center=A (idx 0), outer T R C E S N (idx 1..6).
-    tapWheel([3, 0, 1]); // C-A-T → CAT
-    await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(1));
-    tapWheel([2, 0, 1]); // R-A-T → RAT
-    await waitFor(() => expect(validatorCheck).toHaveBeenCalledTimes(2));
-    tapWheel([0, 3, 4]); // A-C-E → ACE
+    // EN wheel: center=A, outer T R C E S N. Wait on the goal pill (which
+    // updates in the same render batch WordWheelGame clears its builder) so the
+    // next word builds from an empty slate — waiting on the async validator
+    // call resolves mid-submit, before that clear flushes.
+    const goalPill = () => screen.getByTestId('practice-goal-indicator');
+    tapWheel(['C', 'A', 'T']); // CAT
+    await waitFor(() => expect(goalPill()).toHaveTextContent('1'));
+    tapWheel(['R', 'A', 'T']); // RAT
+    await waitFor(() => expect(goalPill()).toHaveTextContent('2'));
+    tapWheel(['A', 'C', 'E']); // ACE
     await waitFor(() => {
       expect(eventNames()).toContain('practice_completed');
     });
