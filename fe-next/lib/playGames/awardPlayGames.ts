@@ -6,7 +6,7 @@
  * throws, so this is safe to invoke unconditionally on every platform.
  *
  * Currently wires the two events derivable from game-end alone:
- *   - score → All-Time Score leaderboard (+ Daily Challenge for the daily mode)
+ *   - score → High Score leaderboard (+ Daily Challenge for the daily mode)
  *   - win   → First Victory achievement
  *
  * TODO (need their own event sources, not game-end):
@@ -37,7 +37,7 @@ export async function awardGameEnd({ mode, score, isWinner }: AwardGameEndArgs):
   const tasks: Array<Promise<unknown>> = [];
 
   if (score > 0) {
-    tasks.push(submitLeaderboardScore(PLAY_GAMES_LEADERBOARDS.allTimeScore, score));
+    tasks.push(submitLeaderboardScore(PLAY_GAMES_LEADERBOARDS.highScore, score));
     if (DAILY_MODES.has(mode)) {
       tasks.push(submitLeaderboardScore(PLAY_GAMES_LEADERBOARDS.dailyChallenge, score));
     }

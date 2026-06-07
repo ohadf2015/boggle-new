@@ -16,7 +16,9 @@ const env = (key: string, fallback: string): string =>
   (process.env[key] && String(process.env[key])) || fallback;
 
 export const PLAY_GAMES_LEADERBOARDS = {
-  allTimeScore: env('NEXT_PUBLIC_PGS_LB_ALL_TIME', 'CgkIruzLyugaEAIQAg'),
+  // "High Score" board: PGS keeps each player's BEST submitted value (not a
+  // cumulative total), so per-game scores rank as a best-single-game board.
+  highScore: env('NEXT_PUBLIC_PGS_LB_HIGH_SCORE', 'CgkIruzLyugaEAIQAg'),
   dailyChallenge: env('NEXT_PUBLIC_PGS_LB_DAILY', 'CgkIruzLyugaEAIQAw'),
 } as const;
 

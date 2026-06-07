@@ -19,14 +19,14 @@ vi.mock('@/utils/platform', () => ({
 describe('awardGameEnd', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('submits the score to the All-Time Score leaderboard', async () => {
+  it('submits the score to the High Score leaderboard', async () => {
     await awardGameEnd({ mode: 'blast', score: 1200 });
-    expect(pgs.submitLeaderboardScore).toHaveBeenCalledWith(PLAY_GAMES_LEADERBOARDS.allTimeScore, 1200);
+    expect(pgs.submitLeaderboardScore).toHaveBeenCalledWith(PLAY_GAMES_LEADERBOARDS.highScore, 1200);
   });
 
   it('also submits to the Daily Challenge leaderboard for the daily mode', async () => {
     await awardGameEnd({ mode: 'daily-challenge', score: 800 });
-    expect(pgs.submitLeaderboardScore).toHaveBeenCalledWith(PLAY_GAMES_LEADERBOARDS.allTimeScore, 800);
+    expect(pgs.submitLeaderboardScore).toHaveBeenCalledWith(PLAY_GAMES_LEADERBOARDS.highScore, 800);
     expect(pgs.submitLeaderboardScore).toHaveBeenCalledWith(PLAY_GAMES_LEADERBOARDS.dailyChallenge, 800);
   });
 
