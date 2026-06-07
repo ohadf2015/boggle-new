@@ -9848,7 +9848,15 @@ const en = {
     "close": "Close",
     "concept": {
       "gotIt": "Let's go",
-      "tag": "New"
+      "tag": "New",
+      "anyRow": {
+        "title": "Words can be on any row",
+        "body": "Not just the bottom row — scan the whole board for words."
+      },
+      "verticalWords": {
+        "title": "Words can be vertical too",
+        "body": "Drag straight down (or up) to spell vertical words."
+      }
     },
     "settings": {
       "tutorials": "Replay Tutorials"
