@@ -13,9 +13,11 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
+import { adminOnlyDailyModes } from '@/lib/dailyModes';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
+import { AdminDailyModeCard } from './landing/AdminDailyModeCard';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { ConfettiBackground } from './landing/ConfettiBackground';
 import { FloatingDecorations } from './landing/FloatingDecorations';
@@ -39,7 +41,10 @@ export function DailyChallengeLanding({
   currentLanguage,
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
+  // Admin-gated daily modes being readied for the public flow (Word Tower today).
+  // Registry-driven so future modes appear here for admins with no hub edits.
+  const adminModes = isAdmin ? adminOnlyDailyModes() : [];
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -317,6 +322,21 @@ export function DailyChallengeLanding({
           buttonText={t('daily.startQuest')}
           delay={0.25}
         />
+      )}
+
+      {/* Admin-only daily modes (rollout staging). Hidden entirely for non-admins. */}
+      {adminModes.length > 0 && (
+        <div className="w-full flex flex-col gap-2" data-testid="daily-admin-modes">
+          {adminModes.map((mode, i) => (
+            <AdminDailyModeCard
+              key={mode.id}
+              mode={mode}
+              locale={currentLanguage}
+              t={t}
+              delay={0.3 + i * 0.05}
+            />
+          ))}
+        </div>
       )}
 
       {/* Insights: surface "you improved" / "personal best" inline once any mode complete */}
