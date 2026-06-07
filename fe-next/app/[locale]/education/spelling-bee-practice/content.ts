@@ -12,8 +12,8 @@ const content: Record<EducationLocale, LocaleContent> = {
     metaDescription: 'Free online spelling bee practice through word games. Boggle-style grids, anagram drills, word wheels, and 1v1 spelling duels. No signup, no app — just open the browser and start practicing for Scripps, regional bees, or classroom spelling tests.',
   },
   he: {
-    metaTitle: 'תרגול כתיב בחינם — משחקי מילים לאלופי | LexiClash',
-    metaDescription: 'תרגול כתיב בחינם דרך משחקים. Boggle, אנגרמה, גלגל, דו־קרבות. ללא הרשמה, ללא אפליקציה — דפדפן בלבד.',
+    metaTitle: 'תרגול איות בחינם — משחקי מילים לאלופי האיות | LexiClash',
+    metaDescription: 'תרגול איות בחינם דרך משחקים: Boggle, אנגרמות, גלגל מילים ודו־קרבות. בלי הרשמה, בלי אפליקציה — רק דפדפן.',
   },
   es: {
     metaTitle: 'Práctica de Ortografía Online — Juegos Gratis | LexiClash',

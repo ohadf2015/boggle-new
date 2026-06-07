@@ -51,15 +51,27 @@ describe('hub FAQ — GEO-citable teacher questions', () => {
     expect(questions.some((q) => /download|install/.test(q))).toBe(true);
   });
 
-  it('adds the 2 new teacher questions to every locale (non-empty)', () => {
+  it('every locale has full FAQ parity with en (no silent dropped entries)', () => {
+    // A length-only `>= 10` guard let he/es silently ship 10 vs en's 12.
+    // Pin exact parity so a missing translated Q&A fails CI, not GSC.
+    const enLen = educationSeoContent.en.faq.length;
     for (const loc of Object.keys(educationSeoContent)) {
       const arr = educationSeoContent[loc].faq;
-      expect(arr.length, `locale ${loc}`).toBeGreaterThanOrEqual(10);
-      // The 2 intent questions are appended at the end of each locale array.
-      for (const item of arr.slice(-2)) {
+      expect(arr.length, `locale ${loc} faq count`).toBe(enLen);
+      for (const item of arr) {
         expect(item.question.length, `locale ${loc} q`).toBeGreaterThan(0);
         expect(item.answer.length, `locale ${loc} a`).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+describe('hub FAQ — native Hebrew, not machine-translated', () => {
+  const he = educationSeoContent.he.faq;
+  const allHe = he.map((f) => `${f.question} ${f.answer}`).join(' ');
+
+  it('uses the real game term ציד מילים, never the MT calque מצודות (fortresses)', () => {
+    expect(allHe).not.toContain('מצוד'); // מצודות = fortresses — wrong word for "word hunt"
+    expect(allHe).toContain('ציד מילים');
   });
 });
