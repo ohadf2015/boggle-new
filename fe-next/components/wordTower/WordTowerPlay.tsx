@@ -31,10 +31,6 @@ import { useWordTowerPerks } from './useWordTowerPerks';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
 import { perkMilestoneAt, reducedTopple, PERKS } from '@/lib/wordTower/perks';
 import { beatsDailyBest } from '@/lib/wordTower/dailyBest';
-import { useSabotageIntegration } from './useSabotage';
-import { WordTowerSabotageBay } from './WordTowerSabotageBay';
-import { SABOTAGE_TOKEN_CAP } from '@/lib/wordTower/sabotage';
-import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
 import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
@@ -238,16 +234,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     return () => clearTimeout(id);
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Wrecking ball — perfect drops earn tokens; spend on a rival to topple a
-  // floor off their ghost tower. Includes the receiver-side simulator
-  // (?sim_sabotage=1) and the rail-display math.
-  const { sab: sabotage, displayRivals } = useSabotageIntegration(crane.perfectStreak, rivals, tower.hazard);
-  const adForSabotage = useRewardedAd({
-    rewardKind: 'feature',
-    surface: 'generic',
-    analyticsSurface: 'sabotage_token',
-    onRewardEarned: () => { sabotage.earnTokenViaAd(); },
-  });
+  // Rival ghosts are leaderboard records to climb past (read-only). The old
+  // solo "wrecking-ball" sabotage was a fake, local-only effect against these
+  // ghosts (no backend) — cut from solo. Async-versus interference lives in the
+  // (unwired) WordTowerVersus prototype for the future shared-daily mode.
+  const displayRivals = rivals;
 
   // Environmental hazards strike at fixed altitudes → topple floors; firedHazards guards re-fire.
   const prevHazardH = useRef(game.heightM);
@@ -453,7 +444,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           *viewed* altitude so panning down reveals the marks at that height. */}
       <WordTowerLandmarkRail viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
-      {/* Rival rail — heights include local sabotage hits so the targeted ghost shrinks. */}
+      {/* Rival rail — read-only leaderboard ghosts to climb past. */}
       <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
       {/* Persistent chase chip — the closest record still ABOVE you (the rail only
@@ -546,26 +537,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           )}
         </div>
       )}
-
-      {/* Wrecking-ball UI: chip + earn toast + rival picker + hit animation. */}
-      <WordTowerSabotageBay
-        tokens={sabotage.tokens}
-        rivals={displayRivals}
-        pickerOpen={sabotage.pickerOpen}
-        onOpen={sabotage.openPicker}
-        onClose={sabotage.closePicker}
-        onSend={sabotage.sabotage}
-        lastHit={sabotage.lastHit}
-        onDismissHit={sabotage.dismissHit}
-        earnedToast={sabotage.earnedToast}
-        onDismissEarned={sabotage.dismissEarned}
-        onWatchAdForToken={adForSabotage.canShowAd && sabotage.tokens < SABOTAGE_TOKEN_CAP ? adForSabotage.showAd : undefined}
-        adLoading={adForSabotage.status === 'loading' || adForSabotage.status === 'showing'}
-        adEarnedToast={sabotage.adEarnedToast}
-        onDismissAdEarned={sabotage.dismissAdEarned}
-        t={t}
-        reducedMotion={reducedMotion}
-      />
 
       {/* Hazard "tower ruined" banner — bold + red so the loss is unmissable */}
       {hazardText && (

@@ -92,7 +92,7 @@ export async function fetchGameModeStats(days: number = 30): Promise<GameModeSta
 }
 
 /** Default card order when no stats available */
-const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'arena', 'practice', 'blast', 'adventure'];
+const DEFAULT_ORDER: LandingGameMode[] = ['daily', 'arena', 'blast', 'practice', 'adventure'];
 
 /** Modes pinned to the front regardless of popularity */
 const PINNED_FIRST: LandingGameMode[] = ['daily', 'arena'];

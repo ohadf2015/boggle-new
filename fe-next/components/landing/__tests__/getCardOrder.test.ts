@@ -1,10 +1,10 @@
 import { getCardOrder, type GameModeStats } from '@/lib/landing/fetchGameModeStats';
 
 describe('getCardOrder', () => {
-  it('returns default order when no stats provided', () => {
-    expect(getCardOrder()).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
-    expect(getCardOrder(undefined)).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
-    expect(getCardOrder([])).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
+  it('returns default order when no stats provided (blast bumped up, under arena)', () => {
+    expect(getCardOrder()).toEqual(['daily', 'arena', 'blast', 'practice', 'adventure']);
+    expect(getCardOrder(undefined)).toEqual(['daily', 'arena', 'blast', 'practice', 'adventure']);
+    expect(getCardOrder([])).toEqual(['daily', 'arena', 'blast', 'practice', 'adventure']);
   });
 
   it('returns default order when all counts are zero', () => {
@@ -15,7 +15,7 @@ describe('getCardOrder', () => {
       { mode: 'adventure', playCount: 0 },
       { mode: 'blast', playCount: 0 },
     ];
-    expect(getCardOrder(stats)).toEqual(['daily', 'arena', 'practice', 'blast', 'adventure']);
+    expect(getCardOrder(stats)).toEqual(['daily', 'arena', 'blast', 'practice', 'adventure']);
   });
 
   it('pins daily and arena first, reorders rest by popularity', () => {
