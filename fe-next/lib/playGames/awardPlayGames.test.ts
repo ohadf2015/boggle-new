@@ -109,6 +109,20 @@ describe('awardGameEnd', () => {
     });
   });
 
+  describe('On a Roll', () => {
+    it('unlocks once the play-streak reaches 7', async () => {
+      localStorage.setItem('lexiclash_win_streak', '7');
+      await awardGameEnd({ mode: 'blast', score: 10, wordCount: 1 });
+      expect(pgs.unlockAchievement).toHaveBeenCalledWith(PLAY_GAMES_ACHIEVEMENTS.onARoll);
+    });
+
+    it('does not unlock below a 7-day streak', async () => {
+      localStorage.setItem('lexiclash_win_streak', '6');
+      await awardGameEnd({ mode: 'blast', score: 10, wordCount: 1 });
+      expect(pgs.unlockAchievement).not.toHaveBeenCalledWith(PLAY_GAMES_ACHIEVEMENTS.onARoll);
+    });
+  });
+
   describe('Daily Devotee', () => {
     it('increments by 1 on a completed daily challenge', async () => {
       await awardGameEnd({ mode: 'daily-challenge', score: 10, wordCount: 1 });

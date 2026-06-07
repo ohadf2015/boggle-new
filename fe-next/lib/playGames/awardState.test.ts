@@ -7,6 +7,9 @@ import {
   markFirstWordAwarded,
   hasAwardedPolyglot,
   markPolyglotAwarded,
+  hasAwardedOnARoll,
+  markOnARollAwarded,
+  getPlayStreak,
   recordLanguagePlayed,
 } from './awardState';
 
@@ -34,5 +37,17 @@ describe('awardState', () => {
 
   it('returns 0 for an empty language', () => {
     expect(recordLanguagePlayed('')).toBe(0);
+  });
+
+  it('On a Roll flag is false until marked, then true', () => {
+    expect(hasAwardedOnARoll()).toBe(false);
+    markOnARollAwarded();
+    expect(hasAwardedOnARoll()).toBe(true);
+  });
+
+  it('reads the global play-streak from localStorage', () => {
+    expect(getPlayStreak()).toBe(0);
+    localStorage.setItem('lexiclash_win_streak', '7');
+    expect(getPlayStreak()).toBe(7);
   });
 });

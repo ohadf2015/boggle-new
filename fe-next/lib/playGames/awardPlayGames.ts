@@ -11,9 +11,7 @@
  *   - words>0  → First Word (once) + Word Smith (incremental, by word count)
  *   - language → Polyglot (once 2+ distinct languages played)
  *   - daily    → Daily Devotee (incremental, +1 per completed daily)
- *
- * TODO: onARoll (7-day streak) — no clean global play-streak source exists yet
- * (streak logic is fragmented per-mode), so it is intentionally not wired here.
+ *   - streak≥7 → On a Roll (global play-streak from useWinStreak)
  */
 
 import { submitLeaderboardScore, unlockAchievement, incrementAchievement } from '@/utils/nativePGS';
@@ -24,8 +22,14 @@ import {
   markFirstWordAwarded,
   hasAwardedPolyglot,
   markPolyglotAwarded,
+  hasAwardedOnARoll,
+  markOnARollAwarded,
+  getPlayStreak,
   recordLanguagePlayed,
 } from './awardState';
+
+/** Consecutive-day play streak that unlocks On a Roll. */
+const ON_A_ROLL_DAYS = 7;
 
 /** Modes whose score should also feed the Daily Challenge leaderboard. */
 const DAILY_MODES = new Set(['daily-challenge']);
@@ -90,6 +94,14 @@ export async function awardGameEnd({
   if (DAILY_MODES.has(mode)) {
     // Daily Devotee: awardGameEnd is only invoked on a completed game.
     tasks.push(incrementAchievement(PLAY_GAMES_ACHIEVEMENTS.dailyDevotee, 1));
+  }
+
+  if (!hasAwardedOnARoll() && getPlayStreak() >= ON_A_ROLL_DAYS) {
+    tasks.push(
+      unlockAchievement(PLAY_GAMES_ACHIEVEMENTS.onARoll).then((r) => {
+        if (r.success) markOnARollAwarded();
+      }),
+    );
   }
 
   // allSettled: never reject, even though the bridge already swallows errors.

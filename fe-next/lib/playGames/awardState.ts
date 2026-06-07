@@ -9,7 +9,11 @@
 
 const FIRST_WORD_KEY = 'pgs_first_word_awarded';
 const POLYGLOT_KEY = 'pgs_polyglot_awarded';
+const ON_A_ROLL_KEY = 'pgs_on_a_roll_awarded';
 const LANGUAGES_KEY = 'pgs_languages_played';
+
+/** Global daily play-streak (any game completion counts) — see hooks/useWinStreak.ts. */
+const PLAY_STREAK_KEY = 'lexiclash_win_streak';
 
 function store(): Storage | null {
   try {
@@ -33,6 +37,21 @@ export function hasAwardedPolyglot(): boolean {
 
 export function markPolyglotAwarded(): void {
   store()?.setItem(POLYGLOT_KEY, '1');
+}
+
+export function hasAwardedOnARoll(): boolean {
+  return store()?.getItem(ON_A_ROLL_KEY) === '1';
+}
+
+export function markOnARollAwarded(): void {
+  store()?.setItem(ON_A_ROLL_KEY, '1');
+}
+
+/** Read the current global play-streak count (0 when unavailable). */
+export function getPlayStreak(): number {
+  const raw = store()?.getItem(PLAY_STREAK_KEY);
+  const n = raw ? parseInt(raw, 10) : 0;
+  return Number.isFinite(n) ? n : 0;
 }
 
 /**
