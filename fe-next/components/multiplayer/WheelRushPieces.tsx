@@ -44,11 +44,11 @@ export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr' }
       data-testid="my-words-slot"
       className="notranslate h-16 overflow-y-auto flex flex-wrap content-start gap-1.5 justify-center"
     >
-      {words.slice(0, 20).map((w, i) => {
+      {words.slice(0, 20).map((w) => {
         const tone = CHIP_TONE[w.kind];
         return (
           <span
-            key={`${w.word}-${i}`}
+            key={w.word}
             data-kind={w.kind}
             dir={dir}
             className={cn(
