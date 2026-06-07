@@ -2487,6 +2487,18 @@ html.lexi-native [data-selectable] {
     0%, 100% { opacity: 0.2; transform: scale(0.6); }
     50% { opacity: 1; transform: scale(1.2); }
   }
+  /* Crossword cell entrance — CSS (not GSAP) so cells ALWAYS resolve to visible even if
+     interrupted by re-renders (the GSAP autoAlpha version left cells stuck hidden). */
+  @keyframes cw-cell-pop {
+    from { opacity: 0; transform: scale(0.45); }
+    60%  { opacity: 1; transform: scale(1.06); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .cw-cell-enter {
+    /* `backwards` (not `both`): holds opacity:0 during the per-cell stagger delay, but does
+       NOT pin the final transform — so the active cell's scale still applies after entrance. */
+    animation: cw-cell-pop 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+  }
   @keyframes blast-heartbeat {
     0%, 100% { transform: scale(1); }
     15% { transform: scale(1.18); }

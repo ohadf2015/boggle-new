@@ -17,6 +17,8 @@ export interface CrosswordCellProps {
   revealed: boolean;
   onSelect: (row: number, col: number) => void;
   label: string;
+  enter?: boolean;
+  enterDelay?: number;
 }
 
 function CrosswordCellBase({
@@ -32,13 +34,21 @@ function CrosswordCellBase({
   revealed,
   onSelect,
   label,
+  enter = false,
+  enterDelay = 0,
 }: CrosswordCellProps) {
   // Column mirroring is the entire RTL story: logical col 0 renders on the right.
   const gridColumn = rtl ? size - cell.col : cell.col + 1;
   const gridRow = cell.row + 1;
 
   if (cell.block) {
-    return <div aria-hidden className="bg-black" style={{ gridColumn, gridRow }} />;
+    return (
+      <div
+        aria-hidden
+        className={`bg-black ${enter ? 'cw-cell-enter' : ''}`}
+        style={{ gridColumn, gridRow, animationDelay: enter ? `${enterDelay}s` : undefined }}
+      />
+    );
   }
 
   const shown = letter ? displayLetter(letter, { isWordEnd }, locale) : '';
@@ -76,8 +86,13 @@ function CrosswordCellBase({
       onClick={() => onSelect(cell.row, cell.col)}
       className={`relative flex items-center justify-center font-neo-display font-extrabold uppercase select-none transition-[background-color,transform,box-shadow] duration-100 ${bg} ${text} ${
         isActive ? 'z-10 scale-[1.08] shadow-hard' : ''
-      }`}
-      style={{ gridColumn, gridRow, fontSize: 'min(6.4vw, 1.75rem)' }}
+      } ${enter ? 'cw-cell-enter' : ''}`}
+      style={{
+        gridColumn,
+        gridRow,
+        fontSize: 'min(6.4vw, 1.75rem)',
+        animationDelay: enter ? `${enterDelay}s` : undefined,
+      }}
     >
       {cell.number != null && (
         <span

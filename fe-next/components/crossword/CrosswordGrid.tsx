@@ -33,27 +33,18 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     return s;
   }, [puzzle.slots]);
 
-  // GSAP entrance: letter tiles pop in from the center on mount. Reduced-motion → no-op.
-  useEffect(() => {
-    if (reduced || !gridRef.current) return;
-    let ctx: { revert: () => void } | null = null;
-    (async () => {
-      const gsap = (await import('gsap')).default;
-      if (!gridRef.current) return;
-      ctx = gsap.context(() => {
-        gsap.from('[data-cell]', {
-          scale: 0.4,
-          autoAlpha: 0,
-          duration: 0.45,
-          ease: 'back.out(1.7)',
-          stagger: { each: 0.018, from: 'center', grid: 'auto' },
-        });
-      }, gridRef);
-    })();
-    return () => ctx?.revert();
-  }, [reduced, puzzle.id]);
+  // Entrance is CSS (see .cw-cell-enter): a staggered pop driven by per-cell animation-delay.
+  // CSS is used deliberately over GSAP here — a CSS animation always resolves to its final
+  // (visible) state and survives React re-renders, so cells can never get stuck hidden.
+  // Center of the grid, for a center-out stagger.
+  const mid = (size - 1) / 2;
+  const enterDelay = (row: number, col: number): number => {
+    const dist = Math.abs(row - mid) + Math.abs(col - mid);
+    return Math.min(dist, 6) * 0.045;
+  };
 
-  // GSAP solved cascade: a celebratory ripple across the solved board.
+  // GSAP solved cascade: a celebratory ripple across the solved board. Safe — by the time the
+  // puzzle is solved every cell is already visible, so there is no stuck-hidden risk.
   useEffect(() => {
     if (!solved || reduced || !gridRef.current) return;
     let ctx: { revert: () => void } | null = null;
@@ -107,6 +98,8 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
             revealed={revealed.includes(key)}
             onSelect={onSelect}
             label={t('crossword.cellLabel', { row: cell.row + 1, col: cell.col + 1 })}
+            enter={!reduced}
+            enterDelay={enterDelay(cell.row, cell.col)}
           />
         );
       })}
