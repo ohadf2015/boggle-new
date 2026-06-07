@@ -1604,6 +1604,77 @@ html.lexi-native [data-selectable] {
   animation: blast-lock-hint-pulse 2s ease-in-out infinite;
 }
 
+@utility blast-frost-shell {
+  /* Un-thawed ice/frozen shell — reads as ICE, not a padlock. Gentle frost
+     sheen + crystalline corner glints so the tile says "break me" not "locked". */
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(0.5px);
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(
+      circle at 30% 25%,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 35%
+    );
+    pointer-events: none;
+  }
+}
+
+@utility blast-frost-hint {
+  /* Frost identity pulse — gentle, never the urgent lock pulse. */
+  animation: blast-frost-hint-pulse 2.6s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+  @keyframes blast-frost-hint-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50% { transform: scale(1.08); opacity: 1; }
+  }
+}
+
+@utility blast-frost-melt {
+  /* Visible ONE-HIT melt — fires the first time a frozen/ice tile is struck but
+     not yet freed. Cracked-ice flash + a downward melt-drip so the player feels
+     the ice giving way. Reduced-motion keeps a static cracked frame. */
+  background:
+    linear-gradient(135deg, transparent 38%, rgba(255, 255, 255, 0.85) 40%, transparent 42%),
+    linear-gradient(48deg, transparent 58%, rgba(210, 244, 255, 0.7) 60%, transparent 62%),
+    radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.5) 0%, transparent 45%);
+  animation: blast-frost-melt-flash 460ms ease-out forwards;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 14%;
+    height: 14%;
+    border-radius: 0 50% 50% 50%;
+    transform: translate(-50%, 0) rotate(45deg);
+    background: rgba(180, 232, 255, 0.9);
+    box-shadow: 0 0 6px rgba(125, 224, 255, 0.9);
+    animation: blast-frost-drip 520ms ease-in forwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 0.9;
+    &::after { animation: none; opacity: 0; }
+  }
+  @keyframes blast-frost-melt-flash {
+    0% { opacity: 0; transform: scale(0.85); }
+    35% { opacity: 1; transform: scale(1.04); }
+    100% { opacity: 0; transform: scale(1); }
+  }
+  @keyframes blast-frost-drip {
+    0% { transform: translate(-50%, 0) rotate(45deg) scale(0.6); opacity: 0; }
+    40% { opacity: 1; }
+    100% { transform: translate(-50%, 220%) rotate(45deg) scale(1); opacity: 0; }
+  }
+}
+
 @utility blast-tile-cracked {
   /* ── Multi-hit crack progression — visual damage states ── */
 

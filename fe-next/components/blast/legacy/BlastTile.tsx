@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { Lock } from 'lucide-react';
+import { Snowflake } from 'lucide-react';
 import type { BlastTileType } from './types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -284,7 +284,7 @@ export const BlastTile = memo(function BlastTile({
         // Clear the live activation-effect flag when its own keyframe finishes.
         // Name-guarding prevents other keyframes (falling, appearing, etc.) from clearing it.
         const name = e.animationName;
-        if (name === 'blast-frost-shatter' || name === 'blast-tile-birth' || name === 'blast-shuffle-rearrange') {
+        if (name === 'blast-frost-shatter' || name === 'blast-tile-birth' || name === 'blast-shuffle-rearrange' || name === 'blast-frost-melt-flash') {
           setLiveActivationEffect(null);
         }
       }}
@@ -411,13 +411,27 @@ export const BlastTile = memo(function BlastTile({
           aria-hidden="true"
         />
       )}
+      {(liveActivationEffect === 'frost-crack' || liveActivationEffect === 'ice-crack') && (
+        /* Visible one-hit melt — the FIRST hit on a frozen/ice tile now reads
+           clearly: cracked-ice flash + a melt drip. The intermediate state was
+           previously silent. Reduced-motion users get a static crack frame
+           (CSS @media handles the freeze). */
+        <span
+          data-testid="frost-melt"
+          className="blast-frost-melt absolute inset-0 rounded-neo pointer-events-none z-30"
+          aria-hidden="true"
+        />
+      )}
       {isLocked && (
-        /* Full overlay for ice/frozen — legitimately hides inner tile until thawed,
-           or reveals it with a diamond glow when the lock is close to breaking. */
+        /* Frost shell for ice/frozen — reads as ICE (not a padlocked "locked"
+           mechanic). Hides the inner tile until a neighbouring word thaws it, or
+           reveals it with a diamond glow when it's close to breaking. */
         <span
           data-testid="locked-overlay"
-          className={`absolute inset-0 rounded-neo pointer-events-none z-20 flex flex-col items-center justify-center gap-0 ${
-            isDiamondRevealed ? 'bg-white/15 border-2 border-dashed border-cyan-300/50' : 'bg-blue-900/40'
+          className={`blast-frost-shell absolute inset-0 rounded-neo pointer-events-none z-20 flex flex-col items-center justify-center gap-0 ${
+            isDiamondRevealed
+              ? 'bg-white/15 border-2 border-dashed border-cyan-300/50'
+              : 'bg-linear-to-br from-cyan-200/30 via-sky-300/20 to-blue-400/30 border border-cyan-100/40'
           }`}
           aria-hidden="true"
         >
@@ -431,8 +445,8 @@ export const BlastTile = memo(function BlastTile({
               );
             })()
           ) : (
-            <span className="blast-lock-hint flex flex-col items-center">
-              <Lock className="w-[clamp(10px,2.6cqw,16px)] h-[clamp(10px,2.6cqw,16px)] text-white" strokeWidth={2.5} />
+            <span className="blast-frost-hint flex flex-col items-center">
+              <Snowflake className="w-[clamp(10px,2.6cqw,16px)] h-[clamp(10px,2.6cqw,16px)] text-cyan-50 drop-shadow-[0_0_3px_rgba(125,224,255,0.8)]" strokeWidth={2.5} />
               {type === 'frozen' && innerType ? (
                 (() => {
                   const InnerIcon = TILE_VISUALS[innerType]?.indicator;
