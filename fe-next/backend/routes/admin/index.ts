@@ -40,6 +40,7 @@ import systemHealthRoutes from './systemHealthRoutes';
 import analyticsRoutes from './analyticsRoutes';
 import moderationRoutes from './moderationRoutes';
 import cheatDetectionRoutes from './cheatDetectionRoutes';
+import curatorRoutes from './curatorRoutes';
 import adminGiftRoutes from '../adminGift';
 import adminNotificationRoutes from '../adminNotification';
 
@@ -85,6 +86,9 @@ router.use('/', systemHealthRoutes);
 
 // Utility routes (/api/admin/daily-word/*, /api/admin/send-test-email)
 router.use('/', utilityRoutes);
+
+// Language Curator assignments (/api/admin/curators)
+router.use('/curators', curatorRoutes);
 
 // Gift routes (/api/admin/gift/*)
 router.use('/gift', adminGiftRoutes);
