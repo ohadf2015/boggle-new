@@ -5,6 +5,7 @@ import { useInterval } from '@/hooks/useSafeTimeout';
 import Link from 'next/link';
 import Image from 'next/image';
 import { m } from 'framer-motion';
+import { MODE_IMAGE_ENTRANCE } from '@/lib/landing/modeImageEntrance';
 import { Flame, Check, Clock, Sparkles, X, Star, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
@@ -185,12 +186,32 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   if (!isClient) {
     return (
       <div className={cn(
-        'w-full h-full rounded-neo-lg border-3 border-neo-black shadow-hard-lg opacity-0',
+        'w-full h-full rounded-neo-lg border-3 border-neo-black shadow-hard-lg relative overflow-hidden',
         gradientClass,
         className
       )}
       style={{ padding: compact ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)' }}
       >
+        {/* Render the illustration at SSR (static, no client state) so it IS the
+            LCP element and paints before hydration — without this it would be
+            floored at hydration time. `priority` also emits the preload <link>
+            at SSR. The interactive banner swaps in on hydration with the image
+            in the same position, so there is no layout shift. */}
+        {!mascot && (
+          <div
+            className={cn('absolute pointer-events-none', isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0')}
+            style={{ width: 'clamp(5.5rem, 28cqw, 8rem)', height: 'clamp(5.5rem, 28cqw, 8rem)' }}
+          >
+            <Image
+              src="/modes/daily.png"
+              alt=""
+              fill
+              priority
+              className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+              sizes="(max-width: 640px) 96px, 192px"
+            />
+          </div>
+        )}
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="rounded-neo border-2 border-neo-black bg-neo-yellow shrink-0 w-10 h-10 sm:w-14 sm:h-14" />
           <div className="flex-1 min-w-0 space-y-2">
@@ -267,9 +288,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               width: 'clamp(5.5rem, 28cqw, 8rem)',
               height: 'clamp(5.5rem, 28cqw, 8rem)',
             }}
-            initial={{ scale: 0.6, opacity: 0, y: 20 }}
-            whileInView={{ scale: 1, opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            {...MODE_IMAGE_ENTRANCE}
             animate={isHovered
               ? { scale: 1.08, y: -6, rotate: isRTL ? -5 : 5 }
               : { scale: 1, y: 0, rotate: 0 }
@@ -280,6 +299,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
               src="/modes/daily.png"
               alt=""
               fill
+              priority
               className={cn(
                 'object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
                 isHovered ? 'brightness-110' : 'brightness-100'

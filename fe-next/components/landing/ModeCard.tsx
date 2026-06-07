@@ -12,6 +12,7 @@ import { useTiltEffect } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { haptics } from '@/utils/haptics';
 import { MascotHaloGlow, type HaloTone } from '@/components/mascot/MascotHaloGlow';
+import { MODE_IMAGE_ENTRANCE } from '@/lib/landing/modeImageEntrance';
 
 // Card variant → halo tone. Each tone amplifies the variant's existing
 // accent (cyan/pink card gets pink-cyan halo; purple gets purple-pink; etc.)
@@ -80,6 +81,8 @@ interface ModeCardProps {
   difficultyLabel?: string;
   /** Path to custom mode sticker image — replaces the small icon box with a large floating sticker */
   modeImage?: string;
+  /** Above-the-fold LCP card — eager-loads the mode image at high fetch priority */
+  priority?: boolean;
 }
 
 /**
@@ -109,6 +112,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   difficulty,
   difficultyLabel,
   modeImage,
+  priority = false,
 }) => {
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -292,9 +296,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
             width: 'clamp(5.5rem, 28cqw, 8rem)',
             height: 'clamp(5.5rem, 28cqw, 8rem)',
           }}
-          initial={{ scale: 0.6, opacity: 0, y: 20 }}
-          whileInView={{ scale: 1, opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          {...MODE_IMAGE_ENTRANCE}
           animate={isHovered
             ? { scale: 1.08, y: -6, rotate: isRTL ? -5 : 5 }
             : { scale: 1, y: 0, rotate: 0 }
@@ -312,6 +314,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
               src={modeImage}
               alt=""
               fill
+              priority={priority}
               className={cn(
                 'object-contain',
                 'drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',

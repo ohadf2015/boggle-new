@@ -16,6 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { requiresNetworkToPlay } from '@/lib/offline/landingOfflineAwareness';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
+import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
 
 interface DailyChallengePreloadedStats {
   hasPlayed: boolean;
@@ -65,7 +66,7 @@ type LandingCardKey =
   | 'crossword';
 
 /** Default card order when no server data available */
-const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'practice', 'blast', 'connections', 'brainGym'];
+const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 'connections', 'brainGym'];
 
 /**
  * Featured landing modes — surfaces every shippable mode so players can
@@ -184,17 +185,10 @@ export function LandingChallengeCards({
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
-  // Guarantee blast always appears before adventure (regardless of popularity ranking)
-  const serverOrder: LandingCardKey[] = (() => {
-    const order = [...rawOrder];
-    const blastIdx = order.indexOf('blast');
-    const adventureIdx = order.indexOf('adventure');
-    if (blastIdx > 0 && adventureIdx >= 0 && blastIdx > adventureIdx) {
-      order.splice(blastIdx, 1);
-      order.splice(adventureIdx, 0, 'blast');
-    }
-    return order;
-  })();
+  // Bump Blast up the hub: it sits directly after the multiplayer ('arena')
+  // card, regardless of popularity ranking. (Supersedes the old
+  // blast-before-adventure rule — arena is always above adventure.)
+  const serverOrder: LandingCardKey[] = placeBlastAfterArena(rawOrder);
   // Veterans have completed practice — remove it so it doesn't compete for
   // the featured-row slot or the SP grid (they don't need the onramp).
   const practiceFiltered: LandingCardKey[] = isVeteran
@@ -223,6 +217,7 @@ export function LandingChallengeCards({
               href={`/${language}/multiplayer`}
               icon={<Swords className="w-6 h-6" />}
               modeImage="/modes/arena.png"
+              priority
               variant="pink"
               liveBadge={{ openRooms, totalPlayers, roomsLabel: t('landing.openRooms'), playersLabel: t('landing.playersLive') }}
               playerCount={{ count: activePlayers, label: t('landing.playingNow') }}
@@ -248,6 +243,7 @@ export function LandingChallengeCards({
               href={`/${language}/practice`}
               icon={<BookOpen className="w-6 h-6" />}
               modeImage="/modes/practice.png"
+              priority
               variant="cyan"
               personalBest={playerAllTimeBest ? { score: playerAllTimeBest.score, label: t('landing.personalBest') } : undefined}
               highlighted={showPracticeHighlight}
