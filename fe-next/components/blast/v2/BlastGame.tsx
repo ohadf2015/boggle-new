@@ -561,6 +561,9 @@ export function BlastGame({
         fastestLabel={finalStats?.fastestLabel}
         isNewFast={finalStats?.isNewFast}
         isNewBonus={finalStats?.isNewBonus}
+        chestNumber={progressState.chestNumber}
+        chestProgress={Math.min(1, progressState.chestProgress + state.chestProgress)}
+        chestProgressGain={state.chestProgress}
         onNext={onAdvance}
       />
     );

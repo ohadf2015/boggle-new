@@ -86,4 +86,24 @@ describe('BlastLevelCompleteCard (trimmed)', () => {
     render(<BlastLevelCompleteCard {...baseProps} stars={3} bestStars={3} isNewBest />);
     expect(screen.getByTestId('complete-newbest')).toBeInTheDocument();
   });
+
+  describe('chest progression insight', () => {
+    it('surfaces chest fill % and the gain earned this level', () => {
+      render(<BlastLevelCompleteCard {...baseProps} chestProgress={0.6} chestProgressGain={0.2} chestNumber={3} />);
+      const chest = screen.getByTestId('complete-chest');
+      expect(chest).toHaveAttribute('data-chest-pct', '60');
+      expect(chest.textContent).toContain('60%');
+      expect(chest.textContent).toContain('+20%'); // the delta from THIS level
+    });
+
+    it('shows a "ready to open" callout when the chest is full', () => {
+      render(<BlastLevelCompleteCard {...baseProps} chestProgress={1} chestProgressGain={0.1} />);
+      expect(screen.getByTestId('complete-chest-ready')).toBeInTheDocument();
+    });
+
+    it('omits the chest block entirely when no chest data is provided', () => {
+      render(<BlastLevelCompleteCard {...baseProps} />);
+      expect(screen.queryByTestId('complete-chest')).not.toBeInTheDocument();
+    });
+  });
 });

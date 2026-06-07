@@ -45,6 +45,13 @@ type Props = {
   // repeated the board). Accepted so existing call sites don't break.
   wordsFoundList?: string[];
   gemsCollected?: number;
+  /** Chest fill 0..1 AFTER this level (server-known progress + in-game gain). */
+  chestProgress?: number;
+  /** Chest fill gained THIS level (0..1) — surfaced as "+N%" so the reward
+   *  loop is visible at the moment the player earned it. */
+  chestProgressGain?: number;
+  /** Current chest number being filled. */
+  chestNumber?: number;
 };
 
 // Pick a single "story" line so the screen doesn't recite the same metrics
@@ -134,6 +141,9 @@ export function BlastLevelCompleteCard({
   cascadeCount,
   timeSeconds,
   bestChainDepth,
+  chestProgress,
+  chestProgressGain = 0,
+  chestNumber,
 }: Props) {
   const { t } = useLanguage();
   const showStars = typeof stars === 'number' && stars > 0;
@@ -141,6 +151,14 @@ export function BlastLevelCompleteCard({
   const wordCount = wordsFound ?? themeWordCount ?? 0;
   const showWords = wordCount > 0;
   const showBest = typeof bestStars === 'number' && bestStars > 0;
+  // Chest progression — the core reward loop. Surfacing it on the result screen
+  // (with the "+N% this level" delta and a near-full nudge) turns each clear
+  // into visible progress toward the next chest, the strongest replay pull.
+  const showChest = typeof chestProgress === 'number';
+  const chestPct = Math.round(Math.min(1, Math.max(0, chestProgress ?? 0)) * 100);
+  const chestGainPct = Math.round(Math.min(1, Math.max(0, chestProgressGain)) * 100);
+  const chestReady = (chestProgress ?? 0) >= 1;
+  const chestAlmost = !chestReady && (chestProgress ?? 0) >= 0.85;
 
   const highlight = pickHighlight({ stars, bonusWordsFound, cascadeCount, bestChainDepth, timeSeconds, completionReason });
   // Celebration intensity scales to the outcome — soft partial / standard win /
@@ -449,6 +467,35 @@ export function BlastLevelCompleteCard({
                 ⭐ {bonusWordsFound} {t('blast.complete.bonusLabel', 'Bonus')}
               </span>
             )}
+          </div>
+        )}
+
+        {/* Chest progression — the reward loop made visible. */}
+        {showChest && (
+          <div data-testid="complete-chest" data-chest-pct={chestPct} className="mt-4 text-left">
+            <div className="flex items-center justify-between mb-1 text-[10px] font-bold uppercase tracking-[0.16em]">
+              <span className="opacity-80">
+                🎁 {t('blast.complete.chestLabel', 'Chest')}{chestNumber ? ` ${chestNumber}` : ''}
+              </span>
+              <span style={{ color: modeColor }}>
+                {chestPct}%{chestGainPct > 0 ? ` (+${chestGainPct}%)` : ''}
+              </span>
+            </div>
+            <div
+              className="h-2.5 rounded-full overflow-hidden"
+              style={{ background: 'rgba(255,255,255,0.1)', border: `1px solid color-mix(in srgb, ${modeColor} 40%, transparent)` }}
+            >
+              <div style={{ width: `${chestPct}%`, height: '100%', background: modeColor, boxShadow: `0 0 8px ${modeColor}` }} />
+            </div>
+            {chestReady ? (
+              <div data-testid="complete-chest-ready" className="mt-1.5 text-[11px] font-black uppercase tracking-wider" style={{ color: '#FFE135', textShadow: '1px 1px 0 #0b1530' }}>
+                {t('blast.complete.chestReady', 'Chest ready to open!')}
+              </div>
+            ) : chestAlmost ? (
+              <div className="mt-1.5 text-[10px] font-bold uppercase tracking-wider opacity-75">
+                {t('blast.complete.chestAlmost', 'Almost full — one more level!')}
+              </div>
+            ) : null}
           </div>
         )}
 
