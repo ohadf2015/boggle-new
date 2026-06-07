@@ -9431,7 +9431,10 @@ const en = {
       "chainLabel": "Best Chain",
       "gemsLabel": "Gems",
       "timeLabel": "Time",
-      "wordsLabel": "Words"
+      "wordsLabel": "Words",
+      "chestLabel": "Chest",
+      "chestReady": "Chest ready to open!",
+      "chestAlmost": "Almost full — one more level!"
     },
     "failed": {
       "title": "Out of guesses!",
@@ -13048,6 +13051,10 @@ const en = {
       "activeGames": "Active Games",
       "auth": "Authenticated",
       "connectedPlayers": "Connected Players",
+      "disconnected": "disconnected",
+      "host": "Host",
+      "private": "Private",
+      "stalled": "Stalled?",
       "game": "Game",
       "games": "Games",
       "guest": "Guest",
@@ -13164,6 +13171,7 @@ const en = {
       "admin_note": "Admin Note",
       "approve": "Approve",
       "close": "Close",
+      "empty": "No requests",
       "col": {
         "country": "Country",
         "email": "Email",
@@ -13197,6 +13205,41 @@ const en = {
       "title": "Teacher Access"
     },
     "todayGames": {
+      "detail": {
+        "acquisition": "Came from",
+        "botsNa": "bots not recorded",
+        "country": "Country",
+        "device": "Device",
+        "duration": "Duration",
+        "error": "Error",
+        "errors": "Errors",
+        "gameCode": "Game Code",
+        "invitedBy": "Invited by",
+        "mode": "Mode",
+        "platform": "Platform",
+        "players": "Players",
+        "posthog": "View in PostHog",
+        "profile": "Player profile",
+        "result": "Result",
+        "session": "Session",
+        "winner": "Winner"
+      },
+      "source": {
+        "analyticsAll": "All plays (incl. guests)",
+        "hint": "Analytics = every play incl. anonymous; Tables = per-product records",
+        "label": "Data source",
+        "noLanguage": "Language is not recorded per play in the all-plays source",
+        "productTables": "Product tables"
+      },
+      "status": {
+        "abandoned": "Abandoned",
+        "completed": "Completed",
+        "errored": "Error",
+        "left": "Left mid-game"
+      },
+      "noData": "No games found",
+      "truncated": "Results capped — narrow the date range for details",
+      "unclassifiedModes": "Unclassified modes",
       "allLanguages": "All Languages",
       "allModes": "All Game Modes",
       "allTypes": "All Types",

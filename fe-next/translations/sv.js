@@ -7339,6 +7339,7 @@ const sv = {
       "teacherAccess": "Lärargång"
     },
     "teacherAccess": {
+      "empty": "Inga begäranden",
       "title": "Lägaråtkomstbegäranden",
       "count": { "pending": "Väntande", "approved": "Godkänd", "declined": "Avvisad", "total": "Totalt" },
       "filter_status": "Status",
@@ -7422,7 +7423,11 @@ const sv = {
       "started": "Startad",
       "lastUpdated": "Senast uppdaterad",
       "singlePlayerLive": "Live Solo",
-      "mode": "Läge"
+      "mode": "Läge",
+      "disconnected": "Frånkopplad",
+      "host": "Värd",
+      "private": "Privat",
+      "stalled": "Pausad?"
     },
     "email": {
       "title": "E-posttestning",
@@ -7438,6 +7443,31 @@ const sv = {
       "info": "Testmail skickas med prefixet [TEST] i ämnesraden. De använder samma mall som produktionens dagliga utmaningsmail."
     },
     "todayGames": {
+      "detail": {
+        "acquisition": "Kom från",
+        "botsNa": "bottar ej registrerade",
+        "country": "Land",
+        "device": "Enhet",
+        "duration": "Varaktighet",
+        "error": "Fel",
+        "errors": "Fel",
+        "gameCode": "Spel-kod",
+        "invitedBy": "Inbjuden av",
+        "mode": "Läge",
+        "platform": "Plattform",
+        "players": "Spelare",
+        "posthog": "Visa i PostHog",
+        "profile": "Spelarprofil",
+        "result": "Resultat",
+        "session": "Session",
+        "winner": "Vinnare"
+      },
+      "status": {
+        "abandoned": "Övergiven",
+        "completed": "Slutförd",
+        "errored": "Fel",
+        "left": "Lämnade mitt i spelet"
+      },
       "title": "Dagens Spel",
       "refresh": "Uppdatera",
       "retry": "Försök igen",
@@ -7471,6 +7501,11 @@ const sv = {
       "of": "av",
       "lastUpdated": "Senast uppdaterad",
       "source": {
+        "analyticsAll": "Alla spel (inkl. gäster)",
+        "hint": "Analys = varje spel inkl. anonym; Tabeller = per-produkt-poster",
+        "label": "Datakälla",
+        "noLanguage": "Språk ej registrerat per spel i all-plays-källan",
+        "productTables": "Produkttabeller",
         "search": "Sökmotor",
         "social": "Sociala medier",
         "ai": "AI",
@@ -7492,7 +7527,10 @@ const sv = {
         "30d": "Senaste 30 dagarna",
         "90d": "Senaste 90 dagarna",
         "all": "All tid"
-      }
+      },
+      "noData": "Inga spel funna",
+      "truncated": "Resultaten är begränsade — minska datumintervallet för mer detaljer",
+      "unclassifiedModes": "Oklassificerade lägen"
     },
     "templateEditor": {
       "previewTitle": "Förhandsgranska med exempeldata",
@@ -9623,7 +9661,10 @@ const sv = {
       "stars": "stjärnor",
       "coins": "Mynt",
       "cascadesLabel": "Kaskader",
-      "next": "Nästa nivå"
+      "next": "Nästa nivå",
+      "chestLabel": "Kista",
+      "chestReady": "Kistan är redo att öppnas!",
+      "chestAlmost": "Nästan full — en nivå till!"
     },
     "failed": {
       "title": "Slut på gissningar!",

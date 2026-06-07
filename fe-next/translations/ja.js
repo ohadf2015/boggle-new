@@ -7359,6 +7359,7 @@ const ja = {
       "teacherAccess": "先生アクセス"
     },
     "teacherAccess": {
+      "empty": "リクエストはありません",
       "title": "先生アクセスリクエスト",
       "count": { "pending": "保留中", "approved": "承認済み", "declined": "却下", "total": "合計" },
       "filter_status": "ステータス",
@@ -7418,6 +7419,10 @@ const ja = {
       }
     },
     "live": {
+      "disconnected": "切断",
+      "host": "ホスト",
+      "private": "プライベート",
+      "stalled": "スタック中？",
       "subtitle": "リアルタイムゲーム監視",
       "live": "ライブ",
       "games": "ゲーム",
@@ -7458,6 +7463,31 @@ const ja = {
       "info": "テストメールは件名に[TEST]プレフィックスが付いて送信されます。本番のデイリーチャレンジメールと同じテンプレートを使用します。"
     },
     "todayGames": {
+      "detail": {
+        "acquisition": "取得元",
+        "botsNa": "ボット未記録",
+        "country": "国",
+        "device": "デバイス",
+        "duration": "時間",
+        "error": "エラー",
+        "errors": "エラー",
+        "gameCode": "ゲームコード",
+        "invitedBy": "招待者",
+        "mode": "モード",
+        "platform": "プラットフォーム",
+        "players": "プレイヤー",
+        "posthog": "PostHogで表示",
+        "profile": "プレイヤープロフィール",
+        "result": "結果",
+        "session": "セッション",
+        "winner": "勝者"
+      },
+      "status": {
+        "abandoned": "放棄",
+        "completed": "完了",
+        "errored": "エラー",
+        "left": "途中退出"
+      },
       "title": "今日のゲーム",
       "refresh": "更新",
       "retry": "再試行",
@@ -7491,6 +7521,11 @@ const ja = {
       "of": "/",
       "lastUpdated": "最終更新",
       "source": {
+        "analyticsAll": "全プレイ（ゲスト含む）",
+        "hint": "分析 = ゲスト含むすべてのプレイ、テーブル = 製品別レコード",
+        "label": "データソース",
+        "noLanguage": "言語は全プレイソースでは記録されていません",
+        "productTables": "製品テーブル",
         "search": "検索",
         "social": "ソーシャル",
         "ai": "AI",
@@ -7502,6 +7537,9 @@ const ja = {
         "direct": "直接アクセス",
         "unknown": "不明"
       },
+      "noData": "ゲームが見つかりません",
+      "truncated": "結果が制限されています — より詳細なデータは期間を絞ってください",
+      "unclassifiedModes": "未分類モード",
       "blast": "ブラスト",
       "wordWheel": "ワードホイール",
       "practice": "練習",
@@ -9571,6 +9609,9 @@ const ja = {
     "description": "ボードをクリア！単語でタイルを爆破。",
     "progress": "クリア済み",
     "complete": {
+      "chestLabel": "チェスト",
+      "chestReady": "チェストを開ける準備完了！",
+      "chestAlmost": "もうすぐ満杯 — あと1レベル！",
       "title": "レベルクリア！",
       "titlePartial": "ボードクリア！",
       "skip": "結果を表示",

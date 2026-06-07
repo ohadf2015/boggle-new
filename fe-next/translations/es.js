@@ -7284,6 +7284,7 @@ const es = {
     },
     "teacherAccess": {
       "title": "Solicitudes de acceso de maestro",
+      "empty": "Sin solicitudes",
       "count": { "pending": "Pendiente", "approved": "Aprobado", "declined": "Rechazado", "total": "Total" },
       "filter_status": "Estado",
       "filter_status_all": "Todo",
@@ -7366,7 +7367,11 @@ const es = {
       "started": "Iniciado",
       "lastUpdated": "Última actualización",
       "singlePlayerLive": "Solo en vivo",
-      "mode": "Modo"
+      "mode": "Modo",
+      "disconnected": "desconectado",
+      "host": "Anfitrión",
+      "private": "Privado",
+      "stalled": "¿Estancado?"
     },
     "email": {
       "title": "Prueba de Email",
@@ -7383,6 +7388,34 @@ const es = {
     },
     "todayGames": {
       "title": "Juegos de Hoy",
+      "detail": {
+        "acquisition": "Proviene de",
+        "botsNa": "bots no registrados",
+        "country": "País",
+        "device": "Dispositivo",
+        "duration": "Duración",
+        "error": "Error",
+        "errors": "Errores",
+        "gameCode": "Código de Juego",
+        "invitedBy": "Invitado por",
+        "mode": "Modo",
+        "platform": "Plataforma",
+        "players": "Jugadores",
+        "posthog": "Ver en PostHog",
+        "profile": "Perfil del jugador",
+        "result": "Resultado",
+        "session": "Sesión",
+        "winner": "Ganador"
+      },
+      "status": {
+        "abandoned": "Abandonado",
+        "completed": "Completado",
+        "errored": "Error",
+        "left": "Se fue durante el juego"
+      },
+      "noData": "Sin juegos encontrados",
+      "truncated": "Resultados limitados — reduce el rango de fechas para más detalles",
+      "unclassifiedModes": "Modos sin clasificar",
       "refresh": "Actualizar",
       "retry": "Reintentar",
       "totalGames": "Total",
@@ -7415,6 +7448,11 @@ const es = {
       "of": "de",
       "lastUpdated": "Última actualización",
       "source": {
+        "analyticsAll": "Todas las partidas (incl. invitados)",
+        "hint": "Analíticas = cada partida incl. anónimas; Tablas = registros por producto",
+        "label": "Fuente de datos",
+        "noLanguage": "El idioma no se registra por partida en la fuente de todas las partidas",
+        "productTables": "Tablas de producto",
         "search": "Búsqueda",
         "social": "Redes sociales",
         "ai": "IA",
@@ -9607,7 +9645,14 @@ const es = {
       "stars": "estrellas",
       "coins": "Monedas",
       "cascadesLabel": "Cascadas",
-      "next": "Siguiente nivel"
+      "next": "Siguiente nivel",
+      "chainLabel": "Mejor cadena",
+      "gemsLabel": "Gemas",
+      "timeLabel": "Tiempo",
+      "wordsLabel": "Palabras",
+      "chestLabel": "Cofre",
+      "chestReady": "¡Cofre listo para abrir!",
+      "chestAlmost": "Casi lleno — ¡un nivel más!"
     },
     "failed": {
       "title": "¡Sin intentos!",

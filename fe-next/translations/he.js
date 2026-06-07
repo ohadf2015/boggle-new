@@ -7293,6 +7293,7 @@ const he = {
     },
     "teacherAccess": {
       "title": "בקשות גישת מורה",
+      "empty": "אין בקשות",
       "count": {
         "pending": "בהמתנה",
         "approved": "אושר",
@@ -7425,6 +7426,10 @@ const he = {
     },
     "live": {
       "subtitle": "מעקב משחקים בזמן אמת",
+      "disconnected": "נותק",
+      "host": "מארח",
+      "private": "פרטי",
+      "stalled": "תקוע?",
       "live": "חי",
       "games": "משחקים",
       "players": "שחקנים",
@@ -7465,6 +7470,25 @@ const he = {
     },
     "todayGames": {
       "title": "משחקי היום",
+      "detail": {
+        "acquisition": "הגיע מהיכן",
+        "botsNa": "בוטים לא נרשמו",
+        "country": "מדינה",
+        "device": "מכשיר",
+        "duration": "משך",
+        "error": "שגיאה",
+        "errors": "שגיאות",
+        "gameCode": "קוד משחק",
+        "invitedBy": "הוזמן על ידי",
+        "mode": "מצב",
+        "platform": "פלטפורמה",
+        "players": "שחקנים",
+        "posthog": "צפה ב-PostHog",
+        "profile": "פרופיל שחקן",
+        "result": "תוצאה",
+        "session": "חיבור",
+        "winner": "המנצח"
+      },
       "refresh": "רענן",
       "retry": "נסה שוב",
       "totalGames": "סה״כ",
@@ -7493,10 +7517,16 @@ const he = {
       "firstGame": "המשחק הראשון של אורח זה",
       "noGames": "אין עדיין משחקים היום",
       "noGamesHint": "משחקים יופיעו כאן כשהשחקנים יתחילו לשחק",
+      "noData": "לא נמצאו משחקים",
       "showing": "מציג",
       "of": "מתוך",
       "lastUpdated": "עודכן לאחרונה",
       "source": {
+        "analyticsAll": "כל ההשחקות (כולל אורחים)",
+        "hint": "אנליטיקה = כל השחקה כולל אנונימי; טבלאות = רשומות לפי מוצר",
+        "label": "מקור נתונים",
+        "noLanguage": "שפה אינה נרשמת לכל משחק במקור הכל-ההשחקות",
+        "productTables": "טבלאות מוצר",
         "search": "חיפוש",
         "social": "רשת חברתית",
         "ai": "בינה מלאכותית",
@@ -7508,9 +7538,17 @@ const he = {
         "direct": "כניסה ישירה",
         "unknown": "לא ידוע"
       },
+      "status": {
+        "abandoned": "נטוש",
+        "completed": "הושלם",
+        "errored": "שגיאה",
+        "left": "עזב באמצע המשחק"
+      },
       "blast": "בלאסט",
       "wordWheel": "גלגל מילים",
       "practice": "תרגול",
+      "truncated": "התוצאות הוגבלו — צמצמו את טווח התאריכים לפרטים",
+      "unclassifiedModes": "מצבים לא מסווגים",
       "dateRange": "טווח תאריכים",
       "range": {
         "today": "היום",
@@ -9825,7 +9863,10 @@ const he = {
       "chainLabel": "שרשרת הכי טובה",
       "gemsLabel": "יהלומים",
       "timeLabel": "זמן",
-      "wordsLabel": "מילים"
+      "wordsLabel": "מילים",
+      "chestLabel": "תיבה",
+      "chestReady": "התיבה מוכנה לפתיחה!",
+      "chestAlmost": "כמעט מלאה — עוד שלב אחד!"
     },
     "failed": {
       "title": "נגמרו הניחושים!",
