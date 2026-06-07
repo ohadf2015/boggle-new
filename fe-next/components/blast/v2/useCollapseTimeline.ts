@@ -30,18 +30,19 @@ export function useCollapseTimeline(
     const tiles = boardRef.current.querySelectorAll<HTMLElement>('[data-cell-id]');
     const tl = gsap.timeline();
     tiles.forEach((el, i) => {
-      // Land thump — a single squash → settle. The previous tuning ended on
-      // `back.out(1.4)` which added a bouncy overshoot tail that felt jelly
-      // after gravity. Now a clean squash-and-settle with eased-out recovery;
-      // no extra bounce keyframe, so the tile reads as a heavy block rather
-      // than a rubber ball. Stagger 18ms per tile keeps the cascade cadence.
+      // Land thump — squash → settle with proper squash-AND-STRETCH: as the
+      // tile compresses vertically it bulges horizontally (volume conservation),
+      // so the landing reads as a real WEIGHTY impact instead of just getting
+      // shorter. Kept subtle (5% bulge) so tiles never overlap neighbours, and
+      // still no spring overshoot tail (the previous `back.out(1.4)` felt jelly)
+      // — a heavy block, not a rubber ball. Stagger 18ms per tile keeps cadence.
       const startAt = i * 0.018;
       tl.fromTo(
         el,
         { scaleY: 1, scaleX: 1 },
         {
-          scaleY: 0.88,
-          scaleX: 1,
+          scaleY: 0.86,
+          scaleX: 1.05,
           duration: 0.07,
           ease: 'power3.in',
           transformOrigin: 'bottom center',

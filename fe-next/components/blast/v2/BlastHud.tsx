@@ -72,7 +72,7 @@ function CoinDisplay({ coins, modeColor }: { coins: number; modeColor: string })
   return (
     <m.div
       data-testid="coin-counter"
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-black text-base tabular-nums"
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-neo-display font-black text-lg tabular-nums"
       style={{
         scale,
         background: 'rgba(0,0,0,0.45)',
@@ -152,7 +152,7 @@ export function BlastHud({
             {theme && (
               <span
                 data-testid="theme-label"
-                className="text-base font-black uppercase tracking-wide truncate mt-0.5"
+                className="text-base font-neo-display font-black uppercase tracking-wide truncate mt-0.5"
                 style={{ color: modeColor, textShadow: `1px 1px 0 #0b1530` }}
               >
                 {t(`blast.themes.${theme}`, theme)}

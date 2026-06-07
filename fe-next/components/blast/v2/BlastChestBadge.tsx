@@ -138,7 +138,7 @@ export function BlastChestBadge({
       <div className="flex items-center gap-1.5 leading-none">
         <span aria-hidden style={{ filter: `drop-shadow(0 0 4px ${rimColor})` }}>📦</span>
         <span
-          className="font-black text-sm tracking-wide"
+          className="font-neo-display font-black text-sm tracking-wide"
           style={{ color: '#fff', textShadow: `1px 1px 0 #0b1530` }}
         >
           {t(`blast.chest.tier.${tier}`, tier.toUpperCase())}
