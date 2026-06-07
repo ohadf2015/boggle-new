@@ -391,7 +391,7 @@ export function PortraitGameLayout({
       )}
 
       {/* Game grid - Takes remaining space */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 pt-1 relative z-30 min-h-0">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 pt-1 relative z-30 min-h-0 [container-type:size]">
         {/* Instruction Banner - Absolute overlay, doesn't shift grid */}
         <AdaptiveAnimatePresence>
           {showHintPrompt && !isPaused && !isGameOver && remainingTime > 0 && (
@@ -411,7 +411,10 @@ export function PortraitGameLayout({
           )}
         </AdaptiveAnimatePresence>
 
-        <div className="game-board-container relative w-full max-w-[min(90vw,360px)] max-h-full aspect-square">
+        <div
+          className="game-board-container relative aspect-square mx-auto"
+          style={{ width: 'min(100cqw, 94cqh)' }}
+        >
           <GridComponent
             grid={grid}
             interactive={!isPaused}
