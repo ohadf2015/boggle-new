@@ -15,6 +15,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { WheelLetter, WordTile } from './WordWheelParts';
 import { useHoldToSubmit } from '@/hooks/useHoldToSubmit';
+import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
@@ -205,11 +206,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     }
   }, [score, rivals, onEffect, playComboSound]);
 
-  // ── Drag-to-build support ── (handlers defined after handleLetterPress)
+  // ── Drag-to-build support ── (handlers wired after handleLetterPress via the
+  // shared useWheelDragSpell hook). Only the pointer-position / dragging refs
+  // (also read by the Pixi ring + useHoldToSubmit) live here; the drag-state
+  // refs are encapsulated inside the hook.
   const draggingRef = useRef(false);
-  const lastDragIdxRef = useRef<number | null>(null);
-  const dragStartIdxRef = useRef<number | null>(null);
-  const dragEngagedRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
 
   // ── Double-tap-to-submit support ──
@@ -441,61 +442,28 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   }, [addLetter, holdSuppressClick, playButtonClickSound]);
 
   // ── Drag-to-build handlers (additive only — skips letters already used) ──
-  // Drag only engages once pointer moves to a DIFFERENT letter than the start,
-  // so single taps stay handled by the button's native onClick (preserving
-  // double-tap-to-submit without a duplicate press from pointerdown).
-  const tryDragHit = useCallback((clientX: number, clientY: number) => {
-    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
-    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    if (!btn) return;
-    const idx = Number(btn.dataset.wheelIndex);
-    if (idx === lastDragIdxRef.current) return;
-    if (!dragEngagedRef.current) {
-      const startIdx = dragStartIdxRef.current;
-      if (startIdx === null || idx === startIdx) return;
-      dragEngagedRef.current = true;
-      lastDragIdxRef.current = startIdx;
-      // Drag took over — abort any in-flight hold ring. Capture the eager-added
-      // index first so we don't re-add the start letter below.
+  // Shared with the practice wheel sandbox via useWheelDragSpell. Drag only
+  // engages once the pointer moves to a DIFFERENT letter than the start, so
+  // single taps stay handled by the button's native onClick (preserving
+  // double-tap-to-submit). onEngage aborts any in-flight hold ring and skips
+  // re-adding a letter the hold already eager-added.
+  const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
+    draggingRef,
+    pointerPosRef,
+    isIndexUsed: (i) => usedIndicesRef.current.has(i),
+    addLetter: (i, letter, el) => handleLetterPress(letter, i, el),
+    getBuiltLength: () => builtLettersRef.current.length,
+    submit: () => handleSubmitRef.current(),
+    onEngage: (startIdx) => {
       const eagerIdx = holdGetEagerAdded();
       holdCancel();
-      const startBtn = document.querySelector<HTMLButtonElement>(
-        `[data-wheel-index="${startIdx}"]`,
-      );
-      if (startBtn && !usedIndicesRef.current.has(startIdx) && eagerIdx !== startIdx) {
-        handleLetterPress(startBtn.dataset.wheelLetter || '', startIdx, startBtn);
-      }
-    }
-    if (usedIndicesRef.current.has(idx)) return;
-    lastDragIdxRef.current = idx;
-    handleLetterPress(btn.dataset.wheelLetter || '', idx, btn);
-  }, [handleLetterPress, holdCancel, holdGetEagerAdded]);
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    draggingRef.current = true;
-    dragEngagedRef.current = false;
-    lastDragIdxRef.current = null;
-    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
-  }, []);
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    pointerPosRef.current = { x: e.clientX, y: e.clientY };
-    if (!draggingRef.current) return;
-    tryDragHit(e.clientX, e.clientY);
-  }, [tryDragHit]);
-  const handlePointerUp = useCallback(() => {
-    pointerPosRef.current = null;
-    const wasEngaged = dragEngagedRef.current;
-    draggingRef.current = false;
-    lastDragIdxRef.current = null;
-    dragStartIdxRef.current = null;
-    dragEngagedRef.current = false;
-    if (wasEngaged && builtLettersRef.current.length >= 3) {
+      return eagerIdx !== startIdx;
+    },
+    onBeforeDragSubmit: () => { lastSubmitWasDragRef.current = true; },
+    cancelPendingSubmit: () => {
       if (idleSubmitTimerRef.current) { clearTimeout(idleSubmitTimerRef.current); idleSubmitTimerRef.current = null; }
-      lastSubmitWasDragRef.current = true;
-      handleSubmitRef.current();
-    }
-  }, []);
+    },
+  });
 
   // ── Remove built letter ──
   const handleRemoveLetter = useCallback((index: number) => {

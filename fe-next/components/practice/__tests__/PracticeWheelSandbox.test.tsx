@@ -53,10 +53,13 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(document.querySelector('[data-wheel-index="7"]')).toBeNull();
   });
 
-  it('renders reset + shuffle buttons (real-game parity)', () => {
+  it('renders clear, submit, and backspace buttons (live WordWheelGame parity)', () => {
     render(<PracticeWheelSandbox />);
     expect(screen.getByTestId('practice-wheel-reset')).toBeInTheDocument();
-    expect(screen.getByTestId('practice-wheel-shuffle')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-wheel-submit')).toBeInTheDocument();
+    expect(screen.getByTestId('practice-wheel-backspace')).toBeInTheDocument();
+    // Shuffle was dropped to match the real wheel's control set.
+    expect(screen.queryByTestId('practice-wheel-shuffle')).toBeNull();
   });
 
   it('reset clears any built letters', () => {
@@ -71,20 +74,17 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(used.length).toBe(0);
   });
 
-  it('shuffle keeps 7 wheel letters and rerenders the outer ring', () => {
+  it('backspace removes only the last built letter', () => {
     render(<PracticeWheelSandbox />);
-    const before = Array.from(
-      document.querySelectorAll('[data-wheel-letter]'),
-    ).map((el) => (el as HTMLElement).dataset.wheelLetter);
-    expect(before.length).toBe(7);
-    fireEvent.click(screen.getByTestId('practice-wheel-shuffle'));
-    const after = Array.from(
-      document.querySelectorAll('[data-wheel-letter]'),
-    ).map((el) => (el as HTMLElement).dataset.wheelLetter);
-    expect(after.length).toBe(7);
-    // Center never moves; outer 6 are the same set, possibly reordered.
-    expect(after[0]).toBe(before[0]);
-    expect(new Set(after.slice(1))).toEqual(new Set(before.slice(1)));
+    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
+    const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
+    const o2 = document.querySelector('[data-wheel-index="2"]') as HTMLElement;
+    fireEvent.click(center);
+    fireEvent.click(o1);
+    fireEvent.click(o2);
+    expect(document.querySelectorAll('[data-wheel-used="true"]').length).toBe(3);
+    fireEvent.click(screen.getByTestId('practice-wheel-backspace'));
+    expect(document.querySelectorAll('[data-wheel-used="true"]').length).toBe(2);
   });
 
   it('renders the inline PracticeCoachTip so the player learns by doing', () => {
@@ -111,17 +111,19 @@ describe('PracticeWheelSandbox redesigned', () => {
     expect(screen.queryByTestId('practice-chain-cta')).toBeNull();
   });
 
-  it('submit button hidden until built word reaches 3 letters (real min)', () => {
+  it('submit button stays disabled until built word reaches 3 letters (real min)', () => {
     render(<PracticeWheelSandbox />);
-    // Tap two letters → still hidden
+    // Always present (live-wheel parity) but disabled below the 3-letter min.
+    const submit = screen.getByTestId('practice-wheel-submit');
+    expect(submit).toBeDisabled();
     const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
     const outer = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
     fireEvent.click(center);
     fireEvent.click(outer);
-    expect(screen.queryByTestId('practice-wheel-submit')).toBeNull();
+    expect(submit).toBeDisabled();
   });
 
-  it('shows submit button at 3 letters then validates on tap', async () => {
+  it('enables submit at 3 letters then validates on tap', async () => {
     render(<PracticeWheelSandbox />);
     const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
     const o1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
@@ -130,6 +132,7 @@ describe('PracticeWheelSandbox redesigned', () => {
     fireEvent.click(o1);
     fireEvent.click(o2);
     const submit = screen.getByTestId('practice-wheel-submit');
+    expect(submit).toBeEnabled();
     fireEvent.click(submit);
     await waitFor(() => expect(validatorCheck).toHaveBeenCalled());
   });
@@ -154,5 +157,15 @@ describe('PracticeWheelSandbox layout', () => {
     const root = container.firstChild as HTMLElement;
     expect(root.className).toContain('h-full');
     expect(root.className).not.toContain('100dvh');
+  });
+
+  it('centers the wheel cluster vertically (flex-1 + justify-center) so it stays in the middle', () => {
+    // Regression guard for the "wheel stuck at the top with a big void below"
+    // bug. Mirrors the live WordWheelGame wheel-cluster which absorbs leftover
+    // vertical space and centers the wheel + action bar.
+    render(<PracticeWheelSandbox />);
+    const cluster = screen.getByTestId('wheel-cluster');
+    expect(cluster.className).toContain('flex-1');
+    expect(cluster.className).toContain('justify-center');
   });
 });

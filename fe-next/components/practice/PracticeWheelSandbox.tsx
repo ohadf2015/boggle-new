@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { ArrowLeft, Check, RotateCcw, Shuffle } from 'lucide-react';
+import { ArrowLeft, Delete, RotateCcw } from 'lucide-react';
 import { AnimatePresence, m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -17,6 +17,7 @@ import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistake
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
 import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
+import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 import { createMicroTutorial } from '@/lib/practice/microTutorial';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
 import {
@@ -108,13 +109,10 @@ export default function PracticeWheelSandbox() {
   const completedFiredRef = useRef(false);
   const isComplete = foundWords.length >= PRACTICE_GOALS.wheelRush;
 
-  // ── Drag-to-spell + idle auto-submit refs (parity with real WordWheelGame
-  // lines 162-397). Drag engages only after pointer moves to a DIFFERENT
-  // letter than the start so single taps stay single taps. ──
+  // ── Drag-to-spell + idle auto-submit refs. The drag-spell pointer algorithm
+  // is shared with the live WordWheelGame via useWheelDragSpell; only the
+  // pointer-position / dragging refs (also read by the Pixi ring) live here. ──
   const draggingRef = useRef(false);
-  const lastDragIdxRef = useRef<number | null>(null);
-  const dragStartIdxRef = useRef<number | null>(null);
-  const dragEngagedRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
   const idleSubmitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const builtRef = useRef(built);
@@ -241,62 +239,25 @@ export default function PracticeWheelSandbox() {
     };
   }, [built, isComplete, feedback, onSubmit]);
 
-  // ── Drag-to-spell (parity with real WordWheelGame.tsx:353-397) ──
-  // Drag only engages once pointer moves to a different letter than the start
-  // — so single taps stay single taps and onClick still fires.
-  const tryDragHit = useCallback((clientX: number, clientY: number) => {
-    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
-    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    if (!btn) return;
-    const idx = Number(btn.dataset.wheelIndex);
-    if (idx === lastDragIdxRef.current) return;
-    if (!dragEngagedRef.current) {
-      const startIdx = dragStartIdxRef.current;
-      if (startIdx === null || idx === startIdx) return;
-      dragEngagedRef.current = true;
-      lastDragIdxRef.current = startIdx;
-      const startBtn = document.querySelector<HTMLButtonElement>(
-        `[data-wheel-index="${startIdx}"]`,
-      );
-      if (startBtn && !usedIndicesRef.current.has(startIdx)) {
-        const startLetter = startBtn.dataset.wheelLetter || '';
-        setBuilt((prev) => [...prev, { letter: startLetter, originIndex: startIdx }]);
-      }
-    }
-    if (usedIndicesRef.current.has(idx)) return;
-    lastDragIdxRef.current = idx;
-    const letter = btn.dataset.wheelLetter || '';
-    setBuilt((prev) => [...prev, { letter, originIndex: idx }]);
-  }, []);
-
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    draggingRef.current = true;
-    dragEngagedRef.current = false;
-    lastDragIdxRef.current = null;
-    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
-  }, []);
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    pointerPosRef.current = { x: e.clientX, y: e.clientY };
-    if (!draggingRef.current) return;
-    tryDragHit(e.clientX, e.clientY);
-  }, [tryDragHit]);
-  const handlePointerUp = useCallback(() => {
-    pointerPosRef.current = null;
-    const wasEngaged = dragEngagedRef.current;
-    draggingRef.current = false;
-    lastDragIdxRef.current = null;
-    dragStartIdxRef.current = null;
-    dragEngagedRef.current = false;
-    if (wasEngaged && builtRef.current.length >= 3) {
+  // ── Drag-to-spell ── shared with the live WordWheelGame via useWheelDragSpell
+  // so practice and the real wheel can never drift. Drag engages only once the
+  // pointer moves to a different letter than the start, so single taps stay taps
+  // and the WheelLetter onClick path still fires.
+  const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
+    draggingRef,
+    pointerPosRef,
+    isIndexUsed: (i) => usedIndicesRef.current.has(i),
+    addLetter: (i, letter) =>
+      setBuilt((prev) => [...prev, { letter, originIndex: i }]),
+    getBuiltLength: () => builtRef.current.length,
+    submit: () => { void onSubmit(); },
+    cancelPendingSubmit: () => {
       if (idleSubmitTimerRef.current) {
         clearTimeout(idleSubmitTimerRef.current);
         idleSubmitTimerRef.current = null;
       }
-      onSubmit();
-    }
-  }, [onSubmit]);
+    },
+  });
 
   // ── Reset (clear built word) ──
   const handleReset = useCallback(() => {
@@ -305,34 +266,13 @@ export default function PracticeWheelSandbox() {
     sound.playButtonClickSound?.();
   }, [sound]);
 
-  // ── Shuffle outer letters (parity with real WordWheelGame.tsx:417-441) ──
-  // Built letters carry positional wheelIndex; after shuffle the same index
-  // would point to a different letter. Remap each built tile to its new
-  // position by letter (preferring unused positions for duplicates); drop any
-  // that can't be relocated. Center letter (originIndex 0) is unaffected.
-  const handleShuffle = useCallback(() => {
-    setOuterLetters((prev) => {
-      const arr = [...prev];
-      for (let i = arr.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      setBuilt((prevBuilt) => {
-        const claimed = new Set<number>();
-        const remapped: typeof prevBuilt = [];
-        for (const b of prevBuilt) {
-          if (b.originIndex === 0) { remapped.push(b); continue; }
-          const newIdx = arr.findIndex((l, idx) => l === b.letter && !claimed.has(idx + 1));
-          if (newIdx !== -1) {
-            claimed.add(newIdx + 1);
-            remapped.push({ letter: b.letter, originIndex: newIdx + 1 });
-          }
-        }
-        return remapped;
-      });
-      return arr;
-    });
-    sound.playBoardShuffleSound?.();
+  // ── Backspace (remove last built letter) — matches the live WordWheelGame
+  // action bar (WordWheelGame.tsx:515-518), which swapped Shuffle out for a
+  // single-step undo. Keeps practice controls identical to the real wheel. ──
+  const handleBackspace = useCallback(() => {
+    setBuilt((prev) => prev.slice(0, -1));
+    setFeedback(null);
+    sound.playButtonClickSound?.();
   }, [sound]);
 
   // Auto-clear feedback toast after 1.4s (matches real WheelRush UX).
@@ -401,156 +341,180 @@ export default function PracticeWheelSandbox() {
       <PracticeCoachTip mode="wheelRush" wordsFound={foundWords.length} />
       <PracticeMistakeCoach kind={coach.active} mode="wheelRush" onClose={coach.close} />
 
-      {/* Wheel — uses real WheelLetter for visual parity, with the real
-          decorative PixiJS orbital ring overlay (pointer-events-none, lazy).
-          Pointer handlers wire drag-to-spell so practice feels exactly like
-          live WheelRush. Single taps still pass through via WheelLetter's
-          onClick because dragEngagedRef gates the additive logic. */}
-      <div
-        data-testid="practice-wheel"
-        className="relative w-56 h-56 sm:w-64 sm:h-64 touch-none"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-      >
-        <div className="absolute inset-0 pointer-events-none">
-          <WordWheelPixiRing
-            selectedIndices={Array.from(usedIndices).map(idx => idx === 0 ? -1 : idx - 1)}
-            radius={RADIUS_PX}
-            combo={0}
-            pointerPosRef={pointerPosRef}
-            isDraggingRef={draggingRef}
-          />
-        </div>
-        <WheelLetter
-          letter={puzzle.center}
-          isCenter
-          index={0}
-          isUsed={usedIndices.has(0)}
-          onPress={onLetterPress}
-        />
-        {outerLetters.map((letter, i) => {
-          const idx = i + 1;
-          return (
-            <WheelLetter
-              key={`${letter}-${i}`}
-              letter={letter}
-              isCenter={false}
-              index={idx}
-              angle={i * (360 / outerLetters.length)}
-              radius={RADIUS_PX}
-              isUsed={usedIndices.has(idx)}
-              onPress={onLetterPress}
-            />
-          );
-        })}
-      </div>
-
-      {/* Feedback toast — mirrors real WheelRush feedback chrome. */}
-      <AnimatePresence>
-        {feedback && (
-          <m.div
-            key={feedback}
-            data-testid="practice-wheel-feedback"
-            initial={{ opacity: 0, y: -4, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className={
-              'px-3 py-1 rounded-neo border-2 text-xs font-neo-display font-black uppercase tracking-wider ' +
-              (feedback === 'ok'
-                ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
-                : feedback === 'noCenter'
-                  ? 'bg-neo-pink/20 border-neo-pink text-neo-pink'
-                  : feedback === 'dup'
-                    ? 'bg-neo-cream/15 border-neo-cream/50 text-neo-white'
-                    : 'bg-neo-red/20 border-neo-red text-neo-red')
-            }
-          >
-            {feedback === 'ok'
-              ? t('practice.wheelRush.found')
-              : feedback === 'noCenter'
-                ? t('practice.wheelRush.needsCenter')
-                : feedback === 'dup'
-                  ? t('practice.wheelRush.duplicate')
-                  : t('practice.wheelRush.notAWord')}
-          </m.div>
-        )}
-      </AnimatePresence>
-
-      {/* Built-word builder — uses real WordTile (tap to remove). Shakes
-          horizontally on bad / missing-center feedback (real-game parity).
-          Empty state shows a tap-or-drag hint so first-timers don't stare
-          at a blank rectangle. */}
+      {/* Built-word builder — sits ABOVE the wheel, matching live
+          WordWheelGame's layout order (WordWheelGame.tsx:772). Fixed height so
+          tile add/remove never shifts the centered wheel cluster below. Uses
+          real WordTile (tap to remove) and shakes horizontally on bad /
+          missing-center feedback (real-game parity). The feedback toast is
+          absolutely positioned under the builder so it never grows the box. */}
       <m.div
-        className="flex items-end gap-1 min-h-[3rem]"
+        className="relative w-full h-[52px] sm:h-[72px] flex items-center justify-center"
         data-testid="practice-built-word"
         animate={builderShake ? { x: [0, -8, 8, -6, 6, 0] } : { x: 0 }}
         transition={{ duration: 0.4 }}
       >
-        {built.length === 0 && (
-          <span className="text-neo-white font-neo-body text-xs italic">
-            {t('practice.wheelRush.builderHint')}
-          </span>
-        )}
-        <AnimatePresence mode="popLayout">
-          {built.map((b, i) => (
-            <WordTile
-              key={`${b.originIndex}-${i}`}
-              letter={b.letter}
-              index={i}
-              isCenter={b.originIndex === 0}
-              onRemove={onTileRemove}
-            />
-          ))}
+        <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
+          {built.length === 0 && (
+            <span className="text-neo-white/55 font-neo-body text-sm italic">
+              {t('practice.wheelRush.builderHint')}
+            </span>
+          )}
+          <AnimatePresence mode="popLayout">
+            {built.map((b, i) => (
+              <WordTile
+                key={`${b.originIndex}-${i}`}
+                letter={b.letter}
+                index={i}
+                isCenter={b.originIndex === 0}
+                onRemove={onTileRemove}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
+
+        {/* Feedback toast — mirrors real WheelRush feedback chrome, anchored
+            under the builder (absolute) like the live game (WordWheelGame.tsx:842). */}
+        <AnimatePresence>
+          {feedback && (
+            <m.div
+              key={feedback}
+              data-testid="practice-wheel-feedback"
+              initial={{ opacity: 0, y: -4, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className={
+                'absolute -bottom-6 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-neo border-2 text-xs font-neo-display font-black uppercase tracking-wider whitespace-nowrap ' +
+                (feedback === 'ok'
+                  ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
+                  : feedback === 'noCenter'
+                    ? 'bg-neo-pink/20 border-neo-pink text-neo-pink'
+                    : feedback === 'dup'
+                      ? 'bg-neo-cream/15 border-neo-cream/50 text-neo-white'
+                      : 'bg-neo-red/20 border-neo-red text-neo-red')
+              }
+            >
+              {feedback === 'ok'
+                ? t('practice.wheelRush.found')
+                : feedback === 'noCenter'
+                  ? t('practice.wheelRush.needsCenter')
+                  : feedback === 'dup'
+                    ? t('practice.wheelRush.duplicate')
+                    : t('practice.wheelRush.notAWord')}
+            </m.div>
+          )}
         </AnimatePresence>
-        {word.length >= 3 && (
-          <button
+      </m.div>
+
+      {/* ── Centered wheel + action cluster (absorbs leftover vertical space) ──
+          flex-1 + justify-center keeps the wheel and its buttons glued together
+          and vertically centered regardless of viewport height — the exact
+          pattern the live WordWheelGame uses (WordWheelGame.tsx:945). Fixes the
+          old layout where the wheel hugged the top and a `mt-auto` bailout left
+          a large empty void in the middle. */}
+      <div
+        data-testid="wheel-cluster"
+        className="flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-3 py-1"
+      >
+        {/* Wheel — real WheelLetter for visual parity, with the decorative
+            PixiJS orbital ring overlay (pointer-events-none, lazy). Pointer
+            handlers wire drag-to-spell so practice feels exactly like live
+            WheelRush. Single taps still pass through via WheelLetter's onClick
+            because dragEngagedRef gates the additive logic. */}
+        <div
+          data-testid="practice-wheel"
+          className="relative w-56 h-56 sm:w-64 sm:h-64 shrink-0 touch-none"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+        >
+          <div className="absolute inset-0 pointer-events-none">
+            <WordWheelPixiRing
+              selectedIndices={Array.from(usedIndices).map(idx => idx === 0 ? -1 : idx - 1)}
+              radius={RADIUS_PX}
+              combo={0}
+              pointerPosRef={pointerPosRef}
+              isDraggingRef={draggingRef}
+            />
+          </div>
+          <WheelLetter
+            letter={puzzle.center}
+            isCenter
+            index={0}
+            isUsed={usedIndices.has(0)}
+            onPress={onLetterPress}
+          />
+          {outerLetters.map((letter, i) => {
+            const idx = i + 1;
+            return (
+              <WheelLetter
+                key={`${letter}-${i}`}
+                letter={letter}
+                isCenter={false}
+                index={idx}
+                angle={i * (360 / outerLetters.length)}
+                radius={RADIUS_PX}
+                isUsed={usedIndices.has(idx)}
+                onPress={onLetterPress}
+              />
+            );
+          })}
+        </div>
+
+        {/* ── Action bar (Clear / Submit / Backspace) — identical control set
+            and chrome to the live WordWheelGame action bar
+            (WordWheelGame.tsx:1037). */}
+        <div
+          data-testid="practice-wheel-action-bar"
+          className="w-full flex items-center justify-center gap-3 mt-1"
+        >
+          {/* Clear */}
+          <m.button
+            type="button"
+            data-testid="practice-wheel-reset"
+            onClick={handleReset}
+            disabled={built.length === 0}
+            aria-label={t('wordWheel.clear')}
+            className="p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-30 disabled:cursor-not-allowed"
+            whileTap={{ scale: 0.9 }}
+          >
+            <RotateCcw className="w-5 h-5" aria-hidden />
+          </m.button>
+
+          {/* Submit */}
+          <m.button
             type="button"
             data-testid="practice-wheel-submit"
             onClick={onSubmit}
-            aria-label="submit"
-            className="ms-1 inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard active:translate-y-px active:shadow-hard-pressed"
+            disabled={word.length < 3}
+            aria-label={t('wordWheel.submit')}
+            className={
+              'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg ' +
+              (word.length >= 3
+                ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
+                : 'bg-neo-navy-light text-neo-white shadow-hard-lg') +
+              ' active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:cursor-not-allowed'
+            }
+            whileTap={word.length >= 3 ? { scale: 0.92 } : {}}
           >
-            <Check className="w-5 h-5" aria-hidden />
-          </button>
-        )}
-      </m.div>
+            {t('wordWheel.submit')}
+          </m.button>
 
-      {/* Reset + Shuffle row — mirrors live WordWheelGame controls
-          (RotateCcw + Shuffle icons, same neo-brutalist chrome). Visible
-          always, sized for thumb reach without crowding the wheel. Stagger
-          entrance keeps the controls feeling crafted on first paint. */}
-      <div className="flex items-center justify-center gap-3" aria-label="wheel-controls">
-        <m.button
-          type="button"
-          data-testid="practice-wheel-reset"
-          onClick={handleReset}
-          aria-label={t('practice.wheelRush.reset')}
-          className="inline-flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-cream text-neo-navy shadow-hard active:translate-y-px active:shadow-hard-pressed disabled:opacity-50"
-          disabled={built.length === 0}
-          initial={{ opacity: 0, y: 8, scale: 0.85 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.1, type: 'spring', stiffness: 360, damping: 22 }}
-          whileTap={{ scale: 0.92 }}
-        >
-          <RotateCcw className="w-5 h-5" aria-hidden />
-        </m.button>
-        <m.button
-          type="button"
-          data-testid="practice-wheel-shuffle"
-          onClick={handleShuffle}
-          aria-label={t('practice.wheelRush.shuffle')}
-          className="inline-flex items-center justify-center w-10 h-10 rounded-full border-3 border-neo-black bg-neo-purple text-neo-white shadow-hard active:translate-y-px active:shadow-hard-pressed"
-          initial={{ opacity: 0, y: 8, scale: 0.85 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.18, type: 'spring', stiffness: 360, damping: 22 }}
-          whileTap={{ scale: 0.92, rotate: 90 }}
-        >
-          <Shuffle className="w-5 h-5" aria-hidden />
-        </m.button>
+          {/* Backspace (remove last letter) */}
+          <m.button
+            type="button"
+            data-testid="practice-wheel-backspace"
+            onClick={handleBackspace}
+            disabled={built.length === 0}
+            aria-label={t('wordWheel.removeLetter')}
+            className="p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-30 disabled:cursor-not-allowed"
+            whileTap={{ scale: 0.9 }}
+          >
+            <Delete className="w-5 h-5" aria-hidden />
+          </m.button>
+        </div>
       </div>
 
       {/* Found words — last-found highlight matches real
