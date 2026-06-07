@@ -20,6 +20,15 @@ describe('shouldExpressParseJsonBody', () => {
     expect(shouldExpressParseJsonBody('/api/admin/send-android-release-launch-to-player')).toBe(false);
     // Bulk send-to-all reads request.json() in the Next route too.
     expect(shouldExpressParseJsonBody('/api/admin/send-bulk-email')).toBe(false);
+    // Feature flags + curator-proposal ratify are Next routes that read the body.
+    expect(shouldExpressParseJsonBody('/api/admin/feature-flags')).toBe(false);
+    expect(shouldExpressParseJsonBody('/api/admin/curator-proposals/abc-123/ratify')).toBe(false);
+  });
+
+  it('parses for /api/admin/curators — now a real Express route that wants req.body', () => {
+    // Curator assignment moved from a Next app/api route (which hung) to the
+    // Express admin router; it MUST be body-parsed. Never add it to the denylist.
+    expect(shouldExpressParseJsonBody('/api/admin/curators')).toBe(true);
   });
 
   it('skips parsing for non-API routes', () => {

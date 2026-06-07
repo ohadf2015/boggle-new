@@ -32,6 +32,13 @@ const NEXT_ADMIN_BODY_ROUTES: string[] = [
   // hung on every emailType (latent: was never registered).
   '/api/admin/send-bulk-email',
   '/api/admin/season-reset',
+  // Feature flags toggle reads request.json() (was hanging with 408).
+  '/api/admin/feature-flags',
+  // Curator proposal ratify (admin approves a curator's word edit) reads
+  // request.json(). Prefix covers /api/admin/curator-proposals/:id/ratify.
+  // NOTE: /api/admin/curators (assignment) is a real Express route now and is
+  // intentionally NOT here — it wants Express body parsing.
+  '/api/admin/curator-proposals',
 ];
 
 export function shouldExpressParseJsonBody(path: string): boolean {
