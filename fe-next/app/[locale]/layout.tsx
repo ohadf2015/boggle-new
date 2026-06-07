@@ -14,6 +14,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
+import NativePGSInitializer from '@/components/NativePGSInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
 import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
@@ -592,6 +593,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* DeepLinkHandler moved to NativeAppProvider (client component) to avoid Capacitor/Turbopack issues */}
                 {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
                 <NativeOAuthInitializer />
+                {/* Warm the Android-only Play Games Services bridge on mobile */}
+                <NativePGSInitializer />
                 {/* Server-rendered legal navigation — guarantees crawlers find
                     privacy/terms/about links even without JS execution */}
                 <nav aria-label="Site Navigation" className="sr-only">
