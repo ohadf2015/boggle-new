@@ -94,6 +94,27 @@ export NIGHTLY_DISABLED
 export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
 export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
 
+# Self-heal claude's bundled ripgrep exec bit. A claude update reinstalls the npm
+# package with the vendored `rg` as -rw-r--r-- (not +x) — every lane's Grep/Glob then
+# fails with EACCES (exit 126) and silently falls back to `find`+`grep`, ~10× slower
+# (this throttled the 600s lanes into timeouts on 2026-06-07). chmod is idempotent and
+# cheap; do it for whichever claude is on PATH before any lane runs.
+_claude_bin="$(command -v claude 2>/dev/null || true)"
+if [ -n "$_claude_bin" ]; then
+  # resolve symlinks to the real install, then chmod every non-exec vendored rg under it
+  _claude_real="$(readlink -f "$_claude_bin" 2>/dev/null || echo "$_claude_bin")"
+  for _root in "$(dirname "$_claude_real")/.." \
+               "$HOME/.nvm/versions/node"/*/lib/node_modules/@anthropic-ai/claude-code; do
+    [ -d "$_root" ] || continue
+    while IFS= read -r _rg; do
+      [ -n "$_rg" ] && [ ! -x "$_rg" ] && chmod +x "$_rg" 2>/dev/null \
+        && echo "[$(date +%H:%M:%S)] self-heal: chmod +x bundled ripgrep $_rg" >> "${RUN_LOG:-/dev/stderr}"
+    done < <(find "$_root" -path '*vendor/ripgrep/*/rg' -type f 2>/dev/null)
+  done
+  unset _claude_real _root _rg
+fi
+unset _claude_bin
+
 # Tell the husky pre-commit hook to BYPASS itself for the nightly. The nightly
 # is NOT an ungated committer — it runs a full lint+test+build on a clean-HEAD
 # worktree (lib/gate-isolated.sh) before shipping. But its working tree holds
@@ -473,18 +494,20 @@ if [ "$gate_ok" = "0" ]; then
         # with a loud TESTS-INCONCLUSIVE alert (mirrors the baseline-red ship path:
         # build-verified work ships; the gate ran at reduced strength, so shout).
         gate_ok=1
-        log "gate-timeout: authored set BUILDS clean (lint+type+next-build) — shipping it; the full test suite was too slow to finish in ${NIGHTLY_GATE_TIMEOUT:-2700}s and is UNVERIFIED this run"
+        log "gate-timeout: authored set BUILDS clean (lint+type+next-build) — shipping it; the full test suite wedged ${NIGHTLY_GATE_IDLE_SECS:-900}s idle or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop and is UNVERIFIED this run"
         mkdir -p docs/nightly 2>/dev/null || true
         {
           echo "# Nightly TESTS-INCONCLUSIVE alert — ${TODAY}"
           echo
-          echo "The integration gate was killed at its ${NIGHTLY_GATE_TIMEOUT:-2700}s ceiling before the full"
-          echo "vitest suite finished, so the authored set's TESTS are UNVERIFIED tonight."
-          echo "A build-only re-gate (lint + type-check + next build) PASSED, so the code"
-          echo "compiles and type-checks; it shipped at reduced gate strength."
+          echo "The integration gate's test suite went silent past the ${NIGHTLY_GATE_IDLE_SECS:-900}s idle"
+          echo "watchdog (or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s absolute backstop), so the authored"
+          echo "set's TESTS are UNVERIFIED tonight. A build-only re-gate (lint + type-check +"
+          echo "next build) PASSED, so the code compiles and type-checks; it shipped at"
+          echo "reduced gate strength."
           echo
-          echo "ACTION: the gate is too slow to complete — investigate suite runtime"
-          echo "(cold vitest in the worktree / parallelism / cache) or raise NIGHTLY_GATE_TIMEOUT."
+          echo "ACTION: a silent-for-${NIGHTLY_GATE_IDLE_SECS:-900}s gate means a hung/OOMing test, not just"
+          echo "a slow one — investigate (e.g. useBlastEngine.mpGrid OOM) or, if genuinely"
+          echo "slow-but-progressing, raise NIGHTLY_GATE_IDLE_SECS / NIGHTLY_GATE_TIMEOUT."
         } > "docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md" 2>/dev/null || true
         echo "docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
         echo -e "\n**Outcome (tests-inconclusive):** the gate timed out before the full test suite finished; a build-only re-gate (lint+type+next-build) passed, so the authored set shipped UNVERIFIED on tests. See docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md." >> "$REPORT"
@@ -499,7 +522,7 @@ if [ "$gate_ok" = "0" ]; then
         # Build-only ALSO timed out (rc=3) → genuinely unverifiable in budget → fall
         # through to docs-only salvage (the conservative last resort; now rare).
         gate_ok=0; iso_rc=3
-        log "gate-timeout: build-only re-gate ALSO timed out — unverifiable in ${NIGHTLY_GATE_TIMEOUT:-2700}s; falling through to docs-only salvage"
+        log "gate-timeout: build-only re-gate ALSO wedged (idle ${NIGHTLY_GATE_IDLE_SECS:-900}s / backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s) — unverifiable; falling through to docs-only salvage"
       fi
       ;;
     2)

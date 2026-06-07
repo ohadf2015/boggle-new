@@ -104,35 +104,47 @@ run_isolated_gate "$EMPTY"; rc=$?
 assert "empty authored list returns 0 (nothing to gate)" "[ $rc -eq 0 ]"
 rm -f "$EMPTY"; teardown
 
-echo "── gate-isolated: a TIMEOUT is INCONCLUSIVE (rc=3), never a content failure ──"
+echo "── gate-isolated: a WEDGE is INCONCLUSIVE (rc=3), never a content failure ──"
 # The 2026-06-06 catastrophe: the gate ran the whole vitest suite + next build, was
-# SIGKILLed at 1800s, and rc=124 collapsed to rc=1 ("lane code broke") → the salvage
-# parser got no FAIL list from the killed run → docs-only drop-ALL-code. A timeout is
+# SIGKILLed mid-run, and rc=124 collapsed to rc=1 ("lane code broke") → the salvage
+# parser got no FAIL list from the killed run → docs-only drop-ALL-code. A kill is
 # UNKNOWN, not BROKEN: it must return a DISTINCT rc=3 so the caller re-verifies
 # (build-only) instead of discarding a whole night's work.
+#
+# The fixed wall-clock cap is now a PROGRESS watchdog (run_with_idle_timeout): a gate
+# producing NO new output for NIGHTLY_GATE_IDLE_SECS is wedged → killed → rc=3.
 setup
 printf 'export const v = "LANE_SLOW";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
 AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
-export NIGHTLY_GATE_CMD='sleep 3'      # hangs past the tiny budget → gtimeout 124
-export NIGHTLY_GATE_TIMEOUT=1
+export NIGHTLY_GATE_CMD='sleep 10'             # silent → no output → idle-killed
+export NIGHTLY_GATE_IDLE_SECS=1 NIGHTLY_GATE_TIMEOUT=60 IDLE_TIMEOUT_POLL=1
 run_isolated_gate "$AUTH"; rc=$?
-assert "gate TIMEOUT returns rc=3 (distinct from 1=fail, 2=setup, 0=pass)" "[ $rc -eq 3 ]"
-assert "main tree untouched on timeout" "grep -q LANE_SLOW \"\$PROJECT_DIR/fe-next/app/lane.ts\""
-unset NIGHTLY_GATE_CMD NIGHTLY_GATE_TIMEOUT; rm -f "$AUTH"; teardown
+assert "gate WEDGE (idle) returns rc=3 (distinct from 1=fail, 2=setup, 0=pass)" "[ $rc -eq 3 ]"
+assert "main tree untouched on wedge" "grep -q LANE_SLOW \"\$PROJECT_DIR/fe-next/app/lane.ts\""
+unset NIGHTLY_GATE_CMD NIGHTLY_GATE_IDLE_SECS NIGHTLY_GATE_TIMEOUT IDLE_TIMEOUT_POLL; rm -f "$AUTH"; teardown
 
-# A process that IGNORES SIGTERM forces gtimeout's --kill-after grace to SIGKILL it →
-# exit 137, NOT 124. next build / vitest spawn children that can outlive SIGTERM, and
-# tsc/vitest have OOM'd (also 137). 137 must ALSO be inconclusive (rc=3), or it routes
-# to drop-all — the same catastrophe in a different exit code. The sleep-3 case above
-# only exercises the easy 124 (dies on SIGTERM); this exercises the hard SIGKILL half.
+# A process that IGNORES SIGTERM forces the watchdog's grace→SIGKILL path. next build /
+# vitest spawn children that can outlive SIGTERM, and tsc/vitest have OOM'd. The hard
+# SIGKILL half must ALSO be inconclusive (rc=3), not drop-all.
 setup
 printf 'export const v = "LANE_WEDGE";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
 AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
-export NIGHTLY_GATE_CMD='trap "" TERM; sleep 30'   # ignore SIGTERM → kill-after SIGKILL → 137
-export NIGHTLY_GATE_TIMEOUT=1
+export NIGHTLY_GATE_CMD='trap "" TERM; sleep 30'   # ignore SIGTERM → grace → SIGKILL
+export NIGHTLY_GATE_IDLE_SECS=1 NIGHTLY_GATE_TIMEOUT=60 IDLE_TIMEOUT_POLL=1 IDLE_TIMEOUT_KILL_GRACE=2
 run_isolated_gate "$AUTH"; rc=$?
-assert "gate SIGKILL/OOM (exit 137) also returns rc=3 (inconclusive, not drop-all)" "[ $rc -eq 3 ]"
-unset NIGHTLY_GATE_CMD NIGHTLY_GATE_TIMEOUT; rm -f "$AUTH"; teardown
+assert "gate SIGKILL (ignores TERM) also returns rc=3 (inconclusive, not drop-all)" "[ $rc -eq 3 ]"
+unset NIGHTLY_GATE_CMD NIGHTLY_GATE_IDLE_SECS NIGHTLY_GATE_TIMEOUT IDLE_TIMEOUT_POLL IDLE_TIMEOUT_KILL_GRACE; rm -f "$AUTH"; teardown
+
+# Busy-but-useless: a gate that keeps EMITTING output forever (never idle) must still
+# be stopped by the absolute NIGHTLY_GATE_TIMEOUT backstop → rc=3 (not an infinite run).
+setup
+printf 'export const v = "LANE_BUSY";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='while true; do echo grinding; sleep 0.2; done'
+export NIGHTLY_GATE_IDLE_SECS=60 NIGHTLY_GATE_TIMEOUT=2 IDLE_TIMEOUT_POLL=1
+run_isolated_gate "$AUTH"; rc=$?
+assert "gate busy-past-max backstop returns rc=3 (no infinite hang)" "[ $rc -eq 3 ]"
+unset NIGHTLY_GATE_CMD NIGHTLY_GATE_IDLE_SECS NIGHTLY_GATE_TIMEOUT IDLE_TIMEOUT_POLL; rm -f "$AUTH"; teardown
 
 setup
 printf 'export const v = "LANE_FAILFAST";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"

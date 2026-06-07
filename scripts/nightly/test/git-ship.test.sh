@@ -345,6 +345,66 @@ assert "ship returns 0 despite an always-failing pre-push hook (--no-verify)" "[
 assert "commit reached origin (hook bypassed)"   "[ \"\$(origin_head)\" = \"\$(git rev-parse HEAD)\" ]"
 assert "lane work shipped"                        "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
 
+# Install a pre-receive hook on the bare ORIGIN that REJECTS the first $1 push
+# attempts then accepts — deterministically simulating a fast concurrent pusher
+# winning the push window N times in a row (the 2026-06-07 lost-work race).
+reject_first_n_pushes() {
+  local n="$1"
+  cat > "$ORIGIN/hooks/pre-receive" <<HOOK
+#!/bin/sh
+cat >/dev/null   # drain the ref list from stdin
+cf="\${GIT_DIR:-.}/reject-count"
+c=\$(cat "\$cf" 2>/dev/null || echo 0); c=\$((c+1)); echo "\$c" > "\$cf"
+if [ "\$c" -le $n ]; then echo "simulated transient push reject #\$c" >&2; exit 1; fi
+exit 0
+HOOK
+  chmod +x "$ORIGIN/hooks/pre-receive"
+}
+
+echo "Scenario 17 — push window lost twice then wins → retry LOOP ships (the 2026-06-07 race)"
+# A fast concurrent pusher rejected BOTH of the old code's two push attempts, so the
+# night's work got stranded to refs/nightly-pending. A bounded retry loop must keep
+# re-fetching+re-pushing until it gets a clean window (here the 3rd attempt).
+setup
+reject_first_n_pushes 2
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+NIGHTLY_PUSH_RETRY_SLEEP=0 ship_nightly_commit; rc=$?
+assert "returns 0 (loop won the race)"        "[ $rc -eq 0 ]"
+assert "commit reached origin"                "[ \"\$(origin_head)\" = \"\$(git rev-parse HEAD)\" ]"
+assert "lane work shipped"                    "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
+assert "NOT stranded to recovery ref"         "! git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+assert "tree clean"                           "local_clean"
+
+echo "Scenario 18 — race never relents (rejects every attempt) → still saved to ref, master reset (guarantee held)"
+# If every window is lost the loop must still degrade to the existing salvage: save
+# to refs/nightly-pending, reset master to origin — never strand, never loop forever.
+setup
+reject_first_n_pushes 99
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+NIGHTLY_PUSH_RETRIES=3 NIGHTLY_PUSH_RETRY_SLEEP=0 ship_nightly_commit; rc=$?
+assert "returns 1 (unrecoverable after retries)"  "[ $rc -eq 1 ]"
+assert "commit saved to recovery ref"             "git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+assert "local master == origin/master (reset)"    "[ \"\$(git rev-parse HEAD)\" = \"\$(origin_head)\" ]"
+assert "origin NOT advanced"                      "! git show origin/master:docs/nightly/reports/2026-01-01.md 2>/dev/null | grep -q 'lane work'"
+assert "tree clean"                               "local_clean"
+
+echo "Scenario 19 — isolated ship loses the window twice then wins → retry LOOP ships nightly diff only"
+# The isolated worktree push (founder has unpushed commits) had the SAME single-shot
+# vulnerability. The loop must re-fetch + rebuild the worktree at fresh origin/master
+# + re-push until a clean window.
+setup
+printf 'export const x = 99; // founder unpushed\n' > fe-next/app/page.tsx
+git add fe-next/app/page.tsx; git commit -qm "founder local wip commit"
+FOUNDER_SHA=$(git rev-parse HEAD)
+reject_first_n_pushes 2
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+NIGHTLY_ISOLATED_SHIP=1 NIGHTLY_PUSH_RETRY_SLEEP=0 ship_nightly_commit; rc=$?
+assert "returns 0 (isolated loop won)"            "[ $rc -eq 0 ]"
+assert "lane doc shipped to origin"               "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
+assert "founder commit NOT published"             "! git show origin/master:fe-next/app/page.tsx | grep -q 'founder unpushed'"
+assert "NOT stranded to recovery ref"             "! git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+unset NIGHTLY_ISOLATED_SHIP
+
 echo
 echo "──────────────────────────────────────────"
 echo "PASS=$PASS  FAIL=$FAIL"

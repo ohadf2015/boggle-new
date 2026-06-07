@@ -39,6 +39,39 @@ NIGHTLY_GENERATED_EXCLUDE=(
   "fe-next/tsconfig.json"
 )
 
+# Push local master to origin, retrying THROUGH a lost push window. The 2026-06-07
+# race lost BOTH of the old code's two push attempts to a fast concurrent pusher
+# (founder /commit-push landing the i18n commit mid-run), stranding the whole night
+# to refs/nightly-pending. This loops: push; on reject re-fetch + rebase --autostash
+# onto the NEW origin/master + push again, up to NIGHTLY_PUSH_RETRIES (default 5)
+# with a short NIGHTLY_PUSH_RETRY_SLEEP (default 3s) between. Re-fetching every
+# iteration means it wins as soon as it gets one clean window. Returns:
+#   0  pushed
+#   2  rebase hit a REAL conflict (rebase left in progress; caller's docs-resolve /
+#      salvage handles it — same contract as the old inline rebase)
+#   1  retries exhausted on pure rejects with no conflict (caller salvages)
+_push_master_retrying() {
+  local retries="${NIGHTLY_PUSH_RETRIES:-5}" slp="${NIGHTLY_PUSH_RETRY_SLEEP:-3}" t=0
+  if git push --no-verify origin master >> "$RUN_LOG" 2>&1; then return 0; fi
+  log "push rejected — fetch+rebase+retry loop (max $retries)"
+  while [ "$t" -lt "$retries" ]; do
+    t=$((t+1))
+    git fetch origin master --quiet || { [ "$slp" -gt 0 ] && sleep "$slp"; continue; }
+    # --autostash: the nightly runs on the founder's dirty WIP; plain rebase refuses
+    # with "you have unstaged changes". autostash stashes tracked WIP, restores after.
+    if ! git rebase --autostash origin/master >> "$RUN_LOG" 2>&1; then
+      return 2   # genuine conflict — leave the rebase in progress for the caller
+    fi
+    if git push --no-verify origin master >> "$RUN_LOG" 2>&1; then
+      log "pushed after rebase (attempt $t)"
+      return 0
+    fi
+    log "push attempt $t lost the window — retrying"
+    [ "$slp" -gt 0 ] && sleep "$slp"
+  done
+  return 1
+}
+
 ship_nightly_commit() {
   # Stage ONLY the paths the nightly's own lanes authored (the allowlist run.sh
   # built as per-lane (dirty after) − (dirty before)). NEVER `git add -A`: a
@@ -139,36 +172,26 @@ ship_nightly_commit() {
   fi
 
   log "pushing master..."
-  # --no-verify: the run reaches ship ONLY after the isolated gate already ran
-  # lint+tsc+build+test on (clean HEAD + authored files) — the pre-push hook
-  # (.husky/pre-push) would re-run lint+`vitest --changed` redundantly. For the
-  # nightly that re-test fans out across the whole night's diff: slow, racy with a
-  # concurrent writer's index, and flaky via vitest's fsModuleCache — it killed a
-  # manual push at exit 144 (2026-06-05). The gate is authoritative for automated
-  # pushes, so skip the hook. (Interactive pushes still run it; this is ship-path only.)
-  if git push --no-verify origin master >> "$RUN_LOG" 2>&1; then
+  # --no-verify (inside _push_master_retrying): the run reaches ship ONLY after the
+  # isolated gate already ran lint+tsc+build+test on (clean HEAD + authored files) —
+  # the pre-push hook (.husky/pre-push) would re-run lint+`vitest --changed`
+  # redundantly: slow, racy with a concurrent writer's index, flaky via vitest's
+  # fsModuleCache (killed a manual push at exit 144, 2026-06-05). The gate is
+  # authoritative for automated pushes. (Interactive pushes still run it.)
+  #
+  # The push goes through a bounded fetch+rebase+retry LOOP, not a single retry: the
+  # 2026-06-07 run lost the push window to a fast concurrent pusher TWICE and the old
+  # two-attempt code gave up, stranding the whole night to refs/nightly-pending.
+  local _pr; _push_master_retrying; _pr=$?
+  if [ "$_pr" = 0 ]; then
+    NEW_SHA=$(git rev-parse HEAD)
     log "pushed $NEW_SHA"
     echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\`" >> "$REPORT"
     return 0
   fi
-
-  # Push rejected — almost always origin advanced during the long run. Our commit
-  # is already gate-vetted, so rebase onto origin and retry once. With generated
-  # files excluded above, the common case rebases clean.
-  log "push rejected — fetch+rebase onto origin/master, retry once"
-  # --autostash: the nightly ALWAYS runs on top of the founder's dirty WIP, and
-  # plain `git rebase` refuses with "cannot rebase: you have unstaged changes" —
-  # which stranded the 2026-05-24 docs commit locally (committed, never pushed).
-  # autostash stashes the tracked WIP before the rebase and restores it after
-  # (untracked files don't block rebase, so they're left as-is).
-  if git fetch origin master --quiet \
-     && git rebase --autostash origin/master >> "$RUN_LOG" 2>&1 \
-     && git push --no-verify origin master >> "$RUN_LOG" 2>&1; then
-    NEW_SHA=$(git rev-parse HEAD)
-    log "pushed after rebase $NEW_SHA"
-    echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\` (rebased onto origin first)" >> "$REPORT"
-    return 0
-  fi
+  # _pr=2 → rebase stopped on a conflict (handled by the docs-resolve / salvage
+  # blocks below, which read the in-progress rebase's unmerged paths).
+  # _pr=1 → retries exhausted on pure rejects (no conflict) → falls straight to salvage.
 
   # The rebase (or its push) failed. If it stopped on a conflict confined ENTIRELY
   # to docs/ — the loop's own machine-authored output (reports/ideas/loop-improvements,
@@ -189,12 +212,17 @@ ship_nightly_commit() {
       while IFS= read -r cf; do
         [ -n "$cf" ] && git checkout --theirs -- "$cf" 2>/dev/null && git add -- "$cf" 2>/dev/null
       done <<< "$conflicted"
-      if git rebase --continue >> "$RUN_LOG" 2>&1 \
-         && git push --no-verify origin master >> "$RUN_LOG" 2>&1; then
-        NEW_SHA=$(git rev-parse HEAD)
-        log "pushed after docs-only auto-resolve $NEW_SHA"
-        echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\` (auto-resolved docs/ conflict, rebased onto origin)" >> "$REPORT"
-        return 0
+      if git rebase --continue >> "$RUN_LOG" 2>&1; then
+        # Re-use the retry loop for the resolved commit's push too — a concurrent
+        # pusher can still win this window. _pr=2 (another conflict) or 1 (exhausted)
+        # both fall through to the salvage block below.
+        _push_master_retrying; _pr=$?
+        if [ "$_pr" = 0 ]; then
+          NEW_SHA=$(git rev-parse HEAD)
+          log "pushed after docs-only auto-resolve $NEW_SHA"
+          echo -e "\n**Outcome:** ✅ shipped \`$NEW_SHA\` (auto-resolved docs/ conflict, rebased onto origin)" >> "$REPORT"
+          return 0
+        fi
       fi
       log "docs-only auto-resolve unexpectedly failed — falling through to abort"
     fi
@@ -275,13 +303,30 @@ _ship_isolated() {
   log "isolated ship: founder has unpushed commits — shipping nightly diff only via worktree"
   git fetch origin master --quiet 2>>"$RUN_LOG" || { log "isolated ship: fetch failed"; }
 
-  local wtbase wt ok=0
+  local wtbase wt ok=0 conflict=""
   wtbase=$(mktemp -d -t nightly-iso.XXXXXX); wt="$wtbase/wt"
-  if git worktree add --detach --quiet "$wt" origin/master 2>>"$RUN_LOG" \
-     && git -C "$wt" cherry-pick "$nightly_sha" >>"$RUN_LOG" 2>&1 \
-     && git -C "$wt" push --no-verify origin HEAD:master >>"$RUN_LOG" 2>&1; then
-    ok=1
-    NEW_SHA=$(git -C "$wt" rev-parse HEAD)
+  if git worktree add --detach --quiet "$wt" origin/master 2>>"$RUN_LOG"; then
+    # Bounded retry loop (same race fix as _push_master_retrying): each attempt
+    # rebuilds the nightly diff on the FRESHEST origin/master (fetch → reset → cherry-
+    # pick) then pushes, so a concurrent pusher winning one window doesn't strand the
+    # night. A cherry-pick CONFLICT (origin touched a nightly file) is genuine → strand
+    # immediately, no retry. A push REJECT is transient → retry on a fresh origin.
+    local retries="${NIGHTLY_PUSH_RETRIES:-5}" slp="${NIGHTLY_PUSH_RETRY_SLEEP:-3}" t=0
+    while : ; do
+      git -C "$wt" fetch origin master --quiet 2>>"$RUN_LOG" || true
+      git -C "$wt" reset --hard origin/master >>"$RUN_LOG" 2>&1 || true   # wipes any prior attempt's cherry-pick
+      if ! git -C "$wt" cherry-pick "$nightly_sha" >>"$RUN_LOG" 2>&1; then
+        conflict=$(git -C "$wt" diff --name-only --diff-filter=U 2>/dev/null | head -3 | tr '\n' ' ')
+        git -C "$wt" cherry-pick --abort 2>/dev/null || true
+        break   # genuine conflict — do not retry
+      fi
+      if git -C "$wt" push --no-verify origin HEAD:master >>"$RUN_LOG" 2>&1; then
+        ok=1; NEW_SHA=$(git -C "$wt" rev-parse HEAD); break
+      fi
+      t=$((t+1)); [ "$t" -ge "$retries" ] && break
+      log "isolated push attempt $t lost the window — retrying"
+      [ "$slp" -gt 0 ] && sleep "$slp"
+    done
   fi
 
   if [ "$ok" = 1 ]; then
@@ -292,13 +337,12 @@ _ship_isolated() {
     return 0
   fi
 
-  # Cherry-pick or push failed — concurrent origin work conflicts with a nightly
-  # file. Save the nightly commit for recovery, clean up. Local stays advanced; the
-  # end-of-run finalize collapses it back to the founder base (the run will be
-  # RUN_FAILED so no residual ship runs, but the summary still reads a full report).
-  local conflict
-  conflict=$(git -C "$wt" diff --name-only --diff-filter=U 2>/dev/null | head -3 | tr '\n' ' ')
-  git -C "$wt" cherry-pick --abort 2>/dev/null || true
+  # Cherry-pick conflict (concurrent origin work touched a nightly file) OR retries
+  # exhausted on a relentless push race. Save the nightly commit for recovery, clean
+  # up. Local stays advanced; end-of-run finalize collapses it back to the founder
+  # base (the run is RUN_FAILED so no residual ship runs, but the summary still reads
+  # a full report). $conflict was captured at the cherry-pick break (empty if the loop
+  # ran out of push attempts with no file conflict).
   git worktree remove --force "$wt" 2>/dev/null || true
   rm -rf "$wtbase" 2>/dev/null || true
   local pending_ref="refs/nightly-pending/$TODAY"

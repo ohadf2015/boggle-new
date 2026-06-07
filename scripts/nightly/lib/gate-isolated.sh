@@ -178,13 +178,22 @@ run_isolated_gate() {
   # mid-run prints no per-file FAIL summary, so the salvage parser gets nothing and
   # would otherwise drop ALL authored code (the 2026-06-06 zero-code night). rc=3 lets
   # the caller re-verify with a fast build-only re-gate instead of discarding the work.
-  local _gto=()
-  if command -v gtimeout >/dev/null 2>&1; then _gto=(gtimeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-2700}s")
-  elif command -v timeout >/dev/null 2>&1; then _gto=(timeout --kill-after=30s "${NIGHTLY_GATE_TIMEOUT:-2700}s"); fi
+  # PROGRESS watchdog instead of a fixed wall-clock cap (2026-06-07): the old fixed
+  # 2700s gtimeout SIGKILLed a slow-but-ADVANCING suite, shipping tests UNVERIFIED.
+  # run_with_idle_timeout kills only on a true wedge — no new gate output for
+  # NIGHTLY_GATE_IDLE_SECS (default 600s, safely past next build's ~4min quiet compile
+  # window) — and otherwise runs to completion, so a slow suite now finishes and tests
+  # get VERIFIED. NIGHTLY_GATE_TIMEOUT is kept as the far-out absolute backstop
+  # (default raised 2700→5400s) against a busy-but-useless hang. An idle/max kill
+  # returns 124 → the rc=3 INCONCLUSIVE path below fires exactly as before.
+  # shellcheck source=/dev/null
+  . "$(dirname "${BASH_SOURCE[0]}")/idle-timeout.sh"
+  local _gidle="${NIGHTLY_GATE_IDLE_SECS:-900}" _gmax="${NIGHTLY_GATE_TIMEOUT:-5400}"
   if [ -n "${NIGHTLY_GATE_CMD:-}" ]; then
-    # Test seam: a deterministic command run inside the worktree's fe-next, bounded by
-    # the same gtimeout so a `sleep`-style hang exercises the rc=3 path.
-    "${_gto[@]}" bash -c 'cd "$1/fe-next" && eval "$2"' _ "$wt" "$NIGHTLY_GATE_CMD" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
+    # Test seam: a deterministic command run inside the worktree's fe-next, watched by
+    # the same idle/max watchdog so a silent `sleep` exercises the idle-kill rc=3 path.
+    run_with_idle_timeout "$_gidle" "$_gmax" "$NIGHTLY_LAST_GATE_OUTPUT" -- \
+      bash -c 'cd "$1/fe-next" && eval "$2"' _ "$wt" "$NIGHTLY_GATE_CMD" || rc=$?
   else
     # build:schemas FIRST — `npm run test` imports `../dist/backend/utils/schemas`
     # via the compiled-bridge in backend/utils/socketValidation.ts:69. The fresh
@@ -192,7 +201,8 @@ run_isolated_gate() {
     # module" — that's what reverted every CODE lane on 2026-05-26. Cheap (~3s
     # tsc), then build:fast (next build), then the full test suite last.
     local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only")"
-    "${_gto[@]}" bash -c "$_body" _ "$wt" > "$NIGHTLY_LAST_GATE_OUTPUT" 2>&1 || rc=$?
+    run_with_idle_timeout "$_gidle" "$_gmax" "$NIGHTLY_LAST_GATE_OUTPUT" -- \
+      bash -c "$_body" _ "$wt" || rc=$?
   fi
   if [ "${rc:-0}" = "124" ] || [ "${rc:-0}" = "137" ]; then
     # 124 = gtimeout's SIGTERM fired. 137 = SIGKILL — either the --kill-after grace
@@ -201,7 +211,7 @@ run_isolated_gate() {
     # verdict is UNKNOWN, not a content failure. The old code only special-cased 124, so
     # a 137 wedge silently fell through to rc=1 → docs-only drop-all (the catastrophe in
     # a different exit code). "timeout-or-OOM" keeps a recurring OOM visible vs a slow night.
-    log "isolated-gate: did NOT complete (rc=${rc:-0}: timeout-or-OOM) after ${NIGHTLY_GATE_TIMEOUT:-2700}s — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-900}s idle, or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
     rc=3
   elif [ "${rc:-0}" != "0" ]; then
     rc=1

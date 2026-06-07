@@ -18,6 +18,10 @@ set -uo pipefail
 
 PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 
+# Progress watchdog (replaces the fixed wall-clock gtimeout cap on each lane).
+# shellcheck source=/dev/null
+. "$(dirname "${BASH_SOURCE[0]}")/idle-timeout.sh"
+
 # --- per-MCP-call watchdogs (the root-cause fix for the exit-124 epidemic) ----
 # Lanes are bounded ONLY by the wall-clock gtimeout below. Before this, a single
 # hung Sentry/Supabase MCP tool call (zero output, indefinite block) stalled the
@@ -194,24 +198,20 @@ PY
     echo "headless: prepended founder directives ($(wc -c < "$directives_file" | tr -d ' ')B) to lane=$lane_id" | tee -a "$log_file"
   fi
 
-  echo "headless: lane=$lane_id model=$model timeout=${timeout_sec}s prompt=$(wc -c < "$rendered")B" | tee -a "$log_file"
+  echo "headless: lane=$lane_id model=$model budget=${timeout_sec}s (idle-watchdog; see time-guard line) prompt=$(wc -c < "$rendered")B" | tee -a "$log_file"
 
-  # Inherit env (claude needs HOME + its own oauth state). Secrets already exported.
-  # macOS ships without GNU timeout; prefer system `timeout`, fall back to
-  # gtimeout (brew coreutils) or perl alarm wrapper. Perl always present on macOS.
-  # Use real timeout (GNU coreutils via brew, or BSD on Linux). Hard-prefer
-  # gtimeout/timeout — earlier perl-alarm fallback was BROKEN: `perl -e 'alarm; exec'`
-  # replaces the perl process with claude, so SIGALRM never fires and claude
-  # hangs indefinitely. Confirmed empirically: lane 1 hung 67 min on 2026-05-19.
-  local timeout_cmd
-  if command -v gtimeout >/dev/null 2>&1; then
-    timeout_cmd=(gtimeout --kill-after=10s "${timeout_sec}s")
-  elif command -v timeout >/dev/null 2>&1; then
-    timeout_cmd=(timeout --kill-after=10s "${timeout_sec}s")
-  else
-    echo "headless: FATAL — neither timeout nor gtimeout found. Install: brew install coreutils" | tee -a "$log_file"
-    return 127
-  fi
+  # Bounding policy (2026-06-07): a PROGRESS watchdog, NOT a fixed wall-clock cap.
+  # The old `gtimeout ${timeout_sec}s` SIGKILLed lanes that were still emitting
+  # stream-json (4 lanes cut mid-edit on 2026-06-07). A lane streams a tool event on
+  # every action, so "no new output for LANE_IDLE_SECS" (default 300s = 5min) is a
+  # true wedge — a hung MCP call / dead loop — and the ONLY thing we kill on. The
+  # per-lane `timeout_sec` arg + LANE_MAX_SECS (default 1800s) are kept only as a
+  # far-out absolute backstop against a busy-but-useless lane (launchd's TimeOut is
+  # advisory and won't stop a hang). A productive lane now runs to natural completion.
+  local lane_idle lane_max
+  lane_idle="${LANE_IDLE_SECS:-300}"
+  lane_max="${LANE_MAX_SECS:-1800}"
+  [ "$timeout_sec" -gt "$lane_max" ] && lane_max="$timeout_sec"
 
   # Run in stream-json + verbose so EVERY tool call is observable. In plain text
   # output `-p` prints only the final message, so a lane that hangs mid-tool
@@ -256,8 +256,10 @@ PY
   # is inert when LEXI_LANE_DEADLINE_FILE is unset, so it never affects normal use.
   local now_epoch finalize_epoch hard_epoch deadline_file fileset_file hook_settings hook_path
   now_epoch=$(date +%s)
-  hard_epoch=$(( now_epoch + timeout_sec ))
-  finalize_epoch=$(( now_epoch + timeout_sec * 8 / 10 ))   # 80% → leave a wrap-up window
+  # Epochs track the absolute backstop (lane_max), not the old fixed cap — the soft
+  # edit-blocking guard must match the watchdog ceiling, not fire at the old 600/900s.
+  hard_epoch=$(( now_epoch + lane_max ))
+  finalize_epoch=$(( now_epoch + lane_max * 8 / 10 ))   # 80% → leave a wrap-up window
   deadline_file=$(mktemp -t "lane-${lane_id}-deadline.XXXXXX")
   printf '%s %s %s\n' "$now_epoch" "$finalize_epoch" "$hard_epoch" > "$deadline_file"
   fileset_file=$(mktemp -t "lane-${lane_id}-fileset.XXXXXX"); : > "$fileset_file"
@@ -273,16 +275,20 @@ PY
   jq -nc --arg cmd "$hook_path" \
     '{hooks:{PreToolUse:[{matcher:"Edit|Write|MultiEdit|NotebookEdit|Bash|WebSearch|WebFetch|mcp__.*",hooks:[{type:"command",command:("bash "+$cmd),timeout:10}]}]}}' \
     > "$hook_settings"
-  echo "headless: lane=$lane_id time-guard armed → finalize @ +$(( timeout_sec*8/10/60 ))m, hard @ +$(( timeout_sec/60 ))m, file-cap=${LANE_FILE_CAP:-8}" | tee -a "$log_file"
+  echo "headless: lane=$lane_id time-guard armed → idle-kill @ ${lane_idle}s no-output, finalize @ +$(( lane_max*8/10/60 ))m, hard backstop @ +$(( lane_max/60 ))m, file-cap=${LANE_FILE_CAP:-8}" | tee -a "$log_file"
 
   # Write claude's stream straight to the sidecar FILE — NOT a live `| tee | python3
   # | tee` pipe. A long-lived MCP server is a child of claude and inherits its
   # stdout fd; on a live pipe that fd keeps the downstream tee/python from ever
   # seeing EOF, so AFTER the agent emits its final `result` the lane sat idle until
-  # the gtimeout SIGTERM — a FALSE exit-124 (lane 05 hung 5m45s post-completion on
-  # 2026-06-03). A file redirect never blocks on a child fd: gtimeout returns the
-  # instant claude itself exits, and we render the timeline from the file afterwards.
-  "${timeout_cmd[@]}" \
+  # the SIGTERM — a FALSE exit-124 (lane 05 hung 5m45s post-completion on 2026-06-03).
+  # A file redirect never blocks on a child fd: the watchdog waits on claude's OWN pid
+  # and returns the instant claude exits; we render the timeline from the file after.
+  # The sidecar's byte-growth IS the progress signal run_with_idle_timeout watches —
+  # every tool event appends to it, so a working lane never idle-trips; on a real wedge
+  # (no event for lane_idle) it kills claude + its MCP server tree and returns 124,
+  # exactly the exit code the KEEP_TIMEOUT_PARTIALS salvage already handles.
+  run_with_idle_timeout "$lane_idle" "$lane_max" "$stream_sidecar" -- \
     claude -p "$(cat "$rendered")" \
       --allowedTools '*' \
       --settings "$hook_settings" \
@@ -290,8 +296,7 @@ PY
       --dangerously-skip-permissions \
       --output-format stream-json \
       --verbose \
-      --model "$model" \
-      < /dev/null > "$stream_sidecar" 2>&1
+      --model "$model"
   local rc=$?
   # Render the compact wall-clock timeline from the captured sidecar into the run log
   # (post-hoc, not live — observability is preserved; the hang is not).
