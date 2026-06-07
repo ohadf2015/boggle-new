@@ -30,4 +30,23 @@ describe('WordCraftRack — mobile drag', () => {
     expect(a.className).not.toMatch(/\btouch-none\b/);
     expect(a.className).not.toMatch(/\btouch-manipulation\b/);
   });
+
+  it('scrolls freely between letters — proximity snap, not mandatory', () => {
+    // snap-mandatory forced the rail to always lock onto a tile, fighting the
+    // finger ("hard to scroll between letters"). snap-proximity lets the rail
+    // pan freely and only gently settles near a tile.
+    render(
+      <WordCraftRack
+        tiles={TILES}
+        selectedId={null}
+        pendingIds={new Set()}
+        onSelect={vi.fn()}
+        ariaLabel="rack"
+      />,
+    );
+    const rail = screen.getByRole('toolbar', { name: 'rack' });
+    expect(rail.className).toMatch(/\bsnap-proximity\b/);
+    expect(rail.className).not.toMatch(/\bsnap-mandatory\b/);
+    expect(rail.className).toMatch(/\boverscroll-x-contain\b/);
+  });
 });

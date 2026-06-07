@@ -60,7 +60,11 @@ function WordCraftRackImpl({
         // when content fits, and the outer scroller is justify-start so
         // the first tile is always reachable from the scroll-start edge.
         'shrink-0 overflow-x-auto overflow-y-hidden',
-        'snap-x snap-mandatory scrollbar-none',
+        // proximity (not mandatory) so the rail pans freely between letters
+        // instead of force-locking onto a tile; overscroll-x-contain stops the
+        // swipe from chaining to the page; scroll-smooth eases programmatic
+        // scroll-into-view of the selected tile.
+        'snap-x snap-proximity scroll-smooth overscroll-x-contain scrollbar-none',
         'bg-black/20 rounded-neo transition-shadow',
         hintPick && 'wc-rack-glow',
       )}

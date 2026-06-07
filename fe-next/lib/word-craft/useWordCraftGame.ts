@@ -191,7 +191,10 @@ function commitMove(
     lastCapture,
     streaks: nextStreaks,
   };
-  if (newRack.length === 0) {
+  // The sack is the game clock: the game finishes the moment it empties (or
+  // the active player exhausts their rack). `state.bag` was already drained by
+  // the `draw` above, so `remaining` reflects the post-refill count.
+  if (newRack.length === 0 || remaining(state.bag) === 0) {
     next.turn = 'over';
   }
   if (next.turn === 'over' && state.territoryEnabled) {
