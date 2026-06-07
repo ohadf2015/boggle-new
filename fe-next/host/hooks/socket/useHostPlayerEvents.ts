@@ -167,6 +167,9 @@ export function useHostPlayerEvents({
 
     const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardWirePlayer[] }) => {
       if (!data.leaderboard || !Array.isArray(data.leaderboard)) return;
+      if (typeof window !== 'undefined' && window.location.search.includes('lbdebug')) {
+        console.info('[lbdebug][host] updateLeaderboard received:', data.leaderboard.map(e => `${e.username}=${e.score}`).join(', '));
+      }
       throttledApplyLeaderboard(data.leaderboard);
     };
 

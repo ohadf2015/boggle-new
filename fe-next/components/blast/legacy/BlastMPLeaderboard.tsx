@@ -52,6 +52,10 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
     };
   }, [opponentActivity]);
 
+  if (typeof window !== 'undefined' && window.location.search.includes('lbdebug')) {
+    console.info('[lbdebug][render] BlastMPLeaderboard prop:', (leaderboard || []).map(e => `${e.username}=${e.score}`).join(', ') || '(empty)');
+  }
+
   if (!leaderboard || leaderboard.length === 0) return null;
 
   const sorted = [...leaderboard].sort((a, b) => b.score - a.score).slice(0, 4);

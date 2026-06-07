@@ -129,6 +129,9 @@ export function usePlayerSessionEvents({
     };
 
     const handleUpdateLeaderboard = (data: LeaderboardUpdatePayload) => {
+      if (typeof window !== 'undefined' && window.location.search.includes('lbdebug')) {
+        console.info('[lbdebug][player] updateLeaderboard received:', (data.leaderboard || []).map(e => `${e.username}=${e.score}`).join(', '));
+      }
       throttledSetLeaderboard(data.leaderboard);
     };
 
