@@ -32,15 +32,15 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
       <button
         type="button"
         onClick={onToggleDir}
-        className="flex-1 flex items-center gap-2 px-3 py-2.5 bg-neo-cyan text-neo-navy border-neo border-black rounded-neo shadow-hard text-start"
+        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 bg-neo-cyan text-neo-navy border-neo border-black rounded-neo shadow-hard text-start active:translate-y-[1px] active:shadow-hard-pressed"
       >
         {slot && (
-          <span className="shrink-0 font-neo-display font-extrabold text-sm">
+          <span className="shrink-0 inline-flex items-center font-neo-display font-extrabold text-xs uppercase tracking-wide bg-neo-navy text-neo-cyan rounded-md px-2 py-1">
             {slot.number}
             {dirLabel ? ` ${dirLabel}` : ''}
           </span>
         )}
-        <span className="font-neo-body font-medium leading-snug">
+        <span className="font-neo-body font-semibold text-[0.95rem] leading-snug">
           {slot?.clue || t('crossword.noClue')}
         </span>
       </button>

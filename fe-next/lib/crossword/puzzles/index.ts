@@ -5,9 +5,15 @@ import { buildGrid } from '../grid';
 import { pickDaily } from '../daily';
 import type { CrosswordPuzzle, PuzzleLocale, Slot } from '../types';
 import { EN_SEED, HE_SEED, type SeedPuzzle } from './seed';
+import generatedEnJson from '../data/puzzles.en.json';
 
-/** Turn a hand-authored seed (grid + clue-by-answer) into a fully-built puzzle. */
-export function buildSeedPuzzle(seed: SeedPuzzle): CrosswordPuzzle {
+// Generated EN bank: real 5×5 minis filled from the lexicon-derived clue bank (every answer
+// auto-clued from Datamuse→LLM→judged clues). See scripts/crossword/build.ts. Hebrew stays
+// curated (no Datamuse for HE — a known scope deferral).
+const GENERATED_EN = generatedEnJson as unknown as SeedPuzzle[];
+
+/** Turn a seed (grid + clue-by-answer) into a fully-built puzzle. */
+export function buildSeedPuzzle(seed: SeedPuzzle, source: CrosswordPuzzle['source'] = 'authored'): CrosswordPuzzle {
   const { size, cells, slots } = buildGrid({ rtl: seed.rtl, solution: seed.grid });
   const cluedSlots: Slot[] = slots.map((s) => ({ ...s, clue: seed.clues[s.id] ?? '' }));
   return {
@@ -18,13 +24,16 @@ export function buildSeedPuzzle(seed: SeedPuzzle): CrosswordPuzzle {
     cells,
     slots: cluedSlots,
     difficulty: seed.difficulty,
-    source: 'authored',
+    source,
   };
 }
 
 const POOLS: Partial<Record<PuzzleLocale, CrosswordPuzzle[]>> = {
-  en: EN_SEED.map(buildSeedPuzzle),
-  he: HE_SEED.map(buildSeedPuzzle),
+  en: [
+    ...EN_SEED.map((s) => buildSeedPuzzle(s)),
+    ...GENERATED_EN.map((s) => buildSeedPuzzle(s, 'generated')),
+  ],
+  he: HE_SEED.map((s) => buildSeedPuzzle(s)),
 };
 
 function resolveLocale(locale: PuzzleLocale): PuzzleLocale {

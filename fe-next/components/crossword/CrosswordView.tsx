@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CheckCheck, Eye, RotateCcw, Lightbulb } from 'lucide-react';
+import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
@@ -100,18 +100,34 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
     <div className="flex flex-col gap-4 items-stretch w-full max-w-[36rem] mx-auto px-3 py-4" translate="no">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-neo-display font-extrabold text-xl text-neo-cyan">
-          {t('crossword.title')}
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="font-neo-display font-extrabold text-xl text-neo-cyan">
+            {t('crossword.title')}
+          </h1>
+          {puzzle.difficulty && (
+            <span
+              className={`font-neo-body font-bold text-[0.65rem] uppercase tracking-wide px-2 py-0.5 rounded-full border-neo border-black ${
+                puzzle.difficulty === 'easy'
+                  ? 'bg-neo-lime text-neo-navy'
+                  : puzzle.difficulty === 'hard'
+                    ? 'bg-neo-pink text-neo-white'
+                    : 'bg-neo-cyan text-neo-navy'
+              }`}
+            >
+              {t(`crossword.difficulty.${puzzle.difficulty}`)}
+            </span>
+          )}
+        </div>
         <div
-          className="font-neo-display font-bold text-lg text-neo-white tabular-nums"
+          className="flex items-center gap-1.5 font-neo-display font-bold text-lg text-neo-white tabular-nums bg-neo-navy-light border-neo border-black rounded-neo shadow-hard px-2.5 py-1"
           aria-label={t('crossword.timer')}
         >
+          <Timer size={16} className="text-neo-cyan" />
           {formatTime(elapsedMs)}
         </div>
       </div>
 
-      <CrosswordGrid state={state} onSelect={focusCell} t={t} />
+      <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
 
       <ClueBar
         slot={activeSlot}

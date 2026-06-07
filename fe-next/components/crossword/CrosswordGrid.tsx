@@ -1,18 +1,22 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { currentSlot, type GameState } from '@/lib/crossword/gameState';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { CrosswordCell } from './CrosswordCell';
 
 export interface CrosswordGridProps {
   state: GameState;
   onSelect: (row: number, col: number) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  solved?: boolean;
 }
 
-export function CrosswordGrid({ state, onSelect, t }: CrosswordGridProps) {
+export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordGridProps) {
   const { puzzle, active, checks, revealed } = state;
   const size = puzzle.size;
+  const reduced = useReducedMotion();
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const slot = currentSlot(state);
   const activeSlotCells = useMemo(
@@ -29,12 +33,58 @@ export function CrosswordGrid({ state, onSelect, t }: CrosswordGridProps) {
     return s;
   }, [puzzle.slots]);
 
+  // GSAP entrance: letter tiles pop in from the center on mount. Reduced-motion → no-op.
+  useEffect(() => {
+    if (reduced || !gridRef.current) return;
+    let ctx: { revert: () => void } | null = null;
+    (async () => {
+      const gsap = (await import('gsap')).default;
+      if (!gridRef.current) return;
+      ctx = gsap.context(() => {
+        gsap.from('[data-cell]', {
+          scale: 0.4,
+          autoAlpha: 0,
+          duration: 0.45,
+          ease: 'back.out(1.7)',
+          stagger: { each: 0.018, from: 'center', grid: 'auto' },
+        });
+      }, gridRef);
+    })();
+    return () => ctx?.revert();
+  }, [reduced, puzzle.id]);
+
+  // GSAP solved cascade: a celebratory ripple across the solved board.
+  useEffect(() => {
+    if (!solved || reduced || !gridRef.current) return;
+    let ctx: { revert: () => void } | null = null;
+    (async () => {
+      const gsap = (await import('gsap')).default;
+      if (!gridRef.current) return;
+      ctx = gsap.context(() => {
+        gsap.fromTo(
+          '[data-letter]',
+          { scale: 1 },
+          {
+            scale: 1.35,
+            duration: 0.3,
+            ease: 'power2.out',
+            yoyo: true,
+            repeat: 1,
+            stagger: { each: 0.04, from: 'start', grid: 'auto' },
+          },
+        );
+      }, gridRef);
+    })();
+    return () => ctx?.revert();
+  }, [solved, reduced]);
+
   return (
     <div
+      ref={gridRef}
       role="grid"
       aria-label={t('crossword.gridLabel')}
       dir={puzzle.rtl ? 'rtl' : 'ltr'}
-      className="grid gap-[3px] mx-auto w-full max-w-[min(92vw,30rem)] aspect-square bg-black p-[3px] rounded-neo shadow-hard-lg"
+      className="grid gap-[3px] mx-auto w-full max-w-[min(92vw,30rem)] aspect-square bg-black p-[3px] rounded-neo shadow-hard-lg border-[3px] border-black"
       style={{
         gridTemplateColumns: `repeat(${size}, 1fr)`,
         gridTemplateRows: `repeat(${size}, 1fr)`,

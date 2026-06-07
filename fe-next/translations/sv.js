@@ -8,6 +8,7 @@ const sv = {
     "gridLabel": "Korsordsrutnät",
     "cellLabel": "Rad {row}, kolumn {col}",
     "dir": { "across": "Vågrätt", "down": "Lodrätt" },
+    "difficulty": { "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
     "acrossHeading": "Vågrätt",
     "downHeading": "Lodrätt",
     "prevClue": "Föregående ledtråd",
