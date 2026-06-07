@@ -3,7 +3,7 @@
 **Updated:** 2026-06-07
 
 ## Play Games Services (PGS) — native bridge (2026-06-07)
-**PROJECT PUBLISHED 2026-06-07** ("Game published" — live to all users in a few hours; achievements/leaderboards now UN-deletable). Published en-US only (he/sv/ja/es descriptions can be added post-publish, additive). Game-project Properties filled to unblock publish: description, category=Word, game icon + 1024×500 feature graphic (generated, brand-matched, `docs/play-games-icons/lexiclash_*`; swap to exact Play Store assets if desired). All 6 achievements + 2 leaderboards + credentials were "Ready to publish".
+**PROJECT PUBLISHED 2026-06-07** ("Game published" — live to all users in a few hours; achievements/leaderboards now UN-deletable). **FULLY LOCALISED + RE-PUBLISHED**: added 4 languages (iw-IL/sv-SE/ja-JP/es-419) via game-details "Manage translations → Select languages", then filled game-details description + all 6 achievement name+descriptions + 2 leaderboard names per locale (locale dropdown on each form once languages added), re-published. Spanish = es-419 (Latin America). Native copy from `docs/play-games-icons/i18n-strings.md`. Game-project Properties filled to unblock publish: description, category=Word, game icon + 1024×500 feature graphic (generated, brand-matched, `docs/play-games-icons/lexiclash_*`; swap to exact Play Store assets if desired). All 6 achievements + 2 leaderboards + credentials were "Ready to publish".
 
 Console config done (both Android credentials: app-signing + upload-key; 4/6 setup tasks). JS bridge SHIPPED in-repo, **native half UNVERIFIED here** (no device build).
 
