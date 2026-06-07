@@ -59,6 +59,23 @@ describe('focus + direction', () => {
     const t = focusCell(s, 0, 1);
     expect(t.active).toEqual({ row: 0, col: 1 });
   });
+
+  it('re-clicking the active cell toggles direction (signature crossword tap)', () => {
+    const s = initGame(puzzle); // active (0,0), across
+    expect(s.dir).toBe('across');
+    const t = focusCell(s, 0, 0); // tap the same cell
+    expect(t.active).toEqual({ row: 0, col: 0 });
+    expect(t.dir).toBe('down');
+    // tapping again toggles back to across
+    expect(focusCell(t, 0, 0).dir).toBe('across');
+  });
+
+  it('focusCell on a different cell keeps the current direction', () => {
+    const s = initGame(puzzle); // across
+    const t = focusCell(s, 1, 0); // a new cell that has an across slot
+    expect(t.active).toEqual({ row: 1, col: 0 });
+    expect(t.dir).toBe('across');
+  });
 });
 
 describe('inputLetter auto-advance', () => {

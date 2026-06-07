@@ -60,12 +60,12 @@ function Section({
   return (
     <div
       data-dir={dir}
-      className="flex flex-col gap-1 bg-neo-navy-light border-neo border-black rounded-neo p-2"
+      className="flex flex-col gap-0.5 bg-neo-cream border-2 border-black rounded-none p-2.5 shadow-hard"
     >
-      <h2 className="font-neo-display font-extrabold text-xs uppercase tracking-wide text-neo-cyan px-1 pb-1">
+      <h2 className="font-neo-display font-extrabold text-xs uppercase tracking-wide text-neo-navy px-1 pb-1.5 mb-0.5 border-b-2 border-black/15">
         {heading}
       </h2>
-      <ul className="flex flex-col gap-0.5">
+      <ul className="flex flex-col">
         {slots.map((slot) => {
           const active = slot.id === activeSlotId;
           return (
@@ -75,10 +75,10 @@ function Section({
                 data-slot-number={slot.number}
                 aria-current={active ? 'true' : undefined}
                 onClick={() => onSelect(slot)}
-                className={`flex w-full items-baseline gap-2 text-start rounded-[4px] px-2 py-1 leading-snug transition-colors ${
+                className={`flex w-full items-baseline gap-2 text-start rounded-none px-2 py-1 leading-snug transition-colors ${
                   active
-                    ? 'bg-neo-cyan text-neo-navy font-semibold'
-                    : 'text-neo-white hover:bg-neo-navy active:bg-neo-navy'
+                    ? 'bg-[#ffe9a8] text-neo-navy font-semibold'
+                    : 'text-neo-navy/90 hover:bg-black/5'
                 }`}
               >
                 <span className="shrink-0 font-neo-display font-bold tabular-nums text-sm w-5 text-end">

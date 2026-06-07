@@ -75,7 +75,7 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
       role="grid"
       aria-label={t('crossword.gridLabel')}
       dir={puzzle.rtl ? 'rtl' : 'ltr'}
-      className="grid gap-[3px] mx-auto w-full max-w-[min(92vw,30rem)] aspect-square bg-black p-[3px] rounded-neo shadow-hard-lg border-[3px] border-black"
+      className="grid gap-px mx-auto w-full max-w-[min(92vw,28rem)] aspect-square bg-black p-px rounded-none shadow-hard-lg border-[3px] border-black"
       style={{
         gridTemplateColumns: `repeat(${size}, 1fr)`,
         gridTemplateRows: `repeat(${size}, 1fr)`,

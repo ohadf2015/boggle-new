@@ -72,6 +72,12 @@ export function initGame(
 export function focusCell(state: GameState, row: number, col: number): GameState {
   if (isBlock(state.puzzle, row, col)) return state;
   let dir = state.dir;
+  // Signature crossword tap: re-clicking the already-active cell flips across<->down
+  // (when the other direction has a slot here). Lets a single tap pick the word you mean.
+  const isReclick = state.active.row === row && state.active.col === col;
+  if (isReclick) {
+    return toggleDir(state);
+  }
   // If the current direction has no slot through this cell, switch to the other.
   if (!slotAt(state.puzzle, row, col, dir)) {
     dir = dir === 'across' ? 'down' : 'across';

@@ -53,28 +53,29 @@ function CrosswordCellBase({
 
   const shown = letter ? displayLetter(letter, { isWordEnd }, locale) : '';
 
-  // No per-cell border — the 2px black grid gap IS the gridline (NYT-mini crispness).
-  // The active cell gets the electric fill + a hard shadow + a small scale pop.
+  // Newspaper look: cream paper cells, the 1px black grid gap IS the gridline. The active
+  // cell is a sky-blue square and the active word a pale-yellow band — the standard
+  // printed/digital crossword highlight pair. No scale pop (it lifts cells off the grid
+  // plane and breaks the flat-paper illusion); the current cell instead gets a dark inset
+  // ring, exactly like a pencil box around the square you're filling.
   const bg =
     check === 'wrong'
       ? isActive
         ? 'bg-neo-red'
-        : 'bg-neo-red/15'
+        : 'bg-neo-red/25'
       : isActive
-        ? 'bg-neo-cyan'
+        ? 'bg-[#7cc0ff]'
         : inActiveSlot
-          ? 'bg-neo-cyan-light'
-          : 'bg-neo-white';
+          ? 'bg-[#ffe9a8]'
+          : 'bg-neo-cream';
   const text =
     check === 'wrong'
       ? isActive
         ? 'text-neo-white'
         : 'text-neo-red'
-      : check === 'correct'
-        ? 'text-neo-cyan-dark'
-        : revealed
-          ? 'text-neo-purple'
-          : 'text-neo-navy';
+      : revealed
+        ? 'text-neo-navy/55'
+        : 'text-neo-navy';
 
   return (
     <button
@@ -84,19 +85,19 @@ function CrosswordCellBase({
       aria-label={label}
       aria-selected={isActive}
       onClick={() => onSelect(cell.row, cell.col)}
-      className={`relative flex items-center justify-center font-neo-display font-extrabold uppercase select-none transition-[background-color,transform,box-shadow] duration-100 ${bg} ${text} ${
-        isActive ? 'z-10 scale-[1.08] shadow-hard' : ''
+      className={`relative flex items-center justify-center font-neo-body font-bold uppercase select-none transition-colors duration-75 ${bg} ${text} ${
+        isActive ? 'z-10 ring-2 ring-inset ring-neo-navy' : ''
       } ${enter ? 'cw-cell-enter' : ''}`}
       style={{
         gridColumn,
         gridRow,
-        fontSize: 'min(6.4vw, 1.75rem)',
+        fontSize: 'min(6.6vw, 1.8rem)',
         animationDelay: enter ? `${enterDelay}s` : undefined,
       }}
     >
       {cell.number != null && (
         <span
-          className="absolute top-[1.5px] start-[2.5px] text-[0.56rem] leading-none font-neo-body font-bold text-neo-navy/55"
+          className="absolute top-[2px] start-[3px] text-[0.6rem] leading-none font-neo-body font-semibold text-neo-navy/70"
           aria-hidden
         >
           {cell.number}
