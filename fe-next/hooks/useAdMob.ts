@@ -29,18 +29,20 @@ export const REWARD_PREPARE_TIMEOUT_MS = 12000;
 // well before it fires.
 export const REWARD_SAFETY_TIMEOUT_MS = 90000;
 
-// Show rewarded ads in immersive mode (system bars hidden, ad owns the full
-// screen). SPECULATIVE fix for the "tap the X, ad won't close" report: the app
-// runs edge-to-edge (MainActivity EdgeToEdge.enable, transparent system bars),
-// and with immersiveMode off the ad's close button can land in/under the
-// translucent status-bar / display-cutout region and miss taps. Immersive mode
-// is also Google's recommended setting for fullscreen ads. JS-only: the native
-// plugin reads `immersiveMode` from the prepare call (shipped since v8.0.0), so
-// this reaches installed apps via the web deploy — no new Android release, and
-// trivially reversible. Does NOT address the "no reward" half (reward is driven
-// by the Rewarded event); a Rewarded-Interstitial-vs-Rewarded ad-unit mismatch
-// remains the prime suspect for that — verify in the AdMob dashboard.
-const REWARD_IMMERSIVE_MODE = true;
+// Immersive mode OFF. A prior session enabled it speculatively (close button
+// under the edge-to-edge status bar) — but immersive mode is the root cause of
+// the universal "Reward in 30 seconds frozen at 30, ad plays fine, never grants,
+// player stuck" bug. MainActivity runs edge-to-edge (EdgeToEdge.enable,
+// transparent system bars); when the rewarded ad Activity fronts with immersive
+// STICKY system-UI, the system-bar hide/show transition churns window focus, and
+// the SDK PAUSES the reward countdown on every focus loss (onWindowFocusChanged).
+// The timer never resumes → reward (driven by the watched-duration → Rewarded
+// event) never fires → the player is stranded with no JS-dismissable native ad.
+// A frozen countdown blocks the reward entirely, which is strictly worse than a
+// hard-to-tap close button, so we trade back. JS-only: the native plugin reads
+// `immersiveMode` from the prepare call (v8.0.0+), so this reaches installed
+// apps via the web deploy — no Android release, trivially reversible.
+const REWARD_IMMERSIVE_MODE = false;
 
 export interface ShowBannerOptions {
   variant?: BannerVariant;

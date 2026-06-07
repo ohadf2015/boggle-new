@@ -91,8 +91,11 @@ describe('useAdMob.showRewarded — rewarded-interstitial routing', () => {
     for (let i = 0; i < 6; i++) await flush();
 
     expect(prepareRewardInterstitialAd).toHaveBeenCalledTimes(1);
+    // immersiveMode false on the interstitial path too — immersive sticky UI
+    // churns window focus on the edge-to-edge MainActivity and the SDK pauses
+    // the reward countdown on focus loss (the frozen "Reward in 30s" bug).
     expect(prepareRewardInterstitialAd).toHaveBeenCalledWith(
-      expect.objectContaining({ adId: 'ri-2', immersiveMode: true }),
+      expect.objectContaining({ adId: 'ri-2', immersiveMode: false }),
     );
     expect(showRewardInterstitialAd).toHaveBeenCalledTimes(1);
     expect(prepareRewardVideoAd).not.toHaveBeenCalled();
