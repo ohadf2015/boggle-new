@@ -39,4 +39,6 @@ export interface PlayerViewProps {
   roomLanguage?: Language | null;
   onUsernameChange?: (newName: string) => void;
   seriesRoundNumber?: number;
+  /** SPA reset to lobby (no reload) — see usePlayerExit.onExitToLobby. */
+  onExitToLobby?: () => void;
 }

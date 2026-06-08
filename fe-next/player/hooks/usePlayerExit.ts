@@ -10,6 +10,15 @@ interface UsePlayerExitParams {
   gameActive: boolean;
   setGameActive: (v: boolean) => void;
   intentionalExitRef: React.RefObject<boolean>;
+  /**
+   * Reset MP state IN PLACE and return to the lobby without a page reload —
+   * PageClient's proven `handleExitToLobby` (also used by the results screen and
+   * host-left grace modal). When provided, confirmExitRoom delegates to it
+   * instead of `window.location.reload()`. The reload blanks the Capacitor
+   * WebView (the "exit MP → black screen" report); the SPA reset doesn't.
+   * Optional so the hook keeps the legacy reload fallback when unwired.
+   */
+  onExitToLobby?: () => void;
 }
 
 /**
@@ -23,6 +32,7 @@ export function usePlayerExit({
   gameActive,
   setGameActive,
   intentionalExitRef,
+  onExitToLobby,
 }: UsePlayerExitParams) {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   // True the instant the player confirms exit. Passed to useNavigationGuard so
@@ -51,6 +61,17 @@ export function usePlayerExit({
     // Disable navigation guard BEFORE navigation
     setGameActive(false);
 
+    // Preferred path: reset MP state IN PLACE via PageClient's proven
+    // handleExitToLobby (emits leaveRoom, clears session, strips the ?room=
+    // param — NO page reload, NO socket.disconnect; the socket is owned by
+    // PageClient and stays alive for the lobby). The legacy hard reload below
+    // blanks the Capacitor WebView; this SPA reset renders the lobby instantly.
+    if (onExitToLobby) {
+      onExitToLobby();
+      return;
+    }
+
+    // Legacy fallback (callback not wired): hard reload.
     try {
       if (socket && gameCode && username) {
         logger.log('[PLAYER] Emitting leaveRoom event');
@@ -82,7 +103,7 @@ export function usePlayerExit({
       }
       window.location.reload();
     }, 200);
-  }, [socket, gameCode, username, setGameActive, intentionalExitRef]);
+  }, [socket, gameCode, username, setGameActive, intentionalExitRef, onExitToLobby]);
 
   // Handle logo click exit request via custom event
   const gameActiveRef = useRef(gameActive);

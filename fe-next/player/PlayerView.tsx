@@ -79,6 +79,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   roomLanguage,
   onUsernameChange,
   seriesRoundNumber,
+  onExitToLobby,
 }) => {
   const { t, dir } = useLanguage();
   const { socket } = useSocket();
@@ -247,6 +248,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     gameActive,
     setGameActive,
     intentionalExitRef,
+    onExitToLobby,
   });
 
 

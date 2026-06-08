@@ -100,6 +100,8 @@ interface HostViewProps {
   isPrivate?: boolean;
   /** Quick Play: auto-fill bots + start the moment the lobby mounts. */
   isQuickPlay?: boolean;
+  /** SPA reset to lobby (no reload) — see useHostGameActions.onExitToLobby. */
+  onExitToLobby?: () => void;
 }
 
 // ==========================================
@@ -119,6 +121,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   autoStart = false,
   isPrivate = false,
   isQuickPlay = false,
+  onExitToLobby,
 }) => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
@@ -320,6 +323,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     setShowSoloConfirm: state.setShowSoloConfirm,
     intentionalExitRef: state.refs.intentionalExitRef,
     tournamentTimeoutRef: state.refs.tournamentTimeoutRef,
+    onExitToLobby,
   });
 
   // Quick Play: auto-start solo game once room is joined and socket ready.

@@ -65,6 +65,15 @@ interface UseHostGameActionsOptions {
   // Refs
   intentionalExitRef: RefObject<boolean>;
   tournamentTimeoutRef: RefObject<NodeJS.Timeout | null>;
+
+  /**
+   * Reset MP state IN PLACE and return to the lobby without a page reload —
+   * PageClient's proven `handleExitToLobby`. When provided, confirmExitRoom
+   * delegates to it instead of `window.location.reload()`, which blanks the
+   * Capacitor WebView (the "exit MP → black screen" report). Optional so the
+   * hook keeps the legacy reload fallback when unwired.
+   */
+  onExitToLobby?: () => void;
 }
 
 export interface UseHostGameActionsReturn {
@@ -122,6 +131,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setShowSoloConfirm,
     intentionalExitRef,
     tournamentTimeoutRef,
+    onExitToLobby,
   } = options;
 
   const startGameLockRef = useRef(false);
@@ -320,6 +330,16 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     // Disable navigation guard BEFORE navigation to prevent native browser prompt
     setGameStarted(false);
 
+    // Preferred path: reset MP state IN PLACE via PageClient's proven
+    // handleExitToLobby (emits the same graceful leaveRoom, clears session,
+    // strips the ?room= param — NO reload, NO socket.disconnect). The legacy
+    // hard reload below blanks the Capacitor WebView.
+    if (onExitToLobby) {
+      onExitToLobby();
+      return;
+    }
+
+    // Legacy fallback (callback not wired): hard reload.
     clearSessionPreservingUsername(username);
     // Persist the intentional-exit flag in sessionStorage so the post-reload
     // boot path skips auto-rejoin. The ref alone is gone after reload.
@@ -334,7 +354,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       socket?.disconnect();
       window.location.reload();
     }, 100);
-  }, [socket, gameCode, username, intentionalExitRef, setGameStarted]);
+  }, [socket, gameCode, username, intentionalExitRef, setGameStarted, onExitToLobby]);
 
   const handleCancelTournament = useCallback(() => {
     if (!socket || !tournamentData) return;

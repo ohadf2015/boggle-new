@@ -501,6 +501,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             onUsernameChange={setUsername} autoStart={false}
             isPrivate={isPrivate}
             isQuickPlay={quickPlay}
+            onExitToLobby={handleExitToLobby}
           />
         </FeatureErrorBoundary>
       );
@@ -515,6 +516,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           onGameStartConsumed={handleGameStartConsumed}
           roomLanguage={roomLanguage} onUsernameChange={setUsername}
           seriesRoundNumber={seriesTracker.roundNumber}
+          onExitToLobby={handleExitToLobby}
         />
       </FeatureErrorBoundary>
     );
