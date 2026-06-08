@@ -298,6 +298,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForLocaleOnly(routes, '/lexiclash-vs-quizlet', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-kahoot', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-wordwall', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-kahoot-gimkit-vocabulary', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
 
   // Per-locale competitor landings — locale-specific indexing for native switcher intent
   routes.push({
