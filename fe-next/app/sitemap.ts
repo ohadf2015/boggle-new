@@ -480,52 +480,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     priority: 0.7,
   });
 
-  // ─── Programmatic SEO: Anagram solver (150 seed letter combos) ───
-  // Top-N common letter racks from competitive word games.
-  // Long tail discovered via internal links + dynamic crawling.
-  const anagramSeeds = [
-    // High-frequency 5-6 letter combos
-    'aaeio', 'aeiourstn', 'aeiort', 'aeinort', 'aeirst', 'aelort', 'aelrst', 'aelstu',
-    'aemnor', 'aenors', 'aenort', 'aenrst', 'aenrsu', 'aenstu', 'aeoprst', 'aersst', 'aerstT',
-    'aerstuv', 'aertsu', 'aersty', 'aertxy', 'aeruvy', 'aesttu', 'aestxy', 'aestuv',
-    // Common 4-5 letter combos
-    'acre', 'aces', 'acts', 'aide', 'aids', 'ails', 'airs', 'ales', 'also', 'ante', 'ants',
-    'apes', 'arms', 'arts', 'ates', 'bade', 'bags', 'bake', 'bald', 'bale', 'ball', 'band',
-    'bane', 'bank', 'bare', 'bark', 'barn', 'base', 'bate', 'bats', 'bean', 'bear', 'beat',
-    'beds', 'beef', 'been', 'beer', 'bees', 'bell', 'belt', 'bend', 'bent', 'best', 'beta',
-    'bile', 'bind', 'bird', 'bite', 'bits', 'blow', 'blue', 'boat', 'bold', 'bolt', 'bomb',
-    'bone', 'book', 'boot', 'bore', 'born', 'both', 'bowl', 'cake', 'cane', 'cans', 'cape',
-    'card', 'care', 'cart', 'case', 'cast', 'cave', 'cell', 'cent', 'chin', 'cite', 'clay',
-    'coat', 'code', 'cold', 'come', 'cone', 'cook', 'cool', 'cope', 'copy', 'cord', 'core',
-    'corn', 'cots', 'crab', 'cute', 'dale', 'dame', 'damp', 'dare', 'dark', 'date', 'dawn',
-    'days', 'dead', 'deal', 'dean', 'dear', 'deck', 'deep', 'dent', 'desk', 'dial', 'dice',
-    'dies', 'dime', 'dine', 'dire', 'dirt', 'dish', 'dive', 'dock', 'does', 'dome', 'done',
-    'door', 'dose', 'dove', 'down', 'draw', 'drew', 'drop', 'drug', 'dual', 'duce', 'duke',
-    'dull', 'dune', 'dusk', 'east', 'easy', 'echo', 'edge', 'edit', 'else', 'emit', 'epic',
-    'euro', 'ever', 'evil', 'exam', 'exit', 'face', 'fact', 'fade', 'fail', 'fair', 'fake',
-    'fall', 'fame', 'fare', 'farm', 'fast', 'fate', 'fear', 'feat', 'feed', 'feel', 'feet',
-    'fell', 'felt', 'fern', 'file', 'fill', 'film', 'find', 'fine', 'fire', 'firm', 'fish',
-    'fist', 'five', 'flag', 'flat', 'flaw', 'flee', 'flew', 'flip', 'flow', 'foam', 'fold',
-    'folk', 'fond', 'font', 'food', 'fool', 'foot', 'fore', 'fork', 'form', 'fort', 'foul',
-    'four', 'free', 'from', 'fuel', 'full', 'fund', 'fury', 'game', 'gang', 'gate', 'gave',
-    'gear', 'gene', 'gift', 'girl', 'give', 'glad', 'glen', 'glow', 'glue', 'goat', 'gold',
-    'golf', 'gone', 'good', 'grab', 'gray', 'grew', 'grid', 'grim', 'grip', 'grow', 'gulf'
-  ];
-
-  // Normalize and dedupe
-  const anagramSet = new Set(
-    anagramSeeds.map(s => s.toLowerCase().split('').sort().join(''))
-  );
-
-  // EN-only indexed (app/[locale]/anagram/[letters]/page.tsx robots:
-  // { index: locale === 'en' }) — thin programmatic pages, English dictionary.
-  Array.from(anagramSet).forEach((letters) => {
-    addForLocaleOnly(routes, `/anagram/${letters}`, {
-      lastModified: LAST_DEPLOYED,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    });
-  });
+  // ─── Anagram solver: programmatic /anagram/[letters] RETIRED from sitemap 2026-06-08 ───
+  // The 150 seed pages earned 0 clicks / 0% CTR over 28d and are now noindexed
+  // (app/[locale]/anagram/[letters]/page.tsx robots:{index:false}). Keeping them
+  // out of the sitemap avoids inviting crawl of noindexed URLs. The /anagram hub
+  // (added above) stays indexed. Reversible with the route's robots flag.
 
   return routes;
 }

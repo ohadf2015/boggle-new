@@ -38,10 +38,12 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     title,
     description,
     openGraph: { type: 'website', url, title, description, siteName: 'LexiClash' },
-    // English-only content + index:locale==='en'. Self-referencing EN hreflang
-    // cluster (never declare the noindexed /he|/sv|/ja|/es siblings).
+    // Founder-authorised 2026-06-08: noindex the whole programmatic family —
+    // 127 indexed pages earned 0 clicks / 0% CTR over 28d (failed SEO experiment
+    // + AdSense thin-page drag). `follow:true` still passes outbound crawl
+    // signal. Reversible: restore `index: locale === 'en'` to re-index.
     alternates: enOnlyAlternates(`/anagram/${letters}`),
-    robots: { index: locale === 'en', follow: true },
+    robots: { index: false, follow: true },
   };
 }
 
