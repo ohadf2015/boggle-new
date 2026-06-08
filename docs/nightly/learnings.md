@@ -18,7 +18,7 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 - **force-dynamic route LCP** — `/en/daily/word-wheel` 6168ms, `/he/daily/word-wheel` 5504ms, `/he/brain` 5444ms; 4 routes `force-dynamic` → no SSR caching. Highest-impact perf target now homepage LCP is fixed.
 - **`/es/multiplayer` INP 704ms + `/en/multiplayer` p75 LCP 4237ms (+621ms regress)** — skeleton-vs-hydrated height mismatch in `PageClient.tsx`.
 - **Invite funnel 83% drop** — 18 invite_consumed → 3 conversions (06-06, persists). Critical engagement signal, undiagnosed.
-- **GSC `webmasters.readonly` scope missing** — 9+ nights; blocks lane 06/08 noindex decisions + IndexNow. Status: open.
+- **GSC `webmasters.readonly` scope — RESOLVED 2026-06-05.** ADC re-consented (token mtime Jun 5 14:56, quota_project=lexiclash); `sites().list()` returns `sc-domain:lexiclash.live` and lane-06 pulls GSC live (06-08: 356 queries/100 clicks/15,662 impr). Any lane still printing "scope missing" (e.g. lane-08) is parroting THIS stale note, NOT a live 403 — lane-08 may now make noindex/IndexNow decisions. Status: closed.
 - **Spanish SEO momentum** — title-truncation fixes shipping; Hebrew `המילה היומית` +3467% WoW (pos 9.1, needs internal links).
 
 ## Idea backlog (founder-signalled)
@@ -52,7 +52,7 @@ Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All l
 - **ripgrep EACCES** — #1 infra blocker. Status: open, investigate sandbox/perms.
 - **force-dynamic route LCP** (word-wheel/brain 5.5–6.2s) — undiagnosed caching. Status: critical perf.
 - **Invite funnel 83% drop** — Status: critical engagement, undiagnosed.
-- **GSC token scope** (`webmasters.readonly`) — 9+ nights. Status: open.
+- **GSC token scope** (`webmasters.readonly`) — RESOLVED 2026-06-05 (ADC re-consented; lane-06 pulls GSC live). Status: closed.
 - **`/es/multiplayer` INP 704ms** — Status: open, height-mismatch suspect.
 - **Preflight abort handler** — Status: open, high.
 - **`PageClient.tsx` 600+ / `SinglePlayerResults.tsx` 500+** — refactor deferred. Status: open.
