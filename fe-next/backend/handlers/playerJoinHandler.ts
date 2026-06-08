@@ -36,7 +36,8 @@ import {
 
 import { cancelAutoStartCountdown } from '../modules/lobbyAutoStart.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
-import { checkRateLimit } from '../utils/rateLimiter.js';
+import { checkRateLimit, getIpFromSocket } from '../utils/rateLimiter.js';
+import { isBlocked } from '../modules/blockListManager.js';
 import timerManager, { clearGameTimer } from '../utils/timerManager.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
@@ -161,6 +162,23 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Block kicked players from re-joining
     if (game.kickedPlayers?.has(username)) {
       emitError(socket, ErrorCodes.PLAYER_KICKED, { message: 'You have been kicked from this room' });
+      return;
+    }
+
+    // Global moderation blocklist (admin-issued): refuse the verified player
+    // (auth user id), the guest (guest session id), or any client behind a
+    // blocked IP. Checked here — before reconnection/late-join — so a blocked
+    // user cannot reclaim a slot or rejoin under a new name.
+    const blockMatch = await isBlocked({
+      authUserId,
+      guestSessionId,
+      ip: getIpFromSocket(socket),
+    });
+    if (blockMatch) {
+      logger.warn('SOCKET', `Blocked ${blockMatch.blockType} attempted to join ${gameCode} as ${username}`);
+      emitError(socket, ErrorCodes.PLAYER_BLOCKED, {
+        message: blockMatch.reason || 'You have been blocked from playing.',
+      });
       return;
     }
 

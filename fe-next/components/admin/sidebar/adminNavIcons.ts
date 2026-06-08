@@ -21,6 +21,7 @@ import {
   Languages,
   GraduationCap,
   UserRound,
+  Ban,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -43,6 +44,7 @@ export const ADMIN_NAV_ICONS: Record<string, LucideIcon> = {
   Languages,
   GraduationCap,
   UserRound,
+  Ban,
 };
 
 /** Safe lookup with a sensible fallback so an unknown key never crashes. */

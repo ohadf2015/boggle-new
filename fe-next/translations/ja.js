@@ -7412,6 +7412,7 @@ const ja = {
       "overview": "概要",
       "analytics": "分析",
       "moderation": "モデレーション",
+      "blocklist": "ブロックリスト",
       "content": "コンテンツ",
       "puzzleReview": "パズルレビュー",
       "people": "ユーザー",
@@ -7420,6 +7421,35 @@ const ja = {
       "guests": "ゲスト",
       "system": "システム",
       "wordCraft": "ワードクラフト"
+    },
+    "blocklist": {
+      "title": "ブロックリスト",
+      "subtitle": "プレイヤー、ゲスト、またはIPのゲーム参加をブロックします。",
+      "typeLabel": "種類",
+      "valueLabel": "識別子",
+      "valuePlaceholder": "ユーザーID、ゲストセッションID、またはIP",
+      "reasonLabel": "理由",
+      "reasonPlaceholder": "任意",
+      "durationLabel": "期間",
+      "blockButton": "ブロック",
+      "unblockButton": "解除",
+      "blockedToast": "ブロックを追加しました",
+      "unblockedToast": "ブロックを解除しました",
+      "empty": "有効なブロックはありません。",
+      "addedOn": "追加日",
+      "expires": "期限",
+      "type": {
+        "authUser": "プレイヤー",
+        "guest": "ゲスト",
+        "ip": "IPアドレス"
+      },
+      "duration": {
+        "permanent": "無期限",
+        "1h": "1時間",
+        "24h": "24時間",
+        "7d": "7日間",
+        "30d": "30日間"
+      }
     },
     "invalidWords": {
       "title": "無効な単語の確認",

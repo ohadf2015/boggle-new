@@ -73,7 +73,12 @@ vi.mock('../../utils/errorHandler', async () => {
 
 vi.mock('../../utils/rateLimiter', () => ({
   checkRateLimit: vi.fn().mockReturnValue(true),
+  getIpFromSocket: vi.fn().mockReturnValue('127.0.0.1'),
   default: { checkRateLimit: vi.fn().mockReturnValue(true) },
+}));
+
+vi.mock('../../modules/blockListManager', () => ({
+  isBlocked: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('../../utils/timerManager', () => ({

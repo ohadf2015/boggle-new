@@ -7392,6 +7392,7 @@ const sv = {
       "overview": "Översikt",
       "analytics": "Analys",
       "moderation": "Moderering",
+      "blocklist": "Blockeringslista",
       "content": "Innehåll",
       "puzzleReview": "Pusselgranskning",
       "people": "Personer",
@@ -7400,6 +7401,35 @@ const sv = {
       "guests": "Gäster",
       "system": "System",
       "wordCraft": "WordCraft"
+    },
+    "blocklist": {
+      "title": "Blockeringslista",
+      "subtitle": "Blockera en spelare, gäst eller IP-adress från att gå med i spel.",
+      "typeLabel": "Typ",
+      "valueLabel": "Identifierare",
+      "valuePlaceholder": "Användar-ID, gästsessions-ID eller IP",
+      "reasonLabel": "Orsak",
+      "reasonPlaceholder": "Valfritt",
+      "durationLabel": "Varaktighet",
+      "blockButton": "Blockera",
+      "unblockButton": "Avblockera",
+      "blockedToast": "Blockering tillagd",
+      "unblockedToast": "Blockering borttagen",
+      "empty": "Inga aktiva blockeringar.",
+      "addedOn": "Tillagd",
+      "expires": "Upphör",
+      "type": {
+        "authUser": "Spelare",
+        "guest": "Gäst",
+        "ip": "IP-adress"
+      },
+      "duration": {
+        "permanent": "Permanent",
+        "1h": "1 timme",
+        "24h": "24 timmar",
+        "7d": "7 dagar",
+        "30d": "30 dagar"
+      }
     },
     "invalidWords": {
       "title": "Granskning av Ogiltiga Ord",

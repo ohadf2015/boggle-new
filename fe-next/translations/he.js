@@ -7368,6 +7368,7 @@ const he = {
       "overview": "סקירה",
       "analytics": "אנליטיקה",
       "moderation": "מודרציה",
+      "blocklist": "רשימת חסומים",
       "content": "תוכן",
       "puzzleReview": "סקירת חידות",
       "people": "אנשים",
@@ -7376,6 +7377,35 @@ const he = {
       "guests": "אורחים",
       "system": "מערכת",
       "wordCraft": "וורדקראפט"
+    },
+    "blocklist": {
+      "title": "רשימת חסומים",
+      "subtitle": "חסום שחקן, אורח או כתובת IP מהצטרפות למשחקים.",
+      "typeLabel": "סוג",
+      "valueLabel": "מזהה",
+      "valuePlaceholder": "מזהה משתמש, מזהה אורח או כתובת IP",
+      "reasonLabel": "סיבה",
+      "reasonPlaceholder": "אופציונלי",
+      "durationLabel": "משך",
+      "blockButton": "חסום",
+      "unblockButton": "בטל חסימה",
+      "blockedToast": "החסימה נוספה",
+      "unblockedToast": "החסימה הוסרה",
+      "empty": "אין חסימות פעילות.",
+      "addedOn": "נוסף",
+      "expires": "פג בתאריך",
+      "type": {
+        "authUser": "שחקן",
+        "guest": "אורח",
+        "ip": "כתובת IP"
+      },
+      "duration": {
+        "permanent": "קבוע",
+        "1h": "שעה",
+        "24h": "24 שעות",
+        "7d": "7 ימים",
+        "30d": "30 ימים"
+      }
     },
     "kpi": {
       "dau": "משתמשים פעילים יומיים",

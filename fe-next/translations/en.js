@@ -13186,9 +13186,39 @@ const en = {
       "people": "People",
       "more": "More",
       "moderation": "Moderation",
+      "blocklist": "Blocklist",
       "overview": "Overview",
       "players": "Players",
       "system": "System"
+    },
+    "blocklist": {
+      "title": "Blocklist",
+      "subtitle": "Block a player, guest, or IP from joining games.",
+      "typeLabel": "Type",
+      "valueLabel": "Identifier",
+      "valuePlaceholder": "User ID, guest session ID, or IP",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Optional",
+      "durationLabel": "Duration",
+      "blockButton": "Block",
+      "unblockButton": "Unblock",
+      "blockedToast": "Block added",
+      "unblockedToast": "Block removed",
+      "empty": "No active blocks.",
+      "addedOn": "Added",
+      "expires": "Expires",
+      "type": {
+        "authUser": "Player",
+        "guest": "Guest",
+        "ip": "IP address"
+      },
+      "duration": {
+        "permanent": "Permanent",
+        "1h": "1 hour",
+        "24h": "24 hours",
+        "7d": "7 days",
+        "30d": "30 days"
+      }
     },
     "system": {
       "down": "Down",

@@ -24,6 +24,7 @@ const {
 
 const { loadCommunityWords } = require('./modules/communityWordManager');
 const { cleanupEmptyRooms } = require('./modules/gameStateManager');
+const { startBlockListAutoRefresh } = require('./modules/blockListManager');
 const { initRateLimit, resetRateLimit, isIpBlocked, isIpBlockedAsync, RateLimiter } = require('./utils/rateLimiter');
 import logger from './utils/logger';
 
@@ -42,6 +43,10 @@ function initializeSocketHandlers(io: Server): void {
 
   // Start connection health check
   startConnectionHealthCheck(io);
+
+  // Warm + keep the admin moderation blocklist cache fresh (used by the
+  // join path to refuse blocked players/guests/IPs).
+  startBlockListAutoRefresh();
 
   // Set up periodic cleanup of empty rooms (tracked for shutdown)
   if (_emptyRoomCleanupTimer) clearInterval(_emptyRoomCleanupTimer);
