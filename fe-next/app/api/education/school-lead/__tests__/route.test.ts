@@ -3,14 +3,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const h = vi.hoisted(() => ({
   insertSpy: vi.fn(async () => ({ data: { id: 'lead-1' }, error: null })),
   sendEmailSpy: vi.fn(async () => ({ ok: true })),
-  recentCount: 0,
+  rateLimited: false as boolean,
+  rpcError: null as null | { message: string },
 }));
 const { insertSpy, sendEmailSpy } = h;
 
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
-    // Rate-limit count goes through a SECURITY DEFINER rpc (RLS-safe), not a SELECT.
-    rpc: vi.fn(async (_fn: string, _args: unknown) => ({ data: h.recentCount, error: null })),
+    // Rate-limit goes through a SECURITY DEFINER boolean rpc (RLS-safe), not a SELECT.
+    rpc: vi.fn(async (_fn: string, _args: unknown) => ({ data: h.rpcError ? null : h.rateLimited, error: h.rpcError })),
     from: () => ({
       insert: h.insertSpy,
     }),
@@ -43,7 +44,8 @@ const valid = {
 describe('POST /api/education/school-lead', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    h.recentCount = 0;
+    h.rateLimited = false;
+    h.rpcError = null;
   });
 
   it('200 + inserts a qualified lead row', async () => {
@@ -76,8 +78,15 @@ describe('POST /api/education/school-lead', () => {
   });
 
   it('429 when rate-limited (>=3 in 24h)', async () => {
-    h.recentCount = 3;
+    h.rateLimited = true;
     expect((await POST(mkReq(valid))).status).toBe(429);
     expect(insertSpy).not.toHaveBeenCalled();
+  });
+
+  it('fails OPEN (still captures the lead) if the rate-limit RPC errors', async () => {
+    h.rpcError = { message: 'rpc boom' };
+    const res = await POST(mkReq(valid));
+    expect(res.status).toBe(200);
+    expect(insertSpy).toHaveBeenCalledTimes(1);
   });
 });

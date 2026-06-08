@@ -20,13 +20,18 @@ export async function POST(req: Request) {
 
   const sb = await createClient();
 
-  // Rate limit: max 3 submissions per email per 24h. Counted via a SECURITY DEFINER
-  // RPC — a plain SELECT here returns 0 under RLS (school_leads SELECT is admin-only),
-  // which would silently disable the limit and leave the endpoint spammable.
-  const { data: recentCount, error: countErr } = await sb.rpc('count_recent_school_leads', {
+  // Rate limit: max 3 submissions per email per 24h. Evaluated via a SECURITY DEFINER
+  // boolean RPC — a plain SELECT here returns 0 under RLS (school_leads SELECT is
+  // admin-only), which would silently disable the limit and leave the endpoint
+  // spammable. Boolean (not raw count) so anon can't enumerate submissions.
+  const { data: rateLimited, error: countErr } = await sb.rpc('school_lead_rate_limited', {
     p_email: lead.email,
   });
-  if (!countErr && (recentCount || 0) >= 3) return bad('too many requests in 24h, try again later', 429);
+  // Fail OPEN by design: a high-value school lead must not be lost to a transient RPC
+  // hiccup. But log so a chronically-broken limiter surfaces instead of silently
+  // disabling itself (the exact regression this RPC was added to fix).
+  if (countErr) console.error('[school-lead] rate-limit check failed, proceeding:', countErr.message);
+  if (rateLimited === true) return bad('too many requests in 24h, try again later', 429);
 
   const ins = await sb.from('school_leads').insert({ ...lead, source: 'for-schools-page' });
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);

@@ -58,8 +58,11 @@ export function validateSchoolLeadPayload(body: unknown): SchoolLeadValidation {
   if (!body || typeof body !== 'object') return { ok: false, error: 'invalid body' };
   const b = body as Record<string, unknown>;
 
-  const email = b.email;
-  if (typeof email !== 'string' || !EMAIL_RE.test(email)) return { ok: false, error: 'invalid email' };
+  if (typeof b.email !== 'string') return { ok: false, error: 'invalid email' };
+  // Canonicalize FIRST so rate-limit lookup + insert always use one form (defeats
+  // Bob@x.com vs bob@x.com rate-limit bypass + duplicate leads), then validate.
+  const email = b.email.trim().toLowerCase();
+  if (!EMAIL_RE.test(email)) return { ok: false, error: 'invalid email' };
 
   const full_name = b.full_name;
   if (typeof full_name !== 'string' || full_name.trim().length < 2 || full_name.length > 120)

@@ -29,6 +29,12 @@ describe('validateSchoolLeadPayload', () => {
     }
   });
 
+  it('canonicalizes email (trim + lowercase) so rate-limit/insert use one form', () => {
+    const r = validateSchoolLeadPayload({ ...valid, email: '  Principal@Lincoln-High.EDU ' });
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.payload.email).toBe('principal@lincoln-high.edu');
+  });
+
   it('accepts empty interests (interest is optional, the org fields qualify)', () => {
     const r = validateSchoolLeadPayload({ ...valid, interests: [] });
     expect(r.ok).toBe(true);
