@@ -25,10 +25,12 @@ import { useState, useEffect } from 'react';
  * ```
  */
 export function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
+  // Start false so SSR (no window) and the client's FIRST render agree — reading
+  // matchMedia in the initializer diverges from SSR for reduced-motion users and
+  // triggers React #418 tree regeneration. The effect below syncs the real value
+  // post-mount; the SSR HTML already paints motion-on either way, so this adds no
+  // flash, it only removes the mismatch.
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     // Check if window is available (SSR safety)
