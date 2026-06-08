@@ -420,3 +420,47 @@ All 5 items triaged with live evidence (Sentry MCP + Supabase SQL + Railway env)
   - https://lexiclash.sentry.io/issues/119434883/ + 119434885/
   - status: deferred — reach=0 (automated logger, no real users affected); constraint likely rejecting guest/bot sessions with null player_id
   - recommended owner: backend — determine if bots/guests should be excluded from game_sessions logging entirely or if GAME_SESSION_LOGGER should coerce null to a sentinel UUID
+
+## 2026-06-08 (Lane 1)
+- [Supabase] anon_security_definer_function_executable — is_language_curator, get_my_curator_languages, is_admin_user
+  - status: shipped (migration `revoke_anon_secdef_rls_helpers` applied via MCP)
+  - why shipped: all 3 are pure RLS helpers; zero TypeScript anon callsites confirmed; REVOKE is fully reversible
+  - recommended owner: review-by-eod — verify curator/propose flow still works (requires authenticated session, unaffected)
+
+- [Sentry] 1JR — `relation "profiles" does not exist` (POST /api/coins, reach=5)
+  - https://lexiclash.sentry.io/issues/123033022/
+  - first/last seen: 2026-05-27 (12 days ago, stopped same day — likely resolved by deploy)
+  - status: deferred — old issue, no recurrence; stale brief data
+  - why: last seen 12 days ago; no stack trace points to fixable first-party code in the obfuscated bundle
+  - recommended owner: backend — confirm resolved; check `/api/coins` for `search_path` or schema-less query patterns if it recurs
+
+- [Sentry] 1KQ — churn-signals 502 (reach=3)
+  - https://lexiclash.sentry.io/issues/124871662/
+  - status: deferred — root cause already fixed in codebase (getBearerUser.ts local JWT verify); may need SUPABASE_JWT_SECRET provisioned in Railway env
+  - why: infrastructure env-var gap, not code bug; `useChurnSignals.ts` already silences 5xx at debug level
+  - recommended owner: review-by-eod — verify SUPABASE_JWT_SECRET is set in Railway dashboard
+
+## 2026-06-08 (Lane 03 — engagement)
+
+### Flag hygiene update
+
+- **`share-prompt-timing`** (PostHog id 163656, 69 days, 100% rollout)
+  - Prior entries (05-26, 05-28, 06-01, 06-04) consistently flag this as stale with near-zero exposures
+  - Call site confirmed: `usePostHogFlag('share-prompt-timing')` in `SinglePlayerResults.tsx` + `useSharePromptImpression.ts`
+  - **Recommendation: RETIRE.** 69 days with minimal exposures = permanently underpowered. Keep `results-page` branch (the default). Remove `useSharePromptImpression` hook and PostHog flag read in `SinglePlayerResults.tsx`. Delete PostHog flag.
+  - Owner: growth (one-session task)
+
+- **`show-signup-after-first-win`** (PostHog id 163655, 69 days, 100% rollout)
+  - Confirmed call site in `useSignupPrompt.ts:61` via `usePostHogFlag('show-signup-after-first-win', 'after-first-win')` (correction from prior entries saying "no call sites")
+  - 69 days, far below 1000/arm — will never reach stat-sig at current traffic
+  - **Recommendation: RETIRE.** Keep `after-first-win` variant as hardcoded path (it's the emotional peak and the default). Remove `usePostHogFlag` call + delete PostHog flag. Small cleanup PR.
+  - Owner: growth (one-session task)
+
+- **`mp-signup-nudge-copy-v1`** (PostHog id 183230, 31 days, 100% rollout)
+  - Description states 0/77 converts in 28d. 0 conversion across ALL variants = the prompt mechanic is broken, not the copy.
+  - **Recommendation: INVESTIGATE FIRST.** Before retiring, verify the signup sheet actually renders on trigger (add a PostHog event on sheet impression — `mp_signup_sheet_shown`). If 0 impressions: trigger is broken. If impressions > 0 but 0 conversion: sheet UX is broken. Then retire flag and redesign trigger/UX separately.
+  - Owner: growth + frontend
+
+### New experiment activated
+- `exp-mp-quickplay-wait-v1` added to typed registry (`fe-next/lib/experiments.ts`) targeting ES MP quickPlay rage clicks (24h: 23 rage clicks, score 0.768)
+- **Next step**: Create PostHog flag `exp-mp-quickplay-wait-v1` with 50/50 split. Wire the overlay variant in `MultiplayerFlow.tsx` — show "Finding a match..." full-screen overlay when `quickPlay && isJoining && variant === 'match-seeking'`. Deferred to next run (time budget).

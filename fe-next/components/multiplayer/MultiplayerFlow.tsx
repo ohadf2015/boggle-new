@@ -336,6 +336,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       language: defaultLanguage,
       gameMode: 'classic',
     });
+    trackGrowthEvent('mp_quickplay_initiated', { hadMatchRoom: !!matchRoom });
     if (matchRoom) {
       setGameCode(matchRoom.gameCode);
       setUsername(quickPlayUsername);

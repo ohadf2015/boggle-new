@@ -12,7 +12,7 @@ import { useAyetVideoAds } from '@/hooks/useAyetVideoAds';
 import { getAyetPlacementId } from '@/lib/ads/ayetVideoAds';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
-import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
+import { trackRewardedAdOffered, trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 import type { RewardedSurface } from '@/lib/admob-config';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
@@ -336,6 +336,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
+
+    trackRewardedAdOffered(telemetrySurface ?? 'unknown', { platform });
 
     // Single idempotent settle guard for this showAd session. The FIRST
     // terminal outcome — reward, error, or the stuck-state watchdog — wins;

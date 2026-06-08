@@ -342,6 +342,28 @@ export const EXPERIMENTS = {
     description:
       'Word Wheel already-played dead-end CTA. control = no replay option. practice-cta = "Play unlimited practice wheels" button. Conversion = wheel_practice_cta_clicked → practice game_started. Anti-bounce for returning daily players.',
   }),
+
+  /**
+   * Quick Play match-seeking overlay. When ?quickPlay=true fires the
+   * auto-join useEffect, control shows only the dimmed Quick Start button
+   * (opacity-70, cursor-wait). Users rage-click because the minimal visual
+   * feedback doesn't signal "I'm finding you a match". The `match-seeking`
+   * variant replaces the lobby with a full-screen "Finding a match..."
+   * overlay while isJoining=true, eliminating the ambiguity.
+   *
+   * Hypothesis: explicit "Finding a match..." overlay will cut rage clicks
+   * on /es/multiplayer?quickPlay=true by ≥50% (24h: 23 rage clicks, score 0.768).
+   *
+   * Conversion: mp_quickplay_joined (successful room join).
+   * Guardrail: mp_quickplay_initiated count must not fall (don't break the flow).
+   * Ship to PostHog: flag key = 'exp-mp-quickplay-wait-v1', 50/50 rollout.
+   */
+  'exp-mp-quickplay-wait-v1': defineExperiment({
+    variants: ['control', 'match-seeking'] as const,
+    default: 'control',
+    description:
+      'Quick Play joining overlay. match-seeking = full-screen "Finding a match..." overlay while isJoining=true during ?quickPlay auto-join. control = dimmed button only. Reduces rage clicks on /multiplayer?quickPlay=true. Conversion = mp_quickplay_joined.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

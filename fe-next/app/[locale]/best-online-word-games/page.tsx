@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
+import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -309,9 +311,11 @@ export default async function BestOnlineWordGamesPage({ params }: PageProps) {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-faq" type="application/ld+json">{faqJsonLd}</Script>
+      {/* SSR-safe: rendered into initial HTML, visible to Googlebot */}
+      <FaqPageJsonLd faqs={faqs} />
+      <VideoGameJsonLd />
+      {/* Article + ItemList remain client-side until wrapper components exist */}
       <Script id="ld-itemlist" type="application/ld+json">{itemListJsonLd}</Script>
-      <Script id="ld-videogame-lexiclash" type="application/ld+json">{lexiclashVideoGameJsonLd}</Script>
       <Script id="ld-article" type="application/ld+json">{articleJsonLd}</Script>
 
       {/* STICKER MARQUEE */}

@@ -5,13 +5,14 @@
  * Shows meme image, typewriter caption reveals, laugh meter, vote results, winner crown.
  */
 
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { setInterval, clearInterval } from 'worker-timers';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { usePartySounds } from '@/hooks/usePartySounds';
 import { PartyConfettiBurst } from '@/components/party/shared/PartyConfettiBurst';
+import { saveWinner, getRandomPast, type CaptionHallEntry } from '@/lib/party/captionHall';
 
 // ==================== Types ====================
 
@@ -63,6 +64,8 @@ function CaptionClashTvInner({ socket }: CaptionClashTvProps) {
   const [laughCounts, setLaughCounts] = useState<Record<string, number>>({});
   const [voteResults, setVoteResults] = useState<VoteResult[]>([]);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [pastWinner, setPastWinner] = useState<CaptionHallEntry | null>(null);
+  const imageDataRef = useRef<ImageReadyData | null>(null);
 
   // Timer countdown
   useEffect(() => {
@@ -79,6 +82,7 @@ function CaptionClashTvInner({ socket }: CaptionClashTvProps) {
     if (!socket) return;
 
     const onImageReady = (data: ImageReadyData) => {
+      imageDataRef.current = data;
       setImageData(data);
       setPhase('writing');
       setSubmissionCount({ count: 0, total: 0 });
@@ -112,6 +116,12 @@ function CaptionClashTvInner({ socket }: CaptionClashTvProps) {
       setPhase('crown');
       setVoteResults(data.results);
       partySounds.onCrowned();
+      const winner = data.results.find(r => r.isWinner);
+      const currentImageId = imageDataRef.current?.imageId;
+      if (winner) {
+        saveWinner({ text: winner.submission.text, username: winner.submission.username, imageId: currentImageId ?? 'unknown' });
+      }
+      setPastWinner(getRandomPast(currentImageId));
     };
 
     const onPhaseChange = (data: { phase: string; gameState: Record<string, unknown> | null }) => {
@@ -380,6 +390,24 @@ function CaptionClashTvInner({ socket }: CaptionClashTvProps) {
               <p className="font-neo-display text-neo-yellow text-lg mt-2">
                 +{winner.points} pts
               </p>
+            </AdaptiveMotion.div>
+          )}
+
+          {/* Crowd verdict — past winner chip */}
+          {pastWinner && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: revealDelay + 0.6 }}
+              className="mt-5 flex items-center justify-center gap-2"
+            >
+              <span className="font-neo-body text-[11px] text-neo-white/35 uppercase tracking-widest shrink-0">
+                {t('party.hallWinner') || 'Past winner:'}
+              </span>
+              <span className="border border-neo-pink/25 rounded-neo px-3 py-1 font-neo-body text-sm text-neo-white/60 italic">
+                &ldquo;{pastWinner.text}&rdquo;
+                <span className="not-italic text-neo-white/35 ml-1">— {pastWinner.username}</span>
+              </span>
             </AdaptiveMotion.div>
           )}
         </div>

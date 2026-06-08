@@ -9,6 +9,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/utils/growthTracking', () => ({
+  trackRewardedAdOffered: vi.fn(),
   trackRewardedAdWatched: vi.fn(),
   trackRewardedAdDeclined: vi.fn(),
 }));
@@ -36,7 +37,7 @@ vi.mock('@/contexts/CoinContext', () => ({
 }));
 
 import { useRewardedAd } from '../useRewardedAd';
-import { trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
+import { trackRewardedAdOffered, trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
 
 describe('useRewardedAd analytics', () => {
   beforeEach(() => {
@@ -105,5 +106,24 @@ describe('useRewardedAd analytics', () => {
       expect.any(String),
       'blast_wave_continue',
     );
+  });
+
+  it('does not fire trackRewardedAdOffered when declined at no_ad_provider gate', async () => {
+    const { result } = renderHook(() => useRewardedAd());
+    await act(async () => {
+      result.current.showAd();
+      await Promise.resolve();
+    });
+    // offered fires only after all guards pass; no_ad_provider is an early return
+    expect(trackRewardedAdOffered).not.toHaveBeenCalled();
+    expect(trackRewardedAdDeclined).toHaveBeenCalledWith('no_ad_provider', expect.any(String), expect.any(String));
+  });
+
+  it('does not fire trackRewardedAdOffered when declined at daily_limit gate', () => {
+    const today = new Date().toISOString().slice(0, 10);
+    localStorage.setItem('lexiclash_daily_ad_views', JSON.stringify({ date: today, count: 10 }));
+    const { result } = renderHook(() => useRewardedAd());
+    act(() => { result.current.showAd(); });
+    expect(trackRewardedAdOffered).not.toHaveBeenCalled();
   });
 });

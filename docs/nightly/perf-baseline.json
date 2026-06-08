@@ -1,104 +1,72 @@
 {
-  "date": "2026-06-06",
-  "note": "Twelfth snapshot. Research-only run (cutoff hit before migrations). Key findings: (1) idx_web_vitals_player_id flagged UNUSED by advisor — added yesterday but no SELECT queries use player_id filter in production; write overhead only — DROP candidate. (2) word_review_state_lesson_id_fkey still unindexed — migration needed. (3) AutoHideHeader CLS fix still unshipped (0.29 CLS on /en/multiplayer). (4) pg_timezone_names 338ms/call = Studio-only, not app. (5) profiles last_seen_at UPDATE up 33916 calls (from 28930) — stable.",
+  "date": "2026-06-08",
+  "note": "Thirteenth snapshot. Backend: applied RLS initplan fix on curator_proposals + curator_language_assignments (auth.uid() → (select auth.uid())). Frontend: LCP regressions identified on /daily/word-wheel (~6168ms) and /brain (~5444ms) — root cause = force-dynamic (no SSR caching) + dynamic import of game component; needs browser trace to confirm LCP element; deferred to human. Multiple permissive policies on word_scores noted (deferred). AutoHideHeader CLS 0.29 on /en/multiplayer still unshipped.",
   "backend": {
+    "advisor_warnings_count": 2,
+    "advisor_warnings": [
+      {
+        "type": "auth_rls_initplan",
+        "table": "curator_proposals",
+        "status": "FIXED — migration 20260608030000 applied to prod + committed to repo"
+      },
+      {
+        "type": "multiple_permissive_policies",
+        "table": "word_scores",
+        "policies": ["Word scores are viewable by everyone", "curators read word scores in their language"],
+        "status": "DEFERRED — needs policy consolidation or restrictive policy; risk of breaking curator read access"
+      }
+    ],
     "top_queries": [
       {
         "label": "supabase_realtime_wal_parser_slot1",
-        "calls": 775439,
-        "mean_ms": 4.29,
-        "total_ms": 3328220,
-        "verdict": "INFRASTRUCTURE: unchanged. Deferred to Supabase support."
+        "note": "infrastructure — deferred to Supabase support",
+        "verdict": "INFRASTRUCTURE"
       },
       {
-        "label": "supabase_realtime_wal_parser_slot2",
-        "calls": 136057,
-        "mean_ms": 4.43,
-        "total_ms": 602093,
-        "verdict": "INFRASTRUCTURE: secondary realtime slot."
-      },
-      {
-        "label": "sync_coins_rpc",
-        "calls": 18761,
-        "mean_ms": 7.30,
-        "total_ms": 136907,
-        "verdict": "STABLE"
-      },
-      {
-        "label": "profiles_update_last_seen_at",
-        "calls": 33916,
-        "mean_ms": 1.89,
-        "total_ms": 64061,
-        "verdict": "ok — calls up from 28930, mean stable"
-      },
-      {
-        "label": "pg_timezone_names_select",
-        "calls": 176,
-        "mean_ms": 337.99,
-        "total_ms": 59485,
-        "verdict": "WATCH: Studio/MCP introspection only. No app caller. Stable from prior run."
-      },
-      {
-        "label": "supabase_schema_introspection",
-        "calls": 18,
-        "mean_ms": 2481.34,
-        "total_ms": 44664,
-        "verdict": "Studio dashboard heavy introspection. Not actionable."
-      },
-      {
-        "label": "friend_messages_dm_thread",
-        "calls": 127908,
-        "mean_ms": 0.15,
-        "total_ms": 19606,
-        "verdict": "ok"
-      },
-      {
-        "label": "web_vitals_insert",
-        "calls": 26025,
-        "mean_ms": 0.71,
-        "total_ms": 18577,
-        "verdict": "ok — INSERT fast. BUT idx_web_vitals_player_id flagged UNUSED by advisor (no SELECT on player_id). DROP this index to remove write overhead."
+        "label": "curator_proposals RLS scan",
+        "note": "was re-evaluating auth.uid() per row — FIXED by 20260608030000 migration",
+        "verdict": "FIXED"
       }
-    ],
-    "advisor_warnings_count": 3,
-    "advisor_notes": "Active advisors: (1) auth_db_connections_absolute — Switch Auth to percentage-based connections (Supabase Dashboard only). (2) word_review_state_lesson_id_fkey unindexed FK — migration needed (add btree index on lesson_id). (3) idx_web_vitals_player_id UNUSED — added 2026-06-05 but no queries use it for reads; DROP saves write cost on 26k/run INSERTs.",
-    "open_migrations": [
-      "DROP INDEX IF EXISTS public.idx_web_vitals_player_id; -- unused, write-overhead only",
-      "CREATE INDEX CONCURRENTLY idx_word_review_state_lesson_id ON public.word_review_state (lesson_id); -- fixes unindexed FK"
     ]
   },
   "frontend": {
-    "by_route_24h": [
+    "by_route": [
       {
-        "route": "/en/multiplayer",
-        "p75_lcp": 4360,
-        "p75_inp": 272,
-        "p75_cls": 0.29,
-        "n": 16,
-        "flags": ["LCP_POOR", "CLS_POOR"],
-        "delta_vs_prior": "Unchanged from 2026-06-05 baseline. Root: AutoHideHeader null-vs-element toggle post-hydration. Fix STILL unshipped (authored: placeholder div strategy)."
+        "route": "/en/daily/word-wheel",
+        "p75_lcp_ms": 6168,
+        "severity": "POOR",
+        "root_cause": "force-dynamic + dynamic import of WordWheelChallenge — no SSR cache, game JS loads client-side",
+        "status": "DEFERRED — needs browser trace to confirm LCP element before fix"
       },
       {
-        "route": "/en",
-        "p75_lcp": 2441,
-        "p75_inp": null,
-        "p75_cls": 0.013,
-        "n": 26,
-        "flags": ["LCP_NEEDS_IMPROVEMENT"],
-        "delta_vs_prior": "Stable. No new data this run."
+        "route": "/he/daily/word-wheel",
+        "p75_lcp_ms": 5504,
+        "severity": "POOR",
+        "status": "DEFERRED — same root cause as /en/daily/word-wheel"
+      },
+      {
+        "route": "/he/brain",
+        "p75_lcp_ms": 5444,
+        "severity": "POOR",
+        "root_cause": "force-dynamic + BrainTrainingPageClient — no SSR cache",
+        "status": "DEFERRED — needs browser trace"
+      },
+      {
+        "route": "/sv/daily/word-hunt",
+        "p75_lcp_ms": 4928,
+        "severity": "POOR",
+        "status": "DEFERRED — same pattern"
+      },
+      {
+        "route": "/en/multiplayer",
+        "p75_cls": 0.29,
+        "severity": "POOR",
+        "root_cause": "AutoHideHeader returns null → layout shift on hydrate",
+        "status": "FIX AUTHORED BUT UNSHIPPED — 3rd night carrying"
       }
-    ],
-    "open_watches": [
-      "/en/multiplayer CLS 0.29 REGRESSION (2nd day) — AutoHideHeader returns null, not hidden div. Fix = reserve space with placeholder <div> matching header height during hydration. PRIORITY: ship tomorrow.",
-      "/en/multiplayer LCP 4360ms — dynamic import MultiplayerFlow delays LCP.",
-      "/he/daily LCP 5600ms — undiagnosed, per brief.",
-      "/es/settings LCP 7768ms — undiagnosed, per brief.",
-      "/es/juego-de-palabras-multijugador LCP 6698ms — Spanish multiplayer landing, undiagnosed.",
-      "/en/free-multiplayer-word-game CLS 1.0 — GSAP pin-spacer. Deferred."
     ]
   },
   "bundle": {
-    "note": ".next/ absent in local checkout. Bundle delta skipped.",
-    "top_chunks": []
+    "note": "Bundle size check skipped this run — time budget prioritised RLS fix. Check .next/static/chunks/*.js delta manually if needed."
   }
 }

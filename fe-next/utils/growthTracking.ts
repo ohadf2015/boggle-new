@@ -178,7 +178,19 @@ export type GrowthEvent =
   // 1|2|3, gameMode?, language? }. NOT a funnel step — kept off
   // CANONICAL_DUAL_EMIT. Consumed by the nightly improvement loop's feedback
   // digest, so all surfaces stay one query.
-  | 'game_feedback';
+  | 'game_feedback'
+  // Quick Play funnel instrumentation. Fired by MultiplayerFlow.handleQuickPlay
+  // to close the rage-click blind spot on /multiplayer?quickPlay=true (24h: 23
+  // rage clicks). Three stages so PostHog funnels can pinpoint drop-off:
+  //   mp_quickplay_initiated — user tapped Quick Start or ?quickPlay auto-fired.
+  //     Props: { trigger: 'url_param' | 'button', hadMatchRoom: boolean }.
+  //   mp_quickplay_socket_wait — socket not yet connected at initiation moment.
+  //     Props: { trigger: 'url_param' | 'button' }. High rate = socket latency issue.
+  //   mp_quickplay_joined — lobby join confirmed (onJoined callback fired).
+  //     Props: { asHost: boolean, language: string }.
+  | 'mp_quickplay_initiated'
+  | 'mp_quickplay_socket_wait'
+  | 'mp_quickplay_joined';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =
