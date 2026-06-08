@@ -61,6 +61,27 @@ describe('useConnectionToasts — reconnect failure dismisses the stuck toast', 
     );
   });
 
+  it('dismisses the stranded "Reconnecting..." toast when the hook unmounts mid-reconnect', () => {
+    const { rerender, unmount } = renderHook(() => useConnectionToasts());
+
+    // connected → reconnecting (shows the duration:Infinity loading toast)
+    socketState = { isConnected: false, isReconnecting: true, connectionError: null };
+    rerender();
+    expect(toastMock.loading).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ id: 'connection-reconnecting' }),
+    );
+
+    toastMock.dismiss.mockClear();
+
+    // User navigates away (e.g. multiplayer → single-player) while still reconnecting.
+    // The global <Toaster> outlives this hook, so the Infinity-duration toast would
+    // otherwise be stranded forever — no mounted code path can ever dismiss it.
+    unmount();
+
+    expect(toastMock.dismiss).toHaveBeenCalledWith('reconnecting-id');
+  });
+
   it('still dismisses + celebrates on a successful reconnect (no regression)', () => {
     const { rerender } = renderHook(() => useConnectionToasts());
 

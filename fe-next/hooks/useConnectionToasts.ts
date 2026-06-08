@@ -103,6 +103,22 @@ export function useConnectionToasts() {
       );
     }
   }, [isConnected, isReconnecting, connectionError, t]);
+
+  // Dismiss any lingering connection toast when the hook unmounts. These toasts
+  // live on the global <Toaster>, which outlives this hook, and the
+  // "Reconnecting..." toast has duration: Infinity. If the user navigates away
+  // mid-reconnect (e.g. multiplayer → single-player), the dismiss branches above
+  // never run again, so the spinner would be stranded forever over an unrelated
+  // screen. Empty deps → this runs only on unmount, never on dep changes (which
+  // would otherwise dismiss-and-recreate the toast on every t/connectionError tick).
+  useEffect(() => {
+    return () => {
+      if (disconnectToastIdRef.current) {
+        toast.dismiss(disconnectToastIdRef.current);
+        disconnectToastIdRef.current = null;
+      }
+    };
+  }, []);
 }
 
 export default useConnectionToasts;
