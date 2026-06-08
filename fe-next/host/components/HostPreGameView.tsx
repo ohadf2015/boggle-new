@@ -257,15 +257,20 @@ function HostPreGameView({
     };
   }, [gameCode, gameState, showInviteButton, hideInviteButton, isInviteButtonVisible, isPrivate]);
 
-  // Actual player count for start logic
-  const actualPlayerCount = hostPlaying
-    ? playersReady.length
-    : playersReady.filter(p => {
-        const isHostPlayer = typeof p === 'object' ? p.isHost : false;
-        const name = typeof p === 'string' ? p : p.username;
-        return !isHostPlayer && name !== username;
-      }).length;
-  const isStartDisabled = !timerValue || actualPlayerCount === 0 || tournamentCreating;
+  // Human opponents in the room (excludes the host + self). This — NOT a raw
+  // player count — drives bot-fill and the alone timer: a host is "alone" when
+  // no human opponents are present, whether or not the host is also playing. A
+  // host-inclusive count hid the mobile case where hostPlaying is forced true,
+  // so a solo host counted as 1 and started an opponent-less game with no bots.
+  const humanGuestCount = playersReady.filter(p => {
+    const isHostPlayer = typeof p === 'object' ? p.isHost : false;
+    const name = typeof p === 'string' ? p : p.username;
+    return !isHostPlayer && name !== username;
+  }).length;
+  // A host alone in the lobby may still press Start: clicking fills bots + starts
+  // immediately (see handleStartClick). Only a missing timer / tournament-in-flight
+  // blocks it — never "no players yet", which trapped new hosts behind a 40s wait.
+  const isStartDisabled = !timerValue || tournamentCreating;
 
   // Auto-fill bots countdown
   const [botCountdown, setBotCountdown] = useState<number | null>(null);
@@ -273,14 +278,19 @@ function HostPreGameView({
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (actualPlayerCount === 0) {
+    if (humanGuestCount === 0) {
       if (isQuickPlay) {
         // Quick Play: skip alone-timer, kick off short "filling bots…" countdown.
         setBotCountdown(3);
-      } else {
+      } else if (!isPrivate) {
+        // Passive fallback for a PUBLIC-room host who never presses Start. Halved
+        // from 30s → 15s to shrink the dead lobby wait that drove new-host
+        // abandonment. A human joining cancels this (the else-branch below).
+        // Private (invite / classroom) rooms are excluded — that host is waiting
+        // on specific humans and can still press Start to fill bots on demand.
         aloneTimerRef.current = setTimeout(() => {
           setBotCountdown(10);
-        }, 30_000);
+        }, 15_000);
       }
     } else {
       if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
@@ -290,7 +300,7 @@ function HostPreGameView({
     return () => {
       if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
     };
-  }, [actualPlayerCount, isQuickPlay]);
+  }, [humanGuestCount, isQuickPlay, isPrivate]);
 
   useEffect(() => {
     if (botCountdown === null) return;
@@ -319,6 +329,16 @@ function HostPreGameView({
     if (aloneTimerRef.current) clearTimeout(aloneTimerRef.current);
     setBotCountdown(null);
   }, []);
+
+  // Host pressed Start. If they're alone (no human guests), fill bots first so the
+  // game has opponents — mirrors the passive bot-countdown path (setAutoFill →
+  // onStartGame) but on demand, so an impatient new host needn't wait out the timer.
+  const handleStartClick = useCallback(() => {
+    if (humanGuestCount === 0) {
+      socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
+    }
+    onStartGame();
+  }, [humanGuestCount, socket, onStartGame]);
 
   // Bot countdown banner
   const renderBotCountdown = (): React.ReactElement | null => {
@@ -449,7 +469,7 @@ function HostPreGameView({
           <div className="flex items-center gap-2 shrink-0">
             {!isPrivate && (
               <div className="min-[720px]:hidden">
-                <MobileShareSection gameCode={gameCode} t={t} showHint={actualPlayerCount === 0} compact />
+                <MobileShareSection gameCode={gameCode} t={t} showHint={humanGuestCount === 0} compact />
               </div>
             )}
             {/* UI-language switcher — only show when UI language differs from room/board language.
@@ -538,7 +558,7 @@ function HostPreGameView({
               <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
               <div className={cn('flex-1', showWaitingNudge && 'animate-pulse')}>
                 <StartButton
-                  onStartGame={onStartGame}
+                  onStartGame={handleStartClick}
                   disabled={isStartDisabled}
                   tournamentCreating={tournamentCreating}
                   playerCount={filteredPlayersForDisplay.length}
@@ -593,7 +613,7 @@ function HostPreGameView({
               </div>
               <div className={cn('short:flex-1 short:min-w-0', showWaitingNudge && 'animate-pulse')}>
                 <StartButton
-                  onStartGame={onStartGame}
+                  onStartGame={handleStartClick}
                   disabled={isStartDisabled}
                   tournamentCreating={tournamentCreating}
                   playerCount={filteredPlayersForDisplay.length}
