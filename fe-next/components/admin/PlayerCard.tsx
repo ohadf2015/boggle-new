@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Calendar, Gift, Bomb, ExternalLink } from 'lucide-react';
+import { Calendar, Gift, Bomb, ExternalLink, Ban } from 'lucide-react';
 import Link from 'next/link';
 import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,9 @@ interface PlayerCardProps {
   onToggleSelect: (id: string) => void;
   onGift: (player: Player) => void;
   onToggleBlast: (player: Player) => void;
+  onBlock: (player: Player) => void;
   blastLoading: boolean;
+  blockLoading: boolean;
   curatorAssignments: CuratorAssignmentRow[];
   onAssignCurator: (player: Player, language: string, tier: number) => void;
   onRevokeCurator: (player: Player, language: string) => void;
@@ -36,7 +38,9 @@ export function PlayerCard({
   onToggleSelect,
   onGift,
   onToggleBlast,
+  onBlock,
   blastLoading,
+  blockLoading,
   curatorAssignments,
   onAssignCurator,
   onRevokeCurator,
@@ -123,6 +127,17 @@ export function PlayerCard({
               >
                 <Bomb className="w-4 h-4 me-1" />
                 {player.blast_access ? 'Blast ✓' : 'Blast'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onBlock(player)}
+                disabled={blockLoading}
+                className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
+                title="Block this player from joining games"
+              >
+                <Ban className="w-4 h-4 me-1" />
+                Block
               </Button>
             </div>
           </div>

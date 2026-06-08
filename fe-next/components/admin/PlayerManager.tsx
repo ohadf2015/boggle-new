@@ -76,6 +76,28 @@ export function PlayerManager({ authToken }: { authToken: string }) {
   const selectedPlayers = players.filter((p) => selectedIds.has(p.id));
 
   const [blastAccessLoading, setBlastAccessLoading] = useState<string | null>(null);
+  const [blockLoading, setBlockLoading] = useState<string | null>(null);
+
+  // Block a registered player by their auth user id so the realtime join path
+  // refuses them. Permanent until lifted from the admin Blocklist view.
+  const handleBlockPlayer = useCallback(async (player: Player) => {
+    const name = player.display_name || player.username;
+    if (blockLoading || !window.confirm(`Block ${name} from joining games?`)) return;
+    setBlockLoading(player.id);
+    try {
+      const response = await fetch('/api/admin/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify({ blockType: 'auth_user', value: player.id, reason: `Blocked by admin: ${name}` }),
+      });
+      if (!response.ok) throw new Error('Failed');
+      toast.success(`Blocked ${name}`);
+    } catch {
+      toast.error('Failed to block player');
+    } finally {
+      setBlockLoading(null);
+    }
+  }, [authToken, blockLoading]);
 
   const handleToggleBlastAccess = useCallback(async (player: Player) => {
     setBlastAccessLoading(player.id);
@@ -340,7 +362,9 @@ export function PlayerManager({ authToken }: { authToken: string }) {
               onToggleSelect={toggleSelect}
               onGift={(p) => openGiftDialog([p])}
               onToggleBlast={handleToggleBlastAccess}
+              onBlock={handleBlockPlayer}
               blastLoading={blastAccessLoading === player.id}
+              blockLoading={blockLoading === player.id}
               curatorAssignments={curatorMap[player.id] ?? []}
               onAssignCurator={handleAssignCurator}
               onRevokeCurator={handleRevokeCurator}

@@ -7336,6 +7336,7 @@ const es = {
       "overview": "Resumen",
       "analytics": "Análisis",
       "moderation": "Moderación",
+      "blocklist": "Lista de bloqueos",
       "content": "Contenido",
       "puzzleReview": "Revisión de acertijos",
       "people": "Personas",
@@ -7344,6 +7345,35 @@ const es = {
       "guests": "Invitados",
       "system": "Sistema",
       "wordCraft": "WordCraft"
+    },
+    "blocklist": {
+      "title": "Lista de bloqueos",
+      "subtitle": "Bloquea a un jugador, invitado o IP para que no se una a las partidas.",
+      "typeLabel": "Tipo",
+      "valueLabel": "Identificador",
+      "valuePlaceholder": "ID de usuario, ID de sesión de invitado o IP",
+      "reasonLabel": "Motivo",
+      "reasonPlaceholder": "Opcional",
+      "durationLabel": "Duración",
+      "blockButton": "Bloquear",
+      "unblockButton": "Desbloquear",
+      "blockedToast": "Bloqueo añadido",
+      "unblockedToast": "Bloqueo eliminado",
+      "empty": "No hay bloqueos activos.",
+      "addedOn": "Añadido",
+      "expires": "Expira",
+      "type": {
+        "authUser": "Jugador",
+        "guest": "Invitado",
+        "ip": "Dirección IP"
+      },
+      "duration": {
+        "permanent": "Permanente",
+        "1h": "1 hora",
+        "24h": "24 horas",
+        "7d": "7 días",
+        "30d": "30 días"
+      }
     },
     "invalidWords": {
       "title": "Revisión de Palabras Inválidas",

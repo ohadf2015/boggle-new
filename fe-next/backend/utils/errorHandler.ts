@@ -78,6 +78,7 @@ export const ErrorCodes = {
   PLAYER_NOT_HOST: 'PLAYER_NOT_HOST',
   PLAYER_ALREADY_IN_GAME: 'PLAYER_ALREADY_IN_GAME',
   PLAYER_KICKED: 'PLAYER_KICKED',
+  PLAYER_BLOCKED: 'PLAYER_BLOCKED',
   PLAYER_USERNAME_TAKEN: 'PLAYER_USERNAME_TAKEN',
   PLAYER_INVALID_USERNAME: 'PLAYER_INVALID_USERNAME',
 
@@ -187,6 +188,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
   },
   [ErrorCodes.PLAYER_KICKED]: {
     message: 'You have been removed from the game',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 403
+  },
+  [ErrorCodes.PLAYER_BLOCKED]: {
+    message: 'You have been blocked from playing',
     severity: ErrorSeverity.LOW,
     httpStatus: 403
   },

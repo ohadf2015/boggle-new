@@ -72,9 +72,9 @@ describe('ADMIN_BUCKET_CHILDREN', () => {
     );
   });
 
-  it('people bucket bundles players, guests, teacher-access', () => {
+  it('people bucket bundles players, guests, teacher-access, blocklist', () => {
     const keys = ADMIN_BUCKET_CHILDREN.people.map((l) => l.key);
-    expect(keys).toEqual(['players', 'guests', 'teacher-access']);
+    expect(keys).toEqual(['players', 'guests', 'teacher-access', 'blocklist']);
   });
 });
 

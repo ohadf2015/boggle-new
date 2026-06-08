@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Search, ChevronLeft, ChevronRight, Smartphone, Monitor,
-  CheckCircle2, XCircle, Globe, Clock, Trophy, Gamepad2, Target,
+  CheckCircle2, XCircle, Globe, Clock, Trophy, Gamepad2, Target, Ban,
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -156,6 +156,27 @@ export function GuestManager({ authToken }: { authToken: string }) {
   useEffect(() => {
     setPage(1);
   }, [resetPageEffect]);
+
+  const [blockingId, setBlockingId] = useState<string | null>(null);
+
+  // Block a guest by their session id so the realtime join path refuses them.
+  const handleBlockGuest = useCallback(async (sessionId: string) => {
+    if (blockingId || !window.confirm(`Block guest ${sessionId.slice(0, 8)} from joining games?`)) return;
+    setBlockingId(sessionId);
+    try {
+      const res = await fetch('/api/admin/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify({ blockType: 'guest_session', value: sessionId, reason: 'Blocked by admin' }),
+      });
+      if (!res.ok) throw new Error('Failed');
+      toast.success('Guest blocked');
+    } catch {
+      toast.error('Failed to block guest');
+    } finally {
+      setBlockingId(null);
+    }
+  }, [authToken, blockingId]);
 
   const guests = data?.guests || [];
   const stats = data?.stats;
@@ -367,6 +388,17 @@ export function GuestManager({ authToken }: { authToken: string }) {
                         <Stat label="Longest" value={g.longest_word} highlight="text-amber-500" />
                       )}
                     </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleBlockGuest(g.session_id)}
+                      disabled={blockingId === g.session_id}
+                      className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0 self-start lg:self-center"
+                      title="Block this guest from joining games"
+                    >
+                      <Ban className="w-4 h-4 me-1" />
+                      Block
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
