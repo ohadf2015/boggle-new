@@ -20,14 +20,13 @@ export async function POST(req: Request) {
 
   const sb = await createClient();
 
-  // Rate limit: max 3 submissions per email per 24h.
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const recent = await sb
-    .from('school_leads')
-    .select('id', { count: 'exact', head: true })
-    .eq('email', lead.email)
-    .gte('created_at', since);
-  if ((recent.count || 0) >= 3) return bad('too many requests in 24h, try again later', 429);
+  // Rate limit: max 3 submissions per email per 24h. Counted via a SECURITY DEFINER
+  // RPC — a plain SELECT here returns 0 under RLS (school_leads SELECT is admin-only),
+  // which would silently disable the limit and leave the endpoint spammable.
+  const { data: recentCount, error: countErr } = await sb.rpc('count_recent_school_leads', {
+    p_email: lead.email,
+  });
+  if (!countErr && (recentCount || 0) >= 3) return bad('too many requests in 24h, try again later', 429);
 
   const ins = await sb.from('school_leads').insert({ ...lead, source: 'for-schools-page' });
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);

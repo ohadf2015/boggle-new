@@ -9,13 +9,10 @@ const { insertSpy, sendEmailSpy } = h;
 
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
+    // Rate-limit count goes through a SECURITY DEFINER rpc (RLS-safe), not a SELECT.
+    rpc: vi.fn(async (_fn: string, _args: unknown) => ({ data: h.recentCount, error: null })),
     from: () => ({
       insert: h.insertSpy,
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          gte: vi.fn(async () => ({ data: [], count: h.recentCount, error: null })),
-        })),
-      })),
     }),
   }),
 }));
