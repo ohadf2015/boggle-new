@@ -16,6 +16,7 @@ import { usePracticeJuice } from './usePracticeJuice';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 import { createMicroTutorial } from '@/lib/practice/microTutorial';
 import { markPracticeMode } from '@/lib/practice/practiceProgress';
+import { generateWordHuntPuzzle } from '@/lib/practice/wordHuntPuzzle';
 import {
   trackPracticeStarted,
   trackPracticeWordFound,
@@ -39,22 +40,6 @@ import { MIN_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import InlineConfetti from '@/components/effects/InlineConfetti';
 
-const BOARDS: Record<string, string[][]> = {
-  en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
-  he: [['ש', 'ל', 'ו', 'מ'], ['ב', 'י', 'ת', 'א'], ['ה', 'נ', 'ר', 'ע'], ['ק', 'ד', 'ח', 'ג']],
-  sv: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
-  ja: [['い', 'ぬ', 'か', 'み'], ['ね', 'こ', 'と', 'り'], ['さ', 'く', 'ら', 'ま'], ['は', 'な', 'ゆ', 'き']],
-  es: [['C', 'A', 'S', 'A'], ['M', 'E', 'L', 'O'], ['T', 'I', 'A', 'R'], ['E', 'O', 'N', 'P']],
-};
-
-const TARGETS: Record<string, string> = {
-  en: 'STAR',
-  he: 'ארנב',
-  sv: 'STAR',
-  ja: 'さくら',
-  es: 'CASA',
-};
-
 const SHORT_TIP_DURATION_MS = 3200;
 
 /**
@@ -72,8 +57,13 @@ const SHORT_TIP_DURATION_MS = 3200;
  */
 export default function PracticeWordHuntSandbox() {
   const { language, t } = useLanguage();
-  const board = BOARDS[language] ?? BOARDS.en;
-  const target = TARGETS[language] ?? TARGETS.en;
+  // RANDOM board with the target word embedded (guaranteed findable) from the
+  // real generators — same approach as classic practice. JA falls back to a
+  // fixed board (its generator can't embed). useState (not useMemo) keeps the
+  // target stable across re-renders; re-rolls only on a real language change.
+  const [puzzle, setPuzzle] = useState(() => generateWordHuntPuzzle(language));
+  const board = puzzle.board;
+  const target = puzzle.target;
   const validator = usePracticeValidator(language);
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const juice = usePracticeJuice({ fxRef, burstColor: 0xbfff00 });
@@ -135,6 +125,22 @@ export default function PracticeWordHuntSandbox() {
   useEffect(() => {
     startedAtRef.current = Date.now();
     trackPracticeStarted({ mode: 'wordHunt', locale: language });
+  }, [language]);
+
+  // Reroll the board + reset the run when the language actually changes.
+  // Guarded by a ref so mount keeps the initial board (no flicker / double-gen).
+  const langRef = useRef(language);
+  useEffect(() => {
+    if (langRef.current === language) return;
+    langRef.current = language;
+    setPuzzle(generateWordHuntPuzzle(language));
+    setSolved(false);
+    setAttempts([]);
+    setLatestFeedback(null);
+    setShowFeedbackOverlay(false);
+    setDiscoveries([]);
+    setPopupDismissed(false);
+    completedFiredRef.current = false;
   }, [language]);
 
   useEffect(() => () => {

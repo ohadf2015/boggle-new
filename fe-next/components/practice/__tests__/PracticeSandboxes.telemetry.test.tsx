@@ -67,6 +67,14 @@ vi.mock('@/components/GridComponent', () => ({
 }));
 
 import PracticeClassicSandbox from '../PracticeClassicSandbox';
+vi.mock('@/lib/practice/wordHuntPuzzle', () => ({
+  generateWordHuntPuzzle: () => ({
+    board: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
+    target: 'STAR',
+  }),
+  getWordHuntTargets: () => ['STAR'],
+}));
+
 import PracticeWordHuntSandbox from '../PracticeWordHuntSandbox';
 import PracticeWheelSandbox from '../PracticeWheelSandbox';
 
