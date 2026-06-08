@@ -15,7 +15,9 @@ import { FACIAL_HAIR_PARTS } from "./parts/FacialHairParts";
 import { NOSE_PARTS } from './parts/NoseParts';
 import { BODY_PARTS } from './parts/BodyParts';
 import AvatarTierEffects, { type Tier } from './AvatarTierEffects';
+import OverlayBadge from './parts/OverlayBadge';
 import { applyMood, getMoodAnimationClass, type AvatarMood } from '@/lib/avatar/avatarMood';
+import type { AvatarOverlay } from '@/lib/avatar/avatarOverlay';
 import '@/styles/avatar-mood-animations.css';
 
 /** Game-mode color frame around avatar — matches brand palette */
@@ -47,6 +49,11 @@ interface AvatarRendererProps {
    * moods fire even in perf-sensitive rosters.
    */
   mood?: AvatarMood;
+  /**
+   * Loud reaction badge drawn at the top-right (alert/flame). Opt-in per
+   * surface — used by the leaderboard so high-signal reactions read on TV.
+   */
+  overlay?: AvatarOverlay | null;
 }
 
 /**
@@ -97,7 +104,7 @@ const SKIP_FEMALE_LASHES_EYES = new Set([
   'pixelEyes', 'glitchEyes', 'thirdEye',
 ]);
 
-const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood }) => {
+const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood, overlay }) => {
   const uid = useId();
   const faceShadowId = `fs${uid}`;
   const halftoneId = `ht${uid}`;
@@ -284,6 +291,9 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
           </g>
         )
       )}
+
+      {/* Reaction overlay badge — loud, glanceable, on top of everything */}
+      {overlay && <OverlayBadge overlay={overlay} />}
     </svg>
     </AvatarEyeColorContext.Provider>
     </AvatarUidContext.Provider>

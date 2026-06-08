@@ -23,8 +23,8 @@ vi.mock('@/components/motion/AdaptiveMotion', () => ({
 
 vi.mock('@/components/Avatar', () => ({
   __esModule: true,
-  default: ({ mood }: { mood?: string }) => (
-    <div data-testid="avatar" data-mood={mood ?? 'idle'} />
+  default: ({ mood, overlay }: { mood?: string; overlay?: string | null }) => (
+    <div data-testid="avatar" data-mood={mood ?? 'idle'} data-overlay={overlay ?? 'none'} />
   ),
 }));
 
@@ -56,6 +56,8 @@ const makePlayer = (overrides: Partial<ExtendedLeaderboardPlayer> = {}): Extende
 
 const moods = () =>
   screen.getAllByTestId('avatar').map((a) => a.getAttribute('data-mood'));
+const overlays = () =>
+  screen.getAllByTestId('avatar').map((a) => a.getAttribute('data-overlay'));
 
 describe('GameLeaderboard — reactive avatar moods', () => {
   it('avatars start idle (no prior tick to react to)', () => {
@@ -119,5 +121,49 @@ describe('GameLeaderboard — reactive avatar moods', () => {
     );
 
     expect(moods()).toContain('emoteShock');
+  });
+
+  it('gives the overtaken player a loud "alert" overlay (TV-legible)', () => {
+    const { rerender } = render(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Alpha', score: 100 }), makePlayer({ username: 'Beta', score: 90 })]}
+        username="Alpha"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+    rerender(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Beta', score: 130 }), makePlayer({ username: 'Alpha', score: 100 })]}
+        username="Alpha"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+    expect(overlays()).toContain('alert');
+  });
+
+  it('does not badge an ordinary score gain (no overlay noise per word)', () => {
+    const { rerender } = render(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Alpha', score: 100 }), makePlayer({ username: 'Beta', score: 50 })]}
+        username="Beta"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+    rerender(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Alpha', score: 105 }), makePlayer({ username: 'Beta', score: 50 })]}
+        username="Beta"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+    expect(overlays().every((o) => o === 'none')).toBe(true);
   });
 });

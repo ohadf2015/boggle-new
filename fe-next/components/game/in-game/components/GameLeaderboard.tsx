@@ -5,6 +5,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Trophy, Crown, Type, TrendingUp, TrendingDown, Flame } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useReactiveAvatarMood } from '@/hooks/useReactiveAvatarMood';
+import { moodToOverlay } from '@/lib/avatar/avatarOverlay';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import PresenceIndicator from '@/components/PresenceIndicator';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
@@ -115,6 +116,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         size="lg"
         disableEffects
         mood={avatarMood}
+        overlay={moodToOverlay(avatarMood)}
       />
 
       {/* Player info */}

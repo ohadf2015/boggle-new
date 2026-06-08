@@ -10,13 +10,21 @@
 import { useState, useEffect } from 'react';
 
 export function useOnlineStatus(): boolean {
-  const [isOnline, setIsOnline] = useState<boolean>(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  // Always start online so SSR (no navigator) and the client's FIRST render
+  // agree — reading navigator.onLine in the initializer makes them diverge when
+  // the client is offline at hydration, flipping downstream element types
+  // (e.g. ModeCard <button> vs <a>) and triggering React #418 tree
+  // regeneration. The real status is synced in the effect below, post-mount.
+  const [isOnline, setIsOnline] = useState<boolean>(true);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
+
+    // Sync the actual status now that we're on the client, post-hydration.
+    if (typeof navigator !== 'undefined') {
+      setIsOnline(navigator.onLine);
+    }
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);

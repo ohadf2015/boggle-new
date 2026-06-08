@@ -6,9 +6,26 @@
 
 import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
+import { createElement } from 'react';
 import { useOnlineStatus } from '../useOnlineStatus';
 
 describe('useOnlineStatus', () => {
+  // Hydration contract (React #418 source): the FIRST render — before the mount
+  // effect syncs the real status — must be online (true) regardless of
+  // navigator.onLine, so SSR (no navigator → true) and the client's first
+  // render agree. renderToString runs no effects, so it reflects exactly that
+  // pre-effect render even though jsdom defines navigator.
+  describe('hydration safety', () => {
+    it('first render is online even when navigator.onLine is false', () => {
+      Object.defineProperty(navigator, 'onLine', { writable: true, value: false });
+      const Probe = () => createElement('span', null, useOnlineStatus() ? 'online' : 'offline');
+      const html = renderToString(createElement(Probe));
+      expect(html).toContain('online');
+      expect(html).not.toContain('offline');
+    });
+  });
+
   describe('initial state', () => {
     it('should return true when navigator.onLine is true', () => {
       // GIVEN
