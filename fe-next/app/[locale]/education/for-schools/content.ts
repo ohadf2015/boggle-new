@@ -40,6 +40,8 @@ export interface ForSchoolsContent {
   leadIntro: string;
   faqTitle: string;
   faqs: ForSchoolsFaq[];
+  closingTitle: string;
+  closingCta: string;
 }
 
 const EN: ForSchoolsContent = {
@@ -94,6 +96,8 @@ const EN: ForSchoolsContent = {
     { q: 'How do we get early access to school features?', a: 'Fill in the “Tell us about your school” form on this page with your role, school or district, and rough student count. We use that to bring schools into early access and to share pricing when it’s ready.' },
     { q: 'How is this different from Kahoot, Gimkit or Quizlet?', a: 'Those are quiz/flashcard tools that cap their free tiers and are English-first. LexiClash is a word-building game (not multiple-choice), genuinely free for the whole class with no player cap, supports five languages including Hebrew RTL, and offers true 1v1 duels.' },
   ],
+  closingTitle: 'Ready to bring LexiClash to your school?',
+  closingCta: 'Tell us about your school',
 };
 
 export function getForSchoolsContent(_locale: string): ForSchoolsContent {

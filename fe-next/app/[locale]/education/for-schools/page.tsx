@@ -197,6 +197,14 @@ export default async function Page({ params }: PageProps) {
             ))}
           </div>
         </section>
+
+        {/* Closing CTA — don't dead-end a high-intent reader who scrolled the whole page */}
+        <section className="mt-16 text-center">
+          <h2 className="font-neo-display text-2xl font-black sm:text-3xl">{c.closingTitle}</h2>
+          <a href="#lead" className="mt-6 inline-block rounded-neo border-4 border-neo-black bg-neo-pink px-8 py-4 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+            {c.closingCta}
+          </a>
+        </section>
       </div>
     </main>
   );
