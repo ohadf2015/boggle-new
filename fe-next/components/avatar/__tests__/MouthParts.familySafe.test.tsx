@@ -45,4 +45,12 @@ describe('MouthParts — family-safe content', () => {
     // still a mouth (renders some path)
     expect(html).toContain('<path');
   });
+
+  it('the "dragon" mouth breathes fire but does not drip blood/venom', () => {
+    const html = markup('dragon').toLowerCase();
+    expect(html).not.toContain('cc0000'); // blood-red drips
+    expect(html).not.toContain('4caf50'); // green venom drip
+    // still a fierce fire-breathing dragon (fire colors remain)
+    expect(html).toContain('ff6d00'); // flame
+  });
 });

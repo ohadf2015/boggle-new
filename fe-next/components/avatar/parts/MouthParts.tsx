@@ -306,8 +306,9 @@ function Dragon() {
       <polygon points="61,58 64,66 58,66" fill="#fff" stroke="#000" strokeWidth={1} strokeLinejoin="round" />
       <polygon points="46,58 48,63 44,63" fill="#fff" stroke="#000" strokeWidth={0.8} />
       <polygon points="54,58 56,63 52,63" fill="#fff" stroke="#000" strokeWidth={0.8} />
-      <path d="M48 64 Q50 70 52 64" fill="#FF3333" stroke="#CC0000" strokeWidth={0.8} />
-      <path d="M49.5 68 L48.5 72 M50.5 68 L51.5 72" fill="none" stroke="#CC0000" strokeWidth={0.8} />
+      {/* Red tongue (black outline). Blood/venom drips removed for "Designed
+          for Families" compliance — fire-breathing dragon, no gore. */}
+      <path d="M48 64 Q50 70 52 64" fill="#FF3333" stroke="#000" strokeWidth={0.8} />
       <path d="M40 68 Q42 60 45 68 Q47 58 50 68 Q53 58 55 68 Q58 60 60 68" fill="none" stroke="#FF6D00" strokeWidth={2}>
         <animate attributeName="opacity" values="0.8;0.4;0.9;0.6;0.8" dur="3s" repeatCount="indefinite" />
       </path>
@@ -317,8 +318,6 @@ function Dragon() {
       <path d="M46 71 Q48 66 50 72 Q52 66 54 71" fill="none" stroke="#FFF176" strokeWidth={0.8}>
         <animate attributeName="opacity" values="0.4;0.7;0.2;0.5;0.4" dur="4s" repeatCount="indefinite" />
       </path>
-      <circle cx="42" cy="69" r="0.5" fill="#4CAF50" opacity="0.7" />
-      <path d="M42 69 L41 72" fill="none" stroke="#4CAF50" strokeWidth={0.5} opacity="0.5" />
     </g>
   );
 }
