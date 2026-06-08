@@ -17,12 +17,13 @@
  * still get a random real board — just no riddle card.
  */
 import type { Language } from '@/shared/types/game';
-import { generateRandomTable } from '@/utils/utils';
+import { generateRandomTable, isWordOnBoard } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import enRiddles from './data/practiceRiddles.en.json';
 import heRiddles from './data/practiceRiddles.he.json';
 import svRiddles from './data/practiceRiddles.sv.json';
 import esRiddles from './data/practiceRiddles.es.json';
+import jaRiddles from './data/practiceRiddles.ja.json';
 
 export interface PracticeRiddle {
   /** The answer word, in the language's native casing/script. */
@@ -33,7 +34,7 @@ export interface PracticeRiddle {
 
 export interface PracticePuzzle {
   board: string[][];
-  /** null when the language has no curated riddle pool (sv/ja/es). */
+  /** null only when no clued word is available (e.g. a JA board with none detected). */
   riddle: PracticeRiddle | null;
 }
 
@@ -42,6 +43,7 @@ const RIDDLE_POOLS: Record<string, PracticeRiddle[]> = {
   he: heRiddles as PracticeRiddle[],
   sv: svRiddles as PracticeRiddle[],
   es: esRiddles as PracticeRiddle[],
+  ja: jaRiddles as PracticeRiddle[],
 };
 
 /** Practice boards are 4x4 — same square the live grid uses for a quick round. */
@@ -85,10 +87,37 @@ function defaultGenerate(language: string, wordsToEmbed: string[]): string[][] {
   );
 }
 
+/** Tries before giving up on detecting a clued word for the JA "detect" path. */
+const JA_DETECT_TRIES = 8;
+
+/**
+ * Japanese can't embed a chosen word (the JA board generator places its own
+ * random common words and ignores caller-supplied ones), so we invert the
+ * pipeline: GENERATE a board, then DETECT which clued word actually landed on
+ * it and use that as the riddle. Guarantees the answer is findable. Falls back
+ * to no riddle if no clued word appears (rare — ~1/40 boards).
+ */
+function generateJapanesePuzzle(opts: GeneratePuzzleOptions): PracticePuzzle {
+  const rng = opts.rng ?? Math.random;
+  const generate = opts.generate ?? (() => defaultGenerate('ja', []));
+  const pool = getRiddlePool('ja');
+  let board: string[][] = [];
+  for (let i = 0; i < JA_DETECT_TRIES; i++) {
+    board = generate([]);
+    const present = pool.filter((r) => isWordOnBoard(r.word, board, 'ja' as Language));
+    if (present.length > 0) {
+      const idx = Math.min(present.length - 1, Math.floor(rng() * present.length));
+      return { board, riddle: present[idx]! };
+    }
+  }
+  return { board, riddle: null };
+}
+
 export function generatePracticePuzzle(
   language: string,
   opts: GeneratePuzzleOptions = {},
 ): PracticePuzzle {
+  if (language === 'ja') return generateJapanesePuzzle(opts);
   const rng = opts.rng ?? Math.random;
   const riddle = pickRiddleTarget(language, rng);
   const wordsToEmbed = riddle ? [riddle.word] : [];

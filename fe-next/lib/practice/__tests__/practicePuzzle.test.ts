@@ -11,24 +11,26 @@ import type { Language } from '@/shared/types/game';
 const rng0 = () => 0;
 
 describe('getRiddlePool', () => {
-  it('returns a non-empty pool for EN, HE, SV and ES', () => {
-    expect(getRiddlePool('en').length).toBeGreaterThan(0);
-    expect(getRiddlePool('he').length).toBeGreaterThan(0);
-    expect(getRiddlePool('sv').length).toBeGreaterThan(0);
-    expect(getRiddlePool('es').length).toBeGreaterThan(0);
+  it('returns a non-empty pool for all 5 supported languages', () => {
+    for (const lang of ['en', 'he', 'sv', 'es', 'ja']) {
+      expect(getRiddlePool(lang).length).toBeGreaterThan(0);
+    }
   });
 
-  it('returns an empty pool for Japanese (its generator cannot embed)', () => {
-    expect(getRiddlePool('ja')).toEqual([]);
+  it('returns an empty pool for unsupported languages', () => {
+    expect(getRiddlePool('fr')).toEqual([]);
   });
 
-  // 3-4 letters: a 5-letter word cannot fit a 4x4 board's embed path, so the
-  // pool is capped at 4 to keep the "guaranteed findable" contract intact.
-  it('only contains short (3-4 letter) words with non-empty clues', () => {
-    for (const lang of ['en', 'he', 'sv', 'es']) {
+  // 3-4 letters for the embed (clue-then-embed) langs: a 5-letter word can't fit
+  // a 4x4 board's embed path. JA uses generate-then-detect with 2-3 kana words.
+  it('contains short, embeddable words with non-empty clues', () => {
+    const bounds: Record<string, [number, number]> = {
+      en: [3, 4], he: [3, 4], sv: [3, 4], es: [3, 4], ja: [2, 3],
+    };
+    for (const [lang, [min, max]] of Object.entries(bounds)) {
       for (const r of getRiddlePool(lang)) {
-        expect(r.word.length).toBeGreaterThanOrEqual(3);
-        expect(r.word.length).toBeLessThanOrEqual(4);
+        expect(r.word.length).toBeGreaterThanOrEqual(min);
+        expect(r.word.length).toBeLessThanOrEqual(max);
         expect(r.clue.trim().length).toBeGreaterThan(0);
       }
     }
@@ -49,8 +51,8 @@ describe('getRiddlePool', () => {
 });
 
 describe('pickRiddleTarget', () => {
-  it('returns null for languages without a riddle pool (ja)', () => {
-    expect(pickRiddleTarget('ja', rng0)).toBeNull();
+  it('returns null for unsupported languages', () => {
+    expect(pickRiddleTarget('fr', rng0)).toBeNull();
   });
 
   it('returns a target for languages with a pool (sv/es)', () => {
@@ -85,9 +87,9 @@ describe('generatePracticePuzzle', () => {
     expect(calls[0]).toEqual([puzzle.riddle!.word]);
   });
 
-  it('calls generate with [] (no embed) when no riddle pool (ja)', () => {
+  it('calls generate with [] (no embed) when no riddle pool (fr)', () => {
     const calls: string[][] = [];
-    const puzzle = generatePracticePuzzle('ja', {
+    const puzzle = generatePracticePuzzle('fr', {
       rng: rng0,
       generate: (words) => {
         calls.push(words);
@@ -114,6 +116,20 @@ describe('generatePracticePuzzle', () => {
         expect(isWordOnBoard(puzzle.riddle!.word, puzzle.board, lang as Language)).toBe(true);
       }
     }
+  });
+
+  // JA uses generate-then-detect: the riddle is a clued word found ON the board.
+  it('detects a findable JA riddle word on a real board', () => {
+    let foundRiddle = false;
+    for (let i = 0; i < 8; i++) {
+      const puzzle = generatePracticePuzzle('ja');
+      if (puzzle.riddle) {
+        foundRiddle = true;
+        expect(isWordOnBoard(puzzle.riddle.word, puzzle.board, 'ja' as Language)).toBe(true);
+      }
+    }
+    // Across 8 boards at least one should yield a clued word (~39/40 hit rate).
+    expect(foundRiddle).toBe(true);
   });
 
   it('produces a 4x4 board by default (real generator)', () => {
