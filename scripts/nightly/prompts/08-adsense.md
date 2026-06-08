@@ -48,10 +48,15 @@ CJK note: the tokenizer splits on whitespace, so Japanese (`/ja`) under-counts m
 Flag genuinely thin INFORMATIONAL pages (<300 words AND not game pages AND not CJK-artifact). These are your candidates.
 
 ═══ STEP 2 — GSC traffic check (decide keep vs noindex; needs gcloud ADC) ═══
-If `$HOME/.config/gcloud/application_default_credentials.json` exists, lane 6 wrote `docs/seo-daily/__TODAY__.md` earlier tonight — read it for per-URL clicks/impressions (28d).
-- A thin page that DOES earn clicks/impressions → improve it (≤200 words) or leave it; do NOT noindex.
-- A thin programmatic/utility page with **~0 clicks AND ~0 impressions over 28d** is dead weight dragging site quality → consider `robots: { index: false }` on it (this REMOVES low-value pages from Google's view, which helps AdSense more than padding them). Cap noindex actions at **5 pages/night** and list each in the report.
-If GSC data is unavailable, SKIP all noindex decisions this night (never blind-noindex) and work only from word counts + structure.
+**Find dead pages with the dedicated tool** (the seo-daily report is query-centric and CANNOT surface zero-traffic pages — it only lists pages that already rank). Run:
+```bash
+python3 scripts/nightly/tools/dead_pages.py
+```
+It pulls GSC page-dimension data (28d), and prints up to 5 **non-banned** thin programmatic pages with **0 clicks AND ≤2 impressions** — these are real noindex candidates (`/words/starting-with/*`, `/words/<n>-letter-words`). It already EXCLUDES the game-page hard-ban list (incl. `/anagram/*` — those dead pages are a separate founder decision, do NOT noindex them here). If it prints "None" or a "GSC unavailable" comment → SKIP noindex this night (never blind-noindex).
+
+These are **dynamic routes** (`/words/starting-with/[letter]`, `/words/[n]-letter-words`) whose `generateMetadata` already does `robots: { index: locale === 'en', ... }`. To noindex a dead one, make the index flag **conditional on the specific dead param** — add the dead key to a small set and AND it in, e.g. `index: locale === 'en' && !DEAD_LETTERS.has(letter)`. NEVER set a blanket `index: false` on the file — that would deindex every letter/slug in the family, including ones that earn traffic. **Cap at 5/night.** List each noindexed URL with its 28d clicks/impr in the report.
+
+For pages that DO earn clicks/impressions (from `docs/seo-daily/__TODAY__.md`): a thin one → improve it (≤200 words) or leave it; never noindex a page with traffic.
 
 ═══ STEP 3 — Pick AT MOST 2 actions tonight (cap hard) ═══
 Choose up to two, highest-leverage first. Prefer fixing a real defect over writing copy.
