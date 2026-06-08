@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 export type CelebrationKind = 'bingo' | 'gameOver' | 'overdrive' | 'burnout' | null;
 
@@ -23,10 +24,9 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
     height: () => number;
   }>({ spawnBurst: null, spawnRain: null, spawnOverdriveBurst: null, cleanup: null, width: () => 0, height: () => 0 });
 
-  const [reducedMotion] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
+  // Hydration-safe reduced-motion (false on SSR + first client render, synced
+  // post-mount) — was an inline useState(matchMedia) that diverged from SSR (#418).
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { WordCraftBoard } from './WordCraftBoard';
 import { WordCraftZoomShell } from './WordCraftZoomShell';
 import { WordCraftPixiStage } from './WordCraftPixiStage';
@@ -30,18 +31,9 @@ interface Props {
 
 export function WordCraftBoardSection(props: Props) {
   const boardRef = useRef<HTMLDivElement | null>(null);
-  const [rm, setRm] = useState(() =>
-    typeof window !== 'undefined' &&
-    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true,
-  );
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const listener = (e: MediaQueryListEvent) => setRm(e.matches);
-    mq.addEventListener('change', listener);
-    return () => mq.removeEventListener('change', listener);
-  }, []);
+  // Hydration-safe reduced-motion (false on SSR + first client render, synced
+  // post-mount) — was an inline useState(matchMedia) that diverged from SSR (#418).
+  const rm = usePrefersReducedMotion();
 
   // Cells the zoom shell should follow: the active word's pending tiles, or
   // the centre star on an empty first-move board so play opens zoomed-in.
