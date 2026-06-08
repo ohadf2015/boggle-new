@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Footer from './Footer';
@@ -25,6 +26,15 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
   const pathname = usePathname();
   const isDesktop = useIsDesktop();
 
+  // Client-only signals (isDesktop reads window in its useState initializer;
+  // isInGame/isTvFullscreen are effect-driven) all start at their SSR values on
+  // the server but flip on the desktop client's FIRST render — diverging from
+  // the server HTML and triggering React #418 (whole-tree regeneration). Gate on
+  // a mount flag so the first client render mirrors the server exactly; the
+  // viewport-aware branch below runs only after mount.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const cleanPath = pathname.replace(`/${language}`, '');
   const isGameRoute = [
     '/singleplayer',
@@ -46,6 +56,14 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
     '/word-forge',
     '/connections',
   ].some(path => cleanPath.startsWith(path));
+
+  // Until mounted, mirror the server render exactly (SSR defaults:
+  // isDesktop=false, isInGame=false, isTvFullscreen=false) → game routes render
+  // null, everything else the full Footer. Keeps hydration stable; the
+  // viewport-aware branch takes over on the next commit.
+  if (!mounted) {
+    return isGameRoute ? null : <Footer className={className} />;
+  }
 
   // TV fullscreen, desktop gameplay, or any mobile game/lobby screen: no footer
   if (isTvFullscreen || (isInGame && isDesktop) || (!isDesktop && (isInGame || isGameRoute))) {
