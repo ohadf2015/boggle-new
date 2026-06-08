@@ -76,6 +76,18 @@ vi.mock('@/lib/practice/wordHuntPuzzle', () => ({
 }));
 
 import PracticeWordHuntSandbox from '../PracticeWordHuntSandbox';
+vi.mock('@/utils/dailyChallenge/wordWheelGeneration', async (orig) => ({
+  ...(await orig()),
+  generateWordWheelPuzzle: () => ({
+    centerLetter: 'A',
+    outerLetters: ['T', 'R', 'C', 'E', 'S', 'N'],
+    allLetters: ['A', 'T', 'R', 'C', 'E', 'S', 'N'],
+    puzzleDate: '',
+    puzzleNumber: 0,
+    language: 'en',
+  }),
+}));
+
 import PracticeWheelSandbox from '../PracticeWheelSandbox';
 
 const eventNames = () => captureMock.mock.calls.map((c) => c[0] as string);

@@ -43,6 +43,18 @@ vi.mock('pixi.js', () => ({
   },
 }));
 
+vi.mock('@/utils/dailyChallenge/wordWheelGeneration', async (orig) => ({
+  ...(await orig()),
+  generateWordWheelPuzzle: () => ({
+    centerLetter: 'A',
+    outerLetters: ['T', 'R', 'C', 'E', 'S', 'N'],
+    allLetters: ['A', 'T', 'R', 'C', 'E', 'S', 'N'],
+    puzzleDate: '',
+    puzzleNumber: 0,
+    language: 'en',
+  }),
+}));
+
 import PracticeWheelSandbox from '../PracticeWheelSandbox';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 

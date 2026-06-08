@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
@@ -24,25 +24,17 @@ import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 // it all for free. `practice` swaps the countdown for an "end run" CTA and
 // `hideCompetitive` strips the leaderboard / rivals / combo / funnel layer.
 import WordWheelGame, { type WordWheelGameResult } from '@/components/daily/WordWheelGame';
-import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
+import { generateWordWheelPuzzle, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import type { Language } from '@/types';
 
-interface WheelPuzzle {
-  /** Letter at the center — must appear in every accepted word. */
-  center: string;
-  /** Outer ring letters arranged clockwise from top (60° spacing). */
-  outer: string[];
+// A fresh RANDOM wheel from the REAL generator (the same one the live daily
+// wheel uses) — different center+outer letters every visit. We blank the
+// date/number so practice never surfaces a daily label.
+function makePracticeWheel(language: string): WordWheelPuzzle {
+  const seed = Math.random().toString(36).slice(2);
+  const generated = generateWordWheelPuzzle(seed, language as Language);
+  return { ...generated, puzzleDate: '', puzzleNumber: 0 };
 }
-
-// 1 center + 6 outer = 7 letters total, matching real WheelRush
-// (utils/dailyChallenge/wordWheelGeneration.ts). Hebrew is finals-free.
-const PUZZLES: Record<string, WheelPuzzle> = {
-  en: { center: 'A', outer: ['T', 'R', 'C', 'E', 'S', 'N'] },
-  he: { center: 'א', outer: ['ב', 'ה', 'ל', 'מ', 'ר', 'ת'] },
-  sv: { center: 'A', outer: ['T', 'R', 'K', 'E', 'S', 'N'] },
-  ja: { center: 'い', outer: ['ぬ', 'と', 'け', 'ま', 'ね', 'こ'] },
-  es: { center: 'A', outer: ['C', 'S', 'M', 'E', 'L', 'R'] },
-};
 
 /**
  * Wheel-rush practice sandbox. Renders the live {@link WordWheelGame} in
@@ -62,15 +54,9 @@ export default function PracticeWheelSandbox() {
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  const p = PUZZLES[language] ?? PUZZLES.en;
-  const puzzle = useMemo<WordWheelPuzzle>(() => ({
-    centerLetter: p.center,
-    outerLetters: p.outer,
-    allLetters: [p.center, ...p.outer],
-    puzzleDate: '',
-    puzzleNumber: 0,
-    language: language as Language,
-  }), [p, language]);
+  // useState (not useMemo) keeps the wheel stable across re-renders; re-rolls
+  // only when the language actually changes (see effect below).
+  const [puzzle, setPuzzle] = useState<WordWheelPuzzle>(() => makePracticeWheel(language));
 
   const validator = usePracticeValidator(language);
   const onValidateWord = useCallback(async (word: string) => {
@@ -88,6 +74,18 @@ export default function PracticeWheelSandbox() {
   useEffect(() => {
     startedAtRef.current = Date.now();
     trackPracticeStarted({ mode: 'wheelRush', locale: language });
+  }, [language]);
+
+  // Reroll the wheel + reset the run when the language actually changes.
+  // Guarded by a ref so mount keeps the initial wheel (no flicker / double-gen).
+  const langRef = useRef(language);
+  useEffect(() => {
+    if (langRef.current === language) return;
+    langRef.current = language;
+    setPuzzle(makePracticeWheel(language));
+    setFoundCount(0);
+    setPopupDismissed(false);
+    completedFiredRef.current = false;
   }, [language]);
 
   useEffect(() => {
