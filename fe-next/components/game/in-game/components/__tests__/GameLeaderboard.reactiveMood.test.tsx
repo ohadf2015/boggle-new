@@ -73,10 +73,15 @@ describe('GameLeaderboard — reactive avatar moods', () => {
     expect(moods().every((m) => m === 'idle')).toBe(true);
   });
 
-  it('a player who gains points reacts with "correct"', () => {
+  it('a player who gains points reacts with a celebratory mood (in their personality style)', () => {
+    // Personality traits remap a plain "correct" into the player's own
+    // celebration (smug -> emoteCool, hyped -> emoteLaugh), so assert the
+    // celebratory SET rather than a single mood. Stoic stays neutral by design;
+    // "Glitch" below is a non-stoic seed so a reaction is guaranteed.
+    const CELEBRATE = ['correct', 'emoteCool', 'emoteLaugh'];
     const { rerender } = render(
       <GameLeaderboard
-        leaderboard={[makePlayer({ username: 'Alpha', score: 100 }), makePlayer({ username: 'Beta', score: 50 })]}
+        leaderboard={[makePlayer({ username: 'Glitch', score: 100 }), makePlayer({ username: 'Beta', score: 50 })]}
         username="Beta"
         isHost={false}
         t={mockT}
@@ -84,10 +89,10 @@ describe('GameLeaderboard — reactive avatar moods', () => {
       />,
     );
 
-    // Alpha scores; ranks unchanged (Alpha already #1).
+    // Glitch scores; ranks unchanged (already #1).
     rerender(
       <GameLeaderboard
-        leaderboard={[makePlayer({ username: 'Alpha', score: 110 }), makePlayer({ username: 'Beta', score: 50 })]}
+        leaderboard={[makePlayer({ username: 'Glitch', score: 110 }), makePlayer({ username: 'Beta', score: 50 })]}
         username="Beta"
         isHost={false}
         t={mockT}
@@ -95,7 +100,7 @@ describe('GameLeaderboard — reactive avatar moods', () => {
       />,
     );
 
-    expect(moods()).toContain('correct');
+    expect(moods().some((m) => CELEBRATE.includes(m ?? ''))).toBe(true);
   });
 
   it('a player who gets overtaken reacts with "emoteShock"', () => {

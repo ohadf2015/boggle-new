@@ -6,6 +6,7 @@ import { Trophy, Crown, Type, TrendingUp, TrendingDown, Flame } from 'lucide-rea
 import Avatar from '@/components/Avatar';
 import { useReactiveAvatarMood } from '@/hooks/useReactiveAvatarMood';
 import { moodToOverlay } from '@/lib/avatar/avatarOverlay';
+import { getAvatarTrait } from '@/lib/avatar/avatarPersonality';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import PresenceIndicator from '@/components/PresenceIndicator';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
@@ -71,6 +72,9 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
     scoreChange,
     rankChange,
     comboLevel: player.comboLevel ?? 0,
+    // Deterministic per-player personality — same player reacts the same way
+    // every game (smug flexes, chaotic clowns, stoic stays cool).
+    trait: getAvatarTrait(player.username),
   });
 
   // Flash score delta briefly when score changes

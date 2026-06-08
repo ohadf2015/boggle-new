@@ -7,12 +7,15 @@ import {
   deriveLeaderboardMood,
   type LeaderboardMoodInput,
 } from '@/lib/avatar/leaderboardMood';
+import { applyTrait, type AvatarTrait } from '@/lib/avatar/avatarPersonality';
 
 export interface ReactiveAvatarMoodInput extends LeaderboardMoodInput {
   /** Absolute current score — the effect KEY (see note below). */
   score: number;
   /** Absolute current rank/index — the effect KEY. */
   rank: number;
+  /** Player's personality trait — remaps the reaction. Defaults to 'standard'. */
+  trait?: AvatarTrait;
 }
 
 /**
@@ -32,11 +35,11 @@ export interface ReactiveAvatarMoodInput extends LeaderboardMoodInput {
  * widening its dependency array (which would re-introduce the delta-keying bug).
  */
 export function useReactiveAvatarMood(input: ReactiveAvatarMoodInput): AvatarMood {
-  const { score, rank, scoreChange, rankChange, comboLevel } = input;
+  const { score, rank, scoreChange, rankChange, comboLevel, trait = 'standard' } = input;
   const { mood, trigger } = useAvatarMood();
 
-  const latest = useRef({ scoreChange, rankChange, comboLevel });
-  latest.current = { scoreChange, rankChange, comboLevel };
+  const latest = useRef({ scoreChange, rankChange, comboLevel, trait });
+  latest.current = { scoreChange, rankChange, comboLevel, trait };
 
   // Skip the mount render: there is no prior event to react to.
   const mounted = useRef(false);
@@ -46,7 +49,8 @@ export function useReactiveAvatarMood(input: ReactiveAvatarMoodInput): AvatarMoo
       mounted.current = true;
       return;
     }
-    const next = deriveLeaderboardMood(latest.current);
+    const base = deriveLeaderboardMood(latest.current);
+    const next = applyTrait(base, latest.current.trait);
     if (next) trigger(next);
     // Keyed on absolute score/rank ONLY — see KEYING note above.
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -74,6 +74,36 @@ describe('useReactiveAvatarMood', () => {
     expect(result.current).toBe('correct');
   });
 
+  it('applies a personality trait: a smug player flexes shades on a score', () => {
+    const { result, rerender } = renderHook((props) => useReactiveAvatarMood(props), {
+      initialProps: { score: 0, rank: 0, scoreChange: 0, rankChange: 0, comboLevel: 0, trait: 'smug' as const },
+    });
+    act(() => {
+      rerender({ score: 10, rank: 0, scoreChange: 10, rankChange: 0, comboLevel: 0, trait: 'smug' as const });
+    });
+    expect(result.current).toBe('emoteCool');
+  });
+
+  it('a stoic player stays neutral on an ordinary score', () => {
+    const { result, rerender } = renderHook((props) => useReactiveAvatarMood(props), {
+      initialProps: { score: 0, rank: 0, scoreChange: 0, rankChange: 0, comboLevel: 0, trait: 'stoic' as const },
+    });
+    act(() => {
+      rerender({ score: 6, rank: 0, scoreChange: 6, rankChange: 0, comboLevel: 0, trait: 'stoic' as const });
+    });
+    expect(result.current).toBe('idle');
+  });
+
+  it('every trait still flinches when overtaken', () => {
+    const { result, rerender } = renderHook((props) => useReactiveAvatarMood(props), {
+      initialProps: { score: 50, rank: 0, scoreChange: 0, rankChange: 0, comboLevel: 0, trait: 'stoic' as const },
+    });
+    act(() => {
+      rerender({ score: 50, rank: 1, scoreChange: 0, rankChange: -1, comboLevel: 0, trait: 'stoic' as const });
+    });
+    expect(result.current).toBe('emoteShock');
+  });
+
   it('does not fire on a no-op re-render (same score/rank, zero deltas)', () => {
     const { result, rerender } = renderHook((props) => useReactiveAvatarMood(props), {
       initialProps: { score: 30, rank: 1, scoreChange: 0, rankChange: 0, comboLevel: 0 },
