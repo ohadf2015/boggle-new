@@ -21,6 +21,8 @@ import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import enRiddles from './data/practiceRiddles.en.json';
 import heRiddles from './data/practiceRiddles.he.json';
+import svRiddles from './data/practiceRiddles.sv.json';
+import esRiddles from './data/practiceRiddles.es.json';
 
 export interface PracticeRiddle {
   /** The answer word, in the language's native casing/script. */
@@ -38,6 +40,8 @@ export interface PracticePuzzle {
 const RIDDLE_POOLS: Record<string, PracticeRiddle[]> = {
   en: enRiddles as PracticeRiddle[],
   he: heRiddles as PracticeRiddle[],
+  sv: svRiddles as PracticeRiddle[],
+  es: esRiddles as PracticeRiddle[],
 };
 
 /** Practice boards are 4x4 — same square the live grid uses for a quick round. */
