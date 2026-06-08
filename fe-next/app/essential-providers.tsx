@@ -21,6 +21,7 @@ import { HapticsProvider } from '@/contexts/HapticsContext';
 import { CoinProvider } from '@/contexts/CoinContext';
 import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { Toaster } from 'react-hot-toast';
+import { globalToastStyle } from '@/lib/toast/toastStyle';
 import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
@@ -257,11 +258,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                             }}
                                             toastOptions={{
                                                 duration: 2000,
-                                                style: {
-                                                    background: 'var(--neo-gray)',
-                                                    color: 'rgb(var(--neo-white))',
-                                                    pointerEvents: 'auto',
-                                                },
+                                                style: globalToastStyle,
                                             }}
                                         />
                                     </SoundEffectsProvider>
