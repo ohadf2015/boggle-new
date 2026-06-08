@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel, Grid3x3 } from 'lucide-react';
 import ModeCard from './ModeCard';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
@@ -101,15 +101,29 @@ export function LandingChallengeCards({
   // other landing mode is solo / offline-capable. SSR-safe (true on server).
   const isOffline = !useOnlineStatus();
 
-  // Synchronous init from localStorage — avoids post-mount card reorder CLS
-  const [isFirstTimer] = useState(() => {
+  // Personalization flags read localStorage, so their value differs between the
+  // server (no window → false) and the client's first render. Using them during
+  // that first render flips element types (expanded <section> ↔ collapsed
+  // <details>) and card order → React #418 → whole-tree regeneration. Gate them
+  // behind `mounted`: the first client render matches SSR (all false → expanded),
+  // and the real personalization applies on the next commit. SSR already paints
+  // the expanded layout, so this reflow is unchanged from before — only the
+  // hydration error is removed.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // Synchronous init from localStorage — read eagerly, but only consumed after
+  // mount (see `mounted` gate below) so SSR/first-render stays stable.
+  const [isFirstTimerRaw] = useState(() => {
     if (typeof window === 'undefined') return false;
     return shouldShowGuidance('firstPlayTutorialCompleted') && !hasCompletedOnboarding();
   });
-  const [isNewbie] = useState(() => {
+  const [isNewbieRaw] = useState(() => {
     if (typeof window === 'undefined') return false;
     return isNewPlayer();
   });
+  const isFirstTimer = mounted && isFirstTimerRaw;
+  const isNewbie = mounted && isNewbieRaw;
   // Veterans skip the practice card entirely. Newcomers keep it as their
   // soft-onramp into the game (single-player word grids without pressure).
   // Practice also disappears as soon as the player has finished any game —
@@ -135,16 +149,18 @@ export function LandingChallengeCards({
   // on first paint.
   const { userStats } = useUserStats();
   const isNewcomerByGames =
+    mounted &&
     !isOnCrazyGamesPlatform &&
     !!userStats &&
     userStats.totalGamesPlayed < THRESHOLDS.modeRoster;
   // Once a player has finished even one multiplayer round they're past the
   // choice-paralysis window — surface every mode unconditionally instead of
   // hiding half behind a "More Game Modes" expander.
-  const [hasPlayedMp] = useState(() => {
+  const [hasPlayedMpRaw] = useState(() => {
     if (typeof window === 'undefined') return false;
     return getGamesCompleted() > 0;
   });
+  const hasPlayedMp = mounted && hasPlayedMpRaw;
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
   //   2. Inject the synthetic `'quickPlay'` card just after `'daily'` so the

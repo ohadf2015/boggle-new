@@ -77,11 +77,18 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
   });
 
   it('veteran: practice card entirely absent (not in featured row or SP grid)', () => {
-    mockIsVeteran.mockReturnValueOnce(true);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('landing-section-practice-featured')).toBeNull();
-    expect(screen.queryByText('landing.practice')).toBeNull();
-    expect(screen.queryByText('landing.quickPlay')).toBeNull();
+    // Stable return (not Once): useIsPracticeVeteran returns a consistent value
+    // across renders, and the component now re-renders once post-mount (the
+    // hydration-safe `mounted` gate) which would exhaust a one-shot mock.
+    mockIsVeteran.mockReturnValue(true);
+    try {
+      render(<LandingChallengeCards {...baseProps} />);
+      expect(screen.queryByTestId('landing-section-practice-featured')).toBeNull();
+      expect(screen.queryByText('landing.practice')).toBeNull();
+      expect(screen.queryByText('landing.quickPlay')).toBeNull();
+    } finally {
+      mockIsVeteran.mockReturnValue(false); // restore default for sibling tests
+    }
   });
 
   it('renders blast when most popular (still inside SP section)', () => {
