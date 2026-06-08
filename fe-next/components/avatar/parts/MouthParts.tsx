@@ -131,8 +131,7 @@ function Vampire() {
       <polygon points="59,58 61,67 57,67" fill="#fff" stroke="#000" strokeWidth={1} strokeLinejoin="round" />
       <path d="M41 58 L41.5 61" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.4" />
       <path d="M59 58 L59.5 61" fill="none" stroke="#fff" strokeWidth={0.5} opacity="0.4" />
-      <ellipse cx="43" cy="68" rx="1.2" ry="1.8" fill="#CC0000" stroke="#800" strokeWidth={0.5} />
-      <ellipse cx="43" cy="67.5" rx="0.5" ry="0.5" fill="#FF4444" opacity="0.5" />
+      {/* Blood drop removed for "Designed for Families" compliance — cute fangs only. */}
     </g>
   );
 }
@@ -294,26 +293,6 @@ function Gap() {
       <path d="M38 59 Q50 61 62 59" fill="none" stroke="#FF9999" strokeWidth={0.8} opacity="0.4" />
       {/* Tongue peek */}
       <ellipse cx="50" cy="67" rx="3" ry="2.5" fill="#FF6B6B" opacity="0.7" />
-    </g>
-  );
-}
-
-function Pipe() {
-  return (
-    <g>
-      <path d="M42 60 Q50 64 54 60" fill="none" stroke="#000" strokeWidth={S} strokeLinecap="round" />
-      <path d="M54 60 L68 56 L70 48" fill="none" stroke="#8B4513" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M56 59 L64 56" fill="none" stroke="#6B3410" strokeWidth={0.6} opacity="0.4" />
-      <path d="M58 59 L66 55.5" fill="none" stroke="#A0522D" strokeWidth={0.5} opacity="0.3" />
-      <rect x="66" y="40" width="8" height="10" rx="2" fill="#8B4513" stroke="#000" strokeWidth={S} />
-      <path d="M67 42 L67 48" fill="none" stroke="#6B3410" strokeWidth={0.5} opacity="0.3" />
-      <path d="M69 41 L69 49" fill="none" stroke="#A0522D" strokeWidth={0.4} opacity="0.25" />
-      <ellipse cx="70" cy="41" rx="3" ry="1.5" fill="#FF4500" opacity="0.6" />
-      <ellipse cx="70" cy="41" rx="1.5" ry="0.8" fill="#FFD700" opacity="0.4" />
-      <circle cx="69" cy="34" r="3" fill="#ddd" opacity="0.5" />
-      <circle cx="73" cy="28" r="4" fill="#ddd" opacity="0.35" />
-      <circle cx="67" cy="23" r="3" fill="#ddd" opacity="0.2" />
-      <circle cx="71" cy="20" r="2.5" fill="#ddd" opacity="0.15" />
     </g>
   );
 }
@@ -705,7 +684,10 @@ export const MOUTH_PARTS = {
   zipper: Zipper,
   blowfish: Blowfish,
   gap: Gap,
-  pipe: Pipe,
+  // 'pipe' (a tobacco smoking pipe) removed for Google Play "Designed for
+  // Families" compliance. Kept in the schema enum so legacy saved configs still
+  // validate, but it now renders a plain smile — no tobacco is ever depicted.
+  pipe: Smile,
   dragon: Dragon,
   diamond: DiamondMouth,
   glitch: Glitch,
