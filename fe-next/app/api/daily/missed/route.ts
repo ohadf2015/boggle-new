@@ -19,7 +19,9 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     const today = new Date().toISOString().split('T')[0]
-    const mode = request.nextUrl.searchParams.get('mode') || 'word-hunt'
+    // Optional-chain nextUrl: production always passes a NextRequest, but unit
+    // tests may call with a plain Request (no `.nextUrl`) — default to word-hunt.
+    const mode = request?.nextUrl?.searchParams.get('mode') || 'word-hunt'
 
     if (!user) {
       return NextResponse.json({ today, missed: [] })

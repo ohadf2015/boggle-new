@@ -29,7 +29,10 @@ const ROOTS = ['components', 'app'];
 // features — word-tower rival chip (`avatarColor ?? '#2a2a40'`, 188e4be63) and blast-v2
 // target toast (`borderColor:'#0b1530'` beside dynamic `modeColor`, eb406a8ec). Raised
 // 170→172 per the protocol above; ratchet stays armed at the new floor.
-const BASELINE = 172;
+// 2026-06-08: +2 more of the same kind — blast-v2 HUD + chest badge (b36cd9df7) use
+// `textShadow:'1px 1px 0 #0b1530'` hard-pixel shadows in the SAME style block as a
+// dynamic `color: modeColor`, so the block can't be a Tailwind utility. Raised 172→174.
+const BASELINE = 174;
 
 // inline `style={{ ... #abc ... }}` containing a hex colour literal.
 const INLINE_STYLE_HEX = /style=\{\{[^}]*#[0-9a-fA-F]{3,6}\b[^}]*\}\}/g;
