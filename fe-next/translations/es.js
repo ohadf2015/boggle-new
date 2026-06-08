@@ -5494,6 +5494,15 @@ const es = {
       "wordHunt": "Siguiente: Práctica Word Hunt",
       "wheelRush": "Siguiente: Práctica Wheel Rush"
     },
+    "helper": {
+      "nudge": "Desliza por las letras para formar una palabra",
+      "reveal": "¿Atascado? Empieza por la casilla brillante"
+    },
+    "riddle": {
+      "answerHint": "Encuentra esta palabra en el tablero",
+      "label": "Acertijo",
+      "solved": "¡Acertijo resuelto!"
+    },
     "coach": {
       "label": "Consejo",
       "dismiss": "Entendido"

@@ -5450,6 +5450,15 @@ const en = {
       "bailoutCta": "Skip to real game",
       "playRealCta": "Play Classic now"
     },
+    "helper": {
+      "nudge": "Drag across letters to spell a word",
+      "reveal": "Stuck? Start from the glowing tile"
+    },
+    "riddle": {
+      "answerHint": "Find this word on the board",
+      "label": "Riddle",
+      "solved": "Riddle solved!"
+    },
     "coach": {
       "dismiss": "Dismiss",
       "label": "Coach"

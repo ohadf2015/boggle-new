@@ -5442,6 +5442,15 @@ const ja = {
       "wordHunt": "次へ: ワードハント練習",
       "wheelRush": "次へ: ホイールラッシュ練習"
     },
+    "helper": {
+      "nudge": "文字をなぞって単語を作ろう",
+      "reveal": "行き詰まった？光るマスから始めよう"
+    },
+    "riddle": {
+      "answerHint": "盤面でこの言葉を見つけよう",
+      "label": "なぞなぞ",
+      "solved": "なぞなぞ正解！"
+    },
     "coach": {
       "label": "ヒント",
       "dismiss": "わかった"

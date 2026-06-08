@@ -5542,6 +5542,15 @@ const sv = {
       "wordHunt": "Nästa: Word Hunt-övning",
       "wheelRush": "Nästa: Wheel Rush-övning"
     },
+    "helper": {
+      "nudge": "Dra över bokstäverna för att stava ett ord",
+      "reveal": "Fastnat? Börja på den lysande rutan"
+    },
+    "riddle": {
+      "answerHint": "Hitta ordet på brädet",
+      "label": "Gåta",
+      "solved": "Gåtan löst!"
+    },
     "coach": {
       "label": "Tips",
       "dismiss": "Uppfattat"

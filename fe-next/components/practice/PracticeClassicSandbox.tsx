@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,7 +13,12 @@ import PracticeInstructions from './PracticeInstructions';
 import PracticeCoachTip from './PracticeCoachTip';
 import PracticeMistakeCoach, { usePracticeMistakeCoach } from './PracticeMistakeCoach';
 import PracticePixiFx, { type PracticePixiFxHandle } from './PracticePixiFx';
+import PracticeRiddleCard from './PracticeRiddleCard';
+import PracticeHelperBubble from './PracticeHelperBubble';
 import { usePracticeJuice } from './usePracticeJuice';
+import { generatePracticePuzzle } from '@/lib/practice/practicePuzzle';
+import { isRiddleSolved } from '@/lib/practice/riddleMask';
+import { nextHintStage, firstCellOf } from '@/lib/practice/practiceHint';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 import { createMicroTutorial } from '@/lib/practice/microTutorial';
 import { markPracticeMode, PRACTICE_GOALS } from '@/lib/practice/practiceProgress';
@@ -34,17 +39,6 @@ import InlineConfetti from '@/components/effects/InlineConfetti';
 import { WordFeedbackToast, type FeedbackType } from '@/components/daily/WordFeedbackToast';
 import { AnimatePresence, m } from 'framer-motion';
 
-// Curated practice boards — Hebrew is finals-free (matches real letter
-// pool in lib/adventure/gridConstants.ts). Each board is hand-picked to
-// ensure ≥3 simple findable words per locale.
-const BOARDS: Record<string, string[][]> = {
-  en: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
-  he: [['ש', 'ל', 'ו', 'מ'], ['ב', 'י', 'ת', 'א'], ['ה', 'נ', 'ר', 'ע'], ['ק', 'ד', 'ח', 'ג']],
-  sv: [['S', 'T', 'A', 'R'], ['E', 'O', 'N', 'I'], ['P', 'L', 'A', 'T'], ['E', 'R', 'I', 'N']],
-  ja: [['い', 'ぬ', 'か', 'み'], ['ね', 'こ', 'と', 'り'], ['さ', 'く', 'ら', 'ま'], ['は', 'な', 'ゆ', 'き']],
-  es: [['C', 'A', 'S', 'A'], ['M', 'E', 'L', 'O'], ['T', 'I', 'A', 'R'], ['E', 'O', 'N', 'P']],
-};
-
 /**
  * Classic practice sandbox — uses the REAL <GridComponent> so visuals,
  * animations, drag/keyboard input, accessibility, and combo escalation
@@ -56,7 +50,14 @@ const BOARDS: Record<string, string[][]> = {
  */
 export default function PracticeClassicSandbox() {
   const { language, t } = useLanguage();
-  const board = BOARDS[language] ?? BOARDS.en;
+  // RANDOM, not-too-easy board from the REAL generators (richest-of-6) with the
+  // riddle answer embedded (guaranteed findable). useState (not useMemo) so the
+  // board is stable across re-renders — a useMemo can be discarded by React and
+  // would re-roll the answer out from under the player mid-game. Re-rolls only
+  // when the language actually changes (see effect below).
+  const [puzzle, setPuzzle] = useState(() => generatePracticePuzzle(language));
+  const board = puzzle.board;
+  const riddle = puzzle.riddle;
   const validator = usePracticeValidator(language);
   const fxRef = useRef<PracticePixiFxHandle | null>(null);
   const juice = usePracticeJuice({ fxRef, burstColor: 0x00ffff });
@@ -74,10 +75,54 @@ export default function PracticeClassicSandbox() {
   const [popupDismissed, setPopupDismissed] = useState(false);
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
-  const isComplete = foundWords.length >= PRACTICE_GOALS.classic;
+  // Riddle solved = headline win. Completion stays beginner-friendly: solving
+  // the riddle OR finding 3 words finishes — never harder than the old gate.
+  const foundUpper = foundWords.map((w) => w.word);
+  const riddleSolved = riddle ? isRiddleSolved(riddle.word, foundUpper) : false;
+  const isComplete = riddleSolved || foundWords.length >= PRACTICE_GOALS.classic;
   // Friendly mid-game coaching — fires once per session per mistake kind.
   const coach = usePracticeMistakeCoach();
   const badCountRef = useRef(0);
+
+  // On-screen FTUE helper: track idle time + drag attempts to escalate hints.
+  const [drags, setDrags] = useState(0);
+  const [idleMs, setIdleMs] = useState(0);
+  const lastActivityRef = useRef(0);
+  const resetIdle = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    setIdleMs(0);
+  }, []);
+  useEffect(() => {
+    lastActivityRef.current = Date.now();
+    const id = setInterval(() => setIdleMs(Date.now() - lastActivityRef.current), 1000);
+    return () => clearInterval(id);
+  }, []);
+  // Reroll the board + reset run state when the language actually changes.
+  // Guarded by a ref so mount doesn't discard the initial board (no flicker).
+  const langRef = useRef(language);
+  useEffect(() => {
+    if (langRef.current !== language) {
+      langRef.current = language;
+      setPuzzle(generatePracticePuzzle(language));
+    }
+    setFoundWords([]);
+    setPopupDismissed(false);
+    setDrags(0);
+    completedFiredRef.current = false;
+    resetIdle();
+  }, [language, resetIdle]);
+
+  const hintCell = useMemo(
+    () => (riddle ? firstCellOf(riddle.word, board, language) : null),
+    [riddle, board, language],
+  );
+  const hintStage = nextHintStage({
+    idleMs,
+    drags,
+    wordsFound: foundWords.length,
+    hasTarget: !!riddle,
+  });
+  const revealedCount = hintStage === 'reveal-tile' ? 1 : 0;
 
   // Full-screen game surface — hide the site footer + bottom nav (matches
   // every other game screen), so the board fits one viewport without scroll.
@@ -128,6 +173,7 @@ export default function PracticeClassicSandbox() {
         return next;
       });
       setFeedback('ok');
+      resetIdle();
       // Use the GridComponent's data-row/data-col attrs to find tile centers
       // for the particle juice. Falls back gracefully if cells aren't in DOM.
       const cells = Array.from(document.querySelectorAll('[data-row][data-col]')) as HTMLElement[];
@@ -140,8 +186,15 @@ export default function PracticeClassicSandbox() {
       setConfettiKey((k) => k + 1);
       // Real-game-style "+points" popup over the board.
       setScorePopup({ key: Date.now(), word: upper });
-      // Real WordFeedbackToast — same component DailyChallengeGame uses.
-      setToast({ type: 'valid-word', message: `+${upper.length} ${upper}` });
+      // Solving the riddle is the headline win — call it out + double burst.
+      const solvedRiddleNow = !!riddle && upper === riddle.word.toUpperCase();
+      if (solvedRiddleNow) {
+        setToast({ type: 'valid-word', message: t('practice.riddle.solved') });
+        setConfettiKey((k) => k + 1);
+      } else {
+        // Real WordFeedbackToast — same component DailyChallengeGame uses.
+        setToast({ type: 'valid-word', message: `+${upper.length} ${upper}` });
+      }
       tutorialRef.current.dispatch({ type: 'word-found' });
       advanceBeat();
     } else {
@@ -157,13 +210,15 @@ export default function PracticeClassicSandbox() {
       if (badCountRef.current === 1) coach.trigger('notAWord');
       else if (badCountRef.current === 2) coach.trigger('diagonalsOk');
     }
-  }, [foundWords, validator, juice, sound, language, advanceBeat, t, coach]);
+  }, [foundWords, validator, juice, sound, language, advanceBeat, t, coach, riddle, resetIdle]);
 
-  // Detect first-drag for tutorial beat advance.
+  // Detect first-drag for tutorial beat advance + reset the helper idle timer.
   const onSelectionChange = useCallback(() => {
+    setDrags((d) => d + 1);
+    resetIdle();
     tutorialRef.current.dispatch({ type: 'drag-started' });
     advanceBeat();
-  }, [advanceBeat]);
+  }, [advanceBeat, resetIdle]);
 
   return (
     <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-full min-h-0 overflow-hidden">
@@ -188,12 +243,19 @@ export default function PracticeClassicSandbox() {
         </div>
       </div>
 
+      {/* The headline objective: a real riddle whose answer is embedded on the
+          board. Renders only for languages with a riddle pool (EN/HE). */}
+      <PracticeRiddleCard riddle={riddle} revealedCount={revealedCount} solved={riddleSolved} />
+
       {/* Learn by doing: no upfront modal gate — the player lands on the
           board with a gentle inline tip that retires the moment they spell
           their first word. The "?" pill stays for on-demand reference. */}
       <PracticeInstructions mode="classic" autoOpen={false} />
       <PracticeCoachTip mode="classic" wordsFound={foundWords.length} />
       <PracticeMistakeCoach kind={coach.active} mode="classic" onClose={coach.close} />
+      {/* On-screen FTUE helper — nudges after idle, then spotlights the riddle
+          answer's first tile if the player is stuck. */}
+      <PracticeHelperBubble stage={hintStage} hintCell={hintCell} />
 
       <div className="flex-1 min-h-0 flex items-center justify-center w-full">
         {/* Fill the flex space; `.game-board-frame` clamps the square to the
