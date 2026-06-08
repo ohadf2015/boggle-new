@@ -4,6 +4,7 @@ import { memo, useMemo, useRef, useEffect, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Trophy, Crown, Type, TrendingUp, TrendingDown, Flame } from 'lucide-react';
 import Avatar from '@/components/Avatar';
+import { useReactiveAvatarMood } from '@/hooks/useReactiveAvatarMood';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import PresenceIndicator from '@/components/PresenceIndicator';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
@@ -60,6 +61,17 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
   const comboInfo = getComboInfo(player.comboLevel || 0);
   const [showScoreDelta, setShowScoreDelta] = useState(false);
 
+  // Live face-swap reactions: scoring → celebrate, overtaken → flinch, on a
+  // streak → flame eyes. Keyed on absolute score/rank inside the hook so equal
+  // back-to-back deltas still fire (see useReactiveAvatarMood).
+  const avatarMood = useReactiveAvatarMood({
+    score: player.score,
+    rank: player.index,
+    scoreChange,
+    rankChange,
+    comboLevel: player.comboLevel ?? 0,
+  });
+
   // Flash score delta briefly when score changes
   useEffect(() => {
     if (scoreChange > 0) {
@@ -102,6 +114,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         avatarImage={player.avatar?.avatarImage}
         size="lg"
         disableEffects
+        mood={avatarMood}
       />
 
       {/* Player info */}

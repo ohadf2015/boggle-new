@@ -1,0 +1,123 @@
+/**
+ * GameLeaderboard — reactive avatar moods
+ *
+ * The leaderboard already computes per-player score/rank deltas each tick.
+ * Those deltas should drive a transient avatar face-swap so the board reads
+ * like a live spectator sport: a scoring player celebrates, an overtaken
+ * player flinches.
+ */
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { GameLeaderboard } from '../GameLeaderboard';
+import type { ExtendedLeaderboardPlayer } from '@/shared/types/view';
+
+vi.mock('@/components/motion/AdaptiveMotion', () => ({
+  __esModule: true,
+  AdaptiveMotion: {
+    div: ({ children, className }: React.PropsWithChildren<{ className?: string }>) => (
+      <div className={className}>{children}</div>
+    ),
+  },
+}));
+
+vi.mock('@/components/Avatar', () => ({
+  __esModule: true,
+  default: ({ mood }: { mood?: string }) => (
+    <div data-testid="avatar" data-mood={mood ?? 'idle'} />
+  ),
+}));
+
+vi.mock('@/components/ui/PlayerProfileTooltip', () => ({
+  __esModule: true,
+  default: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+vi.mock('@/components/PresenceIndicator', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+const mockT = (key: string) => key;
+
+const makePlayer = (overrides: Partial<ExtendedLeaderboardPlayer> = {}): ExtendedLeaderboardPlayer => ({
+  username: 'Alpha',
+  score: 100,
+  wordCount: 5,
+  isHost: false,
+  avatar: undefined,
+  presenceStatus: 'active' as const,
+  isWindowFocused: true,
+  isBot: false,
+  disconnected: false,
+  comboLevel: 0,
+  ...overrides,
+});
+
+const moods = () =>
+  screen.getAllByTestId('avatar').map((a) => a.getAttribute('data-mood'));
+
+describe('GameLeaderboard — reactive avatar moods', () => {
+  it('avatars start idle (no prior tick to react to)', () => {
+    render(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Alpha', score: 100 }), makePlayer({ username: 'Beta', score: 50 })]}
+        username="Alpha"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+    expect(moods().every((m) => m === 'idle')).toBe(true);
+  });
+
+  it('a player who gains points reacts with "correct"', () => {
+    const { rerender } = render(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Alpha', score: 100 }), makePlayer({ username: 'Beta', score: 50 })]}
+        username="Beta"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+
+    // Alpha scores; ranks unchanged (Alpha already #1).
+    rerender(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Alpha', score: 110 }), makePlayer({ username: 'Beta', score: 50 })]}
+        username="Beta"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+
+    expect(moods()).toContain('correct');
+  });
+
+  it('a player who gets overtaken reacts with "emoteShock"', () => {
+    const { rerender } = render(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Alpha', score: 100 }), makePlayer({ username: 'Beta', score: 90 })]}
+        username="Alpha"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+
+    // Beta overtakes Alpha → Beta now #1, Alpha dropped to #2 (rankChange < 0).
+    rerender(
+      <GameLeaderboard
+        leaderboard={[makePlayer({ username: 'Beta', score: 130 }), makePlayer({ username: 'Alpha', score: 100 })]}
+        username="Alpha"
+        isHost={false}
+        t={mockT}
+        dir="ltr"
+      />,
+    );
+
+    expect(moods()).toContain('emoteShock');
+  });
+});
