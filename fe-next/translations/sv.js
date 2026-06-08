@@ -11348,6 +11348,42 @@ const sv = {
       "try_mp": "Spela multiplayer",
       "try_blast": "Prova Blast",
       "try_daily": "Daglig utmaning"
+    },
+    "forSchools": {
+      "form": {
+        "full_name": "Ditt namn",
+        "email": "E-postadress",
+        "school_or_district": "Skola eller kommun",
+        "role": "Din roll",
+        "role_teacher": "Lärare",
+        "role_head_of_department": "Ämneschef",
+        "role_curriculum_lead": "Kursansvarig",
+        "role_school_admin": "Skolledare",
+        "role_district_admin": "Kommunal huvudman",
+        "role_other": "Övrigt",
+        "student_count": "Hur många elever?",
+        "count_lt_50": "Färre än 50",
+        "count_50_200": "50–200",
+        "count_200_500": "200–500",
+        "count_500_2000": "500–2 000",
+        "count_gte_2000": "2 000+",
+        "interests_legend": "Vad intresserar dig? (valfritt)",
+        "interest_district_admin_dashboard": "Instrumentpanel för kommunal huvudman",
+        "interest_analytics": "Analyser och rapporter över klasserna",
+        "interest_content_libraries": "Kunskapsbibliotek",
+        "interest_ad_free": "Annonsfritt skolläge",
+        "interest_sso": "Enkel inloggning (Clever / ClassLink / Google)",
+        "interest_pricing_info": "Prisinformation",
+        "country": "Land (valfritt)",
+        "message": "Något annat? (valfritt)",
+        "submit": "Berätta om din skola",
+        "submitting": "Skickar…",
+        "submit_error": "Något gick fel. Försök igen.",
+        "rate_limited": "För många inlämningar. Försök igen om 24 timmar.",
+        "success_title": "Tack — vi har tagit emot det!",
+        "success_body": "Vi hör av oss snart om tidig åtkomst till skolfunktioner. Fortsätt spela med din klass under tiden — det är gratis.",
+        "privacy_note": "Vi använder detta endast för att kontakta dig om skolfunktioner. Ingen spam."
+      }
     }
   },
   "crazygames": {

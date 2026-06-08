@@ -11585,6 +11585,42 @@ const he = {
       "try_mp": "משחק עם חברים",
       "try_blast": "נסו Blast",
       "try_daily": "המילה היומית"
+    },
+    "forSchools": {
+      "form": {
+        "full_name": "שמך",
+        "email": "כתובת דוא״ל",
+        "school_or_district": "בית ספר או מחוז",
+        "role": "תפקידך",
+        "role_teacher": "מורה",
+        "role_head_of_department": "ראש תחום",
+        "role_curriculum_lead": "רכז תכנית לימודים",
+        "role_school_admin": "מנהל בית ספר",
+        "role_district_admin": "מנהל מחוז",
+        "role_other": "אחר",
+        "student_count": "כמה תלמידים?",
+        "count_lt_50": "פחות מ-50",
+        "count_50_200": "50–200",
+        "count_200_500": "200–500",
+        "count_500_2000": "500–2,000",
+        "count_gte_2000": "2,000 ומעלה",
+        "interests_legend": "מה מעניין אותך? (אופציונלי)",
+        "interest_district_admin_dashboard": "לוח בקרה למנהל מחוז",
+        "interest_analytics": "ניתוחים ודוחות בין-כיתתיים",
+        "interest_content_libraries": "ספריות תוכן לימודי",
+        "interest_ad_free": "מצב בית ספר ללא מודעות",
+        "interest_sso": "כניסה מאוחדת (Clever / ClassLink / Google)",
+        "interest_pricing_info": "מידע על תמחור",
+        "country": "מדינה (אופציונלי)",
+        "message": "משהו נוסף? (אופציונלי)",
+        "submit": "ספרו לנו על בית הספר שלכם",
+        "submitting": "שולח…",
+        "submit_error": "משהו השתבש. אנא נסו שוב.",
+        "rate_limited": "יותר מדי שליחות. אנא נסו שוב בעוד 24 שעות.",
+        "success_title": "תודה — קיבלנו!",
+        "success_body": "ניצור אתכם קשר בנוגע לגישה מוקדמת לתכונות בית ספר. בינתיים המשיכו לשחק עם הכיתה — זה חינם.",
+        "privacy_note": "נשתמש בזה רק כדי ליצור אתכם קשר בנוגע לתכונות בית ספר. ללא ספאם."
+      }
     }
   },
   "crazygames": {

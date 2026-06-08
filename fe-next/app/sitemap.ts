@@ -160,6 +160,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     '/education/esl-word-games',
     '/education/games-for-teachers',
     '/education/spelling-bee-practice',
+    '/education/for-schools',
   ];
   educationLandings.forEach((path) => {
     routes.push({

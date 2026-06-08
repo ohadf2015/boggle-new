@@ -11306,6 +11306,42 @@ const ja = {
       "try_mp": "マルチプレイヤーを試す",
       "try_blast": "Blastモードで遊ぶ",
       "try_daily": "毎日のチャレンジ"
+    },
+    "forSchools": {
+      "form": {
+        "full_name": "お名前",
+        "email": "メールアドレス",
+        "school_or_district": "学校または地域",
+        "role": "職務",
+        "role_teacher": "教員",
+        "role_head_of_department": "教科主任",
+        "role_curriculum_lead": "カリキュラム責任者",
+        "role_school_admin": "学校管理者",
+        "role_district_admin": "地域管理者",
+        "role_other": "その他",
+        "student_count": "生徒数は何名ですか?",
+        "count_lt_50": "50名未満",
+        "count_50_200": "50～200名",
+        "count_200_500": "200～500名",
+        "count_500_2000": "500～2,000名",
+        "count_gte_2000": "2,000名以上",
+        "interests_legend": "どのような機能に興味がありますか?(任意)",
+        "interest_district_admin_dashboard": "地域管理者ダッシュボード",
+        "interest_analytics": "クラス横断的な分析とレポート",
+        "interest_content_libraries": "カリキュラムコンテンツライブラリ",
+        "interest_ad_free": "広告なしの学校モード",
+        "interest_sso": "シングルサインオン(Clever / ClassLink / Google)",
+        "interest_pricing_info": "料金情報",
+        "country": "国(任意)",
+        "message": "その他ご質問やコメントはありますか?(任意)",
+        "submit": "学校情報を送信する",
+        "submitting": "送信中…",
+        "submit_error": "エラーが発生しました。もう一度お試しください。",
+        "rate_limited": "送信が多すぎます。24時間後にもう一度お試しください。",
+        "success_title": "ありがとうございます — 確認しました!",
+        "success_body": "学校向け機能の早期アクセスについてご連絡します。それまではクラスと一緒にLexiClashをお楽しみください — 無料です。",
+        "privacy_note": "この情報は学校向け機能についてのご連絡にのみ使用します。スパムメールはお送りしません。"
+      }
     }
   },
   "crazygames": {
