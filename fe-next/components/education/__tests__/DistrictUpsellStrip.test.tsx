@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DistrictUpsellStrip } from '../DistrictUpsellStrip';
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k }),
+  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
 const mockTrackGrowthEvent = vi.fn();
@@ -21,12 +21,12 @@ describe('DistrictUpsellStrip', () => {
     expect(screen.getByRole('link', { name: 'education.landing.districtCta.button' })).toBeInTheDocument();
   });
 
-  it('button is a mailto link with district pricing subject', () => {
+  it('district button routes to the qualified For Schools lead form (not a raw mailto)', () => {
     render(<DistrictUpsellStrip />);
     const link = screen.getByRole('link', { name: 'education.landing.districtCta.button' });
     const href = link.getAttribute('href') ?? '';
-    expect(href).toContain('mailto:');
-    expect(href).toContain('District');
+    expect(href).toContain('/education/for-schools');
+    expect(href).not.toContain('mailto:');
   });
 
   it('calls trackGrowthEvent on button click', () => {
@@ -49,12 +49,12 @@ describe('DistrictUpsellStrip', () => {
     expect(screen.getByRole('link', { name: 'education.landing.teacherLeadCta.button' })).toBeInTheDocument();
   });
 
-  it('teacher button is a mailto link with Teacher subject', () => {
+  it('teacher button routes to the structured teacher access form (not a raw mailto)', () => {
     render(<DistrictUpsellStrip />);
     const link = screen.getByRole('link', { name: 'education.landing.teacherLeadCta.button' });
     const href = link.getAttribute('href') ?? '';
-    expect(href).toContain('mailto:');
-    expect(href).toContain('Teacher');
+    expect(href).toContain('/education/access');
+    expect(href).not.toContain('mailto:');
   });
 
   it('tracks teacher CTA impression on mount', () => {

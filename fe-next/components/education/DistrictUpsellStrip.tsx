@@ -1,15 +1,16 @@
 'use client';
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
-const TEACHER_MAILTO =
-  'mailto:lexiclash.game@gmail.com?subject=Teacher%20Interest%20-%20Classroom%20Tools';
-const DISTRICT_MAILTO =
-  'mailto:lexiclash.game@gmail.com?subject=District%20Pricing%20Inquiry';
-
 export function DistrictUpsellStrip() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  // Route interest into STRUCTURED, admin-visible capture instead of raw mailto:
+  // individual teachers → the free teacher-access form; districts → the qualified
+  // For Schools lead form (role / size / paid-interest fields + rate limit + admin viewer).
+  const teacherHref = `/${language}/education/access`;
+  const districtHref = `/${language}/education/for-schools`;
 
   useEffect(() => {
     trackGrowthEvent('education_upsell_impression', { cta: 'teacher_individual' });
@@ -29,15 +30,15 @@ export function DistrictUpsellStrip() {
               {t('education.landing.teacherLeadCta.body')}
             </p>
           </div>
-          <a
-            href={TEACHER_MAILTO}
+          <Link
+            href={teacherHref}
             onClick={() =>
               trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_individual' })
             }
             className="shrink-0 rounded-neo border-neo border-neo-lime bg-neo-lime/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-lime/30 hover:shadow-hard"
           >
             {t('education.landing.teacherLeadCta.button')}
-          </a>
+          </Link>
         </div>
       </aside>
 
@@ -52,15 +53,15 @@ export function DistrictUpsellStrip() {
               {t('education.landing.districtCta.body')}
             </p>
           </div>
-          <a
-            href={DISTRICT_MAILTO}
+          <Link
+            href={districtHref}
             onClick={() =>
               trackGrowthEvent('landing_cta_clicked', { cta: 'district_upsell' })
             }
             className="shrink-0 rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-purple/30 hover:shadow-hard"
           >
             {t('education.landing.districtCta.button')}
-          </a>
+          </Link>
         </div>
       </aside>
     </div>
