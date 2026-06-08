@@ -98,7 +98,7 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
 };
 
 type ResourceCard = { badge: string; title: string; desc: string };
-const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: ResourceCard; esl: ResourceCard; teachers: ResourceCard; spelling: ResourceCard }> = {
+const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: ResourceCard; esl: ResourceCard; teachers: ResourceCard; spelling: ResourceCard; forSchools: ResourceCard }> = {
   en: {
     heading: 'Teacher Guides',
     subhead: 'Deep-dive landing pages on specific use cases, with comparison tables, FAQs, and free word lists.',
@@ -106,6 +106,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'ESL Word Games Online', desc: 'CEFR-scaled (A1→C2), 5 dictionaries, no student signup.' },
     teachers: { badge: 'For Teachers', title: 'Word Games for Teachers', desc: 'Sub-day, brain-break, warm-up — zero prep, free forever.' },
     spelling: { badge: 'Spelling Bee', title: 'Spelling Bee Practice Online', desc: '4-week training plan, custom word lists, 1v1 duels — Scripps prep.' },
+    forSchools: { badge: 'For Schools', title: 'LexiClash for Schools', desc: 'Free for every teacher — school & district options, no student logins.' },
   },
   he: {
     heading: 'מדריכים למורים',
@@ -114,6 +115,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'אנגלית', title: 'משחקי מילים באנגלית כשפה זרה', desc: 'מדורג לפי CEFR (A1→C2), 5 מילונים, בלי הרשמת תלמידים.' },
     teachers: { badge: 'למורים', title: 'משחקי מילים למורים', desc: 'יום מילוי מקום, הפסקה מרעננת, חימום — אפס הכנה, חינם לתמיד.' },
     spelling: { badge: 'איות', title: 'תרגול תחרות איות אונליין', desc: 'תוכנית אימון של 4 שבועות, רשימות מילים מותאמות, דואלי 1v1 — הכנה לתחרות.' },
+    forSchools: { badge: 'לבתי ספר', title: 'LexiClash לבתי ספר', desc: 'חינם לכל מורה — אפשרויות לבית ספר ולמחוז, בלי הרשמת תלמידים.' },
   },
   sv: {
     heading: 'Lärarguider',
@@ -122,6 +124,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'Ordspel för engelska online', desc: 'CEFR-skalad (A1→C2), 5 ordböcker, ingen elevregistrering.' },
     teachers: { badge: 'För lärare', title: 'Ordspel för lärare', desc: 'Vikariedag, hjärnpaus, uppvärmning — noll förberedelse, gratis för alltid.' },
     spelling: { badge: 'Stavning', title: 'Stavningstävling online', desc: '4-veckors träningsplan, anpassade ordlistor, 1v1-dueller — tävlingsförberedelse.' },
+    forSchools: { badge: 'För skolor', title: 'LexiClash för skolor', desc: 'Gratis för varje lärare — alternativ för skola och kommun, ingen elevinloggning.' },
   },
   ja: {
     heading: '教師向けガイド',
@@ -130,6 +133,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'オンライン英語単語ゲーム', desc: 'CEFR準拠（A1→C2）、5つの辞書、生徒の登録不要。' },
     teachers: { badge: '教師向け', title: '教師のための単語ゲーム', desc: '代行日、頭の休憩、ウォームアップ — 準備ゼロ、ずっと無料。' },
     spelling: { badge: 'スペリング', title: 'オンラインスペリング練習', desc: '4週間のトレーニングプラン、カスタム単語リスト、1対1デュエル — 大会対策。' },
+    forSchools: { badge: '学校向け', title: '学校向けLexiClash', desc: 'すべての教師に無料 — 学校・地域向けオプション、生徒ログイン不要。' },
   },
   es: {
     heading: 'Guías para docentes',
@@ -138,6 +142,7 @@ const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: 
     esl: { badge: 'ESL', title: 'Juegos de palabras en inglés online', desc: 'Escalado por CEFR (A1→C2), 5 diccionarios, sin registro de estudiantes.' },
     teachers: { badge: 'Para docentes', title: 'Juegos de palabras para docentes', desc: 'Día de sustitución, descanso mental, calentamiento — cero preparación, gratis para siempre.' },
     spelling: { badge: 'Concurso de Ortografía', title: 'Práctica de concurso de ortografía online', desc: 'Plan de entrenamiento de 4 semanas, listas personalizadas, duelos 1v1 — preparación para concursos.' },
+    forSchools: { badge: 'Para escuelas', title: 'LexiClash para escuelas', desc: 'Gratis para cada docente — opciones para escuela y distrito, sin inicio de sesión de estudiantes.' },
   },
 };
 
@@ -178,7 +183,7 @@ function EducationResourceLinks({ locale }: { locale: string }) {
       <p className="mt-2 max-w-2xl text-sm sm:text-base text-neo-gray-200">
         {rc.subhead}
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Link
           href={`/${locale}/education/vocabulary-games-classroom`}
           className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
@@ -210,6 +215,14 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           <span className="inline-block border-2 border-neo-black bg-neo-pink px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-white">{rc.spelling.badge}</span>
           <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.spelling.title}</h3>
           <p className="mt-2 text-xs text-neo-gray-200">{rc.spelling.desc}</p>
+        </Link>
+        <Link
+          href={`/${locale}/education/for-schools`}
+          className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+        >
+          <span className="inline-block border-2 border-neo-black bg-neo-lime px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.forSchools.badge}</span>
+          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.forSchools.title}</h3>
+          <p className="mt-2 text-xs text-neo-gray-200">{rc.forSchools.desc}</p>
         </Link>
       </div>
     </section>
