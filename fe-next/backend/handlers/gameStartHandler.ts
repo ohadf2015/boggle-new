@@ -27,6 +27,7 @@ import {
 } from '../utils/socketHelpers.js';
 
 import { makePositionsMap } from '../modules/wordValidator.js';
+import { clearAutoStartState } from '../modules/lobbyAutoStart.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
@@ -225,6 +226,10 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       emitError(socket, ErrorCodes.PLAYER_NOT_HOST);
       return;
     }
+
+    // The game is starting (manually or via the lobby auto-start firing) — tear
+    // down any in-flight lobby auto-start countdown so it can't fire again.
+    clearAutoStartState(gameCode);
 
     // Rematch preservation: a rematch (ResultsPage) omits these fields, and
     // resetGameForNewRound below wipes game.minWordLength — so snapshot the

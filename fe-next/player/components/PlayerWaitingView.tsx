@@ -16,6 +16,7 @@ import { LobbyReactions } from '../../components/lobby/LobbyReactions';
 import { EmoteTray } from './lobby/EmoteTray';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
+import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
@@ -96,6 +97,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   // sender's own avatar face-swap uses the same canonical username as its tile.
   const socketCtx = useSocketOptional();
   const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({
+    socket: socketCtx?.socket ?? null,
+  });
+
+  // Mirror the host's server-owned auto-start countdown (display only — guests
+  // never fire the start) so everyone watches the same number tick down.
+  const { secondsLeft: autoStartSecondsLeft } = useLobbyAutoStart({
     socket: socketCtx?.socket ?? null,
   });
 
@@ -246,10 +253,15 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           <div className="flex items-center justify-between gap-2 mt-1.5">
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse shrink-0" />
-              <p className="text-sm text-slate-400 truncate">
-                {readyCount > 0
-                  ? `${readyCount}/${readyTotal} ${t('hostView.playersReady')}`
-                  : t('playerView.hostWillStart')}
+              <p className={cn(
+                'text-sm truncate',
+                autoStartSecondsLeft !== null ? 'text-neo-lime font-bold' : 'text-slate-400'
+              )}>
+                {autoStartSecondsLeft !== null
+                  ? t('playerView.autoStartingSoon', { seconds: autoStartSecondsLeft })
+                  : readyCount > 0
+                    ? `${readyCount}/${readyTotal} ${t('hostView.playersReady')}`
+                    : t('playerView.hostWillStart')}
               </p>
             </div>
             {/* Ambient social toy — fling emoji while waiting (reuses quickReaction) */}

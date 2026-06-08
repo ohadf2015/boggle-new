@@ -41,6 +41,7 @@ export interface ClientToServerEvents {
   startGame: (data: StartGamePayload) => void;
   startGameAck: (data: { messageId: string }) => void;
   countdownComplete: (data: { messageId: string }) => void;
+  lobbyAutoStartCancel: () => void;
   endGame: () => void;
   resetGame: () => void;
   closeRoom: () => void;
@@ -291,6 +292,13 @@ export interface ServerToClientEvents {
   allPlayersReady: (data: { readyCount: number; totalPlayers: number }) => void;
   autoStartCountdown: (data: { remaining: number }) => void;
   autoStartCancelled: (data: Record<string, never>) => void;
+  // Lobby auto-start: server-owned countdown that begins when every non-host
+  // human marks ready, so a stalled host no longer blocks the game. Distinct
+  // from the bot auto-fill `autoStart*` events above and from the post-start
+  // 3-2-1 countdown.
+  lobbyAutoStartTick: (data: { secondsLeft: number }) => void;
+  lobbyAutoStartCancelled: (data: Record<string, never>) => void;
+  lobbyAutoStartFire: (data: Record<string, never>) => void;
 
   // Word / room broadcast events
   playerFoundWord: (data: {

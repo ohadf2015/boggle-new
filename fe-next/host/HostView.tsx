@@ -48,6 +48,7 @@ import {
 } from './hooks';
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
@@ -397,6 +398,11 @@ const HostView: React.FC<HostViewProps> = memo(({
     };
   }, [socket]);
 
+  // Server-owned lobby auto-start: when every guest is ready, the server runs a
+  // short synced countdown and then tells the host to fire the normal start —
+  // so a host who never clicks "Start" no longer strands a ready lobby.
+  const lobbyAutoStart = useLobbyAutoStart({ socket, onFire: actions.startGame });
+
   // Handle pending game start (when host returns from results page)
   // The startGame event was captured at page level while HostView was unmounted
   // We need to initialize the game state with that data
@@ -694,6 +700,9 @@ const HostView: React.FC<HostViewProps> = memo(({
           setHostPlaying={state.setHostPlaying}
           playersReady={players.playersReady as any}
           readyUsernames={playersReadyData?.readyUsernames ?? []}
+          readyTotal={playersReadyData?.totalPlayers ?? 0}
+          autoStartSecondsLeft={lobbyAutoStart.secondsLeft}
+          onCancelAutoStart={lobbyAutoStart.cancel}
           playerWordCounts={players.playerWordCounts}
           shufflingGrid={animation.shufflingGrid}
           highlightedCells={animation.highlightedCells}

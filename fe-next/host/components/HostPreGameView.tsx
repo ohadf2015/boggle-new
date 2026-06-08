@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut, Monitor } from 'lucide-react';
+import { BookOpen, LogOut, Monitor, Zap } from 'lucide-react';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
@@ -87,6 +87,12 @@ interface HostPreGameViewProps {
   playersReady: (string | PlayerData)[];
   /** Usernames the server reports as lobby-ready (non-host). */
   readyUsernames?: string[];
+  /** Total non-host humans the server is tracking for readiness. */
+  readyTotal?: number;
+  /** Server-owned lobby auto-start countdown (seconds), or null when idle. */
+  autoStartSecondsLeft?: number | null;
+  /** Cancel the lobby auto-start countdown. */
+  onCancelAutoStart?: () => void;
   playerWordCounts: Record<string, number>;
   shufflingGrid: LetterGrid | null;
   highlightedCells: { row: number; col: number }[];
@@ -124,6 +130,9 @@ function HostPreGameView({
   setHostPlaying,
   playersReady,
   readyUsernames = [],
+  readyTotal = 0,
+  autoStartSecondsLeft = null,
+  onCancelAutoStart,
   onStartGame,
   onExitRoom,
   tournamentCreating,
@@ -335,6 +344,40 @@ function HostPreGameView({
     );
   };
 
+  // Everyone's ready → loud server-synced auto-start banner with a Cancel escape.
+  const renderAutoStartBanner = (): React.ReactElement | null => {
+    if (autoStartSecondsLeft === null) return null;
+    return (
+      <m.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+        className="bg-neo-lime/20 border-3 border-neo-lime rounded-neo-lg px-4 py-2.5 flex items-center justify-between shadow-hard"
+        role="status"
+        aria-live="polite"
+      >
+        <span className="text-neo-lime font-neo-display font-bold text-sm flex items-center gap-2">
+          <Zap className="w-4 h-4 shrink-0" />
+          {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
+        </span>
+        {onCancelAutoStart && (
+          <button
+            onClick={onCancelAutoStart}
+            className="text-xs font-bold uppercase text-neo-lime border-2 border-neo-lime/60 rounded-lg px-3 py-1 hover:bg-neo-lime/10 transition-colors shrink-0"
+          >
+            {t('common.cancel')}
+          </button>
+        )}
+      </m.div>
+    );
+  };
+
+  // Some — but not all — guests are ready: nudge the host to start (no auto-fire).
+  const readyCount = readyUsernames.length;
+  const showWaitingNudge =
+    autoStartSecondsLeft === null && readyCount > 0 && readyTotal > 0 && readyCount < readyTotal;
+
   // TV mode toggle — neo-brutalist pill with hard shadow
   const tvModeToggle = (
     <button
@@ -444,6 +487,7 @@ function HostPreGameView({
             leftContent={
               <>
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
+                <AnimatePresence>{renderAutoStartBanner()}</AnimatePresence>
                 <div className="animate-fade-in-up shrink-0 rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard px-4 pt-2.5 pb-3 overflow-visible">
                   <PlayerRoster
                     players={filteredPlayersForDisplay}
@@ -485,9 +529,14 @@ function HostPreGameView({
           />
           {/* Sticky bottom start button — desktop */}
           <div className="shrink-0 px-6 py-3 short:py-1.5 desktop-short:lg:py-1 desktop-medium-short:lg:py-2 border-t-3 border-neo-black bg-neo-navy/95">
+            {showWaitingNudge && (
+              <p className="text-center text-neo-yellow font-neo-display font-bold text-xs uppercase tracking-wide mb-1.5 animate-neo-wobble">
+                {t('hostView.playersWaitingNudge', { count: readyCount, total: readyTotal })}
+              </p>
+            )}
             <div className="flex items-center gap-3">
               <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
-              <div className="flex-1">
+              <div className={cn('flex-1', showWaitingNudge && 'animate-pulse')}>
                 <StartButton
                   onStartGame={onStartGame}
                   disabled={isStartDisabled}
@@ -506,6 +555,7 @@ function HostPreGameView({
           <div className="flex-1 min-h-0 overflow-y-auto relative z-10">
             <div className="max-w-[600px] mx-auto px-4 py-3 gap-3 flex flex-col pb-3">
               <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
+              <AnimatePresence>{renderAutoStartBanner()}</AnimatePresence>
               <PlayerRoster
                 players={filteredPlayersForDisplay}
                 username={username}
@@ -532,11 +582,16 @@ function HostPreGameView({
           </div>
           {/* Sticky bottom start button — mobile */}
           <div className="shrink-0 px-5 short:px-3 py-3 short:py-1.5 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+            {showWaitingNudge && (
+              <p className="max-w-[600px] mx-auto text-center text-neo-yellow font-neo-display font-bold text-xs uppercase tracking-wide mb-1.5 animate-neo-wobble">
+                {t('hostView.playersWaitingNudge', { count: readyCount, total: readyTotal })}
+              </p>
+            )}
             <div className="max-w-[600px] mx-auto flex flex-col short:flex-row short:items-stretch gap-2">
               <div className="short:shrink-0 short:w-auto">
                 <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
               </div>
-              <div className="short:flex-1 short:min-w-0">
+              <div className={cn('short:flex-1 short:min-w-0', showWaitingNudge && 'animate-pulse')}>
                 <StartButton
                   onStartGame={onStartGame}
                   disabled={isStartDisabled}

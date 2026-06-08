@@ -41,6 +41,12 @@ import {
 } from '../utils/socketHelpers.js';
 
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
+import {
+  shouldTriggerAutoStart,
+  startAutoStartCountdown,
+  cancelAutoStartCountdown,
+  clearAutoStartState,
+} from '../modules/lobbyAutoStart.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { checkSocketRateLimit } from '../middleware/rateLimiterRedis.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
@@ -102,6 +108,24 @@ interface AuthConnection {
 // Guards against TOCTOU race in createGame: tracks game codes whose creation
 // is in-flight (between gameExists check and createGame call across async yields).
 const gamesBeingCreated = new Set<string>();
+
+/**
+ * Begin the server-owned lobby auto-start countdown for a game. Ticks are
+ * broadcast to the whole room (one synced clock for host + guests); at zero the
+ * host socket is told to fire its normal `startGame` path. Re-resolves the host
+ * socket at fire time so a host reconnect mid-countdown still receives it.
+ */
+function beginLobbyAutoStart(io: Server, gameCode: string): void {
+  startAutoStartCountdown(gameCode, {
+    onTick: (secondsLeft) =>
+      broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartTick', { secondsLeft }),
+    onFire: () => {
+      const game = getGame(gameCode);
+      if (!game || game.gameState !== 'waiting' || !game.hostSocketId) return;
+      io.to(game.hostSocketId).emit('lobbyAutoStartFire', {});
+    },
+  });
+}
 
 /**
  * Register game lifecycle socket event handlers
@@ -510,6 +534,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       const stateBeforeReset = game.gameState;
       clearGameTimer(gameCode);
       gameStartCoordinator.cleanupSequence(gameCode);
+      clearAutoStartState(gameCode);
       stopAllBots(gameCode);
 
       const resetSuccess = resetGameForNewRound(gameCode);
@@ -643,7 +668,35 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         totalPlayers: result.totalPlayers,
         readyUsernames: result.readyUsernames,
       });
+
+      // Everyone (non-host humans) is ready in the *waiting* lobby: nudge the
+      // host AND begin a short server-owned countdown so a stalled host no
+      // longer blocks the game. Any un-ready cancels it.
+      if (data?.ready && shouldTriggerAutoStart(result.readyCount, result.totalPlayers)) {
+        broadcastToRoom(io, getGameRoom(gameCode), 'allPlayersReady', {
+          readyCount: result.readyCount,
+          totalPlayers: result.totalPlayers,
+        });
+        beginLobbyAutoStart(io, gameCode);
+      } else if (!data?.ready) {
+        cancelAutoStartCountdown(gameCode, () =>
+          broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})
+        );
+      }
     }
+  });
+
+  // Host cancelled the auto-start countdown (wants to keep waiting / tweak settings).
+  socket.on('lobbyAutoStartCancel', () => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+    const game = getGame(gameCode);
+    // Only the host may cancel the lobby auto-start.
+    if (!game || game.hostSocketId !== socket.id) return;
+    cancelAutoStartCountdown(gameCode, () =>
+      broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})
+    );
   });
 
   // Handle guest name update in lobby

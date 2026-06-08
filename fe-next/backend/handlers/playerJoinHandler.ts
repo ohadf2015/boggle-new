@@ -34,6 +34,7 @@ import {
   LOBBY_ROOM,
 } from '../utils/socketHelpers.js';
 
+import { cancelAutoStartCountdown } from '../modules/lobbyAutoStart.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import timerManager, { clearGameTimer } from '../utils/timerManager.js';
@@ -257,6 +258,15 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       users: getGameUsers(gameCode)
     });
     broadcastActiveRooms(io, getActiveRooms());
+
+    // A newly-joined player starts un-ready, so the lobby auto-start's
+    // all-ready condition no longer holds — cancel any in-flight countdown.
+    // No-op when nothing is counting.
+    if (game.gameState === 'waiting') {
+      cancelAutoStartCountdown(gameCode, () =>
+        broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})
+      );
+    }
 
     logger.info('SOCKET', `${username} joined game ${gameCode}`);
 

@@ -11,6 +11,8 @@ import { LobbyReactions } from '@/components/lobby/LobbyReactions';
 import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { useGameActions } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSocketOptional } from '@/utils/SocketContext';
+import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
 import type { Language, DifficultyLevel, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
@@ -62,6 +64,13 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   setHostPlaying,
 }) => {
   const { isAdmin } = useAuth();
+  // Display the server-owned auto-start countdown on the TV screen too, with a
+  // Cancel so a spectating host can still abort (the start itself fires from
+  // HostView's hook regardless of which lobby surface is mounted).
+  const socketCtx = useSocketOptional();
+  const { secondsLeft: autoStartSecondsLeft, cancel: cancelAutoStart } = useLobbyAutoStart({
+    socket: socketCtx?.socket ?? null,
+  });
   // TV mode = host is the screen, NOT a competitor. Strip the host record so
   // counts/roster only reflect joining players. Mirror of HostPreGameView's
   // host-not-playing filter (HostPreGameView.tsx:194-201).
@@ -149,6 +158,22 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             t={t}
             isAdmin={isAdmin}
           />
+
+          {/* Auto-start countdown banner (everyone ready) */}
+          {autoStartSecondsLeft !== null && (
+            <div className="bg-neo-lime/20 border-3 border-neo-lime rounded-neo-lg px-4 py-3 flex items-center justify-between shadow-hard" role="status" aria-live="polite">
+              <span className="text-neo-lime font-neo-display font-bold text-lg flex items-center gap-2">
+                <Zap className="w-5 h-5 shrink-0" />
+                {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
+              </span>
+              <button
+                onClick={cancelAutoStart}
+                className="text-sm font-bold uppercase text-neo-lime border-2 border-neo-lime/60 rounded-lg px-4 py-1.5 hover:bg-neo-lime/10 transition-colors shrink-0"
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
+          )}
 
           {/* Start button — big for TV */}
           <StartButton

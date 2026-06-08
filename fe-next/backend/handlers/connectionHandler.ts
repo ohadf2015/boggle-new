@@ -27,6 +27,7 @@ import {
   getGameRoom,
 } from '../utils/socketHelpers.js';
 
+import { cancelAutoStartCountdown } from '../modules/lobbyAutoStart.js';
 import timerManager, { clearGameTimer } from '../utils/timerManager.js';
 import { resetRateLimit } from '../utils/rateLimiter.js';
 import { cleanupPlayerData } from '../utils/playerCleanup.js';
@@ -307,6 +308,14 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
  */
 function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCode: string, username: string, reason: string): void {
   logger.info('SOCKET', `Player ${username} disconnected from game ${gameCode}`);
+
+  // Roster changed mid-lobby — cancel any in-flight auto-start countdown so it
+  // doesn't fire against a stale ready-set. No-op when nothing is counting.
+  if (game.gameState === 'waiting') {
+    cancelAutoStartCountdown(gameCode, () =>
+      broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})
+    );
+  }
 
   // Check if user is a bot (bots don't have reconnection handling)
   const userData: GameUserWithTimeout | undefined = game.users?.[username];
