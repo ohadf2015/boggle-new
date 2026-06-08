@@ -8,6 +8,8 @@ export interface CrosswordClueListProps {
   activeSlotId: string | null;
   onSelect: (slot: Slot) => void;
   t: (key: string) => string;
+  /** 'responsive' = 1 col then 2 at sm+ (mobile sheet). 'stacked' = always 1 col (desktop rail). */
+  columns?: 'responsive' | 'stacked';
 }
 
 /**
@@ -15,7 +17,13 @@ export interface CrosswordClueListProps {
  * blocks). Clicking a clue jumps focus to that slot; the active slot is highlighted. The compact
  * ClueBar stays for mobile focus, but this is the at-a-glance overview real solvers expect.
  */
-export function CrosswordClueList({ slots, activeSlotId, onSelect, t }: CrosswordClueListProps) {
+export function CrosswordClueList({
+  slots,
+  activeSlotId,
+  onSelect,
+  t,
+  columns = 'responsive',
+}: CrosswordClueListProps) {
   const { across, down } = useMemo(() => {
     const byNum = (a: Slot, b: Slot) => a.number - b.number;
     return {
@@ -25,7 +33,11 @@ export function CrosswordClueList({ slots, activeSlotId, onSelect, t }: Crosswor
   }, [slots]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+    <div
+      className={`grid gap-3 w-full ${
+        columns === 'stacked' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+      }`}
+    >
       <Section
         dir="across"
         heading={t('crossword.acrossHeading')}

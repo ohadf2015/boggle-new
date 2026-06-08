@@ -21,7 +21,11 @@ const ja = {
     "backspace": "削除",
     "solvedTitle": "完成！",
     "solvedTime": "クリアタイム",
-    "playAgain": "もう一度"
+    "playAgain": "もう一度",
+    "wordsLabel": "単語",
+    "progressLabel": "進捗",
+    "allClues": "すべてのヒント",
+    "hintsLabel": "ヒント"
   },
   "rank": {
     "seasonTitle": "シーズン順位",

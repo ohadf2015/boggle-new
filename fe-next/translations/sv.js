@@ -21,7 +21,11 @@ const sv = {
     "backspace": "Radera",
     "solvedTitle": "Löst!",
     "solvedTime": "Klar på",
-    "playAgain": "Spela igen"
+    "playAgain": "Spela igen",
+    "wordsLabel": "Ord",
+    "progressLabel": "Pusselframsteg",
+    "allClues": "Alla ledtrådar",
+    "hintsLabel": "Ledtrådar"
   },
   "rank": {
     "seasonTitle": "Säsongsrank",

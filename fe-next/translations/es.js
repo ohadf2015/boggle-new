@@ -21,7 +21,11 @@ const es = {
     "backspace": "Borrar",
     "solvedTitle": "¡Resuelto!",
     "solvedTime": "Terminado en",
-    "playAgain": "Jugar de nuevo"
+    "playAgain": "Jugar de nuevo",
+    "wordsLabel": "Palabras",
+    "progressLabel": "Progreso del crucigrama",
+    "allClues": "Todas las pistas",
+    "hintsLabel": "Pistas"
   },
   "rank": {
     "seasonTitle": "Rango de temporada",

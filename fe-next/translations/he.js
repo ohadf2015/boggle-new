@@ -21,7 +21,11 @@ const he = {
     "backspace": "מחיקה",
     "solvedTitle": "פתרתם!",
     "solvedTime": "סיימתם תוך",
-    "playAgain": "שחקו שוב"
+    "playAgain": "שחקו שוב",
+    "wordsLabel": "מילים",
+    "progressLabel": "התקדמות בתשבץ",
+    "allClues": "כל ההגדרות",
+    "hintsLabel": "רמזים"
   },
   "rank": {
     "seasonTitle": "דירוג העונה",
