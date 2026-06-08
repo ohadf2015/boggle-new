@@ -873,6 +873,25 @@ const es = {
       "name": "Fiebre del Oro"
     }
   },
+  "hiddenAchievement": {
+    "unlockedBanner": "¡Secreto desbloqueado!",
+    "board_sweep": {
+      "title": "Barrida total",
+      "desc": "¡Recorriste todas las fichas de un solo trazo!"
+    },
+    "palindrome": {
+      "title": "Palabra espejo",
+      "desc": "Encontraste una palabra que se lee igual al revés."
+    },
+    "speed_demon": {
+      "title": "Demonio veloz",
+      "desc": "Cinco palabras en los primeros diez segundos. ¡Relámpago!"
+    },
+    "triple_threat": {
+      "title": "Triple amenaza",
+      "desc": "Una palabra con la misma letra tres veces."
+    }
+  },
   "easterEgg": {
     "konami": "¡Vaya — código secreto desbloqueado! Eres una leyenda. 🎉"
   },

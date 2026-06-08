@@ -22,6 +22,7 @@ import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
+import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
 
 const PRACTICE_CONTINUE_THRESHOLD = 100;
 
@@ -196,6 +197,24 @@ function SinglePlayerGame({
     [reportActivity, coreWordChange]
   );
 
+  // Wrap path submit to detect the "select every tile in one drag" hidden
+  // achievement. Cosmetic + fire-and-forget; always delegates to the real handler.
+  const corePathSubmit = core.handlePathSubmit;
+  const coreGrid = core.grid;
+  const wrappedPathSubmit = useCallback(
+    (path: Parameters<typeof corePathSubmit>[0]) => {
+      const grid = coreGrid as LetterGrid | null;
+      if (grid && grid.length > 0) {
+        evaluateSelectionAchievements({
+          selectedTileCount: Array.isArray(path) ? path.length : 0,
+          totalTiles: grid.length * (grid[0]?.length ?? 0),
+        });
+      }
+      corePathSubmit(path);
+    },
+    [coreGrid, corePathSubmit]
+  );
+
   // Common props for all layouts - memoized to prevent unnecessary re-renders
   // Must be called before any conditional returns to follow React hooks rules
   const commonProps = useMemo(() => {
@@ -239,7 +258,7 @@ function SinglePlayerGame({
       directionGuidance: core.directionGuidance,
       training: core.training,
       onWordSubmit: core.handleWordSubmit,
-      onPathSubmit: core.handlePathSubmit,
+      onPathSubmit: wrappedPathSubmit,
       onWordChange: wrappedWordChange,
       onPauseToggle: core.handlePauseToggle,
       onFinishPractice: core.handleFinishPractice,
@@ -285,7 +304,7 @@ function SinglePlayerGame({
     core.directionGuidance,
     core.training,
     core.handleWordSubmit,
-    core.handlePathSubmit,
+    wrappedPathSubmit,
     wrappedWordChange,
     core.handlePauseToggle,
     core.handleFinishPractice,

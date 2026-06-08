@@ -884,6 +884,25 @@ const ja = {
       "name": "ゴールドラッシュ"
     }
   },
+  "hiddenAchievement": {
+    "unlockedBanner": "隠し実績を解除！",
+    "board_sweep": {
+      "title": "全マス制覇",
+      "desc": "一筆ですべてのマスをなぞった！"
+    },
+    "palindrome": {
+      "title": "回文ハンター",
+      "desc": "前から読んでも後ろから読んでも同じ単語を発見。"
+    },
+    "speed_demon": {
+      "title": "スピードキング",
+      "desc": "最初の10秒で5単語。電光石火！"
+    },
+    "triple_threat": {
+      "title": "トリプル",
+      "desc": "1つの単語で同じ文字を3回使用。"
+    }
+  },
   "easterEgg": {
     "konami": "おっと — 隠しコマンド発見！君は伝説だ。🎉"
   },

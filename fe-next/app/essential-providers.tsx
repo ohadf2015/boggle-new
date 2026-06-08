@@ -47,6 +47,7 @@ import QuietCelebrationLayer from '@/components/cosy/QuietCelebrationLayer';
 import CosyAmbientBackdrop from '@/components/cosy/CosyAmbientBackdrop';
 import NativeSelectionGuard from '@/components/native/NativeSelectionGuard';
 import EasterEggListener from '@/components/EasterEggListener';
+import HiddenAchievementListener from '@/components/achievements/HiddenAchievementListener';
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
@@ -220,6 +221,9 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 <GlobalCoinEarnFx />
                                                 {/* Hidden Konami-code easter egg → fireworks + toast (cosmetic only) */}
                                                 <EasterEggListener />
+                                                {/* Hidden in-app achievements (easter eggs) → localized reveal card + confetti.
+                                                    Gameplay only emits on the bus; this listener owns all UI. */}
+                                                <HiddenAchievementListener />
                                                 {/* Season modals are gated to home route + first interaction + suspense delay
                                                     so they never interrupt gameplay or pop instantly on landing. */}
                                                 <HomeOnlySeasonGate>

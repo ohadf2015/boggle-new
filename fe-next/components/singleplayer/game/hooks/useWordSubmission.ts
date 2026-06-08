@@ -7,6 +7,7 @@ import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { usePrevalidation } from '@/hooks/usePrevalidation';
+import { evaluateWordAchievements } from '@/lib/achievements/hiddenAchievementBus';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ComboSystemReturn } from '@/hooks/useComboSystem';
@@ -303,6 +304,15 @@ export function useWordSubmission({
       });
       announceWordResult(normalizedWord, true, fullScore);
       announceCombo(currentCombo + 1);
+
+      // Hidden achievements (cosmetic, fire-and-forget): word-pattern easter eggs.
+      // Snapshot every valid word's elapsed time so speed-based eggs can evaluate.
+      evaluateWordAchievements({
+        word: normalizedWord,
+        validWordTimesSec: foundWordsRef.current
+          .filter((fw) => fw.isValid === true)
+          .map((fw) => fw.timeSinceStart),
+      });
     };
 
     // Helper function to handle invalid word (not in dictionary)

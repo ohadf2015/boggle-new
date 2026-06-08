@@ -21,7 +21,11 @@ const en = {
     "backspace": "Delete",
     "solvedTitle": "Solved!",
     "solvedTime": "Finished in",
-    "playAgain": "Play again"
+    "playAgain": "Play again",
+    "wordsLabel": "Words",
+    "progressLabel": "Puzzle progress",
+    "allClues": "All clues",
+    "hintsLabel": "Hints"
   },
   "rank": {
     "seasonTitle": "Season Rank",
@@ -876,6 +880,25 @@ const en = {
     },
     "goldRush": {
       "name": "Gold Rush"
+    }
+  },
+  "hiddenAchievement": {
+    "unlockedBanner": "Secret unlocked!",
+    "board_sweep": {
+      "title": "Clean Sweep",
+      "desc": "You traced every single tile in one go!"
+    },
+    "palindrome": {
+      "title": "Mirror, Mirror",
+      "desc": "Found a word that reads the same backwards."
+    },
+    "speed_demon": {
+      "title": "Speed Demon",
+      "desc": "Five words in the first ten seconds. Lightning!"
+    },
+    "triple_threat": {
+      "title": "Triple Threat",
+      "desc": "One word, the same letter three times over."
     }
   },
   "easterEgg": {

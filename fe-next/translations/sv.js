@@ -972,6 +972,25 @@ const sv = {
       "name": "Guldrusch"
     }
   },
+  "hiddenAchievement": {
+    "unlockedBanner": "Hemlighet upplåst!",
+    "board_sweep": {
+      "title": "Rent bord",
+      "desc": "Du drog över varenda bricka i ett enda svep!"
+    },
+    "palindrome": {
+      "title": "Spegelord",
+      "desc": "Hittade ett ord som läses likadant baklänges."
+    },
+    "speed_demon": {
+      "title": "Fartdjävul",
+      "desc": "Fem ord på de första tio sekunderna. Blixtsnabbt!"
+    },
+    "triple_threat": {
+      "title": "Trippelhot",
+      "desc": "Ett ord, samma bokstav tre gånger."
+    }
+  },
   "easterEgg": {
     "konami": "Oj — hemlig kod upplåst! Du är en legend. 🎉"
   },
