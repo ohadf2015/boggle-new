@@ -78,6 +78,24 @@ interface UseDesktopLayoutOptions {
  * );
  * ```
  */
+// Stable default used for SSR *and* the client's first render. Reading window in
+// the useState initializer would make the desktop client's first render diverge
+// from this server value → React #418 tree regeneration in any consumer that
+// branches on the layout. The mount effect syncs the real viewport.
+const SSR_DEFAULT_LAYOUT: LayoutInfo = {
+  type: 'mobile',
+  isDesktop: false,
+  isTv: false,
+  isTablet: false,
+  isMobile: true,
+  isTallScreen: false,
+  isWideScreen: false,
+  meetsCrazyGamesMin: false,
+  width: 375,
+  height: 667,
+  aspectRatio: 375 / 667,
+};
+
 export function useDesktopLayout(options: UseDesktopLayoutOptions = {}): LayoutInfo {
   const {
     desktopMinWidth = DESKTOP_MIN_WIDTH,
@@ -88,19 +106,7 @@ export function useDesktopLayout(options: UseDesktopLayoutOptions = {}): LayoutI
   const calculateLayout = useCallback((): LayoutInfo => {
     // Default to mobile for SSR
     if (typeof window === 'undefined') {
-      return {
-        type: 'mobile',
-        isDesktop: false,
-        isTv: false,
-        isTablet: false,
-        isMobile: true,
-        isTallScreen: false,
-        isWideScreen: false,
-        meetsCrazyGamesMin: false,
-        width: 375,
-        height: 667,
-        aspectRatio: 375 / 667,
-      };
+      return SSR_DEFAULT_LAYOUT;
     }
 
     const width = window.innerWidth;
@@ -139,7 +145,9 @@ export function useDesktopLayout(options: UseDesktopLayoutOptions = {}): LayoutI
     };
   }, [desktopMinWidth, desktopMinHeight]);
 
-  const [layout, setLayout] = useState<LayoutInfo>(calculateLayout);
+  // Start from the SSR default so the first client render matches the server;
+  // the effect below immediately syncs the real viewport on mount.
+  const [layout, setLayout] = useState<LayoutInfo>(SSR_DEFAULT_LAYOUT);
 
   useEffect(() => {
     // Initial calculation after mount
