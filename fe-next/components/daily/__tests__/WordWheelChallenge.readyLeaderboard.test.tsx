@@ -69,6 +69,15 @@ vi.mock('@/utils/guestManager', () => ({
   getGuestFingerprint: () => 'test-fp',
 }));
 
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    canShowAd: false,
+    isDailyLimitReached: false,
+    showAd: vi.fn(),
+    isLoading: false,
+  }),
+}));
+
 // --- Child components ---
 vi.mock('../WordWheelGame', () => ({
   __esModule: true,

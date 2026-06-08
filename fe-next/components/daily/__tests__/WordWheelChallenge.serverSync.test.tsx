@@ -67,6 +67,15 @@ vi.mock('@/utils/guestManager', () => ({
   getGuestFingerprint: () => null,
 }));
 
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    canShowAd: false,
+    isDailyLimitReached: false,
+    showAd: vi.fn(),
+    isLoading: false,
+  }),
+}));
+
 vi.mock('../WordWheelGame', () => ({
   __esModule: true,
   default: () => <div data-testid="word-wheel-game" />,

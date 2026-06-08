@@ -69,6 +69,15 @@ vi.mock('@/utils/guestManager', () => ({
 }));
 vi.mock('@/hooks/fastValidateWord', () => ({ fastValidateWord: () => true }));
 
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({
+    canShowAd: false,
+    isDailyLimitReached: false,
+    showAd: vi.fn(),
+    isLoading: false,
+  }),
+}));
+
 type GameProps = { onComplete: (r: { wordsFound: string[]; score: number; timeSeconds: number }) => void };
 let capturedOnComplete: GameProps['onComplete'] | null = null;
 vi.mock('../WordWheelGame', () => ({

@@ -67,3 +67,10 @@ docs/nightly/intel/
 .claude/council-cache/
 **/.claude/council-cache/
 *.logo-bak
+
+# Scratch image-generation outputs (source of truth lives in docs/play-games-icons/)
+output/
+
+# Nightly runtime data (regenerated each run; artifacts/ideas ARE committed by run.sh, these are not)
+docs/nightly/feedback/
+docs/nightly/reports/
