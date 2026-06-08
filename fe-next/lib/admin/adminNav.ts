@@ -81,7 +81,7 @@ export const ADMIN_PRIMARY_TABS: AdminNavBucket[] = [
     labelKey: 'admin.sidebar.people',
     iconKey: 'Users',
     defaultPath: '/players',
-    ownedPrefixes: ['/players', '/guests', '/teacher-access', '/blocklist'],
+    ownedPrefixes: ['/players', '/guests', '/teacher-access', '/school-leads', '/blocklist'],
   },
   {
     key: 'more',
@@ -144,6 +144,7 @@ export const ADMIN_BUCKET_CHILDREN: Record<string, AdminNavLeaf[]> = {
     { key: 'players', labelKey: 'admin.sidebar.players', iconKey: 'Users', defaultPath: '/players' },
     { key: 'guests', labelKey: 'admin.nav.guests', iconKey: 'UserRound', defaultPath: '/guests' },
     { key: 'teacher-access', labelKey: 'admin.nav.teacherAccess', iconKey: 'GraduationCap', defaultPath: '/teacher-access' },
+    { key: 'school-leads', labelKey: 'admin.nav.schoolLeads', iconKey: 'Building2', defaultPath: '/school-leads' },
     { key: 'blocklist', labelKey: 'admin.sidebar.blocklist', iconKey: 'Ban', defaultPath: '/blocklist' },
   ],
 };

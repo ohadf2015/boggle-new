@@ -13174,7 +13174,33 @@ const en = {
       "exitToSite": "Exit to site",
       "wikipediaWords": "Wikipedia Words",
       "wordBank": "Word Bank",
-      "teacherAccess": "Teacher Access"
+      "teacherAccess": "Teacher Access",
+      "schoolLeads": "School Leads"
+    },
+    "schoolLeads": {
+      "title": "School & District Leads",
+      "subtitle": "Schools and districts that asked about LexiClash for their classrooms.",
+      "count": {
+        "total": "Total leads",
+        "pricing": "Want pricing",
+        "large": "2,000+ students"
+      },
+      "filter_role_all": "All roles",
+      "filter_size_all": "All sizes",
+      "filter_interest_all": "All interests",
+      "refresh": "Refresh",
+      "empty": "No leads yet",
+      "page": "Page",
+      "export_csv": "Export CSV",
+      "col": {
+        "date": "Date",
+        "school": "School / District",
+        "contact": "Contact",
+        "role": "Role",
+        "size": "Students",
+        "interests": "Interested in",
+        "country": "Country"
+      }
     },
     "noData": "No Data",
     "player": {
