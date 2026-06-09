@@ -112,6 +112,7 @@ const baseProps = {
   highlightedCells: [],
   tableData: [['A', 'B'], ['C', 'D']],
   onStartGame: vi.fn(),
+  onAutoStartWithBots: vi.fn(),
   onExitRoom: vi.fn(),
   onCancelTournament: vi.fn(),
   onRegenerateBoard: vi.fn(),
@@ -143,7 +144,10 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     expect(addBots).toBeUndefined();
     expect(setAutoFill).toBeDefined();
     expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
-    expect(baseProps.onStartGame).toHaveBeenCalled();
+    // Auto-fill rescue starts directly with bots — never via the solo-confirm
+    // popup path (onStartGame → startGame → setShowSoloConfirm).
+    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 
   it('starts bot countdown immediately when isQuickPlay=true and alone', () => {
@@ -155,6 +159,7 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeDefined();
     expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
-    expect(baseProps.onStartGame).toHaveBeenCalled();
+    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 });
