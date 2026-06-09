@@ -20,13 +20,19 @@ vi.mock('framer-motion', () => ({
 
 import { WordHuntGameOverOverlay } from '../WordHuntGameOverOverlay';
 
-const mockT = (key: string) => {
+const mockT = (key: string, params?: Record<string, string | number>) => {
   const translations: Record<string, string> = {
     'wordHunt.mp.youEliminated': "You've been eliminated!",
     'wordHunt.mp.youFoundIt': 'You Found It!',
     'wordHunt.mp.watchOthers': 'Watch the remaining players',
+    'wordHunt.mp.stillHunting': '{count} still hunting',
+    'wordHunt.mp.spectating': 'Spectating',
   };
-  return translations[key] || key;
+  const raw = translations[key] || key;
+  if (params) {
+    return raw.replace(/\{(\w+)\}/g, (_m, k) => String(params[k] ?? `{${k}}`));
+  }
+  return raw;
 };
 
 describe('WordHuntGameOverOverlay', () => {
@@ -73,6 +79,29 @@ describe('WordHuntGameOverOverlay', () => {
     // Spectator phase shows the watch text in the eye icon row
     const watchTexts = screen.getAllByText('Watch the remaining players');
     expect(watchTexts.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('surfaces live "still hunting" count in the spectator phase when eliminated', () => {
+    render(
+      <WordHuntGameOverOverlay reason="eliminated" t={mockT} playersRemaining={3} />
+    );
+
+    // Advance past impact → spectator.
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    // The spectator state must show how many players are still hunting — live
+    // shared content so the dead player isn't staring at a frozen board.
+    expect(screen.getByText('3 still hunting')).toBeInTheDocument();
+  });
+
+  it('does not render the still-hunting count when playersRemaining is undefined', () => {
+    render(<WordHuntGameOverOverlay reason="eliminated" t={mockT} />);
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+    expect(screen.queryByText(/still hunting/)).not.toBeInTheDocument();
   });
 
   it('shows victory particles when reason is found', () => {

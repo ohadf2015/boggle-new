@@ -6187,6 +6187,7 @@ const ja = {
       "playerStatus": "プレイヤー状況",
       "gameEnding": "ゲーム終了中...",
       "watchOthers": "残りのプレイヤーを見る",
+      "stillHunting": "残り{count}人が挑戦中",
       "viewBoard": "ボード表示",
       "boardReview": "ボードレビュー",
       "ladder": {

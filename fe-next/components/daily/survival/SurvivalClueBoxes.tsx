@@ -66,16 +66,25 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
               : "clue-container-glow"
       )}
     >
-      {showMatchWarning && (
-        <div
-          data-testid="match-target-warning"
-          className="text-center mb-1 text-sm sm:text-base font-black text-neo-pink animate-neo-pop [@media(max-height:560px)]:hidden"
-          role="status"
-          aria-live="polite"
-        >
-          ⚠ {t('wordHunt.survival.matchesTargetWarning')}
-        </div>
-      )}
+      {/* Reserved slot — always rendered with a min-height floor so the warning
+          appearing (word reaches target length) / disappearing (on submit) never
+          reflows the boxes below. Collapses on short landscape where the warning
+          is hidden anyway. Mirrors the legend row's min-h reservation. */}
+      <div
+        data-testid="match-target-warning-slot"
+        className="min-h-[1.5rem] sm:min-h-[1.75rem] mb-1 [@media(max-height:560px)]:hidden [@media(max-height:560px)]:min-h-0 [@media(max-height:560px)]:mb-0 flex items-center justify-center"
+      >
+        {showMatchWarning && (
+          <span
+            data-testid="match-target-warning"
+            className="text-center text-sm sm:text-base font-black text-neo-pink animate-neo-pop"
+            role="status"
+            aria-live="polite"
+          >
+            ⚠ {t('wordHunt.survival.matchesTargetWarning')}
+          </span>
+        )}
+      </div>
       {/* Tries counter - only count non-discovery attempts */}
       {(() => {
         const targetAttempts = attempts.filter(a => !a.isDiscovery).length;
@@ -96,8 +105,12 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         );
       })()}
 
-      {/* Black boxes for target word OR Letter Feedback Overlay */}
-      <div dir={gameDir} className="flex justify-center flex-wrap gap-2 sm:gap-2.5 [@media(max-height:560px)]:gap-0.5 [@media(max-height:560px)]:px-0 px-2">
+      {/* Black boxes for target word OR Letter Feedback Overlay.
+          CSS-grid stacking ([&>*]:[grid-area:1/1]) overlaps the exiting + entering
+          box rows in ONE cell during the AnimatePresence crossfade — otherwise
+          mode="sync" keeps both mounted in normal flow and they wrap to a second
+          row, doubling the height for ~150ms and shifting the grid on every submit. */}
+      <div dir={gameDir} className="grid w-full [&>*]:[grid-area:1/1] [@media(max-height:560px)]:px-0 px-2">
         <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackOverlay

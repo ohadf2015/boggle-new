@@ -6236,6 +6236,7 @@ const sv = {
       "playerStatus": "Spelarstatus",
       "gameEnding": "Spelet avslutas...",
       "watchOthers": "Titta på de kvarvarande spelarna",
+      "stillHunting": "{count} kvar i jakten",
       "viewBoard": "Visa bräde",
       "boardReview": "Brädesöversikt",
       "ladder": {

@@ -241,6 +241,11 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
                 reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
                 t={t}
                 deathRecapStats={deathRecapStats}
+                playersRemaining={
+                  Object.entries(playerLives).filter(
+                    ([u, life]) => life > 0 && !eliminatedPlayers.includes(u),
+                  ).length
+                }
               />
             )}
           </div>
@@ -288,6 +293,8 @@ function ClueTilesSkeleton({ t }: { t: (key: string) => string }) {
       aria-live="polite"
       aria-label={t('wordHunt.survival.syncingTarget')}
     >
+      {/* Match the real clue box's reserved warning slot so the skeleton→real swap doesn't shift. */}
+      <div className="min-h-[1.5rem] sm:min-h-[1.75rem] mb-1 [@media(max-height:560px)]:hidden [@media(max-height:560px)]:min-h-0 [@media(max-height:560px)]:mb-0" />
       <div className="text-center mb-2 text-xl sm:text-2xl font-black text-neo-white">
         {t('wordHunt.survival.syncingTarget')}
       </div>

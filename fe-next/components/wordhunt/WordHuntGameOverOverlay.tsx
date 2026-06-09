@@ -13,6 +13,13 @@ export interface WordHuntGameOverOverlayProps {
   t: (key: string, params?: Record<string, string | number>) => string;
   /** Death recap stats — only needed when reason is 'eliminated' */
   deathRecapStats?: DeathRecapStats | null;
+  /**
+   * Live count of players still hunting the target. Word Hunt is one shared
+   * board, so a spectating (eliminated) player has no per-player board to
+   * watch — this count is the live shared signal that keeps the spectator
+   * state feeling alive instead of stuck on a frozen grid.
+   */
+  playersRemaining?: number;
 }
 
 const SPECTATOR_DELAY = 2800;
@@ -33,6 +40,7 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
   reason,
   t,
   deathRecapStats,
+  playersRemaining,
 }) => {
   const [phase, setPhase] = useState<'impact' | 'recap' | 'spectator'>('impact');
 
@@ -110,7 +118,7 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
           ) : phase === 'recap' && isEliminated && deathRecapStats ? (
             <WordHuntDeathRecap key="recap" stats={deathRecapStats} t={t} />
           ) : (
-            <SpectatorContent key="spectator" t={t} />
+            <SpectatorContent key="spectator" t={t} playersRemaining={playersRemaining} />
           )}
         </AdaptiveAnimatePresence>
       </AdaptiveMotion.div>
@@ -202,8 +210,11 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
   </AdaptiveMotion.div>
 );
 
-/** Spectator mode — subtle watching indicator at top */
-const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
+/** Spectator mode — watching indicator + live "still hunting" count */
+const SpectatorContent: React.FC<{
+  t: (key: string, params?: Record<string, string | number>) => string;
+  playersRemaining?: number;
+}> = ({ t, playersRemaining }) => (
   <AdaptiveMotion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
@@ -216,6 +227,13 @@ const SpectatorContent: React.FC<{ t: (key: string) => string }> = ({ t }) => (
         {t('wordHunt.mp.watchOthers')}
       </span>
     </div>
+    {/* Live shared signal — updates as players drop / the target gets found,
+        so spectating reads as an ongoing match rather than a frozen screen. */}
+    {typeof playersRemaining === 'number' && playersRemaining > 0 && (
+      <span className="text-neo-lime font-neo-display text-sm font-black uppercase tracking-wider">
+        {t('wordHunt.mp.stillHunting', { count: playersRemaining })}
+      </span>
+    )}
   </AdaptiveMotion.div>
 );
 

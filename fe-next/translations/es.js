@@ -6433,6 +6433,7 @@ const es = {
       "playerStatus": "Estado de jugadores",
       "gameEnding": "Terminando juego...",
       "watchOthers": "Observa a los jugadores restantes",
+      "stillHunting": "{count} siguen buscando",
       "viewBoard": "Ver tablero",
       "boardReview": "Revisión del tablero",
       "ladder": {

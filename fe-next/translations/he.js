@@ -6219,6 +6219,7 @@ const he = {
       "playerStatus": "סטטוס שחקנים",
       "gameEnding": "המשחק מסתיים...",
       "watchOthers": "צפו בשחקנים שנותרו",
+      "stillHunting": "{count} עדיין במשחק",
       "viewBoard": "צפייה בלוח",
       "boardReview": "סקירת לוח",
       "ladder": {

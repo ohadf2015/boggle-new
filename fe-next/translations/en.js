@@ -6183,6 +6183,7 @@ const en = {
       "playerStatus": "Player Status",
       "gameEnding": "Game ending...",
       "watchOthers": "Watch the remaining players",
+      "stillHunting": "{count} still hunting",
       "viewBoard": "View Board",
       "boardReview": "Board Review",
       "ladder": {
