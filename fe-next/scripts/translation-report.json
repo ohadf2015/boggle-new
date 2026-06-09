@@ -5,8 +5,8 @@
       "en": 10777,
       "he": 10855,
       "sv": 10854,
-      "ja": 10836,
-      "es": 10876
+      "ja": 10842,
+      "es": 10882
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -672,12 +672,6 @@
       "admin.sendError"
     ],
     "ja": [
-      "mpCoach.idleNudge",
-      "mpCoach.tapHint",
-      "mpCoach.submitHint",
-      "mpCoach.validityHint",
-      "mpCoach.dismiss",
-      "mpCoach.sampleWord",
       "wordTower.sabotage.watchAd",
       "wordTower.sabotage.adEarned",
       "seo.wordCraft.title",
@@ -913,12 +907,6 @@
       "admin.sendError"
     ],
     "es": [
-      "mpCoach.idleNudge",
-      "mpCoach.tapHint",
-      "mpCoach.submitHint",
-      "mpCoach.validityHint",
-      "mpCoach.dismiss",
-      "mpCoach.sampleWord",
       "wordTower.sabotage.watchAd",
       "wordTower.sabotage.adEarned",
       "seo.wordCraft.title",
