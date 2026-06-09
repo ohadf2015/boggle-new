@@ -19,7 +19,7 @@ const WordWheelChallenge = dynamicImport(
   { loading: LoadingFallback }
 );
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 const wordWheelMeta: Record<string, { title: string; description: string; ogTitle: string; ogDesc: string }> = {
   en: {

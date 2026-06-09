@@ -104,6 +104,11 @@ const he = {
         "player-invalid": "מילה לא תקינה — הבוט מנצח.",
         "bot-no-move": "הבוט אזל המילים — ניצחתם!",
         "bot-ends-n": "הבוט סיים ב־ん — ניצחתם!"
+      },
+      "combo": {
+        "ariaLabel": "עומק השרשרת: {{n}}",
+        "newBest": "שיא חדש!",
+        "best": "שיא: {{n}}"
       }
     }
   },
@@ -7879,7 +7884,9 @@ const he = {
     "classic": "משחק קלאסי",
     "blast": "מצב בלאסט",
     "wordHunt": "ציד מילים",
-    "seconds": "~{{count}} שניות"
+    "seconds": "~{{count}} שניות",
+    "seekingMatch": "מחפש משחק…",
+    "seekingMatchSub": "מכין את המשחק שלך"
   },
   "theme": {
     "sundayFunday": "כיף של יום ראשון",

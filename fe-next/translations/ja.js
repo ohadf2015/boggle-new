@@ -104,6 +104,11 @@ const ja = {
         "player-invalid": "無効な単語 — ボットの勝ち。",
         "bot-no-move": "ボットの単語切れ — あなたの勝ち！",
         "bot-ends-n": "ボットが ん で終了 — あなたの勝ち！"
+      },
+      "combo": {
+        "ariaLabel": "チェーンの深さ: {{n}}",
+        "newBest": "新記録！",
+        "best": "記録: {{n}}"
       }
     }
   },

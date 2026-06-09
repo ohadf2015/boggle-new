@@ -21,6 +21,9 @@ export const dynamic = 'force-dynamic';
 
 const BASE_URL = 'https://www.lexiclash.live';
 
+// 28d GSC: 0 clicks & ≤2 impressions → noindex until they earn organic traffic
+const DEAD_LETTERS = new Set(['c', 'f', 'i', 'y']);
+
 interface PageParams {
   params: Promise<{ locale: string; letter: string }>;
 }
@@ -45,7 +48,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     // Self-referencing EN hreflang cluster + canonical → /en (non-EN are noindexed,
     // have no localized equivalent, so we never declare them as alternates).
     alternates: enOnlyAlternates(`/words/starting-with/${letter}`),
-    robots: { index: locale === 'en', follow: true },
+    robots: { index: locale === 'en' && !DEAD_LETTERS.has(letter), follow: true },
   };
 }
 

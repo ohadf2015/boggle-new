@@ -100,6 +100,11 @@ const es = {
         "title": "Cómo jugar",
         "cta": "¡Entendido!",
         "steps": ["🔤 Escribe una palabra en hiragana que empiece con el kana resaltado", "⛓️ Cada palabra debe empezar con el último kana de la anterior", "🚫 Pierdes si terminas en ん (n), ¡y nada de repetir palabras!"]
+      },
+      "combo": {
+        "ariaLabel": "Profundidad de cadena: {{n}}",
+        "newBest": "¡Nuevo récord!",
+        "best": "Récord: {{n}}"
       }
     }
   },

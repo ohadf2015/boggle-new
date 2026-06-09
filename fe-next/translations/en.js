@@ -100,6 +100,11 @@ const en = {
         "title": "How to play",
         "cta": "Got it!",
         "steps": ["🔤 Type a hiragana word starting with the highlighted kana", "⛓️ Each word must begin with the last kana of the previous word", "🚫 You lose if you end on ん (n) — and no repeats!"]
+      },
+      "combo": {
+        "ariaLabel": "Chain depth: {{n}}",
+        "newBest": "New best!",
+        "best": "Best: {{n}}"
       }
     }
   },
@@ -7342,7 +7347,9 @@ const en = {
     "subtitle": "Instant room • Friends join via QR",
     "ariaLabel": "Quick play — jump into a game",
     "play": "Play Now",
-    "seconds": "~{{count}}s"
+    "seconds": "~{{count}}s",
+    "seekingMatch": "Finding a match…",
+    "seekingMatchSub": "Setting up your game"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",

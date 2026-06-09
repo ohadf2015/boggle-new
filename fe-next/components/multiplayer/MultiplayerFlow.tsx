@@ -20,6 +20,8 @@ import { useMatchmaking } from '@/hooks/useMatchmaking';
 import { useCgLobbyHeroVariant } from '@/hooks/useCgLobbyHeroVariant';
 import { selectQuickPlayRoom } from '@/lib/multiplayer/selectQuickPlayRoom';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { useExperiment } from '@/hooks/useExperiment';
+import { QuickPlaySeekingOverlay } from '@/components/multiplayer/QuickPlaySeekingOverlay';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
 
@@ -134,6 +136,14 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [heroDismissed, setHeroDismissed] = useState(false);
   const heroVariant = useCgLobbyHeroVariant(cgUser ?? null);
+
+  const { variant: seekingVariant, trackExposure: trackSeekingExposure } = useExperiment('exp-mp-quickplay-wait-v1');
+  const isSeekingOverlay = quickPlay && isJoining && seekingVariant === 'match-seeking';
+  useEffect(() => {
+    if (!isSeekingOverlay) return;
+    trackSeekingExposure();
+    trackGrowthEvent('mp_quickplay_seeking', {});
+  }, [isSeekingOverlay, trackSeekingExposure]);
 
   // UX-014: Room fetch timeout — if rooms haven't loaded after 10s, show retry banner
   const [roomFetchTimedOut, setRoomFetchTimedOut] = useState(false);
@@ -438,6 +448,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         </div>
       </div>
     );
+  }
+
+  if (isSeekingOverlay) {
+    return <QuickPlaySeekingOverlay t={t as (key: string) => string} />;
   }
 
   // Always show RoomListView as base, with modals as overlays

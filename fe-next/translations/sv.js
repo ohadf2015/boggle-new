@@ -191,6 +191,11 @@ const sv = {
         "player-invalid": "Ogiltigt ord — boten vinner.",
         "bot-no-move": "Boten fick slut på ord — du vinner!",
         "bot-ends-n": "Boten slutade på ん — du vinner!"
+      },
+      "combo": {
+        "ariaLabel": "Kedjans djup: {{n}}",
+        "newBest": "Nytt rekord!",
+        "best": "Rekord: {{n}}"
       }
     }
   },
@@ -7917,7 +7922,9 @@ const sv = {
     "subtitle": "Direkt rum • Vänner går med via QR",
     "ariaLabel": "Snabbspel — hoppa in i ett spel",
     "play": "Spela nu",
-    "seconds": "~{{count}}s"
+    "seconds": "~{{count}}s",
+    "seekingMatch": "Söker en match…",
+    "seekingMatchSub": "Sätter upp ditt spel"
   },
   "theme": {
     "sundayFunday": "Söndagsmys",

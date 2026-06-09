@@ -190,6 +190,7 @@ export type GrowthEvent =
   //     Props: { asHost: boolean, language: string }.
   | 'mp_quickplay_initiated'
   | 'mp_quickplay_socket_wait'
+  | 'mp_quickplay_seeking'
   | 'mp_quickplay_joined';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */

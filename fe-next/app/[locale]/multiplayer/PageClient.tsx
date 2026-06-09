@@ -36,7 +36,7 @@ import { neoInfoToast } from '@/components/NeoToast';
 import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal';
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
-import { trackInviteRoomDead } from '@/utils/growthTracking';
+import { trackInviteRoomDead, trackGrowthEvent } from '@/utils/growthTracking';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
@@ -231,6 +231,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setShouldAutoJoin(false);
       setIsJoining(false);
       setPrefilledRoomCode('');
+      if (quickPlay) trackGrowthEvent('mp_quickplay_joined', { asHost: data.isHost, language: data.language ?? language });
       if (data.language) setRoomLanguage(data.language);
       const joinedUsername = data.username || username;
       if (data.isHost) { setUsername(joinedUsername); setStoredUsername(joinedUsername); }

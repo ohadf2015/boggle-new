@@ -15,7 +15,7 @@ const DailyChallenge = dynamicImport(() => import('@/components/daily/DailyChall
   loading: LoadingFallback,
 });
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
