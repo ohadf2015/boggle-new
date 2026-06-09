@@ -7428,6 +7428,18 @@ const es = {
       "noGames": "No hay juegos activos",
       "noGamesHint": "Los juegos aparecerán aquí cuando los jugadores comiencen a jugar",
       "activeGames": "Juegos Activos",
+      "anonymousVisitors": "visitante(s) anónimo(s)",
+      "bots": "bots",
+      "onOtherPages": "En otras páginas",
+      "onPages": "navegando",
+      "pageLanding": "Página de inicio",
+      "roomStatus": {
+        "playing": "Jugando",
+        "scoring": "Puntuando",
+        "waiting": "Esperando jugadores",
+        "empty": "Vacío (sin humanos)",
+        "finished": "Finalizado"
+      },
       "connectedPlayers": "Jugadores Conectados",
       "player": "Jugador",
       "game": "Juego",

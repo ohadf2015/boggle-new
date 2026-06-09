@@ -7,6 +7,17 @@ import express, { Response, Router } from 'express';
 import type { AdminRequest, SocketIO, GameInfo, DailyDataEntry, GuestSession, GuestPlayerStat, EventRow } from './types';
 import logger from '../../utils/logger';
 import { getActiveSinglePlayerCount, getActiveSinglePlayerSessions } from '../singlePlayer';
+import { getActivePagePresence } from '../presence';
+import { playersOnOtherPages } from '../../../lib/admin/liveMonitor/playersOnOtherPages';
+
+interface DetailedGamePlayerLite {
+  isBot: boolean;
+  username: string;
+  playerId: string | null;
+}
+interface DetailedGameLite {
+  players: DetailedGamePlayerLite[];
+}
 
 const { getSupabase } = require('../../modules/supabaseServer');
 const { getAllGames, getDetailedGames } = require('../../modules/gameStateManager');
@@ -160,7 +171,12 @@ router.get('/realtime', async (req: AdminRequest, res: Response): Promise<void> 
     const io = req.app.get('io') as SocketIO | undefined;
 
     const activeRooms = games.length;
-    const playersOnline = games.reduce((sum: number, g: GameInfo) => sum + g.playerCount, 0);
+    // Count humans only — bots must not inflate the online count.
+    const detailed = getDetailedGames() as DetailedGameLite[];
+    const playersOnline = detailed.reduce(
+      (sum: number, g) => sum + g.players.filter((p) => !p.isBot).length,
+      0
+    );
     // Use state machine helper to check if game is in progress
     const gamesInProgress = games.filter((g: GameInfo) => isInProgress(g.gameState)).length;
     const socketConnections = io ? io.sockets.sockets.size : 0;
@@ -188,23 +204,56 @@ router.get('/realtime', async (req: AdminRequest, res: Response): Promise<void> 
 router.get('/live-games', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const io = req.app.get('io') as SocketIO | undefined;
-    const detailedGames = getDetailedGames();
+    const detailedGames = getDetailedGames() as DetailedGameLite[];
     const singlePlayerCount = getActiveSinglePlayerCount();
     const singlePlayers = getActiveSinglePlayerSessions();
 
-    // Calculate stats
+    // Calculate stats — exclude bots from the human player count.
     const activeGames = detailedGames.length;
-    const playersInGames = detailedGames.reduce((sum: number, game: { players: unknown[] }) => sum + game.players.length, 0);
+    const playersInGames = detailedGames.reduce(
+      (sum: number, game) => sum + game.players.filter((p) => !p.isBot).length,
+      0
+    );
+    const botsInGames = detailedGames.reduce(
+      (sum: number, game) => sum + game.players.filter((p) => p.isBot).length,
+      0
+    );
     const socketConnections = io ? io.sockets.sockets.size : 0;
+
+    // Players currently on the site but not in any game (landing/lobby/etc).
+    const gameUsernames: string[] = [];
+    const gamePlayerIds: string[] = [];
+    for (const game of detailedGames) {
+      for (const p of game.players) {
+        if (p.isBot) continue;
+        gameUsernames.push(p.username);
+        if (p.playerId) gamePlayerIds.push(p.playerId);
+      }
+    }
+    const spUsernames = singlePlayers.map((s) => s.username);
+    const spPlayerIds = singlePlayers
+      .map((s) => s.playerId)
+      .filter((id): id is string => !!id);
+
+    const pagePresence = playersOnOtherPages(getActivePagePresence(), {
+      gameUsernames,
+      gamePlayerIds,
+      spUsernames,
+      spPlayerIds,
+    });
+    const playersOnPages = pagePresence.reduce((sum, g) => sum + g.count, 0);
 
     res.json({
       games: detailedGames,
       singlePlayers,
+      pagePresence,
       stats: {
         activeGames,
         playersInGames,
+        botsInGames,
         socketConnections,
         singlePlayerCount,
+        playersOnPages,
       },
       timestamp: Date.now(),
     });

@@ -1,5 +1,13 @@
 // Sv translations
 const sv = {
+  "mpCoach": {
+    "idleNudge": "Dra över bokstäverna för att stava ett ord",
+    "tapHint": "Håll och dra över bokstäverna, släpp sedan för att skicka",
+    "submitHint": "Lyft fingret från sista bokstaven för att skicka ordet",
+    "validityHint": "Bokstäverna måste sitta ihop — stava ett riktigt ord, minst 2 bokstäver",
+    "dismiss": "Okej",
+    "sampleWord": "SOL"
+  },
   "crossword": {
     "name": "Korsord",
     "tagline": "Fyll i rutnätet, en ledtråd i taget",
@@ -7476,6 +7484,18 @@ const sv = {
       "noGames": "Inga aktiva spel",
       "noGamesHint": "Spel visas här när spelare börjar spela",
       "activeGames": "Aktiva Spel",
+      "anonymousVisitors": "anonyma besökare",
+      "bots": "bottar",
+      "onOtherPages": "På andra sidor",
+      "onPages": "surfar",
+      "pageLanding": "Startsida",
+      "roomStatus": {
+        "playing": "Spelar",
+        "scoring": "Poängräkning",
+        "waiting": "Väntar på spelare",
+        "empty": "Tom (inga människor)",
+        "finished": "Avslutat"
+      },
       "connectedPlayers": "Anslutna Spelare",
       "player": "Spelare",
       "game": "Spel",

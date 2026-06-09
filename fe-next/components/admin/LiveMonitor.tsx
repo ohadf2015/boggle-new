@@ -3,14 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { m, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User, AlertCircle } from 'lucide-react';
+import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User, AlertCircle, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import Avatar from '@/components/Avatar';
-import { presenceBreakdown, isStalled, hostName } from '@/lib/admin/liveMonitor/liveGameInsights';
+import { presenceBreakdown, isStalled, hostName, playerComposition, roomStatusKey, type RoomStatusKey } from '@/lib/admin/liveMonitor/liveGameInsights';
+import type { OtherPageGroup } from '@/lib/admin/liveMonitor/playersOnOtherPages';
 import { gameModeLabel } from '@/lib/admin/gameLog/gameDisplay';
 
 // Types matching backend DetailedGame and DetailedGamePlayer
@@ -54,11 +55,14 @@ interface LiveGame {
 interface LiveGamesResponse {
   games: LiveGame[];
   singlePlayers?: LiveSinglePlayerSession[];
+  pagePresence?: OtherPageGroup[];
   stats: {
     activeGames: number;
     playersInGames: number;
+    botsInGames?: number;
     socketConnections: number;
     singlePlayerCount: number;
+    playersOnPages?: number;
   };
   timestamp: number;
 }
@@ -79,19 +83,28 @@ const LANGUAGE_FLAGS: Record<string, string> = {
   de: '🇩🇪',
 };
 
-const STATE_COLORS: Record<string, string> = {
-  waiting: 'bg-yellow-500',
-  'in-progress': 'bg-green-500',
-  validating: 'bg-blue-500',
-  finished: 'bg-gray-500',
-};
-
 const PRESENCE_COLORS: Record<string, string> = {
   active: 'bg-green-500',
   idle: 'bg-yellow-500',
   afk: 'bg-orange-500',
   disconnected: 'bg-red-500',
 };
+
+// Clear, human-meaningful room-status badge colors (keyed by RoomStatusKey).
+const STATUS_COLORS: Record<RoomStatusKey, string> = {
+  playing: 'bg-green-500',
+  scoring: 'bg-blue-500',
+  waiting: 'bg-yellow-500',
+  empty: 'bg-neo-red',
+  finished: 'bg-gray-500',
+};
+
+function roomStatusLabel(
+  key: RoomStatusKey,
+  t: (path: string, fallback?: string) => string
+): string {
+  return t(`admin.live.roomStatus.${key}`, key);
+}
 
 function formatTimeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -208,12 +221,13 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
     );
   }
 
-  const { games = [], singlePlayers = [], stats } = data || {
+  const { games = [], singlePlayers = [], pagePresence = [], stats } = data || {
     games: [],
     singlePlayers: [] as LiveSinglePlayerSession[],
-    stats: { activeGames: 0, playersInGames: 0, socketConnections: 0, singlePlayerCount: 0 },
+    pagePresence: [] as OtherPageGroup[],
+    stats: { activeGames: 0, playersInGames: 0, botsInGames: 0, socketConnections: 0, singlePlayerCount: 0, playersOnPages: 0 },
   };
-  const hasAnyLive = games.length > 0 || singlePlayers.length > 0;
+  const hasAnyLive = games.length > 0 || singlePlayers.length > 0 || pagePresence.length > 0;
 
   return (
     <div className="space-y-6">
@@ -257,6 +271,12 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
               <Users className="w-4 h-4 text-blue-400" />
               <span className="text-sm">{stats.playersInGames} <span className="text-slate-500">{t('admin.live.players')}</span></span>
             </div>
+            {(stats.botsInGames ?? 0) > 0 && (
+              <div className="flex items-center gap-1.5">
+                <Bot className="w-4 h-4 text-slate-400" />
+                <span className="text-sm">{stats.botsInGames} <span className="text-slate-500">{t('admin.live.bots', 'bots')}</span></span>
+              </div>
+            )}
             <div className="flex items-center gap-1.5">
               <Wifi className="w-4 h-4 text-green-400" />
               <span className="text-sm">{stats.socketConnections} <span className="text-slate-500">{t('admin.live.sockets')}</span></span>
@@ -265,6 +285,12 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
               <div className="flex items-center gap-1.5">
                 <User className="w-4 h-4 text-amber-400" />
                 <span className="text-sm">{stats.singlePlayerCount} <span className="text-slate-500">{t('admin.live.singlePlayer')}</span></span>
+              </div>
+            )}
+            {(stats.playersOnPages ?? 0) > 0 && (
+              <div className="flex items-center gap-1.5">
+                <Compass className="w-4 h-4 text-cyan-400" />
+                <span className="text-sm">{stats.playersOnPages} <span className="text-slate-500">{t('admin.live.onPages', 'browsing')}</span></span>
               </div>
             )}
           </div>
@@ -357,6 +383,20 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
             </div>
           )}
 
+          {/* Players on Other Pages (online but not in a game) */}
+          {pagePresence.length > 0 && (
+            <div>
+              <h2 className="text-lg font-neo-display text-neo-white mb-4">
+                {t('admin.live.onOtherPages', 'On Other Pages')}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pagePresence.map((group) => (
+                  <PagePresenceCard key={group.path} group={group} t={t} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* All Connected Players Table */}
           {games.length > 0 && (
             <div>
@@ -423,11 +463,13 @@ function GameCard({
   now: number;
 }) {
   const flag = LANGUAGE_FLAGS[game.language] || '🌐';
-  const stateColor = STATE_COLORS[game.gameState] || 'bg-gray-500';
-  const stateLabel = game.gameState.replace('-', ' ');
+  const statusKey = roomStatusKey(game, now);
+  const statusColor = STATUS_COLORS[statusKey] || 'bg-gray-500';
+  const statusText = roomStatusLabel(statusKey, t);
   const stalledFlag = isStalled(game, now);
   const host = hostName(game.players);
   const breakdown = presenceBreakdown(game.players);
+  const composition = playerComposition(game.players);
   const modeLabel = gameModeLabel(game.gameMode, t);
 
   return (
@@ -458,8 +500,8 @@ function GameCard({
               {t('admin.live.private', 'Private')}
             </span>
           )}
-          <span className={cn('px-2 py-0.5 text-xs rounded font-bold text-white capitalize', stateColor)}>
-            {stateLabel}
+          <span className={cn('px-2 py-0.5 text-xs rounded font-bold text-white', statusColor)}>
+            {statusText}
           </span>
           {stalledFlag && (
             <span className="px-2 py-0.5 text-xs bg-neo-red text-white rounded font-bold flex items-center gap-1">
@@ -470,17 +512,23 @@ function GameCard({
         </div>
       </div>
 
-      {/* Game Mode and Disconnected Count */}
-      {(modeLabel !== '—' || breakdown.disconnected > 0) && (
-        <div className="flex items-center justify-between text-xs text-slate-400 mb-3 pb-3 border-b border-slate-700">
+      {/* Game Mode, Player Composition and Disconnected Count */}
+      <div className="flex items-center justify-between text-xs text-slate-400 mb-3 pb-3 border-b border-slate-700">
+        <div className="flex items-center gap-2">
           {modeLabel !== '—' && <span className="text-slate-300">{modeLabel}</span>}
-          {breakdown.disconnected > 0 && (
-            <span className="text-neo-red font-bold">
-              {breakdown.disconnected}/{breakdown.total} {t('admin.live.disconnected', 'disconnected')}
-            </span>
-          )}
+          <span className="text-slate-400">
+            {composition.humans} {t('admin.live.players')}
+            {composition.bots > 0 && (
+              <span className="text-slate-500"> · {composition.bots} {t('admin.live.bots', 'bots')}</span>
+            )}
+          </span>
         </div>
-      )}
+        {breakdown.disconnected > 0 && (
+          <span className="text-neo-red font-bold">
+            {breakdown.disconnected}/{breakdown.total} {t('admin.live.disconnected', 'disconnected')}
+          </span>
+        )}
+      </div>
 
       {/* Players */}
       <div className="space-y-2 mb-3 border-t border-b border-slate-700 py-3">
@@ -633,6 +681,63 @@ function SinglePlayerRow({
         </span>
       </td>
     </tr>
+  );
+}
+
+// Friendly label for a normalized page path.
+function pageLabel(path: string, t: (path: string, fallback?: string) => string): string {
+  if (path === '/') return t('admin.live.pageLanding', 'Landing Page');
+  return path;
+}
+
+// Page Presence Card — users online on a given page but not in a game.
+function PagePresenceCard({
+  group,
+  t,
+}: {
+  group: OtherPageGroup;
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
+}) {
+  const identified = group.visitors.filter((v) => v.isAuthenticated || v.username);
+  const anonCount = group.count - identified.length;
+
+  return (
+    <m.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 shadow-hard"
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <Compass className="w-4 h-4 text-cyan-400 shrink-0" />
+          <span className="font-mono text-sm text-neo-white truncate">{pageLabel(group.path, t)}</span>
+        </div>
+        <span className="px-2 py-0.5 text-xs bg-neo-cyan text-black rounded font-bold shrink-0">
+          {group.count}
+        </span>
+      </div>
+      <div className="space-y-2">
+        {identified.map((v) => (
+          <div key={v.sessionId} className="flex items-center gap-2">
+            <User className="w-4 h-4 text-slate-400 shrink-0" />
+            <PlayerIdentityLink
+              playerId={v.playerId}
+              isAuthenticated={v.isAuthenticated}
+              avatar={null}
+              username={v.username || t('admin.live.guest')}
+              avatarSeed={v.playerId || v.sessionId}
+              truncate
+            />
+          </div>
+        ))}
+        {anonCount > 0 && (
+          <div className="text-xs text-slate-500">
+            {anonCount} {t('admin.live.anonymousVisitors', 'anonymous visitor(s)')}
+          </div>
+        )}
+      </div>
+    </m.div>
   );
 }
 

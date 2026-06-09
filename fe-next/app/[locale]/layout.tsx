@@ -8,8 +8,10 @@ import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import AdSenseLoader from '@/components/ads/AdSenseLoader';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
+import PagePresenceReporter from '@/components/PagePresenceReporter';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
@@ -583,8 +585,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <GoogleConsentMode />
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
+                {/* Direct AdSense (web Auto-Ads) — replaces PurpleAds. Dark until
+                    NEXT_PUBLIC_ADSENSE_ENABLED=true; consent/tier/web gated internally. */}
+                <AdSenseLoader />
                 <SocialMediaPixels />
                 <WebVitalsReporter />
+                {/* Report current page so admin live monitor sees users not in a game */}
+                <PagePresenceReporter />
                 <ServiceWorkerRegistration />
                 {/* Defer loading animations.css (60KB) after page mount */}
                 <AnimationsLoader />

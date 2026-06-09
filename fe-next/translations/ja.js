@@ -7508,6 +7508,18 @@ const ja = {
       "noGames": "アクティブなゲームはありません",
       "noGamesHint": "プレイヤーがゲームを開始するとここに表示されます",
       "activeGames": "アクティブなゲーム",
+      "anonymousVisitors": "匿名の訪問者",
+      "bots": "ボット",
+      "onOtherPages": "他のページ",
+      "onPages": "閲覧中",
+      "pageLanding": "ランディングページ",
+      "roomStatus": {
+        "playing": "プレイ中",
+        "scoring": "採点中",
+        "waiting": "プレイヤー待ち",
+        "empty": "空（人間なし）",
+        "finished": "終了"
+      },
       "connectedPlayers": "接続中のプレイヤー",
       "player": "プレイヤー",
       "game": "ゲーム",

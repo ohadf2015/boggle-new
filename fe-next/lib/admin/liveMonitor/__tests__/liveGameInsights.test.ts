@@ -3,6 +3,8 @@ import {
   presenceBreakdown,
   isStalled,
   hostName,
+  playerComposition,
+  roomStatusKey,
   STALLED_MS,
 } from '../liveGameInsights';
 import type { DetailedGamePlayer } from '@/backend/modules/gameQueryManager';
@@ -151,6 +153,68 @@ describe('liveGameInsights', () => {
       ];
       const result = hostName(players as DetailedGamePlayer[]);
       expect(result).toBe('alice');
+    });
+  });
+
+  describe('playerComposition', () => {
+    it('should return zeros for empty players', () => {
+      expect(playerComposition([])).toEqual({ humans: 0, bots: 0, total: 0 });
+    });
+
+    it('should split humans and bots', () => {
+      const players = [
+        { isBot: false },
+        { isBot: true },
+        { isBot: false },
+        { isBot: true },
+      ];
+      expect(playerComposition(players as DetailedGamePlayer[])).toEqual({
+        humans: 2,
+        bots: 2,
+        total: 4,
+      });
+    });
+
+    it('should count missing isBot as human', () => {
+      const players = [{}, { isBot: true }];
+      expect(playerComposition(players as DetailedGamePlayer[])).toEqual({
+        humans: 1,
+        bots: 1,
+        total: 2,
+      });
+    });
+  });
+
+  describe('roomStatusKey', () => {
+    const now = 1_000_000;
+    const make = (
+      gameState: DetailedGamePlayer extends never ? never : 'waiting' | 'in-progress' | 'validating' | 'finished',
+      players: { isBot?: boolean }[],
+      createdAt = now,
+    ) => ({ gameState, createdAt, players } as never);
+
+    it('returns playing for in-progress', () => {
+      expect(roomStatusKey(make('in-progress', [{ isBot: false }]), now)).toBe('playing');
+    });
+
+    it('returns scoring for validating', () => {
+      expect(roomStatusKey(make('validating', [{ isBot: false }]), now)).toBe('scoring');
+    });
+
+    it('returns finished for finished', () => {
+      expect(roomStatusKey(make('finished', [{ isBot: false }]), now)).toBe('finished');
+    });
+
+    it('returns waiting when waiting with at least one human', () => {
+      expect(roomStatusKey(make('waiting', [{ isBot: false }, { isBot: true }]), now)).toBe('waiting');
+    });
+
+    it('returns empty when waiting with only bots', () => {
+      expect(roomStatusKey(make('waiting', [{ isBot: true }, { isBot: true }]), now)).toBe('empty');
+    });
+
+    it('returns empty when waiting with no players at all', () => {
+      expect(roomStatusKey(make('waiting', []), now)).toBe('empty');
     });
   });
 });

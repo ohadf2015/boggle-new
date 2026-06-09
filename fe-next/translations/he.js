@@ -1,5 +1,13 @@
 // HE translations
 const he = {
+  "mpCoach": {
+    "idleNudge": "גררו על האותיות כדי לאיית מילה",
+    "tapHint": "החזיקו וגררו על האותיות, ואז הרימו את האצבע לשליחה",
+    "submitHint": "הרימו את האצבע מהאות האחרונה כדי לשלוח את המילה",
+    "validityHint": "האותיות חייבות להתחבר — אייתו מילה אמיתית, לפחות 2 אותיות",
+    "dismiss": "הבנתי",
+    "sampleWord": "ספר"
+  },
   "crossword": {
     "name": "תשבץ",
     "tagline": "מלאו את הלוח, רמז אחר רמז",
@@ -7506,6 +7514,18 @@ const he = {
       "noGames": "אין משחקים פעילים",
       "noGamesHint": "משחקים יופיעו כאן כשהשחקנים יתחילו לשחק",
       "activeGames": "משחקים פעילים",
+      "anonymousVisitors": "מבקרים אנונימיים",
+      "bots": "בוטים",
+      "onOtherPages": "בדפים אחרים",
+      "onPages": "גלישה",
+      "pageLanding": "דף הבית",
+      "roomStatus": {
+        "playing": "משחק",
+        "scoring": "ניקוד",
+        "waiting": "ממתין לשחקנים",
+        "empty": "ריק (ללא אנושיים)",
+        "finished": "הסתיים"
+      },
       "connectedPlayers": "שחקנים מחוברים",
       "player": "שחקן",
       "game": "משחק",

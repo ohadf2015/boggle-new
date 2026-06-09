@@ -1,5 +1,13 @@
 // EN translations
 const en = {
+  "mpCoach": {
+    "idleNudge": "Drag across letters to spell a word",
+    "tapHint": "Hold and drag across letters, then lift to submit",
+    "submitHint": "Lift your finger off the last letter to submit the word",
+    "validityHint": "Letters must connect — spell a real word, 2 letters or more",
+    "dismiss": "Got it",
+    "sampleWord": "CAT"
+  },
   "crossword": {
     "name": "Crossword",
     "tagline": "Fill the grid, one clue at a time",
@@ -13122,9 +13130,21 @@ const en = {
     "landingCardOrder": "Landing Card Order",
     "live": {
       "activeGames": "Active Games",
+      "anonymousVisitors": "anonymous visitor(s)",
       "auth": "Authenticated",
+      "bots": "bots",
       "connectedPlayers": "Connected Players",
       "disconnected": "disconnected",
+      "onOtherPages": "On Other Pages",
+      "onPages": "browsing",
+      "pageLanding": "Landing Page",
+      "roomStatus": {
+        "playing": "Playing",
+        "scoring": "Scoring",
+        "waiting": "Waiting for players",
+        "empty": "Empty (no humans)",
+        "finished": "Finished"
+      },
       "host": "Host",
       "private": "Private",
       "stalled": "Stalled?",

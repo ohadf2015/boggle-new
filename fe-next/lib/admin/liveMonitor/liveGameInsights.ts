@@ -60,6 +60,54 @@ export function isStalled(
   return age > STALLED_MS;
 }
 
+/** Human vs bot composition of a room. */
+export interface PlayerComposition {
+  humans: number;
+  bots: number;
+  total: number;
+}
+
+/**
+ * Split a room's players into human and bot counts. A missing `isBot` is
+ * treated as human (guests/authed users never set the flag).
+ */
+export function playerComposition(
+  players: Pick<DetailedGamePlayer, 'isBot'>[]
+): PlayerComposition {
+  let bots = 0;
+  for (const p of players) {
+    if (p.isBot) bots++;
+  }
+  return { humans: players.length - bots, bots, total: players.length };
+}
+
+/** Human-readable status key for a room. Maps to an i18n label in the UI. */
+export type RoomStatusKey = 'playing' | 'scoring' | 'waiting' | 'empty' | 'finished';
+
+/**
+ * Derive a clear status key from raw game state + player composition.
+ * "empty" = waiting room with no human players (orphaned / bots-only) — the
+ * case that most needs surfacing in the admin monitor.
+ */
+export function roomStatusKey(
+  game: Pick<DetailedGame, 'gameState'> & { players: Pick<DetailedGamePlayer, 'isBot'>[] },
+  _now: number
+): RoomStatusKey {
+  switch (game.gameState) {
+    case 'in-progress':
+      return 'playing';
+    case 'validating':
+      return 'scoring';
+    case 'finished':
+      return 'finished';
+    case 'waiting':
+    default: {
+      const { humans } = playerComposition(game.players);
+      return humans > 0 ? 'waiting' : 'empty';
+    }
+  }
+}
+
 /**
  * Find the host's username from a players array.
  * @param players Array of DetailedGamePlayer
