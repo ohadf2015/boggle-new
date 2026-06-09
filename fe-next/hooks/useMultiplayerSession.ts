@@ -10,6 +10,7 @@ import { getSession, clearSession, saveSession } from '@/utils/session';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { getAvatarForName, getRandomDefaultNameWithAvatar } from '@/utils/defaultNames';
 import logger from '@/utils/logger';
+import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import type { Language, GameMode } from '@/shared/types/game';
 
 interface LessonData {
@@ -95,7 +96,11 @@ export function useMultiplayerSession(
 
     const initializeState = () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const roomFromUrl = urlParams.get('room');
+      // Share-links/deeplinks can carry a stray char (?room=JPX9SL\) that
+      // would fail the backend's alphanumeric GameCodeSchema — strip it at the
+      // source so the prefilled code displays and joins cleanly (Sentry 1NE).
+      const rawRoomFromUrl = urlParams.get('room');
+      const roomFromUrl = rawRoomFromUrl ? sanitizeGameCode(rawRoomFromUrl) : rawRoomFromUrl;
       const fromLesson = urlParams.get('fromLesson') === 'true';
       logger.log(
         '[Init] URL search:',

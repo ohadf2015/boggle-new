@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/validation';
+import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
 import dynamic from 'next/dynamic';
@@ -127,7 +128,10 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
             id="gameCode"
             value={gameCode}
             onChange={(e) => {
-              setGameCode(e.target.value);
+              // Strip stray non-alphanumeric chars as the user types so they
+              // can never reach the join emit (the HTML `pattern` attr is not
+              // enforced on the JS value). Matches the paste handler below.
+              setGameCode(sanitizeGameCode(e.target.value));
               if (gameCodeError) setGameCodeError(false);
             }}
             required
@@ -155,7 +159,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                   onClick={async () => {
                     try {
                       const text = await navigator.clipboard.readText();
-                      const cleaned = text.trim().replace(/[^A-Za-z0-9]/g, '').slice(0, 10);
+                      const cleaned = sanitizeGameCode(text);
                       if (cleaned) {
                         setGameCode(cleaned);
                         if (gameCodeError) setGameCodeError(false);

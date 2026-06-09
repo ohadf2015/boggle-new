@@ -15,6 +15,7 @@ import { setStoredUsername, getStoredAvatarId, getStoredCustomAvatar, setStoredC
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { sanitizeRoomName } from '@/utils/consts';
+import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import type { Language, Avatar } from '@/shared/types/game';
 
@@ -233,7 +234,11 @@ export function useMultiplayerJoin({
       socket.on('joinedAsSpectator', resolveJoin);
       socket.on('rateLimited', resolveJoin);
 
-      const codeToUse = overrideGameCode || gameCode;
+      // Sanitize at the emit chokepoint so EVERY entry path (typed input,
+      // paste, ?room= URL param, auto-join) is covered before it hits the
+      // backend's alphanumeric-only GameCodeSchema. Fixes Sentry
+      // JAVASCRIPT-NEXTJS-1NE ("JPX9SL\" — stray backslash failed the join).
+      const codeToUse = sanitizeGameCode(overrideGameCode || gameCode);
 
       // Build auth context
       let authUserId = null;
