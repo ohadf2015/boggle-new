@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Gamepad2, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,6 +28,15 @@ export function FirstGameLanguageNotice() {
   // case — en cookie, pt browser — where both would otherwise stack.
   const show = visible && !suggested;
 
+  // Auto-dismiss after a brief read window. As an in-flow banner it reserves
+  // layout height while shown (shrinking the play area); auto-dismissing returns
+  // that space and guarantees it never lingers over gameplay controls.
+  useEffect(() => {
+    if (!show) return;
+    const timer = setTimeout(dismiss, 7000);
+    return () => clearTimeout(timer);
+  }, [show, dismiss]);
+
   // language is always one of our five shipped locales -> safe index.
   const nativeName = SUGGESTION_COPY[language as SuggestionLanguage]?.nativeName ?? language;
 
@@ -40,7 +50,7 @@ export function FirstGameLanguageNotice() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -32, opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="fixed top-0 inset-x-0 z-50 flex items-center gap-3 bg-neo-lime text-neo-navy border-b-neo border-neo-navy px-4 py-2 shadow-hard"
+          className="relative z-50 w-full shrink-0 flex items-center gap-3 bg-neo-lime text-neo-navy border-b-neo border-neo-navy px-4 py-2 shadow-hard"
         >
           <Gamepad2 className="size-5 shrink-0" aria-hidden />
           <div className="flex-1 min-w-0">

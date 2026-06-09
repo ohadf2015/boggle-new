@@ -31,7 +31,7 @@ export function NativeLanguageBanner() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -32, opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="notranslate fixed top-0 inset-x-0 z-50 flex items-center gap-3 bg-neo-cyan text-neo-navy border-b-neo border-neo-navy px-4 py-2 shadow-hard"
+          className="notranslate relative z-50 w-full shrink-0 flex items-center gap-3 bg-neo-cyan text-neo-navy border-b-neo border-neo-navy px-4 py-2 shadow-hard"
         >
           <Languages className="size-5 shrink-0" aria-hidden />
           <div className="flex-1 min-w-0">

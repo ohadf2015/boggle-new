@@ -94,4 +94,14 @@ describe('NativeLanguageBanner', () => {
     expect(banner).toHaveAttribute('translate', 'no');
     expect(banner.className).toContain('notranslate');
   });
+
+  it('reserves layout space instead of overlaying the top strip', () => {
+    // Regression: a `fixed top-0 inset-x-0` bar floated over the in-game exit
+    // button. The banner must sit IN FLOW so it pushes content down.
+    setBrowserLanguages(['es-US', 'es', 'en-US']);
+    render(<NativeLanguageBanner />);
+    const banner = screen.getByRole('status');
+    expect(banner.className).not.toContain('fixed');
+    expect(banner.className).not.toContain('inset-x-0');
+  });
 });

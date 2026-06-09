@@ -53,6 +53,17 @@ describe('OfflineBanner', () => {
     expect(screen.getByText('offline.banner.title')).toBeInTheDocument();
   });
 
+  it('reserves layout space instead of overlaying the top strip', () => {
+    // Regression: shares the top-0 banner slot; must sit IN FLOW, not float
+    // over the in-game exit button.
+    onlineMock.mockReturnValue(false);
+    flagMock.mockReturnValue(true);
+    render(<OfflineBanner />);
+    const banner = screen.getByRole('status');
+    expect(banner.className).not.toContain('fixed');
+    expect(banner.className).not.toContain('inset-x-0');
+  });
+
   it('hides itself after dismiss and persists to sessionStorage', () => {
     onlineMock.mockReturnValue(false);
     flagMock.mockReturnValue(true);

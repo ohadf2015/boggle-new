@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 const dismiss = vi.fn();
@@ -63,5 +63,35 @@ describe('FirstGameLanguageNotice', () => {
     mockSuggested = 'es';
     const { container } = render(<FirstGameLanguageNotice />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('reserves layout space instead of overlaying the top strip', () => {
+    // Regression: a `fixed top-0 inset-x-0` bar floated over the in-game exit
+    // button (top-left classic / top-right word-hunt), making it hard to tap.
+    // The banner must sit IN FLOW so it pushes content down and clears both
+    // corners at any viewport width.
+    render(<FirstGameLanguageNotice />);
+    const banner = screen.getByRole('status');
+    expect(banner.className).not.toContain('fixed');
+    expect(banner.className).not.toContain('inset-x-0');
+  });
+
+  describe('auto-dismiss', () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it('dismisses itself after the visible window so it never lingers over gameplay', () => {
+      render(<FirstGameLanguageNotice />);
+      expect(dismiss).not.toHaveBeenCalled();
+      vi.advanceTimersByTime(7000);
+      expect(dismiss).toHaveBeenCalledOnce();
+    });
+
+    it('does not fire the auto-dismiss timer after unmount', () => {
+      const { unmount } = render(<FirstGameLanguageNotice />);
+      unmount();
+      vi.advanceTimersByTime(7000);
+      expect(dismiss).not.toHaveBeenCalled();
+    });
   });
 });
