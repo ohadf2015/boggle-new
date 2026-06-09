@@ -104,14 +104,16 @@ describe('sitemap', () => {
   // noindex tag — the "Excluded by noindex tag" coverage spike (GSC 2026-05-20,
   // ~900 anagram + words + comparison URLs). Sitemap must match the noindex.
 
-  it('lists anagram solver seed pages for EN only (non-EN are noindexed)', () => {
+  it('omits anagram solver seed pages in every locale (retired from sitemap 2026-06-08)', () => {
     const urls = new Set(sitemap().map((e) => e.url));
-    // 'belt' is a seed (sorted form 'belt') — guaranteed present in anagramSeeds.
-    expect(urls.has('https://www.lexiclash.live/en/anagram/belt')).toBe(true);
-    for (const locale of ['he', 'sv', 'ja', 'es']) {
+    // Programmatic /anagram/[letters] routes are robots:{index:false} and were
+    // pulled from the sitemap entirely — emitting them only invited crawl of
+    // noindexed URLs (the "Excluded by noindex tag" GSC spike). 'belt' is a seed
+    // (sorted form 'belt'); none of its locale variants — including EN — may appear.
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
       expect(
         urls.has(`https://www.lexiclash.live/${locale}/anagram/belt`),
-        `sitemap should NOT advertise noindexed /${locale}/anagram/belt`,
+        `sitemap should NOT advertise retired /${locale}/anagram/belt`,
       ).toBe(false);
     }
   });

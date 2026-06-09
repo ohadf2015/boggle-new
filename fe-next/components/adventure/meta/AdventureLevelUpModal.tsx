@@ -13,7 +13,6 @@ import { memo, useEffect, useId, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 
@@ -40,16 +39,21 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
     const titleId = useId();
     const dialogRef = useRef<HTMLDivElement>(null);
 
-    const prefersReducedMotion = usePrefersReducedMotion();
-
     useFocusTrap(dialogRef, isOpen, onClose);
 
-    // Fire confetti when modal opens (unless reduced motion)
+    // Fire confetti when modal opens (unless reduced motion). Read matchMedia
+    // live inside the effect (client-only) rather than via usePrefersReducedMotion:
+    // that hook starts false for SSR/#418 safety and only syncs post-mount, so the
+    // confetti effect would fire once on the stale `false` before the value lands.
     useEffect(() => {
-      if (isOpen && !prefersReducedMotion) {
+      if (!isOpen) return;
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReducedMotion) {
         fireLevelUpConfetti();
       }
-    }, [isOpen, prefersReducedMotion]);
+    }, [isOpen]);
 
     // Auto-close after 3 seconds
     useEffect(() => {
