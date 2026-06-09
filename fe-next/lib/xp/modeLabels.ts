@@ -16,6 +16,7 @@ const MODE_I18N_KEY: Record<string, string> = {
   blast: 'blast',
   'word-hunt': 'wordHunt',
   'wheel-rush': 'wheelRush',
+  'word-tower': 'wordTower',
 };
 
 function humanize(mode: string): string {

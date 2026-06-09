@@ -4201,6 +4201,13 @@ const ja = {
     }
   },
   "leaderboard": {
+    "gameModes": {
+      "classic": "クラシック",
+      "wordHunt": "ワードハント",
+      "blast": "ブラスト",
+      "wheelRush": "ホイールラッシュ",
+      "wordTower": "ワードタワー"
+    },
     "title": "リーダーボード",
     "allTime": "全期間",
     "rank": "ランク",

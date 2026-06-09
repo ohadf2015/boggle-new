@@ -8,11 +8,13 @@ describe('getModeLabel', () => {
     expect(getModeLabel('classic', t)).toBe('T(leaderboard.gameModes.classic)');
     expect(getModeLabel('blast', t)).toBe('T(leaderboard.gameModes.blast)');
     expect(getModeLabel('word-hunt', t)).toBe('T(leaderboard.gameModes.wordHunt)');
+    expect(getModeLabel('wheel-rush', t)).toBe('T(leaderboard.gameModes.wheelRush)');
+    expect(getModeLabel('word-tower', t)).toBe('T(leaderboard.gameModes.wordTower)');
   });
 
   it('humanizes an unknown hyphenated mode id without calling t', () => {
     const t = vi.fn((key: string) => `T(${key})`);
-    expect(getModeLabel('word-tower', t)).toBe('Word Tower');
+    expect(getModeLabel('mystery-mode', t)).toBe('Mystery Mode');
     expect(t).not.toHaveBeenCalled();
   });
 

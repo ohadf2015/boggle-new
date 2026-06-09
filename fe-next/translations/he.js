@@ -4680,6 +4680,13 @@ const he = {
     }
   },
   "leaderboard": {
+    "gameModes": {
+      "classic": "קלאסי",
+      "wordHunt": "ציד מילים",
+      "blast": "בלאסט",
+      "wheelRush": "מרוץ הגלגל",
+      "wordTower": "מגדל מילים"
+    },
     "title": "טבלת מובילים",
     "allTime": "כל הזמנים",
     "rank": "דירוג",

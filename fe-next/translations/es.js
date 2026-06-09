@@ -4615,6 +4615,13 @@ const es = {
     "viewProgress": "Ver Progreso"
   },
   "leaderboard": {
+    "gameModes": {
+      "classic": "Clásico",
+      "wordHunt": "Caza de Palabras",
+      "blast": "Blast",
+      "wheelRush": "Carrera de Ruleta",
+      "wordTower": "Torre de Palabras"
+    },
     "title": "Clasificación",
     "allTime": "Histórico",
     "rank": "Puesto",

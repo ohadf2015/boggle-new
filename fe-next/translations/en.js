@@ -4635,6 +4635,13 @@ const en = {
     }
   },
   "leaderboard": {
+    "gameModes": {
+      "classic": "Classic",
+      "wordHunt": "Word Hunt",
+      "blast": "Blast",
+      "wheelRush": "Wheel Rush",
+      "wordTower": "Word Tower"
+    },
     "title": "Leaderboard",
     "allTime": "All-Time",
     "rank": "Rank",

@@ -4301,6 +4301,13 @@ const sv = {
     }
   },
   "leaderboard": {
+    "gameModes": {
+      "classic": "Klassiskt",
+      "wordHunt": "Ordjakt",
+      "blast": "Blast",
+      "wheelRush": "Hjulrush",
+      "wordTower": "Ordtorn"
+    },
     "title": "Topplista",
     "allTime": "Alla tider",
     "rank": "Rank",
