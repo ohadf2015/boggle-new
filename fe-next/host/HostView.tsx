@@ -712,6 +712,7 @@ const HostView: React.FC<HostViewProps> = memo(({
           highlightedCells={animation.highlightedCells}
           tableData={runtime.tableData}
           onStartGame={actions.startGame}
+          onAutoStartWithBots={actions.confirmSoloStart}
           onExitRoom={actions.handleExitRoom}
           onCancelTournament={actions.handleCancelTournamentDialog}
           onRegenerateBoard={actions.regenerateBoard}

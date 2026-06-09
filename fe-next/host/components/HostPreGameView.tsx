@@ -98,6 +98,14 @@ interface HostPreGameViewProps {
   highlightedCells: { row: number; col: number }[];
   tableData: LetterGrid;
   onStartGame: () => void;
+  /**
+   * Start the game DIRECTLY with bot opponents, bypassing the solo-confirm
+   * popup. Used by the automatic rescue paths (passive alone-timer + Quick
+   * Play countdown) where there is no user click to gate the modal on — an
+   * abandoned host would never dismiss a popup, stranding the lobby. Falls
+   * back to `onStartGame` when not provided.
+   */
+  onAutoStartWithBots?: () => void;
   onExitRoom: () => void;
   onCancelTournament: () => void;
   onRegenerateBoard?: () => void;
@@ -134,6 +142,7 @@ function HostPreGameView({
   autoStartSecondsLeft = null,
   onCancelAutoStart,
   onStartGame,
+  onAutoStartWithBots,
   onExitRoom,
   tournamentCreating,
   lessonData,
@@ -302,13 +311,22 @@ function HostPreGameView({
     };
   }, [humanGuestCount, isQuickPlay, isPrivate]);
 
+  // Automatic rescue start (passive alone-timer + Quick Play countdown). Routes
+  // through onAutoStartWithBots so the game starts DIRECTLY with bots instead of
+  // re-prompting the solo-confirm popup (onStartGame → startGame →
+  // setShowSoloConfirm). A modal here pops up with no user click and an
+  // abandoned host never dismisses it, stranding the lobby.
+  const startWithBots = useCallback(() => {
+    (onAutoStartWithBots ?? onStartGame)();
+  }, [onAutoStartWithBots, onStartGame]);
+
   useEffect(() => {
     if (botCountdown === null) return;
     if (botCountdown <= 0) {
       // setAutoFill is the backend's bot-fill primitive; the prior 'addBots'
       // event had no server handler so silently dropped (bots never spawned).
       socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
-      onStartGame();
+      startWithBots();
       setBotCountdown(null);
       return;
     }
@@ -318,7 +336,7 @@ function HostPreGameView({
     return () => {
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
-  }, [botCountdown, socket, gameCode, onStartGame]);
+  }, [botCountdown, socket, gameCode, startWithBots]);
 
   const handleRoomLanguageChange = useCallback((newLang: Language) => {
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });

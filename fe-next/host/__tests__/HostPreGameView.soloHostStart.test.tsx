@@ -121,6 +121,7 @@ const baseProps = {
   highlightedCells: [],
   tableData: [['A', 'B'], ['C', 'D']],
   onStartGame: vi.fn(),
+  onAutoStartWithBots: vi.fn(),
   onExitRoom: vi.fn(),
   onCancelTournament: vi.fn(),
   onRegenerateBoard: vi.fn(),
@@ -207,7 +208,11 @@ describe('HostPreGameView passive bot auto-fill timer (alone host)', () => {
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeDefined();
-    expect(baseProps.onStartGame).toHaveBeenCalled();
+    // Passive rescue must start DIRECTLY with bots — NOT via the solo-confirm
+    // popup path (onStartGame → startGame → setShowSoloConfirm). An abandoned
+    // host never clicks a modal, so a popup here would strand the lobby forever.
+    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 
   it('does NOT auto-fill via the timer in a PRIVATE (invite/classroom) room', () => {
