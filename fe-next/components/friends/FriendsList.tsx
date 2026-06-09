@@ -73,6 +73,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
     declineRequest,
     cancelRequest,
     unfriend,
+    block,
     unblock,
     blockedUsers,
     search,
@@ -796,6 +797,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         onClose={() => setSelectedFriend(null)}
         onChallenge={setChallengeFriend}
         onUnfriend={unfriend}
+        onBlock={block}
         isDark={isDark}
         t={t}
       />
@@ -822,6 +824,16 @@ const FriendsList: React.FC<FriendsListProps> = ({
         onSendMessage={handleSendMessage}
         onTyping={selectedThread ? (isTyping: boolean) => setTyping(selectedThread.friendUserId, isTyping) : undefined}
         onDeleteMessage={deleteMessage}
+        onReportMessage={(messageId, targetUserId, reason, context) => {
+          giftSocket?.emit('messages:report', {
+            surface: 'direct_message',
+            reason,
+            context,
+            messageId,
+            targetUserId,
+          });
+          toast(t('report.success'), { icon: '🚩' });
+        }}
         onChallenge={selectedThread ? () => {
           const friend = friends.find(f => f.odUserId === selectedThread.friendUserId);
           if (friend) { setChallengeFriend(friend); setSelectedThread(null); setIsInGame(false); }

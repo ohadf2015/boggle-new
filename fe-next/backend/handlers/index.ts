@@ -14,6 +14,7 @@ import { registerPresenceHandlers, startConnectionHealthCheck } from './presence
 import { registerFriendsHandlers } from './friendsHandler.js';
 import { registerFriendMessagingHandlers } from './friendMessagingHandler.js';
 import { registerFriendChallengeHandlers } from './friendChallengeHandler.js';
+import { registerUserReportHandlers } from './userReportHandler.js';
 import { registerHostHandlers } from './hostHandler.js';
 import { registerConnectionHandlers } from './connectionHandler.js';
 import { registerHintHandlers } from './hintHandler.js';
@@ -51,6 +52,7 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerFriendsHandlers(io, socket);
   registerFriendMessagingHandlers(io, socket);
   registerFriendChallengeHandlers(io, socket);
+  registerUserReportHandlers(io, socket);
   registerHostHandlers(io, socket);
   registerConnectionHandlers(io, socket);
   registerHintHandlers(io, socket);

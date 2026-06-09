@@ -205,6 +205,18 @@ export interface ClientToServerEvents {
   'friends:searchUsers': (data: SearchUsersPayload) => void;
   'friends:getPendingRequests': () => void;
 
+  // Reporting (Social Apps & Features policy)
+  'users:report': (data: { targetUserId: string; reason: string; context?: string }) => void;
+  'messages:report': (data: {
+    surface: 'direct_message' | 'room_chat';
+    reason: string;
+    context?: string;
+    messageId?: string;
+    targetUserId?: string;
+    gameCode?: string;
+    messageSnapshot?: { senderId?: string; senderName: string; message: string; timestamp: number };
+  }) => void;
+
   // Messaging
   'friends:sendMessage': (data: SendMessagePayload) => void;
   'friends:getMessages': (data: GetMessagesPayload) => void;
@@ -250,6 +262,9 @@ export interface ServerToClientEvents {
   // Presence notifications
   'friends:friendOnline': (data: { userId: string; username: string; timestamp: number }) => void;
   'friends:friendOffline': (data: { userId: string; timestamp: number }) => void;
+
+  // Reporting confirmation
+  'report:submitted': (data: { success: boolean; timestamp: number }) => void;
 
   // Error events
   'friends:error': (data: { code: string; message: string; details?: unknown }) => void;

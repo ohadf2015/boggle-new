@@ -11,7 +11,8 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
-import { Send, MessageSquare, Bell } from 'lucide-react';
+import { Send, MessageSquare, Bell, Flag } from 'lucide-react';
+import { ReportDialog, type ReportReason } from '@/components/moderation/ReportDialog';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
@@ -77,6 +78,29 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
   const [latestAnnouncement, setLatestAnnouncement] = useState('');
+  const [reportTarget, setReportTarget] = useState<ChatMessage | null>(null);
+
+  // Social Apps & Features policy: let players report an abusive room-chat message.
+  // Room messages are ephemeral and guests lack a stable userId, so we send a snapshot.
+  const handleReportSubmit = useCallback(
+    (reason: ReportReason, context?: string) => {
+      if (!socket || !reportTarget) return;
+      socket.emit('messages:report', {
+        surface: 'room_chat',
+        reason,
+        context,
+        gameCode,
+        messageSnapshot: {
+          senderName: reportTarget.username,
+          message: reportTarget.message,
+          timestamp: reportTarget.timestamp,
+        },
+      });
+      toast(t('report.success'), { icon: '🚩' });
+      setReportTarget(null);
+    },
+    [socket, reportTarget, gameCode, t]
+  );
   const parentRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesLengthRef = useRef(0);
@@ -419,6 +443,16 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                         <span className={`text-xs font-medium ${variant === 'embedded' ? 'text-neo-white' : 'text-neo-black/70'}`}>
                           {formatTime(msg.timestamp)}
                         </span>
+                        {!isOwnMessage && (
+                          <button
+                            type="button"
+                            onClick={() => setReportTarget(msg)}
+                            aria-label={t('report.title')}
+                            className="p-0.5 opacity-50 hover:opacity-100 transition-opacity"
+                          >
+                            <Flag className="w-3 h-3" aria-hidden="true" />
+                          </button>
+                        )}
                       </div>
                       {/* Message bubble */}
                       <div
@@ -516,6 +550,13 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             if (inputRef.current) inputRef.current.value = '';
           }
         }}
+      />
+
+      <ReportDialog
+        open={!!reportTarget}
+        onClose={() => setReportTarget(null)}
+        onSubmit={handleReportSubmit}
+        t={t}
       />
     </div>
   );

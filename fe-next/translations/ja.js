@@ -1,5 +1,13 @@
 // Ja translations
 const ja = {
+  "mpCoach": {
+    "idleNudge": "文字をなぞって単語を作ろう",
+    "tapHint": "文字を押しながらなぞり、指を離して送信しよう",
+    "submitHint": "最後の文字で指を離すと単語が送信されます",
+    "validityHint": "文字はつながっている必要があります。実在する2文字以上の単語を作ろう",
+    "dismiss": "OK",
+    "sampleWord": "さくら"
+  },
   "crossword": {
     "name": "クロスワード",
     "tagline": "ヒントを頼りにマスを埋めよう",
@@ -419,6 +427,20 @@ const ja = {
       "description": "LexiClashの過去のデイリーワードパズルをすべて閲覧。古いボードを再プレイし、スコアを比較し、リリース以来の全チャレンジのリーダーボードを確認できます。",
       "ogTitle": "デイリーチャレンジアーカイブ - 過去のすべてのパズル | LexiClash",
       "ogDescription": "過去のデイリーワードパズルを統計とリーダーボード付きで探索 — どのチャレンジも再訪問可能。"
+    },
+    "report": {
+      "title": "報告",
+      "reason": "問題の内容は？",
+      "reasons": {
+        "harassment": "嫌がらせ・いじめ",
+        "spam": "スパム・詐欺",
+        "inappropriate": "不適切なコンテンツ",
+        "other": "その他"
+      },
+      "detailsOptional": "詳細を追加（任意）",
+      "submit": "報告を送信",
+      "success": "ありがとうございます。チームが確認します。",
+      "error": "報告を送信できませんでした。もう一度お試しください。"
     },
     "friends": {
       "title": "フレンド＆ソーシャル - 友達とワードゲーム | LexiClash",
@@ -6187,6 +6209,7 @@ const ja = {
       "playerStatus": "プレイヤー状況",
       "gameEnding": "ゲーム終了中...",
       "watchOthers": "残りのプレイヤーを見る",
+      "stillHunting": "残り{count}人が挑戦中",
       "viewBoard": "ボード表示",
       "boardReview": "ボードレビュー",
       "ladder": {
@@ -7499,6 +7522,18 @@ const ja = {
       "noGames": "アクティブなゲームはありません",
       "noGamesHint": "プレイヤーがゲームを開始するとここに表示されます",
       "activeGames": "アクティブなゲーム",
+      "anonymousVisitors": "匿名の訪問者",
+      "bots": "ボット",
+      "onOtherPages": "他のページ",
+      "onPages": "閲覧中",
+      "pageLanding": "ランディングページ",
+      "roomStatus": {
+        "playing": "プレイ中",
+        "scoring": "採点中",
+        "waiting": "プレイヤー待ち",
+        "empty": "空（人間なし）",
+        "finished": "終了"
+      },
       "connectedPlayers": "接続中のプレイヤー",
       "player": "プレイヤー",
       "game": "ゲーム",

@@ -1,5 +1,13 @@
 // Es translations
 const es = {
+  "mpCoach": {
+    "idleNudge": "Arrastra sobre las letras para formar una palabra",
+    "tapHint": "Mantén y arrastra sobre las letras, luego suelta para enviar",
+    "submitHint": "Levanta el dedo de la última letra para enviar la palabra",
+    "validityHint": "Las letras deben conectarse — forma una palabra real, 2 letras o más",
+    "dismiss": "Entendido",
+    "sampleWord": "SOL"
+  },
   "crossword": {
     "name": "Crucigrama",
     "tagline": "Rellena la cuadrícula, pista a pista",
@@ -407,6 +415,20 @@ const es = {
       "description": "Explora todos los desafios diarios de LexiClash. Revive tableros antiguos, compara tus puntajes y consulta las clasificaciones de cada puzzle publicado.",
       "ogTitle": "Archivo del Desafio Diario - Todos los Puzzles | LexiClash",
       "ogDescription": "Explora puzzles diarios pasados con estadisticas y clasificaciones — revisita cualquier desafio."
+    },
+    "report": {
+      "title": "Reportar",
+      "reason": "¿Cuál es el problema?",
+      "reasons": {
+        "harassment": "Acoso o intimidación",
+        "spam": "Spam o estafa",
+        "inappropriate": "Contenido inapropiado",
+        "other": "Otra cosa"
+      },
+      "detailsOptional": "Agrega detalles (opcional)",
+      "submit": "Enviar reporte",
+      "success": "Gracias, nuestro equipo lo revisará.",
+      "error": "No se pudo enviar el reporte. Inténtalo de nuevo."
     },
     "friends": {
       "title": "Amigos y Social - Juega con Amigos | LexiClash",
@@ -6433,6 +6455,7 @@ const es = {
       "playerStatus": "Estado de jugadores",
       "gameEnding": "Terminando juego...",
       "watchOthers": "Observa a los jugadores restantes",
+      "stillHunting": "{count} siguen buscando",
       "viewBoard": "Ver tablero",
       "boardReview": "Revisión del tablero",
       "ladder": {
@@ -7419,6 +7442,18 @@ const es = {
       "noGames": "No hay juegos activos",
       "noGamesHint": "Los juegos aparecerán aquí cuando los jugadores comiencen a jugar",
       "activeGames": "Juegos Activos",
+      "anonymousVisitors": "visitante(s) anónimo(s)",
+      "bots": "bots",
+      "onOtherPages": "En otras páginas",
+      "onPages": "navegando",
+      "pageLanding": "Página de inicio",
+      "roomStatus": {
+        "playing": "Jugando",
+        "scoring": "Puntuando",
+        "waiting": "Esperando jugadores",
+        "empty": "Vacío (sin humanos)",
+        "finished": "Finalizado"
+      },
       "connectedPlayers": "Jugadores Conectados",
       "player": "Jugador",
       "game": "Juego",

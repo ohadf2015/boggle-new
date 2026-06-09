@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { X, Target, ChevronLeft, Trash2 } from 'lucide-react';
+import { X, Target, ChevronLeft, Trash2, Flag } from 'lucide-react';
+import { ReportDialog, type ReportReason } from '@/components/moderation/ReportDialog';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
@@ -23,6 +24,7 @@ interface MessageThreadProps {
   onSendMessage: (text: string) => void;
   onTyping?: (isTyping: boolean) => void;
   onDeleteMessage?: (messageId: string) => void;
+  onReportMessage?: (messageId: string, targetUserId: string, reason: ReportReason, context?: string) => void;
   onChallenge?: () => void;
   onMarkAsRead: () => void;
   currentUserId: string;
@@ -50,6 +52,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
   onSendMessage,
   onTyping,
   onDeleteMessage,
+  onReportMessage,
   onChallenge,
   onMarkAsRead,
   currentUserId,
@@ -65,6 +68,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
   // room chat, so a user only ever sees it once.
   const { safetyAcknowledged, acknowledgeSafety } = useSocialCapabilities();
   const [showSafety, setShowSafety] = useState(false);
+  const [reportTarget, setReportTarget] = useState<Message | null>(null);
   const pendingDmTextRef = useRef<string>('');
 
   const handleSend = (text: string) => {
@@ -346,6 +350,20 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                               {message.isRead ? '✓✓' : '✓'}
                             </span>
                           )}
+                          {/* Report a received message (Social Apps & Features policy) */}
+                          {!isMine && onReportMessage && (
+                            <button
+                              type="button"
+                              onClick={() => setReportTarget(message)}
+                              aria-label={t('report.title')}
+                              className={cn(
+                                'p-0.5 opacity-50 hover:opacity-100 transition-opacity',
+                                isDark ? 'text-gray-400' : 'text-gray-500'
+                              )}
+                            >
+                              <Flag className="w-3 h-3" aria-hidden="true" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     </m.div>
@@ -418,6 +436,18 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
               pendingDmTextRef.current = '';
               if (txt) onSendMessage(txt);
             }}
+          />
+
+          <ReportDialog
+            open={!!reportTarget}
+            onClose={() => setReportTarget(null)}
+            onSubmit={(reason, context) => {
+              if (reportTarget && onReportMessage) {
+                onReportMessage(reportTarget.messageId, reportTarget.fromUserId, reason, context);
+              }
+              setReportTarget(null);
+            }}
+            t={t}
           />
         </m.div>
       )}

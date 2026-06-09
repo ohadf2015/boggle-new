@@ -1,5 +1,13 @@
 // EN translations
 const en = {
+  "mpCoach": {
+    "idleNudge": "Drag across letters to spell a word",
+    "tapHint": "Hold and drag across letters, then lift to submit",
+    "submitHint": "Lift your finger off the last letter to submit the word",
+    "validityHint": "Letters must connect — spell a real word, 2 letters or more",
+    "dismiss": "Got it",
+    "sampleWord": "CAT"
+  },
   "crossword": {
     "name": "Crossword",
     "tagline": "Fill the grid, one clue at a time",
@@ -413,6 +421,20 @@ const en = {
       "description": "Browse every past LexiClash daily word puzzle. Replay old boards, compare your scores, and explore leaderboards from every challenge since launch.",
       "ogTitle": "Daily Challenge Archive - Every Past Puzzle | LexiClash",
       "ogDescription": "Explore past daily word puzzles with full stats and leaderboards — revisit any challenge."
+    },
+    "report": {
+      "title": "Report",
+      "reason": "What's the problem?",
+      "reasons": {
+        "harassment": "Harassment or bullying",
+        "spam": "Spam or scam",
+        "inappropriate": "Inappropriate content",
+        "other": "Something else"
+      },
+      "detailsOptional": "Add details (optional)",
+      "submit": "Submit report",
+      "success": "Thanks — our team will review this.",
+      "error": "Couldn't submit report. Please try again."
     },
     "friends": {
       "title": "Friends & Social - Play Word Games With Friends | LexiClash",
@@ -6183,6 +6205,7 @@ const en = {
       "playerStatus": "Player Status",
       "gameEnding": "Game ending...",
       "watchOthers": "Watch the remaining players",
+      "stillHunting": "{count} still hunting",
       "viewBoard": "View Board",
       "boardReview": "Board Review",
       "ladder": {
@@ -13121,9 +13144,21 @@ const en = {
     "landingCardOrder": "Landing Card Order",
     "live": {
       "activeGames": "Active Games",
+      "anonymousVisitors": "anonymous visitor(s)",
       "auth": "Authenticated",
+      "bots": "bots",
       "connectedPlayers": "Connected Players",
       "disconnected": "disconnected",
+      "onOtherPages": "On Other Pages",
+      "onPages": "browsing",
+      "pageLanding": "Landing Page",
+      "roomStatus": {
+        "playing": "Playing",
+        "scoring": "Scoring",
+        "waiting": "Waiting for players",
+        "empty": "Empty (no humans)",
+        "finished": "Finished"
+      },
       "host": "Host",
       "private": "Private",
       "stalled": "Stalled?",

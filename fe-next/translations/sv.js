@@ -1,5 +1,13 @@
 // Sv translations
 const sv = {
+  "mpCoach": {
+    "idleNudge": "Dra över bokstäverna för att stava ett ord",
+    "tapHint": "Håll och dra över bokstäverna, släpp sedan för att skicka",
+    "submitHint": "Lyft fingret från sista bokstaven för att skicka ordet",
+    "validityHint": "Bokstäverna måste sitta ihop — stava ett riktigt ord, minst 2 bokstäver",
+    "dismiss": "Okej",
+    "sampleWord": "SOL"
+  },
   "crossword": {
     "name": "Korsord",
     "tagline": "Fyll i rutnätet, en ledtråd i taget",
@@ -506,6 +514,20 @@ const sv = {
       "description": "Utforska alla tidigare dagliga ordpussel från LexiClash. Spela om gamla brädor, jämför dina poäng och se topplistor från varje utmaning sedan starten.",
       "ogTitle": "Dagliga Utmaningens Arkiv - Alla Tidigare Pussel | LexiClash",
       "ogDescription": "Utforska tidigare dagliga ordpussel med statistik och topplistor — återbesök vilken utmaning som helst."
+    },
+    "report": {
+      "title": "Rapportera",
+      "reason": "Vad är problemet?",
+      "reasons": {
+        "harassment": "Trakasserier eller mobbning",
+        "spam": "Skräppost eller bluff",
+        "inappropriate": "Olämpligt innehåll",
+        "other": "Något annat"
+      },
+      "detailsOptional": "Lägg till detaljer (valfritt)",
+      "submit": "Skicka rapport",
+      "success": "Tack — vårt team granskar detta.",
+      "error": "Det gick inte att skicka rapporten. Försök igen."
     },
     "friends": {
       "title": "Vänner & Socialt - Spela Ordspel med Vänner | LexiClash",
@@ -6236,6 +6258,7 @@ const sv = {
       "playerStatus": "Spelarstatus",
       "gameEnding": "Spelet avslutas...",
       "watchOthers": "Titta på de kvarvarande spelarna",
+      "stillHunting": "{count} kvar i jakten",
       "viewBoard": "Visa bräde",
       "boardReview": "Brädesöversikt",
       "ladder": {
@@ -7475,6 +7498,18 @@ const sv = {
       "noGames": "Inga aktiva spel",
       "noGamesHint": "Spel visas här när spelare börjar spela",
       "activeGames": "Aktiva Spel",
+      "anonymousVisitors": "anonyma besökare",
+      "bots": "bottar",
+      "onOtherPages": "På andra sidor",
+      "onPages": "surfar",
+      "pageLanding": "Startsida",
+      "roomStatus": {
+        "playing": "Spelar",
+        "scoring": "Poängräkning",
+        "waiting": "Väntar på spelare",
+        "empty": "Tom (inga människor)",
+        "finished": "Avslutat"
+      },
       "connectedPlayers": "Anslutna Spelare",
       "player": "Spelare",
       "game": "Spel",
