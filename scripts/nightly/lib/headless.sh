@@ -40,6 +40,66 @@ PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
 export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
 
+# --- session/usage-limit aware retry (root-cause fix 2026-06-09) --------------
+# On 2026-06-09 the shared 5h Claude usage window was exhausted mid-run (evening
+# interactive use before the 01:00 start). Lane 02 died after 47 turns with
+# is_error:true result "You've hit your session limit · resets 3:40am
+# (Europe/Stockholm)"; lanes 03-08 then instant-failed (1 turn, "rate_limit") and
+# 09-10 recovered only AFTER the 3:40am reset. The runner was limit-blind: it
+# treated the limit exactly like a code failure (rc=1 → revert lane → advance),
+# so it burned six lanes as 1-second instant-fails instead of waiting ~2 min for
+# the reset. These two PURE helpers are the testable core of the fix; the retry
+# loop in headless_run() uses them to sleep-until-reset (overnight) or
+# abort-and-report (LANE_LIMIT_NO_WAIT=1, for a budget-aware daytime re-run).
+
+# _seconds_until_reset <message> — seconds from now until the reset clock named in
+# a usage-limit message (e.g. "resets 3:40am"). LEXI_FAKE_NOW overrides now for
+# tests. Echoes a non-negative integer, or "" when no am/pm clock is parseable
+# (caller falls back to a bounded backoff). Reset clock is wall-time in the local
+# TZ (the limit message clock is the machine's TZ).
+_seconds_until_reset() {
+  local msg="$1" clock hh mm ampm now reset_today secs
+  # First am/pm clock following the word "resets".
+  clock=$(printf '%s' "$msg" \
+    | grep -oiE 'resets[^0-9]*[0-9]{1,2}(:[0-9]{2})?[[:space:]]*[ap]m' \
+    | grep -oiE '[0-9]{1,2}(:[0-9]{2})?[[:space:]]*[ap]m' | head -1)
+  [ -z "$clock" ] && { printf ''; return; }
+  hh=$(printf '%s' "$clock" | grep -oE '^[0-9]{1,2}')
+  mm=$(printf '%s' "$clock" | grep -oE ':[0-9]{2}' | tr -d ':'); [ -z "$mm" ] && mm=0
+  ampm=$(printf '%s' "$clock" | grep -oiE '[ap]m' | tr 'A-Z' 'a-z')
+  hh=$((10#$hh)); mm=$((10#$mm))
+  if [ "$ampm" = "pm" ] && [ "$hh" -ne 12 ]; then hh=$((hh + 12)); fi
+  if [ "$ampm" = "am" ] && [ "$hh" -eq 12 ]; then hh=0; fi
+  now="${LEXI_FAKE_NOW:-$(date +%s)}"
+  # Today's epoch (relative to `now`) at hh:mm local. BSD date (darwin runner).
+  reset_today=$(date -j -f "%Y-%m-%d %H:%M:%S" \
+    "$(date -r "$now" +%Y-%m-%d) $(printf '%02d:%02d:00' "$hh" "$mm")" +%s 2>/dev/null)
+  [ -z "$reset_today" ] && { printf ''; return; }
+  secs=$(( reset_today - now ))
+  [ "$secs" -le 0 ] && secs=$(( secs + 86400 ))   # already past today → tomorrow
+  printf '%s' "$secs"
+}
+
+# _detect_limit_signal <sidecar_file> — classify a failed lane's stream-json:
+#   "WAIT <secs>" → an explicit usage/session limit with a parseable reset clock
+#   "BACKOFF"     → a limit/rate_limit with no reset clock (short bounded wait)
+#   ""            → no limit signal: a genuine code failure (caller reverts as usual)
+_detect_limit_signal() {
+  local f="$1" result_line secs
+  [ -f "$f" ] || { printf ''; return; }
+  # The session-limit surfaces as a result string mentioning "session/usage limit"
+  # or "resets <clock>". Match the full "result":"..." value to feed the parser.
+  result_line=$(grep -aoiE '"result":"[^"]*(session limit|usage limit|resets[^"]*)[^"]*"' "$f" 2>/dev/null | head -1)
+  if [ -n "$result_line" ]; then
+    secs=$(_seconds_until_reset "$result_line")
+    if [ -n "$secs" ]; then printf 'WAIT %s' "$secs"; return; fi
+    printf 'BACKOFF'; return
+  fi
+  # Bare rate_limit (assistant/error turn) with no reset clock.
+  if grep -aqE 'rate_limit' "$f" 2>/dev/null; then printf 'BACKOFF'; return; fi
+  printf ''
+}
+
 # --- Mandatory-Minimum-Artifact contract -------------------------------------
 # Prepended to EVERY lane prompt so a lane can never "give up" / produce nothing.
 # The lane writes docs/nightly/artifacts/lane-<id>-<date>.md as its FIRST action
@@ -288,18 +348,64 @@ PY
   # every tool event appends to it, so a working lane never idle-trips; on a real wedge
   # (no event for lane_idle) it kills claude + its MCP server tree and returns 124,
   # exactly the exit code the KEEP_TIMEOUT_PARTIALS salvage already handles.
-  run_with_idle_timeout "$lane_idle" "$lane_max" "$stream_sidecar" -- \
-    claude -p "$(cat "$rendered")" \
-      --allowedTools '*' \
-      --settings "$hook_settings" \
-      ${mcp_args[@]+"${mcp_args[@]}"} \
-      --dangerously-skip-permissions \
-      --output-format stream-json \
-      --verbose \
-      --model "$model"
+  # Inner runner so the limit-aware retry below re-invokes IDENTICALLY (no drift).
+  # --allowedTools is intentionally omitted: --dangerously-skip-permissions already
+  # grants every tool, and the CLI now REJECTS the legacy `--allowedTools '*'`
+  # wildcard with a warning banner (a latent hard-error in a future CLI) — dropping
+  # the redundant flag removes the noise and that risk.
+  _invoke_claude_lane() { # <sidecar>
+    run_with_idle_timeout "$lane_idle" "$lane_max" "$1" -- \
+      claude -p "$(cat "$rendered")" \
+        --settings "$hook_settings" \
+        ${mcp_args[@]+"${mcp_args[@]}"} \
+        --dangerously-skip-permissions \
+        --output-format stream-json \
+        --verbose \
+        --model "$model"
+  }
+  _invoke_claude_lane "$stream_sidecar"
   local rc=$?
-  # Render the compact wall-clock timeline from the captured sidecar into the run log
-  # (post-hoc, not live — observability is preserved; the hang is not).
+
+  # --- limit-aware retry: pause across a usage-window reset, don't cascade ------
+  # A session/usage-limit error is TRANSIENT, not a code failure. Without this the
+  # loop reverts the lane and advances — and every subsequent lane instant-fails on
+  # the same exhausted window (six lanes lost 2026-06-09). Detect it, wait for the
+  # reset (capped), RECOMPUTE the deadline epochs (CRITICAL: the lane-time-guard hook
+  # keys off them; reusing stale epochs after a long sleep would deny every tool call
+  # on the retry and reproduce the very instant-fail this fixes), then re-run.
+  # LANE_LIMIT_NO_WAIT=1 → abort-and-report (rc=75) instead of a multi-hour daytime
+  # sleep, for a budget-aware manual re-run.
+  local limit_tries=0 max_limit_tries="${LANE_LIMIT_RETRIES:-1}"
+  while [ "$rc" -ne 0 ] && [ "$limit_tries" -lt "$max_limit_tries" ]; do
+    local signal wait_secs cap
+    signal=$(_detect_limit_signal "$stream_sidecar")
+    [ -z "$signal" ] && break   # genuine failure → fall through to the normal revert
+    case "$signal" in
+      WAIT\ *) wait_secs="${signal#WAIT }" ;;
+      *)       wait_secs="${LANE_LIMIT_BACKOFF:-120}" ;;   # BACKOFF / unparsed
+    esac
+    cap="${LANE_LIMIT_MAX_WAIT:-21600}"                    # 6h ceiling
+    [ "$wait_secs" -gt "$cap" ] && wait_secs="$cap"
+    [ "$wait_secs" -lt 1 ] && wait_secs="${LANE_LIMIT_BACKOFF:-120}"
+    if [ "${LANE_LIMIT_NO_WAIT:-0}" = "1" ]; then
+      echo "headless: lane=$lane_id USAGE-LIMIT hit; LANE_LIMIT_NO_WAIT=1 → abort (would wait ${wait_secs}s); rc=75 (retry-later, not a code failure)" | tee -a "$log_file"
+      rc=75; break
+    fi
+    echo "headless: lane=$lane_id USAGE-LIMIT hit ($signal) — sleeping ${wait_secs}s for window reset, then retry (attempt $((limit_tries + 2)))" | tee -a "$log_file"
+    sleep "$wait_secs"
+    now_epoch=$(date +%s)
+    hard_epoch=$(( now_epoch + lane_max ))
+    finalize_epoch=$(( now_epoch + lane_max * 8 / 10 ))
+    printf '%s %s %s\n' "$now_epoch" "$finalize_epoch" "$hard_epoch" > "$deadline_file"
+    : > "$fileset_file"; rm -f "${deadline_file}.heavy" 2>/dev/null || true
+    stream_sidecar="$(dirname "$log_file")/stream-${lane_id}-$(date +%H%M%S).ndjson"
+    _invoke_claude_lane "$stream_sidecar"
+    rc=$?
+    limit_tries=$((limit_tries + 1))
+  done
+
+  # Render the compact wall-clock timeline from the (final) captured sidecar into the
+  # run log (post-hoc, not live — observability is preserved; the hang is not).
   python3 "$timeline" < "$stream_sidecar" 2>/dev/null | tee -a "$log_file" \
     || tail -40 "$stream_sidecar" >> "$log_file" 2>/dev/null || true
   echo "headless: lane=$lane_id rc=$rc — full stream-json sidecar: $stream_sidecar" | tee -a "$log_file"
