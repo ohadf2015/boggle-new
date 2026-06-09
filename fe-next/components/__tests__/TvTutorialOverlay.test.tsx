@@ -40,6 +40,7 @@ vi.mock('lucide-react', () => ({
   Trophy: () => <span data-testid="trophy-icon">Trophy</span>,
   Timer: () => <span data-testid="timer-icon">Timer</span>,
   HelpCircle: () => <span data-testid="help-icon">?</span>,
+  LogOut: () => <span data-testid="logout-icon">Exit</span>,
 }));
 
 // Mock localStorage
@@ -67,7 +68,7 @@ describe('TvTutorialOverlay', () => {
   const mockT = (key: string) => {
     const translations: Record<string, string> = {
       'tvTutorial.welcome.title': 'Welcome to TV Mode',
-      'tvTutorial.welcome.description': 'Perfect for presentations!',
+      'tvTutorial.welcome.description': 'You watch on the big screen — players play on their phones. You are not playing in this mode.',
       'tvTutorial.qr.title': 'QR Code & Room Code',
       'tvTutorial.qr.description': 'Players scan to join',
       'tvTutorial.grid.title': 'Game Grid',
@@ -76,6 +77,8 @@ describe('TvTutorialOverlay', () => {
       'tvTutorial.leaderboard.description': 'Track scores in real-time',
       'tvTutorial.timer.title': 'Timer',
       'tvTutorial.timer.description': 'Countdown to victory',
+      'tvTutorial.exit.title': 'Leaving TV Mode',
+      'tvTutorial.exit.description': 'Tap Switch to Player Mode in the lobby to jump in and play yourself.',
       'tvTutorial.letsGo': "Let's Go!",
       'tvTutorial.ariaLabel': 'TV Mode Tutorial',
       'tvTutorial.help': 'Show Tutorial',
@@ -103,16 +106,29 @@ describe('TvTutorialOverlay', () => {
       render(<TvTutorialOverlay {...defaultProps} />);
 
       expect(screen.getByText('Welcome to TV Mode')).toBeInTheDocument();
-      expect(screen.getByText('Perfect for presentations!')).toBeInTheDocument();
-      expect(screen.getByText('1 / 5')).toBeInTheDocument();
+      expect(screen.getByText(/You are not playing in this mode/i)).toBeInTheDocument();
+      expect(screen.getByText('1 / 6')).toBeInTheDocument();
     });
 
     it('should render progress indicators for all steps', () => {
       const { container } = render(<TvTutorialOverlay {...defaultProps} />);
 
-      // 5 progress dots
+      // 6 progress dots (welcome, qr, grid, leaderboard, timer, exit)
       const progressDots = container.querySelectorAll('.h-1.flex-1.rounded-full');
-      expect(progressDots).toHaveLength(5);
+      expect(progressDots).toHaveLength(6);
+    });
+
+    it('explains how to exit TV mode on the final step', () => {
+      render(<TvTutorialOverlay {...defaultProps} />);
+
+      // Advance through to the last (exit) step
+      for (let i = 0; i < 5; i++) {
+        fireEvent.click(screen.getByRole('button', { name: /Next|Let's Go!/i }));
+      }
+
+      expect(screen.getByText('Leaving TV Mode')).toBeInTheDocument();
+      expect(screen.getByText(/Switch to Player Mode/i)).toBeInTheDocument();
+      expect(screen.getByText('6 / 6')).toBeInTheDocument();
     });
 
     it('should render skip button', () => {
@@ -146,7 +162,7 @@ describe('TvTutorialOverlay', () => {
 
       // Second step
       expect(screen.getByText('QR Code & Room Code')).toBeInTheDocument();
-      expect(screen.getByText('2 / 5')).toBeInTheDocument();
+      expect(screen.getByText('2 / 6')).toBeInTheDocument();
     });
 
     it('should go back when clicking Back', () => {
@@ -173,7 +189,7 @@ describe('TvTutorialOverlay', () => {
       render(<TvTutorialOverlay {...defaultProps} />);
 
       // Navigate to last step
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 5; i++) {
         fireEvent.click(screen.getByRole('button', { name: /Next|Let's Go!/i }));
       }
 
@@ -185,7 +201,7 @@ describe('TvTutorialOverlay', () => {
       render(<TvTutorialOverlay {...defaultProps} />);
 
       // Navigate to last step and complete
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         fireEvent.click(screen.getByRole('button', { name: /Next|Let's Go!/i }));
       }
 
@@ -265,7 +281,7 @@ describe('TvTutorialOverlay', () => {
       render(<TvTutorialOverlay {...defaultProps} />);
 
       // Complete tutorial
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         fireEvent.click(screen.getByRole('button', { name: /Next|Let's Go!/i }));
       }
 

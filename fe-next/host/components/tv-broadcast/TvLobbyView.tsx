@@ -108,6 +108,19 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
         t={t}
       />
 
+      {/* View-only badge — always-on reminder that the host is the screen, not a
+          competitor. The first-toggle tutorial says this once; this carries the
+          message for repeat hosts the tutorial won't re-show for. */}
+      <div className="flex justify-center pt-4">
+        <span
+          data-testid="tv-view-only-badge"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border-2 border-neo-cyan bg-neo-cyan/15 text-neo-cyan text-sm font-bold uppercase tracking-wider shadow-hard-sm"
+        >
+          <Monitor className="w-4 h-4 shrink-0" />
+          {t('tvLobby.viewOnlyBadge')}
+        </span>
+      </div>
+
       {/* Main content grid */}
       <div className="flex-1 grid grid-cols-3 gap-6 p-8 max-w-7xl mx-auto w-full">
         {/* Left column: Players */}
@@ -185,14 +198,15 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             className="text-2xl"
           />
 
-          {/* Toggle back to player mode */}
+          {/* Exit TV mode → switch back to phone/player mode. Prominent so a host
+              who landed here by mistake can clearly find the way out. */}
           {setHostPlaying && (
             <button
               data-testid="switch-to-player-mode"
               onClick={() => setHostPlaying(true)}
-              className="flex items-center justify-center gap-2 px-4 py-3 text-neo-cream/60 hover:text-neo-cream text-sm font-neo-body transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-cream hover:bg-neo-cream/10 hover:border-neo-cream text-base font-bold shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all"
             >
-              <Monitor className="w-4 h-4" />
+              <Monitor className="w-5 h-5 shrink-0" />
               {t('tvLobby.switchToPlayer')}
             </button>
           )}

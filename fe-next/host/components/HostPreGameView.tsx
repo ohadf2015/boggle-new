@@ -416,30 +416,40 @@ function HostPreGameView({
   const showWaitingNudge =
     autoStartSecondsLeft === null && readyCount > 0 && readyTotal > 0 && readyCount < readyTotal;
 
-  // TV mode toggle — neo-brutalist pill with hard shadow
+  // TV mode toggle — neo-brutalist pill with hard shadow. The caption beneath
+  // surfaces the view-only consequence AT the decision point, so a host knows
+  // before flipping it that they won't be playing in this mode.
   const tvModeToggle = (
-    <button
-      onClick={() => setHostPlaying(prev => !prev)}
-      className={cn(
-        'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-neo-black transition-all text-[10px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5 active:shadow-none',
-        !hostPlaying
-          ? 'bg-neo-cyan/20 text-neo-cyan'
-          : 'bg-white/5 text-neo-cream/50 hover:bg-white/10'
-      )}
-      aria-label={t('hostView.broadcastModeTitle')}
-    >
-      <Monitor className="w-3.5 h-3.5" />
-      <span>{t('hostView.broadcastModeTitle')}</span>
-      <span className={cn(
-        'w-7 h-4 rounded-full border-2 border-neo-black relative transition-colors',
-        !hostPlaying ? 'bg-neo-cyan' : 'bg-white/10'
-      )}>
+    <div className="flex flex-col items-end gap-0.5">
+      <button
+        onClick={() => setHostPlaying(prev => !prev)}
+        className={cn(
+          'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-neo-black transition-all text-[10px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5 active:shadow-none',
+          !hostPlaying
+            ? 'bg-neo-cyan/20 text-neo-cyan'
+            : 'bg-white/5 text-neo-cream/50 hover:bg-white/10'
+        )}
+        aria-label={`${t('hostView.broadcastModeTitle')} — ${t('hostView.broadcastModeDesc')}`}
+      >
+        <Monitor className="w-3.5 h-3.5" />
+        <span>{t('hostView.broadcastModeTitle')}</span>
         <span className={cn(
-          'absolute top-0.5 w-2.5 h-2.5 rounded-full bg-neo-black transition-all duration-200',
-          !hostPlaying ? 'inset-inline-end-0.5' : 'inset-inline-start-0.5'
-        )} />
+          'w-7 h-4 rounded-full border-2 border-neo-black relative transition-colors',
+          !hostPlaying ? 'bg-neo-cyan' : 'bg-white/10'
+        )}>
+          <span className={cn(
+            'absolute top-0.5 w-2.5 h-2.5 rounded-full bg-neo-black transition-all duration-200',
+            !hostPlaying ? 'inset-inline-end-0.5' : 'inset-inline-start-0.5'
+          )} />
+        </span>
+      </button>
+      <span className={cn(
+        'text-[9px] font-bold uppercase tracking-wider transition-colors',
+        !hostPlaying ? 'text-neo-cyan' : 'text-neo-cream/40'
+      )}>
+        {t('hostView.broadcastModeDesc')}
       </span>
-    </button>
+    </div>
   );
 
   return (

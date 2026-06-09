@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, X, Tv, QrCode, LayoutGrid, Trophy, Timer, HelpCircle } from 'lucide-react';
+import { ChevronRight, ChevronLeft, X, Tv, QrCode, LayoutGrid, Trophy, Timer, HelpCircle, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const TUTORIAL_STORAGE_KEY = 'lexiclash_tv_tutorial_complete';
@@ -50,6 +50,13 @@ const TUTORIAL_STEPS: TutorialStep[] = [
     descriptionKey: 'tvTutorial.timer.description',
     icon: <Timer className="w-12 h-12" />,
     highlightArea: 'timer',
+  },
+  {
+    id: 'exit',
+    titleKey: 'tvTutorial.exit.title',
+    descriptionKey: 'tvTutorial.exit.description',
+    icon: <LogOut className="w-12 h-12" />,
+    highlightArea: null,
   },
 ];
 

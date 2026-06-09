@@ -1903,7 +1903,8 @@ const en = {
   "tvLobby": {
     "waitingForPlayers": "Waiting for Players...",
     "seconds": "seconds",
-    "switchToPlayer": "Switch to Player Mode"
+    "switchToPlayer": "Switch to Player Mode",
+    "viewOnlyBadge": "TV Mode · View Only"
   },
   "tvResults": {
     "title": "WE HAVE A WINNER!",
@@ -7318,7 +7319,7 @@ const en = {
   "tvTutorial": {
     "welcome": {
       "title": "TV Mode",
-      "description": "Party time! Throw it on the big screen and let everyone battle."
+      "description": "Throw it on the big screen — players battle on their phones. You're the screen here, not a player."
     },
     "qr": {
       "title": "Join Code",
@@ -7335,6 +7336,10 @@ const en = {
     "timer": {
       "title": "The Clock",
       "description": "Time's always ticking. Fire rounds crank up the chaos!"
+    },
+    "exit": {
+      "title": "Want to Play?",
+      "description": "You're only watching in TV mode. To join the game, tap \"Switch to Player Mode\" in the lobby."
     },
     "letsGo": "Let's Go!",
     "ariaLabel": "TV Mode Tutorial",

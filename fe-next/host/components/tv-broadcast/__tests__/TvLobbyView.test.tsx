@@ -1,7 +1,7 @@
 'use client';
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import TvLobbyView from '../TvLobbyView';
 
 // Mock Zustand game state hooks
@@ -153,5 +153,22 @@ describe('TvLobbyView', () => {
   it('has tv-lobby-view root testid', () => {
     render(<TvLobbyView {...defaultProps} />);
     expect(screen.getByTestId('tv-lobby-view')).toBeInTheDocument();
+  });
+
+  it('shows a persistent view-only badge so hosts know they are not playing', () => {
+    render(<TvLobbyView {...defaultProps} />);
+    expect(screen.getByText('tvLobby.viewOnlyBadge')).toBeInTheDocument();
+  });
+
+  it('renders the Switch to Player Mode exit button when setHostPlaying is provided', () => {
+    render(<TvLobbyView {...defaultProps} setHostPlaying={vi.fn()} />);
+    expect(screen.getByTestId('switch-to-player-mode')).toBeInTheDocument();
+  });
+
+  it('exits TV mode by calling setHostPlaying(true) when the exit button is clicked', () => {
+    const setHostPlaying = vi.fn();
+    render(<TvLobbyView {...defaultProps} setHostPlaying={setHostPlaying} />);
+    fireEvent.click(screen.getByTestId('switch-to-player-mode'));
+    expect(setHostPlaying).toHaveBeenCalledWith(true);
   });
 });
