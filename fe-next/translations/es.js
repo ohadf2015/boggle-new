@@ -1932,7 +1932,8 @@ const es = {
   "tvLobby": {
     "waitingForPlayers": "Esperando jugadores...",
     "seconds": "segundos",
-    "switchToPlayer": "Cambiar a modo jugador"
+    "switchToPlayer": "Cambiar a modo jugador",
+    "viewOnlyBadge": "Modo TV · Solo visualización"
   },
   "tvResults": {
     "title": "¡TENEMOS UN GANADOR!",
@@ -7336,7 +7337,8 @@ const es = {
       "exitToSite": "Salir del panel",
       "email": "Correo",
       "milogWords": "Palabras Milog",
-      "teacherAccess": "Acceso de maestro"
+      "teacherAccess": "Acceso de maestro",
+      "schoolLeads": "Contactos escolares"
     },
     "teacherAccess": {
       "title": "Solicitudes de acceso de maestro",
@@ -7837,7 +7839,7 @@ const es = {
   "tvTutorial": {
     "welcome": {
       "title": "Bienvenido al modo TV",
-      "description": "¡Perfecto para fiestas! Transmite a una pantalla grande y que todos jueguen."
+      "description": "Transmite a la pantalla grande — los jugadores compiten en sus teléfonos. Aquí eres la pantalla, no un jugador."
     },
     "qr": {
       "title": "Código QR y código de sala",
@@ -7854,6 +7856,10 @@ const es = {
     "timer": {
       "title": "Temporizador del juego",
       "description": "La cuenta regresiva muestra cuánto tiempo queda. ¡Las rondas de fuego añaden emoción!"
+    },
+    "exit": {
+      "title": "¿Quieres jugar?",
+      "description": "Solo estás mirando en modo TV. Para unirte al juego, toca \"Cambiar a modo jugador\" en el lobby."
     },
     "letsGo": "¡Vamos!",
     "ariaLabel": "Tutorial del modo TV",

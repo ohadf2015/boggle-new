@@ -1945,7 +1945,8 @@ const he = {
   "tvLobby": {
     "waitingForPlayers": "...ממתינים לשחקנים",
     "seconds": "שניות",
-    "switchToPlayer": "מעבר למצב שחקן"
+    "switchToPlayer": "מעבר למצב שחקן",
+    "viewOnlyBadge": "מצב TV · צפייה בלבד"
   },
   "tvResults": {
     "title": "יש לנו מנצח!",
@@ -7345,7 +7346,8 @@ const he = {
       "exitToSite": "יציאה לאתר",
       "email": "אימייל",
       "milogWords": "מילים ממילוג",
-      "teacherAccess": "גישת מורה"
+      "teacherAccess": "גישת מורה",
+      "schoolLeads": "פניות מבתי ספר"
     },
     "teacherAccess": {
       "title": "בקשות גישת מורה",
@@ -7851,7 +7853,7 @@ const he = {
   "tvTutorial": {
     "welcome": {
       "title": "ברוכים הבאים למצב TV",
-      "description": "מושלם למסיבות! שדרו למסך גדול ותנו לכולם לשחק."
+      "description": "השלך על המסך הגדול — השחקנים התחרו בטלפונים שלהם. אתה המסך כאן, לא שחקן."
     },
     "qr": {
       "title": "קוד QR וקוד חדר",
@@ -7868,6 +7870,10 @@ const he = {
     "timer": {
       "title": "טיימר המשחק",
       "description": "הספירה לאחור מראה כמה זמן נותר. סיבובי אש מוסיפים התרגשות!"
+    },
+    "exit": {
+      "title": "רוצה לשחק?",
+      "description": "אתה רק צופה במצב TV. כדי להצטרף למשחק, הקש \"מעבר למצב שחקן\" בלובי."
     },
     "letsGo": "בואו נתחיל!",
     "ariaLabel": "מדריך מצב TV",

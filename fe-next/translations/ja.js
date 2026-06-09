@@ -1913,7 +1913,8 @@ const ja = {
   "tvLobby": {
     "waitingForPlayers": "プレイヤーを待っています...",
     "seconds": "秒",
-    "switchToPlayer": "プレイヤーモードに切替"
+    "switchToPlayer": "プレイヤーモードに切替",
+    "viewOnlyBadge": "TVモード · 閲覧のみ"
   },
   "tvResults": {
     "title": "勝者誕生!",
@@ -7293,7 +7294,7 @@ const ja = {
   "tvTutorial": {
     "welcome": {
       "title": "TVモードへようこそ",
-      "description": "パーティーに最適！大画面にキャストして皆で楽しもう。"
+      "description": "大画面にキャスト — プレイヤーは自分のスマートフォンで競い合います。ここではあなたが画面で、プレイヤーではありません。"
     },
     "qr": {
       "title": "QRコード＆ルームコード",
@@ -7310,6 +7311,10 @@ const ja = {
     "timer": {
       "title": "ゲームタイマー",
       "description": "カウントダウンで残り時間を確認。ファイアラウンドで盛り上がろう！"
+    },
+    "exit": {
+      "title": "プレイしたい?",
+      "description": "TVモードではあなたは見ているだけです。ゲームに参加するには、ロビーで「プレイヤーモードに切替」をタップしてください。"
     },
     "letsGo": "さあ始めよう！",
     "ariaLabel": "TVモードチュートリアル",
@@ -7412,7 +7417,8 @@ const ja = {
       "exitToSite": "サイトに戻る",
       "email": "メール",
       "milogWords": "Milog辞書",
-      "teacherAccess": "先生アクセス"
+      "teacherAccess": "先生アクセス",
+      "schoolLeads": "学校からの問い合わせ"
     },
     "teacherAccess": {
       "empty": "リクエストはありません",

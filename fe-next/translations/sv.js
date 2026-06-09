@@ -2013,7 +2013,8 @@ const sv = {
   "tvLobby": {
     "waitingForPlayers": "Väntar på spelare...",
     "seconds": "sekunder",
-    "switchToPlayer": "Byt till spelarläge"
+    "switchToPlayer": "Byt till spelarläge",
+    "viewOnlyBadge": "TV-läge · Endast visning"
   },
   "tvResults": {
     "title": "VI HAR EN VINNARE!",
@@ -7392,7 +7393,8 @@ const sv = {
       "exitToSite": "Lämna adminläget",
       "email": "E-post",
       "milogWords": "Milog-ord",
-      "teacherAccess": "Lärargång"
+      "teacherAccess": "Lärargång",
+      "schoolLeads": "Skolförfrågningar"
     },
     "teacherAccess": {
       "empty": "Inga begäranden",
@@ -7893,7 +7895,7 @@ const sv = {
   "tvTutorial": {
     "welcome": {
       "title": "Välkommen till TV-läge",
-      "description": "Perfekt för fester! Strömma till en stor skärm och låt alla spela."
+      "description": "Strömma till en stor skärm — spelarna tävlar på sina telefoner. Du är skärmen här, inte en spelare."
     },
     "qr": {
       "title": "QR-kod & Rumskod",
@@ -7910,6 +7912,10 @@ const sv = {
     "timer": {
       "title": "Speltimer",
       "description": "Nedräkningen visar hur mycket tid som återstår. Eldrundor ger extra spänning!"
+    },
+    "exit": {
+      "title": "Vill du spela?",
+      "description": "Du tittar bara på i TV-läge. För att gå med i spelet, tryck \"Byt till spelarläge\" i lobbyn."
     },
     "letsGo": "Kör igång!",
     "ariaLabel": "TV-läge handledning",

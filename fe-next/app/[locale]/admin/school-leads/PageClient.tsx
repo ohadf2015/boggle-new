@@ -11,18 +11,23 @@ import { AdminSubNav } from '@/components/admin/sidebar/AdminSubNav';
 import { SchoolLeadsQueue } from '@/components/admin/SchoolLeadsQueue';
 
 export function PageClient() {
-  const { profile, loading } = useAuth();
+  const { user, profile, isAdmin, loading } = useAuth();
   const { language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
 
+  // `loading` flips false when the session resolves, but `profile` is fetched
+  // afterwards — during that gap `profile` is null. Don't treat a real admin as
+  // non-admin (and bounce them home) before the profile has actually loaded.
+  const profileLoading = !loading && !!user && !profile;
+
   useEffect(() => {
-    if (!loading && !profile?.is_admin) {
+    if (!loading && !profileLoading && !isAdmin) {
       router.replace('/');
     }
-  }, [profile?.is_admin, loading, router]);
+  }, [isAdmin, loading, profileLoading, router]);
 
-  if (!profile?.is_admin) return null;
+  if (loading || profileLoading || !isAdmin) return null;
 
   return (
     <div className={cn('flex-1 flex flex-col w-full overflow-x-hidden min-h-screen bg-neo-navy text-neo-white', isRTL && 'rtl')}>
