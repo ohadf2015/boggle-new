@@ -591,6 +591,20 @@ const en = {
       "ogTitle": "Daily Challenge Archive - Every Past Puzzle | LexiClash",
       "ogDescription": "Explore past daily word puzzles with full stats and leaderboards — revisit any challenge."
     },
+    "report": {
+      "title": "Report",
+      "reason": "What's the problem?",
+      "reasons": {
+        "harassment": "Harassment or bullying",
+        "spam": "Spam or scam",
+        "inappropriate": "Inappropriate content",
+        "other": "Something else"
+      },
+      "detailsOptional": "Add details (optional)",
+      "submit": "Submit report",
+      "success": "Thanks — our team will review this.",
+      "error": "Couldn't submit report. Please try again."
+    },
     "friends": {
       "title": "Friends & Social - Play Word Games With Friends | LexiClash",
       "description": "Connect with friends on LexiClash! Send challenges, track friend activity, compete head-to-head, and climb together on the leaderboard.",

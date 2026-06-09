@@ -740,6 +740,20 @@ const sv = {
       "ogTitle": "Dagliga Utmaningens Arkiv - Alla Tidigare Pussel | LexiClash",
       "ogDescription": "Utforska tidigare dagliga ordpussel med statistik och topplistor — återbesök vilken utmaning som helst."
     },
+    "report": {
+      "title": "Rapportera",
+      "reason": "Vad är problemet?",
+      "reasons": {
+        "harassment": "Trakasserier eller mobbning",
+        "spam": "Skräppost eller bluff",
+        "inappropriate": "Olämpligt innehåll",
+        "other": "Något annat"
+      },
+      "detailsOptional": "Lägg till detaljer (valfritt)",
+      "submit": "Skicka rapport",
+      "success": "Tack — vårt team granskar detta.",
+      "error": "Det gick inte att skicka rapporten. Försök igen."
+    },
     "friends": {
       "title": "Vänner & Socialt - Spela Ordspel med Vänner | LexiClash",
       "description": "Anslut med vänner på LexiClash! Skicka utmaningar, följ vänners aktivitet och tävla mot varandra.",

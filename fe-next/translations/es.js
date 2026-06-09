@@ -575,6 +575,20 @@ const es = {
       "ogTitle": "Archivo del Desafio Diario - Todos los Puzzles | LexiClash",
       "ogDescription": "Explora puzzles diarios pasados con estadisticas y clasificaciones — revisita cualquier desafio."
     },
+    "report": {
+      "title": "Reportar",
+      "reason": "¿Cuál es el problema?",
+      "reasons": {
+        "harassment": "Acoso o intimidación",
+        "spam": "Spam o estafa",
+        "inappropriate": "Contenido inapropiado",
+        "other": "Otra cosa"
+      },
+      "detailsOptional": "Agrega detalles (opcional)",
+      "submit": "Enviar reporte",
+      "success": "Gracias, nuestro equipo lo revisará.",
+      "error": "No se pudo enviar el reporte. Inténtalo de nuevo."
+    },
     "friends": {
       "title": "Amigos y Social - Juega con Amigos | LexiClash",
       "description": "Conecta con amigos en LexiClash! Envia desafios, sigue la actividad de amigos y compite cara a cara.",

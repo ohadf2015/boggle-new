@@ -6,7 +6,7 @@
 import { getSupabase } from './supabaseServer';
 import logger from '../utils/logger';
 import type { Message } from '@/shared/types/friends';
-import { areFriends } from './friendsManager';
+import { areFriends, isBlocked } from './friendsManager';
 
 /**
  * Send a message to a friend
@@ -20,6 +20,11 @@ export async function sendMessage(
     const isFriend = await areFriends(senderId, recipientId);
     if (!isFriend) {
       return { success: false, errorCode: 'NOT_FRIENDS' };
+    }
+
+    // Social Apps policy: a block must sever messaging even if a stale friendship row lingers.
+    if (await isBlocked(senderId, recipientId)) {
+      return { success: false, errorCode: 'USER_BLOCKED' };
     }
 
     if (!message || message.trim().length === 0) {

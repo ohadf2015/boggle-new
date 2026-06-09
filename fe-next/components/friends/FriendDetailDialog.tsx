@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Target, Circle, UserMinus, ShieldOff } from 'lucide-react';
+import { Target, Circle, UserMinus, ShieldOff, Ban } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ interface FriendDetailDialogProps {
   onClose: () => void;
   onChallenge: (friend: Friend) => void;
   onUnfriend: (friendUserId: string) => Promise<{ success: boolean; error?: string } | void>;
+  onBlock?: (userId: string) => Promise<{ success: boolean; error?: string }>;
   onUnblock?: (userId: string) => Promise<{ success: boolean; error?: string }>;
   isBlockedUser?: boolean;
   isDark: boolean;
@@ -25,6 +26,7 @@ export function FriendDetailDialog({
   onClose,
   onChallenge,
   onUnfriend,
+  onBlock,
   onUnblock,
   isBlockedUser = false,
   isDark: _isDark,
@@ -53,6 +55,18 @@ export function FriendDetailDialog({
     setActionLoading(false);
     onClose();
   }, [friend, onUnfriend, onClose, confirmAction]);
+
+  const handleBlock = useCallback(async () => {
+    if (!friend || !onBlock) return;
+    if (confirmAction !== 'block') {
+      setConfirmAction('block');
+      return;
+    }
+    setActionLoading(true);
+    await onBlock(friend.odUserId);
+    setActionLoading(false);
+    onClose();
+  }, [friend, onBlock, onClose, confirmAction]);
 
   const handleUnblock = useCallback(async () => {
     if (!friend || !onUnblock) return;
@@ -196,7 +210,7 @@ export function FriendDetailDialog({
                       {t('common.cancel')}
                     </Button>
                     <Button
-                      onClick={handleUnfriend}
+                      onClick={confirmAction === 'block' ? handleBlock : handleUnfriend}
                       disabled={actionLoading}
                       className="px-4 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm font-black text-xs uppercase tracking-wide bg-neo-pink text-neo-white"
                     >
@@ -262,6 +276,21 @@ export function FriendDetailDialog({
                         <UserMinus className="w-4 h-4 stroke-3" aria-hidden="true" />
                       )}
                     </Button>
+                    {onBlock && (
+                      <Button
+                        onClick={handleBlock}
+                        disabled={actionLoading}
+                        className={cn(
+                          'flex items-center gap-2 px-4 py-3 rounded-neo',
+                          'border-3 border-neo-black shadow-hard',
+                          'bg-neo-red text-neo-white font-black uppercase tracking-wide',
+                          'hover:shadow-hard-lg hover:-translate-y-0.5 transition-all'
+                        )}
+                        aria-label={t('friends.block')}
+                      >
+                        <Ban className="w-4 h-4 stroke-3" aria-hidden="true" />
+                      </Button>
+                    )}
                   </>
                 )}
               </div>

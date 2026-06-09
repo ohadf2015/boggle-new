@@ -582,6 +582,20 @@ const ja = {
       "ogTitle": "デイリーチャレンジアーカイブ - 過去のすべてのパズル | LexiClash",
       "ogDescription": "過去のデイリーワードパズルを統計とリーダーボード付きで探索 — どのチャレンジも再訪問可能。"
     },
+    "report": {
+      "title": "報告",
+      "reason": "問題の内容は？",
+      "reasons": {
+        "harassment": "嫌がらせ・いじめ",
+        "spam": "スパム・詐欺",
+        "inappropriate": "不適切なコンテンツ",
+        "other": "その他"
+      },
+      "detailsOptional": "詳細を追加（任意）",
+      "submit": "報告を送信",
+      "success": "ありがとうございます。チームが確認します。",
+      "error": "報告を送信できませんでした。もう一度お試しください。"
+    },
     "friends": {
       "title": "フレンド＆ソーシャル - 友達とワードゲーム | LexiClash",
       "description": "LexiClashで友達とつながろう！チャレンジ送信、フレンド活動追跡、対戦、リーダーボードで競争。",
