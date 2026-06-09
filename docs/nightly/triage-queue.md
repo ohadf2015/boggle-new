@@ -464,3 +464,23 @@ All 5 items triaged with live evidence (Sentry MCP + Supabase SQL + Railway env)
 ### New experiment activated
 - `exp-mp-quickplay-wait-v1` added to typed registry (`fe-next/lib/experiments.ts`) targeting ES MP quickPlay rage clicks (24h: 23 rage clicks, score 0.768)
 - **Next step**: Create PostHog flag `exp-mp-quickplay-wait-v1` with 50/50 split. Wire the overlay variant in `MultiplayerFlow.tsx` — show "Finding a match..." full-screen overlay when `quickPlay && isJoining && variant === 'match-seeking'`. Deferred to next run (time budget).
+
+## 2026-06-09 (Lane 01 — triage)
+
+- [Supabase advisor] web_vitals — RLS INSERT policy `Anyone can insert web vitals` always-true WITH CHECK
+  - reach=0, severity=0.5, score=0.125
+  - status: deferred
+  - why: intentional design (anonymous vitals reporting) but exposes flood risk; should add row size/rate guard or document as accepted risk
+  - recommended owner: review-by-eod — consider adding `WITH CHECK (octet_length(data::text) < 4096)` or similar anti-flood guard
+
+- [Sentry] JAVASCRIPT-NEXTJS-1NE — "Invalid request: gameCode must be alphanumeric" (3 events, 0 users)
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1NE
+  - status: deferred
+  - why: benign user-input validation firing at route level; not a code bug; might be URL-encoded game codes or copy-paste artifacts
+  - recommended owner: self — low priority, verify if game code input should strip non-alphanumeric before validation
+
+- [Sentry] JAVASCRIPT-NEXTJS-14R — game_sessions check_constraint "check_player_id" violation (reach=0, severity=0.36)
+  - https://lexiclash.sentry.io/issues/119434883/
+  - status: deferred (not acted on this run — low reach, not in 24h window)
+  - why: constraint violation means log_game_session receives a null or malformed player_id; likely a timing issue where session is logged before auth resolves
+  - recommended owner: backend — add null guard in log_game_session before DB insert

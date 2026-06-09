@@ -179,6 +179,41 @@ export function trackMpFtue(args: {
   );
 }
 
+/** MP stuck-player coach: fires when one of the four help stages is shown.
+ *  Pairs with trackMpStuckCoachOutcome to answer "did the help work?". */
+export function trackMpStuckCoachShown(args: {
+  stage: string;
+  gamesPlayed: number;
+  isDesktop: boolean;
+}): void {
+  safe(() =>
+    (posthog.capture as PHFn)('mp_stuck_coach_shown', {
+      stage: args.stage,
+      mode: 'classic',
+      games_played: args.gamesPlayed,
+      is_desktop: args.isDesktop,
+    })
+  );
+}
+
+/** MP stuck-player coach outcome — the real "how did the player react" signal.
+ *  helped = a valid word landed within the show window; dismissed = manual close;
+ *  ignored = auto-hidden with no valid word. ms_to_valid present only when helped. */
+export function trackMpStuckCoachOutcome(args: {
+  stage: string;
+  outcome: 'helped' | 'dismissed' | 'ignored';
+  msToValid?: number;
+}): void {
+  safe(() =>
+    (posthog.capture as PHFn)('mp_stuck_coach_outcome', {
+      stage: args.stage,
+      mode: 'classic',
+      outcome: args.outcome,
+      ms_to_valid: args.msToValid,
+    })
+  );
+}
+
 /** CTA click with location — lets you build click-through funnels per surface. */
 export function trackCtaClicked(args: {
   ctaId: string;

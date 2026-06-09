@@ -35,6 +35,15 @@ export function TeacherAccessCTA() {
       >
         {t('education.landing.cta.button')}
       </Link>
+      <div data-cta-item className="mt-4 border-t border-neo-navy/20 pt-4">
+        <p className="text-sm font-bold text-neo-navy">{t('education.landing.districtCta.title')}</p>
+        <Link
+          href={`/${language}/education/for-schools`}
+          className="mt-1 inline-block text-sm font-bold text-neo-navy/70 underline underline-offset-2 transition-colors hover:text-neo-navy"
+        >
+          {t('education.landing.districtCta.button')} →
+        </Link>
+      </div>
     </aside>
   );
 }

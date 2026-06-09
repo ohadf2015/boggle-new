@@ -15,6 +15,8 @@ import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useSelectionStore, resetSelection, useFrozenWhileSelecting } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
+import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
+import { MPStuckCoachCard } from '@/components/game/ftue/MPStuckCoachCard';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -251,6 +253,21 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Tap-to-drag guidance
   const tapDragGuidance = useTapToDragGuidance();
 
+  // Desktop detection via pointer capability (no UA sniffing)
+  const isDesktop = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(pointer: fine)').matches;
+  }, []);
+
+  // Single FTUE arbiter for confused classic-MP players (idle / tap-only /
+  // fruitless-fiddle). One coordinator → never stacks popups, never nags veterans.
+  const stuckCoach = useMPStuckCoach({
+    active: gameActive && isPlaying && !showStartAnimation,
+    isClassic: gameMode === 'classic',
+    totalGamesPlayed: totalGamesPlayed ?? 0,
+    isDesktop,
+  });
+
   // Earthquake/fire round effects
   useEarthquakeEffects({
     earthquakeState,
@@ -468,6 +485,26 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     comboTypeRef,
   });
 
+  // Count every submit attempt so the coach can distinguish "spelling junk"
+  // (validity confusion) from "never submits" (gesture confusion).
+  const handleTrackedWordSubmit = useCallback(
+    (word: string, meta?: { inputMethod: 'kb' | 'drag' }) => {
+      stuckCoach.markSubmit();
+      handleGridWordSubmit(word, meta);
+    },
+    [stuckCoach, handleGridWordSubmit]
+  );
+
+  // A single tap that released on one tile = "clicking randomly" — feed the coach
+  // alongside the legacy tap-to-drag detector.
+  const handleSingleTap = useCallback(
+    (cell: { row: number; col: number; letter: string }) => {
+      stuckCoach.markTap();
+      tapDragGuidance.handleSingleTapDetected(cell);
+    },
+    [stuckCoach, tapDragGuidance]
+  );
+
   // Update fireRoundActiveRef when fireRoundActive changes
   useEffect(() => {
     fireRoundActiveRef.current = fireRoundActive;
@@ -484,6 +521,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     playWordAcceptedSound,
     playWordRejectedSound,
     playWordLengthSound,
+    onWordAccepted: stuckCoach.markAccepted,
   });
 
   // Keyboard word input
@@ -492,15 +530,9 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     language: gameLanguage || 'en',
     gameLanguage: gameLanguage,
     enabled: isPlaying && gameActive && !showStartAnimation,
-    onWordSubmit: handleGridWordSubmit,
+    onWordSubmit: handleTrackedWordSubmit,
     minWordLength,
   });
-
-  // Desktop detection via pointer capability (no UA sniffing)
-  const isDesktop = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(pointer: fine)').matches;
-  }, []);
 
   // Keyboard help state
   const keyboardHelp = useKeyboardHelpState({
@@ -511,9 +543,18 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Word change handler — pushes selection into useSelectionStore so only
   // WordFormingAreaConnected re-renders. InGameScreen + PortraitLayout no longer
   // re-render per cell entered during a drag.
+  const dragCountedRef = useRef(false);
   const handleWordChange = useCallback((word: string, count: number) => {
+    // Detect a real drag (path of 2+ tiles) once per gesture → feeds the coach's
+    // "builds words but never submits" signal. Reset when the path clears.
+    if (count === 0) {
+      dragCountedRef.current = false;
+    } else if (count >= 2 && !dragCountedRef.current) {
+      dragCountedRef.current = true;
+      stuckCoach.markDragStart();
+    }
     useSelectionStore.getState().setSelection(word, count);
-  }, []);
+  }, [stuckCoach]);
 
   // Shared props for layout components
   const sharedLayoutProps = {
@@ -542,10 +583,10 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     totalGamesPlayed,
     onExitRoom,
     onShowTutorial,
-    onWordSubmit: handleGridWordSubmit,
+    onWordSubmit: handleTrackedWordSubmit,
     onPathSubmit: handlePathSubmit,
     onWordChange: handleWordChange,
-    onSingleTapDetected: tapDragGuidance.handleSingleTapDetected,
+    onSingleTapDetected: handleSingleTap,
     hints,
     fireRoundRemaining,
     showDragTutorial: tapDragGuidance.showDragTutorial,
@@ -576,20 +617,31 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
 
   // Portrait/Desktop Layout
   return (
-    <PortraitLayout
-      {...sharedLayoutProps}
-      gameCode={gameCode}
-      isHost={isHost}
-      gameplayFocusMode={gameplayFocusMode}
-      deferredLeaderboard={deferredLeaderboard}
-      foundWords={normalizedFoundWords}
-      tournamentData={tournamentData}
-      totalBoardWords={totalBoardWords}
-      gameStatsRef={gameStatsRef}
-      inDesktopShell={inDesktopShell}
-    >
-      {children}
-    </PortraitLayout>
+    <>
+      <PortraitLayout
+        {...sharedLayoutProps}
+        gameCode={gameCode}
+        isHost={isHost}
+        gameplayFocusMode={gameplayFocusMode}
+        deferredLeaderboard={deferredLeaderboard}
+        foundWords={normalizedFoundWords}
+        tournamentData={tournamentData}
+        totalBoardWords={totalBoardWords}
+        gameStatsRef={gameStatsRef}
+        inDesktopShell={inDesktopShell}
+      >
+        {children}
+      </PortraitLayout>
+      {/* Stuck-player coach: fixed bottom-center, above the grid. Mobile + desktop. */}
+      {stuckCoach.visible && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex justify-center px-3">
+          <MPStuckCoachCard
+            stage={stuckCoach.stage}
+            onDismiss={() => stuckCoach.dismiss('manual')}
+          />
+        </div>
+      )}
+    </>
   );
 });
 

@@ -4568,3 +4568,69 @@ html[data-cosy='true'] .animate-neo-press {
 @media (prefers-reduced-motion: reduce) {
   .practice-hint-cell { animation: none; }
 }
+
+/* MP stuck-player coach drag diagram — wordless "drag across letters" explainer.
+   Self-contained (no asset), RTL-mirrored, silent under reduced-motion. */
+.mp-coach-diagram {
+  position: relative;
+  flex-shrink: 0;
+  width: 88px;
+  height: 32px;
+}
+.mp-coach-tiles {
+  display: flex;
+  gap: 4px;
+  height: 100%;
+  align-items: center;
+}
+.mp-coach-diagram[data-dir='rtl'] .mp-coach-tiles {
+  flex-direction: row-reverse;
+}
+.mp-coach-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgb(var(--neo-black));
+  border-radius: 6px;
+  background: rgb(var(--neo-cream));
+  color: rgb(var(--neo-black));
+  font-family: var(--font-fredoka, sans-serif);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+}
+.mp-coach-trace {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: #FF1493; /* neo-pink: the "finger" tracing the path */
+  box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.3);
+  animation: mp-coach-trace-ltr 2.4s ease-in-out infinite;
+}
+.mp-coach-trace-rtl {
+  left: auto;
+  right: 6px;
+  animation-name: mp-coach-trace-rtl;
+}
+@keyframes mp-coach-trace-ltr {
+  0%   { transform: translateX(0); opacity: 0; }
+  12%  { opacity: 1; }
+  85%  { transform: translateX(64px); opacity: 1; }
+  100% { transform: translateX(64px); opacity: 0; }
+}
+@keyframes mp-coach-trace-rtl {
+  0%   { transform: translateX(0); opacity: 0; }
+  12%  { opacity: 1; }
+  85%  { transform: translateX(-64px); opacity: 1; }
+  100% { transform: translateX(-64px); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mp-coach-trace { animation: none; left: 50%; margin-left: -6px; opacity: 1; }
+  .mp-coach-trace-rtl { right: auto; }
+}

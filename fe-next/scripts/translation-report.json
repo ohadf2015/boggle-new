@@ -1,23 +1,37 @@
 {
   "summary": {
-    "totalKeysInCode": 5605,
+    "totalKeysInCode": 5716,
     "keyCountByLanguage": {
-      "en": 10555,
-      "he": 10653,
-      "sv": 10656,
-      "ja": 10644,
-      "es": 10680
+      "en": 10777,
+      "he": 10855,
+      "sv": 10854,
+      "ja": 10836,
+      "es": 10876
     },
-    "missingFromEnglish": 34,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 24,
+      "templateLiterals": 26,
       "fallbackUsages": 0,
-      "variableKeys": 11
+      "variableKeys": 12
     }
   },
   "runtimeRisks": {
     "templateLiterals": [
+      {
+        "pattern": "curator.tier.${clamped}.label",
+        "file": "components/admin/CuratorTierBadge.tsx",
+        "line": 34,
+        "context": "const label = t(`curator.tier.${clamped}.label`);",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "curator.tier.${clamped}.desc",
+        "file": "components/admin/CuratorTierBadge.tsx",
+        "line": 39,
+        "context": "title={t(`curator.tier.${clamped}.desc`)}",
+        "type": "template_literal"
+      },
       {
         "pattern": "adventure.mechanic.${mechanic}",
         "file": "components/adventure/MechanicIndicator.tsx",
@@ -84,7 +98,7 @@
       {
         "pattern": "blast.combo.${detectedCombos[0].type}",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
-        "line": 159,
+        "line": 200,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU",
         "type": "template_literal"
       },
@@ -246,6 +260,14 @@
         "type": "variable_key"
       },
       {
+        "pattern": "t(message)",
+        "variable": "message",
+        "file": "components/practice/PracticeHelperBubble.tsx",
+        "line": 57,
+        "context": "{t(message)}",
+        "type": "variable_key"
+      },
+      {
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "file": "components/seasons/SeasonLeaderboardTabs.tsx",
@@ -286,346 +308,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "admin.live.disconnected",
-      "usages": [
-        {
-          "file": "components/admin/LiveMonitor.tsx",
-          "line": 479
-        }
-      ]
-    },
-    {
-      "key": "admin.live.host",
-      "usages": [
-        {
-          "file": "components/admin/LiveMonitor.tsx",
-          "line": 447
-        }
-      ]
-    },
-    {
-      "key": "admin.live.private",
-      "usages": [
-        {
-          "file": "components/admin/LiveMonitor.tsx",
-          "line": 458
-        }
-      ]
-    },
-    {
-      "key": "admin.live.stalled",
-      "usages": [
-        {
-          "file": "components/admin/LiveMonitor.tsx",
-          "line": 467
-        }
-      ]
-    },
-    {
-      "key": "admin.teacherAccess.empty",
-      "usages": [
-        {
-          "file": "components/admin/TeacherAccessQueue.tsx",
-          "line": 86
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.acquisition",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 84
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.botsNa",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 72
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.country",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 109
-        },
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 105
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.device",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 79
-        },
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 116
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.duration",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 94
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.error",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 134
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.errors",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 31
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.gameCode",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 26
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.invitedBy",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 87
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.mode",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 56
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.platform",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 111
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.players",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 67
-        },
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 40
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.posthog",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 127
-        },
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 149
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.profile",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 133
-        },
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 155
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.result",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 99
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.session",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 138
-        },
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 160
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.detail.winner",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameDetailPanel.tsx",
-          "line": 103
-        },
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 76
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.noData",
-      "usages": [
-        {
-          "file": "components/admin/today-games/TodayGamesHistory.tsx",
-          "line": 143
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.source.analyticsAll",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 113
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.source.hint",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 111
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.source.label",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 110
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.source.noLanguage",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 69
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.source.productTables",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GamesFilters.tsx",
-          "line": 114
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.status.abandoned",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/VirtualGamesList.tsx",
-          "line": 153
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.status.completed",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/VirtualGamesList.tsx",
-          "line": 152
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.status.errored",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 79
-        },
-        {
-          "file": "components/admin/today-games/components/VirtualGamesList.tsx",
-          "line": 154
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.status.left",
-      "usages": [
-        {
-          "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
-          "line": 82
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.truncated",
-      "usages": [
-        {
-          "file": "components/admin/today-games/TodayGamesHistory.tsx",
-          "line": 124
-        }
-      ]
-    },
-    {
-      "key": "admin.todayGames.unclassifiedModes",
-      "usages": [
-        {
-          "file": "components/admin/today-games/TodayGamesHistory.tsx",
-          "line": 116
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "seo.wordCraft.title",
@@ -730,6 +413,26 @@
       "asyncChallenge.result.bodyWin",
       "asyncChallenge.result.bodyLoss",
       "asyncChallenge.result.bodyTie",
+      "admin.nav.schoolLeads",
+      "admin.schoolLeads.title",
+      "admin.schoolLeads.subtitle",
+      "admin.schoolLeads.count.total",
+      "admin.schoolLeads.count.pricing",
+      "admin.schoolLeads.count.large",
+      "admin.schoolLeads.filter_role_all",
+      "admin.schoolLeads.filter_size_all",
+      "admin.schoolLeads.filter_interest_all",
+      "admin.schoolLeads.refresh",
+      "admin.schoolLeads.empty",
+      "admin.schoolLeads.page",
+      "admin.schoolLeads.export_csv",
+      "admin.schoolLeads.col.date",
+      "admin.schoolLeads.col.school",
+      "admin.schoolLeads.col.contact",
+      "admin.schoolLeads.col.role",
+      "admin.schoolLeads.col.size",
+      "admin.schoolLeads.col.interests",
+      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",
@@ -791,6 +494,10 @@
       "blast.close",
       "blast.concept.gotIt",
       "blast.concept.tag",
+      "blast.concept.anyRow.title",
+      "blast.concept.anyRow.body",
+      "blast.concept.verticalWords.title",
+      "blast.concept.verticalWords.body",
       "blast.settings.tutorials",
       "notifications.teacherAccess.title",
       "notifications.teacherAccess.count.pending",
@@ -925,6 +632,26 @@
       "mp.reconnect.attempt",
       "mp.reconnect.giveUp",
       "mp.reconnect.title",
+      "admin.nav.schoolLeads",
+      "admin.schoolLeads.title",
+      "admin.schoolLeads.subtitle",
+      "admin.schoolLeads.count.total",
+      "admin.schoolLeads.count.pricing",
+      "admin.schoolLeads.count.large",
+      "admin.schoolLeads.filter_role_all",
+      "admin.schoolLeads.filter_size_all",
+      "admin.schoolLeads.filter_interest_all",
+      "admin.schoolLeads.refresh",
+      "admin.schoolLeads.empty",
+      "admin.schoolLeads.page",
+      "admin.schoolLeads.export_csv",
+      "admin.schoolLeads.col.date",
+      "admin.schoolLeads.col.school",
+      "admin.schoolLeads.col.contact",
+      "admin.schoolLeads.col.role",
+      "admin.schoolLeads.col.size",
+      "admin.schoolLeads.col.interests",
+      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",
@@ -945,6 +672,12 @@
       "admin.sendError"
     ],
     "ja": [
+      "mpCoach.idleNudge",
+      "mpCoach.tapHint",
+      "mpCoach.submitHint",
+      "mpCoach.validityHint",
+      "mpCoach.dismiss",
+      "mpCoach.sampleWord",
       "wordTower.sabotage.watchAd",
       "wordTower.sabotage.adEarned",
       "seo.wordCraft.title",
@@ -1002,6 +735,10 @@
       "blast.close",
       "blast.concept.gotIt",
       "blast.concept.tag",
+      "blast.concept.anyRow.title",
+      "blast.concept.anyRow.body",
+      "blast.concept.verticalWords.title",
+      "blast.concept.verticalWords.body",
       "blast.settings.tutorials",
       "notifications.teacherAccess.title",
       "notifications.teacherAccess.count.pending",
@@ -1136,6 +873,26 @@
       "mp.reconnect.attempt",
       "mp.reconnect.giveUp",
       "mp.reconnect.title",
+      "admin.nav.schoolLeads",
+      "admin.schoolLeads.title",
+      "admin.schoolLeads.subtitle",
+      "admin.schoolLeads.count.total",
+      "admin.schoolLeads.count.pricing",
+      "admin.schoolLeads.count.large",
+      "admin.schoolLeads.filter_role_all",
+      "admin.schoolLeads.filter_size_all",
+      "admin.schoolLeads.filter_interest_all",
+      "admin.schoolLeads.refresh",
+      "admin.schoolLeads.empty",
+      "admin.schoolLeads.page",
+      "admin.schoolLeads.export_csv",
+      "admin.schoolLeads.col.date",
+      "admin.schoolLeads.col.school",
+      "admin.schoolLeads.col.contact",
+      "admin.schoolLeads.col.role",
+      "admin.schoolLeads.col.size",
+      "admin.schoolLeads.col.interests",
+      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",
@@ -1156,6 +913,12 @@
       "admin.sendError"
     ],
     "es": [
+      "mpCoach.idleNudge",
+      "mpCoach.tapHint",
+      "mpCoach.submitHint",
+      "mpCoach.validityHint",
+      "mpCoach.dismiss",
+      "mpCoach.sampleWord",
       "wordTower.sabotage.watchAd",
       "wordTower.sabotage.adEarned",
       "seo.wordCraft.title",
@@ -1181,10 +944,6 @@
       "wordHunt.results.wordsFound",
       "blast.tutorial.unlock.gotIt",
       "blast.tutorial.unlock.skipFuture",
-      "blast.complete.chainLabel",
-      "blast.complete.gemsLabel",
-      "blast.complete.timeLabel",
-      "blast.complete.wordsLabel",
       "blast.hint.label",
       "blast.chest.avatarSuffix",
       "blast.chest.boostSuffix",
@@ -1198,6 +957,10 @@
       "blast.close",
       "blast.concept.gotIt",
       "blast.concept.tag",
+      "blast.concept.anyRow.title",
+      "blast.concept.anyRow.body",
+      "blast.concept.verticalWords.title",
+      "blast.concept.verticalWords.body",
       "blast.settings.tutorials",
       "notifications.teacherAccess.title",
       "notifications.teacherAccess.count.pending",
@@ -1332,6 +1095,26 @@
       "mp.reconnect.attempt",
       "mp.reconnect.giveUp",
       "mp.reconnect.title",
+      "admin.nav.schoolLeads",
+      "admin.schoolLeads.title",
+      "admin.schoolLeads.subtitle",
+      "admin.schoolLeads.count.total",
+      "admin.schoolLeads.count.pricing",
+      "admin.schoolLeads.count.large",
+      "admin.schoolLeads.filter_role_all",
+      "admin.schoolLeads.filter_size_all",
+      "admin.schoolLeads.filter_interest_all",
+      "admin.schoolLeads.refresh",
+      "admin.schoolLeads.empty",
+      "admin.schoolLeads.page",
+      "admin.schoolLeads.export_csv",
+      "admin.schoolLeads.col.date",
+      "admin.schoolLeads.col.school",
+      "admin.schoolLeads.col.contact",
+      "admin.schoolLeads.col.role",
+      "admin.schoolLeads.col.size",
+      "admin.schoolLeads.col.interests",
+      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",

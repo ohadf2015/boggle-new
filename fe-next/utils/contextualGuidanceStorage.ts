@@ -27,6 +27,8 @@ export interface GuidanceState {
   firstPlayTutorialCompleted: boolean;
   /** Whether the user has seen the multiplayer "How to Play" tutorial modal */
   multiplayerTutorialShown: boolean;
+  /** Whether the in-game MP stuck-player coach has been shown (one-shot across sessions) */
+  stuckCoachShown: boolean;
 }
 
 const DEFAULT_STATE: GuidanceState = {
@@ -39,6 +41,7 @@ const DEFAULT_STATE: GuidanceState = {
   dragTutorialShown: false,
   firstPlayTutorialCompleted: false,
   multiplayerTutorialShown: false,
+  stuckCoachShown: false,
 };
 
 /**

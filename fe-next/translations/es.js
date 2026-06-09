@@ -1,5 +1,13 @@
 // Es translations
 const es = {
+  "mpCoach": {
+    "idleNudge": "Arrastra sobre las letras para formar una palabra",
+    "tapHint": "Mantén y arrastra sobre las letras, luego suelta para enviar",
+    "submitHint": "Levanta el dedo de la última letra para enviar la palabra",
+    "validityHint": "Las letras deben conectarse — forma una palabra real, 2 letras o más",
+    "dismiss": "Entendido",
+    "sampleWord": "SOL"
+  },
   "crossword": {
     "name": "Crucigrama",
     "tagline": "Rellena la cuadrícula, pista a pista",

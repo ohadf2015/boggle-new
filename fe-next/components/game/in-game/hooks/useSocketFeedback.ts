@@ -19,6 +19,8 @@ interface UseSocketFeedbackOptions {
   playWordRejectedSound: () => void;
   /** Optional bespoke per-length flavor sound, fired in addition to the accept chime. */
   playWordLengthSound?: (length: number) => void;
+  /** Fired when the server confirms a valid word — used by the stuck-player coach. */
+  onWordAccepted?: () => void;
 }
 
 /**
@@ -34,6 +36,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     playWordAcceptedSound,
     playWordRejectedSound,
     playWordLengthSound,
+    onWordAccepted,
   } = options;
 
   useEffect(() => {
@@ -50,6 +53,8 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     }): void => {
       // Track when the last word was found for inactivity-based trail visibility
       setLastWordFoundTime(Date.now());
+      // A valid word landed — let the stuck-player coach mark success / "helped".
+      onWordAccepted?.();
       const wordLen = data.word.length;
       const longWordLabel = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
       setCurrentFeedback({
@@ -168,5 +173,5 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);
     };
-  }, [socket, isPlaying, t, setCurrentFeedback, setLastWordFoundTime, playWordAcceptedSound, playWordRejectedSound, playWordLengthSound]);
+  }, [socket, isPlaying, t, setCurrentFeedback, setLastWordFoundTime, playWordAcceptedSound, playWordRejectedSound, playWordLengthSound, onWordAccepted]);
 }

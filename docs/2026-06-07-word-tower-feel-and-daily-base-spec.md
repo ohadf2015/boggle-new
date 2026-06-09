@@ -91,3 +91,29 @@ local dev env was too unstable to get there: recurring Turbopack cache corruptio
 anti-pattern (prior Word Tower "feel" passes shipped blind and were rejected), a blind
 physics edit is the wrong move. WS3 needs a session where the unstable state can be watched
 in motion (record video; drive ≥5 bad-timed drops). WS1 + WS2 ship independently.
+
+### WS3 partial fix SHIPPED (2026-06-07): building no longer shakes on word-reject
+
+`fix(word-tower): stop shaking the building when a word is rejected` (HEAD 177efeeb5).
+The scene rattled the **whole Pixi tower** (`shakeX`) on every rejected word (`errorKey`) —
+which fires constantly while experimenting with letters — semantically wrong (a typo isn't
+tower damage) and the most *frequent* "building shakes for no reason" event. The error is
+already shown where the mistake is (HUD word-builder: red shake + message + haptic + sound),
+so the tower now stays solid; only real structural events (topple/hazard, landing impacts)
+move it. Justified without motion review because it removes inappropriate, redundant feedback.
+
+**Remaining WS3 (still needs motion review):** the crane↔tower vertical disconnect; whether
+the persistent lean + ambient sway amplitudes feel right; framing more of the built tower.
+These are motion/iteration-dependent — left for a session with observable playback.
+
+**NEW finding (2026-06-07, from a dev-debug seam attempt):** I added a temporary dev-only
+`?wtdebug=floors,lean,inst` seam to render a tall/unstable tower instantly, then reverted it
+because the Pixi **camera always follows the TOP of the tower** — it frames the newest floor
+against open sky, so synthetic floors render *below* the viewport and a base-pivoted lean
+rotates an off-screen stack (invisible in a still). That camera behavior is itself a likely
+root of the "feels weird / not a building" complaint: **the player never sees the whole
+tower** — only the topmost floor or two floating against empty sky, which reads as abstract
+tiles, not a building you've built. A real WS3 fix should consider (a) framing more of the
+built tower (zoom-to-fit or a persistent mini-tower), and (b) whether the base-pivot lean is
+even legible when the base is off-screen. A redone debug seam must also force the camera to
+the base (or zoom out) to be useful for visual testing.

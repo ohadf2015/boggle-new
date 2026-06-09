@@ -1,5 +1,13 @@
 // Ja translations
 const ja = {
+  "mpCoach": {
+    "idleNudge": "文字をなぞって単語を作ろう",
+    "tapHint": "文字を押しながらなぞり、指を離して送信しよう",
+    "submitHint": "最後の文字で指を離すと単語が送信されます",
+    "validityHint": "文字はつながっている必要があります。実在する2文字以上の単語を作ろう",
+    "dismiss": "OK",
+    "sampleWord": "さくら"
+  },
   "crossword": {
     "name": "クロスワード",
     "tagline": "ヒントを頼りにマスを埋めよう",
