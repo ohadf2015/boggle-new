@@ -4,6 +4,26 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-06-09 (lane-03 engagement)
+
+### [Flags] Stale experiments — human decision needed
+
+- **`share-prompt-timing`** (69d, PostHog id 163656) — call site: `SinglePlayerResults.tsx:173` via `usePostHogFlag`. ~0 PostHog exposures (flag evaluates, SDK event may not fire correctly). Recommend: retire + keep `results-page` variant (status quo). Action: delete flag in PostHog UI + remove `usePostHogFlag` call in `SinglePlayerResults.tsx` + delete `useSharePromptImpression.ts`.
+
+- **`show-signup-after-first-win`** (68d, PostHog id 163655) — call site: `useSignupPrompt.ts:61`. Inconclusive (low exposures, no p<0.05 winner). Recommend: retire + keep `after-first-win` variant. Action: delete flag in PostHog UI + unwire conditional in `useSignupPrompt.ts`.
+
+- **`mp-signup-nudge-copy-v1`** (32d, PostHog id 183230) — call site: `useMultiplayerSignupNudge.ts`. 0/77 conversions in 28d. Tracking gap suspected (signup_completed not attributable to sheet within 30min). Recommend: fix tracking first, then re-evaluate at 60d. Action: verify `signup_completed{source:'mp_sheet'}` fires correctly before retiring.
+
+- **`adventure-difficulty-tuning`** (PostHog id 163657, inactive) — no active code consumption found. Safe to delete in PostHog UI.
+
+### [Experiment] `exp-mp-quickplay-wait-v1` — code wired, PostHog flag NOT YET CREATED
+
+- Code fully wired in `MultiplayerFlow.tsx` (overlay + exposure tracking + `mp_quickplay_seeking`), `PageClient.tsx` (`mp_quickplay_joined`), `QuickPlaySeekingOverlay.tsx`.
+- **ACTION REQUIRED**: Create PostHog feature flag `exp-mp-quickplay-wait-v1`, variants `control` / `match-seeking`, 50/50 rollout. Until created, all users get `control`.
+- Hypothesis: full-screen "Finding a match…" overlay cuts rage clicks on `/multiplayer?quickPlay=true` by ≥50%. Conversion = `mp_quickplay_joined`. Guardrail = `mp_quickplay_initiated` must not drop.
+
+---
+
 ## 2026-06-02 (lane-03 engagement)
 
 ### [Flags] Prior entries corrected — call sites ARE present
