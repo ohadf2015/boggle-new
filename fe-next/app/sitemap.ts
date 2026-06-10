@@ -185,6 +185,26 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     });
   });
 
+  // ─── WordCraft marketing landing (English-only target; non-EN hreflang → the
+  //     localized playable game at /word-craft) ───
+  routes.push({
+    url: `${BASE_URL}/en/word-craft-landing`,
+    lastModified: LAST_DEPLOYED,
+    changeFrequency: 'weekly',
+    priority: 0.8,
+    alternates: {
+      languages: {
+        'x-default': `${BASE_URL}/en/word-craft-landing`,
+        en: `${BASE_URL}/en/word-craft-landing`,
+        he: `${BASE_URL}/he/word-craft`,
+        sv: `${BASE_URL}/sv/word-craft`,
+        ja: `${BASE_URL}/ja/word-craft`,
+        es: `${BASE_URL}/es/word-craft`,
+      },
+    },
+    images: [`${BASE_URL}/og-image-en.webp`],
+  });
+
   // ─── Hebrew dedicated education landing (HE primary market) ───
   routes.push({
     url: `${BASE_URL}/he/hebrew-classroom-vocabulary-games`,
