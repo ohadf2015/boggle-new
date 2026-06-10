@@ -1,9 +1,10 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import toast from 'react-hot-toast';
 import type { TeacherAccessRequest } from '@/lib/education/types';
+import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
 
 interface Props { row: TeacherAccessRequest; onClose: () => void; onActioned: () => void; }
 
@@ -12,7 +13,24 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
   const [note, setNote] = useState(row.admin_note || '');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Live render of the approval welcome email so the admin can see exactly how
+  // their personal note will appear to the applicant before sending.
+  const email = useMemo(
+    () => teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale, message: note }),
+    [row.full_name, row.locale, note],
+  );
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(email.html);
+      toast.success(t('admin.teacherAccess.copy_success', 'Email HTML copied to clipboard'));
+    } catch {
+      toast.error(t('admin.teacherAccess.copy_error', 'Failed to copy email'));
+    }
+  }
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -73,10 +91,38 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
         <div className="mt-4">
           <label htmlFor="admin-note" className="font-semibold">{t('admin.teacherAccess.admin_note')}</label>
           <textarea id="admin-note" rows={3} value={note} onChange={(e) => setNote(e.target.value)}
-            className="mt-1 w-full rounded border-2 border-slate-300 p-2 text-sm" />
+            className="mt-1 w-full rounded border-2 border-slate-300 bg-white p-2 text-sm text-neo-navy placeholder:text-slate-400" />
           <p className="mt-1 text-xs text-slate-500">
             {t('admin.teacherAccess.note_hint', 'On approve, this note is included in the welcome email to the applicant. On decline, it’s used as the reason.')}
           </p>
+        </div>
+        <div className="mt-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <button type="button" onClick={() => setShowPreview((v) => !v)}
+              className="rounded-lg border-2 border-neo-navy px-3 py-2 text-sm font-bold text-neo-navy">
+              {showPreview
+                ? t('admin.teacherAccess.hide_preview', 'Hide preview')
+                : t('admin.teacherAccess.show_preview', 'Preview email')}
+            </button>
+            <button type="button" onClick={copyEmail}
+              className="rounded-lg border-2 border-neo-navy px-3 py-2 text-sm font-bold text-neo-navy">
+              {t('admin.teacherAccess.copy_email', 'Copy email HTML')}
+            </button>
+          </div>
+          {showPreview && (
+            <div className="mt-3 rounded-lg border-2 border-slate-300 p-3">
+              <p className="text-xs font-semibold text-slate-500">
+                {t('admin.teacherAccess.preview_subject', 'Subject')}
+              </p>
+              <p className="mb-2 text-sm font-bold text-neo-navy">{email.subject}</p>
+              <iframe
+                title={t('admin.teacherAccess.preview_title', 'Email preview')}
+                srcDoc={email.html}
+                sandbox=""
+                className="h-96 w-full rounded border border-slate-200 bg-white"
+              />
+            </div>
+          )}
         </div>
         {err && <p role="alert" className="mt-3 text-neo-red">{err}</p>}
         {row.status === 'pending' && (
