@@ -29,6 +29,10 @@ export interface MpDropEvent {
     language: string;
     /** Whole seconds the player was in the game before dropping; null if start was never recorded. */
     durationSec: number | null;
+    /** Whole seconds since the room was created (its lobby lifetime at drop time). Unlike
+     *  durationSec this is ALWAYS present — it is the only wait-time signal for a `waiting`
+     *  drop (durationSec is null there), i.e. the solo-host-abandons-empty-lobby case. */
+    lobbyWaitSec: number;
     /** Human (non-bot) seats at drop time, including the dropping player. */
     humanPlayers: number;
     isMultiplayer: boolean;
@@ -50,6 +54,8 @@ function buildDrop(
       ? Math.max(0, Math.round((now - game.gameStartedAt) / 1000))
       : null;
 
+  const lobbyWaitSec = Math.max(0, Math.round((now - game.createdAt) / 1000));
+
   return {
     distinctId: username,
     event: 'mp_player_dropped',
@@ -60,6 +66,7 @@ function buildDrop(
       gameState: game.gameState,
       language: game.language,
       durationSec,
+      lobbyWaitSec,
       humanPlayers,
       isMultiplayer: humanPlayers >= 2,
       wasHost: game.users[username]?.isHost ?? false,

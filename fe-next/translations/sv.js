@@ -1770,6 +1770,11 @@ const sv = {
     "playersInRoom": "Spelare i rummet",
     "noOneYet": "Ingen ännu?",
     "startingWithBots": "Startar med bottar om",
+    "soloPrompt": {
+      "title": "Ingen här än?",
+      "subtitle": "Kör igång mot bottar nu — eller dela din kod och vänta på att vänner ansluter.",
+      "cta": "Spela mot bottar"
+    },
     "allReadyAutoStart": "Alla är redo! Startar om {seconds}…",
     "playersWaitingNudge": "{count}/{total} spelare redo — starta spelet!",
     "addBot": "Lägg till bot",

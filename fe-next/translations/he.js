@@ -1704,6 +1704,11 @@ const he = {
     "playersInRoom": "שחקנים בחדר",
     "noOneYet": "עוד אף אחד?",
     "startingWithBots": "מתחיל עם בוטים בעוד",
+    "soloPrompt": {
+      "title": "עדיין אף אחד כאן?",
+      "subtitle": "התחילו עכשיו נגד בוטים — או שתפו את הקוד וחכו שחברים יצטרפו.",
+      "cta": "שחק נגד בוטים"
+    },
     "allReadyAutoStart": "כולם מוכנים! מתחילים בעוד {seconds}…",
     "playersWaitingNudge": "{count}/{total} שחקנים מוכנים — התחילו את המשחק!",
     "addBot": "הוסף בוט",

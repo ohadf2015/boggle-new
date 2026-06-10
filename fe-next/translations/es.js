@@ -1688,6 +1688,11 @@ const es = {
     "playersInRoom": "Jugadores en la sala",
     "noOneYet": "¿Nadie aún?",
     "startingWithBots": "Empezando con bots en",
+    "soloPrompt": {
+      "title": "¿Aún no hay nadie?",
+      "subtitle": "Empieza ya contra bots, o comparte tu código y espera a que se unan tus amigos.",
+      "cta": "Jugar contra bots"
+    },
     "allReadyAutoStart": "¡Todos listos! Empezando en {seconds}…",
     "playersWaitingNudge": "{count}/{total} jugadores listos — ¡empieza la partida!",
     "addBot": "Añadir Bot",

@@ -15,6 +15,9 @@ import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import { GAME_PRESETS } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
 import { MobileShareSection } from './pre-game/MobileShareSection';
+import { SoloPlayPrompt } from './pre-game/SoloPlayPrompt';
+import { shouldShowSoloPlayPrompt } from '@/lib/multiplayer/soloHostPrompt';
+import { trackSoloPlayPrompt } from '@/utils/posthogEngagement';
 import { PlayerRoster } from './pre-game/PlayerRoster';
 import { BattleModeCard } from './pre-game/BattleModeCard';
 import { AdvancedSettingsModal } from './pre-game/AdvancedSettingsModal';
@@ -358,6 +361,31 @@ function HostPreGameView({
     onStartGame();
   }, [humanGuestCount, socket, onStartGame]);
 
+  // Solo-host rescue prompt: shown vs hidden is a single derived condition so the
+  // render and the "shown" telemetry agree. Gated on !isPrivate to match the alone-
+  // timer exclusion (a classroom/invite host waits on specific humans, not bots).
+  const showSoloPrompt = shouldShowSoloPlayPrompt({
+    humanGuestCount,
+    gameState,
+    botCountdownActive: botCountdown !== null,
+    isPrivate,
+  });
+
+  // Fire `shown` once per host session the moment the prompt first appears — the
+  // head of the shown→clicked→game_started funnel that lets us read whether it works.
+  const soloPromptShownRef = useRef(false);
+  useEffect(() => {
+    if (showSoloPrompt && !soloPromptShownRef.current) {
+      soloPromptShownRef.current = true;
+      trackSoloPlayPrompt({ event: 'shown' });
+    }
+  }, [showSoloPrompt]);
+
+  const handleSoloPlayVsBots = useCallback(() => {
+    trackSoloPlayPrompt({ event: 'clicked' });
+    handleStartClick();
+  }, [handleStartClick]);
+
   // Bot countdown banner
   const renderBotCountdown = (): React.ReactElement | null => {
     if (botCountdown === null) return null;
@@ -409,6 +437,15 @@ function HostPreGameView({
         )}
       </m.div>
     );
+  };
+
+  // Solo-host rescue: a host alone in the lobby is the dominant MP pre-game drop.
+  // Show an immediate, explicit "play vs bots" CTA in place of the silent dead-air
+  // window — stands down once a bot-fill countdown is already running (its banner
+  // then owns the messaging) or a human guest arrives.
+  const renderSoloPrompt = (): React.ReactElement | null => {
+    if (!showSoloPrompt) return null;
+    return <SoloPlayPrompt onPlayVsBots={handleSoloPlayVsBots} t={t} />;
   };
 
   // Some — but not all — guests are ready: nudge the host to start (no auto-fire).
@@ -536,6 +573,7 @@ function HostPreGameView({
               <>
                 <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
                 <AnimatePresence>{renderAutoStartBanner()}</AnimatePresence>
+                <AnimatePresence>{renderSoloPrompt()}</AnimatePresence>
                 <div className="animate-fade-in-up shrink-0 rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard px-4 pt-2.5 pb-3 overflow-visible">
                   <PlayerRoster
                     players={filteredPlayersForDisplay}
@@ -604,6 +642,7 @@ function HostPreGameView({
             <div className="max-w-[600px] mx-auto px-4 py-3 gap-3 flex flex-col pb-3">
               <AnimatePresence>{renderBotCountdown()}</AnimatePresence>
               <AnimatePresence>{renderAutoStartBanner()}</AnimatePresence>
+              <AnimatePresence>{renderSoloPrompt()}</AnimatePresence>
               <PlayerRoster
                 players={filteredPlayersForDisplay}
                 username={username}

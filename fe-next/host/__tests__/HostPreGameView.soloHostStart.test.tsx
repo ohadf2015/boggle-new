@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import React from 'react';
-import { act, render } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import HostPreGameView from '../components/HostPreGameView';
 
 const emitMock = vi.fn();
@@ -226,5 +226,61 @@ describe('HostPreGameView passive bot auto-fill timer (alone host)', () => {
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeUndefined();
+  });
+});
+
+/**
+ * Integration: the "play vs bots" prompt must actually be ON SCREEN for a solo
+ * public host — not merely rendered in component isolation. Two prior backend
+ * fixes (solo-vs-bots start, auto-start) shipped green and the drop number did
+ * not move precisely because they made the engine capable without telling the
+ * host; this surface is the communication. If it doesn't render, the fix is moot.
+ */
+describe('HostPreGameView solo "play vs bots" prompt visibility', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    capturedStartProps = null;
+  });
+
+  const cta = 'hostView.soloPrompt.cta'; // mockT echoes the key
+
+  it('renders the play-vs-bots card for a PUBLIC host alone in the lobby', () => {
+    render(<HostPreGameView {...baseProps} isPrivate={false} />);
+    expect(screen.getByText(cta)).toBeInTheDocument();
+  });
+
+  it('renders the card for a PLAYING host alone (hostPlaying=true, host in roster)', () => {
+    render(
+      <HostPreGameView
+        {...baseProps}
+        hostPlaying={true}
+        playersReady={[{ username: 'Host', isHost: true }]}
+      />,
+    );
+    expect(screen.getByText(cta)).toBeInTheDocument();
+  });
+
+  it('does NOT render the card once a human guest is present', () => {
+    render(
+      <HostPreGameView
+        {...baseProps}
+        playersReady={[{ username: 'Guest', isHost: false }]}
+      />,
+    );
+    expect(screen.queryByText(cta)).not.toBeInTheDocument();
+  });
+
+  it('does NOT render the card for a PRIVATE/classroom host (they wait on specific humans)', () => {
+    render(<HostPreGameView {...baseProps} isPrivate={true} />);
+    expect(screen.queryByText(cta)).not.toBeInTheDocument();
+  });
+
+  it('pressing the card CTA fills bots and starts the game', () => {
+    render(<HostPreGameView {...baseProps} isPrivate={false} />);
+    act(() => { screen.getByText(cta).click(); });
+
+    const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
+    expect(setAutoFill).toEqual(['setAutoFill', { enabled: true, targetCount: 3 }]);
+    expect(baseProps.onStartGame).toHaveBeenCalled();
   });
 });

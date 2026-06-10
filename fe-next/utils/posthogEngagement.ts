@@ -214,6 +214,26 @@ export function trackMpStuckCoachOutcome(args: {
   );
 }
 
+/** Solo-host "play vs bots" rescue prompt — the surface that counters the dominant
+ *  MP pre-game drop (solo host abandons the empty lobby). `shown` fires once when an
+ *  alone host first sees it; `clicked` when they take the bot-start. The shown→clicked
+ *  →game_started funnel is the fast read of whether the prompt works (aggregate
+ *  waiting-drops are ~5-8/day, too noisy to read success off directly). */
+export function trackSoloPlayPrompt(args: {
+  event: 'shown' | 'clicked';
+  lobbyWaitSec?: number;
+}): void {
+  safe(() =>
+    (posthog.capture as PHFn)(
+      args.event === 'shown' ? 'mp_solo_prompt_shown' : 'mp_solo_prompt_play_vs_bots',
+      {
+        mode: 'classic',
+        lobby_wait_sec: args.lobbyWaitSec,
+      }
+    )
+  );
+}
+
 /** CTA click with location — lets you build click-through funnels per surface. */
 export function trackCtaClicked(args: {
   ctaId: string;

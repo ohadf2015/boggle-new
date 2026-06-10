@@ -80,6 +80,34 @@ describe('buildMpDropEvent', () => {
     expect(ev.properties.durationSec).toBeNull();
   });
 
+  it('records lobbyWaitSec as whole seconds since the room was created', () => {
+    const game = makeGame({ createdAt: 100_000 });
+    const ev = buildMpDropEvent(game, 'alice', 'transport close', 134_400);
+    // (134400 - 100000) / 1000 = 34.4 → rounded 34
+    expect(ev.properties.lobbyWaitSec).toBe(34);
+  });
+
+  it('still reports lobbyWaitSec for a WAITING-state drop where durationSec is null (the solo-host abandon case)', () => {
+    // The dominant drop: a solo host alone in the lobby leaves before any game starts.
+    // durationSec is null (game never started) but we still want to know how long they
+    // sat in the dead lobby before bailing — that is what lobbyWaitSec measures.
+    const game = makeGame({
+      gameState: 'waiting',
+      gameStartedAt: undefined,
+      createdAt: 100_000,
+      users: { alice: makeUser({ username: 'alice', isHost: true }) },
+    });
+    const ev = buildMpDropEvent(game, 'alice', 'transport close', 118_000);
+    expect(ev.properties.durationSec).toBeNull();
+    expect(ev.properties.lobbyWaitSec).toBe(18);
+  });
+
+  it('clamps lobbyWaitSec to 0 when now precedes createdAt (clock skew)', () => {
+    const game = makeGame({ createdAt: 200_000 });
+    const ev = buildMpDropEvent(game, 'alice', 'ping timeout', 150_000);
+    expect(ev.properties.lobbyWaitSec).toBe(0);
+  });
+
   it('clamps durationSec to 0 when now precedes gameStartedAt (clock skew)', () => {
     const game = makeGame({ gameStartedAt: 200_000 });
     const ev = buildMpDropEvent(game, 'alice', 'ping timeout', 150_000);
@@ -190,6 +218,22 @@ describe('buildHostLeftDropEvents', () => {
 
     expect(byName.host.properties.durationSec).toBe(30); // (130000 - 100000)/1000, NOT room-lifetime 150
     expect(byName.bob.properties.durationSec).toBe(150); // played to close
+  });
+
+  it('records lobbyWaitSec from createdAt per player drop moment', () => {
+    const game = makeGame({
+      createdAt: 100_000,
+      users: {
+        host: makeUser({ username: 'host', isHost: true, disconnectedAt: 130_000 }),
+        bob: makeUser({ username: 'bob' }),
+      },
+    });
+
+    const evs = buildHostLeftDropEvents(game, 250_000);
+    const byName = Object.fromEntries(evs.map((e) => [e.distinctId, e]));
+
+    expect(byName.host.properties.lobbyWaitSec).toBe(30); // (130000 - 100000)/1000
+    expect(byName.bob.properties.lobbyWaitSec).toBe(150); // (250000 - 100000)/1000
   });
 
   it('returns no events for a room with only bots left', () => {

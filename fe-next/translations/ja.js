@@ -1672,6 +1672,11 @@ const ja = {
     "playersInRoom": "ルーム内のプレイヤー",
     "noOneYet": "まだ誰もいない？",
     "startingWithBots": "ボットで開始まで",
+    "soloPrompt": {
+      "title": "まだ誰もいない？",
+      "subtitle": "今すぐボットと対戦しよう — またはコードを共有して友達の参加を待とう。",
+      "cta": "ボットと対戦"
+    },
     "allReadyAutoStart": "全員準備完了！{seconds}秒後に開始…",
     "playersWaitingNudge": "{count}/{total} 人が準備完了 — ゲームを開始！",
     "addBot": "ボット追加",
