@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
+import { DistrictUpsellBanner } from '@/components/teacher/DistrictUpsellBanner';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -66,7 +67,12 @@ function TeacherDashboardInner() {
     );
   }
 
-  return <TeacherDashboard />;
+  return (
+    <>
+      <DistrictUpsellBanner t={t} language={language} />
+      <TeacherDashboard />
+    </>
+  );
 }
 
 import { TeacherGate } from '@/components/education/TeacherGate';

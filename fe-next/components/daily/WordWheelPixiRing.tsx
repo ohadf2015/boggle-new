@@ -50,7 +50,7 @@ export default function WordWheelPixiRing({
         autoDensity: true,
       });
 
-      if (destroyed) { app.destroy(true, { children: true }); return; }
+      if (destroyed) { try { app.destroy(true, { children: true }); } catch { /* already destroyed by cleanup */ } return; }
       el.appendChild(app.canvas);
 
       const orbitGfx = new Graphics();

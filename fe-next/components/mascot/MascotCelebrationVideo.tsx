@@ -35,7 +35,8 @@ interface VariantConfig {
 
 const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
   champion: {
-    srcs: ['/mascots/celebration-champion.mp4'],
+    // Original + previous variants + latest post-feedback improved version (stronger cube fidelity + trophy physical comedy)
+    srcs: ['/mascots/celebration-champion.mp4', '/mascots/celebration-champion-2.mp4', '/mascots/celebration-champion-3.mp4'],
     tone: 'yellow-orange',
     intensity: 'bold',
     defaultTitle: 'CHAMPION!',
@@ -53,7 +54,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#00FFFF', '#FF1493', '#FFFFFF'],
   },
   defeat: {
-    srcs: ['/mascots/celebration-defeat.mp4'],
+    // Original + previous + latest post-feedback (witty charming trip + instant friendly GG recovery)
+    srcs: ['/mascots/celebration-defeat.mp4', '/mascots/celebration-defeat-2.mp4', '/mascots/celebration-defeat-3.mp4'],
     tone: 'purple-pink',
     intensity: 'subtle',
     defaultTitle: 'GG',
@@ -62,9 +64,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#8B5CF6', '#FF1493', '#FFFFFF'],
   },
   bingo: {
-    // Swapped from celebration-bingo.mp4 → celebration-bingo.mp4 stays; bingo
-    // is already the most production-grade celebration.
-    srcs: ['/mascots/celebration-bingo.mp4'],
+    // Original + previous + latest post-feedback (7-tile juggle snap + big eureka spin + cool pose)
+    srcs: ['/mascots/celebration-bingo.mp4', '/mascots/celebration-bingo-2.mp4', '/mascots/celebration-bingo-3.mp4'],
     tone: 'pink-cyan',
     intensity: 'bold',
     defaultTitle: 'BINGO!',
@@ -73,7 +74,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#FF1493', '#00FFFF', '#FFE135', '#FFFFFF'],
   },
   knight: {
-    srcs: ['/mascots/celebration-knight.mp4'],
+    // Original + previous + latest post-feedback (pencil knight charge + helmet slip klutz + peace sign)
+    srcs: ['/mascots/celebration-knight.mp4', '/mascots/celebration-knight-2.mp4', '/mascots/celebration-knight-3.mp4'],
     tone: 'pink-cyan',
     intensity: 'medium',
     defaultTitle: 'VICTORY!',
@@ -82,7 +84,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#FF1493', '#00FFFF', '#FFFFFF'],
   },
   streak: {
-    srcs: ['/mascots/celebration-streak.mp4'],
+    // Original + previous + latest post-feedback (flame surf + sash + air-guitar with strong energy)
+    srcs: ['/mascots/celebration-streak.mp4', '/mascots/celebration-streak-2.mp4', '/mascots/celebration-streak-3.mp4'],
     tone: 'lime-cyan',
     intensity: 'bold',
     defaultTitle: 'ON FIRE!',
@@ -91,11 +94,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#BFFF00', '#00FFFF', '#FFE135'],
   },
   explorer: {
-    // 2026-05-26: Swapped from celebration-explorer.mp4 (felt low-energy for
-    // the first-daily-of-the-day beat). celebration-knight.mp4 is the more
-    // dynamic generic-victory render and lands better as the player's first
-    // celebration of the day.
-    srcs: ['/mascots/celebration-knight.mp4'],
+    // Still powered by knight variants (latest post-feedback knight-3 included for more variety)
+    srcs: ['/mascots/celebration-knight.mp4', '/mascots/celebration-knight-2.mp4', '/mascots/celebration-knight-3.mp4'],
     tone: 'pink-cyan',
     intensity: 'bold',
     defaultTitle: 'NICE FIND!',
@@ -104,7 +104,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#00FFFF', '#FF1493', '#BFFF00', '#FFFFFF'],
   },
   'mission-complete': {
-    srcs: ['/mascots/celebration-mission-complete.mp4'],
+    // Original + previous + latest post-feedback (broom sweep into chest + throne sit + big wave)
+    srcs: ['/mascots/celebration-mission-complete.mp4', '/mascots/celebration-mission-complete-2.mp4', '/mascots/celebration-mission-complete-3.mp4'],
     tone: 'yellow-orange',
     intensity: 'bold',
     defaultTitle: 'ALL CLEAR!',

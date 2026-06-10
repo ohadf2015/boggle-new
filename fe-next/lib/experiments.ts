@@ -364,6 +364,27 @@ export const EXPERIMENTS = {
     description:
       'Quick Play joining overlay. match-seeking = full-screen "Finding a match..." overlay while isJoining=true during ?quickPlay auto-join. control = dimmed button only. Reduces rage clicks on /multiplayer?quickPlay=true. Conversion = mp_quickplay_joined.',
   }),
+
+  /**
+   * Invite arrival clarity for returning users. When a returning user lands
+   * on the homepage with ?room=XXX, the current flow renders a blank navy div
+   * (line 130 PageClient.tsx) while the client-side redirect fires. On slower
+   * connections the SSR HTML is visible before hydration, causing rage clicks.
+   *
+   * control = current blank navy overlay (status quo).
+   * status-card = a "Connecting…" card with spinner so the user knows the
+   *   redirect is in flight — reduces confusion rage-clicks on invite URLs.
+   *
+   * Conversion: invite_redirect_fired → invite_consumed (successful room join).
+   * Guardrail: invite_room_dead must not rise (don't mask failures).
+   * Ship to PostHog: flag key = 'exp-invite-arrival-clarity-v1', 50/50 rollout.
+   */
+  'exp-invite-arrival-clarity-v1': defineExperiment({
+    variants: ['control', 'status-card'] as const,
+    default: 'control',
+    description:
+      'Invite arrival for returning users. control = blank navy overlay while redirect fires. status-card = "Connecting…" card + spinner so user knows redirect is in flight. Targets rage clicks on ?room= invite URLs. Conversion = invite_redirect_fired → invite_consumed.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

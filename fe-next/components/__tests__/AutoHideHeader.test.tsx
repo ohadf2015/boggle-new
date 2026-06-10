@@ -34,26 +34,36 @@ describe('AutoHideHeader', () => {
     expect(queryByTestId('header-mounted')).not.toBeNull();
   });
 
-  it('returns null during TV fullscreen', () => {
+  it('hides header (no header-mounted) during TV fullscreen but keeps spacer to prevent CLS', () => {
     mockIsTvFullscreen = true;
-    const { queryByTestId } = render(<AutoHideHeader />);
+    const { queryByTestId, container } = render(<AutoHideHeader />);
     expect(queryByTestId('header-mounted')).toBeNull();
+    expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull();
   });
 
-  it('returns null during active gameplay', () => {
+  it('hides header (no header-mounted) during active gameplay but keeps spacer to prevent CLS', () => {
     mockIsInGame = true;
-    const { queryByTestId } = render(<AutoHideHeader />);
+    const { queryByTestId, container } = render(<AutoHideHeader />);
     expect(queryByTestId('header-mounted')).toBeNull();
+    expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull();
   });
 
-  it('returns null on CrazyGames platform — CG provides its own chrome and the in-app header has no menu/auth/dropdown to render anyway', () => {
+  it('returns null (no spacer) on CrazyGames platform — CG provides its own chrome; spacer would create visible empty band', () => {
     mockIsOnCrazyGamesPlatform = true;
-    const { queryByTestId } = render(<AutoHideHeader />);
+    const { queryByTestId, container } = render(<AutoHideHeader />);
     expect(queryByTestId('header-mounted')).toBeNull();
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
   });
 
   it('reports visibility=false through onVisibilityChange when on CrazyGames', () => {
     mockIsOnCrazyGamesPlatform = true;
+    const onVisibilityChange = vi.fn();
+    render(<AutoHideHeader onVisibilityChange={onVisibilityChange} />);
+    expect(onVisibilityChange).toHaveBeenCalledWith(false);
+  });
+
+  it('reports visibility=false through onVisibilityChange during active gameplay', () => {
+    mockIsInGame = true;
     const onVisibilityChange = vi.fn();
     render(<AutoHideHeader onVisibilityChange={onVisibilityChange} />);
     expect(onVisibilityChange).toHaveBeenCalledWith(false);

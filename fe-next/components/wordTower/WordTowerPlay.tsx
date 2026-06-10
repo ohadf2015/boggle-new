@@ -37,6 +37,7 @@ import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 import { WordTowerStatHud } from './WordTowerStatHud';
+import { getTowerArchitectTier } from '@/lib/wordTower/architectTier';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
 
 /** Verdict-pop colour by band — mirrors the swinging-beam tint families. */
@@ -85,6 +86,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
   const { game } = tower.state;
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
+  const architectTier = useMemo(() => getTowerArchitectTier(game.floors), [game.floors]);
   const personalBest = Math.max(personalBestM, game.heightM);
   // Near-miss anticipation: a quiet "Next: Aurora · 18m" chip in the last stretch
   // before a new zone (the zone-entry banner pays it off).
@@ -633,6 +635,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             floorsCount={game.floors.length}
             personalBestM={personalBest}
             combo={game.combo}
+            tier={architectTier}
             t={t}
           />
         </div>

@@ -27,22 +27,25 @@ describe('MascotCelebrationVideo', () => {
     vi.useRealTimers();
   });
 
-  it('renders the champion variant src for kind="champion"', () => {
+  it('renders a champion variant src for kind="champion" (supports multiple clips for variety)', () => {
     render(<MascotCelebrationVideo kind="champion" />);
     const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
-    expect(video?.getAttribute('src')).toBe('/mascots/celebration-champion.mp4');
+    const src = video?.getAttribute('src') || '';
+    expect(src).toMatch(/celebration-champion(-[23])?\.mp4$/);
   });
 
-  it('renders the bingo variant src for kind="bingo"', () => {
+  it('renders a bingo variant src for kind="bingo" (supports multiple clips for variety)', () => {
     render(<MascotCelebrationVideo kind="bingo" />);
     const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
-    expect(video?.getAttribute('src')).toBe('/mascots/celebration-bingo.mp4');
+    const src = video?.getAttribute('src') || '';
+    expect(src).toMatch(/celebration-bingo(-[23])?\.mp4$/);
   });
 
-  it('renders the streak variant src for kind="streak"', () => {
+  it('renders a streak variant src for kind="streak" (supports multiple clips for variety)', () => {
     render(<MascotCelebrationVideo kind="streak" />);
     const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
-    expect(video?.getAttribute('src')).toBe('/mascots/celebration-streak.mp4');
+    const src = video?.getAttribute('src') || '';
+    expect(src).toMatch(/celebration-streak(-[23])?\.mp4$/);
   });
 
   it('exposes data-kind for analytics/E2E selection', () => {
@@ -149,12 +152,12 @@ describe('MascotCelebrationVideo', () => {
     expect(sparkles.length).toBeGreaterThanOrEqual(6);
   });
 
-  it('uses the upgraded video file for the "explorer" first-visit-today kind', () => {
-    // The original celebration-explorer.mp4 felt low-energy for the daily first-visit
-    // beat. Swapped to celebration-knight.mp4 — a more impressive generic victory
-    // render that lands better as the player's first celebration of the day.
+  it('uses a knight-family video for the "explorer" first-visit-today kind (supports variety clips)', () => {
+    // Knight variants (original + new witty knight-2) power explorer; dynamic and energetic
+    // for the player's first daily celebration of the day.
     render(<MascotCelebrationVideo kind="explorer" />);
     const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
-    expect(video?.getAttribute('src')).toBe('/mascots/celebration-knight.mp4');
+    const src = video?.getAttribute('src') || '';
+    expect(src).toMatch(/celebration-knight(-[23])?\.mp4$/);
   });
 });

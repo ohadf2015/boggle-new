@@ -13,11 +13,17 @@ const SITE_URL = 'https://www.lexiclash.live';
 const BLOG_POSTS = [
     { slug: '10-surprising-benefits-word-games', title: '10 Benefits of Word Games - Science-Backed Brain Benefits' },
     { slug: 'best-boggle-alternatives-2026', title: 'Best Boggle Alternatives 2026' },
+    { slug: 'boggle-vs-scrabble', title: 'Boggle vs Scrabble: Honest Verdict After Years of Both (2026)' },
+    { slug: 'boggle-vs-wordle', title: "Boggle vs Wordle in 2026: I Played Both Daily — Here's My Verdict" },
+    { slug: 'boggle-vs-words-with-friends', title: 'Boggle vs Words With Friends 2026 - Real-Time vs Async Word Game Comparison' },
     { slug: 'daily-challenge-strategies', title: 'Daily Word Game Strategies - Tips to Beat the Puzzle' },
+    { slug: 'free-word-games-online', title: 'Free Word Games Online: The Honest Guide (No Pay-to-Win, 2026)' },
     { slug: 'hebrew-word-games-guide', title: 'Hebrew Word Games Guide - Playing Right-to-Left' },
     { slug: 'improve-word-game-skills', title: 'Improve Word Game Skills - Free Boggle & Word Puzzle Tips' },
+    { slug: 'most-popular-word-games-2026', title: 'The Most Popular Online Word Games of 2026 — and Why They Exploded' },
     { slug: 'multilingual-word-learning', title: 'Learn Languages Through Word Games' },
     { slug: 'multiplayer-word-games-social', title: 'Why Playing Word Games With Friends Hits Different' },
+    { slug: 'netflix-word-game-2026-rise', title: 'Netflix Just Dropped a Word Game — 2026 Is the Year Word Games Took Over' },
     { slug: 'science-behind-word-games', title: 'Word Games & Brain Health - Scientific Benefits Explained' },
     { slug: 'top-player-secrets', title: '7 Word Game Secrets Top Players Use' },
     { slug: 'vocabulary-building-strategies', title: 'Vocabulary Building Strategies - 500 Words in 30 Days' },
@@ -26,6 +32,11 @@ const BLOG_POSTS = [
     { slug: 'word-games-and-mental-health', title: 'Word Games & Mental Health - How They Help With Anxiety' },
     { slug: 'word-games-for-brain-training', title: 'Word Games for Brain Training - What the Research Says' },
     { slug: 'word-games-for-kids-education', title: 'Word Games for Education - Why Teachers Need Them in 2026' },
+    { slug: 'milat-hayom-habit', title: 'מילת היום: איך משחק קטן של שלוש דקות הופך להרגל של שנה שלמה' },
+    { slug: 'mishachke-milim-chinuch', title: 'משחקי מילים בכיתה: מה קורה כשמורה לעברית מחליפה דף עבודה במשחק' },
+    { slug: 'juegos-palabras-gratis', title: 'Juegos de Palabras Gratis 2026: Cómo Detectar las Trampas en 30 Segundos' },
+    { slug: 'alternativas-a-scrabble', title: 'Alternativas a Scrabble: 4 Juegos de Palabras que Realmente Valen la Pena' },
+    { slug: 'ordspel-familjer', title: 'Ordspel för Familjer: Hur Vi Hittade Något Att Göra Tillsammans Som Faktiskt Funkar' },
 ];
 
 const EXPERTISE = [

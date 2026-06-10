@@ -1471,6 +1471,20 @@ export const trackInviteRoomDead = (props: { roomCode: string }): void => {
   } catch { /* silent — posthog not initialised */ }
 };
 
+// Fires when a returning user's client-side redirect to /multiplayer fires.
+// Fills the funnel gap between invite_landed and invite_consumed for returning
+// users (new users fire invite_consumed via useInviteOnboardingMode instead).
+interface InviteRedirectFiredProps {
+  roomCode: string;
+  variant: string; // exp-invite-arrival-clarity-v1 variant
+}
+
+export const trackInviteRedirectFired = (props: InviteRedirectFiredProps): void => {
+  try {
+    posthog.capture('invite_redirect_fired', props);
+  } catch { /* silent */ }
+};
+
 interface PracticePendingBannerProps {
   roomCode: string;
   secondsOnPracticeHub: number;

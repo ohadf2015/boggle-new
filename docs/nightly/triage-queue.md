@@ -504,3 +504,32 @@ All 5 items triaged with live evidence (Sentry MCP + Supabase SQL + Railway env)
   - status: deferred (not acted on this run — low reach, not in 24h window)
   - why: constraint violation means log_game_session receives a null or malformed player_id; likely a timing issue where session is logged before auth resolves
   - recommended owner: backend — add null guard in log_game_session before DB insert
+
+## 2026-06-10
+- [Sentry] TypeError: Cannot read properties of null (reading 'clear') (JAVASCRIPT-NEXTJS-1CW)
+  - first seen: 2026-06-06, last seen: 2026-06-09, reach: 5 users
+  - link: https://lexiclash.sentry.io/issues/120102540/
+  - status: shipped (WordWheelPixiRing.tsx:53 try/catch fix)
+  - why: double-destroy race — app unmounts before init resolves, bare second destroy call
+  - recommended owner: review-by-eod
+
+- [Supabase] Signed-In Users Can Execute SECURITY DEFINER Function — upsert_player_word
+  - migration: 20260429160000_atomic_upsert_player_and_community_words.sql
+  - link: https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
+  - status: deferred
+  - why: authenticated users call this during in-game word submission — REVOKE would break gameplay; needs audit of whether SECURITY INVOKER is safe (function likely elevates to bypass RLS for community word writes)
+  - recommended owner: backend
+
+- [Sentry] Error: churn-signals report failed with status 502 (JAVASCRIPT-NEXTJS-1KQ)
+  - last seen: 2026-06-05, reach: 3 events (all admin user)
+  - link: https://lexiclash.sentry.io/issues/124871662/
+  - status: already fixed — getBearerUser.ts fast-path JWT verify eliminates Railway proxy timeout
+  - why: noting for closure; can mark resolved in Sentry
+  - recommended owner: self
+
+- [Sentry] Error: relation "profiles" does not exist at POST /api/coins (JAVASCRIPT-NEXTJS-1JR)
+  - last seen: 2026-05-27 (stale), reach: 5 events
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred
+  - why: /api/coins/route.ts uses `.from('n')` (not 'profiles'); error suggests a search_path issue in a SECURITY DEFINER function on the server path. Needs DB audit of which function queries 'profiles' without schema-qualifying. Stale (May 27) — may be self-healed by a prior migration fix.
+  - recommended owner: backend

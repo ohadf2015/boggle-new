@@ -4,10 +4,12 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
-import { trackInviteLanded } from '@/utils/growthTracking';
+import { trackInviteLanded, trackInviteRedirectFired } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { LandingView } from '@/components/landing';
 import { detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
+import { useExperiment } from '@/hooks/useExperiment';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 // Denylist: allow only Latin/accented/Hebrew/Hiragana/Katakana + space/apostrophe/hyphen
@@ -46,8 +48,8 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // the friends activity feed) and drop straight into the MP lobby. New users
   // still flow through FTUE — `useInviteOnboardingMode` consumes the invite
   // from sessionStorage and routes after profile completion.
-  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null }>(() => {
-    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null };
+  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null }>(() => {
+    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null };
     const returning = hasCompletedOnboarding() || hasSupabaseSession();
     const params = new URLSearchParams(window.location.search);
     const roomCode = params.get('room');
@@ -70,9 +72,12 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         inviteRedirectUrl = `/${locale}/multiplayer?${redirectParams.toString()}`;
       }
     }
-    return { isNewUser: !returning, inviteRedirectUrl };
+    return { isNewUser: !returning, inviteRedirectUrl, inviteRoomCode: roomCode };
   });
-  const { isNewUser, inviteRedirectUrl } = initialState;
+  const { isNewUser, inviteRedirectUrl, inviteRoomCode } = initialState;
+
+  const { variant: clarityVariant, trackExposure: trackClarityExposure } = useExperiment('exp-invite-arrival-clarity-v1');
+  const { t } = useLanguage();
 
   // Same-origin relative path captured from `?next=` so a play surface
   // (e.g. /practice) can redirect first-timers here, finish FTUE, then route
@@ -123,10 +128,24 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   }, [pendingNext, router]);
 
   useEffect(() => {
-    if (inviteRedirectUrl) router.replace(inviteRedirectUrl);
-  }, [inviteRedirectUrl, router]);
+    if (inviteRedirectUrl && inviteRoomCode) {
+      trackClarityExposure();
+      trackInviteRedirectFired({ roomCode: inviteRoomCode, variant: clarityVariant });
+      router.replace(inviteRedirectUrl);
+    }
+  }, [inviteRedirectUrl, inviteRoomCode, clarityVariant, trackClarityExposure, router]);
 
   if (inviteRedirectUrl) {
+    if (clarityVariant === 'status-card') {
+      return (
+        <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 rounded-full border-4 border-neo-lime border-t-transparent animate-spin" />
+            <span className="font-neo-body text-neo-cream text-sm">{t('joinView.connectingToRoom')}</span>
+          </div>
+        </div>
+      );
+    }
     return <div className="fixed inset-0 bg-neo-navy z-50" />;
   }
 

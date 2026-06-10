@@ -3,6 +3,7 @@
 import { Flame } from 'lucide-react';
 import { comboMult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
+import type { ArchitectTier } from '@/lib/wordTower/architectTier';
 
 interface Props {
   heightM: number;
@@ -11,6 +12,8 @@ interface Props {
   personalBestM: number;
   /** Live combo chain — shows a streak chip (×mult) once it's above 1. */
   combo: number;
+  /** Mastery tier based on rare-letter usage + word variety. */
+  tier?: ArchitectTier | null;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -21,7 +24,13 @@ interface Props {
  * the live combo streak chip the old corner card lacked (the multiplier used to
  * flash only in the transient reward popup).
  */
-export function WordTowerStatHud({ heightM, biomeId, floorsCount, personalBestM, combo, t }: Props) {
+const TIER_CLASS: Record<ArchitectTier, string> = {
+  Apprentice: 'bg-neo-cyan text-black',
+  Journeyman: 'bg-neo-purple text-neo-white',
+  Master: 'bg-neo-yellow text-black',
+};
+
+export function WordTowerStatHud({ heightM, biomeId, floorsCount, personalBestM, combo, tier, t }: Props) {
   const mult = comboMult(combo);
   return (
     <div className="pointer-events-none flex flex-col items-center rounded-neo border-neo border-black bg-neo-navy/85 px-3 py-1 text-center shadow-hard-sm backdrop-blur-sm">
@@ -38,6 +47,11 @@ export function WordTowerStatHud({ heightM, biomeId, floorsCount, personalBestM,
       <span className="font-neo-body text-[10px] uppercase leading-tight tracking-wider text-neo-cyan">
         {t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}
       </span>
+      {tier && (
+        <span className={`mt-0.5 rounded-sm border border-black px-1.5 py-px font-neo-display text-[9px] font-black uppercase leading-none tracking-wide ${TIER_CLASS[tier]}`}>
+          {t(`wordTower.tier.${tier.toLowerCase()}`)}
+        </span>
+      )}
       {personalBestM > 0 && (
         <span className="font-neo-body text-[10px] font-bold leading-tight text-neo-yellow">
           {t('wordTower.hud.best', { m: Math.round(personalBestM) })}
