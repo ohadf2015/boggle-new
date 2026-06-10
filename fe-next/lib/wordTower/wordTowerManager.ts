@@ -103,11 +103,22 @@ export function generateTray(
   return out;
 }
 
-function pickAnchor(gameCode: string, playerId: string, language: Language): string {
-  const bag = [...(WORD_TOWER_LETTER_BAGS[language] || '')];
-  if (bag.length === 0) return '';
+// Letters too low-yield to be a fair COLD-OPEN anchor (the very first chain link
+// has no prior context, so a rare starter can strand the player on word #1). The
+// frequency-weighted bag already makes these rare; this guarantees they never
+// open a daily. Mid-run anchors are unaffected — only the initial pick filters.
+const WEAK_ANCHOR_LETTERS: Record<Language, string> = {
+  en: 'QZX', sv: 'QZXWC', es: 'QZXWK', he: 'זטצ', ja: '', fr: 'QZXWK', de: 'QXY',
+};
+
+function pickAnchor(gameCode: string, playerId: string, language: Language, avoidWeak = false): string {
+  const full = [...(WORD_TOWER_LETTER_BAGS[language] || '')];
+  if (full.length === 0) return '';
+  const weak = avoidWeak ? (WEAK_ANCHOR_LETTERS[language] || '') : '';
+  const bag = weak ? full.filter((c) => !weak.includes(c)) : full;
+  const pool = bag.length > 0 ? bag : full;
   const rng = mulberry32(hashString(`word-tower-${gameCode}-${playerId}-anchor`));
-  return bag[Math.floor(rng() * bag.length)];
+  return pool[Math.floor(rng() * pool.length)];
 }
 
 // --- buildability: word must be formable from the tray, with the anchor letter
@@ -216,10 +227,12 @@ export interface InitOpts {
   gameCode: string;
   playerId: string;
   language: Language;
+  /** Daily: exclude low-yield letters from the COLD-OPEN anchor (no Q/Z/X strand). */
+  avoidWeakAnchor?: boolean;
 }
 
 export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
-  const { gameCode, playerId, language } = opts;
+  const { gameCode, playerId, language, avoidWeakAnchor } = opts;
   return {
     gameCode,
     playerId,
@@ -227,7 +240,7 @@ export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
     floors: [],
     heightM: 0,
     combo: 0,
-    anchorLetter: pickAnchor(gameCode, playerId, language),
+    anchorLetter: pickAnchor(gameCode, playerId, language, avoidWeakAnchor),
     tray: generateTray(gameCode, playerId, language, 0),
     scramblesLeft: WORD_TOWER_SCRAMBLES_START,
     scramblesEarned: 0,

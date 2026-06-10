@@ -40,10 +40,14 @@ export function useCraneDrop(
   commit: (multiplier: number) => void,
   hazard: (floors: number, kind: HazardKind, ids: string[]) => void,
   mods: PerkModifiers = NO_MODIFIERS,
+  /** Word-aware height × for the held word (daily mutator). Default 1 = no twist. */
+  wordHeightMult: () => number = () => 1,
 ) {
   // Keep perk modifiers current without re-creating the stable onDrop callback.
   const modsRef = useRef(mods);
   modsRef.current = mods;
+  const wordMultRef = useRef(wordHeightMult);
+  wordMultRef.current = wordHeightMult;
 
   const sloppyRef = useRef(0);
   const perfectRef = useRef(0);
@@ -80,7 +84,8 @@ export function useCraneDrop(
         o.quality === 'perfect'
           ? o.heightMultiplier * (1 + perfectStreakBonus(perfectRef.current) + m.perfectBonus)
           : o.heightMultiplier;
-      commit(base * m.heightMult);
+      // The day's word-aware twist (golden letter / vowels / length) rides on top.
+      commit(base * m.heightMult * wordMultRef.current());
 
       // A topple lands from the usual miss-after-grace OR a fumbled clutch — but
       // `reinforced` can hold it back, and `cushion`/`featherfall` make the crane

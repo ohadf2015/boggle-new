@@ -67,7 +67,7 @@ export function WordTowerGame() {
     let cancelled = false;
 
     if (daily) {
-      const opts = { gameCode: dailyTowerGameCode(), playerId: DAILY_PLAYER_ID, language };
+      const opts = { gameCode: dailyTowerGameCode(), playerId: DAILY_PLAYER_ID, language, avoidWeakAnchor: true };
       let best = 0;
       try { best = Number(localStorage.getItem(`wt-daily-best-${utcDateKey()}`)) || 0; } catch { /* */ }
       setProgress({ initialGame: restoreWordTowerState(opts, null), personalBestM: best });

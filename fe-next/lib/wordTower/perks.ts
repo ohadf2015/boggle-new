@@ -89,6 +89,22 @@ export function reducedTopple(floors: number, mods: PerkModifiers): number {
 }
 
 /**
+ * Fold a partial modifier set (e.g. a daily mutator's structural effects) onto a
+ * base PerkModifiers, COMBINING by each field's own algebra rather than a naive
+ * spread: multipliers multiply, additive bonuses add, booleans OR. So a
+ * skyline-rush day stacks ON TOP of a tallTimber perk instead of clobbering it.
+ */
+export function combineModifiers(base: PerkModifiers, extra: Partial<PerkModifiers>): PerkModifiers {
+  return {
+    perfectBonus: base.perfectBonus + (extra.perfectBonus ?? 0),
+    heightMult: base.heightMult * (extra.heightMult ?? 1),
+    toppleReduction: base.toppleReduction + (extra.toppleReduction ?? 0),
+    brinkExtra: base.brinkExtra + (extra.brinkExtra ?? 0),
+    wobbleImmune: base.wobbleImmune || (extra.wobbleImmune ?? false),
+  };
+}
+
+/**
  * The milestone index newly crossed between `prevHeightM` and `nextHeightM`, or
  * null if none — i.e. the player just passed a fresh PERK_MILESTONE_STEP_M
  * boundary and a draft should open. (Returns the highest crossed index.)
