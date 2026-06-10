@@ -13449,6 +13449,7 @@ const he = {
       "captureYou": "כבשת {{count}} — +{{bonus}}!",
       "captureBot": "הבוט כבש {{count}} — +{{bonus}}!"
     },
+    "combo": "קומבו",
     "duel": {
       "playFriend": "שחק נגד חבר",
       "passPlay": "באותה התקן — העבר וחסום",

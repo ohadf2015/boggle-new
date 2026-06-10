@@ -12949,6 +12949,7 @@ const ja = {
       "captureYou": "{{count}} 占領 — +{{bonus}}!",
       "captureBot": "ボットが {{count}} 占領 — +{{bonus}}!"
     },
+    "combo": "コンボ",
     "duel": {
       "playFriend": "友達と対戦する",
       "passPlay": "同じ端末 — パス＆プレイ",

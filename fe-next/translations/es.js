@@ -13045,6 +13045,7 @@ const es = {
       "captureYou": "¡Capturaste {{count}} — +{{bonus}}!",
       "captureBot": "¡El bot capturó {{count}} — +{{bonus}}!"
     },
+    "combo": "Combo",
     "duel": {
       "playFriend": "Juega contra un amigo",
       "passPlay": "Mismo dispositivo — Pasa y bloquea",

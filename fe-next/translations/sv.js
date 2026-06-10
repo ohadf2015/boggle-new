@@ -13043,6 +13043,7 @@ const sv = {
       "captureYou": "Erövrade {{count}} — +{{bonus}}!",
       "captureBot": "Boten erövrade {{count}} — +{{bonus}}!"
     },
+    "combo": "Kombo",
     "duel": {
       "playFriend": "Spela mot en vän",
       "passPlay": "Samma enhet — Skicka och blockera",
