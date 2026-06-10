@@ -28,6 +28,7 @@ import { POST as approve } from '../[id]/approve/route';
 import { POST as decline } from '../[id]/decline/route';
 import { GET as list } from '../route';
 import { createClient } from '@/utils/supabase/server';
+import { sendEmail } from '@/lib/email/send';
 
 const req = (body?: any) => new Request('http://t', { method: 'POST', body: body ? JSON.stringify(body) : undefined });
 
@@ -44,6 +45,24 @@ describe('admin teacher-access endpoints', () => {
     const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en' };
     const sb = mockSupabase(adminProfile, row);
     (createClient as any).mockReturnValue(sb);
+    const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(200);
+  });
+
+  it('approve forwards the admin custom message into the confirmation email', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    const res = await approve(req({ message: 'See you in class!' }), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(200);
+    expect(sendEmail).toHaveBeenCalled();
+    const arg = (sendEmail as any).mock.calls[0][0];
+    expect(arg.html).toContain('See you in class!');
+  });
+
+  it('approve still succeeds when the email send throws', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    (sendEmail as any).mockRejectedValueOnce(new Error('smtp down'));
     const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
     expect(res.status).toBe(200);
   });

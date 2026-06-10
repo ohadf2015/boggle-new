@@ -7355,7 +7355,8 @@ const es = {
       "col": { "name": "Nombre", "email": "Correo", "role": "Rol", "locale": "Idioma", "country": "País", "status": "Estado", "submitted": "Enviado" },
       "drawer_title": "Detalles de solicitud",
       "field": { "name": "Nombre", "email": "Correo", "role": "Rol", "locale": "Idioma", "country": "País", "school": "Escuela", "status": "Estado", "submitted": "Enviado", "use_case": "Caso de uso" },
-      "admin_note": "Nota de administrador (opcional, incluida en correo de rechazo si se completa)",
+      "admin_note": "Nota para el solicitante (opcional)",
+      "note_hint": "Al aprobar, esta nota se incluye en el correo de bienvenida al solicitante. Al rechazar, se usa como motivo.",
       "approve": "Aprobar",
       "decline": "Rechazar",
       "close": "Cerrar",
@@ -10630,6 +10631,10 @@ const es = {
       "contactAdmin": "¿Necesitas Ayuda?",
       "contactAdminDesc": "Para actualizar tu acceso de profesor o rol, contacta a tu administrador. Las cuentas de profesor son otorgadas por administradores escolares.",
       "avatar": "Avatar del profesor"
+    },
+    "districtBanner": {
+      "text": "¿Gestionas múltiples aulas o una escuela entera?",
+      "cta": "Obtener apoyo escolar y de distrito →"
     },
     "assignment": {
       "createTitle": "Crear Tarea",

@@ -33,13 +33,15 @@ beforeEach(() => {
 });
 
 describe('<TeacherAccessDrawer> authenticated actions', () => {
-  it('approves via fetchWithAuth (sends bearer token)', async () => {
+  it('approves via fetchWithAuth (sends bearer token) and forwards the admin note as message', async () => {
     const user = userEvent.setup();
     render(<TeacherAccessDrawer row={row} onClose={vi.fn()} onActioned={vi.fn()} />);
+    await user.type(screen.getByLabelText(/admin\.teacherAccess\.admin_note/), 'Welcome!');
     await user.click(screen.getByText(/admin\.teacherAccess\.approve/));
     await waitFor(() => expect(fetchWithAuth).toHaveBeenCalled());
-    const [url] = fetchWithAuth.mock.calls[0];
+    const [url, opts] = fetchWithAuth.mock.calls[0];
     expect(String(url)).toContain('/api/admin/teacher-access/abc123/approve');
+    expect(JSON.parse((opts as any).body)).toEqual({ message: 'Welcome!' });
     expect((global.fetch as any).mock.calls.length).toBe(0);
   });
 });

@@ -204,6 +204,7 @@ const ja = {
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
     "loading": "辞書を読み込み中…",
     "biome": { "city": "地上", "sky": "空", "stratosphere": "成層圏", "orbit": "軌道", "nebula": "星雲", "galaxy": "銀河" },
+    "tier": { "apprentice": "見習い", "journeyman": "職人", "master": "マスター建築家" },
     "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "restartConfirm": "本当に？", "best": "ベスト {m} m", "possible": "{n} 単語", "clue": "ヒント", "collapse": "閉じる", "expand": "開く", "rivalPassed": "{name} を抜いた！", "stuck": "詰まった？新しい文字", "backToTop": "上へ", "pickLetters": "文字を選ぶ", "chaseGap": "+{m} m", "chaseAria": "次のライバル: {name}、抜くまであと {m} m" },
     "minimap": { "label": "タワーマップ — {m} m、タップで頂上へ" },
     "milestone": { "m50": "木のてっぺん超え！🌳", "m150": "雲の中へ ☁️", "m400": "鳥もうらやむ 🐦", "m250": "ドローンより上だ 🛸", "m650": "星雲の気分 🌌", "m900": "宇宙までもうすぐ 🚀", "m1300": "深宇宙の住人 👽", "m1800": "ほぼ宇宙飛行士 ✨" },
@@ -7435,7 +7436,8 @@ const ja = {
       "col": { "name": "名前", "email": "メール", "role": "役割", "locale": "言語", "country": "国", "status": "ステータス", "submitted": "提出" },
       "drawer_title": "リクエスト詳細",
       "field": { "name": "名前", "email": "メール", "role": "役割", "locale": "言語", "country": "国", "school": "学校", "status": "ステータス", "submitted": "提出", "use_case": "ユースケース" },
-      "admin_note": "管理者メモ(オプション、埋められた場合は却下メールに含む)",
+      "admin_note": "申請者へのメモ(任意)",
+      "note_hint": "承認時はこのメモが申請者への歓迎メールに含まれます。却下時は理由として使用されます。",
       "approve": "承認",
       "decline": "却下",
       "close": "閉じる",
@@ -10265,6 +10267,10 @@ const ja = {
       "contactAdmin": "お困りですか?",
       "contactAdminDesc": "教師アクセスや役割を変更するには、管理者にお問い合わせください。教師アカウントは学校管理者が付与します。",
       "avatar": "教師アバター"
+    },
+    "districtBanner": {
+      "text": "複数のクラスや学校全体を管理していますか？",
+      "cta": "学校・地区向けサポートを受ける →"
     },
     "dashboard": {
       "title": "教師ダッシュボード",

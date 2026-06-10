@@ -3,8 +3,10 @@ import { createClient } from '@/utils/supabase/server';
 import { sendEmail } from '@/lib/email/send';
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
 
-export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
+  let body: any = {}; try { body = await req.json(); } catch {}
+  const message = typeof body.message === 'string' ? body.message.slice(0, 1000) : undefined;
   const sb = await createClient();
 
   const { data: { user } } = await sb.auth.getUser();
@@ -36,8 +38,14 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     }
   }
 
-  const tpl = teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale });
-  await sendEmail({ to: row.email, subject: tpl.subject, html: tpl.html });
+  // Email is best-effort — the approval (DB state) is the source of truth and
+  // must not be undone by a flaky mail provider, so failures are swallowed.
+  try {
+    const tpl = teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale, message });
+    await sendEmail({ to: row.email, subject: tpl.subject, html: tpl.html });
+  } catch (e) {
+    console.error('[teacher-access approve] email send failed', e);
+  }
 
   return NextResponse.json({ ok: true });
 }

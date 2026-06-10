@@ -39,6 +39,12 @@ const NEXT_ADMIN_BODY_ROUTES: string[] = [
   // NOTE: /api/admin/curators (assignment) is a real Express route now and is
   // intentionally NOT here — it wants Express body parsing.
   '/api/admin/curator-proposals',
+  // Teacher-access approve/decline are Next.js POST routes (decline reads
+  // request.json(); approve doesn't, but Next still buffers the POST body before
+  // invoking the handler, so Express pre-parsing drained the stream → 30s hang →
+  // 408). Prefix covers /api/admin/teacher-access/:id/approve|decline. The GET
+  // list/export have no body so this is a no-op for them.
+  '/api/admin/teacher-access',
 ];
 
 export function shouldExpressParseJsonBody(path: string): boolean {

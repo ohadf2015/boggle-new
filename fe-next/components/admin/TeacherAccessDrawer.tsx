@@ -35,7 +35,8 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
       const res = await fetchWithAuth(`/api/admin/teacher-access/${row.id}/${kind}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: kind === 'decline' ? JSON.stringify({ reason: note }) : undefined,
+        // approve → personal note included in the welcome email; decline → reason.
+        body: kind === 'decline' ? JSON.stringify({ reason: note }) : JSON.stringify({ message: note }),
       });
       if (!res.ok) throw new Error(await res.text());
       toast.success(t(`admin.teacherAccess.${kind}Success`));
@@ -73,6 +74,9 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
           <label htmlFor="admin-note" className="font-semibold">{t('admin.teacherAccess.admin_note')}</label>
           <textarea id="admin-note" rows={3} value={note} onChange={(e) => setNote(e.target.value)}
             className="mt-1 w-full rounded border-2 border-slate-300 p-2 text-sm" />
+          <p className="mt-1 text-xs text-slate-500">
+            {t('admin.teacherAccess.note_hint', 'On approve, this note is included in the welcome email to the applicant. On decline, it’s used as the reason.')}
+          </p>
         </div>
         {err && <p role="alert" className="mt-3 text-neo-red">{err}</p>}
         {row.status === 'pending' && (

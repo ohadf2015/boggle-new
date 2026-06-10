@@ -192,6 +192,7 @@ const en = {
     },
     "loading": "Loading dictionary…",
     "biome": { "city": "Ground", "sky": "Sky", "stratosphere": "Stratosphere", "orbit": "Orbit", "nebula": "Nebula", "galaxy": "Galaxy" },
+    "tier": { "apprentice": "Apprentice", "journeyman": "Journeyman", "master": "Master Architect" },
     "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart", "restartConfirm": "Sure?", "best": "Best {m} m", "possible": "{n} words", "clue": "Clue", "collapse": "Collapse", "expand": "Expand", "rivalPassed": "Passed {name}!", "stuck": "Stuck? New letter", "backToTop": "Top", "pickLetters": "Pick letters", "chaseGap": "+{m} m", "chaseAria": "Next rival above: {name}, {m} metres to pass" },
     "minimap": { "label": "Tower map — {m} m, tap to jump to top" },
     "milestone": { "m50": "Above the treetops! 🌳", "m150": "Cloud territory ☁️", "m400": "The birds are jealous 🐦", "m250": "Higher than the drones 🛸", "m650": "Nebula vibes 🌌", "m900": "Knock knock, space? 🚀", "m1300": "Deep-space dweller 👽", "m1800": "Basically an astronaut now ✨" },
@@ -10072,6 +10073,10 @@ const en = {
       "contactAdminDesc": "To update your teacher access or role, contact your administrator. Teacher accounts are granted by school administrators.",
       "avatar": "Teacher avatar"
     },
+    "districtBanner": {
+      "text": "Managing multiple classrooms or a whole school?",
+      "cta": "Get school & district support →"
+    },
     "dashboard": {
       "title": "Teacher Dashboard",
       "subtitle": "Manage your classrooms, lessons, and student progress",
@@ -11307,6 +11312,7 @@ const en = {
         "use_case": "Use Case"
       },
       "admin_note": "Admin Note",
+      "note_hint": "On approve, this note is included in the welcome email to the applicant. On decline, it’s used as the reason.",
       "approve": "Approve",
       "decline": "Decline",
       "approveSuccess": "Request approved successfully",
@@ -13337,6 +13343,7 @@ const en = {
     },
     "teacherAccess": {
       "admin_note": "Admin Note",
+      "note_hint": "On approve, this note is included in the welcome email to the applicant. On decline, it’s used as the reason.",
       "approve": "Approve",
       "close": "Close",
       "empty": "No requests",

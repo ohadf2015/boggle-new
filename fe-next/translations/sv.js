@@ -291,6 +291,7 @@ const sv = {
     "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",
     "loading": "Laddar ordlista…",
     "biome": { "city": "Mark", "sky": "Himmel", "stratosphere": "Stratosfär", "orbit": "Omloppsbana", "nebula": "Nebulosa", "galaxy": "Galax" },
+    "tier": { "apprentice": "Lärling", "journeyman": "Gesäll", "master": "Mästararkitekt" },
     "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "restartConfirm": "Säker?", "best": "Bästa {m} m", "possible": "{n} ord", "clue": "Ledtråd", "collapse": "Fäll ihop", "expand": "Expandera", "rivalPassed": "Förbi {name}!", "stuck": "Fast? Ny bokstav", "backToTop": "Toppen", "pickLetters": "Välj bokstäver", "chaseGap": "+{m} m", "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera" },
     "minimap": { "label": "Tornkarta — {m} m, tryck för toppen" },
     "milestone": { "m50": "Över trädtopparna! 🌳", "m150": "Molnland ☁️", "m400": "Fåglarna är avundsjuka 🐦", "m250": "Högre än drönarna 🛸", "m650": "Nebulosakänsla 🌌", "m900": "Knack knack, rymden? 🚀", "m1300": "Bor i yttre rymden 👽", "m1800": "Nästan astronaut nu ✨" },
@@ -7411,7 +7412,8 @@ const sv = {
       "col": { "name": "Namn", "email": "E-post", "role": "Roll", "locale": "Språk", "country": "Land", "status": "Status", "submitted": "Skickad" },
       "drawer_title": "Begärinformation",
       "field": { "name": "Namn", "email": "E-post", "role": "Roll", "locale": "Språk", "country": "Land", "school": "Skola", "status": "Status", "submitted": "Skickad", "use_case": "Användningsfall" },
-      "admin_note": "Administratörsanteckning (valfritt, ingår i avvisade-mail om ifylld)",
+      "admin_note": "Anteckning till sökanden (valfritt)",
+      "note_hint": "Vid godkännande inkluderas anteckningen i välkomstmejlet till sökanden. Vid avslag används den som orsak.",
       "approve": "Godkänn",
       "decline": "Avvisa",
       "close": "Stäng",
@@ -10309,6 +10311,10 @@ const sv = {
       "contactAdmin": "Behöver du hjälp?",
       "contactAdminDesc": "För att uppdatera din läraråtkomst eller roll, kontakta din administratör. Lärarkonton beviljas av skoladministratörer.",
       "avatar": "Läraravatar"
+    },
+    "districtBanner": {
+      "text": "Hanterar du flera klassrum eller en hel skola?",
+      "cta": "Få skol- och distriktsstöd →"
     },
     "dashboard": {
       "title": "Lärarpanel",
