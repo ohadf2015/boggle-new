@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { MascotCelebrationVideo, type MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
+import { PreResultFanfare } from '@/components/results/PreResultFanfare';
 
 const LEXICLASH_COLORS = [
   '#BFFF00', // electric lime
@@ -137,6 +139,9 @@ export default function AiFanfareDemoClient() {
   const [selectedKind, setSelectedKind] = useState<MascotCelebrationKind>('champion');
   const [selectedVersion, setSelectedVersion] = useState<1 | 2 | 3>(3); // default to the latest post-feedback improved clip
 
+  // Demo of the requested "pre result page → transition to result page" flow
+  const [showPreDemo, setShowPreDemo] = useState(false);
+
   const fire = () => {
     setTrigger((t) => t + 1);
     setScoreSeed((s) => s + 1);
@@ -144,6 +149,16 @@ export default function AiFanfareDemoClient() {
 
   const currentSrc = getCelebrationSrc(selectedKind, selectedVersion);
   const currentKindLabel = CELEBRATION_KINDS.find((k) => k.key === selectedKind)?.label ?? selectedKind;
+
+  const startPreResultDemo = () => {
+    setShowPreDemo(true);
+  };
+
+  const handlePreComplete = () => {
+    setShowPreDemo(false);
+    // Trigger the existing result content entrance (confetti + score pop)
+    fire();
+  };
 
   return (
     <main className="relative min-h-dvh w-full overflow-hidden bg-[#0A1828] text-white">
@@ -228,6 +243,18 @@ export default function AiFanfareDemoClient() {
           <span className="ml-2 text-base font-bold text-black/70">pts · 7-letter bingo</span>
         </div>
 
+        {/* Demo the new "pre-result video then transition to result page" experience */}
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={startPreResultDemo}
+            className="rounded-2xl border-4 border-black bg-[#BFFF00] px-6 py-2 text-base font-black text-neo-black shadow-hard-lg transition active:translate-x-1 active:translate-y-1 active:shadow-hard-sm"
+          >
+            ▶ Play as PRE-RESULT FANFARE → transition to results
+          </button>
+          <p className="mt-1 text-center text-[10px] text-white/50">Uses the real PreResultFanfare (video first, then hands off)</p>
+        </div>
+
         {/* Controls for previewing the different result moments + clip versions */}
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
           {CELEBRATION_KINDS.map((k) => (
@@ -279,22 +306,43 @@ export default function AiFanfareDemoClient() {
           <span className="ml-2 text-[10px] text-white/50">({currentKindLabel})</span>
         </div>
 
-        {/* The real result-page fanfare component (exact treatment used on actual results) */}
-        <div
-          key={`fanfare-${selectedKind}-${selectedVersion}-${trigger}`}
-          className="relative w-full max-w-[min(420px,92vw)]"
-        >
-          <MascotCelebrationVideo
-            kind={selectedKind}
-            overlay={false}
-            autoDismissMs={0}
-            forceSrc={currentSrc}
-            title={undefined}
-          />
-          <div className="pointer-events-none absolute -right-2 -top-2 rotate-6 rounded-xl border-2 border-black bg-[#FF1493] px-2 py-0.5 text-[10px] font-black text-white shadow-[2px_2px_0_#000]">
-            AI · {selectedVersion === 3 ? 'latest refined' : `v${selectedVersion}`}
-          </div>
-        </div>
+        {/* Pre-result fanfare vs inline result content — demonstrates the requested flow */}
+        <AnimatePresence mode="wait">
+          {showPreDemo ? (
+            <m.div
+              key="pre"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full"
+            >
+              <PreResultFanfare
+                kind={selectedKind}
+                onComplete={handlePreComplete}
+                t={(key, fallback) => fallback || key}
+              />
+            </m.div>
+          ) : (
+            <m.div
+              key={`inline-${selectedKind}-${selectedVersion}-${trigger}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative w-full max-w-[min(420px,92vw)]"
+            >
+              {/* Inline preview of the video treatment (for quick switching) */}
+              <MascotCelebrationVideo
+                kind={selectedKind}
+                overlay={false}
+                autoDismissMs={0}
+                forceSrc={currentSrc}
+                title={undefined}
+              />
+              <div className="pointer-events-none absolute -right-2 -top-2 rotate-6 rounded-xl border-2 border-black bg-[#FF1493] px-2 py-0.5 text-[10px] font-black text-white shadow-[2px_2px_0_#000]">
+                AI · {selectedVersion === 3 ? 'latest refined' : `v${selectedVersion}`}
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
 
         {/* Replay + provenance */}
         <div className="flex flex-wrap items-center justify-center gap-4">

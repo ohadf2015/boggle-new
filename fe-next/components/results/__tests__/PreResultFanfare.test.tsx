@@ -50,6 +50,11 @@ describe('PreResultFanfare — pre-result video then transition to results', () 
       screen.getByTestId('trigger-done').click();
     });
 
+    // The component uses a short exit animation timeout before calling onComplete
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
@@ -63,6 +68,11 @@ describe('PreResultFanfare — pre-result video then transition to results', () 
 
     act(() => {
       skip.click();
+    });
+
+    // Skip also triggers the exit timeout path
+    act(() => {
+      vi.advanceTimersByTime(500);
     });
 
     expect(onComplete).toHaveBeenCalled();
