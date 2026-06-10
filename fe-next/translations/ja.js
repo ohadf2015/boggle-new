@@ -12952,6 +12952,7 @@ const ja = {
       "shareText": "WordCraft で {{score}} ポイント獲得しました — あなたも同じボードで遊べます！",
       "shareTitleChallenge": "WordCraft で対戦しよう",
       "linkCopied": "招待リンクをコピーしました！",
+      "linkCopyFailed": "リンクをコピーできませんでした。もう一度お試しください。",
       "vsChallenger": "vs {{name}}",
       "youWin": "勝利！",
       "youLose": "敗北",

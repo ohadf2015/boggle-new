@@ -5,6 +5,8 @@ import { Users, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { buildDuelUrl } from '@/lib/word-craft/duel';
+import type { BoardDims } from '@/lib/word-craft/boardDimensions';
+import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
 
@@ -19,9 +21,13 @@ interface Props {
   challengerName?: string;
   /** Challenger avatar to embed, so the invitee sees who they're dueling. */
   challengerAvatar?: CustomAvatarConfig;
+  /** Board dims this device played — embedded so the invitee gets the same board. */
+  dims?: BoardDims;
+  /** Bot difficulty this device played — embedded so the bot is equal on both ends. */
+  difficulty?: BotDifficulty;
 }
 
-export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disabled, challengerName, challengerAvatar }: Props) {
+export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disabled, challengerName, challengerAvatar, dims, difficulty }: Props) {
   const [sharing, setSharing] = useState(false);
 
   const handlePassAndPlay = () => {
@@ -50,6 +56,8 @@ export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disab
         name: username,
         score: playerScore,
         avatar: challengerAvatar,
+        dims,
+        difficulty,
       });
 
       const shareText = t('wordcraft.duel.shareText', { score: playerScore });
@@ -83,10 +91,12 @@ export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disab
       navigator.clipboard.writeText(url).then(() => {
         toast.success(t('wordcraft.duel.linkCopied'));
       }).catch(() => {
-        // Silent fail; user can manually copy if needed
+        // Clipboard write rejected (permissions / insecure context): surface it
+        // so the share doesn't silently no-op and leave the inviter confused.
+        toast.error(t('wordcraft.duel.linkCopyFailed'));
       });
     } catch {
-      // Clipboard API not available
+      toast.error(t('wordcraft.duel.linkCopyFailed'));
     }
   };
 

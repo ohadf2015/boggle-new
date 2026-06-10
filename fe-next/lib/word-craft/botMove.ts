@@ -27,6 +27,16 @@ export interface FindBotMoveOptions {
    * `round(1 + skillVariance * 4)` distinct words, ranked best-first.
    */
   skillVariance?: number;
+  /**
+   * How hard to skew selection toward the WEAKER end of the pool. The pool is
+   * ranked best-first; we draw an index via `rng()` raised to `1/(1+skew)`.
+   *  - skew 0   → uniform draw across the pool (no downward bias).
+   *  - skew 1   → `sqrt(rng)` (the historical default; biases toward weaker).
+   *  - skew > 1 → presses the pick even closer to the worst word, so a casual
+   *               player faces an easier opponent without changing maxLength.
+   * Only applies when `skillVariance > 0`. Defaults to 1 (legacy behavior).
+   */
+  selectionSkew?: number;
   /** Injectable RNG (returns [0,1)) so difficulty selection is testable. */
   rng?: () => number;
   /**
@@ -184,9 +194,12 @@ export function findBestBotMove(
   
   // Bias selection towards the bottom of the allowed pool (sub-optimal words)
   // so the bot doesn't accidentally pick the absolute best words as often.
-  // Math.sqrt(r) skews the uniform [0,1) distribution toward 1.
+  // r^(1/(1+skew)) skews the uniform [0,1) distribution toward 1; skew=1 is
+  // the legacy sqrt, higher skew presses harder toward the weakest word.
   const r = rng();
-  const skewedRng = skillVariance > 0 ? Math.sqrt(r) : r;
+  const selectionSkew = options.selectionSkew ?? 1;
+  const skewExponent = 1 / (1 + Math.max(0, selectionSkew));
+  const skewedRng = skillVariance > 0 ? Math.pow(r, skewExponent) : r;
   const idx = Math.min(pool.length - 1, Math.floor(skewedRng * pool.length));
   
   return pool[idx].move;

@@ -168,5 +168,36 @@ describe('findBestBotMove', () => {
       const move = findBestBotMove(board(), rack(), valid, { skillVariance: 1, rng: () => 0 });
       expect(move!.score).toBe(best!.score);
     });
+
+    it('higher selectionSkew biases the pick toward weaker words for the same rng', () => {
+      // GIVEN the same wide pool and the same mid-range rng draw
+      const mild = findBestBotMove(board(), rack(), valid, {
+        skillVariance: 5,
+        selectionSkew: 1,
+        rng: () => 0.5,
+      });
+      const strong = findBestBotMove(board(), rack(), valid, {
+        skillVariance: 5,
+        selectionSkew: 4,
+        rng: () => 0.5,
+      });
+      // THEN a stronger downward skew never picks a HIGHER-scoring word
+      expect(strong!.score).toBeLessThanOrEqual(mild!.score);
+    });
+
+    it('selectionSkew defaults to the legacy sqrt skew (skew=1) when omitted', () => {
+      // Omitting selectionSkew must reproduce the historical behavior exactly.
+      const omitted = findBestBotMove(board(), rack(), valid, {
+        skillVariance: 5,
+        rng: () => 0.5,
+      });
+      const explicit = findBestBotMove(board(), rack(), valid, {
+        skillVariance: 5,
+        selectionSkew: 1,
+        rng: () => 0.5,
+      });
+      expect(omitted!.word).toBe(explicit!.word);
+      expect(omitted!.score).toBe(explicit!.score);
+    });
   });
 });

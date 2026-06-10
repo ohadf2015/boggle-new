@@ -13046,6 +13046,7 @@ const sv = {
       "shareText": "Jag fick {{score}} poäng i WordCraft — kan du slå min bräda?",
       "shareTitleChallenge": "Utmana mig på WordCraft",
       "linkCopied": "Inbjudningslänk kopierad!",
+      "linkCopyFailed": "Kunde inte kopiera länken — försök igen.",
       "vsChallenger": "mot {{name}}",
       "youWin": "Du vinner!",
       "youLose": "De vinner",

@@ -203,5 +203,26 @@ describe('WordCraftGameOverScene', () => {
       );
       expect(screen.getByText(/vs Eve/)).toBeTruthy();
     });
+
+    it('still offers Play Again + Home after a duel (no dead-end)', () => {
+      // GIVEN a finished duel WITH replay handlers
+      const onPlayAgain = vi.fn();
+      const onHome = vi.fn();
+      render(
+        <WordCraftGameOverScene
+          t={t}
+          playerScore={150}
+          botScore={100}
+          duelOutcome={{ outcome: 'win', challengerName: 'Alice', challengerScore: 120 }}
+          onPlayAgain={onPlayAgain}
+          onHome={onHome}
+        />
+      );
+      // THEN the player can escape the duel result, not just re-challenge
+      fireEvent.click(screen.getByRole('button', { name: /playAgain/i }));
+      expect(onPlayAgain).toHaveBeenCalledTimes(1);
+      fireEvent.click(screen.getByRole('button', { name: /home/i }));
+      expect(onHome).toHaveBeenCalledTimes(1);
+    });
   });
 });
