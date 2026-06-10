@@ -232,11 +232,11 @@ export default function StudentProfilePageClient() {
                 <div className="px-3 py-1 bg-neo-lime text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
                   {t('education.xp.level')} {currentLevel}
                 </div>
-                <div className="px-3 py-1 bg-neo-orange text-neo-white font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
+                <div className="px-3 py-1 bg-neo-orange text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
                   {totalXp} {t('education.xp.totalXp')}
                 </div>
                 {currentStreak > 0 && (
-                  <div className="px-3 py-1 bg-neo-pink text-neo-white font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
+                  <div className="px-3 py-1 bg-neo-pink text-neo-black font-neo-display font-bold text-lg rounded-neo border-2 border-neo-black">
                     🔥 {currentStreak} {t('education.xp.streak')}
                   </div>
                 )}

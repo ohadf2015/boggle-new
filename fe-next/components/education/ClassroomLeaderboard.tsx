@@ -198,7 +198,7 @@ const TierBadge = memo<TierBadgeProps>(({ rank, totalStudents }) => {
   const tierConfig = {
     top10: { bg: 'bg-neo-lime', text: 'text-neo-black', label: t('education.leaderboard.top10') },
     top25: { bg: 'bg-neo-cyan', text: 'text-neo-black', label: t('education.leaderboard.top25') },
-    top50: { bg: 'bg-neo-pink', text: 'text-white', label: t('education.leaderboard.top50') },
+    top50: { bg: 'bg-neo-pink', text: 'text-neo-black', label: t('education.leaderboard.top50') },
   };
 
   const config = tierConfig[tier];
@@ -312,7 +312,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
             {currentStreak >= 3 && (
               <span
                 data-testid="streak-badge"
-                className="px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-white rounded flex items-center gap-1"
+                className="px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-neo-black rounded flex items-center gap-1"
               >
                 <Flame className="w-4 h-4 inline" /> {currentStreak}
               </span>

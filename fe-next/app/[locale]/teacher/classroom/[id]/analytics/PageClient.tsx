@@ -184,7 +184,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
               value="lessons"
               className={cn(
                 'font-neo-body font-bold rounded-neo',
-                'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-white',
+                'data-[state=active]:bg-neo-pink data-[state=active]:text-neo-black',
                 'data-[state=inactive]:text-neo-white',
                 'transition-all duration-200'
               )}

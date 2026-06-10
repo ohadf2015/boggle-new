@@ -22,7 +22,7 @@ const PATH = new Set([0, 1, 2, 3]); // C-L-A-S(S)
 const LEADERS = [
   { nameKey: 's1', score: 1280, medal: 'bg-neo-yellow', text: 'text-neo-navy' },
   { nameKey: 's2', score: 1140, medal: 'bg-neo-cyan', text: 'text-neo-navy' },
-  { nameKey: 's3', score: 980, medal: 'bg-neo-pink', text: 'text-neo-white' },
+  { nameKey: 's3', score: 980, medal: 'bg-neo-pink', text: 'text-neo-navy' },
 ] as const;
 
 export function EducationModeMock() {

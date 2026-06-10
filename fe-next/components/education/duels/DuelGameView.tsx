@@ -317,7 +317,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                 onBackToLobby?.();
               }
             }}
-            className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+            className="px-6 py-3 bg-neo-pink text-neo-black font-neo-display font-bold rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
             {t('duels.rematch')}
           </button>
@@ -487,7 +487,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           <button
             onClick={handleSubmitScore}
             disabled={wordsFound.length === 0 || phase === 'submitting'}
-            className="w-full px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold text-lg rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-neo-pink text-neo-black font-neo-display font-bold text-lg rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {phase === 'submitting' ? t('duels.loading') : t('duels.submitScore')}
           </button>

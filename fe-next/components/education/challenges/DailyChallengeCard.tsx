@@ -16,7 +16,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
   const tierColors: Record<'easy' | 'medium' | 'hard', string> = {
     easy: 'bg-neo-lime text-neo-black',
     medium: 'bg-neo-cyan text-neo-black',
-    hard: 'bg-neo-pink text-white',
+    hard: 'bg-neo-pink text-neo-black',
   };
 
   const progress = challenge.target_value > 0

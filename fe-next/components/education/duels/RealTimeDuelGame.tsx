@@ -356,7 +356,7 @@ export function RealTimeDuelGame({
           {opponentId && lessonId && (
             <button
               onClick={handleRematch}
-              className="px-6 py-3 bg-neo-pink text-white font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              className="px-6 py-3 bg-neo-pink text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
               {t('education.duels.rematch')}
             </button>

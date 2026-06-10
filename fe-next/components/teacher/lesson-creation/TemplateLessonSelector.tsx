@@ -210,7 +210,7 @@ export default function TemplateLessonSelector({
             className={cn(
               'px-3 py-2 rounded-neo border-neo font-neo-body text-sm transition-all',
               selectedCategory === category
-                ? 'bg-neo-pink text-neo-white shadow-hard-sm'
+                ? 'bg-neo-pink text-neo-black shadow-hard-sm'
                 : 'bg-neo-navy text-neo-white hover:bg-neo-navy/80'
             )}
           >

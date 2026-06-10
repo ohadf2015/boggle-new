@@ -123,7 +123,7 @@ function TeacherProfileInner() {
                 </div>
                 <div
                   data-testid="total-student-count"
-                  className="text-4xl font-neo-display font-black text-neo-cyan"
+                  className="text-4xl font-neo-display font-black text-neo-black"
                 >
                   {totalStudents}
                 </div>

@@ -162,7 +162,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
         <h2 className="text-2xl font-neo-display font-black text-neo-white uppercase tracking-tight italic">
           {t('duelLobbyTitle')}
         </h2>
-        <span className="px-3 py-1 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-pink text-white">
+        <span className="px-3 py-1 border-3 border-black text-[10px] font-black rounded-neo shadow-hard-sm uppercase tracking-widest bg-neo-pink text-neo-black">
           {t('education.duels.pvp')}
         </span>
       </div>
@@ -217,7 +217,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                     onClick={() => handleDecline(challenge.id)}
                     className={cn(
                       'px-4 py-2 font-black rounded-neo',
-                      'bg-neo-pink text-white',
+                      'bg-neo-pink text-neo-black',
                       'border-3 border-black shadow-hard-sm',
                       'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
                       'transition-all duration-100',
@@ -268,7 +268,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                 onClick={() => onTabChange('classmates')}
                 className={cn(
                   'px-4 py-2 font-black rounded-neo',
-                  'bg-neo-pink text-white',
+                  'bg-neo-pink text-neo-black',
                   'border-3 border-black shadow-hard-sm',
                   'hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
                   'transition-all duration-100',
