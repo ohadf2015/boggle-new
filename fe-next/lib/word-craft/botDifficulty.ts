@@ -11,6 +11,11 @@
  *  - `skillVariance` — widens the pool of distinct words it picks from and skews
  *                      selection toward the weaker end, so it plays human-like
  *                      sub-optimal moves instead of the strict best.
+ *  - `selectionSkew` — how hard, within that pool, the pick is pressed toward the
+ *                      WEAKEST word. 1 = the legacy sqrt bias; higher = easier.
+ *                      Lets us soften easy further without shrinking maxLength
+ *                      (dropping to 3 would make the bot pass too often and look
+ *                      dead rather than beatable).
  *
  * Default is EASY: the literal user complaint was "the bot is too good", so the
  * out-of-the-box opponent must be beatable by a casual solo player.
@@ -24,15 +29,17 @@ export const DEFAULT_BOT_DIFFICULTY: BotDifficulty = 'easy';
 export interface BotTuning {
   maxLength: number;
   skillVariance: number;
+  selectionSkew: number;
 }
 
 const TUNING: Record<BotDifficulty, BotTuning> = {
-  // Short words only (no bingos), large pool skewed low → frequently sub-optimal.
-  easy: { maxLength: 4, skillVariance: 5 },
+  // Short words only (no bingos), large pool pressed hard toward the weakest
+  // word → frequently sub-optimal, comfortably beatable by a casual player.
+  easy: { maxLength: 4, skillVariance: 5, selectionSkew: 3 },
   // The previous global default — moderate, occasionally sharp.
-  medium: { maxLength: 5, skillVariance: 2.5 },
+  medium: { maxLength: 5, skillVariance: 2.5, selectionSkew: 1.5 },
   // Full length (bingo-capable), near-optimal selection.
-  hard: { maxLength: 7, skillVariance: 0.5 },
+  hard: { maxLength: 7, skillVariance: 0.5, selectionSkew: 0.5 },
 };
 
 export function botTuning(difficulty: BotDifficulty): BotTuning {

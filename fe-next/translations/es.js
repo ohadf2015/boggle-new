@@ -13052,6 +13052,7 @@ const es = {
       "shareText": "¡Obtuve {{score}} puntos en WordCraft — ¿puedes superar mi tablero?",
       "shareTitleChallenge": "Retame en WordCraft",
       "linkCopied": "¡Enlace de invitación copiado!",
+      "linkCopyFailed": "No se pudo copiar el enlace: inténtalo de nuevo.",
       "vsChallenger": "vs {{name}}",
       "youWin": "¡Ganaste!",
       "youLose": "Ellos ganan",

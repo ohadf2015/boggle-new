@@ -13456,6 +13456,7 @@ const he = {
       "shareText": "ניקדתי {{score}} ב-WordCraft — הצלחת להכניע את הלוח שלי?",
       "shareTitleChallenge": "אתגור אותי ב-WordCraft",
       "linkCopied": "קישור הזמנה הועתק!",
+      "linkCopyFailed": "לא הצלחנו להעתיק את הקישור — נסו שוב.",
       "vsChallenger": "מול {{name}}",
       "youWin": "ניצחת!",
       "youLose": "הם ניצחו",

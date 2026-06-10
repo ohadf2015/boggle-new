@@ -68,6 +68,7 @@ import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
 import { cn } from '@/lib/utils';
 import { parseDuel, compareDuel } from '@/lib/word-craft/duel';
+import { PHONE_DIMS } from '@/lib/word-craft/boardDimensions';
 import { resolveChallengerIdentity } from '@/lib/word-craft/challengerIdentity';
 import { WordCraftDuelTargetStrip } from '@/components/word-craft/WordCraftDuelTargetStrip';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -186,7 +187,21 @@ export default function WordCraftPageClient() {
     if (typeof window !== 'undefined') window.localStorage.setItem('wordcraft.difficulty', next);
   }, []);
 
-  const game = useWordCraftGame({ seed, dict, locale, territoryEnabled, hotseat, difficulty });
+  // In a duel the board contract is the challenger's, not this device's: force
+  // their dims (legacy links carry none → phone-canonical) and their bot
+  // difficulty so both players play the *identical* game and the bot
+  // contributes equally to each side's Territory score.
+  const effectiveDifficulty = duel?.difficulty ?? difficulty;
+  const forcedDims = duel ? (duel.dims ?? PHONE_DIMS) : undefined;
+  const game = useWordCraftGame({
+    seed,
+    dict,
+    locale,
+    territoryEnabled,
+    hotseat,
+    difficulty: effectiveDifficulty,
+    forcedDims,
+  });
   const { cosyMode } = useAccessibility();
   const prefersReducedMotion = useReducedMotion();
 
@@ -932,8 +947,9 @@ export default function WordCraftPageClient() {
             {t('wordcraft.title')}
           </h1>
           <div className="flex-1" />
-          {/* Bot difficulty — only meaningful vs the auto-bot (not hot-seat/duel). */}
-          {!hotseat ? (
+          {/* Bot difficulty — only meaningful vs the auto-bot. Hidden in a duel:
+              the board contract (incl. difficulty) is locked to the challenger's. */}
+          {!hotseat && !duel ? (
             <WordCraftDifficultySelect value={difficulty} onChange={changeDifficulty} t={t} />
           ) : null}
           {/* Play-vs-friend — compact topbar affordance + popover. Solo only;
@@ -968,6 +984,8 @@ export default function WordCraftPageClient() {
                   disabled={!dict}
                   challengerName={challengerIdentity.name}
                   challengerAvatar={challengerIdentity.avatar}
+                  dims={game.dims}
+                  difficulty={effectiveDifficulty}
                 />
               </div>
             </>
@@ -1272,6 +1290,8 @@ export default function WordCraftPageClient() {
           currentLocale={locale}
           challengerName={challengerIdentity.name}
           challengerAvatar={challengerIdentity.avatar}
+          currentDims={game.dims}
+          currentDifficulty={effectiveDifficulty}
           onPlayAgain={() => game.reset(Math.floor(Math.random() * 1_000_000))}
           onHome={() => router.push(`/${language}`)}
         />

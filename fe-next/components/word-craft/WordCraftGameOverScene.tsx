@@ -1,6 +1,8 @@
 'use client';
 
 import { WordCraftDuelResult } from './WordCraftDuelResult';
+import type { BoardDims } from '@/lib/word-craft/boardDimensions';
+import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Props {
@@ -21,16 +23,33 @@ interface Props {
   /** This player's identity for outgoing re-challenge links (from auth profile). */
   challengerName?: string;
   challengerAvatar?: CustomAvatarConfig;
+  /** Board dims + bot difficulty just played — embedded in re-challenge links. */
+  currentDims?: BoardDims;
+  currentDifficulty?: BotDifficulty;
   /** Play-again closure loop — re-rolls a fresh solo game in place. */
   onPlayAgain?: () => void;
   /** Leave to the home/menu screen. */
   onHome?: () => void;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, onPlayAgain, onHome }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, onPlayAgain, onHome }: Props) {
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
-    return <WordCraftDuelResult t={t} playerScore={playerScore} duelOutcome={duelOutcome} currentSeed={currentSeed} currentLocale={currentLocale} challengerName={challengerName} challengerAvatar={challengerAvatar} />;
+    return (
+      <WordCraftDuelResult
+        t={t}
+        playerScore={playerScore}
+        duelOutcome={duelOutcome}
+        currentSeed={currentSeed}
+        currentLocale={currentLocale}
+        challengerName={challengerName}
+        challengerAvatar={challengerAvatar}
+        dims={currentDims}
+        difficulty={currentDifficulty}
+        onPlayAgain={onPlayAgain}
+        onHome={onHome}
+      />
+    );
   }
 
   const isTie = playerScore === botScore;

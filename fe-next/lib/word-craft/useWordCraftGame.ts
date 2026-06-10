@@ -8,7 +8,7 @@ import { findBestBotMove } from './botMove';
 import { botTuning, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
 import { rollModifier, toScoreModifier, type WordCraftModifier } from './modifiers';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
-import { getBoardDims } from './boardDimensions';
+import { getBoardDims, type BoardDims } from './boardDimensions';
 import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
 import { assignBlankLetter, hasUnassignedBlank } from './blankAssign';
 import type { PlacedTile, PlayerState, RackTile } from './types';
@@ -362,16 +362,25 @@ export interface UseWordCraftGameOptions {
    * auto-bot is disabled, and both seats take input on their own turn.
    */
   hotseat?: boolean;
+  /**
+   * Force the board dimensions instead of deriving them from the viewport.
+   * Used by duels: the invitee MUST play the challenger's exact board, which
+   * means matching size + bag — both read from the device viewport otherwise.
+   * When omitted, dims come from `window.innerWidth` (the normal solo path).
+   */
+  forcedDims?: BoardDims;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims }: UseWordCraftGameOptions) {
   const tuning = botTuning(difficulty);
   const effectiveVariance = botSkillVariance ?? tuning.skillVariance;
-  // Capture viewport dims at initialization and lock them for the game lifetime
+  // Capture dims at initialization and lock them for the game lifetime. A duel
+  // forces the challenger's dims so both players share one board; otherwise we
+  // read the device viewport.
   const initialDimsRef = useRef(
-    getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)
+    forcedDims ?? getBoardDims(typeof window === 'undefined' ? 1024 : window.innerWidth)
   );
   const initialDims = initialDimsRef.current;
 
@@ -595,6 +604,8 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
         // selected difficulty preset (default 'easy').
         maxLength: tuning.maxLength,
         skillVariance: effectiveVariance,
+        // Press the pick toward the weakest pooled word on lower difficulties.
+        selectionSkew: tuning.selectionSkew,
         scoreModifier: modifierSpec,
       });
       if (move) {
@@ -619,7 +630,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       clearTimeout(handle);
       botTurnRunning.current = false;
     };
-  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning.maxLength, effectiveVariance, modifierSpec]);
+  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning.maxLength, effectiveVariance, tuning.selectionSkew, modifierSpec]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);
@@ -645,5 +656,8 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     tilesRemaining,
     isHotseat: hotseat,
     activePlayer,
+    // The dims actually played — duels embed these in the share link so the
+    // invitee reproduces the identical board.
+    dims: initialDims,
   };
 }

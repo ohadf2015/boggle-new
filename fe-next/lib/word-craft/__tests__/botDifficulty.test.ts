@@ -42,6 +42,18 @@ describe('botDifficulty', () => {
     expect(m.skillVariance).toBeGreaterThan(h.skillVariance);
   });
 
+  it('easy applies the strongest downward selection skew (weakest word-pick bias)', () => {
+    const e = botTuning('easy');
+    const m = botTuning('medium');
+    const h = botTuning('hard');
+    // Higher skew = picks closer to the WORST word in the pool. Easy should be
+    // the most skewed; strength still increases monotonically toward hard.
+    expect(e.selectionSkew).toBeGreaterThan(m.selectionSkew);
+    expect(m.selectionSkew).toBeGreaterThanOrEqual(h.selectionSkew);
+    // Easy is meaningfully skewed below the legacy sqrt default of 1.
+    expect(e.selectionSkew).toBeGreaterThan(1);
+  });
+
   it('validates difficulty strings (for localStorage hydration)', () => {
     expect(isBotDifficulty('easy')).toBe(true);
     expect(isBotDifficulty('hard')).toBe(true);

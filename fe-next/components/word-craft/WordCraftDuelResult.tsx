@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import Avatar from '@/components/Avatar';
 import { buildDuelUrl } from '@/lib/word-craft/duel';
+import type { BoardDims } from '@/lib/word-craft/boardDimensions';
+import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Props {
@@ -26,9 +28,17 @@ interface Props {
   challengerName?: string;
   /** This player's avatar for the outgoing re-challenge link. */
   challengerAvatar?: CustomAvatarConfig;
+  /** Board dims this player just played — embedded in the re-challenge link. */
+  dims?: BoardDims;
+  /** Bot difficulty this player just played — embedded in the re-challenge link. */
+  difficulty?: BotDifficulty;
+  /** Re-roll a fresh solo game in place (escapes the duel). */
+  onPlayAgain?: () => void;
+  /** Leave to the home/menu screen. */
+  onHome?: () => void;
 }
 
-export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar }: Props) {
+export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, dims, difficulty, onPlayAgain, onHome }: Props) {
   const [sharing, setSharing] = useState(false);
 
   const outcomeColor = {
@@ -64,6 +74,8 @@ export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, 
         name: username,
         score: playerScore,
         avatar: challengerAvatar,
+        dims,
+        difficulty,
       });
 
       const shareText = t('wordcraft.duel.shareText', { score: playerScore });
@@ -97,10 +109,10 @@ export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, 
       navigator.clipboard.writeText(url).then(() => {
         toast.success(t('wordcraft.duel.linkCopied'));
       }).catch(() => {
-        // Silent fail; user can manually copy if needed
+        toast.error(t('wordcraft.duel.linkCopyFailed'));
       });
     } catch {
-      // Clipboard API not available
+      toast.error(t('wordcraft.duel.linkCopyFailed'));
     }
   };
 
@@ -148,6 +160,31 @@ export function WordCraftDuelResult({ t, playerScore, duelOutcome, currentSeed, 
         <Share2 className="w-4 h-4" />
         {t('wordcraft.duel.challengeFriend')}
       </Button>
+
+      {/* Replay loop — without these the duel result is a dead-end (you could
+          only re-challenge, never start a fresh solo game or go home). */}
+      {(onPlayAgain || onHome) ? (
+        <div className="flex items-center gap-2 mt-1">
+          {onPlayAgain ? (
+            <button
+              type="button"
+              onClick={onPlayAgain}
+              className="px-4 py-2 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+            >
+              ↻ {t('wordcraft.playAgain')}
+            </button>
+          ) : null}
+          {onHome ? (
+            <button
+              type="button"
+              onClick={onHome}
+              className="px-4 py-2 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+            >
+              {t('wordcraft.home')}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
