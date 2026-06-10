@@ -23,13 +23,23 @@ import { milestoneCrossed } from '@/lib/wordTower/milestones';
 import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
 import WordTowerCrane, { type WordTowerCraneHandle } from './WordTowerCrane';
 import { useCraneDrop } from './useCraneDrop';
-import { sweepPeriodMs } from '@/lib/wordTower/craneSweep';
+import { sweepPeriodMs, SWEEP_PERIOD_FLOOR_MS } from '@/lib/wordTower/craneSweep';
+import {
+  mutatorForDate,
+  mutatorModifiers,
+  mutatorSweepMult,
+  mutatorWordMultiplier,
+  type DailyMutator,
+} from '@/lib/wordTower/dailyMutators';
+import { comboMilestone, type ComboMilestone } from '@/lib/wordTower/comboMilestone';
+import { utcDateKey } from '@/lib/wordTower/dailySeed';
+import { WordTowerMutatorBanner } from './WordTowerMutatorBanner';
 import { swayInstability } from '@/lib/wordTower/towerSway';
 import { buildDropVerdict, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
 import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
-import { perkMilestoneAt, reducedTopple, PERKS } from '@/lib/wordTower/perks';
+import { perkMilestoneAt, reducedTopple, combineModifiers, PERKS } from '@/lib/wordTower/perks';
 import { beatsDailyBest } from '@/lib/wordTower/dailyBest';
 import { hazardsCrossed } from '@/lib/wordTower/hazards';
 import { zoneTeaseAt } from '@/lib/wordTower/zoneTease';
@@ -199,9 +209,32 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // the progress POST), so height-boosting perks never inflate records.
   const perks = useWordTowerPerks(daily, perkSeed);
 
-  // Crane Stack — cosy reward-amplifier; logic in useCraneDrop. Perk modifiers
-  // tune the perfect bonus, height, brink forgiveness, and wobble cushioning.
-  const crane = useCraneDrop(tower.commitPlacement, tower.hazard, perks.modifiers);
+  // The day's shared mutator — the twist EVERY player faces today (daily only).
+  // Date-seeded so it's identical worldwide; keeps daily scores comparable while
+  // making each day play differently (the fun + random-factor lever).
+  const mutator: DailyMutator | null = useMemo(
+    () => (daily ? mutatorForDate(utcDateKey(), language) : null),
+    [daily, language],
+  );
+  // Structural mutator effects (skyline ×height, featherday topple-save) fold INTO
+  // the perk struct via the same fields the crane + hazard sites already read.
+  const craneMods = useMemo(
+    () => (mutator ? combineModifiers(perks.modifiers, mutatorModifiers(mutator)) : perks.modifiers),
+    [perks.modifiers, mutator],
+  );
+  // Word-aware mutator height × (golden letter / vowels / length). Read at drop
+  // time from the held word — the only mutator effect that can't fit PerkModifiers.
+  const pendingWordRef = useRef<string | null>(null);
+  pendingWordRef.current = tower.state.pendingWord;
+  const wordHeightMult = useCallback(() => {
+    const pw = pendingWordRef.current;
+    return mutator && pw ? mutatorWordMultiplier(mutator, pw, language) : 1;
+  }, [mutator, language]);
+
+  // Crane Stack — cosy reward-amplifier; logic in useCraneDrop. Combined modifiers
+  // tune the perfect bonus, height, brink forgiveness, and wobble cushioning; the
+  // word-mult getter applies the day's word-aware twist on the drop.
+  const crane = useCraneDrop(tower.commitPlacement, tower.hazard, craneMods, wordHeightMult);
 
   // Imperative handle on the crane so the bottom HUD's swapped-in DROP CTA
   // can fire drop() — the player's thumb stays on the same button instead of
@@ -211,7 +244,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
   // Sweep period RAMPS with tower height (slow + learnable near the ground,
   // faster the taller you climb) — escalating challenge, not a flat speed.
-  const sweepMs = sweepPeriodMs(game.floors.length);
+  // Tailwind day slows the sweep (more dwell = easier perfects); other days = 1×.
+  // Clamped to the floor so a future "gale" mutator can't drive it impossibly fast.
+  const sweepMs = Math.max(
+    SWEEP_PERIOD_FLOOR_MS,
+    sweepPeriodMs(game.floors.length) * (mutator ? mutatorSweepMult(mutator) : 1),
+  );
   // How shaky the tower is (0..1) — drives the continuous SWING and, via the
   // crane's matching offset, makes placing on an unstable tower genuinely harder.
   const instability = swayInstability(crane.consecutiveSloppy, crane.leanDeg);
@@ -236,6 +274,19 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     return () => clearTimeout(id);
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Combo-milestone fanfare — a one-shot "×5 ON FIRE!" beat the moment the combo
+  // crosses 3/5/10/20. Keyed off resultKey so it fires on the placing tick only.
+  const [comboFx, setComboFx] = useState<{ m: ComboMilestone; key: number } | null>(null);
+  useEffect(() => {
+    if (tower.state.resultKey === 0) return;
+    const hit = comboMilestone(game.combo);
+    if (!hit) return;
+    setComboFx({ m: hit, key: tower.state.resultKey });
+    haptics.success();
+    const id = setTimeout(() => setComboFx(null), 1400);
+    return () => clearTimeout(id);
+  }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Rival ghosts are leaderboard records to climb past (read-only). The old
   // solo "wrecking-ball" sabotage was a fake, local-only effect against these
   // ghosts (no backend) — cut from solo. Async-versus interference lives in the
@@ -249,9 +300,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     prevHazardH.current = game.heightM;
     const crossed = hazardsCrossed(prev, game.heightM, game.firedHazards);
     if (crossed.length === 0) return;
-    // featherfall (perk) softens the blow — but the hazard ids still fire so it
-    // never re-triggers, even if 0 floors are lost.
-    const floors = reducedTopple(crossed.reduce((s, h) => s + h.floors, 0), perks.modifiers);
+    // featherfall (perk) + featherday (mutator) soften the blow — but the hazard
+    // ids still fire so it never re-triggers, even if 0 floors are lost.
+    const floors = reducedTopple(crossed.reduce((s, h) => s + h.floors, 0), craneMods);
     tower.hazard(floors, crossed[crossed.length - 1]!.kind, crossed.map((h) => h.id));
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -394,13 +445,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       b: biomeForHeight(g.heightM),
       w: g.longestWord || '',
     });
+    // Surface the day's shared twist on the card — the brag hook that ties the
+    // daily ("I climbed 240m on Golden-Letter day").
+    if (mutator) params.set('m', mutator.id);
     const imgUrl = `${window.location.origin}/api/word-tower/share?${params.toString()}`;
     const text = t('wordTower.share.text', { m: Math.round(g.heightM) });
     try {
       if (navigator.share) await navigator.share({ title: 'Word Tower', text, url: imgUrl });
       else await navigator.clipboard?.writeText(`${text} ${imgUrl}`);
     } catch { /* user cancelled / unsupported */ }
-  }, [t]);
+  }, [t, mutator]);
 
   // keyboard
   useEffect(() => {
@@ -581,6 +635,34 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         </div>
       )}
 
+      {/* Combo-milestone fanfare — a flame-orange "×5 ON FIRE!" beat. Sits below
+          the centre verdict so the two read as separate hits, not one pile. */}
+      {comboFx && (
+        <div
+          key={comboFx.key}
+          className={`pointer-events-none absolute left-1/2 top-[28%] z-30 -translate-x-1/2 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          aria-live="polite"
+        >
+          🔥 {t(comboFx.m.labelKey)} <span className="tabular-nums">×{comboFx.m.combo}</span>
+        </div>
+      )}
+
+      {/* Daily mutator intro — the day's shared twist, popped once on entry. */}
+      {mutator && <WordTowerMutatorBanner mutator={mutator} t={t} reducedMotion={reducedMotion} />}
+
+      {/* Persistent mutator chip — keeps the active twist visible all run. */}
+      {mutator && (
+        <div className="pointer-events-none fixed left-2 top-[44px] z-40" dir={dir}>
+          <span
+            className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-lime px-1.5 py-0.5 font-neo-body text-[10px] font-black text-black shadow-hard-sm"
+            title={t(mutator.descKey, mutator.id === 'goldenLetter' ? { letter: mutator.goldenLetter ?? '' } : undefined)}
+          >
+            <span aria-hidden>{mutator.icon}</span>
+            {t(mutator.nameKey)}
+          </span>
+        </div>
+      )}
+
       {/* Owned perks — small badge row (daily run) so the player sees their build. */}
       {daily && perks.owned.length > 0 && (
         <div className="pointer-events-none fixed left-2 top-[76px] z-40 flex flex-col gap-1" dir={dir}>
@@ -683,6 +765,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           possibleWords={possibleWords}
           clueWord={clueWord}
           onReroll={reroll}
+          goldenLetter={mutator?.id === 'goldenLetter' ? mutator.goldenLetter : undefined}
           lastError={tower.state.lastError}
           errorKey={tower.state.errorKey}
           lastResult={tower.state.lastResult}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { WORD_TOWER_BIOMES, type WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
+import { ALL_MUTATOR_IDS, shareLabelForMutatorId, type MutatorId } from '@/lib/wordTower/dailyMutators';
 import logger from '@/backend/utils/logger';
 
 export const runtime = 'nodejs';
@@ -36,6 +37,11 @@ export async function GET(req: Request) {
     const biomeId = (BIOME_IDS.has(biomeParam) ? biomeParam : 'city') as WordTowerBiomeId;
     const topWord = safeText(q.get('w'), 16);
     const name = safeText(q.get('n'), 18);
+    // Daily twist label — only when `m` is a known mutator id (else omitted).
+    const mParam = q.get('m');
+    const mutatorLabel = ALL_MUTATOR_IDS.includes(mParam as MutatorId)
+      ? shareLabelForMutatorId(mParam as MutatorId)
+      : '';
 
     const [{ default: React }, { renderToStaticMarkup }, { default: WordTowerShareCard }] = await Promise.all([
       import('react'),
@@ -44,7 +50,7 @@ export async function GET(req: Request) {
     ]);
 
     const svg = renderToStaticMarkup(
-      React.createElement(WordTowerShareCard, { heightM, floors, biomeId, topWord, name }),
+      React.createElement(WordTowerShareCard, { heightM, floors, biomeId, topWord, name, mutatorLabel }),
     );
 
     const png = await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();

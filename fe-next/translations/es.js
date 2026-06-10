@@ -202,6 +202,8 @@ const es = {
     "clutch": { "save": "¡Salvada increíble!", "critical": "¡Tambalea — aterriza limpio!" },
     "daily": { "badge": "Diario · {date}", "streak": "racha de {n} días", "toDaily": "Diario", "toEndless": "Infinito", "newBest": "¡Nuevo récord diario!", "questTitle": "Torre de Palabras", "questDesc": "Apila palabras hasta el cielo: hoy las mismas letras para todos." },
     "perk": { "title": "Elige un don", "subtitle": "Elige uno — dura toda la escalada", "skip": "Saltar por ahora", "masterCrane": { "name": "Grúa maestra", "desc": "Mayor recompensa en caídas perfectas" }, "tallTimber": { "name": "Madera alta", "desc": "+12% de altura en cada piso" }, "featherfall": { "name": "Caída de pluma", "desc": "Los derrumbes cuestan un piso menos" }, "reinforced": { "name": "Reforzado", "desc": "Más tambaleo antes del abismo" }, "cushion": { "name": "Cojín de seguridad", "desc": "El vaivén de la grúa nunca tira un piso" } },
+    "mutator": { "todaysTwist": "El giro del día", "goldenLetter": { "name": "Letra dorada", "desc": "Palabras con {letter} suben ×1.6" }, "vowelGale": { "name": "Racha de vocales", "desc": "Cada vocal suma altura" }, "longAndStrong": { "name": "Larga y fuerte", "desc": "Palabras de 6+ letras suben ×1.5" }, "skylineRush": { "name": "Carrera del horizonte", "desc": "Cada piso sube más hoy" }, "tailwind": { "name": "Viento a favor", "desc": "La grúa se mueve más lento — perfectos más fáciles" }, "featherday": { "name": "Día de pluma", "desc": "Los derrumbes cuestan un piso menos" } },
+    "combo": { "roll": "¡En racha!", "fire": "¡Encendido!", "blaze": "¡Ardiendo!", "inferno": "¡INFIERNO!" },
     "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad" },
     "verdict": { "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Flojo", "miss": "¡Fallo!" },
     "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas" },
@@ -210,7 +212,7 @@ const es = {
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
     "share": { "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
     "versus": { "title": "Carrera de Torres", "bomb": "Bombardear a {name}", "waiting": "Esperando rivales…", "incoming": "¡Bomba entrante!", "won": "¡Ganaste!", "lost": "Ganó {name}" },
-    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}" }
+    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}", "goldenTile": "Letra dorada {letter} — puntos extra" }
   },
   "flag": "🇪🇸",
   "androidAppPromo": {

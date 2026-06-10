@@ -20,6 +20,8 @@ export interface WordTowerHudProps {
   clueWord?: string | null;
   /** Re-anchor to a fresh viable letter when the chain dead-ends. */
   onReroll?: () => void;
+  /** Daily "golden letter" mutator — tray tiles of this letter score extra and glow. */
+  goldenLetter?: string;
   lastError: ValidationError | null;
   errorKey: number;
   lastResult: ApplyResult | null;
@@ -56,7 +58,7 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
     anchorLetter, tray, selected, word, heightM, combo, scramblesLeft,
-    possibleWords, clueWord, onReroll, lastError, errorKey, lastResult, resultKey,
+    possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
     pendingWord, onCraneDrop,
     onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t,
   } = props;
@@ -237,20 +239,26 @@ export function WordTowerHud(props: WordTowerHudProps) {
         >
           {tray.map((letter, i) => {
             const isSel = selected.includes(i);
+            // Golden-letter day: this tile climbs extra — ring it gold so the
+            // player spots the high-value tiles at a glance.
+            const isGolden = !!goldenLetter && letter.toUpperCase() === goldenLetter.toUpperCase();
             return (
               <button
                 key={i}
                 type="button"
                 disabled={isSel || isPlacing}
                 onClick={() => onSelectTile(i)}
-                aria-label={t('wordTower.a11y.tile', { letter })}
+                aria-label={t(isGolden ? 'wordTower.a11y.goldenTile' : 'wordTower.a11y.tile', { letter })}
                 className={cn(
-                  'flex aspect-square min-h-[40px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
+                  'relative flex aspect-square min-h-[40px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
                   isSel
                     ? 'bg-neo-navy-light text-neo-white/30'
-                    : 'bg-gradient-to-b from-neo-lime-light to-neo-lime text-black hover:-translate-y-0.5',
+                    : isGolden
+                      ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black hover:-translate-y-0.5 ring-2 ring-neo-yellow ring-offset-1 ring-offset-black'
+                      : 'bg-gradient-to-b from-neo-lime-light to-neo-lime text-black hover:-translate-y-0.5',
                 )}
               >
+                {isGolden && !isSel && <span aria-hidden className="absolute -top-1.5 -right-1.5 text-[11px]">🌟</span>}
                 {letter}
               </button>
             );

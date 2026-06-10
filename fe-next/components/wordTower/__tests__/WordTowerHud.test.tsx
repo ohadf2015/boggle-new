@@ -30,6 +30,20 @@ function makeProps(over: Partial<WordTowerHudProps> = {}): WordTowerHudProps {
   };
 }
 
+describe('WordTowerHud — golden-letter mutator highlight', () => {
+  it('labels matching tray tiles as golden when the goldenLetter mutator is active', () => {
+    render(<WordTowerHud {...makeProps({ goldenLetter: 'T' })} />);
+    // every 'T' tile carries the golden a11y label; non-T tiles stay plain.
+    expect(screen.getAllByLabelText('wordTower.a11y.goldenTile:T').length).toBeGreaterThan(0);
+    expect(screen.getAllByLabelText('wordTower.a11y.tile:A').length).toBeGreaterThan(0);
+  });
+
+  it('uses the plain tile label for all tiles when no golden letter is set', () => {
+    render(<WordTowerHud {...makeProps()} />);
+    expect(screen.queryByLabelText(/goldenTile/)).toBeNull();
+  });
+});
+
 describe('WordTowerHud', () => {
   it('disables Build until the word is 3+ letters', () => {
     const { rerender } = render(<WordTowerHud {...makeProps({ word: 'CA' })} />);

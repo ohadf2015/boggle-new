@@ -15,6 +15,8 @@ export interface ShareCardProps {
   biomeId: WordTowerBiomeId;
   topWord: string;
   name: string;
+  /** Optional daily-twist label ("🌟 Golden Letter"); omitted = no chip. */
+  mutatorLabel?: string;
 }
 
 const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
@@ -27,6 +29,7 @@ export default function WordTowerShareCard({
   biomeId,
   topWord,
   name,
+  mutatorLabel = '',
 }: ShareCardProps) {
   const theme = BIOME_THEME[biomeId];
   const block = hex(theme.block);
@@ -80,6 +83,16 @@ export default function WordTowerShareCard({
       </defs>
       <rect width={width} height={height} fill="url(#sky)" />
       {stars}
+
+      {/* Daily-twist banner — top-left over the sky, only on a daily share. */}
+      {mutatorLabel ? (
+        <g transform="translate(60, 50)">
+          <rect x={0} y={0} width={Math.min(560, 150 + mutatorLabel.length * 22)} height={64} rx={12} fill="#BFFF00" stroke="#000" strokeWidth={4} />
+          <text x={20} y={31} fontFamily="sans-serif" fontSize={18} fontWeight={700} fill="#000" opacity={0.6}>TODAY&apos;S TWIST</text>
+          <text x={20} y={56} fontFamily="sans-serif" fontSize={26} fontWeight={800} fill="#000">{mutatorLabel}</text>
+        </g>
+      ) : null}
+
       {blocks}
 
       {/* Right column copy */}
