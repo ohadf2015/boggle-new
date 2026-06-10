@@ -58,6 +58,12 @@ interface LessonData {
   lessonName: string;
   vocabularyWords: string[];
   language: Language;
+  /**
+   * Game mode the teacher chose in ClassroomGameLobby. Seeds the host's mode
+   * selector so the choice actually applies (see initialMode below). Optional
+   * for back-compat with older sessionStorage payloads.
+   */
+  gameMode?: GameModeOption;
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;
@@ -193,9 +199,16 @@ function HostPreGameView({
   // rounds). `gameMode` holds the resolved mode during gameplay and isn't a reliable
   // signal of intent post-round (a "random" pick gets replaced with the rolled value).
   const hostSelectedGameMode = useHostSelectedGameMode();
-  const initialMode = (hostSelectedGameMode === 'blast' && !isAdmin && !hasBlastAccess)
+  // Classroom games carry the teacher's chosen mode on `lessonData.gameMode`.
+  // It is authoritative for the initial selection (the teacher already picked
+  // in the lobby) and takes precedence over the store default. Without this the
+  // selector seeds from `hostSelectedGameMode` (default 'random'), the startGame
+  // emit then carries 'random', and the backend silently rolls a random mode —
+  // dropping the teacher's choice. The host can still change it before starting.
+  const intendedMode: GameModeOption = lessonData?.gameMode ?? hostSelectedGameMode ?? 'random';
+  const initialMode = (intendedMode === 'blast' && !isAdmin && !hasBlastAccess)
     ? 'random'
-    : (hostSelectedGameMode || 'random');
+    : (intendedMode || 'random');
   const [selectedGameMode, setSelectedGameMode] = useState<GameModeOption>(initialMode);
   const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
 

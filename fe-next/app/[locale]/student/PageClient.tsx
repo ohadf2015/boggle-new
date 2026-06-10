@@ -19,6 +19,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { StudentHubPlayZone } from '@/components/student/StudentHubPlayZone';
 import { StudentHubProgressZone } from '@/components/student/StudentHubProgressZone';
 import { StudentHubLearnZone } from '@/components/student/StudentHubLearnZone';
+import { resolveStudentDisplayName } from '@/lib/education/studentDisplayName';
 import { cn } from '@/lib/utils';
 import { UserPlus, User, Award } from 'lucide-react';
 import Link from 'next/link';
@@ -123,7 +124,7 @@ export default function StudentPageClient() {
           <StudentHubPlayZone
             classroomId={classroomId}
             userId={user.id}
-            username={user.email || t('student.dashboard.defaultName')}
+            username={resolveStudentDisplayName(profile, user, t('student.dashboard.defaultName'))}
           />
         )}
 

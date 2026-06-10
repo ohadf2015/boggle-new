@@ -13,6 +13,7 @@ import { usePresence } from '../hooks/usePresence';
 import { useEarthquakeFireRound } from '../hooks/useEarthquakeFireRound';
 import type { Language, PlayerResult } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import type { GameMode } from '@/shared/types/game';
 import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { useGameMode } from '@/hooks/gameState/store';
 import logger from '@/utils/logger';
@@ -72,6 +73,8 @@ interface LessonData {
   lessonName: string;
   vocabularyWords: string[];
   language: Language;
+  /** Teacher's chosen game mode from ClassroomGameLobby; seeds the host selector. */
+  gameMode?: GameMode;
   templateSettings?: {
     timerSeconds: number;
     difficulty: string;
