@@ -144,6 +144,23 @@ export function getReengagementSubjectV3(
   return lines[dayOfYear % lines.length](firstLetter, recipientName);
 }
 
+/* ─── Locale-aware number formatter (copied from v2 for consistency) ─── */
+const LOCALE_TAG: Record<string, string> = {
+  en: 'en-US',
+  he: 'he-IL',
+  sv: 'sv-SE',
+  ja: 'ja-JP',
+  es: 'es-ES',
+};
+
+function fmtNumber(n: number, language: string): string {
+  try {
+    return new Intl.NumberFormat(LOCALE_TAG[language] || 'en-US').format(n);
+  } catch {
+    return String(n);
+  }
+}
+
 interface Props {
   recipientName: string;
   firstLetter: string;
@@ -281,7 +298,7 @@ export default function ReengagementMascotV3({
                     <tr>
                       <td style={{ padding: '0 20px 16px', textAlign: startAlign }}>
                         <Text style={{ color: '#A1A1B5', fontSize: '13px', fontWeight: 600, margin: 0 }}>
-                          {showSolvedToday && <span style={{ color: '#A8E600' }}>{t.solvedToday(playersToday as string)}</span>}
+                          {showSolvedToday && <span style={{ color: '#A8E600' }}>{t.solvedToday(fmtNumber(playersToday as number, language))}</span>}
                           {showSolvedToday && showHoursLeft && ' · '}
                           {showHoursLeft && <span style={{ color: '#FF1493' }}>{t.hoursLeft(hoursUntilReset as number)}</span>}
                         </Text>
