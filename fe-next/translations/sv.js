@@ -2281,7 +2281,6 @@ const sv = {
     "returningUser": {
       "title": "Välkommen",
       "subtitle": "Logga in för att fortsätta där du slutade, eller börja om.",
-      "haveAccount": "Jag har ett konto",
       "newHere": "Jag är ny här",
       "skip": "Hoppa över tills vidare"
     },
@@ -10306,7 +10305,8 @@ const sv = {
       "winRate": "Vinstprocent"
     },
     "joinClassroom": "Gå med i klassrum",
-    "joinClassroomDescription": "Ange koden från din lärare för att komma igång"
+    "joinClassroomDescription": "Ange koden från din lärare för att komma igång",
+    "notYou": "Inte du? Börja om"
   },
   "teacher": {
     "teacher": {
@@ -11240,8 +11240,12 @@ const sv = {
         "codeLabel": "Klasskod",
         "codePasted": "Klistrad!",
         "emptyClipboard": "Urklipp är tomt",
+        "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
         "invalidCode": "Koden är inte giltig",
         "joining": "Går med...",
+        "nameHint": "Inget konto behövs – välj bara ett namn",
+        "nameLabel": "Ditt namn",
+        "namePlaceholder": "t.ex. Maya",
         "pasteButton": "Klistra",
         "subtitle": "Fråga din lärare om koden",
         "success": "Du är med!",

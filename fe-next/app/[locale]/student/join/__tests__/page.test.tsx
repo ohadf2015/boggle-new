@@ -104,8 +104,8 @@ describe('StudentJoinPageClient - Auth Loading Bug', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  test('should redirect unauthenticated user ONLY after loading completes', async () => {
-    // GIVEN: Auth loading completes, user is not authenticated
+  test('shows the join form (NOT a redirect) for a logged-out student — they join as a guest', async () => {
+    // GIVEN: Auth loading completes, user is not authenticated.
     mockUseAuth.mockReturnValue({
       user: null,
       profile: null,
@@ -117,10 +117,12 @@ describe('StudentJoinPageClient - Auth Loading Bug', () => {
     // WHEN: Page renders
     render(<StudentJoinPageClient />);
 
-    // THEN: Should redirect to landing page
+    // THEN: Account-less students must reach the form (guest join), not be
+    // bounced to the landing page.
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/en');
+      expect(screen.getByTestId('join-form')).toBeInTheDocument();
     });
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
   test('should NOT redirect when user exists but profile still loading', async () => {

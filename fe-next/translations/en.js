@@ -2291,7 +2291,6 @@ const en = {
     "returningUser": {
       "title": "Welcome",
       "subtitle": "Sign in to pick up where you left off, or start fresh.",
-      "haveAccount": "I Have an Account",
       "newHere": "I'm New Here",
       "skip": "Skip for now"
     },
@@ -9958,6 +9957,7 @@ const en = {
     },
     "joinClassroom": "Join a Classroom",
     "joinClassroomDescription": "Enter your teacher's code to join",
+    "notYou": "Not you? Start fresh",
     "activeGame": {
       "title": "Game Starting!",
       "teacherStarted": "{{teacher}} started a classroom game",
@@ -10986,8 +10986,12 @@ const en = {
         "codeLabel": "Class Code",
         "codePasted": "Pasted!",
         "emptyClipboard": "Nothing to paste",
+        "guestError": "Couldn't start your session. Try again or ask your teacher.",
         "invalidCode": "Invalid code",
         "joining": "Joining...",
+        "nameHint": "No account needed — just pick a name",
+        "nameLabel": "Your Name",
+        "namePlaceholder": "e.g. Maya",
         "pasteButton": "Paste",
         "subtitle": "Enter your teacher's code",
         "success": "You're in!",

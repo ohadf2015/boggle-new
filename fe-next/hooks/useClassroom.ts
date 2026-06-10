@@ -14,6 +14,8 @@ import {
   type Classroom,
   type Language,
 } from '@/lib/supabase/education';
+import { createClient } from '@/utils/supabase/client';
+import { signInAsGuestStudent, waitForProfile } from '@/lib/education/guestStudent';
 import logger from '@/utils/logger';
 
 interface UseClassroomsState {
@@ -360,14 +362,32 @@ export function useJoinClassroom() {
   const { user } = useAuth();
 
   const joinClassroom = useCallback(async (
-    joinCode: string
+    joinCode: string,
+    options?: { guestName?: string }
   ): Promise<{ success: boolean; classroomId?: string; error?: string }> => {
-    if (!user) {
-      return { success: false, error: 'Not authenticated' };
-    }
-
     try {
-      const { data, error } = await joinClassroomAPI(joinCode, user.id);
+      let studentId = user?.id;
+
+      // Account-less path: a logged-out student who supplied a name joins as an
+      // anonymous guest. We mint the anon identity, await the trigger-created
+      // profile (race-safe — the hub guard checks user && profile), then join
+      // with the new id. Without a name we keep the original not-authenticated
+      // guard so existing callers are unaffected.
+      if (!studentId) {
+        const guestName = options?.guestName?.trim();
+        if (!guestName) {
+          return { success: false, error: 'Not authenticated' };
+        }
+        const supabase = createClient();
+        const guest = await signInAsGuestStudent(supabase, guestName);
+        if (guest.error || !guest.user) {
+          return { success: false, error: guest.error || 'Failed to start guest session' };
+        }
+        await waitForProfile(supabase, guest.user.id);
+        studentId = guest.user.id;
+      }
+
+      const { data, error } = await joinClassroomAPI(joinCode, studentId);
 
       if (error) {
         return { success: false, error: error.message };

@@ -4319,7 +4319,6 @@ const es = {
     "returningUser": {
       "title": "Bienvenido",
       "subtitle": "Inicia sesión para continuar donde lo dejaste, o empieza de nuevo.",
-      "haveAccount": "Tengo una cuenta",
       "newHere": "Soy nuevo aquí",
       "skip": "Omitir por ahora"
     },
@@ -10189,6 +10188,7 @@ const es = {
     },
     "joinClassroom": "Unirse a un aula",
     "joinClassroomDescription": "Ingresa el código que te dio tu profe para entrar al aula",
+    "notYou": "¿No eres tú? Empieza de nuevo",
     "dashboard": {
       "title": "Mis Lecciones",
       "subtitle": "Practica vocabulario y sigue tu progreso",
@@ -11231,7 +11231,11 @@ const es = {
         "alreadyMember": "Ya estás en esta aula",
         "codePasted": "¡Código pegado!",
         "emptyClipboard": "No hay nada copiado",
-        "clipboardError": "No se pudo leer el portapapeles"
+        "clipboardError": "No se pudo leer el portapapeles",
+        "nameLabel": "Tu nombre",
+        "namePlaceholder": "p. ej. Maya",
+        "nameHint": "No necesitas cuenta: solo elige un nombre",
+        "guestError": "No se pudo iniciar. Inténtalo de nuevo o pide ayuda a tu profe."
       },
       "lessonsAssigned": "Lecciones asignadas"
     },

@@ -2333,7 +2333,6 @@ const he = {
     "returningUser": {
       "title": "ברוכים הבאים",
       "subtitle": "התחברו כדי להמשיך מאיפה שעצרתם, או התחילו מחדש.",
-      "haveAccount": "יש לי חשבון",
       "newHere": "אני חדש כאן",
       "skip": "דלג לעת עתה"
     },
@@ -10543,7 +10542,8 @@ const he = {
       "winRate": "אחוז ניצחונות"
     },
     "joinClassroom": "הצטרפו לכיתה",
-    "joinClassroomDescription": "הזינו קוד מהמורה כדי להצטרף לכיתה ולהתחיל לתרגל"
+    "joinClassroomDescription": "הזינו קוד מהמורה כדי להצטרף לכיתה ולהתחיל לתרגל",
+    "notYou": "זה לא אתם? התחילו מחדש"
   },
   "teacher": {
     "teacher": {
@@ -11477,8 +11477,12 @@ const he = {
         "codeLabel": "קוד כיתה",
         "codePasted": "הודבק!",
         "emptyClipboard": "אין מה להדביק",
+        "guestError": "לא הצלחנו להתחיל. נסו שוב או פנו למורה.",
         "invalidCode": "קוד לא תקין",
         "joining": "מצטרף...",
+        "nameHint": "לא צריך חשבון — פשוט בחרו שם",
+        "nameLabel": "השם שלך",
+        "namePlaceholder": "למשל מאיה",
         "pasteButton": "הדבק",
         "subtitle": "הכנס את הקוד מהמורה",
         "success": "נכנסת!",

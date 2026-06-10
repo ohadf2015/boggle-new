@@ -2180,7 +2180,6 @@ const ja = {
     "returningUser": {
       "title": "ようこそ",
       "subtitle": "サインインして続きから始めるか、新しく始めましょう。",
-      "haveAccount": "アカウントを持っています",
       "newHere": "初めてです",
       "skip": "今はスキップ"
     },
@@ -10262,7 +10261,8 @@ const ja = {
       "winRate": "勝率"
     },
     "joinClassroom": "クラスに参加する",
-    "joinClassroomDescription": "先生からもらったクラスコードを入力して参加しよう"
+    "joinClassroomDescription": "先生からもらったクラスコードを入力して参加しよう",
+    "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
     "teacher": {
@@ -11183,8 +11183,12 @@ const ja = {
         "codeLabel": "クラスコード",
         "codePasted": "コードを貼り付けました！",
         "emptyClipboard": "クリップボードが空です",
+        "guestError": "開始できませんでした。もう一度試すか、先生に聞いてね。",
         "invalidCode": "無効なクラスコードです",
         "joining": "参加中...",
+        "nameHint": "アカウントは不要 — 名前を入力するだけ",
+        "nameLabel": "あなたの名前",
+        "namePlaceholder": "例: マヤ",
         "pasteButton": "貼り付け",
         "subtitle": "先生からもらったコードを入力してね",
         "success": "クラスに参加しました！",

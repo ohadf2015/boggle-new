@@ -20,12 +20,13 @@ import { StudentHubPlayZone } from '@/components/student/StudentHubPlayZone';
 import { StudentHubProgressZone } from '@/components/student/StudentHubProgressZone';
 import { StudentHubLearnZone } from '@/components/student/StudentHubLearnZone';
 import { resolveStudentDisplayName } from '@/lib/education/studentDisplayName';
+import { signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
-import { UserPlus, User, Award } from 'lucide-react';
+import { UserPlus, User, Award, UserX } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StudentPageClient() {
-  const { user, isAuthenticated, loading, profile } = useAuth();
+  const { user, loading, profile } = useAuth();
   const { t, language } = useLanguage();
   const router = useRouter();
   const isRTL = language === 'he';
@@ -34,14 +35,19 @@ export default function StudentPageClient() {
 
   useEffect(() => {
     if (loading) return;
-    if (!isAuthenticated) { router.push(`/${language}`); return; }
+    // Truly logged out → home. A signed-in student whose profile is still
+    // resolving (e.g. a freshly minted guest/anonymous session) must NOT be
+    // bounced — wait for the profile before deciding (avoids the same redirect
+    // race as the teacher-access admin guard).
+    if (!user) { router.push(`/${language}`); return; }
+    if (!profile) return;
     const isTeacherOrAdmin =
       profile?.user_role === 'teacher' ||
       profile?.user_role === 'admin' ||
       profile?.is_admin === true;
     if (isTeacherOrAdmin) { router.push(`/${language}/teacher`); return; }
     setIsChecking(false);
-  }, [isAuthenticated, loading, router, language, profile]);
+  }, [user, profile, loading, router, language]);
 
   if (isChecking || loading) {
     return (
@@ -90,6 +96,21 @@ export default function StudentPageClient() {
               <Award className="w-3.5 h-3.5" />
               {t('student.nav.achievements')}
             </Link>
+            {/* Shared-device escape for guest (anonymous) students: sign out the
+                device-bound session so the next student is not mistaken for this
+                one. Only shown to account-less guests. */}
+            {user?.is_anonymous && (
+              <button
+                onClick={async () => {
+                  await signOut();
+                  router.push(`/${language}/student/join`);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 border border-neo-white/20 rounded-neo text-neo-white font-bold text-xs hover:bg-neo-pink hover:text-neo-black transition-colors"
+              >
+                <UserX className="w-3.5 h-3.5" />
+                {t('student.notYou')}
+              </button>
+            )}
           </div>
         </m.div>
 

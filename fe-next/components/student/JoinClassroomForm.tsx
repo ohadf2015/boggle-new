@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useJoinClassroom } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -37,10 +38,17 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
   const { t, dir, language } = useLanguage();
   const router = useRouter();
   const { joinClassroom } = useJoinClassroom();
+  const { user } = useAuth();
+
+  // Logged-out students join as an anonymous guest by typing a name — no
+  // email/password account required. The session then persists on this device.
+  const isGuest = !user;
 
   const [code, setCode] = useState(initialCode);
+  const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeError, setCodeError] = useState(false);
+  const [nameError, setNameError] = useState(false);
 
   // Handle paste from clipboard
   const handlePaste = async () => {
@@ -65,6 +73,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
     e.preventDefault();
 
     const trimmedCode = code.trim();
+    const trimmedName = name.trim();
 
     // Validate code format (6 alphanumeric characters)
     if (!trimmedCode || trimmedCode.length !== 6) {
@@ -74,10 +83,20 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
       return;
     }
 
+    // Guests must supply a name (becomes their display name + in-game username).
+    if (isGuest && !trimmedName) {
+      setNameError(true);
+      toast.error(t('education.student.join.nameLabel'));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const result = await joinClassroom(trimmedCode.toUpperCase());
+      const result = await joinClassroom(
+        trimmedCode.toUpperCase(),
+        isGuest ? { guestName: trimmedName } : undefined
+      );
 
       if (result.success) {
         trackEduClassroomJoin({
@@ -133,6 +152,44 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Name Input — guests only (account-less join) */}
+              {isGuest && (
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="student-name"
+                    className="text-sm font-bold uppercase text-neo-white"
+                  >
+                    {t('education.student.join.nameLabel')}
+                  </Label>
+                  <Input
+                    id="student-name"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (nameError) setNameError(false);
+                    }}
+                    required
+                    maxLength={40}
+                    autoComplete="off"
+                    placeholder={t('education.student.join.namePlaceholder')}
+                    aria-invalid={nameError ? 'true' : undefined}
+                    aria-describedby={nameError ? 'name-error' : 'name-hint'}
+                    className={cn(
+                      "h-14 text-lg font-bold bg-neo-navy/50 border-neo-white/20 text-white placeholder:text-neo-white/50",
+                      nameError && "border-red-500 bg-red-900/30 focus-visible:ring-red-500"
+                    )}
+                  />
+                  <p id="name-hint" className="text-xs text-neo-lime">
+                    {t('education.student.join.nameHint')}
+                  </p>
+                  {nameError && (
+                    <p id="name-error" className="text-xs text-red-400" role="alert">
+                      {t('education.student.join.nameLabel')}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Code Input */}
               <div className="space-y-2">
                 <Label
@@ -195,7 +252,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={isSubmitting || !code.trim() || code.length !== 6}
+                disabled={isSubmitting || !code.trim() || code.length !== 6 || (isGuest && !name.trim())}
                 size="lg"
                 className="w-full h-14 text-lg font-black uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
