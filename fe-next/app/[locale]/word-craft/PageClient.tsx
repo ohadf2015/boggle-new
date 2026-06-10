@@ -24,6 +24,7 @@ import { WordCraftPlayFriendControl } from '@/components/word-craft/WordCraftPla
 import { WordCraftCelebration, type CelebrationKind } from '@/components/word-craft/WordCraftCelebration';
 import { HeatMeter } from '@/components/word-craft/HeatMeter';
 import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
+import { WordCraftComboBadge } from '@/components/word-craft/WordCraftComboBadge';
 import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
 import { WordCraftDragGhost } from '@/components/word-craft/WordCraftDragGhost';
 import { WordCraftPendingStrip } from '@/components/word-craft/WordCraftPendingStrip';
@@ -1109,6 +1110,9 @@ export default function WordCraftPageClient() {
                 isBingo={scoreFloat.isBingo}
                 encouragement={scoreFloat.encouragement}
               />
+            ) : null}
+            {!cosyMode && !prefersReducedMotion ? (
+              <WordCraftComboBadge streak={game.state.streaks.player} t={t} />
             ) : null}
             <WordCraftHeatStamp beat={heatBeat} onDone={() => setHeatBeat(null)} />
             <WordCraftScorePreviewBadge board={game.state.board} placements={game.state.pendingPlacements} />

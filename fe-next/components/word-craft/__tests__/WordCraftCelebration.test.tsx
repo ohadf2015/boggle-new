@@ -7,7 +7,20 @@
 
 import { render } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { WordCraftCelebration } from '../WordCraftCelebration';
+import { WordCraftCelebration, shouldIdleParticleTicker } from '../WordCraftCelebration';
+
+describe('shouldIdleParticleTicker (perf: stop the 60fps Pixi loop when idle)', () => {
+  it('idles only when no particles are alive AND no rain is spawning', () => {
+    expect(shouldIdleParticleTicker(0, false)).toBe(true);
+  });
+  it('keeps running while particles are still on screen', () => {
+    expect(shouldIdleParticleTicker(5, false)).toBe(false);
+  });
+  it('keeps running mid rain-shower even when momentarily zero particles', () => {
+    // The rain spawns incrementally; idling here would abort the shower.
+    expect(shouldIdleParticleTicker(0, true)).toBe(false);
+  });
+});
 
 const matchMediaMock = (matches: boolean) => {
   Object.defineProperty(window, 'matchMedia', {

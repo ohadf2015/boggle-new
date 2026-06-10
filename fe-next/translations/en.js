@@ -12923,6 +12923,7 @@ const en = {
       "captureYou": "Captured {{count}} — +{{bonus}}!",
       "captureBot": "Bot captured {{count}} — +{{bonus}}!"
     },
+    "combo": "Combo",
     "duel": {
       "playFriend": "Play vs a friend",
       "passPlay": "Same device — Pass & Play",

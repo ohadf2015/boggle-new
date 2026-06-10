@@ -5,6 +5,15 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 export type CelebrationKind = 'bingo' | 'gameOver' | 'overdrive' | 'burnout' | null;
 
+/**
+ * Perf gate: the particle ticker should idle (stop) only when there is nothing
+ * left to animate — no live particles AND no rain shower still spawning. Pure +
+ * exported so the decision is unit-testable without a WebGL context.
+ */
+export function shouldIdleParticleTicker(tileCount: number, rainActive: boolean): boolean {
+  return tileCount === 0 && !rainActive;
+}
+
 export interface WordCraftCelebrationProps {
   kind: CelebrationKind;
   burstId: number;
@@ -33,6 +42,9 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
     if (reducedMotion) return;
     let cancelled = false;
     let cleanupFn: (() => void) | null = null;
+    // True while a rain shower is still spawning tiles, so the idle gate doesn't
+    // stop the ticker between incremental rain spawns.
+    let rainActive = false;
 
     (async () => {
       const PIXI = await import('pixi.js');
@@ -74,6 +86,12 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
         dynamicProperties: { position: true, scale: true, rotation: true, color: false },
       });
       app.stage.addChild(particles);
+
+      // Wake the render loop only while something is animating; the spawn helpers
+      // call this, and the update ticker stops itself once everything clears.
+      const wakeTicker = () => {
+        if (!app.ticker.started) app.ticker.start();
+      };
 
       type TileData = {
         particle: InstanceType<typeof PIXI.Particle>;
@@ -121,6 +139,7 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       };
 
       apiRef.current.spawnBurst = (x: number, y: number, count: number) => {
+        wakeTicker();
         for (let i = 0; i < count; i += 1) {
           const angle = Math.random() * Math.PI * 2;
           const speed = 3 + Math.random() * 6;
@@ -136,11 +155,14 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       };
 
       apiRef.current.spawnRain = (duration: number) => {
+        wakeTicker();
+        rainActive = true;
         const startedAt = performance.now();
         let lastSpawn = startedAt;
         const rainTicker = (ticker: { deltaTime: number }) => {
           const now = performance.now();
           if (now - startedAt > duration) {
+            rainActive = false;
             app.ticker.remove(rainTicker);
             return;
           }
@@ -163,6 +185,7 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       };
 
       apiRef.current.spawnOverdriveBurst = (x: number, y: number) => {
+        wakeTicker();
         for (let i = 0; i < 120; i++) {
           const angle = Math.random() * Math.PI * 2
           const speed = 4 + Math.random() * 8
@@ -203,7 +226,15 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
             tiles.splice(i, 1);
           }
         }
+        // Idle the render loop once everything has cleared — saves continuous
+        // CPU/GPU/battery on phone + TV while the player is just thinking.
+        if (shouldIdleParticleTicker(tiles.length, rainActive)) {
+          app.ticker.stop();
+        }
       });
+
+      // Start idle: nothing is animating until the first spawn wakes the ticker.
+      app.ticker.stop();
 
       cleanupFn = () => {
         try {
