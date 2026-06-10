@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { fetchWithAuth } from '@/utils/authFetch';
 import toast from 'react-hot-toast';
 import type { TeacherAccessRequest } from '@/lib/education/types';
 
@@ -31,7 +32,7 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
     setErr(null);
     setBusy(true);
     try {
-      const res = await fetch(`/api/admin/teacher-access/${row.id}/${kind}`, {
+      const res = await fetchWithAuth(`/api/admin/teacher-access/${row.id}/${kind}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: kind === 'decline' ? JSON.stringify({ reason: note }) : undefined,

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { fetchWithAuth } from '@/utils/authFetch';
 import {
   SCHOOL_LEAD_ROLES,
   STUDENT_COUNT_BUCKETS,
@@ -50,7 +51,7 @@ export function SchoolLeadsQueue() {
     setLoading(true);
     const qs = filterQs();
     qs.set('page', String(page));
-    const res = await fetch(`/api/admin/school-leads?${qs}`);
+    const res = await fetchWithAuth(`/api/admin/school-leads?${qs}`);
     const j = await res.json();
     setRows(j.rows || []);
     setLoading(false);
@@ -58,7 +59,7 @@ export function SchoolLeadsQueue() {
 
   const fetchCounts = useCallback(async () => {
     const one = (extra: string) =>
-      fetch(`/api/admin/school-leads?${extra}&page=0`).then((r) => r.json()).then((j) => j.count || 0);
+      fetchWithAuth(`/api/admin/school-leads?${extra}&page=0`).then((r) => r.json()).then((j) => j.count || 0);
     // "Hot lead" signals: explicit pricing interest + the largest (highest-revenue) districts.
     const [total, pricing, large] = await Promise.all([
       one(''),

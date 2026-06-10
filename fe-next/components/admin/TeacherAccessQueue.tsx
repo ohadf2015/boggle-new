@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { fetchWithAuth } from '@/utils/authFetch';
 import { TeacherAccessDrawer } from './TeacherAccessDrawer';
 import type { TeacherAccessRequest, TeacherAccessStatus } from '@/lib/education/types';
 
@@ -22,7 +23,7 @@ export function TeacherAccessQueue() {
     if (locale) qs.set('locale', locale);
     if (country) qs.set('country', country);
     qs.set('page', String(page));
-    const res = await fetch(`/api/admin/teacher-access?${qs}`);
+    const res = await fetchWithAuth(`/api/admin/teacher-access?${qs}`);
     const j = await res.json();
     setRows(j.rows || []);
     setLoading(false);
@@ -30,7 +31,7 @@ export function TeacherAccessQueue() {
 
   const fetchCounts = useCallback(async () => {
     const one = (s: TeacherAccessStatus | '') =>
-      fetch(`/api/admin/teacher-access?status=${s}&page=0`).then((r) => r.json()).then((j) => j.count || 0);
+      fetchWithAuth(`/api/admin/teacher-access?status=${s}&page=0`).then((r) => r.json()).then((j) => j.count || 0);
     const [p, a, d, total] = await Promise.all([one('pending'), one('approved'), one('declined'), one('')]);
     setCounts({ pending: p, approved: a, declined: d, total });
   }, []);
