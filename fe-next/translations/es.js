@@ -10783,6 +10783,8 @@ const es = {
       "avgXpGain": "XP ganado promedio",
       "backToClassroom": "Volver a la clase",
       "classAverageXp": "XP promedio",
+      "colLevel": "Nivel",
+      "colStreak": "Racha",
       "commonMistakes": "Palabras problemáticas",
       "completionRate": "Tasa de completado",
       "connecting": "Conectando...",
@@ -11218,6 +11220,7 @@ const es = {
         "invalidCode": "Ese código no funciona",
         "alreadyMember": "Ya estás en esta aula",
         "codePasted": "¡Código pegado!",
+        "codePlaceholder": "ABC123",
         "emptyClipboard": "No hay nada copiado",
         "clipboardError": "No se pudo leer el portapapeles"
       },

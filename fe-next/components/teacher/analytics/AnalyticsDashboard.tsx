@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { VocabularyHeatmap } from './VocabularyHeatmap';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
+import { studentsToCsv } from '@/lib/education/studentProgressCsv';
 
 const LessonEffectivenessChart = lazy(() => import('./LessonEffectivenessChart'));
 
@@ -67,6 +68,27 @@ export function AnalyticsDashboard({
     }
     onViewStudents?.('struggling');
   }, [onViewStudents]);
+
+  const handleExportReport = useCallback(() => {
+    if (students.length === 0) return;
+    const csv = studentsToCsv(students, {
+      student: t('education.analytics.student'),
+      level: t('education.analytics.colLevel'),
+      mastery: t('education.analytics.mastery'),
+      accuracy: t('education.analytics.accuracy'),
+      streak: t('education.analytics.colStreak'),
+    });
+    // Prepend a UTF-8 BOM so spreadsheet apps render Hebrew/Japanese correctly.
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `student-progress-${classroomId}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [students, classroomId, t]);
 
   // ==================== LOADING STATE ====================
 
@@ -234,12 +256,15 @@ export function AnalyticsDashboard({
             {t('education.analytics.studentProgress')}
           </h3>
           <button
-            onClick={() => {/* export logic */}}
+            onClick={handleExportReport}
+            disabled={students.length === 0}
             className={cn(
               'px-4 py-2 bg-neo-cyan text-black border-3 border-black',
               'font-bold font-neo-body rounded-neo shadow-hard-sm',
               'hover:-translate-y-0.5 active:translate-y-0.5',
-              'transition-all duration-100 text-sm'
+              'transition-all duration-100 text-sm',
+              'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0'
             )}
           >
             {t('education.analytics.exportReport')}
@@ -251,19 +276,28 @@ export function AnalyticsDashboard({
             <table className="w-full">
               <thead>
                 <tr className="bg-neo-navy/60 border-b-2 border-black/30">
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.level')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.accuracy')}</th>
-                  <th className="px-3 py-2 text-left text-xs font-bold text-neo-white">{t('education.analytics.streak')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.student')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.colLevel')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.mastery')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.accuracy')}</th>
+                  <th className="px-3 py-2 text-start text-xs font-bold text-neo-white">{t('education.analytics.colStreak')}</th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((student) => (
                   <tr
                     key={student.studentId}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${student.displayName} — ${t('education.analytics.studentDetail')}`}
                     onClick={() => setSelectedStudentId(student.studentId)}
-                    className="border-b border-black/10 hover:bg-neo-white/5 cursor-pointer"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedStudentId(student.studentId);
+                      }
+                    }}
+                    className="border-b border-black/10 hover:bg-neo-white/5 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-neo-cyan"
                   >
                     <td className="px-3 py-2 text-sm font-bold text-neo-white">{student.displayName}</td>
                     <td className="px-3 py-2 text-sm text-neo-white">{student.currentLevel}</td>

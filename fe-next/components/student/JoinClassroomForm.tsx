@@ -150,10 +150,11 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                       if (codeError) setCodeError(false);
                     }}
                     required
-                    placeholder="ABC123"
+                    placeholder={t('education.student.join.codePlaceholder')}
                     maxLength={6}
                     pattern="[A-Za-z0-9]{6}"
                     inputMode="text"
+                    autoCapitalize="characters"
                     autoComplete="off"
                     aria-invalid={codeError ? 'true' : undefined}
                     aria-describedby={codeError ? 'code-error' : 'code-hint'}
@@ -170,7 +171,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
                           size="icon"
                           variant="outline"
                           onClick={handlePaste}
-                          className="absolute inset-e-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-neo border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px active:shadow-hard-pressed transition-all"
+                          className="absolute inset-e-2 top-1/2 -translate-y-1/2 h-11 w-11 bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-neo border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-x-px hover:-translate-y-px active:shadow-hard-pressed transition-all"
                           aria-label={t('education.student.join.pasteButton')}
                         >
                           <ClipboardPaste className="w-4 h-4" />
