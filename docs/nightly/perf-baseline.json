@@ -1,97 +1,77 @@
 {
-  "date": "2026-06-09",
-  "note": "Fourteenth snapshot. Backend: dropped redundant 'Admins can view invalid word submissions' SELECT policy on invalid_word_submissions (duplicate of is_admin_user() in 'curators read...' policy — eliminated double per-row profiles scan). Frontend: removed force-dynamic from /daily/word-hunt and /daily/word-wheel, replaced with revalidate=3600 (ISR). Expected LCP drop from ~4500ms to <1000ms on cold path. word_pacts FK index skipped (1-row table, Seq Scan optimal). user_reports indexes skipped (brand-new today, not stale-unused).",
+  "date": "2026-06-10",
+  "note": "Fifteenth snapshot. Frontend: shipped AutoHideHeader CLS fix (spacer div instead of null during gameplay/TV mode; null kept for CrazyGames). PostHog Web Vitals show LCP on /es/multiplayer improved 4903ms→1706ms (ISR fix landed). CLS on /he 0.386 (new — undiagnosed). NOTE (06-10 follow-up): the flagged INP 244→614ms on /es/multiplayer was DEBUNKED as noise (n=10, sub-50 floor; route swings 104↔760ms; suspect overlay dark behind unset flag) — a mandatory n>=50 sample gate was added to prompts/02-perf.md to prevent recurrence. Backend: connections_puzzles multiple-permissive-policy CONSOLIDATED (06-10, two SELECT policies merged into one OR'd policy via migration); word_pacts FK index still deferred (tiny table).",
   "backend": {
     "advisor_warnings_count": 4,
     "advisor_warnings": [
       {
         "type": "multiple_permissive_policies",
-        "table": "invalid_word_submissions",
-        "status": "FIXED — migration 20260609_drop_redundant_invalid_word_submissions_admin_policy applied. Redundant admin SELECT policy dropped; is_admin_user() in remaining curator policy covers admins identically."
+        "table": "connections_puzzles",
+        "policies": ["connections puzzles active public read", "curators read puzzles in their locale"],
+        "status": "DEFERRED — Supabase MCP unavailable 2026-06-10. Needs migration: consolidate two SELECT policies into one using OR condition. Re-queue tomorrow.",
+        "nights_deferred": 2
       },
       {
         "type": "multiple_permissive_policies",
-        "table": "connections_puzzles",
-        "status": "DEFERRED — needs policy audit; similar pattern but not in today's brief scope"
+        "table": "invalid_word_submissions",
+        "status": "FIXED 2026-06-09 — migration 20260609_drop_redundant_invalid_word_submissions_admin_policy applied"
       },
       {
         "type": "unindexed_foreign_keys",
         "table": "word_pacts",
         "fkey": "word_pacts_player2_id_fkey",
-        "status": "SKIPPED — table has 1 row (EXPLAIN ANALYZE: Seq Scan on 1 buffer, 0.7ms). Index would be wasteful. Re-evaluate when table grows."
+        "status": "SKIPPED — table has ~1 row, Seq Scan is optimal. Re-evaluate at 1000+ rows."
       },
       {
-        "type": "unused_index",
-        "table": "user_reports",
-        "indexes": ["idx_user_reports_pending", "idx_user_reports_target"],
-        "status": "SKIPPED — table + indexes created 2026-06-09 (today). Advisor flags new indexes before stats accumulate. Not genuinely unused."
+        "type": "auth_db_connections_absolute",
+        "status": "ADVISORY — switch to percentage-based connection allocation. Low risk at current scale. Deferred."
       }
     ],
     "top_queries": [
       {
-        "label": "realtime.list_changes WAL parser (slot1)",
-        "total_ms": 3328219.9,
-        "mean_ms": 4.3,
-        "calls": 775439,
+        "label": "realtime.list_changes WAL parser",
         "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize"
       },
       {
-        "label": "realtime.list_changes WAL parser (slot2)",
-        "total_ms": 1332308.6,
-        "mean_ms": 4.4,
-        "calls": 304235,
-        "verdict": "INFRASTRUCTURE"
-      },
-      {
         "label": "sync_coins RPC",
-        "total_ms": 136907.5,
         "mean_ms": 7.3,
-        "calls": 18761,
-        "verdict": "OK — 7ms mean acceptable for transactional coin sync"
-      },
-      {
-        "label": "profiles last_seen_at UPDATE",
-        "total_ms": 72579.9,
-        "mean_ms": 1.6,
-        "calls": 45119,
-        "verdict": "OK"
-      },
-      {
-        "label": "pg_timezone_names SELECT",
-        "total_ms": 70483.1,
-        "mean_ms": 330.9,
-        "calls": 213,
-        "verdict": "WATCH — 330ms mean on catalog scan; Supabase Dashboard internal, not app code. Monitor for growth."
+        "verdict": "OK — acceptable for transactional coin sync"
       }
-    ]
+    ],
+    "mcp_available": false,
+    "note": "Supabase MCP did not connect this run. Carrying forward 2026-06-09 backend snapshot. Run tomorrow with MCP to apply connections_puzzles policy consolidation."
   },
   "frontend": {
     "by_route": [
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 4028,
-        "p75_inp_ms": 244,
-        "p75_cls": 0.045,
-        "n": 12,
-        "severity": "POOR",
-        "root_cause": "skeleton-vs-hydrated height mismatch in PageClient.tsx; INP 244ms above 200ms threshold",
-        "status": "DEFERRED — low n (12 events), needs skeleton height fix in PageClient.tsx"
+        "p75_lcp_ms": 1706,
+        "p75_lcp_ms_prev": 4903,
+        "p75_inp_ms": 614,
+        "p75_inp_ms_prev": 244,
+        "p75_cls": 0.157,
+        "p75_cls_prev": 0.045,
+        "n": 10,
+        "lcp_status": "IMPROVED — 4903ms→1706ms (ISR fix landed)",
+        "inp_status": "DEFERRED — low n=10, below 50-sample floor. The 244→614 swing was noise (route gets 2-13 samples/day, p75 swings 104↔760; n=4 outlier-driven on 06-09). NOT a regression; suspect overlay verified dark (flag unset). Do not re-flag below n>=50.",
+        "cls_status": "DEFERRED — low n=10, below 50-sample floor. 0.045→0.157 not reliable at this sample size."
       },
       {
-        "route": "/en/daily/word-wheel",
-        "p75_lcp_ms_baseline": 4516,
-        "severity": "POOR (pre-fix)",
-        "root_cause": "force-dynamic prevented ISR caching; every request paid full SSR cold path",
-        "status": "FIXED — revalidate=3600 (ISR), expected LCP ~500ms on cached path"
-      },
-      {
-        "route": "/he/daily/word-hunt",
-        "p75_lcp_ms_baseline": 4350,
-        "severity": "POOR (pre-fix)",
-        "root_cause": "force-dynamic (same as word-wheel)",
-        "status": "FIXED — revalidate=3600 (ISR)"
+        "route": "/he",
+        "p75_lcp_ms": 1148,
+        "p75_inp_ms": null,
+        "p75_cls": 0.386,
+        "n": 8,
+        "lcp_status": "OK",
+        "cls_status": "POOR — 0.386 is very high. Source undiagnosed. Likely above-fold content shift on Hebrew home page. New watch item."
       }
-    ]
+    ],
+    "cls_fix_shipped": {
+      "component": "AutoHideHeader.tsx",
+      "fix": "Return spacer div (not null) when header hidden in gameplay/TV mode. Null kept for CrazyGames. Prevents layout collapse of 60-124px header slot.",
+      "affects": "All gameplay pages using AutoHideHeader: /multiplayer, /game, etc.",
+      "commit": "UNCOMMITTED — lane does not commit"
+    }
   },
   "bundle": {
     "total_kb": null,

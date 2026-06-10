@@ -52,8 +52,10 @@ WHERE event = '$web_vitals' AND timestamp > now() - INTERVAL 24 HOUR
 GROUP BY route HAVING n > 50 ORDER BY p75_lcp DESC LIMIT 10
 ```
 
-For routes with **p75 LCP > 2500ms**, **INP > 200ms**, or **CLS > 0.1**:
-  • Check `docs/nightly/perf-baseline.json` for prior baseline — flag regressions (>20% worse)
+**MANDATORY SAMPLE GATE (non-negotiable — prevents phantom regressions):** The `HAVING n > 50` in the query above is a HARD floor, not a suggestion. NEVER lower it, never widen the window to clear it, never include a route whose `n < 50` in EITHER the current run OR the baseline. p75 from a handful of samples is noise: on a low-traffic locale route (e.g. `/es/multiplayer`), p75 INP routinely swings 100ms↔760ms day-to-day on n=2–13, and a single slow device drags it. If a route is below the floor, it is INELIGIBLE for a regression verdict — record `"inp_status": "DEFERRED — low n=<N>, below 50-sample floor"` and move on. Do NOT write "REGRESSION", do NOT name a suspect commit, do NOT add a "needs investigation" item for any sub-floor route. (On 2026-06-10 a 244ms→614ms "2.5× regression" was flagged on `/es/multiplayer` at n=10; it was pure noise — the suspect code was even dark behind an unset flag. This rule exists to never repeat that.)
+
+For routes with **n ≥ 50** AND (**p75 LCP > 2500ms**, **INP > 200ms**, or **CLS > 0.1**):
+  • Check `docs/nightly/perf-baseline.json` for prior baseline — flag a regression ONLY if today is >20% worse AND both runs cleared the n ≥ 50 floor
   • Open the offending route, identify likely cause:
     - Above-fold image without `priority` → add Next/Image `priority`
     - Heavy client component on critical path → dynamic import with `ssr: false` IF below fold; otherwise refactor to server component
