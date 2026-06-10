@@ -270,6 +270,12 @@ const WordWheelChallenge: React.FC = () => {
       catchupAdUnlockedRef.current = true;
       startPlaying();
     },
+    // Best-effort gate: on any non-reward outcome (skip / no-fill / stalled show
+    // that hits the safety timeout) degrade to free play so the player isn't
+    // stranded on the ready screen after the native ad Activity tears down.
+    // Mirrors the web contract (which never gates). sessionSettled guarantees
+    // exactly one terminal callback, so this can't double-start.
+    onAdError: () => startPlaying(),
   });
 
   const handleStart = useCallback(() => {

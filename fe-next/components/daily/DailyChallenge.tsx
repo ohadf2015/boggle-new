@@ -323,6 +323,13 @@ const DailyChallenge: React.FC = () => {
     rewardKind: 'feature',
     surface: 'retry',
     onRewardEarned: () => beginPlaying(),
+    // The ad is a best-effort speed bump, not a hard wall. On ANY non-reward
+    // outcome (user skip, no-fill, a stalled show that hits the safety timeout)
+    // degrade to a free replay — same contract as web (which never gates) and
+    // the only way the player isn't stranded on the ready screen after the ad
+    // Activity tore down. sessionSettled in useRewardedAd guarantees exactly one
+    // of these fires, so this can't double-start.
+    onAdError: () => beginPlaying(),
   });
 
   // Rewarded ad that unlocks playing a past day's daily (catch-up). Native only;
@@ -338,6 +345,11 @@ const DailyChallenge: React.FC = () => {
       catchupAdUnlockedRef.current = true;
       startPlaying();
     },
+    // Degrade to free play on any non-reward outcome so a stalled/skipped ad
+    // can't strand the player on the ready screen (the "tapped play, button
+    // vanished, nothing happened" report). No unlock flag — no reward was
+    // granted; we just let this one play through.
+    onAdError: () => startPlaying(),
   });
 
   // Handle game start with safety checks
