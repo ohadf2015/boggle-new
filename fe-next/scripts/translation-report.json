@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 5723,
+    "totalKeysInCode": 5726,
     "keyCountByLanguage": {
       "en": 10798,
       "he": 10876,
@@ -8,7 +8,7 @@
       "ja": 10861,
       "es": 10898
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 3,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 26,
@@ -308,7 +308,35 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "results.fanfareHint",
+      "usages": [
+        {
+          "file": "components/results/PreResultFanfare.tsx",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "key": "results.preFanfare",
+      "usages": [
+        {
+          "file": "components/results/PreResultFanfare.tsx",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "key": "results.skipToResults",
+      "usages": [
+        {
+          "file": "components/results/PreResultFanfare.tsx",
+          "line": 122
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "seo.wordCraft.title",
