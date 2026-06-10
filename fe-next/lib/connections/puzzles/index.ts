@@ -89,16 +89,72 @@ function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
 }
 
 /**
+ * Hand-vetted opening for the level path. A new player walks
+ * getPuzzleForLevel(1), (2), … — and the raw easy band led with the most
+ * generic compounding morphemes (DRAW·BACK·FIRE, SNOW·BALL·ROOM), so the first
+ * impression was "too easy / too obvious." The pool already contained
+ * approachable-but-delightful "aha" easy puzzles (JIG·SAW·DUST, RAIN·BOW·TIE);
+ * they were just buried by id/source ordering. This list pulls the charmers to
+ * the front, verbatim, then the rest of the easy band interleaves as before.
+ *
+ * Picked to (a) be gettable yet have a satisfying twist, (b) be concrete/visual,
+ * (c) disperse bridge + stems so no two openers feel alike. Ids must be `easy`
+ * in the pool (asserted in openingCuration.test.ts); an unknown/typo'd id is
+ * silently skipped — it can't break the level path.
+ *
+ * Locales not listed here (sv/es/ja) fall through to the plain interleave,
+ * byte-for-byte unchanged. `he` is authored from the meaning-pivot puzzles
+ * (the bridge flips sense between the two phrases: כאב·ראש·ממשלה — "head"ache /
+ * "head" of state) and is flagged for native review.
+ */
+export const CURATED_OPENING: Partial<Record<PuzzleLocale, readonly string[]>> = {
+  en: [
+    'en-v-038', // RAIN · BOW · TIE       — rainbow / bow tie
+    'en-v-035', // PINE · APPLE · SAUCE   — pineapple / applesauce
+    'en-v-040', // SEA · HORSE · POWER    — seahorse / horsepower
+    'en-v-036', // BUTTER · CUP · CAKE    — buttercup / cupcake
+    'en-v-008', // JIG · SAW · DUST       — jigsaw / sawdust
+    'en-v-053', // POT · BELLY · LAUGH    — potbelly / belly laugh
+    'en-v-037', // COW · BOY · FRIEND     — cowboy / boyfriend
+    'en-v-010', // FINGER · NAIL · POLISH — fingernail / nail polish
+  ],
+  he: [
+    'he-e-034', // כאב · ראש · ממשלה     — כאב ראש (headache) / ראש ממשלה (PM)
+    'he-h-028', // שלט · רחוק · מאוד     — שלט רחוק (remote) / רחוק מאוד (far)
+    'he-h-020', // בית · ספר · תורה      — בית ספר (school) / ספר תורה (scroll)
+    'he-e-081', // אמצע · יום · הולדת    — אמצע יום (midday) / יום הולדת (birthday)
+    'he-h-022', // מי · ברז · מים        — מי ברז (tap water) / ברז מים
+    'he-e-016', // גלידת · שמנת · חמוצה  — גלידת שמנת (cream) / שמנת חמוצה (sour cream)
+    'he-e-070', // טחנת · רוח · קלה      — טחנת רוח (windmill) / רוח קלה (light breeze)
+    'he-h-041', // מכונת · כביסה · ידנית — מכונת כביסה (machine) / כביסה ידנית (hand-wash)
+  ],
+};
+
+/**
  * Difficulty-ramped order: easy → medium → hard. Within each difficulty, bridges
- * are interleaved so the same category does not appear back-to-back. Built once
- * at module load — pools are import-time constants.
+ * are interleaved so the same category does not appear back-to-back. The curated
+ * opening (if any) is pinned to the front of the easy band verbatim; the rest of
+ * the easy band, plus medium and hard, interleave as before. Built once at module
+ * load — pools are import-time constants.
  */
 const ORDERED_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = (() => {
   const out: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {};
   for (const locale of Object.keys(PUZZLES_BY_LOCALE) as PuzzleLocale[]) {
     const all = PUZZLES_BY_LOCALE[locale] ?? [];
+    const easyAll = all.filter((p) => p.difficulty === 'easy');
+
+    // Pin curated openers to the front (verbatim, in listed order), keeping only
+    // ids that resolve to an actual easy puzzle. Everything else interleaves.
+    const byId = new Map(easyAll.map((p) => [p.id, p] as const));
+    const opening = (CURATED_OPENING[locale] ?? [])
+      .map((id) => byId.get(id))
+      .filter((p): p is ConnectionPuzzle => !!p);
+    const openSet = new Set(opening.map((p) => p.id));
+    const easyRest = easyAll.filter((p) => !openSet.has(p.id));
+
     out[locale] = [
-      ...interleaveByBridge(all.filter((p) => p.difficulty === 'easy')),
+      ...opening,
+      ...interleaveByBridge(easyRest),
       ...interleaveByBridge(all.filter((p) => p.difficulty === 'medium')),
       ...interleaveByBridge(all.filter((p) => p.difficulty === 'hard')),
     ];
