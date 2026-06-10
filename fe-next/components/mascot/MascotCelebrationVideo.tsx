@@ -155,6 +155,11 @@ export interface MascotCelebrationVideoProps {
    * variant's default English title.
    */
   title?: string | null;
+  /**
+   * Demo / preview only: force a specific video src (e.g. the -3 variant)
+   * instead of letting the kind pick from its srcs pool.
+   */
+  forceSrc?: string;
 }
 
 /**
@@ -173,6 +178,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   overlay = true,
   className = '',
   title,
+  forceSrc,
 }: MascotCelebrationVideoProps) {
   const variant = VARIANTS[kind];
   // Pick a clip ONCE per mount. The results page re-renders frequently
@@ -180,8 +186,8 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   // same clip for the life of this celebration instead of reshuffling.
   const [clipSeed] = useState(() => Math.floor(Math.random() * 1e9));
   const src = useMemo(
-    () => pickCelebrationSrc(variant.srcs, clipSeed),
-    [variant.srcs, clipSeed]
+    () => (forceSrc ? forceSrc : pickCelebrationSrc(variant.srcs, clipSeed)),
+    [variant.srcs, clipSeed, forceSrc]
   );
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { MascotCelebrationVideo, type MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 
 const LEXICLASH_COLORS = [
   '#BFFF00', // electric lime
@@ -13,6 +14,23 @@ const LEXICLASH_COLORS = [
 ];
 
 const BINGO = ['B', 'I', 'N', 'G', 'O', '!'];
+
+const CELEBRATION_KINDS: { key: MascotCelebrationKind; label: string; hasVersion3: boolean }[] = [
+  { key: 'champion', label: 'CHAMPION', hasVersion3: true },
+  { key: 'bingo', label: 'BINGO', hasVersion3: true },
+  { key: 'streak', label: 'STREAK', hasVersion3: true },
+  { key: 'defeat', label: 'DEFEAT (GG)', hasVersion3: true },
+  { key: 'knight', label: 'VICTORY', hasVersion3: true },
+  { key: 'mission-complete', label: 'MISSION COMPLETE', hasVersion3: true },
+  { key: 'runner-up', label: 'RUNNER-UP', hasVersion3: false },
+  { key: 'explorer', label: 'EXPLORER', hasVersion3: false },
+];
+
+function getCelebrationSrc(kind: MascotCelebrationKind, version: 1 | 2 | 3): string {
+  const base = `/mascots/celebration-${kind}`;
+  if (version === 1) return `${base}.mp4`;
+  return `${base}-${version}.mp4`;
+}
 
 interface Particle {
   x: number;
@@ -116,11 +134,16 @@ function ScoreCountUp({ to, durationMs = 1400 }: { to: number; durationMs?: numb
 export default function AiFanfareDemoClient() {
   const [trigger, setTrigger] = useState(1);
   const [scoreSeed, setScoreSeed] = useState(0);
+  const [selectedKind, setSelectedKind] = useState<MascotCelebrationKind>('champion');
+  const [selectedVersion, setSelectedVersion] = useState<1 | 2 | 3>(3); // default to the latest post-feedback improved clip
 
   const fire = () => {
     setTrigger((t) => t + 1);
     setScoreSeed((s) => s + 1);
   };
+
+  const currentSrc = getCelebrationSrc(selectedKind, selectedVersion);
+  const currentKindLabel = CELEBRATION_KINDS.find((k) => k.key === selectedKind)?.label ?? selectedKind;
 
   return (
     <main className="relative min-h-dvh w-full overflow-hidden bg-[#0A1828] text-white">
@@ -205,34 +228,72 @@ export default function AiFanfareDemoClient() {
           <span className="ml-2 text-base font-bold text-black/70">pts · 7-letter bingo</span>
         </div>
 
-        {/* AI-generated mascot video */}
+        {/* Controls for previewing the different result moments + clip versions */}
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+          {CELEBRATION_KINDS.map((k) => (
+            <button
+              key={k.key}
+              type="button"
+              onClick={() => {
+                setSelectedKind(k.key);
+                // If switching to a kind without v3, clamp to v2
+                if (!k.hasVersion3 && selectedVersion === 3) setSelectedVersion(2);
+                fire();
+              }}
+              className={`rounded-xl border-2 border-black px-3 py-1 text-xs font-black uppercase tracking-wider shadow-hard-sm transition active:translate-x-px active:translate-y-px ${
+                selectedKind === k.key
+                  ? 'bg-neo-lime text-neo-black'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {k.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Version selector (the different AI generations for the same moment) */}
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-[2px] text-white/60">Clip version</span>
+          {[1, 2, 3].map((v) => {
+            const kindInfo = CELEBRATION_KINDS.find((k) => k.key === selectedKind);
+            const hasIt = v === 1 || (v === 2 && (kindInfo?.hasVersion3 || selectedKind !== 'runner-up')) || (v === 3 && !!kindInfo?.hasVersion3);
+            const isActive = selectedVersion === v;
+            return (
+              <button
+                key={v}
+                type="button"
+                disabled={!hasIt}
+                onClick={() => {
+                  setSelectedVersion(v as 1 | 2 | 3);
+                  fire();
+                }}
+                className={`rounded-lg border-2 border-black px-2.5 py-0.5 text-xs font-black shadow-hard-sm disabled:opacity-40 ${
+                  isActive ? 'bg-[#00FFFF] text-neo-black' : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+                title={v === 3 ? 'Latest refined (post 17-20 feedback)' : v === 2 ? 'Previous variant' : 'Original'}
+              >
+                v{v}
+              </button>
+            );
+          })}
+          <span className="ml-2 text-[10px] text-white/50">({currentKindLabel})</span>
+        </div>
+
+        {/* The real result-page fanfare component (exact treatment used on actual results) */}
         <div
-          key={`video-${trigger}`}
-          className="relative w-full max-w-md"
-          style={{ animation: 'videoEnter 720ms cubic-bezier(0.34, 1.56, 0.64, 1) 520ms both' }}
+          key={`fanfare-${selectedKind}-${selectedVersion}-${trigger}`}
+          className="relative w-full max-w-[min(420px,92vw)]"
         >
-          {/* Animated halo behind the mascot */}
-          <div
-            aria-hidden
-            className="absolute inset-0 -z-10 m-auto h-[110%] w-[110%] rounded-full"
-            style={{
-              background:
-                'radial-gradient(circle, rgba(255,20,147,0.45) 0%, rgba(0,255,255,0.35) 45%, transparent 70%)',
-              animation: 'haloPulse 2.2s ease-in-out infinite',
-              filter: 'blur(12px)',
-            }}
+          <MascotCelebrationVideo
+            kind={selectedKind}
+            overlay={false}
+            autoDismissMs={0}
+            forceSrc={currentSrc}
+            title={undefined}
           />
-          <video
-            src="/mascots/celebration-knight.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full rounded-3xl border-4 border-black shadow-hard-xl"
-          />
-          <span className="absolute -right-3 -top-3 rotate-6 rounded-xl border-2 border-black bg-[#FF1493] px-2 py-1 text-xs font-black text-white shadow-[3px_3px_0_#000]">
-            AI · Kling 2.5 Turbo
-          </span>
+          <div className="pointer-events-none absolute -right-2 -top-2 rotate-6 rounded-xl border-2 border-black bg-[#FF1493] px-2 py-0.5 text-[10px] font-black text-white shadow-[2px_2px_0_#000]">
+            AI · {selectedVersion === 3 ? 'latest refined' : `v${selectedVersion}`}
+          </div>
         </div>
 
         {/* Replay + provenance */}
@@ -248,9 +309,9 @@ export default function AiFanfareDemoClient() {
         </div>
 
         <p className="max-w-xl text-center text-sm text-white">
-          100% AI-generated: mascot motion via <strong className="text-white">fal-ai Kling 2.5 Turbo Pro</strong> (image-to-video) ·
-          confetti, BINGO type, score count-up & screen flash via <strong className="text-white">animate-ai MCP</strong>{' '}
-          (pattern <code className="text-white">micro-confetti-burst</code>) composed in your neo-brutalist palette.
+          Real <code className="text-white">MascotCelebrationVideo</code> component (exact result-page treatment: halo, sparkles, title, hard frame).
+          Use the pills above to switch moments and clip versions (v3 = the new refined ones after 17-20 feedback).
+          Raw motion is AI-generated (image-to-video from the exact kawaii cube mascot references).
         </p>
       </div>
     </main>
