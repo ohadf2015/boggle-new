@@ -84,6 +84,30 @@ describe('experiments registry', () => {
     });
   });
 
+  describe('landing-modes-cubes-v1 flag (homepage cube redesign A/B)', () => {
+    it('exists in registry', () => {
+      expect(EXPERIMENTS['landing-modes-cubes-v1']).toBeDefined();
+    });
+
+    it('defaults to "control" (current card layout) so rollout is opt-in', () => {
+      expect(EXPERIMENTS['landing-modes-cubes-v1'].default).toBe('control');
+    });
+
+    it('has control/cubes variants', () => {
+      expect(EXPERIMENTS['landing-modes-cubes-v1'].variants).toEqual(['control', 'cubes']);
+    });
+
+    it('forces "cubes" for the dev account so the variant is browser-testable pre-rollout', () => {
+      expect(experimentEmailOverride('landing-modes-cubes-v1', 'ohadf2015@gmail.com')).toBe('cubes');
+      // case-insensitive
+      expect(experimentEmailOverride('landing-modes-cubes-v1', 'OHADF2015@GMAIL.COM')).toBe('cubes');
+    });
+
+    it('returns null override for a non-allowlisted email (real users get the live flag)', () => {
+      expect(experimentEmailOverride('landing-modes-cubes-v1', 'random@user.com')).toBeNull();
+    });
+  });
+
   describe('mp.desktop-shell.v1 flag', () => {
     it('exists in registry', () => {
       expect(EXPERIMENTS['mp.desktop-shell.v1']).toBeDefined();
