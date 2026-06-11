@@ -4,6 +4,40 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-06-11 (lane-01 triage)
+
+### [Supabase Security] `upsert_player_word` REVOKE — SHIPPED
+- **Status**: shipped (migration `revoke_upsert_player_word_from_authenticated`)
+- `authenticated` had EXECUTE on this SECURITY DEFINER function despite the original migration having a REVOKE. Re-applied REVOKE + confirmed `has_function_privilege('authenticated',...) = false`.
+- Callsite is `backend/modules/supabase/words.ts` via `service_role` only — no client-side callers.
+- **recommended owner: review-by-eod** — verify migration shows up in Supabase dashboard + re-run advisor to confirm warning cleared.
+
+### [Sentry 1KQ] Churn-signals report 502 — DEFERRED
+- first seen: 2026-06-03, last seen: 2026-06-05, 278 occurrences, 3 users
+- Error: `useChurnSignals: failed to report signals` — no source file found matching `churnSignal`/`useChurnSignal` in fe-next; likely removed or in generated/vendored code.
+- Also: prior memory confirms "fire-and-forget analytics" — no user impact.
+- **status: deferred** — why: code not locatable; last seen 6 days ago (may be self-resolved); no user-facing effect.
+- **recommended owner: self** — search for `churn` once vendored deps are audited.
+
+### [Sentry 1JR] `relation "profiles" does not exist` on POST /api/coins — DEFERRED
+- first seen: 2026-05-27, last seen: 2026-05-27, 18 occurrences, 5 users. No recurrence in 15 days.
+- Likely a transient deployment/migration ordering issue at the time; DB is healthy now.
+- **status: deferred** — why: no recent recurrence; stale deployment artifact.
+- **recommended owner: self** — monitor; re-open if recurs.
+
+### [Sentry 1CW] Word-wheel null `.clear()` TypeError — ALREADY FIXED
+- first seen: 2026-05-15, last seen: 2026-06-09, 13 occurrences, 5 users.
+- Fix shipped in `abe2dcd2f` (guard: `if (destroyed || orbitGfx.destroyed || ...) return` in ticker). Last Sentry event predates the fix deployment.
+- **status: resolved** — monitor Sentry to confirm zero events after deploy.
+
+### [Supabase Security] `web_vitals` RLS INSERT always-true — DOCUMENTED INTENTIONAL
+- Policy: `Anyone can insert web vitals` with `WITH CHECK (true)`.
+- This is intentional public telemetry — any visitor (anon/authenticated) can push web vitals data. There is no user-specific data in the insert.
+- **status: deferred** — why: intentional design; INSERT-only, no SELECT exposure.
+- **recommended owner: review-by-eod** — confirm no sensitive fields in `web_vitals` schema.
+
+---
+
 ## 2026-06-09 (lane-03 engagement)
 
 ### [Flags] Stale experiments — human decision needed
@@ -533,3 +567,34 @@ All 5 items triaged with live evidence (Sentry MCP + Supabase SQL + Railway env)
   - status: deferred
   - why: /api/coins/route.ts uses `.from('n')` (not 'profiles'); error suggests a search_path issue in a SECURITY DEFINER function on the server path. Needs DB audit of which function queries 'profiles' without schema-qualifying. Stale (May 27) — may be self-healed by a prior migration fix.
   - recommended owner: backend
+
+## 2026-06-11 (lane-03 engagement — flag hygiene)
+
+### [Flag] `share-prompt-timing` — STALE, human decision needed
+- **Age**: 71 days (created 2026-03-31)
+- **Rollout**: 100% — all users split
+- **Status**: no stat-sig result logged; experiment running blind for 71 days
+- **Recommended action**: pull PostHog experiment results. If no conversion signal → kill flag, keep whichever variant is currently live as default
+- **Code locations**: grep `share-prompt-timing` in fe-next/
+
+### [Flag] `show-signup-after-first-win` — STALE, human decision needed
+- **Age**: 70 days (created 2026-03-31)
+- **Rollout**: 100%
+- **Status**: learnings note "70d, 0 converts" — conversion = signup_completed within session of first impression; may need longer attribution window check
+- **Recommended action**: pull PostHog experiment results. If truly 0/arm → kill flag, keep current variant
+- **Code locations**: grep `show-signup-after-first-win` in fe-next/
+
+### [Flag] `mp-signup-nudge-copy-v1` — INEFFECTIVE, recommend kill
+- **Age**: 34 days (created 2026-05-08)
+- **Rollout**: 100%
+- **Status**: 0/77 conversions in 28d per flag description. Control = sheet+toast (status quo). Neither variant converts
+- **Recommended action**: kill flag entirely; signup nudge sheet itself may be the problem, not copy
+- **Code locations**: grep `mp-signup-nudge-copy-v1` in fe-next/
+
+### [Action needed] Create PostHog flags for two code-complete experiments
+Both experiments are fully implemented (UI, tracking, translations ×5) but PostHog flags were never created → 100% control exposure, 0 variant data collected.
+
+1. **`exp-invite-arrival-clarity-v1`** — status-card variant shows "Connecting…" spinner when returning user hits `?room=` invite URL (reduces rage clicks). Variants: `control`, `status-card`. Recommend 50/50.
+2. **`exp-mp-quickplay-wait-v1`** — match-seeking overlay replaces dimmed button during quickPlay auto-join. Variants: `control`, `match-seeking`. Recommend 50/50.
+
+Create both in PostHog → Settings → Feature Flags with the exact key names above.

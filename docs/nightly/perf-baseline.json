@@ -1,77 +1,95 @@
 {
-  "date": "2026-06-10",
-  "note": "Fifteenth snapshot. Frontend: shipped AutoHideHeader CLS fix (spacer div instead of null during gameplay/TV mode; null kept for CrazyGames). PostHog Web Vitals show LCP on /es/multiplayer improved 4903ms→1706ms (ISR fix landed). CLS on /he 0.386 (new — undiagnosed). NOTE (06-10 follow-up): the flagged INP 244→614ms on /es/multiplayer was DEBUNKED as noise (n=10, sub-50 floor; route swings 104↔760ms; suspect overlay dark behind unset flag) — a mandatory n>=50 sample gate was added to prompts/02-perf.md to prevent recurrence. Backend: connections_puzzles multiple-permissive-policy CONSOLIDATED (06-10, two SELECT policies merged into one OR'd policy via migration); word_pacts FK index still deferred (tiny table).",
+  "date": "2026-06-11",
+  "note": "Sixteenth snapshot. Backend: dropped unused index idx_user_reports_pending (0 scans, advisor-flagged, reduces write overhead on user_reports). /daily/page.tsx force-dynamic CONFIRMED CORRECT — uses searchParams for per-request OG share images. Frontend: PostHog 7-day n>=50 routes: /es/multiplayer (LCP 4329ms 7d-avg includes pre-ISR-fix data, n=117) + /en (LCP 2460ms, INP 360ms, n=53). 24h window yielded 0 routes above n>=50 floor. Bundle: no .next build in working tree.",
   "backend": {
-    "advisor_warnings_count": 4,
+    "advisor_warnings_count": 3,
     "advisor_warnings": [
-      {
-        "type": "multiple_permissive_policies",
-        "table": "connections_puzzles",
-        "policies": ["connections puzzles active public read", "curators read puzzles in their locale"],
-        "status": "DEFERRED — Supabase MCP unavailable 2026-06-10. Needs migration: consolidate two SELECT policies into one using OR condition. Re-queue tomorrow.",
-        "nights_deferred": 2
-      },
-      {
-        "type": "multiple_permissive_policies",
-        "table": "invalid_word_submissions",
-        "status": "FIXED 2026-06-09 — migration 20260609_drop_redundant_invalid_word_submissions_admin_policy applied"
-      },
       {
         "type": "unindexed_foreign_keys",
         "table": "word_pacts",
         "fkey": "word_pacts_player2_id_fkey",
-        "status": "SKIPPED — table has ~1 row, Seq Scan is optimal. Re-evaluate at 1000+ rows."
+        "status": "SKIPPED — tiny table (~1 row). Seq Scan optimal. Re-evaluate at 1000+ rows."
       },
       {
         "type": "auth_db_connections_absolute",
         "status": "ADVISORY — switch to percentage-based connection allocation. Low risk at current scale. Deferred."
+      },
+      {
+        "type": "unused_index",
+        "index": "idx_user_reports_pending",
+        "table": "user_reports",
+        "status": "FIXED 2026-06-11 — migration drop_unused_idx_user_reports_pending applied. 0 scans confirmed."
       }
     ],
     "top_queries": [
       {
-        "label": "realtime.list_changes WAL parser",
+        "label": "Realtime WAL parser (2 variants)",
+        "total_ms": 5000576,
         "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize"
       },
       {
         "label": "sync_coins RPC",
+        "calls": 18761,
         "mean_ms": 7.3,
-        "verdict": "OK — acceptable for transactional coin sync"
+        "verdict": "OK"
+      },
+      {
+        "label": "UPDATE profiles SET last_seen_at",
+        "calls": 48094,
+        "mean_ms": 1.58,
+        "verdict": "OK"
+      },
+      {
+        "label": "SELECT name FROM pg_timezone_names",
+        "calls": 219,
+        "mean_ms": 338.75,
+        "verdict": "INFRASTRUCTURE — internal PostgREST/catalog query, not app code"
       }
-    ],
-    "mcp_available": false,
-    "note": "Supabase MCP did not connect this run. Carrying forward 2026-06-09 backend snapshot. Run tomorrow with MCP to apply connections_puzzles policy consolidation."
+    ]
   },
   "frontend": {
+    "note": "24h window: 0 routes above n>=50 floor (low traffic). 7-day window used for trend baseline.",
     "by_route": [
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 1706,
-        "p75_lcp_ms_prev": 4903,
-        "p75_inp_ms": 614,
-        "p75_inp_ms_prev": 244,
-        "p75_cls": 0.157,
-        "p75_cls_prev": 0.045,
-        "n": 10,
-        "lcp_status": "IMPROVED — 4903ms→1706ms (ISR fix landed)",
-        "inp_status": "DEFERRED — low n=10, below 50-sample floor. The 244→614 swing was noise (route gets 2-13 samples/day, p75 swings 104↔760; n=4 outlier-driven on 06-09). NOT a regression; suspect overlay verified dark (flag unset). Do not re-flag below n>=50.",
-        "cls_status": "DEFERRED — low n=10, below 50-sample floor. 0.045→0.157 not reliable at this sample size."
+        "p75_lcp_ms": 4329,
+        "p75_inp_ms": 352,
+        "p75_cls": 0.122,
+        "n_7d": 117,
+        "window": "7d",
+        "lcp_status": "DEGRADED 7d-avg — includes pre-ISR-fix data (06-05 to 06-08 at ~4903ms). 24h data below n>=50 floor.",
+        "inp_status": "POOR — 352ms >200ms threshold. Source undiagnosed. Defer until 24h n>=50."
+      },
+      {
+        "route": "/en",
+        "p75_lcp_ms": 2460,
+        "p75_inp_ms": 360,
+        "p75_cls": 0.137,
+        "n_7d": 53,
+        "window": "7d",
+        "lcp_status": "BORDERLINE — 2460ms near 2500ms threshold. Watch.",
+        "inp_status": "POOR — 360ms >200ms threshold. Source undiagnosed.",
+        "cls_status": "BORDERLINE — 0.137 near 0.1 threshold. Watch."
+      }
+    ],
+    "deferred": [
+      {
+        "route": "/en/daily/word-wheel",
+        "brief_lcp_ms": 5932,
+        "status": "DEFERRED — already has revalidate=3600. n<50 in 24h window. Brief data stale/low-n."
+      },
+      {
+        "route": "/sv/daily",
+        "brief_lcp_ms": 3772,
+        "status": "DEFERRED — force-dynamic CORRECT (per-request OG from searchParams). n<50 in 24h window."
       },
       {
         "route": "/he",
-        "p75_lcp_ms": 1148,
-        "p75_inp_ms": null,
         "p75_cls": 0.386,
-        "n": 8,
-        "lcp_status": "OK",
-        "cls_status": "POOR — 0.386 is very high. Source undiagnosed. Likely above-fold content shift on Hebrew home page. New watch item."
+        "n_7d": 8,
+        "status": "DEFERRED — CLS 0.386 very high but n=8 below 50-sample floor. Source undiagnosed."
       }
-    ],
-    "cls_fix_shipped": {
-      "component": "AutoHideHeader.tsx",
-      "fix": "Return spacer div (not null) when header hidden in gameplay/TV mode. Null kept for CrazyGames. Prevents layout collapse of 60-124px header slot.",
-      "affects": "All gameplay pages using AutoHideHeader: /multiplayer, /game, etc.",
-      "commit": "UNCOMMITTED — lane does not commit"
-    }
+    ]
   },
   "bundle": {
     "total_kb": null,
