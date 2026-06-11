@@ -16,6 +16,7 @@ import { LobbyReactions } from '../../components/lobby/LobbyReactions';
 import { EmoteTray } from './lobby/EmoteTray';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
+import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
@@ -99,6 +100,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({
     socket: socketCtx?.socket ?? null,
   });
+  // Broadcast this guest's rewarded-ad state so the host's Start disables while
+  // they watch (return value unused here — guests don't gate anything).
+  useLobbyAdGate({ socket: socketCtx?.socket ?? null });
 
   // Mirror the host's server-owned auto-start countdown (display only — guests
   // never fire the start) so everyone watches the same number tick down.

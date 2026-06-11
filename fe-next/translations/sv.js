@@ -1780,6 +1780,7 @@ const sv = {
     },
     "allReadyAutoStart": "Alla är redo! Startar om {seconds}…",
     "playersWaitingNudge": "{count}/{total} spelare redo — starta spelet!",
+    "adWatchHold": "Vänta — en spelare tittar på en annons för en belöning",
     "addBot": "Lägg till bot",
     "removeBot": "Ta bort bot",
     "botEasy": "Lätt",

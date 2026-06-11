@@ -1671,6 +1671,7 @@ const en = {
     },
     "allReadyAutoStart": "Everyone's ready! Starting in {seconds}…",
     "playersWaitingNudge": "{count}/{total} players ready — start the game!",
+    "adWatchHold": "Hold on — a player is watching an ad for a reward",
     "addBot": "Add Bot",
     "removeBot": "Remove bot",
     "botEasy": "Easy",

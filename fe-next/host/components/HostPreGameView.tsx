@@ -9,6 +9,7 @@ import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
 import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
+import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
@@ -160,6 +161,9 @@ function HostPreGameView({
   isQuickPlay = false,
 }: HostPreGameViewProps): React.ReactElement {
   const { socket } = useSocket();
+  // Disable Start while any player (host or guest) is mid rewarded-ad — starting
+  // would tear a watcher out of their ad and void the reward they're earning.
+  const { anyAdActive } = useLobbyAdGate({ socket });
   const { isAdmin, isAuthenticated, updateProfile } = useAuth();
   // Blast is enabled for all players — the prior blast_access/admin gate was
   // removed once MP blast reached parity (shared-board clear ends room, bots
@@ -291,7 +295,7 @@ function HostPreGameView({
   // A host alone in the lobby may still press Start: clicking fills bots + starts
   // immediately (see handleStartClick). Only a missing timer / tournament-in-flight
   // blocks it — never "no players yet", which trapped new hosts behind a 40s wait.
-  const isStartDisabled = !timerValue || tournamentCreating;
+  const isStartDisabled = !timerValue || tournamentCreating || anyAdActive;
 
   // Auto-fill bots countdown
   const [botCountdown, setBotCountdown] = useState<number | null>(null);
@@ -364,11 +368,14 @@ function HostPreGameView({
   // game has opponents — mirrors the passive bot-countdown path (setAutoFill →
   // onStartGame) but on demand, so an impatient new host needn't wait out the timer.
   const handleStartClick = useCallback(() => {
+    // Hard guard (beyond the disabled button): never start while a player is
+    // mid rewarded-ad — protects against any non-button start path too.
+    if (anyAdActive) return;
     if (humanGuestCount === 0) {
       socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
     }
     onStartGame();
-  }, [humanGuestCount, socket, onStartGame]);
+  }, [anyAdActive, humanGuestCount, socket, onStartGame]);
 
   // Solo-host rescue prompt: shown vs hidden is a single derived condition so the
   // render and the "shown" telemetry agree. Gated on !isPrivate to match the alone-
@@ -629,6 +636,11 @@ function HostPreGameView({
                 {t('hostView.playersWaitingNudge', { count: readyCount, total: readyTotal })}
               </p>
             )}
+            {anyAdActive && (
+              <p role="status" className="text-center text-neo-cyan font-neo-body text-xs mb-1.5">
+                {t('hostView.adWatchHold')}
+              </p>
+            )}
             <div className="flex items-center gap-3">
               <LobbyRewardCluster surface="host_waiting" />
               <div className="flex-1">
@@ -681,6 +693,11 @@ function HostPreGameView({
             {showWaitingNudge && (
               <p className="max-w-[600px] mx-auto text-center text-neo-yellow font-neo-display font-bold text-xs uppercase tracking-wide mb-1.5 animate-neo-wobble">
                 {t('hostView.playersWaitingNudge', { count: readyCount, total: readyTotal })}
+              </p>
+            )}
+            {anyAdActive && (
+              <p role="status" className="max-w-[600px] mx-auto text-center text-neo-cyan font-neo-body text-xs mb-1.5">
+                {t('hostView.adWatchHold')}
               </p>
             )}
             <div className="max-w-[600px] mx-auto flex flex-col short:flex-row short:items-stretch gap-2">

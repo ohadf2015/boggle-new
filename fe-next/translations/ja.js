@@ -1682,6 +1682,7 @@ const ja = {
     },
     "allReadyAutoStart": "全員準備完了！{seconds}秒後に開始…",
     "playersWaitingNudge": "{count}/{total} 人が準備完了 — ゲームを開始！",
+    "adWatchHold": "少し待って — プレイヤーが報酬の広告を視聴中",
     "addBot": "ボット追加",
     "removeBot": "ボットを削除",
     "botEasy": "かんたん",

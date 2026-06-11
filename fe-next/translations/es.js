@@ -1698,6 +1698,7 @@ const es = {
     },
     "allReadyAutoStart": "¡Todos listos! Empezando en {seconds}…",
     "playersWaitingNudge": "{count}/{total} jugadores listos — ¡empieza la partida!",
+    "adWatchHold": "Espera — un jugador está viendo un anuncio por una recompensa",
     "addBot": "Añadir Bot",
     "removeBot": "Eliminar bot",
     "botEasy": "Fácil",

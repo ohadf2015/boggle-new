@@ -38,6 +38,9 @@ export interface ClientToServerEvents {
   // Game events
   createGame: (data: CreateGamePayload) => void;
   join: (data: JoinGamePayload) => void;
+  // Lobby ad-gate: a player announces whether they are watching a rewarded ad,
+  // so the host's Start disables while anyone in the room is mid-ad.
+  'lobby:adWatching': (data: { active: boolean }) => void;
   startGame: (data: StartGamePayload) => void;
   startGameAck: (data: { messageId: string }) => void;
   countdownComplete: (data: { messageId: string }) => void;
@@ -287,6 +290,7 @@ export interface ServerToClientEvents {
   finished: (data: Record<string, never>) => void;
 
   // Lobby / ready-up events
+  lobbyAdWatchingUpdate: (data: { usernames: string[] }) => void;
   playerListUpdate: (data: { users: unknown[] }) => void;
   playersReadyUpdate: (data: { readyCount: number; totalPlayers: number; readyUsernames: string[] }) => void;
   allPlayersReady: (data: { readyCount: number; totalPlayers: number }) => void;

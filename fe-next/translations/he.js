@@ -1714,6 +1714,7 @@ const he = {
     },
     "allReadyAutoStart": "כולם מוכנים! מתחילים בעוד {seconds}…",
     "playersWaitingNudge": "{count}/{total} שחקנים מוכנים — התחילו את המשחק!",
+    "adWatchHold": "רגע — שחקן צופה בפרסומת כדי לקבל פרס",
     "addBot": "הוסף בוט",
     "removeBot": "הסר בוט",
     "botEasy": "קל",
