@@ -1460,7 +1460,8 @@ const sv = {
       "ready": "Redo att hämta — en gratis del väntar",
       "cooldown": "Nästa drop om {time}",
       "exhausted": "Du äger alla premiumdelar — snyggt!",
-      "justClaimed": "Del upplåst! Kolla avatarbyggaren"
+      "justClaimed": "Del upplåst! Kolla avatarbyggaren",
+      "lobbyCta": "Gratis avatardel"
     },
     "builder": {
       "title": "Skapa din look",

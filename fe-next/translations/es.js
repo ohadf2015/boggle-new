@@ -1409,7 +1409,8 @@ const es = {
       "ready": "Listo para reclamar — una pieza gratis te espera",
       "cooldown": "Próxima caída en {time}",
       "exhausted": "Tienes todas las piezas premium — ¡genial!",
-      "justClaimed": "¡Pieza desbloqueada! Revisa el creador de avatar"
+      "justClaimed": "¡Pieza desbloqueada! Revisa el creador de avatar",
+      "lobbyCta": "Pieza gratis"
     },
     "builder": {
       "title": "Crea tu look",

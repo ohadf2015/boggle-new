@@ -1351,7 +1351,8 @@ const en = {
       "ready": "Ready to claim — one free part on the house",
       "cooldown": "Next drop in {time}",
       "exhausted": "You own every premium part — nice!",
-      "justClaimed": "Part unlocked! Check your avatar builder"
+      "justClaimed": "Part unlocked! Check your avatar builder",
+      "lobbyCta": "Free Avatar Part"
     },
     "builder": {
       "title": "Make Your Look",

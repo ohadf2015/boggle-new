@@ -39,8 +39,7 @@ vi.mock('framer-motion', () => {
   };
 });
 
-vi.mock('@/components/boosts/BoostButton', () => ({ BoostButton: () => null }));
-vi.mock('@/components/boosts/BoostPicker', () => ({ BoostPicker: () => null }));
+vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
 
 vi.mock('../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),

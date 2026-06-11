@@ -36,8 +36,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps): React.ReactElem
 
 export const useTheme = (): ThemeContextValue => {
     const context = useContext(ThemeContext);
-    if (context === undefined) {
-        throw new Error('useTheme must be used within a ThemeProvider');
-    }
-    return context;
+    // Degrade gracefully outside a provider rather than crashing the subtree.
+    // The theme is dark-only and toggle is a noop, so this default is identical
+    // to the provider's value (which only adds a DOM-class side-effect). Keeps
+    // theme-aware leaf components (e.g. lobby reward buttons) from hard-failing
+    // when rendered in a context that hasn't mounted ThemeProvider.
+    return context ?? { theme: 'dark', toggleTheme: noop };
 };

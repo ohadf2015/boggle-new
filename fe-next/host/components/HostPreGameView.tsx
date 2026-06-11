@@ -8,8 +8,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
-import { BoostButton } from '@/components/boosts/BoostButton';
-import { BoostPicker } from '@/components/boosts/BoostPicker';
+import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 
 import { GAME_PRESETS } from './pre-game/PresetSelector';
@@ -172,9 +171,6 @@ function HostPreGameView({
 
   // Avatar & name editing state (UI lives in PlayerRoster, modal lives here)
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
-  // Lifted boost-picker state — single picker mounts at view root so picker UI
-  // survives mobile↔desktop layout swaps on device rotation (see audit UX-CRIT-5).
-  const [isBoostPickerOpen, setIsBoostPickerOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
 
@@ -634,8 +630,8 @@ function HostPreGameView({
               </p>
             )}
             <div className="flex items-center gap-3">
-              <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
-              <div className={cn('flex-1', showWaitingNudge && 'animate-pulse')}>
+              <LobbyRewardCluster surface="host_waiting" />
+              <div className="flex-1">
                 <StartButton
                   onStartGame={handleStartClick}
                   disabled={isStartDisabled}
@@ -689,9 +685,9 @@ function HostPreGameView({
             )}
             <div className="max-w-[600px] mx-auto flex flex-col short:flex-row short:items-stretch gap-2">
               <div className="short:shrink-0 short:w-auto">
-                <BoostButton mode="mp" sessionId={gameCode} open={isBoostPickerOpen} onOpenChange={setIsBoostPickerOpen} />
+                <LobbyRewardCluster surface="host_waiting" />
               </div>
-              <div className={cn('short:flex-1 short:min-w-0', showWaitingNudge && 'animate-pulse')}>
+              <div className="short:flex-1 short:min-w-0">
                 <StartButton
                   onStartGame={handleStartClick}
                   disabled={isStartDisabled}
@@ -719,18 +715,6 @@ function HostPreGameView({
           separate tv-broadcast/ components), so they can fling emoji whether they
           play or just run the scoreboard — same ambient delight as every player. */}
       <LobbyReactions username={username} />
-      {/* Single boost picker mount — survives layout tree swaps. Lazy-mounted
-          so the picker's hooks (useBoostStatus, useBoostClaim → AdMobProvider)
-          don't run until needed; HostPreGameView root keeps the open flag so
-          the picker reopens at the same state on viewport changes. */}
-      {isBoostPickerOpen && (
-        <BoostPicker
-          open={isBoostPickerOpen}
-          mode="mp"
-          sessionId={gameCode}
-          onClose={() => setIsBoostPickerOpen(false)}
-        />
-      )}
     </div>
   );
 }

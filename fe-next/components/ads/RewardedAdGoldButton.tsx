@@ -17,6 +17,12 @@ interface RewardedAdGoldButtonProps {
   surface: string;
   /** Larger, more prominent variant for primary CTAs. */
   size?: 'sm' | 'md';
+  /**
+   * Suppress the perpetual idle motion (bob / shimmer sweep / pulsing ring).
+   * Used where the button is secondary chrome sitting beside a primary CTA
+   * (e.g. the lobby reward cluster next to Start) so it doesn't compete.
+   */
+  quietIdle?: boolean;
 }
 
 export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
@@ -25,6 +31,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   className,
   surface,
   size = 'sm',
+  quietIdle = false,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -65,6 +72,8 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   const isDone = status === 'completed';
   const isDisabled = isLoading || capped;
   const isIdle = status === 'idle' && !capped;
+  // Perpetual idle decoration (bob / shimmer / ring); suppressed when quietIdle.
+  const idleMotion = isIdle && !quietIdle;
 
   const label = status === 'showing'
     ? t('ads.rewarded.earning')
@@ -107,9 +116,9 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       aria-label={t('ads.rewarded.watchForGold').replace('{amount}', String(goldAmount))}
       whileHover={!isDisabled ? { scale: 1.05, y: -2 } : undefined}
       whileTap={!isDisabled ? { scale: 0.94 } : undefined}
-      animate={isIdle && !reducedMotion ? { y: [0, -1.5, 0] } : { y: 0 }}
+      animate={idleMotion && !reducedMotion ? { y: [0, -1.5, 0] } : { y: 0 }}
       transition={
-        isIdle && !reducedMotion
+        idleMotion && !reducedMotion
           ? { y: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } }
           : { type: 'spring', stiffness: 400, damping: 18 }
       }
@@ -128,7 +137,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       )}
     >
       {/* idle diagonal shimmer sweep */}
-      {isIdle && !reducedMotion && (
+      {idleMotion && !reducedMotion && (
         <m.span
           aria-hidden
           className="absolute inset-0 pointer-events-none z-0"
@@ -188,7 +197,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       </AnimatePresence>
 
       {/* idle ring hint */}
-      {isIdle && (
+      {idleMotion && (
         <span
           aria-hidden
           className="absolute inset-0 rounded-neo pointer-events-none animate-pulse opacity-40 ring-2 ring-neo-lime z-10"
@@ -201,7 +210,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
         {isIdle && (
           <m.span
             className="inline-flex items-center gap-0.5 font-black text-neo-lime"
-            animate={!reducedMotion ? { rotate: [0, -6, 6, 0] } : undefined}
+            animate={!reducedMotion && !quietIdle ? { rotate: [0, -6, 6, 0] } : undefined}
             transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' }}
           >
             <Coins className={isMd ? 'h-4 w-4' : 'h-3.5 w-3.5'} />

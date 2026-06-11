@@ -77,10 +77,9 @@ vi.mock('@/hooks/gameState', () => ({
   useHostSelectedGameMode: () => 'random',
 }));
 
-// Mock RewardedAdGoldButton
-vi.mock('@/components/ads/RewardedAdGoldButton', () => ({
-  __esModule: true,
-  default: () => <div data-testid="rewarded-ad" />,
+// Mock the lobby reward cluster (pulls AdMob/ad providers transitively).
+vi.mock('@/components/lobby/LobbyRewardCluster', () => ({
+  LobbyRewardCluster: () => <div data-testid="lobby-reward-cluster" />,
 }));
 
 // Mock animation presets

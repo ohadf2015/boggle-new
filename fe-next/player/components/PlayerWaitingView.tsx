@@ -8,7 +8,7 @@ import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crossha
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
-import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
+import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
@@ -268,9 +268,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             <LobbyReactions username={username} />
           </div>
 
-          <div className="mt-3">
-            <RewardedAdGoldButton goldAmount={20} surface="player_waiting" />
-          </div>
+          <LobbyRewardCluster surface="player_waiting" className="mt-3" />
         </div>
       </div>
     </m.div>
