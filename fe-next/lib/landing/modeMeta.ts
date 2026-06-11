@@ -58,7 +58,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   connections: {
     titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/play',
-    Icon: Link2, variant: 'purple', badge: 'NEW', modeImage: '/modes/connections.png', genIcon: '/modes/cubes/connections.png',
+    Icon: Link2, variant: 'blue', badge: 'NEW', modeImage: '/modes/connections.png', genIcon: '/modes/cubes/connections.png',
   },
   brainGym: {
     titleKey: 'landing.brainTraining', descKey: 'landing.brainTrainingDesc', path: '/brain',
@@ -66,48 +66,49 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   wordCraft: {
     titleKey: 'wordcraft.modeTitle', descKey: 'wordcraft.modeDesc', path: '/word-craft',
-    Icon: Layers, variant: 'purple', badge: 'NEW', modeImage: '/modes/word-craft.png', genIcon: '/modes/cubes/wordcraft.png',
+    Icon: Layers, variant: 'orange', badge: 'NEW', modeImage: '/modes/word-craft.png', genIcon: '/modes/cubes/wordcraft.png',
   },
   crossword: {
     titleKey: 'crossword.name', descKey: 'crossword.tagline', path: '/crossword',
     Icon: Grid3x3, variant: 'cyan', badge: 'NEW', genIcon: '/modes/cubes/crossword.png',
   },
-  // Admin-only dev previews — never get generated icons (nobody public sees them).
+  // Admin-only dev previews — also carry generated cube icons so the "+ More"
+  // grid is full-bleed art across the board. Colours spread to avoid clusters.
   blastClassic: {
     titleKey: 'landing.blastClassic', descKey: 'landing.blastClassicDesc', path: '/blast?v2=off',
-    Icon: Bomb, variant: 'orange', badge: 'V1',
+    Icon: Bomb, variant: 'orange', badge: 'V1', genIcon: '/modes/cubes/blastclassic.png',
   },
   blastV2: {
     titleKey: 'landing.blastV2', descKey: 'landing.blastV2Desc', path: '/blast/v2',
-    Icon: Bomb, variant: 'purple', badge: 'V2',
+    Icon: Bomb, variant: 'purple', badge: 'V2', genIcon: '/modes/cubes/blastv2.png',
   },
   wordTower: {
     titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc', path: '/word-tower',
-    Icon: Building2, variant: 'purple', badge: 'ADMIN', modeImage: '/modes/word-tower.png',
+    Icon: Building2, variant: 'lime', badge: 'ADMIN', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',
   },
   wordForge: {
     titleKey: 'landing.wordForgeMode', descKey: 'landing.wordForgeModeDesc', path: '/word-forge',
-    Icon: Hammer, variant: 'lime', badge: 'ADMIN',
+    Icon: Hammer, variant: 'orange', badge: 'ADMIN', genIcon: '/modes/cubes/wordforge.png',
   },
   wordVault: {
     titleKey: 'landing.wordVaultMode', descKey: 'landing.wordVaultModeDesc', path: '/word-vault',
-    Icon: Vault, variant: 'cyan', badge: 'ADMIN',
+    Icon: Vault, variant: 'cyan', badge: 'ADMIN', genIcon: '/modes/cubes/wordvault.png',
   },
   party: {
     titleKey: 'landing.partyMode', descKey: 'landing.partyModeDesc', path: '/party',
-    Icon: PartyPopper, variant: 'pink', badge: 'ADMIN',
+    Icon: PartyPopper, variant: 'pink', badge: 'ADMIN', genIcon: '/modes/cubes/party.png',
   },
   wordAlchemy: {
     titleKey: 'landing.wordAlchemyMode', descKey: 'landing.wordAlchemyModeDesc', path: '/word-alchemy',
-    Icon: FlaskConical, variant: 'purple', badge: 'ADMIN',
+    Icon: FlaskConical, variant: 'purple', badge: 'ADMIN', genIcon: '/modes/cubes/wordalchemy.png',
   },
   shiritori: {
     titleKey: 'landing.shiritoriMode', descKey: 'landing.shiritoriModeDesc', path: '/shiritori/solo',
-    Icon: ScrollText, variant: 'cyan', badge: 'ADMIN',
+    Icon: ScrollText, variant: 'blue', badge: 'ADMIN', genIcon: '/modes/cubes/shiritori.png',
   },
   sealedBid: {
     titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',
-    Icon: Gavel, variant: 'blue', badge: 'ADMIN',
+    Icon: Gavel, variant: 'cyan', badge: 'ADMIN', genIcon: '/modes/cubes/sealedbid.png',
   },
 };
 

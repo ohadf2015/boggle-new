@@ -390,9 +390,9 @@ export function LandingChallengeCards({
               href={`/${language}/connections/play`}
               icon={<Link2 className="w-6 h-6" />}
               modeImage="/modes/connections.png"
-              variant="purple"
+              variant="blue"
               badge="NEW"
-              onClick={() => { trackModeSelected('connections', 'home'); trackLandingCtaClick('mode_card', { mode: 'connections', variant: 'purple' }); }}
+              onClick={() => { trackModeSelected('connections', 'home'); trackLandingCtaClick('mode_card', { mode: 'connections', variant: 'blue' }); }}
             />
           </div>
         );
@@ -421,9 +421,9 @@ export function LandingChallengeCards({
               href={`/${language}/word-craft`}
               icon={<Layers className="w-6 h-6" />}
               modeImage="/modes/word-craft.png"
-              variant="purple"
+              variant="orange"
               badge="NEW"
-              onClick={() => { trackModeSelected('wordCraft' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraft', variant: 'purple' }); }}
+              onClick={() => { trackModeSelected('wordCraft' as never, 'home'); trackLandingCtaClick('mode_card', { mode: 'wordCraft', variant: 'orange' }); }}
             />
           </div>
         );

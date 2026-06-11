@@ -15,9 +15,9 @@ describe('MODE_META — parity with control renderCard', () => {
     ['practice', '/practice', 'cyan'],
     ['blast', '/blast', 'orange'],
     ['adventure', '/adventure', 'lime'],
-    ['connections', '/connections/play', 'purple'],
+    ['connections', '/connections/play', 'blue'],
     ['brainGym', '/brain', 'purple'],
-    ['wordCraft', '/word-craft', 'purple'],
+    ['wordCraft', '/word-craft', 'orange'],
     ['crossword', '/crossword', 'cyan'],
   ];
 
@@ -42,10 +42,10 @@ describe('MODE_META — parity with control renderCard', () => {
     expect(MODE_META['daily']).toBeUndefined();
   });
 
-  // Every public mode must ship a generated cube icon so the bento grid renders
-  // full-bleed art (not an icon-on-navy fallback) — keeps the layout cohesive.
-  // Admin previews are intentionally excluded (nobody public sees them).
-  it.each(PUBLIC_CONTRACT.map(([key]) => key))('public mode %s has a generated cube icon', (key) => {
+  // EVERY mode (public + admin) must ship a generated cube icon so the whole
+  // bento grid — including the "+ More" admin drawer — renders full-bleed art
+  // instead of an icon-on-navy fallback. Keeps the layout cohesive end to end.
+  it.each(Object.keys(MODE_META))('mode %s has a generated cube icon', (key) => {
     const { genIcon } = MODE_META[key];
     expect(genIcon, `${key} genIcon present`).toBeTruthy();
     expect(genIcon, `${key} genIcon lives under /modes/cubes/`).toMatch(/^\/modes\/cubes\/.+\.png$/);
