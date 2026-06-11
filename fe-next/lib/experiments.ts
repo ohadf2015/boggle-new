@@ -261,6 +261,30 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * Homepage mode-section layout redesign. The current `LandingChallengeCards`
+   * renders same-shaped icon+heading+long-description cards in repeated grids
+   * (the "identical card grid" anti-pattern). `cubes` swaps the mode section
+   * for a compact bento of small mode "cubes" (arena = 2×2 anchor, others 1×1)
+   * with generated icons + one scroll-reveal. Both variants consume the SAME
+   * computed/ordered/gated mode list inside LandingChallengeCards, so the test
+   * compares layout only — no mode-logic drift.
+   *
+   * control = current card grid. cubes = bento cube layout.
+   * Conversion = landing_cta_clicked (mode_card) → game start; guardrail: scroll
+   * depth / bounce must not worsen. Ship to PostHog: key 'landing-modes-cubes-v1',
+   * start 0% (dev email forced), ramp after smoke.
+   */
+  'landing-modes-cubes-v1': defineExperiment({
+    variants: ['control', 'cubes'] as const,
+    default: 'control',
+    description:
+      'Homepage mode section layout. control = current LandingChallengeCards grid. cubes = compact bento of mode cubes (arena 2×2 anchor) with generated icons + scroll reveal. Same gated mode list both sides — A/B isolates layout. Conversion = mode_card CTA → game start.',
+    forceVariantByEmail: {
+      'ohadf2015@gmail.com': 'cubes',
+    },
+  }),
+
+  /**
    * Post-game quick-replay CTA. After SP game completion (auto-play
    * countdown cancelled), control shows the existing NextStepPrompt
    * only. The `quick-replay` variant adds a prominent "Run it back?"

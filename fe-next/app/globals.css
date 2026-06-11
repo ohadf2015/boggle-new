@@ -4634,3 +4634,28 @@ html[data-cosy='true'] .animate-neo-press {
   .mp-coach-trace { animation: none; left: 50%; margin-left: -6px; opacity: 1; }
   .mp-coach-trace-rtl { right: auto; }
 }
+
+/* ===== Homepage mode cubes — scroll-driven reveal (landing-modes-cubes-v1) =====
+   Cubes are fully visible by default (no JS/intersection gate → never ships blank
+   on headless renderers or with JS disabled). Where the browser supports
+   scroll-driven timelines AND the user allows motion, each cube rises + fades as
+   it scrolls into view. Browsers without scroll timelines get a one-shot entrance
+   on mount instead. prefers-reduced-motion disables all of it. */
+@keyframes cube-rise {
+  from { opacity: 0; transform: translateY(26px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+.cube-reveal { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .cube-reveal {
+      animation: cube-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 20%;
+      animation-delay: 0s !important; /* scroll timeline drives progress, not time */
+    }
+  }
+  @supports not (animation-timeline: view()) {
+    .cube-reveal { animation: cube-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  }
+}

@@ -17,6 +17,9 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { requiresNetworkToPlay } from '@/lib/offline/landingOfflineAwareness';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
+import { useExperiment } from '@/hooks/useExperiment';
+import { LandingModeCubes } from './LandingModeCubes';
+import { MODE_META, modeRoute, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
 interface DailyChallengePreloadedStats {
   hasPlayed: boolean;
@@ -148,6 +151,15 @@ export function LandingChallengeCards({
   // "More Game Modes" collapse so a brand-new player doesn't see eight options
   // on first paint.
   const { userStats } = useUserStats();
+  // Homepage layout A/B — `cubes` swaps the card grid for a bento of mode cubes.
+  // BOTH layouts consume the identical computed/gated mode list below, so the
+  // test isolates layout. Exposure fires only when the cube layout actually
+  // renders (effect gated on the variant) for a clean denominator.
+  const { variant: cubesVariant, trackExposure: trackCubesExposure } =
+    useExperiment('landing-modes-cubes-v1');
+  useEffect(() => {
+    if (cubesVariant === 'cubes') trackCubesExposure();
+  }, [cubesVariant, trackCubesExposure]);
   const isNewcomerByGames =
     mounted &&
     !isOnCrazyGamesPlatform &&
@@ -545,6 +557,85 @@ export function LandingChallengeCards({
 
   let runningIndex = 0;
   const nextIndex = () => runningIndex++;
+
+  // ===== `cubes` A/B variant — bento layout over the SAME gated mode list =====
+  if (cubesVariant === 'cubes') {
+    // Modes that fire `mode_selected` in the control switch — preserve so the
+    // A/B compares layout, not instrumentation.
+    const TRACK_SELECTED = new Set<LandingCardKey>([
+      'arena', 'practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft',
+    ]);
+    const buildCubeModel = (key: LandingCardKey, role: 'anchor' | 'normal'): ModeCubeModel | null => {
+      const meta = MODE_META[key];
+      const href = modeRoute(key, language);
+      if (!meta || !href) return null; // 'daily' + any unmapped key → not a cube
+      const onClick = () => {
+        if (TRACK_SELECTED.has(key)) trackModeSelected(key as never, 'home');
+        trackLandingCtaClick('mode_card', { mode: key, variant: meta.variant });
+      };
+      const base: ModeCubeModel = {
+        key, title: t(meta.titleKey), href, variant: meta.variant, Icon: meta.Icon,
+        genIcon: meta.genIcon, badge: meta.badge, role, onClick,
+      };
+      if (key === 'arena') {
+        const arenaHighlight = isFirstTimer && !isNewbie && !practiceWinsHighlight;
+        return {
+          ...base,
+          livePill: activePlayers > 0 ? `${activePlayers.toLocaleString()} ${t('landing.playingNow')}` : undefined,
+          highlighted: arenaHighlight,
+          highlightLabel: arenaHighlight ? t('onboarding.welcome.startHere') : undefined,
+          locked: isOffline && requiresNetworkToPlay('arena'),
+          lockedMessage: t('landing.offlineLocked'),
+        };
+      }
+      if (key === 'practice') {
+        const showPracticeHighlight = isNewbie || !isVeteran;
+        return {
+          ...base,
+          highlighted: showPracticeHighlight,
+          highlightLabel: showPracticeHighlight ? t('onboarding.welcome.startHere') : undefined,
+        };
+      }
+      if (key === 'party') {
+        return { ...base, locked: isOffline && requiresNetworkToPlay('party'), lockedMessage: t('landing.offlineLocked') };
+      }
+      return base;
+    };
+
+    const isModel = (m: ModeCubeModel | null): m is ModeCubeModel => m !== null;
+    // SAME above-fold/collapsed split as the control card grid — newcomers see
+    // the essential set, the rest goes into the "more modes" expander. Keeps the
+    // A/B a pure layout test (identical visible + collapsed sets both sides). The
+    // sparse-grid look a 2-mode newcomer set would give is handled by the
+    // adaptive anchor in LandingModeCubes (no forced 2×2 when few cubes).
+    const visibleKeys: LandingCardKey[] = [
+      ...mpCards,
+      ...(featurePractice ? (['practice'] as LandingCardKey[]) : []),
+      ...spCards,
+    ];
+    const visibleModels = visibleKeys
+      .map((k) => buildCubeModel(k, k === 'arena' ? 'anchor' : 'normal'))
+      .filter(isModel);
+    const extraModels = [...mpCardsExtra, ...spCardsExtra]
+      .map((k) => buildCubeModel(k, 'normal'))
+      .filter(isModel);
+    const dailyNode = heroCards.includes('daily')
+      ? <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
+      : null;
+
+    return (
+      <LandingModeCubes
+        models={visibleModels}
+        extras={extraModels}
+        dailyNode={dailyNode}
+        sectionLabel={t('landing.sectionSoloTitle')}
+        moreLabel={t('landing.moreGameModes')}
+        moreHint={t('landing.moreGameModesHint')}
+        collapseLabel={t('common.collapse')}
+        t={t}
+      />
+    );
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto xl:max-w-6xl space-y-5 md:space-y-6">
