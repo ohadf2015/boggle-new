@@ -6756,6 +6756,13 @@ const es = {
     "unblock": "Desbloquear"
   },
   "multiplayer": {
+    "rank": {
+      "you": "Tú",
+      "leading": "¡Líder!"
+    },
+    "overtake": {
+      "passedYou": "te adelantó!"
+    },
     "postRound": {
       "title": "Durante tu ronda",
       "joined": "{{count}} se unieron",

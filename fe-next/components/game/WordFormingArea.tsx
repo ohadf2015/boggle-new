@@ -61,6 +61,8 @@ export interface WordFeedback {
   fireRoundBonus?: number;
   /** Golden letter bonus points */
   goldenBonus?: number;
+  /** Rush-tile bonus points (recurring transient MP tiles) */
+  rushBonus?: number;
   timestamp: number;
   /** Name of the player who found this word first (for foundByOther type) */
   foundBy?: string;
@@ -451,6 +453,25 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   )}
                 >
                   ★+{visibleFeedback.goldenBonus}
+                </m.span>
+              )}
+            </AnimatePresence>
+
+            {/* Rush-tile bonus indicator (recurring transient MP tiles) */}
+            <AnimatePresence mode="popLayout">
+              {showFeedback && visibleFeedback?.type === 'accepted' && visibleFeedback.rushBonus && visibleFeedback.rushBonus > 0 && (
+                <m.span
+                  key="rush"
+                  initial={{ scale: 0, rotate: 15 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0 }}
+                  transition={{ delay: 0.25, ...SPRING_PRESETS.snappy }}
+                  className={cn(
+                    'bg-linear-to-r from-pink-400 to-pink-600 text-pink-50 font-black rounded-md border-2 border-pink-700/60 shadow-[0_0_10px_rgba(255,20,147,0.55)]',
+                    compact ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-0.5'
+                  )}
+                >
+                  ✦+{visibleFeedback.rushBonus}
                 </m.span>
               )}
             </AnimatePresence>

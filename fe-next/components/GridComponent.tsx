@@ -59,6 +59,7 @@ interface GridComponentProps {
   frozenTiles?: Set<string>;
   chargedTiles?: Set<string>;
   meteorTiles?: Set<string>;
+  rushTiles?: Set<string>;
   /** Ghost mode: transparent bg + invisible cells (blast mode — overlay handles visuals) */
   ghostCells?: boolean;
   /** Optional adjacency override — return true if cell2 should be reachable from cell1 (e.g. portal teleportation) */
@@ -94,6 +95,7 @@ const GridComponent = memo<GridComponentProps>(({
   frozenTiles,
   chargedTiles,
   meteorTiles,
+  rushTiles,
   ghostCells = false,
   isAdjacent,
   autoSubmitIdleMs,
@@ -522,6 +524,7 @@ const GridComponent = memo<GridComponentProps>(({
               const isFrozen = frozenTiles?.has(cellKey) ?? false;
               const isCharged = chargedTiles?.has(cellKey) ?? false;
               const isMeteor = meteorTiles?.has(cellKey) ?? false;
+              const isRush = rushTiles?.has(cellKey) ?? false;
 
               return (
                 <GridCell
@@ -543,6 +546,7 @@ const GridComponent = memo<GridComponentProps>(({
                   isFrozen={isFrozen}
                   isCharged={isCharged}
                   isMeteor={isMeteor}
+                  isRush={isRush}
                   highlightedOrder={highlightedOrder}
                   selectionIdx={selectionIdx}
                   escalation={escalation}

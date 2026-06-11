@@ -146,6 +146,10 @@ export interface GameState {
   roundEventSchedule?: { eventType: string; triggerAtPercent: number } | null;
   /** Currently active round event */
   activeRoundEvent?: string | null;
+  /** Transient "rush" bonus-tile positions currently live on the board (recurring, ~10s each) */
+  rushTiles?: Array<{ row: number; col: number }>;
+  /** Whether a rush-tile batch is currently active (scoring gate, independent of activeRoundEvent) */
+  rushTilesActive?: boolean;
   /** Player boost claims: sessionId + signed token for firstWordBonus / scoreMultiplier */
   playerBoosts?: Record<string, { sessionId: string; token: string }>;
   /** Monotonic per-game event counter. Incremented on each scored word submission. Used for resume dedup and delta replay (Phase 3). */

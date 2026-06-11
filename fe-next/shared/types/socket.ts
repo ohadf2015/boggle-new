@@ -322,6 +322,10 @@ export interface ServerToClientEvents {
   roundEventStart: (data: { eventType: string; gameSessionId?: number; duration: number; data?: Record<string, unknown> }) => void;
   roundEventEnd: (data: { eventType: string; gameSessionId?: number }) => void;
 
+  // Rush tiles (recurring transient bonus tiles, ~10s each, all players)
+  rushTilesSpawn: (data: { tiles: Array<{ row: number; col: number }>; durationMs: number; gameSessionId?: number }) => void;
+  rushTilesClear: (data: { gameSessionId?: number }) => void;
+
   // Special word found
   specialWordFound: (data: { word: string; foundBy: string; bonus: number; gameSessionId?: number }) => void;
 
@@ -446,6 +450,8 @@ export interface WordAcceptedPayload {
   fireRoundMultiplier?: number;
   fireRoundBonus?: number;
   goldenBonus?: number;
+  /** Rush-tile bonus (recurring transient MP bonus tiles) */
+  rushBonus?: number;
   isSpecialWord?: boolean;
   inputMethod?: 'kb' | 'drag';
   /** Merged blast data (Fix 2) — present when gameMode is blast */

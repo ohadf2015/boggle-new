@@ -1683,6 +1683,13 @@ const he = {
     }
   },
   "multiplayer": {
+    "rank": {
+      "you": "אתה",
+      "leading": "מוביל!"
+    },
+    "overtake": {
+      "passedYou": "עקף אותך!"
+    },
     "postRound": {
       "title": "במהלך הסיבוב שלך",
       "joined": "{{count}} הצטרפו",

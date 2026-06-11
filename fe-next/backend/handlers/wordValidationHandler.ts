@@ -28,6 +28,7 @@ import { processLongWordEngagement } from './engagementHandler';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, cascadeBlastWord } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
+import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
 import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
 import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
 import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
@@ -207,6 +208,18 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     }
   }
 
+  // ---- Rush-Tile Bonus ----
+  // Recurring transient rush tiles (game.rushTiles) award +50% (ceil) when the
+  // word uses any rush-tile letter while a batch is active. Independent of
+  // activeRoundEvent so it can stack with a live round event without clobbering it.
+  const rushBonus = computeRushBonus(
+    wordScore,
+    normalizedWord,
+    game.rushTiles,
+    game.letterGrid as ReadonlyArray<ReadonlyArray<string>> | undefined,
+    game.rushTilesActive === true,
+  );
+
   // ---- Special Word Detection ----
   let isSpecialWord = false;
   const specialWordBonus = 10;
@@ -230,13 +243,13 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   // Single atomic score update: word score + blast tile bonus + blast letter-value
   // bonus + word-hunt board bonus + bonuses
   const preScore = game.playerScores?.[username] ?? 0;
-  const totalDelta = wordScore + blastTileBonus + blastLetterValueBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + specialBonus;
+  const totalDelta = wordScore + blastTileBonus + blastLetterValueBonus + wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus;
   updatePlayerScore(gameCode, username, totalDelta, true);
   // Mirror the bonuses that are NOT baked into the stored per-word score
   // (wordScore + blast bonuses are; golden/lightning/special/word-hunt-board are not)
   // into a per-player accumulator so the end-of-game recompute can add them back and
   // the result page matches the live leaderboard. See playerEventBonuses.
-  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + specialBonus;
+  const eventBonusDelta = wordHuntBoardBonus + goldenBonus + lightningBonus + rushBonus + specialBonus;
   if (eventBonusDelta !== 0) {
     addPlayerEventBonus(gameCode, username, eventBonusDelta);
   }
@@ -263,6 +276,7 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     inputMethod,
     ...(goldenBonus > 0 ? { goldenBonus } : {}),
     ...(lightningBonus > 0 ? { lightningBonus } : {}),
+    ...(rushBonus > 0 ? { rushBonus } : {}),
     ...(isSpecialWord ? { isSpecialWord: true } : {}),
     // Merged blast data (Fix 2): includes tile bonus, moves, combo info in single emit
     ...(blastMoveResult ? {

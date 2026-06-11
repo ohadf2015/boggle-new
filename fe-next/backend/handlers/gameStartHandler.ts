@@ -58,6 +58,7 @@ import { initShiritoriState } from '../modules/shiritoriManager.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
+import { startRushTiles } from '../modules/rushTiles/rushTilesManager.js';
 import { verifyBoostToken } from '../utils/boostToken.js';
 
 // In-memory mutex to prevent concurrent startGame flows for the same game.
@@ -655,6 +656,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // Only schedule for multiplayer classic games (not blast/word-hunt to keep events simple)
     if (resolvedMode === 'classic' && playerUsernames.length >= 2) {
       scheduleRoundEvent(io, gameCode, game, validTimer);
+      // Recurring transient "rush" bonus tiles for all players (~10s each).
+      startRushTiles(io, gameCode);
     }
 
     // Schedule retries for players who don't acknowledge quickly

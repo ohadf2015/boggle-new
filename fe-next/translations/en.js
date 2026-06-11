@@ -6648,6 +6648,13 @@ const en = {
     "multiplayer": "Multiplayer"
   },
   "multiplayer": {
+    "rank": {
+      "you": "You",
+      "leading": "Leading!"
+    },
+    "overtake": {
+      "passedYou": "passed you!"
+    },
     "postRound": {
       "title": "During your round",
       "joined": "{{count}} joined",

@@ -2,6 +2,7 @@
 
 import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode, type RefObject } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { MobileRankIndicator } from './MobileRankIndicator';
 import { cn } from '@/lib/utils';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
 import { Trophy } from 'lucide-react';
@@ -157,6 +158,9 @@ interface PortraitLayoutProps {
   roundEvent?: RoundEventState | null;
   eventTiles?: { frozen: Set<string>; charged: Set<string>; meteor: Set<string> };
 
+  // Rush tiles — recurring transient bonus tiles ("row-col" keys)
+  rushTiles?: Set<string>;
+
   // Special word toast
   specialWordEvent?: SpecialWordEvent | null;
 
@@ -229,6 +233,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   goldenLetters = [],
   roundEvent,
   eventTiles,
+  rushTiles,
   specialWordEvent,
   timerUrgencyState = 'normal',
   onTimerState,
@@ -620,6 +625,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 frozenTiles={eventTiles?.frozen}
                 chargedTiles={eventTiles?.charged}
                 meteorTiles={eventTiles?.meteor}
+                rushTiles={rushTiles}
               />
               {/* Blast tile type badges */}
               {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (
@@ -655,6 +661,20 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               </div>
             )}
 
+          {/* Mobile rank rail — always visible in MP (even in gameplayFocusMode,
+              which hides the full mobile leaderboard below). Gives phone players a
+              clear "You're #N" plus a transient "{name} passed you!" cue. */}
+          {isPlaying && deferredLeaderboard && deferredLeaderboard.length > 1 && (
+            <div className="mt-0.5 flex justify-center">
+              <MobileRankIndicator
+                leaderboard={deferredLeaderboard}
+                currentUsername={username}
+                t={t}
+                dir={dir}
+              />
+            </div>
+          )}
+
           {/* Mobile: Split-view with compact leaderboard + words.
               Leaderboard only when there are other players; word list always shows while playing
               so single-player users can see their progress. */}
@@ -676,8 +696,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {children}
         </div>
 
-        {/* Right Column: Leaderboard + Chat (Desktop) */}
-        {!gameplayFocusMode && (
+        {/* Right Column: Leaderboard + Chat (Desktop).
+            The live leaderboard is shown for every desktop multiplayer player —
+            including classic mode, which runs in gameplayFocusMode. Focus mode
+            now only suppresses chat here (it keeps the grid screen calm), NOT the
+            standings: desktop players were previously blind to who was winning. */}
+        {((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
             {/* Live race-track leaderboard with avatars (multiplayer only) */}
             {deferredLeaderboard && deferredLeaderboard.length > 1 && (
@@ -688,28 +712,32 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 comboEvent={blastComboSync}
               />
             )}
-            <GameLeaderboard
-              leaderboard={deferredLeaderboard}
-              username={username}
-              isHost={isHost}
-              t={t}
-              dir={dir}
-            />
-
-            {/* Chat Component */}
-            <AdaptiveMotion.div
-              className="hidden lg:block"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <RoomChat
-                username={isHost ? 'Host' : username}
+            {deferredLeaderboard && deferredLeaderboard.length > 0 && (
+              <GameLeaderboard
+                leaderboard={deferredLeaderboard}
+                username={username}
                 isHost={isHost}
-                gameCode={gameCode}
-                className="max-h-[200px] min-h-[80px] desktop-tall:min-h-[120px] desktop-short:max-h-[100px] desktop-short:min-h-[56px] desktop-medium-short:max-h-[140px] desktop-medium-short:min-h-[72px]"
+                t={t}
+                dir={dir}
               />
-            </AdaptiveMotion.div>
+            )}
+
+            {/* Chat Component — hidden during gameplay focus mode */}
+            {!gameplayFocusMode && (
+              <AdaptiveMotion.div
+                className="hidden lg:block"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <RoomChat
+                  username={isHost ? 'Host' : username}
+                  isHost={isHost}
+                  gameCode={gameCode}
+                  className="max-h-[200px] min-h-[80px] desktop-tall:min-h-[120px] desktop-short:max-h-[100px] desktop-short:min-h-[56px] desktop-medium-short:max-h-[140px] desktop-medium-short:min-h-[72px]"
+                />
+              </AdaptiveMotion.div>
+            )}
           </div>
         )}
       </div>

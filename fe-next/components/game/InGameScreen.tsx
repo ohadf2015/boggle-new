@@ -327,6 +327,12 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   const [specialWordEvent, setSpecialWordEvent] = useState<SpecialWordEvent | null>(null);
   const specialWordTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Rush tiles — recurring transient bonus tiles spawned by the server for all
+  // players (~10s each). Server owns spawn AND clear; the local fallback timer is
+  // a visual safety net only (never authoritative) in case a clear event drops.
+  const [rushTiles, setRushTiles] = useState<Set<string>>(() => new Set());
+  const rushTileTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Timer state for heartbeat sound and screen border glow
   const [timerUrgencyState, setTimerUrgencyState] = useState<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
   const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -418,11 +424,30 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
       }, 3000);
     };
 
+    const handleRushTilesSpawn = (data: { tiles?: Array<{ row: number; col: number }>; durationMs?: number }) => {
+      const tiles = data.tiles ?? [];
+      setRushTiles(new Set(tiles.map(t => `${t.row}-${t.col}`)));
+      // Visual safety net only — clear locally a touch after the advertised
+      // lifetime in case the server's clear broadcast is dropped. Scoring stays
+      // server-authoritative regardless.
+      if (rushTileTimerRef.current) clearTimeout(rushTileTimerRef.current);
+      rushTileTimerRef.current = setTimeout(() => {
+        setRushTiles(new Set());
+      }, (data.durationMs ?? 10_000) + 2_000);
+    };
+
+    const handleRushTilesClear = () => {
+      if (rushTileTimerRef.current) clearTimeout(rushTileTimerRef.current);
+      setRushTiles(new Set());
+    };
+
     socket.on('startGame', handleGoldenLetters);
     socket.on('roundEventWarning', handleRoundEventWarning);
     socket.on('roundEventStart', handleRoundEventStart);
     socket.on('roundEventEnd', handleRoundEventEnd);
     socket.on('specialWordFound', handleSpecialWordFound);
+    socket.on('rushTilesSpawn', handleRushTilesSpawn);
+    socket.on('rushTilesClear', handleRushTilesClear);
 
     return () => {
       socket.off('startGame', handleGoldenLetters);
@@ -430,8 +455,11 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
       socket.off('roundEventStart', handleRoundEventStart);
       socket.off('roundEventEnd', handleRoundEventEnd);
       socket.off('specialWordFound', handleSpecialWordFound);
+      socket.off('rushTilesSpawn', handleRushTilesSpawn);
+      socket.off('rushTilesClear', handleRushTilesClear);
       if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
       if (specialWordTimerRef.current) clearTimeout(specialWordTimerRef.current);
+      if (rushTileTimerRef.current) clearTimeout(rushTileTimerRef.current);
     };
   }, [socket]);
 
@@ -610,6 +638,7 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     goldenLetters,
     roundEvent,
     eventTiles,
+    rushTiles,
     specialWordEvent,
     timerUrgencyState,
     onTimerState: setTimerUrgencyState,

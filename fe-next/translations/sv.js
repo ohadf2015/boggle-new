@@ -6800,6 +6800,13 @@ const sv = {
     "unblock": "Avblockera"
   },
   "multiplayer": {
+    "rank": {
+      "you": "Du",
+      "leading": "I ledning!"
+    },
+    "overtake": {
+      "passedYou": "gick om dig!"
+    },
     "postRound": {
       "title": "Under din runda",
       "joined": "{{count}} anslöt",

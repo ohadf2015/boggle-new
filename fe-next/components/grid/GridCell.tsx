@@ -31,6 +31,8 @@ export interface GridCellProps {
   isFrozen: boolean;
   isCharged: boolean;
   isMeteor: boolean;
+  /** Transient rush bonus tile (recurring MP mechanic) */
+  isRush: boolean;
   highlightedOrder: number | undefined;
   selectionIdx: number;
   escalation: ReturnType<typeof getSelectionEscalation> | null;
@@ -66,7 +68,7 @@ const GridCell = memo<GridCellProps>(({
   cell, row, col,
   isSelected, isFirstSelected, isLastSelected, isFading, isFocused,
   isAdjacentHint, isHighlighted, isGolden, isEliminated, isHovered,
-  isFrozen, isCharged, isMeteor,
+  isFrozen, isCharged, isMeteor, isRush,
   highlightedOrder, selectionIdx, escalation, shakeOffset,
   effectiveRenderMode, earthquakePhase, getPhaseAnimation,
   comboLevel, escalationCombo, comboColors, reduceMotion, animateOnMount, interactive,
@@ -203,6 +205,7 @@ const GridCell = memo<GridCellProps>(({
       isFrozen && !isSelected && "ring-2 ring-cyan-300/90 shadow-[0_0_16px_rgba(96,165,250,0.6)] cursor-not-allowed opacity-70",
       isCharged && !isSelected && "ring-2 ring-yellow-300/90 shadow-[0_0_16px_rgba(250,204,21,0.7)] animate-pulse",
       isMeteor && !isSelected && "ring-2 ring-orange-400/90 shadow-[0_0_16px_rgba(251,146,60,0.7)]",
+      isRush && !isSelected && !isEliminated && cn("ring-2 ring-pink-400/95 shadow-[0_0_18px_rgba(255,20,147,0.75)]", !reduceMotion && "animate-pulse"),
       isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
       isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
       isHovered && isLastSelected && selectedCellsLength >= 2 && "ring-4 ring-neo-green ring-offset-2 scale-110",
@@ -260,6 +263,11 @@ const GridCell = memo<GridCellProps>(({
       ...(isMeteor && !isSelected ? {
         background: 'linear-gradient(135deg, rgba(253,186,116,0.5), rgba(251,146,60,0.3), rgba(253,186,116,0.5))',
       } : {}),
+      ...(isRush && !isSelected ? {
+        background: 'linear-gradient(135deg, rgba(255,182,217,0.55), rgba(255,20,147,0.32), rgba(255,182,217,0.55))',
+        backgroundSize: '200% 200%',
+        ...(reduceMotion ? {} : { animation: 'gradient-x 1.2s ease infinite' }),
+      } : {}),
       ...(isHighlighted && isTypingMode && highlightedOrder !== undefined ? {
         animationDelay: `${(highlightedOrder - 1) * 50}ms`,
         animationFillMode: 'both',
@@ -303,6 +311,15 @@ const GridCell = memo<GridCellProps>(({
           ★
         </span>
       </>
+    )}
+
+    {isRush && !isEliminated && !isSelected && (
+      <span
+        className="absolute top-0 left-0.5 text-[8px] font-black leading-none pointer-events-none select-none z-10 text-pink-50 drop-shadow-[0_0_3px_rgba(255,20,147,0.95)]"
+        aria-hidden="true"
+      >
+        ✦
+      </span>
     )}
 
     {/* Round event tile effects (frozen/charged/meteor) */}

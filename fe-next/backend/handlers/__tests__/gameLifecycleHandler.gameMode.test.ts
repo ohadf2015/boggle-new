@@ -240,6 +240,11 @@ vi.mock('../../../backend/modules/roundEventsManager', () => ({
   clearRoundEventTimers: vi.fn(),
 }));
 
+vi.mock('../../../backend/modules/rushTiles/rushTilesManager', () => ({
+  startRushTiles: vi.fn(),
+  clearRushTileTimers: vi.fn(),
+}));
+
 vi.mock('../../../backend/middleware/rateLimiterRedis', () => ({
   checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
 }));

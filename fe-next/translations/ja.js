@@ -6619,6 +6619,13 @@ const ja = {
     "multiplayer": "マルチプレイヤー"
   },
   "multiplayer": {
+    "rank": {
+      "you": "あなた",
+      "leading": "首位！"
+    },
+    "overtake": {
+      "passedYou": "に抜かれた！"
+    },
     "postRound": {
       "title": "ラウンド中の出来事",
       "joined": "{{count}}人参加",
