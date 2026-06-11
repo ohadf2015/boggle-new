@@ -33,6 +33,7 @@ import {
   parseWiktionaryEsResponse,
   verifyWordOnWiktionaryEs,
   processWiktionaryEsVerificationQueue,
+  foldEsDiacritics,
 } from '../wiktionaryEsVerifier';
 
 function makeJsonResponse(body: unknown) {
@@ -181,6 +182,96 @@ describe('WiktionaryEsVerifier', () => {
       const result = await verifyWordOnWiktionaryEs('agua');
       expect(result.verified).toBe(false);
       expect(result.status).toBe('error');
+    });
+  });
+
+  describe('foldEsDiacritics', () => {
+    it('folds Spanish accents to bare vowels', () => {
+      expect(foldEsDiacritics('muchachón')).toBe('muchachon');
+      expect(foldEsDiacritics('canción')).toBe('cancion');
+      expect(foldEsDiacritics('pingüino')).toBe('pinguino');
+    });
+
+    it('folds ñ to n (the board-spellable form)', () => {
+      expect(foldEsDiacritics('puñetazo')).toBe('punetazo');
+      expect(foldEsDiacritics('niño')).toBe('nino');
+    });
+
+    it('leaves already-bare words unchanged', () => {
+      expect(foldEsDiacritics('punetazo')).toBe('punetazo');
+      expect(foldEsDiacritics('gato')).toBe('gato');
+    });
+  });
+
+  describe('verifyWordOnWiktionaryEs accent-restoration retry', () => {
+    // Players type the board-spellable form ("punetazo", no ñ); Wiktionary keys on
+    // the accented/ñ title ("puñetazo"). On not_found we resolve the canonical title
+    // via diacritic-insensitive opensearch and re-verify it — through the SAME source.
+    function routeByUrl(handlers: { definition?: (word: string) => unknown; opensearch?: (q: string) => unknown }) {
+      mockGet.mockImplementation((url: string) => {
+        if (url.includes('opensearch')) {
+          const q = decodeURIComponent(url.match(/search=([^&]+)/)?.[1] || '');
+          return makeJsonResponse(handlers.opensearch ? handlers.opensearch(q) : [q, [], [], []]);
+        }
+        const w = decodeURIComponent(url.split('/').pop() || '');
+        return makeJsonResponse(handlers.definition ? handlers.definition(w) : {});
+      });
+    }
+
+    it('recovers a real word by restoring ñ via opensearch ("punetazo" → "puñetazo")', async () => {
+      routeByUrl({
+        definition: (w) =>
+          w === 'puñetazo' ? { es: [{ partOfSpeech: 'Noun', language: 'Spanish' }] } : { en: [{ partOfSpeech: 'Noun' }] },
+        opensearch: () => ['punetazo', ['puñetazo'], [''], ['https://en.wiktionary.org/wiki/pu%C3%B1etazo']],
+      });
+
+      const result = await verifyWordOnWiktionaryEs('punetazo');
+      expect(result.verified).toBe(true);
+      expect(result.status).toBe('verified');
+      expect(result.url).toContain('etazo');
+    });
+
+    it('recovers an accented word ("muchachon" → "muchachón")', async () => {
+      routeByUrl({
+        definition: (w) =>
+          w === 'muchachón' ? { es: [{ partOfSpeech: 'Noun', language: 'Spanish' }] } : { en: [{ partOfSpeech: 'Noun' }] },
+        opensearch: () => ['muchachon', ['muchachón'], [''], ['']],
+      });
+
+      const result = await verifyWordOnWiktionaryEs('muchachon');
+      expect(result.verified).toBe(true);
+    });
+
+    it('does NOT accept a different word the search surfaces (fold-equality guard)', async () => {
+      // search for "gato" returns "gatos" — folds to "gatos" != "gato" → must be rejected.
+      routeByUrl({
+        definition: () => ({ en: [{ partOfSpeech: 'Noun' }] }),
+        opensearch: () => ['gato', ['gatos', 'gata'], ['', ''], ['', '']],
+      });
+
+      const result = await verifyWordOnWiktionaryEs('gato');
+      expect(result.verified).toBe(false);
+      expect(result.status).toBe('not_found');
+    });
+
+    it('stays not_found when the resolved title also has no Spanish section', async () => {
+      routeByUrl({
+        definition: () => ({ en: [{ partOfSpeech: 'Noun' }] }),
+        opensearch: () => ['punetazo', ['puñetazo'], [''], ['']],
+      });
+
+      const result = await verifyWordOnWiktionaryEs('punetazo');
+      expect(result.verified).toBe(false);
+      expect(result.status).toBe('not_found');
+    });
+
+    it('does not fire the retry when the first lookup already verifies', async () => {
+      routeByUrl({ definition: () => ({ es: [{ partOfSpeech: 'Noun' }] }) });
+      const result = await verifyWordOnWiktionaryEs('gato');
+      expect(result.verified).toBe(true);
+      // only the definition endpoint was hit, never opensearch
+      const calledUrls = mockGet.mock.calls.map((c) => String(c[0]));
+      expect(calledUrls.some((u) => u.includes('opensearch'))).toBe(false);
     });
   });
 

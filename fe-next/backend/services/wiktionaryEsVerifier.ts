@@ -61,6 +61,24 @@ const REJECTED_POS: Record<string, WiktionaryEsWordType> = {
   'Punctuation mark': 'symbol',
 };
 
+const ES_DIACRITIC_MAP: Record<string, string> = {
+  'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u', 'ñ': 'n',
+};
+
+/**
+ * Fold Spanish diacritics to the board-spellable bare form: accents stripped
+ * AND ñ→n. Players spell "puñetazo" as "punetazo" (boards carry no ñ tile), so
+ * this is the canonical key we use to prove a search hit is the SAME word with
+ * diacritics restored — never a different word the search merely surfaced.
+ */
+export function foldEsDiacritics(word: string): string {
+  return word
+    .toLowerCase()
+    .split('')
+    .map((c) => ES_DIACRITIC_MAP[c] || c)
+    .join('');
+}
+
 export function parseWiktionaryEsResponse(
   body: WiktionaryResponse,
   word: string
@@ -131,6 +149,60 @@ async function fetchWithRetry(url: string, retries = MAX_RETRIES): Promise<Wikti
   throw lastError || new Error('Failed after retries');
 }
 
+const OPENSEARCH_MAX_CANDIDATES = 5;
+
+/**
+ * On a not_found, resolve the diacritic-restored canonical title via MediaWiki
+ * opensearch (which is accent/ñ-insensitive) and re-verify it through the SAME
+ * definition endpoint. Returns a successful result ONLY when a surfaced title
+ * folds back to the exact input word — guaranteeing we recover the same word
+ * with diacritics restored, not a different word. Returns null otherwise.
+ */
+async function resolveViaOpenSearch(
+  word: string
+): Promise<WiktionaryEsVerificationResult | null> {
+  // Only restorable when the input is already the bare form (no diacritics to
+  // collapse). An accented input was looked up verbatim already.
+  if (foldEsDiacritics(word) !== word) return null;
+
+  let titles: string[] = [];
+  try {
+    await enforceRateLimit();
+    const searchUrl =
+      `https://en.wiktionary.org/w/api.php?action=opensearch&format=json&namespace=0` +
+      `&limit=${OPENSEARCH_MAX_CANDIDATES}&search=${encodeURIComponent(word)}`;
+    const body = await ky
+      .get(searchUrl, {
+        headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+        timeout: 10000,
+        retry: 0,
+      })
+      .json<[string, string[], string[], string[]]>();
+    titles = Array.isArray(body?.[1]) ? body[1] : [];
+  } catch (error) {
+    logger.warn('WiktionaryEs', `opensearch failed for "${word}"`, {
+      error: error instanceof Error ? error.message : 'Unknown',
+    });
+    return null;
+  }
+
+  const candidate = titles
+    .map((t) => t.toLowerCase())
+    .find((t) => t !== word && foldEsDiacritics(t) === word);
+  if (!candidate) return null;
+
+  try {
+    const url = `https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(candidate)}`;
+    const body = await fetchWithRetry(url);
+    const result = parseWiktionaryEsResponse(body, candidate);
+    return result.status === 'verified' || result.status === 'rejected_type' || result.status === 'needs_review'
+      ? result
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function verifyWordOnWiktionaryEs(
   word: string
 ): Promise<WiktionaryEsVerificationResult> {
@@ -160,7 +232,15 @@ export async function verifyWordOnWiktionaryEs(
     const url = `https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(word)}`;
     logger.info('WiktionaryEs', `Verifying word: ${word}`);
     const body = await fetchWithRetry(url);
-    const result = parseWiktionaryEsResponse(body, word);
+    let result = parseWiktionaryEsResponse(body, word);
+
+    // The board-spellable form ("punetazo") may exist on Wiktionary only under
+    // its accented/ñ title ("puñetazo"). Recover it through the authoritative
+    // source before recording a false not_found.
+    if (result.status === 'not_found') {
+      const restored = await resolveViaOpenSearch(word);
+      if (restored) result = restored;
+    }
 
     if (redis) {
       try {
@@ -177,7 +257,9 @@ export async function verifyWordOnWiktionaryEs(
     return result;
   } catch (error) {
     if (error instanceof HTTPError && error.response.status === 404) {
-      const result: WiktionaryEsVerificationResult = { verified: false, status: 'not_found' };
+      // No page at the bare title — the canonical page may carry the ñ/accent.
+      const restored = await resolveViaOpenSearch(word);
+      const result: WiktionaryEsVerificationResult = restored ?? { verified: false, status: 'not_found' };
       if (redis) {
         try { await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(result)); } catch { /* */ }
       }
