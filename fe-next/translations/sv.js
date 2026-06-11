@@ -6807,6 +6807,11 @@ const sv = {
     "overtake": {
       "passedYou": "gick om dig!"
     },
+    "rival": {
+      "ahead": "före",
+      "behind": "efter",
+      "tied": "lika"
+    },
     "postRound": {
       "title": "Under din runda",
       "joined": "{{count}} anslöt",

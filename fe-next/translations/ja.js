@@ -6626,6 +6626,11 @@ const ja = {
     "overtake": {
       "passedYou": "に抜かれた！"
     },
+    "rival": {
+      "ahead": "先行",
+      "behind": "後方",
+      "tied": "同点"
+    },
     "postRound": {
       "title": "ラウンド中の出来事",
       "joined": "{{count}}人参加",

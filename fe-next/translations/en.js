@@ -6655,6 +6655,11 @@ const en = {
     "overtake": {
       "passedYou": "passed you!"
     },
+    "rival": {
+      "ahead": "ahead",
+      "behind": "behind",
+      "tied": "tied"
+    },
     "postRound": {
       "title": "During your round",
       "joined": "{{count}} joined",

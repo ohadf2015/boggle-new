@@ -1690,6 +1690,11 @@ const he = {
     "overtake": {
       "passedYou": "עקף אותך!"
     },
+    "rival": {
+      "ahead": "לפניך",
+      "behind": "מאחוריך",
+      "tied": "תיקו"
+    },
     "postRound": {
       "title": "במהלך הסיבוב שלך",
       "joined": "{{count}} הצטרפו",

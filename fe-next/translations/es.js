@@ -6763,6 +6763,11 @@ const es = {
     "overtake": {
       "passedYou": "te adelantó!"
     },
+    "rival": {
+      "ahead": "adelante",
+      "behind": "detrás",
+      "tied": "empate"
+    },
     "postRound": {
       "title": "Durante tu ronda",
       "joined": "{{count}} se unieron",
