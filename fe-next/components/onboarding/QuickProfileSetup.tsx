@@ -9,6 +9,7 @@ import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import InviteContextBanner from './InviteContextBanner';
 import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
+import { useImeText } from '@/hooks/useImeText';
 import { cn } from '@/lib/utils';
 
 interface QuickProfileSetupProps {
@@ -37,13 +38,23 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   if (initialSuggestionRef.current === '') {
     initialSuggestionRef.current = suggestPlayerName(language);
   }
-  const [name, setName] = useState(initialSuggestionRef.current);
+  // IME-resilient input. Mobile keyboards (Android GBoard, RTL/Hebrew, swipe &
+  // autocorrect) buffer composition and commit text WITHOUT firing React's
+  // synthetic onChange. A naive `value={name}` controlled input then keeps
+  // forcing the DOM back to the stale suggestion — so the user "can't change
+  // their name". The hook mirrors the live DOM value via onInput/compositionEnd.
+  const {
+    ref: inputRef,
+    value: name,
+    getValue: getLiveName,
+    setValue: setName,
+    inputProps,
+  } = useImeText<HTMLInputElement>({ maxLength: 20, initialValue: initialSuggestionRef.current });
   const [avatar, setAvatar] = useState<CustomAvatarConfig>(getRandomAvatarConfig);
   const [isBuilderOpen, setIsBuilderOpen] = useState(false);
   const [avatarKey, setAvatarKey] = useState(0);
   const [showShake, setShowShake] = useState(false);
   const [justValidated, setJustValidated] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const previouslyValidRef = useRef(false);
 
   const trimmedName = name.trim();
@@ -81,17 +92,12 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   }, []);
 
   const handleSubmit = useCallback(() => {
-    // Read from DOM as source of truth — mobile IME/autofill sometimes
-    // commits text without firing React's synthetic onChange, so `name`
-    // state may lag the actual input value (classic "need to add a space
-    // before it works" symptom).
-    const domValue = inputRef.current?.value ?? name;
-    const liveTrimmed = domValue.trim();
+    // getLiveName() reads the DOM ref directly (and trims/caps) as the source of
+    // truth — React state can still lag mid-composition on mobile keyboards.
+    const liveTrimmed = getLiveName();
     const liveCount = Array.from(liveTrimmed).length;
     const liveValid =
       liveCount >= 1 && liveCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(liveTrimmed);
-
-    if (domValue !== name) setName(domValue);
 
     if (!liveValid) {
       setShowShake(true);
@@ -101,7 +107,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
     }
     const nameEdited = liveTrimmed !== initialSuggestionRef.current.trim();
     onComplete(liveTrimmed, avatar, nameEdited);
-  }, [name, avatar, onComplete]);
+  }, [getLiveName, inputRef, avatar, onComplete]);
 
   const staggerChild = {
     hidden: { opacity: 0, y: 20 },
@@ -234,11 +240,9 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             transition={{ duration: justValidated ? 0.5 : 0.4, ease: 'easeOut' }}
           >
             <input
+              {...inputProps}
               id="profile-name"
-              ref={inputRef}
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && isNameValid) handleSubmit(); }}
               placeholder={t('onboarding.name.placeholder')}
               autoFocus
@@ -283,6 +287,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           initial="hidden"
           animate="visible"
           onClick={handleSubmit}
+          aria-disabled={!isNameValid}
           whileHover={isNameValid ? { scale: 1.02, y: -2 } : {}}
           whileTap={isNameValid ? { scale: 0.98, y: 2 } : {}}
           className={cn(
