@@ -62,6 +62,19 @@ const KEY_CHALLENGER = 'pendingAsyncChallenge';
 const KEY_CHALLENGED = 'pendingFriendChallenge';
 const MAX_CONFIG_AGE_MS = 60 * 60 * 1000; // 1 hour
 
+/**
+ * Modes the async-challenge API + DB CHECK constraint accept
+ * (`async_board_challenges.game_mode IN ('classic','blast','word-hunt')`).
+ * The challenge dialog offers `classic|blitz|survival` as timer/flavor labels,
+ * so blitz/survival would 400 on POST. Async challenges run on a classic board,
+ * so anything outside the valid set collapses to 'classic'.
+ */
+const VALID_API_MODES: readonly string[] = ['classic', 'blast', 'word-hunt'];
+
+export function normalizeAsyncGameMode(mode: string | undefined): string {
+  return mode && VALID_API_MODES.includes(mode) ? mode : 'classic';
+}
+
 function readChallengerConfig(): ChallengerConfig | null {
   if (typeof window === 'undefined') return null;
   try {
@@ -119,7 +132,7 @@ export function useAsyncChallengeProducer(input: AsyncChallengeProducerInput): v
       firedRef.current = true;
       const body = {
         friendUserId: challengerCfg.friendUserId,
-        gameMode: challengerCfg.gameMode,
+        gameMode: normalizeAsyncGameMode(challengerCfg.gameMode),
         language: challengerCfg.language,
         durationSeconds: challengerCfg.durationSeconds,
         letterGrid: input.letterGrid,

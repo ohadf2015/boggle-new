@@ -97,7 +97,9 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
       // ignore storage quota
     }
     neoSuccessToast(t('friends.challenges.accepted'));
-    router.push(`/${locale}/?friendChallenge=${challenge.id}`);
+    // Launch the same-length solo board so the friend can beat the target; the
+    // producer hook submits their result (PUT phase=challenged) on game-end.
+    router.push(`/${locale}/singleplayer?autoStart=challenge`);
   }, [challenge, locale, router, t]);
 
   const onDecline = useCallback(async () => {
@@ -267,7 +269,7 @@ export default function FriendChallengeLandingClient({ locale, challenge, viewer
               } catch {
                 /* ignore */
               }
-              router.push(`/${locale}/?friendChallenge=${challenge.id}`);
+              router.push(`/${locale}/singleplayer?autoStart=challenge`);
             }}
             className={cn(
               'w-full py-3 rounded-neo border-neo-thick border-neo-black shadow-hard',
