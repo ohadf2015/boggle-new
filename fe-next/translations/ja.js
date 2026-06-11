@@ -219,7 +219,7 @@ const ja = {
     "combo": { "roll": "好調！", "fire": "火がついてる！", "blaze": "灼熱！", "inferno": "インフェルノ！" },
     "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定" },
     "verdict": { "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらっ", "miss": "ミス！" },
-    "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト" },
+    "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト", "watchAd": "📺 広告を見る +1", "adEarned": "🎯 広告でトークンゲット！" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
@@ -615,6 +615,12 @@ const ja = {
       "description": "LexiClashアドベンチャーの全実績、マイルストーン、進捗を確認。完了チャレンジ、ボス勝利、コレクション統計。",
       "ogTitle": "アドベンチャー実績 - LexiClash",
       "ogDescription": "マイルストーン、ボス勝利、実績進捗を追跡。"
+    },
+    "wordCraft": {
+      "title": "WordCraft - 無料マルチプレイ単語戦略ゲーム",
+      "description": "盤面に単語を並べて領土を制圧。友達と一緒にプレイできる無料ゲーム。ダウンロード不要。",
+      "ogTitle": "WordCraft - 単語で領土奪取、勝利をつかもう",
+      "ogDescription": "盤面に単語を配置して領土を奪い合う戦略ゲーム。無料・即プレイ。ダウンロード不要。"
     }
   },
   "cookieConsent": {
@@ -777,6 +783,7 @@ const ja = {
     "tapToContinue": "タップで次へ",
     "copied": "コピー完了！",
     "copy": "コピー",
+    "copiedToClipboard": "コピーしました！",
     "noData": "まだ何もないよ",
     "rotateLandscape": "横向きにして！",
     "dontShowAgain": "了解",
@@ -1167,7 +1174,13 @@ const ja = {
     "mute": "ミュート",
     "unmute": "ミュート解除",
     "enabled": "有効",
-    "disabled": "無効"
+    "disabled": "無効",
+    "removeAds": {
+      "title": "広告を削除",
+      "body": "LexiClashを広告なしで楽しもう。近日対応予定 — タップして興味を表示。",
+      "button": "興味がある",
+      "comingSoon": "ありがとう！準備ができたらお知らせします。"
+    }
   },
   "deleteAccountWeb": {
     "title": "アカウント削除",
@@ -1400,6 +1413,9 @@ const ja = {
       "colorTheme": "カラーテーマ",
       "bodyStyle": "服装",
       "download": "ダウンロード",
+      "expressions": "表情",
+      "eyeColor": "目の色",
+      "nose": "鼻",
       bodyStyles: {
         default: "デフォルト",
         hoodie: "パーカー",
@@ -1662,7 +1678,8 @@ const ja = {
       "hostLeft": "ホストがゲームを離れました。ロビーに戻ります...",
       "invalidUsername": "ユーザー名は2〜20文字にしてね",
       "serverError": "サーバーエラー。もう一回試してみて！"
-    }
+    },
+    "crazyGamesFriends": "CrazyGamesで友達と遊ぶ"
   },
   "hostView": {
     "lobby": "ロビー",
@@ -1839,6 +1856,8 @@ const ja = {
     "leaderboard": "リーダーボード",
     "live": "ライブ",
     "waitingForGame": "ゲーム待機中...",
+    "timesUp": "時間切れ！",
+    "timesUpSub": "ペンを置いて！",
     "noPlayersYet": "まだプレイヤーがいません",
     "waitingForPlayers": "プレイヤーの参加を待っています...",
     "earthquake": "地震!",
@@ -2148,6 +2167,7 @@ const ja = {
       "title": "つづれ。",
       "titleAccent": "勝て。",
       "howTo": "つながった文字をタップして単語を作ろう。長い単語ほど高得点。デイリーパズル＆オンライン対戦、5言語対応。",
+      "autoStart": "{{n}}秒後に開始 — 好きなモードをタップして選んでね",
       "playDaily": "デイリー",
       "playPractice": "練習",
       "playMultiplayer": "対戦",
@@ -2182,6 +2202,7 @@ const ja = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
+      "haveAccount": "アカウントを持ってる",
       "title": "ようこそ",
       "subtitle": "サインインして続きから始めるか、新しく始めましょう。",
       "newHere": "初めてです",
@@ -2401,6 +2422,12 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "preFanfare": "結果発表の前に",
+    "skipToResults": "結果へスキップ",
+    "fanfareHint": "マスコットが先に一言…",
+    "backToLobby": "ロビーに戻る",
+    "calculating": "結果を計算中",
+    "calculatingHint": "スコアをカウント・単語を検証中…もうすぐです。",
     "modeTease": {
       "nextUp": "次は",
       "label": {
@@ -5249,7 +5276,11 @@ const ja = {
       "faq6Q": "自分のボードを作れますか？",
       "faq6A": "はい！コミュニティボードビルダーを使って、オリジナルの文字グリッドをデザインできます。公開して他のプレイヤーにプレイ、評価、競争してもらいましょう。トップボードはホームページで紹介されます。",
       "communityTitle": "言葉好き、集まってます。",
-      "communityContent": "LexiClashのプレイヤーは40カ国以上、5言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。"
+      "communityContent": "LexiClashのプレイヤーは40カ国以上、5言語にわたります。グローバルリーダーボードで競い合い、デイリーチャレンジの結果を共有し、新しいワード戦略を発見するコミュニティに参加しましょう。ヒント、アップデート、コミュニティハイライトはInstagram @lexi.clashをフォロー。",
+      "showcase3d": {
+        "title": "LexiClash — 単語の世界へ | 無料マルチプレイ単語ゲーム",
+        "description": "盤面で単語を引き、コンボを繋いで、1v3のリアルタイム戦で全員を倒す。王座を手にしろ。"
+      }
     },
     "firstTimer": {
       "exploreModes": "モードを探索",
@@ -6230,6 +6261,22 @@ const ja = {
       },
       "stopGameConfirm": "全員のゲームを終了しますか？",
       "stopGameYes": "ゲーム終了",
+      "quality": {
+        "degraded": "通信が弱い",
+        "weak": "通信が不安定",
+        "reconnecting": "再接続中…"
+      },
+      "reconnect": {
+        "title": "再接続中…",
+        "attempt": "試行",
+        "giveUp": "諦める"
+      },
+      "abort": {
+        "title": "ゲーム終了",
+        "body": "あなたの単語は最終スコアに反映されました。見つけた単語：",
+        "continueSolo": "ソロで続ける",
+        "returnToLobby": "ロビーに戻る"
+      }
     },
     "shareResult": "結果をシェア",
     "quitConfirmTitle": "ハントを終了する？",

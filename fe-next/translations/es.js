@@ -206,7 +206,8 @@ const es = {
     "combo": { "roll": "¡En racha!", "fire": "¡Encendido!", "blaze": "¡Ardiendo!", "inferno": "¡INFIERNO!" },
     "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad" },
     "verdict": { "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Flojo", "miss": "¡Fallo!" },
-    "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas" },
+    "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas", "watchAd": "📺 Ver anuncio +1", "adEarned": "🎯 ¡Token ganado!" },
+    "tier": { "apprentice": "Aprendiz", "journeyman": "Oficial", "master": "Maestro Constructor" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
@@ -239,6 +240,12 @@ const es = {
     "twitterDescription": "🎮 Alternativa al estilo Scrabble en tiempo real ⚡ Multijugador online gratis 🔥 Sin descargas, sin turnos lentos.",
     "locale": "es_ES",
     "language": "Spanish",
+    "wordCraft": {
+      "title": "WordCraft - Juego Gratis de Estrategia de Palabras en Cuadrícula",
+      "description": "Juega WordCraft gratis — forma palabras en la cuadrícula, domina el territorio y captura rivales. Rachas de cartas, Caza de Gemas y juega con amigos. Sin descargar, sin registrarse.",
+      "ogTitle": "WordCraft - Forma Palabras, Domina Territorio, ¡Gana!",
+      "ogDescription": "Juego de estrategia de palabras con un giro territorial. Gratis, al instante, sin descargar. Rachas de cartas, Caza de Gemas y juega con amigos."
+    },
     "showcase3d": {
       "title": "Juego de palabras en español | LexiClash multijugador gratis en línea",
       "description": "Juego de palabras en español en línea en tiempo real con hasta 4 jugadores. Construye combos, sube en la clasificación global y juega gratis — sin descargas ni registros en el navegador."
@@ -2321,6 +2328,9 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "preFanfare": "el momento antes de los resultados",
+    "skipToResults": "Saltar a los resultados",
+    "fanfareHint": "La mascota quiere decir algo primero…",
     "modeTease": {
       "nextUp": "A continuación",
       "label": {
@@ -2342,6 +2352,9 @@ const es = {
         "random": "Te espera una sorpresa"
       }
     },
+    "backToLobby": "Volver al lobby",
+    "calculating": "Calculando resultados",
+    "calculatingHint": "Sumando puntos y validando palabras — toma un momentito.",
     "results": "Reporte de Batalla",
     "share": "Presumir",
     "yourProgress": "Tu Progreso",
@@ -4283,6 +4296,7 @@ const es = {
     "step2Title": "Gana Puntos",
     "step2Text": "Palabras más largas = más puntos. ¡Encuentra palabras únicas!",
     "crazygames": {
+      "autoStart": "Iniciando en {{n}}s — toca un modo para elegir",
       "tagline": "En Vivo",
       "title": "Juega.",
       "titleAccent": "Gana.",
@@ -4321,6 +4335,7 @@ const es = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
+      "haveAccount": "Ya tengo cuenta",
       "title": "Bienvenido",
       "subtitle": "Inicia sesión para continuar donde lo dejaste, o empieza de nuevo.",
       "newHere": "Soy nuevo aquí",
@@ -5240,6 +5255,10 @@ const es = {
     "createYourBoard": "Crea tu propio tablero",
     "createBoardDesc": "Disena un rompecabezas y compartelo con el mundo",
     "seo": {
+      "showcase3d": {
+        "title": "LexiClash — Un Mundo de Palabras | Juego Multijugador Gratis",
+        "description": "Sumérgete en un mundo de palabras: traza palabras en el tablero, encadena combos, vence a la sala en batallas 1v3 en tiempo real y corona tu victoria. Gratis, en navegador, 5 idiomas — sin descargar."
+      },
       "stepLabel": "Paso",
       "whatIsTitle": "Que es LexiClash?",
       "whatIsContent": "LexiClash es un juego de palabras multijugador gratuito y rapido que puedes jugar directamente en tu navegador. Compite con amigos en batallas de palabras en tiempo real en una cuadricula de letras compartida: encuentra palabras, construye combos y sube en la clasificacion. Es como Boggle y Wordle, pero multijugador. Sin descargas, sin registro. Disponible en ingles, hebreo, sueco, japones y espanol.",
@@ -6453,6 +6472,22 @@ const es = {
       "shareText": "¿Puedes superar mi puntuación de {score}? ¡Desafío de {name}!"
     },
     "mp": {
+      "quality": {
+        "degraded": "Conexión inestable",
+        "weak": "Conexión débil",
+        "reconnecting": "Reconectando…"
+      },
+      "reconnect": {
+        "title": "Reconectando…",
+        "attempt": "Intento",
+        "giveUp": "Abandonar"
+      },
+      "abort": {
+        "title": "Partida terminada",
+        "body": "Tus palabras contaron para la puntuación final. Palabras encontradas:",
+        "continueSolo": "Continuar solo",
+        "returnToLobby": "Volver al lobby"
+      },
       "players": "Jugadores",
       "eliminated": "Eliminado",
       "youEliminated": "¡Te eliminaron!",

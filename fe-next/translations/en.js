@@ -2293,6 +2293,7 @@ const en = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
+      "haveAccount": "I Have an Account",
       "title": "Welcome",
       "subtitle": "Sign in to pick up where you left off, or start fresh.",
       "newHere": "I'm New Here",
@@ -2510,6 +2511,9 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "preFanfare": "moment before the results",
+    "skipToResults": "Skip to results",
+    "fanfareHint": "The mascot has something to say first…",
     "modeTease": {
       "nextUp": "Next up",
       "label": {

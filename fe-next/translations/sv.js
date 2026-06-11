@@ -702,6 +702,12 @@ const sv = {
       "description": "Se alla dina LexiClash-äventyrsprestationer, milstolpar och framsteg. Se avklarade utmaningar och bossvinster.",
       "ogTitle": "Äventyrsprestationer - LexiClash",
       "ogDescription": "Följ milstolpar, bossvinster och prestationsframsteg."
+    },
+    "wordCraft": {
+      "title": "WordCraft – Gratis ordstrategi på rutnät",
+      "description": "Spela WordCraft gratis – bygg ord på rutnätet, ta territorium och slå motståndarna. Kortserier, ädelstenshunt och spel med vänner. Ingen download, ingen registrering.",
+      "ogTitle": "WordCraft – Bygg ord, ta territorium, vinn",
+      "ogDescription": "Ordstrategi med en territoriumvridning. Gratis, omedelbar, ingen download. Kortserier, ädelstenshunt och spel med vänner."
     }
   },
   "cookieConsent": {
@@ -2249,6 +2255,7 @@ const sv = {
       "title": "Stava.",
       "titleAccent": "Vinn.",
       "howTo": "Tryck på sammankopplade bokstäver för att bilda ord. Längre ord = mer poäng. Daglig utmaning och live-flerspelarläge på fem språk.",
+      "autoStart": "Startar om {{n}}s – tryck på något läge för att välja",
       "playDaily": "Daglig Utmaning",
       "playPractice": "Träning",
       "playMultiplayer": "Flerspelare",
@@ -2283,6 +2290,7 @@ const sv = {
       "letterCount": "{current}/{total}"
     },
     "returningUser": {
+      "haveAccount": "Jag har ett konto",
       "title": "Välkommen",
       "subtitle": "Logga in för att fortsätta där du slutade, eller börja om.",
       "newHere": "Jag är ny här",
@@ -2500,6 +2508,9 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "preFanfare": "stunden före resultatet",
+    "skipToResults": "Hoppa till resultat",
+    "fanfareHint": "Maskoten har något att säga först…",
     "modeTease": {
       "nextUp": "Nästa",
       "label": {
@@ -2522,6 +2533,9 @@ const sv = {
       }
     },
     "results": "Stridsrapport",
+    "backToLobby": "Tillbaka till lobby",
+    "calculating": "Räknar resultat",
+    "calculatingHint": "Summerar poäng och kontrollerar ord – tar bara en sekund.",
     "share": "Skryt",
     "yourProgress": "Hur det gick",
     "topPlayers": "Pallen",
@@ -5295,6 +5309,10 @@ const sv = {
     "createYourBoard": "Skapa ditt eget bräde",
     "createBoardDesc": "Designa ett pussel och dela det med världen",
     "seo": {
+      "showcase3d": {
+        "title": "LexiClash — En värld av ord | Gratis flerspelarordspel",
+        "description": "Scrolla in i en ordvärld: dra ord på tavlan, kedja bonusar, slå rummet i realtids 1v3-strider och ta kronan. Gratis, webbläsarbaserad, 5 språk – ingen download."
+      },
       "stepLabel": "Steg",
       "whatIsTitle": "Vad är LexiClash?",
       "whatIsContent": "LexiClash är ett gratis, snabbt multiplayer-ordspel som du kan spela direkt i webbläsaren. Tävla mot vänner i ordstrider i realtid på ett delat bokstavsrutnät — hitta ord, bygg kombos och klättra på topplistorna. Det är som Boggle möter Wordle, men multiplayer. Inga nedladdningar, ingen registrering krävs. Tillgängligt på engelska, hebreiska, svenska, japanska och spanska.",
@@ -6279,6 +6297,22 @@ const sv = {
       },
       "stopGameConfirm": "Avsluta spelet för alla?",
       "stopGameYes": "Avsluta spelet",
+      "quality": {
+        "degraded": "Anslutningen försämrad",
+        "weak": "Svag anslutning",
+        "reconnecting": "Återansluter…"
+      },
+      "reconnect": {
+        "title": "Återansluter…",
+        "attempt": "Försök",
+        "giveUp": "Ge upp"
+      },
+      "abort": {
+        "title": "Spelet avslutad",
+        "body": "Dina ord räknas mot slutresultatet. Ord du hittade:",
+        "continueSolo": "Fortsätt ensam",
+        "returnToLobby": "Tillbaka till lobby"
+      }
     },
     "shareResult": "Dela resultat",
     "quitConfirmTitle": "Lämna jakten?",
