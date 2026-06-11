@@ -755,10 +755,17 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       {/* ── Word Builder Area ──
           Fixed height (not min-h) so popLayout tile-exit animations on submit
           don't briefly collapse/expand the box and cause the wheel cluster
-          (flex-1 + justify-center sibling below) to re-center. */}
+          (flex-1 + justify-center sibling below) to re-center.
+
+          mt-2 reserves clearance from the thin time progress bar directly
+          above: each WordTile paints a red "×" remove badge at -top-1.5 that
+          sits flush at the builder's top edge, and the per-letter `scale`
+          growth nudges it up further — without this gap the tile feedback
+          visually crowds/hides the time bar (short: viewport keeps a tighter
+          gap to preserve vertical budget). */}
       <m.div
         data-testid="word-builder"
-        className="relative w-full h-[52px] sm:h-[72px] short:h-[44px] flex items-center justify-center"
+        className="relative w-full mt-2 short:mt-1 h-[52px] sm:h-[72px] short:h-[44px] flex items-center justify-center"
         animate={
           wordBuilderShake
             ? { x: [-4, 4, -3, 3, -1, 0] }
