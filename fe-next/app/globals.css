@@ -4659,3 +4659,20 @@ html[data-cosy='true'] .animate-neo-press {
     .cube-reveal { animation: cube-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
   }
 }
+
+/* Idle hero sheen — a slow diagonal light sweep over the anchor cube's art so
+   the grid has ambient party energy on TV/party screens where there's no hover.
+   Decorative only; hidden entirely when the user prefers reduced motion. */
+.cube-sheen { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes cube-sheen-sweep {
+    0%   { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+    6%   { opacity: 0.5; }
+    22%  { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+    100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+  }
+  .cube-sheen {
+    opacity: 1;
+    animation: cube-sheen-sweep 7s ease-in-out infinite;
+  }
+}

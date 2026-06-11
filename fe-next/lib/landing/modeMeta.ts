@@ -62,15 +62,15 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   brainGym: {
     titleKey: 'landing.brainTraining', descKey: 'landing.brainTrainingDesc', path: '/brain',
-    Icon: Brain, variant: 'purple', modeImage: '/modes/practice.png',
+    Icon: Brain, variant: 'purple', modeImage: '/modes/practice.png', genIcon: '/modes/cubes/braingym.png',
   },
   wordCraft: {
     titleKey: 'wordcraft.modeTitle', descKey: 'wordcraft.modeDesc', path: '/word-craft',
-    Icon: Layers, variant: 'purple', badge: 'NEW', modeImage: '/modes/word-craft.png',
+    Icon: Layers, variant: 'purple', badge: 'NEW', modeImage: '/modes/word-craft.png', genIcon: '/modes/cubes/wordcraft.png',
   },
   crossword: {
     titleKey: 'crossword.name', descKey: 'crossword.tagline', path: '/crossword',
-    Icon: Grid3x3, variant: 'cyan', badge: 'NEW',
+    Icon: Grid3x3, variant: 'cyan', badge: 'NEW', genIcon: '/modes/cubes/crossword.png',
   },
   // Admin-only dev previews — never get generated icons (nobody public sees them).
   blastClassic: {

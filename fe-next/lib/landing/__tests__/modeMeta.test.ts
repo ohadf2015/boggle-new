@@ -42,6 +42,15 @@ describe('MODE_META — parity with control renderCard', () => {
     expect(MODE_META['daily']).toBeUndefined();
   });
 
+  // Every public mode must ship a generated cube icon so the bento grid renders
+  // full-bleed art (not an icon-on-navy fallback) — keeps the layout cohesive.
+  // Admin previews are intentionally excluded (nobody public sees them).
+  it.each(PUBLIC_CONTRACT.map(([key]) => key))('public mode %s has a generated cube icon', (key) => {
+    const { genIcon } = MODE_META[key];
+    expect(genIcon, `${key} genIcon present`).toBeTruthy();
+    expect(genIcon, `${key} genIcon lives under /modes/cubes/`).toMatch(/^\/modes\/cubes\/.+\.png$/);
+  });
+
   describe('modeRoute', () => {
     it('prefixes the active language', () => {
       expect(modeRoute('arena', 'he')).toBe('/he/multiplayer');

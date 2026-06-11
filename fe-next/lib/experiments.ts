@@ -281,6 +281,7 @@ export const EXPERIMENTS = {
       'Homepage mode section layout. control = current LandingChallengeCards grid. cubes = compact bento of mode cubes (arena 2×2 anchor) with generated icons + scroll reveal. Same gated mode list both sides — A/B isolates layout. Conversion = mode_card CTA → game start.',
     forceVariantByEmail: {
       'ohadf2015@gmail.com': 'cubes',
+      'eden320@gmail.com': 'cubes',
     },
   }),
 

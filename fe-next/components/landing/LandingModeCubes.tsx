@@ -112,7 +112,12 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
       style={{ animationDelay: `${Math.min(index, 8) * 0.05}s` }}
       className={cn(
         'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-neo-thick border-black shadow-hard transition-transform duration-150',
-        'hover:-translate-x-0.5 hover:-translate-y-0.5 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+        // Physical neo-brutalist feedback. Lift on hover AND focus-visible so the
+        // grid feels alive on TV/party screens (no pointer → focus is the only
+        // signal) and for keyboard users. active = press the cube back in.
+        'hover:-translate-x-0.5 hover:-translate-y-0.5 focus-visible:-translate-x-0.5 focus-visible:-translate-y-0.5',
+        'active:translate-x-0 active:translate-y-0 active:shadow-hard-pressed',
+        'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         v.shadow, v.ring,
         anchor
           ? bigAnchor
@@ -134,8 +139,16 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
             fill
             sizes={anchor ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 50vw, 25vw'}
             onError={() => setImgFailed(true)}
-            className="object-cover transition-transform duration-200 group-hover:scale-[1.06]"
+            className="object-cover transition-transform duration-200 motion-safe:group-hover:scale-[1.06] motion-safe:group-focus-visible:scale-[1.06]"
           />
+          {/* idle diagonal light sweep — only on the colour-drenched anchor, where
+              there's room for it to read; reduced-motion users see nothing (CSS-gated). */}
+          {anchor && (
+            <span
+              aria-hidden="true"
+              className="cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] w-1/3 bg-gradient-to-r from-transparent via-white/35 to-transparent"
+            />
+          )}
           {/* scrim so the title stays legible over the art */}
           <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/65 to-transparent" />
         </>
@@ -160,10 +173,12 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
           </h3>
           {model.highlighted && model.highlightLabel && <span className="mt-1.5">{<StartHerePill label={model.highlightLabel} />}</span>}
           {model.livePill && (
-            <span className={cn('mt-1.5 flex items-center gap-1.5 font-neo-body text-xs font-bold sm:text-sm', hasArt ? 'text-neo-white' : v.ink)}>
+            // Physical "live" sticker — a lime chip with a pinging dot reads as
+            // a tangible badge stuck on the card vs flat inline text.
+            <span className="mt-2 inline-flex w-fit items-center gap-1.5 self-start rounded-full border-2 border-black bg-neo-lime px-2.5 py-1 font-neo-display text-[0.7rem] font-black uppercase tracking-wide text-neo-navy shadow-hard-sm sm:text-xs">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-current" />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-navy opacity-70 motion-safe:animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-neo-navy" />
               </span>
               {model.livePill}
             </span>
