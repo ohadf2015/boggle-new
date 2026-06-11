@@ -36,7 +36,7 @@ import { neoInfoToast } from '@/components/NeoToast';
 import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal';
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
-import { trackInviteRoomDead, trackGrowthEvent } from '@/utils/growthTracking';
+import { trackInviteRoomDead, trackGrowthEvent, trackInviteConsumed } from '@/utils/growthTracking';
 import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
@@ -232,6 +232,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
       setIsJoining(false);
       setPrefilledRoomCode('');
       if (quickPlay) trackGrowthEvent('mp_quickplay_joined', { asHost: data.isHost, language: data.language ?? language });
+      // Track invite consumed for returning users who arrived via ?room= invite redirect.
+      // New-user path fires this in useInviteOnboardingMode instead.
+      const inviteLandedTs = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('invite_landed_ts') : null;
+      if (inviteLandedTs && prefilledRoomCode) {
+        const totalSeconds = Math.round((Date.now() - Number(inviteLandedTs)) / 1000);
+        trackInviteConsumed({ roomCode: prefilledRoomCode, path: 'direct', totalSeconds });
+        sessionStorage.removeItem('invite_landed_ts');
+      }
       if (data.language) setRoomLanguage(data.language);
       const joinedUsername = data.username || username;
       if (data.isHost) { setUsername(joinedUsername); setStoredUsername(joinedUsername); }

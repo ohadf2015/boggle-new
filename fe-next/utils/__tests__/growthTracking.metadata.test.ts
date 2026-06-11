@@ -54,6 +54,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'ios'),
         isNative: vi.fn(() => true),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -78,6 +79,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -101,6 +103,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'android'),
         isNative: vi.fn(() => true),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -126,6 +129,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -153,6 +157,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -176,6 +181,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -209,6 +215,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -234,6 +241,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameError } = await import('../growthTracking');
@@ -257,6 +265,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameError } = await import('../growthTracking');
@@ -280,6 +289,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -303,6 +313,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'android'),
         isNative: vi.fn(() => true),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
 
       const { trackGameEnd } = await import('../growthTracking');
@@ -331,6 +342,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
       vi.doMock('@/lib/supabase', () => ({
         getSession: vi.fn(async () => ({ data: { session: { access_token: 'jwt-abc' } } })),
@@ -351,6 +363,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
       vi.doMock('@/lib/supabase', () => ({
         getSession: vi.fn(async () => ({ data: { session: null } })),
@@ -378,6 +391,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
       window.localStorage.setItem('boggle_language', 'he');
 
@@ -396,6 +410,7 @@ describe('Analytics Metadata Enrichment', () => {
       vi.doMock('@/utils/platform', () => ({
         getPlatform: vi.fn(() => 'web'),
         isNative: vi.fn(() => false),
+        isAndroid: vi.fn(() => false), // awardGameEnd no-ops off Android (metadata test, not play-games)
       }));
       window.localStorage.setItem('boggle_language', 'en');
 

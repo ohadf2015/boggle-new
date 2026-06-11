@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 5737,
+    "totalKeysInCode": 5743,
     "keyCountByLanguage": {
-      "en": 10816,
-      "he": 10887,
-      "sv": 10884,
-      "ja": 10872,
-      "es": 10909
+      "en": 10839,
+      "he": 10910,
+      "sv": 10907,
+      "ja": 10895,
+      "es": 10932
     },
-    "missingFromEnglish": 3,
+    "missingFromEnglish": 4,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 26,
@@ -309,6 +309,15 @@
     "es": []
   },
   "missingFromEnglish": [
+    {
+      "key": "onboarding.returningUser.haveAccount",
+      "usages": [
+        {
+          "file": "components/onboarding/ReturningUserStep.tsx",
+          "line": 120
+        }
+      ]
+    },
     {
       "key": "results.fanfareHint",
       "usages": [

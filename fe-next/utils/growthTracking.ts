@@ -1451,7 +1451,7 @@ export const trackInviteTutorialSkipped = (props: InviteTutorialSkippedProps): v
 
 interface InviteConsumedProps {
   roomCode: string;
-  path: 'tutorial' | 'skip';
+  path: 'tutorial' | 'skip' | 'direct';
   totalSeconds: number;
 }
 

@@ -196,6 +196,10 @@ const sv = {
         "ariaLabel": "Kedjans djup: {{n}}",
         "newBest": "Nytt rekord!",
         "best": "Rekord: {{n}}"
+      },
+      "ghost": {
+        "reveal": "👻 Spökturen — ×2!",
+        "score": "Poäng:"
       }
     }
   },
@@ -302,8 +306,6 @@ const sv = {
     "clutch": { "save": "Räddning i sista stund!", "critical": "Vacklar — landa rent!" },
     "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig", "newBest": "Nytt dagsrekord!", "questTitle": "Ordtorn", "questDesc": "Stapla ord mot skyn — samma bokstäver för alla idag." },
     "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
-    "mutator": { "todaysTwist": "Dagens twist", "goldenLetter": { "name": "Gyllene bokstav", "desc": "Ord med {letter} klättrar ×1.6" }, "vowelGale": { "name": "Vokalvind", "desc": "Varje vokal lägger till höjd" }, "longAndStrong": { "name": "Lång och stark", "desc": "Ord med 6+ bokstäver klättrar ×1.5" }, "skylineRush": { "name": "Horisontras", "desc": "Varje våning klättrar högre idag" }, "tailwind": { "name": "Medvind", "desc": "Kranen sveper långsammare — enklare perfekter" }, "featherday": { "name": "Fjäderdag", "desc": "Rasningar kostar en våning mindre" } },
-    "combo": { "roll": "I rullning!", "fire": "I farten!", "blaze": "Flammande!", "inferno": "INFERNO!" },
     "crane": { "place": "Placera ditt ord", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet" },
     "verdict": { "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Slarvigt", "miss": "Miss!" },
     "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "{n} perfekta släpp i rad", "watchAd": "📺 Se annons +1", "adEarned": "🎯 Token via annons!" },
@@ -312,7 +314,7 @@ const sv = {
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
     "share": { "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
     "versus": { "title": "Tornrace", "bomb": "Bomba {name}", "waiting": "Väntar på motståndare…", "incoming": "Inkommande bomb!", "won": "Du vann!", "lost": "{name} vann" },
-    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}", "goldenTile": "Gyllene bokstav {letter} — extra poäng" }
+    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}" }
   },
   "flag": "🇸🇪",
   "androidAppPromo": {
@@ -13081,7 +13083,6 @@ const sv = {
       "captureYou": "Erövrade {{count}} — +{{bonus}}!",
       "captureBot": "Boten erövrade {{count}} — +{{bonus}}!"
     },
-    "combo": "Kombo",
     "duel": {
       "playFriend": "Spela mot en vän",
       "passPlay": "Samma enhet — Skicka och blockera",
@@ -13089,7 +13090,6 @@ const sv = {
       "shareText": "Jag fick {{score}} poäng i WordCraft — kan du slå min bräda?",
       "shareTitleChallenge": "Utmana mig på WordCraft",
       "linkCopied": "Inbjudningslänk kopierad!",
-      "linkCopyFailed": "Kunde inte kopiera länken — försök igen.",
       "vsChallenger": "mot {{name}}",
       "youWin": "Du vinner!",
       "youLose": "De vinner",

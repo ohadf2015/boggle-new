@@ -105,6 +105,10 @@ const en = {
         "ariaLabel": "Chain depth: {{n}}",
         "newBest": "New best!",
         "best": "Best: {{n}}"
+      },
+      "ghost": {
+        "reveal": "👻 Ghost Turn — ×2!",
+        "score": "Score:"
       }
     }
   },
@@ -203,8 +207,6 @@ const en = {
     "clutch": { "save": "Clutch save!", "critical": "Wobbling — land it clean!" },
     "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless", "newBest": "New daily best!", "questTitle": "Word Tower", "questDesc": "Stack words sky-high — same letters for everyone today." },
     "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
-    "mutator": { "todaysTwist": "Today's twist", "goldenLetter": { "name": "Golden Letter", "desc": "Words with {letter} climb ×1.6" }, "vowelGale": { "name": "Vowel Gale", "desc": "Every vowel adds height" }, "longAndStrong": { "name": "Long & Strong", "desc": "6+ letter words climb ×1.5" }, "skylineRush": { "name": "Skyline Rush", "desc": "Every floor climbs higher today" }, "tailwind": { "name": "Tailwind", "desc": "The crane sweeps slower — easier perfects" }, "featherday": { "name": "Featherday", "desc": "Topples cost one fewer floor" } },
-    "combo": { "roll": "On a roll!", "fire": "On fire!", "blaze": "Blazing!", "inferno": "INFERNO!" },
     "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability" },
     "verdict": { "perfect": "Perfect!", "good": "Nice!", "sloppy": "Sloppy", "miss": "Missed!" },
     "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "{n} perfect drops in a row", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!" },
@@ -213,7 +215,7 @@ const en = {
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
     "share": { "button": "Share", "text": "I reached {m} m in Word Tower — beat my tower!" },
     "versus": { "title": "Tower Rush", "bomb": "Bomb {name}", "waiting": "Waiting for rivals…", "incoming": "Incoming bomb!", "won": "You won!", "lost": "{name} won" },
-    "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}", "goldenTile": "Golden letter {letter} — scores extra" }
+    "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}" }
   },
   "flag": "🇺🇸",
   "androidAppPromo": {
@@ -12935,7 +12937,6 @@ const en = {
       "captureYou": "Captured {{count}} — +{{bonus}}!",
       "captureBot": "Bot captured {{count}} — +{{bonus}}!"
     },
-    "combo": "Combo",
     "duel": {
       "playFriend": "Play vs a friend",
       "passPlay": "Same device — Pass & Play",
@@ -12943,7 +12944,6 @@ const en = {
       "shareText": "I scored {{score}} in WordCraft — can you beat my board?",
       "shareTitleChallenge": "Challenge me at WordCraft",
       "linkCopied": "Invite link copied!",
-      "linkCopyFailed": "Couldn't copy the link — try again.",
       "vsChallenger": "vs {{name}}",
       "youWin": "You win!",
       "youLose": "They win",

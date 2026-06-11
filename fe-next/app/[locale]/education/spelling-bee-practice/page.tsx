@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { getSpellingBeeContent, type EducationLocale } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
-import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 
@@ -266,7 +266,7 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <TeacherAccessCTA />
+        <DistrictUpsellStrip />
       </div>
     </main>
   );

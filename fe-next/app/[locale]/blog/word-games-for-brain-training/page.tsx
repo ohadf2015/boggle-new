@@ -4,7 +4,7 @@ import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BrainTrainingPageClient from './PageClient';
 import { contentByLocale } from './content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 interface PageProps {
   params: Promise<{ locale: string }>;

@@ -5,7 +5,7 @@ import BoggleAlternativesPageClient from './PageClient';
 import { contentByLocale } from './content';
 import { faqByLocale } from './faq';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 interface PageProps {
   params: Promise<{ locale: string }>;

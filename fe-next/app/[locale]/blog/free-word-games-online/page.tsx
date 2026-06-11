@@ -5,7 +5,7 @@ import { extractFaqFromSections } from '@/utils/seo/parseFaqProse';
 import FreeWordGamesOnlinePageClient from './PageClient';
 import { contentByLocale } from './content';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 interface PageProps {
   params: Promise<{ locale: string }>;

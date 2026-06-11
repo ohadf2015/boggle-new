@@ -109,6 +109,10 @@ const ja = {
         "ariaLabel": "チェーンの深さ: {{n}}",
         "newBest": "新記録！",
         "best": "記録: {{n}}"
+      },
+      "ghost": {
+        "reveal": "👻 ゴーストターン — ×2!",
+        "score": "スコア:"
       }
     }
   },
@@ -215,8 +219,6 @@ const ja = {
     "clutch": { "save": "ギリギリセーフ！", "critical": "ぐらぐら — きれいに着地！" },
     "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス", "newBest": "デイリー自己ベスト更新！", "questTitle": "ワードタワー", "questDesc": "言葉を高く積み上げよう — 今日はみんな同じ文字。" },
     "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
-    "mutator": { "todaysTwist": "今日のひねり", "goldenLetter": { "name": "黄金文字", "desc": "{letter}を含む単語は高さ ×1.6" }, "vowelGale": { "name": "母音の風", "desc": "母音ごとに高さアップ" }, "longAndStrong": { "name": "長くて強い", "desc": "6文字以上の単語は高さ ×1.5" }, "skylineRush": { "name": "スカイラインラッシュ", "desc": "毎階、どんどん高くなる" }, "tailwind": { "name": "追い風", "desc": "クレーンの動きが遅くなる — パーフェクト狙いやすい" }, "featherday": { "name": "フェザーデー", "desc": "崩落で失う階が1つ減る" } },
-    "combo": { "roll": "好調！", "fire": "火がついてる！", "blaze": "灼熱！", "inferno": "インフェルノ！" },
     "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定" },
     "verdict": { "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらっ", "miss": "ミス！" },
     "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト", "watchAd": "📺 広告を見る +1", "adEarned": "🎯 広告でトークンゲット！" },
@@ -225,7 +227,7 @@ const ja = {
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
     "share": { "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
     "versus": { "title": "タワーラッシュ", "bomb": "{name} を爆撃", "waiting": "対戦相手を待っています…", "incoming": "爆弾が来る！", "won": "勝利！", "lost": "{name} の勝ち" },
-    "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}", "goldenTile": "黄金文字 {letter} — ボーナススコア" }
+    "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}" }
   },
   "flag": "🇯🇵",
   "androidAppPromo": {
@@ -7383,7 +7385,9 @@ const ja = {
     "subtitle": "即座にルーム作成 • QRで友達が参加",
     "ariaLabel": "クイックプレイ — すぐにゲーム開始",
     "play": "今すぐプレイ",
-    "seconds": "約{{count}}秒"
+    "seconds": "約{{count}}秒",
+    "seekingMatch": "マッチを探しています…",
+    "seekingMatchSub": "ゲームを準備中"
   },
   "theme": {
     "sundayFunday": "日曜日のお楽しみ",
@@ -13000,7 +13004,6 @@ const ja = {
       "captureYou": "{{count}} 占領 — +{{bonus}}!",
       "captureBot": "ボットが {{count}} 占領 — +{{bonus}}!"
     },
-    "combo": "コンボ",
     "duel": {
       "playFriend": "友達と対戦する",
       "passPlay": "同じ端末 — パス＆プレイ",
@@ -13008,7 +13011,6 @@ const ja = {
       "shareText": "WordCraft で {{score}} ポイント獲得しました — あなたも同じボードで遊べます！",
       "shareTitleChallenge": "WordCraft で対戦しよう",
       "linkCopied": "招待リンクをコピーしました！",
-      "linkCopyFailed": "リンクをコピーできませんでした。もう一度お試しください。",
       "vsChallenger": "vs {{name}}",
       "youWin": "勝利！",
       "youLose": "敗北",

@@ -11,6 +11,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Bot, RotateCcw, Send, User, Trophy, Skull } from 'lucide-react';
@@ -28,6 +29,7 @@ import {
   type SpState,
 } from '@/lib/shiritori/sp/spEngine';
 import { botPoolForDifficulty } from '@/lib/shiritori/sp/botDict';
+import { useShiritoriGhostMultiplier } from '@/lib/shiritori/sp/useShiritoriGhostMultiplier';
 import { HowToPlayCard } from '@/components/common/HowToPlayCard';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -71,6 +73,8 @@ export default function ShiritoriSoloPage() {
   const [input, setInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [score, setScore] = useState(0);
+  const { isGhostTurn, multiplier, markTurnPlayed, reset: resetGhost } = useShiritoriGhostMultiplier();
   const inputRef = useRef<HTMLInputElement>(null);
   const chainEndRef = useRef<HTMLDivElement>(null);
   const wonFiredRef = useRef(false);
@@ -115,8 +119,10 @@ export default function ShiritoriSoloPage() {
     setState(initialSpState(pickSeed(d)));
     setInput('');
     setError(null);
+    setScore(0);
+    resetGhost();
     wonFiredRef.current = false;
-  }, []);
+  }, [resetGhost]);
 
   const submit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,11 +149,22 @@ export default function ShiritoriSoloPage() {
     setState(r.state);
     setInput('');
     if (r.state.phase === 'playing') {
-      playSound('wordAccepted');
+      const pts = word.length * multiplier;
+      setScore((s) => s + pts);
       const rect = inputRef.current?.getBoundingClientRect();
-      if (rect) SharedFxApp.spawnBurst('sparkle-valid', rect.left + rect.width / 2, rect.top + rect.height / 2);
+      if (isGhostTurn) {
+        toast(t('shiritori.solo.ghost.reveal'), {
+          icon: '👻',
+          style: { background: 'var(--popover)', color: 'var(--popover-foreground)' },
+        });
+        if (rect) SharedFxApp.spawnBurst('sparkle-gold', rect.left + rect.width / 2, rect.top + rect.height / 2, { count: 12 });
+      } else {
+        if (rect) SharedFxApp.spawnBurst('sparkle-valid', rect.left + rect.width / 2, rect.top + rect.height / 2);
+      }
+      markTurnPlayed();
+      playSound('wordAccepted');
     }
-  }, [input, state, pending, playSound, t]);
+  }, [input, state, pending, playSound, t, isGhostTurn, multiplier, markTurnPlayed]);
 
   // Admin gate — hooks above this run on every render so order stays stable.
   // Dev bypass lets the game be reached locally (incl. /he RTL playtest).
@@ -217,6 +234,12 @@ export default function ShiritoriSoloPage() {
             <span dir="ltr" className="inline-block rounded-neo border-2 border-black bg-neo-cyan px-2 py-0.5 font-neo-display font-black text-neo-navy">
               {head || '—'}
             </span>
+          </p>
+        )}
+
+        {score > 0 && (
+          <p className="text-center font-neo-display font-black text-sm text-neo-cyan">
+            {t('shiritori.solo.ghost.score')} {score}
           </p>
         )}
 

@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Scrabble Online Gratis en Español — Juega Ahora Con Amigos',
-    description: 'Juega scrabble en español gratis con amigos en tiempo real. Sala lista en 10 segundos, invita con enlace. Sin registro ni descarga. ¡Hasta 50 jugadores!',
+    description: 'Scrabble online en español gratis — en tiempo real, sin turnos. Sala en 10 segundos, invita con enlace. Hasta 50 jugadores. Sin registro ni descarga. ¡Juega ahora!',
     keywords: 'jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
       title: 'Scrabble Online Gratis en Español — Multijugador en Tiempo Real | LexiClash',
@@ -158,7 +158,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
 
         <section className="mb-12 max-w-3xl">
           <h2 className="mb-3 font-neo-display text-2xl font-black uppercase leading-tight text-neo-white sm:text-3xl">
-            Sobre la alternativa a Scrabble online
+            Scrabble Online Gratis en Español: La Alternativa Multijugador
           </h2>
           <div className="space-y-3 font-neo-body text-sm leading-relaxed text-neo-white sm:text-base">
             <p>

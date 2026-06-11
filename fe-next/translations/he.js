@@ -109,6 +109,10 @@ const he = {
         "ariaLabel": "עומק השרשרת: {{n}}",
         "newBest": "שיא חדש!",
         "best": "שיא: {{n}}"
+      },
+      "ghost": {
+        "reveal": "👻 תור רוח — ×2!",
+        "score": "ניקוד:"
       }
     }
   },
@@ -215,8 +219,6 @@ const he = {
     "clutch": { "save": "הצלה ברגע האחרון!", "critical": "מתנדנד — נחיתה נקייה!" },
     "daily": { "badge": "יומי · {date}", "streak": "רצף {n} ימים", "toDaily": "יומי", "toEndless": "אינסופי", "newBest": "שיא יומי חדש!", "questTitle": "מגדל מילים", "questDesc": "בנו מגדל ממילים עד השמיים — אותן אותיות לכולם היום." },
     "perk": { "title": "בחרו מתנה", "subtitle": "בחרו אחת — היא נשארת לכל הטיפוס", "skip": "דלגו בינתיים", "masterCrane": { "name": "מנופאי מומחה", "desc": "תגמול גדול יותר על הנחה מושלמת" }, "tallTimber": { "name": "קורות גבוהות", "desc": "+12% גובה בכל קומה" }, "featherfall": { "name": "נפילת נוצה", "desc": "התמוטטות מפילה קומה אחת פחות" }, "reinforced": { "name": "מחוזק", "desc": "יותר התנדנדות לפני הסכנה" }, "cushion": { "name": "כרית ביטחון", "desc": "התנדנדות מנוף לא מפילה קומות" } },
-    "mutator": { "todaysTwist": "הטוויסט של היום", "goldenLetter": { "name": "אות זהובה", "desc": "מילים עם {letter} עולות ×1.6" }, "vowelGale": { "name": "סערת תנועות", "desc": "כל תנועה מוסיפה גובה" }, "longAndStrong": { "name": "ארוך וחזק", "desc": "מילים של 6+ אותיות עולות ×1.5" }, "skylineRush": { "name": "מירוץ קו הרקיע", "desc": "כל קומה מטפסת גבוה יותר היום" }, "tailwind": { "name": "רוח גבית", "desc": "המנוף נע לאט יותר — קל יותר לנחות מושלם" }, "featherday": { "name": "יום נוצות", "desc": "התמוטטויות עולות קומה אחת פחות" } },
-    "combo": { "roll": "בתנופה!", "fire": "בוערים!", "blaze": "בלהבות!", "inferno": "תופת!" },
     "crane": { "place": "הנח את המילה", "tapToDrop": "הקש כדי לשחרר", "perfect": "מושלם!", "good": "יפה!", "sloppy": "מתנדנד", "miss": "אופס!", "stability": "יציבות" },
     "verdict": { "perfect": "מושלם!", "good": "יפה!", "sloppy": "רשלני", "miss": "פספוס!" },
     "sabotage": { "chip": "כדור הריסה", "tokens": "{n}", "pickTarget": "בחר יריב", "noTargets": "אין יריבים לכיוון כרגע", "confirm": "לשלוח כדור הריסה אל {name}?", "send": "שלח", "cancel": "ביטול", "sentTo": "💥 פגעת ב-{name} — מטר אחד פחות", "incoming": "🚨 חבלה מתקרבת מ-{name}!", "recovered": "המגדל עומד. תמשיכו לטפס.", "earned": "🎯 השגת כדור הריסה!", "earnedHint": "{n} הנחות מושלמות ברצף", "watchAd": "📺 פרסומת לטוקן", "adEarned": "🎯 טוקן מפרסומת!" },
@@ -225,7 +227,7 @@ const he = {
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },
     "share": { "button": "שיתוף", "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!" },
     "versus": { "title": "מירוץ מגדלים", "bomb": "הפצצה על {name}", "waiting": "ממתינים ליריבים…", "incoming": "פצצה מתקרבת!", "won": "ניצחת!", "lost": "{name} ניצח" },
-    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}", "goldenTile": "אות זהובה {letter} — נקודות נוספות" }
+    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}" }
   },
   "flag": "🇮🇱",
   "androidAppPromo": {
@@ -13490,7 +13492,6 @@ const he = {
       "captureYou": "כבשת {{count}} — +{{bonus}}!",
       "captureBot": "הבוט כבש {{count}} — +{{bonus}}!"
     },
-    "combo": "קומבו",
     "duel": {
       "playFriend": "שחק נגד חבר",
       "passPlay": "באותה התקן — העבר וחסום",
@@ -13498,7 +13499,6 @@ const he = {
       "shareText": "ניקדתי {{score}} ב-WordCraft — הצלחת להכניע את הלוח שלי?",
       "shareTitleChallenge": "אתגור אותי ב-WordCraft",
       "linkCopied": "קישור הזמנה הועתק!",
-      "linkCopyFailed": "לא הצלחנו להעתיק את הקישור — נסו שוב.",
       "vsChallenger": "מול {{name}}",
       "youWin": "ניצחת!",
       "youLose": "הם ניצחו",
