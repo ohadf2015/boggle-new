@@ -730,8 +730,16 @@ function HostPreGameView({
       <ChatBubble gameCode={gameCode} username={username} isHost t={t} />
       {/* The host is a present person on their own device (true cast-to-TV is the
           separate tv-broadcast/ components), so they can fling emoji whether they
-          play or just run the scoreboard — same ambient delight as every player. */}
-      <LobbyReactions username={username} />
+          play or just run the scoreboard — same ambient delight as every player.
+          Anchor the trigger as a fixed floating button mirroring the chat bubble on
+          the opposite (start) corner — otherwise it drops into document flow and
+          orphans as a lone emoji below the sticky start bar, breaking the layout. */}
+      <div
+        data-testid="host-lobby-emote-fab"
+        className="fixed bottom-20 start-4 lg:bottom-6 lg:start-6 z-40"
+      >
+        <LobbyReactions username={username} />
+      </div>
     </div>
   );
 }

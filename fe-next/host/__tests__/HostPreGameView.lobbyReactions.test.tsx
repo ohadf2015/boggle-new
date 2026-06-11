@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import HostPreGameView from '../components/HostPreGameView';
 
 const emitMock = vi.fn();
@@ -151,5 +151,17 @@ describe('HostPreGameView lobby emote (LobbyReactions send tray)', () => {
     const props = lobbyReactionsProps.at(-1);
     expect(props).toBeDefined();
     expect(props!.receiveOnly).toBeFalsy();
+  });
+
+  it('anchors the emote trigger as a fixed floating button, not an in-flow orphan', () => {
+    // The trigger used to render bare at the end of the root div, dropping into
+    // document flow below the sticky start bar — a lone emoji floating bottom-left
+    // that broke the layout. It must be a deliberate fixed-position FAB instead.
+    render(<HostPreGameView {...baseProps} />);
+
+    const fab = screen.getByTestId('host-lobby-emote-fab');
+    expect(fab.className).toContain('fixed');
+    // Mirrors the chat bubble (bottom corner), so the two FABs frame the start bar.
+    expect(fab.className).toMatch(/bottom-/);
   });
 });
