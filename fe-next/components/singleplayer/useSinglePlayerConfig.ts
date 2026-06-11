@@ -241,6 +241,51 @@ export function useSinglePlayerConfig({ searchParams }: UseSinglePlayerConfigOpt
     }
   }, [presetParam, autoStart, phase, uiLanguage]);
 
+  // Auto-start async friend-challenge game (autoStart=challenge).
+  // Both sides of the async flow land here: the challenger (config stashed under
+  // `pendingAsyncChallenge` by the dialog) plays first to lock a target score,
+  // and the accepting friend (`pendingFriendChallenge`) plays to beat it. We
+  // launch a solo, no-bots, timed board using the stashed duration + language so
+  // the player can actually COMPLETE the challenge. The producer hook in
+  // SinglePlayerResults fires the POST/PUT on game-end.
+  useEffect(() => {
+    if (autoStart !== 'challenge' || hasAutoStartedRef.current) return;
+    if (typeof window === 'undefined') return;
+    hasAutoStartedRef.current = true;
+
+    let durationSeconds = 120;
+    let challengeLang: string = uiLanguage;
+    try {
+      const raw =
+        sessionStorage.getItem('pendingAsyncChallenge') ||
+        sessionStorage.getItem('pendingFriendChallenge');
+      if (raw) {
+        const cfg = JSON.parse(raw) as { durationSeconds?: number; language?: string };
+        if (typeof cfg.durationSeconds === 'number' && cfg.durationSeconds > 0) {
+          durationSeconds = cfg.durationSeconds;
+        }
+        if (typeof cfg.language === 'string' && cfg.language) {
+          challengeLang = cfg.language;
+        }
+      }
+    } catch {
+      // Fall back to defaults if the stashed config is unreadable.
+    }
+
+    const minWordLength = getMinWordLength(challengeLang, 'MEDIUM');
+    setGameState(prev => ({
+      ...prev,
+      mode: 'challenge',
+      difficulty: 'MEDIUM',
+      timerSeconds: durationSeconds,
+      bots: [],
+      language: challengeLang as Language,
+      grid: null,
+      minWordLength,
+    }));
+    setPhase('playing');
+  }, [autoStart, uiLanguage]);
+
   // Auto-load MP handoff board (Phase 3.7) — same grid used in MP game
   useEffect(() => {
     if (!mpHandoff || hasAutoStartedRef.current) return;

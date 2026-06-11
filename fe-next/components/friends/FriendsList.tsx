@@ -334,7 +334,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
       }
       toast.success(t('friends.challenges.async.playInstruction'));
       setChallengeFriend(null);
-      router.push(`/${language}/?asyncChallenge=new`);
+      // Drop the challenger straight into a solo timed board so they can play
+      // and lock their target score; the producer hook POSTs on game-end.
+      router.push(`/${language}/singleplayer?autoStart=challenge`);
       return;
     }
 
