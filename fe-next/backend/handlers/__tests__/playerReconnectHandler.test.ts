@@ -303,6 +303,57 @@ describe('handleReconnection', () => {
     );
   });
 
+  // 7d. Blast reconnect must restore the player's OWN evolved board, not the
+  // pristine shared template. Each player evolves an independent board
+  // (playerBoards[username]); sending the template (state.grid/tileStates) snaps
+  // a reconnecting player back to a fresh board → every later word desyncs.
+  it('restores the reconnecting player evolved blast board, not the template', () => {
+    const evolvedBoard = {
+      grid: [['Z', 'Z'], ['Z', 'Z']],
+      tileStates: [
+        [{ uid: 'e1', row: 0, col: 0, type: 'gold' }, { uid: 'e2', row: 0, col: 1, type: 'standard' }],
+        [{ uid: 'e3', row: 1, col: 0, type: 'standard' }, { uid: 'e4', row: 1, col: 1, type: 'standard' }],
+      ],
+      overlay: [{ row: 0, col: 0, type: 'gold' }],
+      overlayMap: new Map(),
+      seed: 999,
+      totalMoves: 5,
+      refillCount: 1,
+    };
+    const game = makeGame({
+      gameState: 'playing',
+      gameMode: 'blast',
+      letterGrid: [['A', 'A'], ['A', 'A']],
+      remainingTime: 60,
+      blastModeState: {
+        // Pristine TEMPLATE — what every player starts from (must NOT be sent on reconnect).
+        grid: [['A', 'A'], ['A', 'A']],
+        tileStates: [
+          [{ uid: 't1', row: 0, col: 0, type: 'standard' }, { uid: 't2', row: 0, col: 1, type: 'standard' }],
+          [{ uid: 't3', row: 1, col: 0, type: 'standard' }, { uid: 't4', row: 1, col: 1, type: 'standard' }],
+        ],
+        overlay: [],
+        overlayMap: new Map(),
+        seed: 1,
+        wave: 3,
+        playerMoves: { Player1: 5 },
+        playerBoards: { Player1: evolvedBoard },
+      },
+    });
+    mockIsInProgress.mockReturnValue(true);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    const startGameCall = (socket.emit as Mock).mock.calls.find((c: any[]) => c[0] === 'startGame');
+    expect(startGameCall).toBeTruthy();
+    const payload = startGameCall![1];
+    expect(payload.blastGrid).toEqual(evolvedBoard.grid);
+    expect(payload.blastTileStates).toEqual(evolvedBoard.tileStates);
+    expect(payload.blastTileOverlay).toEqual(evolvedBoard.overlay);
+    expect(payload.blastSeed).toBe(999);
+  });
+
   // 8. Game state NOT sent when game not in progress
   it('does not emit startGame when game is not in progress', () => {
     const game = makeGame({ gameState: 'waiting' });

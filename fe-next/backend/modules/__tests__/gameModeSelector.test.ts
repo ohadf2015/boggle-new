@@ -23,19 +23,30 @@ describe('gameModeSelector', () => {
       }
     });
 
-    it('should return any mode when history is empty', () => {
-      const results = new Set<GameMode>();
+    it('should ALWAYS open a new room (empty history) on blast', () => {
+      // First game for a new host: a deterministic, high-energy opener beats a
+      // 35%-weighted classic. Blast is the showcase mode → first random game = blast.
       for (let i = 0; i < 200; i++) {
-        results.add(selectNextGameMode([], ALL_GAME_MODES));
+        expect(selectNextGameMode([], ALL_GAME_MODES)).toBe('blast');
       }
-      // With 200 iterations and 4 modes, all should appear
-      expect(results.size).toBe(4);
     });
 
-    it('should only return modes from the enabled list', () => {
+    it('should fall back to weighted random on the first game when blast is disabled', () => {
+      const enabledModes: GameMode[] = ['classic', 'word-hunt'];
+      const results = new Set<GameMode>();
+      for (let i = 0; i < 200; i++) {
+        const result = selectNextGameMode([], enabledModes);
+        expect(enabledModes).toContain(result);
+        results.add(result);
+      }
+      // Both enabled non-blast modes should appear (no forced opener available).
+      expect(results.size).toBe(2);
+    });
+
+    it('should only return modes from the enabled list (game 2+)', () => {
       const enabledModes: GameMode[] = ['classic', 'blast'];
       for (let i = 0; i < 100; i++) {
-        const result = selectNextGameMode([], enabledModes);
+        const result = selectNextGameMode(['classic'], enabledModes);
         expect(enabledModes).toContain(result);
         expect(result).not.toBe('word-hunt');
       }
@@ -64,8 +75,9 @@ describe('gameModeSelector', () => {
       const iterations = 10000;
 
       for (let i = 0; i < iterations; i++) {
-        // Use empty history to not filter any mode
-        const result = selectNextGameMode([], ALL_GAME_MODES);
+        // Game 2+ (non-empty history) so the first-game blast opener doesn't apply;
+        // wheel-rush in history is filtered, leaving classic/blast/word-hunt weighted.
+        const result = selectNextGameMode(['wheel-rush'], ALL_GAME_MODES);
         counts[result]++;
       }
 

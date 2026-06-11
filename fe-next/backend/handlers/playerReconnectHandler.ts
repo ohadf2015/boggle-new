@@ -41,6 +41,7 @@ import { ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
 import logger from '../utils/logger.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { HUNT_INITIAL_LIFE } from '@/shared/constants/wordHuntMultiplayerConstants';
+import { getOrInitPlayerBoard } from '../modules/blastModeManager.js';
 
 interface AuthConnectionResult {
   handled: boolean;
@@ -239,19 +240,24 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       myFoundWords: game.playerWords?.[username] || [],
     };
 
-    // Include blast mode state for reconnecting players
+    // Include blast mode state for reconnecting players. Each player evolves an
+    // INDEPENDENT board (playerBoards[username]); the reconnecting player must get
+    // THEIR evolved board, not the pristine shared template (state.grid/tileStates).
+    // overlay/seed also diverge from the template after a board regen, so read them
+    // off the per-player board too.
     if (game.gameMode === 'blast' && game.blastModeState) {
-      reconnectPayload.blastTileOverlay = game.blastModeState.overlay || [];
-      reconnectPayload.blastSeed = game.blastModeState.seed ?? null;
+      const board = getOrInitPlayerBoard(game.blastModeState, username);
+      reconnectPayload.blastTileOverlay = board.overlay || [];
+      reconnectPayload.blastSeed = board.seed ?? null;
       reconnectPayload.blastWave = game.blastModeState.wave ?? 1;
       // Send player's moves-used count so client can restore correct state
       reconnectPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
-      // Send current server-authoritative board state for MP sync
-      if (game.blastModeState.grid) {
-        reconnectPayload.blastGrid = game.blastModeState.grid;
+      // Send the player's own server-authoritative evolved board for MP sync.
+      if (board.grid) {
+        reconnectPayload.blastGrid = board.grid;
       }
-      if (game.blastModeState.tileStates) {
-        reconnectPayload.blastTileStates = game.blastModeState.tileStates;
+      if (board.tileStates) {
+        reconnectPayload.blastTileStates = board.tileStates;
       }
     }
 
@@ -308,17 +314,20 @@ function handleLateJoin(socket: Socket, game: GameState, gameCode: string, usern
     gameSessionId: game.gameSessionId,
   };
 
-  // Include blast mode state for late joiners
+  // Include blast mode state for late joiners. getOrInitPlayerBoard lazily clones
+  // the template into a fresh independent board for this never-seen player, so the
+  // late joiner starts clean AND the server now tracks their board for cascades.
   if (game.gameMode === 'blast' && game.blastModeState) {
-    lateJoinPayload.blastTileOverlay = game.blastModeState.overlay || [];
-    lateJoinPayload.blastSeed = game.blastModeState.seed ?? null;
+    const board = getOrInitPlayerBoard(game.blastModeState, username);
+    lateJoinPayload.blastTileOverlay = board.overlay || [];
+    lateJoinPayload.blastSeed = board.seed ?? null;
     lateJoinPayload.blastWave = game.blastModeState.wave ?? 1;
     lateJoinPayload.blastPlayerMoves = game.blastModeState.playerMoves || {};
-    if (game.blastModeState.grid) {
-      lateJoinPayload.blastGrid = game.blastModeState.grid;
+    if (board.grid) {
+      lateJoinPayload.blastGrid = board.grid;
     }
-    if (game.blastModeState.tileStates) {
-      lateJoinPayload.blastTileStates = game.blastModeState.tileStates;
+    if (board.tileStates) {
+      lateJoinPayload.blastTileStates = board.tileStates;
     }
   }
 

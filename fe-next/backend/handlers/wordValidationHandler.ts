@@ -25,15 +25,10 @@ import { addWordToBlacklist } from '../modules/botManager.js';
 import { inc, incPerGame } from '../utils/metrics.js';
 import logger from '../utils/logger.js';
 import { processLongWordEngagement } from './engagementHandler';
-import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, cascadeBlastWord } from '../modules/blastModeManager.js';
+import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, getWordPath, getOrInitPlayerBoard, safeCascadeBlastWord } from '../modules/blastModeManager.js';
 import { regenerateBlastBoardIfExhausted } from '../modules/blastBoardRegen.js';
 import { makePositionsMap } from '../modules/wordValidator.js';
 import { computeRushBonus } from '../modules/rushTiles/rushTilesLogic.js';
-import { processTilesForWord } from '@/components/blast/legacy/utils/clearTilesProcessor';
-import { applyVortexLetterSwaps } from '@/components/blast/legacy/utils/blastLetterSwaps';
-import { computeGravityResult } from '@/components/blast/legacy/utils/blastGravity';
-import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterGenerator';
-import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
 import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import { restoreLife, getLifeBonus, computeDiscoveryClues } from '../modules/wordHuntManager.js';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
@@ -91,60 +86,81 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
   let blastMoveResult: { movesUsed: number; bonusMove: boolean } | null = null;
 
   if (game.gameMode === 'blast' && game.blastModeState) {
+    const blastState = game.blastModeState;
+    // PER-PLAYER board: each player evolves their OWN board independently, so one
+    // player's tile-clears never sync to another's. Validate/score/cascade against
+    // THIS player's board, not the shared template.
+    const board = getOrInitPlayerBoard(blastState, username);
+    const lang = (game.language || 'en') as import('@/shared/types').Language;
+    const boardPositions = makePositionsMap(board.grid, lang);
+
+    // 1) Tile/letter bonus + move accounting. Degrade to bonus=0 on any failure
+    //    (e.g. a corrupted overlay after a Redis restore) WITHOUT aborting — the
+    //    base word still scores and, crucially, the cascade/resync below still runs.
     try {
-      const blastState = game.blastModeState;
-      // PER-PLAYER board: each player evolves their OWN board independently, so
-      // one player's tile-clears never sync to another's. Validate/score/cascade
-      // against THIS player's board, not the shared template.
-      const board = getOrInitPlayerBoard(blastState, username);
-      const lang = (game.language || 'en') as import('@/shared/types').Language;
-      const boardPositions = makePositionsMap(board.grid, lang);
       const tilesOnPath = getTilesOnPath(normalizedWord, boardPositions, board.overlay, board.overlayMap);
       blastTileBonus = calculateBlastTileBonus(tilesOnPath);
       blastTilesCleared = tilesOnPath;
       const gemCount = tilesOnPath.filter(t => t === 'gem').length;
       blastMoveResult = recordBlastMove(blastState, username, safeComboLevel, normalizedWord, tilesOnPath.length, gemCount, blastTileBonus);
-
-      // Server-side board mutation on THIS player's board (real cascade in
-      // cascadeBlastWord; refill=false → shrink-until-clear).
-      if (board.grid && board.tileStates) {
-        const wordPath = getWordPath(normalizedWord, boardPositions);
-        const { clearedCount, totalMoves } = cascadeBlastWord(board, wordPath, normalizedWord, blastState.wave ?? 1, lang);
-
-        // UNICAST the player's new board to that player only — boards are
-        // independent, so broadcasting would re-sync them (the bug). Use safeEmit
-        // on the submitting socket.
-        safeEmit(socket, 'blastBoardUpdate', {
-          grid: board.grid,
-          tileStates: board.tileStates,
-          clearedBy: username,
-          word: normalizedWord,
-          clearedCount,
-          totalMoves,
-        });
-
-        // Per-player board refresh on exhaust → a player can clear multiple
-        // boards in one round; the game only ends on the round timer.
-        regenerateBlastBoardIfExhausted({
-          io,
-          gameCode,
-          game,
-          username,
-          board,
-          newTileStates: board.tileStates,
-          socket,
-        });
-      }
     } catch (err: unknown) {
       const error = err as Error;
       logger.error('BLAST', `Blast bonus calculation error: ${error.message}`, {
         gameCode,
         username,
         word: normalizedWord,
-        wave: game.blastModeState?.wave ?? null,
+        wave: blastState.wave ?? null,
         stack: error.stack,
       });
       blastTileBonus = 0;
+    }
+
+    // 2) Cascade on THIS player's board with crash isolation. safeCascadeBlastWord
+    //    runs the real cascade on a CLONE and commits only on success, so a
+    //    mid-cascade throw can never corrupt the authoritative board. We ALWAYS
+    //    unicast the authoritative board back (success = the new board, failure =
+    //    the untouched one) so the client never strands on a diverged/frozen board.
+    if (board.grid && board.tileStates) {
+      const wordPath = getWordPath(normalizedWord, boardPositions);
+      const result = safeCascadeBlastWord(board, wordPath, normalizedWord, blastState.wave ?? 1, lang);
+      if (result.ok) {
+        // Commit the successfully-cascaded board as this player's authoritative board.
+        if (!blastState.playerBoards) blastState.playerBoards = {};
+        blastState.playerBoards[username] = result.board;
+      } else {
+        logger.error('BLAST', 'Blast cascade failed; authoritative board kept intact for resync', {
+          gameCode,
+          username,
+          word: normalizedWord,
+          wave: blastState.wave ?? null,
+        });
+      }
+
+      // UNICAST to the submitting player only — boards are independent, so
+      // broadcasting would re-sync them (the original bug).
+      safeEmit(socket, 'blastBoardUpdate', {
+        grid: result.board.grid,
+        tileStates: result.board.tileStates,
+        clearedBy: username,
+        word: normalizedWord,
+        clearedCount: result.clearedCount,
+        totalMoves: result.totalMoves,
+      });
+
+      // Per-player board refresh on exhaust (success path only — a failed cascade
+      // didn't clear anything). A player can clear multiple boards in one round;
+      // the game only ends on the round timer.
+      if (result.ok) {
+        regenerateBlastBoardIfExhausted({
+          io,
+          gameCode,
+          game,
+          username,
+          board: result.board,
+          newTileStates: result.board.tileStates,
+          socket,
+        });
+      }
     }
   }
 

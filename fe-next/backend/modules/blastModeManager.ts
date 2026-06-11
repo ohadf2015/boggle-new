@@ -257,6 +257,50 @@ export function cascadeBlastWord(
 }
 
 /**
+ * Deep-clone a player's blast board so a cascade can run on a throwaway copy and
+ * be committed only if it succeeds. Mirrors the clone shape in getOrInitPlayerBoard.
+ */
+export function cloneBlastBoard(board: BlastPlayerBoard): BlastPlayerBoard {
+  return {
+    grid: board.grid.map((row) => [...row]),
+    tileStates: board.tileStates.map((row) => row.map((t) => ({ ...t }))),
+    overlay: board.overlay.map((o) => ({ ...o })),
+    overlayMap: new Map(board.overlayMap),
+    seed: board.seed,
+    totalMoves: board.totalMoves,
+    refillCount: board.refillCount,
+  };
+}
+
+/**
+ * Cascade a played word with crash isolation. cascadeBlastWord mutates the board
+ * IN PLACE, so a mid-cascade throw would otherwise leave the authoritative board
+ * half-written. We cascade on a CLONE and commit only on success:
+ *   - ok:true  → `board` is the new committed board (caller stores + emits it).
+ *   - ok:false → `board` is the ORIGINAL authoritative board, byte-for-byte intact,
+ *                so the caller can still resync the client to server truth.
+ * The cascade fn is injectable purely so the failure path is deterministically
+ * testable; production always uses the real cascadeBlastWord.
+ */
+export function safeCascadeBlastWord(
+  liveBoard: BlastPlayerBoard,
+  wordPath: Array<{ row: number; col: number }>,
+  word: string,
+  wave: number,
+  language: Language,
+  cascadeFn: typeof cascadeBlastWord = cascadeBlastWord,
+): { board: BlastPlayerBoard; clearedCount: number; totalMoves: number; ok: boolean } {
+  const work = cloneBlastBoard(liveBoard);
+  try {
+    const { clearedCount, totalMoves } = cascadeFn(work, wordPath, word, wave, language);
+    return { board: work, clearedCount, totalMoves, ok: true };
+  } catch {
+    // Discard the half-mutated clone; hand back the untouched authoritative board.
+    return { board: liveBoard, clearedCount: 0, totalMoves: liveBoard.totalMoves ?? 0, ok: false };
+  }
+}
+
+/**
  * Record a blast move for a player.
  * Increments moves and grants bonus move if combo is high enough.
  */
