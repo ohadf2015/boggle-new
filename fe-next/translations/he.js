@@ -195,6 +195,7 @@ const he = {
   },
   "gameFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
   "wordTower": {
+    "mutator": { "todaysTwist": "הטוויסט של היום" },
     "howTo": {
       "title": "איך משחקים",
       "cta": "הבנתי!",
@@ -13265,6 +13266,7 @@ const he = {
     "belowYourNorm": "{{delta}}% מתחת לממוצע שלך"
   },
   "wordcraft": {
+    "combo": "קומבו",
     "title": "WordCraft",
     "adminBadge": "ארגז חול למנהלים · לוח מילים תחרותי",
     "you": "אתה",
@@ -13511,6 +13513,7 @@ const he = {
       "shareText": "ניקדתי {{score}} ב-WordCraft — הצלחת להכניע את הלוח שלי?",
       "shareTitleChallenge": "אתגור אותי ב-WordCraft",
       "linkCopied": "קישור הזמנה הועתק!",
+      "linkCopyFailed": "לא ניתן להעתיק את הקישור",
       "vsChallenger": "מול {{name}}",
       "youWin": "ניצחת!",
       "youLose": "הם ניצחו",

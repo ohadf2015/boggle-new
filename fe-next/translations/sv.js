@@ -282,6 +282,7 @@ const sv = {
   },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {
+    "mutator": { "todaysTwist": "DAGENS TWIST" },
     "howTo": {
       "title": "Så spelar du",
       "cta": "Uppfattat!",
@@ -12891,6 +12892,7 @@ const sv = {
     "belowYourNorm": "{{delta}}% under ditt snitt"
   },
   "wordcraft": {
+    "combo": "COMBO",
     "title": "WordCraft",
     "adminBadge": "Admin-sandlåda · Tävlings-ordbräde",
     "you": "Du",
@@ -13102,6 +13104,7 @@ const sv = {
       "shareText": "Jag fick {{score}} poäng i WordCraft — kan du slå min bräda?",
       "shareTitleChallenge": "Utmana mig på WordCraft",
       "linkCopied": "Inbjudningslänk kopierad!",
+      "linkCopyFailed": "Kunde inte kopiera länken",
       "vsChallenger": "mot {{name}}",
       "youWin": "Du vinner!",
       "youLose": "De vinner",

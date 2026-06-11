@@ -187,6 +187,7 @@ const en = {
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {
+    "mutator": { "todaysTwist": "TODAY'S TWIST" },
     "cardTitle": "Word Tower",
     "cardDesc": "Stack words sky-high — admin preview",
     "howTo": {
@@ -12710,6 +12711,7 @@ const en = {
     "belowYourNorm": "{{delta}}% below your average"
   },
   "wordcraft": {
+    "combo": "COMBO",
     "title": "WordCraft",
     "adminBadge": "Admin sandbox · Tournament word grid",
     "you": "You",
@@ -12956,6 +12958,7 @@ const en = {
       "shareText": "I scored {{score}} in WordCraft — can you beat my board?",
       "shareTitleChallenge": "Challenge me at WordCraft",
       "linkCopied": "Invite link copied!",
+      "linkCopyFailed": "Couldn't copy link",
       "vsChallenger": "vs {{name}}",
       "youWin": "You win!",
       "youLose": "They win",

@@ -187,6 +187,7 @@ const es = {
   },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {
+    "mutator": { "todaysTwist": "GIRO DE HOY" },
     "cardTitle": "Torre de Palabras",
     "cardDesc": "Apila palabras hasta el cielo — vista de admin",
     "howTo": {
@@ -12896,6 +12897,7 @@ const es = {
     "belowYourNorm": "{{delta}}% bajo tu promedio"
   },
   "wordcraft": {
+    "combo": "COMBO",
     "title": "WordCraft",
     "adminBadge": "Sandbox de admin · Tablero de palabras",
     "you": "Tú",
@@ -13107,6 +13109,7 @@ const es = {
       "shareText": "¡Obtuve {{score}} puntos en WordCraft — ¿puedes superar mi tablero?",
       "shareTitleChallenge": "Retame en WordCraft",
       "linkCopied": "¡Enlace de invitación copiado!",
+      "linkCopyFailed": "No se pudo copiar el enlace",
       "vsChallenger": "vs {{name}}",
       "youWin": "¡Ganaste!",
       "youLose": "Ellos ganan",

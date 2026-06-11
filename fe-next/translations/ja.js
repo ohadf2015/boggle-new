@@ -195,6 +195,7 @@ const ja = {
   },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {
+    "mutator": { "todaysTwist": "今日のひねり" },
     "howTo": {
       "title": "遊び方",
       "cta": "OK！",
@@ -12812,6 +12813,7 @@ const ja = {
     "belowYourNorm": "平均より{{delta}}%"
   },
   "wordcraft": {
+    "combo": "コンボ",
     "title": "WordCraft",
     "adminBadge": "管理者サンドボックス · 単語グリッド",
     "you": "あなた",
@@ -13023,6 +13025,7 @@ const ja = {
       "shareText": "WordCraft で {{score}} ポイント獲得しました — あなたも同じボードで遊べます！",
       "shareTitleChallenge": "WordCraft で対戦しよう",
       "linkCopied": "招待リンクをコピーしました！",
+      "linkCopyFailed": "リンクをコピーできませんでした",
       "vsChallenger": "vs {{name}}",
       "youWin": "勝利！",
       "youLose": "敗北",
