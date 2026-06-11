@@ -2315,6 +2315,21 @@ html.reduce-motion *::after {
   margin: 0 auto;
 }
 
+/* ==================== Word Hunt Grid Container ==================== */
+/* WordHuntGameLayout wraps the grid in a square sized by container queries
+   (`--wh-grid-size: min(100cqw,100cqh,…)`). The inner GridComponent's
+   `.game-board-frame` must fill that square rather than honoring the legacy
+   mobile/landscape-tablet viewport rules above — otherwise on landscape
+   tablets the frame sizes to `min(80vh, calc(100vw - 300px))`, overflows its
+   box, and the grid rows spill over each other (tiles appear to overlap). */
+.wordhunt-grid-container .game-board-frame {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 auto;
+}
+
 /* ====================================
    CLUE BOX ATTENTION ANIMATIONS
    For Daily Challenge Target Word Hints

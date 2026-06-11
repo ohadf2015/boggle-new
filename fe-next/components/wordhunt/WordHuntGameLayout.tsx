@@ -226,7 +226,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
               `max-height: min(--board-size, 100%)` clamp goes inert, and the viewport-based
               --board-size overflows the slot → top/bottom rows clip under the chrome. */}
           <div
-            className="relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,440px)] min-[1024px]:[--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
+            className="wordhunt-grid-container relative mx-auto flex [--wh-grid-size:min(100cqw,100cqh,440px)] min-[1024px]:[--wh-grid-size:min(100cqw,100cqh,560px)] xl:[--wh-grid-size:min(100cqw,100cqh,620px)]"
             style={{
               width: 'var(--wh-grid-size)',
               height: 'var(--wh-grid-size)',
