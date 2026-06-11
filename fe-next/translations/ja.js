@@ -7493,6 +7493,31 @@ const ja = {
       "teacherAccess": "先生アクセス",
       "schoolLeads": "学校からの問い合わせ"
     },
+    "schoolLeads": {
+      "title": "学校・地区からの問い合わせ",
+      "subtitle": "教室での LexiClash 利用について問い合わせた学校・地区。",
+      "count": {
+        "total": "問い合わせ総数",
+        "pricing": "料金を希望",
+        "large": "2,000人以上の生徒"
+      },
+      "filter_role_all": "すべての役割",
+      "filter_size_all": "すべての規模",
+      "filter_interest_all": "すべての関心事",
+      "refresh": "更新",
+      "empty": "まだ問い合わせはありません",
+      "page": "ページ",
+      "export_csv": "CSVをエクスポート",
+      "col": {
+        "date": "日付",
+        "school": "学校 / 地区",
+        "contact": "連絡先",
+        "role": "役割",
+        "size": "生徒数",
+        "interests": "関心のある内容",
+        "country": "国"
+      }
+    },
     "teacherAccess": {
       "empty": "リクエストはありません",
       "title": "先生アクセスリクエスト",

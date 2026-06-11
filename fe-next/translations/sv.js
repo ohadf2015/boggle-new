@@ -7454,6 +7454,31 @@ const sv = {
       "teacherAccess": "Lärargång",
       "schoolLeads": "Skolförfrågningar"
     },
+    "schoolLeads": {
+      "title": "Skol- och distriktsförfrågningar",
+      "subtitle": "Skolor och distrikt som frågat om LexiClash för sina klassrum.",
+      "count": {
+        "total": "Totalt antal förfrågningar",
+        "pricing": "Vill ha prisuppgifter",
+        "large": "2 000+ elever"
+      },
+      "filter_role_all": "Alla roller",
+      "filter_size_all": "Alla storlekar",
+      "filter_interest_all": "Alla intressen",
+      "refresh": "Uppdatera",
+      "empty": "Inga förfrågningar än",
+      "page": "Sida",
+      "export_csv": "Exportera CSV",
+      "col": {
+        "date": "Datum",
+        "school": "Skola / Distrikt",
+        "contact": "Kontakt",
+        "role": "Roll",
+        "size": "Elever",
+        "interests": "Intresserade av",
+        "country": "Land"
+      }
+    },
     "teacherAccess": {
       "empty": "Inga begäranden",
       "title": "Lägaråtkomstbegäranden",

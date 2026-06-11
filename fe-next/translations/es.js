@@ -7398,6 +7398,31 @@ const es = {
       "teacherAccess": "Acceso de maestro",
       "schoolLeads": "Contactos escolares"
     },
+    "schoolLeads": {
+      "title": "Contactos de escuelas y distritos",
+      "subtitle": "Escuelas y distritos que preguntaron por LexiClash para sus aulas.",
+      "count": {
+        "total": "Total de contactos",
+        "pricing": "Quieren precios",
+        "large": "2000+ estudiantes"
+      },
+      "filter_role_all": "Todos los roles",
+      "filter_size_all": "Todos los tamaños",
+      "filter_interest_all": "Todos los intereses",
+      "refresh": "Actualizar",
+      "empty": "Aún no hay contactos",
+      "page": "Página",
+      "export_csv": "Exportar CSV",
+      "col": {
+        "date": "Fecha",
+        "school": "Escuela / Distrito",
+        "contact": "Contacto",
+        "role": "Rol",
+        "size": "Estudiantes",
+        "interests": "Interesados en",
+        "country": "País"
+      }
+    },
     "teacherAccess": {
       "title": "Solicitudes de acceso de maestro",
       "empty": "Sin solicitudes",

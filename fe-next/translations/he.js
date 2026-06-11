@@ -7410,6 +7410,31 @@ const he = {
       "teacherAccess": "גישת מורה",
       "schoolLeads": "פניות מבתי ספר"
     },
+    "schoolLeads": {
+      "title": "פניות מבתי ספר ומחוזות",
+      "subtitle": "בתי ספר ומחוזות שפנו בנוגע ל-LexiClash עבור הכיתות שלהם.",
+      "count": {
+        "total": "סה״כ פניות",
+        "pricing": "מעוניינים בתמחור",
+        "large": "2,000+ תלמידים"
+      },
+      "filter_role_all": "כל התפקידים",
+      "filter_size_all": "כל הגדלים",
+      "filter_interest_all": "כל תחומי העניין",
+      "refresh": "רענון",
+      "empty": "אין פניות עדיין",
+      "page": "עמוד",
+      "export_csv": "ייצוא CSV",
+      "col": {
+        "date": "תאריך",
+        "school": "בית ספר / מחוז",
+        "contact": "איש קשר",
+        "role": "תפקיד",
+        "size": "תלמידים",
+        "interests": "מעוניינים ב",
+        "country": "מדינה"
+      }
+    },
     "teacherAccess": {
       "title": "בקשות גישת מורה",
       "empty": "אין בקשות",
