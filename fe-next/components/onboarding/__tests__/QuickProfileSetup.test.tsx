@@ -101,6 +101,12 @@ vi.mock('@/shared/types/customAvatar', () => ({
   }),
 }));
 
+// Mock the locale-aware name suggester so the initial value (and thus the
+// character counter) is deterministic across tests.
+vi.mock('@/utils/onboardingNameSuggestions', () => ({
+  suggestPlayerName: () => 'StartName', // 9 chars
+}));
+
 // Mock InviteContextBanner
 vi.mock('@/components/onboarding/InviteContextBanner', () => ({
   __esModule: true,
@@ -177,6 +183,35 @@ describe('QuickProfileSetup', () => {
     expect(defaultProps.onComplete).toHaveBeenCalledTimes(1);
     const args = defaultProps.onComplete.mock.calls[0];
     expect(args[2]).toBe(false);
+  });
+
+  describe('mobile IME / virtual keyboard resilience', () => {
+    // Regression: on Android GBoard (incl. Spanish/Hebrew autocorrect & swipe
+    // typing) the keyboard buffers composition and commits text WITHOUT firing
+    // React's synthetic onChange. A naive `value={name}` controlled input then
+    // keeps forcing the DOM back to the stale suggestion, so the user "can't
+    // change their name". The field must mirror the live DOM value.
+
+    it('reflects text committed via compositionEnd even when onChange never fires', () => {
+      render(<QuickProfileSetup {...defaultProps} />);
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      // Initial suggestion 'StartName' => 9 chars.
+      expect(screen.getByText('9/20')).toBeInTheDocument();
+
+      // Override the value setter so React's change tracker can't observe it
+      // (this is exactly what a real mobile IME does), then fire only
+      // compositionEnd — no synthetic onChange.
+      Object.defineProperty(input, 'value', {
+        configurable: true,
+        writable: true,
+        value: 'Bouncy Wolf', // 11 chars
+      });
+      fireEvent.compositionEnd(input, { data: 'Bouncy Wolf' });
+
+      // The visible counter is driven by React state — it must update, proving
+      // the field accepted the change.
+      expect(screen.getByText('11/20')).toBeInTheDocument();
+    });
   });
 
   describe('avatar builder integration', () => {
