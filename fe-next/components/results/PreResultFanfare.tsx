@@ -117,6 +117,29 @@ export const PreResultFanfare = memo(function PreResultFanfare({
       data-testid="pre-result-fanfare"
       data-kind={kind}
     >
+      {/* Screen-edge electric glow vignette — same effect as the fanfare demo.
+          Radial gradient is transparent through the centre and only paints the
+          brand pink/cyan past ~78% radius, so it hugs the screen sides. Flashes
+          in on mount, then settles into a gentle infinite pulse for the duration
+          of the moment. Opacity-only animation = GPU-cheap, no layout cost. */}
+      <div
+        data-testid="pre-result-edge-glow"
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1] animate-[preFanfareEdgeGlow_2600ms_ease-in-out_infinite]"
+        style={{
+          background:
+            'radial-gradient(circle at center, transparent 50%, rgba(191,255,0,0.0) 60%, rgba(255,20,147,0.18) 78%, rgba(0,255,255,0.32) 100%)',
+        }}
+      />
+      <style>{`
+        @keyframes preFanfareEdgeGlow {
+          0%   { opacity: 0; }
+          14%  { opacity: 1; }
+          55%  { opacity: 0.55; }
+          100% { opacity: 0.85; }
+        }
+      `}</style>
+
       {/* Subtle pre-result context label (top) */}
       {showPreLabel && (
         <div className="mb-4 text-[10px] font-bold uppercase tracking-[3px] text-white/50">

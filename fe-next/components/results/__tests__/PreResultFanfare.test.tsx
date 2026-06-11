@@ -122,6 +122,26 @@ describe('PreResultFanfare — pre-result video then transition to results', () 
     expect(colors).toContain('#FFE135');
   });
 
+  it('renders a screen-edge glow vignette (like the fanfare demo) hugging the sides', () => {
+    setReducedMotion(false);
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    const glow = screen.getByTestId('pre-result-edge-glow');
+    expect(glow).toBeInTheDocument();
+    // Vignette = transparent center, colour only past the outer radius
+    expect(glow.getAttribute('style')).toMatch(/radial-gradient/i);
+    expect(glow).toHaveAttribute('aria-hidden');
+  });
+
+  it('does NOT render the edge glow under reduced motion (hands off immediately)', () => {
+    setReducedMotion(true);
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="bingo" onComplete={onComplete} t={(k, f) => f || k} />);
+    expect(screen.queryByTestId('pre-result-edge-glow')).not.toBeInTheDocument();
+    setReducedMotion(false);
+  });
+
   it('does NOT fire confetti (and skips straight to results) under reduced motion', () => {
     setReducedMotion(true);
     confettiMock.mockClear();
