@@ -35,8 +35,8 @@ interface VariantConfig {
 
 const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
   champion: {
-    // Original + previous variants + latest post-feedback improved version (stronger cube fidelity + trophy physical comedy)
-    srcs: ['/mascots/celebration-champion.mp4', '/mascots/celebration-champion-2.mp4', '/mascots/celebration-champion-3.mp4'],
+    // v2 + v3 + reworked v4 (strong cube fidelity + trophy physical comedy). v1 deprecated (feedback: not good).
+    srcs: ['/mascots/celebration-champion-2.mp4', '/mascots/celebration-champion-3.mp4', '/mascots/celebration-champion-4.mp4'],
     tone: 'yellow-orange',
     intensity: 'bold',
     defaultTitle: 'CHAMPION!',
@@ -54,8 +54,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#00FFFF', '#FF1493', '#FFFFFF'],
   },
   defeat: {
-    // Original + previous + latest post-feedback (witty charming trip + instant friendly GG recovery)
-    srcs: ['/mascots/celebration-defeat.mp4', '/mascots/celebration-defeat-2.mp4', '/mascots/celebration-defeat-3.mp4'],
+    // v1 + v2 + reworked v4 (witty charming trip + instant friendly GG recovery). v3 deprecated (feedback: not good).
+    srcs: ['/mascots/celebration-defeat.mp4', '/mascots/celebration-defeat-2.mp4', '/mascots/celebration-defeat-4.mp4'],
     tone: 'purple-pink',
     intensity: 'subtle',
     defaultTitle: 'GG',
@@ -104,8 +104,8 @@ const VARIANTS: Record<MascotCelebrationKind, VariantConfig> = {
     sparkleColors: ['#00FFFF', '#FF1493', '#BFFF00', '#FFFFFF'],
   },
   'mission-complete': {
-    // Original + previous + latest post-feedback (broom sweep into chest + throne sit + big wave)
-    srcs: ['/mascots/celebration-mission-complete.mp4', '/mascots/celebration-mission-complete-2.mp4', '/mascots/celebration-mission-complete-3.mp4'],
+    // v1 + reworked v4 (broom sweep into chest + throne sit + big wave). v2/v3 deprecated (feedback: not good).
+    srcs: ['/mascots/celebration-mission-complete.mp4', '/mascots/celebration-mission-complete-4.mp4'],
     tone: 'yellow-orange',
     intensity: 'bold',
     defaultTitle: 'ALL CLEAR!',

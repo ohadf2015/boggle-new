@@ -31,7 +31,7 @@ describe('MascotCelebrationVideo', () => {
     render(<MascotCelebrationVideo kind="champion" />);
     const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
     const src = video?.getAttribute('src') || '';
-    expect(src).toMatch(/celebration-champion(-[23])?\.mp4$/);
+    expect(src).toMatch(/celebration-champion(-[234])?\.mp4$/);
   });
 
   it('renders a bingo variant src for kind="bingo" (supports multiple clips for variety)', () => {

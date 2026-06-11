@@ -1,10 +1,22 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MascotCelebrationVideo, type MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 import { celebrationTitleFor } from '@/components/mascot/celebrationKind';
+
+/** Confetti palettes per kind — mirror each variant's sparkle colors. */
+const CONFETTI_COLORS: Record<MascotCelebrationKind, string[]> = {
+  champion: ['#FFE135', '#FF6B35', '#FFFFFF'],
+  'runner-up': ['#00FFFF', '#FF1493', '#FFFFFF'],
+  defeat: ['#8B5CF6', '#FF1493', '#FFFFFF'],
+  bingo: ['#FF1493', '#00FFFF', '#FFE135', '#FFFFFF'],
+  knight: ['#FF1493', '#00FFFF', '#FFFFFF'],
+  streak: ['#BFFF00', '#00FFFF', '#FFE135'],
+  explorer: ['#00FFFF', '#FF1493', '#BFFF00', '#FFFFFF'],
+  'mission-complete': ['#FFE135', '#FF6B35', '#BFFF00'],
+};
 
 export interface PreResultFanfareProps {
   kind: MascotCelebrationKind;
@@ -60,6 +72,28 @@ export const PreResultFanfare = memo(function PreResultFanfare({
   const handleSkip = useCallback(() => {
     handleComplete();
   }, [handleComplete]);
+
+  // Celebratory confetti burst on mount — two bottom-corner cannons + a centre
+  // pop, colour-matched to the kind. Skipped entirely for reduced motion.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let cancelled = false;
+    let burstTimer = 0;
+    const colors = CONFETTI_COLORS[kind];
+    void import('canvas-confetti').then(({ default: confetti }) => {
+      if (cancelled) return;
+      confetti({ particleCount: 70, spread: 72, startVelocity: 55, angle: 60, origin: { x: 0.12, y: 1 }, colors, ticks: 220, zIndex: 60 });
+      confetti({ particleCount: 70, spread: 72, startVelocity: 55, angle: 120, origin: { x: 0.88, y: 1 }, colors, ticks: 220, zIndex: 60 });
+      burstTimer = window.setTimeout(() => {
+        if (!cancelled) confetti({ particleCount: 60, spread: 110, startVelocity: 38, origin: { x: 0.5, y: 0.42 }, colors, scalar: 1.1, ticks: 200, zIndex: 60 });
+      }, 260);
+    });
+    return () => {
+      cancelled = true;
+      if (burstTimer) window.clearTimeout(burstTimer);
+    };
+  }, [kind]);
 
   const translatedTitle = celebrationTitleFor(kind, t);
 

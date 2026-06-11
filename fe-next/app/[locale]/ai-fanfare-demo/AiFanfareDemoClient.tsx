@@ -137,7 +137,7 @@ export default function AiFanfareDemoClient() {
   const [trigger, setTrigger] = useState(1);
   const [scoreSeed, setScoreSeed] = useState(0);
   const [selectedKind, setSelectedKind] = useState<MascotCelebrationKind>('champion');
-  const [selectedVersion, setSelectedVersion] = useState<1 | 2 | 3>(3); // default to the latest post-feedback improved clip
+  const [selectedVersion, setSelectedVersion] = useState<1 | 2 | 3>(3); // default latest; v4 reworks added for gg/defeat-3, champion-v1, mission-v2/v3 (bad per feedback)
 
   // Demo of the requested "pre result page → transition to result page" flow
   const [showPreDemo, setShowPreDemo] = useState(false);
@@ -297,7 +297,7 @@ export default function AiFanfareDemoClient() {
                 className={`rounded-lg border-2 border-black px-2.5 py-0.5 text-xs font-black shadow-hard-sm disabled:opacity-40 ${
                   isActive ? 'bg-[#00FFFF] text-neo-black' : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
-                title={v === 3 ? 'Latest refined (post 17-20 feedback)' : v === 2 ? 'Previous variant' : 'Original'}
+                title={v === 3 ? 'Latest refined' : v === 2 ? 'Previous variant' : 'Original (some deprecated)'}
               >
                 v{v}
               </button>
@@ -358,8 +358,7 @@ export default function AiFanfareDemoClient() {
 
         <p className="max-w-xl text-center text-sm text-white">
           Real <code className="text-white">MascotCelebrationVideo</code> component (exact result-page treatment: halo, sparkles, title, hard frame).
-          Use the pills above to switch moments and clip versions (v3 = the new refined ones after 17-20 feedback).
-          Raw motion is AI-generated (image-to-video from the exact kawaii cube mascot references).
+          Use the pills to switch moments and clip versions. v4 reworks shipped for: gg (defeat-3 bad), champion (v1 bad), mission-complete (v2+v3 bad). New clips generated via reference image-to-video from kawaii cube mascot refs (main/trophy/waving/encouraging/etc).
         </p>
       </div>
     </main>

@@ -18,6 +18,9 @@ import logger from '@/utils/logger';
 import type { ResultsPageProps } from '@/types/components';
 import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
 import { useResultsData } from '@/hooks/useResultsData';
+import { PreResultFanfare } from '@/components/results/PreResultFanfare';
+import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
+import type { MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
@@ -420,6 +423,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     gameMode: resolvedGameMode,
     wordHuntTargetFoundBy: wordHuntSummary?.targetFoundBy,
   });
+
+  // Pre-result fanfare: decide ONCE the first render real placement data lands,
+  // then freeze it (ResultsPage re-renders on every socket tick — recomputing
+  // would let the kind flip or re-fire). Renders a full-screen celebration
+  // before the result page; null = nothing celebratory (mid-pack) → straight to
+  // results. Reduced-motion auto-skips inside the component.
+  const fanfareDecidedRef = useRef<MascotCelebrationKind | null | undefined>(undefined);
+  if (fanfareDecidedRef.current === undefined && sortedScores.length > 0 && currentPlayerRank >= 1) {
+    fanfareDecidedRef.current = pickCelebrationKind({
+      rank: currentPlayerRank,
+      totalPlayers: sortedScores.length,
+    });
+  }
+  const celebrationKind = fanfareDecidedRef.current ?? null;
+  const [fanfareDone, setFanfareDone] = useState(false);
 
   const marginToNext =
     currentPlayerRank > 1 && currentPlayerData
@@ -1033,6 +1051,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         </div>
       </div>
+    );
+  }
+
+  // Pre-result fanfare — full-screen, skippable celebration shown BEFORE the
+  // result numbers (not embedded, not a popup). Fires once per result.
+  if (celebrationKind && !fanfareDone) {
+    return (
+      <PreResultFanfare
+        kind={celebrationKind}
+        t={t}
+        onComplete={() => setFanfareDone(true)}
+      />
     );
   }
 

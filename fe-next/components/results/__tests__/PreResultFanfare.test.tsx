@@ -19,6 +19,26 @@ vi.mock('@/components/mascot/MascotCelebrationVideo', () => ({
   ),
 }));
 
+// canvas-confetti is dynamically imported inside the component — hoisted mock
+// so the dynamic import resolves to our spy.
+const { confettiMock } = vi.hoisted(() => ({ confettiMock: vi.fn() }));
+vi.mock('canvas-confetti', () => ({ default: confettiMock }));
+
+function setReducedMotion(matches: boolean) {
+  window.matchMedia = ((q: string) => ({
+    matches,
+    media: q,
+    onchange: null,
+    addEventListener() {},
+    removeEventListener() {},
+    addListener() {},
+    removeListener() {},
+    dispatchEvent() {
+      return false;
+    },
+  })) as unknown as typeof window.matchMedia;
+}
+
 describe('PreResultFanfare — pre-result video then transition to results', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -87,5 +107,31 @@ describe('PreResultFanfare — pre-result video then transition to results', () 
 
     rerender(<PreResultFanfare kind="mission-complete" onComplete={onComplete} t={(k, f) => f || k} />);
     expect(screen.getByTestId('inner-celebration-video').dataset.kind).toBe('mission-complete');
+  });
+
+  it('fires a colour-matched confetti burst on mount', async () => {
+    vi.useRealTimers();
+    setReducedMotion(false);
+    confettiMock.mockClear();
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    await vi.waitFor(() => expect(confettiMock).toHaveBeenCalled());
+    // champion palette includes the celebration gold
+    const colors = confettiMock.mock.calls[0][0].colors as string[];
+    expect(colors).toContain('#FFE135');
+  });
+
+  it('does NOT fire confetti (and skips straight to results) under reduced motion', () => {
+    setReducedMotion(true);
+    confettiMock.mockClear();
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="bingo" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    // Reduced-motion path hands off immediately and shows no video/confetti
+    expect(onComplete).toHaveBeenCalled();
+    expect(confettiMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('inner-celebration-video')).not.toBeInTheDocument();
+    setReducedMotion(false); // restore for other tests
   });
 });
