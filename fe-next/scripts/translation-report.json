@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 5743,
+    "totalKeysInCode": 5750,
     "keyCountByLanguage": {
-      "en": 10839,
-      "he": 10910,
-      "sv": 10907,
-      "ja": 10895,
-      "es": 10932
+      "en": 10830,
+      "he": 10924,
+      "sv": 10918,
+      "ja": 10919,
+      "es": 10948
     },
-    "missingFromEnglish": 4,
+    "missingFromEnglish": 3,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 26,
@@ -310,67 +310,47 @@
   },
   "missingFromEnglish": [
     {
-      "key": "onboarding.returningUser.haveAccount",
+      "key": "wordcraft.combo",
       "usages": [
         {
-          "file": "components/onboarding/ReturningUserStep.tsx",
-          "line": 120
+          "file": "components/word-craft/WordCraftComboBadge.tsx",
+          "line": 46
         }
       ]
     },
     {
-      "key": "results.fanfareHint",
+      "key": "wordcraft.duel.linkCopyFailed",
       "usages": [
         {
-          "file": "components/results/PreResultFanfare.tsx",
-          "line": 126
+          "file": "components/word-craft/WordCraftDuelResult.tsx",
+          "line": 112
+        },
+        {
+          "file": "components/word-craft/WordCraftDuelResult.tsx",
+          "line": 115
+        },
+        {
+          "file": "components/word-craft/WordCraftPlayFriendControl.tsx",
+          "line": 96
+        },
+        {
+          "file": "components/word-craft/WordCraftPlayFriendControl.tsx",
+          "line": 99
         }
       ]
     },
     {
-      "key": "results.preFanfare",
+      "key": "wordTower.mutator.todaysTwist",
       "usages": [
         {
-          "file": "components/results/PreResultFanfare.tsx",
-          "line": 89
-        }
-      ]
-    },
-    {
-      "key": "results.skipToResults",
-      "usages": [
-        {
-          "file": "components/results/PreResultFanfare.tsx",
-          "line": 122
+          "file": "components/wordTower/WordTowerMutatorBanner.tsx",
+          "line": 43
         }
       ]
     }
   ],
   "missingByLanguage": {
     "he": [
-      "seo.wordCraft.title",
-      "seo.wordCraft.description",
-      "seo.wordCraft.ogTitle",
-      "seo.wordCraft.ogDescription",
-      "common.copiedToClipboard",
-      "avatar.builder.expressions",
-      "avatar.builder.eyeColor",
-      "avatar.builder.nose",
-      "multiplayerFlow.crazyGamesFriends",
-      "tvBroadcast.timesUp",
-      "tvBroadcast.timesUpSub",
-      "landing.seo.showcase3d.title",
-      "landing.seo.showcase3d.description",
-      "wordHunt.mp.quality.degraded",
-      "wordHunt.mp.quality.weak",
-      "wordHunt.mp.quality.reconnecting",
-      "wordHunt.mp.reconnect.title",
-      "wordHunt.mp.reconnect.attempt",
-      "wordHunt.mp.reconnect.giveUp",
-      "wordHunt.mp.abort.title",
-      "wordHunt.mp.abort.body",
-      "wordHunt.mp.abort.continueSolo",
-      "wordHunt.mp.abort.returnToLobby",
       "multiplayer.rankUp",
       "multiplayer.welcomeToTier",
       "adventure.loot.fragment",
@@ -497,26 +477,6 @@
       "admin.sendError"
     ],
     "sv": [
-      "seo.wordCraft.title",
-      "seo.wordCraft.description",
-      "seo.wordCraft.ogTitle",
-      "seo.wordCraft.ogDescription",
-      "onboarding.crazygames.autoStart",
-      "results.backToLobby",
-      "results.calculating",
-      "results.calculatingHint",
-      "landing.seo.showcase3d.title",
-      "landing.seo.showcase3d.description",
-      "wordHunt.mp.quality.degraded",
-      "wordHunt.mp.quality.weak",
-      "wordHunt.mp.quality.reconnecting",
-      "wordHunt.mp.reconnect.title",
-      "wordHunt.mp.reconnect.attempt",
-      "wordHunt.mp.reconnect.giveUp",
-      "wordHunt.mp.abort.title",
-      "wordHunt.mp.abort.body",
-      "wordHunt.mp.abort.continueSolo",
-      "wordHunt.mp.abort.returnToLobby",
       "wordHunt.results.wordsFound",
       "friends.backToFriends",
       "quickPlay.seekingMatch",
@@ -725,39 +685,6 @@
       "admin.sendError"
     ],
     "ja": [
-      "wordTower.sabotage.watchAd",
-      "wordTower.sabotage.adEarned",
-      "seo.wordCraft.title",
-      "seo.wordCraft.description",
-      "seo.wordCraft.ogTitle",
-      "seo.wordCraft.ogDescription",
-      "common.copiedToClipboard",
-      "settings.removeAds.title",
-      "settings.removeAds.body",
-      "settings.removeAds.button",
-      "settings.removeAds.comingSoon",
-      "avatar.builder.expressions",
-      "avatar.builder.eyeColor",
-      "avatar.builder.nose",
-      "multiplayerFlow.crazyGamesFriends",
-      "tvBroadcast.timesUp",
-      "tvBroadcast.timesUpSub",
-      "onboarding.crazygames.autoStart",
-      "results.backToLobby",
-      "results.calculating",
-      "results.calculatingHint",
-      "landing.seo.showcase3d.title",
-      "landing.seo.showcase3d.description",
-      "wordHunt.mp.quality.degraded",
-      "wordHunt.mp.quality.weak",
-      "wordHunt.mp.quality.reconnecting",
-      "wordHunt.mp.reconnect.title",
-      "wordHunt.mp.reconnect.attempt",
-      "wordHunt.mp.reconnect.giveUp",
-      "wordHunt.mp.abort.title",
-      "wordHunt.mp.abort.body",
-      "wordHunt.mp.abort.continueSolo",
-      "wordHunt.mp.abort.returnToLobby",
       "wordHunt.results.wordsFound",
       "multiplayer.rankUp",
       "multiplayer.welcomeToTier",
@@ -969,31 +896,6 @@
       "admin.sendError"
     ],
     "es": [
-      "wordTower.tier.apprentice",
-      "wordTower.tier.journeyman",
-      "wordTower.tier.master",
-      "wordTower.sabotage.watchAd",
-      "wordTower.sabotage.adEarned",
-      "seo.wordCraft.title",
-      "seo.wordCraft.description",
-      "seo.wordCraft.ogTitle",
-      "seo.wordCraft.ogDescription",
-      "onboarding.crazygames.autoStart",
-      "results.backToLobby",
-      "results.calculating",
-      "results.calculatingHint",
-      "landing.seo.showcase3d.title",
-      "landing.seo.showcase3d.description",
-      "wordHunt.mp.quality.degraded",
-      "wordHunt.mp.quality.weak",
-      "wordHunt.mp.quality.reconnecting",
-      "wordHunt.mp.reconnect.title",
-      "wordHunt.mp.reconnect.attempt",
-      "wordHunt.mp.reconnect.giveUp",
-      "wordHunt.mp.abort.title",
-      "wordHunt.mp.abort.body",
-      "wordHunt.mp.abort.continueSolo",
-      "wordHunt.mp.abort.returnToLobby",
       "wordHunt.results.wordsFound",
       "quickPlay.seekingMatch",
       "quickPlay.seekingMatchSub",
