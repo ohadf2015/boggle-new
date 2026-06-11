@@ -24,6 +24,37 @@ export interface SurvivalClueBoxesProps {
   t: (key: string) => string;
   /** Formed word currently equals target length — submitting will consume a try. */
   matchesTargetLength?: boolean;
+  /**
+   * Force the short-landscape compact treatment (small tiles, tight spacing,
+   * collapsed reserved slots) regardless of the `max-height:560px` media query.
+   * Word Hunt MP sets this on wide-but-short viewports (e.g. 1530×695) where the
+   * grid would otherwise be squished by the full-size clue boxes. SP daily
+   * survival never passes it, so its behaviour is unchanged.
+   */
+  compact?: boolean;
+}
+
+/**
+ * Clue-tile size classes, keyed by word length. `compact` returns small fixed
+ * sizes (mirroring the `max-height:560px` values) so a tight column on a wide
+ * screen gets the same breathing room a short phone already does. The default
+ * branch keeps the responsive sizes for normal play.
+ */
+function tileSizeClass(wordLength: number, compact?: boolean): string {
+  if (compact) {
+    return wordLength <= 4
+      ? 'w-7 h-7 text-xs rounded border shadow-none'
+      : wordLength <= 8
+        ? 'w-6 h-6 text-[10px] rounded border shadow-none'
+        : 'w-5 h-5 text-[9px] rounded border shadow-none';
+  }
+  return wordLength <= 4
+    ? 'w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl [@media(max-height:560px)]:w-7 [@media(max-height:560px)]:h-7 [@media(max-height:560px)]:text-xs [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none'
+    : wordLength <= 6
+      ? 'w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none'
+      : wordLength <= 8
+        ? 'w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none'
+        : 'w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm [@media(max-height:560px)]:w-5 [@media(max-height:560px)]:h-5 [@media(max-height:560px)]:text-[9px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none';
 }
 
 /**
@@ -43,6 +74,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   gameDir,
   t,
   matchesTargetLength = false,
+  compact = false,
 }, ref) => {
   if (!currentHint) return null;
 
@@ -54,9 +86,11 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "mx-auto max-w-3xl w-full px-3 py-2 mb-0.5 rounded-neo-lg transition-all duration-300",
-        "[@media(max-height:560px)]:py-px [@media(max-height:560px)]:px-1.5 [@media(max-height:560px)]:mb-0 [@media(max-height:560px)]:border [@media(max-height:560px)]:rounded-md",
-        "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
+        "mx-auto max-w-3xl w-full transition-all duration-300",
+        "bg-neo-navy/30 dark:bg-neo-navy/50 border-neo-black/20",
+        compact
+          ? "px-1.5 py-px mb-0 border rounded-md"
+          : "px-3 py-2 mb-0.5 border-2 rounded-neo-lg [@media(max-height:560px)]:py-px [@media(max-height:560px)]:px-1.5 [@media(max-height:560px)]:mb-0 [@media(max-height:560px)]:border [@media(max-height:560px)]:rounded-md",
         showFeedbackOverlay
           ? "clue-feedback-active clue-container-attention animate-pulse ring-2 ring-neo-lime/60"
           : showMatchWarning
@@ -72,7 +106,12 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
           is hidden anyway. Mirrors the legend row's min-h reservation. */}
       <div
         data-testid="match-target-warning-slot"
-        className="min-h-[1.5rem] sm:min-h-[1.75rem] mb-1 [@media(max-height:560px)]:hidden [@media(max-height:560px)]:min-h-0 [@media(max-height:560px)]:mb-0 flex items-center justify-center"
+        className={cn(
+          "flex items-center justify-center",
+          compact
+            ? "hidden min-h-0 mb-0"
+            : "min-h-[1.5rem] sm:min-h-[1.75rem] mb-1 [@media(max-height:560px)]:hidden [@media(max-height:560px)]:min-h-0 [@media(max-height:560px)]:mb-0",
+        )}
       >
         {showMatchWarning && (
           <span
@@ -90,9 +129,10 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         const targetAttempts = attempts.filter(a => !a.isDiscovery).length;
         const triesRemaining = MAX_ATTEMPTS - targetAttempts;
         return (
-          <div className="text-center mb-2 [@media(max-height:560px)]:mb-0.5">
+          <div className={cn("text-center", compact ? "mb-0.5" : "mb-2 [@media(max-height:560px)]:mb-0.5")}>
             <span className={cn(
-              "text-xl sm:text-2xl font-black [@media(max-height:560px)]:text-sm",
+              "font-black",
+              compact ? "text-sm" : "text-xl sm:text-2xl [@media(max-height:560px)]:text-sm",
               triesRemaining <= 2
                 ? "text-neo-red"
                 : triesRemaining <= 4
@@ -117,6 +157,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
               feedback={latestAttemptFeedback}
               targetWordLength={targetWord.length}
               skipAnimations={skipAnimations}
+              compact={compact}
             />
           ) : (
             <HintBoxes
@@ -125,13 +166,17 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
               accumulatedClues={accumulatedClues}
               revealedLetters={revealedLetters}
               attempts={attempts}
+              compact={compact}
             />
           )}
         </AdaptiveAnimatePresence>
       </div>
 
       {/* Legend / Known letters indicator. Floor collapses on short landscape so the grid keeps room. */}
-      <div className="min-h-[40px] sm:min-h-[44px] [@media(max-height:560px)]:min-h-0 flex flex-col justify-center">
+      <div className={cn(
+        "flex flex-col justify-center",
+        compact ? "min-h-0" : "min-h-[40px] sm:min-h-[44px] [@media(max-height:560px)]:min-h-0",
+      )}>
         <AdaptiveAnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackLegend t={t} />
@@ -182,9 +227,10 @@ interface FeedbackOverlayProps {
   feedback: LetterFeedback[];
   targetWordLength: number;
   skipAnimations: boolean;
+  compact?: boolean;
 }
 
-const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordLength, skipAnimations }) => {
+const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordLength, skipAnimations, compact }) => {
   // Gray letters flash briefly then fade to '?' after a delay
   const [grayFaded, setGrayFaded] = useState(false);
 
@@ -196,13 +242,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
   // Normalize feedback to match target word length
   const normalizedFeedback = normalizeToTargetLength(feedback, targetWordLength);
   const wordLength = normalizedFeedback.length;
-  const sizeClass = wordLength <= 4
-    ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl [@media(max-height:560px)]:w-7 [@media(max-height:560px)]:h-7 [@media(max-height:560px)]:text-xs [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
-    : wordLength <= 6
-      ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
-      : wordLength <= 8
-        ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
-        : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm [@media(max-height:560px)]:w-5 [@media(max-height:560px)]:h-5 [@media(max-height:560px)]:text-[9px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none";
+  const sizeClass = tileSizeClass(wordLength, compact);
 
   return (
     <AdaptiveMotion.div
@@ -254,6 +294,7 @@ interface HintBoxesProps {
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
   attempts: TargetAttempt[];
+  compact?: boolean;
 }
 
 const HintBoxes: React.FC<HintBoxesProps> = ({
@@ -262,6 +303,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   accumulatedClues,
   revealedLetters,
   attempts,
+  compact,
 }) => {
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
   const wordLength = hintChars.length;
@@ -276,13 +318,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
     () => computeYellowState(attempts, letterCounts, accumulatedClues),
     [attempts, letterCounts, accumulatedClues]
   );
-  const sizeClass = wordLength <= 4
-    ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl [@media(max-height:560px)]:w-7 [@media(max-height:560px)]:h-7 [@media(max-height:560px)]:text-xs [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
-    : wordLength <= 6
-      ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
-      : wordLength <= 8
-        ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none"
-        : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm [@media(max-height:560px)]:w-5 [@media(max-height:560px)]:h-5 [@media(max-height:560px)]:text-[9px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none";
+  const sizeClass = tileSizeClass(wordLength, compact);
 
   return (
     <AdaptiveMotion.div

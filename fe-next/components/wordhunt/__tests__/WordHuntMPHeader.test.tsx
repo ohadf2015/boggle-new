@@ -67,4 +67,17 @@ describe('WordHuntMPHeader', () => {
     render(<WordHuntMPHeader {...defaultProps} />);
     expect(screen.queryByTestId('wh-help-button')).not.toBeInTheDocument();
   });
+
+  it('uses full-size quit button by default', () => {
+    render(<WordHuntMPHeader {...defaultProps} />);
+    const quitBtn = screen.getByLabelText('common.quit');
+    expect(quitBtn.className).toContain('w-10');
+  });
+
+  it('shrinks the quit button when compact (short landscape)', () => {
+    render(<WordHuntMPHeader {...defaultProps} compact />);
+    const quitBtn = screen.getByLabelText('common.quit');
+    expect(quitBtn.className).not.toContain('w-10');
+    expect(quitBtn.className).toContain('w-8');
+  });
 });

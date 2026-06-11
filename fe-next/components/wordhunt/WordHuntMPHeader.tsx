@@ -2,27 +2,46 @@
 
 import { memo } from 'react';
 import { X, HelpCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface WordHuntMPHeaderProps {
   score: number;
   onQuit: () => void;
   t: (key: string) => string;
   onShowHelp?: () => void;
+  /**
+   * Force the short-landscape compact treatment (small buttons + score chip)
+   * regardless of the `max-height:560px` media query. WordHuntGameLayout sets
+   * this on wide-but-short viewports (e.g. 1530×695) where the row layout is
+   * active but height is tight, so the chrome stops crowding the grid.
+   */
+  compact?: boolean;
 }
+
+// Icon button size — `compact` collapses it without waiting on the media query.
+const iconBtnSize = (compact?: boolean) =>
+  compact ? 'w-8 h-8' : 'w-10 h-10 [@media(max-height:560px)]:w-8 [@media(max-height:560px)]:h-8';
 
 export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
   score,
   onQuit,
   t,
   onShowHelp,
+  compact,
 }) => {
   return (
-    <div className="flex items-center justify-between px-2 py-0.5 [@media(max-height:560px)]:py-0 gap-2">
+    <div className={cn(
+      'flex items-center justify-between px-2 gap-2',
+      compact ? 'py-0' : 'py-0.5 [@media(max-height:560px)]:py-0',
+    )}>
       {/* Help button or spacer for layout balance */}
       {onShowHelp ? (
         <button
           onClick={onShowHelp}
-          className="w-10 h-10 [@media(max-height:560px)]:w-8 [@media(max-height:560px)]:h-8 flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:text-neo-white hover:shadow-hard active:shadow-hard-pressed transition-all"
+          className={cn(
+            iconBtnSize(compact),
+            'flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:text-neo-white hover:shadow-hard active:shadow-hard-pressed transition-all',
+          )}
           aria-label={t('wordHuntRules.quickTipsTitle')}
           data-testid="wh-help-button"
         >
@@ -34,8 +53,14 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
 
       {/* Score Badge */}
       <div className="flex-1 flex justify-center">
-        <div className="bg-neo-navy border-3 border-neo-black rounded-neo px-4 py-1.5 [@media(max-height:560px)]:px-2 [@media(max-height:560px)]:py-0 shadow-hard-sm">
-          <span className="text-2xl [@media(max-height:560px)]:text-base font-black font-neo-display text-neo-yellow tabular-nums">
+        <div className={cn(
+          'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-sm',
+          compact ? 'px-2 py-0' : 'px-4 py-1.5 [@media(max-height:560px)]:px-2 [@media(max-height:560px)]:py-0',
+        )}>
+          <span className={cn(
+            'font-black font-neo-display text-neo-yellow tabular-nums',
+            compact ? 'text-base' : 'text-2xl [@media(max-height:560px)]:text-base',
+          )}>
             {score}
           </span>
         </div>
@@ -44,7 +69,10 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
       {/* Quit Button */}
       <button
         onClick={onQuit}
-        className="w-10 h-10 [@media(max-height:560px)]:w-8 [@media(max-height:560px)]:h-8 flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-red text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-shadow"
+        className={cn(
+          iconBtnSize(compact),
+          'flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-red text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-shadow',
+        )}
         aria-label={t('common.quit')}
       >
         <X size={20} strokeWidth={3} />

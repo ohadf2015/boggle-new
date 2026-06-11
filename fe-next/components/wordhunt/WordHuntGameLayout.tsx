@@ -1,6 +1,8 @@
 'use client';
 
 import { memo } from 'react';
+import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { SurvivalClueBoxes } from '@/components/daily/survival/SurvivalClueBoxes';
 import { SurvivalLifeBar } from '@/components/daily/survival/SurvivalLifeBar';
 import { SurvivalGridSection } from '@/components/daily/survival/SurvivalGridSection';
@@ -131,21 +133,37 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   t,
   gameDir,
 }) => {
+  // Wide-but-short viewports (e.g. 1530×695) run the row layout (≥720px) but
+  // have too little height for the full-size chrome — the clue boxes + header
+  // crowd the grid until it's squished and selected tiles overlap. In that band
+  // we force the compact treatment so the board keeps its room. The min-width
+  // guard scopes this to the sidebar layout; portrait phones keep their own
+  // `max-height:560px` tuning.
+  const shortLandscape = useMediaQuery('(min-width: 720px) and (max-height: 760px)');
+
   return (
     <div className="flex-1 flex flex-col min-[720px]:flex-row min-h-0 overflow-x-hidden overflow-y-auto" translate="no">
       {/* Main game area — capped width on wider screens, with vertical rhythm between sections */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto gap-1.5 md:gap-2 [@media(max-height:560px)]:gap-0.5">
+      <div className={cn(
+        'flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto',
+        shortLandscape ? 'gap-0.5' : 'gap-1.5 md:gap-2 [@media(max-height:560px)]:gap-0.5',
+      )}>
         {/* Score + Quit — compact */}
         <WordHuntMPHeader
           score={score}
           onQuit={onQuit}
           onShowHelp={onShowHelp}
           t={t}
+          compact={shortLandscape}
         />
 
         {/* Clue Boxes — tight vertical padding; on short landscape collapse outer padding too.
             Skeleton placeholder while server target metadata is in flight (recovery race). */}
-        <div className={`px-2 [@media(max-height:560px)]:px-1 flex-shrink-0${wrongGuessShake ? ' animate-neo-shake' : ''}`}>
+        <div className={cn(
+          'flex-shrink-0',
+          shortLandscape ? 'px-1' : 'px-2 [@media(max-height:560px)]:px-1',
+          wrongGuessShake && 'animate-neo-shake',
+        )}>
           {targetLength > 0 ? (
             <SurvivalClueBoxes
               currentHint={currentHint}
@@ -161,6 +179,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
               gameDir={gameDir}
               t={t}
               matchesTargetLength={matchesTargetLength}
+              compact={shortLandscape}
             />
           ) : (
             <ClueTilesSkeleton t={t} />
@@ -171,7 +190,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
             card vanishes in 8s, leaving players thinking they must spell the
             hidden word; this one-liner stays so it's always clear that ANY
             valid word heals and only matching the target wins. */}
-        {targetLength > 0 && (
+        {targetLength > 0 && !shortLandscape && (
           <p
             data-testid="wh-heal-hint"
             className="shrink-0 px-2 text-center text-[11px] sm:text-xs font-neo-body text-neo-white leading-tight"
