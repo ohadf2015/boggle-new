@@ -3,6 +3,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { Loader2 } from 'lucide-react';
+import { retryImport } from '@/utils/retryImport';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded, trackInviteRedirectFired } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
@@ -20,11 +22,20 @@ const sanitizeHostName = (raw: string): string => {
   return raw.replace(HOST_NAME_ALLOWED, '').trim().slice(0, 24);
 };
 
+// `retryImport` hardens the lazy chunk load: a flaky network or a stale chunk
+// hash after a deploy used to leave the bare-navy `loading` fallback on screen
+// forever — reported as "black backdrop, no popup" on the homepage. The loading
+// fallback now shows a spinner so a slow load reads as loading, not a stuck screen.
 const OnboardingFlow = dynamic(
-  () => import('@/components/onboarding/OnboardingFlow'),
+  retryImport(() => import('@/components/onboarding/OnboardingFlow')),
   {
     ssr: false,
-    loading: () => <div className="fixed inset-0 bg-neo-navy z-50" />,
+    loading: () => (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy" role="status" aria-live="polite">
+        <Loader2 className="h-12 w-12 animate-spin text-neo-yellow" aria-hidden />
+        <span className="sr-only">Loading…</span>
+      </div>
+    ),
   }
 );
 
