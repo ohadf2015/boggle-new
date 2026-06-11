@@ -10090,6 +10090,8 @@ const es = {
     "celebrateAgain": "Celebrar de nuevo",
     "best": "Mejor",
     "movesLeft": "Movimientos",
+    "you": "TÚ",
+    "live": "EN VIVO",
     "luckyBoost": "Bonus de Suerte",
     "luckyBoostDesc": "Más fichas especiales tras una racha dura",
     "bonusMove": "¡+1 Movimiento!",

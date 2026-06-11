@@ -10074,6 +10074,8 @@ const ja = {
     "celebrateAgain": "また祝おう",
     "best": "ベスト",
     "movesLeft": "残り手数",
+    "you": "あなた",
+    "live": "ライブ",
     "luckyBoost": "ラッキーブースト",
     "luckyBoostDesc": "苦戦後に特殊タイル増加",
     "bonusMove": "+1 手!",

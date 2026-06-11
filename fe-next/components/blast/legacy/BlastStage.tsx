@@ -17,6 +17,7 @@ import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { ClosestRivalsPanel } from '@/components/game/in-game/ClosestRivalsPanel';
 import { selectClosestRivals } from '@/lib/leaderboard/selectClosestRivals';
+import { selectMyBlastScore } from '@/lib/blast/selectMyBlastScore';
 import { blastEntriesToRivals } from '@/lib/leaderboard/rivalNormalizers';
 import { BlastBoard } from './BlastBoard';
 import BlastChainText from './BlastChainText';
@@ -168,6 +169,11 @@ export const BlastStage = memo(function BlastStage({
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
   const isMultiplayer = remainingTime !== null && remainingTime !== undefined;
 
+  // In MP the local engine never scores (server-authoritative cascades), so the
+  // engine's `score` stays 0 the whole game. Read the player's live score from
+  // the broadcast leaderboard instead. SP keeps the local engine score.
+  const displayScore = isMultiplayer ? selectMyBlastScore(leaderboard, username) : score;
+
   // Live "closest rivals" slice for the desktop side rail. Identity is keyed by
   // username (blast's identity scheme). Returns null in solo blast (no leaderboard).
   const rivalsView = useMemo(() => {
@@ -258,7 +264,7 @@ export const BlastStage = memo(function BlastStage({
           On phones the cap exceeds the screen, so it stays full-width. */}
       <div className="relative z-40 w-full max-w-[640px] lg:max-w-[840px] xl:max-w-[920px] mx-auto">
       <BlastHUD
-        score={score}
+        score={displayScore}
         wordsFoundCount={wordsFound.length}
         movesRemaining={movesRemaining}
         totalMoves={totalMoves}
@@ -295,7 +301,7 @@ export const BlastStage = memo(function BlastStage({
           closest-rivals rail (see right panel). */}
       {leaderboard && leaderboard.length > 0 && (
         <div className="relative z-40 lg:hidden">
-          <BlastMPLeaderboard leaderboard={leaderboard} username={username} />
+          <BlastMPLeaderboard leaderboard={leaderboard} username={username} t={t} />
         </div>
       )}
 
