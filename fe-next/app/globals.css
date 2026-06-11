@@ -4676,3 +4676,14 @@ html[data-cosy='true'] .animate-neo-press {
     animation: cube-sheen-sweep 7s ease-in-out infinite;
   }
 }
+
+/* Floating hero letter-tiles — gentle vertical bob for the energetic (cubes)
+   landing hero. translateY only (rotation lives on a static wrapper so it isn't
+   clobbered). Decorative; holds still under prefers-reduced-motion. */
+@keyframes hero-tile-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-tile-float { animation: hero-tile-float 3.2s ease-in-out infinite; }
+}

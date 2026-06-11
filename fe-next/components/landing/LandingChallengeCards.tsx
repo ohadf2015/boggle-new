@@ -619,9 +619,9 @@ export function LandingChallengeCards({
     const extraModels = [...mpCardsExtra, ...spCardsExtra]
       .map((k) => buildCubeModel(k, 'normal'))
       .filter(isModel);
-    const dailyNode = heroCards.includes('daily')
-      ? <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
-      : null;
+    // Daily is the cubes hero — always present (it's the once-a-day hook), not
+    // gated on heroCards like the control arm. It renders above the bento grid.
+    const dailyNode = <DailyChallengeBanner preloadedStats={dailyChallengeStats} />;
 
     return (
       <LandingModeCubes

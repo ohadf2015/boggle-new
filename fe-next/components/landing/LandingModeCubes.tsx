@@ -126,7 +126,11 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
           : 'aspect-square',
         // base fill when there's no full-bleed art behind the content
         !hasArt && (anchor ? cn(v.fill, v.ink) : 'bg-neo-navy-light'),
-        hasArt && 'bg-neo-navy',
+        // With art: 1×1 cubes are square so the square sticker covers cleanly on
+        // navy. The anchor is non-square on phones, so object-cover would crop the
+        // glyph — instead it sits on its own variant colour and is `object-contain`d
+        // below, so the colour-drenched bleed matches the art and nothing is cut.
+        hasArt && (anchor ? v.fill : 'bg-neo-navy'),
         model.highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
         locked && 'cursor-not-allowed',
       )}
@@ -139,7 +143,10 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
             fill
             sizes={anchor ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 50vw, 25vw'}
             onError={() => setImgFailed(true)}
-            className="object-cover transition-transform duration-200 motion-safe:group-hover:scale-[1.06] motion-safe:group-focus-visible:scale-[1.06]"
+            className={cn(
+              anchor ? 'object-contain' : 'object-cover',
+              'transition-transform duration-200 motion-safe:group-hover:scale-[1.06] motion-safe:group-focus-visible:scale-[1.06]',
+            )}
           />
           {/* idle diagonal light sweep — only on the colour-drenched anchor, where
               there's room for it to read; reduced-motion users see nothing (CSS-gated). */}

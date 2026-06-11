@@ -117,6 +117,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
     trackHeroExposure();
   }, [trackHeroExposure]);
 
+  // When the cubes mode-grid is active, the daily challenge becomes the hero CTA
+  // INSIDE the grid, so the page hero drops the now-redundant Play-Now button and
+  // leans into playful energy instead. Reads the cubes flag so the two homepage
+  // experiments stay independent (cubes wins the hero treatment when on).
+  const { variant: cubesVariant } = useExperiment('landing-modes-cubes-v1');
+  const isCubesLanding = cubesVariant === 'cubes';
+
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
   // Treat "still resolving" as embedded — prevents the auth modal
@@ -196,7 +203,15 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
       {/* Main content — padding uses CSS breakpoints to avoid JS-driven CLS */}
       <section className="w-full max-w-7xl mx-auto overflow-x-clip relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-1.5 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
         {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
-        {heroVariant === 'variant' ? (
+        {isCubesLanding ? (
+          <LandingHero
+            players={topPlayers}
+            playersLoading={topPlayersLoading}
+            isMobilePortrait={isMobilePortrait}
+            energetic
+            activePlayers={activePlayers}
+          />
+        ) : heroVariant === 'variant' ? (
           <LandingHeroVariant
             players={topPlayers}
             playersLoading={topPlayersLoading}

@@ -85,7 +85,7 @@ describe('LandingChallengeCards — cubes A/B variant', () => {
     const connections = screen.getByRole('link', { name: /landing\.wordChainMode/i });
     connections.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(trackModeSelected).toHaveBeenCalledWith('connections', 'home');
-    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', { mode: 'connections', variant: 'purple' });
+    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', { mode: 'connections', variant: 'blue' });
   });
 
   it('falls back to the control card grid when variant=control', () => {
