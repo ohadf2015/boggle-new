@@ -631,6 +631,18 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
         _decision=$(nightly_baseline_ship_decision "$_af_file" "$_bl_rc" "$_bf_file" "$NIGHTLY_AUTHORED_FILE")
         case "$(printf '%s\n' "$_decision" | head -n1)" in
           ship)
+            # GUARD (2026-06-11): the 'ship' verdict trusts FAIL-line parsing to enumerate EVERY
+            # failure. But a code-level Unhandled Rejection (a mock missing an export, surfaced via
+            # a rejected promise) emits NO `FAIL <path>` line, so a NEW authored breakage can be
+            # invisible to the baseline comparison. On 2026-06-11 the authored growthTracking→
+            # isAndroid break printed only as an Unhandled Rejection → 'ship' fired on just the
+            # pre-existing baseline-red FAIL files → only a coincidental build-only rc=3 stopped it
+            # shipping test-broken code. Refuse: a hidden code-level failure ⇒ ship is unverifiable
+            # ⇒ docs-only. (Worker-OOM infra noise is deliberately NOT treated as blocking here — it
+            # is routed via rc=3 — so red-master nights with OOM still baseline-red-ship.)
+            if nightly_gate_has_unattributed_failures "$_authored_out"; then
+              log "baseline-aware: REFUSING baseline-red ship — the authored gate had a code-level failure (unhandled rejection / non-OOM unhandled error) invisible to FAIL-line parsing, so 'every failing test also fails on HEAD' is UNSAFE (a new break may be hidden). Falling through to docs-only salvage."
+            else
             # Every failing test ALSO fails on clean master → not the nightly's fault.
             # `test` short-circuited the gate chain, so the authored set's BUILD was never
             # verified — run a build-only re-gate first (keeps "never ship build-breaking
@@ -658,6 +670,7 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
             else
               log "baseline-aware: authored set BUILD-fails (rc=$_bo_rc) despite a red TEST baseline — NOT shipping; falling through to docs-only salvage (never ship build-breaking code)."
             fi
+            fi  # close unattributed-failure ship guard
             ;;
           peel)
             # Authored set introduced NEW failing test file(s) not red on HEAD — drop just

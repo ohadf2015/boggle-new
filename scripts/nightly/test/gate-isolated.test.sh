@@ -226,6 +226,39 @@ assert "build-only TIMEOUT (3) → docs-only"     "[ \"\$(nightly_gate_timeout_r
 assert "build-only setup-fail (2) → docs-only"  "[ \"\$(nightly_gate_timeout_route 2)\" = docs-only ]"
 assert "missing arg → docs-only (safe default)" "[ \"\$(nightly_gate_timeout_route)\" = docs-only ]"
 
+echo "── gate-isolated: nightly_gate_has_unattributed_failures (FAIL-line parse blind spots) ──"
+# The baseline-aware 'ship' verdict compares FAIL-line test files only. A code-level failure
+# with NO 'FAIL <path>' line is invisible to it. On 2026-06-11 the authored growthTracking→
+# isAndroid break surfaced as an Unhandled Rejection → the FAIL-line parser saw only pre-existing
+# baseline-red files → 'ship' → it nearly shipped test-broken code (a coincidental build-only
+# rc=3 stopped it). This detector lets the ship path refuse. CRITICAL DISCRIMINATION: a vitest
+# worker OOM ALSO prints under an "Unhandled Error" header — that is infra noise, not a hidden
+# authored break, and flagging it would fire on every full-suite red-master night (reverting the
+# 06-02/03 baseline-red-ship fix). So a REJECTION always blocks; an ERROR blocks only when it is
+# NOT a worker-OOM/crash; OOM-only inconclusiveness is left to the rc=3 timeout routing.
+_UO=$(mktemp)
+printf 'FAIL  components/x/__tests__/a.test.tsx > does a thing\n⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯\nError: [vitest] No "isAndroid" export is defined on the "@/utils/platform" mock.\n' > "$_UO"
+assert "Unhandled Rejection (hidden authored break) → BLOCK ship (true)" "nightly_gate_has_unattributed_failures $_UO"
+printf 'FAIL  components/x/__tests__/a.test.tsx\n⎯⎯⎯ Unhandled Error ⎯⎯⎯\nError: ReferenceError: foo is not defined in test setup\n' > "$_UO"
+assert "Unhandled Error that is NOT a worker crash → BLOCK ship (true)" "nightly_gate_has_unattributed_failures $_UO"
+# A worker OOM prints under an Unhandled Error header but is INFRA — must NOT block (preserve baseline-red ship).
+printf 'Test Files  5 failed | 2638 passed\n⎯⎯⎯ Unhandled Error ⎯⎯⎯\nCaused by: Error: Worker terminated due to reaching memory limit: JS heap out of memory\n' > "$_UO"
+assert "Worker terminated (OOM) → infra, NOT blocking (false)" "! nightly_gate_has_unattributed_failures $_UO"
+printf "⎯⎯⎯ Unhandled Error ⎯⎯⎯\nSerialized Error: { code: 'ERR_WORKER_OUT_OF_MEMORY' }\n" > "$_UO"
+assert "ERR_WORKER_OUT_OF_MEMORY → infra, NOT blocking (false)" "! nightly_gate_has_unattributed_failures $_UO"
+printf 'Failed to start threads worker. Timeout waiting for worker to respond.\n' > "$_UO"
+assert "Failed to start ... worker (startup crash) → infra, NOT blocking (false)" "! nightly_gate_has_unattributed_failures $_UO"
+# This night's real output: BOTH an Unhandled Rejection (growthTracking) AND an OOM Unhandled Error → rejection wins → BLOCK.
+printf '⎯ Unhandled Rejection ⎯\nError: [vitest] No "isAndroid" export defined on mock.\n⎯ Unhandled Error ⎯\nError: Worker terminated due to reaching memory limit\n' > "$_UO"
+assert "rejection + OOM-error together (the real 06-11 case) → BLOCK (true)" "nightly_gate_has_unattributed_failures $_UO"
+# A clean failure set — only real FAIL-line tests, every one attributable — does NOT block.
+printf 'FAIL  components/x/__tests__/a.test.tsx > does a thing\n  AssertionError: expected 1 to be 2\nTest Files  1 failed | 2638 passed\n' > "$_UO"
+assert "only attributable FAIL lines → NOT blocking (false)" "! nightly_gate_has_unattributed_failures $_UO"
+: > "$_UO"
+assert "empty gate output → NOT blocking (no evidence, false)" "! nightly_gate_has_unattributed_failures $_UO"
+assert "missing gate output file → NOT blocking (false)" "! nightly_gate_has_unattributed_failures /nonexistent/gate.out"
+rm -f "$_UO"
+
 echo "── gate-isolated: lint-skipped re-gate still gates the AUTHORED worktree ──"
 # The baseline-poison ship decision rides on run_isolated_gate <auth> 1 passing only
 # when the authored set is test+build clean. Prove the skip_lint path still applies

@@ -309,6 +309,37 @@ nightly_parse_test_failures() {
     | sort -u
 }
 
+# nightly_gate_has_unattributed_failures <gate_output_file> → exit 0 (true) iff the gate
+# output contains a CODE-level failure that nightly_parse_test_failures CANNOT see as a
+# `FAIL <path>` line — so the baseline-aware 'ship' verdict ("every FAIL-line test also fails
+# on clean HEAD") is UNSAFE: a NEW authored breakage may be hidden from the comparison.
+#
+# The 2026-06-11 near-miss: the authored growthTracking→isAndroid break surfaced as an
+# "Unhandled Rejection" (a rejected promise from a mock missing an export) with NO `FAIL`
+# line → 'ship' fired on only the pre-existing baseline-red FAIL files → it nearly shipped
+# test-broken code (a coincidental build-only rc=3 was the only thing that stopped it).
+#
+# DISCRIMINATION (deliberate, do not "simplify" away): a vitest worker OOM / startup crash
+# ALSO prints under an "Unhandled Error" header (`Worker terminated … JS heap out of memory`
+# / `ERR_WORKER_OUT_OF_MEMORY` / `Failed to start … worker`). That is INFRA noise, not a
+# hidden authored break, and worker OOM is a recurring full-suite flake here. Treating it as
+# unattributed would fire this guard on virtually every red-master night (those run the full
+# suite → OOM co-occurs) and silently revert the 2026-06-02/03 baseline-red-ship fix that
+# stops zero-code nights. So: an Unhandled REJECTION always blocks; an Unhandled ERROR blocks
+# ONLY when it is not a worker-OOM/crash. OOM-only inconclusiveness is handled elsewhere via
+# the rc=3 timeout routing, not here. Returns 1 (false) on empty/missing output.
+nightly_gate_has_unattributed_failures() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  # A rejected promise (e.g. a mock missing an export) — always a code-level hidden failure.
+  LC_ALL=C grep -qaE 'Unhandled Rejection' "$out" 2>/dev/null && return 0
+  # An unhandled error that is NOT a vitest worker OOM/startup crash is also code-level.
+  if LC_ALL=C grep -qaE 'Unhandled Error' "$out" 2>/dev/null; then
+    LC_ALL=C grep -qaE 'ERR_WORKER_OUT_OF_MEMORY|Worker terminated|Failed to start [^[:space:]]* worker' "$out" 2>/dev/null || return 0
+  fi
+  return 1
+}
+
 # run_baseline_gate [skip_lint=0] — gate a CLEAN HEAD checkout with NO authored
 # files applied, to learn whether master ITSELF is red (a pre-existing failing
 # test/lint that no lane introduced). Output is left in NIGHTLY_LAST_GATE_OUTPUT
