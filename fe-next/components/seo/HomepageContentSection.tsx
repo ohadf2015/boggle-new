@@ -38,42 +38,42 @@ const labels: Record<string, {
   features: string;
   faq: string;
   learnMore: string;
-  links: { howToPlay: string; guides: string; blog: string; about: string };
+  links: { howToPlay: string; guides: string; blog: string; about: string; daily: string };
 }> = {
   en: {
     about: 'About LexiClash',
     features: 'What you can play',
     faq: 'Frequently asked questions',
     learnMore: 'Learn more',
-    links: { howToPlay: 'How to play', guides: 'Strategy guides', blog: 'From the blog', about: 'About us' },
+    links: { howToPlay: 'How to play', guides: 'Strategy guides', blog: 'From the blog', about: 'About us', daily: 'Daily challenge' },
   },
   he: {
     about: 'אודות LexiClash',
     features: 'מה אפשר לשחק',
     faq: 'שאלות נפוצות',
     learnMore: 'מידע נוסף',
-    links: { howToPlay: 'איך משחקים', guides: 'מדריכי אסטרטגיה', blog: 'מהבלוג', about: 'עלינו' },
+    links: { howToPlay: 'איך משחקים', guides: 'מדריכי אסטרטגיה', blog: 'מהבלוג', about: 'עלינו', daily: 'המילה היומית' },
   },
   sv: {
     about: 'Om LexiClash',
     features: 'Vad du kan spela',
     faq: 'Vanliga frågor',
     learnMore: 'Läs mer',
-    links: { howToPlay: 'Hur man spelar', guides: 'Strategiguider', blog: 'Från bloggen', about: 'Om oss' },
+    links: { howToPlay: 'Hur man spelar', guides: 'Strategiguider', blog: 'Från bloggen', about: 'Om oss', daily: 'Daglig utmaning' },
   },
   ja: {
     about: 'LexiClashについて',
     features: '遊べるモード',
     faq: 'よくある質問',
     learnMore: '詳しく見る',
-    links: { howToPlay: '遊び方', guides: '攻略ガイド', blog: 'ブログ', about: '私たちについて' },
+    links: { howToPlay: '遊び方', guides: '攻略ガイド', blog: 'ブログ', about: '私たちについて', daily: 'デイリーチャレンジ' },
   },
   es: {
     about: 'Acerca de LexiClash',
     features: 'A qué puedes jugar',
     faq: 'Preguntas frecuentes',
     learnMore: 'Más información',
-    links: { howToPlay: 'Cómo jugar', guides: 'Guías de estrategia', blog: 'Del blog', about: 'Sobre nosotros' },
+    links: { howToPlay: 'Cómo jugar', guides: 'Guías de estrategia', blog: 'Del blog', about: 'Sobre nosotros', daily: 'Desafío diario' },
   },
 };
 
@@ -137,6 +137,7 @@ export function HomepageContentSection({ content, locale }: HomepageContentSecti
         </h3>
         <ul className="flex flex-wrap gap-2">
           {[
+            { href: `${p}/daily`, label: l.links.daily },
             { href: `${p}/how-to-play`, label: l.links.howToPlay },
             { href: `${p}/guides`, label: l.links.guides },
             { href: `${p}/blog`, label: l.links.blog },
