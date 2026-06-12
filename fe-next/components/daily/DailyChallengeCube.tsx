@@ -14,10 +14,11 @@ interface DailyChallengeCubeProps {
   preloadedStats?: PreloadedDailyStats;
 }
 
-/** Full-bleed cube art — the daily mode in the SAME grammar as the bento cubes
- *  (solid brand-colour tile + one bold black-outlined object), not the old
- *  floating mascot on transparency. Gold (neo-yellow) is the reserved daily /
- *  celebration accent, so the daily tile reads as the one warm note in the grid. */
+/** Full-bleed cube art — the daily mode in the SAME grammar as the bento cubes:
+ *  a DARK navy tile where the colour comes from the mascot art, not the fill
+ *  (homepage brief — dark base, image is the colour). Gold (neo-yellow) survives
+ *  only as the *accent* — the DAILY headline, the puzzle badge and the mascot's
+ *  hourglass — so the daily tile is the one warm note without being a colour block. */
 const DAILY_CUBE_ART = '/modes/cubes/daily.png';
 
 /**
@@ -39,7 +40,7 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
       onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
       aria-label={`${t('daily.badge')} #${puzzleNumber}`}
       className={cn(
-        'cube-reveal group relative flex min-h-[112px] w-full items-stretch overflow-hidden rounded-neo border-neo-thick border-black bg-neo-yellow shadow-hard transition-transform duration-150 sm:min-h-[132px]',
+        'cube-reveal group relative flex min-h-[112px] w-full items-stretch overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy shadow-hard transition-transform duration-150 sm:min-h-[132px]',
         'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg',
         'focus-visible:-translate-x-0.5 focus-visible:-translate-y-0.5',
         'active:translate-x-0 active:translate-y-0 active:shadow-hard-pressed',
@@ -67,28 +68,29 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
         className="cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] w-1/3 bg-gradient-to-r from-transparent via-white/55 to-transparent"
       />
 
-      {/* Content — navy ink on gold (high contrast), kept clear of the end art. */}
-      <div className="relative z-[2] flex flex-1 flex-col justify-center gap-2 p-4 pe-[42%] text-neo-navy sm:p-5 sm:pe-[34%]">
+      {/* Content — white ink on navy with a GOLD headline accent, kept clear of
+          the end art. */}
+      <div className="relative z-[2] flex flex-1 flex-col justify-center gap-2 p-4 pe-[42%] text-neo-white sm:p-5 sm:pe-[34%]">
         <div className="flex items-center gap-2">
           <h2
-            className="font-neo-display text-xl font-black uppercase leading-none tracking-tight sm:text-2xl"
+            className="font-neo-display text-xl font-black uppercase leading-none tracking-tight text-neo-yellow sm:text-2xl"
             style={{ textWrap: 'balance' } as React.CSSProperties}
           >
             {t('daily.badge')}
           </h2>
-          <span className="shrink-0 rounded-neo border-2 border-black bg-neo-navy px-2 py-0.5 font-neo-display text-xs font-black leading-none text-neo-yellow shadow-hard-sm">
+          <span className="shrink-0 rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black leading-none text-neo-navy shadow-hard-sm">
             #{puzzleNumber}
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
           {streak > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-navy px-2 py-0.5 font-neo-body text-[0.7rem] font-bold text-neo-white">
+            <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-navy-light px-2 py-0.5 font-neo-body text-[0.7rem] font-bold text-neo-white">
               <Flame className="h-3.5 w-3.5 text-neo-orange" aria-hidden="true" />
               {streak} {t('daily.dayStreak')}
             </span>
           )}
-          <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-navy px-2 py-0.5 font-neo-body text-[0.7rem] font-bold tabular-nums text-neo-white">
+          <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-navy-light px-2 py-0.5 font-neo-body text-[0.7rem] font-bold tabular-nums text-neo-white">
             <Clock className="h-3.5 w-3.5" aria-hidden="true" />
             {hasPlayed ? (
               <>
@@ -112,7 +114,7 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
             ? hasSolved
               ? 'bg-neo-lime text-neo-navy'
               : 'bg-neo-pink text-neo-navy'
-            : 'bg-neo-navy text-neo-yellow transition-transform group-hover:translate-x-0.5',
+            : 'bg-neo-yellow text-neo-navy transition-transform group-hover:translate-x-0.5',
         )}
         data-testid={hasPlayed ? (hasSolved ? 'won-badge' : 'lost-badge') : undefined}
         aria-hidden="true"

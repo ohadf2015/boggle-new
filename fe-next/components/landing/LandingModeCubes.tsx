@@ -126,11 +126,13 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
           : 'aspect-square',
         // base fill when there's no full-bleed art behind the content
         !hasArt && (anchor ? cn(v.fill, v.ink) : 'bg-neo-navy-light'),
-        // With art: 1×1 cubes are square so the square sticker covers cleanly on
-        // navy. The anchor is non-square on phones, so object-cover would crop the
-        // glyph — instead it sits on its own variant colour and is `object-contain`d
-        // below, so the colour-drenched bleed matches the art and nothing is cut.
-        hasArt && (anchor ? v.fill : 'bg-neo-navy'),
+        // With art: EVERY cube sits on the same dark navy so the colour comes from
+        // the mascot art, not the tile (the homepage brief — dark base, image is the
+        // colour). 1×1 cubes are square → `object-cover` fills cleanly. The anchor is
+        // non-square on phones → `object-contain` below letterboxes onto the same
+        // navy (invisible bars), so the mascot is never cropped. Per-mode identity
+        // now reads only from the art + the quiet coloured hover shadow (`v.shadow`).
+        hasArt && 'bg-neo-navy',
         model.highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
         locked && 'cursor-not-allowed',
       )}
