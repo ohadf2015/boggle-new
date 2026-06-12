@@ -9959,6 +9959,7 @@ const en = {
       "coinsSuffix": "coins",
       "continue": "Continue",
       "opened": "Chest Opened!",
+      "opening": "Opening chest…",
       "preview": "Chest Preview",
       "tier": {
         "label": "Tier"

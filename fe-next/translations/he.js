@@ -10500,6 +10500,7 @@ const he = {
       "coinsSuffix": "מטבעות",
       "continue": "המשך",
       "opened": "התיבה נפתחה!",
+      "opening": "פותח תיבה…",
       "preview": "תצוגת תיבה",
       "tier": {
         "label": "דרגה"

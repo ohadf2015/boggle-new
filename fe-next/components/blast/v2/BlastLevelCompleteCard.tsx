@@ -4,10 +4,13 @@ import type * as React from 'react';
 import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { resultCelebration } from '@/lib/blast/v2/celebration';
+import { themeEmoji } from '@/lib/blast/v2/themeEmoji';
 
 type Props = {
   coins: number;
   modeColor?: string;
+  /** Level theme id (e.g. "animals") — drives the result's theme emoji. */
+  theme?: string;
   levelNumber?: number;
   /** Total theme words in the level (all are found by the time this shows). */
   themeWordCount?: number;
@@ -125,6 +128,7 @@ function StarIcon({ className, filled }: IconProps & { filled: boolean }) {
 export function BlastLevelCompleteCard({
   coins,
   modeColor = '#BFFF00',
+  theme,
   levelNumber,
   themeWordCount,
   wordsFound,
@@ -146,6 +150,7 @@ export function BlastLevelCompleteCard({
   chestNumber,
 }: Props) {
   const { t } = useLanguage();
+  const emoji = themeEmoji(theme);
   const showStars = typeof stars === 'number' && stars > 0;
   const showBonus = bonusWordsFound > 0;
   const wordCount = wordsFound ?? themeWordCount ?? 0;
@@ -333,6 +338,16 @@ export function BlastLevelCompleteCard({
             {t('blast.level', `Level ${levelNumber}`, { n: String(levelNumber) })}
           </div>
         )}
+
+        {/* Theme emoji — gives each level its own visual identity at a glance. */}
+        <div
+          data-testid="complete-theme-emoji"
+          className="mt-1 text-5xl leading-none"
+          aria-hidden
+          style={{ filter: `drop-shadow(0 0 12px color-mix(in srgb, ${modeColor} 70%, transparent))` }}
+        >
+          {emoji}
+        </div>
 
         {/* HERO 1 — stars */}
         {showStars && (

@@ -24,9 +24,8 @@ import { BlastBoard } from './BlastBoard';
 import { BlastHud } from './BlastHud';
 import { BlastSurpriseBanner } from './BlastSurpriseBanner';
 import { BlastLevelIntroCard } from './BlastLevelIntroCard';
-import { BlastLevelCompleteCard } from './BlastLevelCompleteCard';
+import { BlastResultFlow } from './BlastResultFlow';
 import { BlastLevelFailedCard } from './BlastLevelFailedCard';
-import { BlastChestOpenModal } from './BlastChestOpenModal';
 import { BlastFxOverlay } from './BlastFxOverlay';
 import { BlastAtmosphereOverlay } from './BlastAtmosphereOverlay';
 import { BlastFtueOverlay, type FtueStep } from './BlastFtueOverlay';
@@ -211,7 +210,6 @@ export function BlastGame({
   }, [state.chainEventKey]);
 
   const { state: progressState, clearLevel, openChest, openMutation } = progress;
-  const [showChestModal, setShowChestModal] = useState(false);
   const [showUndoAdModal, setShowUndoAdModal] = useState(false);
   const config = LOCALE_CONFIGS[level.locale];
 
@@ -475,13 +473,6 @@ export function BlastGame({
   // FX integration point: BlastFxOverlay mounts useBlastFx internally
   // Board ref is obtained internally by BlastBoard via useRef
 
-  // Show chest modal when complete
-  useEffect(() => {
-    if (state.status === 'levelComplete' && progressState.chestProgress >= 1.0 && !showChestModal) {
-      setShowChestModal(true);
-    }
-  }, [state.status, progressState.chestProgress, showChestModal]);
-
   if (!introDismissed) {
     return (
       <>
@@ -510,21 +501,6 @@ export function BlastGame({
     );
   }
 
-  // Show chest open ceremony if chest is full
-  if (showChestModal && progressState.chestContents) {
-    return (
-      <BlastChestOpenModal
-        contents={progressState.chestContents}
-        isOpen={true}
-        onClose={() => {
-          setShowChestModal(false);
-          setIntroDismissed(false); // Reset for next level
-          onAdvance();
-        }}
-      />
-    );
-  }
-
   if (state.status === 'levelFailed') {
     const foundThemeWordsCount = level.words.filter((w) => state.foundWords.has(w)).length;
     return (
@@ -541,11 +517,16 @@ export function BlastGame({
   if (state.status === 'levelComplete' && showCompleteCard) {
     // Count how many theme words were actually found
     const foundThemeWordsCount = level.words.filter((w) => state.foundWords.has(w)).length;
+    // Server-authoritative chest fullness drives the open ceremony — open-chest
+    // 400s below 1.0, so the decision must read the persisted value, not the
+    // live display blend.
+    const chestReady = progressState.chestProgress >= 1;
     return (
-      <BlastLevelCompleteCard
+      <BlastResultFlow
         coins={state.coins}
         cascadeCount={state.cascadeCount}
         modeColor={modeColor}
+        theme={level.theme}
         levelNumber={level.levelNumber}
         themeWordCount={level.words.length}
         // On a partial finish the player did NOT find every theme word, so show
@@ -565,7 +546,11 @@ export function BlastGame({
         chestNumber={progressState.chestNumber}
         chestProgress={Math.min(1, progressState.chestProgress + state.chestProgress)}
         chestProgressGain={state.chestProgress}
-        onNext={onAdvance}
+        chestReady={chestReady}
+        chestContents={progressState.chestContents}
+        openChest={openChest}
+        openStatus={openMutation.status}
+        onAdvance={onAdvance}
       />
     );
   }
