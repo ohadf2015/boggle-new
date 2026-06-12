@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 5750,
+    "totalKeysInCode": 5788,
     "keyCountByLanguage": {
-      "en": 10830,
-      "he": 10924,
-      "sv": 10918,
-      "ja": 10919,
-      "es": 10948
+      "en": 10881,
+      "he": 10994,
+      "sv": 10987,
+      "ja": 10988,
+      "es": 11017
     },
-    "missingFromEnglish": 3,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 26,
@@ -308,47 +308,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "wordcraft.combo",
-      "usages": [
-        {
-          "file": "components/word-craft/WordCraftComboBadge.tsx",
-          "line": 46
-        }
-      ]
-    },
-    {
-      "key": "wordcraft.duel.linkCopyFailed",
-      "usages": [
-        {
-          "file": "components/word-craft/WordCraftDuelResult.tsx",
-          "line": 112
-        },
-        {
-          "file": "components/word-craft/WordCraftDuelResult.tsx",
-          "line": 115
-        },
-        {
-          "file": "components/word-craft/WordCraftPlayFriendControl.tsx",
-          "line": 96
-        },
-        {
-          "file": "components/word-craft/WordCraftPlayFriendControl.tsx",
-          "line": 99
-        }
-      ]
-    },
-    {
-      "key": "wordTower.mutator.todaysTwist",
-      "usages": [
-        {
-          "file": "components/wordTower/WordTowerMutatorBanner.tsx",
-          "line": 43
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "multiplayer.rankUp",
@@ -438,25 +398,6 @@
       "asyncChallenge.result.bodyWin",
       "asyncChallenge.result.bodyLoss",
       "asyncChallenge.result.bodyTie",
-      "admin.schoolLeads.title",
-      "admin.schoolLeads.subtitle",
-      "admin.schoolLeads.count.total",
-      "admin.schoolLeads.count.pricing",
-      "admin.schoolLeads.count.large",
-      "admin.schoolLeads.filter_role_all",
-      "admin.schoolLeads.filter_size_all",
-      "admin.schoolLeads.filter_interest_all",
-      "admin.schoolLeads.refresh",
-      "admin.schoolLeads.empty",
-      "admin.schoolLeads.page",
-      "admin.schoolLeads.export_csv",
-      "admin.schoolLeads.col.date",
-      "admin.schoolLeads.col.school",
-      "admin.schoolLeads.col.contact",
-      "admin.schoolLeads.col.role",
-      "admin.schoolLeads.col.size",
-      "admin.schoolLeads.col.interests",
-      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",
@@ -494,6 +435,7 @@
       "blast.chest.coinsSuffix",
       "blast.chest.continue",
       "blast.chest.opened",
+      "blast.chest.opening",
       "blast.chest.preview",
       "blast.chest.tier.label",
       "blast.chest.title",
@@ -646,25 +588,6 @@
       "mp.reconnect.attempt",
       "mp.reconnect.giveUp",
       "mp.reconnect.title",
-      "admin.schoolLeads.title",
-      "admin.schoolLeads.subtitle",
-      "admin.schoolLeads.count.total",
-      "admin.schoolLeads.count.pricing",
-      "admin.schoolLeads.count.large",
-      "admin.schoolLeads.filter_role_all",
-      "admin.schoolLeads.filter_size_all",
-      "admin.schoolLeads.filter_interest_all",
-      "admin.schoolLeads.refresh",
-      "admin.schoolLeads.empty",
-      "admin.schoolLeads.page",
-      "admin.schoolLeads.export_csv",
-      "admin.schoolLeads.col.date",
-      "admin.schoolLeads.col.school",
-      "admin.schoolLeads.col.contact",
-      "admin.schoolLeads.col.role",
-      "admin.schoolLeads.col.size",
-      "admin.schoolLeads.col.interests",
-      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",
@@ -705,6 +628,7 @@
       "blast.chest.coinsSuffix",
       "blast.chest.continue",
       "blast.chest.opened",
+      "blast.chest.opening",
       "blast.chest.preview",
       "blast.chest.tier.label",
       "blast.chest.title",
@@ -857,25 +781,6 @@
       "mp.reconnect.attempt",
       "mp.reconnect.giveUp",
       "mp.reconnect.title",
-      "admin.schoolLeads.title",
-      "admin.schoolLeads.subtitle",
-      "admin.schoolLeads.count.total",
-      "admin.schoolLeads.count.pricing",
-      "admin.schoolLeads.count.large",
-      "admin.schoolLeads.filter_role_all",
-      "admin.schoolLeads.filter_size_all",
-      "admin.schoolLeads.filter_interest_all",
-      "admin.schoolLeads.refresh",
-      "admin.schoolLeads.empty",
-      "admin.schoolLeads.page",
-      "admin.schoolLeads.export_csv",
-      "admin.schoolLeads.col.date",
-      "admin.schoolLeads.col.school",
-      "admin.schoolLeads.col.contact",
-      "admin.schoolLeads.col.role",
-      "admin.schoolLeads.col.size",
-      "admin.schoolLeads.col.interests",
-      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",
@@ -908,6 +813,7 @@
       "blast.chest.coinsSuffix",
       "blast.chest.continue",
       "blast.chest.opened",
+      "blast.chest.opening",
       "blast.chest.preview",
       "blast.chest.tier.label",
       "blast.chest.title",
@@ -1060,25 +966,6 @@
       "mp.reconnect.attempt",
       "mp.reconnect.giveUp",
       "mp.reconnect.title",
-      "admin.schoolLeads.title",
-      "admin.schoolLeads.subtitle",
-      "admin.schoolLeads.count.total",
-      "admin.schoolLeads.count.pricing",
-      "admin.schoolLeads.count.large",
-      "admin.schoolLeads.filter_role_all",
-      "admin.schoolLeads.filter_size_all",
-      "admin.schoolLeads.filter_interest_all",
-      "admin.schoolLeads.refresh",
-      "admin.schoolLeads.empty",
-      "admin.schoolLeads.page",
-      "admin.schoolLeads.export_csv",
-      "admin.schoolLeads.col.date",
-      "admin.schoolLeads.col.school",
-      "admin.schoolLeads.col.contact",
-      "admin.schoolLeads.col.role",
-      "admin.schoolLeads.col.size",
-      "admin.schoolLeads.col.interests",
-      "admin.schoolLeads.col.country",
       "admin.sendTitle",
       "admin.selectPlayers",
       "admin.chooseType",
