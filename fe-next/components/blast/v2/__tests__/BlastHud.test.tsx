@@ -73,4 +73,36 @@ describe('BlastHud', () => {
     fireEvent.click(screen.getByTestId('undo-btn'));
     expect(onUndo).toHaveBeenCalledTimes(1);
   });
+
+  describe('target-word clue gating (only first 3 levels)', () => {
+    const words = ['CAT', 'SUN', 'EGG'];
+
+    it('shows the target-word strip on levels 1-3', () => {
+      for (const n of [1, 2, 3]) {
+        const { unmount } = render(
+          <BlastHud levelNumber={n} coins={0} chestProgress={0} onShuffle={vi.fn()} onHint={vi.fn()} targetWords={words} foundWords={[]} />
+        );
+        expect(screen.getByTestId('hud-words-strip')).toBeInTheDocument();
+        unmount();
+      }
+    });
+
+    it('hides the target-word strip from level 4 onward (no word clues)', () => {
+      for (const n of [4, 5, 10, 30]) {
+        const { unmount } = render(
+          <BlastHud levelNumber={n} coins={0} chestProgress={0} onShuffle={vi.fn()} onHint={vi.fn()} targetWords={words} foundWords={[]} />
+        );
+        expect(screen.queryByTestId('hud-words-strip')).not.toBeInTheDocument();
+        unmount();
+      }
+    });
+
+    it('still shows the bonus-word counter after level 3 (it is a reward, not a clue)', () => {
+      render(
+        <BlastHud levelNumber={8} coins={0} chestProgress={0} onShuffle={vi.fn()} onHint={vi.fn()} targetWords={words} foundWords={[]} bonusWordCount={2} />
+      );
+      expect(screen.queryByTestId('hud-words-strip')).not.toBeInTheDocument();
+      expect(screen.getByTestId('hud-bonus-count')).toBeInTheDocument();
+    });
+  });
 });

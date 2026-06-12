@@ -116,6 +116,11 @@ export function BlastHud({
     if (!foundWords) return new Set<string>();
     return new Set(foundWords.map((w) => w.toUpperCase()));
   }, [foundWords]);
+  // The target-word strip is a teaching aid: even masked as bullets it leaks the
+  // word count and length. Show it only on the first 3 levels, then players hunt
+  // the theme words blind. The bonus counter is a reward, not a clue, so it
+  // stays visible at every level.
+  const showTargetWords = !!targetWords && targetWords.length > 0 && levelNumber <= 3;
 
   return (
     <>
@@ -213,13 +218,13 @@ export function BlastHud({
           onClose={() => setShowPreview(false)}
         />
       )}
-      {targetWords && targetWords.length > 0 && (
+      {showTargetWords && (
         <div
           data-testid="hud-words-strip"
           className="flex items-center justify-center gap-1.5 px-3 py-1.5 flex-wrap bg-[#0b1530]/80"
           style={{ borderBottom: `1px solid color-mix(in srgb, ${modeColor} 25%, transparent)` }}
         >
-          {targetWords.map((w) => {
+          {targetWords!.map((w) => {
             const upper = w.toUpperCase();
             const isFound = foundSet.has(upper);
             return (
@@ -245,24 +250,29 @@ export function BlastHud({
               </m.span>
             );
           })}
-          {bonusWordCount > 0 && (
-            <m.span
-              data-testid="hud-bonus-count"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: [1, 1.18, 1], opacity: 1 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="text-[10px] font-black uppercase tracking-wider rounded-md px-2 py-0.5"
-              style={{
-                background: 'rgba(255,255,255,0.08)',
-                color: modeColor,
-                border: `1px solid color-mix(in srgb, ${modeColor} 45%, transparent)`,
-              }}
-            >
-              {t('blast.feedback.bonusCount', `⭐ ${bonusWordCount} bonus`, {
-                count: String(bonusWordCount),
-              })}
-            </m.span>
-          )}
+        </div>
+      )}
+      {bonusWordCount > 0 && (
+        <div
+          data-testid="hud-bonus-strip"
+          className="flex items-center justify-center px-3 py-1 bg-[#0b1530]/80"
+        >
+          <m.span
+            data-testid="hud-bonus-count"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: [1, 1.18, 1], opacity: 1 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="text-[10px] font-black uppercase tracking-wider rounded-md px-2 py-0.5"
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              color: modeColor,
+              border: `1px solid color-mix(in srgb, ${modeColor} 45%, transparent)`,
+            }}
+          >
+            {t('blast.feedback.bonusCount', `⭐ ${bonusWordCount} bonus`, {
+              count: String(bonusWordCount),
+            })}
+          </m.span>
         </div>
       )}
       {((mech.revealLetterHint || mech.revealWordHint) || (canUndo && onUndo)) && (
