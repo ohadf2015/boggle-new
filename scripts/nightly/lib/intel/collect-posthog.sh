@@ -2,7 +2,7 @@
 # Collector: PostHog → normalized intel signals (spec §4). REST/HogQL, NO MCP.
 # This is the richest connected source and is fully REST-able today, so it fills
 # the brief immediately for the data-discovery lanes:
-#   $exception (24h)      → 01-triage   (errors PostHog saw that Sentry may miss)
+#   Error Tracking issues → 01-triage   (deduped active issues Sentry may miss)
 #   $web_vitals LCP > 2.5s→ 02-perf     (Core Web Vitals — the lane-02 promise)
 #   $rageclick by URL     → 03-engagement (UX friction = where to A/B a fix)
 #
@@ -45,14 +45,32 @@ add() { SIGNALS=$(jq -n --argjson a "$SIGNALS" --argjson s "$1" '$a + [$s]'); }
 # severity = floor 0.2 + up to 0.8 scaled by value/max (keeps the smallest >0)
 sev_of() { jq -n --argjson v "$1" --argjson m "$2" '(((($v / (if $m>0 then $m else 1 end)) * 0.8 + 0.2) * 100) | round) / 100 | if . > 1 then 1 else . end'; }
 
-# 1) Top exceptions → 01-triage
-EXC=$(ph "SELECT coalesce(toString(properties.\$exception_type), toString(properties.\$exception_message), 'unknown') AS t, count() AS c, count(distinct person_id) AS u FROM events WHERE event = '\$exception' AND timestamp > now() - INTERVAL 24 HOUR GROUP BY t ORDER BY c DESC LIMIT 5")
-maxc=$(echo "$EXC" | jq '[.results[]?[1]] | max // 1')
-while IFS= read -r row; do
-  [ -z "$row" ] && continue
-  t=$(echo "$row" | jq -r '.[0] // "unknown"'); c=$(echo "$row" | jq -r '.[1] // 0'); u=$(echo "$row" | jq -r '.[2] // 0')
-  add "$(emit_signal posthog error "Exception: $t" events_24h "$c" "$u" "$(sev_of "$c" "$maxc")" 01-triage "posthog:exception:$t" "" M "posthog:exception:$t")"
-done < <(echo "$EXC" | jq -c '.results[]?')
+# 1) Top error-tracking ISSUES (deduped, active-only, with permalinks) → 01-triage.
+# NOT raw $exception events: $exception_type/$exception_message are null on
+# current-schema events, so a HogQL GROUP BY collapses every error into a single
+# useless "unknown" row. The Error Tracking product does the fingerprint grouping;
+# query it via ErrorTrackingQuery on the same /query endpoint. Mirrors
+# collect-sentry.sh: status filter (active) + infra-noise skip + issue permalink.
+# Skip low-signal infra errors (parity with collect-sentry.sh is_noise()).
+is_noise() { echo "$1" | grep -iE '(socket|CSP violation|CORS|timeout|abort|net::|ResizeObserver|NetworkError)' >/dev/null 2>&1; }
+ETQ='{"query":{"kind":"ErrorTrackingQuery","orderBy":"occurrences","dateRange":{"date_from":"-24h"},"status":"active","volumeResolution":0,"limit":10}}'
+ISSUES=$(curl -sS --max-time 30 -X POST "$HOST/api/projects/$PID/query/" \
+           -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
+           -d "$ETQ" 2>/dev/null)
+echo "$ISSUES" | jq -e '.results' >/dev/null 2>&1 || ISSUES='{"results":[]}'
+maxocc=$(echo "$ISSUES" | jq '[.results[]?.aggregations.occurrences // 0] | max // 1')
+while IFS= read -r iss; do
+  [ -z "$iss" ] && continue
+  id=$(echo "$iss" | jq -r '.id // ""')
+  name=$(echo "$iss" | jq -r '.name // "Error"')
+  desc=$(echo "$iss" | jq -r '.description // ""')
+  occ=$(echo "$iss" | jq -r '(.aggregations.occurrences // 0) | floor')
+  usr=$(echo "$iss" | jq -r '(.aggregations.users // 0) | floor')
+  title=$(printf '%s: %s' "$name" "$desc" | tr '\n\r\t' '   ' | cut -c1-140)
+  is_noise "$title" && continue
+  link="$HOST/project/$PID/error_tracking/$id"
+  add "$(emit_signal posthog error "$title" occurrences_24h "$occ" "$usr" "$(sev_of "$occ" "$maxocc")" 01-triage "posthog-issue:$id" "$link" M "posthog-issue:$id")"
+done < <(echo "$ISSUES" | jq -c '.results[]?')
 
 # 2) Core Web Vitals — pages with LCP p-avg over 2.5s → 02-perf
 WV=$(ph "SELECT toString(properties.\$current_url) AS url, round(avg(toFloat(properties.\$web_vitals_LCP_value)),0) AS lcp FROM events WHERE event = '\$web_vitals' AND timestamp > now() - INTERVAL 24 HOUR GROUP BY url HAVING lcp > 2500 ORDER BY lcp DESC LIMIT 5")

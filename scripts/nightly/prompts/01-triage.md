@@ -61,9 +61,11 @@ Use the **supabase** MCP server (`get_advisors` with `type: 'performance'` and `
   • New advisor warnings since last night
   • Skip the 217 unused_index + 69 authd-secdef intentionally kept (see memory `supabase-advisor-cleanup-2026-04-29`)
 
-Use the **posthog** MCP server (or POSTHOG_PERSONAL_API_KEY direct query):
-  • `$exception` events last 24h grouped by `$exception_type` / `$exception_message`
-  • Top 3 by occurrence
+Use the **posthog** MCP server (`query-error-tracking-issues-list`, status `active`, last 24h):
+  • Deduped, grouped Error Tracking issues — NOT raw `$exception` events
+    (`$exception_type`/`$exception_message` are null on current-schema events, so a
+    raw GROUP BY collapses everything to "unknown" — see collect-posthog.sh)
+  • Top 3 by occurrences × users; skip the same infra noise as Sentry
 
 ═══ STEP 2 — Diagnose ═══
 For each candidate (max 5 total across the three sources):
