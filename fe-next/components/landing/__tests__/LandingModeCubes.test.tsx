@@ -95,4 +95,20 @@ describe('LandingModeCubes', () => {
     renderCubes({ extras: [] });
     expect(screen.queryByTestId('landing-cubes-more')).not.toBeInTheDocument();
   });
+
+  it('gives EVERY cube an idle "glance" sheen (not only the anchor)', () => {
+    // models here have no genIcon — the sheen must no longer depend on art,
+    // so the whole bento shimmers, not just the colour-drenched anchor.
+    renderCubes();
+    const sheens = screen.getAllByTestId('cube-sheen');
+    // anchor + 2 rest = 3 cubes, one sheen each
+    expect(sheens.length).toBe(3);
+  });
+
+  it('staggers the sheen per-cube so the grid shimmers organically (no synced strobe)', () => {
+    renderCubes();
+    const delays = screen.getAllByTestId('cube-sheen').map((s) => s.style.animationDelay);
+    // distinct per-cube delays — not every cube sweeping on the same clock
+    expect(new Set(delays).size).toBeGreaterThan(1);
+  });
 });

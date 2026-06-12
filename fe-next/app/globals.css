@@ -4667,8 +4667,9 @@ html[data-cosy='true'] .animate-neo-press {
 @media (prefers-reduced-motion: no-preference) {
   @keyframes cube-sheen-sweep {
     0%   { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
-    6%   { opacity: 0.5; }
-    22%  { transform: translateX(140%) skewX(-18deg); opacity: 0; }
+    5%   { opacity: 0.85; }
+    14%  { opacity: 0.85; }
+    24%  { transform: translateX(140%) skewX(-18deg); opacity: 0; }
     100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
   }
   .cube-sheen {

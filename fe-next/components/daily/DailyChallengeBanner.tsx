@@ -250,6 +250,16 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         }}
         {...combinedHandlers}
       >
+        {/* Idle "glance" sheen — the SAME shared primitive the mode cubes use
+            (.cube-sheen), so the daily hero joins the new homepage design
+            language instead of only shining on hover. Always-on, CSS-gated on
+            prefers-reduced-motion (NOT the JS perf flag), so it shimmers even
+            on low-end devices the way the cubes do. */}
+        <span
+          aria-hidden="true"
+          data-testid="cube-sheen"
+          className="cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] w-1/3 bg-gradient-to-r from-transparent via-white/55 to-transparent rtl:right-auto"
+        />
         {/* Sparkles for unplayed state - celebration accent */}
         {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
           <>

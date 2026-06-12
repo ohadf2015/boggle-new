@@ -148,18 +148,25 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
               'transition-transform duration-200 motion-safe:group-hover:scale-[1.06] motion-safe:group-focus-visible:scale-[1.06]',
             )}
           />
-          {/* idle diagonal light sweep — only on the colour-drenched anchor, where
-              there's room for it to read; reduced-motion users see nothing (CSS-gated). */}
-          {anchor && (
-            <span
-              aria-hidden="true"
-              className="cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] w-1/3 bg-gradient-to-r from-transparent via-white/35 to-transparent"
-            />
-          )}
           {/* scrim so the title stays legible over the art */}
           <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/65 to-transparent" />
         </>
       )}
+
+      {/* idle diagonal light sweep — the homepage "glance". Now on EVERY cube
+          (art or navy) so the whole bento shimmers, not just the anchor. Each
+          cube is phase-shifted via animationDelay so they sweep organically
+          instead of strobing in unison. Brighter/wider on the 2×2 anchor where
+          there's room for it to read. CSS-gated on prefers-reduced-motion. */}
+      <span
+        aria-hidden="true"
+        data-testid="cube-sheen"
+        style={{ animationDelay: `${(index * 1.7).toFixed(2)}s` }}
+        className={cn(
+          'cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] bg-gradient-to-r from-transparent to-transparent',
+          anchor ? 'w-1/2 via-white/60' : 'w-1/3 via-white/45',
+        )}
+      />
 
       {model.badge && <Badge label={model.badge} />}
       {locked && <LockOverlay message={model.lockedMessage} />}
