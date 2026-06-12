@@ -291,17 +291,26 @@ function floorBoard(spec: ChainLevelSpec): BlastLevel | null {
  * MAX_BUILD_ATTEMPTS yields a valid level (author should then tweak the chain).
  */
 export function buildChainLevel(
-  spec: ChainLevelSpec,
+  spec0: ChainLevelSpec,
   seed: number,
   extraWordCheck?: ExtraWordCheck,
   maxAttempts: number = MAX_BUILD_ATTEMPTS,
 ): BlastLevel | null {
-  if (spec.columns < 1) return null;
-  const longest = Math.max(...spec.chain.map((w) => [...w].length));
-  // Phone-friendly silhouettes use cols=5 — long words still pass because
-  // insertWordVertical can stack them as a single tower; floorBoard does the
-  // same for the floor word. Reject only if the word is wider than what BOTH
-  // axes could hold (a 1×1 grid can't hold a 2-letter word).
+  if (spec0.columns < 1) return null;
+  const longest = Math.max(...spec0.chain.map((w) => [...w].length));
+  // Tower fix: a word longer than the authored grid width (he/es packs author
+  // 5-col boards but ship 6–7-letter words) used to slip past the tower-control
+  // filter (the `longest > spec.columns` bypass below) AND run with an
+  // unbounded narrow ceiling, collapsing the whole board into one column
+  // (he L19 -> [0,0,29,0,0], the "שלב 19" screenshot). Widen the working grid so
+  // `columns >= longest`: the long word now lays flat and the SAME proven
+  // height-cap re-engages. en/sv packs are unaffected (their words already fit).
+  // Capped at MAX_PHONE_COLS so an 8+-letter word still stacks vertically (the
+  // floorBoard branch) instead of cramming a phone; shipped packs top out at 7.
+  const MAX_PHONE_COLS = 7;
+  const widenedColumns = Math.min(longest, MAX_PHONE_COLS);
+  const spec: ChainLevelSpec =
+    widenedColumns > spec0.columns ? { ...spec0, columns: widenedColumns } : spec0;
 
   const rand = rng(seed);
   // Narrow-grid relief: 5-col boards leave less horizontal room, so allow
@@ -315,9 +324,16 @@ export function buildChainLevel(
   // chains), but the height-bucketed candidate order in insertWordVertical
   // pushes the realized silhouette toward spread, not tower.
   const narrowCeiling = totalTiles;
+  // Widened boards carry the densest chains (he L25 = 43 tiles). The tight
+  // wide-board cap (longest+1) starves placement -> null -> the level 404s into
+  // the generator. Give them avg+4 headroom: enough to isolate a dense chain,
+  // still far below a tower (a tower needs height == totalTiles).
+  const wasWidened = spec.columns !== spec0.columns;
   const ceiling = spec.columns <= 5
     ? narrowCeiling
-    : Math.max(longest + 1, columnHeightCeiling(spec.chain));
+    : wasWidened
+      ? Math.max(longest + 2, avgPerCol + 4)
+      : Math.max(longest + 1, columnHeightCeiling(spec.chain));
   // Tower control on phone (≤5 col) boards. The OLD cap `max(longest+2, avg+4)`
   // let dense chains realize 9–10 tall towers (founder report: a [9,7,3,2]
   // silhouette on level 17). We TIGHTEN to `max(longest+1, avg+2)` and return
