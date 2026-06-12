@@ -53,7 +53,7 @@ export function BlastTileFirstUseCallout({ type, onDismiss }: BlastTileFirstUseC
           onClick={onDismiss}
           className="shrink-0 rounded-neo border-neo border-black bg-neo-lime px-2 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm active:animate-neo-press"
         >
-          {t('mpCoach.common.gotIt')}
+          {t('blast.firstUse.gotIt', 'Got it')}
         </button>
       </div>
     </div>
