@@ -11,6 +11,8 @@ async function getHowler(): Promise<typeof import('howler')['Howler']> {
   return mod.Howler;
 }
 import { useMusicFocusManager } from '@/lib/audio/useMusicFocusManager';
+import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
+import { resolveStyleTrack } from '@/lib/playerStyle/styles';
 
 type TrackKey = 'lobby' | 'beforeGame' | 'inGame' | 'almostOutOfTime' | 'bossaArcade' | 'bossa' | 'blast';
 
@@ -61,6 +63,16 @@ const TRACKS: Record<TrackKey, string> = {
   blast: '/music/blast_mode.mp3',
 };
 
+/**
+ * The signature in-game theme follows the player's chosen style; every other
+ * cue (lobby, countdown, almost-out-of-time, results) stays universal — they're
+ * gameplay feedback, not vibe. Exported for unit testing.
+ */
+export function resolveTrackSrc(key: TrackKey, styleKey: string): string {
+  if (key === 'inGame') return resolveStyleTrack(styleKey, TRACKS.inGame);
+  return TRACKS[key];
+}
+
 const STORAGE_KEY = 'boggle_music_settings';
 
 function loadMusicSetting<T>(key: keyof MusicSettings, fallback: T): T {
@@ -103,6 +115,12 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   const isMutedRef = useRef(isMuted);
   const volumeRef = useRef(volume);
 
+  // Player-chosen style drives the signature in-game theme. usePlayerStyle is
+  // safe without its provider (returns the default style), so MusicProvider has
+  // no hard dependency on the style tree in tests.
+  const { styleKey } = usePlayerStyle();
+  const styleKeyRef = useRef(styleKey);
+
   useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
   useEffect(() => { volumeRef.current = volume; }, [volume]);
   useEffect(() => { audioUnlockedRef.current = audioUnlocked; }, [audioUnlocked]);
@@ -124,7 +142,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   const getOrCreateHowl = useCallback((key: TrackKey): Howl => {
     if (howlsRef.current[key]) return howlsRef.current[key];
 
-    const src = TRACKS[key];
+    const src = resolveTrackSrc(key, styleKeyRef.current);
     const howl = createLazyHowl(src, {
       loop: true,
       volume: 0,
@@ -303,6 +321,22 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   }, [getOrCreateHowl, windowFocusedRef, pausedByVisibilityRef, pausedByBlurRef]);
 
   useEffect(() => { fadeToTrackRef.current = fadeToTrack; }, [fadeToTrack]);
+
+  // When the player switches style, the cached in-game Howl points at the old
+  // file. Drop it so it rebuilds with the new src on next play; if the in-game
+  // theme is the one currently playing (rare mid-session switch), crossfade to
+  // the new track immediately. Placed after fadeToTrack so it can call it directly.
+  useEffect(() => {
+    styleKeyRef.current = styleKey;
+    const existing = howlsRef.current.inGame;
+    if (!existing) return;
+    const wasPlaying = currentTrackRef.current === 'inGame';
+    try { existing.unload(); } catch { /* already unloaded */ }
+    delete (howlsRef.current as Partial<Record<TrackKey, Howl>>).inGame;
+    if (wasPlaying && audioUnlockedRef.current) {
+      fadeToTrack('inGame', 400, 400);
+    }
+  }, [styleKey, fadeToTrack]);
 
   // Auto-unlock on first user interaction
   useEffect(() => {

@@ -42,6 +42,10 @@ export interface ProfileData {
   utm_campaign?: string | null;
   referrer?: string | null;
   has_customized_profile?: boolean;
+  // Player music/theme style (genre). null = default. See lib/playerStyle/styles.ts.
+  player_style?: string | null;
+  // ISO timestamp the one-time style-choice popup was shown. null = not shown yet.
+  player_style_modal_shown_at?: string | null;
   created_at?: string;
   updated_at?: string;
   // Coins & Collectibles

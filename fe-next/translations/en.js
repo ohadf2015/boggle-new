@@ -1,5 +1,40 @@
 // EN translations
 const en = {
+  "playerStyle": {
+    "styles": {
+      "default": "Classic",
+      "rock": "Rock",
+      "hasidic": "Klezmer",
+      "jazz": "Jazz",
+      "arabic": "Arabic",
+      "epic": "Epic",
+      "viking": "Viking",
+      "arcade": "Arcade",
+      "latin": "Latin",
+      "reggae": "Reggae",
+      "japanese": "Japanese",
+      "desert_epic": "Desert Epic",
+      "fanfare": "Fanfare"
+    },
+    "picker": {
+      "title": "Choose your vibe",
+      "current": "Current",
+      "confirm": "Choose this style",
+      "apply": "Apply",
+      "matchAvatar": "Match my avatar to this style",
+      "shuffleAvatar": "Shuffle"
+    },
+    "popup": {
+      "title": "Make LexiClash yours",
+      "subtitle": "New! Pick a music style and accent color. Change it anytime in Settings.",
+      "save": "Save my style",
+      "keepDefault": "Keep default"
+    },
+    "settings": {
+      "title": "Style",
+      "description": "Your music genre and accent color"
+    }
+  },
   "mpCoach": {
     "idleNudge": "Drag across letters to spell a word",
     "tapHint": "Hold and drag across letters, then lift to submit",

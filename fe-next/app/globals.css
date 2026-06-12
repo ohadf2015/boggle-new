@@ -2295,7 +2295,10 @@ html.lexi-native [data-selectable] {
     --secondary-foreground: rgb(var(--neo-white));
     --muted: var(--neo-navy-light);
     --muted-foreground: #d4d4e8;
-    --accent: var(--neo-pink);
+    /* Player-personalization accent. Default = brand hero (lime); overridden at
+       runtime to the chosen style's hex by PlayerStyleContext (or removed for the
+       default style → falls back to this value). Previously vestigial. */
+    --accent: var(--neo-lime);
     --accent-foreground: rgb(var(--neo-white));
     --destructive: var(--neo-red);
     --destructive-foreground: rgb(var(--neo-white));
@@ -2486,7 +2489,10 @@ html.lexi-native [data-selectable] {
     --secondary-foreground: rgb(var(--neo-black));
     --muted: #e2e8f0;
     --muted-foreground: #475569;
-    --accent: var(--neo-pink);
+    /* Player-personalization accent. Default = brand hero (lime); overridden at
+       runtime to the chosen style's hex by PlayerStyleContext (or removed for the
+       default style → falls back to this value). Previously vestigial. */
+    --accent: var(--neo-lime);
     --accent-foreground: rgb(var(--neo-black));
     --destructive: var(--neo-red);
     --destructive-foreground: rgb(var(--neo-black));

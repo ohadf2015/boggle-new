@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePlayerStyle } from '../../contexts/PlayerStyleContext';
 import { cn } from '../../lib/utils';
 import AuthButton from '../auth/AuthButton';
 import MusicControls from '../MusicControls';
@@ -72,6 +73,7 @@ const staggerItemRtl = {
 const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
+    const { style: playerStyle } = usePlayerStyle();
     const engagementStatus = useEngagementStatus();
     const { missions, completedCount, isGrandSlam, loading: missionsLoading } = useDailyMissions();
     const {
@@ -482,7 +484,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         <Link href={`/${language}/profile`} onClick={closeMenu} className="block group">
                                             <div className="flex items-center gap-3.5">
                                                 <div className="relative shrink-0">
-                                                    <div className="rounded-full border-3 border-neo-lime shadow-hard-sm p-0.5 bg-neo-navy group-hover:border-neo-cyan transition-colors">
+                                                    <div className={cn(
+                                                        'rounded-full border-3 shadow-hard-sm p-0.5 bg-neo-navy group-hover:border-neo-cyan transition-colors',
+                                                        playerStyle.accentHex ? 'border-accent' : 'border-neo-lime'
+                                                    )}>
                                                         <Avatar
                                                             customAvatar={avatarConfig}
                                                             userId={user?.id}

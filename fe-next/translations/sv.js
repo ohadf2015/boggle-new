@@ -1,5 +1,40 @@
 // Sv translations
 const sv = {
+  "playerStyle": {
+    "styles": {
+      "default": "Klassisk",
+      "rock": "Rock",
+      "hasidic": "Klezmer",
+      "jazz": "Jazz",
+      "arabic": "Arabisk",
+      "epic": "Episk",
+      "viking": "Viking",
+      "arcade": "Arkad",
+      "latin": "Latino",
+      "reggae": "Reggae",
+      "japanese": "Japansk",
+      "desert_epic": "Ökenepos",
+      "fanfare": "Fanfar"
+    },
+    "picker": {
+      "title": "Välj din stil",
+      "current": "Nuvarande",
+      "confirm": "Välj den här stilen",
+      "apply": "Tillämpa",
+      "matchAvatar": "Matcha min avatar till stilen",
+      "shuffleAvatar": "Blanda"
+    },
+    "popup": {
+      "title": "Gör LexiClash till din",
+      "subtitle": "Nytt! Välj en musikstil och accentfärg. Ändra det när som helst i Inställningar.",
+      "save": "Spara min stil",
+      "keepDefault": "Behåll standard"
+    },
+    "settings": {
+      "title": "Stil",
+      "description": "Din musikgenre och accentfärg"
+    }
+  },
   "mpCoach": {
     "idleNudge": "Dra över bokstäverna för att stava ett ord",
     "tapHint": "Håll och dra över bokstäverna, släpp sedan för att skicka",

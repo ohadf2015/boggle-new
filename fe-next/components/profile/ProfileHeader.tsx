@@ -16,6 +16,7 @@ import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import LevelBadge from '@/components/LevelBadge';
 import { RankTierChip } from '@/components/seasons/RankTierChip';
 import { scoreTier } from '@/lib/seasons/scoreTier';
@@ -58,6 +59,9 @@ export function ProfileHeader({
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
   const equippedFrame = useEquippedCosmetic('profileFrame');
+  // Personal accent ring: only when the player picked a non-default style
+  // (accentHex non-null). Default users keep the neutral cyan ring → no change.
+  const { style: playerStyle } = usePlayerStyle();
   const avatarNudge = useAvatarCustomizationNudge();
 
   const startEditingName = (): void => {
@@ -146,7 +150,9 @@ export function ProfileHeader({
             className={cn(
               'relative rounded-full overflow-hidden',
               !equippedFrame || equippedFrame === 'frame-none'
-                ? 'ring-2 ring-neo-cyan/30 ring-offset-2 ring-offset-slate-800/40'
+                ? playerStyle.accentHex
+                  ? 'ring-4 ring-accent ring-offset-2 ring-offset-slate-800/40'
+                  : 'ring-2 ring-neo-cyan/30 ring-offset-2 ring-offset-slate-800/40'
                 : '',
               compact ? 'w-20 h-20' : 'w-24 h-24'
             )}

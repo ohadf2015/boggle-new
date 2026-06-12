@@ -1,5 +1,40 @@
 // Es translations
 const es = {
+  "playerStyle": {
+    "styles": {
+      "default": "Clásico",
+      "rock": "Rock",
+      "hasidic": "Klezmer",
+      "jazz": "Jazz",
+      "arabic": "Árabe",
+      "epic": "Épico",
+      "viking": "Vikingo",
+      "arcade": "Arcade",
+      "latin": "Latino",
+      "reggae": "Reggae",
+      "japanese": "Japonés",
+      "desert_epic": "Épico del desierto",
+      "fanfare": "Fanfarria"
+    },
+    "picker": {
+      "title": "Elige tu estilo",
+      "current": "Actual",
+      "confirm": "Elegir este estilo",
+      "apply": "Aplicar",
+      "matchAvatar": "Combinar mi avatar con este estilo",
+      "shuffleAvatar": "Mezclar"
+    },
+    "popup": {
+      "title": "Haz tuyo LexiClash",
+      "subtitle": "¡Nuevo! Elige un estilo de música y un color de acento. Cámbialo cuando quieras en Ajustes.",
+      "save": "Guardar mi estilo",
+      "keepDefault": "Mantener predeterminado"
+    },
+    "settings": {
+      "title": "Estilo",
+      "description": "Tu género musical y color de acento"
+    }
+  },
   "mpCoach": {
     "idleNudge": "Arrastra sobre las letras para formar una palabra",
     "tapHint": "Mantén y arrastra sobre las letras, luego suelta para enviar",

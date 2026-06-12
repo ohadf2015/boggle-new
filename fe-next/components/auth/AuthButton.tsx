@@ -12,6 +12,7 @@ import { signOut } from '../../lib/supabase';
 import dynamic from 'next/dynamic';
 const AuthModal = dynamic(() => import('./AuthModal'), { ssr: false });
 import Avatar from '../Avatar';
+import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import LevelBadge from '../LevelBadge';
 import { getLevelFromXp } from '../XpProgressBar';
 import { cn } from '../../lib/utils';
@@ -45,6 +46,8 @@ interface AuthButtonProps {
 const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: AuthButtonProps = {}): React.ReactElement | null => {
   const { t, language, setLanguage, dir } = useLanguage();
   const { isAuthenticated, profile, isSupabaseEnabled, loading, isAdmin, user } = useAuth();
+  // Personal accent ring around the header avatar when a non-default style is chosen.
+  const { style: playerStyle } = usePlayerStyle();
   const router = useRouter();
   const isDarkMode = true;
   const isRTL = dir === 'rtl';
@@ -211,7 +214,9 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
           )}
         >
-          <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
+          <span className={playerStyle.accentHex ? 'rounded-full ring-2 ring-accent ring-offset-1 ring-offset-neo-navy' : ''}>
+            <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
+          </span>
           <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
           {profile.total_xp !== undefined && (
             <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />

@@ -16,6 +16,7 @@ import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { MusicProvider } from '@/contexts/MusicContext';
+import { PlayerStyleProvider } from '@/contexts/PlayerStyleContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { HapticsProvider } from '@/contexts/HapticsContext';
 import { CoinProvider } from '@/contexts/CoinContext';
@@ -33,6 +34,7 @@ import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer'
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
 import { SignupPromptHost } from '@/components/auth/SignupPromptHost';
+import PlayerStyleOnboardingWrapper from './components/PlayerStyleOnboardingWrapper';
 import { UnlockNotifierMount } from '@/components/cosmetics/UnlockNotifierMount';
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
@@ -204,6 +206,9 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                             <AccessibilityProvider>
                             <MotionConfigProvider>
                                 {/* Active tier: changes during gameplay */}
+                                {/* PlayerStyle owns the chosen genre style; applies the accent
+                                    and is read by Music for the signature track. Above Music. */}
+                                <PlayerStyleProvider>
                                 <MusicProvider>
                                     <SoundEffectsProvider>
                                         <HapticsProvider>
@@ -233,6 +238,10 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 </HomeOnlySeasonGate>
                                                 {/* Global guest signup prompt — fires on first win or 5+ games regardless of mode. MP routes delegate to useMultiplayerSignupNudge. */}
                                                 <SignupPromptHost />
+                                                {/* One-time "pick your music/theme style" popup for existing users.
+                                                    Gated (shouldShowStylePopup): never double-prompts, defers to
+                                                    profile-customization, skips fresh-onboarding visitors. */}
+                                                <PlayerStyleOnboardingWrapper />
                                                 {/* Cosmetic unlock toast — global so rank-up/streak unlocks surface a
                                                     tap-to-equip deep-link wherever the player is, not just on profile. */}
                                                 <UnlockNotifierMount />
@@ -263,6 +272,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                         />
                                     </SoundEffectsProvider>
                                 </MusicProvider>
+                                </PlayerStyleProvider>
                             </MotionConfigProvider>
                         </AccessibilityProvider>
                     </CoinProvider>

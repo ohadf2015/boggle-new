@@ -1,5 +1,40 @@
 // Ja translations
 const ja = {
+  "playerStyle": {
+    "styles": {
+      "default": "クラシック",
+      "rock": "ロック",
+      "hasidic": "クレズマー",
+      "jazz": "ジャズ",
+      "arabic": "アラビック",
+      "epic": "エピック",
+      "viking": "バイキング",
+      "arcade": "アーケード",
+      "latin": "ラテン",
+      "reggae": "レゲエ",
+      "japanese": "和風",
+      "desert_epic": "砂漠の叙事詩",
+      "fanfare": "ファンファーレ"
+    },
+    "picker": {
+      "title": "あなたのスタイルを選ぼう",
+      "current": "現在",
+      "confirm": "このスタイルにする",
+      "apply": "適用",
+      "matchAvatar": "アバターをこのスタイルに合わせる",
+      "shuffleAvatar": "シャッフル"
+    },
+    "popup": {
+      "title": "LexiClashを自分好みに",
+      "subtitle": "新機能！音楽スタイルとアクセントカラーを選べます。設定でいつでも変更できます。",
+      "save": "スタイルを保存",
+      "keepDefault": "デフォルトのまま"
+    },
+    "settings": {
+      "title": "スタイル",
+      "description": "音楽ジャンルとアクセントカラー"
+    }
+  },
   "mpCoach": {
     "idleNudge": "文字をなぞって単語を作ろう",
     "tapHint": "文字を押しながらなぞり、指を離して送信しよう",

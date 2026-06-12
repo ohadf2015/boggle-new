@@ -1,5 +1,40 @@
 // HE translations
 const he = {
+  "playerStyle": {
+    "styles": {
+      "default": "קלאסי",
+      "rock": "רוק",
+      "hasidic": "חסידי",
+      "jazz": "ג'אז",
+      "arabic": "ערבי",
+      "epic": "אפי",
+      "viking": "ויקינגים",
+      "arcade": "ארקייד",
+      "latin": "לטיני",
+      "reggae": "רגאיי",
+      "japanese": "יפני",
+      "desert_epic": "אפי מדברי",
+      "fanfare": "תרועה"
+    },
+    "picker": {
+      "title": "בחרו את הסטייל שלכם",
+      "current": "נוכחי",
+      "confirm": "בחרו סטייל זה",
+      "apply": "החל",
+      "matchAvatar": "התאימו את האווטאר שלי לסטייל",
+      "shuffleAvatar": "ערבבו"
+    },
+    "popup": {
+      "title": "התאימו את LexiClash אליכם",
+      "subtitle": "חדש! בחרו סגנון מוזיקה וצבע הדגשה. אפשר לשנות בכל עת בהגדרות.",
+      "save": "שמרו את הסטייל שלי",
+      "keepDefault": "השאר ברירת מחדל"
+    },
+    "settings": {
+      "title": "סטייל",
+      "description": "סגנון המוזיקה וצבע ההדגשה שלכם"
+    }
+  },
   "mpCoach": {
     "idleNudge": "גררו על האותיות כדי לאיית מילה",
     "tapHint": "החזיקו וגררו על האותיות, ואז הרימו את האצבע לשליחה",

@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { StylePicker } from '@/components/playerStyle/StylePicker';
+import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import Image from 'next/image';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
@@ -155,6 +157,7 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode, labe
 export default function SettingsPageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language, setLanguage } = useLanguage();
+  const { enabled: playerStyleEnabled } = usePlayerStyle();
   const { volume: musicVolume, setVolume: setMusicVolume, isMuted: musicMuted, toggleMute: toggleMusicMute } = useMusic();
   const { sfxVolume, setSfxVolume, sfxMuted, toggleSfxMute } = useSoundEffects();
   const { settings, toggleFireRoundLights, toggleEarthquakeEffects, cycleReduceMotion, toggleCosyMode } = useAccessibility();
@@ -316,6 +319,30 @@ export default function SettingsPageClient(): React.JSX.Element {
               </SettingRow>
             </div>
           </m.section>
+
+          {/* Player Style — music genre + accent color (admin-only during testing) */}
+          {playerStyleEnabled && (
+          <m.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <h2 className={cn(
+              'text-sm font-black uppercase mb-1 flex items-center gap-2',
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            )}>
+              <Sparkles className="w-4 h-4" />
+              {t('playerStyle.settings.title')}
+            </h2>
+            <p className={cn(
+              'text-xs mb-3',
+              isDarkMode ? 'text-gray-500' : 'text-gray-500'
+            )}>
+              {t('playerStyle.settings.description')}
+            </p>
+            <StylePicker confirmLabelKey="playerStyle.picker.apply" />
+          </m.section>
+          )}
           </div>{/* end left column */}
 
           {/* Right column on xl: Accessibility + Support */}
