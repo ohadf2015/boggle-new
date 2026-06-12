@@ -103,7 +103,9 @@ export function computeGravityResult(
   );
   const newTileStates: BlastTileState[][] = Array.from({ length: gridSize }, () =>
     Array.from({ length: gridSize }, () => ({
-      uid: '', row: 0, col: 0, type: 'standard' as BlastTileType, isCleared: false, activationEffect: null, hitsRemaining: 0,
+      // Fail CLOSED: any cell the column loop never writes (jagged/mismatched
+      // input) stays cleared/invisible rather than a selectable blank tile.
+      uid: '', row: 0, col: 0, type: 'standard' as BlastTileType, isCleared: true, activationEffect: null, hitsRemaining: 0,
     }))
   );
   const clearedTiles: ClearedTile[] = [];
@@ -238,6 +240,29 @@ export function computeGravityResult(
           activationEffect: null,
           hitsRemaining: 0,
         };
+      }
+    }
+  }
+
+  // Invariant: a playable (non-cleared) cell must ALWAYS carry a letter.
+  // Gravity runs after every clear / cascade / explosion / vortex pull, so this
+  // single chokepoint repairs any blank stranded upstream (vortex letter-swap
+  // races, unseeded shuffle, server↔client board desync) — the cell keeps its
+  // tile identity but regains a glyph, so the board never renders a selectable
+  // empty tile. Uses the same neighbor-aware generator + RNG as refill, so
+  // seeded multiplayer refills stay deterministic in the (rare) repair case.
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      const ts = newTileStates[row]?.[col];
+      if (ts && !ts.isCleared && !newGrid[row]?.[col]) {
+        const neighbors: string[] = [];
+        const below = newGrid[row + 1]?.[col];
+        if (below) neighbors.push(below);
+        const left = newGrid[row]?.[col - 1];
+        if (left) neighbors.push(left);
+        const right = newGrid[row]?.[col + 1];
+        if (right) neighbors.push(right);
+        newGrid[row][col] = generateNonDuplicateLetter(language, rng ?? Math.random, neighbors, 5);
       }
     }
   }
