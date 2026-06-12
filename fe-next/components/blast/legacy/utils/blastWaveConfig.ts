@@ -276,7 +276,7 @@ export function getWaveConfig(wave: number): WaveConfig {
 
 // ==================== Wave Objectives ====================
 
-import type { BlastObjective } from '../types';
+import type { BlastObjective, BlastTileType } from '../types';
 import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
 
 /**
@@ -491,6 +491,45 @@ export const FUSE_SHARE = 0.08;
 export const ANCHOR_SHARE = 0.08;
 
 /**
+ * CURATED PERMANENT ROSTER (clarity pass, 2026-06).
+ *
+ * The wave 8-12 "revival staircase" (see getWaveDistribution docstring) used to
+ * re-enable ~20 special types at once, so a player past wave 8 faced a board
+ * flooded with effects that blur together — the "too many tile types, can't
+ * tell what they do" complaint. We permanently retire the redundant + hard-to-
+ * read ones so the roster never grows beyond the clear core the player already
+ * learned in the FTUE waves (bomb / ice / gold / rainbow / lightning / prism /
+ * frozen). Each kept tile owns one legible mechanic family.
+ *
+ * Retired here (zeroed at EVERY wave for BOTH client refill and server
+ * generation, since both roll on getWaveDistribution):
+ *   - magnet/vortex  : pull-then-explode is unreadable at a glance
+ *   - gem            : multi-hit treasure overlaps the reward read of gold
+ *   - diamond        : just a bigger gold multiplier
+ *   - countdown/fuse : two near-identical "timer → 3×3 blast" tiles
+ *   - shuffle        : rearranging the board disorients more than it delights
+ *   - magma/catalyst : diagonal/area clears that blur with bomb + lightning
+ *   - portal         : paired-portal scoring is too complex for a fast word game
+ *   - crystal        : passive between-turn multiplier with an invisible payoff
+ *
+ * Reversible: drop a type from this set to bring it back everywhere. This is the
+ * single curation lever — do not also edit the per-wave *Enabled flags.
+ */
+export const BLAST_RETIRED_SPECIAL_TYPES: ReadonlySet<BlastTileType> = new Set<BlastTileType>([
+  'magnet',
+  'gem',
+  'diamond',
+  'countdown',
+  'shuffle',
+  'magma',
+  'portal',
+  'catalyst',
+  'crystal',
+  'fuse',
+  'anchor',
+]);
+
+/**
  * Build tile distribution for a wave, gating special tiles by unlock progression.
  *
  * Candy Crush staircase unlock order:
@@ -647,6 +686,13 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     fuse,
     anchor,
   };
+
+  // Curation: zero every retired type before normalization so the freed weight
+  // redistributes across the kept roster (board stays full of specials, just
+  // fewer distinct kinds). Single lever for both client + server.
+  for (const t of BLAST_RETIRED_SPECIAL_TYPES) {
+    if (t in raw) raw[t] = 0;
+  }
 
   // Normalize to sum to 1.0 (avoids drift when many tiles are enabled)
   const sum = Object.values(raw).reduce((a, b) => a + b, 0);

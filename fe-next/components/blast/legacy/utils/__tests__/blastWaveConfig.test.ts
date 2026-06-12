@@ -7,6 +7,7 @@ import {
   getWaveObjectives,
   seedTargetWordObjective,
   seedColorPowerObjective,
+  BLAST_RETIRED_SPECIAL_TYPES,
 } from '../blastWaveConfig';
 
 /**
@@ -566,5 +567,43 @@ describe('wave completability invariants', () => {
     it('movesAllowed is at least 4 (minimum playable wave length)', () => {
       expect(getWaveConfig(wave).movesAllowed).toBeGreaterThanOrEqual(4);
     });
+  });
+});
+
+// ==================== Curated permanent roster (clarity pass) ====================
+// The wave 8-12 revival staircase used to flood the board with ~20 special
+// types. BLAST_RETIRED_SPECIAL_TYPES zeroes the redundant/confusing ones at
+// EVERY wave so the roster never grows past the clear FTUE core.
+describe('getWaveDistribution — curated permanent roster', () => {
+  const KEPT_CORE = ['bomb', 'ice', 'gold', 'rainbow', 'lightning', 'prism', 'frozen'] as const;
+
+  it('retires every flood tile at the highest waves (no revival)', () => {
+    for (const wave of [9, 12, 15, 20]) {
+      const dist = getWaveDistribution(getWaveConfig(wave));
+      for (const retired of BLAST_RETIRED_SPECIAL_TYPES) {
+        expect(dist[retired] ?? 0).toBe(0);
+      }
+    }
+  });
+
+  it('keeps the legible core spawning at high waves', () => {
+    const dist = getWaveDistribution(getWaveConfig(12));
+    for (const kept of KEPT_CORE) {
+      expect(dist[kept] ?? 0).toBeGreaterThan(0);
+    }
+  });
+
+  it('still normalizes to ~1.0 after curation at high waves', () => {
+    for (const wave of [9, 12, 15]) {
+      const dist = getWaveDistribution(getWaveConfig(wave));
+      const sum = (Object.values(dist) as number[]).reduce((a, b) => a + b, 0);
+      expect(sum).toBeCloseTo(1.0, 1);
+    }
+  });
+
+  it('does not retire any tile the FTUE deliberately keeps', () => {
+    for (const kept of KEPT_CORE) {
+      expect(BLAST_RETIRED_SPECIAL_TYPES.has(kept as never)).toBe(false);
+    }
   });
 });
