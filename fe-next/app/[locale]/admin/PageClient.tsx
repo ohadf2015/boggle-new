@@ -25,6 +25,7 @@ import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
 import { MpModeBreakdown } from '@/components/admin/overview/MpModeBreakdown';
 import { DailyActivityChart } from '@/components/admin/overview/DailyActivityChart';
+import { DeploymentInfoPanel } from '@/components/admin/overview/DeploymentInfoPanel';
 
 export default function AdminPageClient() {
   const router = useRouter();
@@ -137,6 +138,7 @@ export default function AdminPageClient() {
               <DailyActivityChart authToken={authToken} />
               <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
               <TodayGamesHistory authToken={authToken} />
+              <DeploymentInfoPanel authToken={authToken} />
 
               <div id="indexnow" className="mt-8">
                 <IndexNowPanel />

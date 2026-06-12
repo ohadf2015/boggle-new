@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-06-12T14:43:31.856Z",
+  "commits": [
+    {
+      "sha": "f1d7bb30ed68018f5d5cce764c496057495ac5aa",
+      "shortSha": "f1d7bb3",
+      "subject": "fix(mp): wheel orbit parity (96→136) + auto-advance pre-result fanfare",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:43:08+03:00"
+    },
+    {
+      "sha": "e77fd354d16e24dfd58587932e07fdd3fad29665",
+      "shortSha": "e77fd35",
+      "subject": "refactor(rng): consolidate 16 seeded PRNG/hash copies into lib/rng",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:36:28+03:00"
+    },
+    {
+      "sha": "056835aa1ee4c62c749a0f4766c42c0617ffd9e2",
+      "shortSha": "056835a",
+      "subject": "feat(results): MP rivals + improvement panels for all modes",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:35:45+03:00"
+    },
+    {
+      "sha": "259583eafdf5f0cf945448b1f98b7ad3298ccd87",
+      "shortSha": "259583e",
+      "subject": "perf(pixi): gate always-on ambient tickers when hidden + cache wheel rect",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:28:25+03:00"
+    },
+    {
+      "sha": "c030d6de7e5f941f34078111dfe51c6328e7d5b6",
+      "shortSha": "c030d6d",
+      "subject": "fix(daily): lift word-hunt results tab bar above AdMob banner",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:28:02+03:00"
+    },
+    {
+      "sha": "14c337c6e4fe872223ef16c810b6a95777745778",
+      "shortSha": "14c337c",
+      "subject": "feat(landing): dark mascot cubes for the 9 admin \"+More\" modes",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:26:56+03:00"
+    },
+    {
+      "sha": "54eb1928de0b372bf71a4b8b665a61154d1836eb",
+      "shortSha": "54eb192",
+      "subject": "fix(admin): record real words-found in MP game logs (was hardcoded empty)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:23:49+03:00"
+    },
+    {
+      "sha": "38348685deed1b64736a9758095bfdb24f93fa0b",
+      "shortSha": "3834868",
+      "subject": "fix(blast): use defined i18n key for first-use callout button",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:19:41+03:00"
+    },
+    {
+      "sha": "de94d8a9f35dbeed656cb7c69c456103ab4b8bfc",
+      "shortSha": "de94d8a",
+      "subject": "feat(landing): dark mascot cube bento — color from art, not the tile",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:18:48+03:00"
+    },
+    {
+      "sha": "779353ed8d873f0c8a6f22f5c54463eaf7ed840f",
+      "shortSha": "779353e",
+      "subject": "fix(mp): stop useMultiplayerSocket clobbering shared-socket connection listeners",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:08:19+03:00"
+    },
+    {
+      "sha": "80c4cc91f2cd8a274a500cdaffbc02485a31cae8",
+      "shortSha": "80c4cc9",
+      "subject": "feat(blast): teach each special tile the first time it appears",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:04:37+03:00"
+    },
+    {
+      "sha": "8ce781a1e900e2906d5b449f869381ca24cd661f",
+      "shortSha": "8ce781a",
+      "subject": "feat(brain): wire drill feedback + celebration audio",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T16:55:09+03:00"
+    },
+    {
+      "sha": "49c93cc9bb15c4afe7e0b6809b7c2dac4ea071fd",
+      "shortSha": "49c93cc",
+      "subject": "feat(blast): curate special-tile roster — retire the wave 8+ flood",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T16:51:19+03:00"
+    },
+    {
+      "sha": "fb8425080af764a707e4281e9e3a6d585b1b04a1",
+      "shortSha": "fb84250",
+      "subject": "perf(blast): skip the always-on Pixi FX overlay on low-end devices",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T16:35:50+03:00"
+    },
+    {
+      "sha": "c4e447c2ffb66eb028175f6bd280b61f3d27cc4a",
+      "shortSha": "c4e447c",
+      "subject": "fix(blast): repair stranded blank tiles at gravity chokepoint",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T16:28:47+03:00"
+    },
+    {
+      "sha": "3f5441d42307d369648c716aa5f52a98c7294a64",
+      "shortSha": "3f5441d",
+      "subject": "feat(landing): bento daily cube + compress cube art (flag landing-daily-cube-v1)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T15:40:11+03:00"
+    },
+    {
+      "sha": "4801310ac45fc0bcbc6936f190f7f91693e2af5f",
+      "shortSha": "4801310",
+      "subject": "feat(blast): theme emoji on the HUD theme label",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T14:25:41+03:00"
+    },
+    {
+      "sha": "d026495e0b54a3a17321c4361b0e6f8f5fbcf565",
+      "shortSha": "d026495",
+      "subject": "feat(blast): rebrand Blast V2 as \"Wordfall\" with its own logo",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T14:23:18+03:00"
+    },
+    {
+      "sha": "e546825f7269bbab6360588afe70798afa5c0caa",
+      "shortSha": "e546825",
+      "subject": "feat(blast): gate target-word clue strip to first 3 levels only",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T14:18:04+03:00"
+    },
+    {
+      "sha": "a47a0dda801a8062c39d8add9ae4857fda916224",
+      "shortSha": "a47a0dd",
+      "subject": "fix(blast): chest reward never opened + result flow w/ prefanfare",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T14:14:24+03:00"
+    }
+  ]
+}
