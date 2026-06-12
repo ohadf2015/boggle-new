@@ -4,6 +4,8 @@ import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BlastLevel } from '@/lib/blast/v2/types';
 import { LEVEL_MODIFIER_INTRO_KEYS } from '@/lib/blast/v2/level-modifiers';
+import { WordfallLogo } from './WordfallLogo';
+import { themeEmoji } from '@/lib/blast/v2/themeEmoji';
 
 const MODE_COLORS: Record<string, string> = {
   fruits: '#BFFF00', animals: '#00FFFF', food: '#FF1493', ocean: '#00FFFF',
@@ -36,9 +38,17 @@ export function BlastLevelIntroCard({ level, onDismiss }: { level: BlastLevel; o
     >
       <div className="space-y-3 text-center px-6">
         <m.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex justify-center"
+        >
+          <WordfallLogo variant="wordmark" size={34} color={modeColor} />
+        </m.div>
+        <m.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
+          transition={{ duration: 0.25, delay: 0.05 }}
           className="text-xs uppercase tracking-[0.3em] opacity-70"
         >
           {t('blast.intro.level', `Level ${level.levelNumber}`, { n: String(level.levelNumber) })}
@@ -47,10 +57,11 @@ export function BlastLevelIntroCard({ level, onDismiss }: { level: BlastLevel; o
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.1, type: 'spring', stiffness: 360 }}
-          className="text-4xl font-black uppercase tracking-wide"
+          className="flex items-center justify-center gap-2 text-4xl font-black uppercase tracking-wide"
           style={{ color: modeColor, textShadow: `3px 3px 0 #0b1530` }}
         >
-          {t(`blast.themes.${level.theme}`, level.theme)}
+          <span aria-hidden style={{ textShadow: 'none' }}>{themeEmoji(level.theme)}</span>
+          <span>{t(`blast.themes.${level.theme}`, level.theme)}</span>
         </m.div>
         <m.div
           initial={{ opacity: 0 }}

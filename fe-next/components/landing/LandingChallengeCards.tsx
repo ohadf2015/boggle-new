@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layers, Building2, Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel, Grid3x3 } from 'lucide-react';
 import ModeCard from './ModeCard';
+import { WordfallLogo } from '@/components/blast/v2/WordfallLogo';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
@@ -327,9 +328,9 @@ export function LandingChallengeCards({
               title={t('landing.blastV2')}
               description={t('landing.blastV2Desc')}
               href={`/${language}/blast/v2`}
-              icon={<Bomb className="w-6 h-6" />}
+              icon={<WordfallLogo size={26} color="#fff" />}
               variant="purple"
-              badge="V2"
+              badge="NEW"
               onClick={() => { trackLandingCtaClick('mode_card', { mode: 'blastV2', variant: 'purple' }); }}
             />
           </div>
