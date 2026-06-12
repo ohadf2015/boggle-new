@@ -1,4 +1,5 @@
 import type { BlastTileState } from '@/shared/types/blast';
+import { mulberry32 } from '@/lib/rng/seededRandom';
 
 export type Cell = { row: number; col: number };
 
@@ -8,18 +9,6 @@ export interface SpreadOptions {
   seed: number;
   /** Cells in the word the player just played. If any are chocolate, spread is contained. */
   usedCells?: readonly Cell[];
-}
-
-// mulberry32 — same shape as the rest of the blast deterministic-seed code.
-function mulberry32(seed: number) {
-  let s = seed >>> 0;
-  return () => {
-    s = (s + 0x6d2b79f5) >>> 0;
-    let t = s;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 export function isChocolateContained(grid: BlastTileState[][], usedCells: readonly Cell[]): boolean {

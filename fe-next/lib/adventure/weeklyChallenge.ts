@@ -6,6 +6,8 @@
  * Challenge resets every Monday at 00:00 UTC.
  */
 
+import { mulberry32 } from '@/lib/rng/seededRandom';
+
 /**
  * Get the current week identifier (YYYY-WNN format).
  * Used as the seed for grid generation.
@@ -34,19 +36,6 @@ export function getTimeUntilReset(now: Date = new Date()): number {
     0, 0, 0
   ));
   return nextMonday.getTime() - now.getTime();
-}
-
-/**
- * Seeded PRNG (mulberry32) for deterministic grid generation.
- */
-function mulberry32(seed: number): () => number {
-  let s = seed | 0;
-  return () => {
-    s = (s + 0x6D2B79F5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 /**

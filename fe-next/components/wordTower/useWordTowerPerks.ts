@@ -7,26 +7,7 @@ import {
   type PerkId,
   type PerkModifiers,
 } from '@/lib/wordTower/perks';
-
-/** Tiny seeded PRNG (mulberry32) — deterministic perk drafts per daily seed. */
-function mulberry32(seed: number): () => number {
-  let s = seed >>> 0;
-  return () => {
-    s = (s + 0x6d2b79f5) >>> 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function hashSeed(str: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
+import { mulberry32, fnv1aHash } from '@/lib/rng/seededRandom';
 
 /**
  * useWordTowerPerks — owns the daily-run roguelike draft. When `enabled` (daily
@@ -44,7 +25,7 @@ export function useWordTowerPerks(enabled: boolean, seed: string) {
   const offerDraft = useCallback((milestoneIdx: number) => {
     if (!enabled || draftedMilestones.current.has(milestoneIdx)) return;
     draftedMilestones.current.add(milestoneIdx);
-    const rng = mulberry32(hashSeed(`${seed}:${milestoneIdx}`));
+    const rng = mulberry32(fnv1aHash(`${seed}:${milestoneIdx}`));
     const choices = drawPerkChoices(rng, ownedRef.current, 3);
     if (choices.length > 0) setDraft(choices);
   }, [enabled, seed]);

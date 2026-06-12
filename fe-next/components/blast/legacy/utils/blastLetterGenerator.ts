@@ -1,5 +1,6 @@
 import type { Language } from '@/shared/types/game';
 import { SPECIAL_TILE_DISTRIBUTION, type BlastTileType } from '../types';
+import { mulberry32 } from '@/lib/rng/seededRandom';
 
 /**
  * Mulberry32 seeded PRNG — fast, high-quality 32-bit generator.
@@ -7,13 +8,7 @@ import { SPECIAL_TILE_DISTRIBUTION, type BlastTileType } from '../types';
  * Used in multiplayer blast to ensure deterministic tile refills across clients.
  */
 export function createSeededRandom(seed: number): () => number {
-  let s = seed >>> 0;
-  return function mulberry32(): number {
-    s |= 0; s = s + 0x6D2B79F5 | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+  return mulberry32(seed);
 }
 
 /**

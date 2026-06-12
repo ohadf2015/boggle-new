@@ -5,6 +5,7 @@ import {
   type GemColor,
   type GemRarity,
 } from './types';
+import { mulberry32 } from '@/lib/rng/seededRandom';
 
 /** Target on-board gem count at any time. Chosen so 4 colors fit comfortably. */
 export const DEFAULT_TARGET_COUNT = 8;
@@ -15,19 +16,6 @@ const RARITY_WEIGHTS: Record<GemRarity, number> = {
   2: 30,
   3: 10,
 };
-
-/** Mulberry32 — small deterministic PRNG. Same seed → same gem layout. */
-function mulberry32(seed: number) {
-  let a = seed >>> 0;
-  return function next(): number {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 function rollRarity(rand: () => number): GemRarity {
   const total = RARITY_WEIGHTS[1] + RARITY_WEIGHTS[2] + RARITY_WEIGHTS[3];

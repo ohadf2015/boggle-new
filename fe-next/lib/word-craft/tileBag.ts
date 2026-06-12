@@ -5,6 +5,7 @@ import * as he from './tileBags/he';
 import * as es from './tileBags/es';
 import * as ja from './tileBags/ja';
 import { scaleDistribution } from './tileBag.scaler';
+import { mulberry32 } from '@/lib/rng/seededRandom';
 
 export const RACK_SIZE = 7;
 export const TOTAL_TILES = 100;
@@ -43,18 +44,6 @@ export interface CreateBagOptions {
   seed: number;
   locale?: SupportedLocale;
   bagSize?: number;  // when set and < full, scales distribution proportionally
-}
-
-function mulberry32(seed: number): () => number {
-  let a = seed >>> 0;
-  return function () {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 function shuffleInPlace<T>(arr: T[], rng: () => number): void {

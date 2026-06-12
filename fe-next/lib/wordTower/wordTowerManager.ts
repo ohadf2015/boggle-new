@@ -28,26 +28,9 @@ import {
   WORD_TOWER_LETTER_BAGS,
   type WordTowerBiomeId,
 } from '@/shared/constants/wordTowerConstants';
+import { mulberry32, fnv1aHash } from '@/lib/rng/seededRandom';
 
-// --- deterministic RNG (same primitives as wheelRushManager) ---
-function hashString(s: string): number {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-function mulberry32(seed: number): () => number {
-  let a = seed;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+// --- deterministic RNG (imported from @/lib/rng/seededRandom) ---
 
 // --- canonical form for matching + chain comparison ---
 /** Sanitize, normalize per language (sofit→regular, accent-strip), uppercase. */
@@ -95,7 +78,7 @@ export function generateTray(
 ): string[] {
   const bag = [...(WORD_TOWER_LETTER_BAGS[language] || '')];
   if (bag.length === 0) return [];
-  const rng = mulberry32(hashString(`word-tower-${gameCode}-${playerId}-${drawIndex}`));
+  const rng = mulberry32(fnv1aHash(`word-tower-${gameCode}-${playerId}-${drawIndex}`));
   const out: string[] = [];
   for (let i = 0; i < count; i++) {
     out.push(bag[Math.floor(rng() * bag.length)]);
@@ -117,7 +100,7 @@ function pickAnchor(gameCode: string, playerId: string, language: Language, avoi
   const weak = avoidWeak ? (WEAK_ANCHOR_LETTERS[language] || '') : '';
   const bag = weak ? full.filter((c) => !weak.includes(c)) : full;
   const pool = bag.length > 0 ? bag : full;
-  const rng = mulberry32(hashString(`word-tower-${gameCode}-${playerId}-anchor`));
+  const rng = mulberry32(fnv1aHash(`word-tower-${gameCode}-${playerId}-anchor`));
   return pool[Math.floor(rng() * pool.length)];
 }
 
@@ -402,7 +385,7 @@ export function rerollStart(
   let anchorLetter = state.anchorLetter;
   let tray = state.tray;
   for (let attempt = 0; attempt < 16; attempt++) {
-    const a = bag[Math.floor(mulberry32(hashString(`word-tower-${state.gameCode}-${state.playerId}-reanchor-${draw}`))() * bag.length)];
+    const a = bag[Math.floor(mulberry32(fnv1aHash(`word-tower-${state.gameCode}-${state.playerId}-reanchor-${draw}`))() * bag.length)];
     const tr = generateTray(state.gameCode, state.playerId, state.language, draw + 1, WORD_TOWER_TRAY_SIZE);
     anchorLetter = a;
     tray = tr;
