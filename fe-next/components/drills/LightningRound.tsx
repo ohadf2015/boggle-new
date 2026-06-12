@@ -10,6 +10,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { useDrillGameActive } from '@/hooks/useDrillGameActive';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import LightningRoundCompletePhase from './LightningRoundCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
@@ -60,7 +61,13 @@ export default function LightningRound({
   onPlayAgain,
 }: LightningRoundProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
+  const {
+    playErrorSound,
+    playDrillStartSound,
+    playDrillCompleteSound,
+    playWordAcceptedSound,
+    playTimerUrgentSound,
+  } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -92,6 +99,16 @@ export default function LightningRound({
     onWordSubmit: (word: string) => handleWordSubmit(word),
     minWordLength: 2,
   });
+
+  // Drill sounds no-op unless the game is flagged active (see useDrillGameActive)
+  useDrillGameActive(phase === 'playing');
+
+  // Final-seconds urgency cue — fires once when the clock crosses 5s
+  useEffect(() => {
+    if (phase === 'playing' && timeRemaining === 5) {
+      playTimerUrgentSound();
+    }
+  }, [phase, timeRemaining, playTimerUrgentSound]);
 
   // Start game
   const startGame = useCallback(() => {
@@ -136,13 +153,14 @@ export default function LightningRound({
     const wordScore = calculateWordScore(word);
     setScore(prev => prev + wordScore);
     setLastWordScore(wordScore);
+    playWordAcceptedSound();
 
     setFeedback({ message: `+${wordScore} ${t('brain.drills.points')}`, type: 'success' });
     setTimeout(() => {
       setLastWordScore(null);
       setFeedback(null);
     }, 1000);
-  }, [validateWord, t]);
+  }, [validateWord, t, playWordAcceptedSound]);
 
   // Calculate results
   const getResults = useCallback(() => {

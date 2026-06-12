@@ -43,7 +43,7 @@ export function useMemoryHuntGame({
   language,
   onComplete,
 }: UseMemoryHuntGameProps) {
-  const { playErrorSound } = useSoundEffects();
+  const { playErrorSound, playWordAcceptedSound } = useSoundEffects();
 
   // Get level config
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
@@ -238,6 +238,7 @@ export function useMemoryHuntGame({
 
       const wordPoints = calculateWordScore(word) * round;
       setScore(prev => prev + wordPoints);
+      playWordAcceptedSound();
 
       setLastFeedback('correct');
       setPhase('feedback');
@@ -290,7 +291,7 @@ export function useMemoryHuntGame({
       setPhase('feedback');
       playErrorSound?.();
     }
-  }, [phase, targetWords, round, startRound, grid, language, playErrorSound, firstMissUsedThisRound]);
+  }, [phase, targetWords, round, startRound, grid, language, playErrorSound, playWordAcceptedSound, firstMissUsedThisRound]);
 
   // Calculate final results
   const results = useMemo(() => {

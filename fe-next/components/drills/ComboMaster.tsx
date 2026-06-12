@@ -10,6 +10,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { useDrillGameActive } from '@/hooks/useDrillGameActive';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import ComboMasterCompletePhase from './ComboMasterCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
@@ -59,7 +60,14 @@ export default function ComboMaster({
   onPlayAgain,
 }: ComboMasterProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
+  const {
+    playErrorSound,
+    playDrillStartSound,
+    playDrillCompleteSound,
+    playWordAcceptedSound,
+    playComboMilestoneSound,
+    playComboBreakSound,
+  } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -100,6 +108,9 @@ export default function ComboMaster({
     minWordLength: 2,
   });
 
+  // Drill sounds no-op unless the game is flagged active (see useDrillGameActive)
+  useDrillGameActive(phase === 'playing');
+
   // Start combo timer
   const startComboTimer = useCallback(() => {
     if (comboTimerRef.current) clearInterval(comboTimerRef.current);
@@ -118,6 +129,7 @@ export default function ComboMaster({
   // Handle combo break when timer reaches 0
   useEffect(() => {
     if (comboTimer === 0 && phase === 'playing') {
+      if (comboRef.current > 0) playComboBreakSound(comboRef.current);
       setCombo(0);
       comboRef.current = 0;
       comboBreaksRef.current += 1;
@@ -130,7 +142,7 @@ export default function ComboMaster({
         setComboTimer(levelConfig.comboTimeout);
       }
     }
-  }, [comboTimer, phase, levelConfig.comboTimeout]);
+  }, [comboTimer, phase, levelConfig.comboTimeout, playComboBreakSound]);
 
   // Start game
   const startGame = useCallback(() => {
@@ -175,6 +187,14 @@ export default function ComboMaster({
 
     setScore(prev => prev + wordScore);
 
+    // Audio escalation: milestone "ding" at the rungs the sound system supports,
+    // a lighter accept tone otherwise. Without this the combo loop was silent.
+    if (newCombo === 5 || newCombo === 10 || newCombo === 15) {
+      playComboMilestoneSound(newCombo);
+    } else {
+      playWordAcceptedSound();
+    }
+
     setFeedback({ message: `+${wordScore} ${t('brain.drills.points')} x${newCombo}`, type: 'success' });
     setTimeout(() => setFeedback(null), 1000);
     startComboTimer();
@@ -183,7 +203,7 @@ export default function ComboMaster({
       if (comboTimerRef.current) clearInterval(comboTimerRef.current);
       setPhase('complete');
     }
-  }, [validateWord, startComboTimer, levelConfig.targetCombo, t]);
+  }, [validateWord, startComboTimer, levelConfig.targetCombo, t, playComboMilestoneSound, playWordAcceptedSound]);
 
   // Calculate results
   const getResults = useCallback(() => {

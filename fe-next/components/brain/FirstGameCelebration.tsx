@@ -7,6 +7,7 @@ import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 
 interface FirstGameCelebrationProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ export default function FirstGameCelebration({
 }: FirstGameCelebrationProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { playAchievementSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -53,12 +55,14 @@ export default function FirstGameCelebration({
   useEffect(() => {
     if (isOpen) {
       setShowConfetti(true);
+      // Cheer + haptic so this milestone lands as a memory, not just visuals.
+      playAchievementSound();
       // Stop confetti after 3 seconds
       const timer = setTimeout(() => setShowConfetti(false), 3000);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [isOpen]);
+  }, [isOpen, playAchievementSound]);
 
   if (!isOpen) return null;
 

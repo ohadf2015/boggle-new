@@ -55,12 +55,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({
-  useSoundEffects: () => ({
-    playErrorSound: vi.fn(),
-    playDrillStartSound: vi.fn(),
-    playDrillCompleteSound: vi.fn(),
-    playSuccessSound: vi.fn(),
-  }),
+  // Any sound fn (and setGameActive) resolves to a no-op spy; these tests don't
+  // assert audio, they just need drill sound/game-active calls to not throw.
+  useSoundEffects: () => new Proxy({}, { get: () => vi.fn() }),
 }));
 
 vi.mock('@/contexts/AccessibilityContext', () => ({

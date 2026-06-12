@@ -170,9 +170,12 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
   const playEpicVictorySound = useCallback(() => { playSound('epicVictory', { volume: 0.9, requiresGameActive: false }); haptics.legendary(); }, [playSound]);
   const playStreakLegendarySound = useCallback(() => { playSound('streakLegendary', { volume: 0.8, requiresGameActive: false }); haptics.legendary(); }, [playSound]);
 
-  // New game mode sounds
-  const playDrillStartSound = useCallback(() => { playSound('drillStart', { volume: 0.7 }); }, [playSound]);
-  const playDrillCompleteSound = useCallback(() => { playSound('drillComplete', { volume: 0.8 }); haptics.success(); }, [playSound]);
+  // New game mode sounds. Drill start/complete are lifecycle bookends that fire
+  // OUTSIDE the active window (start: ready->playing transition; complete: after
+  // game-active is cleared), so they must bypass the game-active guard or they
+  // stay silent — same opt-out the other lifecycle sounds use.
+  const playDrillStartSound = useCallback(() => { playSound('drillStart', { volume: 0.7, requiresGameActive: false }); }, [playSound]);
+  const playDrillCompleteSound = useCallback(() => { playSound('drillComplete', { volume: 0.8, requiresGameActive: false }); haptics.success(); }, [playSound]);
   const playWheelSpinSound = useCallback(() => { playSound('wheelSpin', { volume: 0.6, requiresGameActive: false }); }, [playSound]);
   const playFlashChallengeSound = useCallback(() => { playSound('flashChallenge', { volume: 0.7 }); haptics.tap(); }, [playSound]);
   const playWordRevealSound = useCallback(() => { playSound('wordReveal', { volume: 0.6, requiresGameActive: false }); }, [playSound]);

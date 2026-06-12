@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { useDrillGameActive } from '@/hooks/useDrillGameActive';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -53,6 +54,11 @@ export default function MemoryHunt({
   });
 
   useFocusTrap(studyModalRef, game.phase === 'study' && game.showStudyModal);
+
+  // Drill sounds no-op unless the game is flagged active (see useDrillGameActive)
+  useDrillGameActive(
+    game.phase === 'study' || game.phase === 'recall' || game.phase === 'feedback',
+  );
 
   // Play drill complete sound when game finishes
   useEffect(() => {

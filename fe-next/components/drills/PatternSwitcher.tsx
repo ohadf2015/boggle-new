@@ -8,6 +8,7 @@ import GridComponent from '@/components/GridComponent';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { useDrillGameActive } from '@/hooks/useDrillGameActive';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import PatternSwitcherCompletePhase from './PatternSwitcherCompletePhase';
@@ -58,7 +59,13 @@ export default function PatternSwitcher({
   onPlayAgain,
 }: PatternSwitcherProps) {
   const { t, dir } = useLanguage();
-  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
+  const {
+    playErrorSound,
+    playDrillStartSound,
+    playDrillCompleteSound,
+    playWordAcceptedSound,
+    playPerfectWordSound,
+  } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -85,6 +92,9 @@ export default function PatternSwitcher({
     onWordSubmit: (word: string) => handleWordSubmit(word),
     minWordLength: 2,
   });
+
+  // Drill sounds no-op unless the game is flagged active (see useDrillGameActive)
+  useDrillGameActive(phase === 'playing' || phase === 'feedback');
 
   // Generate available lengths from words that actually exist on the board
   const availableLengths = [...new Set(availableWords.map(w => w.word.length))].sort();
@@ -178,6 +188,7 @@ export default function PatternSwitcher({
       setWordsFound(prev => [...prev, upperWord]);
       const wordScore = calculateWordScore(word);
       setScore(prev => prev + wordScore);
+      playWordAcceptedSound();
 
       // Show positive feedback using WordFormingArea component
       setCurrentFeedback({
@@ -194,9 +205,10 @@ export default function PatternSwitcher({
         // Move to next in pattern
         const nextIndex = patternIndex + 1;
         if (nextIndex >= pattern.length) {
-          // Pattern completed!
+          // Pattern completed! Reward the discrete win moment with a flourish.
           setPatternsCompleted(prev => prev + 1);
           setScore(prev => prev + 100); // Bonus
+          playPerfectWordSound();
 
           // Generate new pattern — if board exhausted, end with bonus
           const newPattern = generatePattern();
@@ -232,7 +244,7 @@ export default function PatternSwitcher({
         }
       }, 800);
     }
-  }, [phase, availableWords, requiredLength, patternIndex, pattern, lives, generatePattern, playErrorSound, t]);
+  }, [phase, availableWords, requiredLength, patternIndex, pattern, lives, generatePattern, playErrorSound, playWordAcceptedSound, playPerfectWordSound, t]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {

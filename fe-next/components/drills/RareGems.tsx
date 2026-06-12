@@ -10,6 +10,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { useDrillGameActive } from '@/hooks/useDrillGameActive';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import DrillBriefing from '@/components/brain/DrillBriefing';
 import RareGemsCompletePhase from './RareGemsCompletePhase';
@@ -125,6 +126,11 @@ export default function RareGems({
     onWordSubmit: (word: string) => handleWordSubmit(word),
     minWordLength: 2,
   });
+
+  // Drill sounds no-op unless the game is flagged active (see useDrillGameActive).
+  // Without this, RareGems' rare/legendary word sounds were silently dropped —
+  // only the pouch-full chime (requiresGameActive:false) was ever audible.
+  useDrillGameActive(phase === 'playing');
 
   const progress = computeGemProgress(wordsFound, levelConfig.targetRare);
   const rareWordsFound = progress.rareCount;

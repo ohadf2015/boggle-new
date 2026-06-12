@@ -6,6 +6,8 @@ import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins, Trop
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { pickProgressionSound } from '@/lib/drills/progressionSound';
 import type { CognitiveDomain, BrainTier } from '@/shared/types/cognitive';
 import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 
@@ -162,6 +164,7 @@ export default function DrillProgressionOverlay({
 }: DrillProgressionOverlayProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { playLevelUpModalSound, playAchievementSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
   const improvementBadge = pickImprovementBadge(improvement);
   const ImprovementIcon = improvementBadge?.Icon;
@@ -171,6 +174,15 @@ export default function DrillProgressionOverlay({
 
   const domainConfig = DOMAIN_CONFIG[targetDomain];
   const Icon = domainConfig.icon;
+
+  // Celebration audio + haptic on open — reserved for genuine milestones so it
+  // doesn't double up on the in-drill complete sound (see pickProgressionSound).
+  useEffect(() => {
+    if (!isOpen) return;
+    const kind = pickProgressionSound({ levelUp, improvement });
+    if (kind === 'levelUp') playLevelUpModalSound();
+    else if (kind === 'personalBest') playAchievementSound();
+  }, [isOpen, levelUp, improvement, playLevelUpModalSound, playAchievementSound]);
 
   // Animate sequence
   useEffect(() => {

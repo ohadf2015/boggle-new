@@ -18,11 +18,8 @@ vi.mock('@/utils/utils', () => ({
 }));
 
 vi.mock('@/contexts/SoundEffectsContext', () => ({
-  useSoundEffects: () => ({
-    playErrorSound: vi.fn(),
-    playDrillStartSound: vi.fn(),
-    playDrillCompleteSound: vi.fn(),
-  }),
+  // Any sound fn resolves to a no-op spy; this test asserts game state, not audio.
+  useSoundEffects: () => new Proxy({}, { get: () => vi.fn() }),
 }));
 
 import { useMemoryHuntGame } from '../useMemoryHuntGame';
