@@ -1,22 +1,33 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { PreResultFanfare } from '../PreResultFanfare';
 import type { MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 
-// Mock the inner video component so we can control onDone easily (TDD isolation)
+// Mock the inner video component. It honours `autoDismissMs` exactly like the
+// real MascotCelebrationVideo (timer → onDone) so we can verify the fanfare
+// auto-advances on its own, not only via the skip button.
 vi.mock('@/components/mascot/MascotCelebrationVideo', () => ({
-  MascotCelebrationVideo: ({ kind, onDone, overlay, forceSrc }: any) => (
-    <div
-      data-testid="inner-celebration-video"
-      data-kind={kind}
-      data-overlay={overlay}
-      data-force-src={forceSrc}
-    >
-      <button data-testid="trigger-done" onClick={onDone}>
-        Simulate Video Done
-      </button>
-    </div>
-  ),
+  MascotCelebrationVideo: ({ kind, onDone, overlay, forceSrc, autoDismissMs }: any) => {
+    React.useEffect(() => {
+      if (!autoDismissMs || autoDismissMs <= 0) return;
+      const t = window.setTimeout(() => onDone?.(), autoDismissMs);
+      return () => window.clearTimeout(t);
+    }, [autoDismissMs, onDone]);
+    return (
+      <div
+        data-testid="inner-celebration-video"
+        data-kind={kind}
+        data-overlay={overlay}
+        data-force-src={forceSrc}
+        data-auto-dismiss-ms={autoDismissMs}
+      >
+        <button data-testid="trigger-done" onClick={onDone}>
+          Simulate Video Done
+        </button>
+      </div>
+    );
+  },
 }));
 
 // canvas-confetti is dynamically imported inside the component — hoisted mock
@@ -73,6 +84,27 @@ describe('PreResultFanfare — pre-result video then transition to results', () 
     // The component uses a short exit animation timeout before calling onComplete
     act(() => {
       vi.advanceTimersByTime(500);
+    });
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('auto-advances to the result page on its own — no skip click required', () => {
+    // REGRESSION: the fanfare passed autoDismissMs={0} to a LOOPing video, so
+    // onEnded never fired and the timer was disabled — the only way out was the
+    // skip button. A player who looked away was stranded on the celebration.
+    const onComplete = vi.fn();
+    render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+    // It must arm a real auto-dismiss timer (non-zero), unlike before.
+    const inner = screen.getByTestId('inner-celebration-video');
+    expect(Number(inner.dataset.autoDismissMs)).toBeGreaterThan(0);
+
+    expect(onComplete).not.toHaveBeenCalled();
+
+    // Let the clip play out + the exit animation settle — no interaction at all.
+    act(() => {
+      vi.advanceTimersByTime(6000);
     });
 
     expect(onComplete).toHaveBeenCalledTimes(1);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeWheelRadius, WHEEL_LETTER_ALLOWANCE_PX } from '../wheelGeometry';
+import { computeWheelRadius, selectWheelRadius, WHEEL_LETTER_ALLOWANCE_PX } from '../wheelGeometry';
 
 describe('computeWheelRadius', () => {
   it('keeps outer letters inside the rim: radius ≈ (width − one letter)/2', () => {
@@ -67,5 +67,40 @@ describe('computeWheelRadius', () => {
     expect(computeWheelRadius(60, 88, 40, 44)).toBe(40);
     // Large box → capped to the (lower) short maxRadius.
     expect(computeWheelRadius(400, 88, 40, 44)).toBe(88);
+  });
+});
+
+describe('selectWheelRadius — single source of truth for daily + multiplayer wheels', () => {
+  it('uses the SAME orbit cap (136) for a normal mobile wheel in both modes', () => {
+    // REGRESSION GUARD: the multiplayer wheel previously capped at 96 while the
+    // daily wheel capped at 136. On the identical square container that made the
+    // MP letters orbit ~40px tighter — a shrunken flower inside a full-size rim.
+    // Both modes must resolve to the same radius for the same box.
+    const box = { width: 384, height: 384 }; // md: w-96 h-96
+    expect(selectWheelRadius(box)).toBe(computeWheelRadius(384, 136));
+    expect(selectWheelRadius(box)).toBe(136); // (384-60)/2=162 → capped to 136
+  });
+
+  it('measures the shorter axis so a height-capped container pulls the orbit inward', () => {
+    // The MP/daily container caps height via max-h on short/landscape screens, so
+    // the rendered box can be wider than it is tall. Measuring min keeps letters
+    // inside the (shorter) rim instead of overflowing the action bar below.
+    expect(selectWheelRadius({ width: 384, height: 220 })).toBe(computeWheelRadius(220, 136));
+  });
+
+  it('lifts the cap to 140 on the desktop canvas', () => {
+    expect(selectWheelRadius({ width: 600, height: 600, isDesktop: true })).toBe(140);
+  });
+
+  it('drops to the short/landscape cap + tighter floor + allowance when isShort', () => {
+    // Mirrors the daily wheel: short viewport shrinks the letters, so a smaller
+    // max/floor/allowance keeps the orbit from flooring onto the center letter.
+    expect(selectWheelRadius({ width: 280, height: 280, isShort: true })).toBe(
+      computeWheelRadius(280, 88, 56, 44),
+    );
+  });
+
+  it('guards against a zero/unmeasured box (pre-layout render)', () => {
+    expect(selectWheelRadius({ width: 0, height: 0 })).toBe(76);
   });
 });

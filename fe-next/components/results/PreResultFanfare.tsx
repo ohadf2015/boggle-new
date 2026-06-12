@@ -161,7 +161,12 @@ export const PreResultFanfare = memo(function PreResultFanfare({
               kind={kind}
               size={size}
               overlay={false}
-              autoDismissMs={0}          // we control completion
+              // The clip LOOPs, so onEnded never fires — without an auto-dismiss
+              // the only exit was the skip button and a distracted player got
+              // stranded here. Arm the video's own (ref-safe) timer so it hands
+              // off to the results page on its own after ~one clip. Skip button
+              // stays for players who want to jump ahead.
+              autoDismissMs={4000}
               onDone={handleComplete}
               title={translatedTitle}
             />

@@ -20,7 +20,7 @@ import { WheelRushHeader } from './WheelRushHeader';
 import { WheelRushCelebration, type WheelCelebration } from './WheelRushCelebration';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { selectClosestRival } from '@/lib/wheelRush/closestRival';
-import { computeWheelRadius } from '@/lib/wordWheel/wheelGeometry';
+import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
@@ -502,13 +502,29 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   useEffect(() => {
     const el = wheelContainerRef.current;
     if (!el) return;
+    const shortVp = typeof window !== 'undefined' ? window.matchMedia('(max-height: 600px)') : null;
     const update = () => {
-      setWheelRadius(computeWheelRadius(el.getBoundingClientRect().width, isDesktopCanvas ? 140 : 96));
+      const rect = el.getBoundingClientRect();
+      // Shared selector — keeps the orbit cap in lockstep with the daily wheel
+      // (both render the same square container). Previously capped at 96 here,
+      // which shrank the flower inside a full-size rim on phones.
+      setWheelRadius(
+        selectWheelRadius({
+          width: rect.width,
+          height: rect.height,
+          isDesktop: isDesktopCanvas,
+          isShort: !isDesktopCanvas && !!shortVp?.matches,
+        }),
+      );
     };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
-    return () => ro.disconnect();
+    shortVp?.addEventListener?.('change', update);
+    return () => {
+      ro.disconnect();
+      shortVp?.removeEventListener?.('change', update);
+    };
   }, [puzzle, isDesktopCanvas]);
 
   // Keyboard input (shared hook)

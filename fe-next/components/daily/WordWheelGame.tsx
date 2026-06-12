@@ -5,7 +5,7 @@ import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Clock, Delete, RotateCcw, Flame, TrendingUp, ChevronUp, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { computeWheelRadius } from '@/lib/wordWheel/wheelGeometry';
+import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
@@ -627,16 +627,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     const shortVp = typeof window !== 'undefined' ? window.matchMedia('(max-height: 600px)') : null;
     const update = () => {
       const rect = el.getBoundingClientRect();
-      const size = Math.min(rect.width, rect.height);
-      setWheelRadius(
-        shortVp?.matches
-          // short: variant shrinks the letters (center 64px, outer 48px), so
-          // the floor only needs to clear 32+24=56px — but it MUST clear it, or
-          // the petals collapse onto the center the way the default 40 floor let
-          // them on a cramped landscape wheel.
-          ? computeWheelRadius(size, 88, 56, 44)
-          : computeWheelRadius(size, 136),
-      );
+      // Shared selector — same orbit math the multiplayer wheel uses.
+      setWheelRadius(selectWheelRadius({ width: rect.width, height: rect.height, isShort: !!shortVp?.matches }));
     };
     update();
     const ro = new ResizeObserver(update);

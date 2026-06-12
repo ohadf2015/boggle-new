@@ -49,3 +49,42 @@ export function computeWheelRadius(
   const fitInsideRim = (containerWidthPx - letterAllowance) / 2;
   return Math.round(Math.max(minRadius, Math.min(maxRadius, fitInsideRim)));
 }
+
+export interface WheelRadiusInput {
+  /** Rendered container width (getBoundingClientRect). */
+  width: number;
+  /** Rendered container height. The wheel measures the shorter axis. */
+  height: number;
+  /** Desktop multiplayer canvas — wider orbit cap, no short-viewport shrink. */
+  isDesktop?: boolean;
+  /** Short / landscape viewport (`max-height: 600px`) — letters shrink too. */
+  isShort?: boolean;
+}
+
+/**
+ * Single source of truth for the wheel orbit radius across the daily
+ * `WordWheelGame` and the multiplayer `WheelRushView`. Both render the same
+ * square container at every breakpoint, so they MUST resolve to the same radius
+ * for the same box — historically they drifted (MP capped at 96 while daily
+ * capped at 136), making the multiplayer flower orbit ~40px tighter inside an
+ * identical rim. Centralising the cap/floor/allowance selection here stops that
+ * recurring divergence.
+ *
+ * Measures the *shorter* axis: the container is height-capped on short/landscape
+ * screens, so a box that is wider than it is tall must pull its orbit inward to
+ * keep outer letters off the action bar below.
+ */
+export function selectWheelRadius({ width, height, isDesktop = false, isShort = false }: WheelRadiusInput): number {
+  const size = Math.min(width, height);
+  if (isDesktop) {
+    // Desktop canvas is a fixed square (no short variant) → wider 140 cap.
+    return computeWheelRadius(size, 140);
+  }
+  if (isShort) {
+    // short: variant shrinks the letters (center 64px, outer 48px), so feed a
+    // smaller max/floor/allowance to match — otherwise the orbit floors onto the
+    // still-large center letter on a cramped landscape wheel.
+    return computeWheelRadius(size, 88, 56, 44);
+  }
+  return computeWheelRadius(size, 136);
+}
