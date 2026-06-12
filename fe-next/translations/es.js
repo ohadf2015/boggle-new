@@ -183,7 +183,8 @@ const es = {
     },
     "wildcardFound": "¡La Piedra Filosofal!",
     "wildcardSkip": "¡Un paso transmutar — la magia ocurre!",
-    "heat": {"label": "Calor","rush": "¡Fiebre exotérmica!","rushAria": "¡Medidor lleno — la siguiente palabra correcta gana un bono!"}
+    "heat": {"label": "Calor","rush": "¡Fiebre exotérmica!","rushAria": "¡Medidor lleno — la siguiente palabra correcta gana un bono!"},
+    "share": {"copy": "Copiar resultado","copied": "¡Copiado!","emojiRowAria": "Resumen emoji de tu partida","captionPerfect": "¡Transmutación impecable! 🧪","captionWild": "¡El catalizador llegó justo a tiempo! 🔮","captionGood": "¡Buena alquimia! 🌡️","captionHard": "Los elementos se resistieron hoy 😅"}
   },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {

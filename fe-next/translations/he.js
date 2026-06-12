@@ -191,7 +191,8 @@ const he = {
     },
     "wildcardFound": "אבן הפילוסוף!",
     "wildcardSkip": "שלב אחד עבר טרנסמוטציה — קסם קורה",
-    "heat": {"label": "חום","rush": "!פריצת חום","rushAria": "מד החום מלא — המילה הנכונה הבאה מזכה בבונוס!"}
+    "heat": {"label": "חום","rush": "!פריצת חום","rushAria": "מד החום מלא — המילה הנכונה הבאה מזכה בבונוס!"},
+    "share": {"copy": "העתק תוצאה","copied": "הועתק!","emojiRowAria": "סיכום אמוג׳י של המשחק שלך","captionPerfect": "טרנסמוטציה ללא דופי! 🧪","captionWild": "הקטליזטור הציל! 🔮","captionGood": "כימיה טובה! 🌡️","captionHard": "היסודות התנגדו היום 😅"}
   },
   "gameFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
   "wordTower": {

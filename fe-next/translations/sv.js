@@ -278,7 +278,8 @@ const sv = {
     },
     "wildcardFound": "Filosofens sten!",
     "wildcardSkip": "Ett steg förvandlades — magi sker",
-    "heat": {"label": "Värme","rush": "Exoterm Rusning!","rushAria": "Värme full — nästa rätta ord ger bonus!"}
+    "heat": {"label": "Värme","rush": "Exoterm Rusning!","rushAria": "Värme full — nästa rätta ord ger bonus!"},
+    "share": {"copy": "Kopiera resultat","copied": "Kopierat!","emojiRowAria": "Emoji-sammanfattning av din runda","captionPerfect": "Felfri transmutation! 🧪","captionWild": "Katalysatorn räddade dagen! 🔮","captionGood": "Solid alkemi! 🌡️","captionHard": "Elementen kämpade emot idag 😅"}
   },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {

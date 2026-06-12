@@ -191,7 +191,8 @@ const ja = {
     },
     "wildcardFound": "賢者の石発見！",
     "wildcardSkip": "一段階スキップ — 錬金術の奇跡",
-    "heat": {"label": "熱量","rush": "発熱ラッシュ！","rushAria": "熱量満タン — 次の正解でボーナス獲得！"}
+    "heat": {"label": "熱量","rush": "発熱ラッシュ！","rushAria": "熱量満タン — 次の正解でボーナス獲得！"},
+    "share": {"copy": "結果をコピー","copied": "コピーしました！","emojiRowAria": "プレイ結果の絵文字サマリー","captionPerfect": "完璧な錬成！🧪","captionWild": "触媒が大活躍！🔮","captionGood": "見事な錬金術！🌡️","captionHard": "今日は元素が手強かった 😅"}
   },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {

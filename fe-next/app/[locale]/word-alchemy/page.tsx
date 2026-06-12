@@ -16,6 +16,8 @@ import { getWildcardCatalyst } from '@/lib/wordAlchemy/wildcardCatalyst';
 import { WildcardFoundModal } from '@/components/wordAlchemy/WildcardFoundModal';
 import { useAlchemyHeatMeter } from '@/hooks/useAlchemyHeatMeter';
 import { AlchemyHeatBar } from '@/components/wordAlchemy/AlchemyHeatBar';
+import { AlchemyShareCard } from '@/components/wordAlchemy/AlchemyShareCard';
+import { type StepResult } from '@/lib/wordAlchemy/alchemyShare';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -237,6 +239,7 @@ export default function WordAlchemyPage() {
   const [wrongCount, setWrongCount] = useState(0);
   const [streak, setStreak] = useState(0);
   const [wildcardFound, setWildcardFound] = useState(false);
+  const [stepResults, setStepResults] = useState<StepResult[]>([]);
   // The built-word display (was a text input); kept as a ref for shake + burst.
   const inputRef = useRef<HTMLDivElement>(null);
   const flaskRef = useRef<HTMLSpanElement>(null);
@@ -274,6 +277,7 @@ export default function WordAlchemyPage() {
     setWrongCount(0);
     setStreak(0);
     setWildcardFound(false);
+    setStepResults([]);
     wonFxFiredRef.current = false;
     resetHeat();
   };
@@ -300,6 +304,7 @@ export default function WordAlchemyPage() {
       setInput('');
       setWrongCount(0);
       setStreak((s) => s + 1);
+      setStepResults((p) => [...p, { wild: true, attempts: 0 }]);
       setWildcardFound(true);
       playSound('wordAccepted');
       burstAt('sparkle-gold', inputRef.current, 24);
@@ -310,6 +315,7 @@ export default function WordAlchemyPage() {
       setStepIdx((s) => s + 1);
       setInput('');
       const { wasRush } = onCorrectGuess(wrongCount === 0);
+      setStepResults((p) => [...p, { wild: false, attempts: wrongCount }]);
       setWrongCount(0);
       const nextStreak = streak + 1;
       setStreak(nextStreak);
@@ -420,6 +426,9 @@ export default function WordAlchemyPage() {
               {t('wordAlchemy.wonTitle')}
             </h2>
             <p className="font-neo-body text-sm text-neo-navy/80">{t('wordAlchemy.wonSubtitle')}</p>
+            {stepResults.length > 0 && (
+              <AlchemyShareCard stepResults={stepResults} puzzleNumber={puzzleIdx + 1} />
+            )}
             <button
               type="button"
               onClick={() => resetPuzzle((puzzleIdx + 1) % puzzles.length)}

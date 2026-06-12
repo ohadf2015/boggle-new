@@ -183,7 +183,8 @@ const en = {
     },
     "wildcardFound": "Philosopher's Stone!",
     "wildcardSkip": "A step was transmuted — magic happens",
-    "heat": {"label": "Heat","rush": "Exothermic Rush!","rushAria": "Heat meter full — next correct word earns a bonus!"}
+    "heat": {"label": "Heat","rush": "Exothermic Rush!","rushAria": "Heat meter full — next correct word earns a bonus!"},
+    "share": {"copy": "Copy result","copied": "Copied!","emojiRowAria": "Emoji summary of your run","captionPerfect": "Flawless transmutation! 🧪","captionWild": "The catalyst came in clutch! 🔮","captionGood": "Solid alchemy! 🌡️","captionHard": "The elements fought back today 😅"}
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {
