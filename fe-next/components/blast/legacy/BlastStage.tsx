@@ -14,6 +14,8 @@ const BlastEffectsCanvas = dynamic(
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { shouldMountBlastFxCanvas } from './utils/shouldMountBlastFxCanvas';
+import { useBlastTileFirstUse } from './hooks/useBlastTileFirstUse';
+import { BlastTileFirstUseCallout } from './BlastTileFirstUseCallout';
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { ClosestRivalsPanel } from '@/components/game/in-game/ClosestRivalsPanel';
@@ -193,6 +195,11 @@ export const BlastStage = memo(function BlastStage({
   // BlastFxBridge already suppresses there anyway.
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const mountBlastFx = shouldMountBlastFxCanvas({ enableComplexAnimations, prefersReducedMotion });
+  // Teach each curated special tile the first time it appears (once, persisted).
+  const { teaching: firstUseTeaching, dismiss: dismissFirstUse } = useBlastTileFirstUse(
+    tileStates,
+    interactive && !isComplete,
+  );
   useEffect(() => {
     const el = boardContainerRef.current;
     if (!el) return;
@@ -408,6 +415,11 @@ export const BlastStage = memo(function BlastStage({
                   waveCleared={waveCleared}
                 />
               </div>
+            )}
+            {/* First-use teaching: names a special tile + what it does the
+                first time the player meets it (once per tile, persisted). */}
+            {firstUseTeaching && (
+              <BlastTileFirstUseCallout type={firstUseTeaching} onDismiss={dismissFirstUse} />
             )}
           </div>
         </div>
