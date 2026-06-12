@@ -34,6 +34,38 @@ TYPE_RELEVANT=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
+# --- Single-flight mutex for the test job ----------------------------------
+# The 2026-06-12 push failure (exit 144) was a memory-exhaustion OOM: the
+# feedback-daemon and a manual push each fired this hook, and `pgrep` showed
+# SIX concurrent `vitest --changed` runs stacked on top of each other, each
+# holding multiple GB → the kernel OOM-killed them all. `--changed` itself is
+# fine; the bug is that nothing serialized the runs. mkdir is an atomic
+# create-or-fail on POSIX (flock is absent on macOS), so it makes a portable
+# lock. A lock left by a crashed run is reclaimed once its PID is gone.
+# Stable path shared across ALL pre-push invocations (so concurrent runs see
+# the same lock). TMPDIR above is the per-run unique mktemp dir; its PARENT is
+# the stable system temp dir — use that, falling back to /tmp.
+PREPUSH_LOCK="$(dirname "$TMPDIR" 2>/dev/null || echo /tmp)/lexi-prepush-test.lock"
+acquire_test_lock() {
+  waited=0
+  while ! mkdir "$PREPUSH_LOCK" 2>/dev/null; do
+    holder=$(cat "$PREPUSH_LOCK/pid" 2>/dev/null || true)
+    if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
+      rm -rf "$PREPUSH_LOCK" 2>/dev/null  # stale (holder dead) → reclaim
+      continue
+    fi
+    if [ "$waited" -ge 900 ]; then
+      echo "⏰ Another pre-push test run held the lock >15m; proceeding anyway."
+      return 0
+    fi
+    [ "$waited" -eq 0 ] && echo "⏳ Waiting for a concurrent pre-push test run to finish…"
+    sleep 3
+    waited=$((waited + 3))
+  done
+  echo $$ > "$PREPUSH_LOCK/pid" 2>/dev/null || true
+}
+release_test_lock() { rm -rf "$PREPUSH_LOCK" 2>/dev/null || true; }
+
 # --- Run all 3 checks in parallel ---
 
 # Lint
@@ -73,19 +105,53 @@ PID_TSC=$!
 (
   FAIL=0
 
+  # Serialize: only one pre-push test run at a time (see acquire_test_lock).
+  acquire_test_lock
+  trap release_test_lock EXIT
+
   rm -rf node_modules/.experimental-vitest-cache 2>/dev/null
 
-  # NODE_OPTIONS bumps heap to 8GB — required when --changed fans out to
-  # 1000+ test files (hub-component edits) and serial execution accumulates
-  # memory across files, otherwise vitest gets OOM-killed mid-run.
+  # NODE_OPTIONS bumps heap to 8GB. Still needed per-process, but the heap is
+  # no longer the only guard — see sharding below.
   export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192"
 
+  # Adaptive sharding: when a HUB file is in the diff, vitest `--changed` pulls
+  # in its whole dependent cone (1000+ test files for e.g. experiments.ts /
+  # LanguageContext). Running them in ONE process with --no-file-parallelism
+  # accumulates module graphs with no teardown between files → even 8GB is
+  # exhausted → OOM. Splitting the run into N `--shard` slices runs each slice
+  # in a SEPARATE vitest process that exits and releases its heap before the
+  # next starts, so peak memory is ~1/N. Typical pushes touch no hub and run a
+  # single fast shard (no startup tax).
+  HUB_REGEX='(^|/)(experiments|LanguageContext)\.(ts|tsx)$|(^|/)contexts/|(^|/)hooks/use[A-Z]'
+  if echo "$FRONTEND_FILES" | grep -qE "$HUB_REGEX"; then
+    SHARDS=4
+    echo "ℹ️  Hub file changed — sharding frontend tests into $SHARDS processes to bound memory."
+  else
+    SHARDS=1
+  fi
+
+  # Run a sharded vitest set; each shard is a fresh process (heap freed between).
+  # Args after the shard count are passed through verbatim.
+  run_vitest_sharded() {
+    _n="$1"; shift
+    _rc=0
+    _i=1
+    while [ "$_i" -le "$_n" ]; do
+      [ "$_n" -gt 1 ] && echo "── shard $_i/$_n ──"
+      ./node_modules/.bin/vitest run "$@" --shard="$_i/$_n" 2>&1 || _rc=1
+      _i=$((_i + 1))
+    done
+    return $_rc
+  }
+
   if [ -n "$BACKEND_FILES" ]; then
+    # Backend suite is small — never needs sharding.
     ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
   fi
 
   if [ -n "$FRONTEND_FILES" ]; then
-    ./node_modules/.bin/vitest run --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
+    run_vitest_sharded "$SHARDS" --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism || FAIL=1
   fi
 
   if [ -z "$BACKEND_FILES" ] && [ -z "$FRONTEND_FILES" ]; then
