@@ -9699,6 +9699,15 @@ const sv = {
       "coinBonanza": { "title": "MYNTREGN", "sub": "extra mynt denna runda" },
       "bonusStorm": { "title": "BONUSSTORM", "sub": "dubbel-bonus-rutor släppta loss" }
     },
+    "surprise": {
+      "coinBurst": { "title": "Myntregn!" },
+      "gemShower": { "title": "Juvelregn!" },
+      "chainCharge": { "title": "Kedjeladdning!" },
+      "luckyDouble": { "title": "Lyckodubbel!" },
+      "goldenWord": { "title": "Guldord!" },
+      "nextWordDouble": "Nästa ord ×2",
+      "chargedChip": "✨ ×2 laddad"
+    },
     "quip": {
       "big": ["FIN KEDJA!", "I ELDEN!", "FORTSÄTT!"],
       "mega": ["OSTOPPBAR!", "LEGENDARISKT!", "MEGA-COMBO!"]

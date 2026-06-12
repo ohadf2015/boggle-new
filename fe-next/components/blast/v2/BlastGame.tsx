@@ -22,6 +22,7 @@ import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { trackBlastLevelStarted, trackBlastLevelCompleted, trackBlastLevelAbandoned } from '@/lib/blast/v2/telemetry';
 import { BlastBoard } from './BlastBoard';
 import { BlastHud } from './BlastHud';
+import { BlastSurpriseBanner } from './BlastSurpriseBanner';
 import { BlastLevelIntroCard } from './BlastLevelIntroCard';
 import { BlastLevelCompleteCard } from './BlastLevelCompleteCard';
 import { BlastLevelFailedCard } from './BlastLevelFailedCard';
@@ -604,6 +605,16 @@ export function BlastGame({
       />
       <div className="relative flex-1 min-h-0 flex items-stretch justify-center pb-[max(0.5rem,env(safe-area-inset-bottom))] px-2">
         <BlastAtmosphereOverlay modeColor={modeColor} />
+        <BlastSurpriseBanner surprise={state.activeSurprise} modeColor={modeColor} />
+        {state.nextWordMultiplier === 2 && (
+          <div
+            data-testid="surprise-charge-chip"
+            className="pointer-events-none absolute top-3 right-3 z-30 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#0b1530]"
+            style={{ background: '#FFE135', border: '2px solid #0b1530', boxShadow: '2px 2px 0 #0b1530' }}
+          >
+            {t('blast.surprise.chargedChip', '✨ ×2 charged')}
+          </div>
+        )}
         <BlastFxOverlay
           chainEventKey={state.chainEventKey}
           chainDepth={state.lastChainDepth}

@@ -9295,6 +9295,15 @@ const en = {
       "coinBonanza": { "title": "COIN BONANZA", "sub": "extra coins this round" },
       "bonusStorm": { "title": "BONUS STORM", "sub": "double-bonus tiles unleashed" }
     },
+    "surprise": {
+      "coinBurst": { "title": "Coin Burst!" },
+      "gemShower": { "title": "Gem Shower!" },
+      "chainCharge": { "title": "Chain Charge!" },
+      "luckyDouble": { "title": "Lucky Double!" },
+      "goldenWord": { "title": "Golden Word!" },
+      "nextWordDouble": "Next word ×2",
+      "chargedChip": "✨ ×2 charged"
+    },
     "quip": {
       "big": ["NICE CHAIN!", "ON FIRE!", "KEEP IT GOING!"],
       "mega": ["UNSTOPPABLE!", "LEGENDARY!", "MEGA COMBO!"]

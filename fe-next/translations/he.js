@@ -9836,6 +9836,15 @@ const he = {
       "coinBonanza": { "title": "מטחנת מטבעות", "sub": "עוד מטבעות הסיבוב הזה" },
       "bonusStorm": { "title": "סופת בונוס", "sub": "אריחי בונוס כפול שוחררו" }
     },
+    "surprise": {
+      "coinBurst": { "title": "מטר מטבעות!" },
+      "gemShower": { "title": "מקלחת יהלומים!" },
+      "chainCharge": { "title": "טעינת שרשרת!" },
+      "luckyDouble": { "title": "כפל מזל!" },
+      "goldenWord": { "title": "מילת זהב!" },
+      "nextWordDouble": "המילה הבאה ×2",
+      "chargedChip": "✨ ×2 טעון"
+    },
     "quip": {
       "big": ["שרשרת יפה!", "בוערים!", "תמשיכו!"],
       "mega": ["בלתי עצירים!", "אגדה!", "קומבו ענק!"]

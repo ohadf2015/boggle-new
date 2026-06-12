@@ -9670,6 +9670,15 @@ const ja = {
       "coinBonanza": { "title": "コイン大量発生", "sub": "今ラウンドはコイン増" },
       "bonusStorm": { "title": "ボーナスストーム", "sub": "ダブルボーナスタイル解放" }
     },
+    "surprise": {
+      "coinBurst": { "title": "コインバースト！" },
+      "gemShower": { "title": "ジェムシャワー！" },
+      "chainCharge": { "title": "チェインチャージ！" },
+      "luckyDouble": { "title": "ラッキーダブル！" },
+      "goldenWord": { "title": "ゴールデンワード！" },
+      "nextWordDouble": "次の単語 ×2",
+      "chargedChip": "✨ ×2 チャージ"
+    },
     "quip": {
       "big": ["いいチェーン!", "燃えてる!", "続けて!"],
       "mega": ["止まらない!", "伝説!", "メガコンボ!"]

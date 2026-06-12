@@ -9683,6 +9683,15 @@ const es = {
       "coinBonanza": { "title": "LLUVIA DE MONEDAS", "sub": "más monedas esta ronda" },
       "bonusStorm": { "title": "TORMENTA BONUS", "sub": "fichas de doble bonus desatadas" }
     },
+    "surprise": {
+      "coinBurst": { "title": "¡Lluvia de monedas!" },
+      "gemShower": { "title": "¡Lluvia de gemas!" },
+      "chainCharge": { "title": "¡Carga en cadena!" },
+      "luckyDouble": { "title": "¡Doble suerte!" },
+      "goldenWord": { "title": "¡Palabra dorada!" },
+      "nextWordDouble": "Próxima palabra ×2",
+      "chargedChip": "✨ ×2 cargado"
+    },
     "quip": {
       "big": ["¡QUÉ CADENA!", "¡EN LLAMAS!", "¡SIGUE ASÍ!"],
       "mega": ["¡IMPARABLE!", "¡LEGENDARIO!", "¡MEGA COMBO!"]
