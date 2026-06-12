@@ -12,6 +12,8 @@ const BlastEffectsCanvas = dynamic(
   { ssr: false },
 );
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { shouldMountBlastFxCanvas } from './utils/shouldMountBlastFxCanvas';
 import { BlastHUD } from './BlastHUD';
 import { BlastMPLeaderboard } from './BlastMPLeaderboard';
 import { ClosestRivalsPanel } from '@/components/game/in-game/ClosestRivalsPanel';
@@ -185,6 +187,12 @@ export const BlastStage = memo(function BlastStage({
   // Measure board container for PixiJS effects canvas
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
+  // Skip the always-on Pixi FX overlay on low-end / reduced-motion devices.
+  // The DOM tile animations (clear/fall/appear) carry all gameplay feedback;
+  // the overlay is extra juice the weakest devices can't afford and that
+  // BlastFxBridge already suppresses there anyway.
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+  const mountBlastFx = shouldMountBlastFxCanvas({ enableComplexAnimations, prefersReducedMotion });
   useEffect(() => {
     const el = boardContainerRef.current;
     if (!el) return;
@@ -357,7 +365,9 @@ export const BlastStage = memo(function BlastStage({
               : comboFlashTier >= 2
               ? 'rgba(255,20,147,0.4)'
               : 'transparent',
-            ...((sequencerState?.chainLevel ?? 0) >= 2 || comboFlashTier >= 2
+            // Infinite box-shadow keyframe = per-frame paint. Skip it on
+            // low-end / reduced-motion so combos don't add paint cost there.
+            ...(mountBlastFx && ((sequencerState?.chainLevel ?? 0) >= 2 || comboFlashTier >= 2)
               ? { animation: 'blast-frame-glow 1.2s ease-in-out infinite' }
               : {}),
           } as React.CSSProperties}
@@ -385,7 +395,7 @@ export const BlastStage = memo(function BlastStage({
               />
             </div>
             {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}
-            {boardSize.width > 0 && (
+            {boardSize.width > 0 && mountBlastFx && (
               <div className="absolute inset-0 z-20 pointer-events-none rounded-[6px]">
                 <BlastEffectsCanvas
                   width={boardSize.width}
