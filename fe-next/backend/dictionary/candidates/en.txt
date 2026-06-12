@@ -372,3 +372,8 @@ end
 even
 every
 first
+across
+her
+him
+his
+it
