@@ -220,7 +220,9 @@ async function processPlayerResult(
           mode: 'multiplayer',
           language: gameInfo.language || 'en',
           score: gameStats.score || 0,
-          wordsFound: [],
+          // Real validated words this player found, for the admin game-logs
+          // dashboard. Was hardcoded to [] — guest games showed 0 words found.
+          wordsFound: playerScore.words || [],
           durationSeconds: gameStats.timePlayed || 0,
           completed: true,
           roomCode: gameCode,

@@ -6,6 +6,7 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import logger from '../../utils/logger';
+import type { FoundWord } from './foundWords';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -169,6 +170,11 @@ export interface PlayerScore {
   longestWord?: string;
   placement?: number;
   achievements?: string[];
+  /**
+   * The validated words this player found, in the `game_sessions.words_found`
+   * shape, for admin analytics. Optional so non-word modes can omit it.
+   */
+  words?: FoundWord[];
 }
 
 export interface GameInfo {

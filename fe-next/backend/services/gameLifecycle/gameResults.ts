@@ -12,6 +12,7 @@ import { notifyLevelUp, notifyAchievementsBatch, getUserLocalesBatch } from '../
 import type { PushLocale } from '../../utils/pushTranslations';
 import type { GameResultsOutput } from '../../modules/supabase/gameProcessing';
 import type { UserAuthInfo } from '../../modules/supabase/client';
+import { extractFoundWords } from '../../modules/supabase/foundWords';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { completeMissionForMode } from '../../modules/dailyMissionsManager';
 import type { GameStats } from '@/shared/weeklyQuestTemplates';
@@ -188,6 +189,9 @@ export async function recordGameResultsToSupabase(
         placement,
         achievements: playerResult.achievements?.map((a) => a.key) || [],
         totalPlayers: totalPlayersInGame,
+        // Real per-player word list for admin analytics (game_sessions.words_found).
+        // Previously this was never threaded, so guest game logs showed 0 words.
+        words: extractFoundWords(playerResult.wordDetails),
       };
     });
 
