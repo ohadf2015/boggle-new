@@ -286,6 +286,24 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * Daily-challenge hero treatment INSIDE the `cubes` homepage arm. banner =
+   * the legacy gradient banner with the floating mascot. cube = the new bento
+   * daily tile (full-bleed daily cube art, neo tile, shared idle sheen) so the
+   * daily hook joins the cube design language. Only consulted when the cubes
+   * layout renders; exposure fires only when both flags resolve to the new arm.
+   */
+  'landing-daily-cube-v1': defineExperiment({
+    variants: ['banner', 'cube'] as const,
+    default: 'banner',
+    description:
+      'Daily hero style in the cubes homepage arm. banner = legacy gradient + mascot. cube = bento daily tile with cube art. Conversion = daily_banner CTA → daily start.',
+    forceVariantByEmail: {
+      'ohadf2015@gmail.com': 'cube',
+      'eden320@gmail.com': 'cube',
+    },
+  }),
+
+  /**
    * Post-game quick-replay CTA. After SP game completion (auto-play
    * countdown cancelled), control shows the existing NextStepPrompt
    * only. The `quick-replay` variant adds a prominent "Run it back?"

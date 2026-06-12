@@ -5,6 +5,7 @@ import { Swords, BookOpen, Map, Bomb, Link2, Brain, Sparkles, ChevronDown, Layer
 import ModeCard from './ModeCard';
 import { WordfallLogo } from '@/components/blast/v2/WordfallLogo';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
+import DailyChallengeCube from '@/components/daily/DailyChallengeCube';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { getGamesCompleted, isNewPlayer } from '@/utils/multiplayerProgressStorage';
@@ -161,6 +162,14 @@ export function LandingChallengeCards({
   useEffect(() => {
     if (cubesVariant === 'cubes') trackCubesExposure();
   }, [cubesVariant, trackCubesExposure]);
+  // Daily hero treatment within the cubes arm — `cube` swaps the legacy banner
+  // for the bento daily tile. Exposure only when BOTH the cubes layout AND the
+  // cube daily render, so the daily A/B has a clean denominator.
+  const { variant: dailyCubeVariant, trackExposure: trackDailyCubeExposure } =
+    useExperiment('landing-daily-cube-v1');
+  useEffect(() => {
+    if (cubesVariant === 'cubes' && dailyCubeVariant === 'cube') trackDailyCubeExposure();
+  }, [cubesVariant, dailyCubeVariant, trackDailyCubeExposure]);
   const isNewcomerByGames =
     mounted &&
     !isOnCrazyGamesPlatform &&
@@ -622,7 +631,12 @@ export function LandingChallengeCards({
       .filter(isModel);
     // Daily is the cubes hero — always present (it's the once-a-day hook), not
     // gated on heroCards like the control arm. It renders above the bento grid.
-    const dailyNode = <DailyChallengeBanner preloadedStats={dailyChallengeStats} />;
+    const dailyNode =
+      dailyCubeVariant === 'cube' ? (
+        <DailyChallengeCube preloadedStats={dailyChallengeStats} />
+      ) : (
+        <DailyChallengeBanner preloadedStats={dailyChallengeStats} />
+      );
 
     return (
       <LandingModeCubes
