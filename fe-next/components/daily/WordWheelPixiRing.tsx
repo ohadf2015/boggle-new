@@ -33,6 +33,7 @@ export default function WordWheelPixiRing({
     if (!el) return;
 
     let destroyed = false;
+    let removeRectListeners: (() => void) | null = null;
     const app = new Application();
 
     const setup = async () => {
@@ -53,6 +54,19 @@ export default function WordWheelPixiRing({
       if (destroyed) { try { app.destroy(true, { children: true }); } catch { /* already destroyed by cleanup */ } return; }
       el.appendChild(app.canvas);
 
+      // Cache the canvas screen rect OUTSIDE the ticker. It only moves on
+      // scroll/resize, so reading it per-frame (during a drag) was a forced
+      // reflow every ~16ms. Refresh it on those events instead.
+      const canvasEl = app.canvas as HTMLCanvasElement;
+      let canvasRect = canvasEl.getBoundingClientRect();
+      const refreshRect = () => { canvasRect = canvasEl.getBoundingClientRect(); };
+      window.addEventListener('scroll', refreshRect, { passive: true, capture: true });
+      window.addEventListener('resize', refreshRect, { passive: true });
+      removeRectListeners = () => {
+        window.removeEventListener('scroll', refreshRect, { capture: true } as EventListenerOptions);
+        window.removeEventListener('resize', refreshRect);
+      };
+
       const orbitGfx = new Graphics();
       const lineGfx = new Graphics();
       const glowGfx = new Graphics();
@@ -70,6 +84,9 @@ export default function WordWheelPixiRing({
         // /daily/word-wheel). Mirrors the post-destroy guards added in a39f63378
         // for the blast renderers.
         if (destroyed || orbitGfx.destroyed || lineGfx.destroyed || glowGfx.destroyed) return;
+        // Skip all draw work for an invisible canvas (backgrounded tab / hidden
+        // PWA). Freezing `angle` here too avoids a large delta jump on resume.
+        if (typeof document !== 'undefined' && document.hidden) return;
         const dt = ticker.deltaMS / 1000;
         const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef } = stateRef.current;
         angle += dt * 0.5;
@@ -129,10 +146,8 @@ export default function WordWheelPixiRing({
           const pp = ppRef?.current ?? null;
           const isDrag = dragRef?.current ?? false;
           if (isDrag && pp) {
-            const canvasEl = app.canvas as HTMLCanvasElement;
-            const cr = canvasEl.getBoundingClientRect();
-            const lx = pp.x - cr.left;
-            const ly = pp.y - cr.top;
+            const lx = pp.x - canvasRect.left;
+            const ly = pp.y - canvasRect.top;
             const last = pts[pts.length - 1];
             lineGfx.moveTo(last.x, last.y);
             lineGfx.lineTo(lx, ly);
@@ -158,6 +173,7 @@ export default function WordWheelPixiRing({
 
     return () => {
       destroyed = true;
+      removeRectListeners?.();
       try { app.destroy(true, { children: true }); } catch { /* */ }
       while (el.firstChild) el.removeChild(el.firstChild);
     };

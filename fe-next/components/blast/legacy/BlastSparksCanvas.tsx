@@ -93,6 +93,11 @@ export default function BlastSparksCanvas() {
       }
 
       application.ticker.add((ticker) => {
+        // Skip ambient spark updates after teardown (avoids touching destroyed
+        // sprites) and while the tab is hidden (no point animating an unseen
+        // canvas — this overlay otherwise runs 60fps for the whole session).
+        if (destroyed) return;
+        if (typeof document !== 'undefined' && document.hidden) return;
         const dt = ticker.deltaMS / 1000;
         for (const s of sparks) {
           s.life += dt;

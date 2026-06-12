@@ -164,6 +164,11 @@ export function EmberOverlay({
 
       // Animation loop
       app.ticker.add((ticker) => {
+        // Stop after teardown (don't touch removed particles) and while the tab
+        // is hidden — this ambient ember field otherwise drifts at 60fps for the
+        // whole session even when nobody can see it.
+        if (state.destroyed) return;
+        if (typeof document !== 'undefined' && document.hidden) return;
         const dt = ticker.deltaTime;
         for (let i = embers.length - 1; i >= 0; i -= 1) {
           const e = embers[i];
