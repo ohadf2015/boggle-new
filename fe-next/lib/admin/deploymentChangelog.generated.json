@@ -1,6 +1,34 @@
 {
-  "generatedAt": "2026-06-12T14:43:31.856Z",
+  "generatedAt": "2026-06-12T14:58:12.580Z",
   "commits": [
+    {
+      "sha": "cf83a3c286b5f3c627529446181137fbbddb0080",
+      "shortSha": "cf83a3c",
+      "subject": "chore(i18n): refresh translation report (missingFromEnglish 0)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:54:36+03:00"
+    },
+    {
+      "sha": "7bf109f8469eeeef1e2dec53829ad3fc5c438b39",
+      "shortSha": "7bf109f",
+      "subject": "fix(ci): stop pre-push vitest OOM — serialize runs + shard hub fan-out",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:50:30+03:00"
+    },
+    {
+      "sha": "87d8b5aa20dc399b0f0dd6a2a48dfd92b191170b",
+      "shortSha": "87d8b5a",
+      "subject": "feat(admin): show latest deployment + recent changes in dashboard",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:48:46+03:00"
+    },
+    {
+      "sha": "9b206181ee751790d6375a4a678f96ad0a252c5f",
+      "shortSha": "9b20618",
+      "subject": "feat(brain): nudge sign-up when a guest finishes a drill (no silent loss)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-12T17:47:11+03:00"
+    },
     {
       "sha": "f1d7bb30ed68018f5d5cce764c496057495ac5aa",
       "shortSha": "f1d7bb3",
@@ -112,34 +140,6 @@
       "subject": "feat(landing): bento daily cube + compress cube art (flag landing-daily-cube-v1)",
       "author": "Ohad Fisher",
       "date": "2026-06-12T15:40:11+03:00"
-    },
-    {
-      "sha": "4801310ac45fc0bcbc6936f190f7f91693e2af5f",
-      "shortSha": "4801310",
-      "subject": "feat(blast): theme emoji on the HUD theme label",
-      "author": "Ohad Fisher",
-      "date": "2026-06-12T14:25:41+03:00"
-    },
-    {
-      "sha": "d026495e0b54a3a17321c4361b0e6f8f5fbcf565",
-      "shortSha": "d026495",
-      "subject": "feat(blast): rebrand Blast V2 as \"Wordfall\" with its own logo",
-      "author": "Ohad Fisher",
-      "date": "2026-06-12T14:23:18+03:00"
-    },
-    {
-      "sha": "e546825f7269bbab6360588afe70798afa5c0caa",
-      "shortSha": "e546825",
-      "subject": "feat(blast): gate target-word clue strip to first 3 levels only",
-      "author": "Ohad Fisher",
-      "date": "2026-06-12T14:18:04+03:00"
-    },
-    {
-      "sha": "a47a0dda801a8062c39d8add9ae4857fda916224",
-      "shortSha": "a47a0dd",
-      "subject": "fix(blast): chest reward never opened + result flow w/ prefanfare",
-      "author": "Ohad Fisher",
-      "date": "2026-06-12T14:14:24+03:00"
     }
   ]
 }
