@@ -111,4 +111,30 @@ describe('LandingModeCubes', () => {
     // distinct per-cube delays — not every cube sweeping on the same clock
     expect(new Set(delays).size).toBeGreaterThan(1);
   });
+
+  // matches a BARE colored hard-shadow token (the resting tile shadow), ignoring
+  // prefixed variants like `group-hover:shadow-hard-pink` or `active:shadow-hard-pressed`.
+  const restingShadow = (el: HTMLElement) =>
+    el.className.match(/(?:^|\s)(shadow-hard-(?:pink|cyan|lime|purple|orange|blue))(?=\s|$)/)?.[1];
+
+  it('color-codes each cube with a distinct hard shadow AT REST (not a uniform black frame)', () => {
+    renderCubes({
+      models: [
+        model({ key: 'arena', title: 'Arena', variant: 'pink', role: 'anchor' }),
+        model({ key: 'practice', title: 'Practice', variant: 'cyan' }),
+        model({ key: 'blast', title: 'Blast', variant: 'orange' }),
+      ],
+    });
+    const arena = screen.getByRole('link', { name: /Arena/i });
+    const practice = screen.getByRole('link', { name: /Practice/i });
+    const blast = screen.getByRole('link', { name: /Blast/i });
+
+    // each mode carries its own colored resting shadow (design-system "color-coded modes")
+    expect(restingShadow(arena)).toBe('shadow-hard-pink');
+    expect(restingShadow(practice)).toBe('shadow-hard-cyan');
+    expect(restingShadow(blast)).toBe('shadow-hard-orange');
+    // distinct across modes, and no longer the old uniform black `shadow-hard`
+    expect(new Set([restingShadow(arena), restingShadow(practice), restingShadow(blast)]).size).toBe(3);
+    expect(arena.className).not.toMatch(/(?:^|\s)shadow-hard(?=\s|$)/);
+  });
 });

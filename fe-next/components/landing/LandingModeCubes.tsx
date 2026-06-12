@@ -31,20 +31,24 @@ interface VariantStyle {
   chip: string;
   /** ink on the icon chip */
   chipInk: string;
-  /** coloured hard shadow on hover */
+  /** coloured hard shadow AT REST — the per-mode "colour-coded modes" tile signal.
+      Replaces the old uniform black `shadow-hard` so the bento reads colourful at a
+      glance (the homepage brief) without flooding the fill like the legacy cards. */
+  restShadow: string;
+  /** coloured hard shadow on hover (same hue, kept for emphasis under the lift) */
   shadow: string;
   ring: string;
 }
 
-// Mirrors ModeCard's variant palette. orange/blue have no coloured hard-shadow
-// utility → fall back to shadow-hard-lg (keeps the lift without inventing tokens).
+// Mirrors ModeCard's variant palette. Each mode gets a colour-matched hard shadow
+// at rest (Netflix-style: dark tile, distinct coloured edge) — NOT a saturated fill.
 const VARIANT: Record<ModeCubeVariant, VariantStyle> = {
-  pink:   { fill: 'bg-neo-pink',   ink: 'text-neo-navy',  chip: 'bg-neo-pink',   chipInk: 'text-neo-navy',  shadow: 'group-hover:shadow-hard-pink',   ring: 'focus-visible:ring-neo-pink' },
-  cyan:   { fill: 'bg-neo-cyan',   ink: 'text-neo-navy',  chip: 'bg-neo-cyan',   chipInk: 'text-neo-navy',  shadow: 'group-hover:shadow-hard-cyan',   ring: 'focus-visible:ring-neo-cyan' },
-  purple: { fill: 'bg-neo-purple', ink: 'text-neo-white', chip: 'bg-neo-purple', chipInk: 'text-neo-white', shadow: 'group-hover:shadow-hard-purple', ring: 'focus-visible:ring-neo-purple' },
-  orange: { fill: 'bg-neo-orange', ink: 'text-neo-navy',  chip: 'bg-neo-orange', chipInk: 'text-neo-navy',  shadow: 'group-hover:shadow-hard-lg',     ring: 'focus-visible:ring-neo-orange' },
-  lime:   { fill: 'bg-neo-lime',   ink: 'text-neo-navy',  chip: 'bg-neo-lime',   chipInk: 'text-neo-navy',  shadow: 'group-hover:shadow-hard-lime',   ring: 'focus-visible:ring-neo-lime' },
-  blue:   { fill: 'bg-blue-500',   ink: 'text-neo-white', chip: 'bg-blue-500',   chipInk: 'text-neo-white', shadow: 'group-hover:shadow-hard-lg',     ring: 'focus-visible:ring-blue-400' },
+  pink:   { fill: 'bg-neo-pink',   ink: 'text-neo-navy',  chip: 'bg-neo-pink',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-pink',   shadow: 'group-hover:shadow-hard-pink',   ring: 'focus-visible:ring-neo-pink' },
+  cyan:   { fill: 'bg-neo-cyan',   ink: 'text-neo-navy',  chip: 'bg-neo-cyan',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-cyan',   shadow: 'group-hover:shadow-hard-cyan',   ring: 'focus-visible:ring-neo-cyan' },
+  purple: { fill: 'bg-neo-purple', ink: 'text-neo-white', chip: 'bg-neo-purple', chipInk: 'text-neo-white', restShadow: 'shadow-hard-purple', shadow: 'group-hover:shadow-hard-purple', ring: 'focus-visible:ring-neo-purple' },
+  orange: { fill: 'bg-neo-orange', ink: 'text-neo-navy',  chip: 'bg-neo-orange', chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-orange', shadow: 'group-hover:shadow-hard-orange', ring: 'focus-visible:ring-neo-orange' },
+  lime:   { fill: 'bg-neo-lime',   ink: 'text-neo-navy',  chip: 'bg-neo-lime',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-lime',   shadow: 'group-hover:shadow-hard-lime',   ring: 'focus-visible:ring-neo-lime' },
+  blue:   { fill: 'bg-blue-500',   ink: 'text-neo-white', chip: 'bg-blue-500',   chipInk: 'text-neo-white', restShadow: 'shadow-hard-blue',   shadow: 'group-hover:shadow-hard-blue',   ring: 'focus-visible:ring-blue-400' },
 };
 
 function Badge({ label }: { label: string }) {
@@ -111,7 +115,10 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
       data-cube-key={model.key}
       style={{ animationDelay: `${Math.min(index, 8) * 0.05}s` }}
       className={cn(
-        'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-neo-thick border-black shadow-hard transition-transform duration-150',
+        'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-neo-thick border-black transition-transform duration-150',
+        // per-mode coloured hard shadow at rest → the bento reads "colour-coded" at a
+        // glance without a saturated fill (replaces the old uniform black shadow-hard)
+        v.restShadow,
         // Physical neo-brutalist feedback. Lift on hover AND focus-visible so the
         // grid feels alive on TV/party screens (no pointer → focus is the only
         // signal) and for keyboard users. active = press the cube back in.

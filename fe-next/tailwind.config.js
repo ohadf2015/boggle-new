@@ -248,6 +248,8 @@ module.exports = {
         'hard-cozy': '2px 2px 0px var(--neo-cozy)',
         'hard-purple': '2px 2px 0px #581c87',
         'hard-purple-lg': '3px 3px 0px #581c87',
+        'hard-orange': '2px 2px 0px var(--neo-orange)',
+        'hard-blue': '2px 2px 0px #3b82f6',
         // Remove default shadows
         'none': 'none',
       },
@@ -765,6 +767,15 @@ module.exports = {
         },
         '[dir="rtl"] .shadow-hard-cozy': {
           boxShadow: '-4px 4px 0px var(--neo-cozy)',
+        },
+        '[dir="rtl"] .shadow-hard-purple': {
+          boxShadow: '-4px 4px 0px #581c87',
+        },
+        '[dir="rtl"] .shadow-hard-orange': {
+          boxShadow: '-4px 4px 0px var(--neo-orange)',
+        },
+        '[dir="rtl"] .shadow-hard-blue': {
+          boxShadow: '-4px 4px 0px #3b82f6',
         },
         '.badge-token-info': {
           backgroundColor: 'var(--badge-info)',
