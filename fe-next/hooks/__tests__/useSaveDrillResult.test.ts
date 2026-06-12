@@ -209,6 +209,42 @@ describe('useSaveDrillResult', () => {
       expect(saveResult!.brainScore).toBeUndefined();
     });
 
+    it('flags needsAuth when the server rejects with 401 (guest played, progress not saved)', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({ error: 'Unauthorized' }),
+      });
+
+      const { result } = renderHook(() => useSaveDrillResult());
+
+      let saveResult: Awaited<ReturnType<typeof result.current.saveDrillResult>>;
+      await act(async () => {
+        saveResult = await result.current.saveDrillResult(mockDrillResult);
+      });
+
+      expect(saveResult!.success).toBe(false);
+      expect(saveResult!.needsAuth).toBe(true);
+    });
+
+    it('does not flag needsAuth for non-401 failures', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: async () => ({ error: 'Server error' }),
+      });
+
+      const { result } = renderHook(() => useSaveDrillResult());
+
+      let saveResult: Awaited<ReturnType<typeof result.current.saveDrillResult>>;
+      await act(async () => {
+        saveResult = await result.current.saveDrillResult(mockDrillResult);
+      });
+
+      expect(saveResult!.success).toBe(false);
+      expect(saveResult!.needsAuth).toBeFalsy();
+    });
+
     it('should return error on network failure', async () => {
       (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
 

@@ -38,6 +38,10 @@ interface SaveDrillResultResponse {
   idempotent?: boolean;
   /** True when the result was enqueued for offline sync rather than submitted live. Rewards arrive on reconnect via /api/scores/sync. */
   queued?: boolean;
+  /** True when the server rejected with 401 — a guest played a drill but the
+   * score could not be saved. Consumers should nudge sign-up instead of
+   * silently dropping the result. */
+  needsAuth?: boolean;
   /** "You got better" signals for the results screen (personal best, vs average, vs last). */
   improvement?: DrillImprovement;
 }
@@ -100,7 +104,13 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Failed to save drill result' }));
-        return { success: false, error: errorData.error || 'Failed to save drill result' };
+        // 401 = guest played but isn't signed in. Surface it so the drill can
+        // nudge sign-up rather than silently discard the result.
+        return {
+          success: false,
+          needsAuth: response.status === 401,
+          error: errorData.error || 'Failed to save drill result',
+        };
       }
 
       const data = await response.json();

@@ -15,6 +15,7 @@ import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
 import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 import { useDrillRewards } from '@/hooks/useDrillRewards';
+import { useDrillSignupNudge } from '@/hooks/useDrillSignupNudge';
 import { useDrillLevel } from '@/hooks/useDrillLevel';
 import { trackDrillStart } from '@/lib/drills/telemetry';
 import { BoostButton } from '@/components/boosts/BoostButton';
@@ -34,6 +35,7 @@ export default function LightningRoundPageClient() {
   const isDarkMode = theme === 'dark';
   const { saveDrillResult } = useSaveDrillResult();
   const { awardDrillRewards } = useDrillRewards();
+  const { promptSignup, signupNudge } = useDrillSignupNudge();
   const drillLevel = useDrillLevel('lightning-round');
 
   // State for progression overlay
@@ -78,6 +80,13 @@ export default function LightningRoundPageClient() {
       },
     });
 
+    // Guest played but the score could not be saved (401) — nudge sign-up
+    // instead of silently dropping their progress.
+    if (saveResult.needsAuth) {
+      promptSignup();
+      return;
+    }
+
     // Show progression overlay if we got brainScore data back
     if (saveResult.success && saveResult.brainScore) {
       // Mark hub as dirty so it refetches on next mount (live brain-score refresh)
@@ -93,7 +102,7 @@ export default function LightningRoundPageClient() {
       const rewards = await awardDrillRewards({ level: result.level, score: result.score, xpAwarded: saveResult.xpAwarded ?? 0 });
       setDrillRewards(rewards);
     }
-  }, [saveDrillResult, awardDrillRewards]);
+  }, [saveDrillResult, awardDrillRewards, promptSignup]);
 
   const handleExit = useCallback(() => {
     router.push(`/${language}/brain`);
@@ -172,6 +181,7 @@ export default function LightningRoundPageClient() {
       </div>
 
       {/* Brain Score Progression Overlay */}
+      {signupNudge}
       {brainScoreUpdate && (
         <DrillProgressionOverlay
           isOpen={showProgressionOverlay}

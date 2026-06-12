@@ -15,6 +15,7 @@ import { useDrillGrid } from '@/hooks/useDrillGrid';
 import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
 import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 import { useDrillRewards } from '@/hooks/useDrillRewards';
+import { useDrillSignupNudge } from '@/hooks/useDrillSignupNudge';
 import { useDrillLevel } from '@/hooks/useDrillLevel';
 import { trackDrillStart } from '@/lib/drills/telemetry';
 import { BoostButton } from '@/components/boosts/BoostButton';
@@ -34,6 +35,7 @@ export default function ComboMasterPageClient() {
   const isDarkMode = theme === 'dark';
   const { saveDrillResult } = useSaveDrillResult();
   const { awardDrillRewards } = useDrillRewards();
+  const { promptSignup, signupNudge } = useDrillSignupNudge();
   const drillLevel = useDrillLevel('combo-master');
 
   // State for progression overlay
@@ -80,6 +82,13 @@ export default function ComboMasterPageClient() {
       },
     });
 
+    // Guest played but the score could not be saved (401) — nudge sign-up
+    // instead of silently dropping their progress.
+    if (saveResult.needsAuth) {
+      promptSignup();
+      return;
+    }
+
     // Show progression overlay if we got brainScore data back
     if (saveResult.success && saveResult.brainScore) {
       try { sessionStorage.setItem('lex_brain_dirty', '1'); } catch { /* ignore */ }
@@ -94,7 +103,7 @@ export default function ComboMasterPageClient() {
       const rewards = await awardDrillRewards({ level: result.level, score: result.score, xpAwarded: saveResult.xpAwarded ?? 0 });
       setDrillRewards(rewards);
     }
-  }, [saveDrillResult, awardDrillRewards]);
+  }, [saveDrillResult, awardDrillRewards, promptSignup]);
 
   const handleExit = useCallback(() => {
     router.push(`/${language}/brain`);
@@ -173,6 +182,7 @@ export default function ComboMasterPageClient() {
       </div>
 
       {/* Brain Score Progression Overlay */}
+      {signupNudge}
       {brainScoreUpdate && (
         <DrillProgressionOverlay
           isOpen={showProgressionOverlay}
