@@ -598,3 +598,47 @@ Both experiments are fully implemented (UI, tracking, translations ×5) but Post
 2. **`exp-mp-quickplay-wait-v1`** — match-seeking overlay replaces dimmed button during quickPlay auto-join. Variants: `control`, `match-seeking`. Recommend 50/50.
 
 Create both in PostHog → Settings → Feature Flags with the exact key names above.
+
+## 2026-06-12
+- [Supabase] SECURITY DEFINER function `upsert_level_completion` executable by `authenticated`
+  - function: `public.upsert_level_completion(uuid, int, int, int, int, int)`
+  - callsite scan: 0 TS callsites found (processCompletion.ts uses direct .from() inserts)
+  - status: shipped — migration `fe-next/supabase/migrations/20260612030000_revoke_upsert_level_completion.sql` (REVOKE EXECUTE FROM anon, authenticated, public)
+  - why: no anon/auth caller exists; SECURITY DEFINER + executable = privilege escalation vector
+  - recommended owner: review-by-eod (confirm REVOKE landed, check for any edge callsite missed)
+
+- [Supabase] RLS policy always-true on `web_vitals` INSERT
+  - policy: "Anyone can insert web vitals" WITH CHECK (true)
+  - status: deferred — unclear if anonymous submissions expected; changing would break anon perf tracking
+  - why: ambiguous intent — open telemetry vs restricted insert
+  - recommended owner: backend (decide: restrict to auth.uid() IS NOT NULL, or document as intentional)
+
+- [Sentry] TypeError: Cannot read properties of null (reading 'clear') — issue 1CW
+  - link: https://lexiclash.sentry.io/issues/120102540/
+  - reach: 5 users, 24h
+  - status: deferred — Sentry MCP unavailable this run; cannot read stack trace to identify file:line
+  - why: ambiguous root cause without stack trace
+  - recommended owner: self (retry when Sentry MCP is available)
+
+- [Sentry] churn-signals 502 — issue 1KQ
+  - link: https://lexiclash.sentry.io/issues/124871662/
+  - reach: 3 issues/24h
+  - status: deferred — fire-and-forget analytics endpoint; 502 = Railway upstream issue, not a code bug
+  - why: prior learnings confirm this is Railway deploy lag / infra noise
+  - recommended owner: self (monitor; fix only if count rises)
+
+## 2026-06-12 (lane-03 engagement)
+
+### [URGENT] Two code-complete experiments STILL dark — 94 rage clicks/7d lost
+Both `exp-mp-quickplay-wait-v1` and `exp-invite-arrival-clarity-v1` were wired on 2026-06-09 and 2026-06-10 respectively. PostHog 7d rage-click data: `/es/multiplayer` = **94 rage clicks** (dominant signal). Both experiments target this exact surface. Every day without these PostHog flags = continued 0% variant exposure and uncollected evidence.
+
+**ACTION REQUIRED (human, ~5 min each):**
+1. `exp-mp-quickplay-wait-v1` → PostHog → Feature Flags → New flag. Key: `exp-mp-quickplay-wait-v1`. Variants: `control` / `match-seeking`. Rollout: 50/50.
+2. `exp-invite-arrival-clarity-v1` → PostHog → Feature Flags → New flag. Key: `exp-invite-arrival-clarity-v1`. Variants: `control` / `status-card`. Rollout: 50/50.
+
+### [Experiment] `exp-practice-wheel-cta-v1` — registered, needs wire + PostHog flag
+- Registered in `lib/experiments.ts` this run (2026-06-12)
+- **NOT YET WIRED** — needs a "Try Again" CTA added to `PracticeWheelSandbox.tsx` game-over state
+- **ACTION REQUIRED**: Wire retry button in `PracticeWheelSandbox.tsx`, then create PostHog flag `exp-practice-wheel-cta-v1` (variants: `control` / `retry-cta`, 50/50)
+- Hypothesis: adds one-tap retry at game-over → lifts practice_started re-engagement rate, targeting the 43% wheelRush completion drop
+- recommended owner: self (next engagement lane)

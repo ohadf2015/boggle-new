@@ -1,14 +1,14 @@
 {
-  "date": "2026-06-11",
-  "note": "Sixteenth snapshot. Backend: dropped unused index idx_user_reports_pending (0 scans, advisor-flagged, reduces write overhead on user_reports). /daily/page.tsx force-dynamic CONFIRMED CORRECT — uses searchParams for per-request OG share images. Frontend: PostHog 7-day n>=50 routes: /es/multiplayer (LCP 4329ms 7d-avg includes pre-ISR-fix data, n=117) + /en (LCP 2460ms, INP 360ms, n=53). 24h window yielded 0 routes above n>=50 floor. Bundle: no .next build in working tree.",
+  "date": "2026-06-12",
+  "note": "Seventeenth snapshot. Backend: dropped unused index idx_blocked_entities_expires_at (0 scans, advisor-flagged, write cost with no read benefit — blocked_entities queries filter by block_type+value, not expires_at). Frontend: /multiplayer/page.tsx force-dynamic→revalidate=3600 (same fix as daily routes 06-09; no searchParams/cookies/auth in server component). 7-day PostHog: only /es/multiplayer above n>=50 floor.",
   "backend": {
-    "advisor_warnings_count": 3,
+    "advisor_warnings_count": 2,
     "advisor_warnings": [
       {
         "type": "unindexed_foreign_keys",
         "table": "word_pacts",
         "fkey": "word_pacts_player2_id_fkey",
-        "status": "SKIPPED — tiny table (~1 row). Seq Scan optimal. Re-evaluate at 1000+ rows."
+        "status": "SKIPPED — 1 row only. Seq Scan optimal. Re-evaluate at 1000+ rows."
       },
       {
         "type": "auth_db_connections_absolute",
@@ -16,78 +16,93 @@
       },
       {
         "type": "unused_index",
-        "index": "idx_user_reports_pending",
-        "table": "user_reports",
-        "status": "FIXED 2026-06-11 — migration drop_unused_idx_user_reports_pending applied. 0 scans confirmed."
+        "index": "idx_blocked_entities_expires_at",
+        "table": "blocked_entities",
+        "status": "FIXED 2026-06-12 — migration drop_unused_idx_blocked_entities_expires_at applied. 0 scans confirmed. Reduces write overhead on every blocked_entities INSERT/UPDATE."
       }
     ],
     "top_queries": [
       {
         "label": "Realtime WAL parser (2 variants)",
-        "total_ms": 5000576,
-        "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize"
+        "calls": 775439,
+        "mean_ms": 4.29,
+        "pct_total": 83.46,
+        "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize. Audit log: INVESTIGATE since 06-05, verdict unchanged."
       },
       {
         "label": "sync_coins RPC",
         "calls": 18761,
         "mean_ms": 7.3,
+        "pct_total": 2.19,
         "verdict": "OK"
       },
       {
         "label": "UPDATE profiles SET last_seen_at",
-        "calls": 48094,
-        "mean_ms": 1.58,
+        "calls": 50091,
+        "mean_ms": 1.59,
+        "pct_total": 1.27,
         "verdict": "OK"
       },
       {
         "label": "SELECT name FROM pg_timezone_names",
-        "calls": 219,
-        "mean_ms": 338.75,
-        "verdict": "INFRASTRUCTURE — internal PostgREST/catalog query, not app code"
+        "calls": 225,
+        "mean_ms": 343.75,
+        "pct_total": 1.24,
+        "verdict": "INFRASTRUCTURE — PostgREST catalog query on schema-cache reload, cannot optimize from app code"
+      },
+      {
+        "label": "Schema introspection (with tables AS SELECT c.oid...)",
+        "calls": 19,
+        "mean_ms": 2498.74,
+        "pct_total": 0.76,
+        "verdict": "INFRASTRUCTURE — PostgREST schema cache rebuild triggered by NOTIFY pgrst.reload; 19 calls = 19 migration/notify events since last pg_stat_statements reset"
+      },
+      {
+        "label": "friend_messages SELECT",
+        "calls": 190080,
+        "mean_ms": 0.14,
+        "pct_total": 0.43,
+        "verdict": "OK"
+      },
+      {
+        "label": "analytics_events SELECT",
+        "calls": 1384,
+        "mean_ms": 17.25,
+        "pct_total": 0.38,
+        "verdict": "OK"
       }
     ]
   },
   "frontend": {
-    "note": "24h window: 0 routes above n>=50 floor (low traffic). 7-day window used for trend baseline.",
+    "note": "24h window: 0 routes above n>=50 floor (low traffic). 7-day window: only /es/multiplayer above floor.",
     "by_route": [
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 4329,
+        "p75_lcp_ms": 4991,
         "p75_inp_ms": 352,
-        "p75_cls": 0.122,
-        "n_7d": 117,
+        "p75_cls": 0.14,
+        "n_7d": 142,
         "window": "7d",
-        "lcp_status": "DEGRADED 7d-avg — includes pre-ISR-fix data (06-05 to 06-08 at ~4903ms). 24h data below n>=50 floor.",
-        "inp_status": "POOR — 352ms >200ms threshold. Source undiagnosed. Defer until 24h n>=50."
-      },
-      {
-        "route": "/en",
-        "p75_lcp_ms": 2460,
-        "p75_inp_ms": 360,
-        "p75_cls": 0.137,
-        "n_7d": 53,
-        "window": "7d",
-        "lcp_status": "BORDERLINE — 2460ms near 2500ms threshold. Watch.",
-        "inp_status": "POOR — 360ms >200ms threshold. Source undiagnosed.",
-        "cls_status": "BORDERLINE — 0.137 near 0.1 threshold. Watch."
+        "lcp_status": "DEGRADED — 4991ms vs baseline 4329ms (+15.3%, under 20% regression threshold). force-dynamic→revalidate=3600 fix applied to /multiplayer/page.tsx on 2026-06-12; should improve future measurements.",
+        "inp_status": "POOR — 352ms >200ms threshold. Matches prior baseline (unchanged). Source undiagnosed — requires profiling. Defer until 24h n>=50.",
+        "cls_status": "BORDERLINE — 0.14 above 0.1 threshold. Slight uptick from 0.122 baseline (+14.7%, under 20% threshold)."
       }
     ],
     "deferred": [
       {
-        "route": "/en/daily/word-wheel",
-        "brief_lcp_ms": 5932,
-        "status": "DEFERRED — already has revalidate=3600. n<50 in 24h window. Brief data stale/low-n."
+        "route": "/sv/daily/word-hunt",
+        "brief_lcp_ms": 5076,
+        "status": "DEFERRED — brief data stale/low-n. n<50 in both 24h and 7d windows."
       },
       {
-        "route": "/sv/daily",
-        "brief_lcp_ms": 3772,
-        "status": "DEFERRED — force-dynamic CORRECT (per-request OG from searchParams). n<50 in 24h window."
+        "route": "/en/daily/word-wheel",
+        "brief_lcp_ms": 4910,
+        "status": "DEFERRED — already has revalidate=3600. n<50 in both 24h and 7d windows. Brief data stale."
       },
       {
         "route": "/he",
         "p75_cls": 0.386,
-        "n_7d": 8,
-        "status": "DEFERRED — CLS 0.386 very high but n=8 below 50-sample floor. Source undiagnosed."
+        "status": "DEFERRED — CLS 0.386 very high but n below 50-sample floor. Source undiagnosed."
       }
     ]
   },
