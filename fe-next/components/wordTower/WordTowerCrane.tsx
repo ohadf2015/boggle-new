@@ -155,11 +155,12 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     onSignedDrop?.(residual);
     const outcome = evaluatePlacement(effectiveDropError(signedOffset, swayOffset), consecutiveSloppy);
     setFalling(true);
-    // Short fall, then settle the verdict — keeps the impact felt.
+    // Let the girder fall most of the way (so the beam visibly lands) before the
+    // verdict pops + the tower commits — keeps the placement one continuous beat.
     setTimeout(() => {
       setResult(outcome);
       onDrop(outcome);
-    }, reducedMotion ? 0 : 260);
+    }, reducedMotion ? 0 : 300);
   }, [getOffset, onSignedDrop, onDrop, consecutiveSloppy, reducedMotion]);
 
   useImperativeHandle(ref, () => ({ drop }), [drop]);
@@ -237,8 +238,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
         >
           <div
             style={{
-              transform: `translateY(${falling ? 80 : 0}px)`,
-              transition: falling ? 'transform 240ms cubic-bezier(0.5,0,0.75,0)' : 'none',
+              transform: `translateY(${falling ? 94 : 0}px)`,
+              // Gravity accelerates the girder down, then a soft catch as it sets
+              // onto the tower — heavier + more satisfying than the old fast snap.
+              transition: falling ? 'transform 340ms cubic-bezier(0.45,0,0.2,1)' : 'none',
               transformOrigin: 'top center',
             }}
           >

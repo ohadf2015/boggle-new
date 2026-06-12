@@ -10,6 +10,7 @@
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import type { BlockSurface } from '@/lib/wordTower/blockGrade';
+import { swivelBrickFrame, SWIVEL_DESCENT_PX } from '@/lib/wordTower/swivelDrop';
 import { tileVariation, type TileVariation } from './tileVariation';
 
 const FONT = 'Fredoka, Rubik, sans-serif';
@@ -245,12 +246,14 @@ export function makeTile(char: string | null, size: number, color: number, pendi
   return tile;
 }
 
-/** Snap a tile to its slot with no animation (resume / reduced-motion / scroll-in). */
+/** Snap a tile to its slot with no animation (resume / reduced-motion / scroll-in).
+ *  Resets `angle` too so a tile interrupted mid-swivel never stays tilted. */
 export function placeInstant(tile: TileSprite, y: number): void {
   tile.anim++; // cancel any in-flight tween
   tile.y = y;
   tile.alpha = 1;
   tile.scale.set(1);
+  tile.angle = 0;
 }
 
 /** Gravity drop entrance: falls a SHORT distance into its slot with a monotonic
@@ -266,6 +269,50 @@ export function dropIn(tile: TileSprite, toY: number, delay: number, onLand?: ()
     tile.y = fromY + (toY - fromY) * easeOutCubic(k);
     tile.alpha = Math.min(1, k * 2.6);
   }, () => { tile.y = toY; tile.alpha = 1; onLand?.(); });
+}
+
+/** Swivel a whole word's vertical brick-run into place as ONE rigid piece —
+ *  hinged at the base joint, tipping to upright with a damped settle while the
+ *  group lowers in. Replaces the per-letter snap with a satisfying, weighty
+ *  placement. Each tile stays a child of its container (NO reparenting); we just
+ *  drive its local (x, y, angle) from the shared rotation each frame, so the
+ *  registry stays consistent and the lean/sway on the container composes on top.
+ *  `tiles` are given base→top with their rest (restX, restY). */
+export function swivelWordIn(
+  tiles: { tile: TileSprite; restX: number; restY: number }[],
+  pivotX: number,
+  pivotY: number,
+  startDeg: number,
+  durMs: number,
+  onSettle?: (i: number) => void,
+): void {
+  if (tiles.length === 0) return;
+  // Bump every tile's anim token up front: stops any in-flight tween on them, and
+  // lets a later placeInstant (which also bumps the token) cleanly cancel us.
+  const tokens = tiles.map(({ tile }) => ++tile.anim);
+  const t0 = performance.now();
+  const tick = () => {
+    const now = performance.now();
+    const k = Math.min(1, (now - t0) / durMs);
+    let alive = false;
+    tiles.forEach(({ tile, restX, restY }, i) => {
+      if (tile.destroyed || tile.anim !== tokens[i]) return; // cancelled / torn down
+      alive = true;
+      const f = swivelBrickFrame({ x: restX, y: restY }, pivotX, pivotY, startDeg, SWIVEL_DESCENT_PX, k);
+      tile.x = f.x;
+      tile.y = f.y;
+      tile.angle = f.angleDeg;
+      tile.alpha = 1;
+    });
+    if (!alive) return;
+    if (k < 1) { requestAnimationFrame(tick); return; }
+    tiles.forEach(({ tile, restX, restY }, i) => {
+      if (tile.destroyed || tile.anim !== tokens[i]) return;
+      tile.x = restX; tile.y = restY; tile.angle = 0;
+      onSettle?.(i);
+    });
+  };
+  requestAnimationFrame(tick);
 }
 
 /** Ease a settled tile to a new slot (the stack sliding down/up by a row). */

@@ -13,12 +13,12 @@ import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
 import { swayAngleAt } from '@/lib/wordTower/towerSway';
-import { impactParams } from '@/lib/wordTower/fallProfile';
+import { swivelStartDeg, swivelDurationMs } from '@/lib/wordTower/swivelDrop';
 import { toppleCrashFx } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
-  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, bumpScale, shakeX, squashLand, impactRing,
+  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLand, impactRing,
   type TileSprite,
 } from './towerSprites';
 import { BIOME_THEME } from './biomeTheme';
@@ -222,6 +222,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       else { try { tile.destroy({ children: true }); } catch { /* */ } }
     }
 
+    // The just-committed word's bricks (pending ghost → solid this render). They
+    // swivel into the stack TOGETHER as one rigid girder after the loop instead
+    // of each popping in place — the satisfying "the crane sets the word down"
+    // beat. Collected base→top (live is bottom→top), with their rest slot.
+    const committing: { tile: TileSprite; restX: number; restY: number; color: number }[] = [];
+
     // Add newcomers / update survivors — survivors keep their FIXED local y.
     for (const l of live) {
       const y = localY(l.pos);
@@ -236,32 +242,58 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         if (firstRender.current || reducedMotion || !isNewTop) {
           placeInstant(tile, y);
         } else {
-          // Escalating placement juice: each deeper letter lands with a heavier
-          // squash, a bigger shockwave ring, and more impact particles.
+          // A pending preview brick grows gently at the top while the player
+          // builds the word (a soft low-distance drop) — the WEIGHTY placement is
+          // saved for the crane drop (the group swivel below).
           const depth = l.pending ? Math.max(0, l.pos - C) : 0;
           const fx = letterPlacementFx(depth);
-          // Gravity WEIGHT: the further the block fell, the harder it lands —
-          // a depth-scaled screen-shake + dust debris so the impact is felt.
-          const impact = impactParams(depth);
           dropIn(tile, y, 0, () => {
-            squashLand(tile);
-            impactRing(c, centerX, y + half, half, l.color, fx.ringScale);
-            engine.particles.burst(COMBO_FLASH, centerX, y + half, fx.particles + impact.debris); // puff + dust at impact
-            if (impact.shakePx > 0.5) {
-              engine.shake.shake({ intensity: impact.shakePx, duration: 0.18, decay: 'exponential' });
-            }
+            impactRing(c, centerX, y + half, half, l.color, fx.ringScale * 0.6);
+            engine.particles.burst(COMBO_FLASH, centerX, y + half, Math.round(fx.particles * 0.6)); // light puff
           });
         }
       } else {
         // Fixed local y → reposition ONLY on a real layout change (resize); never
         // for the climb — that is the container's job, keeping the stack rigid.
-        if (Math.abs(existing.y - y) > 0.5) placeInstant(existing, y);
+        if (Math.abs(existing.y - y) > 0.5) { placeInstant(existing, y); existing.x = centerX; }
         if (existing.color !== l.color || existing.pending !== l.pending) {
           const lockingIn = existing.pending && !l.pending;
-          if (reducedMotion) paintTile(existing, l.color, l.pending, l.shared);
-          else { recolor(existing, l.color, l.pending, l.shared); if (lockingIn) bumpScale(existing); }
+          if (lockingIn && !reducedMotion) {
+            // Paint solid at once (the ghost was only a preview), then swivel the
+            // whole word-run in as a group below — no per-brick recolor fade.
+            paintTile(existing, l.color, l.pending, l.shared);
+            committing.push({ tile: existing, restX: centerX, restY: y, color: l.color });
+          } else if (reducedMotion) {
+            paintTile(existing, l.color, l.pending, l.shared);
+          } else {
+            // A non-lock colour change (the shared connector blending two words).
+            recolor(existing, l.color, l.pending, l.shared);
+          }
         }
       }
+    }
+
+    // Swivel the committed word in as ONE rigid piece, hinged at its base joint.
+    if (committing.length > 0 && !reducedMotion) {
+      const restYs = committing.map((b) => b.restY);
+      const baseRestY = Math.max(...restYs); // bottom-most new brick (largest y)
+      const topRestY = Math.min(...restYs);
+      const pivotX = centerX;
+      const pivotY = baseRestY + half; // the hinge: bottom edge of the run's base
+      const topDy = pivotY - topRestY; // distance pivot → top brick (for arc cap)
+      const startDeg = swivelStartDeg(leanRef.current, topDy);
+      const durMs = swivelDurationMs(committing.length);
+      const baseColor = committing[0].color;
+      swivelWordIn(committing, pivotX, pivotY, startDeg, durMs, (i) => {
+        const { tile } = committing[i];
+        squashLand(tile); // each brick lands with weight as it settles flush
+        if (i === 0) {
+          // One heavy thud + dust + ring at the base joint where it bites in.
+          impactRing(c, pivotX, pivotY, half, baseColor, 1.3);
+          engine.particles.burst(COMBO_FLASH, pivotX, pivotY, 10 + committing.length * 2);
+          engine.shake.shake({ intensity: Math.min(10, 4 + committing.length), duration: 0.2, decay: 'exponential' });
+        }
+      });
     }
 
     // ── Camera = climb-follow (shift) + user pan, applied to the WHOLE container ──
