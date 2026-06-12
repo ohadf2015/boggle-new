@@ -33,12 +33,19 @@ export type SurpriseEvent =
 // Surprises stay quiet on level 1 — the FTUE is teaching the core trace/clear
 // loop and a reward pop would muddy the first lesson.
 export const SURPRISE_UNLOCK_LEVEL = 2;
-// Minimum words between surprises. < this since the last one → no roll.
+// Minimum words between surprises. < this since the last one → no roll. Keeps
+// pops from clumping back-to-back (which cheapens the moment).
 export const SURPRISE_COOLDOWN = 2;
-// Words since the last surprise that force a guaranteed fire.
-export const SURPRISE_PITY = 7;
+// Words since the last surprise that force a guaranteed fire. CRITICAL: Blast
+// V2 levels are SHORT — 3 words (L1-5) / 4-5 words (L6-30) — so a player makes
+// only ~3-5 submits per level. A pity > 5 is unreachable and the guarantee
+// becomes dead code, leaving ~40% of levels with zero surprises. 4 guarantees
+// a pop by the 4th submit on every 4+ word level (the whole L6+ range).
+export const SURPRISE_PITY = 4;
 
-const BASE_CHANCE = 0.16;
+// Higher base than the first pass (0.16): with so few submits per level we want
+// surprises to land EARLY and often-ish, not only via the pity backstop.
+const BASE_CHANCE = 0.24;
 const MAX_SCALED_CHANCE = 0.9; // scaling never reaches a guaranteed 1
 const LEN_STEP = 0.03;
 const LEN_CAP = 0.15;

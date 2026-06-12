@@ -582,7 +582,11 @@ export function BlastGame({
       )}
       <BlastHud
         levelNumber={state.level.levelNumber}
-        coins={progressState.coins}
+        // Persisted coins + this level's in-progress coins (surprise payouts,
+        // word scores) so the counter ticks live during play — matching the
+        // chest bar below. Without the `state.coins` term, a +75 coin_burst
+        // wouldn't move the counter until level-end (gems would, coins wouldn't).
+        coins={progressState.coins + state.coins}
         chestNumber={progressState.chestNumber}
         // Live chest progress combines the server-known progress with the
         // in-game accumulation (capped at 1) so the badge ticks forward as

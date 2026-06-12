@@ -18,7 +18,9 @@ import {
 
 const baseCtx = (over: Partial<SurpriseContext> = {}): SurpriseContext => ({
   levelNumber: 10,
-  wordsSinceLast: 4,
+  // Below SURPRISE_PITY (4) so the default ctx exercises the SCALED chance, not
+  // the pity guarantee — the scaling tests below depend on this.
+  wordsSinceLast: 3,
   wordLen: 4,
   chainDepth: 0,
   ...over,
@@ -214,5 +216,55 @@ describe('resolveSubmitSurprise — reducer seam', () => {
     } else {
       expect(r.bonusCoins + r.bonusChestProgress).toBeGreaterThan(0);
     }
+  });
+});
+
+// --- Cadence simulation: surprises must actually fire within REAL level
+// lengths. Blast V2 levels ship 3 (L1-5) / 4-5 (L6-30) theme words, so a player
+// makes only ~3-5 submits per level. The variable-reward loop is worthless if
+// a typical level shows zero surprises — these tests pin the felt rate, not
+// just the per-function math. ---
+function simulateLevel(levelNumber: number, submits: number, wordLen = 4, chainDepth = 0) {
+  let s: SurpriseState = {
+    surpriseSeed: initialSurpriseSeed(levelNumber),
+    wordsSinceSurprise: 0,
+    nextWordMultiplier: 1,
+    activeSurprise: null,
+  };
+  const fired: Array<number> = []; // submit indices (1-based) that fired
+  for (let i = 1; i <= submits; i++) {
+    const r = resolveSubmitSurprise(s, { levelNumber, wordLen, chainDepth });
+    if (r.next.activeSurprise) fired.push(i);
+    s = r.next;
+  }
+  return fired;
+}
+
+describe('surprise cadence over real level lengths', () => {
+  it('a 5-word level (L19 class) always lands at least one surprise', () => {
+    expect(simulateLevel(19, 5).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('a 4-word level always lands at least one surprise', () => {
+    expect(simulateLevel(10, 4).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('the pity guarantee is REACHABLE within a 4-5 submit level', () => {
+    // The guarantee must fire by the time a short level ends, else it's dead code.
+    expect(SURPRISE_PITY).toBeLessThanOrEqual(5);
+  });
+
+  it('never fires on two adjacent submits (cooldown holds across the run)', () => {
+    for (const lvl of [6, 10, 19, 25]) {
+      const fired = simulateLevel(lvl, 8);
+      for (let i = 1; i < fired.length; i++) {
+        expect(fired[i]! - fired[i - 1]!).toBeGreaterThanOrEqual(2);
+      }
+    }
+  });
+
+  it('does not over-fire — a short level is not wall-to-wall surprises', () => {
+    // Spacing + cooldown keep it special: at most ~half the submits pop.
+    expect(simulateLevel(19, 5).length).toBeLessThanOrEqual(3);
   });
 });

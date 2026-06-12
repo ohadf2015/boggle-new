@@ -31,6 +31,12 @@ type HistoryEntry = {
   tileIds: string[][];
   status: GameStatus;
   completionReason: CompletionReason | null;
+  // Surprise counters are snapshotted so undo restores the variable-reward
+  // cadence too — otherwise undoing a lucky_double word would keep the banked
+  // ×2. surpriseSeed is deliberately NOT snapshotted (see undo): freezing it
+  // forward stops undo-and-resubmit from re-rolling for a better surprise.
+  wordsSinceSurprise: number;
+  nextWordMultiplier: 1 | 2;
 };
 
 // Cap so the stack can't grow unbounded over a long session. Five undos is
@@ -239,6 +245,8 @@ function applyValidatedSubmit(
     tileIds: state.tileIds,
     status: state.status,
     completionReason: state.completionReason,
+    wordsSinceSurprise: state.wordsSinceSurprise,
+    nextWordMultiplier: state.nextWordMultiplier,
   };
   const newHistory = [...state.history, snapshot].slice(-UNDO_STACK_LIMIT);
   return {
@@ -329,6 +337,8 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
     tileIds: state.tileIds,
     status: state.status,
     completionReason: state.completionReason,
+    wordsSinceSurprise: state.wordsSinceSurprise,
+    nextWordMultiplier: state.nextWordMultiplier,
   };
   const newHistory = [...state.history, snapshot].slice(-UNDO_STACK_LIMIT);
 
@@ -431,9 +441,12 @@ function reducer(state: State, action: Action): State {
       // `freeUndosUsed >= FREE_UNDO_LIMIT`.
       freeUndosUsed: state.freeUndosUsed + 1,
       history: newHistory,
-      // Dismiss any surprise banner from the undone move. Deliberately DON'T
-      // rewind surpriseSeed — otherwise a player could undo-and-resubmit to
+      // Restore the surprise cadence counters so undo rewinds the variable
+      // reward too (a banked ×2 from the undone word is given back). Deliberately
+      // DON'T rewind surpriseSeed — otherwise a player could undo-and-resubmit to
       // reroll until they hit golden_word. The seed only ever moves forward.
+      wordsSinceSurprise: prev.wordsSinceSurprise,
+      nextWordMultiplier: prev.nextWordMultiplier,
       activeSurprise: null,
     };
   }
