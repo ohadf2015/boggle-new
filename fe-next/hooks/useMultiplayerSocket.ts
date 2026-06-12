@@ -146,13 +146,18 @@ export function useMultiplayerSocket(
       socketInstance.emit('getActiveRooms');
     }
 
-    // Remove any existing listeners before adding new ones
+    // Remove any existing listeners before adding new ones.
+    //
+    // IMPORTANT: this list MUST NOT include the connection-lifecycle events
+    // (connect/disconnect/connect_error/reconnect/reconnect_failed/error).
+    // We attach to the SHARED Socket.IO singleton (getSharedSocket), and
+    // SocketContext's SocketProvider also registers ITS handlers for those
+    // events on the same socket to drive the app-wide connection indicator.
+    // `socket.off(event)` with no handler removes ALL listeners — clobbering
+    // SocketProvider's and freezing the indicator app-wide after the MP page
+    // unmounts. Those 6 events are registered as named handlers below and torn
+    // down by reference. Only MP-exclusive events are safe to blanket-remove.
     const eventNames = [
-      'connect',
-      'disconnect',
-      'connect_error',
-      'reconnect',
-      'reconnect_failed',
       'joined',
       'updateUsers',
       'activeRooms',
@@ -160,7 +165,6 @@ export function useMultiplayerSocket(
       'spectatorList',
       'spectatorUpgraded',
       'debugGameStateResponse',
-      'error',
       'startGame',
       'resetGame',
       'hostLeftRoomClosing',
@@ -175,8 +179,12 @@ export function useMultiplayerSocket(
     ];
     eventNames.forEach((event) => socketInstance.off(event));
 
-    // Connection events
-    socketInstance.on('connect', () => {
+    // Connection events.
+    //
+    // Registered as NAMED handlers (not inline) so cleanup can remove ONLY our
+    // handler via off(event, fn) without disturbing SocketProvider's handlers
+    // on the shared singleton. See the eventNames comment above.
+    const onConnect = () => {
       logger.log('[SOCKET.IO] Connected:', socketInstance.id);
       setIsConnected(true);
       setSocket(socketInstance);
@@ -207,18 +215,18 @@ export function useMultiplayerSocket(
         }
       }
       wasConnectedRef.current = true;
-    });
+    };
 
-    socketInstance.on('disconnect', (reason) => {
+    const onDisconnect = (reason: string) => {
       logger.log('[SOCKET.IO] Disconnected:', reason);
       setIsConnected(false);
 
       if (reason === 'io server disconnect') {
         socketInstance.connect();
       }
-    });
+    };
 
-    socketInstance.on('connect_error', (error) => {
+    const onConnectError = (error: Error) => {
       logger.error('[SOCKET.IO] Connection error:', error.message);
       captureSocketError(error, {
         event: 'connect_error',
@@ -226,14 +234,14 @@ export function useMultiplayerSocket(
         socketId: socketInstance.id || undefined,
         username: optionsRef.current.username || undefined,
       });
-    });
+    };
 
-    socketInstance.on('reconnect', (attemptNumber) => {
+    const onReconnect = (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
       setIsConnected(true);
-    });
+    };
 
-    socketInstance.on('reconnect_failed', () => {
+    const onReconnectFailed = () => {
       logger.error('[SOCKET.IO] Reconnection failed');
       captureSocketError(new Error('Reconnection exhausted after max attempts'), {
         event: 'reconnect_failed',
@@ -241,7 +249,13 @@ export function useMultiplayerSocket(
         socketId: socketInstance.id || undefined,
         username: optionsRef.current.username || undefined,
       });
-    });
+    };
+
+    socketInstance.on('connect', onConnect);
+    socketInstance.on('disconnect', onDisconnect);
+    socketInstance.on('connect_error', onConnectError);
+    socketInstance.on('reconnect', onReconnect);
+    socketInstance.on('reconnect_failed', onReconnectFailed);
 
     // Game events
     socketInstance.on('joined', (data) => {
@@ -344,7 +358,8 @@ export function useMultiplayerSocket(
       }
     });
 
-    socketInstance.on('error', (data) => {
+    // socket 'error' payloads are heterogeneous (string | {code,message,...})
+    const onError = (data: any) => {
       const isErrorLike = data && typeof data === 'object' && ('stack' in data || 'message' in data);
       const errorMessage = data?.message || (typeof data === 'string' ? data : null);
       const errorCode = data?.code;
@@ -395,7 +410,9 @@ export function useMultiplayerSocket(
       }
 
       optionsRef.current.onError(data);
-    });
+    };
+
+    socketInstance.on('error', onError);
 
     socketInstance.on('startGame', (data) => {
       logger.log('[SOCKET.IO] startGame received:', data);
@@ -610,6 +627,14 @@ export function useMultiplayerSocket(
         kickedReloadTimerRef.current = null;
       }
       eventNames.forEach((event) => socketInstance.off(event));
+      // Remove ONLY our connection-lifecycle handlers by reference so
+      // SocketProvider's handlers on the shared singleton stay intact.
+      socketInstance.off('connect', onConnect);
+      socketInstance.off('disconnect', onDisconnect);
+      socketInstance.off('connect_error', onConnectError);
+      socketInstance.off('reconnect', onReconnect);
+      socketInstance.off('reconnect_failed', onReconnectFailed);
+      socketInstance.off('error', onError);
       if (!isReusingSocket) {
         releaseSharedSocket();
       }
