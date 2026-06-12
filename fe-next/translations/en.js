@@ -9724,6 +9724,7 @@ const en = {
     "celebrateAgain": "Celebrate again",
     "best": "Best",
     "movesLeft": "Moves",
+    "time": "Time",
     "you": "YOU",
     "live": "LIVE",
     "luckyBoost": "Lucky Boost",

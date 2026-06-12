@@ -10091,6 +10091,7 @@ const es = {
     "celebrateAgain": "Celebrar de nuevo",
     "best": "Mejor",
     "movesLeft": "Movimientos",
+    "time": "Tiempo",
     "you": "TÚ",
     "live": "EN VIVO",
     "luckyBoost": "Bonus de Suerte",

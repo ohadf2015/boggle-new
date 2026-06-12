@@ -10264,6 +10264,7 @@ const he = {
     "celebrateAgain": "חגוג שוב",
     "best": "שיא",
     "movesLeft": "מהלכים",
+    "time": "זמן",
     "you": "את/ה",
     "live": "חי",
     "luckyBoost": "בונוס מזל",

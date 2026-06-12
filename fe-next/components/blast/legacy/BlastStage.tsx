@@ -3,7 +3,6 @@
 import { memo, useRef, useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Shuffle, AlertTriangle, Lightbulb } from 'lucide-react';
-import CircularTimer from '@/components/CircularTimer';
 const BlastTileGuide = dynamic(() => import('./BlastTileGuide'), { ssr: false });
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
@@ -280,6 +279,8 @@ export const BlastStage = memo(function BlastStage({
         ddaBoostActive={ddaBoostActive}
         hintSlot={hintSlot}
         isMultiplayer={isMultiplayer}
+        remainingTime={remainingTime}
+        totalTime={totalTime}
         t={t}
       />
       <BlastObjectiveBanner objectives={objectiveProgress} t={t} />
@@ -289,12 +290,8 @@ export const BlastStage = memo(function BlastStage({
         </div>
       )}
       {hintToast}
-      {/* Multiplayer timer — shown to players only */}
-      {remainingTime !== null && remainingTime !== undefined && totalTime !== undefined && totalTime > 0 && (
-        <div className="flex justify-center mt-2">
-          <CircularTimer remainingTime={remainingTime} totalTime={totalTime} size="sm" />
-        </div>
-      )}
+      {/* MP countdown now lives inline in the HUD top row (see BlastHUD); it no
+          longer floats here above the board, which kept crowding the grid. */}
       </div>
 
       {/* 1b. Live leaderboard strip (MP only) — mobile only; desktop uses the
