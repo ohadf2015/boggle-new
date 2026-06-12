@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useDailyChallengeStats, type PreloadedDailyStats } from '@/hooks/useDailyChallengeStats';
+import { CUBE_BLUR_DATA_URL } from '@/lib/landing/modeMeta';
 
 interface DailyChallengeCubeProps {
   /** Pre-loaded daily stats from the landing page to avoid a duplicate fetch. */
@@ -40,7 +41,11 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
       onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
       aria-label={`${t('daily.badge')} #${puzzleNumber}`}
       className={cn(
-        'cube-reveal group relative flex min-h-[112px] w-full items-stretch overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy shadow-hard transition-transform duration-150 sm:min-h-[132px]',
+        // Gold (neo-yellow) colour-coded edge AT REST — daily was the one tile
+        // with a plain black shadow, so it read as "missing colour". The gold edge
+        // (an allowed celebration accent for daily) gives it the same colour-coded
+        // signal the mode cubes carry, plus the warm sunburst mascot art.
+        'cube-reveal group relative flex min-h-[112px] w-full items-stretch overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy shadow-hard-yellow transition-transform duration-150 sm:min-h-[132px]',
         'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg',
         'focus-visible:-translate-x-0.5 focus-visible:-translate-y-0.5',
         'active:translate-x-0 active:translate-y-0 active:shadow-hard-pressed',
@@ -55,6 +60,8 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
           alt=""
           fill
           priority
+          placeholder="blur"
+          blurDataURL={CUBE_BLUR_DATA_URL}
           sizes="(max-width: 768px) 45vw, 180px"
           className="object-contain object-center transition-transform duration-200 motion-safe:group-hover:scale-[1.06]"
         />

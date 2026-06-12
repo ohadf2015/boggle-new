@@ -225,45 +225,9 @@ describe('LandingChallengeCards — Shiritori admin dev-preview gate', () => {
   });
 });
 
-describe('LandingChallengeCards — Blast Classic admin gate', () => {
-  it('does NOT render the Blast Classic card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.blastClassic')).toBeNull();
-  });
-
-  it('renders the Blast Classic V1 card for an admin with ?v2=off href', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.blastClassic');
-    expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/blast?v2=off');
-  });
-});
-
-describe('LandingChallengeCards — Blast V2 admin gate', () => {
-  it('does NOT render the Blast V2 card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.blastV2')).toBeNull();
-  });
-
-  it('renders the Blast V2 card for an admin linking to the standalone /blast/v2 route', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.blastV2');
-    expect(card).toBeInTheDocument();
-    // Separate mode, not a ?v2=on toggle on the V1 /blast page.
-    expect(card.getAttribute('data-href')).toBe('/en/blast/v2');
-  });
-});
 
 describe('LandingChallengeCards — full admin dev-preview roster', () => {
-  it('renders ALL 9 admin-gated dev preview cards for a post-newbie admin', () => {
+  it('renders ALL 7 admin-gated dev preview cards for a post-newbie admin', () => {
     mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('admin@example.com');
     // Past newbie + first-timer + newcomer-by-games gates → no collapse expander,
@@ -276,8 +240,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       // WordCraft consolidated to ONE public card; Cards/Gems are URL sub-modes
       // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
       'mode-wordTower.cardTitle',          // Word Tower
-      'mode-landing.blastClassic',         // Blast Classic V1
-      'mode-landing.blastV2',              // Blast V2 (/blast/v2)
       'mode-landing.wordForgeMode',        // Word Forge
       'mode-landing.wordVaultMode',        // Word Vault
       'mode-landing.partyMode',            // Party Games
@@ -299,8 +261,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
       'mode-wordTower.cardTitle',
-      'mode-landing.blastClassic',
-      'mode-landing.blastV2',
       'mode-landing.wordForgeMode',
       'mode-landing.wordVaultMode',
       'mode-landing.partyMode',

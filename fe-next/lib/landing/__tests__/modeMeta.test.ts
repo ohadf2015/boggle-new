@@ -57,9 +57,6 @@ describe('MODE_META — parity with control renderCard', () => {
       expect(modeRoute('connections', 'en')).toBe('/en/connections/play');
     });
 
-    it('preserves query strings in the path (blastClassic opts into v1)', () => {
-      expect(modeRoute('blastClassic', 'en')).toBe('/en/blast?v2=off');
-    });
 
     it('returns null for an unknown key', () => {
       expect(modeRoute('nope', 'en')).toBeNull();

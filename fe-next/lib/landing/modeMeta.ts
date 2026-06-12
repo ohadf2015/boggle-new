@@ -19,6 +19,15 @@ import {
 export const CUBE_VARIANTS = ['pink', 'cyan', 'purple', 'orange', 'lime', 'blue'] as const;
 export type ModeCubeVariant = (typeof CUBE_VARIANTS)[number];
 
+/**
+ * Shared LQIP blur for every cube `next/image`. A 4×4 solid `neo-navy` (#1a1a2e)
+ * PNG — the SAME colour every cube tile already paints — so the blur-up is
+ * seamless (tile shows instantly, the mascot art fades in over an identical
+ * navy) and costs one inline 122-byte data URI instead of 16 per-image LQIPs.
+ */
+export const CUBE_BLUR_DATA_URL =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAEElEQVR42mOQktKDIwbiOACeNAYhWqpQcwAAAABJRU5ErkJggg==';
+
 export interface ModeMetaEntry {
   /** i18n key for the cube title */
   readonly titleKey: string;
@@ -74,14 +83,6 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   // Admin-only dev previews — also carry generated cube icons so the "+ More"
   // grid is full-bleed art across the board. Colours spread to avoid clusters.
-  blastClassic: {
-    titleKey: 'landing.blastClassic', descKey: 'landing.blastClassicDesc', path: '/blast?v2=off',
-    Icon: Bomb, variant: 'orange', badge: 'V1', genIcon: '/modes/cubes/blastclassic.png',
-  },
-  blastV2: {
-    titleKey: 'landing.blastV2', descKey: 'landing.blastV2Desc', path: '/blast/v2',
-    Icon: Bomb, variant: 'purple', badge: 'V2', genIcon: '/modes/cubes/blastv2.png',
-  },
   wordTower: {
     titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc', path: '/word-tower',
     Icon: Building2, variant: 'lime', badge: 'ADMIN', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',

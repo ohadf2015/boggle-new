@@ -20,7 +20,7 @@ import Link from 'next/link';
 import { ArrowRight, ArrowLeft, Lock, ChevronDown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { ModeCubeModel, ModeCubeVariant } from '@/lib/landing/modeMeta';
+import { CUBE_BLUR_DATA_URL, type ModeCubeModel, type ModeCubeVariant } from '@/lib/landing/modeMeta';
 
 interface VariantStyle {
   /** solid colour fill (anchor) */
@@ -51,9 +51,18 @@ const VARIANT: Record<ModeCubeVariant, VariantStyle> = {
   blue:   { fill: 'bg-blue-500',   ink: 'text-neo-white', chip: 'bg-blue-500',   chipInk: 'text-neo-white', restShadow: 'shadow-hard-blue',   shadow: 'group-hover:shadow-hard-blue',   ring: 'focus-visible:ring-blue-400' },
 };
 
-function Badge({ label }: { label: string }) {
+// Badge wears the mode colour (not navy) so every flagged cube pops a chip of
+// its own hue — a contained, on-brand splash of colour on the bento beyond the
+// art itself. ADMIN previews stay quiet navy so they don't shout over public modes.
+function Badge({ label, chip, chipInk }: { label: string; chip: string; chipInk: string }) {
+  const quiet = label.toUpperCase() === 'ADMIN';
   return (
-    <span className="absolute top-1.5 end-1.5 z-10 rounded-full border-2 border-black bg-neo-navy px-2 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-none tracking-wide text-neo-white shadow-hard-sm">
+    <span
+      className={cn(
+        'absolute top-1.5 end-1.5 z-10 rounded-full border-2 border-black px-2 py-0.5 font-neo-display text-[0.6rem] font-black uppercase leading-none tracking-wide shadow-hard-sm',
+        quiet ? 'bg-neo-navy text-neo-white' : cn(chip, chipInk),
+      )}
+    >
       {label}
     </span>
   );
@@ -150,6 +159,12 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
             src={model.genIcon as string}
             alt=""
             fill
+            // The anchor (arena) is above the fold → eager-preload it; the rest of
+            // the bento stays lazy. A shared navy LQIP blurs up seamlessly (same
+            // navy as the tile) so cubes never pop in from blank.
+            priority={anchor}
+            placeholder="blur"
+            blurDataURL={CUBE_BLUR_DATA_URL}
             sizes={anchor ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 50vw, 25vw'}
             onError={() => setImgFailed(true)}
             className={cn(
@@ -177,7 +192,7 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
         )}
       />
 
-      {model.badge && <Badge label={model.badge} />}
+      {model.badge && <Badge label={model.badge} chip={v.chip} chipInk={v.chipInk} />}
       {locked && <LockOverlay message={model.lockedMessage} />}
 
       {/* ---- content layer ---- */}
