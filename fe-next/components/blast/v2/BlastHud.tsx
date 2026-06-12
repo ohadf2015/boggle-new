@@ -5,6 +5,7 @@ import { mechanicsForLevel } from '@/lib/blast/v2/mechanic-flags';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BlastChestBadge } from './BlastChestBadge';
 import { BlastChestPreviewModal } from './BlastChestPreviewModal';
+import { themeEmoji } from '@/lib/blast/v2/themeEmoji';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
 type Props = {
@@ -157,10 +158,11 @@ export function BlastHud({
             {theme && (
               <span
                 data-testid="theme-label"
-                className="text-base font-neo-display font-black uppercase tracking-wide truncate mt-0.5"
+                className="flex items-center gap-1 text-base font-neo-display font-black uppercase tracking-wide truncate mt-0.5"
                 style={{ color: modeColor, textShadow: `1px 1px 0 #0b1530` }}
               >
-                {t(`blast.themes.${theme}`, theme)}
+                <span aria-hidden style={{ textShadow: 'none' }}>{themeEmoji(theme)}</span>
+                <span className="truncate">{t(`blast.themes.${theme}`, theme)}</span>
               </span>
             )}
           </div>

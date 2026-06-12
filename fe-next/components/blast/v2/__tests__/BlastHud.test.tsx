@@ -74,6 +74,13 @@ describe('BlastHud', () => {
     expect(onUndo).toHaveBeenCalledTimes(1);
   });
 
+  it('shows the theme emoji beside the theme name (per-level identity)', () => {
+    render(
+      <BlastHud levelNumber={5} coins={0} chestProgress={0} onShuffle={vi.fn()} onHint={vi.fn()} theme="space" />
+    );
+    expect(screen.getByTestId('theme-label')).toHaveTextContent('🚀');
+  });
+
   describe('target-word clue gating (only first 3 levels)', () => {
     const words = ['CAT', 'SUN', 'EGG'];
 
