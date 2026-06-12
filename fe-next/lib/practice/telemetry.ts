@@ -83,3 +83,19 @@ export function trackPracticeChainClicked(args: PracticeChainClickedArgs): void 
     to_mode: args.toMode,
   });
 }
+
+export interface PracticeAbandonedArgs extends ModeLocale {
+  /** Which surface the user was on when they left. */
+  step: 'tutorial' | 'play';
+  /** Seconds from mount to navigation-away — helps distinguish bounce vs engaged-drop. */
+  secondsOnPage: number;
+}
+
+export function trackPracticeAbandoned(args: PracticeAbandonedArgs): void {
+  safeCapture('practice_abandoned', {
+    mode: args.mode,
+    locale: args.locale,
+    step: args.step,
+    seconds_on_page: args.secondsOnPage,
+  });
+}

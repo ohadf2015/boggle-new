@@ -245,6 +245,8 @@ const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
   'session_start',
   'signup_completed',
   'first_win_signup_completed',
+  // collect-revenue.sh queries unprefixed 'rewarded_ad_watched' — must dual-emit
+  'rewarded_ad_watched',
 ]);
 
 /**

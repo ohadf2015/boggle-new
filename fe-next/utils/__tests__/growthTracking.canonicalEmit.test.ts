@@ -96,4 +96,16 @@ describe('trackGrowthEvent — canonical dual-emit', () => {
     const canonical = capture.mock.calls.find(c => c[0] === 'signup_completed');
     expect(canonical?.[1]).toMatchObject({ source: 'unknown' });
   });
+
+  // nightly collect-revenue.sh queries for unprefixed 'rewarded_ad_watched'
+  // but trackRewardedAdWatched only emits 'growth:rewarded_ad_watched' unless
+  // the event is in CANONICAL_DUAL_EMIT — causing 0/7d in the revenue brief.
+  it('trackRewardedAdWatched dual-emits canonical rewarded_ad_watched for nightly collector', async () => {
+    const { trackRewardedAdWatched } = await import('../growthTracking');
+    trackRewardedAdWatched('admob', 50, 'results');
+
+    const names = capture.mock.calls.map(c => c[0]);
+    expect(names).toContain('growth:rewarded_ad_watched');
+    expect(names).toContain('rewarded_ad_watched');
+  });
 });

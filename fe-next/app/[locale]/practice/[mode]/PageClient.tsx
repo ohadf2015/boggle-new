@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useEffect, useLayoutEffect } from 'react';
+import { useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeTutorialSheet from '@/components/practice/PracticeTutorialSheet';
@@ -11,6 +11,7 @@ import PracticeDesktopWelcome from '@/components/practice/PracticeDesktopWelcome
 import { useModeFirstSeen } from '@/hooks/useModeFirstSeen';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
+import { trackPracticeAbandoned } from '@/lib/practice/telemetry';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 interface Props {
@@ -50,6 +51,30 @@ export default function PracticePageClient({ mode, locale }: Props) {
       ? 'play'
       : 'tutorial';
   const [step, setStep] = useState<Step>(initialStep);
+
+  // Track current step in a ref so the unmount cleanup captures the latest value
+  // without adding `step` to the abandon-event dep array (which would re-register
+  // the cleanup on every tutorial→play transition and misfire).
+  const stepRef = useRef<Step>(initialStep);
+  const mountTimeRef = useRef<number>(Date.now());
+  useEffect(() => { stepRef.current = step; }, [step]);
+
+  // Fire `practice_abandoned` when user navigates away before completing.
+  // Runs only on unmount (mode/locale are stable for the lifetime of this page).
+  useEffect(() => {
+    mountTimeRef.current = Date.now();
+    return () => {
+      if (!isPracticeModeComplete(mode, language)) {
+        trackPracticeAbandoned({
+          mode,
+          locale,
+          step: stepRef.current,
+          secondsOnPage: Math.round((Date.now() - mountTimeRef.current) / 1000),
+        });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, locale]); // mode/locale never change; language read at cleanup time via closure
 
   // If the player completes the mode in another tab while this one is open,
   // promote the surface to 'play' on next render so they don't get re-routed

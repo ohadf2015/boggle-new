@@ -410,6 +410,28 @@ export const EXPERIMENTS = {
     description:
       'Invite arrival for returning users. control = blank navy overlay while redirect fires. status-card = "Connecting…" card + spinner so user knows redirect is in flight. Targets rage clicks on ?room= invite URLs. Conversion = invite_redirect_fired → invite_consumed.',
   }),
+
+  /**
+   * WheelRush practice completion retry CTA. PostHog 7d: 43% of practice
+   * sessions on /practice/wheelRush drop before completion (47 started → 27
+   * completed). No retry affordance exists after a failed attempt — player
+   * must navigate back to the hub and tap the tile again.
+   *
+   * `retry-cta` variant adds a primary "Try Again" button at the wheel-game-over
+   * screen so re-engagement is one tap. control = current (no explicit retry).
+   *
+   * Conversion: practice_started within 60s of prior practice_abandoned or
+   * practice_completed (same mode, same person).
+   * Guardrail: practice_chain_clicked must not fall (don't cannibalize chain).
+   * Ship to PostHog: flag key = 'exp-practice-wheel-cta-v1', 50/50 rollout.
+   * Wire: PracticeWheelSandbox.tsx — game-over state, show retry button.
+   */
+  'exp-practice-wheel-cta-v1': defineExperiment({
+    variants: ['control', 'retry-cta'] as const,
+    default: 'control',
+    description:
+      'WheelRush practice retry CTA. retry-cta = "Try Again" primary button on wheel game-over screen. control = current hub-back flow. Targets 43% drop on /practice/wheelRush. Conversion = practice_started within 60s of abandon/complete (same mode+person). Guardrail = practice_chain_clicked.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;
