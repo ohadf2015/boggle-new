@@ -14,8 +14,6 @@ import RoomChat from '@/components/RoomChat';
 import { type WordFeedback } from '../../WordFormingArea';
 import { WordFormingAreaConnected } from './WordFormingAreaConnected';
 import { ComboDisplayConnected } from '../../ComboDisplayConnected';
-import CompactLeaderboard from '../../CompactLeaderboard';
-import { useBlastComboSync } from '@/hooks/gameState/store';
 import { shouldShowKeyboardTrails } from '../../keyboardTrailsUtils';
 import { KeyboardInlineHint } from '@/components/keyboard';
 import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
@@ -239,9 +237,6 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   onTimerState,
   inDesktopShell = false,
 }) {
-  // Combo event for leaderboard badges (from Zustand blastComboSync)
-  const blastComboSync = useBlastComboSync();
-
   // Derive avatar map from leaderboard for WordHunt player lives.
   // Use deferred so socket-burst leaderboard updates don't recompute mid-drag.
   const playerAvatars = useMemo(() => {
@@ -259,18 +254,6 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
     () => foundWords.filter((fw) => fw.isValid !== false && fw.word.length >= 5).length,
     [foundWords],
   );
-  const compactLeaderboardPlayers = useMemo(
-    () => deferredLeaderboard.map((p) => ({
-      username: p.username,
-      score: p.score,
-      rank: 0,
-      avatarImage: p.avatar?.avatarImage,
-      customAvatar: p.avatar?.customAvatar,
-      inputMethod: p.username === username && isTypingMode ? 'keyboard' as const : null,
-    })),
-    [deferredLeaderboard, username, isTypingMode],
-  );
-
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
@@ -675,17 +658,19 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </div>
           )}
 
-          {/* Mobile: Split-view with compact leaderboard + words.
+          {/* Mobile: Split-view with the single live leaderboard + words.
               Leaderboard only when there are other players; word list always shows while playing
               so single-player users can see their progress. */}
           {isPlaying && !gameplayFocusMode && (
             <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto md:space-y-1 shrink overflow-y-auto min-h-0 max-h-[120px] sm:max-h-[140px] medium-short:max-h-[88px] short:max-h-[80px] scrollbar-thin">
-              {deferredLeaderboard && deferredLeaderboard.length > 0 && (
-                <CompactLeaderboard
-                  players={compactLeaderboardPlayers}
-                  currentUsername={username}
+              {deferredLeaderboard && deferredLeaderboard.length > 1 && (
+                <GameLeaderboard
+                  leaderboard={deferredLeaderboard}
+                  username={username}
+                  isHost={isHost}
                   t={t}
-                  comboEvent={blastComboSync}
+                  dir={dir}
+                  compact
                 />
               )}
               <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} compact />
@@ -703,15 +688,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             standings: desktop players were previously blind to who was winning. */}
         {((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
-            {/* Live race-track leaderboard with avatars (multiplayer only) */}
-            {deferredLeaderboard && deferredLeaderboard.length > 1 && (
-              <CompactLeaderboard
-                players={compactLeaderboardPlayers}
-                currentUsername={username}
-                t={t}
-                comboEvent={blastComboSync}
-              />
-            )}
+            {/* Single live leaderboard — ranked standings with a "your standing"
+                cue (leading by N / N points to catch). Replaces the previous
+                duplicate race-track + standings stack. */}
             {deferredLeaderboard && deferredLeaderboard.length > 0 && (
               <GameLeaderboard
                 leaderboard={deferredLeaderboard}

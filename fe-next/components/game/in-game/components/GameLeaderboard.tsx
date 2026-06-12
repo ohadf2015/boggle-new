@@ -10,6 +10,7 @@ import { getAvatarTrait } from '@/lib/avatar/avatarPersonality';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import PresenceIndicator from '@/components/PresenceIndicator';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
+import { cn } from '@/lib/utils';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer } from '@/shared/types/view';
 import type { TranslationFn } from '../types';
 
@@ -19,6 +20,9 @@ interface GameLeaderboardProps {
   isHost: boolean;
   t: TranslationFn;
   dir: 'rtl' | 'ltr';
+  /** Tighter rendering for the mobile in-game split view (smaller border, no
+   *  slide-in). Defaults to the full desktop sidebar styling. */
+  compact?: boolean;
 }
 
 interface MemoizedLeaderboardPlayer extends LeaderboardPlayer {
@@ -214,9 +218,26 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
   isHost,
   t,
   dir,
+  compact = false,
 }) {
   // Track previous scores and ranks for change detection
   const prevDataRef = useRef<Map<string, { rank: number; score: number }>>(new Map());
+
+  // "Your standing" cue — the single live leaderboard now carries the
+  // motivational signal the old race-track panel used to: am I leading (and by
+  // how much), or how many points do I need to pass the player right above me.
+  // `leaderboard` arrives pre-sorted (rank === index), so neighbours are direct.
+  const youStanding = useMemo(() => {
+    const myIndex = leaderboard.findIndex((p) => p.username === username);
+    if (myIndex === -1 || leaderboard.length < 2) return null;
+    if (myIndex === 0) {
+      const gap = leaderboard[0].score - (leaderboard[1]?.score ?? 0);
+      return { leading: true as const, gap };
+    }
+    const target = leaderboard[myIndex - 1];
+    const toCatch = Math.max(1, target.score - leaderboard[myIndex].score + 1);
+    return { leading: false as const, toCatch };
+  }, [leaderboard, username]);
 
   const memoizedLeaderboard: MemoizedLeaderboardPlayer[] = useMemo(
     () =>
@@ -253,24 +274,57 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
 
   return (
     <AdaptiveMotion.div
-      className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-[50vh] lg:shrink relative"
-      initial={{ x: 50, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: 0.2 }}
+      className={cn(
+        'bg-neo-cream text-neo-black border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden relative',
+        compact ? 'border-3' : 'border-4 max-h-[45vh] lg:max-h-[50vh] lg:shrink',
+      )}
+      initial={compact ? false : { x: 50, opacity: 0 }}
+      animate={compact ? undefined : { x: 0, opacity: 1 }}
+      transition={compact ? undefined : { delay: 0.2 }}
     >
       {/* Header */}
-      <div className="py-2.5 px-4 border-b-4 border-neo-black bg-neo-pink text-white">
-        <h3 className="flex items-center gap-2 text-neo-white text-sm uppercase tracking-widest font-black">
-          <Trophy className="w-4 h-4 text-neo-lime" />
-          {t('playerView.leaderboard')}
-          <span className="ms-auto text-[10px] font-bold text-neo-white tabular-nums">
-            {leaderboard.length} {leaderboard.length === 1 ? 'player' : 'players'}
+      <div className={cn('border-b-4 border-neo-black bg-neo-pink text-white', compact ? 'py-1.5 px-3' : 'py-2.5 px-4')}>
+        <h3 className={cn('flex items-center gap-2 text-neo-white uppercase tracking-widest font-black', compact ? 'text-xs' : 'text-sm')}>
+          <Trophy className="w-4 h-4 text-neo-lime shrink-0" />
+          <span className="truncate">{t('playerView.leaderboard')}</span>
+          <span className="ms-auto text-[10px] font-bold text-neo-white tabular-nums whitespace-nowrap shrink-0">
+            {t('mp.rivals.playersCount', { n: leaderboard.length })}
           </span>
         </h3>
       </div>
 
+      {/* Your standing — leading by N / N points to catch the player above. */}
+      {youStanding && (
+        <div
+          data-testid="leaderboard-you-status"
+          className={cn(
+            'flex items-center justify-center gap-1.5 px-3 py-1 border-b-2 border-neo-black font-black uppercase tracking-wide',
+            compact ? 'text-[10px]' : 'text-xs',
+            youStanding.leading ? 'bg-neo-lime text-neo-black' : 'bg-neo-cyan/15 text-neo-black',
+          )}
+        >
+          {youStanding.leading ? (
+            <>
+              <Flame className="w-3.5 h-3.5 text-neo-pink shrink-0" />
+              <span>{t('leaderboard.leading')}</span>
+              {youStanding.gap > 0 && (
+                <span className="tabular-nums text-neo-black/70">
+                  +{youStanding.gap} {t('leaderboard.ahead')}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <TrendingUp className="w-3.5 h-3.5 text-neo-cyan shrink-0" />
+              <span className="tabular-nums">+{youStanding.toCatch}</span>
+              <span>{t('leaderboard.toCatch')}</span>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Content */}
-      <div className="overflow-y-auto flex-1 p-2.5 custom-scrollbar">
+      <div className={cn('p-2.5', compact ? 'overflow-y-auto custom-scrollbar' : 'overflow-y-auto flex-1 custom-scrollbar')}>
         <div className="space-y-1.5" role="list">
           {memoizedLeaderboard.map((player) => {
             const change = changes.get(player.username);
