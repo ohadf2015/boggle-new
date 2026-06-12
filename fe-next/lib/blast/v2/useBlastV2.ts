@@ -10,6 +10,7 @@ import {
 import { mechanicsForLevel } from './mechanic-flags';
 import { computeStrikeBudget } from './strike-budget';
 import { trackBlastWordFound, trackBlastWordRejected, trackBlastHintUsed } from './telemetry';
+import { resolveSubmitSurprise, initialSurpriseSeed, type ActiveSurprise } from './surprise';
 
 // Terminal states end interaction: 'levelComplete' is a win (mastered/partial,
 // advances the campaign), 'levelFailed' is the lose condition (strike budget
@@ -82,6 +83,15 @@ type State = {
   chainEventKey: number;
   tileIds: string[][];
   history: HistoryEntry[];
+  // In-game variable-reward layer (see surprise.ts). The seed advances per
+  // accepted word; `wordsSinceSurprise` drives the cooldown/pity guards;
+  // `nextWordMultiplier` is a ×2 charge banked by a lucky_double, spent on the
+  // following word; `activeSurprise` is the transient banner payload (null when
+  // nothing fired this submit).
+  surpriseSeed: number;
+  wordsSinceSurprise: number;
+  nextWordMultiplier: 1 | 2;
+  activeSurprise: ActiveSurprise | null;
 };
 
 type Action =
@@ -170,7 +180,7 @@ function applyValidatedSubmit(
   const baseDelta = baseChestDeltaForWord(cells.length, kind);
   let newChestProgress = state.chestProgress + outcome.chestProgressDelta + baseDelta;
   let newCascadeCount = state.cascadeCount;
-  let newCoins = state.coins + outcome.coinsBase + outcome.coinsFromOverlays;
+  const wordCoins = outcome.coinsBase + outcome.coinsFromOverlays;
 
   // Track initial word found (not cascade yet)
   trackBlastWordFound({
@@ -203,6 +213,20 @@ function applyValidatedSubmit(
   // now finishes the level as a `partial` instead of trapping the player.
   const completion = computeCompletion(newLevel, newFound, config);
   const thisChainDepth = newCascadeCount - state.cascadeCount;
+  // In-game variable reward: roll a surprise on this accepted word. Spends any
+  // banked ×2 charge on this word's coins, then layers the surprise's own
+  // payout (coins and/or chest) on top.
+  const surprise = resolveSubmitSurprise(
+    {
+      surpriseSeed: state.surpriseSeed,
+      wordsSinceSurprise: state.wordsSinceSurprise,
+      nextWordMultiplier: state.nextWordMultiplier,
+      activeSurprise: state.activeSurprise,
+    },
+    { levelNumber: state.level.levelNumber, wordLen: cells.length, chainDepth: thisChainDepth },
+  );
+  const newCoins = state.coins + wordCoins * surprise.appliedMultiplier + surprise.bonusCoins;
+  newChestProgress += surprise.bonusChestProgress;
   // Snapshot the pre-submit slice so undo can rewind exactly this move.
   const snapshot: HistoryEntry = {
     level: state.level,
@@ -232,6 +256,10 @@ function applyValidatedSubmit(
     tileIds: newTileIds,
     history: newHistory,
     dictCheckPending: false,
+    surpriseSeed: surprise.next.surpriseSeed,
+    wordsSinceSurprise: surprise.next.wordsSinceSurprise,
+    nextWordMultiplier: surprise.next.nextWordMultiplier,
+    activeSurprise: surprise.next.activeSurprise,
   };
 }
 
@@ -252,8 +280,8 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
   const newFound = new Set(state.foundWords);
   newFound.add(word);
   const baseDelta = baseChestDeltaForWord(cells.length, 'bonus');
-  const newChestProgress = state.chestProgress + outcome.chestProgressDelta + baseDelta;
-  const newCoins = state.coins + outcome.coinsBase + outcome.coinsFromOverlays;
+  let newChestProgress = state.chestProgress + outcome.chestProgressDelta + baseDelta;
+  const wordCoins = outcome.coinsBase + outcome.coinsFromOverlays;
 
   trackBlastWordFound({
     level: state.level.levelNumber,
@@ -278,6 +306,17 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
   // check on the post-collapse board so the player isn't soft-locked.
   const completion = computeCompletion(newLevel, newFound, config);
   const thisChainDepth = newCascadeCount - state.cascadeCount;
+  const surprise = resolveSubmitSurprise(
+    {
+      surpriseSeed: state.surpriseSeed,
+      wordsSinceSurprise: state.wordsSinceSurprise,
+      nextWordMultiplier: state.nextWordMultiplier,
+      activeSurprise: state.activeSurprise,
+    },
+    { levelNumber: state.level.levelNumber, wordLen: cells.length, chainDepth: thisChainDepth },
+  );
+  const newCoins = state.coins + wordCoins * surprise.appliedMultiplier + surprise.bonusCoins;
+  newChestProgress += surprise.bonusChestProgress;
 
   const snapshot: HistoryEntry = {
     level: state.level,
@@ -309,6 +348,10 @@ function applyForceBonus(state: State, cells: CellId[], word: string): State {
     history: newHistory,
     lastRejectedCells: [],
     dictCheckPending: false,
+    surpriseSeed: surprise.next.surpriseSeed,
+    wordsSinceSurprise: surprise.next.wordsSinceSurprise,
+    nextWordMultiplier: surprise.next.nextWordMultiplier,
+    activeSurprise: surprise.next.activeSurprise,
   };
 }
 
@@ -388,6 +431,10 @@ function reducer(state: State, action: Action): State {
       // `freeUndosUsed >= FREE_UNDO_LIMIT`.
       freeUndosUsed: state.freeUndosUsed + 1,
       history: newHistory,
+      // Dismiss any surprise banner from the undone move. Deliberately DON'T
+      // rewind surpriseSeed — otherwise a player could undo-and-resubmit to
+      // reroll until they hit golden_word. The seed only ever moves forward.
+      activeSurprise: null,
     };
   }
   return state;
@@ -416,6 +463,10 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
     chainEventKey: 0,
     tileIds: initialLevel.columns.map((col, c) => col.tiles.map((_, r) => `t-${c}-${r}`)),
     history: [],
+    surpriseSeed: initialSurpriseSeed(initialLevel.levelNumber),
+    wordsSinceSurprise: 0,
+    nextWordMultiplier: 1,
+    activeSurprise: null,
   };
   const [state, dispatch] = useReducer(reducer, initial);
   // Hold dictionaryCheck in a ref so handlers can stay memoized (stable
