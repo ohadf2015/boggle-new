@@ -78,25 +78,26 @@ describe('ResultsMainContent wiring', () => {
     t: (k: string) => k,
   };
 
-  it('renders WinStreakBadge when winStreakData has streak >= 2', () => {
+  // Streak now lives inside ImprovementPanel ("Your Progress"), not a standalone
+  // WinStreakBadge — single home for streak/XP/level avoids showing it twice.
+  it('surfaces the win streak via ImprovementPanel when streak >= 2', () => {
     render(
       <ResultsMainContent
         {...baseProps}
         winStreakData={{ currentStreak: 3, bestStreak: 5, isNewMilestone: false, previousStreak: 2 }}
       />
     );
-    // WinStreakBadge renders with aria-label containing the streak translation key
-    expect(screen.getByLabelText('multiplayer.winStreak')).toBeInTheDocument();
+    expect(screen.getByTestId('improvement-streak')).toBeInTheDocument();
   });
 
-  it('does not render WinStreakBadge when streak < 2', () => {
+  it('does not surface a streak when streak < 2', () => {
     render(
       <ResultsMainContent
         {...baseProps}
         winStreakData={{ currentStreak: 1, bestStreak: 1, isNewMilestone: false, previousStreak: 0 }}
       />
     );
-    expect(screen.queryByLabelText('multiplayer.winStreak')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('improvement-streak')).not.toBeInTheDocument();
   });
 
   it('renders NearRankTeaser when nearRankData is provided', () => {

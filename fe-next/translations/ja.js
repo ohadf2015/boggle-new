@@ -2426,6 +2426,26 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "rivals": {
+      "aria": "ライバルとの対戦",
+      "header": "接戦",
+      "headerWon": "勝利！",
+      "of": "/",
+      "you": "あなた",
+      "aheadBy": "あと{n}点",
+      "youBeatBy": "{n}点差で勝利",
+      "tie": "同点",
+      "uniqueWords": "あなただけが見つけた語: {count}"
+    },
+    "progress": {
+      "aria": "今回の成長",
+      "header": "あなたの成長",
+      "streak": "{n}連勝",
+      "leveledUp": "レベル{level}に到達！",
+      "leveledUpTitle": "レベル{level} — {title} 解放！",
+      "xp": "獲得XP",
+      "level": "Lv"
+    },
     "preFanfare": "結果発表の前に",
     "skipToResults": "結果へスキップ",
     "fanfareHint": "マスコットが先に一言…",
@@ -7660,6 +7680,18 @@ const ja = {
       "singlePlayerLive": "ライブソロ",
       "mode": "モード"
     },
+    "deployment": {
+      "title": "デプロイ",
+      "live": "本番環境",
+      "recent": "最近の変更",
+      "by": "作成者",
+      "deployed": "デプロイ済み",
+      "built": "ビルド日時",
+      "viewCommit": "コミット表示",
+      "thisDeploy": "このデプロイ",
+      "unknown": "不明",
+      "error": "デプロイ情報の読み込みに失敗しました"
+    },
     "email": {
       "title": "メールテスト",
       "recipientEmail": "受信者メール",
@@ -9642,6 +9674,7 @@ const ja = {
     }
   },
   "blast": {
+    "firstUse": { "gotIt": "了解" },
     "level": "レベル{n}",
     "results": {
       "sceneTitle": "ブラスト結果",

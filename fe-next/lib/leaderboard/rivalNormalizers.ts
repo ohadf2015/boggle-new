@@ -21,6 +21,13 @@ interface BlastEntryLike {
   avatar?: { customAvatar?: CustomAvatarConfig | null } | null;
 }
 
+interface ResultsPlayerLike {
+  username: string;
+  score: number;
+  allWords?: unknown[];
+  avatar?: { customAvatar?: CustomAvatarConfig | null } | null;
+}
+
 /**
  * Classic desktop shell → RivalInput. Identity is triple-redundant because the
  * shell sometimes carries `isYou` on each roster entry and always passes `meId`
@@ -53,5 +60,24 @@ export function blastEntriesToRivals(
     isMe: username != null && entry.username === username,
     wordsFound: entry.wordCount,
     customAvatar: entry.avatar?.customAvatar ?? null,
+  }));
+}
+
+/**
+ * Results-page `Player[]` → RivalInput. Results key every player by `username`
+ * (no stable userId on the results Player shape), so id === name === username and
+ * "me" is a username match. wordsFound is derived from the player's word list.
+ */
+export function playersToRivals(
+  players: ResultsPlayerLike[],
+  username?: string,
+): RivalInput[] {
+  return players.map((p) => ({
+    id: p.username,
+    name: p.username,
+    score: p.score,
+    isMe: username != null && p.username === username,
+    wordsFound: Array.isArray(p.allWords) ? p.allWords.length : 0,
+    customAvatar: p.avatar?.customAvatar ?? null,
   }));
 }

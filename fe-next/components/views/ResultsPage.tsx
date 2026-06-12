@@ -850,6 +850,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     onMarkReady: handleMarkReady,
     onExit: handleExitRoom,
     winStreakData: winStreakData ?? null,
+    xpGainedData,
+    levelUpData,
     isAuthenticated,
     currentPlayerData: currentPlayerData ?? null,
     isCurrentUserWinner,

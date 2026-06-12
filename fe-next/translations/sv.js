@@ -2512,6 +2512,26 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "rivals": {
+      "aria": "Du mot dina rivaler",
+      "header": "Tätt lopp",
+      "headerWon": "Du vann!",
+      "of": "av",
+      "you": "Du",
+      "aheadBy": "{n} att ta in",
+      "youBeatBy": "Du slog med {n}",
+      "tie": "Lika",
+      "uniqueWords": "Ord bara du hittade: {count}"
+    },
+    "progress": {
+      "aria": "Dina framsteg i matchen",
+      "header": "Dina framsteg",
+      "streak": "{n} segrar i rad",
+      "leveledUp": "Nivå {level} nådd!",
+      "leveledUpTitle": "Nivå {level} — {title} upplåst!",
+      "xp": "XP tjänat",
+      "level": "Nivå"
+    },
     "preFanfare": "stunden före resultatet",
     "skipToResults": "Hoppa till resultat",
     "fanfareHint": "Maskoten har något att säga först…",
@@ -7621,6 +7641,18 @@ const sv = {
       "private": "Privat",
       "stalled": "Pausad?"
     },
+    "deployment": {
+      "title": "Driftsättning",
+      "live": "Aktiv",
+      "recent": "Senaste ändringar",
+      "by": "av",
+      "deployed": "Driftsatt",
+      "built": "Byggd",
+      "viewCommit": "Visa kodändring",
+      "thisDeploy": "denna driftsättning",
+      "unknown": "okänd",
+      "error": "Misslyckades att ladda driftsättningsinformation"
+    },
     "email": {
       "title": "E-posttestning",
       "recipientEmail": "Mottagarens e-post",
@@ -9671,6 +9703,7 @@ const sv = {
     }
   },
   "blast": {
+    "firstUse": { "gotIt": "Förstått" },
     "level": "Nivå {n}",
     "results": {
       "sceneTitle": "Blast-resultat",

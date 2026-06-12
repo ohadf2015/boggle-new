@@ -2515,6 +2515,26 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "rivals": {
+      "aria": "You versus your rivals",
+      "header": "Close Race",
+      "headerWon": "You Won!",
+      "of": "of",
+      "you": "You",
+      "aheadBy": "{n} to catch",
+      "youBeatBy": "Beat by {n}",
+      "tie": "Tied",
+      "uniqueWords": "Words only you found: {count}"
+    },
+    "progress": {
+      "aria": "Your progress this game",
+      "header": "Your Progress",
+      "streak": "{n} win streak",
+      "leveledUp": "Level {level} reached!",
+      "leveledUpTitle": "Level {level} — {title} unlocked!",
+      "xp": "XP earned",
+      "level": "Lv"
+    },
     "preFanfare": "moment before the results",
     "skipToResults": "Skip to results",
     "fanfareHint": "The mascot has something to say first…",
@@ -9221,6 +9241,7 @@ const en = {
     }
   },
   "blast": {
+    "firstUse": { "gotIt": "Got it" },
     "level": "Level {n}",
     "results": {
       "boardDomination": "Board Domination",
@@ -13152,6 +13173,18 @@ const en = {
       "topReported": "Top Reported"
     },
     "dashboard": "Dashboard",
+    "deployment": {
+      "title": "Deployment",
+      "live": "Live",
+      "recent": "Recent changes",
+      "by": "by",
+      "deployed": "Deployed",
+      "built": "Built",
+      "viewCommit": "View commit",
+      "thisDeploy": "this deploy",
+      "unknown": "unknown",
+      "error": "Couldn't load deployment info"
+    },
     "email": {
       "errorNoEmail": "No email address provided",
       "hidePreview": "Hide Preview",

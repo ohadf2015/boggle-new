@@ -15,6 +15,9 @@ import ResultsPodium from '@/components/results/ResultsPodium';
 import ConsolationRows from '@/components/results/ConsolationRows';
 import HighlightsBar from '@/components/results/HighlightsBar';
 import { ResultsRevengeSection } from '@/components/results/ResultsRevengeSection';
+import ResultsRivalsPanel from '@/components/results/ResultsRivalsPanel';
+import ImprovementPanel from '@/components/results/ImprovementPanel';
+import type { XpGainedData, LevelUpData } from '@/types/components';
 
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
@@ -24,7 +27,6 @@ import type { CoinReward } from '@/components/results/CoinRewardDisplay';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
 import type { NearMiss } from '@/components/results/NearMissCard';
-import { WinStreakBadge } from '@/components/multiplayer/WinStreakBadge';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
 import { ShareButton } from '@/components/results/ShareButton';
@@ -53,6 +55,10 @@ export interface ResultsMainContentProps {
   onMarkReady: () => void;
   onExit: () => void;
   winStreakData: WinStreakData | null;
+  /** Server-authoritative XP earned this game (drives the Improvement panel). */
+  xpGainedData?: XpGainedData | null;
+  /** Server-authoritative level-up payload (drives the Improvement panel flourish). */
+  levelUpData?: LevelUpData | null;
   isAuthenticated: boolean;
   currentPlayerData: Player | null;
   isCurrentUserWinner: boolean;
@@ -128,6 +134,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   allPlayerWords,
   gameDuration: _gameDuration,
   winStreakData,
+  xpGainedData,
+  levelUpData,
   nearRankData,
   wordHuntSummary,
   onPodiumReaction,
@@ -244,10 +252,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
 
   return (
     <div className="space-y-6">
-      {/* Win Streak Badge */}
-      {winStreakData && winStreakData.currentStreak >= 2 && (
-        <WinStreakBadge streak={winStreakData.currentStreak} t={t} />
-      )}
+      {/* Win streak now lives inside ImprovementPanel ("Your Progress") below —
+          a single home for streak + XP + level avoids showing the streak twice. */}
 
       {/* Near Rank Teaser */}
       {nearRankData && (
@@ -279,6 +285,31 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       {currentPlayerData && (
         <HighlightsBar stats={highlightStats} />
       )}
+
+      {/* 2.1 YOU vs RIVALS — final standing + closest rivals w/ signed deltas.
+          Feeds purely off sortedScores; renders nothing for solo. Gated by
+          !hideStandings so it owns rivalry on the modes that DON'T ship a custom
+          rival scene (classic, tower, connections…); on blast/wheel-rush their
+          own scene already shows rivals + deltas, so we don't stack a third. */}
+      {isMultiplayer && !hideStandings && (
+        <ResultsRivalsPanel
+          sortedScores={sortedScores}
+          username={username}
+          t={t}
+          reducedMotion={reducedMotion}
+          allPlayerWords={allPlayerWords as Record<string, WordObject[]> | undefined}
+        />
+      )}
+
+      {/* 2.2 YOUR PROGRESS — XP / level / streak from server-authoritative
+          signals. Renders nothing for guests with no progress to show. */}
+      <ImprovementPanel
+        xp={xpGainedData ?? null}
+        levelUp={levelUpData ?? null}
+        streak={winStreakData}
+        t={t}
+        reducedMotion={reducedMotion}
+      />
 
       {/* 2.3 + 2.5 SHARE + REWARDS — single row to reclaim vertical space */}
       {(shareParams || coinReward) && (
@@ -352,8 +383,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
-      {/* 5. REVENGE CARD */}
-      {isMultiplayer && currentPlayerData && sortedScores.length > 1 && (
+      {/* 5. REVENGE CARD — the witty motivational line + VS framing. Shown ONLY
+          where RivalsPanel is suppressed (blast/wheel-rush, hideStandings): those
+          modes' own scenes carry the standings, so Revenge adds the charm layer
+          without duplicating the rival deltas RivalsPanel already shows. */}
+      {isMultiplayer && hideStandings && currentPlayerData && sortedScores.length > 1 && (
         <ResultsRevengeSection
           sortedScores={sortedScores}
           currentPlayerData={currentPlayerData}

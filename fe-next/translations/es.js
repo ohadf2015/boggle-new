@@ -2332,6 +2332,26 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "rivals": {
+      "aria": "Tú contra tus rivales",
+      "header": "Carrera reñida",
+      "headerWon": "¡Ganaste!",
+      "of": "de",
+      "you": "Tú",
+      "aheadBy": "{n} para alcanzar",
+      "youBeatBy": "Ganaste por {n}",
+      "tie": "Empate",
+      "uniqueWords": "Palabras que solo tú encontraste: {count}"
+    },
+    "progress": {
+      "aria": "Tu progreso en la partida",
+      "header": "Tu progreso",
+      "streak": "Racha de {n}",
+      "leveledUp": "¡Nivel {level} alcanzado!",
+      "leveledUpTitle": "Nivel {level} — ¡{title} desbloqueado!",
+      "xp": "XP ganada",
+      "level": "Nv"
+    },
     "preFanfare": "el momento antes de los resultados",
     "skipToResults": "Saltar a los resultados",
     "fanfareHint": "La mascota quiere decir algo primero…",
@@ -7565,6 +7585,18 @@ const es = {
       "private": "Privado",
       "stalled": "¿Estancado?"
     },
+    "deployment": {
+      "title": "Despliegue",
+      "live": "En producción",
+      "recent": "Cambios recientes",
+      "by": "por",
+      "deployed": "Desplegado",
+      "built": "Compilado",
+      "viewCommit": "Ver cambio",
+      "thisDeploy": "este despliegue",
+      "unknown": "desconocido",
+      "error": "No se pudo cargar la información de despliegue"
+    },
     "email": {
       "title": "Prueba de Email",
       "recipientEmail": "Email del destinatario",
@@ -9655,6 +9687,7 @@ const es = {
     }
   },
   "blast": {
+    "firstUse": { "gotIt": "Entendido" },
     "level": "Nivel {n}",
     "results": {
       "sceneTitle": "Resultados Blast",

@@ -2582,6 +2582,26 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
+    "rivals": {
+      "aria": "אתה מול היריבים",
+      "header": "מרוץ צמוד",
+      "headerWon": "ניצחת!",
+      "of": "מתוך",
+      "you": "אתה",
+      "aheadBy": "{n} להשיג",
+      "youBeatBy": "ניצחת ב-{n}",
+      "tie": "תיקו",
+      "uniqueWords": "מילים שרק אתה מצאת: {count}"
+    },
+    "progress": {
+      "aria": "ההתקדמות שלך במשחק",
+      "header": "ההתקדמות שלך",
+      "streak": "רצף {n} נצחונות",
+      "leveledUp": "הגעת לרמה {level}!",
+      "leveledUpTitle": "רמה {level} — {title} נפתח!",
+      "xp": "נק׳ ניסיון",
+      "level": "רמה"
+    },
     "preFanfare": "רגע לפני התוצאות",
     "skipToResults": "דלגו לתוצאות",
     "fanfareHint": "למסקוט יש משהו להגיד קודם…",
@@ -7650,6 +7670,18 @@ const he = {
       "singlePlayerLive": "סולו חי",
       "mode": "מצב"
     },
+    "deployment": {
+      "title": "פריסה",
+      "live": "פעיל",
+      "recent": "שינויים אחרונים",
+      "by": "על ידי",
+      "deployed": "פורס",
+      "built": "בנוי",
+      "viewCommit": "צפה בעדכון",
+      "thisDeploy": "פריסה זו",
+      "unknown": "לא ידוע",
+      "error": "כשל בטעינת מידע הפריסה"
+    },
     "email": {
       "title": "בדיקת אימייל",
       "recipientEmail": "אימייל הנמען",
@@ -9759,6 +9791,7 @@ const he = {
     }
   },
   "blast": {
+    "firstUse": { "gotIt": "הבנתי" },
     "level": "שלב {n}",
     "results": {
       "boardDomination": "שליטה בלוח",
