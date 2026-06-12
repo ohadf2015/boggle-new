@@ -10103,6 +10103,7 @@ const sv = {
     "celebrateAgain": "Fira igen",
     "best": "Bäst",
     "movesLeft": "Drag",
+    "time": "Tid",
     "you": "DU",
     "live": "LIVE",
     "luckyBoost": "Tursam boost",

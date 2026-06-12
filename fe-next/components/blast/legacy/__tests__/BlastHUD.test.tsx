@@ -88,6 +88,41 @@ describe('BlastHUD — score/moves/wave smoke', () => {
   });
 });
 
+describe('BlastHUD — multiplayer timer (consolidated into HUD)', () => {
+  // The MP countdown used to float in a separate band below the HUD, crowding
+  // the board. It now lives inline in the HUD top row (the slot that's empty in
+  // MP since the wave chip is hidden), so the board gets its full height back.
+  const mpProps = { ...baseProps, isMultiplayer: true, totalMoves: Infinity };
+
+  it('renders the inline timer in MP showing MM:SS', () => {
+    render(<BlastHUD {...mpProps} remainingTime={55} totalTime={90} />);
+    const timer = screen.getByTestId('blast-mp-timer');
+    expect(timer.textContent).toContain('0:55');
+  });
+
+  it('does not render the inline timer in single-player (no timer props)', () => {
+    render(<BlastHUD {...baseProps} />);
+    expect(screen.queryByTestId('blast-mp-timer')).toBeNull();
+  });
+
+  it('flags danger urgency when time is low', () => {
+    render(<BlastHUD {...mpProps} remainingTime={4} totalTime={90} />);
+    expect(screen.getByTestId('blast-mp-timer').getAttribute('data-urgency')).toBe('critical');
+  });
+
+  it('stays calm (normal urgency) with plenty of time left', () => {
+    render(<BlastHUD {...mpProps} remainingTime={55} totalTime={90} />);
+    expect(screen.getByTestId('blast-mp-timer').getAttribute('data-urgency')).toBe('normal');
+  });
+});
+
+describe('BlastHUD — labelled stat columns (clarity)', () => {
+  it('labels the score column so the star number reads as SCORE', () => {
+    render(<BlastHUD {...baseProps} score={1234} />);
+    expect(screen.getByTestId('blast-score-label')).toBeDefined();
+  });
+});
+
 describe('BlastHUD — Lucky Boost (DDA visibility)', () => {
   it('hides the Lucky Boost chip when ddaBoostActive=false', () => {
     render(<BlastHUD {...baseProps} ddaBoostActive={false} />);

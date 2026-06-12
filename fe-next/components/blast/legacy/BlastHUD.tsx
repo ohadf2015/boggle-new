@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, HelpCircle, Shield, Bomb, Zap, Sparkles } from 'lucide-react';
+import { X, HelpCircle, Shield, Bomb, Zap, Sparkles, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatTimeMMSS } from '@/shared/utils/timeFormatting';
+import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
+import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
@@ -56,6 +59,65 @@ function useAnimatedScore(target: number) {
   return { display, pulse };
 }
 
+/**
+ * Compact countdown pill for the HUD top row (multiplayer only).
+ *
+ * MP Blast used to float a large CircularTimer in its own band below the HUD,
+ * which crowded the board and read as a detached element. Since the wave chip
+ * is hidden in MP, the top-row left slot is empty — so we dock the timer there
+ * instead: balanced chrome, the board reclaims that vertical space, and the
+ * countdown sits beside the rest of the stats where players already look.
+ *
+ * Urgency escalates the colour (cyan → yellow → red) and pulses when critical,
+ * mirroring CircularTimer. Calm/Cosy mode suppresses the escalation.
+ */
+function BlastHUDTimer({
+  remainingTime,
+  totalTime,
+  t,
+}: {
+  remainingTime: number;
+  totalTime: number;
+  t: (key: string) => string | undefined;
+}) {
+  const suppressUrgency = useSuppressTimerUrgency();
+  const { state } = computeTimerUrgency(remainingTime, suppressUrgency);
+  const danger = state === 'veryLow' || state === 'critical';
+
+  const colorClass =
+    state === 'critical' || state === 'veryLow'
+      ? 'border-neo-red/70 text-neo-red'
+      : state === 'low'
+        ? 'border-neo-yellow/70 text-neo-yellow'
+        : 'border-neo-cyan/50 text-neo-cyan';
+
+  return (
+    <div
+      data-testid="blast-mp-timer"
+      data-urgency={state}
+      role="timer"
+      aria-label={`${t('blast.time') ?? 'Time'}: ${formatTimeMMSS(Math.max(0, Math.round(remainingTime)))}`}
+      className={cn(
+        'shrink-0 inline-flex items-center gap-1.5 rounded-lg border-2 bg-black/25 px-2 py-0.5',
+        colorClass,
+        danger && 'blast-heartbeat',
+      )}
+      style={NO_TEXT_SHADOW_STYLE}
+      title={`${totalTime}s ${t('blast.time') ?? 'Time'}`}
+    >
+      <Clock className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />
+      <div className="flex flex-col items-start leading-none">
+        <span className="text-[8px] font-black uppercase tracking-[0.18em] opacity-70">
+          {t('blast.time') ?? 'Time'}
+        </span>
+        <span className="text-sm font-black tabular-nums leading-tight">
+          {formatTimeMMSS(Math.max(0, Math.round(remainingTime)))}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 interface BlastHUDProps {
   score: number;
   wordsFoundCount: number;
@@ -81,6 +143,11 @@ interface BlastHUDProps {
   hintSlot?: React.ReactNode;
   /** Whether this is multiplayer mode (timer-era, no waves). Hides wave chip in MP. */
   isMultiplayer?: boolean;
+  /** MP countdown — seconds remaining. Rendered as a compact pill in the top row
+   *  (the slot the wave chip would occupy in SP). Omitted in single-player. */
+  remainingTime?: number | null;
+  /** MP round length in seconds — drives the urgency calc + a11y label. */
+  totalTime?: number;
   t: (key: string) => string | undefined;
 }
 
@@ -107,8 +174,12 @@ export function BlastHUD({
   ddaBoostActive = false,
   hintSlot,
   isMultiplayer = false,
+  remainingTime = null,
+  totalTime,
   t,
 }: BlastHUDProps) {
+  const showTimer =
+    isMultiplayer && remainingTime !== null && remainingTime !== undefined && (totalTime ?? 0) > 0;
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
   const isFiniteMoves = isFinite(totalMoves);
   const goalMet = clearPct >= BLAST_WAVE_GOAL_PCT;
@@ -133,6 +204,11 @@ export function BlastHUD({
       {/* Top row: wave + buff slot + controls. Min-h fixed so chip toggles never reflow. */}
       <div className="flex items-center justify-between px-3 py-1.5 pt-safe min-h-[36px]">
         <div className="flex items-center gap-2 min-w-0">
+          {/* MP countdown — docked into the top row where the wave chip would
+              sit in SP, so the board no longer shares space with a floating timer. */}
+          {showTimer && (
+            <BlastHUDTimer remainingTime={remainingTime as number} totalTime={totalTime as number} t={t} />
+          )}
           {/* Wave chip — hidden in MP (timer-era, no waves) */}
           {!isMultiplayer && (
             <span
@@ -209,20 +285,29 @@ export function BlastHUD({
           Each cell uses fixed basis/min-width so digit growth or chip toggles
           don't shove neighbours around. */}
       <div className="flex items-stretch px-3 py-2 gap-3">
-        {/* Score — fixed minimum width room for 5 digits */}
+        {/* Score — fixed minimum width room for 5 digits. Labelled so the lone
+            star + number reads unambiguously as the player's score. */}
         <div
-          className="flex items-center gap-1.5 basis-1/3 min-w-0"
+          className="flex flex-col justify-center basis-1/3 min-w-0"
           aria-label={`${t('blast.score')}: ${animatedScore}`}
         >
-          <span className="text-amber-400 text-base shrink-0">★</span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-amber-400 text-base shrink-0">★</span>
+            <span
+              className={cn(
+                'text-2xl font-black tabular-nums truncate transition-transform duration-150 text-neo-white origin-left',
+                scorePulse && 'scale-[1.15]',
+              )}
+              style={{ minWidth: '5ch' }}
+            >
+              {animatedScore.toLocaleString()}
+            </span>
+          </div>
           <span
-            className={cn(
-              'text-2xl font-black tabular-nums truncate transition-transform duration-150 text-neo-white',
-              scorePulse && 'scale-[1.15]',
-            )}
-            style={{ minWidth: '5ch' }}
+            data-testid="blast-score-label"
+            className="text-[9px] font-bold uppercase tracking-wider text-white/70 leading-none mt-0.5"
           >
-            {animatedScore.toLocaleString()}
+            {t('blast.score')}
           </span>
         </div>
 
