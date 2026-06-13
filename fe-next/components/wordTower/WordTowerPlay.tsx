@@ -7,6 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useGameActiveSound } from '@/hooks/useGameActiveSound';
+import { TOWER_SURPRISE_META, type ActiveTowerSurprise, type TowerSurpriseSound } from '@/lib/wordTower/towerSurprise';
 import type { Language } from '@/shared/types/game';
 import { useWordTower } from '@/lib/wordTower/useWordTower';
 import {
@@ -135,6 +137,39 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     [tower, dictionary],
   );
 
+  // ── audio (declared before the feedback effects below that fire these sounds) ──
+  const haptics = useHaptics();
+  const {
+    playCoinCollectSound,
+    playChestOpenSound,
+    playErrorSound,
+    playComboMilestoneSound,
+    playLevelUpSound,
+    playHintRevealSound,
+    playPowerUpSound,
+    playGiftReceivedSound,
+    playTimeBonusSound,
+    playRareWordSound,
+  } = useSoundEffects();
+  // Maps a surprise event's semantic sound key (declared in TOWER_SURPRISE_META)
+  // to the concrete play*Sound fn — keeps the audio choice co-located with the
+  // event in the pure module, the wiring here.
+  const surpriseSoundFns = useMemo<Record<TowerSurpriseSound, () => void>>(
+    () => ({
+      powerUp: playPowerUpSound,
+      gift: playGiftReceivedSound,
+      timeBonus: playTimeBonusSound,
+      rare: playRareWordSound,
+      chest: playChestOpenSound,
+    }),
+    [playPowerUpSound, playGiftReceivedSound, playTimeBonusSound, playRareWordSound, playChestOpenSound],
+  );
+
+  // ── unmute: tell the sound system a game is active for the playing lifetime.
+  // Word Tower authors 8 SFX but never flipped game-active, so every one silently
+  // no-op'd (playSound defaults requiresGameActive:true). This makes them audible.
+  useGameActiveSound(true);
+
   // "NEW ZONE" banner — owns this slot; milestones at the same height defer.
   const [zoneText, setZoneText] = useState<string | null>(null);
   const prevZone = useRef(biomeId);
@@ -157,6 +192,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const hit = milestoneCrossed(prev, game.heightM);
     if (!hit) return;
     setMilestoneText(t(hit.key));
+    haptics.success();
+    playLevelUpSound();
     const id = setTimeout(() => setMilestoneText(null), 2400);
     return () => clearTimeout(id);
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -172,6 +209,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const hit = landmarkCrossed(prev, game.heightM);
     if (!hit) return;
     setLandmarkText(`${hit.icon} ${t(hit.key)}`);
+    playHintRevealSound();
     const id = setTimeout(() => setLandmarkText(null), 2200);
     return () => clearTimeout(id);
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -199,10 +237,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setAchToast(fresh[fresh.length - 1]); // show the most impressive of the batch
     const id = setTimeout(() => setAchToast(null), 2800);
     return () => clearTimeout(id);
-  }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);  
-
-  const haptics = useHaptics();
-  const { playCoinCollectSound, playChestOpenSound, playErrorSound } = useSoundEffects();
+  }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);
 
   // Roguelike perk draft — daily-run only. Boons fold into one modifier object
   // the crane + hazard sites read. Segregated from the endless board (daily gates
@@ -283,7 +318,24 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     if (!hit) return;
     setComboFx({ m: hit, key: tower.state.resultKey });
     haptics.success();
+    playComboMilestoneSound(hit.combo);
     const id = setTimeout(() => setComboFx(null), 1400);
+    return () => clearTimeout(id);
+  }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Surprise pop — the variable-reward beat. A per-word deterministic roll
+  // (towerSurprise.ts) occasionally grants bonus height / scrambles / an updraft
+  // charge; we surface it as its own banner + a fitting sound so the can't-predict
+  // payoff lands as a felt reward, not a silent number change.
+  const [surpriseFx, setSurpriseFx] = useState<{ s: ActiveTowerSurprise; key: number } | null>(null);
+  useEffect(() => {
+    if (tower.state.resultKey === 0) return;
+    const s = tower.state.lastResult?.surprise;
+    if (!s) return;
+    setSurpriseFx({ s, key: tower.state.resultKey });
+    surpriseSoundFns[TOWER_SURPRISE_META[s.event].sound]();
+    haptics.levelComplete();
+    const id = setTimeout(() => setSurpriseFx(null), 1700);
     return () => clearTimeout(id);
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -644,6 +696,28 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           aria-live="polite"
         >
           🔥 {t(comboFx.m.labelKey)} <span className="tabular-nums">×{comboFx.m.combo}</span>
+        </div>
+      )}
+
+      {/* Surprise pop — the variable-reward beat. Gold tile (celebration accent),
+          sits high-centre so it reads as its own lucky hit above the verdict. */}
+      {surpriseFx && (
+        <div
+          key={surpriseFx.key}
+          className={`pointer-events-none absolute left-1/2 top-[18%] z-40 -translate-x-1/2 flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-1.5 font-neo-display text-xl font-black uppercase tracking-wide text-black">
+            <span aria-hidden>{TOWER_SURPRISE_META[surpriseFx.s.event].emoji}</span>
+            {t(`wordTower.surprise.${TOWER_SURPRISE_META[surpriseFx.s.event].key}`)}
+          </div>
+          {(surpriseFx.s.bonusMeters > 0 || surpriseFx.s.bonusScrambles > 0) && (
+            <div className="font-neo-body text-xs font-black text-black/80 tabular-nums">
+              {surpriseFx.s.bonusMeters > 0 && `+${Math.round(surpriseFx.s.bonusMeters)}m`}
+              {surpriseFx.s.bonusMeters > 0 && surpriseFx.s.bonusScrambles > 0 && ' · '}
+              {surpriseFx.s.bonusScrambles > 0 && `+${surpriseFx.s.bonusScrambles}🔀`}
+            </div>
+          )}
         </div>
       )}
 

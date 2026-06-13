@@ -29,6 +29,12 @@ import {
   type WordTowerBiomeId,
 } from '@/shared/constants/wordTowerConstants';
 import { mulberry32, fnv1aHash } from '@/lib/rng/seededRandom';
+import {
+  resolveTowerSubmitSurprise,
+  initialTowerSurpriseSeed,
+  type TowerSurpriseState,
+  type ActiveTowerSurprise,
+} from './towerSurprise';
 
 // --- deterministic RNG (imported from @/lib/rng/seededRandom) ---
 
@@ -204,6 +210,15 @@ export interface WordTowerPlayerState {
   heightHighWaterM: number;
   /** Ids of environmental hazards already triggered this run (fire once each). */
   firedHazards: Set<string>;
+  // --- variable-reward (surprise) layer — see towerSurprise.ts. Optional so a
+  //     run persisted before this layer shipped restores cleanly (defaulted on
+  //     the first submit). Deterministic: seeded from gameCode, advanced per word. ---
+  /** Deterministic LCG seed for the surprise roller. */
+  surpriseSeed?: number;
+  /** Accepted words since the last surprise (drives cooldown + pity). */
+  wordsSinceSurprise?: number;
+  /** Height multiplier banked by a prior updraft for the next word (1 = none). */
+  nextWordHeightMult?: number;
 }
 
 export interface InitOpts {
@@ -234,6 +249,9 @@ export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
     longestCombo: 0,
     heightHighWaterM: 0,
     firedHazards: new Set<string>(),
+    surpriseSeed: initialTowerSurpriseSeed(gameCode),
+    wordsSinceSurprise: 0,
+    nextWordHeightMult: 1,
   };
 }
 
@@ -277,6 +295,9 @@ export interface ApplyResult {
   tier: CelebrationTier;
   heightM: number;
   biome: WordTowerBiomeId;
+  /** The variable-reward pop this word triggered (null on most words). Drives
+   *  the HUD surprise banner + its sound. */
+  surprise: ActiveTowerSurprise | null;
 }
 
 /** Apply an already-validated word. Returns a new state plus a result for FX/telemetry.
@@ -291,7 +312,24 @@ export function applyTowerWord(
   const w = canon(word, language);
   const len = w.length;
   const combo = state.combo + 1;
-  const meters = floorMeters(len, combo) * placementMultiplier;
+  const baseMeters = floorMeters(len, combo) * placementMultiplier;
+
+  // Variable-reward roll (deterministic). Resolved AFTER the base height so the
+  // surprise bonus can scale off it; consumes any banked updraft multiplier.
+  const prevSurprise: TowerSurpriseState = {
+    surpriseSeed: state.surpriseSeed ?? initialTowerSurpriseSeed(state.gameCode),
+    wordsSinceSurprise: state.wordsSinceSurprise ?? 0,
+    nextWordHeightMult: state.nextWordHeightMult ?? 1,
+    activeSurprise: null,
+  };
+  const surprise = resolveTowerSubmitSurprise(prevSurprise, {
+    floorCount: state.floors.length,
+    wordLen: len,
+    combo,
+    baseMeters,
+  });
+
+  const meters = baseMeters * surprise.appliedHeightMult + surprise.bonusMeters;
   const heightBefore = state.heightM;
   const heightM = heightBefore + meters;
 
@@ -303,7 +341,10 @@ export function applyTowerWord(
     Math.floor(heightM / WORD_TOWER_SCRAMBLE_EARN_EVERY_M) -
       Math.floor(earnBase / WORD_TOWER_SCRAMBLE_EARN_EVERY_M),
   );
-  const scramblesLeft = Math.min(WORD_TOWER_SCRAMBLES_MAX_BANKED, state.scramblesLeft + earned);
+  const scramblesLeft = Math.min(
+    WORD_TOWER_SCRAMBLES_MAX_BANKED,
+    state.scramblesLeft + earned + surprise.bonusScrambles,
+  );
 
   const remaining = consumeFromTray(state.tray, w, state.anchorLetter);
   const refill = generateTray(
@@ -329,12 +370,15 @@ export function applyTowerWord(
     tray,
     trayDraws: state.trayDraws + 1,
     scramblesLeft,
-    scramblesEarned: state.scramblesEarned + earned,
+    scramblesEarned: state.scramblesEarned + earned + surprise.bonusScrambles,
     bombCharge: state.bombCharge + chargeGained,
     usedWords,
     longestWord: len > state.longestWord.length ? w : state.longestWord,
     longestCombo: Math.max(state.longestCombo, combo),
     heightHighWaterM: Math.max(state.heightHighWaterM, heightM),
+    surpriseSeed: surprise.next.surpriseSeed,
+    wordsSinceSurprise: surprise.next.wordsSinceSurprise,
+    nextWordHeightMult: surprise.next.nextWordHeightMult,
   };
 
   return {
@@ -348,6 +392,7 @@ export function applyTowerWord(
       tier: celebrationTier(len),
       heightM,
       biome: biomeForHeight(heightM),
+      surprise: surprise.next.activeSurprise,
     },
   };
 }
@@ -454,6 +499,12 @@ export interface WordTowerSaveState {
   /** Optional (added without a version bump — old blobs default safely). */
   heightHighWaterM?: number;
   firedHazards?: string[];
+  // Surprise (variable-reward) layer — MUST persist so a reloaded run rolls the
+  // SAME surprises and reaches the SAME height (daily leaderboard integrity).
+  // Optional: old blobs predate the layer and default safely on restore.
+  surpriseSeed?: number;
+  wordsSinceSurprise?: number;
+  nextWordHeightMult?: number;
 }
 
 export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerSaveState {
@@ -471,6 +522,9 @@ export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerS
     usedWords: [...state.usedWords].slice(-SAVE_USED_WORDS_CAP),
     heightHighWaterM: state.heightHighWaterM,
     firedHazards: [...state.firedHazards],
+    surpriseSeed: state.surpriseSeed,
+    wordsSinceSurprise: state.wordsSinceSurprise,
+    nextWordHeightMult: state.nextWordHeightMult,
   };
 }
 
@@ -495,6 +549,12 @@ export function restoreWordTowerState(
     // resumed run still can't farm below it) and an empty fired-hazard set.
     heightHighWaterM: Math.max(0, saved.heightHighWaterM ?? saved.heightM ?? 0),
     firedHazards: new Set(saved.firedHazards ?? []),
+    // Surprise layer: carry the advanced seed + cooldown counter + banked updraft
+    // so the next word rolls identically to a no-reload run. Old blobs (no fields)
+    // fall back to base — a fresh seed from gameCode, counter 0, no charge.
+    surpriseSeed: saved.surpriseSeed ?? base.surpriseSeed,
+    wordsSinceSurprise: saved.wordsSinceSurprise ?? 0,
+    nextWordHeightMult: saved.nextWordHeightMult ?? 1,
   };
 }
 

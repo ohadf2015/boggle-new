@@ -64,12 +64,20 @@ const TRACKS: Record<TrackKey, string> = {
 };
 
 /**
- * The signature in-game theme follows the player's chosen style; every other
- * cue (lobby, countdown, almost-out-of-time, results) stays universal — they're
- * gameplay feedback, not vibe. Exported for unit testing.
+ * The musical BEDS follow the player's chosen style so the vibe is pervasive:
+ * homepage (bossa), lobby, countdown (beforeGame) and in-game. The short
+ * functional stings stay universal — urgent ramp, earthquake, blast identity —
+ * they're gameplay feedback, not vibe. Exported for unit testing.
  */
+const STYLE_SWAPPABLE_TRACKS: ReadonlySet<TrackKey> = new Set<TrackKey>([
+  'lobby',
+  'beforeGame',
+  'inGame',
+  'bossa',
+]);
+
 export function resolveTrackSrc(key: TrackKey, styleKey: string): string {
-  if (key === 'inGame') return resolveStyleTrack(styleKey, TRACKS.inGame);
+  if (STYLE_SWAPPABLE_TRACKS.has(key)) return resolveStyleTrack(styleKey, TRACKS[key]);
   return TRACKS[key];
 }
 
@@ -322,19 +330,24 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
 
   useEffect(() => { fadeToTrackRef.current = fadeToTrack; }, [fadeToTrack]);
 
-  // When the player switches style, the cached in-game Howl points at the old
-  // file. Drop it so it rebuilds with the new src on next play; if the in-game
-  // theme is the one currently playing (rare mid-session switch), crossfade to
-  // the new track immediately. Placed after fadeToTrack so it can call it directly.
+  // When the player switches style, every cached style-swappable Howl points at
+  // the old file. Drop them all so they rebuild with the new src on next play;
+  // if one of them is the track currently playing (e.g. switching style while on
+  // the homepage or mid-game), crossfade to the new src immediately. Placed
+  // after fadeToTrack so it can call it directly.
   useEffect(() => {
     styleKeyRef.current = styleKey;
-    const existing = howlsRef.current.inGame;
-    if (!existing) return;
-    const wasPlaying = currentTrackRef.current === 'inGame';
-    try { existing.unload(); } catch { /* already unloaded */ }
-    delete (howlsRef.current as Partial<Record<TrackKey, Howl>>).inGame;
-    if (wasPlaying && audioUnlockedRef.current) {
-      fadeToTrack('inGame', 400, 400);
+    const playing = currentTrackRef.current;
+    let rebuildPlaying = false;
+    for (const key of STYLE_SWAPPABLE_TRACKS) {
+      const existing = howlsRef.current[key];
+      if (!existing) continue;
+      if (playing === key) rebuildPlaying = true;
+      try { existing.unload(); } catch { /* already unloaded */ }
+      delete (howlsRef.current as Partial<Record<TrackKey, Howl>>)[key];
+    }
+    if (rebuildPlaying && playing && audioUnlockedRef.current) {
+      fadeToTrack(playing, 400, 400);
     }
   }, [styleKey, fadeToTrack]);
 

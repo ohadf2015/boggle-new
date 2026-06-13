@@ -7,6 +7,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useWordForgeRun } from '@/hooks/useWordForgeRun';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useGameActiveSound } from '@/hooks/useGameActiveSound';
 import type { Language } from '@/shared/types/game';
 import { Button } from '@/components/ui/button';
 import { HowToPlayCard } from '@/components/common/HowToPlayCard';
@@ -36,6 +37,13 @@ export default function WordForgeGame(): React.JSX.Element {
   const run = useWordForgeRun(language as Language);
   const { checkWord, isLoaded: dictLoaded } = useDictionaryCache(language as Language);
   const { playSound } = useSoundEffects();
+  // Unmute: every WordForge SFX runs through `playSound`, which defaults
+  // requiresGameActive:true and no-ops unless a game is marked active — and this
+  // mode never marked one, so all 14 sounds were silently dropped. Keep active
+  // for the whole run EXCEPT the idle start screen, so the RoundComplete /
+  // RunSummary victory sounds (which fire on the result screens, after play
+  // ends) still land. Cleared on unmount by the hook so it can't leak.
+  useGameActiveSound(run.state.phase !== 'idle');
 
   // Specific rejection feedback — tells the player *why* a word bounced
   // instead of the prototype "nothing happened". Driven by the hook's

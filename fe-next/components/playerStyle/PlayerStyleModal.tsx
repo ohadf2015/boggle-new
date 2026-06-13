@@ -33,7 +33,7 @@ export function PlayerStyleModal({ isOpen, onDismiss }: PlayerStyleModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/70 p-4"
+      className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/70 p-4 pb-[calc(1rem+var(--admob-banner-height,0px))]"
       role="dialog"
       aria-modal="true"
       aria-label={t('playerStyle.popup.title')}

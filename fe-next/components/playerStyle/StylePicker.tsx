@@ -113,7 +113,7 @@ export function StylePicker({
               className={[
                 'group relative flex flex-col items-center gap-1.5 rounded-neo border-neo-thick p-2 transition-all duration-150',
                 isSelected
-                  ? 'z-10 -translate-y-1 scale-[1.07] border-accent bg-accent/20 shadow-hard-lg ring-4 ring-accent ring-offset-2 ring-offset-neo-navy'
+                  ? 'z-10 -translate-y-1 border-accent bg-accent/20 shadow-hard-lg ring-4 ring-accent ring-offset-2 ring-offset-neo-navy'
                   : 'border-neo-black bg-neo-navy-light shadow-hard hover:-translate-y-0.5 active:translate-y-0',
               ].join(' ')}
             >
@@ -127,12 +127,7 @@ export function StylePicker({
                   {t('playerStyle.picker.current')}
                 </span>
               )}
-              <span
-                className={[
-                  'relative aspect-square w-full overflow-hidden rounded-neo bg-neo-navy transition-transform',
-                  isSelected ? 'scale-105' : '',
-                ].join(' ')}
-              >
+              <span className="relative aspect-square w-full overflow-hidden rounded-neo bg-neo-navy">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={style.mascot}
