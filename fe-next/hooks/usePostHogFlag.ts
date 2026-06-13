@@ -11,11 +11,25 @@ import posthog from 'posthog-js';
 
 export function usePostHogFlag<T extends string | boolean = string>(
   flagKey: string,
-  defaultValue: T
+  defaultValue: T,
+  /**
+   * Optional client-resolved seed — e.g. a variant persisted from a prior visit
+   * (see `variantCookie`). Applied in the mount effect (NOT the useState
+   * initializer) so the first render still matches the server's `defaultValue`:
+   * seeding the initializer would render a different variant than SSR and trip
+   * an App Router hydration mismatch. Applying it post-commit re-renders the
+   * bucketed variant within one render cycle — still ~hydration, far ahead of
+   * the ~8s async flag fetch — with no mismatch. A live PostHog value (read
+   * just below) still overrides it.
+   */
+  initialValue?: T
 ): T {
   const [value, setValue] = useState<T>(defaultValue);
 
   useEffect(() => {
+    // Seed from the prior-resolved value immediately (synchronous, no network).
+    if (initialValue !== undefined) setValue(initialValue);
+
     // PostHog may not be initialized (no key, no consent)
     if (typeof posthog?.getFeatureFlag !== 'function') return;
 
@@ -38,7 +52,7 @@ export function usePostHogFlag<T extends string | boolean = string>(
     posthog.onFeatureFlags(handler);
 
     return () => { cancelled = true; };
-  }, [flagKey]);
+  }, [flagKey, initialValue]);
 
   return value;
 }

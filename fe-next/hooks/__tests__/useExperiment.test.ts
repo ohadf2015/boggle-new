@@ -11,9 +11,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-const mockFlagValue = vi.fn<(key: string, fallback: string) => string>();
+const mockFlagValue =
+  vi.fn<(key: string, fallback: string, initial?: string) => string>();
 vi.mock('@/hooks/usePostHogFlag', () => ({
-  usePostHogFlag: (key: string, fallback: string) => mockFlagValue(key, fallback),
+  usePostHogFlag: (key: string, fallback: string, initial?: string) =>
+    mockFlagValue(key, fallback, initial),
+}));
+
+const mockReadVariantCookie = vi.fn<(key: string) => string | undefined>();
+const mockPersistVariant = vi.fn();
+vi.mock('@/lib/experiments/variantCookie', () => ({
+  readVariantCookie: (key: string) => mockReadVariantCookie(key),
+  persistVariant: (...args: unknown[]) => mockPersistVariant(...args),
+  variantCookieName: (key: string) => `exp_${key}`,
 }));
 
 const mockCapture = vi.fn();
@@ -35,6 +45,7 @@ describe('useExperiment', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: null });
+    mockReadVariantCookie.mockReturnValue(undefined);
   });
 
   it('returns the registry default when the flag returns the fallback', () => {
@@ -49,6 +60,7 @@ describe('useExperiment', () => {
     expect(mockFlagValue).toHaveBeenCalledWith(
       'signup-prompt-cta-copy',
       EXPERIMENTS['signup-prompt-cta-copy'].default,
+      undefined, // no cookie seed in this case
     );
   });
 
@@ -101,5 +113,37 @@ describe('useExperiment', () => {
     const { result } = renderHook(() => useExperiment('signup-prompt-cta-copy'));
     result.current.trackExposure();
     expect(mockCapture).not.toHaveBeenCalled();
+  });
+
+  describe('cookie variant seed (fast first paint)', () => {
+    it('seeds usePostHogFlag initial value from the variant cookie', () => {
+      // A returning, already-bucketed visitor: the cookie carries `cubes`, so
+      // the first render must already pick it up (no 8s PostHog wait).
+      mockReadVariantCookie.mockReturnValue('cubes');
+      mockFlagValue.mockImplementation((_key, fallback) => fallback);
+      renderHook(() => useExperiment('landing-modes-cubes-v1'));
+      expect(mockFlagValue).toHaveBeenCalledWith(
+        'landing-modes-cubes-v1',
+        'control',
+        'cubes',
+      );
+    });
+
+    it('persists a non-default resolved variant to the cookie', () => {
+      mockReadVariantCookie.mockReturnValue(undefined);
+      mockFlagValue.mockReturnValue('cubes'); // posthog resolved a real variant
+      renderHook(() => useExperiment('landing-modes-cubes-v1'));
+      expect(mockPersistVariant).toHaveBeenCalledWith(
+        'landing-modes-cubes-v1',
+        'cubes',
+      );
+    });
+
+    it('does not persist when the resolved variant equals the registry default', () => {
+      mockReadVariantCookie.mockReturnValue(undefined);
+      mockFlagValue.mockImplementation((_key, fallback) => fallback); // control
+      renderHook(() => useExperiment('landing-modes-cubes-v1'));
+      expect(mockPersistVariant).not.toHaveBeenCalled();
+    });
   });
 });

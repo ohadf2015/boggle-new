@@ -25,9 +25,10 @@
  *     so unassigned users don't pollute the control bucket.
  */
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import posthog from 'posthog-js';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
+import { readVariantCookie, persistVariant } from '@/lib/experiments/variantCookie';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   experimentDefault,
@@ -47,7 +48,13 @@ export function useExperiment<K extends ExperimentKey>(
   key: K,
 ): UseExperimentResult<K> {
   const fallback = experimentDefault(key);
-  const raw = usePostHogFlag<string>(key, fallback);
+  // Seed the first render from a variant the client resolved on a prior visit
+  // (cookie). Without this the variant stays `fallback` until PostHog resolves
+  // (~8s in prod), so layout-driving experiments (e.g. the homepage cube grid)
+  // paint control first and swap late — delaying their images. Returns
+  // undefined on the server / first-ever visit → unchanged default behaviour.
+  const seeded = readVariantCookie(key);
+  const raw = usePostHogFlag<string>(key, fallback, seeded);
 
   // Defensive: if PostHog returns a variant we don't know about,
   // collapse to the default rather than ship undefined behaviour.
@@ -62,6 +69,15 @@ export function useExperiment<K extends ExperimentKey>(
   const { user } = useAuth();
   const override = experimentEmailOverride(key, user?.email ?? null);
   const variant: ExperimentVariant<K> = override ?? liveVariant;
+
+  // Persist a real (non-default) variant so the next render/visit can seed it
+  // synchronously above. Only non-default values are stored: an unassigned user
+  // (variant === fallback) must NOT get pinned to control, or they'd never
+  // re-bucket once the rollout ramps. persistVariant is a client-only no-op on
+  // the server and skips redundant writes.
+  useEffect(() => {
+    if (variant !== fallback) persistVariant(key, variant);
+  }, [key, variant, fallback]);
 
   const fired = useRef(false);
   const trackExposure = useCallback(() => {
