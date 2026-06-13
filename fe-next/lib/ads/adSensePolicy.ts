@@ -23,6 +23,18 @@ export function getAdSenseClient(): string {
   return DEFAULT_ADSENSE_CLIENT;
 }
 
+/**
+ * The `<meta name="google-adsense-account">` content — Google's privacy-neutral
+ * site-ownership signal (no script, no cookie, no tracking). Rendered UNCONDITIONALLY
+ * in the root layout: it must verify the site even while ad serving is dark, because
+ * the AdSense review crawler never grants cookie consent and so never triggers the
+ * consent-gated adsbygoogle.js loader. Without this tag the crawler cannot connect
+ * the domain to the publisher account, blocking (re-)approval.
+ */
+export function getAdSenseAccountMeta(): string {
+  return getAdSenseClient();
+}
+
 /** True only when explicitly enabled (and a client id exists). Dark by default. */
 export function isAdSenseConfigured(): boolean {
   return (

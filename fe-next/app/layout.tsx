@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { LazyMotionRoot } from './LazyMotionRoot';
+import { getAdSenseAccountMeta } from '@/lib/ads/adSensePolicy';
 
 // Check if this is a preview/staging environment (explicitly set or PR preview)
 // Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
@@ -94,6 +95,10 @@ export const metadata: Metadata = {
     },
     other: {
         'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
+        // AdSense site-ownership signal — privacy-neutral (no script/cookie). Always
+        // present so the review crawler can verify the domain even while ad serving
+        // stays consent-gated/dark. See lib/ads/adSensePolicy.ts:getAdSenseAccountMeta.
+        'google-adsense-account': getAdSenseAccountMeta(),
         'rating': 'General',
         'msapplication-TileColor': '#1a1a2e',
         'msapplication-TileImage': '/icon-144.png',

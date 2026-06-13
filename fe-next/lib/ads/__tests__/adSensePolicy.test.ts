@@ -1,5 +1,10 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { getAdSenseClient, isAdSenseConfigured, shouldLoadAdSense } from '../adSensePolicy';
+import {
+  getAdSenseAccountMeta,
+  getAdSenseClient,
+  isAdSenseConfigured,
+  shouldLoadAdSense,
+} from '../adSensePolicy';
 
 describe('adSensePolicy — config', () => {
   afterEach(() => {
@@ -20,6 +25,28 @@ describe('adSensePolicy — config', () => {
     expect(isAdSenseConfigured()).toBe(false);
     process.env.NEXT_PUBLIC_ADSENSE_ENABLED = 'true';
     expect(isAdSenseConfigured()).toBe(true);
+  });
+});
+
+describe('adSensePolicy — account verification meta', () => {
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_ADSENSE_ENABLED;
+    delete process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+  });
+
+  // The <meta name="google-adsense-account"> tag is Google's privacy-neutral
+  // site-ownership signal: no script, no cookie, no tracking. It MUST render even
+  // while ad *serving* is dark (NEXT_PUBLIC_ADSENSE_ENABLED unset), otherwise the
+  // AdSense review crawler — which never grants cookie consent and so never
+  // triggers the consent-gated adsbygoogle.js — cannot verify the site at all.
+  it('returns the publisher id for verification regardless of the dark flag', () => {
+    expect(isAdSenseConfigured()).toBe(false); // serving off
+    expect(getAdSenseAccountMeta()).toBe('ca-pub-1896836706464880'); // verify still on
+  });
+
+  it('reflects the env-overridden client id', () => {
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT = 'ca-pub-9999999999999999';
+    expect(getAdSenseAccountMeta()).toBe('ca-pub-9999999999999999');
   });
 });
 
