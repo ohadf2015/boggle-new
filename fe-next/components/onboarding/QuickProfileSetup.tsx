@@ -59,7 +59,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
 
   const trimmedName = name.trim();
   const nameCharCount = Array.from(trimmedName).length;
-  const isNameValid = nameCharCount >= 1 && nameCharCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(trimmedName);
+  const isNameValid = nameCharCount >= 2 && nameCharCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(trimmedName);
 
   // Pulse the input once, the first frame a name transitions invalid → valid.
   // Using a ref guard keeps this a single celebration per validation flip.
@@ -97,7 +97,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
     const liveTrimmed = getLiveName();
     const liveCount = Array.from(liveTrimmed).length;
     const liveValid =
-      liveCount >= 1 && liveCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(liveTrimmed);
+      liveCount >= 2 && liveCount <= 20 && /^[\p{L}\p{N}\s._-]+$/u.test(liveTrimmed);
 
     if (!liveValid) {
       setShowShake(true);
@@ -153,7 +153,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           animate="visible"
           className="flex flex-col items-center mb-4"
         >
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-end justify-center gap-4">
             <div className="flex flex-col items-center gap-1 shrink-0">
               <m.button
                 onClick={handleRandomize}
@@ -161,14 +161,14 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                 className={cn(
-                  'w-10 h-10 rounded-full border-2 border-neo-black bg-neo-yellow',
+                  'w-11 h-11 rounded-full border-2 border-neo-black bg-neo-yellow',
                   'flex items-center justify-center shadow-hard-sm'
                 )}
                 aria-label={t('onboarding.ftue.randomize', 'Randomize avatar')}
               >
                 <Shuffle className="w-5 h-5 text-neo-black" />
               </m.button>
-              <span className="text-[10px] font-bold text-neo-black/50">{t('onboarding.ftue.randomize', 'Randomize')}</span>
+              <span className="text-[10px] font-bold text-neo-black/70">{t('onboarding.ftue.randomize', 'Randomize')}</span>
             </div>
             <div className="flex flex-col items-center gap-1 shrink-0">
               <m.button
@@ -205,7 +205,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                   <Pencil className="w-3.5 h-3.5 text-neo-black" />
                 </div>
               </m.button>
-              <span className="text-[10px] font-bold text-neo-black/50">{t('onboarding.profile.tapToCustomize', 'Tap to customize')}</span>
+              <span className="text-[10px] font-bold text-neo-black/70">{t('onboarding.profile.tapToCustomize', 'Tap to customize')}</span>
             </div>
           </div>
         </m.div>
@@ -225,8 +225,8 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           initial="hidden"
           animate="visible"
         >
-          <label htmlFor="profile-name" className="block text-[10px] font-black text-neo-black/60 uppercase tracking-wide mb-1">
-            {t('validation.usernameRequired')}
+          <label htmlFor="profile-name" className="block text-[10px] font-black text-neo-black/70 uppercase tracking-wide mb-1">
+            {t('onboarding.name.label')}
           </label>
           <m.div
             className="relative"
@@ -250,7 +250,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
               autoComplete="off"
               className={cn(
                 'w-full px-3 py-3 bg-white border-3 border-neo-black rounded-neo',
-                'font-bold text-lg text-neo-black placeholder:text-neo-black/30',
+                'font-bold text-lg text-neo-black placeholder:text-neo-black/60',
                 'focus:outline-hidden focus:ring-3 focus:ring-neo-cyan',
                 'shadow-hard-sm mb-1 min-h-[48px] pe-10',
                 isNameValid && trimmedName.length > 0 && 'border-neo-lime',
@@ -274,7 +274,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
               )}
             </AnimatePresence>
           </m.div>
-          <div className="flex justify-between text-[10px] font-bold text-neo-black/40 mb-4 px-0.5">
+          <div className="flex justify-between text-[10px] font-bold text-neo-black/70 mb-4 px-0.5">
             <span>{t('onboarding.ftue.nameHint')}</span>
             <span>{name.length}/20</span>
           </div>

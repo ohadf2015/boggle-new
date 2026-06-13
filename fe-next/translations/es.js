@@ -4402,6 +4402,7 @@ const es = {
       "skip": "Omitir por ahora"
     },
     "name": {
+      "label": "Tu nombre",
       "placeholder": "Ingresa tu nombre",
       "errorInvalid": "Solo letras, números y espacios",
       "errorTooShort": "¡Muy corto! 2+ caracteres",
@@ -4512,7 +4513,7 @@ const es = {
   },
   "invite": {
     "banner": {
-      "host": "{hostName} te espera en",
+      "host": "Te unes a la sala de {hostName}",
       "yourFriend": "Tu amigo",
       "skipCTA": "Saltar y unirme"
     },

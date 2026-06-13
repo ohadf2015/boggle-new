@@ -2407,6 +2407,7 @@ const he = {
       "skip": "דלג לעת עתה"
     },
     "name": {
+      "label": "השם שלך",
       "placeholder": "הכניסו שם",
       "errorInvalid": "רק אותיות, מספרים ורווחים",
       "errorTooShort": "קצר מדי! 2+ תווים",
@@ -2517,7 +2518,7 @@ const he = {
   },
   "invite": {
     "banner": {
-      "host": "{hostName} מחכה ב",
+      "host": "מצטרפים לחדר של {hostName}",
       "yourFriend": "החבר שלך",
       "skipCTA": "דלג והצטרף"
     },

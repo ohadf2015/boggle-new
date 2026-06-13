@@ -2337,6 +2337,7 @@ const sv = {
       "skip": "Hoppa över tills vidare"
     },
     "name": {
+      "label": "Ditt namn",
       "placeholder": "Ange ditt namn",
       "errorInvalid": "Endast bokstäver, siffror och mellanslag",
       "errorTooShort": "För kort! 2+ tecken",
@@ -2447,7 +2448,7 @@ const sv = {
   },
   "invite": {
     "banner": {
-      "host": "{hostName} väntar i",
+      "host": "Du går med i {hostName}s rum",
       "yourFriend": "Din kompis",
       "skipCTA": "Hoppa över och gå med"
     },

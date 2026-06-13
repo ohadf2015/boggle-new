@@ -2340,6 +2340,7 @@ const en = {
       "skip": "Skip for now"
     },
     "name": {
+      "label": "Your name",
       "placeholder": "Your name",
       "errorInvalid": "Letters & numbers only",
       "errorTooShort": "Need 2+ characters",
@@ -2450,7 +2451,7 @@ const en = {
   },
   "invite": {
     "banner": {
-      "host": "{hostName} is waiting in",
+      "host": "Joining {hostName}'s room",
       "yourFriend": "Your friend",
       "skipCTA": "Skip & Join now"
     },

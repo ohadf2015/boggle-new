@@ -47,4 +47,17 @@ describe('InviteContextBanner', () => {
     const banner = screen.getByTestId('invite-banner');
     expect(banner).toHaveAttribute('dir');
   });
+
+  it('renders the room-code chip when a code is present', () => {
+    wrap(<InviteContextBanner roomCode="ABC123" hostName="Alice" onSkip={() => {}} />);
+    const chip = screen.getByTestId('invite-banner-code');
+    expect(chip).toHaveTextContent('ABC123');
+  });
+
+  it('omits the code chip when roomCode is empty (no dangling preposition)', () => {
+    wrap(<InviteContextBanner roomCode="" hostName="Alice" onSkip={() => {}} />);
+    // Banner still renders host context + skip, but no empty black pill.
+    expect(screen.getByTestId('invite-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('invite-banner-code')).not.toBeInTheDocument();
+  });
 });

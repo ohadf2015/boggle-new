@@ -27,11 +27,19 @@ const InviteContextBanner: React.FC<Props> = ({ roomCode, hostName, onSkip }) =>
       aria-live="polite"
     >
       <p className="font-neo-display font-black text-sm uppercase tracking-wide truncate min-w-0">
-        <span aria-hidden>👋 </span>
-        {t('invite.banner.host', { hostName: displayName })}{' '}
-        <span className="font-mono bg-neo-black text-neo-white px-1.5 py-0.5 rounded-neo">
-          {roomCode}
-        </span>
+        <span aria-hidden className="me-1">👋</span>
+        {t('invite.banner.host', { hostName: displayName })}
+        {roomCode?.trim() && (
+          <>
+            {' '}
+            <span
+              data-testid="invite-banner-code"
+              className="font-mono bg-neo-black text-neo-white px-1.5 py-0.5 rounded-neo"
+            >
+              {roomCode}
+            </span>
+          </>
+        )}
       </p>
       <button
         data-testid="invite-banner-skip"

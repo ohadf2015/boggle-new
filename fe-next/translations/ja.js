@@ -2249,6 +2249,7 @@ const ja = {
       "skip": "今はスキップ"
     },
     "name": {
+      "label": "あなたの名前",
       "placeholder": "名前を入力",
       "errorInvalid": "文字、数字、スペースのみ",
       "errorTooShort": "短すぎ！2文字以上",
@@ -2360,7 +2361,7 @@ const ja = {
   },
   "invite": {
     "banner": {
-      "host": "{hostName}さんが待っています:",
+      "host": "{hostName}さんのルームに参加:",
       "yourFriend": "お友達",
       "skipCTA": "スキップして参加"
     },

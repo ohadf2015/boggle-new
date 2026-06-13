@@ -164,6 +164,22 @@ describe('QuickProfileSetup', () => {
     expect(defaultProps.onComplete).not.toHaveBeenCalled();
   });
 
+  it('does not submit a single-character name (min is 2, matching the hint)', () => {
+    render(<QuickProfileSetup {...defaultProps} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'A' } });
+    fireEvent.click(screen.getByText("Let's go!"));
+    expect(defaultProps.onComplete).not.toHaveBeenCalled();
+  });
+
+  it('labels the name field with a calm label, not the validation error string', () => {
+    render(<QuickProfileSetup {...defaultProps} />);
+    // The field label must not reuse the shouting `validation.usernameRequired`
+    // error string; it points at a dedicated `onboarding.name.label` key.
+    expect(screen.queryByText('validation.usernameRequired')).not.toBeInTheDocument();
+    expect(screen.getByText('onboarding.name.label')).toBeInTheDocument();
+  });
+
   it('calls onComplete with name when form submitted', () => {
     render(<QuickProfileSetup {...defaultProps} />);
     const input = screen.getByRole('textbox');
