@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { ClearSubmission } from './anti-cheat';
 import type { ChestContents } from './chest-roll';
 import { readGuestProgress, clearGuestProgress, writeResumeHint } from './guestProgress';
+import { fetchWithAuth } from '@/utils/authFetch';
 
 export type BlastProgressState = {
   coins: number;
@@ -42,7 +43,7 @@ export function useBlastProgress() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/blast/progress');
+        const res = await fetchWithAuth('/api/blast/progress');
         if (res.status === 401) {
           // Logged out — fall back to the guest level position in localStorage.
           const guest = readGuestProgress();

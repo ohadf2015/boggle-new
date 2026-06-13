@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { NextRequest, NextResponse } from 'next/server';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
@@ -176,11 +177,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Local JWT verify (sub-ms) when fetchWithAuth sends a Bearer; cookie fallback
+  // otherwise. Read-only. The cookie client is still used for the data read.
+  const user = await getAuthedUser(req);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const supabase = await createClient();
 
   const localeParam = new URL(req.url).searchParams.get('locale');
   const defaultLocale = VALID_LOCALES.includes(localeParam as (typeof VALID_LOCALES)[number])

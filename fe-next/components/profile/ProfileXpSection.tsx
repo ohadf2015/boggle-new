@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { Zap } from 'lucide-react';
 import XpProgressBar, { getLevelFromXp } from '@/components/XpProgressBar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { fetchWithAuth } from '@/utils/authFetch';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 import type { PrestigeReward } from '@/backend/modules/xpManager';
@@ -33,7 +34,7 @@ export function ProfileXpSection({
 
   useEffect(() => {
     if (level >= 100 && prestigeLevel < 5) {
-      fetch('/api/engagement/prestige')
+      fetchWithAuth('/api/engagement/prestige')
         .then(res => res.ok ? res.json() : null)
         .then(data => {
           if (data?.nextPrestigeRewards) {

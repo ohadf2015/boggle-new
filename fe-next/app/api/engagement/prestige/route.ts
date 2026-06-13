@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import {
   canPrestige,
   getNextPrestigeRewards,
@@ -13,15 +14,17 @@ import { captureApiError } from '@/utils/sentry';
  * GET /api/engagement/prestige
  * Get current prestige status and rewards preview
  */
-export async function GET(_request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    // Local JWT verify (sub-ms) when fetchWithAuth sends a Bearer; cookie
+    // fallback otherwise. Read-only. Query keeps the cookie client so RLS applies.
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const userId = user.id;
 
+    const supabase = await createClient();
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('current_level, prestige_level, prestige_multiplier, prestige_unlocks, total_xp, lifetime_xp')
