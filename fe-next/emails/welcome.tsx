@@ -29,10 +29,9 @@ import {
   Tailwind,
   pixelBasedPreset,
 } from '@react-email/components';
+import { getWelcomeEmailModes, type WelcomeEmailMode } from '@/lib/email/welcomeModes';
 
 /* ───────────────────────── Types ───────────────────────── */
-
-export type ModeAccent = 'lime' | 'pink' | 'cyan' | 'purple';
 
 export interface WelcomeEmailProps {
   recipientName: string;
@@ -41,14 +40,13 @@ export interface WelcomeEmailProps {
   playUrl: string; // where the CTA goes
   videoUrl: string; // hosted tour clip (YouTube / mux / etc.)
   baseUrl?: string; // asset origin; defaults to production
-}
-
-interface ModeDef {
-  key: string;
-  label: string; // brand mode name (kept in latin for all langs)
-  emoji: string;
-  accent: ModeAccent;
-  path: string; // route under /[locale]
+  /**
+   * Localized, link-ready public modes — computed server-side from the shared
+   * MODE_META registry (see lib/email/welcomeModes). Keeps the email in sync
+   * with the landing cubes; the cube art carries the colour, so the tiles
+   * themselves use one uniform chrome (no per-mode rainbow of borders).
+   */
+  modes: WelcomeEmailMode[];
 }
 
 interface WelcomeCopy {
@@ -57,7 +55,6 @@ interface WelcomeCopy {
   videoLabel: string;
   videoSub: string;
   modesHeader: string;
-  taglines: Record<string, string>;
   cta: string;
   ps: string;
   footerReason: string;
@@ -65,35 +62,15 @@ interface WelcomeCopy {
   privacy: string;
 }
 
-/* ───────────────────────── Flagship modes ─────────────────────────
-   Color-coded across the 4 neo-brutalist families for a rainbow grid. */
-
-const MODES: ModeDef[] = [
-  { key: 'multiplayer', label: 'Multiplayer', emoji: '🥊', accent: 'pink', path: 'multiplayer' },
-  { key: 'blast', label: 'Blast', emoji: '💥', accent: 'cyan', path: 'blast' },
-  { key: 'daily', label: 'Daily Word Hunt', emoji: '🎯', accent: 'lime', path: 'daily' },
-  { key: 'connections', label: 'Connections', emoji: '🧩', accent: 'purple', path: 'connections' },
-  { key: 'adventure', label: 'Adventure', emoji: '🗺️', accent: 'pink', path: 'adventure' },
-  { key: 'wordCraft', label: 'Word Craft', emoji: '🏰', accent: 'cyan', path: 'word-craft' },
-];
-
 /* ───────────────────────── Copy — per language ───────────────────────── */
 
 const COPY: Record<string, WelcomeCopy> = {
   en: {
     heading: (n) => `Hi ${n} 👋`,
-    intro: "You're in. Pick a mode, pick a fight 👇",
+    intro: "You're in. Pick a mode, pick a fight.",
     videoLabel: 'See it in action',
     videoSub: "↑ yep, that's the game",
     modesHeader: 'PICK YOUR FIGHT',
-    taglines: {
-      multiplayer: 'Live brawls, real people',
-      blast: 'Combo till it pops',
-      daily: 'One puzzle. Everyone.',
-      connections: 'Spot the hidden links',
-      adventure: 'Solo quest, weird worlds',
-      wordCraft: 'Claim turf with words',
-    },
     cta: 'Play now',
     ps: "Fair warning: it's addictive.",
     footerReason: 'You just joined LexiClash.',
@@ -102,18 +79,10 @@ const COPY: Record<string, WelcomeCopy> = {
   },
   he: {
     heading: (n) => `היי ${n} 👋`,
-    intro: 'יאללה, את/ה בפנים. בחר/י מצב, בחר/י קרב 👇',
+    intro: 'יאללה, את/ה בפנים. בחר/י מצב, בחר/י קרב.',
     videoLabel: 'ככה זה נראה',
     videoSub: '↑ זה המשחק עצמו',
     modesHeader: 'בחרו את הקרב',
-    taglines: {
-      multiplayer: 'קרבות חיים מול אנשים',
-      blast: 'קומבו עד שמתפוצץ',
-      daily: 'חידה אחת. כולם.',
-      connections: 'למצוא את הקשרים',
-      adventure: 'מסע יחיד, עולמות מוזרים',
-      wordCraft: 'לכבוש שטח עם מילים',
-    },
     cta: 'יאללה, משחקים',
     ps: 'אזהרה: זה ממכר.',
     footerReason: 'הרגע הצטרפת ל-LexiClash.',
@@ -122,18 +91,10 @@ const COPY: Record<string, WelcomeCopy> = {
   },
   sv: {
     heading: (n) => `Hej ${n} 👋`,
-    intro: 'Du är med. Välj ett läge och kör 👇',
+    intro: 'Du är med. Välj ett läge och kör.',
     videoLabel: 'Se det i rörelse',
     videoSub: '↑ så ser spelet ut',
     modesHeader: 'VÄLJ DIN MATCH',
-    taglines: {
-      multiplayer: 'Live mot riktiga spelare',
-      blast: 'Kedja tills det smäller',
-      daily: 'Ett pussel. Alla.',
-      connections: 'Hitta dolda kopplingar',
-      adventure: 'Soloäventyr, skumma världar',
-      wordCraft: 'Erövra mark med ord',
-    },
     cta: 'Spela nu',
     ps: 'Varning: beroendeframkallande.',
     footerReason: 'Du gick precis med i LexiClash.',
@@ -142,18 +103,10 @@ const COPY: Record<string, WelcomeCopy> = {
   },
   ja: {
     heading: (n) => `${n}さん、こんにちは 👋`,
-    intro: 'ようこそ。モードを選んで、さあ一戦 👇',
+    intro: 'ようこそ。モードを選んで、さあ一戦。',
     videoLabel: '実際のプレイ',
     videoSub: '↑ これが本物',
     modesHeader: '勝負を選べ',
-    taglines: {
-      multiplayer: '生バトル、相手は本物',
-      blast: '連鎖で大爆発',
-      daily: '一つの問題、みんなで',
-      connections: '隠れた繋がりを探せ',
-      adventure: 'ひとり旅、奇妙な世界',
-      wordCraft: '言葉で陣地を奪え',
-    },
     cta: '今すぐ遊ぶ',
     ps: '注意：ハマります。',
     footerReason: 'LexiClashに登録しました。',
@@ -162,18 +115,10 @@ const COPY: Record<string, WelcomeCopy> = {
   },
   es: {
     heading: (n) => `Hola ${n} 👋`,
-    intro: 'Ya estás dentro. Elige modo y a jugar 👇',
+    intro: 'Ya estás dentro. Elige modo y a jugar.',
     videoLabel: 'Míralo en acción',
     videoSub: '↑ así se juega',
     modesHeader: 'ELIGE TU BATALLA',
-    taglines: {
-      multiplayer: 'Duelos en vivo, gente real',
-      blast: 'Combos hasta reventar',
-      daily: 'Un reto. Todos.',
-      connections: 'Halla los grupos ocultos',
-      adventure: 'Aventura sola, mundos raros',
-      wordCraft: 'Conquista con palabras',
-    },
     cta: 'Jugar ya',
     ps: 'Aviso: engancha.',
     footerReason: 'Acabas de unirte a LexiClash.',
@@ -213,14 +158,11 @@ const C = {
   black: '#000000',
   grayDark: '#374151',
   grayLight: '#9CA3AF',
+  // Uniform tile chrome — one quiet edge for every mode. The cube art carries
+  // all the colour, so the grid reads calm instead of a rainbow of borders.
+  tileBg: '#1e1e3a',
+  tileBorder: '#3a3a5e',
 } as const;
-
-const ACCENT_HEX: Record<ModeAccent, string> = {
-  lime: C.lime,
-  pink: C.pink,
-  cyan: C.cyan,
-  purple: C.purple,
-};
 
 const DEFAULT_BASE = 'https://www.lexiclash.live';
 
@@ -233,13 +175,13 @@ export default function WelcomeEmail({
   playUrl,
   videoUrl,
   baseUrl = DEFAULT_BASE,
+  modes,
 }: WelcomeEmailProps) {
   const t = COPY[language] || COPY.en;
 
   const rtl = language === 'he';
   const dir = rtl ? 'rtl' : 'ltr';
   const sh = rtl ? '-' : ''; // hard-shadow direction flips in RTL
-  const arrow = rtl ? '◀' : '▶';
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `${baseUrl}/${locale}/privacy`;
   // Animated GIF — the only thing that actually plays inside an inbox.
@@ -254,8 +196,8 @@ export default function WelcomeEmail({
   const year = new Date().getFullYear();
 
   // Pair modes into rows of two for the responsive grid.
-  const modeRows: ModeDef[][] = [];
-  for (let i = 0; i < MODES.length; i += 2) modeRows.push(MODES.slice(i, i + 2));
+  const modeRows: WelcomeEmailMode[][] = [];
+  for (let i = 0; i < modes.length; i += 2) modeRows.push(modes.slice(i, i + 2));
 
   return (
     <Html lang={language} dir={dir}>
@@ -337,10 +279,10 @@ export default function WelcomeEmail({
                           overflow: 'hidden',
                         }}>
 
-                        {/* Rainbow accent strip */}
+                        {/* Single brand accent strip (one colour, not a gradient) */}
                         <tr>
                           <td style={{
-                            background: `linear-gradient(90deg, ${C.lime}, ${C.cyan}, ${C.pink}, ${C.purple})`,
+                            backgroundColor: C.lime,
                             height: '6px', fontSize: 0, lineHeight: 0,
                           }}>&nbsp;</td>
                         </tr>
@@ -431,44 +373,64 @@ export default function WelcomeEmail({
                               margin: '0 0 14px',
                               direction: dir,
                             }}>
-                              ✦ {t.modesHeader} ✦
+                              {t.modesHeader}
                             </Text>
 
-                            {/* ── Mode grid (2 cols) ── */}
+                            {/* ── Mode grid (2 cols) — uniform navy tiles, each a
+                                 link; the generated cube image carries the colour,
+                                 name + tagline stay real text so a blocked image
+                                 still reads. ── */}
                             {modeRows.map((row, ri) => (
                               <table key={`mode-row-${ri}`} role="presentation" cellPadding={0} cellSpacing={0}
                                 width="100%" style={{ marginBottom: '12px' }}>
                                 <tr>
-                                  {row.map((m) => {
-                                    const accent = ACCENT_HEX[m.accent];
-                                    return (
-                                      <td key={m.key} width="50%" valign="top" className="mode-td"
-                                        style={{ padding: rtl ? '0 0 0 6px' : '0 6px 0 0' }}>
-                                        <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
+                                  {row.map((m) => (
+                                    <td key={m.key} width="50%" valign="top" className="mode-td"
+                                      style={{ padding: rtl ? '0 0 0 6px' : '0 6px 0 0' }}>
+                                      <Link href={m.href} target="_blank"
+                                        style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+                                        <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
                                           style={{
-                                            backgroundColor: C.cardInner,
-                                            border: `2px solid ${accent}`,
+                                            backgroundColor: C.tileBg,
+                                            border: `2px solid ${C.tileBorder}`,
                                             borderRadius: '12px',
+                                            boxShadow: `${sh}3px 3px 0px ${C.black}`,
                                             height: '100%',
                                           }}>
                                           <tr>
-                                            <td style={{ padding: '12px 12px', direction: dir }}>
+                                            <td width="64" valign="middle" style={{ padding: '10px' }}>
+                                              <Img
+                                                src={m.cubeImageUrl}
+                                                alt={m.title}
+                                                width="56"
+                                                height="56"
+                                                style={{
+                                                  display: 'block',
+                                                  width: '56px',
+                                                  height: '56px',
+                                                  borderRadius: '10px',
+                                                  border: 0,
+                                                  outline: 'none',
+                                                }}
+                                              />
+                                            </td>
+                                            <td valign="middle"
+                                              style={{ padding: rtl ? '10px 0 10px 10px' : '10px 10px 10px 0', direction: dir }}>
                                               <div style={{
-                                                color: accent, fontSize: '14px', fontWeight: 700,
-                                                lineHeight: 1.3, marginBottom: '3px',
+                                                color: C.white, fontSize: '15px', fontWeight: 700,
+                                                lineHeight: 1.25, marginBottom: '2px',
                                               }}>
-                                                <span style={{ fontSize: '15px' }}>{m.emoji}</span>
-                                                &nbsp;&nbsp;{m.label}
+                                                {m.title}
                                               </div>
                                               <div style={{ color: C.grayLight, fontSize: '12px', lineHeight: 1.4 }}>
-                                                {t.taglines[m.key]}
+                                                {m.tagline}
                                               </div>
                                             </td>
                                           </tr>
                                         </table>
-                                      </td>
-                                    );
-                                  })}
+                                      </Link>
+                                    </td>
+                                  ))}
                                 </tr>
                               </table>
                             ))}
@@ -505,7 +467,7 @@ export default function WelcomeEmail({
                                             textTransform: 'uppercase' as const,
                                           }}
                                         >
-                                          {arrow}&nbsp;&nbsp;{t.cta}
+                                          {t.cta}
                                         </Button>
                                       </td>
                                     </tr>
@@ -600,6 +562,7 @@ WelcomeEmail.PreviewProps = {
   playUrl: 'https://www.lexiclash.live/en',
   videoUrl: 'https://www.lexiclash.live/en?tour=1',
   baseUrl: '',
+  modes: getWelcomeEmailModes('en', ''),
 } satisfies WelcomeEmailProps;
 
 export { WelcomeEmail };

@@ -17,6 +17,7 @@ import {
   withTimeout,
 } from '@/lib/email';
 import WelcomeEmail, { getWelcomeSubject } from '@/emails/welcome';
+import { getWelcomeEmailModes } from '@/lib/email/welcomeModes';
 
 /**
  * Get or create Resend client. Lazy initialization to support testing.
@@ -143,6 +144,9 @@ export async function sendWelcomeEmailToUser(
 
     // Step 9: Render email
     const subject = getWelcomeSubject(language, recipientName);
+    // Dynamic public-mode grid — derived from the shared MODE_META registry so
+    // the email lists every all-players mode with its cube art and link.
+    const modes = getWelcomeEmailModes(language, baseUrl);
     const html = await render(
       WelcomeEmail({
         recipientName,
@@ -151,6 +155,7 @@ export async function sendWelcomeEmailToUser(
         playUrl,
         videoUrl,
         baseUrl,
+        modes,
       })
     );
     const text = await render(
@@ -161,6 +166,7 @@ export async function sendWelcomeEmailToUser(
         playUrl,
         videoUrl,
         baseUrl,
+        modes,
       }),
       { plainText: true }
     );
