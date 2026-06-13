@@ -4345,6 +4345,12 @@ const es = {
       "calmDesc": "Efectos más suaves, sin presión de tiempo, celebraciones tranquilas.",
       "changeLater": "Puedes cambiarlo cuando quieras en Ajustes."
     },
+    "style": {
+      "title": "Elige tu estilo",
+      "subtitle": "Elige un ambiente para tu música y tus colores. Puedes cambiarlo cuando quieras en Ajustes.",
+      "confirm": "¡A jugar!",
+      "skip": "Omitir por ahora"
+    },
     "header": "Guía Rápida",
     "loading": "Cargando...",
     "skip": "Omitir",

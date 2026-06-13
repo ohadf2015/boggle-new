@@ -2283,6 +2283,12 @@ const en = {
       "calmDesc": "Gentler visuals, no time pressure, softer celebrations.",
       "changeLater": "You can switch anytime in Settings."
     },
+    "style": {
+      "title": "Pick your style",
+      "subtitle": "Choose a vibe for your music and colors. You can change it anytime in Settings.",
+      "confirm": "Let's Clash!",
+      "skip": "Skip for now"
+    },
     "header": "Quick Start",
     "loading": "Loading...",
     "skip": "Skip",

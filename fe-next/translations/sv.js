@@ -2280,6 +2280,12 @@ const sv = {
       "calmDesc": "Mjukare bilder, ingen tidspress, lugnare firande.",
       "changeLater": "Du kan byta när som helst i inställningarna."
     },
+    "style": {
+      "title": "Välj din stil",
+      "subtitle": "Välj en känsla för din musik och dina färger. Du kan ändra när som helst i inställningarna.",
+      "confirm": "Nu kör vi!",
+      "skip": "Hoppa över just nu"
+    },
     "header": "Snabbguide",
     "loading": "Laddar...",
     "skip": "Hoppa över",
