@@ -472,9 +472,9 @@ export function useAdventureMusic({
   // Handle playing state changes
   useEffect(() => {
     const paths = getWorldTrackPaths(worldNumber, isBossLevel);
-    if (!paths || !enabled) return;
+    if (!paths) return;
 
-    if (isPlaying && !isPaused) {
+    if (enabled && isPlaying && !isPaused) {
       // Start playing if not already
       if (currentTrackRef.current === null) {
         startTrack1();
@@ -487,8 +487,11 @@ export function useAdventureMusic({
         }
       }
     } else {
-      // Pause music when game is paused or not playing
-      suspendAudio('Game paused/stopped');
+      // Suspend when paused, stopped, OR disabled. The disabled case matters: when
+      // AdventureView's ambient hook hands off to AdventureGame's in-game hook
+      // (enabled flips true→false), failing to pause here left the ambient track
+      // playing UNDER the gameplay track = doubled/layered audio.
+      suspendAudio(enabled ? 'Game paused/stopped' : 'Music disabled');
     }
   }, [isPlaying, isPaused, enabled, worldNumber, isBossLevel, startTrack1, suspendAudio, getEffectiveVolume]);
 

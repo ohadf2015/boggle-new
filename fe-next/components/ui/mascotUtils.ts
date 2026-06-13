@@ -3,7 +3,7 @@
  * Pure utilities without React dependencies
  */
 
-import { type MascotVariant } from './Mascot';
+import { type MascotVariant } from './mascotData';
 
 /**
  * Extended variants for semantic meaning - ALL map to 7 GIF variants

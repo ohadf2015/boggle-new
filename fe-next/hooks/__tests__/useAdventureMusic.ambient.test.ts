@@ -216,6 +216,51 @@ describe('useAdventureMusic - Ambient Mode', () => {
     });
   });
 
+  describe('disabling the hook (ambient → gameplay handoff)', () => {
+    it('pauses its own track when enabled flips to false while playing', () => {
+      // AdventureView mounts an ambient music hook with enabled=!isInGameplay.
+      // When the player enters a level, enabled flips to false and AdventureGame
+      // mounts its own enabled=true hook. If the ambient hook does not suspend its
+      // track on disable, both tracks play at once = doubled audio.
+      mockPlaying.mockReturnValue(true);
+
+      const { rerender } = renderHook(
+        ({ enabled }: { enabled: boolean }) =>
+          useAdventureMusic({
+            worldNumber: 1,
+            isPlaying: true,
+            isPaused: false,
+            timeRemaining: 0,
+            totalTime: 0,
+            enabled,
+          }),
+        { initialProps: { enabled: true }, wrapper }
+      );
+
+      vi.clearAllMocks();
+      mockPlaying.mockReturnValue(true);
+      rerender({ enabled: false });
+
+      expect(mockPause).toHaveBeenCalled();
+    });
+
+    it('does not start playback while disabled', () => {
+      renderHook(() =>
+        useAdventureMusic({
+          worldNumber: 1,
+          isPlaying: true,
+          isPaused: false,
+          timeRemaining: 0,
+          totalTime: 0,
+          enabled: false,
+        }),
+        { wrapper }
+      );
+
+      expect(mockPlay).not.toHaveBeenCalled();
+    });
+  });
+
   describe('return to ambient mode after gameplay', () => {
     it('resets hasSwitchedToTrack2 when returning to ambient', () => {
       mockPlaying.mockReturnValue(true);

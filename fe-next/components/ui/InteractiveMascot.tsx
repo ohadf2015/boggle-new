@@ -5,7 +5,8 @@ import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { haptics } from '@/utils/haptics';
-import { MascotVariant, getMascotImagePath, getMascotBgType, isVideoVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
+import { getMascotImagePath, getMascotBgType, isVideoVariant, type MascotVariant } from './mascotData';
+import type { MascotClipShape, MascotBorderColor } from './Mascot';
 import { SilentVideo } from './SilentVideo';
 import {
   getBaseVariant,
