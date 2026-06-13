@@ -584,7 +584,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             )}
           >
             <div
-              className="relative aspect-square mx-auto w-[min(600px,92cqi,calc(100cqb-240px))] medium-short:w-[min(560px,92cqi,calc(100cqb-150px))] short:w-[min(560px,94cqi,calc(100cqb-150px))] lg:w-[min(680px,100cqi,calc(100cqb-120px))] desktop-short:lg:w-[min(560px,100cqi,calc(100cqb-90px))] desktop-medium-short:lg:w-[min(620px,100cqi,calc(100cqb-100px))] max-h-full"
+              data-testid="grid-frame"
+              className="relative aspect-square mx-auto w-[min(720px,94cqi,calc(100cqb-200px))] medium-short:w-[min(560px,92cqi,calc(100cqb-150px))] short:w-[min(560px,94cqi,calc(100cqb-150px))] lg:w-[min(680px,100cqi,calc(100cqb-120px))] desktop-short:lg:w-[min(560px,100cqi,calc(100cqb-90px))] desktop-medium-short:lg:w-[min(620px,100cqi,calc(100cqb-100px))] max-h-full"
             >
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}

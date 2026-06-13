@@ -252,6 +252,18 @@ describe('PortraitLayout Combo Glow', () => {
     expect(gridContainer.className).toContain('transition-shadow');
     expect(gridContainer.className).toContain('duration-500');
   });
+
+  // Roomy portrait screens (e.g. 820×1048 tablets) sit in the mobile base
+  // branch and were capped at a phone-sized 600px grid, leaving a large empty
+  // band. The base clamp is widened so the grid grows into that space; the
+  // smaller short:/medium-short: height-variants still protect short devices.
+  it('lets the base grid clamp grow on roomy screens (raised cap, trimmed reserve)', () => {
+    render(<PortraitLayout {...baseProps} comboLevel={0} />);
+    const frame = screen.getByTestId('grid-frame');
+    expect(frame.className).toContain('w-[min(720px,94cqi,calc(100cqb-200px))]');
+    // Old phone-sized cap must be gone.
+    expect(frame.className).not.toContain('w-[min(600px,92cqi,calc(100cqb-240px))]');
+  });
 });
 
 describe('PortraitLayout Haptic Feedback', () => {
