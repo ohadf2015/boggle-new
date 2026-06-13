@@ -991,6 +991,7 @@ const ja = {
     "wordsReplayed": "保留中の単語を送信しました！"
   },
   "game": {
+    "doubleClickToSubmit": "最後の文字をダブルクリックで送信",
     "foundByOther": "${player}が見つけました",
     "combo": "コンボ",
     "comboHint": "素早く単語を見つけてコンボ！",

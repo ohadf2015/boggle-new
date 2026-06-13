@@ -990,6 +990,7 @@ const he = {
     "wordsReplayed": "מילים בתור נשלחו!"
   },
   "game": {
+    "doubleClickToSubmit": "לחיצה כפולה על האות האחרונה לשליחה",
     "foundByOther": "נמצא על ידי ${player}",
     "combo": "קומבו",
     "comboHint": "מצא מילים מהר לקומבו!",

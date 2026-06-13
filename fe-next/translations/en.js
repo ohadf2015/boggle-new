@@ -978,6 +978,7 @@ const en = {
     "wordsReplayed": "Queued words submitted!"
   },
   "game": {
+    "doubleClickToSubmit": "Double-click last letter to submit",
     "foundByOther": "Found by ${player}",
     "combo": "Combo",
     "comboHint": "Find words fast for combo!",

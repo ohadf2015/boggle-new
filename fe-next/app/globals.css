@@ -928,6 +928,27 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   .blast-progress-shimmer { animation: none; }
 }
 
+@utility blast-clear-delta-pop {
+  /* Blast HUD — "+N" cleared-tiles burst floats up and fades for a satisfying beat */
+  animation: blast-clear-delta-pop 0.65s ease-out forwards;
+}
+
+@keyframes blast-clear-delta-pop {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.7); }
+  30%  { opacity: 1; transform: translateY(-3px) scale(1.18); }
+  100% { opacity: 0; transform: translateY(-16px) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blast-clear-delta-pop { animation: blast-clear-delta-pop-fade 0.65s ease-out forwards; }
+}
+
+@keyframes blast-clear-delta-pop-fade {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @utility blast-board {
   /* Blast board — hide base grid visuals so BlastTile overlay is the sole renderer */
   & .game-board-frame {

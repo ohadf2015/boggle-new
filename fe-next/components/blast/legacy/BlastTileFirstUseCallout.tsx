@@ -7,19 +7,25 @@ import type { BlastTileType } from './types';
 import { getTileTooltip } from './utils/blastTileTooltips';
 
 const AUTO_DISMISS_MS = 6500;
+/** MP is time-pressured + hands-busy: dismiss sooner and never demand a tap. */
+const AUTO_DISMISS_MS_MP = 3500;
 
 interface BlastTileFirstUseCalloutProps {
   type: BlastTileType;
   onDismiss: () => void;
+  /** Multiplayer: hide the ack button + auto-dismiss faster (no click needed). */
+  isMultiplayer?: boolean;
 }
 
 /**
  * Small non-blocking callout that names a special tile and says what it does
- * the first time the player meets it. Auto-dismisses; the "Got it" button lets
- * the player close it early. Pointer-events are off except the button so the
- * board stays fully playable underneath. RTL flips via logical CSS + dir.
+ * the first time the player meets it. Auto-dismisses; in single-player a "Got
+ * it" button lets the player close it early, but in multiplayer the button is
+ * hidden and it just auto-disappears (a mid-round tap is too precious to spend
+ * acking a tooltip). Pointer-events are off except the button so the board
+ * stays fully playable underneath. RTL flips via logical CSS + dir.
  */
-export function BlastTileFirstUseCallout({ type, onDismiss }: BlastTileFirstUseCalloutProps) {
+export function BlastTileFirstUseCallout({ type, onDismiss, isMultiplayer = false }: BlastTileFirstUseCalloutProps) {
   const { t } = useLanguage();
   const reducedMotion = usePrefersReducedMotion();
   const tip = getTileTooltip(type, t);
@@ -27,9 +33,10 @@ export function BlastTileFirstUseCallout({ type, onDismiss }: BlastTileFirstUseC
   dismissRef.current = onDismiss;
 
   useEffect(() => {
-    const id = window.setTimeout(() => dismissRef.current(), AUTO_DISMISS_MS);
+    const ms = isMultiplayer ? AUTO_DISMISS_MS_MP : AUTO_DISMISS_MS;
+    const id = window.setTimeout(() => dismissRef.current(), ms);
     return () => window.clearTimeout(id);
-  }, [type]);
+  }, [type, isMultiplayer]);
 
   if (!tip) return null;
 
@@ -48,13 +55,15 @@ export function BlastTileFirstUseCallout({ type, onDismiss }: BlastTileFirstUseC
           <p className="font-neo-display text-sm font-bold leading-tight text-neo-lime">{tip.name}</p>
           <p className="font-neo-body text-xs leading-snug text-neo-cream/90">{tip.desc}</p>
         </div>
-        <button
-          type="button"
-          onClick={onDismiss}
-          className="shrink-0 rounded-neo border-neo border-black bg-neo-lime px-2 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm active:animate-neo-press"
-        >
-          {t('blast.firstUse.gotIt', 'Got it')}
-        </button>
+        {!isMultiplayer && (
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="shrink-0 rounded-neo border-neo border-black bg-neo-lime px-2 py-1 font-neo-body text-xs font-bold text-black shadow-hard-sm active:animate-neo-press"
+          >
+            {t('blast.firstUse.gotIt', 'Got it')}
+          </button>
+        )}
       </div>
     </div>
   );

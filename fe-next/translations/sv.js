@@ -1078,6 +1078,7 @@ const sv = {
     "wordsReplayed": "Köade ord har skickats!"
   },
   "game": {
+    "doubleClickToSubmit": "Dubbelklicka på sista bokstaven för att skicka",
     "foundByOther": "Hittades av ${player}",
     "combo": "Kombo",
     "comboHint": "Hitta ord snabbt för kombo!",

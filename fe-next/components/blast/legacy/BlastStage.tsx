@@ -419,7 +419,11 @@ export const BlastStage = memo(function BlastStage({
             {/* First-use teaching: names a special tile + what it does the
                 first time the player meets it (once per tile, persisted). */}
             {firstUseTeaching && (
-              <BlastTileFirstUseCallout type={firstUseTeaching} onDismiss={dismissFirstUse} />
+              <BlastTileFirstUseCallout
+                type={firstUseTeaching}
+                onDismiss={dismissFirstUse}
+                isMultiplayer={isMultiplayer}
+              />
             )}
           </div>
         </div>

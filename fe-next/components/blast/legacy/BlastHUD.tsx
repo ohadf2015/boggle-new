@@ -60,6 +60,33 @@ function useAnimatedScore(target: number) {
 }
 
 /**
+ * Tracks tile-clear progress and fires a short "pulse" + the delta whenever the
+ * cleared count jumps, so emptying the board feels rewarding (the bar glows, the
+ * count pops, a "+N" floats up) instead of a silent number tick.
+ */
+function useClearPulse(value: number) {
+  const [pulse, setPulse] = useState(false);
+  const [delta, setDelta] = useState(0);
+  const [burstKey, setBurstKey] = useState(0);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    if (value > prevRef.current) {
+      setDelta(value - prevRef.current);
+      setPulse(true);
+      setBurstKey(k => k + 1);
+      prevRef.current = value;
+      const id = setTimeout(() => setPulse(false), 650);
+      return () => clearTimeout(id);
+    }
+    prevRef.current = value;
+    return undefined;
+  }, [value]);
+
+  return { pulse, delta, burstKey };
+}
+
+/**
  * Compact countdown pill for the HUD top row (multiplayer only).
  *
  * MP Blast used to float a large CircularTimer in its own band below the HUD,
@@ -184,6 +211,7 @@ export function BlastHUD({
   const isFiniteMoves = isFinite(totalMoves);
   const goalMet = clearPct >= BLAST_WAVE_GOAL_PCT;
   const { display: animatedScore, pulse: scorePulse } = useAnimatedScore(score);
+  const { pulse: clearPulse, delta: clearDelta, burstKey: clearBurstKey } = useClearPulse(tilesCleared);
 
   let moveColorClass: string;
   if (movesRemaining <= 2) {
@@ -202,7 +230,7 @@ export function BlastHUD({
       data-testid="blast-hud"
     >
       {/* Top row: wave + buff slot + controls. Min-h fixed so chip toggles never reflow. */}
-      <div className="flex items-center justify-between px-3 py-1.5 pt-safe min-h-[36px]">
+      <div className="flex items-center justify-between px-3 py-0.5 pt-safe min-h-[28px]">
         <div className="flex items-center gap-2 min-w-0">
           {/* MP countdown — docked into the top row where the wave chip would
               sit in SP, so the board no longer shares space with a floating timer. */}
@@ -284,7 +312,7 @@ export function BlastHUD({
       {/* Bottom row: score | moves + combo | progress.
           Each cell uses fixed basis/min-width so digit growth or chip toggles
           don't shove neighbours around. */}
-      <div className="flex items-stretch px-3 py-2 gap-3">
+      <div className="flex items-stretch px-3 py-1 gap-2">
         {/* Score — fixed minimum width room for 5 digits. Labelled so the lone
             star + number reads unambiguously as the player's score. */}
         <div
@@ -292,10 +320,10 @@ export function BlastHUD({
           aria-label={`${t('blast.score')}: ${animatedScore}`}
         >
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-amber-400 text-base shrink-0">★</span>
+            <span className="text-amber-400 text-sm shrink-0">★</span>
             <span
               className={cn(
-                'text-2xl font-black tabular-nums truncate transition-transform duration-150 text-neo-white origin-left',
+                'text-xl font-black tabular-nums truncate transition-transform duration-150 text-neo-white origin-left',
                 scorePulse && 'scale-[1.15]',
               )}
               style={{ minWidth: '5ch' }}
@@ -317,11 +345,11 @@ export function BlastHUD({
             <div className="flex flex-col items-center gap-0.5 w-[56px]">
               <div
                 className={cn(
-                  'w-14 h-14 rounded-full flex flex-col items-center justify-center border-2 transition-colors',
+                  'w-11 h-11 rounded-full flex flex-col items-center justify-center border-2 transition-colors',
                   movesRemaining <= 3 ? 'border-neo-red/80 bg-neo-red/15' : 'border-white/25 bg-white/8',
                 )}
               >
-                <span className={cn('text-2xl font-black tabular-nums leading-none', moveColorClass)}>
+                <span className={cn('text-xl font-black tabular-nums leading-none', moveColorClass)}>
                   {movesRemaining}
                 </span>
               </div>
@@ -331,7 +359,7 @@ export function BlastHUD({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-0.5 w-[56px]">
-              <span className="text-2xl font-black text-neo-white tabular-nums">
+              <span className="text-xl font-black text-neo-white tabular-nums">
                 {wordsFoundCount}
               </span>
               <span className="text-[9px] font-bold uppercase tracking-wider text-white">
@@ -350,22 +378,43 @@ export function BlastHUD({
           </div>
         </div>
 
-        {/* Tile clear progress with 90% goal marker */}
-        <div className="flex flex-col items-end gap-1 basis-1/3 min-w-0">
+        {/* Tile-clear progress. The old "X% / 90%" label + 90% marker confused
+            players, so the goal is now signalled implicitly: the bar fills, then
+            flips lime + shows a ✓ once ≥90% (goalMet) is reached. The concrete
+            X/Y cleared count stays as the only number. */}
+        <div className="relative flex flex-col items-end gap-0.5 basis-1/3 min-w-0">
+          {/* Floating "+N" that pops each time tiles clear — the satisfying beat. */}
+          {clearPulse && clearDelta > 0 && (
+            <span
+              key={clearBurstKey}
+              data-testid="blast-clear-delta"
+              aria-hidden="true"
+              className="blast-clear-delta-pop pointer-events-none absolute right-1 top-0 text-sm font-black text-neo-lime drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]"
+            >
+              +{clearDelta}
+            </span>
+          )}
+          {/* Reserved ready-mark row — keeps height stable; shows ✓ only at goal. */}
           <span
             data-testid="blast-progress-label"
-            className="text-sm font-black tabular-nums whitespace-nowrap"
+            aria-hidden="true"
+            className="h-3.5 text-sm font-black leading-none text-neo-lime"
           >
-            <span className={goalMet ? 'text-neo-lime' : 'text-neo-white'}>{clearPct}%</span>
-            <span className="text-white"> / {BLAST_WAVE_GOAL_PCT}%</span>
+            {goalMet ? '✓' : ' '}
           </span>
-          <div className="relative w-full h-3.5 bg-white/10 rounded-full overflow-hidden border border-white/10">
+          <div
+            className={cn(
+              'relative w-full h-2.5 bg-white/10 rounded-full overflow-hidden border transition-all duration-200',
+              clearPulse ? 'border-neo-lime/80 shadow-[0_0_10px_rgba(191,255,0,0.7)] scale-y-150' : 'border-white/10',
+            )}
+          >
             <div
               data-testid="blast-progress-fill"
               data-goal-met={goalMet ? 'true' : 'false'}
               className={cn(
                 'h-full rounded-full transition-all duration-300',
                 goalMet && 'blast-progress-shimmer',
+                clearPulse && 'brightness-150',
               )}
               style={{
                 width: `${clearPct}%`,
@@ -374,18 +423,14 @@ export function BlastHUD({
                   : 'linear-gradient(90deg, #00FFFF, #66FFFF)',
               }}
             />
-            {/* 90% goal marker — always visible so the player sees how far they need to push */}
-            <div
-              data-testid="blast-progress-target-marker"
-              aria-hidden="true"
-              className={cn(
-                'absolute top-0 bottom-0 w-[2px] -translate-x-1/2 transition-colors',
-                goalMet ? 'bg-neo-lime shadow-[0_0_6px_rgba(191,255,0,0.9)]' : 'bg-white/55',
-              )}
-              style={{ left: `${BLAST_WAVE_GOAL_PCT}%` }}
-            />
           </div>
-          <span className="text-[9px] font-bold uppercase tracking-wider text-white tabular-nums">
+          <span
+            className={cn(
+              'text-[9px] font-bold uppercase tracking-wider tabular-nums transition-transform duration-150 origin-right',
+              goalMet ? 'text-neo-lime' : 'text-white',
+              clearPulse && 'scale-[1.35] text-neo-lime',
+            )}
+          >
             {tilesCleared}/{totalTiles} {t('blast.cleared')}
           </span>
         </div>

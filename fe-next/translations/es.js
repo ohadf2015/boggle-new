@@ -979,6 +979,7 @@ const es = {
     "wordsReplayed": "¡Palabras en cola enviadas!"
   },
   "game": {
+    "doubleClickToSubmit": "Doble clic en la última letra para enviar",
     "foundByOther": "Encontrada por ${player}",
     "combo": "Combo",
     "comboHint": "¡Rápido! Encadena palabras",

@@ -527,6 +527,12 @@ export const BLAST_RETIRED_SPECIAL_TYPES: ReadonlySet<BlastTileType> = new Set<B
   'crystal',
   'fuse',
   'anchor',
+  // "Locked tiles" removal (2026-06-13): un-thawed ice/frozen render as a frost
+  // "locked" overlay (derived via cellFilter) that confused players. Retiring
+  // both zeroes their spawn share for SP + MP (both roll on getWaveDistribution),
+  // so no locked tile can ever appear. Reversible: drop them to bring back.
+  'ice',
+  'frozen',
 ]);
 
 /**

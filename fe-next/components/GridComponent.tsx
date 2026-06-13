@@ -13,6 +13,7 @@ import {
   type SelectedCell,
   type PerformanceMode,
 } from './grid';
+import { shouldShowDoubleClickSubmitHint } from './grid/submitHintVisibility';
 import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import EarthquakeEffects from './grid/EarthquakeEffects';
 import { getSelectionEscalation } from './grid/selectionEscalation';
@@ -328,6 +329,19 @@ const GridComponent = memo<GridComponentProps>(({
     } catch { setReduceMotion(false); return undefined; }
   }, []);
 
+  // Desktop (mouse) detection — drives the "double-click to submit" hint, which
+  // is meaningless on touch (there the last-tile tap auto-submits).
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia('(hover: hover) and (pointer: fine)');
+      setCanHover(!!mq.matches);
+      const handler = (e: MediaQueryListEvent) => setCanHover(!!e.matches);
+      mq.addEventListener?.('change', handler);
+      return () => mq.removeEventListener?.('change', handler);
+    } catch { setCanHover(false); return undefined; }
+  }, []);
+
   useEffect(() => { setPerformanceMode(getPerformanceMode()); }, []);
 
   const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
@@ -437,6 +451,23 @@ const GridComponent = memo<GridComponentProps>(({
             </m.div>
           )}
         </AnimatePresence>
+      )}
+
+      {/* Desktop tap-to-build hint: players who click tile-by-tile (not drag)
+          don't know the submit gesture. Rendered independently of the word
+          preview (blast hides that chip) so it shows in every mode. Hidden on
+          touch (last-tap auto-submits) and while dragging. */}
+      {interactive && shouldShowDoubleClickSubmitHint({ canHover, isClickSelecting: isSelecting, selectedCount: selectedCells.length }) && (
+        <div
+          data-testid="grid-doubleclick-submit-hint"
+          className="fixed top-14 left-1/2 -translate-x-1/2 z-[90] pointer-events-none bg-neo-navy-light text-neo-cream border-neo border-black rounded-neo px-3 py-1 shadow-hard-sm whitespace-nowrap"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="text-[11px] font-bold uppercase tracking-wide">
+            {t('game.doubleClickToSubmit', 'Double-click last letter to submit')}
+          </span>
+        </div>
       )}
 
       {!hideComboIndicator && (

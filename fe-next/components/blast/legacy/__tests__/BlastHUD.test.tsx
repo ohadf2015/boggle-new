@@ -32,17 +32,41 @@ const baseProps = {
   t,
 };
 
-describe('BlastHUD — 90% wave goal clarity', () => {
-  it('renders the 90% target marker on the progress bar', () => {
+describe('BlastHUD — wave goal clarity (no confusing percentage)', () => {
+  // The "X% / 90%" label + 90% target marker confused players ("what is 90%?").
+  // We removed the percentage chrome: the goal is now signalled purely by the
+  // bar flipping lime + a ✓ when ≥90% cleared. The concrete X/Y cleared count
+  // stays. The underlying goalMet (≥90%) logic is unchanged.
+  it('does NOT render a 90% target marker', () => {
     render(<BlastHUD {...baseProps} tilesCleared={32} />);
-    expect(screen.getByTestId('blast-progress-target-marker')).toBeDefined();
+    expect(screen.queryByTestId('blast-progress-target-marker')).toBeNull();
   });
 
-  it('shows progress as "current / target%" so the goal is explicit', () => {
+  it('never shows the raw "/ 90%" percentage text', () => {
     render(<BlastHUD {...baseProps} tilesCleared={45} totalTiles={100} />);
     const label = screen.getByTestId('blast-progress-label');
-    expect(label.textContent).toContain('45');
-    expect(label.textContent).toContain('90');
+    expect(label.textContent).not.toContain('90');
+    expect(label.textContent).not.toContain('45%');
+  });
+
+  it('shows no ready mark below the goal, and a ✓ once the goal is met', () => {
+    const { rerender } = render(<BlastHUD {...baseProps} tilesCleared={89} totalTiles={100} />);
+    expect(screen.getByTestId('blast-progress-label').textContent).not.toContain('✓');
+    rerender(<BlastHUD {...baseProps} tilesCleared={90} totalTiles={100} />);
+    expect(screen.getByTestId('blast-progress-label').textContent).toContain('✓');
+  });
+
+  it('still shows the concrete X/Y cleared count', () => {
+    render(<BlastHUD {...baseProps} tilesCleared={12} totalTiles={36} />);
+    expect(screen.getByText(/12\/36/)).toBeDefined();
+  });
+
+  it('pops a "+N" indicator when more tiles get cleared (satisfying progress)', () => {
+    const { rerender } = render(<BlastHUD {...baseProps} tilesCleared={5} totalTiles={36} />);
+    expect(screen.queryByTestId('blast-clear-delta')).toBeNull();
+    rerender(<BlastHUD {...baseProps} tilesCleared={9} totalTiles={36} />);
+    const delta = screen.getByTestId('blast-clear-delta');
+    expect(delta.textContent).toContain('4');
   });
 
   it('flips to lime gradient only after the 90% goal is met', () => {
