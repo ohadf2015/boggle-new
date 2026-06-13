@@ -1,8 +1,6 @@
 /**
  * OnboardingFlow analytics — FTUE funnel events fire at each step transition.
- * Keeps tight to the 5-step state machine: language -> tutorial -> profile ->
- * scoreReveal -> fork. `score_reveal` carries `action` discriminator so the
- * funnel can split retry friction vs clean continues.
+ * Short state machine: language -> [calmMode (admin)] -> profile -> style -> home.
  */
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -12,7 +10,10 @@ import '@testing-library/jest-dom';
 vi.mock('@/utils/growthTracking', () => ({
   trackOnboardingStart: vi.fn(),
   trackOnboardingStep: vi.fn(),
-  markFirstGameActivation: vi.fn(),
+  trackOnboardingCompleted: vi.fn(),
+  trackOnboardingSkipped: vi.fn(),
+  trackInviteTutorialSkipped: vi.fn(),
+  trackInviteConsumed: vi.fn(),
 }));
 
 vi.mock('framer-motion', () => {
@@ -41,10 +42,6 @@ vi.mock('@/utils/onboardingStorage', () => ({
   consumePendingRoomInvite: () => mockConsumePendingRoom(),
   hasPendingRoomInvite: () => mockHasPendingRoom(),
   getPendingRoomInvite: () => mockGetPendingRoom(),
-}));
-
-vi.mock('@/utils/contextualGuidanceStorage', () => ({
-  markGuidanceShown: vi.fn(),
 }));
 
 vi.mock('@/utils/profileStorage', () => ({
@@ -85,34 +82,23 @@ vi.mock('../LanguageSelect', () => ({
   ),
 }));
 
-vi.mock('../TutorialGame', () => ({
-  __esModule: true,
-  default: ({ onComplete }: any) => (
-    <button data-testid="tut-btn" onClick={() => onComplete(47, ['CAT', 'DOG', 'STAR'])}>
-      tut
-    </button>
-  ),
-}));
-
 vi.mock('../QuickProfileSetup', () => ({
   __esModule: true,
   default: ({ onComplete, hasPendingInvite }: any) => (
     <button
       data-testid="profile-btn"
       data-pending={String(!!hasPendingInvite)}
-      onClick={() => onComplete('Player1', {})}
+      onClick={() => onComplete('Player1', {}, false)}
     >
       profile
     </button>
   ),
 }));
 
-vi.mock('../ScoreRevealV2', () => ({
+vi.mock('../StyleSelectStep', () => ({
   __esModule: true,
-  default: ({ onContinue }: any) => (
-    <>
-      <button data-testid="continue-btn" onClick={onContinue}>continue</button>
-    </>
+  default: ({ onComplete }: any) => (
+    <button data-testid="style-btn" onClick={onComplete}>style</button>
   ),
 }));
 
@@ -146,8 +132,13 @@ describe('OnboardingFlow analytics', () => {
   });
 
   const goNew = () => fireEvent.click(screen.getByTestId('new-btn'));
-  // New player now picks a vibe (calm/energetic) before the tutorial.
+  // Admin picks a vibe (calm/energetic) before the profile step.
   const chooseVibe = () => fireEvent.click(screen.getByTestId('vibe-energetic'));
+  const advanceToProfile = () => {
+    fireEvent.click(screen.getByTestId('lang-btn'));
+    goNew();
+    chooseVibe();
+  };
 
   it('fires onboarding_started once on mount', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
@@ -161,68 +152,41 @@ describe('OnboardingFlow analytics', () => {
     expect(trackOnboardingStep).toHaveBeenCalledWith('language');
   });
 
-  it('fires step=tutorial with score/wordCount on tutorial complete', () => {
-    render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    chooseVibe();
-    fireEvent.click(screen.getByTestId('tut-btn'));
-    expect(trackOnboardingStep).toHaveBeenCalledWith('tutorial', {
-      score: 47,
-      wordCount: 3,
-    });
-  });
-
   it('fires step=profile with hasPendingInvite=false', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    chooseVibe();
-    fireEvent.click(screen.getByTestId('tut-btn'));
+    advanceToProfile();
     fireEvent.click(screen.getByTestId('profile-btn'));
     expect(trackOnboardingStep).toHaveBeenCalledWith('profile', {
       hasPendingInvite: false,
+      nameEdited: false,
     });
   });
 
-  it('fires step=profile with hasPendingInvite=true when invite present', () => {
-    mockHasPendingRoom.mockReturnValue(true);
-    mockConsumePendingRoom.mockReturnValue('ABC123');
+  it('fires step=style on style step completion', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    chooseVibe();
-    fireEvent.click(screen.getByTestId('tut-btn'));
+    advanceToProfile();
     fireEvent.click(screen.getByTestId('profile-btn'));
-    expect(trackOnboardingStep).toHaveBeenCalledWith('profile', {
-      hasPendingInvite: true,
-    });
+    fireEvent.click(screen.getByTestId('style-btn'));
+    expect(trackOnboardingStep).toHaveBeenCalledWith('style');
   });
 
-  // Regression: PostHog funnel showed tutorial step fires ~2x start count
-  // because handleNewUser emitted 'tutorial' on entry AND handleTutorialComplete
-  // emitted 'tutorial' on exit. Step events must fire once per step, on completion only.
-  it('fires step=tutorial exactly once (on completion, not on entry)', () => {
+  it('fires step=style exactly once (on completion, not on entry)', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    chooseVibe();
-    fireEvent.click(screen.getByTestId('tut-btn'));
+    advanceToProfile();
+    fireEvent.click(screen.getByTestId('profile-btn'));
+    fireEvent.click(screen.getByTestId('style-btn'));
 
-    const tutorialCalls = (trackOnboardingStep as unknown as ReturnType<typeof vi.fn>).mock.calls
-      .filter((c) => c[0] === 'tutorial');
-    expect(tutorialCalls).toHaveLength(1);
-    expect(tutorialCalls[0]).toEqual(['tutorial', { score: 47, wordCount: 3 }]);
+    const styleCalls = (trackOnboardingStep as unknown as ReturnType<typeof vi.fn>).mock.calls
+      .filter((c) => c[0] === 'style');
+    expect(styleCalls).toHaveLength(1);
   });
 
-  it('never emits bare tutorial step without score payload', () => {
+  it('never emits a tutorial step (tutorial removed from the short flow)', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    chooseVibe();
-    fireEvent.click(screen.getByTestId('tut-btn'));
-
+    advanceToProfile();
+    fireEvent.click(screen.getByTestId('profile-btn'));
+    fireEvent.click(screen.getByTestId('style-btn'));
     expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial');
-    expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial', undefined);
+    expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial', expect.anything());
   });
 });

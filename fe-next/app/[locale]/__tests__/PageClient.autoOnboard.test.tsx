@@ -1,12 +1,12 @@
 /**
- * PageClient — new users land on LandingView, not OnboardingFlow
+ * PageClient — first-time visitors drop straight into OnboardingFlow.
  *
- * Previously, new users were immediately redirected to OnboardingFlow
- * on mount. The fix: render LandingView first and pass onStartOnboarding
- * so users choose when to begin onboarding.
+ * New users get the short FTUE (language → name/avatar → style) immediately on
+ * first visit, NOT the marketing LandingView (reverses the 2026-05-08
+ * landing-first experiment). Returning users still see LandingView.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import HomePageClient from '@/app/[locale]/PageClient';
 
 // Mock LandingView to expose the onStartOnboarding callback
@@ -32,7 +32,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
-describe('HomePageClient — landing-first for new users', () => {
+describe('HomePageClient — auto-onboarding for new users', () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
@@ -42,29 +42,23 @@ describe('HomePageClient — landing-first for new users', () => {
     });
   });
 
-  it('renders LandingView (not OnboardingFlow) for new users on initial load', () => {
+  it('renders OnboardingFlow (not LandingView) for new users on first visit', () => {
+    render(<HomePageClient />);
+    expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
+    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
+  });
+
+  it('renders LandingView for returning users (onboarding completed)', () => {
+    localStorage.setItem('lexiclash_onboarding_completed', 'true');
     render(<HomePageClient />);
     expect(screen.getByTestId('landing-view')).toBeInTheDocument();
     expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
   });
 
-  it('passes onStartOnboarding to LandingView for new users', () => {
-    render(<HomePageClient />);
-    expect(screen.getByTestId('play-cta')).toBeInTheDocument();
-  });
-
-  it('shows OnboardingFlow after clicking play CTA', () => {
-    render(<HomePageClient />);
-    fireEvent.click(screen.getByTestId('play-cta'));
-    expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
-    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
-  });
-
-  it('does not pass onStartOnboarding for returning users (onboarding completed)', () => {
+  it('does not pass onStartOnboarding for returning users', () => {
     localStorage.setItem('lexiclash_onboarding_completed', 'true');
     render(<HomePageClient />);
     expect(screen.getByTestId('landing-view')).toBeInTheDocument();
-    // No CTA for returning users — they already onboarded
     expect(screen.queryByTestId('play-cta')).not.toBeInTheDocument();
   });
 });

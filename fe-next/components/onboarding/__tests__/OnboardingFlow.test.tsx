@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion
@@ -54,20 +54,6 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-// Mock sub-components
-vi.mock('../TutorialGame', () => {
-  return {
-    __esModule: true,
-    default: ({ onComplete }: any) => (
-      <div data-testid="tutorial-game">
-        <button onClick={() => onComplete(47, ['CAT', 'DOG', 'STAR'])}>
-          Complete Tutorial
-        </button>
-      </div>
-    ),
-  };
-});
-
 vi.mock('@/utils/profileStorage', () => ({
   setStoredCustomAvatar: vi.fn(),
   getStoredCustomAvatar: vi.fn(() => null),
@@ -116,6 +102,16 @@ vi.mock('../QuickProfileSetup', () => {
   };
 });
 
+// The new final step — picking a music/theme style. Confirming finishes onboarding.
+vi.mock('../StyleSelectStep', () => ({
+  __esModule: true,
+  default: ({ onComplete }: any) => (
+    <div data-testid="style-select-step">
+      <button onClick={onComplete}>Finish Style</button>
+    </div>
+  ),
+}));
+
 vi.mock('../InviteTutorialTeaser', () => ({
   __esModule: true,
   default: () => <div data-testid="invite-tutorial-teaser" />,
@@ -156,7 +152,7 @@ describe('OnboardingFlow', () => {
     mockUseInviteOnboardingMode.mockReturnValue({
       isInviteMode: false,
       inviteAtMount: null,
-      activeSteps: ['language', 'returningUser', 'calmMode', 'tutorial', 'profile', 'inviteTutorial'],
+      activeSteps: ['language', 'returningUser', 'profile', 'style'],
       handleInviteTeaserComplete: vi.fn(),
     });
   });
@@ -164,11 +160,18 @@ describe('OnboardingFlow', () => {
   const pickLanguage = () => fireEvent.click(screen.getByText('Select Language'));
   const goNewUser = () => fireEvent.click(screen.getByText("I'm New Here"));
   const chooseEnergetic = () => fireEvent.click(screen.getByText('Energetic'));
-  // Full path to the tutorial: language → new-here → calm/energetic vibe choice.
-  const selectLanguage = () => {
+  // Admin path to the profile step: language → new-here → calm/energetic vibe.
+  // (Non-admins skip the vibe step.)
+  const advanceToProfile = () => {
     pickLanguage();
     goNewUser();
     chooseEnergetic();
+  };
+  // Full path to navigation: profile → style → finish.
+  const finishFlow = () => {
+    advanceToProfile();
+    fireEvent.click(screen.getByText('Set Profile'));
+    fireEvent.click(screen.getByText('Finish Style'));
   };
 
   it('starts with the language select step', () => {
@@ -189,19 +192,19 @@ describe('OnboardingFlow', () => {
     expect(screen.getByTestId('calm-mode-choice')).toBeInTheDocument();
   });
 
-  it('skips the vibe choice for non-admins (soft launch gate) — goes straight to tutorial', () => {
+  it('skips the vibe choice for non-admins (soft launch gate) — goes straight to profile', () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, isAdmin: false });
     render(<OnboardingFlow {...defaultProps} />);
     pickLanguage();
     goNewUser();
     expect(screen.queryByTestId('calm-mode-choice')).not.toBeInTheDocument();
-    expect(screen.getByTestId('tutorial-game')).toBeInTheDocument();
+    expect(screen.getByTestId('quick-profile-setup')).toBeInTheDocument();
   });
 
-  it('advances to the tutorial after the vibe choice', () => {
+  it('advances to profile setup after the vibe choice', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    selectLanguage();
-    expect(screen.getByTestId('tutorial-game')).toBeInTheDocument();
+    advanceToProfile();
+    expect(screen.getByTestId('quick-profile-setup')).toBeInTheDocument();
   });
 
   it('enables cosy mode when the player picks Calm', () => {
@@ -220,34 +223,29 @@ describe('OnboardingFlow', () => {
     expect(mockUpdateSetting).toHaveBeenCalledWith('cosyMode', false);
   });
 
-  it('transitions to profile setup after tutorial completes', () => {
+  it('advances to the style step after profile setup (no tutorial game)', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    selectLanguage();
-    fireEvent.click(screen.getByText('Complete Tutorial'));
-    expect(screen.getByTestId('quick-profile-setup')).toBeInTheDocument();
+    advanceToProfile();
+    fireEvent.click(screen.getByText('Set Profile'));
+    expect(screen.getByTestId('style-select-step')).toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('navigates to practice hub directly after profile setup (no score-reveal interstitial)', () => {
+  it('navigates to practice hub after the style step', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    selectLanguage();
-    fireEvent.click(screen.getByText('Complete Tutorial'));
-    fireEvent.click(screen.getByText('Set Profile'));
+    finishFlow();
     expect(mockPush).toHaveBeenCalledWith('/en/practice');
   });
 
-  it('calls onComplete after profile setup', () => {
+  it('calls onComplete after the style step', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    selectLanguage();
-    fireEvent.click(screen.getByText('Complete Tutorial'));
-    fireEvent.click(screen.getByText('Set Profile'));
+    finishFlow();
     expect(defaultProps.onComplete).toHaveBeenCalled();
   });
 
   it('marks onboarding as complete when flow finishes', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    selectLanguage();
-    fireEvent.click(screen.getByText('Complete Tutorial'));
-    fireEvent.click(screen.getByText('Set Profile'));
+    finishFlow();
     expect(mockMarkComplete).toHaveBeenCalled();
   });
 
@@ -259,38 +257,31 @@ describe('OnboardingFlow', () => {
   });
 
   describe('navigation loading state', () => {
-    it('shows a loading overlay after profile setup triggers navigation', () => {
+    it('shows a loading overlay after the style step triggers navigation', () => {
       render(<OnboardingFlow {...defaultProps} />);
-      selectLanguage();
-      fireEvent.click(screen.getByText('Complete Tutorial'));
-      fireEvent.click(screen.getByText('Set Profile'));
+      finishFlow();
       expect(screen.getByTestId('onboarding-loading')).toBeInTheDocument();
     });
 
-    it('does not show a loading overlay before profile is submitted', () => {
+    it('does not show a loading overlay before the style step is finished', () => {
       render(<OnboardingFlow {...defaultProps} />);
-      selectLanguage();
-      fireEvent.click(screen.getByText('Complete Tutorial'));
+      advanceToProfile();
+      fireEvent.click(screen.getByText('Set Profile'));
       expect(screen.queryByTestId('onboarding-loading')).not.toBeInTheDocument();
     });
 
-    it('ignores duplicate profile submissions while navigating', () => {
+    it('ignores duplicate style submissions while navigating', () => {
       render(<OnboardingFlow {...defaultProps} />);
-      selectLanguage();
-      fireEvent.click(screen.getByText('Complete Tutorial'));
+      advanceToProfile();
       fireEvent.click(screen.getByText('Set Profile'));
-      fireEvent.click(screen.getByText('Set Profile'));
+      fireEvent.click(screen.getByText('Finish Style'));
+      fireEvent.click(screen.getByText('Finish Style'));
       expect(mockPush).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('pending room invite', () => {
-    const advanceToProfile = () => {
-      selectLanguage();
-      fireEvent.click(screen.getByText('Complete Tutorial'));
-    };
-
-    it('advances to InviteTutorialTeaser step when pending invite exists', () => {
+    it('advances to InviteTutorialTeaser step when pending invite exists (no style step)', () => {
       mockGetPendingRoom.mockReturnValue({ code: 'ABC123', hostName: 'Alice', ts: Date.now() });
       mockHasPendingRoom.mockReturnValue(true);
       mockUseInviteOnboardingMode.mockReturnValue({
@@ -303,14 +294,14 @@ describe('OnboardingFlow', () => {
       fireEvent.click(screen.getByText('Select Language'));
       fireEvent.click(screen.getByText('Set Profile'));
       expect(screen.getByTestId('invite-tutorial-teaser')).toBeInTheDocument();
+      expect(screen.queryByTestId('style-select-step')).not.toBeInTheDocument();
       expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer?room='));
     });
 
-    it('redirects to cozy practice hub on profile setup when no pending invite', () => {
+    it('redirects to cozy practice hub after the style step when no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
-      advanceToProfile();
-      fireEvent.click(screen.getByText('Set Profile'));
+      finishFlow();
       expect(mockPush).toHaveBeenCalledWith('/en/practice');
     });
   });

@@ -31,10 +31,11 @@ describe('HomePageClient route allowlist guard', () => {
     });
   });
 
-  it('exposes onStartOnboarding CTA on locale homepage for new user', () => {
+  it('mounts OnboardingFlow on locale homepage for a new user', () => {
     mockPathname.mockReturnValue('/en');
-    render(<HomePageClient />);
-    expect(typeof landingProps.onStartOnboarding).toBe('function');
+    const { getByTestId, queryByTestId } = render(<HomePageClient />);
+    expect(getByTestId('onboarding-flow')).toBeTruthy();
+    expect(queryByTestId('landing-view')).toBeNull();
   });
 
   it('hides onStartOnboarding CTA on blog route', () => {

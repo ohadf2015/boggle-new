@@ -52,11 +52,11 @@ describe('HomePageClient — CG auto-onboarding', () => {
     expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
   });
 
-  it('keeps LandingView for non-CG new users (no auto-skip)', () => {
+  it('mounts OnboardingFlow for non-CG new users too (first-visit auto-onboard)', () => {
     mockCgDetected = false;
     render(<HomePageClient />);
-    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
-    expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
+    expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
+    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
   });
 
   it('does NOT auto-mount FTUE for CG users who already completed onboarding', () => {

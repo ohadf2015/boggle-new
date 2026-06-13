@@ -126,6 +126,7 @@ vi.mock('../../../backend/utils/errorHandler', async () => {
 });
 
 import { registerGameLifecycleHandlers } from '../gameLifecycleHandler';
+import { getLeaderboard } from '../../../backend/modules/gameStateManager';
 
 interface SocketHandlerMap { [event: string]: (...args: unknown[]) => void }
 
@@ -246,5 +247,57 @@ describe('requestGameState — orphan timer recovery', () => {
 
     expect(mockStartGameTimer).not.toHaveBeenCalled();
     expect(mockSafeEmit).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Regression — reconnect score "0 PUNTOS".
+ *
+ * The watchdog recovery path (`requestGameState`) restored the board + timer
+ * via `startGame` but — unlike the primary `join` reconnect
+ * (playerReconnectHandler emits updateLeaderboard) — never re-sent the score.
+ * The live score lives ONLY in the client `leaderboard[]`, fed by
+ * `updateLeaderboard`; without that emit the player's score sat at 0 after a
+ * deploy/reconnect until the next word submission. Fix: the in-progress
+ * recovery branch must also emit the authoritative leaderboard.
+ */
+describe('requestGameState — score restore on reconnect', () => {
+  it('emits updateLeaderboard with current scores when the game is in-progress', () => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue({
+      gameState: 'in-progress',
+      remainingTime: 64,
+      timerSeconds: 120,
+      letterGrid: [[]],
+      language: 'es',
+      minWordLength: 2,
+      gameMode: 'classic',
+      gameSessionId: 1,
+    });
+    mockHasGameTimer.mockReturnValue(true);
+    vi.mocked(getLeaderboard).mockReturnValue([{ username: 'alice', score: 20 }] as never);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestGameState']();
+
+    expect(mockSafeEmit).toHaveBeenCalledWith(socket, 'updateLeaderboard', {
+      leaderboard: [{ username: 'alice', score: 20 }],
+    });
+  });
+
+  it('does NOT emit updateLeaderboard for a finished game (results path owns the leaderboard)', () => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue({ gameState: 'finished', gameMode: 'classic' });
+    vi.mocked(getLeaderboard).mockReturnValue([{ username: 'alice', score: 20 }] as never);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestGameState']();
+
+    const updateLeaderboardCalls = mockSafeEmit.mock.calls.filter(
+      (c) => c[1] === 'updateLeaderboard',
+    );
+    expect(updateLeaderboardCalls).toHaveLength(0);
   });
 });

@@ -6,14 +6,12 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
-import { markGuidanceShown } from '@/utils/contextualGuidanceStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
   trackOnboardingStart,
   trackOnboardingStep,
   trackOnboardingCompleted,
   trackOnboardingSkipped,
-  markFirstGameActivation,
   trackInviteTutorialSkipped,
   trackInviteConsumed,
 } from '@/utils/growthTracking';
@@ -21,7 +19,7 @@ import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useInviteOnboardingMode, type FlowStep } from '@/hooks/useInviteOnboardingMode';
 import LanguageSelect from './LanguageSelect';
 import CalmModeChoice from './CalmModeChoice';
-import TutorialGame from './TutorialGame';
+import StyleSelectStep from './StyleSelectStep';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import QuickProfileSetup from './QuickProfileSetup';
 import OnboardingProgress from './OnboardingProgress';
@@ -38,8 +36,9 @@ interface OnboardingFlowProps {
 }
 
 /**
- * OnboardingFlow - Orchestrates the full FTUE.
- * State machine: language -> tutorial -> profile -> home.
+ * OnboardingFlow - Orchestrates the short FTUE.
+ * State machine: language -> returningUser -> [calmMode (admin)] -> profile -> style -> home.
+ * No tutorial game — new players want to play, not sit through a lesson.
  * Full-screen with floating geometric background and progress dots.
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
@@ -53,7 +52,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   // CG portal substep: tutorial first, then welcome with mode CTAs.
   const [cgTutorialDone, setCgTutorialDone] = useState(false);
-  const [tutorialAttempt] = useState(1);
   const [playerName, setPlayerName] = useState('');
   const [, setPlayerAvatar] = useState<CustomAvatarConfig | null>(null);
   // Gate re-entry + show overlay once we've committed to a route navigation.
@@ -131,16 +129,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   // Calm Mode is admin-only during soft launch. handleNewUser only fires in the
   // non-invite flow, so the admin flag alone decides whether the vibe step shows.
   const handleNewUser = useCallback(() => {
-    setStep(isAdmin ? 'calmMode' : 'tutorial');
+    setStep(isAdmin ? 'calmMode' : 'profile');
   }, [isAdmin]);
 
-  // Calm vs energetic vibe choice — applies cosy mode immediately so the very
-  // first tutorial game already reflects the player's pick, then advances.
+  // Calm vs energetic vibe choice — applies cosy mode immediately so the rest of
+  // onboarding already reflects the player's pick, then advances to profile.
   const handleCalmModeChoice = useCallback(
     (cosy: boolean) => {
       updateSetting('cosyMode', cosy);
       recordStep('calmMode', { cosy });
-      setStep('tutorial');
+      setStep('profile');
     },
     [updateSetting, recordStep]
   );
@@ -207,26 +205,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   }, [activeSteps, isAdmin, isInviteMode]);
 
   const stepIndex = useMemo(() => displaySteps.indexOf(step), [step, displaySteps]);
-  // Step 1: Tutorial complete
-  const handleTutorialComplete = useCallback(
-    (score: number, wordsFound: string[]) => {
-      markGuidanceShown('firstPlayTutorialCompleted');
-      recordStep('tutorial', { score, wordCount: wordsFound.length });
-      markFirstGameActivation({
-        won: true,
-        score,
-        wordCount: wordsFound.length,
-        mode: 'tutorial',
-      });
-      setStep('profile');
-    },
-    [recordStep]
-  );
 
-  // Step 3: Profile complete → finish onboarding and route to practice/invite.
-  // The score-reveal interstitial used to live between this step and navigation,
-  // but it duplicated info already shown on the practice hub (gold/streak/title)
-  // and added a needless tap before the user could play.
+  // Profile complete → advance to the style step (non-invite), or straight into
+  // the invite teaser if a room invite is pending. Persist the avatar now so it
+  // survives even if the player bails before the style step finishes. The actual
+  // onboarding-complete + navigation happens in handleStyleComplete.
   const handleProfileComplete = useCallback(
     (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => {
       if (isNavigating) return;
@@ -243,34 +226,43 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         return;
       }
 
-      setIsNavigating(true);
-      markOnboardingComplete({
-        avatarId: 'custom',
-        displayName: name || 'Player',
-        selectedMode: 'home',
-        nameEdited,
-      });
-
-      const pendingRoom = consumePendingRoomInvite();
-      if (pendingRoom) {
-        router.push(`/${language}/multiplayer?room=${pendingRoom}`);
-      } else {
-        router.push(`/${language}/practice`);
-      }
-      emitCompleted({ via: 'profile' });
-      onComplete();
+      setStep('style');
     },
-    [recordStep, isInviteMode, isNavigating, language, router, onComplete, emitCompleted]
+    [recordStep, isInviteMode, isNavigating]
   );
+
+  // Final step: style picked (or skipped) → finish onboarding and route to the
+  // practice hub. The StylePicker already persisted the chosen style; this only
+  // records completion and navigates.
+  const handleStyleComplete = useCallback(() => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    recordStep('style');
+    markOnboardingComplete({
+      avatarId: 'custom',
+      displayName: playerName || 'Player',
+      selectedMode: 'home',
+      nameEdited: playerNameEditedRef.current,
+    });
+
+    const pendingRoom = consumePendingRoomInvite();
+    if (pendingRoom) {
+      router.push(`/${language}/multiplayer?room=${pendingRoom}`);
+    } else {
+      router.push(`/${language}/practice`);
+    }
+    emitCompleted({ via: 'style' });
+    onComplete();
+  }, [isNavigating, playerName, recordStep, language, router, onComplete, emitCompleted]);
 
   // Step 0: Language selected — proceed to returningUser prompt
   // On CrazyGames the "have an account" branch is dead (no external auth),
-  // so skip straight to tutorial.
+  // so skip straight to the CG short-flow (handled by the early return).
   // In invite mode, skip returnUser and go straight to profile.
   const handleLanguageSelect = useCallback(() => {
     recordStep('language');
     if (isOnCrazyGamesPlatform) {
-      setStep('tutorial');
+      setStep('profile');
       return;
     }
     if (isInviteMode) {
@@ -314,8 +306,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         return <LanguageSelect onSelect={handleLanguageSelect} />;
       case 'calmMode':
         return <CalmModeChoice onChoose={handleCalmModeChoice} />;
-      case 'tutorial':
-        return <TutorialGame onComplete={handleTutorialComplete} attemptNumber={tutorialAttempt} />;
+      case 'style':
+        return <StyleSelectStep onComplete={handleStyleComplete} />;
       case 'profile':
         return (
           <QuickProfileSetup
@@ -345,8 +337,6 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         return null;
     }
   };
-
-  const showProgress = step !== 'tutorial';
 
   // CrazyGames short-flow: one visual welcome screen → game.
   if (isOnCrazyGamesPlatform) {
@@ -427,37 +417,10 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         />
       </div>
 
-      {/* Progress indicator — hidden during tutorial (gameplay fills the screen) */}
-      <AnimatePresence>
-        {showProgress && (
-          <m.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.25 }}
-            className="absolute top-6 z-10"
-          >
-            <OnboardingProgress currentStep={stepIndex} totalSteps={displaySteps.length} />
-          </m.div>
-        )}
-      </AnimatePresence>
-
-      {/* Skip Tutorial CTA — visible during tutorial step so users aren't trapped */}
-      <AnimatePresence>
-        {step === 'tutorial' && (
-          <m.button
-            data-testid="onboarding-skip-tutorial"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.25, delay: 0.5 }}
-            onClick={handleSkipOnboarding}
-            className="absolute top-4 end-4 z-20 min-h-[44px] px-3 py-2 text-xs font-bold uppercase tracking-wide text-neo-white hover:text-neo-white bg-neo-navy/60 border-2 border-neo-cream/20 hover:border-neo-cream/40 rounded-neo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan transition-colors"
-          >
-            {t('onboarding.skipTutorial')}
-          </m.button>
-        )}
-      </AnimatePresence>
+      {/* Progress indicator */}
+      <div className="absolute top-6 z-10">
+        <OnboardingProgress currentStep={stepIndex} totalSteps={displaySteps.length} />
+      </div>
 
       {/* Step content */}
       <AnimatePresence mode="wait">

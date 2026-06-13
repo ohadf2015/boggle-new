@@ -43,28 +43,29 @@ describe('PlayerStyleContext', () => {
     authState = { isAuthenticated: false, isAdmin: false, profile: null };
   });
 
-  it('is disabled for non-admins and forces the default style (no accent)', () => {
+  // Feature is LAUNCHED to everyone (no longer admin-gated). A fresh user with
+  // no chosen style still defaults to `default` → zero change (null accent).
+  it('is enabled for everyone; the default style applies no accent', () => {
     render(<PlayerStyleProvider><Harness /></PlayerStyleProvider>);
-    expect(screen.getByTestId('enabled').textContent).toBe('false');
+    expect(screen.getByTestId('enabled').textContent).toBe('true');
     expect(screen.getByTestId('committed').textContent).toBe('default');
     expect(accent()).toBe('');
   });
 
-  it('forces default for a non-admin even if their profile has a style', () => {
+  it('applies a non-admin user\'s committed profile style', () => {
     authState = { isAuthenticated: true, isAdmin: false, profile: { id: 'u1', player_style: 'viking' } };
     render(<PlayerStyleProvider><Harness /></PlayerStyleProvider>);
-    expect(screen.getByTestId('committed').textContent).toBe('default');
-    expect(accent()).toBe('');
+    expect(screen.getByTestId('committed').textContent).toBe('viking');
+    expect(accent()).toBe(STYLES.viking.accentHex);
   });
 
-  it('non-admin setStyle / preview are no-ops', async () => {
+  it('a non-admin can set a style (persists) and preview it', async () => {
     authState = { isAuthenticated: true, isAdmin: false, profile: { id: 'u1' } };
     render(<PlayerStyleProvider><Harness /></PlayerStyleProvider>);
     await act(async () => screen.getByTestId('set-rock').click());
+    expect(mockUpdateProfile).toHaveBeenCalledWith({ player_style: 'rock' });
     await act(async () => screen.getByTestId('preview-jazz').click());
-    expect(mockUpdateProfile).not.toHaveBeenCalled();
-    expect(accent()).toBe('');
-    expect(screen.getByTestId('active').textContent).toBe('default');
+    expect(accent()).toBe(STYLES.jazz.accentHex);
   });
 
   it('admin setStyle writes to the profile', async () => {

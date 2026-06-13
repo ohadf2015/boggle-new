@@ -479,6 +479,14 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         } : {}),
         ...(game.goldenLetters?.length ? { goldenLetters: game.goldenLetters } : {}),
       });
+
+      // Restore the player's live score. The board/timer ride on `startGame`,
+      // but the score lives ONLY in the client `leaderboard[]` (fed by
+      // `updateLeaderboard`). Without this emit, a player who recovers via this
+      // watchdog path — rather than the primary `join` reconnect, which already
+      // re-sends the leaderboard — sees "0 PUNTOS" until their next word. Mirror
+      // playerReconnectHandler so both reconnect paths restore score identically.
+      safeEmit(socket, 'updateLeaderboard', { leaderboard: getLeaderboard(gameCode) });
     } else if (game.gameState === 'finished') {
       // Reconnecting to a finished game — resend results so the player sees the results screen
       logger.info('SOCKET', `Resending results to reconnecting player in finished game ${gameCode}`);

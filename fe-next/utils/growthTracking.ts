@@ -200,6 +200,7 @@ export type OnboardingStep =
   | 'calmMode'
   | 'tutorial'
   | 'profile'
+  | 'style'
   | 'mode_select';
 
 export interface GrowthEventData {

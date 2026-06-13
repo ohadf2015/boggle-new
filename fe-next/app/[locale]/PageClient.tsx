@@ -5,11 +5,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
 import { retryImport } from '@/utils/retryImport';
-import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded, trackInviteRedirectFired } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { LandingView } from '@/components/landing';
-import { detectCrazyGamesSync } from '@/components/CrazyGamesSDK';
 import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
@@ -100,27 +99,27 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     return next;
   });
 
-  // CG users on homepage skip the LandingView marketing surface and drop
-  // straight into the CG short-flow (tutorial→welcome). PostHog 90d data showed
-  // most CG visitors ignored the "Start Playing" CTA → only 2/20 saw welcome.
-  // CG portal traffic = high intent to play; respect that.
-  // ?next= present + FTUE not done = user was redirected from a gated play
-  // surface. Auto-open FTUE so they don't have to click "Start Playing" again.
-  const [showFTUE, setShowFTUE] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    if (hasCompletedOnboarding() || hasSupabaseSession()) return false;
-    if (pendingNext) return true;
-    // A new user who arrived via a room invite (?room=) must drop straight into
-    // the invite-aware FTUE (OnboardingFlow → name/avatar → teaser → the room),
-    // not the marketing LandingView. Returning users never reach here — they
-    // hit the inviteRedirectUrl branch above. savePendingRoomInvite() already
-    // ran in the initialState initializer above, so the invite is in
-    // sessionStorage by now. Mirrors the `pendingNext` auto-open; without it
-    // invited first-timers were parked on the landing page with no way to pick a
-    // name/avatar (regression from "landing-first UX", 2026-05-08).
-    if (hasPendingRoomInvite()) return true;
-    return detectCrazyGamesSync();
-  });
+  // First-time visitors drop STRAIGHT into the short onboarding (language →
+  // name/avatar → style), not the marketing LandingView. This reverses the
+  // 2026-05-08 "landing-first" experiment: new users want to set up and play,
+  // not browse a landing page first. Returning users (completed onboarding or a
+  // live Supabase session) still get LandingView. This single rule subsumes the
+  // older special cases — ?next= redirects, ?room= invites, and CrazyGames
+  // portal traffic are all brand-new users, so they auto-open the FTUE too.
+  //
+  // Seeded in an EFFECT, not a useState initializer: this page is statically
+  // rendered (SSG), so the server has no localStorage and always emits
+  // LandingView. Reading localStorage in the initializer would make the first
+  // CLIENT render (OnboardingFlow) diverge from that server HTML — a guaranteed
+  // hydration mismatch. Starting false keeps the first render matching SSR, then
+  // the effect flips new users to the FTUE post-hydration. Crawlers (no JS) keep
+  // seeing the full LandingView, so SEO is unaffected.
+  const [showFTUE, setShowFTUE] = useState<boolean>(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (hasCompletedOnboarding() || hasSupabaseSession()) return;
+    setShowFTUE(true);
+  }, []);
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
   // for current users — but guards against a future hoist that would leak the

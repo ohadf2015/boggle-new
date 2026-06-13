@@ -58,11 +58,13 @@ export interface PlayerStyleContextValue {
 const PlayerStyleContext = createContext<PlayerStyleContextValue | null>(null);
 
 export function PlayerStyleProvider({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isAdmin, profile, updateProfile } = useAuth();
-  // ADMIN-ONLY (testing phase): non-admins behave exactly as if the feature is
-  // absent — forced default style, no accent, no music swap, no persistence.
-  // Flip this single gate to roll the feature out to everyone.
-  const enabled = !!isAdmin;
+  const { isAuthenticated, profile, updateProfile } = useAuth();
+  // LAUNCHED to everyone: new players pick a style during onboarding, and anyone
+  // can change it in Settings. Safe for existing users — they default to the
+  // `default` style (null accent/music), so nothing changes until they pick.
+  // The one-time existing-user popup (PlayerStyleOnboardingWrapper) stays
+  // admin-gated separately, so launching this does NOT spam the existing base.
+  const enabled = true;
 
   // Guest store is read on mount only (avoids SSR/hydration mismatch).
   const [storedKey, setStoredKey] = useState<PlayerStyleKey | null>(null);

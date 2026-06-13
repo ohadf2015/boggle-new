@@ -448,7 +448,11 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
               </div>
             )}
 
-            {/* Retry button */}
+            {/* Retry button — hidden during a planned deploy. The reconnect is
+                automatic (jittered 3-10s) and state is preserved server-side, so
+                a manual button is false agency that invites mashing. It stays for
+                a genuine drop, where forcing a retry is genuinely useful. */}
+            {!copy.isUpdate && (
             <button
               onClick={handleRetry}
               disabled={pendingRetry}
@@ -475,6 +479,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
               </m.span>
               <span>{t(showReconnecting ? 'connection.reconnecting' : 'connection.retryNow')}</span>
             </button>
+            )}
 
             {/* Leave Game escape hatch — visible after 3+ failed attempts */}
             {onLeaveGame && reconnectAttempt >= 3 && (

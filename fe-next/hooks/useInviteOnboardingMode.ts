@@ -15,12 +15,16 @@ export type FlowStep =
   | 'calmMode'
   | 'tutorial'
   | 'profile'
+  | 'style'
   | 'inviteTutorial';
 
-// Base flow. The 'calmMode' vibe-choice step is ADMIN-ONLY during soft launch —
-// OnboardingFlow injects it after 'returningUser' for admins (see displaySteps).
-// Invite flow stays minimal (no calmMode) to get friends into the room fast.
-export const STEPS: FlowStep[] = ['language', 'returningUser', 'tutorial', 'profile'];
+// Base flow — short FTUE: pick a language, choose name+avatar (both pre-filled),
+// then pick a music/theme style. No tutorial game (users want to play, not sit
+// through a lesson). The 'calmMode' vibe-choice step is ADMIN-ONLY during soft
+// launch — OnboardingFlow injects it after 'returningUser' for admins (see
+// displaySteps). Invite flow stays minimal (no style step) to get friends into
+// the room fast.
+export const STEPS: FlowStep[] = ['language', 'returningUser', 'profile', 'style'];
 export const INVITE_STEPS: FlowStep[] = ['language', 'profile', 'inviteTutorial'];
 
 interface InviteContext {

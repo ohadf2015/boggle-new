@@ -67,15 +67,18 @@ describe('HomePageClient ?next= round-trip', () => {
     expect(pushMock).toHaveBeenCalledWith('/en/practice');
   });
 
-  it('rejects protocol-relative `next=//evil.com` to prevent open redirect', () => {
+  it('rejects protocol-relative `next=//evil.com` (no open redirect on FTUE complete)', () => {
     Object.defineProperty(window, 'location', {
       value: { search: '?next=%2F%2Fevil.com', pathname: '/en', origin: 'http://localhost' },
       writable: true,
     });
     localStorage.clear();
     render(<HomePageClient />);
-    // FTUE not auto-opened; LandingView shown instead.
-    expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
-    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
+    // New user still auto-opens the FTUE — but the malicious next is dropped, so
+    // finishing onboarding routes to the safe default, never to //evil.com.
+    expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('onboarding-complete'));
+    // The malicious next was dropped → no redirect uses it.
+    expect(pushMock).not.toHaveBeenCalledWith(expect.stringContaining('evil.com'));
   });
 });

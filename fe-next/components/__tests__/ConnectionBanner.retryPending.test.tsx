@@ -111,3 +111,49 @@ describe('ConnectionBanner reconnect button — pending feedback', () => {
     expect(getRetryButton(container)!.disabled).toBe(false);
   });
 });
+
+/**
+ * Planned deploy (server update) — no manual reconnect button.
+ *
+ * During `isServerUpdating` the client reconnects automatically (jittered
+ * 3-10s) and game state is preserved server-side, so a manual "Reconnect!"
+ * button is false agency — it invites mashing and implies the player must act.
+ * The calm "back in a moment / score safe" banner stays; only the button goes.
+ * The button MUST remain for a genuine disconnect, where manual retry helps.
+ */
+describe('ConnectionBanner — planned deploy hides the reconnect button', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    mockSocket.isConnected = false;
+    mockSocket.isReconnecting = false;
+    mockSocket.connectionError = null;
+    mockSocket.isServerUpdating = false;
+    mockSocket.manualReconnect = vi.fn();
+  });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    mockSocket.isServerUpdating = false;
+  });
+
+  it('hides the manual reconnect button during a planned server update', () => {
+    mockSocket.isServerUpdating = true; // copy.isUpdate === true
+    const { container } = showBanner();
+    expect(getRetryButton(container)).toBeFalsy();
+  });
+
+  it('still shows the score-safe reassurance during a planned server update', () => {
+    mockSocket.isServerUpdating = true;
+    const { container } = render(<ConnectionBanner showScoreSafe />);
+    act(() => { vi.advanceTimersByTime(1600); });
+    expect(container.textContent).toContain('connection.scoreSafe');
+  });
+
+  it('keeps the reconnect button for a genuine disconnect (manual retry useful)', () => {
+    mockSocket.connectionError = 'boom'; // real drop, not a deploy
+    const { container } = showBanner();
+    expect(getRetryButton(container)).not.toBeNull();
+  });
+});
