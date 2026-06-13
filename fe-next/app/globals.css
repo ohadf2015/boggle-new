@@ -160,6 +160,23 @@ html.lexi-native [data-selectable] {
   }
 }
 
+/* ── Player-style accent — felt across persistent chrome ──────────────────
+   Scoped to html[data-player-style-active] (set by PlayerStyleContext only for
+   a NON-default style) so the default style is pixel-identical. Ink-not-fill:
+   we tint text/outline on existing dark chrome, never fills, so every one of
+   the 13 accent hexes stays readable. */
+html[data-player-style-active] .player-accent-ink {
+  color: var(--accent);
+}
+/* Keyboard / TV focus ring adopts the player's accent on dark surfaces. */
+html[data-player-style-active] .focus-visible-ring:focus-visible,
+html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
+  outline-color: var(--accent);
+  box-shadow:
+    0 0 0 2px var(--neo-navy),
+    0 0 0 5px var(--accent);
+}
+
 @utility dark {
   /* Alternative focus style for dark backgrounds */
   & .focus-visible-ring:focus-visible {

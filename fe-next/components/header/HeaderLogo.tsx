@@ -39,7 +39,7 @@ const HeaderLogo = memo(() => {
         >
             {/* Lime-light lightning bolt - left */}
             <svg
-                className="w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 shrink-0 text-neo-black dark:text-neo-lime-light"
+                className="player-accent-ink w-4 h-5 xs:w-5 xs:h-6 sm:w-5 sm:h-6 shrink-0 text-neo-black dark:text-neo-lime-light"
                 viewBox="0 0 24 32"
                 fill="none"
                 style={{ transform: 'rotate(-15deg)', filter: 'drop-shadow(0 0 4px currentColor)' }}
@@ -59,7 +59,7 @@ const HeaderLogo = memo(() => {
                 style={{ fontFamily }}
             >
                 <span
-                    className="text-xl xs:text-2xl sm:text-2xl text-neo-black dark:text-neo-lime relative"
+                    className="player-accent-ink text-xl xs:text-2xl sm:text-2xl text-neo-black dark:text-neo-lime relative"
                     style={{
                         WebkitTextStroke: '2px #1a365d',
                         paintOrder: 'stroke fill',

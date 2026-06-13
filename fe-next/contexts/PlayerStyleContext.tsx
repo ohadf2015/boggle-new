@@ -81,7 +81,12 @@ export function PlayerStyleProvider({ children }: { children: ReactNode }) {
   // override so the CSS default cascades back.
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    applyAccentVar(document.documentElement, resolveStyleAccent(activeKey));
+    const accent = resolveStyleAccent(activeKey);
+    applyAccentVar(document.documentElement, accent);
+    // Marker so accent-themed chrome (logo, focus ring) can scope itself to a
+    // non-default style — guarantees ZERO change for the default style.
+    if (accent) document.documentElement.setAttribute('data-player-style-active', 'true');
+    else document.documentElement.removeAttribute('data-player-style-active');
   }, [activeKey]);
 
   const setStyle = useCallback(
