@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import HomePageClient from './PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
+import { HomeEditorialNav } from '@/components/seo/HomeEditorialNav';
 import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
@@ -226,11 +227,15 @@ const seoContent: Record<string, {
 export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
   // Fetch non-realtime landing data server-side to eliminate client waterfall.
-  // Capped at 2s — client hooks provide fallback when initialData is absent.
-  // Reduced from 4s: if Supabase is slow, faster to let client fetch than block SSR.
+  // fetchLandingData is cached per-locale (see LANDING_CACHE_TTL_MS), so this is
+  // a ~0ms memory read for all but the first request per TTL window. The race
+  // below is a cold-miss safety net only: if the underlying DB fetch stalls we
+  // ship HTML immediately and client hooks hydrate the data (they already
+  // fall back gracefully when initialData is absent), rather than blocking TTFB.
+  const SSR_LANDING_DATA_BUDGET_MS = 1500;
   const initialData = await Promise.race([
     fetchLandingData(locale),
-    new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 2000)),
+    new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), SSR_LANDING_DATA_BUDGET_MS)),
   ]).catch(() => undefined);
 
   const content = seoContent[locale] ?? seoContent.en;
@@ -241,6 +246,9 @@ export default async function HomePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
       />
+      {/* Top-of-DOM editorial nav — first paint signals "content publisher", not just
+          a game, to the AdSense reviewer + crawler. Server-rendered, no client JS. */}
+      <HomeEditorialNav locale={locale} />
       <HomePageClient initialData={initialData} />
       <EsScrabbleCrossLink locale={locale} anchorVariant="home" />
       <SvScrabbleCrossLink locale={locale} anchorVariant="home" />

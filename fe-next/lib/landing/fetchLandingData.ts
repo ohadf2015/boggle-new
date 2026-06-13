@@ -19,6 +19,7 @@
 import { createSupabasePublicClient } from '@/lib/supabaseServer';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 import { fetchGameModeStats, getCardOrder, type GameModeStats, type LandingGameMode } from './fetchGameModeStats';
+import { cachedWithTtl } from '@/lib/cache/ttlCache';
 
 export interface LandingInitialData {
   topPlayers: TopPlayer[];
@@ -34,11 +35,29 @@ export interface LandingInitialData {
 const TOP_PLAYERS_LIMIT = 5;
 const VALID_LANGUAGES = new Set(['en', 'he', 'sv', 'ja', 'es']);
 
+/**
+ * Landing data is identical for every visitor of a given language and is
+ * non-realtime, so we cache it per-language for a short window. This collapses
+ * the 1 (season RPC) + 4 query SSR round-trip into a ~0ms memory read for all
+ * but the first request per TTL — the SSR `Promise.race` timeout in page.tsx
+ * then only matters on a genuine cold miss, not on every request. The DB load
+ * for the homepage becomes O(languages / TTL) instead of O(requests).
+ */
+const LANDING_CACHE_TTL_MS = 30_000;
+
 export async function fetchLandingData(language: string): Promise<LandingInitialData> {
   // Guard against invalid locales (e.g. crawlers hitting /sitemap.xml parsed as locale)
   if (!VALID_LANGUAGES.has(language)) {
     language = 'en';
   }
+  return cachedWithTtl(
+    `landing:${language}`,
+    () => fetchLandingDataUncached(language),
+    { ttlMs: LANDING_CACHE_TTL_MS },
+  );
+}
+
+async function fetchLandingDataUncached(language: string): Promise<LandingInitialData> {
   const supabase = createSupabasePublicClient();
 
   if (!supabase) {
