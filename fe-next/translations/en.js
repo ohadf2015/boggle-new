@@ -11426,6 +11426,10 @@ const en = {
       "approve": "Approve",
       "decline": "Decline",
       "approveSuccess": "Request approved successfully",
+      "resend": "Resend approval email",
+      "resend_hint": "Re-sends the welcome email (with the note above) to the applicant. Does not change their access.",
+      "resendSuccess": "Approval email re-sent",
+      "resendError": "Failed to resend approval email",
       "declineSuccess": "Request declined successfully",
       "approveError": "Failed to approve request",
       "declineError": "Failed to decline request"

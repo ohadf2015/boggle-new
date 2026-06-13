@@ -7560,6 +7560,10 @@ const sv = {
       "decline": "Avvisa",
       "close": "Stäng",
       "approveSuccess": "Begäran godkänd",
+      "resend": "Skicka godkännandemejlet igen",
+      "resend_hint": "Skickar välkomstmejlet igen (med anteckningen ovan) till sökanden. Ändrar inte deras åtkomst.",
+      "resendSuccess": "Godkännandemejlet skickades igen",
+      "resendError": "Det gick inte att skicka godkännandemejlet igen",
       "declineSuccess": "Begäran avvisad",
       "approveError": "Kunde inte godkänna begäran",
       "declineError": "Kunde inte avvisa begäran"

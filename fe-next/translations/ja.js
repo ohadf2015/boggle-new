@@ -7599,6 +7599,10 @@ const ja = {
       "decline": "却下",
       "close": "閉じる",
       "approveSuccess": "リクエストを承認しました",
+      "resend": "承認メールを再送信",
+      "resend_hint": "申請者にウェルカムメール（上記のメモ付き）を再送信します。アクセス権は変更されません。",
+      "resendSuccess": "承認メールを再送信しました",
+      "resendError": "承認メールの再送信に失敗しました",
       "declineSuccess": "リクエストを却下しました",
       "approveError": "リクエストを承認できませんでした",
       "declineError": "リクエストを却下できませんでした"

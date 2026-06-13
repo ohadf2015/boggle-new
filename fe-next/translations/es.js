@@ -7504,6 +7504,10 @@ const es = {
       "decline": "Rechazar",
       "close": "Cerrar",
       "approveSuccess": "Solicitud aprobada",
+      "resend": "Reenviar correo de aprobación",
+      "resend_hint": "Reenvía el correo de bienvenida (con la nota anterior) al solicitante. No cambia su acceso.",
+      "resendSuccess": "Correo de aprobación reenviado",
+      "resendError": "No se pudo reenviar el correo de aprobación",
       "declineSuccess": "Solicitud rechazada",
       "approveError": "No se pudo aprobar la solicitud",
       "declineError": "No se pudo rechazar la solicitud"

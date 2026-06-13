@@ -26,6 +26,7 @@ vi.mock('@/lib/email/send', () => ({ sendEmail: vi.fn(async () => ({ ok: true })
 
 import { POST as approve } from '../[id]/approve/route';
 import { POST as decline } from '../[id]/decline/route';
+import { POST as resend } from '../[id]/resend/route';
 import { GET as list } from '../route';
 import { createClient } from '@/utils/supabase/server';
 import { sendEmail } from '@/lib/email/send';
@@ -73,6 +74,45 @@ describe('admin teacher-access endpoints', () => {
     (createClient as any).mockReturnValue(sb);
     const res = await decline(req({ reason: 'incomplete info' }), { params: Promise.resolve({ id: 'req-1' }) });
     expect(res.status).toBe(200);
+  });
+
+  it('resend rejects non-admin', async () => {
+    (createClient as any).mockReturnValue(mockSupabase(userProfile));
+    const res = await resend(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(403);
+  });
+
+  it('resend re-sends the confirmation email for an approved request', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en', status: 'approved' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    const res = await resend(req({ message: 'See you again!' }), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(200);
+    expect(sendEmail).toHaveBeenCalled();
+    const arg = (sendEmail as any).mock.calls[0][0];
+    expect(arg.to).toBe('x@y.com');
+    expect(arg.html).toContain('See you again!');
+  });
+
+  it('resend refuses when the request is not yet approved', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en', status: 'pending' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    const res = await resend(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(400);
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('resend returns 404 when the request does not exist', async () => {
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, null));
+    const res = await resend(req(), { params: Promise.resolve({ id: 'nope' }) });
+    expect(res.status).toBe(404);
+  });
+
+  it('resend surfaces an error when the email send fails (email is the whole point)', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en', status: 'approved' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    (sendEmail as any).mockRejectedValueOnce(new Error('smtp down'));
+    const res = await resend(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(502);
   });
 
   it('list rejects non-admin', async () => {

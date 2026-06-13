@@ -46,6 +46,26 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
     };
   }, [onClose]);
 
+  async function resend() {
+    setErr(null);
+    setBusy(true);
+    try {
+      const res = await fetchWithAuth(`/api/admin/teacher-access/${row.id}/resend`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ message: note }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      toast.success(t('admin.teacherAccess.resendSuccess', 'Approval email re-sent'));
+    } catch {
+      const errorMsg = t('admin.teacherAccess.resendError', 'Failed to resend approval email');
+      setErr(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function act(kind: 'approve' | 'decline') {
     setErr(null);
     setBusy(true);
@@ -125,6 +145,17 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
           )}
         </div>
         {err && <p role="alert" className="mt-3 text-neo-red">{err}</p>}
+        {row.status === 'approved' && (
+          <div className="mt-4">
+            <button type="button" disabled={busy} onClick={resend}
+              className="w-full rounded-lg bg-neo-cyan px-4 py-3 font-bold text-neo-navy disabled:opacity-50">
+              {t('admin.teacherAccess.resend', 'Resend approval email')}
+            </button>
+            <p className="mt-1 text-xs text-slate-500">
+              {t('admin.teacherAccess.resend_hint', 'Re-sends the welcome email (with the note above) to the applicant. Does not change their access.')}
+            </p>
+          </div>
+        )}
         {row.status === 'pending' && (
           <div className="mt-4 flex gap-3">
             <button disabled={busy} onClick={() => act('approve')}
