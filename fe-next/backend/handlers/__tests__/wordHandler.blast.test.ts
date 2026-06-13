@@ -178,6 +178,10 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
     board.totalMoves = (board.totalMoves ?? 0) + 1;
     return { clearedCount: 1, totalMoves: board.totalMoves };
   }),
+  safeCascadeBlastWord: vi.fn((board: any) => {
+    const updatedBoard = { ...board, totalMoves: (board.totalMoves ?? 0) + 1 };
+    return { ok: true, board: updatedBoard, clearedCount: 1, totalMoves: updatedBoard.totalMoves };
+  }),
   regeneratePlayerBoard: vi.fn(),
 }));
 

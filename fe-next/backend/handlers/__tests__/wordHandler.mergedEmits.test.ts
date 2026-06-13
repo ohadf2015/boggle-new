@@ -151,6 +151,12 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
   })),
   getWordPath: vi.fn(() => [{ row: 0, col: 0 }]),
   cascadeBlastWord: vi.fn(() => ({ clearedCount: 1, totalMoves: 1 })),
+  safeCascadeBlastWord: vi.fn(() => ({
+    ok: true,
+    board: { grid: [['A', 'B'], ['C', 'D']], tileStates: [[{}, {}], [{}, {}]], overlay: [], overlayMap: new Map(), seed: 1, totalMoves: 0, refillCount: 0 },
+    clearedCount: 1,
+    totalMoves: 1,
+  })),
 }));
 
 vi.mock('../../../backend/modules/blastBoardRegen', () => ({
