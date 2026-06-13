@@ -1,4 +1,18 @@
 /**
+ * Idle-auto-submit window (ms) for desktop click-built words, shared by modes
+ * that opt into hands-free submission. A click-builder who stalls this long
+ * after their last letter gets the word submitted automatically — the no-gesture
+ * complement to the double-click hint below.
+ *
+ * Tuned higher than the practice sandbox's 1000ms: outside a teaching context a
+ * player pausing to *hunt the next tile* must not trip a premature submit, so we
+ * give more grace. Competitive paths (classic MP, survival) deliberately do NOT
+ * wire this — there a premature partial-word submit is costly, and they rely on
+ * the explicit double-click gesture instead.
+ */
+export const DESKTOP_IDLE_AUTOSUBMIT_MS = 1500;
+
+/**
  * Gate for the desktop "double-click last letter to submit" hint.
  *
  * Tap-to-build (click-select) words don't submit on their own on desktop — the

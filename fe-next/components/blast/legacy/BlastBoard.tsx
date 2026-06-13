@@ -9,6 +9,7 @@ import type { LetterGrid, Language } from '@/shared/types/game';
 import type { BlastTileState, BlastTileType } from './types';
 import type { SequencerState, TileAnimState } from './hooks/useBlastSequencer';
 import { GRID_PADDING, GRID_PADDING_PX, GRID_GAP_CLASS } from '@/components/grid/gridLayoutConstants';
+import { DESKTOP_IDLE_AUTOSUBMIT_MS } from '@/components/grid/submitHintVisibility';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { COMBO_ELIGIBLE_TILES } from './utils/blastCombos';
@@ -238,6 +239,7 @@ export const BlastBoard = memo(function BlastBoard({
         onSelectionChange={handleSelectionChange}
         cellFilter={cellFilter}
         isAdjacent={portalAdjacency}
+        autoSubmitIdleMs={DESKTOP_IDLE_AUTOSUBMIT_MS}
         hideWordPreview
         hideComboIndicator
         largeText
