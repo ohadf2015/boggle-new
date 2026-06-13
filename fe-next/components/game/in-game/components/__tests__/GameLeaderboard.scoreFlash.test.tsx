@@ -122,7 +122,7 @@ describe('GameLeaderboard - Score Flash', () => {
       />
     );
 
-    const rankBadges = container.querySelectorAll('.w-9.h-9');
+    const rankBadges = container.querySelectorAll('.w-7.h-7');
     expect(rankBadges.length).toBeGreaterThanOrEqual(mockPlayers.length);
   });
 
@@ -142,14 +142,14 @@ describe('GameLeaderboard - Score Flash', () => {
       />
     );
 
-    // Host indicator (yellow border-l) should be present in the first row
+    // Host indicator is the crown icon (decluttered: no separate "HOST" chip /
+    // yellow stripe — the crown alone marks the host).
     const rows = container.querySelectorAll('[role="listitem"]');
     expect(rows.length).toBeGreaterThan(0);
-    // The host row should have a yellow border on the left (border-l-4 border-l-neo-yellow)
-    const hostRow = rows[0];
-    const classString = hostRow.className;
-    // Check that the host indicator classes are applied
-    expect(classString).toMatch(/border-l-4.*border-l-neo-yellow|border-l-neo-yellow.*border-l-4/);
+    const crown = container.querySelector('[aria-label="Host"]');
+    expect(crown).not.toBeNull();
+    // ...and it lives in the first (host) row.
+    expect(rows[0].contains(crown)).toBe(true);
   });
 
   it('handles RTL direction', () => {

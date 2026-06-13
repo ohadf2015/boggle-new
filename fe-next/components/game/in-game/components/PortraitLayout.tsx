@@ -20,6 +20,7 @@ import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
 import { GameOverlays } from './GameOverlays';
 import { GameHeader } from './GameHeader';
 import { GameLeaderboard } from './GameLeaderboard';
+import { isBoardInteractive } from '../boardInteractive';
 import { GameWordList } from './GameWordList';
 import { MobileChatFab } from './MobileChatFab';
 import { ScoreDisplay } from './ScoreDisplay';
@@ -590,7 +591,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
                 grid={letterGrid}
-                interactive={isPlaying && !showStartAnimation}
+                interactive={isBoardInteractive({ isPlaying, showStartAnimation })}
                 animateOnMount={!hasAnimated}
                 onWordSubmit={onWordSubmit}
                 onPathSubmit={onPathSubmit}

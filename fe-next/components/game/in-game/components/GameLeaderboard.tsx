@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useRef, useEffect, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Trophy, Crown, Type, TrendingUp, TrendingDown, Flame } from 'lucide-react';
+import { Trophy, Crown, TrendingUp, TrendingDown, Flame } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useReactiveAvatarMood } from '@/hooks/useReactiveAvatarMood';
 import { moodToOverlay } from '@/lib/avatar/avatarOverlay';
@@ -95,21 +95,20 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
     <div
       role="listitem"
       tabIndex={0}
-      className={`flex items-center gap-2.5 p-2 rounded-neo border-3 shadow-hard-sm transition-all duration-300
+      className={`flex items-center gap-2 p-1.5 rounded-neo border-3 shadow-hard-sm transition-all duration-300
         hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
         focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
         ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}
-        ${player.isMe ? 'ring-2 ring-neo-cyan/50' : ''}
-        ${player.isHost ? 'border-l-4 border-l-neo-yellow' : ''}`}
+        ${player.isMe ? 'ring-2 ring-neo-cyan/60' : ''}`}
     >
       {/* Rank badge with change indicator */}
       <div className="relative shrink-0">
-        <div className="w-9 h-9 rounded-neo flex items-center justify-center font-black text-base bg-neo-black text-neo-white border-2 border-neo-black">
+        <div className="w-7 h-7 rounded-neo flex items-center justify-center font-black text-sm bg-neo-black text-neo-white border-2 border-neo-black">
           {player.rankDisplay}
         </div>
         {/* Rank change arrow */}
         {rankChange !== 0 && (
-          <div className={`absolute -top-1.5 -inset-e-1.5 w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-black
+          <div className={`absolute -top-1.5 -inset-e-1.5 w-4 h-4 rounded-full flex items-center justify-center
             ${rankChange > 0 ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}
           >
             {rankChange > 0 ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
@@ -121,81 +120,65 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
       <Avatar
         customAvatar={player.avatar?.customAvatar ?? undefined}
         avatarImage={player.avatar?.avatarImage}
-        size="lg"
+        size="md"
         disableEffects
         mood={avatarMood}
         overlay={moodToOverlay(avatarMood)}
       />
 
-      {/* Player info */}
-      <div className="flex-1 min-w-0">
-        <div
-          className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+      {/* Name — single line; the crown is the host marker (no extra chip). */}
+      <div className={`flex-1 min-w-0 flex items-center gap-1 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+        {player.isHost && (
+          <Crown
+            aria-label="Host"
+            className="w-3.5 h-3.5 text-neo-black shrink-0 drop-shadow-[1px_1px_0px_rgb(var(--neo-white))]"
+          />
+        )}
+        <PlayerProfileTooltip
+          player={{
+            username: player.username,
+            avatarImage: player.avatar?.avatarImage,
+            customAvatar: player.avatar?.customAvatar,
+            score: player.score,
+          }}
+          isCurrentUser={player.isMe}
+          side="left"
         >
-          {player.isHost && (
-            <Crown
-              className="w-3.5 h-3.5 text-neo-lime shrink-0 drop-shadow-[1px_1px_0px_rgb(var(--neo-black))]"
-            />
-          )}
-          <PlayerProfileTooltip
-            player={{
-              username: player.username,
-              avatarImage: player.avatar?.avatarImage,
-              customAvatar: player.avatar?.customAvatar,
-              score: player.score,
-            }}
-            isCurrentUser={player.isMe}
-            side="left"
-          >
-            <span className={`truncate ${!player.isMe ? 'cursor-pointer hover:underline' : ''}`} title={player.username}>
-              {player.username}
-            </span>
-          </PlayerProfileTooltip>
-          {player.isHost && (
-            <span className="text-[9px] bg-neo-yellow text-neo-black px-1.5 py-0.5 rounded-neo font-black shrink-0 border border-neo-black">
-              HOST
-            </span>
-          )}
-          {player.isMe && (
-            <span className="text-[10px] bg-neo-black text-neo-white px-1 py-0.5 rounded-neo font-bold shrink-0">
-              {t('playerView.me')}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <div className="text-[10px] font-bold text-neo-black/70 flex items-center gap-0.5">
-            <Type className="w-2.5 h-2.5 text-neo-cyan" />
-            <span className="tabular-nums">{player.wordCount || 0}</span>
-          </div>
-          {/* Combo badge */}
-          {comboInfo && (
-            <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-neo border border-neo-black/30 flex items-center gap-0.5 ${comboInfo.className}`}>
-              <Flame className="w-2.5 h-2.5" />
-              {comboInfo.label}
-            </span>
-          )}
-        </div>
+          <span className={`truncate font-black text-sm text-neo-black ${!player.isMe ? 'cursor-pointer hover:underline' : ''}`} title={player.username}>
+            {player.username}
+          </span>
+        </PlayerProfileTooltip>
+        {player.isMe && (
+          <span className="text-[9px] bg-neo-black text-neo-white px-1 py-0.5 rounded-neo font-bold shrink-0">
+            {t('playerView.me')}
+          </span>
+        )}
       </div>
 
-      {/* Score with delta */}
-      <div className="flex items-center gap-1.5">
-        {/* Presence indicator */}
+      {/* Combo (only when active) + presence + the score as the hero number */}
+      <div className={`flex items-center gap-1.5 shrink-0 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+        {comboInfo && (
+          <span className={`text-[9px] font-black px-1 py-0.5 rounded-neo flex items-center gap-0.5 ${comboInfo.className}`}>
+            <Flame className="w-2.5 h-2.5" />
+            {comboInfo.label}
+          </span>
+        )}
         {!player.isMe && player.presenceStatus && (
           <PresenceIndicator
             status={player.presenceStatus}
             isWindowFocused={player.isWindowFocused}
-            size="lg"
+            size="md"
           />
         )}
-        <div className="text-end relative min-w-[50px]">
+        <div className="relative">
           {/* Score delta floating */}
           {showScoreDelta && scoreChange > 0 && (
-            <div className="absolute -top-3 inset-e-0 text-[10px] font-black text-green-600 animate-bounce">
+            <div className="absolute -top-3 inset-e-0 text-[10px] font-black text-neo-lime animate-bounce">
               +{scoreChange}
             </div>
           )}
-          <div className="bg-neo-black/5 rounded-neo px-2 py-1">
-            <div className="text-lg font-black text-neo-black leading-none tabular-nums">{player.score}</div>
+          <div className="bg-neo-black text-neo-white rounded-neo px-2.5 py-1 min-w-[44px] text-center border-2 border-neo-black">
+            <div className="text-lg font-black leading-none tabular-nums">{player.score}</div>
           </div>
         </div>
       </div>

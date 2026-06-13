@@ -18,6 +18,7 @@ import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
 import { MPStuckCoachCard } from '@/components/game/ftue/MPStuckCoachCard';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
+import { isBoardInteractive } from '@/components/game/in-game/boardInteractive';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useKeyboardHelpState } from '@/hooks/useKeyboardHelpState';
@@ -557,7 +558,11 @@ const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
     grid: letterGrid,
     language: gameLanguage || 'en',
     gameLanguage: gameLanguage,
-    enabled: isPlaying && gameActive && !showStartAnimation,
+    // Keyboard typing must be enabled in exactly the same states as tile
+    // tap/drag (see PortraitLayout's GridComponent `interactive`). Both route
+    // through isBoardInteractive so they cannot diverge — previously this gate
+    // also required `gameActive`, which let players tap tiles but not type.
+    enabled: isBoardInteractive({ isPlaying, showStartAnimation }),
     onWordSubmit: handleTrackedWordSubmit,
     minWordLength,
   });

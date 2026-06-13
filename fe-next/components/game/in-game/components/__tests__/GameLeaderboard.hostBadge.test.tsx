@@ -40,7 +40,7 @@ vi.mock('@/components/PresenceIndicator', () => ({
 const mockT = (key: string) => key;
 
 describe('GameLeaderboard — HOST badge & row styling', () => {
-  it('renders HOST badge for host player', () => {
+  it('marks the host with a crown icon (no separate HOST text chip)', () => {
     const leaderboard: ExtendedLeaderboardPlayer[] = [
       {
         username: 'HostPlayer',
@@ -56,7 +56,7 @@ describe('GameLeaderboard — HOST badge & row styling', () => {
       },
     ];
 
-    render(
+    const { container } = render(
       <GameLeaderboard
         leaderboard={leaderboard}
         username="OtherPlayer"
@@ -66,14 +66,12 @@ describe('GameLeaderboard — HOST badge & row styling', () => {
       />
     );
 
-    const hostBadge = screen.getByText('HOST');
-    expect(hostBadge).toBeInTheDocument();
-    expect(hostBadge).toHaveClass('bg-neo-yellow');
-    expect(hostBadge).toHaveClass('text-neo-black');
-    expect(hostBadge).toHaveClass('font-black');
+    // Decluttered: the crown is the host marker — there is no "HOST" text chip.
+    expect(screen.queryByText('HOST')).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-label="Host"]')).not.toBeNull();
   });
 
-  it('does NOT render HOST badge for non-host players', () => {
+  it('does NOT mark non-host players with a crown', () => {
     const leaderboard: ExtendedLeaderboardPlayer[] = [
       {
         username: 'Player1',
@@ -89,7 +87,7 @@ describe('GameLeaderboard — HOST badge & row styling', () => {
       },
     ];
 
-    render(
+    const { container } = render(
       <GameLeaderboard
         leaderboard={leaderboard}
         username="OtherPlayer"
@@ -99,11 +97,11 @@ describe('GameLeaderboard — HOST badge & row styling', () => {
       />
     );
 
-    // Should not have HOST badge
     expect(screen.queryByText('HOST')).not.toBeInTheDocument();
+    expect(container.querySelector('[aria-label="Host"]')).toBeNull();
   });
 
-  it('host row has left border styling', () => {
+  it('host row is distinguished by the crown marker, not a yellow stripe', () => {
     const leaderboard: ExtendedLeaderboardPlayer[] = [
       {
         username: 'HostPlayer',
@@ -130,8 +128,10 @@ describe('GameLeaderboard — HOST badge & row styling', () => {
     );
 
     const hostRow = container.querySelector('[role="listitem"]');
-    expect(hostRow?.className).toContain('border-l-4');
-    expect(hostRow?.className).toContain('border-l-neo-yellow');
+    expect(hostRow).not.toBeNull();
+    // Color-overload declutter: no yellow left stripe; the crown carries host identity.
+    expect(hostRow?.className).not.toContain('border-l-neo-yellow');
+    expect(hostRow?.querySelector('[aria-label="Host"]')).not.toBeNull();
   });
 
   it('crown icon still visible for host player', () => {
