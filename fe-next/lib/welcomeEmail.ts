@@ -246,6 +246,70 @@ function resolveLang(
 }
 
 /**
+ * Send a TEST welcome email (admin tooling).
+ *
+ * Bypasses the idempotency claim + 48h new-signup window of
+ * `sendWelcomeEmailToUser` — renders the real template and sends straight to
+ * the given address with a `[TEST]` subject prefix. No DB writes.
+ */
+export async function sendTestWelcomeEmail(
+  toEmail: string,
+  recipientName: string = 'Test User',
+  language: string = 'en',
+): Promise<{ success: boolean; error?: string }> {
+  if (!isEmailServiceConfigured()) {
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  const resend = getResendClient();
+  if (!resend) {
+    return { success: false, error: 'Resend client not initialized' };
+  }
+
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@lexiclash.live';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
+  const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
+
+  try {
+    const subject = getWelcomeSubject(language, recipientName);
+    const html = await withTimeout(
+      render(
+        WelcomeEmail({
+          recipientName,
+          language,
+          unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`,
+          playUrl: `${baseUrl}/${locale}`,
+          videoUrl: `${baseUrl}/${locale}`,
+          baseUrl,
+          modes: getWelcomeEmailModes(language, baseUrl),
+        }),
+      ),
+      30000,
+      'Welcome email render timed out after 30 seconds',
+    );
+
+    const result = await withTimeout(
+      resend.emails.send({
+        from: fromEmail,
+        to: toEmail,
+        subject: `[TEST] ${subject}`,
+        html,
+      }),
+      20000,
+      'Resend API timed out after 20 seconds',
+    );
+
+    if (result.error) {
+      return { success: false, error: result.error.message };
+    }
+    return { success: true };
+  } catch (err) {
+    const error = err as Error;
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Revert the atomic claim by setting welcome_email_sent_at back to null
  */
 async function revertClaim(supabase: any, userId: string): Promise<void> {

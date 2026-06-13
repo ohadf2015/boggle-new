@@ -231,6 +231,67 @@ router.post('/send-test-reengagement', async (req: AdminRequest, res: Response):
 });
 
 /**
+ * POST /api/admin/send-test-welcome
+ * Send a test welcome (onboarding) email to a specified address
+ */
+router.post('/send-test-welcome', async (req: AdminRequest, res: Response): Promise<void> => {
+  const startTime = Date.now();
+  logger.info('ADMIN_API', '====== Send test welcome email request START ======');
+
+  try {
+    const { sendTestWelcomeEmail } = await import('../../../lib/welcomeEmail');
+    const { isEmailServiceConfigured } = await import('../../../lib/email');
+
+    if (!isEmailServiceConfigured()) {
+      logger.warn('ADMIN_API', 'Email service not configured');
+      res.status(503).json({
+        error: 'Email service not configured',
+        details: {
+          hasApiKey: !!process.env.RESEND_API_KEY,
+          hasFromEmail: !!process.env.RESEND_FROM_EMAIL,
+        },
+      });
+      return;
+    }
+
+    const { email, recipientName, language: reqLanguage } = req.body || {};
+
+    const targetEmail = email || req.adminUser?.email;
+    if (!targetEmail) {
+      res.status(400).json({ error: 'No email address provided' });
+      return;
+    }
+
+    const language = reqLanguage || 'en';
+    const name = recipientName || req.adminUser?.username || 'Test User';
+
+    logger.info('ADMIN_API', `Sending test welcome email to ${targetEmail} (lang=${language})`);
+
+    const result = await sendTestWelcomeEmail(targetEmail, name, language);
+
+    if (!result.success) {
+      logger.warn('ADMIN_API', `Send failed: ${result.error}`);
+      res.status(500).json({ error: result.error || 'Failed to send test email' });
+      return;
+    }
+
+    logger.info('ADMIN_API', `====== SUCCESS - Total time: ${Date.now() - startTime}ms ======`);
+    auditLog(req.adminUser, 'SEND_TEST_WELCOME_EMAIL', { targetEmail, language });
+
+    res.json({
+      success: true,
+      message: `Test welcome email sent to ${targetEmail}`,
+      sentTo: targetEmail,
+      language,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Send test welcome email error: ${err.message}`);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
  * POST /api/admin/send-reengagement-to-player
  * Manually send a re-engagement email to a specific player (real email, not test)
  */

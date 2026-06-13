@@ -17,10 +17,22 @@ interface EmailTestPanelProps {
 }
 
 type SendStatus = 'idle' | 'sending' | 'success' | 'error';
-type EmailType = 'reengagement' | 'daily-challenge' | 'game-mode-announcement' | 'android-beta-launch' | 'android-release-launch';
+type EmailType = 'welcome' | 'reengagement' | 'daily-challenge' | 'game-mode-announcement' | 'android-beta-launch' | 'android-release-launch';
 type GameMode = 'blast' | 'wordhunt' | 'adventure';
 
 const EMAIL_TYPE_CONFIG = {
+  'welcome': {
+    label: 'Welcome',
+    icon: Mail,
+    endpoint: '/api/admin/send-test-welcome',
+    previewEndpoint: '/api/admin/welcome-email-preview',
+    previewTitle: 'Welcome Email Preview',
+    infoText: 'Sends a test welcome (onboarding) email with [TEST] prefix. Shows the dynamic cube-image mode grid for the current language.',
+    color: 'neo-lime',
+    bgClass: 'bg-neo-lime',
+    borderClass: 'border-neo-lime',
+    textClass: 'text-neo-lime',
+  },
   'reengagement': {
     label: 'Re-engagement',
     icon: UserX,
@@ -154,7 +166,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
     : process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
 
   const previewUrl =
-    emailType === 'reengagement' || emailType === 'android-beta-launch' || emailType === 'android-release-launch'
+    emailType === 'welcome' || emailType === 'reengagement' || emailType === 'android-beta-launch' || emailType === 'android-release-launch'
       ? `${baseUrl}${config.previewEndpoint}?language=${language}`
       : emailType === 'game-mode-announcement'
         ? `${baseUrl}${config.previewEndpoint}?language=${language}&mode=${gameMode}`
