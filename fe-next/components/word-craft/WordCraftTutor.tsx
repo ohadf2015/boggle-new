@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
-import { X, HelpCircle, Sparkles } from 'lucide-react';
+import { X, HelpCircle, Sparkles, Swords, Flag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 
-const STORAGE_KEY = 'wc_tutor_dismissed_v1';
+// v2: the Conquest rules replaced the Scrabble tutorial (center star + premium
+// squares). Bumping the key re-shows the how-to once to returning players.
+const STORAGE_KEY = 'wc_tutor_dismissed_v2';
 
 export interface WordCraftTutorLabels {
   title: string;
@@ -136,11 +138,11 @@ export function WordCraftTutor({ labels, isRTL }: WordCraftTutorProps) {
 
             <div className="grid grid-cols-1 gap-2 text-[11px] text-neo-white pt-3 border-t border-black/30">
               <div className="flex items-center gap-2">
-                <span aria-hidden className="text-neo-pink text-base leading-none">★</span>
+                <Swords className="w-4 h-4 text-neo-pink shrink-0" aria-hidden />
                 <span>{labels.tipFirst}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span aria-hidden className="px-1.5 py-0.5 bg-neo-cyan/30 text-neo-cyan text-[9px] font-black rounded border border-black/40">×2 ×3</span>
+                <Flag className="w-4 h-4 text-neo-cyan shrink-0" aria-hidden />
                 <span>{labels.tipScore}</span>
               </div>
             </div>

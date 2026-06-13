@@ -105,7 +105,9 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
   const playerRack = draw(bag, RACK_SIZE);
   const botRack = draw(bag, RACK_SIZE);
   return {
-    board: createBoard(finalBoardSize),
+    // Conquest mode: a neutral grid with no premium squares and no center
+    // star. Every cell is plain until a player claims it.
+    board: createBoard(finalBoardSize, { premiums: false }),
     bag,
     player: { id: 'player', name: 'You', score: 0, rack: playerRack, isBot: false },
     bot: { id: 'bot', name: BOT_NAME, score: 0, rack: botRack, isBot: true },
@@ -242,53 +244,17 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       };
     case 'CLEAR_PENDING':
       return { ...state, pendingPlacements: [], selectedRackTileId: null };
-    case 'COMMIT_PLAYER': {
-      const base = commitMove(state, 'player', action.placements, action.score, action.words, action.wordCells);
-      // Hot-seat: both humans submit through the player/bot seats; heat would
-      // only ever accrue for seat 1, a lopsided overdrive edge. Keep it inert.
-      if (state.hotseat) {
-        return base;
-      }
-      const wasOverdrive = state.overdrive;
-      if (wasOverdrive) {
-        // Cashing overdrive: reset heat to 60, clear overdrive state
-        return {
-          ...base,
-          heat: 60,
-          overdrive: false,
-          overdriveWarns: 0,
-          burnout: false,
-        };
-      }
-      const heatGain = Math.min(Math.floor(action.score / 3), 35);
-      const newHeat = Math.min(state.heat + heatGain, 100);
-      const newOverdrive = newHeat >= 100;
-      return {
-        ...base,
-        heat: newHeat,
-        overdrive: newOverdrive,
-        overdriveWarns: 0,
-        burnout: false,
-      };
-    }
-    case 'COMMIT_BOT': {
-      const base = commitMove(state, 'bot', action.placements, action.score, action.words, action.wordCells);
-      // Bot moves do not affect heat state
-      return {
-        ...base,
-        heat: state.heat,
-        overdrive: state.overdrive,
-        overdriveWarns: state.overdriveWarns,
-        burnout: state.burnout,
-      };
-    }
+    // Conquest mode has no heat / overdrive / burnout — territory captures are
+    // the only momentum system. Commits leave the (inert) heat fields untouched.
+    case 'COMMIT_PLAYER':
+      return commitMove(state, 'player', action.placements, action.score, action.words, action.wordCells);
+    case 'COMMIT_BOT':
+      return commitMove(state, 'bot', action.placements, action.score, action.words, action.wordCells);
     case 'SET_ERROR':
       return { ...state, lastError: action.message };
     case 'PASS': {
       const passes = state.consecutivePasses + 1;
       const turn: Turn = passes >= 2 ? 'over' : state.turn === 'player' ? 'bot' : 'player';
-      const newWarns = state.overdrive ? state.overdriveWarns + 1 : state.overdriveWarns;
-      const burnout = state.overdrive && newWarns >= 2;
       const passingSide = state.turn === 'player' ? 'player' : 'bot';
       return {
         ...state,
@@ -296,8 +262,6 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
         selectedRackTileId: null,
         consecutivePasses: passes,
         turn,
-        overdriveWarns: newWarns,
-        burnout,
         history: [...state.history, { who: passingSide, words: [], score: 0, placedTileIds: [] }],
         streaks: { ...state.streaks, [passingSide]: 0 },
       };
@@ -324,9 +288,10 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       return { ...state, cluesRemaining: Math.max(0, state.cluesRemaining - 1) };
     case 'GRANT_CLUE':
       return { ...state, cluesRemaining: state.cluesRemaining + 1 };
-    // Player skips turn during burnout — heat resets to 40, turn passes to bot.
+    // Burnout no longer triggers in Conquest mode; kept as an inert no-op so
+    // any stale dispatch can't wedge the turn.
     case 'BURNOUT_SKIP':
-      return { ...state, burnout: false, heat: 40, overdrive: false, overdriveWarns: 0, turn: 'bot' };
+      return state;
     // Used when locale or board size changes mid-session — wipes the game so a
     // Hebrew player who switched from /en doesn't keep the English bag.
     case 'RESET':
@@ -529,7 +494,9 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       dispatch({ type: 'SET_ERROR', message: 'BLANK_UNASSIGNED' });
       return;
     }
-    const result = validateAndScoreMove(state.board, state.pendingPlacements, isWordValid, modifierSpec);
+    // requireFirstMoveCenter=false → Conquest has no center star; the opening
+    // word may be placed anywhere.
+    const result = validateAndScoreMove(state.board, state.pendingPlacements, isWordValid, modifierSpec, false);
     if (!result.ok) {
       dispatch({
         type: 'SET_ERROR',
@@ -609,7 +576,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
         scoreModifier: modifierSpec,
       });
       if (move) {
-        const result = validateAndScoreMove(state.board, move.placements, isWordValid, modifierSpec);
+        const result = validateAndScoreMove(state.board, move.placements, isWordValid, modifierSpec, false);
         if (result.ok) {
           dispatch({
             type: 'COMMIT_BOT',

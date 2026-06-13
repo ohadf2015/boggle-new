@@ -9005,6 +9005,8 @@ const he = {
       "maxLevel": "מקסימום",
       "purchase": "קנה",
       "needMore": "חסרים עוד {amount}",
+      "locked": "נעול",
+      "unlocksAtWorld": "נפתח בעולם {world}",
       "category": {
         "excavation": "חפירה",
         "survival": "הישרדות",
@@ -13450,10 +13452,10 @@ const he = {
     "tutor": {
       "title": "איך משחקים",
       "step1": "הקש על אות מהמדף שלך",
-      "step2": "הקש על משבצת ריקה כדי להניח אותה",
-      "step3": "כשסיימת, הקש על שלח",
-      "tipFirst": "המילה הראשונה חייבת לכסות את ה־★ במרכז",
-      "tipScore": "משבצות צבעוניות נותנות בונוס ניקוד",
+      "step2": "הקש על משבצת כדי להניח — היא הופכת לשלך",
+      "step3": "הקש שלח כדי לכבוש אותה",
+      "tipFirst": "בנה דרך האותיות של היריב כדי לגנוב אותן",
+      "tipScore": "השולט בכי הרבה משבצות מנצח",
       "dismiss": "הבנתי!",
       "show": "איך משחקים"
     },
@@ -13607,8 +13609,9 @@ const he = {
       "yours": "הטריטוריה שלך",
       "bots": "טריטוריית הבוט",
       "endgameHint": "+2 לכל אריח בסוף המשחק",
-      "captureYou": "כבשת {{count}} — +{{bonus}}!",
-      "captureBot": "הבוט כבש {{count}} — +{{bonus}}!"
+      "captureYou": "גנבת {{count}} מהיריב!",
+      "captureBot": "היריב גנב לך {{count}}!",
+      "claimPreview": "+{{count}} משבצות"
     },
     "duel": {
       "playFriend": "שחק נגד חבר",

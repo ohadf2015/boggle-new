@@ -46,6 +46,38 @@ describe('validateAndScoreMove — geometric validity', () => {
     expect(r.reason).toBe('FIRST_MOVE_MUST_COVER_CENTER');
   });
 
+  it('Conquest mode (requireFirstMoveCenter=false): accepts an off-center first move', () => {
+    const board = createBoard(11, { premiums: false });
+    const r = validateAndScoreMove(
+      board,
+      [place(0, 0, 'C'), place(0, 1, 'A'), place(0, 2, 'T')],
+      isValid,
+      undefined,
+      false,
+    );
+    expect(r.ok).toBe(true);
+  });
+
+  it('Conquest mode: a single-tile first move is still too short', () => {
+    const board = createBoard(11, { premiums: false });
+    const r = validateAndScoreMove(board, [place(0, 0, 'A')], isValid, undefined, false);
+    expect(r.ok).toBe(false);
+  });
+
+  it('Conquest mode: later moves still must connect (DISCONNECTED stays)', () => {
+    const board = createBoard(11, { premiums: false });
+    placeTiles(board, [place(0, 0, 'C'), place(0, 1, 'A'), place(0, 2, 'T')]);
+    const r = validateAndScoreMove(
+      board,
+      [place(5, 5, 'A'), place(5, 6, 'T')],
+      isValid,
+      undefined,
+      false,
+    );
+    expect(r.ok).toBe(false);
+    expect(r.reason).toBe('DISCONNECTED');
+  });
+
   it('rejects diagonal placement', () => {
     const board = createBoard();
     const r = validateAndScoreMove(

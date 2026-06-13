@@ -36,35 +36,26 @@ describe('findBestBotMove', () => {
     expect(move).toBeNull();
   });
 
-  it('on empty board, plays a word covering the center', () => {
-    const board = createBoard();
+  it('on an empty Conquest board, plays a valid word anywhere (no center rule)', () => {
+    const board = createBoard(11, { premiums: false });
     const rack = makeRack('CATXYZ_');
     const dict = new Set(['CAT', 'AT', 'CAB']);
     const move = findBestBotMove(board, rack, (w) => dict.has(w.toUpperCase()));
     expect(move).not.toBeNull();
-    expect(move!.placements.some((p) => p.row === 7 && p.col === 7)).toBe(true);
+    // Every placed tile is in bounds; the opening word need NOT touch the center.
+    expect(move!.placements.every((p) => p.row >= 0 && p.row < 11 && p.col >= 0 && p.col < 11)).toBe(true);
+    expect(move!.placements.length).toBeGreaterThanOrEqual(2);
     expect(move!.score).toBeGreaterThan(0);
   });
 
-  it('on an 11x11 board, plays a word covering the real center (5,5)', () => {
-    const board = createBoard(11);
-    const rack = makeRack('CATXYZ_');
-    const dict = new Set(['CAT', 'AT', 'CAB']);
-    const move = findBestBotMove(board, rack, (w) => dict.has(w.toUpperCase()));
-    expect(move).not.toBeNull();
-    expect(move!.placements.some((p) => p.row === 5 && p.col === 5)).toBe(true);
-    expect(move!.score).toBeGreaterThan(0);
-  });
-
-  it('picks the higher-scoring word when multiple are valid', () => {
-    const board = createBoard();
+  it('picks the higher-scoring word when multiple are valid (premium-free)', () => {
+    const board = createBoard(11, { premiums: false });
     const rack = makeRack('CATSZE_');
-    // CAT = (3+1+1)*2 = 10 (DW). CATS = same line, (3+1+1+1)*2 = 12 (DW).
+    // No premiums: CAT = 3+1+1 = 5, CATS = 3+1+1+1 = 6. Bot should prefer CATS.
     const dict = new Set(['CAT', 'CATS', 'AT', 'AS']);
     const move = findBestBotMove(board, rack, (w) => dict.has(w.toUpperCase()));
     expect(move).not.toBeNull();
-    // CATS score on first move covering DW: 12
-    expect(move!.score).toBeGreaterThanOrEqual(12);
+    expect(move!.score).toBeGreaterThanOrEqual(6);
   });
 
   it('on a non-empty board, plays a word that connects to existing tiles', () => {

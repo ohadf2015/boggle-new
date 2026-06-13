@@ -1,5 +1,5 @@
 import type { PlacedTile, RackTile, Direction } from './types';
-import { getCenter, getCell, isFirstMove, isInBounds, type Board } from './board';
+import { getCell, isInBounds, type Board } from './board';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import type { ScoreModifierSpec } from './scoring';
 
@@ -142,9 +142,7 @@ export function findBestBotMove(
   // difficulty pool spans different words rather than many placements of the
   // same word (which would all score alike and make the nerf invisible).
   const bestByWord = new Map<string, { move: BotMove; ranked: number }>();
-  const empty = isFirstMove(board);
   const size = board.cells.length;
-  const center = getCenter(board.size);
 
   for (const { word, tiles } of candidateWords) {
     for (const direction of ['across', 'down'] as Direction[]) {
@@ -152,15 +150,10 @@ export function findBestBotMove(
         for (let c = 0; c < size; c++) {
           if (!candidateFitsInBounds(board, r, c, tiles.length, direction)) continue;
           if (candidateOverlapsExistingTile(board, r, c, tiles.length, direction)) continue;
-          if (empty) {
-            const coversCenter =
-              direction === 'across'
-                ? r === center && c <= center && c + tiles.length - 1 >= center
-                : c === center && r <= center && r + tiles.length - 1 >= center;
-            if (!coversCenter) continue;
-          }
+          // Conquest mode has no center star: the bot's opening word may land
+          // anywhere. requireFirstMoveCenter=false matches the player's rule.
           const placements = placementsFromCandidate(tiles, r, c, direction);
-          const result = validateAndScoreMove(board, placements, isWordValid, options.scoreModifier);
+          const result = validateAndScoreMove(board, placements, isWordValid, options.scoreModifier, false);
           if (!result.ok || result.score === undefined) continue;
           const bonus = options.extraScore
             ? options.extraScore(placements, result.words?.map((w) => w.cells) ?? [])

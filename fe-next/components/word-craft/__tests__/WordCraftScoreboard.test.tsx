@@ -34,26 +34,24 @@ function renderBoard(extra?: Partial<React.ComponentProps<typeof WordCraftScoreb
   );
 }
 
-describe('WordCraftScoreboard', () => {
-  it('renders both scores and the bag count', () => {
+describe('WordCraftScoreboard (Conquest)', () => {
+  it('falls back to the point totals + bag count when no territory is supplied', () => {
     renderBoard();
     expect(screen.getByText('120')).toBeTruthy();
     expect(screen.getByText('80')).toBeTruthy();
     expect(screen.getByText('42')).toBeTruthy();
   });
 
-  it('renders folded territory counts when territory prop is present', () => {
+  it('headlines territory cell counts (not points) when territory is supplied', () => {
     renderBoard({
       territory: { playerCount: 7, botCount: 3, label: 'Territory' },
     });
-    const terr = screen.getByTestId('wc-scoreboard-territory');
-    expect(terr).toBeTruthy();
-    expect(terr.textContent).toContain('7');
-    expect(terr.textContent).toContain('3');
-  });
-
-  it('omits the territory chip when territory prop is absent', () => {
-    renderBoard();
-    expect(screen.queryByTestId('wc-scoreboard-territory')).toBeNull();
+    // The big numbers are the cell counts now, not the 120/80 point totals.
+    expect(screen.getByText('7')).toBeTruthy();
+    expect(screen.getByText('3')).toBeTruthy();
+    expect(screen.queryByText('120')).toBeNull();
+    expect(screen.queryByText('80')).toBeNull();
+    // Territory label shows in the meta row.
+    expect(screen.getByText('Territory')).toBeTruthy();
   });
 });

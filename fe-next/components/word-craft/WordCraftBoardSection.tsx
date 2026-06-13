@@ -6,7 +6,7 @@ import { WordCraftBoard } from './WordCraftBoard';
 import { WordCraftZoomShell } from './WordCraftZoomShell';
 import { WordCraftPixiStage } from './WordCraftPixiStage';
 import type { Board } from '@/lib/word-craft/board';
-import type { PlacedTile, PremiumKind, RackTile } from '@/lib/word-craft/types';
+import type { PlacedTile, RackTile } from '@/lib/word-craft/types';
 import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
 
 interface Props {
@@ -26,7 +26,6 @@ interface Props {
   reticle?: { row: number; col: number } | null;
   zoomLabel?: string;
   zoomResetLabel?: string;
-  premiumLabels?: Partial<Record<PremiumKind, string>>;
 }
 
 export function WordCraftBoardSection(props: Props) {
@@ -71,7 +70,6 @@ export function WordCraftBoardSection(props: Props) {
           dragHoverCell={props.dragHoverCell}
           locale={props.locale}
           reticle={props.reticle}
-          premiumLabels={props.premiumLabels}
         />
         <WordCraftPixiStage
           boardRef={boardRef}

@@ -8882,6 +8882,8 @@ const ja = {
       "maxLevel": "最大",
       "purchase": "購入",
       "needMore": "あと{amount}必要",
+      "locked": "ロック中",
+      "unlocksAtWorld": "ワールド{world}で解放",
       "category": {
         "excavation": "発掘",
         "survival": "生存",
@@ -12996,10 +12998,10 @@ const ja = {
     "tutor": {
       "title": "遊び方",
       "step1": "ラックから文字をタップ",
-      "step2": "空きマスをタップして置く",
-      "step3": "終わったら送信をタップ",
-      "tipFirst": "最初の語は中央の★を通します",
-      "tipScore": "色付きマスはボーナス点",
+      "step2": "マスをタップして置く — その陣地は自分のものに",
+      "step3": "送信をタップして占領",
+      "tipFirst": "ライバルの文字を通して単語を作り奪い取ろう",
+      "tipScore": "より多くのマスを支配した方が勝ち",
       "dismiss": "わかった！",
       "show": "遊び方"
     },
@@ -13118,8 +13120,9 @@ const ja = {
       "yours": "あなたのテリトリー",
       "bots": "ボットのテリトリー",
       "endgameHint": "ゲーム終了時に各 +2",
-      "captureYou": "{{count}} 占領 — +{{bonus}}!",
-      "captureBot": "ボットが {{count}} 占領 — +{{bonus}}!"
+      "captureYou": "ライバルから {{count}} 奪取！",
+      "captureBot": "ライバルに {{count}} 奪われた！",
+      "claimPreview": "+{{count}} マス"
     },
     "duel": {
       "playFriend": "友達と対戦する",

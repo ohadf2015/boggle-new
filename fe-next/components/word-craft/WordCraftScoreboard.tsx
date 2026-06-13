@@ -64,10 +64,14 @@ function WordCraftScoreboardImpl({
   labels,
   territory,
 }: WordCraftScoreboardProps) {
-  const total = player.score + bot.score;
+  // Conquest score IS territory — the number on the HUD is cells controlled.
+  // Falls back to the internal point total only if no territory is supplied.
+  const pScore = territory ? territory.playerCount : player.score;
+  const bScore = territory ? territory.botCount : bot.score;
+  const total = pScore + bScore;
   // Smoothed split: dampen at low totals so opening moves don't whip the bar.
-  const rawPct = total === 0 ? 50 : (player.score / total) * 100;
-  const dampened = total < 20 ? 50 + (rawPct - 50) * (total / 20) : rawPct;
+  const rawPct = total === 0 ? 50 : (pScore / total) * 100;
+  const dampened = total < 8 ? 50 + (rawPct - 50) * (total / 8) : rawPct;
   const pct = Math.max(10, Math.min(90, dampened));
 
   const status =
@@ -93,9 +97,9 @@ function WordCraftScoreboardImpl({
           />
           <span
             data-score-value="player"
-            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-lime leading-none tabular-nums origin-bottom-left inline-block"
+            className="font-neo-display font-black text-3xl sm:text-4xl text-neo-cyan leading-none tabular-nums origin-bottom-left inline-block"
           >
-            {player.score}
+            {pScore}
           </span>
           <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white truncate">
             {labels.you}
@@ -117,7 +121,7 @@ function WordCraftScoreboardImpl({
             data-score-value="bot"
             className="font-neo-display font-black text-3xl sm:text-4xl text-neo-pink leading-none tabular-nums origin-bottom-right inline-block"
           >
-            {bot.score}
+            {bScore}
           </span>
           <span className="text-[10px] sm:text-xs font-neo-display font-black uppercase tracking-widest text-neo-white truncate">
             {labels.bot}
@@ -125,14 +129,14 @@ function WordCraftScoreboardImpl({
         </div>
       </div>
 
-      {/* Kinetic split bar */}
+      {/* Kinetic split bar — the cyan/pink boundary IS the territory balance. */}
       <div
         role="img"
-        aria-label={`${labels.you} ${player.score} · ${labels.bot} ${bot.score}`}
+        aria-label={`${territory?.label ?? ''} ${labels.you} ${pScore} · ${labels.bot} ${bScore}`}
         className="relative h-3 sm:h-3.5 bg-neo-pink border-neo border-black rounded-neo overflow-hidden shadow-hard-sm"
       >
         <div
-          className="wc-bar-fill absolute inset-y-0 start-0 bg-neo-lime border-e-2 border-black"
+          className="wc-bar-fill absolute inset-y-0 start-0 bg-neo-cyan border-e-2 border-black"
           style={{ width: `${pct}%` }}
         />
         {/* Center seam — sits at 50% so you can see the deviation at a glance */}
@@ -147,19 +151,12 @@ function WordCraftScoreboardImpl({
           <span aria-hidden className="inline-block w-1.5 h-1.5 rounded-full bg-current me-1.5 align-middle" />
           {status}
         </span>
-        {/* Territory, folded in: claimed-cell counts as a compact lime/pink chip
-            so it shares the score HUD instead of a separate stacked band. Only
-            once cells exist (matches the old strip's total>0 gate). */}
-        {territory && territory.playerCount + territory.botCount > 0 ? (
-          <span
-            data-testid="wc-scoreboard-territory"
-            className="inline-flex items-center gap-1.5 font-neo-display font-black tabular-nums"
-            aria-label={`${territory.label}: ${territory.playerCount} · ${territory.botCount}`}
-          >
-            <Crown className="w-3 h-3 text-neo-white/70" aria-hidden />
-            <span className="text-neo-lime">{territory.playerCount}</span>
-            <span aria-hidden className="text-neo-white/30">·</span>
-            <span className="text-neo-pink">{territory.botCount}</span>
+        {/* Territory label sits with the bag meta — the headline numbers above
+            already ARE the cell counts, so no separate chip is needed. */}
+        {territory ? (
+          <span className="inline-flex items-center gap-1 font-neo-display font-black uppercase tracking-wider text-neo-white/70">
+            <Crown className="w-3 h-3" aria-hidden />
+            {territory.label}
           </span>
         ) : null}
         <span className="inline-flex items-center gap-1 text-neo-white">

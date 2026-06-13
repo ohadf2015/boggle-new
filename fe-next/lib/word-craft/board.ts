@@ -123,15 +123,26 @@ export function getPremium(row: number, col: number, board: Board): PremiumKind 
   return CHAR_TO_PREMIUM[LAYOUTS[board.size][row][col]] ?? null;
 }
 
-export function createBoard(size: BoardSize = 15): Board {
+export interface CreateBoardOptions {
+  /**
+   * Whether to stamp Scrabble-style premium squares (DL/TL/DW/TW) into the
+   * grid. Default `true` keeps the Run + Gem modes (which share this engine)
+   * on the classic premium layout. Conquest/territory mode passes `false` so
+   * every cell is neutral until claimed — no "weird cells", no center star.
+   */
+  premiums?: boolean;
+}
+
+export function createBoard(size: BoardSize = 15, options: CreateBoardOptions = {}): Board {
   if (size !== 7 && size !== 9 && size !== 11 && size !== 13 && size !== 15) {
     throw new Error(`Board size must be 7, 9, 11, 13, or 15, got ${size}`);
   }
+  const premiums = options.premiums ?? true;
   const cells: BoardCell[][] = [];
   for (let r = 0; r < size; r++) {
     const row: BoardCell[] = [];
     for (let c = 0; c < size; c++) {
-      row.push({ premium: getPremiumForSize(r, c, size), tile: null });
+      row.push({ premium: premiums ? getPremiumForSize(r, c, size) : null, tile: null });
     }
     cells.push(row);
   }

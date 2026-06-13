@@ -124,6 +124,35 @@ describe('premium square layout (canonical Scrabble)', () => {
   });
 });
 
+describe('premium-free board (Conquest / territory mode)', () => {
+  it('createBoard(size, { premiums: false }) yields every cell premium null', () => {
+    for (const size of [11, 13] as const) {
+      const board = createBoard(size, { premiums: false });
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          expect(board.cells[r][c].premium).toBeNull();
+        }
+      }
+    }
+  });
+
+  it('premiums default to ON when the option is omitted (Run/Gem unchanged)', () => {
+    // Corners of the canonical 15x15 are still TW — Scrabble engine intact.
+    expect(getPremium(0, 0, createBoard(15))).toBe('TW');
+    // Explicit premiums:true behaves like the default.
+    expect(getCell(createBoard(15, { premiums: true }), 0, 0).premium).toBe('TW');
+  });
+
+  it('a premium-free board still tracks placed tiles + isFirstMove', () => {
+    const board = createBoard(11, { premiums: false });
+    expect(isFirstMove(board)).toBe(true);
+    placeTiles(board, [tile(0, 0, 'C', 3), tile(0, 1, 'A', 1), tile(0, 2, 'T', 1)]);
+    expect(isFirstMove(board)).toBe(false);
+    expect(getCell(board, 0, 0).tile?.letter).toBe('C');
+    expect(getCell(board, 0, 0).premium).toBeNull();
+  });
+});
+
 describe('placeTiles', () => {
   it('fills cells and flips isFirstMove to false', () => {
     const board = createBoard();

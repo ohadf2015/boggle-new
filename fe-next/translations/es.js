@@ -9178,6 +9178,8 @@ const es = {
       "maxLevel": "MÁX",
       "purchase": "Comprar",
       "needMore": "Necesitas {amount} más",
+      "locked": "Bloqueado",
+      "unlocksAtWorld": "Se desbloquea en el Mundo {world}",
       "category": {
         "excavation": "Excavación",
         "survival": "Supervivencia",
@@ -13080,10 +13082,10 @@ const es = {
     "tutor": {
       "title": "Cómo jugar",
       "step1": "Toca una letra de tu atril",
-      "step2": "Toca una casilla vacía para colocarla",
-      "step3": "Cuando termines, toca Enviar",
-      "tipFirst": "La primera palabra debe cubrir la ★ central",
-      "tipScore": "Las casillas de color dan puntos extra",
+      "step2": "Toca una casilla para colocarla — ese terreno es tuyo",
+      "step3": "Toca Enviar para conquistarla",
+      "tipFirst": "Construye a través de las letras del rival para robárselas",
+      "tipScore": "Quien controle más casillas gana",
       "dismiss": "¡Entendido!",
       "show": "Cómo jugar"
     },
@@ -13202,8 +13204,9 @@ const es = {
       "yours": "Tu territorio",
       "bots": "Territorio del bot",
       "endgameHint": "+2 cada uno al final",
-      "captureYou": "¡Capturaste {{count}} — +{{bonus}}!",
-      "captureBot": "¡El bot capturó {{count}} — +{{bonus}}!"
+      "captureYou": "¡Le robaste {{count}} al rival!",
+      "captureBot": "¡El rival te robó {{count}}!",
+      "claimPreview": "+{{count}} casillas"
     },
     "duel": {
       "playFriend": "Juega contra un amigo",

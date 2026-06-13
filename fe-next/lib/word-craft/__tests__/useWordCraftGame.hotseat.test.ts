@@ -37,7 +37,7 @@ describe('useWordCraftGame — hot-seat (pass-and-play) reducer', () => {
     expect(reset.hotseat).toBe(true);
   });
 
-  it('COMMIT_PLAYER builds heat in bot mode but stays neutral in hot-seat', () => {
+  it('COMMIT_PLAYER never accrues heat in either mode (Conquest has no heat)', () => {
     // GIVEN a fresh state in each mode
     const bot = buildInitialState({ seed: 1, hotseat: false });
     const hot = buildInitialState({ seed: 1, hotseat: true });
@@ -47,8 +47,9 @@ describe('useWordCraftGame — hot-seat (pass-and-play) reducer', () => {
     const afterBot = wordCraftReducer(bot, commit);
     const afterHot = wordCraftReducer(hot, commit);
 
-    // THEN bot mode accrues heat; hot-seat does not (no asymmetric overdrive)
-    expect(afterBot.heat).toBeGreaterThan(0);
+    // THEN heat stays inert — the heat/overdrive/burnout system was removed.
+    expect(afterBot.heat).toBe(0);
+    expect(afterBot.overdrive).toBe(false);
     expect(afterHot.heat).toBe(0);
   });
 });

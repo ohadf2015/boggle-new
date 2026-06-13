@@ -49,7 +49,7 @@ describe('WordCraftTutor', () => {
   });
 
   it('clicking the pill reopens the dialog after dismiss', () => {
-    localStorage.setItem('wc_tutor_dismissed_v1', '1');
+    localStorage.setItem('wc_tutor_dismissed_v2', '1');
     const { getByLabelText, queryByRole, getByText } = render(<WordCraftTutor labels={labels} />);
     expect(queryByRole('dialog')).toBeNull();
     fireEvent.click(getByLabelText('How to play'));

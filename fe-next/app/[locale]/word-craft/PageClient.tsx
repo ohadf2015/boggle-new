@@ -18,11 +18,9 @@ import { WordCraftRack } from '@/components/word-craft/WordCraftRack';
 import { WordCraftScoreboard } from '@/components/word-craft/WordCraftScoreboard';
 import { WordCraftControls } from '@/components/word-craft/WordCraftControls';
 import { WordCraftDifficultySelect } from '@/components/word-craft/WordCraftDifficultySelect';
-import { WordCraftModifierBanner } from '@/components/word-craft/WordCraftModifierBanner';
 import { DEFAULT_BOT_DIFFICULTY, isBotDifficulty, type BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import { WordCraftPlayFriendControl } from '@/components/word-craft/WordCraftPlayFriendControl';
 import { WordCraftCelebration, type CelebrationKind } from '@/components/word-craft/WordCraftCelebration';
-import { HeatMeter } from '@/components/word-craft/HeatMeter';
 import { ScoreFloat } from '@/components/word-craft/ScoreFloat';
 import { WordCraftComboBadge } from '@/components/word-craft/WordCraftComboBadge';
 import { WordCraftTutor } from '@/components/word-craft/WordCraftTutor';
@@ -36,14 +34,11 @@ import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
 import { useWordCraftKeyboardShortcuts } from '@/components/word-craft/hooks/useWordCraftKeyboardShortcuts';
 import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
-import { mountAmbientSparkles, type PremiumCellRef } from '@/lib/word-craft/pixi/ambientSparkles';
 import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
 import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleCommit';
 import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
 import { recordBest } from '@/lib/word-craft/bestScore';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
-import { classifyHeat, detectHeatTransition, type HeatBeat } from '@/lib/word-craft/celebration/heatTransition';
-import { WordCraftHeatStamp } from '@/components/word-craft/WordCraftHeatStamp';
 import { WordCraftScorePreviewBadge } from '@/components/word-craft/WordCraftScorePreviewBadge';
 import { playBotMoveReveal } from '@/lib/word-craft/pixi/scenes/botMoveReveal';
 import { playGameOverBurst } from '@/lib/word-craft/pixi/scenes/gameOverBurst';
@@ -67,6 +62,7 @@ import {
 } from '@/components/word-craft/wordCraftTelemetry';
 import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
+import { cellsGainedThisTurn } from '@/lib/word-craft/territoryFeedback';
 import { cn } from '@/lib/utils';
 import { parseDuel, compareDuel } from '@/lib/word-craft/duel';
 import { PHONE_DIMS } from '@/lib/word-craft/boardDimensions';
@@ -110,18 +106,6 @@ export default function WordCraftPageClient() {
     [profile, t],
   );
   const locale = (language ?? 'en') as SupportedLocale;
-
-  // Compact multiplier labels painted inside empty premium cells. Built once
-  // per locale so WordCraftBoard's memo isn't busted every render.
-  const premiumLabels = useMemo(
-    () => ({
-      TW: t('wordcraft.premiumLabel.tw'),
-      DW: t('wordcraft.premiumLabel.dw'),
-      TL: t('wordcraft.premiumLabel.tl'),
-      DL: t('wordcraft.premiumLabel.dl'),
-    }),
-    [t],
-  );
 
   // Hide the global bottom nav while in WordCraft — it's an immersive,
   // no-scroll screen and the nav was overlapping the board and rack. This
@@ -257,7 +241,6 @@ export default function WordCraftPageClient() {
   const juice = useWordCraftJuice();
   const { queueAchievement } = useAchievementQueue();
   const [sceneCtx, setSceneCtx] = useState<SceneCtx | null>(null);
-  const ambientSparklesRef = useRef<ReturnType<typeof mountAmbientSparkles> | null>(null);
 
   // --- Telemetry plumbing ---
   // turnIdRef persists for the whole turn so every event tied to one turn
@@ -576,7 +559,6 @@ export default function WordCraftPageClient() {
 
   // --- History: score float + celebrations + achievements ---
   const prevHistoryLenRef = useRef(0);
-  const overdriveCountRef = useRef(0);
   const firstWordAchievedRef = useRef(false);
 
   useEffect(() => {
@@ -619,11 +601,19 @@ export default function WordCraftPageClient() {
 
     if (newest.who === 'player') {
       const isBingo = newest.placedTileIds.length >= 7;
-      const wasOverdrive = game.state.overdrive === false && newest.score > 0; // overdrive was cashed
       const encIdx = Math.floor(Math.random() * ENCOURAGEMENT_COUNT);
       const encouragement = t(`wordcraft.encouragement.${encIdx}`);
 
-      setScoreFloat({ score: newest.score, overdrive: false, isBingo, encouragement, key: len });
+      // The float counts TERRITORY, not points: cells claimed by placing tiles
+      // plus cells stolen from the rival this turn.
+      const cap = game.state.lastCapture;
+      const gain = cellsGainedThisTurn(
+        newest.placedTileIds.length,
+        'player',
+        len - 1,
+        cap ? { by: cap.by, cellCount: cap.cells.length, turnIndex: cap.turnIndex } : null,
+      );
+      setScoreFloat({ score: gain.total, overdrive: false, isBingo, encouragement, key: len });
 
       // Fire tiered spectacle: tier resolver picks the FX bundle (ripple →
       // wave → path trace → word stamp → edge flash → aurora) per commit
@@ -682,90 +672,11 @@ export default function WordCraftPageClient() {
           origin: rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : undefined,
         }));
       }
-
-      // Achievement: overdrive cashed (wasOverdrive means we just exited overdrive via a word)
-      if (wasOverdrive) {
-        queueAchievement({ key: 'wordcraft_overdrive_cash', icon: '🔥' });
-        setScoreFloat((prev) => prev ? { ...prev, overdrive: true } : prev);
-      }
     }
   }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode, playCommitSound, playOpponentScored]);
 
-  // --- Overdrive enter ---
-  const prevOverdriveRef = useRef(false);
-  useEffect(() => {
-    const cur = game.state.overdrive;
-    if (cur && !prevOverdriveRef.current) {
-      overdriveCountRef.current++;
-      setCelebration((prev) => ({
-        kind: 'overdrive',
-        burstId: prev.burstId + 1,
-        origin: undefined,
-      }));
-      queueAchievement({ key: 'wordcraft_overdrive_enter', icon: '⚡' });
-
-      if (overdriveCountRef.current >= 3) {
-        queueAchievement({ key: 'wordcraft_heat_streak', icon: '🏆', count: overdriveCountRef.current });
-      }
-    }
-    prevOverdriveRef.current = cur;
-  }, [game.state.overdrive, queueAchievement]);
-
-  // --- Heat-state transition beat ---
-  // Detects cold/warm/overdrive/burnout state crossings and fires the
-  // corresponding Pixi scene + DOM stamp. Stacks ABOVE existing celebrations
-  // so we keep the achievement toast/celebration overlay too.
-  const [heatBeat, setHeatBeat] = useState<HeatBeat | null>(null);
-  const prevHeatStateRef = useRef(classifyHeat({
-    heat: game.state.heat,
-    overdrive: game.state.overdrive,
-    burnout: game.state.burnout,
-  }));
-  useEffect(() => {
-    const current = classifyHeat({
-      heat: game.state.heat,
-      overdrive: game.state.overdrive,
-      burnout: game.state.burnout,
-    });
-    const beat = detectHeatTransition(prevHeatStateRef.current, current);
-    prevHeatStateRef.current = current;
-    if (!beat) return;
-    setHeatBeat(beat);
-    if (sceneCtx) {
-      import('@/lib/word-craft/pixi/scenes/heatBeat')
-        .then(({ playHeatBeat }) => playHeatBeat(sceneCtx, beat))
-        .catch(() => {
-          // Pixi animations can fail on low-end devices; silently continue
-        });
-    }
-  }, [game.state.heat, game.state.overdrive, game.state.burnout, sceneCtx]);
-
-  // --- Burnout auto-skip after 1.5s ---
-  const prevBurnoutRef = useRef(false);
-  useEffect(() => {
-    const cur = game.state.burnout;
-    const wasAlreadyBurnt = prevBurnoutRef.current;
-    prevBurnoutRef.current = cur;
-    if (!cur || wasAlreadyBurnt) return;
-    setCelebration((prev) => ({ kind: 'burnout', burstId: prev.burstId + 1 }));
-    const timer = setTimeout(() => { game.burnoutSkip(); }, 1500);
-    return () => clearTimeout(timer);
-  }, [game, game.state.burnout, game.burnoutSkip]);
-
-  // --- Pixi: Mount ambient sparkles on premium cells ---
-  useEffect(() => {
-    if (!sceneCtx) return;
-    const cells: PremiumCellRef[] = [];
-    for (let r = 0; r < game.state.board.size; r++) {
-      for (let c = 0; c < game.state.board.size; c++) {
-        const p = game.state.board.cells[r]?.[c]?.premium;
-        if (p) cells.push({ row: r, col: c, kind: p });
-      }
-    }
-    const handle = mountAmbientSparkles(sceneCtx, cells);
-    ambientSparklesRef.current = handle;
-    return () => handle.destroy();
-  }, [sceneCtx, game.state.board]);
+  // (Conquest removed the heat / overdrive / burnout systems and the
+  // premium-cell ambient sparkles — territory captures are the only momentum.)
 
   // --- Linguist achievement ---
   useEffect(() => {
@@ -775,6 +686,13 @@ export default function WordCraftPageClient() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Conquest score = territory controlled. These cell counts are the
+  // authoritative "score" for the win condition, personal best, duel
+  // comparison, and the end-game scene — the internal point total stays a
+  // hidden bot-ranking signal only.
+  const playerTerritory = useMemo(() => countClaimed(game.state.board, 'player'), [game.state.board]);
+  const botTerritory = useMemo(() => countClaimed(game.state.board, 'bot'), [game.state.board]);
 
   // --- Game over ---
   const [newBest, setNewBest] = useState(false);
@@ -795,8 +713,8 @@ export default function WordCraftPageClient() {
       if (
         sceneCtx &&
         shouldCelebrateEnding({
-          playerScore: game.state.player.score,
-          botScore: game.state.bot.score,
+          playerScore: playerTerritory,
+          botScore: botTerritory,
           hotseat,
           cosyMode,
           reducedMotion: prefersReducedMotion,
@@ -808,7 +726,7 @@ export default function WordCraftPageClient() {
       }
       // Duel outcome: compare player score vs challenger score
       if (duel && !recordedBestRef.current) {
-        const outcome = compareDuel(game.state.player.score, duel.score);
+        const outcome = compareDuel(playerTerritory, duel.score);
         setDuelOutcome({
           outcome,
           challengerName: duel.name || t('wordcraft.duel.unnamedChallenger'),
@@ -819,7 +737,7 @@ export default function WordCraftPageClient() {
       // Personal best (SP vs bot only — hotseat has two human seats, no "mine").
       if (!hotseat && !recordedBestRef.current) {
         recordedBestRef.current = true;
-        const { isNewBest } = recordBest('territory', game.state.player.score);
+        const { isNewBest } = recordBest('territory', playerTerritory);
         if (isNewBest) {
           setNewBest(true);
           playNewBest();
@@ -831,7 +749,7 @@ export default function WordCraftPageClient() {
       setNewBest(false);
       setDuelOutcome(null);
     }
-  }, [game.state, game.state.turn, sceneCtx, hotseat, territoryEnabled, game.state.player.score, game.state.bot.score, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
+  }, [game.state, game.state.turn, sceneCtx, hotseat, territoryEnabled, playerTerritory, botTerritory, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
 
   // --- Error shake ---
   const lastErrorRef = useRef<string | null>(null);
@@ -862,12 +780,8 @@ export default function WordCraftPageClient() {
 
   const pendingIds = new Set(game.state.pendingPlacements.map((p) => p.rackTileId));
 
-  // First-move flag drives center-star ping + rack glow.
+  // First-move flag drives the rack glow (no center star to ping anymore).
   const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
-  // Mobile chrome budget: HeatMeter + the empty-pending placeholder eat
-  // ~60 px of vertical that the 11×11 board needs back to keep cells
-  // tappable. Render each only when it carries info.
-  const showHeatMeter = game.state.heat > 0 || game.state.overdrive || game.state.burnout;
   const showPendingStrip = game.state.pendingPlacements.length > 0;
   // Whether the on-screen human may act now. Bot-mode: only on the player's
   // turn. Hot-seat: either seat's turn, but not while the hand-off curtain is
@@ -882,7 +796,6 @@ export default function WordCraftPageClient() {
   const wantsPick =
     canInteract &&
     !!dict &&
-    !game.state.burnout &&
     !game.state.selectedRackTileId &&
     game.state.pendingPlacements.length === 0;
 
@@ -980,7 +893,7 @@ export default function WordCraftPageClient() {
                 <WordCraftPlayFriendControl
                   t={t}
                   seed={seed}
-                  playerScore={game.state.player.score}
+                  playerScore={playerTerritory}
                   locale={locale}
                   disabled={!dict}
                   challengerName={challengerIdentity.name}
@@ -1005,9 +918,6 @@ export default function WordCraftPageClient() {
             }}
           />
         </div>
-
-        {/* Per-game twist (scoring modifier). Hidden for the 'none' baseline. */}
-        <WordCraftModifierBanner modifier={game.state.modifier} t={t} />
 
         {!dict ? (
           <div className="flex items-center gap-2 px-2 py-1 bg-neo-navy-light border-2 border-black rounded-neo shrink-0">
@@ -1048,17 +958,8 @@ export default function WordCraftPageClient() {
             t={t}
             friendName={duel.name || t('wordcraft.duel.unnamedChallenger')}
             friendScore={duel.score}
-            playerScore={game.state.player.score}
+            playerScore={playerTerritory}
             friendAvatar={duel.avatar}
-          />
-        ) : null}
-
-        {showHeatMeter ? (
-          <HeatMeter
-            heat={game.state.heat}
-            overdrive={game.state.overdrive}
-            burnout={game.state.burnout}
-            label={t('wordcraft.heatLabel')}
           />
         ) : null}
 
@@ -1100,7 +1001,6 @@ export default function WordCraftPageClient() {
               reticle={reticle}
               zoomLabel={t('wordcraft.zoomLabel')}
               zoomResetLabel={t('wordcraft.zoomReset')}
-              premiumLabels={premiumLabels}
             />
             {scoreFloat ? (
               <ScoreFloat
@@ -1114,16 +1014,9 @@ export default function WordCraftPageClient() {
             {!cosyMode && !prefersReducedMotion ? (
               <WordCraftComboBadge streak={game.state.streaks.player} t={t} />
             ) : null}
-            <WordCraftHeatStamp beat={heatBeat} onDone={() => setHeatBeat(null)} />
             <WordCraftScorePreviewBadge board={game.state.board} placements={game.state.pendingPlacements} />
           </div>
         </div>
-
-        {game.state.burnout ? (
-          <div className="px-3 py-1 bg-neo-red/20 border-2 border-neo-red text-neo-red text-xs rounded-neo text-center font-neo-display shrink-0">
-            {t('wordcraft.burnout')}
-          </div>
-        ) : null}
 
         {showPendingStrip ? (
           <WordCraftPendingStrip
@@ -1167,7 +1060,7 @@ export default function WordCraftPageClient() {
           onFastTap={handleFastTap}
           axisLocked={game.state.pendingPlacements.length >= 1}
           draggingTileId={drag?.active ? drag.tileId : null}
-          disabled={!canInteract || !dict || game.state.burnout}
+          disabled={!canInteract || !dict}
           ariaLabel={t('wordcraft.yourRack')}
           hintPick={wantsPick && isFirstMove}
           locale={locale}
@@ -1185,10 +1078,10 @@ export default function WordCraftPageClient() {
         ) : null}
 
         <WordCraftControls
-          canSubmit={game.state.pendingPlacements.length > 0 && !!dict && canInteract && !game.state.burnout}
+          canSubmit={game.state.pendingPlacements.length > 0 && !!dict && canInteract}
           canRecall={game.state.pendingPlacements.length > 0}
-          canSwap={activeRack.length > 0 && canInteract && !game.state.burnout}
-          disabled={!canInteract || !dict || game.state.burnout}
+          canSwap={activeRack.length > 0 && canInteract}
+          disabled={!canInteract || !dict}
           onSubmit={submitMoveWithTelemetry}
           onRecall={recallAllPending}
           onPass={() => {
@@ -1284,8 +1177,8 @@ export default function WordCraftPageClient() {
       {game.state.turn === 'over' ? (
         <WordCraftGameOverScene
           t={t}
-          playerScore={game.state.player.score}
-          botScore={game.state.bot.score}
+          playerScore={playerTerritory}
+          botScore={botTerritory}
           playerName={hotseat ? t('wordcraft.player1') : undefined}
           botName={hotseat ? t('wordcraft.player2') : undefined}
           isNewBest={newBest}

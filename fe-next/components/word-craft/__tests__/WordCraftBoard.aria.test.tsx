@@ -33,9 +33,10 @@ describe('WordCraftBoard — aria-label tile state for screen readers', () => {
     expect(label).toContain('pending A');
   });
 
-  it('placed cell announces letter and value', () => {
+  it('placed cell announces its letter and owner (your / rival)', () => {
     const board = createBoard(15);
     board.cells[5][5].tile = { row: 5, col: 5, letter: 'Q', value: 10, isBlank: false, rackTileId: 'r-q' };
+    board.cells[5][5].claim = 'player';
     render(
       <WordCraftBoard
         board={board}
@@ -46,30 +47,16 @@ describe('WordCraftBoard — aria-label tile state for screen readers', () => {
     const cell = document.querySelector('[data-board-cell="5,5"]') as HTMLElement;
     const label = cell.getAttribute('aria-label') ?? '';
     expect(label).toContain('letter Q');
-    expect(label).toContain('value 10');
+    expect(label).toContain('your');
   });
 
-  it('center cell announces "center start" on the empty first move', () => {
+  it('center cell never announces "center start" (no center star in Conquest)', () => {
     render(
       <WordCraftBoard
         board={createBoard(15)}
         pendingPlacements={[]}
         onCellClick={() => {}}
         isFirstMove
-      />,
-    );
-    const cell = document.querySelector('[data-board-cell="7,7"]') as HTMLElement;
-    const label = cell.getAttribute('aria-label') ?? '';
-    expect(label).toContain('center start');
-  });
-
-  it('center cell after first move no longer announces "center start"', () => {
-    render(
-      <WordCraftBoard
-        board={createBoard(15)}
-        pendingPlacements={[]}
-        onCellClick={() => {}}
-        isFirstMove={false}
       />,
     );
     const cell = document.querySelector('[data-board-cell="7,7"]') as HTMLElement;

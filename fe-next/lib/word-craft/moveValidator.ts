@@ -181,6 +181,14 @@ export function validateAndScoreMove(
   placements: PlacedTile[],
   isWordValid: DictionaryCheck,
   modifier?: ScoreModifierSpec,
+  /**
+   * Whether the opening move must cover the board's center square. Default
+   * `true` keeps the Scrabble-style Run + Gem modes intact. Conquest/territory
+   * mode passes `false`: there is no center star, so the first word may be
+   * placed anywhere (it still needs ≥2 tiles). The connection rule for every
+   * later move (DISCONNECTED) is unaffected by this flag.
+   */
+  requireFirstMoveCenter: boolean = true,
 ): MoveResult {
   if (placements.length === 0) return fail('NO_TILES');
   for (const p of placements) {
@@ -209,9 +217,11 @@ export function validateAndScoreMove(
   if (!main) return fail('NOT_CONTIGUOUS');
 
   if (isFirstMove(board)) {
-    const center = getCenter(board.size);
-    const coversCenter = placements.some((p) => p.row === center && p.col === center);
-    if (!coversCenter) return fail('FIRST_MOVE_MUST_COVER_CENTER');
+    if (requireFirstMoveCenter) {
+      const center = getCenter(board.size);
+      const coversCenter = placements.some((p) => p.row === center && p.col === center);
+      if (!coversCenter) return fail('FIRST_MOVE_MUST_COVER_CENTER');
+    }
     if (main.tiles.length < 2) return fail('FIRST_MOVE_TOO_SHORT');
   } else {
     if (!touchesExistingTile(board, placements)) return fail('DISCONNECTED');

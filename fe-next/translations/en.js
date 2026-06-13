@@ -8389,6 +8389,8 @@ const en = {
       "maxLevel": "MAX",
       "purchase": "Buy",
       "needMore": "Need {amount} more",
+      "locked": "Locked",
+      "unlocksAtWorld": "Unlocks at World {world}",
       "category": {
         "excavation": "Excavation",
         "survival": "Survival",
@@ -12858,10 +12860,10 @@ const en = {
     "tutor": {
       "title": "How to play",
       "step1": "Tap a letter from your rack",
-      "step2": "Tap an empty square to place it",
-      "step3": "When done, tap Submit",
-      "tipFirst": "First word must cover the center ★",
-      "tipScore": "Colored squares give bonus points",
+      "step2": "Tap a square to place it — that ground becomes yours",
+      "step3": "Tap Submit to claim it",
+      "tipFirst": "Build through a rival's letters to steal them",
+      "tipScore": "Control the most squares to win",
       "dismiss": "Got it!",
       "show": "How to play"
     },
@@ -13015,8 +13017,9 @@ const en = {
       "yours": "Your territory",
       "bots": "Bot territory",
       "endgameHint": "+2 each at game end",
-      "captureYou": "Captured {{count}} — +{{bonus}}!",
-      "captureBot": "Bot captured {{count}} — +{{bonus}}!"
+      "captureYou": "Stole {{count}} from your rival!",
+      "captureBot": "Rival stole {{count}} of yours!",
+      "claimPreview": "+{{count}} cells"
     },
     "duel": {
       "playFriend": "Play vs a friend",

@@ -8915,6 +8915,8 @@ const sv = {
       "maxLevel": "MAX",
       "purchase": "Köp",
       "needMore": "Behöver {amount} till",
+      "locked": "Låst",
+      "unlocksAtWorld": "Låses upp i värld {world}",
       "category": {
         "excavation": "Utgrävning",
         "survival": "Överlevnad",
@@ -13075,10 +13077,10 @@ const sv = {
     "tutor": {
       "title": "Så spelar du",
       "step1": "Tryck på en bokstav i ditt ställ",
-      "step2": "Tryck på en tom ruta för att placera",
-      "step3": "Tryck Skicka när du är klar",
-      "tipFirst": "Första ordet måste täcka ★ i mitten",
-      "tipScore": "Färgade rutor ger bonuspoäng",
+      "step2": "Tryck på en ruta för att placera — marken blir din",
+      "step3": "Tryck Skicka för att erövra den",
+      "tipFirst": "Bygg genom motståndarens bokstäver för att stjäla dem",
+      "tipScore": "Den som styr flest rutor vinner",
       "dismiss": "Uppfattat!",
       "show": "Så spelar du"
     },
@@ -13197,8 +13199,9 @@ const sv = {
       "yours": "Ditt territorium",
       "bots": "Botens territorium",
       "endgameHint": "+2 vardera vid spelets slut",
-      "captureYou": "Erövrade {{count}} — +{{bonus}}!",
-      "captureBot": "Boten erövrade {{count}} — +{{bonus}}!"
+      "captureYou": "Stal {{count}} från motståndaren!",
+      "captureBot": "Motståndaren stal {{count}} av dina!",
+      "claimPreview": "+{{count}} rutor"
     },
     "duel": {
       "playFriend": "Spela mot en vän",

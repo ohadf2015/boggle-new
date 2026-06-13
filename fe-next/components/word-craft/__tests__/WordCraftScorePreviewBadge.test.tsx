@@ -6,7 +6,8 @@ import type { PlacedTile } from '@/lib/word-craft/types';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => (key === 'wordcraft.scorePreview.bingoReady' ? 'BINGO!' : key),
+    t: (key: string, params?: Record<string, string | number>) =>
+      key === 'wordcraft.territory.claimPreview' ? `Claim ${params?.count}` : key,
   }),
 }));
 
@@ -16,34 +17,24 @@ const t = (rackTileId: string, row: number, col: number, letter: string, value: 
   col,
   letter,
   value,
+  isBlank: false,
 });
 
-describe('WordCraftScorePreviewBadge', () => {
+describe('WordCraftScorePreviewBadge (Conquest territory preview)', () => {
   it('renders nothing when there are no pending placements', () => {
-    const board = createBoard(15);
+    const board = createBoard(11, { premiums: false });
     const { container } = render(<WordCraftScorePreviewBadge board={board} placements={[]} />);
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders +N when placements form a valid layout', () => {
-    const board = createBoard(15);
+  it('previews the number of cells the pending word will claim', () => {
+    const board = createBoard(11, { premiums: false });
     const placements: PlacedTile[] = [
-      t('1', 7, 6, 'C', 3),
-      t('2', 7, 7, 'A', 1),
-      t('3', 7, 8, 'T', 1),
+      t('1', 5, 4, 'C', 3),
+      t('2', 5, 5, 'A', 1),
+      t('3', 5, 6, 'T', 1),
     ];
     render(<WordCraftScorePreviewBadge board={board} placements={placements} />);
-    expect(screen.getByText(/\+\d+/)).toBeInTheDocument();
-  });
-
-  it('shows BINGO when 7+ tiles are pending', () => {
-    const board = createBoard(15);
-    const placements: PlacedTile[] = [
-      t('1', 7, 4, 'A', 1), t('2', 7, 5, 'B', 3), t('3', 7, 6, 'C', 3),
-      t('4', 7, 7, 'D', 2), t('5', 7, 8, 'E', 1), t('6', 7, 9, 'F', 4),
-      t('7', 7, 10, 'G', 2),
-    ];
-    render(<WordCraftScorePreviewBadge board={board} placements={placements} />);
-    expect(screen.getByText('BINGO!')).toBeInTheDocument();
+    expect(screen.getByText('Claim 3')).toBeInTheDocument();
   });
 });
