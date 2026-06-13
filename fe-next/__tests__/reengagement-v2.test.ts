@@ -426,4 +426,23 @@ describe('ReengagementEmailV2 — secondary cube-image mode grid', () => {
       expect(html).not.toContain(emoji);
     }
   });
+
+  it('excludes the not-yet-public crossword mode from the secondary grid', async () => {
+    const modes = getWelcomeEmailModes('en', BASE);
+    const html = await render(ReengagementEmailV2({ ...baseProps, modes }));
+    expect(modes.some((m) => m.key === 'crossword')).toBe(false);
+    expect(html).not.toContain('/modes/cubes/crossword.png');
+  });
+});
+
+describe('ReengagementEmailV2 — Gmail dark-mode-safe CTA colour', () => {
+  it('never uses pure #000000 (Gmail dark mode would invert the lime CTA text to white)', async () => {
+    const html = await renderHtml();
+    expect(html.toLowerCase()).not.toContain('#000000');
+  });
+
+  it('paints the dark CTA elements in an off-black that survives dark-mode inversion', async () => {
+    const html = await renderHtml();
+    expect(html.toLowerCase()).toContain('#0a0a0a');
+  });
 });

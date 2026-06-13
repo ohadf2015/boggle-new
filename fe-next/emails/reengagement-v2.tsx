@@ -250,7 +250,10 @@ const C = {
   dim: '#6b6b85',
   pink: '#FF1493',
   lime: '#A8E600',
-  black: '#000000',
+  // Off-black, NOT pure #000000: Gmail (Android) dark mode force-swaps pure
+  // #000000 → #FFFFFF, which flipped the lime CTA's text + border + hard-shadow
+  // white (illegible on lime). An off-black reads identically but is left alone.
+  black: '#0A0A0A',
   divider: '#2a2a48',
 } as const;
 

@@ -71,4 +71,24 @@ describe('WelcomeEmail — dynamic cube-image mode grid', () => {
     expect(out).toContain(`${BASE}/he/multiplayer`);
     expect(modes.every((m) => m.href.includes('/he/'))).toBe(true);
   });
+
+  it('never uses pure #000000 (Gmail dark-mode inverts it to white, killing the CTA)', async () => {
+    // Gmail (Android) dark mode force-swaps pure #000000 → #FFFFFF. That turned
+    // the lime CTA's dark text + border + hard-shadow white (unreadable on lime).
+    // The whole email uses an off-black instead so dark mode leaves it alone.
+    const out = await renderHtml('en').html;
+    expect(out.toLowerCase()).not.toContain('#000000');
+  });
+
+  it('paints the CTA label in a dark off-black so it reads on the bright lime button', async () => {
+    const out = await renderHtml('en').html;
+    expect(out.toLowerCase()).toContain('#0a0a0a');
+  });
+
+  it('excludes the not-yet-public crossword mode from the grid', async () => {
+    const { modes, html } = renderHtml('en');
+    const out = await html;
+    expect(modes.some((m) => m.key === 'crossword')).toBe(false);
+    expect(out).not.toContain('/modes/cubes/crossword.png');
+  });
 });

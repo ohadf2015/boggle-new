@@ -149,14 +149,17 @@ const C = {
   bg: '#1a1a2e',
   card: '#252545',
   cardInner: '#1e1e3a',
-  border: '#000000',
+  // Off-black, NOT pure #000000: Gmail (Android) dark mode force-swaps pure
+  // #000000 → #FFFFFF, which flipped the lime CTA's text + border + hard-shadow
+  // white (illegible on lime). An off-black reads identically but is left alone.
+  border: '#0A0A0A',
   footer: '#666666',
   lime: '#A8E600',
   pink: '#FF1493',
   cyan: '#5CE0D6',
   purple: '#8B5CF6',
   white: '#FFFFFF',
-  black: '#000000',
+  black: '#0A0A0A',
   grayDark: '#374151',
   grayLight: '#9CA3AF',
   // Uniform tile chrome — one quiet edge for every mode. The cube art carries
