@@ -340,7 +340,7 @@ const BossOverlay = memo<BossOverlayProps>(
                       />
                     )}
                     <AdaptiveMotion.div
-                      className={`relative w-10 h-10 sm:w-14 sm:h-14 rounded-neo border-2 sm:border-3 ${borderClass} shadow-hard-sm overflow-hidden bg-neo-navy-light z-10`}
+                      className={`relative w-14 h-14 sm:w-20 sm:h-20 rounded-neo border-3 ${borderClass} shadow-hard overflow-hidden bg-neo-navy-light z-10`}
                       animate={
                         bossReaction === 'attacking'
                           ? bossAnims.attack.animate
@@ -368,11 +368,11 @@ const BossOverlay = memo<BossOverlayProps>(
                           alt={t(boss.displayName)}
                           fill
                           className="object-cover"
-                          sizes="64px"
+                          sizes="80px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Swords className="w-5 h-5 text-neo-yellow" />
+                          <Swords className="w-7 h-7 text-neo-yellow" />
                         </div>
                       )}
                       {/* Hit flash overlay */}
