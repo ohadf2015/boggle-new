@@ -6,6 +6,7 @@ import { ConditionalProviders } from '../conditional-providers';
 import { loadTranslation } from '@/translations/loadTranslation';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
+import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import AdSenseLoader from '@/components/ads/AdSenseLoader';
@@ -636,6 +637,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         <AutoHideFooter className="relative z-0 shrink-0" />
                         {/* Global bottom navigation - mobile only, hidden during gameplay */}
                         <GlobalBottomNav />
+                        {/* Global mute control — appears only during active gameplay, when
+                            the header (and its MusicControls) is hidden. */}
+                        <InGameAudioButton />
                     </div>
                     <AndroidAppRedirect />
                     <AndroidAppInstallPromo />

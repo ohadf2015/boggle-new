@@ -1,11 +1,8 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
-import { Volume2, VolumeX, Sparkles } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
-import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import React, { memo } from 'react';
+import { Sparkles } from 'lucide-react';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
-import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
 
 export interface SurvivalAudioEffectsControlsProps {
   t: (key: string, fallback?: string) => string;
@@ -15,52 +12,24 @@ const BTN_BASE =
   'flex items-center justify-center w-9 h-9 min-w-[36px] min-h-[36px] bg-neo-black/50 border-2 border-neo-cream/10 rounded-full hover:bg-neo-black/70 active:scale-95 transition-all duration-150';
 
 /**
- * SurvivalAudioEffectsControls — in-game audio + effects toggles.
+ * SurvivalAudioEffectsControls — in-game effects toggle.
  *
- * The app's main MusicControls live in the global header, which AutoHideHeader
- * removes during active gameplay — so the daily challenge had no on-screen mute
- * or effects control. This compact pair sits in the in-game header bar:
- *  - Audio button mutes/unmutes music AND sfx together (master-mute parity).
- *  - Effects button suppresses particles/flashes/confetti (remembered).
+ * Mute lives in the global InGameAudioButton FAB now (mounted in the locale
+ * layout, shown during all active gameplay), so this no longer renders its own
+ * audio button — that would double up the mute on the daily challenge screens.
+ * The effects toggle stays here because the FAB is mute-only: it suppresses
+ * particles/flashes/confetti (remembered) and reuses the established effects.*
+ * keys (already localized in every locale).
  */
 export const SurvivalAudioEffectsControls = memo<SurvivalAudioEffectsControlsProps>(({ t }) => {
-  const { isMuted, toggleMute, audioUnlocked, unlockAudio } = useMusic();
-  const { sfxMuted, toggleSfxMute } = useSoundEffects();
   const [effectsReduced, toggleEffects] = useReducedEffects();
 
-  const allMuted = isMuted && sfxMuted;
-
-  // Mirrors MusicControls: locked → unlock + move toward audible (the enable
-  // tap is never swallowed and never mutes); unlocked → silence-wins toggle.
-  const handleAudioClick = useCallback(() => {
-    const action = resolveMasterMuteClick({ audioUnlocked, isMuted, sfxMuted });
-    if (action.unlock) unlockAudio();
-    if (action.toggleMusic) toggleMute();
-    if (action.toggleSfx) toggleSfxMute();
-  }, [audioUnlocked, unlockAudio, isMuted, sfxMuted, toggleMute, toggleSfxMute]);
-
-  const audioLabel = allMuted ? t('music.unmute', 'Unmute') : t('music.mute', 'Mute');
-  // Reuse the established effects.* keys (already localized in every locale) so
-  // the toggle needs no new translation strings.
   const effectsLabel = effectsReduced
     ? t('effects.enable', 'Enable effects')
     : t('effects.disableAnimations', 'Disable effects');
 
   return (
     <div className="flex items-center gap-1.5" role="group" aria-label={t('music.controls', 'Sound controls')}>
-      <button
-        type="button"
-        onClick={handleAudioClick}
-        className={`${BTN_BASE} ${allMuted ? 'text-neo-white' : 'text-neo-white'}`}
-        aria-label={audioLabel}
-        aria-pressed={!allMuted}
-        title={allMuted ? t('music.soundOff', 'Sound off') : t('music.soundOn', 'Sound on')}
-      >
-        {allMuted
-          ? <VolumeX className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
-          : <Volume2 className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />}
-      </button>
-
       <button
         type="button"
         onClick={toggleEffects}

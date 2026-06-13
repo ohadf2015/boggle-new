@@ -152,7 +152,7 @@ const MusicControls: React.FC = memo(() => {
                 border-3 border-neo-black
                 rounded-neo
                 shadow-hard-lg
-                z-50
+                z-[70]
               "
               style={{
                 top: dropdownPosition.top,
