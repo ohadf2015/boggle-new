@@ -353,6 +353,13 @@ export interface EnhancedEffectsManager {
   destroy(): void;
 }
 
+/**
+ * Hard ceiling (ms) on a single tile effect's lifetime. Real shatter/dissolve
+ * effects finish in well under a second; this only fires when a promise stalls,
+ * forcing cleanup so orphaned sprites/particles can't linger forever.
+ */
+const EFFECT_MAX_LIFETIME_MS = 3000;
+
 /** Create an enhanced effects manager bound to a PixiJS app and container. */
 export function createEnhancedEffects(
   app: Application,
@@ -360,6 +367,7 @@ export function createEnhancedEffects(
   cellSize: number,
 ): EnhancedEffectsManager {
   const activeEffects = new Set<Container>();
+  const effectTimers = new Set<ReturnType<typeof setTimeout>>();
   let destroyed = false;
 
   function shatterTile(x: number, y: number, tileType: string): void {
@@ -414,7 +422,14 @@ export function createEnhancedEffects(
     camera.addChild(effect);
     activeEffects.add(effect);
 
+    let settled = false;
+    let backstop: ReturnType<typeof setTimeout> | null = null;
+
     const cleanup = () => {
+      // Run exactly once — whichever of (promise settle, timeout backstop) wins.
+      if (settled) return;
+      settled = true;
+      if (backstop !== null) { clearTimeout(backstop); effectTimers.delete(backstop); backstop = null; }
       activeEffects.delete(effect);
       // If manager was already destroyed, containers were cleaned up in destroy()
       if (destroyed) return;
@@ -429,6 +444,12 @@ export function createEnhancedEffects(
       }
       try { sprite.destroy(); } catch { /* */ }
     };
+
+    // Backstop: if the custom-pixi-particles promise never settles (renderer torn
+    // down mid-animation, ticker callback dropped), force cleanup after a hard
+    // ceiling so orphaned proxies + red bomb shards can't linger on camera forever.
+    backstop = setTimeout(cleanup, EFFECT_MAX_LIFETIME_MS);
+    effectTimers.add(backstop);
 
     promise.then(cleanup).catch(cleanup);
   }
@@ -498,6 +519,9 @@ export function createEnhancedEffects(
 
   function destroy(): void {
     destroyed = true;
+    // Cancel pending backstop timers so none fires a late cleanup after teardown.
+    for (const timer of effectTimers) clearTimeout(timer);
+    effectTimers.clear();
     for (const effect of activeEffects) {
       try { if (effect.parent) effect.parent.removeChild(effect); } catch { /* */ }
       try { removeFromTicker(effect); } catch { /* already removed */ }

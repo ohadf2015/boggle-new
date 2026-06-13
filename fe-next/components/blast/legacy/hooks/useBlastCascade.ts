@@ -21,6 +21,8 @@ import {
   CASCADE_HIGHLIGHT_LINGER,
 } from '../types';
 import type { WaveConfig } from '../utils/blastWaveConfig';
+import { diffClearedTiles } from '../utils/diffClearedTiles';
+import type { ClearedTileEvent } from '../BlastEffectsCanvas';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { UseBlastComboStreakReturn } from './useBlastComboStreak';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
@@ -45,6 +47,8 @@ interface CascadeDeps {
   waveConfig?: WaveConfig;
   setCascadeHighlightCells: (cells: Array<{ row: number; col: number }>) => void;
   setCascadeHighlightWord: (word: string | null) => void;
+  /** Feeds cascade-cleared tiles to the PixiJS FX layer (shatter/debris). */
+  setClearedTilesForEffects: (tiles: ClearedTileEvent[]) => void;
   setScoreFlyEvents: React.Dispatch<React.SetStateAction<ScoreFlyEvent[]>>;
   setComboFlash: (flash: { id: string; tier: 1 | 2 | 3 } | null) => void;
   flyIdRef: React.RefObject<number>;
@@ -57,7 +61,7 @@ export function useBlastCascade(deps: CascadeDeps) {
     const {
       engine, sequencer, sounds, comboStreak, checkWord, waveConfig,
       setCascadeHighlightCells, setCascadeHighlightWord,
-      setScoreFlyEvents, setComboFlash, flyIdRef,
+      setScoreFlyEvents, setComboFlash, flyIdRef, setClearedTilesForEffects,
     } = deps;
 
     // Build cascade momentum
@@ -147,11 +151,18 @@ export function useBlastCascade(deps: CascadeDeps) {
         await new Promise<void>(r => setTimeout(r, CASCADE_HIGHLIGHT_LINGER));
         setCascadeHighlightCells([]);
 
-        // Submit all finds
+        // Submit all finds. Snapshot tiles before/after so the cascade's cleared
+        // cells reach the FX layer — without this, cascade-cleared tiles vanished
+        // with only the highlight + gravity (Bug: "tiles disappear without effect").
+        const preCascade = structuredClone(engine.getLatestState().tileStates);
         for (const find of cascadeFinds) {
           const bonus = find.bonusFn(chainLevel);
           engine.submitWord(find.cells, find.label, bonus);
           foundWordsSet.add(find.label);
+        }
+        const cascadeCleared = diffClearedTiles(preCascade, engine.getLatestState().tileStates);
+        if (cascadeCleared.length > 0) {
+          setClearedTilesForEffects(cascadeCleared.map(c => ({ row: c.row, col: c.col, type: c.type })));
         }
 
         // Cascade chain sound + score fly

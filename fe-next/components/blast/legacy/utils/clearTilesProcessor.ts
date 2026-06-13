@@ -28,6 +28,9 @@ import {
   FUSE_DEFUSE_BONUS,
   FUSE_DEFUSE_MOVES,
   ANCHOR_LENGTH_BONUS,
+  BLAST_MAX_CHAIN_DETONATIONS,
+  BLAST_MAX_CHAIN_CLEAR_FRACTION,
+  BLAST_MIN_CHAIN_CLEAR_CAP,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -138,6 +141,14 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     next, gridSize, now, prev, path,
     bombQueue, processedBombs, processedLightning,
     markCleared, isMultiHitAlive, hitMultiHitTile,
+    // Runaway-chain guard: one move can't detonate more than N specials, nor
+    // clear more than ~half the board. Bounds the bomb/lightning/prism cascade.
+    chainBudget: {
+      detonations: 0,
+      cleared: 0,
+      maxDetonations: BLAST_MAX_CHAIN_DETONATIONS,
+      maxCleared: Math.max(BLAST_MIN_CHAIN_CLEAR_CAP, Math.floor(gridSize * gridSize * BLAST_MAX_CHAIN_CLEAR_FRACTION)),
+    },
   };
 
   // ── Combo detection (skip if caller already detected) ──

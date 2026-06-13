@@ -36,6 +36,38 @@ export interface TileEffectContext {
   markCleared: (t: BlastTileState) => void;
   isMultiHitAlive: (t: BlastTileState) => boolean;
   hitMultiHitTile: (t: BlastTileState) => void;
+  /**
+   * Optional runaway-chain budget. When present, chain effects (bomb BFS,
+   * lightning/prism/magnet) stop detonating once `maxDetonations` or `maxCleared`
+   * is reached, so one word can't wipe half the board. Absent → uncapped (legacy
+   * behaviour; keeps hand-built test contexts working).
+   */
+  chainBudget?: { detonations: number; cleared: number; maxDetonations: number; maxCleared: number };
+}
+
+// ── Runaway-chain budget helpers ─────────────────────────────────────────
+// A "detonation" = one bomb pop / lightning column / prism cross / magnet blast.
+// The detonation cap is checked at detonation boundaries (atomic — a special
+// fully fires or not at all). The clear ceiling is the hard backstop and is
+// checked per-tile so an extreme runaway is clipped rather than overshooting.
+
+/** True once the per-move detonation cap is reached. */
+function chainAtDetonationCap(ctx: TileEffectContext): boolean {
+  return !!ctx.chainBudget && ctx.chainBudget.detonations >= ctx.chainBudget.maxDetonations;
+}
+/** Record one special detonation. */
+function noteDetonation(ctx: TileEffectContext): void {
+  if (ctx.chainBudget) ctx.chainBudget.detonations++;
+}
+/** True once the per-move chain-clear ceiling is reached. */
+function chainAtClearCap(ctx: TileEffectContext): boolean {
+  return !!ctx.chainBudget && ctx.chainBudget.cleared >= ctx.chainBudget.maxCleared;
+}
+/** Clear a tile through a chain effect and count it against the ceiling.
+ *  Caller must have already checked `!t.isCleared`. */
+function chainMarkCleared(ctx: TileEffectContext, t: BlastTileState): void {
+  ctx.markCleared(t);
+  if (ctx.chainBudget) ctx.chainBudget.cleared++;
 }
 
 export interface EffectResult {
@@ -137,8 +169,10 @@ export function fireLightningColumn(
   col: number,
   ctx: TileEffectContext,
 ): number {
-  const { next, gridSize, processedBombs, bombQueue, markCleared, isMultiHitAlive, hitMultiHitTile } = ctx;
+  const { next, gridSize, processedBombs, bombQueue, isMultiHitAlive, hitMultiHitTile } = ctx;
   let bonus = 0;
+  if (chainAtDetonationCap(ctx)) return 0;
+  noteDetonation(ctx);
   for (let r = 0; r < gridSize; r++) {
     if (r === sourceRow) continue;
     const target = next[r][col];
@@ -146,7 +180,8 @@ export function fireLightningColumn(
     if (isMultiHitAlive(target)) {
       hitMultiHitTile(target);
     } else {
-      markCleared(target);
+      if (chainAtClearCap(ctx)) break;
+      chainMarkCleared(ctx, target);
       bonus += LIGHTNING_COLUMN_CLEAR_BONUS;
       if (target.type === 'bomb' && !processedBombs.has(`${r},${col}`)) {
         processedBombs.add(`${r},${col}`);
@@ -169,8 +204,10 @@ export function firePrismCross(
   ctx: TileEffectContext,
   chainLightning: boolean = true,
 ): number {
-  const { next, gridSize, processedBombs, processedLightning, bombQueue, markCleared, isMultiHitAlive, hitMultiHitTile } = ctx;
+  const { next, gridSize, processedBombs, processedLightning, bombQueue, isMultiHitAlive, hitMultiHitTile } = ctx;
   let bonus = 0;
+  if (chainAtDetonationCap(ctx)) return 0;
+  noteDetonation(ctx);
 
   const clearLine = (r: number, c: number) => {
     const target = next[r][c];
@@ -178,7 +215,8 @@ export function firePrismCross(
     if (isMultiHitAlive(target)) {
       hitMultiHitTile(target);
     } else {
-      markCleared(target);
+      if (chainAtClearCap(ctx)) return;
+      chainMarkCleared(ctx, target);
       if (target.type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
         processedBombs.add(`${r},${c}`);
         bombQueue.push({ row: r, col: c, depth: 0 });
@@ -210,8 +248,10 @@ export function fireMagnetExplode(
   col: number,
   ctx: TileEffectContext,
 ): number {
-  const { next, gridSize, processedBombs, bombQueue, markCleared, isMultiHitAlive, hitMultiHitTile } = ctx;
+  const { next, gridSize, processedBombs, bombQueue, isMultiHitAlive, hitMultiHitTile } = ctx;
   let bonus = 0;
+  if (chainAtDetonationCap(ctx)) return 0;
+  noteDetonation(ctx);
   for (let dr = -VORTEX_EXPLODE_RADIUS; dr <= VORTEX_EXPLODE_RADIUS; dr++) {
     for (let dc = -VORTEX_EXPLODE_RADIUS; dc <= VORTEX_EXPLODE_RADIUS; dc++) {
       if (dr === 0 && dc === 0) continue;
@@ -223,7 +263,8 @@ export function fireMagnetExplode(
       if (isMultiHitAlive(target)) {
         hitMultiHitTile(target);
       } else {
-        markCleared(target);
+        if (chainAtClearCap(ctx)) break;
+        chainMarkCleared(ctx, target);
         bonus += VORTEX_EXPLODE_BONUS;
         if (target.type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
           processedBombs.add(`${r},${c}`);
@@ -294,12 +335,16 @@ export function fireVortexPull(
 export function processBombBFS(
   ctx: TileEffectContext,
 ): EffectResult {
-  const { next, gridSize, bombQueue, processedBombs, markCleared, isMultiHitAlive, hitMultiHitTile, now } = ctx;
+  const { next, gridSize, bombQueue, processedBombs, isMultiHitAlive, hitMultiHitTile, now } = ctx;
   let bonusScore = 0;
   const explosions: BlastExplosion[] = [];
 
   while (bombQueue.length > 0) {
+    // Stop chaining once the move's detonation cap or clear ceiling is hit —
+    // leftover queued bombs stay un-detonated on the board rather than wiping it.
+    if (chainAtDetonationCap(ctx) || chainAtClearCap(ctx)) break;
     const bomb = bombQueue.shift()!;
+    noteDetonation(ctx);
     const staggeredTime = now + bomb.depth * CHAIN_BOMB_STAGGER;
     explosions.push({
       id: `bomb-${staggeredTime}-${bomb.row}-${bomb.col}`,
@@ -316,7 +361,8 @@ export function processBombBFS(
             if (isMultiHitAlive(next[r][c])) {
               hitMultiHitTile(next[r][c]);
             } else {
-              markCleared(next[r][c]);
+              if (chainAtClearCap(ctx)) break;
+              chainMarkCleared(ctx, next[r][c]);
               bonusScore += BOMB_AREA_CLEAR_BONUS;
               if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
                 processedBombs.add(`${r},${c}`);

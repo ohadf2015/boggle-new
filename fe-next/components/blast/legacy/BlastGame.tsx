@@ -263,6 +263,7 @@ export function BlastGame({
     waveConfig,
     setCascadeHighlightCells, setCascadeHighlightWord,
     setScoreFlyEvents, setComboFlash, flyIdRef,
+    setClearedTilesForEffects,
   });
 
   // Word-accepted pipeline (extracted to useBlastWordHandler)

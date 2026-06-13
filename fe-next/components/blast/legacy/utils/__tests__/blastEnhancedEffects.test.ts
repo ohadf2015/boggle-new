@@ -421,4 +421,55 @@ describe('blastEnhancedEffects', () => {
       expect(() => manager.destroy()).not.toThrow();
     });
   });
+
+  describe('stalled-effect timeout backstop', () => {
+    it('force-cleans an effect whose promise never settles, after the max lifetime', () => {
+      // custom-pixi-particles can stall (renderer torn down mid-animation, ticker
+      // callback dropped) → the proxy + red bomb shards would otherwise stay on
+      // camera forever. A timeout backstop must clean it up regardless.
+      vi.useFakeTimers();
+      mockExplode.mockReturnValue(new Promise<void>(() => { /* never resolves */ }));
+
+      const manager = createEnhancedEffects(app, camera, 50);
+      manager.shatterTile(50, 50, 'bomb');
+
+      // Promise never settles → nothing cleaned yet.
+      expect(mockShatterDestroy).not.toHaveBeenCalled();
+
+      // Advance well past any real effect duration.
+      vi.advanceTimersByTime(5000);
+
+      expect(mockShatterDestroy).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
+
+    it('does not double-clean when the promise settles normally before the timeout', async () => {
+      vi.useFakeTimers();
+      mockExplode.mockResolvedValue(undefined);
+
+      const manager = createEnhancedEffects(app, camera, 50);
+      manager.shatterTile(50, 50, 'bomb');
+
+      // Let the resolved promise's .then(cleanup) run, then exhaust any timers.
+      await vi.runAllTimersAsync();
+
+      expect(mockShatterDestroy).toHaveBeenCalledTimes(1);
+      vi.useRealTimers();
+    });
+
+    it('clears pending backstop timers on destroy (no late cleanup after teardown)', () => {
+      vi.useFakeTimers();
+      mockExplode.mockReturnValue(new Promise<void>(() => { /* never resolves */ }));
+
+      const manager = createEnhancedEffects(app, camera, 50);
+      manager.shatterTile(50, 50, 'bomb');
+      manager.destroy(); // cleans the active effect once
+
+      const callsAfterDestroy = mockShatterDestroy.mock.calls.length;
+      // A leftover timer must NOT fire a second cleanup after teardown.
+      vi.advanceTimersByTime(5000);
+      expect(mockShatterDestroy.mock.calls.length).toBe(callsAfterDestroy);
+      vi.useRealTimers();
+    });
+  });
 });

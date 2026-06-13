@@ -10,6 +10,7 @@
 
 import { useCallback, type Dispatch, type SetStateAction, type MutableRefObject } from 'react';
 import { detectSpecialCombos, type SpecialCombo } from '../utils/blastCombos';
+import { diffClearedTiles } from '../utils/diffClearedTiles';
 import { detectNearMiss } from '../utils/blastNearMiss';
 import { vibrateBlastBomb, vibrateBlastLightning, vibrateBlastPrism } from '@/components/grid/hapticFeedback';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
@@ -118,10 +119,9 @@ export function useBlastWordHandler({
     }));
     await sequencer.animateWordClear(clearedInfo);
 
-    // 1b. Fire cleared tile events for PixiJS particle effects
-    effects.setClearedTilesForEffects(clearedInfo.map(c => ({
-      row: c.row, col: c.col, type: c.type as BlastTileType,
-    })));
+    // 1b. FX feed is deferred until AFTER submitWord (below): only then is the full
+    // cleared set — word path PLUS bomb/lightning/prism chain neighbours — known.
+    // Feeding the word path alone here left chain-cleared tiles vanishing silently.
 
     // 2. Submit to engine — fold in the deterministic letter-value bonus (organic,
     // non-round totals; matches the server's MP total exactly), then apply the
@@ -150,6 +150,17 @@ export function useBlastWordHandler({
 
     // 2a. Capture post-grid snapshot after engine processing
     const postGrid = structuredClone(engine.tileStates);
+
+    // 2b. Feed the FULL cleared set to the PixiJS FX layer — word path AND every
+    // bomb/lightning/prism chain neighbour the engine cleared. Diffing pre→post
+    // (gravity hasn't run yet) recovers them; without this, chain-cleared tiles
+    // disappeared with no shatter/debris (Bug: "tiles vanish without effect").
+    const clearedForFx = diffClearedTiles(preGrid, postGrid);
+    effects.setClearedTilesForEffects(
+      clearedForFx.length > 0
+        ? clearedForFx.map(c => ({ row: c.row, col: c.col, type: c.type }))
+        : clearedInfo.map(c => ({ row: c.row, col: c.col, type: c.type as BlastTileType })),
+    );
 
     // 3. Score fly effect
     const avgRow = path.reduce((s, p) => s + p.row, 0) / path.length;

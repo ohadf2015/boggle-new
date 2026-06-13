@@ -151,6 +151,20 @@ export const DIAMOND_REVEAL_TURNS = 3;
 /** Number of adjacent cells a bomb clears */
 export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
 
+/**
+ * Runaway-chain guards (Bug: "too much blast radius — half the level disappears").
+ * Bomb BFS + lightning/prism chains had no bound, so a dense special cluster could
+ * detonate most of the board from one word. These cap a single move's chain so it
+ * never wipes more than ~half the board. Normal 1–2-special chains sit well under
+ * both limits, so ordinary play is never clipped.
+ */
+/** Max number of chained special detonations (bomb pop / lightning column / prism cross) per move. */
+export const BLAST_MAX_CHAIN_DETONATIONS = 8;
+/** Hard ceiling on tiles cleared by chain effects, as a fraction of the board. */
+export const BLAST_MAX_CHAIN_CLEAR_FRACTION = 0.5;
+/** Floor for the chain-clear ceiling on tiny boards. */
+export const BLAST_MIN_CHAIN_CLEAR_CAP = 8;
+
 // ==================== Vortex (Magnet Rework) Constants ====================
 
 /** Pull radius for Vortex tile (Manhattan distance) */
