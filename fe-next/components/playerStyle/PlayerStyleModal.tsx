@@ -40,28 +40,31 @@ export function PlayerStyleModal({ isOpen, onDismiss }: PlayerStyleModalProps) {
       onClick={() => onDismiss()}
     >
       <div
-        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-neo border-neo-thick border-neo-black bg-neo-navy p-5 shadow-hard-lg"
+        className="flex max-h-[90vh] w-full max-w-md flex-col rounded-neo border-neo-thick border-neo-black bg-neo-navy p-5 shadow-hard-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-1 text-center font-neo-display text-2xl font-bold text-neo-cream">
-          {t('playerStyle.popup.title')}
-        </h2>
-        <p className="mb-4 text-center font-neo-body text-sm text-neo-cream/70">
-          {t('playerStyle.popup.subtitle')}
-        </p>
+        <div className="shrink-0">
+          <h2 className="mb-1 text-center font-neo-display text-2xl font-bold text-neo-cream">
+            {t('playerStyle.popup.title')}
+          </h2>
+          <p className="mb-4 text-center font-neo-body text-sm text-neo-cream/70">
+            {t('playerStyle.popup.subtitle')}
+          </p>
+        </div>
 
         <StylePicker
           confirmLabelKey="playerStyle.popup.save"
           onConfirm={(key) => onDismiss(key)}
+          footerExtra={
+            <button
+              type="button"
+              onClick={() => onDismiss()}
+              className="mx-auto block font-neo-body text-xs text-neo-cream/60 underline hover:text-neo-cream"
+            >
+              {t('playerStyle.popup.keepDefault')}
+            </button>
+          }
         />
-
-        <button
-          type="button"
-          onClick={() => onDismiss()}
-          className="mx-auto mt-3 block font-neo-body text-xs text-neo-cream/60 underline hover:text-neo-cream"
-        >
-          {t('playerStyle.popup.keepDefault')}
-        </button>
       </div>
     </div>
   );

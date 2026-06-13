@@ -41,6 +41,7 @@ import {
 import { CosmeticCollection } from '@/components/cosmetics/CosmeticCollection';
 import { SeasonTrophyCase } from '@/components/seasons/SeasonTrophyCase';
 import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
+import { ProfileStyleCard } from '@/components/playerStyle/ProfileStyleCard';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { useCoinContext } from '@/contexts/CoinContext';
 
@@ -306,6 +307,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 transition={{ duration: 0.2 }}
               >
                 <ProfileHeader {...profileHeaderProps} compact />
+                <ProfileStyleCard isDarkMode={isDarkMode} delay={0.18} />
                 <ProfileXpSection profile={profile} isDarkMode={isDarkMode} compact onProfileRefresh={refreshProfile} />
                 <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} compact />
                 <CreatorProfileStats stats={getCreatorStats()} className="mt-4" />
@@ -386,6 +388,9 @@ export default function ProfilePageClient(): React.JSX.Element {
         <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full flex flex-col gap-6', 'py-6 lg:py-8')}>
           {/* 1. Hero Banner */}
           <ProfileHeader {...profileHeaderProps} />
+
+          {/* 1b. Player style (music + accent + avatar) — admin-gated */}
+          <ProfileStyleCard isDarkMode={isDarkMode} delay={0.12} />
 
           {/* 2. Stats Grid */}
           <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} delay={0.1} />

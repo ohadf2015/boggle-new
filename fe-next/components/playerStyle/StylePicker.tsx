@@ -18,7 +18,7 @@ import { STYLE_KEYS, STYLES, type PlayerStyleKey } from '@/lib/playerStyle/style
 import { buildStyledAvatarConfig } from '@/lib/playerStyle/styledAvatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Check } from 'lucide-react';
 
 export interface StylePickerProps {
   /** Called after the choice is committed. */
@@ -27,12 +27,15 @@ export interface StylePickerProps {
   confirmLabelKey?: string;
   /** Show the confirm button (modal/onboarding). Off = caller owns the CTA. */
   showConfirm?: boolean;
+  /** Extra node pinned in the always-visible footer (e.g. modal "keep default"). */
+  footerExtra?: React.ReactNode;
 }
 
 export function StylePicker({
   onConfirm,
   confirmLabelKey = 'playerStyle.picker.confirm',
   showConfirm = true,
+  footerExtra,
 }: StylePickerProps) {
   const { t } = useLanguage();
   const { updateProfile } = useAuth();
@@ -89,9 +92,10 @@ export function StylePicker({
   }, [selected, styleAvatar, avatarPreview, setStyle, updateProfile, stopSnippet, onConfirm]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      {/* Scrollable card region — bottom section stays pinned + always visible. */}
       <div
-        className="grid grid-cols-3 gap-3 sm:grid-cols-4"
+        className="grid min-h-0 flex-1 grid-cols-3 content-start gap-3 overflow-y-auto px-4 pb-1 pt-4 sm:grid-cols-4"
         role="radiogroup"
         aria-label={t('playerStyle.picker.title')}
       >
@@ -107,18 +111,28 @@ export function StylePicker({
               aria-checked={isSelected}
               onClick={() => handleSelect(key)}
               className={[
-                'group relative flex flex-col items-center gap-1.5 rounded-neo border-neo-thick border-neo-black bg-neo-navy-light p-2 transition-transform',
+                'group relative flex flex-col items-center gap-1.5 rounded-neo border-neo-thick p-2 transition-all duration-150',
                 isSelected
-                  ? 'ring-4 ring-accent shadow-hard-pressed translate-x-[1px] translate-y-[1px]'
-                  : 'shadow-hard hover:-translate-y-0.5 active:translate-y-0',
+                  ? 'z-10 -translate-y-1 scale-[1.07] border-accent bg-accent/20 shadow-hard-lg ring-4 ring-accent ring-offset-2 ring-offset-neo-navy'
+                  : 'border-neo-black bg-neo-navy-light shadow-hard hover:-translate-y-0.5 active:translate-y-0',
               ].join(' ')}
             >
+              {isSelected && (
+                <span className="absolute -start-2 -top-2 z-20 flex h-5 w-5 items-center justify-center rounded-full border-neo border-neo-black bg-accent text-neo-black shadow-hard-sm">
+                  <Check className="h-3 w-3" strokeWidth={3.5} />
+                </span>
+              )}
               {isCurrent && (
-                <span className="absolute -top-2 -inset-e-2 z-10 rounded-full border-neo border-neo-black bg-accent px-1.5 py-0.5 text-[9px] font-neo-display font-bold text-neo-black">
+                <span className="absolute -top-2 -inset-e-2 z-20 rounded-full border-neo border-neo-black bg-accent px-1.5 py-0.5 text-[9px] font-neo-display font-bold text-neo-black">
                   {t('playerStyle.picker.current')}
                 </span>
               )}
-              <span className="relative aspect-square w-full overflow-hidden rounded-neo bg-neo-navy">
+              <span
+                className={[
+                  'relative aspect-square w-full overflow-hidden rounded-neo bg-neo-navy transition-transform',
+                  isSelected ? 'scale-105' : '',
+                ].join(' ')}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={style.mascot}
@@ -130,7 +144,7 @@ export function StylePicker({
               <span
                 className={[
                   'font-neo-body text-[11px] leading-tight',
-                  isSelected ? 'text-accent font-bold' : 'text-neo-cream',
+                  isSelected ? 'font-bold text-accent' : 'text-neo-cream',
                 ].join(' ')}
               >
                 {style.emoji} {t(style.labelKey)}
@@ -140,6 +154,8 @@ export function StylePicker({
         })}
       </div>
 
+      {/* Pinned footer — avatar opt-in + confirm + caller extras stay in view. */}
+      <div className="flex shrink-0 flex-col gap-3 border-t-2 border-neo-black/40 pt-3">
       {/* Opt-in: match the avatar to the style (genre parts + accent, random face) */}
       <div className="flex items-center justify-center gap-3 rounded-neo border-neo border-neo-black bg-neo-navy-light p-2.5">
         <label className="flex cursor-pointer items-center gap-2 font-neo-body text-xs text-neo-cream">
@@ -179,6 +195,9 @@ export function StylePicker({
           {t(confirmLabelKey)}
         </button>
       )}
+
+        {footerExtra}
+      </div>
     </div>
   );
 }
