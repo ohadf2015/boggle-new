@@ -16,7 +16,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import {
   UPGRADE_CATEGORIES,
-  getAvailableUpgrades,
+  getUpgradesByCategory,
   getUpgradeTier,
   getNextTierCost,
   canAffordUpgrade,
@@ -47,11 +47,14 @@ export function UpgradeShop({
   const [activeCategory, setActiveCategory] = useState<UpgradeCategory>('excavation');
   const [flashId, setFlashId] = useState<string | null>(null);
 
-  const available = useMemo(() => getAvailableUpgrades(currentWorld), [currentWorld]);
-  const categoryUpgrades = useMemo(
-    () => available.filter(u => u.category === activeCategory),
-    [available, activeCategory]
-  );
+  // Show EVERY upgrade in the category — locked ones (unlockWorld > currentWorld) render as
+  // greyed "Unlocks at World N" teasers so the shop reads full and gives the player goals,
+  // instead of an near-empty modal early on. Buyable upgrades sort to the top.
+  const categoryUpgrades = useMemo(() => {
+    return getUpgradesByCategory(activeCategory)
+      .map(u => ({ upgrade: u, isLocked: u.unlockWorld > currentWorld }))
+      .sort((a, b) => Number(a.isLocked) - Number(b.isLocked));
+  }, [activeCategory, currentWorld]);
 
   const handlePurchase = (upgradeId: string) => {
     const result = purchaseUpgrade(upgrades, upgradeId, gold);
@@ -79,7 +82,7 @@ export function UpgradeShop({
       {/* Category tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {UPGRADE_CATEGORIES.map(cat => {
-          const catCount = available.filter(u => u.category === cat.id).length;
+          const catCount = getUpgradesByCategory(cat.id).length;
           if (catCount === 0) return null;
           return (
             <button
@@ -103,7 +106,7 @@ export function UpgradeShop({
       {/* Upgrade cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <AdaptiveAnimatePresence mode="popLayout">
-          {categoryUpgrades.map(upgrade => (
+          {categoryUpgrades.map(({ upgrade, isLocked }) => (
             <UpgradeCard
               key={upgrade.id}
               upgrade={upgrade}
@@ -111,6 +114,7 @@ export function UpgradeShop({
               nextCost={getNextTierCost(upgrades, upgrade.id)}
               canAfford={canAffordUpgrade(upgrades, upgrade.id, gold)}
               isFlashing={flashId === upgrade.id}
+              isLocked={isLocked}
               onPurchase={handlePurchase}
               t={t}
             />
@@ -131,11 +135,12 @@ interface UpgradeCardProps {
   nextCost: number | null;
   canAfford: boolean;
   isFlashing: boolean;
+  isLocked?: boolean;
   onPurchase: (id: string) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
-function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchase, t }: UpgradeCardProps) {
+function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, isLocked = false, onPurchase, t }: UpgradeCardProps) {
   const isMaxed = nextCost === null;
   const maxTier = upgrade.tiers.length;
 
@@ -146,14 +151,16 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       data-testid="upgrade-card"
+      aria-disabled={isLocked || undefined}
       className={cn(
         'relative bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4 flex flex-col gap-3',
-        isFlashing && 'ring-2 ring-neo-lime'
+        isFlashing && 'ring-2 ring-neo-lime',
+        isLocked && 'opacity-70 grayscale-[0.4]'
       )}
     >
       {/* Icon + Name */}
       <div className="flex items-center gap-3">
-        <div className="relative w-12 h-12 shrink-0">
+        <div className={cn('relative w-12 h-12 shrink-0', isLocked && 'opacity-60')}>
           <Image
             src={`/images/upgrades/${upgrade.icon}`}
             alt={t(upgrade.nameKey)}
@@ -171,6 +178,22 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
           </p>
         </div>
       </div>
+
+      {/* Locked teaser — show the player what's coming and when it unlocks. */}
+      {isLocked && (
+        <div
+          data-testid="upgrade-card-locked"
+          className="mt-auto flex items-center justify-center gap-2 pt-2 border-t border-neo-white/10 text-neo-yellow"
+        >
+          <Lock className="w-4 h-4" />
+          <span className="text-xs font-neo-display font-bold uppercase tracking-wide">
+            {t('adventure.upgrades.unlocksAtWorld', { world: upgrade.unlockWorld })}
+          </span>
+        </div>
+      )}
+
+      {!isLocked && (
+        <>
 
       {/* Tier pips */}
       <div className="flex items-center gap-1">
@@ -265,6 +288,8 @@ function UpgradeCard({ upgrade, tier, nextCost, canAfford, isFlashing, onPurchas
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>
+        </>
+      )}
     </AdaptiveMotion.div>
   );
 }

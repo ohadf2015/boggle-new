@@ -79,9 +79,39 @@ describe('UpgradeShop', () => {
       expect(screen.getByTestId('category-mastery')).toBeInTheDocument();
     });
 
-    it('should NOT show mastery category when world < 5', () => {
-      render(<UpgradeShop {...defaultProps} currentWorld={3} />);
-      expect(screen.queryByTestId('category-mastery')).not.toBeInTheDocument();
+    it('should show ALL four category tabs even at world 1 (locked ones are teasers)', () => {
+      render(<UpgradeShop {...defaultProps} currentWorld={1} />);
+      expect(screen.getByTestId('category-excavation')).toBeInTheDocument();
+      expect(screen.getByTestId('category-survival')).toBeInTheDocument();
+      expect(screen.getByTestId('category-fortune')).toBeInTheDocument();
+      // Mastery upgrades unlock later but the tab is shown so players see what's coming.
+      expect(screen.getByTestId('category-mastery')).toBeInTheDocument();
+    });
+  });
+
+  describe('locked upgrade teasers', () => {
+    it('renders locked upgrades (above current world) as teaser cards', () => {
+      // Excavation at world 1: wordRadar(unlockWorld 1) + deepDrill/gemDetector(unlockWorld 3).
+      render(<UpgradeShop {...defaultProps} currentWorld={1} />);
+      const cards = screen.getAllByTestId('upgrade-card');
+      // All three excavation upgrades render, not just the unlocked one.
+      expect(cards.length).toBe(3);
+    });
+
+    it('shows an "unlocks at world" label on locked teasers', () => {
+      render(<UpgradeShop {...defaultProps} currentWorld={1} />);
+      expect(screen.getAllByText('adventure.upgrades.unlocksAtWorld').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('does not render a purchase button on locked teasers', () => {
+      // Only wordRadar is buyable at world 1 (gold 500 covers its 60 cost).
+      render(<UpgradeShop {...defaultProps} currentWorld={1} gold={500} />);
+      expect(screen.getAllByText('adventure.upgrades.purchase').length).toBe(1);
+    });
+
+    it('marks locked teaser cards via data-testid', () => {
+      render(<UpgradeShop {...defaultProps} currentWorld={1} />);
+      expect(screen.getAllByTestId('upgrade-card-locked').length).toBe(2);
     });
   });
 
