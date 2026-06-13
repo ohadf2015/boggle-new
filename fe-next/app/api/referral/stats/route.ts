@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 import {
   COINS_PER_REFERRAL,
@@ -12,16 +13,14 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    // Local JWT verify (sub-ms) when fetchWithAuth sends a Bearer token; cookie
+    // fallback otherwise. Queries keep the cookie client so RLS still applies.
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     // Fetch profile referral data
     const { data: profile, error: profileError } = await supabase

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fetchWithAuth } from '@/utils/authFetch';
 
 export interface UseStreakFreezeStatusReturn {
   freezesAvailable: number;
@@ -16,7 +17,7 @@ export function useStreakFreezeStatus(isAuthenticated: boolean): UseStreakFreeze
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    fetch('/api/streak')
+    fetchWithAuth('/api/streak')
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!data) return;

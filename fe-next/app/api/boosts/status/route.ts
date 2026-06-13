@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 
 const CAP = 5;
 
-export async function GET() {
-  const supabase = await createClient();
-  const { data: { user }, error: authErr } = await supabase.auth.getUser();
-  if (authErr || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+export async function GET(request: Request) {
+  // Local JWT verify (sub-ms) when the caller sends a Bearer token via
+  // fetchWithAuth; falls back to the cookie round-trip otherwise. Read-only.
+  // The data query keeps the cookie client so RLS still applies (defense in
+  // depth) — fetchWithAuth sends cookies alongside the Bearer, so the session
+  // is present and PostgREST validates the JWT inline (no Auth round-trip).
+  const user = await getAuthedUser(request);
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from('profiles')
     .select('daily_boost_count, last_boost_reset_date')

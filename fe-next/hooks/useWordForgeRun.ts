@@ -8,6 +8,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { fetchWithAuth } from '@/utils/authFetch';
 import type { Language } from '@/types';
 import type {
   WordForgeRunState,
@@ -95,7 +96,7 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
   useEffect(() => {
     async function loadProgress() {
       try {
-        const res = await fetch('/api/word-forge/progress');
+        const res = await fetchWithAuth('/api/word-forge/progress');
         if (res.ok) {
           const data = await res.json();
           if (data.success) setProgress(data.progress);

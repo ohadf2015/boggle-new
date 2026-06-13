@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchWithAuth } from '@/utils/authFetch';
 
 export interface BoostStatus {
   remaining: number;
@@ -30,7 +31,9 @@ export function useBoostStatus(): UseBoostStatusReturn {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/boosts/status');
+      // fetchWithAuth attaches the Bearer JWT so the route verifies it locally
+      // (sub-ms) instead of a 50-200ms Supabase Auth round-trip.
+      const res = await fetchWithAuth('/api/boosts/status');
       if (!res.ok) {
         setError(`status_${res.status}`);
         return;

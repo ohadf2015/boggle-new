@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { fetchWithAuth } from '@/utils/authFetch';
 import { spendCoins, canAfford } from '@/utils/coinManager';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -319,7 +320,7 @@ export const useWinStreak = () => {
             });
           }
         } else {
-          const res = await fetch('/api/streak');
+          const res = await fetchWithAuth('/api/streak');
           if (res.ok) {
             const serverData = await res.json();
             if (serverData.currentStreak > 0) {

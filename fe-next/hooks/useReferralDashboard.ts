@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { queryKeys } from '@/lib/queryKeys';
+import { fetchWithAuth } from '@/utils/authFetch';
 
 export interface ReferralMilestoneData {
   id: string;
@@ -46,7 +47,7 @@ interface UseReferralDashboardReturn {
 }
 
 async function fetchReferralStats(): Promise<ReferralDashboardData> {
-  const res = await fetch('/api/referral/stats');
+  const res = await fetchWithAuth('/api/referral/stats');
   if (!res.ok) {
     if (res.status === 401) throw new Error('unauthorized');
     throw new Error('Failed to fetch referral stats');
