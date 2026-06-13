@@ -243,6 +243,13 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 
 vi.mock('@/utils/confettiUtils', () => ({ fireRankConfetti: vi.fn() }));
 
+// Skip the pre-result fanfare overlay: for a notable rank the real page returns
+// only <PreResultFanfare> and never mounts the results tree (incl. the banner
+// slot + ResultsMainContent these tests assert) until onComplete fires.
+vi.mock('@/components/mascot/celebrationKind', () => ({
+  pickCelebrationKind: vi.fn(() => null),
+}));
+
 const showInterstitialMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('@/hooks/useInterstitialAd', () => ({

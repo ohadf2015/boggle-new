@@ -250,7 +250,16 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
     hasAdblock: vi.fn(async () => false),
     gameplayStart: vi.fn(),
     gameplayStop: vi.fn(),
+    submitLeaderboardScore: vi.fn(),
   })),
+}));
+
+// Skip the pre-result fanfare overlay: for a notable rank the real page returns
+// only <PreResultFanfare> and never mounts the results tree until onComplete
+// fires (auto-dismisses via reduced-motion in real UX, but not in jsdom). These
+// tests assert the underlying rank/banner tree, so collapse the gate to null.
+vi.mock('@/components/mascot/celebrationKind', () => ({
+  pickCelebrationKind: vi.fn(() => null),
 }));
 
 vi.mock('@/utils/confettiUtils', () => ({

@@ -44,6 +44,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 // Avoid PostHog network calls from trackInviteLanded.
 vi.mock('@/utils/growthTracking', () => ({
   trackInviteLanded: vi.fn(),
+  trackInviteRedirectFired: vi.fn(),
 }));
 
 describe('HomePageClient new-user room invite', () => {
