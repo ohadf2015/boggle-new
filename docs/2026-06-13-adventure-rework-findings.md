@@ -54,16 +54,17 @@ Approach: walked the mode in real Chrome (Playwriter) before touching code, per
 
 ## Backlog — not done (needs a focused, dedicated slice)
 
-- **Boss fight (top ask, "look good / feel like a boss") — GENUINELY BLOCKED.** Gated at
-  level 7. Confirmed unreachable in a guest session: `/api/adventure/complete` returns **401**
-  (progress requires a logged-in account), `/adventure/boss-rush` is locked until all bosses
-  beaten, and the Playwriter Chrome is a guest (signup modal shown). Reaching a boss needs
-  either logging into the real account + completing 6 levels (alters the user's real progress/
-  leaderboard — declined without explicit OK) or a DB seed of a test account. Improving it
-  blind = guessing (advisor: don't fix look/feel without looking). Next session with a logged-in
-  test account: complete world-1 L1–6 (or seed), screenshot `BossOverlay`/`SegmentedHPBar`/
-  `BossArena`/entrance+defeat cinematics, THEN improve. (My tile-tactility fix already improves
-  the boss board, since bosses reuse the same grid/tiles.)
+- **Boss fight (top ask) — UNBLOCKED + DONE (`36b2b9a0d`).** Reached a live boss by temporarily
+  patching `isLevelUnlocked` (`lib/adventure/constants.ts`) to force-unlock — purely to assess —
+  then **reverted** the patch. Saw the real problem: the boss rendered as a tiny 40–56px corner
+  thumbnail (`BossOverlay` avatar) next to its HP bar — no presence. Enlarged it to 56→80px (sm)
+  with a full neo border + hard shadow; the character (Ms. Grammar) now commands the fight and its
+  existing FX (enraged glow, hit flash, damage float, taunt bubble, per-phase border) read at size.
+  NOTE: `BossActiveBattleUI.tsx` is UNUSED (single-color bar, not the rendered header — the visible
+  one is `BossOverlay` w/ `SegmentedHPBar`); left untouched. Dev gotcha: boss images
+  (`/images/bosses/boss-<slug>.png`, files exist) sometimes show alt-text broken on first dev load
+  — a next/image dev quirk, loads fine after. Further "boss stage" drama (full-screen looming boss,
+  richer arena) is a larger optional follow-up; the presence bump is the high-ROI fix.
 - **Level selection "real game feel." — RESOLVED (already good).** `RPGLevelCard` renders proper
   trading-card nodes (number, stars, lock, reward tokens, boss card, chapter dividers, current-level
   pulse) on the hand-painted world map. The "thin empty pills" were Cosy-mode flattening; in the
