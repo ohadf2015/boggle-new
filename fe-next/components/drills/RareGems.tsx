@@ -17,6 +17,15 @@ import DrillBriefing from '@/components/brain/DrillBriefing';
 import RareGemsCompletePhase from './RareGemsCompletePhase';
 import GemPouchMeter from './GemPouchMeter';
 import GemFindPopup from './GemFindPopup';
+import DrillRewardBurst from './DrillRewardBurst';
+
+// Bigger gem → wider collect spray.
+const BURST_MAGNITUDE: Record<CelebrationLevel, number> = {
+  small: 0.25,
+  medium: 0.5,
+  big: 0.75,
+  epic: 1,
+};
 import PouchFullBeat from './PouchFullBeat';
 import {
   classifyGem,
@@ -338,14 +347,24 @@ export default function RareGems({
               </div>
             )}
 
-            <GridComponent
-              grid={grid}
-              interactive={true}
-              onWordSubmit={handleWordSubmit}
-              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
-              language={language}
-              className="w-full"
-            />
+            {/* Grid + collect-burst overlay. The burst is absolute/pointer-events
+                -none over the grid, so the satisfying spray never shifts layout. */}
+            <div className="relative w-full">
+              <GridComponent
+                grid={grid}
+                interactive={true}
+                onWordSubmit={handleWordSubmit}
+                highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
+                language={language}
+                className="w-full"
+              />
+              <DrillRewardBurst
+                trigger={wordsFound.length}
+                magnitude={lastWord ? BURST_MAGNITUDE[lastWord.celebration] : 0}
+                seedKey={lastWord ? `${lastWord.word}-${wordsFound.length}` : wordsFound.length}
+                label={lastWord ? `+${lastWord.points}` : undefined}
+              />
+            </div>
 
             {/* Feedback message — fixed-height slot so toggling doesn't shift the grid */}
             <div className="min-h-[2.75rem] flex items-center justify-center">

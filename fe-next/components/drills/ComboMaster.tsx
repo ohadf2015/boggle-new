@@ -15,6 +15,7 @@ import { useDrillMusic } from '@/hooks/useDrillMusic';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import ComboMasterCompletePhase from './ComboMasterCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
+import DrillRewardBurst from './DrillRewardBurst';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
 
@@ -339,15 +340,25 @@ export default function ComboMaster({
               </span>
             </div>
 
-            <GridComponent
-              grid={grid}
-              interactive={true}
-              onWordSubmit={handleWordSubmit}
-              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
-              comboLevel={combo}
-              language={language}
-              className="w-full"
-            />
+            {/* Grid + collect-burst overlay. Higher combo → bigger spray; the
+                burst is absolute/pointer-events-none so it never shifts layout. */}
+            <div className="relative w-full">
+              <GridComponent
+                grid={grid}
+                interactive={true}
+                onWordSubmit={handleWordSubmit}
+                highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
+                comboLevel={combo}
+                language={language}
+                className="w-full"
+              />
+              <DrillRewardBurst
+                trigger={wordsFound.length}
+                magnitude={Math.min(combo / 12, 1)}
+                seedKey={`combo-${wordsFound.length}`}
+                label={combo > 1 ? `x${combo}` : undefined}
+              />
+            </div>
 
             {/* Keyboard typed word display */}
             {keyboard.isTypingMode && keyboard.typedWord && (
