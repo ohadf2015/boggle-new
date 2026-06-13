@@ -17,6 +17,7 @@ import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/c
 import { sanitizeRoomName } from '@/utils/consts';
 import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
+import { setRejoinIntent } from '@/utils/socketRejoin';
 import type { Language, Avatar } from '@/shared/types/game';
 
 // Hex color validation pattern (must match backend schema)
@@ -277,6 +278,19 @@ export function useMultiplayerJoin({
           ...(options?.isClassroom && { isClassroom: true }),
         });
 
+        // Remember how to get back into this room after a socket reconnect
+        // (esp. a server restart/deploy, which wipes the server's in-memory
+        // socket→game map). The host reconnects via the SAME `join` path — the
+        // server's reconnection branch rebinds the host by username.
+        setRejoinIntent({
+          gameCode: codeToUse,
+          username: finalHostUsername,
+          authUserId,
+          guestTokenHash,
+          guestSessionId,
+          avatar: hostAvatar,
+        });
+
         if (options?.quickPlay) {
           logger.log('[QUICK_PLAY] Room created — user will start from lobby');
         }
@@ -289,6 +303,18 @@ export function useMultiplayerJoin({
         });
 
         socket.emit('join', {
+          gameCode: codeToUse,
+          username: effectiveUsername,
+          authUserId,
+          guestTokenHash,
+          guestSessionId,
+          avatar: effectiveAvatar,
+        });
+
+        // Remember how to re-join after a socket reconnect (esp. a server
+        // restart/deploy that wiped the server's in-memory socket→game map).
+        // SocketContext re-emits this exact `join` on reconnect.
+        setRejoinIntent({
           gameCode: codeToUse,
           username: effectiveUsername,
           authUserId,

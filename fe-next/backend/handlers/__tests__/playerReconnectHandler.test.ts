@@ -211,6 +211,34 @@ describe('handleReconnection', () => {
     expect(socket.emit).toHaveBeenCalledWith('updateLeaderboard', expect.objectContaining({ leaderboard: [] }));
   });
 
+  // Finished-game reconnect (deploy recovery): the client's results page is
+  // blank after a server restart because `requestResults` is gated on a socket
+  // mapping the restart wiped. Once handleReconnection rebuilds the mapping it
+  // must ALSO re-deliver the cached results, so a player who reconnects AFTER
+  // the game ended sees their scores instead of a blank page.
+  it('re-delivers cached results when reconnecting into a finished game', () => {
+    const cached = { scores: [{ username: 'Player1', score: 42 }], winner: 'Player1' };
+    const game = makeGame({ gameState: 'finished', cachedResultsPayload: cached } as any);
+    mockIsInProgress.mockReturnValue(false);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).toHaveBeenCalledWith('validatedScores', cached);
+    expect(socket.emit).toHaveBeenCalledWith('validationComplete', cached);
+  });
+
+  // A finished game with NO cached payload must not emit empty/garbage results.
+  it('does not emit results for a finished game with no cached payload', () => {
+    const game = makeGame({ gameState: 'finished' } as any);
+    mockIsInProgress.mockReturnValue(false);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).not.toHaveBeenCalledWith('validatedScores', expect.anything());
+  });
+
   // Belt: the authoritative leaderboard rides INSIDE the startGame payload too,
   // so the client restores the score in the same batched setState as the board —
   // robust against a dropped/raced/reset separate updateLeaderboard.

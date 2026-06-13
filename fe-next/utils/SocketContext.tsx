@@ -5,6 +5,7 @@ import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { sanitizeRoomName } from '@/utils/consts';
 import { computeReconnectDelay } from '@/utils/reconnectDelay';
+import { getRejoinIntent, planReconnectRejoin } from '@/utils/socketRejoin';
 import { readGuestBirthYear } from '@/lib/families/guestAge';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
@@ -221,6 +222,10 @@ export function SocketProvider({ children }: SocketProviderProps) {
   // Pending jittered reconnect scheduled by a serverShutdown (deploy) — tracked
   // so we can cancel it on unmount and never fire connect() on a released socket.
   const shutdownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // False until the FIRST successful connect. Distinguishes the initial connect
+  // (lobby join handles it) from a reconnect (where we must re-emit `join` to
+  // rebuild the server's wiped socket→game mapping after a restart/deploy).
+  const hasConnectedBeforeRef = useRef<boolean>(false);
 
   // Manual reconnect function
   const manualReconnect = useCallback(() => {
@@ -245,6 +250,25 @@ export function SocketProvider({ children }: SocketProviderProps) {
       setIsReconnecting(false);
       setIsServerUpdating(false);
       setConnectionError(null);
+
+      // Reconnect recovery: after a server restart/deploy the backend rehydrates
+      // game state from Redis but CANNOT rehydrate the in-memory socket→game map
+      // (socket ids are ephemeral). Without this, the reconnected socket is a
+      // stranger to the server — actions are rejected with "You are not in a
+      // game" and the results page is blank. Re-emit the remembered `join` so the
+      // server's idempotent reconnection path rebinds us and restores the
+      // in-progress board OR the finished results. The very first connect is
+      // skipped (the lobby's own join already covers it). `join` is idempotent,
+      // so re-emitting on a transient blip merely re-confirms membership.
+      const rejoin = planReconnectRejoin({
+        isReconnect: hasConnectedBeforeRef.current,
+        intent: getRejoinIntent(),
+      });
+      if (rejoin) {
+        logger.log('[SOCKET.IO] Re-joining game after reconnect:', rejoin.gameCode);
+        socketInstance.emit('join', rejoin);
+      }
+      hasConnectedBeforeRef.current = true;
     };
 
     const handleDisconnect = (reason: string) => {
@@ -370,9 +394,13 @@ export function SocketProvider({ children }: SocketProviderProps) {
     socketInstance.on('serverShutdown', handleServerShutdown);
     socketInstance.on('error', handleError);
 
-    // If already connected, update state immediately
+    // If already connected, update state immediately. We also missed the initial
+    // `connect` event, so mark hasConnectedBefore — any FUTURE connect is then a
+    // reconnect and correctly triggers the `join` re-emit (rebuilds the server's
+    // wiped socket→game map after a restart/deploy).
     if (socketInstance.connected) {
       setIsConnected(true);
+      hasConnectedBeforeRef.current = true;
     }
 
     // Schedule setSocket asynchronously to avoid synchronous setState in effect

@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie';
 import logger from '@/utils/logger';
 import type { Session } from '@/types';
+import { clearRejoinIntent } from '@/utils/socketRejoin';
 
 const SESSION_COOKIE_NAME = 'boggle_session';
 const SESSION_EXPIRY_HOURS = 2; // Session expires after 2 hours
@@ -92,6 +93,9 @@ export const clearSession = (): void => {
   } catch {
     // Storage blocked
   }
+  // Drop the socket reconnect intent too — leaving the session must prevent any
+  // later reconnect from re-joining this game.
+  clearRejoinIntent();
 };
 
 /**
@@ -120,5 +124,7 @@ export const clearSessionPreservingUsername = (username?: string): void => {
   } catch {
     // Storage blocked
   }
+  // Same anti-rejoin guarantee for the socket reconnect intent.
+  clearRejoinIntent();
 };
 

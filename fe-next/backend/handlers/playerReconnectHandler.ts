@@ -292,6 +292,15 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
         socket.emit('liveAchievementUnlocked', { achievements });
       }
     }
+  } else if (game.gameState === 'finished' && game.cachedResultsPayload) {
+    // Deploy recovery: a player who reconnects AFTER the game ended sees a blank
+    // results page because the server restart wiped their socket→game mapping,
+    // so their `requestResults` (gated on that mapping) silently no-ops. Now
+    // that the mapping is rebuilt above, re-deliver the cached results here so
+    // reconnect is self-contained — one rejoin restores in-progress board OR
+    // finished results. Mirrors the `requestResults` finished-game path.
+    socket.emit('validatedScores', game.cachedResultsPayload);
+    socket.emit('validationComplete', game.cachedResultsPayload);
   }
 
   broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {

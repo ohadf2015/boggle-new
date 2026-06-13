@@ -126,6 +126,7 @@ vi.mock('../playerReconnectHandler', () => ({
 vi.mock('../playerDataInit', () => ({ ensurePlayerState: vi.fn().mockResolvedValue(undefined) }));
 
 import { registerPlayerJoinHandlers } from '../playerJoinHandler';
+import { handleReconnection, handleLateJoin } from '../playerReconnectHandler';
 
 function captureJoinHandler() {
   const listeners: Record<string, (...args: unknown[]) => unknown> = {};
@@ -187,5 +188,54 @@ describe('PlayerJoinHandler — late-join recovery flag', () => {
       .find((c) => c[0] === 'joined');
     expect(joinedCall).toBeDefined();
     expect(joinedCall![1]).toMatchObject({ success: true, gameInProgress: false });
+  });
+});
+
+/**
+ * Reconnect-after-deploy: the linchpin of the "You are not in a game" fix.
+ *
+ * After a server restart the in-memory socket→username map is WIPED
+ * (`getSocketIdByUsername` → undefined), but the game (incl. its `users` map,
+ * keyed by username) is restored from Redis. The re-emitted `join` must route
+ * to RECONNECTION on the strength of `game.users[username]` ALONE — otherwise
+ * the player is treated as a brand-new late-joiner (membership never rebound,
+ * results never re-sent, score reset). This locks the seam between persistence
+ * (users survive — see backend/redis/__tests__/gameState.roundtrip.test.ts) and
+ * the join gate, which unit tests on `handleReconnection` alone cannot prove.
+ */
+describe('PlayerJoinHandler — reconnect after server restart (deploy)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    // Post-restart reality: the socket→username map is empty.
+    mockGetSocketIdByUsername.mockReturnValue(undefined);
+  });
+
+  it('routes to reconnection (not late-join) when only the restored game.users entry identifies the player', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({
+      // Survived the Redis round-trip, keyed by username; socketId was stripped.
+      users: { Paca: { isHost: false, disconnected: true, authUserId: null, guestTokenHash: null } },
+    }));
+    mockShouldSendGameState.mockReturnValue(true);
+
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Paca' });
+
+    expect(handleReconnection).toHaveBeenCalled();
+    expect(handleLateJoin).not.toHaveBeenCalled();
+  });
+
+  it('treats a genuinely new username as a late-join, not a reconnection', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({
+      users: { Paca: { isHost: false, disconnected: true, authUserId: null, guestTokenHash: null } },
+    }));
+    mockShouldSendGameState.mockReturnValue(true);
+
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Stranger' });
+
+    expect(handleReconnection).not.toHaveBeenCalled();
+    expect(handleLateJoin).toHaveBeenCalled();
   });
 });

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
+import { getRejoinIntent, clearRejoinIntent } from '../../../utils/socketRejoin';
 
 function makeSocket() {
   return {
@@ -67,5 +68,20 @@ describe('useMultiplayerJoin in-flight guard', () => {
 
     await act(async () => { result.current(false); });
     expect(socket.emit).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('useMultiplayerJoin records a rejoin intent', () => {
+  beforeEach(() => { vi.clearAllMocks(); clearRejoinIntent(); });
+
+  it('remembers the joined game so a reconnect can re-join the same room', async () => {
+    const socket = makeSocket();
+    const { result } = renderHook(() => useMultiplayerJoin(makeOptions(socket)));
+
+    await act(async () => { result.current(false); });
+
+    const intent = getRejoinIntent();
+    expect(intent).toEqual(expect.objectContaining({ gameCode: 'ABCD' }));
+    expect(intent?.username).toBeTruthy();
   });
 });
