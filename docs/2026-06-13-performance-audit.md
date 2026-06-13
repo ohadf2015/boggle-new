@@ -75,7 +75,24 @@ The 50–200ms `auth.getUser()` Auth round-trip. Findings:
    round-trip is gone.
 2. **`updateOnlineStatus` — FIXED this session** (commit `c5751d4be`). It did an `auth.getUser()`
    per call; the new module-level throttle cuts those round-trips ~N× alongside the writes.
-3. **~91 API-route `auth.getUser()` calls — BLOCKED on key provisioning (user action).**
+3. **API-route `auth.getUser()` calls — UNBLOCKED + first batch SHIPPED (`83eddb003`).**
+   - `SUPABASE_JWT_SECRET` provisioned (Supabase dashboard → Railway + `.env.local`) and
+     verified: `verifyJwtLocal` accepts real-secret-signed tokens, rejects wrong-secret ones.
+   - **Key realization:** the fast path needs BOTH a secret AND callers that send a Bearer.
+     The hot routes were called via plain cookie `fetch()`, so even the 3 pre-wired routes
+     were silently falling back to the round-trip. Fixed end-to-end:
+     - backend → `getAuthedUser(request)` (keep `createClient()` for queries so RLS still
+       applies; `fetchWithAuth` sends cookies alongside the Bearer): `boosts/status`,
+       `referral/stats`, `word-forge/progress`.
+     - frontend → `fetchWithAuth`: `useBoostStatus`, `useReferralDashboard`, `useWordForgeRun`,
+       `useWinStreak` (GET), `useStreakFreezeStatus`.
+   - **Verified on prod build:** valid-secret token → 404 (auth passed, cookie-less query),
+     wrong-secret → 401, no-auth → 401 ⟹ local verify active, round-trip eliminated.
+   - **Remaining:** more read-only GET routes can follow the same two-half pattern. Keep remote
+     `getUser` on mutations/security-critical. Future hardening: asymmetric signing keys +
+     `getClaims()` (no secret to manage). See memory `auth-getuser-refactor-playbook`.
+
+   _(historical — now resolved:)_
    - `lib/auth/getAuthedUser` + `verifyJwtLocal` exist and 3 hot GETs (streak/notifications/gifts)
      are wired, but the fast path is **inert**: `SUPABASE_JWT_SECRET` is not set locally, and the
      project's JWKS is empty (`{"keys":[]}` → legacy **HS256 symmetric**), so local verify has no
