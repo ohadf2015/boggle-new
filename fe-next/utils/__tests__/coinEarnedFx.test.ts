@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { emitCoinEarned, selectCoinFxMode, COIN_EARNED_EVENT } from '../coinEarnedFx';
+import {
+  emitCoinEarned,
+  emitCoinSpent,
+  selectCoinFxMode,
+  COIN_EARNED_EVENT,
+  COIN_SPENT_EVENT,
+} from '../coinEarnedFx';
 
 describe('emitCoinEarned', () => {
   afterEach(() => vi.restoreAllMocks());
@@ -28,6 +34,30 @@ describe('emitCoinEarned', () => {
     emitCoinEarned(0);
     emitCoinEarned(-5);
     window.removeEventListener(COIN_EARNED_EVENT, handler);
+    expect(handler).not.toHaveBeenCalled();
+  });
+});
+
+describe('emitCoinSpent', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('dispatches a coin-spent event carrying the amount + source', () => {
+    const handler = vi.fn();
+    window.addEventListener(COIN_SPENT_EVENT, handler);
+    emitCoinSpent(120, { x: 5, y: 6 });
+    window.removeEventListener(COIN_SPENT_EVENT, handler);
+    expect(handler).toHaveBeenCalledTimes(1);
+    const detail = (handler.mock.calls[0][0] as CustomEvent).detail;
+    expect(detail.amount).toBe(120);
+    expect(detail.source).toEqual({ x: 5, y: 6 });
+  });
+
+  it('ignores non-positive amounts', () => {
+    const handler = vi.fn();
+    window.addEventListener(COIN_SPENT_EVENT, handler);
+    emitCoinSpent(0);
+    emitCoinSpent(-9);
+    window.removeEventListener(COIN_SPENT_EVENT, handler);
     expect(handler).not.toHaveBeenCalled();
   });
 });

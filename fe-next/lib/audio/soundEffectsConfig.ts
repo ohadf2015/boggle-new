@@ -49,7 +49,7 @@ export interface SoundEffectsContextType {
   playTileSelectSound: () => void;
   playRoundStartSound: () => void;
   playTimesUpSound: () => void;
-  playCoinCollectSound: () => void;
+  playCoinCollectSound: (opts?: { rate?: number; volume?: number }) => void;
   playButtonClickSound: () => void;
   playChestOpenSound: () => void;
   playQuestCompleteSound: () => void;
@@ -62,7 +62,7 @@ export interface SoundEffectsContextType {
   playScreenTransitionSound: () => void;
   playLongWordBonusSound: () => void;
   playBoardClearSound: () => void;
-  playCoinCascadeSound: () => void;
+  playCoinCascadeSound: (opts?: { rate?: number; volume?: number }) => void;
   playCrownVictorySound: () => void;
   playGiftReceivedSound: () => void;
   playLeadChangeSound: () => void;

@@ -127,8 +127,13 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
   const playRoundStartSound = useCallback(() => { playSound('roundStart', { volume: 0.8, requiresGameActive: false }); }, [playSound]);
   const playTimesUpSound = useCallback(() => { playSound('timerUrgent', { volume: 0.8 }); }, [playSound]);
 
-  // ElevenLabs-generated sounds
-  const playCoinCollectSound = useCallback(() => { playSound('coinCollect', { volume: 0.5, requiresGameActive: false }); }, [playSound]);
+  // ElevenLabs-generated sounds.
+  // Coin collect accepts per-play pitch (rate) + volume so the reward arpeggio
+  // can climb in pitch for that casino "ding-ding-ding" feel. Always
+  // requiresGameActive:false — coins are earned on menus/results too.
+  const playCoinCollectSound = useCallback((opts?: { rate?: number; volume?: number }) => {
+    playSound('coinCollect', { volume: opts?.volume ?? 0.5, rate: opts?.rate, requiresGameActive: false });
+  }, [playSound]);
   const playButtonClickSound = useCallback(() => { playSound('buttonClick', { volume: 0.3, requiresGameActive: false }); }, [playSound]);
   const playChestOpenSound = useCallback(() => { playSound('chestOpen', { volume: 0.7, requiresGameActive: false }); haptics.success(); }, [playSound]);
   const playQuestCompleteSound = useCallback(() => { playSound('questComplete', { volume: 0.8, requiresGameActive: false }); haptics.success(); }, [playSound]);
@@ -146,7 +151,9 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
 
   // Multiplayer & misc event sounds
   const playBoardClearSound = useCallback(() => { playSound('boardClear', { volume: 0.7 }); }, [playSound]);
-  const playCoinCascadeSound = useCallback(() => { playSound('coinCascade', { volume: 0.6, requiresGameActive: false }); }, [playSound]);
+  const playCoinCascadeSound = useCallback((opts?: { rate?: number; volume?: number }) => {
+    playSound('coinCascade', { volume: opts?.volume ?? 0.6, rate: opts?.rate, requiresGameActive: false });
+  }, [playSound]);
   const playCrownVictorySound = useCallback(() => { playSound('crownVictory', { volume: 0.8, requiresGameActive: false }); haptics.success(); }, [playSound]);
   const playGiftReceivedSound = useCallback(() => { playSound('giftReceived', { volume: 0.7, requiresGameActive: false }); haptics.success(); }, [playSound]);
   const playLeadChangeSound = useCallback(() => { playSound('leadChange', { volume: 0.6 }); }, [playSound]);

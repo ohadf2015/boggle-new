@@ -14,6 +14,8 @@ import {
 } from '@/shared/types/customAvatar';
 import type { AvatarPremium } from './AvatarBuilderModal';
 import toast from 'react-hot-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 // Staggered grid entrance — cascading waterfall (from animate-ai: playful-staggered-list)
 const gridContainerVariants = {
@@ -72,6 +74,7 @@ export default function PartPreviewGrid<T extends string>({
   onCoinSpend,
 }: PartPreviewGridProps<T>) {
   const cat = premiumCategory ?? partType;
+  const { language } = useLanguage();
   const [confirmPurchase, setConfirmPurchase] = useState<PurchaseConfirmState | null>(null);
 
   const handleClick = (option: T) => {
@@ -297,7 +300,7 @@ export default function PartPreviewGrid<T extends string>({
               {/* Current balance */}
               {premium && (
                 <p className="text-center text-xs text-neo-white mb-4">
-                  Balance: <span className="text-neo-yellow font-bold tabular-nums">{premium.coins}</span> → <span className="text-neo-white font-bold tabular-nums">{premium.coins - confirmPurchase.price}</span>
+                  Balance: <span className="text-neo-yellow font-bold tabular-nums">{safeToLocaleString(premium.coins, language)}</span> → <span className="text-neo-white font-bold tabular-nums">{safeToLocaleString(premium.coins - confirmPurchase.price, language)}</span>
                 </p>
               )}
 

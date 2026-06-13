@@ -202,23 +202,36 @@ function spawnCoinStream(req: CoinStreamRequest): void {
   const capped = Math.min(req.count, deviceConfig.maxParticles);
   if (capped <= 0) return;
 
-  const control = computeControlPoint(req.source, req.target);
   const duration = req.duration ?? STREAM_DEFAULT_DURATION_MS;
 
   for (let i = 0; i < capped; i++) {
+    // Per-coin scatter at the source, a jittered arc apex, varied size + speed.
+    // The coins still converge on the exact target (the counter), but the path
+    // looks alive and a little different every time — the casino "spray". Purely
+    // cosmetic, so Math.random is fine (no determinism/leaderboard constraint).
+    const coinSource = {
+      x: req.source.x + (Math.random() - 0.5) * 48,
+      y: req.source.y + (Math.random() - 0.5) * 48,
+    };
+    const control = computeControlPoint(coinSource, req.target);
+    control.x += (Math.random() - 0.5) * 80;
+    control.y -= Math.random() * 60;
+
+    const radius = STREAM_RADIUS * (0.75 + Math.random() * 0.6); // ~6–11px
+
     const graphic = new Graphics();
-    graphic.circle(0, 0, STREAM_RADIUS).fill(STREAM_COLOR);
-    (graphic as unknown as { x: number }).x = req.source.x;
-    (graphic as unknown as { y: number }).y = req.source.y;
+    graphic.circle(0, 0, radius).fill(STREAM_COLOR);
+    (graphic as unknown as { x: number }).x = coinSource.x;
+    (graphic as unknown as { y: number }).y = coinSource.y;
     app.stage.addChild(graphic);
 
     coinStreams.push({
       graphic,
-      source: req.source,
+      source: coinSource,
       control,
       target: req.target,
-      elapsed: -i * STREAM_STAGGER_MS,
-      duration,
+      elapsed: -i * STREAM_STAGGER_MS - Math.random() * 40,
+      duration: duration * (0.85 + Math.random() * 0.3),
     });
   }
 }

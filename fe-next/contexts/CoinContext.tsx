@@ -26,68 +26,16 @@ import {
   COIN_REWARDS,
 } from '@/utils/coinManager';
 import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
-import { emitCoinEarned } from '@/utils/coinEarnedFx';
+import { emitCoinEarned, emitCoinSpent } from '@/utils/coinEarnedFx';
 import toast from 'react-hot-toast';
 import * as Sentry from '@sentry/nextjs';
 
 // Coin effect toasts — neo-brutalist styled visual feedback for earn/spend
-function coinEarnToast(amount: number, reason?: string) {
-  toast.custom(
-    (t) => (
-      <div
-        className={`${t.visible ? 'animate-neo-pop' : 'opacity-0 scale-75'} transition-all duration-300 max-w-xs w-full`}
-      >
-        <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-neo-navy shadow-hard-lg">
-          {/* Shimmer overlay */}
-          <div className="absolute inset-0 bg-linear-to-r from-transparent via-neo-lime/10 to-transparent animate-shimmer pointer-events-none" />
-          <div className="relative flex items-center gap-3 px-4 py-3">
-            {/* Coin icon with glow */}
-            <div className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-linear-to-br from-yellow-400 to-amber-500 border-2 border-neo-black shadow-[0_0_12px_rgba(251,191,36,0.5)]">
-              <span className="text-lg" role="img" aria-label="coin">🪙</span>
-            </div>
-            {/* Amount + reason */}
-            <div className="flex-1 min-w-0">
-              <p className="font-neo-display text-lg font-black text-neo-lime leading-tight">
-                +{amount} <span className="text-neo-lime/70 text-sm">gold</span>
-              </p>
-              {reason && (
-                <p className="font-neo-body text-xs text-neo-white/60 truncate">{reason}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    { duration: 3000, position: 'top-center' },
-  );
-}
-
-function coinSpendToast(amount: number, reason?: string) {
-  toast.custom(
-    (t) => (
-      <div
-        className={`${t.visible ? 'animate-neo-pop' : 'opacity-0 scale-75'} transition-all duration-300 max-w-xs w-full`}
-      >
-        <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-neo-navy shadow-hard-lg">
-          <div className="relative flex items-center gap-3 px-4 py-3">
-            <div className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-linear-to-br from-pink-400 to-pink-600 border-2 border-neo-black">
-              <span className="text-lg" role="img" aria-label="coin">🪙</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-neo-display text-lg font-black text-neo-pink leading-tight">
-                -{amount} <span className="text-neo-pink/70 text-sm">gold</span>
-              </p>
-              {reason && (
-                <p className="font-neo-body text-xs text-neo-white/60 truncate">{reason}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    ),
-    { duration: 2500, position: 'top-center' },
-  );
-}
+// The old "+X gold" earn toast was retired in favour of the casino-style
+// CoinRewardHud (flying coins + rolling counter + arpeggio), driven by the
+// `lexiclash:coin-earned` event. Spending fires `lexiclash:coin-spent`, which
+// GlobalCoinEarnFx plays as the reverse: coins drain out of the counter, the
+// total rolls down, and the HUD shows a red "-amount". No toast either way.
 
 // Types
 export interface CoinRewardBreakdown {
@@ -255,7 +203,6 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       if (result.success) {
         await refreshProfile();
         const { data: freshProfile } = await getProfile(user.id);
-        coinEarnToast(amount, reason);
         fireCoinEarnedFx();
         return freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
       } else {
@@ -271,7 +218,6 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     } else {
       const newTotal = addLocalCoins(amount, reason, metadata);
       setLocalCoins(newTotal);
-      coinEarnToast(amount, reason);
       fireCoinEarnedFx();
       return newTotal;
     }
@@ -292,7 +238,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 
       if (result.success) {
         await refreshProfile();
-        coinSpendToast(amount, reason);
+        emitCoinSpent(amount);
         return true;
       } else {
         console.error('[CoinContext] Failed to spend coins:', result.error);
@@ -303,7 +249,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       const success = spendLocalCoins(amount, reason, metadata);
       if (success) {
         setLocalCoins(getCoins());
-        coinSpendToast(amount, reason);
+        emitCoinSpent(amount);
       }
       return success;
     }
@@ -521,13 +467,11 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       await refreshProfile();
       const { data: freshProfile } = await getProfile(user.id);
       const newBalance = freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
-      coinEarnToast(amount, 'Watched Ad');
       emitCoinEarned(amount);
       return { awarded: amount, breakdown: { base: amount }, newBalance };
     } else {
       const newBalance = addLocalCoins(amount, 'Watched Ad', metadata);
       setLocalCoins(newBalance);
-      coinEarnToast(amount, 'Watched Ad');
       emitCoinEarned(amount);
       return { awarded: amount, breakdown: { base: amount }, newBalance };
     }

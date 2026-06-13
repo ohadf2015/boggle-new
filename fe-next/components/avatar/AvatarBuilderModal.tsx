@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom';
 import { X, Shuffle, Undo2, Download, Coins, History } from 'lucide-react';
 import { AVATAR_CATEGORY_ICONS } from './AvatarCategoryIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import AvatarRenderer from './AvatarRenderer';
 import FloatingCoinAnimation from '@/components/game/FloatingCoinAnimation';
@@ -67,7 +68,7 @@ export default function AvatarBuilderModal({
   premium,
   previousConfig,
 }: AvatarBuilderModalProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [config, setConfig] = useState<CustomAvatarConfig>(initialConfig ?? DEFAULT_AVATAR_CONFIG);
   const [activeCategory, setActiveCategory] = useState<Category>('base');
   const [previewKey, setPreviewKey] = useState(0);
@@ -194,7 +195,7 @@ export default function AvatarBuilderModal({
             {premium && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-neo bg-neo-navy-light border-2 border-neo-yellow/30">
                 <Coins size={14} className="text-neo-yellow" />
-                <span className="text-neo-yellow font-black text-sm tabular-nums">{premium.coins}</span>
+                <span className="text-neo-yellow font-black text-sm tabular-nums">{safeToLocaleString(premium.coins, language)}</span>
               </div>
             )}
             <button onClick={onClose} className="text-neo-white hover:text-neo-white p-2.5 transition-colors" aria-label={t('common.close')}>

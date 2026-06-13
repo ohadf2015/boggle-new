@@ -9,6 +9,7 @@
  */
 
 export const COIN_EARNED_EVENT = 'lexiclash:coin-earned';
+export const COIN_SPENT_EVENT = 'lexiclash:coin-spent';
 
 export interface CoinEarnedDetail {
   amount: number;
@@ -20,6 +21,19 @@ export function emitCoinEarned(amount: number, source?: { x: number; y: number }
   if (typeof window === 'undefined') return;
   const detail: CoinEarnedDetail = source ? { amount, source } : { amount };
   window.dispatchEvent(new CustomEvent<CoinEarnedDetail>(COIN_EARNED_EVENT, { detail }));
+}
+
+/**
+ * The mirror of `emitCoinEarned` for spending: GlobalCoinEarnFx plays it in
+ * reverse — coins drain OUT of the counter, the total rolls DOWN, and the HUD
+ * shows a red "-amount". `source` is where the spend happened (e.g. the buy
+ * button), so coins can fly from the counter toward it.
+ */
+export function emitCoinSpent(amount: number, source?: { x: number; y: number }): void {
+  if (!(amount > 0)) return;
+  if (typeof window === 'undefined') return;
+  const detail: CoinEarnedDetail = source ? { amount, source } : { amount };
+  window.dispatchEvent(new CustomEvent<CoinEarnedDetail>(COIN_SPENT_EVENT, { detail }));
 }
 
 export type CoinFxMode = 'none' | 'webgl' | 'dom';
