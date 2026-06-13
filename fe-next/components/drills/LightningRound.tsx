@@ -16,6 +16,7 @@ import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import LightningRoundCompletePhase from './LightningRoundCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
+import DrillRewardBurst from './DrillRewardBurst';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
 import { calculateForgivingDrillScore } from '@/shared/utils/drillScoring';
@@ -287,14 +288,23 @@ export default function LightningRound({
               </span>
             </div>
 
-            <GridComponent
-              grid={grid}
-              interactive={true}
-              onWordSubmit={handleWordSubmit}
-              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
-              language={language}
-              className="w-full"
-            />
+            {/* Grid + collect-burst overlay (absolute/pointer-events-none → no reflow). */}
+            <div className="relative w-full">
+              <GridComponent
+                grid={grid}
+                interactive={true}
+                onWordSubmit={handleWordSubmit}
+                highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
+                language={language}
+                className="w-full"
+              />
+              <DrillRewardBurst
+                trigger={wordsFound.length}
+                magnitude={Math.min((lastWordScore ?? 5) / 18, 1)}
+                seedKey={`lr-${wordsFound.length}`}
+                label={lastWordScore ? `+${lastWordScore}` : undefined}
+              />
+            </div>
 
             {/* Keyboard typed word display */}
             {keyboard.isTypingMode && keyboard.typedWord && (

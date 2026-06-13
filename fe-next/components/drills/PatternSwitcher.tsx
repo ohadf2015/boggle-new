@@ -14,6 +14,7 @@ import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import PatternSwitcherCompletePhase from './PatternSwitcherCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
+import DrillRewardBurst from './DrillRewardBurst';
 import type { LetterGrid, Language } from '@/types';
 import { calculateWordScore } from '@/shared/utils/scoring';
 
@@ -359,15 +360,23 @@ export default function PatternSwitcher({
               />
             </div>
 
-            <GridComponent
-              grid={grid}
-              interactive={phase === 'playing'}
-              onWordSubmit={handleWordSubmit}
-              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
-              hideWordPreview={false}
-              language={language}
-              className="w-full"
-            />
+            <div className="relative w-full">
+              <GridComponent
+                grid={grid}
+                interactive={phase === 'playing'}
+                onWordSubmit={handleWordSubmit}
+                highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
+                hideWordPreview={false}
+                language={language}
+                className="w-full"
+              />
+              {/* Collect-burst overlay — fires per matched word (absolute, no reflow). */}
+              <DrillRewardBurst
+                trigger={wordsFound.length}
+                magnitude={Math.min(patternsCompleted / 8 + 0.4, 1)}
+                seedKey={`ps-${wordsFound.length}`}
+              />
+            </div>
 
             {/* Keyboard UI - Desktop only */}
             {keyboard.isDesktop && (

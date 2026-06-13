@@ -46,19 +46,23 @@ describe('DrillBriefing', () => {
     return { onStart };
   };
 
-  it('shows the drill persona, name, mission and benefit', () => {
+  it('shows the drill persona, name and mission (the essentials)', () => {
     setup();
     expect(screen.getByText('brain.drills.memory-hunt.persona')).toBeInTheDocument();
     expect(screen.getByText('brain.drills.memory-hunt.name')).toBeInTheDocument();
     expect(screen.getByText('brain.drills.memory-hunt.mission')).toBeInTheDocument();
-    expect(screen.getByText('brain.drills.memory-hunt.benefit')).toBeInTheDocument();
   });
 
-  it('shows a 3-step how-to so the player knows exactly what to do', () => {
+  it('stays scannable — drops the verbose exposition (benefit, how-to, coach tip)', () => {
+    // 2026-06-13: the briefing was a wall of text that pushed the Start button
+    // below the fold. We keep mascot + mission + goal + a prominent CTA and cut
+    // the rest so a casual player can start in seconds.
     setup();
-    expect(screen.getByText('brain.drills.memory-hunt.step1')).toBeInTheDocument();
-    expect(screen.getByText('brain.drills.memory-hunt.step2')).toBeInTheDocument();
-    expect(screen.getByText('brain.drills.memory-hunt.step3')).toBeInTheDocument();
+    expect(screen.queryByText('brain.drills.memory-hunt.benefit')).not.toBeInTheDocument();
+    expect(screen.queryByText('brain.drills.memory-hunt.coachTip')).not.toBeInTheDocument();
+    expect(screen.queryByText('brain.drills.memory-hunt.step1')).not.toBeInTheDocument();
+    expect(screen.queryByText('brain.drills.memory-hunt.step2')).not.toBeInTheDocument();
+    expect(screen.queryByText('brain.drills.memory-hunt.step3')).not.toBeInTheDocument();
   });
 
   it('renders the themed mascot for the drill (existing on-brand variant)', () => {
