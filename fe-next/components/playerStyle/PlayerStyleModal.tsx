@@ -6,7 +6,8 @@
  * (its confirm calls setStyle); this shell only owns presentation + dismissal.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StylePicker } from './StylePicker';
@@ -20,6 +21,9 @@ export interface PlayerStyleModalProps {
 
 export function PlayerStyleModal({ isOpen, onDismiss }: PlayerStyleModalProps) {
   const { t } = useLanguage();
+  // Portal target is only known client-side; gate on mount to stay SSR-safe.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -30,9 +34,23 @@ export function PlayerStyleModal({ isOpen, onDismiss }: PlayerStyleModalProps) {
     return () => window.removeEventListener('keydown', onKey);
   }, [isOpen, onDismiss]);
 
-  if (!isOpen) return null;
+  // Lock body scroll while open: the page sliding behind the translucent
+  // backdrop is a touch-repaint flicker source on its own.
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen]);
 
-  return (
+  if (!isOpen || !mounted) return null;
+
+  // Portal to <body>: the profile card mounts this inside a framer-motion
+  // m.div whose `transform` would otherwise become the containing block for
+  // this `position: fixed` overlay, dragging it on scroll (flicker).
+  return createPortal(
     <div
       className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/70 p-4 pb-[calc(1rem+var(--admob-banner-height,0px))]"
       role="dialog"
@@ -75,7 +93,8 @@ export function PlayerStyleModal({ isOpen, onDismiss }: PlayerStyleModalProps) {
           }
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
