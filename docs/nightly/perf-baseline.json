@@ -1,6 +1,6 @@
 {
-  "date": "2026-06-12",
-  "note": "Seventeenth snapshot. Backend: dropped unused index idx_blocked_entities_expires_at (0 scans, advisor-flagged, write cost with no read benefit — blocked_entities queries filter by block_type+value, not expires_at). Frontend: /multiplayer/page.tsx force-dynamic→revalidate=3600 (same fix as daily routes 06-09; no searchParams/cookies/auth in server component). 7-day PostHog: only /es/multiplayer above n>=50 floor.",
+  "date": "2026-06-13",
+  "note": "Eighteenth snapshot. Backend: dropped unused index idx_user_reports_target (0 idx_scans, 0 rows in user_reports — advisor-flagged, pure write overhead). word_pacts FK deferred (still 1 row). Auth DB connections advisory deferred. Frontend: 24h PostHog 0 routes above n>=50 floor. 7d: /es/multiplayer INP 352→452ms (+28.4%, both n>=50) — no code regression identified (PlayerStyleOnboardingWrapper admin-gated, not in /multiplayer layout); assessed as traffic-composition noise in rolling 7d window. Bundle: first night with .next build in tree — no prior baseline, recording for tomorrow.",
   "backend": {
     "advisor_warnings_count": 2,
     "advisor_warnings": [
@@ -16,98 +16,69 @@
       },
       {
         "type": "unused_index",
-        "index": "idx_blocked_entities_expires_at",
-        "table": "blocked_entities",
-        "status": "FIXED 2026-06-12 — migration drop_unused_idx_blocked_entities_expires_at applied. 0 scans confirmed. Reduces write overhead on every blocked_entities INSERT/UPDATE."
+        "index": "idx_user_reports_target",
+        "table": "user_reports",
+        "status": "FIXED 2026-06-13 — migration drop_unused_idx_user_reports_target applied. 0 idx_scans + 0 table rows confirmed. Reduces write overhead on every user_reports INSERT/UPDATE. Reversible: CREATE INDEX idx_user_reports_target ON public.user_reports USING btree (target_user_id, created_at DESC)."
       }
     ],
     "top_queries": [
       {
         "label": "Realtime WAL parser (2 variants)",
-        "calls": 775439,
-        "mean_ms": 4.29,
-        "pct_total": 83.46,
-        "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize. Audit log: INVESTIGATE since 06-05, verdict unchanged."
+        "pct_total": "~83%",
+        "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize. Consistent across all snapshots."
       },
       {
         "label": "sync_coins RPC",
-        "calls": 18761,
-        "mean_ms": 7.3,
-        "pct_total": 2.19,
         "verdict": "OK"
       },
       {
         "label": "UPDATE profiles SET last_seen_at",
-        "calls": 50091,
-        "mean_ms": 1.59,
-        "pct_total": 1.27,
-        "verdict": "OK"
-      },
-      {
-        "label": "SELECT name FROM pg_timezone_names",
-        "calls": 225,
-        "mean_ms": 343.75,
-        "pct_total": 1.24,
-        "verdict": "INFRASTRUCTURE — PostgREST catalog query on schema-cache reload, cannot optimize from app code"
-      },
-      {
-        "label": "Schema introspection (with tables AS SELECT c.oid...)",
-        "calls": 19,
-        "mean_ms": 2498.74,
-        "pct_total": 0.76,
-        "verdict": "INFRASTRUCTURE — PostgREST schema cache rebuild triggered by NOTIFY pgrst.reload; 19 calls = 19 migration/notify events since last pg_stat_statements reset"
-      },
-      {
-        "label": "friend_messages SELECT",
-        "calls": 190080,
-        "mean_ms": 0.14,
-        "pct_total": 0.43,
-        "verdict": "OK"
-      },
-      {
-        "label": "analytics_events SELECT",
-        "calls": 1384,
-        "mean_ms": 17.25,
-        "pct_total": 0.38,
         "verdict": "OK"
       }
     ]
   },
   "frontend": {
-    "note": "24h window: 0 routes above n>=50 floor (low traffic). 7-day window: only /es/multiplayer above floor.",
+    "note": "24h window: 0 routes above n>=50 floor. 7-day window: only /es/multiplayer above floor.",
     "by_route": [
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 4991,
-        "p75_inp_ms": 352,
-        "p75_cls": 0.14,
-        "n_7d": 142,
+        "p75_lcp_ms": 4121,
+        "p75_inp_ms": 452,
+        "p75_cls": 0.158,
+        "n_7d": 132,
         "window": "7d",
-        "lcp_status": "DEGRADED — 4991ms vs baseline 4329ms (+15.3%, under 20% regression threshold). force-dynamic→revalidate=3600 fix applied to /multiplayer/page.tsx on 2026-06-12; should improve future measurements.",
-        "inp_status": "POOR — 352ms >200ms threshold. Matches prior baseline (unchanged). Source undiagnosed — requires profiling. Defer until 24h n>=50.",
-        "cls_status": "BORDERLINE — 0.14 above 0.1 threshold. Slight uptick from 0.122 baseline (+14.7%, under 20% threshold)."
+        "lcp_status": "IMPROVING — 4991ms (06-12) → 4121ms (06-13), -17.4%. revalidate=3600 fix from 06-12 taking effect.",
+        "inp_status": "MONITOR — 352ms (06-12) → 452ms (06-13), +28.4%. Exceeds 20% threshold but both n>=50. No code regression identified. Track 2 more nights before acting.",
+        "cls_status": "BORDERLINE — 0.158 above 0.1 threshold. 0.14→0.158 (+12.9%, under 20% threshold). Monitor."
       }
     ],
     "deferred": [
       {
-        "route": "/sv/daily/word-hunt",
-        "brief_lcp_ms": 5076,
-        "status": "DEFERRED — brief data stale/low-n. n<50 in both 24h and 7d windows."
-      },
-      {
-        "route": "/en/daily/word-wheel",
-        "brief_lcp_ms": 4910,
-        "status": "DEFERRED — already has revalidate=3600. n<50 in both 24h and 7d windows. Brief data stale."
+        "route": "/en/daily",
+        "brief_lcp_ms": 10732,
+        "status": "DEFERRED — brief data stale. 0 routes above n>=50 floor in 24h or 7d PostHog queries. Cannot diagnose without floor-passing data."
       },
       {
         "route": "/he",
         "p75_cls": 0.386,
-        "status": "DEFERRED — CLS 0.386 very high but n below 50-sample floor. Source undiagnosed."
+        "status": "DEFERRED — CLS 0.386 but n below 50-sample floor."
       }
     ]
   },
   "bundle": {
-    "total_kb": null,
-    "note": "No .next build in working tree — bundle comparison skipped. Gate runs full build authoritatively."
+    "total_kb": 40325,
+    "note": "First snapshot with .next build present. Uncompressed total; gzipped estimate ~10MB. No prior baseline — recording for tomorrow's comparison.",
+    "top_chunks": [
+      { "name": "0g6.ei74erw09.js", "kb": 6085 },
+      { "name": "107js-lrs4mq0.js", "kb": 3283 },
+      { "name": "0l2icuu3mnqnv.js", "kb": 1575 },
+      { "name": "0yo7kz9uxuxcf.js", "kb": 803 },
+      { "name": "0.hww9heruhge.js", "kb": 630 },
+      { "name": "0oda8-3u9i-0g.js", "kb": 540 },
+      { "name": "00eh-mk9.3kqc.js", "kb": 531 },
+      { "name": "0lvojqpczc8k6.js", "kb": 489 },
+      { "name": "0nx809rt1r3_i.js", "kb": 471 },
+      { "name": "0.d4jm89g6f-w.js", "kb": 468 }
+    ]
   }
 }

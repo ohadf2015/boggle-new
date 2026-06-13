@@ -642,3 +642,17 @@ Both `exp-mp-quickplay-wait-v1` and `exp-invite-arrival-clarity-v1` were wired o
 - **ACTION REQUIRED**: Wire retry button in `PracticeWheelSandbox.tsx`, then create PostHog flag `exp-practice-wheel-cta-v1` (variants: `control` / `retry-cta`, 50/50)
 - Hypothesis: adds one-tap retry at game-over → lifts practice_started re-engagement rate, targeting the 43% wheelRush completion drop
 - recommended owner: self (next engagement lane)
+
+## 2026-06-13
+- [Supabase] upsert_community_word SECURITY DEFINER executable by authenticated
+  - status: shipped fe-next/supabase/migrations/20260613030000_security_advisor_fixes.sql
+  - why: live DB drifted from 20260429160000 REVOKE; re-REVOKE is reversible
+  - recommended owner: review-by-eod (verify advisor clears after migration apply)
+- [Supabase] web_vitals RLS INSERT policy always true
+  - status: shipped (same migration — tightened to player_id IS NULL OR player_id = auth.uid())
+  - why: API route sets player_id: user?.id || null — new check matches exactly
+  - recommended owner: review-by-eod
+- [Supabase] offerwall_postbacks RLS enabled no policies
+  - status: shipped (same migration — added explicit RESTRICTIVE USING(false))
+  - why: service_role-only table; no-policy state IS correct but advisor flags it; explicit deny makes intent clear
+  - recommended owner: review-by-eod
