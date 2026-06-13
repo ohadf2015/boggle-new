@@ -12952,6 +12952,8 @@ const ja = {
     },
     "gameOver": "ゲーム終了",
     "winnerLabel": "{{name}}の勝ち!",
+    "youWon": "勝利！🏆",
+    "opponentWon": "{name} の勝ち",
     "playAgain": "もう一度",
     "home": "ホーム",
     "finalTiles": "最後のタイル!",

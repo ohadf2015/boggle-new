@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
-export type CelebrationKind = 'bingo' | 'gameOver' | 'overdrive' | 'burnout' | null;
+export type CelebrationKind = 'bingo' | 'great' | 'gameOver' | 'overdrive' | 'burnout' | null;
 
 /**
  * Perf gate: the particle ticker should idle (stop) only when there is nothing
@@ -278,6 +278,12 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
         const x = origin?.x ?? api.width() / 2;
         const y = origin?.y ?? api.height() / 2;
         api.spawnBurst(x, y, 80);
+      } else if (kind === 'great') {
+        // Lighter mid-game pop for big words / steals / streaks — half the
+        // particles of a bingo so it rewards without stealing the bingo's thunder.
+        const x = origin?.x ?? api.width() / 2;
+        const y = origin?.y ?? api.height() / 2;
+        api.spawnBurst(x, y, 40);
       } else if (kind === 'gameOver') {
         api.spawnBurst(api.width() / 2, api.height() / 3, 60);
         api.spawnRain(2800);

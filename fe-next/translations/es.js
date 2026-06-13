@@ -13036,6 +13036,8 @@ const es = {
     },
     "gameOver": "Fin del juego",
     "winnerLabel": "¡{{name}} gana!",
+    "youWon": "¡Ganaste! 🏆",
+    "opponentWon": "Ganó {name}",
     "playAgain": "Jugar de nuevo",
     "home": "Inicio",
     "finalTiles": "¡Últimas fichas!",

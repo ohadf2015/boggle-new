@@ -13406,6 +13406,8 @@ const he = {
     },
     "gameOver": "המשחק נגמר",
     "winnerLabel": "{{name}} ניצח!",
+    "youWon": "ניצחת! 🏆",
+    "opponentWon": "{name} ניצח",
     "playAgain": "שחק שוב",
     "home": "בית",
     "finalTiles": "אריחים אחרונים!",

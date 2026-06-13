@@ -36,6 +36,8 @@ import { useWordCraftKeyboardShortcuts } from '@/components/word-craft/hooks/use
 import type { SceneCtx } from '@/lib/word-craft/pixi/sceneCtx';
 import { playTilePlaceRipple } from '@/lib/word-craft/pixi/scenes/tilePlaceRipple';
 import { playSpectacleCommit } from '@/lib/word-craft/celebration/playSpectacleCommit';
+import { resolveCommitTier } from '@/lib/word-craft/celebration/commitTier';
+import { pickMiniCelebration } from '@/lib/word-craft/celebration/miniCelebration';
 import { useWordCraftSound } from '@/components/word-craft/useWordCraftSound';
 import { recordBest } from '@/lib/word-craft/bestScore';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
@@ -51,6 +53,8 @@ import { isUnassignedBlank } from '@/lib/word-craft/blankAssign';
 import { WordCraftBlankPicker } from '@/components/word-craft/WordCraftBlankPicker';
 import { WordCraftAxisChip } from '@/components/word-craft/WordCraftAxisChip';
 import { WordCraftPlacementGuide } from '@/components/word-craft/WordCraftPlacementGuide';
+import { WordCraftStepHint } from '@/components/word-craft/WordCraftStepHint';
+import { resolveWordCraftStep } from '@/lib/word-craft/stepHint';
 import { WordCraftModifierChip } from '@/components/word-craft/WordCraftModifierChip';
 import {
   trackWordCraftAxisLocked,
@@ -663,16 +667,36 @@ export default function WordCraftPageClient() {
         queueAchievement({ key: 'wordcraft_first_word', icon: '🎉' });
       }
 
-      // Achievement: bingo
-      if (isBingo) {
-        queueAchievement({ key: 'wordcraft_bingo', icon: '⭐' });
+      // Confetti bursts: a bingo gets the full 80-particle blast; ordinary turns
+      // that are still satisfying — big words, stealing 2+ rival squares, or a
+      // streak milestone — get a lighter 'great' pop so the mid-game isn't silent.
+      const burstTier = resolveCommitTier({
+        scoreThisTurn: newest.score,
+        tilesPlaced: newest.placedTileIds.length,
+        bingo: isBingo,
+        streak: game.state.streaks.player,
+        hasRareTile: false,
+        premiumTriggered: false,
+        heatLevel: game.state.heat,
+      });
+      const miniKind = pickMiniCelebration({
+        tier: burstTier,
+        streak: game.state.streaks.player,
+        cellsStolen: gain.stolen,
+      });
+      if (isBingo || miniKind) {
         const target = (placedEls[Math.floor(placedEls.length / 2)] as HTMLElement | undefined) ?? null;
         const rect = target?.getBoundingClientRect();
         setCelebration((prev) => ({
-          kind: 'bingo',
+          kind: isBingo ? 'bingo' : 'great',
           burstId: prev.burstId + 1,
           origin: rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : undefined,
         }));
+      }
+
+      // Achievement: bingo
+      if (isBingo) {
+        queueAchievement({ key: 'wordcraft_bingo', icon: '⭐' });
       }
     }
   }, [game.state.history, game.state.overdrive, juice, t, queueAchievement, sceneCtx, game, cosyMode, playCommitSound, playOpponentScored]);
@@ -1064,6 +1088,31 @@ export default function WordCraftPageClient() {
           </div>
         ) : null}
 
+        {/* Live coaching pill for new players: updates pick → place → submit as
+            the player acts (the static guide above only covers the first move).
+            This directly answers the "I tapped a letter, now what?" stuck moment
+            by saying "Tap a square" the instant a tile is selected. Retires after
+            the first few turns so veterans aren't nagged. */}
+        <WordCraftStepHint
+          step={
+            game.state.history.length < 3 && game.state.turn !== 'over'
+              ? resolveWordCraftStep({
+                  turn: game.state.turn,
+                  selectedTileId: game.state.selectedRackTileId,
+                  pendingCount: game.state.pendingPlacements.length,
+                  canInteract,
+                })
+              : 'idle'
+          }
+          labels={{
+            pick: t('wordcraft.place.step1', 'Tap a letter'),
+            place: t('wordcraft.place.step2', 'Tap a square'),
+            submit: t('wordcraft.place.step3', 'Submit'),
+            bot: t('wordcraft.botTurn', 'WordBot is thinking…'),
+            over: t('wordcraft.gameOver', 'Game over'),
+          }}
+        />
+
         <WordCraftRack
           tiles={activeRack}
           selectedId={game.state.selectedRackTileId}
@@ -1197,6 +1246,8 @@ export default function WordCraftPageClient() {
           playerName={hotseat ? t('wordcraft.player1') : undefined}
           botName={hotseat ? t('wordcraft.player2') : undefined}
           isNewBest={newBest}
+          playerAvatar={challengerIdentity.avatar}
+          opponentAvatar={duelOutcome?.challengerAvatar}
           duelOutcome={duelOutcome ?? undefined}
           currentSeed={seed}
           currentLocale={locale}

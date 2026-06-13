@@ -12814,6 +12814,8 @@ const en = {
     },
     "gameOver": "Game over",
     "winnerLabel": "{{name}} wins!",
+    "youWon": "You won! 🏆",
+    "opponentWon": "{name} won",
     "playAgain": "Play again",
     "home": "Home",
     "finalTiles": "Final tiles!",

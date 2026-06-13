@@ -3,12 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { WordCraftGameOverScene } from '../WordCraftGameOverScene';
 
 const t = (k: string, vars?: Record<string, unknown>) => {
-  if (k === 'wordcraft.winnerLabel') {
-    const template = 'Winner: {{name}}';
-    if (vars?.name) return template.replace('{{name}}', String(vars.name));
-    return template;
-  }
+  if (k === 'wordcraft.youWon') return 'You won!';
+  if (k === 'wordcraft.opponentWon') return `${String(vars?.name ?? '')} won`;
+  if (k === 'wordcraft.tied') return 'Tied';
   if (k === 'wordcraft.you') return 'You';
+  if (k === 'wordcraft.bot') return 'Bot';
   if (k === 'wordcraft.duel.youWin') return 'You win!';
   if (k === 'wordcraft.duel.youLose') return 'They win';
   if (k === 'wordcraft.duel.tie') return 'Tied!';
@@ -28,7 +27,7 @@ describe('WordCraftGameOverScene', () => {
     expect(container.querySelector('[role="status"]')).toBeTruthy();
   });
 
-  it('displays winner label with player name when player wins', () => {
+  it('says "You won!" (not the player name) when the local player wins', () => {
     const { container } = render(
       <WordCraftGameOverScene
         t={t}
@@ -37,7 +36,29 @@ describe('WordCraftGameOverScene', () => {
       />
     );
     const banner = container.querySelector('[role="status"]');
-    expect(banner?.textContent).toContain('Winner');
+    expect(banner?.textContent).toContain('You won!');
+    // Must never leak an un-substituted i18n placeholder.
+    expect(banner?.textContent).not.toContain('{name}');
+    expect(banner?.textContent).not.toContain('{{name}}');
+  });
+
+  it('names the opponent + "won" when the local player loses', () => {
+    const { container } = render(
+      <WordCraftGameOverScene t={t} playerScore={80} botScore={120} />
+    );
+    const banner = container.querySelector('[role="status"]');
+    // Default opponent label is the bot; placeholder must be substituted.
+    expect(banner?.textContent).toContain('Bot won');
+    expect(banner?.textContent).not.toContain('{name}');
+  });
+
+  it('renders an avatar beside each score column (seeded fallback when none supplied)', () => {
+    const { container } = render(
+      <WordCraftGameOverScene t={t} playerScore={120} botScore={80} />
+    );
+    // Both the player and opponent columns carry an avatar node — the win/lose
+    // screen now shows faces, not just numbers.
+    expect(container.querySelectorAll('[data-wc-result-avatar]').length).toBe(2);
   });
 
   it('has neo-yellow background for celebration', () => {
@@ -67,6 +88,24 @@ describe('WordCraftGameOverScene', () => {
     const banner = container.querySelector('[role="status"]');
     expect(banner?.textContent).toContain('Player 2');
     expect(banner?.textContent).not.toContain('wordcraft.bot');
+  });
+
+  it('names the winning SEAT in hot-seat instead of ambiguous "You won!"', () => {
+    // GIVEN two humans on one device and Player 1 (the local seat) wins
+    const { container } = render(
+      <WordCraftGameOverScene
+        t={t}
+        playerScore={120}
+        botScore={80}
+        playerName="Player 1"
+        botName="Player 2"
+      />
+    );
+    // THEN the banner names the winning seat — "You won!" is meaningless when
+    // both players share the screen.
+    const banner = container.querySelector('[role="status"]');
+    expect(banner?.textContent).toContain('Player 1');
+    expect(banner?.textContent).not.toContain('You won!');
   });
 
   it('renders as a full-screen modal overlay so the game end is unmissable', () => {

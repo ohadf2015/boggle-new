@@ -13031,6 +13031,8 @@ const sv = {
     },
     "gameOver": "Spelet är slut",
     "winnerLabel": "{{name}} vinner!",
+    "youWon": "Du vann! 🏆",
+    "opponentWon": "{name} vann",
     "playAgain": "Spela igen",
     "home": "Hem",
     "finalTiles": "Sista brickorna!",

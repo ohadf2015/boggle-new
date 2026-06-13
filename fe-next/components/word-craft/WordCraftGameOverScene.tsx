@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
 import { WordCraftDuelResult } from './WordCraftDuelResult';
 import type { BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
@@ -15,6 +16,10 @@ interface Props {
   botName?: string;
   /** Player just set a new single-player personal best this game. */
   isNewBest?: boolean;
+  /** Local player's avatar (from auth profile) — shown beside their score column. */
+  playerAvatar?: CustomAvatarConfig;
+  /** Opponent's avatar (e.g. bot/seat). When absent a seeded fallback is generated. */
+  opponentAvatar?: CustomAvatarConfig;
   /** Duel result when playing vs a remote challenger via a duel link */
   duelOutcome?: { outcome: 'win' | 'lose' | 'tie'; challengerName: string; challengerScore: number; challengerAvatar?: CustomAvatarConfig };
   /** Current game seed for building outgoing duel links */
@@ -33,7 +38,7 @@ interface Props {
   onHome?: () => void;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, onPlayAgain, onHome }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, onPlayAgain, onHome }: Props) {
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
     return (
@@ -56,11 +61,23 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
   const isTie = playerScore === botScore;
   const playerLabel = playerName ?? t('wordcraft.you');
   const botLabel = botName ?? t('wordcraft.bot');
-  const winnerName = playerScore > botScore ? playerLabel : botLabel;
+  const playerWon = !isTie && playerScore > botScore;
+  // Hot-seat (pass-and-play) supplies explicit seat names — two humans share one
+  // screen, so "You won!" is ambiguous; we name the winning seat instead. In
+  // vs-bot / duel play we speak directly to the player: a win is "You won!"
+  // (never their own name), a loss names the victor.
+  // Interpolation is delegated to t() with a params object so the placeholder is
+  // substituted no matter the brace style — the old manual `.replace('{{name}}', …)`
+  // left a literal `{name}` whenever a locale used single braces.
+  const isSeated = playerName != null;
+  const winnerName = playerWon ? playerLabel : botLabel;
   const label = isTie
     ? t('wordcraft.tied')
-    : t('wordcraft.winnerLabel').replace('{{name}}', winnerName);
-  const playerWon = !isTie && playerScore > botScore;
+    : isSeated
+      ? t('wordcraft.opponentWon', { name: winnerName })
+      : playerWon
+        ? t('wordcraft.youWon', 'You won!')
+        : t('wordcraft.opponentWon', { name: botLabel });
   const squares = t('wordcraft.squares', 'squares');
 
   // Full-screen modal: a small bottom banner was easy to miss, so players were
@@ -95,16 +112,22 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
         {/* Concrete result: how many squares each side controls at the buzzer. */}
         <div className="flex items-stretch gap-3 w-full">
           <div className={cn(
-            'flex-1 flex flex-col items-center gap-0.5 py-3 rounded-neo border-neo-thick border-black',
+            'flex-1 flex flex-col items-center gap-1 py-3 rounded-neo border-neo-thick border-black',
             playerWon ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-navy text-neo-cyan',
           )}>
+            <span data-wc-result-avatar className="block">
+              <Avatar customAvatar={playerAvatar ?? null} userId={`wc-player-${playerLabel}`} size="sm" disableEffects />
+            </span>
             <span className="text-3xl font-neo-display font-black leading-none">{playerScore}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{playerLabel} · {squares}</span>
           </div>
           <div className={cn(
-            'flex-1 flex flex-col items-center gap-0.5 py-3 rounded-neo border-neo-thick border-black',
+            'flex-1 flex flex-col items-center gap-1 py-3 rounded-neo border-neo-thick border-black',
             !playerWon && !isTie ? 'bg-neo-pink text-neo-white' : 'bg-neo-navy text-neo-pink',
           )}>
+            <span data-wc-result-avatar className="block">
+              <Avatar customAvatar={opponentAvatar ?? null} userId={`wc-opponent-${botLabel}`} size="sm" disableEffects />
+            </span>
             <span className="text-3xl font-neo-display font-black leading-none">{botScore}</span>
             <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{botLabel} · {squares}</span>
           </div>
