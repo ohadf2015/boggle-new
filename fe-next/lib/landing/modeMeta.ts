@@ -84,12 +84,14 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   brainGym: {
     titleKey: 'landing.brainTraining', descKey: 'landing.brainTrainingDesc', path: '/brain',
     Icon: Brain, variant: 'purple', modeImage: '/modes/practice.png', genIcon: '/modes/cubes/braingym.png',
-    imgScale: 1.4, // taller char (~53% / tall) → gentler scale so the brain stays in-frame
+    // No imgScale: the character is already large-framed (brain + dumbbell + feet
+    // span ~75% of the tile). Upscaling clipped the brain at the top edge and the
+    // feet at the bottom, reading oversized — natural framing matches the other tiles.
   },
   wordCraft: {
     titleKey: 'wordcraft.modeTitle', descKey: 'wordcraft.modeDesc', path: '/word-craft',
     Icon: Layers, variant: 'orange', badge: 'NEW', modeImage: '/modes/word-craft.png', genIcon: '/modes/cubes/wordcraft.png',
-    imgScale: 1.45, // ~55% framed → fill
+    imgScale: 1.1, // hammer + anvil already fill ~60% → a gentle bump to match wordForge, not overgrow
   },
   crossword: {
     titleKey: 'crossword.name', descKey: 'crossword.tagline', path: '/crossword',
