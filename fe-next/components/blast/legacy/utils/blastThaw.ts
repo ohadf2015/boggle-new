@@ -7,8 +7,15 @@
  * BlastTileState import) so it is safe to import from both browser and backend.
  */
 
-/** Tile types that require thawing before they can be selected. */
-export const THAWABLE_TYPES: ReadonlySet<string> = new Set(['ice', 'frozen']);
+/**
+ * Tile types that are LOCKED until thawed by an adjacent word.
+ *
+ * Ice was removed (2026-06-13): players found "can't select this tile" confusing.
+ * Ice now spawns as a directly-selectable, meltable tile (2-hit crack→melt via
+ * hitsRemaining) — it is no longer lockable. Only `frozen` (the inner-special
+ * vault) still gates selection; it's currently retired from spawning anyway.
+ */
+export const THAWABLE_TYPES: ReadonlySet<string> = new Set(['frozen']);
 
 type CellCoord = { row: number; col: number };
 

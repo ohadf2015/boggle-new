@@ -11,24 +11,27 @@ import {
 } from '../blastWaveConfig';
 
 /**
- * "Locked tiles" removal (2026-06-13): ice + frozen retired so the board never
- * spawns a tile the player can't immediately select. The frost "locked" overlay
- * is derived purely from un-thawed ice/frozen via cellFilter — with zero ice/
- * frozen in the resolved distribution, no locked tile can ever appear (SP + MP,
- * since both roll on getWaveDistribution).
+ * "Locked tiles" removal (2026-06-13): only `frozen` (the inner-special vault
+ * that locks until thawed) is retired. ICE is kept — it spawns and is directly
+ * selectable/meltable (no lock; see THAWABLE_TYPES). The derived frost "locked"
+ * overlay therefore never appears, because frozen never spawns and ice never
+ * locks (SP + MP both roll on getWaveDistribution).
  */
-describe('blastWaveConfig — locked (ice/frozen) tiles never spawn', () => {
-  it('resolves ice and frozen to 0 share across every wave (1-12)', () => {
+describe('blastWaveConfig — frozen retired, ice kept (selectable/meltable)', () => {
+  it('resolves frozen to 0 share across every wave (1-12)', () => {
     for (let w = 1; w <= 12; w++) {
       const dist = getWaveDistribution(getWaveConfig(w));
-      expect(dist.ice ?? 0).toBe(0);
       expect(dist.frozen ?? 0).toBe(0);
     }
   });
 
-  it('lists ice and frozen in the retired set', () => {
-    expect(BLAST_RETIRED_SPECIAL_TYPES.has('ice')).toBe(true);
+  it('keeps ice spawning (it is no longer a locked tile)', () => {
+    expect(getWaveDistribution(getWaveConfig(1)).ice ?? 0).toBeGreaterThan(0);
+  });
+
+  it('lists frozen — but NOT ice — in the retired set', () => {
     expect(BLAST_RETIRED_SPECIAL_TYPES.has('frozen')).toBe(true);
+    expect(BLAST_RETIRED_SPECIAL_TYPES.has('ice')).toBe(false);
   });
 });
 
@@ -244,13 +247,11 @@ describe('getWaveDistribution', () => {
     expect(w6GoldRainbow).toBeLessThan(w1GoldRainbow);
   });
 
-  it('keeps gold spawning across waves (ice retired, never spawns)', () => {
+  it('uses wave-specific ice and gold distributions', () => {
     const dist1 = getWaveDistribution(getWaveConfig(1));
     const dist6 = getWaveDistribution(getWaveConfig(6));
-    // Ice is retired (locked-tile removal) → zero at every wave.
-    expect(dist1.ice ?? 0).toBe(0);
-    expect(dist6.ice ?? 0).toBe(0);
-    // Gold remains a workhorse special at every wave.
+    // Ice spawns (kept, selectable/meltable) and scales up across waves.
+    expect(dist6.ice).toBeGreaterThan(dist1.ice);
     expect(dist1.gold).toBeGreaterThan(0);
     expect(dist6.gold).toBeGreaterThan(0);
   });
@@ -261,9 +262,9 @@ describe('getWaveDistribution', () => {
 describe('getWaveDistribution — new tile unlock progression', () => {
   it('wave 1: basic tiles only, no advanced tiles', () => {
     const dist = getWaveDistribution(getWaveConfig(1));
-    // Basic specials all present (ice retired → never spawns)
+    // Basic specials all present (ice kept — selectable/meltable, not locked)
     expect(dist.bomb).toBeGreaterThan(0);
-    expect(dist.ice ?? 0).toBe(0);
+    expect(dist.ice).toBeGreaterThan(0);
     expect(dist.gold).toBeGreaterThan(0);
     expect(dist.rainbow).toBeGreaterThan(0);
     // Advanced tiles absent in wave 1
@@ -599,8 +600,9 @@ describe('wave completability invariants', () => {
 // types. BLAST_RETIRED_SPECIAL_TYPES zeroes the redundant/confusing ones at
 // EVERY wave so the roster never grows past the clear FTUE core.
 describe('getWaveDistribution — curated permanent roster', () => {
-  // Locked-tile removal (2026-06-13) pulled ice + frozen from the kept core.
-  const KEPT_CORE = ['bomb', 'gold', 'rainbow', 'lightning', 'prism'] as const;
+  // Locked-tile removal (2026-06-13) pulled only frozen from the kept core;
+  // ice stays (now selectable/meltable rather than locked).
+  const KEPT_CORE = ['bomb', 'ice', 'gold', 'rainbow', 'lightning', 'prism'] as const;
 
   it('retires every flood tile at the highest waves (no revival)', () => {
     for (const wave of [9, 12, 15, 20]) {

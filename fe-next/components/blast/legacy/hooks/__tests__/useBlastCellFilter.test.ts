@@ -2,7 +2,8 @@
  * Tests for blast cell filter logic — determines which tiles are selectable.
  *
  * Board effects:
- * - ice/frozen: NOT selectable until thawed (adjacent word clears nearby)
+ * - ice: ALWAYS selectable (meltable — 2-hit crack→melt; no longer locked)
+ * - frozen: NOT selectable until thawed (adjacent word clears nearby)
  * - gem: only selectable when path already has 2+ tiles
  * - all others: always selectable
  */
@@ -41,15 +42,15 @@ function makeGrid(size: number, overrides: Record<string, Partial<BlastTileState
 
 describe('computeCellFilter', () => {
   describe('ice tiles', () => {
-    it('blocks unthawed ice tiles from selection', () => {
+    it('ice is directly selectable (meltable, not locked)', () => {
       const grid = makeGrid(4, {
         '1-1': { type: 'ice' },
       });
       const filter = computeCellFilter(grid, []);
-      expect(filter(1, 1)).toBe(false);
+      expect(filter(1, 1)).toBe(true);
     });
 
-    it('allows thawed ice tiles', () => {
+    it('ice stays selectable regardless of thaw state', () => {
       const grid = makeGrid(4, {
         '1-1': { type: 'ice', isThawed: true },
       });
@@ -129,10 +130,19 @@ describe('computeCellFilter', () => {
 });
 
 describe('computeThawedCells', () => {
-  it('thaws ice tiles adjacent to any cell in the submitted word path', () => {
+  it('does NOT thaw ice — ice is directly selectable, not lockable', () => {
     const grid = makeGrid(4, {
-      '0-0': { type: 'ice' },  // adjacent to (0,1) and (1,0) and (1,1)
-      '2-2': { type: 'ice' },  // NOT adjacent to path
+      '0-0': { type: 'ice' },  // adjacent to the path but ice no longer thaws
+    });
+    const path = [{ row: 0, col: 1 }, { row: 0, col: 2 }];
+    const thawed = computeThawedCells(grid, path);
+    expect(thawed).not.toContainEqual({ row: 0, col: 0 });
+  });
+
+  it('thaws frozen tiles adjacent to any cell in the submitted word path', () => {
+    const grid = makeGrid(4, {
+      '0-0': { type: 'frozen' },  // adjacent to (0,1) and (1,0) and (1,1)
+      '2-2': { type: 'frozen' },  // NOT adjacent to path
     });
 
     const path = [{ row: 0, col: 1 }, { row: 0, col: 2 }];
@@ -155,7 +165,7 @@ describe('computeThawedCells', () => {
 
   it('does not thaw tiles that are already thawed', () => {
     const grid = makeGrid(4, {
-      '0-0': { type: 'ice', isThawed: true },
+      '0-0': { type: 'frozen', isThawed: true },
     });
 
     const path = [{ row: 0, col: 1 }];
@@ -166,7 +176,7 @@ describe('computeThawedCells', () => {
 
   it('does not thaw already-cleared tiles', () => {
     const grid = makeGrid(4, {
-      '0-0': { type: 'ice', isCleared: true },
+      '0-0': { type: 'frozen', isCleared: true },
     });
 
     const path = [{ row: 0, col: 1 }];
@@ -185,7 +195,7 @@ describe('computeThawedCells', () => {
 
   it('handles edge/corner cells correctly', () => {
     const grid = makeGrid(4, {
-      '0-0': { type: 'ice' },  // corner — adjacent to (0,1), (1,0), (1,1)
+      '0-0': { type: 'frozen' },  // corner — adjacent to (0,1), (1,0), (1,1)
     });
 
     // Path at (1,1) — diagonally adjacent to (0,0)
@@ -197,7 +207,7 @@ describe('computeThawedCells', () => {
 
   it('does not duplicate thawed cells when multiple path tiles are adjacent', () => {
     const grid = makeGrid(4, {
-      '1-1': { type: 'ice' },  // adjacent to both (0,0) and (0,1)
+      '1-1': { type: 'frozen' },  // adjacent to both (0,0) and (0,1)
     });
 
     const path = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
