@@ -66,13 +66,32 @@ even under this load). Remediation (infra, needs care):
   per 90s window across all mounts. 90s < the 5-min online threshold, so presence stays accurate.
   Cuts both the profiles writes feeding the WAL decoder and the Auth round-trips.
 
-## BACKEND DEBT — auth.getUser() round-trips
+## BACKEND — auth.getUser() round-trips (investigated 2026-06-13)
 
-96 routes still call `supabase.auth.getUser()` (50–200ms Auth round-trip each). Infra to fix
-already exists (`lib/auth/verifyJwtLocal` + `getAuthedUser`, used in 15+ routes). Migrate
-hottest **read-only GET** paths to `getAuthedUser(request)`; keep remote `getUser` on
-mutations/security-critical (local verify can't detect mid-token revocation). See memory
-`auth-getuser-refactor-playbook`.
+The 50–200ms `auth.getUser()` Auth round-trip. Findings:
+
+1. **Per-request middleware — ALREADY FIXED.** `proxy.ts:116-121` switched from `getUser()`
+   (network, every request) to `getSession()` (local JWT read). The highest-frequency
+   round-trip is gone.
+2. **`updateOnlineStatus` — FIXED this session** (commit `c5751d4be`). It did an `auth.getUser()`
+   per call; the new module-level throttle cuts those round-trips ~N× alongside the writes.
+3. **~91 API-route `auth.getUser()` calls — BLOCKED on key provisioning (user action).**
+   - `lib/auth/getAuthedUser` + `verifyJwtLocal` exist and 3 hot GETs (streak/notifications/gifts)
+     are wired, but the fast path is **inert**: `SUPABASE_JWT_SECRET` is not set locally, and the
+     project's JWKS is empty (`{"keys":[]}` → legacy **HS256 symmetric**), so local verify has no
+     key material. `getAuthedUser` silently falls back to the remote round-trip everywhere.
+   - **Activation (one-time, dashboard-only — not MCP-accessible):**
+     - **Option A (quick):** Supabase Dashboard → Settings → API → JWT Secret → copy → add
+       `SUPABASE_JWT_SECRET` to Railway env + `.env.local`. Existing `verifyJwtLocal` (HS256)
+       activates immediately for the 3 wired routes.
+     - **Option B (recommended, no secret to manage):** enable **asymmetric JWT signing keys**
+       in Supabase Auth → JWKS populates → switch `verifyJwtLocal`/`getAuthedUser` to
+       `supabase.auth.getClaims()` (local JWKS verify). Modern, rotation-safe.
+   - **Migration is security-sensitive:** the proven pattern (streak GET) pairs `getAuthedUser`
+     with a **service-role** client (RLS bypass) + explicit `.eq(id, user.id)` filtering — because
+     bearer-only clients (Capacitor) have no cookie session. Do the broader route migration only
+     after the key is live so the win is verifiable and each query's user-filter is reviewed.
+   - See memory `auth-getuser-refactor-playbook`.
 
 ## DB advisors (supabase get_advisors performance)
 
