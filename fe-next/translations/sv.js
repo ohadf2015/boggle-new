@@ -8802,6 +8802,8 @@ const sv = {
       "timerFrozen": "Timer frusen i {seconds}s!",
       "shieldBlocked": "Sköld blockerade {percent}% skada!",
       "allObjectivesComplete": "Alla mål uppnådda!",
+      "finishLevel": "Avsluta nivå",
+      "finishKeepStars": "Behåll {stars}",
       "gridAriaLabel": "Äventyrsspelbräde",
       "wordsYouMissed": "Ord du missade",
       "missedWordsSummary": "{{count}} ord du kunde ha hittat",

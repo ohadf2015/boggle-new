@@ -8276,6 +8276,8 @@ const en = {
       "timerFrozen": "Timer frozen for {seconds}s!",
       "shieldBlocked": "Shield blocked {percent}% damage!",
       "allObjectivesComplete": "All Objectives Complete!",
+      "finishLevel": "Finish Level",
+      "finishKeepStars": "Keep {stars}",
       "gridAriaLabel": "Adventure game board",
       "wordsYouMissed": "Words You Missed",
       "missedWordsSummary": "{{count}} words you could have found",

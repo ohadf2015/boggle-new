@@ -1,13 +1,17 @@
 /**
  * useAdventureGame Level Completion Tests
  *
- * Levels should NOT auto-complete when primary objectives are met.
- * Instead, they run until timer expires so players can earn secondary
- * objectives for 2-3 stars.
+ * Contract (updated 2026-06-13): a level ends the moment there is nothing
+ * left to do — i.e. when EVERY objective (primary AND secondary) is complete.
+ * Players no longer wait out the timer once all quests are done.
  *
- * Level ends only when:
- * 1. Timer runs out
- * 2. Boss kills the player (boss levels)
+ * While objectives remain (primary met but a secondary still open), the level
+ * keeps running so players can chase the remaining stars.
+ *
+ * Level ends when:
+ * 1. All objectives complete (auto-end — no timer wait)
+ * 2. Timer runs out (awards whatever stars were earned)
+ * 3. Boss kills the player (boss levels)
  */
 
 import { vi } from 'vitest';
@@ -57,7 +61,7 @@ function createMockGrid(size: number = 4): string[][] {
 // TESTS
 // ==============================================
 
-describe('useAdventureGame - Level does NOT auto-complete on primary objective', () => {
+describe('useAdventureGame - Level auto-ends when all quests are done', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -66,59 +70,8 @@ describe('useAdventureGame - Level does NOT auto-complete on primary objective',
     vi.useRealTimers();
   });
 
-  it('should keep playing after primary objective is met', () => {
+  it('keeps playing when only the primary is met and a secondary is still open', () => {
     const levelConfig = createMockLevelConfig({
-      objectives: [
-        { type: 'wordCount', target: 1, isPrimary: true },
-        { type: 'scoreTarget', target: 500, isPrimary: false },
-      ],
-    });
-    const grid = createMockGrid();
-    const { result } = renderHook(() =>
-      useAdventureGame({ levelConfig, initialGrid: grid })
-    );
-
-    // Submit word that meets primary objective
-    act(() => {
-      result.current.submitWord('CAT', 50);
-    });
-
-    // Game should NOT be complete — timer still running
-    expect(result.current.gameState.isComplete).toBe(false);
-  });
-
-  it('should allow earning secondary objectives after primary is met', () => {
-    const levelConfig = createMockLevelConfig({
-      objectives: [
-        { type: 'wordCount', target: 1, isPrimary: true },
-        { type: 'scoreTarget', target: 100, isPrimary: false },
-        { type: 'longWords', target: 1, isPrimary: false },
-      ],
-    });
-    const grid = createMockGrid();
-    const { result } = renderHook(() =>
-      useAdventureGame({ levelConfig, initialGrid: grid })
-    );
-
-    // Submit short word — meets primary only
-    act(() => {
-      result.current.submitWord('CAT', 50);
-    });
-
-    expect(result.current.gameState.isComplete).toBe(false);
-
-    // Submit long word — meets secondary objectives
-    act(() => {
-      result.current.submitWord('TESTS', 150);
-    });
-
-    // Still playing — level ends on timer only
-    expect(result.current.gameState.isComplete).toBe(false);
-  });
-
-  it('should complete with correct stars when timer expires', () => {
-    const levelConfig = createMockLevelConfig({
-      timerSeconds: 5,
       objectives: [
         { type: 'wordCount', target: 1, isPrimary: true },
         { type: 'scoreTarget', target: 500, isPrimary: false },
@@ -133,30 +86,70 @@ describe('useAdventureGame - Level does NOT auto-complete on primary objective',
       result.current.startGame();
     });
 
-    // Submit word that meets primary
+    // Meets primary (wordCount) but not the 500-point secondary
     act(() => {
       result.current.submitWord('CAT', 50);
     });
 
+    // Still playing — a star is still on the table
     expect(result.current.gameState.isComplete).toBe(false);
+  });
 
-    // Run timer to zero
+  it('auto-ends immediately when ALL objectives are complete (no timer wait)', () => {
+    const levelConfig = createMockLevelConfig({
+      objectives: [
+        { type: 'wordCount', target: 1, isPrimary: true },
+        { type: 'scoreTarget', target: 100, isPrimary: false },
+        { type: 'longWords', target: 1, isPrimary: false },
+      ],
+    });
+    const grid = createMockGrid();
+    const { result } = renderHook(() =>
+      useAdventureGame({ levelConfig, initialGrid: grid })
+    );
+
     act(() => {
-      vi.advanceTimersByTime(5000);
+      result.current.startGame();
     });
 
-    // Now complete with 1 star (primary met, secondary not)
+    // A single long word clears all three objectives at once
+    act(() => {
+      result.current.submitWord('TESTS', 150);
+    });
+
+    // Nothing left to do → level ends now, with full stars
+    expect(result.current.gameState.isComplete).toBe(true);
+    expect(result.current.gameState.stars).toBe(3);
+    expect(result.current.isPlaying).toBe(false);
+  });
+
+  it('auto-ends a single-objective level the instant it is met', () => {
+    const levelConfig = createMockLevelConfig({
+      objectives: [{ type: 'wordCount', target: 1, isPrimary: true }],
+    });
+    const grid = createMockGrid();
+    const { result } = renderHook(() =>
+      useAdventureGame({ levelConfig, initialGrid: grid })
+    );
+
+    act(() => {
+      result.current.startGame();
+    });
+
+    act(() => {
+      result.current.submitWord('CAT', 50);
+    });
+
     expect(result.current.gameState.isComplete).toBe(true);
     expect(result.current.gameState.stars).toBe(1);
   });
 
-  it('should get 3 stars when all objectives met at timer expiry', () => {
+  it('completes with the earned stars when the timer expires before all quests are done', () => {
     const levelConfig = createMockLevelConfig({
       timerSeconds: 5,
       objectives: [
         { type: 'wordCount', target: 1, isPrimary: true },
-        { type: 'scoreTarget', target: 100, isPrimary: false },
-        { type: 'longWords', target: 1, isPrimary: false },
+        { type: 'scoreTarget', target: 500, isPrimary: false },
       ],
     });
     const grid = createMockGrid();
@@ -168,19 +161,20 @@ describe('useAdventureGame - Level does NOT auto-complete on primary objective',
       result.current.startGame();
     });
 
-    // Submit long word that meets all objectives
+    // Primary met, secondary (500) still open → keeps running
     act(() => {
-      result.current.submitWord('TESTS', 150);
+      result.current.submitWord('CAT', 50);
     });
 
     expect(result.current.gameState.isComplete).toBe(false);
 
-    // Timer expires
+    // Timer drains to zero
     act(() => {
       vi.advanceTimersByTime(5000);
     });
 
+    // Completes with 1 star (primary met, secondary not)
     expect(result.current.gameState.isComplete).toBe(true);
-    expect(result.current.gameState.stars).toBe(3);
+    expect(result.current.gameState.stars).toBe(1);
   });
 });

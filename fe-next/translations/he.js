@@ -8896,6 +8896,8 @@ const he = {
       "timerFrozen": "הטיימר הוקפא ל-{seconds} שניות!",
       "shieldBlocked": "המגן חסם {percent}% נזק!",
       "allObjectivesComplete": "כל המשימות הושלמו!",
+      "finishLevel": "סיים שלב",
+      "finishKeepStars": "שמור {stars}",
       "gridAriaLabel": "לוח משחק הרפתקה"
     },
     "nearMiss": {

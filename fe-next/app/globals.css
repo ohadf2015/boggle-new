@@ -342,6 +342,28 @@ html.lexi-native [data-selectable] {
   background: linear-gradient(165deg, #ffffff 0%, #fefefe 40%, #fafaf8 100%);
 }
 
+@utility adventure-tile-face {
+  /* Adventure-only tile bevel. The shared neo hard-shadow is black, so it
+     vanishes against the dark game board and tiles read flat. This inset
+     bevel — bright top rim + shaded bottom — gives each standard tile a domed,
+     pressable-key depth that reads on ANY background, independent of the board.
+     Applied via ::before so it never collides with the tile's own box-shadow. */
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+    box-shadow:
+      inset 0 3px 1px rgba(255, 255, 255, 0.95),
+      inset 0 -6px 8px rgba(86, 58, 20, 0.28),
+      inset 0 -1px 0 rgba(120, 82, 30, 0.5),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+}
+
 @utility golden-tile-bg {
   /* Golden Tile - Full golden gradient for classic MP special tiles */
   background: linear-gradient(

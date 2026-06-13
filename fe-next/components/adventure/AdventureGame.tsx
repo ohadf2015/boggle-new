@@ -39,6 +39,8 @@ import { getChapterNumber } from '@/lib/adventure/questConfig';
 import { applyGemDetectorBoost, LEVELS_PER_WORLD } from '@/lib/adventure';
 import { useMemoizedFlatTiles } from '@/lib/adventure/flattenTiles';
 import AdventureGameShell from './AdventureGameShell';
+import AdventureFinishCTA from './AdventureFinishCTA';
+import { calculateStars, allObjectivesComplete } from '@/hooks/adventureGameReducer';
 import { useAdventureDerivations } from './hooks/useAdventureDerivations';
 import { useAdventureActions } from './hooks/useAdventureActions';
 import { hasSeenTutorial } from './AdventureTutorial';
@@ -541,7 +543,25 @@ const AdventureGame = memo<AdventureGameProps>(
       );
     }
 
+    // "Finish Level" CTA: the level auto-ends once EVERY quest is done, but when
+    // the required (primary) objectives are met and only an optional one remains,
+    // let the player stop the clock and claim the stars they've already earned.
+    const primaryObjectivesDone =
+      objectives.length > 0 &&
+      objectives.filter((o) => o.isPrimary).every((o) => (o.current ?? 0) >= o.target);
+    const everyObjectiveDone = allObjectivesComplete(objectives);
+    const showFinishCta =
+      isPlaying &&
+      entryPhase === 'playing' &&
+      !isPaused &&
+      !isBossLevel &&
+      !isModalOpen &&
+      primaryObjectivesDone &&
+      !everyObjectiveDone;
+    const starsSoFar = calculateStars(objectives);
+
     return (
+      <>
       <AdventureGameShell
         bossOrch={bossOrch as never}
         wordSubmit={wordSubmit as never}
@@ -612,6 +632,14 @@ const AdventureGame = memo<AdventureGameProps>(
         submitHuntGuess={submitHuntGuess}
         t={t}
       />
+      <AdventureFinishCTA
+        visible={showFinishCta}
+        starsSoFar={starsSoFar}
+        onFinish={completeLevel}
+        t={t}
+        isRTL={language === 'he'}
+      />
+      </>
     );
   }
 );

@@ -9069,6 +9069,8 @@ const es = {
       "timerFrozen": "¡Temporizador congelado por {seconds}s!",
       "shieldBlocked": "¡Escudo bloqueó {percent}% de daño!",
       "allObjectivesComplete": "¡Todos los objetivos completados!",
+      "finishLevel": "Terminar nivel",
+      "finishKeepStars": "Conserva {stars}",
       "gridAriaLabel": "Tablero de juego de aventura"
     },
     "nearMiss": {

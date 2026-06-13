@@ -23,7 +23,10 @@ export default function AdventureShopFAB({
   return (
     <div
       className={cn(
-        'fixed bottom-[calc(1.5rem+var(--admob-banner-height,0px))] z-20 lg:hidden',
+        // Sit clear of BOTH the global bottom tab-nav (z-[80], height published
+        // as --bottom-nav-height) and the AdMob anchor banner — otherwise the
+        // FAB is buried behind the nav bar on phones.
+        'fixed bottom-[calc(1rem+var(--bottom-nav-height,0px)+var(--admob-banner-height,0px))] z-30 lg:hidden',
         isRTL ? 'left-5' : 'right-5'
       )}
     >

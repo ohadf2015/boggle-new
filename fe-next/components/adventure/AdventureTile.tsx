@@ -216,8 +216,10 @@ export const AdventureTile = memo(({
           'animate-pulse motion-reduce:animate-none',
         ],
 
-        // Standard tile background — use same gradient as GridComponent
-        tile.type === 'standard' && 'letter-tile-gradient text-neo-black',
+        // Standard tile background — shared gradient + adventure-only bevel so
+        // the tile reads as a domed key on the dark board (black hard-shadow is
+        // invisible there). Bevel is scoped to adventure; classic MP untouched.
+        tile.type === 'standard' && 'letter-tile-gradient adventure-tile-face text-neo-black',
 
         // Gold tile - golden glow
         tile.type === 'gold' && [

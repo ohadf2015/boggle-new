@@ -8773,6 +8773,8 @@ const ja = {
       "timerFrozen": "タイマーが{seconds}秒間凍結！",
       "shieldBlocked": "シールドが{percent}%のダメージをブロック！",
       "allObjectivesComplete": "すべての目標を達成！",
+      "finishLevel": "レベル終了",
+      "finishKeepStars": "{stars}個を獲得",
       "gridAriaLabel": "アドベンチャーゲームボード"
     },
     "nearMiss": {

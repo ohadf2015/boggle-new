@@ -11,7 +11,7 @@
 
 import { memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Pause, Play, X, Swords, Heart } from 'lucide-react';
+import { Pause, Play, X, Swords, Heart, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHUDTheme } from '@/contexts/AdventureThemeContext';
@@ -124,21 +124,30 @@ export const GameHeader = memo(function GameHeader({
         data-testid="score-display"
       >
         <div className={cn(
-          'relative px-3 py-0.5 rounded-full transition-all duration-300',
+          // Persistent score chip — gives the number presence at rest instead of
+          // floating as bare text. Combo turns the chip purple with the decay ring.
+          'relative flex items-center gap-1.5 px-3 py-1 rounded-full border-2 transition-all duration-300',
           comboCount > 0
-            ? 'bg-neo-purple/15 ring-2 ring-neo-purple/60'
-            : 'bg-transparent'
+            ? 'bg-neo-purple/20 ring-2 ring-neo-purple/60 border-neo-purple/50'
+            : 'bg-neo-black/35 border-neo-yellow/35'
         )}>
           {/* Combo multiplier badge — appears on left when active */}
           {comboCount > 0 && (
             <AdaptiveMotion.span
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="absolute -inset-s-1 -top-1 w-5 h-5 rounded-full bg-neo-purple text-neo-white text-[9px] font-black flex items-center justify-center leading-none"
+              className="absolute -inset-s-1 -top-1 w-5 h-5 rounded-full bg-neo-purple text-neo-white text-[9px] font-black flex items-center justify-center leading-none z-10"
             >
               {comboCount}×
             </AdaptiveMotion.span>
           )}
+          <Star
+            className={cn(
+              'w-3.5 h-3.5 shrink-0 transition-colors duration-300',
+              comboCount > 0 ? 'text-neo-purple-light fill-neo-purple-light' : 'text-neo-yellow fill-neo-yellow'
+            )}
+            aria-hidden="true"
+          />
           <RollingNumber
             value={displayScore(score)}
             variant="white"

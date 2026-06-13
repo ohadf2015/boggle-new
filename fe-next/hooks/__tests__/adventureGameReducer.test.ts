@@ -1,4 +1,4 @@
-import { calculateStars, gameReducer, createInitialState } from '../adventureGameReducer';
+import { calculateStars, gameReducer, createInitialState, allObjectivesComplete } from '../adventureGameReducer';
 import type { LevelObjective, LevelConfig } from '../../types/adventure';
 
 function makeObjective(
@@ -191,6 +191,137 @@ describe('UPDATE_OBJECTIVE action', () => {
       payload: { objectiveType: 'collectGems', value: 5, mode: 'increment' },
     });
     expect(result.objectives).toEqual(state.objectives);
+  });
+});
+
+// ==============================================
+// AUTO-END WHEN ALL OBJECTIVES COMPLETE
+// "If I finished all the relevant quests, the level should end."
+// ==============================================
+
+describe('allObjectivesComplete helper', () => {
+  it('is true only when every objective meets its target', () => {
+    expect(
+      allObjectivesComplete([
+        makeObjective({ isPrimary: true, target: 100, current: 100 }),
+        makeObjective({ isPrimary: false, target: 5, current: 5 }),
+      ])
+    ).toBe(true);
+  });
+
+  it('is false when any objective is still short', () => {
+    expect(
+      allObjectivesComplete([
+        makeObjective({ isPrimary: true, target: 100, current: 100 }),
+        makeObjective({ isPrimary: false, target: 5, current: 4 }),
+      ])
+    ).toBe(false);
+  });
+
+  it('is false for an empty objective list (no false-complete)', () => {
+    expect(allObjectivesComplete([])).toBe(false);
+  });
+});
+
+describe('auto-end on all objectives complete', () => {
+  const nonBossConfig = {
+    world: 1, level: 1, gridSize: 4 as const, timerSeconds: 60,
+    isBossLevel: false, specialTiles: [], difficulty: 'EASY' as const,
+    chapterNumber: 1, levelInChapter: 1,
+    objectives: [
+      { type: 'wordCount', target: 2, isPrimary: true },
+      { type: 'longWords', target: 1, isPrimary: false },
+    ],
+  } as LevelConfig;
+  const grid = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => 'A'));
+
+  function play(config: LevelConfig) {
+    return gameReducer(createInitialState(config, grid), { type: 'START_GAME' });
+  }
+
+  it('ends the level (isComplete + paused + full stars) once every objective is met', () => {
+    let state = play(nonBossConfig);
+    // wordCount 1/2, longWords 1/1 — primary still short, keep playing
+    state = gameReducer(state, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'TESTS', score: 50, path: [], detonate: false },
+    });
+    expect(state.gameState.isComplete).toBe(false);
+    expect(state.isPlaying).toBe(true);
+
+    // Second word completes wordCount → all objectives met → auto-end
+    state = gameReducer(state, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'WORD', score: 50, path: [], detonate: false },
+    });
+    expect(state.gameState.isComplete).toBe(true);
+    expect(state.isPlaying).toBe(false);
+    // 1 primary + 1 (only) secondary complete = 2 stars
+    expect(state.gameState.stars).toBe(2);
+  });
+
+  it('keeps playing while a secondary objective is still open', () => {
+    let state = play(nonBossConfig);
+    // Two short words: wordCount 2/2 (primary done) but longWords 0/1 still open
+    state = gameReducer(state, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'CAT', score: 50, path: [], detonate: false },
+    });
+    state = gameReducer(state, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'DOG', score: 50, path: [], detonate: false },
+    });
+    expect(state.gameState.isComplete).toBe(false);
+    expect(state.isPlaying).toBe(true);
+  });
+
+  it('auto-ends from UPDATE_OBJECTIVE when it is the last-completing quest', () => {
+    const config = {
+      ...nonBossConfig,
+      objectives: [
+        { type: 'wordCount', target: 1, isPrimary: true },
+        { type: 'mechanicTrigger', target: 1, isPrimary: false },
+      ],
+    } as LevelConfig;
+    let state = play(config);
+    // Clear the primary first
+    state = gameReducer(state, {
+      type: 'SUBMIT_WORD',
+      payload: { word: 'CAT', score: 50, path: [], detonate: false },
+    });
+    expect(state.gameState.isComplete).toBe(false);
+
+    // mechanicTrigger is the last quest, completed via UPDATE_OBJECTIVE
+    state = gameReducer(state, {
+      type: 'UPDATE_OBJECTIVE',
+      payload: { objectiveType: 'mechanicTrigger', value: 1, mode: 'set' },
+    });
+    expect(state.gameState.isComplete).toBe(true);
+    expect(state.isPlaying).toBe(false);
+  });
+
+  it('does NOT auto-end on boss levels (boss flow owns the ending)', () => {
+    const bossConfig = {
+      world: 1, level: 7, gridSize: 5 as const, timerSeconds: 120,
+      isBossLevel: true, specialTiles: [], difficulty: 'HARD' as const,
+      chapterNumber: 3, levelInChapter: 3,
+      objectives: [
+        { type: 'defeatBoss', target: 100, isPrimary: true },
+        { type: 'mechanicTrigger', target: 1, isPrimary: false },
+        { type: 'surviveBattle', target: 50, isPrimary: false },
+      ],
+    } as LevelConfig;
+    const bossGrid = Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => 'A'));
+    let state = gameReducer(createInitialState(bossConfig, bossGrid), { type: 'START_GAME' });
+
+    // Force every boss objective complete via UPDATE_OBJECTIVE
+    state = gameReducer(state, { type: 'UPDATE_OBJECTIVE', payload: { objectiveType: 'surviveBattle', value: 100, mode: 'set' } });
+    state = gameReducer(state, { type: 'UPDATE_OBJECTIVE', payload: { objectiveType: 'mechanicTrigger', value: 1, mode: 'set' } });
+    state = gameReducer(state, { type: 'UPDATE_OBJECTIVE', payload: { objectiveType: 'defeatBoss', value: 100, mode: 'set' } });
+
+    // Boss must NOT end via the objective path — its HP/health flow does
+    expect(state.gameState.isComplete).toBe(false);
+    expect(state.isPlaying).toBe(true);
   });
 });
 

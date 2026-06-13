@@ -207,6 +207,17 @@ export function calculateStars(objectives: LevelObjective[]): 0 | 1 | 2 | 3 {
 }
 
 /**
+ * True when there is genuinely nothing left to do: every objective (primary
+ * AND secondary) has reached its target. Used to end a level the instant all
+ * quests are done, so players never wait out the timer on a finished board.
+ * Empty objective lists return false (no false-complete on `[].every()`).
+ */
+export function allObjectivesComplete(objectives: LevelObjective[]): boolean {
+  if (objectives.length === 0) return false;
+  return objectives.every((o) => (o.current ?? 0) >= o.target);
+}
+
+/**
  * Process special tile effects when a word is submitted with a path.
  * Mutates newTiles in place and returns computed bonuses.
  */
@@ -554,9 +565,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const newComboCount = state.gameState.comboCount + 1;
 
-      // Don't auto-complete on primary objectives met — let the timer run out
-      // so players have time to earn secondary objectives for 2-3 stars.
-      // Level ends only when timer expires (TICK) or boss kills player.
+      // Auto-end only when EVERY objective is done (primary AND secondary) — at
+      // that point nothing is left to improve, so waiting out the timer is pure
+      // dead time. While any quest is still open the level keeps running so the
+      // player can chase the remaining stars. Boss levels are excluded — their
+      // win/lose is owned by the boss-health flow, not the objective list.
+      const allQuestsDone =
+        !state.levelConfig.isBossLevel && allObjectivesComplete(newObjectives);
 
       // Collect all upgrade triggers from tile effects
       const allTriggers = [...tileTriggeredUpgrades];
@@ -580,8 +595,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         : undefined;
       const movesExhausted = newMovesRemaining != null && newMovesRemaining <= 0;
 
-      // If moves exhausted, end the level
-      const isComplete = movesExhausted;
+      // End the level when moves run out (blast) or all quests are done.
+      const isComplete = movesExhausted || allQuestsDone;
 
       const resultState: GameState = {
         ...state,
@@ -705,12 +720,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return { ...obj, current: newCurrent, isComplete: newCurrent >= obj.target };
       });
 
+      // Non-objective updates (e.g. mechanicTrigger) can be the last quest to
+      // complete — end the level here too. Boss levels are owned by the boss flow.
+      const allQuestsDone =
+        state.isPlaying &&
+        !state.levelConfig.isBossLevel &&
+        allObjectivesComplete(newObjectives);
+
       return {
         ...state,
         objectives: newObjectives,
+        ...(allQuestsDone ? { isPlaying: false } : {}),
         gameState: {
           ...state.gameState,
           stars: calculateStars(newObjectives),
+          ...(allQuestsDone ? { isComplete: true } : {}),
         },
       };
     }
