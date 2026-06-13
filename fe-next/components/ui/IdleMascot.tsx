@@ -129,8 +129,13 @@ export const IdleMascotWithEntrance = memo(function IdleMascotWithEntrance({
 
   return (
     <m.div
-      initial={shouldAnimate ? { opacity: 0, y: 12 } : undefined}
-      animate={{ opacity: 1, y: 0 }}
+      // Slide-only entrance (no opacity:0). Framer renders `initial` into the SSR
+      // HTML, and an opacity:0 start makes the element non-contentful until JS
+      // hydrates + animates it — which gates LCP (this mascot is the landing's
+      // LCP element). Animating transform-only lets it paint at full opacity on
+      // first paint (pre-hydration) while keeping the spring pop-in.
+      initial={shouldAnimate ? { y: 12 } : undefined}
+      animate={{ y: 0 }}
       transition={{
         type: 'spring',
         stiffness: 260,
