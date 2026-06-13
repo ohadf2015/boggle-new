@@ -48,6 +48,15 @@ describe('WordCraftTutor', () => {
     expect(remount.getByLabelText('How to play')).toBeInTheDocument();
   });
 
+  it('pill never shrinks so it cannot be clipped off a crowded topbar', () => {
+    // The topbar is a no-wrap flex row; without shrink-0 a long title + the
+    // difficulty/friend controls can squeeze the help pill off the edge on a
+    // narrow phone, which is exactly the "help icon is missing" report.
+    localStorage.setItem('wc_tutor_dismissed_v2', '1');
+    const { getByLabelText } = render(<WordCraftTutor labels={labels} />);
+    expect(getByLabelText('How to play').className).toContain('shrink-0');
+  });
+
   it('clicking the pill reopens the dialog after dismiss', () => {
     localStorage.setItem('wc_tutor_dismissed_v2', '1');
     const { getByLabelText, queryByRole, getByText } = render(<WordCraftTutor labels={labels} />);

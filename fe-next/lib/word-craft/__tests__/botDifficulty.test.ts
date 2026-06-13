@@ -54,6 +54,20 @@ describe('botDifficulty', () => {
     expect(e.selectionSkew).toBeGreaterThan(1);
   });
 
+  it('easy barely chases captures (low capture aggression) so it stops hunting the player', () => {
+    const e = botTuning('easy');
+    const m = botTuning('medium');
+    const h = botTuning('hard');
+    // captureAggression scales how hard the bot weights STEALING the player's
+    // cells when ranking candidate words. In Conquest the winner holds the most
+    // squares, so an aggressive thief is the dominant difficulty; easy must back
+    // off it. Strength increases monotonically toward hard (a full 1.0).
+    expect(e.captureAggression).toBeLessThanOrEqual(0.35);
+    expect(e.captureAggression).toBeLessThan(m.captureAggression);
+    expect(m.captureAggression).toBeLessThan(h.captureAggression);
+    expect(h.captureAggression).toBe(1);
+  });
+
   it('validates difficulty strings (for localStorage hydration)', () => {
     expect(isBotDifficulty('easy')).toBe(true);
     expect(isBotDifficulty('hard')).toBe(true);

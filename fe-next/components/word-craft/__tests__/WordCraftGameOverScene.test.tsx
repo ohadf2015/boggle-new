@@ -69,7 +69,7 @@ describe('WordCraftGameOverScene', () => {
     expect(banner?.textContent).not.toContain('wordcraft.bot');
   });
 
-  it('has proper positioning and z-index (on the floating wrapper)', () => {
+  it('renders as a full-screen modal overlay so the game end is unmissable', () => {
     const { container } = render(
       <WordCraftGameOverScene
         t={t}
@@ -77,9 +77,25 @@ describe('WordCraftGameOverScene', () => {
         botScore={50}
       />
     );
-    const wrapper = container.firstElementChild;
-    expect(wrapper?.className).toContain('z-40');
-    expect(wrapper?.className).toContain('bottom-');
+    const overlay = container.querySelector('[role="dialog"]');
+    expect(overlay).toBeTruthy();
+    expect(overlay?.getAttribute('aria-modal')).toBe('true');
+    expect(overlay?.className).toContain('fixed');
+    expect(overlay?.className).toContain('inset-0');
+    expect(overlay?.className).toContain('z-50');
+  });
+
+  it('shows both final square counts so the result is concrete', () => {
+    render(
+      <WordCraftGameOverScene
+        t={t}
+        playerScore={120}
+        botScore={80}
+      />
+    );
+    // The headline number for each side (territory squares) must be visible.
+    expect(screen.getByText('120')).toBeTruthy();
+    expect(screen.getByText('80')).toBeTruthy();
   });
 
   it('shows the New Best badge only when isNewBest is set', () => {

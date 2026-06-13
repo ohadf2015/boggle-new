@@ -99,7 +99,10 @@ export function StylePicker({
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       {/* Scrollable card region — bottom section stays pinned + always visible. */}
       <div
-        className="grid min-h-0 flex-1 grid-cols-3 content-start gap-3 overflow-y-auto px-4 pb-1 pt-4 sm:grid-cols-4"
+        // overscroll-contain + own compositor layer (translateZ) stops the
+        // translucent backdrop behind the modal from repaint-flickering as this
+        // region scrolls on touch devices.
+        className="grid min-h-0 flex-1 grid-cols-3 content-start gap-3 overflow-y-auto overscroll-contain px-4 pb-1 pt-4 [transform:translateZ(0)] [backface-visibility:hidden] sm:grid-cols-4"
         role="radiogroup"
         aria-label={t('playerStyle.picker.title')}
       >
@@ -136,7 +139,7 @@ export function StylePicker({
                 <img
                   src={style.mascot}
                   alt=""
-                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-contain"
                 />
               </span>

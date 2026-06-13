@@ -18,9 +18,11 @@ export function useStyleSnippetPreview() {
   const duckedRef = useRef(false);
   const prevVolRef = useRef(0.5);
 
-  const { volume, setVolume } = useMusic();
+  const { volume, isMuted, setVolume } = useMusic();
   const volumeRef = useRef(volume);
   useEffect(() => { volumeRef.current = volume; }, [volume]);
+  const isMutedRef = useRef(isMuted);
+  useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
 
   const restoreMusic = useCallback(() => {
     if (duckedRef.current) {
@@ -45,6 +47,10 @@ export function useStyleSnippetPreview() {
     (file: string | null) => {
       stopSnippet();
       if (!file || typeof window === 'undefined') return;
+
+      // Music muted = silence, previews included. Skip the whole body: no snippet
+      // and no duck, so we never perturb the music volume state while muted.
+      if (isMutedRef.current) return;
 
       // Duck the main music so the two tracks don't clash.
       if (!duckedRef.current) {

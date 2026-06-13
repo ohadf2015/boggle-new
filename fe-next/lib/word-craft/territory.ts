@@ -30,28 +30,66 @@ function coordKey(r: number, c: number): string {
  * Cross-words can share an anchor; the result deduplicates so a cell flips
  * (and scores its value) at most once per turn.
  */
+export interface ResolveCapturesOptions {
+  /**
+   * `land_grab` modifier: after the direct anchor captures, each captured cell
+   * also flips the opponent cells immediately orthogonally adjacent to it — a
+   * single extra ring (NOT a flood; spread cells do not spread again). Keeps the
+   * blast bounded and symmetric for both seats.
+   */
+  spreadToNeighbors?: boolean;
+}
+
 export function resolveCaptures(
   prevBoard: Board,
   placements: PlacedTile[],
   wordCoordLists: readonly Coord[][],
   by: Owner,
+  options: ResolveCapturesOptions = {},
 ): CaptureResult {
   const placedKeys = new Set(placements.map((p) => coordKey(p.row, p.col)));
   const captured = new Map<string, Coord>();
   let bonus = 0;
+
+  // Try to capture a single opponent-owned, tiled, not-just-placed cell. Returns
+  // its tile value when it newly flips, else 0 (already captured / not eligible).
+  const tryCapture = (r: number, c: number): number => {
+    const key = coordKey(r, c);
+    if (placedKeys.has(key)) return 0;
+    if (captured.has(key)) return 0;
+    const cell = prevBoard.cells[r]?.[c];
+    if (!cell || !cell.tile) return 0;
+    const owner = cell.claim ?? null;
+    if (owner === null || owner === by) return 0;
+    captured.set(key, { row: r, col: c });
+    return cell.tile.value;
+  };
+
+  // Pass 1: direct anchors the played words cross.
+  const directCells: Coord[] = [];
   for (const word of wordCoordLists) {
     for (const c of word) {
-      const key = coordKey(c.row, c.col);
-      if (placedKeys.has(key)) continue;
-      if (captured.has(key)) continue;
-      const cell = prevBoard.cells[c.row]?.[c.col];
-      if (!cell || !cell.tile) continue;
-      const owner = cell.claim ?? null;
-      if (owner === null || owner === by) continue;
-      captured.set(key, { row: c.row, col: c.col });
-      bonus += cell.tile.value;
+      const gained = tryCapture(c.row, c.col);
+      if (gained > 0) {
+        bonus += gained;
+        directCells.push({ row: c.row, col: c.col });
+      }
     }
   }
+
+  // Pass 2 (land_grab): one orthogonal ring around each direct capture.
+  if (options.spreadToNeighbors) {
+    for (const cell of directCells) {
+      const ring: [number, number][] = [
+        [cell.row - 1, cell.col],
+        [cell.row + 1, cell.col],
+        [cell.row, cell.col - 1],
+        [cell.row, cell.col + 1],
+      ];
+      for (const [r, c] of ring) bonus += tryCapture(r, c);
+    }
+  }
+
   return { capturedCells: Array.from(captured.values()), bonus };
 }
 

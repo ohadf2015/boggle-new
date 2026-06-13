@@ -79,7 +79,7 @@ export function WordCraftTutor({ labels, isRTL }: WordCraftTutorProps) {
         type="button"
         onClick={reopen}
         className={cn(
-          'inline-flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-black',
+          'shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-black',
           'bg-neo-cyan-muted text-neo-navy text-[10px] font-neo-display font-black uppercase tracking-wider',
           'shadow-hard-sm hover:-translate-y-px transition-transform',
         )}

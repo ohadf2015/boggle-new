@@ -6,7 +6,7 @@ import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedL
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { botTuning, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
-import { rollModifier, toScoreModifier, type WordCraftModifier } from './modifiers';
+import { rollModifier, toScoreModifier, modifierCaptureSpread, type WordCraftModifier } from './modifiers';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims, type BoardDims } from './boardDimensions';
 import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
@@ -159,8 +159,11 @@ function commitMove(
     const lists = wordCells ?? [];
     // resolveCaptures must see the PRIOR board (before claiming this turn's
     // placements) so newly-placed cells aren't flagged as "anchors of the
-    // opponent". Use state.board, not tilePlacedBoard.
-    const capture = resolveCaptures(state.board, placements, lists, who);
+    // opponent". Use state.board, not tilePlacedBoard. land_grab spreads each
+    // capture by one ring (symmetric — applies to whoever is committing).
+    const capture = resolveCaptures(state.board, placements, lists, who, {
+      spreadToNeighbors: modifierCaptureSpread(state.modifier),
+    });
     captureBonus = capture.bonus;
     nextBoard = applyClaims(tilePlacedBoard, placements, capture.capturedCells, who);
     if (capture.capturedCells.length > 0) {
@@ -562,9 +565,14 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       // 5 that capped the bot below bingo length and made it feel weak.
       const move = findBestBotMove(state.board, state.bot.rack, isWordValid, {
         // Territory bias: rank candidate by score + capture potential so the
-        // bot doesn't ignore juicy flips. No-op when territory is disabled.
+        // bot doesn't ignore juicy flips. Scaled by the difficulty's
+        // captureAggression so easy stops hunting the player's cells. No-op when
+        // territory is disabled.
         extraScore: state.territoryEnabled
-          ? (placements, wordCells) => resolveCaptures(state.board, placements, wordCells, 'bot').bonus
+          ? (placements, wordCells) =>
+              resolveCaptures(state.board, placements, wordCells, 'bot', {
+                spreadToNeighbors: modifierCaptureSpread(state.modifier),
+              }).bonus * tuning.captureAggression
           : undefined,
         // Difficulty: cap word length (easy/medium kill bingos) and pick from a
         // wider, weaker pool so the bot is beatable. Both derived from the
@@ -597,7 +605,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       clearTimeout(handle);
       botTurnRunning.current = false;
     };
-  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning.maxLength, effectiveVariance, tuning.selectionSkew, modifierSpec]);
+  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning.maxLength, effectiveVariance, tuning.selectionSkew, tuning.captureAggression, state.modifier, modifierSpec]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);

@@ -7,6 +7,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StylePicker } from './StylePicker';
 import type { PlayerStyleKey } from '@/lib/playerStyle/styles';
@@ -40,11 +41,19 @@ export function PlayerStyleModal({ isOpen, onDismiss }: PlayerStyleModalProps) {
       onClick={() => onDismiss()}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-md flex-col rounded-neo border-neo-thick border-neo-black bg-neo-navy p-5 shadow-hard-lg"
+        className="relative flex max-h-[90vh] w-full max-w-md flex-col rounded-neo border-neo-thick border-neo-black bg-neo-navy p-5 shadow-hard-lg"
         onClick={(e) => e.stopPropagation()}
       >
+        <button
+          type="button"
+          onClick={() => onDismiss()}
+          aria-label={t('common.close')}
+          className="absolute end-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-neo border-neo border-neo-black bg-neo-navy-light text-neo-cream shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        >
+          <X size={18} strokeWidth={3} />
+        </button>
         <div className="shrink-0">
-          <h2 className="mb-1 text-center font-neo-display text-2xl font-bold text-neo-cream">
+          <h2 className="mb-1 px-10 text-center font-neo-display text-2xl font-bold text-neo-cream">
             {t('playerStyle.popup.title')}
           </h2>
           <p className="mb-4 text-center font-neo-body text-sm text-neo-cream/70">

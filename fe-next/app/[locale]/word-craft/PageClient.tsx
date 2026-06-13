@@ -50,6 +50,8 @@ import { alphabetForLocale } from '@/lib/word-craft/wordCraftAlphabet';
 import { isUnassignedBlank } from '@/lib/word-craft/blankAssign';
 import { WordCraftBlankPicker } from '@/components/word-craft/WordCraftBlankPicker';
 import { WordCraftAxisChip } from '@/components/word-craft/WordCraftAxisChip';
+import { WordCraftPlacementGuide } from '@/components/word-craft/WordCraftPlacementGuide';
+import { WordCraftModifierChip } from '@/components/word-craft/WordCraftModifierChip';
 import {
   trackWordCraftAxisLocked,
   trackWordCraftFastTapUsed,
@@ -853,11 +855,14 @@ export default function WordCraftPageClient() {
           </Button>
           <span
             aria-hidden
-            className="inline-flex items-center justify-center w-7 h-7 rounded-neo bg-neo-purple text-white border-2 border-black shadow-hard-sm rotate-[-4deg]"
+            className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-neo bg-neo-purple text-white border-2 border-black shadow-hard-sm rotate-[-4deg]"
           >
             <Layers className="w-4 h-4" />
           </span>
-          <h1 className="text-lg font-neo-display font-black text-neo-white tracking-tight">
+          {/* min-w-0 + truncate lets the title yield space first so the
+              right-edge controls (incl. the How-to-play pill) never get
+              pushed off a narrow topbar. */}
+          <h1 className="min-w-0 truncate text-lg font-neo-display font-black text-neo-white tracking-tight">
             {t('wordcraft.title')}
           </h1>
           <div className="flex-1" />
@@ -950,6 +955,10 @@ export default function WordCraftPageClient() {
           } : undefined}
         />
 
+        {/* Active per-game modifier — surfaced so the twist (esp. land_grab
+            chain-capture) is felt, not silent. Hidden for the 'none' baseline. */}
+        <WordCraftModifierChip modifier={game.state.modifier} t={t} />
+
         {/* Duel target: keeps the challenger's avatar + name + score-to-beat
             visible for the whole async duel (the bot stays as the live board
             opponent that keeps Territory contested and fair). */}
@@ -1038,15 +1047,28 @@ export default function WordCraftPageClient() {
         ) : canInteract ? (
           // Persistent direction toggle, available before the first tile lands so
           // the player can pre-pick across/down and just keep tapping letters.
-          <div className="flex items-center justify-center gap-2 py-0.5 shrink-0">
-            <WordCraftAxisChip
-              axis={effectiveAxis}
-              onFlip={flipAxis}
-              labelHorizontal={t('wordcraft.axis.horizontal')}
-              labelVertical={t('wordcraft.axis.vertical')}
-              ariaLabel={t('wordcraft.axis.flipAria')}
-            />
-            <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>
+          // On the very first move we also surface the place→submit steps inline
+          // so new players know how to put letters down without opening the tutor.
+          <div className="flex flex-col items-center gap-1 py-0.5 shrink-0">
+            {isFirstMove ? (
+              <WordCraftPlacementGuide
+                labels={{
+                  step1: t('wordcraft.place.step1', 'Tap a letter'),
+                  step2: t('wordcraft.place.step2', 'Tap a square'),
+                  step3: t('wordcraft.place.step3', 'Submit'),
+                }}
+              />
+            ) : null}
+            <div className="flex items-center justify-center gap-2">
+              <WordCraftAxisChip
+                axis={effectiveAxis}
+                onFlip={flipAxis}
+                labelHorizontal={t('wordcraft.axis.horizontal')}
+                labelVertical={t('wordcraft.axis.vertical')}
+                ariaLabel={t('wordcraft.axis.flipAria')}
+              />
+              <span className="text-[10px] text-neo-white/60 font-neo-body">{t('wordcraft.axis.hint')}</span>
+            </div>
           </div>
         ) : null}
 

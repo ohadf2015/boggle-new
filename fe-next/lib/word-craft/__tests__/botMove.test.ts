@@ -176,6 +176,35 @@ describe('findBestBotMove', () => {
       expect(strong!.score).toBeLessThanOrEqual(mild!.score);
     });
 
+    it('scaling the capture signal flips the bot between chasing a steal and playing its best word', () => {
+      // The hook ranks bot candidates by score + (captureBonus × aggression).
+      // Model that here with an extraScore that rewards a SHORT word (a proxy
+      // for "this move steals a cell"). High aggression makes the bot abandon
+      // its best word to grab the bonus; near-zero aggression makes it ignore
+      // the steal and just play its strongest word. This is the lever the easy
+      // nerf turns down.
+      // Premium-free so base scores are pure tile sums: CATS=6 (best, 4 tiles),
+      // AT/AS=2 (short, 2 tiles). A proxy of +8 for short words beats CATS at
+      // full aggression (2+8=10 > 6) but not at 0.25 (2+2=4 < 6).
+      const flat = () => createBoard(11, { premiums: false });
+      const captureProxy = (aggression: number) =>
+        (placements: PlacedTile[]) => (placements.length <= 2 ? 8 * aggression : 0);
+
+      const aggressive = findBestBotMove(flat(), rack(), valid, {
+        skillVariance: 0,
+        extraScore: captureProxy(1),
+      });
+      const tame = findBestBotMove(flat(), rack(), valid, {
+        skillVariance: 0,
+        extraScore: captureProxy(0.25),
+      });
+
+      // Aggressive bot chases the (short-word) steal bonus...
+      expect(aggressive!.placements.length).toBeLessThanOrEqual(2);
+      // ...while the tamed bot plays its strongest (longer) word instead.
+      expect(tame!.placements.length).toBeGreaterThan(aggressive!.placements.length);
+    });
+
     it('selectionSkew defaults to the legacy sqrt skew (skew=1) when omitted', () => {
       // Omitting selectionSkew must reproduce the historical behavior exactly.
       const omitted = findBestBotMove(board(), rack(), valid, {

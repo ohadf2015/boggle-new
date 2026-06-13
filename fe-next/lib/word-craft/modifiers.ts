@@ -7,22 +7,31 @@ import type { ScoreModifierSpec } from './scoring';
  * bag/rack surgery, so a modifier can never break tile generation. Each maps to
  * a {@link ScoreModifierSpec} applied symmetrically to player + bot scoring.
  */
-export type WordCraftModifier = 'none' | 'bingo_bonanza' | 'long_words' | 'rich_letters';
+export type WordCraftModifier =
+  | 'none'
+  | 'bingo_bonanza'
+  | 'long_words'
+  | 'rich_letters'
+  | 'land_grab';
 
 export const WORDCRAFT_MODIFIERS: readonly WordCraftModifier[] = [
   'none',
   'bingo_bonanza',
   'long_words',
   'rich_letters',
+  'land_grab',
 ];
 
 // Weighted so ~half of games run with a live modifier and the rest are the
 // clean baseline. `none` is weighted heavier than any single modifier.
+// land_grab is the marquee Conquest twist (chain-capture), so it gets a little
+// extra weight than the quiet scoring modifiers.
 const WEIGHTED: readonly WordCraftModifier[] = [
   'none', 'none', 'none',
   'bingo_bonanza',
   'long_words',
   'rich_letters',
+  'land_grab', 'land_grab',
 ];
 
 // Same small deterministic PRNG family used by the tile bag — seeded so a game
@@ -47,10 +56,22 @@ export function toScoreModifier(modifier: WordCraftModifier): ScoreModifierSpec 
       return { longWordThreshold: 5, longWordBonus: 15 };
     case 'rich_letters':
       return { richLetterThreshold: 4, richLetterMult: 2 };
+    case 'land_grab':
+      // Pure capture-rule modifier — no scoring change (see modifierCaptureSpread).
+      return {};
     case 'none':
     default:
       return {};
   }
+}
+
+/**
+ * land_grab changes a capture RULE rather than scoring: a captured cell also
+ * flips the opponent cells immediately around it (one ring). Threaded into
+ * {@link resolveCaptures} via its `spreadToNeighbors` option for both seats.
+ */
+export function modifierCaptureSpread(modifier: WordCraftModifier): boolean {
+  return modifier === 'land_grab';
 }
 
 export function modifierLabelKey(modifier: WordCraftModifier): string {

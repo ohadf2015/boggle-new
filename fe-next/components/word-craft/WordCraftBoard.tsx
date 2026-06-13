@@ -3,7 +3,6 @@
 import { memo, useMemo } from 'react';
 import type { Board } from '@/lib/word-craft/board';
 import type { PlacedTile } from '@/lib/word-craft/types';
-import { hebrewDisplayLetter } from '@/lib/word-craft/hebrewDisplay';
 import { JOKER_GLYPH, isUnassignedBlank } from '@/lib/word-craft/blankAssign';
 import { cn } from '@/lib/utils';
 
@@ -18,7 +17,13 @@ export interface WordCraftBoardProps {
   isFirstMove?: boolean;
   /** During an active drag: cell key 'r,c' that the dragged tile is hovering over */
   dragHoverCell?: string | null;
-  /** Active locale — drives Hebrew sofit auto-display */
+  /**
+   * Active locale. Accepted for API parity with callers; the board renders the
+   * raw stored glyph for every locale. Hebrew tiles deliberately stay in their
+   * REGULAR form — never a sofit/final form — because a board tile is shared by
+   * its across and down word, so a "final" glyph would be ambiguous and read as
+   * a bug. (The tile bag never holds sofit forms either.)
+   */
   locale?: string;
   /** Keyboard reticle position — renders a focus ring on this cell */
   reticle?: { row: number; col: number } | null;
@@ -45,7 +50,6 @@ function WordCraftBoardImpl({
   hasSelectedTile,
   isFirstMove,
   dragHoverCell,
-  locale = 'en',
   reticle,
 }: WordCraftBoardProps) {
   const size = board.size;
@@ -182,16 +186,7 @@ function WordCraftBoardImpl({
                     </span>
                   )}
                   <span className={cn('wc-tile-glyph font-bold', 'text-[clamp(14px,5cqi,32px)]')}>
-                    {isUnassignedBlank(placedTile)
-                      ? JOKER_GLYPH
-                      : hebrewDisplayLetter({
-                          board,
-                          pending: pendingPlacements,
-                          row: r,
-                          col: c,
-                          letter: placedTile.letter,
-                          locale,
-                        })}
+                    {isUnassignedBlank(placedTile) ? JOKER_GLYPH : placedTile.letter}
                   </span>
                 </>
               ) : pending ? (
@@ -205,16 +200,7 @@ function WordCraftBoardImpl({
                       {JOKER_GLYPH}
                     </span>
                   )}
-                  {isUnassignedBlank(pending)
-                    ? JOKER_GLYPH
-                    : hebrewDisplayLetter({
-                        board,
-                        pending: pendingPlacements,
-                        row: r,
-                        col: c,
-                        letter: pending.letter,
-                        locale,
-                      })}
+                  {isUnassignedBlank(pending) ? JOKER_GLYPH : pending.letter}
                 </span>
               ) : isAxisHint ? (
                 // tiny dot hints player at where next tile in a line could go

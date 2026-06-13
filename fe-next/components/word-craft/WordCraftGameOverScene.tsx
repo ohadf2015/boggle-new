@@ -1,5 +1,6 @@
 'use client';
 
+import { cn } from '@/lib/utils';
 import { WordCraftDuelResult } from './WordCraftDuelResult';
 import type { BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
@@ -53,48 +54,85 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
   }
 
   const isTie = playerScore === botScore;
-  const winnerName = playerScore > botScore
-    ? (playerName ?? t('wordcraft.you'))
-    : (botName ?? t('wordcraft.bot'));
+  const playerLabel = playerName ?? t('wordcraft.you');
+  const botLabel = botName ?? t('wordcraft.bot');
+  const winnerName = playerScore > botScore ? playerLabel : botLabel;
   const label = isTie
     ? t('wordcraft.tied')
     : t('wordcraft.winnerLabel').replace('{{name}}', winnerName);
+  const playerWon = !isTie && playerScore > botScore;
+  const squares = t('wordcraft.squares', 'squares');
 
+  // Full-screen modal: a small bottom banner was easy to miss, so players were
+  // unsure the game had actually ended. A dim backdrop + centered card makes the
+  // finish unmistakable and puts the result (square counts) + next action front
+  // and center.
   return (
-    <div className="absolute left-1/2 -translate-x-1/2 bottom-[140px] z-40 flex flex-col items-center gap-2">
-      {isNewBest ? (
-        <div className="animate-neo-pop px-3 py-1.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider">
-          🏆 {t('wordcraft.newBest')}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('wordcraft.gameOver', 'Game over')}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-neo-pop"
+    >
+      <div className="relative w-full max-w-sm flex flex-col items-center gap-4 bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg p-6">
+        <span className="text-[11px] font-neo-display font-black uppercase tracking-[0.2em] text-neo-white/70">
+          {t('wordcraft.gameOver', 'Game over')}
+        </span>
+
+        {isNewBest ? (
+          <div className="animate-neo-pop px-3 py-1.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider">
+            🏆 {t('wordcraft.newBest')}
+          </div>
+        ) : null}
+
+        <div
+          role="status"
+          className="w-full text-center px-4 py-3 bg-neo-yellow border-neo-thick border-black text-neo-navy rounded-neo shadow-hard-lg font-neo-display font-black uppercase tracking-wider text-lg"
+        >
+          {label}
         </div>
-      ) : null}
-      <div
-        role="status"
-        className="px-4 py-3 bg-neo-yellow border-neo-thick border-black text-neo-navy rounded-neo shadow-hard-lg font-neo-display font-black uppercase tracking-wider"
-      >
-        {label}
+
+        {/* Concrete result: how many squares each side controls at the buzzer. */}
+        <div className="flex items-stretch gap-3 w-full">
+          <div className={cn(
+            'flex-1 flex flex-col items-center gap-0.5 py-3 rounded-neo border-neo-thick border-black',
+            playerWon ? 'bg-neo-cyan text-neo-navy' : 'bg-neo-navy text-neo-cyan',
+          )}>
+            <span className="text-3xl font-neo-display font-black leading-none">{playerScore}</span>
+            <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{playerLabel} · {squares}</span>
+          </div>
+          <div className={cn(
+            'flex-1 flex flex-col items-center gap-0.5 py-3 rounded-neo border-neo-thick border-black',
+            !playerWon && !isTie ? 'bg-neo-pink text-neo-white' : 'bg-neo-navy text-neo-pink',
+          )}>
+            <span className="text-3xl font-neo-display font-black leading-none">{botScore}</span>
+            <span className="text-[10px] font-neo-body uppercase tracking-wider truncate max-w-full px-1">{botLabel} · {squares}</span>
+          </div>
+        </div>
+
+        {(onPlayAgain || onHome) ? (
+          <div className="flex items-center gap-2 w-full">
+            {onPlayAgain ? (
+              <button
+                type="button"
+                onClick={onPlayAgain}
+                className="flex-1 px-4 py-2.5 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+              >
+                ↻ {t('wordcraft.playAgain')}
+              </button>
+            ) : null}
+            {onHome ? (
+              <button
+                type="button"
+                onClick={onHome}
+                className="flex-1 px-4 py-2.5 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
+              >
+                {t('wordcraft.home')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
       </div>
-      {(onPlayAgain || onHome) ? (
-        <div className="flex items-center gap-2 mt-1">
-          {onPlayAgain ? (
-            <button
-              type="button"
-              onClick={onPlayAgain}
-              className="px-4 py-2 bg-neo-lime border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
-            >
-              ↻ {t('wordcraft.playAgain')}
-            </button>
-          ) : null}
-          {onHome ? (
-            <button
-              type="button"
-              onClick={onHome}
-              className="px-4 py-2 bg-neo-cyan border-neo-thick border-black text-neo-navy rounded-neo shadow-hard font-neo-display font-black uppercase tracking-wider active:animate-neo-press hover:-translate-y-0.5 transition-transform"
-            >
-              {t('wordcraft.home')}
-            </button>
-          ) : null}
-        </div>
-      ) : null}
     </div>
   );
 }

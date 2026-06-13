@@ -83,6 +83,85 @@ describe('territory', () => {
       expect(result.bonus).toBe(0);
     });
 
+    describe('land_grab spread (chain capture)', () => {
+      it('also flips enemy cells orthogonally adjacent to a direct capture', () => {
+        const board = seedBoard(11, [
+          { row: 5, col: 5, letter: 'T', value: 1, claim: 'bot' }, // direct anchor
+          { row: 4, col: 5, letter: 'X', value: 8, claim: 'bot' }, // neighbor above
+        ]);
+        const placements: PlacedTile[] = [
+          makePlaced(5, 4, 'C', 3),
+          makePlaced(5, 6, 'A', 1),
+        ];
+        const wordCoords = [
+          { row: 5, col: 4 },
+          { row: 5, col: 5 },
+          { row: 5, col: 6 },
+        ];
+        const result = resolveCaptures(board, placements, [wordCoords], 'player', {
+          spreadToNeighbors: true,
+        });
+        const keys = result.capturedCells.map((c) => `${c.row},${c.col}`).sort();
+        expect(keys).toEqual(['4,5', '5,5']);
+        expect(result.bonus).toBe(9); // 1 (direct) + 8 (spread neighbor)
+      });
+
+      it('spreads exactly one ring — neighbors of spread cells are NOT captured', () => {
+        const board = seedBoard(11, [
+          { row: 5, col: 5, letter: 'T', value: 1, claim: 'bot' }, // direct
+          { row: 4, col: 5, letter: 'X', value: 8, claim: 'bot' }, // ring 1 (spread)
+          { row: 3, col: 5, letter: 'Z', value: 10, claim: 'bot' }, // ring 2 (must NOT flip)
+        ]);
+        const placements: PlacedTile[] = [makePlaced(5, 4, 'C', 3), makePlaced(5, 6, 'A', 1)];
+        const wordCoords = [
+          { row: 5, col: 4 },
+          { row: 5, col: 5 },
+          { row: 5, col: 6 },
+        ];
+        const result = resolveCaptures(board, placements, [wordCoords], 'player', {
+          spreadToNeighbors: true,
+        });
+        const keys = result.capturedCells.map((c) => `${c.row},${c.col}`);
+        expect(keys).not.toContain('3,5');
+        expect(result.bonus).toBe(9); // ring-2 Z(10) excluded
+      });
+
+      it('spread leaves own and unclaimed neighbors untouched', () => {
+        const board = seedBoard(11, [
+          { row: 5, col: 5, letter: 'T', value: 1, claim: 'bot' }, // direct
+          { row: 4, col: 5, letter: 'O', value: 5, claim: 'player' }, // own — skip
+          // (6,5) is empty/unclaimed — skip
+        ]);
+        const placements: PlacedTile[] = [makePlaced(5, 4, 'C', 3), makePlaced(5, 6, 'A', 1)];
+        const wordCoords = [
+          { row: 5, col: 4 },
+          { row: 5, col: 5 },
+          { row: 5, col: 6 },
+        ];
+        const result = resolveCaptures(board, placements, [wordCoords], 'player', {
+          spreadToNeighbors: true,
+        });
+        expect(result.capturedCells).toEqual([{ row: 5, col: 5 }]);
+        expect(result.bonus).toBe(1);
+      });
+
+      it('is a no-op when spreadToNeighbors is off (default)', () => {
+        const board = seedBoard(11, [
+          { row: 5, col: 5, letter: 'T', value: 1, claim: 'bot' },
+          { row: 4, col: 5, letter: 'X', value: 8, claim: 'bot' },
+        ]);
+        const placements: PlacedTile[] = [makePlaced(5, 4, 'C', 3), makePlaced(5, 6, 'A', 1)];
+        const wordCoords = [
+          { row: 5, col: 4 },
+          { row: 5, col: 5 },
+          { row: 5, col: 6 },
+        ];
+        const result = resolveCaptures(board, placements, [wordCoords], 'player');
+        expect(result.capturedCells).toEqual([{ row: 5, col: 5 }]);
+        expect(result.bonus).toBe(1);
+      });
+    });
+
     it('dedupes captures across multiple words (cross-word turn)', () => {
       const board = seedBoard(11, [
         { row: 5, col: 5, letter: 'T', value: 1, claim: 'bot' },

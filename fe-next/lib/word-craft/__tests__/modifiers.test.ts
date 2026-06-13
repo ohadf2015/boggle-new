@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   rollModifier,
   toScoreModifier,
+  modifierCaptureSpread,
   WORDCRAFT_MODIFIERS,
   modifierLabelKey,
 } from '../modifiers';
@@ -44,6 +45,19 @@ describe('WordCraft modifiers', () => {
     const spec = toScoreModifier('rich_letters');
     expect(spec.richLetterThreshold).toBeGreaterThanOrEqual(4);
     expect(spec.richLetterMult).toBeGreaterThan(1);
+  });
+
+  it('land_grab is a registered modifier with no scoring change (it is a capture rule)', () => {
+    expect(WORDCRAFT_MODIFIERS).toContain('land_grab');
+    expect(toScoreModifier('land_grab')).toEqual({});
+  });
+
+  it('only land_grab enables capture spread', () => {
+    expect(modifierCaptureSpread('land_grab')).toBe(true);
+    expect(modifierCaptureSpread('none')).toBe(false);
+    expect(modifierCaptureSpread('bingo_bonanza')).toBe(false);
+    expect(modifierCaptureSpread('long_words')).toBe(false);
+    expect(modifierCaptureSpread('rich_letters')).toBe(false);
   });
 
   it('exposes an i18n label key per modifier', () => {

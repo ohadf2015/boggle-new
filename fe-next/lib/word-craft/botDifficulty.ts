@@ -16,6 +16,14 @@
  *                      Lets us soften easy further without shrinking maxLength
  *                      (dropping to 3 would make the bot pass too often and look
  *                      dead rather than beatable).
+ *  - `captureAggression` — multiplies the capture (cell-steal) bonus when the
+ *                      bot ranks candidate words. In Conquest the winner holds
+ *                      the most squares, so a bot that hunts the player's cells
+ *                      is the single most punishing thing about it — more than
+ *                      raw word score. Easy turns this down so the bot mostly
+ *                      grows its OWN ground instead of robbing yours; it still
+ *                      captures incidentally (the mechanic always resolves), it
+ *                      just no longer goes out of its way to.
  *
  * Default is EASY: the literal user complaint was "the bot is too good", so the
  * out-of-the-box opponent must be beatable by a casual solo player.
@@ -30,16 +38,19 @@ export interface BotTuning {
   maxLength: number;
   skillVariance: number;
   selectionSkew: number;
+  /** 0–1 multiplier on the bot's steal-seeking bonus. 1 = full thief. */
+  captureAggression: number;
 }
 
 const TUNING: Record<BotDifficulty, BotTuning> = {
-  // Short words only (no bingos), large pool pressed hard toward the weakest
-  // word → frequently sub-optimal, comfortably beatable by a casual player.
-  easy: { maxLength: 4, skillVariance: 5, selectionSkew: 3 },
-  // The previous global default — moderate, occasionally sharp.
-  medium: { maxLength: 5, skillVariance: 2.5, selectionSkew: 1.5 },
-  // Full length (bingo-capable), near-optimal selection.
-  hard: { maxLength: 7, skillVariance: 0.5, selectionSkew: 0.5 },
+  // Short words only (no bingos), wide pool pressed hard toward the weakest word,
+  // and barely any cell-hunting → grows its own ground with weak words and rarely
+  // robs the player. Comfortably beatable by a casual player.
+  easy: { maxLength: 4, skillVariance: 6, selectionSkew: 4, captureAggression: 0.25 },
+  // Moderate, occasionally sharp; chases some steals.
+  medium: { maxLength: 5, skillVariance: 2.5, selectionSkew: 1.5, captureAggression: 0.7 },
+  // Full length (bingo-capable), near-optimal selection, full-on thief.
+  hard: { maxLength: 7, skillVariance: 0.5, selectionSkew: 0.5, captureAggression: 1 },
 };
 
 export function botTuning(difficulty: BotDifficulty): BotTuning {
