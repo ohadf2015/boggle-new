@@ -56,6 +56,25 @@ splitting one importer cannot remove them. A real win needs deeper work:
   largest chunks (~2MB); needs the treemap to target safely.
 - **Status: deferred to a dedicated effort** — high effort, Turbopack-uncertain payoff, landing
   files under active concurrent edits. This is the largest remaining LCP lever.
+- **TREEMAP OBTAINED (2026-06-13):** `next build --experimental-analyze` IS the Turbopack-native
+  analyzer (the webpack `@next/bundle-analyzer` is the no-op). Output: `.next/diagnostics/
+  route-bundle-stats.json` (per-route `firstLoadUncompressedJsBytes` + `firstLoadChunkPaths`) and
+  `.next/diagnostics/analyze/`. Landing `/[locale]` = **7,068,292 bytes (7 MB) first-load JS / 65
+  chunks**. Top chunks: 5× ~415–541KB dominated by **posthog-js + d3**, 2× ~330–415KB = **pixi**.
+  **Defer targets (concrete):**
+  1. **posthog-js (~170KB+):** `components/providers/PostHogProvider.tsx:15` static-imports
+     `posthog-js` + inits eagerly (every page). Defer the *import+init* to post-hydration / idle /
+     first-interaction (mirror the LogRocket pattern in essential-providers). Not LCP-critical.
+  2. **pixi (~744KB):** still eager via the global FX mounts (`SharedFxMount`, `GlobalCoinEarnFx`
+     in essential-providers). Dynamic-import those mounts ({ssr:false}) — BUT first relocate
+     `initHowler()` out of the game-providers module to an always-mounted path (it's a module-level
+     side effect; deferring its importer drops it → audio-pool-exhaustion regression, Sentry JS-9J).
+  3. **d3:** NOT directly imported by landing (recharts importers are all `*ChartInner` = lazy);
+     it's Turbopack vendor-chunk grouping with posthog. May fall out once posthog is deferred.
+  **CAVEAT:** shared vendor chunks mean a chunk stays eager unless ALL its eager importers defer —
+  verify each step by `curl localhost:3001/en` + sizing the `<script>` set before/after, not by
+  manifests. Do this in a FRESH context (the deferral touches analytics init timing + a known
+  audio side-effect — needs full adherence).
 
 ## INFRA — Supabase Realtime WAL decode = 83% of DB CPU (cost/headroom, NOT latency)
 
