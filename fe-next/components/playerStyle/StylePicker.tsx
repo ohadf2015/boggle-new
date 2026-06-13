@@ -80,11 +80,15 @@ export function StylePicker({
   const handleConfirm = useCallback(async () => {
     setSaving(true);
     try {
+      // Stop the preview FIRST: it ducks the global music volume to 0 while a
+      // snippet plays. Committing the style swaps the live music bed (home/lobby/
+      // game) — if we swap while still ducked, the new bed fades in at volume 0.
+      // Restoring before the commit guarantees the new track is audible immediately.
+      stopSnippet();
       await setStyle(selected);
       if (styleAvatar && avatarPreview) {
         await updateProfile({ avatar_config: avatarPreview, avatar_customized: true });
       }
-      stopSnippet();
       onConfirm?.(selected);
     } finally {
       setSaving(false);

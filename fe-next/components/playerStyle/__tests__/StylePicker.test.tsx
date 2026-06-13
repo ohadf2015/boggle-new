@@ -65,6 +65,17 @@ describe('StylePicker', () => {
     expect(onConfirm).toHaveBeenCalledWith('rock');
   });
 
+  it('restores the ducked preview volume BEFORE committing (so the swapped bed is audible, not faded-in at 0)', async () => {
+    render(<StylePicker />);
+    fireEvent.click(screen.getByRole('radio', { name: /playerStyle\.styles\.rock/ }));
+    await act(async () => {
+      fireEvent.click(screen.getByText('playerStyle.picker.confirm'));
+    });
+    // stopSnippet (un-duck) must run before setStyle (which crossfades the live
+    // music bed). Otherwise the new style bed fades in while volume is still 0.
+    expect(stopSnippet.mock.invocationCallOrder[0]).toBeLessThan(setStyle.mock.invocationCallOrder[0]);
+  });
+
   it('opt-in avatar: toggling on shows a themed avatar preview', () => {
     render(<StylePicker />);
     fireEvent.click(screen.getByRole('radio', { name: /playerStyle\.styles\.rock/ }));
