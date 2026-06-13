@@ -175,11 +175,12 @@ export const AdventureTile = memo(({
         // Base tile styles — match GridComponent baseline
         'relative aspect-square flex items-center justify-center',
         'font-black cursor-pointer overflow-hidden',
-        // Neo-brutalist corners — lighter border + softer hard shadow for airy feel
-        'rounded-neo border border-black/20',
-        'shadow-[1px_1px_0px_rgba(0,0,0,0.4)]',
-        // Hover: brightness lift to signal interactivity (no new shadow needed)
-        canInteract && 'hover:brightness-110',
+        // Neo-brutalist tile: solid border + hard pixel shadow for tactile depth (RTL auto-flips)
+        'rounded-neo border-2 border-neo-black/40',
+        'shadow-hard',
+        // Hover brightens; press sinks the tile into its own shadow for a button-like feel
+        canInteract && 'hover:brightness-110 transition-[box-shadow,transform,filter] duration-100',
+        canInteract && 'active:translate-y-px active:shadow-hard-pressed',
 
         // Type-specific classes
         TILE_TYPE_CLASSES[tile.type],
