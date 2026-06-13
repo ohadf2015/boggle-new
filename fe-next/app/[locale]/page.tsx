@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import HomePageClient from './PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
-import { HomeEditorialNav } from '@/components/seo/HomeEditorialNav';
 import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
@@ -246,9 +245,6 @@ export default async function HomePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
       />
-      {/* Top-of-DOM editorial nav — first paint signals "content publisher", not just
-          a game, to the AdSense reviewer + crawler. Server-rendered, no client JS. */}
-      <HomeEditorialNav locale={locale} />
       <HomePageClient initialData={initialData} />
       <EsScrabbleCrossLink locale={locale} anchorVariant="home" />
       <SvScrabbleCrossLink locale={locale} anchorVariant="home" />
