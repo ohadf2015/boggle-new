@@ -1,8 +1,12 @@
 /**
- * Verifies PracticeWheelSandbox maps originIndex (0=center, 1-6=outer)
- * to the convention expected by WordWheelPixiRing (-1=center, 0-5=outer).
- * Without this mapping, connector arcs are drawn 60° clockwise from the
- * actual letter position.
+ * PracticeWheelSandbox embeds WordWheelGame, which feeds the built word's
+ * wheel indices straight into WordWheelPixiRing. Verifies those indices use
+ * the ring's native convention (-1 = center, 0-5 = outer, 0-based). If the
+ * center ever leaked through as 0 (or an outer letter as 1-based), connector
+ * arcs would be drawn 60° clockwise from the actual letter position.
+ *
+ * The mocked WheelLetter exposes WordWheelGame's `index` prop as
+ * data-wheel-index, so the center button is "-1" and the first outer is "0".
  */
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react';
@@ -28,8 +32,12 @@ vi.mock('@/lib/practice/usePracticeValidator', () => ({
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
+// useSoundEffects() returns ~15 play*Sound functions that WordWheelGame
+// destructures and calls; a bare {} makes each one undefined → crash on click.
+// Proxy yields a no-op for any sound accessed, so this never drifts as the
+// component adds more sounds.
 vi.mock('@/contexts/SoundEffectsContext', () => ({
-  useSoundEffects: () => ({}),
+  useSoundEffects: () => new Proxy({}, { get: () => () => {} }),
 }));
 vi.mock('pixi.js', () => ({
   Application: class {
@@ -81,10 +89,10 @@ beforeEach(() => {
   window.localStorage.clear();
 });
 
-describe('PracticeWheelSandbox — Pixi selectedIndices convention mapping', () => {
-  it('passes -1 for center letter (originIndex 0 → Pixi convention -1)', async () => {
+describe('WordWheel Pixi selectedIndices convention (center=-1, outer=0-based)', () => {
+  it('passes -1 for the center letter', async () => {
     await act(async () => { render(<PracticeWheelSandbox />); });
-    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
+    const center = document.querySelector('[data-wheel-index="-1"]') as HTMLElement;
     await act(async () => { fireEvent.click(center); });
     const calls = pixiRingProps.mock.calls;
     const lastCall = calls[calls.length - 1]?.[0];
@@ -92,27 +100,26 @@ describe('PracticeWheelSandbox — Pixi selectedIndices convention mapping', () 
     expect(lastCall?.selectedIndices).not.toContain(0);
   });
 
-  it('passes 0-based outer index for first outer letter (originIndex 1 → Pixi 0)', async () => {
+  it('passes the 0-based index for the first outer letter', async () => {
     await act(async () => { render(<PracticeWheelSandbox />); });
-    const outer1 = document.querySelector('[data-wheel-index="1"]') as HTMLElement;
-    await act(async () => { fireEvent.click(outer1); });
+    const outer0 = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
+    await act(async () => { fireEvent.click(outer0); });
     const calls = pixiRingProps.mock.calls;
     const lastCall = calls[calls.length - 1]?.[0];
     expect(lastCall?.selectedIndices).toContain(0);
-    expect(lastCall?.selectedIndices).not.toContain(1);
+    expect(lastCall?.selectedIndices).not.toContain(-1);
   });
 
   it('maps center + outer correctly together', async () => {
     await act(async () => { render(<PracticeWheelSandbox />); });
-    const center = document.querySelector('[data-wheel-index="0"]') as HTMLElement;
+    const center = document.querySelector('[data-wheel-index="-1"]') as HTMLElement;
     const outer2 = document.querySelector('[data-wheel-index="2"]') as HTMLElement;
     await act(async () => { fireEvent.click(center); });
     await act(async () => { fireEvent.click(outer2); });
     const calls = pixiRingProps.mock.calls;
     const lastCall = calls[calls.length - 1]?.[0];
     expect(lastCall?.selectedIndices).toContain(-1); // center
-    expect(lastCall?.selectedIndices).toContain(1);  // outer idx 2 → Pixi 1
+    expect(lastCall?.selectedIndices).toContain(2);  // outer index 2 passes through as 2
     expect(lastCall?.selectedIndices).not.toContain(0);
-    expect(lastCall?.selectedIndices).not.toContain(2);
   });
 });
