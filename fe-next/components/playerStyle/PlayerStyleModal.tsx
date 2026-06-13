@@ -52,7 +52,7 @@ export function PlayerStyleModal({ isOpen, onDismiss }: PlayerStyleModalProps) {
   // this `position: fixed` overlay, dragging it on scroll (flicker).
   return createPortal(
     <div
-      className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/70 p-4 pb-[calc(1rem+var(--admob-banner-height,0px))]"
+      className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/70 p-4 pb-[calc(1rem+var(--admob-banner-height,0px)+var(--web-anchor-ad-height,0px))]"
       role="dialog"
       aria-modal="true"
       aria-label={t('playerStyle.popup.title')}
