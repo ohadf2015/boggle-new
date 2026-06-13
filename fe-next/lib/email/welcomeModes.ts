@@ -13,6 +13,9 @@
  *  - `adventure` is omitted: it is a public route but the landing intentionally
  *    keeps it out of FEATURED_MODES (and it is mid-rework), so the email mirrors
  *    the landing's promoted public set rather than every reachable route.
+ *  - `crossword` (תשבץ) is omitted: it is not yet public to all players, so it
+ *    must not be promoted in the welcome / re-engagement emails until it ships
+ *    broadly. Re-add it here when it goes fully public.
  *
  * Titles come from the registry's i18n keys (localized via `translateKey`).
  * Taglines are curated per-language email copy (tighter than the landing descs,
@@ -33,8 +36,8 @@ export interface WelcomeEmailMode {
 
 /**
  * The promoted public set, in email order. Mirrors the landing FEATURED_MODES
- * minus admin-gated modes and minus `adventure`. `daily` leads after arena as
- * the habit hook.
+ * minus admin-gated modes, minus `adventure`, and minus `crossword` (not yet
+ * public to all players). `daily` leads after arena as the habit hook.
  */
 export const PUBLIC_WELCOME_MODE_ORDER = [
   'arena',
@@ -43,7 +46,6 @@ export const PUBLIC_WELCOME_MODE_ORDER = [
   'connections',
   'wordCraft',
   'brainGym',
-  'crossword',
   'practice',
 ] as const;
 

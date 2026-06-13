@@ -7,7 +7,8 @@ const BASE = 'https://www.lexiclash.live';
 describe('getWelcomeEmailModes — dynamic public mode list for the welcome email', () => {
   it('includes only public modes available to all players', () => {
     const keys = getWelcomeEmailModes('en', BASE).map((m) => m.key);
-    // Exactly the promoted public set (matches landing FEATURED_MODES minus admin/adventure)
+    // Exactly the promoted public set (matches landing FEATURED_MODES minus
+    // admin/adventure, and minus crossword — not yet public to all players).
     expect(keys).toEqual([
       'arena',
       'daily',
@@ -15,9 +16,13 @@ describe('getWelcomeEmailModes — dynamic public mode list for the welcome emai
       'connections',
       'wordCraft',
       'brainGym',
-      'crossword',
       'practice',
     ]);
+  });
+
+  it('excludes crossword (not yet public to all players)', () => {
+    const keys = new Set(getWelcomeEmailModes('en', BASE).map((m) => m.key));
+    expect(keys.has('crossword')).toBe(false);
   });
 
   it('excludes every admin-gated mode', () => {
@@ -74,7 +79,8 @@ describe('getWelcomeEmailModes — dynamic public mode list for the welcome emai
   });
 
   it('exposes a stable public order constant', () => {
-    expect(PUBLIC_WELCOME_MODE_ORDER.length).toBe(8);
+    expect(PUBLIC_WELCOME_MODE_ORDER.length).toBe(7);
+    expect(PUBLIC_WELCOME_MODE_ORDER).not.toContain('crossword');
   });
 });
 
