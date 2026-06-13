@@ -31,6 +31,7 @@ import {
   pixelBasedPreset,
 } from '@react-email/components';
 import { getWelcomeEmailModes, type WelcomeEmailMode } from '@/lib/email/welcomeModes';
+import { ModeGrid } from './components/ModeGrid';
 
 /* ───────────────────────── i18n copy ─────────────────────────
  * Voice: slightly sarcastic best-friend. Contractions, specifics,
@@ -301,9 +302,6 @@ export default function ReengagementEmailV2({
   );
   const blankTiles = Array.from({ length: totalTiles - 1 });
 
-  // Secondary mode grid — paired into rows of two. Empty when no modes passed.
-  const modeRows: WelcomeEmailMode[][] = [];
-  if (modes) for (let i = 0; i < modes.length; i += 2) modeRows.push(modes.slice(i, i + 2));
 
   // Personalization gates.
   const showMissedDays =
@@ -742,76 +740,24 @@ export default function ReengagementEmailV2({
                        Uniform navy tiles; the generated cube image carries the
                        colour, name + tagline stay real text (blocked-image safe).
                        Each tile links straight into the mode. ── */}
-                  {modeRows.length > 0 && (
+                  {modes && modes.length > 0 && (
                     <tr>
                       <td style={{ padding: '6px 0 0' }}>
-                        <Text style={{
-                          color: C.muted,
-                          fontSize: '12px',
-                          fontWeight: 700,
-                          letterSpacing: '2px',
-                          textTransform: 'uppercase' as const,
-                          textAlign: 'center',
-                          margin: '0 0 14px',
-                          direction: dir,
-                          fontFamily: "'Fredoka', Arial, sans-serif",
-                        }}>
-                          {t.moreModes}
-                        </Text>
-                        {modeRows.map((row, ri) => (
-                          <table key={`re-mode-row-${ri}`} role="presentation" cellPadding={0} cellSpacing={0}
-                            width="100%" style={{ marginBottom: '12px' }}>
-                            <tr>
-                              {row.map((m) => (
-                                <td key={m.key} width="50%" valign="top"
-                                  style={{ padding: rtl ? '0 0 0 6px' : '0 6px 0 0' }}>
-                                  <Link href={m.href} target="_blank"
-                                    style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-                                    <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
-                                      style={{
-                                        backgroundColor: C.bgAlt,
-                                        border: `2px solid ${C.letterBorder}`,
-                                        borderRadius: '12px',
-                                        boxShadow: `${sh}3px 3px 0px ${C.black}`,
-                                        height: '100%',
-                                      }}>
-                                      <tr>
-                                        <td width="60" valign="middle" style={{ padding: '10px' }}>
-                                          <Img
-                                            src={m.cubeImageUrl}
-                                            alt={m.title}
-                                            width="50"
-                                            height="50"
-                                            style={{
-                                              display: 'block',
-                                              width: '50px',
-                                              height: '50px',
-                                              borderRadius: '10px',
-                                              border: 0,
-                                              outline: 'none',
-                                            }}
-                                          />
-                                        </td>
-                                        <td valign="middle"
-                                          style={{ padding: rtl ? '10px 0 10px 8px' : '10px 8px 10px 0', direction: dir }}>
-                                          <div style={{
-                                            color: C.text, fontSize: '14px', fontWeight: 700,
-                                            lineHeight: 1.25, marginBottom: '2px',
-                                          }}>
-                                            {m.title}
-                                          </div>
-                                          <div style={{ color: C.muted, fontSize: '11px', lineHeight: 1.35 }}>
-                                            {m.tagline}
-                                          </div>
-                                        </td>
-                                      </tr>
-                                    </table>
-                                  </Link>
-                                </td>
-                              ))}
-                            </tr>
-                          </table>
-                        ))}
+                        <ModeGrid
+                          modes={modes}
+                          rtl={rtl}
+                          dir={dir}
+                          sh={sh}
+                          header={t.moreModes}
+                          palette={{
+                            tileBg: '#1a1a2e',
+                            tileBorder: C.letterBorder,
+                            title: C.text,
+                            tagline: C.muted,
+                            header: C.muted,
+                            black: C.black,
+                          }}
+                        />
                       </td>
                     </tr>
                   )}

@@ -30,6 +30,7 @@ import {
   pixelBasedPreset,
 } from '@react-email/components';
 import { getWelcomeEmailModes, type WelcomeEmailMode } from '@/lib/email/welcomeModes';
+import { ModeGrid } from './components/ModeGrid';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -160,7 +161,8 @@ const C = {
   grayLight: '#9CA3AF',
   // Uniform tile chrome — one quiet edge for every mode. The cube art carries
   // all the colour, so the grid reads calm instead of a rainbow of borders.
-  tileBg: '#1e1e3a',
+  // tileBg MUST equal the cube image's baked navy so the art bleeds seamlessly.
+  tileBg: '#1a1a2e',
   tileBorder: '#3a3a5e',
 } as const;
 
@@ -195,9 +197,6 @@ export default function WelcomeEmail({
     : `/static/email-logo-${logoLang}.png`;
   const year = new Date().getFullYear();
 
-  // Pair modes into rows of two for the responsive grid.
-  const modeRows: WelcomeEmailMode[][] = [];
-  for (let i = 0; i < modes.length; i += 2) modeRows.push(modes.slice(i, i + 2));
 
   return (
     <Html lang={language} dir={dir}>
@@ -362,78 +361,23 @@ export default function WelcomeEmail({
                               </tr>
                             </table>
 
-                            {/* ── Modes header ── */}
-                            <Text style={{
-                              color: C.grayLight,
-                              fontSize: '12px',
-                              fontWeight: 700,
-                              letterSpacing: '2px',
-                              textTransform: 'uppercase' as const,
-                              textAlign: 'center',
-                              margin: '0 0 14px',
-                              direction: dir,
-                            }}>
-                              {t.modesHeader}
-                            </Text>
-
-                            {/* ── Mode grid (2 cols) — uniform navy tiles, each a
-                                 link; the generated cube image carries the colour,
-                                 name + tagline stay real text so a blocked image
-                                 still reads. ── */}
-                            {modeRows.map((row, ri) => (
-                              <table key={`mode-row-${ri}`} role="presentation" cellPadding={0} cellSpacing={0}
-                                width="100%" style={{ marginBottom: '12px' }}>
-                                <tr>
-                                  {row.map((m) => (
-                                    <td key={m.key} width="50%" valign="top" className="mode-td"
-                                      style={{ padding: rtl ? '0 0 0 6px' : '0 6px 0 0' }}>
-                                      <Link href={m.href} target="_blank"
-                                        style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
-                                        <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
-                                          style={{
-                                            backgroundColor: C.tileBg,
-                                            border: `2px solid ${C.tileBorder}`,
-                                            borderRadius: '12px',
-                                            boxShadow: `${sh}3px 3px 0px ${C.black}`,
-                                            height: '100%',
-                                          }}>
-                                          <tr>
-                                            <td width="64" valign="middle" style={{ padding: '10px' }}>
-                                              <Img
-                                                src={m.cubeImageUrl}
-                                                alt={m.title}
-                                                width="56"
-                                                height="56"
-                                                style={{
-                                                  display: 'block',
-                                                  width: '56px',
-                                                  height: '56px',
-                                                  borderRadius: '10px',
-                                                  border: 0,
-                                                  outline: 'none',
-                                                }}
-                                              />
-                                            </td>
-                                            <td valign="middle"
-                                              style={{ padding: rtl ? '10px 0 10px 10px' : '10px 10px 10px 0', direction: dir }}>
-                                              <div style={{
-                                                color: C.white, fontSize: '15px', fontWeight: 700,
-                                                lineHeight: 1.25, marginBottom: '2px',
-                                              }}>
-                                                {m.title}
-                                              </div>
-                                              <div style={{ color: C.grayLight, fontSize: '12px', lineHeight: 1.4 }}>
-                                                {m.tagline}
-                                              </div>
-                                            </td>
-                                          </tr>
-                                        </table>
-                                      </Link>
-                                    </td>
-                                  ))}
-                                </tr>
-                              </table>
-                            ))}
+                            {/* ── Mode grid (shared component) — seamless navy
+                                 tiles, cube art carries the colour, each tile a link ── */}
+                            <ModeGrid
+                              modes={modes}
+                              rtl={rtl}
+                              dir={dir}
+                              sh={sh}
+                              header={t.modesHeader}
+                              palette={{
+                                tileBg: C.tileBg,
+                                tileBorder: C.tileBorder,
+                                title: C.white,
+                                tagline: C.grayLight,
+                                header: C.grayLight,
+                                black: C.black,
+                              }}
+                            />
 
                             {/* ── CTA ── */}
                             <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
