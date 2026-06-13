@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { queryKeys } from '@/lib/queryKeys';
 import logger from '@/utils/logger';
+import { fetchWithAuth } from '@/utils/authFetch';
 
 interface BadgeInfo {
   id: string;
@@ -107,7 +108,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   const giftsQuery = useQuery({
     queryKey: queryKeys.gifts.list(),
     queryFn: async () => {
-      const response = await fetch('/api/player/gifts');
+      const response = await fetchWithAuth('/api/player/gifts');
       if (response.status === 401) return { gifts: [] };
       if (!response.ok) throw new Error('Failed to fetch gifts');
       return response.json() as Promise<{ gifts: GiftMessage[] }>;

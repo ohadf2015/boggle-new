@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { Bell, BellOff, Calendar, Flame, Users, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { fetchWithAuth } from '@/utils/authFetch';
 import {
   loadCategoryPreferences,
   saveCategoryPreferences,
@@ -63,7 +64,7 @@ export function NotificationCategoryPreferences() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/notifications/preferences')
+    fetchWithAuth('/api/notifications/preferences')
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (cancelled || !data || typeof data !== 'object') return;

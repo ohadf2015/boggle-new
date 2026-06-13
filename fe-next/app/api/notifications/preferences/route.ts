@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { z } from 'zod';
 
 const preferencesSchema = z.object({
@@ -80,18 +81,16 @@ export async function PUT(request: NextRequest) {
  * GET /api/notifications/preferences
  * Load notification category preferences for the authenticated user
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    // Local JWT verify (sub-ms) when fetchWithAuth sends a Bearer; cookie fallback
+    // otherwise. Read-only. Query keeps the cookie client so RLS still applies.
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabase = await createClient();
     const { data, error } = await supabase
       .from('user_notification_preferences')
       .select(
