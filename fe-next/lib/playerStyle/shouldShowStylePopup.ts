@@ -1,10 +1,22 @@
 export interface StylePopupGateInput {
   isMounted: boolean;
+  /**
+   * Auth/session restore has finished (`!useAuth().loading`). Until this is true
+   * `isAuthenticated` is unreliable (starts false, flips true on restore), so a
+   * returning authed user would be routed through the guest branch and flash the
+   * popup. Gate everything on it. False → never decide yet.
+   */
+  authSettled: boolean;
   /** Feature gate (admin-only during testing). False → never show. */
   featureEnabled: boolean;
   isAuthenticated: boolean;
   /** True while the post-OAuth profile-customization modal is pending. */
   needsProfileCustomization: boolean;
+  /**
+   * Profile object has been fetched (authed). False → don't decide yet: an
+   * unloaded profile has null shownAt+style which would wrongly resolve to show.
+   */
+  profileLoaded: boolean;
   /** profiles.player_style_modal_shown_at (authed). */
   profileShownAt: string | null;
   /** profiles.player_style (authed) — already chose a style elsewhere. */
@@ -13,6 +25,13 @@ export interface StylePopupGateInput {
   guestShown: boolean;
   /** Guest has finished onboarding (don't nag fresh visitors). */
   guestOnboardingDone: boolean;
+  /**
+   * Session latch: the popup has already been shown once this mount. True →
+   * never show again. Closes the authed reopen window where `profileShownAt`
+   * still reads null until the async profile refetch lands after dismiss,
+   * which would otherwise re-resolve to `true` and re-pop the modal.
+   */
+  alreadyShownThisSession: boolean;
 }
 
 /**
@@ -23,10 +42,17 @@ export interface StylePopupGateInput {
  */
 export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   if (!input.isMounted) return false;
+  // Once shown this session, never show again — even if the persisted "shown"
+  // marker hasn't caught up yet (authed profile refetch lag after dismiss).
+  if (input.alreadyShownThisSession) return false;
+  // Wait for auth to settle before deciding — otherwise the transient
+  // "not-yet-authenticated" window flashes the popup at returning users.
+  if (!input.authSettled) return false;
   if (!input.featureEnabled) return false;
   if (input.needsProfileCustomization) return false;
 
   if (input.isAuthenticated) {
+    if (!input.profileLoaded) return false; // profile not fetched yet → don't guess
     return !input.profileShownAt && !input.profileStyle;
   }
   return input.guestOnboardingDone && !input.guestShown;

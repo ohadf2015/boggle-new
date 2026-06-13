@@ -128,15 +128,18 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
       data-cube-key={model.key}
       style={{ animationDelay: `${Math.min(index, 8) * 0.05}s`, ['--cube-img-scale' as string]: model.imgScale ?? 1 }}
       className={cn(
-        'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-neo-thick border-black transition-transform duration-150',
+        'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-neo-thick border-black',
         // per-mode coloured hard shadow at rest → the bento reads "colour-coded" at a
         // glance without a saturated fill (replaces the old uniform black shadow-hard)
         v.restShadow,
-        // Physical neo-brutalist feedback. Lift on hover AND focus-visible so the
-        // grid feels alive on TV/party screens (no pointer → focus is the only
-        // signal) and for keyboard users. active = press the cube back in.
-        'hover:-translate-x-0.5 hover:-translate-y-0.5 focus-visible:-translate-x-0.5 focus-visible:-translate-y-0.5',
-        'active:translate-x-0 active:translate-y-0 active:shadow-hard-pressed',
+        // Physical 3D feedback. `.cube-tilt` lifts + tilts the cube back on hover AND
+        // focus-visible (TV/party screens have no pointer → focus is the only signal;
+        // keyboard users get it too) via the INDIVIDUAL transform props, which compose
+        // with the `cube-rise` entrance animation that owns `transform` (a plain
+        // `hover:-translate-*` here is silently clobbered by that filling animation).
+        // active = press the cube back in (handled by `.cube-tilt:active`).
+        'cube-tilt',
+        'active:shadow-hard-pressed',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         v.shadow, v.ring,
         anchor
@@ -296,8 +299,12 @@ export function LandingModeCubes({
   const bigAnchor = rest.length >= 3;
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-5 md:space-y-6 xl:max-w-6xl">
-      {dailyNode && <div className="w-full">{dailyNode}</div>}
+    // `.cube-deck` sets the shared `perspective` so every child `.cube-tilt`
+    // (cubes + daily banner) tilts with real 3D depth on hover.
+    <div className="cube-deck mx-auto w-full max-w-5xl space-y-5 md:space-y-6 xl:max-w-6xl">
+      {dailyNode && (
+        <div className="cube-tilt w-full rounded-neo">{dailyNode}</div>
+      )}
 
       <section aria-label={sectionLabel}>
         <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">

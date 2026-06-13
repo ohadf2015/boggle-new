@@ -6,7 +6,7 @@
  * instead, so this never double-prompts. Mirrors ProfileCustomizationWrapper.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
@@ -24,36 +24,67 @@ const PlayerStyleModal = dynamic(
 );
 
 export default function PlayerStyleOnboardingWrapper() {
-  const { isAuthenticated, profile, needsProfileCustomization, updateProfile } = useAuth();
+  const { isAuthenticated, profile, needsProfileCustomization, updateProfile, loading } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const [show, setShow] = useState(false);
+  // Session latch: once we've decided to show the popup, never let the effect
+  // re-open it. The authed "shown" marker (profileShownAt) is persisted async,
+  // so after dismiss it briefly still reads null and the gate would re-resolve
+  // `true` on the next dep change → modal jumps back ("shows multiple times").
+  const shownOnceRef = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Derive primitives up front so the effect deps are stable values, not the
+  // `profile` object — whose identity changes on every auth refresh and used to
+  // re-fire the timer, racing setShow(true)→setShow(false) into a visible flash.
+  const authSettled = !loading;
+  const profileLoaded = profile != null;
+  const profileShownAt = profile?.player_style_modal_shown_at ?? null;
+  const profileStyle = profile?.player_style ?? null;
+
   useEffect(() => {
     if (!isMounted) return;
     // Don't fight the profile-customization modal; small settle delay.
     const timer = setTimeout(() => {
-      setShow(
-        shouldShowStylePopup({
-          isMounted: true,
-          // SHIPPED TO ALL: the one-time "pick your style" popup now prompts every
-          // existing user once (was admin-only during the pilot). Brand-new users
-          // still choose during onboarding, so this never double-prompts.
-          featureEnabled: true,
-          isAuthenticated,
-          needsProfileCustomization: !!needsProfileCustomization,
-          profileShownAt: profile?.player_style_modal_shown_at ?? null,
-          profileStyle: profile?.player_style ?? null,
-          guestShown: hasPlayerStyleModalBeenShown(),
-          guestOnboardingDone: hasCompletedOnboarding(),
-        }),
-      );
+      const next = shouldShowStylePopup({
+        isMounted: true,
+        // Gate on auth + profile load so we never decide during the transient
+        // unauthenticated / unloaded-profile window (the flash root cause).
+        authSettled,
+        // SHIPPED TO ALL: the one-time "pick your style" popup now prompts every
+        // existing user once (was admin-only during the pilot). Brand-new users
+        // still choose during onboarding, so this never double-prompts.
+        featureEnabled: true,
+        isAuthenticated,
+        needsProfileCustomization: !!needsProfileCustomization,
+        profileLoaded,
+        profileShownAt,
+        profileStyle,
+        guestShown: hasPlayerStyleModalBeenShown(),
+        guestOnboardingDone: hasCompletedOnboarding(),
+        alreadyShownThisSession: shownOnceRef.current,
+      });
+      // Only ever OPEN from the effect; dismissal owns closing. This prevents a
+      // dep change while the modal is open from yanking it shut mid-choice, and
+      // (with the latch) prevents it re-opening after dismiss.
+      if (next) {
+        shownOnceRef.current = true;
+        setShow(true);
+      }
     }, 800);
     return () => clearTimeout(timer);
-  }, [isMounted, isAuthenticated, needsProfileCustomization, profile]);
+  }, [
+    isMounted,
+    authSettled,
+    isAuthenticated,
+    needsProfileCustomization,
+    profileLoaded,
+    profileShownAt,
+    profileStyle,
+  ]);
 
   const markShown = useCallback(async () => {
     if (isAuthenticated && profile) {
