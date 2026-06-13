@@ -47,6 +47,15 @@ splitting one importer cannot remove them. A real win needs deeper work:
 - Gotcha learned: static manifests (`*_client-reference-manifest.js`) **cannot** distinguish
   eager from lazy chunks under Turbopack — verify bundle wins by `curl`-ing SSR HTML and
   checking `<script>` presence, or Lighthouse, not manifests.
+- **Tooling blocker (2026-06-13):** `@next/bundle-analyzer` is a webpack plugin and is a **no-op
+  under the Turbopack build** — `ANALYZE=true npm run build` produces no `.next/analyze` treemap.
+  To analyze, run a one-off webpack build (Turbopack disabled) for the treemap, or boot prod +
+  `curl /en` and size the `<script>` set. socket.io (~48KB, via
+  `LandingView → useLiveRoomStats → useSocketOptional → SocketContext`'s static `socket.io-client`
+  import) is only ~0.8% of the 6MB — not worth a `SocketContext` split. The weight is the 4
+  largest chunks (~2MB); needs the treemap to target safely.
+- **Status: deferred to a dedicated effort** — high effort, Turbopack-uncertain payoff, landing
+  files under active concurrent edits. This is the largest remaining LCP lever.
 
 ## INFRA — Supabase Realtime WAL decode = 83% of DB CPU (cost/headroom, NOT latency)
 
