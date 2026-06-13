@@ -13,6 +13,7 @@ import ReengagementEmailV2, {
   getReengagementSubjectV2,
   SUBJECT_LINES,
 } from '@/emails/reengagement-v2';
+import { getWelcomeEmailModes } from '@/lib/email/welcomeModes';
 
 const baseProps = {
   recipientName: 'Ohad',
@@ -379,6 +380,50 @@ describe('ReengagementEmailV2 — stress copy guardrails', () => {
       expect(s).not.toContain('וקסי');
       // Bare "קסי" alone (not preceded by ל) is wrong — match word boundary
       expect(s).not.toMatch(/(^|[^ל])קסי/);
+    }
+  });
+});
+
+const BASE = 'https://www.lexiclash.live';
+
+describe('ReengagementEmailV2 — secondary cube-image mode grid', () => {
+  it('omits the mode section entirely when no modes are passed', async () => {
+    const html = await render(ReengagementEmailV2(baseProps));
+    expect(html).not.toContain('More ways to play');
+    expect(html).not.toContain('/modes/cubes/');
+  });
+
+  it('renders every public mode cube image + a link when modes are passed', async () => {
+    const modes = getWelcomeEmailModes('en', BASE);
+    const html = await render(ReengagementEmailV2({ ...baseProps, modes }));
+    expect(html).toContain('More ways to play');
+    for (const m of modes) {
+      expect(html).toContain(m.cubeImageUrl);
+      expect(html).toContain(`href="${m.href}"`);
+    }
+  });
+
+  it('keeps the daily-puzzle CTA as the primary action (appears before the grid)', async () => {
+    const modes = getWelcomeEmailModes('en', BASE);
+    const html = await render(ReengagementEmailV2({ ...baseProps, modes }));
+    const ctaIdx = html.search(/Play today.{1,10}s word/i);
+    const gridIdx = html.indexOf('More ways to play');
+    expect(ctaIdx).toBeGreaterThan(-1);
+    expect(gridIdx).toBeGreaterThan(ctaIdx); // grid sits below the CTA
+  });
+
+  it('localizes the section header and links for Hebrew (RTL)', async () => {
+    const modes = getWelcomeEmailModes('he', BASE);
+    const html = await render(ReengagementEmailV2({ ...baseProps, language: 'he', modes }));
+    expect(html).toContain('עוד דרכים לשחק');
+    expect(html).toContain(`${BASE}/he/multiplayer`);
+  });
+
+  it('uses no emoji in the mode tiles', async () => {
+    const modes = getWelcomeEmailModes('en', BASE);
+    const html = await render(ReengagementEmailV2({ ...baseProps, modes }));
+    for (const emoji of ['🥊', '💥', '🎯', '🧩', '🗺️', '🏰']) {
+      expect(html).not.toContain(emoji);
     }
   });
 });

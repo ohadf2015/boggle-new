@@ -11,6 +11,11 @@ import ReengagementEmailV2, {
   getReengagementSubjectV2 as getReengagementSubject,
   SUBJECT_LINES,
 } from '@/emails/reengagement-v2';
+import { getWelcomeEmailModes } from '@/lib/email/welcomeModes';
+
+// Cube images + the hero are served from the production origin (same base the
+// component's HERO_SRC uses), independent of the deprecated `baseUrl` param.
+const EMAIL_ASSET_BASE = 'https://www.lexiclash.live';
 
 export { getReengagementSubject, SUBJECT_LINES };
 
@@ -63,6 +68,8 @@ export async function generateReengagementEmailHtml(params: EmailTemplateParams)
     daysSinceLastPlay,
     playersToday,
     hoursUntilReset,
+    // Secondary "more ways to play" grid — every public mode with its cube art.
+    modes: getWelcomeEmailModes(language, EMAIL_ASSET_BASE),
   };
 
   const html = await render(ReengagementEmailV2(props));

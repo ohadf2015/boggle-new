@@ -30,6 +30,7 @@ import {
   Tailwind,
   pixelBasedPreset,
 } from '@react-email/components';
+import { getWelcomeEmailModes, type WelcomeEmailMode } from '@/lib/email/welcomeModes';
 
 /* ───────────────────────── i18n copy ─────────────────────────
  * Voice: slightly sarcastic best-friend. Contractions, specifics,
@@ -45,6 +46,8 @@ interface Copy {
   hint: string;
   pitch: string;
   cta: string;
+  /** header above the secondary "more ways to play" cube grid */
+  moreModes: string;
   footerReason: string;
   unsubscribe: string;
   privacy: string;
@@ -60,6 +63,7 @@ const COPY: Record<string, Copy> = {
     hint: 'Starts with',
     pitch: "One word. 30 seconds. That's the whole thing.",
     cta: "Play today's word",
+    moreModes: 'More ways to play',
     footerReason: 'You signed up for daily word reminders.',
     unsubscribe: 'Unsubscribe',
     privacy: 'Privacy',
@@ -73,6 +77,7 @@ const COPY: Record<string, Copy> = {
     hint: 'מתחילה באות',
     pitch: 'מילה אחת. 30 שניות. וזהו.',
     cta: 'שחקו את המילה של היום',
+    moreModes: 'עוד דרכים לשחק',
     footerReason: 'נרשמת לתזכורות מילה יומית.',
     unsubscribe: 'ביטול הרשמה',
     privacy: 'פרטיות',
@@ -86,6 +91,7 @@ const COPY: Record<string, Copy> = {
     hint: 'Börjar på',
     pitch: 'Ett ord. 30 sekunder. Det är hela grejen.',
     cta: 'Spela dagens ord',
+    moreModes: 'Fler sätt att spela',
     footerReason: 'Du anmälde dig till dagliga ordpåminnelser.',
     unsubscribe: 'Avprenumerera',
     privacy: 'Integritet',
@@ -99,6 +105,7 @@ const COPY: Record<string, Copy> = {
     hint: '最初の文字は',
     pitch: '一単語、30秒。それだけ。',
     cta: '今日の単語で遊ぶ',
+    moreModes: '他の遊び方',
     footerReason: '毎日の単語リマインダーに登録してくれたよね。',
     unsubscribe: '配信停止',
     privacy: 'プライバシー',
@@ -112,6 +119,7 @@ const COPY: Record<string, Copy> = {
     hint: 'Empieza con',
     pitch: 'Una palabra. 30 segundos. Eso es todo.',
     cta: 'Jugar la palabra de hoy',
+    moreModes: 'Más formas de jugar',
     footerReason: 'Te suscribiste a recordatorios diarios.',
     unsubscribe: 'Cancelar suscripción',
     privacy: 'Privacidad',
@@ -208,6 +216,13 @@ interface ReengagementEmailV2Props {
   playersToday?: number;
   /** Hours until daily reset in user's tz. <12 to render. */
   hoursUntilReset?: number;
+  /**
+   * Public modes for the secondary "more ways to play" cube grid — computed
+   * from the shared MODE_META registry (lib/email/welcomeModes). Optional: the
+   * daily-puzzle CTA stays the primary action; this block sits below it. When
+   * absent the section simply doesn't render.
+   */
+  modes?: WelcomeEmailMode[];
 }
 
 /* ───────────────────────── Assets ───────────────────────── */
@@ -268,6 +283,7 @@ export default function ReengagementEmailV2({
   daysSinceLastPlay,
   playersToday,
   hoursUntilReset,
+  modes,
 }: ReengagementEmailV2Props) {
   const t = COPY[language] || COPY['en'];
   const rtl = language === 'he';
@@ -284,6 +300,10 @@ export default function ReengagementEmailV2({
     Math.min(MAX_TILES, Number.isFinite(wordLength) ? (wordLength as number) : DEFAULT_TILES),
   );
   const blankTiles = Array.from({ length: totalTiles - 1 });
+
+  // Secondary mode grid — paired into rows of two. Empty when no modes passed.
+  const modeRows: WelcomeEmailMode[][] = [];
+  if (modes) for (let i = 0; i < modes.length; i += 2) modeRows.push(modes.slice(i, i + 2));
 
   // Personalization gates.
   const showMissedDays =
@@ -717,6 +737,85 @@ export default function ReengagementEmailV2({
                     </td>
                   </tr>
 
+                  {/* ── 3b. Secondary "more ways to play" — dynamic public mode
+                       grid. Sits BELOW the daily CTA so the puzzle stays primary.
+                       Uniform navy tiles; the generated cube image carries the
+                       colour, name + tagline stay real text (blocked-image safe).
+                       Each tile links straight into the mode. ── */}
+                  {modeRows.length > 0 && (
+                    <tr>
+                      <td style={{ padding: '6px 0 0' }}>
+                        <Text style={{
+                          color: C.muted,
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          letterSpacing: '2px',
+                          textTransform: 'uppercase' as const,
+                          textAlign: 'center',
+                          margin: '0 0 14px',
+                          direction: dir,
+                          fontFamily: "'Fredoka', Arial, sans-serif",
+                        }}>
+                          {t.moreModes}
+                        </Text>
+                        {modeRows.map((row, ri) => (
+                          <table key={`re-mode-row-${ri}`} role="presentation" cellPadding={0} cellSpacing={0}
+                            width="100%" style={{ marginBottom: '12px' }}>
+                            <tr>
+                              {row.map((m) => (
+                                <td key={m.key} width="50%" valign="top"
+                                  style={{ padding: rtl ? '0 0 0 6px' : '0 6px 0 0' }}>
+                                  <Link href={m.href} target="_blank"
+                                    style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+                                    <table role="presentation" cellPadding={0} cellSpacing={0} width="100%" dir={dir}
+                                      style={{
+                                        backgroundColor: C.bgAlt,
+                                        border: `2px solid ${C.letterBorder}`,
+                                        borderRadius: '12px',
+                                        boxShadow: `${sh}3px 3px 0px ${C.black}`,
+                                        height: '100%',
+                                      }}>
+                                      <tr>
+                                        <td width="60" valign="middle" style={{ padding: '10px' }}>
+                                          <Img
+                                            src={m.cubeImageUrl}
+                                            alt={m.title}
+                                            width="50"
+                                            height="50"
+                                            style={{
+                                              display: 'block',
+                                              width: '50px',
+                                              height: '50px',
+                                              borderRadius: '10px',
+                                              border: 0,
+                                              outline: 'none',
+                                            }}
+                                          />
+                                        </td>
+                                        <td valign="middle"
+                                          style={{ padding: rtl ? '10px 0 10px 8px' : '10px 8px 10px 0', direction: dir }}>
+                                          <div style={{
+                                            color: C.text, fontSize: '14px', fontWeight: 700,
+                                            lineHeight: 1.25, marginBottom: '2px',
+                                          }}>
+                                            {m.title}
+                                          </div>
+                                          <div style={{ color: C.muted, fontSize: '11px', lineHeight: 1.35 }}>
+                                            {m.tagline}
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </Link>
+                                </td>
+                              ))}
+                            </tr>
+                          </table>
+                        ))}
+                      </td>
+                    </tr>
+                  )}
+
                   <tr><td style={{ height: '28px', lineHeight: 0, fontSize: 0 }}>&nbsp;</td></tr>
 
                   {/* ── 4. Footer ── */}
@@ -778,4 +877,5 @@ ReengagementEmailV2.PreviewProps = {
   daysSinceLastPlay: 14,
   playersToday: 1847,
   hoursUntilReset: 6,
+  modes: getWelcomeEmailModes('en', 'https://www.lexiclash.live'),
 } satisfies ReengagementEmailV2Props;
