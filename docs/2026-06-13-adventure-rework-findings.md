@@ -64,12 +64,26 @@ Approach: walked the mode in real Chrome (Playwriter) before touching code, per
   test account: complete world-1 L1–6 (or seed), screenshot `BossOverlay`/`SegmentedHPBar`/
   `BossArena`/entrance+defeat cinematics, THEN improve. (My tile-tactility fix already improves
   the boss board, since bosses reuse the same grid/tiles.)
-- **Level selection "real game feel."** Locked level cards render as thin empty pills —
-  assess in dark theme, give them number/lock/stars + neo tactility.
-- **Shop & upgrades depth** (`upgradeConfig.ts`, `AdventureShopFAB`, `AdventureViewModals`).
-  Not yet opened/reviewed.
-- **More atmosphere/juice on the board** (`AdventureEffectsCanvas`, `/pixijs-2d`): word-submit
-  payoff, ambient particles per world theme.
+- **Level selection "real game feel." — RESOLVED (already good).** `RPGLevelCard` renders proper
+  trading-card nodes (number, stars, lock, reward tokens, boss card, chapter dividers, current-level
+  pulse) on the hand-painted world map. The "thin empty pills" were Cosy-mode flattening; in the
+  default dark theme it reads as a real game. No change needed.
+- **Shop & upgrades — DONE (`43c6d2f48`).** Now shows locked upgrades as teasers; see Shipped #4.
+- **"Use more shared logic" — partially served, no broad refactor warranted.** The mascot fix
+  (import from leaf) and shop fix (reuse `getUpgradesByCategory`) both reduce duplication. A broad
+  refactor of a 28k-LOC, heavily-tested feature is high-risk/low-signal without a concrete duplication
+  target; the real shared-logic win on the table is pruning/mining the dead `v2/*` (below).
+- **"/pixijs-2d" — already used appropriately.** `AdventureEffectsCanvas` + `AdventureEffectsLayer`
+  drive Pixi for particles/bursts. No missing integration; the dead `v2/*` is the only unrealized Pixi.
+- **More atmosphere/juice on the board — ASSESSED, mostly already built (not a real gap).**
+  Gameplay already has `themed/GameplayBackground.tsx` (per-world 3-stop gradient + dual ambient
+  glows + tinted vignette, 10 worlds) + `themed/MarginParticles.tsx` (ambient particles kept out
+  of the grid) + `effects/AdventureEffectsLayer.tsx` event juice (score popups, ChainParticleBurst,
+  themed AdaptiveParticles, edge-vignette flash) + Pixi `AdventureEffectsCanvas`. The "plain/flat"
+  look in early screenshots was Cosy mode again. Deliberate choice NOT to put painted world art
+  behind the grid (keeps tiles readable) — correct. Remaining tasteful options if desired: a subtle
+  *animated* ambient element (currently CSS-static for perf — would need reduced-motion gating), or
+  richer word-submit payoff — but neither is a defect; the system is solid.
 - **Dead code:** `components/adventure/v2/*` (~2000 LOC Pixi battle scene) is unimported.
   Decide: mine for boss rendering or prune. Relevant to "use more shared logic" + better graphics.
 
