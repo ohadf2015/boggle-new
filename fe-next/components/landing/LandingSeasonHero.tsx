@@ -47,14 +47,14 @@ export const LandingSeasonHero: React.FC = () => {
       >
         {/* Image bleed — right side with diagonal seam + accent stripe */}
         <div
-          className="absolute inset-y-0 end-0 w-32 sm:w-44 pointer-events-none"
+          className="absolute inset-y-0 end-0 w-24 sm:w-32 pointer-events-none"
           style={{ clipPath: 'polygon(22% 0, 100% 0, 100% 100%, 0% 100%)' }}
         >
           <Image
             src={currentSeason.imageUrl}
             alt={currentSeason.theme}
             fill
-            sizes="(min-width: 640px) 176px, 128px"
+            sizes="(min-width: 640px) 128px, 96px"
             className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
           />
           <div
@@ -66,7 +66,7 @@ export const LandingSeasonHero: React.FC = () => {
         {/* Diagonal accent stripe along the image seam */}
         <div
           aria-hidden
-          className="absolute inset-y-0 end-32 sm:end-44 w-[3px] origin-top translate-x-[7px] rtl:-translate-x-[7px] rotate-[18deg] sm:rotate-[14deg]"
+          className="absolute inset-y-0 end-24 sm:end-32 w-[3px] origin-top translate-x-[7px] rtl:-translate-x-[7px] rotate-[18deg] sm:rotate-[14deg]"
           style={{ background: accent, boxShadow: `1px 0 0 #000` }}
         />
 
@@ -83,7 +83,7 @@ export const LandingSeasonHero: React.FC = () => {
         {/* Oversized outlined season numeral — editorial bg motif */}
         <span
           aria-hidden
-          className="absolute -top-2 sm:-top-3 start-1 sm:start-2 font-neo-display leading-none select-none pointer-events-none text-[3.75rem] sm:text-[5.25rem]"
+          className="absolute -top-1 sm:-top-2 start-1 sm:start-2 font-neo-display leading-none select-none pointer-events-none text-[2.5rem] sm:text-[3.5rem]"
           style={{
             WebkitTextStroke: `1.5px ${accent}55`,
             color: 'transparent',
@@ -94,7 +94,7 @@ export const LandingSeasonHero: React.FC = () => {
         </span>
 
         {/* Content */}
-        <div className="relative flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-3.5 pe-32 sm:pe-44 ps-16 sm:ps-24">
+        <div className="relative flex items-center gap-3 px-4 sm:px-5 py-2 sm:py-2.5 pe-24 sm:pe-32 ps-12 sm:ps-16">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-1">
               <span
@@ -122,7 +122,7 @@ export const LandingSeasonHero: React.FC = () => {
                 </span>
               </span>
             </div>
-            <h2 className="font-neo-display text-base sm:text-lg text-neo-white leading-tight break-words line-clamp-2">
+            <h2 className="font-neo-display text-sm sm:text-base text-neo-white leading-tight break-words line-clamp-2">
               {seasonLabel}
             </h2>
             {/* Season twist — the month's flavor/atmosphere. */}
