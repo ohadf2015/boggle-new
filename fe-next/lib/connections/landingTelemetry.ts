@@ -4,7 +4,7 @@
  * Never throws.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;

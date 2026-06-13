@@ -4,7 +4,7 @@ import AndroidAppInstallPromo from '../AndroidAppInstallPromo';
 
 const captureMock = vi.fn();
 
-vi.mock('posthog-js', () => ({ default: { capture: (...a: unknown[]) => captureMock(...a) } }));
+vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unknown[]) => captureMock(...a) } }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key }),

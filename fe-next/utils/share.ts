@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
 import { trackReferralInviteSent } from '@/utils/viralTracking';
 import { trackGrowthEvent } from '@/utils/growthTracking';

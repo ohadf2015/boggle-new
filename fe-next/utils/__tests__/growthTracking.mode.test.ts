@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const captureMock = vi.fn();
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: {
     register: vi.fn(),
     register_once: vi.fn(),

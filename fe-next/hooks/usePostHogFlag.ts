@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 export function usePostHogFlag<T extends string | boolean = string>(
   flagKey: string,

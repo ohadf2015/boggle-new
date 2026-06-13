@@ -36,7 +36,7 @@ vi.mock('@/hooks/useBoostClaim', () => ({
   useBoostClaim: () => ({ claim: vi.fn(), claimed: null, isLoading: false, error: null }),
 }));
 
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: { capture: vi.fn() },
 }));
 

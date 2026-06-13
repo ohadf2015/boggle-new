@@ -6,7 +6,7 @@ const { getFlag, onFlags } = vi.hoisted(() => ({
   onFlags: vi.fn(),
 }));
 
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: {
     getFeatureFlag: getFlag,
     onFeatureFlags: onFlags,

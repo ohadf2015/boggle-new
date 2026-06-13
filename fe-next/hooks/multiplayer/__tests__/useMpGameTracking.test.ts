@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 
 // Mock posthog
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: {
     capture: vi.fn(),
   }
@@ -38,7 +38,7 @@ vi.mock('@/utils/logger', () => ({
   }
 }));
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 describe('MP game tracking - PostHog events', () => {
   beforeEach(() => {

@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Smartphone } from 'lucide-react';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import {

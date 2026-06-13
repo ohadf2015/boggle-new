@@ -26,7 +26,7 @@ const { capture, identify, people_set_once, reset, posthogMock } = vi.hoisted(()
   return { capture: c, identify: i, people_set_once: pso, reset: r, posthogMock: mock };
 });
 
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   __esModule: true,
   default: posthogMock,
 }));

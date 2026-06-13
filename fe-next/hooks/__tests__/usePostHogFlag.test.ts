@@ -9,7 +9,7 @@ import { renderHook } from '@testing-library/react';
 
 // No `getFeatureFlag` on the mock → the hook's effect early-returns, so state
 // stays at whatever we seeded (isolates the initial-value behaviour under test).
-vi.mock('posthog-js', () => ({ default: {} }));
+vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: {} }));
 
 import { usePostHogFlag } from '../usePostHogFlag';
 

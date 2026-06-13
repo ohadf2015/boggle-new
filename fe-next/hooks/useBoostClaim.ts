@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import type { BoostType } from '@/shared/types/boosts';
 

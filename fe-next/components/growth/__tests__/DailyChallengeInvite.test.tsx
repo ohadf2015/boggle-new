@@ -6,7 +6,7 @@ const capture = vi.fn();
 const trackCta = vi.fn();
 const fetchMock = vi.fn();
 
-vi.mock('posthog-js', () => ({ default: { capture: (...a: unknown[]) => capture(...a) } }));
+vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unknown[]) => capture(...a) } }));
 vi.mock('@/utils/posthogEngagement', () => ({
   trackCtaClicked: (...a: unknown[]) => trackCta(...a),
 }));

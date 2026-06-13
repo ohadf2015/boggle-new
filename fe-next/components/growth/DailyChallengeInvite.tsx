@@ -15,7 +15,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fetchWithAuth } from '@/utils/authFetch';

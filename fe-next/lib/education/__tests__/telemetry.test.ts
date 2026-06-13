@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const captureMock = vi.fn();
 const isFeatureEnabledMock = vi.fn().mockReturnValue(true);
 
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: {
     capture: (...args: unknown[]) => captureMock(...args),
     isFeatureEnabled: (...args: unknown[]) => isFeatureEnabledMock(...args),

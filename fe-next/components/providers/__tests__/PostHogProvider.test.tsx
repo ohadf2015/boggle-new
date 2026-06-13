@@ -4,12 +4,14 @@
  * Verifies consent gating, opt-in/out, and rendering.
  */
 
-import React from 'react';
 import { render, act } from '@testing-library/react';
-import posthog from 'posthog-js';
+// PostHogProvider now talks to the lazy proxy (@/lib/analytics/lazyPosthog),
+// whose own load/buffer mechanics are covered by lazyPosthog.test.ts. Here we
+// mock the proxy seam so the provider's consent/init logic asserts synchronously
+// — the proxy forwards init/opt_in/opt_out to these spies.
+import posthog from '@/lib/analytics/lazyPosthog';
 
-// Must use vi.mocked after mock
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   __esModule: true,
   default: {
     init: vi.fn(),
@@ -19,11 +21,8 @@ vi.mock('posthog-js', () => ({
     opt_in_capturing: vi.fn(),
     opt_out_capturing: vi.fn(),
     has_opted_out_capturing: vi.fn().mockReturnValue(true),
+    onFeatureFlags: vi.fn(),
   },
-}));
-
-vi.mock('posthog-js/react', () => ({
-  PostHogProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 const mockOnConsentChangeCallbacks: Array<(s: { analytics: boolean }) => void> = [];

@@ -14,7 +14,7 @@
  * Privacy: never send raw user-typed content (words). Send length + shape only.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
 
 // ---------- Safe wrapper ----------

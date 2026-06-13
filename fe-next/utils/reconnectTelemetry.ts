@@ -10,7 +10,7 @@
  * `buildReconnectGapPayload` is pure (testable); `trackReconnectGap` fires the
  * event, guarded so analytics can never throw into the socket lifecycle.
  */
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 export interface ReconnectGapPayload {
   gap_ms: number;

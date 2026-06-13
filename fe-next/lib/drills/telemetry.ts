@@ -11,7 +11,7 @@
  * Audit ref: `fe-next/docs/audits/brain-drills-2026-04-26.md` §C1.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
 import type { DrillType } from '@/shared/types/cognitive';
 

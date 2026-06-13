@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { useStore } from 'zustand';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { BOOK_1_HEARTH_ROOMS } from '@/lib/word-vault/content/book1-hearth-stub';
 import type { WordVaultStore } from '@/lib/word-vault/state/gameStore';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';

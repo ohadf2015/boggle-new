@@ -14,7 +14,7 @@ import { updateDailyStreakWithFreeze } from '../streakFreeze';
 import { DAILY_STREAK_KEY } from '../constants';
 
 const captureMock = vi.fn();
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: { capture: (...args: unknown[]) => captureMock(...args) },
 }));
 vi.mock('@/components/GoogleAnalytics', () => ({ trackEvent: vi.fn() }));

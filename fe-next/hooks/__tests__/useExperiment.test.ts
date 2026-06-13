@@ -27,7 +27,7 @@ vi.mock('@/lib/experiments/variantCookie', () => ({
 }));
 
 const mockCapture = vi.fn();
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: {
     capture: (...args: unknown[]) => mockCapture(...args),
   },

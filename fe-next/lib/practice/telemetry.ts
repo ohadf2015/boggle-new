@@ -12,7 +12,7 @@
  * dashboard ergonomics.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
 import type { PracticeMode } from './practiceTutorialSteps';
 

@@ -5,7 +5,7 @@
  * PostHog isn't initialized in tests/SSR) are swallowed so gameplay is
  * never interrupted by analytics failures.
  */
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import type { BlastBadgeId } from './blastBadges';
 

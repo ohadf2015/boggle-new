@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock posthog-js BEFORE importing the module under test so the capture
 // spy is wired in before blastTelemetry grabs the reference.
 const captureMock = vi.fn();
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: { capture: (...args: unknown[]) => captureMock(...args) },
 }));
 

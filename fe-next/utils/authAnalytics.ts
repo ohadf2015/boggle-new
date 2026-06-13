@@ -6,7 +6,7 @@
  * once via `$set_once` so re-logins don't overwrite first-touch source.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { getStoredUtmData } from '@/utils/utmCapture';
 import { setPostHogUserPropsOnce } from '@/utils/posthogEngagement';
 import logger from '@/utils/logger';

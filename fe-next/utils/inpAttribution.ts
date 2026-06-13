@@ -15,7 +15,7 @@
  * refactoring. See docs/2026-05-21-mp-classic-frontend-perf-investigation.md.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 /** Minimal structural shape of a web-vitals INP metric with attribution. */
 export interface InpMetricLike {

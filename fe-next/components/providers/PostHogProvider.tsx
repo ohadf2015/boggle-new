@@ -12,8 +12,11 @@
 
 import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import posthog from 'posthog-js';
-import { PostHogProvider as PHProvider } from 'posthog-js/react';
+// Lazy proxy — NO static `posthog-js` import. The lib is dynamic-import()ed on
+// first init() below, so its ~374KB stays out of the shared-commons chunk that
+// would otherwise ship on every route. See lib/analytics/lazyPosthog.ts.
+import posthog from '@/lib/analytics/lazyPosthog';
+import type { PostHog } from 'posthog-js';
 import { onConsentChange, hasConsent } from '@/utils/cookieConsent';
 import {
   setPostHogSuperProps,
@@ -53,7 +56,7 @@ function initPostHog() {
     capture_performance: { web_vitals: true, web_vitals_attribution: true },
     before_send: filterEmptyException,
     persistence: 'localStorage+cookie',
-    loaded: (ph) => {
+    loaded: (ph: PostHog) => {
       // If the user has already granted analytics consent in a prior session,
       // opt in immediately so this session is tracked.
       if (hasConsent('analytics')) {
@@ -143,12 +146,15 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // No PHProvider/React-context wrapper: nothing consumes the posthog React
+  // context (all flag hooks read the singleton via usePostHogFlag), so wrapping
+  // would only force a static `posthog-js/react` import back into the bundle.
   return (
-    <PHProvider client={posthog}>
+    <>
       <Suspense fallback={null}>
         <PostHogPageView />
       </Suspense>
       {children}
-    </PHProvider>
+    </>
   );
 }

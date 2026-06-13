@@ -10,7 +10,7 @@
  * never block the game.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 export type StreakOutcome = 'continued' | 'broken' | 'started';
 

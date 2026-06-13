@@ -9,7 +9,7 @@
  * completed games do not emit a phantom abandon.
  */
 
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 const MIN_ENGAGED_MS = 2000;
 

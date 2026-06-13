@@ -11,7 +11,7 @@ const { capture } = vi.hoisted(() => ({
   capture: vi.fn(),
 }));
 
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   __esModule: true,
   default: {
     capture,

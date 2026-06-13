@@ -62,9 +62,32 @@ splitting one importer cannot remove them. A real win needs deeper work:
   `.next/diagnostics/analyze/`. Landing `/[locale]` = **7,068,292 bytes (7 MB) first-load JS / 65
   chunks**. Top chunks: 5× ~415–541KB dominated by **posthog-js + d3**, 2× ~330–415KB = **pixi**.
   **Defer targets (concrete):**
-  1. **posthog-js (~170KB+):** `components/providers/PostHogProvider.tsx:15` static-imports
-     `posthog-js` + inits eagerly (every page). Defer the *import+init* to post-hydration / idle /
-     first-interaction (mirror the LogRocket pattern in essential-providers). Not LCP-critical.
+  1. **posthog-js — SHIPPED 2026-06-13 (lazy proxy). ~198KB raw / ~60KB gzipped off EVERY route's
+     eager parse path.** Root: 23 modules did `import posthog from 'posthog-js'`, so Turbopack
+     hoisted the lib into the shared-commons chunk (it shipped on all 199/203 routes incl `/blog/*`,
+     same wall-shape as pixi). Unlike pixi, posthog's API is narrow (capture/identify/register/
+     people/getFeatureFlag/onFeatureFlags/opt) and NOBODY consumes the `usePostHog()` React context
+     (all 8 flag hooks use the local `usePostHogFlag`, which reads the singleton and already guards
+     `typeof posthog?.getFeatureFlag !== 'function'` → default). So a drop-in lazy proxy was feasible:
+       - NEW `lib/analytics/lazyPosthog.ts` (TDD, 11 tests): default export with the same method
+         surface, NO static `posthog-js` import. `init()` triggers a one-time `import('posthog-js')`;
+         fire-and-forget calls buffer (capped) + flush in order AFTER init (so pre-consent events
+         still hit the `opt_out_capturing_by_default` instance and drop — GDPR preserved); sync
+         `getFeatureFlag` returns undefined until load; `onFeatureFlags` callbacks queue then wire.
+       - All 23 `import posthog from 'posthog-js'` → `@/lib/analytics/lazyPosthog`. PostHogProvider
+         drops the `posthog-js/react` PHProvider wrapper (0 context consumers) and triggers the lazy
+         load in its EXISTING mount effect (conservative: preserves `web_vitals_attribution` LCP
+         capture timing — do NOT idle-defer init or you blind the nightly perf-watch).
+       - Completeness gate (the make-or-break, mirrors how the pixi wall was proven): after the swap
+         `grep "from 'posthog-js'"` returns only a type-only import + comments. Oracle: rebuild
+         `--experimental-analyze` + tight lib-signature (`__PosthogExtensions__|rrweb|loaded_recorder`)
+         → **real posthog lib in 0/203 firstLoad**; `curl :3001/en` served `<script>` set → **0 eager
+         heavy-posthog scripts**. The lib is now a 198KB/60KB-gz lazy chunk loaded on first init.
+       - Test maintenance: 27 suites that `vi.mock('posthog-js')` re-pointed to
+         `vi.mock('@/lib/analytics/lazyPosthog')` (the real new dependency) — assertions unchanged.
+       - GOTCHA: a broad signature (`opt_out_capturing_by_default`) FALSE-POSITIVES on the app-shell
+         chunk that holds PostHogProvider's literal init-config string + web-vitals code (184KB). Use
+         lib-internal markers (rrweb/__PosthogExtensions__) to measure the actual library, not config.
   2. **pixi (~744KB) — ATTEMPTED 2026-06-13, PROVEN INFEASIBLE via source-level dynamic import.**
      Tried `dynamic(() => import(...), {ssr:false})` on BOTH landing-eager FX mounts
      (`SharedFxMount`, `GlobalCoinEarnFx` in essential-providers). Result: landing firstLoad moved

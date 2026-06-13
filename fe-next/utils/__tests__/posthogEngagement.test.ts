@@ -17,7 +17,7 @@ const { capture, register, register_once, people_set, people_set_once } = vi.hoi
   people_set_once: vi.fn(),
 }));
 
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   __esModule: true,
   default: {
     capture,

@@ -9,7 +9,7 @@
  *   word_craft_fast_tap_used / word_craft_turn_submitted ≥ 0.4 over 14 days
  * = the axis-lock fast-path landed.
  */
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { trackGameEnd } from '@/utils/growthTracking';
 import type { WordCraftState } from '@/lib/word-craft/useWordCraftGame';
 

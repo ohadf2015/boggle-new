@@ -9,7 +9,7 @@
 import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest';
 
 const captureMock = vi.fn();
-vi.mock('posthog-js', () => ({
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: { capture: (...args: unknown[]) => captureMock(...args) },
 }));
 

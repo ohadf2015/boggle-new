@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useRef } from 'react';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBoostStatus } from '@/hooks/useBoostStatus';
 import { useBoostClaim } from '@/hooks/useBoostClaim';

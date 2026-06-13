@@ -26,7 +26,7 @@
  */
 
 import { useCallback, useEffect, useRef } from 'react';
-import posthog from 'posthog-js';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { usePostHogFlag } from '@/hooks/usePostHogFlag';
 import { readVariantCookie, persistVariant } from '@/lib/experiments/variantCookie';
 import { useAuth } from '@/contexts/AuthContext';
