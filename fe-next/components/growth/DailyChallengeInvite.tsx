@@ -18,6 +18,7 @@ import Link from 'next/link';
 import posthog from 'posthog-js';
 import { Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { fetchWithAuth } from '@/utils/authFetch';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
@@ -70,7 +71,7 @@ export function DailyChallengeInvite({ isWinner, className, placement = null, to
   useEffect(() => {
     if (!shouldCheckMissed) return;
     let cancelled = false;
-    fetch('/api/daily/missed')
+    fetchWithAuth('/api/daily/missed')
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (cancelled || !data?.missed?.length) return;

@@ -8,6 +8,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { fetchWithAuth } from '@/utils/authFetch';
 
 export interface InventoryItem {
   item_id: string;
@@ -37,7 +38,7 @@ export function useAdventureInventory(): UseAdventureInventoryReturn {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/adventure/inventory');
+      const res = await fetchWithAuth('/api/adventure/inventory');
       if (!res.ok) {
         if (mountedRef.current) {
           setError(`Failed to fetch inventory (${res.status})`);

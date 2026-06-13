@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import { getMissedCatchUpDates } from '@/utils/dailyChallenge/catchUp'
 import { getPuzzleNumber } from '@/utils/dailyChallenge/dateUtils'
 import logger from '@/utils/logger'
@@ -15,8 +16,10 @@ import logger from '@/utils/logger'
  */
 export async function GET(request: NextRequest) {
   try {
+    // Local JWT verify (sub-ms) when fetchWithAuth sends a Bearer; cookie
+    // fallback otherwise. Guests (null user) still get the empty list below.
+    const user = await getAuthedUser(request)
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
 
     const today = new Date().toISOString().split('T')[0]
     // Optional-chain nextUrl: production always passes a NextRequest, but unit
