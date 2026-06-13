@@ -241,7 +241,9 @@ export default function AvatarBuilderModal({
                   title={t(cat.labelKey)}
                 >
                   <CategoryIcon category={cat.key} />
-                  <span className="hidden @[38rem]:inline">{t(cat.labelKey)}</span>
+                  {/* Active tab always shows its name — the glyph alone is ambiguous on phones
+                      where inactive labels stay hidden. The row scrolls, so this costs no layout. */}
+                  <span className={isActive ? 'inline' : 'hidden @[38rem]:inline'}>{t(cat.labelKey)}</span>
                 </AdaptiveMotion.button>
               );
             })}
@@ -358,5 +360,5 @@ export default function AvatarBuilderModal({
 
 function CategoryIcon({ category }: { category: Category }) {
   const Icon = AVATAR_CATEGORY_ICONS[category];
-  return <Icon size={16} />;
+  return <Icon size={20} />;
 }

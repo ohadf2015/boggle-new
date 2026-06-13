@@ -78,13 +78,14 @@ function EyesIcon(props: IconProps) {
   );
 }
 
-/** mouth — closed lips: the central seam line distinguishes it from an eye. */
+/** mouth — smiling lips: cupid-bow top + deep lower curve, unmistakably a mouth (not an eye). */
 function MouthIcon(props: IconProps) {
   return (
     <Svg {...props}>
-      <path d="M4 12q8-6 16 0" />
-      <path d="M4 12q8 6 16 0" />
-      <path d="M5 12h14" />
+      {/* upper lip — cupid's bow wave between the two mouth corners */}
+      <path d="M5 11q3.5-2.5 7 0t7 0" />
+      {/* lower lip — deep smile curve closing back to the corners */}
+      <path d="M5 11q7 7 14 0" />
     </Svg>
   );
 }

@@ -41,6 +41,14 @@ describe('AvatarCategoryIcons', () => {
     }
   });
 
+  it('draws the mouth as two lip curves (cupid-bow top + smile bottom), not a lens that reads as an eye', () => {
+    const { container } = render(<AVATAR_CATEGORY_ICONS.mouth size={20} />);
+    const paths = container.querySelectorAll('svg > path');
+    // Exactly two strokes = upper + lower lip. The old glyph had a third horizontal
+    // seam line that, with the symmetric lens curves, looked like the eye glyph.
+    expect(paths.length).toBe(2);
+  });
+
   it('draws visually distinct glyphs (no two categories share identical path geometry)', () => {
     const markup = ALL_KEYS.map(key => {
       const Icon = AVATAR_CATEGORY_ICONS[key];
