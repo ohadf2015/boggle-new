@@ -46,7 +46,7 @@ const baseProps = {
   activePlayers: 1234,
   openRooms: 2,
   totalPlayers: 100,
-  playerAllTimeBest: { score: 800 }, // veteran-ish: practice hidden, all SP modes shown
+  playerAllTimeBest: { score: 800 }, // veteran-ish: practice shown as a normal cube (not featured), all SP modes shown
   t: (key: string) => key,
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
 };

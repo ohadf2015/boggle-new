@@ -184,8 +184,8 @@ export function LandingChallengeCards({
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
   //   2. Inject the synthetic `'quickPlay'` card just after `'daily'` so the
   //      primary CTA sits in the top row on mobile.
-  //   3. Strip `'practice'` for veterans.
-  //   4. Surface `'practice'` first for brand-new players (< 3 games).
+  //   3. Surface `'practice'` first for brand-new players (< 3 games); it stays
+  //      present (as a normal cube) for everyone else.
   //   5. Guarantee `'daily'` lands in the top 2 — it must never be buried.
   const baseOrder: LandingCardKey[] = cardOrderProp ?? DEFAULT_ORDER;
   // Server stats only ship LandingGameMode keys; ensure the synthetic discovery
@@ -218,11 +218,11 @@ export function LandingChallengeCards({
   // card, regardless of popularity ranking. (Supersedes the old
   // blast-before-adventure rule — arena is always above adventure.)
   const serverOrder: LandingCardKey[] = placeBlastAfterArena(rawOrder);
-  // Veterans have completed practice — remove it so it doesn't compete for
-  // the featured-row slot or the SP grid (they don't need the onramp).
-  const practiceFiltered: LandingCardKey[] = isVeteran
-    ? serverOrder.filter((m) => m !== 'practice')
-    : serverOrder;
+  // Practice always stays in the mode list — it's a core single-player cube for
+  // everyone. Newcomers get it PROMOTED to a featured row (`featurePractice`
+  // below); veterans simply see it as a normal SP cube (emphasis only, not
+  // presence, is gated on graduation).
+  const practiceFiltered: LandingCardKey[] = serverOrder;
   const orderedBeforeFeatured: LandingCardKey[] = isNewbie && !isVeteran
     ? (['practice', 'daily', ...practiceFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
     : practiceFiltered[0] === 'daily'

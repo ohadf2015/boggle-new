@@ -143,10 +143,12 @@ describe('LandingChallengeCards', () => {
   describe('practice visibility (quickPlay removed)', () => {
     afterEach(() => mockIsVeteran.mockReturnValue(false));
 
-    it('veterans do not see the practice card', () => {
+    it('veterans still see the practice card (now a normal cube, just not featured)', () => {
       mockIsVeteran.mockReturnValue(true);
       render(<LandingChallengeCards {...baseProps} />);
-      expect(screen.queryByText('landing.practice')).not.toBeInTheDocument();
+      // Practice is always present as a mode; veterans simply don't get the
+      // promoted featured row (asserted separately). No quickPlay either.
+      expect(screen.getByText('landing.practice')).toBeInTheDocument();
       expect(screen.queryByText('landing.quickPlay')).not.toBeInTheDocument();
     });
 

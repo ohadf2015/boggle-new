@@ -76,15 +76,17 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
     );
   });
 
-  it('veteran: practice card entirely absent (not in featured row or SP grid)', () => {
+  it('veteran: practice present as a normal SP cube but NOT promoted to the featured row', () => {
     // Stable return (not Once): useIsPracticeVeteran returns a consistent value
     // across renders, and the component now re-renders once post-mount (the
     // hydration-safe `mounted` gate) which would exhaust a one-shot mock.
     mockIsVeteran.mockReturnValue(true);
     try {
       render(<LandingChallengeCards {...baseProps} />);
+      // No promoted featured row for veterans...
       expect(screen.queryByTestId('landing-section-practice-featured')).toBeNull();
-      expect(screen.queryByText('landing.practice')).toBeNull();
+      // ...but practice is still present as a normal mode cube/card.
+      expect(screen.getByText('landing.practice')).toBeInTheDocument();
       expect(screen.queryByText('landing.quickPlay')).toBeNull();
     } finally {
       mockIsVeteran.mockReturnValue(false); // restore default for sibling tests
