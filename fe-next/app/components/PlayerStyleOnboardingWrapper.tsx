@@ -24,7 +24,7 @@ const PlayerStyleModal = dynamic(
 );
 
 export default function PlayerStyleOnboardingWrapper() {
-  const { isAuthenticated, isAdmin, profile, needsProfileCustomization, updateProfile } = useAuth();
+  const { isAuthenticated, profile, needsProfileCustomization, updateProfile } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const [show, setShow] = useState(false);
 
@@ -39,7 +39,10 @@ export default function PlayerStyleOnboardingWrapper() {
       setShow(
         shouldShowStylePopup({
           isMounted: true,
-          featureEnabled: !!isAdmin,
+          // SHIPPED TO ALL: the one-time "pick your style" popup now prompts every
+          // existing user once (was admin-only during the pilot). Brand-new users
+          // still choose during onboarding, so this never double-prompts.
+          featureEnabled: true,
           isAuthenticated,
           needsProfileCustomization: !!needsProfileCustomization,
           profileShownAt: profile?.player_style_modal_shown_at ?? null,
@@ -50,7 +53,7 @@ export default function PlayerStyleOnboardingWrapper() {
       );
     }, 800);
     return () => clearTimeout(timer);
-  }, [isMounted, isAdmin, isAuthenticated, needsProfileCustomization, profile]);
+  }, [isMounted, isAuthenticated, needsProfileCustomization, profile]);
 
   const markShown = useCallback(async () => {
     if (isAuthenticated && profile) {

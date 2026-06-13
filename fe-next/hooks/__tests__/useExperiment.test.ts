@@ -117,25 +117,26 @@ describe('useExperiment', () => {
 
   describe('cookie variant seed (fast first paint)', () => {
     it('seeds usePostHogFlag initial value from the variant cookie', () => {
-      // A returning, already-bucketed visitor: the cookie carries `cubes`, so
-      // the first render must already pick it up (no 8s PostHog wait).
-      mockReadVariantCookie.mockReturnValue('cubes');
+      // A returning, already-bucketed visitor: the cookie carries the non-default
+      // arm (`control`, the kill-switch), so the first render must already pick it
+      // up (no 8s PostHog wait). Default is now `cubes` (shipped to all).
+      mockReadVariantCookie.mockReturnValue('control');
       mockFlagValue.mockImplementation((_key, fallback) => fallback);
       renderHook(() => useExperiment('landing-modes-cubes-v1'));
       expect(mockFlagValue).toHaveBeenCalledWith(
         'landing-modes-cubes-v1',
-        'control',
         'cubes',
+        'control',
       );
     });
 
     it('persists a non-default resolved variant to the cookie', () => {
       mockReadVariantCookie.mockReturnValue(undefined);
-      mockFlagValue.mockReturnValue('cubes'); // posthog resolved a real variant
+      mockFlagValue.mockReturnValue('control'); // posthog resolved the non-default arm
       renderHook(() => useExperiment('landing-modes-cubes-v1'));
       expect(mockPersistVariant).toHaveBeenCalledWith(
         'landing-modes-cubes-v1',
-        'cubes',
+        'control',
       );
     });
 

@@ -39,7 +39,7 @@ import { getStoredPlayerStyle, setStoredPlayerStyle } from '@/lib/playerStyle/pl
 import { applyAccentVar } from '@/lib/playerStyle/applyAccent';
 
 export interface PlayerStyleContextValue {
-  /** Feature gate — currently admin-only for testing. UI hides when false. */
+  /** Feature gate — launched to all users. UI hides when false (kill-switch). */
   enabled: boolean;
   /** The committed (persisted) style key. */
   styleKey: PlayerStyleKey;
@@ -62,8 +62,8 @@ export function PlayerStyleProvider({ children }: { children: ReactNode }) {
   // LAUNCHED to everyone: new players pick a style during onboarding, and anyone
   // can change it in Settings. Safe for existing users — they default to the
   // `default` style (null accent/music), so nothing changes until they pick.
-  // The one-time existing-user popup (PlayerStyleOnboardingWrapper) stays
-  // admin-gated separately, so launching this does NOT spam the existing base.
+  // The one-time existing-user popup (PlayerStyleOnboardingWrapper) is now also
+  // shown to all (no longer admin-gated) — it prompts each existing user once.
   const enabled = true;
 
   // Guest store is read on mount only (avoids SSR/hydration mismatch).

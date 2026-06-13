@@ -270,19 +270,16 @@ export const EXPERIMENTS = {
    * compares layout only — no mode-logic drift.
    *
    * control = current card grid. cubes = bento cube layout.
-   * Conversion = landing_cta_clicked (mode_card) → game start; guardrail: scroll
-   * depth / bounce must not worsen. Ship to PostHog: key 'landing-modes-cubes-v1',
-   * start 0% (dev email forced), ramp after smoke.
+   * SHIPPED TO ALL: default flipped to `cubes` so every visitor gets the cube
+   * homepage (the A/B concluded). `control` is kept in the variant list only as
+   * a remote kill-switch — set the PostHog flag to `control` to roll back without
+   * a deploy. No email force needed anymore: the default already serves cubes.
    */
   'landing-modes-cubes-v1': defineExperiment({
     variants: ['control', 'cubes'] as const,
-    default: 'control',
+    default: 'cubes',
     description:
-      'Homepage mode section layout. control = current LandingChallengeCards grid. cubes = compact bento of mode cubes (arena 2×2 anchor) with generated icons + scroll reveal. Same gated mode list both sides — A/B isolates layout. Conversion = mode_card CTA → game start.',
-    forceVariantByEmail: {
-      'ohadf2015@gmail.com': 'cubes',
-      'eden320@gmail.com': 'cubes',
-    },
+      'Homepage mode section layout. SHIPPED: cubes (default) = compact bento of mode cubes (arena 2×2 anchor) with generated icons + scroll reveal. control = legacy LandingChallengeCards grid, retained as a PostHog kill-switch only.',
   }),
 
   /**
