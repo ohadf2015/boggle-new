@@ -142,7 +142,7 @@ export function PWAInstallPrompt() {
           <div className="flex gap-2">
             <button
               onClick={handleInstallClick}
-              className="flex-1 px-4 py-2.5 bg-neo-lime text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
+              className="flex-1 px-4 py-2.5 bg-accent text-accent-foreground font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
             >
               {t('pwa.installButton')}
             </button>

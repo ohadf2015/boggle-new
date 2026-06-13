@@ -147,10 +147,10 @@ const SelectItem = React.forwardRef<
       // Neo-brutalist item styling
       "rounded-neo py-2.5 ps-9 pe-3 text-sm font-bold",
       "outline-hidden",
-      // Hover: playful lime highlight
-      "hover:bg-neo-lime/80 hover:text-neo-black",
+      // Hover: player-accent highlight (lime by default)
+      "hover:bg-accent hover:text-accent-foreground",
       // Focus: same as hover for keyboard navigation
-      "focus:bg-neo-lime focus:text-neo-black",
+      "focus:bg-accent focus:text-accent-foreground",
       // Selected state: cyan highlight
       "data-[state=checked]:bg-neo-cyan data-[state=checked]:text-neo-black",
       // Disabled state

@@ -129,7 +129,7 @@ export default function AndroidAppInstallPromo() {
           <button
             type="button"
             onClick={handleInstall}
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-neo-lime text-neo-black font-black uppercase tracking-tight border-3 border-neo-black rounded-neo shadow-hard-sm transition-all duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-accent text-accent-foreground font-black uppercase tracking-tight border-3 border-neo-black rounded-neo shadow-hard-sm transition-all duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
           >
             <Smartphone className="h-5 w-5 stroke-[2.5]" aria-hidden="true" />
             {t('androidAppPromo.install')}

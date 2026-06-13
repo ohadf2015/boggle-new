@@ -94,7 +94,7 @@ export function CommandPalette() {
                   key={item.id}
                   value={`${item.id} ${t(item.labelKey)}`}
                   onSelect={() => handleSelect(item.href)}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors data-[selected=true]:bg-neo-lime data-[selected=true]:text-neo-black"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
                   {t(item.labelKey)}
@@ -111,7 +111,7 @@ export function CommandPalette() {
                   key={item.id}
                   value={`${item.id} ${t(item.labelKey)}`}
                   onSelect={() => handleSelect(item.href)}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors data-[selected=true]:bg-neo-lime data-[selected=true]:text-neo-black"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
                   {t(item.labelKey)}

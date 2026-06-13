@@ -2359,7 +2359,9 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
        runtime to the chosen style's hex by PlayerStyleContext (or removed for the
        default style → falls back to this value). Previously vestigial. */
     --accent: var(--neo-lime);
-    --accent-foreground: rgb(var(--neo-white));
+    /* Black on the lime default (bright bg). Overridden at runtime per style by
+       applyAccentVar, which derives a readable black/white via WCAG contrast. */
+    --accent-foreground: rgb(var(--neo-black));
     --destructive: var(--neo-red);
     --destructive-foreground: rgb(var(--neo-white));
     --border: rgb(var(--neo-black));

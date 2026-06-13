@@ -136,7 +136,7 @@ export function VersionChecker() {
         <button
           type="button"
           onClick={forceUpdate}
-          className="min-h-[44px] bg-neo-lime text-neo-black font-bold text-sm px-4 py-2 border-3 border-neo-black rounded-neo shadow-hard active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-transform"
+          className="min-h-[44px] bg-accent text-accent-foreground font-bold text-sm px-4 py-2 border-3 border-neo-black rounded-neo shadow-hard active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-transform"
         >
           {t('system.refreshToUpdate')}
         </button>

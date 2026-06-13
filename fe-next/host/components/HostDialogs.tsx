@@ -209,7 +209,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = memo(function Val
         <DialogFooter className="shrink-0 pt-3 border-t border-cyan-500/30">
           <Button
             onClick={onSubmit}
-            className="w-full h-12 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
+            className="w-full h-12 text-lg font-black uppercase bg-accent text-accent-foreground border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
           >
             {t('hostView.submitValidation')}
           </Button>
@@ -417,7 +417,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = memo(function F
           {tournamentData && !tournamentData.isComplete && (
             <Button
               onClick={onNextRound}
-              className="w-full h-14 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              className="w-full h-14 text-lg font-black uppercase bg-accent text-accent-foreground border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
               🏁 {t('hostView.startNextRound')}
             </Button>
@@ -425,7 +425,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = memo(function F
           {(!tournamentData || tournamentData.isComplete) && (
             <Button
               onClick={onStartNewGame}
-              className="w-full h-14 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              className="w-full h-14 text-lg font-black uppercase bg-accent text-accent-foreground border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
               🎮 {t('hostView.startNewGame')}
             </Button>
@@ -527,7 +527,7 @@ export const SoloStartConfirmDialog: React.FC<SoloStartConfirmDialogProps> = mem
         <AlertDialogAction
           data-testid="solo-dialog-invite"
           onClick={handleInvite}
-          className="w-full bg-neo-lime text-neo-black font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed flex items-center justify-center gap-2"
+          className="w-full bg-accent text-accent-foreground font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed flex items-center justify-center gap-2"
         >
           <Share2 className="w-4 h-4" />
           {t('hostView.inviteFriends')}

@@ -87,7 +87,7 @@ const HintButton = memo<HintButtonProps>(({
           flex items-center gap-1.5 px-2 py-1.5 max-w-[120px]
           ${isLoading ? 'animate-pulse' : ''}
           ${hintsRemaining > 0
-            ? 'bg-neo-lime border-neo-black text-neo-black hover:bg-neo-pink hover:shadow-hard-sm'
+            ? 'bg-accent border-neo-black text-accent-foreground hover:brightness-110 hover:shadow-hard-sm'
             : 'bg-gray-300 border-gray-400 text-gray-600 cursor-not-allowed'}
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}

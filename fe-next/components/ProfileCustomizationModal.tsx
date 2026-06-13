@@ -255,7 +255,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             className={cn(
               'w-full py-3.5 font-black text-lg uppercase rounded-neo border-3 border-neo-black transition-all',
               isNameValid && !isEmpty
-                ? 'bg-neo-lime text-neo-black shadow-hard hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-px active:shadow-hard-sm'
+                ? 'bg-accent text-accent-foreground shadow-hard hover:translate-y-[-2px] hover:shadow-hard-lg active:translate-y-px active:shadow-hard-sm'
                 : 'bg-neo-black/20 text-neo-black/40 dark:bg-slate-600 dark:text-gray-500 cursor-not-allowed shadow-none',
               'flex items-center justify-center gap-2'
             )}

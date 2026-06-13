@@ -40,7 +40,7 @@ export function NativeLanguageBanner() {
           <button
             type="button"
             onClick={accept}
-            className="shrink-0 rounded-neo border-neo border-neo-navy bg-neo-lime hover:bg-neo-lime/80 active:translate-y-px px-3 py-1 font-bold text-sm"
+            className="shrink-0 rounded-neo border-neo border-neo-navy bg-accent text-accent-foreground hover:brightness-110 active:translate-y-px px-3 py-1 font-bold text-sm"
           >
             {copy.accept}
           </button>

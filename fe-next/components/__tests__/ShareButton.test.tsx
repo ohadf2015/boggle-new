@@ -35,9 +35,9 @@ describe('ShareButton', () => {
     it('applies primary variant styles by default', () => {
       render(<ShareButton onClick={noop}>Copy Link</ShareButton>);
       const button = screen.getByRole('button');
-      // Primary variant uses neo-lime (Phase 2 color migration: yellow -> lime)
-      expect(button.className).toContain('bg-neo-lime');
-      expect(button.className).toContain('text-neo-black');
+      // Primary variant is player-accent themed (lime by default, var(--accent)).
+      expect(button.className).toContain('bg-accent');
+      expect(button.className).toContain('text-accent-foreground');
     });
 
     it('applies whatsapp variant styles', () => {
@@ -60,8 +60,8 @@ describe('ShareButton', () => {
       // @ts-expect-error - Testing invalid variant
       render(<ShareButton onClick={noop} variant="invalid">Test</ShareButton>);
       const button = screen.getByRole('button');
-      // Falls back to primary (neo-lime)
-      expect(button.className).toContain('bg-neo-lime');
+      // Falls back to primary (player-accent themed)
+      expect(button.className).toContain('bg-accent');
     });
   });
 

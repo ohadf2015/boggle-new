@@ -161,7 +161,7 @@ export default function CookieConsent() {
               onClick={handleAcceptAll}
               className={cn(
                 'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
-                'bg-neo-lime text-neo-black',
+                'bg-accent text-accent-foreground',
                 'border-3 border-neo-black rounded-neo shadow-hard-sm',
                 'hover:shadow-hard active:shadow-hard-pressed',
                 'transition-all duration-100'

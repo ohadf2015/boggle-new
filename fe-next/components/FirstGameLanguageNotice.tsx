@@ -50,7 +50,7 @@ export function FirstGameLanguageNotice() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -32, opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="relative z-50 w-full shrink-0 flex items-center gap-3 bg-neo-lime text-neo-navy border-b-neo border-neo-navy px-4 py-2 shadow-hard"
+          className="relative z-50 w-full shrink-0 flex items-center gap-3 bg-accent text-accent-foreground border-b-neo border-neo-navy px-4 py-2 shadow-hard"
         >
           <Gamepad2 className="size-5 shrink-0" aria-hidden />
           <div className="flex-1 min-w-0">

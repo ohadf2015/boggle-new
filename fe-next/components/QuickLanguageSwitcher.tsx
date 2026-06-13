@@ -126,9 +126,9 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
               "cursor-pointer rounded-neo",
               "px-3 py-2.5",
               "font-bold text-neo-black dark:text-white",
-              // Hover state - playful lime highlight
-              "hover:bg-neo-lime hover:text-neo-black",
-              "focus:bg-neo-lime focus:text-neo-black",
+              // Hover state - player-accent highlight (lime by default)
+              "hover:bg-accent hover:text-accent-foreground",
+              "focus:bg-accent focus:text-accent-foreground",
               // Selected state
               "data-[state=checked]:bg-neo-cyan data-[state=checked]:text-neo-black",
               // Remove default focus bg

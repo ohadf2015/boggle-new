@@ -41,8 +41,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Primary: Electric Yellow - main CTA
-        default: 'bg-neo-lime text-neo-black hover:bg-neo-lime-hover',
+        // Primary: player-accent themed (lime by default) - main CTA
+        default: 'bg-accent text-accent-foreground hover:brightness-110',
         // Destructive: Red for danger actions
         destructive: 'bg-neo-red text-neo-black hover:brightness-110',
         // Outline: Transparent with border
