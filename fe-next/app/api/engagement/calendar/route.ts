@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
 
@@ -69,10 +70,13 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
  */
 export async function GET(request: NextRequest) {
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    // Local JWT verify (sub-ms) — callers send a Bearer via authFetch. Read-only
+    // GET; POST keeps getUserIdFromRequest (remote) for mutation safety.
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = user.id;
 
     const supabase = createAdminClient()!;
     const now = new Date();
