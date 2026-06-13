@@ -72,6 +72,33 @@ describe('WordCraftRack — tap-to-place', () => {
     expect(onFastTap).not.toHaveBeenCalled();
   });
 
+  // Lightweight placement: once a REAL axis is locked (≥2 collinear tiles, the
+  // direction is no longer ambiguous), a single tap on ANY non-pending tile
+  // auto-places it at the only legal next cell — no select-then-tap-cell, no
+  // double-tap. Gated to `autoPlaceOnTap` (the ≥2-tile signal) so the earlier
+  // length-1 "tap doesn't work" complaint (ambiguous direction) cannot recur.
+  it('autoPlaceOnTap: a single tap on an UNSELECTED tile fast-taps (no cell-tap needed)', () => {
+    const { onSelect, onFastTap } = setup({ autoPlaceOnTap: true, selectedId: null });
+    fireEvent.click(screen.getByRole('button', { name: /B/i }));
+    expect(onFastTap).toHaveBeenCalledTimes(1);
+    expect(onFastTap.mock.calls[0][0]).toMatchObject({ id: 't2' });
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('autoPlaceOnTap also auto-places the already-selected tile', () => {
+    const { onSelect, onFastTap } = setup({ autoPlaceOnTap: true, selectedId: 't1' });
+    fireEvent.click(screen.getByRole('button', { name: /A/i }));
+    expect(onFastTap).toHaveBeenCalledTimes(1);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('without autoPlaceOnTap, tapping an unselected tile still just selects (length-1 stays explicit)', () => {
+    const { onSelect, onFastTap } = setup({ autoPlaceOnTap: false, axisLocked: true, selectedId: null });
+    fireEvent.click(screen.getByRole('button', { name: /A/i }));
+    expect(onSelect).toHaveBeenCalledWith('t1');
+    expect(onFastTap).not.toHaveBeenCalled();
+  });
+
   it('consumeDropFlag suppresses the trailing tap (no select, no fast-tap)', () => {
     const onSelect = vi.fn();
     const onFastTap = vi.fn();

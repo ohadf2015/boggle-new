@@ -101,6 +101,49 @@ describe('wordCraftReducer reaches a game-over', () => {
     expect(turns).toBeLessThanOrEqual(startBag); // ≤40 turns, a finite game
   });
 
+  // The user's "the sack stays 40" report: the displayed count never moved.
+  // Root cause was an in-place splice that kept `state.bag` referentially
+  // identical across commits, so the HUD's `useMemo([state.bag])` never
+  // recomputed. The fix returns a FRESH bag object each commit. This proves it:
+  // identity must change AND the count must strictly fall.
+  it('each commit returns a fresh bag object whose count strictly decreases (HUD unfreezes)', () => {
+    let s = buildInitialState({ seed: 5, locale: 'en', viewportDims: { size: 11, bagSize: 54 } });
+    let prevCount = s.bag.tiles.length;
+    for (let i = 0; i < 6 && s.turn !== 'over'; i++) {
+      const who = s.turn as 'player' | 'bot';
+      const actor = who === 'player' ? s.player : s.bot;
+      const tile = actor.rack[0];
+      const prevBag = s.bag;
+      s = wordCraftReducer(s, {
+        type: who === 'player' ? 'COMMIT_PLAYER' : 'COMMIT_BOT',
+        placements: [makePlaced(i, (i * 2) % 11, tile.letter, tile.value, tile.id)],
+        score: 1,
+        words: ['X'],
+      });
+      // New reference → Object.is sees a change → memo/​React re-derives the count.
+      expect(s.bag).not.toBe(prevBag);
+      // One tile played → one drawn → strictly one fewer in the sack.
+      expect(s.bag.tiles.length).toBeLessThan(prevCount);
+      prevCount = s.bag.tiles.length;
+    }
+  });
+
+  // Committing must NOT mutate the bag carried by the prior state — otherwise
+  // React's snapshot of the previous render would silently change underfoot
+  // (and StrictMode's double-invoke would double-drain the sack).
+  it('does not mutate the previous state\'s bag (pure commit)', () => {
+    const start = buildInitialState({ seed: 7, locale: 'en', viewportDims: { size: 11, bagSize: 54 } });
+    const before = start.bag.tiles.length;
+    const played = start.player.rack[0];
+    wordCraftReducer(start, {
+      type: 'COMMIT_PLAYER',
+      placements: [makePlaced(5, 5, played.letter, played.value, played.id)],
+      score: 4,
+      words: ['QI'],
+    });
+    expect(start.bag.tiles.length).toBe(before); // prior bag untouched
+  });
+
   it('does NOT end while the sack still has tiles (a normal move passes to the bot)', () => {
     const start = buildInitialState({ seed: 1, locale: 'en', viewportDims: { size: 11, bagSize: 54 } });
     expect(start.bag.tiles.length).toBeGreaterThan(0);

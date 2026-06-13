@@ -5,7 +5,7 @@ import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from '.
 import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
-import { botTuning, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
+import { botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
 import { rollModifier, toScoreModifier, modifierCaptureSpread, type WordCraftModifier } from './modifiers';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims, type BoardDims } from './boardDimensions';
@@ -141,7 +141,15 @@ function commitMove(
   const playedIds = new Set(placements.map((p) => p.rackTileId));
   const owner = who === 'player' ? state.player : state.bot;
   const remainingRack = owner.rack.filter((t) => !playedIds.has(t.id));
-  const replenish = draw(state.bag, RACK_SIZE - remainingRack.length);
+  // Draw replenishments WITHOUT mutating the incoming bag. The old in-place
+  // `draw()` splice kept `state.bag` referentially identical across commits,
+  // which (a) froze the HUD's memoized sack count — the "sack stays 40" bug —
+  // and (b) double-drained the sack under React StrictMode's double-invoke.
+  // Cloning the tile list and carrying a FRESH bag object fixes both.
+  const drawCount = Math.max(0, RACK_SIZE - remainingRack.length);
+  const nextBagTiles = state.bag.tiles.slice();
+  const replenish = nextBagTiles.splice(0, Math.min(drawCount, nextBagTiles.length));
+  const nextBag: TileBag = { ...state.bag, tiles: nextBagTiles };
   const newRack = [...remainingRack, ...replenish];
 
   // Stamp newly-placed tiles into the board first so capture logic walks an
@@ -185,6 +193,7 @@ function commitMove(
   const next: WordCraftState = {
     ...state,
     board: nextBoard,
+    bag: nextBag,
     player: who === 'player' ? updatedOwner : state.player,
     bot: who === 'bot' ? updatedOwner : state.bot,
     pendingPlacements: [],
@@ -197,9 +206,8 @@ function commitMove(
     streaks: nextStreaks,
   };
   // The sack is the game clock: the game finishes the moment it empties (or
-  // the active player exhausts their rack). `state.bag` was already drained by
-  // the `draw` above, so `remaining` reflects the post-refill count.
-  if (newRack.length === 0 || remaining(state.bag) === 0) {
+  // the active player exhausts their rack). Check the post-refill bag.
+  if (newRack.length === 0 || remaining(nextBag) === 0) {
     next.turn = 'over';
   }
   if (next.turn === 'over' && state.territoryEnabled) {
@@ -561,6 +569,15 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     if (botTurnRunning.current) return;
     botTurnRunning.current = true;
     const handle = setTimeout(() => {
+      // Difficulty-driven voluntary skip: on easier settings the bot regularly
+      // passes, gifting the player a free turn to seize ground. This is the
+      // difficulty lever a player actually feels in a territory game (claims
+      // scale with tiles placed, so word-length nerfs barely register).
+      if (shouldBotSkipTurn(tuning)) {
+        dispatch({ type: 'PASS' });
+        botTurnRunning.current = false;
+        return;
+      }
       // Inherit botMove's DEFAULT_MAX_LENGTH (7) — old call passed an explicit
       // 5 that capped the bot below bingo length and made it feel weak.
       const move = findBestBotMove(state.board, state.bot.rack, isWordValid, {
@@ -605,7 +622,10 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
       clearTimeout(handle);
       botTurnRunning.current = false;
     };
-  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning.maxLength, effectiveVariance, tuning.selectionSkew, tuning.captureAggression, state.modifier, modifierSpec]);
+    // `tuning` is a stable module-level object keyed by difficulty (see
+    // botDifficulty's TUNING record), so listing it whole is both correct and
+    // satisfies exhaustive-deps for the shouldBotSkipTurn(tuning) call.
+  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning, effectiveVariance, state.modifier, modifierSpec]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);

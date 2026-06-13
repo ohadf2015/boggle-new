@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   botTuning,
   isBotDifficulty,
+  shouldBotSkipTurn,
   DEFAULT_BOT_DIFFICULTY,
   BOT_DIFFICULTIES,
 } from '../botDifficulty';
@@ -54,18 +55,47 @@ describe('botDifficulty', () => {
     expect(e.selectionSkew).toBeGreaterThan(1);
   });
 
-  it('easy barely chases captures (low capture aggression) so it stops hunting the player', () => {
+  it('easy stops hunting the player entirely (zero capture aggression)', () => {
     const e = botTuning('easy');
     const m = botTuning('medium');
     const h = botTuning('hard');
     // captureAggression scales how hard the bot weights STEALING the player's
     // cells when ranking candidate words. In Conquest the winner holds the most
-    // squares, so an aggressive thief is the dominant difficulty; easy must back
-    // off it. Strength increases monotonically toward hard (a full 1.0).
-    expect(e.captureAggression).toBeLessThanOrEqual(0.35);
+    // squares, so an aggressive thief is the dominant difficulty. The user's
+    // "still too good" → easy must NOT seek steals at all (it still captures
+    // incidentally, it just never goes out of its way to). Monotonic to hard.
+    expect(e.captureAggression).toBe(0);
     expect(e.captureAggression).toBeLessThan(m.captureAggression);
     expect(m.captureAggression).toBeLessThan(h.captureAggression);
     expect(h.captureAggression).toBe(1);
+  });
+
+  it('easy skips turns often, hard never — the lever that makes difficulty FELT in a territory game', () => {
+    const e = botTuning('easy');
+    const m = botTuning('medium');
+    const h = botTuning('hard');
+    // Territory accrues ∝ tiles placed, so word-length/variance knobs barely
+    // change the bot's claim rate. A per-turn skip chance is the one knob the
+    // player actually feels: easy gives the player free turns, hard never does.
+    expect(e.turnSkipChance).toBeGreaterThan(0.25);
+    expect(e.turnSkipChance).toBeGreaterThan(m.turnSkipChance);
+    expect(m.turnSkipChance).toBeGreaterThan(h.turnSkipChance);
+    expect(h.turnSkipChance).toBe(0);
+  });
+});
+
+describe('shouldBotSkipTurn', () => {
+  it('skips when the roll lands under the skip chance', () => {
+    // easy ~0.35 → a 0.1 roll skips.
+    expect(shouldBotSkipTurn(botTuning('easy'), () => 0.1)).toBe(true);
+  });
+
+  it('plays when the roll lands above the skip chance', () => {
+    expect(shouldBotSkipTurn(botTuning('easy'), () => 0.99)).toBe(false);
+  });
+
+  it('hard never skips regardless of the roll (turnSkipChance 0)', () => {
+    expect(shouldBotSkipTurn(botTuning('hard'), () => 0)).toBe(false);
   });
 
   it('validates difficulty strings (for localStorage hydration)', () => {

@@ -21,6 +21,14 @@ export interface WordCraftRackProps {
   onFastTap?: (tile: RackTile) => void;
   /** True when an axis is inferred from the current pending placements. */
   axisLocked?: boolean;
+  /**
+   * True once a REAL axis is locked (≥2 collinear tiles), where the next empty
+   * cell along the line is deterministic and the only legal placement. When set,
+   * a single tap on ANY non-pending tile auto-places it — no select, no cell-tap,
+   * no double-tap. Strictly gated to ≥2 tiles so the length-1 direction choice
+   * (which was the source of the old "tap doesn't work" confusion) stays explicit.
+   */
+  autoPlaceOnTap?: boolean;
   disabled?: boolean;
   ariaLabel: string;
   hintPick?: boolean;
@@ -40,6 +48,7 @@ function WordCraftRackImpl({
   consumeDropFlag,
   onFastTap,
   axisLocked,
+  autoPlaceOnTap,
   disabled,
   ariaLabel,
   hintPick,
@@ -93,7 +102,7 @@ function WordCraftRackImpl({
             key={tile.id}
             type="button"
             data-rack-tile-id={tile.id}
-            data-fast-tap={axisLocked && isSelected ? 'true' : undefined}
+            data-fast-tap={autoPlaceOnTap || (axisLocked && isSelected) ? 'true' : undefined}
             disabled={disabled || isPending}
             aria-pressed={isSelected}
             onPointerDown={(e) => {
@@ -104,12 +113,20 @@ function WordCraftRackImpl({
             onClick={() => {
               // If the gesture ended as a drop, the tile is now pending — skip toggle.
               if (consumeDropFlag?.()) return;
-              // Tapping the ALREADY-selected tile while an axis is locked is an
-              // explicit "auto-place along the line" shortcut (the 1-tap
-              // convenience). Tapping any OTHER tile just selects it — so
-              // "tap a letter, then tap the cell I want" works at every stage,
-              // not only the first move. (Previously every tap fast-fired once
-              // a tile was pending, which players read as "tap doesn't work".)
+              // Real axis locked (≥2 collinear tiles): a single tap on ANY tile
+              // auto-places it at the only legal next cell. This is the
+              // lightweight "tap-tap-tap to spell" flow for letters 3..7. It is
+              // unambiguous (one legal cell), so it cannot reproduce the old
+              // length-1 "tap doesn't work" confusion — that was direction
+              // ambiguity, which only exists before a real axis is set.
+              if (autoPlaceOnTap && onFastTap) {
+                onFastTap(tile);
+                return;
+              }
+              // Length-1 convenience: re-tapping the ALREADY-selected tile while a
+              // (provisional) axis is locked auto-places along the chosen axis.
+              // Tapping any OTHER tile just selects it — so "tap a letter, then
+              // tap the cell I want" still works while the direction is being set.
               if (isSelected && axisLocked && onFastTap) {
                 onFastTap(tile);
                 return;

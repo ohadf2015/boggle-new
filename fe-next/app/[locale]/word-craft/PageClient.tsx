@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Layers, Users } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -853,18 +853,10 @@ export default function WordCraftPageClient() {
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <span
-            aria-hidden
-            className="shrink-0 inline-flex items-center justify-center w-7 h-7 rounded-neo bg-neo-purple text-white border-2 border-black shadow-hard-sm rotate-[-4deg]"
-          >
-            <Layers className="w-4 h-4" />
-          </span>
-          {/* min-w-0 + truncate lets the title yield space first so the
-              right-edge controls (incl. the How-to-play pill) never get
-              pushed off a narrow topbar. */}
-          <h1 className="min-w-0 truncate text-lg font-neo-display font-black text-neo-white tracking-tight">
-            {t('wordcraft.title')}
-          </h1>
+          {/* Logo badge + visual title removed for a lighter HUD — the board IS
+              the game's identity. Heading kept sr-only so the page still has a
+              document heading for screen readers / SEO. */}
+          <h1 className="sr-only">{t('wordcraft.title')}</h1>
           <div className="flex-1" />
           {/* Bot difficulty — only meaningful vs the auto-bot. Hidden in a duel:
               the board contract (incl. difficulty) is locked to the challenger's. */}
@@ -1081,6 +1073,7 @@ export default function WordCraftPageClient() {
           consumeDropFlag={consumeDropFlag}
           onFastTap={handleFastTap}
           axisLocked={game.state.pendingPlacements.length >= 1}
+          autoPlaceOnTap={axis !== null}
           draggingTileId={drag?.active ? drag.tileId : null}
           disabled={!canInteract || !dict}
           ariaLabel={t('wordcraft.yourRack')}
