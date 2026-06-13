@@ -32,6 +32,32 @@ describe('buildStyledAvatarConfig', () => {
     expect(viking.accessory).toBe('viking');
   });
 
+  it('themes MULTIPLE parts so the avatar reads as the genre', () => {
+    const viking = buildStyledAvatarConfig('viking');
+    expect(viking.facialHair).toBe('braidedBeard');
+    expect(viking.bodyStyle).toBe('turtleneck');
+    expect(viking.eyes).toBe('angry');
+    expect(viking.mouth).toBe('grin');
+
+    const arcade = buildStyledAvatarConfig('arcade');
+    expect(arcade.eyes).toBe('pixelEyes');
+    expect(arcade.mouth).toBe('robotMouth');
+    expect(arcade.bodyStyle).toBe('hoodie');
+
+    const jazz = buildStyledAvatarConfig('jazz');
+    expect(jazz.facialHair).toBe('pencilMustache');
+    expect(jazz.bodyStyle).toBe('suit');
+  });
+
+  it('every non-default style themes at least 3 parts beyond color', () => {
+    for (const key of Object.keys(STYLES)) {
+      if (key === 'default') continue;
+      const h = STYLE_AVATAR_HINTS[key]!;
+      const parts = [h.accessory, h.hair, h.facialHair, h.bodyStyle, h.eyes, h.mouth].filter(Boolean);
+      expect(parts.length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
   it('keeps randomizable identity fields present (base/eyes/mouth)', () => {
     const cfg = buildStyledAvatarConfig('jazz');
     expect(cfg.base).toBeTruthy();
