@@ -5,6 +5,7 @@
 
 import { createClient } from '@/utils/supabase/client';
 import logger from '@/utils/logger';
+import { shouldWriteOnlineStatus } from './onlineStatusThrottle';
 import {
   isUserOnline,
   type FriendStatus,
@@ -288,14 +289,32 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
   });
 }
 
+// Module-level last-write timestamp shared across every useFriends instance, so
+// N concurrent mounts collapse to one profiles UPDATE per throttle window.
+let lastOnlineStatusWrite = 0;
+
 /**
- * Update online status (call periodically while user is active)
+ * Update online status (call periodically while user is active).
+ *
+ * Throttled at the module level: multiple always-mounted components each run
+ * their own interval, so without this guard one user emits several identical
+ * profiles UPDATEs per cycle (and an auth.getUser round-trip each). We commit
+ * the timestamp BEFORE the awaits so simultaneous callers can't both pass the
+ * gate. Safe because the window is far under the 5-minute online threshold.
  */
 export async function updateOnlineStatus(): Promise<void> {
+  const now = Date.now();
+  if (!shouldWriteOnlineStatus(now, lastOnlineStatusWrite)) return;
+  lastOnlineStatusWrite = now;
+
   const supabase = createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) {
+    // Not actually authed — release the gate so a real session isn't blocked.
+    lastOnlineStatusWrite = 0;
+    return;
+  }
 
   await supabase
     .from('profiles')

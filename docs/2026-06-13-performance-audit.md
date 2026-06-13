@@ -58,8 +58,13 @@ published). This is **wasted CPU/cost, not a query-latency cause** (app queries 
 even under this load). Remediation (infra, needs care):
 - Investigate disabling unused Realtime "Postgres Changes" / "Broadcast from DB" if no feature
   consumes them (Supabase dashboard — outward-facing, do not blind-change).
-- Safe app-side lever: throttle `profiles.last_seen_at` writes (n=40243) — skip if <5min stale —
-  to cut WAL decode volume.
+- **SHIPPED** — `profiles.last_seen_at` write throttle. Root cause was write *amplification*:
+  `useFriends` is mounted by several always-present components (GlobalBottomNav, HeaderMobileMenu,
+  FriendsActivityFeed, FriendActivityRow), each running its own 2-min interval → one user emitted
+  N `UPDATE profiles SET last_seen_at` writes per cycle (each with an auth.getUser round-trip).
+  Added a module-level shared throttle (`utils/onlineStatusThrottle.ts`, 4 TDD tests): ≤1 write
+  per 90s window across all mounts. 90s < the 5-min online threshold, so presence stays accurate.
+  Cuts both the profiles writes feeding the WAL decoder and the Auth round-trips.
 
 ## BACKEND DEBT — auth.getUser() round-trips
 
