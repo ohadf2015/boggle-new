@@ -11,6 +11,7 @@ import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { AvatarCustomizeHint } from '@/components/profile/AvatarCustomizeHint';
 import { useAvatarCustomizationNudge } from '@/hooks/useAvatarCustomizationNudge';
+import { useAvatarHistory } from '@/hooks/useAvatarHistory';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { CountrySelector } from '@/components/settings/CountrySelector';
@@ -63,6 +64,9 @@ export function ProfileHeader({
   // (accentHex non-null). Default users keep the neutral cyan ring → no change.
   const { style: playerStyle } = usePlayerStyle();
   const avatarNudge = useAvatarCustomizationNudge();
+  // Persistent "previous avatar" so a save can always be reverted (even later).
+  const { previousConfig: previousAvatar, stashCurrent: stashPreviousAvatar } =
+    useAvatarHistory(profile?.id);
 
   const startEditingName = (): void => {
     setEditDisplayName(profile?.display_name || profile?.username || '');
@@ -94,6 +98,12 @@ export function ProfileHeader({
 
   const handleAvatarSave = async (config: CustomAvatarConfig): Promise<void> => {
     try {
+      // Stash the outgoing avatar as "previous" before overwriting it, so the
+      // player can always restore the avatar they had before this save.
+      const outgoing = profile?.avatar_config;
+      if (outgoing && JSON.stringify(outgoing) !== JSON.stringify(config)) {
+        stashPreviousAvatar(outgoing);
+      }
       await updateProfile({ avatar_config: config });
       await refreshProfile();
       setIsAvatarBuilderOpen(false);
@@ -304,6 +314,7 @@ export function ProfileHeader({
         onSave={handleAvatarSave}
         initialConfig={profile?.avatar_config ?? getRandomAvatarConfig()}
         premium={avatarPremium}
+        previousConfig={previousAvatar}
       />
     </m.div>
   );

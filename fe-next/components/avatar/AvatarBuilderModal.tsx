@@ -3,7 +3,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { createPortal } from 'react-dom';
-import { X, Shuffle, Undo2, Download, SmilePlus, Scissors, Eye, Smile, Sparkles, Palette, Coins, Brush } from 'lucide-react';
+import { X, Shuffle, Undo2, Download, Coins, History } from 'lucide-react';
+import { AVATAR_CATEGORY_ICONS } from './AvatarCategoryIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import AvatarRenderer from './AvatarRenderer';
@@ -21,15 +22,6 @@ import {
 
 type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'facialHair' | 'accessories' | 'background';
 
-const CATEGORY_ICONS: Record<Category, typeof X> = {
-  base: SmilePlus,
-  hair: Scissors,
-  eyes: Eye,
-  mouth: Smile,
-  facialHair: Brush,
-  accessories: Sparkles,
-  background: Palette,
-};
 
 const ALL_CATEGORIES: { key: Category; labelKey: string; maleOnly?: boolean }[] = [
   { key: 'base', labelKey: 'avatarBuilder.base' },
@@ -63,6 +55,8 @@ interface AvatarBuilderModalProps {
   initialConfig?: CustomAvatarConfig;
   /** Pass premium context to gate parts, or `null` to explicitly allow only free parts (e.g. onboarding). */
   premium: AvatarPremium | null;
+  /** The player's previously-saved avatar — enables a "restore previous" action. */
+  previousConfig?: CustomAvatarConfig | null;
 }
 
 export default function AvatarBuilderModal({
@@ -71,6 +65,7 @@ export default function AvatarBuilderModal({
   onSave,
   initialConfig,
   premium,
+  previousConfig,
 }: AvatarBuilderModalProps) {
   const { t } = useLanguage();
   const [config, setConfig] = useState<CustomAvatarConfig>(initialConfig ?? DEFAULT_AVATAR_CONFIG);
@@ -129,6 +124,15 @@ export default function AvatarBuilderModal({
     onClose();
   }, [config, onSave, onClose]);
 
+  const handleRestorePrevious = useCallback(() => {
+    if (!previousConfig) return;
+    setConfig(prev => {
+      pushHistory(prev);
+      return previousConfig;
+    });
+    setPreviewKey(k => k + 1);
+  }, [previousConfig, pushHistory]);
+
   const previewRef = useRef<HTMLDivElement>(null);
   const handleDownload = useCallback(() => {
     const svgEl = previewRef.current?.querySelector('svg');
@@ -169,7 +173,7 @@ export default function AvatarBuilderModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 pb-[calc(1rem+var(--admob-banner-height,0px))] overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <AdaptiveMotion.div
         ref={dialogRef}
         role="dialog"
@@ -301,6 +305,18 @@ export default function AvatarBuilderModal({
           >
             <Undo2 size={16} />
           </AdaptiveMotion.button>
+          {previousConfig && (
+            <AdaptiveMotion.button
+              onClick={handleRestorePrevious}
+              whileTap={{ scale: 0.88 }}
+              transition={BUTTON_SPRING}
+              className="inline-flex items-center justify-center w-9 h-9 bg-neo-navy-light text-neo-white rounded-neo border-2 border-neo-white/20 hover:border-neo-white/50 transition-all shrink-0"
+              title={t('avatarBuilder.restorePrevious')}
+              aria-label={t('avatarBuilder.restorePrevious')}
+            >
+              <History size={16} />
+            </AdaptiveMotion.button>
+          )}
           <AdaptiveMotion.button
             onClick={handleDownload}
             whileTap={{ scale: 0.88 }}
@@ -341,6 +357,6 @@ export default function AvatarBuilderModal({
 }
 
 function CategoryIcon({ category }: { category: Category }) {
-  const Icon = CATEGORY_ICONS[category];
+  const Icon = AVATAR_CATEGORY_ICONS[category];
   return <Icon size={16} />;
 }
