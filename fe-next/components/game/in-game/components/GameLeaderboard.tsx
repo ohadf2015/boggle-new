@@ -10,9 +10,22 @@ import { getAvatarTrait } from '@/lib/avatar/avatarPersonality';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
 import PresenceIndicator from '@/components/PresenceIndicator';
 import { getRankStyle, getRankIconString } from '@/utils/rankingStyles';
+import { useLiveScoreFor } from '@/hooks/gameState/selectors';
 import { cn } from '@/lib/utils';
 import type { ExtendedLeaderboardPlayer as LeaderboardPlayer } from '@/shared/types/view';
 import type { TranslationFn } from '../types';
+
+/**
+ * The hero score number, subscribed live to the store rather than the (frozen)
+ * row prop. The row body is intentionally held still by useFrozenWhileSelecting
+ * while the local player drags — but rival scores must keep ticking, so the
+ * number reads the live store value and only falls back to the frozen prop
+ * snapshot when the store has no row yet (e.g. unit tests / first paint).
+ */
+function LiveScore({ username, fallback }: { username: string; fallback: number }) {
+  const live = useLiveScoreFor(username);
+  return <div className="text-lg font-black leading-none tabular-nums">{live ?? fallback}</div>;
+}
 
 interface GameLeaderboardProps {
   leaderboard: LeaderboardPlayer[];
@@ -178,7 +191,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
             </div>
           )}
           <div className="bg-neo-black text-neo-white rounded-neo px-2.5 py-1 min-w-[44px] text-center border-2 border-neo-black">
-            <div className="text-lg font-black leading-none tabular-nums">{player.score}</div>
+            <LiveScore username={player.username} fallback={player.score} />
           </div>
         </div>
       </div>

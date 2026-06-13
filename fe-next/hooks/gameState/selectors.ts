@@ -21,6 +21,15 @@ export const useTotalBoardWords = () => useGameStore((state) => state.totalBoard
 export const usePlayers = () => useGameStore((state) => state.players);
 export const useLeaderboard = () => useGameStore((state) => state.leaderboard);
 
+// Live per-player score selector. Returns a primitive, so a subscriber
+// re-renders ONLY when that one player's score changes. The in-game leaderboard
+// freezes its whole prop during a local drag (useFrozenWhileSelecting) to keep
+// the heavy avatar/row subtree off the drag RAF; this selector lets the cheap
+// score *number* keep ticking live straight from the store, bypassing that
+// freeze without reintroducing the row-render storm.
+export const useLiveScoreFor = (username: string): number | undefined =>
+  useGameStore((state) => state.leaderboard.find((p) => p.username === username)?.score);
+
 // Word selectors
 export const useFoundWords = () => useGameStore((state) => state.foundWords);
 export const useAchievements = () => useGameStore((state) => state.achievements);
