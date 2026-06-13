@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import { useStyleSnippetPreview } from '@/hooks/useStyleSnippetPreview';
 import { STYLE_KEYS, STYLES, type PlayerStyleKey } from '@/lib/playerStyle/styles';
+import { getAnimatedMascot } from '@/lib/playerStyle/animatedMascots';
 import { buildStyledAvatarConfig } from '@/lib/playerStyle/styledAvatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
@@ -102,7 +103,7 @@ export function StylePicker({
         // overscroll-contain + own compositor layer (translateZ) stops the
         // translucent backdrop behind the modal from repaint-flickering as this
         // region scrolls on touch devices.
-        className="grid min-h-0 flex-1 grid-cols-3 content-start gap-3 overflow-y-auto overscroll-contain px-4 pb-1 pt-4 [transform:translateZ(0)] [backface-visibility:hidden] sm:grid-cols-4"
+        className="grid min-h-0 flex-1 grid-cols-2 content-start gap-3 overflow-y-auto overscroll-contain px-4 pb-1 pt-4 [transform:translateZ(0)] [backface-visibility:hidden] sm:grid-cols-3"
         role="radiogroup"
         aria-label={t('playerStyle.picker.title')}
       >
@@ -110,6 +111,10 @@ export function StylePicker({
           const style = STYLES[key];
           const isSelected = selected === key;
           const isCurrent = committedKey === key;
+          // The active tile (being selected, or the committed style) plays its
+          // real dancing loop; the rest stay as the lightweight static art.
+          const animated = getAnimatedMascot(key);
+          const dancing = (isSelected || isCurrent) && !!animated;
           return (
             <button
               key={key}
@@ -118,7 +123,7 @@ export function StylePicker({
               aria-checked={isSelected}
               onClick={() => handleSelect(key)}
               className={[
-                'group relative flex flex-col items-center gap-1.5 rounded-neo border-neo-thick p-2 transition-all duration-150',
+                'group relative flex flex-col items-center gap-1.5 rounded-neo border-neo-thick p-3 transition-all duration-150',
                 isSelected
                   ? 'z-10 -translate-y-1 border-accent bg-accent/20 shadow-hard-lg ring-4 ring-accent ring-offset-2 ring-offset-neo-navy'
                   : 'border-neo-black bg-neo-navy-light shadow-hard hover:-translate-y-0.5 active:translate-y-0',
@@ -137,7 +142,7 @@ export function StylePicker({
               <span className="relative aspect-square w-full overflow-hidden rounded-neo bg-neo-navy">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={style.mascot}
+                  src={dancing ? animated! : style.mascot}
                   alt=""
                   decoding="async"
                   className="h-full w-full object-contain"
@@ -145,7 +150,7 @@ export function StylePicker({
               </span>
               <span
                 className={[
-                  'font-neo-body text-[11px] leading-tight',
+                  'font-neo-body text-sm leading-tight',
                   isSelected ? 'font-bold text-accent' : 'text-neo-cream',
                 ].join(' ')}
               >

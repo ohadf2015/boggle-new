@@ -119,6 +119,22 @@ describe('StylePicker', () => {
     expect(screen.getAllByText('playerStyle.picker.current')).toHaveLength(1);
   });
 
+  it('the selected tile plays its dancing loop (webp); unselected tiles stay static PNG', () => {
+    render(<StylePicker />);
+    const jazz = screen.getByRole('radio', { name: /playerStyle\.styles\.jazz/ });
+    fireEvent.click(jazz);
+    expect(jazz.querySelector('img')?.getAttribute('src')).toBe('/mascots/styles/jazz.webp');
+    const rock = screen.getByRole('radio', { name: /playerStyle\.styles\.rock/ });
+    expect(rock.querySelector('img')?.getAttribute('src')).toBe('/mascots/styles/rock.png');
+  });
+
+  it('the active (committed) style tile dances on mount without a click', () => {
+    committedKey = 'viking';
+    render(<StylePicker />);
+    const viking = screen.getByRole('radio', { name: /playerStyle\.styles\.viking/ });
+    expect(viking.querySelector('img')?.getAttribute('src')).toBe('/mascots/styles/viking.webp');
+  });
+
   it('hides the confirm button when showConfirm is false', () => {
     render(<StylePicker showConfirm={false} />);
     expect(screen.queryByText('playerStyle.picker.confirm')).toBeNull();

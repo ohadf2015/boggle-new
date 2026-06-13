@@ -1,10 +1,9 @@
 'use client';
 
-import { memo } from 'react';
 import dynamic from 'next/dynamic';
 import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
+import { HeroStyleMascot } from './HeroStyleMascot';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 
 // SSR enabled: receives players from server initialData → above-the-fold sidebar paints with data, not skeleton.
@@ -24,25 +23,6 @@ interface LandingHeroProps {
   /** live player count — drives the energetic "playing now" pill */
   activePlayers?: number;
 }
-
-const HeroMascot = memo(function HeroMascot({ isMobilePortrait, energetic }: { isMobilePortrait: boolean; energetic?: boolean }) {
-  return (
-    <IdleMascotWithEntrance
-      baseVariant="happy"
-      enableIdleActivities={!!energetic}
-      cycleBaseVariants={!!energetic}
-      size="xl"
-      sizeClassName="w-[100px] h-[100px] sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-48 lg:h-48"
-      enableHover={!isMobilePortrait}
-      enableClick
-      hoverVariant="excited"
-      clickVariant="celebrating"
-      clickAnimation="bounce"
-      priority
-      delay={0.1}
-    />
-  );
-});
 
 // Cream/colour neo letter-chips that bob around the mascot on the energetic
 // (cubes) hero — pure decoration, hidden from a11y, frozen under reduced-motion.
@@ -85,7 +65,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
           <div className="flex flex-row items-center gap-3 sm:flex-col sm:gap-0">
             <div className="relative">
               {energetic && <FloatingTiles />}
-              <HeroMascot isMobilePortrait={isMobilePortrait} energetic={energetic} />
+              <HeroStyleMascot isMobilePortrait={isMobilePortrait} energetic={energetic} />
             </div>
             <h1 className="font-black uppercase tracking-tight text-neo-white text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl sm:mt-3 sm:mb-2 neo-title animate-[fadeInUp_0.4s_ease-out_0.15s_both]">
               <span className="sr-only">LexiClash — </span>
