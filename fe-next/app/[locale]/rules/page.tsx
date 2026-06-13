@@ -1,6 +1,8 @@
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import RulesPageClient from './PageClient';
 
+export const revalidate = 86400;
+
 const seoContent: Record<string, {
   title: string;
   description: string;
@@ -152,8 +154,18 @@ const seoContent: Record<string, {
 export default async function RulesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = seoContent[locale] ?? seoContent.en;
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: content.faq.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
+  };
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <RulesPageClient />
       <GamePageSeoContent
         title={content.title}

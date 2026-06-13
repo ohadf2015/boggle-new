@@ -142,6 +142,7 @@ export type GrowthEvent =
   // Landing-page CTA instrumentation (visitor → onboarding funnel leak)
   | 'landing_cta_clicked'
   | 'education_upsell_impression'
+  | 'school_lead_submitted'
   // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel)
   | 'cross_promo_click'
   // Results-page CTA tracking — experiment conversion funnel (exp-results-replay-cta-v1)

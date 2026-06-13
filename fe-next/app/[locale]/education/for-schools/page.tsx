@@ -5,6 +5,8 @@ import { getForSchoolsContent, EDUCATION_LOCALES, type EducationLocale } from '.
 import { SchoolLeadForm } from '@/components/education/SchoolLeadForm';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }

@@ -6,6 +6,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
+const mockTrackGrowthEvent = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
+}));
+
 import { SchoolLeadForm } from '../SchoolLeadForm';
 
 describe('<SchoolLeadForm>', () => {
@@ -46,6 +51,17 @@ describe('<SchoolLeadForm>', () => {
     expect(body.student_count).toBeTruthy();
     expect(body.interests).toContain('pricing_info');
     expect(body.locale).toBe('en');
+  });
+
+  it('fires school_lead_submitted growth event on successful submit', async () => {
+    global.fetch = vi.fn(async () => ({ ok: true, json: async () => ({ ok: true }) } as any)) as any;
+    const user = userEvent.setup();
+    render(<SchoolLeadForm />);
+    await user.type(screen.getByLabelText(/education\.forSchools\.form\.full_name/i), 'Dana Levi');
+    await user.type(screen.getByLabelText(/education\.forSchools\.form\.email/i), 'dana@lincoln.edu');
+    await user.type(screen.getByLabelText(/education\.forSchools\.form\.school_or_district/i), 'Lincoln High');
+    await user.click(screen.getByRole('button', { name: /education\.forSchools\.form\.submit/i }));
+    await waitFor(() => expect(mockTrackGrowthEvent).toHaveBeenCalledWith('school_lead_submitted', expect.objectContaining({ role: 'school_admin', locale: 'en' })));
   });
 
   it('shows a success state after a successful submit', async () => {

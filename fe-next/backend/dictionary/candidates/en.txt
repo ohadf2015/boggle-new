@@ -377,3 +377,9 @@ her
 him
 his
 it
+move
+live
+hate
+yes
+no
+not

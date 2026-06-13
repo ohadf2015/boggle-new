@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element -- Decorative character sprites; next/image not needed. */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useStore } from 'zustand';
 import posthog from 'posthog-js';
 import { BOOK_1_HEARTH_ROOMS } from '@/lib/word-vault/content/book1-hearth-stub';
@@ -32,6 +32,11 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
     [roomId],
   );
   const isAlreadySolved = useStore(store, (s) => s.solvedRooms.includes(roomId));
+
+  useEffect(() => {
+    posthog.capture('word_vault_room_entered', { roomId, is_revisit: isAlreadySolved });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
 
   // Feature-flagged routing: r1.1 → BeatRunner when enabled, fallback to DarkDoorScene
   if (magicGridEnabled && roomId === 'room-1-1') {
@@ -79,6 +84,7 @@ export function RoomShell({ store, roomId, onExit }: RoomShellProps) {
   }
 
   const handleSolve = () => {
+    posthog.capture('word_vault_room_solved', { roomId: room.id });
     store.getState().solveRoom(room.id, room.rewards);
   };
 

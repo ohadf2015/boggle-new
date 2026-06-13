@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   SCHOOL_LEAD_ROLES,
   STUDENT_COUNT_BUCKETS,
@@ -76,6 +77,7 @@ export function SchoolLeadForm() {
         return;
       }
       setSuccess(true);
+      trackGrowthEvent('school_lead_submitted', { role, student_count: studentCount, locale: language });
     } catch {
       setError(t('education.forSchools.form.submit_error'));
     } finally {
