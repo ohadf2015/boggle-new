@@ -11,6 +11,7 @@ import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { useDrillGameActive } from '@/hooks/useDrillGameActive';
+import { useDrillMusic } from '@/hooks/useDrillMusic';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import ComboMasterCompletePhase from './ComboMasterCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
@@ -61,7 +62,7 @@ export default function ComboMaster({
 }: ComboMasterProps) {
   const { t, dir } = useLanguage();
   const {
-    playErrorSound,
+    playWordRejectedSound,
     playDrillStartSound,
     playDrillCompleteSound,
     playWordAcceptedSound,
@@ -94,7 +95,7 @@ export default function ComboMaster({
     wordsFound,
     phase,
     playingPhase: 'playing',
-    playErrorSound,
+    playWordRejectedSound,
     t,
   });
   const MAX_COMBO_BREAKS = 3;
@@ -110,6 +111,8 @@ export default function ComboMaster({
 
   // Drill sounds no-op unless the game is flagged active (see useDrillGameActive)
   useDrillGameActive(phase === 'playing');
+  // In-game music bed while playing; restored to the prior track on exit.
+  useDrillMusic(phase === 'playing');
 
   // Start combo timer
   const startComboTimer = useCallback(() => {
@@ -362,27 +365,33 @@ export default function ComboMaster({
               </AdaptiveMotion.div>
             )}
 
-            {/* Feedback message */}
-            <AdaptiveAnimatePresence>
-              {feedback && (
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  role="status"
-                  aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
-                  aria-atomic="true"
-                  className={cn(
-                    'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
-                    feedback.type === 'error'
-                      ? 'bg-neo-red text-neo-white'
-                      : 'bg-neo-green text-neo-black'
-                  )}
-                >
-                  {feedback.message}
-                </AdaptiveMotion.div>
-              )}
-            </AdaptiveAnimatePresence>
+            {/* Feedback message — fixed-height slot so toggling per word never
+                reflows the Finish button / keyboard hints below it. */}
+            <div
+              data-testid="drill-feedback-slot"
+              className="min-h-[2.75rem] flex items-center justify-center"
+            >
+              <AdaptiveAnimatePresence>
+                {feedback && (
+                  <AdaptiveMotion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    role="status"
+                    aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
+                    aria-atomic="true"
+                    className={cn(
+                      'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
+                      feedback.type === 'error'
+                        ? 'bg-neo-red text-neo-white'
+                        : 'bg-neo-green text-neo-black'
+                    )}
+                  >
+                    {feedback.message}
+                  </AdaptiveMotion.div>
+                )}
+              </AdaptiveAnimatePresence>
+            </div>
 
             {/* Keyboard UI - Desktop only */}
             {keyboard.isDesktop && (

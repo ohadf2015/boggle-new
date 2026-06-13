@@ -11,6 +11,7 @@ import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { useDrillGameActive } from '@/hooks/useDrillGameActive';
+import { useDrillMusic } from '@/hooks/useDrillMusic';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import DrillBriefing from '@/components/brain/DrillBriefing';
 import RareGemsCompletePhase from './RareGemsCompletePhase';
@@ -79,7 +80,7 @@ export default function RareGems({
 }: RareGemsProps) {
   const { t, dir } = useLanguage();
   const {
-    playErrorSound,
+    playWordRejectedSound,
     playDrillStartSound,
     playDrillCompleteSound,
     playWordAcceptedSound,
@@ -114,7 +115,7 @@ export default function RareGems({
     wordsFound: foundWordStrings,
     phase,
     playingPhase: 'playing',
-    playErrorSound,
+    playWordRejectedSound,
     t,
   });
 
@@ -131,6 +132,8 @@ export default function RareGems({
   // Without this, RareGems' rare/legendary word sounds were silently dropped —
   // only the pouch-full chime (requiresGameActive:false) was ever audible.
   useDrillGameActive(phase === 'playing');
+  // In-game music bed while playing; restored to the prior track on exit.
+  useDrillMusic(phase === 'playing');
 
   const progress = computeGemProgress(wordsFound, levelConfig.targetRare);
   const rareWordsFound = progress.rareCount;

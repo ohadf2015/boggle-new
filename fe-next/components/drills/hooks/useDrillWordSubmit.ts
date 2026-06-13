@@ -9,7 +9,7 @@ export interface UseDrillWordSubmitProps {
   wordsFound: string[];
   phase: string;
   playingPhase: string;
-  playErrorSound?: () => void;
+  playWordRejectedSound?: () => void;
   t: (key: string) => string;
 }
 
@@ -31,7 +31,7 @@ export function useDrillWordSubmit({
   wordsFound,
   phase,
   playingPhase,
-  playErrorSound,
+  playWordRejectedSound,
   t,
 }: UseDrillWordSubmitProps): UseDrillWordSubmitReturn {
   const availableWordSet = useMemo(
@@ -48,23 +48,23 @@ export function useDrillWordSubmit({
       }
 
       if (!isWordOnBoard(upperWord, grid, language)) {
-        playErrorSound?.();
+        playWordRejectedSound?.();
         return { valid: false, upperWord, error: t('brain.drills.errors.notOnBoard') };
       }
 
       if (wordsFound.includes(upperWord)) {
-        playErrorSound?.();
+        playWordRejectedSound?.();
         return { valid: false, upperWord, error: t('brain.drills.errors.alreadyFound') };
       }
 
       if (!availableWordSet.has(upperWord)) {
-        playErrorSound?.();
+        playWordRejectedSound?.();
         return { valid: false, upperWord, error: t('brain.drills.errors.invalidWord') };
       }
 
       return { valid: true, upperWord };
     },
-    [phase, playingPhase, grid, language, wordsFound, availableWordSet, playErrorSound, t]
+    [phase, playingPhase, grid, language, wordsFound, availableWordSet, playWordRejectedSound, t]
   );
 
   return { validateWord, availableWordSet };

@@ -136,7 +136,10 @@ export function useSoundPlayFunctions(playSound: PlaySoundFn, guards: SoundGuard
   const playUpgradePurchaseSound = useCallback(() => { playSound('upgradePurchase', { volume: 0.7, requiresGameActive: false }); haptics.success(); }, [playSound]);
   const playHintRevealSound = useCallback(() => { playSound('hintReveal', { volume: 0.5 }); }, [playSound]);
   const playDailyRewardSound = useCallback(() => { playSound('dailyReward', { volume: 0.8, requiresGameActive: false }); haptics.success(); }, [playSound]);
-  const playTimerUrgentSound = useCallback(() => { playSound('timerUrgent', { volume: 0.6 }); }, [playSound]);
+  // Softened from 0.6 → 0.35: the final-seconds cue should nudge, not alarm.
+  // Only the brain-training Lightning Round uses this; play-by-play "time's up"
+  // has its own louder cue (playTimesUpSound).
+  const playTimerUrgentSound = useCallback(() => { playSound('timerUrgent', { volume: 0.35 }); }, [playSound]);
   const playStreakFireSound = useCallback(() => { playSound('streakFire', { volume: 0.7, requiresGameActive: false }); haptics.tap(); }, [playSound]);
   const playScreenTransitionSound = useCallback(() => { playSound('screenTransition', { volume: 0.3, requiresGameActive: false }); }, [playSound]);
   const playLongWordBonusSound = useCallback(() => { playSound('longWordBonus', { volume: 0.6 }); haptics.tap(); }, [playSound]);

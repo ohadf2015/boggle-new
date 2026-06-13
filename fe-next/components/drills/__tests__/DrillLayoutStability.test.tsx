@@ -20,6 +20,7 @@ import React from 'react';
 import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('@/hooks/useDrillMusic', () => ({ useDrillMusic: () => {} }));
 vi.mock('framer-motion', () => ({
   m: {
     button: ({ children, className, onClick, ...props }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void }) => (
@@ -109,6 +110,7 @@ vi.mock('@/utils/utils', () => ({
 
 import LightningRound from '../LightningRound';
 import RareGems from '../RareGems';
+import ComboMaster from '../ComboMaster';
 
 const mockGrid = [
   ['C', 'A', 'T', 'S', 'D'],
@@ -170,6 +172,39 @@ describe('LightningRound — found-words box does not grow/shift the grid', () =
     expect(box.className).toMatch(/\bh-28\b/);
     // The submitted word appears as a chip INSIDE the fixed-height box.
     expect(within(box).getByText('CAT')).toBeInTheDocument();
+  });
+});
+
+describe('ComboMaster — per-word feedback does not shift the Finish button', () => {
+  // Founder report (2026-06-13): "bad UX inside the game when finding a letter".
+  // ComboMaster rendered its feedback message as `{feedback && <motion.div>}`
+  // with NO reserved-height wrapper, so each found/rejected word popped a box
+  // in/out of flow — shoving the Finish button (and keyboard hints) up/down
+  // under the player's thumb. Invariant: the feedback lives in a constant-height
+  // slot so the column height never changes as words are submitted.
+  it('wraps feedback in a fixed min-height slot (reserved even with no feedback)', () => {
+    render(
+      <ComboMaster {...baseProps} onComplete={vi.fn()} onExit={vi.fn()} onPlayAgain={vi.fn()} />,
+    );
+    clickStart();
+
+    const slot = screen.getByTestId('drill-feedback-slot');
+    expect(slot).toBeInTheDocument();
+    // Reserved height present before any word — toggling feedback can't reflow.
+    expect(slot.className).toMatch(/min-h-/);
+  });
+
+  it('keeps the feedback slot present after a word is submitted', () => {
+    render(
+      <ComboMaster {...baseProps} onComplete={vi.fn()} onExit={vi.fn()} onPlayAgain={vi.fn()} />,
+    );
+    clickStart();
+    act(() => {
+      fireEvent.click(screen.getByTestId('submit-cat'));
+    });
+
+    const slot = screen.getByTestId('drill-feedback-slot');
+    expect(slot.className).toMatch(/min-h-/);
   });
 });
 

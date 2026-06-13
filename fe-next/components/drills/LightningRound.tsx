@@ -11,6 +11,8 @@ import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { useDrillGameActive } from '@/hooks/useDrillGameActive';
+import { useDrillMusic } from '@/hooks/useDrillMusic';
+import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import LightningRoundCompletePhase from './LightningRoundCompletePhase';
 import DrillBriefing from '@/components/brain/DrillBriefing';
@@ -62,7 +64,7 @@ export default function LightningRound({
 }: LightningRoundProps) {
   const { t, dir } = useLanguage();
   const {
-    playErrorSound,
+    playWordRejectedSound,
     playDrillStartSound,
     playDrillCompleteSound,
     playWordAcceptedSound,
@@ -87,7 +89,7 @@ export default function LightningRound({
     wordsFound,
     phase,
     playingPhase: 'playing',
-    playErrorSound,
+    playWordRejectedSound,
     t,
   });
 
@@ -102,13 +104,19 @@ export default function LightningRound({
 
   // Drill sounds no-op unless the game is flagged active (see useDrillGameActive)
   useDrillGameActive(phase === 'playing');
+  // In-game music bed while playing; restored to the prior track on exit.
+  useDrillMusic(phase === 'playing');
 
-  // Final-seconds urgency cue — fires once when the clock crosses 5s
+  // Players who find time pressure stressful can mute the urgency cue entirely.
+  const suppressTimerUrgency = useSuppressTimerUrgency();
+
+  // Final-seconds urgency cue — a soft tick (not an alarm), fires once when the
+  // clock crosses 5s, and only when the player hasn't suppressed timer urgency.
   useEffect(() => {
-    if (phase === 'playing' && timeRemaining === 5) {
+    if (phase === 'playing' && timeRemaining === 5 && !suppressTimerUrgency) {
       playTimerUrgentSound();
     }
-  }, [phase, timeRemaining, playTimerUrgentSound]);
+  }, [phase, timeRemaining, suppressTimerUrgency, playTimerUrgentSound]);
 
   // Start game
   const startGame = useCallback(() => {

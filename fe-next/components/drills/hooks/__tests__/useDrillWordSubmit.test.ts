@@ -20,7 +20,7 @@ function makeProps(overrides: Partial<UseDrillWordSubmitProps> = {}): UseDrillWo
     wordsFound: [],
     phase: 'playing',
     playingPhase: 'playing',
-    playErrorSound: vi.fn(),
+    playWordRejectedSound: vi.fn(),
     t: (key: string) => key,
     ...overrides,
   };
@@ -66,42 +66,42 @@ describe('useDrillWordSubmit', () => {
 
     it('rejects word not on board and plays error sound', () => {
       mockIsWordOnBoard.mockReturnValue(false);
-      const playErrorSound = vi.fn();
+      const playWordRejectedSound = vi.fn();
       const { result } = renderHook(() =>
-        useDrillWordSubmit(makeProps({ playErrorSound }))
+        useDrillWordSubmit(makeProps({ playWordRejectedSound }))
       );
       const res = result.current.validateWord('cat');
       expect(res.valid).toBe(false);
       expect(res.error).toBe('brain.drills.errors.notOnBoard');
-      expect(playErrorSound).toHaveBeenCalled();
+      expect(playWordRejectedSound).toHaveBeenCalled();
     });
 
     it('rejects duplicate word and plays error sound', () => {
-      const playErrorSound = vi.fn();
+      const playWordRejectedSound = vi.fn();
       const { result } = renderHook(() =>
-        useDrillWordSubmit(makeProps({ wordsFound: ['CAT'], playErrorSound }))
+        useDrillWordSubmit(makeProps({ wordsFound: ['CAT'], playWordRejectedSound }))
       );
       const res = result.current.validateWord('cat');
       expect(res.valid).toBe(false);
       expect(res.error).toBe('brain.drills.errors.alreadyFound');
-      expect(playErrorSound).toHaveBeenCalled();
+      expect(playWordRejectedSound).toHaveBeenCalled();
     });
 
     it('rejects word not in available set and plays error sound', () => {
-      const playErrorSound = vi.fn();
+      const playWordRejectedSound = vi.fn();
       const { result } = renderHook(() =>
-        useDrillWordSubmit(makeProps({ playErrorSound }))
+        useDrillWordSubmit(makeProps({ playWordRejectedSound }))
       );
       const res = result.current.validateWord('dog');
       expect(res.valid).toBe(false);
       expect(res.error).toBe('brain.drills.errors.invalidWord');
-      expect(playErrorSound).toHaveBeenCalled();
+      expect(playWordRejectedSound).toHaveBeenCalled();
     });
 
-    it('does not crash when playErrorSound is undefined', () => {
+    it('does not crash when playWordRejectedSound is undefined', () => {
       mockIsWordOnBoard.mockReturnValue(false);
       const { result } = renderHook(() =>
-        useDrillWordSubmit(makeProps({ playErrorSound: undefined }))
+        useDrillWordSubmit(makeProps({ playWordRejectedSound: undefined }))
       );
       const res = result.current.validateWord('cat');
       expect(res.valid).toBe(false);

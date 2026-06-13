@@ -9,6 +9,7 @@ import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormin
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { useDrillGameActive } from '@/hooks/useDrillGameActive';
+import { useDrillMusic } from '@/hooks/useDrillMusic';
 import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import PatternSwitcherCompletePhase from './PatternSwitcherCompletePhase';
@@ -60,7 +61,7 @@ export default function PatternSwitcher({
 }: PatternSwitcherProps) {
   const { t, dir } = useLanguage();
   const {
-    playErrorSound,
+    playWordRejectedSound,
     playDrillStartSound,
     playDrillCompleteSound,
     playWordAcceptedSound,
@@ -95,6 +96,8 @@ export default function PatternSwitcher({
 
   // Drill sounds no-op unless the game is flagged active (see useDrillGameActive)
   useDrillGameActive(phase === 'playing' || phase === 'feedback');
+  // In-game music bed while playing; restored to the prior track on exit.
+  useDrillMusic(phase === 'playing' || phase === 'feedback');
 
   // Generate available lengths from words that actually exist on the board
   const availableLengths = [...new Set(availableWords.map(w => w.word.length))].sort();
@@ -163,7 +166,7 @@ export default function PatternSwitcher({
         message: t('playerView.wordAlreadyFound'),
         timestamp: now,
       });
-      playErrorSound?.();
+      playWordRejectedSound?.();
       return;
     }
 
@@ -177,7 +180,7 @@ export default function PatternSwitcher({
         message: t('playerView.wordNotInList'),
         timestamp: now,
       });
-      playErrorSound?.();
+      playWordRejectedSound?.();
       return;
     }
 
@@ -235,7 +238,7 @@ export default function PatternSwitcher({
         message: t('brain.drills.wrongLength', { length: requiredLength }),
         timestamp: now,
       });
-      playErrorSound?.();
+      playWordRejectedSound?.();
 
       setTimeout(() => {
         setCurrentFeedback(null);
@@ -244,7 +247,7 @@ export default function PatternSwitcher({
         }
       }, 800);
     }
-  }, [phase, availableWords, requiredLength, patternIndex, pattern, lives, generatePattern, playErrorSound, playWordAcceptedSound, playPerfectWordSound, t]);
+  }, [phase, availableWords, requiredLength, patternIndex, pattern, lives, generatePattern, playWordRejectedSound, playWordAcceptedSound, playPerfectWordSound, t]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {

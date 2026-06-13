@@ -8,6 +8,7 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 
 // Mock framer-motion
+vi.mock('@/hooks/useDrillMusic', () => ({ useDrillMusic: () => {} }));
 vi.mock('framer-motion', () => ({
   m: {
     button: ({ children, className, onClick, ...props }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void }) => (

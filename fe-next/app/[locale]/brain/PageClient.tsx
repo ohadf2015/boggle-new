@@ -398,22 +398,32 @@ export default function BrainTrainingPageClient() {
         backText={t('common.back')}
       />
 
-      {/* Main Content */}
+      {/* Main Content — PLAY-FIRST order: the drill picker is the primary
+          action and leads the page. Score + cognitive analytics follow below
+          for players who want to dig in. (2026-06-13 impeccable overhaul) */}
       <div className="px-4 py-6 pb-24 space-y-6 max-w-4xl mx-auto flex-1">
-        {/* Brain Score Hero */}
+        {/* Personalized "play this next" nudge — a single targeted CTA that
+            sits directly above the full picker to guide the weakest domain. */}
+        {brainScore.gamesAnalyzed >= 1 && (
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <PersonalizedDrillRecommendation
+              domains={brainScore.domains}
+              gamesPlayed={brainScore.gamesAnalyzed}
+            />
+          </m.div>
+        )}
+
+        {/* Quick Drills — THE ACTION. First thing the player sees + taps. */}
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
         >
-          <BrainScoreHero
-            score={brainScore.overallScore}
-            tier={brainScore.tier}
-            tierProgress={brainScore.tierProgress}
-            gamesAnalyzed={brainScore.gamesAnalyzed}
-            drillsCompleted={brainScore.drillsCompleted}
-            onShare={() => setShowShareCard(true)}
-          />
+          <QuickDrillsSection drillProgress={drillProgress} />
         </m.div>
 
         {/* Welcome Back Card (for returning users after 3+ days) */}
@@ -421,7 +431,7 @@ export default function BrainTrainingPageClient() {
           <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.05 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
           >
             <WelcomeBackCard
               daysSinceLastActivity={welcomeBackData.daysSinceLastActivity}
@@ -434,31 +444,36 @@ export default function BrainTrainingPageClient() {
           </m.div>
         )}
 
+        {/* Brain Score Hero — your standings, demoted below the action. */}
+        <m.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.12 }}
+        >
+          <BrainScoreHero
+            score={brainScore.overallScore}
+            tier={brainScore.tier}
+            tierProgress={brainScore.tierProgress}
+            gamesAnalyzed={brainScore.gamesAnalyzed}
+            drillsCompleted={brainScore.drillsCompleted}
+            onShare={() => setShowShareCard(true)}
+          />
+        </m.div>
+
         {/* Radar Chart */}
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
         >
           <CognitiveRadarChart domains={brainScore.domains} />
         </m.div>
-
-        {/* Progress History Chart - only show if there's meaningful history */}
-        {brainScoreHistory.length >= 2 && (
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.12 }}
-          >
-            <BrainScoreHistoryChart history={brainScoreHistory} />
-          </m.div>
-        )}
 
         {/* Cognitive Domains */}
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
+          transition={{ duration: 0.3, delay: 0.18 }}
         >
           <CognitiveDomainGrid
             domains={brainScore.domains}
@@ -467,28 +482,16 @@ export default function BrainTrainingPageClient() {
           />
         </m.div>
 
-        {/* Personalized Drill Recommendation */}
-        {brainScore.gamesAnalyzed >= 1 && (
+        {/* Progress History Chart - only show if there's meaningful history */}
+        {brainScoreHistory.length >= 2 && (
           <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.18 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
           >
-            <PersonalizedDrillRecommendation
-              domains={brainScore.domains}
-              gamesPlayed={brainScore.gamesAnalyzed}
-            />
+            <BrainScoreHistoryChart history={brainScoreHistory} />
           </m.div>
         )}
-
-        {/* Quick Drills */}
-        <m.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <QuickDrillsSection drillProgress={drillProgress} />
-        </m.div>
 
         {/* Scientific Tips */}
         <m.div
@@ -498,32 +501,6 @@ export default function BrainTrainingPageClient() {
         >
           <ScientificTipsCarousel />
         </m.div>
-
-        {/* Empty State for Users with Zero Games */}
-        {brainScore.gamesAnalyzed === 0 && (
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
-            )}
-          >
-            <Brain className="w-16 h-16 mx-auto mb-4 text-neo-cyan" />
-            <h2 className={cn(
-              'text-xl font-bold mb-2',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.empty.title')}
-            </h2>
-            <p className={cn(
-              'text-sm',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
-            )}>
-              {t('brain.empty.description')}
-            </p>
-          </m.div>
-        )}
       </div>
 
       {/* First Game Celebration Modal */}

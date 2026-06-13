@@ -269,6 +269,100 @@ describe('BrainTrainingPage - Loading States', () => {
       expect(screen.getByText('auth.signIn')).toBeInTheDocument();
     });
 
+    // --- Play-first layout (2026-06-13 impeccable overhaul) ---------------
+    // User ask: "bring up the action we want the player to click (right now
+    // choosing the game is in the bottom)". The drill picker (QuickDrillsSection)
+    // must render ABOVE the stats stack (Brain Score Hero, cognitive profile),
+    // and the redundant duplicate empty-state card must be gone.
+    const authedUser = {
+      user: { id: 'user-1' } as any,
+      profile: { id: 'user-1', username: 'test' } as any,
+      rankedProgress: null,
+      loading: false,
+      isSupabaseEnabled: true,
+      isAuthenticated: true,
+      isGuest: false,
+      isAdmin: false,
+      isTeacher: false,
+      canPlayRanked: false,
+      gamesUntilRanked: 10,
+      needsProfileCustomization: false,
+      setupProfile: vi.fn(),
+      updateProfile: vi.fn(),
+      refreshProfile: vi.fn(),
+    };
+
+    const makeBrainScore = (gamesAnalyzed: number) => ({
+      id: 'bs-1',
+      userId: 'user-1',
+      overallScore: 642,
+      tier: 'advanced' as const,
+      tierProgress: 50,
+      gamesAnalyzed,
+      drillsCompleted: 3,
+      currentStreak: 2,
+      longestStreak: 5,
+      lastActivityAt: null,
+      createdAt: '2026-06-01T00:00:00Z',
+      updatedAt: '2026-06-12T00:00:00Z',
+      domains: {
+        processingSpeed: { score: 60, trend: 'improving' as const },
+        workingMemory: { score: 55, trend: 'stable' as const },
+        attention: { score: 70, trend: 'improving' as const },
+        flexibility: { score: 65, trend: 'declining' as const },
+        vocabulary: { score: 80, trend: 'improving' as const },
+      },
+    });
+
+    it('renders the drill picker ABOVE the brain-score stats (play-first)', async () => {
+      mockUseAuth.mockReturnValue(authedUser);
+      mockUseBrainScore.mockReturnValue({
+        brainScore: makeBrainScore(8) as any,
+        recentGameScores: [],
+        drillProgress: [],
+        brainScoreHistory: [],
+        isLoading: false,
+        error: null,
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
+      });
+
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
+
+      const picker = await screen.findByText('brain.quickDrills');
+      const heroLabel = screen.getByText('brain.score');
+
+      // The picker node must appear before the hero node in document order.
+      // Node.compareDocumentPosition returns DOCUMENT_POSITION_FOLLOWING (4)
+      // when `heroLabel` follows `picker`.
+      const rel = picker.compareDocumentPosition(heroLabel);
+      expect(rel & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('does not render a redundant empty-state card for a zero-games dashboard', async () => {
+      // Two code paths once rendered the same "Let's Train" card (the
+      // `!brainScore` early-return and the `gamesAnalyzed === 0` block). The
+      // picker-at-top now IS the call to action, so the duplicate must be gone.
+      mockUseAuth.mockReturnValue(authedUser);
+      mockUseBrainScore.mockReturnValue({
+        brainScore: makeBrainScore(0) as any,
+        recentGameScores: [],
+        drillProgress: [],
+        brainScoreHistory: [],
+        isLoading: false,
+        error: null,
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
+      });
+
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
+
+      // Picker present (the real CTA)...
+      await screen.findByText('brain.quickDrills');
+      // ...and no separate redundant empty-state title card.
+      expect(screen.queryByText('brain.empty.title')).not.toBeInTheDocument();
+    });
+
     it('still surfaces the drill grid when the score fetch fails offline (graceful degrade)', async () => {
       // On a flight the Supabase score fetch fails. The hub must NOT dead-end on
       // an error card — the 5 drills are bundled + client-side, so they stay
