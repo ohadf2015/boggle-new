@@ -23,6 +23,7 @@ import { LandingBlogSection } from './LandingBlogSection';
 import { LandingHero } from './LandingHero';
 import { LandingHeroVariant } from './LandingHeroVariant';
 import { LandingCardsSkeleton } from './LandingCardsSkeleton';
+import { LandingCubesSkeleton } from './LandingCubesSkeleton';
 // SSR enabled: receives initialData (gamesToday) at server time → no skeleton flash above the fold.
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
   loading: () => <div className="h-10 w-full max-w-4xl mx-auto" />,
@@ -252,6 +253,10 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
             dailyChallengeStats={dailyChallengeStats}
             cardOrder={initialData?.cardOrder}
           />
+        ) : isCubesLanding ? (
+          // cubes variant loads into the bento → its skeleton must match that
+          // shape, not the control card column (else a layout jump on swap).
+          <LandingCubesSkeleton />
         ) : (
           <LandingCardsSkeleton isAdmin={isAdmin} />
         )}

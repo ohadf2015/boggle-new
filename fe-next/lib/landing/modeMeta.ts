@@ -46,6 +46,16 @@ export interface ModeMetaEntry {
    * Only a tight, consistent set of public modes gets one (perf + brand).
    */
   readonly genIcon?: string;
+  /**
+   * Per-asset CSS scale for the cube art (default 1). The kawaii stickers are
+   * framed inconsistently — blast/daily/arena/adventure bleed their FX to the
+   * edges, while practice/connections/brainGym/wordCraft float small + centred
+   * in a wide navy margin. A scale >1 grows ONLY the small ones so every tile
+   * reads full-bleed; the baked navy bg is identical to the tile, so the scale
+   * crops invisible margin (no compositing, no seam). NEVER set on a bleeding
+   * asset — it would clip the explosion / sunburst art.
+   */
+  readonly imgScale?: number;
 }
 
 export const MODE_META: Record<string, ModeMetaEntry> = {
@@ -56,6 +66,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   practice: {
     titleKey: 'landing.practice', descKey: 'landing.practiceDesc', path: '/practice',
     Icon: BookOpen, variant: 'cyan', modeImage: '/modes/practice.png', genIcon: '/modes/cubes/practice.png',
+    imgScale: 1.6, // sticker fills ~47% of frame → scale up to read full-bleed
   },
   blast: {
     titleKey: 'landing.blastMode', descKey: 'landing.blastModeDesc', path: '/blast',
@@ -68,14 +79,17 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   connections: {
     titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/play',
     Icon: Link2, variant: 'blue', badge: 'NEW', modeImage: '/modes/connections.png', genIcon: '/modes/cubes/connections.png',
+    imgScale: 1.6, // ~49% framed → fill
   },
   brainGym: {
     titleKey: 'landing.brainTraining', descKey: 'landing.brainTrainingDesc', path: '/brain',
     Icon: Brain, variant: 'purple', modeImage: '/modes/practice.png', genIcon: '/modes/cubes/braingym.png',
+    imgScale: 1.4, // taller char (~53% / tall) → gentler scale so the brain stays in-frame
   },
   wordCraft: {
     titleKey: 'wordcraft.modeTitle', descKey: 'wordcraft.modeDesc', path: '/word-craft',
     Icon: Layers, variant: 'orange', badge: 'NEW', modeImage: '/modes/word-craft.png', genIcon: '/modes/cubes/wordcraft.png',
+    imgScale: 1.45, // ~55% framed → fill
   },
   crossword: {
     titleKey: 'crossword.name', descKey: 'crossword.tagline', path: '/crossword',
@@ -125,6 +139,8 @@ export interface ModeCubeModel {
   readonly variant: ModeCubeVariant;
   readonly Icon: LucideIcon;
   readonly genIcon?: string;
+  /** per-asset CSS scale for the cube art (default 1) — see ModeMetaEntry.imgScale */
+  readonly imgScale?: number;
   readonly badge?: string;
   /** "Start Here" first-timer spotlight */
   readonly highlighted?: boolean;

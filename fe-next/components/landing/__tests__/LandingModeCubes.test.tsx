@@ -137,4 +137,51 @@ describe('LandingModeCubes', () => {
     expect(new Set([restingShadow(arena), restingShadow(practice), restingShadow(blast)]).size).toBe(3);
     expect(arena.className).not.toMatch(/(?:^|\s)shadow-hard(?=\s|$)/);
   });
+
+  // ---- art framing: mascots fill the tile (the homepage "images take the width") ----
+
+  const artModels = [
+    model({ key: 'arena', title: 'Arena', variant: 'pink', role: 'anchor', genIcon: '/modes/cubes/arena.png' }),
+    model({ key: 'connections', title: 'Connections', variant: 'blue', genIcon: '/modes/cubes/connections.png', imgScale: 1.6 }),
+    model({ key: 'blast', title: 'Blast', variant: 'orange', genIcon: '/modes/cubes/blast.png' }),
+  ];
+
+  it('lets the anchor art fill the whole tile (object-cover, no letterbox bars)', () => {
+    const { container } = renderCubes({ models: artModels });
+    const anchor = screen.getByTestId('mode-cube-anchor');
+    const img = anchor.querySelector('img');
+    expect(img, 'anchor renders its art').toBeTruthy();
+    // cover fills the non-square (16/9) phone anchor edge-to-edge; contain would
+    // letterbox the square mascot onto navy side-bars (the bug we are fixing).
+    expect(img!.className).toMatch(/object-cover/);
+    expect(img!.className).not.toMatch(/object-contain/);
+    void container;
+  });
+
+  it('scales up a small-framed mascot so it fills its cube', () => {
+    renderCubes({ models: artModels });
+    const conn = screen.getByRole('link', { name: /Connections/i });
+    // the per-asset scale is exposed as a CSS var the image consumes
+    expect(conn.style.getPropertyValue('--cube-img-scale')).toBe('1.6');
+    const img = conn.querySelector('img');
+    expect(img!.className).toMatch(/scale-\[var\(--cube-img-scale\)\]/);
+  });
+
+  it('defaults edge-bleeding art to scale 1 (no clipping of FX)', () => {
+    renderCubes({ models: artModels });
+    const blast = screen.getByRole('link', { name: /Blast/i });
+    expect(blast.style.getPropertyValue('--cube-img-scale')).toBe('1');
+  });
+
+  it('tints each art cube with its own mode-hue glow over the dead navy', () => {
+    renderCubes({ models: artModels });
+    const glows = screen.getAllByTestId('cube-glow');
+    // one per art cube (anchor + 2) — fills empty navy with mode colour
+    expect(glows.length).toBe(3);
+  });
+
+  it('does NOT add a glow to icon-fallback cubes (no art behind it to tint)', () => {
+    renderCubes(); // default models have no genIcon
+    expect(screen.queryByTestId('cube-glow')).not.toBeInTheDocument();
+  });
 });

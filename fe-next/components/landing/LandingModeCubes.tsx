@@ -38,17 +38,21 @@ interface VariantStyle {
   /** coloured hard shadow on hover (same hue, kept for emphasis under the lift) */
   shadow: string;
   ring: string;
+  /** mode-hue rgba fed to `--cube-glow` — the screen-blended ambient wash that
+      tints the dead navy around the mascot (see `.cube-glow` in globals.css).
+      Tuned per hue: bright accents (cyan/lime) stay lower so they don't blow out. */
+  glow: string;
 }
 
 // Mirrors ModeCard's variant palette. Each mode gets a colour-matched hard shadow
 // at rest (Netflix-style: dark tile, distinct coloured edge) — NOT a saturated fill.
 const VARIANT: Record<ModeCubeVariant, VariantStyle> = {
-  pink:   { fill: 'bg-neo-pink',   ink: 'text-neo-navy',  chip: 'bg-neo-pink',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-pink',   shadow: 'group-hover:shadow-hard-pink',   ring: 'focus-visible:ring-neo-pink' },
-  cyan:   { fill: 'bg-neo-cyan',   ink: 'text-neo-navy',  chip: 'bg-neo-cyan',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-cyan',   shadow: 'group-hover:shadow-hard-cyan',   ring: 'focus-visible:ring-neo-cyan' },
-  purple: { fill: 'bg-neo-purple', ink: 'text-neo-white', chip: 'bg-neo-purple', chipInk: 'text-neo-white', restShadow: 'shadow-hard-purple', shadow: 'group-hover:shadow-hard-purple', ring: 'focus-visible:ring-neo-purple' },
-  orange: { fill: 'bg-neo-orange', ink: 'text-neo-navy',  chip: 'bg-neo-orange', chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-orange', shadow: 'group-hover:shadow-hard-orange', ring: 'focus-visible:ring-neo-orange' },
-  lime:   { fill: 'bg-neo-lime',   ink: 'text-neo-navy',  chip: 'bg-neo-lime',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-lime',   shadow: 'group-hover:shadow-hard-lime',   ring: 'focus-visible:ring-neo-lime' },
-  blue:   { fill: 'bg-blue-500',   ink: 'text-neo-white', chip: 'bg-blue-500',   chipInk: 'text-neo-white', restShadow: 'shadow-hard-blue',   shadow: 'group-hover:shadow-hard-blue',   ring: 'focus-visible:ring-blue-400' },
+  pink:   { fill: 'bg-neo-pink',   ink: 'text-neo-navy',  chip: 'bg-neo-pink',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-pink',   shadow: 'group-hover:shadow-hard-pink',   ring: 'focus-visible:ring-neo-pink',   glow: 'rgba(255,20,147,0.42)' },
+  cyan:   { fill: 'bg-neo-cyan',   ink: 'text-neo-navy',  chip: 'bg-neo-cyan',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-cyan',   shadow: 'group-hover:shadow-hard-cyan',   ring: 'focus-visible:ring-neo-cyan',   glow: 'rgba(0,255,255,0.34)' },
+  purple: { fill: 'bg-neo-purple', ink: 'text-neo-white', chip: 'bg-neo-purple', chipInk: 'text-neo-white', restShadow: 'shadow-hard-purple', shadow: 'group-hover:shadow-hard-purple', ring: 'focus-visible:ring-neo-purple', glow: 'rgba(139,92,246,0.5)' },
+  orange: { fill: 'bg-neo-orange', ink: 'text-neo-navy',  chip: 'bg-neo-orange', chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-orange', shadow: 'group-hover:shadow-hard-orange', ring: 'focus-visible:ring-neo-orange', glow: 'rgba(255,107,53,0.42)' },
+  lime:   { fill: 'bg-neo-lime',   ink: 'text-neo-navy',  chip: 'bg-neo-lime',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-lime',   shadow: 'group-hover:shadow-hard-lime',   ring: 'focus-visible:ring-neo-lime',   glow: 'rgba(191,255,0,0.36)' },
+  blue:   { fill: 'bg-blue-500',   ink: 'text-neo-white', chip: 'bg-blue-500',   chipInk: 'text-neo-white', restShadow: 'shadow-hard-blue',   shadow: 'group-hover:shadow-hard-blue',   ring: 'focus-visible:ring-blue-400',   glow: 'rgba(59,130,246,0.42)' },
 };
 
 // Badge wears the mode colour (not navy) so every flagged cube pops a chip of
@@ -122,7 +126,7 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
       aria-disabled={locked || undefined}
       data-testid={anchor ? 'mode-cube-anchor' : 'mode-cube'}
       data-cube-key={model.key}
-      style={{ animationDelay: `${Math.min(index, 8) * 0.05}s` }}
+      style={{ animationDelay: `${Math.min(index, 8) * 0.05}s`, ['--cube-img-scale' as string]: model.imgScale ?? 1 }}
       className={cn(
         'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-neo-thick border-black transition-transform duration-150',
         // per-mode coloured hard shadow at rest → the bento reads "colour-coded" at a
@@ -144,10 +148,11 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
         !hasArt && (anchor ? cn(v.fill, v.ink) : 'bg-neo-navy-light'),
         // With art: EVERY cube sits on the same dark navy so the colour comes from
         // the mascot art, not the tile (the homepage brief — dark base, image is the
-        // colour). 1×1 cubes are square → `object-cover` fills cleanly. The anchor is
-        // non-square on phones → `object-contain` below letterboxes onto the same
-        // navy (invisible bars), so the mascot is never cropped. Per-mode identity
-        // now reads only from the art + the quiet coloured hover shadow (`v.shadow`).
+        // colour). Both 1×1 cubes AND the anchor use `object-cover` so the art fills
+        // edge-to-edge (no letterbox bars): the anchor's arena sticker is LANDSCAPE
+        // (wider than tall) so cover crops only a sliver, and the baked navy bg is
+        // seamless. Per-asset `--cube-img-scale` then grows the small-framed mascots
+        // (see modeMeta.imgScale) so every tile reads full-bleed, not a tiny floater.
         hasArt && 'bg-neo-navy',
         model.highlighted && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
         locked && 'cursor-not-allowed',
@@ -168,9 +173,21 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
             sizes={anchor ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 50vw, 25vw'}
             onError={() => setImgFailed(true)}
             className={cn(
-              anchor ? 'object-contain' : 'object-cover',
-              'transition-transform duration-200 motion-safe:group-hover:scale-[1.06] motion-safe:group-focus-visible:scale-[1.06]',
+              // cover everywhere now (anchor included) → fills the tile, no navy bars.
+              'object-cover',
+              // per-asset rest scale (var set on the Link) fills small mascots; hover
+              // adds a further 6% pop. calc keeps the two multiplicative.
+              'scale-[var(--cube-img-scale)] transition-transform duration-200',
+              'motion-safe:group-hover:scale-[calc(var(--cube-img-scale)*1.06)] motion-safe:group-focus-visible:scale-[calc(var(--cube-img-scale)*1.06)]',
             )}
+          />
+          {/* per-mode ambient glow — tints the dead navy margin with the mode hue
+              (screen-blended, subtle). Sits above the art, below sheen + content. */}
+          <span
+            aria-hidden="true"
+            data-testid="cube-glow"
+            style={{ ['--cube-glow' as string]: v.glow }}
+            className="cube-glow pointer-events-none absolute inset-0 z-[1]"
           />
           {/* scrim so the title stays legible over the art */}
           <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-neo-navy via-neo-navy/65 to-transparent" />

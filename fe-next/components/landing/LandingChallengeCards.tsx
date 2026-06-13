@@ -546,7 +546,7 @@ export function LandingChallengeCards({
       };
       const base: ModeCubeModel = {
         key, title: t(meta.titleKey), href, variant: meta.variant, Icon: meta.Icon,
-        genIcon: meta.genIcon, badge: meta.badge, role, onClick,
+        genIcon: meta.genIcon, imgScale: meta.imgScale, badge: meta.badge, role, onClick,
       };
       if (key === 'arena') {
         const arenaHighlight = isFirstTimer && !isNewbie && !practiceWinsHighlight;

@@ -4684,6 +4684,18 @@ html[data-cosy='true'] .animate-neo-press {
   }
 }
 
+/* Per-mode ambient glow — a soft radial wash of the mode's own hue, screen-blended
+   over the cube art so the dead navy margins around a mascot pick up colour (the
+   homepage brief: "coherent chaos", colour-coded modes) WITHOUT re-saturating the
+   whole tile the way the legacy colour-fill cards did. The mascot itself stays the
+   hero; only the empty navy lifts. Static (no motion gate needed). The hue is fed
+   per-cube via the `--cube-glow` custom property set on the element. */
+.cube-glow {
+  background: radial-gradient(120% 90% at 50% 16%, var(--cube-glow, transparent), transparent 62%);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+
 /* Floating hero letter-tiles — gentle vertical bob for the energetic (cubes)
    landing hero. translateY only (rotation lives on a static wrapper so it isn't
    clobbered). Decorative; holds still under prefers-reduced-motion. */
