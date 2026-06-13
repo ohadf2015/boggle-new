@@ -124,24 +124,40 @@ PID_TSC=$!
   # next starts, so peak memory is ~1/N. Typical pushes touch no hub and run a
   # single fast shard (no startup tax).
   #
-  # MEGA-HUB tier (2026-06-13, exit-144 OOM fix): `translations/*.js` are the
-  # widest hub of all — imported by LanguageContext, which is imported by nearly
-  # every component that calls t(). A one-line translation edit therefore fans
-  # `--changed` out FURTHER than touching LanguageContext directly, yet the old
-  # HUB_REGEX matched neither `translations/` nor a bare LanguageContext import
-  # cone aggressively enough → a translation-touching push ran UNSHARDED
-  # (SHARDS=1) and OOM-killed at exit 144. Give the mega-hubs more shards (8)
-  # since their dependent cone is the largest in the repo; ordinary hubs keep 4.
+  # Shard count = MEASURED changed-cone size, not a filename guess.
+  #
+  # History: sharding used to be decided by matching the changed filename against
+  # a hardcoded hub allowlist (HUB_REGEX/MEGA_HUB_REGEX). That mis-fires for any
+  # file NOT on the list whose `--changed` cone is nonetheless huge — e.g. a test
+  # that imports a heavy component (PracticeWheelSandbox → WordWheelGame). Such a
+  # push matched no hub → ran UNSHARDED (SHARDS=1) → OOM-killed at exit 144
+  # (2026-06-13). The fix: ask vitest how many test files `--changed` actually
+  # pulls in (`list --filesOnly` resolves the related-files graph WITHOUT
+  # importing test bodies, so it's cheap), then shard proportionally. Now the
+  # shard count tracks the real fan-out regardless of which file triggered it.
+  FILES_PER_SHARD=120   # ~proven-safe batch per 8GB process (mega-hub: 1000+/8 ≈ 125)
+  MAX_SHARDS=16
   MEGA_HUB_REGEX='(^|/)translations/|(^|/)LanguageContext\.(ts|tsx)$'
   HUB_REGEX='(^|/)experiments\.(ts|tsx)$|(^|/)contexts/|(^|/)hooks/use[A-Z]'
-  if echo "$FRONTEND_FILES" | grep -qE "$MEGA_HUB_REGEX"; then
-    SHARDS=8
-    echo "ℹ️  Mega-hub file changed (translations/LanguageContext) — sharding frontend tests into $SHARDS processes to bound memory."
-  elif echo "$FRONTEND_FILES" | grep -qE "$HUB_REGEX"; then
-    SHARDS=4
-    echo "ℹ️  Hub file changed — sharding frontend tests into $SHARDS processes to bound memory."
-  else
-    SHARDS=1
+  SHARDS=1
+  if [ -n "$FRONTEND_FILES" ]; then
+    CONE_COUNT=$(./node_modules/.bin/vitest list --filesOnly --changed origin/master --passWithNoTests 2>/dev/null \
+      | grep -cE '\.(test|spec)\.(ts|tsx|js|jsx)$')
+    [ -z "$CONE_COUNT" ] && CONE_COUNT=0
+    if [ "$CONE_COUNT" -gt 0 ]; then
+      SHARDS=$(( (CONE_COUNT + FILES_PER_SHARD - 1) / FILES_PER_SHARD ))
+      [ "$SHARDS" -lt 1 ] && SHARDS=1
+      [ "$SHARDS" -gt "$MAX_SHARDS" ] && SHARDS=$MAX_SHARDS
+      [ "$SHARDS" -gt 1 ] && echo "ℹ️  Changed-cone = $CONE_COUNT test files — sharding frontend tests into $SHARDS processes (~$FILES_PER_SHARD/shard) to bound memory."
+    else
+      # Measurement unavailable (list errored / empty) → fall back to the old
+      # filename heuristic so a known hub never runs an unbounded single shard.
+      if echo "$FRONTEND_FILES" | grep -qE "$MEGA_HUB_REGEX"; then
+        SHARDS=8; echo "ℹ️  Cone unmeasured; mega-hub file changed — sharding into $SHARDS processes."
+      elif echo "$FRONTEND_FILES" | grep -qE "$HUB_REGEX"; then
+        SHARDS=4; echo "ℹ️  Cone unmeasured; hub file changed — sharding into $SHARDS processes."
+      fi
+    fi
   fi
 
   # Run a sharded vitest set; each shard is a fresh process (heap freed between).
