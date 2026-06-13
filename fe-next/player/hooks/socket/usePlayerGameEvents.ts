@@ -21,7 +21,7 @@ import {
 import { useLetterGrid, useGameLanguage, useShowStartAnimation, useGameActions, useGameStore } from '@/hooks/gameState';
 import type { BlastComboSyncPayload, StartGameBroadcast, PlayerResultPayload } from '@/shared/types/socket';
 import type { BlastTileState } from '@/shared/types/blast';
-import type { BlastTileOverlay, LetterFeedback, BlastPlayerStats, WheelRushPlayerStats } from '@/shared/types/game';
+import type { BlastTileOverlay, LetterFeedback, BlastPlayerStats, WheelRushPlayerStats, LeaderboardEntry } from '@/shared/types/game';
 import type { LetterGrid, Language } from '@/types';
 import type { WordToVote } from '@/player/types';
 import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
@@ -43,6 +43,8 @@ interface StartGameBroadcastExt extends StartGameBroadcast {
   wordHuntEliminatedPlayers?: string[];
   /** Reconnect-only: player's own found-word list, for UI replay */
   myFoundWords?: string[];
+  /** Reconnect-only: authoritative leaderboard, for atomic score restore */
+  leaderboard?: LeaderboardEntry[];
 }
 
 interface ValidatedScoresPayload {
@@ -375,6 +377,14 @@ export function usePlayerGameEvents({
           validated: true,
           isDuplicate: false,
         }));
+      }
+      if (isReconnect && ext.leaderboard && ext.leaderboard.length > 0) {
+        // Atomic score restore. Total score lives ONLY in leaderboard[]; pulling
+        // it from the reconnect payload here (same batched setState as the board)
+        // means a dropped/raced/reset separate updateLeaderboard never strands the
+        // player at "0 PUNTOS". Guarded on isReconnect so a fresh start — which
+        // legitimately has no scores yet — is never stomped.
+        storeUpdates.leaderboard = ext.leaderboard;
       }
       if (data.letterGrid) storeUpdates.letterGrid = data.letterGrid;
       if (data.timerSeconds) {

@@ -478,6 +478,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
           wordHuntPlayerLives: game.wordHuntState.playerLives || {},
         } : {}),
         ...(game.goldenLetters?.length ? { goldenLetters: game.goldenLetters } : {}),
+        // Carry the leaderboard in-payload so the score restores atomically with
+        // the board (see updateLeaderboard belt below for the ordering rationale).
+        leaderboard: getLeaderboard(gameCode),
       });
 
       // Restore the player's live score. The board/timer ride on `startGame`,

@@ -238,6 +238,10 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
       // Replay player's own found words so the in-game word panel isn't blank
       // after reconnect. Score totals come via updateLeaderboard below.
       myFoundWords: game.playerWords?.[username] || [],
+      // Carry the authoritative leaderboard INSIDE startGame too, so the client
+      // restores the score in the same batched setState as the board — robust if
+      // the separate updateLeaderboard below is dropped, raced, or reset away.
+      leaderboard: getLeaderboard(gameCode),
     };
 
     // Include blast mode state for reconnecting players. Each player evolves an

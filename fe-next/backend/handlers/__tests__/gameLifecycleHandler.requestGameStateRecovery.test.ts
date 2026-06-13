@@ -286,6 +286,32 @@ describe('requestGameState — score restore on reconnect', () => {
     });
   });
 
+  it('also carries the leaderboard INSIDE the startGame recovery payload (atomic restore)', () => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue({
+      gameState: 'in-progress',
+      remainingTime: 64,
+      timerSeconds: 120,
+      letterGrid: [[]],
+      language: 'es',
+      minWordLength: 2,
+      gameMode: 'classic',
+      gameSessionId: 1,
+    });
+    mockHasGameTimer.mockReturnValue(true);
+    vi.mocked(getLeaderboard).mockReturnValue([{ username: 'alice', score: 20 }] as never);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestGameState']();
+
+    expect(mockSafeEmit).toHaveBeenCalledWith(
+      socket,
+      'startGame',
+      expect.objectContaining({ leaderboard: [{ username: 'alice', score: 20 }] }),
+    );
+  });
+
   it('does NOT emit updateLeaderboard for a finished game (results path owns the leaderboard)', () => {
     const socket = createSocket();
     mockGetGameBySocketId.mockReturnValue('ABC');

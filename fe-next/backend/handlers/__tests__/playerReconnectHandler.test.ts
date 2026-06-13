@@ -211,6 +211,23 @@ describe('handleReconnection', () => {
     expect(socket.emit).toHaveBeenCalledWith('updateLeaderboard', expect.objectContaining({ leaderboard: [] }));
   });
 
+  // Belt: the authoritative leaderboard rides INSIDE the startGame payload too,
+  // so the client restores the score in the same batched setState as the board —
+  // robust against a dropped/raced/reset separate updateLeaderboard.
+  it('includes the authoritative leaderboard in the startGame payload (atomic score restore)', () => {
+    const game = makeGame({ gameState: 'playing', letterGrid: [['A']], remainingTime: 60 });
+    mockIsInProgress.mockReturnValue(true);
+    mockGetLeaderboard.mockReturnValue([{ username: 'Player1', score: 20 }]);
+    const socket = createMockSocket('socket-new');
+
+    handleReconnection(mockIo, socket, game, 'GAME1', 'Player1');
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      'startGame',
+      expect.objectContaining({ leaderboard: [{ username: 'Player1', score: 20 }] })
+    );
+  });
+
   // 7a. Reconnect must include gameSessionId so client accepts subsequent
   // server timeUpdate ticks (usePlayerGameEvents.ts:398-401 drops stale sessions).
   it('emits startGame with gameSessionId on reconnect to in-progress game', () => {
