@@ -27,6 +27,12 @@ Approach: walked the mode in real Chrome (Playwriter) before touching code, per
    border + `shadow-hard` + press sinks into shadow (`active:translate-y-px`
    + `shadow-hard-pressed`). Palette-independent (helps dark + Cosy). 78 tile/grid tests green.
 
+4. **`43c6d2f48` — fuller upgrade shop.** The shop only rendered upgrades unlocked at the
+   current world, so a new player opened a near-empty modal (world 1 = one Excavation item)
+   and the Mastery tab was hidden. Now all upgrades render; locked ones show greyed,
+   non-purchasable "Unlocks at World N" teasers; all 4 category tabs always show; buyable
+   sorts to top. i18n ×5 (`adventure.upgrades.locked`/`.unlocksAtWorld`). 15 tests + browser-verified.
+
 ## Corrections (important for whoever continues)
 
 - **The "washed-out parchment / low-contrast HUD / off-brand pale world map" I first saw was
@@ -48,12 +54,16 @@ Approach: walked the mode in real Chrome (Playwriter) before touching code, per
 
 ## Backlog — not done (needs a focused, dedicated slice)
 
-- **Boss fight (top ask, "look good / feel like a boss").** Could not assess: gated at
-  level 7 of a world; `/adventure/boss-rush` is locked until all bosses beaten; guest
-  progress is server-side (cookie auth), so reaching one needs play-through or a DB seed.
-  Improving it "to look good" without seeing it live = guessing (advisor: don't). Next step:
-  seed guest progress to world-1 level-7 (or add a dev jump), screenshot the boss
-  (`BossOverlay`, `SegmentedHPBar`, `BossArena`, entrance/defeat cinematics), THEN improve.
+- **Boss fight (top ask, "look good / feel like a boss") — GENUINELY BLOCKED.** Gated at
+  level 7. Confirmed unreachable in a guest session: `/api/adventure/complete` returns **401**
+  (progress requires a logged-in account), `/adventure/boss-rush` is locked until all bosses
+  beaten, and the Playwriter Chrome is a guest (signup modal shown). Reaching a boss needs
+  either logging into the real account + completing 6 levels (alters the user's real progress/
+  leaderboard — declined without explicit OK) or a DB seed of a test account. Improving it
+  blind = guessing (advisor: don't fix look/feel without looking). Next session with a logged-in
+  test account: complete world-1 L1–6 (or seed), screenshot `BossOverlay`/`SegmentedHPBar`/
+  `BossArena`/entrance+defeat cinematics, THEN improve. (My tile-tactility fix already improves
+  the boss board, since bosses reuse the same grid/tiles.)
 - **Level selection "real game feel."** Locked level cards render as thin empty pills —
   assess in dark theme, give them number/lock/stars + neo tactility.
 - **Shop & upgrades depth** (`upgradeConfig.ts`, `AdventureShopFAB`, `AdventureViewModals`).
