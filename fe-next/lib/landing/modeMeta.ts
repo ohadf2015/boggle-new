@@ -48,12 +48,13 @@ export interface ModeMetaEntry {
   readonly genIcon?: string;
   /**
    * Per-asset CSS scale for the cube art (default 1). The kawaii stickers are
-   * framed inconsistently — blast/daily/arena/adventure bleed their FX to the
-   * edges, while practice/connections/brainGym/wordCraft float small + centred
-   * in a wide navy margin. A scale >1 grows ONLY the small ones so every tile
-   * reads full-bleed; the baked navy bg is identical to the tile, so the scale
-   * crops invisible margin (no compositing, no seam). NEVER set on a bleeding
-   * asset — it would clip the explosion / sunburst art.
+   * framed inconsistently — blast/daily/adventure bleed their FX to the
+   * edges, while practice/connections/wordCraft float small + centred
+   * in a wide navy margin. A scale >1 grows the small ones; a scale <1 shrinks
+   * an over-large one (e.g. arena's knights, which the wider 2×2 anchor tile
+   * zooms via object-cover) to restore margin. The baked navy bg is identical
+   * to the tile, so any scale composites seamlessly (no seam). Only caveat: a
+   * scale >1 on a true bleeding asset would clip its FX — keep those at 1.
    */
   readonly imgScale?: number;
 }
@@ -62,6 +63,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   arena: {
     titleKey: 'landing.arena', descKey: 'landing.arenaDesc', path: '/multiplayer',
     Icon: Swords, variant: 'pink', modeImage: '/modes/arena.png', genIcon: '/modes/cubes/arena.png',
+    imgScale: 0.82, // anchor (2×2) tile is wider-than-tall → object-cover zooms the knights+burst and clips the navy margin; scale <1 shrinks the box to restore breathing room (baked navy == tile bg, no seam, no clip)
   },
   practice: {
     titleKey: 'landing.practice', descKey: 'landing.practiceDesc', path: '/practice',
@@ -79,7 +81,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   connections: {
     titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/play',
     Icon: Link2, variant: 'blue', badge: 'NEW', modeImage: '/modes/connections.png', genIcon: '/modes/cubes/connections.png',
-    imgScale: 1.6, // ~49% framed → fill
+    imgScale: 1.15, // subject ~50% framed; 1.6 over-grew it (hard sticker outline crammed the top edge) → gentle bump that reads full-bleed with margin
   },
   brainGym: {
     titleKey: 'landing.brainTraining', descKey: 'landing.brainTrainingDesc', path: '/brain',

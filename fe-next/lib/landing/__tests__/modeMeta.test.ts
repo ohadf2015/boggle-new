@@ -51,22 +51,30 @@ describe('MODE_META — parity with control renderCard', () => {
     expect(genIcon, `${key} genIcon lives under /modes/cubes/`).toMatch(/^\/modes\/cubes\/.+\.png$/);
   });
 
-  // The kawaii cube stickers are not framed consistently. Two groups stay at
-  // natural framing (no imgScale): arena/blast/adventure bleed their FX to the
-  // edges, and brainGym's character is already large — the brain + dumbbell +
-  // feet span ~75% of the tile, so any upscale clips it (top brain / bottom feet).
-  // Only practice/connections/wordCraft float small + centered in a big navy
-  // margin; `imgScale` (a per-asset CSS scale applied in the Cube) grows ONLY
-  // those so every tile reads full-bleed without cropping art.
+  // The kawaii cube stickers are not framed consistently, so imgScale (a
+  // per-asset CSS scale applied in the Cube) normalises them into three groups:
+  //  - FLOATY: subject floats small + centred in a big navy margin → scale up.
+  //  - OVERSIZED: subject reads too large in its tile (arena's knights, zoomed
+  //    by the wider 2×2 anchor's object-cover crop) → scale down to add margin.
+  //  - NATURAL: blast/adventure bleed FX to the edges, brainGym's character
+  //    already spans ~75% → leave at 1 (any change clips FX / character).
   describe('imgScale — per-asset framing normalisation', () => {
     const FLOATY = ['practice', 'connections', 'wordCraft'] as const;
-    const NATURAL = ['arena', 'blast', 'adventure', 'brainGym'] as const;
+    const OVERSIZED = ['arena'] as const;
+    const NATURAL = ['blast', 'adventure', 'brainGym'] as const;
 
     it.each(FLOATY)('small-framed mode %s scales its art up (>1)', (key) => {
       const { imgScale } = MODE_META[key];
       expect(imgScale, `${key} imgScale set`).toBeGreaterThan(1);
       // sanity ceiling — a scale this big would crop the character, not just navy
       expect(imgScale, `${key} imgScale sane`).toBeLessThanOrEqual(1.8);
+    });
+
+    it.each(OVERSIZED)('over-large mode %s scales its art down (<1)', (key) => {
+      const { imgScale } = MODE_META[key];
+      expect(imgScale, `${key} imgScale set`).toBeLessThan(1);
+      // sanity floor — below this the subject would shrink to a postage stamp
+      expect(imgScale, `${key} imgScale sane`).toBeGreaterThanOrEqual(0.6);
     });
 
     it.each(NATURAL)('large/edge-bleeding mode %s is left at natural framing (no imgScale)', (key) => {
