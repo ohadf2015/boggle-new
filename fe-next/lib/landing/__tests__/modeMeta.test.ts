@@ -51,14 +51,16 @@ describe('MODE_META — parity with control renderCard', () => {
     expect(genIcon, `${key} genIcon lives under /modes/cubes/`).toMatch(/^\/modes\/cubes\/.+\.png$/);
   });
 
-  // The kawaii cube stickers are not framed consistently: blast/daily/arena/adventure
-  // bleed their FX to the edges, while practice/connections/brainGym/wordCraft float
-  // small + centered in a big navy margin. `imgScale` (a per-asset CSS scale applied
-  // in the Cube) grows ONLY the small ones so every tile reads full-bleed — scaling the
-  // already-bleeding ones would clip their explosion/sunburst art, so they stay unset.
+  // The kawaii cube stickers are not framed consistently. Two groups stay at
+  // natural framing (no imgScale): arena/blast/adventure bleed their FX to the
+  // edges, and brainGym's character is already large — the brain + dumbbell +
+  // feet span ~75% of the tile, so any upscale clips it (top brain / bottom feet).
+  // Only practice/connections/wordCraft float small + centered in a big navy
+  // margin; `imgScale` (a per-asset CSS scale applied in the Cube) grows ONLY
+  // those so every tile reads full-bleed without cropping art.
   describe('imgScale — per-asset framing normalisation', () => {
-    const FLOATY = ['practice', 'connections', 'brainGym', 'wordCraft'] as const;
-    const BLEED = ['arena', 'blast', 'adventure'] as const;
+    const FLOATY = ['practice', 'connections', 'wordCraft'] as const;
+    const NATURAL = ['arena', 'blast', 'adventure', 'brainGym'] as const;
 
     it.each(FLOATY)('small-framed mode %s scales its art up (>1)', (key) => {
       const { imgScale } = MODE_META[key];
@@ -67,8 +69,8 @@ describe('MODE_META — parity with control renderCard', () => {
       expect(imgScale, `${key} imgScale sane`).toBeLessThanOrEqual(1.8);
     });
 
-    it.each(BLEED)('edge-bleeding mode %s is left at natural framing (no imgScale)', (key) => {
-      // undefined or exactly 1 both mean "no scale" — never >1 (would clip FX)
+    it.each(NATURAL)('large/edge-bleeding mode %s is left at natural framing (no imgScale)', (key) => {
+      // undefined or exactly 1 both mean "no scale" — never >1 (would clip FX / character)
       expect(MODE_META[key].imgScale ?? 1).toBe(1);
     });
   });
