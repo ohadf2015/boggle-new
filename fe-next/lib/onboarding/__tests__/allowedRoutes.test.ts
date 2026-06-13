@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isOnboardingAllowedRoute } from '../allowedRoutes';
+import { isOnboardingAllowedRoute, isLandingRoute } from '../allowedRoutes';
 
 describe('isOnboardingAllowedRoute', () => {
   describe('allows locale homepage', () => {
@@ -63,5 +63,28 @@ describe('isOnboardingAllowedRoute', () => {
     it('rejects unsupported locale', () => {
       expect(isOnboardingAllowedRoute('/de')).toBe(false);
     });
+  });
+});
+
+describe('isLandingRoute', () => {
+  it.each(['/', '/en', '/en/', '/he', '/sv', '/ja', '/es'])(
+    'returns true for the marketing landing route %s',
+    (path) => {
+      expect(isLandingRoute(path)).toBe(true);
+    },
+  );
+
+  it.each([
+    '/en/3d-test',
+    '/en/practice',
+    '/en/multiplayer',
+    '/he/daily',
+    '/en/blog/boggle-vs-wordle',
+  ])('returns false for the in-app/content route %s (popup allowed there)', (path) => {
+    expect(isLandingRoute(path)).toBe(false);
+  });
+
+  it.each([null, undefined, ''])('returns false for malformed input %s', (value) => {
+    expect(isLandingRoute(value)).toBe(false);
   });
 });

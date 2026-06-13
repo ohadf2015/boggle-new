@@ -8,7 +8,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { isLandingRoute } from '@/lib/onboarding/allowedRoutes';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import {
   hasPlayerStyleModalBeenShown,
@@ -25,6 +27,7 @@ const PlayerStyleModal = dynamic(
 
 export default function PlayerStyleOnboardingWrapper() {
   const { isAuthenticated, profile, needsProfileCustomization, updateProfile, loading } = useAuth();
+  const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
   const [show, setShow] = useState(false);
   // Session latch: once we've decided to show the popup, never let the effect
@@ -108,6 +111,9 @@ export default function PlayerStyleOnboardingWrapper() {
   );
 
   if (!isMounted || !show) return null;
+  // Never auto-open over the marketing landing page — it buries the hero and
+  // hurts CWV/SEO. The popup will surface on the user's next in-app navigation.
+  if (isLandingRoute(pathname)) return null;
 
   return <PlayerStyleModal isOpen onDismiss={handleDismiss} />;
 }

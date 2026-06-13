@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-12T14:58:12.580Z",
+  "generatedAt": "2026-06-13T21:09:31.617Z",
   "commits": [
     {
-      "sha": "cf83a3c286b5f3c627529446181137fbbddb0080",
-      "shortSha": "cf83a3c",
-      "subject": "chore(i18n): refresh translation report (missingFromEnglish 0)",
+      "sha": "3e2dc0bd2925570c84e8eea696eb22798665c67a",
+      "shortSha": "3e2dc0b",
+      "subject": "feat(playerStyle): dancing style mascots in hero + picker",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:54:36+03:00"
+      "date": "2026-06-13T23:59:19+03:00"
     },
     {
-      "sha": "7bf109f8469eeeef1e2dec53829ad3fc5c438b39",
-      "shortSha": "7bf109f",
-      "subject": "fix(ci): stop pre-push vitest OOM — serialize runs + shard hub fan-out",
+      "sha": "22a576fcbfdf1729e5524b754110700b0526620f",
+      "shortSha": "22a576f",
+      "subject": "fix(playerStyle): clear web AdSense anchor band so Save button isn't hidden",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:50:30+03:00"
+      "date": "2026-06-13T23:15:24+03:00"
     },
     {
-      "sha": "87d8b5aa20dc399b0f0dd6a2a48dfd92b191170b",
-      "shortSha": "87d8b5a",
-      "subject": "feat(admin): show latest deployment + recent changes in dashboard",
+      "sha": "74a85921a70bdf5396a3cdffd1ee1ecf2478415f",
+      "shortSha": "74a8592",
+      "subject": "fix(landing): stop style-popup flash + add 3D hover to mode cubes",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:48:46+03:00"
+      "date": "2026-06-13T23:14:29+03:00"
     },
     {
-      "sha": "9b206181ee751790d6375a4a678f96ad0a252c5f",
-      "shortSha": "9b20618",
-      "subject": "feat(brain): nudge sign-up when a guest finishes a drill (no silent loss)",
+      "sha": "401ce1c50665b6d6013ea8f9bd42b6b5eccff373",
+      "shortSha": "401ce1c",
+      "subject": "fix(landing): wrap long season titles to two lines",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:47:11+03:00"
+      "date": "2026-06-13T22:17:27+03:00"
     },
     {
-      "sha": "f1d7bb30ed68018f5d5cce764c496057495ac5aa",
-      "shortSha": "f1d7bb3",
-      "subject": "fix(mp): wheel orbit parity (96→136) + auto-advance pre-result fanfare",
+      "sha": "3a99c87c5f6d017b5e4706bedc1dca5ec558584e",
+      "shortSha": "3a99c87",
+      "subject": "fix(playerStyle): stop style modal flicker on scroll from profile",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:43:08+03:00"
+      "date": "2026-06-13T22:12:52+03:00"
     },
     {
-      "sha": "e77fd354d16e24dfd58587932e07fdd3fad29665",
-      "shortSha": "e77fd35",
-      "subject": "refactor(rng): consolidate 16 seeded PRNG/hash copies into lib/rng",
+      "sha": "1187ccf0b354b8a3df08644fead2ec941f63cb9a",
+      "shortSha": "1187ccf",
+      "subject": "fix(mp): live rival scores during local word-building",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:36:28+03:00"
+      "date": "2026-06-13T22:06:25+03:00"
     },
     {
-      "sha": "056835aa1ee4c62c749a0f4766c42c0617ffd9e2",
-      "shortSha": "056835a",
-      "subject": "feat(results): MP rivals + improvement panels for all modes",
+      "sha": "95778b40f816a8cd5de9c8698e828d1f2ab39223",
+      "shortSha": "95778b4",
+      "subject": "feat(landing): ship cube homepage + style popup to all users",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:35:45+03:00"
+      "date": "2026-06-13T22:05:53+03:00"
     },
     {
-      "sha": "259583eafdf5f0cf945448b1f98b7ad3298ccd87",
-      "shortSha": "259583e",
-      "subject": "perf(pixi): gate always-on ambient tickers when hidden + cache wheel rect",
+      "sha": "ec40102c5f66d06e319d1e8c49fa241ed2764cf7",
+      "shortSha": "ec40102",
+      "subject": "fix(mp): unify keyboard + tile interactivity gate; declutter live leaderboard",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:28:25+03:00"
+      "date": "2026-06-13T21:11:27+03:00"
     },
     {
-      "sha": "c030d6de7e5f941f34078111dfe51c6328e7d5b6",
-      "shortSha": "c030d6d",
-      "subject": "fix(daily): lift word-hunt results tab bar above AdMob banner",
+      "sha": "f7a326d4b613c090b323e1327e019fcc69772bd7",
+      "shortSha": "f7a326d",
+      "subject": "fix(multiplayer): re-join on reconnect to survive server restarts",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:28:02+03:00"
+      "date": "2026-06-13T19:57:31+03:00"
     },
     {
-      "sha": "14c337c6e4fe872223ef16c810b6a95777745778",
-      "shortSha": "14c337c",
-      "subject": "feat(landing): dark mascot cubes for the 9 admin \"+More\" modes",
+      "sha": "fba7b8516961b96f06c568454bb86c30e0aa6d38",
+      "shortSha": "fba7b85",
+      "subject": "feat(blast): desktop idle auto-submit for click-built words",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:26:56+03:00"
+      "date": "2026-06-13T19:44:58+03:00"
     },
     {
-      "sha": "54eb1928de0b372bf71a4b8b665a61154d1836eb",
-      "shortSha": "54eb192",
-      "subject": "fix(admin): record real words-found in MP game logs (was hardcoded empty)",
+      "sha": "90dc70baaa33b2e22c0e46b04b56df05fbdb85be",
+      "shortSha": "90dc70b",
+      "subject": "fix(ftue): high-contrast coach banner surface",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:23:49+03:00"
+      "date": "2026-06-13T19:44:36+03:00"
     },
     {
-      "sha": "38348685deed1b64736a9758095bfdb24f93fa0b",
-      "shortSha": "3834868",
-      "subject": "fix(blast): use defined i18n key for first-use callout button",
+      "sha": "6eed0654edca66c9f0cdf181ab74efaabb4fcf80",
+      "shortSha": "6eed065",
+      "subject": "feat(ingame): enlarge in-game grid on roomy portrait screens",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:19:41+03:00"
+      "date": "2026-06-13T19:44:18+03:00"
     },
     {
-      "sha": "de94d8a9f35dbeed656cb7c69c456103ab4b8bfc",
-      "shortSha": "de94d8a",
-      "subject": "feat(landing): dark mascot cube bento — color from art, not the tile",
+      "sha": "33452ff7489580eeadfc10678c103570c2b87241",
+      "shortSha": "33452ff",
+      "subject": "feat(audio): global in-game mute FAB + fix desktop sound popover z-index occlusion",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:18:48+03:00"
+      "date": "2026-06-13T19:40:22+03:00"
     },
     {
-      "sha": "779353ed8d873f0c8a6f22f5c54463eaf7ed840f",
-      "shortSha": "779353e",
-      "subject": "fix(mp): stop useMultiplayerSocket clobbering shared-socket connection listeners",
+      "sha": "a08cf34a74de72e91a692bb7ba7b3d30b9f98751",
+      "shortSha": "a08cf34",
+      "subject": "perf(analytics): lazy-load posthog-js via proxy — 60KB gzip off every route's eager parse",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T17:08:19+03:00"
+      "date": "2026-06-13T19:39:52+03:00"
     },
     {
-      "sha": "80c4cc91f2cd8a274a500cdaffbc02485a31cae8",
-      "shortSha": "80c4cc9",
-      "subject": "feat(blast): teach each special tile the first time it appears",
-      "author": "Ohad Fisher",
-      "date": "2026-06-12T17:04:37+03:00"
+      "sha": "4eee63508ba89c1f5bc45f04df2f62c664c1a50b",
+      "shortSha": "4eee635",
+      "subject": "Merge pull request #548 from ohadf2015/claude/cta-font-color-email-modes-mp1ekj",
+      "author": "ohadf2015",
+      "date": "2026-06-13T17:56:39+02:00"
     },
     {
-      "sha": "8ce781a1e900e2906d5b449f869381ca24cd661f",
-      "shortSha": "8ce781a",
-      "subject": "feat(brain): wire drill feedback + celebration audio",
-      "author": "Ohad Fisher",
-      "date": "2026-06-12T16:55:09+03:00"
+      "sha": "f67e69d23fb7a7077086b770762c7246026aa2a7",
+      "shortSha": "f67e69d",
+      "subject": "fix(emails): legible CTA in dark mode + hide non-public crossword mode",
+      "author": "Claude",
+      "date": "2026-06-13T15:09:07Z"
     },
     {
-      "sha": "49c93cc9bb15c4afe7e0b6809b7c2dac4ea071fd",
-      "shortSha": "49c93cc",
-      "subject": "feat(blast): curate special-tile roster — retire the wave 8+ flood",
+      "sha": "f4eb7b044caf771d1b5636ac28ff2dddc8de6b25",
+      "shortSha": "f4eb7b0",
+      "subject": "docs(perf): record pixi landing-bundle defer as a proven Turbopack wall",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T16:51:19+03:00"
+      "date": "2026-06-13T18:05:46+03:00"
     },
     {
-      "sha": "fb8425080af764a707e4281e9e3a6d585b1b04a1",
-      "shortSha": "fb84250",
-      "subject": "perf(blast): skip the always-on Pixi FX overlay on low-end devices",
+      "sha": "e69356f42bf4d0f3295e8718bb7f313f2712be79",
+      "shortSha": "e69356f",
+      "subject": "docs(perf): landing bundle treemap + concrete defer targets",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T16:35:50+03:00"
+      "date": "2026-06-13T17:38:23+03:00"
     },
     {
-      "sha": "c4e447c2ffb66eb028175f6bd280b61f3d27cc4a",
-      "shortSha": "c4e447c",
-      "subject": "fix(blast): repair stranded blank tiles at gravity chokepoint",
+      "sha": "85ec9e346c028c21f4ea24ac66b1d46447a6b89f",
+      "shortSha": "85ec9e3",
+      "subject": "feat(wordcraft): clearer victory popup, more juice, placement hints",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T16:28:47+03:00"
+      "date": "2026-06-13T17:32:03+03:00"
     },
     {
-      "sha": "3f5441d42307d369648c716aa5f52a98c7294a64",
-      "shortSha": "3f5441d",
-      "subject": "feat(landing): bento daily cube + compress cube art (flag landing-daily-cube-v1)",
+      "sha": "f5b053a06e79e3dfee8f886471ec40db0e868e03",
+      "shortSha": "f5b053a",
+      "subject": "feat(coins): casino reward HUD + varied sound + reversed spend",
       "author": "Ohad Fisher",
-      "date": "2026-06-12T15:40:11+03:00"
+      "date": "2026-06-13T17:31:47+03:00"
     }
   ]
 }

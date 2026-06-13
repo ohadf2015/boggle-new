@@ -291,9 +291,9 @@ export const EXPERIMENTS = {
    */
   'landing-daily-cube-v1': defineExperiment({
     variants: ['banner', 'cube'] as const,
-    default: 'banner',
+    default: 'cube',
     description:
-      'Daily hero style in the cubes homepage arm. banner = legacy gradient + mascot. cube = bento daily tile with cube art. Conversion = daily_banner CTA → daily start.',
+      'Daily hero style in the cubes homepage arm. SHIPPED: cube (default) = bento daily tile with cube art, joining the cube design language. banner = legacy gradient + mascot, retained as a PostHog kill-switch only. Conversion = daily_banner CTA → daily start.',
     forceVariantByEmail: {
       'ohadf2015@gmail.com': 'cube',
       'eden320@gmail.com': 'cube',

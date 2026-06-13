@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 5788,
+    "totalKeysInCode": 5798,
     "keyCountByLanguage": {
-      "en": 10881,
-      "he": 10994,
-      "sv": 10987,
-      "ja": 10988,
-      "es": 11017
+      "en": 10931,
+      "he": 11044,
+      "sv": 11037,
+      "ja": 11038,
+      "es": 11067
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 4,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 26,
+      "templateLiterals": 25,
       "fallbackUsages": 0,
       "variableKeys": 12
     }
@@ -98,7 +98,7 @@
       {
         "pattern": "blast.combo.${detectedCombos[0].type}",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
-        "line": 200,
+        "line": 211,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU",
         "type": "template_literal"
       },
@@ -135,13 +135,6 @@
         "file": "components/seasons/RankTierChip.tsx",
         "line": 39,
         "context": "{t(`rank.tier.${tier}`)}",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "wordcraft.modifier.desc.${modifier}",
-        "file": "components/word-craft/WordCraftModifierBanner.tsx",
-        "line": 28,
-        "context": "{t(`wordcraft.modifier.desc.${modifier}`)}",
         "type": "template_literal"
       },
       {
@@ -308,7 +301,44 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "admin.teacherAccess.resend",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 152
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.resend_hint",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 155
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.resendError",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 61
+        }
+      ]
+    },
+    {
+      "key": "admin.teacherAccess.resendSuccess",
+      "usages": [
+        {
+          "file": "components/admin/TeacherAccessDrawer.tsx",
+          "line": 59
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [
       "multiplayer.rankUp",
@@ -384,6 +414,10 @@
       "notifications.teacherAccess.approve",
       "notifications.teacherAccess.decline",
       "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.resend",
+      "notifications.teacherAccess.resend_hint",
+      "notifications.teacherAccess.resendSuccess",
+      "notifications.teacherAccess.resendError",
       "notifications.teacherAccess.declineSuccess",
       "notifications.teacherAccess.approveError",
       "notifications.teacherAccess.declineError",
@@ -490,6 +524,10 @@
       "notifications.teacherAccess.approve",
       "notifications.teacherAccess.decline",
       "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.resend",
+      "notifications.teacherAccess.resend_hint",
+      "notifications.teacherAccess.resendSuccess",
+      "notifications.teacherAccess.resendError",
       "notifications.teacherAccess.declineSuccess",
       "notifications.teacherAccess.approveError",
       "notifications.teacherAccess.declineError",
@@ -683,6 +721,10 @@
       "notifications.teacherAccess.approve",
       "notifications.teacherAccess.decline",
       "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.resend",
+      "notifications.teacherAccess.resend_hint",
+      "notifications.teacherAccess.resendSuccess",
+      "notifications.teacherAccess.resendError",
       "notifications.teacherAccess.declineSuccess",
       "notifications.teacherAccess.approveError",
       "notifications.teacherAccess.declineError",
@@ -868,6 +910,10 @@
       "notifications.teacherAccess.approve",
       "notifications.teacherAccess.decline",
       "notifications.teacherAccess.approveSuccess",
+      "notifications.teacherAccess.resend",
+      "notifications.teacherAccess.resend_hint",
+      "notifications.teacherAccess.resendSuccess",
+      "notifications.teacherAccess.resendError",
       "notifications.teacherAccess.declineSuccess",
       "notifications.teacherAccess.approveError",
       "notifications.teacherAccess.declineError",
@@ -1015,6 +1061,10 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.resend",
+      "admin.teacherAccess.resend_hint",
+      "admin.teacherAccess.resendSuccess",
+      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",
@@ -1293,6 +1343,10 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.resend",
+      "admin.teacherAccess.resend_hint",
+      "admin.teacherAccess.resendSuccess",
+      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",
@@ -1595,6 +1649,10 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.resend",
+      "admin.teacherAccess.resend_hint",
+      "admin.teacherAccess.resendSuccess",
+      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",
@@ -1881,6 +1939,10 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
+      "admin.teacherAccess.resend",
+      "admin.teacherAccess.resend_hint",
+      "admin.teacherAccess.resendSuccess",
+      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",
