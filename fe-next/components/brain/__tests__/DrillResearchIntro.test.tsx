@@ -39,7 +39,7 @@ describe('DrillResearchIntro', () => {
   it('renders the EN cognitive domain + blurb for lightning-round', () => {
     render(<DrillResearchIntro drillType="lightning-round" />);
     expect(screen.getByText('Processing Speed')).toBeInTheDocument();
-    expect(screen.getByText(/retrieves and validates words/i)).toBeInTheDocument();
+    expect(screen.getByText(/spot and lock in words/i)).toBeInTheDocument();
   });
 
   it('renders different copy per drill type', () => {

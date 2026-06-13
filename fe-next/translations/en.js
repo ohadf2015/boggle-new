@@ -7338,11 +7338,11 @@ const en = {
       "master": "Master"
     },
     "tips": {
-      "tip1": "3 weeks of brain training = 15% faster thinking. That's science!",
-      "tip2": "Duke found word puzzles beat digital games for memory over 78 weeks.",
-      "tip3": "Brain training pumps up your 'focus chemicals' by 2.3%.",
-      "tip4": "16 studies agree: training your brain actually works!",
-      "tip5": "45% of brain health is in your hands - keep challenging it!",
+      "tip1": "Three weeks of word training = 15% faster thinking.",
+      "tip2": "Word puzzles beat brain-game apps at saving memory — Duke tracked 78 weeks.",
+      "tip3": "A little word play nudges your focus chemical up 2.3%.",
+      "tip4": "Sixteen studies agree: training your brain actually works.",
+      "tip5": "Almost half of brain health is up to you. Keep it busy.",
       "source1": "NIH",
       "source2": "Duke University",
       "source3": "Brain Chemistry Research",

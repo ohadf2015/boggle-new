@@ -7412,16 +7412,16 @@ const sv = {
       "master": "Mästare"
     },
     "tips": {
-      "tip1": "En studie på 51 vuxna visade att kognitiv träning förbättrade uppmärksamhetsväxlingen med 15% på bara 3 veckor.",
-      "tip2": "Duke Universitys forskning visade att ordpussel överträffade digitala hjärnspel i att bromsa minnesförsämring över 78 veckor.",
-      "tip3": "En studie från 2025 visade att hjärnträning ökade acetylkolinproduktionen med 2,3% - 'uppmärksamhetskemikalien' för minne.",
-      "tip4": "Metaanalys av 16 studier bekräftar att kognitiv träning visar betydande förbättringar i arbetsminne och bearbetningshastighet.",
-      "tip5": "45% av demensrisken kommer från modifierbara faktorer - regelbundna mentala utmaningar bygger kognitiv reserv.",
-      "source1": "NIH: Kognitiv funktion hos friska personer",
-      "source2": "Duke University Medical School",
-      "source3": "NBC News: Hjärnkemiforskning",
-      "source4": "NIH: Hjärnträning metaanalys",
-      "source5": "National Geographic: Hjärnhälsa"
+      "tip1": "Tre veckors ordträning = 15% snabbare tänkande.",
+      "tip2": "Korsord slår hjärnappar på att bevara minnet — Duke följde 78 veckor.",
+      "tip3": "Lite ordlek höjer din fokuskemikalie med 2,3%.",
+      "tip4": "16 studier, en slutsats: hjärnträning funkar.",
+      "tip5": "Nära hälften av hjärnhälsan ligger hos dig. Håll den i gång.",
+      "source1": "NIH",
+      "source2": "Duke University",
+      "source3": "Hjärnkemiforskning",
+      "source4": "NIH-metaanalys",
+      "source5": "National Geographic"
     },
     "researchBacked": "Forskningsbaserat",
     "sourceLabel": "Källa"

@@ -7356,16 +7356,16 @@ const es = {
       "master": "Maestro"
     },
     "tips": {
-      "tip1": "Un estudio con 51 adultos mostró que el entrenamiento cognitivo mejoró la velocidad de cambio de atención en un 15% en solo 3 semanas.",
-      "tip2": "La investigación de Duke University encontró que los puzzles de palabras superaron a los juegos cerebrales digitales en frenar el deterioro de la memoria durante 78 semanas.",
-      "tip3": "Un estudio de 2025 mostró que el entrenamiento cerebral aumentó la producción de acetilcolina en un 2,3% - el químico de 'prestar atención' para la memoria.",
-      "tip4": "Un metaanálisis de 16 estudios confirma que el entrenamiento cognitivo muestra mejoras significativas en memoria de trabajo y velocidad de procesamiento.",
-      "tip5": "El 45% del riesgo de demencia proviene de factores modificables - los desafíos mentales regulares construyen reserva cognitiva.",
-      "source1": "NIH: Función cognitiva en sujetos sanos",
-      "source2": "Duke University Medical School",
-      "source3": "NBC News: Investigación química cerebral",
-      "source4": "NIH: Metaanálisis de entrenamiento cerebral",
-      "source5": "National Geographic: Salud cerebral"
+      "tip1": "Tres semanas entrenando palabras: piensas 15% más rápido.",
+      "tip2": "Los crucigramas le ganan a las apps para cuidar la memoria — Duke, 78 semanas.",
+      "tip3": "Un poco de juego con palabras sube tu químico del enfoque 2,3%.",
+      "tip4": "16 estudios, una conclusión: entrenar la mente funciona.",
+      "tip5": "Casi la mitad de la salud cerebral está en tus manos. Mantenla activa.",
+      "source1": "NIH",
+      "source2": "Duke University",
+      "source3": "Investigación química cerebral",
+      "source4": "Metaanálisis NIH",
+      "source5": "National Geographic"
     },
     "researchBacked": "Basado en investigación",
     "sourceLabel": "Fuente"
