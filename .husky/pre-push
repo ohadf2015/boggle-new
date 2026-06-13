@@ -123,8 +123,21 @@ PID_TSC=$!
   # in a SEPARATE vitest process that exits and releases its heap before the
   # next starts, so peak memory is ~1/N. Typical pushes touch no hub and run a
   # single fast shard (no startup tax).
-  HUB_REGEX='(^|/)(experiments|LanguageContext)\.(ts|tsx)$|(^|/)contexts/|(^|/)hooks/use[A-Z]'
-  if echo "$FRONTEND_FILES" | grep -qE "$HUB_REGEX"; then
+  #
+  # MEGA-HUB tier (2026-06-13, exit-144 OOM fix): `translations/*.js` are the
+  # widest hub of all — imported by LanguageContext, which is imported by nearly
+  # every component that calls t(). A one-line translation edit therefore fans
+  # `--changed` out FURTHER than touching LanguageContext directly, yet the old
+  # HUB_REGEX matched neither `translations/` nor a bare LanguageContext import
+  # cone aggressively enough → a translation-touching push ran UNSHARDED
+  # (SHARDS=1) and OOM-killed at exit 144. Give the mega-hubs more shards (8)
+  # since their dependent cone is the largest in the repo; ordinary hubs keep 4.
+  MEGA_HUB_REGEX='(^|/)translations/|(^|/)LanguageContext\.(ts|tsx)$'
+  HUB_REGEX='(^|/)experiments\.(ts|tsx)$|(^|/)contexts/|(^|/)hooks/use[A-Z]'
+  if echo "$FRONTEND_FILES" | grep -qE "$MEGA_HUB_REGEX"; then
+    SHARDS=8
+    echo "ℹ️  Mega-hub file changed (translations/LanguageContext) — sharding frontend tests into $SHARDS processes to bound memory."
+  elif echo "$FRONTEND_FILES" | grep -qE "$HUB_REGEX"; then
     SHARDS=4
     echo "ℹ️  Hub file changed — sharding frontend tests into $SHARDS processes to bound memory."
   else
