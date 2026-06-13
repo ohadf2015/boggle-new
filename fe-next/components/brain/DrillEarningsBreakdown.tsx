@@ -113,7 +113,7 @@ export default function DrillEarningsBreakdown({
         className="text-4xl font-black text-neo-white"
       >
         {displayScore}{' '}
-        <span className="text-base font-bold text-neo-white/60">{t('brain.drills.points')}</span>
+        <span className="text-base font-bold text-neo-white/80">{t('brain.drills.points')}</span>
       </AdaptiveMotion.div>
 
       {/* Transparent breakdown */}

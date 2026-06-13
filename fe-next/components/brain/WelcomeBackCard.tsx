@@ -266,11 +266,11 @@ export default function WelcomeBackCard({
             <div className="flex items-center justify-center gap-1.5 mt-3">
               <Clock className={cn(
                 'w-3 h-3',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black/40'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
               )} />
               <p className={cn(
                 'text-[10px]',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black/40'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
               )}>
                 {t('brain.welcomeBack.daysAway', { days: daysSinceLastActivity })}
               </p>

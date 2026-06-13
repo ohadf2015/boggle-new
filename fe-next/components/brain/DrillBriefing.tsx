@@ -73,7 +73,7 @@ export default function DrillBriefing({ drillId, level, goalText, onStart }: Dri
       <div className="p-2.5 rounded-neo border-neo border-neo-black bg-neo-navy-light flex items-center justify-center gap-2 text-center">
         <span className="text-base" aria-hidden>🎯</span>
         <p className="text-sm font-bold text-neo-white">
-          <span className="text-neo-white/60">{t('brain.drills.level')} {level} · </span>
+          <span className="text-neo-white/80">{t('brain.drills.level')} {level} · </span>
           {goalText}
         </p>
       </div>
