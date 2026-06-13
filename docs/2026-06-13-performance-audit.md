@@ -65,16 +65,37 @@ splitting one importer cannot remove them. A real win needs deeper work:
   1. **posthog-js (~170KB+):** `components/providers/PostHogProvider.tsx:15` static-imports
      `posthog-js` + inits eagerly (every page). Defer the *import+init* to post-hydration / idle /
      first-interaction (mirror the LogRocket pattern in essential-providers). Not LCP-critical.
-  2. **pixi (~744KB):** still eager via the global FX mounts (`SharedFxMount`, `GlobalCoinEarnFx`
-     in essential-providers). Dynamic-import those mounts ({ssr:false}) — BUT first relocate
-     `initHowler()` out of the game-providers module to an always-mounted path (it's a module-level
-     side effect; deferring its importer drops it → audio-pool-exhaustion regression, Sentry JS-9J).
+  2. **pixi (~744KB) — ATTEMPTED 2026-06-13, PROVEN INFEASIBLE via source-level dynamic import.**
+     Tried `dynamic(() => import(...), {ssr:false})` on BOTH landing-eager FX mounts
+     (`SharedFxMount`, `GlobalCoinEarnFx` in essential-providers). Result: landing firstLoad moved
+     **−8KB** (just the mount-component code); pixi stayed. THREE independent signals agree it's a
+     Turbopack **shared-commons chunk**, not a per-route import:
+       - `route-bundle-stats.json`: **641KB pixi present in EVERY route's firstLoad — incl. `/blog/*`
+         static articles that import zero game/FX code.** A per-route import could never appear on a
+         blog page → it's one global commons chunk fed by the *union* of all importers.
+       - `curl localhost:3001/en` + sizing the served `<script>` set: **640KB pixi genuinely served
+         eagerly** (4 chunks, 468KB dominant) — confirms it's real download weight, not a manifest
+         over-count.
+       - Static-import reachability walk from all shell roots (conditional-providers, locale layout,
+         PageClient, page): **0 eager source paths to `pixi.js`.** Nothing in the landing source tree
+         statically imports pixi — Turbopack hoisted it because **40+ route-split modules** (blast,
+         adventure, wordcraft, wordtower, daily wheel, results, gameEngine, SharedFxApp) each
+         statically `import 'pixi.js'`, making it "common enough" to put in the always-loaded chunk.
+     **Why there's no clean cut:** the commons chunk dissolves only if ALL ~40 importers defer pixi;
+     cutting any subset (e.g. just SharedFxApp) leaves the other 39 edges → chunk stays. The only
+     real levers are (a) Turbopack chunk-grouping config (webpack `splitChunks` cacheGroups has no
+     clean Next-16-Turbopack equivalent), or (b) lazy `await import('pixi.js')` inside all 40+
+     importers incl. hot game paths — infeasible/high-risk for ~200KB gzipped. **This is a wall, not
+     a TODO. The "feels stuck" symptom was already addressed by the mascot LCP fix + TTFB cache;
+     pixi sits behind game routes that legitimately need it.** (The mount-defer was reverted — it
+     was inert; shipping it would mislead like the socket split would have.)
   3. **d3:** NOT directly imported by landing (recharts importers are all `*ChartInner` = lazy);
-     it's Turbopack vendor-chunk grouping with posthog. May fall out once posthog is deferred.
-  **CAVEAT:** shared vendor chunks mean a chunk stays eager unless ALL its eager importers defer —
-  verify each step by `curl localhost:3001/en` + sizing the `<script>` set before/after, not by
-  manifests. Do this in a FRESH context (the deferral touches analytics init timing + a known
-  audio side-effect — needs full adherence).
+     it's Turbopack vendor-chunk grouping with the still-eager posthog. Will NOT fall out on its own —
+     same commons-chunk dynamic as pixi; tied to the (separate, TDD-gated) posthog effort.
+  **METHOD CAVEAT:** verify bundle wins by `curl localhost:3001/en` + sizing the served `<script>`
+  set AND cross-checking `route-bundle-stats.json` per-route (a lib on a feature-less route like
+  `/blog/*` = proof of a shared-commons chunk that source-level `dynamic()` cannot split). Manifests
+  alone lie under Turbopack.
 
 ## INFRA — Supabase Realtime WAL decode = 83% of DB CPU (cost/headroom, NOT latency)
 
