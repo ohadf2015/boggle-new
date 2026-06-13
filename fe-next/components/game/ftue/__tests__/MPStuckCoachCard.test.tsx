@@ -47,6 +47,17 @@ describe('MPStuckCoachCard', () => {
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
   });
 
+  it('uses a high-contrast light surface so the card separates from the dark game page', () => {
+    // The page background is near-black navy; a navy-light card blends into it
+    // (≈1.08:1). A cream card with black text reads clearly over the board and
+    // matches the cream grid frame directly below it.
+    render(<MPStuckCoachCard stage="tap-hint" onDismiss={() => {}} />);
+    const card = screen.getByRole('status');
+    expect(card.className).toContain('bg-neo-cream');
+    expect(card.className).toContain('text-neo-black');
+    expect(card.className).not.toContain('bg-neo-navy-light');
+  });
+
   it('mirrors the drag diagram in RTL', () => {
     mockDir = 'rtl';
     const { container } = render(

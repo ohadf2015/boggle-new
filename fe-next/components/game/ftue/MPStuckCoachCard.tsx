@@ -47,7 +47,7 @@ export function MPStuckCoachCard({ stage, onDismiss }: MPStuckCoachCardProps) {
     <div
       role="status"
       aria-live="polite"
-      className="animate-neo-pop pointer-events-auto mx-auto flex w-full max-w-sm items-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard"
+      className="animate-neo-pop pointer-events-auto mx-auto flex w-full max-w-sm items-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-cream px-3 py-2 text-neo-black shadow-hard-lg"
     >
       <DragHintDiagram />
       <p className="flex-1 font-neo-body text-sm leading-snug">

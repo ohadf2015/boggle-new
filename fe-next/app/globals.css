@@ -4662,8 +4662,9 @@ html[data-cosy='true'] .animate-neo-press {
   height: 26px;
   border: 2px solid rgb(var(--neo-black));
   border-radius: 6px;
-  background: rgb(var(--neo-cream));
-  color: rgb(var(--neo-black));
+  /* Card surface is cream — tiles invert to navy so they stay visible on it. */
+  background: rgb(var(--neo-navy));
+  color: rgb(var(--neo-cream));
   font-family: var(--font-fredoka, sans-serif);
   font-weight: 700;
   font-size: 13px;
