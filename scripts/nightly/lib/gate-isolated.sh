@@ -340,15 +340,50 @@ nightly_gate_has_unattributed_failures() {
   return 1
 }
 
-# run_baseline_gate [skip_lint=0] — gate a CLEAN HEAD checkout with NO authored
-# files applied, to learn whether master ITSELF is red (a pre-existing failing
-# test/lint that no lane introduced). Output is left in NIGHTLY_LAST_GATE_OUTPUT
-# for the caller to parse (same contract as run_isolated_gate). Returns the gate rc.
+# nightly_baseline_test_tokens <fail_test_file> → space-joined vitest positional
+# filters (test-file basenames) for a TARGETED baseline gate. The 2026-06-13 outage:
+# the baseline gate ran the FULL 3278-test suite on clean HEAD, a network integration
+# test (wikipediaTimeout.integration) WEDGED it → rc=3 inconclusive → the decision read
+# "no comparable baseline" → docs-only DROP of build-clean lane code. Scoping the baseline
+# to ONLY the authored gate's failing test files (none of which touch the network) makes it
+# deterministic: a real rc=1 + FAIL lines instead of a hang. We emit BASENAMES, not paths,
+# on purpose: nightly_parse_test_failures drops a backend test's `backend/` segment (vitest
+# runs cwd=fe-next/backend), so the parsed path can't be resolved on disk — but a basename
+# is a valid vitest substring filter that matches in whichever project owns the file.
+# De-dupes (one file, many failing describes → one filter). Prints nothing on empty/missing.
+nightly_baseline_test_tokens() {
+  local f="$1"
+  [ -n "$f" ] && [ -s "$f" ] || return 0
+  awk -F/ 'NF{print $NF}' "$f" 2>/dev/null | sort -u | tr '\n' ' ' | sed 's/ *$//'
+}
+
+# run_baseline_gate [skip_lint=0] [targeted_tokens=""] — gate a CLEAN HEAD checkout with
+# NO authored files applied, to learn whether master ITSELF is red (a pre-existing failing
+# test/lint that no lane introduced). Output is left in NIGHTLY_LAST_GATE_OUTPUT for the
+# caller to parse (same contract as run_isolated_gate). Returns the gate rc.
+#
+# When targeted_tokens is non-empty, the test phase is SCOPED to just those vitest filters
+# (build:schemas still runs first for the dist bridge) — this is the wedge-proof baseline
+# the 2026-06-13 fix added: it can't hang on an unrelated slow/networked suite, so a red
+# master yields rc=1 + FAIL lines (→ proven pre-existing → ship) instead of rc=3 (→ drop).
 run_baseline_gate() {
-  local skip_lint="${1:-0}" _empty rc
+  local skip_lint="${1:-0}" targeted_tokens="${2:-}" _empty rc
   _empty=$(mktemp -t nightly-baseline-empty.XXXXXX); : > "$_empty"
-  log "baseline-gate: gating CLEAN HEAD (no authored files) to detect pre-existing master breakage"
-  run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?
+  if [ -n "$targeted_tokens" ]; then
+    log "baseline-gate: gating CLEAN HEAD scoped to the authored gate's failing test file(s) [$targeted_tokens] — wedge-proof pre-existing-red check"
+    # Run BOTH vitest projects with the filters (each project runs only its matching files;
+    # the other matches nothing → passes fast). `;`-separate + AND the rcs so a red in EITHER
+    # project propagates to a non-zero gate rc; combined output feeds the FAIL-line parser.
+    # build:schemas precedes the tests (the dist bridge handler suites import ../dist/...).
+    local _saved_cmd="${NIGHTLY_GATE_CMD:-}" _had_cmd=0
+    [ -n "${NIGHTLY_GATE_CMD:-}" ] && _had_cmd=1
+    export NIGHTLY_GATE_CMD="npm run build:schemas && { npm run test:backend -- $targeted_tokens; _bk=\$?; npm run test:frontend -- $targeted_tokens; _fe=\$?; [ \$_bk -eq 0 ] && [ \$_fe -eq 0 ]; }"
+    run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?
+    if [ "$_had_cmd" = 1 ]; then export NIGHTLY_GATE_CMD="$_saved_cmd"; else unset NIGHTLY_GATE_CMD; fi
+  else
+    log "baseline-gate: gating CLEAN HEAD (no authored files) to detect pre-existing master breakage"
+    run_isolated_gate "$_empty" "$skip_lint" 1; rc=$?
+  fi
   rm -f "$_empty" 2>/dev/null || true
   return $rc
 }

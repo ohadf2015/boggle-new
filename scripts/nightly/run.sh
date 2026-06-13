@@ -621,7 +621,13 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
       if [ -n "$_authored_fail_tests" ]; then
         log "baseline-aware: authored gate failed on test file(s) — gating clean HEAD to check for pre-existing master breakage:"
         printf '%s\n' "$_authored_fail_tests" | while IFS= read -r f; do [ -n "$f" ] && log "  authored-fail-test: $f"; done
-        run_baseline_gate 0; _bl_rc=$?
+        # TARGETED baseline (2026-06-13 fix): scope the clean-HEAD gate to ONLY these failing
+        # test files. The full-suite baseline wedged on a networked integration test that night
+        # (rc=3 inconclusive → misread as 'HEAD green' → docs-only DROP of build-clean code).
+        # A scoped run can't hang on an unrelated suite → real rc=1 + FAIL lines → proven pre-existing.
+        _aft_file=$(mktemp -t nightly-aft.XXXXXX); printf '%s\n' "$_authored_fail_tests" > "$_aft_file"
+        _baseline_tokens=$(nightly_baseline_test_tokens "$_aft_file"); rm -f "$_aft_file" 2>/dev/null || true
+        run_baseline_gate 0 "$_baseline_tokens"; _bl_rc=$?
         _baseline_out=$(mktemp -t nightly-baseline-out.XXXXXX)
         cp "${NIGHTLY_LAST_GATE_OUTPUT:-/dev/null}" "$_baseline_out" 2>/dev/null || : > "$_baseline_out"
         rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true

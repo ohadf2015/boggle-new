@@ -216,6 +216,30 @@ assert "red baseline w/ no test-fail list → fallthrough" "[ \"\$(nightly_basel
 assert "no authored failing tests → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = fallthrough ]"
 rm -f "$_AF" "$_BF" "$_ALLOW"
 
+echo "── gate-isolated: nightly_baseline_test_tokens (targeted baseline filters) ──"
+# The full-suite baseline gate WEDGED on 2026-06-13 (a network integration test hung in
+# the 3278-test suite → rc=3 inconclusive → misread as 'HEAD green' → docs-only DROP of
+# build-clean lane code). Fix: gate clean HEAD running ONLY the authored gate's failing
+# test files, passed as vitest positional (substring) filters. The failing wordHandler.*
+# files touch no network, so a scoped run can't wedge → real rc=1 + FAIL lines → PROVEN
+# pre-existing → ship. Tokens are basenames (path-bug-proof: the parser drops backend/'s
+# segment, but a basename filter matches in whichever vitest project owns the file).
+_TT=$(mktemp)
+printf 'fe-next/handlers/__tests__/wordHandler.blast.test.ts\nfe-next/handlers/__tests__/wordHandler.mergedEmits.test.ts\n' > "$_TT"
+_TOKENS=$(nightly_baseline_test_tokens "$_TT")
+assert "tokens are basenames (dir stripped)"        "[[ \"$_TOKENS\" == *'wordHandler.blast.test.ts'* ]]"
+assert "tokens include the 2nd failing file"        "[[ \"$_TOKENS\" == *'wordHandler.mergedEmits.test.ts'* ]]"
+assert "tokens drop the backend/handlers path"      "[[ \"$_TOKENS\" != *'/'* ]]"
+assert "tokens are space-joined on one line"        "[ \"\$(printf '%s' \"$_TOKENS\" | wc -l | tr -d ' ')\" = 0 ]"
+# Empty / missing input → empty token string (caller then runs the full-suite baseline).
+: > "$_TT"
+assert "empty fail list → empty tokens"             "[ -z \"\$(nightly_baseline_test_tokens $_TT)\" ]"
+assert "missing file → empty tokens (no crash)"     "[ -z \"\$(nightly_baseline_test_tokens /nonexistent.XXX)\" ]"
+# De-dup: the same file failing under multiple describe blocks must yield ONE token.
+printf 'fe-next/handlers/__tests__/wordHandler.blast.test.ts\nfe-next/handlers/__tests__/wordHandler.blast.test.ts\n' > "$_TT"
+assert "duplicate paths collapse to one token"      "[ \"\$(nightly_baseline_test_tokens $_TT | tr ' ' '\n' | grep -c blast)\" = 1 ]"
+rm -f "$_TT"
+
 echo "── gate-isolated: nightly_gate_timeout_route (rc=3 inconclusive routing) ──"
 # After a timed-out gate, a build-only re-gate decides: build-clean → ship (tests
 # unverified, alert); build-break → peel (output now parseable); build-only also timed
