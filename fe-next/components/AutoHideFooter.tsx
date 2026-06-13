@@ -13,6 +13,48 @@ interface AutoHideFooterProps {
   className?: string;
 }
 
+// First-path-segment classification (exact match — see `segment` below).
+// GAME_ROUTES: interactive gameplay screens. Hide the full footer; desktop
+// lobbies fall back to a compact legal strip. Their SEO marketing landing pages
+// (e.g. word-craft-game, word-craft-landing, anagram, shiritori) are deliberately
+// NOT listed — those keep the full footer for internal-link SEO.
+const GAME_ROUTES = new Set([
+  'singleplayer',
+  'multiplayer',
+  'daily',
+  'adventure',
+  'education',
+  'student',
+  'teacher',
+  'blast',
+  'word-of-the-day',
+  'challenge',
+  'party',
+  'brain',
+  'join',
+  'create',
+  'custom',
+  'quests',
+  'word-forge',
+  'connections',
+  'crossword',
+  'word-alchemy',
+  'word-tower',
+  'word-craft',
+  'word-vault',
+  'sealed-bid',
+]);
+
+// NO_FOOTER_ROUTES: admin panels + internal dev/test screens. No footer at all,
+// not even the compact legal strip.
+const NO_FOOTER_ROUTES = new Set([
+  'admin',
+  'curator',
+  'ai-fanfare-demo',
+  'avatar-test',
+  'comeback-test',
+]);
+
 /**
  * AutoHideFooter - Footer wrapper component
  *
@@ -36,33 +78,31 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
   useEffect(() => setMounted(true), []);
 
   const cleanPath = pathname.replace(`/${language}`, '');
-  const isGameRoute = [
-    '/singleplayer',
-    '/multiplayer',
-    '/daily',
-    '/adventure',
-    '/education',
-    '/student',
-    '/teacher',
-    '/blast',
-    '/word-of-the-day',
-    '/challenge',
-    '/party',
-    '/brain',
-    '/join',
-    '/create',
-    '/custom',
-    '/quests',
-    '/word-forge',
-    '/connections',
-  ].some(path => cleanPath.startsWith(path));
+  // First path segment, exact-matched. startsWith() is unsafe here: a prefix like
+  // 'word-craft' would wrongly swallow the SEO content routes 'word-craft-game'
+  // and 'word-craft-landing'. Segment equality keeps games and their marketing
+  // landing pages distinct.
+  const segment = cleanPath.split('/')[1] ?? '';
+
+  // Gameplay screens: full marketing footer is irrelevant. Mobile → no footer;
+  // desktop lobby → compact legal strip (see below).
+  const isGameRoute = GAME_ROUTES.has(segment);
+
+  // Admin panels and internal dev/test screens: no footer at all — not even the
+  // compact legal strip (these aren't player-facing game lobbies).
+  const isNoFooterRoute = NO_FOOTER_ROUTES.has(segment);
 
   // Until mounted, mirror the server render exactly (SSR defaults:
-  // isDesktop=false, isInGame=false, isTvFullscreen=false) → game routes render
-  // null, everything else the full Footer. Keeps hydration stable; the
+  // isDesktop=false, isInGame=false, isTvFullscreen=false) → game/admin routes
+  // render null, everything else the full Footer. Keeps hydration stable; the
   // viewport-aware branch takes over on the next commit.
   if (!mounted) {
-    return isGameRoute ? null : <Footer className={className} />;
+    return isGameRoute || isNoFooterRoute ? null : <Footer className={className} />;
+  }
+
+  // Admin/dev/test: never render any footer.
+  if (isNoFooterRoute) {
+    return null;
   }
 
   // TV fullscreen, desktop gameplay, or any mobile game/lobby screen: no footer

@@ -17,6 +17,7 @@ import { vi } from 'vitest';
 const mockUseIsDesktop = vi.fn();
 const mockUseNavigation = vi.fn();
 const mockUseTv = vi.fn();
+const mockUsePathname = vi.fn();
 
 vi.mock('@/hooks/useDesktopLayout', () => ({ useIsDesktop: () => mockUseIsDesktop() }));
 vi.mock('@/contexts/NavigationContext', () => ({ useNavigation: () => mockUseNavigation() }));
@@ -24,7 +25,7 @@ vi.mock('@/hooks/useTvFullscreenListener', () => ({ useTvFullscreenListener: () 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'he' }),
 }));
-vi.mock('next/navigation', () => ({ usePathname: () => '/he/daily' }));
+vi.mock('next/navigation', () => ({ usePathname: () => mockUsePathname() }));
 vi.mock('../Footer', () => ({ __esModule: true, default: () => <div data-testid="full-footer" /> }));
 
 import { render, screen } from '@testing-library/react';
@@ -36,6 +37,7 @@ describe('AutoHideFooter - hydration + behavior', () => {
     vi.clearAllMocks();
     mockUseTv.mockReturnValue(false);
     mockUseNavigation.mockReturnValue({ isInGame: false });
+    mockUsePathname.mockReturnValue('/he/daily');
   });
 
   it('renders the compact legal footer on a desktop game route (post-mount)', () => {
@@ -47,6 +49,52 @@ describe('AutoHideFooter - hydration + behavior', () => {
 
   it('renders nothing on a mobile game route', () => {
     mockUseIsDesktop.mockReturnValue(false);
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer')).toBeNull();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
+  it('renders NO footer at all on /admin (desktop) — not even the compact legal strip', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/admin');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer')).toBeNull();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
+  it('renders no full footer on a dev/test route (avatar-test, desktop)', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/avatar-test');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer')).toBeNull();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
+  it('hides the full footer on the /word-craft GAME route (mobile)', () => {
+    mockUseIsDesktop.mockReturnValue(false);
+    mockUsePathname.mockReturnValue('/he/word-craft');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer')).toBeNull();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
+  it('KEEPS the full footer on /word-craft-landing (SEO content, not a game)', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/word-craft-landing');
+    render(<AutoHideFooter />);
+    expect(screen.getByTestId('full-footer')).toBeTruthy();
+  });
+
+  it('KEEPS the full footer on /word-craft-game (SEO content, not a game)', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/word-craft-game');
+    render(<AutoHideFooter />);
+    expect(screen.getByTestId('full-footer')).toBeTruthy();
+  });
+
+  it('hides the full footer on /crossword GAME route (mobile)', () => {
+    mockUseIsDesktop.mockReturnValue(false);
+    mockUsePathname.mockReturnValue('/he/crossword');
     const { container } = render(<AutoHideFooter />);
     expect(container.querySelector('footer')).toBeNull();
     expect(screen.queryByTestId('full-footer')).toBeNull();
