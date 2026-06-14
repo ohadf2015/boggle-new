@@ -133,6 +133,32 @@ EMPTY=$(mktemp); backup_dropped_authored "$EMPTY" "" && assert "empty dest → n
 rm -f "$EMPTY"
 teardown
 
+echo "── wip-revert: snapshot contains exactly the revert-relevant set (tracked + untracked-non-ignored), never gitignored junk ──"
+# 10) snapshot_pre_lane must copy every file a revert can restore — tracked files
+# (revert_to_pre_lane) AND untracked-non-ignored files (revert_authored's
+# drop-and-re-gate path, lib line ~109) — but MUST NOT copy gitignored build
+# junk (never on any revert list; 97% of the old blanket mirror, the snapshot tax).
+setup
+printf 'node_modules/\nignored.log\n' > "$PROJECT_DIR/.gitignore"
+( cd "$PROJECT_DIR"; git add .gitignore; git commit -qm gitignore )
+printf 'untracked but NOT ignored\n' > "$PROJECT_DIR/src/untracked-new.ts"   # must be snapshotted
+printf 'ignored junk\n'              > "$PROJECT_DIR/ignored.log"             # must NOT be snapshotted
+mkdir -p "$PROJECT_DIR/node_modules/pkg"
+printf 'dep\n'                       > "$PROJECT_DIR/node_modules/pkg/index.js"  # must NOT be snapshotted
+SNAP=$(snapshot_pre_lane)
+assert "snapshot is non-empty (rsync --files-from honored on this platform)" \
+  "[ -n \"\$(find \"\$SNAP\" -type f ! -name '.wip-protect.list')\" ]"
+assert "tracked file IS in snapshot (revert_to_pre_lane can restore it)" \
+  "[ -e \"\$SNAP/src/tracked.ts\" ]"
+assert "untracked-non-ignored file IS in snapshot (revert_authored can restore it)" \
+  "[ -e \"\$SNAP/src/untracked-new.ts\" ]"
+assert "gitignored file is NOT in snapshot (the snapshot tax)" \
+  "[ ! -e \"\$SNAP/ignored.log\" ]"
+assert "gitignored dir is NOT in snapshot" \
+  "[ ! -e \"\$SNAP/node_modules/pkg/index.js\" ]"
+rm -rf "$SNAP"
+teardown
+
 echo
 echo "wip-revert: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

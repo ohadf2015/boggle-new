@@ -27,14 +27,27 @@
 snapshot_pre_lane() {
   local snap
   snap=$(mktemp -d -t lexi-snap.XXXXXX)
-  rsync -a --delete \
-    --exclude='.git' \
-    --exclude='node_modules' \
-    --exclude='.next' \
-    --exclude='.turbo' \
-    --exclude='.claude/worktrees' \
-    --exclude='dist' --exclude='build' --exclude='coverage' \
-    "$PROJECT_DIR/" "$snap/" 2>/dev/null || true
+  # Copy ONLY the files a revert can ever restore: tracked files (consumed by
+  # revert_to_pre_lane) + untracked-non-ignored files (consumed by revert_authored).
+  # git itself enumerates that exact set. A gitignored path is never on any revert
+  # list (both `git diff` and `git ls-files --others --exclude-standard` skip
+  # ignored), so omitting it is loss-free — and ~37x fewer files: the old blanket
+  # rsync mirror copied ~40k files, 97% of them gitignored build junk
+  # (node_modules/.next/native build dirs/etc), multi-GB and ~27min, the dominant
+  # per-lane wall-clock cost. This copies only the ~11.5k revert-relevant files
+  # (~170M, ~2s). Driving the list from git makes it immune to any gitignore
+  # parser divergence — git defines the set.
+  #
+  # Piped through tar, NOT `rsync --files-from`: macOS's openrsync ABORTS the
+  # entire transfer on the first un-stat-able listed path (e.g. a dangling tracked
+  # symlink like fe-next/.agent/skills/*), silently truncating the snapshot — a
+  # catastrophic, test-invisible failure for a data-loss guard. tar archives
+  # symlinks without stat'ing their targets and tolerates the full list. --null/-T
+  # keeps it correct for paths with spaces/newlines.
+  ( cd "$PROJECT_DIR" 2>/dev/null \
+    && { git ls-files -z; git ls-files --others --exclude-standard -z; } \
+       | tar -cf - --null -T - 2>/dev/null ) \
+    | tar -xf - -C "$snap" 2>/dev/null || true
   # Founder's pre-existing dirty set: tracked (unstaged + staged) + untracked.
   # These paths are PROTECTED from any later revert.
   ( cd "$PROJECT_DIR" 2>/dev/null \
