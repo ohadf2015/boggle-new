@@ -30,7 +30,8 @@ import { usePlayerJoinLeaveNotifications } from '@/hooks/usePlayerJoinLeaveNotif
 import { useMultiplayerSounds } from '@/hooks/useMultiplayerSounds';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
-import { useGameActions, useGameStore, useGameActive } from '@/hooks/gameState';
+import { useGameActions, useGameStore, useGameActive, useShowStartAnimation } from '@/hooks/gameState';
+import { resolveMultiplayerMusicTrack } from './multiplayerMusic';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { neoInfoToast } from '@/components/NeoToast';
 import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal';
@@ -126,6 +127,8 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // CrazyGames requires displaying their usernames in multiplayer (Full Launch requirement)
   const { user: cgUser, isCrazyGames, login: loginCrazyGames } = useCrazyGamesAuth();
   const { playTrack, TRACKS } = useMusic();
+  // Countdown overlay flag — flips beforeGame → inGame music once play begins.
+  const showStartAnimation = useShowStartAnimation();
 
   const {
     username, setUsername, guestAvatar, setGuestAvatar,
@@ -432,12 +435,15 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, gameCode]);
 
-  // Music transitions
+  // Music transitions: lobby → countdown bed → in-game track. The third phase
+  // (inGame) was missing before — the countdown bed leaked through the whole
+  // round, so the in-game music never replaced the lobby/homepage vibe.
   useEffect(() => {
-    if (showResults) return;
-    if (!isActive) { playTrack(TRACKS.LOBBY); } else { playTrack(TRACKS.BEFORE_GAME); }
+    const next = resolveMultiplayerMusicTrack({ isActive, showResults, showStartAnimation });
+    if (!next) return;
+    playTrack(TRACKS[next === 'inGame' ? 'IN_GAME' : next === 'beforeGame' ? 'BEFORE_GAME' : 'LOBBY']);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, showResults]);
+  }, [isActive, showResults, showStartAnimation]);
 
   const handleManualReconnect = useCallback(() => {
     if (socket && !socket.connected) socket.connect();

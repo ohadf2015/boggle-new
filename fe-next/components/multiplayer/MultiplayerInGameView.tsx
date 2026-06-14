@@ -363,7 +363,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   if (!effectiveGrid) {
     return (
       <div
-        className="flex-1 flex flex-col min-h-0 bg-neo-cream dark:bg-neo-navy p-4 items-center justify-center"
+        className="flex-1 flex flex-col min-h-0 bg-neo-navy p-4 items-center justify-center"
         role="status"
         aria-busy="true"
         aria-label={t('common.loading')}
@@ -582,7 +582,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     <div
       className={cn(
         'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
-        'bg-neo-cream dark:bg-neo-navy p-0 md:p-4',
+        'bg-neo-navy p-0 md:p-4',
         getCurrentSeasonDynamic().gridSkinClass,
       )}
       translate="no"
