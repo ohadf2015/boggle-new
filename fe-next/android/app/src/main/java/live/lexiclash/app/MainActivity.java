@@ -56,12 +56,22 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     }
 
     /**
-     * When backgrounded, freeze WebView JS timers + layout work. Lowers idle CPU
-     * and shrinks the WebView's working set so Android's low-memory killer is
-     * less likely to evict our process — which is what causes the "app reloads
-     * from scratch when you reopen it" symptom on remote-URL Capacitor apps.
-     * pauseTimers()/resumeTimers() are process-global on WebView; safe here
-     * because there is only one WebView in this Activity.
+     * When backgrounded, pause this WebView's extra processing (animations,
+     * geolocation, rendering) to lower idle CPU and shrink the working set, so
+     * Android's low-memory killer is less likely to evict our process — the
+     * "app reloads from scratch when you reopen it" symptom on remote-URL
+     * Capacitor apps.
+     *
+     * DO NOT call WebView.pauseTimers()/resumeTimers() here. Those are
+     * PROCESS-GLOBAL (documented: "pauses all layout, parsing, and JavaScript
+     * timers for ALL WebViews"). A rewarded AdMob ad renders its creative — and
+     * the "Reward in 30 seconds" countdown of HTML/MRAID creatives — in ITS OWN
+     * WebView inside a fullscreen AdActivity. When that Activity fronts, this
+     * MainActivity gets onPause(); a global pauseTimers() then froze the ad's
+     * countdown WebView too → countdown stuck at 30 → reward never granted →
+     * player stranded ("reward ads stuck at 30sec"). pauseTimers() was added in
+     * 954c11207 for background-eviction; the instance onPause()/onResume() below
+     * keep that benefit without freezing other WebViews. Per-instance only.
      */
     @Override
     public void onPause() {
@@ -69,7 +79,6 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         WebView bridgeWebView = getBridge() != null ? getBridge().getWebView() : null;
         if (bridgeWebView != null) {
             try {
-                bridgeWebView.pauseTimers();
                 bridgeWebView.onPause();
             } catch (Throwable t) {
                 android.util.Log.w("MainActivity", "WebView pause failed: " + t.getMessage());
@@ -84,7 +93,6 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         if (bridgeWebView != null) {
             try {
                 bridgeWebView.onResume();
-                bridgeWebView.resumeTimers();
             } catch (Throwable t) {
                 android.util.Log.w("MainActivity", "WebView resume failed: " + t.getMessage());
             }

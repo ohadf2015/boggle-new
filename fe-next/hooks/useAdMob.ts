@@ -67,9 +67,17 @@ export function useAdMob() {
   const isDev = process.env.NODE_ENV !== 'production';
 
   const showRewarded = useCallback(async (onReward: () => void, onError?: (err: string) => void, opts?: ShowRewardedOptions) => {
-    if (hasNoAds()) return;
+    // Both early-exits MUST signal back via onError. The caller (useRewardedAd)
+    // has ALREADY set status='showing' and emitted emitRewardAdActive(true)
+    // (pausing the game clock) before invoking us. A silent `return` here leaves
+    // the UI stranded — watch-ad button disabled, game clock frozen — until the
+    // caller's 120s stuck-watchdog fires. PostHog confirmed this path: native
+    // `rewarded_ad_offered` events with ZERO downstream prepare/watched/declined
+    // breadcrumbs (e.g. config not yet loaded when the user taps). Settling the
+    // caller immediately re-enables the button and resumes the clock.
+    if (hasNoAds()) { onError?.('Ads are turned off'); return; }
     const config = getConfig();
-    if (!config) return;
+    if (!config) { onError?.('Ad not ready — please try again'); return; }
     const surface: RewardedSurface = opts?.surface ?? 'generic';
     // Per-surface unit ID lets AdMob waterfall optimize each placement separately.
     const adId = config.rewardedUnits?.[surface] ?? config.rewardedAdId;
