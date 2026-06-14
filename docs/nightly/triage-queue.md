@@ -656,3 +656,71 @@ Both `exp-mp-quickplay-wait-v1` and `exp-invite-arrival-clarity-v1` were wired o
   - status: shipped (same migration — added explicit RESTRICTIVE USING(false))
   - why: service_role-only table; no-policy state IS correct but advisor flags it; explicit deny makes intent clear
   - recommended owner: review-by-eod
+
+## 2026-06-14
+- [Supabase] SECURITY DEFINER: `public.update_word_bank_validation_status` executable by `authenticated`
+  - first/last seen: advisor (ongoing)
+  - status: shipped (migration `revoke_anon_execute_update_word_bank_validation_status`)
+  - why: no anon/public callsite found in codebase (lighthouse JSON only); REVOKE is reversible
+  - recommended owner: review-by-eod
+
+- [Supabase] RLS always-true INSERT on `teacher_access_requests`
+  - first/last seen: advisor (ongoing)
+  - status: shipped (migration `fix_teacher_access_requests_insert_rls`)
+  - why: `tar_insert_any` WITH CHECK=true allowed anon inserts (spam vector); replaced with `auth.uid() IS NOT NULL`
+  - recommended owner: review-by-eod
+
+- [Sentry] TypeError: null.clear in WordWheelPixiRing (JAVASCRIPT-NEXTJS-1CW)
+  - first/last seen: 2026-06-08/2026-06-09, reach=5
+  - status: already fixed in code (commit `abe2dcd2f` 2026-06-06, guard `if (destroyed || orbitGfx.destroyed || ...)`)
+  - why: events are cache-lag stragglers (Chrome Mobile WebView); no new occurrences expected
+  - recommended owner: monitor — close if no new events in 7d
+
+- [Sentry] relation "profiles" does not exist at POST /api/coins (JAVASCRIPT-NEXTJS-1JR)
+  - first/last seen: 2026-05-27 (one-day burst, 18 events, 5 users)
+  - status: deferred — stale, not reproducible today; likely transient schema-path issue that resolved
+  - why: no fresh events; root cause unclear without reproduction; touching coin/auth API paths is DEFER territory
+  - recommended owner: backend
+
+- [Sentry] [CoinContext] Failed to add coins (JAVASCRIPT-NEXTJS-1JP)
+  - first/last seen: 2026-05-27, 6 occurrences, 5 users
+  - status: deferred — co-incident with profiles error above (same day/users); stale
+  - why: directly coin-economy logic, DEFER per hard rules
+  - recommended owner: backend
+
+---
+
+## 2026-06-14 (lane-03 engagement)
+
+### [Flag Hygiene] Dead/underpowered experiment flags — PRUNE CANDIDATES
+
+These PostHog flags have been running 75+ days at 100% rollout with 0 recorded conversions (per open watches in nightly learnings). Recommend: delete from PostHog + remove conditional from code (keep the variant that was default/control since all users were already seeing it).
+
+| Flag | Age | Rollout | Evidence | Recommendation |
+|---|---|---|---|---|
+| `share-prompt-timing` | 75+ days | 100% | "dead/underpowered" — 0 converts in open watches | Delete flag; keep `results-page` branch |
+| `show-signup-after-first-win` | 75+ days | 100% | 0 converts in open watches | Delete flag; keep `after-first-win` branch |
+| `adventure-difficulty-tuning` | 75+ days | INACTIVE | Flag deactivated; still in code | Delete flag; clean code ref |
+| `mp-signup-nudge-copy-v1` | 37 days | 100% | Sheet 0/19 + toast 0/58 converts in 28d data | Delete flag; keep `control` (sheet-only at game 2) |
+
+**Owner**: human (PostHog flag deletion requires console access). Code cleanup can follow in next lane-03 run after flags are deleted.
+
+### [FLAG NEEDED] 3 dark experiments — blocked on PostHog flag creation
+
+These experiments are code-complete, tested, and wired to UI, but have ZERO data because no PostHog flag was ever created. Each has been dark for ≥5 nights.
+
+```
+FLAG NEEDED: exp-mp-quickplay-wait-v1  variants=[control, match-seeking]  50/50
+  Hypothesis: explicit "Finding a match…" overlay cuts rage-clicks on /multiplayer?quickPlay=true by ≥50%
+  Wire: components/multiplayer/MultiplayerFlow.tsx:140
+
+FLAG NEEDED: exp-invite-arrival-clarity-v1  variants=[control, status-card]  50/50
+  Hypothesis: "Connecting…" card reduces rage-clicks on ?room= invite URLs; lifts invite_redirect_fired→invite_consumed
+  Wire: app/[locale]/PageClient.tsx:89
+
+FLAG NEEDED: exp-practice-wheel-cta-v1  variants=[control, retry-cta]  50/50
+  Hypothesis: "Try Again" overlay on timer-expiry cuts 43% practice abandon rate on /practice/wheelRush
+  Wire: components/practice/PracticeWheelSandbox.tsx (WIRED THIS NIGHT — see lane-03 2026-06-14)
+```
+
+**Owner**: human (PostHog → Feature Flags → New flag → set key exactly as above).
