@@ -60,6 +60,9 @@ interface SceneProps {
   /** Bumps when a CLUTCH SAVE lands (a clean drop pulled back from a critical
    *  lean) — fires the triumphant snap-back burst + bass-thud shake. */
   clutchSaveKey?: number;
+  /** Bumps on a NEAR MISS (a drop that barely avoided a topple) — reserved for
+   *  the near-miss FX; accepted here so the producer in WordTowerPlay type-checks. */
+  nearMissKey?: number;
   /** Bumps on every hazard/topple strike — fires the crash FX so a collapse is
    *  SEEN + FELT, not just announced by the banner. */
   toppleKey?: number;
