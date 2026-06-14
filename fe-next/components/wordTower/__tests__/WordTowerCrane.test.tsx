@@ -1,18 +1,50 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
+
+// Per-test controllable locale so we can exercise the Hebrew RTL/sofit path.
+const langHolder = vi.hoisted(() => ({ lang: 'en' as string }));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    language: langHolder.lang,
+    t: (k: string) => k,
+    dir: langHolder.lang === 'he' ? 'rtl' : 'ltr',
+    setLanguage: vi.fn(),
+  }),
+}));
+
 import WordTowerCrane from '../WordTowerCrane';
 
 const t = (k: string) => k;
 
 describe('WordTowerCrane — tap-to-drop placement overlay', () => {
   beforeEach(() => vi.useFakeTimers());
-  afterEach(() => vi.useRealTimers());
+  afterEach(() => {
+    vi.useRealTimers();
+    langHolder.lang = 'en';
+  });
 
-  it('shows the word being placed', () => {
+  it('renders the held word as ONE BRICK PER LETTER (not a single word-block)', () => {
     render(
       <WordTowerCrane word="TREE" consecutiveSloppy={0} onDrop={() => {}} t={t} getOffset={() => 0} />,
     );
-    expect(screen.getByText('TREE')).toBeInTheDocument();
+    const tiles = screen.getAllByTestId('crane-letter');
+    expect(tiles).toHaveLength(4);
+    expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E', 'E']);
+  });
+
+  it('Hebrew: per-letter tiles keep RTL + final-letter sofit form', () => {
+    langHolder.lang = 'he';
+    // שלום → 4 tiles; the trailing מ must become its sofit ם, laid out RTL.
+    render(
+      <WordTowerCrane word="שלום" consecutiveSloppy={0} onDrop={() => {}} t={t} getOffset={() => 0} />,
+    );
+    const container = screen.getByTestId('crane-block');
+    expect(container).toHaveAttribute('dir', 'rtl');
+    const tiles = screen.getAllByTestId('crane-letter');
+    expect(tiles).toHaveLength(4);
+    // applyHebrewFinalLetters runs on the whole word, so the last glyph is sofit.
+    expect(tiles[tiles.length - 1].textContent).toBe('ם');
+    expect(tiles.map((el) => el.textContent).join('')).toBe('שלום');
   });
 
   it('a dead-centre drop reports a PERFECT outcome', () => {

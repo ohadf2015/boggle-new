@@ -318,7 +318,16 @@ const sv = {
   },
   "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
   "wordTower": {
-    "mutator": { "todaysTwist": "DAGENS TWIST" },
+    "mutator": {
+      "todaysTwist": "DAGENS TWIST",
+      "goldenLetter": { "name": "Gyllene bokstav", "desc": "Ord med {letter} klättrar 60% högre" },
+      "vowelGale": { "name": "Vokalstorm", "desc": "Varje vokal ger extra lyft" },
+      "longAndStrong": { "name": "Lång och stark", "desc": "Ord med 6+ bokstäver klättrar 50% högre" },
+      "skylineRush": { "name": "Skyline-rush", "desc": "Varje våning klättrar 15% högre" },
+      "tailwind": { "name": "Medvind", "desc": "Kranen sveper snabbare" },
+      "featherday": { "name": "Fjäderdag", "desc": "En extra vingling innan ras" }
+    },
+    "combo": { "roll": "På rad!", "fire": "Eld!", "blaze": "Brinner!", "inferno": "Inferno!" },
     "howTo": {
       "title": "Så spelar du",
       "cta": "Uppfattat!",
@@ -352,7 +361,7 @@ const sv = {
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
     "share": { "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
     "versus": { "title": "Tornrace", "bomb": "Bomba {name}", "waiting": "Väntar på motståndare…", "incoming": "Inkommande bomb!", "won": "Du vann!", "lost": "{name} vann" },
-    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}" }
+    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}", "goldenTile": "Gyllene bokstav {letter}" }
   },
   "flag": "🇸🇪",
   "androidAppPromo": {
@@ -12064,7 +12073,10 @@ const sv = {
       "title": "Första gången? Välkommen.",
       "body": "Tre lugna uppvärmningar, inga poäng, ingen klocka. Tryck på en ruta för att börja.",
       "startHere": "Börja här"
-    }
+    },
+    "timeUp": "Tiden är ute!",
+    "tryAgain": "Försök igen",
+    "goLive": "Spela det riktiga spelet →"
   },
   "practiceBadge": {
     "label": "Övning",
@@ -12881,7 +12893,6 @@ const sv = {
     "bestWord": "Bästa ord",
     "wordsFound": "Ord hittade",
     "totalScore": "Totalpoäng",
-    "tryAgain": "Försök igen",
     "exit": "Avsluta",
     "roundCleared": "Klarat",
     "tapToContinue": "Tryck för att fortsätta",

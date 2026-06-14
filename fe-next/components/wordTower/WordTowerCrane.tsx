@@ -11,6 +11,7 @@ import {
   type PlacementQuality,
 } from '@/lib/wordTower/cranePlacement';
 import { beamWidthFor } from '@/lib/wordTower/craneBeam';
+import { releaseFx } from '@/lib/wordTower/craneReleaseFx';
 import { swayAngleAt, swayNormalizedOffset, effectiveDropError } from '@/lib/wordTower/towerSway';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -121,6 +122,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   // Detach animation: once dropped, the beam drops straight down before the
   // verdict pill replaces the tap button — gives the impact a real beat.
   const [falling, setFalling] = useState(false);
+  // The band the drop actually scored — drives the release celebration (a clean
+  // "you nailed the spot" burst) shown DURING the fall, before the parent clears
+  // the word and unmounts the crane.
+  const [droppedQuality, setDroppedQuality] = useState<PlacementQuality | null>(null);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -154,6 +159,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     const residual = signedOffset - swayOffset;
     onSignedDrop?.(residual);
     const outcome = evaluatePlacement(effectiveDropError(signedOffset, swayOffset), consecutiveSloppy);
+    setDroppedQuality(outcome.quality);
     setFalling(true);
     // Let the girder fall most of the way (so the beam visibly lands) before the
     // verdict pops + the tower commits — keeps the placement one continuous beat.
@@ -173,6 +179,12 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   // shot even while the target swings (WYSIWYG).
   const liveBand = alignmentBand(effectiveDropError(pos, sway));
   const aiming = !falling && !result;
+  // Release celebration — fires DURING the fall when the drop scored well, so the
+  // "you let go in the right spot!" payoff lands before the crane unmounts. Perfect
+  // gets a glowing girder + a fat sparkle burst; good gets a small spark.
+  const release = droppedQuality ? releaseFx(droppedQuality) : null;
+  const celebrating = falling && !reducedMotion && !!release?.celebrate;
+  const onSweetSpot = aiming && liveBand === 'perfect';
   // Hebrew: show the word-final letter in its sofit form and lay the beam RTL.
   // Width still keys off the raw length (same glyph count).
   const beamWord = language === 'he' ? applyHebrewFinalLetters(word) : word;
@@ -238,10 +250,13 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
         >
           <div
             style={{
-              transform: `translateY(${falling ? 94 : 0}px)`,
-              // Gravity accelerates the girder down, then a soft catch as it sets
-              // onto the tower — heavier + more satisfying than the old fast snap.
-              transition: falling ? 'transform 340ms cubic-bezier(0.45,0,0.2,1)' : 'none',
+              transform: `translateY(${falling ? 100 : 0}px)`,
+              // True gravity feel: an ease-IN curve so the girder ACCELERATES the
+              // whole way down (slow lift-off → fast slam) instead of the old
+              // ease-in-out that decelerated before landing. The landing squash on
+              // the girder below supplies the "catch", so the fall itself can hit
+              // hard. Tuned to land just as the verdict pops (drop() fires at 300ms).
+              transition: falling ? 'transform 300ms cubic-bezier(0.55,0.06,0.9,0.28)' : 'none',
               transformOrigin: 'top center',
             }}
           >
@@ -255,18 +270,57 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
             />
             {/* Hook */}
             <div className="mx-auto -mt-1 h-3 w-4 rounded-b-full border-[1.5px] border-t-0 border-black bg-neo-yellow-light shadow-hard" aria-hidden />
-            {/* Held WORD BEAM — width scales with word length */}
-            <div
-              data-testid="crane-block"
-              className={cn(
-                'mx-auto mt-0.5 flex items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-base font-black uppercase tracking-wide text-neo-black shadow-hard transition-colors duration-100',
-                BAND_BEAM[liveBand],
-                !reducedMotion && !falling && 'animate-neo-pop',
+            {/* Held WORD BEAM — ONE BRICK PER LETTER (a girder of stacked letter
+                bricks, matching how the word actually settles into the tower as a
+                run of letter-tiles). Width scales with word length; all tiles
+                share the live band tint so the whole girder reads as one piece. */}
+            <div className="relative mx-auto" style={{ width: `${beamW}px` }}>
+              <div
+                data-testid="crane-block"
+                className={cn(
+                  'flex items-stretch justify-center gap-px',
+                  !reducedMotion && !falling && 'animate-neo-pop',
+                  !reducedMotion && falling && 'crane-girder-land',
+                  celebrating && release?.glow && 'crane-girder-perfect',
+                )}
+                style={{ width: `${beamW}px`, height: '38px' }}
+                dir={language === 'he' ? 'rtl' : 'ltr'}
+              >
+                {[...beamWord].map((ch, i) => (
+                  <span
+                    key={i}
+                    data-testid="crane-letter"
+                    className={cn(
+                      'flex flex-1 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-base font-black uppercase text-neo-black shadow-hard transition-colors duration-100',
+                      BAND_BEAM[liveBand],
+                    )}
+                  >
+                    {ch}
+                  </span>
+                ))}
+              </div>
+              {/* Sparkle burst — scattered around the landed girder when the drop
+                  scored well. Pure CSS; count + reach scale with how clean it was. */}
+              {celebrating && release && (
+                <div className="pointer-events-none absolute inset-0 z-10" aria-hidden>
+                  {Array.from({ length: release.sparkles }).map((_, i) => {
+                    const ang = (i / release.sparkles) * Math.PI * 2;
+                    const dist = release.glow ? 30 : 18;
+                    return (
+                      <span
+                        key={i}
+                        className="crane-spark absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-neo-lime"
+                        style={{
+                          // @ts-expect-error custom props consumed by the keyframe
+                          '--sx': `${Math.cos(ang) * dist}px`,
+                          '--sy': `${Math.sin(ang) * dist}px`,
+                          animationDelay: `${(i % 4) * 20}ms`,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
               )}
-              style={{ width: `${beamW}px`, height: '38px' }}
-              dir={language === 'he' ? 'rtl' : 'ltr'}
-            >
-              {beamWord}
             </div>
           </div>
           {/* Predictive landing shadow — centred under the beam (shares this
@@ -287,7 +341,17 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
             player aims the beam at where the top actually is. Brighter ring makes
             it a clear reticle, not just a faint dash. */}
         <div
-          className="absolute bottom-2 z-0 h-2 w-20 rounded-full border-neo border-dashed border-neo-lime/70 bg-neo-lime/20 will-change-transform"
+          className={cn(
+            'absolute bottom-2 z-0 h-2 w-20 rounded-full border-neo border-dashed will-change-transform',
+            // On the sweet spot the reticle goes SOLID + bright + pulses, so the
+            // player can SEE the perfect release moment before letting go.
+            onSweetSpot
+              ? cn(
+                  'border-solid border-neo-lime bg-neo-lime/60 shadow-[0_0_10px_2px_rgba(191,255,0,0.7)]',
+                  !reducedMotion && 'crane-target-hot',
+                )
+              : 'border-neo-lime/70 bg-neo-lime/20',
+          )}
           style={{ transform: `translateX(${sway * TROLLEY_RANGE_PX}px)`, transition: reducedMotion ? 'none' : 'transform 60ms linear' }}
           aria-hidden
         />

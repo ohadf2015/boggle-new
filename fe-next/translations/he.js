@@ -231,7 +231,16 @@ const he = {
   },
   "gameFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
   "wordTower": {
-    "mutator": { "todaysTwist": "הטוויסט של היום" },
+    "mutator": {
+      "todaysTwist": "הטוויסט של היום",
+      "goldenLetter": { "name": "אות זהב", "desc": "מילים עם {letter} מטפסות 60% גבוה יותר" },
+      "vowelGale": { "name": "סופת תנועות", "desc": "כל תנועה מוסיפה עוד גובה" },
+      "longAndStrong": { "name": "ארוך וחזק", "desc": "מילים מ-6 אותיות מטפסות 50% יותר" },
+      "skylineRush": { "name": "זינוק לגובה", "desc": "כל קומה עולה 15% יותר" },
+      "tailwind": { "name": "רוח גבית", "desc": "המנוף נע מהר יותר" },
+      "featherday": { "name": "יום נוצה", "desc": "התנודדות אחת נוספת לפני קריסה" }
+    },
+    "combo": { "roll": "ברצף!", "fire": "בוערים!", "blaze": "להבות!", "inferno": "אינפרנו!" },
     "howTo": {
       "title": "איך משחקים",
       "cta": "הבנתי!",
@@ -248,7 +257,7 @@ const he = {
     "tier": { "apprentice": "מתחיל", "journeyman": "מיומן", "master": "אדריכל מאסטר" },
     "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "restartConfirm": "בטוח?", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה", "pickLetters": "בחרו אותיות", "chaseGap": "+{m} מ'", "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה" },
     "minimap": { "label": "מפת המגדל — {m} מ', הקש לחזרה למעלה" },
-    "milestone": { "m50": "מעל צמרות העצים! 🌳", "m150": "אזור העננים ☁️", "m400": "הציפורים מקנאות 🐦", "m250": "מעל הרחפנים 🛸", "m650": "אווירת ערפילית 🌌", "m900": "דופק בדלת של החלל 🚀", "m1300": "תושב החלל העמוק 👽", "m1800": "כמעט אסטרונאוט ✨" },
+    "milestone": { "m50": "מעל צמרות העצים! 🌳", "m150": "אזור העננים ☁️", "m400": "הציפורים מקנאות 🐦", "m250": "מעל הרחפנים 🛸", "m650": "אווירה ערפילית 🌌", "m900": "טוק טוק, חלל? 🚀", "m1300": "תושב החלל העמוק 👽", "m1800": "כמעט אסטרונאוט ✨" },
     "ach": { "unlocked": "הישג!", "firstFloor": "קומה ראשונה", "tenFloors": "בניין", "skyHigh": "גבוה בשמיים", "wordsmith": "אמן מילים", "comboKing": "מלך הקומבו", "rivalCrusher": "מנצח יריבים", "unstoppable": "בלתי עציר", "toTheMoon": "אל הירח", "skylineKing": "מלך קו הרקיע", "centurion": "מאה קומות", "comboGod": "אל הקומבו", "wordWizard": "קוסם המילים", "galaxyClass": "דרגת גלקסיה", "deepSpace": "חלל עמוק" },
     "zone": { "entered": "אזור חדש", "next": "הבא: {zone} · {m}מ'" },
     "landmark": { "skyscraper": "פסגת גורד שחקים", "cloudBase": "בסיס העננים", "mountainTop": "פסגת ההר", "jetStream": "זרם הסילון", "stormTops": "ראש הסערה", "weatherBalloon": "בלון מזג אוויר", "earthCurve": "עקמומיות כדור הארץ", "karman": "קצה החלל", "meteorBelt": "חגורת המטאורים", "aurora": "זוהר קוטבי", "deepSpace": "חלל עמוק" },
@@ -261,11 +270,11 @@ const he = {
     "verdict": { "perfect": "מושלם!", "good": "יפה!", "sloppy": "רשלני", "miss": "פספוס!" },
     "sabotage": { "chip": "כדור הריסה", "tokens": "{n}", "pickTarget": "בחר יריב", "noTargets": "אין יריבים לכיוון כרגע", "confirm": "לשלוח כדור הריסה אל {name}?", "send": "שלח", "cancel": "ביטול", "sentTo": "💥 פגעת ב-{name} — מטר אחד פחות", "incoming": "🚨 חבלה מתקרבת מ-{name}!", "recovered": "המגדל עומד. תמשיכו לטפס.", "earned": "🎯 השגת כדור הריסה!", "earnedHint": "{n} הנחות מושלמות ברצף", "watchAd": "📺 פרסומת לטוקן", "adEarned": "🎯 טוקן מפרסומת!" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
-    "celebration": { "highRise": "מתנשא!", "tall": "גבוה!", "skyscraper": "גורד שחקים!" },
+    "celebration": { "highRise": "רב קומות!", "tall": "מתנשא לגובה!", "skyscraper": "גורד שחקים!" },
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },
     "share": { "button": "שיתוף", "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!" },
     "versus": { "title": "מירוץ מגדלים", "bomb": "הפצצה על {name}", "waiting": "ממתינים ליריבים…", "incoming": "פצצה מתקרבת!", "won": "ניצחת!", "lost": "{name} ניצח" },
-    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}" }
+    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}", "goldenTile": "אות זהב {letter}" }
   },
   "flag": "🇮🇱",
   "androidAppPromo": {
@@ -12361,7 +12370,10 @@ const he = {
       "title": "פעם ראשונה? ברוכים הבאים.",
       "body": "שלושה חימומים שקטים, בלי ניקוד ובלי שעון. הקישו על תיבה כדי להתחיל.",
       "startHere": "התחילו כאן"
-    }
+    },
+    "timeUp": "!הזמן נגמר",
+    "tryAgain": "נסה שוב",
+    "goLive": "← שחק את המשחק האמיתי"
   },
   "practiceBadge": {
     "label": "תרגול",

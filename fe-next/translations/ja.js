@@ -231,7 +231,16 @@ const ja = {
   },
   "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
   "wordTower": {
-    "mutator": { "todaysTwist": "今日のひねり" },
+    "mutator": {
+      "todaysTwist": "今日のひねり",
+      "goldenLetter": { "name": "ゴールデン文字", "desc": "{letter} を含む単語は60%高く積める" },
+      "vowelGale": { "name": "母音の風", "desc": "母音ごとに高さアップ" },
+      "longAndStrong": { "name": "長くて強い", "desc": "6文字以上の単語は50%高く積める" },
+      "skylineRush": { "name": "スカイラインラッシュ", "desc": "どの階も15%高く積める" },
+      "tailwind": { "name": "追い風", "desc": "クレーンの動きが速くなる" },
+      "featherday": { "name": "フェザーデー", "desc": "崩れるまでに揺れが1回多い" }
+    },
+    "combo": { "roll": "連続！", "fire": "ヒート！", "blaze": "大炎上！", "inferno": "インフェルノ！" },
     "howTo": {
       "title": "遊び方",
       "cta": "OK！",
@@ -265,7 +274,7 @@ const ja = {
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
     "share": { "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
     "versus": { "title": "タワーラッシュ", "bomb": "{name} を爆撃", "waiting": "対戦相手を待っています…", "incoming": "爆弾が来る！", "won": "勝利！", "lost": "{name} の勝ち" },
-    "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}" }
+    "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}", "goldenTile": "ゴールデン文字 {letter}" }
   },
   "flag": "🇯🇵",
   "androidAppPromo": {
@@ -11984,7 +11993,10 @@ const ja = {
       "title": "はじめて？ようこそ。",
       "body": "静かなウォームアップ3つ、スコアなし、時計なし。タイルをタップして始めましょう。",
       "startHere": "ここから始める"
-    }
+    },
+    "timeUp": "タイムアップ！",
+    "tryAgain": "もう一度",
+    "goLive": "本番ゲームへ →"
   },
   "practiceBadge": {
     "label": "練習",
@@ -12802,7 +12814,6 @@ const ja = {
     "bestWord": "ベストワード",
     "wordsFound": "発見した単語",
     "totalScore": "合計スコア",
-    "tryAgain": "もう一度",
     "exit": "終了",
     "roundCleared": "クリア",
     "tapToContinue": "タップして続ける",

@@ -223,7 +223,16 @@ const en = {
   },
   "gameFeedback": {"prompt":"How was that round?","bad":"Meh","ok":"Good","great":"Loved it!","thanks":"Thanks for the feedback!","dismiss":"Dismiss"},
   "wordTower": {
-    "mutator": { "todaysTwist": "TODAY'S TWIST" },
+    "mutator": {
+      "todaysTwist": "TODAY'S TWIST",
+      "goldenLetter": { "name": "Golden Letter", "desc": "Words with {letter} climb 60% higher" },
+      "vowelGale": { "name": "Vowel Gale", "desc": "Every vowel adds extra lift" },
+      "longAndStrong": { "name": "Long & Strong", "desc": "6+ letter words climb 50% higher" },
+      "skylineRush": { "name": "Skyline Rush", "desc": "Every floor climbs 15% higher" },
+      "tailwind": { "name": "Tailwind", "desc": "The crane sweeps faster" },
+      "featherday": { "name": "Feather Day", "desc": "One extra wobble before a topple" }
+    },
+    "combo": { "roll": "On a roll", "fire": "On fire", "blaze": "Blazing", "inferno": "Inferno" },
     "cardTitle": "Word Tower",
     "cardDesc": "Stack words sky-high — admin preview",
     "howTo": {
@@ -253,7 +262,7 @@ const en = {
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
     "share": { "button": "Share", "text": "I reached {m} m in Word Tower — beat my tower!" },
     "versus": { "title": "Tower Rush", "bomb": "Bomb {name}", "waiting": "Waiting for rivals…", "incoming": "Incoming bomb!", "won": "You won!", "lost": "{name} won" },
-    "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}" }
+    "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}", "goldenTile": "Golden letter {letter}" }
   },
   "flag": "🇺🇸",
   "androidAppPromo": {
@@ -11860,7 +11869,10 @@ const en = {
       "title": "First time? Welcome.",
       "body": "Three quiet warmups, no scores, no clock. Tap a tile to start.",
       "startHere": "Start here"
-    }
+    },
+    "timeUp": "Time's up!",
+    "tryAgain": "Try Again",
+    "goLive": "Play the real game →"
   },
   "practiceBadge": {
     "label": "Practice",
@@ -12467,7 +12479,6 @@ const en = {
     "bestWord": "Best Word",
     "wordsFound": "Words Found",
     "totalScore": "Total Score",
-    "tryAgain": "Try Again",
     "exit": "Exit",
     "roundCleared": "Cleared",
     "tapToContinue": "Tap to continue",

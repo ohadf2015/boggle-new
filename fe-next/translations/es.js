@@ -223,7 +223,16 @@ const es = {
   },
   "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
   "wordTower": {
-    "mutator": { "todaysTwist": "GIRO DE HOY" },
+    "mutator": {
+      "todaysTwist": "GIRO DE HOY",
+      "goldenLetter": { "name": "Letra dorada", "desc": "Las palabras con {letter} suben un 60% más" },
+      "vowelGale": { "name": "Vendaval de vocales", "desc": "Cada vocal da más impulso" },
+      "longAndStrong": { "name": "Largas y fuertes", "desc": "Palabras de 6+ letras suben un 50% más" },
+      "skylineRush": { "name": "Subida vertical", "desc": "Cada piso sube un 15% más" },
+      "tailwind": { "name": "Viento a favor", "desc": "La grúa se mueve más rápido" },
+      "featherday": { "name": "Día pluma", "desc": "Un bamboleo extra antes de caer" }
+    },
+    "combo": { "roll": "¡En racha!", "fire": "¡En llamas!", "blaze": "¡Ardiendo!", "inferno": "¡Infierno!" },
     "cardTitle": "Torre de Palabras",
     "cardDesc": "Apila palabras hasta el cielo — vista de admin",
     "howTo": {
@@ -253,7 +262,7 @@ const es = {
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
     "share": { "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
     "versus": { "title": "Carrera de Torres", "bomb": "Bombardear a {name}", "waiting": "Esperando rivales…", "incoming": "¡Bomba entrante!", "won": "¡Ganaste!", "lost": "Ganó {name}" },
-    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}" }
+    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}", "goldenTile": "Letra dorada {letter}" }
   },
   "flag": "🇪🇸",
   "androidAppPromo": {
@@ -11874,7 +11883,10 @@ const es = {
       "title": "¿Primera vez? Bienvenido.",
       "body": "Tres calentamientos tranquilos, sin puntaje, sin reloj. Toca un mosaico para comenzar.",
       "startHere": "Empieza aquí"
-    }
+    },
+    "timeUp": "¡Se acabó el tiempo!",
+    "tryAgain": "Intentar de nuevo",
+    "goLive": "Jugar el juego real →"
   },
   "practiceBadge": {
     "label": "Práctica",
