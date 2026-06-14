@@ -44,3 +44,14 @@ export function leanFromOffsets(offsets: readonly number[]): number {
   // avg is already in [-1,1]; scale to degrees
   return clamp(avg * LEAN_MAX_DEG, -LEAN_MAX_DEG, LEAN_MAX_DEG);
 }
+
+/** Lean magnitude (deg) at/above which a clean drop counts as a NEAR MISS — the
+ *  tower looked dangerously drunk (≥75% of the cap) but didn't topple. Drives
+ *  the near-miss FX bump in WordTowerPlay. */
+export const NEAR_MISS_LEAN_DEG = LEAN_MAX_DEG * 0.75;
+
+/** True when the current visible lean is in the critical near-miss band — used
+ *  to fire the "phew, barely held" celebration without an actual topple. */
+export function isNearMiss(leanDeg: number): boolean {
+  return Math.abs(leanDeg) >= NEAR_MISS_LEAN_DEG;
+}
