@@ -14,6 +14,7 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 vi.mock('@/utils/onboardingStorage', () => ({ hasCompletedOnboarding: () => true }));
 vi.mock('@/lib/playerStyle/playerStyleStorage', () => ({
+  getStoredPlayerStyle: () => null,
   hasPlayerStyleModalBeenShown: () => false,
   markPlayerStyleModalShown: vi.fn(),
 }));
@@ -58,5 +59,13 @@ describe('PlayerStyleOnboardingWrapper route gate', () => {
     pathname = '/en/practice';
     renderAndSettle();
     expect(screen.getByTestId('style-popup')).toBeInTheDocument();
+  });
+
+  it('does NOT render when a style is already stored locally (e.g. /daily after picking)', async () => {
+    pathname = '/en/daily';
+    const storage = await import('@/lib/playerStyle/playerStyleStorage');
+    vi.spyOn(storage, 'getStoredPlayerStyle').mockReturnValue('rock');
+    renderAndSettle();
+    expect(screen.queryByTestId('style-popup')).not.toBeInTheDocument();
   });
 });

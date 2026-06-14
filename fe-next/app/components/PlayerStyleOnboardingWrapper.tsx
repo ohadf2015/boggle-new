@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { isLandingRoute } from '@/lib/onboarding/allowedRoutes';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import {
+  getStoredPlayerStyle,
   hasPlayerStyleModalBeenShown,
   markPlayerStyleModalShown,
 } from '@/lib/playerStyle/playerStyleStorage';
@@ -68,6 +69,10 @@ export default function PlayerStyleOnboardingWrapper() {
         profileStyle,
         guestShown: hasPlayerStyleModalBeenShown(),
         guestOnboardingDone: hasCompletedOnboarding(),
+        // Local truth: if any style is stored we never prompt, even for authed
+        // users whose `profiles.player_style` hasn't caught up (FTUE pick before
+        // login / sync lag) — the root of "popup reappears after I picked".
+        localStyleChosen: getStoredPlayerStyle() != null,
         alreadyShownThisSession: shownOnceRef.current,
       });
       // Only ever OPEN from the effect; dismissal owns closing. This prevents a

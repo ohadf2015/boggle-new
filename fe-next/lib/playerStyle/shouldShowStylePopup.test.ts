@@ -12,6 +12,7 @@ const base = {
   profileStyle: null as string | null,
   guestShown: false,
   guestOnboardingDone: true,
+  localStyleChosen: false,
   alreadyShownThisSession: false,
 };
 
@@ -43,6 +44,18 @@ describe('shouldShowStylePopup', () => {
     expect(shouldShowStylePopup({ ...base, alreadyShownThisSession: true })).toBe(false);
     expect(
       shouldShowStylePopup({ ...base, isAuthenticated: true, alreadyShownThisSession: true }),
+    ).toBe(false);
+  });
+
+  it('never shows once a style is stored locally, regardless of auth state', () => {
+    // The chosen style lives in localStorage (`boggle_player_style`) before it
+    // syncs to `profiles.player_style`. A guest who picks a style in the FTUE
+    // StylePicker, or one who then logs in, has a local style but a null profile
+    // column / unset guest-shown flag — without this guard the popup re-pops on
+    // the next in-app route (e.g. /daily). One short-circuit covers both paths.
+    expect(shouldShowStylePopup({ ...base, localStyleChosen: true })).toBe(false);
+    expect(
+      shouldShowStylePopup({ ...base, isAuthenticated: true, localStyleChosen: true }),
     ).toBe(false);
   });
 

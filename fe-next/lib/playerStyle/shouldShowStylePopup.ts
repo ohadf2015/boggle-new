@@ -26,6 +26,14 @@ export interface StylePopupGateInput {
   /** Guest has finished onboarding (don't nag fresh visitors). */
   guestOnboardingDone: boolean;
   /**
+   * A style is already stored locally (`boggle_player_style`). This is the
+   * source of truth the moment a style is picked — it precedes the async sync
+   * to `profiles.player_style`, and survives a guest→authed transition. Once
+   * set, the user has chosen, so never prompt — covers the authed path where
+   * `profileStyle` still reads null (FTUE pick before login / sync lag).
+   */
+  localStyleChosen: boolean;
+  /**
    * Session latch: the popup has already been shown once this mount. True →
    * never show again. Closes the authed reopen window where `profileShownAt`
    * still reads null until the async profile refetch lands after dismiss,
@@ -50,6 +58,10 @@ export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   if (!input.authSettled) return false;
   if (!input.featureEnabled) return false;
   if (input.needsProfileCustomization) return false;
+  // Already picked a style (local truth) → never prompt, in either auth state.
+  // Catches the authed gap where `profileStyle` lags behind the local choice
+  // (guest picked in FTUE then logged in, or the profile sync hasn't landed).
+  if (input.localStyleChosen) return false;
 
   if (input.isAuthenticated) {
     if (!input.profileLoaded) return false; // profile not fetched yet → don't guess
