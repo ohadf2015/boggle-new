@@ -4,7 +4,7 @@
  * and NEW-first sort actually render when a premium context is present.
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PartPreviewGrid from '../AvatarBuilderPartGrid';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
@@ -65,6 +65,24 @@ describe('AvatarBuilderPartGrid — premium/locked UI', () => {
     renderAccessories(['none', 'angelWings']);
     expect(screen.getByText('EPIC')).toBeInTheDocument();
     expect(screen.getByText('2200')).toBeInTheDocument();
+  });
+
+  it('shows locked premium parts at full color (no grayscale/dim) — show the goods', () => {
+    const { container } = renderAccessories(['none', 'crystalCrown']);
+    const preview = screen.getAllByTestId('part-preview')[0];
+    const wrapper = preview.parentElement as HTMLElement;
+    // The expensive part must be fully visible so players want it.
+    expect(wrapper.className).not.toMatch(/grayscale/);
+    expect(wrapper.className).not.toMatch(/opacity-40/);
+  });
+
+  it('shows a holographic foil on the legendary buy-confirmation preview', () => {
+    const { container } = renderAccessories(['none', 'crystalCrown']);
+    // Open the purchase confirmation for the legendary part (click bubbles to the
+    // cell's onClick — motion.button is mocked to a div, so no button role).
+    fireEvent.click(screen.getByText('12000'));
+    // The decision-moment preview gets a premium foil sweep (legendary variant).
+    expect(container.querySelector('.avatar-foil-legendary')).toBeTruthy();
   });
 
   it('sorts NEW parts ahead of older premium and free parts (after none)', () => {

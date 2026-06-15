@@ -145,6 +145,52 @@ describe('getRandomAvatarConfig', () => {
   });
 });
 
+describe('clean silhouette generation (anti-slop)', () => {
+  // Most auto-generated avatars should read as "one strong character", NOT
+  // "every slot filled with a random hat" — the generated-slop tell.
+  const SAMPLE = 300;
+  const configs = Array.from({ length: SAMPLE }, (_, i) =>
+    getSeededAvatarConfig(i * 2654435761),
+  );
+
+  it('leaves most heads accessory-free (statement piece, not default)', () => {
+    const withAccessory = configs.filter(c => c.accessory !== 'none').length;
+    const frac = withAccessory / SAMPLE;
+    // Accessories should be a minority highlight, with real variety.
+    expect(frac).toBeGreaterThan(0.1);
+    expect(frac).toBeLessThan(0.5);
+  });
+
+  it('keeps facial hair a minority on male avatars', () => {
+    const males = configs.filter(c => c.gender === 'male');
+    const withBeard = males.filter(c => c.facialHair && c.facialHair !== 'none').length;
+    expect(withBeard / males.length).toBeLessThan(0.5);
+  });
+
+  it('never stacks a loud accessory AND facial hair on the same face', () => {
+    const cluttered = configs.filter(
+      c => c.accessory !== 'none' && c.facialHair && c.facialHair !== 'none',
+    );
+    expect(cluttered.length).toBe(0);
+  });
+
+  it('still always renders a complete face (eyes + mouth present)', () => {
+    for (const c of configs) {
+      expect(c.eyes).not.toBe('none');
+      expect(c.mouth).not.toBe('none');
+    }
+  });
+
+  it('is deterministic — same seed yields identical config', () => {
+    expect(getSeededAvatarConfig(12345)).toEqual(getSeededAvatarConfig(12345));
+  });
+
+  it('still produces accessory variety across the population', () => {
+    const kinds = new Set(configs.map(c => c.accessory).filter(a => a !== 'none'));
+    expect(kinds.size).toBeGreaterThan(3);
+  });
+});
+
 describe('isValidCustomAvatar', () => {
   it('should return true for valid config', () => {
     expect(isValidCustomAvatar(DEFAULT_AVATAR_CONFIG)).toBe(true);

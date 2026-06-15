@@ -16,6 +16,7 @@ import type { AvatarPremium } from './AvatarBuilderModal';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
+import '@/styles/avatar-tier-animations.css';
 
 // Staggered grid entrance — cascading waterfall (from animate-ai: playful-staggered-list)
 const gridContainerVariants = {
@@ -181,8 +182,9 @@ export default function PartPreviewGrid<T extends string>({
                 </div>
               )}
 
-              {/* Part preview */}
-              <div className={`w-12 h-12 flex items-center justify-center ${isLocked ? 'opacity-40 grayscale-30' : ''}`}>
+              {/* Part preview — locked parts shown at FULL color: show the goods so
+                  players want to buy. The lock + price badge below conveys gating. */}
+              <div className="w-12 h-12 flex items-center justify-center">
                 {option === 'none' ? (
                   <span className="text-neo-white text-xs font-bold">{noneLabel ?? '—'}</span>
                 ) : (
@@ -253,7 +255,7 @@ export default function PartPreviewGrid<T extends string>({
 
               {/* Large part preview */}
               <div className="flex justify-center mb-4">
-                <div className={`w-32 h-32 rounded-neo-lg border-3 overflow-hidden ${
+                <div className={`relative w-32 h-32 rounded-neo-lg border-3 overflow-hidden ${
                   confirmPurchase.isLegendary ? 'border-amber-500/50' : confirmPurchase.isEpic ? 'border-purple-500/50' : 'border-neo-yellow/30'
                 }`}>
                   <PartPreview
@@ -262,6 +264,13 @@ export default function PartPreviewGrid<T extends string>({
                     config={config}
                     size={128}
                   />
+                  {/* Holographic foil at the decision moment — makes the part feel collectible */}
+                  {(confirmPurchase.isLegendary || confirmPurchase.isEpic) && (
+                    <div
+                      aria-hidden
+                      className={`avatar-foil ${confirmPurchase.isLegendary ? 'avatar-foil-legendary' : ''}`}
+                    />
+                  )}
                 </div>
               </div>
 

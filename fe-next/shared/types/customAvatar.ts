@@ -490,6 +490,10 @@ const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_M
 const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v) && !isHidden('mouth', v));
 const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v) && !isHidden('accessory', v));
 const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v));
+// "Real" (non-empty) variants — used so accessories/beards are an opt-IN highlight,
+// not a coin-flip that fills every slot (the generated-slop tell).
+const FREE_REAL_ACCESSORIES = FREE_ACCESSORIES.filter(v => v !== 'none');
+const FREE_REAL_FACIAL_HAIR = FREE_FACIAL_HAIR_STYLES.filter(v => v !== 'none');
 const FREE_EYEBROW_STYLES = AVATAR_EYEBROW_STYLES.filter(v => !PREMIUM_MAP.eyebrows.includes(v));
 // Gender-specific free hair lists prevent cross-gender style mismatch in random generation
 const FREE_FEMALE_HAIR_STYLES = FEMALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v));
@@ -581,12 +585,25 @@ const AVATAR_VIBES: readonly AvatarVibe[] = [
   },
 ] as const;
 
+// How often an auto-generated avatar gets a "statement" extra. Tuned so most
+// avatars read as a clean, characterful face + at most ONE highlight — not a
+// slot machine that staples a random hat on everyone.
+const ACCESSORY_CHANCE = 0.33;
+const FACIAL_HAIR_CHANCE = 0.3;
+
 function buildConfig(
   gender: (typeof AVATAR_GENDERS)[number],
   vibe: AvatarVibe,
   pick: <T>(arr: readonly T[]) => T,
+  rand: () => number,
 ): CustomAvatarConfig {
   const hairList = gender === 'female' ? FREE_FEMALE_HAIR_STYLES : FREE_MALE_HAIR_STYLES;
+  // One highlight at most: an accessory OR facial hair, usually neither.
+  const accessory = rand() < ACCESSORY_CHANCE ? pick(FREE_REAL_ACCESSORIES) : 'none';
+  const facialHair =
+    gender === 'male' && accessory === 'none' && rand() < FACIAL_HAIR_CHANCE
+      ? pick(FREE_REAL_FACIAL_HAIR)
+      : 'none';
   return {
     gender,
     base: pick(FREE_BASES),
@@ -597,9 +614,9 @@ function buildConfig(
     eyeColor: pick(vibe.eyes),
     noseStyle: pick(AVATAR_NOSE_STYLES),
     eyebrows: pick(FREE_EYEBROW_STYLES),
-    facialHair: gender === 'male' ? pick(FREE_FACIAL_HAIR_STYLES) : 'none',
+    facialHair,
     mouth: pick(FREE_MOUTH_STYLES),
-    accessory: pick(FREE_ACCESSORIES),
+    accessory,
     accessoryColor: pick(vibe.accessory),
     bgColor: pick(vibe.bg),
     shirtColor: pick(vibe.shirt),
@@ -607,8 +624,9 @@ function buildConfig(
 }
 
 export function getRandomAvatarConfig(): CustomAvatarConfig {
-  const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.length)];
-  return buildConfig(pick(AVATAR_GENDERS), pick(AVATAR_VIBES), pick);
+  const rand = () => Math.random();
+  const pick = <T>(arr: readonly T[]): T => arr[Math.floor(rand() * arr.length)];
+  return buildConfig(pick(AVATAR_GENDERS), pick(AVATAR_VIBES), pick, rand);
 }
 
 /**
@@ -625,7 +643,7 @@ export function getSeededAvatarConfig(seed: number): CustomAvatarConfig {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
   const pick = <T>(arr: readonly T[]): T => arr[Math.floor(rand() * arr.length)];
-  return buildConfig(pick(AVATAR_GENDERS), pick(AVATAR_VIBES), pick);
+  return buildConfig(pick(AVATAR_GENDERS), pick(AVATAR_VIBES), pick, rand);
 }
 
 /**
