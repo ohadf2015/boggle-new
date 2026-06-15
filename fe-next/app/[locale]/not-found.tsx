@@ -4,6 +4,11 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
+import {
+  recoverFromStaleChunk,
+  clearCachesAndReload,
+  CHUNK_RECOVERY_GUARD_KEY,
+} from '@/lib/deploy/staleDeployReload';
 
 export default function NotFound() {
   const { t, language } = useLanguage();
@@ -11,6 +16,37 @@ export default function NotFound() {
   useEffect(() => {
     document.title = '404 - ' + (t('notFound.heading') || 'Page Not Found') + ' | LexiClash';
   }, [t]);
+
+  // A stale tab navigating after a deploy can hit a spurious 404 (the old build
+  // requests an RSC/chunk that no longer exists). If the client build is provably
+  // out of date, reload once to recover; a genuine 404 on a fresh build (build
+  // times match) is left untouched, so this never loops on a real missing page.
+  useEffect(() => {
+    void recoverFromStaleChunk({
+      clientBuildTime: process.env.NEXT_PUBLIC_BUILD_TIME,
+      fetchServerBuildTime: async () => {
+        const res = await fetch('/api/version?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('version check failed');
+        const data = (await res.json()) as { buildTime?: string };
+        return data?.buildTime;
+      },
+      getGuard: () => {
+        try {
+          return sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === 'true';
+        } catch {
+          return false;
+        }
+      },
+      setGuard: () => {
+        try {
+          sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
+        } catch {
+          /* sessionStorage unavailable — version mismatch is still the primary guard */
+        }
+      },
+      clearCachesAndReload,
+    });
+  }, []);
 
   return (
     <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">

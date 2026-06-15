@@ -47,24 +47,16 @@ export default function GlobalError({
   const isRTL = detectedLocale === 'he';
 
   useEffect(() => {
-    // Auto-refresh on chunk load errors (stale deployment cache)
-    if (isChunkLoadError(error)) {
-      const hasRefreshed = sessionStorage.getItem("chunk_error_refresh");
-      if (!hasRefreshed) {
-        sessionStorage.setItem("chunk_error_refresh", "true");
-        window.location.reload();
-        return;
-      }
-      // Clear flag after showing error (so future errors can refresh again)
-      sessionStorage.removeItem("chunk_error_refresh");
-    }
+    const chunkError = isChunkLoadError(error);
 
+    // Fire telemetry BEFORE any reload so the event has a chance to flush
+    // (a reload mid-capture drops it — keeping us blind to recurrence).
     import("@/utils/sentry").then(({ captureError }) => {
       captureError(error, {
         errorBoundary: {
           type: "global-error",
           digest: error.digest,
-          isChunkError: isChunkLoadError(error),
+          isChunkError: chunkError,
           locale: detectedLocale,
           path: (() => { try { return window.location.pathname; } catch { return undefined; } })(),
         },
@@ -77,6 +69,18 @@ export default function GlobalError({
         digest: error.digest ?? "",
       });
     });
+
+    // Auto-refresh on chunk load errors (stale deployment cache)
+    if (chunkError) {
+      const hasRefreshed = sessionStorage.getItem("chunk_error_refresh");
+      if (!hasRefreshed) {
+        sessionStorage.setItem("chunk_error_refresh", "true");
+        window.location.reload();
+        return;
+      }
+      // Clear flag after showing error (so future errors can refresh again)
+      sessionStorage.removeItem("chunk_error_refresh");
+    }
   }, [error, detectedLocale]);
 
   const t = (path: string): string => {

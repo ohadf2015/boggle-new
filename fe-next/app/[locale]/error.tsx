@@ -80,8 +80,27 @@ export default function Error({
     }
   };
   useEffect(() => {
+    const chunkError = isChunkLoadError(error);
+
+    // Log BEFORE any reload — a reload mid-capture drops the Sentry event,
+    // leaving us blind to whether stale-deploy chunk errors still recur.
+    console.error('Page error:', error.name, error.message);
+    captureError(error, {
+      errorBoundary: {
+        type: 'page-error',
+        digest: error.digest,
+        isChunkError: chunkError,
+        // Tag the locale + route so cross-[locale] navigation failures (the
+        // language-switch "black screen" class) are diagnosable. This effect
+        // only runs because the fallback below is dependency-free and always
+        // renders — a heavy fallback that crashed here would also lose telemetry.
+        locale,
+        path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+      },
+    });
+
     // Auto-refresh on chunk load errors (stale deployment cache)
-    if (isChunkLoadError(error)) {
+    if (chunkError) {
       const hasRefreshed = sessionStorage.getItem('chunk_error_refresh');
       if (!hasRefreshed) {
         sessionStorage.setItem('chunk_error_refresh', 'true');
@@ -92,22 +111,6 @@ export default function Error({
       // Already tried refreshing once - clear the flag for next time
       sessionStorage.removeItem('chunk_error_refresh');
     }
-
-    // Log error with message for better debugging (Error objects serialize to {} in console)
-    console.error('Page error:', error.name, error.message);
-    captureError(error, {
-      errorBoundary: {
-        type: 'page-error',
-        digest: error.digest,
-        isChunkError: isChunkLoadError(error),
-        // Tag the locale + route so cross-[locale] navigation failures (the
-        // language-switch "black screen" class) are diagnosable. This effect
-        // only runs because the fallback below is dependency-free and always
-        // renders — a heavy fallback that crashed here would also lose telemetry.
-        locale,
-        path: typeof window !== 'undefined' ? window.location.pathname : undefined,
-      },
-    });
   }, [error, locale]);
 
   const handleRefresh = () => {

@@ -14,6 +14,9 @@ import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PagePresenceReporter from '@/components/PagePresenceReporter';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+// Eager (not nextDynamic): a lazily-loaded recovery component could itself be
+// the stale chunk that 404s, defeating its purpose.
+import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
@@ -621,6 +624,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
+                    {/* Auto-recovers stale-deploy chunk 404s that escape error boundaries
+                        (prefetch / asset onerror / next/dynamic import rejections). */}
+                    <ChunkErrorRecovery />
                     <NativeLanguageBanner />
                     <FirstGameLanguageNotice />
                     <OfflineBanner />
