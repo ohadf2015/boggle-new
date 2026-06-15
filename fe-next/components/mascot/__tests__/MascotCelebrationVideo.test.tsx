@@ -1,6 +1,19 @@
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Native detection — flip per-test to assert the celebration's animated overlay
+// layers do NOT force a GPU compositor layer (`will-change`) inside the
+// Capacitor WebView, where a freshly-promoted layer paints an uninitialised
+// WHITE backing for a frame before content composites (the "fanfare flashes
+// white" report). On web the hint stays (no flash there).
+vi.mock('@capacitor/core', () => ({
+  Capacitor: { isNativePlatform: vi.fn(() => false) },
+}));
+
+import { Capacitor } from '@capacitor/core';
 import { MascotCelebrationVideo } from '../MascotCelebrationVideo';
+
+const mockIsNative = vi.mocked(Capacitor.isNativePlatform);
 
 function mockReducedMotion(matches: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -22,6 +35,7 @@ describe('MascotCelebrationVideo', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     mockReducedMotion(false);
+    mockIsNative.mockReturnValue(false);
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -159,6 +173,38 @@ describe('MascotCelebrationVideo', () => {
     render(<MascotCelebrationVideo kind="streak" />);
     const sparkles = screen.getAllByTestId('mascot-celebration-sparkle');
     expect(sparkles.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('promotes the edge-glow / title / sparkle layers with will-change on web', () => {
+    render(<MascotCelebrationVideo kind="champion" />);
+    expect(screen.getByTestId('mascot-celebration-edge-glow').style.willChange).toBe('box-shadow');
+    expect(screen.getByTestId('mascot-celebration-title').style.willChange).toBe('transform, opacity');
+    for (const sparkle of screen.getAllByTestId('mascot-celebration-sparkle')) {
+      expect(sparkle.style.willChange).toBe('transform, opacity');
+    }
+  });
+
+  it('emits NO will-change layer on native — the promoted layer flashes white in the WebView', () => {
+    // Root cause of "the fanfare flashes white" on the installed app: each of
+    // these decorative layers (edge-glow box-shadow, title, sparkles) forces a
+    // persistent GPU compositor layer via `will-change`. The Android System
+    // WebView paints a freshly-promoted layer with an uninitialised white backing
+    // for a frame or two before the element composites — the edge glow sits
+    // directly over the video, so that white wash lands on the celebration.
+    // Drop the hint on native (keep the animation); promotion then defers to the
+    // first animated frame, after content has painted, so no white flash.
+    mockIsNative.mockReturnValue(true);
+    const { container } = render(<MascotCelebrationVideo kind="champion" />);
+    expect(screen.getByTestId('mascot-celebration-edge-glow').style.willChange).toBe('');
+    expect(screen.getByTestId('mascot-celebration-title').style.willChange).toBe('');
+    for (const sparkle of screen.getAllByTestId('mascot-celebration-sparkle')) {
+      expect(sparkle.style.willChange).toBe('');
+    }
+    // No will-change hint leaks into the markup at all.
+    expect(container.innerHTML).not.toMatch(/will-change/i);
+    // The celebration content still renders (we keep the juice, drop the flash).
+    expect(screen.getByTestId('mascot-celebration-edge-glow')).toBeInTheDocument();
+    expect(screen.getAllByTestId('mascot-celebration-sparkle').length).toBeGreaterThanOrEqual(6);
   });
 
   it('uses a knight-family video for the "explorer" first-visit-today kind (supports variety clips)', () => {
