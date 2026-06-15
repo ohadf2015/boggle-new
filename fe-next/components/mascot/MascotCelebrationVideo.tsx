@@ -1,8 +1,26 @@
 'use client';
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { MascotHaloGlow, type HaloIntensity, type HaloTone } from './MascotHaloGlow';
 import { pickCelebrationSrc } from '@/lib/results/celebrationVariant';
+
+/**
+ * The celebration's animated garnish (edge glow, title, sparkles) hints
+ * `will-change` so the browser promotes each to its own GPU compositor layer up
+ * front. On the native Capacitor (Android System) WebView a freshly-promoted
+ * layer paints an UNINITIALISED WHITE backing for a frame or two before the
+ * element composites onto it — and because the edge glow sits directly over the
+ * mascot video, that white wash reads as "the fanfare flashes white". Dropping
+ * the hint on native keeps the animations (transform / opacity / box-shadow all
+ * still tween) but defers layer promotion to the first animated frame, by which
+ * point real content has painted, so there is no white flash. Web keeps the
+ * hint (it does not flash there). The fanfare's caller is `ssr:false`, so this
+ * sync platform check is hydration-safe.
+ */
+function isNativeApp(): boolean {
+  return typeof window !== 'undefined' && Capacitor.isNativePlatform();
+}
 
 export type MascotCelebrationKind =
   | 'champion'        // MP 1st place
@@ -181,6 +199,8 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   forceSrc,
 }: MascotCelebrationVideoProps) {
   const variant = VARIANTS[kind];
+  // On native the eager GPU-layer promotion flashes white; drop the hint there.
+  const native = isNativeApp();
   // Pick a clip ONCE per mount. The results page re-renders frequently
   // (countdowns, score reveals); seeding from a mount-time random keeps the
   // same clip for the life of this celebration instead of reshuffling.
@@ -344,7 +364,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
               textShadow: `0 0 18px ${glowPrimary}99, 0 0 36px ${glowSecondary}66`,
               filter: `drop-shadow(0 4px 0 rgba(0,0,0,0.85)) drop-shadow(0 0 12px ${glowPrimary}cc)`,
               animation: `lcMcvTitleIn 540ms cubic-bezier(0.34, 1.56, 0.64, 1) both, lcMcvTitleWobble 2.4s ease-in-out 0.6s infinite`,
-              willChange: 'transform, opacity',
+              willChange: native ? undefined : 'transform, opacity',
             }}
           >
             {displayedTitle}
@@ -373,7 +393,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
                   ['--lc-fx' as string]: `${s.floatX}px`,
                   ['--lc-fy' as string]: `${s.floatY}px`,
                   animation: `${sparkleKey} 1.9s ease-in-out ${s.delay}s infinite`,
-                  willChange: 'transform, opacity',
+                  willChange: native ? undefined : 'transform, opacity',
                 }}
               />
             );
@@ -412,7 +432,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
                   borderRadius: '24px',
                   pointerEvents: 'none',
                   animation: `${edgeGlowKey} 1.8s ease-in-out infinite`,
-                  willChange: 'box-shadow',
+                  willChange: native ? undefined : 'box-shadow',
                 }}
               />
             </div>
