@@ -48,9 +48,12 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
 
     await ensureGoogleIdInitialized(google, clientId);
     renderedRef.current = true;
+    // 'outline' = white button (white bg, dark text). The colored "G" can't be
+    // recolored — Google's branding rules forbid a monochrome logo, so a black G
+    // is impossible. White button inside our black frame = neo-brutalist look.
     google.accounts.id.renderButton(containerRef.current, {
       type: 'standard',
-      theme: 'filled_black',
+      theme: 'outline',
       size: 'large',
       shape: 'rectangular',
       text: 'continue_with',
