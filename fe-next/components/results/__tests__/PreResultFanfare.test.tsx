@@ -3,6 +3,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { PreResultFanfare } from '../PreResultFanfare';
 import type { MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
+import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
+
+// Default to the desktop (animated) path; the native describe forces static.
+// On the native Android System WebView / mobile renderers, a full-area element
+// that animates its opacity from 0 promotes a fresh GPU compositor layer whose
+// uninitialised backing paints ONE white frame before content composites — the
+// reported "white flash after the first game". The static path must avoid that.
+vi.mock('@/lib/native/webViewLayerFlash', () => ({
+  prefersStaticFullscreenOverlay: vi.fn(() => false),
+}));
 
 // Mock the inner video component. It honours `autoDismissMs` exactly like the
 // real MascotCelebrationVideo (timer → onDone) so we can verify the fanfare
@@ -198,5 +208,57 @@ describe('PreResultFanfare — pre-result video then transition to results', () 
     expect(confettiMock).not.toHaveBeenCalled();
     expect(screen.queryByTestId('inner-celebration-video')).not.toBeInTheDocument();
     setReducedMotion(false); // restore for other tests
+  });
+
+  it('on DESKTOP the edge glow uses the opacity-in pulse animation (keeps the juice)', () => {
+    setReducedMotion(false);
+    vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(false);
+    render(<PreResultFanfare kind="champion" onComplete={vi.fn()} t={(k, f) => f || k} />);
+
+    const glow = screen.getByTestId('pre-result-edge-glow');
+    // Desktop animates the glow in (opacity 0 → 1 keyframe) for the entrance pop.
+    expect(glow.className).toContain('animate-[preFanfareEdgeGlow');
+  });
+
+  describe('native / mobile static variant (no GPU-layer white flash)', () => {
+    beforeEach(() => {
+      setReducedMotion(false);
+      vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(true);
+    });
+    afterEach(() => {
+      vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(false);
+    });
+
+    it('renders the edge glow WITHOUT an opacity-0 entrance animation (no fresh GPU layer)', () => {
+      render(<PreResultFanfare kind="champion" onComplete={vi.fn()} t={(k, f) => f || k} />);
+
+      const glow = screen.getByTestId('pre-result-edge-glow');
+      // The `preFanfareEdgeGlow` keyframe starts at opacity:0 — animating it from
+      // 0 is exactly what promotes the white-backed compositor layer. On native it
+      // must NOT run; the glow paints statically in the normal document layer.
+      expect(glow.className).not.toContain('animate-[preFanfareEdgeGlow');
+      expect(glow.className).not.toContain('animate-');
+      // It must paint from the first frame at a settled, non-zero opacity (so it
+      // is visible without an entrance tween), not start hidden.
+      expect(glow.style.opacity).not.toBe('');
+      expect(Number(glow.style.opacity)).toBeGreaterThan(0);
+    });
+
+    it('marks the fanfare root as the static overlay variant', () => {
+      render(<PreResultFanfare kind="bingo" onComplete={vi.fn()} t={(k, f) => f || k} />);
+      expect(screen.getByTestId('pre-result-fanfare')).toHaveAttribute('data-static-overlay', 'true');
+    });
+
+    it('still shows the mascot video and auto-advances to results on the static path', () => {
+      const onComplete = vi.fn();
+      render(<PreResultFanfare kind="champion" onComplete={onComplete} t={(k, f) => f || k} />);
+
+      expect(screen.getByTestId('inner-celebration-video')).toBeInTheDocument();
+      expect(onComplete).not.toHaveBeenCalled();
+      act(() => {
+        vi.advanceTimersByTime(6000);
+      });
+      expect(onComplete).toHaveBeenCalledTimes(1);
+    });
   });
 });

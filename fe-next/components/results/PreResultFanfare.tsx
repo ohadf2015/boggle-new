@@ -5,6 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MascotCelebrationVideo, type MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 import { celebrationTitleFor } from '@/components/mascot/celebrationKind';
+import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 
 /**
  * Confetti palettes per kind — brand colours only. Pure white (#FFFFFF) was
@@ -113,6 +114,17 @@ export const PreResultFanfare = memo(function PreResultFanfare({
     return null;
   }
 
+  // On the native Android System WebView (and mobile-web Chromium/WebKit, same
+  // renderer quirk) a full-area element that animates its opacity FROM 0 promotes
+  // a fresh GPU compositor layer whose uninitialised backing paints one white
+  // frame before content composites — the "white flash after the first game".
+  // Dropping `will-change` is not enough (see commit e46807d5b): the entrance
+  // tween itself must not run. So on native/mobile the entrance opacity tweens
+  // (edge-glow keyframe + video-wrapper fade-in) are rendered statically — the
+  // glow paints at its settled opacity in the normal document layer, over the
+  // opaque navy root, and never promotes. Desktop keeps the animated juice.
+  const staticOverlay = prefersStaticFullscreenOverlay();
+
   return (
     <div
       className={cn(
@@ -122,6 +134,7 @@ export const PreResultFanfare = memo(function PreResultFanfare({
       )}
       data-testid="pre-result-fanfare"
       data-kind={kind}
+      data-static-overlay={staticOverlay ? 'true' : 'false'}
     >
       {/* Screen-edge electric glow vignette — same effect as the fanfare demo.
           Radial gradient is transparent through the centre and only paints the
@@ -131,10 +144,18 @@ export const PreResultFanfare = memo(function PreResultFanfare({
       <div
         data-testid="pre-result-edge-glow"
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] animate-[preFanfareEdgeGlow_2600ms_ease-in-out_infinite]"
+        className={cn(
+          'pointer-events-none absolute inset-0 z-[1]',
+          // Animate the opacity-0 → 1 entrance pulse ONLY off the static path.
+          // On native/mobile that opacity-from-0 tween is the white-flash trigger.
+          !staticOverlay && 'animate-[preFanfareEdgeGlow_2600ms_ease-in-out_infinite]',
+        )}
         style={{
           background:
             'radial-gradient(circle at center, transparent 50%, rgba(191,255,0,0.0) 60%, rgba(255,20,147,0.18) 78%, rgba(0,255,255,0.32) 100%)',
+          // Static path: paint at the keyframe's settled (100%) opacity from the
+          // first frame — visible, but never tweened from 0, so no layer promotion.
+          ...(staticOverlay ? { opacity: 0.85 } : {}),
         }}
       />
       <style>{`
@@ -160,7 +181,10 @@ export const PreResultFanfare = memo(function PreResultFanfare({
             // Opacity-only: the inner MascotCelebrationVideo already plays its own
             // `lcMcvVideoIn` scale/translate pop. Stacking a second scale+y here
             // double-transformed the same node = the jumpy "stutter" on entrance.
-            initial={{ opacity: 0 }}
+            // Native/mobile: mount at the final opacity (`initial={false}`) so there
+            // is no opacity-0 → 1 entrance tween to promote a white-backed layer.
+            // Exit still fades (runs ~4s later, long after content has painted).
+            initial={staticOverlay ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.32, ease: 'easeOut' }}
