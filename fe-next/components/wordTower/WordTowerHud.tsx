@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp, RotateCw, ChevronsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { comboMult, type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
-import { useTimedReveal } from '@/lib/wordTower/useTimedReveal';
+import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 
 export interface WordTowerHudProps {
   anchorLetter: string;
@@ -46,7 +45,6 @@ export interface WordTowerHudProps {
 
 /** How long the reward popup stays before it fades away (matches the
  *  wt-reward-pop keyframe's full run so the unmount lands after the fade). */
-const REWARD_REVEAL_MS = 2400;
 
 const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
   none: '',
@@ -64,18 +62,11 @@ export function WordTowerHud(props: WordTowerHudProps) {
   } = props;
   void onClear;
 
-  const mult = comboMult(combo);
   const canSubmit = word.length >= 3;
   // When a word is in flight (post-BUILD, pre-DROP) the deck flips into "armed"
   // mode: tray + edit buttons lock, the CTA becomes a one-tap DROP — keeps the
   // player's finger pinned to the same spot.
   const isPlacing = !!pendingWord;
-
-  // Reward popup is a momentary celebration — it pops in, holds, then fades out
-  // (founder: the "+m ×combo" text used to stay on-screen forever between
-  // words). Re-reveals on every accepted word; the timer also covers reduced-
-  // motion users (who get no CSS fade, just a clean hide).
-  const showReward = useTimedReveal(resultKey, REWARD_REVEAL_MS);
 
   // Clue: reveal a masked sample word on demand; reset when the anchor changes.
   const [clueShown, setClueShown] = useState(false);
@@ -112,23 +103,10 @@ export function WordTowerHud(props: WordTowerHudProps) {
   // — pin it to the bottom of the screen.
   return (
     <div className="pointer-events-none relative flex h-full flex-col justify-end">
-      {/* Floating reward popup on each accepted word — pops in, holds, fades. */}
-      {showReward && lastResult && (
-        <div
-          key={`pop-${resultKey}`}
-          className="pointer-events-none absolute left-1/2 top-[30%] z-20 -translate-x-1/2 animate-[wt-reward-pop_2.2s_ease-out_forwards] text-center"
-        >
-          {lastResult.tier !== 'none' && (
-            <div className="font-neo-display text-3xl font-extrabold uppercase tracking-wide text-neo-yellow drop-shadow-[3px_3px_0_#000]">
-              {t(TIER_KEY[lastResult.tier])}
-            </div>
-          )}
-          <div className="font-neo-display text-2xl font-bold text-neo-lime drop-shadow-[2px_2px_0_#000]">
-            +{lastResult.meters.toFixed(1)} m
-            {combo > 1 && <span className="ms-2 text-neo-orange">×{mult.toFixed(1)}</span>}
-          </div>
-        </div>
-      )}
+      {/* The floating "+X.X m / SKYSCRAPER" reward pop was REMOVED here — it
+          duplicated the centre drop-verdict (which now carries both the tier
+          celebration kicker AND the metres gained), so two near-identical pops
+          stacked on every drop. One consolidated verdict reads far cleaner. */}
       {/* Altitude readout now lives in the top-bar's centre column (see
           WordTowerStatHud in WordTowerPlay) so it can never sit behind the back
           button. This deck owns only the builder + controls. */}
@@ -171,13 +149,13 @@ export function WordTowerHud(props: WordTowerHudProps) {
             : <ChevronUp className="h-3 w-3 text-neo-white/40" />}
         </button>
         {deckOpen && (
-        <div className="space-y-2.5">
+        <div className="space-y-1.5">
         {/* Word builder — framed slot so the anchor + selected letters read as
             a "preview viewfinder" rather than free-floating tiles. */}
         <div
           key={`builder-${errorKey}`}
           className={cn(
-            'mx-auto flex min-h-[56px] max-w-md items-center justify-center gap-1.5 rounded-neo border-neo border-black bg-neo-navy-light/60 px-3 py-2 shadow-hard-sm',
+            'mx-auto flex min-h-[44px] max-w-md items-center justify-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light/60 px-3 py-1.5 shadow-hard-sm',
             lastError && errorKey > 0 && 'animate-neo-shake border-neo-red',
           )}
         >
@@ -232,7 +210,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
         {/* Tray — dimmed + non-interactive while placing */}
         <div
           className={cn(
-            'mx-auto grid max-w-md grid-cols-6 gap-1.5 transition-opacity',
+            'mx-auto grid max-w-md grid-cols-6 gap-1 transition-opacity',
             isPlacing && 'opacity-30',
           )}
           aria-disabled={isPlacing}
@@ -250,7 +228,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
                 onClick={() => onSelectTile(i)}
                 aria-label={t(isGolden ? 'wordTower.a11y.goldenTile' : 'wordTower.a11y.tile', { letter })}
                 className={cn(
-                  'relative flex aspect-square min-h-[40px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
+                  'relative flex aspect-square min-h-[36px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-lg font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
                   isSel
                     ? 'bg-neo-navy-light text-neo-white/30'
                     : isGolden
@@ -271,7 +249,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             type="button"
             onClick={onScramble}
             disabled={scramblesLeft <= 0 || isPlacing}
-            className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-2.5 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-2 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
             aria-label={t('wordTower.hud.scramble')}
           >
             <Shuffle className="h-5 w-5" />
@@ -325,7 +303,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
 function Tile({ letter, variant }: { letter: string; variant: 'anchor' | 'selected' }) {
   return (
     <span
-      className={`flex h-9 w-9 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-xl font-bold shadow-hard ${
+      className={`flex h-8 w-8 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-lg font-bold shadow-hard ${
         variant === 'anchor'
           ? 'bg-neo-yellow text-black ring-2 ring-neo-yellow ring-offset-2 ring-offset-neo-navy'
           : 'bg-neo-cyan text-black'

@@ -8,7 +8,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameActiveSound } from '@/hooks/useGameActiveSound';
-import { TOWER_SURPRISE_META, type ActiveTowerSurprise, type TowerSurpriseSound } from '@/lib/wordTower/towerSurprise';
+import { TOWER_SURPRISE_META, UPDRAFT_MULT, type ActiveTowerSurprise, type TowerSurpriseSound } from '@/lib/wordTower/towerSurprise';
 import type { Language } from '@/shared/types/game';
 import { useWordTower } from '@/lib/wordTower/useWordTower';
 import {
@@ -38,7 +38,10 @@ import {
 import { comboMilestone, type ComboMilestone } from '@/lib/wordTower/comboMilestone';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { WordTowerMutatorBanner } from './WordTowerMutatorBanner';
-import { swayInstability } from '@/lib/wordTower/towerSway';
+import { swayInstability, swayHeightDampen } from '@/lib/wordTower/towerSway';
+import { blockMaterial } from '@/lib/wordTower/blockGrade';
+import { textColorOn } from '@/lib/wordTower/towerColumn';
+import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
 import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import { useWordTowerPerks } from './useWordTowerPerks';
@@ -60,6 +63,15 @@ const VERDICT_TONE_CLASS: Record<VerdictTone, string> = {
   cyan: 'bg-neo-cyan text-neo-black',
   yellow: 'bg-neo-yellow text-neo-black',
   red: 'bg-neo-red text-neo-white',
+};
+
+/** Long-word celebration label per tier — folded into the verdict pop so the
+ *  "SKYSCRAPER!" beat rides with the drop verdict instead of as a 2nd floating
+ *  pop. (Mirrors WordTowerHud's TIER_KEY.) */
+const TOWER_TIER_KEY: Record<'highRise' | 'tall' | 'skyscraper', string> = {
+  highRise: 'wordTower.celebration.highRise',
+  tall: 'wordTower.celebration.tall',
+  skyscraper: 'wordTower.celebration.skyscraper',
 };
 
 interface PlayProps {
@@ -136,7 +148,24 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     playGiftReceivedSound,
     playTimeBonusSound,
     playRareWordSound,
+    playPerfectWordSound,
+    playPathConnectSound,
+    playTileSelectSound,
+    playTileAppearSound,
   } = useSoundEffects();
+  // A satisfying, slightly-random LANDING thock on every drop (founder ask). The
+  // variant + dust scale by how cleanly it landed; seeded per drop so it's varied
+  // but reproducible. Maps dropFlavor's abstract key → a concrete percussive SFX.
+  const dropSoundFns = useMemo<Record<string, () => void>>(
+    () => ({
+      landCrisp: playPerfectWordSound,
+      landSolid: playPathConnectSound,
+      landSoft: playTileSelectSound,
+      landDull: playTileAppearSound,
+    }),
+    [playPerfectWordSound, playPathConnectSound, playTileSelectSound, playTileAppearSound],
+  );
+  const dropCountRef = useRef(0);
   // Maps a surprise event's semantic sound key (declared in TOWER_SURPRISE_META)
   // to the concrete play*Sound fn — keeps the audio choice co-located with the
   // event in the pure module, the wiring here.
@@ -269,15 +298,35 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   );
   // How shaky the tower is (0..1) — drives the continuous SWING and, via the
   // crane's matching offset, makes placing on an unstable tower genuinely harder.
-  const instability = swayInstability(crane.consecutiveSloppy, crane.leanDeg);
+  // Damped by height: a tall tower's top travels far at a given angle, so without
+  // this a 30-floor tower whips side-to-side ("goes crazy"). The SAME damped value
+  // is fed to BOTH the crane target and the Pixi tower angle, so WYSIWYG holds.
+  const instability =
+    swayInstability(crane.consecutiveSloppy, crane.leanDeg) * swayHeightDampen(game.floors.length);
+
+  // The crane carries the block in the FINAL committed material colour of the
+  // current build line, so it never "switches weird colours" on landing. Convert
+  // the packed material int → CSS hex once per zone, with a legible glyph colour.
+  const blockColorInt = useMemo(() => blockMaterial(biomeId), [biomeId]);
+  const blockColorHex = useMemo(() => `#${blockColorInt.toString(16).padStart(6, '0')}`, [blockColorInt]);
+  const blockTextHex = useMemo(
+    () => `#${textColorOn(blockColorInt).toString(16).padStart(6, '0')}`,
+    [blockColorInt],
+  );
 
   // Unmistakable verdict pop — one big, band-coloured beat on every drop telling
   // the player exactly how they did + the metres gained. Keyed off the placement
   // result; the height delta is read after commit settles into `game.heightM`.
   const lastOutcomeRef = useRef<PlacementOutcome | null>(null);
   const handleCraneDrop = useCallback(
-    (o: PlacementOutcome) => { lastOutcomeRef.current = o; crane.onDrop(o); },
-    [crane.onDrop], // eslint-disable-line react-hooks/exhaustive-deps
+    (o: PlacementOutcome) => {
+      lastOutcomeRef.current = o;
+      // Satisfying, varied landing thock — fires on release, before the accepted-
+      // word fanfare, so the drop itself has a percussive payoff.
+      dropSoundFns[dropFlavor(dropCountRef.current++, o.quality).soundKey]?.();
+      crane.onDrop(o);
+    },
+    [crane.onDrop, dropSoundFns], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const [verdict, setVerdict] = useState<{ v: DropVerdict; key: number } | null>(null);
   const prevVerdictHeight = useRef(game.heightM);
@@ -523,6 +572,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         reducedMotion={reducedMotion}
         bottomInsetPx={deckHeight}
         personalBestM={personalBest}
+        rivals={displayRivals}
         leanDeg={crane.leanDeg}
         instability={instability}
         clutchSaveKey={crane.clutch?.outcome === 'save' ? crane.clutch.key : 0}
@@ -605,6 +655,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           reducedMotion={reducedMotion}
           periodMs={sweepMs}
           instability={instability}
+          blockColorHex={blockColorHex}
+          blockTextHex={blockTextHex}
           hideOwnButton
         />
       )}
@@ -619,6 +671,14 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           aria-live="assertive"
           role="status"
         >
+          {/* Tier kicker — the long-word celebration (SKYSCRAPER!) folded INTO the
+              verdict so it is ONE consolidated beat, not a separate floating pop
+              stacking on top of this one (founder: less clutter, more fun to watch). */}
+          {tower.state.lastResult && tower.state.lastResult.tier !== 'none' && (
+            <div className="rounded-neo border-neo border-black bg-neo-yellow px-3 py-0.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard">
+              {t(TOWER_TIER_KEY[tower.state.lastResult.tier])}
+            </div>
+          )}
           <div
             className={`rounded-neo border-neo-thick border-black px-6 py-3 text-center font-neo-display text-3xl font-black uppercase tracking-wide shadow-hard ${VERDICT_TONE_CLASS[verdict.v.tone]} ${reducedMotion ? '' : verdict.v.toppled ? 'animate-neo-shake' : 'animate-neo-pop'}`}
           >
@@ -702,6 +762,13 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
               {surpriseFx.s.bonusMeters > 0 && `+${Math.round(surpriseFx.s.bonusMeters)}m`}
               {surpriseFx.s.bonusMeters > 0 && surpriseFx.s.bonusScrambles > 0 && ' · '}
               {surpriseFx.s.bonusScrambles > 0 && `+${surpriseFx.s.bonusScrambles}🔀`}
+            </div>
+          )}
+          {/* Updraft pays out on the NEXT word, so it has no immediate bonus to
+              show — surface the PROMISE explicitly so the reward isn't hollow. */}
+          {surpriseFx.s.event === 'updraft' && (
+            <div className="font-neo-body text-xs font-black text-black/80 tabular-nums">
+              {t('wordTower.surprise.nextWord')} ×{UPDRAFT_MULT}
             </div>
           )}
         </div>

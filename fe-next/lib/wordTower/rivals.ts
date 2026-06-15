@@ -8,17 +8,23 @@
  */
 
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 export interface RivalMarker {
   id: string;
   name: string;
   /** The rival's record height (m). */
   heightM: number;
-  /** Stable user id (for self-exclusion + future per-rival features). */
+  /** Stable user id (for self-exclusion + the Avatar's seeded fallback). */
   playerId?: string;
   /** Highest zone the rival reached — themes their ghost tower's material. */
   highestBiome?: WordTowerBiomeId;
-  /** Avatar chip atop their ghost tower (from the leaderboard profile). */
+  /** The rival's REAL generated avatar (their identity face) — rendered via the
+   *  shared <Avatar>. Falls back to the seeded face from `playerId` when absent.
+   *  Replaces the old flat emoji+colour chip. */
+  customAvatar?: CustomAvatarConfig | null;
+  avatarImage?: string | null;
+  /** Legacy emoji+colour — kept as a last-resort fallback only. */
   avatarEmoji?: string | null;
   avatarColor?: string | null;
 }
@@ -31,6 +37,8 @@ export interface LeaderboardRivalRow {
   username?: string;
   bestHeightM?: number;
   highestBiome?: string;
+  avatarConfig?: CustomAvatarConfig | null;
+  avatarImage?: string | null;
   avatarEmoji?: string | null;
   avatarColor?: string | null;
 }
@@ -52,6 +60,8 @@ export function rivalsFromLeaderboard(rows: ReadonlyArray<LeaderboardRivalRow>, 
       name: String(r.username ?? 'Player'),
       heightM: Number(r.bestHeightM),
       highestBiome: (KNOWN_BIOMES.has(String(r.highestBiome)) ? r.highestBiome : 'city') as WordTowerBiomeId,
+      customAvatar: r.avatarConfig ?? null,
+      avatarImage: r.avatarImage ?? null,
       avatarEmoji: r.avatarEmoji ?? null,
       avatarColor: r.avatarColor ?? null,
     }));

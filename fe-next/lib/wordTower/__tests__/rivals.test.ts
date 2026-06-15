@@ -99,4 +99,18 @@ describe('rivalsFromLeaderboard', () => {
     const noBiome = rivalsFromLeaderboard([{ playerId: 'x', username: 'X', bestHeightM: 10 }]);
     expect(noBiome[0]!.highestBiome).toBe('city');
   });
+
+  it('carries the generated avatar CONFIG (not just emoji) so the rail can render a real face', () => {
+    const cfg = { skin: 'tan', eyes: 'happy' } as unknown as NonNullable<RivalMarker['customAvatar']>;
+    const out = rivalsFromLeaderboard([
+      { playerId: 'p9', username: 'Ivy', bestHeightM: 50, avatarConfig: cfg, avatarImage: 'img.png' },
+    ]);
+    expect(out[0]!.customAvatar).toBe(cfg);
+    expect(out[0]!.avatarImage).toBe('img.png');
+  });
+
+  it('leaves customAvatar null when the rival has no custom avatar (Avatar falls back to the seeded face)', () => {
+    const out = rivalsFromLeaderboard([{ playerId: 'p10', username: 'Jo', bestHeightM: 30 }]);
+    expect(out[0]!.customAvatar).toBeNull();
+  });
 });

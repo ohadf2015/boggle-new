@@ -32,11 +32,11 @@ export async function GET(request: NextRequest) {
     }
 
     const ids = (rows ?? []).map((r) => r.player_id);
-    const profileMap = new Map<string, { username?: string; display_name?: string; avatar_image?: string | null; avatar_emoji?: string | null; avatar_color?: string | null }>();
+    const profileMap = new Map<string, { username?: string; display_name?: string; avatar_image?: string | null; avatar_config?: unknown; avatar_emoji?: string | null; avatar_color?: string | null }>();
     if (ids.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color')
+        .select('id, username, display_name, avatar_image, avatar_config, avatar_emoji, avatar_color')
         .in('id', ids);
       for (const p of profiles ?? []) profileMap.set(p.id, p);
     }
@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
         isYou: r.player_id === user.id,
         username: p?.display_name || p?.username || 'Player',
         avatarImage: p?.avatar_image ?? null,
+        avatarConfig: p?.avatar_config ?? null,
         avatarEmoji: p?.avatar_emoji ?? null,
         avatarColor: p?.avatar_color ?? null,
         bestHeightM: Number(r.best_height_m) || 0,

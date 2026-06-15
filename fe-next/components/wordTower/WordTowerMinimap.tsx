@@ -2,6 +2,7 @@
 
 import { miniTowerScaleMax, altToFraction, miniTowerZones } from '@/lib/wordTower/miniTower';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
+import type { RivalMarker } from '@/lib/wordTower/rivals';
 
 interface WordTowerMinimapProps {
   /** Committed climber height (m). */
@@ -9,6 +10,9 @@ interface WordTowerMinimapProps {
   /** Currently-viewed altitude (m) — differs from heightM only while panned. */
   viewM: number;
   personalBestM: number;
+  /** Other players' record heights — drawn as ticks so the climber sees who is
+   *  still above them on the same pocket scale they read their own height on. */
+  rivals?: RivalMarker[];
   /** Tap → glide the camera back to the build line (back-to-top affordance). */
   onScrollTop: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -23,7 +27,7 @@ const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
  * where the user is currently looking (while panned). Tapping it glides back to
  * the top, so it doubles as a back-to-top control.
  */
-export function WordTowerMinimap({ heightM, viewM, personalBestM, onScrollTop, t }: WordTowerMinimapProps) {
+export function WordTowerMinimap({ heightM, viewM, personalBestM, rivals, onScrollTop, t }: WordTowerMinimapProps) {
   const scaleMax = miniTowerScaleMax(heightM, personalBestM);
   const zones = miniTowerZones(scaleMax);
   const climberFrac = altToFraction(heightM, scaleMax);
@@ -31,6 +35,11 @@ export function WordTowerMinimap({ heightM, viewM, personalBestM, onScrollTop, t
   const pbFrac = altToFraction(personalBestM, scaleMax);
   const showPb = personalBestM > heightM + 1;
   const panned = Math.abs(viewM - heightM) > 2;
+  // Rival record ticks — coloured by the material of THEIR top zone, so the
+  // pocket map shows "who is above me" at a glance, mirroring the side rail.
+  const rivalTicks = (rivals ?? [])
+    .filter((r) => r.heightM > 0 && r.heightM <= scaleMax)
+    .map((r) => ({ id: r.id, frac: altToFraction(r.heightM, scaleMax), mat: hex(blockMaterial(r.highestBiome ?? 'city')) }));
 
   return (
     <button
@@ -51,6 +60,17 @@ export function WordTowerMinimap({ heightM, viewM, personalBestM, onScrollTop, t
               backgroundColor: hex(blockMaterial(z.id)),
               opacity: 0.9,
             }}
+          />
+        ))}
+        {/* Rival record ticks — a short coloured dash + dot on the right edge at
+            each rival's height. Drawn under the PB/climber marks so your own
+            progress still reads first. */}
+        {rivalTicks.map((r) => (
+          <div
+            key={r.id}
+            className="absolute end-0 h-0.5 w-2.5 rounded-full border-r-2 border-black/70"
+            style={{ bottom: `${r.frac * 100}%`, backgroundColor: r.mat }}
+            aria-hidden
           />
         ))}
         {showPb && (

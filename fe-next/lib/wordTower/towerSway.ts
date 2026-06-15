@@ -20,15 +20,21 @@
 import { TOPPLE_AFTER_SLOPPY } from './cranePlacement';
 import { LEAN_MAX_DEG } from './towerLean';
 
-/** Max sway angle (deg) at full instability. */
-export const SWAY_MAX_DEG = 5;
+/** Max sway angle (deg) at full instability. Tuned DOWN from 5° — at the old
+ *  value a tall tower's top whipped side-to-side ("goes crazy"), because the
+ *  top's travel is height × sin(angle): same angle throws a 30-floor tower far
+ *  wider than a 3-floor one. A gentler base angle + the height dampen below keep
+ *  the swing legible instead of frantic. */
+export const SWAY_MAX_DEG = 3.4;
 /** Below this instability the tower is steady — no sway at all. */
 export const SWAY_START_INSTABILITY = 0.3;
-/** Sway oscillation period (ms): calmer when barely unstable, frantic at the brink. */
-export const SWAY_PERIOD_CALM_MS = 1400;
-export const SWAY_PERIOD_FRANTIC_MS = 900;
-/** How far (in crane [-1,1] error space) the top shifts at the max sway angle. */
-export const SWAY_OFFSET_AT_MAX = 0.35;
+/** Sway oscillation period (ms): calmer when barely unstable, frantic at the
+ *  brink. Slowed a touch so the swing reads as a heavy lean, not a jitter. */
+export const SWAY_PERIOD_CALM_MS = 1600;
+export const SWAY_PERIOD_FRANTIC_MS = 1050;
+/** How far (in crane [-1,1] error space) the top shifts at the max sway angle.
+ *  Lowered with the angle so the landing target drifts calmly, not jumpily. */
+export const SWAY_OFFSET_AT_MAX = 0.26;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 const clamp01 = (n: number) => clamp(n, 0, 1);
@@ -42,6 +48,24 @@ export function swayInstability(consecutiveSloppy: number, leanDegAbs: number): 
   const fromSloppy = clamp01(Math.max(0, consecutiveSloppy) / (TOPPLE_AFTER_SLOPPY + 1));
   const fromLean = clamp01(Math.abs(leanDegAbs) / LEAN_MAX_DEG);
   return clamp01(Math.max(fromSloppy, fromLean));
+}
+
+/** Floor count at which the tower-top travel is so large that even a small angle
+ *  whips it — beyond here the dampen is at its floor. */
+const SWAY_DAMPEN_FULL_FLOORS = 28;
+/** Smallest dampen factor (a tall tower still sways, just calmly). */
+const SWAY_DAMPEN_MIN = 0.45;
+
+/**
+ * Height dampen (0..1) applied to instability BEFORE it reaches the amplitude
+ * ramp. The taller the tower, the further its top travels at a given angle, so
+ * we shrink the effective instability as floors stack — keeping a 30-floor tower
+ * from flailing while a short one still wobbles honestly. Fed into the SAME
+ * `instability` value the crane + scene both read, so WYSIWYG stays locked.
+ */
+export function swayHeightDampen(floorCount: number): number {
+  const f = clamp01(Math.max(0, floorCount) / SWAY_DAMPEN_FULL_FLOORS);
+  return lerp(1, SWAY_DAMPEN_MIN, f);
 }
 
 /** Sway amplitude (deg) — gated below {@link SWAY_START_INSTABILITY}, then ramps to the max. */

@@ -4,6 +4,7 @@ import {
   swayAmplitudeDeg,
   swayAngleAt,
   swayNormalizedOffset,
+  swayHeightDampen,
   effectiveDropError,
   SWAY_MAX_DEG,
   SWAY_START_INSTABILITY,
@@ -75,6 +76,28 @@ describe('swayNormalizedOffset — angle → crane-space horizontal shift', () =
     const o = swayNormalizedOffset(SWAY_MAX_DEG);
     expect(o).toBeGreaterThan(0);
     expect(o).toBeLessThan(0.5); // never moves the target more than half the rack
+  });
+});
+
+describe('swayHeightDampen — tall towers swing calmer, not crazier', () => {
+  it('is full (1) for a fresh, short tower', () => {
+    expect(swayHeightDampen(0)).toBeCloseTo(1, 6);
+  });
+
+  it('shrinks monotonically as floors stack', () => {
+    expect(swayHeightDampen(10)).toBeLessThan(swayHeightDampen(2));
+    expect(swayHeightDampen(25)).toBeLessThan(swayHeightDampen(10));
+  });
+
+  it('never collapses to zero (a tall tower still sways, just gently)', () => {
+    expect(swayHeightDampen(999)).toBeGreaterThan(0.3);
+    expect(swayHeightDampen(999)).toBeLessThan(1);
+  });
+
+  it('damping instability shrinks the effective sway amplitude', () => {
+    const raw = swayAmplitudeDeg(1);
+    const damped = swayAmplitudeDeg(1 * swayHeightDampen(28));
+    expect(damped).toBeLessThan(raw);
   });
 });
 

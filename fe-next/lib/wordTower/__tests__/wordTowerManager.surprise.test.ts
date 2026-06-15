@@ -93,6 +93,42 @@ describe('applyTowerWord — surprise integration', () => {
     expect(b.result.surprise?.event).toBe(a.result.surprise?.event);
   });
 
+  it('REWARD INTEGRITY: the pop value (activeSurprise.bonusMeters) is exactly the height granted beyond the base', () => {
+    const state = buildableState({ wordsSinceSurprise: TOWER_SURPRISE_PITY });
+    const base = floorMeters('CAT'.length, 1);
+    const { result } = applyTowerWord(state, 'CAT');
+    expect(result.surprise).not.toBeNull();
+    const popMeters = result.surprise!.bonusMeters;
+    // Height actually added beyond the base climb == what the pop advertises.
+    // (No updraft banked here, so appliedHeightMult is 1.)
+    expect(result.meters - base).toBeCloseTo(popMeters, 5);
+  });
+
+  it('REWARD INTEGRITY: the pop value (activeSurprise.bonusScrambles) is exactly the scrambles credited', () => {
+    // floorMeters('CAT') is below the earn-every threshold, so the ONLY scramble
+    // delta is the surprise bonus — the pop must equal that delta.
+    const state = buildableState({ wordsSinceSurprise: TOWER_SURPRISE_PITY, scramblesLeft: 0, heightHighWaterM: 9999 });
+    const { state: next, result } = applyTowerWord(state, 'CAT');
+    expect(result.surprise).not.toBeNull();
+    expect(next.scramblesLeft - state.scramblesLeft).toBe(result.surprise!.bonusScrambles);
+  });
+
+  it('REWARD INTEGRITY: a banked updraft pays its promised multiplier out on the NEXT word', () => {
+    // Cooldown word (no NEW surprise) carrying a banked ×1.5 updraft charge.
+    const state = buildableState({ wordsSinceSurprise: 0, nextWordHeightMult: 1.5 });
+    const base = floorMeters('CAT'.length, 1);
+    const { result } = applyTowerWord(state, 'CAT');
+    expect(result.surprise).toBeNull(); // still in cooldown — no new pop
+    expect(result.meters).toBeCloseTo(base * 1.5, 5); // but the charge paid out
+  });
+
+  it('REWARD INTEGRITY: an updraft charge is consumed once, not forever', () => {
+    const state = buildableState({ wordsSinceSurprise: 0, nextWordHeightMult: 1.5 });
+    const { state: afterFirst } = applyTowerWord(state, 'CAT');
+    // The next word (different anchor/tray) should NOT still carry ×1.5.
+    expect(afterFirst.nextWordHeightMult).toBe(1);
+  });
+
   it('works on a restored save with no surprise fields (backward compat)', () => {
     const legacy = buildableState();
     // Simulate an old persisted run: strip the surprise fields entirely.

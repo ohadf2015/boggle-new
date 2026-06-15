@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { visibleRivalMarkers, rivalsPassed, type RivalMarker } from '@/lib/wordTower/rivals';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { PROP_PX_PER_M } from '@/lib/wordTower/parallaxProps';
+import Avatar from '@/components/Avatar';
 
 /** Build line as a fraction of viewport height — matches towerLayout's topCenter. */
 const BUILD_LINE_FRACTION = 0.28;
@@ -77,13 +78,16 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
             className={`absolute ${side}`}
             style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
           >
-            <span className="absolute -top-6 start-0 flex items-center gap-1 whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/75 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white backdrop-blur-sm">
-              <span
-                className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-black text-[8px] leading-none"
-                style={{ background: m.avatarColor ?? '#2a2a40' }}
-              >
-                {m.avatarEmoji ?? '🧗'}
-              </span>
+            <span className="absolute -top-7 start-0 flex items-center gap-1.5 whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/75 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white backdrop-blur-sm">
+              {/* The rival's REAL avatar (their generated identity face), not a flat
+                  emoji — seeded fallback from playerId when they have no custom one. */}
+              <Avatar
+                customAvatar={m.customAvatar ?? undefined}
+                userId={m.playerId ?? m.id}
+                pixelSize={20}
+                disableEffects
+                className="shrink-0 rounded-full border border-black"
+              />
               {m.name} · {Math.round(m.heightM)}m
             </span>
             {/* Roof cap — the rival tower's crown at their record height. */}

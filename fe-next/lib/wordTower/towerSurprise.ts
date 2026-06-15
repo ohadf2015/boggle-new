@@ -121,7 +121,11 @@ export type TowerSurpriseReward = {
   nextWordHeightMult: number;
 };
 
-const UPDRAFT_MULT = 1.5;
+/** The height multiplier a banked updraft applies to the NEXT word. Exported so
+ *  the HUD can SURFACE the promise ("next ×1.5") at roll time — otherwise an
+ *  updraft pop shows no number (its payout lands a word later) and reads as a
+ *  hollow reward. */
+export const UPDRAFT_MULT = 1.5;
 
 export function towerSurpriseReward(
   event: TowerSurpriseEvent,
