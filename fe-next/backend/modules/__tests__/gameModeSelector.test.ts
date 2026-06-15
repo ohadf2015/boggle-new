@@ -31,6 +31,25 @@ describe('gameModeSelector', () => {
       }
     });
 
+    it('should NOT force blast on an empty history when forceBlastFirst is false', () => {
+      // A returning player who already saw the blast showcase: their next NEW room
+      // should roll weighted-random from round 1, not blast again.
+      const results = new Set<GameMode>();
+      for (let i = 0; i < 300; i++) {
+        const result = selectNextGameMode([], ALL_GAME_MODES, false);
+        expect(ALL_GAME_MODES).toContain(result);
+        results.add(result);
+      }
+      // Across many rolls more than one mode must appear (i.e. not always blast).
+      expect(results.size).toBeGreaterThan(1);
+    });
+
+    it('still forces blast on empty history when forceBlastFirst is true (default)', () => {
+      for (let i = 0; i < 100; i++) {
+        expect(selectNextGameMode([], ALL_GAME_MODES, true)).toBe('blast');
+      }
+    });
+
     it('should fall back to weighted random on the first game when blast is disabled', () => {
       const enabledModes: GameMode[] = ['classic', 'word-hunt'];
       const results = new Set<GameMode>();

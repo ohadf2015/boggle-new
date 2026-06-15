@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, m } from 'framer-motion';
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { Zap, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBlastOpponentActivity } from '@/hooks/gameState/selectors';
@@ -15,11 +15,51 @@ interface BlastMPLeaderboardProps {
 }
 
 /**
+ * Live score value that pops + flashes the moment it climbs, so the standings
+ * read as real-time rather than a static number. Tracks the previous value to
+ * detect an increase; honours prefers-reduced-motion (no transform/flash, just
+ * the new number).
+ */
+const LiveScore = memo(function LiveScore({
+  value,
+  emphasised,
+}: {
+  value: number;
+  emphasised: boolean;
+}) {
+  const reduce = useReducedMotion();
+  const prev = useRef(value);
+  const [bump, setBump] = useState(0);
+
+  useEffect(() => {
+    if (value > prev.current) setBump((b) => b + 1);
+    prev.current = value;
+  }, [value]);
+
+  return (
+    <m.span
+      key={bump}
+      animate={
+        reduce || bump === 0
+          ? undefined
+          : { scale: [1, 1.35, 1], color: ['#FFE135', emphasised ? '#0A1828' : '#FFFEF0'] }
+      }
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+      className={cn('ms-auto pl-1 font-black tabular-nums', emphasised ? 'text-base' : 'text-sm')}
+    >
+      {value.toLocaleString()}
+    </m.span>
+  );
+});
+
+/**
  * BlastMPLeaderboard — compact inline live-standings strip under the HUD in
- * multiplayer Blast. Reworked for clarity:
+ * multiplayer Blast.
  *   - the current player is ALWAYS shown (even outside the top slice) with a
  *     "YOU" tag + their true rank, so you can always read your live position;
- *   - the leader carries a crown; every row shows an explicit "#rank";
+ *   - the leader carries a gold crown; every row shows an explicit "#rank";
+ *   - each score pops + flashes the instant it climbs (LiveScore) so the strip
+ *     feels alive, not frozen;
  *   - a pulsing "LIVE" chip frames the strip as real-time standings;
  *   - a transient "opponent found word" flash keeps the round feeling shared.
  *
@@ -68,10 +108,10 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
       {/* Compact horizontal pill row, framed by a pulsing LIVE chip */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <span
-          className="flex items-center gap-1 shrink-0 px-1.5 py-1 text-[9px] font-black uppercase tracking-wider text-neo-pink"
+          className="flex items-center gap-1 shrink-0 ps-0.5 pe-1 text-[10px] font-black uppercase tracking-wider text-neo-pink"
           aria-hidden="true"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-neo-pink blast-heartbeat" />
+          <span className="w-2 h-2 rounded-full bg-neo-pink blast-heartbeat" />
           {label('blast.live', 'LIVE')}
         </span>
 
@@ -85,35 +125,37 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
               data-me={isMe ? 'true' : undefined}
               animate={
                 isFlashing
-                  ? { scale: [1, 1.12, 1], boxShadow: ['0 0 0 rgba(0,255,255,0)', '0 0 12px rgba(0,255,255,0.8)', '0 0 0 rgba(0,255,255,0)'] }
+                  ? { scale: [1, 1.12, 1], boxShadow: ['0 0 0 rgba(0,255,255,0)', '0 0 14px rgba(0,255,255,0.85)', '0 0 0 rgba(0,255,255,0)'] }
                   : { scale: 1 }
               }
               transition={{ duration: 0.9, ease: 'easeOut' }}
               className={cn(
                 'flex items-center gap-1.5 px-2 py-1 rounded-neo text-xs font-bold tabular-nums shrink-0',
-                'border-2 border-neo-black shadow-hard-sm',
+                'border-2 shadow-hard-sm',
                 isMe
-                  ? 'bg-neo-lime text-neo-navy'
-                  : isFlashing
-                    ? 'bg-neo-cyan/80 text-neo-navy'
-                    : 'bg-neo-navy/85 text-neo-white',
+                  ? 'border-neo-black bg-neo-lime text-neo-navy ring-2 ring-neo-black/20'
+                  : isLeader
+                    ? 'border-neo-yellow bg-neo-navy text-neo-white'
+                    : isFlashing
+                      ? 'border-neo-black bg-neo-cyan/80 text-neo-navy'
+                      : 'border-neo-black bg-neo-navy/85 text-neo-white',
               )}
               aria-label={`#${rank} ${isMe ? label('blast.you', 'YOU') : entry.username} ${entry.score}`}
             >
-              {/* Rank badge — crown for the leader, explicit #rank otherwise */}
+              {/* Rank badge — gold crown for the leader, explicit #rank otherwise */}
               <span className="flex items-center justify-center min-w-[18px] shrink-0">
                 {isLeader ? (
-                  <Crown className="w-3.5 h-3.5 text-neo-yellow" strokeWidth={3} fill="currentColor" />
+                  <Crown className="w-4 h-4 text-neo-yellow" strokeWidth={3} fill="currentColor" />
                 ) : (
-                  <span className="opacity-60">#{rank}</span>
+                  <span className="opacity-60 font-black">#{rank}</span>
                 )}
               </span>
               {/* Name — own row reads "YOU" so the player spots themself instantly */}
               <span className={cn('truncate max-w-[72px]', isMe && 'font-black uppercase tracking-wide')}>
                 {isMe ? label('blast.you', 'YOU') : entry.username}
               </span>
-              {/* Live score — bold + prominent */}
-              <span className="ms-auto pl-1 text-sm font-black">{entry.score}</span>
+              {/* Live score — pops + flashes the instant it climbs */}
+              <LiveScore value={entry.score} emphasised={isMe} />
             </m.div>
           );
         })}

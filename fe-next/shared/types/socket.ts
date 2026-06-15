@@ -397,6 +397,11 @@ export interface StartGamePayload {
   language?: Language;
   minWordLength?: number;
   gameMode?: GameMode;
+  /**
+   * Per-player latch from the host's localStorage: true once this player has seen
+   * the blast showcase opener. Skips the forced blast-first round thereafter.
+   */
+  blastIntroSeen?: boolean;
   /** Optional boost token bundled with startGame (atomic boost registration). */
   boostToken?: string;
 }

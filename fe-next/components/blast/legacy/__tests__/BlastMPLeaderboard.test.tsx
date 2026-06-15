@@ -26,11 +26,12 @@ describe('BlastMPLeaderboard', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('shows each visible player score (not zero)', () => {
+  it('shows each visible player score (not zero), thousands-formatted', () => {
     render(<BlastMPLeaderboard leaderboard={LB.slice(0, 3)} username="bob" t={t} />);
-    expect(screen.getByText('1200')).toBeInTheDocument();
-    expect(screen.getByText('800')).toBeInTheDocument();
-    expect(screen.getByText('450')).toBeInTheDocument();
+    // Scores render with locale thousands separators (e.g. 1200 → "1,200").
+    expect(screen.getByText((1200).toLocaleString())).toBeInTheDocument();
+    expect(screen.getByText((800).toLocaleString())).toBeInTheDocument();
+    expect(screen.getByText((450).toLocaleString())).toBeInTheDocument();
   });
 
   it('labels the current player with the YOU tag', () => {
@@ -42,7 +43,7 @@ describe('BlastMPLeaderboard', () => {
     // erin is rank 5 of 5 — must still appear with her score + rank #5
     render(<BlastMPLeaderboard leaderboard={LB} username="erin" t={t} />);
     expect(screen.getByText('YOU')).toBeInTheDocument();
-    expect(screen.getByText('90')).toBeInTheDocument();
+    expect(screen.getByText((90).toLocaleString())).toBeInTheDocument();
     expect(screen.getByText('#5')).toBeInTheDocument();
   });
 

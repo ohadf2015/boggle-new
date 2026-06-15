@@ -355,8 +355,9 @@ describe('gameLifecycleHandler - gameMode', () => {
         gameMode: 'random',
       });
 
-      // THEN: selectNextGameMode was called
-      expect(mockSelectNextGameMode).toHaveBeenCalledWith([], ['classic', 'blast', 'word-hunt']);
+      // THEN: selectNextGameMode was called (forceBlastFirst defaults true when the
+      // payload omits blastIntroSeen — the player hasn't seen the showcase yet)
+      expect(mockSelectNextGameMode).toHaveBeenCalledWith([], ['classic', 'blast', 'word-hunt'], true);
 
       // AND: updateGame received the resolved mode
       expect(updateGame).toHaveBeenCalledWith('TEST', expect.objectContaining({
@@ -371,6 +372,24 @@ describe('gameLifecycleHandler - gameMode', () => {
         'startGame',
         expect.objectContaining({ gameMode: 'word-hunt' })
       );
+    });
+
+    it('passes forceBlastFirst=false when the host has already seen the blast intro', async () => {
+      // GIVEN: a returning player whose client reports blastIntroSeen=true
+      mockSelectNextGameMode.mockReturnValue('classic');
+
+      const handler = getHandler('startGame');
+
+      // WHEN
+      await handler({
+        letterGrid: [['A']],
+        timerSeconds: 180,
+        gameMode: 'random',
+        blastIntroSeen: true,
+      });
+
+      // THEN: the selector is told NOT to force the blast opener
+      expect(mockSelectNextGameMode).toHaveBeenCalledWith([], ['classic', 'blast', 'word-hunt'], false);
     });
 
     it('should resolve missing gameMode via selectNextGameMode', async () => {
@@ -475,8 +494,8 @@ describe('gameLifecycleHandler - gameMode', () => {
         gameMode: 'random',
       });
 
-      // THEN: selectNextGameMode received history
-      expect(mockSelectNextGameMode).toHaveBeenCalledWith(['classic'], ['classic', 'blast', 'word-hunt']);
+      // THEN: selectNextGameMode received history (+ forceBlastFirst=true default)
+      expect(mockSelectNextGameMode).toHaveBeenCalledWith(['classic'], ['classic', 'blast', 'word-hunt'], true);
 
       // AND: modeHistory includes both
       expect(updateGame).toHaveBeenCalledWith('TEST', expect.objectContaining({

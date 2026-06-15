@@ -187,6 +187,13 @@ export const StartGameSchema = z.object({
   gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'shiritori', 'word-tower', 'random']).optional(),
   tvMode: z.boolean().optional(),
   /**
+   * Per-player latch (from the host's localStorage): true once this player has
+   * already been shown the blast showcase opener. When true, a random first round
+   * skips the forced-blast opener and rolls weighted-random from round 1, so the
+   * blast-first impression happens only once per device — not every new room.
+   */
+  blastIntroSeen: z.boolean().optional(),
+  /**
    * Optional boost token bundled with startGame so the server can register
    * the boost atomically with state transition (eliminates the prior race
    * with a separate `boost:apply` emit).

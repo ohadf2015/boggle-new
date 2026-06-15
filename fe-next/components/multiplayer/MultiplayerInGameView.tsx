@@ -1,7 +1,8 @@
 'use client';
 
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { markMpBlastIntroSeen } from '@/lib/blast/mpBlastIntro';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
@@ -254,6 +255,12 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // InGameScreen directly so this component doesn't re-render on irrelevant
   // word-hunt/blast store updates.
   const gameMode = useGameMode();
+
+  // Latch the blast showcase opener once it's actually been played in MP, so the
+  // server stops forcing blast as the first round of every new room for this player.
+  useEffect(() => {
+    if (gameMode === 'blast') markMpBlastIntroSeen();
+  }, [gameMode]);
 
   // Desktop shell routing (standard mode only)
   const shellEnabled = useDesktopShellEnabled();
