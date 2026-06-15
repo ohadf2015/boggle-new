@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 5798,
+    "totalKeysInCode": 5799,
     "keyCountByLanguage": {
-      "en": 10931,
-      "he": 11044,
-      "sv": 11037,
-      "ja": 11038,
-      "es": 11067
+      "en": 10961,
+      "he": 11070,
+      "sv": 11063,
+      "ja": 11064,
+      "es": 11093
     },
-    "missingFromEnglish": 4,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 25,
       "fallbackUsages": 0,
-      "variableKeys": 12
+      "variableKeys": 22
     }
   },
   "runtimeRisks": {
@@ -291,6 +291,86 @@
         "line": 31,
         "context": "if (defaultKey) return t(defaultKey);",
         "type": "variable_key"
+      },
+      {
+        "pattern": "t(this)",
+        "variable": "this",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 11,
+        "context": "*/Symbol.metadata??=Symbol(\"metadata\"),d.litPropertyMetadata??=new WeakMap;let y=class extends HTMLE",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(this)",
+        "variable": "this",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 48,
+        "context": "const pt=\"183\",At=1,gt=3,mt=0,ft=1,bt=2,vt=100,yt=101,xt=102,_t=200,Et=201,St=202,Ct=203,wt=204,Mt=2",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(this)",
+        "variable": "this",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 48,
+        "context": "const pt=\"183\",At=1,gt=3,mt=0,ft=1,bt=2,vt=100,yt=101,xt=102,_t=200,Et=201,St=202,Ct=203,wt=204,Mt=2",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(e)",
+        "variable": "e",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 48,
+        "context": "const pt=\"183\",At=1,gt=3,mt=0,ft=1,bt=2,vt=100,yt=101,xt=102,_t=200,Et=201,St=202,Ct=203,wt=204,Mt=2",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(s)",
+        "variable": "s",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 552,
+        "context": "</div>`;var tp=function(){var t=new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,3,2,0,0,5,3,1,0,",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(e)",
+        "variable": "e",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 552,
+        "context": "</div>`;var tp=function(){var t=new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,3,2,0,0,5,3,1,0,",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(e)",
+        "variable": "e",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 1008,
+        "context": "*/const f_=new vn,b_=new vn,v_=new vn,y_=new class{constructor(t,e,i=0,n=1/0){this.ray=new Us(t,e),t",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(n)",
+        "variable": "n",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 1008,
+        "context": "*/const f_=new vn,b_=new vn,v_=new vn,y_=new class{constructor(t,e,i=0,n=1/0){this.ray=new Us(t,e),t",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(n)",
+        "variable": "n",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 1008,
+        "context": "*/const f_=new vn,b_=new vn,v_=new vn,y_=new class{constructor(t,e,i=0,n=1/0){this.ray=new Us(t,e),t",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(e)",
+        "variable": "e",
+        "file": "public/vendor/model-viewer.min.js",
+        "line": 1036,
+        "context": "*/var C_,w_,M_,I_,T_,B_,R_,D_,L_,P_,F_,U_,N_,O_,k_,Q_=function(t,e,i,n){for(var r,s=arguments.length",
+        "type": "variable_key"
       }
     ]
   },
@@ -301,44 +381,7 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "admin.teacherAccess.resend",
-      "usages": [
-        {
-          "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 152
-        }
-      ]
-    },
-    {
-      "key": "admin.teacherAccess.resend_hint",
-      "usages": [
-        {
-          "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 155
-        }
-      ]
-    },
-    {
-      "key": "admin.teacherAccess.resendError",
-      "usages": [
-        {
-          "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 61
-        }
-      ]
-    },
-    {
-      "key": "admin.teacherAccess.resendSuccess",
-      "usages": [
-        {
-          "file": "components/admin/TeacherAccessDrawer.tsx",
-          "line": 59
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "multiplayer.rankUp",
@@ -1061,10 +1104,6 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.resend",
-      "admin.teacherAccess.resend_hint",
-      "admin.teacherAccess.resendSuccess",
-      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",
@@ -1343,10 +1382,6 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.resend",
-      "admin.teacherAccess.resend_hint",
-      "admin.teacherAccess.resendSuccess",
-      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",
@@ -1649,10 +1684,6 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.resend",
-      "admin.teacherAccess.resend_hint",
-      "admin.teacherAccess.resendSuccess",
-      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",
@@ -1939,10 +1970,6 @@
       "admin.teacherAccess.count.declined",
       "admin.teacherAccess.count.total",
       "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.resend",
-      "admin.teacherAccess.resend_hint",
-      "admin.teacherAccess.resendSuccess",
-      "admin.teacherAccess.resendError",
       "admin.teacherAccess.declineSuccess",
       "admin.teacherAccess.approveError",
       "admin.teacherAccess.declineError",

@@ -1,0 +1,11 @@
+# Python virtualenv (pip-reproducible — never commit, ~200M)
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Generated sticker output (rebuild via build_*.py)
+out/
+
+# macOS
+.DS_Store

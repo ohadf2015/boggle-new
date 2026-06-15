@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-13T21:09:31.617Z",
+  "generatedAt": "2026-06-15T07:46:52.020Z",
   "commits": [
     {
-      "sha": "3e2dc0bd2925570c84e8eea696eb22798665c67a",
-      "shortSha": "3e2dc0b",
-      "subject": "feat(playerStyle): dancing style mascots in hero + picker",
+      "sha": "719e31521f09b0a0f83400bf7c2b5bf20aea8515",
+      "shortSha": "719e315",
+      "subject": "refactor(minigames): center sealed-bid bid hero + compact word-alchemy header",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T23:59:19+03:00"
+      "date": "2026-06-15T10:46:33+03:00"
     },
     {
-      "sha": "22a576fcbfdf1729e5524b754110700b0526620f",
-      "shortSha": "22a576f",
-      "subject": "fix(playerStyle): clear web AdSense anchor band so Save button isn't hidden",
+      "sha": "e681542ceb54fd0b05ab23967ea338abfa483df8",
+      "shortSha": "e681542",
+      "subject": "fix(wordTower): remove reset button, vertical crane letters, auto-dismiss verdict toast",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T23:15:24+03:00"
+      "date": "2026-06-15T10:40:16+03:00"
     },
     {
-      "sha": "74a85921a70bdf5396a3cdffd1ee1ecf2478415f",
-      "shortSha": "74a8592",
-      "subject": "fix(landing): stop style-popup flash + add 3D hover to mode cubes",
+      "sha": "96356b6ece6964f74882a45995cf546db027219b",
+      "shortSha": "96356b6",
+      "subject": "fix(results): kill white scroll-flicker layer + de-double scroll FX; de-flash fanfare",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T23:14:29+03:00"
+      "date": "2026-06-15T10:39:11+03:00"
     },
     {
-      "sha": "401ce1c50665b6d6013ea8f9bd42b6b5eccff373",
-      "shortSha": "401ce1c",
-      "subject": "fix(landing): wrap long season titles to two lines",
+      "sha": "47b7c2c4ebbe3aebeec259740e88679661c8bc00",
+      "shortSha": "47b7c2c",
+      "subject": "feat(minigames): no-scroll GameStage shell + juice for shiritori, word-alchemy, sealed-bid, crossword",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T22:17:27+03:00"
+      "date": "2026-06-15T10:38:46+03:00"
     },
     {
-      "sha": "3a99c87c5f6d017b5e4706bedc1dca5ec558584e",
-      "shortSha": "3a99c87",
-      "subject": "fix(playerStyle): stop style modal flicker on scroll from profile",
+      "sha": "eb55e462fc2bcf9312291afd9fc8f38b2884380e",
+      "shortSha": "eb55e46",
+      "subject": "fix(mp): single avatar-emote in lobby — drop floating-emoji toy",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T22:12:52+03:00"
+      "date": "2026-06-15T10:38:30+03:00"
     },
     {
-      "sha": "1187ccf0b354b8a3df08644fead2ec941f63cb9a",
-      "shortSha": "1187ccf",
-      "subject": "fix(mp): live rival scores during local word-building",
+      "sha": "5a2ca8fcafcb9da97934dc49ad3c5072495736a9",
+      "shortSha": "5a2ca8f",
+      "subject": "fix(mp): dialog z-[101] so exit confirm renders above overlay",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T22:06:25+03:00"
+      "date": "2026-06-15T10:38:15+03:00"
     },
     {
-      "sha": "95778b40f816a8cd5de9c8698e828d1f2ab39223",
-      "shortSha": "95778b4",
-      "subject": "feat(landing): ship cube homepage + style popup to all users",
+      "sha": "796f72cd17fdab885b917744573ae3b8321fcfe6",
+      "shortSha": "796f72c",
+      "subject": "fix(music): only the bossa bed follows player style — stop styled music restarting every page",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T22:05:53+03:00"
+      "date": "2026-06-15T10:16:01+03:00"
     },
     {
-      "sha": "ec40102c5f66d06e319d1e8c49fa241ed2764cf7",
-      "shortSha": "ec40102",
-      "subject": "fix(mp): unify keyboard + tile interactivity gate; declutter live leaderboard",
+      "sha": "e7a3b64191e7b034016facd0c6c478fc8bc26f07",
+      "shortSha": "e7a3b64",
+      "subject": "feat(admin): show chosen player style on player cards",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T21:11:27+03:00"
+      "date": "2026-06-15T10:04:29+03:00"
     },
     {
-      "sha": "f7a326d4b613c090b323e1327e019fcc69772bd7",
-      "shortSha": "f7a326d",
-      "subject": "fix(multiplayer): re-join on reconnect to survive server restarts",
+      "sha": "e8db64846ea7d1598d11ee06cdfae9eee1ce70d9",
+      "shortSha": "e8db648",
+      "subject": "fix(i18n): define missing admin.teacherAccess + wordForge.tryAgain keys",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T19:57:31+03:00"
+      "date": "2026-06-15T09:44:36+03:00"
     },
     {
-      "sha": "fba7b8516961b96f06c568454bb86c30e0aa6d38",
-      "shortSha": "fba7b85",
-      "subject": "feat(blast): desktop idle auto-submit for click-built words",
+      "sha": "d26deeb2a2f9c8775b6ae739d5dd52b5a7d588b8",
+      "shortSha": "d26deeb",
+      "subject": "chore(nightly): move loop schedule to 01:00 local",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T19:44:58+03:00"
+      "date": "2026-06-15T09:35:13+03:00"
     },
     {
-      "sha": "90dc70baaa33b2e22c0e46b04b56df05fbdb85be",
-      "shortSha": "90dc70b",
-      "subject": "fix(ftue): high-contrast coach banner surface",
+      "sha": "e4f5a8abf5378acf6c27475ee61af0d20e80107e",
+      "shortSha": "e4f5a8a",
+      "subject": "fix(nightly): glyph-agnostic MCP connected check + await supabase",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T19:44:36+03:00"
+      "date": "2026-06-15T09:35:03+03:00"
     },
     {
-      "sha": "6eed0654edca66c9f0cdf181ab74efaabb4fcf80",
-      "shortSha": "6eed065",
-      "subject": "feat(ingame): enlarge in-game grid on roomy portrait screens",
+      "sha": "97adb922886ee2060a21f12ec76aec5c82ac179e",
+      "shortSha": "97adb92",
+      "subject": "chore(nightly): autonomous improvement loop 2026-06-15",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T19:44:18+03:00"
+      "date": "2026-06-15T08:22:12+03:00"
     },
     {
-      "sha": "33452ff7489580eeadfc10678c103570c2b87241",
-      "shortSha": "33452ff",
-      "subject": "feat(audio): global in-game mute FAB + fix desktop sound popover z-index occlusion",
+      "sha": "66eb73c7e8ce120d7c8c071fbc025052e7504aca",
+      "shortSha": "66eb73c",
+      "subject": "fix(multiplayer): switch to in-game music + kill cream FOUC white flash on game start",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T19:40:22+03:00"
+      "date": "2026-06-14T22:17:18+03:00"
     },
     {
-      "sha": "a08cf34a74de72e91a692bb7ba7b3d30b9f98751",
-      "shortSha": "a08cf34",
-      "subject": "perf(analytics): lazy-load posthog-js via proxy — 60KB gzip off every route's eager parse",
+      "sha": "7451ef3a22ce3e895c16e0fe4f71b0daa1f8fe51",
+      "shortSha": "7451ef3",
+      "subject": "fix(wordTower): add missing isNearMiss export to towerLean (red-master build break)",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T19:39:52+03:00"
+      "date": "2026-06-14T11:14:43+03:00"
     },
     {
-      "sha": "4eee63508ba89c1f5bc45f04df2f62c664c1a50b",
-      "shortSha": "4eee635",
-      "subject": "Merge pull request #548 from ohadf2015/claude/cta-font-color-email-modes-mp1ekj",
-      "author": "ohadf2015",
-      "date": "2026-06-13T17:56:39+02:00"
-    },
-    {
-      "sha": "f67e69d23fb7a7077086b770762c7246026aa2a7",
-      "shortSha": "f67e69d",
-      "subject": "fix(emails): legible CTA in dark mode + hide non-public crossword mode",
-      "author": "Claude",
-      "date": "2026-06-13T15:09:07Z"
-    },
-    {
-      "sha": "f4eb7b044caf771d1b5636ac28ff2dddc8de6b25",
-      "shortSha": "f4eb7b0",
-      "subject": "docs(perf): record pixi landing-bundle defer as a proven Turbopack wall",
+      "sha": "aeba9f680e8785030fb7cb3ead08ae7f7e29bd68",
+      "shortSha": "aeba9f6",
+      "subject": "chore(nightly): autonomous improvement loop 2026-06-14",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T18:05:46+03:00"
+      "date": "2026-06-14T11:06:22+03:00"
     },
     {
-      "sha": "e69356f42bf4d0f3295e8718bb7f313f2712be79",
-      "shortSha": "e69356f",
-      "subject": "docs(perf): landing bundle treemap + concrete defer targets",
+      "sha": "9371b6c3fa017a660a9ac3a764e62b5075354cd1",
+      "shortSha": "9371b6c",
+      "subject": "fix(wordTower): declare nearMissKey on SceneProps to fix red-master typecheck",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T17:38:23+03:00"
+      "date": "2026-06-14T10:43:10+03:00"
     },
     {
-      "sha": "85ec9e346c028c21f4ea24ac66b1d46447a6b89f",
-      "shortSha": "85ec9e3",
-      "subject": "feat(wordcraft): clearer victory popup, more juice, placement hints",
+      "sha": "9bf31d753c8ffcb66be03911e52058571b8ee2db",
+      "shortSha": "9bf31d7",
+      "subject": "fix(ads): settle reward UI on showRewarded early-returns + stop global pauseTimers freezing AdMob countdown",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T17:32:03+03:00"
+      "date": "2026-06-14T10:30:20+03:00"
     },
     {
-      "sha": "f5b053a06e79e3dfee8f886471ec40db0e868e03",
-      "shortSha": "f5b053a",
-      "subject": "feat(coins): casino reward HUD + varied sound + reversed spend",
+      "sha": "aecd31c9b6c9fb1fb7ad8180c7a46f5de047b8c4",
+      "shortSha": "aecd31c",
+      "subject": "fix(wordTower): stuck notifications, missing/awkward translations, per-letter crane bricks, release juice",
       "author": "Ohad Fisher",
-      "date": "2026-06-13T17:31:47+03:00"
+      "date": "2026-06-14T10:28:35+03:00"
+    },
+    {
+      "sha": "066e685d5004a149b82ba1f17770372f8f8fa96c",
+      "shortSha": "066e685",
+      "subject": "fix(playerStyle): stop style popup reappearing after user already picked",
+      "author": "Ohad Fisher",
+      "date": "2026-06-14T10:02:02+03:00"
+    },
+    {
+      "sha": "e6da04178063e1cb4bde332aa18ac967e74d8088",
+      "shortSha": "e6da041",
+      "subject": "perf(nightly): git-enumerated tar snapshot — 40k→11.5k files, 27min→5s",
+      "author": "Ohad Fisher",
+      "date": "2026-06-14T09:10:37+03:00"
     }
   ]
 }
