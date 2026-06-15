@@ -106,4 +106,37 @@ describe('WordWheelGame short-viewport wheel sizing', () => {
     expect(orbit.className).toMatch(/sm:h-80/);
     expect(orbit.className).toMatch(/md:h-96/);
   });
+
+  it('locks the wheel to a square aspect ratio so it never ovals/stretches on desktop', () => {
+    const orbit = renderGame();
+    // 1:1 guarantee. The orbit ring + pixi decorations follow the box, so a
+    // non-square box was the desktop "stretched / ring detached from letters" bug.
+    expect(orbit.className).toMatch(/\baspect-square\b/);
+    // It is NOT over-enlarged past the orbit's natural fill (md:w-96). The orbit
+    // radius is min(w,h)-capped, so a bigger box only floats the ring away from
+    // the centred letters — keep it contained.
+    expect(orbit.className).not.toMatch(/lg:w-\[/);
+    expect(orbit.className).not.toMatch(/xl:w-\[/);
+  });
+});
+
+describe('WordWheelGame desktop container sizing', () => {
+  it('frames the gameplay column with a centered max-width that grows on desktop', () => {
+    render(
+      <WordWheelGame
+        puzzle={puzzle}
+        duration={60}
+        onComplete={vi.fn()}
+        onValidateWord={vi.fn().mockResolvedValue(true)}
+        onEffect={vi.fn()}
+        language="en"
+      />
+    );
+    // The main game container (translate="no") is a centered max-w column that
+    // widens on large screens so it reads as an intentional app panel, not a
+    // thin ribbon — while the wheel inside stays square (see test above).
+    const gameContainer = screen.getByTestId('wheel-orbit').closest('[translate="no"]');
+    expect(gameContainer?.className).toMatch(/\bmax-w-lg\b/);
+    expect(gameContainer?.className).toMatch(/lg:max-w-/);
+  });
 });

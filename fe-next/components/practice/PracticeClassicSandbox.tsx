@@ -221,7 +221,7 @@ export default function PracticeClassicSandbox() {
   }, [advanceBeat, resetIdle]);
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-full min-h-0 overflow-hidden">
+    <div className="relative flex flex-col items-center w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-full min-h-0 overflow-hidden md:overflow-y-auto">
       <PracticePixiFx ref={fxRef} />
 
       {/* HUD strip — back-to-hub left, goal pill right. */}

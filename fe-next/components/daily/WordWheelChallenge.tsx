@@ -447,7 +447,7 @@ const WordWheelChallenge: React.FC = () => {
             </div>
 
             {/* Instruction cards — icon-driven, color-coded per rule */}
-            <div className="flex flex-col gap-2 max-w-xs w-full">
+            <div className="flex flex-col gap-2 max-w-xs lg:max-w-md xl:max-w-lg w-full">
               <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-lime/60 bg-neo-lime/15 text-neo-lime">
                   <Star className="h-4 w-4" strokeWidth={2.5} aria-hidden />
@@ -471,7 +471,7 @@ const WordWheelChallenge: React.FC = () => {
             {/* Preview wheel — outer letters censored before play to keep the
                 pre-game scout from cheating (you only see the center letter,
                 everything else is a deterministic pixel mosaic). */}
-            <div className="relative w-44 h-44 flex items-center justify-center my-4">
+            <div className="relative w-44 h-44 lg:w-56 lg:h-56 xl:w-64 xl:h-64 flex items-center justify-center my-4">
               {/* Glow ring */}
               <m.div
                 className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
@@ -519,7 +519,7 @@ const WordWheelChallenge: React.FC = () => {
             </m.button>
 
             {/* Tabbed leaderboard — parity with Word Hunt ready screen */}
-            <div className="w-full max-w-md mt-2">
+            <div className="w-full max-w-md lg:max-w-lg xl:max-w-2xl mt-2">
               <TabbedDailyLeaderboard
                 puzzleDate={catchupDate || getDailyChallengeDate()}
                 language={language as Language}
@@ -544,7 +544,7 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'playing' && puzzle && (
           <m.div
             key="playing"
-            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-bottom-stack relative z-20 overflow-y-auto overscroll-contain"
+            className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-bottom-stack lg:pt-6 relative z-20 overflow-y-auto overscroll-contain"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}

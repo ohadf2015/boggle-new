@@ -134,5 +134,16 @@ export default function PracticePageClient({ mode, locale }: Props) {
       />
     );
   }
-  return sandbox;
+  // Play step (mobile + desktop). The sandbox root sizes itself to its parent
+  // (it overrides its own height via the desktop branch's [&>div]:!h-full and
+  // expects a definite-height parent). Rendered bare, a flex-item sandbox
+  // collapsed to content height on mobile → the board shrank to a tiny box and
+  // the page footer pulled up under a blank header (founder bug report). Wrap it
+  // in the same definite-height flex shell the desktop tutorial branch uses so
+  // the board fills the viewport on every surface.
+  return (
+    <div className="flex-1 min-h-0 flex flex-col [&>div]:!h-full">
+      {sandbox}
+    </div>
+  );
 }

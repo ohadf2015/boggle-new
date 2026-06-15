@@ -72,7 +72,7 @@ export default function PracticeDesktopWelcome({ mode, onDismiss }: Props) {
       initial={{ opacity: 0, y: -12, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-      className={`w-full max-w-2xl mx-auto mb-4 rounded-neo border-2 ${MODE_ACCENT[mode]} p-4`}
+      className={`w-full max-w-2xl mx-auto mb-4 md:mb-2 rounded-neo border-2 ${MODE_ACCENT[mode]} p-4`}
     >
       {/* Header — mode glyph + "How to play" label */}
       <div className="flex items-center gap-2 mb-3">

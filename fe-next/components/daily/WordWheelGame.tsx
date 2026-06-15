@@ -664,7 +664,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // (Android mid-nav race, future routes), the found-words list below
         // the sticky action bar would bleed into reserved zone. pb-bottom-stack
         // here keeps the list above any banner overlap.
-        'relative flex flex-col items-center w-full flex-1 max-w-lg mx-auto px-3 sm:px-4 pb-bottom-stack rounded-neo',
+        'relative flex flex-col items-center w-full flex-1 max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto px-3 sm:px-4 pb-bottom-stack rounded-neo',
         equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`,
       )}
       translate="no"
@@ -963,7 +963,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         // cqb-only cap left it stuck at the fixed h-96 (384px) and the orbit
         // collided with the instruction text above and the action bar below.
         // Lower reserve (72px, chrome is tightened on short) and floor (132px).
-        className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))] short:max-w-[max(132px,min(calc(100cqb-72px),46svh))] short:max-h-[max(132px,min(calc(100cqb-72px),46svh))] shrink-0 flex items-center justify-center touch-none"
+        // aspect-square is a hard 1:1 guarantee: even if the width/height caps
+        // ever bind to different values, the box can never become an oval (the
+        // orbit ring + pixi decorations follow the box, so a non-square box was
+        // the "stretched / ring detached from the letters" desktop bug). The
+        // orbit radius is min(w,h)-based and caps at ~140px, so the box never
+        // needs to grow past md:w-96 (384px) — bigger only floats the ring away
+        // from the centred letters. Keep it contained & centred on desktop.
+        className="relative aspect-square w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))] short:max-w-[max(132px,min(calc(100cqb-72px),46svh))] short:max-h-[max(132px,min(calc(100cqb-72px),46svh))] shrink-0 flex items-center justify-center touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

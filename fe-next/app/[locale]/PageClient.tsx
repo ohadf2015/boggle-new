@@ -156,7 +156,17 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         </div>
       );
     }
-    return <div className="fixed inset-0 bg-neo-navy z-50" />;
+    // Never render a contentless dark screen (reads as a "black screen" bug while
+    // the redirect resolves) — show the same connecting spinner as the status-card
+    // branch so the invite hop always has visible, alive feedback.
+    return (
+      <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-4 border-neo-lime border-t-transparent animate-spin" />
+          <span className="font-neo-body text-neo-cream text-sm">{t('joinView.connectingToRoom')}</span>
+        </div>
+      </div>
+    );
   }
 
   if (showFTUE && routeAllowsOnboarding) {
