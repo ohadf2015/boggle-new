@@ -19,7 +19,12 @@ export interface StylePopupGateInput {
   profileLoaded: boolean;
   /** profiles.player_style_modal_shown_at (authed). */
   profileShownAt: string | null;
-  /** profiles.player_style (authed) — already chose a style elsewhere. */
+  /**
+   * profiles.player_style — already chose a style on the account. Suppresses the
+   * popup in EITHER auth state (a transient `isAuthenticated === false` during
+   * session restore must not route a user who already picked through the guest
+   * branch and re-prompt them).
+   */
   profileStyle: string | null;
   /** localStorage one-time flag (guest). */
   guestShown: boolean;
@@ -62,10 +67,18 @@ export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   // Catches the authed gap where `profileStyle` lags behind the local choice
   // (guest picked in FTUE then logged in, or the profile sync hasn't landed).
   if (input.localStyleChosen) return false;
+  // Already picked a style on the ACCOUNT → never prompt, in either auth state.
+  // Global (not just the authed branch): during session restore / token refresh
+  // / cross-tab sync `isAuthenticated` can read false for a tick while the
+  // profile object still holds the chosen style — the same value the "current"
+  // badge renders from. If this lived only in the authed branch, that tick would
+  // fall into the guest branch, ignore the chosen style, and re-open the popup
+  // over a user who already picked ("modal opened after I chose my style").
+  if (input.profileStyle) return false;
 
   if (input.isAuthenticated) {
     if (!input.profileLoaded) return false; // profile not fetched yet → don't guess
-    return !input.profileShownAt && !input.profileStyle;
+    return !input.profileShownAt;
   }
   return input.guestOnboardingDone && !input.guestShown;
 }
