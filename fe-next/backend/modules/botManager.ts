@@ -238,6 +238,25 @@ export function resetBotCombo(gameCode: string, username: string): void {
   }
 }
 
+/**
+ * Reset every bot's per-round in-memory state at the start of a new round.
+ *
+ * Bots are created once per room and REUSED across rounds. The classic driver
+ * re-zeroes a bot via prepareBotWords, but the dedicated blast/wheel-rush drivers
+ * never call it — so a reused bot kept a stale-high `bot.score`, which made
+ * `shouldBotScore` reject every word and freeze the bot at 0. This is the bot-side
+ * mirror of scoreManager.resetScoresForNewRound (which zeroes game.playerScores),
+ * and is invoked together with it from resetGameForNewRound.
+ */
+export function resetBotsForNewRound(gameCode: string): void {
+  for (const bot of getGameBots(gameCode)) {
+    bot.score = 0;
+    bot.comboLevel = 0;
+    bot.wordsFound = [];
+    bot.currentWordIndex = 0;
+  }
+}
+
 export function getBotStats(gameCode: string, username: string): BotStats | null {
   const bot = getBotByUsername(gameCode, username);
   if (!bot) return null;
@@ -297,6 +316,7 @@ module.exports = {
   stopAllBots,
   cleanupGameBots,
   resetBotCombo,
+  resetBotsForNewRound,
   getBotStats,
   getBotManagerStats,
   clearBotManagerCaches,

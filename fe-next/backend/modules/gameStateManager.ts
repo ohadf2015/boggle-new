@@ -312,9 +312,14 @@ function resetGameForNewRound(gameCode: string): boolean {
 
   // Stop all bots for this game — they'll be re-added when the next round starts.
   // Without this, bot timers accumulate across rounds.
+  // Also zero each bot's per-round score/combo: bots are REUSED across rounds, and
+  // the dedicated blast/wheel-rush drivers never re-zero bot.score (only the classic
+  // word-pool prep does). Without this, a reused bot kept a stale-high score and
+  // shouldBotScore rejected every word, freezing the bot at 0 on repeat blast rounds.
   try {
-    const { stopAllBots } = require('../modules/botManager');
+    const { stopAllBots, resetBotsForNewRound } = require('../modules/botManager');
     stopAllBots(gameCode);
+    resetBotsForNewRound(gameCode);
   } catch {
     // botManager may not be loaded in test environments
   }
