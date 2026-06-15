@@ -1,8 +1,8 @@
 /**
- * ResultsParallaxBackdrop — GSAP ScrollTrigger drives two scrubbed layers,
- * desktop adds a velocity-flicker layer. Mobile must drop the flicker
- * layer (paint cost) and use lower intensity. Reduced-motion users must
- * get nothing.
+ * ResultsParallaxBackdrop — GSAP ScrollTrigger drives two scrubbed layers
+ * (back + mid) on every breakpoint. The white "velocity-flicker" layer was
+ * removed (it read as the page flashing white over components). Reduced-motion
+ * users must get nothing.
  *
  * @vitest-environment jsdom
  */
@@ -77,11 +77,12 @@ describe('ResultsParallaxBackdrop', () => {
     expect(layers.length).toBe(2);
   });
 
-  it('mounts 3 layers on desktop (back + mid + velocity flicker)', () => {
+  it('mounts 2 scrubbed layers on desktop (back + mid — velocity flicker removed)', () => {
     setViewport(1200);
     const { container } = render(<Harness />);
+    // white velocity-flicker layer was deleted (read as page "flashing white"); back + mid only
     const layers = container.querySelectorAll('.absolute.inset-0.will-change-transform');
-    expect(layers.length).toBe(3);
+    expect(layers.length).toBe(2);
   });
 
   it('renders nothing under reduced motion', () => {

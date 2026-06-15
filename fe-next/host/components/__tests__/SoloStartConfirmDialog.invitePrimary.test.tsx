@@ -3,7 +3,7 @@
  * SoloStartConfirmDialog — Invite Friends as primary action
  *
  * Requirements (2-CTA layout):
- * 1. "Invite Friends" button is present and is the primary CTA (lime)
+ * 1. "Invite Friends" button is present and is the primary CTA (accent)
  * 2. "Skip & Play with Bots" button is present as secondary
  * 3. "Wait for players" cancel is REMOVED
  * 4. Clicking "Invite Friends" triggers share/copy (native share or clipboard)
@@ -62,10 +62,11 @@ describe('SoloStartConfirmDialog — invite primary', () => {
     expect(screen.getByTestId('solo-dialog-invite')).toBeTruthy();
   });
 
-  it('invite button has lime/primary styling', () => {
+  it('invite button has accent/primary styling', () => {
     render(<SoloStartConfirmDialog {...defaultProps} />);
     const inviteBtn = screen.getByTestId('solo-dialog-invite');
-    expect(inviteBtn.className).toMatch(/neo-lime/);
+    // primary CTA now carries the player-style accent (bg-accent), not the fixed lime
+    expect(inviteBtn.className).toMatch(/bg-accent/);
   });
 
   it('renders skip & play with bots as secondary button', () => {
