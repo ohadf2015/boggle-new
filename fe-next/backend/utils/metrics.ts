@@ -94,6 +94,17 @@ export function getRoomMetrics(): RoomMetricsEntry[] {
 }
 
 /**
+ * Drop a single game's per-room counters.
+ * Called from gameStateManager.deleteGame so per-game entries do not accumulate
+ * unbounded for the process lifetime (every game ever created would otherwise
+ * leak a Map entry → slow heap growth → OOM).
+ */
+export function deleteRoom(gameCode: string | null | undefined): void {
+  if (!gameCode) return;
+  perRoom.delete(gameCode);
+}
+
+/**
  * Reset all metrics
  */
 export function resetAll(): void {

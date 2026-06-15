@@ -95,7 +95,12 @@ USER nextjs
 EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
-ENV NODE_OPTIONS="--max-old-space-size=1024"
+# Heap cap raised 1024 -> 2048: the Next.js SSR + Express + Socket.IO working set
+# sits ~700-900MB and the old 1GB cap caused recurring V8 heap-OOM crashes
+# (FATAL "Ineffective mark-compacts near heap limit") ~every 100min of uptime,
+# surfacing as 502s across every route. Container has multi-GB RAM (RSS peaks
+# ~1.65GB without cgroup kill), so 2GB heap + off-heap stays well within limits.
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3001/health/live || exit 1

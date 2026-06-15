@@ -48,6 +48,7 @@ import * as spectatorManager from './spectatorManager';
 import * as readyStateManager from './readyStateManager';
 import * as gameQueryManager from './gameQueryManager';
 import * as hostManager from './hostManager';
+import * as metrics from '../utils/metrics';
 
 import type { GameBase, AddUserOptions, AuthContext } from './userManager';
 import type { ScoreGameBase, AddWordOptions, LeaderboardPlayer } from './scoreManager';
@@ -225,6 +226,7 @@ function deleteGame(gameCode: string): void {
 
   userManager.cleanupUserMappings(asBase<GameBase>(game), gameCode);
   scoreManager.clearLeaderboardThrottle(gameCode);
+  metrics.deleteRoom(gameCode);
   deleteGameFromRedis(gameCode);
   delete games[gameCode];
   gameCache.delete(gameCode);
