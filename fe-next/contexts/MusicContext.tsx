@@ -64,21 +64,36 @@ const TRACKS: Record<TrackKey, string> = {
 };
 
 /**
- * The musical BEDS follow the player's chosen style so the vibe is pervasive:
- * homepage (bossa), lobby, countdown (beforeGame) and in-game. The short
- * functional stings stay universal — urgent ramp, earthquake, blast identity —
- * they're gameplay feedback, not vibe. Exported for unit testing.
+ * Only the homepage / results bed (bossa) follows the player's chosen style —
+ * that's the ambient "vibe" surface. Lobby, countdown (beforeGame) and in-game
+ * stay on their universal beds, and the functional stings (urgent ramp,
+ * earthquake, blast identity) are always universal gameplay feedback. Exported
+ * for unit testing.
  */
 const STYLE_SWAPPABLE_TRACKS: ReadonlySet<TrackKey> = new Set<TrackKey>([
-  'lobby',
-  'beforeGame',
-  'inGame',
   'bossa',
 ]);
 
 export function resolveTrackSrc(key: TrackKey, styleKey: string): string {
   if (STYLE_SWAPPABLE_TRACKS.has(key)) return resolveStyleTrack(styleKey, TRACKS[key]);
   return TRACKS[key];
+}
+
+/**
+ * Whether switching from `currentKey` to `nextKey` lands on the SAME underlying
+ * audio file. A styled profile collapses lobby/beforeGame/inGame/bossa onto one
+ * file, so a page nav or game-phase change flips the bed KEY while the actual
+ * track is unchanged. In that case the player must keep rolling — restarting the
+ * identical file from zero on every page is the regression this guards against.
+ * Exported for unit testing.
+ */
+export function isSameResolvedTrack(
+  currentKey: TrackKey | null,
+  nextKey: TrackKey,
+  styleKey: string,
+): boolean {
+  if (!currentKey) return false;
+  return resolveTrackSrc(currentKey, styleKey) === resolveTrackSrc(nextKey, styleKey);
 }
 
 const STORAGE_KEY = 'boggle_music_settings';
@@ -249,15 +264,22 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       pendingUnlockTimeoutRef.current = null;
     }
 
+    // Same underlying audio already playing — only the bed KEY changed (a styled
+    // profile collapses lobby/beforeGame/inGame/bossa onto ONE file). Keep it
+    // rolling; restarting the identical track from zero on every page/phase is
+    // the regression this guards against. Subsumes the old same-key check.
+    if (
+      isSameResolvedTrack(currentTrackRef.current, trackKey, styleKeyRef.current) &&
+      currentHowlRef.current?.playing()
+    ) {
+      return;
+    }
+
     const newHowl = getOrCreateHowl(trackKey);
 
     if (newHowl.state() === 'unloaded') {
       logger.log('[Music] Track not loaded, starting load:', trackKey);
       newHowl.load();
-    }
-
-    if (currentTrackRef.current === trackKey && currentHowlRef.current?.playing()) {
-      return;
     }
 
     if (isTransitioningRef.current) {
