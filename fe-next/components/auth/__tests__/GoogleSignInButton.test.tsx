@@ -31,6 +31,14 @@ describe('GoogleSignInButton', () => {
     );
   });
 
+  it('renders our branded neo-brutalist visual layer over the real GSI button', () => {
+    render(<GoogleSignInButton />);
+    // brand visual (what the user sees) sits on top of the invisible real GSI button
+    expect(screen.getByTestId('gsi-branded-visual')).toBeTruthy();
+    // the real GSI button is still present (captures the click)
+    expect(screen.getByTestId('gsi-button-container')).toBeTruthy();
+  });
+
   it('renders nothing on the native platform (native uses the SDK)', () => {
     mockIsNative.mockReturnValue(true);
     render(<GoogleSignInButton />);
