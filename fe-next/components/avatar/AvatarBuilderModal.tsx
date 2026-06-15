@@ -9,6 +9,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import AvatarRenderer from './AvatarRenderer';
+import { getAvatarTier, type Tier } from './AvatarTierEffects';
+import AvatarEquipBurst from './AvatarEquipBurst';
+import { planEquipBurst, type EquipBurst } from '@/lib/avatar/equipBurst';
 import FloatingCoinAnimation from '@/components/game/FloatingCoinAnimation';
 import CategoryOptions from './AvatarBuilderCategoryOptions';
 import {
@@ -74,13 +77,28 @@ export default function AvatarBuilderModal({
   const [previewKey, setPreviewKey] = useState(0);
   const [coinSpendAmount, setCoinSpendAmount] = useState<number | null>(null);
   const historyRef = useRef<CustomAvatarConfig[]>([]);
+  // Equip "snap" burst — fires over the preview when an equip changes the tier.
+  const [equipBurst, setEquipBurst] = useState<EquipBurst | null>(null);
+  const lastTierRef = useRef<Tier>('free');
 
   useEffect(() => {
     if (!isOpen) return;
-    setConfig(initialConfig ?? DEFAULT_AVATAR_CONFIG);
+    const start = initialConfig ?? DEFAULT_AVATAR_CONFIG;
+    setConfig(start);
     historyRef.current = [];
+    lastTierRef.current = getAvatarTier(start);
+    setEquipBurst(null);
     setPreviewKey(k => k + 1);
   }, [isOpen, initialConfig]);
+
+  // Re-plan the burst whenever the equipped config changes tier-relevant parts.
+  useEffect(() => {
+    if (!isOpen) return;
+    const newTier = getAvatarTier(config);
+    const plan = planEquipBurst(lastTierRef.current, newTier);
+    lastTierRef.current = newTier;
+    if (plan.particles > 0) setEquipBurst(plan);
+  }, [config, isOpen]);
 
   const pushHistory = useCallback((current: CustomAvatarConfig) => {
     historyRef.current = [...historyRef.current.slice(-19), current];
@@ -204,17 +222,20 @@ export default function AvatarBuilderModal({
           </div>
         </div>
 
-        {/* Preview — jelly wobble on every change */}
+        {/* Preview — jelly wobble on every change + equip "snap" burst */}
         <div ref={previewRef} className="flex justify-center py-2 sm:py-3 desktop-tall:sm:py-5 shrink-0">
-          <AdaptiveMotion.div
-            key={previewKey}
-            initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
-            animate={{ scaleX: 1, scaleY: 1, rotate: 0 }}
-            transition={JELLY_SPRING}
-            className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] @[24rem]:w-[112px] @[24rem]:h-[112px] @[32rem]:w-[140px] @[32rem]:h-[140px] desktop-tall:@[32rem]:w-[160px] desktop-tall:@[32rem]:h-[160px]"
-          >
-            <AvatarRenderer config={config} size={160} className="w-full h-full" />
-          </AdaptiveMotion.div>
+          <div className="relative">
+            <AdaptiveMotion.div
+              key={previewKey}
+              initial={{ scaleX: 1.06, scaleY: 0.94, rotate: -1.5 }}
+              animate={{ scaleX: 1, scaleY: 1, rotate: 0 }}
+              transition={JELLY_SPRING}
+              className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] @[24rem]:w-[112px] @[24rem]:h-[112px] @[32rem]:w-[140px] @[32rem]:h-[140px] desktop-tall:@[32rem]:w-[160px] desktop-tall:@[32rem]:h-[160px]"
+            >
+              <AvatarRenderer config={config} size={160} className="w-full h-full" />
+            </AdaptiveMotion.div>
+            <AvatarEquipBurst burst={equipBurst} fireKey={previewKey} />
+          </div>
         </div>
 
         {/* Category Tabs — scroll-snap row, icon-only on narrow, icon+label when room */}

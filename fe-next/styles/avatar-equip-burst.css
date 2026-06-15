@@ -1,0 +1,47 @@
+/* ============================================
+   Avatar Equip Burst — one-shot "snap" particle spray fired over the builder
+   preview when a part is equipped/bought. Tier-scaled by planEquipBurst.
+   ============================================ */
+
+.avatar-equip-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  z-index: 5;
+}
+
+.aeb-p {
+  position: absolute;
+  border-radius: 9999px;
+  opacity: 0;
+  transform: translate(0, 0) scale(0.3);
+  animation: aeb-fly 0.62s cubic-bezier(0.18, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes aeb-fly {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.3); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1); }
+}
+
+.aeb-ring {
+  position: absolute;
+  width: 34%;
+  height: 34%;
+  border: 3px solid;
+  border-radius: 9999px;
+  opacity: 0;
+  animation: aeb-ring 0.6s ease-out forwards;
+}
+
+@keyframes aeb-ring {
+  0% { opacity: 0.9; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(2.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-equip-burst { display: none; }
+}
