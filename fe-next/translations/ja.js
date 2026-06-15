@@ -180,6 +180,14 @@ const ja = {
       "cta": "結果をシェア",
       "copied": "コピーしました！"
     },
+    "session": {
+      "title": "ブラフカウンター",
+      "outsmarted": "ラウンド上回った",
+      "uniqueLabel": "ユニーク",
+      "clashLabel": "クラッシュ",
+      "passLabel": "パス",
+      "shareCta": "スコアをシェア"
+    },
     "err": {
       "notInRack": "ラックの文字だけを使ってください",
       "notWord": "辞書にありません"

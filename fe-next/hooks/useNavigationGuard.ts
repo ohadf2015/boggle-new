@@ -9,6 +9,8 @@ interface UseNavigationGuardOptions {
   message?: string;
   /** Callback when user attempts to navigate away - return true to allow, false to block */
   onNavigationAttempt?: () => boolean | void;
+  /** Optional analytics callback fired whenever a back-button abandon attempt is intercepted. */
+  onAbandonAttempt?: () => void;
   /**
    * Set true the instant the consumer starts an intentional client navigation
    * away (e.g. quit confirmed → `router.push('/daily')`). This disables the
@@ -44,6 +46,7 @@ export function useNavigationGuard({
   message = 'Are you sure you want to leave? You will lose your progress in the current game.',
   onNavigationAttempt,
   leaving = false,
+  onAbandonAttempt,
 }: UseNavigationGuardOptions): void {
   // Track if we're handling a back navigation
   const isHandlingBackRef = useRef(false);
@@ -64,12 +67,14 @@ export function useNavigationGuard({
   // (game over → results). If we've navigated away (quit → router.push), the
   // URLs differ and popping would bounce the user back. Avoids that race.
   const phantomHrefRef = useRef('');
-  // Store callback in ref to avoid effect re-runs when callback reference changes
+  // Store callbacks in refs to avoid effect re-runs when references change
   const onNavigationAttemptRef = useRef(onNavigationAttempt);
+  const onAbandonAttemptRef = useRef(onAbandonAttempt);
 
-  // Keep the callback ref updated without triggering effects
+  // Keep callback refs updated without triggering effects
   useEffect(() => {
     onNavigationAttemptRef.current = onNavigationAttempt;
+    onAbandonAttemptRef.current = onAbandonAttempt;
   });
 
   // Handle beforeunload (tab close / refresh)
@@ -113,6 +118,8 @@ export function useNavigationGuard({
       if (isHandlingBackRef.current) return;
       isHandlingBackRef.current = true;
 
+      // Fire analytics callback — caller-supplied, never blocks UX
+      try { onAbandonAttemptRef.current?.(); } catch { /* analytics never block UX */ }
       // Call the navigation attempt handler via ref (always gets latest)
       const shouldAllow = onNavigationAttemptRef.current?.();
 

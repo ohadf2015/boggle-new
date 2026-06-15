@@ -176,6 +176,14 @@ const en = {
       "cta": "Share result",
       "copied": "Copied!"
     },
+    "session": {
+      "title": "Bluff Counter",
+      "outsmarted": "rounds outsmarted",
+      "uniqueLabel": "Unique",
+      "clashLabel": "Clash",
+      "passLabel": "Pass",
+      "shareCta": "Share Score"
+    },
     "err": {
       "notInRack": "Use only the rack letters",
       "notWord": "Not in the dictionary"

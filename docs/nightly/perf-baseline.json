@@ -1,26 +1,20 @@
 {
-  "date": "2026-06-14",
-  "note": "Nineteenth snapshot. Backend: (1) fixed auth_rls_initplan on web_vitals INSERT policy — bare auth.uid() → (select auth.uid()) so planner evaluates once per query not per row; (2) dropped unused idx_school_leads_created (0 idx_scans, advisor-flagged). word_pacts FK still 1 row — defer. Auth DB connections advisory deferred. Frontend: 24h PostHog 0 routes above n>=50 floor. 7d: /he first time above floor (n=64) — LCP 4764ms + CLS 0.386 both POOR; /es/multiplayer improving (lcp 4121→3572ms -13%, inp 452→392ms -13%, cls stable). Bundle: skipped (no fresh .next build to diff; prior top_chunks carried forward).",
+  "date": "2026-06-15",
+  "note": "Twentieth snapshot. Backend: (1) Migration 20260615030000_perf_advisor_fixes.sql written — patches teacher_access_requests tar_insert_authenticated RLS policy to (select auth.uid()) subselect form (auth_rls_initplan fix); adds idx_word_pacts_player2_id covering index (unindexed FK fix). Supabase MCP unavailable — migration written to file, not applied live yet; will run through normal gate. (2) web_vitals policy fix from 06-14 confirmed applied. Frontend: 24h window 0 routes above n>=50 floor. 7d: /he INP REGRESSION confirmed (158→264ms +67%, both runs n>=50); CLS worsening (0.386→0.460); LCP improving (4764→4358ms). /es/multiplayer all metrics within 20% noise band. Bundle: no .next build present for diff — prior top_chunks carried forward.",
   "backend": {
-    "advisor_warnings_count": 1,
+    "advisor_warnings_count": 2,
     "advisor_warnings": [
       {
         "type": "auth_rls_initplan",
-        "table": "web_vitals",
-        "policy": "Insert web vitals with owner check",
-        "status": "FIXED 2026-06-14 — migration fix_auth_rls_initplan_web_vitals applied. Changed (player_id = auth.uid()) to (player_id = (select auth.uid())). Planner now evaluates auth.uid() once per query instead of once per row scanned. Reversible: ALTER POLICY ... WITH CHECK ((player_id IS NULL) OR (player_id = auth.uid()))."
-      },
-      {
-        "type": "unused_index",
-        "index": "idx_school_leads_created",
-        "table": "school_leads",
-        "status": "FIXED 2026-06-14 — migration drop_unused_idx_school_leads_created applied. 0 idx_scans confirmed. Reduces write overhead on every INSERT/UPDATE. Reversible: CREATE INDEX idx_school_leads_created ON public.school_leads (created_at DESC)."
+        "table": "teacher_access_requests",
+        "policy": "tar_insert_authenticated",
+        "status": "MIGRATION WRITTEN 2026-06-15 — 20260615030000_perf_advisor_fixes.sql. Changed auth.uid() → (select auth.uid()). Not yet applied (Supabase MCP unavailable). Reversible: ALTER POLICY ... WITH CHECK (auth.uid() IS NOT NULL)."
       },
       {
         "type": "unindexed_foreign_keys",
         "table": "word_pacts",
         "fkey": "word_pacts_player2_id_fkey",
-        "status": "SKIPPED — 1 row only. Seq Scan optimal. Re-evaluate at 1000+ rows."
+        "status": "MIGRATION WRITTEN 2026-06-15 — 20260615030000_perf_advisor_fixes.sql. CREATE INDEX IF NOT EXISTS idx_word_pacts_player2_id ON public.word_pacts (player2_id). Not yet applied. Was 1 row on 06-14 (deferred); advisor still flagging so added preemptively."
       },
       {
         "type": "auth_db_connections_absolute",
@@ -30,38 +24,14 @@
     "top_queries": [
       {
         "label": "Realtime WAL parser (2 variants)",
-        "total_ms": 5660182,
-        "mean_ms": 4.3,
-        "calls": 1313498,
-        "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize. Consistent across all snapshots."
-      },
-      {
-        "label": "sync_coins RPC",
-        "total_ms": 136907,
-        "mean_ms": 7.3,
-        "calls": 18761,
-        "verdict": "OK"
-      },
-      {
-        "label": "UPDATE profiles SET last_seen_at",
-        "total_ms": 85879,
-        "mean_ms": 1.6,
-        "calls": 54136,
-        "verdict": "OK"
-      },
-      {
-        "label": "SELECT name FROM pg_timezone_names",
-        "total_ms": 85104,
-        "mean_ms": 357.6,
-        "calls": 238,
-        "verdict": "INFRASTRUCTURE — Supabase Studio schema introspection. Not application traffic."
+        "total_ms": "N/A — supabase MCP unavailable 06-15",
+        "verdict": "INFRASTRUCTURE — Supabase Realtime internal. Consistent across all snapshots."
       },
       {
         "label": "analytics_events SELECT",
-        "total_ms": 27936,
         "mean_ms": 18.5,
         "calls": 1514,
-        "verdict": "WATCH — 18.5ms mean above typical threshold. Monitor next snapshot; may warrant index audit."
+        "verdict": "WATCH — 18.5ms mean above typical threshold. Carried from 06-14. Re-check when supabase MCP available."
       }
     ]
   },
@@ -70,37 +40,37 @@
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 4764,
-        "p75_inp_ms": 158,
-        "p75_cls": 0.386,
-        "n_7d": 64,
+        "p75_lcp_ms": 4358,
+        "p75_inp_ms": 264,
+        "p75_cls": 0.460,
+        "n_7d": 58,
         "window": "7d",
-        "lcp_status": "POOR — 4764ms, first snapshot above n>=50 floor. No prior 7d baseline to compare. New watch item.",
-        "inp_status": "OK — 158ms, under 200ms threshold.",
-        "cls_status": "POOR — 0.386, well above 0.1 threshold. Known watch since 06-10 (was sub-floor). RTL font-swap or direction-recalc suspected. Needs investigation."
+        "lcp_status": "IMPROVING — 4764ms (06-14) → 4358ms (06-15), -8.5%. Still POOR but trending down.",
+        "inp_status": "REGRESSION — 158ms (06-14) → 264ms (06-15), +67%. Both runs n>=50 (64→58). Exceeds 20% threshold. Added to perf-watch.md. Watch 2 more nights before named-suspect investigation.",
+        "cls_status": "WORSENING — 0.386 (06-14) → 0.460 (06-15), +19%. Under 20% regression threshold but already POOR. Suspect: RTL font-swap or hero layout shift."
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 3572,
-        "p75_inp_ms": 392,
-        "p75_cls": 0.158,
-        "n_7d": 104,
+        "p75_lcp_ms": 3800,
+        "p75_inp_ms": 424,
+        "p75_cls": 0.144,
+        "n_7d": 96,
         "window": "7d",
-        "lcp_status": "IMPROVING — 4121ms (06-13) → 3572ms (06-14), -13.3%. revalidate=3600 ISR still taking effect.",
-        "inp_status": "MONITOR — 452ms (06-13) → 392ms (06-14), -13.3% improvement. Still above 200ms but trending down. No code regression.",
-        "cls_status": "BORDERLINE — 0.158, stable (0.158 last night). Above 0.1 threshold but no regression."
+        "lcp_status": "MONITOR — 3572ms (06-14) → 3800ms (06-15), +6.4%. Under 20% threshold. No regression.",
+        "inp_status": "MONITOR — 392ms (06-14) → 424ms (06-15), +8.2%. Under 20% threshold. Still above 200ms INP budget but not a new regression.",
+        "cls_status": "IMPROVING — 0.158 (06-14) → 0.144 (06-15), -9%. Stable."
       }
     ],
     "deferred": [
       {
         "route": "/he",
-        "note": "CLS 0.386 is POOR and confirmed above n>=50 floor for first time. RTL layout shift — suspected cause: Hebrew font swap (Rubik RTL vs Latin metrics diverge) or direction:rtl recalculation on hero. Needs dedicated investigation with browser CLS timeline. Added to perf-watch.md."
+        "note": "INP 158→264ms REGRESSION confirmed. CLS 0.386→0.460 worsening. RTL layout/font-swap/interaction-handler cause unknown. Added to perf-watch.md. Minimum 2 more nights n>=50 before investigation recommended."
       }
     ]
   },
   "bundle": {
     "total_kb": 40325,
-    "note": "Carried from 06-13 — no fresh .next build present in tree to diff. Prior top_chunks baseline preserved.",
+    "note": "Carried from 06-14 — no .next build present in tree to diff. Prior top_chunks baseline preserved.",
     "top_chunks": [
       { "name": "0g6.ei74erw09.js", "kb": 6085 },
       { "name": "107js-lrs4mq0.js", "kb": 3283 },

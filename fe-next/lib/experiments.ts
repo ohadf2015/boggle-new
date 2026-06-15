@@ -447,6 +447,30 @@ export const EXPERIMENTS = {
     description:
       'WheelRush practice retry CTA. retry-cta = "Try Again" primary button on wheel game-over screen. control = current hub-back flow. Targets 43% drop on /practice/wheelRush. Conversion = practice_started within 60s of abandon/complete (same mode+person). Guardrail = practice_chain_clicked.',
   }),
+
+  /**
+   * Mid-game quit-confirm stats reveal. 7d funnel: game_started=320 → game_completed=135
+   * (58% completion, 185 silent abandons). Back-button intercept fires via
+   * useNavigationGuard.onAbandonAttempt → game_abandon_attempted event (wired 2026-06-15).
+   *
+   * control = current quit-confirm dialog (no stats context).
+   * stats-shown = quit-confirm dialog surfaces current score + words found so the
+   *   player sees concrete progress they'd lose — making the quit cost tangible.
+   *
+   * Hypothesis: Showing "You found 12 words (280 pts) — quit?" cuts confirmation
+   * abandonment by ≥15% vs the context-free dialog.
+   * Conversion: game_completed / (game_abandon_attempted - game_abandon_confirmed).
+   * Guardrail: game_abandon_confirmed must not rise (don't suppress legitimate exits).
+   * Ship to PostHog: flag key = 'exp-game-abandon-confirm-v1', 50/50 rollout.
+   * Wire: pass useExperiment('exp-game-abandon-confirm-v1') variant to quit-confirm
+   *   modal in DailyChallengeGame.tsx / useSinglePlayerCore.ts + ExitConfirmation.tsx.
+   */
+  'exp-game-abandon-confirm-v1': defineExperiment({
+    variants: ['control', 'stats-shown'] as const,
+    default: 'control',
+    description:
+      'Quit-confirm dialog with/without score+words context. stats-shown = surfaces current score + word count so player sees concrete sunk-cost before quitting. control = current generic dialog. Targets 42% game completion drop. Conversion = game_completed after game_abandon_attempted.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

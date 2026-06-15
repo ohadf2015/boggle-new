@@ -4,6 +4,24 @@ Items flagged by the nightly performance lane that need human judgement or are o
 
 ---
 
+## [FRONTEND] `/he` INP regression — 2026-06-15
+
+**Severity:** Medium  
+**Source:** PostHog `$web_vitals` 7d window, n=58 (above n≥50 floor both nights)  
+**Metric:** p75 INP 158ms (06-14) → 264ms (06-15), **+67%** — exceeds 20% threshold  
+**CLS also worsening:** 0.386 → 0.460 (+19%, under threshold but already POOR)  
+**LCP improving:** 4764ms → 4358ms (-8.5%)
+
+**What to look for:**
+- Heavy interaction handler on `/he` homepage that doesn't fire on `/en`
+- RTL direction recalculation triggered by first user interaction (tap on hero, language toggle)
+- Rubik font RTL variant swap causing render-blocking layout on interaction
+- Accent CSS var assignment (`applyAccentVar`) running synchronously in click handlers
+
+**Action:** Watch 2 more nights (n≥50 gate). If INP stays >200ms on 06-16 AND 06-17, profile with Chrome DevTools INP attribution on `/he` (set locale, first click event). Do NOT guess-fix without attribution data.
+
+---
+
 ## [BACKEND] WAL Parser — 3 consecutive INVESTIGATE flags
 
 **Severity:** High  

@@ -267,6 +267,14 @@ const sv = {
       "cta": "Dela resultat",
       "copied": "Kopierat!"
     },
+    "session": {
+      "title": "Bluffräknare",
+      "outsmarted": "rundor överlistas",
+      "uniqueLabel": "Unik",
+      "clashLabel": "Krock",
+      "passLabel": "Pass",
+      "shareCta": "Dela poäng"
+    },
     "err": {
       "notInRack": "Använd bara bokstäverna i racket",
       "notWord": "Inte i ordlistan"

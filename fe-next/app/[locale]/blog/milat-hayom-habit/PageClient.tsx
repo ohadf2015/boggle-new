@@ -147,7 +147,7 @@ export default function MilatHayomHabitPageClient(): React.ReactElement {
 
           <div className={cn('mt-12 pt-6 border-t', isDarkMode ? 'border-slate-700' : 'border-gray-200')}>
             <div className="flex gap-4">
-              <Link href={`/${locale}/daily/word-of-the-day`}>
+              <Link href={`/${locale}/daily`}>
                 <Button className="rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black font-bold shadow-hard hover:shadow-hard-lg">
                   {content.playDaily}
                 </Button>

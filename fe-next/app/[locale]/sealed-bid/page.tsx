@@ -31,6 +31,7 @@ import {
   type SbState,
 } from '@/lib/sealedBid/sp/sbEngine';
 import { SealedBidShareCard } from '@/components/sealedBid/SealedBidShareCard';
+import { SealedBidSessionSummary } from '@/components/sealedBid/SealedBidSessionSummary';
 import { pickRounds, poolForLang, ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
 import { toDisplay, wordFromChosen } from '@/lib/sealedBid/sp/rackBuilder';
 
@@ -257,6 +258,9 @@ export default function SealedBidPage() {
                 {t('sealedBid.playAgain')}
               </button>
             </div>
+            {history.length > 0 && (
+              <SealedBidSessionSummary history={history} totalScore={state.totalScore} />
+            )}
             {history.length > 0 && (
               <SealedBidShareCard history={history} totalScore={state.totalScore} />
             )}

@@ -180,6 +180,14 @@ const he = {
       "cta": "שתף תוצאה",
       "copied": "הועתק!"
     },
+    "session": {
+      "title": "מונה הבלוף",
+      "outsmarted": "סיבובים שבהם ניצחתי",
+      "uniqueLabel": "ייחודי",
+      "clashLabel": "התנגשות",
+      "passLabel": "פאס",
+      "shareCta": "שתף תוצאה"
+    },
     "err": {
       "notInRack": "השתמשו רק באותיות מהמאגר",
       "notWord": "לא נמצא במילון"

@@ -38,6 +38,34 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-06-15 (lane-03 engagement)
+
+### FLAG NEEDED — 3 dark experiments (blocked-on-human, ≥5 nights)
+
+Create these PostHog feature flags to activate wired experiments:
+
+| Flag key | Variants | Rollout | Hypothesis |
+|---|---|---|---|
+| `exp-mp-quickplay-wait-v1` | `control` / `match-seeking` | 50/50 | "Finding a match…" overlay cuts QuickPlay rage clicks ≥50% |
+| `exp-invite-arrival-clarity-v1` | `control` / `status-card` | 50/50 | "Connecting…" card reduces blank-navy rage clicks on ?room= URLs |
+| `exp-practice-wheel-cta-v1` | `control` / `retry-cta` | 50/50 | "Try Again" button lifts WheelRush re-play within 60s |
+
+All three experiments are fully wired + tested. **Zero A/B data until flags exist.**
+
+### FLAG NEEDED — new experiment wired 2026-06-15
+
+| Flag key | Variants | Rollout | Hypothesis |
+|---|---|---|---|
+| `exp-game-abandon-confirm-v1` | `control` / `stats-shown` | 50/50 | Showing score+words-found in quit-confirm cuts mid-game abandonment ≥15% |
+
+Registry: `fe-next/lib/experiments.ts`. Analytics hook: `useNavigationGuard.onAbandonAttempt` fires `game_abandon_attempted` (GrowthEvent added). Wire UI: pass `useExperiment('exp-game-abandon-confirm-v1')` variant to `ExitConfirmation` / quit-confirm dialog in `DailyChallengeGame.tsx` and `useSinglePlayerCore.ts`.
+
+### [Funnel] game_started → game_completed 42% drop (7d n=320→135)
+
+`game_abandon_attempted` now tracked via `useNavigationGuard.onAbandonAttempt`. Callers must opt-in by passing the callback. Priority: `DailyChallengeGame.tsx`, `useSinglePlayerCore.ts`, `usePlayerExit.ts`.
+
+---
+
 ## 2026-06-09 (lane-03 engagement)
 
 ### [Flags] Stale experiments — human decision needed
@@ -724,3 +752,30 @@ FLAG NEEDED: exp-practice-wheel-cta-v1  variants=[control, retry-cta]  50/50
 ```
 
 **Owner**: human (PostHog → Feature Flags → New flag → set key exactly as above).
+
+## 2026-06-15
+- [Sentry] JAVASCRIPT-NEXTJS-1KQ: churn-signals report failed with status 502
+  - first seen: 2026-06-03, last seen: 2026-06-05, count: 278, users: 3
+  - link: https://lexiclash.sentry.io/issues/124871662/
+  - status: deferred
+  - why: stale (last seen >10d ago); root is backend API returning 502 on POST /api/churn-signals — backend issue, not frontend null-guard
+  - recommended owner: backend
+
+- [Sentry] JAVASCRIPT-NEXTJS-1JR: relation "profiles" does not exist — POST /api/coins
+  - first seen: 2026-05-27, last seen: 2026-05-27, count: 18, users: 5
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred
+  - why: very stale (last seen 19d ago, 1-day window only); likely a transient migration race on deploy. Zero recent recurrence. Monitor; if resurfaces, check coins API route for hardcoded schema ref or missing migration.
+  - recommended owner: backend
+
+- [Sentry] JAVASCRIPT-NEXTJS-1CW: TypeError null 'clear' on /daily/word-wheel
+  - first seen: 2026-05-15, last seen: 2026-06-09, count: 13, users: 5
+  - link: https://lexiclash.sentry.io/issues/120102540/
+  - status: already-fixed — guard at WordWheelPixiRing.tsx:86 (`if (destroyed || orbitGfx.destroyed || …) return`) already in codebase with a comment citing Sentry 1CW. No new occurrences expected.
+  - recommended owner: self — mark resolved in Sentry if no new events in 7d
+
+- [Supabase] RLS Policy Always True: score_challenge_attempts INSERT
+  - link: supabase advisor security:rls_policy_always_true
+  - status: deferred
+  - why: `WITH CHECK (true)` is INTENTIONAL — guest users (anon role) submit challenge scores; player_id is nullable for guests. A meaningful check requires policy REPLACEMENT (e.g. `WITH CHECK (username IS NOT NULL AND score >= 0)`) which is a blast-radius change. Current design is correct; consider hardening with a tighter CHECK when guest flow is audited.
+  - recommended owner: review-by-eod

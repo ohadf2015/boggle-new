@@ -176,6 +176,14 @@ const es = {
       "cta": "Compartir resultado",
       "copied": "¡Copiado!"
     },
+    "session": {
+      "title": "Contador de bluffs",
+      "outsmarted": "rondas superadas",
+      "uniqueLabel": "Único",
+      "clashLabel": "Choque",
+      "passLabel": "Paso",
+      "shareCta": "Compartir puntuación"
+    },
     "err": {
       "notInRack": "Usa solo las letras del atril",
       "notWord": "No está en el diccionario"

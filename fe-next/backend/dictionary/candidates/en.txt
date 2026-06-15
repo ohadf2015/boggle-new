@@ -383,3 +383,10 @@ hate
 yes
 no
 not
+cat
+dog
+face
+food
+girl
+hand
+if

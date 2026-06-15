@@ -42,6 +42,7 @@ export type GrowthEvent =
   | 'game_started'
   | 'game_completed'
   | 'game_abandoned'
+  | 'game_abandon_attempted'
   | 'mode_selected'
   | 'results_viewed'
   | 'replay_countdown_shown'
