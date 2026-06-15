@@ -12,6 +12,7 @@ import { textColorOn } from '@/lib/wordTower/towerColumn';
 import type { BlockSurface } from '@/lib/wordTower/blockGrade';
 import { swivelBrickFrame, SWIVEL_DESCENT_PX } from '@/lib/wordTower/swivelDrop';
 import { tileVariation, type TileVariation } from './tileVariation';
+import { pickGreeble, type Greeble } from '@/lib/wordTower/greebles';
 
 const FONT = 'Fredoka, Rubik, sans-serif';
 
@@ -215,6 +216,63 @@ export function drawBlockSurface(g: Graphics | null, size: number, surface: Bloc
   }
 }
 
+/**
+ * A small INDUSTRIAL bolt-on (antenna / strut / panel / beacon / fin) jutting
+ * from one edge, so a minority of tiles break the stamped-column silhouette.
+ * Hard pixels, near-black + one neon accent, drawn ONCE onto the detail layer.
+ * Deliberately not cute — structure, not decoration. Coords centred (−half..half);
+ * the greeble juts slightly OUTSIDE the face (no clipping on a Pixi child).
+ */
+export function drawGreeble(g: Graphics | null, size: number, greeble: Greeble): void {
+  if (!g) return;
+  const half = size / 2;
+  const dark = 0x05060a;
+  const lite = 0xfffef0;
+  const neon = 0xffe135;
+  const w = Math.max(2, size * 0.05);
+  const len = size * greeble.sizeFrac;
+  const dir = greeble.side === 'left' ? -1 : 1;
+  const edgeX = dir * half; // the tile's left/right edge
+  switch (greeble.kind) {
+    case 'antenna': {
+      // a thin mast rising above the top edge near the chosen side, capped by a node
+      const x = dir * half * 0.55;
+      g.rect(x - w / 2, -half - len, w, len).fill({ color: dark, alpha: 0.8 });
+      g.circle(x, -half - len, w * 0.9).fill({ color: neon, alpha: 0.85 });
+      break;
+    }
+    case 'strut': {
+      // a short diagonal brace off the side edge, mid-height
+      const x0 = edgeX, y0 = -half * 0.2;
+      g.moveTo(x0, y0).lineTo(x0 + dir * len, y0 + len * 0.5).stroke({ color: dark, width: w, alpha: 0.8 });
+      break;
+    }
+    case 'panel': {
+      // a rectangular plate jutting from the side (cladding / solar array)
+      const pw = len, ph = size * 0.34;
+      const x = edgeX + (dir > 0 ? 0 : -pw);
+      g.rect(x, -ph / 2, pw, ph).fill({ color: lite, alpha: 0.18 }).stroke({ color: dark, width: w * 0.7, alpha: 0.75 });
+      break;
+    }
+    case 'beacon': {
+      // a small box clamped to the top corner + a lit dot
+      const bx = dir * half * 0.62;
+      g.rect(bx - size * 0.07, -half - size * 0.1, size * 0.14, size * 0.1).fill({ color: dark, alpha: 0.85 });
+      g.circle(bx, -half - size * 0.05, w).fill({ color: neon, alpha: 0.9 });
+      break;
+    }
+    case 'fin': {
+      // a triangular fin off the side edge
+      const y = 0;
+      g.moveTo(edgeX, y - size * 0.18)
+        .lineTo(edgeX + dir * len, y)
+        .lineTo(edgeX, y + size * 0.18)
+        .fill({ color: dark, alpha: 0.55 });
+      break;
+    }
+  }
+}
+
 /** Build a tile. `char === null` → a label-less brick (versus spoiler-free row).
  *  `pos` (position from the base) seeds the deterministic per-tile variation.
  *  `surface` paints the zone decoration once (skipped for bricks). */
@@ -234,6 +292,12 @@ export function makeTile(char: string | null, size: number, color: number, pendi
   tile.addChild(tile.shadow, tile.face);
   if (tile.detail) {
     drawBlockSurface(tile.detail, size, surface!);
+    // A sparse, deterministic industrial bolt-on breaks the stamped-column read.
+    // Only real letter tiles (pos given) accrete greebles — bricks stay clean.
+    if (pos != null) {
+      const greeble = pickGreeble(pos, surface!);
+      if (greeble) drawGreeble(tile.detail, size, greeble);
+    }
     tile.detail.alpha = pending ? 0.4 : 0.85;
     tile.addChild(tile.detail);
   }

@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import { biomeBackdrop } from '@/lib/wordTower/towerLayout';
+import { dollyScaleFor } from '@/lib/wordTower/dollyZoom';
 import { BIOME_THEME } from './biomeTheme';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 
@@ -57,8 +58,17 @@ export function WordTowerBackdrop({
   const starPos = (depth: number) => `0px ${climb * depth}px`; // seamless infinite scroll
   const slide = (depth: number, cap: number) => (reducedMotion ? 0 : Math.min(climb * depth, cap));
 
+  // Altitude dolly: gently scale the whole backdrop UP about the ground line as
+  // the player climbs, so the world recedes/fills the frame ("the ground falls
+  // away") — vertigo with ZERO impact on the Pixi tower's camera/landing math.
+  const dolly = reducedMotion ? 1 : dollyScaleFor(heightM);
+
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      aria-hidden
+      style={{ transform: `scale(${dolly})`, transformOrigin: '50% 100%', transition: reducedMotion ? 'none' : `transform 1000ms ${EASE}` }}
+    >
       {/* Slow drifting aurora — gives the sky life + a sense of "changing"
           weather. Soft electric tints, stronger as you climb into the dark. */}
       <div className="wt-aurora absolute" style={{ opacity: 0.18 + stars * 0.42 }} />

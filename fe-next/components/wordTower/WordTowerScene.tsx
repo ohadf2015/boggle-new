@@ -18,14 +18,18 @@ import { toppleCrashFx } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
-  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLand, impactRing,
+  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLand, impactRing, bumpScale,
   type TileSprite,
 } from './towerSprites';
+import { shaftWindX } from '@/lib/wordTower/shaftWind';
+import { resonanceSchedule } from '@/lib/wordTower/resonance';
 import { BIOME_THEME } from './biomeTheme';
 import { WordTowerBackdrop } from './WordTowerBackdrop';
 import { WordTowerParallaxProps } from './WordTowerParallaxProps';
+import { WordTowerSighting } from './WordTowerSighting';
 import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
+import type { RivalMarker } from '@/lib/wordTower/rivals';
 
 interface SceneProps {
   floors: WordTowerFloor[];
@@ -46,6 +50,8 @@ interface SceneProps {
   anchorLen?: number;
   /** Personal best (m) — drawn as a tick on the minimap. */
   personalBestM?: number;
+  /** Rival records — drawn as ticks on the minimap (who's still above you). */
+  rivals?: RivalMarker[];
   /** Translator — for the minimap + back-to-top affordance labels. */
   t?: (key: string, params?: Record<string, string | number>) => string;
   /** Fires with the altitude the camera is *looking at* (live height, or lower
@@ -140,6 +146,13 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   const firstRender = useRef(true);
   const prevMaxPos = useRef(-1);
   const prevSnapKey = useRef('');
+  // Shaft-wind needs the live geometry from the diff effect in the rAF tick.
+  const centerXRef = useRef(0);
+  const topPosRef = useRef(0);
+  // Suppress wind after a commit until the swivel (which owns the new tiles' x)
+  // finishes — duration-derived, NOT a fixed guess, so long words can't jump.
+  const lastCommitRef = useRef(0);
+  const commitDurRef = useRef(0);
 
   // One persistent container for the whole tower.
   useEffect(() => {
@@ -168,6 +181,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
 
     const { width: W, height: H } = engine;
     const centerX = W / 2;
+    centerXRef.current = centerX; // shaft-wind tick reads this
 
     // Build the unified bottom→top stack: committed letters/bricks + pending ghosts.
     const committed = buildTowerColumn(floors);
@@ -229,7 +243,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // swivel into the stack TOGETHER as one rigid girder after the loop instead
     // of each popping in place — the satisfying "the crane sets the word down"
     // beat. Collected base→top (live is bottom→top), with their rest slot.
-    const committing: { tile: TileSprite; restX: number; restY: number; color: number }[] = [];
+    const committing: { tile: TileSprite; restX: number; restY: number; color: number; pos: number }[] = [];
 
     // Add newcomers / update survivors — survivors keep their FIXED local y.
     for (const l of live) {
@@ -265,7 +279,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
             // Paint solid at once (the ghost was only a preview), then swivel the
             // whole word-run in as a group below — no per-brick recolor fade.
             paintTile(existing, l.color, l.pending, l.shared);
-            committing.push({ tile: existing, restX: centerX, restY: y, color: l.color });
+            committing.push({ tile: existing, restX: centerX, restY: y, color: l.color, pos: l.pos });
           } else if (reducedMotion) {
             paintTile(existing, l.color, l.pending, l.shared);
           } else {
@@ -291,12 +305,35 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         const { tile } = committing[i];
         squashLand(tile); // each brick lands with weight as it settles flush
         if (i === 0) {
-          // One heavy thud + dust + ring at the base joint where it bites in.
-          impactRing(c, pivotX, pivotY, half, baseColor, 1.3);
-          engine.particles.burst(COMBO_FLASH, pivotX, pivotY, 10 + committing.length * 2);
-          engine.shake.shake({ intensity: Math.min(10, 4 + committing.length), duration: 0.2, decay: 'exponential' });
+          // A heavy, layered thud where the girder bites in: a fat outer ring + a
+          // tight inner ring read as a real shock-wave, a dust burst that scales
+          // with the word's heft, and a camera kick. Punchier than the old single
+          // ring so the placement lands with weight (founder: more satisfying FX).
+          const heft = committing.length;
+          impactRing(c, pivotX, pivotY, half, baseColor, 1.6);
+          impactRing(c, pivotX, pivotY, half, baseColor, 0.85);
+          engine.particles.burst(COMBO_FLASH, pivotX, pivotY, 14 + heft * 3);
+          engine.shake.shake({ intensity: Math.min(13, 5 + heft * 1.6), duration: 0.24, decay: 'exponential' });
         }
       });
+
+      // RESONANCE — the landing thud rings DOWN through the settled tower below
+      // the new joint: each lower tile gives a tiny delayed scale-pop, a wave
+      // travelling toward the base. Cosmetic (scale only), so it never touches
+      // the score or fights the swivel above (which owns the new top tiles).
+      lastCommitRef.current = performance.now(); // gate shaft-wind off until swivel ends
+      commitDurRef.current = durMs;
+      const basePos = Math.min(...committing.map((b) => b.pos));
+      const settledBelow: number[] = [];
+      for (const key of registry.current.keys()) {
+        const p = Number(key.slice(1));
+        if (Number.isFinite(p)) settledBelow.push(p);
+      }
+      for (const hit of resonanceSchedule(basePos, settledBelow)) {
+        const tile = registry.current.get(`s${hit.pos}`);
+        if (!tile) continue;
+        window.setTimeout(() => { if (!tile.destroyed) bumpScale(tile, 0.07); }, hit.delayMs);
+      }
     }
 
     // ── Camera = climb-follow (shift) + user pan, applied to the WHOLE container ──
@@ -324,6 +361,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
 
     firstRender.current = false;
     prevMaxPos.current = maxPos;
+    topPosRef.current = maxPos; // shaft-wind tick reads this
   }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId]);
 
   // A rejected WORD is an INPUT mistake, not tower damage — so the error feel
@@ -372,9 +410,26 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // phase-locked with the crane's target-guide swing — both read the same clock
     // + the same instability, so the visible tower lean and the landing target
     // always point the SAME way at the same instant (the headline of the feature).
+    // After a commit the swivel owns the new tiles' x — hold off wind until it
+    // finishes (its real duration + a small tail) so the two never fight.
+    const WIND_COMMIT_TAIL_MS = 120;
     const tick = (now: number) => {
       const cc = containerRef.current;
       if (cc) cc.angle = leanRef.current + swayAngleAt(now, instabilityRef.current);
+      // Upper-shaft wind: a tiny travelling x-sway on settled crown tiles so a
+      // tall tower feels exposed and alive between drops. x-only (never y/scale),
+      // recomputed each frame (no drift), skipped on the base band + pending tiles.
+      const top = topPosRef.current;
+      const cx = centerXRef.current;
+      if (top > 0 && now - lastCommitRef.current > commitDurRef.current + WIND_COMMIT_TAIL_MS) {
+        const inst = instabilityRef.current;
+        for (const [key, tile] of registry.current) {
+          if (tile.destroyed || tile.pending) continue;
+          const p = Number(key.slice(1));
+          if (!Number.isFinite(p)) continue;
+          tile.x = cx + shaftWindX(p, top, now, inst);
+        }
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -565,6 +620,8 @@ export function WordTowerScene(props: SceneProps) {
         <WordTowerBackdrop biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} />
         {/* Lazy altitude-reference props behind the tower (viewed altitude). */}
         <WordTowerParallaxProps heightM={viewAlt} reducedMotion={props.reducedMotion} />
+        {/* Rare drifting sightings (cosmic whale / satellite / shooting star). */}
+        <WordTowerSighting heightM={viewAlt} reducedMotion={props.reducedMotion} />
       </div>
       {/* Brand climb companion — pops in to cheer only when a word is built. */}
       <WordTowerMascot
@@ -578,6 +635,7 @@ export function WordTowerScene(props: SceneProps) {
         heightM={props.heightM}
         viewM={viewAlt}
         personalBestM={props.personalBestM ?? 0}
+        rivals={props.rivals}
         onScrollTop={scrollToTop}
         t={props.t ?? ((k) => k)}
       />
