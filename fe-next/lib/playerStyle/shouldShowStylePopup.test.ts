@@ -102,4 +102,23 @@ describe('shouldShowStylePopup', () => {
       expect(shouldShowStylePopup({ ...base, guestShown: true })).toBe(false);
     });
   });
+
+  it('never re-shows once the device-level "shown" flag is set, in EITHER auth state', () => {
+    // `guestShown` is the localStorage marker, written the moment the popup is
+    // shown (any auth state). It is a DEVICE-level "shown once" flag, so it must
+    // suppress globally — not just in the guest branch. The re-pop it closes: a
+    // guest sees the popup, dismisses, then logs into an account whose
+    // `player_style_modal_shown_at` is still null → the authed branch would
+    // ignore the localStorage flag and re-prompt on the next page load. This is
+    // the "some pages still show it another time" report.
+    expect(shouldShowStylePopup({ ...base, guestShown: true })).toBe(false);
+    expect(
+      shouldShowStylePopup({
+        ...base,
+        isAuthenticated: true,
+        guestShown: true,
+        profileShownAt: null,
+      }),
+    ).toBe(false);
+  });
 });

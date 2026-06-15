@@ -95,24 +95,58 @@ export default function PlayerStyleOnboardingWrapper() {
   ]);
 
   const markShown = useCallback(async () => {
+    // ALWAYS record the device-level flag — it is the durable, synchronous
+    // marker that survives a guest→login transition, a failed profile write, and
+    // a null `profile` at call time. For authed users ALSO persist the profile
+    // column so the "shown once" state syncs across the user's other devices.
+    markPlayerStyleModalShown();
     if (isAuthenticated && profile) {
       const { error } = await updateProfile({
         player_style_modal_shown_at: new Date().toISOString(),
       });
       if (error) logger.warn('PlayerStyleOnboardingWrapper: failed to mark shown', error.message);
-    } else {
-      markPlayerStyleModalShown();
     }
   }, [isAuthenticated, profile, updateProfile]);
 
+  // Mark the popup as shown the MOMENT it actually appears — not on dismiss.
+  // Dismiss-only marking left the abandon path open: a user who saw the popup
+  // then reloaded / closed the tab without clicking never persisted anything, so
+  // it re-popped on the next page load ("some pages still show it another
+  // time"). Gate past the landing route so a landing-only decision (which
+  // renders null) does not burn the one-shot for a user who never saw it.
+  const markedThisShowRef = useRef(false);
+  useEffect(() => {
+    if (!show || isLandingRoute(pathname)) return;
+    if (markedThisShowRef.current) return;
+    markedThisShowRef.current = true;
+    void markShown();
+  }, [show, pathname, markShown]);
+
+  // Cross-device sync: a guest can only write the localStorage flag, so on login
+  // backfill the account column from it. Without this, device A (where the popup
+  // was seen) is suppressed but device B — no localStorage flag, null column —
+  // re-pops. Runs independently of `show`, so it heals even when the popup is
+  // already suppressed locally.
+  const migratedRef = useRef(false);
+  useEffect(() => {
+    if (!isAuthenticated || !profileLoaded || profileShownAt) return;
+    if (migratedRef.current || !hasPlayerStyleModalBeenShown()) return;
+    migratedRef.current = true;
+    void updateProfile({ player_style_modal_shown_at: new Date().toISOString() }).then(
+      ({ error }) => {
+        if (error)
+          logger.warn('PlayerStyleOnboardingWrapper: failed to migrate shown flag', error.message);
+      },
+    );
+  }, [isAuthenticated, profileLoaded, profileShownAt, updateProfile]);
+
   const handleDismiss = useCallback(
     (_chosen?: PlayerStyleKey) => {
-      // StylePicker already persisted the style choice (if any). We only record
-      // that the one-time popup has now been shown so it never reappears.
-      void markShown();
+      // StylePicker already persisted the style choice (if any). The popup was
+      // already marked shown at render time; dismiss just closes it.
       setShow(false);
     },
-    [markShown],
+    [],
   );
 
   if (!isMounted || !show) return null;

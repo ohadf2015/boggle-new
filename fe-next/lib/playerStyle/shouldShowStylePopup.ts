@@ -26,7 +26,12 @@ export interface StylePopupGateInput {
    * branch and re-prompt them).
    */
   profileStyle: string | null;
-  /** localStorage one-time flag (guest). */
+  /**
+   * Device-level one-time flag (localStorage `boggle_player_style_modal_shown`).
+   * Written at SHOW-time for guest AND authed users, so it suppresses the popup
+   * globally on this device — surviving the guest→login transition, the abandon
+   * path (closed without dismissing), and a failed profile-column write.
+   */
   guestShown: boolean;
   /** Guest has finished onboarding (don't nag fresh visitors). */
   guestOnboardingDone: boolean;
@@ -75,10 +80,19 @@ export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   // fall into the guest branch, ignore the chosen style, and re-open the popup
   // over a user who already picked ("modal opened after I chose my style").
   if (input.profileStyle) return false;
+  // Already shown once ON THIS DEVICE (localStorage marker, written the moment
+  // the popup is shown — see the wrapper's mark-on-show). Global, not just the
+  // guest branch: a guest who saw the popup then logs into an account whose
+  // `player_style_modal_shown_at` is still null must not be re-prompted. Without
+  // this the authed branch would ignore the localStorage flag and re-pop on the
+  // next page load ("some pages still show it another time"). The flag also
+  // survives the abandon path (closed the tab without dismissing) because it is
+  // written at show-time, not on dismiss.
+  if (input.guestShown) return false;
 
   if (input.isAuthenticated) {
     if (!input.profileLoaded) return false; // profile not fetched yet → don't guess
     return !input.profileShownAt;
   }
-  return input.guestOnboardingDone && !input.guestShown;
+  return input.guestOnboardingDone;
 }
