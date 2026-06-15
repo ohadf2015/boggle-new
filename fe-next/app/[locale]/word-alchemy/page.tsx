@@ -370,31 +370,29 @@ export default function WordAlchemyPage() {
   const clue = step?.clueKey ? t(step.clueKey) : '';
   const showHint = wrongCount >= 2 && step;
 
-  // Header slot: title + badge + streak + heat bar
+  // Header slot: compact one-row HUD (title chip · streak · progress) + heat bar.
   const header = (
-    <div className="mx-auto w-full max-w-2xl space-y-3">
-      <div className="text-center space-y-3">
-        <span
-          ref={flaskRef}
-          className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-purple px-3 py-1 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm"
-        >
-          <FlaskConical className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-          {t('wordAlchemy.badge')}
-        </span>
-        {streak >= 2 && (
-          <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-yellow px-2.5 py-0.5 font-neo-display font-black text-[10px] uppercase tracking-wide text-neo-navy shadow-hard-sm animate-neo-pop">
-            {t('wordAlchemy.streak', { n: streak })}
+    <div className="mx-auto w-full max-w-2xl space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-purple px-3 py-1.5 font-neo-display font-black text-base uppercase tracking-wide text-neo-navy shadow-hard-sm">
+          <span ref={flaskRef} className="inline-flex">
+            <FlaskConical className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
           </span>
-        )}
-        <h1 className="font-neo-display font-black text-3xl sm:text-4xl uppercase tracking-tight text-neo-white">
           {t('wordAlchemy.title')}
         </h1>
-        <p className="font-neo-body text-sm sm:text-base text-neo-white max-w-md mx-auto">
-          {t('wordAlchemy.instructions')}
-        </p>
-        <p className="font-neo-body text-xs text-neo-white">
-          {t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: puzzles.length })}
-        </p>
+        <div className="flex items-center gap-2">
+          {streak >= 2 && (
+            <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-yellow px-2.5 py-1 font-neo-display font-black text-[10px] uppercase tracking-wide text-neo-navy shadow-hard-sm animate-neo-pop">
+              {t('wordAlchemy.streak', { n: streak })}
+            </span>
+          )}
+          <span
+            className="rounded-neo border-2 border-black bg-neo-navy-light px-2.5 py-1.5 font-neo-display font-black text-xs tabular-nums text-neo-white shadow-hard-sm"
+            aria-label={t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: puzzles.length })}
+          >
+            {puzzleIdx + 1}/{puzzles.length}
+          </span>
+        </div>
       </div>
       <AlchemyHeatBar heat={heat} maxHeat={maxHeat} />
     </div>

@@ -266,25 +266,16 @@ export default function SealedBidPage() {
           })}
         </div>
 
-        {/* Built word — a single bidi-correct run (so Hebrew reads RTL) with a backspace + clear. */}
-        <form onSubmit={lockIn} className="space-y-3">
-          <p className="text-center font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">{t('sealedBid.sealPhase')}</p>
-
-          <div className="flex items-center gap-2">
-            <div
-              ref={builtRef}
-              dir={dir}
-              aria-live="polite"
-              className="flex min-h-[56px] flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-cream px-4 py-3 font-neo-display font-black text-2xl tracking-widest text-neo-navy shadow-hard"
-            >
-              {word ? toDisplay(word) : <span className="font-neo-body text-sm font-normal tracking-normal text-neo-navy/50">{t('sealedBid.tapHint')}</span>}
-            </div>
+        {/* Controls — backspace/clear edit the bid shown centre-stage; lock-in seals it. */}
+        <form onSubmit={lockIn} className="space-y-2">
+          {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={backspace}
               disabled={chosen.length === 0 || pending}
               aria-label={t('sealedBid.backspace')}
-              className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
+              className="inline-flex h-12 flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
             >
               <Delete className="h-5 w-5 rtl:rotate-180" />
             </button>
@@ -293,18 +284,16 @@ export default function SealedBidPage() {
               onClick={clear}
               disabled={chosen.length === 0 || pending}
               aria-label={t('sealedBid.clear')}
-              className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
+              className="inline-flex h-12 flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
-
-          {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={!canLock}
-              className="flex flex-1 items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5 disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
               {t('sealedBid.lockIn')}
@@ -379,7 +368,28 @@ export default function SealedBidPage() {
               <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </button>
           </div>
-        ) : null}
+        ) : (
+          /* Bidding: the secret word being built takes centre stage above the rack. */
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+            <p className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">
+              {t('sealedBid.sealPhase')}
+            </p>
+            <div
+              ref={builtRef}
+              dir={dir}
+              aria-live="polite"
+              className="flex min-h-[88px] w-full max-w-sm items-center justify-center rounded-neo border-3 border-black bg-neo-cream px-5 py-4 font-neo-display font-black text-4xl tracking-widest text-neo-navy shadow-hard-lg"
+            >
+              {word ? (
+                toDisplay(word)
+              ) : (
+                <span className="font-neo-body text-base font-normal tracking-normal text-neo-navy/50">
+                  {t('sealedBid.tapHint')}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </GameStage>
   );
