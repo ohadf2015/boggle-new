@@ -13,6 +13,8 @@ import { Trophy, Lock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
+import { isNative } from '@/utils/platform';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 export interface LeaderboardTeaserProps {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -105,6 +107,9 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
 
       {/* Sign up buttons */}
       <div className="space-y-2">
+        {!isNative() && process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID ? (
+          <GoogleSignInButton />
+        ) : (
         <Button
           onClick={() => handleSignIn('google')}
           disabled={!!isLoading}
@@ -117,6 +122,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
           )}
           {t('auth.continueWithGoogle')}
         </Button>
+        )}
         <Button
           onClick={() => handleSignIn('discord')}
           disabled={!!isLoading}

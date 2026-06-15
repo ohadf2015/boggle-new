@@ -13,6 +13,8 @@ import { Brain, Lock, TrendingUp, Zap, Target, Lightbulb, BookOpen } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/Loader';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
+import { isNative } from '@/utils/platform';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 
 export interface GuestBrainScorePreviewProps {
   /** Estimated brain score points from this game (can be a rough estimate) */
@@ -89,6 +91,9 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
 
           {/* Sign up buttons */}
           <div className="w-full max-w-xs space-y-2">
+            {!isNative() && process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID ? (
+              <GoogleSignInButton />
+            ) : (
             <Button
               onClick={() => handleSignIn('google')}
               disabled={!!isLoading}
@@ -102,6 +107,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
               )}
               {t('auth.continueWithGoogle')}
             </Button>
+            )}
             <Button
               onClick={() => handleSignIn('discord')}
               disabled={!!isLoading}
