@@ -17,6 +17,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import AnimationsLoader from '@/components/AnimationsLoader';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
+import GoogleOneTapInitializer from '@/components/auth/GoogleOneTapInitializer';
 import NativePGSInitializer from '@/components/NativePGSInitializer';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
@@ -648,6 +649,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <EmailCaptureModal />
                     <NewYearCountdown />
                     <CookieConsent />
+                    {/* Google One Tap (web) — in-page ID-token sign-in so Google's
+                        consent shows our domain, not <ref>.supabase.co. No redirect. */}
+                    <GoogleOneTapInitializer />
                     <ChurnSignalTracker />
                     {/* Toast notifications container */}
                     <ToastContainer position="bottom-right" />
