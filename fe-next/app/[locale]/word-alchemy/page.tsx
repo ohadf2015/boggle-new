@@ -5,8 +5,11 @@ import { useParams } from 'next/navigation';
 import { FlaskConical, ArrowRight, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { GameStage } from '@/components/game/GameStage';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { HowToPlayCard } from '@/components/common/HowToPlayCard';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { applyHebrewFinalLetters, HEBREW_FINAL_TO_REGULAR } from '@/shared/utils/wordNormalization';
@@ -231,6 +234,14 @@ export default function WordAlchemyPage() {
   // Hebrew words are stored base-form; show final (sofit) letters in the UI.
   const display = (w: string) => (isHe ? applyHebrewFinalLetters(w) : w);
 
+  // Full-screen game: hide global header / bottom-nav / footer so the play
+  // surface owns the viewport (and surfaces the in-game mute FAB).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
+
   const { heat, maxHeat, onCorrectGuess, onWrongGuess, reset: resetHeat } = useAlchemyHeatMeter();
 
   const [puzzleIdx, setPuzzleIdx] = useState(0);
@@ -240,6 +251,7 @@ export default function WordAlchemyPage() {
   const [streak, setStreak] = useState(0);
   const [wildcardFound, setWildcardFound] = useState(false);
   const [stepResults, setStepResults] = useState<StepResult[]>([]);
+  const [winFlash, setWinFlash] = useState(0);
   // The built-word display (was a text input); kept as a ref for shake + burst.
   const inputRef = useRef<HTMLDivElement>(null);
   const flaskRef = useRef<HTMLSpanElement>(null);
@@ -263,6 +275,7 @@ export default function WordAlchemyPage() {
     if (!won || wonFxFiredRef.current) return;
     wonFxFiredRef.current = true;
     playSound('victoryFanfare');
+    setWinFlash((f) => f + 1);
     const rect = flaskRef.current?.getBoundingClientRect();
     const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
     const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
@@ -357,44 +370,87 @@ export default function WordAlchemyPage() {
   const clue = step?.clueKey ? t(step.clueKey) : '';
   const showHint = wrongCount >= 2 && step;
 
-  return (
-    <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-8 sm:py-12">
-      <TopBackLink className="mb-4" />
-      <HowToPlayCard
-        storageKey="word-alchemy"
-        title={t('wordAlchemy.howTo.title')}
-        steps={[0, 1, 2].map((i) => t(`wordAlchemy.howTo.steps.${i}`))}
-        cta={t('wordAlchemy.howTo.cta')}
-        accent="purple"
-      />
-      <div className="mx-auto w-full max-w-2xl space-y-6 animate-[fadeInUp_0.4s_ease-out_both] motion-reduce:animate-none">
-        {/* Header */}
-        <header className="text-center space-y-3">
-          <span
-            ref={flaskRef}
-            className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-purple px-3 py-1 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm"
-          >
-            <FlaskConical className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
-            {t('wordAlchemy.badge')}
+  // Header slot: title + badge + streak + heat bar
+  const header = (
+    <div className="mx-auto w-full max-w-2xl space-y-3">
+      <div className="text-center space-y-3">
+        <span
+          ref={flaskRef}
+          className="inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-purple px-3 py-1 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm"
+        >
+          <FlaskConical className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+          {t('wordAlchemy.badge')}
+        </span>
+        {streak >= 2 && (
+          <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-yellow px-2.5 py-0.5 font-neo-display font-black text-[10px] uppercase tracking-wide text-neo-navy shadow-hard-sm animate-neo-pop">
+            {t('wordAlchemy.streak', { n: streak })}
           </span>
-          {streak >= 2 && (
-            <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-yellow px-2.5 py-0.5 font-neo-display font-black text-[10px] uppercase tracking-wide text-neo-navy shadow-hard-sm animate-neo-pop">
-              {t('wordAlchemy.streak', { n: streak })}
-            </span>
-          )}
-          <h1 className="font-neo-display font-black text-3xl sm:text-4xl uppercase tracking-tight text-neo-white">
-            {t('wordAlchemy.title')}
-          </h1>
-          <p className="font-neo-body text-sm sm:text-base text-neo-white max-w-md mx-auto">
-            {t('wordAlchemy.instructions')}
-          </p>
-          <p className="font-neo-body text-xs text-neo-white">
-            {t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: puzzles.length })}
-          </p>
-        </header>
+        )}
+        <h1 className="font-neo-display font-black text-3xl sm:text-4xl uppercase tracking-tight text-neo-white">
+          {t('wordAlchemy.title')}
+        </h1>
+        <p className="font-neo-body text-sm sm:text-base text-neo-white max-w-md mx-auto">
+          {t('wordAlchemy.instructions')}
+        </p>
+        <p className="font-neo-body text-xs text-neo-white">
+          {t('wordAlchemy.puzzleProgress', { n: puzzleIdx + 1, total: puzzles.length })}
+        </p>
+      </div>
+      <AlchemyHeatBar heat={heat} maxHeat={maxHeat} />
+    </div>
+  );
 
-        {/* Heat meter — fills on first-try correct guesses; rush at max. */}
-        <AlchemyHeatBar heat={heat} maxHeat={maxHeat} />
+  // Footer slot: keyboard + submit + restart (only when not won)
+  const footer = !won ? (
+    <div className="mx-auto w-full max-w-2xl space-y-3">
+      <AlchemyKeyboard
+        letters={keyboardLetters}
+        dir={dir}
+        onLetter={(ch) => setInput((sv) => appendLetter(sv, ch))}
+        onBackspace={() => setInput((sv) => backspace(sv))}
+        backspaceLabel={t('wordAlchemy.backspace')}
+      />
+
+      {showHint && (
+        <p className="text-center font-neo-body text-sm text-neo-white">
+          {t('wordAlchemy.hintLabel')}{' '}
+          <span dir="ltr" className="font-neo-display font-black tracking-[0.3em] text-neo-white">
+            {revealHint(step!.answer, wrongCount)}
+          </span>
+        </p>
+      )}
+
+      <button
+        type="submit"
+        form="word-alchemy-form"
+        className="flex w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:animate-neo-press motion-reduce:active:animate-none"
+      >
+        {t('wordAlchemy.submit')}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => resetPuzzle(puzzleIdx)}
+        className="mx-auto flex items-center gap-1.5 font-neo-body text-xs uppercase tracking-wide text-neo-white transition-colors hover:text-neo-white"
+      >
+        <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
+        {t('wordAlchemy.restart')}
+      </button>
+    </div>
+  ) : null;
+
+  return (
+    <GameStage accent="purple" header={header} footer={footer}>
+      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-purple/40" />
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3 animate-[fadeInUp_0.4s_ease-out_both] motion-reduce:animate-none">
+        <TopBackLink className="self-start" />
+        <HowToPlayCard
+          storageKey="word-alchemy"
+          title={t('wordAlchemy.howTo.title')}
+          steps={[0, 1, 2].map((i) => t(`wordAlchemy.howTo.steps.${i}`))}
+          cta={t('wordAlchemy.howTo.cta')}
+          accent="purple"
+        />
 
         {/* Chain so far — flows with the locale's direction (RTL for Hebrew). */}
         <div
@@ -440,7 +496,7 @@ export default function WordAlchemyPage() {
           </div>
         ) : (
           /* Active step */
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id="word-alchemy-form" onSubmit={handleSubmit} className="flex flex-1 flex-col gap-4">
             <div className="rounded-neo border-3 border-black bg-neo-navy-light p-5 shadow-hard space-y-2">
               <p className="font-neo-body text-xs uppercase tracking-widest text-neo-white">
                 {t('wordAlchemy.stepProgress', { n: stepIdx + 1, total: puzzle.steps.length })}
@@ -469,44 +525,10 @@ export default function WordAlchemyPage() {
                 </span>
               )}
             </div>
-
-            {/* On-screen letter keyboard — taps build the word above. */}
-            <AlchemyKeyboard
-              letters={keyboardLetters}
-              dir={dir}
-              onLetter={(ch) => setInput((sv) => appendLetter(sv, ch))}
-              onBackspace={() => setInput((sv) => backspace(sv))}
-              backspaceLabel={t('wordAlchemy.backspace')}
-            />
-
-            {showHint && (
-              <p className="text-center font-neo-body text-sm text-neo-white">
-                {t('wordAlchemy.hintLabel')}{' '}
-                <span dir="ltr" className="font-neo-display font-black tracking-[0.3em] text-neo-white">
-                  {revealHint(step!.answer, wrongCount)}
-                </span>
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:animate-neo-press motion-reduce:active:animate-none"
-            >
-              {t('wordAlchemy.submit')}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => resetPuzzle(puzzleIdx)}
-              className="mx-auto flex items-center gap-1.5 font-neo-body text-xs uppercase tracking-wide text-neo-white transition-colors hover:text-neo-white"
-            >
-              <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
-              {t('wordAlchemy.restart')}
-            </button>
           </form>
         )}
       </div>
       {wildcardFound && <WildcardFoundModal onDismiss={() => setWildcardFound(false)} />}
-    </main>
+    </GameStage>
   );
 }

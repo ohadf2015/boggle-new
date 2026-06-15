@@ -17,8 +17,11 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, Bot, RotateCcw, Send, User, Trophy, Skull } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { GameStage } from '@/components/game/GameStage';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { pickShiritoriWord } from '@/backend/modules/shiritoriBot';
 import {
   commitBotWord,
@@ -74,6 +77,7 @@ export default function ShiritoriSoloPage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [score, setScore] = useState(0);
+  const [winFlash, setWinFlash] = useState(0);
   const { isGhostTurn, multiplier, markTurnPlayed, reset: resetGhost } = useShiritoriGhostMultiplier();
   const inputRef = useRef<HTMLInputElement>(null);
   const chainEndRef = useRef<HTMLDivElement>(null);
@@ -81,6 +85,14 @@ export default function ShiritoriSoloPage() {
 
   const pool = useMemo(() => botPoolForDifficulty(difficulty), [difficulty]);
   const head = requiredHead(state);
+
+  // Full-screen game: hide global header / bottom-nav / footer so the play
+  // surface owns the viewport (and surfaces the in-game mute FAB).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   // Bot turn — fire-and-forget once turn flips to bot.
   useEffect(() => {
@@ -99,11 +111,17 @@ export default function ShiritoriSoloPage() {
     wonFiredRef.current = true;
     if (state.phase === 'won') {
       playSound('victoryFanfare');
+      setWinFlash((f) => f + 1);
+      const cx = window.innerWidth / 2;
+      // Layered ceremony: top-down confetti rain + a gold sparkle pop centred
+      // on the chain, with a delayed second wave so the moment lingers.
+      SharedFxApp.spawnBurst('celebration', cx, window.innerHeight * 0.18, { count: 40 });
+      SharedFxApp.spawnBurst('victory-burst', cx, window.innerHeight * 0.4, { count: 24 });
       const rect = chainEndRef.current?.getBoundingClientRect();
-      const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+      const x = rect ? rect.left + rect.width / 2 : cx;
       const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
-      SharedFxApp.spawnBurst('celebration', x, y);
-      SharedFxApp.spawnBurst('sparkle-gold', x, y, { count: 18 });
+      SharedFxApp.spawnBurst('sparkle-gold', x, y, { count: 22 });
+      window.setTimeout(() => SharedFxApp.spawnBurst('celebration', cx, window.innerHeight * 0.25, { count: 24 }), 360);
     } else {
       playSound('wordRejected');
     }
@@ -182,153 +200,175 @@ export default function ShiritoriSoloPage() {
   const ended = state.phase !== 'playing';
   const won = state.phase === 'won';
 
-  return (
-    <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-8">
-      <HowToPlayCard
-        storageKey="shiritori-solo"
-        title={t('shiritori.solo.howTo.title')}
-        steps={[0, 1, 2].map((i) => t(`shiritori.solo.howTo.steps.${i}`))}
-        cta={t('shiritori.solo.howTo.cta')}
-        accent="lime"
-      />
-      <div className="mx-auto w-full max-w-2xl space-y-5">
-        <header className="flex items-center justify-between">
-          <Link href={`/${locale}/shiritori`} className="inline-flex items-center gap-1.5 font-neo-body text-sm text-neo-white hover:text-neo-white">
-            <ArrowLeft className="h-4 w-4" />
-            {t('shiritori.solo.back')}
-          </Link>
-          <span className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white">
+  const header = (
+    <div className="mx-auto w-full max-w-2xl space-y-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <Link
+          href={`/${locale}/shiritori`}
+          className="inline-flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy-light px-2.5 py-1.5 font-neo-body text-xs text-neo-white shadow-hard-sm"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t('shiritori.solo.back')}
+        </Link>
+        <h1 className="truncate font-neo-display text-base font-black uppercase tracking-wide text-neo-white">
+          {t('shiritori.solo.title')}
+        </h1>
+        {score > 0 ? (
+          <span
+            key={score}
+            className="animate-neo-pop inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-cyan px-2.5 py-1.5 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm"
+          >
+            <Trophy className="h-3.5 w-3.5" aria-hidden="true" />
+            {score}
+          </span>
+        ) : (
+          <span className="font-neo-display text-[10px] font-black uppercase tracking-wide text-neo-white/70">
             {t('shiritori.solo.adminBadge')}
           </span>
-        </header>
-
-        <div className="text-center space-y-2">
-          <h1 className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white">
-            {t('shiritori.solo.title')}
-          </h1>
-          <p className="font-neo-body text-sm text-neo-white">{t('shiritori.solo.tagline')}</p>
-        </div>
-
-        <div className="flex items-center justify-center gap-2" role="radiogroup" aria-label={t('shiritori.solo.difficultyLabel')}>
-          {(['easy', 'medium', 'hard'] as const).map((d) => (
-            <button
-              key={d}
-              type="button"
-              role="radio"
-              aria-checked={difficulty === d}
-              onClick={() => newGame(d)}
-              className={`rounded-neo border-2 border-black px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide shadow-hard-sm transition-transform ${
-                difficulty === d
-                  ? 'bg-neo-lime text-neo-navy'
-                  : 'bg-neo-navy-light text-neo-white hover:text-neo-white'
-              }`}
-            >
-              {t(`shiritori.solo.difficulty.${d}`)}
-            </button>
-          ))}
-        </div>
-
-        {!ended && state.turn === 'player' && (
-          <p className="text-center font-neo-body text-sm text-neo-white">
-            {t('shiritori.solo.headPrompt')}{' '}
-            <span dir="ltr" className="inline-block rounded-neo border-2 border-black bg-neo-cyan px-2 py-0.5 font-neo-display font-black text-neo-navy">
-              {head || '—'}
-            </span>
-          </p>
         )}
+      </div>
 
-        {score > 0 && (
-          <p className="text-center font-neo-display font-black text-sm text-neo-cyan">
-            {t('shiritori.solo.ghost.score')} {score}
-          </p>
-        )}
+      <div className="flex items-center justify-center gap-2" role="radiogroup" aria-label={t('shiritori.solo.difficultyLabel')}>
+        {(['easy', 'medium', 'hard'] as const).map((d) => (
+          <button
+            key={d}
+            type="button"
+            role="radio"
+            aria-checked={difficulty === d}
+            onClick={() => newGame(d)}
+            className={`rounded-neo border-2 border-black px-3 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide shadow-hard-sm transition-transform active:translate-y-0.5 ${
+              difficulty === d ? 'bg-neo-lime text-neo-navy' : 'bg-neo-navy-light text-neo-white'
+            }`}
+          >
+            {t(`shiritori.solo.difficulty.${d}`)}
+          </button>
+        ))}
+      </div>
 
-        <div
+      {!ended && state.turn === 'player' && (
+        <p className="text-center font-neo-body text-sm text-neo-white">
+          {t('shiritori.solo.headPrompt')}{' '}
+          <span dir="ltr" className="inline-block animate-neo-pop rounded-neo border-2 border-black bg-neo-cyan px-2 py-0.5 font-neo-display font-black text-neo-navy" key={head}>
+            {head || '—'}
+          </span>
+        </p>
+      )}
+    </div>
+  );
+
+  const footer = ended ? null : (
+    <form onSubmit={submit} className="mx-auto w-full max-w-2xl space-y-2">
+      {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
+      <div className="flex items-end gap-2">
+        <input
+          ref={inputRef}
+          type="text"
           dir="ltr"
-          className="flex flex-wrap items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard min-h-[80px]"
+          value={input}
+          onChange={(e) => { setInput(e.target.value); if (error) setError(null); }}
+          placeholder={t('shiritori.solo.inputPlaceholder')}
+          aria-label={t('shiritori.solo.inputPlaceholder')}
+          autoComplete="off"
+          spellCheck={false}
+          disabled={state.turn !== 'player' || pending}
+          className="min-w-0 flex-1 rounded-neo border-3 border-black bg-neo-cream px-4 py-3 text-center font-neo-display text-xl font-black text-neo-navy shadow-hard outline-none focus:border-neo-purple disabled:opacity-50"
+        />
+        <button
+          type="button"
+          onClick={() => setState((s) => playerGivesUp(s))}
+          disabled={state.turn !== 'player' || pending}
+          className="shrink-0 rounded-neo border-3 border-black bg-neo-navy-light px-3 py-3 font-neo-display text-[10px] font-black uppercase tracking-wide text-neo-white shadow-hard-sm disabled:opacity-50"
         >
-          {state.chain.map((w, i) => {
-            const fromBot = i % 2 === 1; // alternating: player starts at 0, bot at 1
-            const Icon = fromBot ? Bot : User;
-            return (
-              <span key={`${w}-${i}`} className="inline-flex items-center gap-1.5">
-                {i > 0 && <span className="text-neo-white">→</span>}
-                <span
-                  className={`inline-flex items-center gap-1 rounded-neo border-2 border-black px-2.5 py-1 font-neo-display font-black text-base shadow-hard-sm ${
-                    fromBot ? 'bg-neo-pink text-neo-navy' : 'bg-neo-lime text-neo-navy'
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
-                  {w}
-                </span>
-              </span>
-            );
-          })}
-          <div ref={chainEndRef} aria-hidden="true" />
-        </div>
+          {t('shiritori.solo.giveUp')}
+        </button>
+      </div>
+      <button
+        type="submit"
+        disabled={state.turn !== 'player' || pending}
+        className="flex w-full items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5 disabled:opacity-50"
+      >
+        <Send className="h-4 w-4" />
+        {pending
+          ? t('shiritori.solo.checking')
+          : state.turn === 'bot'
+            ? t('shiritori.solo.botThinking')
+            : t('shiritori.solo.submit')}
+      </button>
+    </form>
+  );
+
+  return (
+    <GameStage accent="lime" header={header} footer={footer}>
+      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-lime/40" />
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3">
+        <HowToPlayCard
+          storageKey="shiritori-solo"
+          title={t('shiritori.solo.howTo.title')}
+          steps={[0, 1, 2].map((i) => t(`shiritori.solo.howTo.steps.${i}`))}
+          cta={t('shiritori.solo.howTo.cta')}
+          accent="lime"
+        />
 
         {ended ? (
-          <div className={`rounded-neo border-3 border-black p-5 text-center shadow-hard-lg space-y-3 ${won ? 'bg-neo-lime' : 'bg-neo-red'}`}>
-            <h2 className="inline-flex items-center justify-center gap-2 font-neo-display font-black text-2xl uppercase text-neo-navy">
-              {won ? <Trophy className="h-6 w-6" /> : <Skull className="h-6 w-6" />}
-              {won ? t('shiritori.solo.won') : t('shiritori.solo.lost')}
-            </h2>
-            <p className="font-neo-body text-sm text-neo-navy/80">
-              {t(`shiritori.solo.endReason.${state.endReason}`)}
-            </p>
-            <div className="flex justify-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => newGame(difficulty)}
-                className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
-              >
-                <RotateCcw className="h-4 w-4" />
-                {t('shiritori.solo.again')}
-              </button>
+          <div className="flex flex-1 items-center justify-center">
+            <div className={`w-full animate-neo-pop rounded-neo border-3 border-black p-5 text-center shadow-hard-lg space-y-3 ${won ? 'bg-neo-lime' : 'bg-neo-red'}`}>
+              <h2 className="inline-flex items-center justify-center gap-2 font-neo-display text-2xl font-black uppercase text-neo-navy">
+                {won ? <Trophy className="h-6 w-6" /> : <Skull className="h-6 w-6" />}
+                {won ? t('shiritori.solo.won') : t('shiritori.solo.lost')}
+              </h2>
+              <p className="font-neo-body text-sm text-neo-navy/80">
+                {t(`shiritori.solo.endReason.${state.endReason}`)}
+              </p>
+              {score > 0 && (
+                <p className="font-neo-display text-lg font-black text-neo-navy">
+                  {t('shiritori.solo.ghost.score')} {score}
+                </p>
+              )}
+              <div className="flex justify-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => newGame(difficulty)}
+                  className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  {t('shiritori.solo.again')}
+                </button>
+              </div>
             </div>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-3">
-            <input
-              ref={inputRef}
-              type="text"
-              dir="ltr"
-              value={input}
-              onChange={(e) => { setInput(e.target.value); if (error) setError(null); }}
-              placeholder={t('shiritori.solo.inputPlaceholder')}
-              aria-label={t('shiritori.solo.inputPlaceholder')}
-              autoComplete="off"
-              spellCheck={false}
-              disabled={state.turn !== 'player' || pending}
-              className="w-full rounded-neo border-3 border-black bg-neo-cream px-4 py-3 text-center font-neo-display font-black text-xl text-neo-navy shadow-hard outline-none focus:border-neo-purple disabled:opacity-50"
-            />
-            {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={state.turn !== 'player' || pending}
-                className="flex flex-1 items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard disabled:opacity-50"
-              >
-                <Send className="h-4 w-4" />
-                {pending ? t('shiritori.solo.checking') : t('shiritori.solo.submit')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setState((s) => playerGivesUp(s))}
-                disabled={state.turn !== 'player' || pending}
-                className="rounded-neo border-3 border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white shadow-hard-sm disabled:opacity-50"
-              >
-                {t('shiritori.solo.giveUp')}
-              </button>
-            </div>
-            {state.turn === 'bot' && (
-              <p className="text-center font-neo-body text-xs text-neo-white animate-pulse">
-                {t('shiritori.solo.botThinking')}
-              </p>
-            )}
-          </form>
+          <div
+            dir="ltr"
+            className="flex flex-1 flex-wrap content-start items-start justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard"
+          >
+            {state.chain.map((w, i) => {
+              // Chain = [seed, player, bot, player, bot, …]. The seed at index 0
+              // belongs to neither side (cyan, no icon); after it, player words
+              // fall on odd indices and bot words on even indices.
+              const isSeed = i === 0;
+              const fromBot = !isSeed && i % 2 === 0;
+              const Icon = fromBot ? Bot : User;
+              const tone = isSeed
+                ? 'bg-neo-cyan text-neo-navy'
+                : fromBot
+                  ? 'bg-neo-pink text-neo-navy'
+                  : 'bg-neo-lime text-neo-navy';
+              return (
+                <span key={`${w}-${i}`} className="inline-flex items-center gap-1.5">
+                  {i > 0 && <span className="text-neo-white">→</span>}
+                  <span
+                    className={`inline-flex animate-neo-pop items-center gap-1 rounded-neo border-2 border-black px-2.5 py-1 font-neo-display text-base font-black shadow-hard-sm ${tone}`}
+                  >
+                    {!isSeed && <Icon className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />}
+                    {w}
+                  </span>
+                </span>
+              );
+            })}
+            <div ref={chainEndRef} aria-hidden="true" />
+          </div>
         )}
       </div>
-    </main>
+    </GameStage>
   );
 }

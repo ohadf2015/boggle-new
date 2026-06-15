@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer, Grid3x3, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
 import { crosswordStats } from '@/lib/crossword/stats';
 import type { CrosswordPuzzle } from '@/lib/crossword/types';
@@ -12,6 +14,7 @@ import { CrosswordKeyboard } from './CrosswordKeyboard';
 import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
 import { CrosswordFx } from './CrosswordFx';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 
 function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -27,8 +30,24 @@ export interface CrosswordViewProps {
 export function CrosswordView({ puzzle }: CrosswordViewProps) {
   const { t } = useLanguage();
   const reduced = useReducedMotion();
+  const { playSound } = useSoundEffects();
   const [burst, setBurst] = useState(0);
-  const game = useCrosswordGame(puzzle, { onSolved: () => setBurst((n) => n + 1) });
+  const [winFlash, setWinFlash] = useState(0);
+  const game = useCrosswordGame(puzzle, {
+    onSolved: () => {
+      setBurst((n) => n + 1);
+      setWinFlash((n) => n + 1);
+      playSound('victoryFanfare');
+    },
+  });
+
+  // Full-screen game: hide global header / bottom-nav / footer so the board
+  // owns the viewport (and surfaces the in-game mute FAB).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
   const {
     state,
     activeSlot,
@@ -101,11 +120,12 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
 
   return (
     <div
-      className="mx-auto w-full max-w-md lg:max-w-5xl px-3 pt-5 pb-10 lg:pt-9"
+      className="fixed inset-x-0 top-0 z-20 flex h-[100dvh] w-full flex-col overflow-hidden bg-neo-navy texture-halftone px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:static lg:z-auto lg:mx-auto lg:block lg:h-auto lg:max-w-5xl lg:overflow-visible lg:bg-transparent lg:pt-9 lg:pb-10"
       translate="no"
     >
+      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
       {/* Puzzle identity bar — solid neo header so it never gets lost on the cream board. */}
-      <header className="bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg px-3.5 py-3">
+      <header className="shrink-0 bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg px-3.5 py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <span
@@ -164,30 +184,52 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
         </div>
       </header>
 
-      {/* Board + clues. Single column on phones; grid left / clue rail right on desktop. */}
-      <div className="mt-3 lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-6 lg:items-start">
-        <div className="flex flex-col gap-3">
-          <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
+      {/* Board + clues. On phones a single fit-to-viewport column (grid+clues
+          scroll in the middle, keyboard pinned); grid left / clue rail right on
+          desktop. */}
+      <div className="mt-3 flex min-h-0 flex-1 flex-col lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-6 lg:items-start">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 lg:block lg:gap-3">
+          {/* Scrollable middle on mobile so the keyboard can stay pinned. */}
+          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain lg:flex-none lg:gap-3 lg:overflow-visible">
+            <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
 
-          <ClueBar
-            slot={activeSlot}
-            rtl={puzzle.rtl}
-            onPrev={() => nextSlot(-1)}
-            onNext={() => nextSlot(1)}
-            onToggleDir={toggleDir}
-            t={t}
-          />
+            <ClueBar
+              slot={activeSlot}
+              rtl={puzzle.rtl}
+              onPrev={() => nextSlot(-1)}
+              onNext={() => nextSlot(1)}
+              onToggleDir={toggleDir}
+              t={t}
+            />
 
-          {/* Toolbar */}
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <ToolButton onClick={checkAll} icon={<CheckCheck size={16} />} label={t('crossword.check')} />
-            <ToolButton onClick={handleReveal} icon={<Lightbulb size={16} />} label={t('crossword.revealLetter')} />
-            <ToolButton onClick={revealWord} icon={<Eye size={16} />} label={t('crossword.revealWord')} />
-            <ToolButton onClick={reset} icon={<RotateCcw size={16} />} label={t('crossword.restart')} />
+            {/* Toolbar */}
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <ToolButton onClick={checkAll} icon={<CheckCheck size={16} />} label={t('crossword.check')} />
+              <ToolButton onClick={handleReveal} icon={<Lightbulb size={16} />} label={t('crossword.revealLetter')} />
+              <ToolButton onClick={revealWord} icon={<Eye size={16} />} label={t('crossword.revealWord')} />
+              <ToolButton onClick={reset} icon={<RotateCcw size={16} />} label={t('crossword.restart')} />
+            </div>
+
+            {/* Mobile: full clue list tucked into a disclosure so it doesn't crowd the board. */}
+            <details className="lg:hidden group bg-neo-navy-light border-neo border-black rounded-neo shadow-hard">
+              <summary className="flex items-center justify-between gap-2 cursor-pointer list-none px-3 py-2.5 font-neo-display font-bold text-sm text-neo-white">
+                {t('crossword.allClues')}
+                <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
+              </summary>
+              <div className="px-2.5 pb-2.5">
+                <CrosswordClueList
+                  slots={puzzle.slots}
+                  activeSlotId={activeSlot?.id ?? null}
+                  onSelect={(slot) => focusSlot(slot.id)}
+                  t={t}
+                />
+              </div>
+            </details>
           </div>
 
-          {/* On-screen keyboard — touch only; desktop uses the physical keyboard. */}
-          <div className="lg:hidden">
+          {/* On-screen keyboard — touch only; pinned to the bottom on mobile so
+              the page never scrolls. Desktop uses the physical keyboard. */}
+          <div className="shrink-0 pt-1 lg:hidden">
             <CrosswordKeyboard
               locale={puzzle.locale}
               onLetter={inputLetter}
@@ -196,22 +238,6 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
               backspaceLabel={t('crossword.backspace')}
             />
           </div>
-
-          {/* Mobile: full clue list tucked into a disclosure so it doesn't crowd the board. */}
-          <details className="lg:hidden group bg-neo-navy-light border-neo border-black rounded-neo shadow-hard">
-            <summary className="flex items-center justify-between gap-2 cursor-pointer list-none px-3 py-2.5 font-neo-display font-bold text-sm text-neo-white">
-              {t('crossword.allClues')}
-              <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
-            </summary>
-            <div className="px-2.5 pb-2.5">
-              <CrosswordClueList
-                slots={puzzle.slots}
-                activeSlotId={activeSlot?.id ?? null}
-                onSelect={(slot) => focusSlot(slot.id)}
-                t={t}
-              />
-            </div>
-          </details>
         </div>
 
         {/* Desktop: the Across/Down clue rail, the strongest "this is a real crossword" signal. */}

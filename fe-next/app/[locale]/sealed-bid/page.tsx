@@ -19,8 +19,11 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Bot, Delete, Gavel, RotateCcw, Send, Sparkles, Trophy, User, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { GameStage } from '@/components/game/GameStage';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import {
   advanceRound,
   commitBid,
@@ -69,9 +72,19 @@ export default function SealedBidPage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [history, setHistory] = useState<RoundResult[]>([]);
+  const [winFlash, setWinFlash] = useState(0);
   const builtRef = useRef<HTMLDivElement>(null);
   const revealRef = useRef<HTMLDivElement>(null);
   const didShuffleRef = useRef(false);
+  const revealFiredRef = useRef(false);
+
+  // Full-screen game: hide global header / bottom-nav / footer so the play
+  // surface owns the viewport (and surfaces the in-game mute FAB).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   // Randomize the round order once, on the client only (post-hydration).
   useEffect(() => {
@@ -118,10 +131,13 @@ export default function SealedBidPage() {
     }
   }, [state.phase, result, playSound]);
 
-  // Final fanfare on the last reveal.
+  // Final fanfare on the last reveal — fire once per game end.
   useEffect(() => {
-    if (state.phase !== 'done') return;
+    if (state.phase !== 'done') { revealFiredRef.current = false; return; }
+    if (revealFiredRef.current) return;
+    revealFiredRef.current = true;
     playSound('victoryFanfare');
+    setWinFlash((f) => f + 1);
     SharedFxApp.spawnBurst('celebration', window.innerWidth / 2, window.innerHeight / 3);
   }, [state.phase, playSound]);
 
@@ -187,34 +203,43 @@ export default function SealedBidPage() {
 
   const usedTiles = new Set(chosen);
 
-  return (
-    <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-8">
-      <div className="mx-auto w-full max-w-2xl space-y-5">
-        <header className="flex items-center justify-between">
-          <Link href={`/${locale}`} className="inline-flex items-center gap-1.5 font-neo-body text-sm text-neo-white">
-            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-            {t('sealedBid.title')}
-          </Link>
-          <span className="inline-flex items-center gap-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white">
-            <Gavel className="h-3.5 w-3.5" />
-            {t('sealedBid.badge')}
-          </span>
-        </header>
+  // Header slot: back link, title/badge, round counter, score
+  const header = (
+    <div className="mx-auto w-full max-w-2xl space-y-2.5">
+      <div className="flex items-center justify-between">
+        <Link
+          href={`/${locale}`}
+          className="inline-flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy-light px-2.5 py-1.5 font-neo-body text-xs text-neo-white shadow-hard-sm"
+        >
+          <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+          {t('sealedBid.title')}
+        </Link>
+        <h1 className="truncate font-neo-display text-base font-black uppercase tracking-wide text-neo-white">
+          {t('sealedBid.title')}
+        </h1>
+        <span className="inline-flex items-center gap-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white">
+          <Gavel className="h-3.5 w-3.5" />
+          {t('sealedBid.badge')}
+        </span>
+      </div>
 
-        <div className="text-center space-y-2">
-          <h1 className="font-neo-display font-black text-3xl sm:text-4xl text-neo-white">{t('sealedBid.title')}</h1>
-          <p className="font-neo-body text-sm text-neo-white/90">{t('sealedBid.instructions')}</p>
-        </div>
+      <div className="flex items-center justify-between gap-2">
+        <span className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white shadow-hard-sm">
+          {t('sealedBid.roundLabel', { n: state.index + 1, total: state.rounds.length })}
+        </span>
+        <span className="rounded-neo border-2 border-black bg-neo-cyan px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm">
+          {t('sealedBid.totalScore', { score: state.totalScore })}
+        </span>
+      </div>
 
-        <div className="flex items-center justify-between gap-2">
-          <span className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white shadow-hard-sm">
-            {t('sealedBid.roundLabel', { n: state.index + 1, total: state.rounds.length })}
-          </span>
-          <span className="rounded-neo border-2 border-black bg-neo-cyan px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm">
-            {t('sealedBid.totalScore', { score: state.totalScore })}
-          </span>
-        </div>
+      <p className="text-center font-neo-body text-sm text-neo-white/90">{t('sealedBid.instructions')}</p>
+    </div>
+  );
 
+  // Footer slot: during bidding phase, the rack and word-builder controls; during revealed/done, null
+  const footer =
+    state.phase === 'bidding' ? (
+      <div className="mx-auto w-full max-w-2xl space-y-3">
         {/* The rack — tappable tiles. Used tiles dim out. */}
         <div dir={dir} className="flex flex-wrap items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard">
           {round.rack.split('').map((ch, i) => {
@@ -241,22 +266,84 @@ export default function SealedBidPage() {
           })}
         </div>
 
+        {/* Built word — a single bidi-correct run (so Hebrew reads RTL) with a backspace + clear. */}
+        <form onSubmit={lockIn} className="space-y-3">
+          <p className="text-center font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">{t('sealedBid.sealPhase')}</p>
+
+          <div className="flex items-center gap-2">
+            <div
+              ref={builtRef}
+              dir={dir}
+              aria-live="polite"
+              className="flex min-h-[56px] flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-cream px-4 py-3 font-neo-display font-black text-2xl tracking-widest text-neo-navy shadow-hard"
+            >
+              {word ? toDisplay(word) : <span className="font-neo-body text-sm font-normal tracking-normal text-neo-navy/50">{t('sealedBid.tapHint')}</span>}
+            </div>
+            <button
+              type="button"
+              onClick={backspace}
+              disabled={chosen.length === 0 || pending}
+              aria-label={t('sealedBid.backspace')}
+              className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
+            >
+              <Delete className="h-5 w-5 rtl:rotate-180" />
+            </button>
+            <button
+              type="button"
+              onClick={clear}
+              disabled={chosen.length === 0 || pending}
+              aria-label={t('sealedBid.clear')}
+              className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={!canLock}
+              className="flex flex-1 items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard disabled:opacity-50"
+            >
+              <Send className="h-4 w-4" />
+              {t('sealedBid.lockIn')}
+            </button>
+            <button
+              type="button"
+              onClick={pass}
+              disabled={pending}
+              className="rounded-neo border-3 border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white shadow-hard-sm disabled:opacity-50"
+            >
+              {t('sealedBid.skip')}
+            </button>
+          </div>
+        </form>
+      </div>
+    ) : null;
+
+  return (
+    <GameStage accent="cyan" header={header} footer={footer}>
+      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3">
         {state.phase === 'done' ? (
           <div className="space-y-4">
-            <div className="rounded-neo border-3 border-black bg-neo-cyan p-6 text-center shadow-hard-lg space-y-4">
-              <h2 className="inline-flex items-center justify-center gap-2 font-neo-display font-black text-2xl uppercase text-neo-navy">
-                <Trophy className="h-6 w-6" />
-                {t('sealedBid.finalScore')}
-              </h2>
-              <p className="font-neo-display font-black text-5xl text-neo-navy">{state.totalScore}</p>
-              <button
-                type="button"
-                onClick={newGame}
-                className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
-              >
-                <RotateCcw className="h-4 w-4" />
-                {t('sealedBid.playAgain')}
-              </button>
+            <div className="flex flex-1 items-center justify-center">
+              <div className="w-full animate-neo-pop rounded-neo border-3 border-black bg-neo-cyan p-6 text-center shadow-hard-lg space-y-4">
+                <h2 className="inline-flex items-center justify-center gap-2 font-neo-display font-black text-2xl uppercase text-neo-navy">
+                  <Trophy className="h-6 w-6" />
+                  {t('sealedBid.finalScore')}
+                </h2>
+                <p className="font-neo-display font-black text-5xl text-neo-navy">{state.totalScore}</p>
+                <button
+                  type="button"
+                  onClick={newGame}
+                  className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  {t('sealedBid.playAgain')}
+                </button>
+              </div>
             </div>
             {history.length > 0 && (
               <SealedBidSessionSummary history={history} totalScore={state.totalScore} />
@@ -292,62 +379,8 @@ export default function SealedBidPage() {
               <ArrowRight className="h-4 w-4 rtl:rotate-180" />
             </button>
           </div>
-        ) : (
-          <form onSubmit={lockIn} className="space-y-3">
-            <p className="text-center font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">{t('sealedBid.sealPhase')}</p>
-
-            {/* Built word — a single bidi-correct run (so Hebrew reads RTL) with a backspace + clear. */}
-            <div className="flex items-center gap-2">
-              <div
-                ref={builtRef}
-                dir={dir}
-                aria-live="polite"
-                className="flex min-h-[56px] flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-cream px-4 py-3 font-neo-display font-black text-2xl tracking-widest text-neo-navy shadow-hard"
-              >
-                {word ? toDisplay(word) : <span className="font-neo-body text-sm font-normal tracking-normal text-neo-navy/50">{t('sealedBid.tapHint')}</span>}
-              </div>
-              <button
-                type="button"
-                onClick={backspace}
-                disabled={chosen.length === 0 || pending}
-                aria-label={t('sealedBid.backspace')}
-                className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
-              >
-                <Delete className="h-5 w-5 rtl:rotate-180" />
-              </button>
-              <button
-                type="button"
-                onClick={clear}
-                disabled={chosen.length === 0 || pending}
-                aria-label={t('sealedBid.clear')}
-                className="inline-flex h-[56px] w-12 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                disabled={!canLock}
-                className="flex flex-1 items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard disabled:opacity-50"
-              >
-                <Send className="h-4 w-4" />
-                {t('sealedBid.lockIn')}
-              </button>
-              <button
-                type="button"
-                onClick={pass}
-                disabled={pending}
-                className="rounded-neo border-3 border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white shadow-hard-sm disabled:opacity-50"
-              >
-                {t('sealedBid.skip')}
-              </button>
-            </div>
-          </form>
-        )}
+        ) : null}
       </div>
-    </main>
+    </GameStage>
   );
 }
