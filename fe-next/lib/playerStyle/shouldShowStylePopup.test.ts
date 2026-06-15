@@ -59,6 +59,20 @@ describe('shouldShowStylePopup', () => {
     ).toBe(false);
   });
 
+  it('never shows once the account already has a style, even if auth reads false transiently', () => {
+    // The chosen style on `profiles.player_style` must suppress the popup in
+    // EITHER auth state, not only the authenticated branch. During session
+    // restore / token refresh / cross-tab sync `isAuthenticated` can briefly
+    // read false while the profile object still holds the chosen style (the same
+    // value the "current" badge renders from). If the profileStyle check only
+    // lived in the authed branch, the gate would fall into the guest branch,
+    // ignore the chosen style, and re-open the popup over a user who already
+    // picked — the exact "modal opened after I chose my style" report.
+    expect(shouldShowStylePopup({ ...base, isAuthenticated: false, profileStyle: 'hasidic' })).toBe(
+      false,
+    );
+  });
+
   describe('authenticated', () => {
     const authed = { ...base, isAuthenticated: true };
     it('shows once when the popup was never shown and no style chosen', () => {
