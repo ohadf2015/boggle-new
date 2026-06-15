@@ -168,8 +168,17 @@ export const ResultsSectionReveal: React.FC<SectionRevealProps> = ({
   const reducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
 
-  if (reducedMotion) {
-    return <div ref={ref} className={className}>{children}</div>;
+  // Drop the reveal on native (same as reduced-motion). Framer-motion promotes
+  // each animating `m.div` to its own GPU compositor layer as it scrolls into
+  // view, and on the Android System WebView a freshly-promoted layer paints an
+  // UNINITIALISED WHITE backing for a frame before it composites. EVERY results
+  // section is wrapped in this reveal, so that surfaced as the page "flashing
+  // white" section-by-section — the hero/podium right as the fanfare hands off,
+  // then each section as the user scrolls. This is the same layer-init flash
+  // class already gated off native for the sibling scroll effects (Parallax /
+  // HeroTilt / ProgressRail in this file); SectionReveal was the one left behind.
+  if (reducedMotion || isNativeApp()) {
+    return <div ref={ref} className={className} data-testid="results-section-reveal-static">{children}</div>;
   }
 
   const xFrom = index % 2 === 0 ? -10 : 10;
@@ -180,6 +189,7 @@ export const ResultsSectionReveal: React.FC<SectionRevealProps> = ({
     <m.div
       ref={ref}
       className={className}
+      data-testid="results-section-reveal-motion"
       initial={{ opacity: 0, y: 22, x: xFrom, rotate: rotateFrom }}
       whileInView={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
       viewport={{ once: true, amount: 0.15, margin: '0px 0px -8% 0px' }}
