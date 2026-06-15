@@ -154,6 +154,19 @@ describe('PreResultFanfare — pre-result video then transition to results', () 
     expect(colors).toContain('#FFE135');
   });
 
+  it('does NOT fling pure-white confetti (white particles flashed on the dark results page)', async () => {
+    vi.useRealTimers();
+    setReducedMotion(false);
+    confettiMock.mockClear();
+    render(<PreResultFanfare kind="champion" onComplete={vi.fn()} t={(k, f) => f || k} />);
+
+    await vi.waitFor(() => expect(confettiMock).toHaveBeenCalled());
+    for (const call of confettiMock.mock.calls) {
+      const colors = ((call[0].colors as string[]) || []).map((c) => c.toUpperCase());
+      expect(colors).not.toContain('#FFFFFF');
+    }
+  });
+
   it('renders a screen-edge glow vignette (like the fanfare demo) hugging the sides', () => {
     setReducedMotion(false);
     const onComplete = vi.fn();

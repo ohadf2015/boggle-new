@@ -6,15 +6,19 @@ import { cn } from '@/lib/utils';
 import { MascotCelebrationVideo, type MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 import { celebrationTitleFor } from '@/components/mascot/celebrationKind';
 
-/** Confetti palettes per kind — mirror each variant's sparkle colors. */
+/**
+ * Confetti palettes per kind — brand colours only. Pure white (#FFFFFF) was
+ * removed: on the dark results page a burst of white particles read as the page
+ * "flashing white". The vivid lime/pink/cyan/gold/purple pop plenty on navy.
+ */
 const CONFETTI_COLORS: Record<MascotCelebrationKind, string[]> = {
-  champion: ['#FFE135', '#FF6B35', '#FFFFFF'],
-  'runner-up': ['#00FFFF', '#FF1493', '#FFFFFF'],
-  defeat: ['#8B5CF6', '#FF1493', '#FFFFFF'],
-  bingo: ['#FF1493', '#00FFFF', '#FFE135', '#FFFFFF'],
-  knight: ['#FF1493', '#00FFFF', '#FFFFFF'],
+  champion: ['#FFE135', '#FF6B35'],
+  'runner-up': ['#00FFFF', '#FF1493'],
+  defeat: ['#8B5CF6', '#FF1493'],
+  bingo: ['#FF1493', '#00FFFF', '#FFE135'],
+  knight: ['#FF1493', '#00FFFF'],
   streak: ['#BFFF00', '#00FFFF', '#FFE135'],
-  explorer: ['#00FFFF', '#FF1493', '#BFFF00', '#FFFFFF'],
+  explorer: ['#00FFFF', '#FF1493', '#BFFF00'],
   'mission-complete': ['#FFE135', '#FF6B35', '#BFFF00'],
 };
 
@@ -83,11 +87,13 @@ export const PreResultFanfare = memo(function PreResultFanfare({
     const colors = CONFETTI_COLORS[kind];
     void import('canvas-confetti').then(({ default: confetti }) => {
       if (cancelled) return;
-      confetti({ particleCount: 70, spread: 72, startVelocity: 55, angle: 60, origin: { x: 0.12, y: 1 }, colors, ticks: 220, zIndex: 60 });
-      confetti({ particleCount: 70, spread: 72, startVelocity: 55, angle: 120, origin: { x: 0.88, y: 1 }, colors, ticks: 220, zIndex: 60 });
+      // Lighter bursts + shorter ticks: the old 200-particle volley lingered and
+      // janked the entrance on phones. Two corner cannons + one small centre pop.
+      confetti({ particleCount: 48, spread: 70, startVelocity: 52, angle: 60, origin: { x: 0.12, y: 1 }, colors, ticks: 160, zIndex: 60 });
+      confetti({ particleCount: 48, spread: 70, startVelocity: 52, angle: 120, origin: { x: 0.88, y: 1 }, colors, ticks: 160, zIndex: 60 });
       burstTimer = window.setTimeout(() => {
-        if (!cancelled) confetti({ particleCount: 60, spread: 110, startVelocity: 38, origin: { x: 0.5, y: 0.42 }, colors, scalar: 1.1, ticks: 200, zIndex: 60 });
-      }, 260);
+        if (!cancelled) confetti({ particleCount: 36, spread: 100, startVelocity: 34, origin: { x: 0.5, y: 0.42 }, colors, scalar: 1.05, ticks: 150, zIndex: 60 });
+      }, 240);
     });
     return () => {
       cancelled = true;
@@ -151,10 +157,13 @@ export const PreResultFanfare = memo(function PreResultFanfare({
       <AnimatePresence>
         {!isExiting && (
           <m.div
-            initial={{ opacity: 0, scale: 0.96, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: -10 }}
-            transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
+            // Opacity-only: the inner MascotCelebrationVideo already plays its own
+            // `lcMcvVideoIn` scale/translate pop. Stacking a second scale+y here
+            // double-transformed the same node = the jumpy "stutter" on entrance.
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.32, ease: 'easeOut' }}
             className="relative"
           >
             <MascotCelebrationVideo

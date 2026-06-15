@@ -31,28 +31,38 @@ function useIsSmallViewport(): boolean {
 interface ParallaxBackdropProps {
   scrollRef: React.RefObject<HTMLElement | null>;
   intensity?: number;
+  /**
+   * Only the result tree for the ACTIVE breakpoint should run scroll effects.
+   * Both the desktop (`hidden md:flex`) and mobile (`md:hidden`) layouts mount
+   * at once (CSS `display:none` ≠ unmounted), so without this gate GSAP
+   * ScrollTriggers + observers ran twice → scroll stutter. `false` = inert.
+   */
+  enabled?: boolean;
 }
 
 /**
- * GSAP-driven parallax backdrop. ScrollTrigger batches transform updates
- * onto GSAP's shared RAF ticker — measurably smoother than framer-motion's
- * per-MotionValue subscriptions during iOS momentum scroll.
+ * GSAP-driven parallax backdrop — two soft brand-tinted radial layers that
+ * scrub on scroll. ScrollTrigger batches transform updates onto GSAP's shared
+ * RAF ticker.
  *
- * Mobile: 0.55x intensity, drops the velocity flicker layer (paint cost).
- * Desktop: full intensity + velocity-driven highlight on fast flicks.
+ * NOTE: the old white "velocity flicker" layer was removed — a full-screen
+ * `rgba(255,255,255,…)` glow whose opacity tracked scroll speed read as the
+ * page "flashing white over components", and re-creating a `gsap.to()` tween on
+ * every scroll RAF frame was a main-thread stutter source. Brand-tint parallax
+ * stays; the white flash does not.
  */
 export const ResultsParallaxBackdrop: React.FC<ParallaxBackdropProps> = ({
   scrollRef,
   intensity = 140,
+  enabled = true,
 }) => {
   const reducedMotion = useReducedMotion();
   const isSmall = useIsSmallViewport();
   const backRef = useRef<HTMLDivElement | null>(null);
   const midRef = useRef<HTMLDivElement | null>(null);
-  const flickRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !enabled) return;
     const scroller = scrollRef.current;
     const back = backRef.current;
     const mid = midRef.current;
@@ -80,49 +90,15 @@ export const ResultsParallaxBackdrop: React.FC<ParallaxBackdropProps> = ({
       mkScrub(mid, -intensity * mult),
     ];
 
-    let cleanupFlick: (() => void) | undefined;
-    const flick = flickRef.current;
-    if (!isSmall && flick) {
-      gsap.set(flick, { opacity: 0, y: 0 });
-      let lastY = scroller.scrollTop;
-      let lastT = performance.now();
-      let raf = 0;
-      const onScroll = () => {
-        if (raf) return;
-        raf = requestAnimationFrame(() => {
-          raf = 0;
-          const now = performance.now();
-          const dt = Math.max(16, now - lastT);
-          const dy = scroller.scrollTop - lastY;
-          const v = (dy / dt) * 1000;
-          lastY = scroller.scrollTop;
-          lastT = now;
-          gsap.to(flick, {
-            opacity: Math.min(0.18, Math.abs(v) / 2000),
-            y: gsap.utils.clamp(-40, 40, -v / 50),
-            duration: 0.4,
-            ease: 'power2.out',
-            overwrite: 'auto',
-          });
-        });
-      };
-      scroller.addEventListener('scroll', onScroll, { passive: true });
-      cleanupFlick = () => {
-        scroller.removeEventListener('scroll', onScroll);
-        if (raf) cancelAnimationFrame(raf);
-      };
-    }
-
     return () => {
-      cleanupFlick?.();
       tweens.forEach((tw) => {
         tw.scrollTrigger?.kill();
         tw.kill();
       });
     };
-  }, [scrollRef, intensity, isSmall, reducedMotion]);
+  }, [scrollRef, intensity, isSmall, reducedMotion, enabled]);
 
-  if (reducedMotion) return null;
+  if (reducedMotion || !enabled) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
@@ -144,16 +120,6 @@ export const ResultsParallaxBackdrop: React.FC<ParallaxBackdropProps> = ({
           transform: 'translate3d(0,0,0)',
         }}
       />
-      {!isSmall && (
-        <div
-          ref={flickRef}
-          className="absolute inset-0 will-change-transform"
-          style={{
-            background:
-              'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.10) 0%, transparent 60%)',
-          }}
-        />
-      )}
     </div>
   );
 };
@@ -213,6 +179,8 @@ interface HeroTiltProps {
   children: ReactNode;
   scrollRef: React.RefObject<HTMLElement | null>;
   className?: string;
+  /** See ParallaxBackdrop — only the active-breakpoint tree runs the scrub. */
+  enabled?: boolean;
 }
 
 /**
@@ -225,12 +193,13 @@ export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
   children,
   scrollRef,
   className,
+  enabled = true,
 }) => {
   const reducedMotion = useReducedMotion();
   const innerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !enabled) return;
     const scroller = scrollRef.current;
     const target = innerRef.current;
     if (!scroller || !target) return;
@@ -250,9 +219,9 @@ export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
       tw.scrollTrigger?.kill();
       tw.kill();
     };
-  }, [scrollRef, reducedMotion]);
+  }, [scrollRef, reducedMotion, enabled]);
 
-  if (reducedMotion) {
+  if (reducedMotion || !enabled) {
     return <div className={className}>{children}</div>;
   }
 
@@ -273,6 +242,8 @@ export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
 interface ScrollProgressRailProps {
   scrollRef: React.RefObject<HTMLElement | null>;
   hideOnMobile?: boolean;
+  /** See ParallaxBackdrop — only the active-breakpoint tree subscribes to scroll. */
+  enabled?: boolean;
 }
 
 /**
@@ -283,13 +254,14 @@ interface ScrollProgressRailProps {
 export const ResultsScrollProgressRail: React.FC<ScrollProgressRailProps> = ({
   scrollRef,
   hideOnMobile = true,
+  enabled = true,
 }) => {
   const reducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ container: scrollRef as React.RefObject<HTMLElement> });
   const smoothed = useSpring(scrollYProgress, { stiffness: 220, damping: 30, mass: 0.4 });
   const height = useTransform(smoothed, [0, 1], ['0%', '100%']);
 
-  if (reducedMotion) return null;
+  if (reducedMotion || !enabled) return null;
 
   return (
     <m.div

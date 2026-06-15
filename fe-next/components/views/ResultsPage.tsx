@@ -93,6 +93,8 @@ interface DesktopResultsLayoutProps {
   currentPlayerRank: number;
   sortedScores: any[];
   marginToNext: number | null;
+  /** Scroll effects only run for the active breakpoint (both trees mount). */
+  scrollFxEnabled: boolean;
 }
 
 function DesktopResultsLayout({
@@ -116,6 +118,7 @@ function DesktopResultsLayout({
   currentPlayerRank,
   sortedScores,
   marginToNext,
+  scrollFxEnabled,
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
@@ -151,8 +154,8 @@ function DesktopResultsLayout({
           paddingBottom: 'calc(var(--mp-results-cta-h, 8rem) + 1rem)',
         }}
       >
-        <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={140} />
-        <ResultsScrollProgressRail scrollRef={scrollRef} />
+        <ResultsParallaxBackdrop scrollRef={scrollRef} intensity={140} enabled={scrollFxEnabled} />
+        <ResultsScrollProgressRail scrollRef={scrollRef} enabled={scrollFxEnabled} />
         {/* Top Bar with Exit Button — kept on the start (left in LTR) edge to
             match the in-game header, so the exit doesn't jump sides on the
             game→results transition. */}
@@ -174,7 +177,7 @@ function DesktopResultsLayout({
         {/* Full-width cinematic area: Hero + Podium + Consolation.
             Wrapped in ResultsHeroTilt so the podium gains a gentle 3D recede
             as the player scrolls further into the page. */}
-        <ResultsHeroTilt scrollRef={scrollRef} className="w-full max-w-5xl mx-auto relative z-10">
+        <ResultsHeroTilt scrollRef={scrollRef} enabled={scrollFxEnabled} className="w-full max-w-5xl mx-auto relative z-10">
           <ResultsSectionReveal index={1} flat>
             <ResultsMainContent
               {...mainContentProps}
@@ -1143,9 +1146,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             paddingBottom: 'calc(var(--mp-results-cta-h, 9rem) + 1rem)',
           }}
         >
-          <ResultsParallaxBackdrop scrollRef={mobileScrollRef} intensity={120} />
+          <ResultsParallaxBackdrop scrollRef={mobileScrollRef} intensity={120} enabled={!isDesktopViewport} />
           <div className="max-w-lg mx-auto space-y-6 medium-short:space-y-3 relative z-10">
-            <ResultsHeroTilt scrollRef={mobileScrollRef}>
+            <ResultsHeroTilt scrollRef={mobileScrollRef} enabled={!isDesktopViewport}>
               <ResultsSectionReveal index={0} flat>
                 {renderResultsTab()}
               </ResultsSectionReveal>
@@ -1257,6 +1260,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         currentPlayerRank={currentPlayerRank}
         sortedScores={sortedScores}
         marginToNext={marginToNext}
+        scrollFxEnabled={isDesktopViewport}
       />
 
       {/* DESKTOP Sticky Ready Bar — pinned to bottom on md+ screens.

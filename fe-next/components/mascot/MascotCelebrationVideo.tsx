@@ -387,11 +387,17 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
                 loop
                 muted
                 playsInline
-                preload="metadata"
+                // `auto` so the first frame is decoded before the scale-in plays —
+                // `metadata` left the framed box EMPTY during the 620ms entrance,
+                // reading as a "flash / video not showing". The dark `backgroundColor`
+                // backs the frame the same navy as the stage so a slow first frame is
+                // never a white/transparent flash on the dark results page.
+                preload="auto"
                 // shadow-hard-xl auto-flips in RTL via the project's tailwind config
                 // (-8px,8px on [dir="rtl"]). Pure tailwind keeps it consistent with
                 // every other neo-brutalist surface in the app.
                 className="block w-full h-full object-cover rounded-3xl border-4 border-black shadow-hard-xl"
+                style={{ backgroundColor: '#0A1828' }}
                 onEnded={handleDone}
               />
               {/* Animated edge glow — sits on top of the video as an overlay so

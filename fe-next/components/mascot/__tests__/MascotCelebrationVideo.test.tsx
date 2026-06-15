@@ -53,6 +53,15 @@ describe('MascotCelebrationVideo', () => {
     expect(screen.getByTestId('mascot-celebration-video').dataset.kind).toBe('defeat');
   });
 
+  it('eagerly preloads + backs the frame with dark navy so it never flashes white/empty', () => {
+    render(<MascotCelebrationVideo kind="champion" />);
+    const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
+    // preload=metadata left the framed box empty during the scale-in entrance.
+    expect(video?.getAttribute('preload')).toBe('auto');
+    // dark backing == #0A1828; a slow first frame reads as navy, not a flash.
+    expect(video?.style.backgroundColor).toBe('#0A1828');
+  });
+
   it('calls onDone after autoDismissMs', () => {
     const onDone = vi.fn();
     render(<MascotCelebrationVideo kind="knight" autoDismissMs={2500} onDone={onDone} />);
