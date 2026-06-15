@@ -60,10 +60,15 @@ function RailHarness({ enabled }: { enabled?: boolean }) {
   );
 }
 
-beforeEach(() => {
-  mockIsNative.mockReturnValue(false);
+/**
+ * Drive `window.matchMedia` so a render-time `(max-width: 768px)` read reports
+ * the chosen viewport. `mobile = true` => the mobile result tree surface, where
+ * the GPU-layer white-backing flash actually fires (mobile Chrome/Safari share
+ * the same Chromium compositor quirk as the Android WebView).
+ */
+function setViewport(mobile: boolean) {
   window.matchMedia = ((q: string) => ({
-    matches: false,
+    matches: /max-width:\s*768px/.test(q) ? mobile : false,
     media: q,
     onchange: null,
     addEventListener() {},
@@ -74,6 +79,11 @@ beforeEach(() => {
       return false;
     },
   })) as unknown as typeof window.matchMedia;
+}
+
+beforeEach(() => {
+  mockIsNative.mockReturnValue(false);
+  setViewport(false); // default: desktop web
 });
 
 describe('ResultsParallaxBackdrop', () => {
@@ -100,6 +110,13 @@ describe('ResultsParallaxBackdrop', () => {
     // No will-change/translate3d hardware-layer hints leak into the DOM.
     expect(container.innerHTML).not.toMatch(/will-change|translate3d/i);
   });
+
+  it('renders NO GPU layer on mobile WEB — the freshly-promoted layer flashes white in mobile Chrome/Safari (primary phone surface), same Chromium quirk as the WebView', () => {
+    setViewport(true); // mobile viewport, NOT native, NOT reduced-motion
+    const { container } = render(<Harness />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+    expect(container.innerHTML).not.toMatch(/will-change|translate3d/i);
+  });
 });
 
 describe('ResultsHeroTilt', () => {
@@ -110,6 +127,13 @@ describe('ResultsHeroTilt', () => {
 
   it('renders children with NO will-change layer on native (no white flash)', () => {
     mockIsNative.mockReturnValue(true);
+    const { container, getByText } = render(<TiltHarness />);
+    expect(getByText('child')).toBeTruthy();
+    expect(container.querySelector('[style*="will-change"]')).toBeNull();
+  });
+
+  it('renders children with NO will-change layer on mobile WEB (the tilt wraps the whole results body — its layer flashes white on mobile renderers)', () => {
+    setViewport(true);
     const { container, getByText } = render(<TiltHarness />);
     expect(getByText('child')).toBeTruthy();
     expect(container.querySelector('[style*="will-change"]')).toBeNull();
@@ -142,6 +166,19 @@ describe('ResultsSectionReveal', () => {
     // No transform / will-change hardware-layer hint leaks into the markup.
     expect(container.innerHTML).not.toMatch(/will-change|transform|translate/i);
   });
+
+  it('renders a plain static div on mobile WEB — every section is wrapped in this reveal; on mobile renderers each m.div promotes a layer that paints white on creation (the results "flashing white" section-by-section after the fanfare)', () => {
+    setViewport(true); // mobile viewport, NOT native, NOT reduced-motion
+    const { container, queryByTestId, getByText } = render(
+      <ResultsSectionReveal index={0}>
+        <span>section</span>
+      </ResultsSectionReveal>,
+    );
+    expect(getByText('section')).toBeTruthy();
+    expect(queryByTestId('results-section-reveal-static')).not.toBeNull();
+    expect(queryByTestId('results-section-reveal-motion')).toBeNull();
+    expect(container.innerHTML).not.toMatch(/will-change|transform|translate/i);
+  });
 });
 
 describe('ResultsScrollProgressRail', () => {
@@ -152,6 +189,12 @@ describe('ResultsScrollProgressRail', () => {
 
   it('renders nothing on native (no promoted layer to flash white)', () => {
     mockIsNative.mockReturnValue(true);
+    const { container } = render(<RailHarness />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
+
+  it('renders nothing on mobile WEB (the will-change:height layer flashes white on mobile renderers)', () => {
+    setViewport(true);
     const { container } = render(<RailHarness />);
     expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
   });

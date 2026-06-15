@@ -1,8 +1,10 @@
 /**
  * ResultsParallaxBackdrop — GSAP ScrollTrigger drives two scrubbed layers
- * (back + mid) on every breakpoint. The white "velocity-flicker" layer was
- * removed (it read as the page flashing white over components). Reduced-motion
- * users must get nothing.
+ * (back + mid) on DESKTOP web only. They are dropped on mobile viewports: the
+ * freshly-promoted `will-change`/`translate3d` layers paint an uninitialised
+ * white backing for a frame on mobile renderers (the post-fanfare "flashing
+ * white" regression). The white "velocity-flicker" layer was removed earlier
+ * (it too read as the page flashing white). Reduced-motion users get nothing.
  *
  * @vitest-environment jsdom
  */
@@ -69,12 +71,12 @@ describe('ResultsParallaxBackdrop', () => {
     gsapSet.mockClear();
   });
 
-  it('mounts 2 scrubbed layers on mobile (no velocity flicker)', () => {
+  it('renders NOTHING on mobile — promoted GPU layers flash white on mobile renderers (post-fanfare white-flash regression)', () => {
     setViewport(400);
     const { container } = render(<Harness />);
-    // back + mid only on mobile — flicker layer omitted from DOM
     const layers = container.querySelectorAll('.absolute.inset-0.will-change-transform');
-    expect(layers.length).toBe(2);
+    expect(layers.length).toBe(0);
+    expect(container.innerHTML).not.toMatch(/will-change|translate3d/i);
   });
 
   it('mounts 2 scrubbed layers on desktop (back + mid — velocity flicker removed)', () => {

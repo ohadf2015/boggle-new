@@ -25,13 +25,36 @@ if (typeof window !== 'undefined') {
  * composites onto it — and because the hero-tilt layer wraps the whole results
  * body, that white wash lands "over" many components on entry (the reported
  * "white bg flashing over the result/pre-result components"). They were added
- * 2026-06-13; before that the page had no such layers and did not flash. The
- * effects are pure garnish, so we drop them on native and keep them on web
- * (where layer init does not flash). Caller is `ssr:false`, so a sync check is
- * hydration-safe.
+ * 2026-06-13; before that the page had no such layers and did not flash.
+ *
+ * IMPORTANT: this white-backing paint is a MOBILE-RENDERER quirk, NOT a native
+ * one — mobile Chrome/Safari flash identically to the WebView. Gating only on
+ * native (the first round of fixes) left mobile web exposed. The effects are
+ * pure DESKTOP garnish, so we drop them on native AND on mobile viewports (see
+ * `isMobileViewport`) and keep them on desktop web only. Caller is `ssr:false`,
+ * so both sync checks are hydration-safe.
  */
 function isNativeApp(): boolean {
   return typeof window !== 'undefined' && Capacitor.isNativePlatform();
+}
+
+/**
+ * The uninitialised-white-layer paint on a freshly-promoted GPU compositor layer
+ * is a MOBILE-RENDERER (Chromium/WebKit) behaviour, not a Capacitor one — mobile
+ * Chrome/Safari exhibit the exact same quirk as the Android System WebView. So
+ * gating these effects on `isNativeApp()` alone left MOBILE WEB — the primary
+ * phone surface — exposed: the mobile result tree runs the parallax/tilt/rail
+ * layers and every section reveal there, and each flashed white after the
+ * fanfare (the reported regression). They are pure desktop garnish, so we also
+ * drop them on small (mobile) viewports.
+ *
+ * The split mirrors the `md:` (768px) result-tree breakpoint, and the caller is
+ * `ssr:false`, so this SYNCHRONOUS read is hydration-safe and correct from the
+ * first paint. A reactive hook would start `false`, render the effect for one
+ * frame, then re-render static — flashing the very layer we mean to suppress.
+ */
+function isMobileViewport(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
 }
 
 function useIsSmallViewport(): boolean {
@@ -80,7 +103,7 @@ export const ResultsParallaxBackdrop: React.FC<ParallaxBackdropProps> = ({
   const backRef = useRef<HTMLDivElement | null>(null);
   const midRef = useRef<HTMLDivElement | null>(null);
   // Native WebView paints promoted layers white before they composite — skip.
-  const active = enabled && !isNativeApp();
+  const active = enabled && !isNativeApp() && !isMobileViewport();
 
   useEffect(() => {
     if (reducedMotion || !active) return;
@@ -177,7 +200,7 @@ export const ResultsSectionReveal: React.FC<SectionRevealProps> = ({
   // then each section as the user scrolls. This is the same layer-init flash
   // class already gated off native for the sibling scroll effects (Parallax /
   // HeroTilt / ProgressRail in this file); SectionReveal was the one left behind.
-  if (reducedMotion || isNativeApp()) {
+  if (reducedMotion || isNativeApp() || isMobileViewport()) {
     return <div ref={ref} className={className} data-testid="results-section-reveal-static">{children}</div>;
   }
 
@@ -230,7 +253,7 @@ export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
   const innerRef = useRef<HTMLDivElement>(null);
   // Native WebView paints this `will-change:transform` layer white on creation
   // (it wraps the whole results body) — render a plain div there instead.
-  const active = enabled && !isNativeApp();
+  const active = enabled && !isNativeApp() && !isMobileViewport();
 
   useEffect(() => {
     if (reducedMotion || !active) return;
@@ -295,7 +318,7 @@ export const ResultsScrollProgressRail: React.FC<ScrollProgressRailProps> = ({
   const smoothed = useSpring(scrollYProgress, { stiffness: 220, damping: 30, mass: 0.4 });
   const height = useTransform(smoothed, [0, 1], ['0%', '100%']);
   // Native WebView flashes the promoted `will-change:height` layer white — skip.
-  const active = enabled && !isNativeApp();
+  const active = enabled && !isNativeApp() && !isMobileViewport();
 
   if (reducedMotion || !active) return null;
 

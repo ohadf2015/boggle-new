@@ -31,6 +31,25 @@ function mockReducedMotion(matches: boolean) {
   });
 }
 
+/** Query-aware: only `(max-width: 768px)` reports the chosen viewport; everything
+ *  else (incl. prefers-reduced-motion) stays false, so mobile is tested in
+ *  isolation. */
+function mockViewport(mobile: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: /max-width:\s*768px/.test(query) ? mobile : false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }),
+  });
+}
+
 describe('MascotCelebrationVideo', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -205,6 +224,19 @@ describe('MascotCelebrationVideo', () => {
     // The celebration content still renders (we keep the juice, drop the flash).
     expect(screen.getByTestId('mascot-celebration-edge-glow')).toBeInTheDocument();
     expect(screen.getAllByTestId('mascot-celebration-sparkle').length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('emits NO will-change layer on mobile WEB — same Chromium white-backing quirk fires in mobile Chrome/Safari, not just the native WebView (the primary phone surface was left exposed by the native-only gate)', () => {
+    mockViewport(true); // mobile viewport, NOT native, NOT reduced-motion
+    const { container } = render(<MascotCelebrationVideo kind="champion" />);
+    expect(screen.getByTestId('mascot-celebration-edge-glow').style.willChange).toBe('');
+    expect(screen.getByTestId('mascot-celebration-title').style.willChange).toBe('');
+    for (const sparkle of screen.getAllByTestId('mascot-celebration-sparkle')) {
+      expect(sparkle.style.willChange).toBe('');
+    }
+    expect(container.innerHTML).not.toMatch(/will-change/i);
+    // Content still renders — drop the flash, keep the juice.
+    expect(screen.getByTestId('mascot-celebration-edge-glow')).toBeInTheDocument();
   });
 
   it('uses a knight-family video for the "explorer" first-visit-today kind (supports variety clips)', () => {

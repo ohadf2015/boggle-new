@@ -14,12 +14,20 @@ import { pickCelebrationSrc } from '@/lib/results/celebrationVariant';
  * mascot video, that white wash reads as "the fanfare flashes white". Dropping
  * the hint on native keeps the animations (transform / opacity / box-shadow all
  * still tween) but defers layer promotion to the first animated frame, by which
- * point real content has painted, so there is no white flash. Web keeps the
- * hint (it does not flash there). The fanfare's caller is `ssr:false`, so this
- * sync platform check is hydration-safe.
+ * point real content has painted, so there is no white flash.
+ *
+ * IMPORTANT: this white-backing paint is a MOBILE-RENDERER quirk, not a native
+ * one — mobile Chrome/Safari flash identically to the WebView, so we drop the
+ * hint on mobile viewports too (the native-only gate left mobile web, the
+ * primary phone surface, exposed). Desktop web keeps the hint (no flash there).
+ * The fanfare's caller is `ssr:false`, so these sync checks are hydration-safe.
  */
 function isNativeApp(): boolean {
   return typeof window !== 'undefined' && Capacitor.isNativePlatform();
+}
+
+function isMobileViewport(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
 }
 
 export type MascotCelebrationKind =
@@ -199,8 +207,9 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   forceSrc,
 }: MascotCelebrationVideoProps) {
   const variant = VARIANTS[kind];
-  // On native the eager GPU-layer promotion flashes white; drop the hint there.
-  const native = isNativeApp();
+  // The eager GPU-layer promotion flashes white on native AND mobile-web
+  // renderers (same Chromium quirk); drop the hint on both, keep it on desktop.
+  const native = isNativeApp() || isMobileViewport();
   // Pick a clip ONCE per mount. The results page re-renders frequently
   // (countdowns, score reveals); seeding from a mount-time random keeps the
   // same clip for the life of this celebration instead of reshuffling.
