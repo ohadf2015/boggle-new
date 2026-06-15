@@ -12,7 +12,6 @@ import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
-import { LobbyReactions } from '../../components/lobby/LobbyReactions';
 import { EmoteTray } from './lobby/EmoteTray';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
@@ -268,8 +267,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     : t('playerView.hostWillStart')}
               </p>
             </div>
-            {/* Ambient social toy — fling emoji while waiting (reuses quickReaction) */}
-            <LobbyReactions username={username} />
           </div>
 
           <LobbyRewardCluster surface="player_waiting" className="mt-3" />

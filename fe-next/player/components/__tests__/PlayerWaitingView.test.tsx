@@ -203,6 +203,20 @@ describe('PlayerWaitingView', () => {
     });
   });
 
+  describe('Lobby emote — single avatar-mood affordance', () => {
+    it('renders the avatar-mood EmoteTray', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.getAllByTestId('emote-tray').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('does NOT render the floating-emoji LobbyReactions toy (dedup)', () => {
+      // The lobby must expose ONE emote affordance — the EmoteTray that changes
+      // the player's avatar face — not the separate floating-emoji social toy.
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.queryByTestId('lobby-reactions-overlay')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Existing Functionality', () => {
     it('should not render room code in header (removed)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
