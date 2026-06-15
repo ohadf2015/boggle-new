@@ -26,9 +26,9 @@ describe('resetBotsForNewRound', () => {
 
   it('zeroes score and comboLevel for every bot in the game', () => {
     const users: Record<string, unknown> = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const a = addBot(GAME, 'hard', users as any, 'en');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const b = addBot(GAME, 'easy', users as any, 'en');
 
     // Simulate scores accumulated over a prior round.
@@ -47,7 +47,7 @@ describe('resetBotsForNewRound', () => {
 
   it('clears accumulated word tracking so stats do not bleed across rounds', () => {
     const users: Record<string, unknown> = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const bot = addBot(GAME, 'medium', users as any, 'en');
     bot.wordsFound = ['cat', 'dog'];
     bot.currentWordIndex = 2;
