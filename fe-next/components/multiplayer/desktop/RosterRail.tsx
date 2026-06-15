@@ -71,7 +71,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
               )}
             </span>
             <div className="relative shrink-0">
-              <Avatar size="sm" customAvatar={p.customAvatar ?? undefined} userId={p.userId} disableEffects />
+              <Avatar size="sm" customAvatar={p.customAvatar ?? undefined} userId={p.userId} disableEffects tierMarker />
               <span
                 data-testid={`status-dot-${p.userId}`}
                 data-status={p.status}

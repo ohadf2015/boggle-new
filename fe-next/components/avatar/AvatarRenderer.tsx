@@ -14,7 +14,7 @@ import { EYEBROW_PARTS } from './parts/EyebrowParts';
 import { FACIAL_HAIR_PARTS } from "./parts/FacialHairParts";
 import { NOSE_PARTS } from './parts/NoseParts';
 import { BODY_PARTS } from './parts/BodyParts';
-import AvatarTierEffects, { type Tier } from './AvatarTierEffects';
+import AvatarTierEffects, { getAvatarTier, type Tier } from './AvatarTierEffects';
 import OverlayBadge from './parts/OverlayBadge';
 import { applyMood, getMoodAnimationClass, type AvatarMood } from '@/lib/avatar/avatarMood';
 import type { AvatarOverlay } from '@/lib/avatar/avatarOverlay';
@@ -54,6 +54,14 @@ interface AvatarRendererProps {
    * surface — used by the leaderboard so high-signal reactions read on TV.
    */
   overlay?: AvatarOverlay | null;
+  /**
+   * Render a small static rarity gem (epic/legendary only) baked into the SVG so
+   * premium reads on `disableEffects` surfaces — leaderboards, results-rivals,
+   * rosters, podium — where rivals see it ("visibility = status" buy driver).
+   * Opt-in: default off, so the ~50 low-signal surfaces (chat pills, nav, admin
+   * tables) are untouched. Skipped when a mode frame or overlay badge is present.
+   */
+  tierMarker?: boolean;
 }
 
 /**
@@ -104,7 +112,7 @@ const SKIP_FEMALE_LASHES_EYES = new Set([
   'pixelEyes', 'glitchEyes', 'thirdEye',
 ]);
 
-const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood, overlay }) => {
+const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood, overlay, tierMarker }) => {
   const uid = useId();
   const faceShadowId = `fs${uid}`;
   const halftoneId = `ht${uid}`;
@@ -131,6 +139,11 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
   const showDepth = !SKIP_BLUSH_BASES.has(config.base);
   const skinShadow = darken(config.skinColor, 0.3);
   const canBlink = !SKIP_BLINK_EYES.has(eff.eyes) && !disableEffects;
+  // Static rarity gem (opt-in). Skipped when a mode frame / overlay already owns
+  // the corner so we never stack markers.
+  const markerTier = tierMarker && !mode && !overlay ? (forceTier ?? getAvatarTier(config)) : 'free';
+  const showTierGem = markerTier === 'epic' || markerTier === 'legendary';
+  const tierGemColor = markerTier === 'legendary' ? '#FFD700' : '#A855F7';
 
   const svgElement = (
     <AvatarUidContext.Provider value={uid}>
@@ -290,6 +303,18 @@ const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className
             <rect x="2" y="2" width="96" height="96" rx="14" fill="none" stroke={MODE_FRAME_COLOR[mode]} strokeWidth="3" />
           </g>
         )
+      )}
+
+      {/* Static rarity gem — top-right faceted diamond, gold(legendary)/purple(epic).
+          Baked into the SVG so it survives disableEffects + downscaling. */}
+      {showTierGem && (
+        <g data-tier-gem={markerTier}>
+          <polygon points="80,6 92,18 80,30 68,18" fill="#000" />
+          <polygon points="80,8.5 89.5,18 80,27.5 70.5,18" fill={tierGemColor} />
+          <polygon points="80,8.5 89.5,18 80,18" fill="#fff" opacity="0.25" />
+          <polygon points="80,8.5 70.5,18 80,18" fill="#fff" opacity="0.55" />
+          <circle cx="76.5" cy="13.5" r="1.1" fill="#fff" opacity="0.9" />
+        </g>
       )}
 
       {/* Reaction overlay badge — loud, glanceable, on top of everything */}

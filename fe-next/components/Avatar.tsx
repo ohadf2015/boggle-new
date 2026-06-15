@@ -51,6 +51,12 @@ interface AvatarProps {
   mood?: AvatarMood;
   /** Loud reaction badge (alert/flame) for TV-legible high-signal moments. */
   overlay?: AvatarOverlay | null;
+  /**
+   * Show a static epic/legendary rarity gem baked into the SVG. Opt-in for
+   * high-visibility surfaces (leaderboards, results-rivals, rosters, podium)
+   * where premium reads as status — survives `disableEffects`. Default off.
+   */
+  tierMarker?: boolean;
 }
 
 /** Map a profile-frame cosmetic id to its avatar wrapper class. Returns null for no frame. */
@@ -84,6 +90,7 @@ const Avatar = memo<AvatarProps>((props) => {
     disableEffects,
     mood,
     overlay,
+    tierMarker,
   } = props;
   // Back-compat: legacy callers still pass `avatarImage`. Read via prop access
   // so this component does not surface its own deprecation diagnostic.
@@ -129,7 +136,7 @@ const Avatar = memo<AvatarProps>((props) => {
         data-avatar-type="custom"
         {...frameAttr}
       >
-        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} />
+        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
       </div>
     );
   }
@@ -143,7 +150,7 @@ const Avatar = memo<AvatarProps>((props) => {
       data-avatar-type="generated"
       {...frameAttr}
     >
-      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} />
+      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} />
     </div>
   );
 });

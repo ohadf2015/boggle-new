@@ -150,7 +150,7 @@ const ResultsRivalsPanel: React.FC<ResultsRivalsPanelProps> = ({
               </span>
 
               <span className="relative z-10 shrink-0">
-                <Avatar size="sm" customAvatar={row.customAvatar ?? undefined} userId={row.id} disableEffects />
+                <Avatar size="sm" customAvatar={row.customAvatar ?? undefined} userId={row.id} disableEffects tierMarker />
               </span>
 
               <span className="relative z-10 flex-1 min-w-0 flex items-center gap-1.5">

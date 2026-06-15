@@ -339,7 +339,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
                       avatarImage={player.avatarImage}
                       customAvatar={player.customAvatar}
                       size="md"
-                      disableEffects
+                      disableEffects tierMarker
                     />
 
                     {/* Score */}

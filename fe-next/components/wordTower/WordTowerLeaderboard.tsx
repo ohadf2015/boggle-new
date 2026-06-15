@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { X, Trophy } from 'lucide-react';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface Row {
   rank: number;
@@ -11,6 +13,7 @@ interface Row {
   bestHeightM: number;
   bestFloors: number;
   highestBiome: string;
+  avatarConfig?: CustomAvatarConfig | null;
 }
 
 interface Props {
@@ -68,8 +71,15 @@ export function WordTowerLeaderboard({ onClose, t, dir }: Props) {
                     r.isYou ? 'bg-neo-lime text-black' : 'bg-neo-navy-light text-neo-white'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <span className="w-6 text-center font-neo-display font-bold tabular-nums">{r.rank}</span>
+                  <span className="flex items-center gap-2.5">
+                    <span className="w-5 text-center font-neo-display font-bold tabular-nums">{r.rank}</span>
+                    <Avatar
+                      customAvatar={r.avatarConfig ?? undefined}
+                      userId={r.playerId}
+                      size="sm"
+                      disableEffects tierMarker
+                      className="shrink-0 rounded-full border border-black"
+                    />
                     <span className="font-neo-body font-bold">{r.username}</span>
                   </span>
                   <span className="flex items-center gap-2">

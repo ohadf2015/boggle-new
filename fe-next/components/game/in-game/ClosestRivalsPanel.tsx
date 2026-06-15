@@ -128,7 +128,7 @@ function ClosestRivalsPanelImpl({
                 size="sm"
                 customAvatar={row.customAvatar ?? undefined}
                 userId={row.id}
-                disableEffects
+                disableEffects tierMarker
               />
 
               {/* Name + YOU chip */}

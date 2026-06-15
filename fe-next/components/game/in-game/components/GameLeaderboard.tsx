@@ -134,7 +134,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         customAvatar={player.avatar?.customAvatar ?? undefined}
         avatarImage={player.avatar?.avatarImage}
         size="md"
-        disableEffects
+        disableEffects tierMarker
         mood={avatarMood}
         overlay={moodToOverlay(avatarMood)}
       />
