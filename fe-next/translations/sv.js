@@ -13575,6 +13575,16 @@ const sv = {
       }
     }
   },
+  "splash": {
+    "loadingText1": "Vässar pennorna…",
+    "loadingText2": "Blandar alfabetet…",
+    "loadingText3": "Värmer upp ordboken…",
+    "loadingText4": "Frammanar sällsynta ord…",
+    "loadingText5": "Mutar vokalerna…",
+    "loadingText6": "Polerar pokalerna…",
+    "loadingText7": "Reder ut trippelpoängen…",
+    "loadingText8": "Väcker ordtrollkarlen…"
+  },
   "offerwall": { "cta": { "label": "Tjäna gratis mynt", "aria": "Tjäna gratis mynt genom att slutföra erbjudanden" }, "modal": { "title": "Gratis mynt", "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.", "close": "Stäng" } },
   "offlineDownload": {
     "title": "Ladda ned för offline",

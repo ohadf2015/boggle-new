@@ -13667,6 +13667,16 @@ const es = {
       }
     }
   },
+  "splash": {
+    "loadingText1": "Afilando los lápices…",
+    "loadingText2": "Barajando el abecedario…",
+    "loadingText3": "Calentando el diccionario…",
+    "loadingText4": "Invocando palabras raras…",
+    "loadingText5": "Sobornando a las vocales…",
+    "loadingText6": "Puliendo los trofeos…",
+    "loadingText7": "Desenredando las palabras triples…",
+    "loadingText8": "Despertando al mago de las palabras…"
+  },
   "offerwall": { "cta": { "label": "Gana monedas gratis", "aria": "Gana monedas gratis completando ofertas" }, "modal": { "title": "Monedas gratis", "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.", "close": "Cerrar" } },
   "offlineDownload": {
     "title": "Descargar para usar sin conexión",

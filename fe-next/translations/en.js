@@ -13926,6 +13926,16 @@ const en = {
       }
     }
   },
+  "splash": {
+    "loadingText1": "Sharpening the pencils…",
+    "loadingText2": "Shuffling the alphabet…",
+    "loadingText3": "Warming up the dictionary…",
+    "loadingText4": "Summoning rare words…",
+    "loadingText5": "Bribing the vowels…",
+    "loadingText6": "Polishing the trophies…",
+    "loadingText7": "Untangling triple-word scores…",
+    "loadingText8": "Waking the word wizard…"
+  },
   "offerwall": { "cta": { "label": "Earn free coins", "aria": "Earn free coins by completing offers" }, "modal": { "title": "Free Coins", "subtitle": "Complete an offer — your coins are added automatically.", "close": "Close" } },
   "offlineDownload": {
     "title": "Download for Offline",

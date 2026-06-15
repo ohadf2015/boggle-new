@@ -13583,6 +13583,16 @@ const ja = {
       }
     }
   },
+  "splash": {
+    "loadingText1": "鉛筆を削っています…",
+    "loadingText2": "アルファベットをシャッフル中…",
+    "loadingText3": "辞書を温めています…",
+    "loadingText4": "レアな単語を召喚中…",
+    "loadingText5": "母音を買収しています…",
+    "loadingText6": "トロフィーを磨いています…",
+    "loadingText7": "トリプルワードを解読中…",
+    "loadingText8": "言葉の魔法使いを起こしています…"
+  },
   "offerwall": { "cta": { "label": "無料コインを獲得", "aria": "オファーを完了して無料コインを獲得" }, "modal": { "title": "無料コイン", "subtitle": "オファーを完了すると、コインが自動で追加されます。", "close": "閉じる" } },
   "offlineDownload": {
     "title": "オフライン用にダウンロード",
