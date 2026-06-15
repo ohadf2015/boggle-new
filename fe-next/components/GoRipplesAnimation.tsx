@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
+import { prefersStaticFullscreenOverlay } from '../lib/native/webViewLayerFlash';
 
 const RING_SIZE_STYLE = { width: 120, height: 120 } as const;
 const GO_TEXT_SHADOW_STYLE = { textShadow: '2px 2px 0px rgba(255,255,255,0.3)' } as const;
@@ -88,6 +89,49 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
   if (!isVisible) return null;
 
   const isGo = count === 0;
+
+  // Native (Android WebView) / mobile: render the full-screen overlay STATICALLY.
+  // The framer-motion variant below animates opacity on `fixed inset-0` nodes,
+  // which promotes a fresh full-screen GPU compositor layer that paints one
+  // uninitialised (white) frame before compositing — the reported "fanfare
+  // flashes" on the native app. A static overlay paints in the normal document
+  // layer (no promotion, no flash). Countdown timing + sound are unchanged; only
+  // the bounded countdown box keeps a fade (it tweens AFTER content has painted,
+  // so it never shows the white backing). See `webViewLayerFlash` for the why.
+  if (prefersStaticFullscreenOverlay()) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden">
+        {/* Opaque-from-first-paint backdrop — never a promoted layer. */}
+        <div className="absolute inset-0 bg-neo-navy/60" />
+
+        <div
+          className={`relative px-10 py-5 border-4 border-neo-black rounded-neo transition-opacity duration-300 ${
+            isGo ? 'bg-neo-lime' : 'bg-neo-cyan'
+          } ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}
+          style={{
+            boxShadow: isGo
+              ? '6px 6px 0px var(--neo-black), 0 0 30px rgba(191, 255, 0, 0.4)'
+              : '6px 6px 0px var(--neo-black), 0 0 25px rgba(0, 255, 255, 0.3)',
+          }}
+        >
+          <span
+            className={`relative z-10 font-black text-neo-black ${
+              isGo ? 'text-6xl sm:text-8xl' : 'text-5xl sm:text-7xl'
+            }`}
+            style={GO_TEXT_SHADOW_STYLE}
+          >
+            {count > 0 ? count : (t?.('countdown.go') || 'GO!')}
+          </span>
+        </div>
+
+        {count > 0 && !isFadingOut && (
+          <p className="absolute bottom-[25%] text-center text-neo-white text-base sm:text-lg font-black px-6 py-2 bg-neo-black/60 rounded-neo">
+            {t?.('countdown.hint') || 'Swipe letters to form words!'}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <m.div

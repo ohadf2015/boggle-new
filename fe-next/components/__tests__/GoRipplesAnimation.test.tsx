@@ -8,6 +8,12 @@
 import React from 'react';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import GoRipplesAnimation, { __resetGoRipplesDupGuard } from '../GoRipplesAnimation';
+import { prefersStaticFullscreenOverlay } from '../../lib/native/webViewLayerFlash';
+
+// Default to the desktop (animated) path; the native describe forces static.
+vi.mock('../../lib/native/webViewLayerFlash', () => ({
+  prefersStaticFullscreenOverlay: vi.fn(() => false),
+}));
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -222,6 +228,47 @@ describe('GoRipplesAnimation', () => {
     const secondOnComplete = vi.fn();
     render(<GoRipplesAnimation onComplete={secondOnComplete} />);
     expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  describe('native static variant (no GPU-layer white flash)', () => {
+    beforeEach(() => {
+      vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(true);
+    });
+    afterEach(() => {
+      vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(false);
+    });
+
+    it('renders the static overlay with no animated full-screen opacity tween', () => {
+      const { container } = render(<GoRipplesAnimation />);
+
+      // Countdown content still present from the first paint.
+      expect(screen.getByText('3')).toBeInTheDocument();
+
+      // The full-screen root is a plain div with NO opacity animation props
+      // (those are what promote the GPU layer that paints white on the WebView).
+      const root = container.firstChild as HTMLElement;
+      expect(root.className).toContain('fixed inset-0');
+      expect(root.style.opacity).toBe('');
+
+      // Backdrop is opaque-navy from the first paint, not an opacity-0 fade-in.
+      const backdrop = root.querySelector('.bg-neo-navy\\/60') as HTMLElement;
+      expect(backdrop).toBeTruthy();
+      expect(backdrop.style.opacity).toBe('');
+    });
+
+    it('still counts down and fires onComplete on the static path', () => {
+      const onComplete = vi.fn();
+      render(<GoRipplesAnimation onComplete={onComplete} />);
+
+      expect(screen.getByText('3')).toBeInTheDocument();
+      act(() => { vi.advanceTimersByTime(1000); });
+      expect(screen.getByText('2')).toBeInTheDocument();
+      act(() => { vi.advanceTimersByTime(1000); }); // → 1
+      act(() => { vi.advanceTimersByTime(1000); }); // → GO!
+      expect(screen.getByText('GO!')).toBeInTheDocument();
+      act(() => { vi.advanceTimersByTime(1000); }); // complete
+      expect(onComplete).toHaveBeenCalled();
+    });
   });
 
   it('handles unmount during countdown gracefully', () => {
