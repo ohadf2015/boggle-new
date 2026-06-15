@@ -31,6 +31,13 @@ describe('GoogleSignInButton', () => {
     );
   });
 
+  it('wraps the visible Google button in a neo-brutalist frame', () => {
+    render(<GoogleSignInButton />);
+    const frame = screen.getByTestId('gsi-frame');
+    expect(frame.className).toMatch(/border-neo-black/);
+    expect(frame.className).toMatch(/shadow-hard/);
+  });
+
   it('renders nothing on the native platform (native uses the SDK)', () => {
     mockIsNative.mockReturnValue(true);
     render(<GoogleSignInButton />);
