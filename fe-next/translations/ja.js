@@ -12804,6 +12804,7 @@ const ja = {
     "subtitle": "単語を綴れ。ルーンを集めろ。スコアを打ち破れ。",
     "go": "GO！",
     "startRun": "ラン開始",
+    "tryAgain": "もう一度",
     "round": "ラウンド",
     "roundOf": "ラウンド {{round}} / {{max}}",
     "bestRound": "ベストラウンド",

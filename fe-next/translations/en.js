@@ -12469,6 +12469,7 @@ const en = {
     "subtitle": "Spell words. Collect runes. Break the score.",
     "go": "Go!",
     "startRun": "Start Run",
+    "tryAgain": "Try Again",
     "round": "Round",
     "roundOf": "Round {{round}} of {{max}}",
     "bestRound": "Best Round",
@@ -13504,6 +13505,10 @@ const en = {
     },
     "teacherAccess": {
       "admin_note": "Admin Note",
+      "resend": "Resend approval email",
+      "resend_hint": "Re-sends the welcome email (with the note above) to the applicant. Does not change their access.",
+      "resendError": "Failed to resend approval email",
+      "resendSuccess": "Approval email re-sent",
       "note_hint": "On approve, this note is included in the welcome email to the applicant. On decline, it’s used as the reason.",
       "show_preview": "Preview email",
       "hide_preview": "Hide preview",

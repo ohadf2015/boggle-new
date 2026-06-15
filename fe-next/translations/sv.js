@@ -12883,6 +12883,7 @@ const sv = {
     },
     "subtitle": "Stava ord. Samla runor. Slå rekordet.",
     "startRun": "Starta körning",
+    "tryAgain": "Försök igen",
     "round": "Runda",
     "roundOf": "Runda {{round}} av {{max}}",
     "bestRound": "Bästa runda",
