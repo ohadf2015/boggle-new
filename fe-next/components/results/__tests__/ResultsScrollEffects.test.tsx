@@ -22,7 +22,12 @@ vi.mock('@capacitor/core', () => ({
 }));
 
 import { Capacitor } from '@capacitor/core';
-import { ResultsParallaxBackdrop, ResultsHeroTilt, ResultsScrollProgressRail } from '../ResultsScrollEffects';
+import {
+  ResultsParallaxBackdrop,
+  ResultsHeroTilt,
+  ResultsScrollProgressRail,
+  ResultsSectionReveal,
+} from '../ResultsScrollEffects';
 
 const mockIsNative = vi.mocked(Capacitor.isNativePlatform);
 
@@ -108,6 +113,34 @@ describe('ResultsHeroTilt', () => {
     const { container, getByText } = render(<TiltHarness />);
     expect(getByText('child')).toBeTruthy();
     expect(container.querySelector('[style*="will-change"]')).toBeNull();
+  });
+});
+
+describe('ResultsSectionReveal', () => {
+  it('animates the section on web (framer-motion m.div reveal)', () => {
+    const { queryByTestId, getByText } = render(
+      <ResultsSectionReveal index={0}>
+        <span>section</span>
+      </ResultsSectionReveal>,
+    );
+    expect(getByText('section')).toBeTruthy();
+    expect(queryByTestId('results-section-reveal-motion')).not.toBeNull();
+    expect(queryByTestId('results-section-reveal-static')).toBeNull();
+  });
+
+  it('renders a plain static div on native — every section is wrapped in this reveal, and framer-motion promotes each m.div to its own GPU layer that the WebView paints white on creation (the results "flashing white" after the fanfare)', () => {
+    mockIsNative.mockReturnValue(true);
+    const { container, queryByTestId, getByText } = render(
+      <ResultsSectionReveal index={0}>
+        <span>section</span>
+      </ResultsSectionReveal>,
+    );
+    // Content still renders — we drop the animation, not the section.
+    expect(getByText('section')).toBeTruthy();
+    expect(queryByTestId('results-section-reveal-static')).not.toBeNull();
+    expect(queryByTestId('results-section-reveal-motion')).toBeNull();
+    // No transform / will-change hardware-layer hint leaks into the markup.
+    expect(container.innerHTML).not.toMatch(/will-change|transform|translate/i);
   });
 });
 
