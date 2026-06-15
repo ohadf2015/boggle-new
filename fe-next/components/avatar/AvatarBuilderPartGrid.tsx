@@ -16,6 +16,7 @@ import type { AvatarPremium } from './AvatarBuilderModal';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
+import { getSetsForPart, getSetProgress } from '@/lib/avatar/avatarSets';
 import '@/styles/avatar-tier-animations.css';
 
 // Staggered grid entrance — cascading waterfall (from animate-ai: playful-staggered-list)
@@ -126,6 +127,20 @@ export default function PartPreviewGrid<T extends string>({
     if (aPrem !== bPrem) return aPrem ? -1 : 1;
     return 0;
   });
+
+  // Set-completion nudge for the part being bought: how close this purchase
+  // brings the player to finishing a themed set (drives completionist spend).
+  const confirmSet = (() => {
+    if (!confirmPurchase) return null;
+    const set = getSetsForPart(cat, confirmPurchase.option)[0];
+    if (!set) return null;
+    const ownedKeys = set.parts.filter(k => {
+      const [c, i] = k.split(':');
+      return premium?.isPartUnlocked(c, i);
+    });
+    const prog = getSetProgress(set, [...ownedKeys, `${cat}:${confirmPurchase.option}`]);
+    return { set, prog };
+  })();
 
   return (
     <div>
@@ -288,6 +303,30 @@ export default function PartPreviewGrid<T extends string>({
                 }`}>
                   {confirmPurchase.isLegendary ? 'LEGENDARY' : 'EPIC'}
                 </p>
+              )}
+
+              {/* Set-completion pip row — language-neutral (diamond pips + N/M) */}
+              {confirmSet && (
+                <div className="flex items-center justify-center gap-2 mb-3" data-testid="set-progress">
+                  <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: confirmSet.set.color }}>
+                    {confirmSet.set.name}
+                  </span>
+                  <span className="flex gap-1">
+                    {Array.from({ length: confirmSet.prog.total }, (_, i) => (
+                      <span
+                        key={i}
+                        className="w-2.5 h-2.5 rotate-45 border-2 rounded-[1px]"
+                        style={{
+                          borderColor: confirmSet.set.color,
+                          background: i < confirmSet.prog.owned ? confirmSet.set.color : 'transparent',
+                        }}
+                      />
+                    ))}
+                  </span>
+                  <span className="text-[10px] font-black tabular-nums" style={{ color: confirmSet.set.color }}>
+                    {confirmSet.prog.complete ? '★' : `${confirmSet.prog.owned}/${confirmSet.prog.total}`}
+                  </span>
+                </div>
               )}
 
               {/* Price + balance */}

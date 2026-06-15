@@ -85,6 +85,16 @@ describe('AvatarBuilderPartGrid — premium/locked UI', () => {
     expect(container.querySelector('.avatar-foil-legendary')).toBeTruthy();
   });
 
+  it('shows a set-completion pip row when buying a part that belongs to a set', () => {
+    const { container } = renderAccessories(['none', 'crystalCrown']);
+    fireEvent.click(screen.getByText('12000'));
+    // crystalCrown is in the "Royal" set (3 parts); buying it = 1/3 owned.
+    const row = container.querySelector('[data-testid="set-progress"]');
+    expect(row).toBeTruthy();
+    expect(row?.textContent).toContain('Royal');
+    expect(row?.textContent).toContain('1/3');
+  });
+
   it('sorts NEW parts ahead of older premium and free parts (after none)', () => {
     const { container } = renderAccessories(['none', 'glasses', 'crown', 'crystalCrown']);
     const grid = container.querySelector('.grid');
