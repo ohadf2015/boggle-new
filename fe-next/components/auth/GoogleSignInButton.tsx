@@ -42,9 +42,9 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
     const google = (window as unknown as { google?: GoogleIdServices }).google;
     if (!google?.accounts?.id) return;
 
-    // Fill the container so the button lines up with the full-width Discord button.
-    const measured = wrapperRef.current?.clientWidth ?? 0;
-    const w = width ?? Math.min(GSI_MAX_WIDTH, Math.max(200, Math.floor(measured) || 320));
+    // Render near the GSI max so the snug frame is a comfortable size; the frame
+    // hugs whatever GSI produces (the personalized "Continue as" form is narrower).
+    const w = width ?? GSI_MAX_WIDTH;
 
     await ensureGoogleIdInitialized(google, clientId);
     renderedRef.current = true;
@@ -68,15 +68,17 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
   if (!enabled) return null;
 
   return (
-    <div ref={wrapperRef} className={cn('w-full', className)}>
+    <div ref={wrapperRef} className={cn('flex justify-center', className)}>
       <Script id="google-gsi-client" src={GSI_SRC} strategy="afterInteractive" onReady={() => void renderButton()} />
-      {/* Neo-brutalist frame around the (visible, clickable) Google button. The GSI
-          iframe is forced full-width and its corners clipped to rounded-neo. */}
+      {/* Neo-brutalist frame hugging the (visible, clickable) Google button — hard
+          black border + hard shadow, corners clipped to rounded-neo. w-fit so it
+          wraps the button snugly (GSI caps width at 400 and the personalized
+          "Continue as" form is narrower, so a full-width frame would leave gaps). */}
       <div
         data-testid="gsi-frame"
-        className="overflow-hidden rounded-neo border-2 border-neo-black bg-neo-black shadow-hard [&_iframe]:!w-full"
+        className="inline-flex w-fit overflow-hidden rounded-neo border-2 border-neo-black shadow-hard"
       >
-        <div ref={containerRef} data-testid="gsi-button-container" className="flex justify-center" />
+        <div ref={containerRef} data-testid="gsi-button-container" />
       </div>
     </div>
   );
