@@ -11,14 +11,14 @@
         <string>/Users/ohadfisher/git/boggle-new/scripts/nightly/run.sh</string>
     </array>
 
-    <!-- Fire at 02:00 local. If mac asleep, launchd silently skips; launchd
+    <!-- Fire at 01:00 local. If mac asleep, launchd silently skips; launchd
          fires the missed run on next wake. preflight dedups to ONE run per local
          calendar day (+ a 4h floor) via ~/.cache/lexi-nightly/last-run mtime, so
          a wake-deferred catch-up runs once and never double-fires. -->
     <key>StartCalendarInterval</key>
     <dict>
         <key>Hour</key>
-        <integer>2</integer>
+        <integer>1</integer>
         <key>Minute</key>
         <integer>0</integer>
     </dict>
