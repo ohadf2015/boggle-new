@@ -238,22 +238,25 @@ describe('GoRipplesAnimation', () => {
       vi.mocked(prefersStaticFullscreenOverlay).mockReturnValue(false);
     });
 
-    it('renders the static overlay with no animated full-screen opacity tween', () => {
+    it('uses an OPAQUE navy full-screen root (covers white-behind, no GPU-promotion flash)', () => {
       const { container } = render(<GoRipplesAnimation />);
 
       // Countdown content still present from the first paint.
       expect(screen.getByText('3')).toBeInTheDocument();
 
-      // The full-screen root is a plain div with NO opacity animation props
-      // (those are what promote the GPU layer that paints white on the WebView).
       const root = container.firstChild as HTMLElement;
       expect(root.className).toContain('fixed inset-0');
-      expect(root.style.opacity).toBe('');
 
-      // Backdrop is opaque-navy from the first paint, not an opacity-0 fade-in.
-      const backdrop = root.querySelector('.bg-neo-navy\\/60') as HTMLElement;
-      expect(backdrop).toBeTruthy();
-      expect(backdrop.style.opacity).toBe('');
+      // Root is OPAQUE navy (`bg-neo-navy`, not the translucent `/60` backdrop
+      // that let a not-yet-painted white surface bleed through during the
+      // countdown). An opaque, non-animated root never promotes a full-screen
+      // GPU layer, so the WebView never paints an uninitialised white frame.
+      expect(root.className).toContain('bg-neo-navy');
+      expect(root.className).not.toContain('/60');
+
+      // No entrance opacity tween on the full-screen root — it starts opaque.
+      expect(root.className).toContain('opacity-100');
+      expect(root.style.opacity).toBe('');
     });
 
     it('still counts down and fires onComplete on the static path', () => {

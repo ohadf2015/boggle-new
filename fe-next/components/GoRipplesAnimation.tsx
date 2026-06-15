@@ -90,65 +90,13 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
 
   const isGo = count === 0;
 
-  // Native (Android WebView) / mobile: render the full-screen overlay STATICALLY.
-  // The framer-motion variant below animates opacity on `fixed inset-0` nodes,
-  // which promotes a fresh full-screen GPU compositor layer that paints one
-  // uninitialised (white) frame before compositing — the reported "fanfare
-  // flashes" on the native app. A static overlay paints in the normal document
-  // layer (no promotion, no flash). Countdown timing + sound are unchanged; only
-  // the bounded countdown box keeps a fade (it tweens AFTER content has painted,
-  // so it never shows the white backing). See `webViewLayerFlash` for the why.
-  if (prefersStaticFullscreenOverlay()) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden">
-        {/* Opaque-from-first-paint backdrop — never a promoted layer. */}
-        <div className="absolute inset-0 bg-neo-navy/60" />
-
-        <div
-          className={`relative px-10 py-5 border-4 border-neo-black rounded-neo transition-opacity duration-300 ${
-            isGo ? 'bg-neo-lime' : 'bg-neo-cyan'
-          } ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}
-          style={{
-            boxShadow: isGo
-              ? '6px 6px 0px var(--neo-black), 0 0 30px rgba(191, 255, 0, 0.4)'
-              : '6px 6px 0px var(--neo-black), 0 0 25px rgba(0, 255, 255, 0.3)',
-          }}
-        >
-          <span
-            className={`relative z-10 font-black text-neo-black ${
-              isGo ? 'text-6xl sm:text-8xl' : 'text-5xl sm:text-7xl'
-            }`}
-            style={GO_TEXT_SHADOW_STYLE}
-          >
-            {count > 0 ? count : (t?.('countdown.go') || 'GO!')}
-          </span>
-        </div>
-
-        {count > 0 && !isFadingOut && (
-          <p className="absolute bottom-[25%] text-center text-neo-white text-base sm:text-lg font-black px-6 py-2 bg-neo-black/60 rounded-neo">
-            {t?.('countdown.hint') || 'Swipe letters to form words!'}
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <m.div
-      className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: isFadingOut ? 0 : 1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-    >
-      {/* Soft background overlay for focus */}
-      <m.div
-        className="absolute inset-0 bg-neo-navy/60"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-      />
-
+  // The fanfare content: expanding GO ring, the popping 3-2-1-GO box with its
+  // inner glow, and the hint. Shared by both roots below. These are SMALL,
+  // bounded elements whose entrance tweens start at `opacity: 0`, so they never
+  // expose an uninitialised white compositor backing — only a full-screen
+  // animated root does (see the native branch).
+  const countdownContent = (
+    <>
       {/* Single subtle expanding ring for GO */}
       <AnimatePresence>
         {isGo && (
@@ -225,6 +173,47 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
           </m.p>
         )}
       </AnimatePresence>
+    </>
+  );
+
+  // Native (Android WebView) / mobile: the overlay ROOT is an OPAQUE navy div
+  // that is NOT animated, so it paints full-screen navy in the normal document
+  // layer from the first frame. This (a) never freshly-promotes a full-screen
+  // GPU compositor layer — the source of the uninitialised-white "flash" on the
+  // Android System WebView — and (b) hides any not-yet-painted (white) surface
+  // behind it during the pre-grid handoff (the reported "blank white screen"
+  // that a translucent `/60` backdrop let bleed through). The fanfare still
+  // plays on top; fade-out is a CSS opacity transition that only runs at exit,
+  // long after content has painted. Desktop web keeps the translucent animated
+  // root (board shows through) — it does not flash. See `webViewLayerFlash`.
+  if (prefersStaticFullscreenOverlay()) {
+    return (
+      <div
+        className={`fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden bg-neo-navy transition-opacity duration-300 ${
+          isFadingOut ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
+        {countdownContent}
+      </div>
+    );
+  }
+
+  return (
+    <m.div
+      className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none overflow-hidden"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: isFadingOut ? 0 : 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+    >
+      {/* Soft background overlay for focus */}
+      <m.div
+        className="absolute inset-0 bg-neo-navy/60"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      />
+      {countdownContent}
     </m.div>
   );
 };
