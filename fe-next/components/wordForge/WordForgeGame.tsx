@@ -67,11 +67,15 @@ export default function WordForgeGame(): React.JSX.Element {
   const [triggeredRuneIds, setTriggeredRuneIds] = useState<string[]>([]);
   const triggeredTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Full-screen game: hide global chrome for the WHOLE run lifecycle (idle →
+  // between-round → runOver), not just the playing phase. The intro/result
+  // screens otherwise rendered the bottom-nav + footer and overflowed the
+  // viewport (in-game scroll). Cleared on unmount so it can't leak.
   const setIsInGame = useHideNavigation();
   useEffect(() => {
-    setIsInGame(run.state.phase === 'playing');
+    setIsInGame(true);
     return () => setIsInGame(false);
-  }, [run.state.phase, setIsInGame]);
+  }, [setIsInGame]);
 
   useEffect(() => {
     if (run.lastWordScore?.runeEffects?.length) {

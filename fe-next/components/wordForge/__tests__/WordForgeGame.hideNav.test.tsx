@@ -1,7 +1,8 @@
 /**
- * WordForgeGame nav-hide wiring — hide bottom nav only when run phase is
- * 'playing'. Idle/roundResult/pickRune/bossReveal/runOver keep the nav
- * visible (they're between-round screens, not gameplay).
+ * WordForgeGame nav-hide wiring — hide global chrome for the WHOLE run
+ * lifecycle (idle → between-round → runOver), not just 'playing'. The
+ * intro/result screens otherwise rendered the bottom-nav + footer and
+ * overflowed the viewport (in-game scroll); the mode is full-screen throughout.
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
@@ -71,16 +72,22 @@ vi.mock('@/components/ui/button', () => ({ Button: (p: any) => <button {...p} />
 import WordForgeGame from '../WordForgeGame';
 
 describe('WordForgeGame — bottom-nav hide wiring', () => {
-  it('idle phase keeps nav visible (setIsInGame(false))', () => {
+  it('idle phase hides nav (full-screen intro — setIsInGame(true))', () => {
     runState.phase = 'idle';
     setIsInGameSpy.mockClear();
     render(<WordForgeGame />);
-    expect(setIsInGameSpy).toHaveBeenCalledWith(false);
-    expect(setIsInGameSpy).not.toHaveBeenCalledWith(true);
+    expect(setIsInGameSpy).toHaveBeenCalledWith(true);
   });
 
   it('playing phase hides nav (setIsInGame(true))', () => {
     runState.phase = 'playing';
+    setIsInGameSpy.mockClear();
+    render(<WordForgeGame />);
+    expect(setIsInGameSpy).toHaveBeenCalledWith(true);
+  });
+
+  it('runOver phase keeps nav hidden (setIsInGame(true))', () => {
+    runState.phase = 'runOver';
     setIsInGameSpy.mockClear();
     render(<WordForgeGame />);
     expect(setIsInGameSpy).toHaveBeenCalledWith(true);
