@@ -32,6 +32,18 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
     expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E', 'E']);
   });
 
+  it('lays the held word as a VERTICAL column so it matches how it settles into the tower', () => {
+    render(
+      <WordTowerCrane word="TREE" consecutiveSloppy={0} onDrop={() => {}} t={t} getOffset={() => 0} />,
+    );
+    const container = screen.getByTestId('crane-block');
+    // Vertical stack, base-first: flex-col-reverse renders word[0] at the BOTTOM,
+    // mirroring the tower (pos 0 = base). A horizontal row would have neither.
+    expect(container.className).toContain('flex-col-reverse');
+    const tiles = screen.getAllByTestId('crane-letter');
+    expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E', 'E']);
+  });
+
   it('Hebrew: per-letter tiles keep RTL + final-letter sofit form', () => {
     langHolder.lang = 'he';
     // שלום → 4 tiles; the trailing מ must become its sofit ם, laid out RTL.

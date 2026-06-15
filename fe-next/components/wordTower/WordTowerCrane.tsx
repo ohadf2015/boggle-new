@@ -71,6 +71,11 @@ const BAND_SHADOW: Record<PlacementQuality, string> = {
   miss: 'rgba(255,51,102,0.4)',
 };
 
+/** Per-letter tile size for the held girder. The word is carried as a VERTICAL
+ *  column of square bricks — the exact orientation it settles into in the tower
+ *  (pos 0 = base at the bottom) — so the carried payload reads as the same shape
+ *  it becomes once placed. */
+const CRANE_BEAM_TILE_PX = 38;
 /** How far the trolley carriage slides along the jib (px from centre). */
 const TROLLEY_RANGE_PX = 110;
 /** Length of the cable from the trolley down to the hook (px). */
@@ -270,20 +275,22 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
             />
             {/* Hook */}
             <div className="mx-auto -mt-1 h-3 w-4 rounded-b-full border-[1.5px] border-t-0 border-black bg-neo-yellow-light shadow-hard" aria-hidden />
-            {/* Held WORD BEAM — ONE BRICK PER LETTER (a girder of stacked letter
-                bricks, matching how the word actually settles into the tower as a
-                run of letter-tiles). Width scales with word length; all tiles
-                share the live band tint so the whole girder reads as one piece. */}
-            <div className="relative mx-auto" style={{ width: `${beamW}px` }}>
+            {/* Held WORD BEAM — ONE BRICK PER LETTER stacked into a VERTICAL
+                column (base-first via flex-col-reverse: word[0] sits at the
+                bottom, exactly how it settles into the tower at pos 0). Height
+                scales with word length; all tiles share the live band tint so the
+                whole girder reads as one piece — the same square letter-bricks
+                shown in the finished tower. */}
+            <div className="relative mx-auto" style={{ width: `${CRANE_BEAM_TILE_PX}px` }}>
               <div
                 data-testid="crane-block"
                 className={cn(
-                  'flex items-stretch justify-center gap-px',
+                  'flex flex-col-reverse items-stretch justify-center gap-px',
                   !reducedMotion && !falling && 'animate-neo-pop',
                   !reducedMotion && falling && 'crane-girder-land',
                   celebrating && release?.glow && 'crane-girder-perfect',
                 )}
-                style={{ width: `${beamW}px`, height: '38px' }}
+                style={{ width: `${CRANE_BEAM_TILE_PX}px`, height: `${beamW}px` }}
                 dir={language === 'he' ? 'rtl' : 'ltr'}
               >
                 {[...beamWord].map((ch, i) => (

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, RotateCcw, Trophy, Share2, ChevronsUp } from 'lucide-react';
+import { ArrowLeft, Trophy, Share2, ChevronsUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -107,22 +107,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const tease = useMemo(() => zoneTeaseAt(game.heightM), [game.heightM]);
   // Viewed altitude (live height, or lower while panned) — drives the landmark + rival rails.
   const [viewAlt, setViewAlt] = useState(game.heightM);
-  // Restart guard: a climb is hard-won, so the reset button asks once. First tap
-  // arms a 3s "Sure?" state; a second tap commits, otherwise it reverts.
-  const [confirmReset, setConfirmReset] = useState(false);
-  const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (confirmTimer.current) clearTimeout(confirmTimer.current); }, []);
-  const handleResetClick = () => {
-    if (confirmReset) {
-      if (confirmTimer.current) clearTimeout(confirmTimer.current);
-      setConfirmReset(false);
-      tower.reset();
-      return;
-    }
-    setConfirmReset(true);
-    confirmTimer.current = setTimeout(() => setConfirmReset(false), 3000);
-  };
-
   // "N words possible" hint — how many dictionary words the player could build
   // from the current anchor + tray (recomputed only when those change).
   const possibleWords = useMemo(
@@ -303,9 +287,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const gain = game.heightM - prevVerdictHeight.current;
     prevVerdictHeight.current = game.heightM;
     setVerdict({ v: buildDropVerdict(o, gain), key: tower.state.resultKey });
-    const id = setTimeout(() => setVerdict(null), 1300);
-    return () => clearTimeout(id);
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Dismiss via the shared hook (keyed on the verdict's own resultKey) rather than
+  // an inline timer, so the lifespan is owned in ONE place and can never be reset
+  // by an unrelated re-render — the same robustness the other banners already use.
+  useAutoDismiss(verdict?.key, () => setVerdict(null), 1300);
 
   // Combo-milestone fanfare — a one-shot "×5 ON FIRE!" beat the moment the combo
   // crosses 3/5/10/20. Keyed off resultKey so it fires on the placing tick only.
@@ -670,7 +656,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* CLUTCH SAVE banner — the do-or-die payoff. Lime = triumph. */}
       {clutchText && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[12%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[12%] z-40 mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
           aria-live="assertive"
         >
           {clutchText}
@@ -680,7 +666,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* New daily best — the self-comparison routine beat. Gold = personal record. */}
       {newBestText && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[19%] z-40 -translate-x-1/2 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[19%] z-40 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
           aria-live="polite"
         >
           🏆 {newBestText}
@@ -692,7 +678,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {comboFx && (
         <div
           key={comboFx.key}
-          className={`pointer-events-none absolute left-1/2 top-[28%] z-30 -translate-x-1/2 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[28%] z-30 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
           aria-live="polite"
         >
           🔥 {t(comboFx.m.labelKey)} <span className="tabular-nums">×{comboFx.m.combo}</span>
@@ -704,7 +690,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {surpriseFx && (
         <div
           key={surpriseFx.key}
-          className={`pointer-events-none absolute left-1/2 top-[18%] z-40 -translate-x-1/2 flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[18%] z-40 mx-auto w-fit flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
           aria-live="polite"
         >
           <div className="flex items-center gap-1.5 font-neo-display text-xl font-black uppercase tracking-wide text-black">
@@ -795,7 +781,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             t={t}
           />
         </div>
-        <div className="pointer-events-auto flex shrink-0 items-center gap-2">
+        {/* me-12 (48px) keeps these actions clear of the global mute FAB
+            (InGameAudioButton: fixed top-inline-end, 40px + 8px inset = 48px),
+            so no button ever sits behind the mute/unmute control. RTL-safe:
+            margin-inline-end + the FAB both flip to the same corner. */}
+        <div className="pointer-events-auto me-12 flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={shareTower}
@@ -811,16 +801,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             className="rounded-neo border-neo-thick border-black bg-neo-yellow p-2 text-black shadow-hard"
           >
             <Trophy className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={handleResetClick}
-            aria-label={confirmReset ? t('wordTower.hud.restartConfirm') : t('wordTower.hud.restart')}
-            className={`rounded-neo border-neo-thick border-black p-2 shadow-hard backdrop-blur-sm transition-colors ${confirmReset ? `bg-neo-red text-neo-white ${reducedMotion ? '' : 'animate-neo-shake'}` : 'bg-neo-navy/80 text-neo-white'}`}
-          >
-            {confirmReset
-              ? <span className="px-1 font-neo-display text-xs font-black leading-none">{t('wordTower.hud.restartConfirm')}</span>
-              : <RotateCcw className="h-4 w-4" />}
           </button>
         </div>
       </div>
