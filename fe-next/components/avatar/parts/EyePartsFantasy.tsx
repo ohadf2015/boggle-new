@@ -353,13 +353,14 @@ export function Infinity() {
           <stop offset="100%" stopColor="#8B00FF"><animate attributeName="stopColor" values="#8B00FF;#FF0000;#FF8C00;#00FF88;#0088FF;#8B00FF" dur="4s" repeatCount="indefinite" /></stop>
         </linearGradient>
       </defs>
-      <circle cx="38" cy="42" r="10" fill="#4A00E0" opacity="0.08" /><circle cx="62" cy="42" r="10" fill="#4A00E0" opacity="0.08" />
-      <circle cx="38" cy="42" r="8" fill="none" stroke={rb} strokeWidth={2}><animate attributeName="strokeWidth" values="2;2.5;2" dur="2s" repeatCount="indefinite" /></circle>
-      <circle cx="38" cy="42" r="6" fill="none" stroke={rb} strokeWidth={1} opacity="0.5" />
-      <circle cx="38" cy="42" r="5" fill={vo} />
-      <circle cx="62" cy="42" r="8" fill="none" stroke={rb} strokeWidth={2}><animate attributeName="strokeWidth" values="2;2.5;2" dur="2s" begin="0.5s" repeatCount="indefinite" /></circle>
-      <circle cx="62" cy="42" r="6" fill="none" stroke={rb} strokeWidth={1} opacity="0.5" />
-      <circle cx="62" cy="42" r="5" fill={vo} />
+      <circle cx="38" cy="42" r="10.5" fill="#7A1FFF" opacity="0.18" /><circle cx="62" cy="42" r="10.5" fill="#7A1FFF" opacity="0.18" />
+      {/* Cosmic core — vivid even in a static frame (PNG/thumbnail), so it never reads as plain glasses */}
+      <circle cx="38" cy="42" r="9" fill={vo} stroke="#000" strokeWidth={S} />
+      <circle cx="62" cy="42" r="9" fill={vo} stroke="#000" strokeWidth={S} />
+      <circle cx="38" cy="42" r="8.4" fill="none" stroke={rb} strokeWidth={2.8}><animate attributeName="strokeWidth" values="2.6;3.4;2.6" dur="2s" repeatCount="indefinite" /></circle>
+      <circle cx="38" cy="42" r="5.6" fill="none" stroke={rb} strokeWidth={1.4} opacity="0.7" />
+      <circle cx="62" cy="42" r="8.4" fill="none" stroke={rb} strokeWidth={2.8}><animate attributeName="strokeWidth" values="2.6;3.4;2.6" dur="2s" begin="0.5s" repeatCount="indefinite" /></circle>
+      <circle cx="62" cy="42" r="5.6" fill="none" stroke={rb} strokeWidth={1.4} opacity="0.7" />
       <circle cx="38" cy="34" r="0.8" fill="#FF0000" opacity="0.8"><animateTransform attributeName="transform" type="rotate" from="0 38 42" to="360 38 42" dur="3s" repeatCount="indefinite" /></circle>
       <circle cx="46" cy="42" r="0.7" fill="#00FF88" opacity="0.7"><animateTransform attributeName="transform" type="rotate" from="120 38 42" to="480 38 42" dur="3s" repeatCount="indefinite" /></circle>
       <circle cx="62" cy="34" r="0.8" fill="#8B00FF" opacity="0.8"><animateTransform attributeName="transform" type="rotate" from="0 62 42" to="-360 62 42" dur="3.2s" repeatCount="indefinite" /></circle>

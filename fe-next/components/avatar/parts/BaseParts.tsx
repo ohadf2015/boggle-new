@@ -269,14 +269,15 @@ function DragonHead({ fill }: BasePartProps) {
       <path d="M20 58 C16 46 18 32 26 24 C32 18 40 14 50 14 C60 14 68 18 74 24 C82 32 84 46 80 58 L76 66 Q68 74 50 74 Q32 74 24 66Z"
         fill={`url(#${u}dragonScaleGrad)`} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
 
-      {/* Big curved horns */}
-      <path d="M28 26 C24 18 18 8 12 -2 C16 2 20 4 22 0 C20 10 24 18 30 22"
+      {/* Big curved horns — kept inside the 0-100 viewBox AND the r=50 circular
+          crop so the dragon's signature reads on every surface (was clipped off). */}
+      <path d="M31 27 C24 23 19.5 18 19 12 C21 14 24 14 26 12 C25 18 29 24 34 26 Z"
         fill={`url(#${u}dragonHornGrad)`} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
-      <path d="M72 26 C76 18 82 8 88 -2 C84 2 80 4 78 0 C80 10 76 18 70 22"
+      <path d="M69 27 C76 23 80.5 18 81 12 C79 14 76 14 74 12 C75 18 71 24 66 26 Z"
         fill={`url(#${u}dragonHornGrad)`} stroke="#000" strokeWidth={2} strokeLinejoin="round" />
       {/* Horn ridges */}
-      <path d="M24 20 L20 12 M22 16 L16 6" stroke="#000" strokeWidth={0.8} opacity="0.2" />
-      <path d="M76 20 L80 12 M78 16 L84 6" stroke="#000" strokeWidth={0.8} opacity="0.2" />
+      <path d="M24 23 L21.5 17 M26 20 L23 14" stroke="#000" strokeWidth={0.8} opacity="0.25" />
+      <path d="M76 23 L78.5 17 M74 20 L77 14" stroke="#000" strokeWidth={0.8} opacity="0.25" />
 
       {/* Brow ridges above eye zone */}
       <path d="M26 34 Q36 28 44 34" fill="none" stroke="#000" strokeWidth={2.5} strokeLinecap="round" />
@@ -293,9 +294,11 @@ function DragonHead({ fill }: BasePartProps) {
       {/* Nostrils (below nose zone, above mouth zone) */}
       <ellipse cx="44" cy="54" rx="2.5" ry="2" fill="#000" opacity="0.4" />
       <ellipse cx="56" cy="54" rx="2.5" ry="2" fill="#000" opacity="0.4" />
-      {/* Nostril glow — static */}
-      <ellipse cx="44" cy="54" rx="1.5" ry="1" fill="#FF4500" opacity="0.45" />
-      <ellipse cx="56" cy="54" rx="1.5" ry="1" fill="#FF4500" opacity="0.45" />
+      {/* Nostril fire-glow — static, brighter so the dragon reads as legendary */}
+      <ellipse cx="44" cy="54" rx="2" ry="1.4" fill="#FF6B00" opacity="0.7" />
+      <ellipse cx="56" cy="54" rx="2" ry="1.4" fill="#FF6B00" opacity="0.7" />
+      <ellipse cx="44" cy="53.7" rx="1" ry="0.7" fill="#FFD54A" opacity="0.85" />
+      <ellipse cx="56" cy="53.7" rx="1" ry="0.7" fill="#FFD54A" opacity="0.85" />
 
       {/* Jaw spikes */}
       <polygon points="22,60 16,66 24,64" fill={fill} stroke="#000" strokeWidth={1.2} />
