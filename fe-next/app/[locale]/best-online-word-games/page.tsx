@@ -18,11 +18,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const canonicalUrl = `${BASE_URL}/en/best-online-word-games`;
 
   return {
-    title: 'Best Free Browser Word Games 2026 — 9 Honest Picks (Free, No Download)',
-    description: 'Best free browser word games of 2026, honestly ranked. Wordle, NYT Connections, Strands, Spelling Bee, Scrabble GO, LexiClash and more. No download, no signup — pick your game.',
+    title: '9 Best Free Word Games Online 2026 — No Download Needed',
+    description: 'Best free browser word games of 2026, honestly ranked. Wordle, NYT Connections, Strands, Spelling Bee, LexiClash and more — no download, no signup. Pick your game.',
     keywords: 'best free browser word games 2026, best word games 2026, best online word games 2025 2026, most popular online word games 2025 2026, free word games online, nyt connections, nyt strands, spelling bee game, semantle, wordle alternatives, multiplayer word games, word games with friends, word puzzle games online, word games no download, connections game',
     openGraph: {
-      title: 'Best Free Browser Word Games 2026 — 9 Honest Picks',
+      title: '9 Best Free Word Games Online 2026 — No Download Needed',
       description: 'Best free browser word games of 2026, honestly ranked. Wordle, NYT Connections, LexiClash & more — no download required.',
       locale: 'en_US',
       type: 'website',
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Best Free Browser Word Games 2026 — 9 Honest Picks',
+      title: '9 Best Free Word Games Online 2026 — No Download Needed',
       description: 'Best free browser word games of 2026, honestly ranked. No download required.',
       images: [`${BASE_URL}/og-image-en.webp`],
     },
