@@ -5,24 +5,13 @@ import Script from 'next/script';
 import { useAuth } from '@/contexts/AuthContext';
 import { isNative } from '@/utils/platform';
 import { supabase } from '@/lib/supabase';
-import logger from '@/utils/logger';
 import {
-  generateOneTapNonce,
-  createOneTapCallback,
+  ensureGoogleIdInitialized,
   shouldEnableGoogleOneTap,
-  type GoogleCredentialResponse,
+  type GoogleIdServices,
 } from '@/lib/auth/googleOneTap';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
-
-interface GoogleIdServices {
-  accounts: {
-    id: {
-      initialize: (config: Record<string, unknown>) => void;
-      prompt: () => void;
-    };
-  };
-}
 
 /**
  * Headless initializer for Google One Tap / Sign In With Google on the WEB.
@@ -53,22 +42,7 @@ export default function GoogleOneTapInitializer() {
     if (!google?.accounts?.id) return;
     promptedRef.current = true;
 
-    const { rawNonce, hashedNonce } = await generateOneTapNonce();
-
-    const callback = createOneTapCallback({
-      rawNonce,
-      onSuccess: () => logger.log('[OneTap] Google sign-in successful'),
-      onError: (message) => logger.debug('[OneTap] sign-in failed:', message),
-    });
-
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: (response: GoogleCredentialResponse) => void callback(response),
-      nonce: hashedNonce,
-      use_fedcm_for_prompt: true,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
+    await ensureGoogleIdInitialized(google, clientId);
     google.accounts.id.prompt();
   }, [clientId]);
 

@@ -8,6 +8,8 @@ import { Loader } from '@/components/ui/Loader';
 import { GoogleIcon, DiscordIcon } from './icons/BrandIcons';
 import { cn } from '@/lib/utils';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { isNative } from '@/utils/platform';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import type { OAuthProvider } from './types';
 
 interface OAuthButtonGroupProps {
@@ -51,6 +53,11 @@ export function OAuthButtonGroup({
 
   const isAnyLoading = loadingProvider !== null || disabled;
 
+  // On web with a Google web client configured, use Google's in-page token
+  // button (signInWithIdToken) so the consent screen shows OUR domain instead
+  // of <ref>.supabase.co. Native keeps the SDK redirect path below.
+  const useGsiGoogleButton = !isNative() && !!process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+
   // On CrazyGames platform, show CrazyGames auth instead of OAuth buttons
   if (isOnCrazyGamesPlatform) {
     return (
@@ -82,6 +89,9 @@ export function OAuthButtonGroup({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 * i, type: 'spring', stiffness: 400, damping: 24 }}
         >
+          {provider.id === 'google' && useGsiGoogleButton ? (
+            <GoogleSignInButton />
+          ) : (
           <Button
             onClick={() => onSignIn(provider.id)}
             disabled={isAnyLoading}
@@ -99,6 +109,7 @@ export function OAuthButtonGroup({
               {t('auth.signInWith', { provider: provider.label })}
             </span>
           </Button>
+          )}
         </m.div>
       ))}
     </div>

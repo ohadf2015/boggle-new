@@ -41,6 +41,10 @@ vi.mock('../../../lib/supabase', () => ({
   signInWithMagicLink: (...args: any[]) => mockSignInWithMagicLink(...args),
 }));
 
+vi.mock('../GoogleSignInButton', () => ({
+  default: () => <div data-testid="gsi-button" />,
+}));
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, string>) => {
@@ -556,6 +560,24 @@ describe('AuthModal', () => {
       await waitFor(() => {
         expect(mockSignInWithEmail).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('Google sign-in button (web)', () => {
+    afterEach(() => vi.unstubAllEnvs());
+
+    it('uses the GSI token button (not the redirect button) when a Google web client id is set', () => {
+      vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid-123.apps.googleusercontent.com');
+      renderModal();
+      expect(screen.getByTestId('gsi-button')).toBeTruthy();
+      expect(screen.queryByText('Sign in with Google')).toBeNull();
+    });
+
+    it('falls back to the redirect Google button when no client id is configured', () => {
+      vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', '');
+      renderModal();
+      expect(screen.queryByTestId('gsi-button')).toBeNull();
+      expect(screen.getByText('Sign in with Google')).toBeTruthy();
     });
   });
 });

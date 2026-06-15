@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 
 /**
  * Google One Tap / Sign In With Google (web).
@@ -115,6 +116,57 @@ export function createOneTapCallback({
       onError(result.error ?? 'Sign in failed');
     }
   };
+}
+
+/** Minimal shape of the global `window.google.accounts.id` we depend on. */
+export interface GoogleIdServices {
+  accounts: {
+    id: {
+      initialize: (config: Record<string, unknown>) => void;
+      prompt: (listener?: (notification: unknown) => void) => void;
+      renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
+    };
+  };
+}
+
+let idInitialized = false;
+
+/**
+ * `google.accounts.id.initialize` is a GLOBAL singleton — the last call wins.
+ * One Tap (prompt) and the rendered button must therefore share ONE init with a
+ * single nonce + callback. This initializes exactly once per page load; both the
+ * One Tap initializer and the Sign-In button call it before prompt()/renderButton().
+ * Success flows through Supabase `SIGNED_IN` (AuthContext), so the callback needs
+ * no per-caller success wiring.
+ */
+export async function ensureGoogleIdInitialized(
+  google: GoogleIdServices | null | undefined,
+  clientId: string,
+): Promise<void> {
+  if (idInitialized) return;
+  if (!google?.accounts?.id) return;
+
+  const { rawNonce, hashedNonce } = await generateOneTapNonce();
+  const callback = createOneTapCallback({
+    rawNonce,
+    onSuccess: () => logger.log('[GoogleAuth] sign-in successful'),
+    onError: (message) => logger.debug('[GoogleAuth] sign-in failed:', message),
+  });
+
+  google.accounts.id.initialize({
+    client_id: clientId,
+    callback: (response: GoogleCredentialResponse) => void callback(response),
+    nonce: hashedNonce,
+    use_fedcm_for_prompt: true,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+  });
+  idInitialized = true;
+}
+
+/** Test-only: reset the one-time init latch. */
+export function __resetGoogleIdInitForTests(): void {
+  idInitialized = false;
 }
 
 export interface OneTapEnableInput {

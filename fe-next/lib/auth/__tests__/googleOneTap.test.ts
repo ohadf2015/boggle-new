@@ -1,9 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   generateOneTapNonce,
   exchangeGoogleOneTapCredential,
   shouldEnableGoogleOneTap,
   createOneTapCallback,
+  ensureGoogleIdInitialized,
+  __resetGoogleIdInitForTests,
 } from '../googleOneTap';
 
 async function sha256Hex(input: string): Promise<string> {
@@ -94,6 +96,36 @@ describe('createOneTapCallback', () => {
     const cb = createOneTapCallback({ rawNonce: 'raw-1', onSuccess: vi.fn(), onError: vi.fn(), exchange });
     await cb({ credential: undefined });
     expect(exchange).not.toHaveBeenCalled();
+  });
+});
+
+describe('ensureGoogleIdInitialized', () => {
+  beforeEach(() => __resetGoogleIdInitForTests());
+
+  function makeGoogle() {
+    return {
+      accounts: { id: { initialize: vi.fn(), prompt: vi.fn(), renderButton: vi.fn() } },
+    };
+  }
+
+  it('initializes GIS once with our client id, a nonce, FedCM, and a callback', async () => {
+    const google = makeGoogle();
+    await ensureGoogleIdInitialized(google, 'cid-123');
+
+    expect(google.accounts.id.initialize).toHaveBeenCalledTimes(1);
+    const cfg = google.accounts.id.initialize.mock.calls[0][0];
+    expect(cfg.client_id).toBe('cid-123');
+    expect(typeof cfg.nonce).toBe('string');
+    expect(cfg.nonce.length).toBeGreaterThan(0);
+    expect(cfg.use_fedcm_for_prompt).toBe(true);
+    expect(typeof cfg.callback).toBe('function');
+  });
+
+  it('is idempotent — a second call does not re-initialize', async () => {
+    const google = makeGoogle();
+    await ensureGoogleIdInitialized(google, 'cid-123');
+    await ensureGoogleIdInitialized(google, 'cid-123');
+    expect(google.accounts.id.initialize).toHaveBeenCalledTimes(1);
   });
 });
 

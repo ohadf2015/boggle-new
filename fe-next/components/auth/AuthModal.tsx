@@ -10,6 +10,7 @@ import { Button } from '../ui/button';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import GoogleSignInButton from './GoogleSignInButton';
 import { trackEvent } from '@/components/GoogleAnalytics';
 import { isNative } from '../../utils/platform';
 
@@ -354,6 +355,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   ];
   // On native, only show Google (Discord requires browser OAuth which leaves the app)
   const providers = isNative() ? allProviders.filter(p => p.id === 'google') : allProviders;
+  // On web with a Google web client, use Google's in-page token button
+  // (signInWithIdToken) so the consent screen shows OUR domain, not <ref>.supabase.co.
+  const useGsiGoogleButton = !isNative() && !!process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
   if (!isOpen) return null;
   if (typeof document === 'undefined') return null;
@@ -470,6 +474,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.05 }}
                     >
+                      {provider.id === 'google' && useGsiGoogleButton ? (
+                        <GoogleSignInButton />
+                      ) : (
                       <Button
                         onClick={() => handleSignIn(provider.id)}
                         disabled={isAnyLoading}
@@ -488,6 +495,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                           </>
                         )}
                       </Button>
+                      )}
                     </m.div>
                   ))}
                 </div>

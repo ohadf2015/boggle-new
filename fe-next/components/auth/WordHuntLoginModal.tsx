@@ -17,6 +17,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
 import { isNative } from '../../utils/platform';
+import GoogleSignInButton from './GoogleSignInButton';
 import { validateEmail } from '../../utils/validation';
 import { cn } from '../../lib/utils';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -184,6 +185,9 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                 transition={{ delay: 0.3 }}
                 className="space-y-3 mb-4"
               >
+                {!isNative() && process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID ? (
+                  <GoogleSignInButton />
+                ) : (
                 <Button
                   onClick={() => handleSignIn('google')}
                   disabled={isLoading !== null}
@@ -197,6 +201,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                   )}
                   <span>{t('auth.signInWith', { provider: 'Google' })}</span>
                 </Button>
+                )}
 
                 <Button
                   onClick={() => handleSignIn('discord')}
