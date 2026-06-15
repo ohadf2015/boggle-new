@@ -94,6 +94,35 @@ assert "posthog down → preflight still RUNS (no hard abort)" "[ $rcM -eq 0 ]"
 assert "  …logs a WARN for posthog"                          'printf "%s" "$OUTM" | grep -q "WARN — MCP .posthog. not connected"'
 assert "  …does NOT abort on MCP"                            '! printf "%s" "$OUTM" | grep -q "ABORT — MCP"'
 unset NIGHTLY_MCP_RETRIES NIGHTLY_MCP_RETRY_SLEEP
+
+# ── glyph-agnostic MCP "Connected" match (2026-06-15 regression) ───────────
+# The claude CLI updated its success glyph from U+2713 ✓ to U+2714 ✔. preflight's
+# grep was pinned to the light ✓, so EVERY MCP falsely read "not connected" — on
+# 2026-06-15 supabase + sentry WARNed even though `claude mcp list` showed both
+# ✔ Connected. The match must key off the stable ASCII word " Connected" (failure
+# lines read "✘ Failed to connect", lowercase), not a specific glyph. Stub here
+# uses the REAL current output shape (heavy ✔ + " - " separator).
+cat > "$BIN/claude" <<'STUB'
+#!/bin/bash
+if [ "$1" = "mcp" ] && [ "$2" = "list" ]; then
+  echo "posthog: https://x (HTTP) - ✔ Connected"
+  echo "sentry: npx -y x - ✔ Connected"
+  echo "supabase: npx -y x --project-ref=y - ✔ Connected"
+fi
+STUB
+chmod +x "$BIN/claude"
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"; unset NIGHTLY_NOW_EPOCH
+export NIGHTLY_MCP_RETRIES=1 NIGHTLY_MCP_RETRY_SLEEP=0
+echo
+echo "MCP heavy-checkmark glyph (✔ U+2714) recognised as connected"
+OUTG=$(preflight_check 2>&1); rcG=$?
+assert "proceeds (rc 0)"             "[ $rcG -eq 0 ]"
+assert "supabase ✔ → NOT warned"     '! printf "%s" "$OUTG" | grep -q "WARN — MCP .supabase. not connected"'
+assert "sentry ✔ → NOT warned"       '! printf "%s" "$OUTG" | grep -q "WARN — MCP .sentry. not connected"'
+assert "posthog ✔ → NOT warned"      '! printf "%s" "$OUTG" | grep -q "WARN — MCP .posthog. not connected"'
+unset NIGHTLY_MCP_RETRIES NIGHTLY_MCP_RETRY_SLEEP
+
 # restore all-connected stub for the dedup cases below
 cat > "$BIN/claude" <<'STUB'
 #!/bin/bash

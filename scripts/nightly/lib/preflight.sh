@@ -215,17 +215,28 @@ preflight_check() {
   # ship. "Graceful degradation over hard fail" for autonomous jobs.
   # NIGHTLY_MCP_RETRIES / NIGHTLY_MCP_RETRY_SLEEP overridable for tests.
   local mcp_status="" tries="${NIGHTLY_MCP_RETRIES:-3}" sleep_s="${NIGHTLY_MCP_RETRY_SLEEP:-15}" i
+  # Glyph-agnostic match: the claude CLI flips its success glyph between releases
+  # (U+2713 ✓ → U+2714 ✔ on 2026-06-15), which silently made a pinned-glyph grep
+  # match nothing → every MCP falsely "not connected". Key off the stable ASCII
+  # word " Connected" (capital C); failure lines read "✘ Failed to connect"
+  # (lowercase), so this matches successes only, regardless of which check glyph
+  # the CLI emits. mcp_connected <server-name> <list-output>.
+  mcp_connected() { printf '%s' "$2" | grep -q "^${1}:.* Connected"; }
   for (( i=1; i<=tries; i++ )); do
     mcp_status=$(claude mcp list 2>&1 || true)
-    # Stop early once BOTH analytics MCPs report connected.
-    if echo "$mcp_status" | grep -q "^posthog:.*✓ Connected" \
-       && echo "$mcp_status" | grep -q "^sentry:.*✓ Connected"; then
+    # Stop early once ALL required MCPs report connected. supabase boots via a
+    # cold `npx` spawn that lags the HTTP servers, so it MUST be in this gate —
+    # otherwise the loop breaks on posthog+sentry while supabase is still starting
+    # and the per-server check below wrongly WARNs it (observed 2026-06-15).
+    if mcp_connected posthog "$mcp_status" \
+       && mcp_connected sentry "$mcp_status" \
+       && mcp_connected supabase "$mcp_status"; then
       break
     fi
     [ "$i" -lt "$tries" ] && { echo "preflight: MCP check attempt $i — not all connected, retrying in ${sleep_s}s"; sleep "$sleep_s"; }
   done
   for srv in posthog sentry supabase; do
-    if echo "$mcp_status" | grep -q "^${srv}:.*✓ Connected"; then
+    if mcp_connected "$srv" "$mcp_status"; then
       continue
     fi
     echo "preflight: WARN — MCP '$srv' not connected after ${tries} attempt(s); lanes needing it will degrade/skip (run continues)."
