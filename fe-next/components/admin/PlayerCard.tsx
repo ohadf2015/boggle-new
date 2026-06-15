@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import Avatar from '@/components/Avatar';
 import type { Player, CuratorAssignmentRow } from './playerManagerTypes';
 import { PlayerCuratorControl } from './PlayerCuratorControl';
+import { formatStyleBadge } from '@/lib/playerStyle/styles';
 
 interface PlayerCardProps {
   player: Player;
@@ -48,6 +49,7 @@ export function PlayerCard({
 }: PlayerCardProps) {
   const name = player.display_name || player.username;
   const phUrl = postHogPersonUrl(player.id);
+  const styleBadge = formatStyleBadge(player.player_style);
 
   return (
     <Card className={`overflow-hidden transition-shadow ${selected ? 'ring-2 ring-neo-lime' : 'hover:shadow-md'}`}>
@@ -71,6 +73,16 @@ export function PlayerCard({
                 {name}
                 {player.display_name && player.username && (
                   <span className="text-xs font-normal text-slate-500">@{player.username}</span>
+                )}
+                {styleBadge && (
+                  <span
+                    data-testid="player-style-badge"
+                    title={`Chosen style: ${styleBadge.label}`}
+                    className="inline-flex items-center gap-1 rounded-full border border-neo-purple/40 bg-neo-purple/10 px-2 py-0.5 text-xs font-semibold text-neo-purple"
+                  >
+                    <span aria-hidden>{styleBadge.emoji}</span>
+                    {styleBadge.label}
+                  </span>
                 )}
               </Link>
               <div className="text-xs text-slate-500 flex items-center gap-3 mt-1">

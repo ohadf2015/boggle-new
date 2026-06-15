@@ -327,6 +327,7 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
         total_coins, lifetime_coins_earned, total_hints_used,
         prestige_level, prestige_multiplier,
         country_code, referral_count, user_role, is_admin, blast_access,
+        player_style,
         daily_email_subscribed, last_seen_at, last_game_at, created_at
       `, { count: 'exact' });
 

@@ -112,3 +112,22 @@ export function resolveStyleTrack(key: unknown, originalTrack: string): string {
 export function resolveStyleAccent(key: unknown): string | null {
   return getStyle(key).accentHex;
 }
+
+/**
+ * Render a stored `profiles.player_style` value as a compact badge (emoji + label)
+ * for admin/display surfaces. Returns `null` when the player never chose a style
+ * (NULL/empty) so the caller can render nothing. Unknown-but-present keys still
+ * badge (forward-compatible) with a generic glyph + a title-cased label.
+ */
+export function formatStyleBadge(
+  style: string | null | undefined,
+): { emoji: string; label: string } | null {
+  const key = (style ?? '').trim();
+  if (!key) return null;
+  const titleCase = key
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  const emoji = isPlayerStyleKey(key) ? STYLES[key].emoji : '🎵';
+  return { emoji, label: titleCase };
+}

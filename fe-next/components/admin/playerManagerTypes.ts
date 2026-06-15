@@ -18,6 +18,8 @@ export interface Player {
   blast_access?: boolean;
   user_role?: string;
   is_admin?: boolean;
+  /** Music/theme personalization the player picked; `null` = never chose. */
+  player_style?: string | null;
 }
 
 /**

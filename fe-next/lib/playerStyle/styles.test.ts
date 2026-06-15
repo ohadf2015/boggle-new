@@ -7,6 +7,7 @@ import {
   isPlayerStyleKey,
   resolveStyleTrack,
   resolveStyleAccent,
+  formatStyleBadge,
   type PlayerStyleKey,
 } from './styles';
 
@@ -84,6 +85,32 @@ describe('player style registry', () => {
     });
     it('returns null for unknown keys', () => {
       expect(resolveStyleAccent('xxx')).toBeNull();
+    });
+  });
+
+  describe('formatStyleBadge', () => {
+    it('returns null when the player never chose a style', () => {
+      expect(formatStyleBadge(null)).toBeNull();
+      expect(formatStyleBadge(undefined)).toBeNull();
+      expect(formatStyleBadge('')).toBeNull();
+      expect(formatStyleBadge('   ')).toBeNull();
+    });
+
+    it('badges a known style with its emoji + title-cased label', () => {
+      expect(formatStyleBadge('hasidic')).toEqual({ emoji: STYLES.hasidic.emoji, label: 'Hasidic' });
+      expect(formatStyleBadge('reggae')).toEqual({ emoji: STYLES.reggae.emoji, label: 'Reggae' });
+    });
+
+    it('title-cases multi-word keys (underscore → space)', () => {
+      expect(formatStyleBadge('desert_epic')).toEqual({ emoji: STYLES.desert_epic.emoji, label: 'Desert Epic' });
+    });
+
+    it('badges an explicit default pick (distinct from never-chosen null)', () => {
+      expect(formatStyleBadge('default')).toEqual({ emoji: STYLES.default.emoji, label: 'Default' });
+    });
+
+    it('falls back to a generic music glyph for an unknown stored key', () => {
+      expect(formatStyleBadge('synthwave')).toEqual({ emoji: '🎵', label: 'Synthwave' });
     });
   });
 });
