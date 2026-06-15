@@ -229,13 +229,20 @@ describe('PlayerInGameView blast mode mounting', () => {
     expect(wrapper.className).not.toContain('bg-neo-cream');
   });
 
-  it('should use cream background with padding for classic mode', () => {
+  it('should use navy background with padding for classic mode (no cream FOUC flash)', () => {
     mockGameMode.value = 'classic';
 
     const { container } = render(<PlayerInGameView {...baseProps} />);
 
+    // App is dark-only: the classic container must be navy from the first paint.
+    // `bg-neo-cream dark:bg-neo-navy` + `transition-colors` painted a 1-frame
+    // cream FOUC that bled through the pre-game countdown overlay as a "fanfare
+    // flash" on the native app. Navy-only, no color transition.
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toContain('bg-neo-cream');
+    expect(wrapper.className).toContain('bg-neo-navy');
+    expect(wrapper.className).not.toContain('bg-neo-cream');
+    expect(wrapper.className).not.toContain('transition-colors');
+    expect(wrapper.className).toContain('md:p-4');
   });
 
   it('should pass totalTime to BlastGame', () => {

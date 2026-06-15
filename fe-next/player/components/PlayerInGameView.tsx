@@ -30,7 +30,7 @@ const WordTowerVersus = dynamic(
 );
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
-import { cn } from '@/lib/utils';
+import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
@@ -328,7 +328,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Show placeholder if no grid
   if (!effectiveGrid) {
     return (
-      <div className="flex-1 flex flex-col min-h-0 bg-neo-cream dark:bg-neo-navy p-4 items-center justify-center">
+      <div className={getMpInGamePlaceholderClass()}>
         <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
@@ -343,10 +343,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   }
 
   return (
-    <div className={cn(
-      'flex-1 flex flex-col min-h-0 overflow-x-clip overflow-y-auto transition-colors duration-300',
-      gameMode === 'blast' ? 'bg-neo-navy p-0' : 'bg-neo-cream dark:bg-neo-navy p-0 md:p-4'
-    )}>
+    <div className={getMpInGameContainerClass(gameMode)}>
 
 
       {/* Main Game Content — Blast/WordHunt use dedicated components, others use InGameScreen */}
