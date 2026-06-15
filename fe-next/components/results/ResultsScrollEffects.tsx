@@ -10,9 +10,28 @@ import {
 } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Capacitor } from '@capacitor/core';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
+}
+
+/**
+ * Inside the native Capacitor WebView these decorative scroll effects must NOT
+ * run. Each promotes a persistent GPU compositor layer via `will-change:
+ * transform` / `translate3d(0,0,0)` (parallax + hero tilt) or `will-change:
+ * height` (rail). On the Android System WebView a freshly-promoted layer paints
+ * an UNINITIALISED WHITE backing for a frame or two before the element's content
+ * composites onto it — and because the hero-tilt layer wraps the whole results
+ * body, that white wash lands "over" many components on entry (the reported
+ * "white bg flashing over the result/pre-result components"). They were added
+ * 2026-06-13; before that the page had no such layers and did not flash. The
+ * effects are pure garnish, so we drop them on native and keep them on web
+ * (where layer init does not flash). Caller is `ssr:false`, so a sync check is
+ * hydration-safe.
+ */
+function isNativeApp(): boolean {
+  return typeof window !== 'undefined' && Capacitor.isNativePlatform();
 }
 
 function useIsSmallViewport(): boolean {
@@ -60,9 +79,11 @@ export const ResultsParallaxBackdrop: React.FC<ParallaxBackdropProps> = ({
   const isSmall = useIsSmallViewport();
   const backRef = useRef<HTMLDivElement | null>(null);
   const midRef = useRef<HTMLDivElement | null>(null);
+  // Native WebView paints promoted layers white before they composite — skip.
+  const active = enabled && !isNativeApp();
 
   useEffect(() => {
-    if (reducedMotion || !enabled) return;
+    if (reducedMotion || !active) return;
     const scroller = scrollRef.current;
     const back = backRef.current;
     const mid = midRef.current;
@@ -96,9 +117,9 @@ export const ResultsParallaxBackdrop: React.FC<ParallaxBackdropProps> = ({
         tw.kill();
       });
     };
-  }, [scrollRef, intensity, isSmall, reducedMotion, enabled]);
+  }, [scrollRef, intensity, isSmall, reducedMotion, active]);
 
-  if (reducedMotion || !enabled) return null;
+  if (reducedMotion || !active) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
@@ -197,9 +218,12 @@ export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
 }) => {
   const reducedMotion = useReducedMotion();
   const innerRef = useRef<HTMLDivElement>(null);
+  // Native WebView paints this `will-change:transform` layer white on creation
+  // (it wraps the whole results body) — render a plain div there instead.
+  const active = enabled && !isNativeApp();
 
   useEffect(() => {
-    if (reducedMotion || !enabled) return;
+    if (reducedMotion || !active) return;
     const scroller = scrollRef.current;
     const target = innerRef.current;
     if (!scroller || !target) return;
@@ -219,9 +243,9 @@ export const ResultsHeroTilt: React.FC<HeroTiltProps> = ({
       tw.scrollTrigger?.kill();
       tw.kill();
     };
-  }, [scrollRef, reducedMotion, enabled]);
+  }, [scrollRef, reducedMotion, active]);
 
-  if (reducedMotion || !enabled) {
+  if (reducedMotion || !active) {
     return <div className={className}>{children}</div>;
   }
 
@@ -260,8 +284,10 @@ export const ResultsScrollProgressRail: React.FC<ScrollProgressRailProps> = ({
   const { scrollYProgress } = useScroll({ container: scrollRef as React.RefObject<HTMLElement> });
   const smoothed = useSpring(scrollYProgress, { stiffness: 220, damping: 30, mass: 0.4 });
   const height = useTransform(smoothed, [0, 1], ['0%', '100%']);
+  // Native WebView flashes the promoted `will-change:height` layer white — skip.
+  const active = enabled && !isNativeApp();
 
-  if (reducedMotion || !enabled) return null;
+  if (reducedMotion || !active) return null;
 
   return (
     <m.div
