@@ -1,9 +1,15 @@
 /**
  * Tests for getReengagementRecipients() — recipient filtering.
  *
- * Focus: the new "any game" gate that skips users who played any mode
- * (MP, SP, brain drills, party, daily) within INACTIVITY_DAYS via
- * `player_engagement.last_played_at`.
+ * Focus:
+ *  - the "any game" gate that skips users who played any mode (MP, SP, brain
+ *    drills, party, daily) within INACTIVITY_DAYS via
+ *    `player_engagement.last_played_at`.
+ *  - the daily-activity gates (recent-daily exclude + historical-daily keep)
+ *    read the LIVE daily tables (Word Hunt + Word Wheel), NOT the legacy,
+ *    now-empty `daily_puzzle_attempts` table. Reading the dead table starved
+ *    the recipient pool to zero — no re-engagement email sent for ~7 weeks
+ *    (regression caught via live DB, not these mocks).
  *
  * The legacy lib/__tests__/reengagementEmail.test.ts is quarantined
  * (vitest.config.ts exclude). This file lives in __tests__/ which is
@@ -39,7 +45,8 @@ interface QueryStub {
  * Build a Supabase mock where each `.from(table)` call returns a fresh chain
  * whose terminal `.single()` / `.maybeSingle()` resolves to the matching stub.
  * Stubs are matched in declaration order — first stub for a table wins, then
- * is consumed (so a second `from('daily_puzzle_attempts')` hits the next stub).
+ * is consumed (so a second `from('daily_word_hunt_attempts')` hits the next
+ * stub for that table).
  */
 function makeSupabase(stubs: QueryStub[], authUsers: { id: string; email: string }[]) {
   const queue = [...stubs];
@@ -103,8 +110,9 @@ describe('getReengagementRecipients — any-game gate', () => {
     const supa = makeSupabase(
       [
         { table: 'profiles', data: [baseProfile] },
-        // No recent daily attempt
-        { table: 'daily_puzzle_attempts', data: null },
+        // No recent daily attempt (both live tables)
+        { table: 'daily_word_hunt_attempts', data: null },
+        { table: 'daily_word_wheel_attempts', data: null },
         // Recent activity in some other game mode → MUST cause skip
         {
           table: 'player_engagement',
@@ -127,9 +135,10 @@ describe('getReengagementRecipients — any-game gate', () => {
     const supa = makeSupabase(
       [
         { table: 'profiles', data: [baseProfile] },
-        { table: 'daily_puzzle_attempts', data: null },        // no recent daily
-        { table: 'player_engagement', data: null },            // no recent any-mode
-        { table: 'daily_puzzle_attempts', data: { id: 'h1' } }, // historical play exists
+        { table: 'daily_word_hunt_attempts', data: null }, // no recent daily (hunt)
+        { table: 'daily_word_wheel_attempts', data: null }, // no recent daily (wheel)
+        { table: 'player_engagement', data: null }, // no recent any-mode
+        { table: 'daily_word_hunt_attempts', data: { id: 'h1' } }, // historical play exists (hunt)
       ],
       [{ id: 'user-1', email: 'test@example.com' }],
     );
@@ -141,13 +150,35 @@ describe('getReengagementRecipients — any-game gate', () => {
     expect(recipients[0].email).toBe('test@example.com');
   });
 
+  test('includes users whose only daily play was Word Wheel (not Word Hunt)', async () => {
+    // GIVEN: historical play exists ONLY in the wheel table → still eligible
+    const supa = makeSupabase(
+      [
+        { table: 'profiles', data: [baseProfile] },
+        { table: 'daily_word_hunt_attempts', data: null }, // no recent daily (hunt)
+        { table: 'daily_word_wheel_attempts', data: null }, // no recent daily (wheel)
+        { table: 'player_engagement', data: null }, // no recent any-mode
+        { table: 'daily_word_hunt_attempts', data: null }, // no historical hunt
+        { table: 'daily_word_wheel_attempts', data: { id: 'w1' } }, // historical wheel play
+      ],
+      [{ id: 'user-1', email: 'test@example.com' }],
+    );
+    mockGetSupabaseAdmin.mockReturnValue(supa);
+
+    const recipients = await getReengagementRecipients();
+
+    expect(recipients).toHaveLength(1);
+  });
+
   test('skips users with no historical play at all (never-played sign-ups)', async () => {
     const supa = makeSupabase(
       [
         { table: 'profiles', data: [baseProfile] },
-        { table: 'daily_puzzle_attempts', data: null },  // no recent daily
-        { table: 'player_engagement', data: null },      // no recent any-mode
-        { table: 'daily_puzzle_attempts', data: null },  // no historical play
+        { table: 'daily_word_hunt_attempts', data: null }, // no recent daily (hunt)
+        { table: 'daily_word_wheel_attempts', data: null }, // no recent daily (wheel)
+        { table: 'player_engagement', data: null }, // no recent any-mode
+        { table: 'daily_word_hunt_attempts', data: null }, // no historical hunt
+        { table: 'daily_word_wheel_attempts', data: null }, // no historical wheel
       ],
       [{ id: 'user-1', email: 'test@example.com' }],
     );
@@ -156,5 +187,27 @@ describe('getReengagementRecipients — any-game gate', () => {
     const recipients = await getReengagementRecipients();
 
     expect(recipients).toEqual([]);
+  });
+
+  test('never queries the legacy (dead) daily_puzzle_attempts table', async () => {
+    // Regression guard: the daily mode was reworked into Word Hunt + Word Wheel
+    // and daily_puzzle_attempts went empty. Reading it starved the pool to 0.
+    const supa = makeSupabase(
+      [
+        { table: 'profiles', data: [baseProfile] },
+        { table: 'daily_word_hunt_attempts', data: null },
+        { table: 'daily_word_wheel_attempts', data: null },
+        { table: 'player_engagement', data: null },
+        { table: 'daily_word_hunt_attempts', data: { id: 'h1' } },
+      ],
+      [{ id: 'user-1', email: 'test@example.com' }],
+    );
+    mockGetSupabaseAdmin.mockReturnValue(supa);
+
+    await getReengagementRecipients();
+
+    const queriedTables = (supa.from as Mock).mock.calls.map((c) => c[0]);
+    expect(queriedTables).not.toContain('daily_puzzle_attempts');
+    expect(queriedTables).toContain('daily_word_hunt_attempts');
   });
 });

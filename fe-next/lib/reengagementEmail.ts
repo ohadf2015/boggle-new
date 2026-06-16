@@ -51,6 +51,58 @@ export const COUNTRY_TO_LANGUAGE: Record<string, string> = {
   PE: 'es',
 };
 
+/**
+ * Live daily-challenge attempt tables. The daily mode was reworked into Word
+ * Hunt + Word Wheel; the legacy `daily_puzzle_attempts` table is empty/dead.
+ * Every daily-activity read (recipient gating + personalization) routes through
+ * this one constant — that single chokepoint is what stops a future table
+ * rename from silently starving the recipient pool again.
+ */
+const DAILY_ATTEMPT_TABLES = ['daily_word_hunt_attempts', 'daily_word_wheel_attempts'] as const;
+
+type DailySupabase = NonNullable<ReturnType<typeof getSupabaseAdmin>>;
+
+/** True if the player has a daily attempt on/after `puzzleDateCutoff` (YYYY-MM-DD) in either live daily mode. */
+async function hasDailyAttemptSince(
+  supabase: DailySupabase,
+  playerId: string,
+  puzzleDateCutoff: string,
+): Promise<boolean> {
+  for (const table of DAILY_ATTEMPT_TABLES) {
+    const { data } = await supabase
+      .from(table)
+      .select('id')
+      .eq('player_id', playerId)
+      .gte('puzzle_date', puzzleDateCutoff)
+      .limit(1)
+      .maybeSingle();
+    if (data) return true;
+  }
+  return false;
+}
+
+/** Most recent daily attempt across both live modes, or null. */
+async function getMostRecentDailyAttempt(
+  supabase: DailySupabase,
+  playerId: string,
+): Promise<{ language: string | null; puzzle_date: string } | null> {
+  let best: { language: string | null; puzzle_date: string } | null = null;
+  for (const table of DAILY_ATTEMPT_TABLES) {
+    const { data } = await supabase
+      .from(table)
+      .select('language, puzzle_date')
+      .eq('player_id', playerId)
+      .order('puzzle_date', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const row = data as { language?: string | null; puzzle_date?: string } | null;
+    if (row?.puzzle_date && (!best || row.puzzle_date > best.puzzle_date)) {
+      best = { language: row.language ?? null, puzzle_date: row.puzzle_date };
+    }
+  }
+  return best;
+}
+
 // ==========================================
 // Types
 // ==========================================
@@ -71,7 +123,7 @@ export interface ReengagementRecipient {
 
 /**
  * Resolve the best language for a user based on:
- * 1. Most recent game language from daily_puzzle_attempts
+ * 1. Most recent daily-attempt language (Word Hunt / Word Wheel)
  * 2. Country code mapping
  * 3. Default 'en'
  */
@@ -82,15 +134,8 @@ export async function resolveUserLanguage(
   const supabase = getSupabaseAdmin();
   if (!supabase) return 'en';
 
-  const { data } = await supabase
-    .from('daily_puzzle_attempts')
-    .select('language')
-    .eq('player_id', userId)
-    .order('puzzle_date', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (data?.language) return data.language;
+  const recent = await getMostRecentDailyAttempt(supabase, userId);
+  if (recent?.language) return recent.language;
 
   if (countryCode && COUNTRY_TO_LANGUAGE[countryCode]) {
     return COUNTRY_TO_LANGUAGE[countryCode];
@@ -201,15 +246,8 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
     if (localHour < 7 || localHour > 9) continue;
 
     // Recent activity check — skip users who played the daily within window.
-    const { data: recentAttempt } = await supabase
-      .from('daily_puzzle_attempts')
-      .select('id')
-      .eq('player_id', profile.id)
-      .gte('puzzle_date', inactivityCutoff)
-      .limit(1)
-      .single();
-
-    if (recentAttempt) continue;
+    const playedDailyRecently = await hasDailyAttemptSince(supabase, profile.id, inactivityCutoff);
+    if (playedDailyRecently) continue;
 
     // Cross-mode activity check — engagementManager writes last_played_at on
     // every game (MP, SP, brain drills, party). If the user played anything
@@ -227,15 +265,8 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
 
     // Engagement window — must have played at least once within last MAX_INACTIVITY_DAYS.
     // Skips two cohorts we shouldn't nag: never-played sign-ups + long-gone users.
-    const { data: lastPlay } = await supabase
-      .from('daily_puzzle_attempts')
-      .select('id')
-      .eq('player_id', profile.id)
-      .gte('puzzle_date', giveUpCutoff)
-      .limit(1)
-      .maybeSingle();
-
-    if (!lastPlay) continue;
+    const playedDailyInWindow = await hasDailyAttemptSince(supabase, profile.id, giveUpCutoff);
+    if (!playedDailyInWindow) continue;
 
     recipients.push({
       id: profile.id,
@@ -276,28 +307,31 @@ async function getPlayersToday(language: string): Promise<number | null> {
   if (playersTodayCache.has(cacheKey)) return playersTodayCache.get(cacheKey) ?? null;
 
   // count of attempts is a useful approximation; one row per player per puzzle.
-  const { count, error } = await supabase
-    .from('daily_puzzle_attempts')
-    .select('id', { count: 'exact', head: true })
-    .eq('puzzle_date', puzzleDate)
-    .eq('language', language);
+  // Sum across both live daily modes (Word Hunt + Word Wheel).
+  let total = 0;
+  let any = false;
+  for (const table of DAILY_ATTEMPT_TABLES) {
+    const { count, error } = await supabase
+      .from(table)
+      .select('id', { count: 'exact', head: true })
+      .eq('puzzle_date', puzzleDate)
+      .eq('language', language);
+    if (!error && count != null) {
+      total += count;
+      any = true;
+    }
+  }
 
-  if (error || count == null) return null;
-  playersTodayCache.set(cacheKey, count);
-  return count;
+  if (!any) return null;
+  playersTodayCache.set(cacheKey, total);
+  return total;
 }
 
 async function getLastPlayedDate(playerId: string): Promise<string | null> {
   const supabase = getSupabaseAdmin();
   if (!supabase) return null;
-  const { data } = await supabase
-    .from('daily_puzzle_attempts')
-    .select('puzzle_date')
-    .eq('player_id', playerId)
-    .order('puzzle_date', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  return data?.puzzle_date ?? null;
+  const recent = await getMostRecentDailyAttempt(supabase, playerId);
+  return recent?.puzzle_date ?? null;
 }
 
 /**
