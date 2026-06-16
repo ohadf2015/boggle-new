@@ -9,8 +9,10 @@ import Avatar from '@/components/Avatar';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import InviteContextBanner from './InviteContextBanner';
 import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
+import OnboardingGoogleSignup from './OnboardingGoogleSignup';
 import { useImeText } from '@/hooks/useImeText';
 import { cn } from '@/lib/utils';
+import { NeoPanel } from '@/components/ui/panel';
 
 interface QuickProfileSetupProps {
   onComplete: (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => void;
@@ -127,7 +129,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
       className="w-full max-w-sm lg:max-w-md mx-auto"
       dir={dir}
     >
-      <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-5 shadow-hard-md">
+      <NeoPanel tone="cream" shadow="md" className="p-5">
         {inviteContext && onSkipInvite && (
           <InviteContextBanner
             roomCode={inviteContext.roomCode}
@@ -301,7 +303,19 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
         >
           {hasPendingInvite ? t('onboarding.ftue.joinFriendsGame') : t('onboarding.ftue.letsGo')}
         </m.button>
-      </div>
+
+        {/* Optional Google signup — secondary to the guest "Let's Go". Hidden in
+            the invite flow, where joining the friend's room is the priority.
+            Lets a brand-new player lock in the avatar + name they just crafted. */}
+        {!hasPendingInvite && (
+          <OnboardingGoogleSignup
+            name={name}
+            avatar={avatar}
+            nameValid={isNameValid}
+            nameEdited={trimmedName !== initialSuggestionRef.current.trim()}
+          />
+        )}
+      </NeoPanel>
     </m.div>
   );
 };

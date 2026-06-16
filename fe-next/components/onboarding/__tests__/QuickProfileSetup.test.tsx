@@ -34,6 +34,13 @@ vi.mock('lucide-react', () => ({
   X: () => <div data-testid="x-icon" />,
 }));
 
+// Mock the optional Google signup panel — it has its own test and pulls in the
+// auth stack (supabase, OAuth hooks) we don't want loaded here.
+vi.mock('../OnboardingGoogleSignup', () => ({
+  __esModule: true,
+  default: () => <div data-testid="onboarding-google-signup" />,
+}));
+
 // Mock AvatarBuilderModal
 vi.mock('@/components/avatar/AvatarBuilderModal', () => ({
   __esModule: true,

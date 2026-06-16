@@ -26,6 +26,7 @@ import {
   type SupabaseAuthError,
 } from '../authUtils';
 import type { AuthStateSetters } from '../authTypes';
+import { shouldReloadAfterSignIn } from '../reloadOnSignIn';
 
 // Constants for timeout values
 // Increased from 2s to 5s to accommodate slower mobile connections (fixes JAVASCRIPT-NEXTJS-11)
@@ -303,6 +304,9 @@ async function handleAuthStateChange(
   switch (event) {
     case 'SIGNED_IN':
       if (sessionUser) {
+        // Captured BEFORE setUser/userIdRef advances — true only on a genuine
+        // guest → authenticated transition (drives the one-shot reload below).
+        const wasUnauthenticated = userIdRef.current === null;
         const isNewUser = sessionUser.id !== userIdRef.current;
         if (isNewUser) {
           setUser(sessionUser);
@@ -331,6 +335,17 @@ async function handleAuthStateChange(
               // Redirect to join page with the code
               const currentLocale = window.location.pathname.split('/')[1] || 'en';
               window.location.href = `/${currentLocale}/join/${pendingJoinCode}`;
+            } else if (
+              shouldReloadAfterSignIn('SIGNED_IN', {
+                wasUnauthenticated,
+                pathname: window.location.pathname,
+              })
+            ) {
+              // Fresh guest → authenticated: hard reload so EVERY page (server
+              // components, authed chrome, the FTUE mount gate) re-renders in
+              // signed-in mode. fetchUserData already finished above, so the new
+              // profile is persisted before the reloaded page re-reads the session.
+              window.location.reload();
             }
           }
         }

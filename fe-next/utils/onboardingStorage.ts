@@ -62,6 +62,27 @@ export const markOnboardingComplete = (data: Omit<OnboardingData, 'completedAt'>
 };
 
 /**
+ * Persist in-progress FTUE identity (name + avatar id + edited flag) WITHOUT
+ * marking onboarding complete. Lets a mid-FTUE OAuth signup carry the crafted
+ * name/avatar into createNewProfile, while a user who abandons mid-profile is
+ * NOT wrongly treated as having finished onboarding (isFirstTimeUser stays true).
+ * Merges over any existing blob so selectedMode/completedAt aren't clobbered.
+ */
+export const savePendingOnboardingProfile = (
+  data: Pick<OnboardingData, 'displayName' | 'avatarId' | 'nameEdited'>
+): void => {
+  const existing = getOnboardingData();
+  const merged: OnboardingData = {
+    avatarId: data.avatarId,
+    displayName: data.displayName,
+    selectedMode: existing?.selectedMode ?? null,
+    completedAt: existing?.completedAt ?? '',
+    nameEdited: data.nameEdited,
+  };
+  saveJsonToLocalStorage(STORAGE_KEYS.ONBOARDING_DATA, merged);
+};
+
+/**
  * Get saved onboarding data
  */
 export const getOnboardingData = (): OnboardingData | null => {

@@ -23,6 +23,7 @@ import { getUtmDataForProfile } from '@/utils/utmCapture';
 import { syncGuestDailyResultsToAccount } from '@/utils/dailyChallenge';
 import { getRandomAvatar, getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getRandomAvatarConfig } from '@/shared/types/customAvatar';
+import { pickSignupCustomAvatar } from '../signupAvatar';
 import { withAvatarCustomizedFlag } from '@/lib/avatar/avatarNudge';
 import { captureBackgroundError } from '@/utils/sentry';
 import logger from '@/utils/logger';
@@ -195,7 +196,9 @@ async function createNewProfile(
   // Get legacy emoji/color from the character avatar (for backward compatibility with DB)
   const { emoji: avatarEmoji, color: avatarColor } = getAvatarEmojiAndColor(finalAvatarImage);
 
-  const randomCustomAvatar = getRandomAvatarConfig();
+  // Prefer the FTUE-crafted custom avatar (if the guest built one before
+  // signing up) over a fresh random one — keeps their character on the account.
+  const randomCustomAvatar = pickSignupCustomAvatar();
 
   const { data: newProfile, error: createError } = await createProfile({
     id: userId,
