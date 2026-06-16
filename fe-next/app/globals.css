@@ -409,6 +409,19 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   50% { opacity: 0.5; }
 }
 
+@utility wt-toast-out {
+  /* Cool exit for Word Tower compliments/messages: a hard-edged upward CLIP
+     wipe + a quick brightness flash + fade. Deliberately transform-free so it
+     never clobbers a toast's own `-translate-x-1/2` centering (a known trap),
+     and stays on-brand (hard clip, no soft blur). `forwards` holds it gone. */
+  animation: wt-toast-out 0.42s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes wt-toast-out {
+  0% { opacity: 1; clip-path: inset(0 0 0 0); filter: brightness(1); }
+  22% { opacity: 1; filter: brightness(1.55); }
+  100% { opacity: 0; clip-path: inset(0 0 100% 0); filter: brightness(1); }
+}
+
 @utility letter-tile-gradient {
   /* Letter Tile Gradient - Bright, clean with subtle warmth */
   background: linear-gradient(165deg, #ffffff 0%, #fefefe 40%, #fafaf8 100%);

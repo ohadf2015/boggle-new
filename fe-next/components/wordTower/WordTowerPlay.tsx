@@ -26,6 +26,7 @@ import { landmarkCrossed } from '@/lib/wordTower/landmarkMoment';
 import WordTowerCrane, { type WordTowerCraneHandle } from './WordTowerCrane';
 import { useCraneDrop } from './useCraneDrop';
 import { useAutoDismiss } from './useAutoDismiss';
+import { useExitReveal } from './useExitReveal';
 import { sweepPeriodMs, SWEEP_PERIOD_FLOOR_MS } from '@/lib/wordTower/craneSweep';
 import { isNearMiss } from '@/lib/wordTower/towerLean';
 import {
@@ -197,7 +198,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     prevZone.current = biomeId;
     setZoneText(t(`wordTower.biome.${biomeId}`));
   }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(zoneText, () => setZoneText(null), 2600);
+  useAutoDismiss(zoneText, () => setZoneText(null), 2000);
 
   // Witty milestone toast on crossing a height landmark.
   const [milestoneText, setMilestoneText] = useState<string | null>(null);
@@ -213,7 +214,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     haptics.success();
     playLevelUpSound();
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(milestoneText, () => setMilestoneText(null), 2400);
+  useAutoDismiss(milestoneText, () => setMilestoneText(null), 2000);
 
   // Landmark flyby — cosy "you passed X" beat. Defers to a zone or milestone at the same height.
   const [landmarkText, setLandmarkText] = useState<string | null>(null);
@@ -228,7 +229,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setLandmarkText(`${hit.icon} ${t(hit.key)}`);
     playHintRevealSound();
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(landmarkText, () => setLandmarkText(null), 2200);
+  useAutoDismiss(landmarkText, () => setLandmarkText(null), 2000);
 
   // Achievements — unlock once (persisted in localStorage), pop a trophy toast.
   const achUnlocked = useRef<Set<string>>(new Set());
@@ -252,7 +253,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     try { localStorage.setItem('wt-achievements', JSON.stringify([...achUnlocked.current])); } catch { /* */ }
     setAchToast(fresh[fresh.length - 1]); // show the most impressive of the batch
   }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);
-  useAutoDismiss(achToast, () => setAchToast(null), 2800);
+  useAutoDismiss(achToast, () => setAchToast(null), 2000);
 
   // Roguelike perk draft — daily-run only. Boons fold into one modifier object
   // the crane + hazard sites read. Segregated from the endless board (daily gates
@@ -336,7 +337,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setSkinUnlock(fresh);
     setSkinIdRef.current(fresh.id); // wear the reward immediately
   }, [personalBest]);
-  useAutoDismiss(skinUnlock, () => setSkinUnlock(null), 3200);
+  useAutoDismiss(skinUnlock, () => setSkinUnlock(null), 2000);
 
   // Unmistakable verdict pop — one big, band-coloured beat on every drop telling
   // the player exactly how they did + the metres gained. Keyed off the placement
@@ -364,7 +365,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Dismiss via the shared hook (keyed on the verdict's own resultKey) rather than
   // an inline timer, so the lifespan is owned in ONE place and can never be reset
   // by an unrelated re-render — the same robustness the other banners already use.
-  useAutoDismiss(verdict?.key, () => setVerdict(null), 1300);
+  useAutoDismiss(verdict?.key, () => setVerdict(null), 2000);
 
   // Combo-milestone fanfare — a one-shot "×5 ON FIRE!" beat the moment the combo
   // crosses 3/5/10/20. Keyed off resultKey so it fires on the placing tick only.
@@ -377,7 +378,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     haptics.success();
     playComboMilestoneSound(hit.combo);
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(comboFx?.key, () => setComboFx(null), 1400);
+  useAutoDismiss(comboFx?.key, () => setComboFx(null), 2000);
 
   // Surprise pop — the variable-reward beat. A per-word deterministic roll
   // (towerSurprise.ts) occasionally grants bonus height / scrambles / an updraft
@@ -392,7 +393,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     surpriseSoundFns[TOWER_SURPRISE_META[s.event].sound]();
     haptics.levelComplete();
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(surpriseFx?.key, () => setSurpriseFx(null), 1700);
+  useAutoDismiss(surpriseFx?.key, () => setSurpriseFx(null), 2000);
 
   // Rival ghosts are leaderboard records to climb past (read-only). The old
   // solo "wrecking-ball" sabotage was a fake, local-only effect against these
@@ -432,7 +433,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     haptics.bossHit();
     playErrorSound();
   }, [tower.state.hazardKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(hazardText, () => setHazardText(null), 2900);
+  useAutoDismiss(hazardText, () => setHazardText(null), 2000);
 
   // CLUTCH SAVE banner — a clean drop pulled the tower back from a critical lean.
   // The biggest single beat in the climb (a fumble instead routes through the
@@ -442,7 +443,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     if (!crane.clutch || crane.clutch.outcome !== 'save') return;
     setClutchText(t('wordTower.clutch.save'));
   }, [crane.clutch?.key]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(clutchText, () => setClutchText(null), 1600);
+  useAutoDismiss(clutchText, () => setClutchText(null), 2000);
 
   // Hide the global bottom nav for the duration of gameplay (full-screen mode).
   const setIsInGame = useHideNavigation();
@@ -513,8 +514,27 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setNewBestText(t('wordTower.daily.newBest'));
     onNewDailyBest?.(game.heightM);
   }, [daily, newBestShown, personalBestM, game.heightM, onNewDailyBest]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(newBestText, () => setNewBestText(null), 2200);
+  useAutoDismiss(newBestText, () => setNewBestText(null), 2000);
   useEffect(() => { if (game.heightM > 0) save(); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Cool EXIT for every compliment/message: after its ~2s hold the source
+  //    nulls, and useExitReveal keeps the LAST value on screen with `exiting`
+  //    true for the wt-toast-out clip-wipe before unmounting (instant under
+  //    reduced motion). Each render below reads `<x>R.value` + `<x>R.exiting`. ──
+  const EXIT_MS = reducedMotion ? 0 : 420;
+  const zoneR = useExitReveal(zoneText, EXIT_MS);
+  const milestoneR = useExitReveal(milestoneText, EXIT_MS);
+  const landmarkR = useExitReveal(landmarkText, EXIT_MS);
+  const skinUnlockR = useExitReveal(skinUnlock, EXIT_MS);
+  const verdictR = useExitReveal(verdict, EXIT_MS);
+  const hazardR = useExitReveal(hazardText, EXIT_MS);
+  const clutchR = useExitReveal(clutchText, EXIT_MS);
+  const newBestR = useExitReveal(newBestText, EXIT_MS);
+  const comboR = useExitReveal(comboFx, EXIT_MS);
+  const surpriseR = useExitReveal(surpriseFx, EXIT_MS);
+  const achR = useExitReveal(achToast, EXIT_MS);
+  /** Entrance anim while live, the clip-wipe exit while leaving (none under RM). */
+  const fxClass = (exiting: boolean, enter: string) => (reducedMotion ? '' : exiting ? 'wt-toast-out' : enter);
 
   // Always flush when the tab is hidden / page unloads.
   useEffect(() => {
@@ -655,9 +675,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
       {/* NEW SKIN UNLOCKED — the variable-reward beat when a climb crosses a
           skin's height milestone (the new look is auto-equipped). */}
-      {skinUnlock && (
+      {skinUnlockR.value && (() => { const skinUnlock = skinUnlockR.value; return (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[22%] z-40 flex -translate-x-1/2 items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute left-1/2 top-[22%] z-40 flex -translate-x-1/2 items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 shadow-hard ${fxClass(skinUnlockR.exiting, 'animate-neo-pop')}`}
           role="status"
           aria-live="polite"
         >
@@ -674,7 +694,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             </span>
           </span>
         </div>
-      )}
+      ); })()}
 
       {/* Next-zone tease — quiet anticipation chip in the approach window. Hidden
           while the NEW ZONE banner is paying off the arrival. */}
@@ -689,35 +709,35 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       )}
 
       {/* NEW ZONE banner — the headline of entering a new biome */}
-      {zoneText && (
+      {zoneR.value && (
         <div
-          className="pointer-events-none absolute left-1/2 top-[9%] z-30 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard"
+          className={`pointer-events-none absolute left-1/2 top-[9%] z-30 -translate-x-1/2 ${fxClass(zoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard`}
           aria-live="polite"
         >
           <div className="font-neo-body text-[10px] font-bold uppercase tracking-[0.2em] text-black/60">{t('wordTower.zone.entered')}</div>
-          <div className="font-neo-display text-base font-black uppercase tracking-wide text-black">{zoneText}</div>
+          <div className="font-neo-display text-base font-black uppercase tracking-wide text-black">{zoneR.value}</div>
         </div>
       )}
 
       {/* Witty milestone toast */}
-      {milestoneText && (
+      {milestoneR.value && (
         <div
-          className="pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-1.5 font-neo-display text-sm font-black text-neo-white shadow-hard"
+          className={`pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 ${fxClass(milestoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-1.5 font-neo-display text-sm font-black text-neo-white shadow-hard`}
           aria-live="polite"
         >
-          {milestoneText}
+          {milestoneR.value}
         </div>
       )}
 
       {/* Calm landmark flyby — a cosy, warm "you passed X" beat. Low-key cream
           (not electric) so it reads as a scenic moment, not a celebration.
           Shares the guarded milestone slot, so the two never co-occur. */}
-      {landmarkText && (
+      {landmarkR.value && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 font-neo-display text-sm font-black text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 font-neo-display text-sm font-black text-black shadow-hard ${fxClass(landmarkR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
-          {landmarkText}
+          {landmarkR.value}
         </div>
       )}
 
@@ -744,10 +764,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* Unmistakable DROP VERDICT — the single big beat that answers "did I nail
           it?". Band-coloured headline (PERFECT/NICE/SLOPPY/MISSED) + the metres
           actually gained, popped centre-stage so it can't be missed. */}
-      {verdict && (
+      {verdictR.value && (() => { const verdict = verdictR.value; return (
         <div
           key={verdict.key}
-          className="pointer-events-none absolute left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5"
+          className={`pointer-events-none absolute left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5 ${fxClass(verdictR.exiting, '')}`}
           aria-live="assertive"
           role="status"
         >
@@ -770,15 +790,15 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             </div>
           )}
         </div>
-      )}
+      ); })()}
 
       {/* Hazard "tower ruined" banner — bold + red so the loss is unmissable */}
-      {hazardText && (
+      {hazardR.value && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[15%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-red px-4 py-2 text-center font-neo-display text-base font-black text-neo-white shadow-hard ${reducedMotion ? '' : 'animate-neo-shake'}`}
+          className={`pointer-events-none absolute left-1/2 top-[15%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-red px-4 py-2 text-center font-neo-display text-base font-black text-neo-white shadow-hard ${fxClass(hazardR.exiting, 'animate-neo-shake')}`}
           aria-live="assertive"
         >
-          {hazardText}
+          {hazardR.value}
         </div>
       )}
 
@@ -794,43 +814,43 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       )}
 
       {/* CLUTCH SAVE banner — the do-or-die payoff. Lime = triumph. */}
-      {clutchText && (
+      {clutchR.value && (
         <div
-          className={`pointer-events-none absolute inset-x-0 top-[12%] z-40 mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[12%] z-40 mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(clutchR.exiting, 'animate-neo-pop')}`}
           aria-live="assertive"
         >
-          {clutchText}
+          {clutchR.value}
         </div>
       )}
 
       {/* New daily best — the self-comparison routine beat. Gold = personal record. */}
-      {newBestText && (
+      {newBestR.value && (
         <div
-          className={`pointer-events-none absolute inset-x-0 top-[19%] z-40 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[19%] z-40 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${fxClass(newBestR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
-          🏆 {newBestText}
+          🏆 {newBestR.value}
         </div>
       )}
 
       {/* Combo-milestone fanfare — a flame-orange "×5 ON FIRE!" beat. Sits below
           the centre verdict so the two read as separate hits, not one pile. */}
-      {comboFx && (
+      {comboR.value && (() => { const comboFx = comboR.value; return (
         <div
           key={comboFx.key}
-          className={`pointer-events-none absolute inset-x-0 top-[28%] z-30 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[28%] z-30 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(comboR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
           🔥 {t(comboFx.m.labelKey)} <span className="tabular-nums">×{comboFx.m.combo}</span>
         </div>
-      )}
+      ); })()}
 
       {/* Surprise pop — the variable-reward beat. Gold tile (celebration accent),
           sits high-centre so it reads as its own lucky hit above the verdict. */}
-      {surpriseFx && (
+      {surpriseR.value && (() => { const surpriseFx = surpriseR.value; return (
         <div
           key={surpriseFx.key}
-          className={`pointer-events-none absolute inset-x-0 top-[18%] z-40 mx-auto w-fit flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[18%] z-40 mx-auto w-fit flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${fxClass(surpriseR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
           <div className="flex items-center gap-1.5 font-neo-display text-xl font-black uppercase tracking-wide text-black">
@@ -852,7 +872,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             </div>
           )}
         </div>
-      )}
+      ); })()}
 
       {/* Daily mutator intro — the day's shared twist, popped once on entry. */}
       {mutator && <WordTowerMutatorBanner mutator={mutator} t={t} reducedMotion={reducedMotion} />}
@@ -890,15 +910,15 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       <WordTowerPerkDraft choices={perks.draft} onChoose={perks.choose} onSkip={perks.skip} t={t} dir={dir} />
 
       {/* Achievement unlock toast */}
-      {achToast && (
+      {achR.value && (() => { const achToast = achR.value; return (
         <div
-          className="pointer-events-none absolute left-1/2 top-[23%] z-30 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-2 text-center shadow-hard"
+          className={`pointer-events-none absolute left-1/2 top-[23%] z-30 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-2 text-center shadow-hard ${fxClass(achR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
           <div className="font-neo-body text-[10px] font-bold uppercase tracking-wider text-black/60">{t('wordTower.ach.unlocked')}</div>
           <div className="font-neo-display text-sm font-black text-black">{achToast.icon} {t(achToast.nameKey)}</div>
         </div>
-      )}
+      ); })()}
 
       {/* Top bar — three flex columns: [back] · [altitude readout] · [actions].
           The altitude HUD shares this row, so it can NEVER sit behind the back
