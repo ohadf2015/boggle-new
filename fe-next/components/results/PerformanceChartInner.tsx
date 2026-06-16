@@ -15,6 +15,7 @@ import {
 import { TrendingUp, TrendingDown, Minus, Trophy, Flame, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { NeoPanel } from '@/components/ui/panel';
 import {
   getChartData,
   calculateTrend,
@@ -236,7 +237,7 @@ const CustomTooltip = ({
   const modeInfo = getGameModeInfo(data.mode, t);
 
   return (
-    <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-3 shadow-hard text-neo-black min-w-[140px]">
+    <NeoPanel tone="cream" className="text-neo-black min-w-[140px] p-3">
       <div className="font-black text-xl mb-1.5">{data.score} <span className="text-base">{t('scorePage.pts')}</span></div>
       <div className="text-xs font-bold space-y-1">
         <div className="flex items-center gap-1.5">
@@ -259,7 +260,7 @@ const CustomTooltip = ({
         )}
         <div className="text-neo-black/50 mt-1.5 pt-1.5 border-t border-neo-black/10 text-[10px]">{timeAgo}</div>
       </div>
-    </div>
+    </NeoPanel>
   );
 };
 

@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { NeoPanel } from '@/components/ui/panel';
 import CustomPuzzleCreator from './CustomPuzzleCreator';
 
 interface BrowsePuzzle {
@@ -175,7 +176,7 @@ const PuzzleBrowse: React.FC = () => {
                 transition={{ delay: i * 0.04 }}
               >
                 <Link href={`/${language}/custom/${puzzle.puzzleCode}`}>
-                  <div className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all p-4 cursor-pointer h-full flex flex-col">
+                  <NeoPanel tone="cream" className="hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all p-4 cursor-pointer h-full flex flex-col">
                     {/* Top row: code + difficulty */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-1.5 text-neo-black/50">
@@ -205,7 +206,7 @@ const PuzzleBrowse: React.FC = () => {
                         {timeAgo(puzzle.createdAt, t)}
                       </span>
                     </div>
-                  </div>
+                  </NeoPanel>
                 </Link>
               </AdaptiveMotion.div>
             ))}

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { X, Hand } from 'lucide-react';
 import { getDemoConfig } from '../onboarding/demoConfigs';
+import { NeoPanel } from '@/components/ui/panel';
 
 const AUTO_DISMISS_MS = 8000; // 8 seconds
 
@@ -172,12 +173,11 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
             }
             className="fixed bottom-[calc(6rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-50 pointer-events-auto safe-area-bottom"
           >
-            <div
-              className="
-                bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo-lg shadow-hard-lg
-                px-4 py-3 max-w-[320px] relative cursor-pointer
-                hover:shadow-hard-xl transition-shadow active:scale-[0.98]
-              "
+            <NeoPanel
+              tone="cream"
+              shadow="lg"
+              radius="neo-lg"
+              className="text-neo-black px-4 py-3 max-w-[320px] relative cursor-pointer hover:shadow-hard-xl transition-shadow active:scale-[0.98]"
               onClick={handleDismiss}
               role="tooltip"
               aria-live="polite"
@@ -364,7 +364,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                 animate={{ width: '0%' }}
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
               />
-            </div>
+            </NeoPanel>
           </m.div>
         )}
       </AnimatePresence>

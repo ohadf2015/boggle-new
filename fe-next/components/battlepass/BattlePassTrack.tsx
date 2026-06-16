@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBattlePass } from '@/hooks/useBattlePass';
+import { NeoPanel } from '@/components/ui/panel';
 import BattlePassRewardCard from './BattlePassRewardCard';
 import { Crown, Clock, Star } from 'lucide-react';
 
@@ -35,7 +36,7 @@ export default function BattlePassTrack() {
   }, [currentTier]);
 
   return (
-    <div className="border-3 border-neo-black rounded-neo shadow-hard bg-neo-cream overflow-hidden">
+    <NeoPanel tone="cream" className="overflow-hidden">
       {/* Header */}
       <div className="bg-linear-to-r from-neo-purple to-neo-pink p-4 border-b-3 border-neo-black">
         <div className="flex items-center justify-between">
@@ -141,6 +142,6 @@ export default function BattlePassTrack() {
           })}
         </div>
       </div>
-    </div>
+    </NeoPanel>
   );
 }

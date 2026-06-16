@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import { X, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NeoPanel } from '@/components/ui/panel';
 
 export interface WordHuntMPHeaderProps {
   score: number;
@@ -53,8 +54,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
 
       {/* Score Badge */}
       <div className="flex-1 flex justify-center">
-        <div className={cn(
-          'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-sm',
+        <NeoPanel tone="navy" shadow="sm" className={cn(
           compact ? 'px-2 py-0' : 'px-4 py-1.5 [@media(max-height:560px)]:px-2 [@media(max-height:560px)]:py-0',
         )}>
           <span className={cn(
@@ -63,7 +63,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
           )}>
             {score}
           </span>
-        </div>
+        </NeoPanel>
       </div>
 
       {/* Quit Button */}

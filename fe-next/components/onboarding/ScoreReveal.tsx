@@ -6,6 +6,7 @@ import { RotateCcw, ArrowRight, Sparkles, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { fireVictoryConfetti, fireFireworks } from '@/utils/confettiUtils';
+import { NeoPanel } from '@/components/ui/panel';
 
 // Generated once at module load — avoids impure Math.random calls during render
 const SPARKLE_COLORS = ['text-neo-lime', 'text-neo-pink', 'text-neo-cyan'] as const;
@@ -115,7 +116,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
         </m.div>
       ))}
 
-      <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-6 shadow-hard-lg text-center relative overflow-hidden">
+      <NeoPanel tone="cream" shadow="lg" className="p-6 text-center relative overflow-hidden">
         {/* Subtle radial glow behind score */}
         <div
           className="absolute inset-0 pointer-events-none opacity-30"
@@ -254,7 +255,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
             {t('onboarding.ftue.tryAgain')}
           </button>
         </div>
-      </div>
+      </NeoPanel>
     </m.div>
   );
 };

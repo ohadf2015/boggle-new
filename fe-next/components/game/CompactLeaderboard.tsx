@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
 import { fireConfetti, NEO_BRUTALIST_COLORS, NEO_BRUTALIST_SHAPES } from '@/utils/confettiUtils';
+import { NeoPanel } from '@/components/ui/panel';
 
 export interface CompactPlayer {
   username: string;
@@ -243,10 +244,14 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
   if (totalPlayers === 0 || !currentUser) return null;
 
   return (
-    <div className={cn(
-      'bg-neo-cream border-3 border-neo-black rounded-neo-lg shadow-hard overflow-hidden',
-      className
-    )}>
+    <NeoPanel
+      tone="cream"
+      radius="neo-lg"
+      className={cn(
+        'overflow-hidden',
+        className
+      )}
+    >
       {/* Header with Race Track theme */}
       <div className="bg-neo-navy text-neo-white px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
@@ -520,7 +525,7 @@ export const CompactLeaderboard = memo<CompactLeaderboardProps>(function Compact
           )}
         </div>
       </div>
-    </div>
+    </NeoPanel>
   );
 });
 

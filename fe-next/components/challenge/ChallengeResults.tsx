@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import { RotateCw, Home, Share2, TrendingUp, TrendingDown, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoPanel } from '@/components/ui/panel';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
@@ -151,17 +152,17 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
 
           {/* Score Comparison */}
           <div className="grid grid-cols-3 gap-3 mt-4">
-            <div className="text-center p-4 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+            <NeoPanel tone="navy" className="text-center p-4">
               <p className="text-[10px] font-black uppercase text-neo-white mb-1">{t('challengeResults.you')}</p>
               <p className="text-3xl font-black text-neo-cyan">{results.playerScore}</p>
-            </div>
+            </NeoPanel>
             <div className="flex items-center justify-center">
               <span className="bg-neo-yellow text-neo-black border-2 border-neo-black rounded-neo font-black px-3 py-1 shadow-hard-sm text-xs uppercase">VS</span>
             </div>
-            <div className="text-center p-4 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+            <NeoPanel tone="navy" className="text-center p-4">
               <p className="text-[10px] font-black uppercase text-neo-white mb-1">{challenge.creatorUsername}</p>
               <p className="text-3xl font-black text-neo-yellow">{challenge.creatorScore}</p>
-            </div>
+            </NeoPanel>
           </div>
 
           {/* Score Difference */}
@@ -186,14 +187,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
 
           {/* Stats Row */}
           <div className="grid grid-cols-2 gap-3 mt-3">
-            <div className="text-center p-3 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+            <NeoPanel tone="navy" className="text-center p-3">
               <p className="text-2xl font-black text-white">{results.playerWords.length}</p>
               <p className="text-[10px] font-black uppercase text-neo-white">{t('challengeResults.words')}</p>
-            </div>
-            <div className="text-center p-3 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+            </NeoPanel>
+            <NeoPanel tone="navy" className="text-center p-3">
               <p className="text-2xl font-black text-white">{Math.max(...results.playerWords.map(w => w.length), 0)}</p>
               <p className="text-[10px] font-black uppercase text-neo-white">{t('challengeResults.longest')}</p>
-            </div>
+            </NeoPanel>
           </div>
         </div>
 

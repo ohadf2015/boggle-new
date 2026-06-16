@@ -5,6 +5,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { FoundWord } from '@/shared/types/view';
 import type { TranslationFn } from '../types';
+import { NeoPanel } from '@/components/ui/panel';
 
 const ROTATE_STYLE = { transform: 'rotate(1deg)' } as const;
 
@@ -44,7 +45,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
   // Compact view for mobile (horizontal wrap)
   if (compact) {
     return (
-      <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-1.5 md:p-2">
+      <NeoPanel tone="cream" className="text-neo-black p-1.5 md:p-2">
         <div className="flex items-center justify-between mb-1 px-0.5">
           <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
             {t('hostView.words')}
@@ -87,7 +88,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
             </div>
           )}
         </div>
-      </div>
+      </NeoPanel>
     );
   }
 

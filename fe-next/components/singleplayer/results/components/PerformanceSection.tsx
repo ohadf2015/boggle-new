@@ -9,6 +9,7 @@
 
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
+import { NeoPanel } from '@/components/ui/panel';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import type { PlayerInsights as PlayerInsightsType } from '@/utils/gameInsights';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
@@ -22,7 +23,7 @@ interface PerformanceSectionProps {
 
 export function PerformanceSection({ insights, title, archetype }: PerformanceSectionProps): React.ReactElement {
   return (
-    <div className="bg-neo-navy border-3 border-neo-black rounded-neo p-3 shadow-hard">
+    <NeoPanel tone="navy" className="p-3">
       <div className="flex items-center gap-2 mb-2">
         <BarChart3 className="w-4 h-4 text-neo-cyan" />
         <h3 className="text-sm font-black uppercase text-white">{title}</h3>
@@ -41,6 +42,6 @@ export function PerformanceSection({ insights, title, archetype }: PerformanceSe
           </div>
         </div>
       )}
-    </div>
+    </NeoPanel>
   );
 }

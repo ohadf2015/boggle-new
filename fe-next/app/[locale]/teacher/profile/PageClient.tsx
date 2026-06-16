@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { NeoPanel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
 import { GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
 
@@ -62,7 +63,7 @@ function TeacherProfileInner() {
       <div className="w-full max-w-3xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-1">
 
         {/* Profile Header */}
-        <div className="mb-8 p-6 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard">
+        <NeoPanel tone="cream" className="mb-8 p-6">
           <div className="flex items-center gap-4">
             {/* Avatar */}
             <div className="w-20 h-20 rounded-neo bg-neo-cyan border-3 border-neo-black shadow-hard-sm flex items-center justify-center shrink-0">
@@ -86,23 +87,23 @@ function TeacherProfileInner() {
               </div>
             </div>
           </div>
-        </div>
+        </NeoPanel>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {classroomsLoading ? (
             <>
               {['a', 'b', 'c'].map((id) => (
-                <div key={`skeleton-${id}`} className="p-5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard animate-pulse">
+                <NeoPanel key={`skeleton-${id}`} tone="cream" className="p-5 animate-pulse">
                   <div className="h-4 w-24 bg-neo-black/10 rounded mb-3" />
                   <div className="h-9 w-16 bg-neo-black/20 rounded" />
-                </div>
+                </NeoPanel>
               ))}
             </>
           ) : (
             <>
               {/* Classroom count */}
-              <div className="p-5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard">
+              <NeoPanel tone="cream" className="p-5">
                 <div className="flex items-center gap-2 mb-2 text-neo-black/60 font-bold text-sm uppercase">
                   <BookOpen className="w-4 h-4" />
                   <span>{t('teacher.profile.classrooms')}</span>
@@ -113,10 +114,10 @@ function TeacherProfileInner() {
                 >
                   {classrooms.length}
                 </div>
-              </div>
+              </NeoPanel>
 
               {/* Student count */}
-              <div className="p-5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard">
+              <NeoPanel tone="cream" className="p-5">
                 <div className="flex items-center gap-2 mb-2 text-neo-black/60 font-bold text-sm uppercase">
                   <Users className="w-4 h-4" />
                   <span>{t('teacher.profile.totalStudents')}</span>
@@ -127,10 +128,10 @@ function TeacherProfileInner() {
                 >
                   {totalStudents}
                 </div>
-              </div>
+              </NeoPanel>
 
               {/* Role status */}
-              <div className="p-5 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard">
+              <NeoPanel tone="cream" className="p-5">
                 <div className="flex items-center gap-2 mb-2 text-neo-black/60 font-bold text-sm uppercase">
                   <ShieldCheck className="w-4 h-4" />
                   <span>{t('teacher.profile.roleStatus')}</span>
@@ -141,12 +142,12 @@ function TeacherProfileInner() {
                 >
                   {userRole}
                 </div>
-              </div>
+              </NeoPanel>
             </>
           )}
         </div>
 
-        {/* Contact Admin Section */}
+        {/* Contact Admin Section - SKIPPED: neo-lime is not a standard NeoPanel tone */}
         <div
           data-testid="contact-admin-section"
           className="p-6 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard mb-8"

@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ChevronRight, Grid3X3 } from 'lucide-react';
+import { NeoPanel } from '@/components/ui/panel';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface NextLevelPreviewProps {
@@ -42,7 +43,7 @@ export function NextLevelPreview({
           data-testid="next-level-preview"
           className="fixed bottom-[calc(1.5rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-40 w-[90%] max-w-sm"
         >
-          <div className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4">
+          <NeoPanel tone="navy" className="p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-neo-display font-bold text-lg text-neo-yellow">
                 {t('adventure.nextLevel')} {nextLevel}
@@ -84,7 +85,7 @@ export function NextLevelPreview({
                 )}
               </AdaptiveAnimatePresence>
             </div>
-          </div>
+          </NeoPanel>
         </AdaptiveMotion.div>
       )}
     </AdaptiveAnimatePresence>

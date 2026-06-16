@@ -3,6 +3,7 @@
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRankedTier } from '@/hooks/useRankedTier';
+import { NeoPanel } from '@/components/ui/panel';
 import { Trophy, ChevronUp } from 'lucide-react';
 
 interface RankedTierBadgeProps {
@@ -30,7 +31,7 @@ export default function RankedTierBadge({ compact, overrideElo }: RankedTierBadg
   }
 
   return (
-    <div className="border-3 border-neo-black rounded-neo shadow-hard bg-neo-cream p-4 space-y-3">
+    <NeoPanel tone="cream" className="p-4 space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -80,6 +81,6 @@ export default function RankedTierBadge({ compact, overrideElo }: RankedTierBadg
           </p>
         )}
       </div>
-    </div>
+    </NeoPanel>
   );
 }

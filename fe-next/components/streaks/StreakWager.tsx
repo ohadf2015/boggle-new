@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { AlertTriangle, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NeoPanel } from '@/components/ui/panel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { calculateWagerPayout, getMaxWager } from '@/shared/utils/wagerCalculator';
 
@@ -26,12 +27,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
   const potentialPayout = calculateWagerPayout(selectedAmount, true);
 
   return (
-    <div
-      className={cn(
-        'bg-neo-navy border-3 border-neo-black rounded-neo p-5',
-        'shadow-hard max-w-sm mx-auto'
-      )}
-    >
+    <NeoPanel tone="navy" className={cn('p-5 max-w-sm mx-auto')}>
       <div className="flex items-center gap-2 mb-3">
         <Coins className="w-6 h-6 text-neo-yellow" />
         <h3 className="text-lg font-black text-neo-white">
@@ -110,7 +106,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
           {t('streaks.wager.confirm')}
         </button>
       </div>
-    </div>
+    </NeoPanel>
   );
 }
 

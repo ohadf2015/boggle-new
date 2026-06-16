@@ -3,6 +3,7 @@
 import { memo, useState, useCallback, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { HelpCircle, X } from 'lucide-react';
+import { NeoPanel } from '@/components/ui/panel';
 
 interface ScoreBreakdownTooltipProps {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -80,7 +81,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
               className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 min-w-[180px]"
             >
-              <div className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg p-3 relative">
+              <NeoPanel tone="cream" shadow="lg" className="p-3 relative">
                 {/* Close button */}
                 <button
                   onClick={closeTooltip}
@@ -119,7 +120,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
 
                 {/* Arrow pointer */}
                 <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-neo-cream border-l-3 border-t-3 border-neo-black rotate-45" />
-              </div>
+              </NeoPanel>
             </m.div>
           </>
         )}

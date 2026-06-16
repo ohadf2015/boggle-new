@@ -8,6 +8,7 @@
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
 import type { WordHuntStats } from './types';
+import { NeoPanel } from '@/components/ui/panel';
 
 export interface DesktopStatsCardProps {
   stats: WordHuntStats | null;
@@ -15,7 +16,7 @@ export interface DesktopStatsCardProps {
 }
 
 export const DesktopStatsCard: React.FC<DesktopStatsCardProps> = ({ stats, t }) => (
-  <div className="bg-neo-navy border-3 border-neo-black rounded-neo p-4 shadow-hard">
+  <NeoPanel tone="navy" shadow="md" className="p-4">
     <h3 className="text-sm font-black uppercase text-white mb-3 flex items-center gap-2">
       <BarChart3 className="w-4 h-4 text-neo-cyan" />
       {t('wordHunt.stats.title')}
@@ -42,7 +43,7 @@ export const DesktopStatsCard: React.FC<DesktopStatsCardProps> = ({ stats, t }) 
     ) : (
       <div className="text-white text-sm">{t('common.loading')}</div>
     )}
-  </div>
+  </NeoPanel>
 );
 
 export default DesktopStatsCard;
