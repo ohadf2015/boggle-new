@@ -42,15 +42,17 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
     const google = (window as unknown as { google?: GoogleIdServices }).google;
     if (!google?.accounts?.id) return;
 
-    // Render near the GSI max so the snug frame is a comfortable size; the frame
-    // hugs whatever GSI produces (the personalized "Continue as" form is narrower).
-    const w = width ?? GSI_MAX_WIDTH;
-
     await ensureGoogleIdInitialized(google, clientId);
     renderedRef.current = true;
     // 'outline' = white button (white bg, dark text). The colored "G" can't be
     // recolored — Google's branding rules forbid a monochrome logo, so a black G
     // is impossible. White button inside our black frame = neo-brutalist look.
+    //
+    // No forced width by default: a width wider than the content makes GSI float
+    // the logo+text off-center (it drifts to the "end", glaringly so with RTL
+    // locales). Auto-sizing keeps the button snug to its content so the content
+    // stays centered; the full-width white frame below supplies the full-width
+    // look. An explicit `width` prop still wins for callers that need a fixed size.
     google.accounts.id.renderButton(containerRef.current, {
       type: 'standard',
       theme: 'outline',
@@ -58,7 +60,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
       shape: 'rectangular',
       text: 'continue_with',
       logo_alignment: 'center',
-      width: w,
+      ...(width != null ? { width: Math.min(width, GSI_MAX_WIDTH) } : {}),
     });
   }, [clientId, width]);
 
@@ -73,13 +75,16 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
   return (
     <div ref={wrapperRef} className={cn('flex justify-center', className)}>
       <Script id="google-gsi-client" src={GSI_SRC} strategy="afterInteractive" onReady={() => void renderButton()} />
-      {/* Neo-brutalist frame hugging the (visible, clickable) Google button — hard
-          black border + hard shadow, corners clipped to rounded-neo. w-fit so it
-          wraps the button snugly (GSI caps width at 400 and the personalized
-          "Continue as" form is narrower, so a full-width frame would leave gaps). */}
+      {/* Neo-brutalist frame around the (visible, clickable) Google button — hard
+          black border + hard shadow, corners clipped to rounded-neo. Full width +
+          white bg + centered: GSI renders a snug, content-sized white button, and
+          the white frame bg blends with it so the control reads as one full-width
+          button (matching the Discord/email buttons) with perfectly centered
+          content — instead of a fixed-width button with the logo+text drifting to
+          one end. */}
       <div
         data-testid="gsi-frame"
-        className="inline-flex w-fit overflow-hidden rounded-neo border-2 border-neo-black shadow-hard"
+        className="flex w-full justify-center overflow-hidden rounded-neo border-2 border-neo-black bg-white shadow-hard"
       >
         <div ref={containerRef} data-testid="gsi-button-container" />
       </div>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 const mockIsNative = vi.fn(() => false);
 vi.mock('@/utils/platform', () => ({
@@ -14,14 +14,31 @@ vi.mock('next/script', () => ({
   default: (props: { src?: string }) => <div data-testid="gsi-script" data-src={props.src} />,
 }));
 
+vi.mock('@/lib/auth/googleOneTap', () => ({
+  ensureGoogleIdInitialized: vi.fn().mockResolvedValue(undefined),
+}));
+
 import GoogleSignInButton from '../GoogleSignInButton';
+
+/** Install a spyable window.google so the render effect actually calls renderButton. */
+function stubGoogleId() {
+  const renderButton = vi.fn();
+  (window as unknown as { google: unknown }).google = {
+    accounts: { id: { renderButton } },
+  };
+  return renderButton;
+}
 
 describe('GoogleSignInButton', () => {
   beforeEach(() => {
     mockIsNative.mockReturnValue(false);
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid-123.apps.googleusercontent.com');
   });
-  afterEach(() => vi.unstubAllEnvs());
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    delete (window as unknown as { google?: unknown }).google;
+    vi.clearAllMocks();
+  });
 
   it('renders a button container + the GIS script on web when configured', () => {
     render(<GoogleSignInButton />);
@@ -36,6 +53,35 @@ describe('GoogleSignInButton', () => {
     const frame = screen.getByTestId('gsi-frame');
     expect(frame.className).toMatch(/border-neo-black/);
     expect(frame.className).toMatch(/shadow-hard/);
+  });
+
+  it('renders a full-width white frame so the snug button reads as full-width like the other providers', () => {
+    render(<GoogleSignInButton />);
+    const frame = screen.getByTestId('gsi-frame');
+    // Full-width + white bg: the auto-sized (snug) GSI button is centered inside,
+    // and the white frame bg blends with the white button → one full-width control.
+    expect(frame.className).toMatch(/w-full/);
+    expect(frame.className).toMatch(/justify-center/);
+    expect(frame.className).toMatch(/bg-white/);
+  });
+
+  it('renders the Google button auto-sized (no forced width) so its content stays centered', async () => {
+    const renderButton = stubGoogleId();
+    render(<GoogleSignInButton />);
+    await waitFor(() => expect(renderButton).toHaveBeenCalled());
+    const opts = renderButton.mock.calls[0][1] as Record<string, unknown>;
+    // A forced width wider than the content makes GSL float the logo+text off-center
+    // (drifts to the "end" in RTL). Omitting width lets GSI size to content.
+    expect(opts.width).toBeUndefined();
+    expect(opts.logo_alignment).toBe('center');
+  });
+
+  it('still honors an explicit width prop when a caller forces one', async () => {
+    const renderButton = stubGoogleId();
+    render(<GoogleSignInButton width={260} />);
+    await waitFor(() => expect(renderButton).toHaveBeenCalled());
+    const opts = renderButton.mock.calls[0][1] as Record<string, unknown>;
+    expect(opts.width).toBe(260);
   });
 
   it('renders nothing on the native platform (native uses the SDK)', () => {
