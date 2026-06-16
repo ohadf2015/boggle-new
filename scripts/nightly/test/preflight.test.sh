@@ -254,7 +254,11 @@ assert "  …doc is now TRACKED on origin/master"           '(cd "$REPO" && git 
 rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
 
 echo
-echo "stranded NON-docs pending ref → left for manual review (never auto-reshipped)"
+echo "stranded NON-docs pending ref → archived to recover/ branch + dropped (autonomous, no human)"
+# OLD behavior left the ref intact "for manual review" — which re-flagged the SAME
+# ref every night (06-07 + 06-13 strand-flagged 4 nights, 2026-06-16). The loop must
+# be HEALTHY with zero human action: preserve the code on a recover/ branch (never
+# lost) and DROP the ref (never re-flagged). Not auto-reshipped (stale vs moved master).
 ( cd "$REPO"
   git checkout -q -b _pending2 origin/master
   echo "rogue code" > rogue.ts
@@ -262,11 +266,47 @@ echo "stranded NON-docs pending ref → left for manual review (never auto-reshi
   git -c user.email=t@t -c user.name=t commit -qm "feat: un-re-gated code strand"
   git update-ref refs/nightly-pending/2099-11-30 HEAD
   git checkout -q master; git branch -qD _pending2 )
+PENDING_SHA=$(cd "$REPO" && git rev-parse refs/nightly-pending/2099-11-30)
 OUTH=$(preflight_check 2>&1); rcH=$?
-assert "non-docs strand does NOT abort the run (return 0)"  "[ $rcH -eq 0 ]"
-assert "  …WARNs it touches non-docs paths"                 'printf "%s" "$OUTH" | grep -q "touches non-docs paths"'
-assert "  …leaves the pending ref intact for manual fix"    '(cd "$REPO" && git show-ref --verify --quiet refs/nightly-pending/2099-11-30)'
-( cd "$REPO"; git update-ref -d refs/nightly-pending/2099-11-30 2>/dev/null || true )
+assert "non-docs strand does NOT abort the run (return 0)"     "[ $rcH -eq 0 ]"
+assert "  …logs it touches non-docs paths"                     'printf "%s" "$OUTH" | grep -q "touches non-docs paths"'
+assert "  …logs the archive (no action required)"              'printf "%s" "$OUTH" | grep -q "archived to recover/nightly-code-2099-11-30"'
+assert "  …DROPS the pending ref (never re-flags)"             '! (cd "$REPO" && git show-ref --verify --quiet refs/nightly-pending/2099-11-30)'
+assert "  …preserves the SHA on recover/ branch (never lost)"  '[ "$(cd "$REPO" && git rev-parse recover/nightly-code-2099-11-30 2>/dev/null)" = "$PENDING_SHA" ]'
+( cd "$REPO"; git branch -qD recover/nightly-code-2099-11-30 2>/dev/null || true )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+
+echo
+echo "content-superseded docs strand → dropped without cherry-pick conflict (06-13 case)"
+# A strand whose UNIQUE per-day artifact already landed byte-identical on origin (under
+# a different, manual-recovery sha) while the cumulative logs it also touched have since
+# ADVANCED on origin. is-ancestor is false (different sha), and a cherry-pick would
+# CONFLICT on the advanced cumulative log. Supersession-by-content must DROP it cleanly.
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; git reset --hard origin/master -q; git fetch -q origin master )
+( cd "$REPO"
+  # Strand: a per-day artifact + a cumulative log, built on current origin/master.
+  git checkout -q -b _pending3 origin/master
+  mkdir -p docs/nightly/artifacts docs/nightly
+  echo "lane-01 output 2099-10-10" > docs/nightly/artifacts/lane-01-2099-10-10.md
+  echo "strand-era learnings" > docs/nightly/learnings.md
+  git add docs/
+  git -c user.email=t@t -c user.name=t commit -qm "docs(nightly): strand 2099-10-10"
+  git update-ref refs/nightly-pending/2099-10-10 HEAD
+  git checkout -q master; git branch -qD _pending3
+  # Origin independently lands the SAME artifact (byte-identical) + ADVANCES the
+  # cumulative log to newer content — exactly the manual-recovery + later-run shape.
+  mkdir -p docs/nightly/artifacts docs/nightly
+  echo "lane-01 output 2099-10-10" > docs/nightly/artifacts/lane-01-2099-10-10.md
+  echo "NEWER learnings from a later run" > docs/nightly/learnings.md
+  git add docs/
+  git -c user.email=t@t -c user.name=t commit -qm "docs(nightly): later run advances learnings"
+  git push -q origin master )
+OUTI=$(preflight_check 2>&1); rcI=$?
+assert "superseded docs strand → return 0 (no abort)"          "[ $rcI -eq 0 ]"
+assert "  …logs content-superseded drop"                       'printf "%s" "$OUTI" | grep -q "content-superseded"'
+assert "  …DROPS the ref (no cherry-pick conflict, no revert)" '! (cd "$REPO" && git show-ref --verify --quiet refs/nightly-pending/2099-10-10)'
+assert "  …did NOT revert origin learnings to strand content"  '[ "$(cd "$REPO" && git show origin/master:docs/nightly/learnings.md)" = "NEWER learnings from a later run" ]'
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
 rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
 
 rm -rf "$ROOT"

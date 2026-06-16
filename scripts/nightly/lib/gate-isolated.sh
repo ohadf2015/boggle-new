@@ -34,7 +34,25 @@ NIGHTLY_GATE_ENV_FILES=(
 # ../dist via the compiled bridge (backend/utils/socketValidation.ts), and a fresh
 # worktree has no dist/ yet (this reverted every code lane on 2026-05-26).
 _gate_npm_chain() {
-  local skip_lint="${1:-0}" build_only="${2:-0}" chain=""
+  local skip_lint="${1:-0}" build_only="${2:-0}" typecheck_only="${3:-0}" chain=""
+  # typecheck_only=1 → the CONCLUSIVE timeout tier: build:schemas + standalone
+  # `tsc --noEmit` + test:changed. WHY this exists (2026-06-16): `next build`'s OWN
+  # internal "Running TypeScript" phase wedges silently >900s in a fresh worktree —
+  # 18x+ slower than a standalone `tsc --noEmit`, which type-checks the SAME project
+  # in ~54s (measured: cold, CoW node_modules, no .tsbuildinfo). So when BOTH the full
+  # gate and the build-only re-gate wedge in that phase, the old code dropped ALL the
+  # night's code (the 06-12/13/16 docs-only salvages). This tier gives the verdict
+  # those wedges never produced, FAST and unwedgeable:
+  #   • tsc --noEmit  → the type/import verdict next-build's TS phase hangs on, in 54s.
+  #   • test:changed  → vitest --changed (both projects); in the worktree the authored
+  #     files are uncommitted-vs-HEAD, so this runs EXACTLY the lane-affected tests —
+  #     lane-attributed, fast, and it streams progress so it can't trip the idle kill.
+  # build:schemas first: the dist bridge (backend/utils/socketValidation.ts) that
+  # test:changed's backend suites import has no dist/ in a fresh worktree.
+  if [ "$typecheck_only" = "1" ]; then
+    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit && npm run test:changed"
+    return 0
+  fi
   # build_only=1 → skip lint AND test, run ONLY build:schemas + build:fast. Used by
   # the baseline-aware ship path: when every failing test already fails on clean
   # master (red baseline), `test` short-circuited so the authored set's BUILD was
@@ -108,12 +126,32 @@ nightly_gate_timeout_route() {
   esac
 }
 
+# nightly_gate_typecheck_route <typecheck_rc> → ship | peel | docs-only
+# Pure decision for the CONCLUSIVE typecheck tier (build:schemas + tsc --noEmit +
+# test:changed) that runs ONLY when BOTH the full gate and the build-only re-gate
+# wedged (rc=3 twice) — i.e. next-build's silent TS phase hung but a standalone
+# tsc + lane-scoped tests can still give a verdict in ~1 min:
+#   tc rc=0 → ship       (authored set type-checks + its affected tests pass; the
+#                         full next-build/full-suite stayed unverified → loud alert)
+#   tc rc=1 → peel       (a REAL type error or a lane-broken test; output now names
+#                         the offender → hand to the drop-and-re-gate peel loop)
+#   tc rc=3 → docs-only  (even the 54s tsc tier wedged — should never happen; keep
+#                         the conservative last resort)
+# Same shape as nightly_gate_timeout_route; pulled out so the routing is unit-locked.
+nightly_gate_typecheck_route() {
+  case "${1:-}" in
+    0) printf 'ship\n' ;;
+    1) printf 'peel\n' ;;
+    *) printf 'docs-only\n' ;;
+  esac
+}
+
 # run_isolated_gate <authored_list_file> [skip_lint=0] [baseline=0]
 # baseline=1 gates a CLEAN HEAD checkout with NO authored files applied (the
 # authored list is ignored / may be empty) — used by run_baseline_gate to learn
 # whether master ITSELF is red independent of any lane code.
 run_isolated_gate() {
-  local authored="$1" skip_lint="${2:-0}" baseline="${3:-0}" build_only="${4:-0}"
+  local authored="$1" skip_lint="${2:-0}" baseline="${3:-0}" build_only="${4:-0}" typecheck_only="${5:-0}"
   if [ "$baseline" != "1" ]; then
     [ -n "$authored" ] && [ -s "$authored" ] || { log "isolated-gate: empty authored list — nothing to gate"; return 0; }
   fi
@@ -162,7 +200,7 @@ run_isolated_gate() {
   done
 
   [ "$_skipped_ignored" -gt 0 ] && log "isolated-gate: skipped $_skipped_ignored gitignored path(s) (build artifacts — never gated/shipped)"
-  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')$([ "$build_only" = "1" ] && printf ' [build-only — verifying authored set builds despite red test baseline]')"
+  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')$([ "$build_only" = "1" ] && printf ' [build-only — verifying authored set builds despite red test baseline]')$([ "$typecheck_only" = "1" ] && printf ' [typecheck tier — tsc --noEmit + test:changed; conclusive verdict after a next-build TS wedge]')"
   # Capture the gate's combined output to a file the caller can parse (the
   # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
   # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
@@ -200,7 +238,7 @@ run_isolated_gate() {
     # worktree has no dist/ yet, so 12 handler-test suites fail with "Cannot find
     # module" — that's what reverted every CODE lane on 2026-05-26. Cheap (~3s
     # tsc), then build:fast (next build), then the full test suite last.
-    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only")"
+    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only" "$typecheck_only")"
     run_with_idle_timeout "$_gidle" "$_gmax" "$NIGHTLY_LAST_GATE_OUTPUT" -- \
       bash -c "$_body" _ "$wt" || rc=$?
   fi

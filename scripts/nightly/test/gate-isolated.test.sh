@@ -191,6 +191,30 @@ assert "build-only chain DROPS test"            "[[ \"$CHAIN_BUILD\" != *'npm ru
 assert "build-only chain keeps build:schemas"   "[[ \"$CHAIN_BUILD\" == *'build:schemas'* ]]"
 assert "build-only chain keeps build:fast"      "[[ \"$CHAIN_BUILD\" == *'build:fast'* ]]"
 
+# typecheck_only=1 (3rd arg) → the CONCLUSIVE timeout tier: build:schemas + standalone
+# `tsc --noEmit` + test:changed. Exists because next-build's OWN silent TS phase wedges
+# >900s in a fresh worktree while a standalone tsc type-checks the same project in ~54s
+# (2026-06-16). It must NOT run next build (build:fast) — that is the thing that hangs —
+# and NOT the full `npm run test` (the other wedge), only the fast lane-scoped checks.
+CHAIN_TC=$(_gate_npm_chain 0 0 1)
+assert "typecheck chain is exactly schemas → tsc --noEmit → test:changed" \
+  "[[ \"\$CHAIN_TC\" == 'npm run build:schemas && npx --no-install tsc --noEmit && npm run test:changed' ]]"
+assert "typecheck chain runs standalone tsc --noEmit"           "[[ \"$CHAIN_TC\" == *'tsc --noEmit'* ]]"
+assert "typecheck chain runs test:changed (lane-scoped)"        "[[ \"$CHAIN_TC\" == *'npm run test:changed'* ]]"
+assert "typecheck chain does NOT run next build (the wedge)"    "[[ \"$CHAIN_TC\" != *'build:fast'* ]]"
+assert "typecheck chain does NOT run lint"                      "[[ \"$CHAIN_TC\" != *'npm run lint'* ]]"
+assert "build:schemas precedes tsc (dist bridge)"               "[[ \"$CHAIN_TC\" == *'build:schemas'*'tsc --noEmit'* ]]"
+assert "tsc precedes test:changed"                              "[[ \"$CHAIN_TC\" == *'tsc --noEmit'*'test:changed'* ]]"
+
+echo "── gate-isolated: nightly_gate_typecheck_route (conclusive tier verdict) ──"
+# After BOTH the full gate and the build-only re-gate wedge, the standalone typecheck
+# tier runs and its rc routes the decision: 0=ship (type-clean + affected tests green),
+# 1=peel (real type/test break, output now parseable), anything else=docs-only.
+assert "typecheck tier rc=0 → ship"        "[ \"\$(nightly_gate_typecheck_route 0)\" = ship ]"
+assert "typecheck tier rc=1 → peel"        "[ \"\$(nightly_gate_typecheck_route 1)\" = peel ]"
+assert "typecheck tier rc=3 → docs-only"   "[ \"\$(nightly_gate_typecheck_route 3)\" = docs-only ]"
+assert "typecheck tier rc=empty → docs-only (safe default)" "[ \"\$(nightly_gate_typecheck_route)\" = docs-only ]"
+
 echo "── gate-isolated: nightly_baseline_ship_decision (baseline-aware verdict) ──"
 _AF=$(mktemp); _BF=$(mktemp); _ALLOW=$(mktemp)
 # Baseline gate PASSED (rc=0) → clean HEAD is green → lanes at fault → fallthrough.

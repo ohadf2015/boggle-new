@@ -11,19 +11,29 @@ LAST_RUN_FILE="${LAST_RUN_FILE:-$HOME/.cache/lexi-nightly/last-run}"
 PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 
 # --- stranded pending-ref recovery -------------------------------------
-# git-ship saves a docs-only nightly commit to refs/nightly-pending/$DATE and
-# resets master to origin/master when a push fails (the 2026-05-29 cause: the
-# pre-push hook's `tsc --noEmit` tripped on an UNRELATED pre-existing error — a
-# stale .next validator referencing a founder-WIP page that never existed). The
-# strand mechanism worked, but the ref then sat forever — "resolve manually"
-# never happened. Recover automatically on every run: for each DOCS-ONLY pending
-# ref, cherry-pick it onto the LATEST origin/master in a throwaway worktree
-# (isolated from the founder's dirty tree, robust even when origin advanced
-# since the strand), and push. Non-docs strands are left for manual review — we
-# never auto-reship code we can't re-gate. --no-verify is safe here: the commit
-# was already gate-vetted when first created, and it is docs-only.
+# git-ship saves a nightly commit to refs/nightly-pending/$DATE and resets master
+# to origin/master when a push fails (the 2026-05-29 cause: the pre-push hook's
+# `tsc --noEmit` tripped on an UNRELATED pre-existing error). The strand mechanism
+# worked, but the ref then sat FOREVER — the old "resolve manually" path never
+# happened (the 06-07 + 06-13 refs strand-flagged 4 nights running, 2026-06-16).
+# The loop must be HEALTHY with ZERO human action. So every run disposes EVERY
+# stranded ref by DATA, never leaving one to re-flag:
+#   1. is-ancestor on origin            → drop (already landed under this SHA).
+#   2. per-day artifacts already on origin (byte-identical) → drop. A strand whose
+#      unique outputs landed under a DIFFERENT sha (a manual recovery commit) is
+#      NOT an ancestor, and its cumulative logs (learnings/triage/perf-baseline)
+#      have since been ADVANCED by later runs — cherry-picking would CONFLICT and
+#      REVERT them. Supersession-by-content drops it cleanly (the 06-13 case).
+#   3. docs-only, not superseded        → cherry-pick onto LATEST origin/master in
+#      a throwaway worktree (robust even when origin advanced) and push.
+#   4. touches non-docs (code)          → ARCHIVE to recover/nightly-code-$DATE so
+#      the SHA is never lost, then drop the ref. We never auto-reship stale code
+#      onto a moved master (unsafe — a human edited around it), but we never strand
+#      it forever either. The branch is an informational handle, not a to-do.
+# --no-verify is safe in the docs cherry-pick: the commit was gate-vetted when
+# first created, and it is docs-only.
 recover_stranded_pending_refs() {
-  local refs pref psha base non_docs wtbase wt
+  local refs pref psha base non_docs wtbase wt date_tag arts superseded a
   refs=$(git for-each-ref refs/nightly-pending/ --format='%(refname)' 2>/dev/null)
   [ -z "$refs" ] && return 0
   git fetch origin master --quiet 2>/dev/null \
@@ -31,6 +41,7 @@ recover_stranded_pending_refs() {
   while IFS= read -r pref; do
     [ -z "$pref" ] && continue
     psha=$(git rev-parse "$pref" 2>/dev/null) || continue
+    date_tag="${pref##*/}"   # refs/nightly-pending/2026-06-13 → 2026-06-13
     # Already on origin (a prior run or a human pushed it)? Just drop the ref.
     if git merge-base --is-ancestor "$psha" origin/master 2>/dev/null; then
       echo "preflight: pending ref $pref already on origin/master — dropping"
@@ -38,10 +49,41 @@ recover_stranded_pending_refs() {
       continue
     fi
     base=$(git merge-base "$psha" origin/master 2>/dev/null) || continue
+    # Content-supersession: a strand's UNIQUE per-day artifacts are new-file-per-day
+    # (reports/artifacts/ideas/seo-daily/loop-improvements) — NOT the cumulative logs
+    # (learnings.md, triage-queue.md, perf-baseline.json, dictionary-improvement-report.md)
+    # that every run rewrites. If every per-day artifact in the strand is already
+    # byte-identical on origin, this day's output landed (under a manual-recovery sha);
+    # the only "unrecovered" diff is stale cumulative logs that newer runs advanced past
+    # — so cherry-pick would CONFLICT and REVERT them. Drop instead. (06-13, 2026-06-16.)
+    arts=$(git diff --name-only "$base" "$psha" 2>/dev/null \
+      | grep -E '^docs/(nightly/(reports|artifacts|ideas|loop-improvements)|seo-daily)/' || true)
+    if [ -n "$arts" ]; then
+      superseded=1
+      while IFS= read -r a; do
+        [ -z "$a" ] && continue
+        if [ "$(git rev-parse "$psha:$a" 2>/dev/null)" != "$(git rev-parse "origin/master:$a" 2>/dev/null)" ]; then
+          superseded=0; break
+        fi
+      done <<< "$arts"
+      if [ "$superseded" = 1 ]; then
+        echo "preflight: pending ref $pref — all per-day artifacts already on origin/master (content-superseded) — dropping"
+        git update-ref -d "$pref" 2>/dev/null || true
+        continue
+      fi
+    fi
     non_docs=$(git diff --name-only "$base" "$psha" 2>/dev/null | grep -vE '^docs/' || true)
     if [ -n "$non_docs" ]; then
-      echo "preflight: WARN — stranded $pref touches non-docs paths; leaving for manual recovery:"
+      # Autonomous code-strand disposition (was: "leaving for manual recovery", which
+      # re-flagged the same ref every night). Preserve the SHA on a recover/ branch so
+      # it is never lost, then drop the ref so the loop is never blocked or re-flagged.
+      # We do NOT auto-reship: the code is stale relative to a moved master and a human
+      # may have edited around it; re-shipping unverified is unsafe. The branch is an
+      # informational handle (revive with `git cherry-pick`), NOT an action item.
+      git branch -f "recover/nightly-code-$date_tag" "$psha" 2>/dev/null || true
+      echo "preflight: stranded $pref touches non-docs paths — archived to recover/nightly-code-$date_tag and dropped (no action required):"
       echo "$non_docs" | sed 's/^/    /'
+      git update-ref -d "$pref" 2>/dev/null || true
       continue
     fi
     # `git worktree add` needs a non-existent leaf path, so nest under mktemp's dir.
