@@ -5,7 +5,7 @@
  * game log. The emit helper itself is tested in lib/crossword/__tests__.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { buildSeedPuzzle } from '@/lib/crossword/puzzles/index';
 import type { SeedPuzzle } from '@/lib/crossword/puzzles/seed';
 import { saveProgress, emptyProgress } from '@/lib/crossword/progress';
@@ -53,5 +53,28 @@ describe('useCrosswordGame — completion analytics wiring', () => {
   it('does NOT fire while the puzzle is still unsolved', () => {
     renderHook(() => useCrosswordGame(puzzle));
     expect(emitCrosswordGameEnd).not.toHaveBeenCalled();
+  });
+
+  it('fires onWordSolved once when a word becomes fully correct by typing', () => {
+    const onWordSolved = vi.fn();
+    const { result } = renderHook(() => useCrosswordGame(puzzle, { onWordSolved }));
+    act(() => {
+      result.current.inputLetter('b');
+      result.current.inputLetter('i');
+      result.current.inputLetter('r');
+      result.current.inputLetter('d'); // completes 1-across "bird"
+    });
+    expect(onWordSolved).toHaveBeenCalledTimes(1);
+  });
+
+  it('does NOT fire onWordSolved for a partially-typed or wrong word', () => {
+    const onWordSolved = vi.fn();
+    const { result } = renderHook(() => useCrosswordGame(puzzle, { onWordSolved }));
+    act(() => {
+      result.current.inputLetter('b');
+      result.current.inputLetter('i');
+      result.current.inputLetter('x'); // wrong — word never completes correctly
+    });
+    expect(onWordSolved).not.toHaveBeenCalled();
   });
 });

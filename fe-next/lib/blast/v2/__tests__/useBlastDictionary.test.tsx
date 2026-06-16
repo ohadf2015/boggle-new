@@ -170,4 +170,26 @@ describe('useBlastDictionary', () => {
     renderHook(() => useBlastDictionary('he'));
     expect(prewarmMock).toHaveBeenCalledWith('he');
   });
+
+  describe('checkSync', () => {
+    it('returns true synchronously for a word in the warmed offline dict', () => {
+      memHit.current = true;
+      const { result } = renderHook(() => useBlastDictionary('en'));
+      expect(result.current.checkSync('hello')).toBe(true);
+    });
+
+    it('returns false when the dict is cold (null) or the word is missing', () => {
+      memHit.current = null;
+      const { result } = renderHook(() => useBlastDictionary('en'));
+      expect(result.current.checkSync('hello')).toBe(false);
+      memHit.current = false;
+      expect(result.current.checkSync('zzqqx')).toBe(false);
+    });
+
+    it('returns false for empty input', () => {
+      memHit.current = true;
+      const { result } = renderHook(() => useBlastDictionary('en'));
+      expect(result.current.checkSync('')).toBe(false);
+    });
+  });
 });

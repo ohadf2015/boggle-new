@@ -85,5 +85,19 @@ export function useBlastDictionary(locale: Locale) {
     [locale, config],
   );
 
-  return { verify };
+  // Synchronous predicate for the engine's inline bonus-word check. A warmed
+  // offline-dict hit validates the bonus word INSTANTLY — no async round-trip,
+  // no "reject then retroactively credit" flicker. Cold/miss returns false and
+  // the async `verify` path still covers community words + cache warm-up.
+  const checkSync = useCallback(
+    (word: string): boolean => {
+      if (!word) return false;
+      const norm = config.normalize(word);
+      if (!norm) return false;
+      return hasWordInMemoryCache(norm, locale as Language) === true;
+    },
+    [locale, config],
+  );
+
+  return { verify, checkSync };
 }

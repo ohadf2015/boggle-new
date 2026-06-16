@@ -24,6 +24,7 @@ import {
   saveProgress,
 } from '@/lib/crossword/progress';
 import { emitCrosswordGameEnd } from '@/lib/crossword/telemetry';
+import { crosswordStats } from '@/lib/crossword/stats';
 import type { CrosswordPuzzle, Direction } from '@/lib/crossword/types';
 
 export interface UseCrosswordGame {
@@ -49,12 +50,17 @@ function now(): number {
 
 export function useCrosswordGame(
   puzzle: CrosswordPuzzle,
-  opts: { onSolved?: () => void } = {},
+  opts: { onSolved?: () => void; onWordSolved?: () => void } = {},
 ): UseCrosswordGame {
   const [state, setState] = useState<GameState>(() => {
     const saved = loadProgress(puzzle.id);
     return initGame(puzzle, saved?.entries ?? {}, saved?.revealedCells ?? []);
   });
+
+  // Per-word feedback: fire whenever the count of fully-correct words climbs
+  // (but not on the final solve — that's `onSolved`). Seeded from the resumed
+  // state so a resume doesn't replay a ding for words already done.
+  const wordsSolvedRef = useRef<number>(crosswordStats(state).wordsSolved);
 
   const startRef = useRef<number>(now());
   const baseElapsedRef = useRef<number>(loadProgress(puzzle.id)?.elapsedMs ?? 0);
@@ -101,6 +107,17 @@ export function useCrosswordGame(
     };
      
   }, [puzzle.id]);
+
+  // Fire onWordSolved each time a new word becomes fully correct (excluding the
+  // final solve, which fires onSolved). The ref guards against re-running when
+  // opts identity changes without a real count increase.
+  useEffect(() => {
+    const solved = crosswordStats(state).wordsSolved;
+    if (solved > wordsSolvedRef.current && state.status !== 'solved') {
+      opts.onWordSolved?.();
+    }
+    wordsSolvedRef.current = solved;
+  }, [state, opts]);
 
   // Fire onSolved once.
   useEffect(() => {

@@ -47,6 +47,9 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
       setWinFlash((n) => n + 1);
       playSound('victoryFanfare');
     },
+    // A light confirmation each time a word is filled in correctly — the
+    // newspaper-solve "tick" of progress before the final fanfare.
+    onWordSolved: () => playSound('wordAccepted'),
   });
 
   // Full-screen game: hide global header / bottom-nav / footer so the board
@@ -220,14 +223,19 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain lg:flex-none lg:gap-3 lg:overflow-visible">
             <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
 
-            <ClueBar
-              slot={activeSlot}
-              rtl={puzzle.rtl}
-              onPrev={() => nextSlot(-1)}
-              onNext={() => nextSlot(1)}
-              onToggleDir={toggleDir}
-              t={t}
-            />
+            {/* Desktop keeps the clue under the grid. On mobile it's pinned just
+                above the keyboard instead (below), so it never scrolls out of
+                view while you're filling letters. */}
+            <div className="hidden lg:block">
+              <ClueBar
+                slot={activeSlot}
+                rtl={puzzle.rtl}
+                onPrev={() => nextSlot(-1)}
+                onNext={() => nextSlot(1)}
+                onToggleDir={toggleDir}
+                t={t}
+              />
+            </div>
 
             {/* Toolbar */}
             <div className="flex items-center justify-center gap-2 flex-wrap">
@@ -252,6 +260,19 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
                 />
               </div>
             </details>
+          </div>
+
+          {/* Mobile: the active clue pinned directly above the keyboard, so it
+              stays in view the whole time you're typing (newspaper habit). */}
+          <div className="shrink-0 lg:hidden">
+            <ClueBar
+              slot={activeSlot}
+              rtl={puzzle.rtl}
+              onPrev={() => nextSlot(-1)}
+              onNext={() => nextSlot(1)}
+              onToggleDir={toggleDir}
+              t={t}
+            />
           </div>
 
           {/* On-screen keyboard — touch only; pinned to the bottom on mobile so

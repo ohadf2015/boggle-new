@@ -99,8 +99,11 @@ export function BlastGame({
 }: Props) {
   const [introDismissed, setIntroDismissed] = useState(false);
   const [levelStartTime] = useState(() => Date.now());
-  const { state, handlers } = useBlastV2(level);
-  const { verify: verifyDictionary } = useBlastDictionary(level.locale);
+  const { verify: verifyDictionary, checkSync: checkDictionarySync } = useBlastDictionary(level.locale);
+  // Feed the warmed offline dict into the engine so valid bonus words validate
+  // instantly inline (no async round-trip / reject-flicker). The async verify
+  // below stays as the fallback for community words + a cold cache.
+  const { state, handlers } = useBlastV2(level, { dictionaryCheck: checkDictionarySync });
   // Hide the global bottom nav while the board is mounted — without this the
   // HUD + board + bottom nav exceed 100dvh on phones and force a page scroll.
   const setIsInGame = useHideNavigation();

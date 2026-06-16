@@ -1,7 +1,12 @@
 /**
- * Blast v2 Bonus Dictionary Loaders
- * Wires per-locale dictionary loaders for bonus word validation (level 25+)
- * Imported from backend dictionaryLoaders or existing library loaders
+ * Blast v2 Bonus Dictionary Loaders (legacy / unused).
+ *
+ * Bonus-word validation now flows through `useBlastDictionary.checkSync` (a sync
+ * predicate over the shared warmed offline dictionary, wired into the engine via
+ * `useBlastV2({ dictionaryCheck })`), with the async `verify` as the fallback.
+ * These per-locale loaders are still referenced by the locale configs but never
+ * invoked by the engine (`useBlastV2` seeds an empty `bonusDict`), so they
+ * intentionally return empty sets. Kept to satisfy the locale-config contract.
  */
 
 import type { Locale } from './types';
