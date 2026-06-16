@@ -44,6 +44,12 @@ describe('applyPlayerListFilters', () => {
     expect(q.calls).toContainEqual({ method: 'eq', args: ['blast_access', true] });
   });
 
+  it('applies hasBeta filter as is_beta_tester=true', () => {
+    const q = makeQuery();
+    applyPlayerListFilters(q as never, { hasBeta: true });
+    expect(q.calls).toContainEqual({ method: 'eq', args: ['is_beta_tester', true] });
+  });
+
   it('applies mmrMin / mmrMax as gte / lte on ranked_mmr', () => {
     const q = makeQuery();
     applyPlayerListFilters(q as never, { mmrMin: 1200, mmrMax: 1800 });

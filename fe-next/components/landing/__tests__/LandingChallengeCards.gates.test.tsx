@@ -60,9 +60,12 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 
 const mockUserEmail = vi.fn<[], string | undefined>(() => undefined);
+// Drives the in-work-mode gate (canSeeInWorkModes = admin OR beta tester). Named
+// mockIsAdmin for history; admins are a subset of in-work access, so true/false
+// here exercises the same gate beta testers now share.
 const mockIsAdmin = vi.fn(() => false);
 vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { email: mockUserEmail() }, isAdmin: mockIsAdmin() }),
+  useAuth: () => ({ user: { email: mockUserEmail() }, canSeeInWorkModes: mockIsAdmin() }),
 }));
 
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));

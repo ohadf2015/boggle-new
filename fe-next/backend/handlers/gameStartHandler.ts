@@ -39,8 +39,9 @@ import { ensureLanguageLoaded } from '../dictionary.js';
 import logger from '../utils/logger.js';
 import { validatePayload, startGameSchema } from '../utils/socketValidation.js';
 import { startGameTimer } from './shared.js';
-import { scheduleGameStartSafetyNet } from '../services/gameLifecycle/gameTimer.js';
+import { scheduleGameStartSafetyNet, resolveGameStartSafetyNetDelayMs } from '../services/gameLifecycle/gameTimer.js';
 import { getCachedTrie } from '../modules/boggleSolver.js';
+import { canAccessInWorkMode } from '@/lib/auth/inWorkModeAccess';
 import { findAllWordsAsync } from '../modules/wordValidatorPool.js';
 import { stopAllBots } from '../modules/botManager.js';
 import { notifyGameStarted } from '../modules/notificationService.js';
@@ -322,9 +323,12 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       DEFAULT_TIMER;
     let validTimer = Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || timerFallback));
 
-    // Word Tower is admin-only during development. UI hides it from non-admins;
-    // this server gate enforces it even if a client crafts the startGame emit
-    // directly. Never reachable via random roll (not in ALL_GAME_MODES).
+    // Word Tower is an in-work mode: hosts must be admins OR beta testers. UI
+    // hides it from everyone else; this server gate enforces it even if a client
+    // crafts the startGame emit directly. Never reachable via random roll (not
+    // in ALL_GAME_MODES). Decision routes through the shared canAccessInWorkMode
+    // chokepoint (lib/auth/inWorkModeAccess.ts) so future in-work modes inherit
+    // beta access for free.
     if (resolvedMode === 'word-tower') {
       const wtHostUser = Object.values(game.users).find((u) => u.isHost);
       const wtHostAuthId = wtHostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
@@ -335,15 +339,15 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       } else if (wtHostAuthId) {
         const { data: wtProfile } = await wtSupabase
           .from('profiles')
-          .select('is_admin')
+          .select('is_admin, is_beta_tester')
           .eq('id', wtHostAuthId)
           .single();
-        wordTowerAllowed = !!wtProfile?.is_admin;
+        wordTowerAllowed = canAccessInWorkMode(wtProfile);
       }
       if (!wordTowerAllowed) {
         gamesStarting.delete(gameCode);
-        logger.debug('SOCKET', `Rejected word-tower for ${gameCode}: host not admin`);
-        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Word Tower is admin-only' });
+        logger.debug('SOCKET', `Rejected word-tower for ${gameCode}: host lacks in-work access`);
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Word Tower is in beta' });
         return;
       }
     }
@@ -708,11 +712,15 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
       // Server-side launch guarantee: the coordinator fallback above relies on a
       // healthy client/coordinator handshake. If the only human's tab is frozen
-      // from before start, neither `countdownComplete` nor that fallback starts
-      // the timer — the round runs with no clock and bots score 0 until a client
-      // reconnects (requestGameState orphan recovery). Arm a proactive server-side
-      // recovery so launch never depends on a client signal. No-op once started.
-      scheduleGameStartSafetyNet(io, gameCode, 10000);
+      // from before start, `countdownComplete` never arrives AND the 8s fallback
+      // can fail to start the timer (its sequence is torn down when that frozen
+      // tab disconnects) — the round then runs with no clock and bots sit at 0
+      // until a client reconnects (requestGameState orphan recovery). Arm a
+      // proactive server-side recovery so launch never depends on a client
+      // signal. Solo games (one human + bots — the common Blast case) use a tight
+      // window so bots never sit visibly frozen at 0; multi-human keeps the longer
+      // window. No-op once the timer has started.
+      scheduleGameStartSafetyNet(io, gameCode, resolveGameStartSafetyNetDelayMs(humanUsernames.length));
     }
 
     logger.info('SOCKET', `Game ${gameCode} starting with ${playerUsernames.length} players`);

@@ -5940,7 +5940,7 @@ const sv = {
     "timedQuest": "Tidsbegränsat",
     "untimedQuest": "Utan Timer",
     "startQuest": "STARTA QUEST",
-    "adminBeta": "Admin",
+    "adminBeta": "Beta",
     "replay": "Spela Igen",
     "cleared": "Klarat!",
     "keepFireBurning": "Håll Flamman Vid Liv",

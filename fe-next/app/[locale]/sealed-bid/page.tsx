@@ -57,7 +57,7 @@ async function dictCheck(word: string, lang: string): Promise<boolean> {
 
 export default function SealedBidPage() {
   const { t } = useLanguage();
-  const { isAdmin } = useAuth();
+  const { canSeeInWorkModes } = useAuth();
   const { playSound } = useSoundEffects();
   const params = useParams<{ locale: string }>();
   const locale = params?.locale ?? 'en';
@@ -187,7 +187,7 @@ export default function SealedBidPage() {
   // Admin gate — hooks above run on every render so order stays stable.
   // Dev bypass lets the preview be reached locally (incl. /he RTL playtest).
   const isDev = process.env.NODE_ENV === 'development';
-  if (!isAdmin && !isDev) {
+  if (!canSeeInWorkModes && !isDev) {
     return (
       <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
         <p className="font-neo-body text-neo-white text-center max-w-sm">{t('sealedBid.adminOnly')}</p>

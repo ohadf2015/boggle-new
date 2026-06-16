@@ -5810,7 +5810,7 @@ const en = {
     "timedQuest": "Timed Quest",
     "untimedQuest": "Untimed Quest",
     "startQuest": "START QUEST",
-    "adminBeta": "Admin",
+    "adminBeta": "Beta",
     "replay": "Replay",
     "cleared": "Cleared!",
     "keepFireBurning": "Keep the Fire Burning",

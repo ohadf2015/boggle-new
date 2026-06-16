@@ -8,6 +8,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { ProfileData, RankedProgress, AuthState, AuthStateSetters } from '../authTypes';
+import { canAccessInWorkMode } from '@/lib/auth/inWorkModeAccess';
 
 /**
  * Core auth state hook that manages user, profile, and ranked progress state.
@@ -95,6 +96,14 @@ export function useComputedAuthValues(
   const isAuthenticated = useMemo(() => !!user && !!profile, [user, profile]);
   const isGuest = useMemo(() => !user, [user]);
   const isAdmin = useMemo(() => !!profile?.is_admin, [profile?.is_admin]);
+  const isBetaTester = useMemo(() => !!profile?.is_beta_tester, [profile?.is_beta_tester]);
+  // Durable chokepoint: in-work/preview modes are visible to admins OR beta
+  // testers. Client mode-gates read this instead of bare isAdmin so a future
+  // in-work mode gets beta access for free. See lib/auth/inWorkModeAccess.ts.
+  const canSeeInWorkModes = useMemo(
+    () => canAccessInWorkMode({ is_admin: profile?.is_admin, is_beta_tester: profile?.is_beta_tester }),
+    [profile?.is_admin, profile?.is_beta_tester]
+  );
   const isTeacher = useMemo(
     () => profile?.user_role === 'teacher' || profile?.user_role === 'admin',
     [profile?.user_role]
@@ -110,6 +119,8 @@ export function useComputedAuthValues(
     isAuthenticated,
     isGuest,
     isAdmin,
+    isBetaTester,
+    canSeeInWorkModes,
     isTeacher,
     needsProfileCustomization,
   };

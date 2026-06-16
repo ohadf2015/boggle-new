@@ -41,10 +41,11 @@ export function DailyChallengeLanding({
   currentLanguage,
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
-  const { user, isAdmin } = useAuth();
-  // Admin-gated daily modes being readied for the public flow (Word Tower today).
-  // Registry-driven so future modes appear here for admins with no hub edits.
-  const adminModes = isAdmin ? adminOnlyDailyModes() : [];
+  const { user, canSeeInWorkModes } = useAuth();
+  // In-work daily modes being readied for the public flow (Word Tower today).
+  // Registry-driven so future modes appear here for admins + beta testers with
+  // no hub edits. See lib/auth/inWorkModeAccess.ts.
+  const adminModes = canSeeInWorkModes ? adminOnlyDailyModes() : [];
   const pathname = usePathname();
   const searchParams = useSearchParams();
 

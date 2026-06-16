@@ -6047,7 +6047,7 @@ const he = {
     "timedQuest": "משימה בזמן",
     "untimedQuest": "משימה חופשית",
     "startQuest": "התחילו משימה",
-    "adminBeta": "מנהל",
+    "adminBeta": "ביתא",
     "replay": "שחקו שוב",
     "cleared": "הושלם!",
     "keepFireBurning": "שמרו על הרצף",

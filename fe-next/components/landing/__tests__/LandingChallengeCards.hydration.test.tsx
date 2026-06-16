@@ -40,7 +40,7 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => ({
 }));
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));
 vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
-vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAdmin: false }) }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ canSeeInWorkModes: false }) }));
 vi.mock('@/hooks/useUserStats', () => ({ useUserStats: () => ({ userStats: null }) }));
 vi.mock('@/hooks/useOnlineStatus', () => ({ useOnlineStatus: () => true }));
 
