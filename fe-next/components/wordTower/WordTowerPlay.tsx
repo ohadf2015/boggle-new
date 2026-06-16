@@ -43,6 +43,7 @@ import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { newlyUnlockedSkin, type TowerSkin } from '@/lib/wordTower/skins';
 import { useTowerSkin } from './useTowerSkin';
 import { WordTowerSkinPicker } from './WordTowerSkinPicker';
+import { WordTowerFlowFrame } from './WordTowerFlowFrame';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
@@ -619,6 +620,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           draws on-screen ghosts, so the real target is usually off-screen up).
           Keyed off the live climb height, not the panned view. */}
       <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
+
+      {/* "In the zone" frame — a hard-edged electric border that lights the play
+          area on a hot perfect-drop streak, gold at "ON FIRE". Pure feel. */}
+      <WordTowerFlowFrame perfectStreak={crane.perfectStreak} reducedMotion={reducedMotion} />
 
       {/* Steady-hands FLOW chip — the positive crane-skill beat: a run of perfect
           drops calms the tower (see instability) and escalates this badge. Cyan →
