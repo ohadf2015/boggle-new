@@ -29,7 +29,7 @@ Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Each line i
 From the **Specialized Skills** table above, invoke the skills listed for **lane 04 competitor/reddit** unless they conflict with this lane's hard rules. `humanizer` is especially important for Reddit drafts — they must not read AI-written.
 
 ═══ GOAL ═══
-Surface (a) viral word-game concepts worth borrowing, (b) Reddit threads where LexiClash is genuinely relevant and a careful reply could organically improve visibility.
+Surface (a) mechanics / polish worth STEALING INTO our existing admin-beta modes (NOT new-mode pitches — the loop no longer ships new modes; it improves the admin-gated ones until they're worth promoting), (b) Reddit threads where LexiClash is genuinely relevant and a careful reply could organically improve visibility.
 
 **NO code edits. NO commits.** Two markdown files only.
 
@@ -196,7 +196,7 @@ Append to `docs/nightly/reports/__TODAY__.md` — this exact format is parsed by
 - Sources fetched: <count> (.json + pullpush.io + portals)
 - Concepts surfaced: <count> (see docs/nightly/ideas/__TODAY__.md)
 - Reddit reply candidates: <count> (see docs/nightly/ideas/__TODAY__-reddit.md)
-- Top idea: <ONE-LINE — a NEW game-mode suggestion OR a fresh improvement to an existing mode. MUST NOT match any concept family in the idea-history ledger (no PASSED, no BUILD, no already-repeated mechanic). This line is what the founder sees in the Telegram idea card — make it count.>
+- Top idea: <ONE-LINE — the single highest-value IMPROVEMENT to an EXISTING admin-beta mode (NEVER a new mode). Name the target mode + the change (UI / gameplay / variable-reward / feel / graphics / clarity). Applying a proven mechanic to a DIFFERENT admin-beta mode IS new work (the goal is making each mode good, not novelty) — but don't re-pitch the SAME mechanic on the SAME mode if the ledger already has it as PASSED/BUILD. This line is what the founder sees in the Telegram idea card — make it count.>
 - Sources that failed: <list or "none">
 
 #### Top Reddit pick of the day
@@ -214,7 +214,7 @@ Append to `docs/nightly/reports/__TODAY__.md` — this exact format is parsed by
 
 Discovery (do this BEFORE picking a Mode):
   1. `grep -rEn "isAdmin\s*&&" fe-next/app/[locale]/page.tsx fe-next/components/home/ fe-next/components/hub/ 2>/dev/null` — admin-only hub tiles → those routes are unpublished.
-  2. Last 14d reports: `grep -hA5 "Experimental game mode shipped" docs/nightly/reports/*.md | grep -E "Mode:|URL:" | sort -u` → other admin-gated experimentals.
+  2. Last 14d reports: `grep -hEA5 "Mode improvement shipped|Experimental game mode shipped" docs/nightly/reports/*.md | grep -E "Mode:|URL:" | sort -u` → admin-beta modes lane 5 has been improving (covers both the new and legacy heading during the transition window).
   3. PostHog session counts will be near-zero for these (admin self-play only) — that's expected. Reason from design + competitor signal + feedback ndjson, not funnels.
   4. Public modes (Word Tower / Blast / Word Wheel / WordCraft / MP / Daily) only as FALLBACK when no unpublished mode is a viable polish target.
 
@@ -232,4 +232,4 @@ Each block MUST use this EXACT structure (run.sh parses it for the Telegram card
 (If a second block is included, repeat the `#### Top game-mode improvement idea` heading + the same 6 fields. Each block hashes independently so the founder can vote per-idea.)
 ```
 
-So every night the founder gets BOTH a new game-mode concept (`- Top idea:`) and up to two distinct polish ideas for unpublished modes — each surfaced as its own Telegram card with try/pass/combine buttons. A `polish:try:<slug>:<hash>` verdict feeds into lane 5's STEP 0 evidence path the next night, so a thumbs-up turns into shipped polish without a separate human step.
+So every night the founder gets up to THREE improvement signals for the admin-beta modes — one headline `- Top idea:` plus up to two distinct polish cards — each surfaced as its own Telegram card with try/pass/combine buttons. These are STEERING only: lane 5 ships a mode improvement EVERY night without waiting for a vote (it self-selects when no vote is pending). A `polish:try:<slug>:<hash>` or `idea:build` verdict simply tells lane 5 which improvement to prioritize next.

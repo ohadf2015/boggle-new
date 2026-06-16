@@ -519,10 +519,57 @@ if [ "$gate_ok" = "0" ]; then
         gate_ok=0; iso_rc=1
         log "gate-timeout: build-only re-gate FAILED — the authored set has a real build break; routing to drop-and-re-gate peel (output now parseable)"
       else
-        # Build-only ALSO timed out (rc=3) → genuinely unverifiable in budget → fall
-        # through to docs-only salvage (the conservative last resort; now rare).
-        gate_ok=0; iso_rc=3
-        log "gate-timeout: build-only re-gate ALSO wedged (idle ${NIGHTLY_GATE_IDLE_SECS:-900}s / backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s) — unverifiable; falling through to docs-only salvage"
+        # Build-only ALSO wedged (rc=3). The 2026-06-16 root cause: next-build's OWN
+        # silent "Running TypeScript" phase hangs >900s in a fresh worktree, while a
+        # standalone `tsc --noEmit` type-checks the project in ~54s (measured cold). The
+        # next-build phase is slower partly because it ALSO checks generated route types
+        # (.next/types/**) that standalone tsc skips — so this tier is a slightly WEAKER
+        # signal, but it is conclusive and unwedgeable, and strictly better than the old
+        # path that DROPPED all code on this wedge. Run it (tsc --noEmit + test:changed,
+        # lane-scoped) before docs-only; ship on green at reduced strength with a loud alert.
+        log "gate-timeout: build-only re-gate ALSO wedged (idle ${NIGHTLY_GATE_IDLE_SECS:-900}s / backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s) — next-build's TS phase is the wedge; running the conclusive standalone typecheck tier (tsc --noEmit + test:changed, ~1min)"
+        run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 0 1; _to_tc_rc=$?
+        _tc_route=$(nightly_gate_typecheck_route "$_to_tc_rc")
+        if [ "$_tc_route" = "ship" ]; then
+          # Type-clean + lane-affected tests pass. The full next-build/full test suite
+          # stayed unverified (they wedged), so ship at reduced strength with a loud
+          # alert — mirrors the build-only 'ship' path above.
+          gate_ok=1
+          log "gate-timeout: standalone typecheck tier PASSED (tsc --noEmit clean + test:changed green) — shipping the authored set; full next-build + full test suite UNVERIFIED this run (both wedged in next-build's TS phase)"
+          mkdir -p docs/nightly 2>/dev/null || true
+          {
+            echo "# Nightly TYPECHECK-TIER ship — ${TODAY}"
+            echo
+            echo "Both the full integration gate AND the build-only re-gate wedged in"
+            echo "next-build's silent \"Running TypeScript\" phase (idle ${NIGHTLY_GATE_IDLE_SECS:-900}s /"
+            echo "backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s). A standalone conclusive tier —"
+            echo "\`build:schemas && tsc --noEmit && test:changed\` (~1 min) — PASSED, so the"
+            echo "authored set type-checks (standalone tsc, committed tsconfig) and its"
+            echo "affected tests are green. It shipped at REDUCED gate strength."
+            echo
+            echo "NOT verified this night: next build's own TS phase additionally checks"
+            echo "GENERATED route/page types (.next/types/**) that standalone tsc does not —"
+            echo "that extra surface, the full next build (SSG prerender), and the FULL test"
+            echo "suite were all unverified. This tier is strictly stronger than the OLD"
+            echo "behaviour (which DROPPED all code on this wedge) but weaker than a clean"
+            echo "full gate."
+            echo
+            echo "Shipped commit is verified post-push by railway-deploy-check.sh + health-monitor.sh."
+            echo "ACTION: none required (autonomous reduced-strength ship)."
+          } > "docs/nightly/TYPECHECK-TIER-${TODAY}.md" 2>/dev/null || true
+          echo "docs/nightly/TYPECHECK-TIER-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
+          echo -e "\n**Outcome (typecheck-tier):** full gate + build-only both wedged in next-build's TS phase; a standalone tsc --noEmit + test:changed tier passed, so the authored set shipped type-checked (standalone tsc) + affected-tests-green — full route-type coverage, SSG, and full suite UNVERIFIED. See docs/nightly/TYPECHECK-TIER-${TODAY}.md." >> "$REPORT"
+          tg_alert "nightly $TODAY: gate wedged in next-build's TS phase; standalone typecheck tier (tsc --noEmit + test:changed) passed + shipped at REDUCED strength — full route-type/SSG/suite UNVERIFIED. No action required. See docs/nightly/TYPECHECK-TIER-${TODAY}.md."
+        elif [ "$_tc_route" = "peel" ]; then
+          # Typecheck tier FAILED → a real type error or a lane-broken test, and the
+          # output now names the offender → route to the drop-and-re-gate peel loop.
+          gate_ok=0; iso_rc=1
+          log "gate-timeout: standalone typecheck tier FAILED (tsc/test:changed) — the authored set has a real type/test break; routing to drop-and-re-gate peel (output now parseable)"
+        else
+          # Even the 54s tsc tier wedged (rc=3) → genuinely unverifiable → docs-only.
+          gate_ok=0; iso_rc=3
+          log "gate-timeout: standalone typecheck tier ALSO wedged — genuinely unverifiable; falling through to docs-only salvage"
+        fi
       fi
       ;;
     2)
@@ -906,10 +953,10 @@ Reply (tap-hold to copy):
 
 Why this format: Telegram renders a bare URL as a tappable link, and triple-backtick blocks are tap-and-hold copyable on mobile. The founder can open the thread + copy the comment in two taps.
 
-🎮 *Game-mode shipped* (ONLY if lane 5 actually shipped this run — extract from `#### Experimental game mode shipped` section in the lane-5 report. Otherwise omit this block entirely.)
+🎮 *Mode improved* (ONLY if lane 5 actually shipped this run — extract from `#### Mode improvement shipped` section in the lane-5 report. Otherwise omit this block entirely.)
 > Mode: <name>
-> URL: <full https URL — the natural mode route, admin-only tile on home>
-> <one-line concept>
+> URL: <full https URL — the existing admin-beta mode route>
+> <one-line: what changed + why it's better>
 > → open URL or refresh home as admin, play 1 round, reply 👍/👎 to this bot
 
 🎮 *Game-mode idea* (only if no mode was shipped this run — surface the top concept from lane 4 / lane 7 instead)
@@ -1034,7 +1081,7 @@ tg_doc "$REPORT" "Full report attached"
 #
 # Patterns scraped from the report:
 #  - "#### Top Reddit pick of the day" block → 💬 Reddit pick card
-#  - "#### Experimental game mode shipped" block → 🎮 mode shipped card
+#  - "#### Mode improvement shipped" block → 🎮 mode improved card
 #  - "#### Top game-mode improvement idea" block → 🎮 idea card
 
 if [ "$DRY_RUN" = "0" ] && [ -f "$REPORT" ]; then
@@ -1057,25 +1104,26 @@ $REDDIT_REPLY
     log "sent Reddit-pick card (hash=$PICK_HASH)"
   fi
 
-  # Game mode shipped: extract URL + name
-  MODE_BLOCK=$(awk '/^#### Experimental game mode shipped/,/^####|^$/' "$REPORT" | head -25)
+  # Mode improvement shipped: extract URL + name
+  MODE_BLOCK=$(awk '/^#### Mode improvement shipped/,/^####|^$/' "$REPORT" | head -25)
   MODE_URL=$(echo "$MODE_BLOCK" | grep -oE 'https?://lexiclash\.live/[^[:space:])]+' | head -1)
   if [ -n "$MODE_URL" ]; then
     MODE_NAME=$(echo "$MODE_BLOCK" | grep -oE '^- Mode: .*' | head -1 | sed 's/^- Mode: //')
     SLUG=$(echo "$MODE_URL" | sed -E 's|^.*/([^/]+)/?$|\1|')
-    MODE_MSG="🎮 *New mode shipped* — $MODE_NAME
+    MODE_MSG="🎮 *Mode improved* — $MODE_NAME
 
 $MODE_URL
 
-(admin-only tile on home; URL also works directly. Refresh the page if you don't see it.)
+(existing admin-beta mode; URL works directly. Refresh the page if you don't see it.)
 
 Reply:
-- 👍 Keep building this direction
-- 👎 Drop it
-- 📐 Tweak — comment in chat with what to change"
-    MODE_KBD="[[{\"text\":\"👍 Keep it\",\"callback_data\":\"mode:keep:${SLUG}\"},{\"text\":\"👎 Drop it\",\"callback_data\":\"mode:drop:${SLUG}\"}],[{\"text\":\"📐 Tweak\",\"callback_data\":\"mode:tweak:${SLUG}\"},{\"text\":\"🚀 Promote to public\",\"callback_data\":\"mode:promote:${SLUG}\"}]]"
+- 👍 Keep this direction
+- 👎 Revert it
+- 📐 Tweak — comment in chat with what to change
+- 🚀 Promote to public when it's ready"
+    MODE_KBD="[[{\"text\":\"👍 Keep it\",\"callback_data\":\"mode:keep:${SLUG}\"},{\"text\":\"👎 Revert\",\"callback_data\":\"mode:drop:${SLUG}\"}],[{\"text\":\"📐 Tweak\",\"callback_data\":\"mode:tweak:${SLUG}\"},{\"text\":\"🚀 Promote to public\",\"callback_data\":\"mode:promote:${SLUG}\"}]]"
     "$TG" kbd "$MODE_MSG" "$MODE_KBD" >/dev/null 2>&1
-    log "sent game-mode card (slug=$SLUG)"
+    log "sent mode-improvement card (slug=$SLUG)"
   fi
 
   # Game mode idea (only if no mode was shipped — same heuristic): top concept from lane 4

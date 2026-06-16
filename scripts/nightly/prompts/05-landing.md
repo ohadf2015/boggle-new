@@ -9,7 +9,7 @@ Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Look for li
   - `mode:drop:<slug>` → that mode failed; do NOT propose anything similar this week
   - `mode:promote:<slug>` → user wants to make it public; lane 5 should propose the promotion path in the report (rollout flag + landing copy + sitemap entry) for next-night work
   - `mode:tweak:<slug>` → user wants iteration; check the chat history (msg_text_first120 field) for the change request
-  - `idea:build:<hash>` → user voted YES on yesterday's idea; ship it tonight
+  - `idea:build:<hash>` → user voted YES on yesterday's improvement idea (lane 4 `- Top idea:`); ship that improvement tonight to the existing admin-beta mode it targets
   - `idea:pass:<hash>` → user voted NO; don't pitch the same idea again
   - `polish:try:<slug>:<hash>` → user voted YES on a game-mode polish idea (lane-4 `#### Top game-mode improvement idea` block; slug = the `Mode:` field, hash = shasum of `Title|Mode`). **Ship THIS polish to that mode tonight in place of the landing variant.** Find the matching block in the prior report (grep `docs/nightly/reports/*.md` for the title, confirm hash) — its `Concrete change:` line is your spec. Treat as a THIRD STEP 0 evidence path on par with lane-4 ideas / loop-improvements citations; no new-mode constraint applies (you're polishing an existing route).
   - `polish:pass:<slug>:<hash>` → user vetoed that polish; don't ship it (idea-history hard-bans it from re-pitch already)
@@ -19,47 +19,60 @@ Read every `.ndjson` file in `docs/nightly/feedback/` (last 7 days). Look for li
 From the **Specialized Skills** table above, invoke the skills listed for **lane 05 landing**. Design-quality skills (`frontend-design` or `impeccable:craft`) are MANDATORY here. Use `web-interface-guidelines` or `code-review` for the post-edit review pass.
 
 ═══ GOAL ═══
-Default: pick the WORST-converting landing page with ≥200 sessions in the last 14d and ship ONE variant behind a typed flag `landing_variant_<slug>_v1`. Goal = lift sign-up or game-start conversion.
+**Default EVERY night: improve an existing admin-beta (admin-gated / experimental) game mode (STEP 0).** Do NOT invent new modes. Do NOT create new routes. The founder wants the not-yet-public modes made genuinely good — better UI, gameplay, variable reward, feel, graphics; less obvious/predictable; more understandable and fun — until each is worth promoting to all players. Landing-CVR work (STEP 1) is now a RARE fallback (see the fallback clause at the end of STEP 0).
 
 **SCOPE CEILING (this lane timed out 5/5 nights on over-scope — read this).** Ship the SMALLEST coherent slice that is shippable TONIGHT, not a perfect/complete deliverable:
-- Landing variant = change the SINGLE highest-leverage element (hero headline OR the primary CTA OR one above-fold proof line) + its 5-locale strings + the flag wiring. NOT a full-page rewrite, NOT multiple sections.
-- Experimental mode (STEP 0) = one route + minimal client logic + the admin hub tile + one test. If you can't finish a whole mode, ship a working vertical slice and record `status: partial` + `next_steps` in your artifact so tomorrow continues it. A partial mode behind an admin-only tile harms nobody.
+- Mode improvement (STEP 0) = ONE axis × ONE mode (e.g. one variable-reward mechanic, OR one feel/juice pass, OR one clarity fix) editing EXISTING files. If you can't finish, ship the working part + record `status: partial` + `next_steps` so tomorrow continues it.
+- Landing variant (STEP 1 fallback) = change the SINGLE highest-leverage element (hero headline OR the primary CTA OR one above-fold proof line) + its 5-locale strings + the flag wiring. NOT a full-page rewrite.
 - A larger timeout is NOT the answer (already tried 1500→600→1200s). Finishing a small slice and writing the artifact beats a half-built big thing that the gate reverts.
 
-**ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, skip the landing variant and consider STEP 0 instead.
+═══ STEP 0 — Improve an existing admin-beta mode (DEFAULT — runs EVERY night, no vote required) ═══
+*Permission: SHIP WITHOUT ASKING. You do NOT wait for a founder vote. Pick a target, ship ONE concrete improvement, report it. KEEP every admin gate intact — promoting a mode to the public is the founder's call (the 🚀 button), never yours.*
 
-═══ STEP 0 — Experimental game mode OR polish (DEFAULT path — try this FIRST) ═══
-*Permission granted by user (see `Permissions` block in preamble). Updated 2026-05-19: mode lives at its natural route; the hub tile that links to it is wrapped in an `isAdmin` check so only the admin sees the entry point. User playtests manually then decides on public rollout.*
+**This path ALWAYS has a target** (admin-beta modes always exist), so it always runs. Only the rare fallback clause at the end sends you to STEP 1. Do NOT call PostHog in STEP 0.
 
-**Execution order: STEP 0 is the DEFAULT.** Only fall through to STEP 1 (landing CVR) if NONE of these signals fire:
+— A) Discover the admin-beta modes (the improvement targets; the list drifts, so re-derive nightly) —
+  1. `grep -rEn "isAdmin" fe-next/app/[locale]/page.tsx fe-next/components/home/ fe-next/components/landing/ fe-next/lib/dailyModes.ts 2>/dev/null` — admin-only hub tiles + admin-only daily modes.
+  2. `grep -rEn "isAdminSession|notFound\(\)" fe-next/app/[locale]/*/page.tsx 2>/dev/null` — server-gated (hard-404) routes.
+  3. Known set as of 2026-06-16 (verify, don't trust blindly): `word-forge`, `shiritori/solo`, `blast/v2`, `crossword`, `word-craft` (cards/gems sub-modes gated by `gateWordCraftMode`), `word-tower` daily. Public modes (Blast, Word Wheel, Word Hunt, MP, classic Daily) are NOT targets here.
 
-1. **`polish:try:<slug>:<hash>` callback in `docs/nightly/feedback/*.ndjson` from the last 7 days** — founder explicitly voted YES on a polish idea. Find the matching `#### Top game-mode improvement idea` block in `docs/nightly/reports/*.md` (grep the title) and SHIP its `Concrete change:` line tonight. This is the strongest signal — never override it with STEP 1.
-2. **`idea:build:<hash>` callback in feedback ndjson** — founder voted YES on a game-mode idea. Build it tonight as an experimental mode (see constraints below).
-3. **NEW game-mode concept in `docs/nightly/loop-improvements/*.md` (last 3 nights) OR `docs/nightly/ideas/*.md` (lane 4)** with ≥2 mentions of evidence (data citation + competitor signal) — ship as experimental mode.
+— B) Pick tonight's target (priority order; (3) is the common case) —
+  1. **`mode:tweak:<slug>` callback** in `docs/nightly/feedback/*.ndjson` (last 7d) → founder asked for a specific change to that mode. Do THAT (read the `msg_text_first120` field for the ask).
+  2. **`polish:try:<slug>:<hash>` callback** (last 7d) → founder voted YES on a lane-4 `#### Top game-mode improvement idea`. Find the matching block in `docs/nightly/reports/*.md` (grep the title, confirm hash); its `Concrete change:` line is your spec. Ship it.
+  3. **SELF-SELECT (no vote needed — default)** → pick the admin-beta mode that most needs work AND was NOT improved in the last 3 nights. Anti-stagnation: `grep -hA2 "#### Mode improvement shipped" docs/nightly/reports/*.md | grep "^- Mode:" | tail -10` → don't repeat the most-recent mode; rotate so every mode gets attention across a week. Among candidates, choose the change with the highest felt-impact on a real player.
 
-If ANY of (1)/(2)/(3) fires → ship via STEP 0, skip STEP 1 entirely, do NOT call PostHog. If NONE fires → fall through to STEP 1 (bounded).
+— C) What "improve" means — pick the ONE highest-leverage axis tonight —
+  • **UI** — clearer hierarchy, better affordances, less clutter, fix a confusing layout.
+  • **Gameplay** — a mechanic that adds depth or fixes a dull/confusing moment.
+  • **Variable reward** — replace flat/predictable payoffs with variable-ratio rewards, streak escalation, near-miss tension, surprise drops. Strongest comeback lever.
+  • **Feel / juice** — motion, sound, haptics, screen-shake, particle bursts on key moments (honor `prefers-reduced-motion`).
+  • **Graphics** — sprites, palette, background, mascot presence — on-brand (read `.impeccable.md`).
+  • **Defeat obviousness** — the outcome must not feel predictable nor the mechanic transparent; add hidden depth / surprise so a player can't see the whole game in 10 seconds. NEVER at the cost of first-time clarity.
+  • **Understandability** — a first-timer must grasp the goal in one screen: better empty-state, a one-line rule hint, a clearer first-move affordance.
+  • **Fun** — the reason to play one more round.
 
-Constraints (ALL must hold):
-- **Mode route at its natural slug**: `fe-next/app/[locale]/<mode-slug>/page.tsx`. The page itself is plain code — no auth gate, no admin lock. If a non-admin types the URL they get the game, but they should never have a path to discover it.
-- **Admin-only hub tile**: add the entry-point tile/card to the home/hub component (e.g., `fe-next/app/[locale]/page.tsx` or whatever the current hub is — grep for the existing mode tiles like Multiplayer/Daily/Adventure to find the pattern). Wrap it in `{isAdmin && <ExperimentalTile slug="<slug>" />}`. Reuse the existing `isAdmin` hook/helper — grep for `useIsAdmin` / `isAdmin` to find the pattern (memory `wordcraft-mvp-2026-05-04` ships an admin tile pattern).
-- **No sitemap entry, no llms.txt entry, no header nav link** — the URL exists, the discovery surface is gated.
-- **No rollout flag, no Playwriter mandate**: user playtests manually after you ship. Just make sure the page loads + the core loop works on your visual inspection during development.
-- Pick a focused mode (one new route + minimal client logic + the hub-tile wiring + a route-scoped test). No file-count cap, but stay coherent. No new realtime tables. No new `auth.getUser()` calls.
-- **MUST emit the mode URL in the report** so the user sees the link in tomorrow's Telegram digest. Use this exact format in the lane-5 section of `docs/nightly/reports/__TODAY__.md`:
+— D) Constraints (ALL must hold) —
+- **EDIT EXISTING mode files only.** NO new route, NO new `page.tsx`, NO new hub tile, NO new mode.
+- **KEEP the existing admin gate intact** (`isAdmin` / `isAdminSession` / client redirect). Do not ungate; promotion to public is the founder's 🚀 decision.
+- Smallest coherent slice that SHIPS tonight (see SCOPE CEILING). One axis, one mode.
+- **5 locales** (en, he, sv, ja, es) for any new strings. Hebrew RTL-safe.
+- Reuse design tokens — no colors/spacing outside `tailwind.config.ts`. Design-quality skill (`frontend-design` / `impeccable:craft`) is MANDATORY. `animate-ai` only if motion serves the improvement.
+- No new realtime tables. No new `auth.getUser()` calls.
+- **MUST emit the report block below** so the founder gets the Telegram card. **The URL MUST use the `.live` host** — `run.sh` only sends the card when it matches `lexiclash.live`, so `.com` = no card.
 
   ```
-  #### Experimental game mode shipped
+  #### Mode improvement shipped
   - Mode: <name>
-  - URL: https://lexiclash.com/en/<slug>/  (mirrors on /he, /sv, /ja, /es)
+  - URL: https://lexiclash.live/en/<slug>/  (mirrors on /he, /sv, /ja, /es)
   - Local URL: http://localhost:3001/en/<slug>/
-  - Hub tile: admin-only via `{isAdmin && ...}` in <hub file:line>
-  - Concept: <one-line>
-  - Lane-4 / loop-improvements evidence: <link or quote>
-  - Files added: <list>
-  - Next step for user: open URL or refresh home as admin, play 1 round, send 👍/👎 to bot
+  - Axis: <ui | gameplay | variable-reward | feel | graphics | obviousness | understandability | fun>
+  - What changed: <one line — what the player feels different>
+  - Files touched: <list>
+  - Next step for user: open URL or refresh home as admin, play 1 round, reply 👍/👎 to the bot
   ```
 
-If none of the STEP 0 signals (polish:try, idea:build, evidenced new concept) fire, only THEN fall through to STEP 1.
+— E) Fallback to STEP 1 (RARE) —
+Take a landing-CVR night INSTEAD of a mode improvement ONLY if BOTH hold: (a) an admin-beta mode was improved on ≥6 of the last 7 nights (`grep -l "#### Mode improvement shipped" docs/nightly/reports/*.md | tail -7 | wc -l` → ≥6), AND (b) a landing page converts <40% with ≥200 sessions. Otherwise STAY in STEP 0. **ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, do not ship another; stay in STEP 0.
 
 ═══ HARD RULES ═══
 - **Ground-truth audit** before writing copy: read `fe-next/public/llms.txt`, `fe-next/app/sitemap.ts`, and the actual mode pages your copy references. No fabricated features, modes, languages.
