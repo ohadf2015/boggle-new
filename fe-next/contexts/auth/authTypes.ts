@@ -68,6 +68,8 @@ export interface ProfileData {
   streak_days?: number;
   // Feature Access (admin-granted)
   blast_access?: boolean;
+  // Admin-granted: unlocks in-work/preview modes (see lib/auth/inWorkModeAccess.ts).
+  is_beta_tester?: boolean;
   // Practice graduation: set once when player crosses 20 total words.
   // Used by useIsPracticeVeteran to hide practice/single-player affordances.
   practice_graduated_at?: string | null;
@@ -130,6 +132,9 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   isGuest: boolean;
   isAdmin: boolean;
+  isBetaTester: boolean;
+  /** Admin OR beta tester — gate for in-work/preview modes. See lib/auth/inWorkModeAccess.ts. */
+  canSeeInWorkModes: boolean;
   isTeacher: boolean;
   canPlayRanked: boolean;
   gamesUntilRanked: number;

@@ -18,13 +18,13 @@ import { WordTowerGame } from '@/components/wordTower/WordTowerGame';
 export function WordTowerPageClient() {
   const { language } = useLanguage();
   const router = useRouter();
-  const { isAdmin, loading } = useAuth();
+  const { canSeeInWorkModes, loading } = useAuth();
   const { trackExposure } = useExperiment('word-tower');
   const gameEnabled = useWordTowerEnabled();
   // Dev bypass so the game is reachable locally (incl. /he RTL playtest) without
   // an admin session. Production still requires admin or the live feature flag.
   const isDev = process.env.NODE_ENV === 'development';
-  const allowed = isAdmin || gameEnabled || isDev;
+  const allowed = canSeeInWorkModes || gameEnabled || isDev;
 
   useEffect(() => {
     if (allowed) trackExposure();

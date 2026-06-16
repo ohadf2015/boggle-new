@@ -6037,7 +6037,7 @@ const es = {
     "timedQuest": "Misión con Tiempo",
     "untimedQuest": "Misión Libre",
     "startQuest": "INICIAR MISIÓN",
-    "adminBeta": "Admin",
+    "adminBeta": "Beta",
     "replay": "Repetir",
     "cleared": "¡Completado!",
     "keepFireBurning": "¡Mantén la Racha!",

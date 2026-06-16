@@ -16,6 +16,7 @@ export interface Player {
   last_game_at: string;
   created_at: string;
   blast_access?: boolean;
+  is_beta_tester?: boolean;
   user_role?: string;
   is_admin?: boolean;
   /** Music/theme personalization the player picked; `null` = never chose. */

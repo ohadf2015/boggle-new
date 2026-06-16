@@ -67,7 +67,7 @@ async function dictCheckJa(word: string): Promise<boolean> {
 
 export default function ShiritoriSoloPage() {
   const { t } = useLanguage();
-  const { isAdmin } = useAuth();
+  const { canSeeInWorkModes } = useAuth();
   const { playSound } = useSoundEffects();
   const { locale } = useParams<{ locale: string }>();
 
@@ -187,7 +187,7 @@ export default function ShiritoriSoloPage() {
   // Admin gate — hooks above this run on every render so order stays stable.
   // Dev bypass lets the game be reached locally (incl. /he RTL playtest).
   const isDev = process.env.NODE_ENV === 'development';
-  if (!isAdmin && !isDev) {
+  if (!canSeeInWorkModes && !isDev) {
     return (
       <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
         <p className="font-neo-body text-neo-white text-center max-w-sm">

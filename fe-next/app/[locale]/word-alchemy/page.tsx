@@ -225,7 +225,7 @@ export const PUZZLES_HE: AlchemyPuzzle[] = [
 
 export default function WordAlchemyPage() {
   const { t } = useLanguage();
-  const { isAdmin } = useAuth();
+  const { canSeeInWorkModes } = useAuth();
   const { playSound } = useSoundEffects();
   const routeParams = useParams<{ locale: string }>();
   const isHe = (routeParams?.locale ?? 'en') === 'he';
@@ -356,7 +356,7 @@ export default function WordAlchemyPage() {
   // Render after hooks so order is stable across admin/non-admin renders.
   // Dev bypass lets the game be reached locally for /he playtest.
   const isDev = process.env.NODE_ENV === 'development';
-  if (!isAdmin && !isDev) {
+  if (!canSeeInWorkModes && !isDev) {
     return (
       <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
         <p className="font-neo-body text-neo-white text-center max-w-sm">

@@ -30,19 +30,19 @@ const WordForgeGame = nextDynamic(
  * (router.replace during render causes SSR/client divergence)
  */
 export default function WordForgePageClient(): React.JSX.Element {
-  const { isAdmin } = useAuth();
+  const { canSeeInWorkModes } = useAuth();
   const { language } = useLanguage();
   const router = useRouter();
 
   // Admin gate — allow in dev mode for testing
   const isDev = process.env.NODE_ENV === 'development';
   useEffect(() => {
-    if (!isAdmin && !isDev) {
+    if (!canSeeInWorkModes && !isDev) {
       router.replace(`/${language}`);
     }
-  }, [isAdmin, isDev, language, router]);
+  }, [canSeeInWorkModes, isDev, language, router]);
 
-  if (!isAdmin && !isDev) {
+  if (!canSeeInWorkModes && !isDev) {
     return <LoadingFallback />;
   }
 

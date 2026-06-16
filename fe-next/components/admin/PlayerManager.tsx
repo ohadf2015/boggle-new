@@ -37,10 +37,11 @@ export function PlayerManager({ authToken }: { authToken: string }) {
   const [country, setCountry] = useState<string>('');
   const [role, setRole] = useState<'all' | 'admin' | 'teacher' | 'player'>('all');
   const [hasBlast, setHasBlast] = useState(false);
+  const [hasBeta, setHasBeta] = useState(false);
   const [daysSinceActive, setDaysSinceActive] = useState<string>('');
 
   const activeFilterCount =
-    (country.trim() ? 1 : 0) + (role !== 'all' ? 1 : 0) + (hasBlast ? 1 : 0) + (daysSinceActive.trim() ? 1 : 0);
+    (country.trim() ? 1 : 0) + (role !== 'all' ? 1 : 0) + (hasBlast ? 1 : 0) + (hasBeta ? 1 : 0) + (daysSinceActive.trim() ? 1 : 0);
 
   // Bulk selection (for gifting many players at once)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -76,6 +77,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
   const selectedPlayers = players.filter((p) => selectedIds.has(p.id));
 
   const [blastAccessLoading, setBlastAccessLoading] = useState<string | null>(null);
+  const [betaAccessLoading, setBetaAccessLoading] = useState<string | null>(null);
   const [blockLoading, setBlockLoading] = useState<string | null>(null);
 
   // Block a registered player by their auth user id so the realtime join path
@@ -115,6 +117,25 @@ export function PlayerManager({ authToken }: { authToken: string }) {
       toast.error('Failed to update blast access');
     } finally {
       setBlastAccessLoading(null);
+    }
+  }, [authToken]);
+
+  const handleToggleBetaAccess = useCallback(async (player: Player) => {
+    setBetaAccessLoading(player.id);
+    try {
+      const newValue = !player.is_beta_tester;
+      const response = await fetch(`/api/admin/players/${player.id}/beta-access`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify({ enabled: newValue }),
+      });
+      if (!response.ok) throw new Error('Failed');
+      toast.success(`Beta access ${newValue ? 'granted' : 'revoked'} for ${player.display_name || player.username}`);
+      setPlayers((prev) => prev.map((p) => p.id === player.id ? { ...p, is_beta_tester: newValue } : p));
+    } catch {
+      toast.error('Failed to update beta access');
+    } finally {
+      setBetaAccessLoading(null);
     }
   }, [authToken]);
 
@@ -202,6 +223,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
       if (country.trim()) params.append('country', country.trim().toUpperCase());
       if (role !== 'all') params.append('role', role);
       if (hasBlast) params.append('hasBlast', 'true');
+      if (hasBeta) params.append('hasBeta', 'true');
       if (daysSinceActive.trim() && Number.isFinite(Number(daysSinceActive))) {
         params.append('daysSinceActive', daysSinceActive.trim());
       }
@@ -220,7 +242,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
     } finally {
       setLoading(false);
     }
-  }, [authToken, searchQuery, sortBy, sortOrder, limit, offset, country, role, hasBlast, daysSinceActive]);
+  }, [authToken, searchQuery, sortBy, sortOrder, limit, offset, country, role, hasBlast, hasBeta, daysSinceActive]);
 
   // Debounce search/filter changes
   useEffect(() => {
@@ -317,6 +339,13 @@ export function PlayerManager({ authToken }: { authToken: string }) {
               Has Blast access
             </label>
           </div>
+          <div className="flex items-end">
+            <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
+              <input type="checkbox" checked={hasBeta}
+                onChange={(e) => { setHasBeta(e.target.checked); setOffset(0); }} className="w-4 h-4" />
+              Beta testers
+            </label>
+          </div>
         </div>
       )}
 
@@ -362,8 +391,10 @@ export function PlayerManager({ authToken }: { authToken: string }) {
               onToggleSelect={toggleSelect}
               onGift={(p) => openGiftDialog([p])}
               onToggleBlast={handleToggleBlastAccess}
+              onToggleBeta={handleToggleBetaAccess}
               onBlock={handleBlockPlayer}
               blastLoading={blastAccessLoading === player.id}
+              betaLoading={betaAccessLoading === player.id}
               blockLoading={blockLoading === player.id}
               curatorAssignments={curatorMap[player.id] ?? []}
               onAssignCurator={handleAssignCurator}

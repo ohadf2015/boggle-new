@@ -132,8 +132,8 @@ export function LandingChallengeCards({
   // a recorded personal best is a durable "I've played" signal that survives
   // localStorage clears for signed-in users.
   // Word Tower, Blast Classic (V1), and Word Craft are admin-only dev previews —
-  // gated on `isAdmin` alone (same pattern), no extra experiment lock.
-  const { isAdmin } = useAuth();
+  // gated on in-work access (admin OR beta tester), no extra experiment lock.
+  const { canSeeInWorkModes } = useAuth();
   const isVeteranRaw = useIsPracticeVeteran();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hasPlayedAnyGame = !!playerAllTimeBest && playerAllTimeBest.score > 0;
@@ -197,20 +197,20 @@ export function LandingChallengeCards({
     if (!next.includes('brainGym')) next.push('brainGym');
     // WordCraft is public — territory surfaces on the hub for everyone.
     if (!next.includes('wordCraft')) next.push('wordCraft');
-    if (isAdmin && !next.includes('wordTower')) next.push('wordTower');
-    // Admin-only dev previews of modes not yet surfaced on the public hub.
-    if (isAdmin && !next.includes('wordForge')) next.push('wordForge');
-    if (isAdmin && !next.includes('wordVault')) next.push('wordVault');
+    if (canSeeInWorkModes && !next.includes('wordTower')) next.push('wordTower');
+    // In-work dev previews of modes not yet surfaced on the public hub.
+    if (canSeeInWorkModes && !next.includes('wordForge')) next.push('wordForge');
+    if (canSeeInWorkModes && !next.includes('wordVault')) next.push('wordVault');
     // Hidden modes that ship code but aren't surfaced to the public hub —
     // gated behind a PostHog flag (party), a typed-URL-only puzzle
-    // (wordAlchemy), or pure standalone routes (shiritori). Admins get one
-    // hub entry per mode so dev previews stay reachable without flipping
-    // flags in the dashboard.
-    if (isAdmin && !next.includes('party')) next.push('party');
-    if (isAdmin && !next.includes('wordAlchemy')) next.push('wordAlchemy');
-    if (isAdmin && !next.includes('shiritori')) next.push('shiritori');
-    if (isAdmin && !next.includes('sealedBid')) next.push('sealedBid');
-    if (isAdmin && !next.includes('crossword')) next.push('crossword');
+    // (wordAlchemy), or pure standalone routes (shiritori). Admins + beta
+    // testers get one hub entry per mode so previews stay reachable without
+    // flipping flags in the dashboard.
+    if (canSeeInWorkModes && !next.includes('party')) next.push('party');
+    if (canSeeInWorkModes && !next.includes('wordAlchemy')) next.push('wordAlchemy');
+    if (canSeeInWorkModes && !next.includes('shiritori')) next.push('shiritori');
+    if (canSeeInWorkModes && !next.includes('sealedBid')) next.push('sealedBid');
+    if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();

@@ -22,6 +22,7 @@ export interface PlayerListFilters {
   country?: string | null;
   role?: 'admin' | 'teacher' | 'player' | null;
   hasBlast?: boolean | null;
+  hasBeta?: boolean | null;
   mmrMin?: number | null;
   mmrMax?: number | null;
   daysSinceActive?: number | null;
@@ -57,6 +58,10 @@ export function applyPlayerListFilters<Q extends FilterableQuery>(
 
   if (filters.hasBlast === true) {
     q = q.eq('blast_access', true) as Q;
+  }
+
+  if (filters.hasBeta === true) {
+    q = q.eq('is_beta_tester', true) as Q;
   }
 
   if (typeof filters.mmrMin === 'number') {

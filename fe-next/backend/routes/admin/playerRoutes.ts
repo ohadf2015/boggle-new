@@ -313,6 +313,7 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
     const roleParam = (req.query.role as string) || null;
     const role: PlayerListFilters['role'] = roleParam === 'admin' || roleParam === 'teacher' || roleParam === 'player' ? roleParam : null;
     const hasBlast = req.query.hasBlast === 'true';
+    const hasBeta = req.query.hasBeta === 'true';
     const mmrMin = req.query.mmrMin ? parseInt(req.query.mmrMin as string) : null;
     const mmrMax = req.query.mmrMax ? parseInt(req.query.mmrMax as string) : null;
     const daysSinceActive = req.query.daysSinceActive ? parseInt(req.query.daysSinceActive as string) : null;
@@ -326,7 +327,7 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
         ranked_mmr, peak_mmr, longest_word, longest_word_length,
         total_coins, lifetime_coins_earned, total_hints_used,
         prestige_level, prestige_multiplier,
-        country_code, referral_count, user_role, is_admin, blast_access,
+        country_code, referral_count, user_role, is_admin, blast_access, is_beta_tester,
         player_style,
         daily_email_subscribed, last_seen_at, last_game_at, created_at
       `, { count: 'exact' });
@@ -336,6 +337,7 @@ router.get('/players', async (req: AdminRequest, res: Response): Promise<void> =
       country,
       role,
       hasBlast: hasBlast ? true : null,
+      hasBeta: hasBeta ? true : null,
       mmrMin: Number.isFinite(mmrMin) ? mmrMin : null,
       mmrMax: Number.isFinite(mmrMax) ? mmrMax : null,
       daysSinceActive: Number.isFinite(daysSinceActive) ? daysSinceActive : null,
@@ -460,6 +462,41 @@ router.post('/players/:id/blast-access', async (req: AdminRequest, res: Response
     const err = error as Error;
     logger.error('ADMIN_API', `Blast access update error: ${err.message}`);
     res.status(500).json({ error: 'Failed to update blast access' });
+  }
+});
+
+/**
+ * POST /api/admin/players/:id/beta-access
+ * Grant or revoke beta-tester status for a specific player. Beta testers can see
+ * + play in-work/preview modes still gated behind is_admin (see
+ * lib/auth/inWorkModeAccess.ts). Mirrors blast-access.
+ * Body: { enabled: boolean }
+ */
+router.post('/players/:id/beta-access', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { enabled } = req.body;
+
+    if (typeof enabled !== 'boolean') {
+      res.status(400).json({ error: 'enabled (boolean) is required' });
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (!supabase) { res.status(503).json({ error: 'Database not available' }); return; }
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_beta_tester: enabled })
+      .eq('id', id);
+
+    if (error) throw error;
+
+    logger.info('ADMIN_API', `Beta access ${enabled ? 'granted' : 'revoked'} for player ${id}`);
+    res.json({ success: true, is_beta_tester: enabled });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Beta access update error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to update beta access' });
   }
 });
 

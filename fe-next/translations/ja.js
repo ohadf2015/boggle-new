@@ -5886,7 +5886,7 @@ const ja = {
     "timedQuest": "タイムクエスト",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
-    "adminBeta": "管理者",
+    "adminBeta": "ベータ",
     "replay": "もう一度",
     "cleared": "クリア！",
     "keepFireBurning": "連続記録を維持しよう",

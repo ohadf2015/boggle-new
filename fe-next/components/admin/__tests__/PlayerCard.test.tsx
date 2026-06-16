@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
@@ -41,7 +41,7 @@ function makePlayer(overrides: Partial<Player> = {}): Player {
   };
 }
 
-function renderCard(player: Player) {
+function renderCard(player: Player, overrides: Partial<React.ComponentProps<typeof PlayerCard>> = {}) {
   return render(
     <PlayerCard
       player={player}
@@ -50,13 +50,16 @@ function renderCard(player: Player) {
       onToggleSelect={noop}
       onGift={noop}
       onToggleBlast={noop}
+      onToggleBeta={noop}
       onBlock={noop}
       blastLoading={false}
+      betaLoading={false}
       blockLoading={false}
       curatorAssignments={[]}
       onAssignCurator={noop}
       onRevokeCurator={noop}
       curatorBusyKey={null}
+      {...overrides}
     />,
   );
 }
@@ -72,5 +75,30 @@ describe('PlayerCard — chosen style badge', () => {
   it('renders no style badge when the player never chose a style', () => {
     renderCard(makePlayer({ player_style: null }));
     expect(screen.queryByTestId('player-style-badge')).not.toBeInTheDocument();
+  });
+});
+
+describe('PlayerCard — beta tester control', () => {
+  it('calls onToggleBeta when the beta button is clicked', () => {
+    const onToggleBeta = vi.fn();
+    const player = makePlayer({ is_beta_tester: false });
+    renderCard(player, { onToggleBeta });
+    fireEvent.click(screen.getByTestId('player-beta-toggle'));
+    expect(onToggleBeta).toHaveBeenCalledWith(player);
+  });
+
+  it('shows the BETA badge for a beta tester and hides it otherwise', () => {
+    renderCard(makePlayer({ is_beta_tester: true }));
+    expect(screen.getByTestId('player-beta-badge')).toBeInTheDocument();
+  });
+
+  it('hides the BETA badge when the player is not a beta tester', () => {
+    renderCard(makePlayer({ is_beta_tester: false }));
+    expect(screen.queryByTestId('player-beta-badge')).not.toBeInTheDocument();
+  });
+
+  it('disables the beta button while a toggle is in flight', () => {
+    renderCard(makePlayer({ is_beta_tester: false }), { betaLoading: true });
+    expect(screen.getByTestId('player-beta-toggle')).toBeDisabled();
   });
 });
