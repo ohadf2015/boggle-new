@@ -16,7 +16,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Bot, Delete, Gavel, RotateCcw, Send, Sparkles, Trophy, User, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, Delete, Gavel, Send, Sparkles, Trophy, User, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -37,6 +37,13 @@ import { SealedBidShareCard } from '@/components/sealedBid/SealedBidShareCard';
 import { SealedBidSessionSummary } from '@/components/sealedBid/SealedBidSessionSummary';
 import { pickRounds, poolForLang, ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
 import { toDisplay, wordFromChosen } from '@/lib/sealedBid/sp/rackBuilder';
+import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
+import {
+  awardSoloDaily,
+  getSoloDateISO,
+  isSoloDailyClaimed,
+  pickDailyModifier,
+} from '@/lib/solo/soloDaily';
 
 async function dictCheck(word: string, lang: string): Promise<boolean> {
   try {
@@ -77,6 +84,11 @@ export default function SealedBidPage() {
   const revealRef = useRef<HTMLDivElement>(null);
   const didShuffleRef = useRef(false);
   const revealFiredRef = useRef(false);
+
+  // Solo Daily layer: shared per-day modifier + once-per-day coin award.
+  const today = useMemo(() => getSoloDateISO(), []);
+  const dailyModifier = useMemo(() => pickDailyModifier('sealed-bid', today), [today]);
+  const [soloAward, setSoloAward] = useState<{ awarded: number; bonus: number; claimed: boolean } | null>(null);
 
   // Full-screen game: hide global header / bottom-nav / footer so the play
   // surface owns the viewport (and surfaces the in-game mute FAB).
@@ -131,7 +143,7 @@ export default function SealedBidPage() {
     }
   }, [state.phase, result, playSound]);
 
-  // Final fanfare on the last reveal — fire once per game end.
+  // Final fanfare on the last reveal — fire once per game end + award daily coins.
   useEffect(() => {
     if (state.phase !== 'done') { revealFiredRef.current = false; return; }
     if (revealFiredRef.current) return;
@@ -139,7 +151,16 @@ export default function SealedBidPage() {
     playSound('victoryFanfare');
     setWinFlash((f) => f + 1);
     SharedFxApp.spawnBurst('celebration', window.innerWidth / 2, window.innerHeight / 3);
-  }, [state.phase, playSound]);
+
+    // Once-per-day coin award; replays the same day are practice (claimed).
+    const claimedBefore = isSoloDailyClaimed('sealed-bid', today, dictLang);
+    const res = awardSoloDaily('sealed-bid', today, dictLang, state.totalScore, state.totalScore > 0);
+    setSoloAward(
+      res
+        ? { awarded: res.awarded, bonus: res.bonus, claimed: false }
+        : { awarded: 0, bonus: 0, claimed: claimedBefore },
+    );
+  }, [state.phase, playSound, today, dictLang, state.totalScore]);
 
   const newGame = useCallback(() => {
     setState(initialSbState(pickRounds(ROUNDS_PER_GAME, locale)));
@@ -324,16 +345,18 @@ export default function SealedBidPage() {
                   {t('sealedBid.finalScore')}
                 </h2>
                 <p className="font-neo-display font-black text-5xl text-neo-navy">{state.totalScore}</p>
-                <button
-                  type="button"
-                  onClick={newGame}
-                  className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  {t('sealedBid.playAgain')}
-                </button>
               </div>
             </div>
+            {soloAward && (
+              <SoloRewardCard
+                t={t}
+                awarded={soloAward.awarded}
+                bonus={soloAward.bonus}
+                modifier={dailyModifier}
+                claimed={soloAward.claimed}
+                onPlayAgain={newGame}
+              />
+            )}
             {history.length > 0 && (
               <SealedBidSessionSummary history={history} totalScore={state.totalScore} />
             )}

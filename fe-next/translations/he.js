@@ -151,6 +151,39 @@ const he = {
       }
     }
   },
+  "solo": {
+    "reward": {
+      "comeBackTomorrow": "הטבעות הישנות כבר תבעו היום — חזרו מחר!",
+      "coinsEarned": "{n} מטבעות הושגו",
+      "surpriseBonus": "בונוס הפתעה!",
+      "noCoins": "אין מטבעות הפעם — עוד סבב!",
+      "playAgain": "שחקו שוב",
+      "share": "שתפו"
+    },
+    "modifier": {
+      "todaysTwist": "טוויסט היום",
+      "shiritori": {
+        "longWords": { "label": "ארוכות וחזקות", "desc": "יום למילים גדולות ועז." },
+        "noRepeatVowel": { "label": "מחסור בתנועות", "desc": "שמרו את התנועות שלכם טריות ומגוונות." },
+        "speedDemon": { "label": "דמון המהירות", "desc": "התחשבות מהירה תשלוט בשרשרת היום." }
+      },
+      "sealedBid": {
+        "noClashPenalty": { "label": "יום שלום", "desc": "שוק ידידותי יותר — הציעו בחופשיות." },
+        "vowelTax": { "label": "מס תנועות", "desc": "תנועות הם הסחורה החמה היום." },
+        "highStakes": { "label": "הימורים גבוהים", "desc": "הצעות עז וייחודיות מגדירות את היום." }
+      },
+      "wordAlchemy": {
+        "doubleCatalyst": { "label": "קטליזטור כפול", "desc": "קטליזטורים חיים והופעיל היום." },
+        "heatDecay": { "label": "מעבדה צוננת", "desc": "מעבדה קרירה — קצבו את התגובות שלכם." },
+        "pureTransmute": { "label": "שינוי טהור", "desc": "יום לשינויים אמתיים." }
+      },
+      "crossword": {
+        "themedGrid": { "label": "יום תמה", "desc": "תמה נסתרת רצה בתוך לוח היום." },
+        "noCheck": { "label": "אין הצצה", "desc": "סמכו על ההזדקות שלכם היום." },
+        "timeAttack": { "label": "התקפת זמן", "desc": "השעון קוקק — פתרו במהירות." }
+      }
+    }
+  },
   "sealedBid": {
     "badge": "הצעה חתומה",
     "title": "הצעה חתומה",
@@ -274,7 +307,7 @@ const he = {
     "surprise": { "nextWord": "המילה הבאה", "surge": "זינוק!", "windfall": "מתנה!", "updraft": "רוח נושאת! המילה הבאה מוגברת", "crystal": "גביש נדיר!", "goldenFloor": "קומת זהב!" },
     "daily": { "badge": "יומי · {date}", "streak": "רצף {n} ימים", "toDaily": "יומי", "toEndless": "אינסופי", "newBest": "שיא יומי חדש!", "questTitle": "מגדל מילים", "questDesc": "בנו מגדל ממילים עד השמיים — אותן אותיות לכולם היום." },
     "perk": { "title": "בחרו מתנה", "subtitle": "בחרו אחת — היא נשארת לכל הטיפוס", "skip": "דלגו בינתיים", "masterCrane": { "name": "מנופאי מומחה", "desc": "תגמול גדול יותר על הנחה מושלמת" }, "tallTimber": { "name": "קורות גבוהות", "desc": "+12% גובה בכל קומה" }, "featherfall": { "name": "נפילת נוצה", "desc": "התמוטטות מפילה קומה אחת פחות" }, "reinforced": { "name": "מחוזק", "desc": "יותר התנדנדות לפני הסכנה" }, "cushion": { "name": "כרית ביטחון", "desc": "התנדנדות מנוף לא מפילה קומות" } },
-    "crane": { "place": "הנח את המילה", "tapToDrop": "הקש כדי לשחרר", "perfect": "מושלם!", "good": "יפה!", "sloppy": "מתנדנד", "miss": "אופס!", "stability": "יציבות" },
+    "crane": { "place": "הנח את המילה", "tapToDrop": "הקש כדי לשחרר", "perfect": "מושלם!", "good": "יפה!", "sloppy": "מתנדנד", "miss": "אופס!", "stability": "יציבות", "steady": "יציב", "onFire": "בוער", "steadyAria": "רצף יד יציבה: {n} הנחות מושלמות" },
     "verdict": { "perfect": "מושלם!", "good": "יפה!", "sloppy": "רשלני", "miss": "פספוס!" },
     "sabotage": { "chip": "כדור הריסה", "tokens": "{n}", "pickTarget": "בחר יריב", "noTargets": "אין יריבים לכיוון כרגע", "confirm": "לשלוח כדור הריסה אל {name}?", "send": "שלח", "cancel": "ביטול", "sentTo": "💥 פגעת ב-{name} — מטר אחד פחות", "incoming": "🚨 חבלה מתקרבת מ-{name}!", "recovered": "המגדל עומד. תמשיכו לטפס.", "earned": "🎯 השגת כדור הריסה!", "earnedHint": "{n} הנחות מושלמות ברצף", "watchAd": "📺 פרסומת לטוקן", "adEarned": "🎯 טוקן מפרסומת!" },
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
@@ -282,7 +315,21 @@ const he = {
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },
     "share": { "button": "שיתוף", "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!" },
     "versus": { "title": "מירוץ מגדלים", "bomb": "הפצצה על {name}", "waiting": "ממתינים ליריבים…", "incoming": "פצצה מתקרבת!", "won": "ניצחת!", "lost": "{name} ניצח" },
-    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}", "goldenTile": "אות זהב {letter}" }
+    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}", "goldenTile": "אות זהב {letter}" },
+    "skin": {
+      "pickerTitle": "עיצובי מגדל",
+      "open": "עיצובי מגדל",
+      "locked": "הגע ל-{m}מ'",
+      "equip": "חליפה",
+      "equipped": "חובש",
+      "unlockedToast": "עיצוב חדש נפתח!",
+      "classic": { "name": "סטנדרטי", "blurb": "בטון ופלדה כנים." },
+      "copper": { "name": "נחושת", "blurb": "חום מחומצן, מעוצב ביד." },
+      "marble": { "name": "שיש", "blurb": "אבן בהירה, רידות קרות." },
+      "gold": { "name": "גולד ראש", "blurb": "זהב מברוש, הרווח בקשה." },
+      "onyx": { "name": "אוניקס", "blurb": "גרפיט לעד שחור." },
+      "aurora": { "name": "זוהר קוטבי", "blurb": "סגסוגת תופסת ערפילית." }
+    }
   },
   "flag": "🇮🇱",
   "androidAppPromo": {
@@ -2512,6 +2559,12 @@ const he = {
       "chooseLanguage": "בחרו שפה",
       "letsPlay": "בואו נשחק",
       "whereToStart": "מאיפה מתחילים?",
+      "google": {
+        "headline": "שמרו את הדמות שלכם לתמיד",
+        "subtext": "הירשמו כדי לשמור את האווטאר, השם והרצף שלכם בכל מכשיר.",
+        "cta": "הרשמה עם Google",
+        "reassure": "לוקח שתי שניות — בלי ספאם, אף פעם."
+      },
       "v2": {
         "rewardsEarned": "פרסים שצברת",
         "goldReward": "+{{gold}} זהב",
@@ -11974,7 +12027,9 @@ const he = {
       "playAdventure": "הרפתקה",
       "playBrain": "אימון מוח",
       "playClassic": "קלאסי",
-      "playWordCraft": "וורדקראפט"
+      "playWordCraft": "וורדקראפט",
+      "playCrossword": "תשבץ",
+      "playWordfall": "Wordfall"
     }
   },
   "system": {

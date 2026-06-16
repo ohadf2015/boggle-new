@@ -238,6 +238,39 @@ const sv = {
       }
     }
   },
+  "solo": {
+    "reward": {
+      "comeBackTomorrow": "Dagens mynt redan hämtade — kom tillbaka imorgon!",
+      "coinsEarned": "{n} mynt tjänade",
+      "surpriseBonus": "överraskningsmål!",
+      "noCoins": "Inga mynt den här gången — ge det ett nytt försök!",
+      "playAgain": "Spela igen",
+      "share": "Dela"
+    },
+    "modifier": {
+      "todaysTwist": "Dagens twist",
+      "shiritori": {
+        "longWords": { "label": "Långa & Starka", "desc": "En dag för att sträcka ut stora, djärva ord." },
+        "noRepeatVowel": { "label": "Vokalstöt", "desc": "Håll dina vokaler färska och varierande." },
+        "speedDemon": { "label": "Snabbets demon", "desc": "Snabb tänkande styr kedjan idag." }
+      },
+      "sealedBid": {
+        "noClashPenalty": { "label": "Fredsdag", "desc": "En vänligare marknad — bjud fritt." },
+        "vowelTax": { "label": "Vokalskat", "desc": "Vokaler är dagens heta handelsvara." },
+        "highStakes": { "label": "Höga insatser", "desc": "Djärva, unika bud definierar dagen." }
+      },
+      "wordAlchemy": {
+        "doubleCatalyst": { "label": "Dubbel katalysator", "desc": "Katalysatorer är extra livfulla idag." },
+        "heatDecay": { "label": "Kyld lab", "desc": "Ett kallare labb — ta din tid med reaktionerna." },
+        "pureTransmute": { "label": "Ren transmutation", "desc": "En dag för verklig transmutation." }
+      },
+      "crossword": {
+        "themedGrid": { "label": "Temadag", "desc": "Ett dolt tema löper genom dagens rutnät." },
+        "noCheck": { "label": "Ingen kontroll", "desc": "Lita på dina instinkter idag." },
+        "timeAttack": { "label": "Tidsattack", "desc": "Klockan tickar — lös snabbt." }
+      }
+    }
+  },
   "sealedBid": {
     "badge": "Förseglat bud",
     "title": "Förseglat bud",
@@ -361,7 +394,7 @@ const sv = {
     "surprise": { "nextWord": "Nästa ord", "surge": "Stöt!", "windfall": "Skänk!", "updraft": "Uppvind! Nästa ord boostat", "crystal": "Kristallfynd!", "goldenFloor": "Gyllene våning!" },
     "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig", "newBest": "Nytt dagsrekord!", "questTitle": "Ordtorn", "questDesc": "Stapla ord mot skyn — samma bokstäver för alla idag." },
     "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
-    "crane": { "place": "Placera ditt ord", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet" },
+    "crane": { "place": "Placera ditt ord", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet", "steady": "Stadig", "onFire": "På gång", "steadyAria": "Stadig hand-svit: {n} perfekta släpp" },
     "verdict": { "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Slarvigt", "miss": "Miss!" },
     "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "{n} perfekta släpp i rad", "watchAd": "📺 Se annons +1", "adEarned": "🎯 Token via annons!" },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
@@ -369,7 +402,21 @@ const sv = {
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
     "share": { "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
     "versus": { "title": "Tornrace", "bomb": "Bomba {name}", "waiting": "Väntar på motståndare…", "incoming": "Inkommande bomb!", "won": "Du vann!", "lost": "{name} vann" },
-    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}", "goldenTile": "Gyllene bokstav {letter}" }
+    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}", "goldenTile": "Gyllene bokstav {letter}" },
+    "skin": {
+      "pickerTitle": "Tornskal",
+      "open": "Tornskal",
+      "locked": "Nå {m}m",
+      "equip": "Utrusta",
+      "equipped": "Utrustad",
+      "unlockedToast": "Nytt skal upplåst!",
+      "classic": { "name": "Klassisk", "blurb": "Ärlig betong och stål." },
+      "copper": { "name": "Koppar", "blurb": "Oxiderad, handsmidbar värme." },
+      "marble": { "name": "Marmor", "blurb": "Blekt sten, ådrig och cool." },
+      "gold": { "name": "Guldrus", "blurb": "Borstlat guld, väl förtjänat." },
+      "onyx": { "name": "Onyx", "blurb": "Grafit till svart glas." },
+      "aurora": { "name": "Aurora", "blurb": "Legering som fångar nebulosan." }
+    }
   },
   "flag": "🇸🇪",
   "androidAppPromo": {
@@ -2442,6 +2489,12 @@ const sv = {
       "chooseLanguage": "Välj språk",
       "letsPlay": "Kör igång",
       "whereToStart": "Var vill du börja?",
+      "google": {
+        "headline": "Gör den till din för alltid",
+        "subtext": "Registrera dig för att spara din avatar, ditt namn och din streak på alla enheter.",
+        "cta": "Registrera dig med Google",
+        "reassure": "Tar två sekunder — aldrig någon spam."
+      },
       "v2": {
         "rewardsEarned": "BELÖNINGAR INTJÄNADE",
         "goldReward": "+{{gold}} GULD",
@@ -11733,7 +11786,9 @@ const sv = {
       "playAdventure": "Äventyr",
       "playBrain": "Hjärnträning",
       "playClassic": "Klassisk",
-      "playWordCraft": "WordCraft"
+      "playWordCraft": "WordCraft",
+      "playCrossword": "Korsord",
+      "playWordfall": "Wordfall"
     }
   },
   "system": {

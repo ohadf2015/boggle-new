@@ -14,7 +14,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Bot, RotateCcw, Send, User, Trophy, Skull } from 'lucide-react';
+import { ArrowLeft, Bot, Send, User, Trophy, Skull } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -34,6 +34,13 @@ import {
 import { botPoolForDifficulty } from '@/lib/shiritori/sp/botDict';
 import { useShiritoriGhostMultiplier } from '@/lib/shiritori/sp/useShiritoriGhostMultiplier';
 import { HowToPlayCard } from '@/components/common/HowToPlayCard';
+import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
+import {
+  awardSoloDaily,
+  getSoloDateISO,
+  isSoloDailyClaimed,
+  pickDailyModifier,
+} from '@/lib/solo/soloDaily';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -83,6 +90,12 @@ export default function ShiritoriSoloPage() {
   const chainEndRef = useRef<HTMLDivElement>(null);
   const wonFiredRef = useRef(false);
 
+  // Solo Daily layer: shared per-day modifier + once-per-day coin award.
+  // Shiritori content is always Japanese, so the daily is shared as lang 'ja'.
+  const today = useMemo(() => getSoloDateISO(), []);
+  const dailyModifier = useMemo(() => pickDailyModifier('shiritori', today), [today]);
+  const [soloAward, setSoloAward] = useState<{ awarded: number; bonus: number; claimed: boolean } | null>(null);
+
   const pool = useMemo(() => botPoolForDifficulty(difficulty), [difficulty]);
   const head = requiredHead(state);
 
@@ -125,7 +138,16 @@ export default function ShiritoriSoloPage() {
     } else {
       playSound('wordRejected');
     }
-  }, [state.phase, playSound]);
+
+    // Once-per-day coin award; replays the same day are practice (claimed).
+    const claimedBefore = isSoloDailyClaimed('shiritori', today, 'ja');
+    const res = awardSoloDaily('shiritori', today, 'ja', score, state.phase === 'won');
+    setSoloAward(
+      res
+        ? { awarded: res.awarded, bonus: res.bonus, claimed: false }
+        : { awarded: 0, bonus: 0, claimed: claimedBefore },
+    );
+  }, [state.phase, playSound, today, score]);
 
   // Auto-scroll the chain into view as it grows.
   useEffect(() => {
@@ -140,6 +162,7 @@ export default function ShiritoriSoloPage() {
     setScore(0);
     resetGhost();
     wonFiredRef.current = false;
+    setSoloAward(null);
   }, [resetGhost]);
 
   const submit = useCallback(async (e: React.FormEvent) => {
@@ -310,7 +333,7 @@ export default function ShiritoriSoloPage() {
         />
 
         {ended ? (
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-3">
             <div className={`w-full animate-neo-pop rounded-neo border-3 border-black p-5 text-center shadow-hard-lg space-y-3 ${won ? 'bg-neo-lime' : 'bg-neo-red'}`}>
               <h2 className="inline-flex items-center justify-center gap-2 font-neo-display text-2xl font-black uppercase text-neo-navy">
                 {won ? <Trophy className="h-6 w-6" /> : <Skull className="h-6 w-6" />}
@@ -324,17 +347,17 @@ export default function ShiritoriSoloPage() {
                   {t('shiritori.solo.ghost.score')} {score}
                 </p>
               )}
-              <div className="flex justify-center gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => newGame(difficulty)}
-                  className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                  {t('shiritori.solo.again')}
-                </button>
-              </div>
             </div>
+            {soloAward && (
+              <SoloRewardCard
+                t={t}
+                awarded={soloAward.awarded}
+                bonus={soloAward.bonus}
+                modifier={dailyModifier}
+                claimed={soloAward.claimed}
+                onPlayAgain={() => newGame(difficulty)}
+              />
+            )}
           </div>
         ) : (
           <div

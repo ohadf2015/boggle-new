@@ -147,6 +147,39 @@ const es = {
       }
     }
   },
+  "solo": {
+    "reward": {
+      "comeBackTomorrow": "¡Las monedas diarias ya se reclamaron — vuelve mañana!",
+      "coinsEarned": "{n} monedas ganadas",
+      "surpriseBonus": "¡bonificación sorpresa!",
+      "noCoins": "Sin monedas esta vez — ¡inténtalo de nuevo!",
+      "playAgain": "Jugar de nuevo",
+      "share": "Compartir"
+    },
+    "modifier": {
+      "todaysTwist": "Giro de hoy",
+      "shiritori": {
+        "longWords": { "label": "Largas y Fuertes", "desc": "Un día para palabras grandes y audaces." },
+        "noRepeatVowel": { "label": "Sequía de vocales", "desc": "Mantén tus vocales frescas y variadas." },
+        "speedDemon": { "label": "Demonio de velocidad", "desc": "El pensamiento rápido domina la cadena hoy." }
+      },
+      "sealedBid": {
+        "noClashPenalty": { "label": "Día de tregua", "desc": "Un mercado más amistoso — puja libremente." },
+        "vowelTax": { "label": "Impuesto de vocales", "desc": "Las vocales son la mercancía del día." },
+        "highStakes": { "label": "Apuestas altas", "desc": "Las pujas audaces y únicas definen el día." }
+      },
+      "wordAlchemy": {
+        "doubleCatalyst": { "label": "Catalizador doble", "desc": "Los catalizadores son especialmente vivos hoy." },
+        "heatDecay": { "label": "Laboratorio frío", "desc": "Un laboratorio más frío — controla tus reacciones." },
+        "pureTransmute": { "label": "Transmutación pura", "desc": "Un día para transmutaciones verdaderas." }
+      },
+      "crossword": {
+        "themedGrid": { "label": "Día de tema", "desc": "Un tema oculto recorre la cuadrícula de hoy." },
+        "noCheck": { "label": "Sin verificación", "desc": "Confía en tu intuición hoy." },
+        "timeAttack": { "label": "Ataque de tiempo", "desc": "El reloj marca — resuelve rápido." }
+      }
+    }
+  },
   "sealedBid": {
     "badge": "Puja secreta",
     "title": "Puja secreta",
@@ -261,7 +294,7 @@ const es = {
     "surprise": { "nextWord": "Próxima palabra", "surge": "¡Subidón!", "windfall": "¡Regalo!", "updraft": "¡Corriente! Próxima palabra reforzada", "crystal": "¡Cristal raro!", "goldenFloor": "¡Piso dorado!" },
     "daily": { "badge": "Diario · {date}", "streak": "racha de {n} días", "toDaily": "Diario", "toEndless": "Infinito", "newBest": "¡Nuevo récord diario!", "questTitle": "Torre de Palabras", "questDesc": "Apila palabras hasta el cielo: hoy las mismas letras para todos." },
     "perk": { "title": "Elige un don", "subtitle": "Elige uno — dura toda la escalada", "skip": "Saltar por ahora", "masterCrane": { "name": "Grúa maestra", "desc": "Mayor recompensa en caídas perfectas" }, "tallTimber": { "name": "Madera alta", "desc": "+12% de altura en cada piso" }, "featherfall": { "name": "Caída de pluma", "desc": "Los derrumbes cuestan un piso menos" }, "reinforced": { "name": "Reforzado", "desc": "Más tambaleo antes del abismo" }, "cushion": { "name": "Cojín de seguridad", "desc": "El vaivén de la grúa nunca tira un piso" } },
-    "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad" },
+    "crane": { "place": "Coloca tu palabra", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad", "steady": "Firme", "onFire": "En racha", "steadyAria": "Racha de pulso firme: {n} caídas perfectas" },
     "verdict": { "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Flojo", "miss": "¡Fallo!" },
     "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas", "watchAd": "📺 Ver anuncio +1", "adEarned": "🎯 ¡Token ganado!" },
     "tier": { "apprentice": "Aprendiz", "journeyman": "Oficial", "master": "Maestro Constructor" },
@@ -270,7 +303,21 @@ const es = {
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
     "share": { "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
     "versus": { "title": "Carrera de Torres", "bomb": "Bombardear a {name}", "waiting": "Esperando rivales…", "incoming": "¡Bomba entrante!", "won": "¡Ganaste!", "lost": "Ganó {name}" },
-    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}", "goldenTile": "Letra dorada {letter}" }
+    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}", "goldenTile": "Letra dorada {letter}" },
+    "skin": {
+      "pickerTitle": "Diseños de Torre",
+      "open": "Diseños de Torre",
+      "locked": "Alcanza {m}m",
+      "equip": "Equipar",
+      "equipped": "Equipado",
+      "unlockedToast": "¡Nuevo diseño desbloqueado!",
+      "classic": { "name": "Estándar", "blurb": "Hormigón y acero honestos." },
+      "copper": { "name": "Cobre", "blurb": "Calidez oxidada, forjada a mano." },
+      "marble": { "name": "Mármol", "blurb": "Piedra pálida, veteada y fresca." },
+      "gold": { "name": "Fiebre del Oro", "blurb": "Oro cepillado, ganado a pulso." },
+      "onyx": { "name": "Ónix", "blurb": "Grafito a vidrio negro." },
+      "aurora": { "name": "Aurora", "blurb": "Aleación que captura la nebulosa." }
+    }
   },
   "flag": "🇪🇸",
   "androidAppPromo": {
@@ -4507,6 +4554,12 @@ const es = {
       "chooseLanguage": "Elige tu idioma",
       "letsPlay": "¡A jugar!",
       "whereToStart": "¿Por dónde empezar?",
+      "google": {
+        "headline": "Hazlo tuyo para siempre",
+        "subtext": "Regístrate para guardar tu avatar, tu nombre y tu racha en todos tus dispositivos.",
+        "cta": "Registrarte con Google",
+        "reassure": "Toma dos segundos, y nunca enviamos spam."
+      },
       "v2": {
         "rewardsEarned": "RECOMPENSAS GANADAS",
         "goldReward": "+{{gold}} ORO",
@@ -11719,7 +11772,9 @@ const es = {
       "playAdventure": "Aventura",
       "playBrain": "Entrenamiento Mental",
       "playClassic": "Clásico",
-      "playWordCraft": "WordCraft"
+      "playWordCraft": "WordCraft",
+      "playCrossword": "Crucigrama",
+      "playWordfall": "Wordfall"
     }
   },
   "system": {

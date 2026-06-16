@@ -147,6 +147,39 @@ const en = {
       }
     }
   },
+  "solo": {
+    "reward": {
+      "comeBackTomorrow": "Daily coins already claimed — come back tomorrow!",
+      "coinsEarned": "{n} coins earned",
+      "surpriseBonus": "surprise bonus!",
+      "noCoins": "No coins this time — give it another go!",
+      "playAgain": "Play Again",
+      "share": "Share"
+    },
+    "modifier": {
+      "todaysTwist": "Today's Twist",
+      "shiritori": {
+        "longWords": { "label": "Long & Strong", "desc": "A day for stretching out big, bold words." },
+        "noRepeatVowel": { "label": "Vowel Drought", "desc": "Keep your vowels fresh and varied." },
+        "speedDemon": { "label": "Speed Demon", "desc": "Quick thinking rules the chain today." }
+      },
+      "sealedBid": {
+        "noClashPenalty": { "label": "Truce Day", "desc": "A friendlier market — bid freely." },
+        "vowelTax": { "label": "Vowel Tax", "desc": "Vowels are the hot commodity today." },
+        "highStakes": { "label": "High Stakes", "desc": "Bold, unique bids define the day." }
+      },
+      "wordAlchemy": {
+        "doubleCatalyst": { "label": "Double Catalyst", "desc": "Catalysts are extra lively today." },
+        "heatDecay": { "label": "Cooling Lab", "desc": "A cooler lab — pace your reactions." },
+        "pureTransmute": { "label": "Pure Transmute", "desc": "A day for true transmutations." }
+      },
+      "crossword": {
+        "themedGrid": { "label": "Theme Day", "desc": "A hidden theme runs through today's grid." },
+        "noCheck": { "label": "No Peeking", "desc": "Trust your instincts today." },
+        "timeAttack": { "label": "Time Attack", "desc": "The clock is ticking — solve swiftly." }
+      }
+    }
+  },
   "sealedBid": {
     "badge": "Sealed Bid",
     "title": "Sealed Bid",
@@ -262,7 +295,7 @@ const en = {
     "surprise": { "nextWord": "Next word", "surge": "Surge!", "windfall": "Windfall!", "updraft": "Updraft! Next word boosted", "crystal": "Crystal find!", "goldenFloor": "Golden floor!" },
     "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless", "newBest": "New daily best!", "questTitle": "Word Tower", "questDesc": "Stack words sky-high — same letters for everyone today." },
     "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
-    "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability" },
+    "crane": { "place": "Place your word", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability", "steady": "Steady", "onFire": "On Fire", "steadyAria": "Steady hands streak: {n} perfect drops" },
     "verdict": { "perfect": "Perfect!", "good": "Nice!", "sloppy": "Sloppy", "miss": "Missed!" },
     "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "{n} perfect drops in a row", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
@@ -270,7 +303,21 @@ const en = {
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
     "share": { "button": "Share", "text": "I reached {m} m in Word Tower — beat my tower!" },
     "versus": { "title": "Tower Rush", "bomb": "Bomb {name}", "waiting": "Waiting for rivals…", "incoming": "Incoming bomb!", "won": "You won!", "lost": "{name} won" },
-    "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}", "goldenTile": "Golden letter {letter}" }
+    "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}", "goldenTile": "Golden letter {letter}" },
+    "skin": {
+      "pickerTitle": "Tower Skins",
+      "open": "Tower skins",
+      "locked": "Reach {m}m",
+      "equip": "Equip",
+      "equipped": "Equipped",
+      "unlockedToast": "New skin unlocked!",
+      "classic": { "name": "Standard", "blurb": "Honest concrete and steel." },
+      "copper": { "name": "Copper", "blurb": "Oxidised, hand-forged warmth." },
+      "marble": { "name": "Marble", "blurb": "Pale stone, veined and cool." },
+      "gold": { "name": "Gold Rush", "blurb": "Brushed gold, earned the hard way." },
+      "onyx": { "name": "Onyx", "blurb": "Graphite to black glass." },
+      "aurora": { "name": "Aurora", "blurb": "Alloy that catches the nebula." }
+    }
   },
   "flag": "🇺🇸",
   "androidAppPromo": {
@@ -2445,6 +2492,12 @@ const en = {
       "chooseLanguage": "Choose your language",
       "letsPlay": "Let's Play",
       "whereToStart": "Where to start?",
+      "google": {
+        "headline": "Make it yours forever",
+        "subtext": "Sign up to keep your avatar, name & streak safe on every device.",
+        "cta": "Sign up with Google",
+        "reassure": "Takes 2 seconds — no spam, ever."
+      },
       "v2": {
         "rewardsEarned": "REWARDS EARNED",
         "goldReward": "+{{gold}} GOLD",
@@ -11473,7 +11526,9 @@ const en = {
       "playAdventure": "Adventure",
       "playBrain": "Brain Training",
       "playClassic": "Classic",
-      "playWordCraft": "WordCraft"
+      "playWordCraft": "WordCraft",
+      "playCrossword": "Crossword",
+      "playWordfall": "Wordfall"
     }
   },
   "system": {

@@ -21,6 +21,14 @@ import { useAlchemyHeatMeter } from '@/hooks/useAlchemyHeatMeter';
 import { AlchemyHeatBar } from '@/components/wordAlchemy/AlchemyHeatBar';
 import { AlchemyShareCard } from '@/components/wordAlchemy/AlchemyShareCard';
 import { type StepResult } from '@/lib/wordAlchemy/alchemyShare';
+import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
+import {
+  awardSoloDaily,
+  getSoloDateISO,
+  isSoloDailyClaimed,
+  pickDailyModifier,
+} from '@/lib/solo/soloDaily';
+import { alchemyScore } from '@/lib/solo/soloReward';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -228,7 +236,8 @@ export default function WordAlchemyPage() {
   const { canSeeInWorkModes } = useAuth();
   const { playSound } = useSoundEffects();
   const routeParams = useParams<{ locale: string }>();
-  const isHe = (routeParams?.locale ?? 'en') === 'he';
+  const locale = routeParams?.locale ?? 'en';
+  const isHe = locale === 'he';
   const puzzles = isHe ? PUZZLES_HE : PUZZLES;
   const dir = isHe ? 'rtl' : 'ltr';
   // Hebrew words are stored base-form; show final (sofit) letters in the UI.
@@ -258,6 +267,11 @@ export default function WordAlchemyPage() {
   const keyboardLetters = getKeyboardLetters(isHe ? 'he' : 'en');
   const wonFxFiredRef = useRef(false);
 
+  // Solo Daily layer: shared per-day modifier + once-per-day coin award.
+  const today = useMemo(() => getSoloDateISO(), []);
+  const dailyModifier = useMemo(() => pickDailyModifier('word-alchemy', today), [today]);
+  const [soloAward, setSoloAward] = useState<{ awarded: number; bonus: number; claimed: boolean } | null>(null);
+
   const puzzle = puzzles[puzzleIdx];
   const won = stepIdx >= puzzle.steps.length;
   const step = won ? null : puzzle.steps[stepIdx];
@@ -281,7 +295,16 @@ export default function WordAlchemyPage() {
     const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
     SharedFxApp.spawnBurst('victory-burst', x, y);
     SharedFxApp.spawnBurst('sparkle-gold', x, y, { count: 24 });
-  }, [won, playSound]);
+
+    // Once-per-day coin award; heat → synthesized score. Replays = practice.
+    const claimedBefore = isSoloDailyClaimed('word-alchemy', today, locale);
+    const res = awardSoloDaily('word-alchemy', today, locale, alchemyScore(heat, maxHeat, true), true);
+    setSoloAward(
+      res
+        ? { awarded: res.awarded, bonus: res.bonus, claimed: false }
+        : { awarded: 0, bonus: 0, claimed: claimedBefore },
+    );
+  }, [won, playSound, today, locale, heat, maxHeat]);
 
   const resetPuzzle = (idx: number) => {
     setPuzzleIdx(idx);
@@ -292,6 +315,7 @@ export default function WordAlchemyPage() {
     setWildcardFound(false);
     setStepResults([]);
     wonFxFiredRef.current = false;
+    setSoloAward(null);
     resetHeat();
   };
 
@@ -474,23 +498,35 @@ export default function WordAlchemyPage() {
         </div>
 
         {won ? (
-          /* Win card */
-          <div className="rounded-neo border-3 border-black bg-neo-lime p-6 text-center shadow-hard-lg space-y-4">
-            <h2 className="font-neo-display font-black text-2xl uppercase text-neo-navy">
-              {t('wordAlchemy.wonTitle')}
-            </h2>
-            <p className="font-neo-body text-sm text-neo-navy/80">{t('wordAlchemy.wonSubtitle')}</p>
-            {stepResults.length > 0 && (
-              <AlchemyShareCard stepResults={stepResults} puzzleNumber={puzzleIdx + 1} />
+          /* Win card + daily reward */
+          <div className="space-y-3">
+            <div className="rounded-neo border-3 border-black bg-neo-lime p-6 text-center shadow-hard-lg space-y-4">
+              <h2 className="font-neo-display font-black text-2xl uppercase text-neo-navy">
+                {t('wordAlchemy.wonTitle')}
+              </h2>
+              <p className="font-neo-body text-sm text-neo-navy/80">{t('wordAlchemy.wonSubtitle')}</p>
+              {stepResults.length > 0 && (
+                <AlchemyShareCard stepResults={stepResults} puzzleNumber={puzzleIdx + 1} />
+              )}
+              <button
+                type="button"
+                onClick={() => resetPuzzle((puzzleIdx + 1) % puzzles.length)}
+                className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:animate-neo-press motion-reduce:active:animate-none"
+              >
+                <ArrowRight className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
+                {t('wordAlchemy.next')}
+              </button>
+            </div>
+            {soloAward && (
+              <SoloRewardCard
+                t={t}
+                awarded={soloAward.awarded}
+                bonus={soloAward.bonus}
+                modifier={dailyModifier}
+                claimed={soloAward.claimed}
+                onPlayAgain={() => resetPuzzle((puzzleIdx + 1) % puzzles.length)}
+              />
             )}
-            <button
-              type="button"
-              onClick={() => resetPuzzle((puzzleIdx + 1) % puzzles.length)}
-              className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-purple px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 active:animate-neo-press motion-reduce:active:animate-none"
-            >
-              <ArrowRight className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-              {t('wordAlchemy.next')}
-            </button>
           </div>
         ) : (
           /* Active step */

@@ -151,6 +151,39 @@ const ja = {
       }
     }
   },
+  "solo": {
+    "reward": {
+      "comeBackTomorrow": "本日のコインはすでに獲得しました — 明日またお越しください！",
+      "coinsEarned": "{n}コイン獲得",
+      "surpriseBonus": "サプライズボーナス！",
+      "noCoins": "今回はコインなし — もう一度挑戦してみよう！",
+      "playAgain": "もう一度",
+      "share": "シェア"
+    },
+    "modifier": {
+      "todaysTwist": "今日のひねり",
+      "shiritori": {
+        "longWords": { "label": "長くて強い", "desc": "大きく大胆な言葉を伸ばす日。" },
+        "noRepeatVowel": { "label": "母音不足", "desc": "母音を新鮮で多様に保とう。" },
+        "speedDemon": { "label": "スピード鬼", "desc": "速い思考がチェーンを支配する今日。" }
+      },
+      "sealedBid": {
+        "noClashPenalty": { "label": "休戦の日", "desc": "より友好的な市場 — 自由に入札しよう。" },
+        "vowelTax": { "label": "母音税", "desc": "母音は今日のホットコモディティ。" },
+        "highStakes": { "label": "ハイステークス", "desc": "大胆でユニークな入札が今日を定義する。" }
+      },
+      "wordAlchemy": {
+        "doubleCatalyst": { "label": "ダブル触媒", "desc": "触媒は今日特に活気に満ちている。" },
+        "heatDecay": { "label": "冷却ラボ", "desc": "冷えたラボ — 反応をペースして。" },
+        "pureTransmute": { "label": "純粋な変換", "desc": "真の錬金術の日。" }
+      },
+      "crossword": {
+        "themedGrid": { "label": "テーマの日", "desc": "隠れたテーマが今日のグリッドを貫く。" },
+        "noCheck": { "label": "ピーク禁止", "desc": "今日は本能を信じよう。" },
+        "timeAttack": { "label": "時間攻撃", "desc": "時計が刻む — すばやく解こう。" }
+      }
+    }
+  },
   "sealedBid": {
     "badge": "シールドビッド",
     "title": "シールドビッド",
@@ -274,7 +307,7 @@ const ja = {
     "surprise": { "nextWord": "次の単語", "surge": "サージ！", "windfall": "棚ぼた！", "updraft": "上昇気流！次の単語が強化", "crystal": "クリスタル発見！", "goldenFloor": "黄金の階！" },
     "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス", "newBest": "デイリー自己ベスト更新！", "questTitle": "ワードタワー", "questDesc": "言葉を高く積み上げよう — 今日はみんな同じ文字。" },
     "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
-    "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定" },
+    "crane": { "place": "単語を置く", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定", "steady": "安定", "onFire": "絶好調", "steadyAria": "安定した手のストリーク：パーフェクト{n}回" },
     "verdict": { "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらっ", "miss": "ミス！" },
     "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト", "watchAd": "📺 広告を見る +1", "adEarned": "🎯 広告でトークンゲット！" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
@@ -282,7 +315,21 @@ const ja = {
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
     "share": { "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
     "versus": { "title": "タワーラッシュ", "bomb": "{name} を爆撃", "waiting": "対戦相手を待っています…", "incoming": "爆弾が来る！", "won": "勝利！", "lost": "{name} の勝ち" },
-    "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}", "goldenTile": "ゴールデン文字 {letter}" }
+    "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}", "goldenTile": "ゴールデン文字 {letter}" },
+    "skin": {
+      "pickerTitle": "タワースキン",
+      "open": "タワースキン",
+      "locked": "{m}m に達する",
+      "equip": "装備",
+      "equipped": "装備済み",
+      "unlockedToast": "新スキン解放！",
+      "classic": { "name": "スタンダード", "blurb": "正直なコンクリートと鋼。" },
+      "copper": { "name": "銅", "blurb": "酸化した手作りの温もり。" },
+      "marble": { "name": "大理石", "blurb": "淡い石、静脈と涼しさ。" },
+      "gold": { "name": "ゴールドラッシュ", "blurb": "ブラッシュ金、苦労して獲得。" },
+      "onyx": { "name": "オニキス", "blurb": "黒鉛から黒いガラスへ。" },
+      "aurora": { "name": "オーロラ", "blurb": "星雲をつかむ合金。" }
+    }
   },
   "flag": "🇯🇵",
   "androidAppPromo": {
@@ -2355,6 +2402,12 @@ const ja = {
       "chooseLanguage": "言語を選択",
       "letsPlay": "プレイ開始",
       "whereToStart": "どこから始める？",
+      "google": {
+        "headline": "あなたのキャラを永久に保存",
+        "subtext": "登録すれば、アバター・名前・連続記録をすべての端末で安全に保存できます。",
+        "cta": "Googleで登録",
+        "reassure": "2秒で完了 — スパムは一切なし。"
+      },
       "v2": {
         "rewardsEarned": "獲得した報酬",
         "goldReward": "+{{gold}} ゴールド",
@@ -11704,7 +11757,9 @@ const ja = {
       "playAdventure": "アドベンチャー",
       "playBrain": "脳トレ",
       "playClassic": "クラシック",
-      "playWordCraft": "ワードクラフト"
+      "playWordCraft": "ワードクラフト",
+      "playCrossword": "クロスワード",
+      "playWordfall": "Wordfall"
     }
   },
   "backToLobby": "ロビーに戻る",
