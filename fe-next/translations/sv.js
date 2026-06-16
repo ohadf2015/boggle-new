@@ -5366,6 +5366,8 @@ const sv = {
     "shiritoriModeDesc": "Japansk ordkedja — sista bokstaven startar nästa",
     "sealedBidMode": "Förseglat bud",
     "sealedBidModeDesc": "Välj ett ord ingen annan väljer — unikt bud ger dubbla poäng",
+    "wordfallMode": "Ordfall",
+    "wordfallModeDesc": "Stava snabbt medan brickorna regnar ner",
     "dailyChallenge": "Daglig Utmaning",
     "education": "Utbildning",
     "educationDesc": "För lärare och elever",

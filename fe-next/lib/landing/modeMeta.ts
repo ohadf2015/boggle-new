@@ -13,6 +13,7 @@
 import {
   Swords, BookOpen, Map, Bomb, Link2, Brain, Layers, Building2,
   Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel, Grid3x3,
+  CloudRain,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -128,6 +129,12 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   sealedBid: {
     titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',
     Icon: Gavel, variant: 'cyan', badge: 'ADMIN', genIcon: '/modes/cubes/sealedbid.png',
+  },
+  // Wordfall = Blast V2 (falling-tile blast). Admin/beta dev preview. Shares the
+  // blast cube art (same game family) until a bespoke Wordfall sticker exists.
+  wordfall: {
+    titleKey: 'landing.wordfallMode', descKey: 'landing.wordfallModeDesc', path: '/blast/v2',
+    Icon: CloudRain, variant: 'purple', badge: 'ADMIN', genIcon: '/modes/cubes/blast.png',
   },
 };
 

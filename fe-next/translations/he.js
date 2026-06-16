@@ -5391,6 +5391,8 @@ const he = {
     "shiritoriModeDesc": "שרשרת מילים יפנית — האות האחרונה מתחילה את הבאה",
     "sealedBidMode": "הצעה חתומה",
     "sealedBidModeDesc": "בחרו מילה שאף אחד לא יבחר — הצעה ייחודית מכפילה ניקוד",
+    "wordfallMode": "מפל מילים",
+    "wordfallModeDesc": "אייתו מהר לפני שהאריחים הנופלים ימלאו את הלוח",
     "dailyChallenge": "אתגר יומי",
     "education": "חינוך",
     "educationDesc": "למורים ותלמידים",

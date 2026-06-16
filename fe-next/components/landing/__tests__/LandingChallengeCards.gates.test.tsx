@@ -236,6 +236,7 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       'wordAlchemy',        // Word Alchemy
       'shiritori',          // Shiritori
       'sealedBid',          // Sealed Bid
+      'wordfall',           // Wordfall (Blast V2)
     ];
     for (const key of expected) {
       const card = container.querySelector(`[data-cube-key="${key}"]`);
@@ -258,6 +259,7 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
       'wordAlchemy',
       'shiritori',
       'sealedBid',
+      'wordfall',
     ];
     for (const key of adminOnly) {
       const card = container.querySelector(`[data-cube-key="${key}"]`);
@@ -281,6 +283,24 @@ describe('LandingChallengeCards — Sealed Bid admin dev-preview gate', () => {
     const card = container.querySelector('[data-cube-key="sealedBid"]');
     expect(card).toBeInTheDocument();
     expect(card?.getAttribute('href')).toBe('/en/sealed-bid');
+  });
+});
+
+describe('LandingChallengeCards — Wordfall (Blast V2) admin dev-preview gate', () => {
+  it('does NOT render the Wordfall card for a non-admin', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="wordfall"]')).toBeNull();
+  });
+
+  it('renders the Wordfall card for an admin/beta with the /blast/v2 href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="wordfall"]');
+    expect(card).toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/blast/v2');
   });
 });
 

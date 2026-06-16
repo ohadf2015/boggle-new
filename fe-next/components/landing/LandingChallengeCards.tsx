@@ -61,7 +61,8 @@ type LandingCardKey =
   | 'wordAlchemy'
   | 'shiritori'
   | 'sealedBid'
-  | 'crossword';
+  | 'crossword'
+  | 'wordfall';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 'connections', 'brainGym'];
@@ -75,7 +76,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordTower',
   'wordForge', 'wordVault',
-  'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword',
+  'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall',
 ]);
 
 /** CSS stagger delay for each card index */
@@ -190,6 +191,8 @@ export function LandingChallengeCards({
     if (canSeeInWorkModes && !next.includes('shiritori')) next.push('shiritori');
     if (canSeeInWorkModes && !next.includes('sealedBid')) next.push('sealedBid');
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
+    // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
+    if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
     if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
     return next;
   })();
@@ -214,7 +217,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall']);
   // Newcomer-essential modes — always visible above the fold. Everything else
   // collapses into a "More Game Modes" expander to reduce choice paralysis
   // without removing the cards from the DOM (preserves SEO + AI-crawler links).

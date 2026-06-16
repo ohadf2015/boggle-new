@@ -5321,6 +5321,8 @@ const en = {
     "shiritoriModeDesc": "Japanese word chain — last letter starts next",
     "sealedBidMode": "Sealed Bid",
     "sealedBidModeDesc": "Pick a word nobody else will — unique bids score double",
+    "wordfallMode": "Wordfall",
+    "wordfallModeDesc": "Spell fast as the tiles rain down",
     "dailyChallenge": "Daily Challenge",
     "education": "Education",
     "educationDesc": "For teachers & students",

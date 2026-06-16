@@ -5313,6 +5313,8 @@ const es = {
     "shiritoriModeDesc": "Cadena de palabras japonesa — última letra inicia la siguiente",
     "sealedBidMode": "Puja secreta",
     "sealedBidModeDesc": "Elige la palabra que nadie más elegirá — pujas únicas dan el doble",
+    "wordfallMode": "Cascada de palabras",
+    "wordfallModeDesc": "Deletrea rápido mientras caen las fichas",
     "dailyChallenge": "Desafío Diario",
     "education": "Educación",
     "educationDesc": "Para profesores y estudiantes",

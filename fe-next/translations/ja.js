@@ -5279,6 +5279,8 @@ const ja = {
     "shiritoriModeDesc": "最後の文字で次の単語をつなごう",
     "sealedBidMode": "シールドビッド",
     "sealedBidModeDesc": "誰も選ばない単語を選べ — ユニークな入札で得点2倍",
+    "wordfallMode": "ワードフォール",
+    "wordfallModeDesc": "降ってくるタイルが埋まる前に素早く綴ろう",
     "dailyChallenge": "デイリーチャレンジ",
     "education": "教育",
     "educationDesc": "教師と生徒向け",
