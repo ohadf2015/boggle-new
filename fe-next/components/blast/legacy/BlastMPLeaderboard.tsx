@@ -2,10 +2,10 @@
 
 import { memo, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { Zap, Crown } from 'lucide-react';
+import { Zap, Crown, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBlastOpponentActivity } from '@/hooks/gameState/selectors';
-import { selectBlastLeaderboardStrip, type BlastLeaderboardEntry } from '@/lib/blast/selectMyBlastScore';
+import { selectBlastLeaderboardStrip, selectMyBlastGap, type BlastLeaderboardEntry } from '@/lib/blast/selectMyBlastScore';
 
 interface BlastMPLeaderboardProps {
   leaderboard: BlastLeaderboardEntry[];
@@ -101,6 +101,10 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
   const rows = selectBlastLeaderboardStrip(leaderboard, username, 4);
   if (rows.length === 0) return null;
 
+  // Competitive gap to the nearest rival, shown ONLY on the player's own pill so
+  // they can read "how far ahead / how much to catch up" at a glance.
+  const myGap = selectMyBlastGap(leaderboard, username);
+
   const latestActivity = opponentActivity[opponentActivity.length - 1] ?? null;
 
   return (
@@ -118,6 +122,15 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
         {rows.map(({ entry, rank, isMe }) => {
           const isLeader = rank === 1;
           const isFlashing = flashingUser === entry.username && !isMe;
+          // Fold the competitive gap into the pill's own aria-label — an
+          // aria-label on the container overrides child text for AT, so the
+          // badge's label below would otherwise be swallowed.
+          const gapSpeech =
+            isMe && myGap && myGap.points > 0
+              ? myGap.kind === 'lead'
+                ? `, ${label('blast.leadingBy', 'leading by')} ${myGap.points}`
+                : `, ${myGap.points} ${label('blast.toCatchUp', 'to catch up')}`
+              : '';
           return (
             <m.div
               key={entry.username}
@@ -130,17 +143,21 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
               }
               transition={{ duration: 0.9, ease: 'easeOut' }}
               className={cn(
-                'flex items-center gap-1.5 px-2 py-1 rounded-neo text-xs font-bold tabular-nums shrink-0',
-                'border-2 shadow-hard-sm',
+                'flex items-center gap-1.5 rounded-neo text-xs font-bold tabular-nums shrink-0',
                 isMe
-                  ? 'border-neo-black bg-neo-lime text-neo-navy ring-2 ring-neo-black/20'
+                  // YOU pill is deliberately the heaviest object in the strip —
+                  // thicker border, a deeper hard shadow and more padding lift it
+                  // off the navy so it reads as "you" instantly, without a
+                  // transform-scale (which would clip in the overflow-x strip and
+                  // fight the LiveScore pop).
+                  ? 'border-[3px] border-neo-black shadow-hard bg-neo-lime text-neo-navy px-2.5 py-1.5 ring-1 ring-neo-navy/15'
                   : isLeader
-                    ? 'border-neo-yellow bg-neo-navy text-neo-white'
+                    ? 'border-2 border-neo-yellow shadow-hard-sm bg-neo-navy text-neo-white px-2 py-1'
                     : isFlashing
-                      ? 'border-neo-black bg-neo-cyan/80 text-neo-navy'
-                      : 'border-neo-black bg-neo-navy/85 text-neo-white',
+                      ? 'border-2 border-neo-black shadow-hard-sm bg-neo-cyan/80 text-neo-navy px-2 py-1'
+                      : 'border-2 border-neo-black shadow-hard-sm bg-neo-navy/85 text-neo-white px-2 py-1',
               )}
-              aria-label={`#${rank} ${isMe ? label('blast.you', 'YOU') : entry.username} ${entry.score}`}
+              aria-label={`#${rank} ${isMe ? label('blast.you', 'YOU') : entry.username} ${entry.score}${gapSpeech}`}
             >
               {/* Rank badge — gold crown for the leader, explicit #rank otherwise */}
               <span className="flex items-center justify-center min-w-[18px] shrink-0">
@@ -156,6 +173,30 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
               </span>
               {/* Live score — pops + flashes the instant it climbs */}
               <LiveScore value={entry.score} emphasised={isMe} />
+              {/* Competitive gap — own pill only. "+N" when leading, "N" to catch
+                  the player above. Direction chevron carries the meaning so the
+                  cue survives colour-blindness. */}
+              {isMe && myGap && myGap.points > 0 && (
+                <span
+                  data-testid="blast-mp-gap"
+                  data-kind={myGap.kind}
+                  aria-hidden="true"
+                  className={cn(
+                    'flex items-center gap-0.5 shrink-0 ms-1 rounded-full px-1.5 py-px text-[10px] font-black tabular-nums',
+                    myGap.kind === 'lead'
+                      ? 'bg-neo-navy text-neo-lime'
+                      : 'bg-neo-navy/15 text-neo-navy',
+                  )}
+                >
+                  {myGap.kind === 'lead' ? (
+                    <ChevronUp className="w-3 h-3" strokeWidth={3} />
+                  ) : (
+                    <ChevronDown className="w-3 h-3" strokeWidth={3} />
+                  )}
+                  {myGap.kind === 'lead' ? '+' : ''}
+                  {myGap.points.toLocaleString()}
+                </span>
+              )}
             </m.div>
           );
         })}

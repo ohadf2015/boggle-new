@@ -3,6 +3,7 @@ import {
   selectMyBlastScore,
   selectMyBlastRank,
   selectBlastLeaderboardStrip,
+  selectMyBlastGap,
 } from '../selectMyBlastScore';
 
 const LB = [
@@ -83,5 +84,43 @@ describe('selectBlastLeaderboardStrip', () => {
   it('returns [] for empty leaderboard', () => {
     expect(selectBlastLeaderboardStrip([], 'bob')).toEqual([]);
     expect(selectBlastLeaderboardStrip(null, 'bob')).toEqual([]);
+  });
+});
+
+describe('selectMyBlastGap', () => {
+  it('reports the lead over the runner-up when the player is #1', () => {
+    expect(selectMyBlastGap(LB, 'alice')).toEqual({ kind: 'lead', points: 400 });
+  });
+
+  it('reports the points to catch the player directly above when not #1', () => {
+    // bob (800) trails alice (1200) by 400
+    expect(selectMyBlastGap(LB, 'bob')).toEqual({ kind: 'behind', points: 400 });
+    // erin (90) trails dave (300) by 210
+    expect(selectMyBlastGap(LB, 'erin')).toEqual({ kind: 'behind', points: 210 });
+  });
+
+  it('returns null when there is no rival to compare against (solo on the board)', () => {
+    expect(selectMyBlastGap([{ username: 'alice', score: 1200 }], 'alice')).toBeNull();
+  });
+
+  it('returns null when the player is absent or input is missing', () => {
+    expect(selectMyBlastGap(LB, 'zoe')).toBeNull();
+    expect(selectMyBlastGap(null, 'alice')).toBeNull();
+    expect(selectMyBlastGap(LB, undefined)).toBeNull();
+  });
+
+  it('handles ties (gap of 0) without crashing', () => {
+    const tied = [
+      { username: 'alice', score: 500 },
+      { username: 'bob', score: 500 },
+    ];
+    expect(selectMyBlastGap(tied, 'alice')).toEqual({ kind: 'lead', points: 0 });
+    expect(selectMyBlastGap(tied, 'bob')).toEqual({ kind: 'behind', points: 0 });
+  });
+
+  it('does not mutate the input array', () => {
+    const copy = [...LB];
+    selectMyBlastGap(LB, 'bob');
+    expect(LB).toEqual(copy);
   });
 });

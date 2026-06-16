@@ -52,4 +52,35 @@ describe('BlastMPLeaderboard', () => {
     // Leader pill carries a data flag the others don't.
     expect(container.querySelector('[data-leader="true"]')).toBeTruthy();
   });
+
+  it('shows a competitive gap badge on the YOU pill when trailing (points to catch)', () => {
+    // bob (800) trails alice (1200) by 400.
+    const { container } = render(<BlastMPLeaderboard leaderboard={LB} username="bob" t={t} />);
+    const gap = container.querySelector('[data-testid="blast-mp-gap"]');
+    expect(gap).toBeTruthy();
+    expect(gap?.getAttribute('data-kind')).toBe('behind');
+    expect(gap?.textContent).toContain('400');
+  });
+
+  it('shows the lead margin on the YOU pill when leading (#1)', () => {
+    // alice (1200) leads bob (800) by 400.
+    const { container } = render(<BlastMPLeaderboard leaderboard={LB} username="alice" t={t} />);
+    const gap = container.querySelector('[data-testid="blast-mp-gap"]');
+    expect(gap).toBeTruthy();
+    expect(gap?.getAttribute('data-kind')).toBe('lead');
+    expect(gap?.textContent).toContain('400');
+  });
+
+  it('renders no gap badge when alone on the board (no rival)', () => {
+    const { container } = render(
+      <BlastMPLeaderboard leaderboard={[{ username: 'solo', score: 100 }]} username="solo" t={t} />,
+    );
+    expect(container.querySelector('[data-testid="blast-mp-gap"]')).toBeNull();
+  });
+
+  it('gives the YOU pill stronger visual weight than rivals (thicker border)', () => {
+    const { container } = render(<BlastMPLeaderboard leaderboard={LB} username="bob" t={t} />);
+    const mePill = container.querySelector('[data-me="true"]');
+    expect(mePill?.className).toContain('border-[3px]');
+  });
 });

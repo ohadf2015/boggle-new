@@ -42,6 +42,37 @@ export function selectMyBlastRank(
   return idx === -1 ? null : idx + 1;
 }
 
+export interface BlastGap {
+  /**
+   * 'lead'  → the player is #1; `points` is the margin over the runner-up.
+   * 'behind'→ the player is not #1; `points` is what they must score to catch
+   *           the player directly above them.
+   */
+  kind: 'lead' | 'behind';
+  points: number;
+}
+
+/**
+ * The current player's competitive gap to the nearest rival, for the live HUD.
+ * - #1 → margin over the runner-up ({ kind: 'lead' }).
+ * - otherwise → points to catch the player directly above ({ kind: 'behind' }).
+ * Returns null when the player is absent, input is missing, or there is no rival
+ * to compare against (alone on the board). Does not mutate the input.
+ */
+export function selectMyBlastGap(
+  leaderboard: readonly BlastLeaderboardEntry[] | null | undefined,
+  username: string | null | undefined,
+): BlastGap | null {
+  if (!leaderboard || !username || leaderboard.length < 2) return null;
+  const sorted = [...leaderboard].sort((a, b) => b.score - a.score);
+  const idx = sorted.findIndex((e) => e.username === username);
+  if (idx === -1) return null;
+  if (idx === 0) {
+    return { kind: 'lead', points: sorted[0].score - sorted[1].score };
+  }
+  return { kind: 'behind', points: sorted[idx - 1].score - sorted[idx].score };
+}
+
 export interface BlastStripRow {
   entry: BlastLeaderboardEntry;
   /** 1-based rank in the full leaderboard. */
