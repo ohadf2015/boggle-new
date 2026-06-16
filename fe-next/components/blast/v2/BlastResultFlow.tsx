@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { BlastLevelCompleteCard } from './BlastLevelCompleteCard';
 import { BlastChestOpenModal } from './BlastChestOpenModal';
 import { PreResultFanfare } from '@/components/results/PreResultFanfare';
+import { shouldPlayPreResultFanfare } from '@/lib/native/webViewLayerFlash';
 import { pickBlastResultKind } from '@/lib/blast/v2/resultKind';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
@@ -60,7 +61,11 @@ export function BlastResultFlow({
     [cardProps.stars, cardProps.completionReason, cardProps.bonusWordsFound, chestReady],
   );
 
-  const [phase, setPhase] = useState<Phase>(() => (kind && !prefersReducedMotion() ? 'fanfare' : 'card'));
+  // Native skips the fanfare (white-flashing GPU layer on the Android WebView);
+  // web keeps it. Reduced-motion also goes straight to the card.
+  const [phase, setPhase] = useState<Phase>(() =>
+    kind && !prefersReducedMotion() && shouldPlayPreResultFanfare() ? 'fanfare' : 'card',
+  );
   // Guard the imperative open so a stray double-tap (or effect re-run) can't
   // fire two open-chest calls / double-award coins.
   const openedRef = useRef(false);

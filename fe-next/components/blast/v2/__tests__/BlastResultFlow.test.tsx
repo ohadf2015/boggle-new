@@ -27,6 +27,11 @@ vi.mock('@/components/results/PreResultFanfare', () => ({
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (_k: string, fb?: string) => fb ?? _k }),
 }));
+// Default to "web" (fanfare allowed); native test flips it to false.
+const mockShouldPlayFanfare = vi.fn(() => true);
+vi.mock('@/lib/native/webViewLayerFlash', () => ({
+  shouldPlayPreResultFanfare: () => mockShouldPlayFanfare(),
+}));
 
 import { BlastResultFlow } from '../BlastResultFlow';
 
@@ -139,6 +144,13 @@ describe('BlastResultFlow', () => {
 
     it('skips the fanfare on an ordinary 1-2 star clear', () => {
       render(<BlastResultFlow {...baseProps} stars={1} chestReady={false} openChest={vi.fn()} onAdvance={vi.fn()} />);
+      expect(screen.queryByTestId('fanfare')).not.toBeInTheDocument();
+      expect(screen.getByTestId('next-btn')).toBeInTheDocument();
+    });
+
+    it('skips the fanfare on native even for a notable 3-star run (white-flash workaround)', () => {
+      mockShouldPlayFanfare.mockReturnValueOnce(false);
+      render(<BlastResultFlow {...baseProps} stars={3} openChest={vi.fn()} onAdvance={vi.fn()} />);
       expect(screen.queryByTestId('fanfare')).not.toBeInTheDocument();
       expect(screen.getByTestId('next-btn')).toBeInTheDocument();
     });
