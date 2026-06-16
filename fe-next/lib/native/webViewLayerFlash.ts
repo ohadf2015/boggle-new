@@ -26,3 +26,21 @@ export function prefersStaticFullscreenOverlay(): boolean {
   const mobileViewport = window.matchMedia('(max-width: 768px)').matches;
   return native || mobileViewport;
 }
+
+/**
+ * Whether the pre-result fanfare ("screen before" the numbers) should play.
+ *
+ * On the Android System WebView the fanfare's full-screen entrance/exit still
+ * promotes a fresh GPU compositor layer that paints one uninitialised white
+ * frame — the residual flash that survived the static-overlay gating above
+ * (the entrance tween is neutralised, but the mount/unmount promotion is not).
+ * Until the native renderer stops flashing, skip the fanfare entirely on native
+ * and hand straight to the result page. Web (desktop + mobile) keeps it: there
+ * the static-overlay path is flash-safe.
+ *
+ * `Capacitor.isNativePlatform()` is false during SSR and on web, so a bare
+ * native check is hydration-safe — no `window` guard needed here.
+ */
+export function shouldPlayPreResultFanfare(): boolean {
+  return !Capacitor.isNativePlatform();
+}

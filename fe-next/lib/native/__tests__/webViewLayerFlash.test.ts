@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { Capacitor } from '@capacitor/core';
-import { prefersStaticFullscreenOverlay } from '../webViewLayerFlash';
+import { prefersStaticFullscreenOverlay, shouldPlayPreResultFanfare } from '../webViewLayerFlash';
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: { isNativePlatform: vi.fn() },
@@ -39,5 +39,22 @@ describe('prefersStaticFullscreenOverlay', () => {
     (Capacitor.isNativePlatform as ReturnType<typeof vi.fn>).mockReturnValue(true);
     vi.stubGlobal('window', undefined);
     expect(prefersStaticFullscreenOverlay()).toBe(false);
+  });
+});
+
+describe('shouldPlayPreResultFanfare', () => {
+  it('is FALSE on the native (Android WebView) app — fanfare promotes a white-flashing GPU layer there', () => {
+    setEnv(true, false);
+    expect(shouldPlayPreResultFanfare()).toBe(false);
+  });
+
+  it('is true on mobile web — static-path gating keeps it flash-safe', () => {
+    setEnv(false, true);
+    expect(shouldPlayPreResultFanfare()).toBe(true);
+  });
+
+  it('is true on desktop web — full animated juice', () => {
+    setEnv(false, false);
+    expect(shouldPlayPreResultFanfare()).toBe(true);
   });
 });

@@ -19,6 +19,7 @@ import type { ResultsPageProps } from '@/types/components';
 import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
 import { useResultsData } from '@/hooks/useResultsData';
 import { PreResultFanfare } from '@/components/results/PreResultFanfare';
+import { shouldPlayPreResultFanfare } from '@/lib/native/webViewLayerFlash';
 import { pickCelebrationKind } from '@/components/mascot/celebrationKind';
 import type { MascotCelebrationKind } from '@/components/mascot/MascotCelebrationVideo';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
@@ -1061,7 +1062,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Pre-result fanfare — full-screen, skippable celebration shown BEFORE the
   // result numbers (not embedded, not a popup). Fires once per result.
-  if (celebrationKind && !fanfareDone) {
+  // Skipped on native: the Android WebView still flashes white on its mount/
+  // unmount layer promotion (see shouldPlayPreResultFanfare).
+  if (celebrationKind && !fanfareDone && shouldPlayPreResultFanfare()) {
     return (
       <PreResultFanfare
         kind={celebrationKind}
