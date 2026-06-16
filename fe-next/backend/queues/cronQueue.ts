@@ -168,6 +168,16 @@ export async function registerAllCronJobs(): Promise<void> {
     const { sendDailyChallengeReminders } = await import('../services/dailyChallengeReminder');
     await sendDailyChallengeReminders();
   });
+
+  // Hourly re-engagement email. Recipient query self-filters by local time
+  // (7–9 AM), so an hourly tick covers all timezones. MUST stay in parity with
+  // the node-cron path (cronScheduler.startReengagementEmailCron) — omitting it
+  // here silently disabled re-engagement email whenever USE_BULLMQ=true.
+  await registerCronJob('reengagement-email', '0 * * * *', async () => {
+    const { runReengagementEmailBatch } = await import('@/lib/reengagementEmail');
+    const result = await runReengagementEmailBatch();
+    logger.info('BULLMQ', 'Re-engagement email complete', result);
+  });
 }
 
 /**

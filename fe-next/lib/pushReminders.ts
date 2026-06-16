@@ -82,12 +82,14 @@ export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipi
   }
   if (!profiles || profiles.length === 0) return [];
 
-  // "Played" = has any attempt row (started or completed) in either daily mode today.
-  // Row existence alone counts — started-but-abandoned still means the user saw today's
-  // puzzle, so a reminder would be noise. Both tables have UNIQUE(puzzle_date, player_id).
-  const [puzzleRes, wordHuntRes] = await Promise.all([
+  // "Played" = has any attempt row (started or completed) in either LIVE daily
+  // mode today (Word Hunt + Word Wheel). Row existence alone counts —
+  // started-but-abandoned still means the user saw today's puzzle, so a reminder
+  // would be noise. Both tables have UNIQUE(puzzle_date, player_id). The legacy
+  // daily_puzzle_attempts table is dead (empty) and intentionally NOT read.
+  const [wheelRes, wordHuntRes] = await Promise.all([
     supabase
-      .from('daily_puzzle_attempts')
+      .from('daily_word_wheel_attempts')
       .select('player_id')
       .eq('puzzle_date', today)
       .in('player_id', userIds),
@@ -98,8 +100,8 @@ export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipi
       .in('player_id', userIds),
   ]);
 
-  if (puzzleRes.error) {
-    logger.error?.('PUSH_REMINDER', `puzzle attempts query failed: ${puzzleRes.error.message}`);
+  if (wheelRes.error) {
+    logger.error?.('PUSH_REMINDER', `word wheel attempts query failed: ${wheelRes.error.message}`);
     return [];
   }
   if (wordHuntRes.error) {
@@ -108,7 +110,7 @@ export async function getDailyChallengePushRecipients(): Promise<DailyPushRecipi
   }
 
   const playedIds = new Set<string>();
-  for (const r of (puzzleRes.data ?? []) as Array<{ player_id: string | null }>) {
+  for (const r of (wheelRes.data ?? []) as Array<{ player_id: string | null }>) {
     if (r.player_id) playedIds.add(r.player_id);
   }
   for (const r of (wordHuntRes.data ?? []) as Array<{ player_id: string | null }>) {
@@ -200,7 +202,7 @@ export async function getSmartDailyChallengePushRecipients(
 
   const userIds = Array.from(new Set(tokens.map((t: { user_id: string }) => t.user_id)));
 
-  const [profilesRes, avgRes, puzzleRes, wordHuntRes, prefRes] = await Promise.all([
+  const [profilesRes, avgRes, wheelRes, wordHuntRes, prefRes] = await Promise.all([
     supabase
       .from('profiles')
       .select('id, timezone, last_daily_push_sent_at, language, avatar_config')
@@ -210,7 +212,7 @@ export async function getSmartDailyChallengePushRecipients(
       .select('player_id, timezone, sample_size, avg_play_minute_of_day')
       .in('player_id', userIds),
     supabase
-      .from('daily_puzzle_attempts')
+      .from('daily_word_wheel_attempts')
       .select('player_id')
       .eq('puzzle_date', today)
       .in('player_id', userIds),
@@ -233,9 +235,9 @@ export async function getSmartDailyChallengePushRecipients(
     logger.error?.('PUSH_REMINDER', `avg view query failed: ${avgRes.error.message}`);
     return [];
   }
-  if (puzzleRes.error || wordHuntRes.error || prefRes.error) {
+  if (wheelRes.error || wordHuntRes.error || prefRes.error) {
     const msg =
-      puzzleRes.error?.message || wordHuntRes.error?.message || prefRes.error?.message;
+      wheelRes.error?.message || wordHuntRes.error?.message || prefRes.error?.message;
     logger.error?.('PUSH_REMINDER', `attempts/prefs query failed: ${msg}`);
     return [];
   }
@@ -264,7 +266,7 @@ export async function getSmartDailyChallengePushRecipients(
   }
 
   const playedIds = new Set<string>();
-  for (const r of (puzzleRes.data ?? []) as Array<{ player_id: string | null }>) {
+  for (const r of (wheelRes.data ?? []) as Array<{ player_id: string | null }>) {
     if (r.player_id) playedIds.add(r.player_id);
   }
   for (const r of (wordHuntRes.data ?? []) as Array<{ player_id: string | null }>) {

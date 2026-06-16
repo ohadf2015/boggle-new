@@ -189,6 +189,16 @@ describe('getReengagementRecipients — any-game gate', () => {
     expect(recipients).toEqual([]);
   });
 
+  test('runReengagementEmailBatch returns zero counts and sends nothing when no eligible recipients', async () => {
+    const supa = makeSupabase([{ table: 'profiles', data: [] }], []);
+    mockGetSupabaseAdmin.mockReturnValue(supa);
+
+    const { runReengagementEmailBatch } = await import('@/lib/reengagementEmail');
+    const result = await runReengagementEmailBatch();
+
+    expect(result).toEqual({ sent: 0, failed: 0, total: 0 });
+  });
+
   test('never queries the legacy (dead) daily_puzzle_attempts table', async () => {
     // Regression guard: the daily mode was reworked into Word Hunt + Word Wheel
     // and daily_puzzle_attempts went empty. Reading it starved the pool to 0.

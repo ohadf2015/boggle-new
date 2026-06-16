@@ -24,7 +24,7 @@ const {
   mockFrom,
   profilesResult,
   tokensResult,
-  puzzleAttemptsResult,
+  wheelAttemptsResult,
   wordHuntAttemptsResult,
   prefsResult,
   avgViewResult,
@@ -32,7 +32,7 @@ const {
   mockFrom: vi.fn(),
   profilesResult: { data: [] as unknown[], error: null },
   tokensResult: { data: [] as unknown[], error: null },
-  puzzleAttemptsResult: { data: [] as unknown[], error: null },
+  wheelAttemptsResult: { data: [] as unknown[], error: null },
   wordHuntAttemptsResult: { data: [] as unknown[], error: null },
   prefsResult: { data: [] as unknown[], error: null },
   avgViewResult: { data: [] as unknown[], error: null },
@@ -52,7 +52,7 @@ function setup() {
   mockFrom.mockImplementation((table: string) => {
     if (table === 'user_push_tokens') return makeBuilder(tokensResult);
     if (table === 'profiles') return makeBuilder(profilesResult);
-    if (table === 'daily_puzzle_attempts') return makeBuilder(puzzleAttemptsResult);
+    if (table === 'daily_word_wheel_attempts') return makeBuilder(wheelAttemptsResult);
     if (table === 'daily_word_hunt_attempts') return makeBuilder(wordHuntAttemptsResult);
     if (table === 'user_notification_preferences') return makeBuilder(prefsResult);
     if (table === 'v_user_daily_play_avg') return makeBuilder(avgViewResult);
@@ -65,7 +65,7 @@ describe('getDailyChallengePushRecipients', () => {
     vi.clearAllMocks();
     profilesResult.data = [];
     tokensResult.data = [];
-    puzzleAttemptsResult.data = [];
+    wheelAttemptsResult.data = [];
     wordHuntAttemptsResult.data = [];
     prefsResult.data = [];
     setup();
@@ -78,7 +78,7 @@ describe('getDailyChallengePushRecipients', () => {
       { id: 'u2', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
       { id: 'u3', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
     ];
-    puzzleAttemptsResult.data = [{ player_id: 'u2' }]; // u2 played daily puzzle
+    wheelAttemptsResult.data = [{ player_id: 'u2' }]; // u2 played word wheel
     wordHuntAttemptsResult.data = [{ player_id: 'u3' }]; // u3 played word hunt
 
     const recipients = await getDailyChallengePushRecipients();
@@ -110,7 +110,10 @@ describe('getDailyChallengePushRecipients', () => {
     expect(recipients).toEqual([]);
   });
 
-  it('does not query the legacy daily_challenges table', async () => {
+  it('reads BOTH live daily tables (Word Hunt + Word Wheel), never the dead legacy ones', async () => {
+    // The daily mode was rebuilt into Word Hunt + Word Wheel. Reading the empty
+    // legacy daily_puzzle_attempts meant Word-Wheel-only players were never
+    // counted as "played today" → got a redundant reminder.
     tokensResult.data = [{ user_id: 'u1' }];
     profilesResult.data = [
       { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
@@ -120,8 +123,21 @@ describe('getDailyChallengePushRecipients', () => {
 
     const tablesQueried = mockFrom.mock.calls.map((c) => c[0]);
     expect(tablesQueried).not.toContain('daily_challenges');
-    expect(tablesQueried).toContain('daily_puzzle_attempts');
+    expect(tablesQueried).not.toContain('daily_puzzle_attempts');
     expect(tablesQueried).toContain('daily_word_hunt_attempts');
+    expect(tablesQueried).toContain('daily_word_wheel_attempts');
+  });
+
+  it('excludes users who played Word Wheel today (live table)', async () => {
+    tokensResult.data = [{ user_id: 'u1' }];
+    profilesResult.data = [
+      { id: 'u1', timezone: 'America/New_York', last_daily_push_sent_at: null, language: 'en' },
+    ];
+    wheelAttemptsResult.data = [{ player_id: 'u1' }]; // played wheel → not "lapsed today"
+
+    const recipients = await getDailyChallengePushRecipients();
+
+    expect(recipients).toEqual([]);
   });
 
   it('excludes users who already got a push today', async () => {
@@ -162,7 +178,7 @@ describe('getSmartDailyChallengePushRecipients', () => {
     vi.clearAllMocks();
     profilesResult.data = [];
     tokensResult.data = [];
-    puzzleAttemptsResult.data = [];
+    wheelAttemptsResult.data = [];
     wordHuntAttemptsResult.data = [];
     prefsResult.data = [];
     avgViewResult.data = [];
@@ -247,7 +263,7 @@ describe('getSmartDailyChallengePushRecipients', () => {
     avgViewResult.data = [
       { player_id: 'u1', timezone: 'America/New_York', sample_size: 5, avg_play_minute_of_day: 1080 },
     ];
-    puzzleAttemptsResult.data = [{ player_id: 'u1' }];
+    wheelAttemptsResult.data = [{ player_id: 'u1' }];
 
     const recipients = await getSmartDailyChallengePushRecipients();
     expect(recipients).toEqual([]);

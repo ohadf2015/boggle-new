@@ -8,18 +8,16 @@ import {
   sendReengagementEmail,
 } from '@/lib/reengagementEmail';
 import { captureApiError } from '@/utils/sentry';
+import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 
 /**
  * POST /api/email/send-reengagement
  *
  * Cron endpoint to send re-engagement emails to inactive daily challenge players.
- * Secured with CRON_SECRET header. Should be called hourly.
+ * Secured with CRON_SECRET header (fail-closed). Should be called hourly.
  */
 export async function POST(request: NextRequest) {
-  const cronSecret = request.headers.get('x-cron-secret') || request.headers.get('authorization');
-  const expectedSecret = process.env.CRON_SECRET;
-
-  if (expectedSecret && cronSecret !== expectedSecret && cronSecret !== `Bearer ${expectedSecret}`) {
+  if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

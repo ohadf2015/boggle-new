@@ -6,6 +6,7 @@ import {
   sendDailyChallengeEmail,
 } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
+import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 
 /**
  * POST /api/email/send-daily
@@ -21,11 +22,8 @@ import { captureApiError } from '@/utils/sentry';
  * 3. Tracks last_daily_email_sent_at to prevent duplicates
  */
 export async function POST(request: NextRequest) {
-  // Verify cron secret for security
-  const cronSecret = request.headers.get('x-cron-secret') || request.headers.get('authorization');
-  const expectedSecret = process.env.CRON_SECRET;
-
-  if (expectedSecret && cronSecret !== expectedSecret && cronSecret !== `Bearer ${expectedSecret}`) {
+  // Verify cron secret for security (fail-closed — see lib/cronAuth)
+  if (!isAuthorizedCronRequest(request)) {
     logger.warn('[Email Cron] Unauthorized request attempted');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

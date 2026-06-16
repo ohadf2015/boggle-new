@@ -282,6 +282,49 @@ export async function getReengagementRecipients(): Promise<ReengagementRecipient
   return recipients;
 }
 
+/**
+ * Run one full re-engagement email batch: fetch eligible recipients, resolve
+ * each one's language + today's first-letter hint, send. Shared by BOTH the
+ * node-cron scheduler and the BullMQ worker so the two paths can never drift —
+ * a job missing from one path is exactly what silently disabled sends before.
+ */
+export async function runReengagementEmailBatch(): Promise<{
+  sent: number;
+  failed: number;
+  total: number;
+}> {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
+
+  const recipients = await getReengagementRecipients();
+  if (recipients.length === 0) return { sent: 0, failed: 0, total: 0 };
+
+  let sent = 0;
+  let failed = 0;
+
+  // Sequential to respect Resend rate limits.
+  for (const recipient of recipients) {
+    const language = await resolveUserLanguage(recipient.id, recipient.country_code);
+    let letterData = await getFirstLetterForLanguage(language);
+    if (!letterData) letterData = await getFirstLetterForLanguage('en');
+    if (!letterData) {
+      failed++;
+      continue;
+    }
+
+    const result = await sendReengagementEmail(
+      recipient,
+      language,
+      letterData.letter,
+      baseUrl,
+      letterData.word.length,
+    );
+    if (result.success) sent++;
+    else failed++;
+  }
+
+  return { sent, failed, total: recipients.length };
+}
+
 // ==========================================
 // Send Functions
 // ==========================================

@@ -581,32 +581,16 @@ export function startReengagementEmailCron() {
       const startTime = Date.now();
 
       try {
-        const { getReengagementRecipients, resolveUserLanguage, getFirstLetterForLanguage, sendReengagementEmail } =
-          await import('@/lib/reengagementEmail');
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
+        const { runReengagementEmailBatch } = await import('@/lib/reengagementEmail');
+        const { sent, failed, total } = await runReengagementEmailBatch();
 
-        const recipients = await getReengagementRecipients();
-        if (recipients.length === 0) {
+        if (total === 0) {
           logger.info('CRON', 'Re-engagement: no eligible recipients');
           return;
         }
 
-        let sent = 0;
-        let failed = 0;
-
-        for (const recipient of recipients) {
-          const language = await resolveUserLanguage(recipient.id, recipient.country_code);
-          let letterData = await getFirstLetterForLanguage(language);
-          if (!letterData) letterData = await getFirstLetterForLanguage('en');
-          if (!letterData) { failed++; continue; }
-
-          const result = await sendReengagementEmail(recipient, language, letterData.letter, baseUrl);
-          if (result.success) sent++;
-          else failed++;
-        }
-
         const duration = Date.now() - startTime;
-        logger.info('CRON', `Re-engagement email complete in ${duration}ms`, { sent, failed, total: recipients.length });
+        logger.info('CRON', `Re-engagement email complete in ${duration}ms`, { sent, failed, total });
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
         logger.error('CRON', 'Re-engagement email failed', { error: errorMsg });
