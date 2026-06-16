@@ -13,6 +13,7 @@ import type { LetterGrid, Language } from '@/types';
 import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
 import { cn } from '@/lib/utils';
+import { NeoPanel } from '@/components/ui/panel';
 import PuzzleWordEditor from './PuzzleWordEditor';
 
 import {
@@ -291,11 +292,11 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
               </AdaptiveMotion.div>
 
               {/* Share URL */}
+              <NeoPanel asChild tone="navy" shadow="sm" className="p-3 flex items-center gap-2">
               <AdaptiveMotion.div
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="bg-neo-navy border-3 border-neo-black rounded-neo p-3 flex items-center gap-2 shadow-hard-sm"
               >
                 <code className="flex-1 text-sm truncate text-neo-white font-mono">
                   {buildPuzzleShareUrl(puzzleCode, language)}
@@ -316,6 +317,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   )}
                 </AdaptiveMotion.button>
               </AdaptiveMotion.div>
+              </NeoPanel>
 
               {/* Actions */}
               <AdaptiveMotion.div

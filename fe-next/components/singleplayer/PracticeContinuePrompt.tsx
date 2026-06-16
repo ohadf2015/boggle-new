@@ -4,6 +4,7 @@ import React from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
+import { NeoPanel } from '@/components/ui/panel';
 
 interface Props {
   open: boolean;
@@ -32,8 +33,8 @@ export default function PracticeContinuePrompt({
           aria-modal="true"
           aria-labelledby="practice-continue-title"
         >
+          <NeoPanel asChild tone="cream" className="p-5 lg:p-6 max-w-sm w-full flex flex-col items-center gap-3">
           <m.div
-            className="bg-neo-cream border-3 border-neo-black rounded-neo p-5 lg:p-6 shadow-hard max-w-sm w-full flex flex-col items-center gap-3"
             initial={{ scale: 0.9, y: 12, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
@@ -64,6 +65,7 @@ export default function PracticeContinuePrompt({
               {t('practiceContinue.skip')}
             </button>
           </m.div>
+          </NeoPanel>
         </m.div>
       )}
     </AnimatePresence>

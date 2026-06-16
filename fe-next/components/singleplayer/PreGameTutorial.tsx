@@ -6,6 +6,7 @@ import { Pointer, Star, Zap, Play, Mouse, Palette, ChevronRight, ChevronLeft } f
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { Mascot, MascotWithEntrance } from '@/components/ui/Mascot';
+import { NeoPanel } from '@/components/ui/panel';
 import MiniGrid from '@/components/onboarding/MiniGrid';
 import AvatarBuilderModal from '@/components/avatar/AvatarBuilderModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -100,8 +101,8 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
               <MascotWithEntrance variant="happy" size="xl" priority clipBorder="none" />
 
               {/* Speech bubble with staggered entrance */}
+              <NeoPanel asChild tone="cream" className="relative p-4 max-w-sm">
               <m.div
-                className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard max-w-sm"
                 initial={{ scale: 0.8, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, ...SPRING_POP }}
@@ -116,6 +117,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
                   {t('preGameTutorial.welcome.subtitle')}
                 </p>
               </m.div>
+              </NeoPanel>
 
               <m.button
                 onClick={handleNext}
@@ -190,8 +192,8 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
             >
               <Mascot variant="celebration" size="lg" clipBorder="none" />
 
+              <NeoPanel asChild tone="cream" className="relative p-4 max-w-sm">
               <m.div
-                className="relative bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard max-w-sm"
                 initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, ...SPRING_POP }}
@@ -206,6 +208,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
                   {t('preGameTutorial.tips.subtitle')}
                 </p>
               </m.div>
+              </NeoPanel>
 
               {/* Tip cards — staggered entrance */}
               <div className="grid grid-cols-3 gap-2 w-full max-w-sm">
