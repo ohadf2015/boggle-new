@@ -15,6 +15,14 @@ import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
 import { CrosswordFx } from './CrosswordFx';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
+import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
+import {
+  awardSoloDaily,
+  getSoloDateISO,
+  isSoloDailyClaimed,
+  pickDailyModifier,
+} from '@/lib/solo/soloDaily';
+import { crosswordScore } from '@/lib/solo/soloReward';
 
 function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -69,6 +77,25 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const stats = useMemo(() => crosswordStats(state), [state]);
   const hintsUsed = state.revealed.length;
+
+  // Solo Daily layer: shared per-day modifier + once-per-day coin award on solve.
+  const today = useMemo(() => getSoloDateISO(), []);
+  const dailyModifier = useMemo(() => pickDailyModifier('crossword', today), [today]);
+  const [soloAward, setSoloAward] = useState<{ awarded: number; bonus: number; claimed: boolean } | null>(null);
+  const soloAwardedRef = useRef(false);
+  useEffect(() => {
+    if (!solved) { soloAwardedRef.current = false; return; }
+    if (soloAwardedRef.current) return;
+    soloAwardedRef.current = true;
+    const score = crosswordScore(elapsedMs, hintsUsed, stats.wordsTotal);
+    const claimedBefore = isSoloDailyClaimed('crossword', today, puzzle.locale);
+    const res = awardSoloDaily('crossword', today, puzzle.locale, score, true);
+    setSoloAward(
+      res
+        ? { awarded: res.awarded, bonus: res.bonus, claimed: false }
+        : { awarded: 0, bonus: 0, claimed: claimedBefore },
+    );
+  }, [solved, elapsedMs, hintsUsed, stats.wordsTotal, today, puzzle.locale]);
 
   // Hardware keyboard support.
   useEffect(() => {
@@ -264,18 +291,29 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
             <h2 className="font-neo-display font-extrabold text-2xl mb-3">
               {t('crossword.solvedTitle')}
             </h2>
-            <div className="grid grid-cols-3 gap-2 mb-5">
+            <div className="grid grid-cols-3 gap-2 mb-4">
               <SolvedStat value={formatTime(elapsedMs)} label={t('crossword.timer')} />
               <SolvedStat value={`${stats.wordsTotal}`} label={t('crossword.wordsLabel')} />
               <SolvedStat value={`${hintsUsed}`} label={t('crossword.hintsLabel')} />
             </div>
-            <button
-              type="button"
-              onClick={reset}
-              className="font-neo-display font-bold bg-neo-navy text-neo-white border-neo border-black rounded-neo shadow-hard px-6 py-2.5 active:translate-y-[1px] active:shadow-hard-pressed"
-            >
-              {t('crossword.playAgain')}
-            </button>
+            {soloAward ? (
+              <SoloRewardCard
+                t={t}
+                awarded={soloAward.awarded}
+                bonus={soloAward.bonus}
+                modifier={dailyModifier}
+                claimed={soloAward.claimed}
+                onPlayAgain={() => { setSoloAward(null); reset(); }}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={reset}
+                className="font-neo-display font-bold bg-neo-navy text-neo-white border-neo border-black rounded-neo shadow-hard px-6 py-2.5 active:translate-y-[1px] active:shadow-hard-pressed"
+              >
+                {t('crossword.playAgain')}
+              </button>
+            )}
           </div>
         </div>
       )}
