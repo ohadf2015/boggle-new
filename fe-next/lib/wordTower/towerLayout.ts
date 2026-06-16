@@ -61,6 +61,12 @@ export function courseTileLayout(word: string, courseW: number, opts: CourseOpts
   return { tiles, width, height: size };
 }
 
+/** Default number of committed rows kept on screen before the camera follows
+ *  the climb. Founder ask: "show max 3 blocks so most of the screen is clean."
+ *  Once the tower passes this, the base scrolls off below the deck and only the
+ *  newest `maxVisibleRows` rows stay in the compact bottom construction zone. */
+export const DEFAULT_MAX_VISIBLE_ROWS = 3;
+
 /** Inputs for the grounded tower-camera row layout. */
 export interface TowerRowLayoutInput {
   /** Committed rows the camera pins on. Pending preview rows are NOT counted —
@@ -70,6 +76,9 @@ export interface TowerRowLayoutInput {
   H: number;
   /** Height (px) of the bottom control deck; the tower never grounds into it. */
   bottomInsetPx: number;
+  /** How many committed rows stay visible before the camera pans (default 3).
+   *  Sets the build line `(maxVisibleRows-1)` rows above the grounded base. */
+  maxVisibleRows?: number;
 }
 
 export interface TowerRowLayout {
@@ -94,13 +103,21 @@ export interface TowerRowLayout {
  * newest tile stays pinned at the build line and the base scrolls off the
  * bottom behind the deck — i.e. the camera follows the climb, Tower-Bloxx style.
  */
-export function towerRowLayout({ pinCount, H, bottomInsetPx }: TowerRowLayoutInput): TowerRowLayout {
+export function towerRowLayout({ pinCount, H, bottomInsetPx, maxVisibleRows = DEFAULT_MAX_VISIBLE_ROWS }: TowerRowLayoutInput): TowerRowLayout {
   const size = clamp(H * 0.066, 38, 54); // compact blocks — was 0.082/46–66 (read too big)
   const half = size / 2;
   const rowH = size + 2; // ~2px seam → tiles read as one cohesive stacked tower, not floating blocks
-  const topCenter = H * 0.28 + half; // park the committed top in the upper-middle so a building word
-                                     // has headroom above it (was 0.15 → new letters crammed under the header)
-  const baseCenter = H - bottomInsetPx - half - Math.round(size * 0.12); // grounded just above the deck
+  const mvr = Math.max(1, Math.round(maxVisibleRows));
+  // Build line stays in the upper-middle, glued to the crane that drops onto it
+  // (the crane chrome + rival rail are anchored to this same ~0.28H line — don't
+  // move it). The committed top pins here once the tower overflows.
+  const topCenter = H * 0.28 + half;
+  // The base floats exactly (mvr-1) rows BELOW the build line, so a fresh tower
+  // never shows more than `mvr` committed rows: the active build zone is a tight
+  // cluster hanging under the crane and the rest of the screen reads clean. We
+  // never let that floor sink into the control deck (clamp for short screens).
+  const groundFloor = H - bottomInsetPx - half - Math.round(size * 0.12);
+  const baseCenter = Math.min(topCenter + (mvr - 1) * rowH, groundFloor);
   // Overflow once the pinned top would rise above the build line; pan down to keep it there.
   const shift = pinCount > 0 ? Math.max(0, topCenter - baseCenter + (pinCount - 1) * rowH) : 0;
   const centerY = (pos: number) => baseCenter - pos * rowH + shift;

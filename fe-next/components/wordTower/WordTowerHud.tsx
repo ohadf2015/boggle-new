@@ -120,13 +120,13 @@ export function WordTowerHud(props: WordTowerHudProps) {
       <div
         ref={deckRef}
         className={cn(
-          'pointer-events-auto space-y-2 rounded-t-neo border-t-neo-thick border-black px-4 pt-1.5 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
+          'pointer-events-auto space-y-1.5 rounded-t-neo border-t-neo-thick border-black px-4 pt-1 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
           isPlacing
             ? 'bg-gradient-to-b from-neo-lime/15 via-neo-navy/95 to-neo-navy/95'
             : 'bg-neo-navy/95',
           deckOpen
-            ? 'pb-[calc(env(safe-area-inset-bottom)+1.5rem)]'
-            : 'pb-[calc(env(safe-area-inset-bottom)+0.5rem)]',
+            ? 'pb-[calc(env(safe-area-inset-bottom)+0.85rem)]'
+            : 'pb-[calc(env(safe-area-inset-bottom)+0.4rem)]',
         )}
       >
         {/* Drawer grip — collapse the deck to free the screen for the tower. */}
@@ -141,7 +141,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             else setDeckOpen(dy < 0); // swipe up = expand, down = collapse
           }}
           aria-label={t(deckOpen ? 'wordTower.hud.collapse' : 'wordTower.hud.expand')}
-          className="mx-auto flex w-full touch-none flex-col items-center justify-center gap-0.5 py-1.5"
+          className="mx-auto flex w-full touch-none flex-col items-center justify-center gap-0.5 py-0.5"
         >
           <span className="h-1.5 w-12 rounded-full bg-neo-white/40" />
           {deckOpen
@@ -149,13 +149,13 @@ export function WordTowerHud(props: WordTowerHudProps) {
             : <ChevronUp className="h-3 w-3 text-neo-white/40" />}
         </button>
         {deckOpen && (
-        <div className="space-y-1.5">
+        <div className="space-y-1">
         {/* Word builder — framed slot so the anchor + selected letters read as
             a "preview viewfinder" rather than free-floating tiles. */}
         <div
           key={`builder-${errorKey}`}
           className={cn(
-            'mx-auto flex min-h-[44px] max-w-md items-center justify-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light/60 px-3 py-1.5 shadow-hard-sm',
+            'mx-auto flex min-h-[40px] max-w-md items-center justify-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light/60 px-3 py-1 shadow-hard-sm',
             lastError && errorKey > 0 && 'animate-neo-shake border-neo-red',
           )}
         >

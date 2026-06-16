@@ -90,10 +90,34 @@ describe('towerRowLayout (grounded camera)', () => {
   });
 
   it('grounded tower never pushes its newest tile above the build line', () => {
-    const l = towerRowLayout({ pinCount: 6, H, bottomInsetPx: inset });
+    // Within the visible cap (default 3 rows) the tower stays grounded.
+    const l = towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset });
     expect(l.shift).toBe(0);
     // top committed tile stays at or below topCenter (i.e. under the crane line)
-    expect(l.centerY(5)).toBeGreaterThanOrEqual(l.topCenter);
+    expect(l.centerY(2)).toBeGreaterThanOrEqual(l.topCenter);
+  });
+
+  // ── "max 3 blocks on screen" — the camera shows only the newest few rows so
+  //    most of the screen stays clean sky; the rest scrolls below the deck. ──
+  it('keeps the tower grounded up to maxVisibleRows, then pans on the next row', () => {
+    const mvr = 3;
+    for (let n = 1; n <= mvr; n++) {
+      expect(towerRowLayout({ pinCount: n, H, bottomInsetPx: inset, maxVisibleRows: mvr }).shift).toBe(0);
+    }
+    // the (mvr+1)-th committed row tips the camera into follow mode
+    expect(towerRowLayout({ pinCount: mvr + 1, H, bottomInsetPx: inset, maxVisibleRows: mvr }).shift).toBeGreaterThan(0);
+  });
+
+  it('defaults to a 3-row visible cap', () => {
+    expect(towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset }).shift).toBe(0);
+    expect(towerRowLayout({ pinCount: 4, H, bottomInsetPx: inset }).shift).toBeGreaterThan(0);
+  });
+
+  it('build line sits exactly (maxVisibleRows-1) rows above the grounded base', () => {
+    for (const mvr of [2, 3, 5]) {
+      const l = towerRowLayout({ pinCount: 1, H, bottomInsetPx: inset, maxVisibleRows: mvr });
+      expect(l.baseCenter - l.topCenter).toBeCloseTo((mvr - 1) * l.rowH);
+    }
   });
 
   it('tall tower overflows: newest committed tile is pinned at the build line', () => {
@@ -147,15 +171,22 @@ describe('towerRowLayout (grounded camera)', () => {
     }
   });
 
-  it('parks the build line low enough to give a building word headroom above it', () => {
-    // The pending word grows UP from the committed top (the build line); if the
-    // line sits too near the screen top the new letters cram under the header and
-    // read as "detached above". Keep it in the upper-middle band.
+  it('keeps the build line glued to the crane line (~0.28H), never up by the header', () => {
+    // The crane chrome + rival rail are anchored to this same upper-middle line;
+    // the build line must stay there so the dropped block lands under the crane.
     for (const h of [700, 915, 1200]) {
-      const l = towerRowLayout({ pinCount: 8, H: h, bottomInsetPx: 200 });
+      const l = towerRowLayout({ pinCount: 8, H: h, bottomInsetPx: 160 });
       expect(l.topCenter).toBeGreaterThanOrEqual(h * 0.22);
-      expect(l.topCenter).toBeLessThanOrEqual(h * 0.42); // but not so low it buries the tower
+      expect(l.topCenter).toBeLessThanOrEqual(h * 0.42);
     }
+  });
+
+  it('floats the base just (maxVisibleRows-1) rows under the crane line — a tight build zone, clean screen below', () => {
+    const l = towerRowLayout({ pinCount: 2, H: 915, bottomInsetPx: 130, maxVisibleRows: 3 });
+    // base hangs in the UPPER screen under the crane (not grounded at the deck),
+    // leaving the lower screen clean
+    expect(l.baseCenter).toBeLessThan(915 * 0.5);
+    expect(l.baseCenter - l.topCenter).toBeCloseTo(2 * l.rowH);
   });
 });
 

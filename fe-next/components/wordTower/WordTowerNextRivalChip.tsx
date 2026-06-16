@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronUp } from 'lucide-react';
+import Avatar from '@/components/Avatar';
 import { nearestRivalAbove, type RivalMarker } from '@/lib/wordTower/rivals';
 
 interface Props {
@@ -32,13 +33,16 @@ export function WordTowerNextRivalChip({ rivals, viewerHeightM, reducedMotion, t
       aria-label={t('wordTower.hud.chaseAria', { name: target.name, m: target.gapM })}
     >
       <ChevronUp className={`h-4 w-4 text-neo-cyan ${reducedMotion ? '' : 'animate-bounce'}`} aria-hidden />
-      <span
-        className="flex h-5 w-5 items-center justify-center rounded-full border border-black text-[10px] leading-none"
-        style={{ background: target.avatarColor ?? '#2a2a40' }}
-        aria-hidden
-      >
-        {target.avatarEmoji ?? '🧗'}
-      </span>
+      {/* The rival's REAL avatar (their generated identity face), not a flat
+          emoji — seeded fallback from playerId when they have no custom one.
+          Mirrors the rail/leaderboard so the chase target reads as a person. */}
+      <Avatar
+        customAvatar={target.customAvatar ?? undefined}
+        userId={target.playerId ?? target.id}
+        pixelSize={20}
+        disableEffects
+        className="shrink-0 rounded-full border border-black"
+      />
       <span className="flex flex-col items-start leading-none" aria-hidden>
         <span className="max-w-[88px] truncate font-neo-body text-[11px] font-bold text-neo-white">{target.name}</span>
         <span className="font-neo-display text-xs font-black text-neo-cyan tabular-nums">

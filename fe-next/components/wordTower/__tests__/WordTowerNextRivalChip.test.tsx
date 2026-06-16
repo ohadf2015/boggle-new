@@ -27,4 +27,11 @@ describe('WordTowerNextRivalChip', () => {
     const { container } = render(<WordTowerNextRivalChip rivals={[]} viewerHeightM={10} t={t} dir="ltr" />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('renders the rival REAL avatar (their identity face), not a flat emoji', () => {
+    render(<WordTowerNextRivalChip rivals={rivals} viewerHeightM={50} t={t} dir="ltr" />);
+    // The shared <Avatar> (seeded from playerId/id when no custom config) — not 🧗.
+    expect(screen.getByTestId('header-avatar')).toBeInTheDocument();
+    expect(screen.queryByText('🧗')).not.toBeInTheDocument();
+  });
 });
