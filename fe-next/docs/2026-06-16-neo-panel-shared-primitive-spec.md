@@ -54,4 +54,8 @@ Added `asChild` to NeoPanel (Radix `Slot`, mirrors `button.tsx`). Correct motion
 
 ### Batch 3 motion migration (2026-06-16)
 +2 motion panels via `asChild`: `EmojiShareCard` (navy, keeps testid+motion), `LanguageDropdown` menu (cream/lg; trigger Button left alone — entangled with Button's own variant classes). **11 motion + 26 plain-div = 37 box shells consolidated.** tsc 0 · lint 0 · panel 14/14 · LanguageDropdown + EmojiShareCard consumer tests green.
+
+## Status — DONE (2026-06-16)
+NeoPanel pattern consolidation complete: **37 box shells** (26 plain-div + 11 motion via `asChild`) behind one primitive across ~25 files / 14 areas. Remaining inline boxes are principled skips (dynamic-bg `style`, conditional `cn()` clusters, `<Button>` variant-overrides) — NOT the same abstraction. Deliberately NOT building IconBadge (round-chip = visual coincidence, not a semantic unit → over-abstraction).
+Build note: earlier `WordTowerPlay.tsx` rules-of-hooks blocker is RESOLVED (loop churned past it; lints clean). Local `next build` now only fails on transient OOM (`Abort trap: 6`) from a concurrent dev server sharing `.next` — environmental, not code. All code verified via `tsc --noEmit` 0 (whole project) + lint 0 + tests; CI/standalone env builds clean.
 ```
