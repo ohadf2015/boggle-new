@@ -105,23 +105,70 @@ function recomputeStatus(state: GameState): 'playing' | 'solved' {
   return isSolved(state.puzzle, state.entries) ? 'solved' : 'playing';
 }
 
-/** Type a letter into the active cell and auto-advance to the next empty cell in the slot. */
+/** Clue order for "next slot": ascending number, across before down (matches nextSlot). */
+function slotsInClueOrder(puzzle: CrosswordPuzzle): Slot[] {
+  return [...puzzle.slots].sort(
+    (a, b) => a.number - b.number || (a.dir === b.dir ? 0 : a.dir === 'across' ? -1 : 1),
+  );
+}
+
+/** True when every cell of the slot already has an entry. */
+function slotFilled(slot: Slot, entries: Record<string, string>): boolean {
+  return slot.cells.every((c) => entries[k(c.row, c.col)]);
+}
+
+/**
+ * First blank cell of the next slot (clue order, wrapping) that still has a
+ * blank, skipping `from`. Returns null when nothing is left to fill — the
+ * cursor then stays put (the puzzle is solved or all other words are done).
+ */
+function nextUnfilledSlotStart(
+  puzzle: CrosswordPuzzle,
+  from: Slot,
+  entries: Record<string, string>,
+): { row: number; col: number; dir: Direction } | null {
+  const order = slotsInClueOrder(puzzle);
+  const start = order.findIndex((s) => s.id === from.id);
+  for (let step = 1; step <= order.length; step++) {
+    const slot = order[(start + step) % order.length];
+    if (!slot || slot.id === from.id) continue;
+    const blank = slot.cells.find((c) => !entries[k(c.row, c.col)]);
+    if (blank) return { row: blank.row, col: blank.col, dir: slot.dir };
+  }
+  return null;
+}
+
+/**
+ * Type a letter into the active cell, then move the cursor like a newspaper:
+ *  - to the next blank cell still inside the current word, else
+ *  - if the word is now complete, hop to the first blank of the next unfilled
+ *    clue (flipping direction as needed), else
+ *  - to the immediate next cell (mirrors the prior in-slot behavior).
+ */
 export function inputLetter(state: GameState, raw: string): GameState {
   const letter = normalizeCell(raw, state.puzzle.locale);
   if (!letter) return state;
   const entries = { ...state.entries, [k(state.active.row, state.active.col)]: letter };
-  let next = state;
-  const slot = currentSlot(state);
   let active = state.active;
+  let dir = state.dir;
+  const slot = currentSlot(state);
   if (slot) {
     const i = activeIndex(state, slot);
-    // advance to the next empty cell after i, else next cell, else stay.
     const after = slot.cells.slice(i + 1);
     const emptyNext = after.find((c) => !entries[k(c.row, c.col)]);
-    const target = emptyNext ?? after[0];
-    if (target) active = { row: target.row, col: target.col };
+    if (emptyNext) {
+      active = { row: emptyNext.row, col: emptyNext.col };
+    } else if (slotFilled(slot, entries)) {
+      const jump = nextUnfilledSlotStart(state.puzzle, slot, entries);
+      if (jump) {
+        active = { row: jump.row, col: jump.col };
+        dir = jump.dir;
+      }
+    } else if (after[0]) {
+      active = { row: after[0].row, col: after[0].col };
+    }
   }
-  next = { ...state, entries, active, checks: {} };
+  const next = { ...state, entries, active, dir, checks: {} };
   return { ...next, status: recomputeStatus(next) };
 }
 

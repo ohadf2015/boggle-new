@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { ClearSubmission } from './anti-cheat';
 import type { ChestContents } from './chest-roll';
 import { readGuestProgress, clearGuestProgress, writeResumeHint } from './guestProgress';
+import { enqueueClear, flushClearQueue } from './clearLevelQueue';
 import { fetchWithAuth } from '@/utils/authFetch';
 
 export type BlastProgressState = {
@@ -105,6 +106,18 @@ export function useBlastProgress() {
     };
   }, []);
 
+  // Replay any clears queued while offline — once on mount (covers a prior
+  // offline session) and whenever the connection returns.
+  useEffect(() => {
+    const flush = () => {
+      void flushClearQueue();
+    };
+    flush();
+    if (typeof window === 'undefined') return undefined;
+    window.addEventListener('online', flush);
+    return () => window.removeEventListener('online', flush);
+  }, []);
+
   const clearLevel = async (
     submission: ClearSubmission,
     earnedCoins: number,
@@ -112,6 +125,13 @@ export function useBlastProgress() {
     unlocksSeen?: Record<string, boolean>,
   ) => {
     setClearMutation({ status: 'loading' });
+    // Queue the clear so coins/chest persist on reconnect. Replay is idempotent
+    // (server dedupes on submissionId), and we treat queueing as success so a
+    // mid-ride connection drop never shows the player an error — the win stands.
+    const queueForReplay = () => {
+      enqueueClear({ submission, earnedCoins, earnedGems, unlocksSeen });
+      setClearMutation({ status: 'success' });
+    };
     try {
       const res = await fetch('/api/blast/clear-level', {
         method: 'POST',
@@ -123,17 +143,28 @@ export function useBlastProgress() {
           unlocksSeen,
         }),
       });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      setState((s) => ({
-        ...s,
-        coins: data.coins,
-        chestProgress: data.chestProgress,
-        chestNumber: data.chestNumber,
-      }));
-      setClearMutation({ status: 'success' });
-    } catch (e) {
-      setClearMutation({ status: 'error', error: String(e) });
+      if (res.ok) {
+        const data = await res.json();
+        setState((s) => ({
+          ...s,
+          coins: data.coins,
+          chestProgress: data.chestProgress,
+          chestNumber: data.chestNumber,
+        }));
+        setClearMutation({ status: 'success' });
+        return;
+      }
+      // A response reached us, so the server is up. 5xx is transient → queue for
+      // retry; 4xx is a permanent rejection → surface the error, don't queue.
+      if (res.status >= 500) {
+        queueForReplay();
+      } else {
+        setClearMutation({ status: 'error', error: await res.text().catch(() => 'rejected') });
+      }
+    } catch {
+      // fetch threw = network error (offline / unreachable), regardless of what
+      // navigator.onLine claims → queue for replay on reconnect.
+      queueForReplay();
     }
   };
 

@@ -54,11 +54,10 @@ describe('usePrefetchDailyContent', () => {
     expect(prefetchDailyPuzzles).not.toHaveBeenCalled();
   });
 
-  it('does not prefetch when flag is off', async () => {
+  it('prefetches even when the offline-mode flag is off (daily offline is decoupled from the flag)', async () => {
     setFlag(false);
     renderHook(() => usePrefetchDailyContent({ language: 'en' }));
-    await vi.waitFor(() => expect(getOfflineStore).not.toHaveBeenCalled());
-    expect(prefetchDailyPuzzles).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(prefetchDailyPuzzles).toHaveBeenCalledOnce());
   });
 
   it('passes the store returned by getOfflineStore to prefetchDailyPuzzles', async () => {

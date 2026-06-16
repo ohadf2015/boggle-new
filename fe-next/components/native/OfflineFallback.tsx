@@ -92,9 +92,9 @@ export function OfflineFallback({ onRetry, isRetrying = false }: OfflineFallback
           {t('native.offline.playablePrompt')}
         </p>
         <div className="flex flex-col gap-3">
-          {OFFLINE_MODES.map(({ segment, labelKey, entry }) => (
+          {OFFLINE_MODES.map(({ labelKey, entry }) => (
             <Link
-              key={segment}
+              key={labelKey}
               href={entry(language)}
               className="
                 flex items-center justify-center px-6 py-3

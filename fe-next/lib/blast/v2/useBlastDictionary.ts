@@ -1,7 +1,9 @@
 'use client';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { Locale } from './types';
 import { LOCALE_CONFIGS } from './locale-config';
+import { prewarmDictionary, hasWordInMemoryCache } from '@/hooks/useDictionaryCache';
+import type { Language } from '@/shared/types/game';
 
 /**
  * Async dictionary fallback for free-form word play in Blast V2.
@@ -28,6 +30,13 @@ export function useBlastDictionary(locale: Locale) {
   const cacheRef = useRef<Map<string, boolean | Promise<boolean>>>(new Map());
   const config = LOCALE_CONFIGS[locale];
 
+  // Warm the shared offline dictionary once per mount. It fetches
+  // /api/dictionary-words (cached offline-first by the service worker) into an
+  // in-memory Set, so a later connection drop can still validate bonus words.
+  useEffect(() => {
+    void prewarmDictionary(locale as Language);
+  }, [locale]);
+
   const verify = useCallback(
     async (word: string): Promise<boolean> => {
       if (!word) return false;
@@ -36,6 +45,19 @@ export function useBlastDictionary(locale: Locale) {
       const cached = cacheRef.current.get(norm);
       if (typeof cached === 'boolean') return cached;
       if (cached instanceof Promise) return cached;
+
+      // Offline-first: a warmed in-memory dictionary hit avoids the network
+      // entirely. `null` = dict not warmed; `false` = not in base dict (but a
+      // community-validated word may still resolve via the server).
+      if (hasWordInMemoryCache(norm, locale as Language) === true) {
+        cacheRef.current.set(norm, true);
+        return true;
+      }
+      // With no connection the server check can't run. Reject WITHOUT caching a
+      // hard false, so reconnecting re-checks the server for community words.
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        return false;
+      }
 
       const inflight = (async () => {
         try {

@@ -2,12 +2,30 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBlastDictionary } from '../useBlastDictionary';
 
+// Control the offline in-memory dictionary the hook now consults before the
+// network. `memHit.current` is what hasWordInMemoryCache returns.
+const { memHit, prewarmMock } = vi.hoisted(() => ({
+  memHit: { current: null as boolean | null },
+  prewarmMock: vi.fn(async () => {}),
+}));
+vi.mock('@/hooks/useDictionaryCache', () => ({
+  prewarmDictionary: prewarmMock,
+  hasWordInMemoryCache: () => memHit.current,
+}));
+
+function setOnline(online: boolean): void {
+  Object.defineProperty(navigator, 'onLine', { value: online, configurable: true });
+}
+
 describe('useBlastDictionary', () => {
   let fetchMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
+    memHit.current = null;
+    prewarmMock.mockClear();
+    setOnline(true);
   });
 
   it('returns true when the API reports the word as valid', async () => {
@@ -102,5 +120,54 @@ describe('useBlastDictionary', () => {
     });
     expect(ok).toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts a word from the offline in-memory dict without touching the network', async () => {
+    memHit.current = true;
+    const { result } = renderHook(() => useBlastDictionary('en'));
+    let ok = false;
+    await act(async () => {
+      ok = await result.current.verify('hello');
+    });
+    expect(ok).toBe(true);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('when offline and the word is not cached, rejects without hitting the network', async () => {
+    setOnline(false);
+    memHit.current = null; // dict not warmed / word unknown
+    const { result } = renderHook(() => useBlastDictionary('en'));
+    let ok = true;
+    await act(async () => {
+      ok = await result.current.verify('zzqqx');
+    });
+    expect(ok).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('does NOT cache a hard offline reject, so going back online re-checks the server', async () => {
+    // Offline miss first…
+    setOnline(false);
+    memHit.current = null;
+    const { result } = renderHook(() => useBlastDictionary('en'));
+    await act(async () => {
+      await result.current.verify('hello');
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    // …then back online: the server confirms it (community-validated word).
+    setOnline(true);
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ isValid: true }) });
+    let ok = false;
+    await act(async () => {
+      ok = await result.current.verify('hello');
+    });
+    expect(ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it('prewarms the offline dictionary on mount so bonus words work on a later connection drop', () => {
+    renderHook(() => useBlastDictionary('he'));
+    expect(prewarmMock).toHaveBeenCalledWith('he');
   });
 });

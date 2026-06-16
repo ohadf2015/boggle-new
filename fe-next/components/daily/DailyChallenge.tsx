@@ -53,9 +53,9 @@ import { useRetryChallenge } from './useRetryChallenge';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import { useNetworkState } from '@/hooks/useNetworkState';
-import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { getOfflineStore } from '@/lib/offline';
 import { getCachedDailyPuzzle } from '@/lib/offline/prefetchDaily';
+import { usePrefetchDailyContent } from '@/hooks/usePrefetchDailyContent';
 import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
 import type { LetterGrid, Language } from '@/types';
 
@@ -67,10 +67,14 @@ const DailyChallenge: React.FC = () => {
   const { unlockAudio } = useMusic();
   const { recordWin: recordStreak } = useWinStreak();
   const isPractice = usePracticeFlag();
-  const offlineFlag = useOfflineModeFlag();
   const { online } = useNetworkState();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Cache today's (+ tomorrow's, late in the day) daily puzzle for offline play.
+  // Runs once per session for whoever opens Daily, independent of the
+  // offline-mode flag — see usePrefetchDailyContent.
+  usePrefetchDailyContent({ language });
 
   // Catch-up: `?date=YYYY-MM-DD` launches a past daily within the last-3-days
   // window. Validated against today so only a genuine catch-up date is honored
@@ -233,7 +237,7 @@ const DailyChallenge: React.FC = () => {
         }
       }
 
-      if (offlineFlag && !online) {
+      if (!online) {
         const store = await getOfflineStore();
         const cached = await getCachedDailyPuzzle<{ grid: LetterGrid; targetWord: string }>(
           store, date, gameLanguage, 'wordhunt',

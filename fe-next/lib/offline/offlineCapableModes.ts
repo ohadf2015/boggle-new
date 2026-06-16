@@ -20,11 +20,16 @@
  *                   the preserved `?practice=1` path (see app/[locale]/singleplayer).
  *  - word-craft   — client-side tile game; EN/SV dicts bundled, HE/ES/JA dict cached after
  *                   one online load (see lib/word-craft/dictionary localStorage cache).
+ *  - crossword    — bundled daily puzzles (lib/crossword/puzzles) + localStorage resume; the
+ *                   board, clue nav and check/reveal are fully client-side.
+ *  - wordfall     — Blast V2 ("Wordfall"); shares the `blast` segment but precaches its own
+ *                   /blast/v2 shell. Levels build client-side from the bundled chain packs via
+ *                   lib/blast/v2/offlineLevelResolver (zero network), guests persist progress
+ *                   to localStorage, authed clears queue for replay on reconnect.
  *
- * NOTE: Crossword is offline-PLAYABLE (bundled puzzles + localStorage resume need no network
- * once loaded) but is intentionally NOT listed here. It's an admin-only `force-dynamic` route
- * (server-side gate), so it has no static shell to precache — and precaching it would risk
- * caching a 404 for non-admins. Same reasoning as the admin-only blast/v2 route.
+ * Both crossword and wordfall were previously admin-only `force-dynamic` routes (404 for
+ * non-admins → no precache-able shell). Their play routes now render for everyone, so the SW
+ * can precache a real shell and a rider can launch them offline.
  */
 
 import { locales } from '@/i18n/config';
@@ -62,6 +67,14 @@ export const OFFLINE_MODES: readonly OfflineMode[] = [
     entry: (locale) => `/${locale}/singleplayer?practice=1`,
   },
   { segment: 'word-craft', labelKey: 'native.offline.playWordCraft', entry: localePath('word-craft') },
+  { segment: 'crossword', labelKey: 'native.offline.playCrossword', entry: localePath('crossword') },
+  {
+    // Wordfall (Blast V2) shares the `blast` segment for the offline-capable
+    // route gate, but precaches/links its own /blast/v2 shell.
+    segment: 'blast',
+    labelKey: 'native.offline.playWordfall',
+    entry: (locale) => `/${locale}/blast/v2`,
+  },
 ] as const;
 
 /** Segment list — preserved for backward compatibility with existing callers. */

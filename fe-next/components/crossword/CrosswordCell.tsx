@@ -97,7 +97,7 @@ function CrosswordCellBase({
     >
       {cell.number != null && (
         <span
-          className="absolute top-[2px] start-[3px] text-[0.6rem] leading-none font-neo-body font-semibold text-neo-navy/70"
+          className="absolute top-[2px] start-[3px] text-[0.6rem] leading-none font-serif font-semibold text-neo-navy/70"
           aria-hidden
         >
           {cell.number}

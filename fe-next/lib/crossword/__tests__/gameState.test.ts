@@ -103,6 +103,25 @@ describe('inputLetter auto-advance', () => {
     s = inputLetter(s, 'e'); // date/date last cell = 'e'
     expect(s.status).toBe('solved');
   });
+
+  it('jumps to the next unfilled clue when a word is completed (newspaper flow)', () => {
+    let s = initGame(puzzle); // (0,0) across — 1-across "bird"
+    s = inputLetter(s, 'b');
+    s = inputLetter(s, 'i');
+    s = inputLetter(s, 'r');
+    s = inputLetter(s, 'd'); // completes 1-across "bird"
+    // Next clue in order (number, across-before-down) is 1-down "bird"; its
+    // first empty cell is (1,0). Cursor should hop there with dir flipped down.
+    expect(s.dir).toBe('down');
+    expect(s.active).toEqual({ row: 1, col: 0 });
+  });
+
+  it('does NOT jump away while a word still has blanks', () => {
+    let s = initGame(puzzle);
+    s = inputLetter(s, 'b'); // 1-across still has blanks
+    expect(s.dir).toBe('across');
+    expect(s.active).toEqual({ row: 0, col: 1 }); // normal in-slot advance
+  });
 });
 
 describe('backspace', () => {

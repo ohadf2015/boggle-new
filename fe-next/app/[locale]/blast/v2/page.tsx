@@ -2,23 +2,24 @@ import { notFound } from 'next/navigation';
 import type { Locale } from '@/lib/blast/v2/types';
 import { buildRegistry, getLevelSourceForLevel } from '@/lib/blast/v2/level-source-registry';
 import { todayUtcVariant } from '@/lib/blast/v2/dailyVariant';
-import { isAdminSession } from '@/lib/auth/isAdminSession';
 import { BlastV2PageClient } from './BlastV2PageClient';
 
 const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
-// Server-rendered per request — admin gating reads the cookie session, so this
-// route can never be statically cached/prerendered.
+// Server-rendered per request — the level board carries a daily variant salt,
+// so the SSR shell must not be frozen at build time.
 export const dynamic = 'force-dynamic';
 
 /**
- * Dedicated Blast V2 route — its own standalone ADMIN-ONLY mode, NOT a toggle
- * on `/blast`. `/blast` always serves V1 (and stays in parity with multiplayer);
- * this route always serves the V2 single-player engine.
+ * Dedicated Wordfall route (Blast V2) — its own standalone single-player mode,
+ * NOT a toggle on `/blast`. `/blast` always serves V1 (and stays in parity with
+ * multiplayer); this route always serves the V2 / Wordfall engine.
  *
- * Admin enforcement is real, not cosmetic: non-admins (and signed-out users)
- * get a 404 here, regardless of whether the hub card is surfaced. The card is
- * only a discovery convenience for admins.
+ * Public + offline-capable: the page renders for everyone (the play code makes
+ * no admin assumption — guests resume from localStorage), so the service worker
+ * can precache a real shell and a rider can launch Wordfall with no connection.
+ * Levels build client-side from the bundled chain packs when offline
+ * (see BlastV2PageClient → lib/blast/v2/offlineLevelResolver).
  */
 export default async function BlastV2Page({
   params,
@@ -27,10 +28,6 @@ export default async function BlastV2Page({
 }) {
   const { locale: rawLocale } = await params;
   if (!VALID_LOCALES.includes(rawLocale as Locale)) {
-    notFound();
-  }
-  // Hard gate: V2 is admin-only at the route level, not just hidden from the hub.
-  if (!(await isAdminSession())) {
     notFound();
   }
   const locale = rawLocale as Locale;

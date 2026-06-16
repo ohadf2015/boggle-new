@@ -23,6 +23,13 @@ describe('offlineCapableModes', () => {
       expect(OFFLINE_CAPABLE_MODES).toContain('word-craft');
     });
 
+    it('includes the newly offline-enabled puzzle modes (crossword + wordfall)', () => {
+      // Crossword is its own segment; Wordfall (blast v2) shares the `blast`
+      // segment but precaches its own /blast/v2 shell.
+      expect(OFFLINE_CAPABLE_MODES).toContain('crossword');
+      expect(OFFLINE_CAPABLE_MODES).toContain('blast');
+    });
+
     it('does NOT include multiplayer or other server-only modes', () => {
       expect(OFFLINE_CAPABLE_MODES).not.toContain('multiplayer');
       expect(OFFLINE_CAPABLE_MODES).not.toContain('friends');
@@ -55,6 +62,20 @@ describe('offlineCapableModes', () => {
       const sp = OFFLINE_MODES.find((m) => m.segment === 'singleplayer')!;
       expect(sp.entry('en')).toBe('/en/singleplayer?practice=1');
     });
+
+    it('crossword entry resolves to the crossword route', () => {
+      const cw = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playCrossword')!;
+      expect(cw).toBeDefined();
+      expect(cw.segment).toBe('crossword');
+      expect(cw.entry('en')).toBe('/en/crossword');
+    });
+
+    it('wordfall entry resolves to the blast/v2 route (shares the blast segment)', () => {
+      const wf = OFFLINE_MODES.find((m) => m.labelKey === 'native.offline.playWordfall')!;
+      expect(wf).toBeDefined();
+      expect(wf.segment).toBe('blast');
+      expect(wf.entry('en')).toBe('/en/blast/v2');
+    });
   });
 
   describe('isOfflineCapable', () => {
@@ -76,6 +97,13 @@ describe('offlineCapableModes', () => {
       expect(isOfflineCapable('/en/daily/results')).toBe(true);
       expect(isOfflineCapable('/en/brain/drills/combo-master')).toBe(true);
       expect(isOfflineCapable('/en/adventure/world/1')).toBe(true);
+    });
+
+    it('returns true for crossword and for wordfall (blast/v2 sub-path)', () => {
+      expect(isOfflineCapable('/en/crossword')).toBe(true);
+      expect(isOfflineCapable('/he/crossword')).toBe(true);
+      // /blast/v2 resolves to the blast segment, which is offline-capable.
+      expect(isOfflineCapable('/en/blast/v2')).toBe(true);
     });
 
     it('handles trailing slashes and query strings', () => {
@@ -124,8 +152,11 @@ describe('offlineCapableModes', () => {
       // singleplayer precaches the playable URL, not the redirecting bare route
       expect(routes).toContain('/en/singleplayer?practice=1');
       expect(routes).not.toContain('/en/singleplayer');
-      // 5 locales x 7 modes
-      expect(routes).toHaveLength(35);
+      // newly offline-enabled puzzle modes precache their own shells
+      expect(routes).toContain('/en/crossword');
+      expect(routes).toContain('/en/blast/v2');
+      // 5 locales x 9 modes (7 original + crossword + wordfall)
+      expect(routes).toHaveLength(45);
     });
   });
 });

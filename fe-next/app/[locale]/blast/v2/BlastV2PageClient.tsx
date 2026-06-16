@@ -6,12 +6,35 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useBlastProgress } from '@/lib/blast/v2/useBlastProgress';
 import { writeGuestProgress, writeResumeHint, readResumeHint } from '@/lib/blast/v2/guestProgress';
 import { todayUtcVariant } from '@/lib/blast/v2/dailyVariant';
-import type { BlastLevel } from '@/lib/blast/v2/types';
+import { resolveOfflineLevel } from '@/lib/blast/v2/offlineLevelResolver';
+import type { BlastLevel, Locale } from '@/lib/blast/v2/types';
 import { type UnlocksSeen, validateUnlocksSeen } from '@/lib/blast/v2/tutorial/unlocks-seen';
 
 type Props = {
   level: BlastLevel;
 };
+
+/**
+ * Load a Wordfall level with graceful offline fallback. Online: fetch the
+ * server-built level (higher-quality board + generated levels 31+). Offline,
+ * or on any fetch failure: build it client-side from the bundled chain packs
+ * (`resolveOfflineLevel`). Returns null only when the level is past the
+ * playable range — the campaign-end signal. Never throws.
+ */
+async function loadBlastLevel(levelNumber: number, locale: Locale): Promise<BlastLevel | null> {
+  const offlineNow = typeof navigator !== 'undefined' && navigator.onLine === false;
+  if (!offlineNow) {
+    try {
+      const res = await fetch(
+        `/api/blast/level?level=${levelNumber}&locale=${locale}&variant=${todayUtcVariant()}`,
+      );
+      if (res.ok) return (await res.json()) as BlastLevel;
+    } catch {
+      // Network hiccup mid-ride — fall through to the bundled offline build.
+    }
+  }
+  return resolveOfflineLevel(levelNumber, locale);
+}
 
 export function BlastV2PageClient({ level: initialLevel }: Props) {
   const [level, setLevel] = useState<BlastLevel>(initialLevel);
@@ -57,17 +80,12 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
         if (!cancelled) setBooting(false);
         return;
       }
-      try {
-        const res = await fetch(`/api/blast/level?level=${currentLevel}&locale=${initialLevel.locale}&variant=${todayUtcVariant()}`);
-        if (!res.ok) throw new Error('resume level fetch failed');
-        const resumed = (await res.json()) as BlastLevel;
-        if (!cancelled) setLevel(resumed);
-      } catch (e) {
-        // Best-effort resume — degrade to the SSR level 1 rather than strand the player.
-        console.error('Failed to resume blast level:', e);
-      } finally {
-        if (!cancelled) setBooting(false);
-      }
+      // Best-effort resume — loadBlastLevel falls back to the bundled offline
+      // build, so a connection drop resumes the saved level instead of
+      // stranding the player on the SSR level 1.
+      const resumed = await loadBlastLevel(currentLevel, initialLevel.locale);
+      if (resumed && !cancelled) setLevel(resumed);
+      if (!cancelled) setBooting(false);
     })();
     return () => {
       cancelled = true;
@@ -93,14 +111,12 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
     advancingRef.current = true;
     const nextNumber = level.levelNumber + 1;
     try {
-      const res = await fetch(
-        `/api/blast/level?level=${nextNumber}&locale=${level.locale}&variant=${todayUtcVariant()}`,
-      );
-      if (!res.ok) {
+      const next = await loadBlastLevel(nextNumber, level.locale);
+      if (!next) {
+        // null = past the playable range (campaign end), online or off.
         setReachedEnd(true);
         return;
       }
-      const next = (await res.json()) as BlastLevel;
       setLevel(next);
       // Paint fast-path hint for next visit (all users).
       writeResumeHint(nextNumber);
@@ -109,9 +125,6 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
       if (isGuest) {
         writeGuestProgress({ currentLevel: nextNumber, locale: level.locale });
       }
-    } catch (e) {
-      console.error('Failed to load next blast level:', e);
-      setReachedEnd(true);
     } finally {
       advancingRef.current = false;
     }
