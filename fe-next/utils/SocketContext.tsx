@@ -89,10 +89,14 @@ export const getSocketURL = (): string => {
     return process.env.NEXT_PUBLIC_WS_URL.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:');
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:3001';
-  }
-
+  // The unified custom server (server/index.ts) serves Next + Socket.IO on the
+  // SAME port in every environment, so Socket.IO is always same-origin. Resolve
+  // it from the page origin rather than a hardcoded port. (Set NEXT_PUBLIC_WS_URL
+  // to override for split dev setups or native apps.)
+  //
+  // The old dev-only `http://localhost:3001` hardcode broke whenever the server
+  // ran on a different port (e.g. PORT=3000): the client dialed a dead 3001 and
+  // the app sat stuck "OFFLINE".
   if (typeof window === 'undefined') return '';
 
   const protocol = window.location.protocol;

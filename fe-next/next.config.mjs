@@ -326,15 +326,21 @@ const nextConfig = {
           },
         ],
       },
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
+      // _next/static fingerprinted assets: Next sets immutable caching itself in
+      // production. Declaring it manually in DEV breaks HMR/chunk reloading
+      // ("Custom Cache-Control header can break Next.js development behavior"),
+      // so only emit it for production builds.
+      ...(process.env.NODE_ENV === 'production'
+        ? [{
+            source: '/_next/static/:path*',
+            headers: [
+              {
+                key: 'Cache-Control',
+                value: 'public, max-age=31536000, immutable',
+              },
+            ],
+          }]
+        : []),
       {
         source: '/logos/:path*',
         headers: [
@@ -434,7 +440,6 @@ const nextConfig = {
   // Enable Turbopack configuration (required for Next.js 16+)
   turbopack: {
     root: __dirname,
-    useSystemTlsCerts: true,
     resolveAlias: {
       '@arvidbt/swedish-words': '@arvidbt/swedish-words/out/index.js',
     },

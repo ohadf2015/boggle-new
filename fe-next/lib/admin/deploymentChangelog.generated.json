@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-16T07:38:10.802Z",
+  "generatedAt": "2026-06-16T20:59:35.355Z",
   "commits": [
     {
-      "sha": "e3bee001fe2d805e8084d0d70b59d3f82d1d3b23",
-      "shortSha": "e3bee00",
-      "subject": "fix(auth): center Google sign-in button content",
+      "sha": "60414cab0018da16f161beb09f42ac85b6e20d7a",
+      "shortSha": "60414ca",
+      "subject": "perf(homepage): kill hydration skeleton-flash + retire control layout (cubes-only)",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T10:24:52+03:00"
+      "date": "2026-06-16T23:59:22+03:00"
     },
     {
-      "sha": "3a25418fb1b4473d9c82e332440b224cf06d3b7f",
-      "shortSha": "3a25418",
-      "subject": "fix(nightly): land lane code reliably + auto-dispose stranded refs (no human gate)",
+      "sha": "786b8cb9442044a86957758eca66fa043ee89f0d",
+      "shortSha": "786b8cb",
+      "subject": "docs(ui): mark NeoPanel consolidation done (37 box shells) + build status note",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T10:05:09+03:00"
+      "date": "2026-06-16T23:55:11+03:00"
     },
     {
-      "sha": "91d2e46b444fbfc56e3b8f66ff3b82cf0bcd7f2c",
-      "shortSha": "91d2e46",
-      "subject": "chore(nightly): improve admin-beta modes nightly instead of shipping new ones",
+      "sha": "c9ba14ad430f8ee188b1f9d3271a193dfc9f7682",
+      "shortSha": "c9ba14a",
+      "subject": "feat(ui): migrate 2 more motion panels (EmojiShareCard, LanguageDropdown) to NeoPanel asChild",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T10:01:08+03:00"
+      "date": "2026-06-16T23:35:38+03:00"
     },
     {
-      "sha": "c5cb32f15c2442e0c33b9c3e1a4cbb8d5497a271",
-      "shortSha": "c5cb32f",
-      "subject": "fix(multiplayer): ask before adding bots when solo host presses Start",
+      "sha": "4517a3b6d752f792b2538dfd8e0fcbf33969b5eb",
+      "shortSha": "4517a3b",
+      "subject": "perf(mp-classic): lean board profile + centered connector + single timer",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T09:49:37+03:00"
+      "date": "2026-06-16T23:24:05+03:00"
     },
     {
-      "sha": "1c11492b54d2fedb0d420e1a771cac3544b07e2e",
-      "shortSha": "1c11492",
-      "subject": "fix(results): skip pre-result fanfare on native to kill residual white flash",
+      "sha": "4425ef94f90e7af9c0fddacd405bccaa49dc7cfc",
+      "shortSha": "4425ef9",
+      "subject": "feat(offline): finish Wordfall bonus-words + crossword feedback polish",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T09:20:37+03:00"
+      "date": "2026-06-16T23:23:22+03:00"
     },
     {
-      "sha": "d4e62e719ad4686d7bbe36b5cd29328337fbca83",
-      "shortSha": "d4e62e7",
-      "subject": "fix(multiplayer): skip the pre-result fanfare on native (stopgap for white flash)",
+      "sha": "53b10004c976c58a61c74eaf7b44f323cd073f38",
+      "shortSha": "53b1000",
+      "subject": "feat(ui): migrate 5 more motion-wrapped panels to NeoPanel asChild",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T09:17:58+03:00"
+      "date": "2026-06-16T23:19:40+03:00"
     },
     {
-      "sha": "f251e08ee3e94b2b098abdc9f85d5b6bc7cee71b",
-      "shortSha": "f251e08",
-      "subject": "fix(email,push): harden the 3 latent reengagement/cron gaps",
+      "sha": "552683e55d3cf2859d006f3ed6d8a149fb8c7ad7",
+      "shortSha": "552683e",
+      "subject": "feat(wordtower): compliments/messages clear after 2s with a cool exit",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T08:48:54+03:00"
+      "date": "2026-06-16T23:17:19+03:00"
     },
     {
-      "sha": "4e9b28a7a7943390e542bb6062b570ea7b6ca5a1",
-      "shortSha": "4e9b28a",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-16",
+      "sha": "3f6963caa27d760bdb5ca4ae1cbf5b22f8f70726",
+      "shortSha": "3f6963c",
+      "subject": "feat(ui): NeoPanel asChild (Slot) + migrate 4 motion-wrapped panels",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T07:19:44+03:00"
+      "date": "2026-06-16T23:13:06+03:00"
     },
     {
-      "sha": "1e55265b8968c54352233afcdfb30c6bc5411cc3",
-      "shortSha": "1e55265",
-      "subject": "fix(email): reengagement query read live daily tables (was starved → 0 sends)",
+      "sha": "64c72b0bb8d3662c2c332f477a46e3054a0dd79b",
+      "shortSha": "64c72b0",
+      "subject": "feat(offline): playable offline ride — Wordfall, Crossword, Daily",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T03:04:10+03:00"
+      "date": "2026-06-16T23:04:12+03:00"
     },
     {
-      "sha": "6569721acda2dbf17170c3b7292eadef35727a3d",
-      "shortSha": "6569721",
-      "subject": "fix(multiplayer): stop native white flash from the pre-result fanfare entrance tweens",
+      "sha": "c605a59193ec517becb6590dbe1424eb2304e956",
+      "shortSha": "c605a59",
+      "subject": "feat(onboarding): fun Google signup at FTUE profile step + reload-on-fresh-signin",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T02:57:49+03:00"
+      "date": "2026-06-16T22:59:45+03:00"
     },
     {
-      "sha": "9b50ad35daca00158bb044f4654b651b50a87300",
-      "shortSha": "9b50ad3",
-      "subject": "style(auth): white Google button (outline theme) in the neo frame",
+      "sha": "8d651d4cc1da6b95c5d37965f1fe02d54bebf0e4",
+      "shortSha": "8d651d4",
+      "subject": "feat(ui): extract shared NeoPanel primitive, consolidate 26 inline box shells",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T02:27:44+03:00"
+      "date": "2026-06-16T22:57:21+03:00"
     },
     {
-      "sha": "4fa0fd9b2e55f23efbddcba45b3e112540695665",
-      "shortSha": "4fa0fd9",
-      "subject": "style(auth): make the Google button frame hug the button (no empty gaps)",
+      "sha": "460ae7e011df7b9737cbf680591223fde658bf07",
+      "shortSha": "460ae7e",
+      "subject": "feat(wordtower): on-brand 'in the zone' frame on hot perfect streaks",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T01:47:36+03:00"
+      "date": "2026-06-16T22:44:40+03:00"
     },
     {
-      "sha": "4b2eca0bcbef456b44d2938e190605988da008a8",
-      "shortSha": "4b2eca0",
-      "subject": "style(auth): neo-brutalist frame + full-width for the Google button",
+      "sha": "bfb5965e074d22447b66248f74d393c7bcfcb93d",
+      "shortSha": "bfb5965",
+      "subject": "feat(wordtower): tower skins + steady-hands crane reward",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T01:32:42+03:00"
+      "date": "2026-06-16T22:38:28+03:00"
     },
     {
-      "sha": "bc8d6eeb644e585ec7b6d65501cc1dec1de3867a",
-      "shortSha": "bc8d6ee",
-      "subject": "fix(multiplayer): opaque navy countdown root on native (no blank-white)",
+      "sha": "4995edefbee12353dd5dbaeb1e54c3cbf6a37dec",
+      "shortSha": "4995ede",
+      "subject": "feat(wordtower): cap visible tower to 3 blocks, slimmer deck, real rival avatars",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T01:26:16+03:00"
+      "date": "2026-06-16T22:37:37+03:00"
     },
     {
-      "sha": "5963fe08d26a52410a2394948e9a0d93b2b994fe",
-      "shortSha": "5963fe0",
-      "subject": "feat(splash): animated branded loading splash screen",
+      "sha": "485c9d04dddd67ff6e1dddf3b07de4455844dea1",
+      "shortSha": "485c9d0",
+      "subject": "feat(solo): wire crossword into solo daily reward layer",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T01:14:47+03:00"
+      "date": "2026-06-16T22:36:16+03:00"
     },
     {
-      "sha": "d095bd147f165b9f00bb9d723b7eedc6933b7925",
-      "shortSha": "d095bd1",
-      "subject": "fix(responsive): desktop word-wheel aspect-lock + practice mobile collapse",
+      "sha": "44ddfd888ae06d2e668ce00c3650b2cae3b7ec92",
+      "shortSha": "44ddfd8",
+      "subject": "feat(solo): daily coin+reward layer for beta modes",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T01:14:28+03:00"
+      "date": "2026-06-16T22:34:04+03:00"
     },
     {
-      "sha": "630b5e69e4364a87f1974c54fccf7c1a99eed14b",
-      "shortSha": "630b5e6",
-      "subject": "fix(auth): revert Google button to visible GSI button (overlay broke clicks)",
+      "sha": "c68678c585b954d8cb611c9ba09e49adaf1ddb67",
+      "shortSha": "c68678c",
+      "subject": "chore: refresh generated deployment changelog + translation report",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T00:57:42+03:00"
+      "date": "2026-06-16T11:16:37+03:00"
     },
     {
-      "sha": "e46807d5b9cd6348d298d66df2b2b427107807b5",
-      "shortSha": "e46807d",
-      "subject": "fix(multiplayer): stop native countdown fanfare flashing white (GPU layer)",
+      "sha": "d6dcb32703917890710dba7b19185549aaca4932",
+      "shortSha": "d6dcb32",
+      "subject": "feat(nightly): autonomous PostHog experiment creation + native FAQ review (no human flags)",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T00:48:38+03:00"
+      "date": "2026-06-16T10:54:39+03:00"
     },
     {
-      "sha": "7c47d0da54306e98906596f5372b6a4ce1c2fd54",
-      "shortSha": "7c47d0d",
-      "subject": "feat(auth): brand-style the Google sign-in button (neo-brutalist overlay)",
+      "sha": "1253611fbf23efe30b2450fece5a4a401a56f256",
+      "shortSha": "1253611",
+      "subject": "feat(blast): stronger YOU-vs-rivals separation + competitive gap in live MP strip",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T00:42:37+03:00"
+      "date": "2026-06-16T10:50:45+03:00"
     },
     {
-      "sha": "90c4fb8de86fa51cde5f8374cb7248eb66b3adb8",
-      "shortSha": "90c4fb8",
-      "subject": "feat(word-tower): crane cap + final-color blocks, pendulum, gentler sway, rival avatars",
+      "sha": "55c4493d3a2c0c6e12cda4af436f91033760e632",
+      "shortSha": "55c4493",
+      "subject": "fix(mp): tighten solo blast safety-net launch window so bots aren't stuck at 0",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T00:37:39+03:00"
+      "date": "2026-06-16T10:50:31+03:00"
     }
   ]
 }
