@@ -4,6 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { m } from 'framer-motion';
 import { Eye, EyeOff, Share2, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoPanel } from '@/components/ui/panel';
 import type { Language } from '@/types';
 
 interface WordEntry {
@@ -88,12 +89,12 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
   }, [shareText, handleCopy]);
 
   return (
+    <NeoPanel asChild tone="navy" className="p-4 font-mono text-sm select-all">
     <m.div
       data-testid="emoji-share-card"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard p-4 font-mono text-sm select-all"
     >
       {/* Puzzle header */}
       <div className="flex items-center justify-between mb-3">
@@ -160,6 +161,7 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
         </Button>
       </div>
     </m.div>
+    </NeoPanel>
   );
 };
 

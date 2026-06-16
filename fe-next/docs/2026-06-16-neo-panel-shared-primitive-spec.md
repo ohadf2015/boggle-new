@@ -51,4 +51,7 @@ Added `asChild` to NeoPanel (Radix `Slot`, mirrors `button.tsx`). Correct motion
 
 ### Batch 2 motion migration (2026-06-16)
 +5 more motion panels via `asChild` (hand-done, class-set-equal): `DirectionHintOverlay` (navy/lg, keeps stopPropagation), `CustomPuzzleCreator` share-url box (navy/sm), `PracticeContinuePrompt` (cream), `PreGameTutorial` ×2 speech bubbles (cream). 9 motion panels total now. Verified: tsc 0 (whole project) · lint 0 (touched) · panel 14/14 · 66 consumer tests green (CustomPuzzleCreator + PreGameTutorial + SinglePlayerView + DailyWordHuntResults render paths). `next build` still blocked by the unrelated `WordTowerPlay.tsx` rules-of-hooks error.
+
+### Batch 3 motion migration (2026-06-16)
++2 motion panels via `asChild`: `EmojiShareCard` (navy, keeps testid+motion), `LanguageDropdown` menu (cream/lg; trigger Button left alone — entangled with Button's own variant classes). **11 motion + 26 plain-div = 37 box shells consolidated.** tsc 0 · lint 0 · panel 14/14 · LanguageDropdown + EmojiShareCard consumer tests green.
 ```

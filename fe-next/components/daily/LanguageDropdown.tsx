@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoPanel } from '@/components/ui/panel';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -50,12 +51,12 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
 
       <AnimatePresence>
         {open && (
+          <NeoPanel asChild tone="cream" shadow="lg" className="absolute top-full right-0 mt-2 z-[100] overflow-hidden min-w-[140px]">
           <m.div
             initial={{ opacity: 0, y: -5, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -5, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[140px]"
             onMouseDown={(e) => e.preventDefault()}
           >
             {LANGUAGE_OPTIONS.map((option) => {
@@ -78,6 +79,7 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
               );
             })}
           </m.div>
+          </NeoPanel>
         )}
       </AnimatePresence>
     </div>
