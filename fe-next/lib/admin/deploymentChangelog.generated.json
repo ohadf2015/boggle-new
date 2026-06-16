@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-15T07:46:52.020Z",
+  "generatedAt": "2026-06-16T07:38:10.802Z",
   "commits": [
     {
-      "sha": "719e31521f09b0a0f83400bf7c2b5bf20aea8515",
-      "shortSha": "719e315",
-      "subject": "refactor(minigames): center sealed-bid bid hero + compact word-alchemy header",
+      "sha": "e3bee001fe2d805e8084d0d70b59d3f82d1d3b23",
+      "shortSha": "e3bee00",
+      "subject": "fix(auth): center Google sign-in button content",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:46:33+03:00"
+      "date": "2026-06-16T10:24:52+03:00"
     },
     {
-      "sha": "e681542ceb54fd0b05ab23967ea338abfa483df8",
-      "shortSha": "e681542",
-      "subject": "fix(wordTower): remove reset button, vertical crane letters, auto-dismiss verdict toast",
+      "sha": "3a25418fb1b4473d9c82e332440b224cf06d3b7f",
+      "shortSha": "3a25418",
+      "subject": "fix(nightly): land lane code reliably + auto-dispose stranded refs (no human gate)",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:40:16+03:00"
+      "date": "2026-06-16T10:05:09+03:00"
     },
     {
-      "sha": "96356b6ece6964f74882a45995cf546db027219b",
-      "shortSha": "96356b6",
-      "subject": "fix(results): kill white scroll-flicker layer + de-double scroll FX; de-flash fanfare",
+      "sha": "91d2e46b444fbfc56e3b8f66ff3b82cf0bcd7f2c",
+      "shortSha": "91d2e46",
+      "subject": "chore(nightly): improve admin-beta modes nightly instead of shipping new ones",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:39:11+03:00"
+      "date": "2026-06-16T10:01:08+03:00"
     },
     {
-      "sha": "47b7c2c4ebbe3aebeec259740e88679661c8bc00",
-      "shortSha": "47b7c2c",
-      "subject": "feat(minigames): no-scroll GameStage shell + juice for shiritori, word-alchemy, sealed-bid, crossword",
+      "sha": "c5cb32f15c2442e0c33b9c3e1a4cbb8d5497a271",
+      "shortSha": "c5cb32f",
+      "subject": "fix(multiplayer): ask before adding bots when solo host presses Start",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:38:46+03:00"
+      "date": "2026-06-16T09:49:37+03:00"
     },
     {
-      "sha": "eb55e462fc2bcf9312291afd9fc8f38b2884380e",
-      "shortSha": "eb55e46",
-      "subject": "fix(mp): single avatar-emote in lobby — drop floating-emoji toy",
+      "sha": "1c11492b54d2fedb0d420e1a771cac3544b07e2e",
+      "shortSha": "1c11492",
+      "subject": "fix(results): skip pre-result fanfare on native to kill residual white flash",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:38:30+03:00"
+      "date": "2026-06-16T09:20:37+03:00"
     },
     {
-      "sha": "5a2ca8fcafcb9da97934dc49ad3c5072495736a9",
-      "shortSha": "5a2ca8f",
-      "subject": "fix(mp): dialog z-[101] so exit confirm renders above overlay",
+      "sha": "d4e62e719ad4686d7bbe36b5cd29328337fbca83",
+      "shortSha": "d4e62e7",
+      "subject": "fix(multiplayer): skip the pre-result fanfare on native (stopgap for white flash)",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:38:15+03:00"
+      "date": "2026-06-16T09:17:58+03:00"
     },
     {
-      "sha": "796f72cd17fdab885b917744573ae3b8321fcfe6",
-      "shortSha": "796f72c",
-      "subject": "fix(music): only the bossa bed follows player style — stop styled music restarting every page",
+      "sha": "f251e08ee3e94b2b098abdc9f85d5b6bc7cee71b",
+      "shortSha": "f251e08",
+      "subject": "fix(email,push): harden the 3 latent reengagement/cron gaps",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:16:01+03:00"
+      "date": "2026-06-16T08:48:54+03:00"
     },
     {
-      "sha": "e7a3b64191e7b034016facd0c6c478fc8bc26f07",
-      "shortSha": "e7a3b64",
-      "subject": "feat(admin): show chosen player style on player cards",
+      "sha": "4e9b28a7a7943390e542bb6062b570ea7b6ca5a1",
+      "shortSha": "4e9b28a",
+      "subject": "chore(nightly): autonomous improvement loop 2026-06-16",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T10:04:29+03:00"
+      "date": "2026-06-16T07:19:44+03:00"
     },
     {
-      "sha": "e8db64846ea7d1598d11ee06cdfae9eee1ce70d9",
-      "shortSha": "e8db648",
-      "subject": "fix(i18n): define missing admin.teacherAccess + wordForge.tryAgain keys",
+      "sha": "1e55265b8968c54352233afcdfb30c6bc5411cc3",
+      "shortSha": "1e55265",
+      "subject": "fix(email): reengagement query read live daily tables (was starved → 0 sends)",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T09:44:36+03:00"
+      "date": "2026-06-16T03:04:10+03:00"
     },
     {
-      "sha": "d26deeb2a2f9c8775b6ae739d5dd52b5a7d588b8",
-      "shortSha": "d26deeb",
-      "subject": "chore(nightly): move loop schedule to 01:00 local",
+      "sha": "6569721acda2dbf17170c3b7292eadef35727a3d",
+      "shortSha": "6569721",
+      "subject": "fix(multiplayer): stop native white flash from the pre-result fanfare entrance tweens",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T09:35:13+03:00"
+      "date": "2026-06-16T02:57:49+03:00"
     },
     {
-      "sha": "e4f5a8abf5378acf6c27475ee61af0d20e80107e",
-      "shortSha": "e4f5a8a",
-      "subject": "fix(nightly): glyph-agnostic MCP connected check + await supabase",
+      "sha": "9b50ad35daca00158bb044f4654b651b50a87300",
+      "shortSha": "9b50ad3",
+      "subject": "style(auth): white Google button (outline theme) in the neo frame",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T09:35:03+03:00"
+      "date": "2026-06-16T02:27:44+03:00"
     },
     {
-      "sha": "97adb922886ee2060a21f12ec76aec5c82ac179e",
-      "shortSha": "97adb92",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-15",
+      "sha": "4fa0fd9b2e55f23efbddcba45b3e112540695665",
+      "shortSha": "4fa0fd9",
+      "subject": "style(auth): make the Google button frame hug the button (no empty gaps)",
       "author": "Ohad Fisher",
-      "date": "2026-06-15T08:22:12+03:00"
+      "date": "2026-06-16T01:47:36+03:00"
     },
     {
-      "sha": "66eb73c7e8ce120d7c8c071fbc025052e7504aca",
-      "shortSha": "66eb73c",
-      "subject": "fix(multiplayer): switch to in-game music + kill cream FOUC white flash on game start",
+      "sha": "4b2eca0bcbef456b44d2938e190605988da008a8",
+      "shortSha": "4b2eca0",
+      "subject": "style(auth): neo-brutalist frame + full-width for the Google button",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T22:17:18+03:00"
+      "date": "2026-06-16T01:32:42+03:00"
     },
     {
-      "sha": "7451ef3a22ce3e895c16e0fe4f71b0daa1f8fe51",
-      "shortSha": "7451ef3",
-      "subject": "fix(wordTower): add missing isNearMiss export to towerLean (red-master build break)",
+      "sha": "bc8d6eeb644e585ec7b6d65501cc1dec1de3867a",
+      "shortSha": "bc8d6ee",
+      "subject": "fix(multiplayer): opaque navy countdown root on native (no blank-white)",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T11:14:43+03:00"
+      "date": "2026-06-16T01:26:16+03:00"
     },
     {
-      "sha": "aeba9f680e8785030fb7cb3ead08ae7f7e29bd68",
-      "shortSha": "aeba9f6",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-14",
+      "sha": "5963fe08d26a52410a2394948e9a0d93b2b994fe",
+      "shortSha": "5963fe0",
+      "subject": "feat(splash): animated branded loading splash screen",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T11:06:22+03:00"
+      "date": "2026-06-16T01:14:47+03:00"
     },
     {
-      "sha": "9371b6c3fa017a660a9ac3a764e62b5075354cd1",
-      "shortSha": "9371b6c",
-      "subject": "fix(wordTower): declare nearMissKey on SceneProps to fix red-master typecheck",
+      "sha": "d095bd147f165b9f00bb9d723b7eedc6933b7925",
+      "shortSha": "d095bd1",
+      "subject": "fix(responsive): desktop word-wheel aspect-lock + practice mobile collapse",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T10:43:10+03:00"
+      "date": "2026-06-16T01:14:28+03:00"
     },
     {
-      "sha": "9bf31d753c8ffcb66be03911e52058571b8ee2db",
-      "shortSha": "9bf31d7",
-      "subject": "fix(ads): settle reward UI on showRewarded early-returns + stop global pauseTimers freezing AdMob countdown",
+      "sha": "630b5e69e4364a87f1974c54fccf7c1a99eed14b",
+      "shortSha": "630b5e6",
+      "subject": "fix(auth): revert Google button to visible GSI button (overlay broke clicks)",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T10:30:20+03:00"
+      "date": "2026-06-16T00:57:42+03:00"
     },
     {
-      "sha": "aecd31c9b6c9fb1fb7ad8180c7a46f5de047b8c4",
-      "shortSha": "aecd31c",
-      "subject": "fix(wordTower): stuck notifications, missing/awkward translations, per-letter crane bricks, release juice",
+      "sha": "e46807d5b9cd6348d298d66df2b2b427107807b5",
+      "shortSha": "e46807d",
+      "subject": "fix(multiplayer): stop native countdown fanfare flashing white (GPU layer)",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T10:28:35+03:00"
+      "date": "2026-06-16T00:48:38+03:00"
     },
     {
-      "sha": "066e685d5004a149b82ba1f17770372f8f8fa96c",
-      "shortSha": "066e685",
-      "subject": "fix(playerStyle): stop style popup reappearing after user already picked",
+      "sha": "7c47d0da54306e98906596f5372b6a4ce1c2fd54",
+      "shortSha": "7c47d0d",
+      "subject": "feat(auth): brand-style the Google sign-in button (neo-brutalist overlay)",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T10:02:02+03:00"
+      "date": "2026-06-16T00:42:37+03:00"
     },
     {
-      "sha": "e6da04178063e1cb4bde332aa18ac967e74d8088",
-      "shortSha": "e6da041",
-      "subject": "perf(nightly): git-enumerated tar snapshot — 40k→11.5k files, 27min→5s",
+      "sha": "90c4fb8de86fa51cde5f8374cb7248eb66b3adb8",
+      "shortSha": "90c4fb8",
+      "subject": "feat(word-tower): crane cap + final-color blocks, pendulum, gentler sway, rival avatars",
       "author": "Ohad Fisher",
-      "date": "2026-06-14T09:10:37+03:00"
+      "date": "2026-06-16T00:37:39+03:00"
     }
   ]
 }
