@@ -100,6 +100,25 @@ describe('AutoHideFooter - hydration + behavior', () => {
     expect(screen.queryByTestId('full-footer')).toBeNull();
   });
 
+  // Practice hub + tutorial are a focused, gated app flow (not an SEO landing) —
+  // no marketing footer. Mobile gets nothing; desktop gets the compact legal
+  // strip floor (the hub itself also flips isInGame=true for full removal).
+  it('hides the full footer on the /practice route (mobile)', () => {
+    mockUseIsDesktop.mockReturnValue(false);
+    mockUsePathname.mockReturnValue('/he/practice');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer')).toBeNull();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
+  it('renders only the compact legal strip on /practice (desktop)', () => {
+    mockUseIsDesktop.mockReturnValue(true);
+    mockUsePathname.mockReturnValue('/he/practice/classic');
+    const { container } = render(<AutoHideFooter />);
+    expect(container.querySelector('footer[role="contentinfo"]')).toBeTruthy();
+    expect(screen.queryByTestId('full-footer')).toBeNull();
+  });
+
   // Hydration contract: server render (no effects → mounted=false) must NOT
   // depend on isDesktop, otherwise server (mobile) and desktop-client first
   // render diverge → React #418. renderToString reflects exactly the !mounted

@@ -22,6 +22,7 @@ const GAME_ROUTES = new Set([
   'singleplayer',
   'multiplayer',
   'daily',
+  'practice',
   'adventure',
   'education',
   'student',

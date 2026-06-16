@@ -14,6 +14,13 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 }));
 vi.mock('@/utils/haptics', () => ({ haptics: { tap: () => {} } }));
 
+// Spy on the in-game lever. The hub flips isInGame=true so the body scroll-locks
+// (no page scroll) and the footer + bottom-nav hide — a focused mode-select.
+const mockSetIsInGame = vi.fn();
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => mockSetIsInGame,
+}));
+
 // A non-zero streak so any lingering streak chip would actually render —
 // proves the chip is gone by design, not just hidden by a zero-state guard.
 vi.mock('@/hooks/usePracticeStreak', () => ({
@@ -32,6 +39,7 @@ beforeEach(() => {
   window.localStorage.setItem('lexiclash_onboarding_completed', 'true');
   mockCompleted.current = new Set();
   sessionStorage.clear();
+  mockSetIsInGame.mockClear();
 });
 
 const wrap = (ui: React.ReactNode) => render(<LanguageProvider>{ui}</LanguageProvider>);
@@ -95,6 +103,27 @@ describe('PracticeHubClient completed-tile celebration', () => {
     // Satisfying, not greyed-out: no dimming, and a trophy badge celebrates it.
     expect(tile.className).not.toContain('opacity-80');
     expect(within(tile).getByTestId('practice-tile-trophy-classic')).toBeInTheDocument();
+  });
+});
+
+describe('PracticeHubClient focused-screen chrome', () => {
+  it('flips isInGame=true on mount so the hub scroll-locks and drops the footer', () => {
+    wrap(<PracticeHubClient locale="en" />);
+    expect(mockSetIsInGame).toHaveBeenCalledWith(true);
+  });
+
+  it('restores isInGame=false on unmount so chrome returns when leaving practice', () => {
+    const { unmount } = wrap(<PracticeHubClient locale="en" />);
+    mockSetIsInGame.mockClear();
+    unmount();
+    expect(mockSetIsInGame).toHaveBeenCalledWith(false);
+  });
+
+  it('does not page-scroll: the root fills its locked parent instead of min-h-[100dvh]', () => {
+    const { container } = wrap(<PracticeHubClient locale="en" />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.className).not.toContain('min-h-[100dvh]');
+    expect(root.className).toContain('h-full');
   });
 });
 

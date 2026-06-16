@@ -11,6 +11,7 @@ import PracticeDesktopWelcome from '@/components/practice/PracticeDesktopWelcome
 import { useModeFirstSeen } from '@/hooks/useModeFirstSeen';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { trackPracticeAbandoned } from '@/lib/practice/telemetry';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
@@ -45,6 +46,16 @@ export default function PracticePageClient({ mode, locale }: Props) {
   const { markSeen } = useModeFirstSeen(mode);
   const searchParams = useSearchParams();
   useFTUEGate(locale, `/${locale}/practice/${mode}`);
+
+  // Own the in-game lever for the WHOLE mode lifecycle — tutorial AND play. The
+  // sandboxes flip it too, but the mobile tutorial sheet mounts no sandbox, so
+  // without this the footer + bottom-nav leaked (and the page scrolled) during
+  // the tutorial. Released on unmount.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   const initialStep: Step =
     searchParams.get('play') === '1' || isPracticeModeComplete(mode, language)

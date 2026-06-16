@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -18,6 +18,7 @@ import PendingRoomBanner from '@/components/practice/PendingRoomBanner';
 import PracticeHubAtmosphere from '@/components/practice/PracticeHubAtmosphere';
 import PracticeHubHeader from '@/components/practice/PracticeHubHeader';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
 // Per-mode color identity — each game mode owns one of the brand families
@@ -96,6 +97,17 @@ export default function PracticeHubClient({ locale }: Props) {
   // First mode the player hasn't finished — the one we nudge them toward next.
   const nextMode = PRACTICE_MODES.find((m) => !completed.has(m)) ?? null;
   useFTUEGate(locale, `/${locale}/practice`);
+
+  // The hub is a focused mode-select, not a marketing page: lock body scroll
+  // (no page scroll) and drop the footer + bottom nav (the hub has its own Home
+  // pill). Same in-game lever the sandboxes use; released on unmount so chrome
+  // returns everywhere else.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
+
   const handleTileTap = () => {
     playButtonClickSound();
     haptics.tap();
@@ -126,7 +138,7 @@ export default function PracticeHubClient({ locale }: Props) {
   }, { scope: gridRef, dependencies: [reduceMotion] });
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-linear-to-b from-neo-navy to-neo-navy-light px-4 sm:px-6 py-6 sm:py-10">
+    <div className="relative h-full min-h-0 w-full overflow-x-hidden overflow-y-auto bg-linear-to-b from-neo-navy to-neo-navy-light px-4 sm:px-6 py-3">
       <PracticeHubAtmosphere />
       <div className="relative z-10 max-w-md md:max-w-3xl xl:max-w-5xl mx-auto">
         {/* Always-visible back to landing — restores hardware-back parity on

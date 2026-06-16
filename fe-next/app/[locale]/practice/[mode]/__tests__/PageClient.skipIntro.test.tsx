@@ -39,6 +39,14 @@ vi.mock('@/hooks/useModeFirstSeen', () => ({
   useModeFirstSeen: () => ({ markSeen: vi.fn() }),
 }));
 
+// Spy on the in-game lever at the PAGE level. The mobile tutorial sheet mounts
+// no sandbox, so without a page-level flip the footer + bottom-nav leaked during
+// the tutorial. The page now owns isInGame for the whole mode lifecycle.
+const mockSetIsInGame = vi.fn();
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => mockSetIsInGame,
+}));
+
 import PracticePageClient from '../PageClient';
 import { markPracticeMode } from '@/lib/practice/practiceProgress';
 
@@ -49,6 +57,7 @@ beforeEach(() => {
   window.localStorage.setItem('lexiclash_onboarding_completed', 'true');
   // Reset query params between tests.
   for (const k of Array.from(searchParamsValue.keys())) searchParamsValue.delete(k);
+  mockSetIsInGame.mockClear();
   // Default viewport: mobile. Individual tests override for desktop.
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
     matches: false,
@@ -80,6 +89,14 @@ describe('PracticePageClient fluency: skip intro for completed modes', () => {
     searchParamsValue.set('play', '1');
     render(<PracticePageClient mode="wordHunt" locale="en" />);
     expect(screen.getByTestId('practice-target')).toBeInTheDocument();
+  });
+
+  it('flips isInGame=true during the mobile tutorial step (no footer/nav leak before play)', () => {
+    // Mobile, first-time → tutorial sheet, NO sandbox mounted. The page itself
+    // must own the in-game lever so chrome stays hidden during the tutorial.
+    render(<PracticePageClient mode="classic" locale="en" />);
+    expect(screen.getByTestId('practice-tutorial-sheet')).toBeInTheDocument();
+    expect(mockSetIsInGame).toHaveBeenCalledWith(true);
   });
 
   it('desktop viewport: skips tutorial and drops the player straight into the sandbox', () => {
