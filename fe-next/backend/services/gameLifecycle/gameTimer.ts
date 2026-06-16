@@ -240,6 +240,31 @@ export async function resumeGameTimerIfMissing(io: Server, gameCode: string): Pr
 }
 
 /**
+ * Safety-net recovery windows (ms). The server force-launches the round (timer +
+ * bots) this long after start if the normal path stalled.
+ *
+ * Solo-human games (one human + bots — the common Blast quick-start) recover on a
+ * tight window: there's no cross-client 3-2-1 animation to keep in sync, so when
+ * that single human's `countdownComplete` never arrives (frozen/backgrounded tab)
+ * AND the 8s coordinator fallback also fails to start the timer (its sequence is
+ * torn down when the frozen tab disconnects), the round otherwise runs with no
+ * clock and bots sit VISIBLY at 0 for the whole window. 5s is comfortably past
+ * the ~3.3s GO animation (3×1000ms) + fade + render + network, so a HEALTHY solo
+ * launch is never force-started a beat early.
+ */
+export const SAFETY_NET_DELAY_SOLO_MS = 5000;
+/** Longer window for multi-human games, so a slow second client isn't force-started early. */
+export const SAFETY_NET_DELAY_MULTI_HUMAN_MS = 10000;
+
+/**
+ * Pick the safety-net recovery window based on how many humans are in the game.
+ * Solo / bot-only (≤1 human) → tight window; 2+ humans → longer window.
+ */
+export function resolveGameStartSafetyNetDelayMs(humanCount: number): number {
+  return humanCount <= 1 ? SAFETY_NET_DELAY_SOLO_MS : SAFETY_NET_DELAY_MULTI_HUMAN_MS;
+}
+
+/**
  * Server-side safety net guaranteeing the round timer (and thus bot launch)
  * starts even when no client signal arrives.
  *
