@@ -23,7 +23,13 @@ export type BlockSurface = 'windows' | 'glass' | 'panels' | 'greebles' | 'facets
 // life comes only from the isometric bevel + the faint monochrome tone jitter in
 // the renderer (same hue, ±brightness), not from colour variety. Climb darkens
 // monotonically: bright concrete city → obsidian deep space.
-const MATERIAL: Record<WordTowerBiomeId, number> = {
+/** A full per-zone building-material palette. A tower SKIN is exactly this — an
+ *  alternate set of six mature materials (see {@link file://./skins.ts}). */
+export type ZoneMaterialPalette = Record<WordTowerBiomeId, number>;
+
+/** The default ("classic") materials. Exported so the skin system can reuse it
+ *  as the baseline and so callers can pass an alternate palette without drift. */
+export const ZONE_MATERIAL: ZoneMaterialPalette = {
   city: 0x7c8a99, // weathered concrete / steel
   sky: 0x5d7d9c, // steel-glass curtain wall (a shade below the city → clean light→dark climb)
   stratosphere: 0x6e6a7c, // titanium dusk
@@ -33,15 +39,16 @@ const MATERIAL: Record<WordTowerBiomeId, number> = {
 };
 
 /** The single building-material colour of an altitude zone (packed RGB). `base`
- *  (the chain word colour) is intentionally ignored — one colour per surface. */
-export function gradeBlockColor(_base: number, biome: WordTowerBiomeId): number {
-  return MATERIAL[biome];
+ *  (the chain word colour) is intentionally ignored — one colour per surface. An
+ *  optional `palette` (a tower skin) swaps the whole material set. */
+export function gradeBlockColor(_base: number, biome: WordTowerBiomeId, palette: ZoneMaterialPalette = ZONE_MATERIAL): number {
+  return palette[biome] ?? ZONE_MATERIAL[biome];
 }
 
 /** The zone's building-material colour — same value the tiles use. Lets the
- *  minimap render the identical materials. */
-export function blockMaterial(biome: WordTowerBiomeId): number {
-  return MATERIAL[biome];
+ *  minimap render the identical materials. Honours the active skin `palette`. */
+export function blockMaterial(biome: WordTowerBiomeId, palette: ZoneMaterialPalette = ZONE_MATERIAL): number {
+  return palette[biome] ?? ZONE_MATERIAL[biome];
 }
 
 /**

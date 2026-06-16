@@ -68,6 +68,25 @@ export function swayHeightDampen(floorCount: number): number {
   return lerp(1, SWAY_DAMPEN_MIN, f);
 }
 
+/** A run of perfect drops at which "steady hands" reaches full calm. */
+export const STEADY_FULL_STREAK = 5;
+/** Floor of the steady-hands dampen — skill calms the crane but never removes
+ *  the wobble entirely, so a tall tower still demands timing. */
+export const STEADY_DAMPEN_MIN = 0.5;
+
+/**
+ * Skill reward on the DYNAMICS side: a run of perfect drops steadies the tower,
+ * scaling instability DOWN (calmer sway, easier next drop) — the positive mirror
+ * of the bad-drop streak that destabilises it. A single perfect doesn't pay yet
+ * (streak ≤ 1 → ×1); the calm ramps in to {@link STEADY_DAMPEN_MIN} by
+ * {@link STEADY_FULL_STREAK}, then holds, so flow feels earned but never trivial.
+ */
+export function steadyHandsDampen(perfectStreak: number): number {
+  if (perfectStreak <= 1) return 1;
+  const k = clamp01((perfectStreak - 1) / (STEADY_FULL_STREAK - 1));
+  return lerp(1, STEADY_DAMPEN_MIN, k);
+}
+
 /** Sway amplitude (deg) — gated below {@link SWAY_START_INSTABILITY}, then ramps to the max. */
 export function swayAmplitudeDeg(instability: number): number {
   const i = clamp01(instability);

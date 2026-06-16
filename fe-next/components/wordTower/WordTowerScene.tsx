@@ -8,7 +8,7 @@ import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS } from '@/lib/gameEngine/preset
 import { biomeForHeight, type WordTowerFloor, type ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import { buildTowerColumn, cellAltitudes, wordColor } from '@/lib/wordTower/towerColumn';
-import { gradeBlockColor, blockSurface, type BlockSurface } from '@/lib/wordTower/blockGrade';
+import { gradeBlockColor, blockSurface, ZONE_MATERIAL, type BlockSurface, type ZoneMaterialPalette } from '@/lib/wordTower/blockGrade';
 import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
@@ -48,6 +48,8 @@ interface SceneProps {
   bottomInsetPx?: number;
   /** Anchor length (1 or 2) — how many leading pending chars are the connector. */
   anchorLen?: number;
+  /** Active tower-skin material palette (six zone colours). Defaults to classic. */
+  palette?: ZoneMaterialPalette;
   /** Personal best (m) — drawn as a tick on the minimap. */
   personalBestM?: number;
   /** Rival records — drawn as ticks on the minimap (who's still above you). */
@@ -139,7 +141,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -212,7 +214,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         key: `s${i}`,
         pos: i,
         char: cell.kind === 'letter' ? cell.char : null,
-        color: gradeBlockColor(cell.color, zone),
+        color: gradeBlockColor(cell.color, zone, palette),
         surface: blockSurface(zone),
         pending: false,
         shared: cell.kind === 'letter' ? cell.shared : false,
@@ -221,7 +223,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // The very first letter at game start is the chain seed (the foundation),
     // not a preview — render it solid so it reads as "start here", not a ghost.
     // Pending tiles grow at the current top → grade them by the live top biome.
-    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: gradeBlockColor(pendingColor, biomeId), surface: topSurface, pending: !(C === 0 && k === 0), shared: false }));
+    pchars.forEach((ch, k) => live.push({ key: `s${C + k}`, pos: C + k, char: ch, color: gradeBlockColor(pendingColor, biomeId, palette), surface: topSurface, pending: !(C === 0 && k === 0), shared: false }));
 
     const total = live.length;
     const maxPos = total - 1;
@@ -362,7 +364,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     firstRender.current = false;
     prevMaxPos.current = maxPos;
     topPosRef.current = maxPos; // shaft-wind tick reads this
-  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId]);
+  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId, palette]);
 
   // A rejected WORD is an INPUT mistake, not tower damage — so the error feel
   // lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on

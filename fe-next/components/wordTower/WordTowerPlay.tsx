@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Trophy, Share2, ChevronsUp } from 'lucide-react';
+import { ArrowLeft, Trophy, Share2, ChevronsUp, Flame, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -38,8 +38,11 @@ import {
 import { comboMilestone, type ComboMilestone } from '@/lib/wordTower/comboMilestone';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { WordTowerMutatorBanner } from './WordTowerMutatorBanner';
-import { swayInstability, swayHeightDampen } from '@/lib/wordTower/towerSway';
+import { swayInstability, swayHeightDampen, steadyHandsDampen } from '@/lib/wordTower/towerSway';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
+import { newlyUnlockedSkin, type TowerSkin } from '@/lib/wordTower/skins';
+import { useTowerSkin } from './useTowerSkin';
+import { WordTowerSkinPicker } from './WordTowerSkinPicker';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
@@ -302,17 +305,37 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // this a 30-floor tower whips side-to-side ("goes crazy"). The SAME damped value
   // is fed to BOTH the crane target and the Pixi tower angle, so WYSIWYG holds.
   const instability =
-    swayInstability(crane.consecutiveSloppy, crane.leanDeg) * swayHeightDampen(game.floors.length);
+    swayInstability(crane.consecutiveSloppy, crane.leanDeg) *
+    swayHeightDampen(game.floors.length) *
+    steadyHandsDampen(crane.perfectStreak); // a perfect run steadies the crane (skill → calm)
 
   // The crane carries the block in the FINAL committed material colour of the
   // current build line, so it never "switches weird colours" on landing. Convert
   // the packed material int → CSS hex once per zone, with a legible glyph colour.
-  const blockColorInt = useMemo(() => blockMaterial(biomeId), [biomeId]);
+  // Tower SKIN — the equipped material palette (persisted, unlocked by climbing).
+  const skin = useTowerSkin(personalBest);
+  const blockColorInt = useMemo(() => blockMaterial(biomeId, skin.palette), [biomeId, skin.palette]);
   const blockColorHex = useMemo(() => `#${blockColorInt.toString(16).padStart(6, '0')}`, [blockColorInt]);
   const blockTextHex = useMemo(
     () => `#${textColorOn(blockColorInt).toString(16).padStart(6, '0')}`,
     [blockColorInt],
   );
+
+  // ── Variable reward: NEW SKIN unlocked by climbing past a height milestone.
+  //    Pops a celebratory beat AND auto-equips the freshly-earned look so the
+  //    payoff is instant. prevBest guards against re-granting on every render.
+  const [skinUnlock, setSkinUnlock] = useState<TowerSkin | null>(null);
+  const prevBestForSkin = useRef(personalBest);
+  const setSkinIdRef = useRef(skin.setSkinId);
+  setSkinIdRef.current = skin.setSkinId;
+  useEffect(() => {
+    const fresh = newlyUnlockedSkin(prevBestForSkin.current, personalBest);
+    prevBestForSkin.current = personalBest;
+    if (!fresh) return;
+    setSkinUnlock(fresh);
+    setSkinIdRef.current(fresh.id); // wear the reward immediately
+  }, [personalBest]);
+  useAutoDismiss(skinUnlock, () => setSkinUnlock(null), 3200);
 
   // Unmistakable verdict pop — one big, band-coloured beat on every drop telling
   // the player exactly how they did + the metres gained. Keyed off the placement
@@ -571,6 +594,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         lastResult={tower.state.lastResult}
         reducedMotion={reducedMotion}
         bottomInsetPx={deckHeight}
+        palette={skin.palette}
         personalBestM={personalBest}
         rivals={displayRivals}
         leanDeg={crane.leanDeg}
@@ -595,6 +619,57 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           draws on-screen ghosts, so the real target is usually off-screen up).
           Keyed off the live climb height, not the panned view. */}
       <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
+
+      {/* Steady-hands FLOW chip — the positive crane-skill beat: a run of perfect
+          drops calms the tower (see instability) and escalates this badge. Cyan →
+          lime → gold "ON FIRE" so the streak reads at a glance. */}
+      {crane.perfectStreak >= 2 && (
+        <div
+          className={`pointer-events-none absolute start-2 top-[11%] z-[8] flex items-center gap-1 rounded-neo border-neo-thick border-black px-2 py-1 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'} ${
+            crane.perfectStreak >= 5
+              ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black'
+              : crane.perfectStreak >= 4
+                ? 'bg-neo-lime text-black'
+                : 'bg-neo-cyan text-black'
+          }`}
+          role="status"
+          aria-live="polite"
+          aria-label={t('wordTower.crane.steadyAria', { n: crane.perfectStreak })}
+        >
+          {crane.perfectStreak >= 5
+            ? <Flame className={`h-4 w-4 ${reducedMotion ? '' : 'animate-bounce'}`} aria-hidden />
+            : <Sparkles className="h-4 w-4" aria-hidden />}
+          <span className="font-neo-display text-sm font-black uppercase tracking-wide tabular-nums">
+            {crane.perfectStreak >= 5 ? t('wordTower.crane.onFire') : t('wordTower.crane.steady')} ×{crane.perfectStreak}
+          </span>
+        </div>
+      )}
+
+      {/* Tower-skin picker — equip the materials you've unlocked by climbing. */}
+      <WordTowerSkinPicker skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
+
+      {/* NEW SKIN UNLOCKED — the variable-reward beat when a climb crosses a
+          skin's height milestone (the new look is auto-equipped). */}
+      {skinUnlock && (
+        <div
+          className={`pointer-events-none absolute left-1/2 top-[22%] z-40 flex -translate-x-1/2 items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="flex overflow-hidden rounded-neo border-neo border-black" aria-hidden>
+            <span className="h-6 w-2.5" style={{ background: `#${skinUnlock.palette.city.toString(16).padStart(6, '0')}` }} />
+            <span className="h-6 w-2.5" style={{ background: `#${skinUnlock.palette.galaxy.toString(16).padStart(6, '0')}` }} />
+          </span>
+          <span className="flex flex-col items-start leading-tight">
+            <span className="font-neo-body text-[10px] font-bold uppercase tracking-[0.2em] text-black/60">
+              {t('wordTower.skin.unlockedToast')}
+            </span>
+            <span className="font-neo-display text-base font-black uppercase tracking-wide text-black">
+              {t(skinUnlock.nameKey)}
+            </span>
+          </span>
+        </div>
+      )}
 
       {/* Next-zone tease — quiet anticipation chip in the approach window. Hidden
           while the NEW ZONE banner is paying off the arrival. */}

@@ -5,9 +5,12 @@ import {
   swayAngleAt,
   swayNormalizedOffset,
   swayHeightDampen,
+  steadyHandsDampen,
   effectiveDropError,
   SWAY_MAX_DEG,
   SWAY_START_INSTABILITY,
+  STEADY_DAMPEN_MIN,
+  STEADY_FULL_STREAK,
 } from '../towerSway';
 import { evaluatePlacement, alignmentBand } from '../cranePlacement';
 
@@ -130,5 +133,32 @@ describe('effectiveDropError — sway couples into the verdict', () => {
     const swayOff = swayNormalizedOffset(SWAY_MAX_DEG);
     const err = effectiveDropError(-1, swayOff);
     expect(err).toBeGreaterThan(0.6); // > SLOPPY_MAX => miss band stays reachable
+  });
+});
+
+describe('steadyHandsDampen — skill calms the crane', () => {
+  it('no dampen until a streak is actually building (0 or 1 perfect → ×1)', () => {
+    expect(steadyHandsDampen(0)).toBe(1);
+    expect(steadyHandsDampen(1)).toBe(1);
+  });
+
+  it('is non-increasing as the perfect streak grows (more skill → calmer)', () => {
+    let prev = steadyHandsDampen(0);
+    for (let s = 1; s <= 12; s++) {
+      const cur = steadyHandsDampen(s);
+      expect(cur).toBeLessThanOrEqual(prev);
+      prev = cur;
+    }
+  });
+
+  it('never fully removes the wobble — floored so the challenge survives', () => {
+    for (let s = 0; s <= 50; s++) {
+      expect(steadyHandsDampen(s)).toBeGreaterThanOrEqual(STEADY_DAMPEN_MIN);
+    }
+    expect(steadyHandsDampen(99)).toBeCloseTo(STEADY_DAMPEN_MIN);
+  });
+
+  it('reaches the calm floor by STEADY_FULL_STREAK', () => {
+    expect(steadyHandsDampen(STEADY_FULL_STREAK)).toBeCloseTo(STEADY_DAMPEN_MIN);
   });
 });
