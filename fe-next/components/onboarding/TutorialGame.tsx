@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
+import { NeoPanel } from '@/components/ui/panel';
 import { trackOnboardingFirstWord } from '@/utils/growthTracking';
 
 interface TutorialGameProps {
@@ -48,11 +49,11 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete, attemptNumber =
       >
         <Mascot variant="celebration" size="xl" clipShape="circle" clipBorder="lime" />
 
+        <NeoPanel asChild tone="cream" className="p-4 text-center">
         <m.div
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="bg-neo-cream border-3 border-neo-black rounded-neo p-4 text-center shadow-hard"
         >
           <h1 className="text-2xl font-neo-display font-black text-neo-black uppercase mb-1">
             {t('practiceWelcome.greet')}
@@ -61,6 +62,7 @@ const TutorialGame: React.FC<TutorialGameProps> = ({ onComplete, attemptNumber =
             {t('practiceWelcome.tip')}
           </p>
         </m.div>
+        </NeoPanel>
 
         <m.button
           data-testid="tutorial-continue"

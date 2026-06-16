@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
@@ -46,16 +47,26 @@ const panelVariants = cva("border-3 border-neo-black", {
 
 export interface NeoPanelProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof panelVariants> {}
+    VariantProps<typeof panelVariants> {
+  /**
+   * Render as the single child element instead of a `<div>`, merging the panel
+   * classes onto it (Radix Slot). Use to make a framer-motion element BE the
+   * panel: `<NeoPanel asChild tone="navy"><m.div initial…>…</m.div></NeoPanel>`.
+   */
+  asChild?: boolean;
+}
 
 const NeoPanel = React.forwardRef<HTMLDivElement, NeoPanelProps>(
-  ({ className, tone, shadow, radius, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(panelVariants({ tone, shadow, radius }), className)}
-      {...props}
-    />
-  )
+  ({ className, tone, shadow, radius, asChild, ...props }, ref) => {
+    const Comp = asChild ? Slot : "div";
+    return (
+      <Comp
+        ref={ref}
+        className={cn(panelVariants({ tone, shadow, radius }), className)}
+        {...props}
+      />
+    );
+  }
 );
 NeoPanel.displayName = "NeoPanel";
 

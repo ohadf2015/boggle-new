@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import { vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { NeoPanel } from '../panel';
 
@@ -76,6 +77,48 @@ describe('NeoPanel', () => {
     expect(el).toHaveAttribute('role', 'region');
     expect(el).toHaveAttribute('aria-label', 'stats');
     expect(ref.current).toBe(el);
+  });
+
+  describe('asChild (compose with motion / custom elements)', () => {
+    it('renders the child element, merging panel classes onto it', () => {
+      const { container } = render(
+        <NeoPanel asChild tone="navy" shadow="lg">
+          <section className="p-5 max-w-[280px]">content</section>
+        </NeoPanel>
+      );
+      const el = container.firstChild as HTMLElement;
+      // child element type preserved (section, not div)
+      expect(el.tagName).toBe('SECTION');
+      // panel variant classes merged onto the child
+      expect(el).toHaveClass('border-3', 'border-neo-black', 'bg-neo-navy', 'shadow-hard-lg');
+      // child's own className preserved
+      expect(el).toHaveClass('p-5', 'max-w-[280px]');
+    });
+
+    it('preserves the child class set ∪ panel classes (motion-wrapper contract)', () => {
+      // Mirrors a real motion panel: <m.div className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-5 ...">
+      const { container } = render(
+        <NeoPanel asChild tone="navy" shadow="lg">
+          <div className="p-5 max-w-[280px] flex flex-col items-center gap-3">x</div>
+        </NeoPanel>
+      );
+      const got = new Set((container.firstChild as HTMLElement).className.split(/\s+/));
+      [
+        'bg-neo-navy', 'border-3', 'border-neo-black', 'rounded-neo', 'shadow-hard-lg',
+        'p-5', 'max-w-[280px]', 'flex', 'flex-col', 'items-center', 'gap-3',
+      ].forEach((c) => expect(got.has(c)).toBe(true));
+    });
+
+    it('forwards child-owned props (e.g. onClick) untouched', () => {
+      const onClick = vi.fn();
+      const { getByTestId } = render(
+        <NeoPanel asChild tone="cream">
+          <div data-testid="c" onClick={onClick}>x</div>
+        </NeoPanel>
+      );
+      getByTestId('c').click();
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('reproduces a real navy panel class set verbatim (class-equality contract)', () => {

@@ -6,6 +6,7 @@ import { Check, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
+import { NeoPanel } from '@/components/ui/panel';
 import { cn } from '@/lib/utils';
 
 interface ProfileSetupStepProps {
@@ -48,11 +49,11 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
   // Deferred mode: gentle prompt after first game
   if (deferred) {
     return (
+      <NeoPanel asChild tone="cream" shadow="sm" className="p-4 text-center max-w-sm mx-auto">
       <m.div
         data-testid="deferred-profile-prompt"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-neo-cream border-3 border-neo-black rounded-neo p-4 shadow-hard-sm text-center max-w-sm mx-auto"
       >
         <h3 className="font-black text-neo-black text-sm uppercase mb-1">
           {t('onboarding.profile.deferredTitle', 'Save your progress?')}
@@ -61,6 +62,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
           {t('onboarding.profile.deferredSubtitle', 'Set up your profile to keep your stats!')}
         </p>
       </m.div>
+      </NeoPanel>
     );
   }
 

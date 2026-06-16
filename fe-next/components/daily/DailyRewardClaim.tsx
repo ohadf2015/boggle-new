@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
+import { NeoPanel } from '@/components/ui/panel';
 import { getRewardCoins } from '@/lib/dailyRewards';
 
 interface DailyRewardClaimProps {
@@ -27,10 +28,10 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
   const tomorrowCoins = getRewardCoins(currentStreakDay + 1);
 
   return (
+    <NeoPanel asChild tone="navy" shadow="sm" className="p-5 text-center space-y-3">
     <m.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-neo-navy border-3 border-neo-black rounded-neo p-5 shadow-hard-sm text-center space-y-3"
     >
       {/* Coin reward */}
       <m.div
@@ -66,5 +67,6 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
         {interpolateTranslation(t('daily.comeBackTomorrow'), { coins: tomorrowCoins })}
       </m.p>
     </m.div>
+    </NeoPanel>
   );
 }

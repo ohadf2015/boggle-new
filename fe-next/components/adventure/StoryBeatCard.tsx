@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { NeoPanel } from '@/components/ui/panel';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface StoryBeatCardProps {
@@ -61,11 +62,11 @@ export function StoryBeatCard({
           className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 p-4"
           onClick={!isComplete ? skipToEnd : undefined}
         >
+          <NeoPanel asChild tone="navy" shadow="lg" className="p-6 max-w-md w-full">
           <AdaptiveMotion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-6 max-w-md w-full"
           >
             <div className="text-neo-yellow font-neo-display font-bold text-lg mb-3">
               {characterName}
@@ -90,6 +91,7 @@ export function StoryBeatCard({
               )}
             </AdaptiveAnimatePresence>
           </AdaptiveMotion.div>
+          </NeoPanel>
         </AdaptiveMotion.div>
       )}
     </AdaptiveAnimatePresence>
