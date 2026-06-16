@@ -57,9 +57,28 @@ SKIP if:
   • Query intent doesn't match a real feature
 
 ═══ STEP 4 — Multi-locale by default ═══
-New landing pages MUST exist in en, he, sv, ja, es. Single route at `fe-next/app/[locale]/<slug>/page.tsx` using `t()`. Strings in `fe-next/messages/{en,he,sv,ja,es}.json`. Hebrew RTL-safe. Non-English AI-generated — flag for native review.
+New landing pages MUST exist in en, he, sv, ja, es. Single route at `fe-next/app/[locale]/<slug>/page.tsx` using `t()`. Strings in `fe-next/messages/{en,he,sv,ja,es}.json`. Hebrew RTL-safe.
 
 EXCEPTION: English-only intent (e.g. "esl word games") → `isTargetLocale` + `META_FALLBACK` pattern (see `fe-next/app/[locale]/lexiclash-vs-wordwall/page.tsx`), `robots: { index: false }` on non-English.
+
+═══ STEP 4b — AUTONOMOUS native-language review (do NOT flag for a human) ═══
+The old flow wrote "flag for native review" — that left AI-generated he/sv/ja/es copy
+(FAQ answers, meta, landing strings) sitting unreviewed for nights. You are multilingual:
+REVIEW AND FIX it yourself, data-driven, before finishing. For EVERY non-English
+user-facing string you wrote or edited this run:
+  1. **Back-translate** the target-language string to English as a naive reader would.
+  2. **Meaning check:** compare that back-translation to the INTENDED English source. If
+     meaning drifted, was lost, or a term is wrong → fix the target string.
+  3. **Native-fluency check:** does it read as written by a native speaker, or as a literal
+     machine translation? Inspect idiom, word order, register/tone (match the brand: quirky,
+     energetic), and locale punctuation (Hebrew RTL + Hebrew quotation/maqaf; Japanese
+     particles + 。、; Spanish ¿¡; Swedish å/ä/ö). Invoke the **ux-writer** skill's bar:
+     native, not literal — rewrite anything that reads translated.
+  4. **Fix in place.** Re-run the two checks on the rewrite until both pass.
+  5. This review is MANDATORY and AUTONOMOUS — never emit "needs native review" / "AI-generated,
+     flag for human". Record the verdict in STEP 7 instead (strings reviewed, strings rewritten).
+Same review applies to any localized copy lane 5 touches — FAQ answers in
+`fe-next/app/[locale]/page.tsx` `seoContent[locale].faq`, page meta, and landing strings.
 
 ═══ STEP 5 — Edit safely (HARD RULES) ═══
   • JSON-LD only via `components/seo/*` wrappers — pre-commit hook BLOCKS raw script-injection.
@@ -81,6 +100,6 @@ Append to `docs/nightly/reports/__TODAY__.md`:
 ### Lane 5 — SEO/GEO
 - Edited: <list of files>
 - Queries targeted: <list with impr/pos>
-- Locales needing native review: <list>
+- Native review (STEP 4b, autonomous): <per-locale: N strings reviewed, M rewritten — NOT "needs human review">
 - New landing: <slug or "none">
 ```

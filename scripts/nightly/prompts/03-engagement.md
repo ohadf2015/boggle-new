@@ -52,6 +52,34 @@ Pick the biggest funnel-drop step. Write the hypothesis: "Changing X will lift c
 Implement variant-B behind a typed flag `exp_<area>_<v>` using the existing typed-experiments pattern (grep `getTypedExperiment` or `experiments/` for examples).
 Both variants must be live by end of lane. Default = control.
 
+**STEP 3b — CREATE the PostHog flag LIVE (autonomous — never leave it for a human).**
+A typed experiment is INERT until a matching PostHog feature flag exists. The repo's
+`fe-next/lib/experiments.ts` defines each experiment's variant keys; the flag must mirror
+them. Create flags with the idempotent WRITE helper (REST API, NOT the flapping MCP):
+
+```
+scripts/nightly/lib/posthog-experiment.sh ensure <flag-key> <variantA> <variantB> "<short desc>"
+```
+- `<variantA> <variantB>` = the EXACT two variant keys from that experiment's `variants:` array
+  in `lib/experiments.ts` (e.g. `control match-seeking`). Creates a multivariate 50/50 flag,
+  rolled out to 100%, sticky-bucketed (`ensure_experience_continuity`).
+- Idempotent: a `"status":"exists"` or `"created"` result means the experiment is LIVE.
+  ONLY if it returns `{"error":...}` may you note that one line in the report — NEVER
+  pre-emptively write "human must create in PostHog" / a dark-experiment flag.
+- **Sweep prior experiments, but ONLY wired ones (HARD PRECONDITION):** grep every `'exp-…'`
+  key in `lib/experiments.ts`. For each, FIRST confirm variant-B is actually WIRED — a real
+  non-test call site exists:
+  ```
+  grep -rl "<exp-key>" fe-next --include='*.ts' --include='*.tsx' | grep -vE 'experiments\.ts|\.test\.|node_modules'
+  ```
+  - **≥1 call site → run `ensure`** (idempotent; back-fills the flag so the live experiment serves).
+  - **0 call sites → do NOT create the flag.** An unwired experiment serves a variant that
+    changes nothing — a fake "running" test that can't move its metric. Instead WIRE variant-B
+    this run if it's in scope, THEN `ensure`; otherwise leave it and note `<key>=unwired` in the
+    report (a real to-do, not a PostHog gap). Verified 2026-06-16: `exp-practice-wheel-cta-v1`
+    and `exp-game-abandon-confirm-v1` were defined but NEVER wired — they must be wired before
+    their flags go live, not flipped blind.
+
 ═══ STEP 4 — Instrument gaps ═══
 For 2-3 events PostHog showed as missing/inferred (e.g., funnel steps with no direct event), add a fire site at the relevant React/server boundary. Use existing `track()` / `posthog.capture()` API. Names = `<noun>_<verb>` lowercase.
 
@@ -67,6 +95,7 @@ Append to `docs/nightly/reports/__TODAY__.md`:
 ### Lane 2 — Engagement A/B + flag hygiene
 - Flags retired: <list> (with winners)
 - New experiment: `<flag_name>` — hypothesis: <H>
+- PostHog flags ensured live: <key=created|exists per experiments.ts sweep; any error=key>
 - New events instrumented: <list>
 - Largest funnel drop targeted: <step> (<prior%> → <today%>)
 ```
