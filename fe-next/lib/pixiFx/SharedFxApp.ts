@@ -3,10 +3,33 @@
 // one GPU context, many effects. Call SharedFxApp.mount(el) once at
 // app root, then SharedFxApp.spawnBurst(preset, x, y) from anywhere.
 
-import { Application, Graphics } from 'pixi.js';
-import { ParticlePool } from '../gameEngine/ParticleSystem';
+// pixi.js + ParticlePool are LAZY-LOADED inside mount() (dynamic import), NOT
+// statically imported. SharedFxMount + GlobalCoinEarnFx mount this singleton from
+// the GLOBAL essential-providers stack, so a static pixi import here would pull
+// pixi.js (hundreds of KB) into the first-load JS of EVERY page — homepage, blog,
+// legal — even though the GPU layer only ever mounts post-hydration, off native,
+// and above the reduced-motion / zero-particle floor. Type-only imports keep the
+// types (erased at build); the runtime classes load when (if) mount() fires.
+// vi.mock('pixi.js') intercepts the dynamic import exactly as a static one.
+import type { Application, Graphics } from 'pixi.js';
+import type { ParticlePool } from '../gameEngine/ParticleSystem';
 import type { ParticleConfig } from '../gameEngine/types';
 import { PRESETS, type PresetName } from './presets';
+
+// Runtime pixi.Graphics constructor, resolved during mount(). The spawn helpers
+// that use it all early-return unless `app` is set (i.e. post-mount), so it is
+// always populated by the time they run.
+let GraphicsCtor: typeof import('pixi.js').Graphics | null = null;
+
+// Memoized lazy loaders for the GPU stack. Concurrent mounts (React StrictMode
+// double-invoke, route churn) share ONE in-flight import each instead of firing
+// a separate pixi.js fetch per call — cheaper at runtime and gives the test's
+// vi.mock a single import to intercept.
+let pixiModulePromise: Promise<typeof import('pixi.js')> | null = null;
+let particleSystemPromise: Promise<typeof import('../gameEngine/ParticleSystem')> | null = null;
+const loadPixi = () => (pixiModulePromise ??= import('pixi.js'));
+const loadParticleSystem = () =>
+  (particleSystemPromise ??= import('../gameEngine/ParticleSystem'));
 
 interface DeviceConfig {
   maxParticles: number;
@@ -106,7 +129,17 @@ async function mount(
   mountPromise = (async () => {
     deviceConfig = { ...DEFAULT_DEVICE, ...device };
 
-    const instance = new Application();
+    // Lazy-load the GPU stack here, off the first-load critical path. Both the
+    // pixi runtime and ParticlePool (which itself statically imports pixi) are
+    // pulled in only now, when a real mount is happening.
+    const [pixi, particleSystem] = await Promise.all([
+      loadPixi(),
+      loadParticleSystem(),
+    ]);
+    GraphicsCtor = pixi.Graphics;
+    const { ParticlePool } = particleSystem;
+
+    const instance = new pixi.Application();
     // NOTE: no `resizeTo` — it installs Pixi's ResizePlugin, whose destroy()
     // throws `_cancelResize is not a function` when teardown races init. We size
     // explicitly and drive resizes ourselves via the listener below.
@@ -219,7 +252,7 @@ function spawnCoinStream(req: CoinStreamRequest): void {
 
     const radius = STREAM_RADIUS * (0.75 + Math.random() * 0.6); // ~6–11px
 
-    const graphic = new Graphics();
+    const graphic = new GraphicsCtor!();
     graphic.circle(0, 0, radius).fill(STREAM_COLOR);
     (graphic as unknown as { x: number }).x = coinSource.x;
     (graphic as unknown as { y: number }).y = coinSource.y;
@@ -326,7 +359,7 @@ function addFireworkParticle(
   delayMs: number,
 ): void {
   if (!app) return;
-  const graphic = new Graphics();
+  const graphic = new GraphicsCtor!();
   const size = kind === 'flash' ? req.size * 0.3 : kind === 'trail' ? 3 : 5;
   graphic.circle(0, 0, size).fill(req.color);
   const g = graphic as unknown as { x: number; y: number; alpha: number };

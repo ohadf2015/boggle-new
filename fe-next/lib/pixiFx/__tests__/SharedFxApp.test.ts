@@ -81,6 +81,26 @@ vi.mock('pixi.js', () => {
 
 import { SharedFxApp } from '../SharedFxApp';
 
+// Perf regression guard: SharedFxApp is mounted from the GLOBAL essential-providers
+// stack (SharedFxMount + GlobalCoinEarnFx), so a static `import { … } from 'pixi.js'`
+// (or a static ParticlePool import, which itself pulls pixi) would drag pixi.js into
+// the first-load JS of EVERY page (homepage/blog/legal) and tank mobile CWV. pixi
+// MUST stay behind the lazy import inside mount(). This reads the source so the
+// constraint survives future edits.
+describe('SharedFxApp — first-load weight guard', () => {
+  it('does not statically import pixi.js or ParticlePool (lazy-load only)', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    const src = readFileSync(resolve(process.cwd(), 'lib/pixiFx/SharedFxApp.ts'), 'utf8');
+    // Allowed: `import type { … } from 'pixi.js'` (erased at build).
+    // Forbidden: a value import that forces pixi into the importer's chunk.
+    expect(src).not.toMatch(/^import\s+(?!type\b)[^;]*from\s+['"]pixi\.js['"]/m);
+    expect(src).not.toMatch(/^import\s+(?!type\b)\{[^}]*ParticlePool[^}]*\}\s+from/m);
+    // And it must lazy-load them at runtime instead.
+    expect(src).toMatch(/import\(['"]pixi\.js['"]\)/);
+  });
+});
+
 describe('SharedFxApp', () => {
   let parent: HTMLDivElement;
 
