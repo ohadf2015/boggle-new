@@ -8,6 +8,7 @@ import { retryImport } from '@/utils/retryImport';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded, trackInviteRedirectFired } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
+import { isCrawler } from '@/lib/seo/isCrawler';
 import { LandingView } from '@/components/landing';
 import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -112,11 +113,18 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // LandingView. Reading localStorage in the initializer would make the first
   // CLIENT render (OnboardingFlow) diverge from that server HTML — a guaranteed
   // hydration mismatch. Starting false keeps the first render matching SSR, then
-  // the effect flips new users to the FTUE post-hydration. Crawlers (no JS) keep
-  // seeing the full LandingView, so SEO is unaffected.
+  // the effect flips new users to the FTUE post-hydration.
+  //
+  // CRAWLERS: do NOT assume "no JS". Googlebot/Bingbot render with an evergreen
+  // Chromium that runs this effect with a fresh, empty localStorage — so without
+  // the isCrawler() guard they'd flip to the FTUE and index the onboarding
+  // interstitial instead of the marketing LandingView (the SSR'd content). The
+  // guard keeps the crawler's RENDERED snapshot equal to the LandingView every
+  // human also reaches. See lib/seo/isCrawler.ts for the not-cloaking rationale.
   const [showFTUE, setShowFTUE] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (isCrawler()) return;
     if (hasCompletedOnboarding() || hasSupabaseSession()) return;
     setShowFTUE(true);
   }, []);

@@ -50,6 +50,15 @@ export interface StylePopupGateInput {
    * which would otherwise re-resolve to `true` and re-pop the modal.
    */
   alreadyShownThisSession: boolean;
+  /**
+   * The current client is a JS-rendering search-engine crawler (Googlebot/
+   * Bingbot). True → never show. The popup is a full-screen `fixed inset-0`
+   * blocking overlay that mounts on every deep route (/practice, /daily, …) for
+   * fresh visitors; a crawler renders with empty localStorage so it would index
+   * the modal instead of the page. Skipping it lets the bot reach the real page
+   * content — the same content humans see once dismissed. See lib/seo/isCrawler.
+   */
+  isCrawler?: boolean;
 }
 
 /**
@@ -60,6 +69,8 @@ export interface StylePopupGateInput {
  */
 export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   if (!input.isMounted) return false;
+  // Search-engine crawlers must reach the page content, never a blocking modal.
+  if (input.isCrawler) return false;
   // Once shown this session, never show again — even if the persisted "shown"
   // marker hasn't caught up yet (authed profile refetch lag after dismiss).
   if (input.alreadyShownThisSession) return false;

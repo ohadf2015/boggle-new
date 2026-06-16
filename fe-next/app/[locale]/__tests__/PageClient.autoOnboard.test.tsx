@@ -61,4 +61,27 @@ describe('HomePageClient — auto-onboarding for new users', () => {
     expect(screen.getByTestId('landing-view')).toBeInTheDocument();
     expect(screen.queryByTestId('play-cta')).not.toBeInTheDocument();
   });
+
+  it('renders LandingView (NOT OnboardingFlow) for a JS-rendering crawler (SEO)', () => {
+    // Googlebot's WRS runs this effect with empty localStorage — without the
+    // isCrawler() guard it would flip to the FTUE and index the onboarding
+    // interstitial instead of the marketing content. This is the regression
+    // guard for "bots can reach the requested page".
+    const originalUA = window.navigator.userAgent;
+    Object.defineProperty(window.navigator, 'userAgent', {
+      value:
+        'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+      configurable: true,
+    });
+    try {
+      render(<HomePageClient />);
+      expect(screen.getByTestId('landing-view')).toBeInTheDocument();
+      expect(screen.queryByTestId('onboarding-flow')).not.toBeInTheDocument();
+    } finally {
+      Object.defineProperty(window.navigator, 'userAgent', {
+        value: originalUA,
+        configurable: true,
+      });
+    }
+  });
 });

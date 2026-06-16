@@ -18,6 +18,7 @@ import {
   markPlayerStyleModalShown,
 } from '@/lib/playerStyle/playerStyleStorage';
 import { shouldShowStylePopup } from '@/lib/playerStyle/shouldShowStylePopup';
+import { isCrawler } from '@/lib/seo/isCrawler';
 import type { PlayerStyleKey } from '@/lib/playerStyle/styles';
 import logger from '@/utils/logger';
 
@@ -74,6 +75,9 @@ export default function PlayerStyleOnboardingWrapper() {
         // login / sync lag) — the root of "popup reappears after I picked".
         localStyleChosen: getStoredPlayerStyle() != null,
         alreadyShownThisSession: shownOnceRef.current,
+        // Never trap a JS-rendering crawler behind the full-screen style modal —
+        // it must index the deep-route page content, not the overlay.
+        isCrawler: isCrawler(),
       });
       // Only ever OPEN from the effect; dismissal owns closing. This prevents a
       // dep change while the modal is open from yanking it shut mid-choice, and

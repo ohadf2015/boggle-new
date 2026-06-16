@@ -59,6 +59,18 @@ describe('shouldShowStylePopup', () => {
     ).toBe(false);
   });
 
+  it('never traps a search-engine crawler behind the blocking modal (SEO)', () => {
+    // Googlebot/Bingbot render with empty localStorage on deep routes, so every
+    // other gate resolves "fresh visitor → show". Without this guard the crawler
+    // indexes the full-screen style overlay instead of the page content.
+    expect(shouldShowStylePopup({ ...base, isCrawler: true })).toBe(false);
+    expect(
+      shouldShowStylePopup({ ...base, isAuthenticated: true, isCrawler: true }),
+    ).toBe(false);
+    // Sanity: the same input WITHOUT the crawler flag would have shown.
+    expect(shouldShowStylePopup({ ...base, isCrawler: false })).toBe(true);
+  });
+
   it('never shows once the account already has a style, even if auth reads false transiently', () => {
     // The chosen style on `profiles.player_style` must suppress the popup in
     // EITHER auth state, not only the authenticated branch. During session
