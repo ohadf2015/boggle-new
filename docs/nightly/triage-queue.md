@@ -779,3 +779,35 @@ FLAG NEEDED: exp-practice-wheel-cta-v1  variants=[control, retry-cta]  50/50
   - status: deferred
   - why: `WITH CHECK (true)` is INTENTIONAL — guest users (anon role) submit challenge scores; player_id is nullable for guests. A meaningful check requires policy REPLACEMENT (e.g. `WITH CHECK (username IS NOT NULL AND score >= 0)`) which is a blast-radius change. Current design is correct; consider hardening with a tighter CHECK when guest flow is audited.
   - recommended owner: review-by-eod
+
+## 2026-06-16
+- [Supabase] score_challenge_attempts RLS INSERT always-true
+  - policy name: "Anyone can create attempts", WITH CHECK (true) → unrestricted anonymous insert
+  - status: deferred
+  - why: need to verify if anon users legitimately submit attempts (public leaderboard feature?) before restricting
+  - recommended owner: backend, review-by-eod
+
+- [Supabase] connections_feedback RLS INSERT always-true
+  - policy name: "anyone can insert", similar always-true pattern
+  - status: deferred
+  - why: need schema context before restricting
+  - recommended owner: backend, review-by-eod
+
+- [Sentry] churn-signals report failed with status 502 (1KQ, ~276 events)
+  - root cause already identified: SUPABASE_JWT_SECRET not set in Railway → bearer auth takes uncapped remote round-trip → 502
+  - fix: set SUPABASE_JWT_SECRET env var in Railway (Supabase → Project Settings → API → JWT Secret)
+  - status: deferred (infra/env var change, not code)
+  - recommended owner: self (Railway dashboard), review-by-eod
+
+- [Sentry] [AVATAR_PNG] render failed — client component called from server (1DV)
+  - AvatarRenderer.tsx is a client component imported server-side for PNG generation
+  - status: deferred
+  - why: requires design decision (separate server-safe avatar renderer or dynamic import?)
+  - recommended owner: frontend, review-by-eod
+
+- [PostHog] Dead flags — recommend kill (lane 03, 2026-06-16)
+  - `share-prompt-timing` — active ~72d, ~0 exposures, no signal
+  - `show-signup-after-first-win` — 41 total exposures over 77d, inconclusive
+  - `mp-signup-nudge-copy-v1` — 0 conversions across 77 users; "toast-disabled" led = feature is net-negative
+  - status: deferred (human must delete in PostHog dashboard)
+  - recommended owner: growth, review-by-eod
