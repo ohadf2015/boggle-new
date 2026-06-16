@@ -133,6 +133,7 @@ import LandingView from '../landing/LandingView';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const mockPlayTrack = vi.fn();
@@ -193,6 +194,30 @@ describe('LandingView', () => {
     // Component calls playTrack unconditionally on mount; MusicContext queues
     // the track via pendingUnlockTrackRef and plays on first gesture.
     expect(mockPlayTrack).toHaveBeenCalledWith('bossa');
+  });
+
+  it('keeps SSR-painted cards (no skeleton downgrade) for a returning authed user whose profile is still loading', () => {
+    // SSR renders the real cards (no window → no session → always ready). A returning
+    // user has a Supabase token in localStorage and auth is still resolving on the
+    // client. The client must NOT replace the painted cards with a skeleton.
+    (hasSupabaseSession as jest.Mock).mockReturnValue(true);
+    (useAuth as jest.Mock).mockReturnValue({
+      isAuthenticated: false,
+      isAdmin: false,
+      profile: null,
+      loading: true,
+    });
+
+    render(<LandingView />, { wrapper: createWrapper() });
+
+    expect(screen.queryByTestId('landing-cards-skeleton')).toBeNull();
+
+    const links = screen.getAllByRole('link');
+    const hasGameModeLink = links.some((link) => {
+      const href = link.getAttribute('href') ?? '';
+      return /\/(singleplayer|multiplayer|practice|daily|adventure|blast|connections|brain)/.test(href);
+    });
+    expect(hasGameModeLink).toBe(true);
   });
 
   it('has accessible navigation links', () => {

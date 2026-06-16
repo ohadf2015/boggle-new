@@ -13,33 +13,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LandingChallengeCards } from '../LandingChallengeCards';
 
 const trackModeSelected = vi.fn();
+const trackLandingCtaClick = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackModeSelected: (...args: unknown[]) => trackModeSelected(...args),
-  trackLandingCtaClick: vi.fn(),
+  trackLandingCtaClick: (...args: unknown[]) => trackLandingCtaClick(...args),
 }));
 
-vi.mock('framer-motion', () => {
-  const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
-    const safe = { ...props };
-    for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
-    return React.createElement('div', { ...safe, ref }, children);
-  });
-  motionComponent.displayName = 'Motion';
-  const motionObj = new Proxy({}, { get: () => motionComponent });
-  const AnimatePresence = ({ children }: any) => children;
-  AnimatePresence.displayName = 'AnimatePresence';
-  return { m: motionObj, AnimatePresence };
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
+
+vi.mock('@/components/daily/DailyChallengeCube', () => {
+  const DailyChallengeCube = () => <div data-testid="daily-challenge-cube" />;
+  DailyChallengeCube.displayName = 'DailyChallengeCube';
+  return { __esModule: true, default: DailyChallengeCube };
 });
 
-vi.mock('../ModeCard', () => {
-  const ModeCard = ({ title, onClick }: any) => (
-    <button type="button" data-testid={`mode-${title}`} onClick={onClick}>
-      {title}
-    </button>
-  );
-  ModeCard.displayName = 'ModeCard';
-  return { __esModule: true, default: ModeCard };
-});
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
 vi.mock('@/utils/onboardingStorage', () => ({ hasCompletedOnboarding: () => true }));
 vi.mock('@/utils/multiplayerProgressStorage', () => ({ isNewPlayer: () => false, getGamesCompleted: () => 0 }));
@@ -48,6 +37,20 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => {
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';
   return { __esModule: true, default: DailyChallengeBanner };
 });
+
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
+}));
+
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => ({ userStats: { totalGamesPlayed: 5 }, isLoading: false }),
+}));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: { email: undefined }, canSeeInWorkModes: false }),
+}));
+
+vi.mock('@/utils/featureGates', () => ({ THRESHOLDS: { modeRoster: 3 } }));
 
 const mockIsVeteran = vi.fn(() => false); // practice shows to all users
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({
@@ -67,21 +70,24 @@ const baseProps = {
 describe('LandingChallengeCards — mode_selected tracking', () => {
   beforeEach(() => {
     trackModeSelected.mockClear();
+    trackLandingCtaClick.mockClear();
   });
 
   it.each([
-    ['landing.arena', 'arena'],
-    ['landing.blastMode', 'blast'],
-  ])('clicking %s card fires trackModeSelected(%s, "home")', (title, mode) => {
-    render(<LandingChallengeCards {...baseProps} />);
-    fireEvent.click(screen.getByTestId(`mode-${title}`));
+    ['arena', 'arena'],
+    ['blast', 'blast'],
+  ])('clicking %s cube fires trackModeSelected(%s, "home")', (key, mode) => {
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const cube = container.querySelector(`[data-cube-key="${key}"]`) as HTMLElement;
+    fireEvent.click(cube);
     expect(trackModeSelected).toHaveBeenCalledWith(mode, 'home');
   });
 
-  it('clicking practice card fires trackModeSelected("practice", "home")', () => {
+  it('clicking practice cube fires trackModeSelected("practice", "home")', () => {
     mockIsVeteran.mockReturnValue(false); // non-veteran sees practice
-    render(<LandingChallengeCards {...baseProps} />);
-    fireEvent.click(screen.getByTestId('mode-landing.practice'));
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const cube = container.querySelector('[data-cube-key="practice"]') as HTMLElement;
+    fireEvent.click(cube);
     expect(trackModeSelected).toHaveBeenCalledWith('practice', 'home');
   });
 });

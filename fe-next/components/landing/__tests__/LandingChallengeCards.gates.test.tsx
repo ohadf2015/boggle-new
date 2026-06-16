@@ -17,25 +17,14 @@ vi.mock('@/utils/growthTracking', () => ({
   trackLandingCtaClick: vi.fn(),
 }));
 
-vi.mock('framer-motion', () => {
-  const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
-    const safe = { ...props };
-    for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
-    return React.createElement('div', { ...safe, ref }, children);
-  });
-  motionComponent.displayName = 'Motion';
-  const motionObj = new Proxy({}, { get: () => motionComponent });
-  const AnimatePresence = ({ children }: any) => children;
-  AnimatePresence.displayName = 'AnimatePresence';
-  return { m: motionObj, AnimatePresence };
-});
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
 
-vi.mock('../ModeCard', () => {
-  const ModeCard = ({ title, href }: any) => (
-    <div data-testid={`mode-${title}`} data-href={href}>{title}</div>
-  );
-  ModeCard.displayName = 'ModeCard';
-  return { __esModule: true, default: ModeCard };
+vi.mock('@/components/daily/DailyChallengeCube', () => {
+  const DailyChallengeCube = () => <div data-testid="daily-challenge-cube" />;
+  DailyChallengeCube.displayName = 'DailyChallengeCube';
+  return { __esModule: true, default: DailyChallengeCube };
 });
 
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
@@ -90,18 +79,18 @@ describe('LandingChallengeCards — Word Craft consolidated to ONE public card',
   it('renders the single wordCraft territory card → /word-craft for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-wordcraft.modeTitle');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="wordCraft"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-craft');
+    expect(card?.getAttribute('href')).toBe('/en/word-craft');
   });
 
   it('renders the wordCraft card when signed out (public)', () => {
     mockIsAdmin.mockReturnValue(false);
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="wordCraft"]')).toBeInTheDocument();
   });
 
   it('surfaces NO separate Card Run / Pass & Play / Gem Hunt hub cards (consolidated)', () => {
@@ -109,12 +98,10 @@ describe('LandingChallengeCards — Word Craft consolidated to ONE public card',
     // is an in-game option. None get their own hub card anymore — even for an admin.
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-wordcraft.cardsModeTitle')).toBeNull();
-    expect(screen.queryByTestId('mode-wordcraft.passPlayModeTitle')).toBeNull();
-    expect(screen.queryByTestId('mode-wordcraft.gemsModeTitle')).toBeNull();
-    // and exactly one wordcraft card remains
-    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    // only one wordcraft card (no separate cards/pass/gems)
+    const wordCraftCards = container.querySelectorAll('[data-cube-key="wordCraft"]');
+    expect(wordCraftCards.length).toBe(1);
   });
 });
 
@@ -122,17 +109,17 @@ describe('LandingChallengeCards — Word Tower admin solo gate', () => {
   it('does NOT render the Word Tower card for a non-admin user', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-wordTower.cardTitle')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="wordTower"]')).toBeNull();
   });
 
   it('renders the Word Tower SOLO card for an admin with /word-tower href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-wordTower.cardTitle');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="wordTower"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-tower');
+    expect(card?.getAttribute('href')).toBe('/en/word-tower');
   });
 });
 
@@ -140,17 +127,17 @@ describe('LandingChallengeCards — Word Forge admin dev-preview gate', () => {
   it('does NOT render the Word Forge card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.wordForgeMode')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="wordForge"]')).toBeNull();
   });
 
   it('renders the Word Forge card for an admin with /word-forge href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.wordForgeMode');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="wordForge"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-forge');
+    expect(card?.getAttribute('href')).toBe('/en/word-forge');
   });
 });
 
@@ -158,17 +145,17 @@ describe('LandingChallengeCards — Word Vault admin dev-preview gate', () => {
   it('does NOT render the Word Vault card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.wordVaultMode')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="wordVault"]')).toBeNull();
   });
 
   it('renders the Word Vault card for an admin with /word-vault href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.wordVaultMode');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="wordVault"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-vault');
+    expect(card?.getAttribute('href')).toBe('/en/word-vault');
   });
 });
 
@@ -176,17 +163,17 @@ describe('LandingChallengeCards — Party Games admin dev-preview gate', () => {
   it('does NOT render the Party Games card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.partyMode')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="party"]')).toBeNull();
   });
 
   it('renders the Party Games card for an admin with /party href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.partyMode');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="party"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/party');
+    expect(card?.getAttribute('href')).toBe('/en/party');
   });
 });
 
@@ -194,17 +181,17 @@ describe('LandingChallengeCards — Word Alchemy admin dev-preview gate', () => 
   it('does NOT render the Word Alchemy card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.wordAlchemyMode')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="wordAlchemy"]')).toBeNull();
   });
 
   it('renders the Word Alchemy card for an admin with /word-alchemy href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.wordAlchemyMode');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="wordAlchemy"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/word-alchemy');
+    expect(card?.getAttribute('href')).toBe('/en/word-alchemy');
   });
 });
 
@@ -212,19 +199,19 @@ describe('LandingChallengeCards — Shiritori admin dev-preview gate', () => {
   it('does NOT render the Shiritori card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.shiritoriMode')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="shiritori"]')).toBeNull();
   });
 
   it('renders the Shiritori card for an admin linking to the playable solo route', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.shiritoriMode');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="shiritori"]');
     expect(card).toBeInTheDocument();
     // Card must start the game, not dump the user on the /shiritori marketing
     // page whose primary CTA bounces to /multiplayer.
-    expect(card.getAttribute('data-href')).toBe('/en/shiritori/solo');
+    expect(card?.getAttribute('href')).toBe('/en/shiritori/solo');
   });
 });
 
@@ -238,20 +225,21 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockIsNewPlayer.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
-    render(<LandingChallengeCards {...baseProps} />);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
     const expected = [
       // WordCraft consolidated to ONE public card; Cards/Gems are URL sub-modes
       // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
-      'mode-wordTower.cardTitle',          // Word Tower
-      'mode-landing.wordForgeMode',        // Word Forge
-      'mode-landing.wordVaultMode',        // Word Vault
-      'mode-landing.partyMode',            // Party Games
-      'mode-landing.wordAlchemyMode',      // Word Alchemy
-      'mode-landing.shiritoriMode',        // Shiritori
-      'mode-landing.sealedBidMode',        // Sealed Bid
+      'wordTower',          // Word Tower
+      'wordForge',          // Word Forge
+      'wordVault',          // Word Vault
+      'party',              // Party Games
+      'wordAlchemy',        // Word Alchemy
+      'shiritori',          // Shiritori
+      'sealedBid',          // Sealed Bid
     ];
-    for (const id of expected) {
-      expect(screen.getByTestId(id), `missing admin card: ${id}`).toBeInTheDocument();
+    for (const key of expected) {
+      const card = container.querySelector(`[data-cube-key="${key}"]`);
+      expect(card, `missing admin card: ${key}`).toBeInTheDocument();
     }
   });
 
@@ -261,18 +249,19 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     mockIsNewPlayer.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 50 });
-    render(<LandingChallengeCards {...baseProps} />);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
-      'mode-wordTower.cardTitle',
-      'mode-landing.wordForgeMode',
-      'mode-landing.wordVaultMode',
-      'mode-landing.partyMode',
-      'mode-landing.wordAlchemyMode',
-      'mode-landing.shiritoriMode',
-      'mode-landing.sealedBidMode',
+      'wordTower',
+      'wordForge',
+      'wordVault',
+      'party',
+      'wordAlchemy',
+      'shiritori',
+      'sealedBid',
     ];
-    for (const id of adminOnly) {
-      expect(screen.queryByTestId(id), `leaked admin card to non-admin: ${id}`).toBeNull();
+    for (const key of adminOnly) {
+      const card = container.querySelector(`[data-cube-key="${key}"]`);
+      expect(card, `leaked admin card to non-admin: ${key}`).toBeNull();
     }
   });
 });
@@ -281,17 +270,17 @@ describe('LandingChallengeCards — Sealed Bid admin dev-preview gate', () => {
   it('does NOT render the Sealed Bid card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-landing.sealedBidMode')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="sealedBid"]')).toBeNull();
   });
 
   it('renders the Sealed Bid card for an admin with the /sealed-bid href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-landing.sealedBidMode');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="sealedBid"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/sealed-bid');
+    expect(card?.getAttribute('href')).toBe('/en/sealed-bid');
   });
 });
 
@@ -299,17 +288,17 @@ describe('LandingChallengeCards — Crossword admin dev-preview gate', () => {
   it('does NOT render the Crossword card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-crossword.name')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="crossword"]')).toBeNull();
   });
 
   it('renders the Crossword card for an admin with the /crossword href', () => {
     mockIsAdmin.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} />);
-    const card = screen.getByTestId('mode-crossword.name');
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const card = container.querySelector('[data-cube-key="crossword"]');
     expect(card).toBeInTheDocument();
-    expect(card.getAttribute('data-href')).toBe('/en/crossword');
+    expect(card?.getAttribute('href')).toBe('/en/crossword');
   });
 });
 
@@ -319,9 +308,9 @@ describe('LandingChallengeCards — collapse-after-MP gate', () => {
     mockGamesCompleted.mockReturnValue(0);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 0 });
     mockUserEmail.mockReturnValue(undefined);
-    render(<LandingChallengeCards {...baseProps} />);
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
     // Non-essential modes are tucked behind the <details> expander.
-    expect(screen.getByTestId('landing-section-more')).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeInTheDocument();
   });
 
   it('omits the expander once the player has completed any MP game', () => {
@@ -329,12 +318,12 @@ describe('LandingChallengeCards — collapse-after-MP gate', () => {
     mockGamesCompleted.mockReturnValue(1); // overrides — MP played at least once
     mockUserStats.mockReturnValue({ totalGamesPlayed: 1 });
     mockUserEmail.mockReturnValue(undefined);
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('landing-section-more')).toBeNull();
-    // And every non-essential mode lives directly in the SP section.
-    const spSection = screen.getByTestId('landing-section-sp');
-    expect(spSection).toContainElement(screen.getByTestId('mode-landing.blastMode'));
-    expect(spSection).toContainElement(screen.getByTestId('mode-landing.wordChainMode'));
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+    // And every non-essential mode lives directly in the visible grid (not hidden in details).
+    // The visible grid contains both blast and connections.
+    expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
   });
 });
 
@@ -342,29 +331,31 @@ describe('LandingChallengeCards — Japanese locale gates', () => {
   it('hides connections card for Japanese locale', () => {
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} language="ja" />);
-    expect(screen.queryByTestId('mode-landing.wordChainMode')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} language="ja" />);
+    expect(container.querySelector('[data-cube-key="connections"]')).toBeNull();
   });
 
   it('shows connections card for English locale', () => {
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} language="en" />);
-    expect(screen.getByTestId('mode-landing.wordChainMode')).toBeInTheDocument();
+    const { container } = render(<LandingChallengeCards {...baseProps} language="en" />);
+    expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
   });
 
   it('shows the public wordCraft territory card for Japanese locale (ja tile bag + dictionary)', () => {
     mockUserEmail.mockReturnValue(undefined);
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} language="ja" />);
-    expect(screen.getByTestId('mode-wordcraft.modeTitle')).toBeInTheDocument();
+    const { container } = render(<LandingChallengeCards {...baseProps} language="ja" />);
+    expect(container.querySelector('[data-cube-key="wordCraft"]')).toBeInTheDocument();
   });
 
   it('still hides the wordCraft Gem Hunt card for Japanese locale', () => {
     mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('ohadf2015@gmail.com');
     mockGamesCompleted.mockReturnValue(10);
-    render(<LandingChallengeCards {...baseProps} language="ja" />);
-    expect(screen.queryByTestId('mode-wordcraft.gemsModeTitle')).toBeNull();
+    const { container } = render(<LandingChallengeCards {...baseProps} language="ja" />);
+    // wordCraft is a single consolidated cube, no separate gems card
+    const wordCraftCards = container.querySelectorAll('[data-cube-key="wordCraft"]');
+    expect(wordCraftCards.length).toBe(1);
   });
 });

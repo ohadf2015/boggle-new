@@ -1,42 +1,58 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { describe, it, expect, vi } from 'vitest';
 import { LandingChallengeCards } from '../LandingChallengeCards';
 import { getCardOrder, type GameModeStats } from '@/lib/landing/fetchGameModeStats';
 
-vi.mock('framer-motion', () => {
-  const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
-    const safe = { ...props };
-    for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
-    return React.createElement('div', { ...safe, ref }, children);
-  });
-  motionComponent.displayName = 'Motion';
-  const motionObj = new Proxy({}, { get: (_, tag) => motionComponent });
-  const AnimatePresence = ({ children }: any) => children;
-  AnimatePresence.displayName = 'AnimatePresence';
-  return { m: motionObj, AnimatePresence };
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
+
+vi.mock('@/components/daily/DailyChallengeCube', () => {
+  const DailyChallengeCube = () => <div data-testid="daily-challenge-cube" />;
+  DailyChallengeCube.displayName = 'DailyChallengeCube';
+  return { __esModule: true, default: DailyChallengeCube };
 });
 
-vi.mock('../ModeCard', () => {
-  const ModeCard = ({ title }: any) => <div data-testid="mode-card">{title}</div>;
-  ModeCard.displayName = 'ModeCard';
-  return { __esModule: true, default: ModeCard };
-});
 vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
+
+vi.mock('@/utils/onboardingStorage', () => ({
+  hasCompletedOnboarding: () => true,
+}));
+
 vi.mock('@/components/daily/DailyChallengeBanner', () => {
   const DailyChallengeBanner = () => <div data-testid="daily-banner">daily</div>;
   DailyChallengeBanner.displayName = 'DailyChallengeBanner';
   return { __esModule: true, default: DailyChallengeBanner };
 });
+
 const mockIsVeteran = vi.fn(() => false);
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({
   useIsPracticeVeteran: () => mockIsVeteran(),
 }));
+
+const mockUserStats = vi.fn(() => ({ userStats: { totalGamesPlayed: 5 }, isLoading: false }));
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => mockUserStats(),
+}));
+
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
 }));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ user: { email: undefined }, canSeeInWorkModes: false }),
+}));
+
+vi.mock('@/utils/multiplayerProgressStorage', () => ({
+  isNewPlayer: () => false,
+  getGamesCompleted: () => 10,
+}));
+
+vi.mock('@/utils/featureGates', () => ({ THRESHOLDS: { modeRoster: 3 } }));
 
 const baseProps = {
   language: 'en',
@@ -48,50 +64,36 @@ const baseProps = {
   dailyChallengeStats: { hasPlayed: false, hasSolved: null, currentStreak: 0, puzzleNumber: 1, loading: false },
 };
 
-describe('LandingChallengeCards reordering (MP/SP split)', () => {
-  it('non-veteran: practice in featured row above SP grid; SP grid has every other solo mode', () => {
+describe('LandingChallengeCards reordering', () => {
+  it('non-veteran: practice cube renders; every mode visible when 5+ games', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
-    const mpSection = screen.getByTestId('landing-section-mp');
-    const spSection = screen.getByTestId('landing-section-sp');
-    const featuredRow = screen.getByTestId('landing-section-practice-featured');
-    expect(mpSection).toHaveTextContent('landing.arena');
-    expect(mpSection).not.toHaveTextContent('landing.practice');
-    expect(featuredRow).toHaveTextContent('landing.practice');
-    expect(spSection).not.toHaveTextContent('landing.practice');
-    expect(spSection).toHaveTextContent('landing.blastMode');
-    expect(spSection).toHaveTextContent('landing.wordChainMode');
-    expect(spSection).toHaveTextContent('landing.brainTraining');
+    expect(screen.getByTestId('daily-challenge-cube')).toBeInTheDocument();
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-cube-key="arena"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cube-key="practice"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
   });
 
-  it('renders MP section before SP section in DOM (discovery hierarchy)', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    const cards = screen.getAllByTestId('mode-card');
-    // Arena (MP) comes before any SP card
-    expect(cards[0]).toHaveTextContent('landing.arena');
-    // Remaining cards still include practice (in featured row) and blast (in SP)
-    const otherTexts = cards.slice(1).map((c) => c.textContent);
-    expect(otherTexts).toEqual(
-      expect.arrayContaining(['landing.practice', 'landing.blastMode'])
-    );
+  it('renders arena cube (always visible on home)', () => {
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const arenaLink = container.querySelector('[data-cube-key="arena"]');
+    expect(arenaLink).toBeInTheDocument();
+    expect(arenaLink?.getAttribute('href')).toBe('/en/multiplayer');
   });
 
-  it('veteran: practice card entirely absent (not in featured row or SP grid)', () => {
-    // Stable return (not Once): useIsPracticeVeteran returns a consistent value
-    // across renders, and the component now re-renders once post-mount (the
-    // hydration-safe `mounted` gate) which would exhaust a one-shot mock.
+  it('veteran: practice cube entirely absent', () => {
     mockIsVeteran.mockReturnValue(true);
     try {
-      render(<LandingChallengeCards {...baseProps} />);
-      expect(screen.queryByTestId('landing-section-practice-featured')).toBeNull();
-      expect(screen.queryByText('landing.practice')).toBeNull();
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
       expect(screen.queryByText('landing.quickPlay')).toBeNull();
     } finally {
-      mockIsVeteran.mockReturnValue(false); // restore default for sibling tests
+      mockIsVeteran.mockReturnValue(false);
     }
   });
 
-  it('renders blast when most popular (still inside SP section)', () => {
+  it('renders blast cube when most popular', () => {
     const stats: GameModeStats[] = [
       { mode: 'blast', playCount: 9999 },
       { mode: 'practice', playCount: 10 },
@@ -100,11 +102,9 @@ describe('LandingChallengeCards reordering (MP/SP split)', () => {
       { mode: 'adventure', playCount: 1 },
     ];
     const cardOrder = getCardOrder(stats);
-    render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
-    const spSection = screen.getByTestId('landing-section-sp');
-    expect(spSection).toHaveTextContent('landing.blastMode');
-    // arena (MP) stays in MP section even though practice/blast/arena stats vary
-    const mpSection = screen.getByTestId('landing-section-mp');
-    expect(mpSection).toHaveTextContent('landing.arena');
+    const { container } = render(<LandingChallengeCards {...baseProps} cardOrder={cardOrder} />);
+    expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
+    // arena stays visible too (always)
+    expect(container.querySelector('[data-cube-key="arena"]')).toBeInTheDocument();
   });
 });

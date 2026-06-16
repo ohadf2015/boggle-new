@@ -1,23 +1,19 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LandingChallengeCards } from '../LandingChallengeCards';
 
-// Same harness mocks as LandingChallengeCards.test.tsx, plus a forced experiment.
-vi.mock('framer-motion', () => {
-  const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
-    const safe = { ...props };
-    for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
-    return React.createElement('div', { ...safe, ref }, children);
-  });
-  motionComponent.displayName = 'Motion';
-  const motionObj = new Proxy({}, { get: () => motionComponent });
-  return { m: motionObj, AnimatePresence: ({ children }: any) => children };
-});
-vi.mock('../ModeCard', () => ({
-  __esModule: true,
-  default: ({ title }: { title: string }) => <div data-testid="mode-card">{title}</div>,
+// Cubes layout mocks
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
+
+vi.mock('@/components/daily/DailyChallengeCube', () => ({
+  __esModule: true,
+  default: () => <div data-testid="daily-challenge-cube" />,
+}));
+
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
 vi.mock('@/utils/onboardingStorage', () => ({ hasCompletedOnboarding: () => true }));
 vi.mock('@/components/daily/DailyChallengeBanner', () => ({
@@ -27,12 +23,9 @@ vi.mock('@/components/daily/DailyChallengeBanner', () => ({
 vi.mock('@/hooks/useIsPracticeVeteran', () => ({ useIsPracticeVeteran: () => false }));
 vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
 vi.mock('@/hooks/useUserStats', () => ({ useUserStats: () => ({ userStats: { totalGamesPlayed: 5 }, isLoading: false }) }));
-
-const trackExposure = vi.fn();
-const mockVariant = vi.fn(() => 'cubes');
-vi.mock('@/hooks/useExperiment', () => ({
-  useExperiment: () => ({ variant: mockVariant(), trackExposure }),
-}));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { email: undefined }, canSeeInWorkModes: false }) }));
+vi.mock('@/utils/multiplayerProgressStorage', () => ({ isNewPlayer: () => false, getGamesCompleted: () => 0 }));
+vi.mock('@/utils/featureGates', () => ({ THRESHOLDS: { modeRoster: 3 } }));
 
 const trackModeSelected = vi.fn();
 const trackLandingCtaClick = vi.fn();
@@ -52,46 +45,38 @@ const baseProps = {
 };
 
 beforeEach(() => {
-  trackExposure.mockClear();
   trackModeSelected.mockClear();
   trackLandingCtaClick.mockClear();
-  mockVariant.mockReturnValue('cubes');
 });
 
-describe('LandingChallengeCards — cubes A/B variant', () => {
-  it('renders the bento cube layout (arena anchor) instead of the card grid', () => {
-    render(<LandingChallengeCards {...baseProps} />);
+describe('LandingChallengeCards — cubes layout', () => {
+  it('renders the bento cube layout with arena anchor', () => {
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
     const anchor = screen.getByTestId('mode-cube-anchor');
     expect(anchor).toBeInTheDocument();
     // arena anchor links to multiplayer + shows the live pill from activePlayers
     expect(anchor).toHaveAttribute('href', '/en/multiplayer');
     expect(screen.getByText(/1,234 landing\.playingNow/)).toBeInTheDocument();
-    // no control card wrappers
-    expect(screen.queryByTestId('mode-card')).not.toBeInTheDocument();
   });
 
-  it('keeps the daily banner as its own hero node (not a cube)', () => {
+  it('renders daily challenge cube (hero node)', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
+    expect(screen.getByTestId('daily-challenge-cube')).toBeInTheDocument();
   });
 
-  it('fires the exposure event when the cube layout renders', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(trackExposure).toHaveBeenCalled();
-  });
-
-  it('preserves control analytics on cube tap (mode_selected + landing_cta_clicked)', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    const connections = screen.getByRole('link', { name: /landing\.wordChainMode/i });
-    connections.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  it('preserves analytics on cube click (mode_selected + landing_cta_clicked)', () => {
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const connectionsLink = container.querySelector('[data-cube-key="connections"]') as HTMLElement;
+    fireEvent.click(connectionsLink);
     expect(trackModeSelected).toHaveBeenCalledWith('connections', 'home');
     expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', { mode: 'connections', variant: 'blue' });
   });
 
-  it('falls back to the control card grid when variant=control', () => {
-    mockVariant.mockReturnValue('control');
-    render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.queryByTestId('mode-cube-anchor')).not.toBeInTheDocument();
-    expect(trackExposure).not.toHaveBeenCalled();
+  it('renders multiple cubes in the grid', () => {
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    const cubes = container.querySelectorAll('[data-cube-key]');
+    // Arena anchor + other SP modes
+    expect(cubes.length).toBeGreaterThan(1);
+    expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
   });
 });

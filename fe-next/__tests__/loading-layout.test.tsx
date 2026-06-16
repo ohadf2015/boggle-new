@@ -70,17 +70,34 @@ describe('Loading Layout', () => {
     expect(main?.className).toContain('flex-1');
   });
 
-  it('should have skeleton mode cards for seamless transition', () => {
-    const { container } = render(<Loading />);
+  it('reserves a season-strip placeholder above the hero to match LandingView order', () => {
+    const { container, getByTestId } = render(<Loading />);
 
-    // Should render skeleton cards in grid structure
+    // LandingSeasonHero renders FIRST in LandingView (above the hero). The route
+    // skeleton must reserve its space or the real content shifts down on swap.
+    const seasonStrip = getByTestId('loading-season-strip');
+    expect(seasonStrip).toBeTruthy();
+
+    // It must be the first child of <main> (before the hero block).
+    const main = container.querySelector('main');
+    expect(main?.firstElementChild).toBe(seasonStrip);
+  });
+
+  it('renders the cubes bento skeleton (matches the live LandingModeCubes layout)', () => {
+    const { container, getByTestId } = render(<Loading />);
+
+    // Cubes is the only homepage layout now — the route skeleton must mirror the
+    // bento (daily strip + 2×2 anchor + small cubes), not the retired 2×2 card grid.
+    expect(getByTestId('landing-cubes-skeleton')).toBeTruthy();
+    expect(getByTestId('cubes-skeleton-anchor')).toBeTruthy();
+    expect(container.querySelectorAll('[data-testid="cubes-skeleton-cube"]').length).toBeGreaterThan(0);
+
+    // Cubes bento grid (not the control grid-cols-1 sm:grid-cols-2 column).
     const grid = container.querySelector('.grid');
-    expect(grid).toBeTruthy();
-    expect(grid?.className).toContain('grid-cols-1');
-    expect(grid?.className).toContain('sm:grid-cols-2');
+    expect(grid?.className).toContain('grid-cols-2');
+    expect(grid?.className).toContain('md:grid-cols-4');
 
-    // Should have multiple skeleton elements with pulse animation
-    const skeletonCards = container.querySelectorAll('.animate-pulse');
-    expect(skeletonCards.length).toBeGreaterThan(0);
+    // Header/hero shimmer still pulses.
+    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
   });
 });

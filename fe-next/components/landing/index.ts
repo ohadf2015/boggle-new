@@ -1,7 +1,6 @@
 export { default as LandingView } from './LandingView';
 export { default as ModeCard } from './ModeCard';
 export { ModeCardSkeleton } from './ModeCardSkeleton';
-export { LandingCardsSkeleton } from './LandingCardsSkeleton';
 export { LandingHero } from './LandingHero';
 export { LandingSocialProofBar } from './LandingSocialProofBar';
 export { LandingLeaderboardPreview } from './LandingLeaderboardPreview';

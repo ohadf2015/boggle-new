@@ -1,35 +1,19 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { LandingChallengeCards } from '../LandingChallengeCards';
 
-vi.mock('framer-motion', () => {
-  const motionComponent = React.forwardRef(({ children, ...props }: any, ref: any) => {
-    const safe = { ...props };
-    for (const k of ['initial','animate','exit','transition','variants','whileHover','whileTap','whileInView','viewport']) delete safe[k];
-    return React.createElement('div', { ...safe, ref }, children);
-  });
-  motionComponent.displayName = 'Motion';
-  const motionObj = new Proxy({}, { get: (_, tag) => motionComponent });
-  const AnimatePresence = ({ children }: any) => children;
-  AnimatePresence.displayName = 'AnimatePresence';
-  return { m: motionObj, AnimatePresence };
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
+}));
+
+vi.mock('@/components/daily/DailyChallengeCube', () => {
+  const DailyChallengeCube = () => <div data-testid="daily-challenge-cube" />;
+  DailyChallengeCube.displayName = 'DailyChallengeCube';
+  return { __esModule: true, default: DailyChallengeCube };
 });
 
-vi.mock('../ModeCard', () => {
-  const ModeCard = ({ title, badge, highlighted, highlightLabel }: any) => (
-    <div
-      data-testid="mode-card"
-      data-title={title}
-      data-highlighted={highlighted ? 'true' : 'false'}
-      data-highlight-label={highlightLabel || ''}
-    >
-      {title}{badge && <span data-testid="badge">{badge}</span>}
-    </div>
-  );
-  ModeCard.displayName = 'ModeCard';
-  return { __esModule: true, default: ModeCard };
-});
 vi.mock('@/utils/contextualGuidanceStorage', () => ({
   shouldShowGuidance: () => false,
 }));
@@ -87,34 +71,35 @@ describe('LandingChallengeCards', () => {
     expect(screen.getByText('landing.brainTraining')).toBeInTheDocument();
   });
 
-  it('renders daily challenge banner', () => {
+  it('renders daily challenge cube', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('daily-banner')).toBeInTheDocument();
+    expect(screen.getByTestId('daily-challenge-cube')).toBeInTheDocument();
   });
 
   describe('practice card emphasis for non-veterans', () => {
     afterEach(() => mockIsVeteran.mockReturnValue(false));
 
-    it('practice card is highlighted whenever player is not a veteran', () => {
-      mockIsVeteran.mockReturnValue(false);
-      render(<LandingChallengeCards {...baseProps} />);
-      const practice = screen.getByText('landing.practice').closest('[data-testid="mode-card"]') as HTMLElement;
-      expect(practice).not.toBeNull();
-      expect(practice.getAttribute('data-highlighted')).toBe('true');
-    });
-
-    it('non-veteran practice card lives in its own featured row above the SP grid', () => {
+    it('practice cube is highlighted whenever player is not a veteran', () => {
       mockIsVeteran.mockReturnValue(false);
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      const featured = container.querySelector('[data-testid="landing-section-practice-featured"]');
-      expect(featured).not.toBeNull();
-      expect(featured?.textContent).toContain('landing.practice');
+      const practice = container.querySelector('[data-cube-key="practice"]');
+      expect(practice).not.toBeNull();
+      // The highlight is rendered as text content "onboarding.welcome.startHere"
+      expect(practice?.textContent).toContain('onboarding.welcome.startHere');
     });
 
-    it('veteran landing has no featured practice row', () => {
+    it('practice cube renders above the SP grid (in visible set)', () => {
+      mockIsVeteran.mockReturnValue(false);
+      const { container } = render(<LandingChallengeCards {...baseProps} />);
+      const practice = container.querySelector('[data-cube-key="practice"]');
+      expect(practice).not.toBeNull();
+      expect(practice?.textContent).toContain('landing.practice');
+    });
+
+    it('veteran landing has no practice cube', () => {
       mockIsVeteran.mockReturnValue(true);
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      expect(container.querySelector('[data-testid="landing-section-practice-featured"]')).toBeNull();
+      expect(container.querySelector('[data-cube-key="practice"]')).toBeNull();
     });
   });
 
@@ -168,13 +153,13 @@ describe('LandingChallengeCards', () => {
       mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
       const { container } = render(<LandingChallengeCards {...baseProps} />);
       // Expander is present
-      expect(container.querySelector('[data-testid="landing-section-more"]')).not.toBeNull();
+      expect(container.querySelector('[data-testid="landing-cubes-more"]')).not.toBeNull();
     });
 
     it('player with 0 games does NOT see connections/brainGym above the fold', () => {
       mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      const moreSection = container.querySelector('[data-testid="landing-section-more"]');
+      const moreSection = container.querySelector('[data-testid="landing-cubes-more"]');
       // The extras live INSIDE the expander, not above it
       expect(moreSection?.textContent).toContain('landing.wordChainMode');
       expect(moreSection?.textContent).toContain('landing.brainTraining');
@@ -183,21 +168,21 @@ describe('LandingChallengeCards', () => {
     it('player with 3 games sees all modes above the fold (no expander needed)', () => {
       mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 3 }, isLoading: false });
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      expect(container.querySelector('[data-testid="landing-section-more"]')).toBeNull();
+      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
     });
 
     it('CrazyGames bypass overrides newcomer collapse', () => {
       mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
       mockIsOnCG.mockReturnValue(true);
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      expect(container.querySelector('[data-testid="landing-section-more"]')).toBeNull();
+      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
       mockIsOnCG.mockReturnValue(false);
     });
 
     it('null userStats (auth still loading) does not collapse — default to open landing', () => {
       mockUserStats.mockReturnValue({ userStats: null, isLoading: true });
       const { container } = render(<LandingChallengeCards {...baseProps} />);
-      expect(container.querySelector('[data-testid="landing-section-more"]')).toBeNull();
+      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
     });
   });
 });

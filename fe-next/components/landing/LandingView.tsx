@@ -17,13 +17,10 @@ import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { InlineBannerAd } from '@/components/ads';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-import { hasCompletedOnboarding, hasSupabaseSession, markOnboardingComplete } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, markOnboardingComplete } from '@/utils/onboardingStorage';
 import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
 import { LandingBlogSection } from './LandingBlogSection';
 import { LandingHero } from './LandingHero';
-import { LandingHeroVariant } from './LandingHeroVariant';
-import { LandingCardsSkeleton } from './LandingCardsSkeleton';
-import { LandingCubesSkeleton } from './LandingCubesSkeleton';
 // SSR enabled: receives initialData (gamesToday) at server time → no skeleton flash above the fold.
 const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
   loading: () => <div className="h-10 w-full max-w-4xl mx-auto" />,
@@ -48,7 +45,6 @@ const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.La
 import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
-import { useExperiment } from '@/hooks/useExperiment';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
@@ -73,7 +69,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAdmin, profile } = useAuth();
   const isMobilePortrait = useMobilePortrait();
   // The in-content InlineBannerAd below is a WEB monetization slot. On native it
   // would register a banner-coordinator 'slot' (priority > the bottom anchor),
@@ -85,15 +81,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const [isNativeApp, setIsNativeApp] = useState(false);
   useEffect(() => { setIsNativeApp(Capacitor.isNativePlatform()); }, []);
 
-  // Auth-flicker gate: if a Supabase token exists in localStorage we KNOW the user
-  // will resolve to authed. Render skeleton until profile lands instead of paint-
-  // ing the guest-default card set and overwriting it on hydration. Guests with
-  // no token sync straight from localStorage and hit the real cards on paint #1.
-  const [hadSession] = useState(() => typeof window !== 'undefined' && hasSupabaseSession());
-  const cardsReady = !hadSession || (!authLoading && !!profile);
-
-  // Below-fold content is already code-split via dynamic() imports,
-  // so no need for a separate hydration gate that causes CLS.
+  // No client-side skeleton gate for the cards. This tree is server-rendered
+  // (PageClient is 'use client' but imports LandingView synchronously), so SSR
+  // always paints the real cards. A localStorage-token gate would only run on the
+  // client and *downgrade* those painted cards into a skeleton until auth resolves
+  // — a hydration mismatch + a real→skeleton→real flash for returning users.
+  // LandingChallengeCards self-manages auth (useAuth().canSeeInWorkModes, admin
+  // cards are additive) and gates hydration-sensitive personalization internally.
 
   const liveRoomStats = useLiveRoomStats();
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
@@ -111,19 +105,9 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
     if (visibleEvent) setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]));
   }, [visibleEvent]);
 
-  // Landing hero A/B test — variant adds subtitle + CTA + live count
-  const { variant: heroVariant, trackExposure: trackHeroExposure } =
-    useExperiment('landing-variant-homepage-v1');
-  useEffect(() => {
-    trackHeroExposure();
-  }, [trackHeroExposure]);
-
-  // When the cubes mode-grid is active, the daily challenge becomes the hero CTA
-  // INSIDE the grid, so the page hero drops the now-redundant Play-Now button and
-  // leans into playful energy instead. Reads the cubes flag so the two homepage
-  // experiments stay independent (cubes wins the hero treatment when on).
-  const { variant: cubesVariant } = useExperiment('landing-modes-cubes-v1');
-  const isCubesLanding = cubesVariant === 'cubes';
+  // Cubes is the permanent homepage layout (the A/B control hero + card grid were
+  // retired). The daily challenge is the hero CTA inside the cubes bento, so the
+  // page hero drops the now-redundant Play-Now button and leans into playful energy.
 
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
@@ -207,28 +191,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
         <LandingSeasonHero />
 
         {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
-        {isCubesLanding ? (
-          <LandingHero
-            players={topPlayers}
-            playersLoading={topPlayersLoading}
-            isMobilePortrait={isMobilePortrait}
-            energetic
-            activePlayers={activePlayers}
-          />
-        ) : heroVariant === 'variant' ? (
-          <LandingHeroVariant
-            players={topPlayers}
-            playersLoading={topPlayersLoading}
-            isMobilePortrait={isMobilePortrait}
-            activePlayers={activePlayers}
-          />
-        ) : (
-          <LandingHero
-            players={topPlayers}
-            playersLoading={topPlayersLoading}
-            isMobilePortrait={isMobilePortrait}
-          />
-        )}
+        <LandingHero
+          players={topPlayers}
+          playersLoading={topPlayersLoading}
+          isMobilePortrait={isMobilePortrait}
+          energetic
+          activePlayers={activePlayers}
+        />
 
         {/* Social Proof Bar — compact stats, immediately below hero */}
         <LandingSocialProofBar
@@ -239,26 +208,20 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
         />
 
         {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
-        {cardsReady ? (
-          <LandingChallengeCards
-            language={language}
-            isAdmin={isAdmin}
-            hasBlastAccess={true}
-            activePlayers={liveRoomStats.activePlayers}
-            openRooms={liveRoomStats.openRooms}
-            totalPlayers={liveRoomStats.totalPlayers}
-            playerAllTimeBest={playerAllTimeBest}
-            t={t}
-            dailyChallengeStats={dailyChallengeStats}
-            cardOrder={initialData?.cardOrder}
-          />
-        ) : isCubesLanding ? (
-          // cubes variant loads into the bento → its skeleton must match that
-          // shape, not the control card column (else a layout jump on swap).
-          <LandingCubesSkeleton />
-        ) : (
-          <LandingCardsSkeleton isAdmin={isAdmin} />
-        )}
+        {/* Always rendered (SSR + client). LandingChallengeCards is the cubes bento;
+            it self-manages auth/personalization, so no client-side skeleton swap. */}
+        <LandingChallengeCards
+          language={language}
+          isAdmin={isAdmin}
+          hasBlastAccess={true}
+          activePlayers={liveRoomStats.activePlayers}
+          openRooms={liveRoomStats.openRooms}
+          totalPlayers={liveRoomStats.totalPlayers}
+          playerAllTimeBest={playerAllTimeBest}
+          t={t}
+          dailyChallengeStats={dailyChallengeStats}
+          cardOrder={initialData?.cardOrder}
+        />
 
         {/* Leaderboard — mobile only via CSS (no JS-driven mount/unmount → no CLS) */}
         <div className="md:hidden w-full max-w-4xl mx-auto">

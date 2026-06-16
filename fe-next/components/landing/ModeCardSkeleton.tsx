@@ -1,8 +1,5 @@
-'use client';
-
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ModeCardSkeletonProps {
   /** Color variant - matches ModeCard variants */
@@ -22,9 +19,6 @@ export const ModeCardSkeleton: React.FC<ModeCardSkeletonProps> = ({
   secondary = false,
   className,
 }) => {
-  const { dir } = useLanguage();
-  const isRTL = dir === 'rtl';
-
   // Simplified solid colors for better performance (no gradients)
   const variantStyles = {
     cyan: 'bg-neo-cyan',

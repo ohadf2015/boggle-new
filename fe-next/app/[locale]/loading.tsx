@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { LandingCubesSkeleton } from '@/components/landing/LandingCubesSkeleton';
 
 /**
  * Landing page loading skeleton — neo-brutalist style with shimmer.
@@ -18,6 +19,19 @@ export default function Loading() {
 
       {/* Main content */}
       <main className="w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 flex flex-col px-2 sm:px-3 lg:px-6 xl:px-8 py-3 sm:py-5 lg:py-8 gap-6 sm:gap-8">
+
+        {/* Season strip — LandingSeasonHero sits ABOVE the hero in LandingView (:207).
+            Reserving its slim height here keeps the real page from shifting down on swap. */}
+        <div
+          data-testid="loading-season-strip"
+          className="w-full max-w-4xl mx-auto rounded-neo border-3 border-neo-black bg-neo-purple/20 shadow-hard flex items-center gap-3 px-4 sm:px-5 py-2 sm:py-2.5 animate-pulse"
+          style={{ minHeight: '52px' }}
+        >
+          <div className="w-8 h-8 rounded-neo bg-neo-white/10 shrink-0" />
+          <div className="h-4 w-40 sm:w-56 rounded bg-neo-white/10" />
+          <div className="flex-1" />
+          <div className="hidden sm:block h-8 w-24 rounded-neo bg-neo-white/10" />
+        </div>
 
         {/* Hero section */}
         <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
@@ -63,32 +77,9 @@ export default function Loading() {
           ))}
         </div>
 
-        {/* Mode cards grid */}
-        <div className="w-full max-w-4xl mx-auto">
-          {/* Daily challenge banner */}
-          <div className="w-full mb-3 sm:mb-4">
-            <div className={cn(
-              'w-full p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard-lg',
-              'bg-neo-yellow/40 animate-pulse'
-            )} style={{ minHeight: '72px' }}>
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-neo bg-neo-black/15 shrink-0" />
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div className="h-5 sm:h-6 w-36 sm:w-44 bg-neo-black/10 rounded" />
-                  <div className="h-3 sm:h-4 w-24 sm:w-32 bg-neo-black/8 rounded" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mode cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
-            <ModeCardSkeleton color="neo-pink" />
-            <ModeCardSkeleton color="neo-cyan" />
-            <ModeCardSkeleton color="neo-lime" secondary />
-            <ModeCardSkeleton color="neo-purple" secondary />
-          </div>
-        </div>
+        {/* Mode cubes — mirrors the live LandingModeCubes bento (daily hero strip +
+            2×2 anchor + small cubes) so the skeleton→content swap reflows nothing. */}
+        <LandingCubesSkeleton />
       </main>
     </div>
   );
@@ -150,39 +141,3 @@ function LeaderboardSkeletonCompact() {
   );
 }
 
-/** Mode card skeleton — matches ModeCard shape */
-function ModeCardSkeleton({ color, secondary = false }: { color: string; secondary?: boolean }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        'w-full rounded-neo-lg border-neo-black overflow-hidden',
-        secondary ? 'border-2 shadow-hard' : 'border-3 shadow-hard-lg',
-        `bg-${color}/30`
-      )}
-      style={{
-        padding: secondary ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)',
-        minHeight: secondary ? '80px' : '100px',
-      }}
-    >
-      <div className={cn('flex items-center', secondary ? 'gap-2' : 'gap-2 sm:gap-3 lg:gap-4')}
-        style={{ marginBottom: secondary ? '0.25rem' : '0.5rem' }}>
-        <div className={cn(
-          'rounded-neo border-neo-black/20 shrink-0 animate-pulse',
-          secondary ? 'border w-8 h-8 sm:w-10 sm:h-10 bg-neo-navy/30' : 'border-2 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-neo-navy/30'
-        )} />
-        <div className={cn(
-          'bg-neo-black/12 rounded flex-1 animate-pulse',
-          secondary ? 'h-4 sm:h-5' : 'h-5 sm:h-6 lg:h-7'
-        )} style={{ maxWidth: '60%' }} />
-        <div className={cn(
-          'rounded-full border-neo-black/20 bg-neo-navy/20 shrink-0 animate-pulse',
-          secondary ? 'border w-10 h-10' : 'border-2 w-11 h-11 sm:w-12 sm:h-12'
-        )} />
-      </div>
-      {!secondary && (
-        <div className="bg-neo-black/10 rounded animate-pulse" style={{ height: 'clamp(0.75rem, 3cqw, 1rem)', width: '80%' }} />
-      )}
-    </div>
-  );
-}
