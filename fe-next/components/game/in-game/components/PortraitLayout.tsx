@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
+import { useTimerSize } from '../timerSize';
 import RoomChat from '@/components/RoomChat';
 import { type WordFeedback } from '../../WordFormingArea';
 import { WordFormingAreaConnected } from './WordFormingAreaConnected';
@@ -249,6 +250,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   }, [deferredLeaderboard]);
   const hapticsEnabled = useHapticsEnabled();
   const reduceMotion = useShouldReduceMotion();
+  // Single responsive timer size — replaces the prior 4 CSS-hidden CircularTimer
+  // mounts that all re-rendered every 1s tick. Resolves the exact size each
+  // viewport showed before (see timerSize.ts).
+  const timerSize = useTimerSize();
 
   // Memoize derived counts to avoid recomputation on every render tick
   const longValidWordCount = useMemo(
@@ -440,18 +445,16 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                     animate={{ scale: 1, opacity: 1 }}
                     className="relative z-20 shrink-0"
                   >
-                    <div className="hidden desktop-short:lg:block desktop-medium-short:lg:block lg:hidden">
-                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" onTimerState={onTimerState} />
-                    </div>
-                    <div className="hidden desktop-tall:lg:block desktop-medium-short:lg:hidden">
-                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" onTimerState={onTimerState} />
-                    </div>
-                    <div className="hidden md:block lg:hidden short:md:hidden medium-short:md:hidden">
-                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
-                    </div>
-                    <div className="md:hidden short:md:block short:lg:hidden medium-short:md:block medium-short:lg:hidden">
-                      <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
-                    </div>
+                    {/* Single responsive timer (was 4 CSS-hidden mounts all ticking
+                        every second). `onTimerState` is now always wired — previously
+                        2 of the 4 instances omitted it, so the urgency vignette silently
+                        failed on the breakpoints those served. */}
+                    <CircularTimer
+                      remainingTime={remainingTime}
+                      totalTime={timerValue * 60}
+                      size={timerSize}
+                      onTimerState={onTimerState}
+                    />
                   </AdaptiveMotion.div>
                 )}
 
@@ -611,6 +614,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 chargedTiles={eventTiles?.charged}
                 meteorTiles={eventTiles?.meteor}
                 rushTiles={rushTiles}
+                effectsProfile={gameMode === 'classic' ? 'lean' : 'full'}
               />
               {/* Blast tile type badges */}
               {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (

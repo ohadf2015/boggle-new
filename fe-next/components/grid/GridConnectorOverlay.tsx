@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, memo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback, memo } from 'react';
 import type { SelectedCell } from './types';
 import { getSelectionEscalation } from './selectionEscalation';
 
@@ -33,33 +33,42 @@ interface Point { x: number; y: number; }
  *
  * Render: one <polyline> not N <line>s — single DOM node + attribute
  * update per drag step, vs N keyed-child diffs.
+ *
+ * Freshness: centers are measured relative to the grid (shift-invariant — a
+ * chrome push-down moves grid+cells together, so relative centers don't drift).
+ * The real staleness source is the board's mount entrance animation (frame
+ * `scale 0.9→1`): the mount + rAF measurement lands mid-scale, baking compressed
+ * centers into an unscaled viewBox → lines ride toward the top for the whole game.
+ * We therefore ALSO re-measure once at each selection start (length 0→≥1), which
+ * runs long after the entrance settles — one measure per word-build, no per-drag
+ * layout reads, lines land on the real tile centers.
  */
 const GridConnectorOverlay = memo<Props>(({ selectedCells, gridEl, color = '#BFFF00', comboLevel = 0 }) => {
   const [size, setSize] = useState({ w: 0, h: 0 });
   const centersRef = useRef<Map<string, Point>>(new Map());
   const [measureTick, setMeasureTick] = useState(0);
 
+  const measure = useCallback(() => {
+    if (!gridEl) return;
+    const gridRect = gridEl.getBoundingClientRect();
+    setSize({ w: gridEl.offsetWidth, h: gridEl.offsetHeight });
+    const map = new Map<string, Point>();
+    const cells = gridEl.querySelectorAll<HTMLElement>('[data-row][data-col]');
+    cells.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const key = `${el.dataset.row}-${el.dataset.col}`;
+      map.set(key, {
+        x: r.left - gridRect.left + r.width / 2,
+        y: r.top - gridRect.top + r.height / 2,
+      });
+    });
+    centersRef.current = map;
+    setMeasureTick((t) => t + 1);
+  }, [gridEl]);
+
   useEffect(() => {
     if (!gridEl) return;
     let raf = 0;
-
-    const measure = () => {
-      const gridRect = gridEl.getBoundingClientRect();
-      setSize({ w: gridEl.offsetWidth, h: gridEl.offsetHeight });
-      const map = new Map<string, Point>();
-      const cells = gridEl.querySelectorAll<HTMLElement>('[data-row][data-col]');
-      cells.forEach((el) => {
-        const r = el.getBoundingClientRect();
-        const key = `${el.dataset.row}-${el.dataset.col}`;
-        map.set(key, {
-          x: r.left - gridRect.left + r.width / 2,
-          y: r.top - gridRect.top + r.height / 2,
-        });
-      });
-      centersRef.current = map;
-      setMeasureTick((t) => t + 1);
-    };
-
     measure();
     raf = requestAnimationFrame(measure);
 
@@ -70,7 +79,22 @@ const GridConnectorOverlay = memo<Props>(({ selectedCells, gridEl, color = '#BFF
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [gridEl]);
+  }, [gridEl, measure]);
+
+  // Re-measure when a NEW selection starts (empty → non-empty). Catches centers
+  // staled by the mount entrance scale or any post-mount board resize, without
+  // adding per-drag-step layout reads. Deferred a frame so the layout is settled.
+  const wasSelectingRef = useRef(false);
+  const hasSelection = selectedCells.length > 0;
+  useEffect(() => {
+    if (hasSelection && !wasSelectingRef.current) {
+      const raf = requestAnimationFrame(measure);
+      wasSelectingRef.current = true;
+      return () => cancelAnimationFrame(raf);
+    }
+    if (!hasSelection) wasSelectingRef.current = false;
+    return undefined;
+  }, [hasSelection, measure]);
 
   const pointsStr = useMemo<string>(() => {
     // measureTick is the explicit invalidation signal for centersRef.current

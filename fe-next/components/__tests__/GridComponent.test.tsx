@@ -104,6 +104,18 @@ describe('GridComponent', () => {
       // Component should render (className is passed to inner element)
       expect(container.firstChild).toBeInTheDocument();
     });
+
+    it('renders the lean effects profile (MP classic) without crashing', () => {
+      // Guards the lean path end-to-end: even with a real scoring combo, the
+      // board renders at visual-combo 0 and every cell mounts. Combo-0 still
+      // yields a non-null escalation on selected cells, so GridCellEffects
+      // never hits a selected+null state.
+      render(
+        <GridComponent grid={mockGrid} interactive comboLevel={6} effectsProfile="lean" />,
+        { wrapper: TestWrapper }
+      );
+      expect(screen.getAllByText(/^[A-I]$/)).toHaveLength(9);
+    });
   });
 
   describe('grid sizes', () => {

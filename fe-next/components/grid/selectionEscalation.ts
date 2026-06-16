@@ -37,6 +37,58 @@ export interface SelectionEscalation {
   liftY: number;
 }
 
+/**
+ * Visual effect profile for the board.
+ *   'full' — the expressive single-player look: escalating gradient/glow/particles,
+ *            tier-transition flashes, tier-3 chromatic aberration.
+ *   'lean' — the Word-Hunt-light look for competitive multiplayer: a clean, snappy
+ *            selected tile (solid color + subtle scale + soft glow), no escalating
+ *            decoration. Drops the main-thread raster + GPU composite that ran during
+ *            every drag without looking better than Word Hunt.
+ */
+export type GridEffectsProfile = 'full' | 'lean';
+
+export interface GridEffectInputs {
+  /** Real between-word combo (drives board VISUALS only here; scoring combo is separate) */
+  comboLevel: number;
+  /** Combo including cooldown warmth (drives escalation tier visuals) */
+  effectiveCombo: number;
+}
+
+export interface GridEffectFlags {
+  /** comboLevel the board renders WITH (0 in lean → no rainbow/combo gradient/amplification) */
+  visualComboLevel: number;
+  /** effective combo the escalation tier + per-cell glow render WITH (0 in lean) */
+  visualEffectiveCombo: number;
+}
+
+/**
+ * Resolve the combo values the BOARD VISUALS render with, for a given profile.
+ * Pure — the single source of truth GridComponent reads so the lean/full split
+ * stays testable and can't drift between the call sites it feeds.
+ *
+ * Lean forces combo to 0 — exactly what Word Hunt passes (`comboLevel={0}`). This
+ * keeps the length-driven escalation (a SELECTED cell always gets a non-null
+ * baseTier escalation, never the novel selected+null state) but drops the combo
+ * AMPLIFICATION that made classic MP heavier than Word Hunt: faster tier climbs,
+ * ×1.6 particle/glow, more frequent tier-flash, and chromatic on shorter words.
+ *
+ * The real SCORING combo is untouched — it flows to useGridInteraction and the
+ * ComboDisplay independently of these board-render values.
+ */
+export function resolveGridEffects(
+  profile: GridEffectsProfile,
+  inputs: GridEffectInputs,
+): GridEffectFlags {
+  if (profile === 'lean') {
+    return { visualComboLevel: 0, visualEffectiveCombo: 0 };
+  }
+  return {
+    visualComboLevel: inputs.comboLevel,
+    visualEffectiveCombo: inputs.effectiveCombo,
+  };
+}
+
 const TIER_COLORS = {
   base: ['#FFE135', '#FFD700', '#FFA500'],
   momentum: ['#FF6B35', '#FF8C00', '#FFE135', '#FFA500'],

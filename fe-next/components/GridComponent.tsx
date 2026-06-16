@@ -16,7 +16,7 @@ import {
 import { shouldShowDoubleClickSubmitHint } from './grid/submitHintVisibility';
 import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
 import EarthquakeEffects from './grid/EarthquakeEffects';
-import { getSelectionEscalation } from './grid/selectionEscalation';
+import { getSelectionEscalation, resolveGridEffects, type GridEffectsProfile } from './grid/selectionEscalation';
 import DragReleaseHint from './grid/DragReleaseHint';
 import GridConnectorOverlay from './grid/GridConnectorOverlay';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
@@ -67,6 +67,13 @@ interface GridComponentProps {
   isAdjacent?: (cell1: { row: number; col: number }, cell2: { row: number; col: number }) => boolean;
   /** Desktop idle auto-submit (ms). Submits a ≥3-letter selection that sits unchanged this long on non-touch devices. Used by practice. */
   autoSubmitIdleMs?: number;
+  /**
+   * Board visual profile. 'full' (default) = expressive escalation/tier-flash/chromatic
+   * (single-player, practice, daily). 'lean' = Word-Hunt-light snappy tiles for
+   * competitive multiplayer — drops the per-drag decoration that didn't beat Word Hunt
+   * visually but cost main-thread raster + GPU composite. Combo SCORING is unaffected.
+   */
+  effectsProfile?: GridEffectsProfile;
 }
 
 const GridComponent = memo<GridComponentProps>(({
@@ -100,6 +107,7 @@ const GridComponent = memo<GridComponentProps>(({
   ghostCells = false,
   isAdjacent,
   autoSubmitIdleMs,
+  effectsProfile = 'full',
 }) => {
   const { t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -344,7 +352,11 @@ const GridComponent = memo<GridComponentProps>(({
 
   useEffect(() => { setPerformanceMode(getPerformanceMode()); }, []);
 
-  const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
+  // Board-visual combo values (lean → 0, matching Word Hunt). Scoring combo is
+  // unaffected: the real comboLevel still flows to useGridInteraction. effectiveCombo
+  // is computed below, so the resolver + comboColors are derived there.
+  const visualComboLevel = effectsProfile === 'lean' ? 0 : comboLevel;
+  const comboColors = useMemo(() => getComboColors(visualComboLevel), [visualComboLevel]);
 
   // Cooldown warmth — carries residual combo boost from previous word
   // so the next word's escalation starts "warm" instead of cold-snapping to tier 0
@@ -371,11 +383,17 @@ const GridComponent = memo<GridComponentProps>(({
   // Effective combo includes cooldown warmth for smoother tier transitions
   const effectiveCombo = comboLevel + cooldownCombo;
 
+  // Combo the BOARD VISUALS render with. Lean (MP classic) forces 0 — exactly
+  // Word Hunt — so escalation still climbs by LENGTH but drops combo amplification
+  // (the faster tier climbs + ×1.6 glow/particles that made classic MP feel heavy).
+  const { visualEffectiveCombo } = resolveGridEffects(effectsProfile, { comboLevel, effectiveCombo });
+
   // Current escalation tier (based on total selected letters)
   const currentTier = useMemo(
-    () => getSelectionEscalation(0, selectedCells.length, effectiveCombo).tier,
-    [selectedCells.length, effectiveCombo],
+    () => getSelectionEscalation(0, selectedCells.length, visualEffectiveCombo).tier,
+    [selectedCells.length, visualEffectiveCombo],
   );
+
   // Boolean view of currentTier for non-selected cells: only flips at the tier-3
   // boundary, so cells skip re-render waves when escalation crosses tier 1→2.
   const isHighTier = currentTier >= 3;
@@ -549,7 +567,7 @@ const GridComponent = memo<GridComponentProps>(({
               const shakeOffset = getShakeOffset(cellKey);
               const selectionIdx = selectionOrderMap.get(cellKey) ?? 0;
               const escalation = isSelected
-                ? getSelectionEscalation(selectionIdx, selectedCells.length, effectiveCombo)
+                ? getSelectionEscalation(selectionIdx, selectedCells.length, visualEffectiveCombo)
                 : null;
 
               const isFrozen = frozenTiles?.has(cellKey) ?? false;
@@ -585,8 +603,8 @@ const GridComponent = memo<GridComponentProps>(({
                   effectiveRenderMode={effectiveRenderMode}
                   earthquakePhase={earthquakePhase}
                   getPhaseAnimation={getPhaseAnimation}
-                  comboLevel={comboLevel}
-                  escalationCombo={effectiveCombo}
+                  comboLevel={visualComboLevel}
+                  escalationCombo={visualEffectiveCombo}
                   comboColors={comboColors}
                   reduceMotion={reduceMotion}
                   animateOnMount={animateOnMount}
@@ -631,7 +649,7 @@ const GridComponent = memo<GridComponentProps>(({
           dust={earthquakeDust}
         />
 
-        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridRef.current} comboLevel={effectiveCombo} />
+        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridRef.current} comboLevel={visualEffectiveCombo} />
 
         {interactive && (
           <>

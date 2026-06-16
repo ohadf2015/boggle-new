@@ -1,4 +1,49 @@
-import { getSelectionEscalation, getEscalationBackground, getEscalationShake, composeEscalationStyle, composeSelectedCellStyle } from '../selectionEscalation';
+import { getSelectionEscalation, getEscalationBackground, getEscalationShake, composeEscalationStyle, composeSelectedCellStyle, resolveGridEffects } from '../selectionEscalation';
+
+describe('resolveGridEffects', () => {
+  const inputs = { comboLevel: 4, effectiveCombo: 6 };
+
+  describe('full profile (default — single-player / practice / daily unchanged)', () => {
+    const flags = resolveGridEffects('full', inputs);
+
+    it('passes the real combo values straight through to the board visuals', () => {
+      expect(flags.visualComboLevel).toBe(4);
+      expect(flags.visualEffectiveCombo).toBe(6);
+    });
+  });
+
+  describe('lean profile (multiplayer classic — Word-Hunt-light feel)', () => {
+    // Lean mirrors exactly what Word Hunt does: combo 0. Length-driven escalation
+    // still computes (baseTier glow/scale), so SELECTED cells always receive a
+    // non-null escalation object — never the novel selected+null combination.
+    const flags = resolveGridEffects('lean', inputs);
+
+    it('forces combo to 0 for board visuals (matches Word Hunt comboLevel={0})', () => {
+      expect(flags.visualComboLevel).toBe(0);
+      expect(flags.visualEffectiveCombo).toBe(0);
+    });
+
+    it('stays at combo 0 regardless of how high the real scoring combo climbs', () => {
+      const hot = resolveGridEffects('lean', { comboLevel: 9, effectiveCombo: 12 });
+      expect(hot.visualComboLevel).toBe(0);
+      expect(hot.visualEffectiveCombo).toBe(0);
+    });
+
+    it('with combo 0, escalation still reaches tiers by LENGTH alone (Word-Hunt parity)', () => {
+      // proves lean is not "no escalation" — it is "no combo amplification"
+      expect(getSelectionEscalation(0, 2, flags.visualEffectiveCombo).tier).toBe(0);
+      expect(getSelectionEscalation(0, 5, flags.visualEffectiveCombo).tier).toBe(2);
+      expect(getSelectionEscalation(0, 7, flags.visualEffectiveCombo).tier).toBe(3);
+    });
+
+    it('combo amplification is what lean removes: full reaches a higher tier than lean at the same short length', () => {
+      const len = 4;
+      const fullTier = getSelectionEscalation(0, len, resolveGridEffects('full', inputs).visualEffectiveCombo).tier;
+      const leanTier = getSelectionEscalation(0, len, resolveGridEffects('lean', inputs).visualEffectiveCombo).tier;
+      expect(fullTier).toBeGreaterThan(leanTier);
+    });
+  });
+});
 
 describe('getSelectionEscalation', () => {
   describe('tier calculation based on word length', () => {

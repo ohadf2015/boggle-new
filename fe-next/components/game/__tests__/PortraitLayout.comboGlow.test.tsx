@@ -60,9 +60,11 @@ vi.mock('@/components/GridComponent', () => {
   };
   return { default: MockGrid };
 });
+const { timerProps } = vi.hoisted(() => ({ timerProps: [] as Array<Record<string, unknown>> }));
 vi.mock('@/components/CircularTimer', () => {
-  const MockTimer = () => {
-    return <div>Timer</div>;
+  const MockTimer = (props: Record<string, unknown>) => {
+    timerProps.push(props);
+    return <div data-testid="circular-timer">Timer</div>;
   };
   return { default: MockTimer };
 });
@@ -312,5 +314,28 @@ describe('PortraitLayout Haptic Feedback', () => {
     );
 
     expect(mockVibrateWordSubmit).not.toHaveBeenCalled();
+  });
+
+  describe('CircularTimer collapse (4 mounts → 1)', () => {
+    it('renders exactly ONE CircularTimer (was 4 CSS-hidden mounts ticking every second)', () => {
+      timerProps.length = 0;
+      render(<PortraitLayout {...baseProps} />);
+      expect(screen.getAllByTestId('circular-timer')).toHaveLength(1);
+    });
+
+    it('forwards onTimerState to the timer (latent bug: 2 of the 4 old mounts dropped it → urgency vignette dead on those breakpoints)', () => {
+      timerProps.length = 0;
+      const onTimerState = vi.fn();
+      render(<PortraitLayout {...baseProps} onTimerState={onTimerState} />);
+      const timer = timerProps[timerProps.length - 1];
+      expect(timer.onTimerState).toBe(onTimerState);
+      expect(['xs', 'sm', 'md', 'lg']).toContain(timer.size);
+    });
+
+    it('suppresses the timer entirely when the desktop shell owns it', () => {
+      timerProps.length = 0;
+      render(<PortraitLayout {...baseProps} inDesktopShell={true} />);
+      expect(screen.queryByTestId('circular-timer')).toBeNull();
+    });
   });
 });
