@@ -292,9 +292,10 @@ function HostPreGameView({
     const name = typeof p === 'string' ? p : p.username;
     return !isHostPlayer && name !== username;
   }).length;
-  // A host alone in the lobby may still press Start: clicking fills bots + starts
-  // immediately (see handleStartClick). Only a missing timer / tournament-in-flight
-  // blocks it — never "no players yet", which trapped new hosts behind a 40s wait.
+  // A host alone in the lobby may still press Start: clicking opens the solo
+  // confirm dialog (Invite Friends vs Play with bots — see handleStartClick).
+  // Only a missing timer / tournament-in-flight blocks it — never "no players
+  // yet", which trapped new hosts behind a 40s wait.
   const isStartDisabled = !timerValue || tournamentCreating || anyAdActive;
 
   // Auto-fill bots countdown
@@ -364,18 +365,17 @@ function HostPreGameView({
     setBotCountdown(null);
   }, []);
 
-  // Host pressed Start. If they're alone (no human guests), fill bots first so the
-  // game has opponents — mirrors the passive bot-countdown path (setAutoFill →
-  // onStartGame) but on demand, so an impatient new host needn't wait out the timer.
+  // Host pressed Start. We do NOT silently fill bots here: if they're alone,
+  // onStartGame (→ startGame → setShowSoloConfirm) hands the decision to the
+  // host via the SoloStartConfirmDialog (Invite Friends vs Play with bots). On
+  // confirm, the server fills bots for the solo player — so pressing Start can no
+  // longer add bots behind the host's back.
   const handleStartClick = useCallback(() => {
     // Hard guard (beyond the disabled button): never start while a player is
     // mid rewarded-ad — protects against any non-button start path too.
     if (anyAdActive) return;
-    if (humanGuestCount === 0) {
-      socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
-    }
     onStartGame();
-  }, [anyAdActive, humanGuestCount, socket, onStartGame]);
+  }, [anyAdActive, onStartGame]);
 
   // Solo-host rescue prompt: shown vs hidden is a single derived condition so the
   // render and the "shown" telemetry agree. Gated on !isPrivate to match the alone-
@@ -397,10 +397,15 @@ function HostPreGameView({
     }
   }, [showSoloPrompt]);
 
+  // The "Play vs Bots" rescue card IS the host's explicit consent, so it starts
+  // straight away via the bots path (onAutoStartWithBots → confirmSoloStart) —
+  // no redundant confirm dialog. The server fills the bots on solo start, mirroring
+  // the dialog's own "Skip & Play with bots" action (neither emits client setAutoFill).
   const handleSoloPlayVsBots = useCallback(() => {
+    if (anyAdActive) return;
     trackSoloPlayPrompt({ event: 'clicked' });
-    handleStartClick();
-  }, [handleStartClick]);
+    (onAutoStartWithBots ?? onStartGame)();
+  }, [anyAdActive, onAutoStartWithBots, onStartGame]);
 
   // Bot countdown banner
   const renderBotCountdown = (): React.ReactElement | null => {

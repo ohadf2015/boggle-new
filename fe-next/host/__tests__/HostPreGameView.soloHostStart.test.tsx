@@ -142,20 +142,23 @@ describe('HostPreGameView solo-host start (alone in lobby)', () => {
     expect(capturedStartProps!.disabled).toBe(false);
   });
 
-  it('fills bots AND starts immediately when an alone host presses Start', () => {
+  it('does NOT silently fill bots when an alone host presses Start (decision deferred to dialog)', () => {
+    // Pressing Start while alone must hand the decision to the host (the
+    // SoloStartConfirmDialog, opened by onStartGame→startGame→setShowSoloConfirm)
+    // — NOT pre-emptively add bots before they can choose.
     render(<HostPreGameView {...baseProps} />);
 
     act(() => { capturedStartProps!.onStartGame(); });
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    expect(setAutoFill).toBeDefined();
-    expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
+    expect(setAutoFill).toBeUndefined();
     expect(baseProps.onStartGame).toHaveBeenCalled();
   });
 
-  it('fills bots on Start for a PLAYING host alone (hostPlaying=true, host in roster)', () => {
+  it('defers to the dialog for a PLAYING host alone (hostPlaying=true, host in roster)', () => {
     // Dominant mobile path: hostPlaying is forced true and the host IS in
     // playersReady, so actualPlayerCount===1 — yet there are no human opponents.
+    // Still no silent fill: onStartGame routes to the confirm dialog.
     render(
       <HostPreGameView
         {...baseProps}
@@ -167,8 +170,7 @@ describe('HostPreGameView solo-host start (alone in lobby)', () => {
     act(() => { capturedStartProps!.onStartGame(); });
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    expect(setAutoFill).toBeDefined();
-    expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
+    expect(setAutoFill).toBeUndefined();
     expect(baseProps.onStartGame).toHaveBeenCalled();
   });
 
@@ -274,12 +276,17 @@ describe('HostPreGameView solo "play vs bots" prompt visibility', () => {
     expect(screen.queryByText(cta)).not.toBeInTheDocument();
   });
 
-  it('pressing the card CTA fills bots and starts the game', () => {
+  it('pressing the card CTA starts directly with bots (explicit consent → no redundant dialog)', () => {
+    // The "Play vs Bots" card IS the consent, so it starts straight away via the
+    // bots path (onAutoStartWithBots → confirmSoloStart) — it must NOT re-open the
+    // confirm dialog (onStartGame), and the server fills the bots, so no client
+    // setAutoFill is emitted (parity with the dialog's "Skip & Play with bots").
     render(<HostPreGameView {...baseProps} isPrivate={false} />);
     act(() => { screen.getByText(cta).click(); });
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    expect(setAutoFill).toEqual(['setAutoFill', { enabled: true, targetCount: 3 }]);
-    expect(baseProps.onStartGame).toHaveBeenCalled();
+    expect(setAutoFill).toBeUndefined();
+    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 });
