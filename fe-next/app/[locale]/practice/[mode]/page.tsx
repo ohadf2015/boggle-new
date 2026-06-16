@@ -30,14 +30,20 @@ const SEO_KEY_BY_MODE: Record<(typeof PRACTICE_MODES)[number], string> = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, mode } = await params;
+  // AdSense thin-page sweep (2026-06-17): practice modes are interactive-only, noindexed
+  // so the crawl sample stays on rich pages. noindex,follow keeps internal crawl paths
+  // alive. docs/2026-06-17-adsense-thin-page-noindex-spec.md
+  const noindexRobots = { index: false, follow: true } as const;
   if (!isValidPracticeMode(mode)) {
-    return generatePageMetadata({ seoKey: 'practice', path: '/practice', locale });
+    const meta = await generatePageMetadata({ seoKey: 'practice', path: '/practice', locale });
+    return { ...meta, robots: noindexRobots };
   }
-  return generatePageMetadata({
+  const meta = await generatePageMetadata({
     seoKey: SEO_KEY_BY_MODE[mode],
     path: `/practice/${mode}`,
     locale,
   });
+  return { ...meta, robots: noindexRobots };
 }
 
 export default async function PracticeModePage({ params }: Props) {

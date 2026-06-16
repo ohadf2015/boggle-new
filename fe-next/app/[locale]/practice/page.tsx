@@ -16,7 +16,11 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'practice', path: '/practice', locale });
+  // AdSense thin-page sweep (2026-06-17): interactive-only hub, noindexed so the crawl
+  // sample stays on rich pages. noindex,follow keeps internal crawl paths alive.
+  // docs/2026-06-17-adsense-thin-page-noindex-spec.md
+  const meta = await generatePageMetadata({ seoKey: 'practice', path: '/practice', locale });
+  return { ...meta, robots: { index: false, follow: true } };
 }
 
 export default async function PracticeHubPage({ params }: Props) {

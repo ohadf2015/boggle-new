@@ -12,7 +12,9 @@ const META: Record<string, { title: string; description: string }> = {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const m = META[locale] || META.en;
-  return { title: m.title, description: m.description };
+  // AdSense thin-page sweep (2026-06-17): a form/redeem page carries no content value
+  // for the crawl sample. docs/2026-06-17-adsense-thin-page-noindex-spec.md
+  return { title: m.title, description: m.description, robots: { index: false, follow: true } };
 }
 
 export default function Page() {

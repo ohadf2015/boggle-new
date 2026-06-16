@@ -132,13 +132,10 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   });
 
   // ─── Practice / tutorial ───
-  // Beginner-friendly stress-free mode. Hub + per-mode tutorials. Strong long-tail
-  // ("how to play boggle", "word game tutorial") + AI-crawler discovery via llms.txt.
-  addForAllLocales(routes, '/practice', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
-  const practiceModes = ['classic', 'wordHunt', 'wheelRush'];
-  practiceModes.forEach((mode) => {
-    addForAllLocales(routes, `/practice/${mode}`, { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.65 });
-  });
+  // Interactive-only pages — noindexed in the AdSense thin-page sweep (2026-06-17), so
+  // they are intentionally OMITTED from the sitemap (a noindexed URL in the sitemap
+  // triggers GSC "Submitted URL marked noindex"). Re-add if real prose is added later.
+  // docs/2026-06-17-adsense-thin-page-noindex-spec.md
 
   // ─── Tools ───
   addForAllLocales(routes, '/tools', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
@@ -149,7 +146,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   // ─── Education ───
   addForAllLocales(routes, '/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
-  addForAllLocales(routes, '/education/access', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
+  // /education/access — form/redeem page, noindexed (AdSense thin-page sweep 2026-06-17),
+  // so omitted from the sitemap to avoid GSC "Submitted URL marked noindex".
   addForAllLocales(routes, '/education/duels', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
   addForAllLocales(routes, '/education/classroom-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
 

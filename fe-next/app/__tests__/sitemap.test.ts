@@ -75,6 +75,26 @@ describe('sitemap', () => {
     ).toBe(0);
   });
 
+  // AdSense thin-page sweep (2026-06-17): /practice (hub + modes) and /education/access
+  // are interactive-only / form pages now noindexed at the page level. A noindexed URL
+  // in the sitemap triggers GSC "Submitted URL marked noindex", so they are omitted.
+  // See docs/2026-06-17-adsense-thin-page-noindex-spec.md.
+  it('does NOT include noindexed thin interactive pages (practice, education/access)', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const mustBeAbsent = [
+      ...['en', 'he', 'sv', 'ja', 'es'].flatMap((l) => [
+        `https://www.lexiclash.live/${l}/practice`,
+        `https://www.lexiclash.live/${l}/practice/classic`,
+        `https://www.lexiclash.live/${l}/practice/wordHunt`,
+        `https://www.lexiclash.live/${l}/practice/wheelRush`,
+        `https://www.lexiclash.live/${l}/education/access`,
+      ]),
+    ];
+    for (const url of mustBeAbsent) {
+      expect(urls.has(url), `sitemap should NOT list noindexed page: ${url}`).toBe(false);
+    }
+  });
+
   it('still lists the /daily/archive hub (canonical archive entry point)', () => {
     const urls = new Set(sitemap().map((e) => e.url));
     for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
