@@ -367,14 +367,12 @@ describe('StudentProfilePageClient - Duel Features', () => {
 
     render(<StudentProfilePageClient />);
 
-    // Wait for duels section to load
+    // Wait for empty-state (requires both the section header AND the async duel
+    // fetch to complete so the empty-state condition fires)
     await waitFor(() => {
-      expect(screen.getByText('student.profile.duelRecord')).toBeInTheDocument();
+      expect(screen.getByText('student.profile.noDuelsYet')).toBeInTheDocument();
+      expect(screen.getByText('student.profile.challengePrompt')).toBeInTheDocument();
     });
-
-    // Check empty state message
-    expect(screen.getByText('student.profile.noDuelsYet')).toBeInTheDocument();
-    expect(screen.getByText('student.profile.challengePrompt')).toBeInTheDocument();
   });
 
   test('shows link to full duel history when duels exist', async () => {

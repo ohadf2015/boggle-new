@@ -77,6 +77,9 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
   // chocolate + cake paint via overlays in BlastTile; visual record is intentionally minimal.
   chocolate: { bg: '', text: 'text-white',    style: { background: '#3a1f0e', boxShadow: HARD_SHADOW, border: `3px solid #1c0e04` } },
   cake:      { bg: '', text: 'text-white',    style: { background: 'transparent', boxShadow: HARD_SHADOW, border: `3px solid ${INK}` } },
+  // locked + key paint via dedicated BlastTile overlays; visual record is minimal.
+  locked:    { bg: '', text: 'text-white',    style: { background: '#1a2444', boxShadow: HARD_SHADOW, border: `3px solid ${INK}` } },
+  key:       { bg: '', text: 'text-neo-navy', style: { background: '#FFD32A', boxShadow: HARD_SHADOW, border: `3px solid #9A6B00` } },
 };
 
 /** Clearing phase background color per tile type — matches the idle hue

@@ -32,7 +32,8 @@ export type BlastTileType =
   | 'locked'
   | 'key';
 
-/** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
+/** Runtime-iterable list of all blast tile types (mirrors BlastTileType union).
+ * locked/key are intentionally excluded — mechanic removed per blastLockedRemoval guard. */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'standard',
   'gold',
@@ -55,8 +56,6 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'anchor',
   'chocolate',
   'cake',
-  'locked',
-  'key',
 ] as const;
 
 // ==================== Combo Type ====================

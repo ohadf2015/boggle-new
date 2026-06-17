@@ -320,18 +320,18 @@ export function buildChainLevel(
   // without permitting tower silhouettes.
   const totalTiles = spec.chain.reduce((sum, w) => sum + [...w].length, 0);
   const avgPerCol = Math.ceil(totalTiles / spec.columns);
-  // Loose hard cap is still totalTiles (placer needs every row for dense HE
-  // chains), but the height-bucketed candidate order in insertWordVertical
-  // pushes the realized silhouette toward spread, not tower.
-  const narrowCeiling = totalTiles;
   // Widened boards carry the densest chains (he L25 = 43 tiles). The tight
   // wide-board cap (longest+1) starves placement -> null -> the level 404s into
   // the generator. Give them avg+4 headroom: enough to isolate a dense chain,
   // still far below a tower (a tower needs height == totalTiles).
   const wasWidened = spec.columns !== spec0.columns;
-  const ceiling = spec.columns <= 5
-    ? narrowCeiling
-    : wasWidened
+  // Use looseCap (max(longest+2, avg+4)) as the placement ceiling for all grids.
+  // Previously narrow grids (≤5 cols) used narrowCeiling=totalTiles, which
+  // nullified the height constraint: the post-build filter rejected towers >looseCap
+  // but only AFTER expensive scans, causing OOM/timeout on dense Hebrew chains.
+  const ceiling = wasWidened
+    ? Math.max(longest + 2, avgPerCol + 4)
+    : spec.columns <= 5
       ? Math.max(longest + 2, avgPerCol + 4)
       : Math.max(longest + 1, columnHeightCeiling(spec.chain));
   // Tower control on phone (≤5 col) boards. The OLD cap `max(longest+2, avg+4)`

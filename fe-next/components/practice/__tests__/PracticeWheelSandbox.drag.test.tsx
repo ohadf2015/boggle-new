@@ -14,6 +14,49 @@ vi.mock('@/lib/practice/usePracticeValidator', () => ({
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
+// useSoundEffects() destructured by WordWheelGame — a bare {} makes every
+// sound function undefined → crash. Proxy yields a no-op for any key.
+vi.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => new Proxy({}, { get: () => () => {} }),
+}));
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => () => {},
+}));
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+// next/dynamic wraps in Suspense + lazy load — bypass to render synchronously
+vi.mock('next/dynamic', () => ({
+  default: (loader: () => Promise<{ default: React.ComponentType<Record<string, unknown>> }>) => {
+    let Resolved: React.ComponentType<Record<string, unknown>> | null = null;
+    const promise = loader().then((m) => { Resolved = m.default; });
+    return function Dynamic(props: Record<string, unknown>) {
+      if (!Resolved) throw promise;
+      return React.createElement(Resolved, props);
+    };
+  },
+}));
+vi.mock('@/components/daily/WordWheelPixiRing', () => ({
+  default: () => <div data-testid="pixi-ring" />,
+}));
+// Mock WheelLetter as a plain button so document.elementFromPoint can
+// return real DOM nodes with data-wheel-letter / data-wheel-index attributes.
+vi.mock('@/components/daily/WordWheelParts', () => ({
+  WheelLetter: ({
+    letter, index, onPress,
+  }: { letter: string; index: number; onPress?: (l: string, i: number, el: HTMLButtonElement) => void }) => (
+    <button
+      type="button"
+      data-wheel-index={index}
+      data-wheel-letter={letter}
+      data-wheel-used="false"
+      onClick={(e) => onPress?.(letter, index, e.currentTarget as HTMLButtonElement)}
+    >
+      {letter}
+    </button>
+  ),
+  WordTile: ({ letter }: { letter: string }) => <span>{letter}</span>,
+}));
 vi.mock('pixi.js', () => ({
   Application: class {
     canvas = document.createElement('canvas');
@@ -31,6 +74,9 @@ vi.mock('pixi.js', () => ({
     circle = vi.fn().mockReturnThis();
     fill = vi.fn().mockReturnThis();
     clear = vi.fn().mockReturnThis();
+    moveTo = vi.fn().mockReturnThis();
+    lineTo = vi.fn().mockReturnThis();
+    stroke = vi.fn().mockReturnThis();
     destroy = vi.fn();
   },
 }));
@@ -58,12 +104,12 @@ const mockElementFromPoint = (indexSequence: number[]) => {
 };
 
 describe('PracticeWheelSandbox drag-spell parity', () => {
-  it('drag across 3 letters with center then release auto-submits', async () => {
+  it('drag across 3 outer letters then release auto-submits', async () => {
     render(<PracticeWheelSandbox />);
     const wheel = screen.getByTestId('wheel-orbit');
-    // Sequence: pointerdown@idx 1 (T = start), pointermove@idx 0 (A center →
-    // engages drag, adds T then A), pointermove@idx 2 (R → adds R),
-    // pointerup → auto-submit "TAR" (3 letters with center A → valid call).
+    // Sequence: pointerdown@idx 1 (outer), pointermove@idx 0 (different outer →
+    // engages drag, adds idx 1 then idx 0), pointermove@idx 2 (adds idx 2),
+    // pointerup → auto-submit (3 letters, ≥3 required → submit fires).
     mockElementFromPoint([1, 0, 2]);
     fireEvent.pointerDown(wheel, { clientX: 10, clientY: 10 });
     fireEvent.pointerMove(wheel, { clientX: 20, clientY: 10 });

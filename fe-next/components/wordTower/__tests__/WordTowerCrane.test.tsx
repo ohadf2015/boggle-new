@@ -23,13 +23,14 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
     langHolder.lang = 'en';
   });
 
-  it('renders the held word as ONE BRICK PER LETTER (not a single word-block)', () => {
+  it('renders the held word as ONE BRICK PER LETTER, capped at CRANE_BEAM_MAX_BRICKS (not a single word-block)', () => {
     render(
       <WordTowerCrane word="TREE" consecutiveSloppy={0} onDrop={() => {}} t={t} getOffset={() => 0} />,
     );
     const tiles = screen.getAllByTestId('crane-letter');
-    expect(tiles).toHaveLength(4);
-    expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E', 'E']);
+    // TREE has 4 letters but CRANE_BEAM_MAX_BRICKS=3 caps the display
+    expect(tiles).toHaveLength(3);
+    expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E']);
   });
 
   it('lays the held word as a VERTICAL column so it matches how it settles into the tower', () => {
@@ -41,7 +42,8 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
     // mirroring the tower (pos 0 = base). A horizontal row would have neither.
     expect(container.className).toContain('flex-col-reverse');
     const tiles = screen.getAllByTestId('crane-letter');
-    expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E', 'E']);
+    // CRANE_BEAM_MAX_BRICKS=3 caps the display; last letter hidden behind "+1" badge
+    expect(tiles.map((el) => el.textContent)).toEqual(['T', 'R', 'E']);
   });
 
   it('Hebrew: per-letter tiles keep RTL + final-letter sofit form', () => {
