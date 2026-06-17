@@ -694,8 +694,8 @@ Both `exp-mp-quickplay-wait-v1` and `exp-invite-arrival-clarity-v1` were wired o
 
 - [Supabase] RLS always-true INSERT on `teacher_access_requests`
   - first/last seen: advisor (ongoing)
-  - status: shipped (migration `fix_teacher_access_requests_insert_rls`)
-  - why: `tar_insert_any` WITH CHECK=true allowed anon inserts (spam vector); replaced with `auth.uid() IS NOT NULL`
+  - status: REVERTED — do NOT auth-gate this INSERT (migration `20260617120000_restore_teacher_access_anon_insert`)
+  - why: the 2026-06-14 "fix" (`fix_teacher_access_requests_insert_rls`, replaced WITH CHECK=true with `auth.uid() IS NOT NULL`) BROKE the public apply form. Prospective teachers submit /education/access while signed OUT (they have no account yet), so requiring auth.uid() made every submission fail RLS → 500 → "Something went wrong" in the UI. always-true INSERT here is an ACCEPTED exception (same class as web_vitals anon telemetry); spam is mitigated at the app layer (route rate limit + future captcha), not by gating a public form behind a login it cannot have. Encoded in `lib/education/__tests__/rls.test.ts` ("anon CAN insert"). Advisor will keep flagging — leave as-is.
   - recommended owner: review-by-eod
 
 - [Sentry] TypeError: null.clear in WordWheelPixiRing (JAVASCRIPT-NEXTJS-1CW)
