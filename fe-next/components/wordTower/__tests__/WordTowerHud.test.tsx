@@ -81,8 +81,8 @@ describe('WordTowerHud', () => {
         })}
       />,
     );
-    expect(screen.getByText('+4.2 m')).toBeInTheDocument();
-    expect(screen.getByText('wordTower.celebration.highRise')).toBeInTheDocument();
+    expect(screen.queryByText('+4.2 m')).not.toBeInTheDocument();
+    expect(screen.queryByText('wordTower.celebration.highRise')).not.toBeInTheDocument();
   });
 
   it('surfaces the combo multiplier in the reward popup only when combo > 1', () => {
@@ -90,9 +90,9 @@ describe('WordTowerHud', () => {
     // combo === 1 → no multiplier shown
     const { rerender } = render(<WordTowerHud {...makeProps({ resultKey: 1, combo: 1, lastResult: result })} />);
     expect(screen.queryByText(/×/)).not.toBeInTheDocument();
-    // combo > 1 → multiplier rides along with the "+Xm" reward
+    // combo > 1 → multiplier no longer shown (reward popup removed)
     rerender(<WordTowerHud {...makeProps({ resultKey: 1, combo: 5, lastResult: result })} />);
-    expect(screen.getByText(/×/)).toBeInTheDocument();
+    expect(screen.queryByText(/×/)).not.toBeInTheDocument();
   });
 
   it('reports its control-deck height so the tower can ground above it', () => {

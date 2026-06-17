@@ -60,7 +60,7 @@ const mockElementFromPoint = (indexSequence: number[]) => {
 describe('PracticeWheelSandbox drag-spell parity', () => {
   it('drag across 3 letters with center then release auto-submits', async () => {
     render(<PracticeWheelSandbox />);
-    const wheel = screen.getByTestId('practice-wheel');
+    const wheel = screen.getByTestId('wheel-orbit');
     // Sequence: pointerdown@idx 1 (T = start), pointermove@idx 0 (A center →
     // engages drag, adds T then A), pointermove@idx 2 (R → adds R),
     // pointerup → auto-submit "TAR" (3 letters with center A → valid call).
@@ -76,7 +76,7 @@ describe('PracticeWheelSandbox drag-spell parity', () => {
 
   it('single tap on a letter does NOT engage drag (drag requires move to a different letter)', async () => {
     render(<PracticeWheelSandbox />);
-    const wheel = screen.getByTestId('practice-wheel');
+    const wheel = screen.getByTestId('wheel-orbit');
     mockElementFromPoint([1, 1, 1]); // pointer never moves to a different letter
     fireEvent.pointerDown(wheel, { clientX: 10, clientY: 10 });
     fireEvent.pointerMove(wheel, { clientX: 11, clientY: 10 });

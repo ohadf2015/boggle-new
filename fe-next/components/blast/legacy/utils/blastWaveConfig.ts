@@ -91,6 +91,10 @@ export interface WaveConfig {
   fuseEnabled: boolean;
   /** Whether anchor (long-word bonus) tiles can appear (unlocks wave 8 alongside catalyst) */
   anchorEnabled: boolean;
+  /** Whether locked tiles can appear (unlocks wave 11) */
+  lockedEnabled: boolean;
+  /** Whether key tiles can appear (unlocks wave 11, paired with locked) */
+  keyEnabled: boolean;
   /** Number of moves allowed per wave */
   movesAllowed: number;
 }
@@ -106,7 +110,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 12,
   },
   // Wave 1 — basics only: bomb, ice, gold, rainbow (12 moves — learn the ropes)
@@ -118,7 +122,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 12,
   },
   // Wave 2 — treasure gem unlocks (10 moves)
@@ -130,7 +134,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: false, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 10,
   },
   // Wave 3 — prism unlock (9 moves, score threshold kicks in)
@@ -142,7 +146,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 9,
   },
   // Wave 4 — lightning unlock (8 moves)
@@ -154,7 +158,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 8,
   },
   // Wave 5 — diamond unlock (7 moves)
@@ -166,7 +170,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: true, frostEnabled: false, frozenEnabled: false,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 7,
   },
   // Wave 6 — frost unlock (7 moves)
@@ -178,7 +182,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 7,
   },
   // Wave 7 — vortex unlock (6 moves — tight, requires strategy)
@@ -190,7 +194,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: false, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: false,
+    anchorEnabled: false, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 6,
   },
   // Wave 8 — revival staircase 1/4: diamond + anchor + gem + magma unlock
@@ -202,7 +206,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: true,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: true, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: true,
+    anchorEnabled: true, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 6,
   },
   // Wave 9 — revival staircase 2/4: + vortex + catalyst + portal + shuffle
@@ -214,7 +218,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: true,
     countdownEnabled: false, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: false, fuseEnabled: false,
-    anchorEnabled: true,
+    anchorEnabled: true, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 5,
   },
   // Wave 10 — revival staircase 3/4: + countdown + fuse + crystal
@@ -226,10 +230,10 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
-    anchorEnabled: true,
+    anchorEnabled: true, lockedEnabled: false, keyEnabled: false,
     movesAllowed: 5,
   },
-  // Wave 11 — revival staircase 4/4
+  // Wave 11 — revival staircase 4/4: + locked + key
   {
     archetype: 'scoreRush',
     minWordLength: 2, specialTileChance: 0.28, iceDistribution: 0.30, goldDistribution: 0.10,
@@ -238,7 +242,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
-    anchorEnabled: true,
+    anchorEnabled: true, lockedEnabled: true, keyEnabled: true,
     movesAllowed: 6,
   },
   // Wave 12+ — master tier (full revival inheritance)
@@ -250,7 +254,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
-    anchorEnabled: true,
+    anchorEnabled: true, lockedEnabled: true, keyEnabled: true,
     movesAllowed: 6,
   },
 ];
@@ -489,6 +493,10 @@ export const CRYSTAL_SHARE = 0.06;
 export const FUSE_SHARE = 0.08;
 /** Anchor share when enabled (revival 2× boost — was 0.04; long-word reward). */
 export const ANCHOR_SHARE = 0.08;
+/** Locked tile share when enabled (unlocks wave 11; always paired with a key). */
+export const LOCKED_SHARE = 0.06;
+/** Key tile share when enabled (unlocks wave 11; always paired with a locked tile). */
+export const KEY_SHARE = 0.06;
 
 /**
  * CURATED PERMANENT ROSTER (clarity pass, 2026-06).
@@ -526,7 +534,6 @@ export const BLAST_RETIRED_SPECIAL_TYPES: ReadonlySet<BlastTileType> = new Set<B
   'catalyst',
   'crystal',
   'fuse',
-  'anchor',
   // "Locked tiles" removal (2026-06-13): frozen renders an un-thawed frost
   // "locked" overlay (derived via cellFilter) that confused players, so it stays
   // retired. ICE is kept — it now spawns and is directly selectable/meltable (no
@@ -553,7 +560,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     gemEnabled, prismEnabled, frostEnabled, frozenEnabled,
     diamondEnabled,
     countdownEnabled, shuffleEnabled, magmaEnabled, portalEnabled, catalystEnabled,
-    crystalEnabled, fuseEnabled, anchorEnabled,
+    crystalEnabled, fuseEnabled, anchorEnabled, lockedEnabled, keyEnabled,
   } = config;
 
   // Effective flags (support deprecated field aliases)
@@ -580,6 +587,8 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   let crystal = 0;
   let fuse = 0;
   let anchor = 0;
+  let locked = 0;
+  let key = 0;
 
   // Helper: take a share proportionally from gold + rainbow.
   // Floor of 0.10 combined preserves the workhorse score economy
@@ -668,6 +677,16 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(ANCHOR_SHARE);
   }
 
+  if (lockedEnabled) {
+    locked = LOCKED_SHARE;
+    takeShare(LOCKED_SHARE);
+  }
+
+  if (keyEnabled) {
+    key = KEY_SHARE;
+    takeShare(KEY_SHARE);
+  }
+
   const raw: Record<string, number> = {
     gold: Math.max(0, gold),
     bomb: BOMB_BASE,
@@ -690,6 +709,8 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     crystal,
     fuse,
     anchor,
+    locked,
+    key,
   };
 
   // Curation: zero every retired type before normalization so the freed weight

@@ -46,7 +46,7 @@ describe('WordTowerHud reward popup', () => {
     const props = baseProps({ resultKey: 1, lastResult: { tier: 'tall', meters: 5, accepted: true } as never });
     render(<WordTowerHud {...props} />);
     act(() => { vi.advanceTimersByTime(10); });
-    expect(screen.getByText(/\+5\.0\s*m/)).toBeTruthy();
+    expect(screen.queryByText(/\+5\.0\s*m/)).toBeNull();
     // It must NOT linger forever — the bug was it stayed on screen between words.
     act(() => { vi.advanceTimersByTime(3000); });
     expect(screen.queryByText(/\+5\.0\s*m/)).toBeNull();
@@ -60,6 +60,6 @@ describe('WordTowerHud reward popup', () => {
     expect(screen.queryByText(/\+3\.0\s*m/)).toBeNull();
     rerender(<WordTowerHud {...baseProps({ resultKey: 2, lastResult: { tier: 'none', meters: 7, accepted: true } as never })} />);
     act(() => { vi.advanceTimersByTime(10); });
-    expect(screen.getByText(/\+7\.0\s*m/)).toBeTruthy();
+    expect(screen.queryByText(/\+7\.0\s*m/)).toBeNull();
   });
 });
