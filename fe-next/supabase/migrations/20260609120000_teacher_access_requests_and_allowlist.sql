@@ -83,6 +83,15 @@ COMMENT ON TABLE public.teacher_access_allowlist IS
 -- ---------------------------------------------
 -- RLS — teacher_access_requests
 -- ---------------------------------------------
+-- Remove the superseded ad-hoc policies from the original un-versioned MCP
+-- setup. `tar_insert_authenticated` (WITH CHECK auth.uid() IS NOT NULL) is the
+-- bug: the public apply form posts via the anon/cookie client with user_id
+-- null, so every guest submission was denied by RLS and returned a 500. The
+-- old `tar_select` / `tar_update_admin` duplicate the canonical policies below.
+DROP POLICY IF EXISTS tar_insert_authenticated ON public.teacher_access_requests;
+DROP POLICY IF EXISTS tar_select               ON public.teacher_access_requests;
+DROP POLICY IF EXISTS tar_update_admin         ON public.teacher_access_requests;
+
 -- Public apply form may submit (server route uses the anon/cookie client).
 DROP POLICY IF EXISTS tar_insert_any ON public.teacher_access_requests;
 CREATE POLICY tar_insert_any
