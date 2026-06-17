@@ -63,13 +63,25 @@ _gate_npm_chain() {
     return 0
   fi
   [ "$skip_lint" = "1" ] || chain="npm run lint && "
-  # ORDER: lint → build:schemas → build:fast → test. The BUILD runs BEFORE the full
-  # vitest suite so a build verdict (the real lane-breakage signal — type/import errors
-  # like an orphaned page that imports missing siblings) is reached even if the slow
-  # test phase overruns its budget. On 2026-06-06 `test` ran first and was SIGKILLed at
+  # ORDER: lint → build:schemas → build:fast → test. The BUILD runs BEFORE the
+  # test phase so a build verdict (the real lane-breakage signal — type/import errors
+  # like an orphaned page that imports missing siblings) is reached even if the test
+  # phase overruns its budget. On 2026-06-06 `test` ran first and was SIGKILLed at
   # 1800s, so `next build` never ran and the gate learned nothing before dropping all
-  # code. build:schemas still precedes everything (the dist-bridge `npm run test` needs).
-  printf '%s' "${chain}npm run build:schemas && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; } && npm run test"
+  # code. build:schemas still precedes everything (the dist-bridge the tests need).
+  #
+  # TEST SCOPE (2026-06-17): default to `test:changed` — vitest --changed runs only the
+  # MODULE-GRAPH CONE of the authored files (the worktree has them uncommitted-vs-HEAD,
+  # so --changed picks them up exactly). WHY: the full `npm run test` suite wedges on
+  # pool-timeouts + 4 chronic-red suites (PracticeWheelSandbox, wordHandler.blast*,
+  # blastTileGeneration, blastModeManager.thaw) that NO lane touches, hitting the 5400s
+  # backstop → rc=124 → the night gets docs-only-salvaged and all code is dropped (the
+  # 06-12/13/16/17 losses). The cone skips those unrelated suites while still testing
+  # every importer of a changed file. The typecheck_only tier already proved this path
+  # fast + correct. Escape hatch: NIGHTLY_GATE_FULL_TEST=1 restores the full suite.
+  local test_cmd="npm run test:changed"
+  [ "${NIGHTLY_GATE_FULL_TEST:-0}" = "1" ] && test_cmd="npm run test"
+  printf '%s' "${chain}npm run build:schemas && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; } && ${test_cmd}"
 }
 
 # nightly_baseline_ship_decision <authored_fail_file> <baseline_rc> <baseline_fail_file> <authored_allowlist_file>

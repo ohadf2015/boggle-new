@@ -182,6 +182,20 @@ assert "build:schemas precedes test (dist bridge)"    "[[ \"$CHAIN_NOLINT\" == *
 assert "full chain runs build:fast BEFORE the full test suite" "[[ \"$CHAIN_FULL\"   == *'build:fast'*'npm run test'* ]]"
 assert "no-lint chain runs build:fast BEFORE test too"         "[[ \"$CHAIN_NOLINT\" == *'build:fast'*'npm run test'* ]]"
 
+# TEST SCOPE (2026-06-17): the gate DEFAULTS to the changed-cone (`test:changed`), not the
+# full suite — the full `npm run test` wedges on pool-timeouts + chronic-red suites no lane
+# touches → 5400s backstop → docs-only salvage drops all code (06-12/13/16/17). The chain
+# must TERMINATE in test:changed by default; only the env escape hatch restores the full suite.
+assert "default chain TERMINATES in test:changed (changed-cone, not full suite)" \
+  "[[ \"\$CHAIN_FULL\" == *'&& npm run test:changed' ]]"
+assert "default no-lint chain also terminates in test:changed" \
+  "[[ \"\$CHAIN_NOLINT\" == *'&& npm run test:changed' ]]"
+CHAIN_FULLSUITE=$(NIGHTLY_GATE_FULL_TEST=1 _gate_npm_chain 0)
+assert "NIGHTLY_GATE_FULL_TEST=1 escape hatch restores the FULL suite (terminal bare test, no :changed)" \
+  "[[ \"\$CHAIN_FULLSUITE\" == *'&& npm run test' ]] && [[ \"\$CHAIN_FULLSUITE\" != *'test:changed' ]]"
+assert "escape-hatch full chain still runs build:fast BEFORE the full suite" \
+  "[[ \"\$CHAIN_FULLSUITE\" == *'build:fast'*'npm run test' ]]"
+
 # build_only=1 → DROP lint AND test, keep build:schemas + build:fast. Used by the
 # baseline-aware ship path to prove the authored set builds clean despite a red TEST
 # baseline (test short-circuited, so the build was never verified).
