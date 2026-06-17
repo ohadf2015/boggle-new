@@ -116,6 +116,19 @@ OUT=$( CALLS_LOG="$CALLS" PATH="$BIN:$PATH" REDDIT_TOKEN_CACHE="$ROOT/toknj" \
        bash "$SCRIPT" feed wordgames top week 5 )
 assert "rss NOT used when JSON listing is usable" "echo '$OUT' | jq -e '.[0].title==\"T1\"' >/dev/null"
 
+# 5c — search on the OAUTH host returns an unusable body (HTML/403/non-listing) → fall back
+# to RSS EVEN WITH a bearer. Regression (2026-06-17 lane-04): oauth /search.json can fail
+# where the /r feed succeeds, and the old bearer-gated fallback dead-ended in "jq parse failed".
+CALLS="$ROOT/calls_search_rss.log"; : > "$CALLS"
+OUT=$( CALLS_LOG="$CALLS" LISTING_403=1 PATH="$BIN:$PATH" \
+       REDDIT_CLIENT_ID=cid REDDIT_CLIENT_SECRET=sec REDDIT_TOKEN_CACHE="$ROOT/toksr" \
+       REDDIT_RSS_CMD="cat $ROOT/rss.xml" REDDIT_SNAPSHOT="$ROOT/no-such-snapshot.json" \
+       bash "$SCRIPT" search "word game" relevance week 5 )
+rc=$?
+assert "oauth search unusable → RSS fallback fires despite bearer" "echo '$OUT' | jq -e '.[0].title==\"RSS Post One\"' >/dev/null"
+assert "oauth search fallback: NOT a jq-parse-fail error object"   "! echo '$OUT' | jq -e '.error' >/dev/null 2>&1"
+assert "oauth search fallback: exit 0"                             "[ $rc -eq 0 ]"
+
 echo "  reddit-fetch (snapshot):"
 
 NOW_ISO=$(date -u +%Y-%m-%dT%H:%M:%SZ)

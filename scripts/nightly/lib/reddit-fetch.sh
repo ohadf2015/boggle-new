@@ -188,7 +188,12 @@ if [ -z "$RESP" ]; then _json_usable=0
 elif echo "$RESP" | jq -e '.error' >/dev/null 2>&1; then _json_usable=0
 elif ! echo "$RESP" | jq -e '(.data.children | type) == "array"' >/dev/null 2>&1; then _json_usable=0
 fi
-if [ "$_json_usable" = "0" ] && [ -z "${BEARER:-}" ]; then
+if [ "$_json_usable" = "0" ]; then
+  # Fall back to RSS whenever the JSON body is unusable — INCLUDING on the oauth host. The
+  # old `&& [ -z BEARER ]` gate assumed a bearer always yields usable JSON, but that is false
+  # for /search.json (oauth global search can 403/return a non-listing where /r feeds 200),
+  # which dead-ended in "jq parse failed" with no fallback (2026-06-17 lane-04). RSS is a
+  # different gate that still serves 200, so it is strictly better than a parse-fail.
   _rss=$(_reddit_rss)
   if [ -n "$_rss" ] && [ "$(printf '%s' "$_rss" | jq -r 'length' 2>/dev/null || echo 0)" -gt 0 ]; then
     printf '%s\n' "$_rss"; exit 0
