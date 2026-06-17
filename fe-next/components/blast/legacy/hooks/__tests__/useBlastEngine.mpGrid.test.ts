@@ -19,10 +19,14 @@ import type { LetterGrid } from '@/shared/types/game';
 
 // Fake timers prevent useBlastEngine's dead-end detection setTimeout(1500ms)
 // from keeping the fork process alive after tests complete.
-beforeEach(() => {
+// beforeAll/afterAll (not beforeEach/afterEach) ensures RTL's per-test cleanup
+// always runs while fake timers are still active — if we restored real timers in
+// afterEach, RTL's global cleanup would unmount the component under real timers
+// and could reschedule the 1500ms timer, leaving the fork event loop alive.
+beforeAll(() => {
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
 });
-afterEach(() => {
+afterAll(() => {
   vi.useRealTimers();
 });
 
