@@ -17,6 +17,15 @@ import { useBlastEngine } from '../useBlastEngine';
 import type { BlastGameConfig, BlastTileState } from '../../types';
 import type { LetterGrid } from '@/shared/types/game';
 
+// Fake timers prevent useBlastEngine's dead-end detection setTimeout(1500ms)
+// from keeping the fork process alive after tests complete.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
+});
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 // Distinct, non-overlapping grids so a swap is unambiguous.
 const LOCAL_GRID: LetterGrid = Array.from({ length: 6 }, () => Array.from({ length: 6 }, () => 'X'));
 const SERVER_GRID: LetterGrid = [
