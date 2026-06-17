@@ -121,6 +121,11 @@ export default defineConfig({
       forks: {
         maxForks: 4,
         minForks: 1,
+        // Raise the V8 heap limit for fork child processes. Without this, forks
+        // accumulate memory across sequentially-assigned test files and crash
+        // with "Reached heap limit Allocation failed" at ~4 GB (the Node.js
+        // default), causing "Worker exited unexpectedly" in Vitest teardown.
+        execArgv: ['--max-old-space-size=8192'],
       },
     },
     teardownTimeout: 5000,

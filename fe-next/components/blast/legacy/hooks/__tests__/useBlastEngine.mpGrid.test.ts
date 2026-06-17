@@ -41,6 +41,21 @@ vi.mock('@/hooks/useDictionaryCache', () => ({
   useDictionaryCache: () => ({ checkWord: () => false, isLoaded: false }),
 }));
 
+// Intercept ALL timers for the entire file, then flush+restore after.
+// Belt-and-suspenders on top of isLoaded:false above: the global
+// QueryClientProvider (vitest.setup.ts, gcTime:0) schedules setTimeout(0)
+// GC sweeps after every unmount. If this file is the last in its fork, those
+// GC timers keep the event loop alive past teardownTimeout and the fork is
+// SIGKILL'd ("Worker exited unexpectedly").  vi.runAllTimers() in afterAll
+// drains them synchronously before vi.useRealTimers() restores the real clock.
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
+});
+afterAll(() => {
+  vi.runAllTimers();
+  vi.useRealTimers();
+});
+
 const config: BlastGameConfig = {
   gridSize: 6,
   specialTileChance: 0,
