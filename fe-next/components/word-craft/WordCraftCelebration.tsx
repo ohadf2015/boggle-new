@@ -266,14 +266,20 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
     if (burstId === lastBurstId.current) return;
     lastBurstId.current = burstId;
 
+    // Track the pending retry so we can cancel it on unmount. Without this,
+    // the timer outlives the test environment and throws "window is not defined"
+    // when happy-dom tears down while the retry is still pending.
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+
     const tryFire = (attempt: number) => {
       const api = apiRef.current;
       if (!api.spawnBurst || !api.spawnRain) {
         if (attempt < 20) {
-          window.setTimeout(() => tryFire(attempt + 1), 50);
+          retryTimer = setTimeout(() => tryFire(attempt + 1), 50);
         }
         return;
       }
+      retryTimer = null;
       if (kind === 'bingo') {
         const x = origin?.x ?? api.width() / 2;
         const y = origin?.y ?? api.height() / 2;
@@ -296,6 +302,10 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
       }
     };
     tryFire(0);
+
+    return () => {
+      if (retryTimer !== null) clearTimeout(retryTimer);
+    };
   }, [kind, burstId, origin, reducedMotion]);
 
   if (reducedMotion) return null;
