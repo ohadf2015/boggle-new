@@ -158,5 +158,42 @@ export function generateTileStates(
     }
   }
 
+  // Pair locked+key tiles: each 'locked' must have a 'key' within Manhattan ≤3.
+  // Orphan locked or orphan key → downgrade to standard (no half-pairs in play).
+  const MAX_LOCK_KEY_DISTANCE = 3;
+  const lockedTiles: BlastTileState[] = [];
+  const keyTiles: BlastTileState[] = [];
+  for (const row of tiles) {
+    for (const tile of row) {
+      if (tile.type === 'locked') lockedTiles.push(tile);
+      if (tile.type === 'key') keyTiles.push(tile);
+    }
+  }
+  const matchedKeySet = new Set<BlastTileState>();
+  for (const locked of lockedTiles) {
+    let bestKey: BlastTileState | undefined;
+    let bestDist = Infinity;
+    for (const key of keyTiles) {
+      if (matchedKeySet.has(key)) continue;
+      const dist = Math.abs(locked.row - key.row) + Math.abs(locked.col - key.col);
+      if (dist <= MAX_LOCK_KEY_DISTANCE && dist < bestDist) {
+        bestKey = key;
+        bestDist = dist;
+      }
+    }
+    if (bestKey) {
+      matchedKeySet.add(bestKey);
+    } else {
+      locked.type = 'standard';
+      locked.hitsRemaining = 0;
+    }
+  }
+  for (const key of keyTiles) {
+    if (!matchedKeySet.has(key)) {
+      key.type = 'standard';
+      key.hitsRemaining = 0;
+    }
+  }
+
   return tiles;
 }

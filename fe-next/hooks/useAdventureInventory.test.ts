@@ -38,7 +38,7 @@ describe('useAdventureInventory', () => {
   it('fetches /api/adventure/inventory on mount', async () => {
     mockFetchItems([]);
     renderHook(() => useAdventureInventory());
-    await waitFor(() => expect(mockFetch).toHaveBeenCalledWith('/api/adventure/inventory'));
+    await waitFor(() => expect(mockFetch).toHaveBeenCalledWith('/api/adventure/inventory', {}));
   });
 
   it('populates inventory from server response', async () => {

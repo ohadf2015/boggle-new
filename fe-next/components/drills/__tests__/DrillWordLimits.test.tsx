@@ -66,6 +66,10 @@ vi.mock('@/utils/utils', () => ({
   isWordOnBoard: () => true,
 }));
 
+vi.mock('@/hooks/useDrillMusic', () => ({
+  useDrillMusic: () => undefined,
+}));
+
 // Import components after mocks
 import PatternSwitcher from '../PatternSwitcher';
 import RareGems from '../RareGems';

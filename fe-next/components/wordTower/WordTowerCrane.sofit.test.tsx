@@ -19,17 +19,18 @@ const baseProps = {
 describe('WordTowerCrane Hebrew sofit beam', () => {
   it('renders the word-final letter in sofit form when locale is Hebrew', () => {
     mockLanguage = 'he';
-    // Bag holds the regular mem (מ); the beam should show the sofit (ם).
-    render(<WordTowerCrane {...baseProps} word="שלומ" />);
+    // 3-char word ending in mem (מ) → crane shows sofit (ם). Stays within 3-brick cap.
+    render(<WordTowerCrane {...baseProps} word="שלמ" />);
     const beam = screen.getByTestId('crane-block');
-    expect(beam.textContent).toBe('שלום');
+    expect(beam.textContent).toBe('שלם');
     cleanup();
   });
 
   it('leaves the word untouched for non-Hebrew locales', () => {
     mockLanguage = 'en';
-    render(<WordTowerCrane {...baseProps} word="STACK" />);
-    expect(screen.getByTestId('crane-block').textContent).toBe('STACK');
+    // 3-char word stays within the 3-brick cap so no truncation or badge text.
+    render(<WordTowerCrane {...baseProps} word="CAT" />);
+    expect(screen.getByTestId('crane-block').textContent).toBe('CAT');
     cleanup();
   });
 });

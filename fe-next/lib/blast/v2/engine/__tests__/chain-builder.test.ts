@@ -133,8 +133,10 @@ describe('buildChainLevel column-height cap', () => {
     // towerCap = max(longest+2, avg+4) = max(7, 9) = 9. Much tighter
     // than the 15+ tower the screenshot showed.
     let saw = false;
+    // maxAttempts capped at 150 per seed to keep the test inside the 10s budget
+    // (3000 attempts × Hebrew word-scan is too slow for CI).
     for (let seed = 1; seed <= 20; seed++) {
-      const level = buildChainLevel(heSpec, seed);
+      const level = buildChainLevel(heSpec, seed, undefined, 150);
       if (!level) continue;
       saw = true;
       for (const col of level.columns) {
