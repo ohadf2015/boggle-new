@@ -164,9 +164,16 @@ class MockResizeObserver {
   }
 };
 
-// Mock requestAnimationFrame
-(global as any).requestAnimationFrame = vi.fn((callback: any) => setTimeout(callback, 0));
-(global as any).cancelAnimationFrame = vi.fn((id: any) => clearTimeout(id));
+// Mock requestAnimationFrame — returns an ID but does NOT schedule the callback.
+// Scheduling via setTimeout causes canvas-confetti and similar libraries to start
+// real animation loops that leak pending timers. Those timers fire after the test
+// environment tears down (with pool:'forks' each file runs in its own process),
+// at which point requestAnimationFrame is no longer in scope → ReferenceError.
+// Test files that need RAF to actually invoke callbacks override this with
+// vi.stubGlobal('requestAnimationFrame', ...) locally.
+let _rafIdCounter = 0;
+(global as any).requestAnimationFrame = vi.fn((_callback: any) => ++_rafIdCounter);
+(global as any).cancelAnimationFrame = vi.fn();
 
 // Mock performance.now
 if (!(global as any).performance) {

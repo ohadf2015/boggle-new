@@ -281,6 +281,10 @@ describe('useBlastDebris — static walls', () => {
   });
 
   it('debris settles below the visible canvas so fragments do not rest on bottom-row tiles', () => {
+    // Pin Math.random so fork-process seeds don't produce upward forces strong
+    // enough to keep fragments above the floor after 600 physics steps.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
     // Given — 8x8 grid, 40px cells. Canvas spans y=0..boardPx (320). Floor was
     // positioned with its top edge at boardPx, so settled fragments rested at
     // y ≈ boardPx (just inside the bottom of the bottom-row tiles), creating
