@@ -204,9 +204,46 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
           </p>
           <p className="mt-4 text-neo-gray-200">
             התחרו בדירוגים גלובליים, אור הישגים, וביטלו מצבי משחק מיוחדים. קרבות הבוסים שלנו מוסיפים טוויסט
-            PvE ייחודי שבו שחקנים שיתפו פעולה נגד יריבים בינה מלאכותית. אתגרים יומיים מציעים חידות טריות כל יום
-            עם פרסים בלעדיים.
+            PvE ייחודי שבו שחקנים שיתפו פעולה נגד יריבים בינה מלאכותית.{' '}
+            <Link href={`/${locale}/daily`} className="text-neo-lime underline underline-offset-2 hover:text-neo-lime/80">
+              המילה היומית
+            </Link>{' '}
+            מציעה חידות טריות כל יום עם פרסים בלעדיים.
           </p>
+        </section>
+
+        <section className="mb-12" dir="rtl">
+          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">כלים ומשאבים בעברית</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link
+              href={`/${locale}/daily`}
+              className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-lime"
+            >
+              <h3 className="font-neo-display font-bold text-neo-lime">המילה היומית — מילת היום</h3>
+              <p className="mt-1 text-xs text-slate-300">גלגל מילים וציד מילים — חידה חדשה כל יום עם טבלת מובילים גלובלית.</p>
+            </Link>
+            <Link
+              href={`/${locale}/words`}
+              className="rounded-neo border-3 border-neo-cyan/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-cyan"
+            >
+              <h3 className="font-neo-display font-bold text-neo-cyan">מילון מילים בעברית</h3>
+              <p className="mt-1 text-xs text-slate-300">חפשו לפי אורך מילה או אות ראשונה — כל המילים התקניות במשחק.</p>
+            </Link>
+            <Link
+              href={`/${locale}/anagram`}
+              className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-pink"
+            >
+              <h3 className="font-neo-display font-bold text-neo-pink">פותר אנגרמות בעברית</h3>
+              <p className="mt-1 text-xs text-slate-300">הכניסו אותיות וגלו כל המילים האפשריות שאפשר לבנות.</p>
+            </Link>
+            <Link
+              href={`/${locale}/leaderboard`}
+              className="rounded-neo border-3 border-neo-yellow/60 bg-neo-navy-light p-4 shadow-hard transition-all hover:border-neo-yellow"
+            >
+              <h3 className="font-neo-display font-bold text-neo-yellow">טבלת מובילים</h3>
+              <p className="mt-1 text-xs text-slate-300">דירוגים יומיים, שבועיים וכלליים — עלו בדירוג הגלובלי.</p>
+            </Link>
+          </div>
         </section>
         <NativePageEnhancements locale={locale} />
       </div>
