@@ -17,19 +17,6 @@ import { useBlastEngine } from '../useBlastEngine';
 import type { BlastGameConfig, BlastTileState } from '../../types';
 import type { LetterGrid } from '@/shared/types/game';
 
-// Fake timers prevent useBlastEngine's dead-end detection setTimeout(1500ms)
-// from keeping the fork process alive after tests complete.
-// beforeAll/afterAll (not beforeEach/afterEach) ensures RTL's per-test cleanup
-// always runs while fake timers are still active — if we restored real timers in
-// afterEach, RTL's global cleanup would unmount the component under real timers
-// and could reschedule the 1500ms timer, leaving the fork event loop alive.
-beforeAll(() => {
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
-});
-afterAll(() => {
-  vi.useRealTimers();
-});
-
 // Distinct, non-overlapping grids so a swap is unambiguous.
 const LOCAL_GRID: LetterGrid = Array.from({ length: 6 }, () => Array.from({ length: 6 }, () => 'X'));
 const SERVER_GRID: LetterGrid = [
@@ -45,8 +32,13 @@ vi.mock('@/components/singleplayer/game/hooks/useGridInit', () => ({
   useGridInit: () => ({ grid: LOCAL_GRID, setGrid: vi.fn(), gridRef: { current: LOCAL_GRID } }),
 }));
 
+// isLoaded: false prevents useBlastEngine's dead-end detection effect from
+// scheduling setTimeout(1500ms) on mount. None of these tests exercise word
+// validation or dead-end detection, so the dictionary is intentionally unloaded
+// to avoid leaking a real timer that outlives the fork process and causes
+// "Worker exited unexpectedly" in Vitest's fork pool teardown.
 vi.mock('@/hooks/useDictionaryCache', () => ({
-  useDictionaryCache: () => ({ checkWord: () => false, isLoaded: true }),
+  useDictionaryCache: () => ({ checkWord: () => false, isLoaded: false }),
 }));
 
 const config: BlastGameConfig = {
