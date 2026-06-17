@@ -73,7 +73,8 @@ export const dynamicParams = true;
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, word: rawWord } = await params;
   const word = sanitizeWord(rawWord);
-  if (!word) return { title: 'Not Found' };
+  // Invalid word param → noindex (AdSense/GSC: never let a not-found leak index,follow).
+  if (!word) return { title: 'Not Found', robots: { index: false, follow: false } };
 
   const displayWord = word.toUpperCase();
   const points = getBasePoints(word);
