@@ -45,7 +45,10 @@ describe('WordCraftCelebration', () => {
     // Pixi API to become available. Those real setTimeouts outlive happy-dom
     // teardown and throw "window is not defined" when they fire. Fake timers
     // capture them so they never fire after the test ends.
-    vi.useFakeTimers();
+    // Scope to setTimeout only — do NOT fake requestAnimationFrame. Other test
+    // files in this fork stub RAF via vi.stubGlobal; faking RAF here would
+    // corrupt their stub bookkeeping and prevent the fork from exiting cleanly.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
   });
 
   afterEach(() => {
