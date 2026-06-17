@@ -48,17 +48,18 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
 
   it('Hebrew: per-letter tiles keep RTL + final-letter sofit form', () => {
     langHolder.lang = 'he';
-    // שלום → 4 tiles; the trailing מ must become its sofit ם, laid out RTL.
+    // "שלנ" = 3 letters (≤ CRANE_BEAM_MAX_BRICKS=3, all tiles display).
+    // applyHebrewFinalLetters converts trailing נ → ן (sofit nun), laid out RTL.
     render(
-      <WordTowerCrane word="שלום" consecutiveSloppy={0} onDrop={() => {}} t={t} getOffset={() => 0} />,
+      <WordTowerCrane word="שלנ" consecutiveSloppy={0} onDrop={() => {}} t={t} getOffset={() => 0} />,
     );
     const container = screen.getByTestId('crane-block');
     expect(container).toHaveAttribute('dir', 'rtl');
     const tiles = screen.getAllByTestId('crane-letter');
-    expect(tiles).toHaveLength(4);
+    expect(tiles).toHaveLength(3);
     // applyHebrewFinalLetters runs on the whole word, so the last glyph is sofit.
-    expect(tiles[tiles.length - 1].textContent).toBe('ם');
-    expect(tiles.map((el) => el.textContent).join('')).toBe('שלום');
+    expect(tiles[tiles.length - 1].textContent).toBe('ן');
+    expect(tiles.map((el) => el.textContent).join('')).toBe('שלן');
   });
 
   it('a dead-centre drop reports a PERFECT outcome', () => {

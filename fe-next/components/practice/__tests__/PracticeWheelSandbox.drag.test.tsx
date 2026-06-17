@@ -4,7 +4,7 @@
  * and a drag-release with ≥3 letters auto-submits.
  */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const validatorCheck = vi.fn();
@@ -105,7 +105,7 @@ const mockElementFromPoint = (indexSequence: number[]) => {
 
 describe('PracticeWheelSandbox drag-spell parity', () => {
   it('drag across 3 outer letters then release auto-submits', async () => {
-    render(<PracticeWheelSandbox />);
+    await act(async () => { render(<PracticeWheelSandbox />); });
     const wheel = screen.getByTestId('wheel-orbit');
     // Sequence: pointerdown@idx 1 (outer), pointermove@idx 0 (different outer →
     // engages drag, adds idx 1 then idx 0), pointermove@idx 2 (adds idx 2),
@@ -121,7 +121,7 @@ describe('PracticeWheelSandbox drag-spell parity', () => {
   });
 
   it('single tap on a letter does NOT engage drag (drag requires move to a different letter)', async () => {
-    render(<PracticeWheelSandbox />);
+    await act(async () => { render(<PracticeWheelSandbox />); });
     const wheel = screen.getByTestId('wheel-orbit');
     mockElementFromPoint([1, 1, 1]); // pointer never moves to a different letter
     fireEvent.pointerDown(wheel, { clientX: 10, clientY: 10 });

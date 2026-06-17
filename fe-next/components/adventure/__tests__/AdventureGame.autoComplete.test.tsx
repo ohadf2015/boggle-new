@@ -65,7 +65,7 @@ describe('AdventureGame - Level does NOT auto-complete', () => {
   });
 
   describe('Game continues after primary objectives met', () => {
-    it('should NOT set isComplete when primary objectives are met', () => {
+    it('auto-completes immediately when the sole objective (primary) is met', () => {
       const levelConfig = createMockLevelConfig({
         objectives: [{ type: 'wordCount', target: 2, isPrimary: true }],
       });
@@ -78,9 +78,9 @@ describe('AdventureGame - Level does NOT auto-complete', () => {
       act(() => result.current.submitWord('CAT', 30));
       act(() => result.current.submitWord('DOG', 30));
 
-      // canComplete is true but game keeps running
+      // all done (only objective met) → auto-completes, no timer wait
       expect(result.current.canComplete).toBe(true);
-      expect(result.current.gameState.isComplete).toBe(false);
+      expect(result.current.gameState.isComplete).toBe(true);
     });
 
     it('should NOT auto-complete if only secondary objectives are met', () => {
@@ -102,7 +102,7 @@ describe('AdventureGame - Level does NOT auto-complete', () => {
       expect(result.current.gameState.isComplete).toBe(false);
     });
 
-    it('should allow earning more objectives after primary is met', () => {
+    it('auto-completes once all objectives are met (primary first, then secondary)', () => {
       const levelConfig = createMockLevelConfig({
         timerSeconds: 10,
         objectives: [
@@ -117,18 +117,14 @@ describe('AdventureGame - Level does NOT auto-complete', () => {
 
       act(() => result.current.startGame());
 
-      // Meet primary with low score
+      // Primary met but secondary (100 pts) still open → keeps running
       act(() => result.current.submitWord('CAT', 30));
       expect(result.current.gameState.isComplete).toBe(false);
 
-      // Keep playing — earn more score toward secondary
+      // Secondary now met (30+80=110 ≥ 100) → all done, auto-completes
       act(() => result.current.submitWord('DOG', 80));
-      expect(result.current.gameState.isComplete).toBe(false);
-
-      // Timer expires — now complete with correct stars
-      act(() => vi.advanceTimersByTime(10000));
       expect(result.current.gameState.isComplete).toBe(true);
-      // Primary met + scoreTarget met (30+80=110 >= 100) = 2 stars
+      // Primary met + scoreTarget met = 2 stars
       expect(result.current.gameState.stars).toBe(2);
     });
   });
