@@ -41,6 +41,15 @@ const matchMediaMock = (matches: boolean) => {
 describe('WordCraftCelebration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // tryFire() in WordCraftCelebration retries up to 20×50ms waiting for the
+    // Pixi API to become available. Those real setTimeouts outlive happy-dom
+    // teardown and throw "window is not defined" when they fire. Fake timers
+    // capture them so they never fire after the test ends.
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders nothing when prefers-reduced-motion is set', () => {
