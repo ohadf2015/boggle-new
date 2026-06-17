@@ -46,6 +46,13 @@ vi.mock('@/contexts/AccessibilityContext', () => ({ useCelebrationIntensity: () 
 import GlobalCoinEarnFx, { COIN_EARNED_EVENT } from '../GlobalCoinEarnFx';
 import { COIN_SPENT_EVENT } from '@/utils/coinEarnedFx';
 
+// CoinRewardHud (rendered by GlobalCoinEarnFx) uses requestAnimationFrame for
+// the roll-up animation. Passing `undefined` as the timestamp makes p=NaN in
+// the tick function, so `NaN < 1` is false and it immediately calls
+// setDisplay(total) — letting waitFor() resolve without an animation loop.
+vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number);
+vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id));
+
 // rand that never triggers the surprise jackpot (first roll high).
 const noSurprise = () => 0.99;
 

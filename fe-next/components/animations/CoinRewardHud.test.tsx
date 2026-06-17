@@ -3,6 +3,13 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { CoinRewardHud } from './CoinRewardHud';
 
+// CoinRewardHud uses requestAnimationFrame for the roll-up animation.
+// Passing `undefined` as the timestamp makes p=NaN in the tick function,
+// so the `if (p < 1)` guard is false and it immediately calls setDisplay(total).
+// This lets waitFor() resolve without an infinite animation loop.
+vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number);
+vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id));
+
 afterEach(() => cleanup());
 
 const baseProps = {
