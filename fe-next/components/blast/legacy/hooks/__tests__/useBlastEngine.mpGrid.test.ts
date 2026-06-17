@@ -52,7 +52,9 @@ beforeAll(() => {
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
 });
 afterAll(() => {
-  vi.runAllTimers();
+  // Discard pending fake timers without running them — running them (vi.runAllTimers)
+  // executes callbacks on already-unmounted React components and crashes the fork.
+  vi.clearAllTimers();
   vi.useRealTimers();
 });
 
