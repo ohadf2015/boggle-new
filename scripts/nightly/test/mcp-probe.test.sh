@@ -1,5 +1,5 @@
 #!/bin/bash
-# Tests for lib/mcp-probe.sh — the preflight MCP auth-surface probe.
+# Tests for lib/mcp-probe.sh — the preflight MCP transport probe.
 set -uo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=/dev/null
@@ -11,27 +11,25 @@ assert() { # <name> <test-expr>
   else printf '    \xE2\x9C\x97 %s\n' "$1"; fail=$((fail+1)); fi
 }
 
-echo "── mcp-probe: mcp_probe_verdict (pure status→verdict) ──"
-assert "200 → ok"                 "[[ \"\$(mcp_probe_verdict 200)\" == 'ok' ]]"
-assert "201 → ok"                 "[[ \"\$(mcp_probe_verdict 201)\" == 'ok' ]]"
-assert "204 → ok"                 "[[ \"\$(mcp_probe_verdict 204)\" == 'ok' ]]"
-assert "401 → fail:auth"          "[[ \"\$(mcp_probe_verdict 401)\" == fail:auth* ]]"
-assert "403 → fail:auth"          "[[ \"\$(mcp_probe_verdict 403)\" == fail:auth* ]]"
-assert "000 → fail:unreachable"   "[[ \"\$(mcp_probe_verdict 000)\" == fail:unreachable* ]]"
-assert "500 → fail:http"          "[[ \"\$(mcp_probe_verdict 500)\" == 'fail:http(500)' ]]"
-assert "empty → fail:no-status"   "[[ \"\$(mcp_probe_verdict '')\" == 'fail:no-status' ]]"
-assert "ok verdict is the ONLY one starting 'ok'" "[[ \"\$(mcp_probe_verdict 500)\" != ok* ]]"
+echo "── mcp-probe: mcp_handshake_verdict (pure initialize-reply→verdict) ──"
+OK1='{"result":{"protocolVersion":"2024-11-05","capabilities":{},"serverInfo":{"name":"supabase"}}}'
+OK2='{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2024-11-05"}}'
+assert "valid result+protocolVersion → ok" "[[ \"\$(mcp_handshake_verdict '$OK1')\" == 'ok' ]]"
+assert "valid result (id first) → ok"       "[[ \"\$(mcp_handshake_verdict '$OK2')\" == 'ok' ]]"
+# THE 06-17 SURFACE: npx failed to connect → empty reply → must be transport fail, never ok.
+assert "empty reply (npx boot/connect failed) → fail:transport" "[[ \"\$(mcp_handshake_verdict '')\" == fail:transport* ]]"
+assert "empty reply is NOT ok (no false-green on the real failure)" "[[ \"\$(mcp_handshake_verdict '')\" != ok* ]]"
+assert "JSON-RPC error reply → fail:handshake" "[[ \"\$(mcp_handshake_verdict '{\"error\":{\"code\":-32000}}')\" == fail:handshake* ]]"
+assert "garbage reply → fail:transport(unrecognized)" "[[ \"\$(mcp_handshake_verdict 'npm ERR! 404')\" == fail:transport* ]]"
 
-echo "── mcp-probe: probe_supabase_mcp non-fatal skip contract ──"
-# Missing config → must SKIP (print skip, return 0) and NEVER fail the run.
-OUT=$(probe_supabase_mcp /nonexistent/claude.json); RC=$?
+echo "── mcp-probe: probe_mcp_server_boot non-fatal skip contract ──"
+OUT=$(probe_mcp_server_boot supabase /nonexistent/claude.json); RC=$?
 assert "missing claude.json → returns 0 (non-fatal)" "[ $RC -eq 0 ]"
 assert "missing claude.json → prints skip"           "[[ \"\$OUT\" == *skip* ]]"
-# Config present but no supabase token → skip, not fail.
 TMP=$(mktemp); printf '{\"mcpServers\":{}}' > "$TMP"
-OUT2=$(probe_supabase_mcp "$TMP"); RC2=$?
-assert "no token/ref in config → returns 0 (non-fatal)" "[ $RC2 -eq 0 ]"
-assert "no token/ref in config → prints skip"           "[[ \"\$OUT2\" == *skip* ]]"
+OUT2=$(probe_mcp_server_boot supabase "$TMP"); RC2=$?
+assert "unconfigured server → returns 0 (non-fatal)" "[ $RC2 -eq 0 ]"
+assert "unconfigured server → prints skip"           "[[ \"\$OUT2\" == *skip* ]]"
 rm -f "$TMP"
 
 echo

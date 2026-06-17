@@ -1,49 +1,69 @@
 #!/bin/bash
-# mcp-probe.sh — preflight connectivity probe for the npx-stdio MCP servers (supabase,
-# sentry). WHY: those servers boot via `npx -y <pkg>` and authenticate a token against a
-# management API; when the npm resolve is slow or the token is rejected, the lane silently
-# reports "<server> MCP unavailable" and defers its fixes (the 06-15/06-17 supabase misses).
-# This probe checks the SAME auth surface the MCP tools use, BEFORE the lanes run, and prints
-# a concrete PASS/FAIL so the failure is OBSERVABLE (loggable + alertable) instead of silent.
-# It does NOT prove the npx boot (that is ~2s steady-state, covered by MCP_TIMEOUT=45s); it
-# proves the credential the tools depend on actually authenticates today.
+# mcp-probe.sh — preflight TRANSPORT probe for the npx-stdio MCP servers (supabase, sentry).
 #
-# Non-fatal by contract: a missing jq/config/token → "skip" + return 0 (never block a run on
-# the probe itself). Only a live auth/unreachable failure returns 1 so the caller can alert.
+# WHY this exact surface: on 2026-06-17 the run lost all supabase work because the server
+# `npx -y @supabase/mcp-server-supabase` "✗ Failed to connect" — and stayed failed the whole
+# 96-min run (lane-01 saw it `pending` → ToolSearch found no tools; lane-02 saw `status:failed`).
+# The TOKEN was valid the whole time (it still authenticates today) — so an auth/REST check would
+# have falsely reported OK. The real failure is the npx boot + MCP handshake (registry resolve /
+# stdio transport), so THAT is what we probe: spawn the server exactly as the lanes do and require
+# a JSON-RPC `initialize` result back. Side benefit: a successful probe WARMS the npx package cache,
+# so the per-lane boots that follow resolve from disk instead of re-hitting the registry.
+#
+# This COMPLEMENTS (does not replace) preflight_check()'s `claude mcp list` retry loop — it pins the
+# concrete failure surface + warms the cache, and gives an alertable verdict. Non-fatal by contract.
 #
 # Tested by test/mcp-probe.test.sh.
 
-# mcp_probe_verdict <http_code> — PURE: map an auth-surface HTTP status to a verdict word.
-mcp_probe_verdict() {
-  case "$1" in
-    200|201|204) printf 'ok' ;;
-    401|403)     printf 'fail:auth(token rejected, http %s)' "$1" ;;
-    000)         printf 'fail:unreachable(no response/timeout)' ;;
-    '')          printf 'fail:no-status' ;;
-    *)           printf 'fail:http(%s)' "$1" ;;
+# mcp_handshake_verdict <first_response_line> — PURE: classify the server's initialize reply.
+mcp_handshake_verdict() {
+  local line="$1"
+  if [ -z "$line" ]; then printf 'fail:transport(no response — npx boot/connect failed)'; return; fi
+  case "$line" in
+    *'"result"'*'"protocolVersion"'*|*'"protocolVersion"'*'"result"'*|*'"result"'*'"serverInfo"'*)
+      printf 'ok' ;;
+    *'"error"'*) printf 'fail:handshake(server returned error)' ;;
+    *)           printf 'fail:transport(unrecognized reply)' ;;
   esac
 }
 
-# _mcp_probe_http <url> <bearer> — emit the HTTP status (000 on connect failure). 8s cap.
-_mcp_probe_http() {
-  curl -s -o /dev/null -m 8 -w '%{http_code}' -H "Authorization: Bearer $2" "$1" 2>/dev/null || printf '000'
-}
+# _mcp_server_field <claude_json> <server> <jq_expr> — extract one field, empty on miss.
+_mcp_server_field() { jq -r ".mcpServers.\"$2\"$3 // empty" "$1" 2>/dev/null; }
 
-# probe_supabase_mcp [claude_json] — verify the supabase MCP auth surface (Management API,
-# the exact endpoint get_advisors/execute_sql/apply_migration authenticate against).
-# Prints "supabase MCP probe: <verdict>"; returns 0 on ok/skip, 1 on a live fail.
-probe_supabase_mcp() {
-  local cj="${1:-${CLAUDE_CONFIG_JSON:-$HOME/.claude.json}}"
-  command -v jq   >/dev/null 2>&1 || { printf 'supabase MCP probe: skip(no jq)\n';          return 0; }
-  command -v curl >/dev/null 2>&1 || { printf 'supabase MCP probe: skip(no curl)\n';        return 0; }
-  [ -f "$cj" ]                    || { printf 'supabase MCP probe: skip(no claude.json)\n';  return 0; }
-  local tok ref
-  tok=$(jq -r '.mcpServers.supabase.env.SUPABASE_ACCESS_TOKEN // empty' "$cj" 2>/dev/null)
-  ref=$(jq -r '.mcpServers.supabase.args[]?' "$cj" 2>/dev/null | sed -n 's/^--project-ref=//p' | head -1)
-  [ -n "$tok" ] && [ -n "$ref" ] || { printf 'supabase MCP probe: skip(no token/ref in config)\n'; return 0; }
-  local code verdict
-  code=$(_mcp_probe_http "https://api.supabase.com/v1/projects/$ref" "$tok")
-  verdict=$(mcp_probe_verdict "$code")
-  printf 'supabase MCP probe: %s\n' "$verdict"
+# probe_mcp_server_boot <server> [claude_json] [timeout_secs] — spawn the server EXACTLY as
+# configured (command+args+env) and pipe an MCP `initialize`; print "ok"/"fail:…" verdict.
+# Returns 0 on ok/skip (non-fatal), 1 on a live transport/handshake failure.
+probe_mcp_server_boot() {
+  local server="$1" cj="${2:-${CLAUDE_CONFIG_JSON:-$HOME/.claude.json}}" to="${3:-30}"
+  command -v jq  >/dev/null 2>&1 || { printf '%s MCP probe: skip(no jq)\n' "$server";        return 0; }
+  command -v npx >/dev/null 2>&1 || { printf '%s MCP probe: skip(no npx)\n' "$server";       return 0; }
+  [ -f "$cj" ]                   || { printf '%s MCP probe: skip(no claude.json)\n' "$server"; return 0; }
+  local cmd; cmd=$(_mcp_server_field "$cj" "$server" '.command')
+  [ -n "$cmd" ] || { printf '%s MCP probe: skip(not configured)\n' "$server"; return 0; }
+
+  # args[] → array; env{} → KEY=VALUE exports for the child only. while-read (not mapfile)
+  # to stay bash-3.2-safe — macOS /bin/bash is 3.2 and the rest of the nightly avoids mapfile.
+  local args=() envkv=() _line
+  while IFS= read -r _line; do [ -n "$_line" ] && args+=("$_line"); done \
+    < <(jq -r ".mcpServers.\"$server\".args[]? // empty" "$cj" 2>/dev/null)
+  while IFS= read -r _line; do [ -n "$_line" ] && envkv+=("$_line"); done \
+    < <(jq -r ".mcpServers.\"$server\".env | to_entries[]? | \"\(.key)=\(.value)\"" "$cj" 2>/dev/null)
+
+  local init='{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"nightly-probe","version":"1"}}}'
+  # Resolve a timeout binary (macOS has gtimeout from coreutils, not bare timeout). If neither
+  # exists, run bare — `head -1` closing the pipe bounds a well-behaved server anyway.
+  local to_bin; to_bin=$(command -v gtimeout || command -v timeout || true)
+  # ${arr[@]+"${arr[@]}"} so an EMPTY array doesn't trip `set -u` under bash 3.2 (same idiom run.sh uses).
+  local resp
+  if [ -n "$to_bin" ]; then
+    resp=$(printf '%s\n' "$init" | env ${envkv[@]+"${envkv[@]}"} "$to_bin" "$to" "$cmd" ${args[@]+"${args[@]}"} 2>/dev/null | head -1)
+  else
+    resp=$(printf '%s\n' "$init" | env ${envkv[@]+"${envkv[@]}"} "$cmd" ${args[@]+"${args[@]}"} 2>/dev/null | head -1)
+  fi
+  local verdict; verdict=$(mcp_handshake_verdict "$resp")
+  printf '%s MCP probe: %s\n' "$server" "$verdict"
   [ "$verdict" = "ok" ]
 }
+
+# probe_supabase_mcp [claude_json] — convenience wrapper for the supabase server.
+probe_supabase_mcp() { probe_mcp_server_boot supabase "${1:-}"; }
