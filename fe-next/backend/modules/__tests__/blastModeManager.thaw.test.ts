@@ -19,28 +19,30 @@ const GRID = [
 ];
 
 describe('cascadeBlastWord — ice/frozen thaw (MP)', () => {
-  it('thaws an ice tile adjacent to the submitted word path', () => {
+  it('thaws a frozen tile adjacent to the submitted word path', () => {
     const state = initBlastModeState(GRID, ['alice'], 1, 4242);
     const alice = getOrInitPlayerBoard(state, 'alice');
 
-    // Plant an un-thawed ICE tile at bottom-left (2,0). It is 8-dir adjacent to
-    // (1,0), which is in the word path below.
+    // Plant an un-thawed FROZEN tile at bottom-left (2,0). It is 8-dir adjacent
+    // to (1,0), which is in the word path. (Ice was removed from THAWABLE_TYPES
+    // on 2026-06-13 — ice tiles are now directly selectable and no longer need
+    // thawing. Only 'frozen' remains lockable.)
     alice.tileStates[2][0] = {
       ...alice.tileStates[2][0],
-      type: 'ice',
+      type: 'frozen',
       isThawed: false,
       isCleared: false,
     };
 
     // Play a 2-tile word along the middle row: (1,0)+(1,1). (1,0) is directly
-    // above the ice at (2,0) → ice must thaw.
+    // above the frozen tile at (2,0) → frozen must thaw.
     cascadeBlastWord(alice, [{ row: 1, col: 0 }, { row: 1, col: 1 }], 'DO', 1, 'en');
 
-    // Ice sits at the bottom row; the cleared cell is above it, so gravity keeps
-    // it at (2,0). It must now be thawed (selectable → no locked overlay).
-    const ice = alice.tileStates[2][0];
-    expect(ice.type).toBe('ice');
-    expect(ice.isThawed).toBe(true);
+    // Frozen sits at the bottom row; the cleared cell is above it, so gravity
+    // keeps it at (2,0). It must now be thawed (selectable → no locked overlay).
+    const frozen = alice.tileStates[2][0];
+    expect(frozen.type).toBe('frozen');
+    expect(frozen.isThawed).toBe(true);
   });
 
   it('does NOT thaw an ice tile far from the word path', () => {
