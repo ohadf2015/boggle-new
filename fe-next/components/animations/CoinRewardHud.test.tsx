@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, afterAll } from 'vitest';
 import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { CoinRewardHud } from './CoinRewardHud';
 
@@ -9,6 +9,11 @@ import { CoinRewardHud } from './CoinRewardHud';
 // This lets waitFor() resolve without an infinite animation loop.
 vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number);
 vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id));
+
+// Restore the setup's no-op RAF after this file so subsequent files in the
+// same fork process don't inherit the setTimeout version (which would let
+// canvas-confetti start real animation loops in other test files).
+afterAll(() => vi.unstubAllGlobals());
 
 afterEach(() => cleanup());
 

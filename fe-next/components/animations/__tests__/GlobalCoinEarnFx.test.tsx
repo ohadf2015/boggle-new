@@ -8,6 +8,7 @@
  * `rand` is injected so the casino surprise-jackpot roll is deterministic here.
  */
 import { render, screen, act, waitFor } from '@testing-library/react';
+import { afterAll } from 'vitest';
 
 const {
   playCoinCollectMock, playCoinCascadeMock, spawnCoinStreamMock,
@@ -52,6 +53,11 @@ import { COIN_SPENT_EVENT } from '@/utils/coinEarnedFx';
 // setDisplay(total) — letting waitFor() resolve without an animation loop.
 vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number);
 vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id));
+
+// Restore the setup's no-op RAF after this file so subsequent files in the
+// same fork process don't inherit the setTimeout version (which would let
+// canvas-confetti start real animation loops in other test files).
+afterAll(() => vi.unstubAllGlobals());
 
 // rand that never triggers the surprise jackpot (first roll high).
 const noSurprise = () => 0.99;
