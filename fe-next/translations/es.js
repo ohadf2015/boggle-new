@@ -5525,6 +5525,7 @@ const es = {
     "timer": "Temporizador",
     "quitConfirmTitle": "¿Salir del juego?",
     "quitConfirmMessage": "Perderás tu progreso actual. ¿Seguro que quieres salir?",
+    "quitConfirmMessageWithStats": "Encontraste {wordCount} palabras ({score} pts). ¿Salir y perderlas?",
     "imSure": "Estoy seguro",
     "gamePaused": "Juego pausado",
     "needHint": "¿Necesitas una pista?",

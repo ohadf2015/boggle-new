@@ -7,6 +7,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import GridComponent from '@/components/GridComponent';
 import DesktopInputHint from '@/components/grid/DesktopInputHint';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { useQuitConfirmDescription } from '@/hooks/useQuitConfirmDescription';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
@@ -144,6 +145,14 @@ export function DesktopGameLayout({
 }: DesktopGameLayoutProps): React.ReactElement {
   const validWords = React.useMemo(() => foundWords.filter(fw => fw.isValid === true), [foundWords]);
   const validWordCount = validWords.length;
+  // exp-game-abandon-confirm-v1: stats-shown variant surfaces score+words in the quit dialog (dark until flag on).
+  const quitConfirmDescription = useQuitConfirmDescription({
+    open: showQuitConfirm,
+    baseMessage: t('singlePlayer.quitConfirmMessage'),
+    statsTemplate: t('singlePlayer.quitConfirmMessageWithStats'),
+    score,
+    wordCount: validWordCount,
+  });
   const validWordLengths = React.useMemo(() => validWords.map(fw => fw.word.length), [validWords]);
   const tSafe = React.useCallback((key: string) => t(key) || key, [t]);
   const isPracticeMode = mode === 'practice';
@@ -360,7 +369,7 @@ export function DesktopGameLayout({
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
         title={t('singlePlayer.quitConfirmTitle')}
-        description={t('singlePlayer.quitConfirmMessage')}
+        description={quitConfirmDescription}
         confirmText={t('common.quit')}
         cancelText={t('common.cancel')}
         onConfirm={onConfirmQuit}

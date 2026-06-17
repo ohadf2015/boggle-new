@@ -5579,6 +5579,7 @@ const sv = {
     "timer": "Timer",
     "quitConfirmTitle": "Avsluta spelet?",
     "quitConfirmMessage": "Du kommer att förlora dina framsteg. Är du säker på att du vill avsluta?",
+    "quitConfirmMessageWithStats": "Du har hittat {wordCount} ord ({score} p). Avsluta och förlora dem?",
     "imSure": "Jag är säker",
     "gamePaused": "Spelet pausat",
     "needHint": "Behöver du en ledtråd?",

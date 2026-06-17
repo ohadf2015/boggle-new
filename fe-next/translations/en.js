@@ -5529,6 +5529,7 @@ const en = {
     "timer": "Timer",
     "quitConfirmTitle": "Quit?",
     "quitConfirmMessage": "You'll lose progress. Sure?",
+    "quitConfirmMessageWithStats": "You've found {wordCount} words ({score} pts). Quit and lose them?",
     "imSure": "Quit",
     "gamePaused": "Paused",
     "needHint": "Need a hint?",

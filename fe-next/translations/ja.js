@@ -5492,6 +5492,7 @@ const ja = {
     "timer": "タイマー",
     "quitConfirmTitle": "ゲームを終了しますか？",
     "quitConfirmMessage": "現在の進捗が失われます。本当に終了しますか？",
+    "quitConfirmMessageWithStats": "{wordCount}語（{score}点）見つけました。終了して失いますか？",
     "imSure": "終了する",
     "gamePaused": "ゲーム一時停止中",
     "needHint": "ヒントが必要?",

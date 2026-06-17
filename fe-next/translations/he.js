@@ -5602,6 +5602,7 @@ const he = {
     "timer": "טיימר",
     "quitConfirmTitle": "לצאת מהמשחק?",
     "quitConfirmMessage": "תאבד את ההתקדמות הנוכחית. בטוח שאתה רוצה לצאת?",
+    "quitConfirmMessageWithStats": "מצאת {wordCount} מילים ({score} נק'). לצאת ולאבד אותן?",
     "imSure": "אני בטוח/ה",
     "gamePaused": "המשחק מושהה",
     "needHint": "צריכ/ה רמז?",
