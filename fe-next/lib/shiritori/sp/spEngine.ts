@@ -46,10 +46,10 @@ const HIRAGANA_RE = /^[ぁ-んー]+$/;
  * Commit a player-submitted word. Caller has already validated it against the
  * dictionary endpoint (dictOk=true) so this is the post-validation gate.
  */
-export function commitPlayerWord(s: SpState, word: string, dictOk: boolean): PlayerCommit {
+export function commitPlayerWord(s: SpState, word: string, dictOk: boolean, wildcardHead = false): PlayerCommit {
   if (!HIRAGANA_RE.test(word)) return { kind: 'err', reason: 'not-hiragana' };
   if (s.used.has(word)) return { kind: 'err', reason: 'duplicate' };
-  if (s.chain.length > 0 && !chains(s.chain[s.chain.length - 1], word)) {
+  if (!wildcardHead && s.chain.length > 0 && !chains(s.chain[s.chain.length - 1], word)) {
     return { kind: 'err', reason: 'wrong-head' };
   }
   if (!dictOk) return { kind: 'err', reason: 'not-in-dict' };
