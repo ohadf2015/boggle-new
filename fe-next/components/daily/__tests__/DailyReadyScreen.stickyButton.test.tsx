@@ -73,4 +73,30 @@ describe('DailyReadyScreen - Mobile sticky button safe area', () => {
     expect(cls).not.toMatch(/\bbottom-16\b/);
     expect(cls).toMatch(/bottom-\[var\(--bottom-stack-height,0px\)\]/);
   });
+
+  it('portals the mobile sticky CTA to <body> so a transformed ancestor cannot demote position:fixed', () => {
+    // Regression: the sticky CTA lived inside the framer-motion `m.div`
+    // (animate={{ y }} → a `transform`). A transformed ancestor turns a
+    // `position: fixed` child into `position: absolute` on Android WebView, so
+    // the CTA scrolls with content and lands under the ad band — the reported
+    // "Start Game button hidden behind the ad" bug. Portaling to <body> keeps
+    // `fixed` anchored to the viewport so `bottom: var(--bottom-stack-height)`
+    // reliably clears the banner. Mirrors ResultsPage's sticky-bar fix.
+    render(<DailyReadyScreen {...defaultProps} />);
+
+    const playButtons = screen.getAllByRole('button', { name: /daily\.playButton/i });
+    const stickyContainer = playButtons
+      .map(btn => btn.closest('div.sm\\:hidden.fixed'))
+      .find(el => el !== null) as HTMLElement | undefined;
+
+    expect(stickyContainer).toBeTruthy();
+
+    // The animated content wrapper carries a transform — the CTA must NOT be
+    // a descendant of it. createPortal(…, document.body) renders the container
+    // as a direct child of <body>, outside the transformed subtree.
+    const animatedWrapper = document.querySelector('[data-daily-ready-content]');
+    expect(animatedWrapper).toBeTruthy();
+    expect(animatedWrapper!.contains(stickyContainer!)).toBe(false);
+    expect(stickyContainer!.parentElement).toBe(document.body);
+  });
 });
