@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles, HelpCircle } from 'lucide-react';
@@ -134,6 +135,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   return (
     <m.div
       key="ready"
+      data-daily-ready-content
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -409,23 +411,35 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
 
       </div>
 
-      {/* Mobile sticky play button — sits above bottom nav, below cookie consent */}
-      <div className="sm:hidden fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
-        <m.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
-          className="max-w-sm mx-auto pointer-events-auto"
-        >
-          <button
-            onClick={onStart}
-            className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
-          >
-            <Target className="w-6 h-6" />
-            {t('daily.playButton')}
-          </button>
-        </m.div>
-      </div>
+      {/* Mobile sticky play button — sits above bottom nav, below cookie consent.
+          PORTALED to <body>: this CTA is `position: fixed`, but its ancestor
+          `m.div` (animate={{ y }}) carries a `transform`, which on Android
+          WebView demotes a fixed child to `absolute` — the CTA then scrolls
+          with content and lands under the ad band (the reported "Start Game
+          button hidden behind the ad"). Rendering outside the transformed
+          subtree keeps `fixed` anchored to the viewport so
+          `bottom: var(--bottom-stack-height)` reliably clears nav + banner.
+          Same fix ResultsPage applies to its StickyReadyBar. */}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <div className="sm:hidden fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
+            <m.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+              className="max-w-sm mx-auto pointer-events-auto"
+            >
+              <button
+                onClick={onStart}
+                className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
+              >
+                <Target className="w-6 h-6" />
+                {t('daily.playButton')}
+              </button>
+            </m.div>
+          </div>,
+          document.body,
+        )}
 
       <CreateChallengeModal
         isOpen={showCreateChallenge}
