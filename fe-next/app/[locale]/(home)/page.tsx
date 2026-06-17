@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import HomePageClient from './PageClient';
+import HomePageClient from '../PageClient';
 import { fetchLandingData } from '@/lib/landing/fetchLandingData';
 import { HomepageContentSection } from '@/components/seo/HomepageContentSection';
 import { buildHomepageFaqJsonLd } from '@/lib/seo/homepageFaqJsonLd';
