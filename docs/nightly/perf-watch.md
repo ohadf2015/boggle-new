@@ -215,3 +215,12 @@ PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Re
 - No deployment in last 24h explains this — likely traffic/sample variation
 - INP improved (528→488ms). CLS improved.
 - Watch next 2 nights to confirm regression vs noise.
+
+## 2026-06-17 additions
+
+### /es/multiplayer CLS regression 0.144→0.288 (+100%, n=91 both runs)
+- Both runs above n≥50 floor; exceeds 20% regression threshold. Confirmed regression.
+- Root cause unknown — no targeted code changes to /es/multiplayer layout in last 7d.
+- Possible causes: late-rendering ads (AdSense), socket-driven player list inserting content above fold, font-swap on Spanish locale.
+- Action: Chrome DevTools CLS attribution on /es/multiplayer — identify which element shifts and when.
+- Owner: human — needs visual verification.

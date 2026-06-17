@@ -1,76 +1,82 @@
 {
-  "date": "2026-06-15",
-  "note": "Twentieth snapshot. Backend: (1) Migration 20260615030000_perf_advisor_fixes.sql written — patches teacher_access_requests tar_insert_authenticated RLS policy to (select auth.uid()) subselect form (auth_rls_initplan fix); adds idx_word_pacts_player2_id covering index (unindexed FK fix). Supabase MCP unavailable — migration written to file, not applied live yet; will run through normal gate. (2) web_vitals policy fix from 06-14 confirmed applied. Frontend: 24h window 0 routes above n>=50 floor. 7d: /he INP REGRESSION confirmed (158→264ms +67%, both runs n>=50); CLS worsening (0.386→0.460); LCP improving (4764→4358ms). /es/multiplayer all metrics within 20% noise band. Bundle: no .next build present for diff — prior top_chunks carried forward.",
+  "date": "2026-06-17",
+  "note": "Twenty-first snapshot. Backend: (1) Migration 20260615030000_perf_advisor_fixes.sql still pending apply (auth_rls_initplan on teacher_access_requests + idx_word_pacts_player2_id) — Supabase MCP unavailable again 06-17; (2) NEW migration 20260617030000_perf_drop_unused_index.sql written — drops idx_offerwall_postbacks_user (0 scans, write-only overhead). Frontend 7d: /he LCP 4764ms (POOR, n=82), INP IMPROVING 264→184ms (-30%), CLS IMPROVING 0.460→0.199 (-57%). /en appeared above n>=50 floor for first time: LCP 4440ms (POOR, n=57), INP 160ms OK. /es/multiplayer CLS 0.144→0.288 (+100%, both n>=50) = POSSIBLE REGRESSION, added to perf-watch.md. 24h window: 0 routes above n>=50 floor. Bundle: no .next build — prior top_chunks carried forward.",
   "backend": {
-    "advisor_warnings_count": 2,
+    "advisor_warnings_count": 3,
     "advisor_warnings": [
       {
         "type": "auth_rls_initplan",
         "table": "teacher_access_requests",
         "policy": "tar_insert_authenticated",
-        "status": "MIGRATION WRITTEN 2026-06-15 — 20260615030000_perf_advisor_fixes.sql. Changed auth.uid() → (select auth.uid()). Not yet applied (Supabase MCP unavailable). Reversible: ALTER POLICY ... WITH CHECK (auth.uid() IS NOT NULL)."
+        "status": "MIGRATION WRITTEN 20260615030000_perf_advisor_fixes.sql — (select auth.uid()) subselect form. NOT YET APPLIED (Supabase MCP unavailable 06-15 + 06-17). Needs manual apply."
       },
       {
         "type": "unindexed_foreign_keys",
         "table": "word_pacts",
         "fkey": "word_pacts_player2_id_fkey",
-        "status": "MIGRATION WRITTEN 2026-06-15 — 20260615030000_perf_advisor_fixes.sql. CREATE INDEX IF NOT EXISTS idx_word_pacts_player2_id ON public.word_pacts (player2_id). Not yet applied. Was 1 row on 06-14 (deferred); advisor still flagging so added preemptively."
+        "status": "MIGRATION WRITTEN 20260615030000_perf_advisor_fixes.sql — CREATE INDEX IF NOT EXISTS idx_word_pacts_player2_id. NOT YET APPLIED."
       },
       {
-        "type": "auth_db_connections_absolute",
-        "status": "ADVISORY — switch to percentage-based connection allocation. Low risk at current scale. Deferred."
+        "type": "unused_index",
+        "table": "offerwall_postbacks",
+        "index": "idx_offerwall_postbacks_user",
+        "status": "MIGRATION WRITTEN 20260617030000_perf_drop_unused_index.sql — DROP INDEX IF EXISTS idx_offerwall_postbacks_user. NOT YET APPLIED."
       }
     ],
     "top_queries": [
       {
-        "label": "Realtime WAL parser (2 variants)",
-        "total_ms": "N/A — supabase MCP unavailable 06-15",
-        "verdict": "INFRASTRUCTURE — Supabase Realtime internal. Consistent across all snapshots."
+        "label": "Realtime WAL parser",
+        "verdict": "INFRASTRUCTURE — Supabase Realtime internal. Not actionable."
       },
       {
         "label": "analytics_events SELECT",
         "mean_ms": 18.5,
         "calls": 1514,
-        "verdict": "WATCH — 18.5ms mean above typical threshold. Carried from 06-14. Re-check when supabase MCP available."
+        "verdict": "WATCH — carried from 06-14. Re-check when Supabase MCP available."
       }
     ]
   },
   "frontend": {
-    "note": "24h window: 0 routes above n>=50 floor. 7-day window: 2 routes above floor.",
+    "note": "24h window: 0 routes above n>=50 floor. 7d window: 3 routes above floor.",
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 4358,
-        "p75_inp_ms": 264,
-        "p75_cls": 0.460,
-        "n_7d": 58,
+        "p75_lcp_ms": 4764,
+        "p75_inp_ms": 184,
+        "p75_cls": 0.199,
+        "n_7d": 82,
         "window": "7d",
-        "lcp_status": "IMPROVING — 4764ms (06-14) → 4358ms (06-15), -8.5%. Still POOR but trending down.",
-        "inp_status": "REGRESSION — 158ms (06-14) → 264ms (06-15), +67%. Both runs n>=50 (64→58). Exceeds 20% threshold. Added to perf-watch.md. Watch 2 more nights before named-suspect investigation.",
-        "cls_status": "WORSENING — 0.386 (06-14) → 0.460 (06-15), +19%. Under 20% regression threshold but already POOR. Suspect: RTL font-swap or hero layout shift."
+        "lcp_status": "POOR — 4764ms. Flat vs 06-14 baseline. INP IMPROVING (-30%). CLS IMPROVING (-57%).",
+        "inp_status": "IMPROVING — 264→184ms (-30%), n=82, both runs above floor.",
+        "cls_status": "IMPROVING — 0.460→0.199 (-57%). Likely from AnimatedSplash/FTUE overlay gating changes 06-16/17."
+      },
+      {
+        "route": "/en",
+        "p75_lcp_ms": 4440,
+        "p75_inp_ms": 160,
+        "p75_cls": 0.149,
+        "n_7d": 57,
+        "window": "7d",
+        "lcp_status": "POOR — 4440ms. FIRST READING above n>=50 floor (no prior baseline). LCP above 2500ms budget.",
+        "inp_status": "OK — 160ms.",
+        "cls_status": "MONITOR — 0.149."
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 3800,
-        "p75_inp_ms": 424,
-        "p75_cls": 0.144,
-        "n_7d": 96,
+        "p75_lcp_ms": 3452,
+        "p75_inp_ms": 436,
+        "p75_cls": 0.288,
+        "n_7d": 91,
         "window": "7d",
-        "lcp_status": "MONITOR — 3572ms (06-14) → 3800ms (06-15), +6.4%. Under 20% threshold. No regression.",
-        "inp_status": "MONITOR — 392ms (06-14) → 424ms (06-15), +8.2%. Under 20% threshold. Still above 200ms INP budget but not a new regression.",
-        "cls_status": "IMPROVING — 0.158 (06-14) → 0.144 (06-15), -9%. Stable."
-      }
-    ],
-    "deferred": [
-      {
-        "route": "/he",
-        "note": "INP 158→264ms REGRESSION confirmed. CLS 0.386→0.460 worsening. RTL layout/font-swap/interaction-handler cause unknown. Added to perf-watch.md. Minimum 2 more nights n>=50 before investigation recommended."
+        "lcp_status": "MONITOR — 3452ms, improving from 3800ms (-9%). ISR revalidate=3600 working.",
+        "inp_status": "POOR — 436ms (+3% vs 424ms baseline). Under 20% threshold.",
+        "cls_status": "POSSIBLE REGRESSION — 0.144→0.288 (+100%), both n>=50. Exceeds 20% threshold. Added to perf-watch.md."
       }
     ]
   },
   "bundle": {
     "total_kb": 40325,
-    "note": "Carried from 06-14 — no .next build present in tree to diff. Prior top_chunks baseline preserved.",
+    "note": "Carried from 06-14 — no .next build present in tree.",
     "top_chunks": [
       { "name": "0g6.ei74erw09.js", "kb": 6085 },
       { "name": "107js-lrs4mq0.js", "kb": 3283 },

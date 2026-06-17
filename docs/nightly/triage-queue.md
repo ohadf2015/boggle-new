@@ -811,3 +811,36 @@ FLAG NEEDED: exp-practice-wheel-cta-v1  variants=[control, retry-cta]  50/50
   - `mp-signup-nudge-copy-v1` — 0 conversions across 77 users; "toast-disabled" led = feature is net-negative
   - status: deferred (human must delete in PostHog dashboard)
   - recommended owner: growth, review-by-eod
+
+## 2026-06-17
+- [Supabase] SECURITY DEFINER: `public.update_milog_verification` executable by `authenticated` role via `/rest/v1/rpc/update_milog_verification`
+  - first seen: 2026-06-17, count: ongoing advisor warning
+  - link: supabase advisor security authenticated_security_definer_function_executable
+  - status: deferred (Supabase MCP unavailable — apply manually)
+  - why: No code callsites found (grep returned empty); REVOKE is safe. SQL: `REVOKE EXECUTE ON FUNCTION public.update_milog_verification(uuid,text,text,text,text,text) FROM authenticated;`
+  - recommended owner: review-by-eod; apply via Supabase SQL editor or MCP `apply_migration`
+
+- [Supabase] RLS always true: `score_challenge_attempts` INSERT policy "Anyone can create attempts"
+  - first seen: 2026-06-17, count: ongoing advisor warning
+  - link: supabase advisor security rls_policy_always_true
+  - status: deferred (table not in codebase TS/SQL — live-only table; Supabase MCP unavailable)
+  - why: Need to inspect table + understand intent before tightening. Likely needs `WITH CHECK (auth.uid() IS NOT NULL)` or role constraint.
+  - recommended owner: review-by-eod
+
+- [Sentry] TypeError: Cannot read properties of null (reading 'clear') — reach=5 users
+  - link: https://lexiclash.sentry.io/issues/120102540/
+  - status: deferred (Sentry MCP unavailable; stack trace inaccessible; .clear() callers in hooks/usePrevalidation.ts:190, hooks/useBossEffectExecutor.ts:256, hooks/useOpponentWordFeed.ts:104 — all use Map refs initialized with new Map(), so likely a PixiJS or different .clear() variant)
+  - why: No stack trace → can't confirm root cause without Sentry MCP
+  - recommended owner: review-by-eod; fetch Sentry issue 120102540 for frame
+
+- [Sentry] relation "profiles" does not exist — reach=5 users
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred (Sentry MCP unavailable; likely search_path mismatch in a SECURITY DEFINER function)
+  - why: Could be linked to mutable search_path advisors; need Sentry frame to confirm callsite
+  - recommended owner: review-by-eod
+
+- [Sentry] [CoinContext] Failed to add coins — reach=5 users
+  - link: https://lexiclash.sentry.io/issues/123033015/
+  - status: deferred (coin economy = human-queue per hard rules; Sentry MCP unavailable for stack trace)
+  - why: Economy logic = hard-banned autonomous change; needs human + full stack trace
+  - recommended owner: backend
