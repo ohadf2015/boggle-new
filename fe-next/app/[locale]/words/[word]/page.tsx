@@ -67,7 +67,10 @@ function getComboScore(wordLength: number, comboLevel: number): number {
   return calculateWordScore(dummyWord, comboLevel);
 }
 
-export const revalidate = 86400;
+// NOTE: no route-level `revalidate` — it conflicts with `dynamic = 'force-dynamic'`
+// above and made Next ISR-cache this route's metadata for 24h, so a deploy's
+// updated robots (noindex) wouldn't take effect until revalidation. force-dynamic
+// governs: metadata is computed per request and always reflects current code.
 export const dynamicParams = true;
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
