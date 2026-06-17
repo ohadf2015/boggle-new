@@ -677,3 +677,8 @@ bajar
 estudiar
 cocinar
 despertar
+grandota
+manaza
+manazo
+calorazo
+agarre
