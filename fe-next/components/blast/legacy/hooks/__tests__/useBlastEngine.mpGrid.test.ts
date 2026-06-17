@@ -34,29 +34,10 @@ vi.mock('@/components/singleplayer/game/hooks/useGridInit', () => ({
 
 // isLoaded: false prevents useBlastEngine's dead-end detection effect from
 // scheduling setTimeout(1500ms) on mount. None of these tests exercise word
-// validation or dead-end detection, so the dictionary is intentionally unloaded
-// to avoid leaking a real timer that outlives the fork process and causes
-// "Worker exited unexpectedly" in Vitest's fork pool teardown.
+// validation or dead-end detection, so the dictionary is intentionally unloaded.
 vi.mock('@/hooks/useDictionaryCache', () => ({
   useDictionaryCache: () => ({ checkWord: () => false, isLoaded: false }),
 }));
-
-// Intercept ALL timers for the entire file, then flush+restore after.
-// Belt-and-suspenders on top of isLoaded:false above: the global
-// QueryClientProvider (vitest.setup.ts, gcTime:0) schedules setTimeout(0)
-// GC sweeps after every unmount. If this file is the last in its fork, those
-// GC timers keep the event loop alive past teardownTimeout and the fork is
-// SIGKILL'd ("Worker exited unexpectedly").  vi.runAllTimers() in afterAll
-// drains them synchronously before vi.useRealTimers() restores the real clock.
-beforeAll(() => {
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
-});
-afterAll(() => {
-  // Discard pending fake timers without running them — running them (vi.runAllTimers)
-  // executes callbacks on already-unmounted React components and crashes the fork.
-  vi.clearAllTimers();
-  vi.useRealTimers();
-});
 
 const config: BlastGameConfig = {
   gridSize: 6,
@@ -100,11 +81,18 @@ describe('useBlastEngine — applyServerBoard skips redundant replacements (anti
     );
 
   it('does NOT replace tileStates when the server board equals the current board', () => {
+    // IMPORTANT: create initialTileStates ONCE outside renderHook.
+    // Passing `mkTiles()` directly inside the callback creates a new array reference
+    // on every render. useBlastEngine's initialTileStates sync effect has
+    // `[initialTileStatesFromOptions]` as its dep — a new ref triggers setTileStates
+    // → re-render → new mkTiles() ref → effect fires again → infinite render loop
+    // → fork OOM crash ("Worker exited unexpectedly").
+    const initialTiles = mkTiles();
     const { result } = renderHook(() =>
       useBlastEngine(config, {
         isMultiplayer: true,
         blastSeed: 123,
-        initialTileStates: mkTiles(),
+        initialTileStates: initialTiles,
         mpInitialGrid: SERVER_GRID,
       }),
     );
@@ -119,11 +107,12 @@ describe('useBlastEngine — applyServerBoard skips redundant replacements (anti
   });
 
   it('DOES replace tileStates when the server board diverges', () => {
+    const initialTiles = mkTiles(); // stable ref — see comment in test above
     const { result } = renderHook(() =>
       useBlastEngine(config, {
         isMultiplayer: true,
         blastSeed: 123,
-        initialTileStates: mkTiles(),
+        initialTileStates: initialTiles,
         mpInitialGrid: SERVER_GRID,
       }),
     );
