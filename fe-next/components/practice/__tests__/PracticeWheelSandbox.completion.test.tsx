@@ -5,7 +5,7 @@
  * rule short-circuits validation (no validator call).
  */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const validatorCheck = vi.fn();
@@ -84,8 +84,13 @@ describe('PracticeWheelSandbox completion integration (real WordWheelGame)', () 
 
     submitWord(['A', 'T', 'R']); // ATR
     await waitFor(() => expect(screen.getByTestId('practice-goal-indicator')).toHaveTextContent('1'));
+    // Flush pending passive effects so builtLettersRef resets to [] before next submit.
+    // Without this, handleLetterPress reads a stale ref still containing ATR's letters
+    // and incorrectly removes the center 'A' instead of adding it for the next word.
+    await act(async () => {});
     submitWord(['A', 'C', 'R']); // ACR
     await waitFor(() => expect(screen.getByTestId('practice-goal-indicator')).toHaveTextContent('2'));
+    await act(async () => {});
     submitWord(['A', 'E', 'S']); // AES
     await waitFor(() => {
       expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
