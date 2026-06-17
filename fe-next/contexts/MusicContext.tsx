@@ -135,6 +135,14 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentTrackRef = useRef<TrackKey | null>(null);
   const isTransitioningRef = useRef(false);
+  // Deferred fade-out stops, keyed by track. A bare `setTimeout(() => howl.stop())`
+  // is fire-and-forget: it nulls currentHowlRef synchronously but leaves the Howl
+  // PLAYING until it fires ~1s later. If the same track is re-entered inside that
+  // window (every Blast wave remounts <BlastGame>), play() lands on a still-playing
+  // Howl and Howler spawns a SECOND concurrent sound — the echo that stacks per
+  // wave until the tab freezes. Tracking the timers lets us cancel a pending stop
+  // before restarting a track so exactly one instance per Howl can ever exist.
+  const pendingStopsRef = useRef<Map<TrackKey, ReturnType<typeof setTimeout>>>(new Map());
   const isMutedRef = useRef(isMuted);
   const volumeRef = useRef(volume);
 
@@ -191,11 +199,38 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     return howl;
   }, []);
 
+  /** Cancel a track's pending deferred stop, if any. */
+  const cancelPendingStop = useCallback((key: TrackKey) => {
+    const pending = pendingStopsRef.current.get(key);
+    if (pending) {
+      clearTimeout(pending);
+      pendingStopsRef.current.delete(key);
+    }
+  }, []);
+
+  /**
+   * Stop `howl` after `ms`, tracking the timer so it can be cancelled if the
+   * track is re-entered before it fires. Replaces bare `setTimeout(stop)` calls
+   * that otherwise leave a Howl playing past the point where currentHowlRef has
+   * already been reassigned — the window in which a duplicate play() echoes.
+   */
+  const scheduleStop = useCallback((key: TrackKey, howl: Howl, ms: number) => {
+    cancelPendingStop(key);
+    const id = setTimeout(() => {
+      pendingStopsRef.current.delete(key);
+      howl.stop();
+    }, ms);
+    pendingStopsRef.current.set(key, id);
+  }, [cancelPendingStop]);
+
   // Cleanup on unmount
   useEffect(() => {
     const howls = howlsRef.current;
     const fadeTimeout = fadeTimeoutRef.current;
+    const pendingStops = pendingStopsRef.current;
     return () => {
+      pendingStops.forEach(clearTimeout);
+      pendingStops.clear();
       Object.values(howls).forEach(howl => howl.unload());
       if (fadeTimeout) clearTimeout(fadeTimeout);
     };
@@ -300,8 +335,9 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       if (key !== trackKey) {
         if (howl.playing()) {
           howl.fade(howl.volume(), 0, fadeOutMs);
-          setTimeout(() => howl.stop(), fadeOutMs);
+          scheduleStop(key as TrackKey, howl, fadeOutMs);
         } else {
+          cancelPendingStop(key as TrackKey);
           howl.stop();
         }
       }
@@ -311,6 +347,15 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       oldHowl.stop();
     }
 
+    // Single-instance guard: collapse any lingering playback of THIS track before
+    // (re)starting it. We only reach here when we genuinely intend to start the
+    // track (the same-track-already-playing case short-circuits above), so a
+    // still-playing Howl here is a zombie from a deferred fade-out — calling
+    // play() on it would spawn a second concurrent Howler sound (the echo).
+    // Cancelling the pending stop also keeps a stale timer from silencing the
+    // instance we're about to start.
+    cancelPendingStop(trackKey);
+    newHowl.stop();
     newHowl.volume(0);
     newHowl.play();
 
@@ -348,7 +393,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
         fadeToTrackRef.current?.(pendingTrack, pendingFadeOut, pendingFadeIn);
       }
     }, Math.max(fadeOutMs, fadeInMs));
-  }, [getOrCreateHowl, windowFocusedRef, pausedByVisibilityRef, pausedByBlurRef]);
+  }, [getOrCreateHowl, scheduleStop, cancelPendingStop, windowFocusedRef, pausedByVisibilityRef, pausedByBlurRef]);
 
   useEffect(() => { fadeToTrackRef.current = fadeToTrack; }, [fadeToTrack]);
 
@@ -423,11 +468,12 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   // auto-unlock listener. A backup effect here caused double-play.
 
   const stopMusic = useCallback((fadeOutMs = 1000) => {
-    Object.values(howlsRef.current).forEach(howl => {
+    Object.entries(howlsRef.current).forEach(([key, howl]) => {
       if (howl.playing()) {
         howl.fade(howl.volume(), 0, fadeOutMs);
-        setTimeout(() => howl.stop(), fadeOutMs);
+        scheduleStop(key as TrackKey, howl, fadeOutMs);
       } else {
+        cancelPendingStop(key as TrackKey);
         howl.stop();
       }
     });
@@ -435,7 +481,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     currentTrackRef.current = null;
     setCurrentTrack(null);
     setIsPlaying(false);
-  }, []);
+  }, [scheduleStop, cancelPendingStop]);
 
   const setVolume = useCallback((newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
