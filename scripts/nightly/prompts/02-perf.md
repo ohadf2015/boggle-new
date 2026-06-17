@@ -25,6 +25,8 @@ Find and fix the top 1-2 backend perf regressions AND the top 1-2 frontend perf 
 - **NO premature code-splitting** — only split chunks >200KB gzipped that have measurable LCP impact.
 - **Memory `feedback-no-symptom-silencing`**: don't raise perf budgets to silence warnings; fix the underlying slowness.
 
+**MCP connect timing (read before STEP 1):** the `supabase` MCP server connects a few seconds AFTER the lane starts (npx-stdio boot) — it is NOT in your toolset on turn 1. Do NOT conclude supabase is "unavailable" early. Read the brief first; the `mcp__supabase__*` tools appear within ~10s. If a tool you need is not yet listed, take one more step and re-check BEFORE falling back to the REST helper. Treat supabase as unavailable ONLY if a tool you actually CALL hangs past its timeout or errors — an empty toolset on turn 1 is just the server still connecting, not a dead server.
+
 ═══ STEP 1 — Backend (Supabase) ═══
 Use **supabase** MCP `execute_sql`:
   • Read top entries from `db_perf_top_query_audit` (last week) where `verdict <> 'ok'`. Memory `50-supabase-perf` documents this table.

@@ -51,6 +51,8 @@ Default = **ship if you can diagnose it**. The old "auth-adjacent = always defer
 
 **When unsure: ship + add a `recommended owner: review-by-eod` line to triage-queue.md** — don't defer the FIX, defer the AUDIT. A reversible commit can be reviewed at 9am; a queued ticket sits for weeks.
 
+**MCP connect timing (read before STEP 1):** the `sentry`/`supabase` MCP servers connect a few seconds AFTER the lane starts (npx-stdio boot) — they are NOT in your toolset on turn 1. Do NOT conclude a server is "unavailable" early. Read the brief / do your first non-MCP steps first; the `mcp__sentry__*` / `mcp__supabase__*` tools appear within ~10s. If a `mcp__supabase__*` tool you need is not yet listed, take one more step and re-check BEFORE falling back. Treat a server as unavailable ONLY if a tool you actually CALL hangs past its timeout or errors (the distinct case the "skip a hung MCP call, don't retry" rule covers) — an empty toolset on turn 1 is just the server still connecting, not a dead server.
+
 ═══ STEP 1 — Pull error inventory ═══
 Use the **sentry** MCP server (tools include `search_issues`, `get_issue`):
   • Filter: project lexiclash, lastSeen within 24h, level≥error

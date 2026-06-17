@@ -33,12 +33,16 @@ PROJECT_DIR="${PROJECT_DIR:-/Users/ohadfisher/git/boggle-new}"
 #   MCP_TOOL_TIMEOUT — hard wall-clock per tool call (ms). On exceed, Claude gets
 #                      a tool error and CONTINUES; it does not kill the process.
 #   MCP_TIMEOUT      — MCP server startup budget (ms); a dead server fails fast.
-# 60s/20s are deliberately generous for night one (Sentry MCP is HTTP/SSE, whose
-# first-byte budget has a 60s floor regardless — only the tool-call watchdog
-# honours sub-60s) so no legitimate slow query is clipped; tune DOWN after a
-# clean run. Both are overridable so the operator can retune without editing.
+# 60s tool-budget is generous (Sentry MCP is HTTP/SSE, whose first-byte budget has a
+# 60s floor regardless — only the tool-call watchdog honours sub-60s) so no legitimate
+# slow query is clipped. STARTUP budget raised 20s→45s on 2026-06-17: the supabase/sentry
+# servers boot via `npx -y <pkg>`, which does an npm-registry resolve round-trip on every
+# boot; steady-state that is ~2s, but on a slow-registry night it can exceed 20s and the
+# server is dropped → the lane reports "supabase MCP unavailable" and defers its fixes (the
+# 06-15/06-17 misses). 45s covers the resolve tail; a genuinely dead server still fails
+# well inside the 600–900s lane budgets. Both overridable so the operator can retune.
 export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
-export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
+export MCP_TIMEOUT="${MCP_TIMEOUT:-45000}"
 
 # --- session/usage-limit aware retry (root-cause fix 2026-06-09) --------------
 # On 2026-06-09 the shared 5h Claude usage window was exhausted mid-run (evening

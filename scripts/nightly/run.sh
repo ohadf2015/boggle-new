@@ -92,7 +92,10 @@ export NIGHTLY_DISABLED
 # A hung Sentry/Supabase MCP call now aborts in ~60s with a tool error instead of
 # stalling a lane until its multi-minute wall-clock ceiling (exit 124).
 export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
-export MCP_TIMEOUT="${MCP_TIMEOUT:-20000}"
+# Startup budget 20s→45s (2026-06-17): npx-stdio MCP boot (supabase/sentry) does an
+# npm-registry resolve per boot that can exceed 20s on a slow-registry night → server
+# dropped → lane reports "MCP unavailable". See lib/headless.sh for full rationale.
+export MCP_TIMEOUT="${MCP_TIMEOUT:-45000}"
 
 # Self-heal claude's bundled ripgrep exec bit. A claude update reinstalls the npm
 # package with the vendored `rg` as -rw-r--r-- (not +x) — every lane's Grep/Glob then
@@ -324,6 +327,17 @@ log "pre-lane WIP: $BASELINE_DIRTY dirty files (snapshot $RUN_SNAPSHOT; protect 
 NIGHTLY_AUTHORED_FILE="$(dirname "$RUN_LOG")/authored-${DATE_TAG}.list"
 : > "$NIGHTLY_AUTHORED_FILE"
 export NIGHTLY_AUTHORED="$NIGHTLY_AUTHORED_FILE"
+
+# --- MCP connectivity probe (observability) --------------------------------
+# Record a concrete supabase MCP auth-surface verdict in the run log BEFORE lanes run, so a
+# credential/reachability failure is VISIBLE — the 06-15/06-17 "supabase MCP unavailable"
+# misses were silent (lanes deferred their fixes with no preflight signal). The probe hits
+# the same Management API the supabase MCP tools authenticate against. Non-fatal: a fail is
+# logged + alerted but never blocks the run (lanes degrade to REST/skip on their own).
+. "$LIB_DIR/mcp-probe.sh"
+MCP_PROBE_LINE="$(probe_supabase_mcp)" || true
+log "$MCP_PROBE_LINE"
+[[ "$MCP_PROBE_LINE" == *fail:* ]] && tg_alert "⚠️ nightly preflight — $MCP_PROBE_LINE (lanes 01/02 supabase fixes will degrade to REST/skip)"
 
 # --- run lanes -------------------------------------------------------------
 LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense 09-monetization 10-dictionary)
