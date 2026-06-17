@@ -10,7 +10,11 @@ const BASE_URL = 'https://www.lexiclash.live';
 const PAGE_PATH = '/lexiclash-vs-wordwall-kahoot-quizlet';
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  await params;
+  const { locale } = await params;
+  // Body is Hebrew-only (RTL). Non-Hebrew routes exist only because of the [locale]
+  // dynamic segment and render the same Hebrew content — a near-duplicate. Canonical
+  // always points to /he; index only the Hebrew route. AdSense thin/dup sweep 2026-06-17.
+  const isHebrew = locale === 'he';
   const pageUrl = `${BASE_URL}/he${PAGE_PATH}`;
   return {
     title: 'LexiClash מול Wordwall, Kahoot ו-Quizlet — משחקי מילים לכיתה בעברית | השוואה',
@@ -39,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'he-IL': pageUrl,
       },
     },
-    robots: { index: true, follow: true },
+    robots: { index: isHebrew, follow: true },
   };
 }
 
