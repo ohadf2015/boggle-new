@@ -110,10 +110,19 @@ export default defineConfig({
       '**/reengagementEmail.test.ts',
     ],
     testTimeout: 10000,
-    pool: 'threads',
-    maxThreads: 4,
-    minThreads: 2,
-    useAtomics: true,
+    // pool:'forks' uses child_process.fork — each worker is a separate OS
+    // process, so memory is fully reclaimed between files. worker_threads
+    // ('threads') recycles heap across files; by file ~470 the accumulated
+    // memory exceeds the per-thread limit causing ERR_WORKER_OUT_OF_MEMORY.
+    // Forks also inherit NODE_OPTIONS (threads do not), which lets CI set
+    // a larger heap limit when needed.
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        maxForks: 4,
+        minForks: 1,
+      },
+    },
     teardownTimeout: 5000,
     hookTimeout: 10000,
     fileParallelism: true,
