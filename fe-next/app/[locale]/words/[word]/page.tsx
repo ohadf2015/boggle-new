@@ -4,6 +4,17 @@ import { notFound } from 'next/navigation';
 import { calculateWordScore, getComboBonus } from '@/shared/utils/scoring';
 import { InlineBannerAd } from '@/components/ads';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { parseWordLength } from '../_utils/wordListData';
+import { nLetterWordsMetadata, NLetterWordsView } from '../_nletter/NLetterWordsView';
+
+// /words/{n}-letter-words (e.g. 3-letter-words) is served by THIS dynamic route and
+// delegated to NLetterWordsView. It used to be a sibling [n]-letter-words route, but two
+// dynamic segments under /words/ conflicted and 404'd both. Detect the exact pattern.
+const N_LETTER_WORDS_RE = /^(\d+)-letter-words$/;
+function nLetterLengthFromParam(rawWord: string): ReturnType<typeof parseWordLength> {
+  const m = rawWord.match(N_LETTER_WORDS_RE);
+  return m ? parseWordLength(m[1]) : null;
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +86,11 @@ export const dynamicParams = true;
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale, word: rawWord } = await params;
+
+  // /words/{n}-letter-words → delegate to the N-letter-words content view's metadata.
+  const nLen = nLetterLengthFromParam(rawWord);
+  if (nLen) return nLetterWordsMetadata(locale, nLen);
+
   const word = sanitizeWord(rawWord);
   // Invalid word param → noindex (AdSense/GSC: never let a not-found leak index,follow).
   if (!word) return { title: 'Not Found', robots: { index: false, follow: false } };
@@ -125,6 +141,11 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 export default async function WordExplorerPage({ params }: PageParams) {
   const { locale, word: rawWord } = await params;
   const validLocale = (locale as Locale) || 'en';
+
+  // /words/{n}-letter-words → render the N-letter-words content view.
+  const nLen = nLetterLengthFromParam(rawWord);
+  if (nLen) return <NLetterWordsView locale={locale} n={nLen} />;
+
   const word = sanitizeWord(rawWord);
 
   if (!word) notFound();

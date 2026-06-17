@@ -1,25 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { InlineBannerAd } from '@/components/ads';
 import {
   getWordsByLength,
   groupByFirstLetter,
   getWordScore,
-  parseWordLength,
   VALID_LENGTHS,
   type WordLength,
 } from '../_utils/wordListData';
 import { getNLetterWordsFaqs } from '../_utils/wordPageFaqSchema';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
-export const dynamic = 'force-dynamic';
-
+// Private module (folder is `_nletter`, not a route). The /words/{n}-letter-words URLs
+// are served by the sibling [word] dynamic route, which delegates here. This used to be
+// its own `[n]-letter-words` route, but two dynamic siblings under /words/ ([word] +
+// [n]-letter-words) created a routing conflict that 404'd BOTH. See
+// docs/2026-06-17-adsense-thin-page-noindex-spec.md.
 const BASE_URL = 'https://www.lexiclash.live';
-
-interface PageParams {
-  params: Promise<{ locale: string; n: string }>;
-}
 
 const WORD_LENGTH_CONTENT: Record<number, { strategy: string; funFact: string; difficulty: string }> = {
   3: {
@@ -66,11 +63,7 @@ const WORD_LENGTH_CONTENT: Record<number, { strategy: string; funFact: string; d
   },
 };
 
-export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
-  const { locale, n: rawN } = await params;
-  const n = parseWordLength(rawN);
-  if (!n) return { title: 'Not Found' };
-
+export async function nLetterWordsMetadata(locale: string, n: WordLength): Promise<Metadata> {
   const title = `All ${n}-Letter Words | LexiClash Word Game`;
   const description = `Browse all ${n}-letter words in the LexiClash dictionary. See every valid ${n}-letter word with its score and play it in a real-time word game.`;
   const url = `${BASE_URL}/${locale}/words/${n}-letter-words`;
@@ -112,11 +105,7 @@ function buildSchemaJson(n: number, locale: string, words: string[]): string {
   return JSON.stringify([breadcrumb, itemList, faqSchema]);
 }
 
-export default async function NLetterWordsPage({ params }: PageParams) {
-  const { locale, n: rawN } = await params;
-  const n = parseWordLength(rawN) as WordLength | null;
-  if (!n) notFound();
-
+export async function NLetterWordsView({ locale, n }: { locale: string; n: WordLength }) {
   const words = getWordsByLength(n);
   const grouped = groupByFirstLetter(words);
   const sortedLetters = Object.keys(grouped).sort();
