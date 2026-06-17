@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { fireFireworks } from '@/utils/confettiUtils';
 import { InlineConfetti } from '@/components/effects/InlineConfetti';
 import {
   HIDDEN_ACHIEVEMENT_EVENT,
@@ -47,11 +46,13 @@ export default function HiddenAchievementListener() {
       // Konami easter egg, louder than a routine confetti burst. Cosmetic and
       // guarded: FX must never break the reveal or dedup (no-op under reduced
       // motion / cosy mode internally).
-      try {
-        fireFireworks(3, 2400);
-      } catch {
-        /* celebration is best-effort */
-      }
+      // Lazy-load confetti on fire (not at module load): this listener mounts
+      // from the global provider stack, so a static import would ship
+      // canvas-confetti in first-load JS on every page. Best-effort; a failed
+      // load/burst must never break the reveal.
+      void import('@/utils/confettiUtils')
+        .then(({ fireFireworks }) => fireFireworks(3, 2400))
+        .catch(() => {});
 
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setCurrent(null), REVEAL_MS);

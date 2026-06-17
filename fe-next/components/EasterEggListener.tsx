@@ -3,7 +3,6 @@
 import { useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useKonamiCode } from '@/hooks/useKonamiCode';
-import { fireFireworks } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
@@ -20,7 +19,11 @@ export default function EasterEggListener(): null {
     const now = Date.now();
     if (now - lastFiredRef.current < 3000) return;
     lastFiredRef.current = now;
-    fireFireworks(4, 2600);
+    // Lazy-load the confetti util on fire, not at module load. This listener is
+    // mounted from the GLOBAL provider stack, so a static import would pull
+    // canvas-confetti + confettiUtils into first-load JS on every page for a
+    // cosmetic easter egg almost no one triggers.
+    void import('@/utils/confettiUtils').then(({ fireFireworks }) => fireFireworks(4, 2600));
     toast(t('easterEgg.konami'), { icon: '🕹️', duration: 4000 });
   }, [t]);
 
