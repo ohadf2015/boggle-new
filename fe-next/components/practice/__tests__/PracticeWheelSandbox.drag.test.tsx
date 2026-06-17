@@ -107,10 +107,11 @@ describe('PracticeWheelSandbox drag-spell parity', () => {
   it('drag across 3 outer letters then release auto-submits', async () => {
     await act(async () => { render(<PracticeWheelSandbox />); });
     const wheel = screen.getByTestId('wheel-orbit');
-    // Sequence: pointerdown@idx 1 (outer), pointermove@idx 0 (different outer →
-    // engages drag, adds idx 1 then idx 0), pointermove@idx 2 (adds idx 2),
-    // pointerup → auto-submit (3 letters, ≥3 required → submit fires).
-    mockElementFromPoint([1, 0, 2]);
+    // Sequence: pointerdown@idx -1 (center), pointermove@idx 0 (outer → engages
+    // drag, adds center then outer 0), pointermove@idx 2 (adds outer 2),
+    // pointerup → submit fires. Word = center+outer[0]+outer[2] which satisfies
+    // handleSubmit's center-letter guard and reaches onValidateWord.
+    mockElementFromPoint([-1, 0, 2]);
     fireEvent.pointerDown(wheel, { clientX: 10, clientY: 10 });
     fireEvent.pointerMove(wheel, { clientX: 20, clientY: 10 });
     fireEvent.pointerMove(wheel, { clientX: 30, clientY: 10 });

@@ -133,6 +133,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     }
 
     const isCrazyGamesIframe = detectCrazyGamesSync();
+    let aborted = false;
 
     const checkSDK = async () => {
       let attempts = 0;
@@ -198,6 +199,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       while (!window.__crazyGamesReady && Date.now() < cgReadyDeadline) {
         await new Promise(resolve => setTimeout(resolve, 25));
       }
+      if (aborted) return;
       const inCgPortal =
         window.__crazyGamesEnvironment === 'crazygames' || isCrazyGamesIframe;
       if (window.CrazyGames?.SDK && inCgPortal) {
@@ -217,6 +219,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     };
 
     checkSDK();
+    return () => { aborted = true; };
   }, []);
 
   // Fetch CrazyGames user after SDK is ready
