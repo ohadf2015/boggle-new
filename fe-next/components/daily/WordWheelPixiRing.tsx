@@ -174,6 +174,10 @@ export default function WordWheelPixiRing({
     return () => {
       destroyed = true;
       removeRectListeners?.();
+      // Stop ticker BEFORE destroying children — otherwise a rAF-queued tick can
+      // fire after Graphics contexts are nulled → "Cannot read properties of null
+      // (reading 'clear')" (Sentry 1CW). Mirrors GameCanvas.tsx teardown order.
+      try { app.ticker?.stop(); } catch { /* */ }
       try { app.destroy(true, { children: true }); } catch { /* */ }
       while (el.firstChild) el.removeChild(el.firstChild);
     };

@@ -450,6 +450,12 @@ module.exports = {
           "50%":  { borderColor: "#FF3366", backgroundColor: "rgba(255,51,102,0.08)" },
           "100%": { borderColor: "currentColor", backgroundColor: "transparent" },
         },
+        // Shiritori pressure-cue: border grows black→orange→red over 5s, signals urgency to act
+        "pressure-border": {
+          "0%":   { boxShadow: "inset 0 0 0 3px #000000" },
+          "60%":  { boxShadow: "inset 0 0 0 4px #FF6B35" },
+          "100%": { boxShadow: "inset 0 0 0 6px #FF3366" },
+        },
         // Subtle pulse for CTA buttons
         "pulse-subtle": {
           "0%, 100%": { transform: "scale(1)", boxShadow: "var(--shadow-lg)" },
@@ -603,6 +609,7 @@ module.exports = {
         "neo-pop": "neo-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-shake": "neo-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
+        "pressure-border": "pressure-border 5s linear forwards",
         "neo-damage-drip": "neo-damage-drip 0.8s ease-out",
         "neo-reject-flash": "neo-reject-flash 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",

@@ -283,19 +283,24 @@ export default function ShiritoriSoloPage() {
     <form onSubmit={submit} className="mx-auto w-full max-w-2xl space-y-2">
       {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
       <div className="flex items-end gap-2">
-        <input
-          ref={inputRef}
-          type="text"
-          dir="ltr"
-          value={input}
-          onChange={(e) => { setInput(e.target.value); if (error) setError(null); }}
-          placeholder={t('shiritori.solo.inputPlaceholder')}
-          aria-label={t('shiritori.solo.inputPlaceholder')}
-          autoComplete="off"
-          spellCheck={false}
-          disabled={state.turn !== 'player' || pending}
-          className="min-w-0 flex-1 rounded-neo border-3 border-black bg-neo-cream px-4 py-3 text-center font-neo-display text-xl font-black text-neo-navy shadow-hard outline-none focus:border-neo-purple disabled:opacity-50"
-        />
+        <div className="relative min-w-0 flex-1">
+          <input
+            ref={inputRef}
+            type="text"
+            dir="ltr"
+            value={input}
+            onChange={(e) => { setInput(e.target.value); if (error) setError(null); }}
+            placeholder={t('shiritori.solo.inputPlaceholder')}
+            aria-label={t('shiritori.solo.inputPlaceholder')}
+            autoComplete="off"
+            spellCheck={false}
+            disabled={state.turn !== 'player' || pending}
+            className="w-full rounded-neo border-3 border-black bg-neo-cream px-4 py-3 text-center font-neo-display text-xl font-black text-neo-navy shadow-hard outline-none focus:border-neo-purple disabled:opacity-50"
+          />
+          {state.turn === 'player' && !pending && !ended && (
+            <div className="pointer-events-none absolute inset-0 rounded-neo animate-pressure-border" aria-hidden="true" />
+          )}
+        </div>
         <button
           type="button"
           onClick={() => setState((s) => playerGivesUp(s))}

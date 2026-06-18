@@ -726,6 +726,16 @@ export function useGridInteraction({
   useEffect(() => {
     const element = gridRef.current;
     if (!element) return;
+    // Pre-build on mount so first drag hits the fast path (no querySelectorAll on the interaction path).
+    const buildCellNodeMap = () => {
+      const cells = element.querySelectorAll<HTMLElement>('[data-row][data-col]');
+      if (cells.length > 0) {
+        const map = new Map<string, HTMLElement>();
+        cells.forEach((el) => map.set(`${el.dataset.row}-${el.dataset.col}`, el));
+        cellNodeMapRef.current = map;
+      }
+    };
+    buildCellNodeMap();
     const invalidateCache = () => {
       gridMeasurementsRef.current = null;
       cellNodeMapRef.current = null;

@@ -418,3 +418,14 @@ cage
 cake
 cane
 cart
+ok
+ribbit
+bonk
+conk
+honk
+whoop
+whee
+howdy
+meow
+oink
+baa

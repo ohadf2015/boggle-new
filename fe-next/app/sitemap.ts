@@ -481,9 +481,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     });
   });
 
-  // ─── Programmatic SEO: Words starting with letter (EN-only: 26 URLs) ───
+  // ─── Programmatic SEO: Words starting with letter (EN-only, excluding dead letters) ───
   // Same English-only-indexed pattern as the N-letter pages above.
-  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  // Sync with DEAD_LETTERS in app/[locale]/words/starting-with/[letter]/page.tsx
+  const SITEMAP_DEAD_LETTERS = new Set(['c', 'f', 'i', 'o', 'y']);
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('').filter(l => !SITEMAP_DEAD_LETTERS.has(l));
   alphabet.forEach((letter) => {
     addForLocaleOnly(routes, `/words/starting-with/${letter}`, {
       lastModified: LAST_DEPLOYED,
