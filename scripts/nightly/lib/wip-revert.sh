@@ -22,21 +22,24 @@
 # fully closed. The gate (lint/test/build) is the authoritative check on
 # whatever ultimately ships.
 
-# snapshot_pre_lane → echoes a snapshot dir holding a full mirror of the tree
-# (heavy dirs excluded) plus a `.wip-protect.list` of paths dirty RIGHT NOW.
+# snapshot_pre_lane → echoes a snapshot dir holding the UNTRACKED-non-ignored files
+# (the only ones a revert cannot restore from HEAD) plus a `.wip-protect.list` of
+# paths dirty RIGHT NOW.
 snapshot_pre_lane() {
   local snap
   snap=$(mktemp -d -t lexi-snap.XXXXXX)
-  # Copy ONLY the files a revert can ever restore: tracked files (consumed by
-  # revert_to_pre_lane) + untracked-non-ignored files (consumed by revert_authored).
-  # git itself enumerates that exact set. A gitignored path is never on any revert
-  # list (both `git diff` and `git ls-files --others --exclude-standard` skip
-  # ignored), so omitting it is loss-free — and ~37x fewer files: the old blanket
-  # rsync mirror copied ~40k files, 97% of them gitignored build junk
-  # (node_modules/.next/native build dirs/etc), multi-GB and ~27min, the dominant
-  # per-lane wall-clock cost. This copies only the ~11.5k revert-relevant files
-  # (~170M, ~2s). Driving the list from git makes it immune to any gitignore
-  # parser divergence — git defines the set.
+  # Copy ONLY untracked-non-ignored files. These have NO version in HEAD, so the
+  # snapshot is the only place revert_authored's drop-and-re-gate path can restore
+  # them from. TRACKED files are deliberately NOT copied: both revert paths now
+  # restore a tracked file from HEAD (revert_authored has always done this; see the
+  # HEAD-fallback in revert_to_pre_lane below), and a non-protected tracked path's
+  # pre-lane content ALWAYS equals HEAD (any file dirty at snapshot time lands in
+  # .wip-protect.list and is never reverted), so HEAD restore is exact, not
+  # approximate. Snapshotting tracked files was pure tax: the tracked tree grew to
+  # ~1GB / 11.7k files as committed media (daily-content trailers, fe-next assets,
+  # output/) accreted, turning the per-lane copy into ~10-16min of dead wall-clock
+  # × every lane. Untracked WIP is a handful of files → the snapshot is ~instant.
+  # Gitignored paths are still skipped (--exclude-standard) — never on any revert list.
   #
   # Piped through tar, NOT `rsync --files-from`: macOS's openrsync ABORTS the
   # entire transfer on the first un-stat-able listed path (e.g. a dangling tracked
@@ -45,7 +48,7 @@ snapshot_pre_lane() {
   # symlinks without stat'ing their targets and tolerates the full list. --null/-T
   # keeps it correct for paths with spaces/newlines.
   ( cd "$PROJECT_DIR" 2>/dev/null \
-    && { git ls-files -z; git ls-files --others --exclude-standard -z; } \
+    && git ls-files --others --exclude-standard -z \
        | tar -cf - --null -T - 2>/dev/null ) \
     | tar -xf - -C "$snap" 2>/dev/null || true
   # Founder's pre-existing dirty set: tracked (unstaged + staged) + untracked.
@@ -173,12 +176,19 @@ revert_to_pre_lane() {
     if [ -s "$protect" ] && grep -qxF -- "$rel" "$protect"; then
       continue   # founder's pre-existing WIP — never revert
     fi
-    if [ -e "$snap/$rel" ]; then
-      # lane modified or deleted a file that existed pre-lane → restore it
+    if git -C "$PROJECT_DIR" cat-file -e "HEAD:$rel" 2>/dev/null; then
+      # Committed in HEAD → restore from HEAD. Tracked files are no longer in the
+      # snapshot (see snapshot_pre_lane); HEAD is the authoritative pre-lane content
+      # for any non-protected tracked path (a dirty-at-snapshot path is protected
+      # above and never reaches here). Matches revert_authored's HEAD-fallback, and
+      # is never older than HEAD so it can't stomp a concurrent session's commit.
+      git -C "$PROJECT_DIR" checkout -q HEAD -- "$rel" 2>/dev/null || true
+    elif [ -e "$snap/$rel" ]; then
+      # Untracked at run start (in the snapshot, not in HEAD) → restore snapshot copy.
       mkdir -p "$PROJECT_DIR/$(dirname "$rel")" 2>/dev/null || true
       cp -p "$snap/$rel" "$PROJECT_DIR/$rel" 2>/dev/null || true
     else
-      # lane added (and staged) a new tracked path absent from the snapshot → drop
+      # lane added (and staged) a new tracked path absent from HEAD and snapshot → drop
       ( cd "$PROJECT_DIR" && git rm -f --quiet -- "$rel" 2>/dev/null ) \
         || rm -f "$PROJECT_DIR/$rel" 2>/dev/null || true
     fi

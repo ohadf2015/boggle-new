@@ -133,11 +133,13 @@ EMPTY=$(mktemp); backup_dropped_authored "$EMPTY" "" && assert "empty dest → n
 rm -f "$EMPTY"
 teardown
 
-echo "── wip-revert: snapshot contains exactly the revert-relevant set (tracked + untracked-non-ignored), never gitignored junk ──"
-# 10) snapshot_pre_lane must copy every file a revert can restore — tracked files
-# (revert_to_pre_lane) AND untracked-non-ignored files (revert_authored's
-# drop-and-re-gate path, lib line ~109) — but MUST NOT copy gitignored build
-# junk (never on any revert list; 97% of the old blanket mirror, the snapshot tax).
+echo "── wip-revert: snapshot copies ONLY untracked-non-ignored files (tracked restore from HEAD), never gitignored junk ──"
+# 10) snapshot_pre_lane must copy the files a revert cannot get anywhere else:
+# untracked-non-ignored files (no HEAD version → revert_authored restores from the
+# snapshot). It MUST NOT copy tracked files — those are restored from HEAD by both
+# revert paths (HEAD-fallback), so snapshotting them is pure tax: the tracked tree
+# grew to ~1GB / 11.7k files (committed media), making the per-lane copy ~10-16min.
+# It still MUST NOT copy gitignored build junk (never on any revert list).
 setup
 printf 'node_modules/\nignored.log\n' > "$PROJECT_DIR/.gitignore"
 ( cd "$PROJECT_DIR"; git add .gitignore; git commit -qm gitignore )
@@ -146,17 +148,49 @@ printf 'ignored junk\n'              > "$PROJECT_DIR/ignored.log"             # 
 mkdir -p "$PROJECT_DIR/node_modules/pkg"
 printf 'dep\n'                       > "$PROJECT_DIR/node_modules/pkg/index.js"  # must NOT be snapshotted
 SNAP=$(snapshot_pre_lane)
-assert "snapshot is non-empty (rsync --files-from honored on this platform)" \
+assert "snapshot is non-empty (tar honored the file list on this platform)" \
   "[ -n \"\$(find \"\$SNAP\" -type f ! -name '.wip-protect.list')\" ]"
-assert "tracked file IS in snapshot (revert_to_pre_lane can restore it)" \
-  "[ -e \"\$SNAP/src/tracked.ts\" ]"
-assert "untracked-non-ignored file IS in snapshot (revert_authored can restore it)" \
+assert "untracked-non-ignored file IS in snapshot (revert_authored has no HEAD to restore from)" \
   "[ -e \"\$SNAP/src/untracked-new.ts\" ]"
+assert "tracked committed file is NOT in snapshot (restored from HEAD — the snapshot tax)" \
+  "[ ! -e \"\$SNAP/src/tracked.ts\" ]"
 assert "gitignored file is NOT in snapshot (the snapshot tax)" \
   "[ ! -e \"\$SNAP/ignored.log\" ]"
 assert "gitignored dir is NOT in snapshot" \
   "[ ! -e \"\$SNAP/node_modules/pkg/index.js\" ]"
 rm -rf "$SNAP"
+teardown
+
+echo "── wip-revert: revert_to_pre_lane restores tracked files from HEAD when absent from snapshot ──"
+# 11) The contract that makes #10 loss-free: a tracked file the lane changed is no
+# longer in the snapshot, so revert_to_pre_lane must restore it from HEAD (not git-rm
+# it). Proves the HEAD-fallback that revert_authored already had (lib ~line 114).
+setup
+SNAP=$(snapshot_pre_lane)
+assert "tracked file is NOT in snapshot (precondition for HEAD-fallback)" \
+  "[ ! -e \"\$SNAP/src/tracked.ts\" ]"
+printf 'lane edited this\n' > "$PROJECT_DIR/src/tracked.ts"
+revert_to_pre_lane "$SNAP"
+assert "lane edit to a committed file (absent from snapshot) is restored from HEAD" \
+  "[ \"\$(cat \"\$PROJECT_DIR/src/tracked.ts\")\" = 'committed v1' ]"
+assert "the committed file still EXISTS (HEAD-fallback, never git-rm'd)" \
+  "[ -f \"\$PROJECT_DIR/src/tracked.ts\" ]"
+teardown
+
+# 12) THE DATA-LOSS GUARD under the new contract: a founder file dirty BEFORE the
+# snapshot is in the protect list AND absent from the snapshot. The protect `continue`
+# MUST fire before the HEAD-fallback — otherwise revert would overwrite founder WIP
+# with HEAD content (silent loss). This is the regression that the absent-snapshot
+# design could introduce; assert it explicitly.
+setup
+printf 'FOUNDER wip before snapshot\n' > "$PROJECT_DIR/src/tracked.ts"   # dirty BEFORE snapshot
+SNAP=$(snapshot_pre_lane)
+assert "founder-dirty tracked file is also absent from snapshot (worst case)" \
+  "[ ! -e \"\$SNAP/src/tracked.ts\" ]"
+printf 'lane edited B\n' > "$PROJECT_DIR/docs/keep.md"   # a lane edit elsewhere drives the revert loop
+revert_to_pre_lane "$SNAP"
+assert "founder WIP is preserved — protect-list skip wins over HEAD-fallback" \
+  "[ \"\$(cat \"\$PROJECT_DIR/src/tracked.ts\")\" = 'FOUNDER wip before snapshot' ]"
 teardown
 
 echo
