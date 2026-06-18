@@ -135,7 +135,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
 
       // Notify recipient via Socket.IO (online) + push (offline)
       broadcastToUser(io, data.friendUserId, 'friends:challengeReceived', challengeData);
-      notifyGameInvite(data.friendUserId, fromProfile.username, roomCode, authUserId).catch(() => {});
+      notifyGameInvite(data.friendUserId, fromProfile.displayName || fromProfile.username, roomCode, authUserId).catch(() => {});
 
       // Confirm to sender
       socket.emit('friends:challengeSent', challengeData);
@@ -236,7 +236,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       broadcastToUser(io, challenge.challenger_id, 'friends:challengeAccepted', acceptedData);
       notifyChallengeAccepted(
         challenge.challenger_id,
-        challengedProfile.username,
+        challengedProfile.displayName || challengedProfile.username,
         result.roomCode!,
         authUserId
       ).catch(() => {});
@@ -335,7 +335,7 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
       broadcastToUser(io, challenge.challenger_id, 'friends:challengeDeclined', declinedData);
       notifyChallengeDeclined(
         challenge.challenger_id,
-        challengedProfile?.username ?? 'Someone',
+        challengedProfile?.displayName || challengedProfile?.username || '',
         authUserId
       ).catch(() => {});
 

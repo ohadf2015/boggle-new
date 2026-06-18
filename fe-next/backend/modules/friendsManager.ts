@@ -107,6 +107,14 @@ export async function sendFriendRequest(
   toUserId: string
 ): Promise<{ success: boolean; request?: FriendRequest; errorCode?: string; message?: string }> {
   try {
+    if (fromUserId === toUserId) {
+      return {
+        success: false,
+        errorCode: 'CANNOT_ADD_SELF',
+        message: 'You cannot send a friend request to yourself',
+      };
+    }
+
     const supabase = getSupabase();
     if (!supabase) {
       logger.error('FRIENDS_MANAGER', 'Supabase client not available');

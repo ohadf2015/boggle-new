@@ -15,6 +15,7 @@ import {
 import Avatar from '@/components/Avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveDisplayName } from '@/lib/displayName';
 import type { Friend } from '@/utils/friends';
 
 interface AddFriendDialogProps {
@@ -168,7 +169,7 @@ export function AddFriendDialog({
                   />
                   <div className="min-w-0">
                     <p className="font-black truncate text-neo-black dark:text-neo-white">
-                      {searchUser.displayName || searchUser.username}
+                      {resolveDisplayName([searchUser.displayName, searchUser.username], t('friends.aPlayer'))}
                     </p>
                     <p className="text-xs font-bold text-current/60 truncate">
                       @{searchUser.username}

@@ -204,7 +204,7 @@ const sv = {
       "adminBadge": "Adminförhandsvisning",
       "adminOnly": "Shiritori Solo är endast en admin-förhandsvisning.",
       "headPrompt": "Nästa ord börjar med:",
-      "inputPlaceholder": "Skriv ett hiragana-ord",
+      "inputPlaceholder": "Håll kedjan vid liv…",
       "submit": "Skicka",
       "checking": "Kontrollerar…",
       "giveUp": "Ge upp",
@@ -6810,6 +6810,7 @@ const sv = {
     "noUsersFound": "Inga användare hittades",
     "pending": "Väntar",
     "pendingRequests": "Väntande förfrågningar",
+    "aPlayer": "en spelare",
     "requestReceivedToast": "{{name}} skickade en vänförfrågan",
     "challengeDeclinedToast": "{{name}} avböjde din utmaning",
     "socialBadge": "{count} vänaviseringar",
@@ -6885,7 +6886,9 @@ const sv = {
         "notFriends": "Ni måste vara vänner för att skicka utmaningar.",
         "rateLimited": "Sakta ner — vänta lite innan du försöker igen.",
         "timeout": "Utmaningen tog för lång tid. Försök skicka igen.",
-        "validation": "Kunde inte skicka utmaningen. Kolla detaljerna och försök igen."
+        "validation": "Kunde inte skicka utmaningen. Kolla detaljerna och försök igen.",
+        "alreadySent": "Du har redan en väntande utmaning med hen.",
+        "cannotChallengeSelf": "Du kan inte utmana dig själv."
       }
     },
     "copyInviteLink": "Kopiera inbjudningslänk",

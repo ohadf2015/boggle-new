@@ -107,6 +107,7 @@ export interface FriendChallenge {
   id: string;
   challengerId: string;
   challengerUsername: string;
+  challengerDisplayName?: string;
   challengerAvatarImage?: string;
   challengerAvatarEmoji: string;
   challengerAvatarColor: string;

@@ -245,6 +245,7 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
       created_at,
       profiles!friend_challenges_challenger_id_fkey (
         username,
+        display_name,
         avatar_emoji,
         avatar_color
       )
@@ -268,6 +269,7 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
     // PostgREST returns a forward (many-to-one) FK embed as a single object, not an array.
     profiles: {
       username: string;
+      display_name?: string | null;
       avatar_emoji?: string;
       avatar_color?: string;
     } | null;
@@ -278,6 +280,7 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
       id: c.id,
       challengerId: c.challenger_id,
       challengerUsername: challenger?.username || 'Unknown',
+      challengerDisplayName: challenger?.display_name ?? undefined,
       challengerAvatarEmoji: challenger?.avatar_emoji || '😊',
       challengerAvatarColor: challenger?.avatar_color || '#4F46E5',
       challengeId: c.challenge_id,

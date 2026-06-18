@@ -117,7 +117,7 @@ const ja = {
       "adminBadge": "管理者プレビュー",
       "adminOnly": "しりとりソロは管理者専用のプレビューです。",
       "headPrompt": "次の言葉の最初の文字：",
-      "inputPlaceholder": "ひらがなで入力",
+      "inputPlaceholder": "チェーンを繋げ…",
       "submit": "送信",
       "checking": "確認中…",
       "giveUp": "降参",
@@ -6805,6 +6805,7 @@ const ja = {
     "noUsersFound": "ユーザーが見つかりません",
     "pending": "保留中",
     "pendingRequests": "保留中のリクエスト",
+    "aPlayer": "プレイヤー",
     "requestReceivedToast": "{{name}}さんからフレンドリクエストが届きました",
     "challengeDeclinedToast": "{{name}}さんがチャレンジを辞退しました",
     "socialBadge": "{count}件のフレンド通知",
@@ -6888,7 +6889,9 @@ const ja = {
         "notFriends": "チャレンジを送るにはフレンドである必要があります。",
         "rateLimited": "少し待ってから再試行してください。",
         "timeout": "チャレンジがタイムアウトしました。もう一度お試しください。",
-        "validation": "チャレンジを送信できませんでした。内容を確認してください。"
+        "validation": "チャレンジを送信できませんでした。内容を確認してください。",
+        "alreadySent": "その相手とのチャレンジはすでに送信済みです。",
+        "cannotChallengeSelf": "自分自身にチャレンジはできません。"
       }
     },
     "backToFriends": "フレンドに戻る",

@@ -24,6 +24,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { cn } from '@/lib/utils';
+import { resolveDisplayName } from '@/lib/displayName';
 import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import Avatar from '@/components/Avatar';
 import { FriendRow } from './FriendRow';
@@ -113,22 +114,24 @@ const FriendsList: React.FC<FriendsListProps> = ({
     giftSocket.on('gift:receive', handleGiftReceive);
 
     // When a challenge we SENT gets accepted, navigate sender to the room
-    const handleChallengeAccepted = (data: { roomCode: string; toUsername?: string }) => {
-      toast.success(t('friends.challenges.friendAccepted', { name: data.toUsername || '' }));
+    const handleChallengeAccepted = (data: { roomCode: string; toUsername?: string; toDisplayName?: string }) => {
+      const name = resolveDisplayName([data.toDisplayName, data.toUsername], t('friends.aPlayer', 'a player'));
+      toast.success(t('friends.challenges.friendAccepted', { name }));
       router.push(`/${language}/multiplayer?room=${data.roomCode}`);
     };
     giftSocket.on('friends:challengeAccepted', handleChallengeAccepted);
 
     // Toast when a new challenge arrives
-    const handleChallengeReceived = (data: { fromUsername?: string }) => {
-      toast(t('friends.challenges.received', { name: data.fromUsername || '' }), { icon: '⚔️' });
+    const handleChallengeReceived = (data: { fromUsername?: string; fromDisplayName?: string }) => {
+      const name = resolveDisplayName([data.fromDisplayName, data.fromUsername], t('friends.aPlayer', 'a player'));
+      toast(t('friends.challenges.received', { name }), { icon: '⚔️' });
     };
     giftSocket.on('friends:challengeReceived', handleChallengeReceived);
 
     // Toast when a challenge we SENT gets declined
-    const handleChallengeDeclined = (data: { toUserId?: string; fromUserId?: string; fromUsername?: string; toUsername?: string }) => {
+    const handleChallengeDeclined = (data: { toUserId?: string; fromUserId?: string; fromUsername?: string; toUsername?: string; toDisplayName?: string }) => {
       // Only toast the challenger (fromUserId === challenger). Decliner already sees UI feedback.
-      const name = data.toUsername || '';
+      const name = resolveDisplayName([data.toDisplayName, data.toUsername], t('friends.aPlayer', 'a player'));
       toast(t('friends.challengeDeclinedToast', { name }), { icon: '🚫' });
     };
     giftSocket.on('friends:challengeDeclined', handleChallengeDeclined);
@@ -156,7 +159,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
     // Toast when a new friend request arrives
     const handleRequestReceived = (data: { fromUsername?: string; fromDisplayName?: string }) => {
-      const name = data.fromDisplayName || data.fromUsername || '';
+      const name = resolveDisplayName([data.fromDisplayName, data.fromUsername], t('friends.aPlayer', 'a player'));
       toast(t('friends.requestReceivedToast', { name }), { icon: '👋' });
     };
     giftSocket.on('friends:requestReceived', handleRequestReceived);
@@ -362,6 +365,8 @@ const FriendsList: React.FC<FriendsListProps> = ({
         result.code === 'RATE_LIMITED' ? t('friends.challenges.errors.rateLimited', fallback) :
         result.code === 'TIMEOUT' ? t('friends.challenges.errors.timeout', fallback) :
         result.code === 'VALIDATION_FAILED' ? t('friends.challenges.errors.validation', fallback) :
+        result.code === 'CHALLENGE_ALREADY_SENT' ? t('friends.challenges.errors.alreadySent', fallback) :
+        result.code === 'CANNOT_CHALLENGE_SELF' ? t('friends.challenges.errors.cannotChallengeSelf', fallback) :
         fallback;
       toast.error(msg);
       throw new Error(result.code);
@@ -745,7 +750,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   {outgoingRequests.map(req => (
                     <div key={req.id} className="flex items-center gap-2 text-sm">
                       <Avatar avatarImage={req.fromAvatarImage} customAvatar={req.fromCustomAvatar} size="sm" />
-                      <span className={cn('flex-1', isDark ? 'text-gray-300' : 'text-gray-600')}>{req.fromUsername}</span>
+                      <span className={cn('flex-1', isDark ? 'text-gray-300' : 'text-gray-600')}>{resolveDisplayName([req.fromDisplayName, req.fromUsername], t('friends.aPlayer', 'a player'))}</span>
                       <span className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-400')}>
                         ({t('friends.pending')})
                       </span>

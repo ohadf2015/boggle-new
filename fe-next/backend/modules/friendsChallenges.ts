@@ -46,6 +46,10 @@ export async function sendChallenge(
   }
 ): Promise<{ success: boolean; challenge?: Challenge; errorCode?: string }> {
   try {
+    if (challengerId === challengedId) {
+      return { success: false, errorCode: 'CANNOT_CHALLENGE_SELF' };
+    }
+
     const isFriend = await areFriends(challengerId, challengedId);
     if (!isFriend) {
       return { success: false, errorCode: 'NOT_FRIENDS' };
@@ -55,6 +59,21 @@ export async function sendChallenge(
     if (!supabase) {
       logger.error('FRIENDS_MANAGER', 'Supabase client not available');
       return { success: false, errorCode: 'SERVER_ERROR' };
+    }
+
+    // Guard against duplicate/spammed invites: one live pending challenge per
+    // (challenger -> challenged) pair. No DB unique constraint exists, so a
+    // double-click would otherwise insert N pending rows.
+    const { data: existingPending } = await supabase
+      .from('friend_challenges')
+      .select('id')
+      .eq('challenger_id', challengerId)
+      .eq('challenged_id', challengedId)
+      .eq('status', 'pending')
+      .maybeSingle();
+
+    if (existingPending) {
+      return { success: false, errorCode: 'CHALLENGE_ALREADY_SENT' };
     }
 
     const { data, error } = await supabase

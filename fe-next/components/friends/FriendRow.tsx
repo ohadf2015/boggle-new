@@ -6,6 +6,7 @@ import { Target, ChevronRight, Clock, Gift, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveDisplayName } from '@/lib/displayName';
 import type { Friend } from '@/utils/friends';
 
 interface FriendRowProps {
@@ -138,7 +139,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
           compact ? 'text-xs' : 'text-sm',
           isDark ? 'text-white' : 'text-gray-900'
         )}>
-          {friend.displayName || friend.username}
+          {resolveDisplayName([friend.displayName, friend.username], t('friends.aPlayer', 'a player'))}
         </p>
         {!compact && (
           <div className="flex items-center gap-1">

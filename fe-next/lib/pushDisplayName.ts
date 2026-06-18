@@ -17,21 +17,11 @@
  */
 
 import type { PushLocale } from '@/backend/utils/pushTranslations';
+import { isPlaceholderName } from './displayName';
 
-/**
- * True when `name` is a system-generated placeholder rather than a name the
- * user chose. Matches the DB defaults (`Player_<hex>`, `Player-XXXX`,
- * `Guest_*`, bare `Guest`) and empty/whitespace/nullish. A separator after
- * "Player"/"Guest" is required so a deliberately chosen handle like
- * "PlayerOne" is treated as real.
- */
-export function isPlaceholderName(name: string | null | undefined): boolean {
-  if (name == null) return true;
-  const trimmed = name.trim();
-  if (trimmed === '') return true;
-  // Player_<hex>, Player-XXXX, Guest_1234, or bare "Guest".
-  return /^(player[_-]|guest($|[_-]))/i.test(trimmed);
-}
+// Re-exported for back-compat: the canonical implementation now lives in
+// `lib/displayName.ts` so UI and backend share one placeholder definition.
+export { isPlaceholderName };
 
 /** Localized generic noun used when no real name is recoverable. */
 const RIVAL_GENERIC: Record<PushLocale, string> = {

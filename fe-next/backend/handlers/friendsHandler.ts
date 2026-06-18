@@ -107,7 +107,7 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
       // Notify recipient via Socket.IO (online) + push (offline)
       broadcastToUser(io, data.targetUserId, 'friends:requestReceived', requestData);
-      notifyFriendRequest(data.targetUserId, fromProfile.username, authUserId).catch(() => {});
+      notifyFriendRequest(data.targetUserId, fromProfile.displayName || fromProfile.username, authUserId).catch(() => {});
 
       // Confirm to sender
       socket.emit('friends:requestSent', requestData);
@@ -208,7 +208,7 @@ export function registerFriendsHandlers(io: Server, socket: Socket): void {
 
       // Notify sender via Socket.IO (online) + push (offline)
       broadcastToUser(io, senderId, 'friends:requestAccepted', acceptedData);
-      notifyFriendAccepted(senderId, recipientProfile.username, recipientId).catch(() => {});
+      notifyFriendAccepted(senderId, recipientProfile.displayName || recipientProfile.username, recipientId).catch(() => {});
 
       // Confirm to recipient
       socket.emit('friends:requestAccepted', acceptedData);

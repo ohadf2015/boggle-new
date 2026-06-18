@@ -117,7 +117,7 @@ const he = {
       "adminBadge": "תצוגה לאדמין",
       "adminOnly": "שיריטורי לבד זמין רק לאדמינים.",
       "headPrompt": "המילה הבאה מתחילה ב־",
-      "inputPlaceholder": "הקלידו מילה ביראגנה",
+      "inputPlaceholder": "שמרו על השרשרת…",
       "submit": "שליחה",
       "checking": "בודק…",
       "giveUp": "אני נכנע",
@@ -6809,6 +6809,7 @@ const he = {
     "noUsersFound": "לא נמצאו משתמשים",
     "pending": "ממתין",
     "pendingRequests": "בקשות ממתינות",
+    "aPlayer": "שחקן",
     "requestReceivedToast": "{{name}} שלח/ה לך בקשת חברות",
     "challengeDeclinedToast": "{{name}} דחה/תה את האתגר שלך",
     "socialBadge": "{count} התראות חברים",
@@ -6884,7 +6885,9 @@ const he = {
         "notFriends": "צריך להיות חברים כדי לשלוח אתגר.",
         "rateLimited": "רגע, חכו שנייה לפני ניסיון נוסף.",
         "timeout": "האתגר נכשל. נסו לשלוח שוב.",
-        "validation": "לא הצלחנו לשלוח את האתגר. בדקו את הפרטים ונסו שוב."
+        "validation": "לא הצלחנו לשלוח את האתגר. בדקו את הפרטים ונסו שוב.",
+        "alreadySent": "כבר יש לכם אתגר ממתין מולו.",
+        "cannotChallengeSelf": "אי אפשר לאתגר את עצמכם."
       }
     },
     "backToFriends": "חזרה לחברים",

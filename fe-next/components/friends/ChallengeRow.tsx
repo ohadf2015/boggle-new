@@ -5,6 +5,7 @@ import { Target, Check, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveDisplayName } from '@/lib/displayName';
 import type { FriendChallenge } from '@/utils/friends';
 
 interface ChallengeRowProps {
@@ -58,7 +59,10 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
       />
       <div className="flex-1 min-w-0">
         <p className={cn('font-bold text-sm truncate', isDark ? 'text-white' : 'text-gray-900')}>
-          {challenge.challengerUsername}
+          {resolveDisplayName(
+            [challenge.challengerDisplayName, challenge.challengerUsername],
+            t('friends.aPlayer', 'a player')
+          )}
         </p>
         <p className={cn('text-xs truncate', isDark ? 'text-yellow-300' : 'text-yellow-600')}>
           {challenge.message || t('friends.challenges.defaultMessage')}

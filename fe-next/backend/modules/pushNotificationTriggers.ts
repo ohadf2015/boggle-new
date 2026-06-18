@@ -6,6 +6,7 @@
 
 import logger from '../utils/logger';
 import { translatePush, type PushLocale, isPushLocale, countryToLocale } from '../utils/pushTranslations';
+import { resolveRivalDisplayName } from '@/lib/pushDisplayName';
 import { sendToUser, type FCMPayload } from './fcmService';
 import { mascotImageUrl } from '../services/pushNotificationService';
 import { getSupabase, isSupabaseConfigured } from './supabase';
@@ -308,9 +309,10 @@ export async function notifyFriendRequest(
   fromUserId?: string
 ): Promise<void> {
   const locale = await getUserLocale(toUserId);
+  const sender = resolveRivalDisplayName([fromUsername], locale);
   return triggerPush(toUserId, 'friend_request', {
     title: translatePush(locale, 'friendRequest.title'),
-    body: translatePush(locale, 'friendRequest.body', { sender: fromUsername }),
+    body: translatePush(locale, 'friendRequest.body', { sender }),
     imageUrl: mascotImageUrl('waving'),
     data: {
       type: 'friend_request',
@@ -328,9 +330,10 @@ export async function notifyFriendAccepted(
   acceptorUserId?: string
 ): Promise<void> {
   const locale = await getUserLocale(toUserId);
+  const sender = resolveRivalDisplayName([acceptorUsername], locale);
   return triggerPush(toUserId, 'friend_accepted', {
     title: translatePush(locale, 'friendAccepted.title'),
-    body: translatePush(locale, 'friendAccepted.body', { sender: acceptorUsername }),
+    body: translatePush(locale, 'friendAccepted.body', { sender }),
     imageUrl: mascotImageUrl('waving'),
     data: {
       type: 'friend_accepted',
@@ -349,9 +352,10 @@ export async function notifyGameInvite(
   inviterUserId?: string
 ): Promise<void> {
   const locale = await getUserLocale(toUserId);
+  const sender = resolveRivalDisplayName([inviterUsername], locale);
   return triggerPush(toUserId, 'game_invite', {
     title: translatePush(locale, 'gameInvite.title'),
-    body: translatePush(locale, 'gameInvite.body', { sender: inviterUsername }),
+    body: translatePush(locale, 'gameInvite.body', { sender }),
     imageUrl: mascotImageUrl('play'),
     data: {
       type: 'game_invite',
@@ -500,9 +504,10 @@ export async function notifyChallengeAccepted(
   acceptorUserId?: string
 ): Promise<void> {
   const locale = await getUserLocale(toUserId);
+  const sender = resolveRivalDisplayName([acceptorUsername], locale);
   return triggerPush(toUserId, 'challenge_accepted', {
     title: translatePush(locale, 'challengeAccepted.title'),
-    body: translatePush(locale, 'challengeAccepted.body', { sender: acceptorUsername }),
+    body: translatePush(locale, 'challengeAccepted.body', { sender }),
     imageUrl: mascotImageUrl('play'),
     data: {
       type: 'challenge_accepted',
@@ -520,9 +525,10 @@ export async function notifyChallengeDeclined(
   declinerUserId?: string
 ): Promise<void> {
   const locale = await getUserLocale(toUserId);
+  const sender = resolveRivalDisplayName([declinerUsername], locale);
   return triggerPush(toUserId, 'challenge_declined', {
     title: translatePush(locale, 'challengeDeclined.title'),
-    body: translatePush(locale, 'challengeDeclined.body', { sender: declinerUsername }),
+    body: translatePush(locale, 'challengeDeclined.body', { sender }),
     imageUrl: mascotImageUrl('crying'),
     data: {
       type: 'challenge_declined',
@@ -550,9 +556,10 @@ export async function notifyChallengeResult(
     outcome === 'win' ? 'challengeResult.bodyWin' :
     outcome === 'loss' ? 'challengeResult.bodyLoss' :
     'challengeResult.bodyTie';
+  const opponent = resolveRivalDisplayName([opponentUsername], locale);
   return triggerPush(toUserId, 'challenge_result', {
-    title: translatePush(locale, titleKey, { opponent: opponentUsername }),
-    body: translatePush(locale, bodyKey, { opponent: opponentUsername }),
+    title: translatePush(locale, titleKey, { opponent }),
+    body: translatePush(locale, bodyKey, { opponent }),
     imageUrl: mascotImageUrl(outcome === 'win' ? 'celebration' : outcome === 'loss' ? 'crying' : 'play'),
     data: {
       type: 'challenge_result',
@@ -577,8 +584,9 @@ export async function notifyAsyncChallengeReceived(
   gameMode: string,
 ): Promise<void> {
   const locale = await getUserLocale(toUserId);
+  const sender = resolveRivalDisplayName([fromUsername], locale);
   return triggerPush(toUserId, 'async_challenge_received', {
-    title: translatePush(locale, 'asyncChallenge.received.title', { sender: fromUsername }),
+    title: translatePush(locale, 'asyncChallenge.received.title', { sender }),
     body: translatePush(locale, 'asyncChallenge.received.body', {
       score: String(targetScore),
       mode: gameMode,

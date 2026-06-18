@@ -108,7 +108,7 @@ const es = {
       "adminBadge": "Vista de admin",
       "adminOnly": "Shiritori en solitario es solo una vista previa para admins.",
       "headPrompt": "La siguiente palabra empieza con:",
-      "inputPlaceholder": "Escribe una palabra en hiragana",
+      "inputPlaceholder": "¡Mantén tu cadena viva…",
       "submit": "Enviar",
       "checking": "Comprobando…",
       "giveUp": "Rendirse",
@@ -6757,6 +6757,7 @@ const es = {
     "noUsersFound": "No encontramos usuarios",
     "pending": "Pendiente",
     "pendingRequests": "Solicitudes Pendientes",
+    "aPlayer": "un jugador",
     "requestReceivedToast": "{{name}} te envió una solicitud de amistad",
     "challengeDeclinedToast": "{{name}} rechazó tu desafío",
     "socialBadge": "{count} notificaciones de amigos",
@@ -6840,7 +6841,9 @@ const es = {
         "notFriends": "Tienen que ser amigos para enviar un desafío.",
         "rateLimited": "Más despacio — espera un momento antes de volver a intentarlo.",
         "timeout": "El desafío caducó. Vuelve a enviarlo.",
-        "validation": "No pudimos enviar el desafío. Revisa los detalles e inténtalo de nuevo."
+        "validation": "No pudimos enviar el desafío. Revisa los detalles e inténtalo de nuevo.",
+        "alreadySent": "Ya tienes un desafío pendiente con esa persona.",
+        "cannotChallengeSelf": "No puedes desafiarte a ti mismo."
       }
     },
     "backToFriends": "Volver a amigos",

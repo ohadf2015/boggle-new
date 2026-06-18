@@ -6,6 +6,7 @@ import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { resolveDisplayName } from '@/lib/displayName';
 import type { FriendRequest } from '@/utils/friends';
 
 interface RequestRowProps {
@@ -47,7 +48,10 @@ export const RequestRow: React.FC<RequestRowProps> = ({
       />
       <div className="flex-1 min-w-0">
         <p className={cn('font-bold text-sm truncate', isDark ? 'text-white' : 'text-gray-900')}>
-          {request.fromUsername}
+          {resolveDisplayName(
+            [request.fromDisplayName, request.fromUsername],
+            t('friends.aPlayer', 'a player')
+          )}
         </p>
       </div>
       <div className="flex gap-1.5">

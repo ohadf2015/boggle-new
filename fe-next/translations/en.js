@@ -108,7 +108,7 @@ const en = {
       "adminBadge": "Admin preview",
       "adminOnly": "Shiritori Solo is an admin-only preview.",
       "headPrompt": "Next word starts with:",
-      "inputPlaceholder": "Type a hiragana word",
+      "inputPlaceholder": "Keep your chain alive…",
       "submit": "Send",
       "checking": "Checking…",
       "giveUp": "Give up",
@@ -6834,6 +6834,7 @@ const en = {
     "noPendingRequests": "All caught up!",
     "requestsWillAppearHere": "Friend requests show up here",
     "noUsersFound": "Nobody matches that",
+    "aPlayer": "a player",
     "pending": "Pending",
     "pendingRequests": "Pending Requests",
     "requestReceivedToast": "{{name}} sent you a friend request",
@@ -6919,7 +6920,9 @@ const en = {
         "notFriends": "You need to be friends to challenge each other.",
         "rateLimited": "Slow down — give it a moment before trying again.",
         "timeout": "Challenge timed out. Try sending it again.",
-        "validation": "Couldn't send the challenge. Check the details and retry."
+        "validation": "Couldn't send the challenge. Check the details and retry.",
+        "alreadySent": "You already have a pending challenge with them.",
+        "cannotChallengeSelf": "You can't challenge yourself."
       }
     },
     "backToFriends": "Back to friends",
