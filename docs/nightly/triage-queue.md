@@ -844,3 +844,38 @@ FLAG NEEDED: exp-practice-wheel-cta-v1  variants=[control, retry-cta]  50/50
   - status: deferred (coin economy = human-queue per hard rules; Sentry MCP unavailable for stack trace)
   - why: Economy logic = hard-banned autonomous change; needs human + full stack trace
   - recommended owner: backend
+
+## 2026-06-18 (lane-01 triage)
+
+- [Supabase Security] `update_milog_verification` REVOKE — SHIPPED
+  - status: shipped (migration `revoke_update_milog_verification_from_authenticated`)
+  - why: SECURITY DEFINER callable by `authenticated` via REST API; admin-only callsite confirmed (milogWordVerifier.ts:384 uses service_role); REVOKE is reversible
+  - recommended owner: review-by-eod (verify no regression in milog admin panel)
+
+- [Sentry] `TypeError: null.clear` on word-wheel — SHIPPED
+  - link: https://lexiclash.sentry.io/issues/120102540/
+  - status: shipped (WordWheelPixiRing.tsx — added `app.ticker?.stop()` before `app.destroy()`)
+  - why: RAF-queued tick fired after Graphics children destroyed; fix matches GameCanvas.tsx pattern
+  - recommended owner: self (monitor Sentry 1CW for recurrence post-deploy)
+
+- [Sentry] churn-signals 502 on /he/multiplayer — DEFERRED
+  - link: https://lexiclash.sentry.io/issues/124871662/
+  - last seen: 2026-06-05 (stale); count=278, users=3
+  - status: deferred (502 = backend service down; last seen 13 days ago; not a JS fix)
+  - why: Root cause is backend API endpoint returning 502; no frontend fix possible
+  - recommended owner: backend
+
+- [Sentry] relation "profiles" does not exist — DEFERRED
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - last seen: 2026-05-27 (stale 22 days); count=18, users=5
+  - status: deferred (likely from a fixed deploy; stale issue)
+  - why: Very old (22 days), likely resolved by subsequent deployment
+  - recommended owner: monitor (auto-resolve if no new occurrences)
+
+- [Supabase Security] `tar_insert_any` on teacher_access_requests (always-true RLS)
+  - status: intentional — anon INSERT for public teacher access request form; deliberately permissive; skip
+
+- [Supabase Security] 70+ additional SECURITY DEFINER functions callable by authenticated
+  - status: deferred (admin-specific functions like admin_overview_stats, admin_bulk_ban_players — these likely need authenticated access; audit required before bulk REVOKE)
+  - why: Bulk REVOKE could break admin panel if some functions ARE intentionally authenticated-callable
+  - recommended owner: review-by-eod; batch audit admin vs user-facing functions
