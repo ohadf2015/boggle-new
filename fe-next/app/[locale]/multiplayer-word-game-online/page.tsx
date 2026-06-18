@@ -218,6 +218,14 @@ export default async function MultiplayerWordGameOnlinePage({ params }: PageProp
               <h3 className="font-bold text-neo-pink">vs Words With Friends</h3>
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, not turn-based</p>
             </Link>
+            <Link href={`/${validLocale}/online-word-games-with-friends`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-lime">Word Games With Friends</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Create a room, share the link, play together</p>
+            </Link>
+            <Link href={`/${validLocale}/word-games-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+              <h3 className="font-bold text-neo-cyan">Word Games Online Free</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">7+ free modes — no download, no signup</p>
+            </Link>
           </div>
         </section>
 
