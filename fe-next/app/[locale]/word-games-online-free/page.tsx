@@ -154,6 +154,24 @@ export default async function WordGamesOnlineFreePage({ params }: PageProps) {
         </section>
 
         <section className="mb-12">
+          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Explore More Word Games</h2>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Link href={`/${locale}/multiplayer-word-game-online`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-lime/40">
+              <h3 className="font-bold text-neo-lime">Multiplayer Word Game Online</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Real-time Scrabble alternative — play live against friends</p>
+            </Link>
+            <Link href={`/${locale}/online-word-games-with-friends`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-cyan/40">
+              <h3 className="font-bold text-neo-cyan">Word Games With Friends</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">Create a room, share the link, play together</p>
+            </Link>
+            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-all hover:border-neo-pink/40">
+              <h3 className="font-bold text-neo-pink">Play Boggle Free</h3>
+              <p className="mt-1 text-xs text-neo-gray-200">No download, instant browser play</p>
+            </Link>
+          </div>
+        </section>
+
+        <section className="mb-12">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Start Playing Free Word Games Now</h2>
           <p className="mt-4 text-neo-gray-200">
             No more searching for word games online free — LexiClash has everything. Multiplayer word battles,
