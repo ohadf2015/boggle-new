@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-16T20:59:35.355Z",
+  "generatedAt": "2026-06-18T01:39:31.093Z",
   "commits": [
     {
-      "sha": "60414cab0018da16f161beb09f42ac85b6e20d7a",
-      "shortSha": "60414ca",
-      "subject": "perf(homepage): kill hydration skeleton-flash + retire control layout (cubes-only)",
+      "sha": "74f8a405ef3df159aa4c748ed82d28a21f755341",
+      "shortSha": "74f8a40",
+      "subject": "perf(nightly): snapshot only untracked WIP, restore tracked from HEAD",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T23:59:22+03:00"
+      "date": "2026-06-18T04:23:32+03:00"
     },
     {
-      "sha": "786b8cb9442044a86957758eca66fa043ee89f0d",
-      "shortSha": "786b8cb",
-      "subject": "docs(ui): mark NeoPanel consolidation done (37 box shells) + build status note",
+      "sha": "37c942179c2eea3faa52fdee69c69f466ba39eaa",
+      "shortSha": "37c9421",
+      "subject": "fix(loading): stop homepage cubes skeleton leaking to all child routes",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T23:55:11+03:00"
+      "date": "2026-06-18T00:44:48+03:00"
     },
     {
-      "sha": "c9ba14ad430f8ee188b1f9d3271a193dfc9f7682",
-      "shortSha": "c9ba14a",
-      "subject": "feat(ui): migrate 2 more motion panels (EmojiShareCard, LanguageDropdown) to NeoPanel asChild",
+      "sha": "1a2b38d6fb72943f36b6ec4fe8030dc7d54e8560",
+      "shortSha": "1a2b38d",
+      "subject": "fix(education): apply teacher-access RLS repair — unblock public apply form",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T23:35:38+03:00"
+      "date": "2026-06-18T00:10:12+03:00"
     },
     {
-      "sha": "4517a3b6d752f792b2538dfd8e0fcbf33969b5eb",
-      "shortSha": "4517a3b",
-      "subject": "perf(mp-classic): lean board profile + centered connector + single timer",
-      "author": "Ohad Fisher",
-      "date": "2026-06-16T23:24:05+03:00"
+      "sha": "49ef08e3d4f102f908023f426bee29cd836a830e",
+      "shortSha": "49ef08e",
+      "subject": "Merge pull request #563 from ohadf2015/claude/teacher-access-request-error-0i5tt5",
+      "author": "ohadf2015",
+      "date": "2026-06-17T22:50:55+02:00"
     },
     {
-      "sha": "4425ef94f90e7af9c0fddacd405bccaa49dc7cfc",
-      "shortSha": "4425ef9",
-      "subject": "feat(offline): finish Wordfall bonus-words + crossword feedback polish",
-      "author": "Ohad Fisher",
-      "date": "2026-06-16T23:23:22+03:00"
+      "sha": "d1746c99fa04f000b0e0814e86eacf6c2f8368c2",
+      "shortSha": "d1746c9",
+      "subject": "fix(education): restore anon INSERT on teacher access requests + seed Anthony Rettig",
+      "author": "Claude",
+      "date": "2026-06-17T20:27:17Z"
     },
     {
-      "sha": "53b10004c976c58a61c74eaf7b44f323cd073f38",
-      "shortSha": "53b1000",
-      "subject": "feat(ui): migrate 5 more motion-wrapped panels to NeoPanel asChild",
-      "author": "Ohad Fisher",
-      "date": "2026-06-16T23:19:40+03:00"
+      "sha": "7b317f4b5c26cf2080080cbfcf0ee0a10a5b2928",
+      "shortSha": "7b317f4",
+      "subject": "Merge pull request #562 from ohadf2015/claude/blast-mode-audio-leak-0giko0",
+      "author": "ohadf2015",
+      "date": "2026-06-17T16:29:05+02:00"
     },
     {
-      "sha": "552683e55d3cf2859d006f3ed6d8a149fb8c7ad7",
-      "shortSha": "552683e",
-      "subject": "feat(wordtower): compliments/messages clear after 2s with a cool exit",
-      "author": "Ohad Fisher",
-      "date": "2026-06-16T23:17:19+03:00"
+      "sha": "e3ea29f31953376d00543f5617db31601144b988",
+      "shortSha": "e3ea29f",
+      "subject": "fix(audio): stop Blast Mode BGM stacking duplicate Howler instances across waves",
+      "author": "Claude",
+      "date": "2026-06-17T13:26:49Z"
     },
     {
-      "sha": "3f6963caa27d760bdb5ca4ae1cbf5b22f8f70726",
-      "shortSha": "3f6963c",
-      "subject": "feat(ui): NeoPanel asChild (Slot) + migrate 4 motion-wrapped panels",
-      "author": "Ohad Fisher",
-      "date": "2026-06-16T23:13:06+03:00"
+      "sha": "d6ba45f923bbbed649d131f4d63b78f9cceeb474",
+      "shortSha": "d6ba45f",
+      "subject": "Merge pull request #561 from ohadf2015/claude/ad-banner-overlap-fix-xoz473",
+      "author": "ohadf2015",
+      "date": "2026-06-17T15:11:36+02:00"
     },
     {
-      "sha": "64c72b0bb8d3662c2c332f477a46e3054a0dd79b",
-      "shortSha": "64c72b0",
-      "subject": "feat(offline): playable offline ride — Wordfall, Crossword, Daily",
-      "author": "Ohad Fisher",
-      "date": "2026-06-16T23:04:12+03:00"
+      "sha": "d2278f187bb4b956d4cf9bb366ca08236658c856",
+      "shortSha": "d2278f1",
+      "subject": "fix(daily): portal sticky Play CTA to <body> so the ad banner can't cover it",
+      "author": "Claude",
+      "date": "2026-06-17T12:51:11Z"
     },
     {
-      "sha": "c605a59193ec517becb6590dbe1424eb2304e956",
-      "shortSha": "c605a59",
-      "subject": "feat(onboarding): fun Google signup at FTUE profile step + reload-on-fresh-signin",
+      "sha": "007c26f72d7c9655450db160c9ed1893aba502ca",
+      "shortSha": "007c26f",
+      "subject": "fix(seo): merge /words/[n]-letter-words into [word] route — fix dynamic-sibling 404",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T22:59:45+03:00"
+      "date": "2026-06-17T12:03:02+03:00"
     },
     {
-      "sha": "8d651d4cc1da6b95c5d37965f1fe02d54bebf0e4",
-      "shortSha": "8d651d4",
-      "subject": "feat(ui): extract shared NeoPanel primitive, consolidate 26 inline box shells",
+      "sha": "04e67bf2d355c320f7f0830f60ac53926efafd83",
+      "shortSha": "04e67bf",
+      "subject": "fix(seo): drop conflicting revalidate on /words/[word] so noindex deploys live",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T22:57:21+03:00"
+      "date": "2026-06-17T10:35:38+03:00"
     },
     {
-      "sha": "460ae7e011df7b9737cbf680591223fde658bf07",
-      "shortSha": "460ae7e",
-      "subject": "feat(wordtower): on-brand 'in the zone' frame on hot perfect streaks",
+      "sha": "bc4d93d1fdd9aacd8d4ebb631b63768e48196c66",
+      "shortSha": "bc4d93d",
+      "subject": "feat(experiment): wire exp-game-abandon-confirm-v1 (stats-shown quit dialog)",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T22:44:40+03:00"
+      "date": "2026-06-17T10:32:43+03:00"
     },
     {
-      "sha": "bfb5965e074d22447b66248f74d393c7bcfcb93d",
-      "shortSha": "bfb5965",
-      "subject": "feat(wordtower): tower skins + steady-hands crane reward",
+      "sha": "c98d5ff43d1e82c7eadc686f68b5ed417eb5dd89",
+      "shortSha": "c98d5ff",
+      "subject": "fix(seo): noindex all [locale] 404s — stop soft-404s leaking index,follow",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T22:38:28+03:00"
+      "date": "2026-06-17T10:21:04+03:00"
     },
     {
-      "sha": "4995edefbee12353dd5dbaeb1e54c3cbf6a37dec",
-      "shortSha": "4995ede",
-      "subject": "feat(wordtower): cap visible tower to 3 blocks, slimmer deck, real rival avatars",
+      "sha": "c5b0c4c107ce560f21e49a4d2ae08eab4bd9cf6f",
+      "shortSha": "c5b0c4c",
+      "subject": "fix(nightly): reddit search falls back to RSS on the oauth host",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T22:37:37+03:00"
+      "date": "2026-06-17T10:16:52+03:00"
     },
     {
-      "sha": "485c9d04dddd67ff6e1dddf3b07de4455844dea1",
-      "shortSha": "485c9d0",
-      "subject": "feat(solo): wire crossword into solo daily reward layer",
+      "sha": "20b569a4f24105c20542f0e5418cc8b26a9060e1",
+      "shortSha": "20b569a",
+      "subject": "fix(nightly): probe the supabase MCP TRANSPORT surface, not auth (+ bash 3.2)",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T22:36:16+03:00"
+      "date": "2026-06-17T10:12:47+03:00"
     },
     {
-      "sha": "44ddfd888ae06d2e668ce00c3650b2cae3b7ec92",
-      "shortSha": "44ddfd8",
-      "subject": "feat(solo): daily coin+reward layer for beta modes",
+      "sha": "2a4ddf2c54cd0892368f21bf894b06862381c6fe",
+      "shortSha": "2a4ddf2",
+      "subject": "feat(shiritori): solo tempo-bonus hook + tests (recovered, not yet wired)",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T22:34:04+03:00"
+      "date": "2026-06-17T10:08:41+03:00"
     },
     {
-      "sha": "c68678c585b954d8cb611c9ba09e49adaf1ddb67",
-      "shortSha": "c68678c",
-      "subject": "chore: refresh generated deployment changelog + translation report",
+      "sha": "53d625df98a3d73ab062104c74a47995320faa09",
+      "shortSha": "53d625d",
+      "subject": "chore(dictionary): 2026-06-17 candidate words (en/es/he/ja/sv)",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T11:16:37+03:00"
+      "date": "2026-06-17T10:08:41+03:00"
     },
     {
-      "sha": "d6dcb32703917890710dba7b19185549aaca4932",
-      "shortSha": "d6dcb32",
-      "subject": "feat(nightly): autonomous PostHog experiment creation + native FAQ review (no human flags)",
+      "sha": "97b3bf5747770febf4e303530ac1d4a17ccbd607",
+      "shortSha": "97b3bf5",
+      "subject": "fix(seo): hebrew multiplayer page rank-up strings",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T10:54:39+03:00"
+      "date": "2026-06-17T10:08:40+03:00"
     },
     {
-      "sha": "1253611fbf23efe30b2450fece5a4a401a56f256",
-      "shortSha": "1253611",
-      "subject": "feat(blast): stronger YOU-vs-rivals separation + competitive gap in live MP strip",
+      "sha": "7f9c145f86b1b962405364dbf767cc1f045bd13d",
+      "shortSha": "7f9c145",
+      "subject": "fix(nightly): make supabase MCP reliable headless (connect-wait + preflight probe)",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T10:50:45+03:00"
+      "date": "2026-06-17T10:01:22+03:00"
     },
     {
-      "sha": "55c4493d3a2c0c6e12cda4af436f91033760e632",
-      "shortSha": "55c4493",
-      "subject": "fix(mp): tighten solo blast safety-net launch window so bots aren't stuck at 0",
+      "sha": "06be046913a6e977a1fbfc7d61e02af4d0b9ca18",
+      "shortSha": "06be046",
+      "subject": "fix(nightly): scope integration gate to changed-cone to stop docs-only salvage",
       "author": "Ohad Fisher",
-      "date": "2026-06-16T10:50:31+03:00"
+      "date": "2026-06-17T10:01:21+03:00"
     }
   ]
 }
