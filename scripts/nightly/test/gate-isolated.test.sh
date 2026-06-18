@@ -220,6 +220,22 @@ assert "typecheck chain does NOT run lint"                      "[[ \"$CHAIN_TC\
 assert "build:schemas precedes tsc (dist bridge)"               "[[ \"$CHAIN_TC\" == *'build:schemas'*'tsc --noEmit'* ]]"
 assert "tsc precedes test:changed"                              "[[ \"$CHAIN_TC\" == *'tsc --noEmit'*'test:changed'* ]]"
 
+# typeonly_notest=1 (4th arg) → build:schemas + standalone `tsc --noEmit` ONLY: NO test, NO
+# next-build, NO lint. The baseline-red SHIP path uses this to build-verify the authored set
+# (2026-06-18): the failing tests are already PROVEN pre-existing-red, so any tier that runs
+# them (build_only's prior sibling typecheck_only runs test:changed, which re-pulls the same
+# red cone) would wrongly block the ship; and build_only's `next build` wedges >900s in a
+# fresh worktree (tonight's false drop). tsc gives a wedge-proof type/import verdict with no
+# test re-run. WHY this is the whole night's code surviving a red master: build_only rc=3
+# (wedge) was being conflated with rc=1 (real break) → docs-only drop of build-clean code.
+CHAIN_TO=$(_gate_npm_chain 0 0 0 1)
+assert "typeonly chain is exactly schemas → tsc --noEmit" \
+  "[[ \"\$CHAIN_TO\" == 'npm run build:schemas && npx --no-install tsc --noEmit' ]]"
+assert "typeonly chain does NOT run any test"       "[[ \"$CHAIN_TO\" != *'npm run test'* ]]"
+assert "typeonly chain does NOT run next build"     "[[ \"$CHAIN_TO\" != *'build:fast'* ]]"
+assert "typeonly chain does NOT run lint"           "[[ \"$CHAIN_TO\" != *'npm run lint'* ]]"
+assert "typeonly build:schemas precedes tsc"        "[[ \"$CHAIN_TO\" == *'build:schemas'*'tsc --noEmit'* ]]"
+
 echo "── gate-isolated: nightly_gate_typecheck_route (conclusive tier verdict) ──"
 # After BOTH the full gate and the build-only re-gate wedge, the standalone typecheck
 # tier runs and its rc routes the decision: 0=ship (type-clean + affected tests green),

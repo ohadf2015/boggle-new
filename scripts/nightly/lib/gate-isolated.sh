@@ -34,7 +34,18 @@ NIGHTLY_GATE_ENV_FILES=(
 # ../dist via the compiled bridge (backend/utils/socketValidation.ts), and a fresh
 # worktree has no dist/ yet (this reverted every code lane on 2026-05-26).
 _gate_npm_chain() {
-  local skip_lint="${1:-0}" build_only="${2:-0}" typecheck_only="${3:-0}" chain=""
+  local skip_lint="${1:-0}" build_only="${2:-0}" typecheck_only="${3:-0}" typeonly_notest="${4:-0}" chain=""
+  # typeonly_notest=1 → build:schemas + standalone `tsc --noEmit` ONLY (no test, no next-build,
+  # no lint). The baseline-red SHIP path uses this to build-verify the authored set after the
+  # tests are already PROVEN pre-existing-red (2026-06-18). It deliberately omits the test phase
+  # — test:changed would re-pull the same red files into the cone and wrongly block the ship —
+  # and next-build (build:fast), which wedges >900s in a fresh worktree (the wedge that, conflated
+  # with a real build break, dropped a whole night of build-clean code). tsc gives the type/import
+  # verdict wedge-proof in ~54s. build:schemas first (the dist bridge tsc resolves through).
+  if [ "$typeonly_notest" = "1" ]; then
+    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit"
+    return 0
+  fi
   # typecheck_only=1 → the CONCLUSIVE timeout tier: build:schemas + standalone
   # `tsc --noEmit` + test:changed. WHY this exists (2026-06-16): `next build`'s OWN
   # internal "Running TypeScript" phase wedges silently >900s in a fresh worktree —
@@ -163,7 +174,7 @@ nightly_gate_typecheck_route() {
 # authored list is ignored / may be empty) — used by run_baseline_gate to learn
 # whether master ITSELF is red independent of any lane code.
 run_isolated_gate() {
-  local authored="$1" skip_lint="${2:-0}" baseline="${3:-0}" build_only="${4:-0}" typecheck_only="${5:-0}"
+  local authored="$1" skip_lint="${2:-0}" baseline="${3:-0}" build_only="${4:-0}" typecheck_only="${5:-0}" typeonly_notest="${6:-0}"
   if [ "$baseline" != "1" ]; then
     [ -n "$authored" ] && [ -s "$authored" ] || { log "isolated-gate: empty authored list — nothing to gate"; return 0; }
   fi
@@ -212,7 +223,7 @@ run_isolated_gate() {
   done
 
   [ "$_skipped_ignored" -gt 0 ] && log "isolated-gate: skipped $_skipped_ignored gitignored path(s) (build artifacts — never gated/shipped)"
-  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')$([ "$build_only" = "1" ] && printf ' [build-only — verifying authored set builds despite red test baseline]')$([ "$typecheck_only" = "1" ] && printf ' [typecheck tier — tsc --noEmit + test:changed; conclusive verdict after a next-build TS wedge]')"
+  log "isolated-gate: gating $(grep -c . "$authored") authored file(s) on a clean HEAD checkout (worktree $wt)$([ "$skip_lint" = "1" ] && printf ' [lint skipped — baseline-poison re-gate]')$([ "$build_only" = "1" ] && printf ' [build-only — verifying authored set builds despite red test baseline]')$([ "$typecheck_only" = "1" ] && printf ' [typecheck tier — tsc --noEmit + test:changed; conclusive verdict after a next-build TS wedge]')$([ "$typeonly_notest" = "1" ] && printf ' [typeonly — build:schemas + tsc --noEmit, no test/next-build; baseline-red ship verification]')"
   # Capture the gate's combined output to a file the caller can parse (the
   # drop-and-re-gate salvage needs to know WHICH file failed). Path is exposed
   # via the global NIGHTLY_LAST_GATE_OUTPUT; caller parses then removes it.
@@ -250,7 +261,7 @@ run_isolated_gate() {
     # worktree has no dist/ yet, so 12 handler-test suites fail with "Cannot find
     # module" — that's what reverted every CODE lane on 2026-05-26. Cheap (~3s
     # tsc), then build:fast (next build), then the full test suite last.
-    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only" "$typecheck_only")"
+    local _body="cd \"\$1/fe-next\" && $(_gate_npm_chain "$skip_lint" "$build_only" "$typecheck_only" "$typeonly_notest")"
     run_with_idle_timeout "$_gidle" "$_gmax" "$NIGHTLY_LAST_GATE_OUTPUT" -- \
       bash -c "$_body" _ "$wt" || rc=$?
   fi

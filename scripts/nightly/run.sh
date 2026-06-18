@@ -714,12 +714,21 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
             # `test` short-circuited the gate chain, so the authored set's BUILD was never
             # verified — run a build-only re-gate first (keeps "never ship build-breaking
             # code"), then ship + shout so the baseline gets fixed.
-            log "baseline-aware: every failing test also fails on clean HEAD — master is RED independent of the nightly. Build-verifying the authored set before shipping…"
-            run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 1; _bo_rc=$?
+            log "baseline-aware: every failing test also fails on clean HEAD — master is RED independent of the nightly. Type-verifying the authored set (tsc, no test/next-build) before shipping…"
+            # TYPE-only verification, NOT build_only (2026-06-18 fix). The failing tests are
+            # already proven pre-existing-red, so we must NOT re-run them (test:changed would
+            # re-pull the same red cone and wrongly block). And build_only's `next build`
+            # WEDGES >900s in a fresh worktree → returns rc=3 (inconclusive) → the old code
+            # conflated that with rc=1 (real break) and DROPPED a whole night of build-clean
+            # code (tonight's false drop). `build:schemas && tsc --noEmit` is wedge-proof (~54s)
+            # and still catches the dominant new-break class (type/import errors). next-build's
+            # extra webpack-boundary coverage is given up here on purpose — the alternative is
+            # dropping all lane code, and the production deploy build still catches those.
+            run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 0 0 1; _bo_rc=$?
             rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
             if [ "$_bo_rc" = "0" ]; then
               gate_ok=1
-              log "baseline-aware: authored set BUILDS clean — shipping it unchanged (introduced no new test failure; the pre-existing red baseline is the problem)."
+              log "baseline-aware: authored set TYPE-checks clean (tsc) — shipping it unchanged (introduced no new test failure; the pre-existing red baseline is the problem)."
               mkdir -p docs/nightly 2>/dev/null || true
               {
                 echo "# Nightly BASELINE-RED alert — ${TODAY}"
@@ -727,7 +736,7 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
                 echo "The nightly gate failed, but a clean-HEAD baseline gate (NO lane code) fails the SAME test file(s):"
                 printf '%s\n' "$_authored_fail_tests" | sed 's/^/  - /'
                 echo
-                echo "These tests are red on master itself. The nightly build-verified its authored work and shipped it anyway (it introduced no NEW failure), but the gate runs at reduced strength until the baseline is green. FIX THESE TESTS on master."
+                echo "These tests are red on master itself. The nightly TYPE-verified its authored work (build:schemas + tsc --noEmit — next-build wedges in a fresh worktree, so full build coverage was skipped) and shipped it anyway (it introduced no NEW failure), but the gate runs at reduced strength until the baseline is green. FIX THESE TESTS on master."
               } > "docs/nightly/BASELINE-RED-${TODAY}.md" 2>/dev/null || true
               echo "docs/nightly/BASELINE-RED-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
               echo -e "\n**Outcome (baseline-red):** the gate's failing test file(s) already fail on clean master ($(printf '%s' "$_authored_fail_tests" | tr '\n' ' ')); the authored set build-verified clean and introduced no new failure, so it shipped. See docs/nightly/BASELINE-RED-${TODAY}.md." >> "$REPORT"
@@ -735,7 +744,7 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
               rm -f "$_af_file" "$_bf_file" "$_baseline_out" "$_authored_out"
               break
             else
-              log "baseline-aware: authored set BUILD-fails (rc=$_bo_rc) despite a red TEST baseline — NOT shipping; falling through to docs-only salvage (never ship build-breaking code)."
+              log "baseline-aware: authored set TYPE-fails (tsc rc=$_bo_rc) despite a red TEST baseline — NOT shipping; falling through to docs-only salvage (never ship type-breaking code)."
             fi
             fi  # close unattributed-failure ship guard
             ;;
