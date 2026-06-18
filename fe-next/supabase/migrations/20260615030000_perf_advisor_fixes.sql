@@ -15,9 +15,22 @@
 --    require a sequential scan. IF NOT EXISTS makes this idempotent.
 --    Reversible: DROP INDEX IF EXISTS idx_word_pacts_player2_id;
 
--- 1. Patch tar_insert_authenticated to use subselect form
-ALTER POLICY "tar_insert_authenticated" ON public.teacher_access_requests
-  WITH CHECK ((select auth.uid()) IS NOT NULL);
+-- 1. Patch tar_insert_authenticated to use subselect form.
+--    OBSOLETE (2026-06-18): the 2026-06-09 teacher-access RLS repair replaced
+--    `tar_insert_authenticated` with `tar_insert_any` (WITH CHECK true — no auth.uid(),
+--    so no init-plan concern). This migration was never applied; running the bare
+--    ALTER POLICY now errors ("policy does not exist") and breaks `db:migrate`. Guard
+--    it so it's a safe no-op when the policy is absent. The CURRENT initplan items live
+--    in 20260618030000_perf_advisor_initplan_fixes.sql.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_policy WHERE polname = 'tar_insert_authenticated'
+  ) THEN
+    ALTER POLICY "tar_insert_authenticated" ON public.teacher_access_requests
+      WITH CHECK ((select auth.uid()) IS NOT NULL);
+  END IF;
+END $$;
 
 -- 2. Add FK index for word_pacts.player2_id
 CREATE INDEX IF NOT EXISTS idx_word_pacts_player2_id
