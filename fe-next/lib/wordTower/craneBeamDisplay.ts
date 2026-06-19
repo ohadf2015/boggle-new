@@ -1,17 +1,39 @@
 /**
- * Word Tower — carried-girder brick cap (pure).
+ * Word Tower — carried-girder brick cap + sizing (pure).
  *
  * The crane carries the just-built word as a VERTICAL column of one-brick-per-
- * letter tiles. A long word (e.g. CONIFER → 7 bricks) builds a girder so tall it
- * runs off the top of the bay and crowds the HUD. The full word already lives in
- * the builder slot below, so the carried payload only needs to READ as "a stack
- * of letter blocks" — it does not need every glyph. We therefore cap the girder
- * to a few bricks and surface any remainder as a small "+N" badge on the top
- * brick, keeping the crane compact and the screen uncluttered.
+ * letter tiles. Founder ask (2026-06-19): "when the crane puts the letters, show
+ * ALL the letters it is trying to put." So the girder now renders the WHOLE word
+ * (every glyph) instead of a 3-brick stub. To stop a long word from running off
+ * the top of the bay, {@link craneBeamTilePx} shrinks each brick to fit a fixed
+ * vertical budget — the column gets denser, not taller. A pathologically long
+ * word (> the cap) still badges the remainder so the crane never overflows.
  */
 
-/** Max letter-bricks rendered on the carried girder (founder: "show up to 3"). */
-export const CRANE_BEAM_MAX_BRICKS = 3;
+/** Max letter-bricks rendered on the carried girder. High enough to show every
+ *  letter of essentially any real word in full (founder: "show all the letters");
+ *  the rare longer word badges the overflow so the bay never overflows. */
+export const CRANE_BEAM_MAX_BRICKS = 10;
+
+/** Vertical pixel budget the carried girder must fit within (the bay below the
+ *  hook). Bricks shrink to share it once the word is long. */
+export const CRANE_BEAM_BUDGET_PX = 150;
+/** Brick size clamps (px) — never so small it's illegible, never bigger than the
+ *  comfortable default that short words use. */
+export const CRANE_BEAM_TILE_MIN_PX = 16;
+export const CRANE_BEAM_TILE_MAX_PX = 38;
+
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
+/**
+ * Per-brick pixel size for a girder carrying `count` letters: the full word is
+ * shown, so the bricks shrink to share {@link CRANE_BEAM_BUDGET_PX} once the
+ * column is tall, clamped to a legible range. A short word keeps the comfy max.
+ */
+export function craneBeamTilePx(count: number): number {
+  if (count <= 0) return CRANE_BEAM_TILE_MAX_PX;
+  return Math.round(clamp(CRANE_BEAM_BUDGET_PX / count, CRANE_BEAM_TILE_MIN_PX, CRANE_BEAM_TILE_MAX_PX));
+}
 
 export interface CraneBeamBricks {
   /** Bricks to render, base→top (word[0] first). Length ≤ the cap. */

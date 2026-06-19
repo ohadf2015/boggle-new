@@ -159,7 +159,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             : <ChevronUp className="h-3 w-3 text-neo-white/40" />}
         </button>
         {deckOpen && (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
         {/* Rejection feedback — the wheel's centre hub shows the live word, so the
             old framed builder slot is gone; the error line stays. */}
         {lastError && errorKey > 0 && (
@@ -223,12 +223,12 @@ export function WordTowerHud(props: WordTowerHudProps) {
             moved INTO the wheel's centre hub (build a word → tap the centre to
             lift it → tap again to drop), so the redundant bottom build button is
             gone and the deck is shorter. Disabled while a word is in flight. */}
-        <div className="mx-auto flex max-w-md items-center justify-center gap-3">
+        <div className="mx-auto flex max-w-md items-center justify-center gap-2.5">
           <button
             type="button"
             onClick={onScramble}
             disabled={scramblesLeft <= 0 || isPlacing}
-            className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-2 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-1.5 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
             aria-label={t('wordTower.hud.scramble')}
           >
             <Shuffle className="h-5 w-5" />
@@ -238,7 +238,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             type="button"
             onClick={onBackspace}
             disabled={selected.length === 0 || isPlacing}
-            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2.5 text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
             aria-label={t('wordTower.hud.backspace')}
           >
             <Delete className="h-5 w-5" />

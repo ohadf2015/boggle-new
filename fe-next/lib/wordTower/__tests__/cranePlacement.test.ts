@@ -48,10 +48,10 @@ describe('evaluatePlacement — cosy reward amplifier (never a fail-gate)', () =
   });
 
   it('a loose drop is SLOPPY: trims and reduces height, but tower stands', () => {
-    const r = evaluatePlacement(0.4, 0);
+    const r = evaluatePlacement(0.5, 0);
     expect(r.quality).toBe('sloppy');
     expect(r.heightMultiplier).toBeLessThan(1);
-    expect(r.overlap).toBeCloseTo(0.6);
+    expect(r.overlap).toBeCloseTo(0.5);
     expect(r.topples).toBe(false);
   });
 

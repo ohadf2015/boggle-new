@@ -12,7 +12,7 @@ import {
 } from '@/lib/wordTower/cranePlacement';
 import { releaseFx } from '@/lib/wordTower/craneReleaseFx';
 import { swayAngleAt, swayNormalizedOffset, effectiveDropError } from '@/lib/wordTower/towerSway';
-import { craneBeamBricks } from '@/lib/wordTower/craneBeamDisplay';
+import { craneBeamBricks, craneBeamTilePx } from '@/lib/wordTower/craneBeamDisplay';
 import { pendulumTargetDeg, stepPendulum, REST_PENDULUM, type PendulumState } from '@/lib/wordTower/cranePendulum';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -71,10 +71,11 @@ const BAND_SHADOW: Record<PlacementQuality, string> = {
   miss: 'rgba(255,51,102,0.4)',
 };
 
-/** Per-letter tile size for the held girder. The word is carried as a VERTICAL
- *  column of square bricks — the exact orientation it settles into in the tower
- *  (pos 0 = base at the bottom) — so the carried payload reads as the same shape
- *  it becomes once placed. */
+/** Default per-letter tile size for the held girder (short words). The word is
+ *  carried as a VERTICAL column of square bricks — the exact orientation it
+ *  settles into in the tower (pos 0 = base at the bottom) — so the carried
+ *  payload reads as the same shape it becomes once placed. Longer words shrink
+ *  the bricks (craneBeamTilePx) so the FULL word still fits the bay. */
 const CRANE_BEAM_TILE_PX = 38;
 /** How far the trolley carriage slides along the jib (px from centre). */
 const TROLLEY_RANGE_PX = 110;
@@ -215,12 +216,15 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const onSweetSpot = aiming && liveBand === 'perfect';
   // Hebrew: show the word-final letter in its sofit form and lay the beam RTL.
   const beamWord = language === 'he' ? applyHebrewFinalLetters(word) : word;
-  // Carry at most 3 bricks — a long word built a girder so tall it ran off the
-  // top of the bay and crowded the HUD. The full word lives in the builder slot
-  // below; the carried payload only needs to READ as a stack of blocks. Any
-  // remainder is surfaced as a small "+N" badge so the size is still legible.
+  // Show the FULL word the crane is placing (founder: "show all the letters it
+  // is trying to put"). The bricks shrink to share a fixed vertical budget so a
+  // long girder stays inside the bay instead of running off the top. Only a
+  // pathologically long word (> the cap) badges any remainder.
   const { chars: beamChars, hiddenCount } = craneBeamBricks(beamWord);
-  const beamH = beamChars.length * CRANE_BEAM_TILE_PX;
+  const beamTilePx = craneBeamTilePx(beamChars.length);
+  const beamH = beamChars.length * beamTilePx;
+  // Glyph size tracks the brick so dense (small-brick) girders stay legible.
+  const beamFontPx = Math.max(11, Math.round(beamTilePx * 0.5));
 
   // Instability dots — 0, 1, 2, 3 (3 = next miss topples a floor).
   const dots = Array.from({ length: TOPPLE_AFTER_SLOPPY + 1 }, (_, i) => i < consecutiveSloppy);
@@ -316,7 +320,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                   The bricks wear the FINAL committed material colour, so the girder does
                   NOT change colour when it lands. The "stop here" skill cue lives on the
                   glow ring + the reticle/shadow below, not on the face. */}
-              <div className="relative mx-auto" style={{ width: `${CRANE_BEAM_TILE_PX}px` }}>
+              <div className="relative mx-auto" style={{ width: `${beamTilePx}px` }}>
                 <div
                   data-testid="crane-block"
                   className={cn(
@@ -328,15 +332,15 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                     // the skill shot stays readable while the colour stays honest.
                     onSweetSpot && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                   )}
-                  style={{ width: `${CRANE_BEAM_TILE_PX}px`, height: `${beamH}px` }}
+                  style={{ width: `${beamTilePx}px`, height: `${beamH}px` }}
                   dir={language === 'he' ? 'rtl' : 'ltr'}
                 >
                   {beamChars.map((ch, i) => (
                     <span
                       key={i}
                       data-testid="crane-letter"
-                      className="flex flex-1 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-base font-black uppercase shadow-hard"
-                      style={{ backgroundColor: blockColorHex, color: blockTextHex }}
+                      className="flex flex-1 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display font-black uppercase shadow-hard"
+                      style={{ backgroundColor: blockColorHex, color: blockTextHex, fontSize: `${beamFontPx}px` }}
                     >
                       {ch}
                     </span>

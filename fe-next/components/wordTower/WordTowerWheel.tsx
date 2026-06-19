@@ -35,8 +35,11 @@ export interface WordTowerWheelProps {
   onDrop: () => void;
 }
 
-/** Ring radius as a percentage of half the stage (letters sit on this circle). */
-const RING_PCT = 38;
+/** Ring radius as a percentage of half the stage (letters sit on this circle).
+ *  Founder ask (2026-06-19): tighten the circle (smaller ring) while the letter
+ *  tiles themselves get BIGGER — a denser, punchier wheel that also frees deck
+ *  height. */
+const RING_PCT = 33;
 
 /** Polar → cartesian on the 0..100 SVG/percent grid (0 = top, clockwise). */
 function letterPos(i: number, n: number): { x: number; y: number } {
@@ -99,7 +102,7 @@ export function WordTowerWheel({
 
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-w-[230px] touch-none select-none"
+      className="relative mx-auto aspect-square w-full max-w-[206px] touch-none select-none"
       onPointerDown={onDown}
       onPointerMove={placing ? undefined : handlePointerMove}
       onPointerUp={placing ? undefined : handlePointerUp}
@@ -181,7 +184,7 @@ export function WordTowerWheel({
             aria-label={t(isGolden ? 'wordTower.a11y.goldenTile' : 'wordTower.a11y.tile', { letter })}
             aria-pressed={isSel}
             className={cn(
-              'absolute z-10 flex h-[15%] w-[15%] items-center justify-center rounded-full border-neo-thick border-black font-neo-display text-lg font-black uppercase shadow-hard transition-all duration-300',
+              'absolute z-10 flex h-[19%] w-[19%] items-center justify-center rounded-full border-neo-thick border-black font-neo-display text-2xl font-black uppercase shadow-hard transition-all duration-300',
               placing ? 'scale-50 opacity-0' : 'opacity-100',
               isSel
                 ? 'bg-neo-cyan text-black ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy'
@@ -243,7 +246,7 @@ export function WordTowerWheel({
             onClick={onDrop}
             aria-label={t('wordTower.crane.steer')}
             className={cn(
-              'pointer-events-auto flex h-[72px] w-[72px] flex-col items-center justify-center rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-lime-light to-neo-lime font-neo-display text-[11px] font-black uppercase leading-tight text-black shadow-hard active:translate-y-0.5',
+              'pointer-events-auto flex h-[66px] w-[66px] flex-col items-center justify-center rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-lime-light to-neo-lime font-neo-display text-[11px] font-black uppercase leading-tight text-black shadow-hard active:translate-y-0.5',
               !reducedMotion && 'animate-neo-pop',
             )}
           >
@@ -256,7 +259,7 @@ export function WordTowerWheel({
             onClick={onSubmit}
             aria-label={t('wordTower.hud.build')}
             className={cn(
-              'pointer-events-auto flex h-[72px] min-w-[72px] max-w-[78%] flex-col items-center justify-center gap-0.5 rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-cyan-light to-neo-cyan px-3 font-neo-display font-black uppercase leading-none text-black shadow-hard active:translate-y-0.5',
+              'pointer-events-auto flex h-[66px] min-w-[66px] max-w-[78%] flex-col items-center justify-center gap-0.5 rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-cyan-light to-neo-cyan px-3 font-neo-display font-black uppercase leading-none text-black shadow-hard active:translate-y-0.5',
               !reducedMotion && 'animate-neo-pop',
             )}
           >

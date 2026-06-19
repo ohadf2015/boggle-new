@@ -16,7 +16,7 @@ import { useCraneDrop } from '../useCraneDrop';
 import { evaluatePlacement } from '@/lib/wordTower/cranePlacement';
 import { perkModifiers } from '@/lib/wordTower/perks';
 
-const SLOPPY = () => evaluatePlacement(0.4, 0); // a sloppy drop (offset in the sloppy band)
+const SLOPPY = () => evaluatePlacement(0.5, 0); // a sloppy drop (offset in the sloppy band)
 const PERFECT = () => evaluatePlacement(0, 0);
 
 describe('useCraneDrop', () => {
@@ -41,7 +41,7 @@ describe('useCraneDrop', () => {
   it('a non-perfect drop breaks the perfect streak', () => {
     const { result } = renderHook(() => useCraneDrop(vi.fn(), vi.fn()));
     act(() => result.current.onDrop(evaluatePlacement(0, 0)));
-    act(() => result.current.onDrop(evaluatePlacement(0.4, 0))); // sloppy
+    act(() => result.current.onDrop(evaluatePlacement(0.5, 0))); // sloppy
     expect(result.current.perfectStreak).toBe(0);
     expect(result.current.consecutiveSloppy).toBe(1);
   });

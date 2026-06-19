@@ -64,8 +64,15 @@ import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
 
 /** How long a transient celebration toast holds before it auto-dismisses. Kept
  *  short + uniform so banners clear quickly and never pile up / "stick" on
- *  screen (founder: the toasts were staying up too long). */
-const TOAST_MS = 1300;
+ *  screen (founder 2026-06-19: "the notifications stay stuck and don't
+ *  disappear"). Trimmed again so even back-to-back drops never leave a banner
+ *  lingering over the play area. */
+const TOAST_MS = 950;
+
+/** The big centre DROP VERDICT is the most screen-dominant banner, so it clears
+ *  fastest — long enough to read the result + metres, gone before the next drop
+ *  so it never blocks the tower. */
+const VERDICT_MS = 750;
 
 /** Verdict-pop colour by band — mirrors the swinging-beam tint families. */
 const VERDICT_TONE_CLASS: Record<VerdictTone, string> = {
@@ -370,7 +377,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Dismiss via the shared hook (keyed on the verdict's own resultKey) rather than
   // an inline timer, so the lifespan is owned in ONE place and can never be reset
   // by an unrelated re-render — the same robustness the other banners already use.
-  useAutoDismiss(verdict?.key, () => setVerdict(null), TOAST_MS);
+  useAutoDismiss(verdict?.key, () => setVerdict(null), VERDICT_MS);
 
   // Combo-milestone fanfare — a one-shot "×5 ON FIRE!" beat the moment the combo
   // crosses 3/5/10/20. Keyed off resultKey so it fires on the placing tick only.
@@ -618,6 +625,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         resultKey={tower.state.resultKey}
         errorKey={tower.state.errorKey}
         lastResult={tower.state.lastResult}
+        dropQuality={lastOutcomeRef.current?.quality}
         reducedMotion={reducedMotion}
         bottomInsetPx={deckHeight}
         palette={skin.palette}
