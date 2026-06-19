@@ -77,6 +77,17 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     trackOnboardingStart();
   }, []);
 
+  // Keep the entire first run ad-free. The FTUE is a fixed full-screen takeover on
+  // the home route (NOT its own route), so the route-based ad gates can't catch it
+  // and the native banner composites ABOVE the WebView regardless of z-index. This
+  // single class is the source of truth read by BannerCoordinatorMount (native) and
+  // useOnboardingActive → AdSenseLoader (web) to suppress both ad layers, and it
+  // also gives the overlay a CSS hook. Removed on unmount so ads resume afterwards.
+  useEffect(() => {
+    document.documentElement.classList.add('onboarding-active');
+    return () => document.documentElement.classList.remove('onboarding-active');
+  }, []);
+
   const emitCompleted = useCallback((extras: Record<string, unknown> = {}) => {
     if (completionEmittedRef.current) return;
     completionEmittedRef.current = true;
@@ -403,7 +414,13 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   return (
     <div
       data-testid="onboarding-flow"
-      className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-center overflow-y-auto"
+      // Keyboard-safe layout: 100dvh shrinks with the soft keyboard (paired with
+      // viewport `interactiveWidget: resizes-content`), and on small screens we
+      // top-align + scroll instead of hard-centering — otherwise the vertically
+      // centered card pushes the "Continue" CTA under the keyboard. Desktop keeps
+      // the centered presentation (no keyboard inset there).
+      className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-start sm:justify-center overflow-y-auto py-[max(env(safe-area-inset-top),1rem)]"
+      style={{ minHeight: '100dvh' }}
       dir={dir}
     >
       {/* Subtle diagonal grid pattern */}

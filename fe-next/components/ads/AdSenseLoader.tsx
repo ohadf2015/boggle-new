@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { Capacitor } from '@capacitor/core';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
+import { useOnboardingActive } from '@/hooks/useOnboardingActive';
 import { shouldSuppressAdsForTier } from '@/lib/families/adPolicy';
 import { hasConsent, onConsentChange } from '@/utils/cookieConsent';
 import { getAdSenseClient, isAdSenseConfigured, shouldLoadAdSense } from '@/lib/ads/adSensePolicy';
@@ -22,6 +23,7 @@ import { getAdSenseClient, isAdSenseConfigured, shouldLoadAdSense } from '@/lib/
 export function AdSenseLoader() {
   const { tier } = useSocialCapabilities();
   const crazyGames = useCrazyGames();
+  const onboardingActive = useOnboardingActive();
   const [adConsent, setAdConsent] = useState(false);
 
   useEffect(() => {
@@ -36,6 +38,8 @@ export function AdSenseLoader() {
     isNative: Capacitor.isNativePlatform(),
     isCrazyGames: crazyGames?.isOnCrazyGamesPlatform === true,
     suppressedByTier: shouldSuppressAdsForTier(tier),
+    // Keep the FTUE ad-free: withhold the script while the onboarding overlay is up.
+    onboardingActive,
   });
 
   if (!load) return null;

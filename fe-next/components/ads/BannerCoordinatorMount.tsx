@@ -122,6 +122,10 @@ export default function BannerCoordinatorMount() {
           drawerOpen: document.documentElement.classList.contains('mobile-drawer-open'),
           inGame: document.body.classList.contains('screen-fit-locked'),
           allowInGame: document.documentElement.classList.contains('banner-allow-in-game'),
+          // FTUE overlay open (set by OnboardingFlow). Unconditional suppress so the
+          // first run stays ad-free — see shouldSuppressBanner. Lives on <html>,
+          // already covered by the observer below.
+          onboarding: document.documentElement.classList.contains('onboarding-active'),
         }),
       );
     syncSuppress(); // reflect any drawer/game state already active at mount

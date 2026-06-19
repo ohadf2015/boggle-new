@@ -51,12 +51,23 @@ export function shouldLoadAdSense(ctx: {
   isNative: boolean;
   isCrazyGames: boolean;
   suppressedByTier: boolean;
+  /**
+   * The FTUE onboarding overlay is open. Onboarding is the highest-leverage
+   * conversion funnel; an anchored Auto-Ads banner there covers the primary CTA
+   * and reads as aggressive monetization before any value is delivered. Industry
+   * standard is an ad-free registration/onboarding flow — so we withhold the
+   * script entirely until onboarding completes. (Onboarding mounts before the
+   * consent-gated, afterInteractive adsbygoogle.js would load on first run, so in
+   * practice the script never injects during the FTUE.)
+   */
+  onboardingActive?: boolean;
 }): boolean {
   return (
     ctx.enabled &&
     ctx.hasAdConsent &&
     !ctx.isNative &&
     !ctx.isCrazyGames &&
-    !ctx.suppressedByTier
+    !ctx.suppressedByTier &&
+    !ctx.onboardingActive
   );
 }

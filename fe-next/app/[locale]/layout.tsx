@@ -213,6 +213,11 @@ export const viewport = {
     initialScale: 1,
     viewportFit: 'cover',
     themeColor: '#1a1a2e',
+    // Let the soft keyboard SHRINK the layout viewport instead of overlaying it.
+    // With this, a bottom-anchored element (e.g. the onboarding "Continue" CTA)
+    // sits above the keyboard rather than behind it. Combined with 100dvh on the
+    // onboarding overlay, this keeps the primary action reachable while typing.
+    interactiveWidget: 'resizes-content' as const,
 };
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<ReactNode> {

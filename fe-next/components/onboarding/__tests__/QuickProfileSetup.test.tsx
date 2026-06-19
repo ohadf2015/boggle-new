@@ -34,6 +34,17 @@ vi.mock('lucide-react', () => ({
   X: () => <div data-testid="x-icon" />,
 }));
 
+// Controllable virtual-keyboard mock so we can assert the CTA is scrolled into
+// view when the soft keyboard opens (the fix for "the keyboard + banner cover the
+// Continue button").
+const { kbState } = vi.hoisted(() => ({
+  kbState: { current: { keyboardVisible: false, keyboardHeight: 0 } },
+}));
+vi.mock('@/hooks/useMobileKeyboard', () => ({
+  useMobileKeyboard: () => kbState.current,
+  scrollInputIntoView: vi.fn(),
+}));
+
 // Mock the optional Google signup panel — it has its own test and pulls in the
 // auth stack (supabase, OAuth hooks) we don't want loaded here.
 vi.mock('../OnboardingGoogleSignup', () => ({
@@ -135,6 +146,33 @@ describe('QuickProfileSetup', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    kbState.current = { keyboardVisible: false, keyboardHeight: 0 };
+  });
+
+  describe('keyboard-safe CTA', () => {
+    it('scrolls the Continue button into view when the soft keyboard opens', () => {
+      const scrollSpy = vi.fn();
+      // happy-dom doesn't implement scrollIntoView — install a spy to observe it.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (Element.prototype as any).scrollIntoView = scrollSpy;
+
+      const { rerender } = render(<QuickProfileSetup {...defaultProps} />);
+      scrollSpy.mockClear();
+
+      // Keyboard opens → component re-renders with keyboardVisible=true.
+      kbState.current = { keyboardVisible: true, keyboardHeight: 300 };
+      rerender(<QuickProfileSetup {...defaultProps} />);
+
+      expect(scrollSpy).toHaveBeenCalled();
+    });
+
+    it('does not scroll on mount while the keyboard is closed', () => {
+      const scrollSpy = vi.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (Element.prototype as any).scrollIntoView = scrollSpy;
+      render(<QuickProfileSetup {...defaultProps} />);
+      expect(scrollSpy).not.toHaveBeenCalled();
+    });
   });
 
   it('renders the slide-up profile card', () => {
