@@ -6,13 +6,15 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Auth: fast local JWT verify (read-only GET); supabase client retained for the query.
+    const user = await getAuthedUser(request);
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

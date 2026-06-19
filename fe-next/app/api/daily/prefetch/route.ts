@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { generateDailyPuzzle } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -29,10 +29,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'invalid date format' }, { status: 400 });
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthedUser(request);
   if (!user) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }

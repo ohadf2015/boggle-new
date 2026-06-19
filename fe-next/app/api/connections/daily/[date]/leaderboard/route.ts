@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
 
@@ -40,10 +40,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .eq('puzzle_date', date);
 
     // Caller's own rank (authed user wins over guest fingerprint).
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getAuthedUser(request);
     const guestFingerprint = url.searchParams.get('guestFingerprint');
     let ownRank: number | null = null;
     if (user || guestFingerprint) {
