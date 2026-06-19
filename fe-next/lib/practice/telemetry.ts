@@ -99,3 +99,10 @@ export function trackPracticeAbandoned(args: PracticeAbandonedArgs): void {
     seconds_on_page: args.secondsOnPage,
   });
 }
+
+export function trackPracticeRetryClicked(args: ModeLocale): void {
+  safeCapture('practice_retry_clicked', {
+    mode: args.mode,
+    locale: args.locale,
+  });
+}

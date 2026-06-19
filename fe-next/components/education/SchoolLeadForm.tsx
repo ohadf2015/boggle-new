@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -23,6 +23,10 @@ const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display
 export function SchoolLeadForm() {
   const { t, language } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    trackGrowthEvent('school_lead_form_viewed', { locale: language });
+  }, [language]);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [school, setSchool] = useState('');

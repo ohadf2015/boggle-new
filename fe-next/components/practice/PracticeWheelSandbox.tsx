@@ -16,7 +16,9 @@ import {
   trackPracticeStarted,
   trackPracticeWordFound,
   trackPracticeCompleted,
+  trackPracticeRetryClicked,
 } from '@/lib/practice/telemetry';
+import { usePracticeWheelRetryCta } from '@/hooks/usePracticeWheelRetryCta';
 import { getPracticeStreak } from '@/hooks/usePracticeStreak';
 import { usePracticeValidator } from '@/lib/practice/usePracticeValidator';
 // REUSE the real Wheel Rush gameplay. WordWheelGame renders the wheel, builder,
@@ -66,10 +68,12 @@ export default function PracticeWheelSandbox() {
 
   const [foundCount, setFoundCount] = useState(0);
   const [popupDismissed, setPopupDismissed] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
   const startedAtRef = useRef(0);
   const completedFiredRef = useRef(false);
   const goal = PRACTICE_GOALS.wheelRush;
   const isComplete = foundCount >= goal;
+  const showRetryCta = usePracticeWheelRetryCta(gameOver || (isComplete && popupDismissed));
 
   useEffect(() => {
     startedAtRef.current = Date.now();
@@ -110,11 +114,27 @@ export default function PracticeWheelSandbox() {
 
   const liveHref = practiceTargetUrl('wheelRush', language);
 
-  // "End run" (WordWheelGame practice CTA) → hand the player straight to the
-  // real game, same destination as the quiet bailout link.
+  // When the game ends (timer/end-run): mark gameOver so the routing effect
+  // or retry-cta overlay can respond. Kept dependency-free to avoid stale closures.
   const handleComplete = useCallback((_result: WordWheelGameResult) => {
-    router.push(liveHref);
-  }, [router, liveHref]);
+    setGameOver(true);
+  }, []);
+
+  // control variant: navigate to live game on game-over (retry-cta intercepts via overlay).
+  useEffect(() => {
+    if (gameOver && !showRetryCta) router.push(liveHref);
+  }, [gameOver, showRetryCta, router, liveHref]);
+
+  const handleRetry = useCallback(() => {
+    setPuzzle(makePracticeWheel(language));
+    setFoundCount(0);
+    setPopupDismissed(false);
+    setGameOver(false);
+    completedFiredRef.current = false;
+    startedAtRef.current = Date.now();
+    trackPracticeRetryClicked({ mode: 'wheelRush', locale: language });
+    trackPracticeStarted({ mode: 'wheelRush', locale: language });
+  }, [language]);
 
   // Practice drops the daily effects canvas — sounds still play via context.
   const noopEffect = useCallback(() => {}, []);
@@ -171,7 +191,26 @@ export default function PracticeWheelSandbox() {
         mode="wheelRush"
         onDismiss={() => setPopupDismissed(true)}
       />
-      <PracticePostCompleteChip open={isComplete && popupDismissed} mode="wheelRush" />
+      {!showRetryCta && <PracticePostCompleteChip open={isComplete && popupDismissed} mode="wheelRush" />}
+
+      {/* exp-practice-wheel-cta-v1: retry-cta variant — "Try Again" overlay on game-over */}
+      {showRetryCta && (gameOver || (isComplete && popupDismissed)) && (
+        <div className="absolute inset-x-0 bottom-0 p-4 flex flex-col gap-2 bg-neo-navy/95 border-t-2 border-neo-purple z-20">
+          <button
+            data-testid="practice-retry-cta"
+            onClick={handleRetry}
+            className="w-full py-3 rounded-neo border-2 border-neo-purple bg-neo-purple text-neo-white font-neo-display font-black text-base shadow-hard"
+          >
+            {t('practiceHub.tryAgain')}
+          </button>
+          <a
+            href={liveHref}
+            className="block w-full py-2 text-center text-xs text-neo-cream/60 font-neo-display hover:text-neo-cream transition-colors"
+          >
+            {t('practiceHub.goLive')}
+          </a>
+        </div>
+      )}
     </div>
   );
 }

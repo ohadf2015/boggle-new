@@ -29,6 +29,8 @@ import {
   pickDailyModifier,
 } from '@/lib/solo/soloDaily';
 import { alchemyScore } from '@/lib/solo/soloReward';
+import toast from 'react-hot-toast';
+import { checkAndUpdatePB, getAlchemyStreakPB } from '@/lib/wordAlchemy/alchemyStreak';
 
 /**
  * Word Alchemy — an experimental, admin-gated transformation-chain mode
@@ -258,6 +260,7 @@ export default function WordAlchemyPage() {
   const [input, setInput] = useState('');
   const [wrongCount, setWrongCount] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [pbStreak, setPbStreak] = useState(() => getAlchemyStreakPB());
   const [wildcardFound, setWildcardFound] = useState(false);
   const [stepResults, setStepResults] = useState<StepResult[]>([]);
   const [winFlash, setWinFlash] = useState(0);
@@ -356,6 +359,11 @@ export default function WordAlchemyPage() {
       setWrongCount(0);
       const nextStreak = streak + 1;
       setStreak(nextStreak);
+      const { isNewPB } = checkAndUpdatePB(nextStreak);
+      if (isNewPB && nextStreak >= 2) {
+        setPbStreak(nextStreak);
+        toast.success(t('wordAlchemy.streakNewPB', { n: nextStreak }));
+      }
       playSound(wasRush ? 'victoryFanfare' : 'wordAccepted');
       burstAt(wasRush ? 'celebration' : nextStreak >= 3 ? 'celebration' : 'sparkle-valid', inputRef.current, wasRush ? 32 : nextStreak >= 3 ? 18 : undefined);
     } else {
@@ -406,8 +414,14 @@ export default function WordAlchemyPage() {
         </h1>
         <div className="flex items-center gap-2">
           {streak >= 2 && (
-            <span className="inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-yellow px-2.5 py-1 font-neo-display font-black text-[10px] uppercase tracking-wide text-neo-navy shadow-hard-sm animate-neo-pop">
-              {t('wordAlchemy.streak', { n: streak })}
+            <span
+              className={`inline-flex items-center gap-1 rounded-neo border-2 border-black px-2.5 py-1 font-neo-display font-black text-[10px] uppercase tracking-wide text-neo-navy shadow-hard-sm animate-neo-pop ${
+                streak >= pbStreak && pbStreak >= 2
+                  ? 'bg-neo-purple text-neo-cream'
+                  : 'bg-neo-yellow'
+              }`}
+            >
+              {streak >= pbStreak && pbStreak >= 2 ? `⚗️ ${t('wordAlchemy.streak', { n: streak })}` : t('wordAlchemy.streak', { n: streak })}
             </span>
           )}
           <span

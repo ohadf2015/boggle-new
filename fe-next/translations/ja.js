@@ -251,6 +251,7 @@ const ja = {
     "wonSubtitle": "お見事！次のパズルへ進みますか？",
     "adminOnly": "ワードアルケミーは管理者専用のプレビューです。",
     "streak": "{n} 連続",
+    "streakNewPB": "自己ベスト更新：{n}連続！⚗️",
     "ops": {
       "synonym": "同義語",
       "anagram": "アナグラム",

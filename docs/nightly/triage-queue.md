@@ -879,3 +879,51 @@ FLAG NEEDED: exp-practice-wheel-cta-v1  variants=[control, retry-cta]  50/50
   - status: deferred (admin-specific functions like admin_overview_stats, admin_bulk_ban_players — these likely need authenticated access; audit required before bulk REVOKE)
   - why: Bulk REVOKE could break admin panel if some functions ARE intentionally authenticated-callable
   - recommended owner: review-by-eod; batch audit admin vs user-facing functions
+
+## 2026-06-19
+- [Sentry] JAVASCRIPT-NEXTJS-1KQ: churn-signals report failed with status 502
+  - first seen: 2026-06-03, last seen: 2026-06-05, count: 278, users: 3
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1KQ
+  - status: deferred (code no longer exists — useChurnSignals hook and API endpoint fully removed from codebase; needs Sentry resolve)
+  - why: Sentry API returned 403 on update_issue — token lacks write permission
+  - recommended owner: review-by-eod; manually resolve in Sentry UI
+
+- [Sentry] JAVASCRIPT-NEXTJS-1CW: TypeError null.clear() on word-wheel
+  - first seen: 2026-05-15, last seen: 2026-06-09, count: 13, users: 5
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1CW
+  - status: already fixed — commit abe2dcd2f added destroyed-guard + ticker stop-before-destroy in WordWheelPixiRing.tsx; Sentry resolve also blocked by 403
+  - why: Cannot programmatically resolve (403); resolve manually in Sentry UI
+  - recommended owner: review-by-eod
+
+- [Supabase] SECURITY DEFINER: update_difficulty_after_game callable by authenticated
+  - link: supabase advisor security:authenticated_security_definer_function_executable
+  - status: deferred — migration SQL written at supabase/migrations/20260619030000_security_hardening_advisors.sql
+  - why: Supabase MCP unauthorized (SUPABASE_ACCESS_TOKEN not set); requires manual apply + function body inspection before adding auth.uid() guard
+  - recommended owner: review-by-eod; inspect function body via SQL editor, then apply migration
+
+- [Supabase] RLS always-true: teacher_access_requests tar_insert_any INSERT policy
+  - link: supabase advisor security:rls_policy_always_true
+  - status: deferred — tightened policy SQL written at supabase/migrations/20260619030000_security_hardening_advisors.sql
+  - why: Supabase MCP unauthorized; policy replacement (not addition) — DEFER per autonomy matrix
+  - recommended owner: review-by-eod; anon path preserved, authenticated path restricted to own user_id
+
+---
+
+## Dead Feature Flags — retire (2026-06-19, lane 03)
+
+These flags have active call sites and cannot be removed autonomously. All have been running long enough to decide.
+
+- **`share-prompt-timing`** (~72d, ~0 experiment exposure, active=true, 2 call sites)
+  - Status: never ramped / always dark — no data collected
+  - Recommended action: delete flag + remove conditional from code (no variant to preserve — control is status quo)
+  - Owner: human
+
+- **`show-signup-after-first-win`** (inconclusive, active=true, 1 call site)
+  - Status: marked inconclusive in prior triage, still live
+  - Recommended action: pick whichever arm is default → delete flag + remove conditional
+  - Owner: human
+
+- **`mp-signup-nudge-copy-v1`** (0/77 converts in 28d, active=true, 3 call sites)
+  - Status: null result — `toast-disabled` variant indistinguishable from control on conversion
+  - Recommended action: keep control code path (sheet-only, no toast), delete flag + toast-disabled branch
+  - Owner: human

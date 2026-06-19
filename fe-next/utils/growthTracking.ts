@@ -144,6 +144,7 @@ export type GrowthEvent =
   | 'landing_cta_clicked'
   | 'education_upsell_impression'
   | 'school_lead_submitted'
+  | 'school_lead_form_viewed'
   // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel)
   | 'cross_promo_click'
   // Results-page CTA tracking — experiment conversion funnel (exp-results-replay-cta-v1)

@@ -1,95 +1,103 @@
 {
-  "date": "2026-06-18",
-  "note": "Twenty-second snapshot. Frontend fix shipped: useGridInteraction.ts — cellNodeMapRef now pre-populated at mount (querySelectorAll moved off interaction path → INP improvement for all game modes). TDD test: useGridInteraction.cellNodeMap.test.ts (2 cases). Backend (RESOLVED 2026-06-18, manual): the lane DEFERRED believing Supabase MCP was unavailable, but it was working (lane 01 used it fine; token valid). Applied live via Management API: 3 auth_rls_initplan wraps (tar_select_own, taa_select_own_email, taa_update_own_email) + word_pacts.player2_id FK index → live advisor auth_rls_initplan 3→0. offerwall_postbacks unused index was already dropped. Recorded in migrations 20260615030000 (now idempotent) + 20260618030000. multiple_permissive_policies (20) + unused_index (7) left for careful review. 7d window: /es/multiplayer INP 442ms POOR (n=87). 24h window: 0 routes above n>=50 floor.",
+  "date": "2026-06-19",
+  "note": "Twenty-third snapshot. Backend fix shipped LIVE: policy consolidation on teacher_access_allowlist (6 separate policies → 3: taa_admin_insert + taa_select + taa_update) and teacher_access_requests (2 SELECT policies → 1: tar_select). Dropped 3 unused indexes: idx_word_pacts_player2_id, idx_tar_status, idx_taa_consumed. Migration 20260619040000_perf_policy_consolidation.sql applied via REST. Supabase MCP unauthorized (token config issue) — used REST API fallback throughout. 7d window: /he LCP jumped 4764→6273ms (+31.6%, n=85) — WATCH, no clear code root cause found (mascot has priority, loading.tsx change is suspense fallback not LCP). /es/multiplayer INP improving: 442→400ms (-9.5%, cellNodeMap fix from 06-18 may be contributing). 24h window: 0 routes above n≥50 floor (low traffic).",
   "backend": {
-    "advisor_warnings_count": 5,
-    "advisor_warnings": [
+    "advisor_warnings_count": 0,
+    "advisor_warnings_warn_count_before": 20,
+    "advisor_warnings_warn_count_after": 0,
+    "advisor_warnings_info_unused_idx_before": 8,
+    "advisor_warnings_info_unused_idx_after": 5,
+    "changes_applied": [
       {
-        "type": "auth_rls_initplan",
-        "table": "teacher_access_requests",
-        "policy": "tar_insert_authenticated",
-        "status": "MIGRATION WRITTEN 20260615030000_perf_advisor_fixes.sql. NOT YET APPLIED (MCP unavailable 06-15/17/18). Needs manual apply."
-      },
-      {
-        "type": "unindexed_foreign_keys",
-        "table": "word_pacts",
-        "fkey": "word_pacts_player2_id_fkey",
-        "status": "MIGRATION WRITTEN 20260615030000_perf_advisor_fixes.sql. NOT YET APPLIED."
-      },
-      {
-        "type": "unused_index",
-        "table": "offerwall_postbacks",
-        "index": "idx_offerwall_postbacks_user",
-        "status": "MIGRATION WRITTEN 20260617030000_perf_drop_unused_index.sql. NOT YET APPLIED."
-      },
-      {
-        "type": "auth_rls_initplan",
+        "type": "policy_consolidation",
         "table": "teacher_access_allowlist",
-        "policy": "taa_update_own_email",
-        "status": "NEW 06-18 — re-evaluates auth.uid() per row on UPDATE. Fix: wrap in (select auth.uid()). Migration NOT YET WRITTEN (MCP unavailable)."
+        "detail": "Dropped 6 policies (3 inline-EXISTS admin duplicates + 2 admin+1 own-email originals); created taa_select (admin OR own email) and taa_update (admin OR own email). INSERT kept as taa_admin_insert (1 policy, no duplicate).",
+        "status": "APPLIED LIVE 2026-06-19"
       },
       {
-        "type": "multiple_permissive_policies",
+        "type": "policy_consolidation",
         "table": "teacher_access_requests",
-        "role": "supabase_privileged_role",
-        "action": "SELECT",
-        "policies": ["tar_admin_select", "tar_select_own"],
-        "status": "NEW 06-18 — two permissive SELECT policies ORed together. Fix: consolidate into one policy. Migration NOT YET WRITTEN (MCP unavailable)."
+        "detail": "Merged tar_admin_select + tar_select_own into single tar_select policy: is_admin_user() OR (SELECT auth.uid()) = user_id",
+        "status": "APPLIED LIVE 2026-06-19"
+      },
+      {
+        "type": "unused_index_drop",
+        "index": "idx_word_pacts_player2_id",
+        "table": "word_pacts",
+        "status": "DROPPED LIVE 2026-06-19"
+      },
+      {
+        "type": "unused_index_drop",
+        "index": "idx_tar_status",
+        "table": "teacher_access_requests",
+        "status": "DROPPED LIVE 2026-06-19"
+      },
+      {
+        "type": "unused_index_drop",
+        "index": "idx_taa_consumed",
+        "table": "teacher_access_allowlist",
+        "status": "DROPPED LIVE 2026-06-19"
       }
     ],
     "top_queries": [
       {
-        "label": "Realtime WAL parser",
+        "label": "Realtime WAL parser (x2 variants)",
+        "total_ms": 5974046,
+        "calls": 1389248,
+        "mean_ms": 4.30,
         "verdict": "INFRASTRUCTURE — Supabase Realtime internal. Not actionable."
       },
       {
+        "label": "pg_timezone_names SELECT",
+        "total_ms": 133388,
+        "calls": 1016,
+        "mean_ms": 131.29,
+        "verdict": "INFRASTRUCTURE — Supabase internal auth connection init. Not actionable."
+      },
+      {
         "label": "analytics_events SELECT",
-        "mean_ms": 18.5,
-        "calls": 1514,
-        "verdict": "WATCH — carried from 06-14. Re-check when MCP available."
+        "mean_ms": 19.15,
+        "calls": 1984,
+        "verdict": "WATCH — slight increase from 18.5ms (06-18). Monitor."
       }
+    ],
+    "remaining_unused_indexes": [
+      "idx_word_review_state_lesson_id",
+      "idx_curator_proposals_lang_status",
+      "idx_curator_proposals_curator",
+      "idx_curator_proposals_open",
+      "idx_word_wheel_attempts_catchup"
     ]
   },
   "frontend": {
-    "note": "24h window: 0 routes above n>=50 floor. 7d window: 3 routes above floor.",
+    "note": "24h window: 0 routes above n≥50 floor. 7d window: 2 routes above floor.",
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 4764,
+        "p75_lcp_ms": 6273,
         "p75_inp_ms": 184,
         "p75_cls": 0.193,
-        "n_7d": 84,
+        "n_7d": 85,
         "window": "7d",
-        "lcp_status": "POOR — 4764ms, flat vs 06-17.",
-        "inp_status": "WATCH — 184ms, improving trend from 264ms (06-14). Below 200ms threshold.",
-        "cls_status": "IMPROVING — 0.193, down from 0.460 (06-14)."
-      },
-      {
-        "route": "/en",
-        "p75_lcp_ms": 4352,
-        "p75_inp_ms": 160,
-        "p75_cls": 0.150,
-        "n_7d": 57,
-        "window": "7d",
-        "lcp_status": "POOR — 4352ms, slight improvement from 4440ms (06-17).",
-        "inp_status": "OK — 160ms.",
-        "cls_status": "WATCH — 0.150, near 0.1 Good threshold."
+        "lcp_status": "POOR — 6273ms (+31.6% vs 4764ms baseline on 06-18, n=85 both runs). WATCH — mascot has priority prop, loading.tsx change is suspense fallback not LCP. No code root cause identified. Needs 2nd reading before flagging code regression.",
+        "inp_status": "OK — 184ms, stable.",
+        "cls_status": "WATCH — 0.193, improving trend from 0.460 (06-14)."
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 3452,
-        "p75_inp_ms": 442,
-        "p75_cls": 0.239,
-        "n_7d": 87,
+        "p75_lcp_ms": 2980,
+        "p75_inp_ms": 400,
+        "p75_cls": 0.207,
+        "n_7d": 71,
         "window": "7d",
-        "lcp_status": "POOR — 3452ms.",
-        "inp_status": "POOR — 442ms (n=87). No prior INP baseline entry for this route. cellNodeMap mount-time fix ships tonight — may reduce on next baseline.",
-        "cls_status": "POOR — 0.239. Trend: 0.144→0.288→0.239. Watch 2 more nights."
+        "lcp_status": "POOR — 2980ms, improving from 3452ms (06-18) -13.7%.",
+        "inp_status": "POOR — 400ms, improving from 442ms (06-18) -9.5%. cellNodeMap mount-time fix (06-18) may be contributing.",
+        "cls_status": "POOR — 0.207. Trend: 0.144→0.288→0.239→0.207. Slow improvement."
       }
     ]
   },
   "bundle": {
-    "note": "No .next build run this lane (budget constraint). Prior top_chunks carried forward.",
+    "note": "No .next build run this lane (budget constraint).",
     "total_kb": null,
     "top_chunks": []
   }

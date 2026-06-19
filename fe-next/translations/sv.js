@@ -338,6 +338,7 @@ const sv = {
     "wonSubtitle": "Snygg kedja! Redo för nästa?",
     "adminOnly": "Ordalkemi är endast en admin-förhandsvisning.",
     "streak": "{n} i rad",
+    "streakNewPB": "Nytt rekord: {n} i rad! ⚗️",
     "ops": {
       "synonym": "Synonym",
       "anagram": "Anagram",

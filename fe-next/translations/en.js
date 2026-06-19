@@ -238,6 +238,7 @@ const en = {
     "wonSubtitle": "Nice chain! Ready for the next one?",
     "adminOnly": "Word Alchemy is an admin-only preview.",
     "streak": "{n} in a row",
+    "streakNewPB": "New best chain: {n} in a row! ⚗️",
     "ops": {
       "synonym": "Synonym",
       "anagram": "Anagram",
