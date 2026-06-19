@@ -301,7 +301,7 @@ export function BlastHUD({
           )}
           <ExitRoomButton
             onClick={onQuit}
-            label={t('common.quit')}
+            label={t('common.quit') ?? 'Quit'}
             data-testid="blast-quit-btn"
             className="w-7 h-7 min-w-0 min-h-0"
           />
