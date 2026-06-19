@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Weekly disk reclaim. Install:
+    cp scripts/com.lexi.disk-janitor.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.lexi.disk-janitor.plist
+  Runs Sundays 04:00 local. Safe: skips live .next/.next-nightly, dirty/in-use
+  worktrees; worktree removal keeps branch refs. Adjust the age floor via the
+  EnvironmentVariables block if you want it more/less aggressive.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.lexi.disk-janitor</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/ohadfisher/git/boggle-new/scripts/disk-janitor.sh</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>DISK_JANITOR_MIN_AGE_DAYS</key>
+    <string>3</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key><integer>0</integer>
+    <key>Hour</key><integer>4</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/Users/ohadfisher/.cache/lexi-nightly/disk-janitor.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/ohadfisher/.cache/lexi-nightly/disk-janitor.log</string>
+</dict>
+</plist>
