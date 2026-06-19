@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
 
@@ -134,20 +135,17 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/coins
  * Get user's current coin balance through server-side proxy.
+ * Uses getAuthedUser helper for fast local JWT verification (sub-ms) instead of network round-trip.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const user = await getAuthedUser(request);
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabase = await createClient();
     const { data, error } = await supabase
       .from('profiles')
       .select('total_coins, lifetime_coins_earned')

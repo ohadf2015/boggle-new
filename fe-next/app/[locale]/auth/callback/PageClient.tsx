@@ -211,6 +211,7 @@ function AuthCallbackContent(): React.JSX.Element {
 
     return new Promise((resolve) => {
       let resolved = false;
+      let isCheckingRef = false; // Guard against overlapping in-flight checks
 
       // Subscribe to cross-tab auth messages
       const unsubscribe = subscribeToAuthSync((message: AuthSyncMessage) => {
@@ -237,7 +238,8 @@ function AuthCallbackContent(): React.JSX.Element {
 
       // Also poll periodically in case BroadcastChannel events are missed
       const pollTimer = setInterval(async () => {
-        if (resolved) return;
+        // Guard: skip if a check is already in-flight
+        if (resolved || isCheckingRef) return;
 
         if (Date.now() - startTime >= maxWaitMs) {
           cleanup();
@@ -246,13 +248,19 @@ function AuthCallbackContent(): React.JSX.Element {
         }
 
         if (!supabase) return;
-        const { data } = await supabase.auth.getSession();
-        if (data?.session) {
-          logger.log('Auth callback: Session detected from other tab via polling');
-          resolved = true;
-          cleanup();
-          safeRedirect(next);
-          resolve(true);
+
+        isCheckingRef = true;
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session) {
+            logger.log('Auth callback: Session detected from other tab via polling');
+            resolved = true;
+            cleanup();
+            safeRedirect(next);
+            resolve(true);
+          }
+        } finally {
+          isCheckingRef = false;
         }
       }, pollInterval);
 

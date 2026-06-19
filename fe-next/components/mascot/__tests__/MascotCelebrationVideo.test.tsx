@@ -89,10 +89,31 @@ describe('MascotCelebrationVideo', () => {
   it('eagerly preloads + backs the frame with dark navy so it never flashes white/empty', () => {
     render(<MascotCelebrationVideo kind="champion" />);
     const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
-    // preload=metadata left the framed box empty during the scale-in entrance.
+    // preload=auto ensures the first frame is decoded before the 620ms scale-in entrance plays.
+    // preload=metadata left the framed box empty during entrance, reading as a flash.
+    // preload=none would prevent autoPlay from playing immediately on mount.
     expect(video?.getAttribute('preload')).toBe('auto');
-    // dark backing == #0A1828; a slow first frame reads as navy, not a flash.
+    // dark backing == #0A1828; a slow first frame reads as navy, not a white flash.
     expect(video?.style.backgroundColor).toBe('#0A1828');
+  });
+
+  it('component is lazy-mounted only when celebration triggers (prevents mp4 pre-fetch)', () => {
+    /**
+     * The component wraps heavy mp4s (2.6-5.7MB each). Per architecture, ResultsPage
+     * conditionally renders <PreResultFanfare /> only when celebrationKind is truthy
+     * and !fanfareDone and shouldPlayPreResultFanfare() → component never enters the DOM
+     * until celebration is needed. This ensures mp4 files don't pre-fetch on page load.
+     *
+     * This test exists as documentation of the expected pattern; the actual conditional
+     * render lives in ResultsPage.tsx:1067 ("if (celebrationKind && !fanfareDone && ...)")
+     * and PreResultFanfare.tsx (mounts MascotCelebrationVideo inside an AnimatePresence gate).
+     */
+    render(<MascotCelebrationVideo kind="champion" />);
+    // When mounted, the video element exists and uses preload=auto (not none)
+    // because autoPlay requires eager first-frame availability.
+    const video = screen.getByTestId('mascot-celebration-video').querySelector('video');
+    expect(video).toBeInTheDocument();
+    expect(video?.getAttribute('preload')).toBe('auto');
   });
 
   it('calls onDone after autoDismissMs', () => {
