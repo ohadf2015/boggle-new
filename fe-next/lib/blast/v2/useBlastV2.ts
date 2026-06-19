@@ -401,12 +401,17 @@ function reducer(state: State, action: Action): State {
     const config = LOCALE_CONFIGS[state.level.locale];
     const next = detectCascade(state.level, state.foundWords, config);
     if (!next) return state; // nothing formable to point at — no charge
+    // Keep the two unlock tiers distinct: revealWordHint (L30+) glows the whole
+    // word path (the full solve); the earlier revealLetterHint (L7+) glows only
+    // the FIRST letter — a nudge, not a drag-along-the-glow auto-solve.
+    const mech = mechanicsForLevel(state.level.levelNumber);
+    const cells = mech.revealWordHint ? next.cells : next.cells.slice(0, 1);
     trackBlastHintUsed({
       level: state.level.levelNumber,
-      hint_type: 'reveal_word',
+      hint_type: mech.revealWordHint ? 'reveal_word' : 'reveal_letter',
       coin_cost: 0,
     });
-    return { ...state, hintsUsed: state.hintsUsed + 1, hintCells: next.cells };
+    return { ...state, hintsUsed: state.hintsUsed + 1, hintCells: cells };
   }
   if (action.type === 'forceBonus') {
     return { ...applyForceBonus(state, action.cells, action.word), hintCells: [] };

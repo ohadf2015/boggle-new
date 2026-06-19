@@ -35,22 +35,36 @@ describe('useBlastV2 — reveal hint', () => {
     expect(result.current.state.hintsUsed).toBe(0);
   });
 
-  it('revealHint highlights the next formable theme word and spends a star', () => {
-    const { result } = renderHook(() => useBlastV2(level));
+  it('revealLetterHint (L7) glows only the FIRST letter of the next word — a nudge', () => {
+    const { result } = renderHook(() => useBlastV2(level)); // levelNumber 7
 
     act(() => {
       result.current.handlers.onRevealHint();
     });
 
-    // First formable remaining theme word is CAT (col 0, bottom-up).
+    // First formable remaining theme word is CAT (col 0, bottom-up); at the
+    // letter-hint tier we reveal only its first cell, not the whole path.
+    expect(result.current.state.hintCells).toEqual([cellId(0, 0)]);
+    // Cost is a star penalty (hintsUsed), NOT coins — coins untouched.
+    expect(result.current.state.hintsUsed).toBe(1);
+    expect(result.current.state.coins).toBe(0);
+  });
+
+  it('revealWordHint (L30+) glows the WHOLE word path', () => {
+    const wordHintLevel = { ...level, levelNumber: 30 };
+    const { result } = renderHook(() => useBlastV2(wordHintLevel));
+
+    act(() => {
+      result.current.handlers.onRevealHint();
+    });
+
+    // At the word-hint tier the full CAT column lights up.
     expect(result.current.state.hintCells).toEqual([
       cellId(0, 0),
       cellId(0, 1),
       cellId(0, 2),
     ]);
-    // Cost is a star penalty (hintsUsed), NOT coins — coins untouched.
     expect(result.current.state.hintsUsed).toBe(1);
-    expect(result.current.state.coins).toBe(0);
   });
 
   it('clears the hint glow once a word is submitted', () => {
