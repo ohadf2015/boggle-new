@@ -310,7 +310,9 @@ const ja = {
     "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
     "crane": { "place": "単語を置く", "steer": "操作して落とす", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定", "steady": "安定", "onFire": "絶好調", "steadyAria": "安定した手のストリーク：パーフェクト{n}回" },
     "verdict": { "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらっ", "miss": "ミス！" },
-    "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "{n}回連続パーフェクト", "watchAd": "📺 広告を見る +1", "adEarned": "🎯 広告でトークンゲット！" },
+    "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "新エリアまたは実績！", "watchAd": "📺 広告を見る +1", "adEarned": "🎯 広告でトークンゲット！" },
+    "reward": { "tier": { "common": "コイン", "uncommon": "いい収穫！", "rare": "レアな発見！", "epic": "ジャックポット！" } },
+    "wreck": { "reportTitle": "塔が襲撃された！", "reportBody": "留守中に{name}が{floors}階を崩した — 反撃用のシャッフルをどうぞ。" },
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
@@ -730,6 +732,7 @@ const ja = {
   },
   "cookieConsent": {
     "title": "Cookieの同意",
+    "mascotAlt": "クッキーを頬張るLexiClashのマスコット",
     "message": "分析および関連広告の表示にCookieを使用しています。以下で設定をカスタマイズできます。",
     "accept": "すべて承認",
     "decline": "すべて拒否",
@@ -13665,6 +13668,77 @@ const ja = {
     "downloaded": "{size} MB · {count} 語",
     "notDownloaded": "ダウンロードされていません",
     "errorGeneric": "ダウンロードに失敗しました。もう一度お試しください。"
+  },
+  "modeCoach": {
+    "skip": "スキップ",
+    "next": "次へ",
+    "gotIt": "わかりました！",
+    "classic": {
+      "title": "文字をなぞる",
+      "step1": "つながった文字をなぞって単語を作ろう",
+      "step2": "長い単語ほど高得点",
+      "scoreTip": "連続で単語を作るとコンボゲット！"
+    },
+    "wordHunt": {
+      "title": "単語を当てる",
+      "step1": "マスをタップして答えを推測",
+      "step2": "色が答えのヒント",
+      "scoreTip": "早く当てると大加点！"
+    },
+    "wheelRush": {
+      "title": "回して綴る",
+      "step1": "中央の文字は必ず使う",
+      "step2": "ライバルに奪われる前に確定",
+      "scoreTip": "長い単語ほど高得点ゲット！"
+    },
+    "blast": {
+      "title": "タイルを爆破",
+      "step1": "文字をなぞって単語を作る",
+      "step2": "タイルを消してカスケード発動",
+      "scoreTip": "カスケード連鎖でメガコンボ！"
+    },
+    "wordTower": {
+      "title": "塔を積み上げる",
+      "step1": "単語を積んで高く上る",
+      "step2": "長い単語ほど塔が高くなる",
+      "scoreTip": "高さがスコア — もっと高く！"
+    },
+    "connections": {
+      "title": "つながりを見つける",
+      "step1": "関連する4つの単語をグループ化",
+      "step2": "間違うと1回失う",
+      "scoreTip": "完璧に解く！"
+    },
+    "wordCraft": {
+      "title": "単語を作成",
+      "step1": "マスを滑らせて配置",
+      "step2": "単語を形成して消す"
+    },
+    "wordAlchemy": {
+      "title": "単語錬金術",
+      "step1": "マスを混ぜて新しい単語に",
+      "step2": "ワイルドカードで何にでも変身"
+    },
+    "crossword": {
+      "title": "クロスワードを埋める",
+      "step1": "ヒントをタップして答えを入力",
+      "step2": "タテヨコ両方を解く"
+    },
+    "sealedBid": {
+      "title": "シールド入札",
+      "step1": "こっそり最高の単語を入札",
+      "step2": "ユニークな入札が2倍獲得"
+    },
+    "shiritori": {
+      "title": "言葉のチェーン",
+      "step1": "最後の文字から始める",
+      "step2": "毎ターン制限時間内に応答"
+    },
+    "adventure": {
+      "title": "アドベンチャー",
+      "step1": "目標をクリアして進む",
+      "step2": "大きな単語でボスを倒す"
+    }
   }
 };
 

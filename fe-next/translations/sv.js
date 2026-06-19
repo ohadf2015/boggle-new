@@ -43,6 +43,77 @@ const sv = {
     "dismiss": "Okej",
     "sampleWord": "SOL"
   },
+  "modeCoach": {
+    "skip": "Hoppa över",
+    "next": "Nästa",
+    "gotIt": "Klar!",
+    "classic": {
+      "title": "Dra ord",
+      "step1": "Dra genom angränsande bokstäver",
+      "step2": "Längre ord ger mer poäng",
+      "scoreTip": "Dra ord snabbt för combo!"
+    },
+    "wordHunt": {
+      "title": "Knäck ordet",
+      "step1": "Tryck på rutor för att gissa",
+      "step2": "Färger avslöjar svaret",
+      "scoreTip": "Hitta först för mycket poäng!"
+    },
+    "wheelRush": {
+      "title": "Snurra & stava",
+      "step1": "Använd alltid mittenrutan",
+      "step2": "Lås ord innan fiender gör det",
+      "scoreTip": "Långa ord låser mest poäng!"
+    },
+    "blast": {
+      "title": "Spräng rutor",
+      "step1": "Dra bokstäver för att göra ord",
+      "step2": "Rensa rutor, framkalla skakningar",
+      "scoreTip": "Kedjeskakningar för jättecombo!"
+    },
+    "wordTower": {
+      "title": "Bygg tornet",
+      "step1": "Stapla ord för att klättra högre",
+      "step2": "Längre ord = högre torn",
+      "scoreTip": "Höjd är ditt resultat — gå högt!"
+    },
+    "connections": {
+      "title": "Hitta länkarna",
+      "step1": "Gruppera fyra relaterade ord",
+      "step2": "En felgissning kostar dig",
+      "scoreTip": "Lös utan misstag!"
+    },
+    "wordCraft": {
+      "title": "Skapa ord",
+      "step1": "Dra rutor på plats",
+      "step2": "Forma ord för att rensa dem"
+    },
+    "wordAlchemy": {
+      "title": "Ord-alkemi",
+      "step1": "Blanda rutor till nya ord",
+      "step2": "Vildkort omvandlar vad som helst"
+    },
+    "crossword": {
+      "title": "Fyll rutnätet",
+      "step1": "Tryck på ledtråd, skriv svaret",
+      "step2": "Lös över och ned"
+    },
+    "sealedBid": {
+      "title": "Förseglade bud",
+      "step1": "Tryck hemligt på ditt bästa ord",
+      "step2": "Unika bud ger dubbel poäng"
+    },
+    "shiritori": {
+      "title": "Ordkedja",
+      "step1": "Börja med sista bokstaven",
+      "step2": "Slå klockan varje tur"
+    },
+    "adventure": {
+      "title": "Äventyr",
+      "step1": "Rensa mål för att avancera",
+      "step2": "Slå bossar med långa ord"
+    }
+  },
   "crossword": {
     "name": "Korsord",
     "tagline": "Fyll i rutnätet, en ledtråd i taget",
@@ -397,7 +468,9 @@ const sv = {
     "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
     "crane": { "place": "Placera ditt ord", "steer": "Styr & släpp", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet", "steady": "Stadig", "onFire": "På gång", "steadyAria": "Stadig hand-svit: {n} perfekta släpp" },
     "verdict": { "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Slarvigt", "miss": "Miss!" },
-    "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "{n} perfekta släpp i rad", "watchAd": "📺 Se annons +1", "adEarned": "🎯 Token via annons!" },
+    "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "Ny zon eller bedrift!", "watchAd": "📺 Se annons +1", "adEarned": "🎯 Token via annons!" },
+    "reward": { "tier": { "common": "Mynt", "uncommon": "Fin fångst!", "rare": "Sällsynt fynd!", "epic": "JACKPOT!" } },
+    "wreck": { "reportTitle": "Tornet raidat!", "reportBody": "{name} slog ner {floors} våningar medan du var borta — här är en omblandning för att slå tillbaka." },
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
@@ -817,6 +890,7 @@ const sv = {
   },
   "cookieConsent": {
     "title": "Cookiemedgivande",
+    "mascotAlt": "LexiClash-maskoten som glatt mumsar på en kaka",
     "message": "Vi använder cookies för analys och för att visa relevanta annonser. Du kan anpassa dina inställningar nedan.",
     "accept": "Acceptera alla",
     "decline": "Avvisa alla",

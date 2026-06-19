@@ -45,4 +45,27 @@ describe('useSabotage', () => {
     expect(result.current.tokens).toBe(0);
     expect(result.current.lastHit).toBeNull();
   });
+
+  it('earns a charge from progression events (new zone / achievement)', () => {
+    const { result, rerender } = renderHook(({ e }) => useSabotage(0, e), {
+      initialProps: { e: 0 },
+    });
+    expect(result.current.tokens).toBe(0);
+    rerender({ e: 1 }); // entered a new zone
+    expect(result.current.tokens).toBe(1);
+    rerender({ e: 2 }); // unlocked an achievement
+    expect(result.current.tokens).toBe(2);
+  });
+
+  it('does not phantom-re-grant a progression charge after it is spent', () => {
+    const { result, rerender } = renderHook(({ e }) => useSabotage(0, e), {
+      initialProps: { e: 0 },
+    });
+    rerender({ e: 1 });
+    act(() => result.current.sabotage('rival-2', 'Sam'));
+    expect(result.current.tokens).toBe(0);
+    // Re-render with the SAME earn total — must not re-grant the spent charge.
+    rerender({ e: 1 });
+    expect(result.current.tokens).toBe(0);
+  });
 });

@@ -22,6 +22,18 @@ export const SABOTAGE_TOKEN_CAP = 3;
 /** Floors removed per sabotage hit. Matches the wobble hazard for fairness. */
 export const SABOTAGE_FLOORS_PER_HIT = 1;
 
+/** Max floors a single ASYNC wrecking-ball attack can remove from a rival's
+ *  restored tower. Higher than the live per-hit floor (it's a one-shot raid that
+ *  has to feel weighty), but capped so it never gut-punches a defender — and it
+ *  only ever touches SESSION state, never the protected personal-best. */
+export const WRECK_MAX_FLOORS_PER_ATTACK = 4;
+/** Meters of attacker lead that buys one extra floor of async wreck damage. */
+export const WRECK_LEAD_PER_FLOOR_M = 80;
+/** Scrambles handed to a defender when they absorb async wrecks at session
+ *  start — turns "I got hit" into "I got paid + I'll retaliate", per the
+ *  research on keeping async PvP feeling fair to BOTH sides. */
+export const WRECK_COMPENSATION_SCRAMBLES = 1;
+
 /**
  * Award one token if the player's perfect-streak just crossed a multiple of
  * the threshold (and we're not already at cap). Idempotent on the same
@@ -60,4 +72,39 @@ export function canEarnViaAd(currentTokens: number): boolean {
 /** Grant one token earned via a reward-ad watch. Same cap ceiling as streak earn. */
 export function awardSabotageTokenViaAd(currentTokens: number): number {
   return Math.min(SABOTAGE_TOKEN_CAP, currentTokens + 1);
+}
+
+/**
+ * Earn wrecking-ball charges from PROGRESSION events — reaching a new height
+ * zone or unlocking an achievement (the founder's brief: "earned on a new place
+ * or an achievement"). The caller passes the cumulative count of earn-events
+ * seen this run plus how many it has already credited; we grant only the new
+ * delta and return the updated credited count to persist.
+ *
+ * Uses a credited-count (not a cumulative max) so SPEND-then-EARN is correct: a
+ * charge spent on a wreck doesn't get phantom-re-granted the next time the same
+ * totals are re-evaluated.
+ */
+export function wreckingBallEarn(
+  currentCharges: number,
+  opts: { totalEarnEvents: number; credited: number },
+): { charges: number; credited: number } {
+  const newlyEarned = Math.max(0, opts.totalEarnEvents - opts.credited);
+  return {
+    charges: Math.min(SABOTAGE_TOKEN_CAP, currentCharges + newlyEarned),
+    credited: opts.totalEarnEvents,
+  };
+}
+
+/**
+ * Floors a single async wrecking-ball attack removes from the target's restored
+ * tower, scaled by the attacker's height lead and clamped to
+ * {@link WRECK_MAX_FLOORS_PER_ATTACK}. Always at least 1 — an attack the player
+ * spent a charge on must visibly land something. Pure so the server can re-clamp
+ * the client-claimed damage with the identical formula.
+ */
+export function asyncWreckDamageFloors(attackerHeightM: number, targetHeightM: number): number {
+  const lead = Math.max(0, attackerHeightM - targetHeightM);
+  const fromLead = 1 + Math.floor(lead / WRECK_LEAD_PER_FLOOR_M);
+  return Math.max(1, Math.min(WRECK_MAX_FLOORS_PER_ATTACK, fromLead));
 }
