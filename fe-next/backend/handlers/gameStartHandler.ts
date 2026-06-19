@@ -339,6 +339,17 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       DEFAULT_TIMER;
     let validTimer = Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || timerFallback));
 
+    // Event-driven in-work modes: the room game-timer is only a BACKSTOP, not a
+    // word-game clock. Their length is set by their own round/turn logic, so the
+    // host's grid-game timer (and DEFAULT_TIMER=90s) would fire endGame mid-match
+    // — guillotining Sealed Bid at ~round 3, cutting a Crossword race short, etc.
+    // Override with each mode's natural max length so a match always plays out and
+    // its mode-specific finalize (results + win achievement) runs, not the generic
+    // timeout path. (clamped to <=600 above's range.)
+    if (resolvedMode === 'sealed-bid') validTimer = 210;       // 5 rounds x (30s bid + 5s reveal) = 175s + buffer
+    else if (resolvedMode === 'crossword') validTimer = 420;   // generous race cap (a 5x5 can take minutes)
+    else if (resolvedMode === 'shiritori') validTimer = 300;   // turn-driven; long backstop
+
     // In-work modes (Word Tower, Shiritori) are beta: hosts must be admins OR
     // beta testers. UI hides them from everyone else; this server gate enforces
     // it even if a client crafts the startGame emit directly. Neither is reachable
