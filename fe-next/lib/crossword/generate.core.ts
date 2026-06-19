@@ -10,12 +10,24 @@ import type { GridLayout } from './types';
 export interface DictIndex {
   /** word length -> list of words of that length (normalized). */
   byLength: Map<number, string[]>;
+  /**
+   * Position-letter index: posByLength.get(len)[pos] = Map<letter, indices into byLength[len]>.
+   * Lets the filler intersect on the most-selective fixed letter instead of rescanning the whole
+   * length bucket each backtrack step. Built ONCE here so repeated fillGrid calls (build scripts,
+   * runtime retries) reuse it — the index build is the dominant cost otherwise.
+   */
+  posByLength: Map<number, Map<string, number[]>[]>;
+  /** Flat membership set for validating slots completed purely by crossings. */
+  poolSet: Set<string>;
 }
 
 export function buildDictIndex(words: Iterable<string>): DictIndex {
   const byLength = new Map<number, string[]>();
+  const poolSet = new Set<string>();
   for (const w of words) {
     if (!w) continue;
+    if (poolSet.has(w)) continue; // de-dupe so an index entry maps 1:1 to a bucket slot
+    poolSet.add(w);
     const len = w.length;
     let bucket = byLength.get(len);
     if (!bucket) {
@@ -24,7 +36,26 @@ export function buildDictIndex(words: Iterable<string>): DictIndex {
     }
     bucket.push(w);
   }
-  return { byLength };
+
+  const posByLength = new Map<number, Map<string, number[]>[]>();
+  for (const [len, bucket] of byLength) {
+    const perPos: Map<string, number[]>[] = Array.from({ length: len }, () => new Map());
+    for (let wi = 0; wi < bucket.length; wi++) {
+      const w = bucket[wi];
+      for (let p = 0; p < len; p++) {
+        const ch = w[p];
+        let lst = perPos[p].get(ch);
+        if (!lst) {
+          lst = [];
+          perPos[p].set(ch, lst);
+        }
+        lst.push(wi);
+      }
+    }
+    posByLength.set(len, perPos);
+  }
+
+  return { byLength, posByLength, poolSet };
 }
 
 export interface FillTemplate {
@@ -87,9 +118,11 @@ export function fillGrid(
   };
 
   const blockSet = new Set(blocks.map(([r, c]) => cellKey(r, c)));
-  // Membership set for validating slots completed purely by crossings (see solve()).
-  const poolSet = new Set<string>();
-  for (const [, words] of dict.byLength) for (const w of words) poolSet.add(w);
+  // Membership set + position-letter index are precomputed once in buildDictIndex and reused
+  // across every fillGrid call (build scripts, runtime retries) — building them per-call was the
+  // dominant cost. See DictIndex.
+  const poolSet = dict.poolSet;
+  const posIndex = dict.posByLength;
 
   // Placeholder layout: fillable cells get 'x', blocks get null. buildGrid gives us slot
   // geometry (cells + direction order) — we discard its placeholder answers.
@@ -120,7 +153,29 @@ export function fillGrid(
     const pool = dict.byLength.get(slot.length) ?? [];
     const pattern = patternOf(slot);
     const out: string[] = [];
-    for (const w of pool) {
+
+    // Fixed (crossing) positions narrow the search. Intersect on the most-selective one rather
+    // than scanning the whole length bucket.
+    const fixed: number[] = [];
+    for (let i = 0; i < pattern.length; i++) if (pattern[i] !== null) fixed.push(i);
+
+    if (fixed.length === 0) {
+      for (const w of pool) if (!used.has(w)) out.push(w);
+      return out;
+    }
+
+    const perPos = posIndex.get(slot.length);
+    // Pick the fixed position whose letter has the fewest matching words (smallest candidate list).
+    let bestList: number[] | undefined;
+    for (const p of fixed) {
+      const lst = perPos?.[p].get(pattern[p] as string);
+      if (!lst) return out; // no word has this letter here → dead slot
+      if (!bestList || lst.length < bestList.length) bestList = lst;
+    }
+    if (!bestList) return out;
+
+    for (const wi of bestList) {
+      const w = pool[wi];
       if (used.has(w)) continue;
       if (matches(w, pattern)) out.push(w);
     }

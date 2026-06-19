@@ -1,10 +1,13 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { getDailyPuzzle } from '@/lib/crossword/puzzles/index';
-import type { PuzzleLocale } from '@/lib/crossword/types';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { generateDailyPuzzle, generateFreeplayPuzzle } from '@/lib/crossword/generate.daily';
+import { loadStreak, persistSolve, type StreakState, emptyStreak } from '@/lib/crossword/streak';
+import type { CrosswordPuzzle, Difficulty, PuzzleLocale } from '@/lib/crossword/types';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { CrosswordLoader } from '@/components/crossword/CrosswordLoader';
 
 // Client-only: the view pulls in pixi.js + gsap on demand.
 const CrosswordView = dynamic(
@@ -19,16 +22,133 @@ function todayISO(): string {
   ).padStart(2, '0')}`;
 }
 
+// Cache the generated daily so a mid-solve refresh keeps the SAME grid (and is instant) — and a
+// deploy that changes the generator can't pull the rug out from under an in-progress solver.
+const dailyCacheKey = (date: string, locale: PuzzleLocale) =>
+  `lexiclash:crossword:daily:${locale}:${date}`;
+const FREEPLAY_COUNT_KEY = 'lexiclash:crossword:freeplayCount';
+
+function readDailyCache(date: string, locale: PuzzleLocale): CrosswordPuzzle | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(dailyCacheKey(date, locale));
+    return raw ? (JSON.parse(raw) as CrosswordPuzzle) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDailyCache(date: string, locale: PuzzleLocale, puzzle: CrosswordPuzzle): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(dailyCacheKey(date, locale), JSON.stringify(puzzle));
+  } catch {
+    /* storage full — daily just regenerates next visit (still deterministic) */
+  }
+}
+
+function nextFreeplayCount(): number {
+  if (typeof window === 'undefined') return 1;
+  try {
+    const n = Number(window.localStorage.getItem(FREEPLAY_COUNT_KEY) ?? '0') + 1;
+    window.localStorage.setItem(FREEPLAY_COUNT_KEY, String(n));
+    return n;
+  } catch {
+    return 1;
+  }
+}
+
+interface Edition {
+  isDaily: boolean;
+  label: string;
+}
+
 export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
-  const puzzle = useMemo(() => getDailyPuzzle(todayISO(), locale), [locale]);
+  const { t, language } = useLanguage();
+  const today = useMemo(() => todayISO(), []);
+
+  const [puzzle, setPuzzle] = useState<CrosswordPuzzle | null>(null);
+  const [edition, setEdition] = useState<Edition>({ isDaily: true, label: '' });
+  const [streak, setStreak] = useState<StreakState>(emptyStreak());
+  const [generating, setGenerating] = useState(false);
+  const seqRef = useRef(0); // guards against out-of-order async results
+
+  const dailyEditionLabel = useMemo(() => {
+    try {
+      const [y, m, d] = today.split('-').map(Number);
+      return new Intl.DateTimeFormat(language || locale, {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+      }).format(new Date(Date.UTC(y, m - 1, d)));
+    } catch {
+      return today;
+    }
+  }, [today, language, locale]);
+
+  // Initial load: today's daily (from cache if present, else generated + cached).
+  useEffect(() => {
+    let cancelled = false;
+    const seq = ++seqRef.current;
+    setGenerating(true);
+    (async () => {
+      const cached = readDailyCache(today, locale);
+      const p = cached ?? (await generateDailyPuzzle(today, locale));
+      if (!cached && p) writeDailyCache(today, locale, p);
+      if (cancelled || seq !== seqRef.current) return;
+      setPuzzle(p);
+      setEdition({ isDaily: true, label: dailyEditionLabel });
+      setStreak(loadStreak());
+      setGenerating(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [today, locale, dailyEditionLabel]);
+
+  const handleNewPuzzle = useCallback(
+    (difficulty?: Difficulty) => {
+      const seq = ++seqRef.current;
+      setGenerating(true);
+      const count = nextFreeplayCount();
+      // Yield a frame so the (compositor-animated) loader paints before the synchronous fill runs.
+      setTimeout(() => {
+        void (async () => {
+          const seed = count * 2654435761; // spread counters across the seed space
+          const p = await generateFreeplayPuzzle(seed, locale, difficulty);
+          if (seq !== seqRef.current) return;
+          if (p) {
+            setPuzzle(p);
+            setEdition({ isDaily: false, label: t('crossword.freeplayEdition', { count }) });
+          }
+          setGenerating(false);
+        })();
+      }, 16);
+    },
+    [locale, t],
+  );
+
+  const handleDailySolved = useCallback(() => {
+    setStreak(persistSolve(today));
+  }, [today]);
 
   if (!puzzle) {
-    return null;
+    return <CrosswordLoader label={t('crossword.generating')} />;
   }
 
   return (
     <main className="min-h-dvh bg-neo-navy texture-halftone">
-      <CrosswordView puzzle={puzzle} />
+      {generating && <CrosswordLoader label={t('crossword.generating')} overlay />}
+      <CrosswordView
+        key={puzzle.id}
+        puzzle={puzzle}
+        edition={edition.label}
+        isDaily={edition.isDaily}
+        streak={streak.current}
+        onNewPuzzle={handleNewPuzzle}
+        onDailySolved={handleDailySolved}
+      />
       <ModeCoach mode="crossword" />
     </main>
   );

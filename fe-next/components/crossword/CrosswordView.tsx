@@ -1,16 +1,17 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer, Grid3x3, ChevronDown } from 'lucide-react';
+import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
 import { crosswordStats } from '@/lib/crossword/stats';
-import type { CrosswordPuzzle } from '@/lib/crossword/types';
+import type { CrosswordPuzzle, Difficulty } from '@/lib/crossword/types';
 import { CrosswordGrid } from './CrosswordGrid';
 import { CrosswordKeyboard } from './CrosswordKeyboard';
+import { CrosswordMasthead } from './CrosswordMasthead';
 import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
 import { CrosswordFx } from './CrosswordFx';
@@ -33,9 +34,26 @@ function formatTime(ms: number): string {
 
 export interface CrosswordViewProps {
   puzzle: CrosswordPuzzle;
+  /** Masthead edition line — a formatted date for the daily, "Freeplay #N" otherwise. */
+  edition?: string;
+  /** Current daily streak (shown in the masthead + bumped on a daily solve). */
+  streak?: number;
+  /** True when this puzzle is today's daily — only daily solves advance the streak. */
+  isDaily?: boolean;
+  /** Start a fresh generated puzzle (endless). Optional difficulty target. */
+  onNewPuzzle?: (difficulty?: Difficulty) => void;
+  /** Fired once when the daily is solved, so the host can persist the streak. */
+  onDailySolved?: () => void;
 }
 
-export function CrosswordView({ puzzle }: CrosswordViewProps) {
+export function CrosswordView({
+  puzzle,
+  edition,
+  streak = 0,
+  isDaily = false,
+  onNewPuzzle,
+  onDailySolved,
+}: CrosswordViewProps) {
   const { t } = useLanguage();
   const reduced = useReducedMotion();
   const { playSound } = useSoundEffects();
@@ -46,6 +64,7 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
       setBurst((n) => n + 1);
       setWinFlash((n) => n + 1);
       playSound('victoryFanfare');
+      if (isDaily) onDailySolved?.();
     },
     // A light confirmation each time a word is filled in correctly — the
     // newspaper-solve "tick" of progress before the final fanfare.
@@ -148,59 +167,45 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
 
   const handleReveal = useCallback(() => revealCell(), [revealCell]);
 
+  // "Next" on the solve card: start a fresh generated puzzle if the host wired endless mode,
+  // otherwise replay the same grid.
+  const handleNext = useCallback(() => {
+    if (onNewPuzzle) onNewPuzzle();
+    else {
+      setSoloAward(null);
+      reset();
+    }
+  }, [onNewPuzzle, reset]);
+
   return (
     <div
       className="fixed inset-x-0 top-0 z-20 flex h-[100dvh] w-full flex-col overflow-hidden bg-neo-navy texture-halftone px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:static lg:z-auto lg:mx-auto lg:block lg:h-auto lg:max-w-5xl lg:overflow-visible lg:bg-transparent lg:pt-9 lg:pb-10"
       translate="no"
     >
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
-      {/* Puzzle identity bar — solid neo header so it never gets lost on the cream board. */}
-      <header className="shrink-0 bg-neo-navy-light border-neo-thick border-black rounded-neo shadow-hard-lg px-3.5 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <span
-              className="grid place-items-center size-9 shrink-0 bg-neo-cyan text-neo-navy border-neo border-black rounded-neo shadow-hard"
-              aria-hidden
-            >
-              <Grid3x3 size={20} strokeWidth={2.5} />
-            </span>
-            <h1 className="font-neo-display font-extrabold text-xl text-neo-cyan truncate">
-              {t('crossword.title')}
-            </h1>
-            {puzzle.difficulty && (
-              <span
-                className={`font-neo-body font-bold text-[0.6rem] uppercase tracking-wide px-2 py-0.5 rounded-full border-neo border-black ${
-                  puzzle.difficulty === 'easy'
-                    ? 'bg-neo-lime text-neo-navy'
-                    : puzzle.difficulty === 'hard'
-                      ? 'bg-neo-pink text-neo-white'
-                      : 'bg-neo-cyan text-neo-navy'
-                }`}
-              >
-                {t(`crossword.difficulty.${puzzle.difficulty}`)}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span
-              className="font-neo-display font-bold text-sm text-neo-cyan tabular-nums"
-              aria-label={t('crossword.wordsLabel')}
-            >
-              {stats.wordsSolved}
-              <span className="text-neo-white/55">/{stats.wordsTotal}</span>
-            </span>
-            <div
-              className="flex items-center gap-1.5 font-neo-display font-bold text-lg text-neo-white tabular-nums bg-neo-navy border-neo border-black rounded-neo shadow-hard px-2.5 py-1"
-              aria-label={t('crossword.timer')}
-            >
-              <Timer size={16} className="text-neo-cyan" />
-              {formatTime(elapsedMs)}
-            </div>
-          </div>
-        </div>
-        {/* Live fill bar — fills with CORRECT letters, so it only completes at a true solve. */}
+
+      {/* Newspaper masthead — the identity ("real crossword") signal. */}
+      <CrosswordMasthead
+        title={t('crossword.mastheadTitle')}
+        edition={edition ?? t('crossword.title')}
+        difficulty={puzzle.difficulty}
+        difficultyLabel={t(`crossword.difficulty.${puzzle.difficulty}`)}
+        streak={streak}
+        streakLabel={t('crossword.streakLabel', { count: streak })}
+      />
+
+      {/* Slim stat bar: words solved + timer + the live fill bar (fills with CORRECT letters,
+          so it only completes at a true solve). */}
+      <div className="shrink-0 mt-2 flex items-center gap-3 bg-neo-navy-light border-neo border-black rounded-neo shadow-hard px-3 py-1.5">
+        <span
+          className="font-neo-display font-bold text-sm text-neo-cyan tabular-nums shrink-0"
+          aria-label={t('crossword.wordsLabel')}
+        >
+          {stats.wordsSolved}
+          <span className="text-neo-white/55">/{stats.wordsTotal}</span>
+        </span>
         <div
-          className="mt-2.5 h-2 w-full bg-neo-navy border-neo border-black rounded-full overflow-hidden"
+          className="flex-1 h-2 bg-neo-navy border-neo border-black rounded-full overflow-hidden"
           role="progressbar"
           aria-valuemin={0}
           aria-valuemax={100}
@@ -212,7 +217,14 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
             style={{ width: `${stats.percent}%` }}
           />
         </div>
-      </header>
+        <div
+          className="flex items-center gap-1.5 font-neo-display font-bold text-sm text-neo-white tabular-nums shrink-0"
+          aria-label={t('crossword.timer')}
+        >
+          <Timer size={15} className="text-neo-cyan" />
+          {formatTime(elapsedMs)}
+        </div>
+      </div>
 
       {/* Board + clues. On phones a single fit-to-viewport column (grid+clues
           scroll in the middle, keyboard pinned); grid left / clue rail right on
@@ -317,15 +329,50 @@ export function CrosswordView({ puzzle }: CrosswordViewProps) {
               <SolvedStat value={`${stats.wordsTotal}`} label={t('crossword.wordsLabel')} />
               <SolvedStat value={`${hintsUsed}`} label={t('crossword.hintsLabel')} />
             </div>
-            {soloAward ? (
+            {soloAward && (
               <SoloRewardCard
                 t={t}
                 awarded={soloAward.awarded}
                 bonus={soloAward.bonus}
                 modifier={dailyModifier}
                 claimed={soloAward.claimed}
-                onPlayAgain={() => { setSoloAward(null); reset(); }}
+                onPlayAgain={handleNext}
               />
+            )}
+            {onNewPuzzle ? (
+              // Endless: pick the next puzzle by difficulty (or replay the same grid).
+              <div className={soloAward ? 'mt-3' : ''}>
+                <p className="font-neo-body font-semibold text-[0.65rem] uppercase tracking-[0.12em] text-neo-navy/70 mb-2">
+                  {t('crossword.nextPuzzlePrompt')}
+                </p>
+                <div className="flex items-center justify-center gap-2">
+                  {(['easy', 'medium', 'hard'] as const).map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => onNewPuzzle(d)}
+                      className={`font-neo-display font-bold text-sm border-neo border-black rounded-neo shadow-hard px-4 py-2 active:translate-y-[1px] active:shadow-hard-pressed ${
+                        d === 'easy'
+                          ? 'bg-neo-lime text-neo-navy'
+                          : d === 'hard'
+                            ? 'bg-neo-pink text-neo-white'
+                            : 'bg-neo-navy text-neo-white'
+                      }`}
+                    >
+                      {t(`crossword.difficulty.${d}`)}
+                    </button>
+                  ))}
+                </div>
+                {!soloAward && (
+                  <button
+                    type="button"
+                    onClick={reset}
+                    className="mt-3 font-neo-body font-semibold text-xs text-neo-navy/70 underline underline-offset-2"
+                  >
+                    {t('crossword.playAgain')}
+                  </button>
+                )}
+              </div>
             ) : (
               <button
                 type="button"
