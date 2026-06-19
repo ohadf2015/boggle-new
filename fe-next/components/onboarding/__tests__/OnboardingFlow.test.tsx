@@ -305,4 +305,25 @@ describe('OnboardingFlow', () => {
       expect(mockPush).toHaveBeenCalledWith('/en/practice');
     });
   });
+
+  // The FTUE is a fixed full-screen takeover on the home route; it flags
+  // <html>.onboarding-active so the (route-blind) native + web ad layers stay
+  // suppressed for the whole first run — see shouldSuppressBanner / shouldLoadAdSense.
+  describe('ad-free onboarding signal', () => {
+    afterEach(() => {
+      document.documentElement.classList.remove('onboarding-active');
+    });
+
+    it('flags html.onboarding-active while the flow is mounted', () => {
+      render(<OnboardingFlow {...defaultProps} />);
+      expect(document.documentElement.classList.contains('onboarding-active')).toBe(true);
+    });
+
+    it('clears the flag on unmount so ads resume after onboarding', () => {
+      const { unmount } = render(<OnboardingFlow {...defaultProps} />);
+      expect(document.documentElement.classList.contains('onboarding-active')).toBe(true);
+      unmount();
+      expect(document.documentElement.classList.contains('onboarding-active')).toBe(false);
+    });
+  });
 });

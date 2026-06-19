@@ -55,13 +55,22 @@ export function selectActiveBannerRequest(
  * (only `/adventure` today, via `--admob-banner-height`) opts back in by flagging
  * `html.banner-allow-in-game`. The drawer always wins (an open side menu must never
  * have the SurfaceView banner painted on top of it).
+ *
+ * Onboarding (`html.onboarding-active`, set by OnboardingFlow) is an unconditional
+ * suppress: the FTUE is a fixed full-screen takeover on the home route — NOT its own
+ * route — so `isAllowedAdBannerRoute` can't catch it, and the native SurfaceView
+ * composites ABOVE the WebView (z-index can't cover it). A banner there covers the
+ * "Continue" CTA and tanks the highest-leverage conversion funnel, so we keep the
+ * whole first run ad-free. The opt-in does NOT rescue it (no onboarding screen
+ * reserves banner room).
  */
 export function shouldSuppressBanner(input: {
   drawerOpen: boolean;
   inGame: boolean;
   allowInGame: boolean;
+  onboarding?: boolean;
 }): boolean {
-  return input.drawerOpen || (input.inGame && !input.allowInGame);
+  return Boolean(input.onboarding) || input.drawerOpen || (input.inGame && !input.allowInGame);
 }
 
 export interface BannerOps {

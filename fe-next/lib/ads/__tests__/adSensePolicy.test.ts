@@ -79,4 +79,16 @@ describe('adSensePolicy — shouldLoadAdSense', () => {
   it('does NOT load for a child tier (COPPA/Families — web ad suppression)', () => {
     expect(shouldLoadAdSense({ ...base, suppressedByTier: true })).toBe(false);
   });
+
+  it('does NOT load while the FTUE onboarding overlay is active (ad-free first run)', () => {
+    // Onboarding is the highest-leverage conversion funnel; an anchored Auto-Ads
+    // banner there covers the "Continue" CTA and reads as aggressive monetization
+    // before any value is delivered. Withhold the script until onboarding completes.
+    expect(shouldLoadAdSense({ ...base, onboardingActive: true })).toBe(false);
+  });
+
+  it('still loads normally when onboarding is not active (flag omitted or false)', () => {
+    expect(shouldLoadAdSense({ ...base, onboardingActive: false })).toBe(true);
+    expect(shouldLoadAdSense(base)).toBe(true); // omitted → treated as not active
+  });
 });

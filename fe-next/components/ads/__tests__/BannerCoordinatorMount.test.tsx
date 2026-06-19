@@ -56,8 +56,8 @@ vi.mock('@/lib/native/bannerController', () => ({
     setSuppressed: (v: boolean) => setSuppressed(v),
   },
   // Mirror the real pure policy so the mount's wiring is exercised end-to-end.
-  shouldSuppressBanner: (i: { drawerOpen: boolean; inGame: boolean; allowInGame: boolean }) =>
-    i.drawerOpen || (i.inGame && !i.allowInGame),
+  shouldSuppressBanner: (i: { drawerOpen: boolean; inGame: boolean; allowInGame: boolean; onboarding?: boolean }) =>
+    Boolean(i.onboarding) || i.drawerOpen || (i.inGame && !i.allowInGame),
 }));
 
 /** Flush the MutationObserver microtask queue. */
@@ -71,7 +71,7 @@ describe('BannerCoordinatorMount', () => {
     isNative.current = true;
     for (const k of Object.keys(listeners)) delete listeners[k];
     foregroundCb.current = null;
-    document.documentElement.classList.remove('mobile-drawer-open', 'banner-allow-in-game');
+    document.documentElement.classList.remove('mobile-drawer-open', 'banner-allow-in-game', 'onboarding-active');
     document.body.classList.remove('screen-fit-locked');
   });
 
@@ -190,6 +190,29 @@ describe('BannerCoordinatorMount', () => {
 
   it('reflects the initial in-game state on mount (game active before render)', () => {
     document.body.classList.add('screen-fit-locked');
+    render(<BannerCoordinatorMount />);
+    expect(setSuppressed).toHaveBeenCalledWith(true);
+  });
+
+  it('suppresses the banner while the FTUE onboarding overlay is open (onboarding-active)', async () => {
+    render(<BannerCoordinatorMount />);
+    setSuppressed.mockClear();
+    document.documentElement.classList.add('onboarding-active');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(true);
+  });
+
+  it('restores the banner when onboarding finishes (onboarding-active removed)', async () => {
+    document.documentElement.classList.add('onboarding-active');
+    render(<BannerCoordinatorMount />);
+    setSuppressed.mockClear();
+    document.documentElement.classList.remove('onboarding-active');
+    await flushObserver();
+    expect(setSuppressed).toHaveBeenCalledWith(false);
+  });
+
+  it('reflects the initial onboarding state on mount (overlay open before render)', () => {
+    document.documentElement.classList.add('onboarding-active');
     render(<BannerCoordinatorMount />);
     expect(setSuppressed).toHaveBeenCalledWith(true);
   });

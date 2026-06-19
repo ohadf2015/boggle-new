@@ -11,6 +11,7 @@ import InviteContextBanner from './InviteContextBanner';
 import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 import OnboardingGoogleSignup from './OnboardingGoogleSignup';
 import { useImeText } from '@/hooks/useImeText';
+import { useMobileKeyboard } from '@/hooks/useMobileKeyboard';
 import { cn } from '@/lib/utils';
 import { NeoPanel } from '@/components/ui/panel';
 
@@ -58,6 +59,17 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   const [showShake, setShowShake] = useState(false);
   const [justValidated, setJustValidated] = useState(false);
   const previouslyValidRef = useRef(false);
+  const submitRef = useRef<HTMLButtonElement>(null);
+
+  // When the soft keyboard opens, the layout viewport shrinks (viewport
+  // `interactiveWidget: resizes-content`). Pull the primary CTA into view so it's
+  // never stranded under the keyboard — the core "can't reach Continue" fix.
+  const { keyboardVisible } = useMobileKeyboard();
+  useEffect(() => {
+    if (keyboardVisible) {
+      submitRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [keyboardVisible]);
 
   const trimmedName = name.trim();
   const nameCharCount = Array.from(trimmedName).length;
@@ -129,7 +141,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
       className="w-full max-w-sm lg:max-w-md mx-auto"
       dir={dir}
     >
-      <NeoPanel tone="cream" shadow="md" className="p-5">
+      <NeoPanel tone="cream" shadow="md" className="p-6 sm:p-7">
         {inviteContext && onSkipInvite && (
           <InviteContextBanner
             roomCode={inviteContext.roomCode}
@@ -143,7 +155,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
           variants={staggerChild}
           initial="hidden"
           animate="visible"
-          className="text-xl font-black text-neo-black text-center mb-1"
+          className="text-xl font-black text-neo-black text-center mb-4"
         >
           {hasPendingInvite ? t('onboarding.ftue.friendIsWaiting') : t('onboarding.ftue.niceWork')}
         </m.h2>
@@ -163,7 +175,10 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 15 }}
                 className={cn(
-                  'w-11 h-11 rounded-full border-2 border-neo-black bg-neo-yellow',
+                  // Neutral at rest (color only on hover) so the avatar + pink CTA
+                  // are the only saturated elements — calmer palette, clear hierarchy.
+                  'w-11 h-11 rounded-full border-2 border-neo-black bg-neo-white',
+                  'hover:bg-neo-yellow transition-colors',
                   'flex items-center justify-center shadow-hard-sm'
                 )}
                 aria-label={t('onboarding.ftue.randomize', 'Randomize avatar')}
@@ -247,7 +262,9 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
               type="text"
               onKeyDown={(e) => { if (e.key === 'Enter' && isNameValid) handleSubmit(); }}
               placeholder={t('onboarding.name.placeholder')}
-              autoFocus
+              // Intentionally NOT autoFocused: let the avatar (the fun, first
+              // impression) land before the keyboard slams up and shifts the
+              // layout. The keyboard opens only when the player taps the field.
               maxLength={20}
               autoComplete="off"
               className={cn(
@@ -284,6 +301,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
 
         {/* Submit button */}
         <m.button
+          ref={submitRef}
           custom={3}
           variants={staggerChild}
           initial="hidden"

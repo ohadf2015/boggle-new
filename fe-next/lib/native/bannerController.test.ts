@@ -49,6 +49,24 @@ describe('shouldSuppressBanner (pure)', () => {
   it('ignores the opt-in when not in a game (it is in-game-scoped)', () => {
     expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: true })).toBe(false);
   });
+
+  it('suppresses while the FTUE onboarding overlay is open (ad-free first run)', () => {
+    // Onboarding is a fixed full-screen takeover on the home route, not its own
+    // route — the route gate can't catch it, so the global suppress must. A
+    // banner over the identity screen covers the "Continue" CTA and tanks the
+    // highest-leverage conversion funnel; industry standard is ad-free onboarding.
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: false, onboarding: true })).toBe(true);
+  });
+
+  it('onboarding suppression is not overridden by the in-game opt-in', () => {
+    expect(
+      shouldSuppressBanner({ drawerOpen: false, inGame: true, allowInGame: true, onboarding: true }),
+    ).toBe(true);
+  });
+
+  it('treats a missing onboarding flag as false (back-compat with existing callers)', () => {
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: false })).toBe(false);
+  });
 });
 
 describe('BannerController', () => {
