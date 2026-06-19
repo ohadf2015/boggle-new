@@ -62,6 +62,11 @@ import { WordTowerStatHud } from './WordTowerStatHud';
 import { getTowerArchitectTier } from '@/lib/wordTower/architectTier';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
 
+/** How long a transient celebration toast holds before it auto-dismisses. Kept
+ *  short + uniform so banners clear quickly and never pile up / "stick" on
+ *  screen (founder: the toasts were staying up too long). */
+const TOAST_MS = 1300;
+
 /** Verdict-pop colour by band — mirrors the swinging-beam tint families. */
 const VERDICT_TONE_CLASS: Record<VerdictTone, string> = {
   lime: 'bg-neo-lime text-neo-black',
@@ -198,7 +203,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     prevZone.current = biomeId;
     setZoneText(t(`wordTower.biome.${biomeId}`));
   }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(zoneText, () => setZoneText(null), 2000);
+  useAutoDismiss(zoneText, () => setZoneText(null), TOAST_MS);
 
   // Witty milestone toast on crossing a height landmark.
   const [milestoneText, setMilestoneText] = useState<string | null>(null);
@@ -214,7 +219,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     haptics.success();
     playLevelUpSound();
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(milestoneText, () => setMilestoneText(null), 2000);
+  useAutoDismiss(milestoneText, () => setMilestoneText(null), TOAST_MS);
 
   // Landmark flyby — cosy "you passed X" beat. Defers to a zone or milestone at the same height.
   const [landmarkText, setLandmarkText] = useState<string | null>(null);
@@ -229,7 +234,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setLandmarkText(`${hit.icon} ${t(hit.key)}`);
     playHintRevealSound();
   }, [game.heightM]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(landmarkText, () => setLandmarkText(null), 2000);
+  useAutoDismiss(landmarkText, () => setLandmarkText(null), TOAST_MS);
 
   // Achievements — unlock once (persisted in localStorage), pop a trophy toast.
   const achUnlocked = useRef<Set<string>>(new Set());
@@ -253,7 +258,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     try { localStorage.setItem('wt-achievements', JSON.stringify([...achUnlocked.current])); } catch { /* */ }
     setAchToast(fresh[fresh.length - 1]); // show the most impressive of the batch
   }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);
-  useAutoDismiss(achToast, () => setAchToast(null), 2000);
+  useAutoDismiss(achToast, () => setAchToast(null), TOAST_MS);
 
   // Roguelike perk draft — daily-run only. Boons fold into one modifier object
   // the crane + hazard sites read. Segregated from the endless board (daily gates
@@ -337,7 +342,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setSkinUnlock(fresh);
     setSkinIdRef.current(fresh.id); // wear the reward immediately
   }, [personalBest]);
-  useAutoDismiss(skinUnlock, () => setSkinUnlock(null), 2000);
+  useAutoDismiss(skinUnlock, () => setSkinUnlock(null), TOAST_MS);
 
   // Unmistakable verdict pop — one big, band-coloured beat on every drop telling
   // the player exactly how they did + the metres gained. Keyed off the placement
@@ -365,7 +370,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Dismiss via the shared hook (keyed on the verdict's own resultKey) rather than
   // an inline timer, so the lifespan is owned in ONE place and can never be reset
   // by an unrelated re-render — the same robustness the other banners already use.
-  useAutoDismiss(verdict?.key, () => setVerdict(null), 2000);
+  useAutoDismiss(verdict?.key, () => setVerdict(null), TOAST_MS);
 
   // Combo-milestone fanfare — a one-shot "×5 ON FIRE!" beat the moment the combo
   // crosses 3/5/10/20. Keyed off resultKey so it fires on the placing tick only.
@@ -378,7 +383,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     haptics.success();
     playComboMilestoneSound(hit.combo);
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(comboFx?.key, () => setComboFx(null), 2000);
+  useAutoDismiss(comboFx?.key, () => setComboFx(null), TOAST_MS);
 
   // Surprise pop — the variable-reward beat. A per-word deterministic roll
   // (towerSurprise.ts) occasionally grants bonus height / scrambles / an updraft
@@ -393,7 +398,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     surpriseSoundFns[TOWER_SURPRISE_META[s.event].sound]();
     haptics.levelComplete();
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(surpriseFx?.key, () => setSurpriseFx(null), 2000);
+  useAutoDismiss(surpriseFx?.key, () => setSurpriseFx(null), TOAST_MS);
 
   // Rival ghosts are leaderboard records to climb past (read-only). The old
   // solo "wrecking-ball" sabotage was a fake, local-only effect against these
@@ -433,7 +438,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     haptics.bossHit();
     playErrorSound();
   }, [tower.state.hazardKey]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(hazardText, () => setHazardText(null), 2000);
+  useAutoDismiss(hazardText, () => setHazardText(null), TOAST_MS);
 
   // CLUTCH SAVE banner — a clean drop pulled the tower back from a critical lean.
   // The biggest single beat in the climb (a fumble instead routes through the
@@ -443,7 +448,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     if (!crane.clutch || crane.clutch.outcome !== 'save') return;
     setClutchText(t('wordTower.clutch.save'));
   }, [crane.clutch?.key]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(clutchText, () => setClutchText(null), 2000);
+  useAutoDismiss(clutchText, () => setClutchText(null), TOAST_MS);
 
   // Hide the global bottom nav for the duration of gameplay (full-screen mode).
   const setIsInGame = useHideNavigation();
@@ -514,7 +519,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setNewBestText(t('wordTower.daily.newBest'));
     onNewDailyBest?.(game.heightM);
   }, [daily, newBestShown, personalBestM, game.heightM, onNewDailyBest]); // eslint-disable-line react-hooks/exhaustive-deps
-  useAutoDismiss(newBestText, () => setNewBestText(null), 2000);
+  useAutoDismiss(newBestText, () => setNewBestText(null), TOAST_MS);
   useEffect(() => { if (game.heightM > 0) save(); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Cool EXIT for every compliment/message: after its ~2s hold the source

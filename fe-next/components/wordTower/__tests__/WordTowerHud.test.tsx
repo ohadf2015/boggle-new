@@ -45,9 +45,11 @@ describe('WordTowerHud — golden-letter mutator highlight', () => {
 });
 
 describe('WordTowerHud', () => {
-  it('disables Build until the word is 3+ letters', () => {
+  it('reveals the Build control (wheel centre) only once the word is 3+ letters', () => {
+    // The redundant bottom Build button is gone; building lives in the wheel
+    // centre, which only surfaces the control once a buildable word is spelled.
     const { rerender } = render(<WordTowerHud {...makeProps({ word: 'CA' })} />);
-    expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /wordTower\.hud\.build/ })).toBeNull();
     rerender(<WordTowerHud {...makeProps({ word: 'CAT' })} />);
     expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeEnabled();
   });
@@ -78,20 +80,22 @@ describe('WordTowerHud', () => {
     expect(onDeckHeight).toHaveBeenCalled();
   });
 
-  it('swaps Build → Drop CTA at the SAME position when a word is pending placement', () => {
+  it('swaps the wheel-centre Build → Drop control when a word is pending placement', () => {
     const onSubmit = vi.fn();
     const onCraneDrop = vi.fn();
     const { rerender } = render(
       <WordTowerHud {...makeProps({ word: 'CAT', onSubmit, onCraneDrop })} />,
     );
-    expect(screen.queryByRole('button', { name: /wordTower\.crane\.tapToDrop/ })).toBeNull();
+    // Spelling a word: the wheel centre is the Build control, no Drop yet.
+    expect(screen.queryByRole('button', { name: /wordTower\.crane\.steer/ })).toBeNull();
     expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeEnabled();
 
     rerender(
       <WordTowerHud {...makeProps({ word: 'CAT', pendingWord: 'CCAT', onSubmit, onCraneDrop })} />,
     );
+    // Word in flight: the same centre morphs into the Drop control.
     expect(screen.queryByRole('button', { name: /wordTower\.hud\.build/ })).toBeNull();
-    const dropBtn = screen.getByRole('button', { name: /wordTower\.crane\.tapToDrop/ });
+    const dropBtn = screen.getByRole('button', { name: /wordTower\.crane\.steer/ });
     fireEvent.click(dropBtn);
     expect(onCraneDrop).toHaveBeenCalledTimes(1);
     expect(onSubmit).not.toHaveBeenCalled();

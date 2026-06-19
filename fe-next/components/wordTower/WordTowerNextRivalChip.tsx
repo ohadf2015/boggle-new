@@ -1,8 +1,14 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ChevronUp } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { nearestRivalAbove, type RivalMarker } from '@/lib/wordTower/rivals';
+
+/** How long the chase chip stays up after a new target appears before it
+ *  auto-hides — long enough to register the goal, short enough that it never
+ *  "sticks" permanently on screen. */
+const CHASE_CHIP_MS = 6000;
 
 interface Props {
   rivals: RivalMarker[];
@@ -22,7 +28,21 @@ interface Props {
  */
 export function WordTowerNextRivalChip({ rivals, viewerHeightM, reducedMotion, t, dir }: Props) {
   const target = nearestRivalAbove(viewerHeightM, rivals);
-  if (!target) return null;
+  const targetId = target?.id ?? null;
+
+  // Flash the chase goal when the target CHANGES (you climb past one → the next
+  // becomes the goal), then auto-hide. Keyed on the target id so it re-appears
+  // for each new rival but never lingers indefinitely — the founder's "these
+  // notifications stay stuck" fix.
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    if (targetId == null) return;
+    setVisible(true);
+    const id = setTimeout(() => setVisible(false), CHASE_CHIP_MS);
+    return () => clearTimeout(id);
+  }, [targetId]);
+
+  if (!target || !visible) return null;
 
   return (
     <div

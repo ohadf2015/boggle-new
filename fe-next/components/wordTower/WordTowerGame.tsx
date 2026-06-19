@@ -74,7 +74,12 @@ export function WordTowerGame() {
       return () => { cancelled = true; };
     }
 
-    const opts = { gameCode: 'solo', playerId: 'solo', language };
+    // Day-seeded wheel: the gameCode carries the UTC date so the letter ring is
+    // FRESH every calendar day (a new set of letters daily, NYT-Spelling-Bee
+    // style) while the endless climb itself persists across days. Stable within
+    // the day, so reloads keep the same letters. (Step toward folding the daily
+    // letter set into the broader daily-challenges flow.)
+    const opts = { gameCode: `solo-${utcDateKey()}`, playerId: 'solo', language };
     fetch('/api/word-tower/progress')
       .then((r) => (r.ok ? r.json() : Promise.resolve({ progress: null })))
       .then((d) => {
