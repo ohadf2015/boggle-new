@@ -49,6 +49,14 @@ describe('ArenaEmptyState (focused / decluttered)', () => {
     expect(screen.queryByRole('button')).toBeNull();
   });
 
+  it('mascot has no hard offset-box shadow (opaque webp + hard shadow = visible square; must blend into the navy pane)', () => {
+    const { container } = render(<ArenaEmptyState />);
+    const mascot = container.querySelector('img');
+    // The spectating.webp has a baked-in opaque navy square; a hard pixel
+    // drop-shadow casts off its rectangle edge -> ugly offset border. Forbid it.
+    expect(mascot?.className).not.toMatch(/drop-shadow-\[\d+px_\d+px_0/);
+  });
+
   it('mascot image is decorative (empty alt -> presentation, screen readers skip)', () => {
     const { container } = render(<ArenaEmptyState />);
     const mascot = container.querySelector('img');

@@ -41,7 +41,7 @@ const ArenaEmptyState: React.FC = () => {
           alt=""
           width={112}
           height={112}
-          className="w-24 h-24 sm:w-28 sm:h-28 short:w-16 short:h-16 object-contain drop-shadow-[3px_3px_0_rgba(0,0,0,0.8)]"
+          className="w-24 h-24 sm:w-28 sm:h-28 short:w-16 short:h-16 object-contain"
         />
       </m.div>
       <div className="max-w-xs">
