@@ -130,13 +130,17 @@ export function WordTowerHud(props: WordTowerHudProps) {
       <div
         ref={deckRef}
         className={cn(
-          'pointer-events-auto space-y-1 rounded-t-neo border-t-neo-thick border-black px-4 pt-0.5 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
+          'pointer-events-auto relative space-y-1 rounded-t-neo border-t-neo-thick border-black px-4 pt-0.5 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
           isPlacing
             ? 'bg-gradient-to-b from-neo-lime/15 via-neo-navy/95 to-neo-navy/95'
             : 'bg-neo-navy/95',
+          // Keep the bottom controls clear of the screen edge / home-indicator so
+          // they're comfortable to tap (open), and float the grab handle well
+          // above the edge when collapsed so re-opening the drawer never grazes
+          // the system back-gesture zone and exits the game.
           deckOpen
-            ? 'pb-[calc(env(safe-area-inset-bottom)+0.55rem)]'
-            : 'pb-[calc(env(safe-area-inset-bottom)+0.4rem)]',
+            ? 'pb-[calc(env(safe-area-inset-bottom)+1.15rem)]'
+            : 'pb-[calc(env(safe-area-inset-bottom)+1.6rem)]',
         )}
       >
         {/* Drawer grip — collapse the deck to free the screen for the tower. */}
@@ -151,12 +155,17 @@ export function WordTowerHud(props: WordTowerHudProps) {
             else setDeckOpen(dy < 0); // swipe up = expand, down = collapse
           }}
           aria-label={t(deckOpen ? 'wordTower.hud.collapse' : 'wordTower.hud.expand')}
-          className="mx-auto flex w-full touch-none flex-col items-center justify-center gap-0.5 py-0.5"
+          className={cn(
+            'mx-auto flex w-full touch-none flex-col items-center justify-center gap-0.5',
+            // Collapsed: a fat, easy-to-grab handle so a single tap brings the
+            // drawer back without hunting for a thin sliver at the screen edge.
+            deckOpen ? 'py-0.5' : 'py-3',
+          )}
         >
-          <span className="h-1.5 w-12 rounded-full bg-neo-white/40" />
+          <span className={cn('rounded-full bg-neo-white/40', deckOpen ? 'h-1.5 w-12' : 'h-2 w-16')} />
           {deckOpen
             ? <ChevronDown className="h-3 w-3 text-neo-white/40" />
-            : <ChevronUp className="h-3 w-3 text-neo-white/40" />}
+            : <ChevronUp className="h-5 w-5 text-neo-white/60" />}
         </button>
         {deckOpen && (
         <div className="space-y-0.5">
@@ -168,32 +177,43 @@ export function WordTowerHud(props: WordTowerHudProps) {
           </p>
         )}
 
-        {/* "N words possible" + tap-for-clue (reveals a masked sample word). */}
+        {/* Hint — pinned to the deck's top-end corner as a single icon (absolute,
+            so it never costs a row of deck height). Tap to reveal a sample word;
+            the buildable-word count rides as a small badge. With NO buildable
+            words it flips to a one-tap reroll. */}
         {possibleWords != null && (
-          <div className="flex justify-center">
+          <div className="absolute end-3 top-1.5 z-10 flex flex-col items-end gap-1" dir={dir}>
             {possibleWords === 0 && onReroll ? (
               <button
                 type="button"
                 onClick={onReroll}
-                className="inline-flex items-center gap-1 rounded-neo border-neo border-black bg-neo-orange px-2.5 py-0.5 font-neo-body text-[11px] font-bold text-black transition-transform active:translate-y-0.5"
+                aria-label={t('wordTower.hud.stuck')}
+                title={t('wordTower.hud.stuck')}
+                className="flex h-9 w-9 items-center justify-center rounded-full border-neo border-black bg-neo-orange text-black shadow-hard-sm transition-transform active:translate-y-0.5"
               >
-                <RotateCw className="h-3 w-3" />
-                {t('wordTower.hud.stuck')}
+                <RotateCw className="h-4 w-4" />
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => setClueShown(true)}
                 disabled={!clueWord || clueShown}
-                aria-label={t('wordTower.hud.clue')}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/60 bg-neo-navy-light/60 px-2 py-0.5 font-neo-body text-[10px] font-bold uppercase tracking-wider text-neo-cyan/90 transition-transform active:translate-y-0.5 disabled:opacity-60"
+                aria-label={t('wordTower.hud.possible', { n: possibleWords })}
+                title={t('wordTower.hud.clue')}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border-neo border-black bg-neo-navy-light/70 text-neo-cyan shadow-hard-sm transition-transform active:translate-y-0.5 disabled:opacity-60"
               >
-                <Lightbulb className="h-3 w-3" />
-                {t('wordTower.hud.possible', { n: possibleWords })}
-                {clueShown && maskedClue && (
-                  <span className="ms-1 font-neo-display tracking-[0.25em] text-neo-yellow">{maskedClue}</span>
+                <Lightbulb className="h-4 w-4" />
+                {possibleWords > 0 && (
+                  <span className="absolute -end-1.5 -top-1.5 min-w-[1.1rem] rounded-full border border-black bg-neo-cyan px-1 text-center font-neo-body text-[10px] font-black leading-4 text-black tabular-nums">
+                    {possibleWords}
+                  </span>
                 )}
               </button>
+            )}
+            {clueShown && maskedClue && (
+              <span className="rounded-neo border-neo border-black bg-neo-navy px-2 py-0.5 font-neo-display text-sm tracking-[0.25em] text-neo-yellow shadow-hard">
+                {maskedClue}
+              </span>
             )}
           </div>
         )}

@@ -378,6 +378,14 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // an inline timer, so the lifespan is owned in ONE place and can never be reset
   // by an unrelated re-render — the same robustness the other banners already use.
   useAutoDismiss(verdict?.key, () => setVerdict(null), VERDICT_MS);
+  // Safety net: the instant the next word is LIFTED for placement, drop any
+  // lingering verdict so it can NEVER bleed into the next build. This defends
+  // against a main-thread-janked timer (the Pixi loop can starve setTimeout on a
+  // busy mobile webview) holding the big centre PERFECT/+m pop on screen — the
+  // founder's "the perfect and metres text stays on the screen" report.
+  useEffect(() => {
+    if (tower.state.pendingWord) setVerdict(null);
+  }, [tower.state.pendingWord]);
 
   // Combo-milestone fanfare — a one-shot "×5 ON FIRE!" beat the moment the combo
   // crosses 3/5/10/20. Keyed off resultKey so it fires on the placing tick only.
@@ -534,11 +542,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   //    true for the wt-toast-out clip-wipe before unmounting (instant under
   //    reduced motion). Each render below reads `<x>R.value` + `<x>R.exiting`. ──
   const EXIT_MS = reducedMotion ? 0 : 420;
+  // The centre verdict is the most screen-dominant beat, so it gets a SNAPPIER
+  // exit than the peripheral toasts — its full presence is VERDICT_MS + this tail,
+  // and a long tail is exactly what made the big PERFECT/+m pop feel like it
+  // "stays on the screen" between back-to-back drops.
+  const VERDICT_EXIT_MS = reducedMotion ? 0 : 160;
   const zoneR = useExitReveal(zoneText, EXIT_MS);
   const milestoneR = useExitReveal(milestoneText, EXIT_MS);
   const landmarkR = useExitReveal(landmarkText, EXIT_MS);
   const skinUnlockR = useExitReveal(skinUnlock, EXIT_MS);
-  const verdictR = useExitReveal(verdict, EXIT_MS);
+  const verdictR = useExitReveal(verdict, VERDICT_EXIT_MS);
   const hazardR = useExitReveal(hazardText, EXIT_MS);
   const clutchR = useExitReveal(clutchText, EXIT_MS);
   const newBestR = useExitReveal(newBestText, EXIT_MS);
@@ -780,7 +793,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {verdictR.value && (() => { const verdict = verdictR.value; return (
         <div
           key={verdict.key}
-          className={`pointer-events-none absolute left-1/2 top-1/2 z-40 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5 ${fxClass(verdictR.exiting, '')}`}
+          className={`pointer-events-none absolute left-1/2 top-[40%] z-40 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5 ${fxClass(verdictR.exiting, '')}`}
           aria-live="assertive"
           role="status"
         >
@@ -793,7 +806,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             </div>
           )}
           <div
-            className={`rounded-neo border-neo-thick border-black px-6 py-3 text-center font-neo-display text-3xl font-black uppercase tracking-wide shadow-hard ${VERDICT_TONE_CLASS[verdict.v.tone]} ${reducedMotion ? '' : verdict.v.toppled ? 'animate-neo-shake' : 'animate-neo-pop'}`}
+            className={`rounded-neo border-neo-thick border-black px-5 py-2.5 text-center font-neo-display text-2xl font-black uppercase tracking-wide shadow-hard ${VERDICT_TONE_CLASS[verdict.v.tone]} ${reducedMotion ? '' : verdict.v.toppled ? 'animate-neo-shake' : 'animate-neo-pop'}`}
           >
             {t(verdict.v.labelKey)}
           </div>
