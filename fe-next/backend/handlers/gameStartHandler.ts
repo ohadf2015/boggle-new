@@ -505,8 +505,15 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       if (currentGame) currentGame.goldenLetters = goldenLetters;
     }
 
-    // Auto-add bots if solo player started the game
-    const autoAddResult = await autoAddBotsForSoloPlayer(gameCode, game);
+    // Auto-add bots if solo player started the game.
+    // EXCEPT in-work human-vs-human invite modes (Shiritori turn-chain, Sealed Bid
+    // auction): the bot AI has no move logic for them, so auto-filled bots would
+    // stall a Shiritori turn forever / never lock a Sealed Bid round. These modes
+    // are invite-a-human modes; started solo they degrade to single-player practice.
+    const HUMAN_ONLY_MODES: GameMode[] = ['shiritori', 'sealed-bid'];
+    const autoAddResult = HUMAN_ONLY_MODES.includes(resolvedMode)
+      ? { botsAdded: 0 }
+      : await autoAddBotsForSoloPlayer(gameCode, game);
     if (autoAddResult.botsAdded > 0) {
       // SECURITY: solo→multiplayer grid regen (audit SRV-CRIT-4).
       // The earlier line-334 regen check let solo (1 player) games keep the
@@ -564,9 +571,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       }
     }
 
-    // Initialize shiritori (しりとり) word-chain state if needed.
+    // Initialize shiritori (しりとり) word-chain state if needed. Humans only —
+    // bots have no shiritori move logic, so a bot in the turn order would hang
+    // the chain on its turn (no per-turn auto-advance for bots).
     if (resolvedMode === 'shiritori') {
-      const shiritoriState = initShiritoriState(playerUsernames);
+      const shiritoriState = initShiritoriState(humanUsernames);
       const currentGame = getGame(gameCode);
       if (currentGame) {
         currentGame.shiritoriState = shiritoriState;
@@ -574,9 +583,11 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     }
 
     // Initialize Sealed Bid auction state if needed (shared racks for all players).
+    // Humans only — bots never emit submitSealedBid, so including them would block
+    // the all-locked round resolution until the deadline every round.
     if (resolvedMode === 'sealed-bid') {
       const racks = pickSealedBidRacks(SEALED_BID_ROUNDS_PER_GAME, gameLang).map((r) => r.rack);
-      const sealedBidState = initSealedBidState(playerUsernames, racks);
+      const sealedBidState = initSealedBidState(humanUsernames, racks);
       const currentGame = getGame(gameCode);
       if (currentGame) {
         currentGame.sealedBidState = sealedBidState;
