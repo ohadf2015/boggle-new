@@ -62,10 +62,12 @@ export function courseTileLayout(word: string, courseW: number, opts: CourseOpts
 }
 
 /** Default number of committed rows kept on screen before the camera follows
- *  the climb. Founder ask: "show max 3 blocks so most of the screen is clean."
- *  Once the tower passes this, the base scrolls off below the deck and only the
- *  newest `maxVisibleRows` rows stay in the compact bottom construction zone. */
-export const DEFAULT_MAX_VISIBLE_ROWS = 3;
+ *  the climb. Founder ask (2026-06-19): "the tower should show only the top 2
+ *  letter blocks when regular — scrolling reveals all the rest." Once the tower
+ *  passes this, the base scrolls off below the deck and only the newest
+ *  `maxVisibleRows` rows stay in the compact bottom construction zone; the user
+ *  pans down to review everything below. */
+export const DEFAULT_MAX_VISIBLE_ROWS = 2;
 
 /** Inputs for the grounded tower-camera row layout. */
 export interface TowerRowLayoutInput {

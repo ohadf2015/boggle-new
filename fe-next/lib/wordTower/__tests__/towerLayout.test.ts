@@ -82,7 +82,7 @@ describe('towerRowLayout (grounded camera)', () => {
   });
 
   it('short tower is grounded: base sits near the bottom (above the deck), no shift', () => {
-    const l = towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset });
+    const l = towerRowLayout({ pinCount: 2, H, bottomInsetPx: inset });
     expect(l.shift).toBe(0);
     // base (pos 0) centred at baseCenter, which is above the control deck
     expect(l.centerY(0)).toBe(l.baseCenter);
@@ -90,14 +90,14 @@ describe('towerRowLayout (grounded camera)', () => {
   });
 
   it('grounded tower never pushes its newest tile above the build line', () => {
-    // Within the visible cap (default 3 rows) the tower stays grounded.
-    const l = towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset });
+    // Within the visible cap (default 2 rows) the tower stays grounded.
+    const l = towerRowLayout({ pinCount: 2, H, bottomInsetPx: inset });
     expect(l.shift).toBe(0);
     // top committed tile stays at or below topCenter (i.e. under the crane line)
-    expect(l.centerY(2)).toBeGreaterThanOrEqual(l.topCenter);
+    expect(l.centerY(1)).toBeGreaterThanOrEqual(l.topCenter);
   });
 
-  // ── "max 3 blocks on screen" — the camera shows only the newest few rows so
+  // ── "top 2 blocks on screen" — the camera shows only the newest few rows so
   //    most of the screen stays clean sky; the rest scrolls below the deck. ──
   it('keeps the tower grounded up to maxVisibleRows, then pans on the next row', () => {
     const mvr = 3;
@@ -108,9 +108,9 @@ describe('towerRowLayout (grounded camera)', () => {
     expect(towerRowLayout({ pinCount: mvr + 1, H, bottomInsetPx: inset, maxVisibleRows: mvr }).shift).toBeGreaterThan(0);
   });
 
-  it('defaults to a 3-row visible cap', () => {
-    expect(towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset }).shift).toBe(0);
-    expect(towerRowLayout({ pinCount: 4, H, bottomInsetPx: inset }).shift).toBeGreaterThan(0);
+  it('defaults to a 2-row visible cap (only the top 2 blocks show when regular)', () => {
+    expect(towerRowLayout({ pinCount: 2, H, bottomInsetPx: inset }).shift).toBe(0);
+    expect(towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset }).shift).toBeGreaterThan(0);
   });
 
   it('build line sits exactly (maxVisibleRows-1) rows above the grounded base', () => {

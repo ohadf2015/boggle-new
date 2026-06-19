@@ -10,8 +10,9 @@ interface Props {
   reducedMotion?: boolean;
 }
 
-/** How long the intro card holds before fading (ms). */
-const INTRO_MS = 4200;
+/** How long the intro card holds before fading (ms). The persistent chip keeps
+ *  the twist visible afterwards, so the big card can clear quickly. */
+const INTRO_MS = 3000;
 
 /**
  * WordTowerMutatorBanner — pops the day's shared twist once on entry, then

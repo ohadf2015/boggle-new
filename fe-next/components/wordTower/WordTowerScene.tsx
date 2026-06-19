@@ -30,6 +30,7 @@ import { WordTowerSighting } from './WordTowerSighting';
 import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
+import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
 
 interface SceneProps {
   floors: WordTowerFloor[];
@@ -43,6 +44,10 @@ interface SceneProps {
   /** Bumps each rejected word — shakes the pending stack. */
   errorKey: number;
   lastResult: ApplyResult | null;
+  /** Quality of the latest crane drop (perfect/good/sloppy/miss) — drives the
+   *  colour-coded landing FX so the player SEES whether they did good/ok/bad,
+   *  not just reads a label. Paired with `resultKey` (the fire trigger). */
+  dropQuality?: PlacementQuality;
   reducedMotion?: boolean;
   /** Height (px) of the bottom control deck — the tower grounds just above it. */
   bottomInsetPx?: number;
@@ -141,7 +146,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   const containerRef = useRef<Container | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
@@ -451,19 +456,45 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     }
   }, [biomeId, engine, reducedMotion]);
 
-  // Celebration FX on each accepted word.
+  // Celebration FX on each accepted word — COLOUR-CODED BY DROP QUALITY so the
+  // player instantly SEES whether they landed good/ok/bad (founder 2026-06-19:
+  // "add more FX on the drop, make it noticeable when it was good, ok or bad").
+  // A full-screen tint flash carries the verdict's colour (green/cyan/yellow/red)
+  // while particles + shake scale the punch; the word-length tier (high-rise →
+  // skyscraper) adds an EXTRA flourish on top for a long build.
+  const dropQualityRef = useRef(dropQuality);
+  dropQualityRef.current = dropQuality;
   useEffect(() => {
     if (resultKey === 0 || !lastResult || reducedMotion) return;
     const { width: W, height: H } = engine;
     const x = W / 2;
-    const y = H * 0.2;
-    if (lastResult.tier === 'skyscraper') {
-      engine.particles.burst(GOLD_STARS, x, y, 48);
-      engine.shake.shake({ intensity: 10, duration: 0.4, decay: 'exponential' });
-    } else if (lastResult.tier === 'highRise' || lastResult.tier === 'tall') {
-      engine.particles.burst(CONFETTI_BURST, x, y, 40);
+    const y = H * 0.22;
+    const q = dropQualityRef.current ?? 'good';
+    if (q === 'perfect') {
+      // Triumph — a bright lime wash, a gold star shower, and a satisfying kick.
+      engine.flash.flash({ color: 0xbfff00, duration: 0.32, intensity: 0.34 });
+      engine.particles.burst(GOLD_STARS, x, y, 40);
+      engine.shake.shake({ intensity: 8, duration: 0.32, decay: 'exponential' });
+    } else if (q === 'good') {
+      // Solid — a cool cyan wash + a healthy confetti pop.
+      engine.flash.flash({ color: 0x22d3ee, duration: 0.26, intensity: 0.22 });
+      engine.particles.burst(CONFETTI_BURST, x, y, 26);
+    } else if (q === 'sloppy') {
+      // Just ok — a brief amber blink + a small puff, no celebration.
+      engine.flash.flash({ color: 0xffe135, duration: 0.22, intensity: 0.18 });
+      engine.particles.burst(COMBO_FLASH, x, y, 12);
     } else {
-      engine.particles.burst(COMBO_FLASH, x, y, 14);
+      // Bad — a red warning wash + a sharp jolt so a fumbled drop clearly stings.
+      engine.flash.flash({ color: 0xff3366, duration: 0.3, intensity: 0.3 });
+      engine.particles.burst(COMBO_FLASH, x, y, 8);
+      engine.shake.shake({ intensity: 5, duration: 0.26, decay: 'exponential' });
+    }
+    // Word-length tier flourish on top of the quality cue (longer build = more).
+    if (lastResult.tier === 'skyscraper') {
+      engine.particles.burst(GOLD_STARS, x, y, 30);
+      engine.shake.shake({ intensity: 9, duration: 0.34, decay: 'exponential' });
+    } else if (lastResult.tier === 'highRise' || lastResult.tier === 'tall') {
+      engine.particles.burst(CONFETTI_BURST, x, y, 20);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultKey]);

@@ -21,10 +21,16 @@ export interface PlacementOutcome {
   topples: boolean;
 }
 
-/** Normalised drop-error band edges (0 = dead centre). */
-export const PERFECT_MAX = 0.08;
-export const GOOD_MAX = 0.25;
-export const SLOPPY_MAX = 0.6;
+/** Normalised drop-error band edges (0 = dead centre).
+ *
+ * Founder ask (2026-06-19): "make the player stay more in the GREEN area so he
+ * really feels he succeeded." The perfect + good ("green") windows are widened
+ * so a reasonably-timed release reliably lands a celebrated drop — the crane is
+ * a reward amplifier, not a precision fail-gate. Only a clearly mistimed release
+ * falls to sloppy/miss. */
+export const PERFECT_MAX = 0.14;
+export const GOOD_MAX = 0.4;
+export const SLOPPY_MAX = 0.62;
 /** Cosy "catch": a missed drop still lands at least this much of the block. */
 export const MIN_CAUGHT_OVERLAP = 0.2;
 /** Bad drops in a row before a miss is allowed to topple a floor. */
