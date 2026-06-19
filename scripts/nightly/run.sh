@@ -942,7 +942,7 @@ log "composing manager summary..."
 SUMMARY_FILE=$(mktemp -t nightly-summary.XXXXXX)
 SUMMARY_PROMPT=$(mktemp -t summary-prompt.XXXXXX)
 cat > "$SUMMARY_PROMPT" <<PROMPT_EOF
-You are writing a daily Telegram message for the LexiClash founder. Read \`docs/nightly/reports/${TODAY}.md\` end-to-end.
+You are writing a daily Telegram message for the LexiClash founder. Today's FULL report is inlined at the very bottom of this prompt (after the format spec) — base the message ONLY on it. Do NOT read any files or call any tools; everything you need is below.
 
 Mode: $([ "$RUN_FAILED" = "1" ] && echo "RUN FAILED — the gate failed and/or the push failed (read the **Outcome** line in the report for which). LEAD with that honestly (e.g. 'code gate failed, nothing shipped' or 'committed locally but push failed'), then a brief what-ran/what-was-attempted. Still include the Reddit pick + game-mode idea sections below if present — they're useful regardless." || { [ "$NO_CHANGE_MODE" = "1" ] && echo "NO-CHANGE NIGHT (no lanes shipped). Output 4-6 lines max: a one-line 'all clear' headline + a brief 'what was checked'. NO bullet sections. Skip 'wins' entirely." || echo "Changes shipped. Lead with concrete impact."; })
 
@@ -1003,6 +1003,17 @@ STYLE RULES (critical for readability):
 Output ONLY the message body. No preamble, no markdown fence around it.
 PROMPT_EOF
 
+# Inline the full report so the composer needs ZERO tool calls. The agentic
+# "Read the report file" round-trip was the #1 cause of the 240s timeout — 31%
+# of runs fell back to the deterministic brief (the 2026-05/06 pattern). With the
+# report inlined this is a pure text task that returns well under the timeout.
+if [ -f "$REPORT" ]; then
+  {
+    printf '\n\n===== TODAY'\''S FULL REPORT (%s) =====\n\n' "$REPORT"
+    cat "$REPORT"
+  } >> "$SUMMARY_PROMPT"
+fi
+
 # Real GNU timeout (via coreutils, installed by setup). Earlier perl-alarm
 # fallback was broken — see headless.sh comment. If neither binary exists,
 # hard-fail with a clear "install coreutils" message.
@@ -1023,7 +1034,6 @@ fi
 # Stdin piping cannot silently empty itself: an empty file fails earlier and
 # loudly, and the kernel never re-quotes content.
 if [ ${#_to[@]} -gt 0 ] && [ -s "$SUMMARY_PROMPT" ] && "${_to[@]}" claude --print \
-  --allowedTools '*' \
   --dangerously-skip-permissions \
   --model sonnet \
   < "$SUMMARY_PROMPT" \

@@ -301,7 +301,16 @@ _ship_isolated() {
   local nightly_sha="$1"
 
   log "isolated ship: founder has unpushed commits — shipping nightly diff only via worktree"
-  git fetch origin master --quiet 2>>"$RUN_LOG" || { log "isolated ship: fetch failed"; }
+  # Bounded retry (same wake-time-network rationale as preflight): the worktree below
+  # checks out origin/master, so a fetch that fails on a not-yet-ready network would
+  # build the nightly diff on a stale ref. Non-fatal — fall through after retries
+  # (the inner push loop re-fetches anyway) rather than abort the ship.
+  _is_ft=0; _is_max="${NIGHTLY_FETCH_RETRIES:-5}"; _is_slp="${NIGHTLY_FETCH_RETRY_SLEEP:-15}"
+  until git fetch origin master --quiet 2>>"$RUN_LOG"; do
+    _is_ft=$((_is_ft+1))
+    if [ "$_is_ft" -ge "$_is_max" ]; then log "isolated ship: fetch failed after $_is_max attempts — continuing on last-known origin/master"; break; fi
+    log "isolated ship: fetch attempt $_is_ft failed — retrying in ${_is_slp}s"; sleep "$_is_slp"
+  done
 
   local wtbase wt ok=0 conflict=""
   wtbase=$(mktemp -d -t nightly-iso.XXXXXX); wt="$wtbase/wt"

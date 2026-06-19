@@ -187,7 +187,19 @@ preflight_check() {
   # and let the push-time rebase reconcile any divergence.
   if [ "$tree_clean" = "1" ]; then
     echo "preflight: fetching + ff-pulling master..."
-    git fetch origin master --quiet || { echo "preflight: fetch failed"; return 1; }
+    # Bounded retry: a mac waking at the 01:00 trigger may not have DNS/network up
+    # yet — a single-shot fetch then hits "Could not resolve host: github.com" and
+    # aborted the WHOLE run (the 2026-06-19 miss). Retry with backoff so a not-yet-
+    # ready network self-heals; only abort after all attempts (a genuine outage).
+    _pf_ft=0; _pf_max="${NIGHTLY_FETCH_RETRIES:-5}"; _pf_slp="${NIGHTLY_FETCH_RETRY_SLEEP:-15}"
+    until git fetch origin master --quiet; do
+      _pf_ft=$((_pf_ft+1))
+      if [ "$_pf_ft" -ge "$_pf_max" ]; then
+        echo "preflight: fetch failed after $_pf_max attempts"; return 1
+      fi
+      echo "preflight: fetch attempt $_pf_ft failed (network not ready?) — retrying in ${_pf_slp}s"
+      sleep "$_pf_slp"
+    done
     if ! git pull --ff-only origin master --quiet; then
       # ff failed → local diverged from origin. Self-heal ONLY when every local-only
       # commit is docs/-only (a stranded seo-daily report, or our own failed-push

@@ -20,10 +20,18 @@ _tg_post() {
     echo "telegram: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID unset — skipping $method" >&2
     return 0
   fi
-  curl -sS -X POST \
+  # --max-time guards against a network stall hanging the whole run on the final
+  # digest send (curl had no timeout). Capture the result so a failed send (400/
+  # 401/429/timeout) is no longer invisible — surface it to stderr (→ RUN_LOG).
+  local _resp _ok
+  _resp=$(curl -sS --max-time 30 -X POST \
     "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}" \
-    "$@" \
-    | jq -r '.ok // false' >/dev/null
+    "$@") || { echo "telegram: curl failed (network/timeout) — $method" >&2; return 1; }
+  _ok=$(printf '%s' "$_resp" | jq -r '.ok // false' 2>/dev/null)
+  if [ "$_ok" != "true" ]; then
+    echo "telegram: send FAILED — $method: $(printf '%s' "$_resp" | jq -r '.description // empty' 2>/dev/null | head -c 200)" >&2
+    return 1
+  fi
 }
 
 cmd_msg() {
