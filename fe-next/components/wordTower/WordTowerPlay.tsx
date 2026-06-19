@@ -501,18 +501,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       sab.sabotage(rivalId, rivalName); // local beat + spend a charge
       const rival = rivals.find((r) => r.id === rivalId);
       if (!daily && rival?.playerId) {
+        // Heights are derived server-side from the authoritative progress table —
+        // we only name the target; the server computes + clamps the damage.
         void fetch('/api/word-tower/wreck', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            targetPlayerId: rival.playerId,
-            attackerHeightM: personalBest,
-            targetHeightM: rival.heightM,
-          }),
+          body: JSON.stringify({ targetPlayerId: rival.playerId }),
         }).catch(() => { /* best-effort raid */ });
       }
     },
-    [sab, rivals, daily, personalBest],
+    [sab, rivals, daily],
   );
 
   // Apply any pending async wrecks ONCE on session start (endless only): fold
