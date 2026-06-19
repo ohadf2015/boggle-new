@@ -296,7 +296,9 @@ const es = {
     "perk": { "title": "Elige un don", "subtitle": "Elige uno — dura toda la escalada", "skip": "Saltar por ahora", "masterCrane": { "name": "Grúa maestra", "desc": "Mayor recompensa en caídas perfectas" }, "tallTimber": { "name": "Madera alta", "desc": "+12% de altura en cada piso" }, "featherfall": { "name": "Caída de pluma", "desc": "Los derrumbes cuestan un piso menos" }, "reinforced": { "name": "Reforzado", "desc": "Más tambaleo antes del abismo" }, "cushion": { "name": "Cojín de seguridad", "desc": "El vaivén de la grúa nunca tira un piso" } },
     "crane": { "place": "Coloca tu palabra", "steer": "Dirige y suelta", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad", "steady": "Firme", "onFire": "En racha", "steadyAria": "Racha de pulso firme: {n} caídas perfectas" },
     "verdict": { "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Flojo", "miss": "¡Fallo!" },
-    "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "{n} caídas perfectas seguidas", "watchAd": "📺 Ver anuncio +1", "adEarned": "🎯 ¡Token ganado!" },
+    "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "¡Nueva zona o logro!", "watchAd": "📺 Ver anuncio +1", "adEarned": "🎯 ¡Token ganado!" },
+    "reward": { "tier": { "common": "Monedas", "uncommon": "¡Buen botín!", "rare": "¡Hallazgo raro!", "epic": "¡PREMIO GORDO!" } },
+    "wreck": { "reportTitle": "¡Torre asaltada!", "reportBody": "{name} te tiró {floors} pisos mientras no estabas — aquí tienes un revuelto para contraatacar." },
     "tier": { "apprentice": "Aprendiz", "journeyman": "Oficial", "master": "Maestro Constructor" },
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
@@ -717,6 +719,7 @@ const es = {
   },
   "cookieConsent": {
     "title": "Consentimiento de cookies",
+    "mascotAlt": "La mascota de LexiClash mordisqueando una galleta feliz",
     "message": "Usamos cookies para análisis y para mostrar anuncios relevantes. Puedes personalizar tus preferencias a continuación.",
     "accept": "Aceptar todo",
     "decline": "Rechazar todo",
@@ -11841,6 +11844,77 @@ const es = {
     "timeLow": {
       "cta": "Añadir +{seconds}s",
       "earning": "Añadiendo tiempo..."
+    }
+  },
+  "modeCoach": {
+    "skip": "Saltar",
+    "next": "Siguiente",
+    "gotIt": "¡Vale!",
+    "classic": {
+      "title": "Trazar Palabras",
+      "step1": "Desliza por letras que se tocan",
+      "step2": "Palabras largas dan más puntos",
+      "scoreTip": "¡Encadena rápido para combos!"
+    },
+    "wordHunt": {
+      "title": "Caza Palabras",
+      "step1": "Toca fichas para adivinar",
+      "step2": "Los colores revelan la respuesta",
+      "scoreTip": "¡Adivina primero para muchísimos puntos!"
+    },
+    "wheelRush": {
+      "title": "Rueda y Deletrea",
+      "step1": "Siempre usa la letra del centro",
+      "step2": "Bloquea palabras antes que te las roben",
+      "scoreTip": "¡Palabras largas bloquean más!"
+    },
+    "blast": {
+      "title": "Explosión de Fichas",
+      "step1": "Desliza letras para hacer palabras",
+      "step2": "Limpia fichas, provoca cascadas",
+      "scoreTip": "¡Encadena cascadas para combos enormes!"
+    },
+    "wordTower": {
+      "title": "Construye la Torre",
+      "step1": "Apila palabras para subir",
+      "step2": "Palabras largas, torre más alta",
+      "scoreTip": "¡La altura es tu puntuación — ¡sube!"
+    },
+    "connections": {
+      "title": "Encuentra los Vínculos",
+      "step1": "Agrupa cuatro palabras relacionadas",
+      "step2": "Un error te cuesta",
+      "scoreTip": "¡Resuelve sin errores!"
+    },
+    "wordCraft": {
+      "title": "Crear Palabras",
+      "step1": "Desliza fichas a su lugar",
+      "step2": "Forma palabras para limpiarlas"
+    },
+    "wordAlchemy": {
+      "title": "Alquimia de Palabras",
+      "step1": "Mezcla fichas en palabras nuevas",
+      "step2": "Los comodines transforman lo que sea"
+    },
+    "crossword": {
+      "title": "Completa la Cuadrícula",
+      "step1": "Toca una pista, escribe la respuesta",
+      "step2": "Resuelve horizontal y vertical"
+    },
+    "sealedBid": {
+      "title": "Puja Sellada",
+      "step1": "Toca en secreto tu mejor palabra",
+      "step2": "Las pujas únicas puntúan doble"
+    },
+    "shiritori": {
+      "title": "Cadena de Palabras",
+      "step1": "Empieza con la última letra",
+      "step2": "Vence el reloj cada turno"
+    },
+    "adventure": {
+      "title": "Aventura",
+      "step1": "Logra objetivos para avanzar",
+      "step2": "Vence jefes con palabras grandes"
     }
   },
   "gameModes": {

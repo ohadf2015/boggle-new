@@ -10,6 +10,7 @@ import {
   canSabotage,
   sabotageFloorsFor,
   spendSabotageToken,
+  wreckingBallEarn,
 } from '@/lib/wordTower/sabotage';
 
 interface SentHit {
@@ -24,17 +25,21 @@ interface SentHit {
 /**
  * useSabotage — owns the wrecking-ball mechanic for the climber.
  *
- * - Tokens earn from perfect-drop streaks (capped). Caller passes the LIVE
- *   `perfectStreak` from useCraneDrop; awarding is idempotent across renders.
+ * - Wrecking-ball charges earn from PROGRESSION — reaching a new height zone or
+ *   unlocking an achievement (founder brief). The caller passes the cumulative
+ *   count of those earn-events this run (`progressEarnEvents`); crediting is
+ *   idempotent and spend-safe via {@link wreckingBallEarn}.
+ * - Perfect-drop streaks remain a secondary earn path (capped) — caller passes
+ *   the LIVE `perfectStreak` from useCraneDrop.
  * - `openPicker` / `closePicker` toggle the rival picker overlay.
- * - `sabotage` records a hit (drives the rail's local ghost-tower drop + the
- *   animation/toast). Backend POST is deferred to a follow-up; the local
- *   experience is fully demoable today.
+ * - `sabotage` records a hit locally (drives the rail's ghost-tower drop + the
+ *   wrecking-ball animation/toast). The async cross-player POST is fired by the
+ *   caller, which holds the heights — this hook owns only the local beat.
  *
  * Pure-ish: side effects limited to a one-shot localStorage breadcrumb so
  * the founder can confirm spend counts during playtests.
  */
-export function useSabotage(perfectStreak: number) {
+export function useSabotage(perfectStreak: number, progressEarnEvents = 0) {
   const [tokens, setTokens] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [lastHit, setLastHit] = useState<SentHit | null>(null);
@@ -43,6 +48,8 @@ export function useSabotage(perfectStreak: number) {
   const [earnedToast, setEarnedToast] = useState<number | null>(null);
   const [adEarnedToast, setAdEarnedToast] = useState(false);
   const lastEarnedRef = useRef(0);
+  // How many progression earn-events (zones + achievements) we've credited.
+  const creditedRef = useRef(0);
 
   // Token earn driven by the perfect-streak; idempotent.
   useEffect(() => {
@@ -57,6 +64,24 @@ export function useSabotage(perfectStreak: number) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [perfectStreak]);
+
+  // Charge earn driven by PROGRESSION (new zone / new achievement). Credits only
+  // the new delta and is spend-safe, so a charge spent on a wreck is never
+  // phantom-re-granted when the same totals re-evaluate.
+  useEffect(() => {
+    const { charges, credited } = wreckingBallEarn(tokens, {
+      totalEarnEvents: progressEarnEvents,
+      credited: creditedRef.current,
+    });
+    if (credited > creditedRef.current) {
+      creditedRef.current = credited;
+      if (charges > tokens) {
+        setTokens(charges);
+        setEarnedToast(charges);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progressEarnEvents]);
 
   const dismissEarned = useCallback(() => setEarnedToast(null), []);
   const dismissAdEarned = useCallback(() => setAdEarnedToast(false), []);
@@ -114,16 +139,19 @@ const SABOTAGE_M_PER_FLOOR = 8;
  * useSabotageIntegration — wraps useSabotage with rival-rail display math +
  * the receiver-side simulator (URL-flag) so WordTowerPlay can stay slim.
  *
- * @param perfectStreak  current perfect-drop streak from useCraneDrop
- * @param rivals         leaderboard markers (untouched)
- * @param fireHazard     tower.hazard fn — used by the receiver-side simulator
+ * @param perfectStreak       current perfect-drop streak from useCraneDrop
+ * @param progressEarnEvents  cumulative zone-entries + achievement-unlocks this
+ *                            run — the primary wrecking-ball earn source
+ * @param rivals              leaderboard markers (untouched)
+ * @param fireHazard          tower.hazard fn — used by the receiver-side simulator
  */
 export function useSabotageIntegration(
   perfectStreak: number,
+  progressEarnEvents: number,
   rivals: ReadonlyArray<RivalMarker>,
   fireHazard: (floors: number, kind: HazardKind, ids: string[]) => void,
 ) {
-  const sab = useSabotage(perfectStreak);
+  const sab = useSabotage(perfectStreak, progressEarnEvents);
 
   const displayRivals = useMemo(
     () => rivals.map((r) => ({
