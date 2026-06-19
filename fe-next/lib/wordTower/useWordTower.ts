@@ -182,6 +182,9 @@ export function useWordTower(opts: UseWordTowerOpts) {
       hazard: (floors: number, kind: HazardKind, ids: string[]) => dispatch({ type: 'hazard', floors, kind, ids }),
       reset: () =>
         dispatch({ type: 'reset', game: initWordTowerState({ gameCode: sessionId, playerId: 'solo', language }) }),
+      /** Replace the live tower with a specific state (e.g. after applying async
+       *  wrecks on session start). Reuses the reset reducer path. */
+      restore: (game: WordTowerPlayerState) => dispatch({ type: 'reset', game }),
     }),
     [language, sessionId],
   );

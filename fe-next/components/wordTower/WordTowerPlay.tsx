@@ -16,7 +16,7 @@ import {
   serializeWordTowerState,
   type WordTowerPlayerState,
 } from '@/lib/wordTower/wordTowerManager';
-import { WORD_TOWER_MIN_WORD_LEN } from '@/shared/constants/wordTowerConstants';
+import { WORD_TOWER_MIN_WORD_LEN, WORD_TOWER_BIOMES } from '@/shared/constants/wordTowerConstants';
 import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
@@ -61,6 +61,17 @@ import { WordTowerHud } from './WordTowerHud';
 import { WordTowerStatHud } from './WordTowerStatHud';
 import { getTowerArchitectTier } from '@/lib/wordTower/architectTier';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
+import { addCoins } from '@/utils/coinManager';
+import {
+  rollTowerReward,
+  nextDryStreak,
+  rewardRoll01,
+  type RewardSource,
+} from '@/lib/wordTower/towerReward';
+import { WordTowerRewardReveal, type RewardRevealPayload } from './WordTowerRewardReveal';
+import { useSabotageIntegration } from './useSabotage';
+import { WordTowerSabotageBay } from './WordTowerSabotageBay';
+import { applyAsyncWrecks, type PendingWreck } from '@/lib/wordTower/asyncWreck';
 
 /** How long a transient celebration toast holds before it auto-dismisses. Kept
  *  short + uniform so banners clear quickly and never pile up / "stick" on
@@ -73,6 +84,13 @@ const TOAST_MS = 950;
  *  fastest — long enough to read the result + metres, gone before the next drop
  *  so it never blocks the tower. */
 const VERDICT_MS = 750;
+
+/** Coin-reward reveal holds a touch longer than a toast — it's the "you got
+ *  something" beat and deserves a readable count. */
+const REWARD_MS = 1500;
+/** Wreck Report (async raid landed on you) holds longest — it's a one-per-session
+ *  story beat the defender should actually read. */
+const WRECK_REPORT_MS = 3500;
 
 /** Verdict-pop colour by band — mirrors the swinging-beam tint families. */
 const VERDICT_TONE_CLASS: Record<VerdictTone, string> = {
@@ -128,6 +146,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const reducedMotion = usePrefersReducedMotion();
   const tower = useWordTower({ language, sessionId: 'solo', isInDictionary, initialGame });
   const { game } = tower.state;
+  // Always-current pointer to the live game, for async callbacks (e.g. the
+  // session-start wreck apply) that must act on the latest state, not a stale
+  // closure snapshot.
+  const gameRef = useRef(game);
+  gameRef.current = game;
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
   const architectTier = useMemo(() => getTowerArchitectTier(game.floors), [game.floors]);
   const personalBest = Math.max(personalBestM, game.heightM);
@@ -202,6 +225,42 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // no-op'd (playSound defaults requiresGameActive:true). This makes them audible.
   useGameActiveSound(true);
 
+  // ── Tangible rewards: REAL coins granted at milestones (new zone / achievement),
+  // with a variable-reward tier reveal. Coins land in the shared wallet via
+  // coinManager — the player ACTUALLY keeps them, closing the old "visual-only
+  // rewards" gap.
+  //
+  // Idempotency is owned by the CALLERS, not a cross-run breadcrumb: the zone
+  // effect's `prevZone` ref fires once per zone crossing, and `achUnlocked`
+  // (localStorage-persisted) makes each achievement pay once ever. That is
+  // deliberate — a localStorage breadcrumb keyed on the static endless gameCode
+  // ('solo') would pay each zone only ONCE PER DEVICE EVER, starving every later
+  // climb. With the ref guards, a fresh climb re-earns its zone coins (income
+  // that flows each session) while achievements stay one-time feats.
+  const dryStreakRef = useRef(0);
+  // Per-mount seed so each climb's reward tiers vary (the static gameCode can't).
+  const rewardRunSeed = useRef(typeof window !== 'undefined' ? String(Date.now()) : 'ssr');
+  const [rewardFx, setRewardFx] = useState<RewardRevealPayload | null>(null);
+  // Cumulative progression earn-events (new zones + achievements) this run —
+  // the primary source of wrecking-ball charges.
+  const [earnEvents, setEarnEvents] = useState(0);
+  const grantReward = useCallback(
+    (source: RewardSource, id: string, magnitude: number) => {
+      if (typeof window === 'undefined') return;
+      const reward = rollTowerReward(rewardRoll01(`${rewardRunSeed.current}-${source}-${id}`), {
+        source,
+        magnitude,
+        dryStreak: dryStreakRef.current,
+      });
+      dryStreakRef.current = nextDryStreak(dryStreakRef.current, reward.tier);
+      addCoins(reward.coins, `wordtower_${source}`, { id });
+      setRewardFx({ coins: reward.coins, tier: reward.tier, source, key: Date.now() });
+      playCoinCollectSound();
+    },
+    [playCoinCollectSound],
+  );
+  useAutoDismiss(rewardFx?.key, () => setRewardFx(null), REWARD_MS);
+
   // "NEW ZONE" banner — owns this slot; milestones at the same height defer.
   const [zoneText, setZoneText] = useState<string | null>(null);
   const prevZone = useRef(biomeId);
@@ -209,6 +268,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     if (prevZone.current === biomeId) return;
     prevZone.current = biomeId;
     setZoneText(t(`wordTower.biome.${biomeId}`));
+    // A new place pays out coins AND earns a wrecking-ball charge (founder ask).
+    const zoneIndex = WORD_TOWER_BIOMES.findIndex((b) => b.id === biomeId);
+    grantReward('zone', biomeId, Math.max(0, zoneIndex));
+    setEarnEvents((n) => n + 1);
   }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
   useAutoDismiss(zoneText, () => setZoneText(null), TOAST_MS);
 
@@ -264,7 +327,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     fresh.forEach((ach) => achUnlocked.current.add(ach.id));
     try { localStorage.setItem('wt-achievements', JSON.stringify([...achUnlocked.current])); } catch { /* */ }
     setAchToast(fresh[fresh.length - 1]); // show the most impressive of the batch
-  }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]);
+    // Each unlock pays REAL coins + earns a wrecking-ball charge (founder ask).
+    fresh.forEach((ach, i) => grantReward('achievement', ach.id, i));
+    setEarnEvents((n) => n + fresh.length);
+  }, [game.heightM, game.floors.length, game.longestWord, game.longestCombo, rivals]); // eslint-disable-line react-hooks/exhaustive-deps
   useAutoDismiss(achToast, () => setAchToast(null), TOAST_MS);
 
   // Roguelike perk draft — daily-run only. Boons fold into one modifier object
@@ -412,14 +478,69 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setSurpriseFx({ s, key: tower.state.resultKey });
     surpriseSoundFns[TOWER_SURPRISE_META[s.event].sound]();
     haptics.levelComplete();
+    // NB: surprises keep paying in bonus metres + scrambles (their existing
+    // reward). They intentionally do NOT grant coins — surprises fire many
+    // times per climb, and addCoins increments the games-played counter, so
+    // coin grants stay on the BOUNDED milestones (new zone / achievement).
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
   useAutoDismiss(surpriseFx?.key, () => setSurpriseFx(null), TOAST_MS);
 
-  // Rival ghosts are leaderboard records to climb past (read-only). The old
-  // solo "wrecking-ball" sabotage was a fake, local-only effect against these
-  // ghosts (no backend) — cut from solo. Async-versus interference lives in the
-  // (unwired) WordTowerVersus prototype for the future shared-daily mode.
-  const displayRivals = rivals;
+  // ── Wrecking Ball — earned by PROGRESSION (new zone / achievement), spent on a
+  // rival. The local beat (ghost-tower drop + wrecking-ball arc + toast) fires
+  // immediately; the cross-player raid is PERSISTED so it lands on the rival's
+  // NEXT climb (endless only — daily never writes shared state). This restores
+  // the wrecking-ball, now with the real backend the old local-only version lacked.
+  const { sab, displayRivals } = useSabotageIntegration(
+    crane.perfectStreak,
+    earnEvents,
+    rivals,
+    tower.hazard,
+  );
+  const sendWreck = useCallback(
+    (rivalId: string, rivalName: string) => {
+      sab.sabotage(rivalId, rivalName); // local beat + spend a charge
+      const rival = rivals.find((r) => r.id === rivalId);
+      if (!daily && rival?.playerId) {
+        void fetch('/api/word-tower/wreck', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            targetPlayerId: rival.playerId,
+            attackerHeightM: personalBest,
+            targetHeightM: rival.heightM,
+          }),
+        }).catch(() => { /* best-effort raid */ });
+      }
+    },
+    [sab, rivals, daily, personalBest],
+  );
+
+  // Apply any pending async wrecks ONCE on session start (endless only): fold
+  // them into the restored tower (SESSION state only — never the protected
+  // best_*), surface a Wreck Report, and hand the defender compensation
+  // scrambles so the beat feels fair, not punitive.
+  const [wreckReport, setWreckReport] = useState<{ names: string[]; floors: number } | null>(null);
+  const wreckCheckedRef = useRef(false);
+  useEffect(() => {
+    if (daily || wreckCheckedRef.current) return;
+    wreckCheckedRef.current = true;
+    void fetch('/api/word-tower/wreck')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { wrecks?: PendingWreck[] } | null) => {
+        const wrecks = data?.wrecks ?? [];
+        if (wrecks.length === 0) return;
+        // Fold into the LIVE tower (via ref), not the stale mount snapshot — if
+        // the fetch resolves after the player has already placed a word, we
+        // knock floors off what's actually there instead of discarding progress.
+        const res = applyAsyncWrecks(gameRef.current, wrecks);
+        tower.restore(res.state);
+        setWreckReport({ names: res.attackerNames, floors: res.totalFloorsRemoved });
+        haptics.error();
+      })
+      .catch(() => { /* best-effort */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useAutoDismiss(wreckReport, () => setWreckReport(null), WRECK_REPORT_MS);
 
   // Environmental hazards strike at fixed altitudes → topple floors; firedHazards guards re-fire.
   const prevHazardH = useRef(game.heightM);
@@ -477,8 +598,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const onDeckHeight = useCallback((px: number) => setDeckHeight(px), []);
 
   // ── persistence: build payload + save (fetch or beacon) ──
-  const gameRef = useRef(game);
-  gameRef.current = game;
+  // (gameRef is declared once near the top — used here + by the async wreck apply.)
   // Dedupe by floor count: skip a save if nothing was built since the last one
   // (heightM always changes per word, so it can't dedupe; floor count can).
   const lastSavedFloors = useRef(-1);
@@ -666,6 +786,50 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           draws on-screen ghosts, so the real target is usually off-screen up).
           Keyed off the live climb height, not the panned view. */}
       <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
+
+      {/* Wrecking Ball bay — token chip + rival picker + the wrecking-ball arc.
+          Earned by reaching new zones / unlocking achievements; spent to raid a
+          rival's tower (local beat now, lands on their next climb via the queue). */}
+      <WordTowerSabotageBay
+        tokens={sab.tokens}
+        rivals={displayRivals}
+        pickerOpen={sab.pickerOpen}
+        onOpen={sab.openPicker}
+        onClose={sab.closePicker}
+        onSend={sendWreck}
+        lastHit={sab.lastHit}
+        onDismissHit={sab.dismissHit}
+        earnedToast={sab.earnedToast}
+        onDismissEarned={sab.dismissEarned}
+        adEarnedToast={sab.adEarnedToast}
+        onDismissAdEarned={sab.dismissAdEarned}
+        t={t}
+        reducedMotion={reducedMotion}
+      />
+
+      {/* "You actually got coins" reveal — flashes the granted amount + rarity. */}
+      <WordTowerRewardReveal reward={rewardFx} t={t} reducedMotion={reducedMotion} />
+
+      {/* Wreck Report — a rival raided you while away; the hit (session-only) has
+          already been folded in + you were handed a compensation scramble. */}
+      {wreckReport && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`pointer-events-none absolute inset-x-0 top-[12%] z-40 mx-auto flex w-fit flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-pink px-5 py-2.5 text-center text-neo-white shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+        >
+          <span className="flex items-center gap-1.5 font-neo-display text-base font-extrabold">
+            <span aria-hidden>🧨</span>
+            {t('wordTower.wreck.reportTitle')}
+          </span>
+          <span className="font-neo-body text-xs font-bold">
+            {t('wordTower.wreck.reportBody', {
+              name: wreckReport.names[0] ?? 'Rival',
+              floors: wreckReport.floors,
+            })}
+          </span>
+        </div>
+      )}
 
       {/* "In the zone" frame — a hard-edged electric border that lights the play
           area on a hot perfect-drop streak, gold at "ON FIRE". Pure feel. */}

@@ -298,7 +298,9 @@ const en = {
     "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
     "crane": { "place": "Place your word", "steer": "Steer & drop", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability", "steady": "Steady", "onFire": "On Fire", "steadyAria": "Steady hands streak: {n} perfect drops" },
     "verdict": { "perfect": "Perfect!", "good": "Nice!", "sloppy": "Sloppy", "miss": "Missed!" },
-    "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "{n} perfect drops in a row", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!" },
+    "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "New zone or achievement!", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!" },
+    "reward": { "tier": { "common": "Coins", "uncommon": "Nice haul!", "rare": "Rare find!", "epic": "JACKPOT!" } },
+    "wreck": { "reportTitle": "Tower raided!", "reportBody": "{name} knocked off {floors} floors while you were away — here's a scramble to fight back." },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
@@ -718,6 +720,7 @@ const en = {
   },
   "cookieConsent": {
     "title": "Cookie consent",
+    "mascotAlt": "LexiClash mascot happily munching a cookie",
     "message": "We use cookies for analytics and to serve relevant ads. You can customize your preferences below.",
     "accept": "Accept All",
     "decline": "Decline All",
@@ -11821,6 +11824,77 @@ const en = {
     "cta": "Play Word Hunt",
     "dismiss": "Maybe Later",
     "imageAlt": "Word Hunt multiplayer duel"
+  },
+  "modeCoach": {
+    "skip": "Skip",
+    "next": "Next",
+    "gotIt": "Got it!",
+    "classic": {
+      "title": "Trace Words",
+      "step1": "Drag through touching letters",
+      "step2": "Longer words score more",
+      "scoreTip": "Chain words fast for combos!"
+    },
+    "wordHunt": {
+      "title": "Crack the Word",
+      "step1": "Tap tiles to guess",
+      "step2": "Colors reveal the answer",
+      "scoreTip": "Find it first for big points!"
+    },
+    "wheelRush": {
+      "title": "Spin & Spell",
+      "step1": "Always use the center letter",
+      "step2": "Lock words before rivals steal",
+      "scoreTip": "Long words lock the most points!"
+    },
+    "blast": {
+      "title": "Blast Tiles",
+      "step1": "Drag letters to make words",
+      "step2": "Clear tiles, trigger cascades",
+      "scoreTip": "Chain cascades for huge combos!"
+    },
+    "wordTower": {
+      "title": "Build the Tower",
+      "step1": "Stack words to climb higher",
+      "step2": "Longer words, taller tower",
+      "scoreTip": "Height is your score — go tall!"
+    },
+    "connections": {
+      "title": "Find the Links",
+      "step1": "Group four related words",
+      "step2": "One wrong guess costs you",
+      "scoreTip": "Solve with no mistakes!"
+    },
+    "wordCraft": {
+      "title": "Craft Words",
+      "step1": "Slide tiles into place",
+      "step2": "Form words to clear them"
+    },
+    "wordAlchemy": {
+      "title": "Word Alchemy",
+      "step1": "Mix tiles into new words",
+      "step2": "Wildcards transform anything"
+    },
+    "crossword": {
+      "title": "Fill the Grid",
+      "step1": "Tap a clue, type the answer",
+      "step2": "Solve across and down"
+    },
+    "sealedBid": {
+      "title": "Sealed Bid",
+      "step1": "Secretly tap your best word",
+      "step2": "Unique bids score double"
+    },
+    "shiritori": {
+      "title": "Word Chain",
+      "step1": "Start with the last letter",
+      "step2": "Beat the clock each turn"
+    },
+    "adventure": {
+      "title": "Adventure",
+      "step1": "Clear goals to advance",
+      "step2": "Beat bosses with big words"
+    }
   },
   "gameModes": {
     "classic": {
