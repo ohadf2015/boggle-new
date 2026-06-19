@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
 import { getRankTier, DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import { captureApiError } from '@/utils/sentry';
@@ -40,8 +40,7 @@ export async function GET(request: NextRequest) {
     const serviceClient = createServiceClient(config.url, config.key);
 
     // Get authenticated user (optional - leaderboard is public)
-    const authSupabase = await createClient();
-    const { data: { user } } = await authSupabase.auth.getUser();
+    const user = await getAuthedUser(request);
 
     // Phase 1: Fetch leaderboard and user rating in parallel
     const [leaderboardResult, userRatingResult] = await Promise.all([

@@ -15,6 +15,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
@@ -195,10 +196,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
+    const user = await getAuthedUser(request);
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

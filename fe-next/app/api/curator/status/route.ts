@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import {
   SUPPORTED_LANGUAGES,
   curatorLanguages,
@@ -19,12 +20,10 @@ const EMPTY = { isCurator: false, isAdmin: false, languages: [] as string[], ass
  * uses it to decide whether to render at all, so a plain user simply gets
  * isCurator:false. Admins are treated as curators for every language.
  */
-export async function GET(_request: NextRequest): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getAuthedUser(request);
     if (!user) return NextResponse.json(EMPTY, { headers: PRIVATE });
 
     const { data: profile } = await supabase

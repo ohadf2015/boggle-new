@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 
 interface Insight {
   type: string
@@ -11,8 +12,8 @@ interface Insight {
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const user = await getAuthedUser(req)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const mode = searchParams.get('mode') ?? 'word_hunt'

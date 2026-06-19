@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import {
   computeCycleProgress,
   computeChestTierForCycle,
@@ -22,12 +23,12 @@ import logger from '@/utils/logger'
  * - isClaimable: boolean — true if 7 days are complete and not yet claimed
  * - pendingChest: { tier, coins, badgeId } | null — chest waiting to be claimed
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const user = await getAuthedUser(request)
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
