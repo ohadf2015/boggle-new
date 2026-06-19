@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { getDailyPuzzle } from '@/lib/crossword/puzzles/index';
 import type { PuzzleLocale } from '@/lib/crossword/types';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 // Client-only: the view pulls in pixi.js + gsap on demand.
 const CrosswordView = dynamic(
@@ -28,6 +29,7 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
   return (
     <main className="min-h-dvh bg-neo-navy texture-halftone">
       <CrosswordView puzzle={puzzle} />
+      <ModeCoach mode="crossword" />
     </main>
   );
 }

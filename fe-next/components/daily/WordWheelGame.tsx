@@ -21,6 +21,7 @@ import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import dynamic from 'next/dynamic';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import Avatar from '@/components/Avatar';
 
 const WordWheelPixiRing = dynamic(() => import('./WordWheelPixiRing'), { ssr: false });
@@ -678,6 +679,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           <PracticeCoachTip mode="wheelRush" wordsFound={wordsFound.length} />
         </div>
       )}
+
+      {/* Mode coach for non-practice mode. */}
+      {!practice && <ModeCoach mode="wheelRush" />}
 
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">

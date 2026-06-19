@@ -4,6 +4,7 @@ import React, { Suspense } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import ConnectionsGame from '@/components/connections/ConnectionsGame';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 interface Props {
   locale: string;
@@ -24,6 +25,7 @@ export default function PlayPageClient(_props: Props): React.JSX.Element {
       <Suspense fallback={<LoadingFallback />}>
         <ConnectionsGame />
       </Suspense>
+      <ModeCoach mode="connections" />
     </div>
   );
 }
