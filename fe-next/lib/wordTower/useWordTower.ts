@@ -52,13 +52,13 @@ type Action =
   | { type: 'commitPlacement'; multiplier: number }
   | { type: 'cancelPlacement' }
   | { type: 'scramble' }
-  | { type: 'rerollStart'; isViableAnchor?: (anchor: string, tray: string[]) => boolean }
+  | { type: 'rerollStart'; isViable?: (wheel: string[]) => boolean }
   | { type: 'hazard'; floors: number; kind: HazardKind; ids: string[] }
   | { type: 'reset'; game: WordTowerPlayerState };
 
-/** Word currently being built: anchor letter + the selected tray tiles. */
+/** Word currently being built: the selected wheel tiles, in tap/drag order. */
 export function currentWord(state: WordTowerUIState): string {
-  return state.game.anchorLetter + state.selected.map((i) => state.game.tray[i]).join('');
+  return state.selected.map((i) => state.game.tray[i]).join('');
 }
 
 function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
@@ -135,7 +135,7 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
     case 'scramble':
       return { ...state, game: scrambleTray(state.game), selected: [] };
     case 'rerollStart':
-      return { ...state, game: rerollStart(state.game, action.isViableAnchor), selected: [], lastError: null };
+      return { ...state, game: rerollStart(state.game, action.isViable), selected: [], lastError: null };
     case 'reset':
       return makeInitial(action.game);
     default:
@@ -178,7 +178,7 @@ export function useWordTower(opts: UseWordTowerOpts) {
       commitPlacement: (multiplier: number) => dispatch({ type: 'commitPlacement', multiplier }),
       cancelPlacement: () => dispatch({ type: 'cancelPlacement' }),
       scramble: () => dispatch({ type: 'scramble' }),
-      reroll: (isViableAnchor?: (anchor: string, tray: string[]) => boolean) => dispatch({ type: 'rerollStart', isViableAnchor }),
+      reroll: (isViable?: (wheel: string[]) => boolean) => dispatch({ type: 'rerollStart', isViable }),
       hazard: (floors: number, kind: HazardKind, ids: string[]) => dispatch({ type: 'hazard', floors, kind, ids }),
       reset: () =>
         dispatch({ type: 'reset', game: initWordTowerState({ gameCode: sessionId, playerId: 'solo', language }) }),

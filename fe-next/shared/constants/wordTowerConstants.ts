@@ -6,6 +6,15 @@ import type { Language } from '@/shared/types/game';
 
 // --- Tray + scramble economy ---
 export const WORD_TOWER_TRAY_SIZE = 12;
+/**
+ * Word-wheel size. The chain ("next word starts with the last letter") was
+ * retired: the player now spells MANY words from one fixed ring of letters
+ * (classic word-wheel), reusing the same tiles until they scramble for a fresh
+ * ring. Seven reads cleanly around a dial and yields a rich buildable set.
+ */
+export const WORD_TOWER_WHEEL_SIZE = 7;
+/** Guaranteed vowels in a freshly-spun wheel so it is virtually always solvable. */
+export const WORD_TOWER_WHEEL_MIN_VOWELS = 2;
 export const WORD_TOWER_MIN_WORD_LEN = 3;
 export const WORD_TOWER_SCRAMBLES_START = 3;
 export const WORD_TOWER_SCRAMBLES_MAX_BANKED = 5;
@@ -186,4 +195,20 @@ export const WORD_TOWER_LETTER_BAGS: Record<Language, string> = {
   // Languages present in the Language union but not yet supported by Word Tower.
   fr: '',
   de: '',
+};
+
+/**
+ * Per-language vowel set. A freshly-spun wheel is seeded with
+ * {@link WORD_TOWER_WHEEL_MIN_VOWELS} of these so the small (7-letter) ring is
+ * almost always solvable. Hebrew/Japanese list their vowel-like mater/kana so
+ * the same guarantee holds; empty for unsupported languages.
+ */
+export const WORD_TOWER_VOWELS: Record<Language, string> = {
+  en: 'AEIOU',
+  sv: 'AEIOUYÅÄÖ',
+  es: 'AEIOU',
+  he: 'אהויע',
+  ja: 'あいうえお',
+  fr: 'AEIOU',
+  de: 'AEIOU',
 };

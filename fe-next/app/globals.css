@@ -422,6 +422,27 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   100% { opacity: 0; clip-path: inset(0 0 100% 0); filter: brightness(1); }
 }
 
+@utility wt-wheel-orbit {
+  /* Word Tower wheel — slow orbiting sparks around the letter ring. The ring
+     gets denser/brighter the higher you climb (count driven in JS); this just
+     spins the whole halo. */
+  animation: wt-wheel-orbit 14s linear infinite;
+}
+@keyframes wt-wheel-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@utility wt-dial-spin {
+  /* The crane steering dial the wheel morphs into — a slow, weighty turn that
+     reads as "this now drives the crane". */
+  animation: wt-dial-spin 8s linear infinite;
+}
+@keyframes wt-dial-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @utility letter-tile-gradient {
   /* Letter Tile Gradient - Bright, clean with subtle warmth */
   background: linear-gradient(165deg, #ffffff 0%, #fefefe 40%, #fafaf8 100%);

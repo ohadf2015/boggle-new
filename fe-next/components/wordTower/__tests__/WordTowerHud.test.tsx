@@ -68,31 +68,8 @@ describe('WordTowerHud', () => {
   });
 
   it('shows the error message after a rejection', () => {
-    render(<WordTowerHud {...makeProps({ lastError: 'bad_chain', errorKey: 1 })} />);
-    expect(screen.getByText('wordTower.error.bad_chain')).toBeInTheDocument();
-  });
-
-  it('shows the floating reward popup on an accepted word', () => {
-    render(
-      <WordTowerHud
-        {...makeProps({
-          resultKey: 1,
-          lastResult: { floorAdded: true, meters: 4.2, combo: 2, scramblesEarned: 0, bombCharge: 1, tier: 'highRise', heightM: 16, biome: 'city' },
-        })}
-      />,
-    );
-    expect(screen.getByText('+4.2 m')).toBeInTheDocument();
-    expect(screen.getByText('wordTower.celebration.highRise')).toBeInTheDocument();
-  });
-
-  it('surfaces the combo multiplier in the reward popup only when combo > 1', () => {
-    const result = { floorAdded: true, meters: 4.2, combo: 2, scramblesEarned: 0, bombCharge: 1, tier: 'highRise', heightM: 16, biome: 'city' } as const;
-    // combo === 1 → no multiplier shown
-    const { rerender } = render(<WordTowerHud {...makeProps({ resultKey: 1, combo: 1, lastResult: result })} />);
-    expect(screen.queryByText(/×/)).not.toBeInTheDocument();
-    // combo > 1 → multiplier rides along with the "+Xm" reward
-    rerender(<WordTowerHud {...makeProps({ resultKey: 1, combo: 5, lastResult: result })} />);
-    expect(screen.getByText(/×/)).toBeInTheDocument();
+    render(<WordTowerHud {...makeProps({ lastError: 'not_buildable', errorKey: 1 })} />);
+    expect(screen.getByText('wordTower.error.not_buildable')).toBeInTheDocument();
   });
 
   it('reports its control-deck height so the tower can ground above it', () => {

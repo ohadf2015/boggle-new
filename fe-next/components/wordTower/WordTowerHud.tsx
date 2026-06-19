@@ -4,8 +4,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp, RotateCw, ChevronsDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
+import { WordTowerWheel } from './WordTowerWheel';
 
 export interface WordTowerHudProps {
+  /** @deprecated chain retired — always '' now; kept for prop-shape stability. */
   anchorLetter: string;
   tray: string[];
   selected: number[];
@@ -13,6 +15,9 @@ export interface WordTowerHudProps {
   heightM: number;
   combo: number;
   scramblesLeft: number;
+  /** Tower material colour (CSS hex) — tints the wheel's ring glow + spell path. */
+  accentHex?: string;
+  reducedMotion?: boolean;
   /** How many dictionary words are buildable from the current anchor + tray. */
   possibleWords?: number | null;
   /** A sample buildable word for the clue reveal (canonical form). */
@@ -55,22 +60,27 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
-    anchorLetter, tray, selected, word, heightM, combo, scramblesLeft,
+    tray, selected, word, heightM, combo, scramblesLeft,
+    accentHex = '#7c8a99', reducedMotion = false,
     possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
     pendingWord, onCraneDrop,
-    onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t,
+    onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t, dir,
   } = props;
   void onClear;
 
   const canSubmit = word.length >= 3;
+  // Climb intensity (0..1) — feeds the wheel a "more satisfying the higher you
+  // go" glow + spark density. Saturates near the top biome.
+  const intensity = Math.min(1, heightM / 800);
   // When a word is in flight (post-BUILD, pre-DROP) the deck flips into "armed"
   // mode: tray + edit buttons lock, the CTA becomes a one-tap DROP — keeps the
   // player's finger pinned to the same spot.
   const isPlacing = !!pendingWord;
 
-  // Clue: reveal a masked sample word on demand; reset when the anchor changes.
+  // Clue: reveal a masked sample word on demand; reset when the wheel changes.
+  const wheelKey = tray.join('');
   const [clueShown, setClueShown] = useState(false);
-  useEffect(() => { setClueShown(false); }, [anchorLetter]);
+  useEffect(() => { setClueShown(false); }, [wheelKey]);
   const maskedClue = clueWord ?? ''; // reveal the FULL word — a masked clue led to wrong last-letter guesses ("not in dictionary")
 
   // Mobile drawer: the deck collapses to a peek bar to free the screen for the tower.
@@ -150,27 +160,8 @@ export function WordTowerHud(props: WordTowerHudProps) {
         </button>
         {deckOpen && (
         <div className="space-y-1">
-        {/* Word builder — framed slot so the anchor + selected letters read as
-            a "preview viewfinder" rather than free-floating tiles. */}
-        <div
-          key={`builder-${errorKey}`}
-          className={cn(
-            'mx-auto flex min-h-[40px] max-w-md items-center justify-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light/60 px-3 py-1 shadow-hard-sm',
-            lastError && errorKey > 0 && 'animate-neo-shake border-neo-red',
-          )}
-        >
-          {Array.from(anchorLetter).map((ch, k) => (
-            <Tile key={`anchor-${k}`} letter={ch} variant="anchor" />
-          ))}
-          {selected.map((idx, k) => (
-            <Tile key={`${idx}-${k}`} letter={tray[idx] ?? ''} variant="selected" />
-          ))}
-          {selected.length === 0 && (
-            <span className="font-neo-body text-[11px] font-bold uppercase tracking-[0.2em] text-neo-white/40">
-              {t('wordTower.hud.pickLetters')}
-            </span>
-          )}
-        </div>
+        {/* Rejection feedback — the wheel's centre hub shows the live word, so the
+            old framed builder slot is gone; the error line stays. */}
         {lastError && errorKey > 0 && (
           <p key={`err-${errorKey}`} className="text-center font-neo-body text-sm font-bold text-neo-red">
             {t(`wordTower.error.${lastError}`)}
@@ -207,40 +198,25 @@ export function WordTowerHud(props: WordTowerHudProps) {
           </div>
         )}
 
-        {/* Tray — dimmed + non-interactive while placing */}
-        <div
-          className={cn(
-            'mx-auto grid max-w-md grid-cols-6 gap-1 transition-opacity',
-            isPlacing && 'opacity-30',
-          )}
-          aria-disabled={isPlacing}
-        >
-          {tray.map((letter, i) => {
-            const isSel = selected.includes(i);
-            // Golden-letter day: this tile climbs extra — ring it gold so the
-            // player spots the high-value tiles at a glance.
-            const isGolden = !!goldenLetter && letter.toUpperCase() === goldenLetter.toUpperCase();
-            return (
-              <button
-                key={i}
-                type="button"
-                disabled={isSel || isPlacing}
-                onClick={() => onSelectTile(i)}
-                aria-label={t(isGolden ? 'wordTower.a11y.goldenTile' : 'wordTower.a11y.tile', { letter })}
-                className={cn(
-                  'relative flex aspect-square min-h-[36px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-lg font-bold shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed',
-                  isSel
-                    ? 'bg-neo-navy-light text-neo-white/30'
-                    : isGolden
-                      ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black hover:-translate-y-0.5 ring-2 ring-neo-yellow ring-offset-1 ring-offset-black'
-                      : 'bg-gradient-to-b from-neo-lime-light to-neo-lime text-black hover:-translate-y-0.5',
-                )}
-              >
-                {isGolden && !isSel && <span aria-hidden className="absolute -top-1.5 -right-1.5 text-[11px]">🌟</span>}
-                {letter}
-              </button>
-            );
-          })}
+        {/* The word WHEEL — spell by dragging a path (or tapping); it morphs into
+            the crane steering dial once a word is held for placement. */}
+        <div className={cn('transition-[filter] duration-300', lastError && errorKey > 0 && 'animate-neo-shake')}>
+          <WordTowerWheel
+            tray={tray}
+            selected={selected}
+            word={word}
+            placing={isPlacing}
+            canBuild={canSubmit}
+            intensity={intensity}
+            accentHex={accentHex}
+            goldenLetter={goldenLetter}
+            reducedMotion={reducedMotion}
+            dir={dir}
+            t={t}
+            onSelectTile={onSelectTile}
+            onSubmit={onSubmit}
+            onDrop={() => onCraneDrop?.()}
+          />
         </div>
 
         {/* Actions */}
@@ -297,19 +273,5 @@ export function WordTowerHud(props: WordTowerHudProps) {
         )}
       </div>
     </div>
-  );
-}
-
-function Tile({ letter, variant }: { letter: string; variant: 'anchor' | 'selected' }) {
-  return (
-    <span
-      className={`flex h-8 w-8 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-lg font-bold shadow-hard ${
-        variant === 'anchor'
-          ? 'bg-neo-yellow text-black ring-2 ring-neo-yellow ring-offset-2 ring-offset-neo-navy'
-          : 'bg-neo-cyan text-black'
-      }`}
-    >
-      {letter}
-    </span>
   );
 }
