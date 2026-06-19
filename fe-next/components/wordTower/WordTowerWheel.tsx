@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { ChevronsDown } from 'lucide-react';
+import { ChevronsDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 
@@ -99,7 +99,7 @@ export function WordTowerWheel({
 
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-w-[300px] touch-none select-none"
+      className="relative mx-auto aspect-square w-full max-w-[230px] touch-none select-none"
       onPointerDown={onDown}
       onPointerMove={placing ? undefined : handlePointerMove}
       onPointerUp={placing ? undefined : handlePointerUp}
@@ -231,7 +231,11 @@ export function WordTowerWheel({
         </div>
       </div>
 
-      {/* Centre hub — word preview while spelling, DROP control while placing. */}
+      {/* Centre hub — the single action surface. While spelling it is the BUILD
+          button (lifts the spelled word to the crane); once a word is held it
+          morphs into the DROP control. The old bottom BUILD button is gone — the
+          action lives where the player's eyes already are (centre of the wheel),
+          and a drag-release still auto-builds via onSubmit. */}
       <div className="absolute left-1/2 top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
         {placing ? (
           <button
@@ -239,19 +243,32 @@ export function WordTowerWheel({
             onClick={onDrop}
             aria-label={t('wordTower.crane.steer')}
             className={cn(
-              'pointer-events-auto flex h-20 w-20 flex-col items-center justify-center rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-lime-light to-neo-lime font-neo-display text-[11px] font-black uppercase leading-tight text-black shadow-hard active:translate-y-0.5',
+              'pointer-events-auto flex h-[72px] w-[72px] flex-col items-center justify-center rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-lime-light to-neo-lime font-neo-display text-[11px] font-black uppercase leading-tight text-black shadow-hard active:translate-y-0.5',
               !reducedMotion && 'animate-neo-pop',
             )}
           >
             <ChevronsDown className={cn('h-6 w-6', !reducedMotion && 'animate-bounce')} />
             {t('wordTower.crane.steer')}
           </button>
+        ) : canBuild ? (
+          <button
+            type="button"
+            onClick={onSubmit}
+            aria-label={t('wordTower.hud.build')}
+            className={cn(
+              'pointer-events-auto flex h-[72px] min-w-[72px] max-w-[78%] flex-col items-center justify-center gap-0.5 rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-cyan-light to-neo-cyan px-3 font-neo-display font-black uppercase leading-none text-black shadow-hard active:translate-y-0.5',
+              !reducedMotion && 'animate-neo-pop',
+            )}
+          >
+            <span className="max-w-full truncate text-base tracking-wide">{word}</span>
+            <span className="flex items-center gap-0.5 text-[9px] tracking-[0.15em]">
+              <ArrowUp className="h-3 w-3" />
+              {t('wordTower.hud.build')}
+            </span>
+          </button>
         ) : (
           <div
-            className={cn(
-              'flex h-[34%] min-h-[44px] min-w-[44px] max-w-[60%] items-center justify-center rounded-full border-neo border-black/40 bg-neo-navy/70 px-3 text-center font-neo-display text-xl font-black uppercase tracking-wide text-neo-white backdrop-blur-sm',
-              word.length > 0 && canBuild && 'ring-2 ring-neo-cyan/50',
-            )}
+            className="flex h-[34%] min-h-[44px] min-w-[44px] max-w-[60%] items-center justify-center rounded-full border-neo border-black/40 bg-neo-navy/70 px-3 text-center font-neo-display text-xl font-black uppercase tracking-wide text-neo-white backdrop-blur-sm"
           >
             {word.length > 0
               ? word

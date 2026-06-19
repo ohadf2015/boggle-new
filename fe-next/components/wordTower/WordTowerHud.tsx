@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Delete, Shuffle, ArrowUp, Lightbulb, ChevronDown, ChevronUp, RotateCw, ChevronsDown } from 'lucide-react';
+import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import { WordTowerWheel } from './WordTowerWheel';
@@ -130,12 +130,12 @@ export function WordTowerHud(props: WordTowerHudProps) {
       <div
         ref={deckRef}
         className={cn(
-          'pointer-events-auto space-y-1.5 rounded-t-neo border-t-neo-thick border-black px-4 pt-1 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
+          'pointer-events-auto space-y-1 rounded-t-neo border-t-neo-thick border-black px-4 pt-0.5 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
           isPlacing
             ? 'bg-gradient-to-b from-neo-lime/15 via-neo-navy/95 to-neo-navy/95'
             : 'bg-neo-navy/95',
           deckOpen
-            ? 'pb-[calc(env(safe-area-inset-bottom)+0.85rem)]'
+            ? 'pb-[calc(env(safe-area-inset-bottom)+0.55rem)]'
             : 'pb-[calc(env(safe-area-inset-bottom)+0.4rem)]',
         )}
       >
@@ -219,8 +219,11 @@ export function WordTowerHud(props: WordTowerHudProps) {
           />
         </div>
 
-        {/* Actions */}
-        <div className="mx-auto flex max-w-md items-center gap-2">
+        {/* Actions — only the two tray TOOLS live here now. The BUILD / DROP CTA
+            moved INTO the wheel's centre hub (build a word → tap the centre to
+            lift it → tap again to drop), so the redundant bottom build button is
+            gone and the deck is shorter. Disabled while a word is in flight. */}
+        <div className="mx-auto flex max-w-md items-center justify-center gap-3">
           <button
             type="button"
             onClick={onScramble}
@@ -240,34 +243,6 @@ export function WordTowerHud(props: WordTowerHudProps) {
           >
             <Delete className="h-5 w-5" />
           </button>
-          {/* Primary CTA — Build flips to Drop in-place when a word is in flight */}
-          {isPlacing ? (
-            <button
-              type="button"
-              onClick={onCraneDrop}
-              aria-label={t('wordTower.crane.tapToDrop')}
-              className="relative flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-neo border-neo-thick border-black bg-gradient-to-b from-neo-lime-light to-neo-lime py-3 font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard animate-neo-pop active:translate-y-0.5 active:shadow-hard-pressed"
-            >
-              <ChevronsDown className="h-5 w-5 animate-bounce" />
-              {t('wordTower.crane.tapToDrop')}
-              <ChevronsDown className="h-5 w-5 animate-bounce" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onSubmit}
-              disabled={!canSubmit}
-              className={cn(
-                'flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black py-2.5 font-neo-display text-lg font-bold text-black shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed',
-                canSubmit
-                  ? 'bg-gradient-to-b from-neo-cyan-light to-neo-cyan ring-2 ring-neo-cyan/40 ring-offset-2 ring-offset-neo-navy'
-                  : 'bg-neo-cyan',
-              )}
-            >
-              <ArrowUp className="h-5 w-5" />
-              {t('wordTower.hud.build')}
-            </button>
-          )}
         </div>
         </div>
         )}
