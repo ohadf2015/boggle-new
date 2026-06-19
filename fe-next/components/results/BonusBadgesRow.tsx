@@ -26,7 +26,6 @@ interface BonusBadgesRowProps {
  *
  * Used in:
  * - SinglePlayerResults (desktop and mobile)
- * - ConsolidatedPlayerCard (multiplayer current player)
  * - ResultsPlayerCard (other players - without XP)
  *
  * @example

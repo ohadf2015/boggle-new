@@ -2,7 +2,6 @@
  * useWordCategories - Shared hook for categorizing and analyzing word data
  *
  * Consolidates duplicated word processing logic from:
- * - ConsolidatedPlayerCard.tsx
  * - ResultsPlayerCard.tsx
  * - SinglePlayerResults.tsx / useResultsData.ts
  */

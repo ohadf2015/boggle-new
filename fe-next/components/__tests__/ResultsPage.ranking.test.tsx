@@ -137,11 +137,6 @@ vi.mock('@/components/auth/FirstWinSignupModal', () => ({
   default: () => null,
 }));
 
-vi.mock('@/components/results/ShareWinPrompt', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
 vi.mock('@/components/voting/WordFeedbackModal', () => ({
   __esModule: true,
   default: () => null,

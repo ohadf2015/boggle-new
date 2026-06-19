@@ -18,8 +18,5 @@ export function preloadResultsChunks(): void {
 
   // High-visibility results components
   void import('@/components/results/ResultsWinnerBanner');
-  void import('@/components/results/ScoreRevealAnimation');
-  void import('@/components/results/Top3Leaderboard');
-  void import('@/components/results/CompactResultsStats');
   void import('@/components/results/RewardsSummary');
 }

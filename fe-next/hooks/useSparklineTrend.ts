@@ -10,7 +10,7 @@ interface SparklineTrendResult {
 /**
  * Shared hook for sparkline data + trend calculation.
  *
- * Used by CompactResultsStats and ResultsInfoCards to avoid duplicating
+ * Used by ResultsInfoCards to avoid duplicating
  * the getChartData fetch, currentScore dedup, and trend math.
  *
  * @param currentScore - The current game's score (appended if not already in history)

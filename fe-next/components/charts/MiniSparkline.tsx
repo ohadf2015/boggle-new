@@ -20,8 +20,8 @@ const TREND_COLORS = {
 /**
  * MiniSparkline - Tiny SVG line chart for performance history.
  *
- * Shared between CompactResultsStats (dark bg) and ResultsInfoCards (light bg).
- * Uses `variant` to pick appropriate color intensities.
+ * Used by ResultsInfoCards (light bg); `variant` picks the color intensities
+ * for the surrounding surface.
  */
 export const MiniSparkline = memo(function MiniSparkline({
   data,

@@ -26,7 +26,7 @@ export interface RankConfig {
 
 /**
  * Complete rank configuration for top 3 places
- * Used by Top3Leaderboard, ConsolidatedPlayerCard, etc.
+ * Used by the results leaderboard + player cards.
  */
 export const RANK_CONFIG: Record<1 | 2 | 3, RankConfig> = {
   1: {
@@ -57,7 +57,7 @@ export const RANK_CONFIG: Record<1 | 2 | 3, RankConfig> = {
 
 /**
  * Simplified rank colors for player cards
- * Used by ConsolidatedPlayerCard, ResultsPlayerCard
+ * Used by ResultsPlayerCard
  */
 export const RANK_COLORS_SIMPLE: Record<number, { bg: string; text: string }> = {
   1: { bg: 'bg-amber-400', text: 'text-neo-black' },
