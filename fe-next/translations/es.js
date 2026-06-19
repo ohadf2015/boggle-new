@@ -10035,7 +10035,10 @@ const es = {
       "chestReady": "¡Cofre listo para abrir!",
       "chestAlmost": "Casi lleno — ¡un nivel más!",
       "replay": "Repetir",
-      "home": "Inicio"
+      "home": "Inicio",
+      "recordBest": "RÉCORD",
+      "recordFast": "MÁS RÁPIDO",
+      "recordBonus": "BONUS"
     },
     "failed": {
       "title": "¡Sin intentos!",
@@ -12008,6 +12011,10 @@ const es = {
     "sealedBid": {
       "name": "Puja Sellada",
       "description": "¡Apuesta una palabra que nadie más elija: las pujas únicas valen doble!"
+    },
+    "crossword": {
+      "name": "Crucigrama",
+      "description": "Carrera por resolver el mismo crucigrama: ¡gana quien termine primero!"
     },
     "intro": {
       "cta": "Vamos",

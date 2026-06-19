@@ -129,6 +129,13 @@ function StarIcon({ className, filled }: IconProps & { filled: boolean }) {
  * from the surface; the cascade/time/chain values still feed the one highlight
  * line so the screen keeps a little variety.
  */
+// New records glow gold (celebration semantic); a standing best stays quiet.
+function recordChipStyle(isNew: boolean, _modeColor: string): React.CSSProperties {
+  return isNew
+    ? { background: '#FFE135', color: '#0b1530', boxShadow: '1px 1px 0 #0b1530' }
+    : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.15)' };
+}
+
 export function BlastLevelCompleteCard({
   coins,
   modeColor = '#BFFF00',
@@ -331,7 +338,7 @@ export function BlastLevelCompleteCard({
     >
       <div
         ref={cardRef}
-        className="relative max-w-sm w-[90%] px-6 py-8 rounded-2xl text-center"
+        className="relative max-w-sm w-[90%] px-6 py-6 rounded-2xl text-center max-h-[calc(100dvh-1.5rem)] overflow-y-auto"
         style={{
           opacity: 0,
           background: '#16213e',
@@ -348,7 +355,7 @@ export function BlastLevelCompleteCard({
         {/* Theme emoji — gives each level its own visual identity at a glance. */}
         <div
           data-testid="complete-theme-emoji"
-          className="mt-1 text-5xl leading-none"
+          className="mt-1 text-4xl leading-none"
           aria-hidden
           style={{ filter: `drop-shadow(0 0 12px color-mix(in srgb, ${modeColor} 70%, transparent))` }}
         >
@@ -377,54 +384,50 @@ export function BlastLevelCompleteCard({
           </div>
         )}
 
-        {/* Best / new-best — quiet line under the stars */}
-        {isNewBest ? (
-          <div
-            data-testid="complete-newbest"
-            className="mt-1.5 text-[11px] font-black uppercase tracking-[0.18em]"
-            style={{ color: '#FFE135', textShadow: '1px 1px 0 #0b1530' }}
-          >
-            {t('blast.complete.newBest', 'NEW BEST!')}
-          </div>
-        ) : showBest ? (
-          <div data-testid="complete-best" className="mt-1.5 text-[11px] font-semibold uppercase tracking-wider opacity-60">
-            {t('blast.complete.best', 'Best')} {'★'.repeat(bestStars!)}
-          </div>
-        ) : null}
-
-        {/* Multi-axis personal-best subline — fastest time + bonus-word best.
-            Flashes yellow on a new record; quiet otherwise. Drives replay
-            on TWO extra axes beyond stars. */}
-        {(isNewFast || isNewBonus || (fastestLabel && fastestLabel !== '—') || (typeof bestBonus === 'number' && bestBonus > 0)) && (
+        {/* Records — ONE compact row of pill badges. New records glow gold; a
+            standing personal best shows quiet. Folding best/fastest/bonus into a
+            single wrapping row (was three stacked lines) keeps the card short
+            enough to never clip the CTAs on a phone. */}
+        {(isNewBest || showBest || isNewFast || isNewBonus
+          || (fastestLabel && fastestLabel !== '—')
+          || (typeof bestBonus === 'number' && bestBonus > 0)) && (
           <div
             data-testid="complete-records"
-            className="mt-2 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.16em] font-bold"
+            className="mt-2 flex flex-wrap items-center justify-center gap-1.5 text-[10px] uppercase tracking-[0.12em] font-black"
           >
-            {fastestLabel && fastestLabel !== '—' && (
+            {(isNewBest || showBest) && (
+              <span
+                data-testid="complete-newbest"
+                data-new={isNewBest ? 'true' : 'false'}
+                className="rounded-full px-2 py-0.5"
+                style={recordChipStyle(!!isNewBest, modeColor)}
+              >
+                {isNewBest
+                  ? `🏆 ${t('blast.complete.recordBest', 'BEST')}`
+                  : `${'★'.repeat(bestStars!)} ${t('blast.complete.best', 'Best')}`}
+              </span>
+            )}
+            {(isNewFast || (fastestLabel && fastestLabel !== '—')) && (
               <span
                 data-testid="complete-fastest"
                 data-new={isNewFast ? 'true' : 'false'}
-                style={{
-                  color: isNewFast ? '#FFE135' : 'rgba(255,255,255,0.55)',
-                  textShadow: isNewFast ? '1px 1px 0 #0b1530' : 'none',
-                }}
+                className="rounded-full px-2 py-0.5"
+                style={recordChipStyle(!!isNewFast, modeColor)}
               >
                 {isNewFast
-                  ? t('blast.completeExtras.newFast', 'NEW FASTEST!')
-                  : t('blast.completeExtras.bestFast', 'Fastest {time}', { time: fastestLabel })}
+                  ? `⚡ ${t('blast.complete.recordFast', 'FASTEST')}`
+                  : t('blast.completeExtras.bestFast', 'Fastest {time}', { time: fastestLabel ?? '' })}
               </span>
             )}
-            {typeof bestBonus === 'number' && bestBonus > 0 && (
+            {(isNewBonus || (typeof bestBonus === 'number' && bestBonus > 0)) && (
               <span
                 data-testid="complete-bestbonus"
                 data-new={isNewBonus ? 'true' : 'false'}
-                style={{
-                  color: isNewBonus ? '#FFE135' : 'rgba(255,255,255,0.55)',
-                  textShadow: isNewBonus ? '1px 1px 0 #0b1530' : 'none',
-                }}
+                className="rounded-full px-2 py-0.5"
+                style={recordChipStyle(!!isNewBonus, modeColor)}
               >
                 {isNewBonus
-                  ? t('blast.completeExtras.newBonus', 'NEW BONUS RECORD!')
+                  ? `⭐ ${t('blast.complete.recordBonus', 'BONUS')}`
                   : t('blast.completeExtras.bestBonus', 'Best ⭐ {count}', { count: String(bestBonus) })}
               </span>
             )}
@@ -458,7 +461,7 @@ export function BlastLevelCompleteCard({
         <div
           ref={coinsRef}
           data-testid="complete-coins"
-          className="mt-5 flex items-center justify-center gap-2"
+          className="mt-4 flex items-center justify-center gap-2"
           style={{ color: modeColor }}
         >
           <CoinIcon className="w-8 h-8" />

@@ -77,14 +77,20 @@ describe('BlastLevelCompleteCard (trimmed)', () => {
     expect(screen.getByTestId('next-btn')).toBeInTheDocument();
   });
 
-  it('shows a personal-best stars indicator when provided', () => {
+  it('shows a personal-best stars indicator when provided (quiet, not new)', () => {
     render(<BlastLevelCompleteCard {...baseProps} stars={2} bestStars={3} />);
-    expect(screen.getByTestId('complete-best')).toBeInTheDocument();
+    // Standing best renders as a quiet record chip (data-new="false") in the
+    // consolidated records row.
+    const chip = screen.getByTestId('complete-newbest');
+    expect(chip).toBeInTheDocument();
+    expect(chip.getAttribute('data-new')).toBe('false');
   });
 
-  it('flags a NEW BEST when this run beats the stored best', () => {
+  it('flags a NEW BEST (gold chip) when this run beats the stored best', () => {
     render(<BlastLevelCompleteCard {...baseProps} stars={3} bestStars={3} isNewBest />);
-    expect(screen.getByTestId('complete-newbest')).toBeInTheDocument();
+    const chip = screen.getByTestId('complete-newbest');
+    expect(chip).toBeInTheDocument();
+    expect(chip.getAttribute('data-new')).toBe('true');
   });
 
   describe('chest progression insight', () => {

@@ -9711,7 +9711,10 @@ const en = {
       "chestReady": "Chest ready to open!",
       "chestAlmost": "Almost full — one more level!",
       "replay": "Replay",
-      "home": "Home"
+      "home": "Home",
+      "recordBest": "BEST",
+      "recordFast": "FASTEST",
+      "recordBonus": "BONUS"
     },
     "failed": {
       "title": "Out of guesses!",
@@ -12005,6 +12008,10 @@ const en = {
     "sealedBid": {
       "name": "Sealed Bid",
       "description": "Bid a word nobody else picks — unique bids score double!"
+    },
+    "crossword": {
+      "name": "Crossword",
+      "description": "Race to solve the same crossword — fastest finisher wins!"
     },
     "intro": {
       "cta": "Let's go",

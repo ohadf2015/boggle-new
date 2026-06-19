@@ -10119,7 +10119,10 @@ const sv = {
       "chestReady": "Kistan är redo att öppnas!",
       "chestAlmost": "Nästan full — en nivå till!",
       "replay": "Spela igen",
-      "home": "Hem"
+      "home": "Hem",
+      "recordBest": "BÄST",
+      "recordFast": "SNABBAST",
+      "recordBonus": "BONUS"
     },
     "failed": {
       "title": "Slut på gissningar!",
@@ -12199,6 +12202,10 @@ const sv = {
     sealedBid: {
       name: "Hemligt bud",
       description: "Bjud ett ord ingen annan väljer — unika bud ger dubbla poäng!"
+    },
+    crossword: {
+      name: "Korsord",
+      description: "Kapplöpning att lösa samma korsord — snabbast vinner!"
     },
     intro: {
       cta: "Sätt igång",

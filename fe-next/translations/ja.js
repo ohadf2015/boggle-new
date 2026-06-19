@@ -10019,7 +10019,10 @@ const ja = {
       "cascadesLabel": "カスケード",
       "next": "次のレベル",
       "replay": "もう一度",
-      "home": "ホーム"
+      "home": "ホーム",
+      "recordBest": "ベスト",
+      "recordFast": "最速",
+      "recordBonus": "ボーナス"
     },
     "failed": {
       "title": "ヒント切れ！",
@@ -12048,6 +12051,10 @@ const ja = {
     sealedBid: {
       name: "封印入札",
       description: "他の誰も選ばない単語を入札 — ユニークな入札は得点2倍！"
+    },
+    crossword: {
+      name: "クロスワード",
+      description: "同じクロスワードを解く競争 — 最速で完成した人が勝ち！"
     },
     intro: {
       cta: "はじめよう",
