@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, HelpCircle, Shield, Bomb, Zap, Sparkles, Clock } from 'lucide-react';
+import { HelpCircle, Shield, Bomb, Zap, Sparkles, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ExitRoomButton from '@/components/ExitRoomButton';
 import { formatTimeMMSS } from '@/shared/utils/timeFormatting';
 import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
 import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
@@ -298,14 +299,12 @@ export function BlastHUD({
               <HelpCircle className="h-4 w-4" />
             </button>
           )}
-          <button
+          <ExitRoomButton
             onClick={onQuit}
-            className="flex items-center justify-center w-7 h-7 rounded-lg bg-white/8 hover:bg-neo-red/25 text-white hover:text-neo-red transition-colors"
-            aria-label={t('common.quit')}
+            label={t('common.quit')}
             data-testid="blast-quit-btn"
-          >
-            <X className="h-4 w-4" />
-          </button>
+            className="w-7 h-7 min-w-0 min-h-0"
+          />
         </div>
       </div>
 

@@ -10,15 +10,17 @@ import { Button } from './ui/button';
  * Reusable Exit Room Button component with consistent Neo-Brutalist styling
  * Used across all game views (WaitingScreen, PlayerInGameView, HostInGameView, etc.)
  */
-interface ExitRoomButtonProps {
+interface ExitRoomButtonProps
+  extends Omit<React.ComponentProps<typeof Button>, 'onClick' | 'aria-label'> {
   onClick: () => void;
   label: string;
   className?: string;
 }
 
-const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, className = '' }) => {
+const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, className = '', ...rest }) => {
   return (
     <Button
+      {...rest}
       type="button"
       onClick={onClick}
       variant="ghost"

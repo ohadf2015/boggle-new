@@ -10,7 +10,7 @@
  *  - Combo badge slot is reserved (fixed width) regardless of streak presence
  */
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 vi.mock('../BlastComboStreakBadge', () => ({
   BlastComboStreakBadge: () => <div data-testid="combo-streak-badge" />,
@@ -144,6 +144,28 @@ describe('BlastHUD — labelled stat columns (clarity)', () => {
   it('labels the score column so the star number reads as SCORE', () => {
     render(<BlastHUD {...baseProps} score={1234} />);
     expect(screen.getByTestId('blast-score-label')).toBeDefined();
+  });
+});
+
+describe('BlastHUD — exit uses the shared canonical exit button', () => {
+  // Blast used to render a bare lucide <X> (reads as "dismiss"). It now reuses
+  // the shared ExitRoomButton (DoorOpen) like every other game shell. Contract
+  // that must survive the swap: labelled common.quit, fires onQuit, keeps testid.
+  it('renders an exit affordance labelled common.quit', () => {
+    render(<BlastHUD {...baseProps} />);
+    expect(screen.getByLabelText('common.quit')).toBeInTheDocument();
+  });
+
+  it('fires onQuit when the exit button is clicked', () => {
+    const onQuit = vi.fn();
+    render(<BlastHUD {...baseProps} onQuit={onQuit} />);
+    fireEvent.click(screen.getByLabelText('common.quit'));
+    expect(onQuit).toHaveBeenCalledTimes(1);
+  });
+
+  it('preserves the blast-quit-btn test id', () => {
+    render(<BlastHUD {...baseProps} />);
+    expect(screen.getByTestId('blast-quit-btn')).toBeInTheDocument();
   });
 });
 

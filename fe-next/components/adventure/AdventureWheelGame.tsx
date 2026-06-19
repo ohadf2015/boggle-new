@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { X } from 'lucide-react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import ExitRoomButton from '@/components/ExitRoomButton';
 import { useProgressionActions, useProgressionData } from '@/contexts/ProgressionContext';
 import { useUpgradeEffects } from '@/hooks/useUpgradeEffects';
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
@@ -18,7 +18,6 @@ import type { Language } from '@/types';
 import WordWheelGame, { type WordWheelGameResult } from '@/components/daily/WordWheelGame';
 import { WordWheelEffectsCanvas, type WordWheelEffect } from '@/components/daily/WordWheelEffectsCanvas';
 import { generateWordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
-import { cn } from '@/lib/utils';
 
 interface Props {
   levelConfig: LevelConfig;
@@ -155,18 +154,12 @@ const AdventureWheelGame: React.FC<Props> = ({ levelConfig, onLevelComplete, onE
         paddingBottom: 'var(--admob-banner-height, 0px)',
       }}
     >
-      {/* Minimal adventure chrome: exit button overlay */}
-      <button
+      {/* Minimal adventure chrome: shared canonical exit button overlay */}
+      <ExitRoomButton
         onClick={onExit}
-        aria-label={t('common.exit')}
-        className={cn(
-          'absolute top-2 start-2 z-20 p-2 rounded-neo',
-          'bg-neo-white/8 text-neo-white hover:bg-neo-red/20 hover:text-neo-red',
-          'transition-colors duration-200'
-        )}
-      >
-        <X className="w-5 h-5" />
-      </button>
+        label={t('common.exit')}
+        className="absolute top-2 start-2 z-20"
+      />
 
       {/* Level badge */}
       <div className="absolute top-2 end-2 z-20 px-3 py-1 rounded-neo bg-neo-purple/20 border-2 border-neo-purple/40">

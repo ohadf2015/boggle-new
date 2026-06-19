@@ -10,7 +10,8 @@
  * this is presentational glue over it.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Delete, Shuffle, ArrowUp, LogOut } from 'lucide-react';
+import { Delete, Shuffle, ArrowUp } from 'lucide-react';
+import ExitRoomButton from '@/components/ExitRoomButton';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { biomeForHeight } from '@/lib/wordTower/wordTowerManager';
@@ -73,9 +74,7 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-3">
         <div className="pointer-events-auto flex items-center gap-2">
           {onQuit && (
-            <button type="button" onClick={onQuit} aria-label={t('common.backToHome')} className="rounded-neo border-neo-thick border-black bg-neo-navy/80 p-2 text-neo-white shadow-hard backdrop-blur-sm">
-              <LogOut className="h-4 w-4" />
-            </button>
+            <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />
           )}
           <div className="rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 shadow-hard backdrop-blur-sm">
             <div className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">{Math.round(you.heightM)}<span className="text-sm text-neo-cyan"> m</span></div>

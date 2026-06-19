@@ -1,9 +1,10 @@
 'use client';
 
 import { memo } from 'react';
-import { X, HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NeoPanel } from '@/components/ui/panel';
+import ExitRoomButton from '@/components/ExitRoomButton';
 
 export interface WordHuntMPHeaderProps {
   score: number;
@@ -66,17 +67,13 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
         </NeoPanel>
       </div>
 
-      {/* Quit Button */}
-      <button
+      {/* Quit Button — shared canonical exit button (DoorOpen), sized to match
+          the header's compact/full responsive treatment. */}
+      <ExitRoomButton
         onClick={onQuit}
-        className={cn(
-          iconBtnSize(compact),
-          'flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-red text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-shadow',
-        )}
-        aria-label={t('common.quit')}
-      >
-        <X size={20} strokeWidth={3} />
-      </button>
+        label={t('common.quit')}
+        className={cn(iconBtnSize(compact), 'min-w-0 min-h-0')}
+      />
     </div>
   );
 });
