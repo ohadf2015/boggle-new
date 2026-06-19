@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { BlastGame } from '@/components/blast/v2/BlastGame';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -37,6 +38,7 @@ async function loadBlastLevel(levelNumber: number, locale: Locale): Promise<Blas
 }
 
 export function BlastV2PageClient({ level: initialLevel }: Props) {
+  const router = useRouter();
   const [level, setLevel] = useState<BlastLevel>(initialLevel);
   const [unlocksSeen, setUnlocksSeen] = useState<UnlocksSeen>({});
   const [isVeteran] = useState(false);
@@ -203,6 +205,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
       isVeteranPlayer={isVeteran}
       onAdvance={handleAdvance}
       onRetry={handleRetry}
+      onHome={() => router.push(`/${level.locale}`)}
       onLevelCleared={handleLevelCleared}
       onUpdateUnlocks={(updated) => setUnlocksSeen(updated)}
     />

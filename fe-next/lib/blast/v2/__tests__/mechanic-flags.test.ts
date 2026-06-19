@@ -24,11 +24,16 @@ describe('mechanicsForLevel', () => {
   it('level 8 unlocks frozen tiles', () => {
     expect(mechanicsForLevel(8).frozenTiles).toBe(true);
   });
+  it('level 7 unlocks the reveal-letter hint (front-loaded from 18)', () => {
+    expect(mechanicsForLevel(7).revealLetterHint).toBe(true);
+    expect(mechanicsForLevel(6).revealLetterHint).toBe(false);
+  });
+  it('level 9 unlocks bonus dictionary (front-loaded from 25)', () => {
+    expect(mechanicsForLevel(9).bonusDictionary).toBe(true);
+    expect(mechanicsForLevel(8).bonusDictionary).toBe(false);
+  });
   it('level 12 unlocks cascade words', () => {
     expect(mechanicsForLevel(12).cascadeWords).toBe(true);
-  });
-  it('level 25 unlocks bonus dictionary', () => {
-    expect(mechanicsForLevel(25).bonusDictionary).toBe(true);
   });
   it('level 35 unlocks lateral-slide', () => {
     expect(mechanicsForLevel(35).lateralSlideGravity).toBe(true);

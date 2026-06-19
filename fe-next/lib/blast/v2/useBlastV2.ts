@@ -3,7 +3,7 @@ import { useReducer, useMemo, useRef } from 'react';
 import type { BlastLevel, CellId } from './types';
 import { LOCALE_CONFIGS } from './locale-config';
 import {
-  reduceSelection, validateSelection, collapseCells, rebuildTileIds, detectAllCascades, scoreForWord,
+  reduceSelection, validateSelection, collapseCells, rebuildTileIds, detectAllCascades, detectCascade, scoreForWord,
   computeCompletion,
   type SelectionState, type SelectionEvent, type ValidationResult, type CompletionReason,
 } from './engine';
@@ -63,6 +63,11 @@ type State = {
   strikeBudget: number | null;
   strikesUsed: number;
   hintsUsed: number;
+  // Cells of the theme word most recently surfaced by a reveal hint. The board
+  // glows these so the help is VISIBLE (the prior hint button was a dead stub).
+  // Transient: cleared the moment the board changes (submit / bonus / undo) so a
+  // stale path can't glow shifted tiles after a collapse. Empty = no active hint.
+  hintCells: CellId[];
   cascadeCount: number;
   invalidShakeKey: number;
   // Count of confirmed wrong attempts this level — deterministic rejections
@@ -103,6 +108,7 @@ type State = {
 type Action =
   | { type: 'sel'; event: SelectionEvent; dictionaryCheck?: (word: string) => boolean }
   | { type: 'shuffle' }
+  | { type: 'revealHint' }
   | { type: 'undo' }
   | { type: 'forceBonus'; cells: CellId[]; word: string }
   | { type: 'rejectConfirmed' }
@@ -373,7 +379,9 @@ function reducer(state: State, action: Action): State {
   }
   if (action.type === 'sel') {
     const t = reduceSelection(state.selection, action.event);
-    if (t.submit) return applyValidatedSubmit({ ...state, selection: t.state }, t.cells, action.dictionaryCheck);
+    // A submit mutates the board — drop any active hint glow so it can't point
+    // at tiles that just collapsed/shifted.
+    if (t.submit) return { ...applyValidatedSubmit({ ...state, selection: t.state }, t.cells, action.dictionaryCheck), hintCells: [] };
     return { ...state, selection: t.state };
   }
   if (action.type === 'shuffle') {
@@ -384,8 +392,24 @@ function reducer(state: State, action: Action): State {
     });
     return { ...state, hintsUsed: state.hintsUsed + 1, coins: Math.max(0, state.coins - 50) };
   }
+  if (action.type === 'revealHint') {
+    // Surface the next formable theme word's cells so the board can glow them.
+    // Cost is a STAR (hintsUsed feeds the rating: 1 hint still allows 2★, 2+ → 1★)
+    // — deliberately NOT coins. The reducer's `coins` is only the in-game delta;
+    // the old `shuffle` deduct charged nothing real and read as confusing. A hint
+    // reveals ONE word and never auto-solves, so spam self-limits via the star drop.
+    const config = LOCALE_CONFIGS[state.level.locale];
+    const next = detectCascade(state.level, state.foundWords, config);
+    if (!next) return state; // nothing formable to point at — no charge
+    trackBlastHintUsed({
+      level: state.level.levelNumber,
+      hint_type: 'reveal_word',
+      coin_cost: 0,
+    });
+    return { ...state, hintsUsed: state.hintsUsed + 1, hintCells: next.cells };
+  }
   if (action.type === 'forceBonus') {
-    return applyForceBonus(state, action.cells, action.word);
+    return { ...applyForceBonus(state, action.cells, action.word), hintCells: [] };
   }
   if (action.type === 'rejectConfirmed') {
     // The async dictionary check came back negative for a pending `unknown`
@@ -441,6 +465,9 @@ function reducer(state: State, action: Action): State {
       // `freeUndosUsed >= FREE_UNDO_LIMIT`.
       freeUndosUsed: state.freeUndosUsed + 1,
       history: newHistory,
+      // Undo rewinds the board, so a hint that pointed at the just-undone state
+      // is stale — clear it.
+      hintCells: [],
       // Restore the surprise cadence counters so undo rewinds the variable
       // reward too (a banked ×2 from the undone word is given back). Deliberately
       // DON'T rewind surpriseSeed — otherwise a player could undo-and-resubmit to
@@ -465,6 +492,7 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
     strikeBudget: computeStrikeBudget(initialLevel.levelNumber),
     strikesUsed: 0,
     hintsUsed: 0,
+    hintCells: [],
     cascadeCount: 0,
     invalidShakeKey: 0,
     wrongAttempts: 0,
@@ -496,6 +524,7 @@ export function useBlastV2(initialLevel: BlastLevel, options: UseBlastV2Options 
       onDoubleTap: (cell: CellId) => dispatch({ type: 'sel', event: { type: 'doubletap', cell }, dictionaryCheck: dictRef.current }),
       onCancel: () => dispatch({ type: 'sel', event: { type: 'cancel' }, dictionaryCheck: dictRef.current }),
       onShuffle: () => dispatch({ type: 'shuffle' }),
+      onRevealHint: () => dispatch({ type: 'revealHint' }),
       onUndo: () => dispatch({ type: 'undo' }),
       // Async-confirmed dictionary bonus. BlastGame fires this after the
       // local validator rejects with 'unknown' and the dictionary API confirms

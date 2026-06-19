@@ -13,8 +13,14 @@ export function mechanicsForLevel(n: number): MechanicSet {
     frozenTiles: n >= 8,
     cascadeWords: n >= 12,
     doubleBonusTile: n >= 15,
-    revealLetterHint: n >= 18,
-    bonusDictionary: n >= 25,
+    // Front-loaded so the fun/help arrives in the zone most players actually reach.
+    // revealLetterHint: stuck-player recourse, lands right before frozen tiles (L8).
+    // bonusDictionary: free-form bonus hunting already works at every level via the
+    //   async dict path — this gate only flips on instant inline acceptance + the
+    //   explanatory unlock card, so teaching it at L9 (not L25) surfaces a mechanic
+    //   that's already live. Keep in sync with mechanic-cards.ts `level`.
+    revealLetterHint: n >= 7,
+    bonusDictionary: n >= 9,
     revealWordHint: n >= 30,
     lateralSlideGravity: n >= 35,
     multiWordReveal: n >= 40,

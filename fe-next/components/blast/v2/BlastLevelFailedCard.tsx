@@ -11,6 +11,8 @@ type Props = {
   /** Theme words the player managed to find before running out of guesses. */
   wordsFound: number;
   onRetry: () => void;
+  /** Optional escape to the home screen. Omitted = no Home button (back-compat). */
+  onHome?: () => void;
 };
 
 /**
@@ -26,6 +28,7 @@ export function BlastLevelFailedCard({
   themeWordCount,
   wordsFound,
   onRetry,
+  onHome,
 }: Props) {
   const { t } = useLanguage();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -90,6 +93,17 @@ export function BlastLevelFailedCard({
         >
           {t('blast.failed.retry', 'Try Again')}
         </button>
+
+        {onHome && (
+          <button
+            type="button"
+            onClick={onHome}
+            data-testid="failed-home-btn"
+            className="mt-3 w-full rounded-neo border-neo border-black bg-transparent px-8 py-2 font-neo-body text-sm uppercase tracking-wide text-neo-cream/80 transition-transform hover:translate-x-[1px] hover:translate-y-[1px]"
+          >
+            {t('blast.failed.home', 'Home')}
+          </button>
+        )}
 
         <p className="mt-3 font-neo-body text-xs text-neo-cream/50">
           {t('blast.failed.progressSafe', 'Your progress is safe — level {n}').replace(

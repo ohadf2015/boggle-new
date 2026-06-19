@@ -60,14 +60,14 @@ const MECHANIC_CARDS: Record<MechanicKey, MechanicCard> = {
   },
   revealLetterHint: {
     key: 'revealLetterHint',
-    level: 18,
+    level: 7,
     titleKey: 'blast.tutorial.mechanic.revealLetterHint.title',
     bodyKey: 'blast.tutorial.mechanic.revealLetterHint.body',
     iconAsset: '🔍',
   },
   bonusDictionary: {
     key: 'bonusDictionary',
-    level: 25,
+    level: 9,
     titleKey: 'blast.tutorial.mechanic.bonusDictionary.title',
     bodyKey: 'blast.tutorial.mechanic.bonusDictionary.body',
     iconAsset: '📚',

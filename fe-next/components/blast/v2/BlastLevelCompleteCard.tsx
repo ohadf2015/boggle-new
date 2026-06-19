@@ -31,6 +31,10 @@ type Props = {
   /** True when THIS run set a new bonus-word record. */
   isNewBonus?: boolean;
   stars?: number;
+  /** Replay THIS level (re-mount fresh). Omitted = no Replay button. */
+  onReplay?: () => void;
+  /** Escape to the home screen. Omitted = no Home button. */
+  onHome?: () => void;
   /**
    * Why the level ended. 'mastered' = every theme word found (the clean win).
    * 'partial' = the board was cleared / soft-locked without every target — the
@@ -142,6 +146,8 @@ export function BlastLevelCompleteCard({
   stars,
   completionReason = 'mastered',
   onNext,
+  onReplay,
+  onHome,
   cascadeCount,
   timeSeconds,
   bestChainDepth,
@@ -523,6 +529,31 @@ export function BlastLevelCompleteCard({
         >
           {t('blast.complete.next', 'Next Level')} →
         </button>
+
+        {(onReplay || onHome) && (
+          <div className="mt-3 flex items-center justify-center gap-3">
+            {onReplay && (
+              <button
+                onClick={onReplay}
+                data-testid="complete-replay-btn"
+                className="flex-1 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-transform active:scale-95"
+                style={{ background: 'transparent', color: modeColor, border: `2px solid color-mix(in srgb, ${modeColor} 55%, transparent)` }}
+              >
+                ↺ {t('blast.complete.replay', 'Replay')}
+              </button>
+            )}
+            {onHome && (
+              <button
+                onClick={onHome}
+                data-testid="complete-home-btn"
+                className="flex-1 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-transform active:scale-95"
+                style={{ background: 'transparent', color: 'rgba(255,255,255,0.7)', border: '2px solid rgba(255,255,255,0.25)' }}
+              >
+                ⌂ {t('blast.complete.home', 'Home')}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

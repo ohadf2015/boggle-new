@@ -10434,7 +10434,9 @@ const sv = {
         "colorPower": "Leta efter {color} brickor",
         "collectType": "Hitta fler {tileType}",
         "clearAllType": "Rensa kvarvarande {tileType}"
-      }
+      },
+      "label": "Tips",
+      "revealAria": "Avslöja ett ord — kostar en stjärna"
     },
     "combo": {
       "bomb_bomb": "MEGASMALL!",

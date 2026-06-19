@@ -10349,7 +10349,9 @@ const es = {
         "colorPower": "Busca fichas {color}",
         "collectType": "Encuentra más {tileType}",
         "clearAllType": "Limpia los {tileType} restantes"
-      }
+      },
+      "label": "Pista",
+      "revealAria": "Revela una palabra — cuesta una estrella"
     },
     "combo": {
       "bomb_bomb": "¡MEGA EXPLOSIÓN!",

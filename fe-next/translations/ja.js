@@ -10334,7 +10334,9 @@ const ja = {
         "colorPower": "{color}のタイルを探そう",
         "collectType": "{tileType}をもっと見つけよう",
         "clearAllType": "残りの{tileType}をクリア"
-      }
+      },
+      "label": "ヒント",
+      "revealAria": "単語を表示 — 星を1つ消費"
     },
     "combo": {
       "bomb_bomb": "メガブラスト！",

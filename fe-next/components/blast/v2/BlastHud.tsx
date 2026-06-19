@@ -298,12 +298,14 @@ export function BlastHud({
             <button
               onClick={onHint}
               data-testid="hint-btn"
-              className="px-4 py-2 rounded-md font-bold text-[#0b1530] transition-transform active:scale-95"
+              aria-label={t('blast.hint.revealAria', 'Reveal a word — costs a star')}
+              className="px-4 py-2 rounded-md font-bold text-[#0b1530] transition-transform active:scale-95 inline-flex items-center gap-1.5"
               style={{
                 background: 'white',
                 boxShadow: `2px 2px 0 #0b1530`,
               }}
             >
+              <span aria-hidden>💡</span>
               {t('blast.hint.label', 'Hint')}
             </button>
           )}

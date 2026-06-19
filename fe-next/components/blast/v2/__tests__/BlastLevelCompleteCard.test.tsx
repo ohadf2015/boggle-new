@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastLevelCompleteCard } from '../BlastLevelCompleteCard';
 
 // GSAP touches the DOM in an effect; jsdom is fine with it, but stub matchMedia
@@ -104,6 +104,35 @@ describe('BlastLevelCompleteCard (trimmed)', () => {
     it('omits the chest block entirely when no chest data is provided', () => {
       render(<BlastLevelCompleteCard {...baseProps} />);
       expect(screen.queryByTestId('complete-chest')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('secondary CTAs (Replay / Home)', () => {
+    it('keeps "Next Level" as the primary CTA', () => {
+      const onNext = vi.fn();
+      render(<BlastLevelCompleteCard {...baseProps} onNext={onNext} />);
+      fireEvent.click(screen.getByTestId('next-btn'));
+      expect(onNext).toHaveBeenCalledTimes(1);
+    });
+
+    it('offers a Replay button (re-play this level) that calls onReplay', () => {
+      const onReplay = vi.fn();
+      render(<BlastLevelCompleteCard {...baseProps} onReplay={onReplay} />);
+      fireEvent.click(screen.getByTestId('complete-replay-btn'));
+      expect(onReplay).toHaveBeenCalledTimes(1);
+    });
+
+    it('offers a Home button that calls onHome', () => {
+      const onHome = vi.fn();
+      render(<BlastLevelCompleteCard {...baseProps} onHome={onHome} />);
+      fireEvent.click(screen.getByTestId('complete-home-btn'));
+      expect(onHome).toHaveBeenCalledTimes(1);
+    });
+
+    it('omits the secondary buttons when their callbacks are absent', () => {
+      render(<BlastLevelCompleteCard {...baseProps} />);
+      expect(screen.queryByTestId('complete-replay-btn')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('complete-home-btn')).not.toBeInTheDocument();
     });
   });
 });

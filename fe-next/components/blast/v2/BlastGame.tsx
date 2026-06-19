@@ -48,6 +48,9 @@ type Props = {
   // Re-mount the SAME level fresh after a loss (strike budget exhausted). No
   // campaign advance, no clear-level submit — progress stays exactly where it was.
   onRetry?: () => void;
+  // Escape to the home screen from the result/failed cards. Omitted = no Home
+  // button (the cards are the only exit while the bottom nav is hidden in-game).
+  onHome?: () => void;
   onUpdateUnlocks?: (unlocks: UnlocksSeen) => void;
   onLevelCleared?: (nextLevel: number) => void;
 };
@@ -94,6 +97,7 @@ export function BlastGame({
   isVeteranPlayer = false,
   onAdvance,
   onRetry,
+  onHome,
   onUpdateUnlocks,
   onLevelCleared,
 }: Props) {
@@ -513,6 +517,7 @@ export function BlastGame({
         themeWordCount={level.words.length}
         wordsFound={foundThemeWordsCount}
         onRetry={() => onRetry?.()}
+        onHome={onHome}
       />
     );
   }
@@ -554,6 +559,8 @@ export function BlastGame({
         openChest={openChest}
         openStatus={openMutation.status}
         onAdvance={onAdvance}
+        onReplay={onRetry}
+        onHome={onHome}
       />
     );
   }
@@ -591,9 +598,7 @@ export function BlastGame({
         bonusWordCount={state.bonusWordCount}
         canUndo={state.canUndo && state.status === 'playing'}
         onUndo={handleUndoPressed}
-        onHint={() => {
-          /* Plan 5 wires hints */
-        }}
+        onHint={handlers.onRevealHint}
       />
       <div className="relative flex-1 min-h-0 flex items-stretch justify-center pb-[max(0.5rem,env(safe-area-inset-bottom))] px-2">
         <BlastAtmosphereOverlay modeColor={modeColor} />
@@ -647,7 +652,7 @@ export function BlastGame({
           modeColor={modeColor}
           almosts={almosts}
           tileIds={state.tileIds}
-          revealGlowCells={cascadeGlow.length > 0 ? [...revealGlowCells, ...cascadeGlow] : revealGlowCells}
+          revealGlowCells={[...revealGlowCells, ...cascadeGlow, ...state.hintCells]}
           boardRows={initialBoardRows}
           onCommitSelection={(centers) => {
             clearCentersRef.current = centers;

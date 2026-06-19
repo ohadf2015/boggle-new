@@ -53,4 +53,17 @@ describe('BlastLevelFailedCard', () => {
     const { container } = render(<BlastLevelFailedCard {...baseProps} />);
     expect(container.querySelector('[data-testid="failed-confetti"]')).toBeNull();
   });
+
+  it('offers a Home escape that calls onHome when provided', () => {
+    const onHome = vi.fn();
+    render(<BlastLevelFailedCard {...baseProps} onHome={onHome} />);
+    const btn = screen.getByTestId('failed-home-btn');
+    fireEvent.click(btn);
+    expect(onHome).toHaveBeenCalledTimes(1);
+  });
+
+  it('omits the Home button when onHome is not provided', () => {
+    render(<BlastLevelFailedCard {...baseProps} />);
+    expect(screen.queryByTestId('failed-home-btn')).not.toBeInTheDocument();
+  });
 });
