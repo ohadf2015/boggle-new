@@ -27,6 +27,8 @@ import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
 import ModeRevealOverlay from '@/components/game/ModeRevealOverlay';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import type { CoachModeKey } from '@/lib/tutorial/modeCoachStore';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Loader2 } from 'lucide-react';
 
@@ -128,6 +130,21 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     v ? dispatchReveal({ type: 'endReveal' }) : dispatchReveal({ type: 'reset' });
   const [minWordLength, setMinWordLength] = useState<number>(2);
   const gameMode = useGameMode();
+
+  // Map GameMode string to CoachModeKey for ModeCoach mount
+  function getCoachMode(gm: string | undefined): CoachModeKey | undefined {
+    if (!gm) return undefined;
+    const modeMap: Record<string, CoachModeKey> = {
+      'classic': 'classic',
+      'blast': 'blast',
+      'word-hunt': 'wordHunt',
+      'wheel-rush': 'wheelRush',
+      'word-tower': 'wordTower',
+      'shiritori': 'shiritori',
+    };
+    return modeMap[gm];
+  }
+  const coachMode = getCoachMode(gameMode);
 
   // Captures the messageId from the most recent startGame so we can emit
   // `countdownComplete` once the GoRipplesAnimation finishes. Server gates
@@ -719,6 +736,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           onIntroDismiss={() => dispatchReveal({ type: 'endReveal' })}
         />
       )}
+      {coachMode && <ModeCoach mode={coachMode} />}
       {showStartAnimation && (
         <GoRipplesAnimation
           onComplete={() => {

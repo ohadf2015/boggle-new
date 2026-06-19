@@ -10,7 +10,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { GameStage } from '@/components/game/GameStage';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
-import { HowToPlayCard } from '@/components/common/HowToPlayCard';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { applyHebrewFinalLetters, HEBREW_FINAL_TO_REGULAR } from '@/shared/utils/wordNormalization';
 import AlchemyKeyboard from '@/components/wordAlchemy/AlchemyKeyboard';
@@ -480,13 +480,7 @@ export default function WordAlchemyPage() {
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-purple/40" />
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3 animate-[fadeInUp_0.4s_ease-out_both] motion-reduce:animate-none">
         <TopBackLink className="self-start" />
-        <HowToPlayCard
-          storageKey="word-alchemy"
-          title={t('wordAlchemy.howTo.title')}
-          steps={[0, 1, 2].map((i) => t(`wordAlchemy.howTo.steps.${i}`))}
-          cta={t('wordAlchemy.howTo.cta')}
-          accent="purple"
-        />
+        <ModeCoach mode="wordAlchemy" />
 
         {/* Chain so far — flows with the locale's direction (RTL for Hebrew). */}
         <div

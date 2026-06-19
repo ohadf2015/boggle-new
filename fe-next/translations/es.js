@@ -11876,9 +11876,9 @@ const es = {
     },
     "wordTower": {
       "title": "Construye la Torre",
-      "step1": "Apila palabras para subir",
-      "step2": "Palabras largas, torre más alta",
-      "scoreTip": "¡La altura es tu puntuación — ¡sube!"
+      "step1": "Toca para soltar el bloque",
+      "step2": "Ponlo centrado, no torcido",
+      "scoreTip": "¡Cada palabra apila un piso — ¡sube!"
     },
     "connections": {
       "title": "Encuentra los Vínculos",
@@ -11893,8 +11893,8 @@ const es = {
     },
     "wordAlchemy": {
       "title": "Alquimia de Palabras",
-      "step1": "Mezcla fichas en palabras nuevas",
-      "step2": "Los comodines transforman lo que sea"
+      "step1": "Cambia una letra cada paso",
+      "step2": "Añade, intercambia o elimina una letra"
     },
     "crossword": {
       "title": "Completa la Cuadrícula",
@@ -11908,8 +11908,8 @@ const es = {
     },
     "shiritori": {
       "title": "Cadena de Palabras",
-      "step1": "Empieza con la última letra",
-      "step2": "Vence el reloj cada turno"
+      "step1": "Empieza con la última kana",
+      "step2": "Nunca termines en ん (n)"
     },
     "adventure": {
       "title": "Aventura",

@@ -11855,9 +11855,9 @@ const en = {
     },
     "wordTower": {
       "title": "Build the Tower",
-      "step1": "Stack words to climb higher",
-      "step2": "Longer words, taller tower",
-      "scoreTip": "Height is your score — go tall!"
+      "step1": "Tap to drop the block",
+      "step2": "Land it centered, not sloppy",
+      "scoreTip": "Each word stacks a floor — go high!"
     },
     "connections": {
       "title": "Find the Links",
@@ -11872,8 +11872,8 @@ const en = {
     },
     "wordAlchemy": {
       "title": "Word Alchemy",
-      "step1": "Mix tiles into new words",
-      "step2": "Wildcards transform anything"
+      "step1": "Change one letter each step",
+      "step2": "Add, swap, or remove a letter"
     },
     "crossword": {
       "title": "Fill the Grid",
@@ -11887,8 +11887,8 @@ const en = {
     },
     "shiritori": {
       "title": "Word Chain",
-      "step1": "Start with the last letter",
-      "step2": "Beat the clock each turn"
+      "step1": "Start with the last kana",
+      "step2": "Never end on ん (n)"
     },
     "adventure": {
       "title": "Adventure",

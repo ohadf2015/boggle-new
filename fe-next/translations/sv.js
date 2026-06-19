@@ -73,9 +73,9 @@ const sv = {
     },
     "wordTower": {
       "title": "Bygg tornet",
-      "step1": "Stapla ord för att klättra högre",
-      "step2": "Längre ord = högre torn",
-      "scoreTip": "Höjd är ditt resultat — gå högt!"
+      "step1": "Tryck för att släppa blocket",
+      "step2": "Landa det i mitten, inte snett",
+      "scoreTip": "Varje ord = en våning — gå högt!"
     },
     "connections": {
       "title": "Hitta länkarna",
@@ -90,8 +90,8 @@ const sv = {
     },
     "wordAlchemy": {
       "title": "Ord-alkemi",
-      "step1": "Blanda rutor till nya ord",
-      "step2": "Vildkort omvandlar vad som helst"
+      "step1": "Byt en bokstav varje steg",
+      "step2": "Lägg till, byt eller ta bort en bokstav"
     },
     "crossword": {
       "title": "Fyll rutnätet",
@@ -105,8 +105,8 @@ const sv = {
     },
     "shiritori": {
       "title": "Ordkedja",
-      "step1": "Börja med sista bokstaven",
-      "step2": "Slå klockan varje tur"
+      "step1": "Börja med sista kana",
+      "step2": "Sluta aldrig på ん (n)"
     },
     "adventure": {
       "title": "Äventyr",

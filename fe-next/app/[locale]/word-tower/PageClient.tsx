@@ -7,6 +7,7 @@ import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWordTowerEnabled } from '@/hooks/useWordTowerEnabled';
 import { WordTowerGame } from '@/components/wordTower/WordTowerGame';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 /**
  * The WHOLE Word Tower game is feature-gated: admins always have access (dev
@@ -38,5 +39,10 @@ export function WordTowerPageClient() {
     return <div className="min-h-[100dvh] bg-neo-navy" aria-hidden />;
   }
 
-  return <WordTowerGame />;
+  return (
+    <>
+      <ModeCoach mode="wordTower" />
+      <WordTowerGame />
+    </>
+  );
 }

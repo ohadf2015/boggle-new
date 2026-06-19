@@ -38,6 +38,7 @@ import { SealedBidSessionSummary } from '@/components/sealedBid/SealedBidSession
 import { pickRounds, poolForLang, ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
 import { toDisplay, wordFromChosen } from '@/lib/sealedBid/sp/rackBuilder';
 import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import {
   awardSoloDaily,
   getSoloDateISO,
@@ -334,6 +335,7 @@ export default function SealedBidPage() {
 
   return (
     <GameStage accent="cyan" header={header} footer={footer}>
+      <ModeCoach mode="sealedBid" />
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3">
         {state.phase === 'done' ? (

@@ -33,7 +33,7 @@ import {
 } from '@/lib/shiritori/sp/spEngine';
 import { botPoolForDifficulty } from '@/lib/shiritori/sp/botDict';
 import { useShiritoriGhostMultiplier } from '@/lib/shiritori/sp/useShiritoriGhostMultiplier';
-import { HowToPlayCard } from '@/components/common/HowToPlayCard';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
 import {
   awardSoloDaily,
@@ -329,13 +329,7 @@ export default function ShiritoriSoloPage() {
     <GameStage accent="lime" header={header} footer={footer}>
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-lime/40" />
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3">
-        <HowToPlayCard
-          storageKey="shiritori-solo"
-          title={t('shiritori.solo.howTo.title')}
-          steps={[0, 1, 2].map((i) => t(`shiritori.solo.howTo.steps.${i}`))}
-          cta={t('shiritori.solo.howTo.cta')}
-          accent="lime"
-        />
+        <ModeCoach mode="shiritori" />
 
         {ended ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3">
