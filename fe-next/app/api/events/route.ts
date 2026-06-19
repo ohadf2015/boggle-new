@@ -4,11 +4,18 @@ import { createClient } from '@/utils/supabase/server';
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: events, error } = await supabase
-      .from('events')
-      .select('id, name, description, type, status, start_time, end_time, config, rewards')
-      .in('status', ['active', 'upcoming'])
-      .order('start_time', { ascending: true });
+
+    // Run events query and auth.getUser concurrently
+    const [eventsResult, { data: { user } }] = await Promise.all([
+      supabase
+        .from('events')
+        .select('id, name, description, type, status, start_time, end_time, config, rewards')
+        .in('status', ['active', 'upcoming'])
+        .order('start_time', { ascending: true }),
+      supabase.auth.getUser(),
+    ]);
+
+    const { data: events, error } = eventsResult;
 
     if (error) {
       console.error('[API /events] DB error:', error.message);
@@ -19,7 +26,6 @@ export async function GET() {
     const upcoming = (events ?? []).filter((e) => e.status === 'upcoming');
 
     // Fetch the user's joined events (if authenticated)
-    const { data: { user } } = await supabase.auth.getUser();
     let myEvents: typeof active = [];
 
     if (user) {

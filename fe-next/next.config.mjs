@@ -96,17 +96,13 @@ const nextConfig = {
   },
 
   // Transpile packages to fix HMR/ESM issues with Turbopack
-  // - Three.js packages: Fix HMR issues
   // - @supabase/ssr: Fix "module is not defined" error (CommonJS/ESM interop)
   // - date-fns: Fix "module is not defined" on mobile browsers (JAVASCRIPT-NEXTJS-9S, 9Z, 19)
   // - framer-motion: Fix CommonJS/ESM interop issues on student pages
   // - react-hot-toast: Fix "module is not defined" in practice/education components (JAVASCRIPT-NEXTJS-9S, 9Z)
   // - remotion/@remotion/player: Fix ESM interop for Remotion cinematics (black screen without transpilation)
+  // NB: three / @react-three/* removed 2026-06-19 — not in package.json (dead entries).
   transpilePackages: [
-    'three',
-    '@react-three/fiber',
-    '@react-three/drei',
-    '@react-three/postprocessing',
     '@supabase/ssr',
     'date-fns',
     'framer-motion',

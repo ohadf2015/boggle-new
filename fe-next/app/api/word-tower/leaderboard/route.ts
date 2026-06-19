@@ -58,7 +58,13 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ leaderboard });
+    return NextResponse.json(
+      { leaderboard },
+      // Per-user payload (rows carry `isYou`) — MUST be `private` so shared CDN/proxy
+      // caches never serve one user's marked leaderboard to another. Browsers honor
+      // max-age (not s-maxage), so use max-age for the per-user browser cache.
+      { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=60' } }
+    );
   } catch (err) {
     captureApiError(err as Error, 'word-tower-leaderboard');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
