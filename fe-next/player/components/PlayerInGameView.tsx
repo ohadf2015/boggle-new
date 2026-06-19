@@ -28,10 +28,11 @@ const WordTowerVersus = dynamic(
   () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
-const ShiritoriVersus = dynamic(
-  () => import('@/components/multiplayer/shiritori/ShiritoriVersus').then(m => ({ default: m.ShiritoriVersus })),
-  { ssr: false, loading: () => <GameLoadingFallback /> },
-);
+// Lightweight gridless versus views (no pixi/gsap) — static-imported so they
+// never race jsdom teardown via a deferred dynamic import. WordTower stays
+// dynamic above because it pulls the pixi scene.
+import { ShiritoriVersus } from '@/components/multiplayer/shiritori/ShiritoriVersus';
+import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
@@ -329,6 +330,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Shiritori — turn-based word chain, no letter grid
   if (gameMode === 'shiritori') {
     return <ShiritoriVersus socket={socket} username={username} onQuit={onExitRoom} />;
+  }
+
+  // Sealed Bid — secret auction bids, no letter grid
+  if (gameMode === 'sealed-bid') {
+    return <SealedBidVersus socket={socket} username={username} onQuit={onExitRoom} />;
   }
 
   // Use letterGrid or shufflingGrid

@@ -56,6 +56,9 @@ import { initWordHuntState, selectTargetWordWithFallback } from '../modules/word
 import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
 import { initVersusMatch } from '@/lib/wordTower/versusMatch';
 import { initShiritoriState } from '../modules/shiritoriManager.js';
+import { initSealedBidState } from '../modules/sealedBidManager.js';
+import { armSealedBidFirstRound } from './sealedBidHandler.js';
+import { pickRounds as pickSealedBidRacks, ROUNDS_PER_GAME as SEALED_BID_ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
@@ -329,7 +332,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // via random roll (not in ALL_GAME_MODES). Decision routes through the shared
     // canAccessInWorkMode chokepoint (lib/auth/inWorkModeAccess.ts) so future
     // in-work modes inherit beta access for free.
-    if (resolvedMode === 'word-tower' || resolvedMode === 'shiritori') {
+    if (resolvedMode === 'word-tower' || resolvedMode === 'shiritori' || resolvedMode === 'sealed-bid') {
       const iwHostUser = Object.values(game.users).find((u) => u.isHost);
       const iwHostAuthId = iwHostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
       const iwSupabase = getSupabase();
@@ -344,16 +347,17 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           .single();
         inWorkAllowed = canAccessInWorkMode(iwProfile);
       }
-      // Shiritori additionally requires a Japanese board (its dictionary is JA).
-      // gameLang is declared later in this handler, so resolve the board language inline here.
+      // Per-mode language constraints (gameLang is declared later — resolve inline here):
+      //  - Shiritori needs a Japanese board (JA hiragana dictionary).
+      //  - Sealed Bid only has curated racks + dictionary for EN and HE.
       const boardLang = language || game.language || 'en';
-      if (inWorkAllowed && resolvedMode === 'shiritori' && boardLang !== 'ja') {
-        inWorkAllowed = false;
-      }
+      if (inWorkAllowed && resolvedMode === 'shiritori' && boardLang !== 'ja') inWorkAllowed = false;
+      if (inWorkAllowed && resolvedMode === 'sealed-bid' && boardLang !== 'en' && boardLang !== 'he') inWorkAllowed = false;
       if (!inWorkAllowed) {
         gamesStarting.delete(gameCode);
         logger.debug('SOCKET', `Rejected in-work mode ${resolvedMode} for ${gameCode}: host lacks access or wrong language`);
-        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: `${resolvedMode === 'shiritori' ? 'Shiritori' : 'Word Tower'} is in beta` });
+        const modeName = resolvedMode === 'shiritori' ? 'Shiritori' : resolvedMode === 'sealed-bid' ? 'Sealed Bid' : 'Word Tower';
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: `${modeName} is in beta` });
         return;
       }
     }
@@ -569,6 +573,16 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       }
     }
 
+    // Initialize Sealed Bid auction state if needed (shared racks for all players).
+    if (resolvedMode === 'sealed-bid') {
+      const racks = pickSealedBidRacks(SEALED_BID_ROUNDS_PER_GAME, gameLang).map((r) => r.rack);
+      const sealedBidState = initSealedBidState(playerUsernames, racks);
+      const currentGame = getGame(gameCode);
+      if (currentGame) {
+        currentGame.sealedBidState = sealedBidState;
+      }
+    }
+
     // Initialize Word Tower versus match state if needed (per-player towers).
     if (resolvedMode === 'word-tower') {
       const match = initVersusMatch(
@@ -637,6 +651,27 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           finished: ss.finished,
           winner: ss.winner,
         });
+      }
+    }
+
+    // Broadcast sealed-bid init AFTER startGame so the client can mount the view
+    // and subscribe; arm the first round's deadline timer. Reconnects poll
+    // requestSealedBidState (see sealedBidHandler).
+    if (resolvedMode === 'sealed-bid') {
+      const cg = getGame(gameCode);
+      const sb = cg?.sealedBidState;
+      if (sb) {
+        broadcastToRoom(io, getGameRoom(gameCode), 'sealedBidInit', {
+          players: sb.players,
+          racks: sb.racks,
+          index: sb.index,
+          rack: sb.racks[sb.index] ?? null,
+          phase: sb.phase,
+          scores: sb.scores,
+          roundDeadline: sb.roundDeadline,
+          totalRounds: sb.racks.length,
+        });
+        armSealedBidFirstRound(io, gameCode);
       }
     }
 

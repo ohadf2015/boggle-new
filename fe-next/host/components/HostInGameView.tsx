@@ -24,14 +24,15 @@ const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
-const ShiritoriVersus = dynamic(
-  () => import('@/components/multiplayer/shiritori/ShiritoriVersus').then(m => ({ default: m.ShiritoriVersus })),
-  { ssr: false },
-);
+// Lightweight gridless versus views (no pixi/gsap) — static-imported so they
+// never race jsdom teardown via a deferred dynamic import. WordTower stays
+// dynamic below because it pulls the pixi scene.
 const WordTowerVersus = dynamic(
   () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
+import { ShiritoriVersus } from '@/components/multiplayer/shiritori/ShiritoriVersus';
+import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -317,6 +318,17 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     return (
       <>
         <ShiritoriVersus socket={socket} username={username} onQuit={handleStopGameClick} />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
+        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+      </>
+    );
+  }
+
+  // Sealed Bid — secret auction bids, no shared grid
+  if (gameMode === 'sealed-bid') {
+    return (
+      <>
+        <SealedBidVersus socket={socket} username={username} onQuit={handleStopGameClick} />
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
       </>

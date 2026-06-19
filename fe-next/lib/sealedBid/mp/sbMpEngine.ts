@@ -9,8 +9,7 @@
  * clash. Pure + deterministic so it unit-tests without sockets. Reuses the solo
  * letter-value scoring (sbEngine.letterScore) so points stay consistent.
  */
-import { letterScore } from '../sp/sbEngine';
-import type { BidOutcome } from '../sp/sbEngine';
+import { letterScore, type BidOutcome } from '../sp/sbEngine';
 
 export interface SbMpBid {
   username: string;
