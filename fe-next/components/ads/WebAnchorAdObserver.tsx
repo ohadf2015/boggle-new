@@ -55,15 +55,26 @@ export default function WebAnchorAdObserver() {
 
     window.addEventListener('resize', schedule);
     window.addEventListener('orientationchange', schedule);
+    window.addEventListener('load', schedule);
+
+    // AdSense can finish painting the anchor AFTER DOM mutations settle — the ad
+    // iframe loads late with no further mutation the observers can see, so the
+    // single initial measure reads 0 and nothing reserves the band. Nudge a few
+    // re-measures on a settle curve to catch the late paint.
+    const settleTimers = [300, 1000, 2500, 5000].map((ms) =>
+      window.setTimeout(schedule, ms),
+    );
 
     apply();
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
+      settleTimers.forEach((id) => window.clearTimeout(id));
       mo.disconnect();
       ro?.disconnect();
       window.removeEventListener('resize', schedule);
       window.removeEventListener('orientationchange', schedule);
+      window.removeEventListener('load', schedule);
       root.style.setProperty('--web-anchor-ad-height', '0px');
       root.classList.remove('has-web-anchor-ad');
     };

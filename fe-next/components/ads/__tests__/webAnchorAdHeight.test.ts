@@ -80,4 +80,114 @@ describe('measureWebAnchorHeight', () => {
     makeAnchor({ className: 'adsbygoogle', status: 'displayed', height: 64, bottom: 800 });
     expect(measureWebAnchorHeight(window)).toBe(64);
   });
+
+  /**
+   * Fallback: Google Auto-Ads frequently renders the bottom anchor as a
+   * `position: fixed` WRAPPER (e.g. `<div id="aswift_..._anchor">`) holding an
+   * iframe — NOT an `ins.adsbygoogle-noablate`. The narrow <ins> selector misses
+   * it, so the band must also be discovered by walking from the ad frame/ins up
+   * to its nearest fixed/sticky ancestor and measuring that.
+   */
+  function makeWrappedAd(opts: {
+    inner: 'iframe' | 'ins';
+    innerAttrs?: Record<string, string>;
+    wrapperPosition?: string; // computed position of the pinned ancestor
+    height: number;
+    bottom?: number; // viewport-relative bottom of the WRAPPER
+  }): HTMLElement {
+    const wrapper = document.createElement('div');
+    wrapper.style.position = opts.wrapperPosition ?? 'fixed';
+    const bottom = opts.bottom ?? window.innerHeight;
+    wrapper.getBoundingClientRect = () =>
+      ({
+        height: opts.height,
+        width: 360,
+        top: bottom - opts.height,
+        bottom,
+        left: 0,
+        right: 360,
+        x: 0,
+        y: bottom - opts.height,
+        toJSON: () => ({}),
+      }) as DOMRect;
+
+    const inner = document.createElement(opts.inner);
+    for (const [k, v] of Object.entries(opts.innerAttrs ?? {})) {
+      inner.setAttribute(k, v);
+    }
+    // The inner ad node is statically positioned inside the pinned wrapper; its
+    // own rect would NOT register as bottom-pinned, so the walk-up must measure
+    // the wrapper. Give it a non-bottom rect to prove that.
+    inner.getBoundingClientRect = () =>
+      ({
+        height: opts.height,
+        width: 360,
+        top: 0,
+        bottom: opts.height,
+        left: 0,
+        right: 360,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      }) as DOMRect;
+
+    wrapper.appendChild(inner);
+    document.body.appendChild(wrapper);
+    return wrapper;
+  }
+
+  // Non-navigable srcs that still match the `src*="googleads"` selector — avoids
+  // happy-dom issuing a real network fetch for the iframe.
+  const GOOGLEADS_SRC = 'data:text/html,googleads';
+
+  it('detects an iframe ad whose fixed wrapper is pinned to the bottom', () => {
+    makeWrappedAd({
+      inner: 'iframe',
+      innerAttrs: { src: GOOGLEADS_SRC },
+      height: 90,
+      bottom: 800,
+    });
+    expect(measureWebAnchorHeight(window)).toBe(90);
+  });
+
+  it('detects a plain ins.adsbygoogle (no anchor class/status) in a fixed bottom wrapper', () => {
+    makeWrappedAd({
+      inner: 'ins',
+      innerAttrs: { class: 'adsbygoogle' },
+      height: 70,
+      bottom: 800,
+    });
+    expect(measureWebAnchorHeight(window)).toBe(70);
+  });
+
+  it('detects an aswift-named iframe (Google ad frame) in a fixed bottom wrapper', () => {
+    makeWrappedAd({
+      inner: 'iframe',
+      innerAttrs: { name: 'aswift_3', src: 'about:blank' },
+      height: 60,
+      bottom: 800,
+    });
+    expect(measureWebAnchorHeight(window)).toBe(60);
+  });
+
+  it('ignores a fixed ad wrapper that is NOT pinned to the bottom (top anchor)', () => {
+    makeWrappedAd({
+      inner: 'iframe',
+      innerAttrs: { src: GOOGLEADS_SRC },
+      height: 90,
+      bottom: 90, // pinned to the TOP, not the bottom
+    });
+    expect(measureWebAnchorHeight(window)).toBe(0);
+  });
+
+  it('ignores an ad frame with no fixed/sticky ancestor (in-flow unit)', () => {
+    makeWrappedAd({
+      inner: 'iframe',
+      innerAttrs: { src: GOOGLEADS_SRC },
+      wrapperPosition: 'static',
+      height: 250,
+      bottom: 800,
+    });
+    expect(measureWebAnchorHeight(window)).toBe(0);
+  });
 });
