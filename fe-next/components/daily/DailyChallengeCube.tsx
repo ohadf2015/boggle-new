@@ -41,20 +41,20 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
       onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
       aria-label={`${t('daily.badge')} #${puzzleNumber}`}
       className={cn(
-        // Gold (neo-yellow) colour-coded edge AT REST — daily was the one tile
-        // with a plain black shadow, so it read as "missing colour". The gold edge
-        // (an allowed celebration accent for daily) gives it the same colour-coded
-        // signal the mode cubes carry, plus the warm sunburst mascot art.
-        'cube-reveal group relative flex min-h-[112px] w-full items-stretch overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy shadow-hard-yellow transition-transform duration-150 sm:min-h-[132px]',
-        'hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg',
-        'focus-visible:-translate-x-0.5 focus-visible:-translate-y-0.5',
-        'active:translate-x-0 active:translate-y-0 active:shadow-hard-pressed',
+        // Quiet gold colour-coding folded into a 2px tinted hard border (matches the
+        // mode cubes) instead of the loud 3px black frame + offset slab. Slimmer, one
+        // warm note on the page — not a shouting banner. Gold brightens on hover.
+        'cube-reveal group relative flex min-h-[84px] w-full items-stretch overflow-hidden rounded-neo border-2 border-neo-yellow/45 bg-neo-navy transition-[transform,border-color] duration-150 sm:min-h-[96px]',
+        'hover:-translate-y-0.5 hover:border-neo-yellow/80',
+        'focus-visible:-translate-y-0.5',
+        'active:translate-y-0',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
       )}
     >
-      {/* Cube art bleeds from the end (object-contain so the hourglass never
-          crops). Sits behind the content, which is padded clear of it. */}
-      <div className="pointer-events-none absolute inset-y-0 end-0 z-0 aspect-square h-full">
+      {/* Daily mascot — a neat, sizeable sticker hugging the end of the slim strip.
+          (The asset is a centred mascot with its own margins, so it reads as a tidy
+          sticker rather than full-bleed art; zoomed a touch to give it presence.) */}
+      <div className="pointer-events-none absolute inset-y-0 end-1 z-0 aspect-square h-full sm:end-2">
         <Image
           src={DAILY_CUBE_ART}
           alt=""
@@ -62,8 +62,8 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
           priority
           placeholder="blur"
           blurDataURL={CUBE_BLUR_DATA_URL}
-          sizes="(max-width: 768px) 45vw, 180px"
-          className="object-contain object-center transition-transform duration-200 motion-safe:group-hover:scale-[1.06]"
+          sizes="(max-width: 768px) 120px, 140px"
+          className="scale-110 object-contain object-center transition-transform duration-200 motion-safe:group-hover:scale-[1.16]"
         />
       </div>
 
@@ -77,10 +77,10 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
 
       {/* Content — white ink on navy with a GOLD headline accent, kept clear of
           the end art. */}
-      <div className="relative z-[2] flex flex-1 flex-col justify-center gap-2 p-4 pe-[42%] text-neo-white sm:p-5 sm:pe-[34%]">
+      <div className="relative z-[2] flex flex-1 flex-col justify-center gap-1.5 p-3 pe-24 text-neo-white sm:p-4 sm:pe-28">
         <div className="flex items-center gap-2">
           <h2
-            className="font-neo-display text-xl font-black uppercase leading-none tracking-tight text-neo-yellow sm:text-2xl"
+            className="font-neo-display text-lg font-black uppercase leading-none tracking-tight text-neo-yellow sm:text-xl"
             style={{ textWrap: 'balance' } as React.CSSProperties}
           >
             {t('daily.badge')}

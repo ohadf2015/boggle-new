@@ -33,21 +33,23 @@ export const LandingSeasonHero: React.FC = () => {
   return (
     <section
       data-testid="landing-season-hero"
-      className="relative w-full max-w-4xl mx-auto"
+      className="relative w-full max-w-2xl mx-auto"
     >
       <Link
         href="/leaderboard"
         aria-label={`${seasonLabel} — ${ctaLabel}`}
         onClick={() => haptics.tap()}
-        className="group relative block isolate overflow-hidden rounded-neo border-neo border-black bg-neo-navy-light transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
+        className="group relative block isolate overflow-hidden rounded-neo border-2 bg-neo-navy-light/70 transition-[transform,border-color] duration-150 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
         style={{
-          borderColor: '#000',
-          boxShadow: `4px 4px 0 #000, inset 0 0 0 1px ${accent}`,
+          // quiet, smaller secondary banner: a single tinted hairline in the season
+          // accent (no black 3px frame, no hard offset slab) so it recedes below the
+          // daily hero + mode cubes instead of competing with them.
+          borderColor: `${accent}66`,
         }}
       >
         {/* Image bleed — right side with diagonal seam + accent stripe */}
         <div
-          className="absolute inset-y-0 end-0 w-24 sm:w-32 pointer-events-none"
+          className="absolute inset-y-0 end-0 w-20 sm:w-24 pointer-events-none"
           style={{ clipPath: 'polygon(22% 0, 100% 0, 100% 100%, 0% 100%)' }}
         >
           <Image
@@ -66,14 +68,14 @@ export const LandingSeasonHero: React.FC = () => {
         {/* Diagonal accent stripe along the image seam */}
         <div
           aria-hidden
-          className="absolute inset-y-0 end-24 sm:end-32 w-[3px] origin-top translate-x-[7px] rtl:-translate-x-[7px] rotate-[18deg] sm:rotate-[14deg]"
-          style={{ background: accent, boxShadow: `1px 0 0 #000` }}
+          className="absolute inset-y-0 end-20 sm:end-24 w-[2px] origin-top translate-x-[6px] rtl:-translate-x-[6px] rotate-[18deg] sm:rotate-[14deg] opacity-70"
+          style={{ background: accent }}
         />
 
         {/* Halftone dot pattern in accent color */}
         <div
           aria-hidden
-          className="absolute inset-0 pointer-events-none opacity-[0.18] mix-blend-screen"
+          className="absolute inset-0 pointer-events-none opacity-[0.08] mix-blend-screen"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, ${accent} 1px, transparent 1.5px)`,
             backgroundSize: '7px 7px',
@@ -83,9 +85,9 @@ export const LandingSeasonHero: React.FC = () => {
         {/* Oversized outlined season numeral — editorial bg motif */}
         <span
           aria-hidden
-          className="absolute -top-1 sm:-top-2 start-1 sm:start-2 font-neo-display leading-none select-none pointer-events-none text-[2.5rem] sm:text-[3.5rem]"
+          className="absolute -top-1 start-1 sm:start-1.5 font-neo-display leading-none select-none pointer-events-none text-[1.9rem] sm:text-[2.4rem]"
           style={{
-            WebkitTextStroke: `1.5px ${accent}55`,
+            WebkitTextStroke: `1px ${accent}3d`,
             color: 'transparent',
             letterSpacing: '-0.04em',
           }}
@@ -94,7 +96,7 @@ export const LandingSeasonHero: React.FC = () => {
         </span>
 
         {/* Content */}
-        <div className="relative flex items-center gap-3 px-4 sm:px-5 py-2 sm:py-2.5 pe-24 sm:pe-32 ps-12 sm:ps-16">
+        <div className="relative flex items-center gap-3 px-4 sm:px-5 py-1.5 sm:py-2 pe-20 sm:pe-24 ps-9 sm:ps-11">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-1">
               <span

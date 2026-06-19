@@ -96,17 +96,38 @@ describe('LandingModeCubes', () => {
     expect(screen.queryByTestId('landing-cubes-more')).not.toBeInTheDocument();
   });
 
-  it('gives EVERY cube an idle "glance" sheen (not only the anchor)', () => {
-    // models here have no genIcon — the sheen must no longer depend on art,
-    // so the whole bento shimmers, not just the colour-drenched anchor.
+  it('reserves the idle "glance" sheen for RECOMMENDED modes only (less on-screen glare)', () => {
+    // default set: arena (anchor) + practice + adventure. Only the anchor is
+    // "recommended" here, so only it shimmers — the calm modes stay glare-free.
     renderCubes();
     const sheens = screen.getAllByTestId('cube-sheen');
-    // anchor + 2 rest = 3 cubes, one sheen each
-    expect(sheens.length).toBe(3);
+    expect(sheens.length).toBe(1);
+    // and it's the anchor that carries it
+    const anchor = screen.getByTestId('mode-cube-anchor');
+    expect(within(anchor).queryByTestId('cube-sheen')).toBeInTheDocument();
   });
 
-  it('staggers the sheen per-cube so the grid shimmers organically (no synced strobe)', () => {
-    renderCubes();
+  it('also shimmers high-energy modes (blast) but never the calm ones (practice)', () => {
+    renderCubes({
+      models: [
+        model({ key: 'arena', title: 'Arena', variant: 'pink', role: 'anchor' }),
+        model({ key: 'blast', title: 'Blast', variant: 'orange' }),
+        model({ key: 'practice', title: 'Practice', variant: 'cyan' }),
+      ],
+    });
+    // arena (anchor) + blast = 2 recommended sheens; practice has none
+    expect(screen.getAllByTestId('cube-sheen').length).toBe(2);
+    const practice = screen.getByRole('link', { name: /Practice/i });
+    expect(within(practice).queryByTestId('cube-sheen')).not.toBeInTheDocument();
+  });
+
+  it('staggers the sheen per-cube so the recommended set shimmers organically (no synced strobe)', () => {
+    renderCubes({
+      models: [
+        model({ key: 'arena', title: 'Arena', variant: 'pink', role: 'anchor' }),
+        model({ key: 'blast', title: 'Blast', variant: 'orange' }),
+      ],
+    });
     const delays = screen.getAllByTestId('cube-sheen').map((s) => s.style.animationDelay);
     // distinct per-cube delays — not every cube sweeping on the same clock
     expect(new Set(delays).size).toBeGreaterThan(1);
@@ -117,7 +138,19 @@ describe('LandingModeCubes', () => {
   const restingShadow = (el: HTMLElement) =>
     el.className.match(/(?:^|\s)(shadow-hard-(?:pink|cyan|lime|purple|orange|blue))(?=\s|$)/)?.[1];
 
-  it('color-codes each cube with a distinct hard shadow AT REST (not a uniform black frame)', () => {
+  it('drops the loud 3px black frame AND the floating neon offset shadow at rest', () => {
+    renderCubes();
+    const arena = screen.getByTestId('mode-cube-anchor');
+    // the hard black neo frame is gone — it boxed the full-bleed mascot art
+    expect(arena.className).not.toMatch(/(?:^|\s)border-neo-thick(?=\s|$)/);
+    expect(arena.className).not.toMatch(/(?:^|\s)border-black(?=\s|$)/);
+    // and the detached coloured offset slab is gone at rest (read as a neon bar
+    // once the frame was removed) — no bare `shadow-hard-*` resting on the tile
+    expect(restingShadow(arena)).toBeUndefined();
+    expect(arena.className).not.toMatch(/(?:^|\s)shadow-hard(?=\s|$)/);
+  });
+
+  it('color-codes each cube by folding the hue INTO a contained hard border (no slab, no blur)', () => {
     renderCubes({
       models: [
         model({ key: 'arena', title: 'Arena', variant: 'pink', role: 'anchor' }),
@@ -129,13 +162,15 @@ describe('LandingModeCubes', () => {
     const practice = screen.getByRole('link', { name: /Practice/i });
     const blast = screen.getByRole('link', { name: /Blast/i });
 
-    // each mode carries its own colored resting shadow (design-system "color-coded modes")
-    expect(restingShadow(arena)).toBe('shadow-hard-pink');
-    expect(restingShadow(practice)).toBe('shadow-hard-cyan');
-    expect(restingShadow(blast)).toBe('shadow-hard-orange');
-    // distinct across modes, and no longer the old uniform black `shadow-hard`
-    expect(new Set([restingShadow(arena), restingShadow(practice), restingShadow(blast)]).size).toBe(3);
-    expect(arena.className).not.toMatch(/(?:^|\s)shadow-hard(?=\s|$)/);
+    // a 2px mode-tinted hard border IS the colour-coding now (contained, not floating)
+    expect(arena.className).toMatch(/border-2/);
+    expect(arena.className).toMatch(/border-neo-pink/);
+    expect(practice.className).toMatch(/border-neo-cyan/);
+    expect(blast.className).toMatch(/border-neo-orange/);
+    // the per-mode hue still carries on HOVER (interaction feedback stays brutalist)
+    expect(arena.className).toMatch(/group-hover:shadow-hard-pink/);
+    // but never as a resting offset slab
+    expect(restingShadow(arena)).toBeUndefined();
   });
 
   // ---- art framing: mascots fill the tile (the homepage "images take the width") ----

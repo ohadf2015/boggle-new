@@ -24,14 +24,14 @@ export const LandingCubesSkeleton: React.FC<{ className?: string }> = ({ classNa
       {/* Daily-hero strip — matches the wide DailyChallengeCube tile */}
       <div
         data-testid="cubes-skeleton-daily"
-        className="h-[72px] w-full rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard-lg sm:h-20 motion-safe:animate-pulse"
+        className="h-[64px] w-full rounded-neo border-2 border-white/10 bg-neo-navy-light sm:h-[76px] motion-safe:animate-pulse"
       />
 
       <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         {/* 2×2 anchor placeholder — same span + aspect ramp as the live anchor */}
         <div
           data-testid="cubes-skeleton-anchor"
-          className="col-span-2 aspect-[16/9] rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard sm:aspect-[2/1] md:row-span-2 md:aspect-square motion-safe:animate-pulse"
+          className="col-span-2 aspect-[16/9] rounded-neo border-2 border-white/10 bg-neo-navy-light sm:aspect-[2/1] md:row-span-2 md:aspect-square motion-safe:animate-pulse"
         />
         {cubes.map((_, i) => (
           <div
@@ -39,7 +39,7 @@ export const LandingCubesSkeleton: React.FC<{ className?: string }> = ({ classNa
             data-testid="cubes-skeleton-cube"
             // stagger the pulse so the grid breathes instead of strobing in unison
             style={{ animationDelay: `${i * 0.12}s` }}
-            className="aspect-square rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard motion-safe:animate-pulse"
+            className="aspect-square rounded-neo border-2 border-white/10 bg-neo-navy-light motion-safe:animate-pulse"
           />
         ))}
       </div>

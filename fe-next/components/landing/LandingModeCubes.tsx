@@ -31,10 +31,11 @@ interface VariantStyle {
   chip: string;
   /** ink on the icon chip */
   chipInk: string;
-  /** coloured hard shadow AT REST — the per-mode "colour-coded modes" tile signal.
-      Replaces the old uniform black `shadow-hard` so the bento reads colourful at a
-      glance (the homepage brief) without flooding the fill like the legacy cards. */
-  restShadow: string;
+  /** mode-tinted hard BORDER at rest — the per-mode "colour-coded modes" signal,
+      folded INTO the edge instead of a detached coloured offset shadow (which read
+      as a floating neon slab once the black frame was removed). Contained, hard-edged
+      (no blur), quiet — does separation + colour-coding in one stroke. */
+  border: string;
   /** coloured hard shadow on hover (same hue, kept for emphasis under the lift) */
   shadow: string;
   ring: string;
@@ -44,16 +45,22 @@ interface VariantStyle {
   glow: string;
 }
 
-// Mirrors ModeCard's variant palette. Each mode gets a colour-matched hard shadow
-// at rest (Netflix-style: dark tile, distinct coloured edge) — NOT a saturated fill.
+// Mirrors ModeCard's variant palette. Each mode's hue lives in a quiet tinted
+// hard border at rest (contained colour-coding); the hard offset shadow is kept
+// for HOVER only, as interaction lift — not resting clutter.
 const VARIANT: Record<ModeCubeVariant, VariantStyle> = {
-  pink:   { fill: 'bg-neo-pink',   ink: 'text-neo-navy',  chip: 'bg-neo-pink',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-pink',   shadow: 'group-hover:shadow-hard-pink',   ring: 'focus-visible:ring-neo-pink',   glow: 'rgba(255,20,147,0.42)' },
-  cyan:   { fill: 'bg-neo-cyan',   ink: 'text-neo-navy',  chip: 'bg-neo-cyan',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-cyan',   shadow: 'group-hover:shadow-hard-cyan',   ring: 'focus-visible:ring-neo-cyan',   glow: 'rgba(0,255,255,0.34)' },
-  purple: { fill: 'bg-neo-purple', ink: 'text-neo-white', chip: 'bg-neo-purple', chipInk: 'text-neo-white', restShadow: 'shadow-hard-purple', shadow: 'group-hover:shadow-hard-purple', ring: 'focus-visible:ring-neo-purple', glow: 'rgba(139,92,246,0.5)' },
-  orange: { fill: 'bg-neo-orange', ink: 'text-neo-navy',  chip: 'bg-neo-orange', chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-orange', shadow: 'group-hover:shadow-hard-orange', ring: 'focus-visible:ring-neo-orange', glow: 'rgba(255,107,53,0.42)' },
-  lime:   { fill: 'bg-neo-lime',   ink: 'text-neo-navy',  chip: 'bg-neo-lime',   chipInk: 'text-neo-navy',  restShadow: 'shadow-hard-lime',   shadow: 'group-hover:shadow-hard-lime',   ring: 'focus-visible:ring-neo-lime',   glow: 'rgba(191,255,0,0.36)' },
-  blue:   { fill: 'bg-blue-500',   ink: 'text-neo-white', chip: 'bg-blue-500',   chipInk: 'text-neo-white', restShadow: 'shadow-hard-blue',   shadow: 'group-hover:shadow-hard-blue',   ring: 'focus-visible:ring-blue-400',   glow: 'rgba(59,130,246,0.42)' },
+  pink:   { fill: 'bg-neo-pink',   ink: 'text-neo-navy',  chip: 'bg-neo-pink',   chipInk: 'text-neo-navy',  border: 'border-neo-pink/50',   shadow: 'group-hover:shadow-hard-pink',   ring: 'focus-visible:ring-neo-pink',   glow: 'rgba(255,20,147,0.42)' },
+  cyan:   { fill: 'bg-neo-cyan',   ink: 'text-neo-navy',  chip: 'bg-neo-cyan',   chipInk: 'text-neo-navy',  border: 'border-neo-cyan/50',   shadow: 'group-hover:shadow-hard-cyan',   ring: 'focus-visible:ring-neo-cyan',   glow: 'rgba(0,255,255,0.34)' },
+  purple: { fill: 'bg-neo-purple', ink: 'text-neo-white', chip: 'bg-neo-purple', chipInk: 'text-neo-white', border: 'border-neo-purple/50', shadow: 'group-hover:shadow-hard-purple', ring: 'focus-visible:ring-neo-purple', glow: 'rgba(139,92,246,0.5)' },
+  orange: { fill: 'bg-neo-orange', ink: 'text-neo-navy',  chip: 'bg-neo-orange', chipInk: 'text-neo-navy',  border: 'border-neo-orange/50', shadow: 'group-hover:shadow-hard-orange', ring: 'focus-visible:ring-neo-orange', glow: 'rgba(255,107,53,0.42)' },
+  lime:   { fill: 'bg-neo-lime',   ink: 'text-neo-navy',  chip: 'bg-neo-lime',   chipInk: 'text-neo-navy',  border: 'border-neo-lime/50',   shadow: 'group-hover:shadow-hard-lime',   ring: 'focus-visible:ring-neo-lime',   glow: 'rgba(191,255,0,0.36)' },
+  blue:   { fill: 'bg-blue-500',   ink: 'text-neo-white', chip: 'bg-blue-500',   chipInk: 'text-neo-white', border: 'border-blue-400/50',   shadow: 'group-hover:shadow-hard-blue',   ring: 'focus-visible:ring-blue-400',   glow: 'rgba(59,130,246,0.42)' },
 };
+
+// RECOMMENDED modes keep the idle "glance" sheen — the high-energy competitive
+// set (multiplayer arena, blast, party). Calm modes (practice, adventure, …) stay
+// glare-free so the homepage has less going on at once (the anchor is always in).
+const RECOMMENDED_SHEEN_KEYS = new Set(['arena', 'multiplayer', 'blast', 'party']);
 
 // Badge wears the mode colour (not navy) so every flagged cube pops a chip of
 // its own hue — a contained, on-brand splash of colour on the bento beyond the
@@ -107,6 +114,7 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
   const { dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const v = VARIANT[model.variant];
+  const showSheen = anchor || RECOMMENDED_SHEEN_KEYS.has(model.key);
   const locked = !!model.locked;
   const [imgFailed, setImgFailed] = useState(false);
   const hasArt = !!model.genIcon && !imgFailed;
@@ -128,10 +136,12 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
       data-cube-key={model.key}
       style={{ animationDelay: `${Math.min(index, 8) * 0.05}s`, ['--cube-img-scale' as string]: model.imgScale ?? 1 }}
       className={cn(
-        'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-neo-thick border-black',
-        // per-mode coloured hard shadow at rest → the bento reads "colour-coded" at a
-        // glance without a saturated fill (replaces the old uniform black shadow-hard)
-        v.restShadow,
+        // Colour-coding folded INTO a quiet 2px mode-tinted hard border (no blur) —
+        // replaces both the loud 3px black frame AND the detached coloured offset
+        // shadow, which read as a floating neon slab once the frame was gone. One
+        // contained hard edge: separation + colour signal, far less on-screen noise.
+        'cube-reveal group relative flex flex-col overflow-hidden rounded-neo border-2',
+        v.border,
         // Physical 3D feedback. `.cube-tilt` lifts + tilts the cube back on hover AND
         // focus-visible (TV/party screens have no pointer → focus is the only signal;
         // keyboard users get it too) via the INDIVIDUAL transform props, which compose
@@ -197,20 +207,22 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
         </>
       )}
 
-      {/* idle diagonal light sweep — the homepage "glance". Now on EVERY cube
-          (art or navy) so the whole bento shimmers, not just the anchor. Each
-          cube is phase-shifted via animationDelay so they sweep organically
-          instead of strobing in unison. Brighter/wider on the 2×2 anchor where
-          there's room for it to read. CSS-gated on prefers-reduced-motion. */}
-      <span
-        aria-hidden="true"
-        data-testid="cube-sheen"
-        style={{ animationDelay: `${(index * 1.7).toFixed(2)}s` }}
-        className={cn(
-          'cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] bg-gradient-to-r from-transparent to-transparent',
-          anchor ? 'w-1/2 via-white/60' : 'w-1/3 via-white/45',
-        )}
-      />
+      {/* idle diagonal light sweep — the homepage "glance". RESERVED for the
+          recommended/high-energy set (anchor + blast/party) so the bento has less
+          glare overall; the calm modes stay still. Phase-shifted via animationDelay
+          so the recommended cubes sweep organically, not in unison. CSS-gated on
+          prefers-reduced-motion. */}
+      {showSheen && (
+        <span
+          aria-hidden="true"
+          data-testid="cube-sheen"
+          style={{ animationDelay: `${(index * 1.7).toFixed(2)}s` }}
+          className={cn(
+            'cube-sheen pointer-events-none absolute inset-y-0 -left-1/3 z-[1] bg-gradient-to-r from-transparent to-transparent',
+            anchor ? 'w-1/2 via-white/55' : 'w-1/3 via-white/40',
+          )}
+        />
+      )}
 
       {model.badge && <Badge label={model.badge} chip={v.chip} chipInk={v.chipInk} />}
       {locked && <LockOverlay message={model.lockedMessage} />}
@@ -303,7 +315,9 @@ export function LandingModeCubes({
     // (cubes + daily banner) tilts with real 3D depth on hover.
     <div className="cube-deck mx-auto w-full max-w-5xl space-y-5 md:space-y-6 xl:max-w-6xl">
       {dailyNode && (
-        <div className="cube-tilt w-full rounded-neo">{dailyNode}</div>
+        // Centred + width-capped so the daily reads as a tidy banner (content + mascot
+        // sit close) instead of a full-width strip with a dead navy gap in the middle.
+        <div className="cube-tilt mx-auto w-full max-w-3xl rounded-neo">{dailyNode}</div>
       )}
 
       <section aria-label={sectionLabel}>
