@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Shuffle, FileText, Target, Check, Bomb, Building2, Link2, Gavel } from 'lucide-react';
+import { Shuffle, FileText, Target, Check, Bomb, Building2, Link2, Gavel, Grid3x3 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -78,6 +78,12 @@ const MODES: ModeVisualConfig[] = [
     nameKey: 'gameModes.sealedBid.name',
     activeBg: 'bg-neo-pink',
   },
+  {
+    mode: 'crossword',
+    icon: <Grid3x3 className="w-4 h-4" />,
+    nameKey: 'gameModes.crossword.name',
+    activeBg: 'bg-neo-cyan',
+  },
 ];
 
 // ==================== Main Component ====================
@@ -103,10 +109,13 @@ export function BattleModeCard({
   const shiritoriEnabled = isAdmin && isShiritoriAvailable(language);
   // Sealed Bid has curated racks + dictionary only for EN and HE boards.
   const sealedBidEnabled = isAdmin && (language === 'en' || language === 'he');
+  // Crossword has a baked puzzle pool for every locale (falls back to EN).
+  const crosswordEnabled = isAdmin;
   const visibleModes = MODES.filter((m) => {
     if (m.mode === 'word-tower') return wordTowerEnabled;
     if (m.mode === 'shiritori') return shiritoriEnabled;
     if (m.mode === 'sealed-bid') return sealedBidEnabled;
+    if (m.mode === 'crossword') return crosswordEnabled;
     return true;
   });
 

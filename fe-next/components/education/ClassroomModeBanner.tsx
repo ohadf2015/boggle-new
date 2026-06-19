@@ -36,6 +36,7 @@ const MODE_ICON: Record<GameMode, typeof LayoutGrid> = {
   'word-tower': Building2,
   shiritori: Link2,
   'sealed-bid': Gavel,
+  crossword: Grid3x3,
 };
 
 const MODE_TRANSLATION_KEY: Record<GameMode, string> = {
@@ -46,6 +47,7 @@ const MODE_TRANSLATION_KEY: Record<GameMode, string> = {
   'word-tower': 'wordTower',
   shiritori: 'shiritori',
   'sealed-bid': 'sealedBid',
+  crossword: 'crossword',
 };
 
 function boardSizeLabel(size?: string): string {

@@ -33,6 +33,7 @@ const WordTowerVersus = dynamic(
 );
 import { ShiritoriVersus } from '@/components/multiplayer/shiritori/ShiritoriVersus';
 import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
+import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
@@ -329,6 +330,17 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     return (
       <>
         <SealedBidVersus socket={socket} username={username} onQuit={handleStopGameClick} />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
+        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+      </>
+    );
+  }
+
+  // Crossword race — all players solve the same puzzle, no shared grid
+  if (gameMode === 'crossword') {
+    return (
+      <>
+        <CrosswordVersus socket={socket} username={username} onQuit={handleStopGameClick} />
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
       </>

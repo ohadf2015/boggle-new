@@ -15,6 +15,7 @@ const MODE_KEY_MAP: Record<GameMode, string> = {
   'word-tower': 'wordTower',
   shiritori: 'shiritori',
   'sealed-bid': 'sealedBid',
+  crossword: 'crossword',
 };
 
 const GAME_MODES: { key: GameMode; icon: typeof LayoutGrid; color: string }[] = [

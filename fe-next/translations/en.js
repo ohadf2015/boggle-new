@@ -44,6 +44,15 @@ const en = {
     "sampleWord": "CAT"
   },
   "crossword": {
+    "mp": {
+      "title": "Crossword Race",
+      "waiting": "Setting up the race…",
+      "standings": "Standings",
+      "done": "Done!",
+      "youFinished": "You finished! 🏁",
+      "youWin": "You win the race!",
+      "wins": "wins the race!"
+    },
     "name": "Crossword",
     "tagline": "Fill the grid, one clue at a time",
     "title": "Crossword",

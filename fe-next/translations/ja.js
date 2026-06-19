@@ -44,6 +44,15 @@ const ja = {
     "sampleWord": "さくら"
   },
   "crossword": {
+    "mp": {
+      "title": "クロスワードレース",
+      "waiting": "レースを準備中…",
+      "standings": "順位",
+      "done": "完成！",
+      "youFinished": "完成しました！🏁",
+      "youWin": "レースに勝利！",
+      "wins": "がレースに勝利！"
+    },
     "name": "クロスワード",
     "tagline": "ヒントを頼りにマスを埋めよう",
     "title": "クロスワード",

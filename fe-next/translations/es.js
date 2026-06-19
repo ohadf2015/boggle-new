@@ -44,6 +44,15 @@ const es = {
     "sampleWord": "SOL"
   },
   "crossword": {
+    "mp": {
+      "title": "Carrera de Crucigrama",
+      "waiting": "Preparando la carrera…",
+      "standings": "Clasificación",
+      "done": "¡Listo!",
+      "youFinished": "¡Terminaste! 🏁",
+      "youWin": "¡Ganas la carrera!",
+      "wins": "¡gana la carrera!"
+    },
     "name": "Crucigrama",
     "tagline": "Rellena la cuadrícula, pista a pista",
     "title": "Crucigrama",

@@ -33,6 +33,7 @@ const WordTowerVersus = dynamic(
 // dynamic above because it pulls the pixi scene.
 import { ShiritoriVersus } from '@/components/multiplayer/shiritori/ShiritoriVersus';
 import { SealedBidVersus } from '@/components/multiplayer/sealedBid/SealedBidVersus';
+import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVersus';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
@@ -335,6 +336,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Sealed Bid — secret auction bids, no letter grid
   if (gameMode === 'sealed-bid') {
     return <SealedBidVersus socket={socket} username={username} onQuit={onExitRoom} />;
+  }
+
+  // Crossword race — all players solve the same puzzle, no letter grid
+  if (gameMode === 'crossword') {
+    return <CrosswordVersus socket={socket} username={username} onQuit={onExitRoom} />;
   }
 
   // Use letterGrid or shufflingGrid

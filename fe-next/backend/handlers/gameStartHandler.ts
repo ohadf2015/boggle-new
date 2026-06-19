@@ -59,6 +59,19 @@ import { initShiritoriState } from '../modules/shiritoriManager.js';
 import { initSealedBidState } from '../modules/sealedBidManager.js';
 import { armSealedBidFirstRound } from './sealedBidHandler.js';
 import { pickRounds as pickSealedBidRacks, ROUNDS_PER_GAME as SEALED_BID_ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
+import { initCrosswordMpState } from '../modules/crosswordMpManager.js';
+import { getPool as getCrosswordPool, getDailyPuzzle as getDailyCrossword } from '@/lib/crossword/puzzles/index';
+import type { PuzzleLocale as CrosswordLocale } from '@/lib/crossword/types';
+
+/** Deterministic non-negative seed from a room key (FNV-1a) for picking a puzzle. */
+function crosswordRoomSeed(key: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < key.length; i++) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
 import { getSupabase } from '../modules/supabase/client.js';
 import { autoAddBotsForSoloPlayer } from '../services/gameLifecycle/autoAddBots.js';
 import { scheduleRoundEvent } from '../modules/roundEventsManager.js';
@@ -332,7 +345,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // via random roll (not in ALL_GAME_MODES). Decision routes through the shared
     // canAccessInWorkMode chokepoint (lib/auth/inWorkModeAccess.ts) so future
     // in-work modes inherit beta access for free.
-    if (resolvedMode === 'word-tower' || resolvedMode === 'shiritori' || resolvedMode === 'sealed-bid') {
+    if (resolvedMode === 'word-tower' || resolvedMode === 'shiritori' || resolvedMode === 'sealed-bid' || resolvedMode === 'crossword') {
       const iwHostUser = Object.values(game.users).find((u) => u.isHost);
       const iwHostAuthId = iwHostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
       const iwSupabase = getSupabase();
@@ -356,7 +369,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       if (!inWorkAllowed) {
         gamesStarting.delete(gameCode);
         logger.debug('SOCKET', `Rejected in-work mode ${resolvedMode} for ${gameCode}: host lacks access or wrong language`);
-        const modeName = resolvedMode === 'shiritori' ? 'Shiritori' : resolvedMode === 'sealed-bid' ? 'Sealed Bid' : 'Word Tower';
+        const modeName = resolvedMode === 'shiritori' ? 'Shiritori' : resolvedMode === 'sealed-bid' ? 'Sealed Bid' : resolvedMode === 'crossword' ? 'Crossword' : 'Word Tower';
         emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: `${modeName} is in beta` });
         return;
       }
@@ -510,7 +523,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // auction): the bot AI has no move logic for them, so auto-filled bots would
     // stall a Shiritori turn forever / never lock a Sealed Bid round. These modes
     // are invite-a-human modes; started solo they degrade to single-player practice.
-    const HUMAN_ONLY_MODES: GameMode[] = ['shiritori', 'sealed-bid'];
+    const HUMAN_ONLY_MODES: GameMode[] = ['shiritori', 'sealed-bid', 'crossword'];
     const autoAddResult = HUMAN_ONLY_MODES.includes(resolvedMode)
       ? { botsAdded: 0 }
       : await autoAddBotsForSoloPlayer(gameCode, game);
@@ -591,6 +604,23 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const currentGame = getGame(gameCode);
       if (currentGame) {
         currentGame.sealedBidState = sealedBidState;
+      }
+    }
+
+    // Initialize Crossword race state if needed: pick ONE shared puzzle (seeded by
+    // the room so different rooms get different grids, deterministic per room) and
+    // broadcast it; every player solves the same grid. Humans only.
+    if (resolvedMode === 'crossword') {
+      const pool = getCrosswordPool(gameLang as CrosswordLocale);
+      let puzzle = null;
+      if (pool.length > 0) {
+        const seed = crosswordRoomSeed(`${gameCode}:${game.gameSessionId ?? ''}`);
+        puzzle = pool[seed % pool.length];
+      }
+      if (!puzzle) puzzle = getDailyCrossword(new Date().toISOString().slice(0, 10), gameLang as CrosswordLocale);
+      const currentGame = getGame(gameCode);
+      if (currentGame && puzzle) {
+        currentGame.crosswordMpState = initCrosswordMpState(humanUsernames, puzzle);
       }
     }
 
@@ -683,6 +713,21 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
           totalRounds: sb.racks.length,
         });
         armSealedBidFirstRound(io, gameCode);
+      }
+    }
+
+    // Broadcast the shared Crossword puzzle AFTER startGame so the client can mount
+    // the race view and subscribe; reconnects poll requestCrosswordMpState.
+    if (resolvedMode === 'crossword') {
+      const cg = getGame(gameCode);
+      const cw = cg?.crosswordMpState;
+      if (cw) {
+        broadcastToRoom(io, getGameRoom(gameCode), 'crosswordMpInit', {
+          puzzle: cw.puzzle,
+          players: cw.players,
+          standings: cw.players.map((username, i) => ({ username, percent: 0, solved: false, elapsedMs: 0, score: 0, rank: i + 1 })),
+          startedAt: cw.startedAt,
+        });
       }
     }
 

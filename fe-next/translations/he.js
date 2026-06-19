@@ -44,6 +44,15 @@ const he = {
     "sampleWord": "ספר"
   },
   "crossword": {
+    "mp": {
+      "title": "מירוץ תשבץ",
+      "waiting": "מכינים את המירוץ…",
+      "standings": "דירוג",
+      "done": "סיים!",
+      "youFinished": "סיימת! 🏁",
+      "youWin": "ניצחת במירוץ!",
+      "wins": "ניצח במירוץ!"
+    },
     "name": "תשבץ",
     "tagline": "מלאו את הלוח, רמז אחר רמז",
     "title": "תשבץ",

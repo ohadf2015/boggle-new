@@ -21,7 +21,7 @@ export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
  * - Standalone modes (daily / adventure / endless / drill / single player)
  *   which have their own local types in their respective modules.
  */
-export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'shiritori' | 'sealed-bid';
+export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'shiritori' | 'sealed-bid' | 'crossword';
 export type GameModeSelection = GameMode | 'random';
 
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
@@ -275,6 +275,8 @@ export interface Game {
   shiritoriState?: ShiritoriModeState | null;
   /** Sealed Bid auction state (present during sealed-bid games) */
   sealedBidState?: SealedBidModeState | null;
+  /** Crossword race state (present during crossword MP games) */
+  crosswordMpState?: CrosswordMpModeState | null;
 }
 
 export interface RoomPlayerAvatar {
@@ -407,6 +409,26 @@ export interface SealedBidModeState {
   startedAt: number;
   /** Absolute epoch ms by which bids for the current round must be in. */
   roundDeadline: number;
+}
+
+/** One player's live progress in a Crossword race. */
+export interface CrosswordMpPlayerProgress {
+  /** 0..100 correct-cell completion. */
+  percent: number;
+  solved: boolean;
+  elapsedMs: number;
+  score: number;
+}
+
+/** Crossword race (parallel-race) multiplayer mode state. All players solve the
+ *  SAME puzzle simultaneously; the server aggregates progress + ranks finishers. */
+export interface CrosswordMpModeState {
+  players: string[];
+  /** The shared CrosswordPuzzle JSON. Typed `unknown` to avoid a shared→lib dep;
+   *  the client casts it to CrosswordPuzzle. */
+  puzzle: unknown;
+  progress: Record<string, CrosswordMpPlayerProgress>;
+  startedAt: number;
 }
 
 // ==================== Tournament Types ====================

@@ -271,6 +271,17 @@ export const SubmitSealedBidSchema = z.object({
 });
 
 /**
+ * submitCrosswordProgress event payload — a player's live progress in a Crossword
+ * race. The server clamps/validates; clients report on each word solved.
+ */
+export const SubmitCrosswordProgressSchema = z.object({
+  percent: z.number().min(0).max(100),
+  solved: z.boolean(),
+  elapsedMs: z.number().min(0).max(36_000_000),
+  score: z.number().min(0).max(100_000),
+});
+
+/**
  * submitWordVote event payload - voting on community words
  * Note: voteType must be 'like' or 'dislike' to match database constraint
  */
@@ -458,6 +469,7 @@ export const ClientEventSchemas = {
   submitWheelWord: SubmitWheelWordSchema,
   submitShiritoriWord: SubmitShiritoriWordSchema,
   submitSealedBid: SubmitSealedBidSchema,
+  submitCrosswordProgress: SubmitCrosswordProgressSchema,
   submitWordVote: SubmitWordVoteSchema,
   submitPeerValidationVote: SubmitPeerValidationVoteSchema,
   sendChatMessage: ChatMessageSchema,
@@ -572,6 +584,7 @@ export type ScrambleTowerData = z.infer<typeof ScrambleTowerSchema>;
 export type SendTowerBombData = z.infer<typeof SendTowerBombSchema>;
 export type SubmitShiritoriWordData = z.infer<typeof SubmitShiritoriWordSchema>;
 export type SubmitSealedBidData = z.infer<typeof SubmitSealedBidSchema>;
+export type SubmitCrosswordProgressData = z.infer<typeof SubmitCrosswordProgressSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
 export type AddBotData = z.infer<typeof AddBotSchema>;
 export type RemoveBotData = z.infer<typeof RemoveBotSchema>;

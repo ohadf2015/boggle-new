@@ -115,6 +115,15 @@ const sv = {
     }
   },
   "crossword": {
+    "mp": {
+      "title": "Korsordskapplöpning",
+      "waiting": "Förbereder loppet…",
+      "standings": "Ställning",
+      "done": "Klar!",
+      "youFinished": "Du blev klar! 🏁",
+      "youWin": "Du vinner loppet!",
+      "wins": "vinner loppet!"
+    },
     "name": "Korsord",
     "tagline": "Fyll i rutnätet, en ledtråd i taget",
     "title": "Korsord",

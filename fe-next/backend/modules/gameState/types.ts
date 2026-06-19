@@ -3,7 +3,7 @@
  * Centralized type definitions for game state management
  */
 
-import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState, ShiritoriModeState as SharedShiritoriModeState, SealedBidModeState as SharedSealedBidModeState } from '@/shared/types/game';
+import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState, ShiritoriModeState as SharedShiritoriModeState, SealedBidModeState as SharedSealedBidModeState, CrosswordMpModeState as SharedCrosswordMpModeState } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { VersusMatchState } from '@/lib/wordTower/versusMatch';
 
@@ -66,6 +66,7 @@ export type WordHuntState = SharedWordHuntModeState;
 export type WheelRushState = SharedWheelRushModeState;
 export type ShiritoriState = SharedShiritoriModeState;
 export type SealedBidState = SharedSealedBidModeState;
+export type CrosswordMpState = SharedCrosswordMpModeState;
 
 // Game state interface
 export interface GameState {
@@ -132,6 +133,7 @@ export interface GameState {
   wheelRushState?: WheelRushState | null;
   shiritoriState?: ShiritoriState | null;
   sealedBidState?: SealedBidState | null;
+  crosswordMpState?: CrosswordMpState | null;
   wordTowerVersusState?: VersusMatchState | null;
   kickedPlayers?: Set<string>;
   /** O(1) duplicate-word lookup set, parallel to playerWords (not persisted to Redis) */

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { Shuffle, FileText, Bomb, Crosshair, Disc3, Building2, Link2, Gavel } from 'lucide-react';
+import { Shuffle, FileText, Bomb, Crosshair, Disc3, Building2, Link2, Gavel, Grid3x3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { GameMode } from '@/shared/types/game';
 
@@ -30,6 +30,7 @@ export const MODE_ICONS: Record<GameModeOption, React.ReactNode> = {
   'word-tower': <Building2 className="w-4 h-4" />,
   shiritori: <Link2 className="w-4 h-4" />,
   'sealed-bid': <Gavel className="w-4 h-4" />,
+  crossword: <Grid3x3 className="w-4 h-4" />,
 };
 
 export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
@@ -41,6 +42,7 @@ export const MODE_ACTIVE_COLORS: Record<GameModeOption, string> = {
   'word-tower': 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
   shiritori: 'bg-neo-purple/30 text-neo-purple border-neo-purple/60',
   'sealed-bid': 'bg-neo-pink/30 text-neo-pink border-neo-pink/60',
+  crossword: 'bg-neo-cyan/30 text-neo-cyan border-neo-cyan/60',
 };
 
 const MODE_GLOW: Record<GameModeOption, string> = {
@@ -52,6 +54,7 @@ const MODE_GLOW: Record<GameModeOption, string> = {
   'word-tower': 'shadow-[0_0_10px_rgba(139,92,246,0.25)]',
   shiritori: 'shadow-[0_0_10px_rgba(139,92,246,0.25)]',
   'sealed-bid': 'shadow-[0_0_10px_rgba(255,20,147,0.25)]',
+  crossword: 'shadow-[0_0_10px_rgba(0,255,255,0.25)]',
 };
 
 export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']): string {
@@ -64,6 +67,7 @@ export function getModeLabel(mode: GameModeOption, t: GameModeSelectorProps['t']
     'word-tower': t('wordTower.cardTitle'),
     shiritori: t('gameModes.shiritori.name'),
     'sealed-bid': t('gameModes.sealedBid.name'),
+    crossword: t('gameModes.crossword.name'),
   };
   return labels[mode];
 }
@@ -82,6 +86,7 @@ export function getModeDescription(mode: GameModeOption, t: GameModeSelectorProp
     'word-tower': t('wordTower.cardDesc'),
     shiritori: t('gameModes.shiritori.description'),
     'sealed-bid': t('gameModes.sealedBid.description'),
+    crossword: t('gameModes.crossword.description'),
   };
   return descriptions[mode];
 }

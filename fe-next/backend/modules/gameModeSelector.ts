@@ -19,6 +19,8 @@ export const GAME_MODE_WEIGHTS: Record<GameMode, number> = {
   'shiritori': 0,
   // Sealed Bid is an admin/beta auction mode — never auto-rotated.
   'sealed-bid': 0,
+  // Crossword race is an admin/beta parallel-race mode — never auto-rotated.
+  'crossword': 0,
 };
 
 /**
