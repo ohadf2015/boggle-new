@@ -75,6 +75,7 @@ import { PHONE_DIMS } from '@/lib/word-craft/boardDimensions';
 import { resolveChallengerIdentity } from '@/lib/word-craft/challengerIdentity';
 import { WordCraftDuelTargetStrip } from '@/components/word-craft/WordCraftDuelTargetStrip';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 const ENCOURAGEMENT_COUNT = 8;
 const LINGUIST_STORAGE_KEY = 'wc_locales_played';
@@ -1259,6 +1260,8 @@ export default function WordCraftPageClient() {
           onHome={() => router.push(`/${language}`)}
         />
       ) : null}
+
+      <ModeCoach mode="wordCraft" />
     </div>
   );
 }

@@ -21,6 +21,7 @@ import type { LetterGrid } from '@/shared/types/game';
 import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
 
@@ -362,6 +363,10 @@ function SinglePlayerGame({
     </div>
   ) : null;
 
+  const modeCoachElement = settings.mode !== 'practice' ? (
+    <ModeCoach mode="classic" />
+  ) : null;
+
   // Landscape layout
   if (core.isLandscape) {
     return (
@@ -370,6 +375,7 @@ function SinglePlayerGame({
         {scorePopupElement}
         {practicePromptElement}
         {practiceCoachElement}
+        {modeCoachElement}
         <LandscapeGameLayout
           {...commonProps}
           progressBarExpanded={core.progressBarExpanded}
@@ -389,6 +395,7 @@ function SinglePlayerGame({
         {scorePopupElement}
         {practicePromptElement}
         {practiceCoachElement}
+        {modeCoachElement}
         <DesktopGameLayout
           {...commonProps}
           targetHighScore={core.targetHighScore}
@@ -407,6 +414,7 @@ function SinglePlayerGame({
       {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}
+      {modeCoachElement}
       <PortraitGameLayout
         {...commonProps}
         targetHighScore={core.targetHighScore}
