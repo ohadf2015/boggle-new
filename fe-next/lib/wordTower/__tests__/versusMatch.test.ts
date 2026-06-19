@@ -43,9 +43,9 @@ describe('versusMatch — init', () => {
 describe('versusMatch — submit', () => {
   it('raises the submitting player height on a valid word; leaves others untouched', () => {
     let m = twoPlayerMatch();
-    // Build a word from a's anchor + two tray tiles (dict accepts all).
+    // Build a 3-tile word from a's wheel (no chain anchor; dict accepts all).
     const a = m.players.a.game;
-    const word = a.anchorLetter + a.tray[0] + a.tray[1];
+    const word = a.tray[0] + a.tray[1] + a.tray[2];
     const out = submitVersusWord(m, 'a', word, acceptAll);
     expect(out.accepted).toBe(true);
     expect(out.state.players.a.game.floors).toHaveLength(1);
@@ -60,7 +60,7 @@ describe('versusMatch — submit', () => {
   it('rejects a non-dictionary word', () => {
     const m = twoPlayerMatch();
     const a = m.players.a.game;
-    const word = a.anchorLetter + a.tray[0] + a.tray[1];
+    const word = a.tray[0] + a.tray[1] + a.tray[2];
     expect(submitVersusWord(m, 'a', word, () => false)).toMatchObject({ accepted: false, error: 'not_in_dictionary' });
   });
 });

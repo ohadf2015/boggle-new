@@ -127,17 +127,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // "N words possible" hint — how many dictionary words the player could build
   // from the current anchor + tray (recomputed only when those change).
   const possibleWords = useMemo(
-    () => (dictionary ? countBuildableWords(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
-    [dictionary, game.anchorLetter, game.tray, game.usedWords],
+    () => (dictionary ? countBuildableWords(dictionary, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
+    [dictionary, game.tray, game.usedWords],
   );
   const clueWord = useMemo(
-    () => (dictionary ? pickClueWord(dictionary, game.anchorLetter, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
-    [dictionary, game.anchorLetter, game.tray, game.usedWords],
+    () => (dictionary ? pickClueWord(dictionary, game.tray, WORD_TOWER_MIN_WORD_LEN, game.usedWords) : null),
+    [dictionary, game.tray, game.usedWords],
   );
-  // Dead-end escape: re-anchor to a letter that actually has buildable words.
+  // Dead-end escape: spin a fresh wheel that actually has buildable words left.
   const reroll = useCallback(
-    () => tower.reroll(dictionary ? (a, tr) => countBuildableWords(dictionary, a, tr, WORD_TOWER_MIN_WORD_LEN) > 0 : undefined),
-    [tower, dictionary],
+    () => tower.reroll(dictionary ? (wheel) => countBuildableWords(dictionary, wheel, WORD_TOWER_MIN_WORD_LEN, game.usedWords) > 0 : undefined),
+    [tower, dictionary, game.usedWords],
   );
 
   // ── audio (declared before the feedback effects below that fire these sounds) ──
@@ -999,6 +999,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           onDeckHeight={onDeckHeight}
           pendingWord={tower.state.pendingWord}
           onCraneDrop={triggerCraneDrop}
+          accentHex={blockColorHex}
+          reducedMotion={reducedMotion}
           t={t}
           dir={dir}
         />

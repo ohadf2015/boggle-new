@@ -12,6 +12,8 @@ import type { Language } from '@/shared/types/game';
 import { normalizeWord, sanitizeWord } from '@/shared/utils/wordNormalization';
 import {
   WORD_TOWER_TRAY_SIZE,
+  WORD_TOWER_WHEEL_SIZE,
+  WORD_TOWER_WHEEL_MIN_VOWELS,
   WORD_TOWER_MIN_WORD_LEN,
   WORD_TOWER_SCRAMBLES_START,
   WORD_TOWER_SCRAMBLES_MAX_BANKED,
@@ -26,6 +28,7 @@ import {
   WORD_TOWER_BOMB_CHARGE_BY_LEN,
   WORD_TOWER_BIOMES,
   WORD_TOWER_LETTER_BAGS,
+  WORD_TOWER_VOWELS,
   type WordTowerBiomeId,
 } from '@/shared/constants/wordTowerConstants';
 import { mulberry32, fnv1aHash } from '@/lib/rng/seededRandom';
@@ -92,57 +95,55 @@ export function generateTray(
   return out;
 }
 
-// Letters too low-yield to be a fair COLD-OPEN anchor (the very first chain link
-// has no prior context, so a rare starter can strand the player on word #1). The
-// frequency-weighted bag already makes these rare; this guarantees they never
-// open a daily. Mid-run anchors are unaffected — only the initial pick filters.
-const WEAK_ANCHOR_LETTERS: Record<Language, string> = {
-  en: 'QZX', sv: 'QZXWC', es: 'QZXWK', he: 'זטצ', ja: '', fr: 'QZXWK', de: 'QXY',
-};
-
-function pickAnchor(gameCode: string, playerId: string, language: Language, avoidWeak = false): string {
-  const full = [...(WORD_TOWER_LETTER_BAGS[language] || '')];
-  if (full.length === 0) return '';
-  const weak = avoidWeak ? (WEAK_ANCHOR_LETTERS[language] || '') : '';
-  const bag = weak ? full.filter((c) => !weak.includes(c)) : full;
-  const pool = bag.length > 0 ? bag : full;
-  const rng = mulberry32(fnv1aHash(`word-tower-${gameCode}-${playerId}-anchor`));
-  return pool[Math.floor(rng() * pool.length)];
+/**
+ * Spin a fresh word WHEEL: a small fixed ring of frequency-weighted letters the
+ * player spells MANY words from (reused, not consumed) until they scramble. To
+ * keep the small ring almost always solvable it is SEEDED with a guaranteed
+ * minimum of vowels before the rest is drawn from the full bag, then shuffled
+ * deterministically so the vowels aren't always in the same slots.
+ */
+export function generateWheel(
+  gameCode: string,
+  playerId: string,
+  language: Language,
+  drawIndex = 0,
+  count: number = WORD_TOWER_WHEEL_SIZE,
+  minVowels: number = WORD_TOWER_WHEEL_MIN_VOWELS,
+): string[] {
+  const bag = [...(WORD_TOWER_LETTER_BAGS[language] || '')];
+  if (bag.length === 0) return [];
+  const vowelSet = WORD_TOWER_VOWELS[language] || '';
+  const vowelBag = bag.filter((c) => vowelSet.includes(c));
+  const rng = mulberry32(fnv1aHash(`word-tower-wheel-${gameCode}-${playerId}-${drawIndex}`));
+  const out: string[] = [];
+  const wantVowels = vowelBag.length > 0 ? Math.min(minVowels, count) : 0;
+  for (let i = 0; i < wantVowels; i++) out.push(vowelBag[Math.floor(rng() * vowelBag.length)]);
+  while (out.length < count) out.push(bag[Math.floor(rng() * bag.length)]);
+  // Fisher–Yates (seeded) so the guaranteed vowels land in varied positions.
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
 }
 
-// --- buildability: word must be formable from the tray, with the anchor letter
-//     providing exactly one free instance of the required start letter ---
+// --- buildability: word must be formable from the wheel letters, each wheel
+//     tile usable at most once per word (no chain anchor — the word stands on
+//     its own letters). The wheel is REUSED across words, never consumed. ---
 export function isBuildable(
   word: string,
-  tray: string[],
-  anchorLetter: string,
+  wheel: string[],
   language: Language,
 ): boolean {
   const w = canon(word, language);
   const avail = new Map<string, number>();
-  // The anchor (1 or 2 chars) supplies its letters free — they're the shared connector.
-  for (const ach of anchorLetter) avail.set(ach, (avail.get(ach) || 0) + 1);
-  for (const t of tray) avail.set(t, (avail.get(t) || 0) + 1);
+  for (const t of wheel) avail.set(t, (avail.get(t) || 0) + 1);
   for (const ch of w) {
     const n = avail.get(ch) || 0;
     if (n <= 0) return false;
     avail.set(ch, n - 1);
   }
   return true;
-}
-
-function consumeFromTray(tray: string[], canonWord: string, anchorLetter: string): string[] {
-  const need = new Map<string, number>();
-  for (const ch of canonWord) need.set(ch, (need.get(ch) || 0) + 1);
-  // The anchor (1 or 2 chars) supplies its letters free (not tray tiles).
-  for (const ach of anchorLetter) { const n = need.get(ach) || 0; if (n > 0) need.set(ach, n - 1); }
-  const out: string[] = [];
-  for (const t of tray) {
-    const n = need.get(t) || 0;
-    if (n > 0) need.set(t, n - 1);
-    else out.push(t);
-  }
-  return out;
 }
 
 // --- scoring math ---
@@ -225,12 +226,16 @@ export interface InitOpts {
   gameCode: string;
   playerId: string;
   language: Language;
-  /** Daily: exclude low-yield letters from the COLD-OPEN anchor (no Q/Z/X strand). */
+  /**
+   * @deprecated No-op since the chain was retired — there is no cold-open anchor
+   * to protect any more (the wheel's guaranteed vowels keep the daily solvable).
+   * Kept so existing daily callers compile unchanged.
+   */
   avoidWeakAnchor?: boolean;
 }
 
 export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
-  const { gameCode, playerId, language, avoidWeakAnchor } = opts;
+  const { gameCode, playerId, language } = opts;
   return {
     gameCode,
     playerId,
@@ -238,8 +243,10 @@ export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
     floors: [],
     heightM: 0,
     combo: 0,
-    anchorLetter: pickAnchor(gameCode, playerId, language, avoidWeakAnchor),
-    tray: generateTray(gameCode, playerId, language, 0),
+    // Chain retired: there is no required start letter, so the anchor is empty.
+    // The field is kept (always '') for save/versus-prototype shape compatibility.
+    anchorLetter: '',
+    tray: generateWheel(gameCode, playerId, language, 0),
     scramblesLeft: WORD_TOWER_SCRAMBLES_START,
     scramblesEarned: 0,
     bombCharge: 0,
@@ -279,8 +286,9 @@ export function validateTowerWord(
   const { language } = state;
   const w = canon(word, language);
   if (w.length < WORD_TOWER_MIN_WORD_LEN) return { accepted: false, error: 'too_short' };
-  if (!canon(word, language).startsWith(state.anchorLetter)) return { accepted: false, error: 'bad_chain' };
-  if (!isBuildable(word, state.tray, state.anchorLetter, language)) return { accepted: false, error: 'not_buildable' };
+  // Chain retired — a word no longer has to start with any anchor letter; it only
+  // has to be spellable from the wheel, unused, and real.
+  if (!isBuildable(word, state.tray, language)) return { accepted: false, error: 'not_buildable' };
   if (state.usedWords.has(w)) return { accepted: false, error: 'duplicate' };
   if (!isInDictionary(w)) return { accepted: false, error: 'not_in_dictionary' };
   return { accepted: true };
@@ -346,16 +354,8 @@ export function applyTowerWord(
     state.scramblesLeft + earned + surprise.bonusScrambles,
   );
 
-  const remaining = consumeFromTray(state.tray, w, state.anchorLetter);
-  const refill = generateTray(
-    state.gameCode,
-    state.playerId,
-    language,
-    state.trayDraws,
-    WORD_TOWER_TRAY_SIZE - remaining.length,
-  );
-  const tray = [...remaining, ...refill];
-
+  // The wheel is REUSED — letters are not consumed, so the ring stays put. The
+  // player keeps spelling fresh words from it until they scramble for a new ring.
   const usedWords = new Set(state.usedWords);
   usedWords.add(w);
 
@@ -366,9 +366,9 @@ export function applyTowerWord(
     floors: [...state.floors, { word: w, len, meters, placementMultiplier }],
     heightM,
     combo,
-    anchorLetter: nextChainAnchor(word, language),
-    tray,
-    trayDraws: state.trayDraws + 1,
+    // No chain: the anchor stays empty; the wheel carries over unchanged.
+    anchorLetter: '',
+    tray: state.tray,
     scramblesLeft,
     scramblesEarned: state.scramblesEarned + earned + surprise.bonusScrambles,
     bombCharge: state.bombCharge + chargeGained,
@@ -397,10 +397,10 @@ export function applyTowerWord(
   };
 }
 
-/** Reroll the whole tray. Costs one scramble and breaks the combo; anchor unchanged. */
+/** Spin a fresh wheel. Costs one scramble and breaks the combo. */
 export function scrambleTray(state: WordTowerPlayerState): WordTowerPlayerState {
   if (state.scramblesLeft <= 0) return state;
-  const tray = generateTray(state.gameCode, state.playerId, state.language, state.trayDraws, WORD_TOWER_TRAY_SIZE);
+  const tray = generateWheel(state.gameCode, state.playerId, state.language, state.trayDraws);
   return {
     ...state,
     tray,
@@ -411,33 +411,29 @@ export function scrambleTray(state: WordTowerPlayerState): WordTowerPlayerState 
 }
 
 /**
- * Escape a dead-end chain. Shiritori forces the next word to start with the
- * previous word's last letter — a word ending in a low-yield letter (Hebrew
- * ו/ה, English vowels) can strand the player with zero buildable words and no
- * way out (scramble keeps the anchor). This picks a FRESH anchor + tray to begin
- * a new chain link, breaking the combo. When `isViableAnchor` is supplied (the
- * client passes a dictionary check) it retries until the new anchor actually has
- * buildable words, so it never re-strands you. Free — the broken combo is the
- * only cost.
+ * Spin a FREE fresh wheel — the dead-end escape. When the player has exhausted
+ * (or can't see) the words in the current ring, this hands them a brand-new ring
+ * at no scramble cost; the broken combo is the only price. When `isViable` is
+ * supplied (the client passes a dictionary check) it retries until the new wheel
+ * actually has buildable words, so it never re-strands the player.
+ *
+ * Named `rerollStart` for historical/import compatibility (it used to re-anchor
+ * the chain); it now simply re-spins the wheel.
  */
 export function rerollStart(
   state: WordTowerPlayerState,
-  isViableAnchor?: (anchor: string, tray: string[]) => boolean,
+  isViable?: (wheel: string[]) => boolean,
 ): WordTowerPlayerState {
-  const bag = [...(WORD_TOWER_LETTER_BAGS[state.language] || '')];
-  if (bag.length === 0) return state;
+  if ((WORD_TOWER_LETTER_BAGS[state.language] || '').length === 0) return state;
   let draw = state.trayDraws;
-  let anchorLetter = state.anchorLetter;
   let tray = state.tray;
   for (let attempt = 0; attempt < 16; attempt++) {
-    const a = bag[Math.floor(mulberry32(fnv1aHash(`word-tower-${state.gameCode}-${state.playerId}-reanchor-${draw}`))() * bag.length)];
-    const tr = generateTray(state.gameCode, state.playerId, state.language, draw + 1, WORD_TOWER_TRAY_SIZE);
-    anchorLetter = a;
+    const tr = generateWheel(state.gameCode, state.playerId, state.language, draw + 1);
     tray = tr;
     draw += 2;
-    if (!isViableAnchor || isViableAnchor(a, tr)) break;
+    if (!isViable || isViable(tr)) break;
   }
-  return { ...state, anchorLetter, tray, trayDraws: draw, combo: 0 };
+  return { ...state, anchorLetter: '', tray, trayDraws: draw, combo: 0 };
 }
 
 export interface DamageResult {
@@ -450,11 +446,11 @@ export interface DamageResult {
 
 /**
  * Environmental hazard hit: topple the top `floorsToRemove` floors off the tower
- * (bomb / hurricane). Height drops by the lost floors' metres, the combo breaks,
- * and the chain re-anchors to whatever floor is now on top (a fresh anchor if the
- * tower is emptied). The high-water mark is deliberately preserved so re-climbing
- * can't farm scrambles. Pure — the scene reconciles the shorter `floors` array by
- * popping the missing tiles, which IS the "your building was ruined" visual.
+ * (bomb / hurricane). Height drops by the lost floors' metres and the combo
+ * breaks. The wheel is untouched (no chain to re-anchor). The high-water mark is
+ * deliberately preserved so re-climbing can't farm scrambles. Pure — the scene
+ * reconciles the shorter `floors` array by popping the missing tiles, which IS
+ * the "your building was ruined" visual.
  */
 export function damageTower(state: WordTowerPlayerState, floorsToRemove: number): DamageResult {
   const remove = Math.min(Math.max(0, Math.floor(floorsToRemove)), state.floors.length);
@@ -464,12 +460,9 @@ export function damageTower(state: WordTowerPlayerState, floorsToRemove: number)
   const kept = state.floors.slice(0, cut);
   const metersLost = state.floors.slice(cut).reduce((s, f) => s + f.meters, 0);
   const heightM = Math.max(0, state.heightM - metersLost);
-  const anchorLetter = kept.length > 0
-    ? nextChainAnchor(kept[kept.length - 1]!.word, state.language)
-    : pickAnchor(state.gameCode, state.playerId, state.language);
 
   return {
-    state: { ...state, floors: kept, heightM, combo: 0, anchorLetter },
+    state: { ...state, floors: kept, heightM, combo: 0 },
     removed: remove,
     metersLost,
   };
@@ -538,7 +531,9 @@ export function restoreWordTowerState(
     ...base,
     heightM: Math.max(0, saved.heightM ?? 0),
     combo: Math.max(0, saved.combo ?? 0),
-    anchorLetter: saved.anchorLetter || base.anchorLetter,
+    // Chain retired: always empty, even when resuming a pre-wheel save whose blob
+    // still carries a stale anchor letter (it must never prefix the built word).
+    anchorLetter: '',
     scramblesLeft: Math.max(0, saved.scramblesLeft ?? base.scramblesLeft),
     bombCharge: Math.max(0, saved.bombCharge ?? 0),
     floors: Array.isArray(saved.floors) ? saved.floors : [],

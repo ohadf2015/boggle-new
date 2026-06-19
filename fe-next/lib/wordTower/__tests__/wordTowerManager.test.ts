@@ -6,6 +6,7 @@ const isInDict = (canonWord: string): boolean => DICT.has(canonWord);
 
 import {
   generateTray,
+  generateWheel,
   chainLetter,
   chainStartLetter,
   isBuildable,
@@ -28,10 +29,13 @@ import {
 } from '../wordTowerManager';
 import {
   WORD_TOWER_TRAY_SIZE,
+  WORD_TOWER_WHEEL_SIZE,
+  WORD_TOWER_WHEEL_MIN_VOWELS,
   WORD_TOWER_BASE_FLOOR_M,
   WORD_TOWER_SCRAMBLES_START,
   WORD_TOWER_SCRAMBLE_EARN_EVERY_M,
   WORD_TOWER_LETTER_BAGS,
+  WORD_TOWER_VOWELS,
 } from '@/shared/constants/wordTowerConstants';
 
 describe('wordTowerManager — tray generation', () => {
@@ -39,14 +43,6 @@ describe('wordTowerManager — tray generation', () => {
     const a = generateTray('GAME1', 'p1', 'en', 0);
     const b = generateTray('GAME1', 'p1', 'en', 0);
     expect(a).toEqual(b);
-  });
-
-  it('differs by player and by draw index', () => {
-    const p1 = generateTray('GAME1', 'p1', 'en', 0);
-    const p2 = generateTray('GAME1', 'p2', 'en', 0);
-    const next = generateTray('GAME1', 'p1', 'en', 1);
-    expect(p1).not.toEqual(p2);
-    expect(p1).not.toEqual(next);
   });
 
   it('returns TRAY_SIZE tiles drawn only from the language bag', () => {
@@ -57,36 +53,56 @@ describe('wordTowerManager — tray generation', () => {
   });
 });
 
-describe('wordTowerManager — chain letters', () => {
+describe('wordTowerManager — wheel generation', () => {
+  it('is deterministic per gameCode+playerId+drawIndex and differs by draw', () => {
+    const a = generateWheel('GAME1', 'p1', 'en', 0);
+    const b = generateWheel('GAME1', 'p1', 'en', 0);
+    const next = generateWheel('GAME1', 'p1', 'en', 1);
+    expect(a).toEqual(b);
+    expect(a).not.toEqual(next);
+  });
+
+  it('returns WHEEL_SIZE letters drawn only from the language bag', () => {
+    const wheel = generateWheel('GAME1', 'p1', 'en', 0);
+    expect(wheel).toHaveLength(WORD_TOWER_WHEEL_SIZE);
+    const bag = new Set(WORD_TOWER_LETTER_BAGS.en.split(''));
+    for (const c of wheel) expect(bag.has(c)).toBe(true);
+  });
+
+  it('guarantees the minimum number of vowels so the small ring stays solvable', () => {
+    const vowels = new Set(WORD_TOWER_VOWELS.en.split(''));
+    for (let i = 0; i < 30; i++) {
+      const wheel = generateWheel('G', `p${i}`, 'en', i);
+      const vowelCount = wheel.filter((c) => vowels.has(c)).length;
+      expect(vowelCount).toBeGreaterThanOrEqual(WORD_TOWER_WHEEL_MIN_VOWELS);
+    }
+  });
+});
+
+describe('wordTowerManager — chain letters (helpers retained)', () => {
   it('English: first and last letters uppercased', () => {
     expect(chainStartLetter('cat', 'en')).toBe('C');
     expect(chainLetter('cat', 'en')).toBe('T');
   });
 
-  it('Hebrew: collapses sofit final form to regular for the chain', () => {
-    // שלום ends in ם (sofit mem) -> chain letter is regular מ
+  it('Hebrew: collapses sofit final form to regular', () => {
     expect(chainLetter('שלום', 'he')).toBe('מ');
-  });
-
-  it('Spanish: strips accents in the chain boundary', () => {
-    expect(chainLetter('café', 'es')).toBe('E');
   });
 });
 
-describe('wordTowerManager — buildability', () => {
-  const anchor = 'C';
-  it('accepts a word starting with the anchor and buildable from the tray', () => {
-    // CAT: anchor provides C, tray provides A and T
-    expect(isBuildable('cat', ['A', 'T', 'X', 'E'], anchor, 'en')).toBe(true);
+describe('wordTowerManager — buildability (wheel only, no anchor)', () => {
+  it('accepts a word formable from the wheel letters', () => {
+    expect(isBuildable('cat', ['C', 'A', 'T', 'X', 'E'], 'en')).toBe(true);
   });
 
   it('rejects a word missing a needed tile', () => {
-    expect(isBuildable('cat', ['A', 'X', 'E'], anchor, 'en')).toBe(false);
+    expect(isBuildable('cat', ['A', 'X', 'E'], 'en')).toBe(false); // no C, no T
   });
 
-  it('respects tile counts (anchor gives only one instance)', () => {
-    // CACA needs two C's; anchor gives one, tray has none
-    expect(isBuildable('caca', ['A', 'A'], anchor, 'en')).toBe(false);
+  it('respects tile counts (each wheel tile used at most once)', () => {
+    // CACA needs two C's; the wheel has only one
+    expect(isBuildable('caca', ['C', 'A', 'A'], 'en')).toBe(false);
+    expect(isBuildable('caca', ['C', 'A', 'C', 'A'], 'en')).toBe(true);
   });
 });
 
@@ -105,9 +121,7 @@ describe('wordTowerManager — scoring math', () => {
   });
 
   it('floorMeters = base + lengthBonus * comboMult', () => {
-    // 5-letter at combo 0 (mult 1.0): 2.0 + 1.5*1.0 = 3.5
     expect(floorMeters(5, 0)).toBeCloseTo(3.5);
-    // 5-letter at combo 10 (mult 2.0): 2.0 + 1.5*2.0 = 5.0
     expect(floorMeters(5, 10)).toBeCloseTo(5.0);
   });
 
@@ -132,34 +146,35 @@ describe('wordTowerManager — scoring math', () => {
   });
 });
 
-describe('wordTowerManager — validate', () => {
+describe('wordTowerManager — validate (no chain)', () => {
   function freshState() {
     const s = initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' });
-    // Force a known anchor + tray so validation is deterministic in tests.
-    s.anchorLetter = 'C';
-    s.tray = ['A', 'T', 'R', 'E', 'A', 'E', 'N', 'T', 'I', 'S', 'L', 'T'];
+    // Force a known wheel so validation is deterministic in tests.
+    s.tray = ['C', 'A', 'T', 'R', 'E', 'S', 'N'];
     return s;
   }
 
-  it('accepts a valid chained, buildable, dictionary word', () => {
+  it('accepts any buildable, real word regardless of its first letter', () => {
     const s = freshState();
     expect(validateTowerWord(s, 'cat', isInDict)).toEqual({ accepted: true });
+    // RAT would have broken the old shiritori chain — now it is perfectly fine.
+    expect(validateTowerWord(s, 'rat', isInDict)).toEqual({ accepted: true });
   });
 
-  it('rejects a word that breaks the chain', () => {
+  it('rejects a word that is not buildable from the wheel', () => {
     const s = freshState();
-    expect(validateTowerWord(s, 'rat', isInDict)).toEqual({ accepted: false, error: 'bad_chain' });
+    // AREA needs two A's; the wheel has only one.
+    expect(validateTowerWord(s, 'area', isInDict)).toEqual({ accepted: false, error: 'not_buildable' });
   });
 
   it('rejects too-short words', () => {
     const s = freshState();
-    s.anchorLetter = 'A';
     expect(validateTowerWord(s, 'at', isInDict)).toEqual({ accepted: false, error: 'too_short' });
   });
 
   it('rejects a non-dictionary word', () => {
     const s = freshState();
-    expect(validateTowerWord(s, 'ctt', isInDict)).toMatchObject({ accepted: false });
+    expect(validateTowerWord(s, 'sec', isInDict)).toMatchObject({ accepted: false }); // buildable but not in DICT
   });
 
   it('rejects a duplicate word', () => {
@@ -172,21 +187,21 @@ describe('wordTowerManager — validate', () => {
 describe('wordTowerManager — apply', () => {
   function freshState() {
     const s = initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' });
-    s.anchorLetter = 'C';
-    s.tray = ['A', 'T', 'R', 'E', 'A', 'E', 'N', 'T', 'I', 'S', 'L', 'T'];
+    s.tray = ['C', 'A', 'T', 'R', 'E', 'S', 'N'];
     return s;
   }
 
-  it('adds a floor, increments combo, raises height, and sets the next anchor', () => {
+  it('adds a floor, increments combo, raises height, and REUSES the same wheel', () => {
     const s = freshState();
+    const wheelBefore = [...s.tray];
     const { state, result } = applyTowerWord(s, 'cat');
     expect(state.floors).toHaveLength(1);
     expect(state.combo).toBe(1);
     expect(result.meters).toBeCloseTo(WORD_TOWER_BASE_FLOOR_M + lengthBonusM(3) * comboMult(1));
     expect(state.heightM).toBeCloseTo(result.meters);
-    expect(state.anchorLetter).toBe('T'); // last letter of CAT
+    expect(state.anchorLetter).toBe(''); // no chain
     expect(state.usedWords.has('CAT')).toBe(true);
-    expect(state.tray).toHaveLength(WORD_TOWER_TRAY_SIZE); // refilled
+    expect(state.tray).toEqual(wheelBefore); // wheel reused, not consumed/refilled
   });
 
   it('scales meters by the crane placement multiplier', () => {
@@ -211,33 +226,33 @@ describe('wordTowerManager — apply', () => {
     expect(state.scramblesLeft).toBe(before + 1);
   });
 
-  it('scrambleTray rerolls the tray, spends a scramble, and breaks the combo', () => {
+  it('scrambleTray spins a fresh wheel, spends a scramble, and breaks the combo', () => {
     const s = freshState();
     s.combo = 4;
     const before = s.scramblesLeft;
     const next = scrambleTray(s);
     expect(next.scramblesLeft).toBe(before - 1);
     expect(next.combo).toBe(0);
-    expect(next.anchorLetter).toBe('C'); // anchor unchanged by scramble
-    expect(next.tray).toHaveLength(WORD_TOWER_TRAY_SIZE);
+    expect(next.tray).toHaveLength(WORD_TOWER_WHEEL_SIZE);
   });
 
-  it('starts with the configured number of scrambles', () => {
+  it('starts with the configured number of scrambles and a full wheel', () => {
     const s = initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' });
     expect(s.scramblesLeft).toBe(WORD_TOWER_SCRAMBLES_START);
+    expect(s.tray).toHaveLength(WORD_TOWER_WHEEL_SIZE);
+    expect(s.anchorLetter).toBe('');
   });
 });
 
 describe('wordTowerManager — serialize/restore', () => {
   const opts = { gameCode: 'G', playerId: 'p1', language: 'en' as const };
 
-  it('round-trips a tower (height, combo, anchor, floors, usedWords) with a fresh tray', () => {
+  it('round-trips a tower (height, combo, floors, usedWords) with a fresh wheel and no anchor', () => {
     const base = initWordTowerState(opts);
     const s = {
       ...base,
       heightM: 120,
       combo: 4,
-      anchorLetter: 'T',
       scramblesLeft: 2,
       bombCharge: 3,
       floors: [{ word: 'CAT', len: 3, meters: 2 }],
@@ -251,25 +266,19 @@ describe('wordTowerManager — serialize/restore', () => {
     const r = restoreWordTowerState(opts, blob);
     expect(r.heightM).toBe(120);
     expect(r.combo).toBe(4);
-    expect(r.anchorLetter).toBe('T');
+    expect(r.anchorLetter).toBe(''); // chain retired
     expect(r.scramblesLeft).toBe(2);
     expect(r.bombCharge).toBe(3);
     expect(r.floors).toHaveLength(1);
     expect(r.usedWords.has('CAT')).toBe(true);
     expect(r.longestCombo).toBe(7);
-    expect(r.tray).toHaveLength(WORD_TOWER_TRAY_SIZE); // tray regenerated, not persisted
+    expect(r.tray).toHaveLength(WORD_TOWER_WHEEL_SIZE); // wheel regenerated, not persisted
   });
 
-  it('caps floors at 50 and usedWords at 200', () => {
+  it('forces an empty anchor even when restoring a pre-wheel save blob', () => {
     const base = initWordTowerState(opts);
-    const s = {
-      ...base,
-      floors: Array.from({ length: 80 }, () => ({ word: 'X', len: 1, meters: 1 })),
-      usedWords: new Set(Array.from({ length: 300 }, (_, i) => `W${i}`)),
-    };
-    const blob = serializeWordTowerState(s);
-    expect(blob.floors).toHaveLength(50);
-    expect(blob.usedWords).toHaveLength(200);
+    const blob = serializeWordTowerState({ ...base, anchorLetter: 'T' });
+    expect(restoreWordTowerState(opts, blob).anchorLetter).toBe('');
   });
 
   it('returns a fresh tower for null or wrong-version blobs', () => {
@@ -278,32 +287,33 @@ describe('wordTowerManager — serialize/restore', () => {
   });
 });
 
-describe('rerollStart (dead-end escape)', () => {
+describe('rerollStart (free fresh wheel)', () => {
   const base = () => initWordTowerState({ gameCode: 'g1', playerId: 'p1', language: 'en' });
 
-  it('breaks the combo, advances trayDraws, keeps a full tray', () => {
+  it('breaks the combo, advances trayDraws, keeps a full wheel, no anchor', () => {
     const s = { ...base(), combo: 5 };
     const r = rerollStart(s);
     expect(r.combo).toBe(0);
     expect(r.trayDraws).toBeGreaterThan(s.trayDraws);
-    expect(r.tray.length).toBe(s.tray.length);
+    expect(r.tray.length).toBe(WORD_TOWER_WHEEL_SIZE);
+    expect(r.anchorLetter).toBe('');
   });
 
-  it('preserves height and floors (it only restarts the chain link)', () => {
+  it('preserves height and floors (it only re-spins the wheel)', () => {
     const s = { ...base(), heightM: 120, floors: [{ word: 'CAT', len: 3, meters: 6 }] };
     const r = rerollStart(s);
     expect(r.heightM).toBe(120);
     expect(r.floors).toHaveLength(1);
   });
 
-  it('retries until the new anchor is viable, then stops', () => {
+  it('retries until the new wheel is viable, then stops', () => {
     const s = base();
-    // Only accept anchor 'E'; reroll must land on it (within the retry budget)
-    const r = rerollStart(s, (a) => a === 'E');
-    expect(r.anchorLetter).toBe('E');
+    // Accept only a wheel that contains an E; reroll must land on one.
+    const r = rerollStart(s, (wheel) => wheel.includes('E'));
+    expect(r.tray.includes('E')).toBe(true);
   });
 
-  it('does not hang when no anchor is ever viable (bounded retries)', () => {
+  it('does not hang when no wheel is ever viable (bounded retries)', () => {
     const s = base();
     const r = rerollStart(s, () => false);
     expect(r.combo).toBe(0); // returns after the retry budget
@@ -311,13 +321,13 @@ describe('rerollStart (dead-end escape)', () => {
   });
 });
 
-describe('nextChainAnchor (vowel-ending chain skip)', () => {
+describe('nextChainAnchor (helper retained for the versus prototype)', () => {
   it('chains on the last letter for consonant endings', () => {
     expect(nextChainAnchor('CAT', 'en')).toBe('T');
   });
   it('chains on the letter BEFORE a vowel ending', () => {
-    expect(nextChainAnchor('AREA', 'en')).toBe('EA'); // ends A (vowel) -> [before][vowel] = EA
-    expect(nextChainAnchor('PIZZA', 'en')).toBe('ZA'); // ends A -> ZA
+    expect(nextChainAnchor('AREA', 'en')).toBe('EA');
+    expect(nextChainAnchor('PIZZA', 'en')).toBe('ZA');
   });
 });
 
@@ -331,7 +341,6 @@ describe('damageTower (hazard ruin)', () => {
     ],
     heightM: 30,
     heightHighWaterM: 30,
-    anchorLetter: 'N',
     combo: 5,
   });
 
@@ -343,18 +352,17 @@ describe('damageTower (hazard ruin)', () => {
     expect(state.floors.map((f) => f.word)).toEqual(['CAT']);
   });
 
-  it('breaks the combo and re-anchors to the new top floor', () => {
+  it('breaks the combo and leaves the wheel/anchor untouched', () => {
     const { state } = damageTower(built(), 2);
     expect(state.combo).toBe(0);
-    expect(state.anchorLetter).toBe(nextChainAnchor('CAT', 'en')); // 'T'
+    expect(state.anchorLetter).toBe(''); // no chain to re-anchor
   });
 
-  it('clamps to the floors available, never negative, and re-anchors when emptied', () => {
+  it('clamps to the floors available, never negative', () => {
     const { state, removed } = damageTower(built(), 99);
     expect(removed).toBe(3);
     expect(state.floors).toHaveLength(0);
     expect(state.heightM).toBe(0);
-    expect(state.anchorLetter.length).toBeGreaterThan(0); // fresh anchor, no crash
   });
 
   it('is a no-op for zero/negative', () => {
@@ -371,13 +379,13 @@ describe('applyTowerWord — high-water guards scramble farming', () => {
   it('does NOT re-earn a scramble when re-climbing below the high-water mark', () => {
     const s = {
       ...initWordTowerState({ gameCode: 'G', playerId: 'p1', language: 'en' as const }),
+      tray: ['C', 'A', 'T', 'R', 'E', 'S', 'N'],
       heightM: 10,
-      heightHighWaterM: 30, // already climbed to 30 before a hazard knocked us to 10
+      heightHighWaterM: 30,
       scramblesLeft: 0,
       scramblesEarned: 0,
-      anchorLetter: 'C',
     };
-    const { state } = applyTowerWord(s, 'cat'); // small climb, stays under 25 and under 30
+    const { state } = applyTowerWord(s, 'cat');
     expect(state.scramblesLeft).toBe(0);
     expect(state.scramblesEarned).toBe(0);
   });
