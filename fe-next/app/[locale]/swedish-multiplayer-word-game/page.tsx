@@ -16,12 +16,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Scrabble Online Svenska Gratis — Alfapet | LexiClash',
-    description: 'Spela Scrabble och Alfapet online gratis på svenska med vänner i realtid. Skapa rum, bjud in med länk. Ingen nedladdning, ingen registrering. Starta nu!',
+    title: 'Scrabble Svenska Online Gratis | Alfapet — LexiClash',
+    description: 'Spela Scrabble & Alfapet på svenska online gratis — tävla med vänner i realtid. Ingen nedladdning, ingen registrering. Skapa rum och börja nu!',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
-      title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-      description: 'Scrabble på svenska i realtid — inte tur och ordning. Skapa rum, bjud in med länk. Gratis, ingen registrering.',
+      title: 'Scrabble Svenska Online Gratis | Alfapet — LexiClash',
+      description: 'Spela Scrabble & Alfapet på svenska online gratis — tävla med vänner i realtid. Ingen nedladdning, ingen registrering. Skapa rum och börja nu!',
       locale: 'sv_SE',
       type: 'website',
       url: pageUrl,
@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble Online Svenska Gratis — Spela Multiplayer | LexiClash',
-      description: 'Scrabble på svenska i realtid — inte tur och ordning. Skapa rum, bjud in med länk, tävla direkt. Gratis.',
+      title: 'Scrabble Svenska Online Gratis | Alfapet — LexiClash',
+      description: 'Spela Scrabble & Alfapet på svenska online gratis — tävla med vänner i realtid. Ingen nedladdning, ingen registrering. Skapa rum och börja nu!',
       images: [`${BASE_URL}/og-image-sv.webp`],
     },
     alternates: {
