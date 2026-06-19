@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X, Building2, Link2 } from 'lucide-react';
+import { GraduationCap, BookOpen, Copy, Check, LayoutGrid, Search, Zap, RotateCw, Clock, Grid3x3, UserPlus, X, Building2, Link2, Gavel } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -35,6 +35,7 @@ const MODE_ICON: Record<GameMode, typeof LayoutGrid> = {
   'wheel-rush': RotateCw,
   'word-tower': Building2,
   shiritori: Link2,
+  'sealed-bid': Gavel,
 };
 
 const MODE_TRANSLATION_KEY: Record<GameMode, string> = {
@@ -44,6 +45,7 @@ const MODE_TRANSLATION_KEY: Record<GameMode, string> = {
   'wheel-rush': 'wheelRush',
   'word-tower': 'wordTower',
   shiritori: 'shiritori',
+  'sealed-bid': 'sealedBid',
 };
 
 function boardSizeLabel(size?: string): string {

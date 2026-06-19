@@ -323,31 +323,37 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       DEFAULT_TIMER;
     let validTimer = Math.max(30, Math.min(600, rawTimer || priorTimerSeconds || timerFallback));
 
-    // Word Tower is an in-work mode: hosts must be admins OR beta testers. UI
-    // hides it from everyone else; this server gate enforces it even if a client
-    // crafts the startGame emit directly. Never reachable via random roll (not
-    // in ALL_GAME_MODES). Decision routes through the shared canAccessInWorkMode
-    // chokepoint (lib/auth/inWorkModeAccess.ts) so future in-work modes inherit
-    // beta access for free.
-    if (resolvedMode === 'word-tower') {
-      const wtHostUser = Object.values(game.users).find((u) => u.isHost);
-      const wtHostAuthId = wtHostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
-      const wtSupabase = getSupabase();
-      let wordTowerAllowed = false;
-      if (!wtSupabase) {
-        wordTowerAllowed = true; // dev/test (no Supabase) → allow
-      } else if (wtHostAuthId) {
-        const { data: wtProfile } = await wtSupabase
+    // In-work modes (Word Tower, Shiritori) are beta: hosts must be admins OR
+    // beta testers. UI hides them from everyone else; this server gate enforces
+    // it even if a client crafts the startGame emit directly. Neither is reachable
+    // via random roll (not in ALL_GAME_MODES). Decision routes through the shared
+    // canAccessInWorkMode chokepoint (lib/auth/inWorkModeAccess.ts) so future
+    // in-work modes inherit beta access for free.
+    if (resolvedMode === 'word-tower' || resolvedMode === 'shiritori') {
+      const iwHostUser = Object.values(game.users).find((u) => u.isHost);
+      const iwHostAuthId = iwHostUser?.authUserId || (socket.data?.verifiedUserId as string | undefined);
+      const iwSupabase = getSupabase();
+      let inWorkAllowed = false;
+      if (!iwSupabase) {
+        inWorkAllowed = true; // dev/test (no Supabase) → allow
+      } else if (iwHostAuthId) {
+        const { data: iwProfile } = await iwSupabase
           .from('profiles')
           .select('is_admin, is_beta_tester')
-          .eq('id', wtHostAuthId)
+          .eq('id', iwHostAuthId)
           .single();
-        wordTowerAllowed = canAccessInWorkMode(wtProfile);
+        inWorkAllowed = canAccessInWorkMode(iwProfile);
       }
-      if (!wordTowerAllowed) {
+      // Shiritori additionally requires a Japanese board (its dictionary is JA).
+      // gameLang is declared later in this handler, so resolve the board language inline here.
+      const boardLang = language || game.language || 'en';
+      if (inWorkAllowed && resolvedMode === 'shiritori' && boardLang !== 'ja') {
+        inWorkAllowed = false;
+      }
+      if (!inWorkAllowed) {
         gamesStarting.delete(gameCode);
-        logger.debug('SOCKET', `Rejected word-tower for ${gameCode}: host lacks in-work access`);
-        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Word Tower is in beta' });
+        logger.debug('SOCKET', `Rejected in-work mode ${resolvedMode} for ${gameCode}: host lacks access or wrong language`);
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: `${resolvedMode === 'shiritori' ? 'Shiritori' : 'Word Tower'} is in beta` });
         return;
       }
     }
@@ -613,6 +619,25 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // polls on mount during the countdown, before the match exists.
     if (resolvedMode === 'word-tower') {
       broadcastToRoom(io, getGameRoom(gameCode), 'towerMatchReady', {});
+    }
+
+    // Broadcast shiritori init AFTER startGame so the client has time to mount
+    // ShiritoriVersus and subscribe. Late joiners/reconnects poll requestShiritoriState.
+    if (resolvedMode === 'shiritori') {
+      const cg = getGame(gameCode);
+      const ss = cg?.shiritoriState;
+      if (ss) {
+        broadcastToRoom(io, getGameRoom(gameCode), 'shiritoriInit', {
+          players: ss.players,
+          currentPlayer: ss.players[ss.turnIndex] ?? null,
+          requiredHead: ss.requiredHead,
+          chain: ss.chain,
+          eliminated: Object.keys(ss.eliminated).filter((p) => ss.eliminated[p]),
+          startedAt: ss.startedAt,
+          finished: ss.finished,
+          winner: ss.winner,
+        });
+      }
     }
 
     // Broadcast wheel-rush init AFTER startGame so client has time to mount WheelRushView

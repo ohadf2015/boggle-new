@@ -24,6 +24,10 @@ const WheelRushView = dynamic(
   () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
+const ShiritoriVersus = dynamic(
+  () => import('@/components/multiplayer/shiritori/ShiritoriVersus').then(m => ({ default: m.ShiritoriVersus })),
+  { ssr: false },
+);
 const WordTowerVersus = dynamic(
   () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
@@ -302,6 +306,17 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     return (
       <>
         <WordTowerVersus socket={socket} username={username} onQuit={handleStopGameClick} />
+        {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
+        {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
+      </>
+    );
+  }
+
+  // Shiritori — turn-based word chain, no shared grid
+  if (gameMode === 'shiritori') {
+    return (
+      <>
+        <ShiritoriVersus socket={socket} username={username} onQuit={handleStopGameClick} />
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
       </>

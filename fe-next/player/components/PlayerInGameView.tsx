@@ -28,6 +28,10 @@ const WordTowerVersus = dynamic(
   () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
   { ssr: false, loading: () => <GameLoadingFallback /> },
 );
+const ShiritoriVersus = dynamic(
+  () => import('@/components/multiplayer/shiritori/ShiritoriVersus').then(m => ({ default: m.ShiritoriVersus })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
@@ -320,6 +324,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Word Tower versus — per-player towers, no shared grid
   if (gameMode === 'word-tower') {
     return <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} />;
+  }
+
+  // Shiritori — turn-based word chain, no letter grid
+  if (gameMode === 'shiritori') {
+    return <ShiritoriVersus socket={socket} username={username} onQuit={onExitRoom} />;
   }
 
   // Use letterGrid or shufflingGrid

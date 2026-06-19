@@ -68,7 +68,12 @@ const he = {
     "wordsLabel": "מילים",
     "progressLabel": "התקדמות בתשבץ",
     "allClues": "כל ההגדרות",
-    "hintsLabel": "רמזים"
+    "hintsLabel": "רמזים",
+    "mastheadTitle": "LexiClash יומי",
+    "streakLabel": "סדרה של {count} ימים",
+    "nextPuzzlePrompt": "תשבץ הבא",
+    "freeplayEdition": "תרגול #{count}",
+    "generating": "מכינים את התשבץ…"
   },
   "rank": {
     "seasonTitle": "דירוג העונה",
@@ -101,6 +106,13 @@ const he = {
     "wins": "ניצח!",
     "yourTurn": "תורכם — הקלידו מילה",
     "youWin": "ניצחתם!",
+    "error": {
+      "too-short": "קצר מדי — לפחות 2 הברות.",
+      "already-used": "כבר שוחק — בלי חזרות.",
+      "bad-chain": "חייב להתחיל בהברה הנדרשת.",
+      "not-a-word": "לא במילון.",
+      "not-your-turn": "המתן לתורך."
+    },
     "solo": {
       "howTo": {
         "title": "איך משחקים",
@@ -2732,6 +2744,7 @@ const he = {
         "wheelRush": "גלגל מהיר",
         "wordTower": "מגדל מילים",
         "shiritori": "שירִיטורי",
+        "sealedBid": "הצעה סמויה",
         "random": "מצב הפתעה"
       },
       "hook": {
@@ -2741,6 +2754,7 @@ const he = {
         "wheelRush": "סובבו וגנבו מילים",
         "wordTower": "בנו את המגדל",
         "shiritori": "שרשרו את המילים",
+        "sealedBid": "להערים על כולם",
         "random": "הפתעה מחכה"
       }
     },
@@ -10237,13 +10251,16 @@ const he = {
       "wordsLabel": "מילים",
       "chestLabel": "תיבה",
       "chestReady": "התיבה מוכנה לפתיחה!",
-      "chestAlmost": "כמעט מלאה — עוד שלב אחד!"
+      "chestAlmost": "כמעט מלאה — עוד שלב אחד!",
+      "replay": "שחק שוב",
+      "home": "בית"
     },
     "failed": {
       "title": "נגמרו הניחושים!",
       "subtitle": "כל כך קרוב — נסו שוב.",
       "wordsLabel": "מילים",
       "retry": "נסו שוב",
+      "home": "בית",
       "progressSafe": "ההתקדמות נשמרה — שלב {n}"
     },
     "strikes": {
@@ -10402,10 +10419,7 @@ const he = {
     "hint": {
       "free": "חינם",
       "ad": "רמז",
-      "aria": {
-        "free": "רמז חינם — עולה 25 נק'",
-        "ad": "צפה בפרסומת לרמז — עולה 25 נק'"
-      },
+      "aria": "חשוף מילה — עולה כוכב",
       "toast": {
         "targetWord": "נסה ליצור: {word}",
         "colorPower": "חפש אריחים בצבע {color}",
@@ -12469,6 +12483,10 @@ const he = {
     "shiritori": {
       "name": "שיריטורי",
       "description": "שרשרת מילים — כל מילה מתחילה באות האחרונה של הקודמת!"
+    },
+    "sealedBid": {
+      "name": "הצעה סמויה",
+      "description": "הציעו מילה שאף אחד אחר לא יבחר — הצעות ייחודיות מכפילות ניקוד!"
     },
     "intro": {
       "cta": "בוא נתחיל",

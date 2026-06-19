@@ -139,7 +139,12 @@ const sv = {
     "wordsLabel": "Ord",
     "progressLabel": "Pusselframsteg",
     "allClues": "Alla ledtrådar",
-    "hintsLabel": "Ledtrådar"
+    "hintsLabel": "Ledtrådar",
+    "mastheadTitle": "LexiClash Dagligt",
+    "streakLabel": "{count}-dagars serie",
+    "nextPuzzlePrompt": "Nästa pussel",
+    "freeplayEdition": "Träning #{count}",
+    "generating": "Bygger rutnätet…"
   },
   "rank": {
     "seasonTitle": "Säsongsrank",
@@ -259,6 +264,13 @@ const sv = {
     "wins": "vinner!",
     "yourTurn": "Din tur – skriv ett ord",
     "youWin": "Du vinner!",
+    "error": {
+      "too-short": "För kort — minst 2 kana.",
+      "already-used": "Redan spelat — inga upprepningar.",
+      "bad-chain": "Måste börja med rätt kana.",
+      "not-a-word": "Inte i ordlistan.",
+      "not-your-turn": "Vänta på din tur."
+    },
     "solo": {
       "howTo": {
         "title": "Så spelar du",
@@ -2733,6 +2745,7 @@ const sv = {
         "wheelRush": "Hjulrush",
         "wordTower": "Ordtorn",
         "shiritori": "Shiritori",
+        "sealedBid": "Hemligt bud",
         "random": "Överraskningsläge"
       },
       "hook": {
@@ -2742,6 +2755,7 @@ const sv = {
         "wheelRush": "Snurra & stjäl ord",
         "wordTower": "Bygg tornet",
         "shiritori": "Kedja orden",
+        "sealedBid": "Övertrumfa rummet",
         "random": "En överraskning väntar"
       }
     },
@@ -10103,13 +10117,16 @@ const sv = {
       "next": "Nästa nivå",
       "chestLabel": "Kista",
       "chestReady": "Kistan är redo att öppnas!",
-      "chestAlmost": "Nästan full — en nivå till!"
+      "chestAlmost": "Nästan full — en nivå till!",
+      "replay": "Spela igen",
+      "home": "Hem"
     },
     "failed": {
       "title": "Slut på gissningar!",
       "subtitle": "Så nära — försök igen.",
       "wordsLabel": "ord",
       "retry": "Försök igen",
+      "home": "Hem",
       "progressSafe": "Dina framsteg är sparade — nivå {n}"
     },
     "strikes": {
@@ -10122,6 +10139,10 @@ const sv = {
       "bonusWord": "BONUSORD!",
       "bonusHint": "Inte på listan – räknas ändå!",
       "bonusCount": "⭐ {count} bonus"
+    },
+    "hint": {
+      "label": "Tips",
+      "aria": "Avslöja ett ord — kostar en stjärna"
     },
     "noMoreWords": "Inga fler ord möjliga",
     "giveUp": "Avsluta spel",
@@ -12172,6 +12193,10 @@ const sv = {
     shiritori: {
       name: "Shiritori",
       description: "Kedja ord — varje ord börjar på förra ordets sista bokstav!"
+    },
+    sealedBid: {
+      name: "Hemligt bud",
+      description: "Bjud ett ord ingen annan väljer — unika bud ger dubbla poäng!"
     },
     intro: {
       cta: "Sätt igång",

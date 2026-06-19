@@ -198,7 +198,39 @@ export function handleShiritoriTimeout(io: Server, gameCode: string): void {
   }
 }
 
+/**
+ * Push a snapshot of the current shiritori state to a single socket. The MP view
+ * mounts only after `startGame`, so it polls this on mount (and on reconnect) to
+ * learn the roster, whose turn it is, the required head, and the chain so far —
+ * mirrors wheelRushHandler.handleRequestWheelRushState. No-op off shiritori.
+ */
+export function handleRequestShiritoriState(socket: Socket): void {
+  const gameCode = getGameBySocketId(socket.id);
+  if (!gameCode) return;
+  const game = getGame(gameCode);
+  if (!game || game.gameMode !== 'shiritori' || !game.shiritoriState) return;
+  const state = game.shiritoriState;
+  socket.emit('shiritoriInit', {
+    players: state.players,
+    currentPlayer: currentPlayer(state),
+    requiredHead: state.requiredHead,
+    chain: state.chain,
+    eliminated: Object.keys(state.eliminated).filter((p) => state.eliminated[p]),
+    startedAt: state.startedAt,
+    finished: state.finished,
+    winner: state.winner,
+  });
+}
+
 export function registerShiritoriHandlers(io: Server, socket: Socket): void {
+  socket.on('requestShiritoriState', () => {
+    try {
+      handleRequestShiritoriState(socket);
+    } catch (err) {
+      logger.error('SHIRITORI', `Error requestShiritoriState: ${(err as Error).message}`);
+    }
+  });
+
   socket.on('submitShiritoriWord', (data: unknown) => {
     if (!checkRateLimit(socket.id, 5)) {
       socket.emit('rateLimited', { message: 'Too many submissions, slow down' });

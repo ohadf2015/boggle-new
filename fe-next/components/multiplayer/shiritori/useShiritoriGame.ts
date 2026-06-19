@@ -31,20 +31,33 @@ interface GameOverPayload { winner: string | null; reason: string; loser?: strin
  * The MP view passes the real Socket.IO client + the initial roster/turn from
  * the startGame payload; this hook owns the live turn-chain state.
  */
+/** Optional snapshot to seed mid-game state (reconnect / late join). */
+export interface ShiritoriInitialSnapshot {
+  chain?: string[];
+  requiredHead?: string | null;
+  eliminated?: string[];
+  finished?: boolean;
+  winner?: string | null;
+}
+
 export function useShiritoriGame(
   socket: ShiritoriSocketLike | null,
   initialPlayers: string[],
   firstPlayer: string | null,
+  initial?: ShiritoriInitialSnapshot,
 ): ShiritoriClientState & { submit: (word: string) => void } {
-  const [state, setState] = useState<ShiritoriClientState>(() => ({
-    chain: [],
-    requiredHead: null,
-    players: initialPlayers.map((username) => ({ username, eliminated: false })),
-    currentPlayer: firstPlayer,
-    finished: false,
-    winner: null,
-    lastError: null,
-  }));
+  const [state, setState] = useState<ShiritoriClientState>(() => {
+    const eliminatedSet = new Set(initial?.eliminated ?? []);
+    return {
+      chain: initial?.chain ?? [],
+      requiredHead: initial?.requiredHead ?? null,
+      players: initialPlayers.map((username) => ({ username, eliminated: eliminatedSet.has(username) })),
+      currentPlayer: firstPlayer,
+      finished: initial?.finished ?? false,
+      winner: initial?.winner ?? null,
+      lastError: null,
+    };
+  });
 
   useEffect(() => {
     if (!socket) return;

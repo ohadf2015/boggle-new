@@ -68,7 +68,12 @@ const ja = {
     "wordsLabel": "単語",
     "progressLabel": "進捗",
     "allClues": "すべてのヒント",
-    "hintsLabel": "ヒント"
+    "hintsLabel": "ヒント",
+    "mastheadTitle": "LexiClash デイリー",
+    "streakLabel": "{count}日連続",
+    "nextPuzzlePrompt": "次のパズル",
+    "freeplayEdition": "練習 #{count}",
+    "generating": "盤面を準備中…"
   },
   "rank": {
     "seasonTitle": "シーズン順位",
@@ -101,6 +106,13 @@ const ja = {
     "wins": "の勝ち！",
     "yourTurn": "あなたの番です — 言葉を入力",
     "youWin": "あなたの勝ち！",
+    "error": {
+      "too-short": "短すぎます — 2文字以上で。",
+      "already-used": "もう使われました — 繰り返しは禁止。",
+      "bad-chain": "指定のかなで始めてください。",
+      "not-a-word": "辞書にありません。",
+      "not-your-turn": "順番をお待ちください。"
+    },
     "solo": {
       "howTo": {
         "title": "遊び方",
@@ -2579,6 +2591,7 @@ const ja = {
         "wheelRush": "ホイールラッシュ",
         "wordTower": "ワードタワー",
         "shiritori": "しりとり",
+        "sealedBid": "封印入札",
         "random": "サプライズモード"
       },
       "hook": {
@@ -2588,6 +2601,7 @@ const ja = {
         "wheelRush": "回して単語を奪え",
         "wordTower": "タワーを積もう",
         "shiritori": "単語をつなげよう",
+        "sealedBid": "全員を出し抜け",
         "random": "お楽しみに"
       }
     },
@@ -10003,13 +10017,16 @@ const ja = {
       "stars": "星",
       "coins": "コイン",
       "cascadesLabel": "カスケード",
-      "next": "次のレベル"
+      "next": "次のレベル",
+      "replay": "もう一度",
+      "home": "ホーム"
     },
     "failed": {
       "title": "ヒント切れ！",
       "subtitle": "おしい！もう一度挑戦しよう。",
       "wordsLabel": "語",
       "retry": "もう一度",
+      "home": "ホーム",
       "progressSafe": "進行状況は保存されています — レベル {n}"
     },
     "strikes": {
@@ -10022,6 +10039,10 @@ const ja = {
       "bonusWord": "ボーナスワード！",
       "bonusHint": "リストにないけどカウントされる！",
       "bonusCount": "⭐ ボーナス {count}"
+    },
+    "hint": {
+      "label": "ヒント",
+      "aria": "単語を表示 — 星を1つ消費"
     },
     "noMoreWords": "もう単語がありません",
     "giveUp": "ゲーム終了",
@@ -12021,6 +12042,10 @@ const ja = {
     shiritori: {
       name: "しりとり",
       description: "前の言葉の最後の文字から始めよう！"
+    },
+    sealedBid: {
+      name: "封印入札",
+      description: "他の誰も選ばない単語を入札 — ユニークな入札は得点2倍！"
     },
     intro: {
       cta: "はじめよう",

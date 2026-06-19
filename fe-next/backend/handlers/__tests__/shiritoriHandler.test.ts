@@ -38,7 +38,7 @@ vi.mock('../../services/gameLifecycle/gameResults', () => ({
   recordGameResultsToSupabase: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { handleSubmitShiritoriWord, handleShiritoriTimeout } from '../shiritoriHandler';
+import { handleSubmitShiritoriWord, handleShiritoriTimeout, handleRequestShiritoriState } from '../shiritoriHandler';
 import { initShiritoriState } from '../../modules/shiritoriManager';
 import { broadcastToRoom } from '../../utils/socketHelpers';
 import { getGame, getUsernameBySocketId, transitionGameState } from '../../modules/gameStateManager';
@@ -248,5 +248,42 @@ describe('handleShiritoriTimeout', () => {
       key: 'shiritori_win',
       icon: '🏆',
     });
+  });
+});
+
+describe('handleRequestShiritoriState', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (getUsernameBySocketId as unknown as Mock).mockReturnValue('p1');
+  });
+  afterEach(() => vi.clearAllMocks());
+
+  it('emits a shiritoriInit snapshot of the current turn-chain state', () => {
+    const game = mkGame({
+      shiritoriState: { ...initShiritoriState(['p1', 'p2'], 1000, 15000), chain: ['しりとり'], requiredHead: 'り', turnIndex: 1 },
+    });
+    (getGame as unknown as Mock).mockReturnValue(game);
+    const sock = mkSocket();
+    handleRequestShiritoriState(sock);
+    expect(sock.emit).toHaveBeenCalledWith('shiritoriInit', expect.objectContaining({
+      players: ['p1', 'p2'],
+      currentPlayer: 'p2',
+      requiredHead: 'り',
+      chain: ['しりとり'],
+    }));
+  });
+
+  it('is a no-op when the game is not shiritori', () => {
+    (getGame as unknown as Mock).mockReturnValue(mkGame({ gameMode: 'classic' }));
+    const sock = mkSocket();
+    handleRequestShiritoriState(sock);
+    expect(sock.emit).not.toHaveBeenCalled();
+  });
+
+  it('is a no-op when there is no shiritori state', () => {
+    (getGame as unknown as Mock).mockReturnValue(mkGame({ shiritoriState: null }));
+    const sock = mkSocket();
+    handleRequestShiritoriState(sock);
+    expect(sock.emit).not.toHaveBeenCalled();
   });
 });

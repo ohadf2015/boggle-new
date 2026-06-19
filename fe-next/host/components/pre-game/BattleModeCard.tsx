@@ -2,17 +2,20 @@
 
 import React, { useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Shuffle, FileText, Target, Check, Bomb, Building2 } from 'lucide-react';
+import { Shuffle, FileText, Target, Check, Bomb, Building2, Link2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { useExperiment } from '@/hooks/useExperiment';
+import { isShiritoriAvailable } from '@/shared/utils/availableModes';
 
 interface BattleModeCardProps {
   selectedGameMode: GameModeOption;
   setSelectedGameMode: (mode: GameModeOption) => void;
   t: (path: string, params?: Record<string, string | number>) => string;
-  /** When true, surfaces the admin-only Word Tower preview. (Blast is public — no longer gated.) */
+  /** When true, surfaces the admin-only Word Tower + Shiritori previews. (Blast is public — no longer gated.) */
   isAdmin?: boolean;
+  /** Board/game language — gates Shiritori (Japanese-only). */
+  language?: string | null;
   /** @deprecated Blast is offered to all players now; this no longer affects visibility. */
   hasBlastAccess?: boolean;
 }
@@ -63,6 +66,12 @@ const MODES: ModeVisualConfig[] = [
     nameKey: 'wordTower.cardTitle',
     activeBg: 'bg-neo-purple',
   },
+  {
+    mode: 'shiritori',
+    icon: <Link2 className="w-4 h-4" />,
+    nameKey: 'gameModes.shiritori.name',
+    activeBg: 'bg-neo-purple',
+  },
 ];
 
 // ==================== Main Component ====================
@@ -72,6 +81,7 @@ export function BattleModeCard({
   setSelectedGameMode,
   t,
   isAdmin = false,
+  language = null,
 }: BattleModeCardProps): React.ReactElement {
   const handleSelect = useCallback((mode: GameModeOption) => {
     setSelectedGameMode(mode);
@@ -79,11 +89,15 @@ export function BattleModeCard({
 
   // Blast is now offered to ALL players (gate removed after MP-blast parity).
   // Word Tower stays admin-only AND behind the `word-tower` experiment (mirrors
-  // the solo gating; server enforces admin too).
+  // the solo gating; server enforces admin too). Shiritori is an in-work beta
+  // mode: admin-only AND Japanese-only (server gates it the same — JA dictionary
+  // + canAccessInWorkMode), so it never reaches non-beta players' rotation.
   const { variant: wordTowerVariant } = useExperiment('word-tower');
   const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
+  const shiritoriEnabled = isAdmin && isShiritoriAvailable(language);
   const visibleModes = MODES.filter((m) => {
     if (m.mode === 'word-tower') return wordTowerEnabled;
+    if (m.mode === 'shiritori') return shiritoriEnabled;
     return true;
   });
 

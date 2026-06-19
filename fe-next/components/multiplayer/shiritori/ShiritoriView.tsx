@@ -1,10 +1,6 @@
 'use client';
 
 import { useRef, useState, type KeyboardEvent, type CompositionEvent } from 'react';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-
-gsap.registerPlugin(useGSAP);
 
 export interface ShiritoriPlayerView {
   username: string;
@@ -54,20 +50,11 @@ export default function ShiritoriView({
   onSubmit,
   t,
 }: ShiritoriViewProps) {
-  const root = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const composingRef = useRef(false);
   const [value, setValue] = useState('');
 
   const isMyTurn = !finished && currentPlayer === me;
-
-  useGSAP(
-    () => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      gsap.from('.shiritori-chip', { scale: 0.7, opacity: 0, stagger: 0.04, duration: 0.3, ease: 'back.out(2)' });
-    },
-    { scope: root, dependencies: [chain.length] },
-  );
 
   const submit = () => {
     // Read the live DOM value (IME may not have flushed to React state yet).
@@ -87,7 +74,7 @@ export default function ShiritoriView({
   };
 
   return (
-    <div ref={root} className="mx-auto flex max-w-xl flex-col gap-4 p-4">
+    <div className="mx-auto flex max-w-xl flex-col gap-4 p-4">
       {/* Turn rail */}
       <ul className="flex flex-wrap gap-2" aria-label={t('shiritori.players')}>
         {players.map((p) => (
@@ -122,7 +109,7 @@ export default function ShiritoriView({
         {chain.map((w, i) => (
           <li
             key={`${w}-${i}`}
-            className="shiritori-chip rounded-neo border-neo border-black bg-neo-pink px-3 py-1 font-neo-display text-black shadow-hard"
+            className="shiritori-chip animate-neo-pop rounded-neo border-neo border-black bg-neo-pink px-3 py-1 font-neo-display text-black shadow-hard motion-reduce:animate-none"
           >
             {w}
           </li>

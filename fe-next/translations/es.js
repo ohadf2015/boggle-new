@@ -68,7 +68,12 @@ const es = {
     "wordsLabel": "Palabras",
     "progressLabel": "Progreso del crucigrama",
     "allClues": "Todas las pistas",
-    "hintsLabel": "Pistas"
+    "hintsLabel": "Pistas",
+    "mastheadTitle": "LexiClash Diario",
+    "streakLabel": "racha de {count} días",
+    "nextPuzzlePrompt": "Siguiente acertijo",
+    "freeplayEdition": "Práctica #{count}",
+    "generating": "Preparando la cuadrícula…"
   },
   "rank": {
     "seasonTitle": "Rango de temporada",
@@ -101,6 +106,13 @@ const es = {
     "wins": "¡gana!",
     "yourTurn": "Tu turno: escribe una palabra",
     "youWin": "¡Ganaste!",
+    "error": {
+      "too-short": "Demasiado corto — al menos 2 kana.",
+      "already-used": "Ya se usó — sin repeticiones.",
+      "bad-chain": "Debe empezar con la kana requerida.",
+      "not-a-word": "No está en el diccionario.",
+      "not-your-turn": "Espera tu turno."
+    },
     "solo": {
       "title": "Shiritori en solitario",
       "tagline": "Encadena palabras en hiragana contra el bot.",
@@ -2468,6 +2480,7 @@ const es = {
         "wheelRush": "Rueda Rápida",
         "wordTower": "Torre de Palabras",
         "shiritori": "Shiritori",
+        "sealedBid": "Puja Sellada",
         "random": "Modo Sorpresa"
       },
       "hook": {
@@ -2477,6 +2490,7 @@ const es = {
         "wheelRush": "Gira y roba palabras",
         "wordTower": "Apila la torre",
         "shiritori": "Encadena las palabras",
+        "sealedBid": "Supera a todos",
         "random": "Te espera una sorpresa"
       }
     },
@@ -10019,13 +10033,16 @@ const es = {
       "wordsLabel": "Palabras",
       "chestLabel": "Cofre",
       "chestReady": "¡Cofre listo para abrir!",
-      "chestAlmost": "Casi lleno — ¡un nivel más!"
+      "chestAlmost": "Casi lleno — ¡un nivel más!",
+      "replay": "Repetir",
+      "home": "Inicio"
     },
     "failed": {
       "title": "¡Sin intentos!",
       "subtitle": "Casi lo logras, ¡inténtalo de nuevo!",
       "wordsLabel": "palabras",
       "retry": "Reintentar",
+      "home": "Inicio",
       "progressSafe": "Tu progreso está a salvo — nivel {n}"
     },
     "strikes": {
@@ -10038,6 +10055,10 @@ const es = {
       "bonusWord": "¡PALABRA EXTRA!",
       "bonusHint": "No está en la lista, ¡pero cuenta!",
       "bonusCount": "⭐ {count} extra"
+    },
+    "hint": {
+      "label": "Pista",
+      "aria": "Revela una palabra — cuesta una estrella"
     },
     "noMoreWords": "No hay más palabras posibles",
     "giveUp": "Terminar juego",
@@ -11981,6 +12002,10 @@ const es = {
     "shiritori": {
       "name": "Shiritori",
       "description": "¡Encadena palabras — cada una empieza con la última letra de la anterior!"
+    },
+    "sealedBid": {
+      "name": "Puja Sellada",
+      "description": "¡Apuesta una palabra que nadie más elija: las pujas únicas valen doble!"
     },
     "intro": {
       "cta": "Vamos",

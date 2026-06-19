@@ -68,7 +68,12 @@ const en = {
     "wordsLabel": "Words",
     "progressLabel": "Puzzle progress",
     "allClues": "All clues",
-    "hintsLabel": "Hints"
+    "hintsLabel": "Hints",
+    "mastheadTitle": "LexiClash Daily",
+    "streakLabel": "{count}-day streak",
+    "nextPuzzlePrompt": "Next puzzle",
+    "freeplayEdition": "Freeplay #{count}",
+    "generating": "Setting the grid…"
   },
   "rank": {
     "seasonTitle": "Season Rank",
@@ -101,6 +106,13 @@ const en = {
     "wins": "wins!",
     "yourTurn": "Your turn — type a word",
     "youWin": "You win!",
+    "error": {
+      "too-short": "Too short — at least 2 kana.",
+      "already-used": "Already played — no repeats.",
+      "bad-chain": "Must start with the required kana.",
+      "not-a-word": "Not in the dictionary.",
+      "not-your-turn": "Wait for your turn."
+    },
     "solo": {
       "title": "Shiritori Solo",
       "tagline": "Chain hiragana words against the bot.",
@@ -2665,6 +2677,7 @@ const en = {
         "wheelRush": "Wheel Rush",
         "wordTower": "Word Tower",
         "shiritori": "Shiritori",
+        "sealedBid": "Sealed Bid",
         "random": "Surprise Mode"
       },
       "hook": {
@@ -2674,6 +2687,7 @@ const en = {
         "wheelRush": "Spin & steal words",
         "wordTower": "Stack the tower",
         "shiritori": "Chain the words",
+        "sealedBid": "Outbid the room",
         "random": "A surprise awaits"
       }
     },
@@ -9680,13 +9694,16 @@ const en = {
       "wordsLabel": "Words",
       "chestLabel": "Chest",
       "chestReady": "Chest ready to open!",
-      "chestAlmost": "Almost full — one more level!"
+      "chestAlmost": "Almost full — one more level!",
+      "replay": "Replay",
+      "home": "Home"
     },
     "failed": {
       "title": "Out of guesses!",
       "subtitle": "So close — give it another shot.",
       "wordsLabel": "words",
       "retry": "Try Again",
+      "home": "Home",
       "progressSafe": "Your progress is safe — level {n}"
     },
     "strikes": {
@@ -9855,7 +9872,8 @@ const en = {
         "collectType": "Find more {tileType}",
         "clearAllType": "Clear remaining {tileType}"
       },
-      "label": "Hint"
+      "label": "Hint",
+      "aria": "Reveal a word — costs a star"
     },
     "undo": "Undo",
     "undoTooltip": "Reverse last move",
@@ -11968,6 +11986,10 @@ const en = {
     "shiritori": {
       "name": "Shiritori",
       "description": "Chain words — each begins with the last letter of the one before!"
+    },
+    "sealedBid": {
+      "name": "Sealed Bid",
+      "description": "Bid a word nobody else picks — unique bids score double!"
     },
     "intro": {
       "cta": "Let's go",

@@ -616,6 +616,7 @@ function HostPreGameView({
                     setSelectedGameMode={setSelectedGameMode}
                     t={t}
                     isAdmin={isAdmin}
+                    language={roomLanguage}
                     hasBlastAccess={hasBlastAccess}
                   />
                 </div>
@@ -687,6 +688,7 @@ function HostPreGameView({
                 setSelectedGameMode={setSelectedGameMode}
                 t={t}
                 isAdmin={isAdmin}
+                    language={roomLanguage}
                 hasBlastAccess={hasBlastAccess}
               />
               <GameInstructions selectedGameMode={selectedGameMode} t={t} defaultOpen={false} lang={roomLanguage} />
