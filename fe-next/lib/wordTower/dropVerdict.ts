@@ -42,6 +42,17 @@ export function verdictTone(quality: PlacementQuality): VerdictTone {
 }
 
 /**
+ * Whether to stack the long-word tier celebration (HIGH-RISE! / SKYSCRAPER!) on
+ * top of the verdict pop. Suppressed on a MISS (red tone): a fumbled drop must
+ * never read as a celebration — the founder's screenshot showed "HIGH-RISE!"
+ * sitting directly above a red "MISSED!", which is contradictory. The word tier
+ * is earned by length, but the *moment* belongs to how the drop landed.
+ */
+export function showsTierKicker(tone: VerdictTone): boolean {
+  return tone !== 'red';
+}
+
+/**
  * Signed, rounded metre string. A *positive* gain never reads as "+0m" (that
  * looked like a failure), so anything above zero floors at "+1m"; a genuine
  * zero (or negative) gain shows "+0m".
