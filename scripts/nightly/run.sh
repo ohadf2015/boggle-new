@@ -355,6 +355,14 @@ should_run() {
 # (09-monetization) — so the monetization lane was defined, executable, and
 # carried a brief, yet NEVER RAN. Deriving the bound from ${#LANES[@]} makes a
 # lane impossible to silently strand again when one is appended.
+# Circuit breaker (2026-06-20): K consecutive lanes that die with NO productive output
+# (rc 75 = usage-limit cutoff-abort, rc 124 = idle-kill) almost always means the shared
+# Claude usage window is exhausted — lanes 6,7,9,10 cascaded this way after the window
+# re-drained post-reset. Once tripped, every further lane just burns another idle window
+# failing identically, so stop starting new lanes and DEFER the rest to the next run.
+# A productive lane (success, or a timeout that KEPT partials) resets the counter.
+consec_dead=0
+throttle_break="${NIGHTLY_THROTTLE_BREAK:-3}"
 for i in $(seq 1 "${#LANES[@]}"); do
   lane="${LANES[$((i-1))]}"
   # Pass the lane NAME (not the index $i) — should_run compares against $ONLY/$SKIP
@@ -391,6 +399,7 @@ for i in $(seq 1 "${#LANES[@]}"); do
     # count. (A lane that genuinely crashes, below, still has its own output
     # reverted — that is cleanup of broken partial work, not a cap.)
     cat "$LANE_AUTHORED" >> "$NIGHTLY_AUTHORED_FILE"
+    consec_dead=0   # productive lane → reset circuit breaker
     log "lane $i — kept $changed authored file(s)"
     LANE_RESULTS+=("✅ lane $i ($lane) — changed $changed files")
     echo "- ✅ **$lane** — $changed files touched" >> "$REPORT"
@@ -406,6 +415,7 @@ for i in $(seq 1 "${#LANES[@]}"); do
       # lane already spent is recovered instead of discarded — no count cap.
       log "lane $i — TIMEOUT (124), kept $changed partial file(s) [KEEP_TIMEOUT_PARTIALS=1]"
       cat "$LANE_AUTHORED" >> "$NIGHTLY_AUTHORED_FILE"
+      consec_dead=0   # kept partials = productive → reset circuit breaker
       LANE_RESULTS+=("⏱️  lane $i ($lane) — timeout, kept $changed partial file(s)")
       echo "- ⏱️  **$lane** — timed out, kept $changed partial file(s) (gate-validated)" >> "$REPORT"
     else
@@ -413,10 +423,29 @@ for i in $(seq 1 "${#LANES[@]}"); do
       revert_authored "$PRE_LANE" "$LANE_AUTHORED"
       LANE_RESULTS+=("❌ lane $i ($lane) — exit $rc")
       echo "- ❌ **$lane** — failed (exit $rc), reverted" >> "$REPORT"
+      # rc 75 (usage-cutoff abort) / 124 (idle-kill) = no-productive-output failures
+      # strongly correlated with an exhausted usage window → count toward the breaker.
+      # Any other rc is a genuine code failure (not a throttle) → reset the counter.
+      if [ "$rc" = "75" ] || [ "$rc" = "124" ]; then
+        consec_dead=$(( consec_dead + 1 ))
+      else
+        consec_dead=0
+      fi
     fi
     rm -f "$LANE_AFTER" "$LANE_AUTHORED"
   fi
   rm -rf "$PRE_LANE"; rm -f "$LANE_BEFORE"
+
+  # Trip the breaker: too many consecutive no-output failures → defer the rest.
+  if [ "$consec_dead" -ge "$throttle_break" ] && [ "$i" -lt "${#LANES[@]}" ]; then
+    log "circuit-breaker: $consec_dead consecutive no-output lane failures (rc 75/124) — usage window almost certainly exhausted; stopping early and deferring remaining lanes"
+    for j in $(seq $((i+1)) "${#LANES[@]}"); do
+      _dl="${LANES[$((j-1))]}"
+      LANE_RESULTS+=("⏭️  lane $j ($_dl) — deferred (usage window exhausted)")
+      echo "- ⏭️  **$_dl** — deferred (circuit-breaker: usage window exhausted)" >> "$REPORT"
+    done
+    break
+  fi
 done
 
 # De-dup the run allowlist (a later lane may re-touch an earlier lane's file).

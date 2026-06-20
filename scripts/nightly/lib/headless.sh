@@ -325,16 +325,33 @@ PY
   # instead of all ~23 global+plugin servers. Lanes needing none get an empty config →
   # zero MCP boot. On any build failure we DROP the flags and fall back to the full set
   # (today's behavior) so a lane is never stranded without a server it needs.
-  local mcp_args=() lane_mcp_cfg=""
+  local mcp_args=() lane_mcp_cfg="" mcp_scope_count=-1
   # shellcheck source=/dev/null
   . "$(dirname "${BASH_SOURCE[0]}")/mcp-config.sh"
   lane_mcp_cfg=$(mktemp -t "lane-${lane_id}-mcp.XXXXXX")
   if build_lane_mcp_config "$lane_id" "$lane_mcp_cfg"; then
     mcp_args=(--mcp-config "$lane_mcp_cfg" --strict-mcp-config)
+    mcp_scope_count=$(jq -r '.mcpServers|length' "$lane_mcp_cfg" 2>/dev/null || echo -1)
     echo "headless: lane=$lane_id MCP scoped → $(jq -rc '.mcpServers|keys|join(",")|if .=="" then "(none)" else . end' "$lane_mcp_cfg" 2>/dev/null)" | tee -a "$log_file"
   else
     rm -f "$lane_mcp_cfg" 2>/dev/null || true; lane_mcp_cfg=""
     echo "headless: lane=$lane_id MCP scope build failed → falling back to full MCP set" | tee -a "$log_file"
+  fi
+
+  # Idle leash for no-MCP lanes (fix 2026-06-20). A lane with ZERO MCP servers cannot
+  # hang on an MCP tool call, so the only source of "no output for lane_idle" is the
+  # Claude SDK silently backing off on a rate-limit/usage-429 at the FIRST token —
+  # which on 2026-06-20 idle-killed lanes 6/7/9/10 (rc=124 + EMPTY sidecar) before any
+  # "usage limit" result was written, leaving the limit-detector blind. A longer leash
+  # lets a transient throttle resolve into real output (or a parseable limit result)
+  # instead of an unclassifiable empty-sidecar death. Only applied when the scope is
+  # provably empty (count 0); a full-MCP fallback (count -1) keeps the strict 300s.
+  if [ "$mcp_scope_count" = "0" ]; then
+    local _no_mcp_idle="${LANE_IDLE_SECS_NO_MCP:-600}"
+    if [ "$_no_mcp_idle" -gt "$lane_idle" ]; then
+      lane_idle="$_no_mcp_idle"
+      echo "headless: lane=$lane_id no MCP → idle leash raised to ${lane_idle}s (silent rate-limit-backoff tolerance)" | tee -a "$log_file"
+    fi
   fi
 
   # --- Mechanical time + scope enforcement (PreToolUse hook) -------------------
@@ -413,8 +430,22 @@ PY
   # sleep, for a budget-aware manual re-run.
   local limit_tries=0 max_limit_tries="${LANE_LIMIT_RETRIES:-1}"
   while [ "$rc" -ne 0 ] && [ "$limit_tries" -lt "$max_limit_tries" ]; do
-    local signal wait_secs cap
+    local signal wait_secs cap _sc_bytes
     signal=$(_detect_limit_signal "$stream_sidecar")
+    # Silent-throttle variant (2026-06-20 lanes 6/7/9/10): an idle-kill (rc=124) whose
+    # sidecar is EMPTY/near-empty = claude -p emitted ZERO stream output for the whole
+    # idle window. The dominant cause is a rate-limit/usage-429 at the FIRST token — the
+    # SDK backs off silently, so the idle-watchdog kills it BEFORE any "usage limit"
+    # result line is written → _detect_limit_signal returns "" → it would revert as a
+    # generic failure. Treat a 124 with an (near-)empty sidecar as a probable throttle
+    # and BACKOFF-retry once instead of discarding the lane.
+    if [ -z "$signal" ] && [ "$rc" = "124" ]; then
+      _sc_bytes=$(wc -c < "$stream_sidecar" 2>/dev/null | tr -d ' '); _sc_bytes="${_sc_bytes:-0}"
+      if [ "$_sc_bytes" -lt "${LANE_EMPTY_SIDECAR_BYTES:-200}" ]; then
+        signal="BACKOFF"
+        echo "headless: lane=$lane_id rc=124 with empty sidecar (${_sc_bytes}B) → probable silent rate-limit throttle; BACKOFF-retry" | tee -a "$log_file"
+      fi
+    fi
     [ -z "$signal" ] && break   # genuine failure → fall through to the normal revert
     case "$signal" in
       WAIT\ *) wait_secs="${signal#WAIT }" ;;
