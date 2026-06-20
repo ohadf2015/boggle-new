@@ -13,7 +13,7 @@
  *       - PracticeCompletePopup    t(`practice.${mode}.playRealCta`)
  *       - Practice*Sandbox         t('practice.wordHunt.playRealCta' | 'practice.wordHunt.bailoutCta')
  *       - PracticeMistakeCoach     t(`practice.mistakeCoach.${kind}.title|body`)  kind ∈ MistakeCoachKind
- *       - PracticeDesktopWelcome   t(`practice.tips.${mode}.line${n}`)
+ *       - PracticeInstructions     t(`practice.tips.${mode}.line${n}`)
  *       - PracticeModeSelector     t(`education.practice.mastery.${mastery}`)
  *
  *  2. STATIC `practice.*` keys present in en/he but whose entire sub-blocks

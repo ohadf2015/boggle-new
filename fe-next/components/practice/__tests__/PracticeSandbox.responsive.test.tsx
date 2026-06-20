@@ -49,14 +49,4 @@ describe('PracticeSandbox — responsive overflow contract (classNames)', () => 
     expect(content).toContain('items-stretch w-full');
     expect(content).toContain('overflow-hidden');
   });
-
-  it('PracticeDesktopWelcome card has reduced margin on desktop (md:mb-2)', () => {
-    const filePath = path.join(
-      __dirname,
-      '../PracticeDesktopWelcome.tsx'
-    );
-    const content = fs.readFileSync(filePath, 'utf-8');
-    // Should have md:mb-2 in the className (compact on desktop)
-    expect(content).toMatch(/md:mb-2/);
-  });
 });
