@@ -322,6 +322,30 @@ describe('LandingChallengeCards — Crossword admin dev-preview gate', () => {
   });
 });
 
+describe('LandingChallengeCards — Adventure beta/admin gate', () => {
+  // Adventure ships in the server card order; the client gate hides it unless
+  // the user can see in-work modes (admin OR beta tester).
+  const withAdventure = { ...baseProps, cardOrder: ['daily', 'arena', 'blast', 'adventure', 'practice'] as const };
+
+  it('does NOT render the Adventure card for a non-beta/non-admin user', () => {
+    mockIsAdmin.mockReturnValue(false);
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...withAdventure} />);
+    expect(container.querySelector('[data-cube-key="adventure"]')).toBeNull();
+  });
+
+  it('renders the Adventure card for a beta tester / admin with /adventure href', () => {
+    mockIsAdmin.mockReturnValue(true);
+    mockIsNewPlayer.mockReturnValue(false);
+    mockGamesCompleted.mockReturnValue(10);
+    const { container } = render(<LandingChallengeCards {...withAdventure} />);
+    const card = container.querySelector('[data-cube-key="adventure"]');
+    expect(card).toBeInTheDocument();
+    expect(card?.getAttribute('href')).toBe('/en/adventure');
+  });
+});
+
 describe('LandingChallengeCards — collapse-after-MP gate', () => {
   it('renders the "More Game Modes" expander for a brand-new player (zero MP games)', () => {
     mockIsNewPlayer.mockReturnValue(true);

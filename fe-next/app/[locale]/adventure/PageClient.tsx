@@ -1,10 +1,12 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Loading fallback component with playful design
 function LoadingFallback(): React.JSX.Element {
@@ -27,12 +29,30 @@ const AdventureView = nextDynamic(
 );
 
 /**
- * Adventure Mode page route
- * Shows the world map and level selection for Adventure Mode
+ * Adventure Mode page route — Beta testers & admins only (for now).
+ * Shows the world map and level selection for Adventure Mode.
  *
- * Wrapped in Suspense boundary for proper hook handling
+ * Gated on canSeeInWorkModes (admin OR beta tester), mirroring the in-work
+ * mode pattern (e.g. Word Forge). Dev mode bypasses the gate for testing.
  */
 export default function AdventurePageClient(): React.JSX.Element {
+  const { canSeeInWorkModes } = useAuth();
+  const { language } = useLanguageSafe();
+  const router = useRouter();
+
+  // Beta/admin gate — allow in dev mode for testing. Redirect via effect to
+  // avoid a router.replace-during-render hydration mismatch.
+  const isDev = process.env.NODE_ENV === 'development';
+  useEffect(() => {
+    if (!canSeeInWorkModes && !isDev) {
+      router.replace(`/${language}`);
+    }
+  }, [canSeeInWorkModes, isDev, language, router]);
+
+  if (!canSeeInWorkModes && !isDev) {
+    return <LoadingFallback />;
+  }
+
   return (
     <Suspense fallback={<LoadingFallback />}>
       <AdventureView />

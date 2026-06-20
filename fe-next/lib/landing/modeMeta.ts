@@ -77,7 +77,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   adventure: {
     titleKey: 'landing.adventureMode', descKey: 'landing.adventureModeDesc', path: '/adventure',
-    Icon: Map, variant: 'lime', modeImage: '/modes/adventure.png', genIcon: '/modes/cubes/adventure.png',
+    Icon: Map, variant: 'lime', badge: 'BETA', modeImage: '/modes/adventure.png', genIcon: '/modes/cubes/adventure.png',
   },
   connections: {
     titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/play',

@@ -81,6 +81,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
   'connections', 'brainGym', 'wordCraft', 'wordTower',
   'wordForge', 'wordVault',
   'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall',
+  'adventure', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
 ]);
 
 /** CSS stagger delay for each card index */
@@ -198,8 +199,11 @@ export function LandingChallengeCards({
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
     if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
-    if (language === 'ja') return next.filter((m) => !JA_HIDDEN_MODES.has(m));
-    return next;
+    // Adventure is a beta/admin-only preview for now — hide it from the public
+    // hub (the route guard in adventure/PageClient blocks direct navigation too).
+    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure');
+    if (language === 'ja') return gated.filter((m) => !JA_HIDDEN_MODES.has(m));
+    return gated;
   })();
   // Bump Blast up the hub: it sits directly after the multiplayer ('arena')
   // card, regardless of popularity ranking. (Supersedes the old
