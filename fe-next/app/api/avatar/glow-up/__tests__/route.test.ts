@@ -95,4 +95,14 @@ describe('POST /api/avatar/glow-up', () => {
     const res = await POST(req(validBody));
     expect(res.status).toBe(500);
   });
+
+  it('surfaces the real failure reason (admin-only route) so it is diagnosable', async () => {
+    // The opaque generic message left admins unable to tell "no Higgsfield token"
+    // from a real bug. This route is admin-gated, so returning the cause is safe.
+    mockGenerate.mockRejectedValue(new Error('No Higgsfield token (set via admin token endpoint or HIGGSFIELD_TOKEN)'));
+    const res = await POST(req(validBody));
+    expect(res.status).toBe(500);
+    const data = await res.json();
+    expect(data.error).toContain('No Higgsfield token');
+  });
 });

@@ -282,8 +282,14 @@ export default function AvatarBuilderModal({
           <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-neo-navy to-transparent @[38rem]:hidden" aria-hidden="true" />
         </div>
 
-        {/* Options Grid — animated category transition */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0">
+        {/* Options Grid — animated category transition.
+            onMouseDown guard: stop a pointer click from focusing a part/colour
+            button and scroll-jumping the list to reveal it (worst on short
+            viewports). Click + keyboard Tab focus are unaffected. */}
+        <div
+          className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0"
+          onMouseDown={(e) => { if (shouldSuppressPointerFocus(e.target)) e.preventDefault(); }}
+        >
           <AdaptiveAnimatePresence mode="wait">
             <AdaptiveMotion.div
               key={activeCategory}
@@ -391,4 +397,15 @@ export default function AvatarBuilderModal({
 function CategoryIcon({ category }: { category: Category }) {
   const Icon = AVATAR_CATEGORY_ICONS[category];
   return <Icon size={20} />;
+}
+
+/**
+ * True when a pointer-down landed on (or inside) a button. Used to preventDefault
+ * the pointer's native focus so clicking a part/colour button near the scroll
+ * edge doesn't focus it and scroll the options list into view ("jump to start").
+ * Keyboard Tab focus is a separate path and stays intact, as does the click.
+ */
+export function shouldSuppressPointerFocus(target: EventTarget | null): boolean {
+  const el = target as HTMLElement | null;
+  return !!(el && typeof el.closest === 'function' && el.closest('button'));
 }

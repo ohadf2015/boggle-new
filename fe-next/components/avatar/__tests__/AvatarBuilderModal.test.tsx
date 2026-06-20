@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import AvatarBuilderModal from '../AvatarBuilderModal';
+import AvatarBuilderModal, { shouldSuppressPointerFocus } from '../AvatarBuilderModal';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -50,5 +50,37 @@ describe('AvatarBuilderModal', () => {
     fireEvent.click(screen.getByText('avatarBuilder.save'));
     expect(defaultProps.onSave).toHaveBeenCalledWith(DEFAULT_AVATAR_CONFIG);
     expect(defaultProps.onClose).toHaveBeenCalled();
+  });
+});
+
+/**
+ * Clicking a part/colour button near the scroll-viewport edge used to focus it,
+ * and the browser scrolled the options list to reveal the focused element — so
+ * the list "jumped" on every selection (worst on short mobile viewports where
+ * almost every row sits at an edge). Suppressing the pointer-down default focus
+ * for button targets keeps the list still on click; keyboard Tab focus (which
+ * SHOULD scroll a focused item into view) goes through a different path and is
+ * unaffected, and the click itself still fires.
+ */
+describe('shouldSuppressPointerFocus — kills pointer focus-scroll jump', () => {
+  it('suppresses when the pointer target is a button', () => {
+    const btn = document.createElement('button');
+    expect(shouldSuppressPointerFocus(btn)).toBe(true);
+  });
+
+  it('suppresses when the target is inside a button (e.g. the SVG/label)', () => {
+    const btn = document.createElement('button');
+    const span = document.createElement('span');
+    btn.appendChild(span);
+    expect(shouldSuppressPointerFocus(span)).toBe(true);
+  });
+
+  it('does NOT suppress for non-button targets (e.g. empty list gap)', () => {
+    const div = document.createElement('div');
+    expect(shouldSuppressPointerFocus(div)).toBe(false);
+  });
+
+  it('is null-safe', () => {
+    expect(shouldSuppressPointerFocus(null)).toBe(false);
   });
 });

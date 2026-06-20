@@ -77,11 +77,14 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url, seedHash, status: 'ready', persisted });
   } catch (error) {
-    captureApiError(
-      error instanceof Error ? error : new Error(String(error)),
-      '/api/avatar/glow-up',
-      { method: 'POST' },
+    const err = error instanceof Error ? error : new Error(String(error));
+    captureApiError(err, '/api/avatar/glow-up', { method: 'POST' });
+    // Admin-only route: surface the actual cause so the operator can tell a
+    // config gap (e.g. "No Higgsfield token", binary not on PATH) from a real
+    // bug. The generic message left every failure indistinguishable.
+    return NextResponse.json(
+      { error: `Glow-up generation failed: ${err.message}` },
+      { status: 500 },
     );
-    return NextResponse.json({ error: 'Glow-up generation failed' }, { status: 500 });
   }
 }
