@@ -97,13 +97,17 @@ async function loadDictionarySet(language: string): Promise<Set<string>> {
     }
 
     case 'ja': {
+      // Boards are hiragana-only, so the validation set is the base + approved
+      // HIRAGANA wordlists — mirroring backend/dictionaryLoaders.ts. Kanji
+      // compounds are seeding-only (never a playable word) and must NOT be loaded
+      // here, or the base ~9.6k hiragana corpus would be silently rejected.
       const backendDir = path.join(process.cwd(), 'backend');
-      const [kanjiContent, approvedContent] = await Promise.all([
-        fsp.readFile(path.join(backendDir, 'kanji_compounds.txt'), 'utf-8').catch(() => ''),
+      const [baseContent, approvedContent] = await Promise.all([
+        fsp.readFile(path.join(backendDir, 'japanese_words.txt'), 'utf-8').catch(() => ''),
         fsp.readFile(path.join(backendDir, 'japanese_words_approved.txt'), 'utf-8').catch(() => ''),
       ]);
 
-      for (const content of [kanjiContent, approvedContent]) {
+      for (const content of [baseContent, approvedContent]) {
         if (content) {
           for (const line of content.split('\n')) {
             const w = line.trim();

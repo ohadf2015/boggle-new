@@ -9,6 +9,7 @@
  */
 
 import { isHiraganaWord } from '@/shared/constants/japaneseLetters';
+import { isConjugatablePos } from './conjugate';
 
 const KATAKANA_START = 0x30a1; // ァ
 const KATAKANA_END = 0x30f6;   // ヶ
@@ -52,6 +53,54 @@ export function parseJmdictReadings(xml: string): Set<string> {
     while ((rebMatch = rebPattern.exec(block)) !== null) {
       const word = katakanaToHiragana(rebMatch[1].trim());
       if (word.length > 0 && isHiraganaWord(word)) out.add(word);
+    }
+  }
+  return out;
+}
+
+/** Strip the JMdict entity wrapper: "&v5m;" → "v5m". */
+function stripPosEntity(raw: string): string {
+  return raw.trim().replace(/^&/, '').replace(/;$/, '');
+}
+
+export interface JmdictInflectable {
+  reading: string;
+  pos: string[];
+}
+
+/**
+ * Parse JMdict XML into the conjugatable entries: each pure-hiragana reading
+ * paired with its <pos> entity list, but ONLY for entries whose POS resolves to
+ * a known conjugation class (ichidan / godan / i-adjective). Nouns, irregular and
+ * special verb classes, and sensitive/X-rated entries are excluded — so callers
+ * can safely run every item through deriveForms().
+ */
+export function parseJmdictInflectables(xml: string): JmdictInflectable[] {
+  const out: JmdictInflectable[] = [];
+  if (!xml) return out;
+
+  const entryPattern = /<entry\b[\s\S]*?<\/entry>/g;
+  const rebPattern = /<reb>([^<]+)<\/reb>/g;
+  const posPattern = /<pos>([^<]+)<\/pos>/g;
+
+  let entryMatch: RegExpExecArray | null;
+  while ((entryMatch = entryPattern.exec(xml)) !== null) {
+    const block = entryMatch[0];
+    if (SKIP_ENTITIES.some((tag) => block.includes(tag))) continue;
+
+    const pos: string[] = [];
+    posPattern.lastIndex = 0;
+    let posMatch: RegExpExecArray | null;
+    while ((posMatch = posPattern.exec(block)) !== null) {
+      pos.push(stripPosEntity(posMatch[1]));
+    }
+    if (!isConjugatablePos(pos)) continue; // not conjugatable by rule or irregular table
+
+    rebPattern.lastIndex = 0;
+    let rebMatch: RegExpExecArray | null;
+    while ((rebMatch = rebPattern.exec(block)) !== null) {
+      const reading = katakanaToHiragana(rebMatch[1].trim());
+      if (reading.length > 0 && isHiraganaWord(reading)) out.push({ reading, pos });
     }
   }
   return out;
