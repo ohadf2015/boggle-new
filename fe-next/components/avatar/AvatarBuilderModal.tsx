@@ -76,6 +76,9 @@ export default function AvatarBuilderModal({
   const [config, setConfig] = useState<CustomAvatarConfig>(initialConfig ?? DEFAULT_AVATAR_CONFIG);
   const [activeCategory, setActiveCategory] = useState<Category>('base');
   const [previewKey, setPreviewKey] = useState(0);
+  // Spins the shuffle glyph ONLY on randomize — keyed off previewKey would
+  // re-spin it on every part tweak, which both looks odd and re-runs the spring.
+  const [randomizeKey, setRandomizeKey] = useState(0);
   const [coinSpendAmount, setCoinSpendAmount] = useState<number | null>(null);
   const historyRef = useRef<CustomAvatarConfig[]>([]);
   // Equip "snap" burst — fires over the preview when an equip changes the tier.
@@ -130,6 +133,7 @@ export default function AvatarBuilderModal({
       return getRandomAvatarConfig();
     });
     setPreviewKey(k => k + 1);
+    setRandomizeKey(k => k + 1);
   }, [pushHistory]);
 
   const handleUndo = useCallback(() => {
@@ -193,7 +197,7 @@ export default function AvatarBuilderModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 pb-[calc(1rem+var(--admob-banner-height,0px))] overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 pb-[calc(1rem+min(var(--admob-banner-height,0px),120px)+min(var(--web-anchor-ad-height,0px),120px))] overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
       <AdaptiveMotion.div
         ref={dialogRef}
         role="dialog"
@@ -312,7 +316,7 @@ export default function AvatarBuilderModal({
             aria-label={t('avatarBuilder.randomize')}
           >
             <AdaptiveMotion.span
-              key={previewKey}
+              key={randomizeKey}
               initial={{ rotate: 180 }}
               animate={{ rotate: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}

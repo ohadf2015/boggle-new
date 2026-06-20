@@ -26,6 +26,36 @@ const PART_KEY: Record<PartType, keyof CustomAvatarConfig> = {
 };
 
 /**
+ * Memo guard for the grid cells. A cell FORCES its own part key
+ * (`{...config, [PART_KEY[partType]]: partName}`), so its rendered look is
+ * independent of `config[PART_KEY[partType]]`. The builder hands a NEW config
+ * object on every edit, which defeats the default `memo` shallow compare and
+ * re-renders all ~50 full-SVG thumbnails per click. This compares the EFFECTIVE
+ * inputs: partType/partName/size plus every config field EXCEPT the overridden
+ * one. Result: clicking through a category re-renders zero thumbnails, while a
+ * shared field (skin/hair colour, background) still updates every cell.
+ */
+export function arePartPreviewPropsEqual(prev: PartPreviewProps, next: PartPreviewProps): boolean {
+  if (
+    prev.partType !== next.partType ||
+    prev.partName !== next.partName ||
+    prev.size !== next.size
+  ) {
+    return false;
+  }
+  const ignore = PART_KEY[prev.partType];
+  const a = prev.config as Record<string, unknown>;
+  const b = next.config as Record<string, unknown>;
+  if (a === b) return true;
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const k of keys) {
+    if (k === ignore) continue;
+    if (a[k] !== b[k]) return false;
+  }
+  return true;
+}
+
+/**
  * Small parts occupy a few pixels on a full face at the 48px grid size, so we
  * zoom into their region. Big-silhouette parts (base/hair/accessory/facialHair)
  * read fine full-face. `cy` is the feature's vertical centre in the 0–100 viewBox.
@@ -70,7 +100,7 @@ const PartPreview = memo<PartPreviewProps>(({ partType, partName, config, size =
       </div>
     </div>
   );
-});
+}, arePartPreviewPropsEqual);
 
 PartPreview.displayName = 'PartPreview';
 
