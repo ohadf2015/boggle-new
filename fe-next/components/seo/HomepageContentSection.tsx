@@ -81,79 +81,79 @@ export function HomepageContentSection({ content, locale }: HomepageContentSecti
   const l = labels[locale] ?? labels.en;
   const p = `/${locale}`;
 
+  // Deliberate "reference footer": after the lively sections above, this is the
+  // calm, readable deep-dive — the About prose + the single canonical FAQ +
+  // links into the editorial surface. Zero client JS (native <details>), which
+  // keeps it crawler- and AdSense-reviewer-friendly. "What you can play" now
+  // lives in the Mode Showcase above, so the redundant features grid is gone.
   return (
     <section
       aria-label={l.about}
-      className="mx-auto w-full max-w-4xl px-4 py-10 font-neo-body text-neo-white"
+      className="mx-auto mt-4 w-full max-w-4xl px-4 pb-12 pt-10 font-neo-body text-neo-white"
     >
-      {/* About */}
-      <h2 className="mb-3 font-neo-display text-2xl font-black text-neo-lime sm:text-3xl">
-        {content.title}
-      </h2>
-      <p className="mb-8 text-base leading-relaxed text-neo-cream/90">
-        {content.description}
-      </p>
+      <div className="rounded-neo border-3 border-neo-black bg-neo-navy-light/60 p-6 shadow-hard sm:p-8">
+        {/* About */}
+        <p className="mb-2 text-xs font-black uppercase tracking-widest text-neo-lime">
+          {l.about}
+        </p>
+        <h2 className="mb-3 font-neo-display text-2xl font-black text-neo-white sm:text-3xl text-balance">
+          {content.title}
+        </h2>
+        <p className="mb-8 max-w-prose text-sm leading-relaxed text-neo-cream/90 sm:text-base">
+          {content.description}
+        </p>
 
-      {/* Features */}
-      <h3 className="mb-3 font-neo-display text-xl font-black text-neo-cyan">
-        {l.features}
-      </h3>
-      <ul className="mb-8 grid gap-2 sm:grid-cols-2">
-        {content.features.map((feature) => (
-          <li
-            key={feature}
-            className="flex items-start gap-2 rounded-neo border-neo border-neo-black bg-neo-navy-light p-3 text-sm shadow-hard-sm"
-          >
-            <span aria-hidden className="font-black text-neo-lime">›</span>
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-
-      {/* FAQ — native disclosure, no client JS */}
-      <h3 className="mb-3 font-neo-display text-xl font-black text-neo-pink">
-        {l.faq}
-      </h3>
-      <div className="mb-8 space-y-2">
-        {content.faq.map((item) => (
-          <details
-            key={item.question}
-            className="rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard-sm"
-          >
-            <summary className="cursor-pointer list-none p-3 font-neo-display font-bold text-neo-white marker:hidden">
-              {item.question}
-            </summary>
-            <p className="px-3 pb-3 text-sm leading-relaxed text-neo-cream/90">
-              {item.answer}
-            </p>
-          </details>
-        ))}
-      </div>
-
-      {/* Editorial internal links — surfaces the publisher content to reviewers + users */}
-      <nav aria-label={l.learnMore} className="border-t-neo border-neo-black/40 pt-4">
-        <h3 className="mb-3 font-neo-display text-lg font-black text-neo-purple">
-          {l.learnMore}
+        {/* FAQ — native disclosure, no client JS */}
+        <h3 className="mb-3 font-neo-display text-lg font-black text-neo-pink sm:text-xl">
+          {l.faq}
         </h3>
-        <ul className="flex flex-wrap gap-2">
-          {[
-            { href: `${p}/daily`, label: l.links.daily },
-            { href: `${p}/how-to-play`, label: l.links.howToPlay },
-            { href: `${p}/guides`, label: l.links.guides },
-            { href: `${p}/blog`, label: l.links.blog },
-            { href: `${p}/about`, label: l.links.about },
-          ].map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className="inline-block rounded-neo border-neo border-neo-black bg-neo-lime px-4 py-2 text-sm font-bold text-neo-black shadow-hard-sm transition-transform hover:-translate-y-0.5"
-              >
-                {link.label}
-              </Link>
-            </li>
+        <div className="mb-8 space-y-2">
+          {content.faq.map((item) => (
+            <details
+              key={item.question}
+              className="group rounded-neo border-2 border-neo-black bg-neo-navy shadow-hard-sm"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 font-neo-display font-bold text-neo-white marker:hidden sm:p-4">
+                <span>{item.question}</span>
+                <span
+                  aria-hidden
+                  className="shrink-0 font-black text-neo-pink transition-transform duration-200 group-open:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
+              <p className="px-3 pb-3 text-sm leading-relaxed text-neo-cream/90 sm:px-4 sm:pb-4">
+                {item.answer}
+              </p>
+            </details>
           ))}
-        </ul>
-      </nav>
+        </div>
+
+        {/* Editorial internal links — surfaces the publisher content to reviewers + users */}
+        <nav aria-label={l.learnMore} className="border-t-2 border-neo-black/40 pt-5">
+          <h3 className="mb-3 font-neo-display text-base font-black text-neo-purple">
+            {l.learnMore}
+          </h3>
+          <ul className="flex flex-wrap gap-2">
+            {[
+              { href: `${p}/daily`, label: l.links.daily },
+              { href: `${p}/how-to-play`, label: l.links.howToPlay },
+              { href: `${p}/guides`, label: l.links.guides },
+              { href: `${p}/blog`, label: l.links.blog },
+              { href: `${p}/about`, label: l.links.about },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="inline-block rounded-neo border-2 border-neo-black bg-neo-lime px-4 py-2 text-sm font-bold text-neo-black shadow-hard-sm transition-transform hover:-translate-y-0.5"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
     </section>
   );
 }

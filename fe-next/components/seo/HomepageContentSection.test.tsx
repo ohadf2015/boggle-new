@@ -30,10 +30,12 @@ describe('HomepageContentSection', () => {
     expect(container.querySelector('.sr-only')).toBeNull();
   });
 
-  it('renders every feature', () => {
+  it('does NOT render a features list (now owned by the Mode Showcase above)', () => {
     render(<HomepageContentSection content={content} locale="en" />);
+    // The redundant features grid was removed; "what you can play" lives in the
+    // lively Mode Showcase. AdSense substance is carried by the prose + FAQ below.
     for (const f of content.features) {
-      expect(screen.getByText(f), `feature: ${f}`).toBeTruthy();
+      expect(screen.queryByText(f), `feature should be gone: ${f}`).toBeNull();
     }
   });
 
