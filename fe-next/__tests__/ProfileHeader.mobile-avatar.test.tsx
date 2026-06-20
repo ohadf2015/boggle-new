@@ -27,9 +27,15 @@ vi.mock('next/image', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  m: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  },
+  // Generic motion factory so any m.<tag> (div, circle, span, ...) renders.
+  m: new Proxy(
+    {},
+    {
+      get: (_t, tag: string) =>
+        ({ children, ...props }: any) => React.createElement(tag, props, children),
+    },
+  ),
+  useInView: () => true,
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({

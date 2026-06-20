@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { m, AnimatePresence, PanInfo } from 'framer-motion';
-import { User, ArrowLeft, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Trophy, Gem } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, LayoutDashboard, BarChart3, Trophy, Gem, Sparkles, Star, Lock } from 'lucide-react';
+import { LevelRing } from '@/components/profile/LevelRing';
 import { useRouter } from 'next/navigation';
 import { useQueryState, parseAsStringLiteral } from 'nuqs';
 import Link from 'next/link';
@@ -141,37 +142,71 @@ export default function ProfilePageClient(): React.JSX.Element {
         isDarkMode ? 'bg-neo-navy' : 'bg-linear-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
-        {/* Reduced padding for unauthenticated view */}
-        <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
-          <div className="text-center py-6 sm:py-8">
-            <User className="mx-auto text-6xl text-gray-600 mb-4" />
-            <h2 className={cn('text-2xl font-bold mb-2', isDarkMode ? 'text-white' : 'text-gray-900')}>
+        <div className="max-w-md mx-auto px-4 py-6 sm:py-8 w-full">
+          <m.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden bg-neo-navy-light border-3 border-neo-black rounded-neo-xl shadow-hard-lg p-6 pt-8 text-center"
+          >
+            {/* Identity banner — segmented full-palette bar */}
+            <div className="absolute top-0 inset-x-0 h-2.5 flex" aria-hidden>
+              {['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-purple', 'bg-neo-yellow'].map((c) => (
+                <span key={c} className={cn('flex-1 relative', c)}>
+                  <span className="absolute inset-0 texture-halftone-comic opacity-30 mix-blend-overlay" />
+                </span>
+              ))}
+            </div>
+
+            {/* Locked HQ orb — a teaser of the level ring they'll earn */}
+            <div className="relative mx-auto w-fit mt-2 mb-5">
+              <LevelRing percent={68} size={88} color="cyan" ariaLabel={t('profile.title')}>
+                <div className="w-full h-full rounded-full bg-neo-navy border-2 border-neo-black flex items-center justify-center">
+                  <Sparkles className="w-9 h-9 text-neo-cyan" strokeWidth={2.25} />
+                </div>
+              </LevelRing>
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-0.5 leading-none">
+                <span className="text-[8px] font-black uppercase tracking-[0.15em] opacity-70">{t('xp.level')}</span>
+                <span className="font-neo-display font-black text-sm">?</span>
+              </div>
+            </div>
+
+            <h2 className="text-3xl font-black font-neo-display uppercase tracking-tight text-neo-white mb-2">
               {t('profile.title')}
             </h2>
-            <p className={cn('text-lg mb-6', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+            <p className="text-base text-gray-300 mb-5 font-neo-body">
               {t('auth.upgradePrompt')}
             </p>
-            <div className="flex gap-4 justify-center">
+
+            {/* Teaser stat tiles — locked, hinting at what fills in */}
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {[
+                { icon: <Star strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.totalScore'), color: 'text-neo-cyan' },
+                { icon: <Trophy strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.wins'), color: 'text-neo-pink' },
+                { icon: <Gem strokeWidth={2.5} className="w-4 h-4" />, label: t('profile.achievements'), color: 'text-neo-lime' },
+              ].map((tile) => (
+                <div key={tile.label} className="relative bg-neo-black/40 border-2 border-neo-black rounded-neo px-2 py-2.5">
+                  <span className={cn('inline-flex mb-1', tile.color)}>{tile.icon}</span>
+                  <p className="text-[9px] font-black uppercase tracking-[0.1em] text-neo-white truncate leading-none">{tile.label}</p>
+                  <div className="mt-1 flex items-center justify-center gap-1 text-gray-500">
+                    <Lock className="w-3 h-3" />
+                    <span className="font-neo-display font-black text-base">—</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               {!isOnCrazyGamesPlatform && (
-                <EnhancedButton
-                  onClick={() => setShowAuthModal(true)}
-                  variant="cyan"
-                  haptic
-                  animation="pop"
-                >
+                <EnhancedButton onClick={() => setShowAuthModal(true)} variant="cyan" haptic animation="pop">
                   {t('auth.signIn')}
                 </EnhancedButton>
               )}
-              <EnhancedButton
-                variant="outline"
-                onClick={() => router.push(`/${language}`)}
-                haptic
-              >
+              <EnhancedButton variant="outline" onClick={() => router.push(`/${language}`)} haptic>
                 <ArrowLeft className="me-2 rtl:rotate-180" />
                 {t('profile.backToGame')}
               </EnhancedButton>
             </div>
-          </div>
+          </m.div>
         </div>
         {!isOnCrazyGamesPlatform && (
           <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} showGuestStats={true} />

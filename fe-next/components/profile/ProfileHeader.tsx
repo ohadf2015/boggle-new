@@ -18,10 +18,11 @@ import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
-import LevelBadge from '@/components/LevelBadge';
 import { RankTierChip } from '@/components/seasons/RankTierChip';
 import { scoreTier } from '@/lib/seasons/scoreTier';
-import { getLevelFromXp } from '@/components/XpProgressBar';
+import { getXpProgress } from '@/backend/modules/xpManager';
+import { LevelRing } from '@/components/profile/LevelRing';
+import { StreakFlame } from '@/components/profile/StreakFlame';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -129,60 +130,70 @@ export function ProfileHeader({
     }
   }, [updateProfile, refreshProfile, t]);
 
-  const level = getLevelFromXp(profile?.total_xp || 0);
+  const xp = getXpProgress(profile?.total_xp || 0);
+  const level = xp.currentLevel;
+  const tier = scoreTier(profile?.total_score);
+  const streakDays = profile?.streak_days || 0;
+  const avatarPx = compact ? 80 : 96;
 
   return (
     <m.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'relative bg-neo-navy-light border border-white/[0.08] rounded-neo-xl mb-4',
-        compact ? 'p-4' : 'p-6'
+        'relative overflow-hidden bg-neo-navy-light border-3 border-neo-black rounded-neo-xl shadow-hard-lg mb-4',
+        compact ? 'p-4 pt-5' : 'p-6 pt-7'
       )}
     >
-      {/* Level badge + season tier — top-right */}
-      {!compact && (
-        <div className="absolute top-4 inset-e-4 flex flex-col items-end gap-1.5">
-          <div className="bg-neo-cyan/10 rounded-xl px-3 py-1.5 text-center">
-            <span className="text-xl font-black text-neo-cyan leading-none">{level}</span>
-            <span className="block text-[9px] font-bold uppercase tracking-wider text-gray-400">{t('xp.level')}</span>
-          </div>
-          {scoreTier(profile?.total_score) !== 'stone' && (
-            <RankTierChip tier={scoreTier(profile?.total_score)} size="xs" />
-          )}
-        </div>
-      )}
+      {/* Identity banner — segmented full-palette bar (coherent chaos, hard blocks, no blur) */}
+      <div className="absolute top-0 inset-x-0 h-2.5 flex" aria-hidden>
+        {['bg-neo-lime', 'bg-neo-cyan', 'bg-neo-pink', 'bg-neo-purple', 'bg-neo-yellow'].map((c) => (
+          <span key={c} className={cn('flex-1 relative', c)}>
+            <span className="absolute inset-0 texture-halftone-comic opacity-30 mix-blend-overlay" />
+          </span>
+        ))}
+      </div>
 
-      <div className={cn('flex', compact ? 'flex-row gap-3 items-center' : 'flex-row gap-5 items-center')}>
-        {/* Avatar with subtle cyan ring */}
+      <div className={cn('flex', compact ? 'flex-row gap-4 items-center' : 'flex-row gap-6 items-center')}>
+        {/* Avatar wrapped in a level-progress ring + LV plate */}
         <div className="relative shrink-0">
+          <LevelRing
+            percent={xp.progressPercent}
+            size={avatarPx}
+            colorHex={playerStyle.accentHex}
+            isMaxLevel={xp.isMaxLevel}
+            ariaLabel={`${t('xp.level')} ${level} · ${xp.progressPercent}%`}
+          >
+            <div className="relative w-full h-full rounded-full overflow-hidden">
+              <Avatar
+                customAvatar={profile?.avatar_config ?? undefined}
+                userId={profile?.id}
+                size={compact ? 'lg' : '2xl'}
+                className="w-full h-full"
+                frame={equippedFrame}
+              />
+            </div>
+          </LevelRing>
+
+          {/* LV plate — overlaps the bottom of the ring */}
           <div
             className={cn(
-              'relative rounded-full overflow-hidden',
-              !equippedFrame || equippedFrame === 'frame-none'
-                ? playerStyle.accentHex
-                  ? 'ring-4 ring-accent ring-offset-2 ring-offset-slate-800/40'
-                  : 'ring-2 ring-neo-cyan/30 ring-offset-2 ring-offset-slate-800/40'
-                : '',
-              compact ? 'w-20 h-20' : 'w-24 h-24'
+              'absolute -bottom-2 left-1/2 -translate-x-1/2 z-10',
+              'flex items-center gap-1 bg-neo-cyan text-neo-black',
+              'border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-0.5 leading-none',
             )}
           >
-            <Avatar
-              customAvatar={profile?.avatar_config ?? undefined}
-              userId={profile?.id}
-              size={compact ? 'lg' : '2xl'}
-              className="w-full h-full"
-              frame={equippedFrame}
-            />
+            <span className="text-[8px] font-black uppercase tracking-[0.15em] opacity-70">{t('xp.level')}</span>
+            <span className="font-neo-display font-black text-sm tabular-nums">{level}</span>
           </div>
 
           {/* Edit avatar button */}
           <button
             onClick={() => setIsAvatarBuilderOpen(true)}
             className={cn(
-              'absolute -bottom-1 -inset-e-1 flex items-center justify-center',
-              'rounded-full bg-neo-pink/90 border border-white/20',
-              'text-white hover:bg-neo-pink hover:scale-110 transition-all',
+              'absolute -top-1 -inset-e-1 z-10 flex items-center justify-center',
+              'rounded-full bg-neo-pink border-2 border-neo-black shadow-hard-sm',
+              'text-white hover:scale-110 transition-transform',
               compact ? 'w-6 h-6' : 'w-8 h-8'
             )}
             title={t('profile.chooseAvatar')}
@@ -201,7 +212,6 @@ export function ProfileHeader({
                 onChange={(e) => setEditDisplayName(e.target.value)}
                 className="h-10 text-lg font-bold bg-neo-navy-elevated border-slate-600"
                 maxLength={20}
-                
               />
               <Button
                 size="sm"
@@ -237,12 +247,13 @@ export function ProfileHeader({
             </h1>
           )}
 
-          {/* Compact level badge inline */}
-          {compact && (
-            <div className="inline-flex items-center mt-1">
-              <LevelBadge level={level} size="sm" showLabel />
-            </div>
-          )}
+          {/* Title + streak — the identity badges */}
+          <div className={cn('flex flex-wrap items-center gap-2', compact ? 'mt-1.5' : 'mt-2.5')}>
+            {tier !== 'stone' && (
+              <RankTierChip tier={tier} size={compact ? 'xs' : 'sm'} />
+            )}
+            <StreakFlame days={streakDays} size={compact ? 'sm' : 'md'} />
+          </div>
 
           {/* Country + join date pills */}
           <div className={cn('flex flex-wrap items-center gap-2', compact ? 'mt-1' : 'mt-3')}>

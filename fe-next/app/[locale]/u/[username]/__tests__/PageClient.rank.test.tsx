@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
 vi.mock('@/components/AutoHideHeader', () => ({ default: () => null }));
+vi.mock('@/components/Avatar', () => ({ __esModule: true, default: () => <div data-testid="pub-avatar" /> }));
 vi.mock('@/hooks/useSeasonBadges', () => ({ useSeasonBadges: () => ({ badges: [], isLoading: false }) }));
 vi.mock('@/components/seasons/SeasonTrophyCase', () => ({ SeasonTrophyCase: () => <div data-testid="trophy-case" /> }));
 vi.mock('@/components/seasons/SeasonRankCard', () => ({

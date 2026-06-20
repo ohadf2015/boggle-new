@@ -32,7 +32,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
       <StatCard
         icon={<Star strokeWidth={2.5} />}
         label={t('profile.totalScore')}
-        value={totalScore.toLocaleString()}
+        value={totalScore}
         isDarkMode={isDarkMode}
         color="cyan"
         index={0}
@@ -48,7 +48,7 @@ export function ProfileStatsGrid({ profile, isDarkMode, delay = 0.1 }: ProfileSt
       <StatCard
         icon={<BookOpenText strokeWidth={2.5} />}
         label={t('profile.wordsFound')}
-        value={totalWords.toLocaleString()}
+        value={totalWords}
         isDarkMode={isDarkMode}
         color="lime"
         index={2}
