@@ -3,15 +3,18 @@ import { hashStringToSeed, seededPRNG } from './prng';
 import { tierForChestNumber, type ChestTier, CHEST_TIERS } from './chest-config';
 import { milestoneForChest } from './chest-milestone';
 
-// Stub pools — Plan 6 expands these per locale
-const BOOST_POOL = ['shield', 'speed', 'xray', 'reload'];
-const AVATAR_PARTS_PER_LOCALE: Record<Locale, string[]> = {
-  en: ['head_1', 'eyes_1', 'mouth_1', 'body_1'],
-  he: ['head_1', 'eyes_1', 'mouth_1', 'body_1'],
-  sv: ['head_1', 'eyes_1', 'mouth_1', 'body_1'],
-  ja: ['head_1', 'eyes_1', 'mouth_1', 'body_1'],
-  es: ['head_1', 'eyes_1', 'mouth_1', 'body_1'],
-};
+// Phantom-reward removal (2026-06-20). The chest used to mint two reward types
+// the player never actually received:
+//   - `boosts` (shield/speed/xray/reload): there is NO boost inventory or in-game
+//     power-up system — they were display-only and vanished on chest open.
+//   - `avatarPart` ('head_1' …): placeholder ids that don't match the real avatar
+//     schema ({category, partId}) and were never redeemed into a player's avatar.
+// Celebrating rewards the player can't use makes the headline chest loop feel
+// hollow. Until those systems ship, we fold their value into COINS — the one real,
+// spendable reward — so the chest pays out only tangible things. The chest UIs
+// already gate boost/part display on non-empty, so the fake rows auto-hide.
+const BOOST_COIN_VALUE = 100; // coins folded in per boost the tier would have rolled
+const AVATAR_PART_COIN_VALUE = 150; // coins folded in when an avatar part would have rolled
 
 export type ChestContents = {
   tier: ChestTier['tier'];
@@ -23,29 +26,26 @@ export type ChestContents = {
   milestone?: number;
 };
 
-export function rollChest(userId: string, chestNumber: number, locale: Locale): ChestContents {
+export function rollChest(userId: string, chestNumber: number, _locale: Locale): ChestContents {
   const seed = hashStringToSeed(`${userId}:chest:${chestNumber}`);
   const prng = seededPRNG(seed);
   const tierDef = tierForChestNumber(chestNumber);
 
-  const coins = tierDef.coinBase + prng.intRange(tierDef.coinVariance + 1);
-
-  const boosts: { type: string; count: number }[] = [];
-  for (let i = 0; i < tierDef.boostCount; i++) {
-    const type = prng.pick(BOOST_POOL);
-    boosts.push({ type, count: 1 });
-  }
-
-  const avatarPart = prng.chance(tierDef.avatarPartChance)
-    ? prng.pick(AVATAR_PARTS_PER_LOCALE[locale] ?? AVATAR_PARTS_PER_LOCALE.en)
-    : null;
+  const baseCoins = tierDef.coinBase + prng.intRange(tierDef.coinVariance + 1);
+  // Convert what the tier WOULD have dropped as boosts/parts into coins. The
+  // avatar chance is still rolled (advances the PRNG + decides the bonus) so the
+  // rare "you got the legendary drop" feel survives — as a coin windfall.
+  const foldedBoostCoins = tierDef.boostCount * BOOST_COIN_VALUE;
+  const wouldRollAvatarPart = prng.chance(tierDef.avatarPartChance);
+  const foldedAvatarCoins = wouldRollAvatarPart ? AVATAR_PART_COIN_VALUE : 0;
+  const coins = baseCoins + foldedBoostCoins + foldedAvatarCoins;
 
   const milestone = milestoneForChest(chestNumber);
   return {
     tier: tierDef.tier,
     coins,
-    boosts,
-    avatarPart,
+    boosts: [], // no usable boost system yet — value folded into coins above
+    avatarPart: null, // chest parts were never redeemable — value folded into coins
     frameSkin: tierDef.frame,
     ...(milestone !== null ? { milestone } : {}),
   };
