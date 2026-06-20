@@ -47,7 +47,7 @@ import { WordTowerSkinPicker } from './WordTowerSkinPicker';
 import { WordTowerFlowFrame } from './WordTowerFlowFrame';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
-import { buildDropVerdict, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
+import { buildDropVerdict, showsTierKicker, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
 import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
@@ -825,7 +825,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         <div
           role="status"
           aria-live="polite"
-          className={`pointer-events-none absolute inset-x-0 top-[12%] z-40 mx-auto flex w-fit flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-pink px-5 py-2.5 text-center text-neo-white shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
+          className={`pointer-events-none absolute inset-x-0 top-[6.75rem] z-40 mx-auto flex w-fit flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-pink px-5 py-2.5 text-center text-neo-white shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
         >
           <span className="flex items-center gap-1.5 font-neo-display text-base font-extrabold">
             <span aria-hidden>🧨</span>
@@ -898,7 +898,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           while the NEW ZONE banner is paying off the arrival. */}
       {tease && !zoneText && (
         <div
-          className="pointer-events-none absolute left-1/2 top-[13%] z-20 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
+          className="pointer-events-none absolute left-1/2 top-[6.75rem] z-20 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
           aria-live="polite"
         >
           <ChevronsUp className="h-3 w-3" />
@@ -909,7 +909,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* NEW ZONE banner — the headline of entering a new biome */}
       {zoneR.value && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[13%] z-30 -translate-x-1/2 ${fxClass(zoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard`}
+          className={`pointer-events-none absolute left-1/2 top-[6.75rem] z-30 -translate-x-1/2 ${fxClass(zoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard`}
           aria-live="polite"
         >
           <div className="font-neo-body text-[10px] font-bold uppercase tracking-[0.2em] text-black/60">{t('wordTower.zone.entered')}</div>
@@ -971,8 +971,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         >
           {/* Tier kicker — the long-word celebration (SKYSCRAPER!) folded INTO the
               verdict so it is ONE consolidated beat, not a separate floating pop
-              stacking on top of this one (founder: less clutter, more fun to watch). */}
-          {tower.state.lastResult && tower.state.lastResult.tier !== 'none' && (
+              stacking on top of this one (founder: less clutter, more fun to watch).
+              Hidden on a MISS so a fumbled drop never reads as a celebration
+              (founder screenshot: "HIGH-RISE!" sat on top of a red "MISSED!"). */}
+          {tower.state.lastResult && tower.state.lastResult.tier !== 'none' && showsTierKicker(verdict.v.tone) && (
             <div className="rounded-neo border-neo border-black bg-neo-yellow px-3 py-0.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard">
               {t(TOWER_TIER_KEY[tower.state.lastResult.tier])}
             </div>
@@ -983,7 +985,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             {t(verdict.v.labelKey)}
           </div>
           {verdict.v.gainText !== '+0m' && (
-            <div className="rounded-neo border-neo border-black bg-neo-navy/85 px-3 py-1 font-neo-display text-lg font-black text-neo-white shadow-hard backdrop-blur-sm">
+            <div dir="ltr" className="rounded-neo border-neo border-black bg-neo-navy/85 px-3 py-1 font-neo-display text-lg font-black text-neo-white shadow-hard backdrop-blur-sm">
               {verdict.v.gainText}
             </div>
           )}
@@ -1004,7 +1006,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           Telegraphs the clutch stake: land THIS drop cleanly. */}
       {crane.critical && tower.state.pendingWord && !clutchText && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[12%] z-30 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-orange px-3 py-1.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-pulse'}`}
+          className={`pointer-events-none absolute left-1/2 top-[6.75rem] z-30 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-orange px-3 py-1.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-pulse'}`}
           aria-live="assertive"
         >
           ⚠ {t('wordTower.clutch.critical')}
@@ -1014,7 +1016,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* CLUTCH SAVE banner — the do-or-die payoff. Lime = triumph. */}
       {clutchR.value && (
         <div
-          className={`pointer-events-none absolute inset-x-0 top-[12%] z-40 mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(clutchR.exiting, 'animate-neo-pop')}`}
+          className={`pointer-events-none absolute inset-x-0 top-[6.75rem] z-40 mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(clutchR.exiting, 'animate-neo-pop')}`}
           aria-live="assertive"
         >
           {clutchR.value}
@@ -1056,7 +1058,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             {t(`wordTower.surprise.${TOWER_SURPRISE_META[surpriseFx.s.event].key}`)}
           </div>
           {(surpriseFx.s.bonusMeters > 0 || surpriseFx.s.bonusScrambles > 0) && (
-            <div className="font-neo-body text-xs font-black text-black/80 tabular-nums">
+            <div dir="ltr" className="font-neo-body text-xs font-black text-black/80 tabular-nums">
               {surpriseFx.s.bonusMeters > 0 && `+${Math.round(surpriseFx.s.bonusMeters)}m`}
               {surpriseFx.s.bonusMeters > 0 && surpriseFx.s.bonusScrambles > 0 && ' · '}
               {surpriseFx.s.bonusScrambles > 0 && `+${surpriseFx.s.bonusScrambles}🔀`}

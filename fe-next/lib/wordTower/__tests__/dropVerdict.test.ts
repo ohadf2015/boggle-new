@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildDropVerdict, formatHeightGain, verdictLabelKey, verdictTone } from '../dropVerdict';
+import { buildDropVerdict, formatHeightGain, showsTierKicker, verdictLabelKey, verdictTone } from '../dropVerdict';
 import type { PlacementOutcome } from '../cranePlacement';
 
 const outcome = (q: PlacementOutcome['quality'], over = 1, topples = false): PlacementOutcome => ({
@@ -44,6 +44,18 @@ describe('formatHeightGain', () => {
 
   it('clamps negatives to +0m (height never decreases on a drop)', () => {
     expect(formatHeightGain(-3)).toBe('+0m');
+  });
+});
+
+describe('showsTierKicker — never celebrate a long word on a fumbled drop', () => {
+  it('shows the word-tier celebration for a clean placement (lime/cyan/yellow)', () => {
+    expect(showsTierKicker('lime')).toBe(true);
+    expect(showsTierKicker('cyan')).toBe(true);
+    expect(showsTierKicker('yellow')).toBe(true);
+  });
+
+  it('suppresses it on a MISS so "HIGH-RISE!" never stacks on top of "MISSED!"', () => {
+    expect(showsTierKicker('red')).toBe(false);
   });
 });
 
