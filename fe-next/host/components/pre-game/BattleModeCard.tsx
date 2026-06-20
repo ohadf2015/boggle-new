@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Shuffle, FileText, Target, Check, Bomb, Building2, Link2, Gavel, Grid3x3 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
-import type { GameModeOption } from '@/components/GameModeSelector';
+import { getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
 import { useExperiment } from '@/hooks/useExperiment';
 import { isShiritoriAvailable } from '@/shared/utils/availableModes';
 
@@ -126,9 +126,11 @@ export function BattleModeCard({
       <h3 className="text-[10px] font-bold uppercase tracking-widest text-neo-cream/50 px-0.5">
         {t('hostView.battleMode')}
       </h3>
-      {/* Equal-width chips. 2×2 grid below 1024 (Spanish "CAZA DE PALABRAS" overflows
-          when 4 share a narrow rail at 720-1023); 4-col only when card has full width. */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5">
+      {/* Showcase cards: each mode shows its own icon + name + one-line rule.
+          2-col on mobile, 3-col on wide rails — the per-card vertical layout
+          gives long labels (e.g. Spanish "CAZA DE PALABRAS") room to wrap, so
+          they no longer overflow as they did in the old single-row chips. */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
         {visibleModes.map(({ mode, icon, nameKey, activeBg }) => {
             const isActive = selectedGameMode === mode;
 
@@ -136,33 +138,56 @@ export function BattleModeCard({
               <m.button
                 key={mode}
                 type="button"
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => handleSelect(mode)}
                 data-testid={`game-mode-${mode}`}
+                aria-pressed={isActive}
                 className={cn(
-                  'flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl border-2 text-xs font-bold uppercase transition-all whitespace-nowrap',
+                  'flex flex-col items-start gap-1.5 p-2.5 rounded-xl border-2 text-left transition-all',
                   isActive
-                    ? `${activeBg} border-neo-black text-neo-black shadow-hard-lg`
-                    : 'bg-white/5 border-neo-white/15 text-neo-cream/60 hover:border-neo-white/30 hover:bg-white/10'
+                    ? `${activeBg} border-neo-black shadow-hard-lg`
+                    : 'bg-white/5 border-neo-white/15 hover:border-neo-white/30 hover:bg-white/10'
                 )}
               >
-                <span className={cn(isActive ? 'text-neo-black' : 'text-neo-cream/50')}>
-                  {icon}
-                </span>
-                <span>{t(nameKey)}</span>
-                <AnimatePresence mode="wait">
-                  {isActive && (
-                    <m.div
-                      key="check"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                    >
-                      <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />
-                    </m.div>
+                <div className="flex items-center gap-1.5 w-full">
+                  <span
+                    className={cn(
+                      'flex items-center justify-center w-7 h-7 rounded-lg border-2 border-neo-black shrink-0',
+                      isActive ? 'bg-neo-black/15 text-neo-black' : 'bg-neo-navy/60 text-neo-cream/70'
+                    )}
+                  >
+                    {icon}
+                  </span>
+                  <span
+                    className={cn(
+                      'flex-1 min-w-0 text-xs font-bold uppercase leading-tight',
+                      isActive ? 'text-neo-black' : 'text-neo-cream/80'
+                    )}
+                  >
+                    {t(nameKey)}
+                  </span>
+                  <AnimatePresence mode="wait">
+                    {isActive && (
+                      <m.div
+                        key="check"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                      >
+                        <Check className="w-3.5 h-3.5 text-neo-black" strokeWidth={3} />
+                      </m.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+                <span
+                  className={cn(
+                    'text-[10px] leading-snug line-clamp-2',
+                    isActive ? 'text-neo-black/70' : 'text-neo-cream/45'
                   )}
-                </AnimatePresence>
+                >
+                  {getModeDescription(mode, t)}
+                </span>
               </m.button>
             );
           })}
