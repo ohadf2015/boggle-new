@@ -25,6 +25,7 @@ export const STYLE_DANCE: Record<PlayerStyleKey, string> = {
   latin: 'hero-dance-salsa', // quick salsa side-step
   reggae: 'hero-dance-skank', // laid-back off-beat skank
   japanese: 'hero-dance-bounce', // dainty cute bounce
+  k_pop: 'hero-dance-kpop', // bouncy idol point-and-wave
   desert_epic: 'hero-dance-dune', // slow swaying dune drift
   fanfare: 'hero-dance-triumph', // chest-out triumphant pulse
 };

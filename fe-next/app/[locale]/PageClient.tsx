@@ -3,8 +3,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { Loader2 } from 'lucide-react';
 import { retryImport } from '@/utils/retryImport';
+import { DancingMascot } from '@/components/ui/DancingMascot';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded, trackInviteRedirectFired } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
@@ -32,7 +32,9 @@ const OnboardingFlow = dynamic(
     ssr: false,
     loading: () => (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy" role="status" aria-live="polite">
-        <Loader2 className="h-12 w-12 animate-spin text-neo-yellow" aria-hidden />
+        {/* A dancing cube greets the player while the onboarding chunk loads —
+            a brief, high-visibility first impression beats a bare spinner. */}
+        <DancingMascot className="h-28 w-28 sm:h-32 sm:w-32" />
         <span className="sr-only">Loading…</span>
       </div>
     ),

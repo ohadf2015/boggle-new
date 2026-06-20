@@ -13,6 +13,7 @@ const he = {
       "latin": "לטיני",
       "reggae": "רגאיי",
       "japanese": "יפני",
+      "k_pop": "קיי-פופ",
       "desert_epic": "אפי מדברי",
       "fanfare": "תרועה"
     },
@@ -2354,6 +2355,14 @@ const he = {
       "cool": "קול"
     }
   },
+  "lobbyDailyEmber": {
+    "secured": "יומי הושלם · {streak}",
+    "atRisk": "רצף של {streak} ימים",
+    "invite": "האתגר היומי מחכה",
+    "popoverTitle": "האתגר היומי",
+    "popoverBody": "חידה חדשה כל יום. היא תחכה לכם גם אחרי המשחק — סיימו את הסיבוב ואז שמרו על הרצף.",
+    "gotIt": "הבנתי"
+  },
   "playerView": {
     "onlyLanguageWords": "השתמשו רק באותיות של השפה הזו",
     "wordsFound": "מילים שנמצאו",
@@ -4565,6 +4574,7 @@ const he = {
     },
     "title": "פרופיל",
     "notFound": "השחקן לא נמצא",
+    "streakDays": "ימי רצף",
     "stats": {
       "games": "משחקים",
       "winRate": "אחוז ניצחון"
@@ -4977,6 +4987,7 @@ const he = {
     "yourProgress": "ההתקדמות שלך",
     "percentile": "אחוזון",
     "nextRank": "הדירוג הבא",
+    "topThree": "שלושת המובילים",
     "pointsToGo": "נקודות נשארו",
     "beat": "לנצח",
     "youAreFirst": "אתה #1!",

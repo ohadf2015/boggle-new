@@ -13,6 +13,7 @@ const ja = {
       "latin": "ラテン",
       "reggae": "レゲエ",
       "japanese": "和風",
+      "k_pop": "K-POP",
       "desert_epic": "砂漠の叙事詩",
       "fanfare": "ファンファーレ"
     },
@@ -2182,6 +2183,14 @@ const ja = {
       "cool": "クール"
     }
   },
+  "lobbyDailyEmber": {
+    "secured": "デイリー達成 · {streak}",
+    "atRisk": "{streak}日連続",
+    "invite": "デイリー開催中",
+    "popoverTitle": "デイリーチャレンジ",
+    "popoverBody": "毎日新しいパズルが登場。試合のあともちゃんと待ってるよ。まずは対戦を終えて、それから連続記録をキープしよう。",
+    "gotIt": "わかった"
+  },
   "playerView": {
     "onlyLanguageWords": "この言語の文字だけを使ってください",
     "wordsFound": "見つけた単語",
@@ -4068,6 +4077,7 @@ const ja = {
     },
     "title": "プロフィール",
     "notFound": "プレイヤーが見つかりません",
+    "streakDays": "日連続",
     "stats": {
       "games": "ゲーム",
       "winRate": "勝率"
@@ -4481,6 +4491,7 @@ const ja = {
     "yourProgress": "あなたの進捗",
     "percentile": "パーセンタイル",
     "nextRank": "次のランク",
+    "topThree": "トップ3プレイヤー",
     "pointsToGo": "ポイント差",
     "beat": "追い越す",
     "youAreFirst": "あなたが1位!",

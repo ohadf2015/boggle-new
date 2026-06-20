@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/utils/accessibility';
+import { DancingMascot } from '@/components/ui/DancingMascot';
 
 const MIN_SHOW_MS = 600;
 const MAX_SHOW_MS = 3500;
@@ -33,6 +34,10 @@ export function AnimatedSplash() {
   const prefersReducedMotion = useReducedMotion();
   const [show, setShow] = useState(false);
   const [textIndex, setTextIndex] = useState(0);
+  // Pick one genre dancing mascot per session. Lazy init = stable for this mount,
+  // and the splash only ever renders client-side (show starts false on SSR), so
+  // the random pick can't cause a hydration mismatch.
+  const [danceSeed] = useState(() => Math.floor(Math.random() * 997));
 
   useEffect(() => {
     // Show once per session. Decide after mount so SSR never renders the overlay.
@@ -189,6 +194,22 @@ export function AnimatedSplash() {
             <path d={BOLT_PATH} fill="currentColor" stroke="#1a365d" strokeWidth="2" strokeLinejoin="round" />
           </motion.svg>
         </motion.div>
+
+        {/* Dancing mascot — a genre cube bops while the app boots. Skipped under
+            reduced motion (an animated WebP can't be paused via CSS). */}
+        {!prefersReducedMotion && (
+          <motion.div
+            className="relative z-10 mb-5"
+            initial={{ scale: 0, y: 12, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 220, damping: 16, delay: 0.4 }}
+          >
+            <DancingMascot
+              seed={danceSeed}
+              className="w-28 h-28 sm:w-32 sm:h-32 drop-shadow-[0_6px_0_rgba(0,0,0,0.35)]"
+            />
+          </motion.div>
+        )}
 
         {/* Witty loading text */}
         <div className="h-8 flex items-center justify-center mb-10 px-6">

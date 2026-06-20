@@ -13,6 +13,7 @@ const sv = {
       "latin": "Latino",
       "reggae": "Reggae",
       "japanese": "Japansk",
+      "k_pop": "K-pop",
       "desert_epic": "Ökenepos",
       "fanfare": "Fanfar"
     },
@@ -2340,6 +2341,14 @@ const sv = {
       "cool": "Cool"
     }
   },
+  "lobbyDailyEmber": {
+    "secured": "Dagens klar · {streak}",
+    "atRisk": "{streak} dagars svit",
+    "invite": "Dagens utmaning live",
+    "popoverTitle": "Dagens utmaning",
+    "popoverBody": "Ett nytt pussel varje dag. Det finns kvar efter din match — spela klart rundan och håll sviten vid liv.",
+    "gotIt": "Okej"
+  },
   "playerView": {
     "onlyLanguageWords": "Använd endast bokstäver från detta språk",
     "wordsFound": "Ord hittade",
@@ -4148,6 +4157,7 @@ const sv = {
     },
     "title": "Ditt HK",
     "notFound": "Spelaren hittades inte",
+    "streakDays": "dagars svit",
     "stats": {
       "games": "matcher",
       "winRate": "vinstprocent"
@@ -4639,6 +4649,7 @@ const sv = {
     "yourProgress": "Dina framsteg",
     "percentile": "Percentil",
     "nextRank": "Nästa rank",
+    "topThree": "Tre i topp",
     "pointsToGo": "poäng kvar",
     "beat": "Slå",
     "youAreFirst": "Du är #1!",

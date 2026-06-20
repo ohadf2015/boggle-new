@@ -26,6 +26,7 @@ export type PlayerStyleKey =
   | 'latin'
   | 'reggae'
   | 'japanese'
+  | 'k_pop'
   | 'desert_epic'
   | 'fanfare';
 
@@ -58,6 +59,7 @@ export const STYLE_KEYS: PlayerStyleKey[] = [
   'latin',
   'reggae',
   'japanese',
+  'k_pop',
   'desert_epic',
   'fanfare',
 ];
@@ -87,6 +89,7 @@ export const STYLES: Record<PlayerStyleKey, PlayerStyle> = {
   latin: def('latin', '#ff5e57', '🪇'),
   reggae: def('reggae', '#36b04a', '🌴'),
   japanese: def('japanese', '#ff7eb6', '🌸'),
+  k_pop: def('k_pop', '#b14bff', '🎤'),
   desert_epic: def('desert_epic', '#e0a526', '🏜️'),
   fanfare: def('fanfare', '#ffd13b', '🎺'),
 };

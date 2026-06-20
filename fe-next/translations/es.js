@@ -13,6 +13,7 @@ const es = {
       "latin": "Latino",
       "reggae": "Reggae",
       "japanese": "Japonés",
+      "k_pop": "K-Pop",
       "desert_epic": "Épico del desierto",
       "fanfare": "Fanfarria"
     },
@@ -2306,6 +2307,14 @@ const es = {
       "cool": "Genial"
     }
   },
+  "lobbyDailyEmber": {
+    "secured": "Reto diario hecho · {streak}",
+    "atRisk": "Racha de {streak} días",
+    "invite": "Reto diario activo",
+    "popoverTitle": "Reto diario",
+    "popoverBody": "Un puzzle nuevo cada día. Sigue aquí después de tu partida — termina la ronda y luego mantén tu racha.",
+    "gotIt": "Entendido"
+  },
   "playerView": {
     "onlyLanguageWords": "Usa solo letras de este idioma",
     "wordsFound": "Palabras Encontradas",
@@ -4054,6 +4063,7 @@ const es = {
     },
     "title": "Tu Cuartel",
     "notFound": "Jugador no encontrado",
+    "streakDays": "días de racha",
     "stats": {
       "games": "partidas",
       "winRate": "% victorias"
@@ -4881,6 +4891,7 @@ const es = {
     "yourProgress": "Tu Progreso",
     "percentile": "Percentil",
     "nextRank": "Siguiente Puesto",
+    "topThree": "Los tres mejores",
     "pointsToGo": "puntos restantes",
     "beat": "Superar",
     "youAreFirst": "¡Eres el #1!",

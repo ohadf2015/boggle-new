@@ -13,6 +13,7 @@ const en = {
       "latin": "Latin",
       "reggae": "Reggae",
       "japanese": "Japanese",
+      "k_pop": "K-Pop",
       "desert_epic": "Desert Epic",
       "fanfare": "Fanfare"
     },
@@ -363,9 +364,16 @@ const en = {
     "title": "Get the LexiClash App",
     "subtitle": "Smoother, faster play on the free Android app.",
     "install": "Get it on Google Play",
+    "installEyebrow": "Install free",
     "dismiss": "Not now",
     "close": "Close",
-    "imageAlt": "LexiClash mascot showing the game on an Android phone"
+    "imageAlt": "LexiClash mascot showing the game on an Android phone",
+    "perkFaster": "Snappier, full-screen play — no browser bars",
+    "perkOffline": "Play offline, anywhere",
+    "perkReminders": "Streak reminders so you never break your run",
+    "menuLabel": "Get the App",
+    "pillLabel": "Get the App",
+    "pillClose": "Hide app banner"
   },
   "name": "English",
   "direction": "ltr",
@@ -2286,6 +2294,14 @@ const en = {
       "shock": "Shocked",
       "cool": "Cool"
     }
+  },
+  "lobbyDailyEmber": {
+    "secured": "Daily done · {streak}",
+    "atRisk": "{streak}-day streak",
+    "invite": "Daily's live",
+    "popoverTitle": "Daily Challenge",
+    "popoverBody": "One fresh puzzle, every day. It'll still be here after your match — finish the round, then keep your streak going.",
+    "gotIt": "Got it"
   },
   "playerView": {
     "onlyLanguageWords": "Use only letters from this language",
@@ -4462,6 +4478,7 @@ const en = {
     },
     "title": "Your HQ",
     "notFound": "Player not found",
+    "streakDays": "day streak",
     "stats": {
       "games": "games",
       "winRate": "win rate"
@@ -4874,6 +4891,7 @@ const en = {
     "yourProgress": "Your Progress",
     "percentile": "Percentile",
     "nextRank": "Next Rank",
+    "topThree": "Top three players",
     "pointsToGo": "points to go",
     "beat": "Beat",
     "youAreFirst": "You're #1!",

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { LandingCubesSkeleton } from '@/components/landing/LandingCubesSkeleton';
+import { DancingMascot } from '@/components/ui/DancingMascot';
 
 /**
  * Homepage-specific loading skeleton — neo-brutalist style with shimmer.
@@ -46,8 +47,13 @@ export default function Loading() {
             <div className="flex flex-col items-center sm:items-start flex-1 w-full">
               {/* Mobile: inline mascot + title */}
               <div className="flex items-center gap-3 mb-2 sm:flex-col sm:items-start sm:gap-0">
-                {/* Mascot */}
-                <div className="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-full bg-neo-navy-light border-3 border-neo-black animate-pulse shrink-0" />
+                {/* Mascot — real dancing cube (the homepage's actual hero
+                    mascot slot), not a grey placeholder, so the page greets you
+                    with personality while it loads. Server-rendered <img>, no JS. */}
+                <DancingMascot
+                  src="/mascots/styles/k_pop.webp"
+                  className="w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 shrink-0"
+                />
                 {/* Title */}
                 <div className="sm:mt-3 sm:mb-2">
                   <div className="h-6 sm:h-8 lg:h-10 w-40 sm:w-56 lg:w-72 rounded-neo bg-neo-white/10 animate-pulse" />

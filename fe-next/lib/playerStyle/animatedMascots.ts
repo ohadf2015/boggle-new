@@ -29,6 +29,7 @@ export const ANIMATED_STYLE_MASCOTS: Partial<Record<PlayerStyleKey, string>> = {
   latin: '/mascots/styles/latin.webp',
   reggae: '/mascots/styles/reggae.webp',
   japanese: '/mascots/styles/japanese.webp',
+  k_pop: '/mascots/styles/k_pop.webp',
   desert_epic: '/mascots/styles/desert_epic.webp',
   fanfare: '/mascots/styles/fanfare.webp',
 };
