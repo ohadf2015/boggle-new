@@ -138,7 +138,7 @@ export function BlastBoard({
       data-shake-key={invalidShakeKey}
       data-testid="blast-board"
       data-board-rows={visualRows}
-      className={`relative flex items-end justify-center gap-2 p-4 touch-none select-none w-full h-full ${styles.board}`}
+      className={`relative flex items-center justify-center gap-2 p-4 touch-none select-none w-full h-full ${styles.board}`}
       style={{
         touchAction: 'none',
         // Drives container-query tile sizing: every tile reads
@@ -153,7 +153,7 @@ export function BlastBoard({
       {/* Cell-well backdrop — empty inset slots line up with tile positions.
           Renders a FIXED `visualRows` wells per column so the board stays the
           same size as tiles are cleared (Royal-Match style stable playfield). */}
-      <div aria-hidden className="absolute inset-0 flex items-end justify-center gap-2 p-4 pointer-events-none">
+      <div aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 p-4 pointer-events-none">
         {level.columns.map((col) => (
           <div key={`well-${col.index}`} className="flex flex-col-reverse gap-2">
             {Array.from({ length: visualRows }).map((_, row) => (
