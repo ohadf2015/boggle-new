@@ -9,6 +9,7 @@ import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
+import { LobbyDailyEmber } from '@/components/lobby/LobbyDailyEmber';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
@@ -275,6 +276,15 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     </m.div>
   );
 
+  // Ambient daily-challenge awareness. Rendered as a SIBLING of the hero card
+  // (not inside it) because the hero card is `overflow-hidden` — nesting would
+  // clip the tap-popover. Own status only; never navigates out of the room.
+  const renderDailyEmber = (): React.ReactElement => (
+    <div className="px-1" data-testid="lobby-daily-ember-slot">
+      <LobbyDailyEmber />
+    </div>
+  );
+
   // ==================== Player Roster ====================
   const renderPlayerRoster = (): React.ReactElement => (
     <section className="space-y-2">
@@ -409,6 +419,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const renderMobileContent = (): React.ReactElement => (
     <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-3 space-y-4 min-h-0">
       <section>{renderHeroCard()}</section>
+      {renderDailyEmber()}
       {renderPlayerRoster()}
       {renderModeTips()}
       <MobileShareSection gameCode={gameCode} t={t} />
@@ -475,6 +486,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             leftContent={
               <>
                 {renderHeroCard()}
+                {renderDailyEmber()}
                 {renderPlayerRoster()}
                 {renderModeTips()}
               </>
