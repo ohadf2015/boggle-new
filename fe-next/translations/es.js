@@ -350,7 +350,14 @@ const es = {
     "install": "Disponible en Google Play",
     "dismiss": "Ahora no",
     "close": "Cerrar",
-    "imageAlt": "La mascota de LexiClash mostrando el juego en un teléfono Android"
+    "imageAlt": "La mascota de LexiClash mostrando el juego en un teléfono Android",
+    "installEyebrow": "Instala gratis",
+    "perkFaster": "Más ágil y a pantalla completa, sin barras del navegador",
+    "perkOffline": "Juega sin conexión, donde sea",
+    "perkReminders": "Recordatorios para no perder tu racha",
+    "menuLabel": "Descargar la app",
+    "pillLabel": "Descargar la app",
+    "pillClose": "Ocultar el banner de la app"
   },
   "name": "Español",
   "direction": "ltr",

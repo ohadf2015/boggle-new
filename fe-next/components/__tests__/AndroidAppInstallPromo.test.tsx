@@ -1,13 +1,14 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import AndroidAppInstallPromo from '../AndroidAppInstallPromo';
+import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
 
 const captureMock = vi.fn();
 
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unknown[]) => captureMock(...a) } }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (key: string) => key }),
+  useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 vi.mock('next/image', () => ({
   default: ({ alt, src }: { alt: string; src: string }) => (
@@ -39,6 +40,7 @@ beforeEach(() => {
   captureMock.mockClear();
   localStorage.clear();
   sessionStorage.clear();
+  useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
   setUA(ANDROID_UA);
   Object.defineProperty(window, 'location', {
     value: { href: 'https://www.lexiclash.live/' },
@@ -62,24 +64,28 @@ describe('AndroidAppInstallPromo', () => {
     });
     expect(screen.getByText('androidAppPromo.title')).toBeInTheDocument();
     expect(screen.getByText('androidAppPromo.install')).toBeInTheDocument();
-    expect(captureMock).toHaveBeenCalledWith('android_install_promo_shown');
+    expect(captureMock).toHaveBeenCalledWith('android_install_promo_shown', { source: 'auto_popup' });
     expect(sessionStorage.getItem('android_app_install_promo_shown')).toBe('1');
   });
 
-  it('navigates to the Play Store and records dismissal on install click', async () => {
+  it('navigates to the Play Store (with install referrer) and records dismissal on install click', async () => {
     render(<AndroidAppInstallPromo />);
     await act(async () => {
       await vi.runAllTimersAsync();
     });
     fireEvent.click(screen.getByText('androidAppPromo.install'));
-    expect(window.location.href).toBe(
+    expect(window.location.href).toContain(
       'https://play.google.com/store/apps/details?id=live.lexiclash.app'
     );
-    expect(captureMock).toHaveBeenCalledWith('android_install_promo_install_click');
+    expect(window.location.href).toContain('referrer=');
+    expect(window.location.href).toContain('utm_campaign');
+    expect(captureMock).toHaveBeenCalledWith('android_install_promo_install_click', {
+      source: 'auto_popup',
+    });
     expect(localStorage.getItem('android_app_install_promo_dismissed_until')).toBeTruthy();
   });
 
-  it('records a 14-day dismissal when the user taps "not now"', async () => {
+  it('records a 14-day dismissal and collapses to the session pill on "not now"', async () => {
     render(<AndroidAppInstallPromo />);
     await act(async () => {
       await vi.runAllTimersAsync();
@@ -87,7 +93,29 @@ describe('AndroidAppInstallPromo', () => {
     fireEvent.click(screen.getByText('androidAppPromo.dismiss'));
     const until = parseInt(localStorage.getItem('android_app_install_promo_dismissed_until')!, 10);
     expect(until).toBeGreaterThan(Date.now() + 13 * 86_400_000);
-    expect(captureMock).toHaveBeenCalledWith('android_install_promo_dismissed');
+    expect(captureMock).toHaveBeenCalledWith('android_install_promo_dismissed', {
+      source: 'auto_popup',
+    });
+    // Dismissing the popup leaves a re-entry pill rather than total silence.
+    expect(useAndroidInstallStore.getState().pillVisible).toBe(true);
+  });
+
+  it('reopens via a re-entry surface even after the auto-popup was dismissed', async () => {
+    // Simulate the 14-day cooldown being armed (auto-popup would stay silent)…
+    localStorage.setItem(
+      'android_app_install_promo_dismissed_until',
+      String(Date.now() + 14 * 86_400_000)
+    );
+    render(<AndroidAppInstallPromo />);
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    // …auto-popup stays hidden…
+    expect(screen.queryByText('androidAppPromo.title')).not.toBeInTheDocument();
+    // …but a user-initiated surface (menu/pill) can still open it.
+    act(() => useAndroidInstallStore.getState().openPromo('menu'));
+    expect(screen.getByText('androidAppPromo.title')).toBeInTheDocument();
+    expect(useAndroidInstallStore.getState().source).toBe('menu');
   });
 
   it('stays hidden when already shown this session', async () => {

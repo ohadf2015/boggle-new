@@ -378,7 +378,14 @@ const he = {
     "install": "הורדה מ‑Google Play",
     "dismiss": "לא עכשיו",
     "close": "סגירה",
-    "imageAlt": "קמע LexiClash מציג את המשחק על טלפון אנדרואיד"
+    "imageAlt": "קמע LexiClash מציג את המשחק על טלפון אנדרואיד",
+    "installEyebrow": "התקנה חינם",
+    "perkFaster": "מהיר יותר ובמסך מלא — בלי שורת הדפדפן",
+    "perkOffline": "אפשר לשחק גם בלי אינטרנט",
+    "perkReminders": "תזכורות כדי לא לאבד את הרצף",
+    "menuLabel": "הורדת האפליקציה",
+    "pillLabel": "הורדת האפליקציה",
+    "pillClose": "הסתרת באנר האפליקציה"
   },
   "name": "עברית",
   "direction": "rtl",

@@ -1,0 +1,59 @@
+'use client';
+
+/**
+ * GetAppMenuRow — the DURABLE re-entry surface for the Android app install.
+ *
+ * Unlike the session pill (which a reload clears), this lives in the header
+ * drawer menu, so it's a permanent, discoverable way to reopen the install
+ * promo no matter how many times the popup was dismissed. It bypasses the
+ * 14-day cooldown because tapping it is an explicit, user-initiated request.
+ *
+ * Renders only on Android browsers where installing the native app is possible
+ * — it returns null on desktop / iOS / the native shell / an installed PWA, so
+ * it never clutters the menu for users who can't act on it.
+ */
+
+import { useMemo } from 'react';
+import { Smartphone } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
+import { isAndroidInstallEntryEligible } from '@/lib/androidInstall/installEligibility';
+import { isCapacitorNative, isStandaloneDisplay } from '@/utils/androidApp';
+import { trackInstallMenuClick } from '@/lib/androidInstall/installTracking';
+
+export default function GetAppMenuRow({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useLanguage();
+  const openPromo = useAndroidInstallStore((s) => s.openPromo);
+
+  const eligible = useMemo(
+    () =>
+      typeof navigator !== 'undefined' &&
+      isAndroidInstallEntryEligible({
+        ua: navigator.userAgent,
+        isCapacitorNative: isCapacitorNative(),
+        isStandalone: isStandaloneDisplay(),
+      }),
+    []
+  );
+
+  if (!eligible) return null;
+
+  const handleClick = () => {
+    trackInstallMenuClick();
+    onNavigate?.();
+    openPromo('menu');
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className="relative flex w-full items-center gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 text-sm font-bold text-neo-black shadow-hard-sm transition-all duration-100 hover:-translate-y-px hover:shadow-hard active:translate-y-px active:shadow-none"
+    >
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black/30 bg-neo-black/15">
+        <Smartphone className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
+      </span>
+      <span>{t('androidAppPromo.menuLabel')}</span>
+    </button>
+  );
+}

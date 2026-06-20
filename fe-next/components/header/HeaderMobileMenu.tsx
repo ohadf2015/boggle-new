@@ -21,6 +21,7 @@ import { NotificationItem } from '../notifications/NotificationItem';
 import type { NotificationData } from '../notifications/types';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
+import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
 import Avatar from '../Avatar';
 import { getStoredCustomAvatar, getStoredUsername, setStoredUsername } from '../../utils/profileStorage';
 import { setGuestName } from '../../utils/guestManager';
@@ -816,6 +817,11 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             </div>
                                         </m.div>
                                     )}
+
+                                    {/* ─ Get the App (durable Android install re-entry; self-hides off Android) ─ */}
+                                    <m.div variants={itemVariants}>
+                                        <GetAppMenuRow onNavigate={closeMenu} />
+                                    </m.div>
 
                                     {/* ─ Settings Section ─ */}
                                     <m.div variants={itemVariants}>

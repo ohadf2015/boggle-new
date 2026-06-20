@@ -58,6 +58,9 @@ const AndroidAppRedirect = nextDynamic(() => import('@/components/AndroidAppRedi
 const AndroidAppInstallPromo = nextDynamic(() => import('@/components/AndroidAppInstallPromo'), {
   loading: () => null,
 });
+const AndroidInstallPill = nextDynamic(() => import('@/components/android-install/AndroidInstallPill'), {
+  loading: () => null,
+});
 const VersionChecker = nextDynamic(() => import('@/components/VersionChecker'), {
   loading: () => null,
 });
@@ -658,6 +661,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     </div>
                     <AndroidAppRedirect />
                     <AndroidAppInstallPromo />
+                    <AndroidInstallPill />
                     <PWAInstallPrompt />
                     <PushNotificationPrompt />
                     <EmailCaptureModal />

@@ -521,7 +521,14 @@ const sv = {
     "install": "Hämta på Google Play",
     "dismiss": "Inte nu",
     "close": "Stäng",
-    "imageAlt": "LexiClash-maskot som visar spelet på en Android-telefon"
+    "imageAlt": "LexiClash-maskot som visar spelet på en Android-telefon",
+    "installEyebrow": "Ladda ner gratis",
+    "perkFaster": "Snabbare helskärmsspel — utan webbläsarfält",
+    "perkOffline": "Spela offline, var du vill",
+    "perkReminders": "Påminnelser så att du aldrig bryter din streak",
+    "menuLabel": "Hämta appen",
+    "pillLabel": "Hämta appen",
+    "pillClose": "Dölj app-bannern"
   },
   "name": "Svenska",
   "direction": "ltr",

@@ -8,25 +8,38 @@
  * the app; this one pitches the install to those who don't. The two use
  * separate dismissal keys so dismissing one never silences the other.
  *
- * Gating lives in the pure `shouldShowAndroidInstallPromo` helper (unit-tested);
- * this component only wires up the browser-side inputs, a non-intrusive delay,
- * and the neo-brutalist popup UI.
+ * Two ways in:
+ *  - the unsolicited auto-popup (gated by `shouldShowAndroidInstallPromo`,
+ *    shown once per session after a delay, then silenced for 14 days), and
+ *  - the user-initiated re-entry surfaces (the header menu row and the session
+ *    pill) which open the SAME dialog via the shared store with their own
+ *    `source` tag.
+ *
+ * Dismissing still arms the 14-day auto-popup cooldown (we respect the "no"),
+ * but collapses to a session pill so the player can reopen it on a whim, and
+ * the permanent menu row remains as the durable way back across reloads.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Smartphone } from 'lucide-react';
-import posthog from '@/lib/analytics/lazyPosthog';
+import { Zap, WifiOff, Bell } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import {
-  PLAY_STORE_URL,
   hasLexiClashInstalled,
   isCapacitorNative,
   isStandaloneDisplay,
+  playStoreUrlWithReferrer,
   shouldShowAndroidInstallPromo,
 } from '@/utils/androidApp';
+import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
+import {
+  trackInstallClick,
+  trackInstallDismissed,
+  trackInstallPromoShown,
+} from '@/lib/androidInstall/installTracking';
+import GooglePlayMark from '@/components/android-install/GooglePlayMark';
 import {
   Dialog,
   DialogContent,
@@ -41,10 +54,16 @@ const DISMISS_DAYS = 14;
 const SHOW_DELAY_MS = 12_000;
 
 export default function AndroidAppInstallPromo() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
 
+  const open = useAndroidInstallStore((s) => s.open);
+  const source = useAndroidInstallStore((s) => s.source);
+  const openPromo = useAndroidInstallStore((s) => s.openPromo);
+  const closePromo = useAndroidInstallStore((s) => s.closePromo);
+  const showPill = useAndroidInstallStore((s) => s.showPill);
+
+  // ── Unsolicited auto-popup gating (behaviour unchanged) ──────────────────
   useEffect(() => {
     const storedDismiss = localStorage.getItem(DISMISS_KEY);
     const baseInput = {
@@ -73,8 +92,8 @@ export default function AndroidAppInstallPromo() {
       timer = setTimeout(() => {
         if (cancelled) return;
         sessionStorage.setItem(SESSION_FLAG, '1');
-        setOpen(true);
-        posthog.capture('android_install_promo_shown');
+        openPromo('auto_popup');
+        trackInstallPromoShown('auto_popup');
       }, SHOW_DELAY_MS);
     });
 
@@ -82,23 +101,32 @@ export default function AndroidAppInstallPromo() {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [pathname]);
+  }, [pathname, openPromo]);
 
   const persistDismissal = () => {
     localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_DAYS * 86_400_000));
   };
 
   const handleDismiss = () => {
-    setOpen(false);
+    trackInstallDismissed(source);
+    closePromo();
     persistDismissal();
-    posthog.capture('android_install_promo_dismissed');
+    // Collapse to the session pill instead of vanishing entirely.
+    showPill();
   };
 
   const handleInstall = () => {
-    posthog.capture('android_install_promo_install_click');
+    trackInstallClick(source);
     persistDismissal();
-    window.location.href = PLAY_STORE_URL;
+    // Carry an install referrer so the install is attributable in Play Console.
+    window.location.href = playStoreUrlWithReferrer('install_popup', language);
   };
+
+  const perks = [
+    { Icon: Zap, text: t('androidAppPromo.perkFaster') },
+    { Icon: WifiOff, text: t('androidAppPromo.perkOffline') },
+    { Icon: Bell, text: t('androidAppPromo.perkReminders') },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
@@ -123,21 +151,40 @@ export default function AndroidAppInstallPromo() {
           <p dir="auto" className="mt-2 text-sm sm:text-base font-medium text-neo-white">
             {t('androidAppPromo.subtitle')}
           </p>
+
+          <ul className="mt-4 flex flex-col gap-2 text-start">
+            {perks.map(({ Icon, text }) => (
+              <li key={text} dir="auto" className="flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black">
+                  <Icon className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
+                </span>
+                <span className="text-sm font-semibold text-neo-white">{text}</span>
+              </li>
+            ))}
+          </ul>
         </DialogBody>
 
         <DialogFooter className="flex-col gap-2 sm:flex-col">
           <button
             type="button"
             onClick={handleInstall}
-            className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-accent text-accent-foreground font-black uppercase tracking-tight border-3 border-neo-black rounded-neo shadow-hard-sm transition-all duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            aria-label={`${t('androidAppPromo.install')} — Google Play`}
+            className="group w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-neo-black text-neo-white border-3 border-neo-black rounded-neo shadow-hard-sm transition-all duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
           >
-            <Smartphone className="h-5 w-5 stroke-[2.5]" aria-hidden="true" />
-            {t('androidAppPromo.install')}
+            <GooglePlayMark size={26} />
+            <span className="flex flex-col items-start leading-none">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neo-lime">
+                {t('androidAppPromo.installEyebrow')}
+              </span>
+              <span className="font-neo-display text-lg font-black tracking-tight">
+                {t('androidAppPromo.install')}
+              </span>
+            </span>
           </button>
           <button
             type="button"
             onClick={handleDismiss}
-            className="w-full px-4 py-2 text-sm font-bold uppercase tracking-wide text-neo-white transition-colors hover:text-neo-white"
+            className="w-full px-4 py-2 text-sm font-bold uppercase tracking-wide text-neo-white/70 transition-colors hover:text-neo-white"
           >
             {t('androidAppPromo.dismiss')}
           </button>

@@ -363,7 +363,14 @@ const ja = {
     "install": "Google Play で手に入れよう",
     "dismiss": "後で",
     "close": "閉じる",
-    "imageAlt": "Android スマホでゲームを見せる LexiClash のマスコット"
+    "imageAlt": "Android スマホでゲームを見せる LexiClash のマスコット",
+    "installEyebrow": "無料インストール",
+    "perkFaster": "全画面でサクサク — ブラウザのバーなし",
+    "perkOffline": "オフラインでもどこでもプレイ",
+    "perkReminders": "連続記録が途切れないようにリマインド",
+    "menuLabel": "アプリを入手",
+    "pillLabel": "アプリを入手",
+    "pillClose": "アプリのバナーを隠す"
   },
   "name": "日本語",
   "direction": "ltr",
