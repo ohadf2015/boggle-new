@@ -693,7 +693,15 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             now only suppresses chat here (it keeps the grid screen calm), NOT the
             standings: desktop players were previously blind to who was winning. */}
         {((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
-          <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
+          <div
+            className={cn(
+              'hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto',
+              // Focus mode hides the chat, leaving the leaderboard stranded at the
+              // top of a full-height column with a large empty gap below. Center it
+              // vertically so the standings sit in the player's eyeline instead.
+              gameplayFocusMode && 'lg:justify-center',
+            )}
+          >
             {/* Single live leaderboard — ranked standings with a "your standing"
                 cue (leading by N / N points to catch). Replaces the previous
                 duplicate race-track + standings stack. */}

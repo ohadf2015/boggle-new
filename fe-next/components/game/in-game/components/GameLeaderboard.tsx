@@ -108,11 +108,19 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
     <div
       role="listitem"
       tabIndex={0}
-      className={`flex items-center gap-2 p-1.5 rounded-neo border-3 shadow-hard-sm transition-all duration-300
+      data-current-player={player.isMe ? 'true' : 'false'}
+      className={cn(
+        `flex items-center gap-2 p-1.5 rounded-neo border-3 shadow-hard-sm transition-all duration-300
         hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
-        focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
-        ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}
-        ${player.isMe ? 'ring-2 ring-neo-cyan/60' : ''}`}
+        focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1`,
+        dir === 'rtl' && 'flex-row-reverse',
+        // The current player's row gets an unmistakable solid cyan fill + bold
+        // ring/offset so it stands out from the gold/silver/bronze rank rows at
+        // a glance. Rivals keep their rank-coloured styling.
+        player.isMe
+          ? 'bg-neo-cyan text-neo-black border-neo-black ring-3 ring-neo-cyan ring-offset-2 ring-offset-neo-cream relative z-10 shadow-hard'
+          : player.rankStyle,
+      )}
     >
       {/* Rank badge with change indicator */}
       <div className="relative shrink-0">
@@ -162,7 +170,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
           </span>
         </PlayerProfileTooltip>
         {player.isMe && (
-          <span className="text-[9px] bg-neo-black text-neo-white px-1 py-0.5 rounded-neo font-bold shrink-0">
+          <span className="text-[10px] bg-neo-black text-neo-cyan px-1.5 py-0.5 rounded-neo font-black uppercase tracking-wide shrink-0">
             {t('playerView.me')}
           </span>
         )}
