@@ -58,13 +58,25 @@ export default function WordForgeGame(): React.JSX.Element {
     rejectTimerRef.current = setTimeout(() => setRejectMsg(null), 1600);
   }, [t, playSound]);
   useEffect(() => {
-    if (run.lastRejection) flashReject(run.lastRejection.reason);
+    if (run.lastRejection) {
+      flashReject(run.lastRejection.reason);
+      setConsecutiveRejectCount(c => c + 1);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [run.lastRejection]);
+  // Reset hint counter on successful word or new round
+  useEffect(() => {
+    if (run.lastWordScore) setConsecutiveRejectCount(0);
+  }, [run.lastWordScore]);
+  useEffect(() => {
+    setConsecutiveRejectCount(0);
+  }, [run.state.round, run.state.phase]);
   useEffect(() => () => { if (rejectTimerRef.current) clearTimeout(rejectTimerRef.current); }, []);
 
   // Track triggered rune IDs for glow effect
   const [triggeredRuneIds, setTriggeredRuneIds] = useState<string[]>([]);
+  // Consecutive rejection counter — drives alphabet hint overlay on grid
+  const [consecutiveRejectCount, setConsecutiveRejectCount] = useState(0);
   const triggeredTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Full-screen game: hide global chrome for the WHOLE run lifecycle (idle →
@@ -243,7 +255,8 @@ export default function WordForgeGame(): React.JSX.Element {
           bossConstraintId={run.state.bossConstraint?.def.id ?? null}
           checkWord={dictLoaded ? checkWord : undefined}
           dictReady={dictLoaded}
-          onReject={() => flashReject('notWord')}
+          onReject={() => { flashReject('notWord'); setConsecutiveRejectCount(c => c + 1); }}
+          showAlphaHints={consecutiveRejectCount >= 2}
         />
       </div>
 

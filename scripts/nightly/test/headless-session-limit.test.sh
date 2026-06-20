@@ -85,6 +85,29 @@ g=$(_detect_limit_signal "/no/such/file")
 check "missing sidecar → empty" "$g" ""
 rm -f "$SC"
 
+echo "── _stall_should_abort: cutoff guard (don't sleep a stall into morning) ──"
+# Helper: echo abort|sleep for a given now/wait (default cutoff 06:30 local).
+verdict() { if LEXI_FAKE_NOW="$1" _stall_should_abort "$2"; then echo abort; else echo sleep; fi; }
+
+g=$(verdict "$NOW" 9550)                 # 02:00 + ~2h39m → ~04:39 < 06:30
+check "in-window reset (resume 04:39) still sleeps" "$g" sleep
+
+g=$(verdict "$NOW" 20000)                # 02:00 + ~5h33m → ~07:33 > 06:30
+check "wait that resumes past 06:30 → abort" "$g" abort
+
+g=$(verdict "$NOW_LATE" 7200)            # now 04:00 + 2h → 06:00 < 06:30
+check "later start, still in-window (06:00) sleeps" "$g" sleep
+
+NOW_PAST=$(date -j -f "%Y-%m-%d %H:%M:%S" "2026-06-09 07:00:00" +%s)
+g=$(verdict "$NOW_PAST" 60)              # already past 06:30 cutoff
+check "now already past cutoff → abort even a tiny wait" "$g" abort
+
+g=$(LANE_LIMIT_NO_SLEEP_PAST=08:00 verdict "$NOW" 20000)  # resume 07:33 < custom 08:00
+check "custom cutoff 08:00 lets the 07:33 resume sleep" "$g" sleep
+
+g=$(LANE_LIMIT_NO_SLEEP_PAST=garbage verdict "$NOW" 99999) # unparseable → never abort
+check "unparseable cutoff → sleep (fail-open, preserves old behavior)" "$g" sleep
+
 echo
 echo "headless-session-limit: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]

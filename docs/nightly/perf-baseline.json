@@ -1,66 +1,10 @@
 {
-  "date": "2026-06-19",
-  "note": "Twenty-third snapshot. Backend fix shipped LIVE: policy consolidation on teacher_access_allowlist (6 separate policies → 3: taa_admin_insert + taa_select + taa_update) and teacher_access_requests (2 SELECT policies → 1: tar_select). Dropped 3 unused indexes: idx_word_pacts_player2_id, idx_tar_status, idx_taa_consumed. Migration 20260619040000_perf_policy_consolidation.sql applied via REST. Supabase MCP unauthorized (token config issue) — used REST API fallback throughout. 7d window: /he LCP jumped 4764→6273ms (+31.6%, n=85) — WATCH, no clear code root cause found (mascot has priority, loading.tsx change is suspense fallback not LCP). /es/multiplayer INP improving: 442→400ms (-9.5%, cellNodeMap fix from 06-18 may be contributing). 24h window: 0 routes above n≥50 floor (low traffic).",
+  "date": "2026-06-20",
+  "note": "Twenty-fourth snapshot. No backend fix applied (Supabase MCP unavailable, deferred to human — security migration 20260619030000 still pending). Frontend: /he LCP sustained at 6273ms (2nd consecutive 7d reading, n=82 — CONFIRMED regression from 4764ms baseline 06-18). /he INP NEW regression: 184→264ms (+43%), crosses 200ms 'needs improvement' threshold. Root cause hypothesis: he.js translation file is 694KB (largest of 5 langs, +23% vs en.js 561KB) — lazy-loaded but main-thread parse overhead explains INP delta. LCP root cause: ISR cache (revalidate=300) means loading.tsx is rarely shown; actual LCP element likely in-page (mascot image via usePlayerStyle context changes src after hydration, or ModeCoach bundle). Both need deeper investigation. No code fix shipped this lane — insufficient budget for safe root-cause-certain fix.",
   "backend": {
-    "advisor_warnings_count": 0,
-    "advisor_warnings_warn_count_before": 20,
-    "advisor_warnings_warn_count_after": 0,
-    "advisor_warnings_info_unused_idx_before": 8,
-    "advisor_warnings_info_unused_idx_after": 5,
-    "changes_applied": [
-      {
-        "type": "policy_consolidation",
-        "table": "teacher_access_allowlist",
-        "detail": "Dropped 6 policies (3 inline-EXISTS admin duplicates + 2 admin+1 own-email originals); created taa_select (admin OR own email) and taa_update (admin OR own email). INSERT kept as taa_admin_insert (1 policy, no duplicate).",
-        "status": "APPLIED LIVE 2026-06-19"
-      },
-      {
-        "type": "policy_consolidation",
-        "table": "teacher_access_requests",
-        "detail": "Merged tar_admin_select + tar_select_own into single tar_select policy: is_admin_user() OR (SELECT auth.uid()) = user_id",
-        "status": "APPLIED LIVE 2026-06-19"
-      },
-      {
-        "type": "unused_index_drop",
-        "index": "idx_word_pacts_player2_id",
-        "table": "word_pacts",
-        "status": "DROPPED LIVE 2026-06-19"
-      },
-      {
-        "type": "unused_index_drop",
-        "index": "idx_tar_status",
-        "table": "teacher_access_requests",
-        "status": "DROPPED LIVE 2026-06-19"
-      },
-      {
-        "type": "unused_index_drop",
-        "index": "idx_taa_consumed",
-        "table": "teacher_access_allowlist",
-        "status": "DROPPED LIVE 2026-06-19"
-      }
-    ],
-    "top_queries": [
-      {
-        "label": "Realtime WAL parser (x2 variants)",
-        "total_ms": 5974046,
-        "calls": 1389248,
-        "mean_ms": 4.30,
-        "verdict": "INFRASTRUCTURE — Supabase Realtime internal. Not actionable."
-      },
-      {
-        "label": "pg_timezone_names SELECT",
-        "total_ms": 133388,
-        "calls": 1016,
-        "mean_ms": 131.29,
-        "verdict": "INFRASTRUCTURE — Supabase internal auth connection init. Not actionable."
-      },
-      {
-        "label": "analytics_events SELECT",
-        "mean_ms": 19.15,
-        "calls": 1984,
-        "verdict": "WATCH — slight increase from 18.5ms (06-18). Monitor."
-      }
-    ],
+    "advisor_warnings_count": null,
+    "note": "Supabase MCP unavailable (token likely still expired from 06-19). Skipped pg_stat_statements + advisor queries. Security migration 20260619030000 still pending apply.",
+    "top_queries": [],
     "remaining_unused_indexes": [
       "idx_word_review_state_lesson_id",
       "idx_curator_proposals_lang_status",
@@ -70,35 +14,74 @@
     ]
   },
   "frontend": {
-    "note": "24h window: 0 routes above n≥50 floor. 7d window: 2 routes above floor.",
+    "note": "24h window: 0 routes above n≥50 floor (low traffic, same as 06-19). 7d window: only /he above floor (n=82).",
     "by_route": [
       {
         "route": "/he",
         "p75_lcp_ms": 6273,
-        "p75_inp_ms": 184,
+        "p75_inp_ms": 264,
         "p75_cls": 0.193,
-        "n_7d": 85,
+        "n_7d": 82,
         "window": "7d",
-        "lcp_status": "POOR — 6273ms (+31.6% vs 4764ms baseline on 06-18, n=85 both runs). WATCH — mascot has priority prop, loading.tsx change is suspense fallback not LCP. No code root cause identified. Needs 2nd reading before flagging code regression.",
-        "inp_status": "OK — 184ms, stable.",
-        "cls_status": "WATCH — 0.193, improving trend from 0.460 (06-14)."
+        "lcp_status": "POOR — 6273ms. 2nd consecutive reading (06-19: 6273ms, n=85 · 06-20: 6273ms, n=82). CONFIRMED regression from 4764ms on 06-18. Root cause: TBD — ISR cache means loading.tsx rarely shown. Suspects: (1) usePlayerStyle causes mascot src change after hydration, defeating priority preload; (2) ModeCoach bundle added 06-19 adds JS parse overhead.",
+        "inp_status": "POOR — 264ms (+43% vs 184ms on 06-19). NEW regression crossing 200ms threshold. Root cause: he.js translation file 694KB (largest, +23% vs en.js 561KB) — lazy-loaded but main-thread parse time grows with file size. Fix: audit + prune dead translation keys from he.js.",
+        "cls_status": "WATCH — 0.193, stable vs 06-19."
+      },
+      {
+        "route": "/en",
+        "p75_lcp_ms": 4440,
+        "p75_inp_ms": 144,
+        "p75_cls": 0.266,
+        "n_7d": 49,
+        "window": "7d",
+        "lcp_status": "DEFERRED — low n=49, below 50-sample floor. 4440ms is notable but unactionable without ≥50 samples.",
+        "inp_status": "OK — 144ms.",
+        "cls_status": "POOR — 0.266. Below floor, cannot flag as regression."
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 2980,
-        "p75_inp_ms": 400,
-        "p75_cls": 0.207,
-        "n_7d": 71,
+        "p75_lcp_ms": 2876,
+        "p75_inp_ms": 268,
+        "p75_cls": 0.051,
+        "n_7d": 49,
         "window": "7d",
-        "lcp_status": "POOR — 2980ms, improving from 3452ms (06-18) -13.7%.",
-        "inp_status": "POOR — 400ms, improving from 442ms (06-18) -9.5%. cellNodeMap mount-time fix (06-18) may be contributing.",
-        "cls_status": "POOR — 0.207. Trend: 0.144→0.288→0.239→0.207. Slow improvement."
+        "lcp_status": "DEFERRED — low n=49, below 50-sample floor.",
+        "inp_status": "DEFERRED — low n=49, below 50-sample floor.",
+        "cls_status": "OK — 0.051, improving."
       }
     ]
   },
   "bundle": {
-    "note": "No .next build run this lane (budget constraint).",
+    "note": "No .next build available locally (no npm run build per lane rules). No chunk delta computed.",
     "total_kb": null,
     "top_chunks": []
-  }
+  },
+  "translation_file_sizes_kb": {
+    "he": 678,
+    "ja": 654,
+    "es": 598,
+    "sv": 566,
+    "en": 548,
+    "note": "he.js is 23% larger than en.js. Lazy-loaded per language but main-thread parse overhead on /he pages. Growing: was ~250KB at introduction (per loadTranslation.ts comment), now 694KB — 2.7x growth. Audit dead keys."
+  },
+  "open_watches": [
+    {
+      "id": "he-lcp-regression",
+      "description": "/he p75 LCP 6273ms (2nd reading, confirmed). Root cause not found. Suspects: (1) HeroStyleMascot usePlayerStyle src-change post-hydration defeating priority preload; (2) ModeCoach JS bundle on homepage. Next: profile with DevTools LCP element identification.",
+      "severity": "HIGH",
+      "since": "2026-06-18"
+    },
+    {
+      "id": "he-inp-regression",
+      "description": "/he p75 INP 264ms (+43% vs 184ms, NEW). Root cause: he.js 694KB translation file (largest). Fix: audit + remove dead translation keys. Target: bring he.js size to <600KB.",
+      "severity": "MEDIUM",
+      "since": "2026-06-20"
+    },
+    {
+      "id": "supabase-mcp-unauthorized",
+      "description": "Supabase MCP token expired/unset (2nd consecutive night). Security migration 20260619030000 still pending.",
+      "severity": "INFRA",
+      "since": "2026-06-19"
+    }
+  ]
 }

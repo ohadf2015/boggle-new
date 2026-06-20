@@ -927,3 +927,33 @@ These flags have active call sites and cannot be removed autonomously. All have 
   - Status: null result — `toast-disabled` variant indistinguishable from control on conversion
   - Recommended action: keep control code path (sheet-only, no toast), delete flag + toast-disabled branch
   - Owner: human
+
+## 2026-06-20
+- [Supabase] `is_catchup` column missing from `daily_word_wheel_attempts`
+  - first seen: 2026-06-07 (when migration authored), active in Sentry since
+  - last seen: 2026-06-20, count: recurring, reach: 0 (server-side)
+  - link: https://lexiclash.sentry.io/issues/125836250/ (JAVASCRIPT-NEXTJS-1NB, score 0.06)
+  - status: deferred — SUPABASE_ACCESS_TOKEN expired, cannot apply
+  - fix ready: `supabase/migrations/20260607100000_word_wheel_catchup.sql` (correct, just unapplied)
+  - action: `SUPABASE_ACCESS_TOKEN=<fresh> npx supabase db push` OR REST: `POST https://api.supabase.com/v1/projects/hdtmpkicuxvtmvrmtybx/database/query` with the migration SQL
+  - recommended owner: review-by-eod (apply at 9am with refreshed token)
+
+- [Sentry] Coin transaction failures: `[CoinContext] Failed to add coins` + `Coin sync API error`
+  - first seen: recent, last seen: 2026-06-20, count: active, userCount: 5+4
+  - links: https://lexiclash.sentry.io/issues/123033015/ (1JP) + https://lexiclash.sentry.io/issues/123033018/ (1JQ)
+  - status: deferred — needs Supabase MCP to inspect `sync_coins` RPC definition
+  - suspected root cause: `sync_coins` has `search_path = ''` (function_search_path_mutable advisor) + uses unqualified `profiles` table → `relation "profiles" does not exist` (JAVASCRIPT-NEXTJS-1JR)
+  - action when MCP restored: `SELECT prosrc FROM pg_proc WHERE proname = 'sync_coins'` — check if `profiles` is schema-qualified; add `SET search_path = 'public'` or qualify table names
+  - recommended owner: backend, review-by-eod
+
+- [Sentry] `TypeError: Cannot read properties of null (reading 'clear')`
+  - last seen: 2026-06-20, reach: 5
+  - link: https://lexiclash.sentry.io/issues/120102540/ (JAVASCRIPT-NEXTJS-1CW)
+  - status: deferred — stack trace needed from Sentry MCP (MCP not connected this run)
+  - note: ScreenFlash.ts guard (line 78) already handles destroyed-race; source is elsewhere; need exact frame
+  - recommended owner: self (next nightly with MCP)
+
+- [Sentry] churn-signals report 502
+  - link: https://lexiclash.sentry.io/issues/124871662/ (JAVASCRIPT-NEXTJS-1KQ, score 0.443)
+  - status: deferred — external service 502; not a code fix
+  - recommended owner: infra/human

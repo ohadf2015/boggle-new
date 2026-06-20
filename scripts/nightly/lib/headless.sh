@@ -104,6 +104,38 @@ _detect_limit_signal() {
   printf ''
 }
 
+# _stall_should_abort <wait_secs> — return 0 (abort) if sleeping wait_secs would
+# resume PAST the safe cutoff LANE_LIMIT_NO_SLEEP_PAST (HH:MM local, default 06:30),
+# or if `now` is already past it. A multi-hour usage stall that resumes in the
+# morning risks (a) running lanes into the founder's workday and (b) colliding with
+# the next 01:00 run. A stall that clears before the cutoff (e.g. tonight's ~04:42
+# reset) still sleeps-and-retries unchanged. LEXI_FAKE_NOW overrides now for tests.
+# Pure + side-effect-free so it is unit-testable like the other helpers above.
+_stall_should_abort() {
+  local wait_secs="$1" cutoff now resume cutoff_today
+  cutoff="${LANE_LIMIT_NO_SLEEP_PAST:-06:30}"
+  now="${LEXI_FAKE_NOW:-$(date +%s)}"
+  resume=$(( now + wait_secs ))
+  cutoff_today=$(date -j -f "%Y-%m-%d %H:%M:%S" \
+    "$(date -r "$now" +%Y-%m-%d) ${cutoff}:00" +%s 2>/dev/null)
+  [ -z "$cutoff_today" ] && return 1            # unparseable cutoff → sleep as before
+  [ "$now" -ge "$cutoff_today" ] && return 0    # already past today's cutoff → abort
+  [ "$resume" -gt "$cutoff_today" ] && return 0 # sleep would push past it → abort
+  return 1
+}
+
+# _notify_stall <lane_id> <wait_secs> <action> — best-effort Telegram heads-up that
+# the nightly is throttled on the shared Claude usage window. Before this, a stall
+# was a SILENT multi-hour gap (operator could not tell "throttled" from "dead").
+# Never fails the run: telegram.sh is a creds-gated no-op and all errors swallowed.
+_notify_stall() {
+  local lane_id="$1" wait_secs="$2" action="$3" tg resume_hm
+  tg="${LIB_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}/telegram.sh"
+  [ -x "$tg" ] || return 0
+  resume_hm=$(date -v "+${wait_secs}S" +%H:%M 2>/dev/null || echo '?')
+  "$tg" msg "⏳ *Nightly throttled* — lane \`${lane_id}\` hit the Claude usage limit. ${action}. Window reset ~${resume_hm}." >/dev/null 2>&1 || true
+}
+
 # --- Mandatory-Minimum-Artifact contract -------------------------------------
 # Prepended to EVERY lane prompt so a lane can never "give up" / produce nothing.
 # The lane writes docs/nightly/artifacts/lane-<id>-<date>.md as its FIRST action
@@ -393,9 +425,21 @@ PY
     [ "$wait_secs" -lt 1 ] && wait_secs="${LANE_LIMIT_BACKOFF:-120}"
     if [ "${LANE_LIMIT_NO_WAIT:-0}" = "1" ]; then
       echo "headless: lane=$lane_id USAGE-LIMIT hit; LANE_LIMIT_NO_WAIT=1 → abort (would wait ${wait_secs}s); rc=75 (retry-later, not a code failure)" | tee -a "$log_file"
+      _notify_stall "$lane_id" "$wait_secs" "aborting (LANE_LIMIT_NO_WAIT)"
+      rc=75; break
+    fi
+    # Cutoff guard: never sleep a stall into the morning. If the wait would resume
+    # past LANE_LIMIT_NO_SLEEP_PAST (default 06:30) abort-and-report instead — the
+    # window is fresh for the next 01:00 run, and a limited night can't bleed into
+    # the workday or collide with the next run. Tonight's ~04:42 reset is < 06:30,
+    # so the in-window case still sleeps-and-retries exactly as before.
+    if _stall_should_abort "$wait_secs"; then
+      echo "headless: lane=$lane_id USAGE-LIMIT hit ($signal) — wait ${wait_secs}s would resume past ${LANE_LIMIT_NO_SLEEP_PAST:-06:30}; aborting (rc=75) to avoid running into the next day" | tee -a "$log_file"
+      _notify_stall "$lane_id" "$wait_secs" "aborting (would resume past ${LANE_LIMIT_NO_SLEEP_PAST:-06:30})"
       rc=75; break
     fi
     echo "headless: lane=$lane_id USAGE-LIMIT hit ($signal) — sleeping ${wait_secs}s for window reset, then retry (attempt $((limit_tries + 2)))" | tee -a "$log_file"
+    _notify_stall "$lane_id" "$wait_secs" "sleeping ${wait_secs}s until reset"
     sleep "$wait_secs"
     now_epoch=$(date +%s)
     hard_epoch=$(( now_epoch + lane_max ))

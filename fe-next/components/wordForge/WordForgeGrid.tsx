@@ -25,6 +25,8 @@ interface WordForgeGridProps {
   dictReady?: boolean;
   /** Called when the grid itself rejects a word (e.g. not in dictionary). */
   onReject?: (reason: 'notWord') => void;
+  /** Show ▲/▼ alphabet-position hints on idle tiles after 2 consecutive rejections. */
+  showAlphaHints?: boolean;
 }
 
 /**
@@ -42,6 +44,7 @@ export function WordForgeGrid({
   language = 'en',
   dictReady = true,
   onReject,
+  showAlphaHints = false,
 }: WordForgeGridProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { customHaptic } = useHapticFeedback();
@@ -219,7 +222,7 @@ export function WordForgeGrid({
                 }
                 transition={{ duration: isValidated ? 0.4 : 0.15 }}
                 className={cn(
-                  'aspect-square flex items-center justify-center',
+                  'relative aspect-square flex items-center justify-center',
                   'border-3 border-neo-black rounded-neo shadow-hard-sm',
                   'text-lg sm:text-xl font-black font-neo-display uppercase',
                   'cursor-pointer select-none',
@@ -235,6 +238,14 @@ export function WordForgeGrid({
                 )}
               >
                 {letter}
+                {showAlphaHints && !inPath && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0.5 right-0.5 text-[0.45rem] leading-none text-neo-black/40 font-black select-none"
+                  >
+                    {letter.toUpperCase().charCodeAt(0) <= 77 ? '▲' : '▼'}
+                  </span>
+                )}
               </m.div>
             );
           })
