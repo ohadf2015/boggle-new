@@ -11,6 +11,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import AvatarRenderer from './AvatarRenderer';
 import { getAvatarTier, type Tier } from './AvatarTierEffects';
 import AvatarEquipBurst from './AvatarEquipBurst';
+import GlowUpButton from './GlowUpButton';
 import { planEquipBurst, type EquipBurst } from '@/lib/avatar/equipBurst';
 import FloatingCoinAnimation from '@/components/game/FloatingCoinAnimation';
 import CategoryOptions from './AvatarBuilderCategoryOptions';
@@ -237,6 +238,9 @@ export default function AvatarBuilderModal({
             <AvatarEquipBurst burst={equipBurst} fireKey={previewKey} />
           </div>
         </div>
+
+        {/* Admin-only: AI Glow-Up of the built avatar (Track B) */}
+        <GlowUpButton previewRef={previewRef} config={config} />
 
         {/* Category Tabs — scroll-snap row, icon-only on narrow, icon+label when room */}
         <div className="relative shrink-0">

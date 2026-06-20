@@ -5246,6 +5246,31 @@ const ja = {
     "alternativesTitle": "2026年おすすめボグル代替ゲーム"
   },
   "landing": {
+    "home": {
+      "greeting": "こんにちは、{name}さん",
+      "levelTitle": "レベル{level}・{title}",
+      "levelOnly": "レベル{level}",
+      "online": "オンライン",
+      "gameModes": "ゲームモード",
+      "todaysPuzzle": "今日のパズル",
+      "puzzleNo": "パズル #{n}",
+      "resetsIn": "{time}でリセット",
+      "dayStreak": "{n}日連続",
+      "gamesToday": "本日のゲーム",
+      "modes": "モード",
+      "languages": "言語",
+      "rank": "ランク",
+      "maxLevel": "最大",
+      "xpToNext": "次のレベル{level}まで{xp} XP",
+      "bestScore": "ベストスコア",
+      "tier": {
+        "common": "ルーキーリーグ",
+        "uncommon": "ブロンズリーグ",
+        "rare": "シルバーリーグ",
+        "epic": "ゴールドリーグ",
+        "legendary": "レジェンドリーグ"
+      }
+    },
     "teaser": {
       "signInToUnlock": "サインインして解除",
       "rivalTitle": "今週のライバル",
@@ -12275,6 +12300,7 @@ const ja = {
     }
   },
   avatarBuilder: {
+    glowUp: { button: "グロウアップ", loading: "生成中…", adminTag: "管理者", resultTitle: "あなたのグロウアップ" },
     title: "アバタービルダー",
     base: "形",
     hair: "髪",

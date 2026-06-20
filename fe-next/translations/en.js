@@ -5305,6 +5305,31 @@ const en = {
     "alternativesTitle": "Best Boggle Alternatives 2026"
   },
   "landing": {
+    "home": {
+      "greeting": "Hey, {name}",
+      "levelTitle": "Level {level} · {title}",
+      "levelOnly": "Level {level}",
+      "online": "online",
+      "gameModes": "Game Modes",
+      "todaysPuzzle": "Today's Puzzle",
+      "puzzleNo": "Puzzle #{n}",
+      "resetsIn": "resets in {time}",
+      "dayStreak": "{n}-day streak",
+      "gamesToday": "Games today",
+      "modes": "Modes",
+      "languages": "Languages",
+      "rank": "Rank",
+      "maxLevel": "MAX",
+      "xpToNext": "{xp} XP to Lvl {level}",
+      "bestScore": "Best score",
+      "tier": {
+        "common": "Rookie League",
+        "uncommon": "Bronze League",
+        "rare": "Silver League",
+        "epic": "Gold League",
+        "legendary": "Legend League"
+      }
+    },
     "teaser": {
       "signInToUnlock": "Sign in to unlock",
       "rivalTitle": "Your Weekly Rival",
@@ -12210,6 +12235,7 @@ const en = {
     }
   },
   "avatarBuilder": {
+    "glowUp": { "button": "Glow Up", "loading": "Glowing up…", "adminTag": "Admin", "resultTitle": "Your glow-up" },
     "title": "Avatar Builder",
     "base": "Shape",
     "hair": "Hair",

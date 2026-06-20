@@ -5375,6 +5375,31 @@ const he = {
     "alternativesTitle": "החלופות הטובות ביותר לבוגל 2026"
   },
   "landing": {
+    "home": {
+      "greeting": "היי, {name}",
+      "levelTitle": "רמה {level} · {title}",
+      "levelOnly": "רמה {level}",
+      "online": "מחוברים",
+      "gameModes": "מצבי משחק",
+      "todaysPuzzle": "החידה היומית",
+      "puzzleNo": "חידה #{n}",
+      "resetsIn": "מתאפס בעוד {time}",
+      "dayStreak": "רצף {n} ימים",
+      "gamesToday": "משחקים היום",
+      "modes": "מצבים",
+      "languages": "שפות",
+      "rank": "דירוג",
+      "maxLevel": "מקס",
+      "xpToNext": "{xp} XP לרמה {level}",
+      "bestScore": "שיא",
+      "tier": {
+        "common": "ליגת מתחילים",
+        "uncommon": "ליגת ארד",
+        "rare": "ליגת כסף",
+        "epic": "ליגת זהב",
+        "legendary": "ליגת אגדה"
+      }
+    },
     "teaser": {
       "signInToUnlock": "התחברו כדי לפתוח",
       "rivalTitle": "היריב השבועי שלך",
@@ -12711,6 +12736,7 @@ const he = {
     }
   },
   "avatarBuilder": {
+    "glowUp": { "button": "שדרוג זוהר", "loading": "משדרג…", "adminTag": "מנהל", "resultTitle": "האווטאר המשודרג" },
     "title": "בונה דמויות",
     "base": "צורה",
     "hair": "שיער",

@@ -5404,6 +5404,31 @@ const sv = {
     "alternativesTitle": "Bästa Boggle-alternativen 2026"
   },
   "landing": {
+    "home": {
+      "greeting": "Hej, {name}",
+      "levelTitle": "Nivå {level} · {title}",
+      "levelOnly": "Nivå {level}",
+      "online": "online",
+      "gameModes": "Spellägen",
+      "todaysPuzzle": "Dagens pussel",
+      "puzzleNo": "Pussel #{n}",
+      "resetsIn": "återställs om {time}",
+      "dayStreak": "{n} dagar i rad",
+      "gamesToday": "Spel idag",
+      "modes": "Lägen",
+      "languages": "Språk",
+      "rank": "Rang",
+      "maxLevel": "MAX",
+      "xpToNext": "{xp} XP till nivå {level}",
+      "bestScore": "Bästa poäng",
+      "tier": {
+        "common": "Nybörjarliga",
+        "uncommon": "Bronsliga",
+        "rare": "Silverliga",
+        "epic": "Guldliga",
+        "legendary": "Legendliga"
+      }
+    },
     "teaser": {
       "signInToUnlock": "Logga in för att låsa upp",
       "rivalTitle": "Din veckorival",
@@ -12426,6 +12451,7 @@ const sv = {
     }
   },
   avatarBuilder: {
+    glowUp: { button: "Glow-up", loading: "Skapar…", adminTag: "Admin", resultTitle: "Din glow-up" },
     title: "Avatarskapare",
     base: "Form",
     hair: "Hår",

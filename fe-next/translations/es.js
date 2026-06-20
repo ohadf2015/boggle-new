@@ -5279,6 +5279,31 @@ const es = {
     "alternativesTitle": "Mejores alternativas a Boggle 2026"
   },
   "landing": {
+    "home": {
+      "greeting": "Hola, {name}",
+      "levelTitle": "Nivel {level} · {title}",
+      "levelOnly": "Nivel {level}",
+      "online": "en línea",
+      "gameModes": "Modos de juego",
+      "todaysPuzzle": "Reto de hoy",
+      "puzzleNo": "Puzle #{n}",
+      "resetsIn": "se reinicia en {time}",
+      "dayStreak": "racha de {n} días",
+      "gamesToday": "Partidas hoy",
+      "modes": "Modos",
+      "languages": "Idiomas",
+      "rank": "Rango",
+      "maxLevel": "MÁX",
+      "xpToNext": "{xp} XP para nivel {level}",
+      "bestScore": "Mejor puntuación",
+      "tier": {
+        "common": "Liga Novato",
+        "uncommon": "Liga Bronce",
+        "rare": "Liga Plata",
+        "epic": "Liga Oro",
+        "legendary": "Liga Leyenda"
+      }
+    },
     "teaser": {
       "signInToUnlock": "Inicia sesión para desbloquear",
       "rivalTitle": "Tu rival semanal",
@@ -12360,6 +12385,7 @@ const es = {
     }
   },
   avatarBuilder: {
+    glowUp: { button: "Mejorar", loading: "Mejorando…", adminTag: "Admin", resultTitle: "Tu avatar mejorado" },
     title: "Constructor de Avatar",
     base: "Forma",
     hair: "Cabello",
