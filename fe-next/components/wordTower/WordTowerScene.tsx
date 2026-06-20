@@ -108,6 +108,12 @@ interface PanState {
 /** Fraction of the user's pan applied to the background (parallax — bg slower). */
 const BG_PAN_DEPTH = 0.4;
 
+/** Max pending-preview ghost bricks drawn at the crown while spelling. Founder
+ *  ask (2026-06-20): "the tower should always display max 2 top letter blocks —
+ *  here you can see around 5." Capping the live preview keeps the tower's crown
+ *  clean; the full word still reads in the wheel hub + on the carried girder. */
+const MAX_PENDING_PREVIEW = 2;
+
 /** How far the user must scroll down (px) before the back-to-top button shows. */
 const BACK_TO_TOP_REVEAL_PX = 90;
 
@@ -211,7 +217,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     const pendingColor = wordColor(floors.length);
     const topSurface = blockSurface(biomeId);
     // Skip the anchor (pendingWord[0]) when it's already the committed top.
-    const pchars = C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(anchorLen);
+    // Cap the live ghost preview to the first MAX_PENDING_PREVIEW bricks so a long
+    // word doesn't grow a tall column of blocks above the crown (the full word is
+    // shown in the wheel hub + carried on the crane girder). Stable positions →
+    // the diff registry keeps each preview brick's char fixed as the word grows.
+    const pchars = (C === 0 ? Array.from(pendingWord) : Array.from(pendingWord).slice(anchorLen))
+      .slice(0, MAX_PENDING_PREVIEW);
 
     const live: LiveCell[] = committed.map((cell, i) => {
       const zone = biomeForHeight(alts[i] ?? 0);

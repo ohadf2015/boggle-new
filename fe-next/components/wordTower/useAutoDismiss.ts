@@ -28,7 +28,32 @@ export function useAutoDismiss(token: unknown, clear: () => void, ms: number): v
   clearRef.current = clear;
   useEffect(() => {
     if (token == null) return;
-    const id = setTimeout(() => clearRef.current(), ms);
-    return () => clearTimeout(id);
+    let done = false;
+    let raf = 0;
+    const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    const start = now();
+    const fire = () => {
+      if (done) return;
+      done = true;
+      if (raf) cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      clearRef.current();
+    };
+    // Primary path: a plain setTimeout.
+    const timer = setTimeout(fire, ms);
+    // Watchdog: on a busy mobile webview the Pixi render loop can STARVE
+    // setTimeout, leaving a celebration toast "stuck" on screen (founder report
+    // 2026-06-20: "messages stay stuck — the plus-height + encouragement"). rAF
+    // is pumped every animation frame while the page is visible, so this fires
+    // the dismiss on time even when the timer lags. Whichever wins is idempotent.
+    if (typeof requestAnimationFrame !== 'undefined') {
+      const tick = () => {
+        if (done) return;
+        if (now() - start >= ms) { fire(); return; }
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }
+    return () => { done = true; clearTimeout(timer); if (raf) cancelAnimationFrame(raf); };
   }, [token, ms]);
 }

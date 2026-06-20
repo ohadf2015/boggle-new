@@ -45,6 +45,7 @@ export interface WordTowerUIState {
 
 type Action =
   | { type: 'selectTile'; index: number }
+  | { type: 'deselectTile'; index: number }
   | { type: 'backspace' }
   | { type: 'clear' }
   | { type: 'submit'; isInDictionary: (canonWord: string) => boolean }
@@ -67,6 +68,15 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
       if (action.index < 0 || action.index >= state.game.tray.length) return state;
       if (state.selected.includes(action.index)) return state; // each tile once
       return { ...state, selected: [...state.selected, action.index] };
+    }
+    case 'deselectTile': {
+      // Tap an already-chosen tile to UNSELECT it (founder ask 2026-06-20). We
+      // rewind the path to just BEFORE that tile — dropping it and everything
+      // chosen after — so the remaining selection stays a clean, contiguous
+      // prefix (no holes in the spell path / connecting polyline).
+      const at = state.selected.indexOf(action.index);
+      if (at === -1) return state;
+      return { ...state, selected: state.selected.slice(0, at) };
     }
     case 'backspace':
       if (state.selected.length === 0) return state;
@@ -171,6 +181,7 @@ export function useWordTower(opts: UseWordTowerOpts) {
   const handlers = useMemo(
     () => ({
       selectTile: (index: number) => dispatch({ type: 'selectTile', index }),
+      deselectTile: (index: number) => dispatch({ type: 'deselectTile', index }),
       backspace: () => dispatch({ type: 'backspace' }),
       clear: () => dispatch({ type: 'clear' }),
       submit: () => dispatch({ type: 'submit', isInDictionary: dictRef.current }),

@@ -32,6 +32,10 @@ const TIER_CLASS: Record<ArchitectTier, string> = {
 
 export function WordTowerStatHud({ heightM, biomeId, floorsCount, personalBestM, combo, tier, t }: Props) {
   const mult = comboMult(combo);
+  // Compact two-line card (founder ask 2026-06-20: the stat card was a tall
+  // 4-row stack that overlapped the next-zone chip + mode toggle). Line 1: the
+  // big altitude + combo + best. Line 2: biome · floors with the tier badge
+  // inline. Shorter footprint → no collision with the top-centre banners.
   return (
     <div className="pointer-events-none flex flex-col items-center rounded-neo border-neo border-black bg-neo-navy/85 px-3 py-1 text-center shadow-hard-sm backdrop-blur-sm">
       <div className="flex items-baseline gap-2">
@@ -43,20 +47,20 @@ export function WordTowerStatHud({ heightM, biomeId, floorsCount, personalBestM,
             <Flame className="h-3 w-3" aria-hidden />×{mult.toFixed(1)}
           </span>
         )}
+        {personalBestM > 0 && (
+          <span className="font-neo-body text-[10px] font-bold leading-none text-neo-yellow tabular-nums">
+            {t('wordTower.hud.best', { m: Math.round(personalBestM) })}
+          </span>
+        )}
       </div>
-      <span className="font-neo-body text-[10px] uppercase leading-tight tracking-wider text-neo-cyan">
-        {t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}
+      <span className="mt-0.5 flex items-center gap-1.5 font-neo-body text-[10px] uppercase leading-none tracking-wider text-neo-cyan">
+        <span>{t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}</span>
+        {tier && (
+          <span className={`rounded-sm border border-black px-1 py-px font-neo-display text-[9px] font-black uppercase leading-none tracking-wide ${TIER_CLASS[tier]}`}>
+            {t(`wordTower.tier.${tier.toLowerCase()}`)}
+          </span>
+        )}
       </span>
-      {tier && (
-        <span className={`mt-0.5 rounded-sm border border-black px-1.5 py-px font-neo-display text-[9px] font-black uppercase leading-none tracking-wide ${TIER_CLASS[tier]}`}>
-          {t(`wordTower.tier.${tier.toLowerCase()}`)}
-        </span>
-      )}
-      {personalBestM > 0 && (
-        <span className="font-neo-body text-[10px] font-bold leading-tight text-neo-yellow">
-          {t('wordTower.hud.best', { m: Math.round(personalBestM) })}
-        </span>
-      )}
     </div>
   );
 }

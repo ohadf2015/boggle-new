@@ -26,6 +26,7 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
 
   useEffect(() => {
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+    let raf = 0;
 
     if (source != null) {
       // Live (or refreshed) content — show it now, cancel any pending exit.
@@ -35,14 +36,35 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
       // Source cleared while something is showing → run the exit, keep the last
       // value on screen until the animation finishes, then unmount it.
       setExiting(true);
-      timer.current = setTimeout(() => {
+      const finish = () => {
+        if (raf) cancelAnimationFrame(raf);
         setValue(null);
         setExiting(false);
         timer.current = null;
-      }, exitMs);
+      };
+      timer.current = setTimeout(finish, exitMs);
+      // rAF watchdog (same rationale as useAutoDismiss): guarantees the exit
+      // completes + unmounts even if the main thread starves setTimeout, so a
+      // toast can never linger half-faded on a busy frame.
+      if (exitMs > 0 && typeof requestAnimationFrame !== 'undefined') {
+        const start = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+        const tick = () => {
+          const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+          if (now - start >= exitMs) {
+            if (timer.current) { clearTimeout(timer.current); }
+            finish();
+            return;
+          }
+          raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      }
     }
 
-    return () => { if (timer.current) { clearTimeout(timer.current); timer.current = null; } };
+    return () => {
+      if (timer.current) { clearTimeout(timer.current); timer.current = null; }
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [source, exitMs]);
 
   return { value, exiting };

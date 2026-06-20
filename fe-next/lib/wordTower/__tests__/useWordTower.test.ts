@@ -163,6 +163,37 @@ describe('useWordTower', () => {
     expect(result.current.state.selected).toEqual([0]);
   });
 
+  describe('deselectTile — tap a chosen tile to unselect it', () => {
+    it('tapping the last-selected tile removes just it (backspace-equivalent)', () => {
+      const { result } = setup();
+      pick(result, [0, 1, 2]);
+      act(() => result.current.deselectTile(2));
+      expect(result.current.state.selected).toEqual([0, 1]);
+    });
+
+    it('tapping a tile in the middle rewinds the path to before it', () => {
+      const { result } = setup();
+      pick(result, [0, 1, 2, 3]);
+      act(() => result.current.deselectTile(1));
+      // 1 and everything chosen after it (2, 3) are dropped — clean prefix remains.
+      expect(result.current.state.selected).toEqual([0]);
+    });
+
+    it('tapping the first-selected tile clears the whole word', () => {
+      const { result } = setup();
+      pick(result, [0, 1, 2]);
+      act(() => result.current.deselectTile(0));
+      expect(result.current.state.selected).toEqual([]);
+    });
+
+    it('tapping an unselected tile is a no-op', () => {
+      const { result } = setup();
+      pick(result, [0, 1]);
+      act(() => result.current.deselectTile(4));
+      expect(result.current.state.selected).toEqual([0, 1]);
+    });
+  });
+
   it('scramble spends a scramble, resets combo, clears selection', () => {
     const { result } = setup();
     act(() => result.current.selectTile(0));
