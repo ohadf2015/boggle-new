@@ -38,6 +38,8 @@ export interface AdventureGameOverlaysProps {
   handleBossIntroSkip?: () => void;
   bossHealthState: BossHealthState;
   bossEffectCallbacks: EffectCallbacks;
+  bossComboCount: number;
+  onBossCombatDamage: (baseDamage: number, mechanicMultiplier: number) => number;
   isBossLevel: boolean;
   isBossActive: boolean;
   showBossFireworks: boolean;
@@ -121,7 +123,7 @@ export interface AdventureGameOverlaysProps {
 
 const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
   bossConfig, bossTaunt, showBossIntro, handleBossIntroStart, handleBossIntroSkip,
-  bossHealthState, bossEffectCallbacks, isBossLevel, isBossActive,
+  bossHealthState, bossEffectCallbacks, bossComboCount, onBossCombatDamage, isBossLevel, isBossActive,
   showBossFireworks, defeatedBossTier, showEdgeVignette, playerHealthState,
   showLevelComplete, gameStars, gameScore, wordsFound, gameState,
   handleContinue, handleRetry, onExit, handleCinematicComplete, handlePauseToggle,
@@ -152,7 +154,9 @@ const AdventureGameOverlays = memo<AdventureGameOverlaysProps>(({
       onContinue={handleContinue} onRetry={handleRetry}
       worldNumber={worldNumber}
       healthState={bossHealthState}
-      effectCallbacks={bossEffectCallbacks} />
+      effectCallbacks={bossEffectCallbacks}
+      comboCount={bossComboCount}
+      onCombatDamage={onBossCombatDamage} />
 
     {isBossLevel && isBossActive && !showBossIntro && !showLevelComplete && !playerHealthState.isDead && (
       <div className="fixed bottom-[calc(4.5rem+var(--admob-banner-height,0px))] sm:bottom-[calc(6rem+var(--admob-banner-height,0px))] lg:bottom-[calc(1rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-30 px-4 w-full max-w-md">

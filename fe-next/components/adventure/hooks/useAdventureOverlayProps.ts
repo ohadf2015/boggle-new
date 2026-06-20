@@ -34,6 +34,7 @@ interface BossOrchInput {
   handleBossIntroSkip?: () => void;
   bossHealthState: BossHealthState;
   bossEffectCallbacks: EffectCallbacks;
+  dealBossDamage: (baseDamage: number, mechanicMultiplier: number) => number;
   isBossActive: boolean;
   showBossFireworks: boolean;
   defeatedBossTier: BossTier | null;
@@ -190,6 +191,8 @@ export function useAdventureOverlayProps(p: UseAdventureOverlayPropsParams): Adv
     handleBossIntroSkip: bossOrch.handleBossIntroSkip,
     bossHealthState: bossOrch.bossHealthState,
     bossEffectCallbacks: bossOrch.bossEffectCallbacks,
+    bossComboCount: gameState.comboCount,
+    onBossCombatDamage: bossOrch.dealBossDamage,
     isBossLevel: p.isBossLevel,
     isBossActive: bossOrch.isBossActive,
     showBossFireworks: bossOrch.showBossFireworks,

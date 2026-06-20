@@ -2323,6 +2323,39 @@ const ja = {
         "tryIt": "なぞって！"
       }
     },
+    "boss": {
+      "combat": {
+        "abilityBar": "アビリティ",
+        "charge": "アビリティチャージ",
+        "weakLabel": "弱点",
+        "weaknessHit": "弱点ヒット！",
+        "weakness": {
+          "length": "長い単語",
+          "lengthLong": "より長い単語",
+          "lengthEpic": "超長い単語",
+          "doubleLetter": "二重文字",
+          "palindrome": "回文",
+          "rareLetter": "レア文字",
+          "vowelHeavy": "母音の多い単語"
+        },
+        "parry": {
+          "hint": "防御！大きな単語を急いで！",
+          "success": "パリィ成功！"
+        },
+        "ability": {
+          "smite": { "name": "スマイト", "desc": "ボスに大ダメージを叩き込む" },
+          "ward": { "name": "ガード", "desc": "ボスの次の攻撃を防ぐ" },
+          "focus": { "name": "フォーカス", "desc": "次の単語がボーナスダメージを与える" }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": { "label": "ゴールド2倍！", "desc": "このレベルはゴールドが2倍。" },
+      "bonusChest": { "label": "ボーナス宝箱！", "desc": "追加の宝箱が出現。" },
+      "luckyGems": { "label": "ラッキージェム！", "desc": "ジェムの大当たり。" },
+      "goldenWord": { "label": "ゴールデンワード！", "desc": "隠れた単語が大当たりだった。" },
+      "comboFrenzy": { "label": "コンボフレンジー！", "desc": "このレベルはコンボ報酬が2倍。" }
+    },
     "welcome": {
       "title": "LexiClashへようこそ！",
       "subtitle": "なぞって。つなげて。勝ち取れ。",

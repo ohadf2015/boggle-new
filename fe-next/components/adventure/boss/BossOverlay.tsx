@@ -19,6 +19,9 @@ import BossVictory from '../BossVictory';
 import SegmentedHPBar from './SegmentedHPBar';
 import { AttackTelegraph } from './AttackTelegraph';
 import BossAttackEffect from './BossAttackEffect';
+import PlayerAbilityBar from './PlayerAbilityBar';
+import ParryPrompt, { type ParryOutcome } from './ParryPrompt';
+import WeaknessBadge, { type WeaknessCrit } from './WeaknessBadge';
 import {
   CinematicPlayer,
   BossEntranceCinematic,
@@ -35,6 +38,10 @@ import type { BossConfig } from '@/types/boss';
 import { getBossAnimations } from '@/lib/adventure/bossAnimations';
 import type { AdventureGameState } from '@/types/adventure';
 import { BOSS_PHASE_THRESHOLDS } from '@/types/bossStateMachine';
+import { useBossCombat } from '@/hooks/useBossCombat';
+import { getParryRequirement } from '@/lib/adventure/combat/parry';
+import { evaluateWeakness, getBossWeakness } from '@/lib/adventure/combat/weakness';
+import { BOSS_RPG_COMBAT_ENABLED } from '@/lib/adventure/combat/config';
 
 // ==============================================
 // TYPES
@@ -64,6 +71,10 @@ interface BossOverlayProps {
     isActive: boolean;
   };
   effectCallbacks?: EffectCallbacks;
+  /** Current combo — charges the player ability kit. */
+  comboCount?: number;
+  /** Deal counter/burst damage to the boss (smite, parry counter, focus burst). */
+  onCombatDamage?: (damage: number, mechanicMultiplier: number) => number;
 }
 
 // ==============================================
@@ -102,6 +113,8 @@ const BossOverlay = memo<BossOverlayProps>(
     worldNumber,
     healthState,
     effectCallbacks,
+    comboCount = 0,
+    onCombatDamage,
   }) => {
     const { t } = useLanguage();
 
@@ -172,6 +185,9 @@ const BossOverlay = memo<BossOverlayProps>(
 
     // --- Abilities ---
 
+    // Parry/defend result banner (auto-cleared by an effect below — no ref timers).
+    const [parryResult, setParryResult] = useState<ParryOutcome>(null);
+
     const {
       telegraphingAbility,
       checkActivation,
@@ -182,8 +198,16 @@ const BossOverlay = memo<BossOverlayProps>(
 
     const { applyEffects } = useBossEffectExecutor(effectCallbacks ?? {});
 
+    // Holds the live combat API so callbacks defined before the hook can reach it.
+    const combatRef = useRef<ReturnType<typeof useBossCombat> | null>(null);
+
     const handleTelegraphComplete = useCallback((abilityId: string, _targetTiles: number[]) => {
       const effects = executeAbility(abilityId);
+      // WARD: auto-block the attack — consume the ward and skip its effects.
+      if (combatRef.current?.consumeWardForAttack()) {
+        setParryResult('parried');
+        return;
+      }
       applyEffects(effects);
       const damageEffect = effects.find(e => e.type === 'player_damage');
       const damage = (damageEffect?.params?.amount as number) ?? 0;
@@ -200,7 +224,72 @@ const BossOverlay = memo<BossOverlayProps>(
       state: telegraphState,
       startTelegraph,
       isActive: isTelegraphing,
+      cancelTelegraph,
     } = useAttackTelegraph({ duration: 2000, onComplete: handleTelegraphComplete });
+
+    // ============================================================
+    // RPG COMBAT LAYER — parry, player abilities, weakness crit
+    // ============================================================
+    const [weakCrit, setWeakCrit] = useState<WeaknessCrit | null>(null);
+    const weakCritTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const weakCritIdRef = useRef(0);
+    useEffect(() => () => {
+      if (weakCritTimerRef.current) clearTimeout(weakCritTimerRef.current);
+    }, []);
+
+    // Auto-clear the parry/ward banner after a beat (no manual ref timer).
+    useEffect(() => {
+      if (!parryResult) return;
+      const id = setTimeout(() => setParryResult(null), 900);
+      return () => clearTimeout(id);
+    }, [parryResult]);
+
+    const combatEnabled = BOSS_RPG_COMBAT_ENABLED && effectiveIsActive && !showIntro && !showVictory && !showDefeat;
+    const newestWord = wordsFound.length > 0 ? wordsFound[wordsFound.length - 1] : null;
+
+    const weaknessRule = useMemo(
+      () => getBossWeakness(boss?.twistMechanic.type ?? 'popQuiz'),
+      [boss]
+    );
+    const parryReq = useMemo(
+      () => (isTelegraphing && combatEnabled ? getParryRequirement(weaknessRule, derivedPhase) : null),
+      [isTelegraphing, combatEnabled, weaknessRule, derivedPhase]
+    );
+
+    const handleCounterDamage = useCallback((dmg: number) => {
+      onCombatDamage?.(dmg, 1);
+    }, [onCombatDamage]);
+
+    const handleParrySuccess = useCallback(() => {
+      cancelTelegraph();
+      setParryResult('parried');
+    }, [cancelTelegraph]);
+
+    const combat = useBossCombat({
+      twist: boss?.twistMechanic.type,
+      world: worldNumber,
+      phase: derivedPhase,
+      comboCount,
+      newestWord,
+      parryReq,
+      enabled: combatEnabled,
+      onCounterDamage: handleCounterDamage,
+      onParrySuccess: handleParrySuccess,
+    });
+    combatRef.current = combat;
+
+    // WEAKNESS crit popup — independent of word-submit (same deterministic rule).
+    const handledWeakWordRef = useRef<string | null>(null);
+    useEffect(() => {
+      if (!combatEnabled || !newestWord || newestWord === handledWeakWordRef.current) return;
+      handledWeakWordRef.current = newestWord;
+      if (evaluateWeakness(newestWord, weaknessRule).isWeakHit) {
+        const id = ++weakCritIdRef.current;
+        setWeakCrit({ id, label: weaknessRule.labelKey });
+        if (weakCritTimerRef.current) clearTimeout(weakCritTimerRef.current);
+        weakCritTimerRef.current = setTimeout(() => setWeakCrit(prev => (prev?.id === id ? null : prev)), 900);
+      }
+    }, [newestWord, combatEnabled, weaknessRule]);
 
     // --- Effect cap: prevent "effect soup" by limiting simultaneous visual effects ---
     const effectEntries: EffectEntry[] = useMemo(() => [
@@ -239,7 +328,7 @@ const BossOverlay = memo<BossOverlayProps>(
         const delta = now - lastCheckRef.current;
         lastCheckRef.current = now;
         tickCooldowns(delta);
-        if (!telegraphingAbility) {
+        if (!telegraphingAbility && !combatRef.current?.isBossStunned()) {
           const abilityToActivate = checkActivation(derivedContextRef.current, abilityStateRef.current);
           if (abilityToActivate) {
             startAbility(abilityToActivate.id);
@@ -554,6 +643,35 @@ const BossOverlay = memo<BossOverlayProps>(
               timeRemaining={telegraphState.timeRemaining}
               abilityName={telegraphingAbility?.name}
             />
+
+            {/* RPG combat HUD — flag-dark; mounts only when the layer is enabled */}
+            {BOSS_RPG_COMBAT_ENABLED && (
+              <>
+                {/* PARRY prompt — turns the telegraph into an active defend window */}
+                <ParryPrompt
+                  active={isTelegraphing}
+                  hintKey={parryReq?.hintKey ?? 'adventure.boss.combat.parry.hint'}
+                  secondsLeft={telegraphState.timeRemaining / 1000}
+                  result={parryResult}
+                  t={t}
+                />
+
+                {/* Player ability kit + weakness — the RPG moveset & strategy HUD.
+                    Docked as a SOLID panel just above the player HP bar so it reads as
+                    controls (legible + tappable) even where it meets the board edge on
+                    tall, narrow phones, rather than transparent buttons over the tiles. */}
+                <div className="fixed bottom-[calc(8rem+var(--admob-banner-height,0px))] sm:bottom-[calc(9.5rem+var(--admob-banner-height,0px))] lg:bottom-[calc(4.5rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1 px-2 py-1.5 rounded-neo bg-neo-navy/92 border-2 border-neo-black shadow-hard backdrop-blur-sm">
+                  <WeaknessBadge labelKey={weaknessRule.labelKey} crit={weakCrit} t={t} />
+                  <PlayerAbilityBar
+                    abilities={combat.abilities}
+                    charge={combat.charge}
+                    maxCharge={combat.maxCharge}
+                    onCast={combat.cast}
+                    t={t}
+                  />
+                </div>
+              </>
+            )}
 
             {/* Boss Attack Effect (capped) */}
             {fx.attackEffect && <BossAttackEffect attackEffect={attackEffect} bossId={boss.id} />}

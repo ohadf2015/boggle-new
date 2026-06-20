@@ -285,6 +285,13 @@ export function isLevelUnlocked(
   level: number,
   completions: Array<{ world: number; level: number; stars: number }>
 ): boolean {
+  // Dev-only playtest escape hatch (?devUnlockAll=1). Dead in production builds.
+  if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+    try {
+      if (new URLSearchParams(window.location.search).get('devUnlockAll') === '1') return true;
+    } catch { /* ignore */ }
+  }
+
   // Level 1 of any world is always available (if world is unlocked)
   if (level <= 1) return true;
 

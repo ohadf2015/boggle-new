@@ -12,6 +12,8 @@ import type { BossTauntEvent, BossConfig, BossMechanicResult } from '@/types/bos
 import type { AdventureAchievementId } from '@/utils/adventureAchievementUtils';
 import type { GridTileState } from '@/types/adventure';
 import { evaluateWorldMechanic } from '@/lib/adventure/worldMechanics';
+import { getBossWeakness, evaluateWeakness } from '@/lib/adventure/combat/weakness';
+import { BOSS_RPG_COMBAT_ENABLED } from '@/lib/adventure/combat/config';
 import { useHaptics } from '@/hooks/useHaptics';
 
 // Monotonic counter for unique IDs (avoids Date.now() collisions on rapid submission)
@@ -256,6 +258,13 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
             const mechResult = checkBossWord(word);
             scoreValue = Math.floor(scoreValue * mechResult.scoreMultiplier);
 
+            // RPG elemental weakness: hitting the boss's weak word-type crits.
+            // Deterministic from the boss twist mechanic (see lib/adventure/combat/weakness).
+            // Flag-dark: no damage change unless the RPG combat layer is enabled.
+            const weak = BOSS_RPG_COMBAT_ENABLED
+              ? evaluateWeakness(word, getBossWeakness(bossConfig.twistMechanic?.type))
+              : { isWeakHit: false, multiplier: 1 };
+
             // Round once after all multipliers; stacked ceils would inflate damage up to +3.
             const rawBase = Math.max(1, scoreValue / 3);
             const baseDamage = Math.max(
@@ -264,6 +273,7 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
                 rawBase
                   * skillEffects.bossDamageMultiplier
                   * skillEffects.getLongWordDamageMultiplier(word.length)
+                  * weak.multiplier
               )
             );
 
@@ -276,7 +286,9 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
               triggerBossTaunt('onGoodWord');
             }
 
-            if (mechResult.meetsRequirement) {
+            if (weak.isWeakHit) {
+              bossBonus = 'WEAKNESS!';
+            } else if (mechResult.meetsRequirement) {
               bossBonus = 'BOSS!';
             }
 

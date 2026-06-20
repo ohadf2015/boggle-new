@@ -2496,6 +2496,39 @@ const he = {
         "tryIt": "החליקו!"
       }
     },
+    "boss": {
+      "combat": {
+        "abilityBar": "היכולות שלך",
+        "charge": "טעינת יכולת",
+        "weakLabel": "פגיע ל",
+        "weaknessHit": "חולשה!",
+        "weakness": {
+          "length": "מילים ארוכות",
+          "lengthLong": "מילים ארוכות מאוד",
+          "lengthEpic": "מילים ענקיות",
+          "doubleLetter": "אותיות כפולות",
+          "palindrome": "מילים הפיכות",
+          "rareLetter": "אותיות נדירות",
+          "vowelHeavy": "מילים עתירות תנועות"
+        },
+        "parry": {
+          "hint": "הגן! מילה גדולה, מהר!",
+          "success": "נחסם!"
+        },
+        "ability": {
+          "smite": { "name": "מכה", "desc": "שחרר מכת נזק עוצמתית על הבוס" },
+          "ward": { "name": "מגן", "desc": "חסום את המתקפה הבאה של הבוס" },
+          "focus": { "name": "מיקוד", "desc": "המילה הבאה שלך פוגעת בנזק בונוס" }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": { "label": "זהב כפול!", "desc": "השלב הזה משלם זהב כפול." },
+      "bonusChest": { "label": "תיבת בונוס!", "desc": "תיבת אוצר נוספת מופיעה." },
+      "luckyGems": { "label": "אבני חן ממזל!", "desc": "מבול של אבני חן." },
+      "goldenWord": { "label": "מילת זהב!", "desc": "מילה נסתרת שווה ג'קפוט." },
+      "comboFrenzy": { "label": "טירוף קומבו!", "desc": "תגמולי הקומבו נספרו כפול בשלב הזה." }
+    },
     "welcome": {
       "title": "ברוכים הבאים ל-LexiClash!",
       "subtitle": "החליקו. אייתו. שלטו.",

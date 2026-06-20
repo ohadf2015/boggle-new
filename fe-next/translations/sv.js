@@ -2482,6 +2482,39 @@ const sv = {
         "tryIt": "Svep!"
       }
     },
+    "boss": {
+      "combat": {
+        "abilityBar": "Dina förmågor",
+        "charge": "Förmågeladdning",
+        "weakLabel": "Svag mot",
+        "weaknessHit": "SVAGHET!",
+        "weakness": {
+          "length": "LÅNGA ORD",
+          "lengthLong": "LÄNGRE ORD",
+          "lengthEpic": "ENORMA ORD",
+          "doubleLetter": "DUBBLA BOKSTÄVER",
+          "palindrome": "PALINDROM",
+          "rareLetter": "OVANLIGA BOKSTÄVER",
+          "vowelHeavy": "VOKALRIKA ORD"
+        },
+        "parry": {
+          "hint": "FÖRSVARA! Långt ord, snabbt!",
+          "success": "PARERAT!"
+        },
+        "ability": {
+          "smite": { "name": "Slag", "desc": "Släpp loss en explosion av skada på bossen" },
+          "ward": { "name": "Sköld", "desc": "Blockera bossens nästa attack" },
+          "focus": { "name": "Fokus", "desc": "Ditt nästa ord slår med bonusskada" }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": { "label": "Dubbelt Guld!", "desc": "Den här nivån ger dubbelt guld." },
+      "bonusChest": { "label": "Bonuskista!", "desc": "En extra skattkista dyker upp." },
+      "luckyGems": { "label": "Turädelstenar!", "desc": "Ett regn av ädelstenar." },
+      "goldenWord": { "label": "Gyllene Ord!", "desc": "Ett dolt ord var värt en jackpott." },
+      "comboFrenzy": { "label": "Combo-frenesi!", "desc": "Combo-belöningar räknades dubbelt på den här nivån." }
+    },
     "welcome": {
       "title": "Välkommen till LexiClash!",
       "subtitle": "Svep bokstäver. Bilda ord. Dominera.",

@@ -7692,6 +7692,39 @@ const en = {
     "of": "of"
   },
   "adventure": {
+    "boss": {
+      "combat": {
+        "abilityBar": "Your abilities",
+        "charge": "Ability charge",
+        "weakLabel": "Weak to",
+        "weaknessHit": "WEAKNESS!",
+        "weakness": {
+          "length": "LONG WORDS",
+          "lengthLong": "LONGER WORDS",
+          "lengthEpic": "HUGE WORDS",
+          "doubleLetter": "DOUBLE LETTERS",
+          "palindrome": "PALINDROMES",
+          "rareLetter": "RARE LETTERS",
+          "vowelHeavy": "VOWEL-RICH WORDS"
+        },
+        "parry": {
+          "hint": "DEFEND! Big word, fast!",
+          "success": "PARRIED!"
+        },
+        "ability": {
+          "smite": { "name": "Smite", "desc": "Unleash a burst of damage on the boss" },
+          "ward": { "name": "Ward", "desc": "Block the boss's next attack" },
+          "focus": { "name": "Focus", "desc": "Your next word strikes for bonus damage" }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": { "label": "Double Gold!", "desc": "This level pays out double gold." },
+      "bonusChest": { "label": "Bonus Chest!", "desc": "An extra chest of treasure appears." },
+      "luckyGems": { "label": "Lucky Gems!", "desc": "A windfall of gems." },
+      "goldenWord": { "label": "Golden Word!", "desc": "A hidden word was worth a jackpot." },
+      "comboFrenzy": { "label": "Combo Frenzy!", "desc": "Combo rewards counted double this level." }
+    },
     "welcome": {
       "title": "Welcome to Adventure Mode!",
       "description": "Explore 10 themed worlds, battle bosses, and level up your word skills. Tap World 1 to begin your journey!",

@@ -4477,6 +4477,39 @@ const es = {
         "tryIt": "¡Trázala!"
       }
     },
+    "boss": {
+      "combat": {
+        "abilityBar": "Tus habilidades",
+        "charge": "Carga de habilidad",
+        "weakLabel": "Débil a",
+        "weaknessHit": "¡DEBILIDAD!",
+        "weakness": {
+          "length": "PALABRAS LARGAS",
+          "lengthLong": "PALABRAS MÁS LARGAS",
+          "lengthEpic": "PALABRAS ENORMES",
+          "doubleLetter": "LETRAS DOBLES",
+          "palindrome": "PALÍNDROMOS",
+          "rareLetter": "LETRAS RARAS",
+          "vowelHeavy": "PALABRAS CON MUCHAS VOCALES"
+        },
+        "parry": {
+          "hint": "¡DEFIENDE! ¡Palabra larga, rápido!",
+          "success": "¡PARADO!"
+        },
+        "ability": {
+          "smite": { "name": "Castigo", "desc": "Desata una ráfaga de daño sobre el jefe" },
+          "ward": { "name": "Guarda", "desc": "Bloquea el próximo ataque del jefe" },
+          "focus": { "name": "Enfoque", "desc": "Tu próxima palabra golpea con daño extra" }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": { "label": "¡Oro Doble!", "desc": "Este nivel paga el doble de oro." },
+      "bonusChest": { "label": "¡Cofre Extra!", "desc": "Aparece un cofre de tesoro adicional." },
+      "luckyGems": { "label": "¡Gemas de la Suerte!", "desc": "Una lluvia de gemas." },
+      "goldenWord": { "label": "¡Palabra Dorada!", "desc": "Una palabra oculta valía un premio gordo." },
+      "comboFrenzy": { "label": "¡Frenesí de Combos!", "desc": "Las recompensas de combo contaron doble en este nivel." }
+    },
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
       "subtitle": "Desliza letras. Forma palabras. Domina.",

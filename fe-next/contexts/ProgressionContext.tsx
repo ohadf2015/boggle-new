@@ -39,6 +39,22 @@ import { buildCompleteLevelBody } from './progressionRequestBody';
 
 const PROGRESSION_CACHE_KEY = 'lexiclash_adventure_progression';
 
+/**
+ * Dev-only escape hatch: unlock every world/level for playtesting (e.g. jumping
+ * straight to a boss level). DEAD in production builds (NODE_ENV gate) and only
+ * active with an explicit `?devUnlockAll=1` query param, so it can never affect
+ * real users or be triggered accidentally.
+ */
+function devUnlockAll(): boolean {
+  if (process.env.NODE_ENV === 'production') return false;
+  if (typeof window === 'undefined') return false;
+  try {
+    return new URLSearchParams(window.location.search).get('devUnlockAll') === '1';
+  } catch {
+    return false;
+  }
+}
+
 function cacheProgression(data: PlayerProgression): void {
   try {
     localStorage.setItem(PROGRESSION_CACHE_KEY, JSON.stringify(data));
@@ -683,6 +699,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
   // Helper: Check if world is unlocked
   const isWorldUnlocked = useCallback(
     (worldId: number): boolean => {
+      if (devUnlockAll()) return true;
       if (!progression) return worldId === 1;
       return checkWorldUnlocked(worldId, progression.totalStars);
     },
@@ -692,6 +709,7 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
   // Helper: Check if level is unlocked
   const isLevelUnlocked = useCallback(
     (worldId: number, levelId: number): boolean => {
+      if (devUnlockAll()) return true;
       if (!progression) return worldId === 1 && levelId === 1;
       return checkLevelUnlocked(worldId, levelId, progression.completions);
     },
