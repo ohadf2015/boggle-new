@@ -7,7 +7,6 @@ import PracticeTutorialSheet from '@/components/practice/PracticeTutorialSheet';
 import PracticeClassicSandbox from '@/components/practice/PracticeClassicSandbox';
 import PracticeWordHuntSandbox from '@/components/practice/PracticeWordHuntSandbox';
 import PracticeWheelSandbox from '@/components/practice/PracticeWheelSandbox';
-import PracticeDesktopWelcome from '@/components/practice/PracticeDesktopWelcome';
 import { useModeFirstSeen } from '@/hooks/useModeFirstSeen';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
@@ -35,7 +34,11 @@ const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : use
  * surface per new mode.
  *
  * Fluency rules:
- *   - First visit: tutorial sheet → sandbox.
+ *   - First visit (mobile): tutorial sheet → sandbox.
+ *   - Desktop: NO pre-game gate — drop straight into the sandbox. The old inline
+ *     "How it works" card cluttered the screen and misaligned with the board
+ *     (founder: "practice mode looks bad, get rid of the how it works container").
+ *     The in-game "?" help pill + coach tips teach the mode without a gate.
  *   - Already-completed mode: skip tutorial, drop straight into sandbox.
  *     Re-reading the intro for a mode you've already finished feels infantilizing.
  *   - Explicit ?play=1 query param: skip tutorial regardless of state.
@@ -106,6 +109,14 @@ export default function PracticePageClient({ mode, locale }: Props) {
     setStep('play');
   }, [markSeen]);
 
+  // Desktop has no pre-game gate: the larger viewport + pointer affordances make
+  // the sandbox self-evident, and the in-game "?" help pill + coach tips teach
+  // the mode inline. Flip straight to play once desktop is detected so the
+  // player lands on the board (and telemetry records the real step).
+  useEffect(() => {
+    if (isDesktop && step === 'tutorial') goToPlay();
+  }, [isDesktop, step, goToPlay]);
+
   const sandbox =
     mode === 'wordHunt' ? <PracticeWordHuntSandbox /> :
     mode === 'wheelRush' ? <PracticeWheelSandbox /> :
@@ -115,25 +126,10 @@ export default function PracticePageClient({ mode, locale }: Props) {
   // of the wrong tutorial surface.
   if (step === 'tutorial' && isDesktop === null) return null;
 
-  if (step === 'tutorial') {
-    if (isDesktop) {
-      // Desktop: compact tip card inline ABOVE the sandbox so new players get
-      // context without a full-screen gate. The sandbox root is hardcoded to
-      // ~100dvh, so cap the whole thing to one viewport (via flex-1 + min-h-0 respecting
-      // the padded locked body) and let the sandbox fill the remaining height
-      // ([&>div]:!h-full overrides its own height) — otherwise card + 100dvh sandbox
-      // overflows and the board lands far below the fold (founder: "too much scroll in the game screen").
-      return (
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-          <div className="shrink-0">
-            <PracticeDesktopWelcome mode={mode} onDismiss={goToPlay} />
-          </div>
-          <div className="flex-1 min-h-0 [&>div]:!h-full">
-            {sandbox}
-          </div>
-        </div>
-      );
-    }
+  // Mobile first-timers still get the merged walkthrough sheet. Desktop is
+  // handled by the flip-to-play effect above, so this branch only renders on
+  // mobile (isDesktop === false).
+  if (step === 'tutorial' && !isDesktop) {
     return (
       <PracticeTutorialSheet
         mode={mode}
@@ -146,12 +142,11 @@ export default function PracticePageClient({ mode, locale }: Props) {
     );
   }
   // Play step (mobile + desktop). The sandbox root sizes itself to its parent
-  // (it overrides its own height via the desktop branch's [&>div]:!h-full and
-  // expects a definite-height parent). Rendered bare, a flex-item sandbox
-  // collapsed to content height on mobile → the board shrank to a tiny box and
-  // the page footer pulled up under a blank header (founder bug report). Wrap it
-  // in the same definite-height flex shell the desktop tutorial branch uses so
-  // the board fills the viewport on every surface.
+  // (the [&>div]:!h-full override forces its own height to fill, and it expects a
+  // definite-height parent). Rendered bare, a flex-item sandbox collapsed to
+  // content height on mobile → the board shrank to a tiny box and the page footer
+  // pulled up under a blank header (founder bug report). Wrap it in this
+  // definite-height flex shell so the board fills the viewport on every surface.
   return (
     <div className="flex-1 min-h-0 flex flex-col [&>div]:!h-full">
       {sandbox}

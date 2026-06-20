@@ -60,4 +60,21 @@ describe('PracticeBailoutCta', () => {
     expect(cta.className).not.toMatch(/bg-neo-pink/);
     expect(cta.className).not.toMatch(/border-3/);
   });
+
+  it('renders a tappable button affordance (bordered, rounded) so players can start the real game immediately', () => {
+    // Founder ask: the skip-to-real-game escape was a faint underline link that
+    // players missed. It must read as an actual button — a visible border + rounded
+    // frame — without becoming the loud hero CTA (still no pink / border-3 above).
+    render(<PracticeBailoutCta mode="classic" done={false} href="/en/singleplayer?practice=1" />);
+    const cta = screen.getByTestId('practice-bailout-cta');
+    expect(cta.className).toMatch(/border-2/);
+    expect(cta.className).toMatch(/rounded-neo/);
+  });
+
+  it('always shows the forward arrow (clear "go play" affordance, not just done state)', () => {
+    const { container } = render(
+      <PracticeBailoutCta mode="classic" done={false} href="/en/singleplayer?practice=1" />,
+    );
+    expect(container.querySelector('svg')).toBeTruthy();
+  });
 });

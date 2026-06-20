@@ -24,8 +24,8 @@ import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 // Per-mode color identity — each game mode owns one of the brand families
 // (classic = cyan / single-player, wordHunt = lime / primary, wheelRush =
 // purple / brain-training). The hub wears these colors boldly so it reads as
-// "our game", and the same mapping is mirrored in PracticeCompletePopup +
-// PracticeDesktopWelcome so the whole practice surface stays coherent.
+// "our game", and the same mapping is mirrored in PracticeCompletePopup so the
+// whole practice surface stays coherent.
 interface ModeAccent {
   /** Card background wash — stronger for finished tiles (a claimed trophy). */
   tile: string;

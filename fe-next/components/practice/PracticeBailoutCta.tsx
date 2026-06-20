@@ -25,12 +25,14 @@ interface Props {
  *    This resolves `practice.<mode>.{playRealCta,bailoutCta}` so the wording
  *    always matches the mode you actually played.
  *
- * 2. **Quiet, not the hero.** Practice is meant to feel calm and fun; a giant
- *    saturated-pink button screaming "Skip to real game" was the loudest thing
- *    on every board, drawing the eye toward the exit. This renders as a slim
- *    ghost text-link so the escape stays available without competing with the
- *    game. (When the goal is done it brightens slightly + shows an arrow — a
- *    gentle forward nudge, while the celebration popup carries the loud CTA.)
+ * 2. **A real, tappable button — not the hero.** Practice should feel calm, so
+ *    this isn't a giant saturated-pink CTA. But the original slim ghost text-link
+ *    was so quiet players missed it entirely (founder: "let's have a skip button
+ *    if the player wants to start playing immediately"). It now renders as a
+ *    clear bordered button — a visible affordance with a forward arrow — that
+ *    reads as "go play the real game" without shouting over the board. (When the
+ *    goal is done it brightens to a solid cream fill; the celebration popup still
+ *    carries the loud primary CTA.)
  */
 export default function PracticeBailoutCta({ mode, done, href, className = '' }: Props) {
   const { t } = useLanguage();
@@ -42,22 +44,21 @@ export default function PracticeBailoutCta({ mode, done, href, className = '' }:
       data-testid="practice-bailout-cta"
       className={
         'group inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-4 ' +
-        'font-neo-display font-bold text-sm underline underline-offset-4 ' +
-        'decoration-2 transition-colors ' +
+        'rounded-neo border-2 font-neo-display font-bold text-sm transition-colors ' +
+        'active:translate-y-px ' +
         (done
-          ? 'text-neo-cream decoration-neo-cream/40 hover:decoration-neo-cream'
-          : 'text-neo-white/60 decoration-neo-cream/20 hover:text-neo-white/90 hover:decoration-neo-cream/50') +
+          ? 'bg-neo-cream text-neo-black border-neo-black shadow-hard-sm hover:brightness-105'
+          : 'bg-neo-navy-light/70 text-neo-cream border-neo-cream/50 ' +
+            'hover:bg-neo-navy-light hover:border-neo-cream') +
         (className ? ` ${className}` : '')
       }
     >
       <span>{t(`practice.${mode}.${key}`)}</span>
-      {done && (
-        <ArrowRight
-          className="w-3.5 h-3.5 rtl:rotate-180 transition-transform group-hover:translate-x-0.5"
-          strokeWidth={3}
-          aria-hidden
-        />
-      )}
+      <ArrowRight
+        className="w-3.5 h-3.5 rtl:rotate-180 transition-transform group-hover:translate-x-0.5"
+        strokeWidth={3}
+        aria-hidden
+      />
     </Link>
   );
 }
