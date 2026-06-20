@@ -21,6 +21,7 @@ import { ArrowRight, ArrowLeft, Lock, ChevronDown, Sparkles } from 'lucide-react
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CUBE_BLUR_DATA_URL, type ModeCubeModel, type ModeCubeVariant } from '@/lib/landing/modeMeta';
+import { formatLiveShort } from '@/lib/landing/homeHubFormat';
 
 interface VariantStyle {
   /** solid colour fill (anchor) */
@@ -290,6 +291,12 @@ export interface LandingModeCubesProps {
   moreHint?: string;
   collapseLabel?: string;
   t: (key: string) => string;
+  /** `'hub'` (mobile Home Hub) shows a VISIBLE section header + live-online pill
+      above the grid; `'bento'` (default, desktop landing) keeps the header as an
+      invisible aria-label only. */
+  layout?: 'bento' | 'hub';
+  /** live player count — drives the hub header's "{n} online" pill */
+  liveCount?: number;
 }
 
 export function LandingModeCubes({
@@ -301,6 +308,8 @@ export function LandingModeCubes({
   moreHint,
   collapseLabel,
   t,
+  layout = 'bento',
+  liveCount,
 }: LandingModeCubesProps) {
   const anchor = models.find((m) => m.role === 'anchor') ?? models[0];
   const rest = models.filter((m) => m !== anchor);
@@ -321,6 +330,22 @@ export function LandingModeCubes({
       )}
 
       <section aria-label={sectionLabel}>
+        {layout === 'hub' && (
+          <div className="mb-3 flex items-center justify-between gap-2 px-0.5">
+            <h3 className="whitespace-nowrap font-neo-display text-lg font-black uppercase tracking-wide text-neo-cream">
+              {sectionLabel}
+            </h3>
+            {typeof liveCount === 'number' && liveCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 font-neo-display text-xs font-bold text-neo-lime">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-neo-lime opacity-65 motion-safe:animate-ping" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-neo-lime" />
+                </span>
+                {formatLiveShort(liveCount)} {t('landing.home.online')}
+              </span>
+            )}
+          </div>
+        )}
         <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {anchor && <Cube model={anchor} index={0} anchor bigAnchor={bigAnchor} />}
           {rest.map((m, i) => (

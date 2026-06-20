@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import DailyChallengeCube from '@/components/daily/DailyChallengeCube';
+import { HomeDailyHero } from './home/HomeDailyHero';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import { getGamesCompleted, isNewPlayer } from '@/utils/multiplayerProgressStorage';
@@ -40,6 +41,9 @@ interface LandingChallengeCardsProps {
   dailyChallengeStats: DailyChallengePreloadedStats;
   /** Pre-computed card order from server — static per ISR/deploy */
   cardOrder?: LandingGameMode[];
+  /** `'hub'` renders for the mobile Home Hub: a richer daily hero + a visible
+      "Game Modes" header with a live-online pill. Defaults to the desktop bento. */
+  layout?: 'bento' | 'hub';
 }
 
 /**
@@ -93,6 +97,7 @@ export function LandingChallengeCards({
   t,
   dailyChallengeStats,
   cardOrder: cardOrderProp,
+  layout = 'bento',
 }: LandingChallengeCardsProps) {
   // Offline-aware home: when the device is offline, live-multiplayer cards are
   // shown locked so a player on a flight doesn't tap into a dead lobby. Every
@@ -304,18 +309,27 @@ export function LandingChallengeCards({
     .filter(isModel);
   // Daily is the cubes hero — always present (it's the once-a-day hook), not
   // gated on heroCards like the control arm. It renders above the bento grid.
-  const dailyNode = <DailyChallengeCube preloadedStats={dailyChallengeStats} />;
+  // The mobile Home Hub promotes it to a richer banner (HomeDailyHero); desktop
+  // keeps the slim inline cube. Same `useDailyChallengeStats` feed + `/daily` route.
+  const dailyNode =
+    layout === 'hub' ? (
+      <HomeDailyHero preloadedStats={dailyChallengeStats} />
+    ) : (
+      <DailyChallengeCube preloadedStats={dailyChallengeStats} />
+    );
 
   return (
     <LandingModeCubes
       models={visibleModels}
       extras={extraModels}
       dailyNode={dailyNode}
-      sectionLabel={t('landing.sectionSoloTitle')}
+      sectionLabel={layout === 'hub' ? t('landing.home.gameModes') : t('landing.sectionSoloTitle')}
       moreLabel={t('landing.moreGameModes')}
       moreHint={t('landing.moreGameModesHint')}
       collapseLabel={t('common.collapse')}
       t={t}
+      layout={layout}
+      liveCount={activePlayers}
     />
   );
 

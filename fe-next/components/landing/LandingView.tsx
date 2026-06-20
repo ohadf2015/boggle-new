@@ -30,7 +30,7 @@ const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m
   loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
 import { LandingChallengeCards } from './LandingChallengeCards';
-import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
+import { HomeHub } from './home/HomeHub';
 import { LandingSeasonHero } from './LandingSeasonHero';
 import { LandingBottomCTA } from './LandingBottomCTA';
 
@@ -187,55 +187,73 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
 
       {/* Main content — padding uses CSS breakpoints to avoid JS-driven CLS */}
       <section className="w-full max-w-7xl mx-auto overflow-x-clip relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-1.5 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
-        {/* Season strip — slim countdown + leaderboard CTA, sits above the hero */}
-        <LandingSeasonHero />
-
-        {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
-        <LandingHero
-          players={topPlayers}
-          playersLoading={topPlayersLoading}
-          isMobilePortrait={isMobilePortrait}
-          energetic
-          activePlayers={activePlayers}
-        />
-
-        {/* Social Proof Bar — compact stats, immediately below hero */}
-        <LandingSocialProofBar
-          activePlayers={activePlayers}
+        {/* ===== MOBILE: focused arcade Home Hub (CSS-gated `md:hidden`, never a JS
+            branch → no hydration CLS). Reuses the same gated mode list + data hooks
+            as the desktop tree below. ===== */}
+        <HomeHub
+          className="md:hidden"
+          profile={profile}
+          language={language}
+          isAdmin={isAdmin}
+          liveRoomStats={liveRoomStats}
           gamesToday={gamesToday}
           gameModes={gameModes}
           languages={langCount}
-        />
-
-        {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
-        {/* Always rendered (SSR + client). LandingChallengeCards is the cubes bento;
-            it self-manages auth/personalization, so no client-side skeleton swap. */}
-        <LandingChallengeCards
-          language={language}
-          isAdmin={isAdmin}
-          hasBlastAccess={true}
-          activePlayers={liveRoomStats.activePlayers}
-          openRooms={liveRoomStats.openRooms}
-          totalPlayers={liveRoomStats.totalPlayers}
           playerAllTimeBest={playerAllTimeBest}
-          t={t}
           dailyChallengeStats={dailyChallengeStats}
           cardOrder={initialData?.cardOrder}
+          topPlayers={topPlayers}
+          topPlayersLoading={topPlayersLoading}
         />
 
-        {/* Leaderboard — mobile only via CSS (no JS-driven mount/unmount → no CLS) */}
-        <div className="md:hidden w-full max-w-4xl mx-auto">
-          <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
-        </div>
+        {/* ===== DESKTOP / TABLET: classic landing arrangement (unchanged), hidden
+            on mobile where the Home Hub takes over. ===== */}
+        <div className="hidden w-full flex-col gap-6 sm:gap-8 md:flex">
+          {/* Season strip — slim countdown + leaderboard CTA, sits above the hero */}
+          <LandingSeasonHero />
 
-        {/* Below-fold sections — rank + avatar only. Community/Share moved off landing. */}
-        <div className="flex flex-col gap-6 sm:gap-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
-            <div className="lg:flex-1">
-              <LandingYourRank />
-            </div>
-            <div className="lg:flex-1">
-              <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+          {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
+          <LandingHero
+            players={topPlayers}
+            playersLoading={topPlayersLoading}
+            isMobilePortrait={isMobilePortrait}
+            energetic
+            activePlayers={activePlayers}
+          />
+
+          {/* Social Proof Bar — compact stats, immediately below hero */}
+          <LandingSocialProofBar
+            activePlayers={activePlayers}
+            gamesToday={gamesToday}
+            gameModes={gameModes}
+            languages={langCount}
+          />
+
+          {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
+          {/* Always rendered (SSR + client). LandingChallengeCards is the cubes bento;
+              it self-manages auth/personalization, so no client-side skeleton swap. */}
+          <LandingChallengeCards
+            language={language}
+            isAdmin={isAdmin}
+            hasBlastAccess={true}
+            activePlayers={liveRoomStats.activePlayers}
+            openRooms={liveRoomStats.openRooms}
+            totalPlayers={liveRoomStats.totalPlayers}
+            playerAllTimeBest={playerAllTimeBest}
+            t={t}
+            dailyChallengeStats={dailyChallengeStats}
+            cardOrder={initialData?.cardOrder}
+          />
+
+          {/* Below-fold sections — rank + avatar only. Community/Share moved off landing. */}
+          <div className="flex flex-col gap-6 sm:gap-8">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
+              <div className="lg:flex-1">
+                <LandingYourRank />
+              </div>
+              <div className="lg:flex-1">
+                <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Flame, Check, Clock, X, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -31,8 +31,18 @@ const DAILY_CUBE_ART = '/modes/cubes/daily.png';
 const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats }) => {
   const { t, language, dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
-  const { countdown, hasPlayed, hasSolved, streak, puzzleNumber } =
-    useDailyChallengeStats(preloadedStats);
+  const stats = useDailyChallengeStats(preloadedStats);
+  // The puzzle #/countdown/streak are derived from the date on the client, so the
+  // SSR "loading" zero-state differs from the first client render (real values) →
+  // hydration mismatch (incl. the `aria-label`). Gate behind mount so SSR + first
+  // client render agree; real values commit after mount.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const countdown = mounted ? stats.countdown : '';
+  const hasPlayed = mounted ? stats.hasPlayed : false;
+  const hasSolved = mounted ? stats.hasSolved : null;
+  const streak = mounted ? stats.streak : 0;
+  const puzzleNumber = mounted ? stats.puzzleNumber : 0;
 
   return (
     <Link

@@ -58,6 +58,25 @@ describe('LandingModeCubes', () => {
     expect(screen.getByText('NEW')).toBeInTheDocument();
   });
 
+  it('hub layout: shows a VISIBLE section header + a compacted live-online pill', () => {
+    renderCubes({ layout: 'hub', liveCount: 1240 });
+    // section label is a visible heading in hub mode (aria-label-only in bento)
+    expect(screen.getByRole('heading', { name: /Game modes/i })).toBeInTheDocument();
+    // header live pill compacts 1240 → "1.2k" (distinct from the anchor's livePill)
+    expect(screen.getByText(/1\.2k landing\.home\.online/)).toBeInTheDocument();
+  });
+
+  it('hub layout: hides the live pill when the count is zero', () => {
+    renderCubes({ layout: 'hub', liveCount: 0 });
+    expect(screen.getByRole('heading', { name: /Game modes/i })).toBeInTheDocument();
+    expect(screen.queryByText(/online/i)).toBeNull();
+  });
+
+  it('bento layout (default): section label stays an invisible aria-label, no heading', () => {
+    renderCubes();
+    expect(screen.queryByRole('heading', { name: /Game modes/i })).toBeNull();
+  });
+
   it('fires the model onClick on tap (analytics parity with control)', () => {
     const onClick = vi.fn();
     renderCubes({
