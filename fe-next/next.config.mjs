@@ -257,8 +257,11 @@ const nextConfig = {
             value: 'application/javascript; charset=utf-8',
           },
           {
+            // Revalidate the SW on every load so a new deploy's worker is picked
+            // up immediately. max-age=3600 previously let the browser hold a stale
+            // /sw.js for up to an hour, delaying the build-stamped cache bump.
             key: 'Cache-Control',
-            value: 'public, max-age=3600, must-revalidate',
+            value: 'public, max-age=0, must-revalidate',
           },
           {
             key: 'Service-Worker-Allowed',

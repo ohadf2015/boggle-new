@@ -41,7 +41,10 @@ describe('swSource', () => {
 
   it('stamps the cache name', () => {
     expect(SW_SOURCE).toContain(SW_CACHE_NAME);
-    expect(SW_CACHE_NAME).toMatch(/^lexiclash-v\d+-\d{8}$/);
+    // Build-stamped so the cache name auto-bumps every deploy (install→activate
+    // purges the prior build's caches). 8 digits = dev/test fallback date,
+    // up to 14 = a per-build YYYYMMDDHHMMSS stamp from NEXT_PUBLIC_BUILD_TIME.
+    expect(SW_CACHE_NAME).toMatch(/^lexiclash-v\d+-\d{8,14}$/);
   });
 });
 

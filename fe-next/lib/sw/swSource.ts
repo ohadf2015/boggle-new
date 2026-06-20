@@ -16,8 +16,25 @@
 import { offlineCapableRoutes } from '@/lib/offline/offlineCapableModes';
 import { locales } from '@/i18n/config';
 
-/** Bump on any behavior/precache change. Format: lexiclash-v{MAJOR}-{YYYYMMDD}. */
-export const SW_CACHE_NAME = 'lexiclash-v6-20260605';
+/**
+ * Cache name. The `v{MAJOR}` prefix is bumped manually on a behavior/precache
+ * change; the suffix is a per-build stamp derived from NEXT_PUBLIC_BUILD_TIME
+ * (baked at build in next.config.mjs) so the name AUTO-BUMPS on every deploy.
+ *
+ * Why this matters: the SW `activate` handler deletes every cache whose key
+ * isn't the current name, and `install` calls skipWaiting + `activate` calls
+ * clients.claim. A *static* name meant the served `/sw.js` was byte-identical
+ * across deploys → the browser never saw a new SW → install/activate never
+ * re-ran → returning PWA / native-WebView users kept the previous build's
+ * precached shells indefinitely. A build-stamped name changes the bytes every
+ * deploy, so the new SW installs, claims clients, and purges the stale caches.
+ *
+ * Format: lexiclash-v{MAJOR}-{YYYYMMDDHHMMSS}. Dev/test (env unset) fall back to
+ * a fixed 8-digit date so the value is deterministic.
+ */
+const BUILD_STAMP =
+  (process.env.NEXT_PUBLIC_BUILD_TIME || '').replace(/\D/g, '').slice(0, 14) || '20260605';
+export const SW_CACHE_NAME = `lexiclash-v7-${BUILD_STAMP}`;
 
 /**
  * Route shells to precache so a cold (offline) launch has a cached document to
