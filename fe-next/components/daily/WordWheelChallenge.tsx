@@ -545,7 +545,14 @@ const WordWheelChallenge: React.FC = () => {
           <m.div
             key="playing"
             className="flex-1 flex flex-col items-center justify-start pt-3 sm:pt-4 pb-bottom-stack lg:pt-6 relative z-20 overflow-y-auto overscroll-contain"
-            initial={{ opacity: 0, scale: 0.95 }}
+            // Paint the board INSTANTLY on mount. With AnimatePresence mode="wait"
+            // the playing layer only mounts after the ready layer finishes exiting;
+            // a fade-in-from-opacity-0 here then leaves the bg-neo-navy parent fully
+            // exposed for the enter duration — a black-screen flash after the coach
+            // on slower / native devices. initial={false} renders at the animate
+            // state immediately, so the wheel + HUD are visible the moment the
+            // ready screen clears. (Exit stays animated for a smooth out.)
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}

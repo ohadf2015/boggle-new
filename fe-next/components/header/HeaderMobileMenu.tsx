@@ -13,6 +13,8 @@ import AuthButton from '../auth/AuthButton';
 import MusicControls from '../MusicControls';
 import { ReportBugModal } from '../feedback/ReportBugModal';
 import { CoinBalance } from '../CoinBalance';
+import { RankTierChip } from '../seasons/RankTierChip';
+import { scoreTier } from '@/lib/seasons/scoreTier';
 import { GiftNotificationBadge } from '../gift/GiftNotificationBadge';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import { NotificationItem } from '../notifications/NotificationItem';
@@ -502,11 +504,16 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     )}
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                    <span className="text-base font-black text-neo-white truncate">
-                                                        {profile.display_name || profile.username}
-                                                    </span>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <CoinBalance coins={profile.total_coins || 0} size="sm" showAnimation={false} />
+                                                    <div className="flex items-center gap-2 min-w-0">
+                                                        <span className="text-base font-black text-neo-white truncate">
+                                                            {profile.display_name || profile.username}
+                                                        </span>
+                                                        {/* Player title — score-based rank tier, fully translated
+                                                            via rank.tier.* in all 5 languages. */}
+                                                        <RankTierChip tier={scoreTier(profile.total_score)} size="xs" className="shrink-0" />
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mt-1.5">
+                                                        <CoinBalance coins={profile.total_coins || 0} size="md" showSparkle />
                                                     </div>
                                                     {engagementStatus.streak > 0 && (
                                                         <div className="flex items-center gap-2 mt-1">

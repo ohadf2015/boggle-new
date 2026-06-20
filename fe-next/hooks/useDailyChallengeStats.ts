@@ -55,6 +55,22 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
     setIsClient(true);
     const date = getDailyChallengeDate();
 
+    // Freshest local truth first. When the player finishes today's daily,
+    // saveWordHuntResult writes localStorage synchronously. If they then return
+    // home via client-side routing the tab never loses visibility, so the
+    // focus/visibility refresh below never fires — the preloaded server snapshot
+    // (fetched at page load, before they played) would otherwise pin the cube to
+    // a stale "not played" state until a hard refresh. Reading localStorage on
+    // mount makes the homepage outcome badge update immediately.
+    const localStatus = getWordHuntStatusToday(language as Language);
+    if (localStatus) {
+      setHasPlayed(true);
+      setHasSolved(localStatus.solved);
+      setStreak(getDailyStreak().currentStreak);
+      setPuzzleNumber(preloadedStats?.puzzleNumber || getPuzzleNumber(date));
+      return;
+    }
+
     if (preloadedStats && !preloadedStats.loading) {
       setHasPlayed(preloadedStats.hasPlayed);
       setHasSolved(preloadedStats.hasSolved ?? false);
@@ -64,9 +80,8 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
     }
 
     setPuzzleNumber(getPuzzleNumber(date));
-    const status = getWordHuntStatusToday(language as Language);
-    setHasPlayed(!!status);
-    setHasSolved(status?.solved ?? false);
+    setHasPlayed(false);
+    setHasSolved(false);
     setStreak(getDailyStreak().currentStreak);
   }, [language, preloadedStats]);
 
