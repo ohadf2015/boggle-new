@@ -13,9 +13,18 @@ export interface LootDrop {
   rarity: 'common' | 'rare' | 'epic';
 }
 
+import {
+  ADVENTURE_SURPRISES_ENABLED,
+  rollLevelSurprise,
+  applySurpriseToGold,
+  type LevelSurprise,
+} from './surpriseRewards';
+
 export interface LootChest {
   drops: LootDrop[];
   chestTier: 'wooden' | 'silver' | 'golden';
+  /** Unexpected variable-reward event this level rolled (flag-dark; undefined when off). */
+  surprise?: LevelSurprise;
 }
 
 /**
@@ -78,7 +87,23 @@ export function generateLootChest(
 
   const chestTier = stars === 3 ? 'golden' : stars === 2 ? 'silver' : 'wooden';
 
-  return { drops, chestTier };
+  // Variable-reward surprise (flag-dark): additive only — boosts the gold drop and
+  // attaches the event for the level-complete UI to announce. Off → identical output.
+  let surprise: LevelSurprise | undefined;
+  if (ADVENTURE_SURPRISES_ENABLED) {
+    surprise = rollLevelSurprise(worldId, levelNumber) ?? undefined;
+    if (surprise) {
+      const goldDrop = drops.find(d => d.type === 'gold');
+      if (goldDrop) {
+        const delta = applySurpriseToGold(goldDrop.amount, surprise) - goldDrop.amount;
+        if (delta > 0) {
+          drops.push({ type: 'bonusGold', amount: delta, nameKey: surprise.labelKey, rarity: 'epic' });
+        }
+      }
+    }
+  }
+
+  return { drops, chestTier, surprise };
 }
 
 function seededRandom(seed: number): number {
