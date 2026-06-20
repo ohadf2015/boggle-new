@@ -38,6 +38,8 @@ export interface WordTowerHudProps {
    *  imperative `drop()`. */
   onCraneDrop?: () => void;
   onSelectTile: (i: number) => void;
+  /** Tap an already-selected wheel tile to unselect it. */
+  onDeselectTile?: (i: number) => void;
   onBackspace: () => void;
   onClear: () => void;
   onSubmit: () => void;
@@ -64,7 +66,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
     accentHex = '#7c8a99', reducedMotion = false,
     possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
     pendingWord, onCraneDrop,
-    onSelectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t, dir,
+    onSelectTile, onDeselectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t, dir,
   } = props;
   void onClear;
 
@@ -139,7 +141,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
           // above the edge when collapsed so re-opening the drawer never grazes
           // the system back-gesture zone and exits the game.
           deckOpen
-            ? 'pb-[calc(env(safe-area-inset-bottom)+1.15rem)]'
+            ? 'pb-[calc(env(safe-area-inset-bottom)+1.65rem)]'
             : 'pb-[calc(env(safe-area-inset-bottom)+1.6rem)]',
         )}
       >
@@ -234,6 +236,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
             dir={dir}
             t={t}
             onSelectTile={onSelectTile}
+            onDeselectTile={onDeselectTile}
             onSubmit={onSubmit}
             onDrop={() => onCraneDrop?.()}
           />

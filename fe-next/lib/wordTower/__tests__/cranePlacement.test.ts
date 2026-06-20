@@ -27,6 +27,16 @@ describe('alignmentBand — live drop-quality preview (matches the scorer)', () 
       expect(alignmentBand(e)).toBe(evaluatePlacement(e, 0).quality);
     }
   });
+
+  // Founder ask 2026-06-20: "stay more around the green placement." The green
+  // window (perfect + good) is wide so a relaxed, roughly-centred tap reliably
+  // lands a celebrated drop — guard it from quietly narrowing again.
+  it('keeps a forgiving green (perfect/good) window', () => {
+    expect(PERFECT_MAX).toBeGreaterThanOrEqual(0.16);
+    expect(GOOD_MAX).toBeGreaterThanOrEqual(0.45);
+    expect(alignmentBand(0.16)).toBe('perfect');
+    expect(alignmentBand(0.44)).toBe('good');
+  });
 });
 
 describe('evaluatePlacement — cosy reward amplifier (never a fail-gate)', () => {

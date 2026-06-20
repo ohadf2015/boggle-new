@@ -29,6 +29,8 @@ export interface WordTowerWheelProps {
   dir: 'ltr' | 'rtl';
   t: (key: string, params?: Record<string, string | number>) => string;
   onSelectTile: (i: number) => void;
+  /** Tap an already-selected tile to unselect it (rewinds the path to before it). */
+  onDeselectTile?: (i: number) => void;
   /** Build (validate + hand to the crane). Also fired on a drag-release. */
   onSubmit: () => void;
   /** Drop the held word (drives the crane). Fired by the dial's centre button. */
@@ -59,7 +61,7 @@ function letterPos(i: number, n: number): { x: number; y: number } {
  */
 export function WordTowerWheel({
   tray, selected, word, placing, canBuild, intensity, accentHex, goldenLetter,
-  reducedMotion = false, dir, t, onSelectTile, onSubmit, onDrop,
+  reducedMotion = false, dir, t, onSelectTile, onDeselectTile, onSubmit, onDrop,
 }: WordTowerWheelProps) {
   const n = tray.length;
   const draggingRef = useRef(false);
@@ -89,7 +91,10 @@ export function WordTowerWheel({
   const tapLetter = (i: number) => {
     // The drag hook already added letters this gesture — swallow the trailing click.
     if (addedDuringDragRef.current) { addedDuringDragRef.current = false; return; }
-    if (placing || selected.includes(i)) return;
+    if (placing) return;
+    // Tap an already-selected tile to UNSELECT it (founder ask) — rewinds the
+    // path to just before that letter. Otherwise add it to the spell path.
+    if (selected.includes(i)) { onDeselectTile?.(i); return; }
     onSelectTile(i);
   };
 
@@ -102,7 +107,7 @@ export function WordTowerWheel({
 
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-w-[206px] touch-none select-none"
+      className="relative mx-auto aspect-square w-full max-w-[178px] touch-none select-none"
       onPointerDown={onDown}
       onPointerMove={placing ? undefined : handlePointerMove}
       onPointerUp={placing ? undefined : handlePointerUp}

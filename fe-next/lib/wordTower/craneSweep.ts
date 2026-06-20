@@ -14,12 +14,18 @@
  * instead of sitting at a flat 1800 ms forever.
  */
 
-/** Sweep period (ms) at the ground floor — generous, learnable. */
-export const SWEEP_PERIOD_START_MS = 2600;
-/** Floor on the period (ms) — the fastest the sweep ever gets, however tall. */
-export const SWEEP_PERIOD_FLOOR_MS = 1400;
-/** How many ms shorter (faster) the sweep gets per floor climbed. */
-export const SWEEP_PERIOD_STEP_MS = 60;
+/** Sweep period (ms) at the ground floor — generous, learnable.
+ *  Founder ask (2026-06-20): "the placing of the word is moving too fast — it
+ *  should be slower and stay more around the green placement." Slowed across the
+ *  board so the trolley dwells longer over the centre and a relaxed tap reliably
+ *  lands in the green window. */
+export const SWEEP_PERIOD_START_MS = 3400;
+/** Floor on the period (ms) — the fastest the sweep ever gets, however tall.
+ *  Raised so even a tall tower never sweeps faster than a comfortably-timed tap. */
+export const SWEEP_PERIOD_FLOOR_MS = 2200;
+/** How many ms shorter (faster) the sweep gets per floor climbed. Gentled so the
+ *  difficulty ramp is slower — the climb stays fair far higher up. */
+export const SWEEP_PERIOD_STEP_MS = 40;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 

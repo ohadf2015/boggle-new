@@ -13,6 +13,10 @@ interface Props {
   t: (key: string, params?: Record<string, string | number>) => string;
   dir: 'ltr' | 'rtl';
   reducedMotion?: boolean;
+  /** Render the trigger as a normal flex item (no absolute positioning) so it can
+   *  sit inside the top-bar actions row next to Share/Leaderboard (founder ask:
+   *  "skin selection can be near the share"). */
+  inline?: boolean;
 }
 
 const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
@@ -22,17 +26,22 @@ const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
  * skins equip on tap; locked ones show the height still to climb (the carrot).
  * Self-contained open state so the parent mounts it with one line.
  */
-export function WordTowerSkinPicker({ skin, bestHeightM, t, dir, reducedMotion }: Props) {
+export function WordTowerSkinPicker({ skin, bestHeightM, t, dir, reducedMotion, inline = false }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      {/* Trigger — a small palette button tucked under the top bar. */}
+      {/* Trigger — a small palette button. Inline = a flush flex item that lives
+          in the top-bar actions row beside Share/Leaderboard; otherwise the old
+          floating button tucked under the top bar. */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label={t('wordTower.skin.open')}
-        className="pointer-events-auto absolute end-2 top-[14%] z-[9] flex h-9 w-9 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy/85 text-neo-cyan shadow-hard backdrop-blur-sm active:translate-y-0.5 active:shadow-hard-pressed"
+        className={cn(
+          'pointer-events-auto relative flex h-9 w-9 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy/85 text-neo-cyan shadow-hard backdrop-blur-sm active:translate-y-0.5 active:shadow-hard-pressed',
+          !inline && 'absolute end-2 top-[14%] z-[9]',
+        )}
       >
         <Palette className="h-5 w-5" />
         {/* Live swatch dot of the equipped skin. */}

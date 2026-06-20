@@ -452,6 +452,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   useEffect(() => {
     if (tower.state.pendingWord) setVerdict(null);
   }, [tower.state.pendingWord]);
+  // Belt-and-suspenders against the "messages stay stuck" report: the instant the
+  // player begins spelling the NEXT word (first tile selected), drop every
+  // lingering post-drop celebration so none can bleed across builds even if a
+  // timer was starved. (useAutoDismiss/useExitReveal now also self-heal via rAF.)
+  useEffect(() => {
+    if (tower.word.length === 1) {
+      setVerdict(null);
+      setComboFx(null);
+      setSurpriseFx(null);
+    }
+  }, [tower.word.length]);
 
   // Combo-milestone fanfare — a one-shot "×5 ON FIRE!" beat the moment the combo
   // crosses 3/5/10/20. Keyed off resultKey so it fires on the placing tick only.
@@ -858,8 +869,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         </div>
       )}
 
-      {/* Tower-skin picker — equip the materials you've unlocked by climbing. */}
-      <WordTowerSkinPicker skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
+      {/* (Tower-skin picker now lives in the top-bar actions row beside Share.) */}
 
       {/* NEW SKIN UNLOCKED — the variable-reward beat when a climb crosses a
           skin's height milestone (the new look is auto-equipped). */}
@@ -888,7 +898,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           while the NEW ZONE banner is paying off the arrival. */}
       {tease && !zoneText && (
         <div
-          className="pointer-events-none absolute left-1/2 top-[6%] z-20 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
+          className="pointer-events-none absolute left-1/2 top-[13%] z-20 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
           aria-live="polite"
         >
           <ChevronsUp className="h-3 w-3" />
@@ -899,7 +909,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* NEW ZONE banner — the headline of entering a new biome */}
       {zoneR.value && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[9%] z-30 -translate-x-1/2 ${fxClass(zoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard`}
+          className={`pointer-events-none absolute left-1/2 top-[13%] z-30 -translate-x-1/2 ${fxClass(zoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard`}
           aria-live="polite"
         >
           <div className="font-neo-body text-[10px] font-bold uppercase tracking-[0.2em] text-black/60">{t('wordTower.zone.entered')}</div>
@@ -1149,6 +1159,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           >
             <Share2 className="h-4 w-4" />
           </button>
+          {/* Tower-skin picker sits right beside Share (founder ask: "skin
+              selection can be near the share") instead of floating mid-screen. */}
+          <WordTowerSkinPicker inline skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
           <button
             type="button"
             onClick={onOpenLeaderboard}
@@ -1180,6 +1193,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           lastResult={tower.state.lastResult}
           resultKey={tower.state.resultKey}
           onSelectTile={selectTileHaptic}
+          onDeselectTile={tower.deselectTile}
           onBackspace={tower.backspace}
           onClear={tower.clear}
           onSubmit={tower.hold}

@@ -80,6 +80,16 @@ describe('sweepPeriodMs — height-ramped difficulty', () => {
     expect(sweepPeriodMs(-3)).toBe(SWEEP_PERIOD_START_MS);
   });
 
+  // Founder ask 2026-06-20: "placing is moving too fast — slower, stay around
+  // green." Lock the relaxed pace so a future tweak can't silently speed it back
+  // up: the ground sweep is a leisurely ≥3s and even the tallest tower never
+  // sweeps faster than a comfortable ≥2s.
+  it('keeps the sweep comfortably slow at every height', () => {
+    expect(SWEEP_PERIOD_START_MS).toBeGreaterThanOrEqual(3000);
+    expect(SWEEP_PERIOD_FLOOR_MS).toBeGreaterThanOrEqual(2000);
+    expect(sweepPeriodMs(9999)).toBeGreaterThanOrEqual(2000);
+  });
+
   it('is monotonically non-increasing in height', () => {
     let prev = sweepPeriodMs(0);
     for (let f = 1; f <= 40; f++) {
