@@ -25,6 +25,7 @@ import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { InlineBannerAd } from '@/components/ads';
 const NearRankIndicator = dynamic(() => import('@/components/leaderboard/NearRankIndicator'), { ssr: false });
+import LeaderboardPodium from '@/components/leaderboard/LeaderboardPodium';
 import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { useTierPosition } from '@/hooks/useTierPosition';
@@ -61,10 +62,11 @@ function getRankIcon(rank: number): React.ReactNode {
     case 3:
       return <span className="text-2xl">🥉</span>;
     default:
-      return <span className="text-lg font-bold text-gray-600">#{rank}</span>;
+      return <span className="text-lg font-bold text-slate-400">#{rank}</span>;
   }
 }
 
+// Leaderboard glow-up: top-3 podium + neo-brutalist table + correct rival avatars.
 export default function LeaderboardPageClient(): React.JSX.Element {
   const { theme } = useTheme();
   const { t, language } = useLanguage();
@@ -139,7 +141,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           <h2 className={cn('text-2xl font-bold mb-2', isDarkMode ? 'text-white' : 'text-gray-900')}>
             {t('leaderboard.title')}
           </h2>
-          <p className={cn('text-lg', 'text-gray-600')}>
+          <p className={cn('text-lg', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
             Coming soon! Leaderboard feature is being set up.
           </p>
           <EnhancedButton
@@ -176,7 +178,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             {t('leaderboard.title')}
           </h1>
           <div className="flex items-center justify-center gap-3 mt-2">
-            <p className={cn('text-gray-600')}>
+            <p className={cn((isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
               {t('leaderboard.allTime')}
             </p>
             {/* Live indicator */}
@@ -187,7 +189,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   subscriptionStatus === 'SUBSCRIBED' ? 'bg-green-500' : 'bg-yellow-500'
                 )}
               />
-              <span className={cn('text-xs', 'text-gray-600')}>
+              <span className={cn('text-xs', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
                 {subscriptionStatus === 'SUBSCRIBED'
                   ? t('leaderboard.live')
                   : t('common.connecting')}
@@ -210,7 +212,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                 <RefreshCw
                   className={cn(
                     'w-3 h-3',
-                    'text-gray-600'
+                    (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600')
                   )}
                 />
               )}
@@ -273,10 +275,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className={cn(
-                'p-4 rounded-xl border-2',
-                isDarkMode
-                  ? 'bg-linear-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30'
-                  : 'bg-linear-to-r from-cyan-50 to-blue-50 border-cyan-200'
+                'p-4 rounded-neo-lg border-3 border-neo-black shadow-hard-cyan',
+                isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
               )}
             >
               {tierPanelEnabled && tierPosition && user?.id ? (
@@ -309,7 +309,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       size="lg"
                     />
                     <div>
-                      <p className={cn('text-sm', 'text-gray-600')}>
+                      <p className={cn('text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
                         {t('leaderboard.yourRank')}
                       </p>
                       <p className={cn('text-2xl font-bold', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
@@ -324,7 +324,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   </div>
                   <div className="text-right flex flex-col items-end gap-2">
                     <div>
-                      <p className={cn('text-sm', 'text-gray-600')}>
+                      <p className={cn('text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
                         {t('leaderboard.score')}
                       </p>
                       <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
@@ -393,16 +393,26 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             />
           }
         >
-          {/* Leaderboard Table */}
+          {/* Top-3 Podium — celebratory crown for the leaders */}
+          {leaderboard.length > 0 && (
+            <div className="mb-6 px-2">
+              <LeaderboardPodium
+                entries={leaderboard.slice(0, 3)}
+                language={language}
+                currentUserId={user?.id}
+              />
+            </div>
+          )}
+
+          {/* Leaderboard Table — ranks 4+ (top 3 live in the podium above) */}
+          {leaderboard.length > 3 && (
           <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             className={cn(
-              'rounded-xl overflow-hidden',
-              isDarkMode
-                ? 'bg-neo-navy-light/50 border border-slate-700'
-                : 'bg-white border border-gray-200 shadow-lg'
+              'rounded-neo-lg overflow-hidden border-3 border-neo-black shadow-hard',
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             {/* Table Header */}
@@ -420,8 +430,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
             {/* Table Body */}
             <div className="divide-y divide-gray-200 dark:divide-slate-700">
-              {leaderboard.map((entry: LeaderboardEntry, index: number) => {
-                const rank = index + 1;
+              {leaderboard.slice(3).map((entry: LeaderboardEntry, index: number) => {
+                const rank = index + 4;
                 const isCurrentUser = user?.id === entry.player_id;
 
                 return (
@@ -482,7 +492,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                     >
                       {safeToLocaleString(entry.total_score ?? 0, language)}
                     </div>
-                    <div className={cn('hidden sm:block sm:col-span-2 text-right text-sm', 'text-gray-600')}>
+                    <div className={cn('hidden sm:block sm:col-span-2 text-right text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
                       {entry.games_played || 0}
                     </div>
                   </div>
@@ -490,6 +500,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               })}
             </div>
           </m.div>
+          )}
         </PageStateHandler>
 
         </>

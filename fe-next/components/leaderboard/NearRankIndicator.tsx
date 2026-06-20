@@ -14,7 +14,7 @@ interface LeaderboardEntry {
   avatar_emoji?: string;
   avatar_color?: string;
   avatar_image?: string;
-  custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
+  avatar_config?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   total_score?: number;
   games_played?: number;
 }
@@ -196,9 +196,9 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                 <span>{t('leaderboard.beat')}:</span>
                 <div className="w-7 h-7 rounded-full overflow-hidden border border-white/30 shrink-0">
                   <Avatar
-
                     avatarImage={playerAbove.avatar_image ?? undefined}
-                    customAvatar={playerAbove.custom_avatar ?? undefined}
+                    customAvatar={playerAbove.avatar_config ?? undefined}
+                    userId={playerAbove.player_id}
                     size="md"
                   />
                 </div>
@@ -264,9 +264,9 @@ const NearRankIndicator: React.FC<NearRankIndicatorProps> = memo(({
                     </span>
                     <div className="w-8 h-8 shrink-0 rounded-full overflow-hidden border-2 border-white/20">
                       <Avatar
-
                         avatarImage={player.avatar_image ?? undefined}
-                        customAvatar={player.custom_avatar ?? undefined}
+                        customAvatar={player.avatar_config ?? undefined}
+                        userId={player.player_id}
                         size="md"
                       />
                     </div>
