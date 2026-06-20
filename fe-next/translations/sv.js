@@ -46,72 +46,72 @@ const sv = {
   "modeCoach": {
     "skip": "Hoppa över",
     "next": "Nästa",
-    "gotIt": "Klar!",
+    "gotIt": "Klart!",
     "classic": {
       "title": "Dra ord",
-      "step1": "Dra genom angränsande bokstäver",
-      "step2": "Längre ord ger mer poäng",
-      "scoreTip": "Dra ord snabbt för combo!"
+      "step1": "Dra över angränsande bokstäver",
+      "step2": "Längre ord = mer poäng",
+      "scoreTip": "Snabba ord bygger combo!"
     },
     "wordHunt": {
-      "title": "Knäck ordet",
-      "step1": "Tryck på rutor för att gissa",
-      "step2": "Färger avslöjar svaret",
-      "scoreTip": "Hitta först för mycket poäng!"
+      "title": "Gissa ordet",
+      "step1": "Tryck på bokstäver för att gissa",
+      "step2": "Färgen visar hur nära du är",
+      "scoreTip": "Rätt först ger bonus!"
     },
     "wheelRush": {
       "title": "Snurra & stava",
-      "step1": "Använd alltid mittenrutan",
-      "step2": "Lås ord innan fiender gör det",
-      "scoreTip": "Långa ord låser mest poäng!"
+      "step1": "Alla ord använder mittbokstaven",
+      "step2": "Säkra ord innan fienden gör det",
+      "scoreTip": "Längre ord = högre poäng"
     },
     "blast": {
-      "title": "Spräng rutor",
-      "step1": "Dra bokstäver för att göra ord",
-      "step2": "Rensa rutor, framkalla skakningar",
-      "scoreTip": "Kedjeskakningar för jättecombo!"
+      "title": "Sprängord",
+      "step1": "Dra bokstäver för att bygga ord",
+      "step2": "Rensa ord för att utlösa kedjor",
+      "scoreTip": "Kedja sprängningar för jackpot!"
     },
     "wordTower": {
       "title": "Bygg tornet",
       "step1": "Tryck för att släppa blocket",
-      "step2": "Landa det i mitten, inte snett",
-      "scoreTip": "Varje ord = en våning — gå högt!"
+      "step2": "Centrera blocket för att stapla högt",
+      "scoreTip": "Varje ord = en våning upp"
     },
     "connections": {
-      "title": "Hitta länkarna",
+      "title": "Hitta länken",
       "step1": "Gruppera fyra relaterade ord",
-      "step2": "En felgissning kostar dig",
-      "scoreTip": "Lös utan misstag!"
+      "step2": "Fel gissning = ett försök mindre",
+      "scoreTip": "Lös felfritt för poäng"
     },
     "wordCraft": {
       "title": "Skapa ord",
-      "step1": "Dra rutor på plats",
-      "step2": "Forma ord för att rensa dem"
+      "step1": "Dra rutor på rätt plats",
+      "step2": "Stava ord för att rensa brädet"
     },
     "wordAlchemy": {
-      "title": "Ord-alkemi",
-      "step1": "Byt en bokstav varje steg",
-      "step2": "Lägg till, byt eller ta bort en bokstav"
+      "title": "Ordkemi",
+      "step1": "Byt en bokstav per drag",
+      "step2": "Lägg till, byt eller ta bort"
     },
     "crossword": {
       "title": "Fyll rutnätet",
-      "step1": "Tryck på ledtråd, skriv svaret",
-      "step2": "Lös över och ned"
+      "step1": "Tryck ledtråd, skriv svar",
+      "step2": "Vågrätt och lodrätt"
     },
     "sealedBid": {
-      "title": "Förseglade bud",
-      "step1": "Tryck hemligt på ditt bästa ord",
-      "step2": "Unika bud ger dubbel poäng"
+      "title": "Hemligt bud",
+      "step1": "Välj ditt starkaste ord",
+      "step2": "Unikt bud = dubbelt poäng"
     },
     "shiritori": {
       "title": "Ordkedja",
-      "step1": "Börja med sista kana",
-      "step2": "Sluta aldrig på ん (n)"
+      "step1": "Börja på förra ordets sista bokstav",
+      "step2": "Aldrig samma ord två gånger"
     },
     "adventure": {
-      "title": "Äventyr",
-      "step1": "Rensa mål för att avancera",
-      "step2": "Slå bossar med långa ord"
+      "title": "Äventyret",
+      "step1": "Rensa mål för att gå vidare",
+      "step2": "Besegra bossar med långa ord"
     }
   },
   "crossword": {

@@ -11884,72 +11884,72 @@ const es = {
   "modeCoach": {
     "skip": "Saltar",
     "next": "Siguiente",
-    "gotIt": "¡Vale!",
+    "gotIt": "¡Dale!",
     "classic": {
-      "title": "Trazar Palabras",
-      "step1": "Desliza por letras que se tocan",
-      "step2": "Palabras largas dan más puntos",
-      "scoreTip": "¡Encadena rápido para combos!"
+      "title": "Desliza Palabras",
+      "step1": "Toca letras conectadas",
+      "step2": "Palabras largas = más puntos",
+      "scoreTip": "Combos rápidos ganan mucho"
     },
     "wordHunt": {
-      "title": "Caza Palabras",
-      "step1": "Toca fichas para adivinar",
-      "step2": "Los colores revelan la respuesta",
-      "scoreTip": "¡Adivina primero para muchísimos puntos!"
+      "title": "Adivina la Palabra",
+      "step1": "Toca letras para probar",
+      "step2": "Los colores te dicen qué tan cerca",
+      "scoreTip": "Aciertas primero, ganas más"
     },
     "wheelRush": {
-      "title": "Rueda y Deletrea",
-      "step1": "Siempre usa la letra del centro",
-      "step2": "Bloquea palabras antes que te las roben",
-      "scoreTip": "¡Palabras largas bloquean más!"
+      "title": "Rueda y Juega",
+      "step1": "La letra del centro va en todo",
+      "step2": "Bloquea antes que lo hagan",
+      "scoreTip": "Palabras largas, puntos gordos"
     },
     "blast": {
-      "title": "Explosión de Fichas",
-      "step1": "Desliza letras para hacer palabras",
-      "step2": "Limpia fichas, provoca cascadas",
-      "scoreTip": "¡Encadena cascadas para combos enormes!"
+      "title": "Blast de Letras",
+      "step1": "Arrastra letras, forma palabras",
+      "step2": "Limpia, dispara cascadas",
+      "scoreTip": "Cascadas en cadena te llueven puntos"
     },
     "wordTower": {
-      "title": "Construye la Torre",
-      "step1": "Toca para soltar el bloque",
-      "step2": "Ponlo centrado, no torcido",
-      "scoreTip": "¡Cada palabra apila un piso — ¡sube!"
+      "title": "Torre de Palabras",
+      "step1": "Toca, suelta el bloque",
+      "step2": "Centra bien para apilar",
+      "scoreTip": "Cada palabra sube el piso"
     },
     "connections": {
-      "title": "Encuentra los Vínculos",
-      "step1": "Agrupa cuatro palabras relacionadas",
-      "step2": "Un error te cuesta",
-      "scoreTip": "¡Resuelve sin errores!"
+      "title": "Halla los Vínculos",
+      "step1": "Agrupa cuatro del mismo grupo",
+      "step2": "Los errores cuestan caro",
+      "scoreTip": "Perfecto: cero errores"
     },
     "wordCraft": {
-      "title": "Crear Palabras",
-      "step1": "Desliza fichas a su lugar",
-      "step2": "Forma palabras para limpiarlas"
+      "title": "Arma Palabras",
+      "step1": "Desliza fichas al lugar",
+      "step2": "Forma palabras para limpiar"
     },
     "wordAlchemy": {
-      "title": "Alquimia de Palabras",
-      "step1": "Cambia una letra cada paso",
-      "step2": "Añade, intercambia o elimina una letra"
+      "title": "Transforma la Palabra",
+      "step1": "Cambia una letra por vez",
+      "step2": "Suma, intercambia o quita"
     },
     "crossword": {
-      "title": "Completa la Cuadrícula",
-      "step1": "Toca una pista, escribe la respuesta",
-      "step2": "Resuelve horizontal y vertical"
+      "title": "Resuelve la Cuadrícula",
+      "step1": "Pista → escribe la respuesta",
+      "step2": "Horizontal y vertical"
     },
     "sealedBid": {
-      "title": "Puja Sellada",
-      "step1": "Toca en secreto tu mejor palabra",
-      "step2": "Las pujas únicas puntúan doble"
+      "title": "Puja Secreta",
+      "step1": "Elige tu palabra más fuerte",
+      "step2": "Palabras únicas valen el doble"
     },
     "shiritori": {
       "title": "Cadena de Palabras",
-      "step1": "Empieza con la última kana",
-      "step2": "Nunca termines en ん (n)"
+      "step1": "Empieza con la última letra de la anterior",
+      "step2": "Sin repetir, nunca"
     },
     "adventure": {
-      "title": "Aventura",
-      "step1": "Logra objetivos para avanzar",
-      "step2": "Vence jefes con palabras grandes"
+      "title": "Bate Niveles",
+      "step1": "Cumple metas para avanzar",
+      "step2": "Vence jefes con palabras fuertes"
     }
   },
   "gameModes": {

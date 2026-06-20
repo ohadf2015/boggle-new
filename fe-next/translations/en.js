@@ -11876,69 +11876,69 @@ const en = {
     "gotIt": "Got it!",
     "classic": {
       "title": "Trace Words",
-      "step1": "Drag through touching letters",
+      "step1": "Swipe across connected letters",
       "step2": "Longer words score more",
-      "scoreTip": "Chain words fast for combos!"
+      "scoreTip": "Find words fast to build combos!"
     },
     "wordHunt": {
       "title": "Crack the Word",
-      "step1": "Tap tiles to guess",
-      "step2": "Colors reveal the answer",
-      "scoreTip": "Find it first for big points!"
+      "step1": "Tap letters to guess",
+      "step2": "Colors show how close you are",
+      "scoreTip": "Guess it first for big points!"
     },
     "wheelRush": {
       "title": "Spin & Spell",
-      "step1": "Always use the center letter",
-      "step2": "Lock words before rivals steal",
-      "scoreTip": "Long words lock the most points!"
+      "step1": "Every word uses the center letter",
+      "step2": "Claim words before rivals do",
+      "scoreTip": "Long words score the most!"
     },
     "blast": {
       "title": "Blast Tiles",
-      "step1": "Drag letters to make words",
-      "step2": "Clear tiles, trigger cascades",
+      "step1": "Drag letters to build words",
+      "step2": "Clear words to trigger cascades",
       "scoreTip": "Chain cascades for huge combos!"
     },
     "wordTower": {
       "title": "Build the Tower",
-      "step1": "Tap to drop the block",
-      "step2": "Land it centered, not sloppy",
-      "scoreTip": "Each word stacks a floor — go high!"
+      "step1": "Tap to drop each block",
+      "step2": "Land it centered to stack higher",
+      "scoreTip": "Every word adds a floor — go high!"
     },
     "connections": {
       "title": "Find the Links",
-      "step1": "Group four related words",
-      "step2": "One wrong guess costs you",
-      "scoreTip": "Solve with no mistakes!"
+      "step1": "Group four words that belong together",
+      "step2": "Each wrong guess costs a try",
+      "scoreTip": "Solve it with no mistakes!"
     },
     "wordCraft": {
       "title": "Craft Words",
       "step1": "Slide tiles into place",
-      "step2": "Form words to clear them"
+      "step2": "Spell words to clear the board"
     },
     "wordAlchemy": {
-      "title": "Word Alchemy",
-      "step1": "Change one letter each step",
-      "step2": "Add, swap, or remove a letter"
+      "title": "Transform the Word",
+      "step1": "Change one letter at a time",
+      "step2": "Add, swap, or drop a letter"
     },
     "crossword": {
       "title": "Fill the Grid",
-      "step1": "Tap a clue, type the answer",
+      "step1": "Tap a clue, then type the answer",
       "step2": "Solve across and down"
     },
     "sealedBid": {
-      "title": "Sealed Bid",
-      "step1": "Secretly tap your best word",
-      "step2": "Unique bids score double"
+      "title": "Bid in Secret",
+      "step1": "Pick your strongest word",
+      "step2": "Words nobody else picks score double"
     },
     "shiritori": {
       "title": "Word Chain",
-      "step1": "Start with the last kana",
-      "step2": "Never end on ん (n)"
+      "step1": "Start where the last word ended",
+      "step2": "Keep the chain alive — no repeats"
     },
     "adventure": {
-      "title": "Adventure",
-      "step1": "Clear goals to advance",
-      "step2": "Beat bosses with big words"
+      "title": "Beat the Levels",
+      "step1": "Hit each goal to move on",
+      "step2": "Take down bosses with big words"
     }
   },
   "gameModes": {
