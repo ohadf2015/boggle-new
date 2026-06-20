@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import LevelGrid from '../LevelGrid';
 import type { WorldConfig } from '@/lib/adventure';
 
@@ -230,6 +230,50 @@ describe('LevelGrid Scroll Behavior', () => {
       // Parallax layers inside the background container
       const absoluteLayers = bgContainer?.querySelectorAll('.absolute');
       expect(absoluteLayers?.length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  describe('Auto-scroll to current level (must not scroll the window)', () => {
+    let scrollIntoViewSpy: ReturnType<typeof vi.fn>;
+    let scrollBySpy: ReturnType<typeof vi.fn>;
+    let scrollToSpy: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      scrollIntoViewSpy = vi.fn();
+      scrollBySpy = vi.fn();
+      scrollToSpy = vi.fn();
+      Object.defineProperty(Element.prototype, 'scrollIntoView', { value: scrollIntoViewSpy, writable: true, configurable: true });
+      Object.defineProperty(Element.prototype, 'scrollBy', { value: scrollBySpy, writable: true, configurable: true });
+      Object.defineProperty(Element.prototype, 'scrollTo', { value: scrollToSpy, writable: true, configurable: true });
+    });
+
+    afterEach(() => {
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
+    });
+
+    it('scrolls the inner scroll container, never calling Element.scrollIntoView (which bubbles to the window)', () => {
+      // GIVEN a world with a current (first unlocked, 0-star) level below the fold
+      render(
+        <LevelGrid
+          world={mockWorld}
+          completions={mockCompletions}
+          totalStars={6}
+          onLevelSelect={vi.fn()}
+        />
+      );
+
+      // WHEN the mount auto-scroll timer fires
+      act(() => {
+        vi.advanceTimersByTime(700);
+      });
+
+      // THEN it must NOT use scrollIntoView — that scrolls every ancestor incl. the
+      // document, dragging the page down to the footer.
+      expect(scrollIntoViewSpy).not.toHaveBeenCalled();
+      // AND it scrolls the container itself (scrollBy keeps movement inside the panel).
+      expect(scrollBySpy).toHaveBeenCalled();
     });
   });
 

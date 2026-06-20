@@ -101,19 +101,33 @@ const LevelGrid = memo(function LevelGrid({
 
   // Auto-scroll to current level on mount
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const currentLevelRef = useRef<HTMLDivElement>(null);
+  const currentLevelNum = useMemo(
+    () => levels.find((l) => l.isCurrent)?.levelNum ?? null,
+    [levels]
+  );
 
   useEffect(() => {
-    const el = currentLevelRef.current;
-    if (!el) return;
+    const container = scrollContainerRef.current;
+    if (!container || currentLevelNum == null) return;
 
     // Wait for parent slide-in (300ms) + stagger animations to settle
     const timer = setTimeout(() => {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const el = container.querySelector<HTMLElement>(
+        `[data-testid="level-card-${currentLevelNum}"]`
+      );
+      if (!el) return;
+
+      // Scroll the container itself to center the card — never el.scrollIntoView(),
+      // which bubbles to the document and drags the whole page to the footer.
+      const delta =
+        el.getBoundingClientRect().top -
+        container.getBoundingClientRect().top -
+        (container.clientHeight - el.clientHeight) / 2;
+      container.scrollBy({ top: delta, behavior: 'smooth' });
     }, 600);
 
     return () => clearTimeout(timer);
-  }, [world.id]);
+  }, [world.id, currentLevelNum]);
 
   // Stable click handler
   const handleLevelClick = useCallback(
@@ -141,7 +155,7 @@ const LevelGrid = memo(function LevelGrid({
 
   for (const level of levels) {
     gridItems.push(
-      <AdaptiveMotion.div key={level.levelNum} variants={cardVariants} ref={level.isCurrent ? currentLevelRef : undefined}>
+      <AdaptiveMotion.div key={level.levelNum} variants={cardVariants}>
         <RPGLevelCard
           levelNum={level.levelNum}
           stars={level.stars}

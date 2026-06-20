@@ -447,7 +447,6 @@ const WorldMap = memo(function WorldMap({
   const { t, dir } = useLanguage();
   const isRtl = dir === 'rtl';
   const containerRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useMotionValue(0);
 
   // RAF-throttled scroll handler for parallax effect
@@ -466,10 +465,13 @@ const WorldMap = memo(function WorldMap({
     });
   }, [scrollProgress]);
 
-  // Scroll to bottom on mount (shows World 1 first)
+  // Scroll to bottom on mount (shows World 1 first).
+  // Scroll the container directly — Element.scrollIntoView() bubbles to every
+  // scrollable ancestor incl. the document, dragging the whole page to the footer.
   useEffect(() => {
     const timer = setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      const c = containerRef.current;
+      if (c) c.scrollTo({ top: c.scrollHeight, behavior: 'smooth' });
     }, 100);
     return () => clearTimeout(timer);
   }, []);
@@ -620,7 +622,7 @@ const WorldMap = memo(function WorldMap({
             {welcomeBanner}
           </div>
         )}
-        <div ref={bottomRef} className="h-32" />
+        <div className="h-32" />
       </div>
 
       {/* Floating Continue Button */}
