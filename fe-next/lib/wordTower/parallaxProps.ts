@@ -84,6 +84,13 @@ export const WORD_TOWER_PROPS: ParallaxProp[] = [
   // Biome-native creature: a kawaii cosmic jellyfish drifting through the Nebula
   // band (500–800m), so the nebula reads as its OWN world, not just a pink sky.
   { id: 'nebulaJelly', src: '/images/word-tower/wt-nebula-jelly.png', atM: 580, topPct: 24, xPct: 30, width: 104, depth: 0.85, rangeM: 74 },
+  // Biome-native creatures — one per band so every zone reads as its OWN world
+  // (sleek, on-brand; see daily-content/word-tower-biome-props-v1).
+  { id: 'cityBird',     src: '/images/word-tower/wt-city-bird.png',     atM: 38,   topPct: 26, xPct: 72, width: 92,  depth: 1.05, rangeM: 30 },
+  { id: 'skyManta',     src: '/images/word-tower/wt-sky-manta.png',     atM: 90,   topPct: 22, xPct: 26, width: 120, depth: 0.95, rangeM: 36 },
+  { id: 'stratSerpent', src: '/images/word-tower/wt-strat-serpent.png', atM: 235,  topPct: 28, xPct: 68, width: 116, depth: 0.9,  rangeM: 48 },
+  { id: 'orbitJelly',   src: '/images/word-tower/wt-orbit-jelly.png',   atM: 430,  topPct: 24, xPct: 28, width: 104, depth: 0.8,  rangeM: 62 },
+  { id: 'galaxyWhale',  src: '/images/word-tower/wt-galaxy-whale.png',  atM: 1050, topPct: 24, xPct: 70, width: 134, depth: 0.85, rangeM: 110 },
 ];
 
 /**

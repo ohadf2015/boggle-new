@@ -18,6 +18,11 @@ sky gradient). Proof-of-direction batch.
    cleanly). Cropped to content, resized to 512px long edge.
 3. `nebula-jelly-raw.png` = the raw 2048² generation (kept for re-keying).
 
-## Next (per-biome, follow-up)
-City / Sky / Stratosphere / Orbit / Galaxy each want one native creature on the same
-pipeline so every band reads as a distinct world.
+## Full set shipped
+All 6 biomes now have a sleek native creature wired into `parallaxProps.ts`:
+- city `wt-city-bird` (38m, faceted lime/cyan origami crane)
+- sky `wt-sky-manta` (90m, cyan manta ray)
+- stratosphere `wt-strat-serpent` (235m, purple/amber sky-serpent)
+- orbit `wt-orbit-jelly` (430m, chrome ice-cyan crystal jelly)
+- nebula `wt-nebula-jelly` (580m, bioluminescent jellyfish)
+- galaxy `wt-galaxy-whale` (1050m, gold/purple cosmic star-whale)
