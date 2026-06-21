@@ -20,13 +20,16 @@ export const clamp01 = (k: number) => clamp(k, 0, 1);
 
 const DEG = Math.PI / 180;
 
-/** A CLEAN drop tips the run this far (deg) before settling upright. */
-export const SWIVEL_BASE_DEG = 11;
-/** A sloppy drop (big tower lean) tips harder, up to this, in the lean's dir. */
-export const SWIVEL_MAX_DEG = 19;
+/** A CLEAN drop tips the run this far (deg) before settling upright. Bumped
+ *  11→13 in the 2026-06-21 feel pass so a clean placement reads as a confident,
+ *  weighty swing-in rather than a timid tip. */
+export const SWIVEL_BASE_DEG = 13;
+/** A sloppy drop (big tower lean) tips harder, up to this, in the lean's dir.
+ *  Bumped 19→22 to make a recovery-from-lean drop visibly more dramatic. */
+export const SWIVEL_MAX_DEG = 22;
 /** The run's TOP brick never swings more than this horizontally (px) — keeps a
  *  tall word from carving an unphysical arc; caps the start angle by run height. */
-export const SWIVEL_ARC_CAP_PX = 26;
+export const SWIVEL_ARC_CAP_PX = 28;
 /** How much the lean (deg) feeds the start tilt above the clean base amount. */
 const LEAN_TO_DEG = 0.8;
 /** How far (px) the whole run lifts above its rest at the start, then lowers in. */
@@ -93,12 +96,41 @@ export interface BrickFrame {
   angleDeg: number;
 }
 
+/** How much of the swivel each brick's descent is staggered by, top vs bottom.
+ *  At 0.35 the TOP brick of a run starts lowering ~35% of the way through, so a
+ *  placed word visibly settles bottom→top under its own weight (a stacking
+ *  "ripple") instead of the whole girder dropping as one flat slab. */
+export const SWIVEL_DESCENT_STAGGER = 0.35;
+
+/**
+ * Per-brick lift fraction (1 = fully lifted at the start, 0 = flush at rest) for
+ * the cascading descent. Brick `brickIndex` (0 = bottom of the run) lags higher
+ * up the run so the base lands first and the crown tips in last. Two hard
+ * invariants the tests pin: at k=1 every brick is flush (lift 0) so the word
+ * lands exactly on its slot, and with `runLen<=1` or `stagger<=0` it collapses to
+ * the original uniform `1 - swivelDescent(k)`.
+ */
+export function brickLiftFrac(
+  k: number,
+  brickIndex: number,
+  runLen: number,
+  stagger: number = SWIVEL_DESCENT_STAGGER,
+): number {
+  const t = clamp01(k);
+  if (runLen <= 1 || stagger <= 0) return 1 - swivelDescent(t);
+  const frac = clamp01(brickIndex / (runLen - 1)); // 0 bottom → 1 top
+  const delay = clamp(stagger * frac, 0, 0.95);
+  const localK = clamp01((t - delay) / (1 - delay));
+  return 1 - swivelDescent(localK);
+}
+
 /**
  * Position + tilt of one brick at progress k, for a run rotating rigidly about
- * (pivotX, pivotY) from `startDeg` to upright while the whole group lowers
- * `descentPx` into place. At k=1 every brick lands exactly on its rest slot,
- * upright. Generic in dx so it is correct even if a future run isn't perfectly
- * column-aligned.
+ * (pivotX, pivotY) from `startDeg` to upright while the run lowers `descentPx`
+ * into place. At k=1 every brick lands exactly on its rest slot, upright.
+ * Generic in dx so it is correct even if a future run isn't perfectly
+ * column-aligned. `brickIndex`/`runLen`/`descentStagger` drive the cascading
+ * descent (default `runLen=1` → no cascade, preserving the original feel).
  */
 export function swivelBrickFrame(
   rest: BrickRest,
@@ -107,10 +139,13 @@ export function swivelBrickFrame(
   startDeg: number,
   descentPx: number,
   k: number,
+  brickIndex: number = 0,
+  runLen: number = 1,
+  descentStagger: number = 0,
 ): BrickFrame {
   const angleDeg = startDeg * swivelSettle(k);
   const theta = angleDeg * DEG;
-  const lift = descentPx * (1 - swivelDescent(k)); // starts high, eases to 0
+  const lift = descentPx * brickLiftFrac(k, brickIndex, runLen, descentStagger); // starts high, eases to 0
   const py = pivotY - lift; // the pivot itself lowers into place
   const dx = rest.x - pivotX;
   const dy = rest.y - pivotY;

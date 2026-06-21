@@ -84,6 +84,29 @@ export function evaluatePlacement(
   }
 }
 
+/**
+ * Impact intensity (0..1) of a drop by quality — drives the *feel* layer
+ * (screen-shake magnitude, dust-burst count, impact-ring size) in the Pixi
+ * scene. PURELY cosmetic: never feeds the verdict or height math.
+ *
+ * A perfect drop is a small, crisp jolt (NOT zero — landing dead-centre should
+ * feel satisfying, the old behaviour gave perfect drops no shake at all). A miss
+ * slams the tower hardest. Monotonic so the harder the mistake, the heavier the
+ * thud the player feels.
+ */
+export function dropQualityIntensity(quality: PlacementQuality): number {
+  switch (quality) {
+    case 'perfect':
+      return 0.22;
+    case 'good':
+      return 0.42;
+    case 'sloppy':
+      return 0.66;
+    default:
+      return 1;
+  }
+}
+
 /** Next instability count: clean drop resets it, a bad drop bumps it. */
 export function nextConsecutiveSloppy(prev: number, quality: PlacementQuality): number {
   return quality === 'perfect' || quality === 'good' ? 0 : prev + 1;

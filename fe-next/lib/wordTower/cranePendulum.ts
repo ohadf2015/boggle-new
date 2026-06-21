@@ -16,6 +16,24 @@
 /** Max cosmetic tilt (deg) of the hanging load at full trolley speed. */
 export const PENDULUM_MAX_DEG = 8;
 
+/** Peak cable stretch (px) at full drop intensity. The cable visibly elongates
+ *  as the freed load yanks it, then snaps back taut. */
+export const CABLE_STRETCH_MAX_PX = 14;
+
+/**
+ * Cosmetic cable stretch (px, ≥0) over the release→land progress `k` (0..1),
+ * scaled by drop `intensity` (0..1, e.g. {@link dropQualityIntensity}). The load
+ * yanks the cable taut early in the fall (fast attack via the `k^0.6` warp),
+ * then the stretch relaxes to 0 as it settles — a "snap-back" read of weight.
+ * PURELY a render hint for the cable's drawn length; never touches scoring.
+ */
+export function cableStretchAt(k: number, intensity: number): number {
+  const t = clamp(k, 0, 1);
+  const i = clamp(intensity, 0, 1);
+  const attack = Math.sin(Math.PI * Math.pow(t, 0.6)); // rises fast, returns to 0 at t=1
+  return CABLE_STRETCH_MAX_PX * i * attack * (1 - t);
+}
+
 export interface PendulumState {
   angleDeg: number;
   velDegPerSec: number;

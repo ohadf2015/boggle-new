@@ -12,7 +12,8 @@ import { gradeBlockColor, blockSurface, ZONE_MATERIAL, type BlockSurface, type Z
 import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
-import { swayAngleAt } from '@/lib/wordTower/towerSway';
+import { swayAngleAt, swayJitterDeg } from '@/lib/wordTower/towerSway';
+import { useTowerUpgradeStore } from '@/lib/wordTower/useTowerUpgradeStore';
 import { swivelStartDeg, swivelDurationMs } from '@/lib/wordTower/swivelDrop';
 import { toppleCrashFx } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
@@ -31,6 +32,10 @@ import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
+
+/** Pixi particle presets carry bare 6-char hex strings ('00ffff'); the biome
+ *  palettes are hex ints. Convert int → bare-hex string for `burst({colors})`. */
+const toHexStr = (n: number): string => (n & 0xffffff).toString(16).padStart(6, '0');
 
 interface SceneProps {
   floors: WordTowerFloor[];
@@ -419,6 +424,11 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   leanRef.current = leanDeg;
   const instabilityRef = useRef(instability);
   instabilityRef.current = instability;
+  // Per-biome ambient wind intensity (cosmetic crown sway only — never scoring),
+  // so the higher, more exposed zones visibly buffet the tower-top harder. The
+  // Windbreak upgrade calms it (read imperatively to avoid store-churn re-renders).
+  const windMultRef = useRef(1);
+  windMultRef.current = BIOME_THEME[biomeId].windMult * useTowerUpgradeStore.getState().effects().windMult;
   useEffect(() => {
     const c = containerRef.current;
     if (!c) return;
@@ -433,7 +443,13 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     const WIND_COMMIT_TAIL_MS = 120;
     const tick = (now: number) => {
       const cc = containerRef.current;
-      if (cc) cc.angle = leanRef.current + swayAngleAt(now, instabilityRef.current);
+      // angle = lean (drift) + heavy pendulum sway + a tiny high-freq jitter so
+      // a stressed-but-not-yet-swaying tower still reads as nervous/on-edge. The
+      // jitter is render-only (never in swayNormalizedOffset) so WYSIWYG holds.
+      if (cc) {
+        const inst0 = instabilityRef.current;
+        cc.angle = leanRef.current + swayAngleAt(now, inst0) + swayJitterDeg(now, inst0);
+      }
       // Upper-shaft wind: a tiny travelling x-sway on settled crown tiles so a
       // tall tower feels exposed and alive between drops. x-only (never y/scale),
       // recomputed each frame (no drift), skipped on the base band + pending tiles.
@@ -441,11 +457,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       const cx = centerXRef.current;
       if (top > 0 && now - lastCommitRef.current > commitDurRef.current + WIND_COMMIT_TAIL_MS) {
         const inst = instabilityRef.current;
+        const windMul = windMultRef.current;
         for (const [key, tile] of registry.current) {
           if (tile.destroyed || tile.pending) continue;
           const p = Number(key.slice(1));
           if (!Number.isFinite(p)) continue;
-          tile.x = cx + shaftWindX(p, top, now, inst);
+          tile.x = cx + shaftWindX(p, top, now, inst) * windMul;
         }
       }
       raf = requestAnimationFrame(tick);
@@ -460,8 +477,14 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     if (prevBiome.current !== biomeId) {
       if (!reducedMotion) {
         engine.flash.flash({ color: BIOME_THEME[biomeId].block, duration: 0.5, intensity: 0.45 });
-        // Star shower to celebrate reaching a new zone (dopamine on arrival).
-        engine.particles.burst(GOLD_STARS, engine.width / 2, engine.height * 0.24, 34);
+        // Star shower to celebrate reaching a new zone (dopamine on arrival),
+        // tinted to the zone you've JUST broken into so each arrival looks unique.
+        engine.particles.burst(
+          { ...GOLD_STARS, colors: BIOME_THEME[biomeId].particles.map(toHexStr) },
+          engine.width / 2,
+          engine.height * 0.24,
+          34,
+        );
       }
       prevBiome.current = biomeId;
     }
@@ -475,21 +498,27 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // skyscraper) adds an EXTRA flourish on top for a long build.
   const dropQualityRef = useRef(dropQuality);
   dropQualityRef.current = dropQuality;
+  // Keep the live biome id readable inside the [resultKey]-only FX effect so each
+  // celebration burst spits THIS biome's palette (galaxy gold/purple, city
+  // lime/white) instead of one generic confetti everywhere.
+  const biomeIdRef = useRef(biomeId);
+  biomeIdRef.current = biomeId;
   useEffect(() => {
     if (resultKey === 0 || !lastResult || reducedMotion) return;
     const { width: W, height: H } = engine;
     const x = W / 2;
     const y = H * 0.22;
     const q = dropQualityRef.current ?? 'good';
+    const biomePal = BIOME_THEME[biomeIdRef.current].particles.map(toHexStr);
     if (q === 'perfect') {
-      // Triumph — a bright lime wash, a gold star shower, and a satisfying kick.
+      // Triumph — a bright lime wash, a biome-tinted star shower, and a kick.
       engine.flash.flash({ color: 0xbfff00, duration: 0.32, intensity: 0.34 });
-      engine.particles.burst(GOLD_STARS, x, y, 40);
+      engine.particles.burst({ ...GOLD_STARS, colors: biomePal }, x, y, 40);
       engine.shake.shake({ intensity: 8, duration: 0.32, decay: 'exponential' });
     } else if (q === 'good') {
-      // Solid — a cool cyan wash + a healthy confetti pop.
+      // Solid — a cool cyan wash + a biome-tinted confetti pop.
       engine.flash.flash({ color: 0x22d3ee, duration: 0.26, intensity: 0.22 });
-      engine.particles.burst(CONFETTI_BURST, x, y, 26);
+      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, 26);
     } else if (q === 'sloppy') {
       // Just ok — a brief amber blink + a small puff, no celebration.
       engine.flash.flash({ color: 0xffe135, duration: 0.22, intensity: 0.18 });

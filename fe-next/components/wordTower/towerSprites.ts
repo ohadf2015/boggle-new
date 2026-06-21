@@ -10,7 +10,7 @@
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import type { BlockSurface } from '@/lib/wordTower/blockGrade';
-import { swivelBrickFrame, SWIVEL_DESCENT_PX } from '@/lib/wordTower/swivelDrop';
+import { swivelBrickFrame, SWIVEL_DESCENT_PX, SWIVEL_DESCENT_STAGGER } from '@/lib/wordTower/swivelDrop';
 import { tileVariation, type TileVariation } from './tileVariation';
 import { pickGreeble, type Greeble } from '@/lib/wordTower/greebles';
 
@@ -145,12 +145,27 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
  * (−half..half), matching the face. Neo-brutalist: hard pixels, NO blur, drawn in
  * near-black / near-white / one neon accent with low alpha so it reads on any
  * graded fill (and any ghost). */
-export function drawBlockSurface(g: Graphics | null, size: number, surface: BlockSurface): void {
+/** Per-biome neon accent for surface decoration + greebles. 1:1 with the
+ *  {@link BlockSurface} decoration kind (which is 1:1 with the biome), so a
+ *  city window-grid glows lime, an orbit hull glows ice-cyan, a nebula facet
+ *  glows pink — instead of every zone wearing the same gold. Pinned to
+ *  `BIOME_THEME[*].greebleAccent` by a test so the two never drift. */
+export const SURFACE_ACCENT: Record<BlockSurface, number> = {
+  windows: 0xbfff00,
+  glass: 0x00ffff,
+  panels: 0xb98cff,
+  greebles: 0x6fe6ff,
+  facets: 0xff79c6,
+  energy: 0xffe135,
+};
+const DEFAULT_ACCENT = 0xffe135;
+
+export function drawBlockSurface(g: Graphics | null, size: number, surface: BlockSurface, accent: number = DEFAULT_ACCENT): void {
   if (!g) return;
   const half = size / 2;
   const dark = 0x05060a;
   const lite = 0xfffef0;
-  const neon = 0xffe135; // celebration gold — the deep-space "neon edge" accent
+  const neon = accent; // per-biome neon edge accent
   const line = Math.max(1, size * 0.03);
   if (surface === 'windows') {
     // 2 columns × 3 rows of small recessed windows, a couple "lit".
@@ -223,12 +238,12 @@ export function drawBlockSurface(g: Graphics | null, size: number, surface: Bloc
  * Deliberately not cute — structure, not decoration. Coords centred (−half..half);
  * the greeble juts slightly OUTSIDE the face (no clipping on a Pixi child).
  */
-export function drawGreeble(g: Graphics | null, size: number, greeble: Greeble): void {
+export function drawGreeble(g: Graphics | null, size: number, greeble: Greeble, accent: number = DEFAULT_ACCENT): void {
   if (!g) return;
   const half = size / 2;
   const dark = 0x05060a;
   const lite = 0xfffef0;
-  const neon = 0xffe135;
+  const neon = accent;
   const w = Math.max(2, size * 0.05);
   const len = size * greeble.sizeFrac;
   const dir = greeble.side === 'left' ? -1 : 1;
@@ -291,14 +306,16 @@ export function makeTile(char: string | null, size: number, color: number, pendi
     : null;
   tile.addChild(tile.shadow, tile.face);
   if (tile.detail) {
-    drawBlockSurface(tile.detail, size, surface!);
+    const accent = SURFACE_ACCENT[surface!] ?? DEFAULT_ACCENT;
+    drawBlockSurface(tile.detail, size, surface!, accent);
     // A sparse, deterministic industrial bolt-on breaks the stamped-column read.
     // Only real letter tiles (pos given) accrete greebles — bricks stay clean.
     if (pos != null) {
       const greeble = pickGreeble(pos, surface!);
-      if (greeble) drawGreeble(tile.detail, size, greeble);
+      if (greeble) drawGreeble(tile.detail, size, greeble, accent);
     }
-    tile.detail.alpha = pending ? 0.4 : 0.85;
+    // Pending ghosts kept fainter than committed so the live top reads strongest.
+    tile.detail.alpha = pending ? 0.28 : 0.85;
     tile.addChild(tile.detail);
   }
   if (tile.glyph) {
@@ -362,7 +379,17 @@ export function swivelWordIn(
     tiles.forEach(({ tile, restX, restY }, i) => {
       if (tile.destroyed || tile.anim !== tokens[i]) return; // cancelled / torn down
       alive = true;
-      const f = swivelBrickFrame({ x: restX, y: restY }, pivotX, pivotY, startDeg, SWIVEL_DESCENT_PX, k);
+      const f = swivelBrickFrame(
+        { x: restX, y: restY },
+        pivotX,
+        pivotY,
+        startDeg,
+        SWIVEL_DESCENT_PX,
+        k,
+        i,
+        tiles.length,
+        SWIVEL_DESCENT_STAGGER,
+      );
       tile.x = f.x;
       tile.y = f.y;
       tile.angle = f.angleDeg;

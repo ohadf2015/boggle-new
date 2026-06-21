@@ -26,8 +26,11 @@ import { LEAN_MAX_DEG } from './towerLean';
  *  wider than a 3-floor one. A gentler base angle + the height dampen below keep
  *  the swing legible instead of frantic. */
 export const SWAY_MAX_DEG = 3.4;
-/** Below this instability the tower is steady — no sway at all. */
-export const SWAY_START_INSTABILITY = 0.3;
+/** Below this instability the main pendulum sway is silent. Lowered 0.3→0.18 in
+ *  the 2026-06-21 feel pass so the tower starts visibly leaning into its swing
+ *  earlier — the player feels it getting shaky sooner, before the brink. The
+ *  cosmetic {@link swayJitterDeg} layer covers the even-lower band below this. */
+export const SWAY_START_INSTABILITY = 0.18;
 /** Sway oscillation period (ms): calmer when barely unstable, frantic at the
  *  brink. Slowed a touch so the swing reads as a heavy lean, not a jitter. */
 export const SWAY_PERIOD_CALM_MS = 1600;
@@ -117,6 +120,37 @@ export function swayAngleAt(elapsedMs: number, instability: number): number {
  */
 export function swayNormalizedOffset(angleDeg: number): number {
   return (angleDeg / SWAY_MAX_DEG) * SWAY_OFFSET_AT_MAX;
+}
+
+/** Peak amplitude (deg) of the cosmetic micro-jitter — kept tiny so it reads as
+ *  "structure under strain" shimmer, NOT a frantic vibration, and never large
+ *  enough to meaningfully move the landing target. */
+export const SWAY_JITTER_MAX_DEG = 0.3;
+/** The jitter runs much faster than the main sway (a high-freq tremor). */
+const JITTER_PERIOD_A_MS = 190;
+const JITTER_PERIOD_B_MS = 310;
+/** Instability at which the jitter reaches its full amplitude — set BELOW the
+ *  main sway gate so the band 0..{@link SWAY_START_INSTABILITY} already shimmers
+ *  with nervous energy before the heavy pendulum sway kicks in. */
+const JITTER_FULL_INSTABILITY = 0.3;
+
+/**
+ * Cosmetic high-frequency micro-jitter (deg, signed) layered UNDER the main
+ * sway. Two detuned sines beat against each other so it never reads as a clean
+ * metronome. Ramps from 0 at instability 0 (a truly steady tower is perfectly
+ * still) to full amplitude by {@link JITTER_FULL_INSTABILITY}, so even a slightly
+ * stressed tower (below the sway gate) has a live, on-edge shimmer.
+ *
+ * RENDER-ONLY: this is added to the container's visual angle alongside the
+ * pendulum tilt; it is NOT part of {@link swayNormalizedOffset}, so it can never
+ * feed the placement verdict and break WYSIWYG.
+ */
+export function swayJitterDeg(elapsedMs: number, instability: number): number {
+  const amp = SWAY_JITTER_MAX_DEG * clamp01(clamp01(instability) / JITTER_FULL_INSTABILITY);
+  if (amp === 0) return 0;
+  const a = Math.sin((2 * Math.PI * elapsedMs) / JITTER_PERIOD_A_MS);
+  const b = Math.sin((2 * Math.PI * elapsedMs) / JITTER_PERIOD_B_MS);
+  return amp * 0.5 * (a + b);
 }
 
 /**

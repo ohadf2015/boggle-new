@@ -69,6 +69,9 @@ import {
   type RewardSource,
 } from '@/lib/wordTower/towerReward';
 import { WordTowerRewardReveal, type RewardRevealPayload } from './WordTowerRewardReveal';
+import { useTowerUpgradeStore } from '@/lib/wordTower/useTowerUpgradeStore';
+import { computeEffects as computeUpgradeEffects } from '@/lib/wordTower/upgrades';
+import { WordTowerUpgradePanel } from './WordTowerUpgradePanel';
 import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
 import { applyAsyncWrecks, type PendingWreck } from '@/lib/wordTower/asyncWreck';
@@ -159,6 +162,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const tease = useMemo(() => zoneTeaseAt(game.heightM), [game.heightM]);
   // Viewed altitude (live height, or lower while panned) — drives the landmark + rival rails.
   const [viewAlt, setViewAlt] = useState(game.heightM);
+  // Persistent upgrade shop (spend coins on permanent tower boosts between climbs).
+  const [showUpgrades, setShowUpgrades] = useState(false);
   // "N words possible" hint — how many dictionary words the player could build
   // from the current anchor + tray (recomputed only when those change).
   const possibleWords = useMemo(
@@ -253,8 +258,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         dryStreak: dryStreakRef.current,
       });
       dryStreakRef.current = nextDryStreak(dryStreakRef.current, reward.tier);
-      addCoins(reward.coins, `wordtower_${source}`, { id });
-      setRewardFx({ coins: reward.coins, tier: reward.tier, source, key: Date.now() });
+      // Master Architect upgrade fattens every payout (read imperatively so the
+      // store subscription never churns this hot reward path).
+      const rewardMult = useTowerUpgradeStore.getState().effects().rewardMult;
+      const coins = Math.round(reward.coins * rewardMult);
+      addCoins(coins, `wordtower_${source}`, { id });
+      setRewardFx({ coins, tier: reward.tier, source, key: Date.now() });
       playCoinCollectSound();
     },
     [playCoinCollectSound],
@@ -347,10 +356,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   );
   // Structural mutator effects (skyline ×height, featherday topple-save) fold INTO
   // the perk struct via the same fields the crane + hazard sites already read.
-  const craneMods = useMemo(
-    () => (mutator ? combineModifiers(perks.modifiers, mutatorModifiers(mutator)) : perks.modifiers),
-    [perks.modifiers, mutator],
-  );
+  // Persistent upgrades the player has bought, folded into the run. Reinforced
+  // Core (extraTopple) → brinkExtra (more bad drops before do-or-die) via the SAME
+  // modifier algebra perks + mutators use; Steady Cable (sweepSpeedMult) slows the
+  // crane below; reward/wind are read at their own sites.
+  const upgradeLevels = useTowerUpgradeStore((s) => s.levels);
+  const upgradeEffects = useMemo(() => computeUpgradeEffects(upgradeLevels), [upgradeLevels]);
+  const craneMods = useMemo(() => {
+    const withMutator = mutator ? combineModifiers(perks.modifiers, mutatorModifiers(mutator)) : perks.modifiers;
+    return upgradeEffects.extraTopple > 0
+      ? combineModifiers(withMutator, { brinkExtra: upgradeEffects.extraTopple })
+      : withMutator;
+  }, [perks.modifiers, mutator, upgradeEffects]);
   // Word-aware mutator height × (golden letter / vowels / length). Read at drop
   // time from the held word — the only mutator effect that can't fit PerkModifiers.
   const pendingWordRef = useRef<string | null>(null);
@@ -375,9 +392,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // faster the taller you climb) — escalating challenge, not a flat speed.
   // Tailwind day slows the sweep (more dwell = easier perfects); other days = 1×.
   // Clamped to the floor so a future "gale" mutator can't drive it impossibly fast.
+  // Steady Cable upgrade slows the sweep (÷ sweepSpeedMult<1 lengthens the
+  // period → more dwell, easier timing) on top of the height/mutator pacing.
   const sweepMs = Math.max(
     SWEEP_PERIOD_FLOOR_MS,
-    sweepPeriodMs(game.floors.length) * (mutator ? mutatorSweepMult(mutator) : 1),
+    (sweepPeriodMs(game.floors.length) * (mutator ? mutatorSweepMult(mutator) : 1)) / upgradeEffects.sweepSpeedMult,
   );
   // How shaky the tower is (0..1) — drives the continuous SWING and, via the
   // crane's matching offset, makes placing on an unstable tower genuinely harder.
@@ -1108,6 +1127,21 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
       {/* Roguelike perk draft — pick 1 of 3 at each daily milestone. */}
       <WordTowerPerkDraft choices={perks.draft} onChoose={perks.choose} onSkip={perks.skip} t={t} dir={dir} />
+
+      {/* Persistent upgrade shop — opened from the corner pill, spends coins on
+          permanent tower boosts (calmer crane, fatter rewards, tougher tower…). */}
+      <button
+        type="button"
+        onClick={() => setShowUpgrades(true)}
+        className="absolute start-2 top-2 z-40 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-cyan px-2.5 py-1.5 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm active:translate-y-px"
+        aria-label={t('wordTower.upgrade.title')}
+      >
+        <Sparkles className="h-3.5 w-3.5" />
+        {t('wordTower.upgrade.open')}
+      </button>
+      {showUpgrades && (
+        <WordTowerUpgradePanel onClose={() => setShowUpgrades(false)} t={t} dir={dir} />
+      )}
 
       {/* Achievement unlock toast */}
       {achR.value && (() => { const achToast = achR.value; return (
