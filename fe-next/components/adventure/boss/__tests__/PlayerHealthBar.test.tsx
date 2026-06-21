@@ -201,3 +201,15 @@ describe('PlayerHealthBar', () => {
     });
   });
 });
+
+describe('PlayerHealthBar neo-brutalist hard chrome (no blur)', () => {
+  it('uses hard shadow on the HP fill, not a soft 0 0 glow (low health)', () => {
+    const { container } = renderPlayerHealthBar(createHealthState(20, 100, { isLowHealth: true }));
+    expect(container.innerHTML).not.toContain('shadow-[0_0');
+  });
+
+  it('normal-health HP fill also avoids soft glow', () => {
+    const { container } = renderPlayerHealthBar(createHealthState(80, 100));
+    expect(container.innerHTML).not.toContain('shadow-[0_0');
+  });
+});

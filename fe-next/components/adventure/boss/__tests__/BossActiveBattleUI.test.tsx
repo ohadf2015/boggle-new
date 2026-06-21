@@ -146,3 +146,15 @@ describe('BossActiveBattleUI', () => {
     });
   });
 });
+
+describe('BossActiveBattleUI neo-brutalist hard chrome (no blur)', () => {
+  it('boss HP fill uses hard shadow, not a soft 0 0 glow (desperate phase)', () => {
+    const { container } = renderBattleUI({ phase: 'desperate' });
+    expect(container.innerHTML).not.toContain('shadow-[0_0');
+  });
+
+  it('angry phase HP fill avoids soft glow', () => {
+    const { container } = renderBattleUI({ phase: 'angry' });
+    expect(container.innerHTML).not.toContain('shadow-[0_0');
+  });
+});

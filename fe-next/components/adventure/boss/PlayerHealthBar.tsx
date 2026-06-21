@@ -78,9 +78,8 @@ export default function PlayerHealthBar({
 
   // Determine HP bar color based on health state
   const hpBarColor = isLowHealth ? 'bg-neo-red' : 'bg-neo-cyan';
-  const hpBarGlow = isLowHealth
-    ? 'shadow-[0_0_12px_rgba(255,51,102,0.5)]'
-    : 'shadow-[0_0_8px_rgba(0,255,255,0.3)]';
+  // Neo-brutalist hard shadow (no blur) — health state is already signaled by bar color.
+  const hpBarGlow = 'shadow-hard-sm';
 
   // Flash overlay color
   const flashOverlayColor =

@@ -51,8 +51,8 @@ const PHASE_COLORS: Record<BossPhaseNew, string> = {
 
 const PHASE_GLOW: Record<BossPhaseNew, string> = {
   normal: '',
-  angry: 'shadow-[0_0_8px_rgba(255,225,53,0.5)]',
-  desperate: 'shadow-[0_0_12px_rgba(255,51,102,0.6)]',
+  angry: 'shadow-hard-sm',
+  desperate: 'shadow-hard-sm',
 };
 
 // ==============================================
