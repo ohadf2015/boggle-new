@@ -5327,6 +5327,18 @@ const en = {
       "greeting": "Hey, {name}",
       "levelTitle": "Level {level} · {title}",
       "levelOnly": "Level {level}",
+      "titles": {
+        "WORD_SEEKER": "Word Seeker",
+        "LETTER_SCOUT": "Letter Scout",
+        "VOCAB_WARRIOR": "Vocab Warrior",
+        "WORD_KNIGHT": "Word Knight",
+        "LEXICAL_MASTER": "Lexical Master",
+        "DICTIONARY_LORD": "Dictionary Lord",
+        "WORD_LEGEND": "Word Legend",
+        "LEXICON_KING": "Lexicon King",
+        "GRANDMASTER": "Grandmaster",
+        "ETERNAL_CHAMPION": "Eternal Champion"
+      },
       "online": "online",
       "gameModes": "Game Modes",
       "todaysPuzzle": "Today's Puzzle",

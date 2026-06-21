@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -12,7 +13,13 @@ interface HomeTopBarProps {
   profile: ProfileData | null;
   /** daily-challenge streak (days) */
   streak: number;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  /** active locale — powers the avatar's link to the profile page */
+  language: string;
+  t: (
+    key: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    params?: Record<string, string | number>,
+  ) => string;
 }
 
 /**
@@ -24,7 +31,7 @@ interface HomeTopBarProps {
  * via the shared `xpManager` curve, coins from `profile.total_coins`. Missing
  * fields degrade gracefully (level 1, no title, 0 coins) — never "undefined".
  */
-export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
+export function HomeTopBar({ profile, streak, language, t }: HomeTopBarProps) {
   // Profile + streak are client-resolved (auth/daily hooks). On the server and
   // the first client render they may differ — and `coins.toLocaleString()` is
   // locale-dependent (Node vs browser) — so gate ALL dynamic values behind a
@@ -40,15 +47,23 @@ export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
   const progress = getXpProgress(totalXp);
   // Prefer the persisted level but fall back to the XP-derived one if absent.
   const level = p?.current_level ?? progress.currentLevel;
-  const title = getTitleForLevel(level);
+  // `getTitleForLevel` returns a raw constant key (e.g. "LEXICON_KING"). Localize
+  // it via the `landing.home.titles.*` table; fall back to a humanized key so a
+  // missing translation degrades to "Lexicon King" rather than the raw token.
+  const titleKey = getTitleForLevel(level);
+  const title = titleKey ? t(`landing.home.titles.${titleKey}`, humanizeTitleKey(titleKey)) : null;
   const ringPct = clampPercent(progress.progressPercent);
   const coins = p?.total_coins ?? 0;
   const name = p?.display_name || p?.username || t('common.player');
 
   return (
     <div className="flex items-center justify-between gap-2.5 px-0.5">
-      {/* avatar + greeting */}
-      <div className="flex min-w-0 items-center gap-2.5">
+      {/* avatar + greeting — tapping the avatar/name opens the profile */}
+      <Link
+        href={`/${language}/profile`}
+        aria-label={t('nav.profile', 'Profile')}
+        className="flex min-w-0 items-center gap-2.5 rounded-full transition-transform active:scale-95"
+      >
         <div
           className="relative h-[50px] w-[50px] shrink-0 rounded-full p-[3px]"
           style={{
@@ -78,7 +93,7 @@ export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
               : t('landing.home.levelOnly', { level })}
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* streak + coins */}
       <div className="flex shrink-0 items-center gap-2">
@@ -95,6 +110,19 @@ export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
       </div>
     </div>
   );
+}
+
+/**
+ * Humanize a raw level-title constant as a safety net when its translation is
+ * missing: "LEXICON_KING" → "Lexicon King". Never user-facing in the happy path
+ * (the `landing.home.titles.*` table covers every key), but beats leaking a token.
+ */
+function humanizeTitleKey(key: string): string {
+  return key
+    .toLowerCase()
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 }
 
 /** Two overlapping lime discs — a tiny stacked-coins glyph, on-brand vs a generic icon. */

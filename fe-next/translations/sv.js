@@ -5459,6 +5459,18 @@ const sv = {
       "greeting": "Hej, {name}",
       "levelTitle": "Nivå {level} · {title}",
       "levelOnly": "Nivå {level}",
+      "titles": {
+        "WORD_SEEKER": "Ordsökare",
+        "LETTER_SCOUT": "Bokstavsspejare",
+        "VOCAB_WARRIOR": "Ordkrigare",
+        "WORD_KNIGHT": "Ordriddare",
+        "LEXICAL_MASTER": "Lexikal mästare",
+        "DICTIONARY_LORD": "Ordboksherre",
+        "WORD_LEGEND": "Ordlegend",
+        "LEXICON_KING": "Lexikonkung",
+        "GRANDMASTER": "Stormästare",
+        "ETERNAL_CHAMPION": "Evig mästare"
+      },
       "online": "online",
       "gameModes": "Spellägen",
       "todaysPuzzle": "Dagens pussel",
