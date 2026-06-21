@@ -169,14 +169,25 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
   const ambientRef = useRef(false);
   const urgencyEmitterRef = useRef<ReturnType<typeof particles.create> | null>(null);
 
-  // Ambient floating particles
+  // Ambient floating particles — the calm backdrop behind the wheel.
+  // The shared AMBIENT_BOKEH preset peaks at alpha 0.15 with ~1px specks in a
+  // cool blue palette; over bg-neo-navy (#1a1a2e) that's imperceptible, so the
+  // play area read as flat solid black. Override the visibility-driving fields
+  // here (word-wheel only — the shared preset is untouched) so the layer reads
+  // as a gentle, additive lime/cyan/violet glow that gives the board depth.
   useEffect(() => {
     if (ambientRef.current) return;
     ambientRef.current = true;
     const emitter = particles.create({
       ...AMBIENT_BOKEH,
-      maxParticles: 30,
-      frequency: 0.15,
+      maxParticles: 38,
+      frequency: 0.13,
+      lifetime: { min: 4, max: 8 },
+      speed: { min: 4, max: 12 },
+      scale: { start: 0.6, end: 1.8 },
+      alpha: { start: 0, end: 0.24 },
+      colors: ['bfff00', '00ffff', '8b5cf6'],
+      blendMode: 'add',
       spawnConfig: { width, height },
     });
     emitter.emit(width / 2, height / 2);
