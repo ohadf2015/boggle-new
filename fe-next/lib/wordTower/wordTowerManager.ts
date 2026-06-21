@@ -14,6 +14,7 @@ import {
   WORD_TOWER_TRAY_SIZE,
   WORD_TOWER_WHEEL_SIZE,
   WORD_TOWER_WHEEL_MIN_VOWELS,
+  WORD_TOWER_WHEEL_MAX_SAME,
   WORD_TOWER_MIN_WORD_LEN,
   WORD_TOWER_SCRAMBLES_START,
   WORD_TOWER_SCRAMBLES_MAX_BANKED,
@@ -116,9 +117,29 @@ export function generateWheel(
   const vowelBag = bag.filter((c) => vowelSet.includes(c));
   const rng = mulberry32(fnv1aHash(`word-tower-wheel-${gameCode}-${playerId}-${drawIndex}`));
   const out: string[] = [];
+  const counts = new Map<string, number>();
+  const distinctBag = new Set(bag).size;
+  const distinctVowels = new Set(vowelBag).size;
+  // Draw one frequency-weighted letter from `source`, respecting the duplicate
+  // cap when the source has enough DISTINCT letters to satisfy it (bounded
+  // re-draws keep it deterministic + always terminating; a tiny bag falls back
+  // to an uncapped draw so the ring still fills). Caps "3-of-a-kind" dud wheels.
+  const drawCapped = (source: string[], distinct: number): string => {
+    const capActive = distinct >= 2;
+    for (let tries = 0; tries < 12 && capActive; tries++) {
+      const c = source[Math.floor(rng() * source.length)];
+      if ((counts.get(c) ?? 0) < WORD_TOWER_WHEEL_MAX_SAME) {
+        counts.set(c, (counts.get(c) ?? 0) + 1);
+        return c;
+      }
+    }
+    const c = source[Math.floor(rng() * source.length)];
+    counts.set(c, (counts.get(c) ?? 0) + 1);
+    return c;
+  };
   const wantVowels = vowelBag.length > 0 ? Math.min(minVowels, count) : 0;
-  for (let i = 0; i < wantVowels; i++) out.push(vowelBag[Math.floor(rng() * vowelBag.length)]);
-  while (out.length < count) out.push(bag[Math.floor(rng() * bag.length)]);
+  for (let i = 0; i < wantVowels; i++) out.push(drawCapped(vowelBag, distinctVowels));
+  while (out.length < count) out.push(drawCapped(bag, distinctBag));
   // Fisher–Yates (seeded) so the guaranteed vowels land in varied positions.
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));

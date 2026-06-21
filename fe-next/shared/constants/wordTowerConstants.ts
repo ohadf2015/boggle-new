@@ -15,6 +15,10 @@ export const WORD_TOWER_TRAY_SIZE = 12;
 export const WORD_TOWER_WHEEL_SIZE = 7;
 /** Guaranteed vowels in a freshly-spun wheel so it is virtually always solvable. */
 export const WORD_TOWER_WHEEL_MIN_VOWELS = 2;
+/** Max copies of any single letter in a freshly-spun wheel — caps "3 of the same
+ *  letter" dud rings that waste slots and starve word variety (relaxed only when
+ *  a language bag lacks enough distinct letters to satisfy it). */
+export const WORD_TOWER_WHEEL_MAX_SAME = 2;
 export const WORD_TOWER_MIN_WORD_LEN = 3;
 export const WORD_TOWER_SCRAMBLES_START = 3;
 export const WORD_TOWER_SCRAMBLES_MAX_BANKED = 5;
