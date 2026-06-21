@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Flame, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Flame, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
@@ -39,6 +39,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   useEffect(() => setMounted(true), []);
   const countdown = mounted ? stats.countdown : '';
   const hasPlayed = mounted ? stats.hasPlayed : false;
+  const hasSolved = mounted ? stats.hasSolved : false;
   const streak = mounted ? stats.streak : 0;
   const puzzleNumber = mounted ? stats.puzzleNumber : 0;
   // Progress strip = the player's REAL last-5-days completion (each cell filled
@@ -59,17 +60,18 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
         'transition-[transform,box-shadow] duration-150 active:translate-x-px active:translate-y-px active:shadow-hard-pressed',
       )}
     >
-      {/* warm amber base tint over the navy — the daily card's signature colour */}
+      {/* warm amber base tint over the navy — the daily card's signature colour.
+          Kept low-opacity so the navy reads through (darker, less saturated gold). */}
       <span
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(135deg, rgba(255,225,53,0.20) 0%, rgba(255,107,53,0.10) 55%, transparent 100%)' }}
+        style={{ background: 'linear-gradient(135deg, rgba(255,225,53,0.11) 0%, rgba(255,107,53,0.06) 55%, transparent 100%)' }}
       />
       {/* golden radial glow on the end (behind the mascot) */}
       <span
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(120% 120% at 100% 50%, rgba(255,225,53,0.28), transparent 60%)' }}
+        style={{ background: 'radial-gradient(120% 120% at 100% 50%, rgba(255,225,53,0.16), transparent 60%)' }}
       />
       {/* floating daily mascot */}
       <div className="pointer-events-none absolute -bottom-2.5 -end-3.5 h-[150px] w-[150px] motion-safe:animate-bob">
@@ -120,10 +122,25 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
         </div>
       </div>
 
-      {/* Play pill */}
-      <span className="absolute end-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black bg-neo-lime px-3 py-[7px] font-neo-display text-[13px] font-bold uppercase text-neo-navy shadow-hard transition-transform group-hover:translate-x-0.5">
-        {t('daily.play')}
-        <Arrow className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
+      {/* CTA pill — once today's daily is played it flips from the lime "Play"
+          prompt to a calmer "View results" so it never invites a replay it can't grant. */}
+      <span
+        className={cn(
+          'absolute end-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black px-3 py-[7px] font-neo-display text-[13px] font-bold uppercase shadow-hard transition-transform group-hover:translate-x-0.5',
+          hasPlayed ? 'bg-neo-navy-light text-neo-cream' : 'bg-neo-lime text-neo-navy',
+        )}
+      >
+        {hasPlayed ? (
+          <>
+            {t('daily.viewResults')}
+            {hasSolved && <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />}
+          </>
+        ) : (
+          <>
+            {t('daily.play')}
+            <Arrow className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
+          </>
+        )}
       </span>
     </Link>
   );

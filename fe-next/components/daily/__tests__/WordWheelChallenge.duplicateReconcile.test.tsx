@@ -56,6 +56,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
   saveWordWheelResult: (...args: unknown[]) => saveWordWheelResultMock(...args),
   hasPlayedWordHuntToday: () => false,
   getDailyStreak: () => ({ currentStreak: 0 }),
+  updateDailyStreak: vi.fn(() => ({ currentStreak: 1, longestStreak: 1, lastPlayedDate: null, totalDailiesCompleted: 1 })),
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
   generateWordWheelPuzzle: () => ({
