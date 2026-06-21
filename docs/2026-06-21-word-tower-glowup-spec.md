@@ -106,9 +106,10 @@ locally on `feature/word-tower-glowup` (`129d93b20` phases 1/2/5, `6ddcc6d8d` ph
   `daily-content/word-tower-biome-props-v1/`.
 
 ### Remaining (scoped follow-ups)
-- **Phase 3 — Pixi crane render layer (NOT done):** the crane is still DOM. Its FEEL improved (cable
-  physics, drop quality) but a true Pixi render-layer migration is browser-verified work, risky to land
-  unsupervised. `cableStretchAt` + `dropQualityIntensity` are tested + staged for it.
+- **Phase 3 — crane feel ✅ / full Pixi migration deferred:** `cableStretchAt` + `dropQualityIntensity`
+  are now WIRED into the DOM crane — the cable yanks taut on release and snaps back as the girder falls,
+  scaled by drop quality (render-only, WYSIWYG-safe, reduced-motion static). A true DOM→Pixi crane
+  render-layer migration remains a browser-verified follow-up (admin-gated mode; can't verify blind).
 - More biome-native creatures (City/Sky/Stratosphere/Orbit/Galaxy) on the same Higgsfield pipeline.
 - Deferred upgrade effects (Wide Footing perfect-band widen, Quick Recovery lean) — need WYSIWYG-safe
   crane-band/lean threading.
