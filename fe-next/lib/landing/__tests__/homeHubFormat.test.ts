@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { formatLiveShort, streakStripCells, clampPercent } from '../homeHubFormat';
+import {
+  formatLiveShort,
+  clampPercent,
+  formatTitleFallback,
+  dailyWeekCells,
+} from '../homeHubFormat';
 
 describe('formatLiveShort', () => {
   it('leaves sub-1000 counts as plain integers', () => {
@@ -23,20 +28,49 @@ describe('formatLiveShort', () => {
   });
 });
 
-describe('streakStripCells', () => {
-  it('fills the first N of `total` cells from the start', () => {
-    expect(streakStripCells(4, 5)).toEqual([true, true, true, true, false]);
-    expect(streakStripCells(0, 5)).toEqual([false, false, false, false, false]);
-    expect(streakStripCells(5, 5)).toEqual([true, true, true, true, true]);
+describe('formatTitleFallback', () => {
+  it('humanises a SNAKE_CASE title constant to Title Case', () => {
+    expect(formatTitleFallback('LEXICON_KING')).toBe('Lexicon King');
+    expect(formatTitleFallback('WORD_SEEKER')).toBe('Word Seeker');
+    expect(formatTitleFallback('GRANDMASTER')).toBe('Grandmaster');
   });
 
-  it('caps at `total` for long streaks and floors negatives at 0', () => {
-    expect(streakStripCells(99, 5)).toEqual([true, true, true, true, true]);
-    expect(streakStripCells(-3, 5)).toEqual([false, false, false, false, false]);
+  it('is defensive against empty / messy input', () => {
+    expect(formatTitleFallback('')).toBe('');
+    expect(formatTitleFallback('__WORD__KNIGHT__')).toBe('Word Knight');
+  });
+});
+
+describe('dailyWeekCells', () => {
+  it('returns `days` cells in chronological order ending today, today flagged last', () => {
+    const cells = dailyWeekCells([], '2026-06-21', 7);
+    expect(cells).toHaveLength(7);
+    expect(cells[0].date).toBe('2026-06-15');
+    expect(cells[6].date).toBe('2026-06-21');
+    expect(cells[6].isToday).toBe(true);
+    expect(cells.filter((c) => c.isToday)).toHaveLength(1);
   });
 
-  it('defaults to 5 cells', () => {
-    expect(streakStripCells(2)).toHaveLength(5);
+  it('marks a day played when its date is in the played set', () => {
+    const cells = dailyWeekCells(['2026-06-19', '2026-06-21', '2026-05-01'], '2026-06-21', 7);
+    const byDate = Object.fromEntries(cells.map((c) => [c.date, c.played]));
+    expect(byDate['2026-06-19']).toBe(true);
+    expect(byDate['2026-06-21']).toBe(true);
+    expect(byDate['2026-06-20']).toBe(false);
+    // a played date outside the window does not leak in
+    expect(cells.some((c) => c.date === '2026-05-01')).toBe(false);
+  });
+
+  it('crosses month boundaries correctly', () => {
+    const cells = dailyWeekCells([], '2026-03-02', 7);
+    expect(cells[0].date).toBe('2026-02-24');
+    expect(cells[6].date).toBe('2026-03-02');
+  });
+
+  it('is defensive against an invalid today string', () => {
+    const cells = dailyWeekCells([], 'not-a-date', 7);
+    expect(cells).toHaveLength(7);
+    expect(cells.every((c) => c.played === false)).toBe(true);
   });
 });
 

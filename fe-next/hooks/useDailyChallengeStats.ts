@@ -10,6 +10,7 @@ import {
   formatCountdown,
   getWordHuntStatusToday,
   getDailyStreak,
+  getAllWordHuntResults,
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -27,6 +28,8 @@ export interface DailyChallengeStats {
   hasSolved: boolean;
   streak: number;
   puzzleNumber: number;
+  /** ISO dates (YYYY-MM-DD) the player completed the daily — powers the week tracker. */
+  playedDates: string[];
   isClient: boolean;
 }
 
@@ -49,11 +52,15 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
   const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);
   const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
   const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber ?? 0);
+  const [playedDates, setPlayedDates] = useState<string[]>([]);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
     const date = getDailyChallengeDate();
+    // Completion history (per-day) for the home week tracker. localStorage-only,
+    // so it's read on the client after mount alongside the other daily state.
+    setPlayedDates(getAllWordHuntResults(language as Language).map((r) => r.date));
 
     // Freshest local truth first. When the player finishes today's daily,
     // saveWordHuntResult writes localStorage synchronously. If they then return
@@ -94,6 +101,7 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
       setHasPlayed(!!status);
       setHasSolved(status?.solved ?? false);
       setStreak(getDailyStreak().currentStreak);
+      setPlayedDates(getAllWordHuntResults(language as Language).map((r) => r.date));
     };
     const onVisible = () => document.visibilityState === 'visible' && refresh();
     document.addEventListener('visibilitychange', onVisible);
@@ -112,7 +120,7 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
     isClient ? 1000 : null,
   );
 
-  return { countdown, hasPlayed, hasSolved, streak, puzzleNumber, isClient };
+  return { countdown, hasPlayed, hasSolved, streak, puzzleNumber, playedDates, isClient };
 }
 
 export default useDailyChallengeStats;

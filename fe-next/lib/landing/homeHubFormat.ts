@@ -18,17 +18,64 @@ export function formatLiveShort(n: number): string {
   return `${k.toFixed(1).replace(/\.0$/, '')}k`;
 }
 
-/**
- * The daily-streak strip: `total` cells, the first `min(streak, total)` filled.
- * Returns a boolean[] the component maps to lime-filled / navy-empty squares.
- */
-export function streakStripCells(streak: number, total = 5): boolean[] {
-  const filled = Math.max(0, Math.min(Math.floor(streak) || 0, total));
-  return Array.from({ length: total }, (_, i) => i < filled);
-}
-
 /** Clamp a percentage into 0..100 (NaN/Infinity → 0). Drives the level ring + XP bar. */
 export function clampPercent(pct: number): number {
   if (!Number.isFinite(pct)) return 0;
   return Math.max(0, Math.min(100, pct));
+}
+
+/**
+ * Humanise a raw `LEVEL_TITLES` constant (e.g. "LEXICON_KING") into a readable
+ * "Lexicon King". Used purely as the i18n FALLBACK when a localized title string
+ * is missing — so the top bar never paints a SCREAMING_SNAKE constant at users.
+ */
+export function formatTitleFallback(raw: string): string {
+  if (!raw) return '';
+  return raw
+    .split('_')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
+/** One day in the daily-challenge week tracker. */
+export interface DailyWeekCell {
+  /** ISO date (YYYY-MM-DD, UTC) this cell represents. */
+  date: string;
+  /** Did the player complete the daily on this date? */
+  played: boolean;
+  /** Is this today (the last, live cell)? */
+  isToday: boolean;
+}
+
+/**
+ * Build the daily-challenge week tracker: the last `days` calendar days ending
+ * today, in chronological order (oldest → today). Each cell is `played` when its
+ * date appears in `playedDates`, and the final cell is flagged `isToday`.
+ *
+ * Unlike the old streak-mirror strip (which just lit `min(streak, 5)` cells),
+ * this reflects the player's ACTUAL completion history per day — so a gap
+ * yesterday shows as an empty cell between two filled ones.
+ *
+ * Defensive: an unparseable `todayDate` yields `days` empty (unplayed) cells
+ * rather than throwing, so a storage hiccup never crashes the home card.
+ */
+export function dailyWeekCells(
+  playedDates: Iterable<string>,
+  todayDate: string,
+  days = 7,
+): DailyWeekCell[] {
+  const played = new Set(playedDates);
+  const base = new Date(`${todayDate}T00:00:00Z`);
+  const valid = !Number.isNaN(base.getTime());
+
+  return Array.from({ length: days }, (_, idx) => {
+    // idx 0 = oldest, idx (days-1) = today
+    const offset = days - 1 - idx;
+    if (!valid) return { date: '', played: false, isToday: offset === 0 };
+    const d = new Date(base);
+    d.setUTCDate(d.getUTCDate() - offset);
+    const iso = d.toISOString().split('T')[0];
+    return { date: iso, played: played.has(iso), isToday: offset === 0 };
+  });
 }

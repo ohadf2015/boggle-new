@@ -1,18 +1,25 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
-import { clampPercent } from '@/lib/landing/homeHubFormat';
+import { clampPercent, formatTitleFallback } from '@/lib/landing/homeHubFormat';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
 interface HomeTopBarProps {
   profile: ProfileData | null;
   /** daily-challenge streak (days) */
   streak: number;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  /** active locale — builds the profile link target */
+  language?: string;
+  t: (
+    key: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    params?: Record<string, string | number>,
+  ) => string;
 }
 
 /**
@@ -24,7 +31,7 @@ interface HomeTopBarProps {
  * via the shared `xpManager` curve, coins from `profile.total_coins`. Missing
  * fields degrade gracefully (level 1, no title, 0 coins) — never "undefined".
  */
-export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
+export function HomeTopBar({ profile, streak, language = 'en', t }: HomeTopBarProps) {
   // Profile + streak are client-resolved (auth/daily hooks). On the server and
   // the first client render they may differ — and `coins.toLocaleString()` is
   // locale-dependent (Node vs browser) — so gate ALL dynamic values behind a
@@ -40,15 +47,22 @@ export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
   const progress = getXpProgress(totalXp);
   // Prefer the persisted level but fall back to the XP-derived one if absent.
   const level = p?.current_level ?? progress.currentLevel;
-  const title = getTitleForLevel(level);
+  const rawTitle = getTitleForLevel(level);
+  // Localize the rank title (e.g. "LEXICON_KING" → "מלך המילים"), with a humanized
+  // fallback so a missing key never surfaces a SCREAMING_SNAKE constant to players.
+  const title = rawTitle ? t(`landing.home.titles.${rawTitle}`, formatTitleFallback(rawTitle)) : null;
   const ringPct = clampPercent(progress.progressPercent);
   const coins = p?.total_coins ?? 0;
   const name = p?.display_name || p?.username || t('common.player');
 
   return (
     <div className="flex items-center justify-between gap-2.5 px-0.5">
-      {/* avatar + greeting */}
-      <div className="flex min-w-0 items-center gap-2.5">
+      {/* avatar + greeting — taps through to the player's profile */}
+      <Link
+        href={`/${language}/profile`}
+        aria-label={t('profile.viewProfile', 'View Profile')}
+        className="flex min-w-0 items-center gap-2.5 rounded-neo-pill -mx-1 px-1 py-0.5 transition-transform active:scale-[0.98]"
+      >
         <div
           className="relative h-[50px] w-[50px] shrink-0 rounded-full p-[3px]"
           style={{
@@ -78,7 +92,7 @@ export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
               : t('landing.home.levelOnly', { level })}
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* streak + coins */}
       <div className="flex shrink-0 items-center gap-2">
@@ -97,12 +111,28 @@ export function HomeTopBar({ profile, streak, t }: HomeTopBarProps) {
   );
 }
 
-/** Two overlapping lime discs — a tiny stacked-coins glyph, on-brand vs a generic icon. */
+/** A proper gold coin: black-outlined disc, gold gradient face, inset rim + a star. */
 function CoinGlyph() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="9" cy="12" r="7" fill="var(--neo-lime)" stroke="#000" strokeWidth="1.4" />
-      <circle cx="15" cy="12" r="7" fill="#d4ff4d" stroke="#000" strokeWidth="1.4" />
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <defs>
+        <radialGradient id="coinFace" cx="38%" cy="32%" r="75%">
+          <stop offset="0%" stopColor="#ffe98a" />
+          <stop offset="55%" stopColor="#ffce3a" />
+          <stop offset="100%" stopColor="#f0a512" />
+        </radialGradient>
+      </defs>
+      {/* outer disc with bold outline */}
+      <circle cx="12" cy="12" r="10.5" fill="url(#coinFace)" stroke="#000" strokeWidth="1.6" />
+      {/* inset rim ring */}
+      <circle cx="12" cy="12" r="7.4" fill="none" stroke="#b8860b" strokeWidth="1.3" opacity="0.85" />
+      {/* center star */}
+      <path
+        d="M12 7.4l1.32 2.68 2.96.43-2.14 2.09.5 2.95L12 14.13l-2.64 1.42.5-2.95-2.14-2.09 2.96-.43z"
+        fill="#7a5200"
+      />
+      {/* top-left shine */}
+      <circle cx="8.6" cy="8.4" r="1.5" fill="#fffbe6" opacity="0.85" />
     </svg>
   );
 }

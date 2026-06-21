@@ -9,9 +9,19 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useDailyChallengeStats, type PreloadedDailyStats } from '@/hooks/useDailyChallengeStats';
 import { CUBE_BLUR_DATA_URL } from '@/lib/landing/modeMeta';
-import { streakStripCells } from '@/lib/landing/homeHubFormat';
+import { dailyWeekCells } from '@/lib/landing/homeHubFormat';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge';
 
 const DAILY_ART = '/modes/cubes/daily.png';
+
+/** BCP-47 locale per app language — drives the localized weekday initials in the tracker. */
+const WEEKDAY_LOCALE: Record<string, string> = {
+  en: 'en-US',
+  he: 'he-IL',
+  sv: 'sv-SE',
+  ja: 'ja-JP',
+  es: 'es-ES',
+};
 
 interface HomeDailyHeroProps {
   preloadedStats?: PreloadedDailyStats;
@@ -39,7 +49,12 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   const hasPlayed = mounted ? stats.hasPlayed : false;
   const streak = mounted ? stats.streak : 0;
   const puzzleNumber = mounted ? stats.puzzleNumber : 0;
-  const cells = streakStripCells(streak, 5);
+  // Real per-day completion history (last 7 days, today last). Pre-mount paints a
+  // neutral empty week so SSR and first client render agree (no hydration drift).
+  const week = mounted ? dailyWeekCells(stats.playedDates, getDailyChallengeDate(), 7) : dailyWeekCells([], '', 7);
+  const locale = WEEKDAY_LOCALE[language] ?? 'en-US';
+  const weekdayLabel = (iso: string) =>
+    iso ? new Date(`${iso}T00:00:00Z`).toLocaleDateString(locale, { weekday: 'narrow', timeZone: 'UTC' }) : '';
 
   return (
     <Link
@@ -48,15 +63,16 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
       aria-label={`${t('daily.title')} #${puzzleNumber}`}
       className={cn(
-        'group relative block min-h-[138px] overflow-hidden rounded-neo-xl border-neo-thick border-black bg-neo-navy-light shadow-hard-lg',
+        'group relative block min-h-[138px] overflow-hidden rounded-neo-xl border-neo-thick border-black shadow-hard-lg',
+        'bg-gradient-to-br from-[#2a2410] via-neo-navy-light to-neo-navy-light',
         'transition-[transform,box-shadow] duration-150 active:translate-x-px active:translate-y-px active:shadow-hard-pressed',
       )}
     >
-      {/* cyan radial wash on the end */}
+      {/* warm gold radial wash — gives the daily card its signature yellow tint */}
       <span
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(120% 120% at 100% 50%, rgba(0,255,255,0.16), transparent 60%)' }}
+        style={{ background: 'radial-gradient(130% 130% at 100% 35%, rgba(255,225,53,0.22), rgba(255,107,53,0.10) 45%, transparent 68%)' }}
       />
       {/* floating daily mascot */}
       <div className="pointer-events-none absolute -bottom-2.5 -end-3.5 h-[150px] w-[150px] motion-safe:animate-bob">
@@ -73,7 +89,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       </div>
 
       <div className="relative max-w-[250px] p-3.5">
-        <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black bg-neo-cyan px-2.5 py-[3px] font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-navy shadow-hard-sm">
+        <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black bg-neo-yellow px-2.5 py-[3px] font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-navy shadow-hard-sm">
           <span className="relative flex h-[7px] w-[7px]">
             <span className="absolute inline-flex h-full w-full rounded-full bg-neo-navy opacity-60 motion-safe:animate-ping" />
             <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-neo-navy" />
@@ -88,22 +104,35 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
           {t('landing.home.puzzleNo', { n: puzzleNumber })} · {t('landing.home.resetsIn', { time: countdown })}
         </div>
 
-        <div className="mt-3 flex items-center gap-1">
-          {cells.map((filled, i) => (
-            <span
-              key={i}
-              className={cn(
-                'h-[13px] w-[13px] rounded-[3px] border-[1.5px] border-black',
-                filled ? 'bg-neo-lime' : 'bg-neo-navy-light',
-              )}
-            />
+        {/* 7-day completion tracker — each column is a real calendar day; lime = solved,
+            today gets a gold ring. Replaces the old streak-mirror strip. */}
+        <div className="mt-3 flex items-end gap-[5px]" suppressHydrationWarning>
+          {week.map((cell, i) => (
+            <div key={cell.date || i} className="flex flex-col items-center gap-1">
+              <span className="font-neo-body text-[8px] font-semibold uppercase leading-none text-neo-white/40">
+                {weekdayLabel(cell.date)}
+              </span>
+              <span
+                className={cn(
+                  'h-[14px] w-[14px] rounded-[4px] border-[1.5px] border-black',
+                  cell.played ? 'bg-neo-lime' : 'bg-neo-navy',
+                  cell.isToday && 'ring-2 ring-neo-yellow ring-offset-1 ring-offset-neo-navy-light',
+                )}
+              />
+            </div>
           ))}
-          {streak > 0 && (
-            <span className="ms-1.5 inline-flex items-center gap-1 font-neo-display text-[11px] font-semibold text-neo-lime">
-              <Flame className="h-3 w-3 text-neo-orange" strokeWidth={2.4} aria-hidden="true" />
-              {t('landing.home.dayStreak', { n: streak })}
-            </span>
-          )}
+        </div>
+
+        {/* streak readout — always shown so the day-tracking always has a clear label */}
+        <div className="mt-2.5 inline-flex items-center gap-1.5 font-neo-display text-[11px] font-semibold">
+          <Flame
+            className={cn('h-3.5 w-3.5', streak > 0 ? 'text-neo-orange' : 'text-neo-white/35')}
+            strokeWidth={2.4}
+            aria-hidden="true"
+          />
+          <span className={streak > 0 ? 'text-neo-yellow' : 'text-neo-white/55'}>
+            {streak > 0 ? t('landing.home.dayStreak', { n: streak }) : t('landing.home.streakStart')}
+          </span>
         </div>
       </div>
 

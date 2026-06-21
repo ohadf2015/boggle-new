@@ -10,18 +10,33 @@ vi.mock('@/components/Avatar', () => ({
   default: () => <div data-testid="avatar-stub" />,
 }));
 
-// Simple interpolating t — substitutes {param} tokens so we can assert real output.
-const t = (key: string, params?: Record<string, string | number>) => {
-  const dict: Record<string, string> = {
-    'common.player': 'Player',
-    'landing.home.greeting': 'Hey, {name}',
-    'landing.home.levelTitle': 'Level {level} · {title}',
-    'landing.home.levelOnly': 'Level {level}',
+// Interpolating t that mirrors the real signature: t(key, fallbackString?) or
+// t(key, params?). A string 2nd arg is a fallback used when the key is missing.
+const makeT =
+  (dict: Record<string, string>) =>
+  (
+    key: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    paramsWhenFallback?: Record<string, string | number>,
+  ) => {
+    const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
+    const params =
+      typeof fallbackOrParams === 'object' && fallbackOrParams !== null
+        ? fallbackOrParams
+        : paramsWhenFallback ?? {};
+    let s = dict[key] ?? fallback ?? key;
+    for (const [k, v] of Object.entries(params)) s = s.replace(`{${k}}`, String(v));
+    return s;
   };
-  let s = dict[key] ?? key;
-  if (params) for (const [k, v] of Object.entries(params)) s = s.replace(`{${k}}`, String(v));
-  return s;
+
+const baseDict: Record<string, string> = {
+  'common.player': 'Player',
+  'landing.home.greeting': 'Hey, {name}',
+  'landing.home.levelTitle': 'Level {level} · {title}',
+  'landing.home.levelOnly': 'Level {level}',
 };
+
+const t = makeT(baseDict);
 
 describe('HomeTopBar', () => {
   it('renders real name, level and coins from the profile', () => {
@@ -52,5 +67,26 @@ describe('HomeTopBar', () => {
     // XP-derived level when none persisted
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.queryByText(/undefined/i)).toBeNull();
+  });
+
+  it('localizes the rank title via landing.home.titles.<KEY>', () => {
+    const localized = makeT({ ...baseDict, 'landing.home.titles.LEXICON_KING': 'מלך הלקסיקון' });
+    const profile = { id: 'u1', current_level: 75, total_xp: 0 } as unknown as ProfileData;
+    render(<HomeTopBar profile={profile} streak={0} language="he" t={localized} />);
+    expect(screen.getByText('Level 75 · מלך הלקסיקון')).toBeInTheDocument();
+  });
+
+  it('falls back to a humanized title (never SCREAMING_SNAKE) when the key is missing', () => {
+    const profile = { id: 'u1', current_level: 75, total_xp: 0 } as unknown as ProfileData;
+    render(<HomeTopBar profile={profile} streak={0} t={t} />);
+    expect(screen.getByText('Level 75 · Lexicon King')).toBeInTheDocument();
+    expect(screen.queryByText(/LEXICON_KING/)).toBeNull();
+  });
+
+  it('wraps the greeting in a link to the localized profile route', () => {
+    const profile = { id: 'u1', display_name: 'Maya', current_level: 7, total_xp: 0 } as unknown as ProfileData;
+    render(<HomeTopBar profile={profile} streak={0} language="he" t={t} />);
+    const link = screen.getByText('Hey, Maya').closest('a');
+    expect(link).toHaveAttribute('href', '/he/profile');
   });
 });
