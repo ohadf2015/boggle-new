@@ -177,6 +177,28 @@ describe('ResultDisplay Component', () => {
     });
   });
 
+  describe('Score-tier badge (keyed to score %, not attempts)', () => {
+    it('shows the top tier only for a near-perfect score', () => {
+      // life 100, 1 attempt, 20 words → total 1000 (100%) → legendary
+      render(<ResultDisplay {...solvedProps} attemptsUsed={1} lifeRemaining={100} wordsDiscovered={20} />);
+      expect(screen.getByTestId('score-tier-legendary')).toBeInTheDocument();
+      expect(screen.getByText('wordHunt.results.scoreTierLegendary')).toBeInTheDocument();
+    });
+
+    it('regression: a sub-50% score does NOT get top praise even in few attempts', () => {
+      // life 30 (120), 3 attempts (320 accuracy), 5 words (50) → total 490 (49%) → rising
+      render(<ResultDisplay {...solvedProps} attemptsUsed={3} lifeRemaining={30} wordsDiscovered={5} />);
+      expect(screen.getByTestId('score-tier-rising')).toBeInTheDocument();
+      expect(screen.queryByTestId('score-tier-legendary')).not.toBeInTheDocument();
+      expect(screen.getByText('wordHunt.results.scoreTierRising')).toBeInTheDocument();
+    });
+
+    it('still shows attempts used as a secondary detail under the badge', () => {
+      render(<ResultDisplay {...solvedProps} attemptsUsed={3} />);
+      expect(screen.getByText('3/10')).toBeInTheDocument();
+    });
+  });
+
   describe('Eye toggle', () => {
     it('renders the word visibility toggle button', () => {
       render(<ResultDisplay {...solvedProps} />);
