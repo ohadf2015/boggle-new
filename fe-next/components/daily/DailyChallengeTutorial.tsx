@@ -142,26 +142,69 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
     threshold: 50,
   });
 
-  const renderStep = () => {
+  const renderStepBody = () => {
     switch (currentStep) {
       case 1:
-        return <Step1Guess onNext={nextStep} />;
+        return <Step1Guess />;
       case 2:
-        return <Step2Bonus onNext={nextStep} onPrev={prevStep} />;
+        return <Step2Bonus />;
       case 3:
-        return <Step3Ready onNext={onComplete} onPrev={prevStep} />;
+        return <Step3Ready />;
+      default:
+        return null;
+    }
+  };
+
+  const renderStepFooter = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <Button onClick={nextStep} className="w-full bg-neo-pink text-white">
+            {t('tutorial.wordHunt.welcome.next')}{' '}
+            <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
+          </Button>
+        );
+      case 2:
+        return (
+          <div className="flex gap-2">
+            <Button onClick={prevStep} variant="outline" className="flex-1">
+              ← {t('common.back')}
+            </Button>
+            <Button onClick={nextStep} className="flex-1 bg-neo-pink text-white">
+              {t('tutorial.wordHunt.letterFeedback.gotIt')}{' '}
+              <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
+            </Button>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="flex flex-col gap-2">
+            <Button onClick={onComplete} className="w-full bg-neo-pink text-white text-lg py-6">
+              {t('tutorial.wordHunt.complete.start')} 🚀
+            </Button>
+            <Button onClick={prevStep} variant="outline" size="sm">
+              ← {t('common.back')}
+            </Button>
+          </div>
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 text-white flex items-center justify-center z-[100] p-4">
+    // z-[120] keeps this modal above the daily ready-screen's persistent green
+    // "play" CTA, which is portaled to <body> at z-[100]. Equal z-index let that
+    // later-in-DOM portal paint over the tutorial's action buttons.
+    <div className="fixed inset-0 bg-black/80 text-white flex items-center justify-center z-[120] p-4">
       <m.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black max-w-md w-full p-6 shadow-neo-brutalist relative max-h-[92vh] overflow-y-auto"
+        // Flex column so the body scrolls and the footer stays pinned. The card
+        // never exceeds the viewport (max-h) and clips its own overflow; only
+        // the inner body scrolls.
+        className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black max-w-md w-full p-6 shadow-neo-brutalist relative flex flex-col max-h-[92vh] overflow-hidden"
         {...swipeHandlers}
       >
         {/* Close button */}
@@ -173,8 +216,8 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Progress indicator */}
-        <div className="flex items-center justify-center gap-2 mb-5">
+        {/* Progress indicator — fixed header, never scrolls */}
+        <div className="flex items-center justify-center gap-2 mb-5 shrink-0">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
             <div
               key={`tutorial-dot-${i}`}
@@ -190,30 +233,47 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
           ))}
         </div>
 
-        {/* Step content with swipe support */}
-        <AnimatePresence mode="wait">
-          <m.div
-            key={currentStep}
-            initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            {renderStep()}
-          </m.div>
-        </AnimatePresence>
+        {/* Scrollable body — shrinks to fit; only this region scrolls. The
+            negative-then-positive horizontal padding keeps the scrollbar off
+            the content while preserving the card's inner gutter. */}
+        <div
+          data-testid="tutorial-body"
+          className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden -mx-1 px-1"
+        >
+          <AnimatePresence mode="wait">
+            <m.div
+              key={currentStep}
+              initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {renderStepBody()}
+            </m.div>
+          </AnimatePresence>
+        </div>
 
-        {/* Swipe hint indicator - only shown on mobile */}
-        <div className="block sm:hidden text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
-          {t('tutorial.swipeHint')}
+        {/* Pinned footer — primary actions live here, always visible and never
+            clipped, regardless of body length or viewport height. */}
+        <div
+          data-testid="tutorial-footer"
+          className="shrink-0 pt-4 mt-4 border-t-2 border-neo-black/10 dark:border-white/10"
+        >
+          {renderStepFooter()}
+
+          {/* Swipe hint indicator - only shown on mobile */}
+          <div className="block sm:hidden text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
+            {t('tutorial.swipeHint')}
+          </div>
         </div>
       </m.div>
     </div>
   );
 };
 
-// Step 1: Guess the word — goal + live color legend
-const Step1Guess: React.FC<{ onNext: () => void }> = ({ onNext }) => {
+// Step 1: Guess the word — goal + live color legend.
+// Body only; the "next" action is rendered in the modal's pinned footer.
+const Step1Guess: React.FC = () => {
   const { t, language } = useLanguage();
   const example = getTutorialExample(language);
 
@@ -257,19 +317,13 @@ const Step1Guess: React.FC<{ onNext: () => void }> = ({ onNext }) => {
           </span>
         </div>
       </div>
-
-      <Button onClick={onNext} className="w-full bg-neo-pink text-white">
-        {t('tutorial.wordHunt.welcome.next')} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
-      </Button>
     </div>
   );
 };
 
-// Step 2: Free bonus words — the twist that sets Word Hunt apart from Wordle
-const Step2Bonus: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
-  onNext,
-  onPrev,
-}) => {
+// Step 2: Free bonus words — the twist that sets Word Hunt apart from Wordle.
+// Body only; the back/continue actions live in the modal's pinned footer.
+const Step2Bonus: React.FC = () => {
   const { t } = useLanguage();
 
   return (
@@ -305,30 +359,18 @@ const Step2Bonus: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
       </div>
 
       {/* Key takeaway */}
-      <div className="bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300 dark:border-amber-700 p-3 mb-4">
+      <div className="bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300 dark:border-amber-700 p-3">
         <div className="text-sm font-bold text-center">
           {t('tutorial.wordHunt.triesRule.keyInsight')}
         </div>
-      </div>
-
-      <div className="flex gap-2">
-        <Button onClick={onPrev} variant="outline" className="flex-1">
-          ← {t('common.back')}
-        </Button>
-        <Button onClick={onNext} className="flex-1 bg-neo-pink text-white">
-          {t('tutorial.wordHunt.letterFeedback.gotIt')}{' '}
-          <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
-        </Button>
       </div>
     </div>
   );
 };
 
-// Step 3: Ready to hunt
-const Step3Ready: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
-  onNext,
-  onPrev,
-}) => {
+// Step 3: Ready to hunt.
+// Body only; the start/back actions live in the modal's pinned footer.
+const Step3Ready: React.FC = () => {
   const { t } = useLanguage();
 
   return (
@@ -341,19 +383,10 @@ const Step3Ready: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
         {t('tutorial.wordHunt.complete.title')}
       </h2>
 
-      <div className="bg-slate-100 dark:bg-neo-navy-light rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-6 text-center">
+      <div className="bg-slate-100 dark:bg-neo-navy-light rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 text-center">
         <div className="text-sm text-gray-600 dark:text-gray-300">
           {t('tutorial.wordHunt.complete.sameChallenge')}
         </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Button onClick={onNext} className="w-full bg-neo-pink text-white text-lg py-6">
-          {t('tutorial.wordHunt.complete.start')} 🚀
-        </Button>
-        <Button onClick={onPrev} variant="outline" size="sm">
-          ← {t('common.back')}
-        </Button>
       </div>
     </div>
   );

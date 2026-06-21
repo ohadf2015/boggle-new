@@ -48,8 +48,8 @@ import { DailyChallengeTutorial } from '../DailyChallengeTutorial';
 const setup = () => {
   const onComplete = vi.fn();
   const onSkip = vi.fn();
-  render(<DailyChallengeTutorial onComplete={onComplete} onSkip={onSkip} />);
-  return { onComplete, onSkip };
+  const utils = render(<DailyChallengeTutorial onComplete={onComplete} onSkip={onSkip} />);
+  return { onComplete, onSkip, ...utils };
 };
 
 const next = () =>
@@ -101,5 +101,37 @@ describe('DailyChallengeTutorial (3-step image redesign)', () => {
     const { onSkip } = setup();
     fireEvent.click(screen.getByRole('button', { name: 'common.close' }));
     expect(onSkip).toHaveBeenCalledTimes(1);
+  });
+
+  /**
+   * Regression: the daily "ready" screen renders a persistent green
+   * "play today's puzzle" CTA portaled to <body> at z-[100]. Because the portal
+   * sits later in the DOM than this inline overlay, an EQUAL z-index let the
+   * sticky CTA paint over the tutorial's action buttons (the reported Swedish
+   * clipping bug). The full-screen tutorial is a modal dialog and must sit
+   * above persistent page chrome.
+   */
+  it('renders the overlay above the persistent daily play CTA (z-index > z-[100])', () => {
+    const { container } = setup();
+    const overlay = container.firstChild as HTMLElement;
+    expect(overlay.className).toContain('z-[120]');
+  });
+
+  /**
+   * Layout hardening: the step actions must live in a non-scrolling footer that
+   * is a sibling of (not inside) the scrollable body. This guarantees the
+   * primary actions are always visible and tappable on short viewports instead
+   * of being pushed below the fold or clipped.
+   */
+  it('pins the step actions in a footer outside the scrollable body', () => {
+    setup();
+    const body = screen.getByTestId('tutorial-body');
+    const footer = screen.getByTestId('tutorial-footer');
+
+    expect(body.className).toContain('overflow-y-auto');
+
+    const primary = screen.getByRole('button', { name: /welcome\.next/ });
+    expect(footer.contains(primary)).toBe(true);
+    expect(body.contains(primary)).toBe(false);
   });
 });
