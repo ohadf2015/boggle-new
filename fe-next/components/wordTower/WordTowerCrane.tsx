@@ -6,6 +6,7 @@ import {
   evaluatePlacement,
   craneOffsetAt,
   alignmentBand,
+  dropQualityIntensity,
   TOPPLE_AFTER_SLOPPY,
   type PlacementOutcome,
   type PlacementQuality,
@@ -13,7 +14,7 @@ import {
 import { releaseFx } from '@/lib/wordTower/craneReleaseFx';
 import { swayAngleAt, swayNormalizedOffset, effectiveDropError } from '@/lib/wordTower/towerSway';
 import { craneBeamBricks, craneBeamTilePx } from '@/lib/wordTower/craneBeamDisplay';
-import { pendulumTargetDeg, stepPendulum, REST_PENDULUM, type PendulumState } from '@/lib/wordTower/cranePendulum';
+import { pendulumTargetDeg, stepPendulum, REST_PENDULUM, cableStretchAt, type PendulumState } from '@/lib/wordTower/cranePendulum';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
@@ -145,6 +146,13 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const prevPosRef = useRef(0);
   const prevNowRef = useRef(0);
   const fallingRef = useRef(false);
+  // Cosmetic cable stretch-and-snap: on release the freed load yanks the cable
+  // taut, then it snaps back as the girder falls — sells the block's weight.
+  // Render-only (cable height never feeds the verdict). Driven off the drop
+  // timestamp + the drop's quality intensity in the existing rAF below.
+  const [cableStretch, setCableStretch] = useState(0);
+  const dropAtRef = useRef(0);
+  const dropIntensityRef = useRef(0);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -170,6 +178,11 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
       const p = stepPendulum(pendulumRef.current, target, dtMs);
       pendulumRef.current = p;
       setPendulumDeg(p.angleDeg);
+      // Cable stretch-and-snap over the ~300ms fall (0 while aiming).
+      if (fallingRef.current) {
+        const fk = Math.min(1, (now - dropAtRef.current) / 300);
+        setCableStretch(cableStretchAt(fk, dropIntensityRef.current));
+      }
       prevPosRef.current = x;
       prevNowRef.current = now;
       raf = requestAnimationFrame(tick);
@@ -190,6 +203,8 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     onSignedDrop?.(residual);
     const outcome = evaluatePlacement(effectiveDropError(signedOffset, swayOffset), consecutiveSloppy);
     setDroppedQuality(outcome.quality);
+    dropAtRef.current = performance.now();
+    dropIntensityRef.current = dropQualityIntensity(outcome.quality);
     setFalling(true);
     // Let the girder fall most of the way (so the beam visibly lands) before the
     // verdict pops + the tower commits — keeps the placement one continuous beat.
@@ -307,10 +322,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
               className="relative will-change-transform"
               style={{ transform: `rotate(${pendulumDeg}deg)`, transformOrigin: 'top center' }}
             >
-              {/* Cable */}
+              {/* Cable — stretches taut on release, then snaps back as it falls. */}
               <div
                 className="mx-auto w-[2px] bg-black"
-                style={{ height: `${CABLE_LEN_PX}px` }}
+                style={{ height: `${CABLE_LEN_PX + cableStretch}px` }}
                 aria-hidden
               />
               {/* Hook */}
