@@ -5430,6 +5430,18 @@ const he = {
       "greeting": "היי, {name}",
       "levelTitle": "רמה {level} · {title}",
       "levelOnly": "רמה {level}",
+      "titles": {
+        "WORD_SEEKER": "מחפש מילים",
+        "LETTER_SCOUT": "סייר אותיות",
+        "VOCAB_WARRIOR": "לוחם מילים",
+        "WORD_KNIGHT": "אביר המילים",
+        "LEXICAL_MASTER": "אמן הלשון",
+        "DICTIONARY_LORD": "אדון המילון",
+        "WORD_LEGEND": "אגדת המילים",
+        "LEXICON_KING": "מלך המילון",
+        "GRANDMASTER": "רב אמן",
+        "ETERNAL_CHAMPION": "אלוף נצחי"
+      },
       "online": "מחוברים",
       "gameModes": "מצבי משחק",
       "todaysPuzzle": "החידה היומית",

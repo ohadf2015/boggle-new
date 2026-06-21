@@ -9,7 +9,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useDailyChallengeStats, type PreloadedDailyStats } from '@/hooks/useDailyChallengeStats';
 import { CUBE_BLUR_DATA_URL } from '@/lib/landing/modeMeta';
-import { streakStripCells } from '@/lib/landing/homeHubFormat';
+import { dailyProgressCells } from '@/lib/landing/homeHubFormat';
+import { getLastSevenDaysCompletion } from '@/utils/dailyChallenge/storage';
+import type { Language } from '@/types';
 
 const DAILY_ART = '/modes/cubes/daily.png';
 
@@ -39,7 +41,12 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   const hasPlayed = mounted ? stats.hasPlayed : false;
   const streak = mounted ? stats.streak : 0;
   const puzzleNumber = mounted ? stats.puzzleNumber : 0;
-  const cells = streakStripCells(streak, 5);
+  // Progress strip = the player's REAL last-5-days completion (each cell filled
+  // when that day's daily was actually played), not an echo of the streak count.
+  // Reads localStorage, so gate behind mount to keep SSR/first-render in sync.
+  const cells = mounted
+    ? dailyProgressCells(getLastSevenDaysCompletion(language as Language), 5)
+    : dailyProgressCells([], 5);
 
   return (
     <Link
@@ -52,11 +59,17 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
         'transition-[transform,box-shadow] duration-150 active:translate-x-px active:translate-y-px active:shadow-hard-pressed',
       )}
     >
-      {/* cyan radial wash on the end */}
+      {/* warm amber base tint over the navy — the daily card's signature colour */}
       <span
         aria-hidden="true"
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(120% 120% at 100% 50%, rgba(0,255,255,0.16), transparent 60%)' }}
+        style={{ background: 'linear-gradient(135deg, rgba(255,225,53,0.20) 0%, rgba(255,107,53,0.10) 55%, transparent 100%)' }}
+      />
+      {/* golden radial glow on the end (behind the mascot) */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{ background: 'radial-gradient(120% 120% at 100% 50%, rgba(255,225,53,0.28), transparent 60%)' }}
       />
       {/* floating daily mascot */}
       <div className="pointer-events-none absolute -bottom-2.5 -end-3.5 h-[150px] w-[150px] motion-safe:animate-bob">
@@ -73,7 +86,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       </div>
 
       <div className="relative max-w-[250px] p-3.5">
-        <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black bg-neo-cyan px-2.5 py-[3px] font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-navy shadow-hard-sm">
+        <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black bg-neo-yellow px-2.5 py-[3px] font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-navy shadow-hard-sm">
           <span className="relative flex h-[7px] w-[7px]">
             <span className="absolute inline-flex h-full w-full rounded-full bg-neo-navy opacity-60 motion-safe:animate-ping" />
             <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-neo-navy" />
@@ -94,12 +107,12 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
               key={i}
               className={cn(
                 'h-[13px] w-[13px] rounded-[3px] border-[1.5px] border-black',
-                filled ? 'bg-neo-lime' : 'bg-neo-navy-light',
+                filled ? 'bg-neo-yellow' : 'bg-neo-navy/60',
               )}
             />
           ))}
           {streak > 0 && (
-            <span className="ms-1.5 inline-flex items-center gap-1 font-neo-display text-[11px] font-semibold text-neo-lime">
+            <span className="ms-1.5 inline-flex items-center gap-1 font-neo-display text-[11px] font-semibold text-neo-yellow">
               <Flame className="h-3 w-3 text-neo-orange" strokeWidth={2.4} aria-hidden="true" />
               {t('landing.home.dayStreak', { n: streak })}
             </span>

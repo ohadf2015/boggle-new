@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatLiveShort, streakStripCells, clampPercent } from '../homeHubFormat';
+import { formatLiveShort, streakStripCells, clampPercent, dailyProgressCells } from '../homeHubFormat';
 
 describe('formatLiveShort', () => {
   it('leaves sub-1000 counts as plain integers', () => {
@@ -37,6 +37,44 @@ describe('streakStripCells', () => {
 
   it('defaults to 5 cells', () => {
     expect(streakStripCells(2)).toHaveLength(5);
+  });
+});
+
+describe('dailyProgressCells', () => {
+  const day = (done: boolean) => ({ wordHunt: done, wordWheel: false });
+
+  it('maps the last `total` days to completed/empty cells (oldest→newest)', () => {
+    const days = [day(true), day(false), day(true), day(true), day(false)];
+    expect(dailyProgressCells(days, 5)).toEqual([true, false, true, true, false]);
+  });
+
+  it('treats either word-hunt OR word-wheel completion as done', () => {
+    const days = [
+      { wordHunt: false, wordWheel: true },
+      { wordHunt: true, wordWheel: false },
+      { wordHunt: false, wordWheel: false },
+    ];
+    expect(dailyProgressCells(days, 3)).toEqual([true, true, false]);
+  });
+
+  it('keeps only the most recent `total` days when given more', () => {
+    const days = Array.from({ length: 7 }, (_, i) => day(i >= 5)); // last 2 done
+    expect(dailyProgressCells(days, 5)).toEqual([false, false, false, true, true]);
+  });
+
+  it('left-pads with empty cells when fewer days than `total` are available', () => {
+    expect(dailyProgressCells([day(true), day(true)], 5)).toEqual([
+      false,
+      false,
+      false,
+      true,
+      true,
+    ]);
+  });
+
+  it('defaults to 5 cells and is defensive against empty / missing input', () => {
+    expect(dailyProgressCells([])).toEqual([false, false, false, false, false]);
+    expect(dailyProgressCells(undefined as never)).toHaveLength(5);
   });
 });
 

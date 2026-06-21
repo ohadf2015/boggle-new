@@ -5334,6 +5334,18 @@ const es = {
       "greeting": "Hola, {name}",
       "levelTitle": "Nivel {level} · {title}",
       "levelOnly": "Nivel {level}",
+      "titles": {
+        "WORD_SEEKER": "Buscapalabras",
+        "LETTER_SCOUT": "Explorador de letras",
+        "VOCAB_WARRIOR": "Guerrero del léxico",
+        "WORD_KNIGHT": "Caballero de las palabras",
+        "LEXICAL_MASTER": "Maestro léxico",
+        "DICTIONARY_LORD": "Señor del diccionario",
+        "WORD_LEGEND": "Leyenda de las palabras",
+        "LEXICON_KING": "Rey del léxico",
+        "GRANDMASTER": "Gran maestro",
+        "ETERNAL_CHAMPION": "Campeón eterno"
+      },
       "online": "en línea",
       "gameModes": "Modos de juego",
       "todaysPuzzle": "Reto de hoy",

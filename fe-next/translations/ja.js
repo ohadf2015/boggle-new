@@ -5301,6 +5301,18 @@ const ja = {
       "greeting": "こんにちは、{name}さん",
       "levelTitle": "レベル{level}・{title}",
       "levelOnly": "レベル{level}",
+      "titles": {
+        "WORD_SEEKER": "ワードシーカー",
+        "LETTER_SCOUT": "レタースカウト",
+        "VOCAB_WARRIOR": "ボキャブウォリアー",
+        "WORD_KNIGHT": "ワードナイト",
+        "LEXICAL_MASTER": "語彙マスター",
+        "DICTIONARY_LORD": "辞書の王",
+        "WORD_LEGEND": "ワードレジェンド",
+        "LEXICON_KING": "辞書王",
+        "GRANDMASTER": "グランドマスター",
+        "ETERNAL_CHAMPION": "永遠の王者"
+      },
       "online": "オンライン",
       "gameModes": "ゲームモード",
       "todaysPuzzle": "今日のパズル",

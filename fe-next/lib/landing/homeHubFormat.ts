@@ -27,6 +27,25 @@ export function streakStripCells(streak: number, total = 5): boolean[] {
   return Array.from({ length: total }, (_, i) => i < filled);
 }
 
+/**
+ * The daily-challenge progress strip: real recent completion, not a streak echo.
+ * Takes the per-day completion history (each day "done" when either the Word Hunt
+ * OR Word Wheel daily was played) and returns the most recent `total` days as a
+ * boolean[] (oldest→newest). Fewer days than `total` left-pad with empty cells so
+ * the strip width is stable. Unlike `streakStripCells` (which just fills the first
+ * N), this reflects WHICH days were actually completed.
+ */
+export function dailyProgressCells(
+  days: ReadonlyArray<{ wordHunt: boolean; wordWheel: boolean }>,
+  total = 5,
+): boolean[] {
+  const recent = Array.isArray(days) ? days.slice(-total) : [];
+  const cells = recent.map((d) => Boolean(d?.wordHunt || d?.wordWheel));
+  // left-pad so the strip is always `total` wide (oldest cells empty)
+  while (cells.length < total) cells.unshift(false);
+  return cells;
+}
+
 /** Clamp a percentage into 0..100 (NaN/Infinity → 0). Drives the level ring + XP bar. */
 export function clampPercent(pct: number): number {
   if (!Number.isFinite(pct)) return 0;
