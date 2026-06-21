@@ -12,6 +12,9 @@ import { m } from 'framer-motion';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
+/** Neo color tokens supported by the gauge ring (without 'text-' prefix). */
+export type GaugeColor = 'neo-lime' | 'neo-cyan' | 'neo-pink' | 'neo-yellow' | 'neo-orange';
+
 export interface ScoreGaugeRingProps {
   score: number;
   maxScore: number;
@@ -20,7 +23,7 @@ export interface ScoreGaugeRingProps {
   /** Ring thickness in px */
   strokeWidth?: number;
   /** Tailwind color class for the filled arc (without 'text-' prefix) */
-  color?: 'neo-lime' | 'neo-cyan' | 'neo-pink' | 'neo-yellow' | 'neo-orange';
+  color?: GaugeColor;
   /** Animation delay in seconds */
   delay?: number;
   /** Show score number in center */

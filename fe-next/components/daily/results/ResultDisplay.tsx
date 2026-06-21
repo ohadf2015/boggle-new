@@ -14,6 +14,7 @@ import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { ScoreGaugeRing } from './ScoreGaugeRing';
+import { getScoreTier } from './scoreFeedbackTiers';
 import type { Language } from '@/types';
 
 export interface ResultDisplayProps {
@@ -31,16 +32,12 @@ export interface ResultDisplayProps {
   t: (key: string) => string;
 }
 
-/** Score tier accent colors for the gauge ring */
-function getGaugeColor(score: number): 'neo-lime' | 'neo-yellow' | 'neo-orange' | 'neo-pink' {
-  if (score >= 800) return 'neo-lime';
-  if (score >= 600) return 'neo-yellow';
-  if (score >= 400) return 'neo-orange';
-  return 'neo-pink';
-}
+/** Max attainable daily score — the gauge + tier percentage are relative to this. */
+const MAX_SCORE = 1000;
 
 const COLOR_HEX: Record<string, string> = {
   'neo-lime': '#BFFF00',
+  'neo-cyan': '#00FFFF',
   'neo-yellow': '#FFE135',
   'neo-orange': '#FF6B35',
   'neo-pink': '#FF1493',
@@ -52,19 +49,6 @@ const CHIP_STYLES: Record<string, string> = {
   'neo-lime': 'bg-neo-lime/10 border-neo-lime/30 text-neo-lime shadow-hard-sm',
   'neo-pink': 'bg-neo-pink/10 border-neo-pink/30 text-neo-pink shadow-hard-sm',
 };
-
-/** Wordle-style attempt tier labels */
-type AttemptTier = { key: string; gradient: string; glow: string };
-
-function getAttemptTier(attempts: number): AttemptTier | null {
-  if (attempts === 1) return { key: 'wordHunt.results.tierGenius', gradient: 'from-amber-400 via-yellow-300 to-amber-400', glow: 'rgba(255,225,53,0.4)' };
-  if (attempts === 2) return { key: 'wordHunt.results.tierMagnificent', gradient: 'from-neo-cyan via-cyan-300 to-neo-cyan', glow: 'rgba(0,255,255,0.3)' };
-  if (attempts === 3) return { key: 'wordHunt.results.tierImpressive', gradient: 'from-neo-lime via-green-300 to-neo-lime', glow: 'rgba(191,255,0,0.3)' };
-  if (attempts === 4) return { key: 'wordHunt.results.tierSplendid', gradient: 'from-purple-400 via-purple-300 to-purple-400', glow: 'rgba(192,132,252,0.3)' };
-  if (attempts <= 6) return { key: 'wordHunt.results.tierGreat', gradient: 'from-neo-orange via-orange-300 to-neo-orange', glow: 'rgba(255,107,53,0.25)' };
-  if (attempts <= 8) return { key: 'wordHunt.results.tierNice', gradient: 'from-slate-400 via-slate-300 to-slate-400', glow: 'rgba(148,163,184,0.2)' };
-  return { key: 'wordHunt.results.tierPhew', gradient: 'from-neo-pink via-pink-300 to-neo-pink', glow: 'rgba(255,20,147,0.25)' };
-}
 
 /** Chip entrance variant: staggered slide-up with scale pop */
 const chipVariants = {
@@ -101,7 +85,12 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
     [lifeRemaining, attemptsUsed, wordsDiscovered, solved]
   );
 
-  const gaugeColor = solved ? getGaugeColor(scoreBreakdown.total) : 'neo-pink';
+  // Praise + color theme are keyed to the SHARE of the score earned
+  // (score / MAX_SCORE), not how few attempts were used — so a 490/1000 run
+  // reads "rising", not the top tier. One tier drives both the badge and the
+  // gauge ring for a coherent color theme.
+  const scoreTier = getScoreTier(scoreBreakdown.total, MAX_SCORE);
+  const gaugeColor = solved ? scoreTier.color : 'neo-pink';
   const glowHex = COLOR_HEX[gaugeColor] || '#BFFF00';
 
   const displayedTargetWord = language === 'he'
@@ -193,35 +182,30 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 />
               </m.div>
 
-              {/* Attempt tier badge — Wordle-style "Genius!" label */}
-              {(() => {
-                const tier = getAttemptTier(attemptsUsed);
-                if (!tier) return null;
-                return (
-                  <m.div
-                    initial={{ scale: 0, rotate: -8 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.35, type: 'spring', stiffness: 400, damping: 12 }}
-                    className="relative"
-                  >
-                    <div
-                      className={`inline-flex items-center gap-2 px-5 py-2 bg-linear-to-r ${tier.gradient} rounded-neo border-3 border-neo-black shadow-hard`}
-                      style={{ boxShadow: `0 0 20px ${tier.glow}, 4px 4px 0px black` }}
-                    >
-                      {attemptsUsed === 1 && <Sparkles className="w-5 h-5 text-neo-black" />}
-                      <span className="font-black text-neo-black text-lg uppercase tracking-wider">
-                        {t(tier.key)}
-                      </span>
-                      {attemptsUsed === 1 && <Sparkles className="w-5 h-5 text-neo-black" />}
-                    </div>
-                    <div className="text-center mt-1">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase">
-                        {attemptsUsed}/10
-                      </span>
-                    </div>
-                  </m.div>
-                );
-              })()}
+              {/* Score-tier badge — praise scales with the share of score earned */}
+              <m.div
+                initial={{ scale: 0, rotate: -8 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.35, type: 'spring', stiffness: 400, damping: 12 }}
+                className="relative"
+              >
+                <div
+                  data-testid={`score-tier-${scoreTier.id}`}
+                  className={`inline-flex items-center gap-2 px-5 py-2 bg-linear-to-r ${scoreTier.gradient} rounded-neo border-3 border-neo-black shadow-hard`}
+                  style={{ boxShadow: `0 0 20px ${scoreTier.glow}, 4px 4px 0px black` }}
+                >
+                  {scoreTier.id === 'legendary' && <Sparkles className="w-5 h-5 text-neo-black" />}
+                  <span className="font-black text-neo-black text-lg uppercase tracking-wider">
+                    {t(scoreTier.key)}
+                  </span>
+                  {scoreTier.id === 'legendary' && <Sparkles className="w-5 h-5 text-neo-black" />}
+                </div>
+                <div className="text-center mt-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase">
+                    {attemptsUsed}/10
+                  </span>
+                </div>
+              </m.div>
 
               {/* Target Word with Eye Toggle */}
               <m.div
