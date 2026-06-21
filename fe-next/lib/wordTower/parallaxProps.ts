@@ -81,6 +81,9 @@ export const WORD_TOWER_PROPS: ParallaxProp[] = [
   { id: 'disco',      src: '/images/word-tower/wt-disco.png',       atM: 540,  topPct: 22, xPct: 68, width: 90,  depth: 0.9,  rangeM: 72 },
   { id: 'narwhal',    src: '/images/word-tower/wt-narwhal.png',     atM: 880,  topPct: 24, xPct: 28, width: 110, depth: 0.85, rangeM: 90 },
   { id: 'wizard',     src: '/images/word-tower/wt-wizard.png',      atM: 1350, topPct: 22, xPct: 70, width: 110, depth: 0.9,  rangeM: 120 },
+  // Biome-native creature: a kawaii cosmic jellyfish drifting through the Nebula
+  // band (500–800m), so the nebula reads as its OWN world, not just a pink sky.
+  { id: 'nebulaJelly', src: '/images/word-tower/wt-nebula-jelly.png', atM: 580, topPct: 24, xPct: 30, width: 104, depth: 0.85, rangeM: 74 },
 ];
 
 /**
