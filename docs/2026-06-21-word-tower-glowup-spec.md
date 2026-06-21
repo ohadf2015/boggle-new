@@ -99,12 +99,17 @@ explicit ask) → 4 (randomness) → 7 (assets, bonus). Ship per phase; ask befo
 Net: **749 Word Tower tests green**, tsc clean for all WT files, lint clean, i18n parses ×5. Committed
 locally on `feature/word-tower-glowup` (`129d93b20` phases 1/2/5, `6ddcc6d8d` phase 4) — NOT pushed.
 
+- **Phase 6 ✅** — DesignSync mocks (`climb-hud.html`, `upgrade-shop.html`) synced to the LexiClash
+  Design System on claude.ai/design; source under `fe-next/.superdesign/claude-design/word-tower/`.
+- **Phase 7 ✅** — first biome-native creature: a Higgsfield kawaii cosmic jellyfish (PIL chroma-keyed)
+  wired as a Nebula-band parallax prop (`wt-nebula-jelly`, atM 580). Pipeline + provenance in
+  `daily-content/word-tower-biome-props-v1/`.
+
 ### Remaining (scoped follow-ups)
-- **Phase 3 — Pixi crane render layer:** the crane is still DOM. `cableStretchAt` + `dropQualityIntensity`
-  are tested + staged for this. Plan: add a Pixi crane layer (cable/hook/carried-beam) into the scene
-  with in-air dust + cable stretch-snap on release; keep DOM for input.
-- **Phase 6 — Claude Design (DesignSync) HUD mock** of the redesigned HUD for review.
-- **Phase 7 — Higgsfield biome ambient art** (sky/props) per biome.
+- **Phase 3 — Pixi crane render layer (NOT done):** the crane is still DOM. Its FEEL improved (cable
+  physics, drop quality) but a true Pixi render-layer migration is browser-verified work, risky to land
+  unsupervised. `cableStretchAt` + `dropQualityIntensity` are tested + staged for it.
+- More biome-native creatures (City/Sky/Stratosphere/Orbit/Galaxy) on the same Higgsfield pipeline.
 - Deferred upgrade effects (Wide Footing perfect-band widen, Quick Recovery lean) — need WYSIWYG-safe
   crane-band/lean threading.
 
