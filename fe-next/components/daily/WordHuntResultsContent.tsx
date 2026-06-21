@@ -164,6 +164,19 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     trackCrossPromoExposure();
   }, [trackCrossPromoExposure]);
 
+  // A/B: hide the dead "Tap a player to see their path" hint that causes rage clicks.
+  const { variant: hintVariant, trackExposure: trackHintExposure } =
+    useExperiment('exp-wordhunt-hint-v1');
+  useEffect(() => {
+    trackHintExposure();
+    trackGrowthEvent('wordhunt_results_loaded', {
+      solved: result.solved,
+      hint_variant: hintVariant,
+      language,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trackHintExposure]);
+
   const wheelCtaNode = !wordWheelPlayed && (
     <m.div
       data-testid="wordhunt-wheel-cta"
@@ -389,9 +402,10 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </div>
     )}
 
-    {(result.wordsDiscovered?.length ?? 0) > 0 && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
+    {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
 
     {/* Leaderboard — in place of the removed emoji share section */}
+    <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
     <TabbedDailyLeaderboard
       key={leaderboardKey}
       puzzleDate={puzzleDate}
@@ -405,6 +419,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       scope="word-hunt"
       myHuntWordsDiscovered={result.wordsDiscovered?.map(w => w.word)}
     />
+    </div>
 
     {/* SECONDARY CROSS-PROMO (variant): Word Wheel CTA below leaderboard. */}
     {crossPromoOrder === 'leaderboard-first' && wheelCtaNode}

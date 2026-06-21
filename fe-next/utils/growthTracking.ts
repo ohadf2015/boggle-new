@@ -194,7 +194,14 @@ export type GrowthEvent =
   | 'mp_quickplay_initiated'
   | 'mp_quickplay_socket_wait'
   | 'mp_quickplay_seeking'
-  | 'mp_quickplay_joined';
+  | 'mp_quickplay_joined'
+  // Word Hunt results page instrumentation — surfaces rage-click source.
+  // wordhunt_results_loaded: fires on mount, tagged with solved + hint_variant
+  //   (exp-wordhunt-hint-v1) so PostHog can split rage clicks by variant.
+  // wordhunt_leaderboard_tap: fires when user taps the leaderboard area;
+  //   high rate = evidence the dead tap-hint is confusing players.
+  | 'wordhunt_results_loaded'
+  | 'wordhunt_leaderboard_tap';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

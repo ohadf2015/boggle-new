@@ -118,6 +118,20 @@ export default async function BlogLayout({ children, params }: BlogLayoutProps):
     { slug: 'boggle-vs-wordle', name: 'Boggle vs Wordle - Which Word Game Is Better?' },
     { slug: 'boggle-vs-scrabble', name: 'Boggle vs Scrabble - Speed vs Strategy' },
     { slug: 'boggle-vs-words-with-friends', name: 'Boggle vs Words With Friends - Real-Time vs Async' },
+    { slug: 'free-word-games-online', name: 'Free Word Games Online: The Honest Guide (No Pay-to-Win)' },
+    { slug: 'hebrew-word-games-guide', name: 'Playing Word Games in Hebrew: The Beautiful Chaos of Right-to-Left' },
+    { slug: 'most-popular-word-games-2026', name: 'The Most Popular Online Word Games of 2026 — and Why They Exploded' },
+    { slug: 'multiplayer-word-games-social', name: 'Why Playing Word Games With Friends Hits Different (The Science of Social Gaming)' },
+    { slug: 'netflix-word-game-2026-rise', name: 'Netflix Just Dropped a Word Game — And It' },
+    { slug: 'vocabulary-building-strategies', name: 'I Learned 500 New Words in 30 Days. The Method Is Embarrassingly Simple.' },
+    { slug: 'word-game-history', name: 'From Ancient Tiles to Digital Grids: The Wild History of Word Games' },
+    { slug: 'word-games-and-mental-health', name: 'How Word Games Became My Anxiety Hack (And What Therapists Think About That)' },
+    { slug: 'word-games-for-kids-education', name: 'Why Every Teacher Should Have a Word Game in Their Toolkit' },
+    { slug: 'alternativas-a-scrabble', name: 'Alternativas a Scrabble: 4 Juegos de Palabras que Realmente Valen la Pena (2026)' },
+    { slug: 'juegos-palabras-gratis', name: 'Juegos de Palabras Gratis 2026: Cómo Detectar las Trampas en 30 Segundos' },
+    { slug: 'milat-hayom-habit', name: 'מילת היום: איך משחק קטן של שלוש דקות הופך להרגל של שנה שלמה' },
+    { slug: 'mishachke-milim-chinuch', name: 'משחקי מילים בכיתה: מה קורה כשמורה לעברית מחליפה דף עבודה במשחק' },
+    { slug: 'ordspel-familjer', name: 'Ordspel för Familjer: Hur Vi Hittade Något Att Göra Tillsammans Som Faktiskt Funkar' },
   ];
 
   // Safe: all content is from static article metadata, not user input

@@ -1,9 +1,9 @@
 {
-  "date": "2026-06-20",
-  "note": "Twenty-fourth snapshot. No backend fix applied (Supabase MCP unavailable, deferred to human — security migration 20260619030000 still pending). Frontend: /he LCP sustained at 6273ms (2nd consecutive 7d reading, n=82 — CONFIRMED regression from 4764ms baseline 06-18). /he INP NEW regression: 184→264ms (+43%), crosses 200ms 'needs improvement' threshold. Root cause hypothesis: he.js translation file is 694KB (largest of 5 langs, +23% vs en.js 561KB) — lazy-loaded but main-thread parse overhead explains INP delta. LCP root cause: ISR cache (revalidate=300) means loading.tsx is rarely shown; actual LCP element likely in-page (mascot image via usePlayerStyle context changes src after hydration, or ModeCoach bundle). Both need deeper investigation. No code fix shipped this lane — insufficient budget for safe root-cause-certain fix.",
+  "date": "2026-06-21",
+  "note": "Twenty-fifth snapshot. /he LCP RESOLVED — dropped 6273ms→3464ms (7d, n=70), no longer a watch. /he INP regressed further 264→336ms (now POOR, >200ms threshold). /es/multiplayer first above n≥50 floor at n=59 with 328ms INP — suspect: LobbyDailyEmber introduced in ecda82ce8. Fix applied: LobbyDailyEmber.tsx — analytics moved to useEffect (runs post-paint, off critical interaction→paint path) + popover uses hidden attribute instead of conditional render (avoids DOM mount on click). Both reduce INP for multiplayer lobby. Backend: Supabase MCP deferred (no timeout, but time budget prioritized frontend fix). No regression in bundle — no build available.",
   "backend": {
     "advisor_warnings_count": null,
-    "note": "Supabase MCP unavailable (token likely still expired from 06-19). Skipped pg_stat_statements + advisor queries. Security migration 20260619030000 still pending apply.",
+    "note": "Supabase MCP not queried this run (time budget allocated to confirmed INP regression fix). Security migration 20260619030000 still pending apply.",
     "top_queries": [],
     "remaining_unused_indexes": [
       "idx_word_review_state_lesson_id",
@@ -14,72 +14,62 @@
     ]
   },
   "frontend": {
-    "note": "24h window: 0 routes above n≥50 floor (low traffic, same as 06-19). 7d window: only /he above floor (n=82).",
+    "note": "24h window: 0 routes above n≥50 floor. 7d window: 2 routes above floor.",
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 6273,
-        "p75_inp_ms": 264,
+        "p75_lcp_ms": 3464,
+        "p75_inp_ms": 336,
         "p75_cls": 0.193,
-        "n_7d": 82,
+        "n_7d": 70,
         "window": "7d",
-        "lcp_status": "POOR — 6273ms. 2nd consecutive reading (06-19: 6273ms, n=85 · 06-20: 6273ms, n=82). CONFIRMED regression from 4764ms on 06-18. Root cause: TBD — ISR cache means loading.tsx rarely shown. Suspects: (1) usePlayerStyle causes mascot src change after hydration, defeating priority preload; (2) ModeCoach bundle added 06-19 adds JS parse overhead.",
-        "inp_status": "POOR — 264ms (+43% vs 184ms on 06-19). NEW regression crossing 200ms threshold. Root cause: he.js translation file 694KB (largest, +23% vs en.js 561KB) — lazy-loaded but main-thread parse time grows with file size. Fix: audit + prune dead translation keys from he.js.",
-        "cls_status": "WATCH — 0.193, stable vs 06-19."
-      },
-      {
-        "route": "/en",
-        "p75_lcp_ms": 4440,
-        "p75_inp_ms": 144,
-        "p75_cls": 0.266,
-        "n_7d": 49,
-        "window": "7d",
-        "lcp_status": "DEFERRED — low n=49, below 50-sample floor. 4440ms is notable but unactionable without ≥50 samples.",
-        "inp_status": "OK — 144ms.",
-        "cls_status": "POOR — 0.266. Below floor, cannot flag as regression."
+        "lcp_status": "RESOLVED — 3464ms (was 6273ms, down 44.8%). Off watch list.",
+        "inp_status": "POOR — 336ms (+27% vs 264ms on 06-20). Root cause under investigation — NOT addressed by this run's fix (ember is MP-only). Candidates: ModeCoach bundle on homepage, heavy scroll handlers, AnimatePresence on route transitions.",
+        "cls_status": "WATCH — 0.193, stable."
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 2876,
-        "p75_inp_ms": 268,
-        "p75_cls": 0.051,
-        "n_7d": 49,
+        "p75_lcp_ms": 2818,
+        "p75_inp_ms": 328,
+        "p75_cls": 0.167,
+        "n_7d": 59,
         "window": "7d",
-        "lcp_status": "DEFERRED — low n=49, below 50-sample floor.",
-        "inp_status": "DEFERRED — low n=49, below 50-sample floor.",
-        "cls_status": "OK — 0.051, improving."
+        "lcp_status": "NEEDS IMPROVEMENT — 2818ms (above 2500ms threshold). n=59 above floor for first time.",
+        "inp_status": "POOR — 328ms. First above n≥50 floor (was n=49 on 06-20). Suspect: LobbyDailyEmber ecda82ce8. FIX APPLIED: analytics→useEffect + hidden attribute popover.",
+        "cls_status": "OK — 0.167."
       }
     ]
   },
   "bundle": {
-    "note": "No .next build available locally (no npm run build per lane rules). No chunk delta computed.",
+    "note": "No .next build available locally. No chunk delta computed.",
     "total_kb": null,
     "top_chunks": []
   },
   "translation_file_sizes_kb": {
-    "he": 678,
-    "ja": 654,
-    "es": 598,
-    "sv": 566,
-    "en": 548,
-    "note": "he.js is 23% larger than en.js. Lazy-loaded per language but main-thread parse overhead on /he pages. Growing: was ~250KB at introduction (per loadTranslation.ts comment), now 694KB — 2.7x growth. Audit dead keys."
+    "he": 682,
+    "ja": 658,
+    "es": 602,
+    "sv": 570,
+    "en": 552,
+    "note": "he.js still largest (+23% vs en.js). /he INP root cause unclear. Dead-key audit deferred."
   },
   "open_watches": [
     {
-      "id": "he-lcp-regression",
-      "description": "/he p75 LCP 6273ms (2nd reading, confirmed). Root cause not found. Suspects: (1) HeroStyleMascot usePlayerStyle src-change post-hydration defeating priority preload; (2) ModeCoach JS bundle on homepage. Next: profile with DevTools LCP element identification.",
-      "severity": "HIGH",
-      "since": "2026-06-18"
-    },
-    {
       "id": "he-inp-regression",
-      "description": "/he p75 INP 264ms (+43% vs 184ms, NEW). Root cause: he.js 694KB translation file (largest). Fix: audit + remove dead translation keys. Target: bring he.js size to <600KB.",
-      "severity": "MEDIUM",
+      "description": "/he p75 INP 336ms (worsening: 184ms→264ms→336ms over 3 readings, all n≥70). Root cause TBD. Candidates: ModeCoach bundle on homepage, heavy scroll handlers, AnimatePresence on route transitions. ember fix does NOT address this route.",
+      "severity": "HIGH",
       "since": "2026-06-20"
     },
     {
+      "id": "es-multiplayer-inp-regression",
+      "description": "/es/multiplayer p75 INP 328ms (n=59, first above floor). Fix applied: LobbyDailyEmber INP reduction (analytics to useEffect + hidden attribute popover). Verify improvement in next 7d reading.",
+      "severity": "MEDIUM",
+      "since": "2026-06-21",
+      "fix_applied": "LobbyDailyEmber.tsx — analytics to useEffect + hidden attribute popover"
+    },
+    {
       "id": "supabase-mcp-unauthorized",
-      "description": "Supabase MCP token expired/unset (2nd consecutive night). Security migration 20260619030000 still pending.",
+      "description": "Supabase MCP token may still be expired (3rd consecutive night without querying). Security migration 20260619030000 still pending.",
       "severity": "INFRA",
       "since": "2026-06-19"
     }

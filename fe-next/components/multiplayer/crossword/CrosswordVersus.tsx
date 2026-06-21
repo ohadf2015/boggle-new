@@ -8,14 +8,14 @@
  * directly so it never edits the (churning) solo CrosswordView. Mirrors the
  * WordTower/Shiritori/SealedBid versus mounts.
  */
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { Socket } from 'socket.io-client';
 import { CheckCheck, Lightbulb, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import type { CrosswordPuzzle } from '@/lib/crossword/types';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
-import { crosswordStats } from '@/lib/crossword/stats';
+import { crosswordStats, solvedSlotIds } from '@/lib/crossword/stats';
 import { crosswordScore } from '@/lib/solo/soloReward';
 import { CrosswordGrid } from '@/components/crossword/CrosswordGrid';
 import { CrosswordKeyboard } from '@/components/crossword/CrosswordKeyboard';
@@ -65,6 +65,7 @@ function CrosswordRace({
   const game = useCrosswordGame(puzzle, {});
   const stats = crosswordStats(game.state);
   const solved = game.state.status === 'solved';
+  const mySolvedSlotIds = useMemo(() => solvedSlotIds(game.state), [game.state]);
   const hintsUsed = game.state.revealed.length;
 
   // Report progress on each newly-solved word + on final solve (word-granularity,
@@ -112,7 +113,7 @@ function CrosswordRace({
           </div>
           <details className="lg:hidden">
             <summary className="cursor-pointer font-neo-body text-xs text-neo-cream/60">{t('crossword.allClues')}</summary>
-            <CrosswordClueList slots={puzzle.slots} activeSlotId={game.activeSlot?.id ?? null} onSelect={(slot) => game.focusSlot(slot.id)} t={t} />
+            <CrosswordClueList slots={puzzle.slots} activeSlotId={game.activeSlot?.id ?? null} onSelect={(slot) => game.focusSlot(slot.id)} t={t} capturedSlotIds={mySolvedSlotIds} />
           </details>
         </div>
 

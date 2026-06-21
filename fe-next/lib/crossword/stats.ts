@@ -57,3 +57,18 @@ export function crosswordStats(state: GameState): CrosswordStats {
     percent,
   };
 }
+
+/** IDs of every slot where all cells are filled with the correct letter. */
+export function solvedSlotIds(state: GameState): string[] {
+  const { puzzle, entries } = state;
+  const result: string[] = [];
+  for (const slot of puzzle.slots) {
+    const done = slot.cells.every((c) => {
+      const entered = entries[`${c.row},${c.col}`];
+      const sol = puzzle.cells.find((x) => x.row === c.row && x.col === c.col)?.solution;
+      return !!entered && entered === sol;
+    });
+    if (done) result.push(slot.id);
+  }
+  return result;
+}

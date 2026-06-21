@@ -17,7 +17,7 @@
  * enriches only its own hero card.
  */
 
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { Flame, Check, X } from 'lucide-react';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { cn } from '@/lib/utils';
@@ -41,6 +41,7 @@ export function LobbyDailyEmber({ className }: Props) {
   const { hasPlayed, currentStreak, loading } = useDailyChallengeStatus(language);
   const [open, setOpen] = useState(false);
   const shownRef = useRef<string | null>(null);
+  const prevOpenRef = useRef(false);
   const popoverId = useId();
 
   const { kind, streak } = selectLobbyEmberState({ hasPlayed, currentStreak, loading });
@@ -53,15 +54,16 @@ export function LobbyDailyEmber({ className }: Props) {
     posthog.capture('growth:lobby_daily_ember_shown', { kind, streak, surface: 'mp_lobby' });
   }, [kind, streak]);
 
-  const handleToggle = useCallback(() => {
-    setOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        posthog.capture('growth:lobby_daily_ember_tapped', { kind, streak, surface: 'mp_lobby' });
-      }
-      return next;
-    });
-  }, [kind, streak]);
+  // Analytics fire AFTER paint (useEffect runs post-commit) — keeps analytics off the
+  // interaction→paint critical path, improving INP on multiplayer lobby.
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      posthog.capture('growth:lobby_daily_ember_tapped', { kind, streak, surface: 'mp_lobby' });
+    }
+    prevOpenRef.current = open;
+  }, [open, kind, streak]);
+
+  const handleToggle = () => setOpen((prev) => !prev);
 
   if (kind === 'hidden') return null;
 
@@ -98,12 +100,12 @@ export function LobbyDailyEmber({ className }: Props) {
         <span>{label}</span>
       </button>
 
-      {open && (
-        <div
+      <div
           id={popoverId}
           role="dialog"
           aria-label={t('lobbyDailyEmber.popoverTitle')}
           data-testid="lobby-daily-ember-popover"
+          hidden={!open}
           className="absolute z-30 mt-2 w-60 rounded-neo border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard-lg start-0"
         >
           <div className="flex items-start justify-between gap-2">
@@ -133,7 +135,6 @@ export function LobbyDailyEmber({ className }: Props) {
             {t('lobbyDailyEmber.gotIt')}
           </button>
         </div>
-      )}
     </div>
   );
 }

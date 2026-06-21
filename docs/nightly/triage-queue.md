@@ -957,3 +957,35 @@ These flags have active call sites and cannot be removed autonomously. All have 
   - link: https://lexiclash.sentry.io/issues/124871662/ (JAVASCRIPT-NEXTJS-1KQ, score 0.443)
   - status: deferred — external service 502; not a code fix
   - recommended owner: infra/human
+
+## 2026-06-21
+- [Sentry] [API] Word Wheel submit error: Could not find the 'is_catchup' column of 'daily_word_wheel_attempts' in the schema cache
+  - last seen: 2026-06-21, score 0.06, reach 0
+  - link: https://lexiclash.sentry.io/issues/125836250/
+  - root cause: migration `fe-next/supabase/migrations/20260607100000_word_wheel_catchup.sql` adds `is_catchup boolean NOT NULL DEFAULT false` to `daily_word_wheel_attempts` but was NOT applied to prod. `backend/routes/dailyChallenge/wordWheelRoutes.ts:108` inserts `is_catchup` on every word wheel submit → column missing → PostgREST schema cache error.
+  - fix: apply the migration. SQL is idempotent (`ADD COLUMN IF NOT EXISTS`). Safe, additive, reversible.
+    ```sql
+    ALTER TABLE public.daily_word_wheel_attempts
+      ADD COLUMN IF NOT EXISTS is_catchup boolean NOT NULL DEFAULT false;
+    CREATE INDEX IF NOT EXISTS idx_word_wheel_attempts_catchup
+      ON public.daily_word_wheel_attempts (player_id, is_catchup)
+      WHERE is_catchup = false;
+    ```
+  - status: deferred (Supabase MCP unavailable this run — blocked by token/timing)
+  - recommended owner: human — apply via Supabase dashboard SQL editor or `npx supabase db push` — takes 30s, zero blast radius
+
+- [Sentry] relation "profiles" does not exist (score 0.125, reach 5)
+  - link: https://lexiclash.sentry.io/issues/123033022/
+  - status: deferred (no time to diagnose root cause this run)
+  - recommended owner: review-by-eod — investigate which API route queries `profiles` without schema prefix
+
+- [Sentry] [CoinContext] Failed to add coins: Failed to process coin transaction (score 0.11, reach 5)
+  - link: https://lexiclash.sentry.io/issues/123033015/
+  - status: deferred (coin economy = human-queue per hard rules)
+  - recommended owner: human — HARD LINE: never touch coin economy autonomously
+
+## 2026-06-21 — Lane 03 engagement flag hygiene
+- `share-prompt-timing` (flag id 163656): ~72d running, ~0 experiment events. RECOMMEND KILL — delete flag + keep control code path. Status: open, human.
+- `show-signup-after-first-win` (flag id 163655): running 72d+, inconclusive (no statistically significant winner). RECOMMEND KILL — delete flag + keep control code path. Status: open, human.
+- `mp-signup-nudge-copy-v1` (flag id 183230): 0/77 converts in 28d+. RECOMMEND RETIRE — delete flag, keep `control` (sheet only, suppress toast). Status: open, human.
+- `exp-leaderboard-play-cta-v1` (flag id 209542): DEACTIVATED — variant-B still unwired (leaderboard/PageClient.tsx 519 lines, blocked on <500-line refactor). Do not re-enable until PageClient refactored. Status: blocked on refactor.

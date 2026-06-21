@@ -10,6 +10,8 @@ export interface CrosswordClueListProps {
   t: (key: string) => string;
   /** 'responsive' = 1 col then 2 at sm+ (mobile sheet). 'stacked' = always 1 col (desktop rail). */
   columns?: 'responsive' | 'stacked';
+  /** Slot IDs this player has correctly solved — renders a capture badge. */
+  capturedSlotIds?: string[];
 }
 
 /**
@@ -23,6 +25,7 @@ export function CrosswordClueList({
   onSelect,
   t,
   columns = 'responsive',
+  capturedSlotIds,
 }: CrosswordClueListProps) {
   const { across, down } = useMemo(() => {
     const byNum = (a: Slot, b: Slot) => a.number - b.number;
@@ -44,6 +47,7 @@ export function CrosswordClueList({
         slots={across}
         activeSlotId={activeSlotId}
         onSelect={onSelect}
+        capturedSlotIds={capturedSlotIds}
       />
       <Section
         dir="down"
@@ -51,6 +55,7 @@ export function CrosswordClueList({
         slots={down}
         activeSlotId={activeSlotId}
         onSelect={onSelect}
+        capturedSlotIds={capturedSlotIds}
       />
     </div>
   );
@@ -62,12 +67,14 @@ function Section({
   slots,
   activeSlotId,
   onSelect,
+  capturedSlotIds,
 }: {
   dir: 'across' | 'down';
   heading: string;
   slots: Slot[];
   activeSlotId: string | null;
   onSelect: (slot: Slot) => void;
+  capturedSlotIds?: string[];
 }) {
   return (
     <div
@@ -80,23 +87,30 @@ function Section({
       <ul className="flex flex-col">
         {slots.map((slot) => {
           const active = slot.id === activeSlotId;
+          const captured = capturedSlotIds?.includes(slot.id) ?? false;
           return (
             <li key={slot.id}>
               <button
                 type="button"
                 data-slot-number={slot.number}
+                data-captured={captured ? 'true' : undefined}
                 aria-current={active ? 'true' : undefined}
                 onClick={() => onSelect(slot)}
                 className={`flex w-full items-baseline gap-2 text-start rounded-none px-2 py-1 leading-snug transition-colors ${
                   active
                     ? 'bg-[#ffe9a8] text-neo-navy font-semibold'
-                    : 'text-neo-navy/90 hover:bg-black/5'
+                    : captured
+                      ? 'bg-neo-cyan/10 text-neo-navy/90 hover:bg-neo-cyan/20'
+                      : 'text-neo-navy/90 hover:bg-black/5'
                 }`}
               >
-                <span className="shrink-0 font-neo-display font-bold tabular-nums text-sm w-5 text-end">
+                <span className={`shrink-0 font-neo-display font-bold tabular-nums text-sm w-5 text-end ${captured ? 'text-neo-cyan' : ''}`}>
                   {slot.number}
                 </span>
                 <span className="font-neo-body text-sm">{slot.clue}</span>
+                {captured && (
+                  <span className="ml-auto shrink-0 text-neo-cyan text-[10px] font-bold" aria-label="captured">✓</span>
+                )}
               </button>
             </li>
           );

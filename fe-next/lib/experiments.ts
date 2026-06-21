@@ -471,6 +471,28 @@ export const EXPERIMENTS = {
     description:
       'Quit-confirm dialog with/without score+words context. stats-shown = surfaces current score + word count so player sees concrete sunk-cost before quitting. control = current generic dialog. Targets 42% game completion drop. Conversion = game_completed after game_abandon_attempted.',
   }),
+
+  /**
+   * Word Hunt results leaderboard tap-hint. PostHog rage-click signal on
+   * /he/daily/word-hunt (score 0.693). Root cause: line in results page
+   * reads "Tap a player to see their path" but TabbedDailyLeaderboard has
+   * NO onClick handlers — the promised interaction is dead, causing users
+   * to tap repeatedly with zero feedback.
+   *
+   * control = keep the misleading hint text (status quo).
+   * hide-hint = remove the hint text so nothing promises a non-existent interaction.
+   *
+   * Conversion: wordhunt_results_rage_click rate (guardrail metric — must drop).
+   * Guardrail: wordhunt_leaderboard_tap must not rise (no more attempts).
+   * Ship to PostHog: flag key = 'exp-wordhunt-hint-v1', 50/50 rollout.
+   * Wire: WordHuntResultsContent.tsx — conditional render of the hint p tag.
+   */
+  'exp-wordhunt-hint-v1': defineExperiment({
+    variants: ['control', 'hide-hint'] as const,
+    default: 'control',
+    description:
+      'Word Hunt leaderboard tap-hint A/B. control = shows "Tap a player to see their path" (dead interaction → rage clicks). hide-hint = removes the hint. Targets rage-click regression on /he/daily/word-hunt (score 0.693). Conversion = wordhunt_leaderboard_tap drops.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

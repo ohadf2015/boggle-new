@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { crosswordStats } from '../stats';
+import { crosswordStats, solvedSlotIds } from '../stats';
 import { initGame } from '../gameState';
 import type { CrosswordPuzzle } from '../types';
 
@@ -80,5 +80,27 @@ describe('crosswordStats', () => {
     expect(s.totalCells).toBe(3);
     expect(s.correctCells).toBe(3);
     expect(s.percent).toBe(100);
+  });
+});
+
+describe('solvedSlotIds', () => {
+  it('returns empty array when nothing is solved', () => {
+    const ids = solvedSlotIds(initGame(makePuzzle()));
+    expect(ids).toEqual([]);
+  });
+
+  it('returns only fully-correct slot IDs', () => {
+    // fill A1 = "ca" correctly, leave others empty
+    const game = initGame(makePuzzle(), { '0,0': 'c', '0,1': 'a' });
+    const ids = solvedSlotIds(game);
+    expect(ids).toContain('A1');
+    // D1 needs (1,0) too — not yet solved
+    expect(ids).not.toContain('D1');
+  });
+
+  it('returns all slot IDs when grid is fully solved', () => {
+    const game = initGame(makePuzzle(), { '0,0': 'c', '0,1': 'a', '1,0': 'a', '1,1': 't' });
+    const ids = solvedSlotIds(game);
+    expect(ids.sort()).toEqual(['A1', 'A3', 'D1', 'D2'].sort());
   });
 });

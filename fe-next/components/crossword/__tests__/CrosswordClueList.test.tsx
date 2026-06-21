@@ -85,4 +85,29 @@ describe('CrosswordClueList', () => {
     const sorted = [...numbers].sort((a, b) => a - b);
     expect(numbers).toEqual(sorted);
   });
+
+  describe('capture badges', () => {
+    it('marks captured slots with data-captured attribute', () => {
+      const { slots } = build();
+      const captured = slots[0];
+      render(
+        <CrosswordClueList slots={slots} activeSlotId={null} onSelect={() => {}} t={t} capturedSlotIds={[captured.id]} />,
+      );
+      const btn = screen.getByText(`clue-${captured.id}`).closest('button')!;
+      expect(btn.getAttribute('data-captured')).toBe('true');
+    });
+
+    it('shows checkmark only on captured slots', () => {
+      const { slots } = build();
+      const captured = slots[0];
+      const uncaptured = slots[1];
+      render(
+        <CrosswordClueList slots={slots} activeSlotId={null} onSelect={() => {}} t={t} capturedSlotIds={[captured.id]} />,
+      );
+      const capturedBtn = screen.getByText(`clue-${captured.id}`).closest('button')!;
+      const uncapturedBtn = screen.getByText(`clue-${uncaptured.id}`).closest('button')!;
+      expect(capturedBtn.querySelector('[aria-label="captured"]')).toBeTruthy();
+      expect(uncapturedBtn.querySelector('[aria-label="captured"]')).toBeNull();
+    });
+  });
 });
