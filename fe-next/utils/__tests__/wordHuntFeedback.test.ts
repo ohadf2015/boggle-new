@@ -56,6 +56,46 @@ describe('getLetterFeedback', () => {
       // but LABEL has L at position 4 too, so it's yellow
       expect(feedback[1].feedback).toBe('yellow');
     });
+
+    // Regression: the classic "Wordle duplicate letters" bug. A letter guessed
+    // more times than it appears in the target must not produce a false yellow.
+    // Colors map strictly to the target letter count: greens first, then yellows,
+    // and any extra guessed instances stay gray.
+    it('marks an extra duplicate as gray once the target count is exhausted (FOOD vs FOD)', () => {
+      const feedback = getLetterFeedback('FOOD', 'FOD');
+      expect(feedback.map(f => f.feedback)).toEqual([
+        'green', // F at position 0
+        'green', // first O claims the single target O
+        'gray', // second O is extra -> gray, NOT yellow
+        'yellow', // D exists in target but at a different position
+      ]);
+    });
+
+    it('caps yellows at the target letter count for triple duplicates (OOOZE vs PLUTO)', () => {
+      const feedback = getLetterFeedback('OOOZE', 'PLUTO');
+      // PLUTO has exactly one O (and not at position 0), so only the first
+      // guessed O may be yellow; the remaining two O's must be gray.
+      expect(feedback.map(f => f.feedback)).toEqual([
+        'yellow', // first O
+        'gray', // extra O
+        'gray', // extra O
+        'gray', // Z not in target
+        'gray', // E not in target
+      ]);
+    });
+
+    it('keeps both duplicates colored when the target has the same count (SPEED vs ERASE)', () => {
+      // ERASE has two E's, SPEED has two E's (neither in a matching position),
+      // so both guessed E's are legitimately yellow.
+      const feedback = getLetterFeedback('SPEED', 'ERASE');
+      expect(feedback.map(f => f.feedback)).toEqual([
+        'yellow', // S exists in ERASE, wrong spot
+        'gray', // P not in target
+        'yellow', // first E
+        'yellow', // second E (target also has two)
+        'gray', // D not in target
+      ]);
+    });
   });
 });
 
