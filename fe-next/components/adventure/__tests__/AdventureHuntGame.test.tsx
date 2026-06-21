@@ -16,6 +16,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
     language: 'en',
     dir: 'ltr',
   }),
+  // ConfirmationDialog (real, un-mocked) calls useLanguage() — provide it too.
+  useLanguage: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    dir: 'ltr',
+  }),
 }));
 
 vi.mock('@/contexts/ProgressionContext', () => ({
@@ -202,7 +208,11 @@ describe('AdventureHuntGame', () => {
     expect(screen.getByRole('button', { name: 'common.exit' })).toBeInTheDocument();
   });
 
-  it('calls onExit when exit button clicked', () => {
+  it('does NOT exit immediately — opens a quit confirmation dialog first', () => {
+    // Regression: tapping exit mid-match used to tear the scene down with no
+    // confirmation (window.history.back → blank Capacitor WebView / "black
+    // screen on exit"). Exit must now be gated behind a confirmation, matching
+    // classic AdventureGame and every other Word Hunt surface.
     render(
       <AdventureHuntGame
         levelConfig={makeHuntLevel()} initialGrid={baseGrid}
@@ -211,7 +221,34 @@ describe('AdventureHuntGame', () => {
       />
     );
     fireEvent.click(screen.getByRole('button', { name: 'common.exit' }));
+    expect(onExit).not.toHaveBeenCalled();
+    expect(screen.getByText('adventure.game.confirmExit')).toBeInTheDocument();
+  });
+
+  it('calls onExit only after the quit confirmation is confirmed', () => {
+    render(
+      <AdventureHuntGame
+        levelConfig={makeHuntLevel()} initialGrid={baseGrid}
+        onLevelComplete={onLevelComplete}
+        onExit={onExit}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'common.exit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'common.quit' }));
     expect(onExit).toHaveBeenCalledOnce();
+  });
+
+  it('does not exit when the quit confirmation is cancelled', () => {
+    render(
+      <AdventureHuntGame
+        levelConfig={makeHuntLevel()} initialGrid={baseGrid}
+        onLevelComplete={onLevelComplete}
+        onExit={onExit}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'common.exit' }));
+    fireEvent.click(screen.getByRole('button', { name: 'common.cancel' }));
+    expect(onExit).not.toHaveBeenCalled();
   });
 
   it('shows level badge W2·L3', () => {

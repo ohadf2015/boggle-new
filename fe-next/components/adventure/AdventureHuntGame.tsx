@@ -13,6 +13,7 @@ import { showAchievementToast } from '@/components/achievements/AchievementToast
 import { ADVENTURE_ACHIEVEMENTS } from '@/utils/adventureAchievementUtils';
 import { useAdventureWordValidation } from '@/hooks/useAdventureWordValidation';
 import { WordHuntGameLayout } from '@/components/wordhunt/WordHuntGameLayout';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { pickHuntTarget, HUNT_WRONG_GUESS_DAMAGE, HUNT_MAX_ATTEMPTS, getHuntLifePoints } from '@/lib/adventure/huntMode';
 import { getLetterFeedback } from '@/utils/wordHuntFeedback';
 import { cn } from '@/lib/utils';
@@ -154,6 +155,22 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
   const targetWord = state.targetWord;
   const targetLength = targetWord?.length ?? 0;
 
+  // Quit confirmation. Tapping exit mid-match used to call onExit directly,
+  // which fires window.history.back() and tears the live scene down with no
+  // gate — an accidental tap blanked the Capacitor WebView ("black screen on
+  // exit"). Gate it behind a confirmation like classic AdventureGame and every
+  // other Word Hunt surface (MP, daily Survival). Skip the prompt once the game
+  // is over (nothing left to lose) so the post-game exit stays one tap.
+  const [showExitConfirm, setShowExitConfirm] = React.useState(false);
+  const handleRequestExit = useCallback(() => {
+    if (state.isGameOver) { onExit(); return; }
+    setShowExitConfirm(true);
+  }, [state.isGameOver, onExit]);
+  const handleConfirmExit = useCallback(() => {
+    setShowExitConfirm(false);
+    onExit();
+  }, [onExit]);
+
   const completedRef = React.useRef(false);
   React.useEffect(() => {
     if (!state.targetFound || completedRef.current) return;
@@ -207,7 +224,7 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
     <div className="relative h-full w-full bg-neo-navy flex flex-col">
       {/* Exit button */}
       <button
-        onClick={onExit}
+        onClick={handleRequestExit}
         aria-label={t('common.exit')}
         className={cn(
           'absolute top-2 start-2 z-20 p-2 rounded-neo',
@@ -247,7 +264,7 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
           <WordHuntGameLayout
             // Header
             score={state.foundWords.length * 10}
-            onQuit={onExit}
+            onQuit={handleRequestExit}
 
             // Clue boxes
             targetLength={targetLength}
@@ -286,6 +303,19 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
           />
         </div>
       )}
+
+      {/* Quit confirmation — prevents accidental mid-match teardown / black screen */}
+      <ConfirmationDialog
+        open={showExitConfirm}
+        onOpenChange={setShowExitConfirm}
+        title={t('adventure.game.confirmExit')}
+        description={t('adventure.game.confirmExitDesc')}
+        confirmText={t('common.quit')}
+        cancelText={t('common.cancel')}
+        onConfirm={handleConfirmExit}
+        variant="danger"
+        analyticsId="adventure_hunt_quit_confirm"
+      />
     </div>
   );
 };
