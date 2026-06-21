@@ -185,3 +185,21 @@ describe('BlastHUD — Lucky Boost (DDA visibility)', () => {
     expect(screen.queryByTestId('blast-lucky-boost-chip')).toBeNull();
   });
 });
+
+// Neo-brutalist polish: full-contrast text + full-opacity borders, no soft
+// glows. Mirrors the Claude Design HUD mockup (.superdesign/claude-design/blast).
+describe('BlastHUD — neo-brutalist contrast polish', () => {
+  it('score label is full-contrast white (no opacity fade)', () => {
+    render(<BlastHUD {...baseProps} score={1234} />);
+    const label = screen.getByTestId('blast-score-label');
+    expect(label.className).toContain('text-white');
+    expect(label.className).not.toContain('text-white/70');
+  });
+
+  it('wave chip border is full-opacity cyan (not faded /40)', () => {
+    render(<BlastHUD {...baseProps} waveNumber={3} />);
+    const chip = screen.getByLabelText('blast.wave 3');
+    expect(chip.className).toContain('border-neo-cyan');
+    expect(chip.className).not.toContain('border-neo-cyan/40');
+  });
+});

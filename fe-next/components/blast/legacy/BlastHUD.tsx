@@ -241,7 +241,7 @@ export function BlastHUD({
           {/* Wave chip — hidden in MP (timer-era, no waves) */}
           {!isMultiplayer && (
             <span
-              className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan/40 text-neo-cyan tabular-nums"
+              className="shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg border-2 border-neo-cyan text-neo-cyan tabular-nums"
               style={NO_TEXT_SHADOW_STYLE}
               aria-label={`${t('blast.wave')} ${waveNumber}`}
             >
@@ -332,7 +332,7 @@ export function BlastHUD({
           </div>
           <span
             data-testid="blast-score-label"
-            className="text-[9px] font-bold uppercase tracking-wider text-white/70 leading-none mt-0.5"
+            className="text-[9px] font-bold uppercase tracking-wider text-white leading-none mt-0.5"
           >
             {t('blast.score')}
           </span>
@@ -404,7 +404,7 @@ export function BlastHUD({
           <div
             className={cn(
               'relative w-full h-2.5 bg-white/10 rounded-full overflow-hidden border transition-all duration-200',
-              clearPulse ? 'border-neo-lime/80 shadow-[0_0_10px_rgba(191,255,0,0.7)] scale-y-150' : 'border-white/10',
+              clearPulse ? 'border-neo-lime shadow-hard-sm scale-y-150' : 'border-white/10',
             )}
           >
             <div

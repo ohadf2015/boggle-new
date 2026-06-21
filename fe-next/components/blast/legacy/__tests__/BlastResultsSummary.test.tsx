@@ -347,3 +347,57 @@ describe('BlastResultsSummary', () => {
     expect(onQuit).toHaveBeenCalledTimes(1);
   });
 });
+
+// Neo-brutalist polish: flat solid surfaces (no soft gradients), full-contrast
+// text, and a celebratory confetti burst on a winning run. Mirrors the Claude
+// Design mockups under .superdesign/claude-design/blast/.
+describe('BlastResultsSummary — neo-brutalist polish', () => {
+  const noop = () => {};
+  const win = (o = {}) => makeResults({ clearPercentage: 95, stars: 3, ...o });
+  const fail = (o = {}) => makeResults({ clearPercentage: 50, ...o });
+
+  it('renders a celebratory confetti burst on a winning run', () => {
+    render(
+      <BlastResultsSummary results={win()} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    expect(screen.getByTestId('blast-results-confetti')).toBeDefined();
+  });
+
+  it('does NOT render confetti on a failed run', () => {
+    render(
+      <BlastResultsSummary results={fail()} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    expect(screen.queryByTestId('blast-results-confetti')).toBeNull();
+  });
+
+  it('score card uses a solid surface, not a soft gradient', () => {
+    render(
+      <BlastResultsSummary results={win()} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    const card = screen.getByTestId('blast-results-score-card');
+    expect(card.className).not.toMatch(/bg-linear|bg-gradient/);
+    expect(card.className).toContain('bg-neo-navy-light');
+  });
+
+  it('new-record ribbon uses a solid lime fill, not a gradient', () => {
+    render(
+      <BlastResultsSummary
+        results={win({ finalScore: 9000, previousBest: 6000 })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const card = screen.getByTestId('blast-results-score-card');
+    expect(card.innerHTML).not.toMatch(/from-neo-lime via-yellow/);
+  });
+
+  it('star-rating label uses full-contrast yellow (no opacity fade)', () => {
+    render(
+      <BlastResultsSummary results={win()} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    const label = screen.getByText('blast.stars3');
+    expect(label.className).toContain('text-yellow-400');
+    expect(label.className).not.toContain('text-yellow-400/80');
+  });
+});

@@ -21,6 +21,17 @@ const BADGE_ICONS: Record<string, IconType> = {
   Sparkles, Waves, Flag, Link: LinkIcon, Crown, BookOpen, Target, Trophy,
 };
 
+// Static confetti layout for the win celebration — deterministic so SSR and
+// client render identically (no Math.random). Full neo palette, hard borders.
+const CONFETTI_PIECES = [
+  { left: '8%', top: '12px', rotate: 12, size: 'w-3.5 h-3.5', color: 'bg-neo-lime' },
+  { left: '22%', top: '40px', rotate: -18, size: 'w-3 h-3', color: 'bg-neo-pink' },
+  { left: '40%', top: '8px', rotate: 24, size: 'w-2.5 h-2.5', color: 'bg-neo-cyan' },
+  { left: '58%', top: '44px', rotate: -8, size: 'w-3.5 h-3.5', color: 'bg-neo-yellow' },
+  { left: '74%', top: '14px', rotate: 16, size: 'w-3 h-3', color: 'bg-neo-purple' },
+  { left: '90%', top: '48px', rotate: -22, size: 'w-2.5 h-2.5', color: 'bg-neo-lime' },
+] as const;
+
 interface BlastResultsSummaryProps {
   results: BlastResultsData;
   t: (key: string, vars?: Record<string, string | number> | string) => string;
@@ -73,7 +84,29 @@ export function BlastResultsSummary({
       data-testid="blast-results-summary"
       data-fail={didFail ? 'true' : 'false'}
     >
-      <div className="flex-1 overflow-y-auto px-4 pt-6 pb-4 flex flex-col items-center gap-4">
+      <div className="relative flex-1 overflow-y-auto px-4 pt-6 pb-4 flex flex-col items-center gap-4">
+      {/* Celebratory confetti burst — only on a winning run. Hard-edged neo
+          blocks at deterministic positions (no Math.random → hydration-safe);
+          purely decorative so pointer-events-none + aria-hidden. */}
+      {!didFail && (
+        <div
+          data-testid="blast-results-confetti"
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-40 overflow-hidden"
+        >
+          {CONFETTI_PIECES.map((p, i) => (
+            <span
+              key={i}
+              className={cn(
+                'absolute block border-2 border-neo-black animate-neo-pop',
+                p.size,
+                p.color,
+              )}
+              style={{ left: p.left, top: p.top, transform: `rotate(${p.rotate}deg)` }}
+            />
+          ))}
+        </div>
+      )}
       {/* Mascot */}
       <AdaptiveMotion.div
         initial={{ scale: 0, rotate: -10, opacity: 0 }}
@@ -172,7 +205,7 @@ export function BlastResultsSummary({
           transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.05 }}
           className={cn(
             'inline-flex items-center gap-2 px-3 py-1.5',
-            'rounded-neo border-2 border-neo-black/30',
+            'rounded-neo border-2 border-neo-black',
             'bg-neo-navy-light text-neo-white',
             'font-neo-body font-bold text-xs',
           )}
@@ -189,7 +222,7 @@ export function BlastResultsSummary({
         transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.05 }}
         className={cn(
           'w-full rounded-neo border-3 border-neo-black shadow-hard-lg p-5 text-center',
-          'bg-linear-to-br from-neo-navy-light via-neo-navy to-neo-navy-light',
+          'bg-neo-navy-light',
         )}
         data-testid="blast-results-score-card"
       >
@@ -201,7 +234,7 @@ export function BlastResultsSummary({
             className={cn(
               'inline-flex items-center gap-1.5 px-3 py-1 mb-2',
               'rounded-neo border-3 border-neo-black shadow-hard',
-              'bg-linear-to-r from-neo-lime via-yellow-300 to-neo-lime',
+              'bg-neo-lime',
               'font-neo-display font-black uppercase tracking-wider text-xs text-neo-black',
             )}
           >
@@ -436,7 +469,7 @@ export function BlastResultsSummary({
                           'rounded-neo border-3 border-neo-black shadow-hard',
                           'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink',
                           badge.isNew
-                            ? 'bg-linear-to-r from-neo-lime via-yellow-300 to-neo-lime'
+                            ? 'bg-neo-lime'
                             : 'bg-neo-navy text-white',
                         )}
                         data-testid={`blast-badge-${badge.id}`}
@@ -590,7 +623,7 @@ function StarRating({ stars, label }: StarRatingProps) {
           />
         ))}
       </div>
-      <span className="text-[10px] uppercase tracking-widest font-black text-yellow-400/80">
+      <span className="text-[10px] uppercase tracking-widest font-black text-yellow-400">
         {label}
       </span>
     </div>
