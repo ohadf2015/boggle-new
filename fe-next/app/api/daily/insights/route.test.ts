@@ -112,6 +112,50 @@ describe('GET /api/daily/insights', () => {
     expect(p.subParams.n).toBeGreaterThan(0)
   })
 
+  it('dispatches the 3 independent queries in parallel (not awaited sequentially)', async () => {
+    // The today-attempt query must run first (it gates the rest), but history,
+    // peers and recent are independent and should be fired concurrently. We hold
+    // history pending and assert peers+recent still dispatch — sequential awaits
+    // would block them behind history; Promise.all fires all three at once.
+    const mockAttempt = { efficiency_score: 50, solved: false, attempts_used: 2 }
+    let resolveHistory!: (v: unknown) => void
+    const historyPending = new Promise((r) => { resolveHistory = r })
+    const historyLimit = vi.fn(() => historyPending)
+    const peersLimit = vi.fn(async () => ({ data: [], error: null }))
+    const recentOrder = vi.fn(async () => ({ data: [], error: null }))
+
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { getUser: async () => ({ data: { user: { id: 'u1' } }, error: null }) },
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn((k1: string) => {
+            if (k1 === 'player_id') {
+              return {
+                eq: vi.fn(() => ({ single: async () => ({ data: mockAttempt, error: null }) })),
+                order: vi.fn(() => ({ limit: historyLimit })),
+                gte: vi.fn(() => ({ order: recentOrder })),
+              }
+            }
+            if (k1 === 'puzzle_date') {
+              return { limit: peersLimit }
+            }
+            return {}
+          }),
+        })),
+      })),
+    } as never)
+
+    const p = GET(req('word_hunt'))
+    await new Promise((r) => setTimeout(r, 0)) // flush microtasks
+
+    expect(historyLimit).toHaveBeenCalled()
+    expect(peersLimit).toHaveBeenCalled()
+    expect(recentOrder).toHaveBeenCalled()
+
+    resolveHistory({ data: [], error: null })
+    await p
+  })
+
   it('skips percentile insight when user is below top 20%', async () => {
     // user score 30 beats only 1 of 5 peers → 80th percentile from bottom → not top 20
     const mockAttempt = { efficiency_score: 30, solved: false, attempts_used: 4 }

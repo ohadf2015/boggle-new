@@ -28,12 +28,26 @@ export async function GET(req: NextRequest) {
     if (!today) return NextResponse.json({ insights: [] })
 
     const score = today.efficiency_score ?? 0
+    const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0]
+
+    // history, peers and recent are independent reads (each only feeds its own
+    // insight). Dispatch them concurrently so the route pays one round-trip of
+    // latency instead of three. The `today` query above must stay sequential —
+    // it gates whether we run any of these at all.
+    const [{ data: history }, { data: peers }, { data: recent }] = await Promise.all([
+      supabase
+        .from('daily_word_hunt_attempts').select('efficiency_score')
+        .eq('player_id', user.id).order('efficiency_score', { ascending: false }).limit(20),
+      supabase
+        .from('daily_word_hunt_attempts').select('efficiency_score')
+        .eq('puzzle_date', date).limit(500),
+      supabase
+        .from('daily_word_hunt_attempts').select('efficiency_score,puzzle_date')
+        .eq('player_id', user.id).gte('puzzle_date', cutoff)
+        .order('puzzle_date', { ascending: false }),
+    ])
 
     // Personal best
-    const { data: history } = await supabase
-      .from('daily_word_hunt_attempts').select('efficiency_score')
-      .eq('player_id', user.id).order('efficiency_score', { ascending: false }).limit(20)
-
     const prevBest = (history ?? [])
       .filter((r: { efficiency_score: number }) => r.efficiency_score !== score)
       .reduce((max: number, r: { efficiency_score: number }) => Math.max(max, r.efficiency_score ?? 0), 0)
@@ -50,9 +64,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Percentile vs all players today (top 20% only)
-    const { data: peers } = await supabase
-      .from('daily_word_hunt_attempts').select('efficiency_score')
-      .eq('puzzle_date', date).limit(500)
     const peerScores = (peers ?? []).map((r: { efficiency_score: number }) => r.efficiency_score ?? 0)
     if (peerScores.length >= 5) {
       const below = peerScores.filter((s: number) => s < score).length
@@ -64,12 +75,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Speed vs 30-day average
-    const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0]
-    const { data: recent } = await supabase
-      .from('daily_word_hunt_attempts').select('efficiency_score,puzzle_date')
-      .eq('player_id', user.id).gte('puzzle_date', cutoff)
-      .order('puzzle_date', { ascending: false })
-
     const prevAttempts = (recent ?? []).filter((r: { puzzle_date: string }) => r.puzzle_date !== date)
     const recentScores = prevAttempts.map((r: { efficiency_score: number }) => r.efficiency_score ?? 0)
 

@@ -1,4 +1,5 @@
 'use client';
+import { memo } from 'react';
 import { m } from 'framer-motion';
 import type { CellId, TileFlag } from '@/lib/blast/v2/types';
 import styles from './BlastTile.module.css';
@@ -14,12 +15,15 @@ type Props = {
   fontStack: string;
   paddingExtra?: number;
   displayChar?: string;
-  onPointerDown?: () => void;
-  onPointerEnter?: () => void;
-  onPointerUp?: () => void;
+  // Pointer handlers receive this tile's CellId so the parent can pass ONE
+  // stable handler for the whole board instead of minting a closure per tile
+  // per render (which would defeat the React.memo wrapper below).
+  onPointerDown?: (cell: CellId) => void;
+  onPointerEnter?: (cell: CellId) => void;
+  onPointerUp?: (cell: CellId) => void;
 };
 
-export function BlastTile({
+function BlastTileImpl({
   letter,
   cellId: id,
   flags,
@@ -60,10 +64,10 @@ export function BlastTile({
         // can hit-test other tiles during a touch drag.
         const t = e.currentTarget as Element & { releasePointerCapture?: (id: number) => void };
         t.releasePointerCapture?.(e.pointerId);
-        onPointerDown?.();
+        onPointerDown?.(id);
       }}
-      onPointerEnter={() => onPointerEnter?.()}
-      onPointerUp={() => onPointerUp?.()}
+      onPointerEnter={() => onPointerEnter?.(id)}
+      onPointerUp={() => onPointerUp?.(id)}
     >
       <span className={styles.letter}>{displayChar ?? letter}</span>
       {hasCoin && <span data-flag="coin" className={styles.coin} />}
@@ -71,3 +75,8 @@ export function BlastTile({
     </m.div>
   );
 }
+
+// Memoized: tiles only re-render when their OWN props change (e.g. this tile's
+// selection state flips). During a drag the board re-renders on every pointer
+// move; without this, all N tiles would re-render each time.
+export const BlastTile = memo(BlastTileImpl);

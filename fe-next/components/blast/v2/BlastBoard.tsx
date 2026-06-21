@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useCallback, useEffect, useMemo } from 'react';
 import { LayoutGroup, AnimatePresence, m } from 'framer-motion';
-import type { BlastLevel, CellId } from '@/lib/blast/v2/types';
+import type { BlastLevel, CellId, TileFlag } from '@/lib/blast/v2/types';
 import { cellId as makeCellId, type SelectionState, type AlmostWord } from '@/lib/blast/v2/engine';
 import { LOCALE_CONFIGS } from '@/lib/blast/v2/locale-config';
 import { BlastTile, type BlastTileState } from './BlastTile';
@@ -10,6 +10,11 @@ import { BlastAlmostGhost } from './BlastAlmostGhost';
 import { useCollapseTimeline } from './useCollapseTimeline';
 import { useInvalidShake } from './useInvalidShake';
 import styles from './BlastTile.module.css';
+
+// Shared stable reference for flagless tiles. Using a literal `[]` in the render
+// loop would allocate a fresh array per tile per render, defeating BlastTile's
+// React.memo for every tile that has no flags.
+const EMPTY_FLAGS: TileFlag[] = [];
 
 type Props = {
   level: BlastLevel;
@@ -172,7 +177,7 @@ export function BlastBoard({
             <AnimatePresence>
               {col.tiles.map((letter, row) => {
                 const id = makeCellId(col.index, row);
-                const flags = level.tileFlags[id] ?? [];
+                const flags = level.tileFlags[id] ?? EMPTY_FLAGS;
                 const tileKey = tileIds[c]?.[row] ?? id;
                 const hasRevealGlow = revealGlowSet.has(id);
                 // Framer's LayoutGroup tracks the keyed child — promoting
@@ -202,7 +207,7 @@ export function BlastBoard({
                       modeColor={modeColor}
                       fontStack={config.fontStack}
                       paddingExtra={config.tileExtraPadding}
-                      onPointerDown={() => onPointerDown(id)}
+                      onPointerDown={onPointerDown}
                     />
                     {hasRevealGlow && (
                       <span data-reveal-glow className={styles.revealGlow} />
