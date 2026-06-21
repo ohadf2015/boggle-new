@@ -424,7 +424,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
 
   // Series tracking
   useEffect(() => {
-    if (showResults && resultsData?.scores) seriesTracker.recordRound(resultsData.scores);
+    if (showResults && resultsData?.scores) seriesTracker.recordRound(resultsData.scores, resultsData.gameSessionId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showResults, resultsData?.scores]);
 

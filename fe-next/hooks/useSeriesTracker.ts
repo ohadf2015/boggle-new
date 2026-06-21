@@ -4,7 +4,7 @@
  * Maintains a history of round scores for each player, computes accumulated
  * standings, rank changes, and provides data compatible with SessionStatsCard.
  */
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import type { PlayerResult } from '@/types/components';
 import type { Avatar } from '@/shared/types/game';
 
@@ -23,6 +23,11 @@ export interface SeriesStanding {
 }
 
 interface RoundSnapshot {
+  // Server's per-round identifier (gameSessionId), when available. Used to
+  // dedup the SAME round being re-emitted, without collapsing two distinct
+  // rounds that happen to have identical scores (e.g. vs-bots: human always 0
+  // + deterministic bots → identical scores every round).
+  roundId?: number | string;
   scores: Array<{ username: string; score: number; avatar?: AvatarLike }>;
 }
 
@@ -57,8 +62,19 @@ export function useSeriesTracker() {
     saveRounds(rounds);
   }, [rounds]);
 
-  const recordRound = useCallback((players: PlayerResult[]) => {
+  // Reference to the last players array recorded — used only on the no-roundId
+  // fallback path to swallow a double-fired effect (same array reference),
+  // while still counting genuinely distinct rounds.
+  const lastScoresRef = useRef<PlayerResult[] | null>(null);
+
+  const recordRound = useCallback((players: PlayerResult[], roundId?: number | string | null) => {
+    // No server round id: guard only against the identical effect re-firing
+    // (same array reference). Distinct rounds always arrive as new arrays.
+    if (roundId == null && lastScoresRef.current === players) return;
+    lastScoresRef.current = players;
+
     const snapshot: RoundSnapshot = {
+      roundId: roundId ?? undefined,
       scores: players.map(p => ({
         username: p.username,
         score: p.score,
@@ -67,20 +83,18 @@ export function useSeriesTracker() {
     };
 
     setRounds(prev => {
-      // Duplicate detection: compare by sorted username+score pairs
-      // (order-independent, since score arrays may arrive in different order)
-      if (prev.length > 0) {
-        const last = prev[prev.length - 1];
-        const sortKey = (s: { username: string; score: number }) => `${s.username}:${s.score}`;
-        const lastSorted = last.scores.map(sortKey).sort().join('|');
-        const snapSorted = snapshot.scores.map(sortKey).sort().join('|');
-        if (lastSorted === snapSorted) return prev;
+      // Dedup the SAME server round being re-emitted (reconnect / late
+      // validation update). Two distinct rounds with identical scores have
+      // different roundIds and are correctly kept.
+      if (roundId != null && prev.length > 0 && prev[prev.length - 1].roundId === roundId) {
+        return prev;
       }
       return [...prev, snapshot];
     });
   }, []);
 
   const reset = useCallback(() => {
+    lastScoresRef.current = null;
     setRounds([]);
   }, []);
 

@@ -337,8 +337,52 @@ describe('useSeriesTracker', () => {
         result.current.recordRound(scores);
       });
 
-      // Should still be round 1 since scores are identical
+      // Should still be round 1 — same array reference = a double-fired effect
       expect(result.current.roundNumber).toBe(1);
+    });
+
+    it('should count two DISTINCT rounds that happen to have identical scores (vs-bots bug)', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+
+      // Vs bots: human always 0, deterministic bots produce the SAME scores
+      // every round. These are genuinely different rounds (different roundId)
+      // and must both count, otherwise the series never reaches completion.
+      act(() => {
+        result.current.recordRound([makePlayer('You', 0), makePlayer('Bitsy', 120)], 1);
+      });
+      act(() => {
+        result.current.recordRound([makePlayer('You', 0), makePlayer('Bitsy', 120)], 2);
+      });
+
+      expect(result.current.roundNumber).toBe(2);
+    });
+
+    it('should dedup by roundId when the same server round is re-emitted', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+
+      act(() => {
+        result.current.recordRound([makePlayer('Alice', 100), makePlayer('Bob', 80)], 7);
+      });
+      // Same gameSessionId re-broadcast (reconnect / late validation update)
+      act(() => {
+        result.current.recordRound([makePlayer('Alice', 110), makePlayer('Bob', 90)], 7);
+      });
+
+      expect(result.current.roundNumber).toBe(1);
+    });
+
+    it('completes a vs-bots series of identical-score rounds with distinct roundIds', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+      const total = result.current.totalGames;
+
+      for (let i = 0; i < total; i++) {
+        act(() => {
+          result.current.recordRound([makePlayer('You', 0), makePlayer('Bitsy', 120)], i + 1);
+        });
+      }
+
+      expect(result.current.roundNumber).toBe(total);
+      expect(result.current.isSeriesComplete).toBe(true);
     });
   });
 });

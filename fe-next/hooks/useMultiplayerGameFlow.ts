@@ -20,6 +20,7 @@ interface ResultsData {
   letterGrid: string[][];
   duplicateRuleDisabled?: boolean;
   playerCount?: number;
+  gameSessionId?: number;
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, any> };
   wheelRushSummary?: { playerStats?: Record<string, any> };

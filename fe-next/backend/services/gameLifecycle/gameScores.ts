@@ -206,6 +206,9 @@ export async function calculateAndBroadcastFinalScores(
     duplicateRuleDisabled,
     playerCount,
     gameMode: game.gameMode,
+    // Per-round id so the client series tracker can dedup a re-emitted round
+    // without collapsing two distinct rounds that share identical scores.
+    gameSessionId: game.gameSessionId,
     wordHuntSummary,
     blastSummary,
     wheelRushSummary,
