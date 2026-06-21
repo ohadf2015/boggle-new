@@ -24,6 +24,9 @@ vi.mock('../ui', () => ({
     <div data-testid="clue-boxes" data-length={p.targetLength} />
   ),
   GameLiveRegion: () => <div data-testid="game-live-region" />,
+  PrimaryObjectiveBanner: (p: { objectives?: unknown[] }) => (
+    <div data-testid="primary-objective-banner" data-count={(p.objectives ?? []).length} />
+  ),
 }));
 vi.mock('../AdventureGameOverlays', () => ({
   default: (p: { handlePauseToggle?: () => void }) => (

@@ -140,4 +140,30 @@ describe('RPGLevelCard', () => {
       expect(screen.getByTestId('difficulty-skulls')).toBeInTheDocument();
     });
   });
+
+  describe('neo-brutalist hard chrome (no blur)', () => {
+    it('current card uses a hard offset shadow with no soft 0 0 blur glow', () => {
+      const { container } = render(<RPGLevelCard {...baseProps} stars={0} isCurrent />);
+      const card = container.firstChild as HTMLElement;
+      expect(card.style.boxShadow).toContain('4px 4px');
+      expect(card.style.boxShadow).not.toMatch(/0 0 \d+px/);
+    });
+
+    it('boss card box-shadow has no soft 0 0 blur glow', () => {
+      const { container } = render(<RPGLevelCard {...baseProps} levelNum={7} isBoss />);
+      const card = container.firstChild as HTMLElement;
+      expect(card.style.boxShadow).not.toMatch(/0 0 \d+px/);
+    });
+
+    it('card surface does not use backdrop-blur (no glassmorphism)', () => {
+      const { container } = render(<RPGLevelCard {...baseProps} />);
+      expect(container.innerHTML).not.toContain('backdrop-blur');
+    });
+
+    it('current level number text-shadow has no soft glow', () => {
+      render(<RPGLevelCard {...baseProps} stars={0} isCurrent />);
+      const num = screen.getByTestId('level-number') as HTMLElement;
+      expect(num.style.textShadow).not.toMatch(/0 0 \d+px/);
+    });
+  });
 });

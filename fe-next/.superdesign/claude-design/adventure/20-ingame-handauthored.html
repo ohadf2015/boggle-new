@@ -1,0 +1,104 @@
+<!-- @dsCard group="Adventure · In-Game" label="In-Game HUD + Board — NEO (graphic atmosphere)" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adventure In-Game — Neo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--navy:#1a1a2e;--navy-l:#16213e;--cream:#FFFEF0;--ink:#0a0a12;
+    --lime:#BFFF00;--pink:#FF1493;--cyan:#00FFFF;--purple:#8B5CF6;--yellow:#FFE135;--orange:#FF6B35;
+    --disp:'Fredoka',sans-serif;--body:'Rubik',sans-serif;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0b0b16;display:flex;justify-content:center;padding:24px;font-family:var(--body);}
+  .phone{width:390px;height:780px;border-radius:28px;overflow:hidden;position:relative;display:flex;flex-direction:column;
+    /* GRAPHIC ATMOSPHERE: bold flat color field + hard graphic depth, NO haze */
+    background:linear-gradient(180deg,#0a3a2a 0%,#0a3a2a 55%,#072a1e 55%,#072a1e 100%);}
+  .phone::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.16;
+    background-image:radial-gradient(rgba(191,255,0,.55) 1.1px,transparent 1.2px);background-size:14px 14px;}
+  /* graphic silhouette band (defined sprite-like shapes, not blur) */
+  .phone::after{content:'';position:absolute;left:0;right:0;top:46%;height:0;border-top:3px solid var(--ink);opacity:.5;}
+  /* HEADER — hard bar */
+  .gh{position:relative;z-index:5;display:flex;align-items:center;gap:8px;padding:12px;}
+  .exit{background:var(--navy);border:2px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 var(--ink);
+    color:var(--cream);font-weight:700;width:38px;height:38px;display:grid;place-items:center;font-size:18px;}
+  .mode{background:var(--lime);border:2px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 var(--ink);
+    color:var(--ink);font-family:var(--disp);font-weight:700;font-size:12px;padding:7px 10px;}
+  .score{margin-left:auto;background:var(--navy);border:3px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink);
+    padding:4px 14px;text-align:center;}
+  .score .lab{color:var(--lime);font-size:9px;font-weight:700;letter-spacing:1px;}
+  .score .v{font-family:var(--disp);font-size:24px;font-weight:700;color:var(--cream);line-height:1;text-shadow:2px 2px 0 var(--ink);}
+  .timer{background:var(--orange);border:2px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 var(--ink);
+    color:var(--ink);font-family:var(--disp);font-weight:700;font-size:15px;padding:6px 10px;display:flex;align-items:center;gap:4px;}
+  /* OBJECTIVE STRIP — clear single goal */
+  .obj{position:relative;z-index:5;margin:2px 12px 0;background:var(--navy-l);border:2px solid var(--ink);border-radius:10px;
+    box-shadow:3px 3px 0 var(--ink);padding:8px 12px;display:flex;align-items:center;gap:10px;}
+  .obj .ic{width:26px;height:26px;display:grid;place-items:center;background:var(--cyan);border:2px solid var(--ink);border-radius:7px;}
+  .obj .txt{color:var(--cream);font-weight:600;font-size:13px;flex:1;}
+  .obj .prog{font-family:var(--disp);font-weight:700;color:var(--cyan);font-size:15px;}
+  .pbar{height:8px;background:var(--ink);border-radius:6px;overflow:hidden;margin:6px 12px 0;border:2px solid var(--ink);position:relative;z-index:5;}
+  .pbar i{display:block;height:100%;width:62%;background:var(--cyan);}
+  /* COMBO JUICE badge */
+  .combo{position:absolute;top:150px;right:18px;z-index:8;background:var(--pink);border:3px solid var(--ink);border-radius:12px;
+    box-shadow:5px 5px 0 var(--ink);padding:6px 12px;transform:rotate(-6deg);text-align:center;}
+  .combo .x{font-family:var(--disp);font-weight:700;font-size:22px;color:var(--cream);line-height:1;text-shadow:2px 2px 0 var(--ink);}
+  .combo .l{font-size:9px;font-weight:700;color:var(--ink);letter-spacing:1px;}
+  /* BOARD */
+  .board{position:relative;z-index:5;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:9px;
+    padding:14px;background:rgba(8,20,14,.45);border:3px solid var(--ink);border-radius:16px;box-shadow:6px 6px 0 var(--ink);}
+  .tile{width:54px;height:54px;border:2px solid var(--ink);border-radius:10px;box-shadow:3px 3px 0 var(--ink);
+    display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:24px;color:var(--ink);background:var(--cream);position:relative;}
+  .tile small{position:absolute;bottom:3px;right:5px;font-size:9px;font-weight:700;opacity:.65;}
+  .tile.sel{background:var(--lime);box-shadow:3px 3px 0 var(--ink),0 0 0 3px var(--cyan);}
+  .tile.gold{background:var(--yellow);}
+  .tile.ice{background:#bdeaff;}
+  .tile.bomb{background:var(--orange);color:var(--cream);text-shadow:1px 1px 0 var(--ink);}
+  /* current word pill */
+  .word{position:relative;z-index:6;margin:0 auto 10px;background:var(--cyan);border:3px solid var(--ink);border-radius:12px;
+    box-shadow:4px 4px 0 var(--ink);padding:7px 18px;font-family:var(--disp);font-weight:700;font-size:20px;color:var(--ink);letter-spacing:2px;}
+  /* bottom action row */
+  .acts{position:relative;z-index:5;display:flex;gap:8px;padding:0 12px 14px;}
+  .act{flex:1;background:var(--navy);border:2px solid var(--ink);border-radius:10px;box-shadow:3px 3px 0 var(--ink);
+    color:var(--cream);font-weight:700;font-size:12px;padding:10px;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .act .hot{color:var(--yellow);}
+  .note{position:absolute;bottom:0;left:0;right:0;text-align:center;color:#9ff0c8;font-size:10px;font-weight:600;z-index:9;padding-bottom:3px;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="gh">
+      <div class="exit">✕</div>
+      <div class="mode">⚡ CLASSIC</div>
+      <div class="score"><div class="lab">SCORE</div><div class="v">2,480</div></div>
+      <div class="timer">⏱ 0:42</div>
+    </div>
+
+    <div class="obj">
+      <div class="ic">🎯</div>
+      <div class="txt">Find 3 words of 5+ letters</div>
+      <div class="prog">2/3</div>
+    </div>
+    <div class="pbar"><i></i></div>
+
+    <div class="combo"><div class="x">×4</div><div class="l">COMBO!</div></div>
+
+    <div class="board">
+      <div class="tile">S</div><div class="tile sel">P</div><div class="tile sel">L</div><div class="tile">R<small>1</small></div><div class="tile gold">A<small>★</small></div>
+      <div class="tile">T</div><div class="tile sel">A</div><div class="tile sel">S</div><div class="tile ice">E</div><div class="tile">N</div>
+      <div class="tile bomb">💣</div><div class="tile sel">H</div><div class="tile">O</div><div class="tile">D</div><div class="tile">I</div>
+      <div class="tile">E</div><div class="tile">R</div><div class="tile">M</div><div class="tile">C</div><div class="tile">U</div>
+      <div class="tile">L</div><div class="tile">N</div><div class="tile">T</div><div class="tile">A</div><div class="tile">E</div>
+    </div>
+
+    <div class="word">S P L A S H</div>
+
+    <div class="acts">
+      <div class="act">💡 Hint <span class="hot">★1</span></div>
+      <div class="act">🔀 Shuffle</div>
+      <div class="act">❄ Freeze</div>
+    </div>
+    <div class="note">NEO — hard HUD bar · single clear objective + bar · graphic flat-field atmosphere + halftone · juicy combo plate · framed tiles</div>
+  </div>
+</body>
+</html>

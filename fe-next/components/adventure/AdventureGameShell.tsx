@@ -6,7 +6,7 @@
  */
 import React, { memo } from 'react';
 import GameplayBackground from './themed/GameplayBackground';
-import { GameHeader, GameSidebar, GameGridArea, GameLayout, GameInfoStrip, AdventureHuntClueBoxes, GameLiveRegion } from './ui';
+import { GameHeader, GameSidebar, GameGridArea, GameLayout, GameInfoStrip, AdventureHuntClueBoxes, GameLiveRegion, PrimaryObjectiveBanner } from './ui';
 import AdventureGameOverlays, { type AdventureGameOverlaysProps } from './AdventureGameOverlays';
 import AdventureTailOverlays from './AdventureTailOverlays';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
@@ -112,15 +112,22 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
       <GameLayout
         isBossActive={isBossLevel && bossOrch.isBossActive && !bossOrch.showBossIntro && !showLevelComplete}
         belowHeader={
-          modeState.showTargetWordUI && huntTargetWord && huntTargetWord.length > 0 ? (
-            <div className="lg:hidden px-3 py-2 bg-neo-navy/70 border-b-2 border-neo-black/30">
-              <AdventureHuntClueBoxes
-                targetLength={huntTargetWord.length}
-                attempts={huntAttempts as never}
-                huntFound={huntFound}
-              />
-            </div>
-          ) : undefined
+          <>
+            {/* Primary-goal strip — mobile-only clarity (desktop shows full list in sidebar).
+                Hidden during active boss combat and hunt mode, which have their own goal UI. */}
+            {!(isBossLevel && bossOrch.isBossActive) && !modeState.showTargetWordUI && (
+              <PrimaryObjectiveBanner objectives={objectives as never} className="lg:hidden" />
+            )}
+            {modeState.showTargetWordUI && huntTargetWord && huntTargetWord.length > 0 ? (
+              <div className="lg:hidden px-3 py-2 bg-neo-navy/70 border-b-2 border-neo-black/30">
+                <AdventureHuntClueBoxes
+                  targetLength={huntTargetWord.length}
+                  attempts={huntAttempts as never}
+                  huntFound={huntFound}
+                />
+              </div>
+            ) : null}
+          </>
         }
         header={
           <GameHeader worldNumber={levelConfig.world} levelNumber={levelConfig.level}

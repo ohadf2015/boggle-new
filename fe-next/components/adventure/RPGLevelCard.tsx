@@ -47,12 +47,11 @@ const RPGLevelCard = memo(function RPGLevelCard({
   const isLocked = !isUnlocked;
   const isCompleted = stars > 0;
 
-  // Dynamic shadow: world-colored glow for current/boss, hard black otherwise
-  const cardShadow = isCurrent
-    ? `4px 4px 0px black, 0 0 20px ${glowColor}`
-    : isBoss
-      ? '4px 4px 0px rgba(255,51,102,0.5), 0 0 16px rgba(255,51,102,0.2)'
-      : '4px 4px 0px black';
+  // Neo-brutalist hard shadow — solid offset, NO blur. Boss gets a hard red-tinted
+  // offset; current is differentiated by its lime border + pulse ring (below).
+  const cardShadow = isBoss
+    ? '5px 5px 0px rgba(255,51,102,0.65)'
+    : '4px 4px 0px black';
 
   return (
     <AdaptiveMotion.div
@@ -88,7 +87,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
       {/* Card background */}
       <div className={cn(
         'relative',
-        'bg-[rgba(15,15,35,0.9)] backdrop-blur-xs',
+        'bg-[#0f0f23]',
         isBoss && 'min-h-[160px]',
       )}>
         {/* Top accent strip — world-colored gradient for unlocked, muted for locked */}
@@ -136,11 +135,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
                 isBoss ? 'text-5xl' : 'text-4xl sm:text-5xl',
                 isCurrent ? 'text-neo-white' : isCompleted ? 'text-neo-white' : 'text-neo-white',
               )}
-              style={{
-                textShadow: isCurrent
-                  ? `2px 2px 0px rgba(0,0,0,0.8), 0 0 12px ${glowColor}`
-                  : '2px 2px 0px rgba(0,0,0,0.8)',
-              }}
+              style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.8)' }}
             >
               {levelNum}
             </span>
@@ -160,7 +155,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
                       ? 'w-5 h-5 text-neo-yellow fill-neo-yellow'
                       : 'w-4 h-4 text-neo-white fill-neo-white/5'
                   )}
-                  style={isFilled ? { filter: 'drop-shadow(0 0 5px rgba(255,225,53,0.5))' } : undefined}
+                  style={isFilled ? { filter: 'drop-shadow(1px 1px 0 rgba(0,0,0,0.9))' } : undefined}
                 />
               );
             })}
@@ -203,15 +198,6 @@ const RPGLevelCard = memo(function RPGLevelCard({
           )}
         </div>
 
-        {/* Inner ambient glow for current level */}
-        {isCurrent && isUnlocked && (
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: `radial-gradient(ellipse at 50% 30%, ${glowColor.replace(/[\d.]+\)$/, '0.08)')}, transparent 70%)`,
-            }}
-          />
-        )}
       </div>
 
       {/* Perfect crown badge */}

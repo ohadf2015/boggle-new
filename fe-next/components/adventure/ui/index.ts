@@ -13,3 +13,4 @@ export { GameLayout } from './GameLayout';
 export { GameInfoStrip } from './GameInfoStrip';
 export { default as AdventureHuntClueBoxes } from './AdventureHuntClueBoxes';
 export { GameLiveRegion } from './GameLiveRegion';
+export { PrimaryObjectiveBanner } from './PrimaryObjectiveBanner';

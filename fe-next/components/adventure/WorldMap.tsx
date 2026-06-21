@@ -128,15 +128,16 @@ const WorldNode = memo(function WorldNode({
   // while drop-shadow triggers a separate paint + compositing pipeline per element.
   const orbButtonStyle = useMemo<CSSProperties>(() => {
     if (!isUnlocked) return { filter: 'grayscale(1) brightness(0.5)' };
+    // Neo-brutalist: hard solid offset shadow, NO blur glow.
     return {
-      boxShadow: `0 0 16px ${glowColor}, 0 0 32px ${glowColor}`,
+      boxShadow: '5px 5px 0px rgba(10,10,18,0.9)',
     };
-  }, [isUnlocked, glowColor]);
+  }, [isUnlocked]);
 
+  // Flat hard-edged colored halo behind the orb — graphic backing, NOT a blurred glow.
   const glowBgStyle = useMemo<CSSProperties>(() => ({
-    background: `radial-gradient(circle, ${glowColor} 0%, ${glowColor.replace(/[\d.]+\)$/, '0.25)')} 45%, transparent 72%)`,
-    transform: 'scale(1.6)',
-    filter: 'blur(16px)',
+    background: glowColor,
+    transform: 'scale(1.18)',
     zIndex: 0,
   }), [glowColor]);
 
@@ -156,7 +157,7 @@ const WorldNode = memo(function WorldNode({
     background: isUnlocked
       ? `linear-gradient(90deg, ${glowColor}, ${glowColor.replace(/[\d.]+\)$/, '0.6)')})`
       : 'rgba(255,255,255,0.1)',
-    boxShadow: isUnlocked && currentStars > 0 ? `0 0 8px ${glowColor}` : 'none',
+    boxShadow: 'none',
   }), [isUnlocked, glowColor, currentStars, totalWorldStars]);
 
   const cardBottomGradientStyle = useMemo<CSSProperties>(() => ({
