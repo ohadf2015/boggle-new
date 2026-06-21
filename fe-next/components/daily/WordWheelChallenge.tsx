@@ -21,6 +21,7 @@ import {
   getTodaysWordWheelResult,
   saveWordWheelResult,
   getDailyStreak,
+  updateDailyStreak,
   hasPlayedWordWheel,
   getWordWheelResultForDate,
 } from '@/utils/dailyChallenge';
@@ -307,7 +308,13 @@ const WordWheelChallenge: React.FC = () => {
 
     const gameLang = language as Language;
     const date = catchupDate || getDailyChallengeDate();
-    const streak = getDailyStreak();
+    // Completing today's daily advances the streak — mirror Word Hunt, which is
+    // the only mode that used to call this. Without it a player whose daily is the
+    // Word Wheel fills the progress strip but their streak stays pinned at 0.
+    // Streak tracking is for authenticated users only; catch-up plays of past
+    // puzzles must not rewrite the live streak's last-played date.
+    const streak =
+      isAuthenticated && !isCatchup ? updateDailyStreak(date) : getDailyStreak();
 
     saveWordWheelResult({
       puzzleNumber,

@@ -1,12 +1,13 @@
 /**
- * Cross-device sync: when localStorage on this device has no Word Wheel result
- * but the server reports the player already submitted today's puzzle, the
- * component must hydrate the result and show 'already-played' instead of
- * letting the user replay.
+ * Streak advancement: completing today's Word Wheel daily must advance the daily
+ * streak (`updateDailyStreak`), exactly like the Word Hunt daily already does.
+ * Regression guard for the bug where a player whose daily is the Word Wheel
+ * filled the home progress strip but their streak stayed pinned at 0 — because
+ * `saveWordWheelResult` never touched the streak.
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import WordWheelChallenge from '../WordWheelChallenge';
 
 vi.mock('next/dynamic', () => ({
@@ -38,7 +39,7 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 }));
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
-    profile: { id: 'player-123', display_name: 'P', avatar_emoji: '🎯', avatar_color: '#fff' },
+    profile: { id: 'player-77', display_name: 'P', avatar_emoji: '🎯', avatar_color: '#fff' },
     isAuthenticated: true,
   }),
 }));
@@ -47,15 +48,21 @@ vi.mock('@/contexts/NavigationContext', () => ({
 }));
 
 const saveWordWheelResultMock = vi.fn();
+const updateDailyStreakMock = vi.fn(() => ({
+  currentStreak: 5,
+  longestStreak: 5,
+  lastPlayedDate: '2026-04-27',
+  totalDailiesCompleted: 5,
+}));
 vi.mock('@/utils/dailyChallenge', () => ({
-  getDailyChallengeDate: () => '2026-04-25',
-  getPuzzleNumber: () => 117,
+  getDailyChallengeDate: () => '2026-04-27',
+  getPuzzleNumber: () => 119,
   hasPlayedWordWheelToday: () => false,
   getTodaysWordWheelResult: () => null,
   saveWordWheelResult: (...args: unknown[]) => saveWordWheelResultMock(...args),
   hasPlayedWordHuntToday: () => false,
-  getDailyStreak: () => ({ currentStreak: 0 }),
-  updateDailyStreak: vi.fn(() => ({ currentStreak: 1, longestStreak: 1, lastPlayedDate: null, totalDailiesCompleted: 1 })),
+  getDailyStreak: () => ({ currentStreak: 4 }),
+  updateDailyStreak: (...args: unknown[]) => updateDailyStreakMock(...args),
 }));
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
   generateWordWheelPuzzle: () => ({
@@ -67,6 +74,7 @@ vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({
 vi.mock('@/utils/guestManager', () => ({
   getGuestFingerprint: () => null,
 }));
+vi.mock('@/hooks/fastValidateWord', () => ({ fastValidateWord: () => true }));
 
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: () => ({
@@ -77,9 +85,14 @@ vi.mock('@/hooks/useRewardedAd', () => ({
   }),
 }));
 
+type GameProps = { onComplete: (r: { wordsFound: string[]; score: number; timeSeconds: number }) => void };
+let capturedOnComplete: GameProps['onComplete'] | null = null;
 vi.mock('../WordWheelGame', () => ({
   __esModule: true,
-  default: () => <div data-testid="word-wheel-game" />,
+  default: (props: GameProps) => {
+    capturedOnComplete = props.onComplete;
+    return <div data-testid="word-wheel-game" />;
+  },
 }));
 vi.mock('../WordWheelResults', () => ({
   __esModule: true,
@@ -92,24 +105,16 @@ vi.mock('../TabbedDailyLeaderboard', () => ({
 
 beforeEach(() => {
   saveWordWheelResultMock.mockReset();
+  updateDailyStreakMock.mockClear();
+  capturedOnComplete = null;
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string) => {
-      if (url.includes('/api/daily-challenge/word-wheel/check-played/')) {
-        return new Response(
-          JSON.stringify({
-            hasPlayed: true,
-            result: {
-              wordsFound: ['CAB', 'BAD'],
-              score: 42,
-              timeSeconds: 95,
-              longestWord: 'CAB',
-              centerLetter: 'A',
-              completedAt: '2026-04-25T10:00:00.000Z',
-            },
-          }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
+      if (url.includes('/check-played/')) {
+        return new Response(JSON.stringify({ hasPlayed: false }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }
       return new Response('{}', { status: 200 });
     })
@@ -120,27 +125,31 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('WordWheelChallenge - cross-device server sync', () => {
-  it('GIVEN authenticated player with empty local storage AND server reports already played THEN renders already-played view (results), not the ready screen', async () => {
+describe('WordWheelChallenge — streak advancement', () => {
+  it('GIVEN an authenticated player completes today\'s Word Wheel THEN updateDailyStreak is called with today\'s date and the saved result records the advanced streak', async () => {
     render(<WordWheelChallenge />);
 
+    const playButton = await screen.findByText('daily.play');
+    fireEvent.click(playButton);
+
     await waitFor(() => {
-      expect(screen.getByTestId('word-wheel-results')).toBeInTheDocument();
+      expect(capturedOnComplete).not.toBeNull();
     });
 
-    expect(screen.queryByTestId('tabbed-daily-leaderboard')).not.toBeInTheDocument();
+    await act(async () => {
+      capturedOnComplete!({ wordsFound: ['CAB', 'BAD'], score: 42, timeSeconds: 60 });
+    });
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/daily-challenge/word-wheel/check-played/2026-04-25/en'),
-      expect.anything()
-    );
+    await waitFor(() => {
+      expect(updateDailyStreakMock).toHaveBeenCalledWith('2026-04-27');
+    });
 
-    expect(saveWordWheelResultMock).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(saveWordWheelResultMock).toHaveBeenCalled();
+    });
     expect(saveWordWheelResultMock.mock.calls[0][0]).toMatchObject({
       score: 42,
-      wordsFound: ['CAB', 'BAD'],
-      language: 'en',
-      puzzleDate: '2026-04-25',
+      streakDays: 5,
     });
   });
 });
