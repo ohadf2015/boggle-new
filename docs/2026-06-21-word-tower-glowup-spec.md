@@ -92,8 +92,27 @@ explicit ask) → 4 (randomness) → 7 (assets, bonus). Ship per phase; ask befo
   deferred** (kept in economy, hidden from shop via `LIVE_UPGRADE_IDS`): Wide Footing (perfect-band
   widen) + Quick Recovery (lean recovery) — both need WYSIWYG-sensitive crane-band/lean wiring. +15 tests.
 
-Net: 745 Word Tower tests green, tsc/lint clean, i18n parses ×5. Phases 3 (Pixi crane), 4 (randomness),
-6 (Claude Design), 7 (assets) remain.
+- **Phase 4 ✅** — `generateWheel` caps any letter to `WORD_TOWER_WHEEL_MAX_SAME` (2) via bounded
+  deterministic re-draws — kills "3-of-a-kind" dud rings, preserves determinism/length/bag/vowel
+  guarantee, relaxes only when a bag lacks distinct letters. +4 tests.
+
+Net: **749 Word Tower tests green**, tsc clean for all WT files, lint clean, i18n parses ×5. Committed
+locally on `feature/word-tower-glowup` (`129d93b20` phases 1/2/5, `6ddcc6d8d` phase 4) — NOT pushed.
+
+### Remaining (scoped follow-ups)
+- **Phase 3 — Pixi crane render layer:** the crane is still DOM. `cableStretchAt` + `dropQualityIntensity`
+  are tested + staged for this. Plan: add a Pixi crane layer (cable/hook/carried-beam) into the scene
+  with in-air dust + cable stretch-snap on release; keep DOM for input.
+- **Phase 6 — Claude Design (DesignSync) HUD mock** of the redesigned HUD for review.
+- **Phase 7 — Higgsfield biome ambient art** (sky/props) per biome.
+- Deferred upgrade effects (Wide Footing perfect-band widen, Quick Recovery lean) — need WYSIWYG-safe
+  crane-band/lean threading.
+
+### Build note
+`npm run build` is currently red from TWO pre-existing, non-Word-Tower issues: a stale
+`.next-dev-verify/` validator referencing the deleted `profile-preview` throwaway route, and an unrelated
+`components/adventure/ui/PrimaryObjectiveBanner.tsx` error from another session's uncommitted work. All WT
+files are tsc-clean (unfiltered `tsc`: 2 errors, 0 in WT).
 
 ## Guardrails
 - Mode stays flag/admin-gated; additive only; don't regress the 84 existing tests.
