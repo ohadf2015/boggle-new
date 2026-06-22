@@ -421,13 +421,15 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [showModeReveal, showStartAnimation, letterGrid, remainingTime, gameActive, waitingForResults, timerResume]);
 
-  // Auto-dismiss mode reveal after 2 seconds, then trigger countdown.
+  // Auto-dismiss mode reveal, then trigger countdown. Kept short (1.1s) so the
+  // splash → 3-2-1 handoff reads as one quick flourish rather than two separate
+  // full-screen "screens" — the laggy mid-start screen-switching players reported.
   // MP enters round same for first-time + returning players (no cozy fork).
   useEffect(() => {
     if (!showModeReveal) return;
     const timer = setTimeout(() => {
       dispatchReveal({ type: 'endReveal' });
-    }, 2000);
+    }, 1100);
     return () => clearTimeout(timer);
   }, [showModeReveal]);
 
@@ -746,6 +748,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
             if (socket) sendCountdownComplete(socket, id, 'PLAYER');
           }}
           t={t}
+          players={playersReady}
         />
       )}
       {/* First-time achievement celebrations for new players */}

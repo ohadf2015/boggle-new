@@ -15,7 +15,7 @@
 import type { Server } from 'socket.io';
 import type { Language, BlastModeState } from '@/shared/types/game';
 import type { Bot } from '../../modules/botBehavior';
-import { getGame, updatePlayerScore, addPlayerWord, recordFirstFinder, trackBotWord, getLeaderboard } from '../../modules/gameStateManager';
+import { getGame, updatePlayerScore, addPlayerWord, recordFirstFinder, trackBotWord } from '../../modules/gameStateManager';
 import {
   calculateBlastTileBonus,
   getTilesOnPath,
@@ -34,7 +34,7 @@ import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../uti
 import { findAllWords, getCachedTrie } from '../../modules/boggleSolver';
 import { setBotTimeout } from '../../modules/botLifecycle';
 import { ensureLanguageLoaded } from '../../dictionary';
-import { shouldBotScore } from './botGame';
+import { shouldBotScore, emitBotLeaderboard } from './botGame';
 import { BOT_CONFIG } from '../../modules/botConfig';
 import { makePositionsMap } from '../../modules/wordValidator';
 import logger from '../../utils/logger';
@@ -210,8 +210,12 @@ export function submitBlastWord(
       isFirstFinder,
     });
 
-    const leaderboard = getLeaderboard(gameCode);
-    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'updateLeaderboard', { leaderboard });
+    // Live leaderboard broadcast — route through the SHARED throttled path used
+    // by every other mode (classic/word-hunt/wheel-rush). Blast previously emitted
+    // an unthrottled per-word `updateLeaderboard`, diverging from the proven path;
+    // emitBotLeaderboard caps total leaderboard broadcasts (humans + bots) while
+    // preserving leading + trailing edges so bot scores update live, never stale.
+    emitBotLeaderboard(io, gameCode);
 
     logger.info('BOT_BLAST', `Bot "${bot.username}" submitted "${word}" (+${totalScore}) in ${gameCode}`);
     // Board refresh handled by regenerateBlastBoardIfExhausted above (shared path).

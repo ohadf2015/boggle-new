@@ -2,14 +2,41 @@ import React, { useEffect, useState, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { prefersStaticFullscreenOverlay } from '../lib/native/webViewLayerFlash';
+import Avatar from './Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 const RING_SIZE_STYLE = { width: 120, height: 120 } as const;
 const GO_TEXT_SHADOW_STYLE = { textShadow: '2px 2px 0px rgba(255,255,255,0.3)' } as const;
+
+/** Max avatars shown in the pre-game hype row — keep it a glanceable few. */
+const MAX_COUNTDOWN_AVATARS = 5;
+
+export interface CountdownPlayer {
+  username: string;
+  avatar?: { customAvatar?: CustomAvatarConfig | null } | null;
+  isBot?: boolean;
+  disconnected?: boolean;
+}
 
 interface GoRipplesAnimationProps {
   onComplete?: () => void;
   /** Translation function for hints */
   t?: (key: string) => string;
+  /**
+   * Roster shown as a row of bouncing avatars above the countdown to build
+   * pre-game excitement ("who am I about to play?"). Humans are prioritized over
+   * bots and the row is capped at MAX_COUNTDOWN_AVATARS. Optional — omit to hide.
+   */
+  players?: ReadonlyArray<CountdownPlayer>;
+}
+
+/** Pick a glanceable few players for the hype row: connected humans first, then the rest. */
+function selectCountdownAvatars(players?: ReadonlyArray<CountdownPlayer>): CountdownPlayer[] {
+  if (!players || players.length === 0) return [];
+  const connected = players.filter(p => !p.disconnected);
+  const humans = connected.filter(p => !p.isBot);
+  const bots = connected.filter(p => p.isBot);
+  return [...humans, ...bots].slice(0, MAX_COUNTDOWN_AVATARS);
 }
 
 // Module-level latch: blocks a duplicate mount within DUP_GUARD_MS of the last
@@ -29,7 +56,7 @@ export function __resetGoRipplesDupGuard(): void {
  * Minimal & calm pre-game countdown with smooth animations
  * Clean 3-2-1-GO with soft cyan glow - easy on the eyes
  */
-const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }) => {
+const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t, players }) => {
   // Lazy-init reads `Date.now()` only at first mount — keeps the render pure
   // for the React Compiler while still latching the dup-guard verdict.
   const [isDuplicate] = useState(() => Date.now() - lastCompletedAt < DUP_GUARD_MS);
@@ -95,8 +122,39 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
   // bounded elements whose entrance tweens start at `opacity: 0`, so they never
   // expose an uninitialised white compositor backing — only a full-screen
   // animated root does (see the native branch).
+  const countdownAvatars = selectCountdownAvatars(players);
+
   const countdownContent = (
     <>
+      {/* Pre-game hype: a few player avatars bouncing with excitement above the
+          countdown so players see who they're about to face before "GO!". */}
+      {countdownAvatars.length > 0 && (
+        <div
+          data-testid="countdown-avatars"
+          className="absolute top-[24%] flex items-center justify-center -space-x-2"
+        >
+          {countdownAvatars.map((p, i) => (
+            <m.div
+              key={p.username}
+              initial={{ scale: 0, y: 0 }}
+              animate={{ scale: 1, y: [0, -8, 0] }}
+              transition={{
+                scale: { delay: 0.1 + i * 0.08, type: 'spring', stiffness: 400, damping: 16 },
+                y: { delay: 0.1 + i * 0.08, duration: 0.7, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' },
+              }}
+              className="rounded-full border-3 border-neo-black bg-neo-navy shadow-hard-sm"
+            >
+              <Avatar
+                pixelSize={40}
+                customAvatar={p.avatar?.customAvatar ?? null}
+                userId={p.username}
+                className="rounded-full"
+              />
+            </m.div>
+          ))}
+        </div>
+      )}
+
       {/* Single subtle expanding ring for GO */}
       <AnimatePresence>
         {isGo && (
