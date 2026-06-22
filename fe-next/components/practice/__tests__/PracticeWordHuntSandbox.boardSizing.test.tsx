@@ -61,6 +61,11 @@ describe('PracticeWordHuntSandbox — board fits its flex space (no clipping)', 
     expect(board.className).toContain('h-full');
     expect(board.className).toContain('w-full');
 
+    // Establishes a size container so the frame can resolve `100cqh` and size
+    // itself to the largest fitting square instead of stretching to the
+    // wrapper's (taller) height, which made cells tall rectangles.
+    expect(board.className).toContain('[container-type:size]');
+
     // Must NOT use a width-driven aspect-square — that overflowed downward and
     // painted over the discoveries list. The square is enforced by the inner
     // .game-board-frame CSS, not by the wrapper.

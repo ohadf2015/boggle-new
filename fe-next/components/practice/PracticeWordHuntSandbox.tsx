@@ -422,7 +422,7 @@ export default function PracticeWordHuntSandbox() {
             available height — mirrors the live game's <SurvivalGridSection>.
             A width-driven `aspect-square` here overflowed downward and painted
             tiles over the discoveries list when vertical room was tight. */}
-        <div data-testid="practice-board" className="w-full h-full">
+        <div data-testid="practice-board" className="w-full h-full [container-type:size]">
           <GridComponent
             grid={board}
             interactive
