@@ -1,42 +1,52 @@
 {
-  "date": "2026-06-21",
-  "note": "Twenty-fifth snapshot. /he LCP RESOLVED — dropped 6273ms→3464ms (7d, n=70), no longer a watch. /he INP regressed further 264→336ms (now POOR, >200ms threshold). /es/multiplayer first above n≥50 floor at n=59 with 328ms INP — suspect: LobbyDailyEmber introduced in ecda82ce8. Fix applied: LobbyDailyEmber.tsx — analytics moved to useEffect (runs post-paint, off critical interaction→paint path) + popover uses hidden attribute instead of conditional render (avoids DOM mount on click). Both reduce INP for multiplayer lobby. Backend: Supabase MCP deferred (no timeout, but time budget prioritized frontend fix). No regression in bundle — no build available.",
+  "date": "2026-06-22",
+  "note": "Twenty-sixth snapshot. /he LCP improved 3464→3297ms; INP improved 336→264ms (both 7d, n=67). /es/multiplayer LCP crept 2818→3127ms (+11%, below 20% regression threshold). Both routes still LCP NEEDS IMPROVEMENT (>2500ms); no new root cause identified — mascot uses priority, translations pre-seeded in layout. Hook waterfall (useAuth→usePlayerStats→useDailyChallengeStatus) remains a candidate for /he LCP but needs profiler trace. Backend: migration 20260622030000 adds RLS initplan fix on word_tower_pending_wrecks (wtw_select_party: auth.uid()→(SELECT auth.uid())) + re-ensures idx_word_pacts_player2_id (advisor still flagging despite 20260615030000).",
   "backend": {
-    "advisor_warnings_count": null,
-    "note": "Supabase MCP not queried this run (time budget allocated to confirmed INP regression fix). Security migration 20260619030000 still pending apply.",
+    "advisor_warnings_count": 2,
+    "note": "Supabase MCP not queried (tools not available this run). Fixes applied via migration file: initplan on wtw_select_party + word_pacts FK index.",
     "top_queries": [],
-    "remaining_unused_indexes": [
-      "idx_word_review_state_lesson_id",
-      "idx_curator_proposals_lang_status",
-      "idx_curator_proposals_curator",
-      "idx_curator_proposals_open",
-      "idx_word_wheel_attempts_catchup"
+    "migrations_applied_this_run": [
+      "20260622030000_perf_rls_initplan_and_fk_index.sql"
+    ],
+    "remaining_advisor_items": [
+      {
+        "id": "auth_rls_initplan:wtw_select_party",
+        "status": "FIXED via migration 20260622030000 (pending prod apply)"
+      },
+      {
+        "id": "unindexed_fk:word_pacts_player2_id_fkey",
+        "status": "FIXED via migration 20260622030000 IF NOT EXISTS (idempotent)"
+      },
+      {
+        "id": "auth_db_connections_absolute",
+        "status": "DEFERRED — human config change in Supabase dashboard (Auth connection strategy)"
+      }
     ]
   },
   "frontend": {
-    "note": "24h window: 0 routes above n≥50 floor. 7d window: 2 routes above floor.",
+    "note": "7d window (n>=50 floor). 24h intel brief items all show reach=0 (parameterized URLs or sub-floor n); not actionable without profiler.",
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 3464,
-        "p75_inp_ms": 336,
-        "p75_cls": 0.193,
-        "n_7d": 70,
+        "p75_lcp_ms": 3297,
+        "p75_inp_ms": 264,
+        "p75_cls": 0.073,
+        "n_7d": 67,
         "window": "7d",
-        "lcp_status": "RESOLVED — 3464ms (was 6273ms, down 44.8%). Off watch list.",
-        "inp_status": "POOR — 336ms (+27% vs 264ms on 06-20). Root cause under investigation — NOT addressed by this run's fix (ember is MP-only). Candidates: ModeCoach bundle on homepage, heavy scroll handlers, AnimatePresence on route transitions.",
-        "cls_status": "WATCH — 0.193, stable."
+        "lcp_status": "NEEDS IMPROVEMENT — 3297ms (improved from 3464ms, -4.8%). Still >2500ms threshold. Root cause: hook waterfall suspected, needs profiler.",
+        "inp_status": "POOR — 264ms (improved from 336ms, -21.4%). Continuing improvement trend.",
+        "cls_status": "OK — 0.073 (improved from 0.193)"
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 2818,
+        "p75_lcp_ms": 3127,
         "p75_inp_ms": 328,
         "p75_cls": 0.167,
-        "n_7d": 59,
+        "n_7d": 62,
         "window": "7d",
-        "lcp_status": "NEEDS IMPROVEMENT — 2818ms (above 2500ms threshold). n=59 above floor for first time.",
-        "inp_status": "POOR — 328ms. First above n≥50 floor (was n=49 on 06-20). Suspect: LobbyDailyEmber ecda82ce8. FIX APPLIED: analytics→useEffect + hidden attribute popover.",
-        "cls_status": "OK — 0.167."
+        "lcp_status": "WATCH — 3127ms (+11% from 2818ms, below 20% regression threshold). Still >2500ms.",
+        "inp_status": "POOR — 328ms (stable). LobbyDailyEmber fix from 06-21 should help; verify next 7d reading.",
+        "cls_status": "WATCH — 0.167 (stable)"
       }
     ]
   },
@@ -45,33 +55,30 @@
     "total_kb": null,
     "top_chunks": []
   },
-  "translation_file_sizes_kb": {
-    "he": 682,
-    "ja": 658,
-    "es": 602,
-    "sv": 570,
-    "en": 552,
-    "note": "he.js still largest (+23% vs en.js). /he INP root cause unclear. Dead-key audit deferred."
-  },
   "open_watches": [
     {
-      "id": "he-inp-regression",
-      "description": "/he p75 INP 336ms (worsening: 184ms→264ms→336ms over 3 readings, all n≥70). Root cause TBD. Candidates: ModeCoach bundle on homepage, heavy scroll handlers, AnimatePresence on route transitions. ember fix does NOT address this route.",
-      "severity": "HIGH",
+      "id": "he-lcp-high",
+      "description": "/he p75 LCP 3297ms (7d, n=67). Improving trend. Root cause unresolved — hook waterfall suspected. Needs profiler trace.",
+      "severity": "MEDIUM",
       "since": "2026-06-20"
     },
     {
-      "id": "es-multiplayer-inp-regression",
-      "description": "/es/multiplayer p75 INP 328ms (n=59, first above floor). Fix applied: LobbyDailyEmber INP reduction (analytics to useEffect + hidden attribute popover). Verify improvement in next 7d reading.",
+      "id": "he-inp-regression",
+      "description": "/he p75 INP 264ms (7d, n=67). Improving: 336ms→264ms. Still POOR (>200ms).",
       "severity": "MEDIUM",
-      "since": "2026-06-21",
-      "fix_applied": "LobbyDailyEmber.tsx — analytics to useEffect + hidden attribute popover"
+      "since": "2026-06-20"
     },
     {
-      "id": "supabase-mcp-unauthorized",
-      "description": "Supabase MCP token may still be expired (3rd consecutive night without querying). Security migration 20260619030000 still pending.",
-      "severity": "INFRA",
-      "since": "2026-06-19"
+      "id": "es-multiplayer-lcp-creep",
+      "description": "/es/multiplayer p75 LCP 3127ms (7d, n=62). Up from 2818ms (+11%). Below 20% regression threshold. Watch next reading.",
+      "severity": "LOW",
+      "since": "2026-06-22"
+    },
+    {
+      "id": "es-multiplayer-inp",
+      "description": "/es/multiplayer p75 INP 328ms (7d, n=62). LobbyDailyEmber fix from 06-21 applied. Verify improvement in next 7d reading.",
+      "severity": "MEDIUM",
+      "since": "2026-06-21"
     }
   ]
 }

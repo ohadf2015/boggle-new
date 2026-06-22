@@ -989,3 +989,17 @@ These flags have active call sites and cannot be removed autonomously. All have 
 - `show-signup-after-first-win` (flag id 163655): running 72d+, inconclusive (no statistically significant winner). RECOMMEND KILL — delete flag + keep control code path. Status: open, human.
 - `mp-signup-nudge-copy-v1` (flag id 183230): 0/77 converts in 28d+. RECOMMEND RETIRE — delete flag, keep `control` (sheet only, suppress toast). Status: open, human.
 - `exp-leaderboard-play-cta-v1` (flag id 209542): DEACTIVATED — variant-B still unwired (leaderboard/PageClient.tsx 519 lines, blocked on <500-line refactor). Do not re-enable until PageClient refactored. Status: blocked on refactor.
+
+---
+
+## 2026-06-22 (lane-03 engagement)
+
+### Dead flags — retire after human confirm
+
+| Flag key | Created | Age | Status |
+|---|---|---|---|
+| `share-prompt-timing` | 2026-03-31 | 83d | 0 converts, inconclusive — retire, keep control (results-page timing) |
+| `show-signup-after-first-win` | 2026-03-31 | 83d | 0 converts, inconclusive — retire, keep default |
+| `mp-signup-nudge-copy-v1` | 2026-05-08 | 45d | 0/77 converts — retire, keep toast-disabled path (no dismissal training) |
+
+Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace conditional with winner path, delete defineExperiment entry, archive PostHog flag.
