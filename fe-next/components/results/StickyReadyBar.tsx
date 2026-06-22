@@ -38,6 +38,12 @@ interface StickyReadyBarProps {
   onNewSeries?: () => void;
   /** Classroom mode — teacher controls game flow, no auto-countdown */
   isClassroom?: boolean;
+  /**
+   * Desktop results page variant — renders the host mode switcher with a
+   * heading and larger, higher-contrast pills so the active mode (and any
+   * change to it) is unmistakable on the wide desktop bar.
+   */
+  desktopProminent?: boolean;
 }
 
 const ALL_MODES: GameModeOption[] = ['word-hunt', 'classic', 'wheel-rush', 'blast', 'random'];
@@ -79,6 +85,7 @@ export default function StickyReadyBar({
   seriesWinnerUsername,
   onNewSeries,
   isClassroom = false,
+  desktopProminent = false,
 }: StickyReadyBarProps) {
   const { t } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -375,10 +382,18 @@ export default function StickyReadyBar({
 
   return (
     <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
-        {/* Host mode selector — always-visible horizontal pills */}
+        {/* Host mode selector — always-visible horizontal pills.
+            On desktop (desktopProminent) the bar is wide, so the pills grow,
+            gain a labelled heading, and the active mode gets a high-contrast
+            ring + lift so switching modes reads clearly. */}
         {isHost && selectedGameMode !== undefined && onSelectGameMode && (
           <div className="flex flex-col gap-1 min-w-0">
-            <div className="flex items-center gap-1 px-0.5 min-w-0">
+            {desktopProminent && (
+              <div className="text-center text-[10px] font-black uppercase tracking-widest text-neo-white/60">
+                {t('results.nextRoundMode')}
+              </div>
+            )}
+            <div className={cn('flex items-center px-0.5 min-w-0', desktopProminent ? 'gap-2' : 'gap-1')}>
               {ALL_MODES.map((mode) => {
                 const isActive = selectedGameMode === mode;
                 return (
@@ -396,21 +411,36 @@ export default function StickyReadyBar({
                     }}
                     title={getModeDescription(mode, t)}
                     aria-label={`${getModeLabel(mode, t)} — ${getModeDescription(mode, t)}`}
+                    aria-pressed={isActive}
                     className={cn(
-                      'flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1 text-[9px] font-black uppercase rounded-lg border-2 transition-all',
+                      'flex-1 min-w-0 flex items-center justify-center font-black uppercase rounded-lg border-2 transition-all',
+                      desktopProminent
+                        ? 'gap-2 py-2.5 px-2 text-[11px]'
+                        : 'gap-1.5 py-1.5 px-1 text-[9px]',
                       isActive
-                        ? cn(MODE_ACTIVE_COLORS[mode], 'border-current/30 shadow-xs')
-                        : 'text-neo-white border-transparent hover:text-neo-white hover:bg-neo-white/5'
+                        ? cn(
+                            MODE_ACTIVE_COLORS[mode],
+                            desktopProminent
+                              ? 'border-current shadow-hard-sm scale-105 ring-2 ring-current/40 z-10'
+                              : 'border-current/30 shadow-xs'
+                          )
+                        : cn(
+                            'text-neo-white border-transparent hover:text-neo-white hover:bg-neo-white/5',
+                            desktopProminent && 'opacity-70 hover:opacity-100'
+                          )
                     )}
                   >
-                    <span className="shrink-0 [&>svg]:w-3 [&>svg]:h-3">{MODE_ICONS[mode]}</span>
-                    <span className="hidden xs:inline truncate">{getModeLabel(mode, t)}</span>
+                    <span className={cn('shrink-0', desktopProminent ? '[&>svg]:w-4 [&>svg]:h-4' : '[&>svg]:w-3 [&>svg]:h-3')}>{MODE_ICONS[mode]}</span>
+                    <span className={cn('truncate', desktopProminent ? 'inline' : 'hidden xs:inline')}>{getModeLabel(mode, t)}</span>
                   </button>
                 );
               })}
             </div>
             <div
-              className="min-h-[14px] text-center text-[10px] leading-tight text-neo-white px-2 transition-opacity duration-150"
+              className={cn(
+                'text-center leading-tight text-neo-white px-2 transition-opacity duration-150',
+                desktopProminent ? 'min-h-[16px] text-[11px]' : 'min-h-[14px] text-[10px]'
+              )}
               aria-live="polite"
             >
               {(() => {

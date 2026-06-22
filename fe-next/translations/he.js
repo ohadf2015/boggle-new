@@ -3016,6 +3016,7 @@ const he = {
     },
     "of": "מתוך",
     "readyForNextRound": "מוכנים לסיבוב הבא?",
+    "nextRoundMode": "מצב הסיבוב הבא",
     "hostStartDescription": "התחילו משחק חדש כשכולם מוכנים!",
     "yourPlace": "{place} מתוך {total}",
     "yourPlaceSimple": "מקום {place}",

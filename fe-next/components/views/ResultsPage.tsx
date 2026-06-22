@@ -1287,6 +1287,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               isSeriesComplete={isSeriesComplete}
               seriesWinnerUsername={seriesWinnerUsername}
               onNewSeries={handleNewSeries}
+              desktopProminent
             />
           </div>
         </div>,

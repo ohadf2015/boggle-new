@@ -2809,6 +2809,7 @@ const ja = {
     },
     "of": "/",
     "readyForNextRound": "次のラウンドの準備はいい？",
+    "nextRoundMode": "次のラウンドのモード",
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
     "readyExplanation": "タップしてホストに「もう一回やりたい！」を伝えよう",
     "defendTitle": "王座を守れ！",
