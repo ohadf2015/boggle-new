@@ -168,10 +168,41 @@ preflight_check() {
     git status --short
   fi
 
-  local branch=$(git rev-parse --abbrev-ref HEAD)
+  local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
   if [ "$branch" != "master" ]; then
-    echo "preflight: ABORT — not on master (on $branch)"
-    return 1
+    # SELF-HEAL: a prior MANUAL session (e.g. land-via-worktree, an aborted cherry-
+    # pick) can leave this shared working tree checked out on a non-master branch.
+    # Before 2026-06-22 we hard-aborted here in <10s and sent NO alert — so every
+    # nightly silently no-op'd until a human noticed days later. Auto-recover onto
+    # master, but ONLY when it is LOSSLESS: the tree is clean AND the current HEAD's
+    # commits are all already on origin/master (nothing to abandon). This merely
+    # changes which branch is checked out; it ships NOTHING new — it is NOT the
+    # 2026-06-21 "push-if-ff" hardening advisor killed (that auto-shipped unverified
+    # code). When recovery is unsafe we still abort, but now we ALERT instead of dying
+    # silently.
+    echo "preflight: not on master (on ${branch:-detached}) — attempting safe auto-recover"
+    git fetch origin master --quiet 2>/dev/null || true
+    if [ "$tree_clean" = "1" ] && git merge-base --is-ancestor HEAD origin/master 2>/dev/null; then
+      # Preserve any diverged local-master SHA before -B clobbers it (matches the
+      # recover/ convention used for stranded pending refs above). Cheap, reversible.
+      if git rev-parse --verify --quiet master >/dev/null \
+         && ! git merge-base --is-ancestor master origin/master 2>/dev/null; then
+        git branch -f "recover/preflight-master-$(git rev-parse --short master)" master 2>/dev/null || true
+      fi
+      if git checkout -B master origin/master >/dev/null 2>&1; then
+        echo "preflight: ✓ auto-recovered onto master (was ${branch:-detached}, now == origin/master)"
+        tg_alert "nightly: auto-recovered from stray branch '${branch:-detached}' onto master (lossless — HEAD already on origin/master). A prior manual session left the repo off master; nightly self-healed and is proceeding."
+        branch=master
+      else
+        echo "preflight: ABORT — auto-recover checkout failed (on ${branch:-detached})"
+        tg_alert "⚠️ nightly ABORTED — repo on stray branch '${branch:-detached}', auto-recover checkout failed. Manual fix: cd repo && git checkout master."
+        return 1
+      fi
+    else
+      echo "preflight: ABORT — not on master (on ${branch:-detached}) and auto-recover unsafe (dirty tree or unpushed work)"
+      tg_alert "⚠️ nightly ABORTED — repo on stray branch '${branch:-detached}' with uncommitted or unpushed work; refusing to switch (would lose work). Manual review needed."
+      return 1
+    fi
   fi
 
   # Auto-recover any docs-only commit a prior run failed to push (so it never

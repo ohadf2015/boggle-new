@@ -309,6 +309,37 @@ assert "  …did NOT revert origin learnings to strand content"  '[ "$(cd "$REPO
 ( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
 rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
 
+# ── stray non-master branch → safe auto-recover (2026-06-22 regression) ────
+# A prior MANUAL session (land-via-worktree, aborted cherry-pick) left the shared
+# working tree checked out on a non-master branch. The OLD preflight hard-aborted
+# in <10s with NO alert, so every nightly silently no-op'd until a human noticed
+# days later (2026-06-22: stuck on 'wt-land'). It must now self-heal onto master
+# when LOSSLESS (clean tree + HEAD already on origin/master) and ALERT either way.
+# tg_alert is defined in run.sh (sourced before preflight); stub it as a no-op here.
+tg_alert() { :; }
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; git reset --hard origin/master -q; git fetch -q origin master )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+echo
+echo "stray branch, clean tree, HEAD on origin/master → auto-recovers onto master"
+( cd "$REPO"; git checkout -q -B stray origin/master )   # detach onto a non-master branch at origin tip
+OUTJ=$(cd "$REPO" && preflight_check 2>&1); rcJ=$?
+assert "stray-but-lossless → PROCEEDS (return 0)"            "[ $rcJ -eq 0 ]"
+assert "  …logs the auto-recover onto master"               'printf "%s" "$OUTJ" | grep -q "auto-recovered onto master"'
+assert "  …repo is now actually on master"                  '[ "$(cd "$REPO" && git rev-parse --abbrev-ref HEAD)" = "master" ]'
+( cd "$REPO"; git branch -qD stray 2>/dev/null || true )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+
+echo
+echo "stray branch + DIRTY tree → refuses to switch (would lose work) + aborts"
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; git reset --hard origin/master -q )
+( cd "$REPO"; git checkout -q -B stray2 origin/master; echo "uncommitted on stray" >> base.txt )
+OUTK=$(cd "$REPO" && preflight_check 2>&1); rcK=$?
+assert "stray + dirty → ABORTS (return 1, won't discard WIP)" "[ $rcK -eq 1 ]"
+assert "  …logs auto-recover unsafe"                          'printf "%s" "$OUTK" | grep -q "auto-recover unsafe"'
+assert "  …left the tree on the stray branch (no switch)"     '[ "$(cd "$REPO" && git rev-parse --abbrev-ref HEAD)" = "stray2" ]'
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; git checkout -q master; git branch -qD stray2 2>/dev/null || true )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+
 rm -rf "$ROOT"
 echo
 echo "──────────────────────────────────────────"
