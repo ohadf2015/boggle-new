@@ -16,6 +16,7 @@ import {
   isValidLanguage,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
+import { rerankSequential, sortWordWheelRowsGlobally } from './leaderboardSort';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
@@ -324,15 +325,17 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Per-language leaderboard: each language plays a different puzzle, so players
-    // only compete against others on the same puzzle (same date + language).
+    // Cross-language (global) leaderboard: no `.eq('language', …)` filter — players
+    // from every language compete together. The view's rank_position is per-language,
+    // so we order by the scoring columns directly and renumber globally below.
     const { data, error } = await supabase
       .from('daily_word_wheel_leaderboard')
       .select('*')
       .eq('puzzle_date', date)
-      .eq('language', language)
       .not('player_id', 'is', null)
-      .order('rank_position', { ascending: true })
+      .order('score', { ascending: false, nullsFirst: false })
+      .order('word_count', { ascending: false, nullsFirst: false })
+      .order('completed_at', { ascending: true, nullsFirst: false })
       .limit(limit);
 
     if (error) {
@@ -341,23 +344,19 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Re-rank after filtering out guests
-    const rerankedData = (data || []).map((row, index) => ({
-      ...row,
-      rank_position: index + 1,
-    }));
+    // Sort the merged cross-language rows by the global scoring order, then
+    // renumber rank_position sequentially 1..N (the view's rank is per-language).
+    const rerankedData = rerankSequential(sortWordWheelRowsGlobally(data || []));
 
     const { count: totalCount } = await supabase
       .from('daily_word_wheel_attempts')
       .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language);
+      .eq('puzzle_date', date);
 
     const { count: guestCount } = await supabase
       .from('daily_word_wheel_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
-      .eq('language', language)
       .is('player_id', null)
       .not('guest_fingerprint', 'is', null);
 
@@ -366,7 +365,6 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_wheel_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
-      .eq('language', language)
       .gt('word_count', 0);
 
     res.set('Cache-Control', 'public, max-age=20, s-maxage=20, stale-while-revalidate=60');
@@ -411,12 +409,11 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
       return;
     }
 
-    // Per-language all-time leaderboard: each language plays different puzzles, so
-    // players are ranked against others in their own language.
+    // Cross-language (global) all-time leaderboard: no `.eq('language', …)` filter.
+    // The view aggregates each player across every language and ranks globally.
     const { data, error } = await supabase
       .from('word_wheel_alltime_leaderboard')
       .select('*')
-      .eq('language', language)
       .order('rank_position', { ascending: true })
       .limit(limit);
 
@@ -428,8 +425,7 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
 
     const { count } = await supabase
       .from('word_wheel_alltime_leaderboard')
-      .select('*', { count: 'exact', head: true })
-      .eq('language', language);
+      .select('*', { count: 'exact', head: true });
 
     res.set('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=180');
     res.json({
