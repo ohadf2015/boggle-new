@@ -28,7 +28,6 @@ import {
   computeWordHuntRetryScore,
 } from './utils';
 import { completeMissionForMode } from '../../modules/dailyMissionsManager';
-import { rerankSequential, sortWordHuntRowsGlobally } from './leaderboardSort';
 import { updateDailyProfileStats } from './profileStats';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
@@ -497,18 +496,16 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Cross-language (global) leaderboard: no `.eq('language', …)` filter — players
-    // from every language compete together. The view's rank_position is per-language,
-    // so we order by the scoring columns directly and renumber globally below.
+    // Per-language leaderboard: each language plays a different puzzle, so players
+    // only compete against others on the same puzzle (same date + language).
     const { data, error } = await supabase
       .from('daily_word_hunt_leaderboard')
       .select('*')
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true)
       .not('player_id', 'is', null)
-      .order('efficiency_score', { ascending: false, nullsFirst: false })
-      .order('attempts_used', { ascending: true, nullsFirst: false })
-      .order('completed_at', { ascending: true, nullsFirst: false })
+      .order('rank_position', { ascending: true })
       .limit(limit);
 
     if (error) {
@@ -536,6 +533,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true)
       .not('player_id', 'is', null);
 
@@ -546,7 +544,8 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     const { count: totalPlayersCount, error: totalPlayersError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date);
+      .eq('puzzle_date', date)
+      .eq('language', language);
 
     if (totalPlayersError) {
       logger.debug('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`);
@@ -556,6 +555,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true);
 
     if (totalSolvedError) {
@@ -566,6 +566,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true)
       .is('player_id', null)
       .not('guest_fingerprint', 'is', null);
@@ -574,10 +575,13 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message || guestSolvedError.code || 'Unknown'}`, { code: guestSolvedError.code, details: guestSolvedError.details });
     }
 
-    // Sort the merged cross-language rows by the global scoring order, then
-    // renumber rank_position sequentially 1..N. The view's rank_position is
-    // partitioned per language (and includes guests), so it can't be trusted here.
-    const rerankedData = rerankSequential(sortWordHuntRowsGlobally(data || []));
+    // Re-number rank_position sequentially among authenticated players only.
+    // The view's rank_position includes guests, so post-filter rows would otherwise
+    // keep gaps (e.g. only auth player showing as rank #2 because rank #1 was a guest).
+    const rerankedData = (data || []).map((row, index) => ({
+      ...row,
+      rank_position: index + 1,
+    }));
 
     const dataLength = rerankedData.length;
     const queryCount = count ?? 0;
@@ -878,11 +882,12 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
       return;
     }
 
-    // Cross-language (global) all-time leaderboard: no `.eq('language', …)` filter.
-    // The view aggregates each player across every language and ranks globally.
+    // Per-language all-time leaderboard: each language plays different puzzles, so
+    // players are ranked against others in their own language.
     const { data, error } = await supabase
       .from('word_hunt_alltime_leaderboard')
       .select('*')
+      .eq('language', language)
       .order('rank_position', { ascending: true })
       .limit(limit);
 
@@ -909,7 +914,8 @@ router.get('/alltime-leaderboard/:language', async (req: Request<{ language: str
 
     const { count, error: countError } = await supabase
       .from('word_hunt_alltime_leaderboard')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true })
+      .eq('language', language);
 
     if (countError) {
       logger.warn('API', `Word Hunt all-time leaderboard count error: ${countError.message}`);
