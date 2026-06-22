@@ -9,9 +9,10 @@
 
 import React, { useState, useMemo } from 'react';
 import { m } from 'framer-motion';
-import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen, Sparkles } from 'lucide-react';
+import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen, Sparkles, PartyPopper } from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
+import { isRonPrankUser, RON_PRANK_BONUS_POINTS } from '@/utils/dailyChallenge/ronPrank';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { ScoreGaugeRing } from './ScoreGaugeRing';
 import { getScoreTier } from './scoreFeedbackTiers';
@@ -29,6 +30,8 @@ export interface ResultDisplayProps {
   wordsDiscovered?: number;
   rank?: number;
   totalPlayers?: number;
+  /** Current player's id — drives the display-only Ron bonus easter egg. */
+  currentUserId?: string | null;
   t: (key: string) => string;
 }
 
@@ -76,9 +79,14 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   countdown,
   lifeRemaining = 0,
   wordsDiscovered = 0,
+  currentUserId,
   t,
 }) => {
   const [wordHidden, setWordHidden] = useState(false);
+
+  // Display-only easter egg: Ron sees a fake "jackpot" bonus chip. Real score,
+  // streak, and leaderboard are untouched — see utils/dailyChallenge/ronPrank.
+  const showRonBonus = solved && isRonPrankUser(currentUserId);
 
   const scoreBreakdown = useMemo(() =>
     getScoreBreakdown(lifeRemaining, attemptsUsed, wordsDiscovered, solved),
@@ -291,6 +299,20 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     {chip.icon} +{chip.value}
                   </m.span>
                 ))}
+                {/* Display-only Ron easter egg — fake jackpot bonus chip. */}
+                {showRonBonus && (
+                  <m.span
+                    data-testid="ron-bonus-chip"
+                    custom={3}
+                    variants={chipVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 text-xs font-black bg-neo-yellow/15 border-neo-yellow/40 text-neo-yellow shadow-hard-sm"
+                  >
+                    <PartyPopper className="w-3.5 h-3.5 inline-block" />
+                    +{RON_PRANK_BONUS_POINTS.toLocaleString('en-US')}
+                  </m.span>
+                )}
               </div>
 
               {/* Tap to celebrate hint (mobile) */}

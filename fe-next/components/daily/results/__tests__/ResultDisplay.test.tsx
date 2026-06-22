@@ -9,6 +9,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ResultDisplay } from '../ResultDisplay';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
+import { RON_PRANK_USER_ID } from '@/utils/dailyChallenge/ronPrank';
 
 // Mock framer-motion to render immediately
 vi.mock('framer-motion', () => ({
@@ -196,6 +197,38 @@ describe('ResultDisplay Component', () => {
     it('still shows attempts used as a secondary detail under the badge', () => {
       render(<ResultDisplay {...solvedProps} attemptsUsed={3} />);
       expect(screen.getByText('3/10')).toBeInTheDocument();
+    });
+  });
+
+  describe('Ron bonus prank (display-only)', () => {
+    it('shows a fake +1,000,000 bonus chip when the player is Ron and solved', () => {
+      render(<ResultDisplay {...solvedProps} currentUserId={RON_PRANK_USER_ID} />);
+      const chip = screen.getByTestId('ron-bonus-chip');
+      expect(chip).toBeInTheDocument();
+      expect(chip).toHaveTextContent(/\+1,000,000/);
+    });
+
+    it('does NOT show the bonus chip for any other player', () => {
+      render(<ResultDisplay {...solvedProps} currentUserId="not-ron-id" />);
+      expect(screen.queryByTestId('ron-bonus-chip')).not.toBeInTheDocument();
+    });
+
+    it('does NOT show the bonus chip when currentUserId is absent (guests)', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.queryByTestId('ron-bonus-chip')).not.toBeInTheDocument();
+    });
+
+    it('does NOT show the bonus chip in fail state, even for Ron', () => {
+      render(<ResultDisplay {...solvedProps} solved={false} currentUserId={RON_PRANK_USER_ID} />);
+      expect(screen.queryByTestId('ron-bonus-chip')).not.toBeInTheDocument();
+    });
+
+    it('leaves the real score chips unchanged (prank does not alter the real total)', () => {
+      render(<ResultDisplay {...solvedProps} currentUserId={RON_PRANK_USER_ID} />);
+      // Real breakdown for solvedProps: speed=240, accuracy=320, exploration=80
+      expect(screen.getByText(/\+240/)).toBeInTheDocument();
+      expect(screen.getByText(/\+320/)).toBeInTheDocument();
+      expect(screen.getByText(/\+80/)).toBeInTheDocument();
     });
   });
 
