@@ -416,14 +416,44 @@ const WordWheelChallenge: React.FC = () => {
 
   if (phase === 'loading') {
     return (
-      <div className="flex-1 flex items-center justify-center bg-neo-navy">
+      <div
+        className="flex-1 flex items-center justify-center bg-neo-navy"
+        style={{
+          background:
+            'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)',
+        }}
+      >
         <PageLoader size="lg" text={t('wordWheel.loading')} />
       </div>
     );
   }
 
   return (
-    <div ref={containerRef} className="relative flex-1 flex flex-col bg-neo-navy min-h-0 overflow-hidden">
+    <div
+      ref={containerRef}
+      data-testid="word-wheel-stage"
+      className="relative flex-1 flex flex-col bg-neo-navy min-h-0 overflow-hidden"
+      // Depth background (matches ResultsPage): a radial gradient from
+      // --neo-navy-radial (center) to --neo-navy (edges). The pixi bokeh layer
+      // only paints during play and fades in slowly, so without this the stage
+      // exposed flat near-black navy on the ready/loading screens and the first
+      // moments of play. CSS is always-on and phase-independent, so the board
+      // reads with depth instead of solid black.
+      style={{
+        background:
+          'radial-gradient(circle at center, var(--neo-navy-radial) 0%, var(--neo-navy) 70%)',
+      }}
+    >
+      {/* Subtle dot pattern — adds texture/depth over the gradient */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, var(--neo-black) 1px, transparent 1px)',
+          backgroundSize: '10px 10px',
+        }}
+        aria-hidden
+      />
+
       {/* PixiJS Effects Layer */}
       {phase === 'playing' && (
         <WordWheelEffectsCanvas
