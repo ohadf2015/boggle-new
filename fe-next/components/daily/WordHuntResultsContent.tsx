@@ -281,6 +281,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       countdown={countdown}
       lifeRemaining={result.lifeRemaining || 0}
       wordsDiscovered={result.wordsDiscovered?.length || 0}
+      currentUserId={profile?.id}
       t={t}
     />
 
