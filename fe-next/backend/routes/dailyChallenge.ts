@@ -15,7 +15,6 @@ import { COIN_COSTS } from '../../utils/coinManager';
 import type { Language } from '../../types';
 import wordHuntRouter from './dailyChallenge/wordHuntRoutes';
 import wordWheelRouter from './dailyChallenge/wordWheelRoutes';
-import { rerankSequential, sortClassicPuzzleRowsGlobally } from './dailyChallenge/leaderboardSort';
 import { updateQuestProgress } from '../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../lib/daily/questCredit';
 
@@ -161,17 +160,15 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         throw new Error('Database connection unavailable');
       }
 
-      // Cross-language (global) leaderboard: no `.eq('language', …)` filter — players
-      // from every language compete together. The view's rank_position is per-language,
-      // so we order by the scoring columns directly and renumber globally below.
+      // Per-language leaderboard: each language plays a different puzzle, so players
+      // only compete against others on the same puzzle (same date + language).
       const { data, error } = await supabase
         .from('daily_puzzle_leaderboard')
         .select('*')
         .eq('puzzle_date', date)
+        .eq('language', language)
         .not('player_id', 'is', null)
-        .order('score', { ascending: false, nullsFirst: false })
-        .order('word_count', { ascending: false, nullsFirst: false })
-        .order('time_seconds', { ascending: true, nullsFirst: false })
+        .order('rank_position', { ascending: true })
         .limit(limit);
 
       if (error) {
@@ -182,6 +179,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         .from('daily_puzzle_attempts')
         .select('*', { count: 'exact', head: true })
         .eq('puzzle_date', date)
+        .eq('language', language)
         .not('player_id', 'is', null);
 
       if (countError) {
@@ -191,7 +189,8 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       const { count: totalCount, error: totalCountError } = await supabase
         .from('daily_puzzle_attempts')
         .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date);
+        .eq('puzzle_date', date)
+        .eq('language', language);
 
       if (totalCountError) {
         logger.warn('API', `Daily leaderboard total count error: ${totalCountError.message}`);
@@ -201,6 +200,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         .from('daily_puzzle_attempts')
         .select('*', { count: 'exact', head: true })
         .eq('puzzle_date', date)
+        .eq('language', language)
         .is('player_id', null)
         .not('guest_fingerprint', 'is', null);
 
@@ -208,11 +208,15 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         logger.warn('API', `Daily leaderboard guest count error: ${guestCountError.message}`);
       }
 
-      // Sort the merged cross-language rows by the global scoring order, then
-      // renumber rank_position sequentially 1..N. The view's rank_position is
-      // partitioned per (puzzle_date, language) and includes guests, so it can't
-      // be trusted once the language filter is dropped.
-      const rerankedData = rerankSequential(sortClassicPuzzleRowsGlobally(data || []));
+      // Re-number rank_position sequentially among authenticated players only.
+      // The view's rank_position is partitioned by (puzzle_date, language) but
+      // includes guest rows, so post-filter rows would otherwise keep gaps
+      // (e.g. first auth player showing as rank #3 because ranks #1/#2 were guests).
+      // This guarantees each language's leaderboard starts at rank 1.
+      const rerankedData = (data || []).map((row, index) => ({
+        ...row,
+        rank_position: index + 1,
+      }));
 
       const dataLength = rerankedData.length;
       const queryCount = count ?? 0;
