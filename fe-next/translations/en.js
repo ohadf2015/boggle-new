@@ -2875,6 +2875,7 @@ const en = {
     },
     "of": "of",
     "readyForNextRound": "Ready?",
+    "nextRoundMode": "Next round mode",
     "hostStartDescription": "Start anytime!",
     "readyExplanation": "Ready up to show you're in!",
     "defendTitle": "DEFEND TITLE",

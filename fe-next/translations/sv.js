@@ -2966,6 +2966,7 @@ const sv = {
     },
     "of": "av",
     "readyForNextRound": "Redo för nästa runda?",
+    "nextRoundMode": "Nästa rundas läge",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
     "readyExplanation": "Tryck för att visa att du vill köra igen",
     "defendTitle": "Försvara din titel!",

@@ -2667,6 +2667,7 @@ const es = {
     },
     "of": "de",
     "readyForNextRound": "¿Listos para la siguiente ronda?",
+    "nextRoundMode": "Modo de la próxima ronda",
     "readyExplanation": "Marca listo para la siguiente ronda",
     "defendTitle": "¡Defiende tu título!",
     "aheadOf": "por delante de {player}",
