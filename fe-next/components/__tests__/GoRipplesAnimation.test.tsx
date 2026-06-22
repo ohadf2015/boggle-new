@@ -52,6 +52,14 @@ vi.mock('../../contexts/SoundEffectsContext', () => ({
   }),
 }));
 
+// Avatar is heavy (pixi/renderer) — stub it to a marker for the avatar-row tests.
+vi.mock('../Avatar', () => ({
+  __esModule: true,
+  default: ({ userId }: { userId?: string }) => (
+    <div data-testid="countdown-avatar" data-user={userId} />
+  ),
+}));
+
 describe('GoRipplesAnimation', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -271,6 +279,42 @@ describe('GoRipplesAnimation', () => {
       expect(screen.getByText('GO!')).toBeInTheDocument();
       act(() => { vi.advanceTimersByTime(1000); }); // complete
       expect(onComplete).toHaveBeenCalled();
+    });
+  });
+
+  describe('player avatars during countdown', () => {
+    it('renders avatars for the supplied players to build pre-game excitement', () => {
+      render(
+        <GoRipplesAnimation
+          players={[
+            { username: 'Ann' },
+            { username: 'Bob' },
+          ]}
+        />
+      );
+      expect(screen.getAllByTestId('countdown-avatar')).toHaveLength(2);
+    });
+
+    it('caps the avatar row at 5 and prioritizes humans over bots', () => {
+      render(
+        <GoRipplesAnimation
+          players={[
+            { username: 'Bot1', isBot: true },
+            { username: 'H1' }, { username: 'H2' }, { username: 'H3' },
+            { username: 'H4' }, { username: 'H5' }, { username: 'H6' },
+          ]}
+        />
+      );
+      const avatars = screen.getAllByTestId('countdown-avatar');
+      expect(avatars).toHaveLength(5);
+      // The bot should be dropped in favor of human players when capping.
+      const users = avatars.map(a => a.getAttribute('data-user'));
+      expect(users).not.toContain('Bot1');
+    });
+
+    it('renders no avatar row when no players are supplied', () => {
+      render(<GoRipplesAnimation />);
+      expect(screen.queryByTestId('countdown-avatar')).not.toBeInTheDocument();
     });
   });
 

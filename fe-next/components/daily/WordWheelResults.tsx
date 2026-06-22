@@ -19,6 +19,7 @@ import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WordWheelSignupCta from './WordWheelSignupCta';
 import WordWheelReplayCta from './WordWheelReplayCta';
 import CatchUpSuggestion from './CatchUpSuggestion';
+import MpModeCrossPromo from './MpModeCrossPromo';
 import { wasSignupModalDismissedRecently } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import type { WordWheelGameResult } from './WordWheelGame';
@@ -499,6 +500,19 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             </div>
             <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
           </Link>
+        </m.div>
+      )}
+
+      {/* Multiplayer cross-promo — only once today's daily pair is complete, so it
+          never competes with the "finish today's challenge" daily↔daily CTA. */}
+      {!isPractice && hasPlayedWordHunt && (
+        <m.div
+          className="w-full z-10"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.58, type: 'spring', stiffness: 300, damping: 26 }}
+        >
+          <MpModeCrossPromo language={language} source="word_wheel_results" t={t} />
         </m.div>
       )}
 

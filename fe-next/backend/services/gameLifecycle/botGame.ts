@@ -149,17 +149,41 @@ export function getBestHumanScore(gameCode: string): number {
 }
 
 /**
+ * Per-mode tuning for the bot scoring gate. Lets short, fast modes (Wheel Rush)
+ * run gentler bots than the default classic calibration WITHOUT forking the
+ * shared gate. All multipliers default to 1 (no change) and graceMs defaults to
+ * the module-wide grace window.
+ */
+export interface BotScoreTuning {
+  /** Multiplier on the relative score target (<1 = bots aim lower vs best human). */
+  targetMult?: number;
+  /** Multiplier on the per-difficulty minimum-score floor (<1 = lower guaranteed bot score). */
+  floorMult?: number;
+  /** Multiplier on the post-grace fallback ceiling. */
+  ceilingMult?: number;
+  /** Override the free-scoring grace window (ms) before any human has scored. */
+  graceMs?: number;
+}
+
+/** Minimum floor: bots always get at least this many points before capping kicks in. */
+const MIN_BOT_SCORE: Record<string, number> = { easy: 80, medium: 150, hard: 250 };
+
+/**
  * Check whether a bot should be allowed to score.
  * Bots target a percentage of the best human's score (difficulty-dependent).
  * This creates competitive pressure without making bots unbeatable.
  * A ±10% random variance is applied to the target to feel natural.
+ *
+ * `tuning` lets a caller (e.g. the Wheel Rush driver) soften the bots for a
+ * short mode where the classic calibration is disproportionately strong.
  */
 export function shouldBotScore(
   gameCode: string,
   botUsername: string,
   currentBotScore: number,
   pendingScore: number,
-  botDifficulty: string = 'medium'
+  botDifficulty: string = 'medium',
+  tuning?: BotScoreTuning
 ): boolean {
   const bestHuman = getBestHumanScore(gameCode);
   const projectedScore = currentBotScore + pendingScore;
@@ -168,25 +192,25 @@ export function shouldBotScore(
     // No human scored yet. Use a time-based grace window instead of a hard
     // point ceiling, because Blast tile bonuses routinely exceed small ceilings
     // on the first word and would otherwise freeze the bot permanently.
+    const graceMs = tuning?.graceMs ?? BOT_FREE_SCORING_GRACE_MS;
     const startedAt = gameScoringStart.get(gameCode);
-    if (!startedAt || Date.now() - startedAt <= BOT_FREE_SCORING_GRACE_MS) {
+    if (!startedAt || Date.now() - startedAt <= graceMs) {
       return true;
     }
     // Grace window elapsed with no human activity — fall back to a much
     // looser ceiling so bots still contribute rather than going silent.
-    const ceiling = BOT_POST_GRACE_CEILING[botDifficulty] ?? BOT_POST_GRACE_CEILING.medium;
-    return projectedScore <= ceiling;
+    const baseCeiling = BOT_POST_GRACE_CEILING[botDifficulty] ?? BOT_POST_GRACE_CEILING.medium;
+    return projectedScore <= baseCeiling * (tuning?.ceilingMult ?? 1);
   }
 
   const baseTarget = BOT_SCORE_TARGET[botDifficulty] ?? BOT_SCORE_TARGET.medium;
   // Per-(game,bot) variance (±10%), memoized so the target line doesn't
   // flicker as Math.random drifts across consecutive submissions.
   const variance = getOrSeedVariance(gameCode, botUsername);
-  const scoreTarget = bestHuman * baseTarget * variance;
+  const scoreTarget = bestHuman * baseTarget * variance * (tuning?.targetMult ?? 1);
 
-  // Minimum floor: bots always get at least this many points before capping kicks in
-  const MIN_BOT_SCORE: Record<string, number> = { easy: 80, medium: 150, hard: 250 };
-  const floor = MIN_BOT_SCORE[botDifficulty] ?? MIN_BOT_SCORE.medium;
+  const baseFloor = MIN_BOT_SCORE[botDifficulty] ?? MIN_BOT_SCORE.medium;
+  const floor = baseFloor * (tuning?.floorMult ?? 1);
 
   return projectedScore <= Math.max(scoreTarget, floor);
 }

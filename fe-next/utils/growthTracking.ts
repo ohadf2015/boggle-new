@@ -145,8 +145,12 @@ export type GrowthEvent =
   | 'education_upsell_impression'
   | 'school_lead_submitted'
   | 'school_lead_form_viewed'
-  // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel)
+  // Cross-promo CTA tracking (e.g. Word Hunt → Word Wheel, Daily → Multiplayer)
   | 'cross_promo_click'
+  // Cross-promo CTA exposure — fires once when a cross-promo card is rendered, so
+  // PostHog can compute click-through rate (clicks / impressions). Props mirror
+  // cross_promo_click: { target, source, placement?, language? }.
+  | 'cross_promo_impression'
   // Results-page CTA tracking — experiment conversion funnel (exp-results-replay-cta-v1)
   // Properties: { cta: 'quick_replay' | 'back_to_lobby' | 'next_step', mode?: string }
   | 'results_cta_clicked'

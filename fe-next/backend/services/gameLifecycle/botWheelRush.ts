@@ -27,10 +27,25 @@ import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../uti
 import timerManager from '../../utils/timerManager';
 import { setBotTimeout } from '../../modules/botLifecycle';
 import { ensureLanguageLoaded } from '../../dictionary';
-import { shouldBotScore } from './botGame';
+import { shouldBotScore, type BotScoreTuning } from './botGame';
 import { BOT_CONFIG } from '../../modules/botConfig';
 import { WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
 import logger from '../../utils/logger';
+
+/**
+ * Wheel Rush is a SHORT (60s) mode, so the classic bot calibration — a 25s
+ * free-scoring grace window, hard bots aiming for 115% of the best human, and a
+ * 250-point floor — made bots dominate the leaderboard. These knobs soften them:
+ * the grace window roughly matches the 10s fog, hard bots cap below the human,
+ * and the floor drops so a modest human round can't be lapped by a guaranteed
+ * bot floor. See shouldBotScore / BotScoreTuning.
+ */
+const WHEEL_RUSH_BOT_TUNING: BotScoreTuning = {
+  targetMult: 0.7,   // hard ≈ 0.80×, medium ≈ 0.67×, easy ≈ 0.53× of best human
+  floorMult: 0.4,    // floors → easy 32 / medium 60 / hard 100
+  ceilingMult: 0.6,  // gentler fallback if nobody has scored yet
+  graceMs: 9_000,    // ≈ fog duration, not the classic 25s
+};
 
 /**
  * DFS trie walk over the wheel letter bag. Each outer letter usable at most
@@ -130,7 +145,7 @@ function submitOneWord(
 
   if (outcome.kind === 'locked') {
     const total = outcome.score;
-    if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty)) return;
+    if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty, WHEEL_RUSH_BOT_TUNING)) return;
     bot.score += total;
     updatePlayerScore(gameCode, bot.username, total, true);
     addPlayerWord(gameCode, bot.username, word, {
@@ -150,7 +165,7 @@ function submitOneWord(
 
   if (outcome.kind === 'stolen') {
     const total = outcome.score + outcome.stealBonus;
-    if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty)) return;
+    if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty, WHEEL_RUSH_BOT_TUNING)) return;
     bot.score += total;
     updatePlayerScore(gameCode, bot.username, total, true);
     addPlayerWord(gameCode, bot.username, word, {
@@ -234,8 +249,10 @@ export async function startBotsForWheelRush(
 
   for (const bot of bots) {
     bot.isActive = true;
-    // Shuffled slice so bots diverge — also acts as a soft per-bot cap.
-    const perBotCap = bot.difficulty === 'hard' ? 30 : bot.difficulty === 'medium' ? 20 : 12;
+    // Shuffled slice so bots diverge — also acts as a soft per-bot cap. Trimmed
+    // for the short 60s round so bots can't out-volume a focused human (see
+    // WHEEL_RUSH_BOT_TUNING for the matching score-ceiling softening).
+    const perBotCap = bot.difficulty === 'hard' ? 18 : bot.difficulty === 'medium' ? 12 : 8;
     const words = shuffle(allCandidates).slice(0, perBotCap);
     scheduleBot(io, gameCode, bot, state, words, language, gameEndTime);
     logger.info('BOT_WHEEL', `Bot "${bot.username}" queued ${words.length} wheel words for ${gameCode}`);

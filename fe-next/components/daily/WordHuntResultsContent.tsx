@@ -17,6 +17,7 @@ import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSi
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
 import CatchUpSuggestion from './CatchUpSuggestion';
+import MpModeCrossPromo from './MpModeCrossPromo';
 import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -349,6 +350,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         sees a clear, useful next step instead of a stale cross-promo. */}
     {backToDailyCtaNode}
     {!wordWheelPlayed && crossPromoOrder === 'wheel-first' && wheelCtaNode}
+
+    {/* Multiplayer cross-promo — surfaced once today's daily pair is complete, so
+        it never competes with the daily↔daily "finish today's challenge" CTA. */}
+    {wordWheelPlayed && (
+      <MpModeCrossPromo language={language} source="word_hunt_results" t={t} />
+    )}
 
     {/* Catch up dailies missed in the last 3 days — nudge after finishing one. */}
     <CatchUpSuggestion excludeDate={puzzleDate} />

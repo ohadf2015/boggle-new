@@ -76,6 +76,7 @@ const mocks = vi.hoisted(() => ({
     return setTimeout(() => {}, 0);
   }),
   shouldBotScore: vi.fn(() => true),
+  emitBotLeaderboard: vi.fn(),
   markBotScoringStart: vi.fn(),
   clearBotResyncThrottle: vi.fn(),
   startBotsForWordHunt: vi.fn(),
@@ -141,6 +142,7 @@ vi.mock('../../../modules/botLifecycle', () => ({
 
 vi.mock('./botGame', () => ({
   shouldBotScore: mocks.shouldBotScore,
+  emitBotLeaderboard: mocks.emitBotLeaderboard,
 }));
 
 vi.mock('../botWordHunt', () => ({
@@ -351,6 +353,34 @@ describe('startBotsForBlast', () => {
     const playerFound = mocks.volatileBroadcastToRoom.mock.calls.find(c => c[2] === 'playerFoundWord');
     expect(playerFound).toBeTruthy();
     expect(playerFound![3]).toMatchObject({ isFirstFinder: true });
+  });
+
+  it('broadcasts the bot\'s live score via the shared throttled leaderboard path (not an unthrottled direct emit)', async () => {
+    mocks.findAllWords.mockReturnValue(['hello']);
+    // emitBotLeaderboard routes through the throttled broadcaster — invoke its
+    // callback so we can assert the leaderboard payload actually reaches clients.
+    mocks.getLeaderboardThrottled.mockImplementation((_gc: string, cb: (lb: unknown) => void) =>
+      cb([{ username: 'BotTest', score: 12, isBot: true }]));
+    const bot = makeBot();
+    const blastState = makeBlastState();
+    mocks.getGame.mockReturnValue({
+      gameMode: 'blast', blastModeState: blastState,
+      letterGrid: [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']],
+      letterPositions: new Map(), playerCombos: {}, playerScores: {}, playerWords: {},
+    });
+
+    startBotsForBlast(mockIo, gameCode, [bot], blastState, 'en', 120);
+    await new Promise(resolve => setTimeout(resolve, 60));
+
+    // Score updated AND broadcast through the SHARED throttled path used by every
+    // other mode — so blast bot scores no longer freeze at 0 on the client.
+    expect(mocks.updatePlayerScore).toHaveBeenCalledWith(gameCode, bot.username, expect.any(Number), true);
+    expect(mocks.getLeaderboardThrottled).toHaveBeenCalled();
+    const lbEmit = mocks.volatileBroadcastToRoom.mock.calls.find((c: unknown[]) => c[2] === 'updateLeaderboard');
+    expect(lbEmit).toBeTruthy();
+    expect(lbEmit![3].leaderboard).toEqual(
+      expect.arrayContaining([expect.objectContaining({ username: 'BotTest', score: 12 })]),
+    );
   });
 
   it('cascades the played word on the bot\'s OWN board (per-player; refill=false is enforced inside cascadeBlastWord)', async () => {

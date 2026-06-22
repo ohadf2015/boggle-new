@@ -600,6 +600,7 @@ const HostView: React.FC<HostViewProps> = memo(({
             if (socket) sendCountdownComplete(socket, id, 'HOST');
           }}
           t={t}
+          players={players.playersReady as unknown as React.ComponentProps<typeof GoRipplesAnimation>['players']}
         />
       )}
 
