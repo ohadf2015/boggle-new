@@ -407,97 +407,89 @@ export default function ConnectionsGame() {
     <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative flex flex-col gap-2 w-full max-w-xl mx-auto py-3 px-4" translate="no">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
-      {/* Back to home */}
-      <div className="flex" dir={isRTL ? 'rtl' : 'ltr'}>
-        <button
-          type="button"
-          onClick={handleQuit}
-          aria-label={t('common.back')}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px] font-neo-body font-bold text-sm transition-all duration-100"
-        >
-          <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
-          <span>{t('common.back')}</span>
-        </button>
-      </div>
-
-      {/* Header: lives + level + score — sticky so HUD stays visible while scrolling / mobile keyboard up */}
+      {/* Command bar: back + lives + level + score in ONE compact sticky band.
+          Consolidating these (was 2 separate rows of 3 shouty stat boxes) lifts
+          the puzzle higher and cuts the visual noise above the playfield. */}
       <m.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
-        className="sticky top-0 z-30 -mx-4 px-4 py-2 bg-neo-navy/90 backdrop-blur-sm border-b-2 border-neo-purple/40 flex items-center justify-between gap-3"
+        className="sticky top-0 z-30 -mx-4 px-4 py-2 bg-neo-navy/90 backdrop-blur-sm border-b-2 border-neo-purple/40 flex items-center gap-2.5"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
-        {/* LIVES — neo-brutalist hearts pill */}
+        {/* Back — icon-only to keep the bar light */}
+        <button
+          type="button"
+          onClick={handleQuit}
+          aria-label={t('common.back')}
+          className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px] transition-all duration-100"
+        >
+          <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />
+        </button>
+
+        {/* LIVES — compact hearts row */}
         <div
           ref={heartsRef}
-          className="flex flex-col items-start gap-1"
+          className="flex items-center gap-1 shrink-0"
           aria-label={`${t('connections.lives')}: ${state.lives} / ${MAX_LIVES}`}
         >
-          <p className="text-neo-pink text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
-            {t('connections.lives')}
-          </p>
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-navy-light border-neo border-black rounded-neo shadow-hard">
-            {Array.from({ length: MAX_LIVES }).map((_, i) => {
-              const alive = i < state.lives;
-              return (
-                <m.span
-                  key={`life-${i}`}
-                  animate={
-                    alive
-                      ? { scale: 1, opacity: 1, filter: 'grayscale(0) drop-shadow(0 0 4px rgba(255,20,147,0.6))' }
-                      : { scale: 0.55, opacity: 0.18, filter: 'grayscale(1)' }
-                  }
-                  transition={{ type: 'spring' as const, stiffness: 420, damping: 16 }}
-                  className="text-xl select-none leading-none"
-                >
-                  {alive ? '❤️' : '🖤'}
-                </m.span>
-              );
-            })}
-          </div>
+          <span className="sr-only">{t('connections.lives')}</span>
+          {Array.from({ length: MAX_LIVES }).map((_, i) => {
+            const alive = i < state.lives;
+            return (
+              <m.span
+                key={`life-${i}`}
+                animate={
+                  alive
+                    ? { scale: 1, opacity: 1, filter: 'grayscale(0) drop-shadow(0 0 4px rgba(255,20,147,0.6))' }
+                    : { scale: 0.55, opacity: 0.18, filter: 'grayscale(1)' }
+                }
+                transition={{ type: 'spring' as const, stiffness: 420, damping: 16 }}
+                className="text-lg select-none leading-none"
+              >
+                {alive ? '❤️' : '🖤'}
+              </m.span>
+            );
+          })}
         </div>
 
-        {/* LEVEL — neo-brutalist cyan badge */}
-        <m.div
-          ref={levelBadgeRef}
-          key={`level-${level}`}
-          initial={{ scale: 0.8, rotate: -3 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring' as const, stiffness: 400, damping: 14 }}
-          className="flex flex-col items-center gap-1"
-        >
-          <p className="text-neo-cyan text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
-            {t('connections.level')}
-          </p>
-          <div className="px-3 py-1 bg-neo-cyan border-neo border-black rounded-neo shadow-hard">
-            <p className="font-neo-display text-2xl text-neo-navy font-black leading-none tabular-nums">
+        {/* LEVEL + SCORE pushed to the trailing edge */}
+        <div className="ms-auto flex items-center gap-3">
+          {/* LEVEL — cyan badge with inline label */}
+          <m.div
+            ref={levelBadgeRef}
+            key={`level-${level}`}
+            initial={{ scale: 0.85, rotate: -2 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring' as const, stiffness: 400, damping: 14 }}
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-neo-cyan border-neo border-black rounded-neo shadow-hard-sm"
+          >
+            <span className="text-neo-navy/60 text-[9px] uppercase tracking-widest font-neo-display font-bold leading-none">
+              {t('connections.level')}
+            </span>
+            <span className="font-neo-display text-lg text-neo-navy font-black leading-none tabular-nums">
               {level}
-              <span className="text-neo-navy/50 text-xs font-mono font-bold"> / {totalLevels}</span>
-            </p>
-          </div>
-        </m.div>
+              <span className="text-neo-navy/50 text-[10px] font-mono font-bold"> / {totalLevels}</span>
+            </span>
+          </m.div>
 
-        <div className="flex flex-col items-end gap-1 text-sm font-neo-body min-w-0">
-          <p className="text-neo-lime text-[10px] uppercase tracking-widest font-neo-display font-bold leading-none">
-            {t('connections.score')}
-          </p>
-          <div className="flex items-center gap-2">
-          <AnimatePresence>
-            {state.streak >= 2 && (
-              <m.span
-                key={`streak-${state.streak}`}
-                initial={{ scale: 0.5, opacity: 0, y: -8 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ type: 'spring' as const, stiffness: 400, damping: 16 }}
-                className="text-neo-orange font-bold"
-              >
-                🔥 ×{state.streak}
-              </m.span>
-            )}
-          </AnimatePresence>
-          <span className="text-neo-white">
+          {/* SCORE — streak flame + animated total */}
+          <div className="flex items-center gap-1.5 font-neo-body">
+            <span className="sr-only">{t('connections.score')}</span>
+            <AnimatePresence>
+              {state.streak >= 2 && (
+                <m.span
+                  key={`streak-${state.streak}`}
+                  initial={{ scale: 0.5, opacity: 0, y: -8 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  transition={{ type: 'spring' as const, stiffness: 400, damping: 16 }}
+                  className="text-neo-orange text-sm font-bold leading-none"
+                >
+                  🔥{state.streak}
+                </m.span>
+              )}
+            </AnimatePresence>
             <AnimatePresence mode="popLayout">
               <m.span
                 key={sessionScore + state.score}
@@ -505,42 +497,53 @@ export default function ConnectionsGame() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 14, opacity: 0 }}
                 transition={{ type: 'spring' as const, stiffness: 380, damping: 22 }}
-                className="text-neo-cyan font-bold inline-block"
+                className="text-neo-cyan text-lg font-bold leading-none tabular-nums inline-block"
               >
                 {(sessionScore + state.score).toLocaleString()}
               </m.span>
             </AnimatePresence>
-          </span>
           </div>
         </div>
       </m.div>
 
-      {/* Daily Challenge + Community entries */}
-      <div className="flex gap-2">
+      {/* Daily + Community — lightweight secondary links, not full-width CTAs */}
+      <div className="flex justify-center gap-2">
         <Link
           href={`/${language}/connections/daily`}
-          className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo border-neo-yellow/60 bg-neo-yellow/10 px-3 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          className="inline-flex items-center gap-1.5 rounded-full border border-neo-yellow/40 bg-neo-yellow/5 px-3 py-1 font-neo-body text-xs font-bold text-neo-yellow/90 transition-colors hover:bg-neo-yellow/10 hover:text-neo-yellow"
         >
-          🏆 {t('connections.daily.cta')}
+          <span aria-hidden="true">🏆</span>
+          <span>{t('connections.daily.cta')}</span>
         </Link>
         <Link
           href={`/${language}/connections/community`}
-          className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo border-neo-pink/60 bg-neo-pink/10 px-3 py-2 font-neo-display text-sm font-black text-neo-pink shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          className="inline-flex items-center gap-1.5 rounded-full border border-neo-pink/40 bg-neo-pink/5 px-3 py-1 font-neo-body text-xs font-bold text-neo-pink/90 transition-colors hover:bg-neo-pink/10 hover:text-neo-pink"
         >
-          👥 {t('connections.community.cta')}
+          <span aria-hidden="true">👥</span>
+          <span>{t('connections.community.cta')}</span>
         </Link>
       </div>
 
-      {/* XP earned this session */}
-      {xpEarned > 0 && (
-        <p className="text-center text-neo-lime text-xs font-neo-body">
-          +{xpEarned} {t('connections.xpEarned')}
-        </p>
-      )}
-
-      {/* Momentum: dangle the next reward / hype the streak — pulls into the next puzzle */}
-      <div>
-        <ConnectionsMomentumChip state={momentumState({ solvedThisSession, streak: state.streak })} />
+      {/* Momentum: dangle the next reward / hype the streak — pulls into the next
+          puzzle. XP earned this session rides here too (was a separate line). */}
+      <div className="flex items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <ConnectionsMomentumChip state={momentumState({ solvedThisSession, streak: state.streak })} />
+        </div>
+        <AnimatePresence>
+          {xpEarned > 0 && (
+            <m.span
+              key={xpEarned}
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ type: 'spring' as const, stiffness: 360, damping: 18 }}
+              className="shrink-0 rounded-full border border-neo-lime/40 bg-neo-lime/10 px-2.5 py-1 font-neo-body text-xs font-bold text-neo-lime tabular-nums"
+            >
+              +{xpEarned} {t('connections.xpEarned')}
+            </m.span>
+          )}
+        </AnimatePresence>
       </div>
 
       <PuzzleCard
