@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useState, useCallback, useEffect } from 'react';
+import React, { memo, useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { m, AnimatePresence } from 'framer-motion';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
@@ -10,6 +10,7 @@ import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
 import { LobbyDailyEmber } from '@/components/lobby/LobbyDailyEmber';
+import { LobbyAutoStartStatus } from '@/components/lobby/LobbyAutoStartStatus';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
 import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
@@ -17,7 +18,6 @@ import { EmoteTray } from './lobby/EmoteTray';
 import { useSocketOptional } from '@/utils/SocketContext';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
-import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
 import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
@@ -104,11 +104,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   // they watch (return value unused here — guests don't gate anything).
   useLobbyAdGate({ socket: socketCtx?.socket ?? null });
 
-  // Mirror the host's server-owned auto-start countdown (display only — guests
-  // never fire the start) so everyone watches the same number tick down.
-  const { secondsLeft: autoStartSecondsLeft } = useLobbyAutoStart({
-    socket: socketCtx?.socket ?? null,
-  });
+  // The server-owned auto-start countdown (1Hz `lobbyAutoStartTick`) lives in
+  // <LobbyAutoStartStatus/>, a memoized leaf — keeping it out of this component
+  // so the whole 8-avatar lobby tree no longer re-renders once per second.
 
   const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const avatarPremium = useAvatarPremium();
@@ -127,18 +125,20 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
   // Ready-state lookups for roster badges + the "N/M ready" status line.
   // Bots auto-count as ready; host clicks Start (never "Ready") so is excluded.
-  const readySet = new Set(readyUsernames);
-  const readyTotal = nonHostPlayers.filter((p) => {
+  // Memoized so unrelated re-renders don't rebuild the Set / re-scan the roster
+  // and so child props keep stable references.
+  const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
+  const readyTotal = useMemo(() => nonHostPlayers.filter((p) => {
     const o = typeof p === 'object' ? p : null;
     return !o?.isHost && !o?.isBot;
-  }).length;
-  const readyCount = nonHostPlayers.filter((p) => {
+  }).length, [nonHostPlayers]);
+  const readyCount = useMemo(() => nonHostPlayers.filter((p) => {
     const o = typeof p === 'object' ? p : null;
     const nm = typeof p === 'string' ? p : p.username;
     // Match server `getPlayersReadyCount`: humans only, host + bots excluded.
     if (o?.isHost || o?.isBot) return false;
     return readySet.has(nm);
-  }).length;
+  }).length, [nonHostPlayers, readySet]);
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [editNameValue, setEditNameValue] = useState(username);
@@ -254,21 +254,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             </m.button>
           ) : null}
 
-          <div className="flex items-center justify-between gap-2 mt-1.5">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse shrink-0" />
-              <p className={cn(
-                'text-sm truncate',
-                autoStartSecondsLeft !== null ? 'text-neo-lime font-bold' : 'text-slate-400'
-              )}>
-                {autoStartSecondsLeft !== null
-                  ? t('playerView.autoStartingSoon', { seconds: autoStartSecondsLeft })
-                  : readyCount > 0
-                    ? `${readyCount}/${readyTotal} ${t('hostView.playersReady')}`
-                    : t('playerView.hostWillStart')}
-              </p>
-            </div>
-          </div>
+          <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />
 
           <LobbyRewardCluster surface="player_waiting" className="mt-3" />
         </div>
