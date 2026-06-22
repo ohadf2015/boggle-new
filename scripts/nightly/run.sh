@@ -336,8 +336,23 @@ export NIGHTLY_AUTHORED="$NIGHTLY_AUTHORED_FILE"
 # logged + alerted but never blocks the run (lanes degrade to REST/skip on their own).
 . "$LIB_DIR/mcp-probe.sh"
 MCP_PROBE_LINE="$(probe_supabase_mcp)" || true
+# Bounded retry on TRANSPORT failures only: the probe spawns npx + does a stdio
+# handshake, and it fires moments after a sleeping mac wakes at the trigger. A cold
+# node boot under lane-warmup contention (load ~8) can overrun the handshake window
+# and return a FALSE fail:transport even though supabase is healthy (token verified
+# 200, pkg cached, a warm boot is ~3s — the 2026-06-22 false alarm). Mirror the
+# fetch-retry in preflight: retry the transient transport class with backoff before
+# alerting. fail:auth is NOT retried (a 401 won't self-heal); a genuine outage still
+# fails every attempt and alerts as before.
+_probe_try=1; _probe_max="${NIGHTLY_PROBE_RETRIES:-3}"; _probe_slp="${NIGHTLY_PROBE_RETRY_SLEEP:-10}"
+while [[ "$MCP_PROBE_LINE" == *fail:transport* && "$_probe_try" -lt "$_probe_max" ]]; do
+  log "supabase MCP probe: $MCP_PROBE_LINE — attempt $_probe_try/$_probe_max (cold-boot under load?), retrying in ${_probe_slp}s"
+  sleep "$_probe_slp"
+  _probe_try=$((_probe_try+1))
+  MCP_PROBE_LINE="$(probe_supabase_mcp)" || true
+done
 log "$MCP_PROBE_LINE"
-[[ "$MCP_PROBE_LINE" == *fail:* ]] && tg_alert "⚠️ nightly preflight — $MCP_PROBE_LINE (lanes 01/02 supabase fixes will degrade to REST/skip)"
+[[ "$MCP_PROBE_LINE" == *fail:* ]] && tg_alert "⚠️ nightly preflight — $MCP_PROBE_LINE after ${_probe_try} attempt(s) (lanes 01/02 supabase fixes will degrade to REST/skip)"
 
 # --- run lanes -------------------------------------------------------------
 LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense 09-monetization 10-dictionary)
