@@ -77,6 +77,20 @@ describe('DailyChallengeCube', () => {
     expect(screen.getByText(/5 daily\.dayStreak/)).toBeInTheDocument();
   });
 
+  it('prefers the chest-authoritative preloaded streak over the localStorage value', () => {
+    // The hook's `streak` is the legacy localStorage (Word-Hunt-only) value; when
+    // the landing page threads the chest's all-modes streak through preloadedStats,
+    // the cube must show THAT so its fire chip matches the weekly chest.
+    mockStats.mockReturnValue({ ...baseStats, streak: 5 });
+    render(
+      <DailyChallengeCube
+        preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 9, puzzleNumber: 123, loading: false }}
+      />,
+    );
+    expect(screen.getByText(/9 daily\.dayStreak/)).toBeInTheDocument();
+    expect(screen.queryByText(/5 daily\.dayStreak/)).not.toBeInTheDocument();
+  });
+
   it('shows the won badge when the player solved today', () => {
     mockStats.mockReturnValue({ ...baseStats, hasPlayed: true, hasSolved: true });
     render(<DailyChallengeCube />);

@@ -157,6 +157,7 @@ describe('computeCycleProgress', () => {
     expect(r.cycleNumber).toBe(1)
     expect(r.cycleStart).toBe('2026-05-12')
     expect(r.isClaimable).toBe(false)
+    expect(r.currentStreak).toBe(1)
   })
 
   it('returns daysCompleted 7 and isClaimable for 7 consecutive days', () => {
@@ -165,6 +166,7 @@ describe('computeCycleProgress', () => {
     expect(r.daysCompleted).toBe(7)
     expect(r.cycleNumber).toBe(1)
     expect(r.isClaimable).toBe(true)
+    expect(r.currentStreak).toBe(7)
   })
 
   it('starts cycle 2 on day 8', () => {
@@ -178,17 +180,40 @@ describe('computeCycleProgress', () => {
     expect(r.daysCompleted).toBe(1)
   })
 
+  // The fire-icon streak is the FULL consecutive-day run (it can exceed 7), not
+  // the within-cycle day count — so day 8 reads "8-day streak" while the chest
+  // shows day 1 of cycle 2. Both derive from the same walk, so they never disagree.
+  it('reports the full consecutive-day streak across cycle boundaries', () => {
+    const dates = Array.from({ length: 8 }, (_, i) => {
+      const d = new Date('2026-05-05')
+      d.setDate(d.getDate() + i)
+      return d.toISOString().split('T')[0]
+    })
+    const r = computeCycleProgress(dates, '2026-05-12')
+    expect(r.currentStreak).toBe(8)
+  })
+
   it('resets streak on gap', () => {
     const dates = ['2026-05-08','2026-05-09','2026-05-11','2026-05-12']
     const r = computeCycleProgress(dates, today)
     expect(r.daysCompleted).toBe(2)
     expect(r.cycleNumber).toBe(1)
+    expect(r.currentStreak).toBe(2)
+  })
+
+  it('does not count the streak when today is not completed', () => {
+    // Played yesterday + the day before, but not today → the live streak from
+    // `today` is 0 (the run ended yesterday). Matches the chest walk-back.
+    const r = computeCycleProgress(['2026-05-10', '2026-05-11'], today)
+    expect(r.currentStreak).toBe(0)
+    expect(r.daysCompleted).toBe(0)
   })
 
   it('returns empty progress with no dates', () => {
     const r = computeCycleProgress([], today)
     expect(r.daysCompleted).toBe(0)
     expect(r.isClaimable).toBe(false)
+    expect(r.currentStreak).toBe(0)
   })
 })
 

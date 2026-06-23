@@ -40,7 +40,10 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   const countdown = mounted ? stats.countdown : '';
   const hasPlayed = mounted ? stats.hasPlayed : false;
   const hasSolved = mounted ? stats.hasSolved : false;
-  const streak = mounted ? stats.streak : 0;
+  // Prefer the chest-authoritative streak threaded through `preloadedStats`
+  // (all daily modes + freezes) so the fire icon matches the weekly chest; fall
+  // back to the hook's localStorage value when no preloaded streak is supplied.
+  const streak = mounted ? (preloadedStats?.currentStreak ?? stats.streak) : 0;
   const puzzleNumber = mounted ? stats.puzzleNumber : 0;
   // Progress strip = the player's REAL last-5-days completion (each cell filled
   // when that day's daily was actually played), not an echo of the streak count.

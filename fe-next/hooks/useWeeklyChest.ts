@@ -17,6 +17,8 @@ export type ChestTier = 'bronze' | 'silver' | 'gold'
 export interface WeeklyChestState {
   loading: boolean
   daysCompleted: number
+  /** Full consecutive-day streak (can exceed 7) — powers the daily "fire" icon. */
+  currentStreak: number
   completedDates: string[]
   cycleStart: string
   cycleNumber: number
@@ -32,6 +34,7 @@ export interface WeeklyChestState {
 
 const DEFAULTS = {
   daysCompleted: 0,
+  currentStreak: 0,
   completedDates: [] as string[],
   cycleStart: '',
   cycleNumber: 1,
@@ -50,6 +53,10 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
   const daysCompleted = Number.isFinite(rawDays)
     ? Math.max(0, Math.min(7, Math.trunc(rawDays)))
     : 0
+  // currentStreak is the full consecutive run — NOT clamped to 7 (the fire icon
+  // shows real streaks like "23"), only floored at 0 and integer-coerced.
+  const rawStreak = Number(obj.currentStreak)
+  const currentStreak = Number.isFinite(rawStreak) ? Math.max(0, Math.trunc(rawStreak)) : 0
   const completedDates = Array.isArray(obj.completedDates)
     ? (obj.completedDates.filter(d => typeof d === 'string') as string[])
     : []
@@ -69,6 +76,7 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
     : 0
   return {
     daysCompleted,
+    currentStreak,
     completedDates,
     cycleStart,
     cycleNumber,
