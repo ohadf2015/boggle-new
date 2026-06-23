@@ -38,6 +38,10 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => new Proxy({}, { get: () => vi.fn() }),
 }));
 
+vi.mock('@/hooks/useDrillMusic', () => ({
+  useDrillMusic: () => {},
+}));
+
 vi.mock('@/hooks/useDrillKeyboardSupport', () => ({
   useDrillKeyboardSupport: () => ({
     isTypingMode: false,

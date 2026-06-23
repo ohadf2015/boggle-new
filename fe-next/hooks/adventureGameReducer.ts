@@ -565,14 +565,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const newComboCount = state.gameState.comboCount + 1;
 
-      // Auto-end only when EVERY objective is done (primary AND secondary) — at
-      // that point nothing is left to improve, so waiting out the timer is pure
-      // dead time. While any quest is still open the level keeps running so the
-      // player can chase the remaining stars. Boss levels are excluded — their
-      // win/lose is owned by the boss-health flow, not the objective list.
-      const allQuestsDone =
-        !state.levelConfig.isBossLevel && allObjectivesComplete(newObjectives);
-
       // Collect all upgrade triggers from tile effects
       const allTriggers = [...tileTriggeredUpgrades];
 
@@ -595,8 +587,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         : undefined;
       const movesExhausted = newMovesRemaining != null && newMovesRemaining <= 0;
 
-      // End the level when moves run out (blast) or all quests are done.
-      const isComplete = movesExhausted || allQuestsDone;
+      // End the level when all objectives done (non-boss) OR moves run out (blast mode).
+      const allQuestsDone = !state.levelConfig.isBossLevel && allObjectivesComplete(newObjectives);
+      const isComplete = allQuestsDone || movesExhausted;
 
       const resultState: GameState = {
         ...state,

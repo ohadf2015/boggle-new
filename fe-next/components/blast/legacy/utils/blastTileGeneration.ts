@@ -158,5 +158,44 @@ export function generateTileStates(
     }
   }
 
+  // Pair locked + key tiles — each locked must have a key within Manhattan ≤3.
+  // Orphan locked or orphan key → downgrade to standard.
+  const lockedTiles: BlastTileState[] = [];
+  const keyTiles: BlastTileState[] = [];
+  for (const row of tiles) {
+    for (const tile of row) {
+      if (tile.type === 'locked') lockedTiles.push(tile);
+      else if (tile.type === 'key') keyTiles.push(tile);
+    }
+  }
+  const MAX_KEY_DISTANCE = 3;
+  const lockedPaired = new Set<number>();
+  const keyPaired = new Set<number>();
+  for (let i = 0; i < lockedTiles.length; i++) {
+    for (let j = 0; j < keyTiles.length; j++) {
+      if (keyPaired.has(j)) continue;
+      const dist =
+        Math.abs(lockedTiles[i].row - keyTiles[j].row) +
+        Math.abs(lockedTiles[i].col - keyTiles[j].col);
+      if (dist <= MAX_KEY_DISTANCE) {
+        lockedPaired.add(i);
+        keyPaired.add(j);
+        break;
+      }
+    }
+  }
+  for (let i = 0; i < lockedTiles.length; i++) {
+    if (!lockedPaired.has(i)) {
+      lockedTiles[i].type = 'standard';
+      lockedTiles[i].hitsRemaining = 0;
+    }
+  }
+  for (let j = 0; j < keyTiles.length; j++) {
+    if (!keyPaired.has(j)) {
+      keyTiles[j].type = 'standard';
+      keyTiles[j].hitsRemaining = 0;
+    }
+  }
+
   return tiles;
 }

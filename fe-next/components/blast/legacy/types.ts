@@ -358,6 +358,8 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   anchor: 0,
   chocolate: 0,
   cake: 0,
+  locked: 0,
+  key: 0,
 };
 
 // ==================== Objectives ====================

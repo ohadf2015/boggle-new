@@ -561,6 +561,11 @@ vi.mock('../AdventureGameOverlays', () => ({
   default: () => null,
 }));
 
+vi.mock('../AdventureTailOverlays', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 vi.mock('../themed/GameplayBackground', () => ({
   __esModule: true,
   default: () => null,
@@ -604,6 +609,7 @@ vi.mock('../ui', () => {
         {overlays}
       </div>
     ),
+    PrimaryObjectiveBanner: () => null,
   };
 });
 
