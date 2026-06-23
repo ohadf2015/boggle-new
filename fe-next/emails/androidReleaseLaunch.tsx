@@ -363,6 +363,15 @@ export default function AndroidReleaseLaunchEmail({
                     </td>
                   </tr>
 
+                  {/* Review ask — converts the install blast into a review-seeder */}
+                  <tr>
+                    <td align="center" style={{ padding: '4px 24px 0' }}>
+                      <p style={{ margin: 0, fontFamily: FONT_STACK, fontSize: '14px', lineHeight: '20px', color: C.muted }}>
+                        {t.rateAsk}
+                      </p>
+                    </td>
+                  </tr>
+
                   {/* Footer */}
                   <tr>
                     <td align="center" style={{ padding: '24px 16px 8px' }}>

@@ -24,6 +24,8 @@ export interface ReleaseStrings {
   chips: [string, string, string];
   /** Primary call-to-action button label. */
   cta: string;
+  /** Review nudge for the already-installed cohort — turns the blast into a review-seeder. */
+  rateAsk: string;
   /** Footer reason-for-receiving line. */
   footer: string;
   /** Unsubscribe link label. */
@@ -41,6 +43,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     subhead: 'Daily puzzles, live multiplayer and offline play — now in your pocket.',
     chips: ['Daily puzzles', 'Live multiplayer', 'Play offline'],
     cta: 'Get it on Google Play',
+    rateAsk: 'Already hooked? A quick ⭐⭐⭐⭐⭐ helps new players find us.',
     footer: 'You receive this because you have a LexiClash account.',
     unsubscribe: 'Unsubscribe',
   },
@@ -52,6 +55,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     subhead: 'חידות יומיות, רב‑משתתפים בזמן אמת ומשחק לא מקוון — עכשיו בכיס שלך.',
     chips: ['חידה יומית', 'רב‑משתתפים', 'משחק לא מקוון'],
     cta: 'הורידו מ‑Google Play',
+    rateAsk: 'כבר התמכרתם? דירוג ⭐⭐⭐⭐⭐ קטן עוזר לשחקנים חדשים לגלות אותנו.',
     footer: 'קיבלת הודעה זו כי יש לך חשבון ב‑LexiClash.',
     unsubscribe: 'ביטול מנוי',
   },
@@ -63,6 +67,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     subhead: 'Dagliga pussel, live-flerspelarläge och offline-spel — nu i fickan.',
     chips: ['Dagliga pussel', 'Flerspelarläge', 'Spela offline'],
     cta: 'Hämta på Google Play',
+    rateAsk: 'Redan fast? Ett snabbt ⭐⭐⭐⭐⭐ hjälper nya spelare att hitta oss.',
     footer: 'Du får detta för att du har ett LexiClash-konto.',
     unsubscribe: 'Avsluta prenumeration',
   },
@@ -74,6 +79,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     subhead: '毎日のパズル、リアルタイム対戦、オフラインプレイ — すべて手のひらに。',
     chips: ['毎日のパズル', 'オンライン対戦', 'オフライン対応'],
     cta: 'Google Playで入手',
+    rateAsk: 'もうハマってる？ ⭐⭐⭐⭐⭐ の評価が新しいプレイヤーの発見につながります。',
     footer: 'このメールはLexiClashアカウントをお持ちの方にお送りしています。',
     unsubscribe: '配信停止',
   },
@@ -85,6 +91,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     subhead: 'Retos diarios, multijugador en vivo y juego sin conexión — ahora en tu bolsillo.',
     chips: ['Retos diarios', 'Multijugador', 'Sin conexión'],
     cta: 'Descárgalo en Google Play',
+    rateAsk: '¿Ya enganchado? Una valoración de ⭐⭐⭐⭐⭐ ayuda a que nuevos jugadores nos descubran.',
     footer: 'Recibes esto porque tienes una cuenta de LexiClash.',
     unsubscribe: 'Cancelar suscripción',
   },
