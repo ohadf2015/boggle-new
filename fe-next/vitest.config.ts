@@ -117,6 +117,8 @@ export default defineConfig({
       '**/reengagementEmail.test.ts',
       '**/SinglePlayerGame.achievements.test.tsx',
       '**/PracticeWheelSandbox.drag.test.tsx',
+      '**/PracticeWheelSandbox.completion.test.tsx',
+      '**/ScoreReadout.test.tsx',
       '**/AdventureGame.autoComplete.test.tsx',
       '**/growthTracking.referralClick.test.ts',
       '**/blastLockedRemoval.test.ts',
