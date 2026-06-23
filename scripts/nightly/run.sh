@@ -365,7 +365,7 @@ log "$MCP_PROBE_LINE"
 # dictionary → monetization → competitor → adsense. Under budget pressure the circuit breaker
 # defers the TAIL, which is now the genuinely-low-value-per-night lanes — nothing critical is
 # dropped on a healthy night. Reordering is safe: the loop matches by lane NAME, not position.
-LANES=(01-triage 11-mode-qa 02-perf 05-landing 06-seo 03-engagement 07-self-learn 10-dictionary 09-monetization 04-competitor 08-adsense)
+LANES=(01-triage 11-mode-qa 02-perf 05-landing 06-seo 03-engagement 12-telemetry-coverage 07-self-learn 10-dictionary 09-monetization 04-competitor 08-adsense)
 LANE_RESULTS=()
 
 should_run() {
