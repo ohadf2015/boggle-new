@@ -130,36 +130,35 @@ export function determineLocale(req: GeoRequest): string {
  * @param parsedUrl - Parsed URL object
  * @returns True if request was handled (redirected), false to continue
  */
-export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: UrlWithParsedQuery): boolean {
+export function handleLocaleRedirect(req: GeoRequest, _res: Response, parsedUrl: UrlWithParsedQuery): boolean {
   const userAgent = (req.headers['user-agent'] as string) || '';
   const locale = determineLocale(req);
   const queryString = parsedUrl.search || '';
 
   // A real browser TOP-LEVEL navigation always sends `Sec-Fetch-Mode: navigate`
   // (Chrome 76+/Firefox 90+/Safari 16.4+). Server-side fetches — including
-  // ad-network ownership verifiers that spoof a "Mozilla" UA — cannot forge it,
-  // so its absence is a strong "not an interactive human" signal at the root.
+  // ad-network ownership verifiers that spoof a "Mozilla" UA — cannot forge it.
   const secFetchMode = (req.headers['sec-fetch-mode'] as string) || '';
   const isBrowserNavigation = secFetchMode === 'navigate';
 
-  // For any bot (social/SEO), non-browser client, OR any non-navigation request:
-  // rewrite internally (don't redirect). Redirects waste crawl budget AND break
-  // ownership verifiers (Monetag etc.) that fetch the root and never follow the
-  // 301 — they must see the rendered page to read the verification <meta>.
-  // Real browser navigations fall through to the locale 301 below.
-  if (isBot(userAgent) || isNonBrowserClient(userAgent) || !isBrowserNavigation) {
-    // SEO bots + non-browser clients get x-default locale (en) to match the
-    // sitemap canonical; known social crawlers keep the detected locale.
-    const botLocale = isSocialCrawler(userAgent) ? locale : 'en';
-    httpLogger.debug({ botLocale, queryString }, 'Bot/verifier detected, rewriting');
-    parsedUrl.pathname = `/${botLocale}`;
-    req.url = `/${botLocale}${queryString}`;
-    return false; // Continue to Next.js handler
-  }
+  // ALWAYS rewrite the bare root internally (200 localized content), NEVER 301.
+  // Why no redirect: ad-network ownership verifiers (Monetag etc.) fetch the
+  // root and do NOT follow redirects, so the verification <meta> must be on the
+  // 200 response — and their request shape (UA / headers) is not reliably
+  // detectable, so we stop trying to single them out and just serve everyone.
+  // SEO is unaffected: SEO crawlers ALREADY received /en content here (this
+  // handler never issued them a redirect), and every locale page carries an
+  // absolute canonical, so removing the human 301 changes nothing Googlebot sees.
+  //
+  // x-default 'en' for SEO crawlers + non-browser/non-navigation clients (match
+  // the sitemap canonical); a genuine human browser navigation gets its detected
+  // locale so it still lands on localized content at the root.
+  const servesXDefault =
+    isSeoCrawler(userAgent) || isNonBrowserClient(userAgent) || !isBrowserNavigation;
+  const targetLocale = servesXDefault ? 'en' : locale;
 
-  // For regular users: 301 permanent redirect (locale structure is permanent)
-  httpLogger.debug({ from: req.url, to: `/${locale}${queryString}` }, 'Root path redirect');
-  res.writeHead(301, { Location: `/${locale}${queryString}` });
-  res.end();
-  return true; // Request handled
+  httpLogger.debug({ targetLocale, servesXDefault, queryString }, 'Root rewrite (no redirect)');
+  parsedUrl.pathname = `/${targetLocale}`;
+  req.url = `/${targetLocale}${queryString}`;
+  return false; // Continue to Next.js handler — serves 200 localized content
 }

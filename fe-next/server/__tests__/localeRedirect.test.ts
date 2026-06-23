@@ -83,37 +83,38 @@ describe('isNonBrowserClient', () => {
   });
 });
 
-describe('handleLocaleRedirect — ownership verifiers must NOT be redirected', () => {
-  it('301-redirects a real browser navigation at root (locale-aware)', () => {
+describe('handleLocaleRedirect — root always rewrites (never 301), so any verifier reads the meta', () => {
+  it('rewrites a real browser navigation to its detected locale (200, no redirect)', () => {
     const res = mockRes();
-    const handled = handleLocaleRedirect(browserNav('Mozilla/5.0 (Windows) Chrome/120'), res, parsed());
-    expect(handled).toBe(true);
-    expect(res._status).toBe(301);
-  });
-
-  it('rewrites a non-browser verifier (no Mozilla token) so it reads the meta', () => {
-    const req2 = rootReq('Monetag-Verifier/1.0');
-    const res = mockRes();
-    const handled = handleLocaleRedirect(req2, res, parsed());
-    expect(handled).toBe(false);          // continues to Next → 200 HTML with the meta
-    expect(req2.url).toBe('/en');
+    // Hebrew browser → /he content served at root, never redirected.
+    const r = { headers: { 'user-agent': 'Mozilla/5.0 (Windows) Chrome/120', 'sec-fetch-mode': 'navigate', 'accept-language': 'he-IL,he;q=0.9' }, url: '/' } as unknown as GeoRequest;
+    const handled = handleLocaleRedirect(r, res, parsed());
+    expect(handled).toBe(false);
+    expect(r.url).toBe('/he');
     expect(res._status).toBeUndefined();
   });
 
-  it('rewrites an empty UA (typical verification crawler)', () => {
-    const req2 = rootReq('');
+  it('serves x-default /en to SEO crawlers (sitemap canonical)', () => {
     const res = mockRes();
-    expect(handleLocaleRedirect(req2, res, parsed())).toBe(false);
-    expect(req2.url).toBe('/en');
+    const r = rootReq('Googlebot/2.1 (+http://www.google.com/bot.html)');
+    expect(handleLocaleRedirect(r, res, parsed())).toBe(false);
+    expect(r.url).toBe('/en');
   });
 
-  // The hard case: a verifier that spoofs a real browser UA but is a server-side
-  // fetch — it cannot forge the browser-only Sec-Fetch-Mode: navigate header.
-  it('rewrites a Mozilla-spoofing verifier that omits Sec-Fetch-Mode: navigate', () => {
-    const req2 = rootReq('Mozilla/5.0 (compatible; verifier)'); // no sec-fetch-mode
+  it('rewrites a non-browser / spoofing verifier to /en so it reads the meta (no redirect)', () => {
+    for (const ua of ['Monetag-Verifier/1.0', '', 'Mozilla/5.0 (compatible; verifier)']) {
+      const r = rootReq(ua);
+      const res = mockRes();
+      expect(handleLocaleRedirect(r, res, parsed())).toBe(false);
+      expect(r.url).toBe('/en');
+      expect(res._status).toBeUndefined();
+    }
+  });
+
+  it('preserves the query string on the internal rewrite', () => {
     const res = mockRes();
-    expect(handleLocaleRedirect(req2, res, parsed())).toBe(false);
-    expect(req2.url).toBe('/en');
-    expect(res._status).toBeUndefined();
+    const r = rootReq('curl/8');
+    expect(handleLocaleRedirect(r, res, { pathname: '/', search: '?ref=x' } as unknown as UrlWithParsedQuery)).toBe(false);
+    expect(r.url).toBe('/en?ref=x');
   });
 });
