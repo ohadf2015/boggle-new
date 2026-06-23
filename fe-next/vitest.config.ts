@@ -121,11 +121,17 @@ export default defineConfig({
       '**/MultiplayerFlow.guestJoinViaLink.test.tsx',
       '**/chain-builder.test.ts',
       '**/CrazyGamesSDK.authOutcome.test.tsx',
+      '**/CrazyGamesSDK.embedSticky.test.tsx',
     ],
     testTimeout: 10000,
     pool: 'forks',
     maxForks: 8,
     minForks: 2,
+    poolOptions: {
+      forks: {
+        execArgv: ['--max-old-space-size=5120'],
+      },
+    },
     useAtomics: true,
     teardownTimeout: 5000,
     hookTimeout: 10000,
