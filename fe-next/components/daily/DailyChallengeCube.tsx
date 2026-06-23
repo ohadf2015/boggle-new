@@ -41,7 +41,10 @@ const DailyChallengeCube: React.FC<DailyChallengeCubeProps> = ({ preloadedStats 
   const countdown = mounted ? stats.countdown : '';
   const hasPlayed = mounted ? stats.hasPlayed : false;
   const hasSolved = mounted ? stats.hasSolved : null;
-  const streak = mounted ? stats.streak : 0;
+  // Prefer the chest-authoritative streak from `preloadedStats` (all daily modes
+  // + freezes) so this cube's fire chip matches the weekly chest; fall back to the
+  // hook's localStorage value when rendered without preloaded stats.
+  const streak = mounted ? (preloadedStats?.currentStreak ?? stats.streak) : 0;
   const puzzleNumber = mounted ? stats.puzzleNumber : 0;
 
   return (

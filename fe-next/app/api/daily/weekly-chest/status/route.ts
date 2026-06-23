@@ -90,6 +90,13 @@ export async function GET(request: NextRequest) {
     const completedCycles = findCompletedCycles(allDates)
     const unclaimed = completedCycles.find(c => !openedCycleStarts.has(c.cycleStart))
 
+    // Live streak: the full consecutive-day run from `today` backward across ALL
+    // modes (+ freezes). This is the single source of truth for the daily "fire"
+    // streak shown on the homepage card and the /daily header — computed the SAME
+    // way the chest progress is, so the two surfaces can never disagree. Computed
+    // unconditionally so the fire icon stays correct even on the backdated path.
+    const liveProgress = computeCycleProgress(allDates, today)
+
     // Backdated path: prior cycle still owed — surface it as the active cycle so
     // the player can still claim what they earned even after a new week began.
     // In-progress path: show current streak from `today` backward.
@@ -101,7 +108,7 @@ export async function GET(request: NextRequest) {
           daysCompleted: 7,
           isClaimable: true,
         }
-      : computeCycleProgress(allDates, today)
+      : liveProgress
 
     // Projected tier — what tier the chest would be if claimed right now, based
     // on the player's performance so far this cycle. Puzzle/Hunt/Wheel all
@@ -132,6 +139,7 @@ export async function GET(request: NextRequest) {
       cycleNumber: progress.cycleNumber,
       completedDates: progress.completedDates,
       daysCompleted: progress.daysCompleted,
+      currentStreak: liveProgress.currentStreak,
       isClaimable,
       pendingChest,
       weekScore,
