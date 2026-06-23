@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import {
   computeCycleProgress,
+  computeCurrentStreak,
   computeChestTierForCycle,
   findCompletedCycles,
   type HuntScoreRow,
@@ -85,6 +86,11 @@ export async function GET(request: NextRequest) {
         .map((c: any) => c.cycle_start as string)
     )
 
+    // The live streak (full run, grace-aware) is independent of which cycle we
+    // surface below — it's the same number every homepage "fire" icon shows, so
+    // compute it once from the combined dates and return it on every branch.
+    const currentStreak = computeCurrentStreak(allDates, today)
+
     // Find any fully-completed 7-day chunks across the player's history that
     // haven't been claimed yet. Oldest unclaimed wins so backlog clears in order.
     const completedCycles = findCompletedCycles(allDates)
@@ -132,6 +138,7 @@ export async function GET(request: NextRequest) {
       cycleNumber: progress.cycleNumber,
       completedDates: progress.completedDates,
       daysCompleted: progress.daysCompleted,
+      currentStreak,
       isClaimable,
       pendingChest,
       weekScore,

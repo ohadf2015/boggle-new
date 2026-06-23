@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
+import { useWeeklyChest } from '@/hooks/useWeeklyChest';
 import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { InlineBannerAd } from '@/components/ads';
@@ -92,6 +93,14 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const liveRoomStats = useLiveRoomStats();
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
   const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
+  // Single source of truth for the "fire" streak shown across the home surfaces
+  // (top bar, daily card, daily cube). The weekly-chest endpoint computes the
+  // real consecutive run across ALL daily modes (Hunt/Wheel/Puzzle) + freezes,
+  // so it can't disagree with the chest's own day dots. `useDailyChallengeStatus`
+  // alone only knew the Word-Hunt streak (`word_hunt_player_stats`), which is why
+  // the surfaces drifted apart. Guests/offline (chest 401 → no cycleStart) fall
+  // back to the local/Hunt value so they still see their own streak.
+  const weeklyChest = useWeeklyChest();
   const { activeEvents, myEvents, joinEvent: joinEventAction } = useEvents();
   const { players: topPlayers, loading: topPlayersLoading } = useTopPlayers(5, {
     initialData: initialData?.topPlayers,
@@ -154,7 +163,12 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,
     hasSolved: dailyChallengeStatus.hasSolved,
-    currentStreak: dailyChallengeStatus.currentStreak,
+    // Prefer the chest-authoritative streak once it has resolved (a real
+    // cycleStart proves the server replied for an authed user); before that, or
+    // for guests, fall back to the local/Hunt streak.
+    currentStreak: weeklyChest.cycleStart
+      ? weeklyChest.currentStreak
+      : dailyChallengeStatus.currentStreak,
     puzzleNumber: dailyChallengeStatus.puzzleNumber,
     loading: dailyChallengeStatus.loading,
   };

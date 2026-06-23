@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   computeCycleProgress,
+  computeCurrentStreak,
   computeWeekScore,
   normalizeDayScore,
   getChestTier,
@@ -189,6 +190,47 @@ describe('computeCycleProgress', () => {
     const r = computeCycleProgress([], today)
     expect(r.daysCompleted).toBe(0)
     expect(r.isClaimable).toBe(false)
+  })
+})
+
+describe('computeCurrentStreak', () => {
+  const today = '2026-05-12'
+
+  it('counts the consecutive run ending today', () => {
+    const dates = ['2026-05-10', '2026-05-11', '2026-05-12']
+    expect(computeCurrentStreak(dates, today)).toBe(3)
+  })
+
+  it('is NOT clamped to the 7-day cycle (real run can exceed 7)', () => {
+    const dates = Array.from({ length: 10 }, (_, i) => {
+      const d = new Date('2026-05-03T00:00:00Z')
+      d.setUTCDate(d.getUTCDate() + i)
+      return d.toISOString().slice(0, 10)
+    }) // 05-03..05-12 = 10 consecutive days ending today
+    expect(computeCurrentStreak(dates, today)).toBe(10)
+  })
+
+  it('GRACE: keeps the streak alive when today is not played yet but yesterday was', () => {
+    // Played through yesterday (05-11); today (05-12) not yet done. The streak
+    // stays alive until midnight — must still report 4, not 0.
+    const dates = ['2026-05-08', '2026-05-09', '2026-05-10', '2026-05-11']
+    expect(computeCurrentStreak(dates, today)).toBe(4)
+  })
+
+  it('returns 0 when neither today nor yesterday was played (streak broken)', () => {
+    const dates = ['2026-05-08', '2026-05-09', '2026-05-10'] // last play 2 days ago
+    expect(computeCurrentStreak(dates, today)).toBe(0)
+  })
+
+  it('bridges a freeze day baked into the completed-dates set', () => {
+    // Freeze rows are merged into allDates by the route, so a frozen 05-11
+    // bridges the gap → unbroken 5-day run.
+    const dates = ['2026-05-08', '2026-05-09', '2026-05-10', '2026-05-11', '2026-05-12']
+    expect(computeCurrentStreak(dates, today)).toBe(5)
+  })
+
+  it('returns 0 for no completions', () => {
+    expect(computeCurrentStreak([], today)).toBe(0)
   })
 })
 

@@ -158,6 +158,36 @@ describe('GET /api/daily/weekly-chest/status', () => {
     expect(body.pendingChest).toBe(null)
   })
 
+  it('returns currentStreak as the full run (uncapped) and survives a grace day', async () => {
+    // 10 consecutive days ending today (2026-05-12). daysCompleted clamps to the
+    // 7-cycle, but currentStreak reports the real run (10) for the fire icon.
+    const tenDays = Array.from({ length: 10 }, (_, i) => {
+      const d = new Date('2026-05-03T00:00:00Z')
+      d.setUTCDate(d.getUTCDate() + i)
+      return d.toISOString().slice(0, 10)
+    })
+    vi.mocked(createClient).mockResolvedValue(
+      makeMockSupabase({ huntAttempts: tenDays.map(d => ({ puzzle_date: d })) }) as any,
+    )
+    const res = await GET()
+    const body = await res.json()
+    expect(body.currentStreak).toBe(10)
+  })
+
+  it('keeps currentStreak alive on a grace day (played through yesterday, not today)', async () => {
+    // Played 05-08..05-11; today (05-12) not yet played. Streak must stay 4
+    // while the chest cycle (today-anchored) shows no progress yet.
+    vi.mocked(createClient).mockResolvedValue(
+      makeMockSupabase({
+        huntAttempts: ['2026-05-08','2026-05-09','2026-05-10','2026-05-11'].map(d => ({ puzzle_date: d })),
+      }) as any,
+    )
+    const res = await GET()
+    const body = await res.json()
+    expect(body.currentStreak).toBe(4)
+    expect(body.daysCompleted).toBe(0)
+  })
+
   it('returns daysCompleted 1 for single day attempt', async () => {
     const today = '2026-05-12'
     vi.mocked(createClient).mockResolvedValue(

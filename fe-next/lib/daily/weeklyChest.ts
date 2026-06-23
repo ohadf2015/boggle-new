@@ -151,6 +151,35 @@ export function findCompletedCycles(allCompletedDates: string[]): CompletedCycle
   return cycles
 }
 
+// The player's CURRENT streak — consecutive days (any daily mode, freeze rows
+// already merged into `allCompletedDates` by the caller) ending at `today`, OR
+// at yesterday when today hasn't been played yet. The grace day mirrors the
+// client localStorage streak (`isStreakAtRisk`): a run earned through yesterday
+// stays alive until the next UTC midnight, so the homepage "fire" number doesn't
+// flicker to 0 every morning before the player opens today's daily.
+//
+// Unlike `computeCycleProgress().daysCompleted` (clamped to the 7-day chest
+// cycle) this is the real run length — it can read 23, 100, … — and it's the
+// single authority every streak surface (top bar, daily card, cube) reads via
+// the weekly-chest status endpoint.
+export function computeCurrentStreak(allCompletedDates: string[], today: string): number {
+  const uniqueDateSet = new Set(allCompletedDates)
+  const cursor = new Date(today + 'T00:00:00Z')
+  // Grace: if today isn't done yet, anchor at yesterday. If yesterday is also
+  // missing, the loop counts 0 (streak genuinely broken).
+  if (!uniqueDateSet.has(today)) {
+    cursor.setUTCDate(cursor.getUTCDate() - 1)
+  }
+  let count = 0
+  while (true) {
+    const iso = cursor.toISOString().slice(0, 10)
+    if (!uniqueDateSet.has(iso)) break
+    count++
+    cursor.setUTCDate(cursor.getUTCDate() - 1)
+  }
+  return count
+}
+
 // allCompletedDates: all ISO dates the player ever finished a daily (any mode)
 // today: ISO date string (YYYY-MM-DD)
 export function computeCycleProgress(
