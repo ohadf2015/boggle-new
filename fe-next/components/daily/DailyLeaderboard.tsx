@@ -281,7 +281,9 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           </div>
         </div>
         <div className="text-center py-6">
-          <div className="text-4xl mb-3">🏆</div>
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 text-white border-2 border-indigo-600 shadow-md">
+            <Trophy aria-hidden className="h-7 w-7 text-amber-300" />
+          </div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
             {totalAttempts > 0
               ? (t('daily.signUpToAppear'))

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import { useSafeInterval } from '@/hooks/useSafeTimeout';
 import { m, AnimatePresence } from 'framer-motion';
-import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users } from 'lucide-react';
+import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users, Target, CircleDot } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useFriends } from '@/hooks/useFriends';
 import type { Language } from '@/types';
@@ -549,7 +549,9 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     if (isEmpty) {
       return (
         <div className="text-center py-6">
-          <div className="text-4xl mb-3">🏆</div>
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 text-white border-2 border-indigo-600 shadow-md">
+            <Trophy aria-hidden className="h-7 w-7 text-amber-300" />
+          </div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
             {activeTab === 'friends'
               ? t('leaderboard.noFriendsPlayed')
@@ -637,7 +639,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
             <span>{t('wordHunt.leaderboard.title')}</span>
             <span
               className={`
-                text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full border-2 border-neo-black shadow-xs normal-case tracking-normal
+                inline-flex items-center gap-1 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full border-2 border-neo-black shadow-xs normal-case tracking-normal
                 ${scope === 'word-hunt' ? 'bg-neo-cyan text-neo-black' : ''}
                 ${scope === 'word-wheel' ? 'bg-neo-purple text-white' : ''}
                 ${scope === 'combined' ? 'bg-neo-lime text-neo-black' : ''}
@@ -650,9 +652,25 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                     : 'Word Wheel only'
               }
             >
-              {scope === 'combined' && <>🎯 + 🎡 {t('wordHunt.leaderboard.scopeCombined') || 'Combined'}</>}
-              {scope === 'word-hunt' && <>🎯 {t('wordHunt.leaderboard.scopeWordHunt') || 'Word Hunt'}</>}
-              {scope === 'word-wheel' && <>🎡 {t('wordHunt.leaderboard.scopeWordWheel') || 'Word Wheel'}</>}
+              {scope === 'combined' && (
+                <>
+                  <Target aria-hidden className="w-3 h-3" />
+                  <CircleDot aria-hidden className="w-3 h-3" />
+                  {t('wordHunt.leaderboard.scopeCombined') || 'Combined'}
+                </>
+              )}
+              {scope === 'word-hunt' && (
+                <>
+                  <Target aria-hidden className="w-3 h-3" />
+                  {t('wordHunt.leaderboard.scopeWordHunt') || 'Word Hunt'}
+                </>
+              )}
+              {scope === 'word-wheel' && (
+                <>
+                  <CircleDot aria-hidden className="w-3 h-3" />
+                  {t('wordHunt.leaderboard.scopeWordWheel') || 'Word Wheel'}
+                </>
+              )}
             </span>
           </h3>
           {!isLoading && !error && (
@@ -663,9 +681,15 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                   <span className="mx-1.5">•</span>
                   {scope === 'combined' && todayHuntSolved > 0 && todayWheelSolved > 0 ? (
                     <>
-                      <span className="text-emerald-600 dark:text-emerald-400">🎯 {todayHuntSolved} {t('wordHunt.leaderboard.solved')}</span>
+                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                        <Target aria-hidden className="w-3.5 h-3.5" />
+                        {todayHuntSolved} {t('wordHunt.leaderboard.solved')}
+                      </span>
                       <span className="mx-1.5">•</span>
-                      <span className="text-emerald-600 dark:text-emerald-400">🎡 {todayWheelSolved} {t('wordHunt.leaderboard.solved')}</span>
+                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                        <CircleDot aria-hidden className="w-3.5 h-3.5" />
+                        {todayWheelSolved} {t('wordHunt.leaderboard.solved')}
+                      </span>
                     </>
                   ) : (
                     <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
