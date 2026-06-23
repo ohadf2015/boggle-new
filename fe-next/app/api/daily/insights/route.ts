@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
+import { cacheAside } from '@/backend/cache/redisCache'
+import { cacheKeys } from '@/lib/cache/cacheKeys'
 
 interface Insight {
   type: string
@@ -8,6 +10,23 @@ interface Insight {
   subKey: string
   subParams?: Record<string, string | number>
   lucideIcon: string
+}
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>
+
+// The percentile pool (every player's score for this puzzle) is identical for
+// all players on a given date, so cache it shared instead of re-scanning up to
+// 500 rows on every completion. 5min staleness is invisible on a coarse
+// "top 20%" bucket that only grows through the day. Throws on DB error so a
+// failed scan is never cached. Takes mode+date only — no per-user data.
+const PEER_POOL_TTL_SECONDS = 300
+
+async function fetchPeerScores(supabase: SupabaseServerClient, date: string): Promise<number[]> {
+  const { data, error } = await supabase
+    .from('daily_word_hunt_attempts').select('efficiency_score')
+    .eq('puzzle_date', date).limit(500)
+  if (error) throw error
+  return (data ?? []).map((r: { efficiency_score: number }) => r.efficiency_score ?? 0)
 }
 
 export async function GET(req: NextRequest) {
@@ -34,13 +53,16 @@ export async function GET(req: NextRequest) {
     // insight). Dispatch them concurrently so the route pays one round-trip of
     // latency instead of three. The `today` query above must stay sequential —
     // it gates whether we run any of these at all.
-    const [{ data: history }, { data: peers }, { data: recent }] = await Promise.all([
+    const [{ data: history }, peerScores, { data: recent }] = await Promise.all([
       supabase
         .from('daily_word_hunt_attempts').select('efficiency_score')
         .eq('player_id', user.id).order('efficiency_score', { ascending: false }).limit(20),
-      supabase
-        .from('daily_word_hunt_attempts').select('efficiency_score')
-        .eq('puzzle_date', date).limit(500),
+      // Shared percentile pool — cached per (mode, date), not per user.
+      cacheAside(
+        cacheKeys.dailyInsightsPeers(mode, date),
+        () => fetchPeerScores(supabase, date),
+        PEER_POOL_TTL_SECONDS
+      ),
       supabase
         .from('daily_word_hunt_attempts').select('efficiency_score,puzzle_date')
         .eq('player_id', user.id).gte('puzzle_date', cutoff)
@@ -63,8 +85,7 @@ export async function GET(req: NextRequest) {
         subKey: 'daily.insights.firstTry.sub', subParams: { n: 8 }, lucideIcon: 'Target' })
     }
 
-    // Percentile vs all players today (top 20% only)
-    const peerScores = (peers ?? []).map((r: { efficiency_score: number }) => r.efficiency_score ?? 0)
+    // Percentile vs all players today (top 20% only). peerScores is the cached pool.
     if (peerScores.length >= 5) {
       const below = peerScores.filter((s: number) => s < score).length
       const rankPct = Math.max(1, Math.round(100 - (below / peerScores.length) * 100))

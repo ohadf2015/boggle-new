@@ -15,4 +15,17 @@ describe('cacheKeys', () => {
     expect(cacheKeys.leagueStandings('abc')).toBe('lc:next:lb:league:abc');
     expect(cacheKeys.leagueStandings('abc')).not.toBe(cacheKeys.leagueStandings('xyz'));
   });
+
+  it('dailyInsightsPeers namespaces by mode AND date (one shared percentile pool per puzzle)', () => {
+    expect(cacheKeys.dailyInsightsPeers('word_hunt', '2026-06-23')).toBe(
+      'lc:next:daily:peers:word_hunt:2026-06-23'
+    );
+    // Different mode or different date must never collide
+    expect(cacheKeys.dailyInsightsPeers('word_hunt', '2026-06-23')).not.toBe(
+      cacheKeys.dailyInsightsPeers('word_hunt', '2026-06-24')
+    );
+    expect(cacheKeys.dailyInsightsPeers('word_hunt', '2026-06-23')).not.toBe(
+      cacheKeys.dailyInsightsPeers('crossword', '2026-06-23')
+    );
+  });
 });
