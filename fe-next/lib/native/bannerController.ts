@@ -63,14 +63,27 @@ export function selectActiveBannerRequest(
  * "Continue" CTA and tanks the highest-leverage conversion funnel, so we keep the
  * whole first run ad-free. The opt-in does NOT rescue it (no onboarding screen
  * reserves banner room).
+ *
+ * Modal/dialog open (`html.modal-open`, ref-counted by the shared `DialogContent`)
+ * is likewise unconditional: a Radix dialog is a full-screen z-90 overlay in the
+ * DOM, but the native banner is a SurfaceView composited ABOVE the WebView, so it
+ * paints on top of the modal's content and action buttons (device-confirmed over
+ * CreateRoomModal). Modals appear on every route — including in-game ones — so the
+ * in-game opt-in does NOT rescue it: while a modal owns the screen, no banner.
  */
 export function shouldSuppressBanner(input: {
   drawerOpen: boolean;
   inGame: boolean;
   allowInGame: boolean;
   onboarding?: boolean;
+  modalOpen?: boolean;
 }): boolean {
-  return Boolean(input.onboarding) || input.drawerOpen || (input.inGame && !input.allowInGame);
+  return (
+    Boolean(input.onboarding) ||
+    Boolean(input.modalOpen) ||
+    input.drawerOpen ||
+    (input.inGame && !input.allowInGame)
+  );
 }
 
 export interface BannerOps {

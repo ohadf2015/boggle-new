@@ -3,6 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "../../lib/utils";
+import { acquireModalOpen, releaseModalOpen } from "../../lib/native/modalOpenSignal";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -58,6 +59,25 @@ interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof Dialo
   closeButtonVariant?: 'default' | 'minimal';
 }
 
+/**
+ * Flags the screen as modal-owned (html.modal-open) for as long as it is mounted.
+ * It is rendered INSIDE DialogPrimitive.Content, which Radix only commits to the
+ * DOM while the dialog is actually open — so this mounts iff open, even though the
+ * parent DialogContent component stays in the React tree across open/close toggles
+ * (the common `<Dialog open={isOpen}><DialogContent>` pattern). The native AdMob
+ * banner is a SurfaceView composited ABOVE the WebView and can't be covered by the
+ * dialog's z-90 overlay, so the banner coordinator reads this flag to hide the
+ * banner while a modal is up. Ref-counted so stacked dialogs don't clear it early
+ * (see modalOpenSignal).
+ */
+const ModalOpenFlag = () => {
+  React.useEffect(() => {
+    acquireModalOpen();
+    return () => releaseModalOpen();
+  }, []);
+  return null;
+};
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
@@ -109,6 +129,9 @@ const DialogContent = React.forwardRef<
       }}
       {...props}
     >
+      {/* Mounts iff the dialog is actually open → flags html.modal-open so the
+          native banner is suppressed while a modal covers the screen. */}
+      <ModalOpenFlag />
       {children}
       {/* Neo-Brutalist Close Button - supports two variants */}
       {!hideCloseButton && (
