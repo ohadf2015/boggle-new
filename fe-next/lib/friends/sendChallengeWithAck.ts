@@ -1,4 +1,5 @@
 import type { Socket } from 'socket.io-client';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export interface SendChallengePayload {
   friendUserId: string;
@@ -48,6 +49,9 @@ export function sendChallengeWithAck(
 
     const onSent = (data: unknown) => {
       const d = data as { challengeId?: string; roomCode?: string } | undefined;
+      // Social-loop telemetry: fires only on a server-confirmed send (audit
+      // 2026-06-23 §3.4 — the social loop was previously unmeasured).
+      trackGrowthEvent('challenge_sent', { challengeType: payload.challengeType });
       settle({
         ok: true,
         data: { challengeId: d?.challengeId ?? '', roomCode: d?.roomCode ?? '' },

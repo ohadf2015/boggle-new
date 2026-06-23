@@ -8,6 +8,12 @@
  */
 
 import { vi } from 'vitest';
+
+const trackGrowthEvent = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => trackGrowthEvent(...args),
+}));
+
 import { sendChallengeWithAck } from '../sendChallengeWithAck';
 
 type Listener = (...args: unknown[]) => void;
@@ -35,6 +41,32 @@ function makeFakeSocket() {
 }
 
 describe('sendChallengeWithAck (B1)', () => {
+  beforeEach(() => trackGrowthEvent.mockClear());
+
+  it('tracks challenge_sent only on a confirmed send (social-loop telemetry)', async () => {
+    const socket = makeFakeSocket();
+    const promise = sendChallengeWithAck(socket as never, {
+      friendUserId: 'u-b',
+      challengeType: 'new_game',
+    });
+    socket.fire('friends:challengeSent', { challengeId: 'cx', roomCode: 'ABC123' });
+    await promise;
+    expect(trackGrowthEvent).toHaveBeenCalledWith('challenge_sent', {
+      challengeType: 'new_game',
+    });
+  });
+
+  it('does NOT track challenge_sent when the server rejects', async () => {
+    const socket = makeFakeSocket();
+    const promise = sendChallengeWithAck(socket as never, {
+      friendUserId: 'u-b',
+      challengeType: 'new_game',
+    });
+    socket.fire('friends:error', { code: 'NOT_FRIENDS' });
+    await promise;
+    expect(trackGrowthEvent).not.toHaveBeenCalled();
+  });
+
   it('resolves ok on friends:challengeSent', async () => {
     const socket = makeFakeSocket();
     const payload = { friendUserId: 'u-b', challengeType: 'new_game' as const };
