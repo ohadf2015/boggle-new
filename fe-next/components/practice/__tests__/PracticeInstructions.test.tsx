@@ -79,4 +79,16 @@ describe('PracticeInstructions overlay', () => {
     // The on-demand "?" pill is still available for reference.
     expect(screen.getByTestId('practice-instructions-toggle')).toBeInTheDocument();
   });
+
+  // Regression: popups used a Framer entrance (initial opacity 0 → animate 1).
+  // When that JS animation didn't run (observed on Hebrew/RTL), the panel stayed
+  // invisible and only the dark backdrop showed — "a black overlay screen". The
+  // panel must reveal via a CSS animation whose RESTING state is visible, never
+  // an inline opacity:0 that can get stuck.
+  it('reveals the panel via a CSS entrance, never a stuck inline opacity:0', () => {
+    render(<PracticeInstructions mode="classic" />);
+    const panel = screen.getByTestId('practice-instructions');
+    expect(panel.className).toContain('animate-pop-in');
+    expect(panel.style.opacity).not.toBe('0');
+  });
 });

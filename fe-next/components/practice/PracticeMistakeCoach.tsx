@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
@@ -71,90 +70,83 @@ export default function PracticeMistakeCoach({ kind, mode, onClose }: Props) {
     onClose();
   }, [onClose, playButtonClickSound]);
 
+  if (!kind) return null;
+
+  // CSS-only entrance (no Framer): the panel's resting state is visible, so it
+  // can never stay stuck invisible behind the backdrop — the bug that showed
+  // these popups as a bare black overlay on RTL/Hebrew.
   return (
-    <AdaptiveAnimatePresence>
-      {kind && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label={t('practice.mistakeCoach.ariaLabel')}
-          data-testid="practice-mistake-coach"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('practice.mistakeCoach.ariaLabel')}
+      data-testid="practice-mistake-coach"
+    >
+      {/* Backdrop — tap-to-dismiss with soft fade. */}
+      <button
+        type="button"
+        data-testid="practice-mistake-coach-backdrop"
+        aria-label={t('practice.mistakeCoach.cta')}
+        onClick={handleDismiss}
+        className="absolute inset-0 bg-neo-navy/90 backdrop-blur-sm cursor-default animate-fadeIn"
+      />
+
+      {/* Modal panel. */}
+      <div
+        data-testid={`practice-mistake-coach-panel-${kind}`}
+        className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col animate-pop-in`}
+      >
+        {/* Mode-color accent bar at top — matches help modal language. */}
+        <div className={`h-1.5 ${ACCENT_BG[mode]}`} aria-hidden />
+
+        <button
+          type="button"
+          data-testid="practice-mistake-coach-dismiss"
+          onClick={handleDismiss}
+          aria-label={t('practice.mistakeCoach.cta')}
+          className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-white hover:text-neo-white hover:bg-neo-cream/10 transition-colors"
         >
-          {/* Backdrop — tap-to-dismiss with soft fade. */}
-          <AdaptiveMotion.button
-            type="button"
-            data-testid="practice-mistake-coach-backdrop"
-            aria-label={t('practice.mistakeCoach.cta')}
-            onClick={handleDismiss}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="absolute inset-0 bg-neo-navy/90 backdrop-blur-sm cursor-default"
-          />
+          <X className="w-4 h-4" aria-hidden />
+        </button>
 
-          {/* Modal panel — bouncy spring entrance for a friendly hello. */}
-          <AdaptiveMotion.div
-            data-testid={`practice-mistake-coach-panel-${kind}`}
-            initial={{ opacity: 0, y: 24, scale: 0.85 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-            className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col`}
-          >
-            {/* Mode-color accent bar at top — matches help modal language. */}
-            <div className={`h-1.5 ${ACCENT_BG[mode]}`} aria-hidden />
+        <div className="p-4 sm:p-5 flex flex-col gap-3 min-h-0 overflow-y-auto">
+          {/* Hero illustration — the visual story carries the lesson.
+              Capped height (4:3 + max-vh) so body text + CTA always fit
+              on short phones without forcing modal scroll. */}
+          <div className="relative w-full aspect-[4/3] max-h-[28vh] sm:max-h-[32vh] rounded-neo overflow-hidden border-2 border-neo-black flex-shrink-0">
+            <Image
+              src={IMAGE_FOR_KIND[kind]}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 90vw, 384px"
+              className="object-cover"
+              priority
+            />
+          </div>
 
-            <button
-              type="button"
-              data-testid="practice-mistake-coach-dismiss"
-              onClick={handleDismiss}
-              aria-label={t('practice.mistakeCoach.cta')}
-              className="absolute top-2 end-2 z-10 inline-flex items-center justify-center w-8 h-8 rounded-full text-neo-white hover:text-neo-white hover:bg-neo-cream/10 transition-colors"
+          <div className="flex flex-col gap-2 text-neo-white text-center">
+            <h2
+              className={`text-lg font-neo-display font-black ${ACCENT_TEXT[mode]}`}
             >
-              <X className="w-4 h-4" aria-hidden />
-            </button>
+              {t(`practice.mistakeCoach.${kind}.title`)}
+            </h2>
+            <p className="text-sm font-neo-body text-neo-white leading-snug">
+              {t(`practice.mistakeCoach.${kind}.body`)}
+            </p>
+          </div>
 
-            <div className="p-4 sm:p-5 flex flex-col gap-3 min-h-0 overflow-y-auto">
-              {/* Hero illustration — the visual story carries the lesson.
-                  Capped height (4:3 + max-vh) so body text + CTA always fit
-                  on short phones without forcing modal scroll. */}
-              <div className="relative w-full aspect-[4/3] max-h-[28vh] sm:max-h-[32vh] rounded-neo overflow-hidden border-2 border-neo-black flex-shrink-0">
-                <Image
-                  src={IMAGE_FOR_KIND[kind]}
-                  alt=""
-                  fill
-                  sizes="(max-width: 640px) 90vw, 384px"
-                  className="object-cover"
-                  priority
-                />
-              </div>
-
-              <div className="flex flex-col gap-2 text-neo-white text-center">
-                <h2
-                  className={`text-lg font-neo-display font-black ${ACCENT_TEXT[mode]}`}
-                >
-                  {t(`practice.mistakeCoach.${kind}.title`)}
-                </h2>
-                <p className="text-sm font-neo-body text-neo-white leading-snug">
-                  {t(`practice.mistakeCoach.${kind}.body`)}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                data-testid="practice-mistake-coach-cta"
-                onClick={handleDismiss}
-                className={`w-full inline-flex items-center justify-center rounded-neo border-3 border-neo-black ${ACCENT_BG[mode]} text-neo-black py-3 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed`}
-              >
-                {t('practice.mistakeCoach.cta')}
-              </button>
-            </div>
-          </AdaptiveMotion.div>
+          <button
+            type="button"
+            data-testid="practice-mistake-coach-cta"
+            onClick={handleDismiss}
+            className={`w-full inline-flex items-center justify-center rounded-neo border-3 border-neo-black ${ACCENT_BG[mode]} text-neo-black py-3 font-neo-display font-black text-base shadow-hard active:translate-y-px active:shadow-hard-pressed`}
+          >
+            {t('practice.mistakeCoach.cta')}
+          </button>
         </div>
-      )}
-    </AdaptiveAnimatePresence>
+      </div>
+    </div>
   );
 }
 

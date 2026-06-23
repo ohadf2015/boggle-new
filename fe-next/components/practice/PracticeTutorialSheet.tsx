@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Move, TrendingUp, Compass, Target, Route, Disc, Hand, Plus, type LucideIcon } from 'lucide-react';
 import { m, type PanInfo } from 'framer-motion';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics';
 import { tutorialTipKeys, type PracticeMode } from '@/lib/practice/practiceTutorialSteps';
@@ -127,11 +126,12 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
       data-testid="practice-tutorial-sheet"
       className="min-h-[100dvh] w-full bg-linear-to-b from-neo-navy to-neo-navy-light flex items-center justify-center px-4 sm:px-6 py-5 sm:py-8"
     >
-      <AdaptiveMotion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-md md:max-w-2xl flex flex-col gap-4"
+      {/* CSS-only entrance (no Framer): the sheet's resting state is visible,
+          so a stalled JS animation can never leave the player staring at a bare
+          dark gradient — the "black overlay" bug seen on RTL/Hebrew. */}
+      <div
+        data-testid="practice-tutorial-content"
+        className="w-full max-w-md md:max-w-2xl flex flex-col gap-4 animate-fadeIn"
       >
         {/* Top bar — back arrow + tutorial label + skip */}
         <div className="flex items-center justify-between gap-3">
@@ -271,7 +271,7 @@ const PracticeTutorialSheet: React.FC<PracticeTutorialSheetProps> = ({ mode, t, 
             <ArrowRight className="w-4 h-4 rtl:rotate-180" aria-hidden />
           </button>
         </div>
-      </AdaptiveMotion.div>
+      </div>
     </div>
   );
 };

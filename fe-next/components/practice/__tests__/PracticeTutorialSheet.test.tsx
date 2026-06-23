@@ -106,6 +106,17 @@ describe('PracticeTutorialSheet', () => {
     expect(screen.getByTestId('practice-tutorial-sheet')).toBeInTheDocument();
   });
 
+  // Regression: the sheet content used a Framer entrance starting at opacity 0
+  // over a dark gradient. When that animation didn't run (observed on RTL) the
+  // player saw only the dark gradient — a "black overlay". Reveal must be a CSS
+  // entrance with a visible resting state, never a stuck inline opacity:0.
+  it('reveals content via a CSS entrance, never a stuck inline opacity:0', () => {
+    render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
+    const content = screen.getByTestId('practice-tutorial-content');
+    expect(content.className).toContain('animate-fadeIn');
+    expect(content.style.opacity).not.toBe('0');
+  });
+
   it('renders a per-slide illustration component (one per slide) instead of a single hero image', () => {
     render(<PracticeTutorialSheet mode="classic" t={t} onContinue={() => {}} />);
     expect(screen.getByTestId('practice-tutorial-art-classic-0')).toBeInTheDocument();
