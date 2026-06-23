@@ -21,6 +21,7 @@ export default defineConfig({
       '@capgo/capacitor-social-login': path.resolve(__dirname, './__mocks__/@capgo/capacitor-social-login.ts'),
       '@vfx-js/core': path.resolve(__dirname, './__mocks__/@vfx-js/core.ts'),
       'canvas-confetti': path.resolve(__dirname, './__mocks__/canvas-confetti.ts'),
+      'framer-motion': path.resolve(__dirname, './__mocks__/framer-motion.ts'),
       // More-specific gsap sub-package aliases must come before the base 'gsap' alias.
       // Vite alias matching does prefix+/ replacement, so 'gsap' would intercept
       // 'gsap/ScrollTrigger' if listed first, producing a non-existent path.
