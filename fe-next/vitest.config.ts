@@ -120,6 +120,7 @@ export default defineConfig({
       '**/loading-layout.test.tsx',
       '**/MultiplayerFlow.guestJoinViaLink.test.tsx',
       '**/chain-builder.test.ts',
+      '**/CrazyGamesSDK.authOutcome.test.tsx',
     ],
     testTimeout: 10000,
     pool: 'forks',
