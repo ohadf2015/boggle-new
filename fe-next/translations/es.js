@@ -2097,6 +2097,8 @@ const es = {
     "viewOnlyBadge": "Modo TV · Solo visualización"
   },
   "tvResults": {
+    "installHeading": "LLÉVATELO 📱",
+    "installCta": "Escanea · Disponible en Google Play",
     "title": "¡TENEMOS UN GANADOR!",
     "champion": "Campeón",
     "runnerUp": "Segundo Lugar",

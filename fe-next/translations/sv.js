@@ -2250,6 +2250,8 @@ const sv = {
     "viewOnlyBadge": "TV-läge · Endast visning"
   },
   "tvResults": {
+    "installHeading": "TA MED HEM 📱",
+    "installCta": "Skanna · Hämta på Google Play",
     "title": "VI HAR EN VINNARE!",
     "champion": "Mästare",
     "runnerUp": "Tvåa",

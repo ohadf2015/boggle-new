@@ -10,6 +10,7 @@ import TvResultsAwards from './TvResultsAwards';
 import TvResultsPlayerSpotlight from './TvResultsPlayerSpotlight';
 import TvResultsLeaderboard from './TvResultsLeaderboard';
 import TvResultsControls from './TvResultsControls';
+import TvInstallQr from './TvInstallQr';
 import TournamentStandings from '../../../components/TournamentStandings';
 import PlayersReadyIndicator from '../../../components/results/PlayersReadyIndicator';
 import { HostWordSelector } from '../../../components/multiplayer/HostWordSelector';
@@ -242,6 +243,9 @@ const TvResultsView = memo<TvResultsViewProps>(({
           )}
         </m.button>
       )}
+
+      {/* Scan-to-install QR — "take it home" prompt, top-start corner */}
+      <TvInstallQr language={language} t={t} />
 
       {/* Main Content */}
       <div className="relative h-full flex flex-col">

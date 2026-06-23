@@ -45,3 +45,12 @@ export function trackInstallPillDismissed(): void {
 export function trackInstallMenuClick(): void {
   posthog.capture('android_install_menu_click');
 }
+
+/**
+ * Big-screen (TV/party) install QR impression. Scan-only surface — there's no
+ * click event because the conversion happens on the phone that scans it; Play
+ * Console attributes the install via the `tv_results_qr` referrer instead.
+ */
+export function trackTvInstallQrShown(): void {
+  posthog.capture('android_tv_install_qr_shown');
+}

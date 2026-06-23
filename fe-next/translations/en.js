@@ -2078,6 +2078,8 @@ const en = {
     "viewOnlyBadge": "TV Mode · View Only"
   },
   "tvResults": {
+    "installHeading": "TAKE IT HOME 📱",
+    "installCta": "Scan · Get it on Google Play",
     "title": "WE HAVE A WINNER!",
     "champion": "Champion",
     "runnerUp": "Runner Up",

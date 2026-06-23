@@ -2092,6 +2092,8 @@ const ja = {
     "viewOnlyBadge": "TVモード · 閲覧のみ"
   },
   "tvResults": {
+    "installHeading": "スマホでも 📱",
+    "installCta": "スキャンして Google Play で入手",
     "title": "勝者誕生!",
     "champion": "チャンピオン",
     "runnerUp": "準優勝",

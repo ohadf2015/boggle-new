@@ -2145,6 +2145,8 @@ const he = {
     "viewOnlyBadge": "מצב TV · צפייה בלבד"
   },
   "tvResults": {
+    "installHeading": "📱 קחו הביתה",
+    "installCta": "סרקו · הורידו מ‑Google Play",
     "title": "יש לנו מנצח!",
     "champion": "אלוף",
     "runnerUp": "סגן אלוף",
