@@ -52,6 +52,7 @@ vi.mock('lucide-react', () => ({
   Trophy: () => <span data-testid="trophy-icon">Trophy</span>,
   Timer: () => <span data-testid="timer-icon">Timer</span>,
   HelpCircle: () => <span data-testid="help-icon">?</span>,
+  LogOut: () => <span data-testid="logout-icon">LogOut</span>,
 }));
 
 // Mock localStorage
