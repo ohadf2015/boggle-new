@@ -135,12 +135,19 @@ export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: 
   const locale = determineLocale(req);
   const queryString = parsedUrl.search || '';
 
-  // For any bot (social/SEO) OR non-browser client: rewrite internally (don't
-  // redirect). Redirects waste crawl budget AND break ownership verifiers
-  // (Monetag etc.) that fetch the root with a plain GET and never follow the
-  // 301 — they must see the rendered page so they can read the verification
-  // <meta>. Real browsers (UA contains "Mozilla") fall through to the locale 301.
-  if (isBot(userAgent) || isNonBrowserClient(userAgent)) {
+  // A real browser TOP-LEVEL navigation always sends `Sec-Fetch-Mode: navigate`
+  // (Chrome 76+/Firefox 90+/Safari 16.4+). Server-side fetches — including
+  // ad-network ownership verifiers that spoof a "Mozilla" UA — cannot forge it,
+  // so its absence is a strong "not an interactive human" signal at the root.
+  const secFetchMode = (req.headers['sec-fetch-mode'] as string) || '';
+  const isBrowserNavigation = secFetchMode === 'navigate';
+
+  // For any bot (social/SEO), non-browser client, OR any non-navigation request:
+  // rewrite internally (don't redirect). Redirects waste crawl budget AND break
+  // ownership verifiers (Monetag etc.) that fetch the root and never follow the
+  // 301 — they must see the rendered page to read the verification <meta>.
+  // Real browser navigations fall through to the locale 301 below.
+  if (isBot(userAgent) || isNonBrowserClient(userAgent) || !isBrowserNavigation) {
     // SEO bots + non-browser clients get x-default locale (en) to match the
     // sitemap canonical; known social crawlers keep the detected locale.
     const botLocale = isSocialCrawler(userAgent) ? locale : 'en';
