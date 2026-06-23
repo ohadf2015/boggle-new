@@ -163,12 +163,15 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
 
   if (!isSupabaseEnabled) return null;
 
-  // While Supabase auth or CrazyGames SDK is still resolving, show skeleton.
-  // Without this guard, standard auth buttons flash for ~5s before SDK detects CrazyGames.
+  // While Supabase auth or the CrazyGames SDK is still resolving, render nothing.
+  // Every render-site (HeaderDesktopControls / HeaderMobileMenu) already gates this
+  // button on `!loading && !cgLoading`, so a skeleton here is redundant — and it
+  // visibly flashes a stray gray pulse pill next to the already-styled controls
+  // because `isReady` (hasCheckedUser) lags slightly behind the SDK loading flag.
+  // Holding the slot empty avoids that flash without re-introducing the ~5s
+  // standard-auth flash the parent gates already prevent.
   if (loading || !isReady) {
-    return (
-      <div className={cn('w-24 h-9 rounded-full animate-pulse', isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200')} />
-    );
+    return null;
   }
 
   const handleSignOut = async (): Promise<void> => {
