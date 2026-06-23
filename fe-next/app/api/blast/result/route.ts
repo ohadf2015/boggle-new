@@ -7,8 +7,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-import { createClient } from '@/utils/supabase/server';
 import { createClient as createServiceClient } from '@supabase/supabase-js';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { validateBlastResult, type PersonalBests } from '../utils';
 import { captureApiError } from '@/utils/sentry';
 import { processBlastCompletion } from './processCompletion';
@@ -39,11 +39,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Auth check
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
-
-    if (authError || !user) {
+    // Auth check (local-first JWT verify; read/write scoped to user.id below)
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -89,11 +87,9 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: Request) {
   try {
-    // Auth check
-    const authSupabase = await createClient();
-    const { data: { user }, error: authError } = await authSupabase.auth.getUser();
-
-    if (authError || !user) {
+    // Auth check (local-first JWT verify; read scoped to user.id below)
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

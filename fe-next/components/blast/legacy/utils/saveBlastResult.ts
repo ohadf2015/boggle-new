@@ -1,4 +1,5 @@
 import type { BlastResultsData } from '../types';
+import { postWithAuth } from '@/utils/authFetch';
 
 /**
  * Subset of the /api/blast/result response the UI cares about for result-screen enrichment.
@@ -68,21 +69,17 @@ export async function saveBlastResult(
   }
 
   try {
-    const res = await fetch('/api/blast/result', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        score: results.finalScore,
-        tilesCleared: results.tilesCleared,
-        totalTiles: results.totalTiles,
-        clearPercentage: results.clearPercentage,
-        wordsFound: results.wordsFound,
-        bestWord: results.bestWord,
-        maxCombo: results.maxCombo,
-        stars: results.stars,
-        difficulty,
-        language,
-      }),
+    const res = await postWithAuth('/api/blast/result', {
+      score: results.finalScore,
+      tilesCleared: results.tilesCleared,
+      totalTiles: results.totalTiles,
+      clearPercentage: results.clearPercentage,
+      wordsFound: results.wordsFound,
+      bestWord: results.bestWord,
+      maxCombo: results.maxCombo,
+      stars: results.stars,
+      difficulty,
+      language,
     });
     if (!res.ok) return null;
 
