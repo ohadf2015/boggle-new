@@ -17,6 +17,9 @@ From the **Specialized Skills** table above, invoke the skills listed for **lane
 ═══ GOAL ═══
 Find and fix the top 1-2 backend perf regressions AND the top 1-2 frontend perf regressions in the last 24h. Update `docs/nightly/perf-baseline.json` so tomorrow can detect deltas.
 
+═══ FOUNDER PRIORITY: SPEED (read first) ═══
+The #1 founder goal right now is the site loading MUCH faster WITHOUT introducing bugs. This run, after the brief's top regression, also look for a concrete win in: oversized/unoptimized images (add priority/sizes/next-image), heavy synchronous imports that should be dynamic()'d, render-blocking work, and missing memoization on hot components. Ship the fix only if you can verify it doesn't break the page (a fast page with a new bug is a net loss). Prefer wins that improve LCP/INP/bundle size with low blast radius.
+
 ═══ HARD RULES ═══
 - **NO new realtime publication tables** (`50-supabase-perf` — one such add ate 94% DB CPU).
 - **NO new `auth.getUser()` calls** in API routes — local JWT verify only (see `auth-getuser-refactor-playbook`).

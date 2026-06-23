@@ -33,6 +33,9 @@ Surface (a) mechanics / polish worth STEALING INTO our existing admin-beta modes
 
 **NO code edits. NO commits.** Two markdown files only.
 
+═══ FOUNDER PRIORITY: EDUCATION COMPETITORS ═══
+Education is a top growth target. Each run, include at least one EDUCATION-space competitor in your research (e.g. spelling/vocabulary/ESL learning apps, classroom word-game tools, Duolingo-style vocab, Vocabulary.com, Spelling City, Blooket/Gimkit-style classroom games). Note one concrete mechanic or acquisition tactic worth stealing to grow LexiClash's education module. Keep the existing NO-CODE rule for this lane.
+
 ═══ TOOLS — use these (NO external API key needed) ═══
 
 **Reddit access — use the LOCAL Bash helper, NOT WebFetch.** As of 2026-05-30 the

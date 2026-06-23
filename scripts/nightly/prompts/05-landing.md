@@ -21,6 +21,9 @@ From the **Specialized Skills** table above, invoke the skills listed for **lane
 ═══ GOAL ═══
 **Default EVERY night: improve an existing admin-beta (admin-gated / experimental) game mode (STEP 0).** Do NOT invent new modes. Do NOT create new routes. The founder wants the not-yet-public modes made genuinely good — better UI, gameplay, variable reward, feel, graphics; less obvious/predictable; more understandable and fun — until each is worth promoting to all players. Landing-CVR work (STEP 1) is now a RARE fallback (see the fallback clause at the end of STEP 0).
 
+═══ FOUNDER PRIORITY: EDUCATION GROWTH ═══
+Driving users to the EDUCATION module is a top growth goal. When choosing this run's landing variant, strongly prefer one that targets the education / "learn to spell / build vocabulary / classroom / teachers / students" audience and routes them into the education module. The page should make the education value prop concrete and have a clear CTA into the module. (Still behind a flag, still all 5 locales, per the existing rules below.)
+
 **SCOPE CEILING (this lane timed out 5/5 nights on over-scope — read this).** Ship the SMALLEST coherent slice that is shippable TONIGHT, not a perfect/complete deliverable:
 - Mode improvement (STEP 0) = ONE axis × ONE mode (e.g. one variable-reward mechanic, OR one feel/juice pass, OR one clarity fix) editing EXISTING files. If you can't finish, ship the working part + record `status: partial` + `next_steps` so tomorrow continues it.
 - Landing variant (STEP 1 fallback) = change the SINGLE highest-leverage element (hero headline OR the primary CTA OR one above-fold proof line) + its 5-locale strings + the flag wiring. NOT a full-page rewrite.

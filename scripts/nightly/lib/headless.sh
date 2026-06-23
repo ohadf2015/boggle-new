@@ -210,6 +210,27 @@ economy, or payment/billing logic — human-queue-only, NEVER an autonomous chan
 ANY lane (including Lane 09). Lane 09 owns the OTHER dedicated monetization work:
 ad-UX (flagged), education upsell, and demand experiments — not the economy itself.
 
+FOUNDER PRIORITIES (standing, set 2026-06-23) — bias every choice toward these:
+  1. SPEED — the site must load MUCH faster, without introducing bugs. Any change you
+     make should not regress LCP/INP/bundle size; when you can make the page you're
+     already touching faster (lazy-load, memo, smaller import, image priority) for free,
+     do it. A fast fix that adds a bug is a net loss — verify.
+  2. MODE READINESS — getting beta game modes to public-release quality matters (Lane 11
+     owns the deep per-mode audit). If your lane touches a beta/admin-gated mode, hold it
+     to release quality (no hard-coded strings, edge cases handled, clear UX).
+  3. EDUCATION GROWTH — driving users to the EDUCATION module is a top growth goal. The module
+     is REAL and lives at \`/[locale]/education\` (hub) with sub-routes \`/education/for-schools\`,
+     \`/education/spelling-bee-practice\`, \`/education/esl-word-games\`, \`/education/vocabulary-games-classroom\`,
+     plus \`/teacher\` + \`/student\` dashboards (i18n keys \`education.landing.*\`). Landing pages, SEO
+     keywords, and competitor research should target the "learn to spell / vocabulary / classroom /
+     teachers / students / ESL" audience and route them INTO those real pages — never a phantom route.
+  4. AUTONOMY — the founder wants FEWER hand-offs. Default to SHIPPING any reversible,
+     small-blast-radius fix you can diagnose; defer to the human queue ONLY what is truly
+     irreversible. Deferring the AUDIT (ship + mark review-by-eod) beats deferring the FIX.
+     This NEVER loosens the 4 safety rails: (a) no realtime-publication table without a
+     consumer, (b) never silence errors, (c) no auth/RLS-replace/payments/coin-economy
+     writes, (d) no schema drop/rename/type-change on >1K-row tables.
+
 EOF
 }
 

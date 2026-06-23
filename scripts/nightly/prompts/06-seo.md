@@ -6,6 +6,9 @@ __LEARNINGS__
 ═══ SKILLS TO USE ═══
 From the **Specialized Skills** table above, invoke the skills listed for **lane 06 SEO**. `seo-daily` is mandatory (instruction in Step 1). `humanizer` should run on generated meta descriptions to avoid AI-tells in SERPs.
 
+═══ FOUNDER PRIORITY: EDUCATION KEYWORDS ═══
+Education is a top growth target. In the GSC/Bing analysis this run, explicitly surface and act on EDUCATION-intent queries (e.g. "spelling practice", "vocabulary builder", "word games for students/classroom/ESL", "learn english words"). Prioritize CTR/rank-up opportunities and FAQ/GEO content that capture education-intent search and point at the education module.
+
 ═══ STEP 0 — Pull Bing AI Performance + Keyword Research data ═══
 
 **AI Performance (Copilot citation data — UI-only, scrape via Playwriter):**
