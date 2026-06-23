@@ -1,33 +1,110 @@
 {
-  "generatedAt": "2026-06-23T20:02:39.330Z",
+  "generatedAt": "2026-06-23T20:43:45.250Z",
   "commits": [
     {
-      "sha": "a792378e35e1a0df8e37ffa46f6081a5285e5ddb",
-      "shortSha": "a792378",
+      "sha": "58b13453b77ad65d50bf3fb4e3af46089344b747",
+      "shortSha": "58b1345",
+      "subject": "perf(mp): throttle player-view roster updates (updateUsers/playerListUpdate)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T23:24:02+03:00"
+    },
+    {
+      "sha": "f2bb8dfe2306fb02b4b7f121d8ba2060de3019ab",
+      "shortSha": "f2bb8df",
+      "subject": "chore: batch remaining working-tree changes (mp page, handlers, opponent-feed test)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T23:04:40+03:00"
+    },
+    {
+      "sha": "83d710aed3e080e36c66da8e08d9ca1dddf35fcf",
+      "shortSha": "83d710a",
+      "subject": "feat(mp): opponent word-feed batcher + related WIP",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T23:03:45+03:00"
+    },
+    {
+      "sha": "df400462e0724059e6e2117009500dc0418f0d61",
+      "shortSha": "df40046",
+      "subject": "fix(cache): guard getCacheClient .on() so test mocks without it don't crash",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T23:03:45+03:00"
+    },
+    {
+      "sha": "af3d2fd857f2712e555d684251873296715fb10f",
+      "shortSha": "af3d2fd",
       "subject": "perf(auth): finish local-JWT migration — kill remote auth round-trips on hot reads",
       "author": "Ohad Fisher",
       "date": "2026-06-23T23:00:46+03:00"
     },
     {
-      "sha": "26bbafbb5f6ba08acb0a62633c4cdb2d65e37358",
-      "shortSha": "26bbafb",
+      "sha": "5cea8a353481080b079136b7bc8febc964495a1d",
+      "shortSha": "5cea8a3",
       "subject": "perf(auth): migrate 2 read-only GETs to fast local-JWT getAuthedUser",
       "author": "Ohad Fisher",
       "date": "2026-06-23T22:53:13+03:00"
     },
     {
-      "sha": "717806e0dc1216021e50e3d4918265f10b032a67",
-      "shortSha": "717806e",
+      "sha": "66fec60130a7c4d01007a9afbb69d818eae221e4",
+      "shortSha": "66fec60",
       "subject": "perf(cache): Redis-cache the daily-insights percentile pool (shared 500-row scan)",
       "author": "Ohad Fisher",
       "date": "2026-06-23T22:41:14+03:00"
     },
     {
-      "sha": "dce5abf2b751c31505a2324508702165c61f81d3",
-      "shortSha": "dce5abf",
+      "sha": "f7eb9454ff5996ea16d545ec624f791fdc71b2ce",
+      "shortSha": "f7eb945",
       "subject": "perf(cache): Redis-cache shared leaderboard reads (ranked top-50, league standings)",
       "author": "Ohad Fisher",
       "date": "2026-06-23T22:36:06+03:00"
+    },
+    {
+      "sha": "b5be6e92738851bd5e3d785b1cd5252f42b787d9",
+      "shortSha": "b5be6e9",
+      "subject": "Merge pull request #614 from ohadf2015/claude/redundant-skeleton-loader-t4n0eg",
+      "author": "ohadf2015",
+      "date": "2026-06-23T22:59:11+03:00"
+    },
+    {
+      "sha": "d1c47235db0f9205068374d9cdc3ff6bec7987f7",
+      "shortSha": "d1c4723",
+      "subject": "fix(header): drop redundant AuthButton loading skeleton",
+      "author": "Claude",
+      "date": "2026-06-23T19:58:34Z"
+    },
+    {
+      "sha": "98aa82db526727c586f536676bf960266653d527",
+      "shortSha": "98aa82d",
+      "subject": "Merge pull request #613 from ohadf2015/claude/icons-not-emojis-ut5u4g",
+      "author": "ohadf2015",
+      "date": "2026-06-23T22:49:02+03:00"
+    },
+    {
+      "sha": "25e9ee2fe19418af5901c4a9ec788ecb8e58b2b7",
+      "shortSha": "25e9ee2",
+      "subject": "refactor(daily): swap leaderboard emojis for lucide icons",
+      "author": "Claude",
+      "date": "2026-06-23T19:45:17Z"
+    },
+    {
+      "sha": "4261abe311f9ae13a2c2d7832754a11e9f1a41ff",
+      "shortSha": "4261abe",
+      "subject": "fix(ads): put token in HilltopAds verification file (was empty)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T22:42:51+03:00"
+    },
+    {
+      "sha": "2d9f11dc75507a4b270495e910ab08d31c7a5e13",
+      "shortSha": "2d9f11d",
+      "subject": "Merge pull request #612 from ohadf2015/claude/cta-ux-improvement-nb0mxy",
+      "author": "ohadf2015",
+      "date": "2026-06-23T22:37:26+03:00"
+    },
+    {
+      "sha": "6107eb1d13cfffe5421b36af335cc678eabdaa3b",
+      "shortSha": "6107eb1",
+      "subject": "refactor(daily): calm the Word Wheel results CTA stack into one quiet tier",
+      "author": "Claude",
+      "date": "2026-06-23T19:35:15Z"
     },
     {
       "sha": "4f1ccc8b76d8c004da0fb3f83b301cbeb06ad9a4",
@@ -63,83 +140,6 @@
       "subject": "Merge pull request #611 from ohadf2015/claude/hebrew-popup-rendering-r39fh4",
       "author": "ohadf2015",
       "date": "2026-06-23T20:37:31+03:00"
-    },
-    {
-      "sha": "35129028b8a92673495c51b5a77b92efda7cd0c7",
-      "shortSha": "3512902",
-      "subject": "fix(popups): migrate remaining black-screen modals off JS-gated reveals",
-      "author": "Claude",
-      "date": "2026-06-23T17:23:16Z"
-    },
-    {
-      "sha": "ccbb16ef247cf511e1074674b191ffed79602be3",
-      "shortSha": "ccbb16e",
-      "subject": "fix(daily): single source of truth for homepage streak",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T19:54:40+03:00"
-    },
-    {
-      "sha": "acf92779eecb6c26d63bfd70c87fd9bda9b66061",
-      "shortSha": "acf9277",
-      "subject": "feat(dictionary): add dual-judged candidate words (5 langs, +155)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T15:58:33+03:00"
-    },
-    {
-      "sha": "b608034087dbc9995543c4bdb11d19a889819f87",
-      "shortSha": "b608034",
-      "subject": "feat(admin): dashboard insights panel + preventive MP fallback fix",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T15:42:22+03:00"
-    },
-    {
-      "sha": "10d6190b6bffa62b5fe4f73f6779b0f2bbc61d92",
-      "shortSha": "10d6190",
-      "subject": "Merge pull request #609 from ohadf2015/claude/hebrew-popup-empty-screen-xjoy2h",
-      "author": "ohadf2015",
-      "date": "2026-06-23T15:19:58+03:00"
-    },
-    {
-      "sha": "fb3a328216d5091f3015d1dd6b0697903fae66aa",
-      "shortSha": "fb3a328",
-      "subject": "Merge pull request #610 from ohadf2015/claude/daily-challenge-streak-sync-03myqp",
-      "author": "ohadf2015",
-      "date": "2026-06-23T15:19:35+03:00"
-    },
-    {
-      "sha": "5c7934e0be2b3be6fbf704e63fa778158fcf8b24",
-      "shortSha": "5c7934e",
-      "subject": "Merge pull request #608 from ohadf2015/claude/popups-empty-backdrop-sweep-xjoy2h",
-      "author": "ohadf2015",
-      "date": "2026-06-23T15:17:28+03:00"
-    },
-    {
-      "sha": "6471d489d16702361045f1462a35f0e40f29bf9e",
-      "shortSha": "6471d48",
-      "subject": "feat(nightly): lane 12 telemetry coverage-health + audit",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T15:08:09+03:00"
-    },
-    {
-      "sha": "d1a9c3083b5bb1c92760693aaa6f687dedf846bf",
-      "shortSha": "d1a9c30",
-      "subject": "feat(analytics): wire 4 typed-but-dead social events",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T15:07:58+03:00"
-    },
-    {
-      "sha": "55742a3fa539f5c4c2422ec2956b60f30285a2bf",
-      "shortSha": "55742a3",
-      "subject": "feat(telemetry): track challenge_sent on a confirmed friend challenge",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T15:01:10+03:00"
-    },
-    {
-      "sha": "9b6f3ce08b6e5d5a3571666d1ab21cd63d0d81e6",
-      "shortSha": "9b6f3ce",
-      "subject": "feat(observability): forward errors to PostHog so they survive a Sentry outage",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T14:32:14+03:00"
     }
   ]
 }

@@ -10,7 +10,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('../socketHelpers.js', () => ({
+vi.mock('../socketHelpers', () => ({
   volatileBroadcastToRoom: vi.fn(),
   getGameRoom: (code: string) => `game:${code}`,
 }));
@@ -20,8 +20,8 @@ import {
   flushOpponentWordFeed,
   clearOpponentWordFeed,
   type OpponentWordItem,
-} from '../opponentWordFeedBatcher.js';
-import { volatileBroadcastToRoom } from '../socketHelpers.js';
+} from '../opponentWordFeedBatcher';
+import { volatileBroadcastToRoom } from '../socketHelpers';
 
 const mockIo = {} as any;
 const item = (playerName: string): OpponentWordItem => ({

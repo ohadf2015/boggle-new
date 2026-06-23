@@ -1,5 +1,10 @@
 {
   "enabledPlugins": {
     "react-best-practices@Ferdi-plugins": true
+  },
+  "permissions": {
+    "allow": [
+      "Read(.env.example)"
+    ]
   }
 }

@@ -10,6 +10,8 @@ import { useGameDistributionAds } from '@/hooks/useGameDistributionAds';
 import { getGdGameId } from '@/lib/ads/gameDistributionAds';
 import { useAyetVideoAds } from '@/hooks/useAyetVideoAds';
 import { getAyetPlacementId } from '@/lib/ads/ayetVideoAds';
+import { useMonetagAds } from '@/hooks/useMonetagAds';
+import { getMonetagZoneId } from '@/lib/ads/monetagAds';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { trackRewardedAdOffered, trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
@@ -216,6 +218,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const h5Ads = useH5GamesAds();
   const gdAds = useGameDistributionAds();
   const ayetAds = useAyetVideoAds();
+  const monetagAds = useMonetagAds();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
@@ -257,11 +260,25 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     (typeof location !== 'undefined' && /[?&]gdads_test=1/.test(location.search))
   );
   const shouldUseGd = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && gdAds.isAvailable && gdEnvEnabled && (isProd || hasGdTestFlag);
-  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
+  // Production web → Monetag rewarded interstitial (instant-approval, no traffic
+  // minimum — the fallback when AdSense/CrazyGames/AdinPlay reject at our scale).
+  // Triple-gated like the others: explicit `NEXT_PUBLIC_MONETAG_ADS_ENABLED=true`
+  // + a configured zone id, prod runtime OR `?monetag_test=1`, browser env — so
+  // it ships dormant and flips by env. The lib hard-gates on !isNative() +
+  // top-frame, so Monetag (popunder-class) never loads inside the AdMob native
+  // app or a portal iframe regardless of this chain ordering. Sits below the
+  // own-domain video providers (ayeT/GD) and above the dead H5 path.
+  const monetagEnvEnabled = process.env.NEXT_PUBLIC_MONETAG_ADS_ENABLED === 'true' && getMonetagZoneId() !== '';
+  const hasMonetagTestFlag = typeof window !== 'undefined' && (
+    (window as unknown as { __monetagAdsTest?: boolean }).__monetagAdsTest === true ||
+    (typeof location !== 'undefined' && /[?&]monetag_test=1/.test(location.search))
+  );
+  const shouldUseMonetag = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && monetagAds.isAvailable && monetagEnvEnabled && (isProd || hasMonetagTestFlag);
+  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseMonetag && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
   // Simulation only in development — never award free gold in production
-  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseH5;
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseMonetag && !shouldUseH5;
   // Placeholder: no ad platform available — still grant coins, log for admin
-  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseH5
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseMonetag && !shouldUseH5
     && !shouldUseSimulation;
 
   // Always available — placeholder grants coins when no real ads exist
@@ -280,6 +297,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       : shouldUseAdMob ? 'admob'
       : shouldUseAyet ? 'ayet'
       : shouldUseGd ? 'gamedistribution'
+      : shouldUseMonetag ? 'monetag'
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
@@ -333,6 +351,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       : shouldUseAdMob ? 'admob'
       : shouldUseAyet ? 'ayet'
       : shouldUseGd ? 'gamedistribution'
+      : shouldUseMonetag ? 'monetag'
       : shouldUseH5 ? 'h5-games'
       : shouldUseSimulation ? 'simulation'
       : 'no-ad-placeholder';
@@ -480,6 +499,21 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         (reason) => { unmuteGd(); handleAdError(reason || 'Ad dismissed without reward'); },
         { name: surface },
       );
+    } else if (shouldUseMonetag) {
+      // Priority 1.73: Monetag rewarded interstitial for production web —
+      // instant-approval fill (no SSV; replay protection is the server-side
+      // daily cap in /api/coins). Mute Howler around the fullscreen ad and
+      // restore on both terminal paths. The lib's surface gate guarantees this
+      // never runs inside the AdMob native app.
+      setStatus('showing');
+      onAdStarted?.();
+      try { Howler.mute(true); } catch { /* Howler not initialized */ }
+      const unmuteMonetag = () => { try { Howler.mute(false); } catch { /* Howler not initialized */ } };
+      monetagAds.showRewarded(
+        () => { unmuteMonetag(); awardCoinsAndNotify(); },
+        (reason) => { unmuteMonetag(); handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
     } else if (shouldUseH5) {
       // Priority 1.75: H5 Games Ads for production web (no SSV — relies on
       // server-side daily cap in /api/coins for replay protection).
@@ -505,7 +539,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       onAdStarted?.();
       awardCoinsAndNotify();
     }
-  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseMonetag, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, monetagAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
 
   // Pre-load AdMob rewarded slot when caller signals likely intent (button
   // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
