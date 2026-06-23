@@ -5,17 +5,23 @@ function reset() {
   useAndroidInstallStore.setState({
     open: false,
     source: 'auto_popup',
-    pillVisible: false,
+    pillVisible: true,
   });
 }
 
 describe('androidInstallStore', () => {
   beforeEach(reset);
 
-  it('starts closed with no pill', () => {
+  it('defaults the pill to visible so it is a persistent on-load entry point', () => {
+    // The layout-mounted pill is the always-available "Get the app" affordance
+    // for eligible Android browsers — not gated behind dismissing the popup.
+    expect(useAndroidInstallStore.getInitialState().pillVisible).toBe(true);
+  });
+
+  it('starts closed with the pill available', () => {
     const s = useAndroidInstallStore.getState();
     expect(s.open).toBe(false);
-    expect(s.pillVisible).toBe(false);
+    expect(s.pillVisible).toBe(true);
   });
 
   it('openPromo opens the popup tagged with the source and clears the pill', () => {

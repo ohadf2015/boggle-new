@@ -16,7 +16,7 @@ interface AndroidInstallState {
   open: boolean;
   /** which surface opened the popup — drives source-tagged tracking */
   source: InstallSource;
-  /** session pill currently visible (set after a dismiss; resets on reload) */
+  /** session pill currently visible — defaults true so it's a persistent on-load entry, not just a post-dismiss fallback; resets on reload */
   pillVisible: boolean;
   openPromo: (source: InstallSource) => void;
   closePromo: () => void;
@@ -27,7 +27,7 @@ interface AndroidInstallState {
 export const useAndroidInstallStore = create<AndroidInstallState>((set) => ({
   open: false,
   source: 'auto_popup',
-  pillVisible: false,
+  pillVisible: true,
   // Opening the popup always supersedes the collapsed pill.
   openPromo: (source) => set({ open: true, source, pillVisible: false }),
   // Keep `source` so the dismiss handler can attribute correctly after close.
