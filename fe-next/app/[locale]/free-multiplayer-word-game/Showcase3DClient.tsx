@@ -13,6 +13,7 @@ import FloatingCTA from '@/components/showcase3d/FloatingCTA';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import FaqAccordion from '@/components/showcase3d/FaqAccordion';
 import { loadPercent, isPlayable } from '@/lib/showcase3d/loadProgress';
+import { getAssetUrl } from '@/lib/assets/cdn';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -22,7 +23,7 @@ if (typeof window !== 'undefined') {
 const sampleFrames = (dir: string, total: number, n: number) =>
   Array.from({ length: n }, (_, i) => {
     const idx = Math.round(1 + (i * (total - 1)) / (n - 1));
-    return `${dir}/${String(idx).padStart(4, '0')}.jpg`;
+    return getAssetUrl(`${dir}/${String(idx).padStart(4, '0')}.jpg`);
   });
 
 // Four no-mascot gameplay chapters scrub one after another, each with progressive
@@ -94,9 +95,9 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
   ];
 
   const modes: Mode[] = [
-    { side: 'left', accent: 'bg-neo-cyan', tag: t('showcase3d.mode1Tag', 'Solo · Daily'), title: t('showcase3d.mode1', 'One board. One shot.'), body: t('showcase3d.mode1Body', 'The same daily grid for everyone. Climb the global rank before midnight.'), video: '/videos/reddit-gameplay-demo.mp4', poster: '/showcase3d/poster-reddit-gameplay-demo.jpg' },
-    { side: 'right', accent: 'bg-neo-pink', tag: t('showcase3d.mode2Tag', 'Up to 1v3'), title: t('showcase3d.mode2', 'Real-time party versus'), body: t('showcase3d.mode2Body', 'Four cubes, one live board, zero mercy. The loudest scoreboard wins.'), video: '/videos/reddit-vs-battle.mp4', poster: '/showcase3d/poster-reddit-vs-battle.jpg' },
-    { side: 'left', accent: 'bg-neo-purple', tag: t('showcase3d.mode3Tag', '5 languages'), title: t('showcase3d.mode3', 'Play in your language'), body: t('showcase3d.mode3Body', 'Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.'), video: '/videos/reddit-multilingual-showcase.mp4', poster: '/showcase3d/poster-reddit-multilingual-showcase.jpg' },
+    { side: 'left', accent: 'bg-neo-cyan', tag: t('showcase3d.mode1Tag', 'Solo · Daily'), title: t('showcase3d.mode1', 'One board. One shot.'), body: t('showcase3d.mode1Body', 'The same daily grid for everyone. Climb the global rank before midnight.'), video: getAssetUrl('/videos/reddit-gameplay-demo.mp4'), poster: getAssetUrl('/showcase3d/poster-reddit-gameplay-demo.jpg') },
+    { side: 'right', accent: 'bg-neo-pink', tag: t('showcase3d.mode2Tag', 'Up to 1v3'), title: t('showcase3d.mode2', 'Real-time party versus'), body: t('showcase3d.mode2Body', 'Four cubes, one live board, zero mercy. The loudest scoreboard wins.'), video: getAssetUrl('/videos/reddit-vs-battle.mp4'), poster: getAssetUrl('/showcase3d/poster-reddit-vs-battle.jpg') },
+    { side: 'left', accent: 'bg-neo-purple', tag: t('showcase3d.mode3Tag', '5 languages'), title: t('showcase3d.mode3', 'Play in your language'), body: t('showcase3d.mode3Body', 'Hebrew, English, Swedish, Japanese, Spanish — your words, your turf.'), video: getAssetUrl('/videos/reddit-multilingual-showcase.mp4'), poster: getAssetUrl('/showcase3d/poster-reddit-multilingual-showcase.jpg') },
   ];
 
   // pinned multi-chapter scroll-scrub: canvas frame-sequence driven by ScrollTrigger scrub

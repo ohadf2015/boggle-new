@@ -40,6 +40,18 @@ ARG NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID
 ARG NEXT_PUBLIC_CRAZYGAMES_ENABLED
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
+# CDN base for heavy static media (music/sounds/showcase3d) — offloaded to Supabase Storage.
+# When set, next build inlines CDN URLs via getAssetUrl(); when unset, assets serve from public/.
+ARG NEXT_PUBLIC_ASSET_CDN_BASE
+# Build-only secret (not baked into the final runner image — this stage is discarded).
+# Lets the CDN sync below upload new/changed media. Never echoed.
+ARG SUPABASE_SERVICE_ROLE_KEY
+
+# Auto-sync new/changed media to the CDN bucket on every deploy (incremental;
+# safe no-op when SERVICE key or CDN base is absent). Must run BEFORE the image
+# strip in the runner stage so newly-added assets exist on the CDN before their
+# local copies are dropped. node_modules (with @supabase/supabase-js) is present.
+RUN node scripts/upload-static-cdn.mjs
 
 # Compile CJS schemas first (bundle-server expects backend/dist/ to exist for copy step)
 RUN npm run build:schemas
@@ -74,6 +86,16 @@ COPY --from=proddeps --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+# Image shrink: when the CDN is active, drop the fully-offloaded media dirs from
+# the runtime image (~169MB). Gated on the SAME var that makes getAssetUrl emit
+# CDN URLs, so files are removed only when references point elsewhere — no 404 risk.
+# videos/ stays: wordhunt-promo* are not CDN-wrapped (referenced outside Showcase3DClient).
+ARG NEXT_PUBLIC_ASSET_CDN_BASE
+RUN if [ -n "$NEXT_PUBLIC_ASSET_CDN_BASE" ]; then \
+      rm -rf public/music public/sounds public/showcase3d && \
+      echo "CDN active — removed music/sounds/showcase3d from image"; \
+    else echo "CDN base unset — keeping media in image"; fi
 
 # Custom Express server bundle + runtime files
 COPY --from=builder --chown=nextjs:nodejs /app/dist ./dist

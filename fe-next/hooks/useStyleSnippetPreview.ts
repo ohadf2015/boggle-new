@@ -8,6 +8,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
+import { getAssetUrl } from '@/lib/assets/cdn';
 
 const SNIPPET_MS = 9000;
 const SNIPPET_VOLUME = 0.7;
@@ -63,7 +64,7 @@ export function useStyleSnippetPreview() {
       // object trips react-hooks/immutability).
       const a = new Audio();
       a.preload = 'auto';
-      a.src = file;
+      a.src = getAssetUrl(file);
       a.volume = SNIPPET_VOLUME;
       audioRef.current = a;
       void a.play().catch(() => { /* autoplay blocked until gesture */ });

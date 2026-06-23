@@ -9,6 +9,7 @@
 
 import type { Howl as HowlType, HowlOptions } from 'howler';
 import logger from '@/utils/logger';
+import { getAssetUrl } from '@/lib/assets/cdn';
 
 // Re-export the Howl type so consumers can reference it without importing howler directly.
 export type { HowlType };
@@ -104,8 +105,12 @@ export function createLazyHowl(
   options?: Partial<HowlOptions>
 ): HowlType {
   const Howl = getHowlSync();
+  // Route every audio src through the CDN resolver. This is the single choke
+  // point for all music + sound-effect loading, so the only edit needed to
+  // offload audio to Supabase Storage lives here.
+  const srcs = (Array.isArray(src) ? src : [src]).map(getAssetUrl);
   return new Howl({
-    src: Array.isArray(src) ? src : [src],
+    src: srcs,
     preload: false, // CRITICAL: Prevent automatic loading
     html5: true, // Enable streaming, reduces memory footprint
     ...options, // Allow volume, loop, etc. overrides

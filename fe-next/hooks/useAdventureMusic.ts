@@ -4,6 +4,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { Howl, Howler } from 'howler';
 import logger from '@/utils/logger';
 import { useMusic } from '@/contexts/MusicContext';
+import { getAssetUrl } from '@/lib/assets/cdn';
 
 // ==============================================
 // TYPES
@@ -279,7 +280,7 @@ export function useAdventureMusic({
    */
   const createHowl = useCallback((src: string, trackName: string): Howl => {
     const howl = new Howl({
-      src: [src],
+      src: [getAssetUrl(src)],
       loop: false, // Manual looping for crossfade
       volume: 0,
       preload: true, // Preload immediately so tracks are ready when needed

@@ -15,6 +15,7 @@
  */
 
 import logger from '@/utils/logger';
+import { getAssetUrl } from '@/lib/assets/cdn';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
@@ -58,7 +59,7 @@ export class PixiSoundManager {
       // Register default sounds
       for (const entry of DEFAULT_SOUNDS) {
         this.pixiSound.sound.add(entry.alias, {
-          url: entry.url,
+          url: getAssetUrl(entry.url),
           preload: false, // load on first play
         });
       }

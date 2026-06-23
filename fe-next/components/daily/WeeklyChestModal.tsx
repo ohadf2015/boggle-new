@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 import { cn } from '@/lib/utils'
 import gsap from 'gsap'
 import { triggerHaptic } from '@/utils/hapticFeedback'
+import { getAssetUrl } from '@/lib/assets/cdn'
 import type { PendingChest } from '@/hooks/useWeeklyChest'
 
 const CHEST_IMAGES: Record<string, string> = {
@@ -40,7 +41,7 @@ const SOUNDS = {
 function playSound(src: string, volume = 0.5) {
   if (typeof window === 'undefined') return
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const a = new Audio(src)
+  const a = new Audio(getAssetUrl(src))
   a.volume = Math.max(0, Math.min(1, volume))
   a.play().catch(() => {})
 }
