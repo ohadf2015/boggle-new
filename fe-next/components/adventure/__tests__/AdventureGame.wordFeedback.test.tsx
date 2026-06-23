@@ -609,6 +609,7 @@ vi.mock('../ui', () => {
         {overlays}
       </div>
     ),
+    PrimaryObjectiveBanner: () => null,
   };
 });
 

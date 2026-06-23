@@ -2,7 +2,7 @@ import {
   type LucideIcon,
   Bomb, Zap, Triangle, Rainbow, Snowflake, Gem, Magnet,
   Diamond, Hourglass, Shuffle, Flame, Orbit, FlaskConical,
-  Sparkles, Star, Anchor,
+  Sparkles, Star, Anchor, Lock, KeyRound,
 } from 'lucide-react';
 import type { BlastTileType } from './types';
 
@@ -77,6 +77,8 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
   // chocolate + cake paint via overlays in BlastTile; visual record is intentionally minimal.
   chocolate: { bg: '', text: 'text-white',    style: { background: '#3a1f0e', boxShadow: HARD_SHADOW, border: `3px solid #1c0e04` } },
   cake:      { bg: '', text: 'text-white',    style: { background: 'transparent', boxShadow: HARD_SHADOW, border: `3px solid ${INK}` } },
+  locked:    { bg: '', indicator: Lock,        text: 'text-white',    style: solid('#64748b', '#334155') },
+  key:       { bg: '', indicator: KeyRound,    text: 'text-neo-navy', style: solid(F.gold,    F.goldEdge) },
 };
 
 /** Clearing phase background color per tile type — matches the idle hue

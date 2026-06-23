@@ -587,8 +587,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         : undefined;
       const movesExhausted = newMovesRemaining != null && newMovesRemaining <= 0;
 
-      // End the level when moves run out (blast mode only). Timer handles non-blast completion.
-      const isComplete = movesExhausted;
+      // End the level when all objectives done (non-boss) OR moves run out (blast mode).
+      const allQuestsDone = !state.levelConfig.isBossLevel && allObjectivesComplete(newObjectives);
+      const isComplete = allQuestsDone || movesExhausted;
 
       const resultState: GameState = {
         ...state,
