@@ -483,22 +483,22 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           <Link
             href={`/${language}/daily`}
             data-testid="back-to-daily-link"
-            className="flex items-center justify-between gap-3 w-full p-5 rounded-neo border-3 border-neo-black bg-neo-cyan shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+            className="flex items-center justify-between gap-3 w-full p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm hover:bg-neo-navy active:translate-x-px active:translate-y-px transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-                <Home className="w-7 h-7 text-neo-cyan" />
+              <div className="flex items-center justify-center w-9 h-9 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+                <Home className="w-5 h-5 text-neo-cyan" />
               </div>
               <div>
-                <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
+                <span className="block font-neo-display font-black text-neo-white text-sm leading-tight">
                   {t('wordWheel.results.backToDaily', 'Back to Daily Hub')}
                 </span>
-                <p className="text-neo-black/70 text-xs mt-0.5">
+                <p className="text-neo-white/55 text-xs mt-0.5">
                   {t('wordWheel.results.backToDailyDesc', "See today's leaderboard")}
                 </p>
               </div>
             </div>
-            <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
+            <ArrowRight className="w-5 h-5 text-neo-white/40 shrink-0" />
           </Link>
         </m.div>
       )}

@@ -15,10 +15,11 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => trackGrowthEvent(...args),
 }));
 
-// next/link → plain anchor for assertion.
+// next/link → plain anchor for assertion (className passed through so we can
+// assert the calm secondary styling).
 vi.mock('next/link', () => ({
-  default: ({ href, children, onClick }: { href: string; children: React.ReactNode; onClick?: () => void }) => (
-    <a href={href} onClick={onClick}>{children}</a>
+  default: ({ href, children, onClick, className }: { href: string; children: React.ReactNode; onClick?: () => void; className?: string }) => (
+    <a href={href} onClick={onClick} className={className}>{children}</a>
   ),
 }));
 
@@ -51,6 +52,22 @@ describe('MpModeCrossPromo', () => {
     const targets = impressions.map(c => (c[1] as { target: string }).target);
     expect(targets).toEqual(expect.arrayContaining(['wheel_rush_mp', 'word_hunt_mp']));
     impressions.forEach(c => expect((c[1] as { source: string }).source).toBe('word_wheel_results'));
+  });
+
+  it('groups the two live modes in a compact 2-column grid', () => {
+    render(<MpModeCrossPromo language="en" source="word_wheel_results" t={t} />);
+    const grid = screen.getByTestId('mp-live-grid');
+    expect(grid.className).toMatch(/grid-cols-2/);
+  });
+
+  it('uses calm secondary styling — no saturated full-fill or heavy shadow', () => {
+    render(<MpModeCrossPromo language="en" source="word_wheel_results" t={t} />);
+    for (const link of screen.getAllByRole('link')) {
+      const cls = link.className;
+      expect(cls).toContain('bg-neo-navy-light');
+      expect(cls).not.toMatch(/bg-neo-(purple|lime|cyan)\b/);
+      expect(cls).not.toContain('shadow-hard-lg');
+    }
   });
 
   it('fires cross_promo_click with the target + source when a card is tapped', () => {
