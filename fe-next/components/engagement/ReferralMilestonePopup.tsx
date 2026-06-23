@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { X, Users, Gift, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
@@ -78,26 +77,22 @@ export function ReferralMilestonePopup({
   const colors = MILESTONE_COLORS[milestone.milestone] || MILESTONE_COLORS.first_game_played;
   const gameCount = MILESTONE_ICONS[milestone.milestone] || '1';
 
+  // CSS entrances (animate-in) instead of framer-motion: a starved main thread —
+  // e.g. while the large Hebrew bundle parses — would leave a framer-motion
+  // `initial` opacity:0 pinned, so the user sees only the dark backdrop ("black
+  // screen"). CSS runs off the main thread and always settles visible.
   return (
-    <AnimatePresence>
-      {isOpen && (
+    isOpen && (
         <>
           {/* Backdrop */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs"
+          <div
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-300"
             onClick={handleClose}
           />
 
           {/* Popup */}
-          <m.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className={`fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2 ${
+          <div
+            className={`fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 duration-300 ${
               isDarkMode
                 ? 'bg-neo-black border-neo-cream/30'
                 : 'bg-neo-cream border-neo-black'
@@ -118,92 +113,64 @@ export function ReferralMilestonePopup({
 
             {/* Header with gradient */}
             <div className={`bg-linear-to-br ${colors.bg} p-6 pb-8 text-center text-white`}>
-              <m.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-xs mb-3"
+              <div
+                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-xs mb-3 animate-in zoom-in-50 duration-300"
               >
                 <Users className="w-10 h-10" />
-              </m.div>
+              </div>
 
-              <m.h2
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-xl font-bold"
-              >
+              <h2 className="text-xl font-bold animate-in fade-in-0 duration-300">
                 {t('referral.milestoneTitle')}
-              </m.h2>
+              </h2>
             </div>
 
             {/* Content */}
             <div className="p-6 text-center">
               {/* Friend name and milestone */}
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mb-4"
-              >
+              <div className="mb-4 animate-in fade-in-0 duration-300">
                 <p className={`text-lg ${isDarkMode ? 'text-neo-white' : 'text-neo-black'}`}>
                   <span className="font-bold">{milestone.referredUsername}</span>
                   {' '}
                   {t(`referral.milestone_${milestone.milestone}`)}
                 </p>
-              </m.div>
+              </div>
 
               {/* Game count badge */}
-              <m.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
-                className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br ${colors.bg} text-white text-2xl font-bold shadow-lg mb-4`}
+              <div
+                className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br ${colors.bg} text-white text-2xl font-bold shadow-lg mb-4 animate-in zoom-in-50 duration-300`}
               >
                 {gameCount}
-              </m.div>
+              </div>
 
               {/* Reward */}
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className={`flex items-center justify-center gap-2 text-lg font-bold mb-4 ${colors.text}`}
+              <div
+                className={`flex items-center justify-center gap-2 text-lg font-bold mb-4 animate-in fade-in-0 duration-300 ${colors.text}`}
               >
                 <Gift className="w-5 h-5" />
                 <span>+{milestone.rewardXp} XP</span>
                 <Sparkles className="w-5 h-5" />
-              </m.div>
+              </div>
 
               {/* Message */}
-              <m.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className={`text-sm ${isDarkMode ? 'text-neo-white' : 'text-neo-black/70'}`}
+              <p
+                className={`text-sm animate-in fade-in-0 duration-300 ${isDarkMode ? 'text-neo-white' : 'text-neo-black/70'}`}
               >
                 {t('referral.milestoneMessage')}
-              </m.p>
+              </p>
 
               {/* Close button */}
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="mt-6"
-              >
+              <div className="mt-6 animate-in fade-in-0 duration-300">
                 <Button
                   onClick={handleClose}
                   className={`w-full bg-linear-to-r ${colors.bg} text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity`}
                 >
                   {t('common.awesome')}
                 </Button>
-              </m.div>
+              </div>
             </div>
-          </m.div>
+          </div>
         </>
-      )}
-    </AnimatePresence>
+      )
   );
 }
 

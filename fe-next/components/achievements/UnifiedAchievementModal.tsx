@@ -15,9 +15,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -191,146 +189,119 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
     ? t('achievements.unlocked')
     : t('achievements.upgraded');
 
+  // CSS entrances (animate-in) instead of framer-motion: a starved main thread —
+  // e.g. while the large Hebrew bundle parses — would leave a framer-motion
+  // `initial` opacity:0 pinned, so the user sees only the dark backdrop ("black
+  // screen"). CSS runs off the main thread and always settles visible.
   return (
-    <AnimatePresence>
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={handleBackdropClick}
+    <div
+      onClick={handleBackdropClick}
+      className={cn(
+        'fixed inset-0 z-60',
+        'flex items-center justify-center',
+        'bg-neo-black/80 backdrop-blur-xs',
+        'animate-in fade-in-0 duration-300'
+      )}
+      data-testid="unified-achievement-modal"
+    >
+      <div
         className={cn(
-          'fixed inset-0 z-60',
-          'flex items-center justify-center',
-          'bg-neo-black/80 backdrop-blur-xs'
+          'relative p-8 rounded-neo',
+          'bg-neo-navy border-4',
+          'shadow-hard-lg',
+          'max-w-sm w-full mx-4',
+          'animate-in fade-in-0 zoom-in-95 duration-300'
         )}
-        data-testid="unified-achievement-modal"
+        style={{
+          borderColor: tierColors?.border || '#BFFF00',
+          boxShadow: tierColors
+            ? `0 0 30px ${tierColors.glow}`
+            : '0 0 30px rgba(191, 255, 0, 0.5)',
+        }}
       >
-        <m.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.5, opacity: 0 }}
-          transition={{ type: 'spring', damping: 15, stiffness: 300 }}
+        {/* Celebration mascot */}
+        <div className="flex justify-center mb-2 animate-in zoom-in-50 duration-300">
+          <SilentVideo
+            src="/mascot/celebration.webp"
+            width={64}
+            height={64}
+            className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+            preload="metadata"
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* Achievement Icon */}
+        <div
           className={cn(
-            'relative p-8 rounded-neo',
-            'bg-neo-navy border-4',
-            'shadow-hard-lg',
-            'max-w-sm w-full mx-4'
+            'w-20 h-20 mx-auto mb-6',
+            'flex items-center justify-center',
+            'rounded-full border-4 border-neo-white',
+            'animate-in zoom-in-50 duration-300'
           )}
           style={{
-            borderColor: tierColors?.border || '#BFFF00',
-            boxShadow: tierColors
-              ? `0 0 30px ${tierColors.glow}`
-              : '0 0 30px rgba(191, 255, 0, 0.5)',
+            backgroundColor: tierColors?.bg || '#333',
           }}
         >
-          {/* Celebration mascot */}
-          <m.div
-            className="flex justify-center mb-2"
-            initial={{ scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 12 }}
-          >
-            <SilentVideo
-              src="/mascot/celebration.webp"
-              width={64}
-              height={64}
-              className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-              preload="metadata"
-              aria-hidden="true"
-            />
-          </m.div>
+          <span className="text-4xl">{normalized.icon}</span>
+        </div>
 
-          {/* Achievement Icon */}
-          <m.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 10 }}
-            className={cn(
-              'w-20 h-20 mx-auto mb-6',
-              'flex items-center justify-center',
-              'rounded-full border-4 border-neo-white'
-            )}
-            style={{
-              backgroundColor: tierColors?.bg || '#333',
-            }}
-          >
-            <span className="text-4xl">{normalized.icon}</span>
-          </m.div>
-
-          {/* Title */}
-          <m.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
-            className={cn(
-              'text-xl font-black text-center mb-2',
-              'text-neo-white'
-            )}
-          >
-            {titleText}
-          </m.h2>
-
-          {/* Achievement Name */}
-          <m.h3
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
-            className={cn('text-2xl font-black text-center mb-2')}
-            style={{ color: tierColors?.text || 'var(--neo-lime)' }}
-          >
-            {normalized.name}
-          </m.h3>
-
-          {/* Tier Badge */}
-          {normalized.tier && (
-            <m.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5, type: 'spring', stiffness: 400, damping: 22 }}
-              className="flex items-center justify-center gap-2 mb-4"
-            >
-              <span className="text-2xl">{tierIcon}</span>
-              <span
-                className="text-lg font-bold uppercase"
-                style={{ color: tierColors?.text }}
-              >
-                {normalized.tier}
-              </span>
-            </m.div>
+        {/* Title */}
+        <h2
+          className={cn(
+            'text-xl font-black text-center mb-2',
+            'text-neo-white',
+            'animate-in fade-in-0 duration-300'
           )}
+        >
+          {titleText}
+        </h2>
 
-          {/* Achievement Description */}
-          <m.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, type: 'spring', stiffness: 280, damping: 26 }}
-            className="text-center text-neo-white text-sm"
-          >
-            {normalized.description}
-          </m.p>
+        {/* Achievement Name */}
+        <h3
+          className={cn('text-2xl font-black text-center mb-2', 'animate-in fade-in-0 duration-300')}
+          style={{ color: tierColors?.text || 'var(--neo-lime)' }}
+        >
+          {normalized.name}
+        </h3>
 
-          {/* Continue Button - Neo-Lime (Green) */}
-          <m.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, type: 'spring', stiffness: 280, damping: 26 }}
-            onClick={props.onClose}
-            className={cn(
-              'mt-6 w-full py-3',
-              'bg-neo-lime text-neo-black',
-              'font-black text-lg',
-              'border-3 border-neo-black rounded-neo',
-              'shadow-hard hover:shadow-hard-lg',
-              'hover:-translate-y-0.5',
-              'active:translate-y-0.5 active:shadow-hard-pressed',
-              'transition-all duration-200'
-            )}
-          >
-            {t('common.continue')}
-          </m.button>
-        </m.div>
-      </m.div>
-    </AnimatePresence>
+        {/* Tier Badge */}
+        {normalized.tier && (
+          <div className="flex items-center justify-center gap-2 mb-4 animate-in fade-in-0 zoom-in-95 duration-300">
+            <span className="text-2xl">{tierIcon}</span>
+            <span
+              className="text-lg font-bold uppercase"
+              style={{ color: tierColors?.text }}
+            >
+              {normalized.tier}
+            </span>
+          </div>
+        )}
+
+        {/* Achievement Description */}
+        <p className="text-center text-neo-white text-sm animate-in fade-in-0 duration-300">
+          {normalized.description}
+        </p>
+
+        {/* Continue Button - Neo-Lime (Green) */}
+        <button
+          onClick={props.onClose}
+          className={cn(
+            'mt-6 w-full py-3',
+            'bg-neo-lime text-neo-black',
+            'font-black text-lg',
+            'border-3 border-neo-black rounded-neo',
+            'shadow-hard hover:shadow-hard-lg',
+            'hover:-translate-y-0.5',
+            'active:translate-y-0.5 active:shadow-hard-pressed',
+            'transition-all duration-200',
+            'animate-in fade-in-0 duration-300'
+          )}
+        >
+          {t('common.continue')}
+        </button>
+      </div>
+    </div>
   );
 }
 

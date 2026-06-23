@@ -21,7 +21,6 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, X, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -145,27 +144,22 @@ export function ParentalConsentModal({
     return null;
   }
 
+  // CSS entrances (animate-in) instead of framer-motion: a starved main thread —
+  // e.g. while the large Hebrew bundle parses — would leave a framer-motion
+  // `initial` opacity:0 pinned, so the user sees only the dark backdrop ("black
+  // screen"). CSS runs off the main thread and always settles visible.
   return (
-    <AnimatePresence>
-      {isOpen && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center"
           onClick={handleBackdropClick}
         >
           {/* Backdrop */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-neo-black/60 backdrop-blur-xs"
+          <div
+            className="absolute inset-0 bg-neo-black/60 backdrop-blur-xs animate-in fade-in-0 duration-300"
           />
 
           {/* Modal */}
-          <m.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="consent-modal-title"
@@ -174,7 +168,8 @@ export function ParentalConsentModal({
               'bg-white',
               'border-4 border-neo-black rounded-neo',
               'shadow-hard-xl',
-              'max-h-[90vh] overflow-y-auto'
+              'max-h-[90vh] overflow-y-auto',
+              'animate-in fade-in-0 zoom-in-95 duration-300'
             )}
           >
             {/* Header */}
@@ -393,10 +388,8 @@ export function ParentalConsentModal({
                   : t('consent.submit')}
               </button>
             </form>
-          </m.div>
+          </div>
         </div>
-      )}
-    </AnimatePresence>
   );
 }
 

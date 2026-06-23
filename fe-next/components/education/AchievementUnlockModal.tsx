@@ -13,7 +13,6 @@
 
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -52,7 +51,7 @@ const TOAST_DISMISS_MS = 3000;
 // ==============================================
 
 const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onClose }) => {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
   const titleId = useId();
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -111,11 +110,15 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
     ? t('education.achievements.newBadge')
     : t('education.achievements.tierUpgrade');
 
+  // CSS entrances (animate-in) instead of framer-motion: a starved main thread —
+  // e.g. while the large Hebrew bundle parses — would leave a framer-motion
+  // `initial` opacity:0 pinned, so the user sees only the dark backdrop ("black
+  // screen"). CSS runs off the main thread and always settles visible.
   return (
-    <AnimatePresence>
+    <>
       {/* Toast Layout (Bronze/Silver) */}
       {isToast && (
-        <m.div
+        <div
           role="dialog"
           aria-modal="false"
           aria-labelledby={titleId}
@@ -125,12 +128,9 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
             'bg-neo-navy border-3 border-neo-black',
             'rounded-neo shadow-hard',
             'p-4',
-            'cursor-pointer'
+            'cursor-pointer',
+            'animate-in fade-in-0 slide-in-from-top-2 duration-300'
           )}
-          initial={{ opacity: 0, x: dir === 'rtl' ? -50 : 50, scale: 0.9 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={{ opacity: 0, x: dir === 'rtl' ? -50 : 50, scale: 0.9 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           onClick={onClose}
         >
           {/* Toast Content */}
@@ -167,48 +167,38 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
               </p>
             </div>
           </div>
-        </m.div>
+        </div>
       )}
 
       {/* Full Modal Layout (Gold/Platinum) */}
       {isFullModal && (
-        <m.div
+        <div
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
           className={cn(
             'fixed inset-0 z-60',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-xs'
+            'bg-neo-black/80 backdrop-blur-xs',
+            'animate-in fade-in-0 duration-300'
           )}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           onClick={onClose}
         >
           {/* Modal Card */}
-          <m.div
+          <div
             ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
-              'text-center'
+              'text-center',
+              'animate-in fade-in-0 zoom-in-95 duration-300'
             )}
-            initial={{ scale: 0, rotate: -5 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: 5 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Celebration Mascot */}
-            <m.div
-              className="mb-4"
-              initial={{ scale: 0, rotate: -30 }}
-              animate={{ scale: [0, 1.3, 1], rotate: [30, -15, 0] }}
-              transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
-            >
+            <div className="mb-4 animate-in zoom-in-50 duration-300">
               <SilentVideo
                 src="/mascot/celebration.webp"
                 width={80}
@@ -217,14 +207,15 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
                 preload="metadata"
                 aria-hidden="true"
               />
-            </m.div>
+            </div>
 
             {/* Title */}
             <h2
               id={titleId}
               className={cn(
                 'text-3xl md:text-4xl font-black',
-                'mb-4'
+                'mb-4',
+                'animate-in fade-in-0 duration-300'
               )}
               style={{
                 color: TIER_COLORS[tier],
@@ -237,45 +228,41 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
             {/* Badge Display */}
             <div className="mb-6">
               <p className="text-neo-white font-bold text-lg mb-2">{badgeText}</p>
-              <m.div
+              <div
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
-                  'border-4 rounded-full'
+                  'border-4 rounded-full',
+                  'animate-in zoom-in-50 duration-300'
                 )}
                 style={{
                   backgroundColor: `${TIER_COLORS[tier]}20`,
                   borderColor: TIER_COLORS[tier],
                 }}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
               >
                 <span className="text-4xl md:text-5xl">{icon}</span>
-              </m.div>
+              </div>
             </div>
 
             {/* Tier Badge */}
-            <m.div
+            <div
               className={cn(
                 'mb-6 py-2 px-4 rounded-neo',
-                'border-neo'
+                'border-neo',
+                'animate-in fade-in-0 duration-300'
               )}
               style={{
                 backgroundColor: `${TIER_COLORS[tier]}20`,
                 borderColor: TIER_COLORS[tier],
               }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
             >
               <p className="font-bold text-sm uppercase tracking-wide" style={{ color: TIER_COLORS[tier] }}>
                 {tierName}
               </p>
-            </m.div>
+            </div>
 
             {/* Continue Button */}
-            <m.button
+            <button
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
@@ -285,18 +272,16 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                 'active:translate-y-0.5 active:shadow-hard-pressed',
                 'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                'transition-all duration-200'
+                'transition-all duration-200',
+                'animate-in fade-in-0 duration-300'
               )}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
             >
               {t('education.achievements.continue')}
-            </m.button>
-          </m.div>
-        </m.div>
+            </button>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 });
 

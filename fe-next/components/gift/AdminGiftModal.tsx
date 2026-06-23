@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { Gift, Sparkles, Coins, Crown, X, Award } from 'lucide-react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -270,39 +269,31 @@ export function AdminGiftModal({
     }
   };
 
+  // CSS entrances (animate-in) instead of framer-motion for the backdrop and
+  // card: a starved main thread — e.g. while the large Hebrew bundle parses —
+  // would leave a framer-motion `initial` opacity:0 pinned, so the user sees only
+  // the dark backdrop ("black screen"). CSS runs off the main thread and always
+  // settles visible. (The GSAP reveal timeline animates already-visible content.)
   return (
-    <LazyMotion features={domAnimation}>
-      <AnimatePresence>
-      {show && (
-        <m.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
+      show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-300">
           {/* Backdrop */}
-          <m.div
-            className="absolute inset-0 bg-black/70 backdrop-blur-xs"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-xs animate-in fade-in-0 duration-300"
             onClick={phase === 'ready' ? onDismiss : undefined}
           />
 
           {/* Modal Content */}
-          <m.div
+          <div
             ref={containerRef}
             className={cn(
               'relative w-full max-w-md',
               'bg-linear-to-br from-neo-navy via-neo-navy to-purple-900/30',
               'rounded-xl overflow-hidden',
               'shadow-2xl',
+              'animate-in fade-in-0 zoom-in-95 duration-300',
               className
             )}
-            initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.5, opacity: 0, rotate: 10 }}
-            transition={{ type: 'spring', damping: 15, stiffness: 300 }}
           >
             {/* VIP Gold/Purple Border */}
             <div className="absolute inset-0 rounded-xl border-4 border-gradient-to-r from-amber-400 via-purple-500 to-amber-400 pointer-events-none"
@@ -338,14 +329,9 @@ export function AdminGiftModal({
             {/* Content */}
             <div className="relative p-6 text-center">
               {/* Header Line */}
-              <m.div
-                className="text-amber-400 text-sm font-medium mb-4 tracking-wide uppercase"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
+              <div className="text-amber-400 text-sm font-medium mb-4 tracking-wide uppercase animate-in fade-in-0 duration-300">
                 {getHeaderLine()}
-              </m.div>
+              </div>
 
               {/* Icon Container with Glow Ring */}
               <div className="gift-icon-container relative mx-auto w-24 h-24 mb-6">
@@ -413,11 +399,8 @@ export function AdminGiftModal({
 
                   {/* Before/After Balance Display (skip for already-claimed gifts) */}
                   {gift.claimed ? null : phase === 'done' ? (
-                    <m.div
-                      className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs"
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
+                    <div
+                      className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs animate-in fade-in-0 duration-300"
                     >
                       {gift.xp_amount > 0 && (
                         <div className="text-purple-300/80">
@@ -431,7 +414,7 @@ export function AdminGiftModal({
                           <span className="font-bold">{(startCoinsRef.current + gift.coin_amount).toLocaleString()} {t('gift.coins')}</span>
                         </div>
                       )}
-                    </m.div>
+                    </div>
                   ) : (
                     <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white">
                       {gift.xp_amount > 0 && (
@@ -453,11 +436,8 @@ export function AdminGiftModal({
 
               {/* Badge Section */}
               {gift.badge && (
-                <m.div
-                  className="gift-badge mb-6 p-4 bg-white/5 rounded-lg border border-white/10"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.4 }}
+                <div
+                  className="gift-badge mb-6 p-4 bg-white/5 rounded-lg border border-white/10 animate-in fade-in-0 duration-300"
                 >
                   <div className="flex items-center justify-center gap-3">
                     <div className={cn(
@@ -495,7 +475,7 @@ export function AdminGiftModal({
                       </p>
                     </div>
                   </div>
-                </m.div>
+                </div>
               )}
 
               {/* Claim Button */}
@@ -535,10 +515,8 @@ export function AdminGiftModal({
                 </p>
               )}
             </div>
-          </m.div>
-        </m.div>
-      )}
-      </AnimatePresence>
-    </LazyMotion>
+          </div>
+        </div>
+      )
   );
 }
