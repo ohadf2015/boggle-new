@@ -1,6 +1,6 @@
 /**
  * useOpponentWordFeed - Real-time feed of opponent word finds in multiplayer
- * Listens for opponentWordFound socket events and maintains a display queue
+ * Listens for batched opponentWordsBatch socket events and maintains a display queue
  */
 
 import { useEffect, useCallback, useRef, useState } from 'react';
@@ -59,46 +59,60 @@ export function useOpponentWordFeed({ socket, currentPlayerName }: UseOpponentWo
   useEffect(() => {
     if (!socket) return;
 
-    const handler = (data: OpponentWordFeedEvent) => {
+    // The server coalesces per-word opponent finds into a single windowed
+    // `opponentWordsBatch` broadcast (see backend/utils/opponentWordFeedBatcher).
+    // Processing the whole batch in one setFeedItems = one re-render per window
+    // instead of one per word — fewer paints in busy rooms.
+    const handler = (data: { words: OpponentWordFeedEvent[] }) => {
       if (!isEnabled()) return;
-      if (data.playerName === currentPlayerName) return;
       // Suppress the opponent-word flood while the player is mid-drag building a
-      // word. In busy MP classic rooms (esp. with bots) opponentWordFound fires
-      // several times/sec; each enqueue re-renders the feed + runs framer-motion
+      // word. In busy MP classic rooms (esp. with bots) batches arrive several
+      // times/sec; each enqueue re-renders the feed + runs framer-motion
       // enter/exit animations, and that paint steals the drag's frame budget
       // ("MP classic feels slow when selecting"). The feed is ephemeral
-      // (auto-removes in 3s) so opponent pops dropped during a sub-2s drag are
+      // (auto-removes in 3s) so pops dropped during a sub-2s drag are
       // imperceptible. Mirrors useFrozenWhileSelecting for the leaderboard.
       if (useSelectionStore.getState().letterCount > 0) return;
 
-      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-      const item: OpponentWordFeedItem = {
-        id,
-        playerId: data.playerId,
-        playerName: data.playerName,
-        wordLength: data.wordLength,
-        firstLetter: data.firstLetter,
-        lastLetter: data.lastLetter,
-        score: data.score,
-        isLongWord: data.wordLength >= LONG_WORD_THRESHOLD,
-        timestamp: Date.now(),
-      };
+      const words = data?.words;
+      if (!Array.isArray(words) || words.length === 0) return;
+
+      const newItems: OpponentWordFeedItem[] = [];
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i];
+        if (!w || w.playerName === currentPlayerName) continue;
+        const id = `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`;
+        newItems.push({
+          id,
+          playerId: w.playerId,
+          playerName: w.playerName,
+          wordLength: w.wordLength,
+          firstLetter: w.firstLetter,
+          lastLetter: w.lastLetter,
+          score: w.score,
+          isLongWord: w.wordLength >= LONG_WORD_THRESHOLD,
+          timestamp: Date.now(),
+        });
+      }
+      if (newItems.length === 0) return;
 
       setFeedItems(prev => {
-        const next = [...prev, item];
+        const next = [...prev, ...newItems];
         // FIFO: drop oldest if over max
         return next.length > MAX_QUEUE_SIZE ? next.slice(next.length - MAX_QUEUE_SIZE) : next;
       });
 
-      const timer = setTimeout(() => removeItem(id), AUTO_REMOVE_MS);
-      timersRef.current.set(id, timer);
+      for (const it of newItems) {
+        const timer = setTimeout(() => removeItem(it.id), AUTO_REMOVE_MS);
+        timersRef.current.set(it.id, timer);
+      }
     };
 
-    socket.on('opponentWordFound', handler);
+    socket.on('opponentWordsBatch', handler);
 
     const timers = timersRef.current;
     return () => {
-      socket.off('opponentWordFound', handler);
+      socket.off('opponentWordsBatch', handler);
       // Clean up all timers
       timers.forEach(timer => clearTimeout(timer));
       timers.clear();

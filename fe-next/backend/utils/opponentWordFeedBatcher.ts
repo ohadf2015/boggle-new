@@ -15,7 +15,9 @@
  */
 
 import type { Server } from 'socket.io';
-import { volatileBroadcastToRoom, getGameRoom } from './socketHelpers.js';
+// Extensionless: this module is reachable from the Next/Turbopack app graph
+// (via gameStateManager ← app/api routes), which resolves .ts directly.
+import { volatileBroadcastToRoom, getGameRoom } from './socketHelpers';
 
 export interface OpponentWordItem {
   playerId: string;

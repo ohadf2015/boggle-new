@@ -21,6 +21,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { useConnectionToasts } from '@/hooks/useConnectionToasts';
 import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
+import { throttleLatest } from '@/utils/throttle';
 import { useAchievementSocketBridge } from '@/hooks/useAchievementSocketBridge';
 import { useMultiplayerAuth } from '@/hooks/useMultiplayerAuth';
 import { useMultiplayerSession } from '@/hooks/useMultiplayerSession';
@@ -98,6 +99,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
   const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
   const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>>([]);
+  // Coalesce roster updates: in busy rooms `updateUsers` can fire many times/sec
+  // (presence/focus/score pings). Throttling to one apply per 150ms collapses the
+  // re-render storm to ~6.7/s while always landing the latest roster.
+  const setPlayersInRoomThrottled = useMemo(
+    () => throttleLatest((users: Parameters<typeof setPlayersInRoom>[0]) => setPlayersInRoom(users), 150),
+    []
+  );
+  useEffect(() => () => setPlayersInRoomThrottled.cancel(), [setPlayersInRoomThrottled]);
   const [isJoining, setIsJoining] = useState<boolean>(false);
   // Soft-cushion modal state for `hostLeftRoomClosing` socket event.
   // Replaces the prior 2s `window.location` reload (audit 2026-05-10 #1) so
@@ -254,7 +263,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
         language: data.language || roomLanguage || 'en',
       });
     },
-    onUpdateUsers: (users) => setPlayersInRoom(users),
+    onUpdateUsers: (users) => setPlayersInRoomThrottled(users),
     onActiveRooms: (rooms) => setActiveRooms(rooms),
     onJoinedAsSpectator: (data) => {
       setIsSpectator(true);

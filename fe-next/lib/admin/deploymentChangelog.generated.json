@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-18T01:39:31.093Z",
+  "generatedAt": "2026-06-23T20:02:39.330Z",
   "commits": [
     {
-      "sha": "74f8a405ef3df159aa4c748ed82d28a21f755341",
-      "shortSha": "74f8a40",
-      "subject": "perf(nightly): snapshot only untracked WIP, restore tracked from HEAD",
+      "sha": "a792378e35e1a0df8e37ffa46f6081a5285e5ddb",
+      "shortSha": "a792378",
+      "subject": "perf(auth): finish local-JWT migration — kill remote auth round-trips on hot reads",
       "author": "Ohad Fisher",
-      "date": "2026-06-18T04:23:32+03:00"
+      "date": "2026-06-23T23:00:46+03:00"
     },
     {
-      "sha": "37c942179c2eea3faa52fdee69c69f466ba39eaa",
-      "shortSha": "37c9421",
-      "subject": "fix(loading): stop homepage cubes skeleton leaking to all child routes",
+      "sha": "26bbafbb5f6ba08acb0a62633c4cdb2d65e37358",
+      "shortSha": "26bbafb",
+      "subject": "perf(auth): migrate 2 read-only GETs to fast local-JWT getAuthedUser",
       "author": "Ohad Fisher",
-      "date": "2026-06-18T00:44:48+03:00"
+      "date": "2026-06-23T22:53:13+03:00"
     },
     {
-      "sha": "1a2b38d6fb72943f36b6ec4fe8030dc7d54e8560",
-      "shortSha": "1a2b38d",
-      "subject": "fix(education): apply teacher-access RLS repair — unblock public apply form",
+      "sha": "717806e0dc1216021e50e3d4918265f10b032a67",
+      "shortSha": "717806e",
+      "subject": "perf(cache): Redis-cache the daily-insights percentile pool (shared 500-row scan)",
       "author": "Ohad Fisher",
-      "date": "2026-06-18T00:10:12+03:00"
+      "date": "2026-06-23T22:41:14+03:00"
     },
     {
-      "sha": "49ef08e3d4f102f908023f426bee29cd836a830e",
-      "shortSha": "49ef08e",
-      "subject": "Merge pull request #563 from ohadf2015/claude/teacher-access-request-error-0i5tt5",
+      "sha": "dce5abf2b751c31505a2324508702165c61f81d3",
+      "shortSha": "dce5abf",
+      "subject": "perf(cache): Redis-cache shared leaderboard reads (ranked top-50, league standings)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T22:36:06+03:00"
+    },
+    {
+      "sha": "4f1ccc8b76d8c004da0fb3f83b301cbeb06ad9a4",
+      "shortSha": "4f1ccc8",
+      "subject": "fix(ads): serve HilltopAds verification file on apex (skip www redirect)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T22:29:56+03:00"
+    },
+    {
+      "sha": "40384d5197f11aa100fe946d529cc400db4f97d3",
+      "shortSha": "40384d5",
+      "subject": "chore(ads): add HilltopAds website ownership verification file",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T22:20:28+03:00"
+    },
+    {
+      "sha": "ab626d745fd88fd12d0c67fdd4886490e1441399",
+      "shortSha": "ab626d7",
+      "subject": "perf(assets): offload+compress heavy media to Supabase Storage CDN",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T22:11:51+03:00"
+    },
+    {
+      "sha": "449de021053cbef30c7d719e16b457f29fe57240",
+      "shortSha": "449de02",
+      "subject": "fix(daily): dedupe leaderboard by player, keep best score across languages",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T22:04:14+03:00"
+    },
+    {
+      "sha": "431539b90de8442fe3f70f210670b1440cf9a07b",
+      "shortSha": "431539b",
+      "subject": "Merge pull request #611 from ohadf2015/claude/hebrew-popup-rendering-r39fh4",
       "author": "ohadf2015",
-      "date": "2026-06-17T22:50:55+02:00"
+      "date": "2026-06-23T20:37:31+03:00"
     },
     {
-      "sha": "d1746c99fa04f000b0e0814e86eacf6c2f8368c2",
-      "shortSha": "d1746c9",
-      "subject": "fix(education): restore anon INSERT on teacher access requests + seed Anthony Rettig",
+      "sha": "35129028b8a92673495c51b5a77b92efda7cd0c7",
+      "shortSha": "3512902",
+      "subject": "fix(popups): migrate remaining black-screen modals off JS-gated reveals",
       "author": "Claude",
-      "date": "2026-06-17T20:27:17Z"
+      "date": "2026-06-23T17:23:16Z"
     },
     {
-      "sha": "7b317f4b5c26cf2080080cbfcf0ee0a10a5b2928",
-      "shortSha": "7b317f4",
-      "subject": "Merge pull request #562 from ohadf2015/claude/blast-mode-audio-leak-0giko0",
+      "sha": "ccbb16ef247cf511e1074674b191ffed79602be3",
+      "shortSha": "ccbb16e",
+      "subject": "fix(daily): single source of truth for homepage streak",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T19:54:40+03:00"
+    },
+    {
+      "sha": "acf92779eecb6c26d63bfd70c87fd9bda9b66061",
+      "shortSha": "acf9277",
+      "subject": "feat(dictionary): add dual-judged candidate words (5 langs, +155)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T15:58:33+03:00"
+    },
+    {
+      "sha": "b608034087dbc9995543c4bdb11d19a889819f87",
+      "shortSha": "b608034",
+      "subject": "feat(admin): dashboard insights panel + preventive MP fallback fix",
+      "author": "Ohad Fisher",
+      "date": "2026-06-23T15:42:22+03:00"
+    },
+    {
+      "sha": "10d6190b6bffa62b5fe4f73f6779b0f2bbc61d92",
+      "shortSha": "10d6190",
+      "subject": "Merge pull request #609 from ohadf2015/claude/hebrew-popup-empty-screen-xjoy2h",
       "author": "ohadf2015",
-      "date": "2026-06-17T16:29:05+02:00"
+      "date": "2026-06-23T15:19:58+03:00"
     },
     {
-      "sha": "e3ea29f31953376d00543f5617db31601144b988",
-      "shortSha": "e3ea29f",
-      "subject": "fix(audio): stop Blast Mode BGM stacking duplicate Howler instances across waves",
-      "author": "Claude",
-      "date": "2026-06-17T13:26:49Z"
-    },
-    {
-      "sha": "d6ba45f923bbbed649d131f4d63b78f9cceeb474",
-      "shortSha": "d6ba45f",
-      "subject": "Merge pull request #561 from ohadf2015/claude/ad-banner-overlap-fix-xoz473",
+      "sha": "fb3a328216d5091f3015d1dd6b0697903fae66aa",
+      "shortSha": "fb3a328",
+      "subject": "Merge pull request #610 from ohadf2015/claude/daily-challenge-streak-sync-03myqp",
       "author": "ohadf2015",
-      "date": "2026-06-17T15:11:36+02:00"
+      "date": "2026-06-23T15:19:35+03:00"
     },
     {
-      "sha": "d2278f187bb4b956d4cf9bb366ca08236658c856",
-      "shortSha": "d2278f1",
-      "subject": "fix(daily): portal sticky Play CTA to <body> so the ad banner can't cover it",
-      "author": "Claude",
-      "date": "2026-06-17T12:51:11Z"
+      "sha": "5c7934e0be2b3be6fbf704e63fa778158fcf8b24",
+      "shortSha": "5c7934e",
+      "subject": "Merge pull request #608 from ohadf2015/claude/popups-empty-backdrop-sweep-xjoy2h",
+      "author": "ohadf2015",
+      "date": "2026-06-23T15:17:28+03:00"
     },
     {
-      "sha": "007c26f72d7c9655450db160c9ed1893aba502ca",
-      "shortSha": "007c26f",
-      "subject": "fix(seo): merge /words/[n]-letter-words into [word] route — fix dynamic-sibling 404",
+      "sha": "6471d489d16702361045f1462a35f0e40f29bf9e",
+      "shortSha": "6471d48",
+      "subject": "feat(nightly): lane 12 telemetry coverage-health + audit",
       "author": "Ohad Fisher",
-      "date": "2026-06-17T12:03:02+03:00"
+      "date": "2026-06-23T15:08:09+03:00"
     },
     {
-      "sha": "04e67bf2d355c320f7f0830f60ac53926efafd83",
-      "shortSha": "04e67bf",
-      "subject": "fix(seo): drop conflicting revalidate on /words/[word] so noindex deploys live",
+      "sha": "d1a9c3083b5bb1c92760693aaa6f687dedf846bf",
+      "shortSha": "d1a9c30",
+      "subject": "feat(analytics): wire 4 typed-but-dead social events",
       "author": "Ohad Fisher",
-      "date": "2026-06-17T10:35:38+03:00"
+      "date": "2026-06-23T15:07:58+03:00"
     },
     {
-      "sha": "bc4d93d1fdd9aacd8d4ebb631b63768e48196c66",
-      "shortSha": "bc4d93d",
-      "subject": "feat(experiment): wire exp-game-abandon-confirm-v1 (stats-shown quit dialog)",
+      "sha": "55742a3fa539f5c4c2422ec2956b60f30285a2bf",
+      "shortSha": "55742a3",
+      "subject": "feat(telemetry): track challenge_sent on a confirmed friend challenge",
       "author": "Ohad Fisher",
-      "date": "2026-06-17T10:32:43+03:00"
+      "date": "2026-06-23T15:01:10+03:00"
     },
     {
-      "sha": "c98d5ff43d1e82c7eadc686f68b5ed417eb5dd89",
-      "shortSha": "c98d5ff",
-      "subject": "fix(seo): noindex all [locale] 404s — stop soft-404s leaking index,follow",
+      "sha": "9b6f3ce08b6e5d5a3571666d1ab21cd63d0d81e6",
+      "shortSha": "9b6f3ce",
+      "subject": "feat(observability): forward errors to PostHog so they survive a Sentry outage",
       "author": "Ohad Fisher",
-      "date": "2026-06-17T10:21:04+03:00"
-    },
-    {
-      "sha": "c5b0c4c107ce560f21e49a4d2ae08eab4bd9cf6f",
-      "shortSha": "c5b0c4c",
-      "subject": "fix(nightly): reddit search falls back to RSS on the oauth host",
-      "author": "Ohad Fisher",
-      "date": "2026-06-17T10:16:52+03:00"
-    },
-    {
-      "sha": "20b569a4f24105c20542f0e5418cc8b26a9060e1",
-      "shortSha": "20b569a",
-      "subject": "fix(nightly): probe the supabase MCP TRANSPORT surface, not auth (+ bash 3.2)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-17T10:12:47+03:00"
-    },
-    {
-      "sha": "2a4ddf2c54cd0892368f21bf894b06862381c6fe",
-      "shortSha": "2a4ddf2",
-      "subject": "feat(shiritori): solo tempo-bonus hook + tests (recovered, not yet wired)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-17T10:08:41+03:00"
-    },
-    {
-      "sha": "53d625df98a3d73ab062104c74a47995320faa09",
-      "shortSha": "53d625d",
-      "subject": "chore(dictionary): 2026-06-17 candidate words (en/es/he/ja/sv)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-17T10:08:41+03:00"
-    },
-    {
-      "sha": "97b3bf5747770febf4e303530ac1d4a17ccbd607",
-      "shortSha": "97b3bf5",
-      "subject": "fix(seo): hebrew multiplayer page rank-up strings",
-      "author": "Ohad Fisher",
-      "date": "2026-06-17T10:08:40+03:00"
-    },
-    {
-      "sha": "7f9c145f86b1b962405364dbf767cc1f045bd13d",
-      "shortSha": "7f9c145",
-      "subject": "fix(nightly): make supabase MCP reliable headless (connect-wait + preflight probe)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-17T10:01:22+03:00"
-    },
-    {
-      "sha": "06be046913a6e977a1fbfc7d61e02af4d0b9ca18",
-      "shortSha": "06be046",
-      "subject": "fix(nightly): scope integration gate to changed-cone to stop docs-only salvage",
-      "author": "Ohad Fisher",
-      "date": "2026-06-17T10:01:21+03:00"
+      "date": "2026-06-23T14:32:14+03:00"
     }
   ]
 }

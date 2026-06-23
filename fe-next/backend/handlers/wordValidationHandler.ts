@@ -17,7 +17,8 @@ import {
   removePeerRejectedWordScore,
 } from '../modules/gameStateManager.js';
 
-import { broadcastToRoom, broadcastToRoomExceptSender, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
+import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
+import { queueOpponentWord } from '../utils/opponentWordFeedBatcher.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
@@ -377,9 +378,11 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     lastWordScore: wordScore,
   });
 
-  // Broadcast opponent word feed to all OTHER players (not the word finder)
-  // Only reveals word length/first/last letter, not the full word
-  broadcastToRoomExceptSender(socket, getGameRoom(gameCode), 'opponentWordFound', {
+  // Queue the opponent word feed (cosmetic: length + first/last letter only,
+  // never the full word). Coalesced into a single windowed `opponentWordsBatch`
+  // broadcast instead of one emit per word — see opponentWordFeedBatcher. The
+  // client filters out its own words, so we broadcast to the whole room.
+  queueOpponentWord(io, gameCode, {
     playerId: username,
     playerName: username,
     wordLength: normalizedWord.length,
