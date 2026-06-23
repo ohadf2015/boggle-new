@@ -18,6 +18,7 @@ _lane_mcp_servers() {
     01|01-triage)     echo "sentry supabase posthog" ;;
     02|02-perf)       echo "supabase posthog" ;;
     03|03-engagement) echo "posthog" ;;
+    11|11-mode-qa)    echo "posthog" ;;
     05|05-landing)    echo "posthog mcp-image" ;;
     09|09-monetization) echo "posthog" ;;
     *)                echo "" ;;

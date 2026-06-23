@@ -200,6 +200,9 @@ trap on_signal TERM INT
 # founder free-text directives (texted to the bot) → active block for this run.
 # shellcheck disable=SC1091
 . "$LIB_DIR/user-directives.sh"
+# landing/page URL surfacing for the digest. Tested by test/landing-cards.test.sh.
+# shellcheck disable=SC1091
+. "$LIB_DIR/landing-cards.sh"
 log "========================================"
 log "nightly-loop start ${DATE_TAG} dry=$DRY_RUN no-push=$NO_PUSH only=$ONLY skip=$SKIP"
 log "========================================"
@@ -355,7 +358,14 @@ log "$MCP_PROBE_LINE"
 [[ "$MCP_PROBE_LINE" == *fail:* ]] && tg_alert "⚠️ nightly preflight — $MCP_PROBE_LINE after ${_probe_try} attempt(s) (lanes 01/02 supabase fixes will degrade to REST/skip)"
 
 # --- run lanes -------------------------------------------------------------
-LANES=(01-triage 02-perf 03-engagement 04-competitor 05-landing 06-seo 07-self-learn 08-adsense 09-monetization 10-dictionary)
+# Ordered PRIORITY-FIRST (2026-06-23). The shared Claude usage window can drain mid-run
+# (rc=75 cutoffs, see circuit breaker below), so the lanes the founder most wants must run
+# BEFORE the tail. Order = triage (bugs) → mode-qa (production-readiness, the headline ask)
+# → perf (faster site) → landing+seo (education-module growth) → engagement → self-learn →
+# dictionary → monetization → competitor → adsense. Under budget pressure the circuit breaker
+# defers the TAIL, which is now the genuinely-low-value-per-night lanes — nothing critical is
+# dropped on a healthy night. Reordering is safe: the loop matches by lane NAME, not position.
+LANES=(01-triage 11-mode-qa 02-perf 05-landing 06-seo 03-engagement 07-self-learn 10-dictionary 09-monetization 04-competitor 08-adsense)
 LANE_RESULTS=()
 
 should_run() {
@@ -1152,6 +1162,17 @@ else
 fi
 tg_doc "$REPORT" "Full report attached"
 
+# New / updated page routes this run → tappable URLs so the founder can SEE them
+# (goal 2026-06-23). Reads the night's authored file list (repo-relative git paths),
+# keeps app-router page.tsx routes, maps each to a www.lexiclash.live URL. Sent as its
+# own message. Silent when the run touched no page routes (function returns nonzero).
+if declare -F nightly_landing_url_block >/dev/null 2>&1 && [ -s "$NIGHTLY_AUTHORED_FILE" ]; then
+  if LANDING_BLOCK=$(nightly_landing_url_block "$NIGHTLY_AUTHORED_FILE" "https://www.lexiclash.live" 6); then
+    tg_msg "$LANDING_BLOCK"
+    log "sent landing/page URL card"
+  fi
+fi
+
 # Extract actionable items from the report and send each as its OWN message
 # with its own feedback keyboard. Telegram inline-keyboards are per-message,
 # so one message = one feedback target. The user sees a clear actionable card.
@@ -1201,6 +1222,34 @@ Reply:
     MODE_KBD="[[{\"text\":\"👍 Keep it\",\"callback_data\":\"mode:keep:${SLUG}\"},{\"text\":\"👎 Revert\",\"callback_data\":\"mode:drop:${SLUG}\"}],[{\"text\":\"📐 Tweak\",\"callback_data\":\"mode:tweak:${SLUG}\"},{\"text\":\"🚀 Promote to public\",\"callback_data\":\"mode:promote:${SLUG}\"}]]"
     "$TG" kbd "$MODE_MSG" "$MODE_KBD" >/dev/null 2>&1
     log "sent mode-improvement card (slug=$SLUG)"
+  fi
+
+  # Mode-readiness verdict (lane 11 mode-qa): extract the readiness card so the founder
+  # sees how production-ready tonight's audited mode is + can steer focus. Block shape is
+  # locked in prompts/11-mode-qa.md STEP 6.
+  # Flag-based (NOT a /start/,/end/ range): the header line "#### Mode readiness verdict"
+  # also matches an "^#### " end pattern, which would collapse a range to one line. Consume
+  # the header with `next`, then print field lines until the next heading.
+  QA_BLOCK=$(awk '/^#### Mode readiness verdict/{f=1;next} f&&/^(#### |### )/{exit} f' "$REPORT" 2>/dev/null | head -20)
+  QA_URL=$(echo "$QA_BLOCK" | grep -oE 'https?://[^[:space:]]*lexiclash\.live/[^[:space:])]+' | head -1)
+  if [ -n "$QA_URL" ]; then
+    QA_MODE=$(echo "$QA_BLOCK" | grep -oE '^- Mode: .*' | head -1 | sed 's/^- Mode: //')
+    QA_SCORE=$(echo "$QA_BLOCK" | grep -oE '^- Readiness: .*' | head -1 | sed 's/^- Readiness: //')
+    QA_VERDICT=$(echo "$QA_BLOCK" | grep -oE '^- Verdict: .*' | head -1 | sed 's/^- Verdict: //')
+    QA_BLOCKERS=$(echo "$QA_BLOCK" | grep -oE '^- Blockers remaining: .*' | head -1 | sed 's/^- Blockers remaining: //')
+    QA_SLUG=$(echo "${QA_MODE%% *}" | tr -cd 'a-z0-9-')
+    QA_MSG="🧪 *Mode readiness* — ${QA_MODE:-?}
+Readiness: ${QA_SCORE:-?}
+
+$QA_URL
+
+Blockers: ${QA_BLOCKERS:-?}
+Verdict: ${QA_VERDICT:-?}
+
+(one mode audited per night until ≥90% ready. Tap to view; steer focus below.)"
+    QA_KBD="[[{\"text\":\"👍 On track\",\"callback_data\":\"modeqa:ontrack:${QA_SLUG}\"},{\"text\":\"🔧 Different mode next\",\"callback_data\":\"modeqa:refocus:${QA_SLUG}\"}]]"
+    "$TG" kbd "$QA_MSG" "$QA_KBD" >/dev/null 2>&1 || tg_msg "$QA_MSG"
+    log "sent mode-readiness card (slug=$QA_SLUG, score=$QA_SCORE)"
   fi
 
   # Game mode idea (only if no mode was shipped — same heuristic): top concept from lane 4
