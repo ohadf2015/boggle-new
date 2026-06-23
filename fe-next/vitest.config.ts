@@ -21,6 +21,7 @@ export default defineConfig({
       '@capgo/capacitor-social-login': path.resolve(__dirname, './__mocks__/@capgo/capacitor-social-login.ts'),
       '@vfx-js/core': path.resolve(__dirname, './__mocks__/@vfx-js/core.ts'),
       'canvas-confetti': path.resolve(__dirname, './__mocks__/canvas-confetti.ts'),
+      'gsap': path.resolve(__dirname, './__mocks__/gsap.ts'),
     },
   },
   test: {
@@ -122,6 +123,7 @@ export default defineConfig({
       '**/chain-builder.test.ts',
       '**/CrazyGamesSDK.authOutcome.test.tsx',
       '**/CrazyGamesSDK.embedSticky.test.tsx',
+      '**/ChallengeResults.test.tsx',
     ],
     testTimeout: 10000,
     pool: 'forks',
