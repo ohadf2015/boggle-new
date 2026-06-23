@@ -1,5 +1,12 @@
 // Sv translations
 const sv = {
+  "mpCrossPromo": {
+    "heading": "Spela live med andra",
+    "wheelRushTitle": "Ordhjul · Live",
+    "wheelRushDesc": "Tävla mot rivaler på hjulet i realtid",
+    "wordHuntTitle": "Ordjakt · Live",
+    "wordHuntDesc": "Jaga de dolda orden mot andra spelare"
+  },
   "playerStyle": {
     "styles": {
       "default": "Klassisk",

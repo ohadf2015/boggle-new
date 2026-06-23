@@ -1,5 +1,12 @@
 // Es translations
 const es = {
+  "mpCrossPromo": {
+    "heading": "Juega en vivo con otros",
+    "wheelRushTitle": "Rueda de Palabras · En vivo",
+    "wheelRushDesc": "Compite contra rivales en la rueda en tiempo real",
+    "wordHuntTitle": "Caza de Palabras · En vivo",
+    "wordHuntDesc": "Caza las palabras ocultas contra otros jugadores"
+  },
   "playerStyle": {
     "styles": {
       "default": "Clásico",

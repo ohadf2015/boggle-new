@@ -1,5 +1,12 @@
 // Ja translations
 const ja = {
+  "mpCrossPromo": {
+    "heading": "みんなとライブで対戦",
+    "wheelRushTitle": "ワードホイール · ライブ",
+    "wheelRushDesc": "ホイールでライバルとリアルタイム対戦",
+    "wordHuntTitle": "ワードハント · ライブ",
+    "wordHuntDesc": "隠れた単語を他のプレイヤーと取り合おう"
+  },
   "playerStyle": {
     "styles": {
       "default": "クラシック",

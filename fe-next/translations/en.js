@@ -1,5 +1,12 @@
 // EN translations
 const en = {
+  "mpCrossPromo": {
+    "heading": "Play live with others",
+    "wheelRushTitle": "Word Wheel · Live",
+    "wheelRushDesc": "Race rivals on the wheel in real time",
+    "wordHuntTitle": "Word Hunt · Live",
+    "wordHuntDesc": "Hunt the hidden words against others"
+  },
   "playerStyle": {
     "styles": {
       "default": "Classic",
