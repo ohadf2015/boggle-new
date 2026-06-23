@@ -48,7 +48,9 @@ const SEO_CRAWLERS: string[] = [
   'sogou', 'exabot', 'ia_archiver', 'applebot', 'petalbot',
   'semrushbot', 'ahrefsbot', 'mj12bot', 'dotbot', 'rogerbot',
   'google-inspectiontool', 'google-extended', 'bytespider',
-  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot'
+  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot',
+  // Ad-network ownership verifier (meta-tag check at root)
+  'monetag'
 ];
 
 /**
@@ -69,6 +71,20 @@ export function isSocialCrawler(userAgent: string): boolean {
 export function isSeoCrawler(userAgent: string): boolean {
   const ua = (userAgent || '').toLowerCase();
   return SEO_CRAWLERS.some(bot => ua.includes(bot));
+}
+
+/**
+ * Detect a non-browser HTTP client (empty UA, or a UA lacking the "Mozilla"
+ * token every real browser sends). Covers curl/python/go-http and, crucially,
+ * ad-network ownership verifiers (Monetag etc.) that fetch the root with a
+ * plain server-side GET and do NOT follow the locale 301 — so they must be
+ * served the rendered page (200 + verification <meta>) instead of a redirect.
+ * @param userAgent - User agent string
+ */
+export function isNonBrowserClient(userAgent: string): boolean {
+  const ua = (userAgent || '').trim();
+  if (!ua) return true;
+  return !/mozilla/i.test(ua);
 }
 
 /**
@@ -119,12 +135,16 @@ export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: 
   const locale = determineLocale(req);
   const queryString = parsedUrl.search || '';
 
-  // For any bot (social or SEO): rewrite internally (don't redirect)
-  // Redirects waste crawl budget — serve content directly
-  if (isBot(userAgent)) {
-    // SEO bots always get x-default locale (en) to match sitemap canonical
-    const botLocale = isSeoCrawler(userAgent) ? 'en' : locale;
-    httpLogger.debug({ botLocale, queryString }, 'Bot detected, rewriting');
+  // For any bot (social/SEO) OR non-browser client: rewrite internally (don't
+  // redirect). Redirects waste crawl budget AND break ownership verifiers
+  // (Monetag etc.) that fetch the root with a plain GET and never follow the
+  // 301 — they must see the rendered page so they can read the verification
+  // <meta>. Real browsers (UA contains "Mozilla") fall through to the locale 301.
+  if (isBot(userAgent) || isNonBrowserClient(userAgent)) {
+    // SEO bots + non-browser clients get x-default locale (en) to match the
+    // sitemap canonical; known social crawlers keep the detected locale.
+    const botLocale = isSocialCrawler(userAgent) ? locale : 'en';
+    httpLogger.debug({ botLocale, queryString }, 'Bot/verifier detected, rewriting');
     parsedUrl.pathname = `/${botLocale}`;
     req.url = `/${botLocale}${queryString}`;
     return false; // Continue to Next.js handler

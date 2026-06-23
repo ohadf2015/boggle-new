@@ -125,7 +125,11 @@ const nextConfig = {
   // SEO: Redirect non-www to www and ensure consistent URLs
   async redirects() {
     return [
-      // Redirect bare root to default locale (prevents 404 and duplicate content flags)
+      // Redirect bare root to default locale (prevents 404 and duplicate content flags).
+      // NOTE: in production the custom Express server (server/localeRedirect.ts)
+      // handles `/` BEFORE Next sees it — locale-detecting 301 for browsers,
+      // internal rewrite (200 + content) for bots/verifiers. This rule is the
+      // Next-only-dev / fallback path.
       {
         source: '/',
         destination: '/en',
