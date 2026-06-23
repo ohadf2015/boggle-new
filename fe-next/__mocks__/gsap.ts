@@ -50,4 +50,5 @@ const gsap = {
 };
 
 export default gsap;
+export { gsap };
 export const { to, from, fromTo, set, timeline, registerPlugin, killTweensOf, ticker, utils, context } = gsap;
