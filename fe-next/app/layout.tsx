@@ -95,6 +95,10 @@ export const metadata: Metadata = {
     },
     other: {
         'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
+        // Monetag site-ownership verification (head-tag method — avoids the
+        // /sw.js file method, which would clobber the app's PWA service worker).
+        // Privacy-neutral; enables Monetag rewarded-interstitial fill on web.
+        'monetag': 'd3074d8552ebb843aff52f0fe6ec3b94',
         // AdSense site-ownership signal — privacy-neutral (no script/cookie). Always
         // present so the review crawler can verify the domain even while ad serving
         // stays consent-gated/dark. See lib/ads/adSensePolicy.ts:getAdSenseAccountMeta.
