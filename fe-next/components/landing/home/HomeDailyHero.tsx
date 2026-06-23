@@ -8,8 +8,9 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useDailyChallengeStats, type PreloadedDailyStats } from '@/hooks/useDailyChallengeStats';
+import { useWeeklyChest } from '@/hooks/useWeeklyChest';
 import { CUBE_BLUR_DATA_URL } from '@/lib/landing/modeMeta';
-import { dailyProgressCells } from '@/lib/landing/homeHubFormat';
+import { dailyProgressCells, cycleProgressCells } from '@/lib/landing/homeHubFormat';
 import { getLastSevenDaysCompletion } from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/types';
 
@@ -30,6 +31,11 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   const { t, language, dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const stats = useDailyChallengeStats(preloadedStats);
+  // The progress boxes mirror the WEEKLY CHEST's day markers — same server-side,
+  // all-modes (Hunt/Wheel/Puzzle) + freeze-aware cycle — so the card can't show a
+  // day as done/undone differently from the chest. Guests/offline (no cycle) fall
+  // back to the local last-7-days completion so they still see their own progress.
+  const chest = useWeeklyChest();
   // `useDailyChallengeStats` derives the puzzle number/countdown from the date on
   // the client, so SSR (preloaded "loading" 0) ≠ first client render (real #173)
   // → hydration mismatch (incl. the `aria-label`). Gate the date-derived values
@@ -45,12 +51,15 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   // back to the hook's localStorage value when no preloaded streak is supplied.
   const streak = mounted ? (preloadedStats?.currentStreak ?? stats.streak) : 0;
   const puzzleNumber = mounted ? stats.puzzleNumber : 0;
-  // Progress strip = the player's REAL last-5-days completion (each cell filled
-  // when that day's daily was actually played), not an echo of the streak count.
-  // Reads localStorage, so gate behind mount to keep SSR/first-render in sync.
-  const cells = mounted
-    ? dailyProgressCells(getLastSevenDaysCompletion(language as Language), 5)
-    : dailyProgressCells([], 5);
+  // Progress strip = the chest's current 7-day cycle, each cell filled when that
+  // day's daily was completed (any mode) per the server — identical to the chest's
+  // dots. Falls back to local completion for guests / before the chest resolves.
+  // Gated behind mount to keep SSR/first client render in sync (no hydration flash).
+  const cells = !mounted
+    ? cycleProgressCells([], '', 7)
+    : chest.cycleStart
+      ? cycleProgressCells(chest.completedDates, chest.cycleStart, 7)
+      : dailyProgressCells(getLastSevenDaysCompletion(language as Language), 7);
 
   return (
     <Link

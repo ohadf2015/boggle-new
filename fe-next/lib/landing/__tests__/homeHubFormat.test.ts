@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatLiveShort, streakStripCells, clampPercent, dailyProgressCells } from '../homeHubFormat';
+import { formatLiveShort, streakStripCells, clampPercent, dailyProgressCells, cycleProgressCells } from '../homeHubFormat';
 
 describe('formatLiveShort', () => {
   it('leaves sub-1000 counts as plain integers', () => {
@@ -75,6 +75,40 @@ describe('dailyProgressCells', () => {
   it('defaults to 5 cells and is defensive against empty / missing input', () => {
     expect(dailyProgressCells([])).toEqual([false, false, false, false, false]);
     expect(dailyProgressCells(undefined as never)).toHaveLength(5);
+  });
+});
+
+describe('cycleProgressCells', () => {
+  // Mirrors the weekly chest's day markers: 7 cells starting at `cycleStart`,
+  // each filled iff that UTC date is in the server's all-modes `completedDates`.
+  const cycleStart = '2026-05-06';
+
+  it('fills the 7 cycle days that match the chest completedDates (oldest→newest)', () => {
+    // completed: day 1, day 3, day 4 of the cycle
+    const completed = ['2026-05-06', '2026-05-08', '2026-05-09'];
+    expect(cycleProgressCells(completed, cycleStart, 7)).toEqual([
+      true, false, true, true, false, false, false,
+    ]);
+  });
+
+  it('ignores dates outside the cycle window', () => {
+    const completed = ['2026-05-01', '2026-05-06', '2026-05-20'];
+    expect(cycleProgressCells(completed, cycleStart, 7)).toEqual([
+      true, false, false, false, false, false, false,
+    ]);
+  });
+
+  it('returns all-empty cells when cycleStart is missing (guest / not loaded yet)', () => {
+    expect(cycleProgressCells(['2026-05-06'], '', 7)).toEqual([
+      false, false, false, false, false, false, false,
+    ]);
+  });
+
+  it('defaults to 7 cells and is defensive against missing completedDates', () => {
+    expect(cycleProgressCells(undefined as never, cycleStart)).toHaveLength(7);
+    expect(cycleProgressCells(undefined as never, cycleStart)).toEqual([
+      false, false, false, false, false, false, false,
+    ]);
   });
 });
 

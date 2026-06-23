@@ -46,6 +46,30 @@ export function dailyProgressCells(
   return cells;
 }
 
+/**
+ * The daily-challenge progress strip, sourced from the WEEKLY CHEST so the card's
+ * boxes always match the chest's day markers. Returns `total` cells starting at
+ * `cycleStart` (the chest's current 7-day cycle), each filled iff that UTC date is
+ * in the server-authoritative `completedDates` (any daily mode + freezes). When
+ * `cycleStart` is empty (guest / not loaded), every cell is empty.
+ *
+ * This is the chest-aligned counterpart to `dailyProgressCells` (which reads a
+ * Word-Hunt/Wheel-only localStorage history and drifted from the chest).
+ */
+export function cycleProgressCells(
+  completedDates: ReadonlyArray<string>,
+  cycleStart: string,
+  total = 7,
+): boolean[] {
+  if (!cycleStart) return Array.from({ length: total }, () => false);
+  const done = new Set(Array.isArray(completedDates) ? completedDates : []);
+  return Array.from({ length: total }, (_, i) => {
+    const d = new Date(cycleStart + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + i);
+    return done.has(d.toISOString().slice(0, 10));
+  });
+}
+
 /** Clamp a percentage into 0..100 (NaN/Infinity → 0). Drives the level ring + XP bar. */
 export function clampPercent(pct: number): number {
   if (!Number.isFinite(pct)) return 0;
