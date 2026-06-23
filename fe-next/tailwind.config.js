@@ -423,6 +423,14 @@ module.exports = {
           "60%": { transform: "scale(1.1) rotate(2deg)", opacity: "1" },
           "100%": { transform: "scale(1) rotate(0deg)", opacity: "1" },
         },
+        // Clean modal entrance (scale + fade, no rotate). CSS-only so the
+        // content's RESTING state is the normal cascade (opacity:1) — it can
+        // never get stuck invisible the way a stalled Framer entrance can,
+        // which was painting popups as a bare dark overlay (esp. RTL/Hebrew).
+        "pop-in": {
+          "0%": { transform: "scale(0.95) translateY(8px)", opacity: "0" },
+          "100%": { transform: "scale(1) translateY(0)", opacity: "1" },
+        },
         "neo-slide-in": {
           "0%": { transform: "translateY(-20px) rotate(-3deg)", opacity: "0" },
           "60%": { transform: "translateY(5px) rotate(1deg)" },
@@ -607,6 +615,8 @@ module.exports = {
         "neo-press": "neo-press 0.1s ease-out forwards",
         "neo-wobble": "neo-wobble 0.3s ease-in-out",
         "neo-pop": "neo-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+        "pop-in": "pop-in 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fadeIn": "fadeIn 0.2s ease-out forwards",
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-shake": "neo-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97)",
         "pressure-border": "pressure-border 5s linear forwards",

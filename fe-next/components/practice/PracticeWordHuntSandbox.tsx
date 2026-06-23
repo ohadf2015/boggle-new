@@ -337,7 +337,7 @@ export default function PracticeWordHuntSandbox() {
   const liveHref = `/${language}/daily/word-hunt`;
 
   return (
-    <div className="relative flex flex-col items-stretch w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-full min-h-0 overflow-hidden md:overflow-y-auto">
+    <div className="relative flex flex-col items-stretch w-full max-w-md mx-auto px-4 pt-3 pb-2 gap-2 h-full min-h-0 overflow-x-clip overflow-y-auto">
       <PracticePixiFx ref={fxRef} />
 
       {/* Discovery mechanic onboarding tip */}

@@ -88,4 +88,15 @@ describe('PracticeCompletePopup', () => {
     expect(screen.getByTestId('practice-chain-cta')).toBeInTheDocument();
     expect(screen.queryByTestId('practice-complete-popup-play-real')).toBeNull();
   });
+
+  // Regression: the celebratory panel revealed via a Framer entrance starting at
+  // opacity 0. When that animation didn't run (observed on Hebrew/RTL) only the
+  // dark backdrop showed — "a black overlay screen". The panel must reveal via a
+  // CSS entrance whose resting state is visible, never a stuck inline opacity:0.
+  it('reveals the panel via a CSS entrance, never a stuck inline opacity:0', () => {
+    render(<PracticeCompletePopup open mode="classic" />);
+    const panel = screen.getByTestId('practice-complete-popup-panel-classic');
+    expect(panel.className).toContain('animate-pop-in');
+    expect(panel.style.opacity).not.toBe('0');
+  });
 });

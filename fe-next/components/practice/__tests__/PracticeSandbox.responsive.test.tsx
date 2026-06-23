@@ -1,52 +1,38 @@
 /**
  * PracticeSandbox responsive layout contract (className-based).
  *
- * On desktop (md+), the sandbox root MUST allow vertical scroll to prevent
- * clipped content when the welcome card consumes vertical space. This test
- * verifies that the className strings match the expected pattern.
+ * The sandbox root MUST allow vertical scroll (and clip horizontally) at EVERY
+ * breakpoint — not just desktop. The live games (e.g. DailyWordHuntSurvival)
+ * use `overflow-x-clip overflow-y-auto`, so on short phones their content is
+ * never clipped: the board fills the available flex space and the page scrolls
+ * if the surrounding chrome doesn't fit. Practice previously used
+ * `overflow-hidden md:overflow-y-auto`, which hard-clipped on mobile and
+ * squeezed the board on short viewports (the reported "board responsiveness"
+ * bug). This test pins the new contract so we don't regress to mobile clipping.
  *
- * NOTE: jsdom has no layout engine, so visual verification (no clipped content,
- * card visible at 1280×633) must be done via browser screenshot. This test
- * verifies the classNames are correct.
+ * NOTE: jsdom/happy-dom has no layout engine, so visual verification (no clipped
+ * content, board fills the viewport) must be done via browser screenshot. This
+ * test only verifies the className strings.
  */
 import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
+const ROOTS = [
+  'PracticeClassicSandbox.tsx',
+  'PracticeWordHuntSandbox.tsx',
+  'PracticeWheelSandbox.tsx',
+];
+
 describe('PracticeSandbox — responsive overflow contract (classNames)', () => {
-  it('PracticeClassicSandbox root contains md:overflow-y-auto', () => {
-    const filePath = path.join(
-      __dirname,
-      '../PracticeClassicSandbox.tsx'
-    );
-    const content = fs.readFileSync(filePath, 'utf-8');
-    // Find the root div around line 224
-    const match = content.match(
-      /return\s*\(\s*<div className="relative flex flex-col items-center w-full[^"]*overflow-hidden[^"]*">/
-    );
-    expect(match).toBeTruthy();
-    expect(content).toMatch(/md:overflow-y-auto/);
-  });
-
-  it('PracticeWordHuntSandbox root contains md:overflow-y-auto', () => {
-    const filePath = path.join(
-      __dirname,
-      '../PracticeWordHuntSandbox.tsx'
-    );
-    const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain('md:overflow-y-auto');
-    expect(content).toContain('items-stretch w-full');
-    expect(content).toContain('overflow-hidden');
-  });
-
-  it('PracticeWheelSandbox root contains md:overflow-y-auto', () => {
-    const filePath = path.join(
-      __dirname,
-      '../PracticeWheelSandbox.tsx'
-    );
-    const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain('md:overflow-y-auto');
-    expect(content).toContain('items-stretch w-full');
-    expect(content).toContain('overflow-hidden');
-  });
+  for (const file of ROOTS) {
+    it(`${file} root scrolls vertically at every breakpoint (matches live game)`, () => {
+      const content = fs.readFileSync(path.join(__dirname, '..', file), 'utf-8');
+      // Vertical scroll is always available — never hard-clipped on mobile.
+      expect(content).toContain('overflow-y-auto');
+      expect(content).toContain('overflow-x-clip');
+      // Must NOT hard-clip content (the old mobile `overflow-hidden` default).
+      expect(content).not.toContain('overflow-hidden md:overflow-y-auto');
+    });
+  }
 });

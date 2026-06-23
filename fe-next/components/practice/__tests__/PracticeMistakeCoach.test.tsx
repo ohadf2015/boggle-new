@@ -123,6 +123,17 @@ describe('<PracticeMistakeCoach>', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  // Regression: panel revealed via a Framer entrance starting at opacity 0.
+  // When the animation didn't run (observed on Hebrew/RTL) only the dark
+  // backdrop showed. Reveal must be a CSS entrance with a visible resting
+  // state, never a stuck inline opacity:0.
+  it('reveals the panel via a CSS entrance, never a stuck inline opacity:0', () => {
+    render(<PracticeMistakeCoach kind="notAWord" mode="classic" onClose={() => {}} />);
+    const panel = screen.getByTestId('practice-mistake-coach-panel-notAWord');
+    expect(panel.className).toContain('animate-pop-in');
+    expect(panel.style.opacity).not.toBe('0');
+  });
+
   it('switches images per kind via deterministic data-testid', () => {
     const { rerender } = render(
       <PracticeMistakeCoach kind="notAWord" mode="classic" onClose={() => {}} />,

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { X, HelpCircle } from 'lucide-react';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { PracticeMode } from '@/lib/practice/practiceTutorialSteps';
 
@@ -132,13 +131,12 @@ export default function PracticeInstructions({ mode, autoOpen = true }: Props) {
         className="absolute inset-0 bg-neo-navy/85 backdrop-blur-sm cursor-default"
       />
 
-      <AdaptiveMotion.div
+      {/* CSS-only entrance (no Framer): the panel's resting state is visible,
+          so it can never stay stuck invisible behind the backdrop — the bug
+          that showed popups as a bare black overlay on RTL/Hebrew. */}
+      <div
         data-testid="practice-instructions"
-        initial={{ opacity: 0, y: 12, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 12 }}
-        transition={{ duration: 0.22, ease: 'easeOut' }}
-        className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col`}
+        className={`relative w-full max-w-sm rounded-neo border-3 border-neo-black ${ACCENT_BORDER[mode]} bg-neo-navy-light shadow-hard-lg max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col animate-pop-in`}
       >
         {/* Mode-color bar at the top — same chunky brand language as the live HUD. */}
         <div className={`h-1.5 ${ACCENT_BG[mode]}`} aria-hidden />
@@ -196,7 +194,7 @@ export default function PracticeInstructions({ mode, autoOpen = true }: Props) {
             {t('practice.instructions.cta')}
           </button>
         </div>
-      </AdaptiveMotion.div>
+      </div>
     </div>
   );
 }
