@@ -164,9 +164,15 @@ class MockResizeObserver {
   }
 };
 
-// Mock requestAnimationFrame
-(global as any).requestAnimationFrame = vi.fn((callback: any) => setTimeout(callback, 0));
-(global as any).cancelAnimationFrame = vi.fn((id: any) => clearTimeout(id));
+// Mock requestAnimationFrame — no-op (returns ID, never fires callback).
+// Using setTimeout(callback, 0) here caused animation-loop rAF chains to
+// accumulate as pending timers across an entire fork's test run. On exit the
+// Node process kept scheduling more callbacks, preventing clean shutdown and
+// causing "Worker exited unexpectedly" in vitest-pool/forks.
+// Tests that need actual rAF dispatch provide their own vi.stubGlobal override.
+let _rafIdCounter = 0;
+(global as any).requestAnimationFrame = vi.fn((_callback: any) => ++_rafIdCounter);
+(global as any).cancelAnimationFrame = vi.fn();
 
 // Mock performance.now
 if (!(global as any).performance) {
