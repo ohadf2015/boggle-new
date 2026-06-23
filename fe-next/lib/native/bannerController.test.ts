@@ -67,6 +67,23 @@ describe('shouldSuppressBanner (pure)', () => {
   it('treats a missing onboarding flag as false (back-compat with existing callers)', () => {
     expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: false })).toBe(false);
   });
+
+  it('suppresses whenever a modal/dialog is open (any screen)', () => {
+    // The native banner is a SurfaceView composited ABOVE the WebView, so an open
+    // Radix dialog (z-90 overlay in the DOM) can't cover it — the banner paints on
+    // top of the modal's content/CTAs (device-confirmed over CreateRoomModal).
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: false, modalOpen: true })).toBe(true);
+  });
+
+  it('modal suppression is not overridden by the in-game opt-in', () => {
+    expect(
+      shouldSuppressBanner({ drawerOpen: false, inGame: true, allowInGame: true, modalOpen: true }),
+    ).toBe(true);
+  });
+
+  it('treats a missing modalOpen flag as false (back-compat with existing callers)', () => {
+    expect(shouldSuppressBanner({ drawerOpen: false, inGame: false, allowInGame: false })).toBe(false);
+  });
 });
 
 describe('BannerController', () => {

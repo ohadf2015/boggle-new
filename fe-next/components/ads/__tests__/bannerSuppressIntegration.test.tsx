@@ -66,6 +66,7 @@ describe('Banner suppress/restore — integration', () => {
 
   afterEach(() => {
     document.documentElement.classList.remove('mobile-drawer-open');
+    document.documentElement.classList.remove('modal-open');
   });
 
   it('hides on drawer open and restores (resume + show) on drawer close', async () => {
@@ -97,6 +98,37 @@ describe('Banner suppress/restore — integration', () => {
     await flush();
     await bannerController.whenIdle();
     expect(resumeBannerSpy).toHaveBeenCalled(); // un-hide the GONE AdView
+    expect(showBannerSpy).toHaveBeenCalled();
+  });
+
+  it('hides while a modal is open (html.modal-open) and restores when it closes', async () => {
+    const BannerCoordinatorMount = (await import('../BannerCoordinatorMount')).default;
+    const AnchoredNativeBanner = (await import('../AnchoredNativeBanner')).default;
+    const { bannerController } = await import('@/lib/native/bannerController');
+
+    render(
+      <>
+        <BannerCoordinatorMount />
+        <AnchoredNativeBanner />
+      </>,
+    );
+
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled());
+    hideBannerSpy.mockClear();
+    showBannerSpy.mockClear();
+    resumeBannerSpy.mockClear();
+
+    // A dialog opens (the shared DialogContent ref-counts this class) → suppress.
+    document.documentElement.classList.add('modal-open');
+    await flush();
+    await bannerController.whenIdle();
+    expect(hideBannerSpy).toHaveBeenCalled();
+
+    // Dialog closes → banner returns (visibility restored first, then re-show).
+    document.documentElement.classList.remove('modal-open');
+    await flush();
+    await bannerController.whenIdle();
+    expect(resumeBannerSpy).toHaveBeenCalled();
     expect(showBannerSpy).toHaveBeenCalled();
   });
 });
