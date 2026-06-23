@@ -13564,6 +13564,35 @@ const en = {
       "wheelRush": "Wheel Rush",
       "totalGames": "Total"
     },
+    "insights": {
+      "title": "Insights",
+      "allTime": "1y",
+      "gamesToday": "Games today",
+      "vsYesterday": "vs yesterday",
+      "vsYesterdayNew": "vs 0 yesterday",
+      "bestDayEver": "Best day ever",
+      "fastestGrowing": "Fastest-growing mode",
+      "thisWeek": "this week",
+      "byDayOfWeek": "Busiest day",
+      "isPeakDay": "is your peak day",
+      "byHour": "Busiest hour (UTC)",
+      "isPeakHour": "is your peak hour",
+      "crossPlay": "Players who play X also play Y",
+      "noShowRate": "Joined but never scored",
+      "noShowHint": "Share of games recorded with 0 score & 0 words — players who joined but did not play.",
+      "wordQuality": "Word-quality by language",
+      "wordQualityHint": "Rejected vs accepted word submissions (30d). A high reject rate flags dictionary gaps for that language.",
+      "rejected": "rejected",
+      "dow": {
+        "sun": "Sunday",
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday"
+      }
+    },
     "geo": {
       "empty": "No geographic data",
       "error": "Failed to load geographic data",

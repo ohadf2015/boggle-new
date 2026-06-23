@@ -24,6 +24,7 @@ import { KPICards } from '@/components/admin/overview/KPICards';
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
 import { GameModePopularity } from '@/components/admin/overview/GameModePopularity';
 import { MpModeBreakdown } from '@/components/admin/overview/MpModeBreakdown';
+import { InsightsPanel } from '@/components/admin/overview/InsightsPanel';
 import { DailyActivityChart } from '@/components/admin/overview/DailyActivityChart';
 import { DeploymentInfoPanel } from '@/components/admin/overview/DeploymentInfoPanel';
 
@@ -131,6 +132,11 @@ export default function AdminPageClient() {
 
           {/* MP Mode Breakdown */}
           <MpModeBreakdown />
+
+          {/* Insights — activity heatmaps, cross-play, records, word-quality */}
+          <div className="mt-4">
+            <InsightsPanel />
+          </div>
 
           {/* Dashboard content */}
           {authToken ? (

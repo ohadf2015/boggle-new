@@ -95,7 +95,10 @@ export async function endGame(io: Server, gameCode: string): Promise<void> {
     const fallbackScores = Object.entries(game.users || {}).map(([username]) => ({
       username,
       totalScore: game.playerScores?.[username] || 0,
-      words: (game.playerWords?.[username] || []).map((word: string) => ({
+      // Field MUST be `wordDetails` to match PlayerResult: both the client
+      // broadcast (gameScores.ts) and the Supabase mapper (gameResults.ts:187/194)
+      // read `wordDetails`. A `words` key here silently persists 0 words / 0 longest.
+      wordDetails: (game.playerWords?.[username] || []).map((word: string) => ({
         word,
         score: 0,
         isValid: true,
