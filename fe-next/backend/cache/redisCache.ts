@@ -23,7 +23,9 @@ export function getCacheClient(): Redis {
   // unhandled events. We degrade silently to the DB (errors also reject the
   // pending command, handled below), but log the first one so an outage isn't
   // invisible.
-  cacheClient.on('error', (err: Error) => {
+  // Optional-chain: real ioredis always has .on; some test mocks don't, and a
+  // missing listener must not crash client creation.
+  cacheClient.on?.('error', (err: Error) => {
     if (!loggedConnError) {
       loggedConnError = true;
       console.warn('[apiCache] Redis unavailable, serving from DB:', err?.message);
