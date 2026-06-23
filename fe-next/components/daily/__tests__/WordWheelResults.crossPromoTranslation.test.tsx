@@ -128,5 +128,29 @@ describe('WordWheelResults — cross-promo CTA translation + gating', () => {
       expect(link).toBeInTheDocument();
       expect(link).toHaveAttribute('href', '/en/daily');
     });
+
+    it('renders the back-to-daily CTA with calm secondary styling (no loud full-fill)', async () => {
+      vi.doMock('@/contexts/LanguageContext', () => ({
+        useLanguage: () => ({
+          t: (k: string, fb?: string) => fb || k,
+          language: 'en',
+          dir: 'ltr',
+        }),
+      }));
+      const { default: Component } = await import('../WordWheelResults');
+      render(
+        <Component
+          result={baseResult}
+          puzzleNumber={1}
+          puzzleDate="2026-04-21"
+          language="en"
+          hasPlayedWordHunt={true}
+        />
+      );
+      const cls = screen.getByTestId('back-to-daily-link').className;
+      expect(cls).toContain('bg-neo-navy-light');
+      expect(cls).not.toMatch(/bg-neo-cyan\b/);
+      expect(cls).not.toContain('shadow-hard-lg');
+    });
   });
 });

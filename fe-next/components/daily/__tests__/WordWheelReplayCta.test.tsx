@@ -59,6 +59,14 @@ describe('WordWheelReplayCta', () => {
     expect(mockTrackExposure).toHaveBeenCalled();
   });
 
+  it('uses calm secondary styling — no saturated full-fill or heavy shadow', () => {
+    render(<WordWheelReplayCta />);
+    const cls = screen.getByTestId('wheel-replay-cta').className;
+    expect(cls).toContain('bg-neo-navy-light');
+    expect(cls).not.toMatch(/bg-neo-purple\b/);
+    expect(cls).not.toContain('shadow-hard-lg');
+  });
+
   it('fires wheel_practice_cta_clicked when tapped', () => {
     render(<WordWheelReplayCta />);
     fireEvent.click(screen.getByTestId('wheel-replay-cta'));

@@ -46,19 +46,17 @@ const WordWheelReplayCta: React.FC = () => {
         href={href}
         data-testid="wheel-replay-cta"
         onClick={() => trackGrowthEvent('wheel_practice_cta_clicked', { experiment: EXPERIMENT_KEY, variant })}
-        className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-purple shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all"
+        className="flex items-center gap-3 w-full p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm hover:bg-neo-navy active:translate-x-px active:translate-y-px transition-colors"
       >
-        <span className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-11 h-11 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-            <RotateCcw className="w-6 h-6 text-neo-purple" aria-hidden />
+        <span className="flex items-center justify-center w-9 h-9 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+          <RotateCcw className="w-5 h-5 text-neo-purple" aria-hidden />
+        </span>
+        <span>
+          <span className="block font-neo-display font-black text-neo-white text-sm leading-tight">
+            {t('wordWheel.replay.title')}
           </span>
-          <span>
-            <span className="block font-neo-display font-black text-neo-white text-sm leading-tight">
-              {t('wordWheel.replay.title')}
-            </span>
-            <span className="block text-neo-white/70 text-xs mt-0.5">
-              {t('wordWheel.replay.subtitle')}
-            </span>
+          <span className="block text-neo-white/55 text-xs mt-0.5">
+            {t('wordWheel.replay.subtitle')}
           </span>
         </span>
       </Link>

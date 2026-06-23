@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { m } from 'framer-motion';
 import Link from 'next/link';
-import { Users, ArrowRight, RefreshCw, Search } from 'lucide-react';
+import { Users, RefreshCw, Search } from 'lucide-react';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { Language } from '@/types';
 
@@ -31,21 +31,17 @@ const MP_MODES = [
     target: 'wheel_rush_mp',
     mode: 'wheel-rush',
     icon: RefreshCw,
-    accent: 'bg-neo-purple',
+    iconColor: 'text-neo-purple',
     titleKey: 'mpCrossPromo.wheelRushTitle',
     titleFallback: 'Word Wheel · Live',
-    descKey: 'mpCrossPromo.wheelRushDesc',
-    descFallback: 'Race rivals on the wheel in real time',
   },
   {
     target: 'word_hunt_mp',
     mode: 'word-hunt',
     icon: Search,
-    accent: 'bg-neo-lime',
+    iconColor: 'text-neo-lime',
     titleKey: 'mpCrossPromo.wordHuntTitle',
     titleFallback: 'Word Hunt · Live',
-    descKey: 'mpCrossPromo.wordHuntDesc',
-    descFallback: 'Hunt the hidden words against others',
   },
 ] as const;
 
@@ -69,43 +65,37 @@ const MpModeCrossPromo: React.FC<MpModeCrossPromoProps> = ({ language, source, t
         </span>
       </div>
 
-      {MP_MODES.map((mode) => {
-        const Icon = mode.icon;
-        return (
-          <m.div
-            key={mode.target}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-          >
-            <Link
-              href={`/${language}/multiplayer?mode=${mode.mode}`}
-              onClick={() => trackGrowthEvent('cross_promo_click', {
-                target: mode.target,
-                source,
-                placement: 'mp_cross_promo',
-                language,
-              })}
-              className={`flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black ${mode.accent} shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all`}
+      <div data-testid="mp-live-grid" className="grid grid-cols-2 gap-2">
+        {MP_MODES.map((mode) => {
+          const Icon = mode.icon;
+          return (
+            <m.div
+              key={mode.target}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-11 h-11 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
-                  <Icon className="w-6 h-6 text-neo-white" />
-                </div>
-                <div>
-                  <span className="block font-neo-display font-black text-neo-black text-base leading-tight">
-                    {t(mode.titleKey, mode.titleFallback)}
-                  </span>
-                  <p className="text-neo-black/70 text-xs mt-0.5">
-                    {t(mode.descKey, mode.descFallback)}
-                  </p>
-                </div>
-              </div>
-              <ArrowRight className="w-6 h-6 text-neo-black shrink-0" />
-            </Link>
-          </m.div>
-        );
-      })}
+              <Link
+                href={`/${language}/multiplayer?mode=${mode.mode}`}
+                onClick={() => trackGrowthEvent('cross_promo_click', {
+                  target: mode.target,
+                  source,
+                  placement: 'mp_cross_promo',
+                  language,
+                })}
+                className="flex h-full flex-col items-center justify-center gap-2 p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm hover:bg-neo-navy active:translate-x-px active:translate-y-px transition-colors text-center"
+              >
+                <span className="flex items-center justify-center w-9 h-9 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0">
+                  <Icon className={`w-5 h-5 ${mode.iconColor}`} />
+                </span>
+                <span className="font-neo-display font-black text-neo-white text-xs leading-tight">
+                  {t(mode.titleKey, mode.titleFallback)}
+                </span>
+              </Link>
+            </m.div>
+          );
+        })}
+      </div>
     </div>
   );
 };
