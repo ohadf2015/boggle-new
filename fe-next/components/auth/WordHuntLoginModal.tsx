@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { m } from 'framer-motion';
 import { Mail, Wand2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '../ui/button';
@@ -12,6 +11,7 @@ import {
   DialogTitle,
   DialogBody,
 } from '@/components/ui/dialog';
+import { Reveal } from '@/components/ui/Reveal';
 
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
@@ -152,12 +152,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
 
         <DialogBody className="p-6 pt-0">
           {/* Content */}
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-center mb-6"
-          >
+          <Reveal className="text-center mb-6">
             <div className="text-5xl mb-4">🎯</div>
             <h2 className="text-2xl font-bold text-white mb-2">
               {t('auth.wordHunt.loginTitle')}
@@ -165,26 +160,21 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
             <p className="text-sm text-gray-300">
               {t('auth.wordHunt.loginSubtitle')}
             </p>
-          </m.div>
+          </Reveal>
 
           {/* Success Message */}
           {success ? (
-            <m.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
+            <Reveal
+              noSlide
+              role="status"
               className="mb-4 p-4 rounded-lg bg-emerald-900/30 border border-emerald-500/50 text-center"
             >
               <p className="text-sm font-bold text-emerald-300">{success}</p>
-            </m.div>
+            </Reveal>
           ) : (
             <>
               {/* Sign In Buttons */}
-              <m.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="space-y-3 mb-4"
-              >
+              <Reveal className="space-y-3 mb-4">
                 {!isNative() && process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID ? (
                   <GoogleSignInButton />
                 ) : (
@@ -216,7 +206,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                   )}
                   <span>{t('auth.signInWith', { provider: 'Discord' })}</span>
                 </Button>
-              </m.div>
+              </Reveal>
 
               {/* Email Form (OTP on native, magic link on web) */}
               {!showEmailForm ? (
@@ -228,11 +218,9 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                   <span>{t('auth.inlineSignup.orContinueWith')}</span>
                 </button>
               ) : (
-                <m.form
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
+                <form
                   onSubmit={handleEmailSubmit}
-                  className="mb-4 space-y-3"
+                  className="mb-4 space-y-3 animate-in fade-in-0 duration-300"
                 >
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <div className="flex-1 h-px bg-gray-600" />
@@ -296,36 +284,31 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                       </>
                     )}
                   </Button>
-                </m.form>
+                </form>
               )}
             </>
           )}
 
           {/* Error Message */}
           {error && (
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+            <Reveal
+              noSlide
+              role="alert"
               className="mb-4 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300 text-sm"
             >
               <AlertCircle className="w-4 h-4 shrink-0 inline-block me-1" />{error}
-            </m.div>
+            </Reveal>
           )}
 
           {/* Skip Option */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-center"
-          >
+          <Reveal noSlide className="text-center">
             <button
               onClick={onClose}
               className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
             >
               {t('auth.wordHunt.skipCta')}
             </button>
-          </m.div>
+          </Reveal>
         </DialogBody>
       </DialogContent>
     </Dialog>

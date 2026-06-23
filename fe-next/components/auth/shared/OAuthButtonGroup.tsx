@@ -1,6 +1,6 @@
 'use client';
 
-import { m } from 'framer-motion';
+import { Reveal } from '@/components/ui/Reveal';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -82,13 +82,8 @@ export function OAuthButtonGroup({
 
   return (
     <div className={cn('space-y-3', className)}>
-      {providers.map((provider, i) => (
-        <m.div
-          key={provider.id}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 * i, type: 'spring', stiffness: 400, damping: 24 }}
-        >
+      {providers.map((provider) => (
+        <Reveal key={provider.id}>
           {provider.id === 'google' && useGsiGoogleButton ? (
             <GoogleSignInButton />
           ) : (
@@ -110,7 +105,7 @@ export function OAuthButtonGroup({
             </span>
           </Button>
           )}
-        </m.div>
+        </Reveal>
       ))}
     </div>
   );

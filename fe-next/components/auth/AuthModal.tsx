@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import { X, Mail, Eye, EyeOff, Wand2, Shield, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
+import { Reveal } from '@/components/ui/Reveal';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -362,25 +363,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   if (!isOpen) return null;
   if (typeof document === 'undefined') return null;
 
+  // Backdrop + panel use CSS entrance animations (tailwindcss-animate), NOT
+  // framer-motion. JS-driven entrance animations can leave the panel pinned at
+  // its invisible `initial` state when the main thread is starved (e.g. parsing
+  // the large Hebrew translation bundle), which rendered the modal as just the
+  // dark backdrop. CSS animations run off the main thread and always settle to
+  // the visible resting state, so the panel can never get stuck invisible.
   return createPortal(
-    <AnimatePresence>
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-200"
         onClick={onClose}
       >
-        <m.div
+        <div
           ref={modalRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="auth-modal-title"
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', damping: 22, stiffness: 280 }}
-          className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy p-6 shadow-hard-lg"
+          className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy p-6 shadow-hard-lg animate-in fade-in-0 zoom-in-95 duration-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -467,13 +466,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                 </div>
               ) : (
                 <div className="space-y-2.5">
-                  {providers.map((provider, idx) => (
-                    <m.div
-                      key={provider.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                    >
+                  {providers.map((provider) => (
+                    <Reveal key={provider.id}>
                       {provider.id === 'google' && useGsiGoogleButton ? (
                         <GoogleSignInButton />
                       ) : (
@@ -496,7 +490,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         )}
                       </Button>
                       )}
-                    </m.div>
+                    </Reveal>
                   ))}
                 </div>
               )}
@@ -831,9 +825,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               </Link>
             </p>
           </div>
-        </m.div>
-      </m.div>
-    </AnimatePresence>,
+        </div>
+      </div>,
     document.body
   );
 };

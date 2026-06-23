@@ -1,8 +1,8 @@
 'use client';
 
-import { m } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Reveal } from '@/components/ui/Reveal';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -21,12 +21,7 @@ export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButto
   const isDarkMode = theme === 'dark';
 
   return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.2 }}
-      className={cn('absolute top-4 inset-e-4', className)}
-    >
+    <Reveal noSlide className={cn('absolute top-4 inset-e-4', className)}>
       <Button
         variant="ghost"
         size="icon"
@@ -39,7 +34,7 @@ export function AuthModalCloseButton({ onClose, className }: AuthModalCloseButto
       >
         <X className="w-5 h-5" />
       </Button>
-    </m.div>
+    </Reveal>
   );
 }
 
