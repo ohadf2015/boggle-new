@@ -180,17 +180,18 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Listen for per-word server feedback to drive pending-word chip transitions
   useEffect(() => {
     if (!socket) return;
-    const handlePlayerFound = (data: { username: string; word: string }) => {
-      if (data.username === username) confirmPending(data.word);
+    // playerFoundWord is now coalesced server-side into playerFoundWordBatch.
+    const handlePlayerFoundBatch = (data: { words?: Array<{ username: string; word: string }> }) => {
+      data.words?.forEach((w) => { if (w.username === username) confirmPending(w.word); });
     };
     const handleWordRejected = (data: { word: string }) => rejectPending(data.word);
-    socket.on('playerFoundWord', handlePlayerFound);
+    socket.on('playerFoundWordBatch', handlePlayerFoundBatch);
     socket.on('wordRejected', handleWordRejected);
     socket.on('wordAlreadyFound', handleWordRejected);
     socket.on('wordNotOnBoard', handleWordRejected);
     socket.on('endGame', clearAll);
     return () => {
-      socket.off('playerFoundWord', handlePlayerFound);
+      socket.off('playerFoundWordBatch', handlePlayerFoundBatch);
       socket.off('wordRejected', handleWordRejected);
       socket.off('wordAlreadyFound', handleWordRejected);
       socket.off('wordNotOnBoard', handleWordRejected);

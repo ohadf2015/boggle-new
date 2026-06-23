@@ -19,6 +19,7 @@ import {
 
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom, getSocketById, safeEmit } from '../utils/socketHelpers.js';
 import { queueOpponentWord } from '../utils/opponentWordFeedBatcher.js';
+import { queuePlayerFoundWord } from '../utils/playerFoundWordBatcher.js';
 import { calculateWordScore } from '../modules/scoringEngine.js';
 import { checkAndAwardAchievements } from '../modules/achievementManager.js';
 import { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } from '../modules/supabaseServer.js';
@@ -352,11 +353,13 @@ function handleValidatedWord(io: Server, socket: Socket, game: GameState, gameCo
     }
   }
 
-  // Broadcast playerFoundWord to room for TV broadcast mode
-  // Includes combo level and word for exciting notifications
+  // Queue playerFoundWord (live feed / combo FX / TV broadcast / pending-chip
+  // confirm). Coalesced into a windowed `playerFoundWordBatch` broadcast instead
+  // of one emit per word — see playerFoundWordBatcher. Per-word payload shape is
+  // preserved verbatim inside the batch array.
   const totalScore = preScore + totalDelta;
   const playerWordCount = (game.playerWords?.[username]?.length || 0) + 1;
-  broadcastToRoom(io, getGameRoom(gameCode), 'playerFoundWord', {
+  queuePlayerFoundWord(io, gameCode, {
     username: username,
     word: normalizedWord,
     wordCount: playerWordCount,

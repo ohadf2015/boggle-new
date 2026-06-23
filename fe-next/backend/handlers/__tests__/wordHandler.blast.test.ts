@@ -94,6 +94,10 @@ vi.mock('../../../backend/handlers/engagementHandler', () => ({
   processLongWordEngagement: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../../../backend/utils/playerFoundWordBatcher', () => ({
+  queuePlayerFoundWord: vi.fn(),
+  clearPlayerFoundWords: vi.fn(),
+}));
 vi.mock('../../../backend/utils/socketHelpers', () => ({
   broadcastToRoom: vi.fn(),
   broadcastToRoomExceptSender: vi.fn(),
@@ -213,6 +217,7 @@ import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
 import { broadcastToRoom, safeEmit } from '../../../backend/utils/socketHelpers';
+import { queuePlayerFoundWord } from '../../../backend/utils/playerFoundWordBatcher';
 import { calculateBlastTileBonus, getTilesOnPath, recordBlastMove, isBlastBoardCleared, advanceBlastWave, regenerateBlastBoard, recordBlastBoardClear } from '../../../backend/modules/blastModeManager';
 import { endGame } from '../../../backend/services/gameLifecycle/gameEnd';
 import timerManager from '../../../backend/utils/timerManager';
@@ -294,10 +299,10 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
     it('should include comboSync in playerFoundWord when comboType is provided', async () => {
       await handlers['submitWord']({ word: 'test', comboType: 'bomb_bomb' });
 
-      const calls = (broadcastToRoom as Mock).mock.calls;
-      const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-      expect(foundWordCall).toBeDefined();
-      const payload = foundWordCall[3];
+      // playerFoundWord is coalesced via the batcher: queuePlayerFoundWord(io, gameCode, payload)
+      const calls = (queuePlayerFoundWord as Mock).mock.calls;
+      expect(calls.length).toBeGreaterThan(0);
+      const payload = calls[0][2];
       expect(payload.comboSync).toBeDefined();
       expect(payload.comboSync.comboType).toBe('bomb_bomb');
       expect(payload.comboSync.username).toBe('testUser');
@@ -319,14 +324,15 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       expect(comboSyncCall).toBeUndefined();
     });
 
-    it('should include comboSync in playerFoundWord with correct room', async () => {
+    it('should include comboSync in playerFoundWord with correct gameCode', async () => {
       await handlers['submitWord']({ word: 'test', comboType: 'lightning_prism' });
 
-      const calls = (broadcastToRoom as Mock).mock.calls;
-      const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-      expect(foundWordCall).toBeDefined();
-      expect(foundWordCall[1]).toBe('game:BLAST1');
-      expect(foundWordCall[3].comboSync).toEqual({
+      // queuePlayerFoundWord(io, gameCode, payload) — call[1] is the raw gameCode
+      const calls = (queuePlayerFoundWord as Mock).mock.calls;
+      expect(calls.length).toBeGreaterThan(0);
+      const foundWordCall = calls[0];
+      expect(foundWordCall[1]).toBe('BLAST1');
+      expect(foundWordCall[2].comboSync).toEqual({
         comboType: 'lightning_prism',
         username: 'testUser',
       });
@@ -415,11 +421,9 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       expect(wordAcceptedCall).toBeDefined();
       expect(wordAcceptedCall[1].isFirstFinder).toBe(true);
 
-      const foundWordCall = (broadcastToRoom as Mock).mock.calls.find(
-        (c: any[]) => c[2] === 'playerFoundWord'
-      );
+      const foundWordCall = (queuePlayerFoundWord as Mock).mock.calls[0];
       expect(foundWordCall).toBeDefined();
-      expect(foundWordCall[3].isFirstFinder).toBe(true);
+      expect(foundWordCall[2].isFirstFinder).toBe(true);
     });
 
     it('sets isFirstFinder: false on both broadcasts when recordFirstFinder returns false', async () => {
@@ -432,10 +436,8 @@ describe('wordHandler - blastComboSync broadcast (52-02)', () => {
       );
       expect(wordAcceptedCall[1].isFirstFinder).toBe(false);
 
-      const foundWordCall = (broadcastToRoom as Mock).mock.calls.find(
-        (c: any[]) => c[2] === 'playerFoundWord'
-      );
-      expect(foundWordCall[3].isFirstFinder).toBe(false);
+      const foundWordCall = (queuePlayerFoundWord as Mock).mock.calls[0];
+      expect(foundWordCall[2].isFirstFinder).toBe(false);
     });
   });
 

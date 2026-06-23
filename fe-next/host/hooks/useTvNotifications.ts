@@ -266,10 +266,14 @@ export function useTvNotifications({
       }
     };
 
-    socket.on('playerFoundWord', handlePlayerFoundWord);
+    // playerFoundWord is coalesced server-side into playerFoundWordBatch.
+    const handleBatch = (data: { words?: PlayerFoundWordPayload[] }) => {
+      data.words?.forEach((w) => handlePlayerFoundWord(w));
+    };
+    socket.on('playerFoundWordBatch', handleBatch);
 
     return () => {
-      socket.off('playerFoundWord', handlePlayerFoundWord);
+      socket.off('playerFoundWordBatch', handleBatch);
     };
   }, [socket, enabled, addNotification, t]);
 

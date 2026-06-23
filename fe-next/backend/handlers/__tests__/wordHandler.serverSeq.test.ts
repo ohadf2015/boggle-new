@@ -97,6 +97,10 @@ vi.mock('../../../backend/handlers/engagementHandler', () => ({
   processLongWordEngagement: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../../../backend/utils/playerFoundWordBatcher', () => ({
+  queuePlayerFoundWord: vi.fn(),
+  clearPlayerFoundWords: vi.fn(),
+}));
 vi.mock('../../../backend/utils/socketHelpers', () => ({
   broadcastToRoom: vi.fn(),
   broadcastToRoomExceptSender: vi.fn(),
@@ -169,6 +173,7 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
 import { getGame, getGameBySocketId, getUsernameBySocketId } from '../../../backend/modules/gameStateManager';
 import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { broadcastToRoom } from '../../../backend/utils/socketHelpers';
+import { queuePlayerFoundWord } from '../../../backend/utils/playerFoundWordBatcher';
 import { registerWordHandlers } from '../wordHandler';
 
 function makeClassicGame(overrides: Record<string, unknown> = {}) {
@@ -251,14 +256,14 @@ describe('wordValidationHandler - serverSeq delta payloads (Phase 3.4)', () => {
     expect(game.serverSeq).toBe(3);
   });
 
-  it('includes serverSeq in playerFoundWord broadcast', async () => {
+  it('includes serverSeq in the queued playerFoundWord payload', async () => {
     game.serverSeq = 3;
     await handlers['submitWord']({ word: 'cat' });
 
-    const calls = (broadcastToRoom as Mock).mock.calls;
-    const playerFoundCall = calls.find((c: unknown[]) => c[2] === 'playerFoundWord');
-    expect(playerFoundCall).toBeDefined();
-    expect(playerFoundCall![3]).toMatchObject({ serverSeq: 4 });
+    // playerFoundWord is now coalesced via the batcher: queuePlayerFoundWord(io, gameCode, payload)
+    const calls = (queuePlayerFoundWord as Mock).mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    expect(calls[0][2]).toMatchObject({ serverSeq: 4 });
   });
 
   it('broadcasts scoreUpdate event with delta info after accepted word', async () => {

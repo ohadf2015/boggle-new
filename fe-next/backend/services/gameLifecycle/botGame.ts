@@ -17,6 +17,7 @@ import {
   recordFirstFinder,
 } from '../../modules/gameStateManager';
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
+import { queuePlayerFoundWord } from '../../utils/playerFoundWordBatcher';
 
 /**
  * Broadcast the leaderboard after a bot word — THROTTLED.
@@ -388,10 +389,11 @@ export function startBotsForGame(
           isFirstFinder,
         });
 
-        // Also emit playerFoundWord so the frontend treats bot words like human words
-        // (leaderboard updates, opponent activity feed, word count tracking)
+        // Also queue playerFoundWord so the frontend treats bot words like human
+        // words (leaderboard updates, opponent activity feed, word count tracking).
+        // Coalesced into playerFoundWordBatch — same path as human words.
         const playerWordCount = currentGame?.playerWords?.[username]?.length || 0;
-        volatileBroadcastToRoom(io, getGameRoom(gameCode), 'playerFoundWord', {
+        queuePlayerFoundWord(io, gameCode, {
           username,
           word,
           wordCount: playerWordCount,

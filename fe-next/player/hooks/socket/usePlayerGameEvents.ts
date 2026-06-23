@@ -804,13 +804,15 @@ export function usePlayerGameEvents({
       }
     };
 
-    // Handle playerFoundWord broadcast — shows opponent word activity in blast MP feed
-    const handlePlayerFoundWord = (data: { username: string; word: string; score: number; comboLevel: number; wordCount: number; comboSync?: { comboType: string; username: string } }) => {
+    // Handle playerFoundWord — shows opponent word activity in blast MP feed.
+    // `seq` disambiguates ids within a single coalesced batch (all items are
+    // processed in the same millisecond, so Date.now() alone would collide).
+    const handlePlayerFoundWord = (data: { username: string; word: string; score: number; comboLevel: number; wordCount: number; comboSync?: { comboType: string; username: string } }, seq = 0) => {
       // Handle merged comboSync (Fix 2) — extract from playerFoundWord instead of separate event
       if (data.comboSync && data.comboSync.username !== username) {
-        setBlastComboSync({ ...data.comboSync, id: `combo-sync-${Date.now()}` });
+        setBlastComboSync({ ...data.comboSync, id: `combo-sync-${Date.now()}-${seq}` });
         useGameStore.getState().pushBlastOpponentActivity({
-          id: `combo-${Date.now()}`,
+          id: `combo-${Date.now()}-${seq}`,
           username: data.comboSync.username,
           type: 'combo',
           message: data.comboSync.comboType,
@@ -820,7 +822,7 @@ export function usePlayerGameEvents({
       if (data.username === username) return; // Skip own words
       const store = useGameStore.getState();
       store.pushBlastOpponentActivity({
-        id: `word-${Date.now()}-${data.username}`,
+        id: `word-${Date.now()}-${seq}-${data.username}`,
         username: data.username,
         type: 'word',
         word: data.word,
@@ -830,13 +832,18 @@ export function usePlayerGameEvents({
       // Milestone alerts at score thresholds
       if (data.score > 0 && data.score % 500 < 50 && data.score >= 500) {
         store.pushBlastOpponentActivity({
-          id: `milestone-${Date.now()}-${data.username}`,
+          id: `milestone-${Date.now()}-${seq}-${data.username}`,
           username: data.username,
           type: 'milestone',
           score: data.score,
           message: `${data.score}+ pts!`,
         });
       }
+    };
+
+    // playerFoundWord is coalesced server-side into playerFoundWordBatch.
+    const handlePlayerFoundWordBatch = (data: { words?: Array<Parameters<typeof handlePlayerFoundWord>[0]> }) => {
+      data.words?.forEach((w, i) => handlePlayerFoundWord(w, i));
     };
 
     // Handle server-authoritative blast board update (MP board sync)
@@ -929,7 +936,7 @@ export function usePlayerGameEvents({
     socket.on('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
     socket.on('totalBoardWords', handleTotalBoardWords);
     socket.on('blastComboSync', handleBlastComboSync);
-    socket.on('playerFoundWord', handlePlayerFoundWord);
+    socket.on('playerFoundWordBatch', handlePlayerFoundWordBatch);
     socket.on('blastBoardUpdate', handleBlastBoardUpdate);
     socket.on('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
     socket.on('wordHuntTargetResult', handleWordHuntTargetResult);
@@ -974,7 +981,7 @@ export function usePlayerGameEvents({
       earthquakeHandlers.cleanup();
       socket.off('totalBoardWords', handleTotalBoardWords);
       socket.off('blastComboSync', handleBlastComboSync);
-      socket.off('playerFoundWord', handlePlayerFoundWord);
+      socket.off('playerFoundWordBatch', handlePlayerFoundWordBatch);
       socket.off('blastBoardUpdate', handleBlastBoardUpdate);
       socket.off('wordHuntLifeUpdate', handleWordHuntLifeUpdate);
       socket.off('wordHuntTargetResult', handleWordHuntTargetResult);

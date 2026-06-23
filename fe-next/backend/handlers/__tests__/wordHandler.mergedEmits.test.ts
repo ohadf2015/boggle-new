@@ -100,6 +100,10 @@ vi.mock('../../../backend/handlers/engagementHandler', () => ({
   processLongWordEngagement: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../../../backend/utils/playerFoundWordBatcher', () => ({
+  queuePlayerFoundWord: vi.fn(),
+  clearPlayerFoundWords: vi.fn(),
+}));
 vi.mock('../../../backend/utils/socketHelpers', () => ({
   broadcastToRoom: vi.fn(),
   broadcastToRoomExceptSender: vi.fn(),
@@ -169,6 +173,7 @@ import { isWordOnBoardAsync } from '../../../backend/modules/wordValidatorPool';
 import { isDictionaryWord, isValidWordCached } from '../../../backend/dictionary';
 import { isWordCommunityValid, isWordValidForScoring } from '../../../backend/modules/communityWordManager';
 import { broadcastToRoom } from '../../../backend/utils/socketHelpers';
+import { queuePlayerFoundWord } from '../../../backend/utils/playerFoundWordBatcher';
 import { registerWordHandlers } from '../wordHandler';
 
 function makeBlastGame(overrides = {}) {
@@ -275,25 +280,24 @@ describe('wordHandler - merged blast emits (Fix 2)', () => {
   });
 
   describe('playerFoundWord includes comboSync field when comboType present', () => {
-    it('should include comboSync in playerFoundWord payload when comboType is provided', async () => {
+    it('should include comboSync in queued playerFoundWord payload when comboType is provided', async () => {
       await handlers['submitWord']({ word: 'test', comboType: 'bomb_bomb' });
 
-      const calls = (broadcastToRoom as Mock).mock.calls;
-      const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-      expect(foundWordCall).toBeDefined();
-      const payload = foundWordCall[3];
+      // playerFoundWord is coalesced via the batcher: queuePlayerFoundWord(io, gameCode, payload)
+      const calls = (queuePlayerFoundWord as Mock).mock.calls;
+      expect(calls.length).toBeGreaterThan(0);
+      const payload = calls[0][2];
       expect(payload.comboSync).toBeDefined();
       expect(payload.comboSync.comboType).toBe('bomb_bomb');
       expect(payload.comboSync.username).toBe('testUser');
     });
 
-    it('should NOT include comboSync in playerFoundWord when comboType is absent', async () => {
+    it('should NOT include comboSync in queued playerFoundWord when comboType is absent', async () => {
       await handlers['submitWord']({ word: 'test' });
 
-      const calls = (broadcastToRoom as Mock).mock.calls;
-      const foundWordCall = calls.find((call: any[]) => call[2] === 'playerFoundWord');
-      expect(foundWordCall).toBeDefined();
-      const payload = foundWordCall[3];
+      const calls = (queuePlayerFoundWord as Mock).mock.calls;
+      expect(calls.length).toBeGreaterThan(0);
+      const payload = calls[0][2];
       expect(payload.comboSync).toBeUndefined();
     });
 

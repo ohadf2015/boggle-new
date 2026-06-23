@@ -62,6 +62,7 @@ import type { HostGameBase, TransferHostResult } from './hostManager';
 import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
 import timerManager from '../utils/timerManager';
 import { clearOpponentWordFeed } from '../utils/opponentWordFeedBatcher';
+import { clearPlayerFoundWords } from '../utils/playerFoundWordBatcher';
 import { MAX_PLAYERS_PER_ROOM } from '../utils/consts';
 import { LRUCache } from 'lru-cache';
 import { publishCacheInvalidation, startCacheInvalidationListener, stopCacheInvalidationListener } from '../redis/cacheInvalidation';
@@ -228,6 +229,7 @@ function deleteGame(gameCode: string): void {
   userManager.cleanupUserMappings(asBase<GameBase>(game), gameCode);
   scoreManager.clearLeaderboardThrottle(gameCode);
   clearOpponentWordFeed(gameCode);
+  clearPlayerFoundWords(gameCode);
   metrics.deleteRoom(gameCode);
   deleteGameFromRedis(gameCode);
   delete games[gameCode];
@@ -310,6 +312,7 @@ function resetGameForNewRound(gameCode: string): boolean {
   scoreManager.resetScoresForNewRound(asBase<ScoreGameBase>(game));
   scoreManager.clearLeaderboardThrottle(gameCode);
   clearOpponentWordFeed(gameCode);
+  clearPlayerFoundWords(gameCode);
   peerValidationManager.resetPeerValidation(asBase<PeerValidationGameBase>(game));
   readyStateManager.clearPlayersReadyForNextGame(asBase<ReadyStateGameBase>(game));
 

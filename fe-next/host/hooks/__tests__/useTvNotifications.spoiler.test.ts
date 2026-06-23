@@ -84,11 +84,8 @@ describe('useTvNotifications - anti-spoiler', () => {
 
     // Trigger a long word
     act(() => {
-      socket._trigger('playerFoundWord', {
-        username: 'player1',
-        wordCount: 1,
-        word: 'EXTRALONG',
-        score: 100,
+      socket._trigger('playerFoundWordBatch', {
+        words: [{ username: 'player1', wordCount: 1, word: 'EXTRALONG', score: 100 }],
       });
     });
 
@@ -108,11 +105,8 @@ describe('useTvNotifications - anti-spoiler', () => {
 
     act(() => socket._trigger('startGame', {}));
     act(() => {
-      socket._trigger('playerFoundWord', {
-        username: 'player1',
-        wordCount: 1,
-        word: 'STUNNING',
-        score: 80,
+      socket._trigger('playerFoundWordBatch', {
+        words: [{ username: 'player1', wordCount: 1, word: 'STUNNING', score: 80 }],
       });
     });
 
@@ -136,21 +130,15 @@ describe('useTvNotifications - anti-spoiler', () => {
 
     // Player 1 finds a word
     act(() => {
-      socket._trigger('playerFoundWord', {
-        username: 'player1',
-        wordCount: 1,
-        word: 'SECRET',
-        score: 50,
+      socket._trigger('playerFoundWordBatch', {
+        words: [{ username: 'player1', wordCount: 1, word: 'SECRET', score: 50 }],
       });
     });
 
     // Player 2 finds the same word within 2s (snipe)
     act(() => {
-      socket._trigger('playerFoundWord', {
-        username: 'player2',
-        wordCount: 1,
-        word: 'SECRET',
-        score: 50,
+      socket._trigger('playerFoundWordBatch', {
+        words: [{ username: 'player2', wordCount: 1, word: 'SECRET', score: 50 }],
       });
     });
 

@@ -165,6 +165,11 @@ export function useHostPlayerEvents({
       }
     };
 
+    // playerFoundWord is coalesced server-side into playerFoundWordBatch.
+    const handlePlayerFoundWordBatch = (data: { words?: Array<Parameters<typeof handlePlayerFoundWord>[0]> }) => {
+      data.words?.forEach((w) => handlePlayerFoundWord(w));
+    };
+
     const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardWirePlayer[] }) => {
       if (!data.leaderboard || !Array.isArray(data.leaderboard)) return;
       if (typeof window !== 'undefined' && window.location.search.includes('lbdebug')) {
@@ -199,7 +204,7 @@ export function useHostPlayerEvents({
     socket.on('playerListUpdate', handleUpdateUsers);
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
     socket.on('playerJoinedLate', handlePlayerJoinedLate);
-    socket.on('playerFoundWord', handlePlayerFoundWord);
+    socket.on('playerFoundWordBatch', handlePlayerFoundWordBatch);
     socket.on('updateLeaderboard', handleUpdateLeaderboard);
     socket.on('leaderboardUpdate', handleUpdateLeaderboard); // Same handler for bot updates
     socket.on('achievementUnlocked', handleAchievementUnlocked);
@@ -217,7 +222,7 @@ export function useHostPlayerEvents({
       socket.off('playerListUpdate', handleUpdateUsers);
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
       socket.off('playerJoinedLate', handlePlayerJoinedLate);
-      socket.off('playerFoundWord', handlePlayerFoundWord);
+      socket.off('playerFoundWordBatch', handlePlayerFoundWordBatch);
       socket.off('updateLeaderboard', handleUpdateLeaderboard);
       socket.off('leaderboardUpdate', handleUpdateLeaderboard);
       socket.off('achievementUnlocked', handleAchievementUnlocked);

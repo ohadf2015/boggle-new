@@ -316,12 +316,16 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
     }
   }, []);
 
-  // Socket listener
+  // Socket listener — playerFoundWord is coalesced server-side into
+  // playerFoundWordBatch; replay each word through the per-word handler.
   useEffect(() => {
     if (!socket) return;
-    socket.on('playerFoundWord', handlePlayerFoundWord);
+    const handleBatch = (data: { words?: Array<{ wordLength?: number; comboLevel?: number }> }) => {
+      data.words?.forEach((w) => handlePlayerFoundWord(w));
+    };
+    socket.on('playerFoundWordBatch', handleBatch);
     return () => {
-      socket.off('playerFoundWord', handlePlayerFoundWord);
+      socket.off('playerFoundWordBatch', handleBatch);
     };
   }, [socket, handlePlayerFoundWord]);
 

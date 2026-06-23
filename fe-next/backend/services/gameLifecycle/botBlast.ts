@@ -31,6 +31,7 @@ import { createSeededRandom } from '@/components/blast/legacy/utils/blastLetterG
 import { BLAST_SPECIAL_TILE_CHANCE } from '@/shared/constants/blastMultiplayerConstants';
 import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultiplayerConstants';
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
+import { queuePlayerFoundWord } from '../../utils/playerFoundWordBatcher';
 import { findAllWords, getCachedTrie } from '../../modules/boggleSolver';
 import { setBotTimeout } from '../../modules/botLifecycle';
 import { ensureLanguageLoaded } from '../../dictionary';
@@ -201,7 +202,7 @@ export function submitBlastWord(
       isFirstFinder,
     });
 
-    volatileBroadcastToRoom(io, getGameRoom(gameCode), 'playerFoundWord', {
+    queuePlayerFoundWord(io, gameCode, {
       username: bot.username,
       word,
       wordCount: (game.playerWords?.[bot.username]?.length || 0),
