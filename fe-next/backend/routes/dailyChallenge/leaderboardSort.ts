@@ -18,6 +18,34 @@ export function rerankSequential<T>(rows: T[]): (T & { rank_position: number })[
   return rows.map((row, index) => ({ ...row, rank_position: index + 1 }));
 }
 
+/**
+ * Collapse a player's multiple leaderboard rows into a single entry, keeping the
+ * FIRST occurrence per `player_id`. Input MUST be pre-sorted best-first (via the
+ * sortXGlobally helpers) so "first" == "best".
+ *
+ * Why: the per-language SQL views emit one row per ATTEMPT, and players replay the
+ * same puzzle many times (and across languages) — so the same player shows up
+ * repeatedly, including lower-scored duplicates that misread as "their real score".
+ * Dedup by player_id alone fixes both same-language replays and cross-language rows.
+ *
+ * Rows with a null/missing player_id (guests) are never collapsed together.
+ */
+export function dedupeByPlayerKeepBest<T extends { player_id?: string | null }>(rows: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const row of rows) {
+    const id = row.player_id;
+    if (id == null) {
+      out.push(row);
+      continue;
+    }
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(row);
+  }
+  return out;
+}
+
 /** Descending numeric compare with NULL/undefined sorted last. */
 function compareNumberDescNullsLast(a: number | null | undefined, b: number | null | undefined): number {
   const an = a ?? null;

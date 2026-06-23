@@ -15,7 +15,7 @@ import { COIN_COSTS } from '../../utils/coinManager';
 import type { Language } from '../../types';
 import wordHuntRouter from './dailyChallenge/wordHuntRoutes';
 import wordWheelRouter from './dailyChallenge/wordWheelRoutes';
-import { rerankSequential, sortClassicPuzzleRowsGlobally } from './dailyChallenge/leaderboardSort';
+import { rerankSequential, dedupeByPlayerKeepBest, sortClassicPuzzleRowsGlobally } from './dailyChallenge/leaderboardSort';
 import { updateQuestProgress } from '../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../lib/daily/questCredit';
 
@@ -172,7 +172,10 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         .order('score', { ascending: false, nullsFirst: false })
         .order('word_count', { ascending: false, nullsFirst: false })
         .order('time_seconds', { ascending: true, nullsFirst: false })
-        .limit(limit);
+        // Over-fetch: view has one row per ATTEMPT, so a player occupies many slots
+        // (replays + languages). Pull extra so dedup-to-one-per-player still yields `limit`.
+        // ponytail: ×10 cap 500 covers current worst case; move to DISTINCT ON in the view if replays climb.
+        .limit(Math.min(limit * 10, 500));
 
       if (error) {
         throw new Error(`Daily leaderboard fetch error: ${error.message}`);
@@ -208,11 +211,13 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         logger.warn('API', `Daily leaderboard guest count error: ${guestCountError.message}`);
       }
 
-      // Sort the merged cross-language rows by the global scoring order, then
-      // renumber rank_position sequentially 1..N. The view's rank_position is
-      // partitioned per (puzzle_date, language) and includes guests, so it can't
-      // be trusted once the language filter is dropped.
-      const rerankedData = rerankSequential(sortClassicPuzzleRowsGlobally(data || []));
+      // Sort by global scoring order, collapse each player to their single best row
+      // (view has one row per ATTEMPT — replays + languages), trim to limit, then
+      // renumber 1..N. The view's rank_position is partitioned per (puzzle_date,
+      // language) and includes guests/replays, so it can't be trusted here.
+      const rerankedData = rerankSequential(
+        dedupeByPlayerKeepBest(sortClassicPuzzleRowsGlobally(data || [])).slice(0, limit),
+      );
 
       const dataLength = rerankedData.length;
       const queryCount = count ?? 0;

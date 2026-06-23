@@ -16,7 +16,7 @@ import {
   isValidLanguage,
 } from './utils';
 import { updateDailyProfileStats } from './profileStats';
-import { rerankSequential, sortWordWheelRowsGlobally } from './leaderboardSort';
+import { rerankSequential, dedupeByPlayerKeepBest, sortWordWheelRowsGlobally } from './leaderboardSort';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
 import { leaderboardPointsForGame } from '../../modules/leaderboardScoring';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
@@ -336,7 +336,10 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .order('score', { ascending: false, nullsFirst: false })
       .order('word_count', { ascending: false, nullsFirst: false })
       .order('completed_at', { ascending: true, nullsFirst: false })
-      .limit(limit);
+      // Over-fetch: view has one row per ATTEMPT, so a player occupies many slots
+      // (replays + languages). Pull extra so dedup-to-one-per-player still yields `limit`.
+      // ponytail: ×10 cap 500 covers current worst case; move to DISTINCT ON in the view if replays climb.
+      .limit(Math.min(limit * 10, 500));
 
     if (error) {
       logger.error('API', `Word Wheel leaderboard error: ${error.message}`);
@@ -344,9 +347,11 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Sort the merged cross-language rows by the global scoring order, then
-    // renumber rank_position sequentially 1..N (the view's rank is per-language).
-    const rerankedData = rerankSequential(sortWordWheelRowsGlobally(data || []));
+    // Sort by global scoring order, collapse each player to their single best row
+    // (view has one row per ATTEMPT), trim to limit, then renumber 1..N.
+    const rerankedData = rerankSequential(
+      dedupeByPlayerKeepBest(sortWordWheelRowsGlobally(data || [])).slice(0, limit),
+    );
 
     const { count: totalCount } = await supabase
       .from('daily_word_wheel_attempts')

@@ -18,10 +18,62 @@
 import { describe, it, expect } from 'vitest';
 import {
   rerankSequential,
+  dedupeByPlayerKeepBest,
   sortWordHuntRowsGlobally,
   sortWordWheelRowsGlobally,
   sortClassicPuzzleRowsGlobally,
 } from '../leaderboardSort';
+
+describe('dedupeByPlayerKeepBest', () => {
+  // Input is assumed pre-sorted best-first, so the first row seen for a player IS their best.
+  it('collapses a players multiple same-language attempts to one entry, keeping the first (best) row', () => {
+    const rows = [
+      { player_id: 'a', language: 'en', score: 971 }, // best — sorted first
+      { player_id: 'b', language: 'en', score: 900 },
+      { player_id: 'a', language: 'en', score: 804 }, // worse attempt — must be dropped
+      { player_id: 'a', language: 'en', score: 500 },
+    ];
+
+    const deduped = dedupeByPlayerKeepBest(rows);
+
+    expect(deduped.map((r) => r.player_id)).toEqual(['a', 'b']);
+    expect(deduped.find((r) => r.player_id === 'a')?.score).toBe(971);
+  });
+
+  it('collapses a players rows across multiple languages to one entry', () => {
+    const rows = [
+      { player_id: 'poly', language: 'he', score: 751 }, // best across languages — first
+      { player_id: 'poly', language: 'en', score: 467 },
+    ];
+
+    expect(dedupeByPlayerKeepBest(rows).map((r) => r.player_id)).toEqual(['poly']);
+    expect(dedupeByPlayerKeepBest(rows)[0].score).toBe(751);
+  });
+
+  it('keeps distinct players and preserves their order', () => {
+    const rows = [
+      { player_id: 'x', score: 3 },
+      { player_id: 'y', score: 2 },
+      { player_id: 'z', score: 1 },
+    ];
+    expect(dedupeByPlayerKeepBest(rows).map((r) => r.player_id)).toEqual(['x', 'y', 'z']);
+  });
+
+  it('never collapses rows with a null/missing player_id (guests stay separate)', () => {
+    const rows = [
+      { player_id: null, score: 5 },
+      { player_id: null, score: 4 },
+    ];
+    expect(dedupeByPlayerKeepBest(rows)).toHaveLength(2);
+  });
+
+  it('returns an empty array unchanged and does not mutate input', () => {
+    expect(dedupeByPlayerKeepBest([])).toEqual([]);
+    const rows = [{ player_id: 'a', score: 1 }, { player_id: 'a', score: 0 }];
+    dedupeByPlayerKeepBest(rows);
+    expect(rows).toHaveLength(2);
+  });
+});
 
 describe('rerankSequential', () => {
   it('renumbers rank_position 1..N regardless of incoming per-language ranks', () => {
