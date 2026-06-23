@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { m, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Check, X, User, Paintbrush } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
 import Image from 'next/image';
 import { AVATARS, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -132,20 +133,16 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <Reveal
+        noSlide
         className="fixed inset-0 z-1000 flex items-center justify-center bg-black/60 p-4"
         onClick={onClose}
         role="dialog"
         aria-modal="true"
         aria-label={t('profile.chooseAvatar')}
       >
-        <m.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
+        <Reveal
+          noSlide
           className="w-full max-w-md rounded-neo overflow-hidden bg-neo-navy border-3 border-neo-black shadow-hard-lg"
           onClick={(e) => e.stopPropagation()}
         >
@@ -255,8 +252,8 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
               {t('common.save')}
             </button>
           </div>
-        </m.div>
-      </m.div>
+        </Reveal>
+      </Reveal>
       )}
       {showBuilder && (
         <AvatarBuilderModal

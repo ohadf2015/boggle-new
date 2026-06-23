@@ -6,6 +6,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Reveal } from '../ui/Reveal';
 import type { AchievementPayload } from '@/shared/types/socket';
 
 interface LocalizedAchievement {
@@ -199,11 +200,8 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
       {isMounted && createPortal(
         <AnimatePresence>
           {isExpanded && panelPosition && (
-            <m.div
-              initial={{ opacity: 0, scale: 0.9, y: -10, rotate: -2 }}
-              animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: -10 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            <Reveal
+              noSlide
               style={{
                 position: 'fixed',
                 top: panelPosition.top,
@@ -231,16 +229,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                   {localizedAchievements.map((achievement, index) => (
                     <Tooltip key={`${achievement.name}-${index}`}>
                       <TooltipTrigger asChild>
-                        <m.div
-                          initial={index === localizedAchievements.length - 1 && hasNewAchievement ? {
-                            x: 20,
-                            opacity: 0,
-                          } : false}
-                          animate={{
-                            x: 0,
-                            opacity: 1,
-                          }}
-                          transition={{ duration: 0.3 }}
+                        <Reveal
                           className={cn(
                             'flex items-center gap-3 p-3 rounded-md',
                             'bg-neo-white border-3 border-neo-black',
@@ -260,7 +249,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                               {achievement.description}
                             </p>
                           </div>
-                        </m.div>
+                        </Reveal>
                       </TooltipTrigger>
                       <TooltipContent
                         side="left"
@@ -273,7 +262,7 @@ const AchievementDock = ({ achievements = EMPTY_ACHIEVEMENTS, className }: Achie
                   ))}
                 </TooltipProvider>
               </div>
-            </m.div>
+            </Reveal>
           )}
         </AnimatePresence>,
         document.body

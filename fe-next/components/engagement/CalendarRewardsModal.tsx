@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { m } from 'framer-motion';
 import { Calendar, Gift, Zap, Sparkles, Shield, Crown, Flame } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogDescription } from '@/components/ui/dialog';
@@ -13,6 +12,7 @@ import { toast } from 'react-hot-toast';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { fetchWithAuth, postWithAuth } from '@/utils/authFetch';
+import { Reveal } from '@/components/ui/Reveal';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -246,11 +246,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
 
               {/* Claim button for today */}
               {calendarStatus.canClaimToday && (
-                <m.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-3 sm:mt-4"
-                >
+                <Reveal className="mt-3 sm:mt-4">
                   <Button
                     onClick={handleClaimReward}
                     disabled={isClaiming}
@@ -265,7 +261,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                       </>
                     )}
                   </Button>
-                </m.div>
+                </Reveal>
               )}
 
               {/* Already claimed message */}

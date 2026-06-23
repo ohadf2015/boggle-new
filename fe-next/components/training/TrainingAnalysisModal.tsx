@@ -2,8 +2,8 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { m, AnimatePresence } from 'framer-motion';
-import { SPRING_PRESETS } from '@/lib/animation/presets';
+import { m } from 'framer-motion';
+import { Reveal } from '@/components/ui/Reveal';
 import {
   X,
   Trophy,
@@ -125,19 +125,12 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
   const progressPercent = Math.round((masteredCount / totalSkills) * 100);
 
   return createPortal(
-    <AnimatePresence>
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <Reveal
+        noSlide
         className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={handleClose}
       >
-        <m.div
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+        <Reveal
           className={cn(
             'w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
             isDarkMode
@@ -166,10 +159,8 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           </button>
 
           {/* Header with celebration */}
-          <m.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 10, delay: 0.1 }}
+          <Reveal
+            noSlide
             className="flex justify-center mb-4"
           >
             {hasPassed ? (
@@ -196,13 +187,10 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )} size={48} />
               </div>
             )}
-          </m.div>
+          </Reveal>
 
           {/* Title */}
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
+          <Reveal
             className="text-center mb-6"
           >
             <h2 className={cn(
@@ -227,13 +215,11 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 ? (t('training.analysis.subtitleComplete'))
                 : (t('training.analysis.subtitleProgress'))}
             </p>
-          </m.div>
+          </Reveal>
 
           {/* Progress bar */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
+          <Reveal
+            noSlide
             className="mb-6"
           >
             <div className="flex justify-between mb-1">
@@ -260,26 +246,21 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )}
               />
             </div>
-          </m.div>
+          </Reveal>
 
           {/* Skills grid */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
+          <Reveal
+            noSlide
             className="grid grid-cols-2 gap-3 mb-6"
           >
-            {allSkills.map((skill, index) => {
+            {allSkills.map((skill) => {
               const config = SKILL_CONFIGS[skill];
               const isMastered = summary.mastered.includes(skill);
               const Icon = config.icon;
 
               return (
-                <m.div
+                <Reveal
                   key={skill}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 + index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
                   className={cn(
                     'p-3 rounded-xl border-2 transition-all',
                     isMastered
@@ -319,16 +300,14 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   )}>
                     {t(`training.analysis.skills.${skill}`) || config.label}
                   </p>
-                </m.div>
+                </Reveal>
               );
             })}
-          </m.div>
+          </Reveal>
 
           {/* Stats */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
+          <Reveal
+            noSlide
             className={cn(
               'p-4 rounded-xl mb-6',
               isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50'
@@ -384,14 +363,12 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 </p>
               </div>
             </div>
-          </m.div>
+          </Reveal>
 
           {/* Tips for improvement (if not passed) */}
           {!hasPassed && summary.needsWork.length > 0 && (
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.45, type: 'spring', stiffness: 280, damping: 26 }}
+            <Reveal
+              noSlide
               className={cn(
                 'p-4 rounded-xl mb-6 border',
                 isDarkMode
@@ -419,14 +396,11 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   </li>
                 ))}
               </ul>
-            </m.div>
+            </Reveal>
           )}
 
           {/* Action Buttons */}
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
+          <Reveal
             className="space-y-3"
           >
             {hasPassed ? (
@@ -505,10 +479,9 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )}
               </>
             )}
-          </m.div>
-        </m.div>
-      </m.div>
-    </AnimatePresence>,
+          </Reveal>
+        </Reveal>
+      </Reveal>,
     document.body
   );
 };

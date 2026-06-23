@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { m, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Rocket } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
@@ -241,23 +240,20 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
           <OnboardingProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
         </div>
 
-        {/* Step content with animation and swipe support */}
+        {/* Step content with animation and swipe support.
+            Keyed CSS entrance (animate-in) instead of framer-motion: the JS
+            animation loop can be starved while the large Hebrew bundle parses,
+            which would leave the step pinned at its invisible `initial` state and
+            show an empty modal. Re-mounting on `key={currentStep}` replays the
+            CSS animation on each step change; CSS runs off the main thread and
+            always settles visible. */}
         <DialogBody className="space-y-3 px-3 sm:px-6" {...swipeHandlers}>
-          <AnimatePresence mode="wait">
-            <m.div
-              key={currentStep}
-              initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
-              transition={{
-                duration: 0.25,
-                ease: [0.25, 0.1, 0.25, 1]
-              }}
-              style={{ willChange: 'transform, opacity' }}
-            >
-              {renderStep()}
-            </m.div>
-          </AnimatePresence>
+          <div
+            key={currentStep}
+            className="animate-in fade-in-0 slide-in-from-bottom-1 duration-300"
+          >
+            {renderStep()}
+          </div>
 
           {/* Swipe hint indicator - only shown on mobile */}
           <div className="block sm:hidden text-center text-xs text-neo-white mt-2">

@@ -19,6 +19,7 @@ import { sanitizeRoomName } from '@/utils/consts';
 import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { Reveal } from '@/components/ui/Reveal';
 import { Swords, Loader2, MapPin } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
 
@@ -144,10 +145,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         </DialogHeader>
 
         {/* ── Battle Arena Banner ── */}
-        <AdaptiveMotion.div
-          initial={{ opacity: 0, y: -16, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ ...SPRING, delay: 0.05 }}
+        <Reveal
           className="relative bg-linear-to-r from-neo-orange to-neo-pink px-5 py-4 border-b-4 border-black overflow-hidden"
         >
           {/* Halftone dot pattern overlay */}
@@ -162,15 +160,12 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               </h2>
             </div>
           </div>
-        </AdaptiveMotion.div>
+        </Reveal>
 
         <div className="px-5 py-5 space-y-5">
 
           {/* ── Hero Avatar + Name ── */}
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...SPRING, delay: 0.1 }}
+          <Reveal
             className="flex flex-col items-center space-y-3"
           >
             {/* Avatar with glow ring */}
@@ -263,16 +258,13 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 </span>
               </div>
             </div>
-          </AdaptiveMotion.div>
+          </Reveal>
 
           {/* ── Divider ── */}
           <div className="border-t-2 border-neo-white/5" />
 
           {/* ── Room Name (optional) ── */}
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...SPRING, delay: 0.18 }}
+          <Reveal
             className="space-y-1.5"
           >
             <label htmlFor="create-room-name" className="text-[10px] font-black uppercase text-neo-white flex items-center gap-1.5 tracking-widest">
@@ -290,13 +282,10 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               placeholder={generateRoomName(username || 'Your')}
               className="w-full h-11 px-3 bg-neo-navy-light/50 border-3 border-neo-white/20 rounded-neo text-neo-white text-sm font-bold placeholder:text-neo-white outline-hidden focus:border-neo-cyan/50 focus:bg-neo-navy-light/70 transition-colors"
             />
-          </AdaptiveMotion.div>
+          </Reveal>
 
           {/* ── Language — inline flag pills ── */}
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...SPRING, delay: 0.22 }}
+          <Reveal
             className="space-y-2"
           >
             <p className="text-[10px] font-black uppercase text-neo-white tracking-widest">
@@ -322,7 +311,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 </AdaptiveMotion.button>
               ))}
             </div>
-          </AdaptiveMotion.div>
+          </Reveal>
         </div>
 
         {/* ── CTA ── */}
