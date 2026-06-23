@@ -119,6 +119,7 @@ export default defineConfig({
       '**/gridAriaLabel.i18n.test.ts',
       '**/loading-layout.test.tsx',
       '**/MultiplayerFlow.guestJoinViaLink.test.tsx',
+      '**/chain-builder.test.ts',
     ],
     testTimeout: 10000,
     pool: 'forks',
