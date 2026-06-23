@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { X, Target, Sparkles, Zap, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -59,53 +59,40 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
     router.push(`/${language}/multiplayer?mode=word-hunt&autoCreate=true`);
   }, [language, router]);
 
+  // CSS entrances (animate-in) for the wrapper/backdrop/card instead of
+  // framer-motion: a starved main thread — e.g. while the large Hebrew bundle
+  // parses — would leave a framer-motion `initial` opacity:0 pinned, so the user
+  // sees only the dark backdrop ("black screen"). CSS runs off the main thread
+  // and always settles visible. Looping decorations + the hover CTA stay on
+  // framer-motion (they never gate content visibility).
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <m.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+    isVisible && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-300">
           {/* Backdrop */}
-          <m.div
-            className="absolute inset-0 bg-black/70 backdrop-blur-xs"
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-xs animate-in fade-in-0 duration-300"
             onClick={showCloseButton ? handleClose : undefined}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
           />
 
           {/* Popup Card */}
-          <m.div
+          <div
             className={cn(
               'relative w-full max-w-sm overflow-hidden rounded-neo border-3 border-neo-black',
               'bg-neo-navy shadow-[8px_8px_0px_rgb(var(--neo-black))]',
+              'animate-in fade-in-0 zoom-in-95 duration-300',
               isRTL && 'shadow-[-8px_8px_0px_rgb(var(--neo-black))]'
             )}
-            initial={{ opacity: 0, scale: 0.8, y: 40 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 28, delay: 0.1 }}
           >
             {/* Close Button — delayed appearance */}
-            <AnimatePresence>
-              {showCloseButton && (
-                <m.button
-                  onClick={handleClose}
-                  className="absolute top-2 inset-e-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white hover:text-neo-white hover:bg-neo-black/80 transition-colors"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                  aria-label={t('common.close') || 'Close'}
-                >
-                  <X className="w-4 h-4" />
-                </m.button>
-              )}
-            </AnimatePresence>
+            {showCloseButton && (
+              <button
+                onClick={handleClose}
+                className="absolute top-2 inset-e-2 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-neo-black/60 text-neo-white hover:text-neo-white hover:bg-neo-black/80 transition-colors animate-in fade-in-0 zoom-in-50 duration-300"
+                aria-label={t('common.close') || 'Close'}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
 
             {/* Hero Image */}
             <div className="relative w-full aspect-video overflow-hidden">
@@ -182,19 +169,14 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
               </m.button>
 
               {/* Dismiss text — appears with close button */}
-              <AnimatePresence>
-                {showCloseButton && (
-                  <m.button
-                    onClick={handleClose}
-                    className="mt-3 text-xs text-neo-white hover:text-neo-white transition-colors"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    {t('wordHuntPromo.dismiss')}
-                  </m.button>
-                )}
-              </AnimatePresence>
+              {showCloseButton && (
+                <button
+                  onClick={handleClose}
+                  className="mt-3 text-xs text-neo-white hover:text-neo-white transition-colors animate-in fade-in-0 duration-300"
+                >
+                  {t('wordHuntPromo.dismiss')}
+                </button>
+              )}
             </div>
 
             {/* Halftone texture */}
@@ -205,10 +187,9 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
                 backgroundSize: '6px 6px',
               }}
             />
-          </m.div>
-        </m.div>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
+      )
   );
 };
 

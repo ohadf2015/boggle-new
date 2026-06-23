@@ -30,28 +30,23 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
   return (
     <AnimatePresence>
       {open && (
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/85 backdrop-blur-sm px-6"
+        // CSS entrances (animate-in) instead of framer-motion for the backdrop
+        // and card: a starved main thread — e.g. while the large Hebrew bundle
+        // parses — would leave a framer-motion `initial` opacity:0 pinned, so the
+        // user sees only the dark backdrop ("black screen"). CSS runs off the
+        // main thread and always settles visible.
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/85 backdrop-blur-sm px-6 animate-in fade-in-0 duration-300"
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <m.div
-            initial={{ scale: 0.85, y: 40, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-            className="relative w-full max-w-sm rounded-neo border-neo-thick border-neo-red bg-neo-navy-light shadow-hard-lg p-6 text-center"
+          <div
+            className="relative w-full max-w-sm rounded-neo border-neo-thick border-neo-red bg-neo-navy-light shadow-hard-lg p-6 text-center animate-in fade-in-0 zoom-in-95 duration-300"
           >
-            <m.div
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 14 }}
-              className="mx-auto mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-red/15 border-neo-thick border-neo-red"
+            <div
+              className="mx-auto mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-red/15 border-neo-thick border-neo-red animate-in zoom-in-50 duration-300"
             >
               <Heart className="w-8 h-8 text-neo-red" aria-hidden="true" />
-            </m.div>
+            </div>
 
             <h2 className="font-neo-display text-2xl text-neo-white font-bold mb-2">
               {t('connections.outOfLives')}
@@ -103,8 +98,8 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
                 <p className="text-neo-white text-xs">{t('connections.noAdAvailable')}</p>
               )}
             </div>
-          </m.div>
-        </m.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );

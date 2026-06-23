@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check, Share2, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -40,30 +39,27 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
     }
   }, [isOpen, fetchShareData]);
 
+  // CSS entrances (animate-in) instead of framer-motion: a starved main thread —
+  // e.g. while the large Hebrew bundle parses — would leave a framer-motion
+  // `initial` opacity:0 pinned, so the user sees only the dark backdrop ("black
+  // screen"). CSS runs off the main thread and always settles visible.
   return (
-    <AnimatePresence>
-      {isOpen && (
+    isOpen && (
         <>
-          <m.div
+          <div
             data-testid="share-modal-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-neo-black/60 z-[60] backdrop-blur-xs"
+            className="fixed inset-0 bg-neo-black/60 z-[60] backdrop-blur-xs animate-in fade-in-0 duration-300"
             onClick={onClose}
             aria-hidden="true"
           />
 
-          <m.div
+          <div
             ref={dialogRef}
-            initial={{ opacity: 0, y: 60, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             role="dialog"
             aria-modal="true"
             aria-labelledby="share-modal-title"
             className={cn(
+              'animate-in fade-in-0 duration-300',
               'fixed bottom-0 left-0 right-0 z-61',
               'sm:bottom-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2',
               'sm:w-full sm:max-w-md',
@@ -208,9 +204,8 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
               )}
               <span aria-live="polite">{copied ? (t('common.copied')) : (t('common.copy'))}</span>
             </button>
-          </m.div>
+          </div>
         </>
-      )}
-    </AnimatePresence>
+      )
   );
 }
