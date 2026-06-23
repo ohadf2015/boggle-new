@@ -18,6 +18,7 @@ import { PageStateHandler } from '@/components/layout/PageStateHandler';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
@@ -116,6 +117,13 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   useEffect(() => {
     if (tierPanelEnabled && tierPosition) trackTierPanelExposure();
   }, [tierPanelEnabled, tierPosition, trackTierPanelExposure]);
+
+  useEffect(() => {
+    // Fire once on mount with the initial scope/tab snapshot — intentionally empty deps
+    // (re-firing on every tab/scope change would inflate the "viewed" count).
+    trackGrowthEvent('leaderboard_viewed', { seasonScope, activeTab });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Pre-compute tiers to avoid calling getGlobalLeaderboardTier per-row on every render
   const leaderboardTiers = useMemo(

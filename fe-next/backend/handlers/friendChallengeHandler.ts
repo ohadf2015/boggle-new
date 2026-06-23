@@ -11,6 +11,7 @@ import * as friendsManager from '../modules/friendsManager';
 import { notifyGameInvite, notifyChallengeAccepted, notifyChallengeDeclined } from '../modules/pushNotificationTriggers';
 import { getSupabase } from '../modules/supabaseServer';
 import { getAuthUserId, broadcastToUser, getUserProfile } from '../utils/socialHelpers';
+import { getPostHogServer } from '@/lib/posthog';
 
 // Rate limit weights
 const RATE_WEIGHTS = {
@@ -102,6 +103,15 @@ export function registerFriendChallengeHandlers(io: Server, socket: Socket): voi
         });
         return;
       }
+
+      // Track challenge_sent event
+      getPostHogServer()?.capture({
+        distinctId: authUserId,
+        event: 'challenge_sent',
+        properties: {
+          challengeType: data.challengeType,
+        },
+      });
 
       // Get profiles for both users
       const fromProfile = await getUserProfile(authUserId);

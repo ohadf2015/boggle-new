@@ -24,6 +24,7 @@ import {
 } from '@/utils/friends';
 import { useSocketOptional } from '@/utils/SocketContext';
 import logger from '@/utils/logger';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 interface UseFriendsState {
   friends: Friend[];
@@ -152,6 +153,7 @@ export function useFriends(): UseFriendsReturn {
   const acceptRequest = useCallback(async (requestId: string) => {
     const result = await acceptFriendRequest(requestId);
     if (result.success) {
+      trackGrowthEvent('friend_added');
       await refresh();
     }
     return result;

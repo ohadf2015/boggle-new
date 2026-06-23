@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, User as UserIcon } from 'lucide-react';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { SeasonTrophyCase } from '@/components/seasons/SeasonTrophyCase';
 import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
@@ -23,6 +24,12 @@ export default function PublicProfilePageClient({ username }: { username: string
   const profile = profileQuery.data;
 
   const { badges, isLoading: isLoadingBadges } = useSeasonBadges(profile?.id ?? null);
+
+  useEffect(() => {
+    if (profile?.id) {
+      trackGrowthEvent('profile_viewed', { isPublicProfile: true });
+    }
+  }, [profile?.id]);
 
   if (profileQuery.isLoading) {
     return (
