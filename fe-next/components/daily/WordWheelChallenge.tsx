@@ -51,16 +51,27 @@ const WordWheelEffectsCanvas = dynamic(
 
 type WordWheelPhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
 
-// Deterministic 4×4 pixel mosaic that fills an outer letter tile in the
-// ready-screen preview wheel. Seed-based so SSR + client render the same
-// pattern (no hydration mismatch) and each tile gets a different splatter.
-const CENSOR_BUCKETS = ['bg-neo-navy', 'bg-neo-navy-light', 'bg-neo-cream/30'] as const;
-function CensorTile({ seed }: { seed: number }) {
-  const cells = Array.from({ length: 16 }, (_, i) => (seed * 31 + i * 7 + 3) % 3);
+// Blurred "censored letter" that fills an outer tile in the ready-screen
+// preview wheel. We deliberately render a DECOY glyph (never the real outer
+// letter) so the pre-game scout can't read the answer by inspecting the
+// markup — only the look of a censored letter survives the blur. Decoys are
+// deterministic per seed (SSR + client match, no hydration mismatch) and the
+// `avoid` letter is skipped so the decoy can never coincide with the real one.
+const DECOY_GLYPHS = ['Q', 'X', 'Z', 'K', 'W', 'V', 'Y', 'J'] as const;
+function CensorTile({ seed, avoid }: { seed: number; avoid?: string }) {
+  let glyph = DECOY_GLYPHS[seed % DECOY_GLYPHS.length];
+  if (avoid && glyph === avoid.toUpperCase()) {
+    glyph = DECOY_GLYPHS[(seed + 1) % DECOY_GLYPHS.length];
+  }
   return (
-    <div className="grid h-full w-full grid-cols-4 grid-rows-4" aria-hidden>
-      {cells.map((b, i) => <span key={i} className={CENSOR_BUCKETS[b]} />)}
-    </div>
+    <span
+      data-testid="censor-blur"
+      className="flex h-full w-full select-none items-center justify-center font-neo-display font-black text-neo-navy"
+      style={{ filter: 'blur(4px)', fontSize: '0.95rem' }}
+      aria-hidden
+    >
+      {glyph}
+    </span>
   );
 }
 
@@ -469,7 +480,7 @@ const WordWheelChallenge: React.FC = () => {
         {phase === 'ready' && puzzle && (
           <m.div
             key="ready"
-            className="flex-1 flex flex-col items-center gap-6 px-4 pt-4 pb-bottom-stack sm:pb-6 overflow-y-auto"
+            className="flex-1 flex flex-col items-center gap-4 px-4 pt-4 pb-bottom-stack sm:pb-6 overflow-y-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -483,32 +494,27 @@ const WordWheelChallenge: React.FC = () => {
               </span>
             </div>
 
-            {/* Instruction cards — icon-driven, color-coded per rule */}
-            <div className="flex flex-col gap-2 max-w-xs lg:max-w-md xl:max-w-lg w-full">
-              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-lime/60 bg-neo-lime/15 text-neo-lime">
-                  <Star className="h-4 w-4" strokeWidth={2.5} aria-hidden />
-                </span>
-                <span className="text-neo-white text-sm">{t('wordWheel.centerLetterRule')}</span>
-              </div>
-              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cyan/60 bg-neo-cyan/15 text-neo-cyan">
-                  <Type className="h-4 w-4" strokeWidth={2.5} aria-hidden />
-                </span>
-                <span className="text-neo-white text-sm">{t('wordWheel.minLetters', { min: '3' })}</span>
-              </div>
-              <div className="flex items-center gap-3 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-xs">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo border-2 border-neo-pink/60 bg-neo-pink/15 text-neo-pink">
-                  <Timer className="h-4 w-4" strokeWidth={2.5} aria-hidden />
-                </span>
-                <span className="text-neo-white text-sm">{t('wordWheel.timeLimit')}</span>
-              </div>
+            {/* Instruction rules — compact wrapping chips instead of stacked
+                full-width cards, so they take far less vertical space. */}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-md w-full">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
+                <Star className="h-3.5 w-3.5 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
+                {t('wordWheel.centerLetterRule')}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
+                <Type className="h-3.5 w-3.5 shrink-0 text-neo-cyan" strokeWidth={2.5} aria-hidden />
+                {t('wordWheel.minLetters', { min: '3' })}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border-2 border-neo-black bg-neo-navy-light shadow-hard-xs text-neo-white text-xs">
+                <Timer className="h-3.5 w-3.5 shrink-0 text-neo-pink" strokeWidth={2.5} aria-hidden />
+                {t('wordWheel.timeLimit')}
+              </span>
             </div>
 
             {/* Preview wheel — outer letters censored before play to keep the
                 pre-game scout from cheating (you only see the center letter,
                 everything else is a deterministic pixel mosaic). */}
-            <div className="relative w-44 h-44 lg:w-56 lg:h-56 xl:w-64 xl:h-64 flex items-center justify-center my-4">
+            <div className="relative w-32 h-32 lg:w-40 lg:h-40 flex items-center justify-center my-2">
               {/* Glow ring */}
               <m.div
                 className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
@@ -517,7 +523,7 @@ const WordWheelChallenge: React.FC = () => {
                 transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
               />
               <m.div
-                className="w-16 h-16 rounded-full border-3 border-neo-black bg-neo-lime flex items-center justify-center font-neo-display font-black text-2xl text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]"
+                className="w-12 h-12 rounded-full border-3 border-neo-black bg-neo-lime flex items-center justify-center font-neo-display font-black text-xl text-neo-black shadow-[3px_3px_0px_black,0_0_20px_rgba(191,255,0,0.5)]"
                 animate={{ scale: [1, 1.08, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
@@ -526,19 +532,19 @@ const WordWheelChallenge: React.FC = () => {
               {puzzle.outerLetters.map((letter, i) => {
                 const angle = i * 60;
                 const rad = (angle * Math.PI) / 180;
-                const x = Math.sin(rad) * 60;
-                const y = -Math.cos(rad) * 60;
+                const x = Math.sin(rad) * 44;
+                const y = -Math.cos(rad) * 44;
                 return (
                   <m.div
                     key={`outer-${i}`}
                     data-testid="preview-outer-letter"
-                    className="absolute inset-0 m-auto w-10 h-10 rounded-full border-2 border-neo-black bg-neo-white overflow-hidden shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
+                    className="absolute inset-0 m-auto w-8 h-8 rounded-full border-2 border-neo-black bg-neo-white overflow-hidden shadow-[2px_2px_0px_black,0_0_6px_rgba(191,255,0,0.12)]"
                     initial={{ scale: 0, x, y }}
                     animate={{ scale: 1, x, y }}
                     transition={{ delay: i * 0.06, type: 'spring', stiffness: 400 }}
                     aria-label="hidden letter"
                   >
-                    <CensorTile seed={i + 1} />
+                    <CensorTile seed={i + 1} avoid={letter} />
                   </m.div>
                 );
               })}
