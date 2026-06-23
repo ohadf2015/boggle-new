@@ -10,6 +10,7 @@ import { getGuestSessionId, getGuestName } from './guestManager';
 import { getPlatform } from '@/utils/platform';
 import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
 import { awardGameEnd } from '@/lib/playGames/awardPlayGames';
+import { maybeRequestReviewAfterWin } from '@/utils/nativeReview';
 import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
@@ -1010,6 +1011,10 @@ export const trackGameEnd = (
       isWinner: extras.isWinner === true,
       language: getCurrentLanguage() ?? undefined,
     });
+
+    // Seed reviews: on a win, maybe surface the native Play review sheet.
+    // Self-gated (win-threshold + throttle), native-Android-only, never throws.
+    if (extras.isWinner === true) void maybeRequestReviewAfterWin();
   } else if (durationSec !== undefined && durationSec < 15) {
     // Rage-quit: abandoned a game within 15s — strong onboarding-friction signal.
     trackRageQuit({ mode, durationMs: durationSec * 1000, wordsFound: wordCount });
