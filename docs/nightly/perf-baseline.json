@@ -1,52 +1,52 @@
 {
-  "date": "2026-06-22",
-  "note": "Twenty-sixth snapshot. /he LCP improved 3464→3297ms; INP improved 336→264ms (both 7d, n=67). /es/multiplayer LCP crept 2818→3127ms (+11%, below 20% regression threshold). Both routes still LCP NEEDS IMPROVEMENT (>2500ms); no new root cause identified — mascot uses priority, translations pre-seeded in layout. Hook waterfall (useAuth→usePlayerStats→useDailyChallengeStatus) remains a candidate for /he LCP but needs profiler trace. Backend: migration 20260622030000 adds RLS initplan fix on word_tower_pending_wrecks (wtw_select_party: auth.uid()→(SELECT auth.uid())) + re-ensures idx_word_pacts_player2_id (advisor still flagging despite 20260615030000).",
+  "date": "2026-06-23",
+  "note": "Twenty-seventh snapshot. /he LCP improved 3297→3112ms (-5.8%, 7d n=58); INP 264→280ms (+6%, still POOR). /es/multiplayer LCP REGRESSION: 3127→3876ms (+24%, 7d n=75) — both runs clear n≥50 floor. Hypothesis: LobbyDailyEmber (useDailyChallengeStatus hook added 06-21) adds async fetch to lobby; proportion of 7d window post-ember is growing. Backend: migration 20260623030000 adds idx_word_clubs_owner_id (advisor unindexed FK) + drops idx_word_wheel_attempts_catchup (advisor unused index, 0 scans).",
   "backend": {
-    "advisor_warnings_count": 2,
-    "note": "Supabase MCP not queried (tools not available this run). Fixes applied via migration file: initplan on wtw_select_party + word_pacts FK index.",
+    "advisor_warnings_count": 3,
+    "note": "Brief flagged 3 advisor items. Two fixed via migration 20260623030000. auth_db_connections_absolute remains deferred (human config in Supabase dashboard).",
     "top_queries": [],
     "migrations_applied_this_run": [
-      "20260622030000_perf_rls_initplan_and_fk_index.sql"
+      "20260623030000_perf_fk_index_and_drop_unused.sql"
     ],
     "remaining_advisor_items": [
       {
-        "id": "auth_rls_initplan:wtw_select_party",
-        "status": "FIXED via migration 20260622030000 (pending prod apply)"
-      },
-      {
-        "id": "unindexed_fk:word_pacts_player2_id_fkey",
-        "status": "FIXED via migration 20260622030000 IF NOT EXISTS (idempotent)"
-      },
-      {
         "id": "auth_db_connections_absolute",
-        "status": "DEFERRED — human config change in Supabase dashboard (Auth connection strategy)"
+        "status": "DEFERRED — human config change in Supabase dashboard (Auth connection pool strategy: absolute→percentage)"
+      },
+      {
+        "id": "unindexed_fk:word_clubs_owner_id_fkey",
+        "status": "FIXED via migration 20260623030000 — idx_word_clubs_owner_id created IF NOT EXISTS"
+      },
+      {
+        "id": "unused_index:idx_word_wheel_attempts_catchup",
+        "status": "FIXED via migration 20260623030000 — DROP INDEX IF EXISTS (0 scans, pure write overhead)"
       }
     ]
   },
   "frontend": {
-    "note": "7d window (n>=50 floor). 24h intel brief items all show reach=0 (parameterized URLs or sub-floor n); not actionable without profiler.",
+    "note": "7d window (n>=50 floor). 24h window: /es/multiplayer n=19, /he n=9 — both sub-floor, DEFERRED. 7d measurements used for regression detection.",
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 3297,
-        "p75_inp_ms": 264,
-        "p75_cls": 0.073,
-        "n_7d": 67,
+        "p75_lcp_ms": 3112,
+        "p75_inp_ms": 280,
+        "p75_cls": 0.078,
+        "n_7d": 58,
         "window": "7d",
-        "lcp_status": "NEEDS IMPROVEMENT — 3297ms (improved from 3464ms, -4.8%). Still >2500ms threshold. Root cause: hook waterfall suspected, needs profiler.",
-        "inp_status": "POOR — 264ms (improved from 336ms, -21.4%). Continuing improvement trend.",
-        "cls_status": "OK — 0.073 (improved from 0.193)"
+        "lcp_status": "NEEDS IMPROVEMENT — 3112ms (improved from 3297ms, -5.8%). Still >2500ms. Root cause unresolved — LobbyDailyEmber + hook waterfall (useAuth→usePlayerStats→useDailyChallengeStatus) suspected; needs profiler trace.",
+        "inp_status": "POOR — 280ms (slight creep from 264ms, +6%, below 20% regression threshold). Improving trend over 2-week window.",
+        "cls_status": "OK — 0.078 (stable from 0.073)"
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 3127,
+        "p75_lcp_ms": 3876,
         "p75_inp_ms": 328,
-        "p75_cls": 0.167,
-        "n_7d": 62,
+        "p75_cls": 0.173,
+        "n_7d": 75,
         "window": "7d",
-        "lcp_status": "WATCH — 3127ms (+11% from 2818ms, below 20% regression threshold). Still >2500ms.",
-        "inp_status": "POOR — 328ms (stable). LobbyDailyEmber fix from 06-21 should help; verify next 7d reading.",
-        "cls_status": "WATCH — 0.167 (stable)"
+        "lcp_status": "REGRESSION — 3876ms (+24% from 3127ms, exceeds 20% threshold, n=75 vs baseline n=62, both ≥50). Hypothesis: LobbyDailyEmber useDailyChallengeStatus async fetch added 06-21 increasing proportion of 7d window. Needs profiler trace in dev to confirm.",
+        "inp_status": "POOR — 328ms (stable from 328ms). No change.",
+        "cls_status": "WATCH — 0.173 (stable from 0.167)"
       }
     ]
   },
@@ -57,27 +57,27 @@
   },
   "open_watches": [
     {
+      "id": "es-multiplayer-lcp-regression",
+      "description": "/es/multiplayer p75 LCP 3876ms (7d, n=75). REGRESSION: +24% from 3127ms (06-22). Both runs n≥50. Hypothesis: LobbyDailyEmber (06-21) adds useDailyChallengeStatus fetch to lobby render path. Needs profiler trace.",
+      "severity": "HIGH",
+      "since": "2026-06-23"
+    },
+    {
       "id": "he-lcp-high",
-      "description": "/he p75 LCP 3297ms (7d, n=67). Improving trend. Root cause unresolved — hook waterfall suspected. Needs profiler trace.",
+      "description": "/he p75 LCP 3112ms (7d, n=58). Improving trend (-5.8% this week). Root cause unresolved — hook waterfall suspected.",
       "severity": "MEDIUM",
       "since": "2026-06-20"
     },
     {
-      "id": "he-inp-regression",
-      "description": "/he p75 INP 264ms (7d, n=67). Improving: 336ms→264ms. Still POOR (>200ms).",
+      "id": "he-inp-poor",
+      "description": "/he p75 INP 280ms (7d, n=58). POOR (>200ms). Slight creep +6% from 264ms, below 20% regression threshold.",
       "severity": "MEDIUM",
       "since": "2026-06-20"
     },
     {
-      "id": "es-multiplayer-lcp-creep",
-      "description": "/es/multiplayer p75 LCP 3127ms (7d, n=62). Up from 2818ms (+11%). Below 20% regression threshold. Watch next reading.",
+      "id": "es-multiplayer-cls-watch",
+      "description": "/es/multiplayer p75 CLS 0.173 (7d, n=75). Stable. Exceeds 0.1 threshold.",
       "severity": "LOW",
-      "since": "2026-06-22"
-    },
-    {
-      "id": "es-multiplayer-inp",
-      "description": "/es/multiplayer p75 INP 328ms (7d, n=62). LobbyDailyEmber fix from 06-21 applied. Verify improvement in next 7d reading.",
-      "severity": "MEDIUM",
       "since": "2026-06-21"
     }
   ]

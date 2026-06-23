@@ -1003,3 +1003,30 @@ These flags have active call sites and cannot be removed autonomously. All have 
 | `mp-signup-nudge-copy-v1` | 2026-05-08 | 45d | 0/77 converts — retire, keep toast-disabled path (no dismissal training) |
 
 Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace conditional with winner path, delete defineExperiment entry, archive PostHog flag.
+
+## 2026-06-23
+
+### [Supabase Security] `authenticated_security_definer_function_executable` — 68 remaining functions
+- first seen: ongoing advisor warning
+- count: 68 functions flagged (add_league_xp, admin_*, award_coins, sync_coins, etc.)
+- status: deferred (bulk — `update_difficulty_after_game` SHIPPED separately)
+- why: each needs individual callsite grep + auth.uid() check or REVOKE decision; bulk change is large blast radius
+- recommended owner: backend
+
+### [Supabase Security] `rls_policy_always_true` — `teacher_access_requests`
+- Policy: `tar_insert_any` for INSERT with `WITH CHECK (true)`
+- status: deferred
+- why: intentional design — teacher applications allow anonymous/public INSERT via API route (service-role); tightening could break public teacher onboarding flow
+- recommended owner: review-by-eod
+
+### [Supabase Security] `rls_policy_always_true` — `connections_feedback`, `custom_puzzle_attempts`, `custom_puzzles`
+- Three more tables with always-true INSERT policies
+- status: deferred
+- why: likely intentional (public content submission); need product owner confirmation before restricting
+- recommended owner: backend
+
+### [Sentry] TypeError: Cannot read properties of null (reading 'clear') — JAVASCRIPT-NEXTJS-1CW
+- culprit: `/:locale/daily/word-wheel`; PostHog last seen 2026-06-22 (2 occurrences)
+- status: research-only — existing guards in `WordWheelPixiRing.tsx:86`, `TrailRenderer.ts:60`, `TileRenderer.ts:429` already patched
+- why: remaining 2 PostHog hits may be stale (pre-fix) or from an unmapped chunk; no new unguarded call sites found
+- recommended owner: monitor — close if no new occurrences in 7d
