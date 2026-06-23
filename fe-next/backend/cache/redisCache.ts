@@ -2,15 +2,32 @@ import Redis from 'ioredis';
 
 let cacheClient: Redis | null = null;
 
+let loggedConnError = false;
+
 export function getCacheClient(): Redis {
   if (cacheClient) return cacheClient;
   const url =
     process.env.REDIS_URL ||
     `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`;
   cacheClient = new Redis(url, {
-    maxRetriesPerRequest: 3,
+    maxRetriesPerRequest: 1,
     lazyConnect: true,
     enableReadyCheck: true,
+    // Fail FAST to the DB fetcher when Redis is unreachable. A cache that hangs
+    // is slower than no cache: commandTimeout bounds every op so cacheAside's
+    // catch falls through to Postgres within ~1s instead of stalling the request.
+    connectTimeout: 1000,
+    commandTimeout: 1000,
+  });
+  // Without an 'error' listener ioredis surfaces connection failures as
+  // unhandled events. We degrade silently to the DB (errors also reject the
+  // pending command, handled below), but log the first one so an outage isn't
+  // invisible.
+  cacheClient.on('error', (err: Error) => {
+    if (!loggedConnError) {
+      loggedConnError = true;
+      console.warn('[apiCache] Redis unavailable, serving from DB:', err?.message);
+    }
   });
   return cacheClient;
 }
@@ -36,6 +53,20 @@ export async function cacheAside<T>(
     /* cache write failure is non-fatal */
   }
   return result;
+}
+
+/**
+ * Delete exact keys in one DEL (no SCAN). Use on hot mutation paths where the
+ * key is known — far cheaper than invalidateCache's pattern scan. Non-fatal:
+ * if Redis is down the stale entry simply expires on its TTL.
+ */
+export async function invalidateKeys(...keys: string[]): Promise<void> {
+  if (keys.length === 0) return;
+  try {
+    await getCacheClient().del(...keys);
+  } catch {
+    /* non-fatal — entry expires via TTL */
+  }
 }
 
 export async function invalidateCache(pattern: string): Promise<void> {

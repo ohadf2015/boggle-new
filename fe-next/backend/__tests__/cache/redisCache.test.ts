@@ -36,12 +36,13 @@ vi.mock('ioredis', () => {
       };
     });
     quit = vi.fn(() => Promise.resolve());
+    on = vi.fn();
   }
   return { default: MockRedis };
 });
 
 import { vi, type Mock, type MockInstance } from 'vitest';
-import { cacheAside, invalidateCache, closeCacheClient } from '../../cache/redisCache';
+import { cacheAside, invalidateCache, invalidateKeys, closeCacheClient } from '../../cache/redisCache';
 
 describe('redisCache', () => {
   beforeEach(() => {
@@ -76,5 +77,30 @@ describe('redisCache', () => {
     expect(store.has('prefix:a')).toBe(false);
     expect(store.has('prefix:b')).toBe(false);
     expect(store.has('other:c')).toBe(true);
+  });
+
+  it('invalidateKeys deletes exact keys without scanning', async () => {
+    store.set('k:1', 'a');
+    store.set('k:2', 'b');
+    store.set('keep', 'c');
+    await invalidateKeys('k:1', 'k:2');
+    expect(store.has('k:1')).toBe(false);
+    expect(store.has('k:2')).toBe(false);
+    expect(store.has('keep')).toBe(true);
+  });
+
+  it('invalidateKeys no-ops on an empty key list', async () => {
+    store.set('x', '1');
+    await invalidateKeys();
+    expect(store.has('x')).toBe(true);
+  });
+
+  it('cacheAside does not cache a failed fetch (thrown error propagates, nothing stored)', async () => {
+    await expect(
+      cacheAside('fail:key', async () => {
+        throw new Error('db error');
+      }, 60)
+    ).rejects.toThrow('db error');
+    expect(store.has('fail:key')).toBe(false);
   });
 });

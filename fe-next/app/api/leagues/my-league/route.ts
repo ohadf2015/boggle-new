@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { enrichLeagueStandings, type RawStandingRow } from '@/lib/league/enrichStandings';
+import { cacheAside } from '@/backend/cache/redisCache';
+import { cacheKeys } from '@/lib/cache/cacheKeys';
+
+// Standings (a full member scan) are co-member-visible and identical for every
+// member, so they cache per-league under one shared key. XP updates post-game;
+// a few seconds of staleness on a weekly board is fine.
+const STANDINGS_TTL_SECONDS = 30;
 
 /**
  * GET /api/leagues/my-league?userId=<uuid>
@@ -42,21 +49,25 @@ export async function GET(request: NextRequest) {
     const tier = leagueRow ? leagueRow.tier : null;
     const weekEnd = leagueRow ? (leagueRow.week_end as string | null) : null;
 
-    // Get standings for this league (ordered so position derives from rank)
-    const { data: standings } = await supabase
-      .from('league_members')
-      .select('user_id, weekly_xp, profiles!inner(username, display_name, avatar_image)')
-      .eq('league_id', leagueId)
-      .order('weekly_xp', { ascending: false });
+    // Get standings for this league (ordered so position derives from rank),
+    // cached per-league. Enriched into the ranked, camelCase shape the client
+    // hook indexes by (position + zone) before caching, so a hit returns the
+    // final shape. Throws on DB error so a failed fetch is never cached.
+    const standings = await cacheAside(
+      cacheKeys.leagueStandings(leagueId),
+      async () => {
+        const { data, error } = await supabase
+          .from('league_members')
+          .select('user_id, weekly_xp, profiles!inner(username, display_name, avatar_image)')
+          .eq('league_id', leagueId)
+          .order('weekly_xp', { ascending: false });
+        if (error) throw error;
+        return enrichLeagueStandings((data ?? []) as RawStandingRow[]);
+      },
+      STANDINGS_TTL_SECONDS
+    );
 
-    // Enrich into the ranked, camelCase shape the client hook indexes by
-    // (position + zone). Without this the badge's myPosition was always null.
-    return NextResponse.json({
-      leagueId,
-      tier,
-      weekEnd,
-      standings: enrichLeagueStandings((standings ?? []) as RawStandingRow[]),
-    });
+    return NextResponse.json({ leagueId, tier, weekEnd, standings });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('[API] /api/leagues/my-league error:', message);
