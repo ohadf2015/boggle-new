@@ -150,9 +150,10 @@ const nextConfig = {
         permanent: true,
       },
       // Redirect non-www to www (handled by hosting platform like Vercel/Railway)
-      // This is a fallback for any requests that slip through
+      // This is a fallback for any requests that slip through.
+      // Exempt assetlinks.json + ad-network verification file (verifiers refuse redirects).
       {
-        source: '/:path((?!\\.well-known/assetlinks\\.json$).*)',
+        source: '/:path((?!\\.well-known/assetlinks\\.json$|d41d650cb226c9b4c235\\.txt$).*)',
         has: [
           {
             type: 'host',
