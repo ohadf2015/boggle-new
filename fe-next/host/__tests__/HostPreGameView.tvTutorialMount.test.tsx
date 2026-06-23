@@ -128,6 +128,7 @@ vi.mock('../components/pre-game/MobileBottomNav', () => ({
 vi.mock('../components/pre-game/MobileShareSection', () => ({
   MobileShareSection: () => null,
 }));
+vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
 
 vi.mock('../components/pre-game/PresetInfoDrawer', () => ({
   PresetInfoDrawer: () => null,

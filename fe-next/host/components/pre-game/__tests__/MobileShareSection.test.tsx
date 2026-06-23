@@ -115,6 +115,12 @@ describe('MobileShareSection', () => {
       expect(screen.getByText('Invite')).toBeInTheDocument();
     });
 
+    it('styles the trigger as a brand-lime CTA in compact mode', () => {
+      render(<MobileShareSection gameCode="TEST123" t={mockT} compact />);
+      const trigger = screen.getByTestId('mobile-share-trigger');
+      expect(trigger.className).toContain('bg-neo-lime');
+    });
+
     it('renders copy link and WhatsApp buttons inside dialog', async () => {
       await renderAndOpenDialog('TEST123');
       expect(screen.getByTestId('mobile-copy-link-button')).toBeInTheDocument();

@@ -1,13 +1,11 @@
 'use client';
 
-import React, { memo, useCallback } from 'react';
+import React, { memo } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useMusic } from '@/contexts/MusicContext';
-import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useTvFullscreenListener } from '@/hooks/useTvFullscreenListener';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
+import { useMasterMute } from '@/hooks/useMasterMute';
 
 /**
  * InGameAudioButton — global, always-available mute control during gameplay.
@@ -27,33 +25,24 @@ import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
  * swallowed when locked.
  */
 const InGameAudioButton: React.FC = memo(() => {
-  const { isInGame } = useNavigation();
+  const { isInGame, headerAudioControlActive } = useNavigation();
   const isTvFullscreen = useTvFullscreenListener();
-  const { isMuted, toggleMute, audioUnlocked, unlockAudio } = useMusic();
-  const { sfxMuted, toggleSfxMute } = useSoundEffects();
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const isRTL = language === 'he';
-
-  const handleClick = useCallback(() => {
-    const action = resolveMasterMuteClick({ audioUnlocked, isMuted, sfxMuted });
-    if (action.unlock) unlockAudio();
-    if (action.toggleMusic) toggleMute();
-    if (action.toggleSfx) toggleSfxMute();
-  }, [audioUnlocked, unlockAudio, isMuted, sfxMuted, toggleMute, toggleSfxMute]);
+  const { allMuted, toggle, label, title } = useMasterMute();
 
   // Passive broadcast view has no player to mute for — leave it untouched.
-  if (!isInGame || isTvFullscreen) return null;
-
-  const allMuted = isMuted && sfxMuted;
-  const label = allMuted ? t('music.unmute', 'Unmute') : t('music.mute', 'Mute');
+  // Stand down when a visible screen header already hosts a mute control
+  // (e.g. the MP lobby header) so we never show two mute buttons at once.
+  if (!isInGame || isTvFullscreen || headerAudioControlActive) return null;
 
   return (
     <button
       type="button"
-      onClick={handleClick}
+      onClick={toggle}
       aria-label={label}
       aria-pressed={!allMuted}
-      title={allMuted ? t('music.soundOff', 'Sound off') : t('music.soundOn', 'Sound on')}
+      title={title}
       className={[
         'fixed z-[70] top-[max(0.5rem,env(safe-area-inset-top))]',
         isRTL

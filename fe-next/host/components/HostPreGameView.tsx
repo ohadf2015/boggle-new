@@ -21,6 +21,7 @@ import { trackSoloPlayPrompt } from '@/utils/posthogEngagement';
 import { PlayerRoster } from './pre-game/PlayerRoster';
 import { BattleModeCard } from './pre-game/BattleModeCard';
 import { AdvancedSettingsModal } from './pre-game/AdvancedSettingsModal';
+import { LobbyAudioButton } from './pre-game/LobbyAudioButton';
 import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
 import { GameInstructions } from './pre-game/GameInstructions';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
@@ -561,6 +562,7 @@ function HostPreGameView({
             {/* UI-language switcher — only show when UI language differs from room/board language.
                 When they match (same flag on both chips), the chip is redundant clutter (visual audit 2026-05-14). */}
             {language !== roomLanguage && <QuickLanguageSwitcher compact />}
+            <LobbyAudioButton />
             <AdvancedSettingsModal
               timerValue={timerValue}
               setTimerValue={setTimerValue}
