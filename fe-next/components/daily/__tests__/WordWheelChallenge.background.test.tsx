@@ -7,10 +7,15 @@
  * and fades in slowly, so the ready/loading screens (and the first moments of
  * play) exposed flat near-black navy.
  *
- * Fix: give the container the project's established "depth" background — a
- * radial gradient from `--neo-navy-radial` (center) to `--neo-navy` (edges),
- * matching ResultsPage. This is CSS, always-on, and phase-independent, so the
- * board never reads as flat black.
+ * An earlier fix added a radial gradient but ran it from `--neo-navy-radial`
+ * (#1e1e3f) to `--neo-navy` (#1a1a2e) — only ~5 relative-luminance apart, i.e.
+ * imperceptible, so the stage STILL read as flat black and the regression kept
+ * coming back.
+ *
+ * Fix: run the radial gradient from a perceptibly-elevated center
+ * (`--neo-navy-elevated`, #2a2a4e, ~17 luminance above the navy edge) out to
+ * `--neo-navy`. This is CSS, always-on, and phase-independent, so the board
+ * reads with real depth instead of flat black regardless of the pixi layer.
  */
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -108,14 +113,16 @@ afterEach(() => {
 import WordWheelChallenge from '../WordWheelChallenge';
 
 describe('WordWheelChallenge background', () => {
-  it('gives the stage a radial depth gradient instead of flat near-black navy', async () => {
+  it('gives the stage a radial depth gradient with a perceptibly-elevated center', async () => {
     render(<WordWheelChallenge />);
 
     const stage = await waitFor(() => screen.getByTestId('word-wheel-stage'));
 
-    // The container must carry the project depth gradient (radial, navy-radial
-    // center -> navy edge), not a flat fill — otherwise it reads as black.
+    // The container must carry a radial depth gradient whose center is the
+    // elevated navy (#2a2a4e) — NOT navy-radial (#1e1e3f), which sits only ~5
+    // luminance above the navy edge and so reads as flat black.
     expect(stage.style.background).toContain('radial-gradient');
-    expect(stage.style.background).toContain('--neo-navy-radial');
+    expect(stage.style.background).toContain('--neo-navy-elevated');
+    expect(stage.style.background).not.toContain('--neo-navy-radial');
   });
 });
