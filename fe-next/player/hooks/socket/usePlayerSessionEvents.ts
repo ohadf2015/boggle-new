@@ -115,8 +115,17 @@ export function usePlayerSessionEvents({
       LEADERBOARD_THROTTLE_MS,
     );
 
+    // Same rationale as the leaderboard throttle above: in busy rooms
+    // `updateUsers` fires many times/sec (presence/focus/score/ready pings),
+    // each re-rendering the player roster mid-drag. Coalesce to ~6.7/s with the
+    // freshest roster. A sub-150ms delay on membership/rename is imperceptible.
+    const throttledSetPlayers = throttleLatest(
+      (users: UpdateUsersPayload['users']) => setPlayersReady(users || []),
+      LEADERBOARD_THROTTLE_MS,
+    );
+
     const handleUpdateUsers = (data: UpdateUsersPayload) => {
-      setPlayersReady(data.users || []);
+      throttledSetPlayers(data.users || []);
     };
 
     const handleShufflingGridUpdate = (data: ShufflingGridPayload) => {
@@ -208,6 +217,7 @@ export function usePlayerSessionEvents({
 
     return () => {
       throttledSetLeaderboard.cancel();
+      throttledSetPlayers.cancel();
       socket.off('updateUsers', handleUpdateUsers);
       socket.off('playerListUpdate', handleUpdateUsers);
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);

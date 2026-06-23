@@ -69,14 +69,27 @@ describe('usePlayerSessionEvents — playerListUpdate (guest-rename roster refre
     expect(setPlayers).toHaveBeenCalledWith(renamed);
   });
 
-  it('handles playerListUpdate identically to updateUsers', () => {
-    const socket = makeMockSocket();
-    mountWith(socket);
+  it('handles playerListUpdate identically to updateUsers (throttled, freshest wins)', () => {
+    vi.useFakeTimers();
+    try {
+      const socket = makeMockSocket();
+      mountWith(socket);
 
-    socket.__fire('updateUsers', { users: [{ username: 'A' }] as never });
-    socket.__fire('playerListUpdate', { users: [{ username: 'A' }] as never });
+      // Leading edge: first roster update applies immediately.
+      socket.__fire('updateUsers', { users: [{ username: 'A' }] as never });
+      expect(setPlayers).toHaveBeenCalledTimes(1);
 
-    expect(setPlayers).toHaveBeenCalledTimes(2);
+      // Second update within the 150ms window is coalesced into a trailing flush
+      // carrying the freshest payload — not dropped, just deferred.
+      socket.__fire('playerListUpdate', { users: [{ username: 'B' }] as never });
+      expect(setPlayers).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(150);
+      expect(setPlayers).toHaveBeenCalledTimes(2);
+      expect(setPlayers).toHaveBeenLastCalledWith([{ username: 'B' }]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('unregisters its playerListUpdate listener on unmount', () => {
