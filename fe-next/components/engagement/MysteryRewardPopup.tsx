@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
+import { Reveal } from '@/components/ui/Reveal';
 import { cn } from '@/lib/utils';
 import { Sparkles, Gift, Zap, Star, Crown } from 'lucide-react';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -182,15 +183,18 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
         </DialogTitle>
 
         <div className="p-6 flex flex-col items-center">
-          <AnimatePresence mode="wait">
+          {/* Phase swap uses keyed CSS entrances (animate-in) instead of
+              framer-motion: a starved JS loop (e.g. while the large Hebrew
+              bundle parses) would leave the active phase pinned at its invisible
+              `initial` state, showing an empty popup. Distinct keys remount on
+              phase change so the CSS entrance replays; CSS runs off the main
+              thread and always settles visible. */}
+          <>
             {phase === 'chest' && (
               /* Chest Phase - Show mystery box */
-              <m.div
+              <div
                 key="chest"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 1.2, opacity: 0 }}
-                className="flex flex-col items-center gap-4"
+                className="flex flex-col items-center gap-4 animate-in fade-in-0 zoom-in-95 duration-300"
               >
                 <m.div
                   animate={{
@@ -216,17 +220,14 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                 >
                   {t('mysteryReward.opening')}
                 </m.div>
-              </m.div>
+              </div>
             )}
 
             {phase === 'opening' && (
               /* Opening Phase - Shaking/glowing animation */
-              <m.div
+              <div
                 key="opening"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center gap-4"
+                className="flex flex-col items-center gap-4 animate-in fade-in-0 duration-300"
               >
                 <m.div
                   animate={{
@@ -258,27 +259,17 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                 >
                   {t('mysteryReward.revealing')}
                 </m.div>
-              </m.div>
+              </div>
             )}
 
             {phase === 'reveal' && (
               /* Reveal Phase - Show the reward */
-              <m.div
+              <div
                 key="reveal"
-                initial={{ scale: 0.95, opacity: 0, rotateY: 180 }}
-                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
-                transition={{
-                  type: 'spring',
-                  damping: 15,
-                  stiffness: 150
-                }}
-                className="flex flex-col items-center gap-4 text-center"
+                className="flex flex-col items-center gap-4 text-center animate-in fade-in-0 zoom-in-95 duration-300"
               >
                 {/* Rarity Badge */}
-                <m.div
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
+                <Reveal
                   className={cn(
                     'px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide',
                     rarity === 'legendary' && 'bg-yellow-500 text-yellow-900',
@@ -289,7 +280,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                   )}
                 >
                   {rarity}
-                </m.div>
+                </Reveal>
 
                 {/* Reward Icon */}
                 <m.div
@@ -312,21 +303,15 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                 </m.div>
 
                 {/* Reward Display */}
-                <m.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
+                <Reveal>
                   <p className="text-2xl font-black text-white">
                     {reward.display}
                   </p>
-                </m.div>
+                </Reveal>
 
                 {/* Trigger info */}
-                <m.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
+                <Reveal
+                  noSlide
                   className="text-center space-y-1"
                 >
                   <p className="text-xs text-white">
@@ -341,14 +326,10 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                     {reward.triggerType === 'long_word' && (t('mysteryReward.longWordExplain'))}
                     {reward.triggerType === 'achievement' && (t('mysteryReward.achievementExplain'))}
                   </p>
-                </m.div>
+                </Reveal>
 
                 {/* Excited mascot */}
-                <m.div
-                  initial={{ scale: 0, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  transition={{ delay: 0.4, type: 'spring', stiffness: 250, damping: 15 }}
-                >
+                <Reveal>
                   <SilentVideo
                     src={rarity === 'legendary' || rarity === 'epic' ? '/mascot/celebration.webp' : '/mascot/flexing.webp'}
                     width={80}
@@ -357,26 +338,24 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                     preload="metadata"
                     aria-hidden="true"
                   />
-                </m.div>
+                </Reveal>
 
                 {/* Tap to dismiss */}
-                <m.button
+                <button
                   onClick={onClose}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
                   className={cn(
                     'mt-4 px-6 py-2.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
                     'font-bold uppercase text-sm',
                     'bg-white/20 hover:bg-white/30 transition-colors',
+                    'animate-in fade-in-0 duration-300',
                     styles.text
                   )}
                 >
                   {t('mysteryReward.awesome')}
-                </m.button>
-              </m.div>
+                </button>
+              </div>
             )}
-          </AnimatePresence>
+          </>
         </div>
       </DialogContent>
     </Dialog>

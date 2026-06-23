@@ -3,11 +3,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { m, AnimatePresence } from 'framer-motion';
-import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Trophy, Sparkles, Check, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '../ui/button';
 import { Loader } from '@/components/ui/Loader';
+import { Reveal } from '@/components/ui/Reveal';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
@@ -125,18 +125,12 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
 
   return createPortal(
     <AnimatePresence>
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <Reveal
+        noSlide
         className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs"
         onClick={(e) => e.stopPropagation()}
       >
-        <m.div
-          initial={{ scale: 0.8, opacity: 0, y: 30 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 30 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+        <Reveal
           className={cn(
             'w-full max-w-2xl rounded-2xl p-8 shadow-2xl overflow-hidden relative border-4',
             isDarkMode
@@ -149,10 +143,8 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Trophy animation */}
-          <m.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', damping: 10, stiffness: 100, delay: 0.2 }}
+          <Reveal
+            noSlide
             className="flex justify-center mb-6 relative"
           >
             <m.div
@@ -166,13 +158,10 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
               <Trophy className="w-20 h-20 text-amber-400" />
               <Sparkles className="absolute -top-2 -right-2 w-8 h-8 text-yellow-300" />
             </m.div>
-          </m.div>
+          </Reveal>
 
           {/* Header */}
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
+          <Reveal
             className="text-center mb-8"
           >
             <h1 className="text-4xl font-black mb-3 text-neo-lime">
@@ -184,12 +173,10 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
             )}>
               {celebrationMsg.subtitle}
             </p>
-          </m.div>
+          </Reveal>
 
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
+          <Reveal
+            noSlide
             className="space-y-6"
           >
             {/* Avatar Selection */}
@@ -203,11 +190,9 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
 
               {/* Preview */}
               <div className="flex justify-center mb-4">
-                <m.div
+                <Reveal
                   key={selectedAvatar.id}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  noSlide
                   className="relative"
                 >
                   <div className={cn(
@@ -231,7 +216,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                   )}>
                     {selectedAvatar.name}
                   </div>
-                </m.div>
+                </Reveal>
               </div>
 
               {/* Avatar Grid */}
@@ -338,9 +323,9 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 </>
               )}
             </Button>
-          </m.div>
-        </m.div>
-      </m.div>
+          </Reveal>
+        </Reveal>
+      </Reveal>
     </AnimatePresence>,
     document.body
   );

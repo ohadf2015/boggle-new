@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Hash, Zap } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
 
 interface WordEntry {
   word: string;
@@ -85,21 +85,18 @@ export const WordHuntWordsModal: React.FC<WordHuntWordsModalProps> = ({
                 : t('wordWheel.noWordsSubmitted', 'No words found')}
             </p>
           ) : (
-            <AnimatePresence mode="popLayout">
-              <div className="flex flex-wrap gap-1.5">
-                {sortedWords.map((word, idx) => (
-                  <m.span
-                    key={`${word}-${idx}`}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: idx * 0.015, type: 'spring', stiffness: 500, damping: 25 }}
-                    className="inline-flex items-center px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-white text-neo-navy text-xs sm:text-sm font-black uppercase shadow-hard-xs"
-                  >
-                    {word}
-                  </m.span>
-                ))}
-              </div>
-            </AnimatePresence>
+            <div className="flex flex-wrap gap-1.5">
+              {sortedWords.map((word, idx) => (
+                <Reveal
+                  as="span"
+                  noSlide
+                  key={`${word}-${idx}`}
+                  className="inline-flex items-center px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-white text-neo-navy text-xs sm:text-sm font-black uppercase shadow-hard-xs"
+                >
+                  {word}
+                </Reveal>
+              ))}
+            </div>
           )}
         </div>
       </DialogContent>

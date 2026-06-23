@@ -4,6 +4,7 @@ import React, { useState, useCallback, useMemo, useRef, useEffect, createContext
 import { createPortal } from 'react-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { Reveal } from '@/components/ui/Reveal';
 import { UnifiedAchievementModal } from './UnifiedAchievementModal';
 import type { CinematicPlayerProps } from '../adventure/boss/cinematics/CinematicPlayer';
 
@@ -219,12 +220,9 @@ function AchievementInlineToast({
   // to avoid the element extending beyond viewport bounds, which gets
   // clipped by overflow-x:clip on body (screen-fit class)
   const toast = (
-    <m.div
+    <Reveal
+      noSlide
       data-testid="achievement-inline-toast"
-      initial={{ y: -40, opacity: 0, scale: 0.92 }}
-      animate={{ y: 0, opacity: 1, scale: 1 }}
-      exit={{ y: -20, opacity: 0, scale: 0.96 }}
-      transition={{ type: 'spring', stiffness: 460, damping: 22, mass: 0.6 }}
       className="fixed inset-x-0 z-60 flex justify-center pointer-events-none px-4"
       style={{
         top: 'max(1rem, env(safe-area-inset-top, 1rem))',
@@ -270,11 +268,9 @@ function AchievementInlineToast({
             className="absolute inset-0 rounded-full"
             aria-hidden
           />
-          <m.div
+          <Reveal
+            noSlide
             data-testid="achievement-inline-icon"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.05, type: 'spring', stiffness: 360, damping: 12 }}
             className="relative w-9 h-9 flex items-center justify-center rounded-full border-2 border-neo-black"
             style={{ backgroundColor: iconBg }}
           >
@@ -285,7 +281,7 @@ function AchievementInlineToast({
             >
               {icon}
             </m.span>
-          </m.div>
+          </Reveal>
           {sparkles.map((s, i) => (
             <m.span
               key={i}
@@ -311,18 +307,15 @@ function AchievementInlineToast({
 
         {/* Text content */}
         <div className="relative flex flex-col flex-1 min-w-0 leading-tight">
-          <m.span
-            initial={{ opacity: 0, y: -3 }}
-            animate={{ opacity: 0.7, y: 0 }}
-            transition={{ delay: 0.12 }}
-            className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-neo-white"
+          <Reveal
+            as="span"
+            className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-neo-white opacity-70"
           >
             <span>{t('achievements.unlocked')}</span>
             {tier && tierColors && tierStyle.showRarityBadge && (
-              <m.span
-                initial={{ scale: 0, rotate: -8 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.22, type: 'spring', stiffness: 500, damping: 14 }}
+              <Reveal
+                as="span"
+                noSlide
                 className="px-1.5 py-px rounded-sm font-black tracking-wider"
                 style={{
                   backgroundColor: tierColors.bg,
@@ -332,21 +325,19 @@ function AchievementInlineToast({
                 data-testid="achievement-inline-rarity"
               >
                 {tier}
-              </m.span>
+              </Reveal>
             )}
-          </m.span>
-          <m.span
+          </Reveal>
+          <Reveal
+            as="span"
             data-testid="achievement-inline-name"
-            initial={{ opacity: 0, y: 3 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 }}
             className="font-black text-sm truncate text-neo-lime"
           >
             {name}
-          </m.span>
+          </Reveal>
         </div>
       </div>
-    </m.div>
+    </Reveal>
   );
 
   // Use portal to render at body level, escaping overflow constraints

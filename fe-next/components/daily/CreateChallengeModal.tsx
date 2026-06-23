@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { m } from 'framer-motion';
+import { Reveal } from '@/components/ui/Reveal';
 import { Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap, X, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -196,11 +197,8 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
             <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-linear-to-br from-neo-lime to-neo-pink sticky top-0 z-10">
-              <m.div
+              <Reveal
                 className="flex items-center gap-3"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 380, damping: 26, delay: 0.2 }}
               >
                 <div className="relative">
                   <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black drop-shadow-xs" strokeWidth={2.5} />
@@ -215,7 +213,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                 <h2 className="font-bold text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-xs">
                   {t('daily.createChallengeTitle')}
                 </h2>
-              </m.div>
+              </Reveal>
               <button
                 onClick={handleClose}
                 aria-label={t('common.close')}
@@ -228,11 +226,9 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
             {/* Content */}
             <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {step === 'config' && (
-                <m.div
+                <Reveal
+                  noSlide
                   className="space-y-4"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
                 >
                   {/* Board Size Selection */}
                   <div className="space-y-3">
@@ -261,16 +257,14 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.classic')}</span>
                         </div>
                         {boardSize === 5 && (
-                          <m.div
+                          <Reveal
+                            noSlide
                             className="absolute -top-2 -right-2"
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1, rotate: 360 }}
-                            transition={{ type: 'spring', bounce: 0.6 }}
                           >
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
                               <Check className="w-4 h-4 text-neo-white" strokeWidth={3} />
                             </div>
-                          </m.div>
+                          </Reveal>
                         )}
                       </m.button>
 
@@ -292,26 +286,21 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.pro')}</span>
                         </div>
                         {boardSize === 7 && (
-                          <m.div
+                          <Reveal
+                            noSlide
                             className="absolute -top-2 -right-2"
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1, rotate: 360 }}
-                            transition={{ type: 'spring', bounce: 0.6 }}
                           >
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
                               <Check className="w-4 h-4 text-neo-white" strokeWidth={3} />
                             </div>
-                          </m.div>
+                          </Reveal>
                         )}
                       </m.button>
                     </div>
                   </div>
 
                   {/* Word Input */}
-                  <m.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
+                  <Reveal
                     className="space-y-2"
                   >
                     <label htmlFor="target-word" className="block text-sm sm:text-base font-black text-neo-black dark:text-neo-white uppercase tracking-tight">
@@ -337,23 +326,17 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       dir={language === 'he' ? 'rtl' : 'ltr'}
                     />
                     {wordError && (
-                      <m.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-sm font-bold text-red-600 flex items-center gap-2"
+                      <p
+                        className="animate-in fade-in-0 slide-in-from-bottom-1 duration-300 text-sm font-bold text-red-600 flex items-center gap-2"
                       >
                         <span className="inline-block w-1 h-1 rounded-full bg-red-600" />
                         {wordError}
-                      </m.p>
+                      </p>
                     )}
-                  </m.div>
+                  </Reveal>
 
                   {/* Generate Button */}
-                  <m.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
-                  >
+                  <Reveal>
                     <Button
                       onClick={handleCreate}
                       className="relative w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
@@ -368,15 +351,14 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
                       />
                     </Button>
-                  </m.div>
-                </m.div>
+                  </Reveal>
+                </Reveal>
               )}
 
               {step === 'loading' && (
-                <m.div
+                <Reveal
+                  noSlide
                   className="flex flex-col items-center justify-center py-12 sm:py-16 space-y-6"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
                 >
                   {/* Animated Loader */}
                   <div className="relative">
@@ -428,31 +410,24 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       ))}
                     </m.div>
                   </div>
-                </m.div>
+                </Reveal>
               )}
 
               {step === 'share' && (
-                <m.div
+                <Reveal
+                  noSlide
                   className="space-y-6 text-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ type: 'spring', bounce: 0.4 }}
                 >
                   {/* Success Mascot with 3D effect */}
                   <div className="relative flex items-center justify-center h-32 sm:h-40">
                     {/* Background circle */}
-                    <m.div
+                    <Reveal
+                      noSlide
                       className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-linear-to-br from-neo-lime to-neo-pink rounded-full border-neo-thick border-neo-black shadow-hard-lg"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ type: 'spring', bounce: 0.6, duration: 0.6 }}
                     />
 
                     {/* Mascot popping out of circle (3D effect) */}
-                    <m.div
-                      initial={{ opacity: 0, scale: 0.95, rotate: -180, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, rotate: 0, y: -8 }}
-                      transition={{ type: 'spring', bounce: 0.6, duration: 0.8, delay: 0.1 }}
+                    <Reveal
                       className="relative z-10"
                     >
                       <Mascot
@@ -462,7 +437,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         className="drop-shadow-2xl"
                         clipBorder="none"
                       />
-                    </m.div>
+                    </Reveal>
 
                     {/* Confetti particles */}
                     {[...Array(8)].map((_, i) => (
@@ -488,23 +463,16 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   </div>
 
                   {/* Success Message */}
-                  <m.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
-                  >
+                  <Reveal>
                     <h3 className="font-black text-2xl sm:text-3xl mb-2 text-neo-black dark:text-neo-white uppercase tracking-tight">
                       {t('daily.challengeCreated')}
                     </h3>
                     <p className="text-base text-slate-700 dark:text-slate-300 font-medium">{t('daily.challengeCreatedDesc')}</p>
-                  </m.div>
+                  </Reveal>
 
                   {/* Share URL Box */}
-                  <m.div
+                  <Reveal
                     className="flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-xl p-3 shadow-hard-sm"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
                   >
                     <div className="flex-1 overflow-hidden">
                       <p className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">{t('daily.challengeLink')}</p>
@@ -526,13 +494,10 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         <Copy className="w-5 h-5 text-neo-black" strokeWidth={2.5} />
                       )}
                     </m.button>
-                  </m.div>
+                  </Reveal>
 
                   {/* Share Button */}
-                  <m.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
+                  <Reveal
                     className="space-y-3"
                   >
                     <Button
@@ -558,34 +523,31 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     >
                       {t('daily.close')}
                     </Button>
-                  </m.div>
+                  </Reveal>
 
                   {/* Footer Hint */}
-                  <m.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
+                  <Reveal
+                    noSlide
                     className="pt-4 border-t-3 border-gray-200"
                   >
                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium flex items-center justify-center gap-2">
                       <Sparkles className="w-4 h-4 text-neo-pink" />
                       {t('daily.canPlayYourself')}
                     </p>
-                  </m.div>
-                </m.div>
+                  </Reveal>
+                </Reveal>
               )}
 
               {step === 'stats' && puzzleCode && (
-                <m.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                <Reveal
+                  noSlide
                   className="space-y-4"
                 >
                   <CustomChallengeStats
                     puzzleCode={puzzleCode}
                     onClose={() => setStep('share')}
                   />
-                </m.div>
+                </Reveal>
               )}
             </div>
         </div>

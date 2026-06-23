@@ -10,6 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
 import { useHapticsConfig } from '../contexts/HapticsContext';
 import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
+import { Reveal } from '@/components/ui/Reveal';
 
 /**
  * MusicControls - Neo-Brutalist styled volume controls with separate music and SFX sliders
@@ -140,11 +141,8 @@ const MusicControls: React.FC = memo(() => {
       {hasMounted && createPortal(
         <AnimatePresence>
           {showSlider && (
-            <m.div
-              initial={{ opacity: 0, y: -10, scale: 0.95, rotate: -2 }}
-              animate={{ opacity: 1, y: 0, scale: 1, rotate: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.15, ease: [0.68, -0.55, 0.265, 1.55] }}
+            <Reveal
+              noSlide
               className="
                 fixed p-3
                 min-w-[150px]
@@ -269,7 +267,7 @@ const MusicControls: React.FC = memo(() => {
                   </span>
                 )}
               </div>
-            </m.div>
+            </Reveal>
           )}
         </AnimatePresence>,
         document.body

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Trophy, Hash, Star } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/types';
 
@@ -169,22 +169,19 @@ export const WordWheelWordsModal: React.FC<WordWheelWordsModalProps> = ({
                 </p>
               ) : (
                 <>
-                  <AnimatePresence mode="popLayout">
-                    <div className="flex flex-wrap gap-1.5">
-                      {visibleWords.map((word, idx) => (
-                        <m.span
-                          key={`${word}-${idx}`}
-                          data-testid="missed-word-chip"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: idx * 0.015, type: 'spring', stiffness: 500, damping: 25 }}
-                          className="inline-flex items-center px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-white text-neo-navy text-xs sm:text-sm font-black uppercase shadow-hard-xs"
-                        >
-                          {language === 'he' ? applyHebrewFinalLetters(word) : word}
-                        </m.span>
-                      ))}
-                    </div>
-                  </AnimatePresence>
+                  <div className="flex flex-wrap gap-1.5">
+                    {visibleWords.map((word, idx) => (
+                      <Reveal
+                        as="span"
+                        noSlide
+                        key={`${word}-${idx}`}
+                        data-testid="missed-word-chip"
+                        className="inline-flex items-center px-2.5 py-1 rounded-neo border-2 border-neo-black bg-neo-white text-neo-navy text-xs sm:text-sm font-black uppercase shadow-hard-xs"
+                      >
+                        {language === 'he' ? applyHebrewFinalLetters(word) : word}
+                      </Reveal>
+                    ))}
+                  </div>
 
                   {showToggle && (
                     <button

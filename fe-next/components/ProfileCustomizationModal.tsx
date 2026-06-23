@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Check, X, Sparkles, ArrowRight } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
 import { Loader } from '@/components/ui/Loader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -188,27 +189,23 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
               </m.div>
 
               {/* Validation indicator */}
-              <AnimatePresence>
-                {displayName.length > 0 && (
-                  <m.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    className={cn(
-                      'w-9 h-9 rounded-full border-2 flex items-center justify-center shadow-hard-sm shrink-0',
-                      isNameValid
-                        ? 'bg-neo-lime border-neo-black'
-                        : 'bg-neo-red border-neo-black'
-                    )}
-                  >
-                    {isNameValid ? (
-                      <Check className="text-neo-black w-4 h-4" />
-                    ) : (
-                      <X className="text-neo-white w-4 h-4" />
-                    )}
-                  </m.div>
-                )}
-              </AnimatePresence>
+              {displayName.length > 0 && (
+                <Reveal
+                  noSlide
+                  className={cn(
+                    'w-9 h-9 rounded-full border-2 flex items-center justify-center shadow-hard-sm shrink-0',
+                    isNameValid
+                      ? 'bg-neo-lime border-neo-black'
+                      : 'bg-neo-red border-neo-black'
+                  )}
+                >
+                  {isNameValid ? (
+                    <Check className="text-neo-black w-4 h-4" />
+                  ) : (
+                    <X className="text-neo-white w-4 h-4" />
+                  )}
+                </Reveal>
+              )}
             </div>
 
             {/* Character counter / Error */}
