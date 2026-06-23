@@ -19,7 +19,7 @@ import '@testing-library/jest-dom';
  *   - locked audio         → unlock first, move toward audible
  */
 
-const navState = { isInGame: false };
+const navState = { isInGame: false, headerAudioControlActive: false };
 const musicState = {
   isMuted: false,
   audioUnlocked: true,
@@ -47,6 +47,7 @@ import InGameAudioButton from '../InGameAudioButton';
 
 function resetState() {
   navState.isInGame = false;
+  navState.headerAudioControlActive = false;
   musicState.isMuted = false;
   musicState.audioUnlocked = true;
   musicState.toggleMute.mockClear();
@@ -76,6 +77,13 @@ describe('InGameAudioButton', () => {
   it('stays hidden during a passive TV broadcast even while in game', () => {
     navState.isInGame = true;
     tvFullscreen = true;
+    const { container } = render(<InGameAudioButton />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('stands down when a screen header already hosts a mute control', () => {
+    navState.isInGame = true;
+    navState.headerAudioControlActive = true;
     const { container } = render(<InGameAudioButton />);
     expect(container).toBeEmptyDOMElement();
   });

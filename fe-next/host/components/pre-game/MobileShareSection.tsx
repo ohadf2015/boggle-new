@@ -82,10 +82,10 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
         data-testid="mobile-share-trigger"
         whileTap={{ scale: 0.95 }}
         className={cn(
-          'flex items-center gap-1.5 rounded-full border-2 border-neo-black shadow-hard transition-all font-bold uppercase tracking-wide',
-          compact
-            ? 'h-8 px-3 text-xs bg-white text-neo-black shadow-hard-sm'
-            : 'h-10 px-4 text-sm bg-neo-lime text-neo-black',
+          // Brand-lime CTA in both sizes so "invite" reads as the next action,
+          // not a neutral chip lost among the header's exit/settings controls.
+          'flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-lime text-neo-black font-black uppercase tracking-wide shadow-hard active:translate-y-0.5 active:shadow-hard-sm transition-all',
+          compact ? 'h-8 px-3.5 text-xs' : 'h-10 px-4 text-sm',
           showHint && 'animate-neo-wobble',
         )}
       >
