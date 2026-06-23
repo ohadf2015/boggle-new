@@ -22,6 +22,8 @@ export default defineConfig({
       '@vfx-js/core': path.resolve(__dirname, './__mocks__/@vfx-js/core.ts'),
       'canvas-confetti': path.resolve(__dirname, './__mocks__/canvas-confetti.ts'),
       'gsap': path.resolve(__dirname, './__mocks__/gsap.ts'),
+      'gsap/ScrollTrigger': path.resolve(__dirname, './__mocks__/gsap/ScrollTrigger.ts'),
+      '@gsap/react': path.resolve(__dirname, './__mocks__/@gsap/react.ts'),
     },
   },
   test: {
@@ -124,6 +126,8 @@ export default defineConfig({
       '**/CrazyGamesSDK.authOutcome.test.tsx',
       '**/CrazyGamesSDK.embedSticky.test.tsx',
       '**/ChallengeResults.test.tsx',
+      '**/processCompletion.test.ts',
+      '**/BlastFxOverlay.test.tsx',
     ],
     testTimeout: 10000,
     pool: 'forks',
