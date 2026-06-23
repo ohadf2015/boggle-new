@@ -5,6 +5,7 @@
  */
 
 import * as Sentry from "@sentry/nextjs";
+import { forwardToPostHog } from "./sentry";
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -51,6 +52,7 @@ class FrontendLogger {
             }
           }
         });
+        forwardToPostHog(errorArg, { 'log.level': 'warning', source: 'logger' });
         return;
       }
 
@@ -97,6 +99,7 @@ class FrontendLogger {
             }
           }
         });
+        forwardToPostHog(errorArg, { 'log.level': 'error', source: 'logger' });
       } else {
         // Otherwise, capture as a message
         const message = args.map(arg =>

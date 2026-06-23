@@ -6,6 +6,7 @@ import { locales, defaultLocale } from '../lib/i18n';
 import { matchLanguageList } from '../lib/localeResolution';
 import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
 import logger from '@/utils/logger';
+import { trackTelemetryEvent } from '@/utils/sentry';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import type { Language } from '@/types';
 
@@ -325,6 +326,9 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
                 }
                 // DO NOT demote to debug. User mandate 2026-05-01: missing keys are real bugs and must page Sentry.
                 logger.warn(`Translation missing for key: ${path} in language: ${language}`);
+                // Dedicated, queryable PostHog signal so missing keys stay traceable
+                // even when Sentry is dark (quota/outage). Deduped per key+language.
+                trackTelemetryEvent('translation_missing', { key: path, language });
                 return path;
             }
             current = (current as Record<string, unknown>)[key];

@@ -92,6 +92,12 @@ export function captureError(
     }
     Sentry.captureException(error);
   });
+
+  forwardToPostHog(
+    error,
+    context ?? {},
+    typeof context?.userId === "string" ? context.userId : undefined
+  );
 }
 
 /**
@@ -239,6 +245,107 @@ export function isExpectedError(error: Error | unknown): boolean {
 }
 
 // ============================================================================
+// PostHog Forwarding Backstop
+// ============================================================================
+
+/**
+ * Forward a captured error to PostHog as a resilient backstop, so error
+ * visibility never drops to zero when Sentry is dark (quota/spike-protection
+ * or a missing DSN). Server uses posthog-node; client uses the already-loaded
+ * browser SDK (no posthog-node in the client bundle). Fire-and-forget and
+ * fully guarded — telemetry forwarding must never throw into the caller.
+ */
+export function forwardToPostHog(
+  error: Error,
+  properties: Record<string, unknown>,
+  distinctId?: string
+): void {
+  if (process.env.NODE_ENV !== "production") return;
+  try {
+    if (typeof window === "undefined") {
+      // Server: API routes, Socket.IO backend, cron jobs.
+      void import("@/lib/posthog")
+        .then(({ getPostHogServer }) => {
+          getPostHogServer()?.captureException(error, distinctId, properties);
+        })
+        .catch(() => {});
+    } else {
+      // Client: browser SDK initialized in PostHogProvider.
+      const ph = (
+        window as unknown as {
+          posthog?: {
+            captureException?: (
+              e: unknown,
+              p?: Record<string, unknown>
+            ) => void;
+          };
+        }
+      ).posthog;
+      ph?.captureException?.(error, properties);
+    }
+  } catch {
+    // Never let telemetry forwarding break the caller.
+  }
+}
+
+/**
+ * Per-session dedupe of high-frequency telemetry signals. A missing translation
+ * key is hit on every render; without this we'd recreate the very flood that
+ * exhausted Sentry's quota. Bounded in practice by the number of unique
+ * (event + properties) signatures — small for translation keys.
+ * ponytail: unbounded Set; if signature cardinality ever explodes, cap it (LRU).
+ */
+const telemetryEventThrottle = new Set<string>();
+
+/** Test-only: clear the dedupe cache between cases. */
+export function __resetTelemetryThrottleForTests(): void {
+  telemetryEventThrottle.clear();
+}
+
+/**
+ * Emit a custom, queryable telemetry event to PostHog (e.g. 'translation_missing')
+ * so error categories can be traced later via PostHog breakdowns — independent of
+ * Sentry availability. Deduped per (event + properties) signature, production-only,
+ * fire-and-forget. Server uses posthog-node; client uses the browser SDK.
+ */
+export function trackTelemetryEvent(
+  event: string,
+  properties: Record<string, unknown> = {},
+  distinctId?: string
+): void {
+  if (process.env.NODE_ENV !== "production") return;
+
+  const signature = `${event}:${JSON.stringify(properties)}`;
+  if (telemetryEventThrottle.has(signature)) return;
+  telemetryEventThrottle.add(signature);
+
+  try {
+    if (typeof window === "undefined") {
+      void import("@/lib/posthog")
+        .then(({ getPostHogServer }) => {
+          getPostHogServer()?.capture({
+            distinctId: distinctId ?? "server",
+            event,
+            properties,
+          });
+        })
+        .catch(() => {});
+    } else {
+      const ph = (
+        window as unknown as {
+          posthog?: {
+            capture?: (e: string, p?: Record<string, unknown>) => void;
+          };
+        }
+      ).posthog;
+      ph?.capture?.(event, properties);
+    }
+  } catch {
+    // Never let telemetry forwarding break the caller.
+  }
+}
+
+// ============================================================================
 // Specialized Error Capture Functions
 // ============================================================================
 
@@ -281,6 +388,17 @@ export function captureApiError(
 
     Sentry.captureException(error);
   });
+
+  forwardToPostHog(
+    error,
+    {
+      "error.type": "api_error",
+      "api.route": route,
+      "api.method": context?.method,
+      "api.status_code": context?.statusCode,
+    },
+    context?.userId
+  );
 }
 
 /**
@@ -319,6 +437,17 @@ export function captureSocketError(
 
     Sentry.captureException(error);
   });
+
+  forwardToPostHog(
+    error,
+    {
+      "error.type": "socket_error",
+      "socket.event": context.event,
+      "socket.game_code": context.gameCode,
+      "socket.is_host": context.isHost,
+    },
+    context.username
+  );
 }
 
 /**
@@ -359,6 +488,13 @@ export function captureAIServiceError(
     });
 
     Sentry.captureException(error);
+  });
+
+  forwardToPostHog(error, {
+    "error.type": "ai_service_error",
+    "ai.operation": context.operation,
+    "ai.language": context.language,
+    "ai.retry_attempt": context.retryAttempt,
   });
 }
 
@@ -401,6 +537,16 @@ export function captureBackgroundError(
 
     Sentry.captureException(error);
   });
+
+  forwardToPostHog(
+    error,
+    {
+      "error.type": "background_error",
+      "background.operation": context.operation,
+      "background.service": context.service,
+    },
+    context.userId
+  );
 }
 
 // ============================================================================
