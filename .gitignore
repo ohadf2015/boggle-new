@@ -78,3 +78,5 @@ __pycache__/
 # Nightly runtime data (regenerated each run; artifacts/ideas ARE committed by run.sh, these are not)
 docs/nightly/feedback/
 docs/nightly/reports/
+# mode-qa screenshots are transient visual-QA proof (anti-fabrication on-disk check); not committed (avoid PNG bloat)
+docs/nightly/mode-qa/
