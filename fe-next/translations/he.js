@@ -1,5 +1,12 @@
 // HE translations
 const he = {
+  "mpCrossPromo": {
+    "heading": "שחקו בשידור חי עם אחרים",
+    "wheelRushTitle": "מרוץ הגלגל · לייב",
+    "wheelRushDesc": "התחרו ביריבים על הגלגל בזמן אמת",
+    "wordHuntTitle": "ציד מילים · לייב",
+    "wordHuntDesc": "צודו את המילים הנסתרות מול שחקנים אחרים"
+  },
   "playerStyle": {
     "styles": {
       "default": "קלאסי",
