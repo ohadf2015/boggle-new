@@ -2,9 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { m } from 'framer-motion';
-import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Trophy, TrendingUp, Medal, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
+import { Reveal } from '../ui/Reveal';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -117,13 +117,10 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-linear-to-b from-yellow-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
 
 
-          {/* Trophy animation */}
-          <m.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', damping: 10, stiffness: 100, delay: 0.2 }}
-            className="flex justify-center mb-4"
-          >
+          {/* Trophy animation. Reveal (CSS) guarantees the trophy is visible even
+              if the JS animation loop is starved; the inner pulse/sparkles below
+              stay on framer-motion since they are continuous, decorative loops. */}
+          <Reveal noSlide className="flex justify-center mb-4">
             <div className="relative">
               <m.div
                 animate={{
@@ -154,15 +151,10 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                 transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
               />
             </div>
-          </m.div>
+          </Reveal>
 
           {/* Header */}
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
-            className="text-center mb-6"
-          >
+          <Reveal className="text-center mb-6">
             <h2 className="text-2xl font-bold mb-2 text-neo-lime">
               {isMultiGamesVariant
                 ? t('auth.multiGames.title')
@@ -171,13 +163,10 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             <p className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
               {t(subtitleKey)}
             </p>
-          </m.div>
+          </Reveal>
 
           {/* Benefits list */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
+          <Reveal
             className={cn('mb-6 p-4 rounded-xl', isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50')}
           >
             <p
@@ -189,12 +178,9 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
               {t('auth.firstWin.benefitsTitle')}
             </p>
             <ul className="space-y-2">
-              {benefits.map((benefit, index) => (
-                <m.li
+              {benefits.map((benefit) => (
+                <li
                   key={benefit.translationKey}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}
                   className={cn(
                     'flex items-center gap-3 text-sm',
                     isDarkMode ? 'text-gray-200' : 'text-gray-700'
@@ -205,17 +191,14 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                     size={16}
                   />
                   <span>{t(benefit.translationKey)}</span>
-                </m.li>
+                </li>
               ))}
             </ul>
-          </m.div>
+          </Reveal>
 
           {/* Current stats teaser */}
           {guestStats && guestStats.gamesPlayed > 0 && (
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, ...SPRING_PRESETS.balanced }}
+            <Reveal
               className={cn(
                 'mb-6 p-3 rounded-lg text-center text-sm',
                 isDarkMode
@@ -229,28 +212,19 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                   score: guestStats.totalScore,
                 })}
               </span>
-            </m.div>
+            </Reveal>
           )}
 
           {/* OAuth Sign In Buttons */}
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, ...SPRING_PRESETS.balanced }}
-          >
+          <Reveal>
             <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} />
-          </m.div>
+          </Reveal>
 
           {/* Error Message */}
           {error && <AuthErrorMessage message={error} className="mt-4" />}
 
           {/* Continue as Guest */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, type: 'spring', stiffness: 280, damping: 26 }}
-            className="mt-6 text-center"
-          >
+          <Reveal className="mt-6 text-center">
             <button
               onClick={onClose}
               className={cn(
@@ -260,7 +234,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             >
               {t('auth.firstWin.maybeLater')}
             </button>
-          </m.div>
+          </Reveal>
 
           {/* Terms */}
           <AuthTermsFooter className="mt-4" />

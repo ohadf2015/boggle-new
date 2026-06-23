@@ -1,6 +1,5 @@
 'use client';
 
-import { m } from 'framer-motion';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -10,26 +9,30 @@ interface BenefitsListProps {
   benefits: AuthBenefit[];
   titleKey?: string;
   className?: string;
-  animationDelay?: number;
 }
 
 /**
- * Animated list of benefits for auth signup modals
+ * List of benefits for auth signup modals.
+ *
+ * Uses a CSS entrance (`animate-in`) rather than per-item framer-motion reveals:
+ * JS-driven reveals can leave the items pinned at their invisible `initial` state
+ * when the main thread is starved (e.g. parsing the large Hebrew bundle), which
+ * showed up as popups rendering only the dark backdrop. CSS animations settle to
+ * the visible resting state regardless, so content can never get stuck hidden.
  */
 export function BenefitsList({
   benefits,
   titleKey,
   className,
-  animationDelay = 0.1,
 }: BenefitsListProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
 
   return (
-    <m.div
+    <div
       className={cn(
-        'p-4 rounded-xl',
+        'p-4 rounded-xl animate-in fade-in-0 duration-300',
         isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50',
         className
       )}
@@ -43,12 +46,9 @@ export function BenefitsList({
         </p>
       )}
       <ul className="space-y-2">
-        {benefits.map((benefit, index) => (
-          <m.li
+        {benefits.map((benefit) => (
+          <li
             key={benefit.translationKey}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: animationDelay * (index + 1) }}
             className="flex items-center gap-2 text-sm"
           >
             <benefit.icon className={cn(
@@ -58,10 +58,10 @@ export function BenefitsList({
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
               {t(benefit.translationKey)}
             </span>
-          </m.li>
+          </li>
         ))}
       </ul>
-    </m.div>
+    </div>
   );
 }
 
