@@ -424,8 +424,9 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     });
 
     // Per-mode solved counts visible separately, so it's never solved > played
-    expect(screen.getByText(/🎯.*4.*solved/)).toBeInTheDocument();
-    expect(screen.getByText(/🎡.*6.*solved/)).toBeInTheDocument();
+    // (mode is now denoted by a lucide icon rather than an emoji, so match on text only)
+    expect(screen.getByText(/4.*solved/)).toBeInTheDocument();
+    expect(screen.getByText(/6.*solved/)).toBeInTheDocument();
 
     // Confirm the bug is gone: no element renders the summed "10 solved"
     expect(screen.queryByText('10 solved')).not.toBeInTheDocument();

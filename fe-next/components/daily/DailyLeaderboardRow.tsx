@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { m } from 'framer-motion';
-import { Clock, Sparkles, Crown, Eye } from 'lucide-react';
+import { Clock, Sparkles, Crown, Eye, Target, CircleDot } from 'lucide-react';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
@@ -159,7 +159,8 @@ export const TodayParticipantRow = memo<{
           )}
           {(participant.word_hunt_score ?? 0) > 0 && (participant.word_wheel_score ?? 0) > 0 && (
             <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium ms-1 inline-flex items-center gap-1">
-              🎯 {participant.word_hunt_score}
+              <Target aria-hidden className="w-3 h-3" />
+              {participant.word_hunt_score}
               <span aria-hidden>·</span>
               {onViewWheelWords && participant.player_id ? (
                 <button
@@ -169,11 +170,15 @@ export const TodayParticipantRow = memo<{
                   aria-label={t('wordWheel.viewSubmittedWords')}
                   title={t('wordWheel.viewSubmittedWords')}
                 >
-                  🎡 {participant.word_wheel_score}
+                  <CircleDot aria-hidden className="w-3 h-3" />
+                  {participant.word_wheel_score}
                   <Eye aria-hidden className="w-3 h-3 opacity-80" />
                 </button>
               ) : (
-                <span>🎡 {participant.word_wheel_score}</span>
+                <span className="inline-flex items-center gap-1">
+                  <CircleDot aria-hidden className="w-3 h-3" />
+                  {participant.word_wheel_score}
+                </span>
               )}
             </span>
           )}
