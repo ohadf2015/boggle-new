@@ -8,6 +8,7 @@ import { WeeklyChallengeCard } from './WeeklyChallengeCard';
 import type { DailyChallengeRow, WeeklyQuestRow } from '@/lib/supabase/education/types';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { cn } from '@/lib/utils';
+import { getWithAuth } from '@/utils/authFetch';
 import { Sun, Calendar, Trophy } from 'lucide-react';
 
 // --- Animation variants ---
@@ -54,8 +55,8 @@ export function ChallengePanel({ playerId, className = '' }: ChallengePanelProps
     queryKey: challengeKeys,
     queryFn: async () => {
       const [dailyRes, weeklyRes] = await Promise.all([
-        fetch('/api/education/challenges/daily'),
-        fetch('/api/education/challenges/weekly'),
+        getWithAuth('/api/education/challenges/daily'),
+        getWithAuth('/api/education/challenges/weekly'),
       ]);
       const [dailyJson, weeklyJson] = await Promise.all([
         dailyRes.json(),

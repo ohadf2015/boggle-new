@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { queryKeys } from '@/lib/queryKeys';
 import logger from '@/utils/logger';
-import { fetchWithAuth } from '@/utils/authFetch';
+import { fetchWithAuth, getWithAuth } from '@/utils/authFetch';
 
 interface BadgeInfo {
   id: string;
@@ -74,7 +74,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   const countQuery = useQuery({
     queryKey: queryKeys.gifts.unclaimedCount(),
     queryFn: async () => {
-      const response = await fetch('/api/player/gifts/unclaimed-count');
+      const response = await getWithAuth('/api/player/gifts/unclaimed-count');
       if (response.status === 401) return { count: 0 };
       if (!response.ok) throw new Error('Failed to fetch unclaimed count');
       return response.json() as Promise<{ count: number }>;

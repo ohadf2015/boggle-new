@@ -6,6 +6,7 @@ import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { queryKeys } from '@/lib/queryKeys';
 import { isPremiumPart } from '@/shared/types/customAvatar';
+import { getWithAuth } from '@/utils/authFetch';
 import toast from 'react-hot-toast';
 
 const TEMP_PREMIUM_KEY = 'lexiclash_temp_premium';
@@ -46,7 +47,7 @@ export function useAvatarPremium() {
   const { data: premiumData } = useQuery<{ premiumAvatarParts: string[] }>({
     queryKey: queryKeys.avatar.premiumParts(),
     queryFn: async () => {
-      const res = await fetch('/api/avatar/premium-parts');
+      const res = await getWithAuth('/api/avatar/premium-parts');
       if (!res.ok) throw new Error('Failed to fetch premium parts');
       return res.json();
     },

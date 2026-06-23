@@ -6,6 +6,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, isRTL: false }),
 }))
 
+// Component fetches via getWithAuth (Bearer wrapper); delegate to whatever
+// global.fetch each test installs, preserving call args.
+vi.mock('@/utils/authFetch', () => ({
+  getWithAuth: (...args: unknown[]) => (global.fetch as (...a: unknown[]) => unknown)(...args),
+}))
+
 vi.mock('framer-motion', () => ({
   m: new Proxy({}, {
     get: (_t: unknown, prop: string) => {

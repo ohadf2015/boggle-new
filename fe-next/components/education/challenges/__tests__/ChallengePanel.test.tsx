@@ -29,6 +29,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+// GET challenges route through getWithAuth (Bearer wrapper); delegate to the
+// global.fetch mock each test installs, preserving call args + counts.
+vi.mock('@/utils/authFetch', () => ({
+  getWithAuth: (...args: unknown[]) => (global.fetch as (...a: unknown[]) => unknown)(...args),
+}));
+
 vi.mock('@/components/ui/PageLoader', () => ({
   PageLoader: ({ text }: { text?: string }) => (
     <div data-testid="page-loader">{text}</div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X, Trophy } from 'lucide-react';
+import { getWithAuth } from '@/utils/authFetch';
 import Avatar from '@/components/Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -28,7 +29,7 @@ export function WordTowerLeaderboard({ onClose, t, dir }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/word-tower/leaderboard')
+    getWithAuth('/api/word-tower/leaderboard')
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((d) => { if (!cancelled) setRows(d.leaderboard ?? []); })
       .catch(() => { if (!cancelled) setError(true); });

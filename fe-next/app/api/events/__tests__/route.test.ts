@@ -12,16 +12,24 @@ vi.mock('@/utils/supabase/server', () => ({
   createClient: vi.fn(),
 }));
 
+vi.mock('@/lib/auth/getAuthedUser', () => ({
+  getAuthedUser: vi.fn(),
+}));
+
 import { GET } from '../route';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 
 const mockCreateClient = createClient as any;
+const mockGetAuthedUser = getAuthedUser as any;
 
 const req = () =>
   ({ url: 'https://www.lexiclash.live/api/events' } as any);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Default: authenticated. Individual tests override for the unauth case.
+  mockGetAuthedUser.mockResolvedValue({ id: 'user-123' });
 });
 
 afterEach(() => {
@@ -44,7 +52,7 @@ describe('GET /api/events', () => {
       },
     });
 
-    const res = await GET();
+    const res = await GET(req());
     const body = await res.json();
     expect(res.status).toBe(200);
     expect(body).toEqual({ active: [], upcoming: [], myEvents: [] });
@@ -68,7 +76,7 @@ describe('GET /api/events', () => {
       },
     });
 
-    const res = await GET();
+    const res = await GET(req());
     const body = await res.json();
     expect(res.status).toBe(200);
     expect(body.active).toHaveLength(1);
@@ -90,12 +98,13 @@ describe('GET /api/events', () => {
       },
     });
 
-    const res = await GET();
+    const res = await GET(req());
     const body = await res.json();
     expect(body).toEqual({ active: [], upcoming: [], myEvents: [] });
   });
 
   it('returns myEvents empty when user is not authenticated', async () => {
+    mockGetAuthedUser.mockResolvedValueOnce(null);
     mockCreateClient.mockResolvedValueOnce({
       from: vi.fn((table: string) => ({
         select: vi.fn(() => ({
@@ -110,7 +119,7 @@ describe('GET /api/events', () => {
       },
     });
 
-    const res = await GET();
+    const res = await GET(req());
     const body = await res.json();
     expect(body.myEvents).toEqual([]);
     expect(body.active).toEqual([]);

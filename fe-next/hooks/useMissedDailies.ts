@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { getWithAuth } from '@/utils/authFetch';
 
 export interface MissedDaily {
   date: string;
@@ -24,7 +25,7 @@ export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean
   const refresh = useCallback(() => {
     if (!enabled) return;
     setLoading(true);
-    fetch(`/api/daily/missed?mode=${mode}`)
+    getWithAuth(`/api/daily/missed?mode=${mode}`)
       .then(r => (r.ok ? r.json() : null))
       .then(json => {
         if (!mountedRef.current) return;

@@ -10,6 +10,9 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSpacedRepetition } from './useSpacedRepetition';
 
+// Mock getWithAuth to delegate to global.fetch
+vi.mock('@/utils/authFetch', () => ({ getWithAuth: (...a: unknown[]) => (global.fetch as (...x: unknown[]) => unknown)(...a) }));
+
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },

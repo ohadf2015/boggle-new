@@ -23,6 +23,7 @@ const TelegramIcon = ({ className }: { className?: string }) => (
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackShare } from '@/utils/growthTracking';
+import { getWithAuth } from '@/utils/authFetch';
 import Avatar from '@/components/Avatar';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -60,7 +61,7 @@ export function ReferralCard() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/referral');
+      const response = await getWithAuth('/api/referral');
       if (!response.ok) {
         throw new Error('Failed to fetch referral data');
       }

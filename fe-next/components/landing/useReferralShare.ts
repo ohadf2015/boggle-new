@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackShare } from '@/utils/growthTracking';
+import { getWithAuth } from '@/utils/authFetch';
 
 export interface ReferralShareState {
   referralCode: string | null;
@@ -40,7 +41,7 @@ export function useReferralShare(): ReferralShareState {
 
     setIsLoading(true);
     try {
-      const res = await fetch('/api/referral');
+      const res = await getWithAuth('/api/referral');
       if (res.ok) {
         const { data } = await res.json();
         setReferralCode(data.referralCode);

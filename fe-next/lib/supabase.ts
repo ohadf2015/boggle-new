@@ -425,7 +425,8 @@ export async function spendCoinsFromDatabase(
  */
 export async function getDatabaseCoinBalance(_userId: string): Promise<{ coins: number; lifetime: number } | null> {
   try {
-    const res = await fetch('/api/coins');
+    const { getWithAuth } = await import('@/utils/authFetch');
+    const res = await getWithAuth('/api/coins');
     if (!res.ok) return null;
 
     const data = await res.json();

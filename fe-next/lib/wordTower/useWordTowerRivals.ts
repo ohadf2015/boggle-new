@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getWithAuth } from '@/utils/authFetch';
 import { rivalsFromLeaderboard, type RivalMarker, type LeaderboardRivalRow } from './rivals';
 
 /**
@@ -14,7 +15,7 @@ export function useWordTowerRivals(max = 8): RivalMarker[] {
 
   useEffect(() => {
     let alive = true;
-    fetch('/api/word-tower/leaderboard')
+    getWithAuth('/api/word-tower/leaderboard')
       .then((r) => (r.ok ? r.json() : null))
       .then((data: { leaderboard?: LeaderboardRivalRow[] } | null) => {
         if (!alive || !data?.leaderboard) return;

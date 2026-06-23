@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { getWithAuth } from '@/utils/authFetch'
 
 export interface PendingChest {
   tier: 'bronze' | 'silver' | 'gold'
@@ -94,7 +95,7 @@ export function useWeeklyChest(): WeeklyChestState {
 
   const refresh = useCallback(() => {
     setLoading(true)
-    fetch('/api/daily/weekly-chest/status')
+    getWithAuth('/api/daily/weekly-chest/status')
       .then(async r => {
         // 429/5xx return error JSON; normalize coerces but we still skip the write
         // entirely so a rate-limited refresh doesn't blank out previously-good data.

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { getWithAuth } from '@/utils/authFetch';
 import type { CuratorAssignment } from './curatorScope';
 
 export interface CuratorStatus {
@@ -36,7 +37,7 @@ export function useCuratorStatus(): CuratorStatus {
     }
     let cancelled = false;
     setLoading(true);
-    fetch('/api/curator/status')
+    getWithAuth('/api/curator/status')
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
         if (cancelled || !j) return;

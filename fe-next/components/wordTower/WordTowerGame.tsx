@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getWithAuth } from '@/utils/authFetch';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import {
@@ -79,7 +80,7 @@ export function WordTowerGame() {
     // the day, so reloads keep the same letters. (Step toward folding the daily
     // letter set into the broader daily-challenges flow.)
     const opts = { gameCode: `solo-${utcDateKey()}`, playerId: 'solo', language };
-    fetch('/api/word-tower/progress')
+    getWithAuth('/api/word-tower/progress')
       .then((r) => (r.ok ? r.json() : Promise.resolve({ progress: null })))
       .then((d) => {
         if (cancelled) return;

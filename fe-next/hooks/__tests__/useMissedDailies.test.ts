@@ -1,13 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useMissedDailies } from '../useMissedDailies';
+import { getWithAuth } from '@/utils/authFetch';
+
+vi.mock('@/utils/authFetch', () => ({ getWithAuth: vi.fn() }));
 
 describe('useMissedDailies', () => {
+  // Hook fetches via getWithAuth (Bearer-token wrapper), not raw fetch.
   let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    mockFetch = vi.fn();
-    global.fetch = mockFetch;
+    mockFetch = getWithAuth as unknown as ReturnType<typeof vi.fn>;
+    mockFetch.mockReset();
   });
 
   afterEach(() => {

@@ -31,8 +31,12 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
-// Mock fetch
+// Mock fetch. The count call now routes through getWithAuth (Bearer wrapper);
+// delegate it to the same mockFetch so ordering/assertions are unchanged.
 const mockFetch = vi.fn();
+
+vi.mock('@/utils/authFetch', () => ({ getWithAuth: vi.fn(), fetchWithAuth: vi.fn() }));
+import { getWithAuth, fetchWithAuth } from '@/utils/authFetch';
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -84,6 +88,9 @@ describe('useUnclaimedGifts', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', mockFetch);
     vi.clearAllMocks();
+    const delegate = (...args: unknown[]) => mockFetch(...args);
+    (getWithAuth as unknown as ReturnType<typeof vi.fn>).mockImplementation(delegate);
+    (fetchWithAuth as unknown as ReturnType<typeof vi.fn>).mockImplementation(delegate);
     mockIsAuthenticated.mockReturnValue(true);
     mockLocalStorage.getItem.mockReturnValue(null);
   });

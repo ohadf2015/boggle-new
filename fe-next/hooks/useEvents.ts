@@ -8,6 +8,7 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
+import { getWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
 
 export interface ClientGameEvent {
@@ -42,7 +43,7 @@ export function useEvents(): UseEventsReturn {
   const { data, isLoading } = useQuery<EventsData>({
     queryKey: queryKeys.events.all(),
     queryFn: async ({ signal }) => {
-      const res = await fetch('/api/events', { signal });
+      const res = await getWithAuth('/api/events', { signal });
       if (!res.ok) throw new Error('Failed to fetch events');
       const json = await res.json();
       return {

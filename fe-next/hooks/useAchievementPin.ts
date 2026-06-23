@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { getWithAuth } from '@/utils/authFetch';
 import type { StudentAchievement } from '@/types/education';
 import logger from '@/utils/logger';
 
@@ -56,7 +57,7 @@ export function useAchievementPin(studentId: string | undefined): UseAchievement
 
     const fetchPinned = async () => {
       try {
-        const response = await fetch('/api/education/achievements/pin');
+        const response = await getWithAuth('/api/education/achievements/pin');
 
         if (!response.ok) {
           throw new Error('Failed to fetch pinned achievements');

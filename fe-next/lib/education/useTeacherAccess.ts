@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { getWithAuth } from '@/utils/authFetch';
 import type { TeacherAccessRequest, TeacherAccessStatus } from './types';
 
 interface UseTeacherAccessResult {
@@ -21,7 +22,7 @@ export function useTeacherAccess(): UseTeacherAccessResult {
   useEffect(() => {
     if (!user?.id || hasAccess) return;
     setReqLoading(true);
-    fetch('/api/education/access-request')
+    getWithAuth('/api/education/access-request')
       .then((r) => r.ok ? r.json() : null)
       .then((j) => setLatestRequest(j?.row || null))
       .finally(() => setReqLoading(false));

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
+import { getWithAuth } from '@/utils/authFetch';
 import { useAuth } from '../../contexts/AuthContext';
 
 export function useGiftNotifications() {
@@ -78,7 +79,7 @@ export function useGiftNotifications() {
                 }
                 // Gift not in local unclaimed list — fetch by ID (may be already claimed)
                 try {
-                    const res = await fetch(`/api/player/gifts/${giftId}`);
+                    const res = await getWithAuth(`/api/player/gifts/${giftId}`);
                     if (res.ok) {
                         const data = await res.json();
                         if (data.gift) {

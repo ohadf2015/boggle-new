@@ -7,23 +7,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 
 function getSupabaseAdmin() {
   return createAdminClient()!;
-}
-
-async function getUserFromRequest(req: NextRequest) {
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader) return null;
-  const token = authHeader.replace('Bearer ', '');
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-  const { data: { user } } = await supabase.auth.getUser(token);
-  return user;
 }
 
 function getDateRange(period: string): { start: string; end: string } {
@@ -61,7 +49,7 @@ interface RecapStats {
  */
 export async function GET(req: NextRequest) {
   try {
-    const user = await getUserFromRequest(req);
+    const user = await getAuthedUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

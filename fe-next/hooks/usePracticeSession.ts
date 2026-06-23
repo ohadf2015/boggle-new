@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMounted } from '@/hooks/useMounted';
+import { getWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
 
 // Types
@@ -84,7 +85,7 @@ async function fetchSessionsAPI(
 
 async function fetchSessionAPI(sessionId: string): Promise<{ session: PracticeSession | null; error?: string }> {
   try {
-    const response = await fetch(`/api/education/practice?sessionId=${sessionId}`);
+    const response = await getWithAuth(`/api/education/practice?sessionId=${sessionId}`);
     const data = await response.json();
 
     if (!response.ok) {

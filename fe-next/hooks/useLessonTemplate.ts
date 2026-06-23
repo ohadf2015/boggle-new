@@ -4,6 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { queryKeys } from '@/lib/queryKeys';
+import { getWithAuth } from '@/utils/authFetch';
 import logger from '@/utils/logger';
 
 // Types
@@ -51,7 +52,7 @@ export interface UpdateTemplateData {
 // API functions
 async function fetchTemplatesAPI(lessonId: string): Promise<{ templates: LessonTemplate[]; error?: string }> {
   try {
-    const response = await fetch(`/api/education/templates?lessonId=${lessonId}`);
+    const response = await getWithAuth(`/api/education/templates?lessonId=${lessonId}`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -67,7 +68,7 @@ async function fetchTemplatesAPI(lessonId: string): Promise<{ templates: LessonT
 
 async function fetchTemplateAPI(templateId: string): Promise<{ template: LessonTemplate | null; error?: string }> {
   try {
-    const response = await fetch(`/api/education/templates?id=${templateId}`);
+    const response = await getWithAuth(`/api/education/templates?id=${templateId}`);
     const data = await response.json();
 
     if (!response.ok) {

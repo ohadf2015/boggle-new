@@ -1,18 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // Run events query and auth.getUser concurrently
-    const [eventsResult, { data: { user } }] = await Promise.all([
+    // Run events query and (local-first) auth concurrently
+    const [eventsResult, user] = await Promise.all([
       supabase
         .from('events')
         .select('id, name, description, type, status, start_time, end_time, config, rewards')
         .in('status', ['active', 'upcoming'])
         .order('start_time', { ascending: true }),
-      supabase.auth.getUser(),
+      getAuthedUser(request),
     ]);
 
     const { data: events, error } = eventsResult;

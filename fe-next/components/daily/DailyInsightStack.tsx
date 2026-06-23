@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { getWithAuth } from '@/utils/authFetch'
 import InsightCard, { type InsightIcon } from './InsightCard'
 
 interface InsightData {
@@ -25,7 +26,7 @@ export default function DailyInsightStack({ mode, date }: Props) {
   const [insights, setInsights] = useState<InsightData[]>([])
 
   useEffect(() => {
-    fetch(`/api/daily/insights?mode=${mode}&date=${encodeURIComponent(date)}`)
+    getWithAuth(`/api/daily/insights?mode=${mode}&date=${encodeURIComponent(date)}`)
       .then(r => r.json())
       .then(({ insights: data }) => setInsights((data ?? []).slice(0, 3)))
       .catch(() => {})

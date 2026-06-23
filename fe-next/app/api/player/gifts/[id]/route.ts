@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 
 /**
@@ -8,21 +9,18 @@ import { captureApiError } from '@/utils/sentry';
  * Used when clicking gift notifications to show the gift modal.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id: giftId } = await params;
-    const supabase = await createClient();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const supabase = await createClient();
 
     const { data: gift, error: giftError } = await supabase
       .from('admin_gift_messages')

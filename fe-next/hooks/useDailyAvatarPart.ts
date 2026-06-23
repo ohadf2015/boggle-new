@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
+import { getWithAuth } from '@/utils/authFetch';
 
 interface StatusResponse {
   cooldownActive: boolean;
@@ -64,7 +65,7 @@ export function useDailyAvatarPart(): DailyAvatarPartState {
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     try {
-      const res = await fetch(ENDPOINT, { signal: ctrl.signal });
+      const res = await getWithAuth(ENDPOINT, { signal: ctrl.signal });
       if (!res.ok) return;
       const json = (await res.json()) as StatusResponse;
       setStatus(json);

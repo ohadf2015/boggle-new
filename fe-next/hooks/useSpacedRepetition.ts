@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
+import { getWithAuth } from '@/utils/authFetch';
 import {
   createWordReviewData,
   calculateNextReview,
@@ -80,7 +81,7 @@ function mergeDbIntoLocal(
  * Fetch review schedule from the API. Returns empty array on failure.
  */
 async function fetchDbSchedule(lessonId: string): Promise<WordReviewData[]> {
-  const res = await fetch(`/api/education/spaced-repetition?lessonId=${encodeURIComponent(lessonId)}`);
+  const res = await getWithAuth(`/api/education/spaced-repetition?lessonId=${encodeURIComponent(lessonId)}`);
   if (!res.ok) return [];
   const json = await res.json();
   return (json.reviews ?? []) as WordReviewData[];
