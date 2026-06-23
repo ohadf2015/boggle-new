@@ -133,6 +133,7 @@ export default defineConfig({
       '**/ChallengeResults.test.tsx',
       '**/processCompletion.test.ts',
       '**/BlastFxOverlay.test.tsx',
+      '**/BoardClearedCard.test.tsx',
     ],
     testTimeout: 10000,
     pool: 'forks',
