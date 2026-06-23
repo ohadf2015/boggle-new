@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
-import { useDailyStreak } from '@/hooks/useDailyStreak';
 import { useTopPlayers } from '@/hooks/useTopPlayers';
 import { useLandingStats } from '@/hooks/useLandingStats';
 import { InlineBannerAd } from '@/components/ads';
@@ -93,10 +92,6 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const liveRoomStats = useLiveRoomStats();
   const { allTimeBest: playerAllTimeBest } = usePlayerStats();
   const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
-  // Fire-icon streak comes from the chest's all-modes, server-authoritative walk
-  // (NOT the Word-Hunt-only localStorage counter), so the homepage card + top-bar
-  // pill stay in sync with the weekly chest. Falls back to the local seed instantly.
-  const { streak: dailyStreak } = useDailyStreak();
   const { activeEvents, myEvents, joinEvent: joinEventAction } = useEvents();
   const { players: topPlayers, loading: topPlayersLoading } = useTopPlayers(5, {
     initialData: initialData?.topPlayers,
@@ -159,9 +154,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const dailyChallengeStats = {
     hasPlayed: dailyChallengeStatus.hasPlayed,
     hasSolved: dailyChallengeStatus.hasSolved,
-    // Chest-authoritative streak (all daily modes + freezes) — keeps the fire icon
-    // identical to the weekly chest instead of the Word-Hunt-only legacy counter.
-    currentStreak: dailyStreak,
+    currentStreak: dailyChallengeStatus.currentStreak,
     puzzleNumber: dailyChallengeStatus.puzzleNumber,
     loading: dailyChallengeStatus.loading,
   };

@@ -6,13 +6,6 @@ export interface CycleProgress {
   completedDates: string[]
   daysCompleted: number
   isClaimable: boolean
-  /**
-   * Full consecutive-day run ending today (can exceed 7) — the number the daily
-   * "fire" streak shows. Distinct from `daysCompleted`, which wraps within the
-   * current 7-day chest cycle. Both come from the same backward walk, so the
-   * homepage fire icon and the chest can never contradict each other.
-   */
-  currentStreak: number
 }
 
 export interface DayScore {
@@ -176,7 +169,7 @@ export function computeCycleProgress(
   }
 
   if (streak.length === 0) {
-    return { cycleStart: today, cycleNumber: 1, completedDates: [], daysCompleted: 0, isClaimable: false, currentStreak: 0 }
+    return { cycleStart: today, cycleNumber: 1, completedDates: [], daysCompleted: 0, isClaimable: false }
   }
 
   const streakLen = streak.length
@@ -185,5 +178,5 @@ export function computeCycleProgress(
   const completedDates = streak.slice(streak.length - daysInCurrentCycle)
   const cycleStart = completedDates[0]
 
-  return { cycleStart, cycleNumber, completedDates, daysCompleted: daysInCurrentCycle, isClaimable: daysInCurrentCycle === 7, currentStreak: streakLen }
+  return { cycleStart, cycleNumber, completedDates, daysCompleted: daysInCurrentCycle, isClaimable: daysInCurrentCycle === 7 }
 }

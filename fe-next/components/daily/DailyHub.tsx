@@ -12,8 +12,8 @@ import {
   getSecondsUntilNextDaily,
   hasPlayedWordHuntToday,
   hasPlayedWordWheelToday,
+  getDailyStreak,
 } from '@/utils/dailyChallenge';
-import { useDailyStreak } from '@/hooks/useDailyStreak';
 import { getLastSevenDaysCompletion } from '@/utils/dailyChallenge/storage';
 import LastSevenDaysIndicator from './LastSevenDaysIndicator';
 import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
@@ -135,9 +135,7 @@ export default function DailyHub() {
 
   const date = getDailyChallengeDate();
   const puzzleNumber = getPuzzleNumber(date);
-  // Same chest-authoritative streak the WeeklyChestCard below uses, so the header
-  // fire icon and the chest can't show different numbers on the same screen.
-  const { streak: currentStreak } = useDailyStreak();
+  const streak = getDailyStreak();
   const playedWH = hasPlayedWordHuntToday(gameLang);
   const playedWW = hasPlayedWordWheelToday(gameLang);
   const bothDone = playedWH && playedWW;
@@ -175,9 +173,9 @@ export default function DailyHub() {
 
         {/* Streak & Countdown */}
         <div className="flex items-center justify-center gap-4">
-          {currentStreak > 0 && (
+          {streak.currentStreak > 0 && (
             <span className="text-neo-lime font-neo-display font-black text-lg">
-              🔥 {currentStreak}
+              🔥 {streak.currentStreak}
             </span>
           )}
           <span className="flex items-center gap-1.5 text-neo-white text-sm">
