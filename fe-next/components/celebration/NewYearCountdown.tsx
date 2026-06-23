@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Sparkles, PartyPopper } from 'lucide-react';
 import { Dialog, DialogContent, DialogBody, DialogTitle } from '../ui/dialog';
+import { Reveal } from '../ui/Reveal';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useNewYearDetection, formatTimeRemaining } from '../../hooks/useNewYearDetection';
 import { triggerHaptic } from '../../utils/hapticFeedback';
@@ -150,11 +151,7 @@ function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
             {t('newYear.countdownTitle')}
           </DialogTitle>
           <DialogBody className="text-center py-8">
-            <m.div
-              className="flex flex-col items-center gap-6"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-            >
+            <Reveal noSlide className="flex flex-col items-center gap-6">
               <Sparkles className="w-16 h-16 text-neo-lime" />
 
               <div>
@@ -166,13 +163,11 @@ function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
                 </p>
               </div>
 
-              {/* Countdown number */}
-              <m.div
+              {/* Countdown number — keyed CSS zoom replays each second; CSS keeps
+                  the big number visible even if the JS loop is starved. */}
+              <div
                 key={newYearState.secondsUntilMidnight}
-                className="relative"
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', damping: 10 }}
+                className="relative animate-in zoom-in-50 duration-300"
               >
                 <div
                   className="text-9xl font-black text-neo-pink border-8 border-neo-black rounded-neo-xl shadow-hard-2xl bg-neo-lime w-48 h-48 flex items-center justify-center"
@@ -182,12 +177,12 @@ function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
                 >
                   {newYearState.secondsUntilMidnight}
                 </div>
-              </m.div>
+              </div>
 
               <p className="text-lg font-bold text-neo-black uppercase">
                 {t('newYear.almostThere')}
               </p>
-            </m.div>
+            </Reveal>
           </DialogBody>
         </DialogContent>
       </Dialog>
@@ -199,12 +194,7 @@ function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
             {t('newYear.happyNewYear')}
           </DialogTitle>
           <DialogBody className="text-center py-12 relative">
-            <m.div
-              className="flex flex-col items-center gap-8"
-              initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ type: 'spring', damping: 15 }}
-            >
+            <Reveal noSlide className="flex flex-col items-center gap-8">
               <PartyPopper className="w-20 h-20 text-neo-pink animate-neo-wobble" />
 
               {/* Happy New Year text */}
@@ -232,24 +222,17 @@ function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
                 </m.h1>
 
                 {/* Year badge */}
-                <m.div
+                <Reveal
+                  noSlide
                   className="mt-6 inline-block bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg px-8 py-3"
-                  initial={{ scale: 0, rotate: -15 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.3, type: 'spring', damping: 12 }}
                 >
                   <span className="text-5xl font-black">{newYearState.celebrationYear}</span>
-                </m.div>
+                </Reveal>
               </div>
 
-              <m.p
-                className="text-xl font-bold text-neo-black uppercase max-w-md"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
+              <p className="text-xl font-bold text-neo-black uppercase max-w-md animate-in fade-in-0 slide-in-from-bottom-1 duration-300">
                 {t('newYear.celebrationMessage')}
-              </m.p>
+              </p>
 
               {/* Confetti emoji decorations */}
               <div className="flex gap-4 text-4xl">
@@ -273,7 +256,7 @@ function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
                   </m.span>
                 ))}
               </div>
-            </m.div>
+            </Reveal>
           </DialogBody>
         </DialogContent>
       </Dialog>

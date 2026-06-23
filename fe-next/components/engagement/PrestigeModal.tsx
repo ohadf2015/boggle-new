@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { Sparkles, Star, Crown, Zap, AlertTriangle, Check } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
+import { Reveal } from '@/components/ui/Reveal';
 import { toRoman, PRESTIGE_CONFIG, type PrestigeReward } from '@/backend/modules/xpManager';
 
 interface PrestigeModalProps {
@@ -113,16 +114,18 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
           <Sparkles className={cn('w-6 h-6', colors.text)} />
         </div>
 
+        {/* View swap uses keyed CSS entrances (animate-in) rather than
+            framer-motion: a starved JS loop (e.g. during Hebrew bundle parse)
+            would leave the active view pinned at its invisible `initial` state,
+            showing an empty modal. Distinct keys remount on swap so the CSS
+            entrance replays; CSS runs off the main thread and always settles
+            visible. */}
         <div className="p-5 space-y-5">
-          <AnimatePresence mode="wait">
             {prestigeComplete ? (
               /* Success Animation */
-              <m.div
+              <div
                 key="success"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center gap-4 py-6"
+                className="flex flex-col items-center gap-4 py-6 animate-in fade-in-0 zoom-in-95 duration-300"
               >
                 <Image
                   src="/mascot/powerup-nobg.webp"
@@ -151,27 +154,21 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                 </div>
 
                 <div className="flex gap-2 mt-2">
-                  {nextRewards.map((reward, rewardIdx) => (
-                    <m.div
+                  {nextRewards.map((reward) => (
+                    <Reveal
                       key={reward.value}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + rewardIdx * 0.2 }}
                       className="text-3xl"
                     >
                       {reward.icon}
-                    </m.div>
+                    </Reveal>
                   ))}
                 </div>
-              </m.div>
+              </div>
             ) : isConfirming ? (
               /* Confirmation View */
-              <m.div
+              <div
                 key="confirm"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
+                className="space-y-4 animate-in fade-in-0 slide-in-from-bottom-1 duration-300"
               >
                 <div className="flex items-start gap-3 p-4 rounded-neo bg-neo-lime/20 border-2 border-neo-lime/50">
                   <AlertTriangle className="w-6 h-6 text-neo-lime shrink-0 mt-0.5" />
@@ -228,15 +225,12 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     )}
                   </button>
                 </div>
-              </m.div>
+              </div>
             ) : (
               /* Main View */
-              <m.div
+              <div
                 key="main"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="space-y-4"
+                className="space-y-4 animate-in fade-in-0 duration-300"
               >
                 {/* Current Status */}
                 <div className="flex items-center justify-between p-4 rounded-neo bg-neo-cream/5 border-2 border-white/10">
@@ -291,12 +285,9 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                       </p>
 
                       <div className="grid gap-2">
-                        {nextRewards.map((reward, rewardIdx) => (
-                          <m.div
+                        {nextRewards.map((reward) => (
+                          <Reveal
                             key={reward.value}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: rewardIdx * 0.1 }}
                             className={cn(
                               'flex items-center gap-3 p-3 rounded-neo',
                               'bg-neo-cream/5 border-2',
@@ -316,7 +307,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                             {reward.type === 'title' && (
                               <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-neo-white')} />
                             )}
-                          </m.div>
+                          </Reveal>
                         ))}
                       </div>
                     </div>
@@ -351,9 +342,8 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     )}
                   </>
                 )}
-              </m.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
       </DialogContent>
     </Dialog>

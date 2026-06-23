@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { m } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, Book, CheckCircle, HelpCircle } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '../../utils/utils';
@@ -221,16 +222,8 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
         className="bg-neo-cream border-4 border-neo-black max-w-md overflow-hidden"
         dir={dir}
       >
-        <m.div
+        <Reveal
           key={currentWord.word}
-          initial={{ opacity: 0, scale: 0.8, y: 50, rotate: -5 }}
-          animate={{ opacity: 1, scale: 1, y: 0, rotate: -1 }}
-          exit={{ opacity: 0, scale: 0.9, y: -30, rotate: 3 }}
-          transition={{
-            type: 'spring',
-            stiffness: 300,
-            damping: 20
-          }}
         >
           <DialogHeader
             variant="pink"
@@ -250,18 +243,14 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
 
           <DialogBody className="space-y-4">
             {/* Encouragement - Dictionary focused */}
-            <m.p
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center text-neo-pink font-bold text-sm"
+            <p
+              className="text-center text-neo-pink font-bold text-sm animate-in fade-in-0 duration-300 slide-in-from-bottom-1"
             >
               {encouragementSentence}
-            </m.p>
+            </p>
             {/* Submitter Info */}
             {currentWord.submittedBy && (
-              <m.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+              <Reveal
                 className="flex flex-col items-center gap-1"
               >
                 <Avatar
@@ -271,15 +260,12 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 <span className="text-xs text-neo-white font-semibold">
                   {currentWord.submittedBy}
                 </span>
-              </m.div>
+              </Reveal>
             )}
 
             {/* Word Card - Cleaner, focused on the word */}
-            <m.div
+            <Reveal
               key={currentWord.word}
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 20 }}
               className="
                 bg-neo-lime
                 border-3 border-neo-black
@@ -313,14 +299,11 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   </p>
                 </div>
               )}
-            </m.div>
+            </Reveal>
 
             {/* Voting Buttons */}
             {!hasVoted ? (
-              <m.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+              <Reveal
                 className="flex gap-3 justify-center"
               >
                 {/* Thumbs Down */}
@@ -385,11 +368,10 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   <ThumbsUp className="w-5 h-5" />
                   <span>{t('wordFeedback.realWord')}</span>
                 </button>
-              </m.div>
+              </Reveal>
             ) : (
-              <m.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+              <Reveal
+                noSlide
                 className="text-center py-4"
               >
                 <span className="text-2xl font-black text-neo-pink flex items-center justify-center gap-2">
@@ -399,7 +381,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     : (t('wordFeedback.thankYou'))
                   }
                 </span>
-              </m.div>
+              </Reveal>
             )}
 
             {/* Timer Bar */}
@@ -430,7 +412,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               </div>
             </div>
           </DialogBody>
-        </m.div>
+        </Reveal>
       </DialogContent>
     </Dialog>
   );

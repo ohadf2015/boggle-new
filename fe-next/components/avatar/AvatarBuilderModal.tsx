@@ -8,6 +8,7 @@ import { AVATAR_CATEGORY_ICONS } from './AvatarCategoryIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { Reveal } from '@/components/ui/Reveal';
 import AvatarRenderer from './AvatarRenderer';
 import { getAvatarTier, type Tier } from './AvatarTierEffects';
 import AvatarEquipBurst from './AvatarEquipBurst';
@@ -198,14 +199,11 @@ export default function AvatarBuilderModal({
 
   return createPortal(
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 pb-[calc(1rem+min(var(--admob-banner-height,0px),120px)+min(var(--web-anchor-ad-height,0px),120px))] overflow-hidden" role="presentation" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}>
-      <AdaptiveMotion.div
-        ref={dialogRef}
+      <Reveal
+        ref={dialogRef as React.Ref<HTMLElement>}
         role="dialog"
         aria-modal="true"
         aria-labelledby="avatar-builder-title"
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className="bg-neo-navy border-3 border-black shadow-hard-lg rounded-neo-lg w-full max-w-[95vw] sm:max-w-xl md:max-w-2xl max-h-full flex flex-col min-h-0 [container-type:inline-size]"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
@@ -290,24 +288,23 @@ export default function AvatarBuilderModal({
           className="flex-1 overflow-y-auto p-3 sm:p-4 min-h-0"
           onMouseDown={(e) => { if (shouldSuppressPointerFocus(e.target)) e.preventDefault(); }}
         >
-          <AdaptiveAnimatePresence mode="wait">
-            <AdaptiveMotion.div
-              key={activeCategory}
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -16 }}
-              transition={{ duration: 0.12 }}
-            >
-              <CategoryOptions
-                category={activeCategory}
-                config={config}
-                updateConfig={updateConfig}
-                t={t}
-                premium={premium ?? undefined}
-                onCoinSpend={setCoinSpendAmount}
-              />
-            </AdaptiveMotion.div>
-          </AdaptiveAnimatePresence>
+          {/* Keyed CSS entrance (animate-in) instead of framer: a starved JS
+              loop would leave the options grid pinned at its invisible `initial`
+              state. Re-mounting on `key={activeCategory}` replays the CSS slide;
+              CSS runs off the main thread and always settles visible. */}
+          <div
+            key={activeCategory}
+            className="animate-in fade-in-0 slide-in-from-bottom-1 duration-200"
+          >
+            <CategoryOptions
+              category={activeCategory}
+              config={config}
+              updateConfig={updateConfig}
+              t={t}
+              premium={premium ?? undefined}
+              onCoinSpend={setCoinSpendAmount}
+            />
+          </div>
         </div>
 
         {/* Actions — single row, secondary icon-only on narrow */}
@@ -388,7 +385,7 @@ export default function AvatarBuilderModal({
           coinAmount={coinSpendAmount}
           onAnimationComplete={() => setCoinSpendAmount(null)}
         />
-      </AdaptiveMotion.div>
+      </Reveal>
     </div>,
     document.body
   );

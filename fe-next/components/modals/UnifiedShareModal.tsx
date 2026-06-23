@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
-import { m } from 'framer-motion';
+import { Reveal } from '@/components/ui/Reveal';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, MessageCircle, Trophy, Flame, Check, Target, Mail, MessageSquare } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
@@ -250,9 +250,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         <div className="p-4 space-y-4">
           {/* Post-game Stats Display - Enhanced Share Card */}
           {isPostGame && gameResult && (
-            <m.div
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+            <Reveal
               className="flex flex-col items-center gap-3"
             >
               {/* Witty Message */}
@@ -264,17 +262,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
               {/* Player Archetype Badge */}
               {gameResult.archetype && (
-                <m.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
+                <Reveal
+                  noSlide
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-cyan/50 bg-neo-cyan/20"
                 >
                   <span className="text-xl">{gameResult.archetype.emoji}</span>
                   <span className="text-sm font-bold text-neo-cyan">
                     {gameResult.archetype.name}
                   </span>
-                </m.div>
+                </Reveal>
               )}
 
               {/* Main Stats Row */}
@@ -329,10 +325,8 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 <div className="flex items-center justify-center gap-3 flex-wrap">
                   {/* Longest Word */}
                   {gameResult.longestWord && (
-                    <m.div
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.15 }}
+                    <Reveal
+                      noSlide
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-purple-500/50 bg-purple-500/20"
                     >
                       <span className="text-purple-300 text-xs font-bold uppercase">
@@ -341,14 +335,12 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                       <span className="text-white font-black text-sm uppercase">
                         {gameResult.longestWord}
                       </span>
-                    </m.div>
+                    </Reveal>
                   )}
                   {/* Achievements */}
                   {gameResult.achievements && gameResult.achievements.length > 0 && (
-                    <m.div
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.2 }}
+                    <Reveal
+                      noSlide
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 border-neo-lime/50 bg-neo-lime/20"
                     >
                       <span className="text-lg">
@@ -359,17 +351,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                           +{gameResult.achievements.length - 3}
                         </span>
                       )}
-                    </m.div>
+                    </Reveal>
                   )}
                 </div>
               )}
 
               {/* Placement Badge */}
               {gameResult.placement && gameResult.totalPlayers && gameResult.totalPlayers > 1 && (
-                <m.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.25 }}
+                <Reveal
+                  noSlide
                   className={cn(
                     'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2',
                     gameResult.placement === 1 ? 'border-yellow-500/50 bg-yellow-500/20' :
@@ -390,16 +380,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   <span className="text-gray-400 text-xs">
                     / {gameResult.totalPlayers}
                   </span>
-                </m.div>
+                </Reveal>
               )}
-            </m.div>
+            </Reveal>
           )}
 
           {/* QR Code - Hidden on mobile, visible on desktop */}
-          <m.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1 }}
+          <Reveal
+            noSlide
             className="hidden sm:flex flex-col items-center"
           >
             <p className="text-xs font-bold text-white uppercase tracking-wide mb-2">
@@ -417,13 +405,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 includeMargin={false}
               />
             </div>
-          </m.div>
+          </Reveal>
 
           {/* Room Code Display */}
-          <m.div
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+          <Reveal
             className="flex items-center justify-center gap-2"
           >
             <div className="bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm">
@@ -442,24 +427,19 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             >
               {copied ? <Check className="w-4 h-4 text-neo-black" /> : <Copy className="w-4 h-4 text-neo-black" />}
             </button>
-          </m.div>
+          </Reveal>
 
           {/* Simplified Share Options - Only Copy + WhatsApp */}
-          <m.div
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
+          <Reveal
             className="space-y-3"
           >
             {/* Primary: Copy Link - Full Width */}
-            <m.button
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.35 }}
+            <button
               onClick={handleCopyLink}
               disabled={isLoading}
               aria-label={copied ? t('share.linkCopied') : t('share.copyLink')}
               className={cn(
+                'animate-in fade-in-0 duration-300',
                 'w-full flex items-center justify-center gap-2 p-4 rounded-neo',
                 'border-4 border-neo-black shadow-hard-lg',
                 'hover:shadow-hard-xl hover:-translate-y-1 active:shadow-hard-sm active:translate-y-0',
@@ -478,16 +458,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 <Copy className="w-5 h-5" />
               )}
               <span>{copied ? t('share.linkCopied') : t('share.copyLink')}</span>
-            </m.button>
+            </button>
 
             {/* Secondary: WhatsApp - Full Width */}
-            <m.button
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.4 }}
+            <button
               onClick={handleWhatsApp}
               aria-label={t('share.whatsapp')}
               className={cn(
+                'animate-in fade-in-0 duration-300',
                 'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
                 'border-2 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
@@ -499,17 +477,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             >
               <MessageCircle className="w-5 h-5" />
               <span>{t('share.whatsapp')}</span>
-            </m.button>
+            </button>
 
             {/* More Platforms Toggle */}
-            <m.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.42 }}
+            <button
               onClick={() => setShowMorePlatforms(!showMorePlatforms)}
               aria-expanded={showMorePlatforms}
               aria-controls="more-platforms"
               className={cn(
+                'animate-in fade-in-0 duration-300',
                 'w-full flex items-center justify-center gap-1.5 py-2 rounded-neo',
                 'text-white hover:text-white transition-colors',
                 'font-medium text-xs uppercase tracking-wide',
@@ -525,26 +501,21 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
-            </m.button>
+            </button>
 
             {/* Additional Share Platforms */}
             {showMorePlatforms && (
-              <m.div
+              <Reveal
+                noSlide
                 id="more-platforms"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
                 className="grid grid-cols-2 gap-2"
               >
                 {/* Twitter/X */}
-                <m.button
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.05 }}
+                <button
                   onClick={handleTwitter}
                   aria-label={t('share.twitter')}
                   className={cn(
+                    'animate-in fade-in-0 duration-300',
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
                     'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
@@ -558,16 +529,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                   <span>{t('share.twitter')}</span>
-                </m.button>
+                </button>
 
                 {/* Discord */}
-                <m.button
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
+                <button
                   onClick={handleDiscord}
                   aria-label={t('share.discord')}
                   className={cn(
+                    'animate-in fade-in-0 duration-300',
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
                     'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
@@ -579,16 +548,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>{t('share.discord')}</span>
-                </m.button>
+                </button>
 
                 {/* Email */}
-                <m.button
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.15 }}
+                <button
                   onClick={handleEmail}
                   aria-label={t('share.email')}
                   className={cn(
+                    'animate-in fade-in-0 duration-300',
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
                     'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
@@ -600,17 +567,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 >
                   <Mail className="w-4 h-4" />
                   <span>{t('share.email')}</span>
-                </m.button>
+                </button>
 
                 {/* SMS - Mobile Only */}
                 {isMobile && (
-                  <m.button
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
+                  <button
                     onClick={handleSms}
                     aria-label={t('share.sms')}
                     className={cn(
+                      'animate-in fade-in-0 duration-300',
                       'flex items-center justify-center gap-2 p-3 rounded-neo',
                       'border-2 border-neo-black shadow-hard-sm',
                       'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
@@ -622,21 +587,19 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   >
                     <MessageCircle className="w-4 h-4" />
                     <span>{t('share.sms')}</span>
-                  </m.button>
+                  </button>
                 )}
-              </m.div>
+              </Reveal>
             )}
 
             {/* Challenge a Friend (Post-game only, when challenge data is available) */}
             {isPostGame && challengeData && (
-              <m.button
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.42 }}
+              <button
                 onClick={handleCreateChallenge}
                 disabled={isCreatingChallenge}
                 aria-label={t('challenge.challengeFriend')}
                 className={cn(
+                  'animate-in fade-in-0 duration-300',
                   'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-neo-black shadow-hard-sm',
                   'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
@@ -659,18 +622,16 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     ? t('share.linkCopied')
                     : t('challenge.challengeFriend')}
                 </span>
-              </m.button>
+              </button>
             )}
 
             {/* Native Share (Mobile Only) */}
             {canNativeShare && (
-              <m.button
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.45 }}
+              <button
                 onClick={handleNativeShare}
                 aria-label={t('share.more')}
                 className={cn(
+                  'animate-in fade-in-0 duration-300',
                   'w-full sm:hidden flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-white/30 shadow-hard-sm',
                   'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
@@ -680,9 +641,9 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 )}
               >
                 <span>{t('share.more')}</span>
-              </m.button>
+              </button>
             )}
-          </m.div>
+          </Reveal>
         </div>
       </DialogContent>
     </Dialog>

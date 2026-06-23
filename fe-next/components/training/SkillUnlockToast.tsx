@@ -7,6 +7,7 @@ import { Check, MoveUpRight, RotateCw, Target, Trophy, Sparkles } from 'lucide-r
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { Reveal } from '@/components/ui/Reveal';
 import type { TrainingSkillId } from './TrainingProgressBar';
 
 interface SkillConfig {
@@ -113,12 +114,9 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
   return createPortal(
     <AnimatePresence>
       {skillId && (
-        <m.div
+        <Reveal
+          noSlide
           key={`skill-unlock-${skillId}`}
-          initial={{ opacity: 0, y: -50, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -30, scale: 0.9 }}
-          transition={{ type: 'spring', damping: 15, stiffness: 300 }}
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
         >
           <m.div
@@ -132,17 +130,15 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             {/* Icon with color background */}
-            <m.div
+            <Reveal
+              noSlide
               className={cn(
                 'flex items-center justify-center w-8 h-8 rounded-lg',
                 config.bgColor
               )}
-              initial={{ rotate: -180, scale: 0 }}
-              animate={{ rotate: 0, scale: 1 }}
-              transition={{ type: 'spring', damping: 10, delay: 0.1 }}
             >
               <Check className="w-5 h-5 text-white" />
-            </m.div>
+            </Reveal>
 
             {/* Text */}
             <div className="flex flex-col">
@@ -165,7 +161,7 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
               transition={{ duration: duration / 1000, ease: 'linear' }}
             />
           </m.div>
-        </m.div>
+        </Reveal>
       )}
     </AnimatePresence>,
     document.body
