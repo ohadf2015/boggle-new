@@ -20,8 +20,8 @@ describe('player style registry', () => {
     expect(def.key).toBe('default');
   });
 
-  it('exposes 12 genres + default = 13 styles, keys match record', () => {
-    expect(STYLE_KEYS).toHaveLength(13);
+  it('exposes 13 genres + default = 14 styles, keys match record', () => {
+    expect(STYLE_KEYS).toHaveLength(14);
     expect(STYLE_KEYS[0]).toBe('default'); // default leads the picker
     for (const key of STYLE_KEYS) {
       expect(STYLES[key].key).toBe(key);

@@ -100,12 +100,12 @@ export function LobbyDailyEmber({ className }: Props) {
         <span>{label}</span>
       </button>
 
-      <div
+      {open && (
+        <div
           id={popoverId}
           role="dialog"
           aria-label={t('lobbyDailyEmber.popoverTitle')}
           data-testid="lobby-daily-ember-popover"
-          hidden={!open}
           className="absolute z-30 mt-2 w-60 rounded-neo border-3 border-neo-black bg-neo-navy-light p-3 shadow-hard-lg start-0"
         >
           <div className="flex items-start justify-between gap-2">
@@ -135,6 +135,7 @@ export function LobbyDailyEmber({ className }: Props) {
             {t('lobbyDailyEmber.gotIt')}
           </button>
         </div>
+      )}
     </div>
   );
 }

@@ -40,6 +40,7 @@ export const STYLE_AVATAR_HINTS: Partial<Record<PlayerStyleKey, AvatarHint>> = {
   latin: { accessory: 'sombrero', eyes: 'happy', mouth: 'grin' },
   reggae: { accessory: 'beanie', hair: 'dreads', facialHair: 'goatee', eyes: 'relaxed', mouth: 'smile' },
   japanese: { accessory: 'samurai', hair: 'himecut', bodyStyle: 'turtleneck', eyes: 'focused', mouth: 'closedSmile' },
+  k_pop: { accessory: 'headphones', hair: 'vaporwave', bodyStyle: 'hoodie', eyes: 'star', mouth: 'smile' },
   desert_epic: { accessory: 'turban', facialHair: 'fullBeard', eyes: 'determined', mouth: 'flat' },
   fanfare: { accessory: 'partyHat', eyes: 'star', mouth: 'grin' },
 };

@@ -25,7 +25,7 @@ vi.mock('@/hooks/useCrosswordGame', () => ({
     nextSlot: vi.fn(), focusSlot: vi.fn(), reset: vi.fn(),
   }),
 }));
-vi.mock('@/lib/crossword/stats', () => ({ crosswordStats: () => ({ percent: 25, wordsSolved: 1, wordsTotal: 4, totalCells: 20, filledCells: 5, correctCells: 5 }) }));
+vi.mock('@/lib/crossword/stats', () => ({ crosswordStats: () => ({ percent: 25, wordsSolved: 1, wordsTotal: 4, totalCells: 20, filledCells: 5, correctCells: 5 }), solvedSlotIds: () => [] }));
 vi.mock('@/lib/solo/soloReward', () => ({ crosswordScore: () => 30 }));
 // Stub heavy daemon components so this stays a unit test of the wrapper.
 vi.mock('@/components/crossword/CrosswordGrid', () => ({ CrosswordGrid: () => <div data-testid="grid" /> }));

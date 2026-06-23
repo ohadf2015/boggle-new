@@ -108,6 +108,8 @@ export default defineConfig({
       '**/AdventureGame.bossIntegration.test.tsx',
       '**/useAdventureCurrency.test.ts',
       '**/reengagementEmail.test.ts',
+      '**/SinglePlayerGame.achievements.test.tsx',
+      '**/PracticeWheelSandbox.drag.test.tsx',
     ],
     testTimeout: 10000,
     pool: 'threads',

@@ -13,11 +13,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockVariant = vi.fn<() => string>(() => 'wheel-first');
 const mockTrackExposure = vi.fn();
+const mockTrackHintExposure = vi.fn();
 
 vi.mock('@/hooks/useExperiment', () => ({
   useExperiment: (key: string) => ({
     variant: mockVariant(),
-    trackExposure: mockTrackExposure,
+    trackExposure: key === 'wordhunt-crosspromo-position' ? mockTrackExposure : mockTrackHintExposure,
     _key: key,
   }),
 }));

@@ -91,6 +91,10 @@ export interface WaveConfig {
   fuseEnabled: boolean;
   /** Whether anchor (long-word bonus) tiles can appear (unlocks wave 8 alongside catalyst) */
   anchorEnabled: boolean;
+  /** Whether locked tiles can appear (requires matching key tile within distance 3; unlocks wave 11) */
+  lockedEnabled?: boolean;
+  /** Whether key tiles can appear (pairs with locked; unlocks wave 11) */
+  keyEnabled?: boolean;
   /** Number of moves allowed per wave */
   movesAllowed: number;
 }
@@ -238,7 +242,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
-    anchorEnabled: true,
+    anchorEnabled: true, lockedEnabled: true, keyEnabled: true,
     movesAllowed: 6,
   },
   // Wave 12+ — master tier (full revival inheritance)
@@ -250,7 +254,7 @@ const WAVE_TABLE: WaveConfig[] = [
     gemEnabled: true, prismEnabled: true, frostEnabled: true, frozenEnabled: true,
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
-    anchorEnabled: true,
+    anchorEnabled: true, lockedEnabled: true, keyEnabled: true,
     movesAllowed: 6,
   },
 ];
@@ -489,6 +493,10 @@ export const CRYSTAL_SHARE = 0.06;
 export const FUSE_SHARE = 0.08;
 /** Anchor share when enabled (revival 2× boost — was 0.04; long-word reward). */
 export const ANCHOR_SHARE = 0.08;
+/** Locked tile share when enabled (paired with key; unlocks wave 11). */
+export const LOCKED_SHARE = 0.06;
+/** Key tile share when enabled (unlocks paired locked tiles; unlocks wave 11). */
+export const KEY_SHARE = 0.06;
 
 /**
  * CURATED PERMANENT ROSTER (clarity pass, 2026-06).
@@ -526,7 +534,6 @@ export const BLAST_RETIRED_SPECIAL_TYPES: ReadonlySet<BlastTileType> = new Set<B
   'catalyst',
   'crystal',
   'fuse',
-  'anchor',
   // "Locked tiles" removal (2026-06-13): frozen renders an un-thawed frost
   // "locked" overlay (derived via cellFilter) that confused players, so it stays
   // retired. ICE is kept — it now spawns and is directly selectable/meltable (no
@@ -554,6 +561,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     diamondEnabled,
     countdownEnabled, shuffleEnabled, magmaEnabled, portalEnabled, catalystEnabled,
     crystalEnabled, fuseEnabled, anchorEnabled,
+    lockedEnabled, keyEnabled,
   } = config;
 
   // Effective flags (support deprecated field aliases)
@@ -580,6 +588,8 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   let crystal = 0;
   let fuse = 0;
   let anchor = 0;
+  let locked = 0;
+  let key = 0;
 
   // Helper: take a share proportionally from gold + rainbow.
   // Floor of 0.10 combined preserves the workhorse score economy
@@ -668,6 +678,16 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(ANCHOR_SHARE);
   }
 
+  if (lockedEnabled) {
+    locked = LOCKED_SHARE;
+    takeShare(LOCKED_SHARE);
+  }
+
+  if (keyEnabled) {
+    key = KEY_SHARE;
+    takeShare(KEY_SHARE);
+  }
+
   const raw: Record<string, number> = {
     gold: Math.max(0, gold),
     bomb: BOMB_BASE,
@@ -690,6 +710,8 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     crystal,
     fuse,
     anchor,
+    locked,
+    key,
   };
 
   // Curation: zero every retired type before normalization so the freed weight

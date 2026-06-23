@@ -6,7 +6,7 @@
 
 // ==================== Tile Type ====================
 
-/** All possible blast mode tile types (standard + 20 special) */
+/** All possible blast mode tile types (standard + 22 special) */
 export type BlastTileType =
   | 'standard'
   | 'gold'
@@ -28,7 +28,9 @@ export type BlastTileType =
   | 'fuse'
   | 'anchor'
   | 'chocolate'
-  | 'cake';
+  | 'cake'
+  | 'locked'
+  | 'key';
 
 /** Runtime-iterable list of all blast tile types (mirrors BlastTileType union) */
 export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
@@ -53,6 +55,8 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'anchor',
   'chocolate',
   'cake',
+  'locked',
+  'key',
 ] as const;
 
 // ==================== Combo Type ====================
