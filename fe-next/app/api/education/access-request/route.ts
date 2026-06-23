@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { sendEmail } from '@/lib/email/send';
 import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdminNotify';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
@@ -46,9 +47,9 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const sb = await createClient();
-  const { data: { user } } = await sb.auth.getUser();
+  const user = await getAuthedUser(request);
   if (!user) return NextResponse.json({ row: null });
   const { data } = await sb.from('teacher_access_requests')
     .select('*').eq('user_id', user.id)
