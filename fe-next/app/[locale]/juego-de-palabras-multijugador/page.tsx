@@ -27,12 +27,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/es/juego-de-palabras-multijugador`;
 
   return {
-    title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
-    description: 'Alternativa gratuita a Scrabble online en español — hasta 50 jugadores en tiempo real, sin registro ni descarga. ¡Crea sala en segundos y juega ahora!',
+    title: 'Scrabble Online en Español Gratis — 50 Jugadores | LexiClash',
+    description: 'Juega Scrabble online gratis en español con hasta 50 jugadores en tiempo real. Sin registro, sin descarga — sala lista en 10 s. ¡Empieza ahora!',
     keywords: 'jugar scrabble en español online gratis, scrabble en español online gratis, scrabble online español, cruzaletras online, apalabrados online gratis, scrabble en linea, scrabble en línea español, jugar scrabble online en español, alternativa a scrabble online español multijugador, juego como scrabble online en español gratis, alternativa scrabble multijugador online, scrabble online en español multijugador, jugar scrabble gratis multijugador, juegos de palabras online multijugador, juego de palabras multijugador, boggle online en español, juego de palabras online gratis, batalla de palabras tiempo real, juegos de letras online',
     openGraph: {
-      title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
-      description: 'Juega Scrabble online en español con amigos en tiempo real. Sin registro ni descarga — sala lista en 10 s. ¡Empieza gratis!',
+      title: 'Scrabble Online en Español Gratis — 50 Jugadores | LexiClash',
+      description: 'Juega Scrabble online en español con hasta 50 jugadores en tiempo real. Sin registro, sin descarga — sala lista en 10 s. ¡Empieza gratis!',
       locale: 'es_ES',
       type: 'website',
       url: pageUrl,
@@ -47,8 +47,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
-      description: 'Juega Scrabble online en español con amigos en tiempo real. Sin registro ni descarga — sala lista en 10 s. ¡Empieza gratis!',
+      title: 'Scrabble Online en Español Gratis — 50 Jugadores | LexiClash',
+      description: 'Juega Scrabble online en español con hasta 50 jugadores en tiempo real. Sin registro, sin descarga — sala lista en 10 s. ¡Empieza gratis!',
       images: [`${BASE_URL}/og-image-es-multiplayer.webp`],
     },
     alternates: {
