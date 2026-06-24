@@ -9,6 +9,8 @@ const LAYOUTS: Partial<Record<PuzzleLocale, string[]>> = {
   // Spanish keyboard = QWERTY + ñ. Grids are accent-folded (see answer.foldEsAccents) so no
   // accented vowel keys are needed; ñ is a distinct letter and must be typeable.
   es: ['qwertyuiop', 'asdfghjklñ', 'zxcvbnm'],
+  // Swedish keyboard = QWERTY + å/ä/ö (distinct Swedish letters, appended to the home/top rows).
+  sv: ['qwertyuiopå', 'asdfghjklöä', 'zxcvbnm'],
 };
 
 export interface CrosswordKeyboardProps {

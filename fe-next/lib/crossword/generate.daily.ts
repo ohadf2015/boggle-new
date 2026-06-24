@@ -25,16 +25,17 @@ export function dailyDifficulty(dateISO: string): Difficulty {
 }
 
 /**
- * Locale → clue-bank to fill from. he → Hebrew bank, es → Spanish bank (accent-folded keys, 4×4),
+ * Locale → clue-bank to fill from. he → Hebrew, es → Spanish (accent-folded keys), sv → Swedish,
  * everything else → en. es fills only because its keys are accent-folded (Spanish crosswords omit
- * grid diacritics; see answer.foldEsAccents) — without folding, accented/unaccented letters can't
- * cross and the sparse 3-letter pool can't fill a 4×4. sv stays on en (å/ä/ö are distinct letters,
- * bank too sparse — kept as a dormant dictionary). See the spec.
+ * grid diacritics; see answer.foldEsAccents). sv keeps å/ä/ö (distinct Swedish letters) and fills
+ * with a dense-enough 3-letter pool. All three use the 4×4 mini (their banks are too thin for a
+ * doubly-checked 5×5). See the spec.
  */
-type GenLocale = 'en' | 'he' | 'es';
+type GenLocale = 'en' | 'he' | 'es' | 'sv';
 function genLocaleFor(locale: PuzzleLocale): GenLocale {
   if (locale === 'he') return 'he';
   if (locale === 'es') return 'es';
+  if (locale === 'sv') return 'sv';
   return 'en';
 }
 
@@ -48,7 +49,9 @@ async function loadClues(gen: GenLocale): Promise<ClueMap> {
     ? import('./data/clueBank.he.json')
     : gen === 'es'
       ? import('./data/clueBank.es.json')
-      : import('./data/clueBank.en.json'));
+      : gen === 'sv'
+        ? import('./data/clueBank.sv.json')
+        : import('./data/clueBank.en.json'));
   const clues = ((mod as { default?: unknown }).default ?? mod) as unknown as ClueMap;
   clueCache.set(gen, clues);
   return clues;

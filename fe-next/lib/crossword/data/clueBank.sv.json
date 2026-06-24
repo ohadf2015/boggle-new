@@ -634,5 +634,1841 @@
   "arnouxity": {
     "clue": "Björn Francia kvalitet",
     "score": 80
+  },
+  "dig": {
+    "clue": "Pronomen för mottagare",
+    "score": 90
+  },
+  "hon": {
+    "clue": "Ordet när man talar om en kvinna",
+    "score": 90
+  },
+  "vad": {
+    "clue": "Sakfråga eller spelinsats",
+    "score": 90
+  },
+  "fly": {
+    "clue": "Rymma undan",
+    "score": 90
+  },
+  "ren": {
+    "clue": "Nordens djur med horn",
+    "score": 90
+  },
+  "fru": {
+    "clue": "Äkta gemål",
+    "score": 90
+  },
+  "dog": {
+    "clue": "Upphörde att leva",
+    "score": 90
+  },
+  "sex": {
+    "clue": "Dubbel av tre",
+    "score": 90
+  },
+  "fri": {
+    "clue": "Inte bunden eller fängslad",
+    "score": 90
+  },
+  "båt": {
+    "clue": "Farkost på vatten",
+    "score": 90
+  },
+  "tag": {
+    "clue": "Håll eller grepp",
+    "score": 90
+  },
+  "mor": {
+    "clue": "Kvinnlig förälder",
+    "score": 90
+  },
+  "väg": {
+    "clue": "Färdlinje mellan två platser",
+    "score": 90
+  },
+  "hos": {
+    "clue": "Tillsammans med",
+    "score": 90
+  },
+  "ben": {
+    "clue": "Kroppsdel under knäet",
+    "score": 90
+  },
+  "max": {
+    "clue": "Högsta gräns",
+    "score": 90
+  },
+  "dök": {
+    "clue": "Kastade sig i vattnet",
+    "score": 90
+  },
+  "mat": {
+    "clue": "Näring man äter",
+    "score": 90
+  },
+  "rör": {
+    "clue": "Genomföring för vattnets väg",
+    "score": 90
+  },
+  "tro": {
+    "clue": "Innerlig övertygelse",
+    "score": 90
+  },
+  "sen": {
+    "clue": "Inte på tid",
+    "score": 90
+  },
+  "säg": {
+    "clue": "Uttryck med ord",
+    "score": 90
+  },
+  "era": {
+    "clue": "Din eller hans",
+    "score": 90
+  },
+  "sju": {
+    "clue": "Dagar i en vecka",
+    "score": 90
+  },
+  "ska": {
+    "clue": "Uttrycker framtida handling",
+    "score": 90
+  },
+  "dum": {
+    "clue": "Motsats till klok",
+    "score": 90
+  },
+  "död": {
+    "clue": "Livets ände",
+    "score": 90
+  },
+  "par": {
+    "clue": "Två som älskar varandra",
+    "score": 90
+  },
+  "två": {
+    "clue": "Par av något",
+    "score": 90
+  },
+  "öga": {
+    "clue": "Sinne för att se",
+    "score": 90
+  },
+  "sam": {
+    "clue": "Badade förr",
+    "score": 90
+  },
+  "kul": {
+    "clue": "Roligt och underhållande",
+    "score": 90
+  },
+  "tio": {
+    "clue": "Fingrar eller tår tillsammans",
+    "score": 90
+  },
+  "nån": {
+    "clue": "Obestämd person",
+    "score": 90
+  },
+  "dag": {
+    "clue": "Soluppgång till solnedgång",
+    "score": 90
+  },
+  "ens": {
+    "clue": "Inte ___ då",
+    "score": 90
+  },
+  "oss": {
+    "clue": "Vi när vi är många",
+    "score": 90
+  },
+  "del": {
+    "clue": "Portion av något större",
+    "score": 90
+  },
+  "hej": {
+    "clue": "Hälsning vid möte",
+    "score": 90
+  },
+  "bär": {
+    "clue": "Frukt från växt med frön",
+    "score": 90
+  },
+  "nio": {
+    "clue": "Tre gånger tre",
+    "score": 90
+  },
+  "vem": {
+    "clue": "Pronomen vid fråga om person",
+    "score": 90
+  },
+  "lag": {
+    "clue": "Statens regel",
+    "score": 90
+  },
+  "hem": {
+    "clue": "Där man bor",
+    "score": 90
+  },
+  "ord": {
+    "clue": "Enhet av språk",
+    "score": 90
+  },
+  "liv": {
+    "clue": "Från födelse till död",
+    "score": 90
+  },
+  "råd": {
+    "clue": "Gott tips eller vägledning",
+    "score": 90
+  },
+  "wow": {
+    "clue": "Uttryck för häpnad",
+    "score": 90
+  },
+  "hel": {
+    "clue": "Utan sprucka eller lucka",
+    "score": 90
+  },
+  "bra": {
+    "clue": "Motsats till dåligt",
+    "score": 90
+  },
+  "tre": {
+    "clue": "Två plus ett",
+    "score": 90
+  },
+  "nya": {
+    "clue": "Motsatsen till gamla",
+    "score": 90
+  },
+  "nåd": {
+    "clue": "Överordnads förlåtelse",
+    "score": 90
+  },
+  "lik": {
+    "clue": "Nästan detsamma",
+    "score": 90
+  },
+  "dra": {
+    "clue": "Förflytta med kraft bakåt",
+    "score": 90
+  },
+  "fan": {
+    "clue": "Överjordisk motståndare i många religioner",
+    "score": 90
+  },
+  "gav": {
+    "clue": "Skänkte bort",
+    "score": 90
+  },
+  "hur": {
+    "clue": "Frågande ord om sätt",
+    "score": 90
+  },
+  "bli": {
+    "clue": "Förändras och utvecklas",
+    "score": 90
+  },
+  "ned": {
+    "clue": "Motsatsen till upp",
+    "score": 90
+  },
+  "arg": {
+    "clue": "Långt från lugn",
+    "score": 90
+  },
+  "vän": {
+    "clue": "Person man håller av och delar med",
+    "score": 90
+  },
+  "tom": {
+    "clue": "Utan innehål",
+    "score": 90
+  },
+  "tog": {
+    "clue": "Greppad tidigare",
+    "score": 90
+  },
+  "såg": {
+    "clue": "Verktyg för träsnitt",
+    "score": 90
+  },
+  "min": {
+    "clue": "Sextiondel av timme",
+    "score": 90
+  },
+  "lät": {
+    "clue": "Gav tillåtelse eller verkade",
+    "score": 90
+  },
+  "ske": {
+    "clue": "Äga rum",
+    "score": 90
+  },
+  "sov": {
+    "clue": "Vilade under natten",
+    "score": 90
+  },
+  "låg": {
+    "clue": "Motsatsen till högt",
+    "score": 90
+  },
+  "far": {
+    "clue": "Pojkens eller flickans manlige förälder",
+    "score": 90
+  },
+  "blå": {
+    "clue": "Himmelens färg",
+    "score": 90
+  },
+  "bok": {
+    "clue": "Läsmaterial mellan pärmar",
+    "score": 90
+  },
+  "kär": {
+    "clue": "Älskvärd eller förälskad",
+    "score": 90
+  },
+  "sån": {
+    "clue": "Den slaget, den arten",
+    "score": 90
+  },
+  "rum": {
+    "clue": "Hotellövernattning",
+    "score": 90
+  },
+  "bor": {
+    "clue": "Kemiskt grundämne, ljust och sprött",
+    "score": 90
+  },
+  "ära": {
+    "clue": "Beröm och ryktbarhet",
+    "score": 90
+  },
+  "per": {
+    "clue": "Motsvarar varje enhet",
+    "score": 90
+  },
+  "fel": {
+    "clue": "Inte rätt",
+    "score": 90
+  },
+  "val": {
+    "clue": "Världens största djur",
+    "score": 90
+  },
+  "eld": {
+    "clue": "Värmande ljus och värme",
+    "score": 90
+  },
+  "god": {
+    "clue": "Motsats till dålig",
+    "score": 90
+  },
+  "jul": {
+    "clue": "Årets största festhelg",
+    "score": 90
+  },
+  "kom": {
+    "clue": "Dök upp före",
+    "score": 90
+  },
+  "upp": {
+    "clue": "Motsats till ned",
+    "score": 90
+  },
+  "vet": {
+    "clue": "Är förvissad om något",
+    "score": 90
+  },
+  "hög": {
+    "clue": "Når långt från marken",
+    "score": 90
+  },
+  "typ": {
+    "clue": "Slag eller sort",
+    "score": 90
+  },
+  "sak": {
+    "clue": "Angelägenhet eller föremål",
+    "score": 90
+  },
+  "hår": {
+    "clue": "Håll på huvudet",
+    "score": 90
+  },
+  "dit": {
+    "clue": "Till det stället",
+    "score": 90
+  },
+  "bad": {
+    "clue": "Simning i havet eller bassäng",
+    "score": 90
+  },
+  "kör": {
+    "clue": "Sånggrupp med många röster",
+    "score": 90
+  },
+  "son": {
+    "clue": "Mans avkomma",
+    "score": 90
+  },
+  "bar": {
+    "clue": "Avtäckt, utan klädsel",
+    "score": 90
+  },
+  "fem": {
+    "clue": "Talföljd mellan fyra och sex",
+    "score": 90
+  },
+  "all": {
+    "clue": "Träd som växer vid vattnet",
+    "score": 90
+  },
+  "tur": {
+    "clue": "Resa genom byggnader eller landskap",
+    "score": 90
+  },
+  "din": {
+    "clue": "Pronomen för dig",
+    "score": 90
+  },
+  "man": {
+    "clue": "Hustrus äkta make",
+    "score": 90
+  },
+  "tja": {
+    "clue": "Tvivlande hälsning",
+    "score": 90
+  },
+  "gud": {
+    "clue": "Överväsen från mytologin",
+    "score": 90
+  },
+  "hit": {
+    "clue": "Riktning mot denna plats",
+    "score": 90
+  },
+  "ner": {
+    "clue": "Motsatsen till upp",
+    "score": 90
+  },
+  "söt": {
+    "clue": "Behaglig smak eller charmig",
+    "score": 90
+  },
+  "ses": {
+    "clue": "Att vara synlig eller framträda",
+    "score": 90
+  },
+  "vår": {
+    "clue": "Årets gröna säsong",
+    "score": 90
+  },
+  "vid": {
+    "clue": "Nära något eller någon",
+    "score": 90
+  },
+  "ung": {
+    "clue": "I början av livet",
+    "score": 90
+  },
+  "nåt": {
+    "clue": "Skåra i ytan",
+    "score": 90
+  },
+  "tal": {
+    "clue": "Siffra eller matematiskt värde",
+    "score": 90
+  },
+  "vin": {
+    "clue": "Druvornas festlig frukt",
+    "score": 90
+  },
+  "tid": {
+    "clue": "Vad klockan visar",
+    "score": 90
+  },
+  "nog": {
+    "clue": "Räcker eller ungefär",
+    "score": 90
+  },
+  "ert": {
+    "clue": "Possessivt pronomen, neutrum",
+    "score": 90
+  },
+  "väl": {
+    "clue": "I god ordning, på rätt sätt",
+    "score": 90
+  },
+  "stå": {
+    "clue": "Befinna sig på en plats",
+    "score": 90
+  },
+  "bit": {
+    "clue": "Liten del av något",
+    "score": 90
+  },
+  "bil": {
+    "clue": "Motoriserad vägtransport",
+    "score": 90
+  },
+  "mot": {
+    "clue": "Vägar möts här",
+    "score": 90
+  },
+  "sin": {
+    "clue": "Torrläggning, uttorkad mark",
+    "score": 90
+  },
+  "där": {
+    "clue": "Inte här utan",
+    "score": 90
+  },
+  "ont": {
+    "clue": "Smärta eller värkande känning",
+    "score": 90
+  },
+  "får": {
+    "clue": "Ullbärande bondgård djur",
+    "score": 90
+  },
+  "fin": {
+    "clue": "Vacker och tilltalande",
+    "score": 90
+  },
+  "slå": {
+    "clue": "Att träffa eller hamra",
+    "score": 90
+  },
+  "hus": {
+    "clue": "Byggnad där man bor",
+    "score": 90
+  },
+  "låt": {
+    "clue": "Musikstycke",
+    "score": 90
+  },
+  "ers": {
+    "clue": "Gammalt ord för \"din\" eller \"er\"",
+    "score": 90
+  },
+  "ute": {
+    "clue": "Motsatsen till inne",
+    "score": 90
+  },
+  "dem": {
+    "clue": "Tredje person i objektsform",
+    "score": 90
+  },
+  "mig": {
+    "clue": "Självet i objektform",
+    "score": 90
+  },
+  "när": {
+    "clue": "Vid vilket tillfälle",
+    "score": 90
+  },
+  "knä": {
+    "clue": "Benets böjled",
+    "score": 90
+  },
+  "ägg": {
+    "clue": "Hönas produkt",
+    "score": 90
+  },
+  "inte": {
+    "clue": "Motsats till ja",
+    "score": 90
+  },
+  "igen": {
+    "clue": "Gjort eller händer på nytt",
+    "score": 90
+  },
+  "ost": {
+    "clue": "Smörgårdsmat av mjölk",
+    "score": 90
+  },
+  "lön": {
+    "clue": "Månadlig ersättning för arbete",
+    "score": 90
+  },
+  "men": {
+    "clue": "Dock eller ändå",
+    "score": 90
+  },
+  "lex": {
+    "clue": "Förordning på latin",
+    "score": 90
+  },
+  "över": {
+    "clue": "Högre än",
+    "score": 90
+  },
+  "utan": {
+    "clue": "Motsatsen till med",
+    "score": 90
+  },
+  "lås": {
+    "clue": "Dörrarnas säkerhet",
+    "score": 90
+  },
+  "mitt": {
+    "clue": "Mellan två ändar",
+    "score": 90
+  },
+  "dam": {
+    "clue": "Förnäm kvinnlig väsen",
+    "score": 90
+  },
+  "sår": {
+    "clue": "Skada på huden",
+    "score": 90
+  },
+  "röv": {
+    "clue": "Kroppsdel man sitter på",
+    "score": 90
+  },
+  "rad": {
+    "clue": "Horisontell linje i text",
+    "score": 90
+  },
+  "rök": {
+    "clue": "Vit ånga från eld",
+    "score": 90
+  },
+  "mil": {
+    "clue": "Skandinaviskt längdmått motsvarande tio kilometer",
+    "score": 90
+  },
+  "dna": {
+    "clue": "Genetisk arvsmassa",
+    "score": 90
+  },
+  "sur": {
+    "clue": "Bitter i smaken",
+    "score": 90
+  },
+  "åkt": {
+    "clue": "Rest med fordon",
+    "score": 90
+  },
+  "allt": {
+    "clue": "Helhet utan undantag",
+    "score": 90
+  },
+  "mun": {
+    "clue": "Öppning för mat och ord",
+    "score": 90
+  },
+  "hade": {
+    "clue": "Ägde då",
+    "score": 90
+  },
+  "syn": {
+    "clue": "Möjlighet att skåda",
+    "score": 90
+  },
+  "lov": {
+    "clue": "Tillåtelse från överordnad",
+    "score": 90
+  },
+  "ler": {
+    "clue": "Finmaterial för keramik",
+    "score": 90
+  },
+  "bak": {
+    "clue": "Motsatt sida från fram",
+    "score": 90
+  },
+  "rom": {
+    "clue": "Fiskens ägg under lekperioden",
+    "score": 90
+  },
+  "fet": {
+    "clue": "Innehåller mycket smör",
+    "score": 90
+  },
+  "klä": {
+    "clue": "Försörj med textil",
+    "score": 90
+  },
+  "gick": {
+    "clue": "Förflyttade sig till fots",
+    "score": 90
+  },
+  "ron": {
+    "clue": "Lugn och frid",
+    "score": 90
+  },
+  "lek": {
+    "clue": "Barnets favoritsyssla",
+    "score": 90
+  },
+  "han": {
+    "clue": "Maskulint pronomen",
+    "score": 90
+  },
+  "tas": {
+    "clue": "Passiv form av verbet",
+    "score": 90
+  },
+  "mej": {
+    "clue": "Jag själv, folkligt talat",
+    "score": 90
+  },
+  "dej": {
+    "clue": "Informell form av dig",
+    "score": 90
+  },
+  "los": {
+    "clue": "Liten höjd i terrängen",
+    "score": 90
+  },
+  "byn": {
+    "clue": "Liten tätort på landsbygden",
+    "score": 90
+  },
+  "kod": {
+    "clue": "Hemligt skriftsystem",
+    "score": 90
+  },
+  "bara": {
+    "clue": "Endast, inget mer",
+    "score": 90
+  },
+  "alla": {
+    "clue": "Hela folket, ingen undantagen",
+    "score": 90
+  },
+  "jag": {
+    "clue": "Första personspronomen",
+    "score": 90
+  },
+  "bög": {
+    "clue": "Entusiast för samling eller intresse",
+    "score": 90
+  },
+  "het": {
+    "clue": "Motsats till kall",
+    "score": 90
+  },
+  "ena": {
+    "clue": "Tal före två",
+    "score": 90
+  },
+  "fot": {
+    "clue": "Kroppsdel man går på",
+    "score": 90
+  },
+  "vis": {
+    "clue": "Klok och förståendefull",
+    "score": 90
+  },
+  "tok": {
+    "clue": "Dåraktig människa",
+    "score": 90
+  },
+  "lös": {
+    "clue": "Inte fastknuten eller tätt packad",
+    "score": 90
+  },
+  "itu": {
+    "clue": "I två delar sönder",
+    "score": 90
+  },
+  "kan": {
+    "clue": "Är i stånd att",
+    "score": 90
+  },
+  "års": {
+    "clue": "Tidens växling",
+    "score": 90
+  },
+  "rik": {
+    "clue": "Välfylld på pengar",
+    "score": 90
+  },
+  "fick": {
+    "clue": "Erhöll eller kom över",
+    "score": 90
+  },
+  "från": {
+    "clue": "Preposition för ursprung eller början",
+    "score": 90
+  },
+  "hela": {
+    "clue": "Fullständig eller utan skador",
+    "score": 90
+  },
+  "röd": {
+    "clue": "Färg på tomat och ros",
+    "score": 90
+  },
+  "ett": {
+    "clue": "Siffran före två",
+    "score": 90
+  },
+  "ful": {
+    "clue": "Motbjudande eller smutsig",
+    "score": 90
+  },
+  "mod": {
+    "clue": "Styrka att trotsa rädsla",
+    "score": 90
+  },
+  "lite": {
+    "clue": "Mindre än mycket",
+    "score": 90
+  },
+  "hans": {
+    "clue": "Possessivt pronomen för honom",
+    "score": 90
+  },
+  "rätt": {
+    "clue": "Motsatsen till fel",
+    "score": 90
+  },
+  "tåg": {
+    "clue": "Järnvägsfordon på räls",
+    "score": 90
+  },
+  "blev": {
+    "clue": "Förändrades i dåtid",
+    "score": 90
+  },
+  "for": {
+    "clue": "Reste eller resgick",
+    "score": 90
+  },
+  "via": {
+    "clue": "Väg eller försämlingsmedel mellan två punkter",
+    "score": 90
+  },
+  "sms": {
+    "clue": "Telemeddelande på mobilen",
+    "score": 90
+  },
+  "nej": {
+    "clue": "Motsatt till ja",
+    "score": 90
+  },
+  "ond": {
+    "clue": "Moraliskt dålig",
+    "score": 90
+  },
+  "red": {
+    "clue": "Färdades på häst förr",
+    "score": 90
+  },
+  "göra": {
+    "clue": "Framställa något",
+    "score": 90
+  },
+  "säga": {
+    "clue": "Uttrycka med ord",
+    "score": 90
+  },
+  "drog": {
+    "clue": "Tog tag i något",
+    "score": 90
+  },
+  "båda": {
+    "clue": "Inte bara en av två",
+    "score": 90
+  },
+  "sagt": {
+    "clue": "Framfört muntligt",
+    "score": 90
+  },
+  "miss": {
+    "clue": "Ofrivillig blunder eller fel",
+    "score": 90
+  },
+  "land": {
+    "clue": "Område på världskartan",
+    "score": 90
+  },
+  "ihop": {
+    "clue": "Motsatsen till isär",
+    "score": 90
+  },
+  "sköt": {
+    "clue": "Nät för sillfiske",
+    "score": 90
+  },
+  "gett": {
+    "clue": "Överlämnat tidigare",
+    "score": 90
+  },
+  "möte": {
+    "clue": "Sammankomst mellan personer",
+    "score": 90
+  },
+  "både": {
+    "clue": "Det ena och det andra",
+    "score": 90
+  },
+  "öka": {
+    "clue": "Göra större eller mer av något",
+    "score": 90
+  },
+  "bett": {
+    "clue": "Tandmarken på ett frö",
+    "score": 90
+  },
+  "fler": {
+    "clue": "I större antal",
+    "score": 90
+  },
+  "fyra": {
+    "clue": "Talföljdens andra pund",
+    "score": 90
+  },
+  "året": {
+    "clue": "Tolv månader tillsammans",
+    "score": 90
+  },
+  "titt": {
+    "clue": "Hastig blick",
+    "score": 90
+  },
+  "leva": {
+    "clue": "Finnas och andas",
+    "score": 90
+  },
+  "fred": {
+    "clue": "Motsats till krig",
+    "score": 90
+  },
+  "sent": {
+    "clue": "Motsatsen till tidigt",
+    "score": 90
+  },
+  "namn": {
+    "clue": "Identitet genom ord",
+    "score": 90
+  },
+  "jack": {
+    "clue": "Uttag för hörlur",
+    "score": 90
+  },
+  "kvar": {
+    "clue": "Inte borta än",
+    "score": 90
+  },
+  "lugn": {
+    "clue": "Fridsamt sinnesstillstånd",
+    "score": 90
+  },
+  "ljus": {
+    "clue": "Dag- och eldskens motsats",
+    "score": 90
+  },
+  "goda": {
+    "clue": "Söta läckerheter",
+    "score": 90
+  },
+  "lösa": {
+    "clue": "Klara av ett pussel",
+    "score": 90
+  },
+  "skäl": {
+    "clue": "Anledning eller grund",
+    "score": 90
+  },
+  "jaha": {
+    "clue": "Uttryck för överraskning",
+    "score": 90
+  },
+  "karl": {
+    "clue": "Motsats till flicka",
+    "score": 90
+  },
+  "låta": {
+    "clue": "Ge ifrån sig ljud",
+    "score": 90
+  },
+  "mord": {
+    "clue": "Allvarligt brott mot person",
+    "score": 90
+  },
+  "uppe": {
+    "clue": "Motsatsen till nere",
+    "score": 90
+  },
+  "sett": {
+    "clue": "Skådat, betraktad",
+    "score": 90
+  },
+  "leda": {
+    "clue": "Stå i spetsen för",
+    "score": 90
+  },
+  "tala": {
+    "clue": "Framföra ord muntligt",
+    "score": 90
+  },
+  "resa": {
+    "clue": "Färd genom världen",
+    "score": 90
+  },
+  "slut": {
+    "clue": "Färdig eller förbi",
+    "score": 90
+  },
+  "sånt": {
+    "clue": "Denna typ av sak",
+    "score": 90
+  },
+  "tolv": {
+    "clue": "Månader på ett år",
+    "score": 90
+  },
+  "gay": {
+    "clue": "HBTQ-person eller homosexuell",
+    "score": 90
+  },
+  "åkte": {
+    "clue": "Körde eller reste",
+    "score": 90
+  },
+  "fint": {
+    "clue": "Något vackert och stilfullt",
+    "score": 90
+  },
+  "häst": {
+    "clue": "Fyrabent husdjur",
+    "score": 90
+  },
+  "sant": {
+    "clue": "Motsatsen till falskt",
+    "score": 90
+  },
+  "form": {
+    "clue": "Gestalt eller skepnad",
+    "score": 90
+  },
+  "iväg": {
+    "clue": "Långt bort från här",
+    "score": 90
+  },
+  "lita": {
+    "clue": "Tro på någon eller något",
+    "score": 90
+  },
+  "sida": {
+    "clue": "Höger eller vänster",
+    "score": 90
+  },
+  "slag": {
+    "clue": "Kraftig smäll med näven",
+    "score": 90
+  },
+  "makt": {
+    "clue": "Auktoritet och styrka",
+    "score": 90
+  },
+  "fort": {
+    "clue": "Med god fart",
+    "score": 90
+  },
+  "djur": {
+    "clue": "Levande varelse utan tal",
+    "score": 90
+  },
+  "kung": {
+    "clue": "Monark på tronen",
+    "score": 90
+  },
+  "idag": {
+    "clue": "För närvarande",
+    "score": 90
+  },
+  "sägs": {
+    "clue": "Antas eller påstås",
+    "score": 90
+  },
+  "visa": {
+    "clue": "Låta se eller demonstrera",
+    "score": 90
+  },
+  "röst": {
+    "clue": "Ljudet när man talar eller sjunger",
+    "score": 90
+  },
+  "sätt": {
+    "clue": "Hur något görs",
+    "score": 90
+  },
+  "unga": {
+    "clue": "De som inte är gamla ännu",
+    "score": 90
+  },
+  "ljög": {
+    "clue": "Talade osanning",
+    "score": 90
+  },
+  "helt": {
+    "clue": "Totalt, utan reservation",
+    "score": 90
+  },
+  "plan": {
+    "clue": "Slät yta utan ojämnheter",
+    "score": 90
+  },
+  "runt": {
+    "clue": "I cirklar utan mål",
+    "score": 90
+  },
+  "don": {
+    "clue": "Redskap eller verktyg",
+    "score": 90
+  },
+  "glad": {
+    "clue": "I god humör",
+    "score": 90
+  },
+  "möta": {
+    "clue": "Träffa någon",
+    "score": 90
+  },
+  "förr": {
+    "clue": "I gamla dagar",
+    "score": 90
+  },
+  "jobb": {
+    "clue": "Lönat arbete",
+    "score": 90
+  },
+  "tack": {
+    "clue": "Uttryckt överensstämmelse; gillande",
+    "score": 90
+  },
+  "före": {
+    "clue": "I tiden tidigare än något annat",
+    "score": 90
+  },
+  "hårt": {
+    "clue": "Med kraft och styrka",
+    "score": 90
+  },
+  "guds": {
+    "clue": "Ordet före \"namn\" i bönen",
+    "score": 90
+  },
+  "guld": {
+    "clue": "Vinnares trofé",
+    "score": 90
+  },
+  "slog": {
+    "clue": "Träffade med kraft",
+    "score": 90
+  },
+  "äkta": {
+    "clue": "Inte falsk",
+    "score": 90
+  },
+  "pris": {
+    "clue": "Vinnares belöning",
+    "score": 90
+  },
+  "högt": {
+    "clue": "Med stor volym",
+    "score": 90
+  },
+  "sitt": {
+    "clue": "Hans, hennes eller dess",
+    "score": 90
+  },
+  "vila": {
+    "clue": "Avbrott från arbete",
+    "score": 90
+  },
+  "and": {
+    "clue": "Vild sjöfågel",
+    "score": 90
+  },
+  "bror": {
+    "clue": "Familjemedlem, man",
+    "score": 90
+  },
+  "dröm": {
+    "clue": "Nattlig fantasi",
+    "score": 90
+  },
+  "adjö": {
+    "clue": "Ord vid avskedad",
+    "score": 90
+  },
+  "köp": {
+    "clue": "Vad man gör när man betalar för något",
+    "score": 90
+  },
+  "gått": {
+    "clue": "Varit på vägen",
+    "score": 90
+  },
+  "vara": {
+    "clue": "Finnas till",
+    "score": 90
+  },
+  "fina": {
+    "clue": "Elegant och vacker",
+    "score": 90
+  },
+  "kuk": {
+    "clue": "Hönsfågel med röd kam",
+    "score": 90
+  },
+  "hopp": {
+    "clue": "Önskan om lycka",
+    "score": 90
+  },
+  "stad": {
+    "clue": "Större bosättning med gator och hus",
+    "score": 90
+  },
+  "reda": {
+    "clue": "Ordnat tillstånd",
+    "score": 90
+  },
+  "fast": {
+    "clue": "Stadigt fästad",
+    "score": 90
+  },
+  "glas": {
+    "clue": "Genomskinligt drickgefäss",
+    "score": 90
+  },
+  "skit": {
+    "clue": "Djurs avföring",
+    "score": 90
+  },
+  "jämt": {
+    "clue": "Alltid, hela tiden",
+    "score": 90
+  },
+  "ditt": {
+    "clue": "Neutrum av din",
+    "score": 90
+  },
+  "röda": {
+    "clue": "Färg som signalerar fara",
+    "score": 90
+  },
+  "fått": {
+    "clue": "Erhållen eller mottagit",
+    "score": 90
+  },
+  "kött": {
+    "clue": "Animalisk matkomponent",
+    "score": 90
+  },
+  "leta": {
+    "clue": "Spana runt efter något",
+    "score": 90
+  },
+  "ännu": {
+    "clue": "Så långt hittills",
+    "score": 90
+  },
+  "bröt": {
+    "clue": "Sprack sönder",
+    "score": 90
+  },
+  "nytt": {
+    "clue": "Motsats till gammalt",
+    "score": 90
+  },
+  "grej": {
+    "clue": "Sak vars namn man glömt",
+    "score": 90
+  },
+  "okej": {
+    "clue": "Godtagbar, acceptabel",
+    "score": 90
+  },
+  "vita": {
+    "clue": "Snöns färg",
+    "score": 90
+  },
+  "hund": {
+    "clue": "Mans bästa vän",
+    "score": 90
+  },
+  "roll": {
+    "clue": "Skådespelares uppgift",
+    "score": 90
+  },
+  "värd": {
+    "clue": "Den som mottar gäster",
+    "score": 90
+  },
+  "lära": {
+    "clue": "Vetenskaplig riktning eller teori",
+    "score": 90
+  },
+  "svar": {
+    "clue": "Repliker vid frågor",
+    "score": 90
+  },
+  "gift": {
+    "clue": "Orm biter med denna",
+    "score": 90
+  },
+  "nära": {
+    "clue": "Tätt intill",
+    "score": 90
+  },
+  "rakt": {
+    "clue": "Vägen utan krökar",
+    "score": 90
+  },
+  "leka": {
+    "clue": "Barn gör detta med dockor och bilar",
+    "score": 90
+  },
+  "dela": {
+    "clue": "Giv till flera",
+    "score": 90
+  },
+  "led": {
+    "clue": "Uttråkad och vilsen",
+    "score": 90
+  },
+  "mest": {
+    "clue": "Oftast, huvudsakligen",
+    "score": 90
+  },
+  "full": {
+    "clue": "Omöjlig att köra bil när man är det",
+    "score": 90
+  },
+  "bäst": {
+    "clue": "Överträffar alla andra",
+    "score": 90
+  },
+  "gott": {
+    "clue": "Väl, fint",
+    "score": 90
+  },
+  "köra": {
+    "clue": "Framföra bil",
+    "score": 90
+  },
+  "ihåg": {
+    "clue": "Glömma det motsatta av",
+    "score": 90
+  },
+  "till": {
+    "clue": "Riktning mot något eller någon",
+    "score": 90
+  },
+  "nyss": {
+    "clue": "För inte lång tid sedan",
+    "score": 90
+  },
+  "eget": {
+    "clue": "Till en själv",
+    "score": 90
+  },
+  "fann": {
+    "clue": "Stötte på, upptäckte",
+    "score": 90
+  },
+  "åker": {
+    "clue": "Odlingsmark för spannmål",
+    "score": 90
+  },
+  "bära": {
+    "clue": "Transportera eller ha på sig",
+    "score": 90
+  },
+  "fram": {
+    "clue": "Motsatt till bak",
+    "score": 90
+  },
+  "låna": {
+    "clue": "Få något på tid",
+    "score": 90
+  },
+  "stor": {
+    "clue": "Motsatt till liten",
+    "score": 90
+  },
+  "vadå": {
+    "clue": "Frågande utrop vid förvåning",
+    "score": 90
+  },
+  "enda": {
+    "clue": "Utan motsvarighet",
+    "score": 90
+  },
+  "fall": {
+    "clue": "Olycka från högt ner",
+    "score": 90
+  },
+  "skål": {
+    "clue": "Tost vid fest",
+    "score": 90
+  },
+  "jaga": {
+    "clue": "Sälta efter bytesdjur i skogen",
+    "score": 90
+  },
+  "vart": {
+    "clue": "Till vilket ställe",
+    "score": 90
+  },
+  "ofta": {
+    "clue": "Många gånger",
+    "score": 90
+  },
+  "inne": {
+    "clue": "Mellan fyra väggar",
+    "score": 90
+  },
+  "höra": {
+    "clue": "Uppfatta ljud",
+    "score": 90
+  },
+  "chef": {
+    "clue": "Överordnad på jobbet",
+    "score": 90
+  },
+  "tyst": {
+    "clue": "Utan ljud eller brus",
+    "score": 90
+  },
+  "tjej": {
+    "clue": "Ung kvinnlig ungdom",
+    "score": 90
+  },
+  "laga": {
+    "clue": "Gör mat klar",
+    "score": 90
+  },
+  "säng": {
+    "clue": "Möbel för vila och sömn",
+    "score": 90
+  },
+  "åtta": {
+    "clue": "Halva sexton",
+    "score": 90
+  },
+  "inom": {
+    "clue": "Beteckning för räckvidden eller området",
+    "score": 90
+  },
+  "film": {
+    "clue": "Tunnare beläggning",
+    "score": 90
+  },
+  "lagt": {
+    "clue": "Placerat eller arrangerat",
+    "score": 90
+  },
+  "dess": {
+    "clue": "Pronomen för två personer",
+    "score": 90
+  },
+  "inga": {
+    "clue": "Null mängd",
+    "score": 90
+  },
+  "byta": {
+    "clue": "Ersätta något med något annat",
+    "score": 90
+  },
+  "illa": {
+    "clue": "Inte väl eller bra",
+    "score": 90
+  },
+  "lägg": {
+    "clue": "Djurets framben",
+    "score": 90
+  },
+  "läsa": {
+    "clue": "Studera genom böcker",
+    "score": 90
+  },
+  "fest": {
+    "clue": "Mingel med musik och mat",
+    "score": 90
+  },
+  "oroa": {
+    "clue": "Att inte slappna av",
+    "score": 90
+  },
+  "redo": {
+    "clue": "Förberedd att börja",
+    "score": 90
+  },
+  "köpt": {
+    "clue": "Anskaffad för pengar",
+    "score": 90
+  },
+  "gode": {
+    "clue": "Fornnordisk präst och ledare",
+    "score": 90
+  },
+  "team": {
+    "clue": "Lag av spelare eller medarbetare",
+    "score": 90
+  },
+  "egna": {
+    "clue": "Tillhör bara en själv",
+    "score": 90
+  },
+  "satt": {
+    "clue": "Inte långsmal eller smäcker",
+    "score": 90
+  },
+  "the": {
+    "clue": "Varm bladdryck",
+    "score": 90
+  },
+  "nere": {
+    "clue": "Motsatsen till uppe",
+    "score": 90
+  },
+  "sist": {
+    "clue": "Avslutande; på slutet",
+    "score": 90
+  },
+  "spår": {
+    "clue": "Avtryck i sand eller snö",
+    "score": 90
+  },
+  "själ": {
+    "clue": "Andlig essens",
+    "score": 90
+  },
+  "läst": {
+    "clue": "Sökte kunskap på sidor",
+    "score": 90
+  },
+  "steg": {
+    "clue": "Rörelse med foten framåt",
+    "score": 90
+  },
+  "här": {
+    "clue": "På denna plats",
+    "score": 90
+  },
+  "höll": {
+    "clue": "Grep om med handen",
+    "score": 90
+  },
+  "ätit": {
+    "clue": "Fullgjort måltiden",
+    "score": 90
+  },
+  "döda": {
+    "clue": "Sätta stopp för",
+    "score": 90
+  },
+  "halv": {
+    "clue": "En av två lika stora delar",
+    "score": 90
+  },
+  "just": {
+    "clue": "Exakt så, nyss",
+    "score": 90
+  },
+  "folk": {
+    "clue": "Människor i stort",
+    "score": 90
+  },
+  "sjuk": {
+    "clue": "Dåligt mående",
+    "score": 90
+  },
+  "baby": {
+    "clue": "Litet barn eller spädbarn",
+    "score": 90
+  },
+  "fixa": {
+    "clue": "Reparera eller ordna",
+    "score": 90
+  },
+  "utom": {
+    "clue": "Bortom gränsen",
+    "score": 90
+  },
+  "ändå": {
+    "clue": "Likväl, trots det",
+    "score": 90
+  },
+  "bill": {
+    "clue": "Lagförslag i parlament",
+    "score": 90
+  },
+  "även": {
+    "clue": "Dessutom",
+    "score": 90
+  },
+  "hand": {
+    "clue": "Gripande kroppsdel vid armen",
+    "score": 90
+  },
+  "akta": {
+    "clue": "Vara försiktig med",
+    "score": 90
+  },
+  "dött": {
+    "clue": "Livlöst, utan tecken på liv",
+    "score": 90
+  },
+  "bort": {
+    "clue": "Motsatsen till hit",
+    "score": 90
+  },
+  "igår": {
+    "clue": "Dagen innan idag",
+    "score": 90
+  },
+  "röra": {
+    "clue": "Virrvarr och kaos",
+    "score": 90
+  },
+  "krig": {
+    "clue": "Väpnad konflikt mellan folk",
+    "score": 90
+  },
+  "lång": {
+    "clue": "Motsats till kort",
+    "score": 90
+  },
+  "natt": {
+    "clue": "Tid då det är mörkt",
+    "score": 90
+  },
+  "föll": {
+    "clue": "Ramlade ned från höjd",
+    "score": 90
+  },
+  "alls": {
+    "clue": "Inte på något sätt, överhuvudtaget",
+    "score": 90
+  },
+  "stan": {
+    "clue": "Bebyggd tätort",
+    "score": 90
+  },
+  "synd": {
+    "clue": "Skada eller beklagligt misstag",
+    "score": 90
+  },
+  "känt": {
+    "clue": "Välbekant eller berömt",
+    "score": 90
+  },
+  "city": {
+    "clue": "Större tätort",
+    "score": 90
+  },
+  "sova": {
+    "clue": "Vad man gör på natten",
+    "score": 90
+  },
+  "håll": {
+    "clue": "Grepp eller tag",
+    "score": 90
+  },
+  "spel": {
+    "clue": "Underhållning med regler och tärning",
+    "score": 90
+  },
+  "hänt": {
+    "clue": "Något som skett tidigare",
+    "score": 90
+  },
+  "kort": {
+    "clue": "Motsatsen till långt",
+    "score": 90
+  },
+  "dejt": {
+    "clue": "Möte mellan två personer",
+    "score": 90
+  },
+  "brev": {
+    "clue": "Skrift man postar",
+    "score": 90
+  },
+  "lärt": {
+    "clue": "Skaffat kunskap",
+    "score": 90
+  },
+  "fart": {
+    "clue": "Hastighet på vägen",
+    "score": 90
+  },
+  "kära": {
+    "clue": "Älskad, värderad",
+    "score": 90
+  },
+  "kört": {
+    "clue": "Framfört fordon",
+    "score": 90
+  },
+  "make": {
+    "clue": "Äkta hälfte",
+    "score": 90
+  },
+  "barn": {
+    "clue": "Liten människa, son eller dotter",
+    "score": 90
+  },
+  "emot": {
+    "clue": "Riktning framåt eller bakåt",
+    "score": 90
+  },
+  "sade": {
+    "clue": "Gav höra tidigare",
+    "score": 90
+  },
+  "gäng": {
+    "clue": "Skara vänner",
+    "score": 90
+  },
+  "rent": {
+    "clue": "Fri från smuts",
+    "score": 90
+  },
+  "nöjd": {
+    "clue": "Belåten och glad",
+    "score": 90
+  },
+  "dags": {
+    "clue": "Rätt tid för något",
+    "score": 90
+  },
+  "vårt": {
+    "clue": "Gemensamt ägo",
+    "score": 90
+  },
+  "blod": {
+    "clue": "Röd vätska i kroppen",
+    "score": 90
+  },
+  "vann": {
+    "clue": "Fick segern",
+    "score": 90
+  },
+  "lova": {
+    "clue": "Ge sitt ord",
+    "score": 90
+  },
+  "sina": {
+    "clue": "Upphör att innehålla vätska",
+    "score": 90
+  },
+  "veta": {
+    "clue": "Är medveten om",
+    "score": 90
+  },
+  "unge": {
+    "clue": "Liten människa",
+    "score": 90
+  },
+  "nick": {
+    "clue": "Godkännande huvudrörelse",
+    "score": 90
+  },
+  "tänk": {
+    "clue": "Fundera och reflektera",
+    "score": 90
+  },
+  "gång": {
+    "clue": "Sätt att röra sig på två ben",
+    "score": 90
+  },
+  "bild": {
+    "clue": "Foto eller målning",
+    "score": 90
+  },
+  "fara": {
+    "clue": "Hot eller risk",
+    "score": 90
+  },
+  "lätt": {
+    "clue": "Motsats till tung",
+    "score": 90
+  },
+  "ända": {
+    "clue": "Slutet på vägen",
+    "score": 90
+  },
+  "band": {
+    "clue": "Remsa av tyg eller plast",
+    "score": 90
+  },
+  "lika": {
+    "clue": "Ekvivalent",
+    "score": 90
+  },
+  "hört": {
+    "clue": "Uppfattat med örat",
+    "score": 90
+  },
+  "stör": {
+    "clue": "Stor kaviarfisk",
+    "score": 90
+  },
+  "köpa": {
+    "clue": "Förvärva mot betalning",
+    "score": 90
+  },
+  "stal": {
+    "clue": "Tog utan att fråga",
+    "score": 90
+  },
+  "stod": {
+    "clue": "Marmorprydnad",
+    "score": 90
+  },
+  "egen": {
+    "clue": "Personlig eller särskild",
+    "score": 90
+  },
+  "jaså": {
+    "clue": "Reaktion på överraskande nyhet",
+    "score": 90
+  },
+  "vore": {
+    "clue": "Villkorlig form av vara",
+    "score": 90
+  },
+  "mark": {
+    "clue": "Jordens översta lager",
+    "score": 90
+  },
+  "ring": {
+    "clue": "Boxningsarena",
+    "score": 90
+  },
+  "dumt": {
+    "clue": "Inte intelligent eller klokt",
+    "score": 90
+  },
+  "frun": {
+    "clue": "Husets värdinna",
+    "score": 90
+  },
+  "klar": {
+    "clue": "Färdig att börja",
+    "score": 90
+  },
+  "rädd": {
+    "clue": "Utan mod och självförtroende",
+    "score": 90
+  },
+  "haft": {
+    "clue": "Varit i sin ägo",
+    "score": 90
   }
 }

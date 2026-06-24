@@ -9,19 +9,22 @@ import { isCircularClue } from '../clues/clueText';
 import enBank from '../data/clueBank.en.json';
 import heBank from '../data/clueBank.he.json';
 import esBank from '../data/clueBank.es.json';
+import svBank from '../data/clueBank.sv.json';
 import type { PuzzleLocale } from '../types';
 
 const BANKS: Record<string, ClueMap> = {
   en: enBank as unknown as ClueMap,
   he: heBank as unknown as ClueMap,
   es: esBank as unknown as ClueMap,
+  sv: svBank as unknown as ClueMap,
 };
 
-// gen locale mirrors generate.daily.genLocaleFor: he→he, es→es (accent-folded 4×4 keys), else en.
-// (sv has a real-data bank but stays a dormant dictionary — å/ä/ö can't fold, pool too thin.)
-const CASES: Array<{ locale: PuzzleLocale; gen: 'en' | 'he' | 'es' }> = [
+// gen locale mirrors generate.daily.genLocaleFor: he→he, es→es (accent-folded 4×4 keys),
+// sv→sv (4×4, å/ä/ö kept), else en.
+const CASES: Array<{ locale: PuzzleLocale; gen: 'en' | 'he' | 'es' | 'sv' }> = [
   { locale: 'en', gen: 'en' },
   { locale: 'he', gen: 'he' },
+  { locale: 'sv', gen: 'sv' },
   { locale: 'es', gen: 'es' },
 ];
 

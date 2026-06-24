@@ -40,7 +40,7 @@ export const MINI_TEMPLATES_4: BlockTemplate[] = [
 export const HE_TEMPLATES_4 = MINI_TEMPLATES_4;
 
 // Languages whose clue bank fills a 4×4 mini but not a doubly-checked 5×5 (needs ~2k words).
-const MINI_4_LOCALES: ReadonlySet<string> = new Set(['he', 'es']);
+const MINI_4_LOCALES: ReadonlySet<string> = new Set(['he', 'es', 'sv']);
 
 /** Default grid size for a locale's mini. */
 export function defaultSize(locale: PuzzleLocale): number {
