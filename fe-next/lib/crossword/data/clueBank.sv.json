@@ -16,20 +16,20 @@
     "score": 80
   },
   "ankri": {
-    "clue": "Båtens ankar",
-    "score": 80
+    "clue": "Järnkrok för båten",
+    "score": 85
   },
   "ansi": {
     "clue": "Amerikansk standard",
     "score": 75
   },
   "ante": {
-    "clue": "Spelpojka",
-    "score": 80
+    "clue": "Pokerspelarens insats",
+    "score": 85
   },
   "antle": {
-    "clue": "Antilop djur",
-    "score": 82
+    "clue": "Afrikansk antilop",
+    "score": 85
   },
   "apel": {
     "clue": "Frukt från träd",
@@ -40,8 +40,8 @@
     "score": 85
   },
   "apod": {
-    "clue": "Utan ben",
-    "score": 80
+    "clue": "Benlos skapelse",
+    "score": 85
   },
   "apol": {
     "clue": "Gudens templet",
@@ -52,12 +52,12 @@
     "score": 88
   },
   "apot": {
-    "clue": "Apotek på kort",
-    "score": 78
+    "clue": "Läkemedelsbutik",
+    "score": 85
   },
   "appe": {
-    "clue": "Mat behag",
-    "score": 78
+    "clue": "Matbegäring",
+    "score": 85
   },
   "arbe": {
     "clue": "Frukt från växt",
@@ -80,8 +80,8 @@
     "score": 75
   },
   "areia": {
-    "clue": "Sand ström",
-    "score": 78
+    "clue": "Ökenvind från Afrika",
+    "score": 80
   },
   "arena": {
     "clue": "Sand eller kamp plats",
@@ -92,11 +92,11 @@
     "score": 78
   },
   "areol": {
-    "clue": "Liten område område",
-    "score": 78
+    "clue": "Liten område",
+    "score": 85
   },
   "arere": {
-    "clue": "Bakom bakom",
+    "clue": "Efteråt igen",
     "score": 75
   },
   "argal": {
@@ -108,7 +108,7 @@
     "score": 82
   },
   "arge": {
-    "clue": "Argument kort",
+    "clue": "Kortform för debatt",
     "score": 75
   },
   "argent": {
@@ -120,7 +120,7 @@
     "score": 78
   },
   "argh": {
-    "clue": "Sorgsenlyd",
+    "clue": "Frustration rop",
     "score": 75
   },
   "argi": {
@@ -132,12 +132,12 @@
     "score": 82
   },
   "argol": {
-    "clue": "Vinkristall",
-    "score": 82
+    "clue": "Druva sediment i vin",
+    "score": 80
   },
   "argon": {
-    "clue": "Noblegasen",
-    "score": 85
+    "clue": "Inert med nummer 18",
+    "score": 80
   },
   "argos": {
     "clue": "Många ögon myth",
@@ -212,8 +212,8 @@
     "score": 82
   },
   "ariette": {
-    "clue": "Liten aria musikstycke",
-    "score": 82
+    "clue": "Kort operasång",
+    "score": 80
   },
   "ariety": {
     "clue": "Variation eller mångfald",
@@ -276,7 +276,7 @@
     "score": 80
   },
   "armatim": {
-    "clue": "Gruppväpnad",
+    "clue": "Många soldater tillsammans",
     "score": 75
   },
   "armatur": {
@@ -288,8 +288,8 @@
     "score": 80
   },
   "armband": {
-    "clue": "Armring från väv",
-    "score": 85
+    "clue": "Smycke för handleden",
+    "score": 82
   },
   "armbrust": {
     "clue": "Medeltida skyt väapen",
