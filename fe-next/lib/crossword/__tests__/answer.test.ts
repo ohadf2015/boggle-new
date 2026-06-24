@@ -89,3 +89,26 @@ describe('displayLetter — Hebrew sofit at word end', () => {
     expect(displayLetter('a', { isWordEnd: true }, 'en')).toBe('a');
   });
 });
+
+describe('normalizeCell — Spanish accent folding', () => {
+  // Spanish crosswords omit grid diacritics: accented input must match the folded grid letter, and
+  // accented/unaccented letters must be the same cell so the sparse pool can cross-fill a 4×4.
+  it('folds accented vowels to plain (es)', () => {
+    expect(normalizeCell('á', 'es')).toBe('a');
+    expect(normalizeCell('É', 'es')).toBe('e');
+    expect(normalizeCell('í', 'es')).toBe('i');
+    expect(normalizeCell('ó', 'es')).toBe('o');
+    expect(normalizeCell('ú', 'es')).toBe('u');
+    expect(normalizeCell('ü', 'es')).toBe('u');
+  });
+  it('keeps ñ distinct (it is a letter, not an accent)', () => {
+    expect(normalizeCell('ñ', 'es')).toBe('ñ');
+  });
+  it('a player typing an accented letter matches the folded solution', () => {
+    expect(checkCell('í', 'i', 'es')).toBe(true);
+    expect(checkCell('Á', 'a', 'es')).toBe(true);
+  });
+  it('does NOT fold accents for other locales (en/he unaffected)', () => {
+    expect(normalizeCell('á', 'en')).toBe('á');
+  });
+});

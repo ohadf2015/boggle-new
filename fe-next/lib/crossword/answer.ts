@@ -6,9 +6,22 @@ import { applyHebrewFinalLetters, normalizeWord } from '@/shared/utils/wordNorma
 import type { Language } from '@/shared/types/game';
 import type { CrosswordPuzzle, PuzzleLocale } from './types';
 
-/** Normalize a single typed cell letter for comparison (locale-aware; folds HE sofit forms). */
+// Spanish crosswords omit diacritics in the grid (standard convention) — clue text keeps accents,
+// but the grid cells are plain letters. Fold the accent MARKS (á→a … ü→u) so a player typing an
+// accented letter still matches, and so accented/unaccented words interlock at crossings (without
+// this, "í" can't cross "i" and the sparse Spanish pool can't fill a 4×4). ñ is a distinct letter
+// and is intentionally NOT folded. (Swedish å/ä/ö are likewise distinct letters — es only.)
+const ES_ACCENT_FOLD: Record<string, string> = {
+  á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u',
+};
+export function foldEsAccents(s: string): string {
+  return s.toLowerCase().replace(/[áéíóúü]/g, (c) => ES_ACCENT_FOLD[c] ?? c);
+}
+
+/** Normalize a single typed cell letter for comparison (locale-aware; folds HE sofit + ES accents). */
 export function normalizeCell(input: string, locale: PuzzleLocale): string {
-  return normalizeWord((input ?? '').trim(), locale as Language);
+  const base = normalizeWord((input ?? '').trim(), locale as Language);
+  return locale === 'es' ? foldEsAccents(base) : base;
 }
 
 /** True if a typed letter matches the (already-normalized) solution letter. */

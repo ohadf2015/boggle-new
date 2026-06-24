@@ -6,6 +6,9 @@ import type { PuzzleLocale } from '@/lib/crossword/types';
 const LAYOUTS: Partial<Record<PuzzleLocale, string[]>> = {
   en: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'],
   he: ['קראטוןםפ', 'שדגכעיחלךף', 'זסבהנמצתץ'],
+  // Spanish keyboard = QWERTY + ñ. Grids are accent-folded (see answer.foldEsAccents) so no
+  // accented vowel keys are needed; ñ is a distinct letter and must be typeable.
+  es: ['qwertyuiop', 'asdfghjklñ', 'zxcvbnm'],
 };
 
 export interface CrosswordKeyboardProps {

@@ -24,19 +24,31 @@ export function dailyDifficulty(dateISO: string): Difficulty {
   return 'medium'; // Wed, Thu, Fri
 }
 
-/** he fills from the Hebrew bank; every other locale uses en (matches the existing en-fallback). */
-function genLocaleFor(locale: PuzzleLocale): 'en' | 'he' {
-  return locale === 'he' ? 'he' : 'en';
+/**
+ * Locale → clue-bank to fill from. he → Hebrew bank, es → Spanish bank (accent-folded keys, 4×4),
+ * everything else → en. es fills only because its keys are accent-folded (Spanish crosswords omit
+ * grid diacritics; see answer.foldEsAccents) — without folding, accented/unaccented letters can't
+ * cross and the sparse 3-letter pool can't fill a 4×4. sv stays on en (å/ä/ö are distinct letters,
+ * bank too sparse — kept as a dormant dictionary). See the spec.
+ */
+type GenLocale = 'en' | 'he' | 'es';
+function genLocaleFor(locale: PuzzleLocale): GenLocale {
+  if (locale === 'he') return 'he';
+  if (locale === 'es') return 'es';
+  return 'en';
 }
 
 // The clue bank is large (~200KB en). Load it once, on demand — it never touches the bundle until
 // the first puzzle is generated.
-const clueCache = new Map<'en' | 'he', ClueMap>();
-async function loadClues(gen: 'en' | 'he'): Promise<ClueMap> {
+const clueCache = new Map<GenLocale, ClueMap>();
+async function loadClues(gen: GenLocale): Promise<ClueMap> {
   const cached = clueCache.get(gen);
   if (cached) return cached;
-  const mod =
-    gen === 'he' ? await import('./data/clueBank.he.json') : await import('./data/clueBank.en.json');
+  const mod = await (gen === 'he'
+    ? import('./data/clueBank.he.json')
+    : gen === 'es'
+      ? import('./data/clueBank.es.json')
+      : import('./data/clueBank.en.json'));
   const clues = ((mod as { default?: unknown }).default ?? mod) as unknown as ClueMap;
   clueCache.set(gen, clues);
   return clues;

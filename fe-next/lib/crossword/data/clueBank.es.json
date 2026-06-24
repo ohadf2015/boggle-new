@@ -17,7 +17,7 @@
   },
   "ala": {
     "clue": "Extremidad para volar en las aves",
-    "score": 45
+    "score": 90
   },
   "alga": {
     "clue": "Planta del fondo marino",
@@ -71,7 +71,7 @@
     "clue": "Equino de orejas largas y testuz resistente",
     "score": 65
   },
-  "atún": {
+  "atun": {
     "clue": "Pez marino comestible",
     "score": 42
   },
@@ -79,7 +79,7 @@
     "clue": "Grano para el desayuno",
     "score": 45
   },
-  "avión": {
+  "avion": {
     "clue": "Vehículo que surca los cielos",
     "score": 45
   },
@@ -87,7 +87,7 @@
     "clue": "Color del cielo despejado",
     "score": 80
   },
-  "bahía": {
+  "bahia": {
     "clue": "Ensenada costera",
     "score": 80
   },
@@ -95,11 +95,11 @@
     "clue": "Movimiento rítmico al son de la música",
     "score": 45
   },
-  "balón": {
+  "balon": {
     "clue": "Objeto esférico de juego deportivo",
     "score": 45
   },
-  "bambú": {
+  "bambu": {
     "clue": "Planta que come el panda",
     "score": 57
   },
@@ -151,7 +151,7 @@
     "clue": "Calzado que llega a la rodilla",
     "score": 80
   },
-  "botón": {
+  "boton": {
     "clue": "Cierre de prenda",
     "score": 45
   },
@@ -167,11 +167,11 @@
     "clue": "Équido de orejas largas y hocico largo",
     "score": 80
   },
-  "buzón": {
+  "buzon": {
     "clue": "Donde llega la correspondencia",
     "score": 45
   },
-  "búho": {
+  "buho": {
     "clue": "Ave nocturna cazadora",
     "score": 45
   },
@@ -179,7 +179,7 @@
     "clue": "Animal saltador de montaña",
     "score": 45
   },
-  "café": {
+  "cafe": {
     "clue": "Bebida oscura y aromática",
     "score": 45
   },
@@ -187,7 +187,7 @@
     "clue": "Recipiente de cartón",
     "score": 45
   },
-  "cajón": {
+  "cajon": {
     "clue": "Compartimiento del escritorio",
     "score": 80
   },
@@ -387,7 +387,7 @@
     "clue": "Mamífero nocturno con púas que se enrolla en bola",
     "score": 65
   },
-  "esquí": {
+  "esqui": {
     "clue": "Deporte en pistas nevadas",
     "score": 80
   },
@@ -431,7 +431,7 @@
     "clue": "Manzana, naranja o plátano",
     "score": 80
   },
-  "frío": {
+  "frio": {
     "clue": "Contrario al calor",
     "score": 65
   },
@@ -439,7 +439,7 @@
     "clue": "Llamas que calientan",
     "score": 77
   },
-  "fénix": {
+  "fenix": {
     "clue": "Ave mitológica que renace de sus cenizas",
     "score": 45
   },
@@ -468,8 +468,8 @@
     "score": 80
   },
   "gol": {
-    "clue": "Tanto en el fútbol",
-    "score": 80
+    "clue": "Tanto en fútbol",
+    "score": 90
   },
   "golpe": {
     "clue": "Impacto o contacto violento",
@@ -531,7 +531,7 @@
     "clue": "Vapor que sale del fuego",
     "score": 80
   },
-  "imán": {
+  "iman": {
     "clue": "Atrae el hierro y acero",
     "score": 65
   },
@@ -539,11 +539,11 @@
     "clue": "Tierra rodeada de agua",
     "score": 80
   },
-  "jabón": {
+  "jabon": {
     "clue": "Limpiador corporal sólido",
     "score": 65
   },
-  "jamón": {
+  "jamon": {
     "clue": "Embutido de cerdo ibérico y curado",
     "score": 80
   },
@@ -587,7 +587,7 @@
     "clue": "Producto blanco que da la vaca",
     "score": 90
   },
-  "león": {
+  "leon": {
     "clue": "Rey de la selva",
     "score": 45
   },
@@ -595,7 +595,7 @@
     "clue": "Obra escrita para leer",
     "score": 80
   },
-  "limón": {
+  "limon": {
     "clue": "Fruta ácida y amarilla",
     "score": 92
   },
@@ -632,10 +632,10 @@
     "score": 80
   },
   "luz": {
-    "clue": "Brillo que ilumina la oscuridad",
-    "score": 80
+    "clue": "Lo opuesto a la oscuridad",
+    "score": 90
   },
-  "lápiz": {
+  "lapiz": {
     "clue": "Utensilio de madera para escribir",
     "score": 80
   },
@@ -660,10 +660,10 @@
     "score": 80
   },
   "mar": {
-    "clue": "Vasto cuerpo de agua salada",
-    "score": 80
+    "clue": "Extensión de agua salada",
+    "score": 90
   },
-  "maíz": {
+  "maiz": {
     "clue": "Cereal de granos amarillos en la mazorca",
     "score": 60
   },
@@ -671,7 +671,7 @@
     "clue": "Lo que arde en una vela o lámpara",
     "score": 80
   },
-  "melón": {
+  "melon": {
     "clue": "Fruta redonda de verano",
     "score": 80
   },
@@ -785,11 +785,11 @@
   },
   "ojo": {
     "clue": "Órgano de la visión",
-    "score": 45
+    "score": 90
   },
   "ola": {
-    "clue": "Movimiento del mar",
-    "score": 80
+    "clue": "Movimiento del agua marina",
+    "score": 90
   },
   "olivo": {
     "clue": "Árbol que da aceitunas",
@@ -808,16 +808,16 @@
     "score": 80
   },
   "oro": {
-    "clue": "Metal precioso amarillo",
-    "score": 87
+    "clue": "Metal precioso",
+    "score": 90
   },
   "oruga": {
     "clue": "Larva que se convierte en mariposa",
     "score": 80
   },
   "oso": {
-    "clue": "Plantígrado mamífero de gran tamaño",
-    "score": 92
+    "clue": "Plantígrado pardo de gran envergadura",
+    "score": 90
   },
   "ostra": {
     "clue": "Molusco que produce perlas",
@@ -831,7 +831,7 @@
     "clue": "Productora de lana",
     "score": 45
   },
-  "oído": {
+  "oido": {
     "clue": "Sentido auditivo",
     "score": 65
   },
@@ -840,8 +840,8 @@
     "score": 80
   },
   "pan": {
-    "clue": "Alimento hecho de harina y levadura",
-    "score": 80
+    "clue": "Alimento hecho con harina",
+    "score": 90
   },
   "pared": {
     "clue": "Superficie que cierra una habitación",
@@ -888,8 +888,8 @@
     "score": 80
   },
   "pie": {
-    "clue": "Extremidad con cinco dedos para caminar",
-    "score": 80
+    "clue": "Extremidad inferior del cuerpo",
+    "score": 90
   },
   "pista": {
     "clue": "Indicio para hallar la respuesta",
@@ -960,8 +960,8 @@
     "score": 80
   },
   "red": {
-    "clue": "Aparejo de pesca",
-    "score": 80
+    "clue": "Malla de hilos entrecruzados",
+    "score": 90
   },
   "reina": {
     "clue": "Pieza importante en ajedrez",
@@ -976,8 +976,8 @@
     "score": 45
   },
   "rey": {
-    "clue": "Soberano de un reino",
-    "score": 80
+    "clue": "Monarca o soberano",
+    "score": 90
   },
   "risa": {
     "clue": "Sonido de alegría y diversión",
@@ -988,8 +988,8 @@
     "score": 45
   },
   "ron": {
-    "clue": "Bebida alcohólica de caña de azúcar",
-    "score": 45
+    "clue": "Bebida de caña de azúcar",
+    "score": 90
   },
   "rosa": {
     "clue": "Flor de tallo espinoso",
@@ -999,7 +999,7 @@
     "clue": "Pan dulce de forma circular",
     "score": 80
   },
-  "rubí": {
+  "rubi": {
     "clue": "Piedra preciosa roja",
     "score": 80
   },
@@ -1016,8 +1016,8 @@
     "score": 80
   },
   "sal": {
-    "clue": "Sazonador de alimentos",
-    "score": 80
+    "clue": "Mineral blanco para condimentar",
+    "score": 90
   },
   "salsa": {
     "clue": "Aderezo picante que acompaña los tacos",
@@ -1052,8 +1052,8 @@
     "score": 80
   },
   "sol": {
-    "clue": "Estrella que ilumina el día",
-    "score": 80
+    "clue": "Astro que ilumina el día",
+    "score": 90
   },
   "sopa": {
     "clue": "Plato caliente con caldo",
@@ -1131,17 +1131,17 @@
     "clue": "Lugar de descanso eterno",
     "score": 80
   },
-  "túnel": {
+  "tunel": {
     "clue": "Paso subterráneo",
     "score": 65
   },
   "uva": {
-    "clue": "Fruto que crece en racimos",
-    "score": 45
+    "clue": "Fruto de la vid",
+    "score": 90
   },
   "uña": {
-    "clue": "Cubierta dura del dedo",
-    "score": 80
+    "clue": "Lámina córnea de los dedos",
+    "score": 90
   },
   "vaca": {
     "clue": "Rumiante que produce leche",
@@ -1195,11 +1195,11 @@
     "clue": "Animal astuto y ágil",
     "score": 30
   },
-  "álamo": {
+  "alamo": {
     "clue": "Árbol de hojas temblantes",
     "score": 45
   },
-  "ángel": {
+  "angel": {
     "clue": "Ser celestial benevolente",
     "score": 65
   },
@@ -1239,7 +1239,7 @@
     "clue": "Solución para abrir una cerradura",
     "score": 80
   },
-  "cojín": {
+  "cojin": {
     "clue": "Lo que hace cómodo un asiento",
     "score": 65
   },
@@ -1284,20 +1284,20 @@
     "score": 45
   },
   "pez": {
-    "clue": "Habitante del agua con escamas",
-    "score": 92
+    "clue": "Ser acuático con aletas",
+    "score": 90
   },
   "puñal": {
     "clue": "Arma blanca corta",
     "score": 80
   },
-  "ratón": {
+  "raton": {
     "clue": "Pequeño roedor de bigotes",
     "score": 90
   },
-  "río": {
+  "rio": {
     "clue": "Corriente de agua dulce",
-    "score": 80
+    "score": 90
   },
   "salto": {
     "clue": "Despegue del piso",
@@ -1307,9 +1307,9 @@
     "clue": "Producir ruido, como una campana",
     "score": 88
   },
-  "tía": {
-    "clue": "Hermana del padre o la madre",
-    "score": 80
+  "tia": {
+    "clue": "Hermana de los padres",
+    "score": 90
   },
   "zanja": {
     "clue": "Surco profundo cavado en la tierra",
@@ -1346,5 +1346,405 @@
   "ropa": {
     "clue": "Lo que vestimos a diario",
     "score": 80
+  },
+  "amo": {
+    "clue": "Señor de la hacienda",
+    "score": 90
+  },
+  "lio": {
+    "clue": "Revoltijo de cosas",
+    "score": 90
+  },
+  "hey": {
+    "clue": "Interjección para llamar la atención",
+    "score": 90
+  },
+  "uno": {
+    "clue": "Primer número",
+    "score": 90
+  },
+  "ios": {
+    "clue": "Sistema operativo de Apple",
+    "score": 90
+  },
+  "ten": {
+    "clue": "Número tras nueve",
+    "score": 90
+  },
+  "aca": {
+    "clue": "Lugar donde uno está",
+    "score": 90
+  },
+  "sur": {
+    "clue": "Opuesto del norte",
+    "score": 90
+  },
+  "iba": {
+    "clue": "Se dirigía a algún lugar",
+    "score": 90
+  },
+  "amy": {
+    "clue": "Nombre de mujer en inglés",
+    "score": 90
+  },
+  "ven": {
+    "clue": "Orden para acercarse",
+    "score": 90
+  },
+  "era": {
+    "clue": "Período histórico",
+    "score": 90
+  },
+  "uso": {
+    "clue": "Práctica habitual",
+    "score": 90
+  },
+  "den": {
+    "clue": "Guarida de animales salvajes",
+    "score": 90
+  },
+  "wow": {
+    "clue": "Expresión de asombro o admiración",
+    "score": 90
+  },
+  "hmm": {
+    "clue": "Sonido de duda o reflexión",
+    "score": 90
+  },
+  "doc": {
+    "clue": "Médico, informalmente",
+    "score": 90
+  },
+  "lei": {
+    "clue": "Norma o estatuto jurídico",
+    "score": 90
+  },
+  "sir": {
+    "clue": "Título británico para caballeros",
+    "score": 90
+  },
+  "dia": {
+    "clue": "Período de 24 horas",
+    "score": 90
+  },
+  "ser": {
+    "clue": "Existir o tener identidad",
+    "score": 90
+  },
+  "has": {
+    "clue": "Hay, pero en segunda persona",
+    "score": 90
+  },
+  "mac": {
+    "clue": "Impermeable corto",
+    "score": 90
+  },
+  "año": {
+    "clue": "Período de doce meses",
+    "score": 90
+  },
+  "mmm": {
+    "clue": "Sonido de satisfacción ante algo delicioso",
+    "score": 90
+  },
+  "rie": {
+    "clue": "Expresa risa o alegría",
+    "score": 90
+  },
+  "tom": {
+    "clue": "Pavo macho de granja",
+    "score": 90
+  },
+  "leo": {
+    "clue": "Signo del zodiaco de verano",
+    "score": 90
+  },
+  "ama": {
+    "clue": "Dueña del hogar",
+    "score": 90
+  },
+  "ana": {
+    "clue": "Colección de dichos memorables",
+    "score": 90
+  },
+  "ley": {
+    "clue": "Norma que todos debemos seguir",
+    "score": 90
+  },
+  "lee": {
+    "clue": "Descifra un texto escrito",
+    "score": 90
+  },
+  "eva": {
+    "clue": "Primera mujer según la Biblia",
+    "score": 90
+  },
+  "adn": {
+    "clue": "Molécula de la herencia",
+    "score": 90
+  },
+  "dos": {
+    "clue": "Número par entre uno y tres",
+    "score": 90
+  },
+  "mas": {
+    "clue": "Conjunción de contraste u oposición",
+    "score": 90
+  },
+  "gas": {
+    "clue": "Combustible de los autos",
+    "score": 90
+  },
+  "haz": {
+    "clue": "Manojo de leña",
+    "score": 90
+  },
+  "vea": {
+    "clue": "Forma imperativa de observar",
+    "score": 90
+  },
+  "ben": {
+    "clue": "Árbol tropical de flores blancas",
+    "score": 90
+  },
+  "vas": {
+    "clue": "Tú te desplazas",
+    "score": 90
+  },
+  "cae": {
+    "clue": "Desciende sin resistencia",
+    "score": 90
+  },
+  "paz": {
+    "clue": "Ausencia de guerra y conflicto",
+    "score": 90
+  },
+  "new": {
+    "clue": "Opuesto a antiguo",
+    "score": 90
+  },
+  "fin": {
+    "clue": "Término o conclusión",
+    "score": 90
+  },
+  "fue": {
+    "clue": "Pasado de ser",
+    "score": 90
+  },
+  "sam": {
+    "clue": "Tío estadounidense",
+    "score": 90
+  },
+  "feo": {
+    "clue": "Falto de belleza",
+    "score": 90
+  },
+  "ahi": {
+    "clue": "En ese lugar",
+    "score": 90
+  },
+  "dan": {
+    "clue": "Rango en artes marciales",
+    "score": 90
+  },
+  "oir": {
+    "clue": "Percibir sonidos",
+    "score": 90
+  },
+  "oye": {
+    "clue": "Grito para captar atención",
+    "score": 90
+  },
+  "voy": {
+    "clue": "Marcho hacia adelante",
+    "score": 90
+  },
+  "tan": {
+    "clue": "Expresión de intensidad o grado",
+    "score": 90
+  },
+  "das": {
+    "clue": "Entregas, en presente",
+    "score": 90
+  },
+  "vos": {
+    "clue": "Pronombre para dirigirse informalmente",
+    "score": 90
+  },
+  "vio": {
+    "clue": "Miró en el pasado",
+    "score": 90
+  },
+  "ese": {
+    "clue": "El demostrativo de allá",
+    "score": 90
+  },
+  "sue": {
+    "clue": "Demandar ante la justicia",
+    "score": 90
+  },
+  "ray": {
+    "clue": "Pez de agua salada con cuerpo plano",
+    "score": 90
+  },
+  "ooh": {
+    "clue": "Sonido de sorpresa o admiración",
+    "score": 90
+  },
+  "bob": {
+    "clue": "Corte de cabello femenino a la altura del mentón",
+    "score": 90
+  },
+  "usa": {
+    "clue": "Pone en práctica",
+    "score": 90
+  },
+  "vez": {
+    "clue": "Ocasión o momento",
+    "score": 90
+  },
+  "fbi": {
+    "clue": "Agencia federal estadounidense de investigación",
+    "score": 90
+  },
+  "ver": {
+    "clue": "Percibir con los ojos",
+    "score": 90
+  },
+  "kim": {
+    "clue": "Nombre coreano popular en el mundo",
+    "score": 90
+  },
+  "ido": {
+    "clue": "Despistado, fuera de sí",
+    "score": 90
+  },
+  "tio": {
+    "clue": "Hermano de tus progenitores",
+    "score": 90
+  },
+  "fui": {
+    "clue": "Marché tiempo atrás",
+    "score": 90
+  },
+  "mal": {
+    "clue": "Contrario a bien",
+    "score": 90
+  },
+  "joe": {
+    "clue": "Taza de café en inglés",
+    "score": 90
+  },
+  "roy": {
+    "clue": "Monarca de antaño",
+    "score": 90
+  },
+  "mes": {
+    "clue": "Doceava parte del año",
+    "score": 90
+  },
+  "liz": {
+    "clue": "Forma corta de un nombre bíblico",
+    "score": 90
+  },
+  "lou": {
+    "clue": "Reed, músico de rock clásico",
+    "score": 90
+  },
+  "jay": {
+    "clue": "Pájaro de plumaje azul y negro",
+    "score": 90
+  },
+  "van": {
+    "clue": "Se desplazan hacia un lugar",
+    "score": 90
+  },
+  "hoy": {
+    "clue": "Jornada actual",
+    "score": 90
+  },
+  "bar": {
+    "clue": "Lugar de copas",
+    "score": 90
+  },
+  "dio": {
+    "clue": "Otorgó en el pasado",
+    "score": 90
+  },
+  "aun": {
+    "clue": "Todavía no ocurre",
+    "score": 90
+  },
+  "ire": {
+    "clue": "Furia o enojo intenso",
+    "score": 90
+  },
+  "soy": {
+    "clue": "Verbo conjugado en primera persona",
+    "score": 90
+  },
+  "ira": {
+    "clue": "Cólera sin control",
+    "score": 90
+  },
+  "max": {
+    "clue": "Grado superior alcanzado",
+    "score": 90
+  },
+  "tal": {
+    "clue": "De esa manera",
+    "score": 90
+  },
+  "doy": {
+    "clue": "Entrego generosamente",
+    "score": 90
+  },
+  "par": {
+    "clue": "Número divisible entre dos",
+    "score": 90
+  },
+  "web": {
+    "clue": "Sitio de internet o página virtual",
+    "score": 90
+  },
+  "que": {
+    "clue": "Pronombre relativo muy común en español",
+    "score": 90
+  },
+  "voz": {
+    "clue": "Sonido de la garganta",
+    "score": 90
+  },
+  "asi": {
+    "clue": "De esta manera",
+    "score": 90
+  },
+  "hay": {
+    "clue": "Existe o se encuentra presente",
+    "score": 90
+  },
+  "ian": {
+    "clue": "Nombre escocés común",
+    "score": 90
+  },
+  "sed": {
+    "clue": "Deseo de beber",
+    "score": 90
+  },
+  "des": {
+    "clue": "Prefijo de negación e inversión",
+    "score": 90
+  },
+  "don": {
+    "clue": "Título de cortesía para caballeros",
+    "score": 90
+  },
+  "veo": {
+    "clue": "Percibo con los ojos",
+    "score": 90
+  },
+  "jim": {
+    "clue": "Forma inglesa de Jaime",
+    "score": 90
   }
 }
