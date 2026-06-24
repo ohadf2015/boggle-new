@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { getVocabClassroomContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
 import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
@@ -131,11 +131,11 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-vgc-faq" type="application/ld+json">{JSON.stringify(faqJsonLd)}</Script>
-      <Script id="ld-vgc-resource" type="application/ld+json">{JSON.stringify(learningResourceJsonLd)}</Script>
-      <Script id="ld-vgc-howto" type="application/ld+json">{JSON.stringify(howToJsonLd)}</Script>
-      <Script id="ld-vgc-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
-      <Script id="ld-vgc-course" type="application/ld+json">{JSON.stringify(courseJsonLd)}</Script>
+      <JsonLd data={faqJsonLd} />
+      <JsonLd data={learningResourceJsonLd} />
+      <JsonLd data={howToJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={courseJsonLd} />
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-4" />

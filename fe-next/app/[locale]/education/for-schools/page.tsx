@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Script from 'next/script';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { getForSchoolsContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { SchoolLeadForm } from '@/components/education/SchoolLeadForm';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
@@ -86,9 +86,9 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <Script id="ld-fs-faq" type="application/ld+json">{JSON.stringify(faqJsonLd)}</Script>
-      <Script id="ld-fs-org" type="application/ld+json">{JSON.stringify(orgJsonLd)}</Script>
-      <Script id="ld-fs-breadcrumb" type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</Script>
+      <JsonLd data={faqJsonLd} />
+      <JsonLd data={orgJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <TopBackLink className="mb-4" />

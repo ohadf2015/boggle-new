@@ -1,52 +1,42 @@
 {
-  "date": "2026-06-23",
-  "note": "Twenty-seventh snapshot. /he LCP improved 3297→3112ms (-5.8%, 7d n=58); INP 264→280ms (+6%, still POOR). /es/multiplayer LCP REGRESSION: 3127→3876ms (+24%, 7d n=75) — both runs clear n≥50 floor. Hypothesis: LobbyDailyEmber (useDailyChallengeStatus hook added 06-21) adds async fetch to lobby; proportion of 7d window post-ember is growing. Backend: migration 20260623030000 adds idx_word_clubs_owner_id (advisor unindexed FK) + drops idx_word_wheel_attempts_catchup (advisor unused index, 0 scans).",
+  "date": "2026-06-24",
+  "note": "Twenty-eighth snapshot. /es/multiplayer LCP WORSENING: 3876→5932ms (+53%, 7d n=62 both runs ≥50 floor). Now fully outside the LobbyDailyEmber (06-21) 7d window so entire sample is post-ember. Root cause unresolved — structural: all 4 views are ssr:false dynamic imports, socket-gated; PlayfulBackground is CSS-only; mascot already has priority=true. Needs Chrome profiler trace to identify LCP element and whether re-renders are responsible. /he improved: 3112→2927ms (-6%, n=55). Backend: no new advisor items to fix — FK index + unused index already fixed by migration 20260623030000 (06-23). auth_db_connections_absolute remains deferred (human config in Supabase dashboard).",
   "backend": {
-    "advisor_warnings_count": 3,
-    "note": "Brief flagged 3 advisor items. Two fixed via migration 20260623030000. auth_db_connections_absolute remains deferred (human config in Supabase dashboard).",
+    "advisor_warnings_count": 1,
+    "note": "Only remaining advisor item is auth_db_connections_absolute (human config change in Supabase dashboard). FK index (word_clubs_owner_id_fkey) + unused index (idx_word_wheel_attempts_catchup) fixed yesterday.",
     "top_queries": [],
-    "migrations_applied_this_run": [
-      "20260623030000_perf_fk_index_and_drop_unused.sql"
-    ],
+    "migrations_applied_this_run": [],
     "remaining_advisor_items": [
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human config change in Supabase dashboard (Auth connection pool strategy: absolute→percentage)"
-      },
-      {
-        "id": "unindexed_fk:word_clubs_owner_id_fkey",
-        "status": "FIXED via migration 20260623030000 — idx_word_clubs_owner_id created IF NOT EXISTS"
-      },
-      {
-        "id": "unused_index:idx_word_wheel_attempts_catchup",
-        "status": "FIXED via migration 20260623030000 — DROP INDEX IF EXISTS (0 scans, pure write overhead)"
       }
     ]
   },
   "frontend": {
-    "note": "7d window (n>=50 floor). 24h window: /es/multiplayer n=19, /he n=9 — both sub-floor, DEFERRED. 7d measurements used for regression detection.",
+    "note": "7d window (n>=50 floor). 24h window: all routes sub-floor (empty). Two routes cleared 7d n≥50 floor.",
     "by_route": [
       {
-        "route": "/he",
-        "p75_lcp_ms": 3112,
-        "p75_inp_ms": 280,
-        "p75_cls": 0.078,
-        "n_7d": 58,
+        "route": "/es/multiplayer",
+        "p75_lcp_ms": 5932,
+        "p75_inp_ms": 328,
+        "p75_cls": 0.167,
+        "n_7d": 62,
         "window": "7d",
-        "lcp_status": "NEEDS IMPROVEMENT — 3112ms (improved from 3297ms, -5.8%). Still >2500ms. Root cause unresolved — LobbyDailyEmber + hook waterfall (useAuth→usePlayerStats→useDailyChallengeStatus) suspected; needs profiler trace.",
-        "inp_status": "POOR — 280ms (slight creep from 264ms, +6%, below 20% regression threshold). Improving trend over 2-week window.",
-        "cls_status": "OK — 0.078 (stable from 0.073)"
+        "lcp_status": "REGRESSION — 5932ms (+53% from 3876ms baseline, n=62 both ≥50). Full 7d window now post-LobbyDailyEmber (06-21). Root cause investigation: all 4 multiplayer views are ssr:false dynamic imports (HostView/PlayerView/MultiplayerFlow/ResultsPage); no above-fold images missing priority; PlayfulBackground is CSS-only. Mascot in ViewLoadingSkeleton has priority=true but unoptimized=true (animated WebP). Hypothesis: socket connection latency + dynamic import waterfall is structural LCP floor. Needs Chrome profiler trace in dev to identify LCP element and re-render candidates.",
+        "inp_status": "POOR — 328ms (unchanged from baseline). No change.",
+        "cls_status": "WATCH — 0.167 (stable from 0.173)"
       },
       {
-        "route": "/es/multiplayer",
-        "p75_lcp_ms": 3876,
-        "p75_inp_ms": 328,
-        "p75_cls": 0.173,
-        "n_7d": 75,
+        "route": "/he",
+        "p75_lcp_ms": 2927,
+        "p75_inp_ms": 298,
+        "p75_cls": 0.089,
+        "n_7d": 55,
         "window": "7d",
-        "lcp_status": "REGRESSION — 3876ms (+24% from 3127ms, exceeds 20% threshold, n=75 vs baseline n=62, both ≥50). Hypothesis: LobbyDailyEmber useDailyChallengeStatus async fetch added 06-21 increasing proportion of 7d window. Needs profiler trace in dev to confirm.",
-        "inp_status": "POOR — 328ms (stable from 328ms). No change.",
-        "cls_status": "WATCH — 0.173 (stable from 0.167)"
+        "lcp_status": "NEEDS IMPROVEMENT — 2927ms (improved from 3112ms, -6%). Still >2500ms. Improving trend (3297→3112→2927ms over 3 weeks). Root cause unresolved but trending right.",
+        "inp_status": "POOR — 298ms (improved from 280ms, +6%, within 20% threshold, not a regression). Still >200ms.",
+        "cls_status": "OK — 0.089 (improved from 0.078)"
       }
     ]
   },
@@ -58,27 +48,31 @@
   "open_watches": [
     {
       "id": "es-multiplayer-lcp-regression",
-      "description": "/es/multiplayer p75 LCP 3876ms (7d, n=75). REGRESSION: +24% from 3127ms (06-22). Both runs n≥50. Hypothesis: LobbyDailyEmber (06-21) adds useDailyChallengeStatus fetch to lobby render path. Needs profiler trace.",
+      "description": "/es/multiplayer p75 LCP 5932ms (7d, n=62). WORSENING: +53% from 3876ms (06-23), +90% from original 3127ms (06-22). Root cause structural — ssr:false dynamic imports + socket-gated content. Needs Chrome profiler trace to identify LCP element and confirm fix path. Next step: profiler trace in dev, check if ViewLoadingSkeleton mascot is LCP candidate or if a re-render moves it post-socket.",
       "severity": "HIGH",
-      "since": "2026-06-23"
+      "since": "2026-06-23",
+      "updated": "2026-06-24"
     },
     {
       "id": "he-lcp-high",
-      "description": "/he p75 LCP 3112ms (7d, n=58). Improving trend (-5.8% this week). Root cause unresolved — hook waterfall suspected.",
+      "description": "/he p75 LCP 2927ms (7d, n=55). Improving trend (-6% this week, -11% from 3297ms peak). Still >2500ms needs-improvement threshold.",
       "severity": "MEDIUM",
-      "since": "2026-06-20"
+      "since": "2026-06-20",
+      "updated": "2026-06-24"
     },
     {
       "id": "he-inp-poor",
-      "description": "/he p75 INP 280ms (7d, n=58). POOR (>200ms). Slight creep +6% from 264ms, below 20% regression threshold.",
+      "description": "/he p75 INP 298ms (7d, n=55). POOR (>200ms). Stable.",
       "severity": "MEDIUM",
-      "since": "2026-06-20"
+      "since": "2026-06-20",
+      "updated": "2026-06-24"
     },
     {
       "id": "es-multiplayer-cls-watch",
-      "description": "/es/multiplayer p75 CLS 0.173 (7d, n=75). Stable. Exceeds 0.1 threshold.",
+      "description": "/es/multiplayer p75 CLS 0.167 (7d, n=62). Stable, exceeds 0.1 threshold.",
       "severity": "LOW",
-      "since": "2026-06-21"
+      "since": "2026-06-21",
+      "updated": "2026-06-24"
     }
   ]
 }

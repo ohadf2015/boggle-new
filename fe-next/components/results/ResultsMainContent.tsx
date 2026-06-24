@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useMemo, useState, useEffect } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, Type, Star, ChevronDown, ChevronUp } from 'lucide-react';
@@ -31,6 +31,8 @@ import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
 import { ShareButton } from '@/components/results/ShareButton';
 import GameFeedback from '@/components/feedback/GameFeedback';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useExperiment } from '@/hooks/useExperiment';
 
 
 // ==============================================
@@ -163,6 +165,15 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const isWordHunt = gameMode === 'word-hunt';
   const isMultiplayer = sortedScores.length > 1;
 
+  const { variant: feedbackPosition } = useExperiment('exp-mp-round-feedback-top-v1');
+
+  useEffect(() => {
+    if (isMultiplayer) {
+      trackGrowthEvent('mp_results_viewed', { gameMode: gameMode ?? 'unknown', language });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Split players: top 3 for podium, 4th+ for consolation rows
   const podiumPlayers = useMemo(() => sortedScores.slice(0, 3), [sortedScores]);
   const consolationPlayers = useMemo(() => sortedScores.slice(3), [sortedScores]);
@@ -254,6 +265,21 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     <div className="space-y-6">
       {/* Win streak now lives inside ImprovementPanel ("Your Progress") below —
           a single home for streak + XP + level avoids showing the streak twice. */}
+
+      {/* exp-mp-round-feedback-top-v1: top-prompt shows feedback above the fold */}
+      {feedbackPosition === 'top-prompt' && (
+        <GameFeedback
+          surface="mp_round"
+          eligible={
+            isMultiplayer &&
+            !!gameCode &&
+            !(seriesRoundNumber != null && seriesRoundNumber >= (seriesTotalGames ?? 3))
+          }
+          gameMode={gameMode}
+          language={language}
+          throttleKey={gameCode}
+        />
+      )}
 
       {/* Near Rank Teaser */}
       {nearRankData && (
@@ -356,18 +382,21 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       {/* 3.6 BETWEEN-ROUNDS FEEDBACK — one-tap round sentiment → PostHog
           (game_feedback, surface=mp_round). Eligible only between live rounds
           (multiplayer + room + not the series finale); the shared throttle in
-          useGameFeedback keeps it to ~once every few days across all surfaces. */}
-      <GameFeedback
-        surface="mp_round"
-        eligible={
-          isMultiplayer &&
-          !!gameCode &&
-          !(seriesRoundNumber != null && seriesRoundNumber >= (seriesTotalGames ?? 3))
-        }
-        gameMode={gameMode}
-        language={language}
-        throttleKey={gameCode}
-      />
+          useGameFeedback keeps it to ~once every few days across all surfaces.
+          top-prompt variant renders above the fold instead (see top of return). */}
+      {feedbackPosition !== 'top-prompt' && (
+        <GameFeedback
+          surface="mp_round"
+          eligible={
+            isMultiplayer &&
+            !!gameCode &&
+            !(seriesRoundNumber != null && seriesRoundNumber >= (seriesTotalGames ?? 3))
+          }
+          gameMode={gameMode}
+          language={language}
+          throttleKey={gameCode}
+        />
+      )}
 
       {/* 4. CONSOLATION ROW — current player only (their placement + crown).
           Keeps the recap focused on the player instead of listing every

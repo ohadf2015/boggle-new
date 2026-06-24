@@ -206,7 +206,17 @@ export type GrowthEvent =
   // wordhunt_leaderboard_tap: fires when user taps the leaderboard area;
   //   high rate = evidence the dead tap-hint is confusing players.
   | 'wordhunt_results_loaded'
-  | 'wordhunt_leaderboard_tap';
+  | 'wordhunt_leaderboard_tap'
+  // Multiplayer results page funnel — fills mp_round blind spots.
+  //   mp_results_viewed: fires on ResultsMainContent mount (isMultiplayer=true).
+  //     Props: { gameMode, language }. Baseline reach for round-result funnel.
+  //   mp_round_ready_clicked: fires when player marks ready for next round.
+  //     Props: { language }. Measures round-transition engagement.
+  //   mp_results_exit_clicked: fires when player exits from between-round results.
+  //     Props: { language, gameMode }. Measures voluntary mid-series exits.
+  | 'mp_results_viewed'
+  | 'mp_round_ready_clicked'
+  | 'mp_results_exit_clicked';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

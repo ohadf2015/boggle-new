@@ -465,6 +465,28 @@ export const EXPERIMENTS = {
    * Wire: pass useExperiment('exp-game-abandon-confirm-v1') variant to quit-confirm
    *   modal in DailyChallengeGame.tsx / useSinglePlayerCore.ts + ExitConfirmation.tsx.
    */
+  /**
+   * MP round GameFeedback prompt position. PostHog 24h: mp_round sentiment
+   * avg 1/3 (bad) — but only 1 response in 24h, suggesting the feedback card
+   * is rarely seen (buried below series standings + consolation rows). The
+   * `top-prompt` variant renders the card BEFORE the podium so it's above the
+   * fold on mobile, increasing response rate and giving us signal to understand
+   * WHY mp_round feels bad before investing in a fix.
+   *
+   * control: current position (below series standings, line 360 ResultsMainContent).
+   * top-prompt: GameFeedback rendered at top of results (before NearRankTeaser).
+   *
+   * Primary metric: game_feedback rate on mp_round (responses / mp_results_viewed).
+   * Guardrail: mp_results_exit_clicked must not rise (don't tank results experience).
+   * Ship to PostHog: flag key = 'exp-mp-round-feedback-top-v1', 50/50 rollout.
+   */
+  'exp-mp-round-feedback-top-v1': defineExperiment({
+    variants: ['control', 'top-prompt'] as const,
+    default: 'control',
+    description:
+      'MP round GameFeedback card position. top-prompt = card above podium (above the fold). control = current below-series-standings position. Lifts mp_round feedback response rate to improve signal quality before investing in sentiment fixes.',
+  }),
+
   'exp-game-abandon-confirm-v1': defineExperiment({
     variants: ['control', 'stats-shown'] as const,
     default: 'control',

@@ -15,6 +15,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { applyHebrewFinalLetters, HEBREW_FINAL_TO_REGULAR } from '@/shared/utils/wordNormalization';
 import AlchemyKeyboard from '@/components/wordAlchemy/AlchemyKeyboard';
 import { getKeyboardLetters, appendLetter, backspace } from '@/lib/wordAlchemy/keyboard';
+import { alchemyDirHint } from '@/lib/wordAlchemy/dirHint';
 import { getWildcardCatalyst } from '@/lib/wordAlchemy/wildcardCatalyst';
 import { WildcardFoundModal } from '@/components/wordAlchemy/WildcardFoundModal';
 import { useAlchemyHeatMeter } from '@/hooks/useAlchemyHeatMeter';
@@ -259,6 +260,7 @@ export default function WordAlchemyPage() {
   const [stepIdx, setStepIdx] = useState(0);
   const [input, setInput] = useState('');
   const [wrongCount, setWrongCount] = useState(0);
+  const [hintDir, setHintDir] = useState<'↑' | '↓' | null>(null);
   const [streak, setStreak] = useState(0);
   const [pbStreak, setPbStreak] = useState(() => getAlchemyStreakPB());
   const [wildcardFound, setWildcardFound] = useState(false);
@@ -315,6 +317,7 @@ export default function WordAlchemyPage() {
     setInput('');
     setWrongCount(0);
     setStreak(0);
+    setHintDir(null);
     setWildcardFound(false);
     setStepResults([]);
     wonFxFiredRef.current = false;
@@ -381,6 +384,8 @@ export default function WordAlchemyPage() {
         void el.offsetWidth;
         el.classList.add('animate-neo-shake');
       }
+      setHintDir(alchemyDirHint(input, step.answer, isHe ? 'he' : 'en'));
+      setTimeout(() => setHintDir(null), 2000);
     }
   };
 
@@ -567,6 +572,11 @@ export default function WordAlchemyPage() {
                 </span>
               )}
             </div>
+            {hintDir && (
+              <p role="status" aria-live="polite" className="mt-2 text-center font-neo-display text-3xl animate-neo-pop select-none text-neo-orange">
+                {hintDir}
+              </p>
+            )}
           </form>
         )}
       </div>
