@@ -38,6 +38,11 @@ ARG NEXT_PUBLIC_SENTRY_DSN
 ARG NEXT_PUBLIC_GA4_MEASUREMENT_ID
 ARG NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID
 ARG NEXT_PUBLIC_CRAZYGAMES_ENABLED
+# Monetag web rewarded (instant-approval fallback). ZONE_ID = MultiTag zone for site
+# www.lexiclash.live; ADS_ENABLED gates it in the rewarded waterfall. Web top-frame
+# only — the lib hard-blocks native/iframe regardless of these.
+ARG NEXT_PUBLIC_MONETAG_ADS_ENABLED
+ARG NEXT_PUBLIC_MONETAG_ZONE_ID
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
 # CDN base for heavy static media (music/sounds/showcase3d) — offloaded to Supabase Storage.
