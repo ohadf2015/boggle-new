@@ -663,10 +663,6 @@
     "clue": "Upphörde att leva",
     "score": 90
   },
-  "sex": {
-    "clue": "Dubbel av tre",
-    "score": 90
-  },
   "fri": {
     "clue": "Inte bunden eller fängslad",
     "score": 90
@@ -853,10 +849,6 @@
   },
   "dra": {
     "clue": "Förflytta med kraft bakåt",
-    "score": 90
-  },
-  "fan": {
-    "clue": "Överjordisk motståndare i många religioner",
     "score": 90
   },
   "gav": {
@@ -1219,16 +1211,8 @@
     "clue": "Mellan två ändar",
     "score": 90
   },
-  "dam": {
-    "clue": "Förnäm kvinnlig väsen",
-    "score": 90
-  },
   "sår": {
     "clue": "Skada på huden",
-    "score": 90
-  },
-  "röv": {
-    "clue": "Kroppsdel man sitter på",
     "score": 90
   },
   "rad": {
@@ -1345,10 +1329,6 @@
   },
   "jag": {
     "clue": "Första personspronomen",
-    "score": 90
-  },
-  "bög": {
-    "clue": "Entusiast för samling eller intresse",
     "score": 90
   },
   "het": {
@@ -1627,10 +1607,6 @@
     "clue": "Månader på ett år",
     "score": 90
   },
-  "gay": {
-    "clue": "HBTQ-person eller homosexuell",
-    "score": 90
-  },
   "åkte": {
     "clue": "Körde eller reste",
     "score": 90
@@ -1817,10 +1793,6 @@
   },
   "fina": {
     "clue": "Elegant och vacker",
-    "score": 90
-  },
-  "kuk": {
-    "clue": "Hönsfågel med röd kam",
     "score": 90
   },
   "hopp": {
@@ -2125,10 +2097,6 @@
   },
   "satt": {
     "clue": "Inte långsmal eller smäcker",
-    "score": 90
-  },
-  "the": {
-    "clue": "Varm bladdryck",
     "score": 90
   },
   "nere": {
