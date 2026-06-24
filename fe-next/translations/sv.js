@@ -139,6 +139,7 @@ const sv = {
     "gridLabel": "Korsordsrutnät",
     "cellLabel": "Rad {row}, kolumn {col}",
     "dir": { "across": "Vågrätt", "down": "Lodrätt" },
+    "switchDir": "Byt riktning",
     "difficulty": { "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
     "acrossHeading": "Vågrätt",
     "downHeading": "Lodrätt",

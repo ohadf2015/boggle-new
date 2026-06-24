@@ -68,6 +68,7 @@ const en = {
     "gridLabel": "Crossword grid",
     "cellLabel": "Row {row}, column {col}",
     "dir": { "across": "Across", "down": "Down" },
+    "switchDir": "Switch direction",
     "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "acrossHeading": "Across",
     "downHeading": "Down",

@@ -68,6 +68,7 @@ const he = {
     "gridLabel": "לוח תשבץ",
     "cellLabel": "שורה {row}, עמודה {col}",
     "dir": { "across": "מאוזן", "down": "מאונך" },
+    "switchDir": "החלף כיוון",
     "difficulty": { "easy": "קל", "medium": "בינוני", "hard": "קשה" },
     "acrossHeading": "מאוזן",
     "downHeading": "מאונך",

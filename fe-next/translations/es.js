@@ -68,6 +68,7 @@ const es = {
     "gridLabel": "Cuadrícula del crucigrama",
     "cellLabel": "Fila {row}, columna {col}",
     "dir": { "across": "Horizontal", "down": "Vertical" },
+    "switchDir": "Cambiar dirección",
     "difficulty": { "easy": "Fácil", "medium": "Media", "hard": "Difícil" },
     "acrossHeading": "Horizontales",
     "downHeading": "Verticales",

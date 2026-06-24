@@ -68,6 +68,7 @@ const ja = {
     "gridLabel": "クロスワードの盤面",
     "cellLabel": "{row}行 {col}列",
     "dir": { "across": "ヨコ", "down": "タテ" },
+    "switchDir": "方向を切り替え",
     "difficulty": { "easy": "かんたん", "medium": "ふつう", "hard": "むずかしい" },
     "acrossHeading": "ヨコのカギ",
     "downHeading": "タテのカギ",
