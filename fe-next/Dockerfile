@@ -38,9 +38,11 @@ ARG NEXT_PUBLIC_SENTRY_DSN
 ARG NEXT_PUBLIC_GA4_MEASUREMENT_ID
 ARG NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID
 ARG NEXT_PUBLIC_CRAZYGAMES_ENABLED
-# Monetag web rewarded (instant-approval fallback). ZONE_ID = MultiTag zone for site
-# www.lexiclash.live; ADS_ENABLED gates it in the rewarded waterfall. Web top-frame
-# only — the lib hard-blocks native/iframe regardless of these.
+# Monetag web rewarded (instant-approval fallback). ZONE_ID = the SDK-show zone for
+# site www.lexiclash.live — use the Vignette sub-zone (11196925), NOT the MultiTag
+# OnClick/popunder parent (11196923 returns 404 on the SDK show_<id>() path; popunder
+# isn't an on-demand format). ADS_ENABLED gates it in the rewarded waterfall. Web
+# top-frame only — the lib hard-blocks native/iframe regardless of these.
 ARG NEXT_PUBLIC_MONETAG_ADS_ENABLED
 ARG NEXT_PUBLIC_MONETAG_ZONE_ID
 ARG NEXT_PUBLIC_POSTHOG_KEY
