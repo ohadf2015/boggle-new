@@ -55,6 +55,14 @@ describe('PlayerStyleOnboardingWrapper route gate', () => {
     expect(screen.queryByTestId('style-popup')).not.toBeInTheDocument();
   });
 
+  it('does NOT render the style popup on an SEO/education landing page', () => {
+    // Reported: the full-screen popup buried the /education hero for search
+    // visitors. Education is an SEO doorway, not an in-app route.
+    pathname = '/en/education/esl-word-games';
+    renderAndSettle();
+    expect(screen.queryByTestId('style-popup')).not.toBeInTheDocument();
+  });
+
   it('renders the style popup on an in-app route (eligible guest)', () => {
     pathname = '/en/practice';
     renderAndSettle();

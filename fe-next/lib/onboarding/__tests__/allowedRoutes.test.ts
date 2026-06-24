@@ -79,9 +79,68 @@ describe('isLandingRoute', () => {
     '/en/practice',
     '/en/multiplayer',
     '/he/daily',
+    '/en/singleplayer',
+    '/en/blast',
+    '/en/brain',
+    '/en/adventure',
+    '/en/profile',
+    '/en/settings',
+    '/en/quests',
+    '/en/leaderboard',
+    // Blog/editorial content is explicitly NOT a marketing landing — popup allowed.
     '/en/blog/boggle-vs-wordle',
   ])('returns false for the in-app/content route %s (popup allowed there)', (path) => {
     expect(isLandingRoute(path)).toBe(false);
+  });
+
+  describe('marketing / SEO landing doorways (popup suppressed)', () => {
+    it.each([
+      // Education SEO section — the reported case (full-screen popup buried the
+      // /education/esl-word-games hero on a search-visitor doorway).
+      '/en/education',
+      '/en/education/esl-word-games',
+      '/en/education/for-schools',
+      '/en/education/duels',
+      '/he/education',
+      // Info / content doorways
+      '/en/about',
+      '/en/faq',
+      '/en/how-to-play',
+      '/en/rules',
+      '/en/glossary',
+      '/en/guides',
+      '/en/contact',
+      '/en/legal',
+      '/en/accessibility',
+      '/en/editorial-policy',
+      // Word-game SEO doorways
+      '/en/best-online-word-games',
+      '/en/play-boggle-online-free',
+      '/en/word-games-online-free',
+      '/en/brain-training-word-games',
+      '/en/competitive-word-games',
+      '/en/multiplayer-word-game-online',
+      '/en/online-word-games-with-friends',
+      '/en/words-with-friends-alternative',
+      '/en/free-multiplayer-word-game',
+      '/en/scrabble-alternative-online',
+      // Locale-specific landings
+      '/he/hebrew-multiplayer-word-game',
+      '/sv/swedish-multiplayer-word-game',
+      '/es/juego-de-palabras-multijugador',
+      // Competitor comparison landings
+      '/en/lexiclash-vs-scrabble',
+      '/en/lexiclash-vs-wordle',
+      '/en/lexiclash-vs-quizlet',
+      '/he/lexiclash-neged-wordle',
+    ])('returns true for %s', (path) => {
+      expect(isLandingRoute(path)).toBe(true);
+    });
+
+    it('does not match a non-landing route that merely shares a prefix', () => {
+      // '/aboutus' must not be swallowed by the '/about' prefix.
+      expect(isLandingRoute('/en/aboutus')).toBe(false);
+    });
   });
 
   it.each([null, undefined, ''])('returns false for malformed input %s', (value) => {
