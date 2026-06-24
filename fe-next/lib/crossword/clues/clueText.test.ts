@@ -27,6 +27,18 @@ describe('isCircularClue', () => {
   it('passes a clean clue', () => {
     expect(isCircularClue('Atlantic or Pacific', 'ocean')).toBe(false);
   });
+  // The gate must fire for non-Latin scripts too — Hebrew banks were ~20% circular because the
+  // old /[a-z]+/ tokenizer matched zero Hebrew characters and silently passed everything.
+  it('flags a Hebrew answer that appears verbatim in its clue', () => {
+    expect(isCircularClue('רחב; גדול', 'רחב')).toBe(true);
+    expect(isCircularClue('כעס; זעם', 'כעס')).toBe(true);
+  });
+  it('passes a clean Hebrew clue', () => {
+    expect(isCircularClue('צבע השמיים', 'כחול')).toBe(false);
+  });
+  it('flags a Spanish answer with accents appearing in its clue', () => {
+    expect(isCircularClue('león; el rey', 'león')).toBe(true);
+  });
 });
 
 describe('clueLengthOk', () => {

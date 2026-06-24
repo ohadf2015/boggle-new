@@ -26,10 +26,14 @@ function sharesStem(a: string, b: string): boolean {
   return n >= 3 && Math.min(x.length, y.length) >= 3;
 }
 
-/** True if the clue gives the answer away (contains it, or a derivative of it). */
+/**
+ * True if the clue gives the answer away (contains it, or a derivative of it). Tokenizes on
+ * Unicode letters (`\p{L}`), not `[a-z]` — the old Latin-only regex matched zero Hebrew/accented
+ * characters, so the gate silently passed every non-English clue (Hebrew bank was ~20% circular).
+ */
 export function isCircularClue(clue: string, answer: string): boolean {
   const ans = answer.toLowerCase();
-  const words = clue.toLowerCase().match(/[a-z]+/g) ?? [];
+  const words = clue.toLowerCase().match(/\p{L}+/gu) ?? [];
   return words.some((w) => w === ans || w.includes(ans) || sharesStem(w, ans));
 }
 
