@@ -27,10 +27,6 @@
     "clue": "Pokerspelarens insats",
     "score": 85
   },
-  "antle": {
-    "clue": "Afrikansk antilop",
-    "score": 85
-  },
   "apel": {
     "clue": "Frukt från träd",
     "score": 88
@@ -315,18 +311,6 @@
     "clue": "Vapen samling plats",
     "score": 80
   },
-  "armful": {
-    "clue": "Armlas fulla mål",
-    "score": 82
-  },
-  "armfuls": {
-    "clue": "Flera armfullar",
-    "score": 80
-  },
-  "armgaunt": {
-    "clue": "Mager armar",
-    "score": 78
-  },
   "armiger": {
     "clue": "Väpnad skjutsman",
     "score": 80
@@ -347,21 +331,9 @@
     "clue": "Himmelsarmband",
     "score": 78
   },
-  "armilla": {
-    "clue": "Armband eller ring",
-    "score": 82
-  },
-  "armillae": {
-    "clue": "Flera armband ring",
-    "score": 78
-  },
   "armillary": {
     "clue": "Ringartig himmels",
     "score": 80
-  },
-  "armils": {
-    "clue": "Rom präst armband",
-    "score": 78
   },
   "arming": {
     "clue": "Väpning eller utrustnig",
@@ -378,18 +350,6 @@
   "armistice": {
     "clue": "Krig fred paus",
     "score": 88
-  },
-  "armk": {
-    "clue": "Förk för armering",
-    "score": 75
-  },
-  "armlet": {
-    "clue": "Liten armband ring",
-    "score": 85
-  },
-  "armload": {
-    "clue": "Armfull mängd",
-    "score": 82
   },
   "armoire": {
     "clue": "Französk garderob",
@@ -424,7 +384,7 @@
     "score": 80
   },
   "armoury": {
-    "clue": "Vapen lagerhus",
+    "clue": "Vapen förvar plats",
     "score": 85
   },
   "armory": {
@@ -447,20 +407,12 @@
     "clue": "Vapen förvaringar",
     "score": 82
   },
-  "armoury": {
-    "clue": "Vapen förvar plats",
-    "score": 85
-  },
   "armouse": {
-    "clue": "Väpnad möss",
+    "clue": "Väpnad datormus",
     "score": 75
   },
   "armousement": {
     "clue": "Väpnad rosamling",
-    "score": 75
-  },
-  "armouse": {
-    "clue": "Väpnad datormus",
     "score": 75
   },
   "armozeen": {
@@ -471,25 +423,9 @@
     "clue": "Morningväv",
     "score": 78
   },
-  "armplate": {
-    "clue": "Armplåt rustning",
-    "score": 80
-  },
-  "armrest": {
-    "clue": "Stol arm stöd",
-    "score": 85
-  },
   "arms": {
     "clue": "Vapen eller kroppsdel",
     "score": 88
-  },
-  "armscye": {
-    "clue": "Armhål öppning",
-    "score": 82
-  },
-  "armsy": {
-    "clue": "Med många arm",
-    "score": 75
   },
   "army": {
     "clue": "Soldat försvarsmakt",
@@ -563,26 +499,6 @@
     "clue": "Grekisk låmål",
     "score": 80
   },
-  "arnical": {
-    "clue": "Arnika växt",
-    "score": 80
-  },
-  "arnication": {
-    "clue": "Arnika behandling",
-    "score": 78
-  },
-  "arnied": {
-    "clue": "Med arnika växt",
-    "score": 75
-  },
-  "arnies": {
-    "clue": "Flera arnika växt",
-    "score": 78
-  },
-  "arning": {
-    "clue": "Med björn",
-    "score": 75
-  },
   "arnion": {
     "clue": "Liten älm växt",
     "score": 75
@@ -595,24 +511,12 @@
     "clue": "Björn befäst",
     "score": 75
   },
-  "arnite": {
-    "clue": "Arnika växters mineral",
-    "score": 75
-  },
   "arnitter": {
     "clue": "Björn gräs",
     "score": 75
   },
-  "arnittin": {
-    "clue": "Arnika kemikalier",
-    "score": 75
-  },
   "arnitus": {
     "clue": "Björn på latin",
-    "score": 75
-  },
-  "arnizol": {
-    "clue": "Arnika oljeextrakt",
     "score": 75
   },
   "arnol": {
@@ -633,18 +537,6 @@
   },
   "arnolda": {
     "clue": "Björn kvinna",
-    "score": 75
-  },
-  "arnoldian": {
-    "clue": "Arnold relaterad",
-    "score": 75
-  },
-  "arnolding": {
-    "clue": "Arnold grässtil",
-    "score": 75
-  },
-  "arnoldy": {
-    "clue": "Som Arnold",
     "score": 75
   },
   "arnom": {
