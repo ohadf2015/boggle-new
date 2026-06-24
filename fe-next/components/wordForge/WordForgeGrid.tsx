@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/shared/types/game';
 import { tileFromPoint, stepPath, type TilePos } from '@/lib/wordForge/tileHitTest';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
@@ -152,10 +151,10 @@ export function WordForgeGrid({
   };
 
   const currentWord = getCurrentWord();
-  // Hebrew shows the word-final letter in its sofit form (e.g. כ→ך). The board
-  // tiles keep their regular form (the bag holds regular); only this linear
-  // preview gets the end-of-word glyph.
-  const displayWord = language === 'he' ? applyHebrewFinalLetters(currentWord) : currentWord;
+  // In-progress input stays base-form (no sofit) — the board holds regular
+  // letters and you're still building the word. The sofit final-letter glyph
+  // appears only once the word is submitted (ScoreFeedback / RunSummary).
+  const displayWord = currentWord;
   const wordDir = language === 'he' ? 'rtl' : 'ltr';
 
   return (

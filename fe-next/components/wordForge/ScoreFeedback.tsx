@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import type { WordScoreResult } from '@/types/wordForge';
 import { cn } from '@/lib/utils';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 interface ScoreFeedbackProps {
   lastScore: WordScoreResult | null;
@@ -56,7 +57,7 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
         <div className="bg-[#0A0A1A]/90 border-2 border-neo-black rounded-neo px-4 py-2 flex items-center gap-1.5 flex-wrap justify-center">
           {/* Word */}
           <span className="text-sm font-black text-neo-cream uppercase font-neo-display">
-            {displayScore.word}
+            {applyHebrewFinalLetters(displayScore.word)}
           </span>
           <span className="text-neo-cream/40">→</span>
 

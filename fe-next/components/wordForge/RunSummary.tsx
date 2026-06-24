@@ -8,6 +8,7 @@ import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { calculateRunXp, XP_THRESHOLDS } from '@/lib/wordForge/scoring';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import WatchAdButton from '@/components/daily/WatchAdButton';
 
 interface RunSummaryProps {
@@ -59,7 +60,7 @@ export function RunSummary({ state, onPlayAgain, onExit }: RunSummaryProps): Rea
         {state.bestWord && (
           <StatRow
             label={t('wordForge.bestWord')}
-            value={`${state.bestWord.word} (${state.bestWord.score} pts)`}
+            value={`${applyHebrewFinalLetters(state.bestWord.word)} (${state.bestWord.score} pts)`}
             highlight
           />
         )}

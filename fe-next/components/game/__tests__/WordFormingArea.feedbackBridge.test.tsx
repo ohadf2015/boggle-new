@@ -121,6 +121,22 @@ describe('WordFormingArea — feedback bridge on submit', () => {
     expect(screen.getByText('✓')).toBeInTheDocument(); // still visible — accepted gets full 5s
   });
 
+  // Hebrew sofit invariant: the in-progress forming word is INPUT and must show
+  // base letters (the board holds regular forms); the sofit final-letter glyph
+  // only appears once the word is submitted/settled.
+  // base "שלומ" ends in regular mem (מ); sofit display ends in final mem (ם).
+  it('shows the forming word in base form (no sofit), then the sofit form once submitted', () => {
+    const { rerender } = render(<WordFormingArea word="שלומ" letterCount={4} feedback={null} compact />);
+    // While forming → base mem, NOT the sofit form.
+    expect(screen.getByText('שלומ')).toBeInTheDocument();
+    expect(screen.queryByText('שלום')).not.toBeInTheDocument();
+
+    // Submitted (accepted feedback) → sofit final mem.
+    rerender(<WordFormingArea word="" letterCount={0} feedback={accepted('שלומ')} compact />);
+    expect(screen.getByText('שלום')).toBeInTheDocument();
+    expect(screen.queryByText('שלומ')).not.toBeInTheDocument();
+  });
+
   it('bounds the bridge — an abandoned word (no feedback ever) clears, not lingers', () => {
     const { rerender } = render(<WordFormingArea word="CAT" letterCount={3} feedback={null} compact />);
     // Player deselects without submitting — word clears, no feedback will ever come.

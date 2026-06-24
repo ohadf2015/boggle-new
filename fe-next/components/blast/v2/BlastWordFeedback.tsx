@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
 import type { ValidationResult } from '@/lib/blast/v2/engine';
+import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 type Props = {
   /** True while an off-theme word is awaiting the async dictionary verdict. */
@@ -107,7 +108,7 @@ export function BlastWordFeedback({
               🎯 {t('blast.feedback.target', 'TARGET!')}
             </div>
             <div className="mt-1 font-neo-display text-2xl font-black uppercase leading-none text-neo-navy">
-              {targetWord}
+              {applyHebrewFinalLetters(targetWord)}
             </div>
           </div>
         </m.div>
@@ -135,7 +136,7 @@ export function BlastWordFeedback({
               ⭐ {t('blast.feedback.bonusWord', 'BONUS WORD!')}
             </div>
             <div className="mt-0.5 font-neo-body text-lg font-black uppercase leading-none text-neo-navy">
-              {bonusWord}
+              {applyHebrewFinalLetters(bonusWord)}
             </div>
           </div>
           <div className="mt-1 font-neo-body text-[0.7rem] font-semibold text-neo-white">

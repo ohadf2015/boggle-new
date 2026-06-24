@@ -76,6 +76,34 @@ describe('BlastWordFeedback', () => {
     expect(screen.queryByTestId('blast-feedback-target')).not.toBeInTheDocument();
   });
 
+  // Hebrew sofit invariant: the submitted/found word shown back to the player
+  // gets the final-letter glyph. base "שלומ" (regular mem מ) → "שלום" (final ם).
+  it('shows the Hebrew final (sofit) form on the submitted target word', () => {
+    render(
+      <BlastWordFeedback
+        dictCheckPending={false}
+        lastValidation={{ kind: 'theme_match', word: 'שלומ' }}
+        eventKey={1}
+        modeColor="#00FFFF"
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId('blast-feedback-target').textContent).toContain('שלום');
+  });
+
+  it('shows the Hebrew final (sofit) form on the submitted bonus word', () => {
+    render(
+      <BlastWordFeedback
+        dictCheckPending={false}
+        lastValidation={{ kind: 'bonus', word: 'שלומ' }}
+        eventKey={1}
+        modeColor="#00FFFF"
+        t={t}
+      />,
+    );
+    expect(screen.getByTestId('blast-feedback-bonus').textContent).toContain('שלום');
+  });
+
   it('renders nothing when idle', () => {
     const { container } = render(
       <BlastWordFeedback

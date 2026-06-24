@@ -184,10 +184,12 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   // the bridge / feedback effects clear it so a submitted word never lingers.
   const hasContent = showForming || showFeedback || lastWord.length > 0;
 
-  // Get display word - forming word, feedback word, or last word
-  // Apply Hebrew final letters (sofit) transformation for proper display
+  // Get display word - forming word, feedback word, or last word.
+  // Sofit (final-letter) form is applied ONLY to the settled/submitted word —
+  // the in-progress forming word stays base-form (the board holds regular
+  // letters; while tracing you're still entering input, not a final word).
   const rawDisplayWord = showForming ? word : (showFeedback ? visibleFeedback?.word : lastWord);
-  const displayWord = rawDisplayWord ? applyHebrewFinalLetter(rawDisplayWord) : rawDisplayWord;
+  const displayWord = (!showForming && rawDisplayWord) ? applyHebrewFinalLetter(rawDisplayWord) : rawDisplayWord;
   const displayLetterCount = showForming ? letterCount : lastLetterCount;
 
   // Container size classes - responsive min-width for small screens
