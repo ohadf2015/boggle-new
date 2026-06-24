@@ -77,6 +77,29 @@ function CensorTile({ seed, avoid }: { seed: number; avoid?: string }) {
 
 const WORD_WHEEL_DURATION = 120; // 2 minutes
 
+// Always-on ambient backdrop for the Word Wheel stage.
+//
+// Root cause this replaces: depth used to lean on (a) a navy-only radial
+// gradient whose center sat only ~16 luminance above the edge — imperceptible
+// on-device, so it read as flat black no matter which navy token was the
+// center; and (b) the pixi bokeh, which only paints during `phase==='playing'`
+// and is faint. Neither delivered perceptible, phase-independent ambient depth,
+// so the stage kept regressing to "black".
+//
+// This is a layered CSS backdrop, painted top-most layer first:
+//   1. lime glow blooming from the top (brand primary)
+//   2. cyan glow rising from the bottom
+//   3. soft violet glow lower-right for color depth
+//   4. depth gradient: elevated-navy center → navy → abyss (#0a0a1a) at the
+//      edges, a real vignette that makes the board pop.
+// Always-on + phase-independent → genuine ambient feel on ready/playing/results
+// without depending on the pixi layer.
+const STAGE_AMBIENT_BG =
+  'radial-gradient(125% 75% at 50% -8%, rgba(191,255,0,0.10) 0%, transparent 55%),' +
+  'radial-gradient(115% 70% at 50% 108%, rgba(0,255,255,0.08) 0%, transparent 55%),' +
+  'radial-gradient(70% 55% at 85% 82%, rgba(139,92,246,0.07) 0%, transparent 60%),' +
+  'radial-gradient(circle at 50% 42%, var(--neo-navy-elevated) 0%, var(--neo-navy) 55%, var(--neo-abyss) 100%)';
+
 // ==========================================
 // Word Wheel Challenge Orchestrator
 // ==========================================
@@ -429,10 +452,7 @@ const WordWheelChallenge: React.FC = () => {
     return (
       <div
         className="flex-1 flex items-center justify-center bg-neo-navy"
-        style={{
-          background:
-            'radial-gradient(circle at center, var(--neo-navy-elevated) 0%, var(--neo-navy) 70%)',
-        }}
+        style={{ background: STAGE_AMBIENT_BG }}
       >
         <PageLoader size="lg" text={t('wordWheel.loading')} />
       </div>
@@ -444,19 +464,12 @@ const WordWheelChallenge: React.FC = () => {
       ref={containerRef}
       data-testid="word-wheel-stage"
       className="relative flex-1 flex flex-col bg-neo-navy min-h-0 overflow-hidden"
-      // Depth background: a radial gradient from --neo-navy-elevated (#2a2a4e,
-      // center) out to --neo-navy (#1a1a2e, edges). The pixi bokeh layer only
-      // paints during play and fades in slowly, so without an always-on CSS
-      // backdrop the stage exposed flat near-black navy on the ready/loading
-      // screens and the first moments of play. An earlier pass used
-      // --neo-navy-radial (#1e1e3f) as the center, but it sits only ~5
-      // luminance above the navy edge — imperceptible, so the stage still read
-      // as solid black. The elevated center (~17 luminance above the edge)
-      // gives genuine, phase-independent depth.
-      style={{
-        background:
-          'radial-gradient(circle at center, var(--neo-navy-elevated) 0%, var(--neo-navy) 70%)',
-      }}
+      // Layered, always-on ambient backdrop (see STAGE_AMBIENT_BG): a
+      // depth-to-abyss vignette plus soft brand-colored glows. Replaces the
+      // old navy-only gradient, whose elevated/radial center sat too close to
+      // the navy edge to register on-device — so the stage kept reading as
+      // flat black with no ambient feel regardless of which navy token it used.
+      style={{ background: STAGE_AMBIENT_BG }}
     >
       {/* Subtle dot pattern — adds texture/depth over the gradient */}
       <div

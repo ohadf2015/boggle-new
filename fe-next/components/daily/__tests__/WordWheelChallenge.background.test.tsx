@@ -1,21 +1,21 @@
 /**
- * Background depth regression.
+ * Background depth + ambient regression (root-cause fix).
  *
- * Bug: the Word Wheel play area read as a flat solid black background. The
- * container was a plain `bg-neo-navy` (#1a1a2e) and the only ambient depth
- * came from the pixi bokeh layer — which only renders during `phase==='playing'`
- * and fades in slowly, so the ready/loading screens (and the first moments of
- * play) exposed flat near-black navy.
+ * Bug: the Word Wheel play area read as a flat solid black background with no
+ * ambient feel. Depth relied on two inadequate sources:
+ *   1. A navy-only radial gradient. Successive fixes swapped its center token
+ *      (`--neo-navy-radial` #1e1e3f → `--neo-navy-elevated` #2a2a4e) but both
+ *      sit too close to the `--neo-navy` (#1a1a2e) edge to register on-device,
+ *      so the stage kept reading as flat black — the regression kept returning.
+ *   2. The PixiJS bokeh layer, which only paints during `phase==='playing'` and
+ *      is sparse/faint, so the broad "ambient feel" was effectively absent.
  *
- * An earlier fix added a radial gradient but ran it from `--neo-navy-radial`
- * (#1e1e3f) to `--neo-navy` (#1a1a2e) — only ~5 relative-luminance apart, i.e.
- * imperceptible, so the stage STILL read as flat black and the regression kept
- * coming back.
- *
- * Fix: run the radial gradient from a perceptibly-elevated center
- * (`--neo-navy-elevated`, #2a2a4e, ~17 luminance above the navy edge) out to
- * `--neo-navy`. This is CSS, always-on, and phase-independent, so the board
- * reads with real depth instead of flat black regardless of the pixi layer.
+ * Root-cause fix: stop leaning on an imperceptible navy delta and a play-only
+ * particle layer. The stage now carries a layered, always-on ambient backdrop:
+ *   - a depth gradient from the elevated navy center out to `--neo-abyss`
+ *     (#0a0a1a) at the edges — a real vignette that makes the board pop, and
+ *   - soft brand-colored glows (lime + cyan + violet) that give genuine ambient
+ *     energy on EVERY phase (ready / playing / results), independent of pixi.
  */
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -113,16 +113,23 @@ afterEach(() => {
 import WordWheelChallenge from '../WordWheelChallenge';
 
 describe('WordWheelChallenge background', () => {
-  it('gives the stage a radial depth gradient with a perceptibly-elevated center', async () => {
+  it('gives the stage a layered ambient backdrop: depth-to-abyss vignette + brand glows', async () => {
     render(<WordWheelChallenge />);
 
     const stage = await waitFor(() => screen.getByTestId('word-wheel-stage'));
+    const bg = stage.style.background;
 
-    // The container must carry a radial depth gradient whose center is the
-    // elevated navy (#2a2a4e) — NOT navy-radial (#1e1e3f), which sits only ~5
-    // luminance above the navy edge and so reads as flat black.
-    expect(stage.style.background).toContain('radial-gradient');
-    expect(stage.style.background).toContain('--neo-navy-elevated');
-    expect(stage.style.background).not.toContain('--neo-navy-radial');
+    // Depth layer: elevated navy center vignetting out to the deep-space abyss
+    // edge (#0a0a1a) — a perceptible vignette, NOT the old navy-only delta that
+    // sat too close to the edge and read as flat black.
+    expect(bg).toContain('radial-gradient');
+    expect(bg).toContain('--neo-navy-elevated');
+    expect(bg).toContain('--neo-abyss');
+    expect(bg).not.toContain('--neo-navy-radial');
+
+    // Ambient color: soft brand glows give phase-independent "ambient feel"
+    // instead of leaning on the play-only pixi bokeh. Lime + cyan at minimum.
+    expect(bg).toContain('rgba(191,255,0'); // lime glow
+    expect(bg).toContain('rgba(0,255,255'); // cyan glow
   });
 });
