@@ -24,19 +24,30 @@ export function dailyDifficulty(dateISO: string): Difficulty {
   return 'medium'; // Wed, Thu, Fri
 }
 
-/** he fills from the Hebrew bank; every other locale uses en (matches the existing en-fallback). */
-function genLocaleFor(locale: PuzzleLocale): 'en' | 'he' {
-  return locale === 'he' ? 'he' : 'en';
+/**
+ * Locale → clue-bank to fill from. Each supported language has its OWN real-data bank (clues
+ * grounded in Wiktionary); any unsupported locale falls back to en. he/es/sv are full banks; en is
+ * the default. (Previously every non-he locale forced en, so es/sv players got English puzzles.)
+ */
+type GenLocale = 'en' | 'he' | 'es' | 'sv';
+const SUPPORTED_GEN: ReadonlySet<string> = new Set<GenLocale>(['en', 'he', 'es', 'sv']);
+function genLocaleFor(locale: PuzzleLocale): GenLocale {
+  return (SUPPORTED_GEN.has(locale) ? locale : 'en') as GenLocale;
 }
 
-// The clue bank is large (~200KB en). Load it once, on demand — it never touches the bundle until
-// the first puzzle is generated.
-const clueCache = new Map<'en' | 'he', ClueMap>();
-async function loadClues(gen: 'en' | 'he'): Promise<ClueMap> {
+// The clue bank can be large (~200KB en). Load it once, on demand — it never touches the bundle
+// until the first puzzle is generated.
+const clueCache = new Map<GenLocale, ClueMap>();
+async function loadClues(gen: GenLocale): Promise<ClueMap> {
   const cached = clueCache.get(gen);
   if (cached) return cached;
-  const mod =
-    gen === 'he' ? await import('./data/clueBank.he.json') : await import('./data/clueBank.en.json');
+  const mod = await (gen === 'he'
+    ? import('./data/clueBank.he.json')
+    : gen === 'es'
+      ? import('./data/clueBank.es.json')
+      : gen === 'sv'
+        ? import('./data/clueBank.sv.json')
+        : import('./data/clueBank.en.json'));
   const clues = ((mod as { default?: unknown }).default ?? mod) as unknown as ClueMap;
   clueCache.set(gen, clues);
   return clues;

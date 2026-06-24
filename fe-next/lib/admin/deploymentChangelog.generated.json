@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-23T20:43:45.250Z",
+  "generatedAt": "2026-06-24T20:40:55.065Z",
   "commits": [
     {
-      "sha": "58b13453b77ad65d50bf3fb4e3af46089344b747",
-      "shortSha": "58b1345",
-      "subject": "perf(mp): throttle player-view roster updates (updateUsers/playerListUpdate)",
+      "sha": "1f9bb7e8a6a02cd3f9298bdb0feb213abc415349",
+      "shortSha": "1f9bb7e",
+      "subject": "fix(crossword): Unicode-aware circular-clue gate + repair Hebrew clue bank",
       "author": "Ohad Fisher",
-      "date": "2026-06-23T23:24:02+03:00"
+      "date": "2026-06-24T22:55:59+03:00"
     },
     {
-      "sha": "f2bb8dfe2306fb02b4b7f121d8ba2060de3019ab",
-      "shortSha": "f2bb8df",
-      "subject": "chore: batch remaining working-tree changes (mp page, handlers, opponent-feed test)",
+      "sha": "1367e96a49658c06e67f7b0d4ae14df3489ae412",
+      "shortSha": "1367e96",
+      "subject": "fix(ads): allow Monetag in the force-disabled CSP branch (prod default)",
       "author": "Ohad Fisher",
-      "date": "2026-06-23T23:04:40+03:00"
+      "date": "2026-06-24T22:50:23+03:00"
     },
     {
-      "sha": "83d710aed3e080e36c66da8e08d9ca1dddf35fcf",
-      "shortSha": "83d710a",
-      "subject": "feat(mp): opponent word-feed batcher + related WIP",
+      "sha": "d36b937da1de4f9c1e760d2de3de84405b618827",
+      "shortSha": "d36b937",
+      "subject": "fix(he): base letters for in-progress input, sofit only on final word",
       "author": "Ohad Fisher",
-      "date": "2026-06-23T23:03:45+03:00"
+      "date": "2026-06-24T22:38:45+03:00"
     },
     {
-      "sha": "df400462e0724059e6e2117009500dc0418f0d61",
-      "shortSha": "df40046",
-      "subject": "fix(cache): guard getCacheClient .on() so test mocks without it don't crash",
+      "sha": "873090b6238554599267e4058944b2dded255cd3",
+      "shortSha": "873090b",
+      "subject": "fix(ads): wire real Monetag monetization zone + CSP + Docker build args",
       "author": "Ohad Fisher",
-      "date": "2026-06-23T23:03:45+03:00"
+      "date": "2026-06-24T22:36:58+03:00"
     },
     {
-      "sha": "af3d2fd857f2712e555d684251873296715fb10f",
-      "shortSha": "af3d2fd",
-      "subject": "perf(auth): finish local-JWT migration — kill remote auth round-trips on hot reads",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T23:00:46+03:00"
-    },
-    {
-      "sha": "5cea8a353481080b079136b7bc8febc964495a1d",
-      "shortSha": "5cea8a3",
-      "subject": "perf(auth): migrate 2 read-only GETs to fast local-JWT getAuthedUser",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T22:53:13+03:00"
-    },
-    {
-      "sha": "66fec60130a7c4d01007a9afbb69d818eae221e4",
-      "shortSha": "66fec60",
-      "subject": "perf(cache): Redis-cache the daily-insights percentile pool (shared 500-row scan)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T22:41:14+03:00"
-    },
-    {
-      "sha": "f7eb9454ff5996ea16d545ec624f791fdc71b2ce",
-      "shortSha": "f7eb945",
-      "subject": "perf(cache): Redis-cache shared leaderboard reads (ranked top-50, league standings)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T22:36:06+03:00"
-    },
-    {
-      "sha": "b5be6e92738851bd5e3d785b1cd5252f42b787d9",
-      "shortSha": "b5be6e9",
-      "subject": "Merge pull request #614 from ohadf2015/claude/redundant-skeleton-loader-t4n0eg",
+      "sha": "3ae0fdc82f1e02950d3b2e235d8a195b2d9f1df7",
+      "shortSha": "3ae0fdc",
+      "subject": "Merge pull request #619 from ohadf2015/claude/landing-page-visibility-40gnan",
       "author": "ohadf2015",
-      "date": "2026-06-23T22:59:11+03:00"
+      "date": "2026-06-24T09:00:16+03:00"
     },
     {
-      "sha": "d1c47235db0f9205068374d9cdc3ff6bec7987f7",
-      "shortSha": "d1c4723",
-      "subject": "fix(header): drop redundant AuthButton loading skeleton",
+      "sha": "5c8a5fd0891137aee2f6b85ad7e8358ed05b5e92",
+      "shortSha": "5c8a5fd",
+      "subject": "fix(playerStyle): suppress style popup on SEO/marketing landing pages",
       "author": "Claude",
-      "date": "2026-06-23T19:58:34Z"
+      "date": "2026-06-24T05:18:38Z"
     },
     {
-      "sha": "98aa82db526727c586f536676bf960266653d527",
-      "shortSha": "98aa82d",
-      "subject": "Merge pull request #613 from ohadf2015/claude/icons-not-emojis-ut5u4g",
+      "sha": "30fe9d2610df6908eb54c08441a5fab244d55b8d",
+      "shortSha": "30fe9d2",
+      "subject": "chore(nightly): autonomous improvement loop 2026-06-24",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T05:13:09+03:00"
+    },
+    {
+      "sha": "65aee638f90b914a088831e7dd28dfab439776b6",
+      "shortSha": "65aee63",
+      "subject": "fix(ads): serve Monetag verification SW to the verifier only (file method)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T01:46:42+03:00"
+    },
+    {
+      "sha": "f89991d5a96d024819e45b17a9a8fd4478d48755",
+      "shortSha": "f89991d",
+      "subject": "fix(ads): always rewrite bare root (200), never 301 — unblocks any verifier",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T01:30:56+03:00"
+    },
+    {
+      "sha": "0ce92acea324a7d4d16f870c2a6cea4d377f901a",
+      "shortSha": "0ce92ac",
+      "subject": "feat(email): review ask in Android launch blast to seed ratings",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T01:03:49+03:00"
+    },
+    {
+      "sha": "f502242c8c0b06fb7682068b00467c560e4c5fd7",
+      "shortSha": "f502242",
+      "subject": "fix(ads): treat non-navigation root requests as verifiers (Sec-Fetch-Mode)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T00:51:48+03:00"
+    },
+    {
+      "sha": "233e9a2872b135c562bad39e7e74fa860abbf066",
+      "shortSha": "233e9a2",
+      "subject": "fix(ads): serve verification meta to non-browser clients at root (Monetag)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T00:39:19+03:00"
+    },
+    {
+      "sha": "93bc1ec94e23f2b7190b086c64509e58ec4b334f",
+      "shortSha": "93bc1ec",
+      "subject": "Merge pull request #617 from ohadf2015/claude/play-bots-helper-ui-8e9ejd",
       "author": "ohadf2015",
-      "date": "2026-06-23T22:49:02+03:00"
+      "date": "2026-06-24T00:09:35+03:00"
     },
     {
-      "sha": "25e9ee2fe19418af5901c4a9ec788ecb8e58b2b7",
-      "shortSha": "25e9ee2",
-      "subject": "refactor(daily): swap leaderboard emojis for lucide icons",
-      "author": "Claude",
-      "date": "2026-06-23T19:45:17Z"
-    },
-    {
-      "sha": "4261abe311f9ae13a2c2d7832754a11e9f1a41ff",
-      "shortSha": "4261abe",
-      "subject": "fix(ads): put token in HilltopAds verification file (was empty)",
+      "sha": "84d6a3e741421ba7f7edc710dec55b83c2f9375b",
+      "shortSha": "84d6a3e",
+      "subject": "feat(ads): add Monetag site-ownership verification meta tag",
       "author": "Ohad Fisher",
-      "date": "2026-06-23T22:42:51+03:00"
+      "date": "2026-06-24T00:07:27+03:00"
     },
     {
-      "sha": "2d9f11dc75507a4b270495e910ab08d31c7a5e13",
-      "shortSha": "2d9f11d",
-      "subject": "Merge pull request #612 from ohadf2015/claude/cta-ux-improvement-nb0mxy",
+      "sha": "e0ffd113829c6cbef42a298b8fe71b597be8ed08",
+      "shortSha": "e0ffd11",
+      "subject": "feat(android): native in-app review nudge after a win",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T00:07:14+03:00"
+    },
+    {
+      "sha": "f85979dfc4c98f106122aacf1265229fb7ef50d6",
+      "shortSha": "f85979d",
+      "subject": "chore: working-tree snapshot — monetag rewarded ads + tooling",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T00:04:24+03:00"
+    },
+    {
+      "sha": "f82f1d802230a28fd2ffc63181eeab5a92bea3c7",
+      "shortSha": "f82f1d8",
+      "subject": "feat(android): scan-to-install QR on TV results screen",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T00:02:41+03:00"
+    },
+    {
+      "sha": "843ee188e783170e0c231ed6744f7c667e72b046",
+      "shortSha": "843ee18",
+      "subject": "Merge pull request #616 from ohadf2015/claude/modal-ads-overlap-jeryis",
       "author": "ohadf2015",
-      "date": "2026-06-23T22:37:26+03:00"
+      "date": "2026-06-24T00:01:05+03:00"
     },
     {
-      "sha": "6107eb1d13cfffe5421b36af335cc678eabdaa3b",
-      "shortSha": "6107eb1",
-      "subject": "refactor(daily): calm the Word Wheel results CTA stack into one quiet tier",
-      "author": "Claude",
-      "date": "2026-06-23T19:35:15Z"
-    },
-    {
-      "sha": "4f1ccc8b76d8c004da0fb3f83b301cbeb06ad9a4",
-      "shortSha": "4f1ccc8",
-      "subject": "fix(ads): serve HilltopAds verification file on apex (skip www redirect)",
+      "sha": "df9b60065858daf67d98da5118c749416e50e4f9",
+      "shortSha": "df9b600",
+      "subject": "perf(auth): local-JWT verify on blast/result (pure-progress mutation)",
       "author": "Ohad Fisher",
-      "date": "2026-06-23T22:29:56+03:00"
+      "date": "2026-06-23T23:58:20+03:00"
     },
     {
-      "sha": "40384d5197f11aa100fe946d529cc400db4f97d3",
-      "shortSha": "40384d5",
-      "subject": "chore(ads): add HilltopAds website ownership verification file",
+      "sha": "4e7d4e16d734495d7973a9517bd1d70751ab5382",
+      "shortSha": "4e7d4e1",
+      "subject": "feat(android): persistent install pill as on-load entry point",
       "author": "Ohad Fisher",
-      "date": "2026-06-23T22:20:28+03:00"
-    },
-    {
-      "sha": "ab626d745fd88fd12d0c67fdd4886490e1441399",
-      "shortSha": "ab626d7",
-      "subject": "perf(assets): offload+compress heavy media to Supabase Storage CDN",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T22:11:51+03:00"
-    },
-    {
-      "sha": "449de021053cbef30c7d719e16b457f29fe57240",
-      "shortSha": "449de02",
-      "subject": "fix(daily): dedupe leaderboard by player, keep best score across languages",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T22:04:14+03:00"
-    },
-    {
-      "sha": "431539b90de8442fe3f70f210670b1440cf9a07b",
-      "shortSha": "431539b",
-      "subject": "Merge pull request #611 from ohadf2015/claude/hebrew-popup-rendering-r39fh4",
-      "author": "ohadf2015",
-      "date": "2026-06-23T20:37:31+03:00"
+      "date": "2026-06-23T23:55:40+03:00"
     }
   ]
 }

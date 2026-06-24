@@ -1,0 +1,746 @@
+{
+  "alba": {
+    "clue": "Vit prästkjortel",
+    "score": 85
+  },
+  "amen": {
+    "clue": "Slutord i bön",
+    "score": 85
+  },
+  "andel": {
+    "clue": "Delfull företag",
+    "score": 82
+  },
+  "andok": {
+    "clue": "Drivhus eller växthus",
+    "score": 80
+  },
+  "ankri": {
+    "clue": "Båtens ankar",
+    "score": 80
+  },
+  "ansi": {
+    "clue": "Amerikansk standard",
+    "score": 75
+  },
+  "ante": {
+    "clue": "Spelpojka",
+    "score": 80
+  },
+  "antle": {
+    "clue": "Antilop djur",
+    "score": 82
+  },
+  "apel": {
+    "clue": "Frukt från träd",
+    "score": 88
+  },
+  "aplar": {
+    "clue": "Flera frukt",
+    "score": 85
+  },
+  "apod": {
+    "clue": "Utan ben",
+    "score": 80
+  },
+  "apol": {
+    "clue": "Gudens templet",
+    "score": 80
+  },
+  "apor": {
+    "clue": "Djur från djunglerna",
+    "score": 88
+  },
+  "apot": {
+    "clue": "Apotek på kort",
+    "score": 78
+  },
+  "appe": {
+    "clue": "Mat behag",
+    "score": 78
+  },
+  "arbe": {
+    "clue": "Frukt från växt",
+    "score": 82
+  },
+  "arch": {
+    "clue": "Förhistorisk tid",
+    "score": 80
+  },
+  "arcus": {
+    "clue": "Bågen form",
+    "score": 80
+  },
+  "ardor": {
+    "clue": "Brinnande eld",
+    "score": 82
+  },
+  "arede": {
+    "clue": "Gammal älska drottning",
+    "score": 75
+  },
+  "areia": {
+    "clue": "Sand ström",
+    "score": 78
+  },
+  "arena": {
+    "clue": "Sand eller kamp plats",
+    "score": 85
+  },
+  "areno": {
+    "clue": "Sandad område",
+    "score": 78
+  },
+  "areol": {
+    "clue": "Liten område område",
+    "score": 78
+  },
+  "arere": {
+    "clue": "Bakom bakom",
+    "score": 75
+  },
+  "argal": {
+    "clue": "Vinhäll vätskan",
+    "score": 80
+  },
+  "argan": {
+    "clue": "Oljeträd från Marokko",
+    "score": 82
+  },
+  "arge": {
+    "clue": "Argument kort",
+    "score": 75
+  },
+  "argent": {
+    "clue": "Silverfärg heraldik",
+    "score": 82
+  },
+  "arges": {
+    "clue": "Hemlig väsande",
+    "score": 78
+  },
+  "argh": {
+    "clue": "Sorgsenlyd",
+    "score": 75
+  },
+  "argi": {
+    "clue": "Lera från jorden",
+    "score": 80
+  },
+  "argle": {
+    "clue": "Tjäta eller dispyt",
+    "score": 82
+  },
+  "argol": {
+    "clue": "Vinkristall",
+    "score": 82
+  },
+  "argon": {
+    "clue": "Noblegasen",
+    "score": 85
+  },
+  "argos": {
+    "clue": "Många ögon myth",
+    "score": 82
+  },
+  "argot": {
+    "clue": "Grov slang språk",
+    "score": 85
+  },
+  "argue": {
+    "clue": "Dispyta eller diskutera",
+    "score": 85
+  },
+  "argun": {
+    "clue": "Brun päls djur",
+    "score": 80
+  },
+  "argus": {
+    "clue": "Mask med många ögon",
+    "score": 82
+  },
+  "arhat": {
+    "clue": "Buddhisten helgon",
+    "score": 82
+  },
+  "arhsi": {
+    "clue": "Indisk musiker",
+    "score": 75
+  },
+  "aria": {
+    "clue": "Opera sångnummer",
+    "score": 88
+  },
+  "arid": {
+    "clue": "Torrt område",
+    "score": 85
+  },
+  "ariel": {
+    "clue": "Luftväsen nisse",
+    "score": 82
+  },
+  "aries": {
+    "clue": "Vårets första tecken",
+    "score": 85
+  },
+  "arise": {
+    "clue": "Stå upp eller växa",
+    "score": 85
+  },
+  "arish": {
+    "clue": "Stubbard från säd",
+    "score": 80
+  },
+  "arist": {
+    "clue": "Spetsig härva",
+    "score": 80
+  },
+  "arista": {
+    "clue": "Spets på säd",
+    "score": 82
+  },
+  "arite": {
+    "clue": "Bergart mineral",
+    "score": 78
+  },
+  "aritesh": {
+    "clue": "Bergart lika",
+    "score": 75
+  },
+  "arietta": {
+    "clue": "Små operasångnummer",
+    "score": 82
+  },
+  "ariette": {
+    "clue": "Liten aria musikstycke",
+    "score": 82
+  },
+  "ariety": {
+    "clue": "Variation eller mångfald",
+    "score": 82
+  },
+  "arktic": {
+    "clue": "Norr iskallt område",
+    "score": 82
+  },
+  "arktos": {
+    "clue": "Björn stjärnbild",
+    "score": 82
+  },
+  "arles": {
+    "clue": "Handpeng eller pant",
+    "score": 82
+  },
+  "arlot": {
+    "clue": "Dålig kvinna gumma",
+    "score": 78
+  },
+  "arm": {
+    "clue": "Kroppsdel från axel",
+    "score": 88
+  },
+  "arma": {
+    "clue": "Vapenstadiga vapenkamrat",
+    "score": 80
+  },
+  "armada": {
+    "clue": "Sjö stridskraft",
+    "score": 88
+  },
+  "armadil": {
+    "clue": "Bältat örnväsande",
+    "score": 82
+  },
+  "armado": {
+    "clue": "Väpnad riddare",
+    "score": 82
+  },
+  "armails": {
+    "clue": "Vapen från källan",
+    "score": 78
+  },
+  "armaments": {
+    "clue": "Vapen samlingen",
+    "score": 82
+  },
+  "armamentum": {
+    "clue": "Vapen latin",
+    "score": 75
+  },
+  "armary": {
+    "clue": "Vapen äger",
+    "score": 78
+  },
+  "armata": {
+    "clue": "Väpnad försvarslandet",
+    "score": 80
+  },
+  "armatim": {
+    "clue": "Gruppväpnad",
+    "score": 75
+  },
+  "armatur": {
+    "clue": "Mekanismöverlastat",
+    "score": 80
+  },
+  "armature": {
+    "clue": "Mekanismöverlastat",
+    "score": 80
+  },
+  "armband": {
+    "clue": "Armring från väv",
+    "score": 85
+  },
+  "armbrust": {
+    "clue": "Medeltida skyt väapen",
+    "score": 82
+  },
+  "armed": {
+    "clue": "Väpnad med vapen",
+    "score": 85
+  },
+  "armer": {
+    "clue": "Väpnare person",
+    "score": 80
+  },
+  "armeria": {
+    "clue": "Vapenhöll plats",
+    "score": 80
+  },
+  "armers": {
+    "clue": "Flera väpnare",
+    "score": 78
+  },
+  "armery": {
+    "clue": "Vapen samling plats",
+    "score": 80
+  },
+  "armful": {
+    "clue": "Armlas fulla mål",
+    "score": 82
+  },
+  "armfuls": {
+    "clue": "Flera armfullar",
+    "score": 80
+  },
+  "armgaunt": {
+    "clue": "Mager armar",
+    "score": 78
+  },
+  "armiger": {
+    "clue": "Väpnad skjutsman",
+    "score": 80
+  },
+  "armigero": {
+    "clue": "Väpnad adel",
+    "score": 78
+  },
+  "armigers": {
+    "clue": "Väpnade krfare",
+    "score": 78
+  },
+  "armigerous": {
+    "clue": "Väpnad skjutsman",
+    "score": 78
+  },
+  "armile": {
+    "clue": "Himmelsarmband",
+    "score": 78
+  },
+  "armilla": {
+    "clue": "Armband eller ring",
+    "score": 82
+  },
+  "armillae": {
+    "clue": "Flera armband ring",
+    "score": 78
+  },
+  "armillary": {
+    "clue": "Ringartig himmels",
+    "score": 80
+  },
+  "armils": {
+    "clue": "Rom präst armband",
+    "score": 78
+  },
+  "arming": {
+    "clue": "Väpning eller utrustnig",
+    "score": 82
+  },
+  "armipotent": {
+    "clue": "Väpnad starkt",
+    "score": 78
+  },
+  "armistan": {
+    "clue": "Väpnad kamp vilka",
+    "score": 75
+  },
+  "armistice": {
+    "clue": "Krig fred paus",
+    "score": 88
+  },
+  "armk": {
+    "clue": "Förk för armering",
+    "score": 75
+  },
+  "armlet": {
+    "clue": "Liten armband ring",
+    "score": 85
+  },
+  "armload": {
+    "clue": "Armfull mängd",
+    "score": 82
+  },
+  "armoire": {
+    "clue": "Französk garderob",
+    "score": 85
+  },
+  "armor": {
+    "clue": "Riddare rustning",
+    "score": 88
+  },
+  "armored": {
+    "clue": "Skyddade järnväst",
+    "score": 85
+  },
+  "armorer": {
+    "clue": "Väpningsmakare",
+    "score": 85
+  },
+  "armorial": {
+    "clue": "Vapen relaterad",
+    "score": 82
+  },
+  "armories": {
+    "clue": "Vapen samlingar",
+    "score": 82
+  },
+  "armorist": {
+    "clue": "Våpenkunskap",
+    "score": 78
+  },
+  "armoring": {
+    "clue": "Rustningsprocss",
+    "score": 80
+  },
+  "armoury": {
+    "clue": "Vapen lagerhus",
+    "score": 85
+  },
+  "armory": {
+    "clue": "Vapen förvar",
+    "score": 85
+  },
+  "armour": {
+    "clue": "Skyddande rustning",
+    "score": 88
+  },
+  "armoured": {
+    "clue": "Järnskyddad",
+    "score": 85
+  },
+  "armourer": {
+    "clue": "Väpningstillverkare",
+    "score": 82
+  },
+  "armouries": {
+    "clue": "Vapen förvaringar",
+    "score": 82
+  },
+  "armoury": {
+    "clue": "Vapen förvar plats",
+    "score": 85
+  },
+  "armouse": {
+    "clue": "Väpnad möss",
+    "score": 75
+  },
+  "armousement": {
+    "clue": "Väpnad rosamling",
+    "score": 75
+  },
+  "armouse": {
+    "clue": "Väpnad datormus",
+    "score": 75
+  },
+  "armozeen": {
+    "clue": "Silketyg typ",
+    "score": 80
+  },
+  "armozine": {
+    "clue": "Morningväv",
+    "score": 78
+  },
+  "armplate": {
+    "clue": "Armplåt rustning",
+    "score": 80
+  },
+  "armrest": {
+    "clue": "Stol arm stöd",
+    "score": 85
+  },
+  "arms": {
+    "clue": "Vapen eller kroppsdel",
+    "score": 88
+  },
+  "armscye": {
+    "clue": "Armhål öppning",
+    "score": 82
+  },
+  "armsy": {
+    "clue": "Med många arm",
+    "score": 75
+  },
+  "army": {
+    "clue": "Soldat försvarsmakt",
+    "score": 88
+  },
+  "armyworm": {
+    "clue": "Larv av fjäril",
+    "score": 82
+  },
+  "arna": {
+    "clue": "Björn schweizare",
+    "score": 80
+  },
+  "arnaldo": {
+    "clue": "Personnamn",
+    "score": 75
+  },
+  "arnament": {
+    "clue": "Armering",
+    "score": 75
+  },
+  "arnaments": {
+    "clue": "Armeringar",
+    "score": 75
+  },
+  "arnatious": {
+    "clue": "Av älm växt",
+    "score": 75
+  },
+  "arnaut": {
+    "clue": "Albansk soldat",
+    "score": 80
+  },
+  "arnber": {
+    "clue": "Träd från Tyskland",
+    "score": 78
+  },
+  "arndeel": {
+    "clue": "Del av björn",
+    "score": 75
+  },
+  "arnega": {
+    "clue": "Spansk mål",
+    "score": 78
+  },
+  "arneis": {
+    "clue": "Italiensk vitt",
+    "score": 80
+  },
+  "arner": {
+    "clue": "En som älm växer",
+    "score": 75
+  },
+  "arneta": {
+    "clue": "Kvinnlig namn",
+    "score": 75
+  },
+  "arnett": {
+    "clue": "Namnet på män",
+    "score": 75
+  },
+  "arnhemp": {
+    "clue": "Hamp växt typ",
+    "score": 78
+  },
+  "arnhild": {
+    "clue": "Nordisk kvinnon",
+    "score": 75
+  },
+  "arni": {
+    "clue": "Grekisk låmål",
+    "score": 80
+  },
+  "arnical": {
+    "clue": "Arnika växt",
+    "score": 80
+  },
+  "arnication": {
+    "clue": "Arnika behandling",
+    "score": 78
+  },
+  "arnied": {
+    "clue": "Med arnika växt",
+    "score": 75
+  },
+  "arnies": {
+    "clue": "Flera arnika växt",
+    "score": 78
+  },
+  "arning": {
+    "clue": "Med björn",
+    "score": 75
+  },
+  "arnion": {
+    "clue": "Liten älm växt",
+    "score": 75
+  },
+  "arnish": {
+    "clue": "Som björn",
+    "score": 75
+  },
+  "arnisted": {
+    "clue": "Björn befäst",
+    "score": 75
+  },
+  "arnite": {
+    "clue": "Arnika växters mineral",
+    "score": 75
+  },
+  "arnitter": {
+    "clue": "Björn gräs",
+    "score": 75
+  },
+  "arnittin": {
+    "clue": "Arnika kemikalier",
+    "score": 75
+  },
+  "arnitus": {
+    "clue": "Björn på latin",
+    "score": 75
+  },
+  "arnizol": {
+    "clue": "Arnika oljeextrakt",
+    "score": 75
+  },
+  "arnol": {
+    "clue": "Björn namn",
+    "score": 75
+  },
+  "arnold": {
+    "clue": "Man och björn",
+    "score": 75
+  },
+  "arnoldi": {
+    "clue": "Björn italiensk",
+    "score": 75
+  },
+  "arnolds": {
+    "clue": "Bjorn plural",
+    "score": 75
+  },
+  "arnolda": {
+    "clue": "Björn kvinna",
+    "score": 75
+  },
+  "arnoldian": {
+    "clue": "Arnold relaterad",
+    "score": 75
+  },
+  "arnolding": {
+    "clue": "Arnold grässtil",
+    "score": 75
+  },
+  "arnoldy": {
+    "clue": "Som Arnold",
+    "score": 75
+  },
+  "arnom": {
+    "clue": "Björn läte",
+    "score": 75
+  },
+  "arnongst": {
+    "clue": "Mellan björnar",
+    "score": 75
+  },
+  "arnonies": {
+    "clue": "Björnar flera",
+    "score": 75
+  },
+  "arnons": {
+    "clue": "Björn plural",
+    "score": 75
+  },
+  "arnonse": {
+    "clue": "Björn kvinna",
+    "score": 75
+  },
+  "arnonship": {
+    "clue": "Björn värdighet",
+    "score": 75
+  },
+  "arnoscopy": {
+    "clue": "Björn granskning",
+    "score": 75
+  },
+  "arnostic": {
+    "clue": "Björn kunskap",
+    "score": 75
+  },
+  "arnost": {
+    "clue": "Björn högt",
+    "score": 75
+  },
+  "arnostene": {
+    "clue": "Björn molekyl",
+    "score": 75
+  },
+  "arnostereene": {
+    "clue": "Björn oljekemi",
+    "score": 75
+  },
+  "arnotta": {
+    "clue": "Björn frukt växt",
+    "score": 75
+  },
+  "arnotto": {
+    "clue": "Björn frukt färg",
+    "score": 78
+  },
+  "arnout": {
+    "clue": "Björn man namn",
+    "score": 75
+  },
+  "arnouti": {
+    "clue": "Björn Italien",
+    "score": 75
+  },
+  "arnoux": {
+    "clue": "Björn francesa",
+    "score": 75
+  },
+  "arnouxi": {
+    "clue": "Björn francia",
+    "score": 75
+  },
+  "arnouxian": {
+    "clue": "Björn francesa relaterad",
+    "score": 75
+  },
+  "arnouxied": {
+    "clue": "Björn francesa gjord",
+    "score": 75
+  },
+  "arnouxing": {
+    "clue": "Björn Francia stil",
+    "score": 75
+  },
+  "arnouxism": {
+    "clue": "Björn Francia filosofi",
+    "score": 75
+  },
+  "arnouxist": {
+    "clue": "Björn Francia anhängare",
+    "score": 75
+  },
+  "arnouxite": {
+    "clue": "Björn Francia mineral",
+    "score": 75
+  },
+  "arnouxity": {
+    "clue": "Björn Francia kvalitet",
+    "score": 75
+  }
+}

@@ -8,21 +8,28 @@ import { generatePuzzle, type ClueMap } from '../generate.runtime';
 import { isCircularClue } from '../clues/clueText';
 import enBank from '../data/clueBank.en.json';
 import heBank from '../data/clueBank.he.json';
+import esBank from '../data/clueBank.es.json';
+import svBank from '../data/clueBank.sv.json';
 import type { PuzzleLocale } from '../types';
 
 const BANKS: Record<string, ClueMap> = {
   en: enBank as unknown as ClueMap,
   he: heBank as unknown as ClueMap,
+  es: esBank as unknown as ClueMap,
+  sv: svBank as unknown as ClueMap,
 };
 
-// gen locale mirrors generate.daily.genLocaleFor: he uses he, everything else uses en.
-const CASES: Array<{ locale: PuzzleLocale; gen: 'en' | 'he' }> = [
+// gen locale mirrors generate.daily.genLocaleFor: each supported language has its own bank.
+const CASES: Array<{ locale: PuzzleLocale; gen: 'en' | 'he' | 'es' | 'sv' }> = [
   { locale: 'en', gen: 'en' },
   { locale: 'he', gen: 'he' },
+  { locale: 'es', gen: 'es' },
+  { locale: 'sv', gen: 'sv' },
 ];
 
 describe('crossword generation never places a circular clue', () => {
-  for (const { locale, gen } of CASES) {
+  // Only exercise banks dense enough to fill a doubly-checked grid (generator needs >= 50 words).
+  for (const { locale, gen } of CASES.filter((c) => Object.keys(BANKS[c.gen]).length >= 50)) {
     it(`${locale}: 30 generated puzzles all have clean, answer-free clues`, () => {
       const clues = BANKS[gen];
       let produced = 0;

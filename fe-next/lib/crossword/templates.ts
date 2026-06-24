@@ -30,21 +30,28 @@ export const EN_TEMPLATES_7: BlockTemplate[] = [
   },
 ];
 
-// 4×4 Hebrew minis (RTL). Diagonal block pair gives mixed 3/4-letter runs, all doubly checked.
-export const HE_TEMPLATES_4: BlockTemplate[] = [
+// 4×4 minis. Diagonal block pair gives mixed 3/4-letter runs, all doubly checked. Pure geometry —
+// used by every language whose clue bank is too small to reliably fill a doubly-checked 5×5 (he,
+// es, sv). RTL is a render concern, so the same templates serve LTR (es/sv) and RTL (he).
+export const MINI_TEMPLATES_4: BlockTemplate[] = [
   { label: '4x4-corners', size: 4, blocks: [[0, 0], [3, 3]] },
   { label: '4x4-antidiag', size: 4, blocks: [[0, 3], [3, 0]] },
 ];
+/** @deprecated alias kept for callers; identical to MINI_TEMPLATES_4. */
+export const HE_TEMPLATES_4 = MINI_TEMPLATES_4;
+
+// Languages whose bank is dense enough only for a 4×4 mini (5×5 doubly-checked needs ~2k+ words).
+const SMALL_BANK_LOCALES: ReadonlySet<string> = new Set(['he', 'es', 'sv']);
 
 /** Default grid size for a locale's mini. */
 export function defaultSize(locale: PuzzleLocale): number {
-  return locale === 'he' ? 4 : 5;
+  return SMALL_BANK_LOCALES.has(locale) ? 4 : 5;
 }
 
 /** Templates available for a (locale, size). Empty array = unsupported combination. */
 export function templatesFor(locale: PuzzleLocale, size: number): BlockTemplate[] {
-  if (locale === 'he') return size === 4 ? HE_TEMPLATES_4 : [];
-  // en + en-fallback locales
+  if (SMALL_BANK_LOCALES.has(locale)) return size === 4 ? MINI_TEMPLATES_4 : [];
+  // en + any other locale: 5×5 mini (or 7×7 midi when explicitly requested).
   if (size === 7) return EN_TEMPLATES_7;
   return EN_TEMPLATES_5;
 }
