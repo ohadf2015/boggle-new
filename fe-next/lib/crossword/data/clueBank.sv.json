@@ -52,7 +52,7 @@
     "score": 85
   },
   "appe": {
-    "clue": "Matbegäring",
+    "clue": "Hungerbegäring",
     "score": 85
   },
   "arbe": {
@@ -104,7 +104,7 @@
     "score": 82
   },
   "arge": {
-    "clue": "Kortform för debatt",
+    "clue": "Debattämne för diskussion",
     "score": 75
   },
   "argent": {
@@ -316,7 +316,7 @@
     "score": 80
   },
   "armigero": {
-    "clue": "Väpnad adel",
+    "clue": "Väpnad adlig",
     "score": 78
   },
   "armigers": {
@@ -396,7 +396,7 @@
     "score": 88
   },
   "armoured": {
-    "clue": "Järnskyddad",
+    "clue": "Med järnskydd",
     "score": 85
   },
   "armourer": {
@@ -420,7 +420,7 @@
     "score": 80
   },
   "armozine": {
-    "clue": "Morningväv",
+    "clue": "Fin väv typ",
     "score": 78
   },
   "arms": {
@@ -440,19 +440,19 @@
     "score": 80
   },
   "arnaldo": {
-    "clue": "Personnamn",
+    "clue": "Manligt namn",
     "score": 75
   },
   "arnament": {
-    "clue": "Armering",
+    "clue": "Väpning eller utrustning",
     "score": 75
   },
   "arnaments": {
-    "clue": "Armeringar",
+    "clue": "Väpningar och utrustningar",
     "score": 75
   },
   "arnatious": {
-    "clue": "Av älm växt",
+    "clue": "Växtartig till sitt väsen",
     "score": 75
   },
   "arnaut": {
@@ -468,7 +468,7 @@
     "score": 75
   },
   "arnega": {
-    "clue": "Spansk mål",
+    "clue": "Målstocken för skjutning",
     "score": 78
   },
   "arneis": {
@@ -504,7 +504,7 @@
     "score": 75
   },
   "arnish": {
-    "clue": "Som björn",
+    "clue": "Täckande eller beläggande",
     "score": 75
   },
   "arnisted": {
@@ -512,7 +512,7 @@
     "score": 75
   },
   "arnitter": {
-    "clue": "Björn gräs",
+    "clue": "Växtens fina stam",
     "score": 75
   },
   "arnitus": {
@@ -520,7 +520,7 @@
     "score": 75
   },
   "arnol": {
-    "clue": "Björn namn",
+    "clue": "Manligt namn",
     "score": 75
   },
   "arnold": {
@@ -540,7 +540,7 @@
     "score": 75
   },
   "arnom": {
-    "clue": "Björn läte",
+    "clue": "Dunderande läte",
     "score": 75
   },
   "arnongst": {
@@ -572,7 +572,7 @@
     "score": 75
   },
   "arnost": {
-    "clue": "Björn högt",
+    "clue": "Kraftigt ljud från något",
     "score": 75
   },
   "arnostene": {
