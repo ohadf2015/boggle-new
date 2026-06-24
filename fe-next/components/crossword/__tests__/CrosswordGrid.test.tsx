@@ -57,6 +57,20 @@ describe('CrosswordGrid', () => {
     expect(active.textContent).toContain('b');
   });
 
+  it('colours the grid drop-shadow by difficulty (easy lime · hard pink)', () => {
+    const easy = buildSeedPuzzle(seedEn); // seedEn is easy
+    const { container: easyC } = render(
+      <CrosswordGrid state={initGame(easy)} onSelect={() => {}} t={t} />,
+    );
+    expect(easyC.querySelector('[role="grid"]')?.className).toContain('shadow-hard-lime');
+
+    const hard = buildSeedPuzzle({ ...seedEn, id: 'grid-hard', difficulty: 'hard' });
+    const { container: hardC } = render(
+      <CrosswordGrid state={initGame(hard)} onSelect={() => {}} t={t} />,
+    );
+    expect(hardC.querySelector('[role="grid"]')?.className).toContain('shadow-hard-pink');
+  });
+
   it('renders a Hebrew grid in RTL with final-form letter at word end', () => {
     const puzzle = buildSeedPuzzle(seedHe);
     // fill the bottom-right cell (last of a word) so sofit display applies
