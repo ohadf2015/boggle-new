@@ -204,3 +204,10 @@ export function evaluateSvClue(answer: string, clue: string): ClueEvaluation {
 
   return { score: Math.round(score * 100) / 100, reason };
 }
+
+/**
+ * Spanish clue evaluator (uses the same logic as Swedish).
+ */
+export function evaluateEsClue(answer: string, clue: string): ClueEvaluation {
+  return evaluateSvClue(answer, clue);
+}
