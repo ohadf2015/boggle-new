@@ -1,6 +1,76 @@
 {
-  "generatedAt": "2026-06-24T20:40:55.065Z",
+  "generatedAt": "2026-06-24T21:54:09.254Z",
   "commits": [
+    {
+      "sha": "27af54cafa604e86e6b934c18664d99b10bad085",
+      "shortSha": "27af54c",
+      "subject": "feat(crossword): discoverable horizontal↔vertical direction toggle",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:35:54+03:00"
+    },
+    {
+      "sha": "7d85af820b6d174b521903339abdd7f6c57fd99a",
+      "shortSha": "7d85af8",
+      "subject": "test(crossword): add evaluateEsClue + audit tests for Spanish & Swedish clue banks",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:31:15+03:00"
+    },
+    {
+      "sha": "886dd6cb600802fe725d019da1514168c5c526d0",
+      "shortSha": "886dd6c",
+      "subject": "chore(crossword): re-score Spanish and Swedish clue banks",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:19:01+03:00"
+    },
+    {
+      "sha": "ec0840b1c564be059d785f9bb8e154b9d122bc24",
+      "shortSha": "ec0840b",
+      "subject": "fix(crossword): eliminate all poor-scoring Swedish clues through targeted improvements",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:17:48+03:00"
+    },
+    {
+      "sha": "e8e9097b01b1dc1dd02cd6ac3bc15ac4184d5210",
+      "shortSha": "e8e9097",
+      "subject": "fix(crossword): unwire es/sv live generation (keep banks as dictionaries)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:16:05+03:00"
+    },
+    {
+      "sha": "7d5e4372975e3efe30b55ac53e4f266c709db9bb",
+      "shortSha": "7d5e437",
+      "subject": "fix(crossword): remove 25 circular clues from Swedish clue bank",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:13:54+03:00"
+    },
+    {
+      "sha": "65d6ac14d8d9641bdff1718434bc1fc087999492",
+      "shortSha": "65d6ac1",
+      "subject": "fix(crossword): continue improving Swedish clue bank quality",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:06:37+03:00"
+    },
+    {
+      "sha": "1f53b5a3da485db2f7f197919af0eaa595050197",
+      "shortSha": "1f53b5a",
+      "subject": "fix(ads): point Monetag at the Vignette sub-zone that actually fills",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:03:43+03:00"
+    },
+    {
+      "sha": "76175add8e54d937f966723d01efa7cefc82d413",
+      "shortSha": "76175ad",
+      "subject": "fix(crossword): improve Swedish clue bank quality - fix echo issues and dictionary-like patterns",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:01:25+03:00"
+    },
+    {
+      "sha": "526df842b7be9ff5c1d9ac54fb35754462b10503",
+      "shortSha": "526df84",
+      "subject": "feat(crossword): add Swedish clue quality evaluator for audit",
+      "author": "Ohad Fisher",
+      "date": "2026-06-24T23:41:42+03:00"
+    },
     {
       "sha": "1f9bb7e8a6a02cd3f9298bdb0feb213abc415349",
       "shortSha": "1f9bb7e",
@@ -70,76 +140,6 @@
       "subject": "feat(email): review ask in Android launch blast to seed ratings",
       "author": "Ohad Fisher",
       "date": "2026-06-24T01:03:49+03:00"
-    },
-    {
-      "sha": "f502242c8c0b06fb7682068b00467c560e4c5fd7",
-      "shortSha": "f502242",
-      "subject": "fix(ads): treat non-navigation root requests as verifiers (Sec-Fetch-Mode)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T00:51:48+03:00"
-    },
-    {
-      "sha": "233e9a2872b135c562bad39e7e74fa860abbf066",
-      "shortSha": "233e9a2",
-      "subject": "fix(ads): serve verification meta to non-browser clients at root (Monetag)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T00:39:19+03:00"
-    },
-    {
-      "sha": "93bc1ec94e23f2b7190b086c64509e58ec4b334f",
-      "shortSha": "93bc1ec",
-      "subject": "Merge pull request #617 from ohadf2015/claude/play-bots-helper-ui-8e9ejd",
-      "author": "ohadf2015",
-      "date": "2026-06-24T00:09:35+03:00"
-    },
-    {
-      "sha": "84d6a3e741421ba7f7edc710dec55b83c2f9375b",
-      "shortSha": "84d6a3e",
-      "subject": "feat(ads): add Monetag site-ownership verification meta tag",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T00:07:27+03:00"
-    },
-    {
-      "sha": "e0ffd113829c6cbef42a298b8fe71b597be8ed08",
-      "shortSha": "e0ffd11",
-      "subject": "feat(android): native in-app review nudge after a win",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T00:07:14+03:00"
-    },
-    {
-      "sha": "f85979dfc4c98f106122aacf1265229fb7ef50d6",
-      "shortSha": "f85979d",
-      "subject": "chore: working-tree snapshot — monetag rewarded ads + tooling",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T00:04:24+03:00"
-    },
-    {
-      "sha": "f82f1d802230a28fd2ffc63181eeab5a92bea3c7",
-      "shortSha": "f82f1d8",
-      "subject": "feat(android): scan-to-install QR on TV results screen",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T00:02:41+03:00"
-    },
-    {
-      "sha": "843ee188e783170e0c231ed6744f7c667e72b046",
-      "shortSha": "843ee18",
-      "subject": "Merge pull request #616 from ohadf2015/claude/modal-ads-overlap-jeryis",
-      "author": "ohadf2015",
-      "date": "2026-06-24T00:01:05+03:00"
-    },
-    {
-      "sha": "df9b60065858daf67d98da5118c749416e50e4f9",
-      "shortSha": "df9b600",
-      "subject": "perf(auth): local-JWT verify on blast/result (pure-progress mutation)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T23:58:20+03:00"
-    },
-    {
-      "sha": "4e7d4e16d734495d7973a9517bd1d70751ab5382",
-      "shortSha": "4e7d4e1",
-      "subject": "feat(android): persistent install pill as on-load entry point",
-      "author": "Ohad Fisher",
-      "date": "2026-06-23T23:55:40+03:00"
     }
   ]
 }

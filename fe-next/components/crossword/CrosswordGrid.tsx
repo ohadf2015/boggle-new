@@ -18,6 +18,14 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
   const reduced = useReducedMotion();
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // Difficulty reads at a glance from the grid's hard drop-shadow colour — same family as the
+  // masthead difficulty chip (easy lime · medium cyan · hard pink). Black border stays (neo rule);
+  // the colour lives in the shadow. Colored hard-shadows carry their own RTL flip variants.
+  const diffShadow =
+    ({ easy: 'shadow-hard-lime', medium: 'shadow-hard-cyan', hard: 'shadow-hard-pink' } as const)[
+      puzzle.difficulty
+    ] ?? 'shadow-hard-lg';
+
   const slot = currentSlot(state);
   const activeSlotCells = useMemo(
     () => new Set((slot?.cells ?? []).map((c) => `${c.row},${c.col}`)),
@@ -75,7 +83,7 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
       role="grid"
       aria-label={t('crossword.gridLabel')}
       dir={puzzle.rtl ? 'rtl' : 'ltr'}
-      className="grid gap-px mx-auto w-full max-w-[min(92vw,28rem)] aspect-square bg-black p-px rounded-none shadow-hard-lg border-[3px] border-black"
+      className={`grid gap-px mx-auto w-full max-w-[min(92vw,28rem)] aspect-square bg-black p-px rounded-none ${diffShadow} border-[3px] border-black`}
       style={{
         gridTemplateColumns: `repeat(${size}, 1fr)`,
         gridTemplateRows: `repeat(${size}, 1fr)`,
