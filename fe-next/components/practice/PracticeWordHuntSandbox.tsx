@@ -377,8 +377,8 @@ export default function PracticeWordHuntSandbox() {
       {/* Learn by doing: drop straight onto the board with an inline tip that
           retires once the player lands their first word. */}
       <PracticeInstructions mode="wordHunt" autoOpen={false} />
-      <PracticeCoachTip mode="wordHunt" wordsFound={discoveries.length + (solved ? 1 : 0)} />
       <PracticeMistakeCoach kind={coach.active} mode="wordHunt" onClose={coach.close} />
+      <PracticeCoachTip mode="wordHunt" wordsFound={discoveries.length + (solved ? 1 : 0)} />
 
       <div className="flex flex-col items-center gap-2 flex-1 min-h-0 w-full overflow-hidden">
         {/* REAL clue boxes — letters reveal as discoveries / target attempts
@@ -405,6 +405,11 @@ export default function PracticeWordHuntSandbox() {
               gameDir={dir}
               t={t as (key: string) => string}
               matchesTargetLength={!solved && currentSelectionLength === target.length}
+              // Compact = small tiles + collapsed empty reserved slots. The
+              // full-size clue panel is built for the real survival screen; in
+              // the practice column it ate ~360px of mostly-empty height and
+              // crushed the board to a tiny square. Intended use of the prop.
+              compact
             />
           </div>
         </div>

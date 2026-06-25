@@ -251,11 +251,19 @@ export default function PracticeClassicSandbox() {
           board with a gentle inline tip that retires the moment they spell
           their first word. The "?" pill stays for on-demand reference. */}
       <PracticeInstructions mode="classic" autoOpen={false} />
-      <PracticeCoachTip mode="classic" wordsFound={foundWords.length} />
       <PracticeMistakeCoach kind={coach.active} mode="classic" onClose={coach.close} />
-      {/* On-screen FTUE helper — nudges after idle, then spotlights the riddle
-          answer's first tile if the player is stuck. */}
-      <PracticeHelperBubble stage={hintStage} hintCell={hintCell} />
+
+      {/* ONE teaching slot, never two stacked. The board used to be squeezed by
+          a coach tip AND a helper bubble both reserving a row and saying nearly
+          the same "spell a word" thing. Now the escalating helper takes the slot
+          when the player stalls (it can spotlight the riddle answer's first
+          tile); otherwise the rotating coach tip holds it. Both retire on the
+          first word, returning the row to the board. */}
+      {hintStage !== 'none' ? (
+        <PracticeHelperBubble stage={hintStage} hintCell={hintCell} />
+      ) : (
+        <PracticeCoachTip mode="classic" wordsFound={foundWords.length} />
+      )}
 
       <div className="flex-1 min-h-0 flex items-center justify-center w-full">
         {/* Fill the flex space; `.game-board-frame` clamps the square to the
