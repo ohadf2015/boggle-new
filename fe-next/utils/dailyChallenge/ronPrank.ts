@@ -8,8 +8,8 @@
  * accumulate exactly as normal. Nobody else ever sees it.
  */
 
-/** Ron's Supabase user id — the only account that sees the joke bonus. */
-export const RON_PRANK_USER_ID = 'hdtmpkicuxvtmvrmtybx';
+/** Ron's Supabase user id (profiles.id UUID) — the only account that sees the joke bonus. */
+export const RON_PRANK_USER_ID = '4d68a876-a3ee-4687-8a66-65b93f0c12c7';
 
 /** The obviously-a-joke bonus amount shown to Ron (display only). */
 export const RON_PRANK_BONUS_POINTS = 1_000_000;
