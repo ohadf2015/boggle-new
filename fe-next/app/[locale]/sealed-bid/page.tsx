@@ -81,6 +81,8 @@ export default function SealedBidPage() {
   const [pending, setPending] = useState(false);
   const [history, setHistory] = useState<RoundResult[]>([]);
   const [winFlash, setWinFlash] = useState(0);
+  // Poker showdown sequence: 0=hidden, 1=heading, 2=player flipped, 3=bot flipped, 4=outcome
+  const [revealStep, setRevealStep] = useState(0);
   const builtRef = useRef<HTMLDivElement>(null);
   const revealRef = useRef<HTMLDivElement>(null);
   const didShuffleRef = useRef(false);
@@ -143,6 +145,18 @@ export default function SealedBidPage() {
       playSound('wordRejected');
     }
   }, [state.phase, result, playSound]);
+
+  // Poker showdown sequence — stage the reveal over 1.4 s (skipped on reduced motion).
+  useEffect(() => {
+    if (state.phase !== 'revealed') { setRevealStep(0); return; }
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { setRevealStep(4); return; }
+    setRevealStep(1);
+    const t1 = setTimeout(() => setRevealStep(2), 400);
+    const t2 = setTimeout(() => setRevealStep(3), 900);
+    const t3 = setTimeout(() => setRevealStep(4), 1400);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [state.phase]);
 
   // Final fanfare on the last reveal — fire once per game end + award daily coins.
   useEffect(() => {
@@ -368,22 +382,50 @@ export default function SealedBidPage() {
           </div>
         ) : state.phase === 'revealed' && result ? (
           <div ref={revealRef} className="rounded-neo border-3 border-black bg-neo-navy-light p-5 text-center shadow-hard-lg space-y-3">
-            <p className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">{t('sealedBid.revealPhase')}</p>
+            {/* Poker showdown heading — fades in first */}
+            <p className={`font-neo-display font-black text-sm uppercase tracking-[0.25em] transition-opacity duration-300 ${revealStep >= 1 ? 'text-neo-yellow opacity-100' : 'opacity-0'}`}>
+              {t('sealedBid.showdown')}
+            </p>
             <div dir={dir} className="flex items-center justify-center gap-4">
+              {/* Player flip card */}
               <div className="space-y-1">
                 <p className="inline-flex items-center gap-1 font-neo-body text-xs text-neo-white/80"><User className="h-3.5 w-3.5" />{t('sealedBid.youPicked')}</p>
-                <p className="rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm">{result.playerWord ? toDisplay(result.playerWord) : '—'}</p>
+                <div style={{ perspective: '600px' }}>
+                  <div
+                    className="relative min-w-[80px]"
+                    style={{ transformStyle: 'preserve-3d', transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)', transform: revealStep >= 2 ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+                  >
+                    <div className="rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 font-neo-display font-black text-lg text-neo-white/40 shadow-hard-sm text-center select-none" style={{ backfaceVisibility: 'hidden' }}>?</div>
+                    <div className="absolute inset-0 flex items-center justify-center rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                      {result.playerWord ? toDisplay(result.playerWord) : '—'}
+                    </div>
+                  </div>
+                </div>
               </div>
+              {/* Bot flip card */}
               <div className="space-y-1">
                 <p className="inline-flex items-center gap-1 font-neo-body text-xs text-neo-white/80"><Bot className="h-3.5 w-3.5" />{t('sealedBid.botPicked')}</p>
-                <p className="rounded-neo border-2 border-black bg-neo-pink px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm">{toDisplay(result.botWord)}</p>
+                <div style={{ perspective: '600px' }}>
+                  <div
+                    className="relative min-w-[80px]"
+                    style={{ transformStyle: 'preserve-3d', transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)', transform: revealStep >= 3 ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+                  >
+                    <div className="rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 font-neo-display font-black text-lg text-neo-white/40 shadow-hard-sm text-center select-none" style={{ backfaceVisibility: 'hidden' }}>?</div>
+                    <div className="absolute inset-0 flex items-center justify-center rounded-neo border-2 border-black bg-neo-pink px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                      {toDisplay(result.botWord)}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <p className={`inline-flex items-center justify-center gap-1.5 font-neo-display font-black text-lg uppercase ${result.outcome === 'unique' ? 'text-neo-lime' : result.outcome === 'clash' ? 'text-neo-orange' : 'text-neo-white/70'}`}>
-              {result.outcome === 'unique' && <Sparkles className="h-5 w-5" />}
-              {t(resultKey)}
-            </p>
-            <p className="font-neo-display font-black text-2xl text-neo-white">{t('sealedBid.pointsEarned', { pts: result.points })}</p>
+            {/* Outcome + points fade in after both cards flip */}
+            <div className={`space-y-1 transition-opacity duration-300 ${revealStep >= 4 ? 'opacity-100' : 'opacity-0'}`}>
+              <p className={`inline-flex items-center justify-center gap-1.5 font-neo-display font-black text-lg uppercase ${result.outcome === 'unique' ? 'text-neo-lime' : result.outcome === 'clash' ? 'text-neo-orange' : 'text-neo-white/70'}`}>
+                {result.outcome === 'unique' && <Sparkles className="h-5 w-5" />}
+                {t(resultKey)}
+              </p>
+              <p className="font-neo-display font-black text-2xl text-neo-white">{t('sealedBid.pointsEarned', { pts: result.points })}</p>
+            </div>
             <button
               type="button"
               onClick={next}

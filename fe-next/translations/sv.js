@@ -384,6 +384,7 @@ const sv = {
     "backspace": "Ta bort sista bokstaven",
     "clear": "Rensa ordet",
     "revealPhase": "Avslöjning",
+    "showdown": "SHOWDOWN!",
     "lockIn": "Lås in",
     "skip": "Hoppa över",
     "youPicked": "Du valde",

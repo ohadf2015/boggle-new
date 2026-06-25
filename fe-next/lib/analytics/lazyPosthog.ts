@@ -112,6 +112,9 @@ const lazyPosthog = {
   opt_in_capturing: ff(['opt_in_capturing']),
   opt_out_capturing: ff(['opt_out_capturing']),
 
+  /** True once posthog-js has loaded and inited. Replaces __loaded checks. */
+  isLoaded: (): boolean => real !== null,
+
   people: {
     set: ff(['people', 'set']),
     set_once: ff(['people', 'set_once']),

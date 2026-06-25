@@ -222,6 +222,7 @@ const es = {
     "backspace": "Borrar última letra",
     "clear": "Borrar palabra",
     "revealPhase": "Revelación",
+    "showdown": "¡SHOWDOWN!",
     "lockIn": "Confirmar",
     "skip": "Pasar",
     "youPicked": "Elegiste",

@@ -14,8 +14,10 @@ const { capture, identify, people_set_once, reset, posthogMock } = vi.hoisted(()
   const pso = vi.fn();
   const r = vi.fn();
   // `__loaded` is mutated per-test to simulate init state.
+  // `isLoaded` reads __loaded so guard tests still work via posthogMock.__loaded = false.
   const mock: Record<string, unknown> = {
     __loaded: true,
+    isLoaded: () => (mock as Record<string, boolean>).__loaded === true,
     capture: c,
     identify: i,
     reset: r,

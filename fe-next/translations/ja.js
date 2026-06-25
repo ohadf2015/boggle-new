@@ -226,6 +226,7 @@ const ja = {
     "backspace": "最後の文字を削除",
     "clear": "単語をクリア",
     "revealPhase": "公開",
+    "showdown": "ショーダウン！",
     "lockIn": "確定",
     "skip": "スキップ",
     "youPicked": "あなたの選択",

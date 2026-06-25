@@ -241,6 +241,7 @@ const he = {
     "backspace": "מחיקת האות האחרונה",
     "clear": "ניקוי המילה",
     "revealPhase": "חשיפה",
+    "showdown": "גילוי פנים!",
     "lockIn": "נעל",
     "skip": "דלג",
     "youPicked": "בחרתם",

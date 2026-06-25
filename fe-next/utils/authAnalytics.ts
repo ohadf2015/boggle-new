@@ -33,12 +33,11 @@ function safe<T>(fn: () => T): T | undefined {
   }
 }
 
-// posthog.* throws `Cannot read properties of undefined (reading '__loaded')`
-// when init() has never run (e.g., NEXT_PUBLIC_POSTHOG_KEY missing in dev).
-// Guard at the caller so the error never fires — safe() would catch it but
-// the dev console gets polluted on every auth-state mount.
+// lazyPosthog proxy exposes isLoaded(); legacy real posthog-js used __loaded.
+// Both paths checked so this guard survives if the proxy is ever swapped back.
 function isPostHogLoaded(): boolean {
-  return (posthog as unknown as { __loaded?: boolean }).__loaded === true;
+  const ph = posthog as unknown as { isLoaded?: () => boolean; __loaded?: boolean };
+  return typeof ph.isLoaded === 'function' ? ph.isLoaded() : ph.__loaded === true;
 }
 
 export function identifyUserForAnalytics(args: IdentifyArgs): void {

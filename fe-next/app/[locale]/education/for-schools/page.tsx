@@ -68,10 +68,13 @@ export default async function Page({ params }: PageProps) {
     name: 'LexiClash Education',
     url: `${BASE_URL}/en/education`,
     description:
-      'Free multiplayer vocabulary games for schools — 5 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free for every teacher.',
+      'Multiplayer vocabulary games for schools — 5 languages including Hebrew RTL, no student logins, 1v1 duels and whole-class play. Free 30-day trial for teachers; school plans from $149/year.',
     audience: { '@type': 'EducationalAudience', educationalRole: 'teacher' },
     areaServed: ['US', 'IL', 'SE', 'JP', 'ES'],
-    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD', category: 'free', availability: 'https://schema.org/InStock' },
+    offers: [
+      { '@type': 'Offer', name: 'Teacher Trial', price: 0, priceCurrency: 'USD', category: 'free trial', description: 'Full 30-day free trial for individual teachers', availability: 'https://schema.org/InStock' },
+      { '@type': 'Offer', name: 'School Plan', price: 149, priceCurrency: 'USD', priceSpecification: { '@type': 'UnitPriceSpecification', price: 149, priceCurrency: 'USD', unitText: 'year' }, category: 'paid', description: 'School plan: admin dashboard, analytics, curriculum libraries, ad-free environment, SSO', availability: 'https://schema.org/InStock' },
+    ],
   };
 
   const breadcrumbJsonLd = {

@@ -237,6 +237,7 @@ const en = {
     "backspace": "Delete last letter",
     "clear": "Clear word",
     "revealPhase": "Reveal",
+    "showdown": "SHOWDOWN!",
     "lockIn": "Lock in",
     "skip": "Pass",
     "youPicked": "You picked",

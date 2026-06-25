@@ -1030,3 +1030,32 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - status: research-only — existing guards in `WordWheelPixiRing.tsx:86`, `TrailRenderer.ts:60`, `TileRenderer.ts:429` already patched
 - why: remaining 2 PostHog hits may be stale (pre-fix) or from an unmapped chunk; no new unguarded call sites found
 - recommended owner: monitor — close if no new occurrences in 7d
+
+## 2026-06-25
+
+### [Sentry] churn-signals 502 (JAVASCRIPT-NEXTJS-1KQ)
+- last seen: active, 276+ events; root cause identified in `fe-next/lib/auth/getBearerUser.ts:14-19`
+- link: https://lexiclash.sentry.io/issues/124871662/
+- status: deferred (operational, not code)
+- why: code fix already shipped — `getBearerUser` does local HS256 JWT verify (no network). Fix takes effect when `SUPABASE_JWT_SECRET` is provisioned on Railway (Supabase Dashboard → Project Settings → API → JWT Secret). Zero code changes needed.
+- recommended owner: review-by-eod (Railway env var: set SUPABASE_JWT_SECRET)
+
+### [Sentry] "relation 'profiles' does not exist" (JAVASCRIPT-NEXTJS-1JR)
+- last seen: active, reach=5
+- link: https://lexiclash.sentry.io/issues/123033022/
+- status: deferred (root cause not traced)
+- why: `public.profiles` table EXISTS with expected columns (id, total_coins, lifetime_coins_earned). `sync_coins` uses `public.profiles` (schema-qualified, safe). No function with bare `profiles` reference + empty search_path found. Error origin may be an edge function or uncaptured PostgREST path — needs Sentry stack trace read.
+- recommended owner: backend (read Sentry stack trace for callsite)
+
+### [Sentry] Coin transaction failures (JAVASCRIPT-NEXTJS-1JP, 1JQ)
+- last seen: active, reach=5/4
+- links: https://lexiclash.sentry.io/issues/123033015/ · https://lexiclash.sentry.io/issues/123033018/
+- status: deferred (DB-level; coin-economy → human queue)
+- why: `sync_coins` and `award_ad_coins` are SECURITY DEFINER RPCs returning actual Supabase errors (not logical failures like "Insufficient coins"). Requires pg_stat_statements or Sentry stack trace to pinpoint. Coin-economy logic = safety rail, human review required.
+- recommended owner: backend (read Sentry stack trace; check pg_stat_statements for recent errors on these RPCs)
+
+### [Supabase Security] upsert_push_token SECURITY DEFINER callable by authenticated
+- link: https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable
+- status: deferred (requires refactor to fix correctly)
+- why: function intentionally SECURITY DEFINER — body uses `auth.uid()` AND updates OTHER users' tokens (cross-user cleanup). REVOKE from authenticated breaks the push-token route (uses user-session client). Proper fix: add `p_user_id` param to function, route → service_role client, REVOKE authenticated. No anon grant exists (already safe from anon). 53 total flagged functions; this one is the clearest case.
+- recommended owner: backend (2-step: modify function signature + route, then REVOKE authenticated)

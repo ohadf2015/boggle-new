@@ -241,6 +241,11 @@ export default async function HomePage({ params }: PageProps) {
   const faqJsonLd = JSON.stringify(buildHomepageFaqJsonLd(locale));
   return (
     <>
+      {/* Preload hero mascot from first server HTML byte — fires before the client
+          component subtree emits its own <Image priority> preload, giving the
+          browser a head-start on the 402 KB animated WebP that is the LCP element.
+          Mirrors the same pattern used on the multiplayer page (/mascot/play.webp). */}
+      <link rel="preload" as="image" href="/mascot/winner.webp" type="image/webp" fetchPriority="high" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}

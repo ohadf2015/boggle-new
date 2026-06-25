@@ -1,10 +1,14 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { Flame } from 'lucide-react';
+import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useExperiment } from '@/hooks/useExperiment';
 import { HeroStyleMascot } from './HeroStyleMascot';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 // SSR enabled: receives players from server initialData → above-the-fold sidebar paints with data, not skeleton.
 const LandingLeaderboardPreview = dynamic(
@@ -54,8 +58,14 @@ function FloatingTiles() {
 // matches client first paint regardless of viewport — no JS-driven layout flip.
 // `isMobilePortrait` only feeds behavior props on the mascot (hover/click).
 export function LandingHero({ players, playersLoading, isMobilePortrait, energetic, activePlayers = 0 }: LandingHeroProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const showLivePill = energetic && activePlayers > 10;
+  const { variant: heroVariant, trackExposure } = useExperiment('landing-variant-homepage-v1');
+  const showHeroCta = heroVariant === 'variant';
+
+  useEffect(() => {
+    if (showHeroCta) trackExposure();
+  }, [showHeroCta, trackExposure]);
 
   return (
     <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 md:px-5 lg:px-6">
@@ -77,6 +87,23 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
             <p className="mt-1 max-w-md font-neo-body text-sm text-neo-white/80 sm:text-base animate-[fadeInUp_0.4s_ease-out_0.25s_both]">
               {t('landing.welcomeSubtitle')}
             </p>
+          )}
+
+          {showHeroCta && (
+            <Link
+              href={`/${language}/daily`}
+              className="mt-4 inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed animate-[fadeInUp_0.4s_ease-out_0.3s_both]"
+              onClick={() => {
+                try {
+                  (posthog.capture as (e: string, p?: Record<string, unknown>) => void)(
+                    'landing_hero_cta_clicked',
+                    { variant: 'variant', destination: 'daily' },
+                  );
+                } catch { /* posthog not loaded */ }
+              }}
+            >
+              {t('landing.playTodayChallenge')}
+            </Link>
           )}
 
           {showLivePill && (
