@@ -177,10 +177,12 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       });
     }
     const pendingRoom = consumePendingRoomInvite();
+    // Skip = bail out of onboarding. Land on the home page, NOT multiplayer —
+    // unless a room invite is pending (that's explicit intent to play MP).
     router.push(
       pendingRoom
         ? `/${language}/multiplayer?room=${pendingRoom}`
-        : `/${language}/multiplayer`,
+        : `/${language}`,
     );
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);

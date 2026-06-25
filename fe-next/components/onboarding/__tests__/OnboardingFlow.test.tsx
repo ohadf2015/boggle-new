@@ -73,9 +73,10 @@ vi.mock('@/components/auth/AuthModal', () => ({
 
 vi.mock('../ReturningUserStep', () => ({
   __esModule: true,
-  default: ({ onNew }: any) => (
+  default: ({ onNew, onSkip }: any) => (
     <div data-testid="returning-user-step">
       <button onClick={onNew}>I&apos;m New Here</button>
+      <button onClick={onSkip}>Skip</button>
     </div>
   ),
 }));
@@ -303,6 +304,25 @@ describe('OnboardingFlow', () => {
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
       expect(mockPush).toHaveBeenCalledWith('/en/practice');
+    });
+  });
+
+  describe('skip onboarding navigation', () => {
+    it('lands a brand-new player on the home page (not multiplayer) when they skip with no pending invite', () => {
+      mockConsumePendingRoom.mockReturnValue(null);
+      render(<OnboardingFlow {...defaultProps} />);
+      pickLanguage();
+      fireEvent.click(screen.getByText('Skip'));
+      expect(mockPush).toHaveBeenCalledWith('/en');
+      expect(mockPush).not.toHaveBeenCalledWith('/en/multiplayer');
+    });
+
+    it('still honors a pending room invite on skip (joins multiplayer room)', () => {
+      mockConsumePendingRoom.mockReturnValue('ABC123');
+      render(<OnboardingFlow {...defaultProps} />);
+      pickLanguage();
+      fireEvent.click(screen.getByText('Skip'));
+      expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ABC123');
     });
   });
 
