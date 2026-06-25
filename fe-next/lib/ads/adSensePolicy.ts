@@ -17,7 +17,7 @@ const DEFAULT_ADSENSE_CLIENT = 'ca-pub-1896836706464880';
 
 /** The AdSense client id (`ca-pub-…`). Defaults to our direct publisher id; env-overridable. */
 export function getAdSenseClient(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_ADSENSE_CLIENT) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_CLIENT) {
     return process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
   }
   return DEFAULT_ADSENSE_CLIENT;
@@ -39,7 +39,7 @@ export function getAdSenseAccountMeta(): string {
 export function isAdSenseConfigured(): boolean {
   return (
     typeof process !== 'undefined' &&
-    process.env?.NEXT_PUBLIC_ADSENSE_ENABLED === 'true' &&
+    process.env.NEXT_PUBLIC_ADSENSE_ENABLED === 'true' &&
     getAdSenseClient() !== ''
   );
 }

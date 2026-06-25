@@ -67,7 +67,7 @@ let loadPromise: Promise<void> | null = null;
 let configured = false;
 
 export function getH5Client(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_ADSENSE_H5_CLIENT) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT) {
     return process.env.NEXT_PUBLIC_ADSENSE_H5_CLIENT;
   }
   return DEFAULT_CLIENT;

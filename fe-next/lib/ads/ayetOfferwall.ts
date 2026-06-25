@@ -16,7 +16,7 @@ const OFFERWALL_BASE = 'https://www.ayetstudios.com/offers/web_offerwall';
 
 /** Configured web offerwall adslot id. Empty = stay dark. */
 export function getAyetOfferwallAdslot(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_AYET_OFFERWALL_ADSLOT) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_AYET_OFFERWALL_ADSLOT) {
     return process.env.NEXT_PUBLIC_AYET_OFFERWALL_ADSLOT;
   }
   return '';
@@ -26,7 +26,7 @@ export function getAyetOfferwallAdslot(): string {
 export function isAyetOfferwallConfigured(): boolean {
   return (
     typeof process !== 'undefined' &&
-    process.env?.NEXT_PUBLIC_AYET_OFFERWALL_ENABLED === 'true' &&
+    process.env.NEXT_PUBLIC_AYET_OFFERWALL_ENABLED === 'true' &&
     getAyetOfferwallAdslot() !== ''
   );
 }

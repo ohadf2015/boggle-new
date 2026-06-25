@@ -48,7 +48,7 @@ let initialized = false;
 
 /** Resolve the configured ayeT web video placement id. Empty = stay dark. */
 export function getAyetPlacementId(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_AYET_PLACEMENT_ID) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_AYET_PLACEMENT_ID) {
     return process.env.NEXT_PUBLIC_AYET_PLACEMENT_ID;
   }
   return '';
@@ -56,7 +56,7 @@ export function getAyetPlacementId(): string {
 
 /** Resolve the adslot name to request. Defaults to 'default'. */
 export function getAyetAdslot(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_AYET_ADSLOT) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_AYET_ADSLOT) {
     return process.env.NEXT_PUBLIC_AYET_ADSLOT;
   }
   return 'default';

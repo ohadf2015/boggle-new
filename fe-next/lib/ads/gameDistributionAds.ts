@@ -62,7 +62,7 @@ let rewardWatched = false;
 
 /** Resolve the configured GameDistribution game id (hash). Empty = stay dark. */
 export function getGdGameId(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_GD_GAME_ID) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_GD_GAME_ID) {
     return process.env.NEXT_PUBLIC_GD_GAME_ID;
   }
   return '';

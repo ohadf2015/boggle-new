@@ -28,12 +28,12 @@ const SCRIPT_ID = 'monetag-banner-sdk';
 // the rewarded path). The domain rotates to dodge adblock; if Monetag rotates it,
 // update this AND the CSP script-src in next.config.mjs. Override via env if needed.
 const SCRIPT_SRC =
-  (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_MONETAG_BANNER_SRC) ||
+  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_MONETAG_BANNER_SRC) ||
   'https://nap5k.com/tag.min.js';
 
 /** Resolve the configured Monetag BANNER zone id. Empty = stay dark. */
 export function getMonetagBannerZoneId(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_MONETAG_BANNER_ZONE_ID) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_MONETAG_BANNER_ZONE_ID) {
     return process.env.NEXT_PUBLIC_MONETAG_BANNER_ZONE_ID;
   }
   return '';
@@ -41,7 +41,7 @@ export function getMonetagBannerZoneId(): string {
 
 /** Master web-ads enable flag (shared with the rewarded path). */
 export function isMonetagAdsEnabled(): boolean {
-  return typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_MONETAG_ADS_ENABLED === 'true';
+  return typeof process !== 'undefined' && process.env.NEXT_PUBLIC_MONETAG_ADS_ENABLED === 'true';
 }
 
 /** True iff the banner is configured to run at all (flag + zone id present). */

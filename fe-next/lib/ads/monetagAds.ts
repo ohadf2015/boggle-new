@@ -39,7 +39,7 @@ let configured = false;
 
 /** Resolve the configured Monetag zone id. Empty = stay dark. */
 export function getMonetagZoneId(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_MONETAG_ZONE_ID) {
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_MONETAG_ZONE_ID) {
     return process.env.NEXT_PUBLIC_MONETAG_ZONE_ID;
   }
   return '';
