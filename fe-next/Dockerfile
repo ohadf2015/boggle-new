@@ -38,22 +38,11 @@ ARG NEXT_PUBLIC_SENTRY_DSN
 ARG NEXT_PUBLIC_GA4_MEASUREMENT_ID
 ARG NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID
 ARG NEXT_PUBLIC_CRAZYGAMES_ENABLED
-# AdSense web display gate. Like Monetag, this MUST be declared as an ARG or Railway
-# won't forward the service var into the build → the client bundle bakes it as undefined
-# → AdSense stays dark despite NEXT_PUBLIC_ADSENSE_ENABLED=true in the runtime env.
+# AdSense web display gate. MUST be declared as an ARG or Railway won't forward the
+# service var into the build → the client bundle bakes it as undefined → AdSense stays
+# dark despite NEXT_PUBLIC_ADSENSE_ENABLED=true in the runtime env.
 # (Publisher id is not forwarded: adSensePolicy.ts defaults to the correct ca-pub-… id.)
 ARG NEXT_PUBLIC_ADSENSE_ENABLED
-# Monetag web rewarded (instant-approval fallback). ZONE_ID = the SDK-show zone for
-# site www.lexiclash.live — use the Vignette sub-zone (11196925), NOT the MultiTag
-# OnClick/popunder parent (11196923 returns 404 on the SDK show_<id>() path; popunder
-# isn't an on-demand format). ADS_ENABLED gates it in the rewarded waterfall. Web
-# top-frame only — the lib hard-blocks native/iframe regardless of these.
-ARG NEXT_PUBLIC_MONETAG_ADS_ENABLED
-ARG NEXT_PUBLIC_MONETAG_ZONE_ID
-# Monetag web BANNER zone (anchored/in-page banner — the web analog of the native
-# AdMob anchor). MUST be a banner/in-page zone, NOT the rewarded or MultiTag
-# popunder zone. Empty → the web banner stays dark. Gated by NEXT_PUBLIC_MONETAG_ADS_ENABLED.
-ARG NEXT_PUBLIC_MONETAG_BANNER_ZONE_ID
 ARG NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
 # CDN base for heavy static media (music/sounds/showcase3d) — offloaded to Supabase Storage.

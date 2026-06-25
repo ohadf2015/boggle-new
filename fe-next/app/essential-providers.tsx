@@ -30,8 +30,6 @@ import { AdMobProvider } from '@/contexts/AdMobContext';
 import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
 import BannerCoordinatorMount from '@/components/ads/BannerCoordinatorMount';
 import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
-// MonetagWebBanner disabled 2026-06-25 (In-Page Push too spammy) — see mount site below.
-// import MonetagWebBanner from '@/components/ads/MonetagWebBanner';
 import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
@@ -257,13 +255,6 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     so bottom CTAs (e.g. daily Play button) clear the injected
                                                     fixed anchor the AdMob var can't see. No-op on native AdMob. */}
                                                 <WebAnchorAdObserver />
-                                                {/* WEB Monetag banner DISABLED 2026-06-25: the only configured
-                                                    banner zone (11197640) is In-Page Push, which renders spammy
-                                                    notification-style cards — bad UX + hurts AdSense reapproval.
-                                                    Opt-in rewarded ads (useRewardedAd) stay live; they're not spammy.
-                                                    To re-enable: create a real DISPLAY Banner zone in Monetag,
-                                                    render it in a reserved anchored slot, then restore <MonetagWebBanner />. */}
-                                                {/* <MonetagWebBanner /> */}
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>

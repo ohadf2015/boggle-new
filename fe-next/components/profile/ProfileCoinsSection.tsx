@@ -111,7 +111,7 @@ export function ProfileCoinsSection({
         </span>
       </div>
 
-      {/* Discoverable rewarded-ad option — watch a Monetag rewarded ad for coins.
+      {/* Discoverable rewarded-ad option — watch a rewarded ad for coins.
           Self-hides when no provider can serve (canShowAd false) or the daily cap
           is hit, so it only appears when it can actually grant. */}
       <RewardedAdGoldButton goldAmount={20} surface="profile_coins" size="md" className="mt-3 w-full justify-center" />

@@ -48,9 +48,7 @@ const SEO_CRAWLERS: string[] = [
   'sogou', 'exabot', 'ia_archiver', 'applebot', 'petalbot',
   'semrushbot', 'ahrefsbot', 'mj12bot', 'dotbot', 'rogerbot',
   'google-inspectiontool', 'google-extended', 'bytespider',
-  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot',
-  // Ad-network ownership verifier (meta-tag check at root)
-  'monetag'
+  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot'
 ];
 
 /**
@@ -75,10 +73,9 @@ export function isSeoCrawler(userAgent: string): boolean {
 
 /**
  * Detect a non-browser HTTP client (empty UA, or a UA lacking the "Mozilla"
- * token every real browser sends). Covers curl/python/go-http and, crucially,
- * ad-network ownership verifiers (Monetag etc.) that fetch the root with a
- * plain server-side GET and do NOT follow the locale 301 — so they must be
- * served the rendered page (200 + verification <meta>) instead of a redirect.
+ * token every real browser sends). Covers curl/python/go-http and other
+ * server-side GETs that fetch the root and do NOT follow the locale 301 — so
+ * they must be served the rendered page (200) instead of a redirect.
  * @param userAgent - User agent string
  */
 export function isNonBrowserClient(userAgent: string): boolean {
@@ -136,15 +133,13 @@ export function handleLocaleRedirect(req: GeoRequest, _res: Response, parsedUrl:
   const queryString = parsedUrl.search || '';
 
   // A real browser TOP-LEVEL navigation always sends `Sec-Fetch-Mode: navigate`
-  // (Chrome 76+/Firefox 90+/Safari 16.4+). Server-side fetches — including
-  // ad-network ownership verifiers that spoof a "Mozilla" UA — cannot forge it.
+  // (Chrome 76+/Firefox 90+/Safari 16.4+). Server-side fetches cannot forge it.
   const secFetchMode = (req.headers['sec-fetch-mode'] as string) || '';
   const isBrowserNavigation = secFetchMode === 'navigate';
 
   // ALWAYS rewrite the bare root internally (200 localized content), NEVER 301.
-  // Why no redirect: ad-network ownership verifiers (Monetag etc.) fetch the
-  // root and do NOT follow redirects, so the verification <meta> must be on the
-  // 200 response — and their request shape (UA / headers) is not reliably
+  // Why no redirect: some server-side clients fetch the root and do NOT follow
+  // redirects, and their request shape (UA / headers) is not reliably
   // detectable, so we stop trying to single them out and just serve everyone.
   // SEO is unaffected: SEO crawlers ALREADY received /en content here (this
   // handler never issued them a redirect), and every locale page carries an

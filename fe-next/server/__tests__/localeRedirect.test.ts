@@ -79,11 +79,10 @@ describe('isNonBrowserClient', () => {
     expect(isNonBrowserClient('curl/8.0')).toBe(true);
     expect(isNonBrowserClient('python-requests/2.31')).toBe(true);
     expect(isNonBrowserClient('Go-http-client/2.0')).toBe(true);
-    expect(isNonBrowserClient('Monetag-Verifier/1.0')).toBe(true);
   });
 });
 
-describe('handleLocaleRedirect — root always rewrites (never 301), so any verifier reads the meta', () => {
+describe('handleLocaleRedirect — root always rewrites (never 301)', () => {
   it('rewrites a real browser navigation to its detected locale (200, no redirect)', () => {
     const res = mockRes();
     // Hebrew browser → /he content served at root, never redirected.
@@ -101,8 +100,8 @@ describe('handleLocaleRedirect — root always rewrites (never 301), so any veri
     expect(r.url).toBe('/en');
   });
 
-  it('rewrites a non-browser / spoofing verifier to /en so it reads the meta (no redirect)', () => {
-    for (const ua of ['Monetag-Verifier/1.0', '', 'Mozilla/5.0 (compatible; verifier)']) {
+  it('rewrites a non-browser / spoofing client to /en (no redirect)', () => {
+    for (const ua of ['curl/8.0', '', 'Mozilla/5.0 (compatible; verifier)']) {
       const r = rootReq(ua);
       const res = mockRes();
       expect(handleLocaleRedirect(r, res, parsed())).toBe(false);
