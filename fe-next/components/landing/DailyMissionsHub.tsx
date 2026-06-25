@@ -18,7 +18,6 @@ import { DailyAvatarPartCard } from '@/components/avatar/DailyAvatarPartCard';
 interface MissionConfig {
   type: MissionType;
   icon: React.ElementType;
-  borderColor: string;
   dotColor: string;
   translationKey: string;
 }
@@ -27,21 +26,18 @@ const ALL_MISSION_CONFIGS: Record<DailyQuestMode, MissionConfig> = {
   wordHunt: {
     type: 'wordHunt',
     icon: Trophy,
-    borderColor: 'border-s-neo-yellow',
     dotColor: 'bg-neo-yellow',
     translationKey: 'dailyMissions.wordHunt',
   },
   multiplayer: {
     type: 'multiplayer',
     icon: Users,
-    borderColor: 'border-s-neo-pink',
     dotColor: 'bg-neo-pink',
     translationKey: 'dailyMissions.multiplayer',
   },
   brainDrills: {
     type: 'brainDrills',
     icon: Brain,
-    borderColor: 'border-s-neo-purple',
     dotColor: 'bg-neo-purple',
     translationKey: 'dailyMissions.brainDrills',
   },
@@ -98,8 +94,7 @@ function MissionRow({
       href={`/${language}${href}`}
       className={cn(
         'flex items-center gap-3 p-3 rounded-neo',
-        'border-3 border-neo-black border-s-4',
-        config.borderColor,
+        'border-3 border-neo-black',
         'bg-neo-navy/60 hover:bg-neo-navy/80',
         'shadow-hard-sm hover:shadow-hard',
         'transition-all duration-150',
@@ -112,11 +107,11 @@ function MissionRow({
         className={cn(
           'shrink-0 w-9 h-9 flex items-center justify-center rounded-neo',
           'border-2 border-neo-black',
-          completed ? 'bg-neo-lime/20' : 'bg-neo-navy',
+          completed ? 'bg-neo-lime/20' : config.dotColor,
         )}
       >
         <Icon
-          className={cn('w-5 h-5', completed ? 'text-neo-lime' : 'text-neo-white')}
+          className={cn('w-5 h-5', completed ? 'text-neo-lime' : 'text-neo-black')}
           aria-hidden="true"
         />
       </div>
