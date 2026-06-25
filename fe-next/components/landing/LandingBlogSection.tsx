@@ -86,7 +86,7 @@ export function LandingBlogSection() {
                 <p className="text-sm text-gray-400 mb-3 line-clamp-2">
                   {c.excerpt}
                 </p>
-                <div className="flex items-center gap-4 text-xs text-gray-500">
+                <div className="flex items-center gap-4 text-xs text-gray-400">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     {safeToLocaleDateString(new Date(post.date), lang, { month: 'short', day: 'numeric', year: 'numeric' })}
