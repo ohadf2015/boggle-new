@@ -22,9 +22,10 @@ interface GoogleSignInButtonProps {
  *
  * The GSI button is an iframe and can't be CSS-styled, and it MUST stay visible
  * (GSI anti-clickjacking ignores clicks on hidden/obscured buttons — a custom
- * overlay is impossible). So we render Google's own `filled_black` button at full
- * width and wrap it in our hard border + hard shadow, giving brand chrome around
- * a working button. It uses the in-page ID-token flow → consent shows OUR domain.
+ * overlay is impossible). So we render Google's own `outline` (white) button and
+ * wrap it in a neo frame whose chrome (border-3, rounded-xl, 48px) matches the
+ * Discord Button so the two providers read as a matched pair. It uses the in-page
+ * ID-token flow → consent shows OUR domain.
  *
  * Shares the single global GIS init with the One Tap initializer; success
  * propagates via Supabase `SIGNED_IN`. Web-only (native uses the SDK).
@@ -84,7 +85,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
           one end. */}
       <div
         data-testid="gsi-frame"
-        className="flex w-full justify-center overflow-hidden rounded-neo border-2 border-neo-black bg-white shadow-hard"
+        className="flex w-full min-h-[48px] items-center justify-center overflow-hidden rounded-xl border-3 border-neo-black bg-white shadow-hard"
       >
         <div ref={containerRef} data-testid="gsi-button-container" />
       </div>

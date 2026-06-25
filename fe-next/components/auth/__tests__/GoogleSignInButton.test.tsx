@@ -55,6 +55,17 @@ describe('GoogleSignInButton', () => {
     expect(frame.className).toMatch(/shadow-hard/);
   });
 
+  it('matches the Discord button chrome so the two providers read as a matched pair', () => {
+    render(<GoogleSignInButton />);
+    const frame = screen.getByTestId('gsi-frame');
+    // Discord (Button base) = border-3, rounded-xl, 48px tall. The frame must
+    // match or Google reads as the weaker/smaller sibling.
+    expect(frame.className).toMatch(/border-3/);
+    expect(frame.className).toMatch(/rounded-xl/);
+    expect(frame.className).toMatch(/min-h-\[48px\]/);
+    expect(frame.className).toMatch(/items-center/);
+  });
+
   it('renders a full-width white frame so the snug button reads as full-width like the other providers', () => {
     render(<GoogleSignInButton />);
     const frame = screen.getByTestId('gsi-frame');
