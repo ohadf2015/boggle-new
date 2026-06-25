@@ -24,8 +24,7 @@ import {
 } from '@/lib/curator/curatorAdmin';
 import { SUPPORTED_LANGUAGES } from '@/lib/curator/curatorScope';
 import { notifyCuratorAssigned } from '../../modules/pushNotificationTriggers';
-
-const { getSupabase } = require('../../modules/supabaseServer');
+import { getSupabase } from '../../modules/supabaseServer';
 
 const router: Router = Router();
 

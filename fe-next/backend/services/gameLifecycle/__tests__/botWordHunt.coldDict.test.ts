@@ -47,7 +47,13 @@ vi.mock('../../../modules/boggleSolver', () => ({
 }));
 vi.mock('./gameEnd', () => ({ endGame: mocks.endGame }));
 vi.mock('./botGame', () => ({ getBestHumanScore: mocks.getBestHumanScore }));
-vi.mock('../../../modules/botLifecycle', () => ({ setBotTimeout: mocks.setBotTimeout }));
+vi.mock('../../../modules/botLifecycle', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    setBotTimeout: mocks.setBotTimeout,
+  };
+});
 vi.mock('../../../dictionary', () => ({ ensureLanguageLoaded: mocks.ensureLanguageLoaded }));
 
 import { startBotsForWordHunt } from '../botWordHunt';

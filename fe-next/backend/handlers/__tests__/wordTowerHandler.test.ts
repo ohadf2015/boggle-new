@@ -36,7 +36,7 @@ vi.mock('@/lib/wordTower/wordTowerManager', () => ({
 
 import { handleSubmitTowerWord, handleSendTowerBomb, handleRequestTowerState } from '../wordTowerHandler';
 import { broadcastToRoom, volatileBroadcastToRoom } from '../../utils/socketHelpers';
-import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
+import { getGame, updatePlayerScore, getUsernameBySocketId } from '../../modules/gameStateManager';
 import { submitVersusWord, sendVersusBomb } from '@/lib/wordTower/versusMatch';
 
 const mkSocket = () => ({ id: 's1', emit: vi.fn() } as unknown as Socket);
@@ -146,7 +146,7 @@ describe('wordTowerHandler', () => {
     });
     const sock = mkSocket();
     // Socket for p2
-    (require('../../modules/gameStateManager').getUsernameBySocketId as unknown as Mock).mockReturnValue('p2');
+    (getUsernameBySocketId as unknown as Mock).mockReturnValue('p2');
     handleSubmitTowerWord(mkIo(), sock, { word: 'GOODBYE' });
     expect(game.playerWords).toEqual({ p1: ['HELLO'], p2: ['GOODBYE'] });
   });

@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-25T18:02:30.901Z",
+  "generatedAt": "2026-06-25T22:12:00.315Z",
   "commits": [
     {
-      "sha": "7f16221e8b003fede5aed5279726886ba655939f",
-      "shortSha": "7f16221",
+      "sha": "415c39188ec5ff016fad6c956fc9f829b703e67d",
+      "shortSha": "415c391",
+      "subject": "test(bot-broadcast): fix stale assertions for playerFoundWord batching",
+      "author": "Ohad Fisher",
+      "date": "2026-06-26T00:03:56+03:00"
+    },
+    {
+      "sha": "d6ae0896d23de6c3e9032bbe01a45c0f81e8db92",
+      "shortSha": "d6ae089",
+      "subject": "test: fix 13 pre-existing red test files blocking pre-push",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T23:42:48+03:00"
+    },
+    {
+      "sha": "f6cfd01b9a296295d9379f5ca0cd5b76550a13e2",
+      "shortSha": "f6cfd01",
+      "subject": "test(mp): real-render smoke test for MpDesktopShellFrame + ignore impeccable scratch",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T22:25:48+03:00"
+    },
+    {
+      "sha": "6f15360782826f037eaab94b1c0ad402d87c0dc6",
+      "shortSha": "6f15360",
+      "subject": "feat(results): clearer placement hierarchy on the Wheel Rush results wheel",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T21:43:34+03:00"
+    },
+    {
+      "sha": "8a2462d97d749faee6d3bc48482c8e3f8f1afb23",
+      "shortSha": "8a2462d",
+      "subject": "style(auth): match Google GSI frame chrome to Discord button",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T21:37:54+03:00"
+    },
+    {
+      "sha": "d81907850a92496f90d54a4b5ec6faba3aa26af5",
+      "shortSha": "d819078",
+      "subject": "fix(popups): finish Hebrew backdrop-only modal fix + harden reveal guard",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T21:20:19+03:00"
+    },
+    {
+      "sha": "e0d94f6a851ff8ceb827d346fca9acad8b0a7cdb",
+      "shortSha": "e0d94f6",
+      "subject": "feat(daily): enforce 5-7 letter Word Hunt target words in word bank",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T21:19:46+03:00"
+    },
+    {
+      "sha": "927a83b12369a330574df598ceb818edd495e8f0",
+      "shortSha": "927a83b",
+      "subject": "fix(landing): blog-card meta text contrast to WCAG AA",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T21:02:56+03:00"
+    },
+    {
+      "sha": "1e7bd161e03ae357ff585d139ece06e4fa53cffe",
+      "shortSha": "1e7bd16",
       "subject": "feat(results): dedup Blast results — scene shows only the player's stat card",
       "author": "Ohad Fisher",
       "date": "2026-06-25T21:01:31+03:00"
     },
     {
-      "sha": "1d7566d7522b05a7e7ecaf001628b75da0e60728",
-      "shortSha": "1d7566d",
+      "sha": "ad7c59a157078893c0ada442055fb7ee68e588bb",
+      "shortSha": "ad7c59a",
       "subject": "feat(ftue): coach MP sealed-bid + crossword (getCoachMode was missing them)",
       "author": "Ohad Fisher",
       "date": "2026-06-25T20:57:57+03:00"
     },
     {
-      "sha": "16958cc64f0f1a61229cd6957c6227ef28f240b1",
-      "shortSha": "16958cc",
+      "sha": "2473772611f16750bdccbb2e77ae19217d72c905",
+      "shortSha": "2473772",
       "subject": "chore: land in-flight working tree (motion codemod + concurrent fixes/tests)",
       "author": "Ohad Fisher",
       "date": "2026-06-25T20:55:01+03:00"
     },
     {
-      "sha": "3eb52fd7b10a366eeccaf9fd0abcf1297725991d",
-      "shortSha": "3eb52fd",
+      "sha": "b1a55bd56b6e76777f91c50d6aad9e6fe695d716",
+      "shortSha": "b1a55bd",
       "subject": "fix(daily): correct Ron prank user id to real profiles.id UUID",
       "author": "Ohad Fisher",
       "date": "2026-06-25T20:48:33+03:00"
     },
     {
-      "sha": "7e52c414474e32f3fa71b15672943030b810ec34",
-      "shortSha": "7e52c41",
+      "sha": "e57d1953537bc318496404236f9c20cb5c8ab35a",
+      "shortSha": "e57d195",
       "subject": "feat(brain): Memory Hunt clue fix, ad-gated clues, no-scroll board, real memory insights",
       "author": "Ohad Fisher",
       "date": "2026-06-25T20:46:54+03:00"
     },
     {
-      "sha": "494fe3b7404ad10a25e4650b059f66aea2c70bf6",
-      "shortSha": "494fe3b",
+      "sha": "b314099a2b4371321142f1bb2cc0e3e4f8127ce2",
+      "shortSha": "b314099",
       "subject": "feat(ftue): coach solo Blast + daily Word Hunt, add mode-coach analytics",
       "author": "Ohad Fisher",
       "date": "2026-06-25T20:39:17+03:00"
     },
     {
-      "sha": "6d50fdc41244d920b51784cb67eac3917e370ce7",
-      "shortSha": "6d50fdc",
+      "sha": "6581282aa72c2245935225952f277aa85720d0be",
+      "shortSha": "6581282",
       "subject": "feat(results): idle float + winner score glow on hero",
       "author": "Ohad Fisher",
       "date": "2026-06-25T20:38:44+03:00"
     },
     {
-      "sha": "ff45b730d53b5b20f32fe510b8ef6fe18d806f73",
-      "shortSha": "ff45b73",
+      "sha": "789377837486512eb18d35f08a8e921fdcd148ea",
+      "shortSha": "7893778",
       "subject": "fix(landing): remove side-stripe border tell in DailyMissionsHub",
       "author": "Ohad Fisher",
       "date": "2026-06-25T20:38:24+03:00"
     },
     {
-      "sha": "987920282a634401ab48dbb55047238077422222",
-      "shortSha": "9879202",
-      "subject": "chore(ads): remove Monetag completely (rewarded waterfall, banner, CSP, SW verifier)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T13:53:27+03:00"
+      "sha": "3d444cabf1ddd73068be1a913112942845e9ce4a",
+      "shortSha": "3d444ca",
+      "subject": "Merge pull request #629 from ohadf2015/claude/leaderboard-layout-redesign-mt3i22",
+      "author": "ohadf2015",
+      "date": "2026-06-26T00:20:23+03:00"
     },
     {
-      "sha": "d9fb48cb2796b2ff309fdb626edbcb1ef6a37beb",
-      "shortSha": "d9fb48c",
-      "subject": "feat(bots): face-shape accuracy pass for celebrity lookalikes",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T12:28:57+03:00"
+      "sha": "f94e7b9b90eedaae5c7a9e9d350e9f0c9f1aacae",
+      "shortSha": "f94e7b9",
+      "subject": "feat(leaderboard): cap in-game leaderboard to a 3-row window around the player",
+      "author": "Claude",
+      "date": "2026-06-25T20:42:01Z"
     },
     {
-      "sha": "0767281917ea3a9def43738f768af487a22a04fc",
-      "shortSha": "0767281",
-      "subject": "feat(bots): earsOut part + sharpen Obama/Brad/Oprah lookalikes",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:47:27+03:00"
+      "sha": "5ac700805290e7d997cfdf65bb874884613715d8",
+      "shortSha": "5ac7008",
+      "subject": "Merge pull request #628 from ohadf2015/claude/dictionary-help-ui-timing-o5iw08",
+      "author": "ohadf2015",
+      "date": "2026-06-25T23:27:17+03:00"
     },
     {
-      "sha": "a2075ed38fb10d26e0470b13c17582130a87bec1",
-      "shortSha": "a2075ed",
-      "subject": "feat(bots): microphone legendary accessory for singer lookalikes",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:42:46+03:00"
-    },
-    {
-      "sha": "0cef359c958eb460398bda0b692d357b399ed732",
-      "shortSha": "0cef359",
-      "subject": "feat(ads): discoverable 'watch ad for coins' option in Profile",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:33:39+03:00"
-    },
-    {
-      "sha": "4b283b8a75049524b6af38a49a2851d48b02305d",
-      "shortSha": "4b283b8",
-      "subject": "feat(bots): highAndTight legendary hair — Kim Jong-un shaved-side bouffant",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:28:46+03:00"
-    },
-    {
-      "sha": "2144d1769244c13434253ec7636f232e402933b0",
-      "shortSha": "2144d17",
-      "subject": "polish(bots): stronger lookalike cues + unique emojis",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:25:02+03:00"
-    },
-    {
-      "sha": "e27ccc9d08d3b8ce3f9155ac7fc135a5f0bdcc79",
-      "shortSha": "e27ccc9",
-      "subject": "fix(bots): sharpen Greta + Elon lookalikes",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:20:38+03:00"
-    },
-    {
-      "sha": "99560740969cfeedb5f7ddedefa369aaf91bd28c",
-      "shortSha": "9956074",
-      "subject": "fix(ads): disable spammy Monetag In-Page Push web banner",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:18:38+03:00"
-    },
-    {
-      "sha": "243713321013adb47b56446024418a219993e165",
-      "shortSha": "2437133",
-      "subject": "feat(bots): recedingHair legendary part for Elon lookalike",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:11:29+03:00"
-    },
-    {
-      "sha": "c730d6de7259810b96f4651845c2b82ac1d47527",
-      "shortSha": "c730d6d",
-      "subject": "feat(results): situational random avatar moods on MP brag card",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T11:04:25+03:00"
-    },
-    {
-      "sha": "60c7343e22837171e865d7ca418202e71acf585b",
-      "shortSha": "60c7343",
-      "subject": "feat(bots): trumpSwoop legendary hair + tier-gate celebrity lookalike parts",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T10:55:06+03:00"
+      "sha": "1dde2a9683a835f084ce8e5ce34e8f2e8b8bd175",
+      "shortSha": "1dde2a9",
+      "subject": "Merge pull request #627 from ohadf2015/claude/desktop-ui-help-dialog-05i8ng",
+      "author": "ohadf2015",
+      "date": "2026-06-25T23:26:15+03:00"
     }
   ]
 }

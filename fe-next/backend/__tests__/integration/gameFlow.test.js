@@ -331,10 +331,13 @@ describe('Room Auto-Close', () => {
 
   beforeEach(() => {
     env = createTestEnvironment();
+    vi.useFakeTimers({ advanceTimers: true });
   });
 
   afterEach(() => {
+    globalThis.__clearAllGameTimers?.();
     env.cleanup();
+    vi.useRealTimers();
   });
 
   test('room auto-closes when last player (host) leaves in waiting state', async () => {
@@ -410,7 +413,13 @@ describe('Room Auto-Close', () => {
     // Host disconnects (simulates browser close, network issue, etc.)
     await hostSocket.disconnect();
 
-    // Room should be auto-closed immediately since host was the only player
+    // Grace period is active, room still exists
+    expect(gameExists(gameData.gameCode)).toBe(true);
+
+    // Advance past the grace period (300s = 300000ms)
+    await vi.advanceTimersByTimeAsync(301000);
+
+    // Room should be auto-closed after grace period expires
     expect(gameExists(gameData.gameCode)).toBe(false);
   });
 
@@ -446,7 +455,13 @@ describe('Room Auto-Close', () => {
     // Player1 (now host) disconnects
     await playerSocket.disconnect();
 
-    // Room should be auto-closed since Player1 was the only player
+    // Grace period is active, room still exists
+    expect(gameExists(gameData.gameCode)).toBe(true);
+
+    // Advance past the grace period (300s = 300000ms)
+    await vi.advanceTimersByTimeAsync(301000);
+
+    // Room should be auto-closed after grace period expires
     expect(gameExists(gameData.gameCode)).toBe(false);
   });
 });

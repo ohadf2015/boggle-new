@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }))
+vi.mock('@/backend/cache/redisCache', () => ({
+  cacheAside: vi.fn((key, fn) => fn()),
+}))
 
 import { createClient } from '@/utils/supabase/server'
 import { GET } from './route'

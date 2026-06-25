@@ -6,8 +6,7 @@
 import { Response, NextFunction } from 'express';
 import type { AdminRequest, AdminUser, RateLimitRecord } from './types';
 import logger from '../../utils/logger';
-
-const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseServer');
+import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
 
 // ==================== Rate Limiting ====================
 
@@ -137,6 +136,10 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
 
   try {
     const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'Auth service unavailable', requestId });
+      return;
+    }
     // Verify the JWT and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
@@ -160,7 +163,8 @@ export async function adminAuth(req: AdminRequest, res: Response, next: NextFunc
     }
 
     req.adminUser = {
-      ...user,
+      id: user.id,
+      email: user.email ?? '',
       username: profile.username,
       admin_role: profile.admin_role ?? 'viewer',
     };

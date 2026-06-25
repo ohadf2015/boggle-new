@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, waitFor, act, cleanup } from '@testing-library/react';
 import { CoinRewardHud } from './CoinRewardHud';
 
 afterEach(() => cleanup());
@@ -27,12 +27,18 @@ describe('CoinRewardHud', () => {
   });
 
   it('GIVEN non-reduced THEN eventually rolls up to the final total', async () => {
-    render(
-      <CoinRewardHud {...baseProps} total={1000} delta={1000} reduced={false} calm={false} countDuration={50} />,
-    );
-    await waitFor(() => {
+    vi.useFakeTimers();
+    try {
+      render(
+        <CoinRewardHud {...baseProps} total={1000} delta={1000} reduced={false} calm={false} countDuration={50} />,
+      );
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
       expect(screen.getByTestId('coin-hud-total')).toHaveTextContent('1,000');
-    });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('GIVEN jackpot tier AND not calm THEN renders the jackpot flair', () => {
@@ -72,10 +78,18 @@ describe('CoinRewardHud', () => {
     });
 
     it('GIVEN spend AND non-reduced THEN rolls DOWN from (total+delta) to total', async () => {
-      render(
-        <CoinRewardHud {...baseProps} total={1000} delta={1000} direction="spend" reduced={false} calm={false} countDuration={50} />,
-      );
-      await waitFor(() => expect(screen.getByTestId('coin-hud-total')).toHaveTextContent('1,000'));
+      vi.useFakeTimers();
+      try {
+        render(
+          <CoinRewardHud {...baseProps} total={1000} delta={1000} direction="spend" reduced={false} calm={false} countDuration={50} />,
+        );
+        act(() => {
+          vi.advanceTimersByTime(100);
+        });
+        expect(screen.getByTestId('coin-hud-total')).toHaveTextContent('1,000');
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('GIVEN spend THEN never shows the jackpot flair, even on a jackpot tier', () => {
