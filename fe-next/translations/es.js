@@ -12331,6 +12331,21 @@ const es = {
     "weeklyWordMastery": "Maestría Semanal de Palabras",
     "weeklyWordMasteryDesc": "Domina {target} palabras esta semana"
   },
+  "brag": {
+    "headline": {
+      "crushed": "LO SIENTO {name} 💀 {score}–{opponent}",
+      "won": "{count} RIVALES. CERO SUPERVIVIENTES.",
+      "challenge": "{score} PTS. ¿TE CREES MEJOR?"
+    },
+    "hero": {
+      "points": "PUNTOS DE GLORIA",
+      "combo": "COMBO BRUTAL",
+      "longest": "PALABRA DE CAMPEÓN"
+    },
+    "cta": "TE TOCA →",
+    "copied": "¡Enlace copiado!",
+    "screenshotHint": "Captura y presume"
+  },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
     "multiplayer": "LexiClash Batalla",

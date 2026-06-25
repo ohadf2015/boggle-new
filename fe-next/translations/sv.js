@@ -12397,6 +12397,21 @@ const sv = {
     "label": "Övning",
     "aria": "Övningsläge — ingen XP tjänas"
   },
+  "brag": {
+    "headline": {
+      "crushed": "SORRY {name} 💀 {score}–{opponent}",
+      "won": "{count} RIVALER. NOLL ÖVERLEVANDE.",
+      "challenge": "{score} P. TROR DU ATT DU ÄR BÄTTRE?"
+    },
+    "hero": {
+      "points": "ÄRANS POÄNG",
+      "combo": "VILT COMBO",
+      "longest": "STORA ORD-ENERGI"
+    },
+    "cta": "DIN TUR →",
+    "copied": "Länk kopierad!",
+    "screenshotHint": "Skärmdumpa skrytet"
+  },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
     "multiplayer": "LexiClash Strid",

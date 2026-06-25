@@ -12174,6 +12174,21 @@ const en = {
     "label": "Practice",
     "aria": "Practice mode — no XP earned"
   },
+  "brag": {
+    "headline": {
+      "crushed": "SORRY {name} 💀 {score}–{opponent}",
+      "won": "{count} RIVALS. ZERO SURVIVORS.",
+      "challenge": "{score} PTS. THINK YOU'RE BETTER?"
+    },
+    "hero": {
+      "points": "POINTS OF GLORY",
+      "combo": "WILD COMBO",
+      "longest": "BIG WORD ENERGY"
+    },
+    "cta": "YOUR MOVE →",
+    "copied": "Link copied!",
+    "screenshotHint": "Screenshot the flex"
+  },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
     "multiplayer": "LexiClash Battle",

@@ -12246,6 +12246,21 @@ const ja = {
     "label": "練習",
     "aria": "練習モード — XPなし"
   },
+  "brag": {
+    "headline": {
+      "crushed": "{name}、ごめんね 💀 {score}–{opponent}",
+      "won": "{count}人撃破。生存者ゼロ。",
+      "challenge": "{score}点。勝てる自信ある？"
+    },
+    "hero": {
+      "points": "栄光のポイント",
+      "combo": "ヤバいコンボ",
+      "longest": "規格外の単語"
+    },
+    "cta": "次はキミの番 →",
+    "copied": "リンクをコピー！",
+    "screenshotHint": "スクショして自慢"
+  },
   "shareResult": {
     "singleplayer": "LexiClash ソロ",
     "multiplayer": "LexiClash バトル",

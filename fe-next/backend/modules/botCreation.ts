@@ -4,6 +4,7 @@
  */
 
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { CELEBRITY_BOTS, CELEBRITY_CHANCE } from './botCelebrities';
 import type { Bot } from './botBehavior';
 
 const botConfig = require('./botConfig');
@@ -68,6 +69,25 @@ export function generateBotName(difficulty: string, existingNames: string[] = []
   const langNames = BOT_CONFIG.NAMES[language] || BOT_CONFIG.NAMES.en;
   const namePool = langNames[difficulty] || langNames.medium;
   const botSuffix = langNames.botSuffix || 'Bot';
+
+  // Funny viral twist: sometimes the opponent is a celebrity/politician lookalike
+  // (Trump Bot, Bibi Bot, Einstein Bot...) with a handcrafted avatar that caricatures them.
+  // Keeps the requested difficulty for timing — only name/avatar/emoji change.
+  const availableCelebs = CELEBRITY_BOTS.filter((celeb) =>
+    !existingNames.some((existing) => existing.toLowerCase().includes(celeb.name.toLowerCase()))
+  );
+  if (availableCelebs.length > 0 && Math.random() < CELEBRITY_CHANCE) {
+    const celeb = availableCelebs[Math.floor(Math.random() * availableCelebs.length)];
+    const botName = `${celeb.name} ${botSuffix}`.trim();
+    return {
+      name: botName,
+      avatar: {
+        customAvatar: celeb.customAvatar,
+        emoji: celeb.emoji,
+        color: celeb.color,
+      },
+    };
+  }
 
   const availableEntries = namePool.filter((entry: { name: string }) =>
     !existingNames.some((existing: string) =>

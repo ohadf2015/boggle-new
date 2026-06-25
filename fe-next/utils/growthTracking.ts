@@ -216,7 +216,17 @@ export type GrowthEvent =
   //     Props: { language, gameMode }. Measures voluntary mid-series exits.
   | 'mp_results_viewed'
   | 'mp_round_ready_clicked'
-  | 'mp_results_exit_clicked';
+  | 'mp_results_exit_clicked'
+  // Brag-card share funnel (screenshot-first MP results card). NOTE: the web has
+  // no screenshot API, so we can't fire on the actual screenshot — these are the
+  // measurable proxies bracketing the intent.
+  //   mp_brag_card_viewed: card mounted/impression. Props: { gameMode, outcome, language }.
+  //     Denominator for "how many saw the shareable artifact".
+  //   mp_brag_card_copy_link: player tapped the explicit Copy-link affordance on the
+  //     card. Props: { gameMode, outcome, language }. The one directly-measurable
+  //     share action; best signal that an impression converted to share intent.
+  | 'mp_brag_card_viewed'
+  | 'mp_brag_card_copy_link';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

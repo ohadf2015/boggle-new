@@ -1,6 +1,97 @@
 {
-  "generatedAt": "2026-06-24T21:54:09.254Z",
+  "generatedAt": "2026-06-25T07:27:21.807Z",
   "commits": [
+    {
+      "sha": "545fe1aff913f12b6a619d5005ccee55b2f9a44d",
+      "shortSha": "545fe1a",
+      "subject": "fix(home): desktop daily card reuses HomeDailyHero banner",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T10:19:47+03:00"
+    },
+    {
+      "sha": "282955516a214d355304938caffb9256d61c5d92",
+      "shortSha": "2829555",
+      "subject": "Merge pull request #623 from ohadf2015/claude/word-tower-physics-ui-xq155q",
+      "author": "ohadf2015",
+      "date": "2026-06-25T09:32:16+03:00"
+    },
+    {
+      "sha": "b636fab59579f3cf244f68acf988b4e4bced3008",
+      "shortSha": "b636fab",
+      "subject": "feat(word-tower): centre the tower sway, fix stuck toasts + HUD overlap, wire all upgrades",
+      "author": "Claude",
+      "date": "2026-06-25T06:27:37Z"
+    },
+    {
+      "sha": "87ce8460c0cf330ffa5d5e180cde9da2724c9422",
+      "shortSha": "87ce846",
+      "subject": "Merge pull request #622 from ohadf2015/claude/word-wheel-gradient-bg-67y74t",
+      "author": "ohadf2015",
+      "date": "2026-06-25T09:11:48+03:00"
+    },
+    {
+      "sha": "d35c1e1af125b27dc09b15d4466d810720ced177",
+      "shortSha": "d35c1e1",
+      "subject": "fix(word-wheel): restore radial gradient backdrop behind the wheel",
+      "author": "Claude",
+      "date": "2026-06-25T06:04:58Z"
+    },
+    {
+      "sha": "f37142f2a7fbff0aee47774aa29397bc35d58d65",
+      "shortSha": "f37142f",
+      "subject": "chore(nightly): autonomous improvement loop 2026-06-25",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T04:53:28+03:00"
+    },
+    {
+      "sha": "ec9ca75a80b78f3c182ad28089b012dda569d40a",
+      "shortSha": "ec9ca75",
+      "subject": "feat(ads): Monetag web banner (In-Page Push) mirroring the native AdMob banner",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T03:58:46+03:00"
+    },
+    {
+      "sha": "8135ce73c5d2cb74d6fdd820375052438ebefaec",
+      "shortSha": "8135ce7",
+      "subject": "feat(home): random avatar + loading skeletons + always-show all modes",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T03:41:37+03:00"
+    },
+    {
+      "sha": "bce4d76736f444f3c0a257e07ca3f662e06108c1",
+      "shortSha": "bce4d76",
+      "subject": "fix(crossword): drop vulgar/non-Swedish answers from sv bank",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T02:16:27+03:00"
+    },
+    {
+      "sha": "dc356c908ba14b217e4f773f10cf550b01b78e0e",
+      "shortSha": "dc356c9",
+      "subject": "feat(crossword): infinite Swedish crosswords",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T02:09:26+03:00"
+    },
+    {
+      "sha": "5b2c7de47ae81cd23dd5ff707149013b0745b797",
+      "shortSha": "5b2c7de",
+      "subject": "feat(crossword): infinite Spanish crosswords via accent-folded fill",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T01:51:35+03:00"
+    },
+    {
+      "sha": "ee767c0729bccf2346295d0d2b5b0b7c43261bb5",
+      "shortSha": "ee767c0",
+      "subject": "feat(crossword): difficulty-coloured grid shadow (glance-readable difficulty)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T01:02:54+03:00"
+    },
+    {
+      "sha": "e5fda370c0d6d71496fdc67205402088a8df0226",
+      "shortSha": "e5fda37",
+      "subject": "feat(crossword): difficulty-coded shadow colors on grid",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T00:57:50+03:00"
+    },
     {
       "sha": "27af54cafa604e86e6b934c18664d99b10bad085",
       "shortSha": "27af54c",
@@ -49,97 +140,6 @@
       "subject": "fix(crossword): continue improving Swedish clue bank quality",
       "author": "Ohad Fisher",
       "date": "2026-06-25T00:06:37+03:00"
-    },
-    {
-      "sha": "1f53b5a3da485db2f7f197919af0eaa595050197",
-      "shortSha": "1f53b5a",
-      "subject": "fix(ads): point Monetag at the Vignette sub-zone that actually fills",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T00:03:43+03:00"
-    },
-    {
-      "sha": "76175add8e54d937f966723d01efa7cefc82d413",
-      "shortSha": "76175ad",
-      "subject": "fix(crossword): improve Swedish clue bank quality - fix echo issues and dictionary-like patterns",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T00:01:25+03:00"
-    },
-    {
-      "sha": "526df842b7be9ff5c1d9ac54fb35754462b10503",
-      "shortSha": "526df84",
-      "subject": "feat(crossword): add Swedish clue quality evaluator for audit",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T23:41:42+03:00"
-    },
-    {
-      "sha": "1f9bb7e8a6a02cd3f9298bdb0feb213abc415349",
-      "shortSha": "1f9bb7e",
-      "subject": "fix(crossword): Unicode-aware circular-clue gate + repair Hebrew clue bank",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T22:55:59+03:00"
-    },
-    {
-      "sha": "1367e96a49658c06e67f7b0d4ae14df3489ae412",
-      "shortSha": "1367e96",
-      "subject": "fix(ads): allow Monetag in the force-disabled CSP branch (prod default)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T22:50:23+03:00"
-    },
-    {
-      "sha": "d36b937da1de4f9c1e760d2de3de84405b618827",
-      "shortSha": "d36b937",
-      "subject": "fix(he): base letters for in-progress input, sofit only on final word",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T22:38:45+03:00"
-    },
-    {
-      "sha": "873090b6238554599267e4058944b2dded255cd3",
-      "shortSha": "873090b",
-      "subject": "fix(ads): wire real Monetag monetization zone + CSP + Docker build args",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T22:36:58+03:00"
-    },
-    {
-      "sha": "3ae0fdc82f1e02950d3b2e235d8a195b2d9f1df7",
-      "shortSha": "3ae0fdc",
-      "subject": "Merge pull request #619 from ohadf2015/claude/landing-page-visibility-40gnan",
-      "author": "ohadf2015",
-      "date": "2026-06-24T09:00:16+03:00"
-    },
-    {
-      "sha": "5c8a5fd0891137aee2f6b85ad7e8358ed05b5e92",
-      "shortSha": "5c8a5fd",
-      "subject": "fix(playerStyle): suppress style popup on SEO/marketing landing pages",
-      "author": "Claude",
-      "date": "2026-06-24T05:18:38Z"
-    },
-    {
-      "sha": "30fe9d2610df6908eb54c08441a5fab244d55b8d",
-      "shortSha": "30fe9d2",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-24",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T05:13:09+03:00"
-    },
-    {
-      "sha": "65aee638f90b914a088831e7dd28dfab439776b6",
-      "shortSha": "65aee63",
-      "subject": "fix(ads): serve Monetag verification SW to the verifier only (file method)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T01:46:42+03:00"
-    },
-    {
-      "sha": "f89991d5a96d024819e45b17a9a8fd4478d48755",
-      "shortSha": "f89991d",
-      "subject": "fix(ads): always rewrite bare root (200), never 301 — unblocks any verifier",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T01:30:56+03:00"
-    },
-    {
-      "sha": "0ce92acea324a7d4d16f870c2a6cea4d377f901a",
-      "shortSha": "0ce92ac",
-      "subject": "feat(email): review ask in Android launch blast to seed ratings",
-      "author": "Ohad Fisher",
-      "date": "2026-06-24T01:03:49+03:00"
     }
   ]
 }

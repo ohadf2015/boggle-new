@@ -45,8 +45,10 @@ export function generateShareText(params: ShareParams, t: TFunction): string {
 
   lines.push(header);
 
-  // Emoji grid if words provided
-  if (params.words && params.words.length > 0) {
+  // Emoji grid if words provided. Multiplayer uses the screenshot-first BragCard
+  // instead — a Wordle-style grid is meaningless for head-to-head, so never emit
+  // it for MP (defensive: MP already passes no `words`).
+  if (params.words && params.words.length > 0 && params.gameMode !== 'multiplayer') {
     lines.push(generateEmojiGrid(params.words));
   }
 

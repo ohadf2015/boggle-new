@@ -12704,6 +12704,21 @@ const he = {
     "label": "תרגול",
     "aria": "מצב תרגול — לא צוברים XP"
   },
+  "brag": {
+    "headline": {
+      "crushed": "סליחה {name} 💀 {score}–{opponent}",
+      "won": "{count} יריבים. אפס ניצולים.",
+      "challenge": "{score} נק'. בטוח שתעשה יותר?"
+    },
+    "hero": {
+      "points": "נקודות של תהילה",
+      "combo": "קומבו מטורף",
+      "longest": "מילה אדירה"
+    },
+    "cta": "תורך →",
+    "copied": "הקישור הועתק!",
+    "screenshotHint": "צלמו מסך והשוויצו"
+  },
   "shareResult": {
     "singleplayer": "LexiClash סולו",
     "multiplayer": "LexiClash קרב",

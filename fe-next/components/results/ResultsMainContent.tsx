@@ -30,6 +30,8 @@ import type { NearMiss } from '@/components/results/NearMissCard';
 import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
 import { ShareButton } from '@/components/results/ShareButton';
+import MpBragCard from '@/components/results/MpBragCard';
+import { deriveBragCardData } from '@/lib/results/bragCard';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -48,6 +50,14 @@ interface WinStreakData {
 
 /** Translation function type */
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
+
+/** Mode names are brand proper-nouns shown on the brag card badge. */
+const BRAG_MODE_LABEL: Record<string, string> = {
+  classic: 'CLASSIC',
+  blast: 'BLAST',
+  'word-hunt': 'WORD HUNT',
+  'wheel-rush': 'WHEEL RUSH',
+};
 
 export interface ResultsMainContentProps {
   sortedScores: Player[];
@@ -255,6 +265,45 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     };
   }, [currentPlayerData, currentPlayerValidWords.length, shareCardStats, isCurrentUserWinner, sortedScores, username, gameMode]);
 
+  // Brag card — screenshot-first MP share artifact. MP-only; reuses the same
+  // derived stats as shareParams. The card is built to be screenshotted (no
+  // Share button), so the play link is printed on it.
+  const bragData = useMemo(() => {
+    if (!currentPlayerData || !isMultiplayer) return null;
+    const opponent = sortedScores.find(p => p.username !== username);
+    const name = username ?? currentPlayerData.username;
+    return {
+      data: deriveBragCardData({
+        gameMode,
+        isWinner: isCurrentUserWinner,
+        rank: currentPlayerRank,
+        playerCount: sortedScores.length,
+        score: currentPlayerData.score,
+        wordsFound: currentPlayerValidWords.length,
+        longestWord: shareCardStats?.longestWord,
+        maxCombo: shareCardStats?.maxCombo,
+        opponentName: opponent?.username,
+        opponentScore: opponent?.score,
+        locale: language,
+      }),
+      current: { name, avatar: currentPlayerData.avatar, score: currentPlayerData.score },
+      opponent: opponent
+        ? { name: opponent.username, avatar: opponent.avatar, score: opponent.score }
+        : undefined,
+    };
+  }, [currentPlayerData, isMultiplayer, sortedScores, username, isCurrentUserWinner, currentPlayerRank, currentPlayerValidWords.length, shareCardStats, gameMode, language]);
+
+  useEffect(() => {
+    if (bragData) {
+      trackGrowthEvent('mp_brag_card_viewed', {
+        gameMode: gameMode ?? 'unknown',
+        outcome: bragData.data.outcome,
+        language,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bragData?.data.outcome]);
+
   // Word Hunt status for current player
   const wordHuntStatus = useMemo(() => {
     if (!isWordHunt || !wordHuntSummary || !username) return undefined;
@@ -312,6 +361,27 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         <HighlightsBar stats={highlightStats} />
       )}
 
+      {/* 2.05 BRAG CARD — screenshot-first share artifact (MP only). No Share
+          button by design: players screenshot it, so the play link is printed
+          on the card itself. */}
+      {bragData && (
+        <MpBragCard
+          data={bragData.data}
+          current={bragData.current}
+          opponent={bragData.opponent}
+          modeLabel={BRAG_MODE_LABEL[gameMode ?? ''] ?? 'MULTIPLAYER'}
+          shareUrl="https://lexiclash.live"
+          onCopyLink={() =>
+            trackGrowthEvent('mp_brag_card_copy_link', {
+              gameMode: gameMode ?? 'unknown',
+              outcome: bragData.data.outcome,
+              language,
+            })
+          }
+          t={t}
+        />
+      )}
+
       {/* 2.1 YOU vs RIVALS — final standing + closest rivals w/ signed deltas.
           Feeds purely off sortedScores; renders nothing for solo. Gated by
           !hideStandings so it owns rivalry on the modes that DON'T ship a custom
@@ -337,8 +407,10 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         reducedMotion={reducedMotion}
       />
 
-      {/* 2.3 + 2.5 SHARE + REWARDS — single row to reclaim vertical space */}
-      {(shareParams || coinReward) && (
+      {/* 2.3 + 2.5 SHARE + REWARDS — single row to reclaim vertical space.
+          MP uses the screenshot-first BragCard above (no Share button); the
+          text ShareButton stays for solo/daily where the brag card doesn't run. */}
+      {(coinReward || (shareParams && !isMultiplayer)) && (
         <div className="flex flex-wrap items-stretch gap-2">
           {coinReward && (
             <div className="flex-1 min-w-0 [&>*]:h-full">
@@ -350,7 +422,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
               />
             </div>
           )}
-          {shareParams && (
+          {shareParams && !isMultiplayer && (
             <ShareButton params={shareParams} t={t} className="shrink-0" />
           )}
         </div>
