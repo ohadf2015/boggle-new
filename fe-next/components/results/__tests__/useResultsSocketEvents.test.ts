@@ -83,10 +83,22 @@ describe('useResultsSocketEvents', () => {
   let mockSocket: ReturnType<typeof createMockSocket>;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     mockSocket = createMockSocket();
     vi.clearAllMocks();
     mockShowToast.mockClear();
   });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  // The dictionary-building modal is intentionally delayed ~10s before it shows.
+  const advanceWordFeedbackDelay = () => {
+    act(() => {
+      vi.advanceTimersByTime(10_000);
+    });
+  };
 
   describe('Initialization', () => {
     it('should return initial state with all values set to defaults', () => {
@@ -199,7 +211,7 @@ describe('useResultsSocketEvents', () => {
   });
 
   describe('Word Feedback Events', () => {
-    it('should update state when showWordFeedback event is received', () => {
+    it('should update state when showWordFeedback event is received (after delay)', () => {
       // GIVEN
       const { result } = renderHook(() =>
         useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
@@ -216,6 +228,7 @@ describe('useResultsSocketEvents', () => {
           language: 'en',
         });
       });
+      advanceWordFeedbackDelay();
 
       // THEN
       expect(result.current.showWordFeedback).toBe(true);
@@ -228,6 +241,82 @@ describe('useResultsSocketEvents', () => {
         gameCode: 'ABC123',
         language: 'en',
       });
+    });
+
+    it('should NOT show the modal until the ~10s delay has elapsed', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+      );
+
+      // WHEN
+      act(() => {
+        triggerSocketEvent(mockSocket, 'showWordFeedback', {
+          word: 'HELLO',
+          submittedBy: 'testUser',
+          gameCode: 'ABC123',
+          language: 'en',
+        });
+      });
+
+      // THEN - still hidden right after the event
+      expect(result.current.showWordFeedback).toBe(false);
+      expect(result.current.wordToVote).toBeNull();
+
+      // WHEN - not quite enough time has passed
+      act(() => {
+        vi.advanceTimersByTime(9_000);
+      });
+
+      // THEN - still hidden
+      expect(result.current.showWordFeedback).toBe(false);
+
+      // WHEN - the full delay elapses
+      act(() => {
+        vi.advanceTimersByTime(1_000);
+      });
+
+      // THEN - now visible
+      expect(result.current.showWordFeedback).toBe(true);
+    });
+
+    it('should only show word feedback once per results page', () => {
+      // GIVEN
+      const { result } = renderHook(() =>
+        useResultsSocketEvents({ socket: mockSocket as unknown as Socket })
+      );
+
+      // WHEN - first event shows the modal, then the user skips it
+      act(() => {
+        triggerSocketEvent(mockSocket, 'showWordFeedback', {
+          word: 'HELLO',
+          submittedBy: 'testUser',
+          gameCode: 'ABC123',
+          language: 'en',
+        });
+      });
+      advanceWordFeedbackDelay();
+      expect(result.current.showWordFeedback).toBe(true);
+
+      act(() => {
+        result.current.handleFeedbackSkip();
+      });
+      expect(result.current.showWordFeedback).toBe(false);
+
+      // WHEN - a second event arrives later
+      act(() => {
+        triggerSocketEvent(mockSocket, 'showWordFeedback', {
+          word: 'WORLD',
+          submittedBy: 'otherUser',
+          gameCode: 'ABC123',
+          language: 'en',
+        });
+      });
+      advanceWordFeedbackDelay();
+
+      // THEN - it must not re-appear
+      expect(result.current.showWordFeedback).toBe(false);
+      expect(result.current.wordToVote).toBeNull();
     });
 
     it('should limit word queue to 2 items', () => {
@@ -251,6 +340,7 @@ describe('useResultsSocketEvents', () => {
           ],
         });
       });
+      advanceWordFeedbackDelay();
 
       // THEN - Queue should be limited to 2
       expect(result.current.wordQueue).toHaveLength(2);
@@ -274,6 +364,7 @@ describe('useResultsSocketEvents', () => {
           language: 'en',
         });
       });
+      advanceWordFeedbackDelay();
 
       // THEN
       expect(result.current.wordToVote?.voteInfo).toEqual({
@@ -500,6 +591,7 @@ describe('useResultsSocketEvents', () => {
             language: 'en',
           });
         });
+        advanceWordFeedbackDelay();
 
         // WHEN
         act(() => {
@@ -550,6 +642,7 @@ describe('useResultsSocketEvents', () => {
             language: 'en',
           });
         });
+        advanceWordFeedbackDelay();
 
         expect(result.current.showWordFeedback).toBe(true);
 
