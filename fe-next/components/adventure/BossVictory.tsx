@@ -9,7 +9,7 @@
 'use client';
 
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Star, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -101,7 +101,7 @@ const BossVictory = memo<BossVictoryProps>(
     const bossName = useMemo(() => t(boss.displayName), [t, boss.displayName]);
 
     return (
-      <AdaptiveAnimatePresence>
+      <>
         <div
           ref={dialogRef}
           role="dialog"
@@ -110,7 +110,7 @@ const BossVictory = memo<BossVictoryProps>(
           className={cn(
             'fixed inset-0 z-50',
             'flex items-center justify-center',
-            'bg-neo-black/85 backdrop-blur-xs'
+            'bg-neo-black/85 backdrop-blur-xs animate-in fade-in-0 duration-300'
           )}
         >
           {/* Themed background glow */}
@@ -129,52 +129,34 @@ const BossVictory = memo<BossVictoryProps>(
           </div>
 
           {/* Modal Content */}
-          <AdaptiveMotion.div
-            initial={{ scale: 0.8, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.8, opacity: 0, y: 20 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          <div
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
               'rounded-neo shadow-hard-lg',
-              'p-6 md:p-8'
+              'p-6 md:p-8',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
             )}
           >
             {/* Title */}
-            <AdaptiveMotion.h2
+            <h2
               id="boss-victory-title"
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
+              style={{ animationDelay: '0.1s' }}
               className={cn(
                 'text-center text-2xl md:text-3xl font-black mb-2',
-                isVictory ? 'text-neo-lime' : 'text-neo-red'
+                isVictory ? 'text-neo-lime' : 'text-neo-red',
+                'animate-in fade-in-0 duration-300 fill-mode-both'
               )}
             >
               {isVictory
                 ? t('adventure.bosses.bossDefeated')
                 : t('adventure.bosses.bossWins')}
-            </AdaptiveMotion.h2>
+            </h2>
 
             {/* Boss Image — victory: defeated boss wobbles in, defeat: attack boss slams in */}
-            <AdaptiveMotion.div
-              className="flex justify-center mb-3"
-              initial={isVictory
-                ? { scale: 0, rotate: 10, y: -20 }
-                : { scale: 0, x: 40, rotate: 8 }
-              }
-              animate={isVictory
-                ? { scale: [0, 1.15, 0.95, 1.02, 1], rotate: [10, -8, 4, -1, 0], y: [-20, 5, -2, 0] }
-                : { scale: [0, 1.2, 1], x: [40, -5, 0], rotate: [8, -2, 0] }
-              }
-              transition={{
-                delay: 0.2,
-                type: 'spring',
-                stiffness: isVictory ? 150 : 300,
-                damping: isVictory ? 10 : 18,
-                mass: 1.2,
-              }}
+            <div
+              style={{ animationDelay: '0.2s' }}
+              className="flex justify-center mb-3 animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both"
             >
               <div className="relative">
                 <AdaptiveMotion.img
@@ -208,41 +190,37 @@ const BossVictory = memo<BossVictoryProps>(
                   />
                 )}
               </div>
-            </AdaptiveMotion.div>
+            </div>
 
             {/* Boss Name */}
-            <AdaptiveMotion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-center text-lg font-black text-neo-white mb-1"
+            <p
+              style={{ animationDelay: '0.3s' }}
+              className="text-center text-lg font-black text-neo-white mb-1 animate-in fade-in-0 duration-300 fill-mode-both"
             >
               {bossName}
-            </AdaptiveMotion.p>
+            </p>
 
             {/* Boss Taunt */}
-            <AdaptiveMotion.p
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+            <p
+              style={{ animationDelay: '0.4s' }}
               className={cn(
                 'text-center text-sm font-bold italic mb-4',
-                isVictory ? 'text-neo-lime/80' : 'text-neo-orange/80'
+                isVictory ? 'text-neo-lime/80' : 'text-neo-orange/80',
+                'animate-in fade-in-0 duration-300 fill-mode-both'
               )}
             >
               &ldquo;{bossTaunt}&rdquo;
-            </AdaptiveMotion.p>
+            </p>
 
             {/* Near-miss encouragement */}
             {isNearMiss && (
-              <AdaptiveMotion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+              <div
+                style={{ animationDelay: '0.5s' }}
                 className={cn(
                   'mx-auto mb-4 px-4 py-2 rounded-neo',
                   'bg-neo-yellow/20 border-2 border-neo-yellow/50',
-                  'text-center'
+                  'text-center',
+                  'animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both'
                 )}
               >
                 <p className="text-neo-yellow font-black text-sm">
@@ -251,7 +229,7 @@ const BossVictory = memo<BossVictoryProps>(
                 <p className="text-neo-white text-xs mt-0.5">
                   {t('adventure.bosses.nearMissDesc', { hp: 100 - bossHpDepleted })}
                 </p>
-              </AdaptiveMotion.div>
+              </div>
             )}
 
             {/* Stars */}
@@ -263,14 +241,13 @@ const BossVictory = memo<BossVictoryProps>(
 
             {/* Lexicon Fragment collected (victory only) */}
             {isVictory && (
-              <AdaptiveMotion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6, type: 'spring', stiffness: 200, damping: 15 }}
+              <div
+                style={{ animationDelay: '0.6s' }}
                 className={cn(
                   'mx-auto mb-4 px-4 py-2.5 rounded-neo',
                   'bg-neo-lime/10 border-2 border-neo-lime/40',
-                  'text-center'
+                  'text-center',
+                  'animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both'
                 )}
               >
                 <p className="text-neo-lime font-black text-sm">
@@ -279,7 +256,7 @@ const BossVictory = memo<BossVictoryProps>(
                 <p className="text-neo-white text-xs mt-0.5">
                   {t('adventure.bosses.fragmentCount', { current: boss.worldId, total: 10 })}
                 </p>
-              </AdaptiveMotion.div>
+              </div>
             )}
 
             {/* Stats Grid */}
@@ -306,11 +283,9 @@ const BossVictory = memo<BossVictoryProps>(
             </div>
 
             {/* Mascot reaction */}
-            <AdaptiveMotion.div
-              className="flex justify-center mb-4"
-              initial={{ scale: 0, rotate: isVictory ? 10 : -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 14 }}
+            <div
+              style={{ animationDelay: '0.7s' }}
+              className="flex justify-center mb-4 animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both"
             >
               <SilentVideo
                 src={isVictory ? '/mascot/flexing.webp' : '/mascot/encouraging.webp'}
@@ -320,7 +295,7 @@ const BossVictory = memo<BossVictoryProps>(
                 preload="metadata"
                 aria-hidden="true"
               />
-            </AdaptiveMotion.div>
+            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col gap-3">
@@ -364,9 +339,9 @@ const BossVictory = memo<BossVictoryProps>(
                 {t('adventure.retryLevel')}
               </button>
             </div>
-          </AdaptiveMotion.div>
+          </div>
         </div>
-      </AdaptiveAnimatePresence>
+      </>
     );
   }
 );

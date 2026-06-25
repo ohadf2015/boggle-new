@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -214,37 +213,29 @@ export default function DrillProgressionOverlay({
   }, [isOpen, onClose]);
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in-0 duration-300"
           style={{ backdropFilter: 'blur(8px)' }}
         >
           {/* Backdrop */}
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.8 }}
-            exit={{ opacity: 0 }}
+          <div
             className={cn(
               'absolute inset-0',
-              isDarkMode ? 'bg-neo-navy' : 'bg-neo-black'
+              isDarkMode ? 'bg-neo-navy' : 'bg-neo-black',
+              'animate-in fade-in-0 duration-300'
             )}
+            style={{ opacity: 0.8 }}
             onClick={onClose}
           />
 
           {/* Content Card */}
-          <m.div
-            initial={{ scale: 0.8, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: -20 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          <div
             className={cn(
               'relative w-full max-w-sm rounded-neo border-4 border-neo-black shadow-hard-lg p-6',
-              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
             )}
           >
             {/* Close button */}
@@ -262,80 +253,63 @@ export default function DrillProgressionOverlay({
 
             {/* Level-up celebration banner — shows above header when drill promoted player to new level */}
             {levelUp && levelUp.newLevel > levelUp.previousLevel && (
-              <m.div
-                initial={{ opacity: 0, y: -12, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: 'spring', damping: 14, stiffness: 220, delay: 0.4 }}
-                className="mb-4 flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-2 shadow-hard-sm"
+              <div
+                className="mb-4 flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-2 shadow-hard-sm animate-in fade-in-0 zoom-in-95 duration-300"
                 role="status"
                 aria-label={`Level up to ${levelUp.newLevel}`}
+                style={{ animationDelay: '0.4s' }}
               >
                 <Star className="h-4 w-4 text-neo-black" fill="currentColor" />
                 <span className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-black">
                   {t('brain.drills.levelUp', { level: levelUp.newLevel })}
                 </span>
                 <Star className="h-4 w-4 text-neo-black" fill="currentColor" />
-              </m.div>
+              </div>
             )}
 
             {/* Header */}
             <div className="text-center mb-6">
-              <m.p
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+              <p
                 className={cn(
                   'text-sm font-bold uppercase tracking-wide mb-2',
+                  'animate-in fade-in-0 duration-300',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
                 )}
               >
                 {t('brain.drills.brainTraining')}
-              </m.p>
-              <m.h2
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
+              </p>
+              <h2
                 className={cn(
                   'text-xl font-black uppercase',
+                  'animate-in fade-in-0 duration-300',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black'
                 )}
+                style={{ animationDelay: '0.1s' }}
               >
                 {t(`brain.domains.${targetDomain}`)}
-              </m.h2>
+              </h2>
             </div>
 
             {/* Domain Icon with Animation */}
-            <m.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
-              className="flex justify-center mb-6"
+            <div
+              className="flex justify-center mb-6 animate-in zoom-in-50 duration-300"
+              style={{ animationDelay: '0.2s' }}
             >
-              <m.div
-                animate={{
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
+              <div
                 className={cn(
                   'w-20 h-20 rounded-neo border-4 border-neo-black flex items-center justify-center',
                   domainConfig.bgColor
                 )}
               >
                 <Icon className="w-10 h-10 text-neo-black" />
-              </m.div>
-            </m.div>
+              </div>
+            </div>
 
             {/* Score Display */}
-            <AnimatePresence>
+            <>
               {showScore && (
-                <m.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center mb-4"
+                <div
+                  className="text-center mb-4 animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
                 >
                   <div className="flex items-center justify-center gap-2">
                     <span className={cn(
@@ -357,26 +331,22 @@ export default function DrillProgressionOverlay({
                     'h-3 mt-3 rounded-full border-2 border-neo-black overflow-hidden',
                     isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200'
                   )}>
-                    <m.div
+                    <div
                       className={cn('h-full', domainConfig.bgColor)}
-                      initial={{ width: `${previousDomainScore}%` }}
-                      animate={{ width: `${newDomainScore}%` }}
-                      transition={{ type: 'spring', stiffness: 80, damping: 15 }}
+                      style={{ width: `${newDomainScore}%` }}
                     />
                   </div>
-                </m.div>
+                </div>
               )}
-            </AnimatePresence>
+            </>
 
             {/* Improvement badge — the single most flattering true "you got better" signal */}
-            <AnimatePresence>
+            <>
               {showDelta && improvementBadge && ImprovementIcon && (
-                <m.div
-                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ type: 'spring', damping: 15 }}
-                  className="flex justify-center mb-4"
+                <div
+                  className="flex justify-center mb-4 animate-in fade-in-0 zoom-in-95 duration-300"
                   data-testid="drill-improvement-badge"
+                  style={{ animationDelay: '0s' }}
                 >
                   <div className={cn(
                     'inline-flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black',
@@ -387,18 +357,16 @@ export default function DrillProgressionOverlay({
                       {t(improvementBadge.key)}
                     </span>
                   </div>
-                </m.div>
+                </div>
               )}
-            </AnimatePresence>
+            </>
 
             {/* Delta Display - Only show positive gains with upward arrow */}
-            <AnimatePresence>
+            <>
               {showDelta && scoreDelta > 0 && (
-                <m.div
-                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ type: 'spring', damping: 15 }}
-                  className="flex justify-center mb-4"
+                <div
+                  className="flex justify-center mb-4 animate-in fade-in-0 zoom-in-95 duration-300"
+                  style={{ animationDelay: '0s' }}
                 >
                   <div className={cn(
                     'inline-flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black',
@@ -409,18 +377,17 @@ export default function DrillProgressionOverlay({
                       +{scoreDelta}
                     </span>
                   </div>
-                </m.div>
+                </div>
               )}
-            </AnimatePresence>
+            </>
 
             {/* Overall Score */}
-            <AnimatePresence>
+            <>
               {showOverall && (
-                <m.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
+                <div
                   className={cn(
                     'text-center pt-4 mt-4 border-t-2',
+                    'animate-in fade-in-0 slide-in-from-bottom-2 duration-300',
                     isDarkMode ? 'border-slate-700' : 'border-gray-200'
                   )}
                 >
@@ -444,18 +411,16 @@ export default function DrillProgressionOverlay({
                       {t(`brain.tiers.${tier}`)}
                     </span>
                   </div>
-                </m.div>
+                </div>
               )}
-            </AnimatePresence>
+            </>
 
             {/* XP + Gold rewards */}
-            <AnimatePresence>
+            <>
               {showOverall && (xpAwarded !== undefined || goldAwarded !== undefined) && (
-                <m.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex justify-center gap-3 mt-3"
+                <div
+                  className="flex justify-center gap-3 mt-3 animate-in fade-in-0 duration-300"
+                  style={{ animationDelay: '0.3s' }}
                 >
                   {(xpAwarded ?? 0) > 0 && (
                     <div className={cn(
@@ -475,25 +440,23 @@ export default function DrillProgressionOverlay({
                       {t('brain.drills.goldEarned', { gold: goldAwarded ?? 0 })}
                     </div>
                   )}
-                </m.div>
+                </div>
               )}
-            </AnimatePresence>
+            </>
 
             {/* Tap to close hint */}
-            <m.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              transition={{ delay: 2 }}
+            <p
               className={cn(
-                'text-center text-xs mt-4',
+                'text-center text-xs mt-4 animate-in fade-in-0 duration-300',
                 isDarkMode ? 'text-neo-white' : 'text-neo-black'
               )}
+              style={{ animationDelay: '2s', opacity: 0.5 }}
             >
               {t('common.tapToClose')}
-            </m.p>
-          </m.div>
-        </m.div>
+            </p>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

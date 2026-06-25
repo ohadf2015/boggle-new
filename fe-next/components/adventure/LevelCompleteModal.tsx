@@ -11,7 +11,6 @@
 'use client';
 
 import { memo, useEffect, useRef } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -157,7 +156,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
     if (!isOpen) return null;
 
     return (
-      <AdaptiveAnimatePresence>
+      <>
         <div
           ref={dialogRef}
           role="dialog"
@@ -166,7 +165,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
           className={cn(
             'fixed inset-0 z-50',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-xs'
+            'bg-neo-black/80 backdrop-blur-xs animate-in fade-in-0 duration-300'
           )}
         >
           <div
@@ -174,26 +173,21 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
             style={{ backgroundColor: getBackgroundTint(stars) }}
           />
 
-          <AdaptiveMotion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          <div
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
               'rounded-neo shadow-hard-lg',
-              'max-h-[90vh] flex flex-col overflow-hidden'
+              'max-h-[90vh] flex flex-col overflow-hidden',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
             )}
           >
             {/* Scrollable content area */}
             <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8 pb-0">
               {/* Title */}
-              <AdaptiveMotion.div
-                initial={{ y: -30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 25 }}
-                className="mb-2"
+              <div
+                style={{ animationDelay: '0.1s' }}
+                className="mb-2 animate-in fade-in-0 slide-in-from-top-4 duration-300 fill-mode-both"
               >
                 <h2
                   id="level-complete-title"
@@ -206,14 +200,12 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     ? t('adventure.perfect')
                     : t('adventure.levelComplete')}
                 </h2>
-              </AdaptiveMotion.div>
+              </div>
 
               {/* Level Badge */}
-              <AdaptiveMotion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
-                className="flex justify-center mb-3"
+              <div
+                style={{ animationDelay: '0.2s' }}
+                className="flex justify-center mb-3 animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both"
               >
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-black/50 border-2 border-neo-white/20 rounded-neo">
                   <span className="text-neo-white text-sm font-bold uppercase">
@@ -224,14 +216,12 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                     {t('adventure.level')} {levelNumber}
                   </span>
                 </div>
-              </AdaptiveMotion.div>
+              </div>
 
               {/* Mascot — smaller on mobile to save space */}
-              <AdaptiveMotion.div
-                className="flex justify-center mb-3"
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+              <div
+                style={{ animationDelay: '0.2s' }}
+                className="flex justify-center mb-3 animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both"
               >
                 <InteractiveMascot
                   variant={getMascotVariantForStars(stars)}
@@ -240,36 +230,28 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                   enableHover={false}
                   enableClick={false}
                 />
-              </AdaptiveMotion.div>
+              </div>
 
               {/* Perfect Badge */}
               {isPerfect && (
-                <AdaptiveMotion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 25 }}
-                  className="text-center text-lg font-black text-neo-yellow mb-3"
+                <p
+                  style={{ animationDelay: '0.5s' }}
+                  className="text-center text-lg font-black text-neo-yellow mb-3 animate-in fade-in-0 duration-300 fill-mode-both"
                 >
                   {t('adventure.game.perfect')}
-                </AdaptiveMotion.p>
+                </p>
               )}
 
               {/* Stars */}
               <div className="flex justify-center gap-3 mb-4">
                 {[0, 1, 2].map((i) => (
-                  <AdaptiveMotion.div
+                  <div
                     key={`star-${i}`}
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{
-                      scale: i < stars ? 1 : 0.8,
-                      opacity: i < stars ? 1 : 0.5,
-                    }}
-                    transition={{
-                      delay: 0.3 + i * 0.1,
-                      type: 'spring',
-                      stiffness: 300,
-                      damping: 20,
-                    }}
+                    style={{ animationDelay: `${0.3 + i * 0.1}s` }}
+                    className={cn(
+                      'animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both',
+                      i >= stars && 'opacity-50 scale-80'
+                    )}
                   >
                     <Star
                       className={cn(
@@ -279,17 +261,15 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                           : 'text-neo-white fill-neo-white/10'
                       )}
                     />
-                  </AdaptiveMotion.div>
+                  </div>
                 ))}
               </div>
 
               {/* Show previous best stars when current attempt earned fewer */}
               {previousBestStars > stars && (
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 25 }}
-                  className="flex justify-center items-center gap-1.5 -mt-2 mb-4"
+                <div
+                  style={{ animationDelay: '0.6s' }}
+                  className="flex justify-center items-center gap-1.5 -mt-2 mb-4 animate-in fade-in-0 duration-300 fill-mode-both"
                 >
                   <span className="text-neo-white text-xs font-bold uppercase">
                     {t('adventure.bestStars')}:
@@ -305,7 +285,7 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
                       )}
                     />
                   ))}
-                </AdaptiveMotion.div>
+                </div>
               )}
 
               {/* Rewards, Objectives — scrollable body (no action buttons) */}
@@ -357,9 +337,9 @@ const LevelCompleteModal = memo<LevelCompleteModalProps>(
               streakMilestone={streakMilestone}
               t={t}
             />
-          </AdaptiveMotion.div>
+          </div>
         </div>
-      </AdaptiveAnimatePresence>
+      </>
     );
   }
 );

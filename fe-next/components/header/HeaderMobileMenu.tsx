@@ -46,33 +46,6 @@ interface HeaderMobileMenuProps {
 // --- Animation config ---
 const SWIPE_CLOSE_THRESHOLD = 80;
 
-const backdropVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 },
-};
-
-const staggerContainer = {
-    visible: {
-        transition: { staggerChildren: 0.04, delayChildren: 0.1 },
-    },
-    exit: {
-        transition: { staggerChildren: 0.02, staggerDirection: -1 },
-    },
-};
-
-const staggerItem = {
-    hidden: { opacity: 0, x: 24 },
-    visible: { opacity: 1, x: 0, transition: { type: 'spring' as const, damping: 22, stiffness: 260 } },
-    exit: { opacity: 0, x: 24, transition: { duration: 0.12 } },
-};
-
-const staggerItemRtl = {
-    hidden: { opacity: 0, x: -24 },
-    visible: { opacity: 1, x: 0, transition: { type: 'spring' as const, damping: 22, stiffness: 260 } },
-    exit: { opacity: 0, x: -24, transition: { duration: 0.12 } },
-};
-
 const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGiftModal, onSignIn, onSignUp }) => {
     const { t, language } = useLanguage();
     const { isAuthenticated, isAdmin, profile, user, loading } = useAuth();
@@ -287,7 +260,6 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const avatarConfig = isAuthenticated
         ? (profile?.avatar_config ?? storedAvatar)
         : storedAvatar;
-    const itemVariants = isRtl ? staggerItemRtl : staggerItem;
 
     return (
         <>
@@ -383,27 +355,18 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
             {/* Mobile Menu Slide-out Pane (also hidden on CrazyGames) */}
             {!isCrazyGames && mounted && createPortal(
                 <LazyMotion features={domAnimation}>
-                <AnimatePresence>
+                <>
                     {showMobileMenu && (
                         <>
                             {/* Backdrop */}
-                            <m.div
-                                variants={backdropVariants}
-                                initial="hidden"
-                                animate="visible"
-                                exit="exit"
-                                transition={{ duration: 0.2 }}
-                                className="fixed inset-0 bg-neo-black/60 backdrop-blur-[2px] z-70"
+                            <div
+                                className="fixed inset-0 bg-neo-black/60 backdrop-blur-[2px] z-70 animate-in fade-in-0 duration-200"
                                 onClick={closeMenu}
                             />
 
                             {/* Slide-out pane with swipe-to-close */}
-                            <m.div
+                            <div
                                 ref={mobileMenuRef}
-                                initial={{ x: isRtl ? '-100%' : '100%' }}
-                                animate={{ x: 0 }}
-                                exit={{ x: isRtl ? '-100%' : '100%' }}
-                                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
                                 onTouchStart={handleTouchStart}
                                 onTouchEnd={handleTouchEnd}
                                 data-testid="mobile-menu-drawer"
@@ -425,9 +388,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     // body below; swipe-to-close is handled by the passive touch
                                     // handlers above (no framer `drag`, so nothing fights scroll).
                                     "shadow-hard-xl overflow-hidden flex flex-col",
+                                    'animate-in duration-300',
                                     isRtl
-                                        ? "left-0 border-r-4 rounded-r-neo-lg"
-                                        : "right-0 border-l-4 rounded-l-neo-lg"
+                                        ? "left-0 border-r-4 rounded-r-neo-lg slide-in-from-left-full"
+                                        : "right-0 border-l-4 rounded-l-neo-lg slide-in-from-right-full"
                                 )}
                             >
                               {/* ── Scrollable body — owns vertical scroll, decoupled from the
@@ -764,16 +728,12 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                 )}
 
                                 {/* ── Menu Items (Staggered) ── */}
-                                <m.div
+                                <div
                                     className="flex flex-col gap-1.5 p-4"
-                                    variants={staggerContainer}
-                                    initial="hidden"
-                                    animate="visible"
-                                    exit="exit"
                                 >
                                     {/* Gift Notification - highlighted */}
                                     {isAuthenticated && unclaimedCount > 0 && !giftBannerDismissed && (
-                                        <m.div variants={itemVariants}>
+                                        <div>
                                             <div className="relative">
                                                 <button
                                                     onClick={handleOpenGift}
@@ -815,20 +775,20 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     <X size={12} />
                                                 </button>
                                             </div>
-                                        </m.div>
+                                        </div>
                                     )}
 
                                     {/* ─ Get the App (durable Android install re-entry; self-hides off Android) ─ */}
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <GetAppMenuRow onNavigate={closeMenu} />
-                                    </m.div>
+                                    </div>
 
                                     {/* ─ Settings Section ─ */}
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <SectionLabel>{t('settings.title')}</SectionLabel>
-                                    </m.div>
+                                    </div>
 
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <div className={cn(
                                             "flex items-center gap-3 px-4 py-3 rounded-neo",
                                             "bg-neo-white/5 border-2 border-neo-white/10"
@@ -840,41 +800,41 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 <QuickLanguageSwitcher showLabel />
                                             </div>
                                         </div>
-                                    </m.div>
+                                    </div>
 
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <MenuLink href={`/${language}/settings#accessibility`} onClick={closeMenu} accentColor="cyan">
                                             <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
                                                 <Accessibility className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
                                             </MenuIcon>
                                             <span>{t('settings.accessibility')}</span>
                                         </MenuLink>
-                                    </m.div>
+                                    </div>
 
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <MenuLink href={`/${language}/settings`} onClick={closeMenu} accentColor="cyan">
                                             <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
                                                 <Settings className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
                                             </MenuIcon>
                                             <span>{t('settings.moreSettings')}</span>
                                         </MenuLink>
-                                    </m.div>
+                                    </div>
 
                                     {/* ─ Community ─ */}
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <SectionLabel>{t('ugc.nav.community')}</SectionLabel>
-                                    </m.div>
+                                    </div>
 
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <MenuLink href={`/${language}/community`} onClick={closeMenu} accentColor="pink">
                                             <MenuIcon className="bg-neo-pink/20 border-neo-pink/40">
                                                 <Users className="w-4 h-4 text-neo-pink" aria-hidden="true" />
                                             </MenuIcon>
                                             <span>{t('ugc.nav.community')}</span>
                                         </MenuLink>
-                                    </m.div>
+                                    </div>
 
-                                    <m.div variants={itemVariants} className="relative">
+                                    <div className="relative">
                                         <MenuLink href={`/${language}/friends`} onClick={closeMenu} accentColor="cyan">
                                             <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
                                                 <UserPlus className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
@@ -882,15 +842,15 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             <span>{t('nav.friends')}</span>
                                         </MenuLink>
                                         <GiftNotificationBadge count={friendsBadgeCount} />
-                                    </m.div>
+                                    </div>
 
                                     {/* ─ Admin ─ */}
                                     {isAdmin && (
                                         <>
-                                            <m.div variants={itemVariants}>
+                                            <div>
                                                 <SectionLabel>{t('common.admin')}</SectionLabel>
-                                            </m.div>
-                                            <m.div variants={itemVariants}>
+                                            </div>
+                                            <div>
                                                 <Link
                                                     href={`/${language}/admin`}
                                                     onClick={closeMenu}
@@ -908,19 +868,19 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     </MenuIcon>
                                                     <span>{t('common.adminDashboard')}</span>
                                                 </Link>
-                                            </m.div>
+                                            </div>
                                         </>
                                     )}
 
                                     {/* ─ Info Links ─ */}
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <SectionLabel>{t('common.info')}</SectionLabel>
-                                    </m.div>
+                                    </div>
 
                                     {/* Report a Bug — promoted to a prominent full-width action so
                                         players can flag issues from anywhere. Routes to /api/feedback
                                         (Supabase + Telegram + email). */}
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <button
                                             type="button"
                                             onClick={() => { closeMenu(); setShowBugReport(true); }}
@@ -938,9 +898,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             </MenuIcon>
                                             <span>{t('bugReport.menuLabel')}</span>
                                         </button>
-                                    </m.div>
+                                    </div>
 
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <div className="grid grid-cols-2 gap-1.5">
                                             <InfoLink href={`/${language}/about`} onClick={closeMenu} icon={<Info className="w-3.5 h-3.5" />} color="bg-neo-cyan/20 text-neo-cyan">{t('footer.about')}</InfoLink>
                                             <InfoLink href={`/${language}/faq`} onClick={closeMenu} icon={<HelpCircle className="w-3.5 h-3.5" />} color="bg-neo-purple/20 text-neo-purple">{t('footer.faq')}</InfoLink>
@@ -949,9 +909,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             <InfoLink href={`/${language}/legal`} onClick={closeMenu} icon={<ScrollText className="w-3.5 h-3.5" />} color="bg-neo-pink/20 text-neo-pink-light">{t('legal.title')}</InfoLink>
                                             <InfoLinkExternal href="https://ko-fi.com/lexiclash" onClick={closeMenu} icon={<Coffee className="w-3.5 h-3.5" />} color="bg-neo-pink/30 text-neo-pink" label={t('common.opensInNewTab')}>{t('support.kofiFooter')}</InfoLinkExternal>
                                         </div>
-                                    </m.div>
+                                    </div>
 
-                                    <m.div variants={itemVariants}>
+                                    <div>
                                         <div className="flex items-center gap-1.5">
                                             <a
                                                 href="https://www.instagram.com/lexi.clash"
@@ -991,39 +951,39 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 <ManageCookiesButton />
                                             </div>
                                         </div>
-                                    </m.div>
+                                    </div>
 
                                     {/* ─ Account (Login/Logout) ─ */}
                                     {isAuthenticated && (
                                         <>
-                                            <m.div variants={itemVariants}>
+                                            <div>
                                                 <SectionLabel>{t('common.account')}</SectionLabel>
-                                            </m.div>
-                                            <m.div variants={itemVariants}>
+                                            </div>
+                                            <div>
                                                 <AuthButton
                                                     inline
                                                     onClose={closeMenu}
                                                     onSignInClick={handleSignIn}
                                                     onSignUpClick={handleSignUp}
                                                 />
-                                            </m.div>
+                                            </div>
                                         </>
                                     )}
 
                                     {/* Swipe hint */}
-                                    <m.div variants={itemVariants} className="flex justify-center pt-2 pb-1">
+                                    <div className="flex justify-center pt-2 pb-1">
                                         <span className="text-[10px] text-neo-white font-bold">
                                             {isRtl ? '← ' : ''}
                                             {t('common.swipeToClose') || 'Swipe to close'}
                                             {!isRtl ? ' →' : ''}
                                         </span>
-                                    </m.div>
-                                </m.div>
+                                    </div>
+                                </div>
                               </div>
-                            </m.div>
+                            </div>
                         </>
                     )}
-                </AnimatePresence>
+                </>
                 </LazyMotion>,
                 document.body
             )}

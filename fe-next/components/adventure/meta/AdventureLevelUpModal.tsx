@@ -10,7 +10,6 @@
 'use client';
 
 import { memo, useEffect, useId, useRef } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -83,9 +82,9 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
     }
 
     return (
-      <AdaptiveAnimatePresence>
+      <>
         {/* Overlay */}
-        <AdaptiveMotion.div
+        <div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
@@ -93,37 +92,29 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
           className={cn(
             'fixed inset-0 z-60',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-xs'
+            'bg-neo-black/80 backdrop-blur-xs animate-in fade-in-0 duration-300'
           )}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           onClick={onClose}
         >
           {/* Modal Card */}
-          <AdaptiveMotion.div
+          <div
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
-              'text-center'
+              'text-center',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
             )}
-            initial={{ opacity: 0, scale: 0.95, rotate: -5 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, scale: 0.95, rotate: 5 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Celebration Emoji */}
-            <AdaptiveMotion.span
-              className="block text-6xl mb-4"
-              initial={{ opacity: 0, scale: 0.95, rotate: -30 }}
-              animate={{ opacity: 1, scale: [0.95, 1.3, 1], rotate: [30, -15, 0] }}
-              transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
+            <span
+              style={{ animationDelay: '0.2s' }}
+              className="block text-6xl mb-4 animate-in zoom-in-95 duration-300 fill-mode-both"
             >
               🎉
-            </AdaptiveMotion.span>
+            </span>
 
             {/* Title */}
             <h2
@@ -132,7 +123,8 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
                 'text-3xl md:text-4xl font-black',
                 'text-neo-yellow',
                 'drop-shadow-[0_0_15px_rgba(255,225,53,0.6)]',
-                'mb-4'
+                'mb-4',
+                'animate-in fade-in-0 duration-300'
               )}
             >
               {t('adventure.xp.levelUp')}
@@ -143,16 +135,15 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
               <p className="text-neo-white font-bold text-lg mb-2">
                 {t('adventure.xp.newLevel')}
               </p>
-              <AdaptiveMotion.div
+              <div
+                style={{ animationDelay: '0.4s' }}
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
                   'bg-neo-cyan/20 border-4 border-neo-cyan',
-                  'rounded-full'
+                  'rounded-full',
+                  'animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both'
                 )}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
               >
                 <span
                   className={cn(
@@ -163,12 +154,13 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
                 >
                   {newLevel}
                 </span>
-              </AdaptiveMotion.div>
+              </div>
             </div>
 
             {/* Continue Button */}
-            <AdaptiveMotion.button
+            <button
               onClick={onClose}
+              style={{ animationDelay: '0.6s' }}
               className={cn(
                 'w-full py-3 px-6',
                 'bg-neo-yellow hover:bg-neo-orange',
@@ -177,17 +169,15 @@ const AdventureLevelUpModal = memo<AdventureLevelUpModalProps>(
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                 'active:translate-y-0.5 active:shadow-hard-pressed',
                 'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                'transition-all duration-200'
+                'transition-all duration-200',
+                'animate-in fade-in-0 duration-300 fill-mode-both'
               )}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
             >
               {t('adventure.xp.continue')}
-            </AdaptiveMotion.button>
-          </AdaptiveMotion.div>
-        </AdaptiveMotion.div>
-      </AdaptiveAnimatePresence>
+            </button>
+          </div>
+        </div>
+      </>
     );
   }
 );

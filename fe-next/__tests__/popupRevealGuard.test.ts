@@ -80,12 +80,27 @@ function isPanel(window: string): boolean {
 
 const IMPORTS_DIALOG = /from\s+['"](?:@\/components\/ui\/dialog|@radix-ui\/react-dialog)['"]/;
 
-/** A file is a modal/popup file if it dims the screen or uses the Dialog primitive. */
+/**
+ * A file is a modal/popup file if it dims the screen or uses the Dialog
+ * primitive. NOTE: classNames are frequently built with `cn('fixed inset-0',
+ * 'bg-neo-black/80', …)` — a function CALL, not a string/template literal — so a
+ * per-className-literal scan misses them entirely (this is the bug that let the
+ * whole cn()-based modal family slip past the guard). Detect at file scope: a
+ * full-screen dimmer (`fixed inset-0` + a dark bg anywhere in the file) OR the
+ * Dialog primitive. The per-`initial` enclosing-tag check below still binds each
+ * finding to its own element, so file-scope detection doesn't over-flag.
+ */
 function isModalFile(src: string): boolean {
-  if (IMPORTS_DIALOG.test(src)) return true;
-  const classNames = src.match(/className=(?:"[^"]*"|'[^']*'|\{`[^`]*`\})/g) ?? [];
-  return classNames.some(isBackdrop);
+  return IMPORTS_DIALOG.test(src) || (/fixed inset-0/.test(src) && DARK_BG.test(src));
 }
+
+// Variant-form gating: `initial="hidden"` (a string keyed into a `variants`
+// object that sets opacity/scale 0) is the SAME JS-gated reveal as an inline
+// hidden initial, just indirected — equally invisible on a starved thread, and
+// invisible to HIDDEN_INITIAL. Flag any string-form `initial="<name>"` whose name
+// isn't an obviously-visible resting state.
+const VISIBLE_STATE = /^(visible|show|shown|open|opened|enter|entered|idle|animate|in)$/i;
+const STRING_INITIAL = /initial=["']([a-zA-Z][\w-]*)["']/g;
 
 /**
  * Return the JSX opening tag (`<... >`) enclosing position `i`. Scans back to
@@ -131,6 +146,8 @@ function findOffenders(): Offender[] {
       const src = stripComments(readFileSync(file, 'utf8'));
       if (!isModalFile(src)) continue; // skip pages & decorative effect layers
       const rel = file.slice(ROOT.length + 1);
+      let flagged = false;
+      // (1) inline hidden initials
       for (const m of src.matchAll(HIDDEN_INITIAL)) {
         // Inspect the element's OWN opening tag (so className binds to THIS
         // element, not a neighbouring card — avoids false positives on deep
@@ -139,7 +156,19 @@ function findOffenders(): Offender[] {
         const kind = isBackdrop(tag) ? 'backdrop' : isPanel(tag) ? 'panel' : null;
         if (kind) {
           offenders.push({ file: rel, kind, snippet: m[0].slice(0, 60) });
+          flagged = true;
           break; // one finding per file is enough to flag it for migration
+        }
+      }
+      if (flagged) continue;
+      // (2) variant-form hidden initials (initial="hidden" + variants)
+      for (const m of src.matchAll(STRING_INITIAL)) {
+        if (VISIBLE_STATE.test(m[1])) continue; // a visible resting state is fine
+        const tag = enclosingTag(src, m.index ?? 0);
+        const kind = isBackdrop(tag) ? 'backdrop' : isPanel(tag) ? 'panel' : null;
+        if (kind) {
+          offenders.push({ file: rel, kind, snippet: m[0].slice(0, 60) });
+          break;
         }
       }
     }

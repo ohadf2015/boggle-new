@@ -8,7 +8,6 @@
 'use client';
 
 import React, { memo, useRef, useEffect } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { RotateCcw, Clock, Lightbulb, LogOut, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -61,30 +60,6 @@ const BONUS_TIME_THRESHOLD = 2;
 const HINT_ASSIST_THRESHOLD = 3;
 
 // ==============================================
-// ANIMATION VARIANTS
-// ==============================================
-
-const backdropVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-};
-
-const modalVariants = {
-  hidden: { opacity: 0, scale: 0.9, y: 20 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 300,
-      damping: 25,
-    },
-  },
-  exit: { opacity: 0, scale: 0.9, y: 20 },
-};
-
-// ==============================================
 // COMPONENT
 // ==============================================
 
@@ -132,35 +107,29 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     );
 
     return (
-      <AdaptiveAnimatePresence>
+      <>
         {isOpen && (
-          <AdaptiveMotion.div
+          <div
             data-testid="retry-assist-modal"
             role="dialog"
             aria-modal="true"
             aria-label={t('adventure.game.retryOptions')}
-            variants={backdropVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
             className={cn(
               'fixed inset-0 z-50',
               'flex items-center justify-center',
               'bg-neo-black/80 backdrop-blur-xs',
-              'p-4'
+              'p-4',
+              'animate-in fade-in-0 duration-300'
             )}
           >
-            <AdaptiveMotion.div
+            <div
               ref={dialogRef}
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
               className={cn(
                 'w-full max-w-md',
                 'bg-neo-navy border-3 border-neo-black rounded-neo',
                 'shadow-hard-lg',
-                'overflow-hidden'
+                'overflow-hidden',
+                'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
               )}
             >
               {/* Header */}
@@ -397,10 +366,10 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                   {t('common.exit')}
                 </button>
               </div>
-            </AdaptiveMotion.div>
-          </AdaptiveMotion.div>
+            </div>
+          </div>
         )}
-      </AdaptiveAnimatePresence>
+      </>
     );
   }
 );

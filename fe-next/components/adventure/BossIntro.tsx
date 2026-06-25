@@ -9,7 +9,6 @@
 'use client';
 
 import { memo, useRef } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBossFightTheme } from '@/contexts/AdventureThemeContext';
@@ -35,7 +34,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
     : '';
 
   return (
-    <AdaptiveAnimatePresence>
+    <>
       <div
         ref={dialogRef}
         role="dialog"
@@ -44,123 +43,106 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
         className={cn(
           'fixed inset-0 z-50',
           'flex items-center justify-center',
-          'bg-neo-black/90 backdrop-blur-md'
+          'bg-neo-black/90 backdrop-blur-md animate-in fade-in-0 duration-300'
         )}
       >
         {/* Modal Content */}
-        <AdaptiveMotion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        <div
           className={cn(
             'relative w-full max-w-md mx-4',
             'bg-neo-navy border-4 border-neo-black',
             'rounded-neo shadow-hard-lg',
             'p-6 md:p-8',
-            'flex flex-col items-center'
+            'flex flex-col items-center',
+            'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
           )}
         >
           {/* Boss Battle Heading */}
-          <AdaptiveMotion.h1
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+          <h1
+            style={{ animationDelay: '0.1s' }}
             className={cn(
               'text-center text-2xl md:text-3xl font-black',
               'text-neo-yellow mb-4',
               'uppercase tracking-wider',
-              'drop-shadow-[0_0_10px_rgba(255,225,53,0.6)]'
+              'drop-shadow-[0_0_10px_rgba(255,225,53,0.6)]',
+              'animate-in fade-in-0 slide-in-from-top-4 duration-300 fill-mode-both'
             )}
           >
             {t('adventure.bosses.bossIntro')}
-          </AdaptiveMotion.h1>
+          </h1>
 
           {/* Boss Image with dramatic reveal + scared mascot */}
           <div className="relative mb-4">
             {/* Danger glow behind boss portrait */}
-            <AdaptiveMotion.div
-              className="absolute -inset-3 rounded-neo blur-md"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: [0, 0.6, 0.4], scale: 1 }}
-              transition={{ delay: 0.15, duration: 1, ease: 'easeOut' }}
-              style={{ background: bossFightTheme.avatarGlow }}
+            <div
+              style={{ animationDelay: '0.15s', background: bossFightTheme.avatarGlow }}
+              className="absolute -inset-3 rounded-neo blur-md animate-in fade-in-0 duration-300 fill-mode-both"
               aria-hidden="true"
             />
-            <AdaptiveMotion.div
-              initial={{ scale: 0, rotate: -10, y: 30 }}
-              animate={{ scale: 1, rotate: 0, y: 0 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 14, mass: 1.2 }}
+            <div
+              style={{ animationDelay: '0.2s', boxShadow: `0 0 20px ${bossFightTheme.avatarGlow}` }}
               className={cn(
                 'relative w-40 h-40 md:w-48 md:h-48',
                 'border-neo-thick border-neo-black',
                 'rounded-neo shadow-hard-lg',
-                'overflow-hidden bg-neo-navy/50'
+                'overflow-hidden bg-neo-navy/50',
+                'animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both'
               )}
-              style={{ boxShadow: `0 0 20px ${bossFightTheme.avatarGlow}` }}
             >
-              <AdaptiveMotion.img
+              <img
                 src={boss.imagePath}
                 alt={bossName}
                 className="w-full h-full object-cover"
-                initial={{ scale: 1.3, filter: 'brightness(0)' }}
-                animate={{ scale: 1, filter: 'brightness(1)' }}
-                transition={{ delay: 0.35, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               />
-            </AdaptiveMotion.div>
+            </div>
             {/* Scared mascot bounces in from bottom-right */}
-            <AdaptiveMotion.div
-              initial={{ scale: 0, opacity: 0, y: 20 }}
-              animate={{ scale: [0, 1.2, 0.9, 1], opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-2 -right-4"
+            <div
+              style={{ animationDelay: '0.6s' }}
+              className="absolute -bottom-2 -right-4 animate-in zoom-in-95 slide-in-from-bottom-2 duration-300 fill-mode-both"
             >
               <Mascot variant="scared" size="sm" />
-            </AdaptiveMotion.div>
+            </div>
           </div>
 
           {/* Boss Name */}
-          <AdaptiveMotion.h1
+          <h1
             id="boss-intro-title"
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, type: 'spring', stiffness: 200, damping: 20 }}
+            style={{ animationDelay: '0.3s' }}
             className={cn(
               'text-center text-xl md:text-2xl font-black',
               bossFightTheme.bossNameColor,
-              'mb-2'
+              'mb-2',
+              'animate-in fade-in-0 duration-300 fill-mode-both'
             )}
           >
             {bossName}
-          </AdaptiveMotion.h1>
+          </h1>
 
           {/* Storyline Text */}
           {boss.storylineIntro && (
-            <AdaptiveMotion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.35 }}
+            <div
+              style={{ animationDelay: '0.35s' }}
               className={cn(
                 'w-full p-3 mb-3 rounded-neo',
                 'bg-neo-cyan/5 border-2 border-neo-cyan/20',
-                'text-center'
+                'text-center',
+                'animate-in fade-in-0 duration-300 fill-mode-both'
               )}
             >
               <p className="text-neo-white text-xs md:text-sm italic leading-relaxed">
                 {t(boss.storylineIntro)}
               </p>
-            </AdaptiveMotion.div>
+            </div>
           )}
 
           {/* Twist Mechanic Section */}
-          <AdaptiveMotion.div
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
+          <div
+            style={{ animationDelay: '0.4s' }}
             className={cn(
               'w-full p-3 mb-4 rounded-neo',
               'bg-neo-orange/10 border-2 border-neo-orange/40',
-              'text-center'
+              'text-center',
+              'animate-in fade-in-0 duration-300 fill-mode-both'
             )}
           >
             <p className="text-neo-orange text-xs font-bold uppercase tracking-wider mb-1">
@@ -169,31 +151,29 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
             <p className="text-neo-white font-bold text-sm md:text-base">
               {mechanicDescription}
             </p>
-          </AdaptiveMotion.div>
+          </div>
 
           {/* Start Taunt */}
           {startTaunt && (
-            <AdaptiveMotion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+            <p
+              style={{ animationDelay: '0.6s' }}
               className={cn(
                 'text-center text-neo-white italic font-bold',
                 'text-sm md:text-base mb-6',
-                'px-4'
+                'px-4',
+                'animate-in fade-in-0 duration-300 fill-mode-both'
               )}
             >
               &ldquo;{startTaunt}&rdquo;
-            </AdaptiveMotion.p>
+            </p>
           )}
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3 w-full">
             {/* Fight Button */}
-            <AdaptiveMotion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.7, type: 'spring', stiffness: 200, damping: 20 }}
+            <div
+              style={{ animationDelay: '0.7s' }}
+              className="animate-in fade-in-0 duration-300 fill-mode-both"
             >
               <button
                 onClick={onStart}
@@ -210,13 +190,12 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               >
                 {t('adventure.bosses.readyToFight')}
               </button>
-            </AdaptiveMotion.div>
+            </div>
 
             {/* Skip Button */}
-            <AdaptiveMotion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
+            <div
+              style={{ animationDelay: '0.9s' }}
+              className="animate-in fade-in-0 duration-300 fill-mode-both"
             >
               <button
                 onClick={onSkip}
@@ -231,11 +210,11 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               >
                 {t('adventure.bosses.skipIntro')}
               </button>
-            </AdaptiveMotion.div>
+            </div>
           </div>
-        </AdaptiveMotion.div>
+        </div>
       </div>
-    </AdaptiveAnimatePresence>
+    </>
   );
 });
 

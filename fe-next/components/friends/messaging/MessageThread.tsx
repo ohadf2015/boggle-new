@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { X, Target, ChevronLeft, Trash2 } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -133,17 +132,16 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
   if (!thread) return null;
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <m.div
-          initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
+        <div
           className={cn(
             'fixed inset-0 z-50 flex flex-col',
             'pt-[env(safe-area-inset-top)]',
             isDark ? 'bg-neo-navy' : 'bg-white',
-            className
+            className,
+            'animate-in fade-in-0 slide-in-from-right-2 duration-300',
+            isRTL && 'slide-in-from-left-2'
           )}
         >
           {/* Header */}
@@ -237,15 +235,14 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                   const showAvatar = index === filtered.length - 1 || filtered[index + 1]?.fromUserId !== message.fromUserId;
 
                   return (
-                    <m.div
+                    <div
                       key={message.messageId}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.02 }}
                       className={cn(
                         'flex gap-2',
+                        'animate-in fade-in-0 slide-in-from-bottom-2 duration-300',
                         isMine ? (isRTL ? 'justify-start' : 'justify-end') : (isRTL ? 'justify-end' : 'justify-start')
                       )}
+                      style={{ animationDelay: `${index * 0.02}s` }}
                     >
                       {/* Avatar for received messages */}
                       {!isMine && showAvatar && (
@@ -292,11 +289,10 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                       >
                         {/* Delete action menu */}
                         {deleteMenuId === message.messageId && isMine && onDeleteMessage && (
-                          <m.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                          <div
                             className={cn(
-                              'absolute -top-10 inset-e-0 z-10 flex gap-1'
+                              'absolute -top-10 inset-e-0 z-10 flex gap-1',
+                              'animate-in fade-in-0 zoom-in-95 duration-200'
                             )}
                           >
                             <button
@@ -322,7 +318,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                             >
                               <X className="w-3 h-3" />
                             </button>
-                          </m.div>
+                          </div>
                         )}
                         <p className="wrap-break-word whitespace-pre-wrap text-sm">
                           {message.message}
@@ -348,17 +344,16 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                           )}
                         </div>
                       </div>
-                    </m.div>
+                    </div>
                   );
                 })}
 
                 {/* Typing indicator */}
                 {typingUsername && (
-                  <m.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                  <div
                     className={cn(
                       'flex gap-2',
+                      'animate-in fade-in-0 duration-300',
                       isRTL ? 'justify-end' : 'justify-start'
                     )}
                   >
@@ -387,7 +382,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                         )} style={{ animationDelay: '300ms' }} />
                       </div>
                     </div>
-                  </m.div>
+                  </div>
                 )}
 
                 <div ref={messagesEndRef} />
@@ -419,9 +414,9 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
               if (txt) onSendMessage(txt);
             }}
           />
-        </m.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 

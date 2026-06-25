@@ -11,8 +11,6 @@
 
 import { memo, useEffect, useId, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -70,44 +68,37 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
     const hasTitleUnlocks = newTitles.length > 0;
 
     return (
-      <AdaptiveAnimatePresence>
+      <>
         {/* Overlay */}
-        <AdaptiveMotion.div
+        <div
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
           className={cn(
             'fixed inset-0 z-60',
             'flex items-center justify-center',
-            'bg-neo-black/80 backdrop-blur-xs'
+            'bg-neo-black/80 backdrop-blur-xs',
+            'animate-in fade-in-0 duration-300'
           )}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           onClick={onClose}
         >
           {/* Modal Card */}
-          <AdaptiveMotion.div
+          <div
             ref={modalRef}
             className={cn(
               'relative w-full max-w-md mx-4',
               'bg-neo-navy border-4 border-neo-black',
               'rounded-neo shadow-hard-lg',
               'p-6 md:p-8',
-              'text-center'
+              'text-center',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
             )}
-            initial={{ scale: 0, rotate: -5 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: 5 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             {/* Celebration mascot */}
-            <AdaptiveMotion.div
-              className="mb-4"
-              initial={{ scale: 0, rotate: -15 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 12 }}
+            <div
+              className="mb-4 animate-in zoom-in-50 duration-300"
+              style={{ animationDelay: '0.2s' }}
             >
               <SilentVideo
                 src="/mascot/celebration.webp"
@@ -117,7 +108,7 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 preload="metadata"
                 aria-hidden="true"
               />
-            </AdaptiveMotion.div>
+            </div>
 
             {/* Title */}
             <h2
@@ -137,16 +128,15 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
               <p className="text-neo-white font-bold text-lg mb-2">
                 {t('education.xp.newLevel')}
               </p>
-              <AdaptiveMotion.div
+              <div
                 className={cn(
                   'inline-flex items-center justify-center',
                   'w-20 h-20 md:w-24 md:h-24',
                   'bg-neo-pink/20 border-4 border-neo-pink',
-                  'rounded-full'
+                  'rounded-full',
+                  'animate-in zoom-in-50 duration-300'
                 )}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
+                style={{ animationDelay: '0.4s' }}
               >
                 <span
                   className={cn(
@@ -157,44 +147,42 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 >
                   {levelUpData.newLevel}
                 </span>
-              </AdaptiveMotion.div>
+              </div>
             </div>
 
             {/* Title Unlock Section */}
             {hasTitleUnlocks && (
-              <AdaptiveMotion.div
+              <div
                 className={cn(
                   'mb-6 p-4 rounded-neo',
-                  'bg-neo-pink/20 border-neo border-neo-pink'
+                  'bg-neo-pink/20 border-neo border-neo-pink',
+                  'animate-in fade-in-0 slide-in-from-bottom-2 duration-300'
                 )}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                style={{ animationDelay: '0.6s' }}
               >
                 <p className="text-neo-pink font-bold text-sm uppercase tracking-wide mb-2">
                   {t('education.xp.newTitleUnlocked')}
                 </p>
                 <div className="space-y-1">
                   {newTitles.map((title, index) => (
-                    <AdaptiveMotion.p
+                    <p
                       key={title}
                       className={cn(
                         'text-lg md:text-xl font-black',
-                        'text-neo-white'
+                        'text-neo-white',
+                        'animate-in fade-in-0 slide-in-from-left-2 duration-300 fill-mode-both'
                       )}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.7 + index * 0.1 }}
+                      style={{ animationDelay: `${0.7 + index * 0.1}s` }}
                     >
                       {title}
-                    </AdaptiveMotion.p>
+                    </p>
                   ))}
                 </div>
-              </AdaptiveMotion.div>
+              </div>
             )}
 
             {/* Continue Button */}
-            <AdaptiveMotion.button
+            <button
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',
@@ -204,17 +192,16 @@ const LevelUpCelebration = memo<LevelUpCelebrationProps>(
                 'shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5',
                 'active:translate-y-0.5 active:shadow-hard-pressed',
                 'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
-                'transition-all duration-200'
+                'transition-all duration-200',
+                'animate-in fade-in-0 slide-in-from-bottom-2 duration-300'
               )}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
+              style={{ animationDelay: '0.8s' }}
             >
               {t('education.xp.continue')}
-            </AdaptiveMotion.button>
-          </AdaptiveMotion.div>
-        </AdaptiveMotion.div>
-      </AdaptiveAnimatePresence>
+            </button>
+          </div>
+        </div>
+      </>
     );
   }
 );
