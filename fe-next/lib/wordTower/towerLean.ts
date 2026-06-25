@@ -45,6 +45,19 @@ export function leanFromOffsets(offsets: readonly number[]): number {
   return clamp(avg * LEAN_MAX_DEG, -LEAN_MAX_DEG, LEAN_MAX_DEG);
 }
 
+/**
+ * Pull the rolling lean window toward upright by `resetMult` (≥1). Each stored
+ * offset is divided by the multiplier, so the recent-weighted average — and thus
+ * the visible lean — shrinks toward 0. A clean drop already nudges the tower
+ * straighter (it appends a ~centred offset); this lets the Quick Recovery upgrade
+ * make that straightening visibly FASTER. `resetMult` of 1 is a no-op (returns a
+ * copy unchanged) so the base game is untouched.
+ */
+export function relaxLean(offsets: readonly number[], resetMult: number): number[] {
+  if (!(resetMult > 1)) return [...offsets];
+  return offsets.map((o) => o / resetMult);
+}
+
 /** Lean magnitude (deg) at/above which a clean drop counts as a NEAR MISS — the
  *  tower looked dangerously drunk (≥75% of the cap) but didn't topple. Drives
  *  the near-miss FX bump in WordTowerPlay. */

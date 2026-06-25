@@ -32,12 +32,18 @@ export const SWAY_MAX_DEG = 3.4;
  *  cosmetic {@link swayJitterDeg} layer covers the even-lower band below this. */
 export const SWAY_START_INSTABILITY = 0.18;
 /** Sway oscillation period (ms): calmer when barely unstable, frantic at the
- *  brink. Slowed a touch so the swing reads as a heavy lean, not a jitter. */
-export const SWAY_PERIOD_CALM_MS = 1600;
-export const SWAY_PERIOD_FRANTIC_MS = 1050;
+ *  brink. Slowed substantially (was 1600/1050) so even a very shaky tower sways
+ *  like a heavy, real structure under strain — a slow, weighty lean rather than a
+ *  fast nervous wobble (founder 2026-06-25: "it moves too quickly and weird when
+ *  it isn't stable — it should shake but not too fast, it should look real"). */
+export const SWAY_PERIOD_CALM_MS = 2600;
+export const SWAY_PERIOD_FRANTIC_MS = 1650;
 /** How far (in crane [-1,1] error space) the top shifts at the max sway angle.
- *  Lowered with the angle so the landing target drifts calmly, not jumpily. */
-export const SWAY_OFFSET_AT_MAX = 0.26;
+ *  Lowered (0.26→0.20) so the landing target stays nearer the centre even on a
+ *  shaky tower — the player can still reliably reach the GREEN window while it
+ *  sways (founder 2026-06-25: "make it possible to drop on the green part").
+ *  WYSIWYG holds: the reticle + landing shadow read this same offset. */
+export const SWAY_OFFSET_AT_MAX = 0.20;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 const clamp01 = (n: number) => clamp(n, 0, 1);
@@ -125,10 +131,11 @@ export function swayNormalizedOffset(angleDeg: number): number {
 /** Peak amplitude (deg) of the cosmetic micro-jitter — kept tiny so it reads as
  *  "structure under strain" shimmer, NOT a frantic vibration, and never large
  *  enough to meaningfully move the landing target. */
-export const SWAY_JITTER_MAX_DEG = 0.3;
-/** The jitter runs much faster than the main sway (a high-freq tremor). */
-const JITTER_PERIOD_A_MS = 190;
-const JITTER_PERIOD_B_MS = 310;
+export const SWAY_JITTER_MAX_DEG = 0.26;
+/** The jitter runs faster than the main sway (a tremor) — but slowed from the old
+ *  190/310 ms so it reads as "structure flexing under load", not an electric buzz. */
+const JITTER_PERIOD_A_MS = 280;
+const JITTER_PERIOD_B_MS = 450;
 /** Instability at which the jitter reaches its full amplitude — set BELOW the
  *  main sway gate so the band 0..{@link SWAY_START_INSTABILITY} already shimmers
  *  with nervous energy before the heavy pendulum sway kicks in. */

@@ -46,9 +46,12 @@ const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
  * {@link evaluatePlacement} reuses it so the live preview can never disagree with
  * the verdict that follows the drop.
  */
-export function alignmentBand(offset: number): PlacementQuality {
+export function alignmentBand(offset: number, perfectBandBonus = 0): PlacementQuality {
   const e = clamp01(offset);
-  if (e <= PERFECT_MAX) return 'perfect';
+  // `perfectBandBonus` (the Wide Footing upgrade) widens ONLY the perfect window,
+  // so buying it makes nailing the green sweet-spot reliably easier — never the
+  // good/sloppy edges, so a clear miss is still a miss.
+  if (e <= PERFECT_MAX + Math.max(0, perfectBandBonus)) return 'perfect';
   if (e <= GOOD_MAX) return 'good';
   if (e <= SLOPPY_MAX) return 'sloppy';
   return 'miss';
@@ -62,10 +65,11 @@ export function alignmentBand(offset: number): PlacementQuality {
 export function evaluatePlacement(
   offset: number,
   consecutiveSloppy: number,
+  perfectBandBonus = 0,
 ): PlacementOutcome {
   const e = clamp01(offset);
 
-  switch (alignmentBand(e)) {
+  switch (alignmentBand(e, perfectBandBonus)) {
     case 'perfect':
       return { quality: 'perfect', overlap: 1, heightMultiplier: 1.4, perfect: true, topples: false };
     case 'good':
