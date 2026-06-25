@@ -7,7 +7,13 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { generateBotName } from './botCreation';
 import { CELEBRITY_BOTS, CELEBRITY_CHANCE } from './botCelebrities';
-import { customAvatarSchema } from '@/shared/types/customAvatar';
+import {
+  customAvatarSchema,
+  isLegendaryPart,
+  isPremiumPart,
+  getPartPrice,
+  getRandomAvatarConfig,
+} from '@/shared/types/customAvatar';
 
 describe('celebrity bots', () => {
   afterEach(() => vi.restoreAllMocks());
@@ -51,5 +57,26 @@ describe('celebrity bots', () => {
     const { name } = generateBotName('easy', [], 'en');
     const isCeleb = CELEBRITY_BOTS.some((c) => name.includes(c.name));
     expect(isCeleb).toBe(false);
+  });
+});
+
+describe('celebrity legendary part gating (bots free, players pay)', () => {
+  it('trumpSwoop is a legendary, premium, priced part', () => {
+    expect(isLegendaryPart('hair', 'trumpSwoop')).toBe(true);
+    expect(isPremiumPart('hair', 'trumpSwoop')).toBe(true);
+    expect(getPartPrice('hair', 'trumpSwoop')).toBeGreaterThanOrEqual(5000);
+  });
+
+  it('the Trump bot wears the legendary trumpSwoop (bots bypass purchase via config)', () => {
+    const trump = CELEBRITY_BOTS.find((c) => c.name === 'Trump');
+    expect(trump?.customAvatar.hair).toBe('trumpSwoop');
+    // render path is ownership-agnostic: a valid config renders regardless of tier
+    expect(customAvatarSchema.safeParse(trump?.customAvatar).success).toBe(true);
+  });
+
+  it('never hands a legendary celebrity part to a free random player avatar', () => {
+    for (let i = 0; i < 200; i++) {
+      expect(getRandomAvatarConfig().hair).not.toBe('trumpSwoop');
+    }
   });
 });

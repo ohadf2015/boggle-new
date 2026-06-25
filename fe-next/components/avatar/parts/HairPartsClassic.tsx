@@ -175,6 +175,30 @@ function Combover({ fill }: HairPartProps) {
   );
 }
 
+function TrumpSwoop({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  // Signature bouffant comb-over: SOLID voluminous mass over the whole crown,
+  // swept diagonally with a forward flap dipping low over one brow.
+  const cap = "M15 39 Q11 12 42 6 Q73 2 87 21 Q90 30 82 39 Q80 31 70 31 Q52 31 36 33 Q24 35 15 39Z";
+  const fringe = "M17 33 Q23 45 47 42 Q68 39 80 30 Q83 39 72 45 Q50 51 29 46 Q19 43 17 33Z";
+  return (
+    <g>
+      <defs><HairPolishDefs uid={u} keyName="trumpSwoop" /></defs>
+      {/* Solid bouffant crown */}
+      <path d={cap} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <HairPolish uid={u} keyName="trumpSwoop" d={cap} />
+      {/* Forward comb-over flap overhanging the brow (asymmetric dip) */}
+      <path d={fringe} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      {/* Diagonal sweep texture */}
+      <path d="M24 16 Q48 7 74 13" fill="none" stroke="#000" strokeWidth={0.9} opacity="0.14" />
+      <path d="M22 24 Q46 15 72 21" fill="none" stroke="#000" strokeWidth={0.9} opacity="0.12" />
+      <path d="M24 31 Q46 24 70 29" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.1" />
+      {/* Crest rim-light */}
+      <path d="M28 9 Q52 2 74 10" fill="none" stroke="#fff" strokeWidth={1.6} opacity="0.24" strokeLinecap="round" />
+    </g>
+  );
+}
+
 function Elvis({ fill }: HairPartProps) {
   const u = useAvatarUid();
   const pompadour = "M28 32 Q26 10 40 2 Q52 0 60 8 Q64 16 56 26 Q48 34 38 36";
@@ -310,5 +334,5 @@ function Bob({ fill }: HairPartProps) {
 
 export const HAIR_PARTS_CLASSIC = {
   spiky: Spiky, curly: Curly, buzz: Buzz, mohawk: Mohawk, topknot: Topknot,
-  ponytail: Ponytail, combover: Combover, elvis: Elvis, ramen: Ramen, long: Long, bob: Bob,
+  ponytail: Ponytail, combover: Combover, trumpSwoop: TrumpSwoop, elvis: Elvis, ramen: Ramen, long: Long, bob: Bob,
 } as const;

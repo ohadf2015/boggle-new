@@ -27,7 +27,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     name: 'Trump', emoji: '🇺🇸', color: '#FF6B35',
     customAvatar: {
       gender: 'male', base: 'round', skinColor: '#D08B5B',
-      hair: 'combover', hairColor: '#E8C07A',
+      hair: 'trumpSwoop', hairColor: '#E8C07A',
       eyes: 'squint', eyeColor: '#3B82F6', noseStyle: 'wide', eyebrows: 'thin',
       facialHair: 'none', mouth: 'smirk',
       accessory: 'none', accessoryColor: '#FFD700',

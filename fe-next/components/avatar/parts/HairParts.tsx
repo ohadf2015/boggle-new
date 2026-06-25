@@ -31,6 +31,7 @@ export const HAIR_PARTS = {
   twintails: HAIR_PARTS_VOLUME.twintails,
   mullet: HAIR_PARTS_VOLUME.mullet,
   combover: HAIR_PARTS_CLASSIC.combover,
+  trumpSwoop: HAIR_PARTS_CLASSIC.trumpSwoop,
   elvis: HAIR_PARTS_CLASSIC.elvis,
   ramen: HAIR_PARTS_CLASSIC.ramen,
   flame: HAIR_PARTS_FANTASY.flame,
