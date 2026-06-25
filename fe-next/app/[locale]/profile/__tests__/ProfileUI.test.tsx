@@ -14,6 +14,10 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 
+// Stub the rewarded-ad gold button — its AdMob/useRewardedAd machinery is
+// irrelevant to these title-sizing assertions and pulls in unmocked context.
+vi.mock('@/components/ads/RewardedAdGoldButton', () => ({ __esModule: true, default: () => null, RewardedAdGoldButton: () => null }));
+
 const createWrapper = () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -92,6 +96,7 @@ vi.mock('framer-motion', () => ({
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
   PanInfo: {},
+  useReducedMotion: () => false,
 }));
 
 vi.mock('@/contexts/CoinContext', () => ({

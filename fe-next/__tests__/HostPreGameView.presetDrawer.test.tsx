@@ -12,6 +12,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import HostPreGameView from '../host/components/HostPreGameView';
 import type { DifficultyLevel } from '@/shared/types/game';
+import { MusicProvider } from '../contexts/MusicContext';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => {
@@ -159,12 +160,14 @@ describe('HostPreGameView Game Mode Selection', () => {
     const setMinWordLength = vi.fn();
 
     render(
-      <HostPreGameView
-        {...defaultProps}
-        setTimerValue={setTimerValue}
-        setDifficulty={setDifficulty}
-        setMinWordLength={setMinWordLength}
-      />
+      <MusicProvider>
+        <HostPreGameView
+          {...defaultProps}
+          setTimerValue={setTimerValue}
+          setDifficulty={setDifficulty}
+          setMinWordLength={setMinWordLength}
+        />
+      </MusicProvider>
     );
 
     await waitFor(() => {
@@ -175,7 +178,7 @@ describe('HostPreGameView Game Mode Selection', () => {
   });
 
   it('renders game mode buttons visible without needing to expand', () => {
-    render(<HostPreGameView {...defaultProps} />);
+    render(<MusicProvider><HostPreGameView {...defaultProps} /></MusicProvider>);
 
     // Game mode cards should be visible immediately (no collapse)
     const gameModeButtons = screen.getAllByTestId(/^game-mode-/);
@@ -184,7 +187,7 @@ describe('HostPreGameView Game Mode Selection', () => {
 
 
   it('game mode buttons are clickable', () => {
-    render(<HostPreGameView {...defaultProps} />);
+    render(<MusicProvider><HostPreGameView {...defaultProps} /></MusicProvider>);
 
     const wordHuntButtons = screen.getAllByTestId('game-mode-word-hunt');
     fireEvent.click(wordHuntButtons[0]);

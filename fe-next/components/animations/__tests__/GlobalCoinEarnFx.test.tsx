@@ -7,7 +7,7 @@
  *
  * `rand` is injected so the casino surprise-jackpot roll is deterministic here.
  */
-import { render, screen, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor, cleanup } from '@testing-library/react';
 
 const {
   playCoinCollectMock, playCoinCascadeMock, spawnCoinStreamMock,
@@ -79,11 +79,18 @@ describe('GlobalCoinEarnFx', () => {
     playCoinCollectMock.mockClear();
     playCoinCascadeMock.mockClear();
     spawnCoinStreamMock.mockClear();
+    coinsMock.mockClear();
+    calmMock.mockClear();
     isInitializedMock.mockReturnValue(true);
     isNativeMock.mockReturnValue(false);
     reducedMock.mockReturnValue(false);
     coinsMock.mockReturnValue(5000);
     calmMock.mockReturnValue('full');
+    removeExtraChildren();
+  });
+
+  afterEach(() => {
+    cleanup();
     removeExtraChildren();
   });
 
@@ -143,12 +150,26 @@ describe('GlobalCoinEarnFx', () => {
   });
 
   it('renders the CoinRewardHud counter that rolls up to the new total, with +delta', async () => {
-    coinsMock.mockReturnValue(5000);
-    render(<GlobalCoinEarnFx rand={noSurprise} />);
-    fire({ amount: 200 });
-    expect(screen.getByTestId('coin-reward-hud')).toBeInTheDocument();
-    expect(screen.getByTestId('coin-hud-delta')).toHaveTextContent('+200');
-    await waitFor(() => expect(screen.getByTestId('coin-hud-total')).toHaveTextContent('5,000'));
+    vi.useFakeTimers();
+    try {
+      // GlobalCoinEarnFx captures coinsRef.current when the event fires, which should be
+      // the post-transaction balance (i.e., after the coins context has been updated).
+      // So we render with the NEW balance (5,000) that would result from the +200 event.
+      coinsMock.mockReturnValue(5000);
+      render(<GlobalCoinEarnFx rand={noSurprise} />);
+      fire({ amount: 200 });
+      expect(screen.getByTestId('coin-reward-hud')).toBeInTheDocument();
+      expect(screen.getByTestId('coin-hud-delta')).toHaveTextContent('+200');
+      // Advance timers to let the animation complete (countDuration=800ms by default)
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      // The HUD shows total (current balance) which is 5,000, after animating from
+      // startValue (5000-200=4800) to total (5000).
+      expect(screen.getByTestId('coin-hud-total')).toHaveTextContent('5,000');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('renders the HUD even under reduced motion (toast replacement), no particles', () => {

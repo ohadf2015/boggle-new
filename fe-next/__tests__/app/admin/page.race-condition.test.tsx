@@ -79,6 +79,24 @@ vi.mock('@/components/admin/sidebar/AdminSidebar', () => ({
 vi.mock('@/components/admin/sidebar/AdminBottomNav', () => ({
   AdminBottomNav: () => <div data-testid="admin-bottom-nav">AdminBottomNav</div>,
 }));
+vi.mock('@/components/admin/overview/InsightsPanel', () => ({
+  InsightsPanel: () => <div data-testid="insights-panel">InsightsPanel</div>,
+}));
+vi.mock('@/components/admin/overview/GameModePopularity', () => ({
+  GameModePopularity: () => <div data-testid="game-mode-popularity">GameModePopularity</div>,
+}));
+vi.mock('@/components/admin/overview/MpModeBreakdown', () => ({
+  MpModeBreakdown: () => <div data-testid="mp-mode-breakdown">MpModeBreakdown</div>,
+}));
+vi.mock('@/components/admin/overview/DailyActivityChart', () => ({
+  DailyActivityChart: () => <div data-testid="daily-activity-chart">DailyActivityChart</div>,
+}));
+vi.mock('@/components/admin/overview/DeploymentInfoPanel', () => ({
+  DeploymentInfoPanel: () => <div data-testid="deployment-info-panel">DeploymentInfoPanel</div>,
+}));
+vi.mock('@/components/admin/IndexNowPanel', () => ({
+  IndexNowPanel: () => <div data-testid="index-now-panel">IndexNowPanel</div>,
+}));
 vi.mock('@/components/ui/Loader', () => ({
   Loader: ({ text }: { text?: string }) => <div>{text}</div>,
 }));

@@ -62,7 +62,10 @@ function buildScores(scenario: Scenario): { scores: Player[]; rank: number; winn
       const below = [240, 205, 188].map((s, i) => mkPlayer(NAMES[i + 4], s));
       return { scores: [...above, you, ...below], rank: 5, winner: false };
     }
-    case 'solo': {
+    case 'solo':
+    default: {
+      // blast_scene / wheel_scene render their own scene and ignore this;
+      // return a solo default so every Scenario has a return path.
       you.score = 287;
       return { scores: [you], rank: 1, winner: true };
     }

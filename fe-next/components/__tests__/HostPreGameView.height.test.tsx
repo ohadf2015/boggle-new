@@ -6,6 +6,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import HostPreGameView from '../../host/components/HostPreGameView';
 import { SocketContext } from '../../utils/SocketContext';
+import { MusicProvider } from '../../contexts/MusicContext';
 
 // Mock next/navigation
 vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
@@ -126,9 +127,11 @@ describe('HostPreGameView Height Constraint', () => {
 
   it('should use flex-1 instead of h-dvh to fit within parent container', () => {
     const { container } = render(
-      <SocketContext.Provider value={socketContextValue}>
-        <HostPreGameView {...defaultProps} />
-      </SocketContext.Provider>
+      <MusicProvider>
+        <SocketContext.Provider value={socketContextValue}>
+          <HostPreGameView {...defaultProps} />
+        </SocketContext.Provider>
+      </MusicProvider>
     );
 
     // Get the root div of HostPreGameView
@@ -142,9 +145,11 @@ describe('HostPreGameView Height Constraint', () => {
 
   it('should have proper flex layout structure for content containment', () => {
     const { container } = render(
-      <SocketContext.Provider value={socketContextValue}>
-        <HostPreGameView {...defaultProps} />
-      </SocketContext.Provider>
+      <MusicProvider>
+        <SocketContext.Provider value={socketContextValue}>
+          <HostPreGameView {...defaultProps} />
+        </SocketContext.Provider>
+      </MusicProvider>
     );
 
     const rootDiv = container.firstChild as HTMLElement;

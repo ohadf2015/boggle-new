@@ -89,6 +89,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
                 'animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both'
               )}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={boss.imagePath}
                 alt={bossName}

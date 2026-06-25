@@ -101,6 +101,7 @@ vi.mock('../../host/components/tv-broadcast/TvTutorialOverlay', () => ({
 import HostPreGameView from '../../host/components/HostPreGameView';
 import PlayerWaitingView from '../../player/components/PlayerWaitingView';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MusicProvider } from '../../contexts/MusicContext';
 
 const mockT = (key: string) => key;
 
@@ -149,7 +150,7 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
     };
 
     it('should have mobile layout hidden on desktop (lg screens)', () => {
-      render(<HostPreGameView {...defaultHostProps} />, { wrapper: createWrapper() });
+      render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
 
       // The mobile single-scroll container has lg:hidden class
       const desktopLayout = screen.getByTestId('desktop-lobby-layout');
@@ -160,7 +161,7 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
     });
 
     it('should have start button in both desktop and mobile layouts', () => {
-      render(<HostPreGameView {...defaultHostProps} />, { wrapper: createWrapper() });
+      render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
 
       // StartButton renders t('hostView.startBattle') which returns 'hostView.startBattle' via mockT
       const startButtons = screen.getAllByRole('button', { name: /startBattle/i });
@@ -184,7 +185,7 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
     });
 
     it('should have desktop layout with two-column grid', () => {
-      render(<HostPreGameView {...defaultHostProps} />, { wrapper: createWrapper() });
+      render(<MusicProvider><HostPreGameView {...defaultHostProps} /></MusicProvider>, { wrapper: createWrapper() });
 
       const desktopLayout = screen.getByTestId('desktop-lobby-layout');
 
@@ -218,7 +219,7 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
     };
 
     it('should have mobile layout hidden on desktop (lg screens)', () => {
-      render(<PlayerWaitingView {...defaultPlayerProps} />, { wrapper: createWrapper() });
+      render(<MusicProvider><PlayerWaitingView {...defaultPlayerProps} /></MusicProvider>, { wrapper: createWrapper() });
 
       // The mobile single-scroll container has lg:hidden class
       const desktopLayout = screen.getByTestId('desktop-lobby-layout');
@@ -229,7 +230,7 @@ describe('Multiplayer Lobby Mobile/Desktop Layout Split', () => {
     });
 
     it('should have desktop two-column layout with chat', () => {
-      render(<PlayerWaitingView {...defaultPlayerProps} />, { wrapper: createWrapper() });
+      render(<MusicProvider><PlayerWaitingView {...defaultPlayerProps} /></MusicProvider>, { wrapper: createWrapper() });
 
       // Desktop layout renders chat area
       const chatArea = screen.queryByTestId('desktop-chat-area');

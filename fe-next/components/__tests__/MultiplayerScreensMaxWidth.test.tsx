@@ -5,6 +5,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MusicProvider } from '../../contexts/MusicContext';
 
 // Mock hooks that require providers
 vi.mock('../../utils/SocketContext', () => ({
@@ -103,7 +104,7 @@ describe('Multiplayer Screens Max Width', () => {
         tournamentCreating: false,
       };
 
-      const { container } = render(<HostPreGameView {...mockProps} />, { wrapper: createWrapper() });
+      const { container } = render(<MusicProvider><HostPreGameView {...mockProps} /></MusicProvider>, { wrapper: createWrapper() });
 
       // The root should have a max-width constraint for desktop
       const rootDiv = container.firstChild as HTMLElement;
@@ -138,7 +139,7 @@ describe('Multiplayer Screens Max Width', () => {
         onConfirmExit: vi.fn(),
       };
 
-      const { container } = render(<PlayerWaitingView {...mockProps} />, { wrapper: createWrapper() });
+      const { container } = render(<MusicProvider><PlayerWaitingView {...mockProps} /></MusicProvider>, { wrapper: createWrapper() });
 
       // The root container should have max-width constraint for desktop
       const rootDiv = container.firstChild as HTMLElement;
