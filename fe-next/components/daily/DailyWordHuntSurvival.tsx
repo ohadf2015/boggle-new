@@ -41,6 +41,7 @@ import {
 import { SurvivalDesktopLayout } from './survival/SurvivalDesktopLayout';
 import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 
 const EXTRA_LIFE_RESTORE_AMOUNT = 50;
 const EXTRA_LIFE_COIN_COST = 50;
@@ -397,6 +398,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <PracticeCoachTip mode="wordHunt" wordsFound={state.discoveredWords.length} />
           </div>
         )}
+        {!practice && <ModeCoach mode="wordHunt" />}
         {/* react-rewards anchor — must exist in DOM for reward confetti to target */}
         <span id={rewardId} className="fixed top-1/2 left-1/2 pointer-events-none" />
         <SurvivalDesktopLayout
@@ -499,6 +501,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           <PracticeCoachTip mode="wordHunt" wordsFound={state.discoveredWords.length} />
         </div>
       )}
+      {!practice && <ModeCoach mode="wordHunt" />}
 
       {/* Top bar */}
       <SurvivalHeader

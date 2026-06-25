@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import posthog from '@/lib/analytics/lazyPosthog';
 import {
   COACH_VERSION,
   hasSeenCoach,
@@ -9,6 +10,9 @@ import {
   type CoachStorage,
 } from '@/lib/tutorial/modeCoachStore';
 import { getModeCoach } from '@/lib/tutorial/modeCoachContent';
+
+/** Why the coach closed — lets us tell "read it" from "tapped past it" in data. */
+export type CoachDismissReason = 'skip' | 'board_touch' | 'escape' | 'completed';
 
 function browserStorage(): CoachStorage | null {
   if (typeof window === 'undefined') return null;
@@ -24,10 +28,10 @@ export interface UseModeCoach {
   visible: boolean;
   stepIndex: number;
   isLastStep: boolean;
-  /** Advance to the next step, or dismiss when on the last one. */
+  /** Advance to the next step, or dismiss (reason=completed) on the last one. */
   advance: () => void;
-  /** Close immediately (Skip / first action / done). */
-  dismiss: () => void;
+  /** Close immediately. `reason` defaults to 'skip'. */
+  dismiss: (reason?: CoachDismissReason) => void;
 }
 
 /**
@@ -46,6 +50,11 @@ export function useModeCoach(
 
   const [visible, setVisible] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  // Guards one `mode_coach_dismissed` per show cycle (advance + dismiss + the
+  // board-tap listener can all race to close). Reset when the coach shows.
+  const dismissedRef = useRef(false);
+  const stepRef = useRef(0);
+  stepRef.current = stepIndex;
 
   // First-visit detection runs in an effect so SSR and first client render
   // agree (nothing rendered) — no hydration mismatch.
@@ -57,7 +66,9 @@ export function useModeCoach(
     const timer = window.setTimeout(() => {
       setStepIndex(0);
       setVisible(true);
+      dismissedRef.current = false;
       markCoachSeen(mode, COACH_VERSION, storage); // mark-on-show: abandon-safe
+      posthog.capture('mode_coach_shown', { mode });
       onShown?.();
     }, settleMs);
     return () => window.clearTimeout(timer);
@@ -65,17 +76,30 @@ export function useModeCoach(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, content, settleMs]);
 
-  const dismiss = useCallback(() => setVisible(false), []);
+  const close = useCallback(
+    (reason: CoachDismissReason) => {
+      if (dismissedRef.current) return;
+      dismissedRef.current = true;
+      posthog.capture('mode_coach_dismissed', { mode, reason, step: stepRef.current });
+      setVisible(false);
+    },
+    [mode],
+  );
+
+  const dismiss = useCallback(
+    (reason: CoachDismissReason = 'skip') => close(reason),
+    [close],
+  );
 
   const advance = useCallback(() => {
     setStepIndex((i) => {
       if (i >= stepCount - 1) {
-        setVisible(false);
+        close('completed');
         return i;
       }
       return i + 1;
     });
-  }, [stepCount]);
+  }, [stepCount, close]);
 
   const isLastStep = stepIndex >= stepCount - 1;
 

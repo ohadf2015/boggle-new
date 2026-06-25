@@ -29,6 +29,7 @@ import { useHighlightStore } from '@/stores/highlightStore';
 import { rankMoments } from '@/lib/blast/highlightScoring';
 import type { Language } from '@/shared/types/game';
 import { Button } from '@/components/ui/button';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { saveBlastResult } from './utils/saveBlastResult';
 
 /**
@@ -382,6 +383,7 @@ export function BlastView() {
               onToggle={mascotPref.toggle}
             />
           </div>
+          <ModeCoach mode="blast" />
         </>
       )}
 

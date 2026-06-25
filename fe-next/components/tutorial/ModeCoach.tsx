@@ -55,7 +55,7 @@ export function ModeCoach({ mode, onShown, graceMs = 1500 }: ModeCoachProps) {
   useEffect(() => {
     if (!visible) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') dismiss();
+      if (e.key === 'Escape') dismiss('escape');
     };
     let armed = false;
     const arm = window.setTimeout(() => {
@@ -67,7 +67,7 @@ export function ModeCoach({ mode, onShown, graceMs = 1500 }: ModeCoachProps) {
       // listener is capture-phase, so guard by DOM containment, not React's
       // bubble-phase stopPropagation (which runs too late to help here).
       if (cardRef.current?.contains(e.target as Node)) return;
-      if (armed) dismiss();
+      if (armed) dismiss('board_touch');
     };
     window.addEventListener('keydown', onKey);
     window.addEventListener('pointerdown', onPointer, { capture: true });
@@ -110,7 +110,7 @@ export function ModeCoach({ mode, onShown, graceMs = 1500 }: ModeCoachProps) {
               </h3>
               <button
                 type="button"
-                onClick={dismiss}
+                onClick={() => dismiss('skip')}
                 aria-label={t('modeCoach.skip')}
                 className="shrink-0 font-neo-body text-xs font-bold text-neo-white/50 underline-offset-2 hover:text-neo-white hover:underline"
               >
