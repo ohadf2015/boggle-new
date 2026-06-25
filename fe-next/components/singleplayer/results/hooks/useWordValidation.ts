@@ -5,6 +5,30 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAutoShowWithInteraction } from '@/hooks/useAutoShowWithInteraction';
 
+/**
+ * Session-scoped flag so the dictionary-help prompt is shown at most once per
+ * browser session, no matter how many games the player finishes in that session.
+ */
+const SESSION_SHOWN_KEY = 'lc_dictionary_help_shown';
+
+function hasShownThisSession(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.sessionStorage.getItem(SESSION_SHOWN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markShownThisSession(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.setItem(SESSION_SHOWN_KEY, '1');
+  } catch {
+    // sessionStorage unavailable (private mode / blocked) — fail open, no crash.
+  }
+}
+
 interface UseWordValidationParams {
   botWordsForValidation?: string[];
   gameSessionId?: string;
@@ -28,17 +52,26 @@ export function useWordValidation({
   const [wordValidationQueue, setWordValidationQueue] = useState<string[]>([]);
   const [showWordValidation, setShowWordValidation] = useState(false);
 
-  // Initialize queue from bot words
+  // Initialize queue from bot words — only ever ask about a single word so the
+  // prompt is "show once", not a multi-word sequence.
   useEffect(() => {
     if (!botWordsForValidation || botWordsForValidation.length === 0) return;
-    setWordValidationQueue(botWordsForValidation.slice(0, 2));
+    setWordValidationQueue(botWordsForValidation.slice(0, 1));
   }, [botWordsForValidation]);
 
-  // Auto-show validation modal after interaction delay
+  // Auto-show validation modal only after the player has interacted with the
+  // page for 7s, and at most once per browser session.
   useAutoShowWithInteraction({
-    enabled: !disabled && wordValidationQueue.length > 0 && !showWordValidation,
-    delayMs: 5000,
-    onTrigger: () => setShowWordValidation(true),
+    enabled:
+      !disabled &&
+      wordValidationQueue.length > 0 &&
+      !showWordValidation &&
+      !hasShownThisSession(),
+    delayMs: 7000,
+    onTrigger: () => {
+      markShownThisSession();
+      setShowWordValidation(true);
+    },
   });
 
   const handleWordVote = useCallback(async (voteType: 'like' | 'dislike', word?: string) => {
