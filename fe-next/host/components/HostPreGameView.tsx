@@ -8,7 +8,9 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
-import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
+import { LobbyAvatarRewardButton } from '@/components/avatar/LobbyAvatarRewardButton';
+import { EmoteTray } from '@/player/components/lobby/EmoteTray';
+import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 
@@ -26,7 +28,6 @@ import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
 import { GameInstructions } from './pre-game/GameInstructions';
 import TvTutorialOverlay, { isTvTutorialComplete } from './tv-broadcast/TvTutorialOverlay';
 import { ChatBubble } from './pre-game/ChatBubble';
-import { LobbyReactions } from '@/components/lobby/LobbyReactions';
 import dynamic from 'next/dynamic';
 const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
@@ -193,6 +194,27 @@ function HostPreGameView({
   }, [username, onNameChange]);
 
   const handleOpenAvatarBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
+
+  // Lobby emotes — the host changes their OWN avatar's emotion (face-swap) and
+  // the server echoes it to the whole room. Replaces the old floating-emoji FAB:
+  // the expression lives ON the avatar, the same affordance every player has.
+  const { sendEmote, cooldownActive } = useLobbyEmotes({ socket });
+
+  // Self-only lobby actions rendered beneath the roster avatars: an emote picker
+  // (change your avatar's emotion) + the rewarded daily-avatar-part claim. The
+  // avatar-part ad replaces the redundant "+20 gold" lobby ad — an ad that earns
+  // a piece of the avatar, surfaced right where the avatar lives.
+  const selfRosterActions = (
+    <div className="flex flex-col items-center gap-2 pt-1">
+      <div className="w-full space-y-1.5">
+        <h4 className="px-1 text-center text-[10px] font-bold uppercase tracking-widest text-neo-cream/50">
+          {t('lobby.emote.title')}
+        </h4>
+        <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} />
+      </div>
+      <LobbyAvatarRewardButton />
+    </div>
+  );
 
   const [hasInitialized, setHasInitialized] = useState(false);
   const [showTvTutorial, setShowTvTutorial] = useState(false);
@@ -610,6 +632,7 @@ function HostPreGameView({
                     onSelfNameChange={handleSelfNameChange}
                     canEditSelfName={!isAuthenticated}
                     headerExtra={tvModeToggle}
+                    selfActions={selfRosterActions}
                   />
                 </div>
                 <div className="animate-fade-in-up" style={{ animationDelay: '80ms' }}>
@@ -650,7 +673,6 @@ function HostPreGameView({
               </p>
             )}
             <div className="flex items-center gap-3">
-              <LobbyRewardCluster surface="host_waiting" />
               <div className="flex-1">
                 <StartButton
                   onStartGame={handleStartClick}
@@ -684,6 +706,7 @@ function HostPreGameView({
                 onSelfAvatarClick={handleOpenAvatarBuilder}
                 onSelfNameChange={handleSelfNameChange}
                 canEditSelfName={!isAuthenticated}
+                selfActions={selfRosterActions}
               />
               <BattleModeCard
                 selectedGameMode={selectedGameMode}
@@ -710,9 +733,6 @@ function HostPreGameView({
               </p>
             )}
             <div className="max-w-[600px] mx-auto flex flex-col short:flex-row short:items-stretch gap-2">
-              <div className="short:shrink-0 short:w-auto">
-                <LobbyRewardCluster surface="host_waiting" />
-              </div>
               <div className="short:flex-1 short:min-w-0">
                 <StartButton
                   onStartGame={handleStartClick}
@@ -737,18 +757,6 @@ function HostPreGameView({
         premium={avatarPremium}
       />
       <ChatBubble gameCode={gameCode} username={username} isHost t={t} />
-      {/* The host is a present person on their own device (true cast-to-TV is the
-          separate tv-broadcast/ components), so they can fling emoji whether they
-          play or just run the scoreboard — same ambient delight as every player.
-          Anchor the trigger as a fixed floating button mirroring the chat bubble on
-          the opposite (start) corner — otherwise it drops into document flow and
-          orphans as a lone emoji below the sticky start bar, breaking the layout. */}
-      <div
-        data-testid="host-lobby-emote-fab"
-        className="fixed bottom-20 start-4 lg:bottom-6 lg:start-6 z-40"
-      >
-        <LobbyReactions username={username} />
-      </div>
     </div>
   );
 }

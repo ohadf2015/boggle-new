@@ -1,10 +1,10 @@
 import { vi } from 'vitest';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import HostPreGameView from '../components/HostPreGameView';
 
 const emitMock = vi.fn();
-const mockSocket = { emit: emitMock } as unknown as { emit: (...args: unknown[]) => void };
+const mockSocket = { emit: emitMock, on: vi.fn(), off: vi.fn() } as unknown as { emit: (...args: unknown[]) => void };
 
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: mockSocket }),
@@ -66,7 +66,11 @@ vi.mock('../components/pre-game/PresetSelector', () => ({
     challenge: { timer: 5, difficulty: 'HARD', nameKey: 'hostView.presetPro' },
   },
 }));
-vi.mock('../components/pre-game/PlayerRoster', () => ({ PlayerRoster: () => null }));
+// Render the roster's self-actions slot so the host emote tray flows through.
+vi.mock('../components/pre-game/PlayerRoster', () => ({
+  PlayerRoster: ({ selfActions }: { selfActions?: React.ReactNode }) =>
+    React.createElement('div', { 'data-testid': 'roster-mock' }, selfActions as React.ReactNode),
+}));
 vi.mock('../components/pre-game/BattleModeCard', () => ({ BattleModeCard: () => null }));
 vi.mock('../components/pre-game/StartButton', () => ({ StartButton: () => null }));
 vi.mock('../components/pre-game/MobileBottomNav', () => ({ MobileBottomNav: () => null }));
@@ -74,22 +78,15 @@ vi.mock('../components/pre-game/MobileShareSection', () => ({ MobileShareSection
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
 vi.mock('../components/pre-game/PresetInfoDrawer', () => ({ PresetInfoDrawer: () => null }));
 vi.mock('../components/pre-game/desktop', () => ({
-  DesktopLobbyLayout: () => null,
+  DesktopLobbyLayout: ({ leftContent }: { leftContent?: React.ReactNode }) =>
+    React.createElement('div', null, leftContent as React.ReactNode),
   SettingsPanel: () => null,
   InviteCard: () => null,
   EnhancedPlayerList: () => null,
 }));
-
-// Capture the props HostPreGameView passes to LobbyReactions.
-const lobbyReactionsProps: Array<Record<string, unknown>> = [];
-vi.mock('@/components/lobby/LobbyReactions', () => ({
-  LobbyReactions: (props: Record<string, unknown>) => {
-    lobbyReactionsProps.push(props);
-    return null;
-  },
-}));
-vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
-vi.mock('../components/HostPreGameView.useAvatarPremium', () => ({ useAvatarPremium: () => ({ allowed: true }) }), { virtual: true });
+// Avatar-part reward is the relocated lobby ad — stubbed (heavy deps) so the
+// emote-tray assertions stay focused.
+vi.mock('@/components/avatar/LobbyAvatarRewardButton', () => ({ LobbyAvatarRewardButton: () => null }));
 
 const mockT = (key: string) => key;
 
@@ -126,43 +123,28 @@ const baseProps = {
   tournamentCreating: false,
 };
 
-describe('HostPreGameView lobby emote (LobbyReactions send tray)', () => {
+describe('HostPreGameView lobby emote (avatar emotion picker)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    lobbyReactionsProps.length = 0;
   });
 
-  it('lets a PLAYING host send reactions (receiveOnly falsy) when hostPlaying=true', () => {
-    render(<HostPreGameView {...baseProps} hostPlaying />);
-
-    const props = lobbyReactionsProps.at(-1);
-    expect(props).toBeDefined();
-    expect(props!.username).toBe('Host');
-    // Playing host is a competitor → must be able to fling emoji, not just watch.
-    expect(props!.receiveOnly).toBeFalsy();
-  });
-
-  it('lets a scoreboard host (hostPlaying=false) send reactions too', () => {
-    // HostPreGameView always runs on the host's own interactive device (true
-    // cast-to-TV is the separate tv-broadcast/ components). A scoreboard host is
-    // still a present person watching the lobby, so they must be able to fling
-    // emoji like everyone else — not be stuck in receive-only.
-    render(<HostPreGameView {...baseProps} hostPlaying={false} />);
-
-    const props = lobbyReactionsProps.at(-1);
-    expect(props).toBeDefined();
-    expect(props!.receiveOnly).toBeFalsy();
-  });
-
-  it('anchors the emote trigger as a fixed floating button, not an in-flow orphan', () => {
-    // The trigger used to render bare at the end of the root div, dropping into
-    // document flow below the sticky start bar — a lone emoji floating bottom-left
-    // that broke the layout. It must be a deliberate fixed-position FAB instead.
+  it('removes the old floating emoji FAB', () => {
     render(<HostPreGameView {...baseProps} />);
+    // The reaction toy was replaced by an on-avatar emote picker — no orphan FAB.
+    expect(screen.queryByTestId('host-lobby-emote-fab')).toBeNull();
+  });
 
-    const fab = screen.getByTestId('host-lobby-emote-fab');
-    expect(fab.className).toContain('fixed');
-    // Mirrors the chat bubble (bottom corner), so the two FABs frame the start bar.
-    expect(fab.className).toMatch(/bottom-/);
+  it('renders an emote tray so the host can change their avatar emotion', () => {
+    render(<HostPreGameView {...baseProps} />);
+    // EmoteTray is fed through the roster self-actions slot.
+    expect(screen.getAllByTestId('emote-tray').length).toBeGreaterThan(0);
+  });
+
+  it('emits a lobbyEmote over the socket when the host picks an emote', () => {
+    render(<HostPreGameView {...baseProps} />);
+    // Tap the first emote face → server-echoed lobbyEmote drives the face-swap.
+    const laugh = screen.getAllByLabelText('lobby.emote.laugh')[0];
+    fireEvent.click(laugh);
+    expect(emitMock).toHaveBeenCalledWith('lobbyEmote', { emote: 'emoteLaugh' });
   });
 });

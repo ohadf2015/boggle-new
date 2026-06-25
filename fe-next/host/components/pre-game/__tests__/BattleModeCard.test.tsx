@@ -14,10 +14,16 @@ vi.mock('framer-motion', () => {
       <div ref={ref} {...props}>{children}</div>
     ),
   );
+  const Span = React.forwardRef<HTMLSpanElement, React.ComponentProps<'span'> & Record<string, unknown>>(
+    ({ children, initial, animate, exit, transition, ...props }, ref) => (
+      <span ref={ref} {...props}>{children}</span>
+    ),
+  );
   Btn.displayName = 'MotionBtn';
   Div.displayName = 'MotionDiv';
+  Span.displayName = 'MotionSpan';
   return {
-    m: { button: Btn, div: Div },
+    m: { button: Btn, div: Div, span: Span },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   };
 });
@@ -58,30 +64,40 @@ describe('BattleModeCard — Blast visibility', () => {
   });
 });
 
-describe('BattleModeCard — Showcase cards (per-mode description)', () => {
+describe('BattleModeCard — Showcase cards (expand selected on click)', () => {
   const baseProps = {
     selectedGameMode: 'classic' as const,
     setSelectedGameMode: vi.fn(),
     t,
   };
 
-  // Each mode card surfaces its own one-line rule via getModeDescription(),
-  // which routes through the existing gameModes.*.description i18n keys.
-  // With the identity `t`, the description renders as its key string.
-  it('renders a description line for every visible mode', () => {
+  // To keep the grid short, ONLY the selected mode reveals its one-line rule;
+  // the other cards stay compact (icon + name). getModeDescription() routes
+  // through the gameModes.*.description i18n keys, so with the identity `t` the
+  // description renders as its key string.
+  it('shows the description only for the selected mode', () => {
     render(<BattleModeCard {...baseProps} isAdmin={false} />);
-    expect(screen.getByText('gameModes.randomDescription')).toBeInTheDocument();
+    // Selected = classic → its description is visible…
     expect(screen.getByText('gameModes.classic.description')).toBeInTheDocument();
-    expect(screen.getByText('gameModes.wordHunt.description')).toBeInTheDocument();
-    expect(screen.getByText('gameModes.wheelRush.description')).toBeInTheDocument();
-    expect(screen.getByText('gameModes.blast.description')).toBeInTheDocument();
+    // …while unselected modes do NOT spend vertical space on a description.
+    expect(screen.queryByText('gameModes.randomDescription')).toBeNull();
+    expect(screen.queryByText('gameModes.wordHunt.description')).toBeNull();
+    expect(screen.queryByText('gameModes.blast.description')).toBeNull();
   });
 
-  it('keeps the mode name alongside its description', () => {
+  it('keeps every mode name visible even when collapsed', () => {
     render(<BattleModeCard {...baseProps} isAdmin={false} />);
-    // name key + description key both present for classic
     expect(screen.getByText('gameModes.classic.name')).toBeInTheDocument();
-    expect(screen.getByText('gameModes.classic.description')).toBeInTheDocument();
+    expect(screen.getByText('gameModes.random')).toBeInTheDocument();
+    expect(screen.getByText('gameModes.wordHunt.name')).toBeInTheDocument();
+    expect(screen.getByText('gameModes.blast.name')).toBeInTheDocument();
+  });
+
+  it('reveals a freshly selected mode’s description', () => {
+    // Re-render with blast selected → blast now shows its rule, classic collapses.
+    render(<BattleModeCard {...baseProps} selectedGameMode={'blast'} isAdmin={false} />);
+    expect(screen.getByText('gameModes.blast.description')).toBeInTheDocument();
+    expect(screen.queryByText('gameModes.classic.description')).toBeNull();
   });
 
   it('still fires setSelectedGameMode when a mode card is clicked', () => {

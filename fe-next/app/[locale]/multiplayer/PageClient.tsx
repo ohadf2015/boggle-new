@@ -592,7 +592,11 @@ export default function MultiplayerPageClient(): React.JSX.Element {
               </>
             )
           ) : (
-            <AutoHideHeader />
+            // Active lobby/in-game uses a full-bleed immersive layout with its
+            // own sticky header — the AutoHideHeader spacer would just stack dead
+            // space above the lobby's top accent bar. Drop it while active (keep
+            // it for the room list + results so their CLS reservation holds).
+            (isActive && !showResults) ? null : <AutoHideHeader />
           )}
           {renderView()}
           <HostLeftGraceModal
