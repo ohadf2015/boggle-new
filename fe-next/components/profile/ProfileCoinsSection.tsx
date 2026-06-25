@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { Coins, Gamepad2, Trophy, BarChart3, Target } from 'lucide-react';
 import { CoinBalance } from '@/components/CoinBalance';
 import { EarnCoinsOfferwallButton } from '@/components/ads/EarnCoinsOfferwall';
+import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
@@ -109,6 +110,11 @@ export function ProfileCoinsSection({
           {(profile?.lifetime_coins_earned || 0).toLocaleString()}
         </span>
       </div>
+
+      {/* Discoverable rewarded-ad option — watch a Monetag rewarded ad for coins.
+          Self-hides when no provider can serve (canShowAd false) or the daily cap
+          is hit, so it only appears when it can actually grant. */}
+      <RewardedAdGoldButton goldAmount={20} surface="profile_coins" size="md" className="mt-3 w-full justify-center" />
 
       {/* Pay-per-action offerwall — self-hides unless configured + web (dark by default). */}
       <EarnCoinsOfferwallButton size="md" className="mt-3 w-full" />
