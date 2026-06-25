@@ -26,7 +26,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
   {
     name: 'Trump', emoji: '🇺🇸', color: '#FF6B35',
     customAvatar: {
-      gender: 'male', base: 'round', skinColor: '#D08B5B',
+      gender: 'male', base: 'round', skinColor: '#E3A164',
       hair: 'trumpSwoop', hairColor: '#E8C07A',
       eyes: 'squint', eyeColor: '#3B82F6', noseStyle: 'wide', eyebrows: 'thin',
       facialHair: 'none', mouth: 'smirk',
@@ -38,7 +38,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     name: 'Bibi', emoji: '🇮🇱', color: '#4A90D9',
     customAvatar: {
       gender: 'male', base: 'square', skinColor: '#EDB98A',
-      hair: 'combover', hairColor: '#C0C0C0',
+      hair: 'recedingHair', hairColor: '#C0C0C0',
       eyes: 'cool', eyeColor: '#6B4423', noseStyle: 'roman', eyebrows: 'thick',
       facialHair: 'none', mouth: 'flat',
       accessory: 'none', accessoryColor: '#000000',
@@ -60,7 +60,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     name: 'Putin', emoji: '🐻', color: '#808080',
     customAvatar: {
       gender: 'male', base: 'square', skinColor: '#FFDBB4',
-      hair: 'buzz', hairColor: '#C0C0C0',
+      hair: 'recedingHair', hairColor: '#C0C0C0',
       eyes: 'squint', eyeColor: '#6B7280', noseStyle: 'round', eyebrows: 'flat',
       facialHair: 'none', mouth: 'flat',
       accessory: 'none', accessoryColor: '#000000',
@@ -68,7 +68,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     },
   },
   {
-    name: 'Kim', emoji: '🚀', color: '#C62828',
+    name: 'Kim', emoji: '🇰🇵', color: '#C62828',
     customAvatar: {
       gender: 'male', base: 'round', skinColor: '#FFE0BD',
       hair: 'flatTop', hairColor: '#2C1B18',
@@ -178,7 +178,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     },
   },
   {
-    name: 'Beyonce', emoji: '👑', color: '#FFD700',
+    name: 'Beyoncé', emoji: '👑', color: '#FFD700',
     customAvatar: {
       gender: 'female', base: 'oval', skinColor: '#C68642',
       hair: 'wavy', hairColor: '#D4A574',
@@ -200,7 +200,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     },
   },
   {
-    name: 'Snoop', emoji: '🎤', color: '#BFFF00',
+    name: 'Snoop', emoji: '🌿', color: '#BFFF00',
     customAvatar: {
       gender: 'male', base: 'oval', skinColor: '#8D5524',
       hair: 'braids', hairColor: '#2C1B18',
