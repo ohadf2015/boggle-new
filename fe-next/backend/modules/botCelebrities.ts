@@ -82,11 +82,11 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     name: 'Greta', emoji: '🌍', color: '#BFFF00',
     customAvatar: {
       gender: 'female', base: 'round', skinColor: '#FFE0BD',
-      hair: 'pigtails', hairColor: '#4A3728',
+      hair: 'braids', hairColor: '#4A3728',
       eyes: 'angry', eyeColor: '#6B4423', noseStyle: 'button', eyebrows: 'natural',
       mouth: 'flat',
       accessory: 'none', accessoryColor: '#000000',
-      bgColor: '#BFFF00', shirtColor: '#F57F17', bodyStyle: 'hoodie',
+      bgColor: '#00897B', shirtColor: '#F57F17', bodyStyle: 'hoodie',
     },
   },
   {
@@ -94,7 +94,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     customAvatar: {
       gender: 'male', base: 'oval', skinColor: '#F8D5C2',
       hair: 'recedingHair', hairColor: '#4A3728',
-      eyes: 'cool', eyeColor: '#6B4423', noseStyle: 'round', eyebrows: 'natural',
+      eyes: 'focused', eyeColor: '#6B4423', noseStyle: 'round', eyebrows: 'natural',
       facialHair: 'stubble', mouth: 'smirk',
       accessory: 'none', accessoryColor: '#000000',
       bgColor: '#1a1a2e', shirtColor: '#2C1B18', bodyStyle: 'suit',
