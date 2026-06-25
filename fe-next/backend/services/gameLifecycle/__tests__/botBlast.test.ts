@@ -100,6 +100,14 @@ vi.mock('../../../utils/socketHelpers', () => ({
   getGameRoom: mocks.getGameRoom,
 }));
 
+const playerFoundWordBatcherMocks = vi.hoisted(() => ({
+  queuePlayerFoundWord: vi.fn(),
+}));
+
+vi.mock('../../../utils/playerFoundWordBatcher', () => ({
+  queuePlayerFoundWord: playerFoundWordBatcherMocks.queuePlayerFoundWord,
+}));
+
 vi.mock('../../../modules/blastModeManager', () => ({
   getTilesOnPath: mocks.getTilesOnPath,
   calculateBlastTileBonus: mocks.calculateBlastTileBonus,
@@ -350,9 +358,17 @@ describe('startBotsForBlast', () => {
     startBotsForBlast(mockIo, gameCode, [bot], blastState, 'en', 120);
     await new Promise(resolve => setTimeout(resolve, 60));
 
-    const playerFound = mocks.volatileBroadcastToRoom.mock.calls.find(c => c[2] === 'playerFoundWord');
-    expect(playerFound).toBeTruthy();
-    expect(playerFound![3]).toMatchObject({ isFirstFinder: true });
+    // Verify botWordFound broadcast includes isFirstFinder (direct emission)
+    const botWordFound = mocks.volatileBroadcastToRoom.mock.calls.find(c => c[2] === 'botWordFound');
+    expect(botWordFound).toBeTruthy();
+    expect(botWordFound![3]).toMatchObject({ isFirstFinder: true });
+
+    // Verify playerFoundWord is batched with isFirstFinder (via queuePlayerFoundWord)
+    expect(playerFoundWordBatcherMocks.queuePlayerFoundWord).toHaveBeenCalledWith(
+      mockIo,
+      gameCode,
+      expect.objectContaining({ isFirstFinder: true })
+    );
   });
 
   it('broadcasts the bot\'s live score via the shared throttled leaderboard path (not an unthrottled direct emit)', async () => {

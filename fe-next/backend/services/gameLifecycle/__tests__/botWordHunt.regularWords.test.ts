@@ -33,7 +33,7 @@ vi.mock('../../../modules/gameStateManager', () => ({
       eliminatedPlayers: [],
     },
   })),
-  recordFirstFinder: vi.fn(),
+  recordFirstFinder: vi.fn(() => true),
 }));
 
 vi.mock('../../../modules/blastModeManager', () => ({
@@ -109,6 +109,10 @@ vi.mock('../../../utils/socketHelpers', () => ({
   getGameRoom: vi.fn((code: string) => `game:${code}`),
 }));
 
+vi.mock('../../../utils/playerFoundWordBatcher', () => ({
+  queuePlayerFoundWord: vi.fn(),
+}));
+
 vi.mock('../../../../shared/constants/wordHuntMultiplayerConstants', () => ({
   BOARD_WORD_SCORE_PER_LETTER: 2,
 }));
@@ -127,6 +131,7 @@ vi.mock('../../../modules/botConfig', () => ({
 import { startBotsForGame } from '../botGame';
 import { addPlayerWord, updatePlayerScore } from '../../../modules/gameStateManager';
 import { broadcastToRoom, volatileBroadcastToRoom } from '../../../utils/socketHelpers';
+import { queuePlayerFoundWord } from '../../../utils/playerFoundWordBatcher';
 import * as botManager from '../../../modules/botManager';
 
 function createMockBot(overrides: Partial<Bot> = {}): Bot {
@@ -242,14 +247,27 @@ describe('Bot Word Hunt - Regular Word Finding', () => {
 
     vi.advanceTimersByTime(150);
 
-    expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
+    // playerFoundWord is now batched via queuePlayerFoundWord (not direct broadcast)
+    expect(queuePlayerFoundWord).toHaveBeenCalledWith(
       mockIo,
-      'game:TEST1',
-      'playerFoundWord',
+      'TEST1',
       expect.objectContaining({
         username: 'BotPlayer',
         word: 'cat',
         comboLevel: 0,
+        isFirstFinder: true,
+      })
+    );
+
+    // Also verify botWordFound is broadcast (the direct event for bot activity visibility)
+    expect(volatileBroadcastToRoom).toHaveBeenCalledWith(
+      mockIo,
+      'game:TEST1',
+      'botWordFound',
+      expect.objectContaining({
+        username: 'BotPlayer',
+        word: 'cat',
+        isFirstFinder: true,
       })
     );
   });
