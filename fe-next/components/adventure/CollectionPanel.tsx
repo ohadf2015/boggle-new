@@ -2,7 +2,6 @@
 
 import { memo, useMemo, useState } from 'react';
 import { X, Trophy, ScrollText, Gem, Sparkles, Lock } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -92,15 +91,13 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <AdaptiveMotion.div
+      <div
         data-testid="collection-panel"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
         className={cn(
           'w-full max-w-lg max-h-[85dvh] flex flex-col',
           'bg-neo-navy border-3 border-black rounded-neo shadow-hard-lg',
-          'overflow-hidden'
+          'overflow-hidden',
+          'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
         )}
       >
         {/* Header */}
@@ -164,14 +161,10 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
 
         {/* Items Grid */}
         <div className="flex-1 overflow-y-auto p-4">
-          <AdaptiveAnimatePresence mode="wait">
-            <AdaptiveMotion.div
-              key={activeCategory}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="grid grid-cols-3 gap-3"
-            >
+          <div
+            key={activeCategory}
+            className="grid grid-cols-3 gap-3 animate-in fade-in-0 duration-300"
+          >
               {categoryItems.map((item) => {
                 const owned = ownedItemIds.has(item.id);
                 const invItem = inventoryMap.get(item.id);
@@ -223,8 +216,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
                   </div>
                 );
               })}
-            </AdaptiveMotion.div>
-          </AdaptiveAnimatePresence>
+            </div>
         </div>
 
         {/* Rarity Legend */}
@@ -235,7 +227,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
             </span>
           ))}
         </div>
-      </AdaptiveMotion.div>
+      </div>
     </div>
   );
 });

@@ -2,7 +2,6 @@
 
 import { memo, useCallback, useRef } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import {
   GraduationCap,
   Users,
@@ -152,24 +151,18 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
   const isLastStep = currentStep === ONBOARDING_STEPS.length - 1;
 
   return (
-    <AdaptiveAnimatePresence>
-      <AdaptiveMotion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-black/70 p-4"
+    <>
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-neo-black/70 p-4 animate-in fade-in-0 duration-300"
       >
-        <AdaptiveMotion.div
+        <div
           ref={modalRef}
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className={cn(
             'relative w-full max-w-lg',
             'bg-neo-navy border-neo-thick border-neo-black',
             'rounded-neo-lg shadow-hard-xl',
-            'overflow-hidden'
+            'overflow-hidden',
+            'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
           )}
           role="dialog"
           aria-modal="true"
@@ -206,15 +199,10 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           </div>
 
           {/* Step content */}
-          <AdaptiveAnimatePresence mode="wait">
-            <AdaptiveMotion.div
-              key={step.id}
-              initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isRTL ? 20 : -20 }}
-              transition={{ duration: 0.2 }}
-              className="p-8 text-center"
-            >
+          <div
+            key={step.id}
+            className="p-8 text-center animate-in fade-in-0 duration-200"
+          >
               {/* Icon */}
               <div
                 className={cn(
@@ -247,8 +235,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
                   {t('education.onboarding.of')} {ONBOARDING_STEPS.length}
                 </span>
               </div>
-            </AdaptiveMotion.div>
-          </AdaptiveAnimatePresence>
+            </div>
 
           {/* Navigation buttons */}
           <div className={cn(
@@ -304,9 +291,9 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
           <div className="absolute bottom-12 inset-e-12 text-neo-pink/30">
             <Sparkles className="w-4 h-4" />
           </div>
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-    </AdaptiveAnimatePresence>
+        </div>
+      </div>
+    </>
   );
 });
 

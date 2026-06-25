@@ -23,8 +23,10 @@ export const DAILY_CHALLENGE_DURATION = 120;
 // Minimum number of same-length words to embed (excluding target word)
 export const MIN_SAME_LENGTH_WORDS = 5;
 
-// Maximum letter count for target words (keeps puzzles accessible across all languages)
-export const MAX_TARGET_WORD_LENGTH = 6;
+// Maximum letter count for target words. 7 keeps targets in the fun-to-reveal
+// 5-7 band; the 6×6 daily board has room for a 7-letter target plus its
+// same-length decoys (verified against MIN_SAME_LENGTH_WORDS).
+export const MAX_TARGET_WORD_LENGTH = 7;
 
 // ==========================================
 // Hebrew Letter Normalization

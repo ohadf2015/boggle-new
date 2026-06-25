@@ -9,7 +9,6 @@
 
 import { useRef, useState } from 'react';
 import { X, Zap, Sparkles, Shield, Crown, Check, AlertCircle } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { postWithAuth } from '@/utils/authFetch';
@@ -89,27 +88,18 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
           : { gradient: 'from-neo-lime to-neo-cyan', glow: '#BFFF00' };
 
   return (
-    <AdaptiveAnimatePresence>
+    <>
       {isOpen && (
-        <AdaptiveMotion.div
-          key="comeback-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in-0 duration-300"
           onClick={(e: React.MouseEvent) => { if (e.target === e.currentTarget) onClose(); }}
         >
-          <AdaptiveMotion.div
-            key="comeback-modal"
-            initial={{ opacity: 0, scale: 0.8, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 30 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+          <div
             ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="comeback-title"
-            className="relative w-full max-w-[340px]"
+            className="relative w-full max-w-[340px] animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
           >
             {/* ── Card ── */}
             <div className="bg-neo-navy-light border-neo-thick border-neo-white rounded-neo shadow-hard-lg overflow-hidden relative">
@@ -132,12 +122,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                 />
 
                 {/* Mascot GIF */}
-                <AdaptiveMotion.div
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 250, damping: 18, delay: 0.1 }}
-                  className="relative z-10"
-                >
+                <div className="relative z-10 animate-in zoom-in-50 duration-300">
                   <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-3 border-neo-pink shadow-hard bg-neo-navy">
                     <SilentVideo
                       aria-hidden="true"
@@ -147,7 +132,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                       <source src={VIDEO_MP4} type="video/mp4" />
                     </SilentVideo>
                   </div>
-                </AdaptiveMotion.div>
+                </div>
 
                 {/* Player name */}
                 {playerName && (
@@ -165,12 +150,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                 </p>
 
                 {/* Multiplier badge - overlapping into rewards section */}
-                <AdaptiveMotion.div
-                  initial={{ scale: 0, rotate: -8 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 12, delay: 0.25 }}
-                  className="mt-2 sm:mt-3 -mb-4 sm:-mb-5 z-20 relative"
-                >
+                <div className="mt-2 sm:mt-3 -mb-4 sm:-mb-5 z-20 relative animate-in zoom-in-50 duration-300">
                   <div className={`bg-linear-to-r ${tierColor.gradient} px-6 py-2 rounded-neo border-neo-thick border-neo-white shadow-hard-lg`}>
                     <span className="text-3xl font-black font-neo-display text-neo-white drop-shadow-lg leading-none">
                       {multiplierDisplay}
@@ -179,7 +159,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                       {t('comebackBonus.xpBonus')}
                     </span>
                   </div>
-                </AdaptiveMotion.div>
+                </div>
               </div>
 
               {/* ── Rewards section ── */}
@@ -209,11 +189,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                 </div>
 
                 {/* Claim button */}
-                <AdaptiveMotion.div
-                  initial={{ y: 10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                >
+                <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
                   <button
                     onClick={exhausted ? onClose : handleClaim}
                     disabled={claimState === 'claiming' || claimState === 'success' || cooling}
@@ -226,11 +202,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                     } disabled:cursor-not-allowed`}
                   >
                     {claimState === 'claiming' && (
-                      <AdaptiveMotion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                        className="w-5 h-5 border-2 border-neo-white/30 border-t-neo-white rounded-full"
-                      />
+                      <div className="w-5 h-5 border-2 border-neo-white/30 border-t-neo-white rounded-full animate-spin" />
                     )}
                     {claimState === 'success' && <Check className="w-5 h-5" />}
                     {claimState === 'error' && <AlertCircle className="w-5 h-5" />}
@@ -239,7 +211,7 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                     {claimState === 'success' && t('comebackBonus.claimed')}
                     {claimState === 'error' && t('comebackBonus.claimError')}
                   </button>
-                </AdaptiveMotion.div>
+                </div>
 
                 {claimState === 'error' && (
                   <p className="text-neo-white text-xs text-center mt-2">
@@ -248,10 +220,10 @@ export function ComebackBonusModal({ isOpen, daysAway, tier, playerName, onClose
                 )}
               </div>
             </div>
-          </AdaptiveMotion.div>
-        </AdaptiveMotion.div>
+          </div>
+        </div>
       )}
-    </AdaptiveAnimatePresence>
+    </>
   );
 }
 
@@ -262,11 +234,9 @@ function RewardCard({ icon, color, delay, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <AdaptiveMotion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20, delay }}
-      className={`flex flex-col items-center gap-1.5 rounded-neo p-3 border border-${color}/30 bg-${color}/10 text-center`}
+    <div
+      style={{ animationDelay: `${delay}s` }}
+      className={`flex flex-col items-center gap-1.5 rounded-neo p-3 border border-${color}/30 bg-${color}/10 text-center animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both`}
     >
       <div className={`w-9 h-9 rounded-full bg-${color}/25 flex items-center justify-center text-${color}`}>
         {icon}
@@ -274,7 +244,7 @@ function RewardCard({ icon, color, delay, children }: {
       <span className="text-neo-white text-xs font-bold leading-tight">
         {children}
       </span>
-    </AdaptiveMotion.div>
+    </div>
   );
 }
 

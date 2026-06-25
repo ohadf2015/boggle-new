@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
-import { m, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Check, Share2, Maximize2, X } from 'lucide-react';
 import { getJoinUrl, copyJoinUrl } from '../../../../utils/share';
@@ -67,21 +66,14 @@ export function InviteCard({
   }, [gameCode, joinUrl, t, handleCopyLink]);
 
   const qrModal = (
-    <AnimatePresence>
+    <>
       {qrExpanded && (
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-neo-black/80"
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-neo-black/80 animate-in fade-in-0 duration-300"
           onClick={() => setQrExpanded(false)}
         >
-          <m.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="relative bg-neo-navy border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 max-w-xs"
+          <div
+            className="relative bg-neo-navy border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 max-w-xs animate-in fade-in-0 zoom-in-95 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -109,9 +101,8 @@ export function InviteCard({
                 {gameCode}
               </p>
               <div className="flex items-center gap-3 w-full">
-                <m.button
+                <button
                   onClick={handleCopyLink}
-                  whileTap={{ scale: 0.95 }}
                   className={cn(
                     'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-xs font-bold uppercase tracking-widest transition-all',
                     linkCopied
@@ -121,21 +112,20 @@ export function InviteCard({
                 >
                   {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   <span>{linkCopied ? t('roomCode.copied') : t('roomCode.copyLink')}</span>
-                </m.button>
-                <m.button
+                </button>
+                <button
                   onClick={() => setQrExpanded(false)}
-                  whileTap={{ scale: 0.95 }}
                   className="flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-3 border-neo-black bg-neo-lime text-neo-black text-sm font-black uppercase tracking-wider shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed transition-all"
                 >
                   <Maximize2 className="w-4 h-4" />
                   <span>{t('hostView.letsGo')}</span>
-                </m.button>
+                </button>
               </div>
             </div>
-          </m.div>
-        </m.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 
   // Invite card with hero illustration header + prominent CTAs
@@ -200,10 +190,9 @@ export function InviteCard({
           {/* SHARE button — single primary lobby CTA (lime). Uses Web Share API
               when available, falls back to clipboard copy otherwise. Replaces
               the prior copy-link + share split per UX audit 2026-05-04. */}
-          <m.button
+          <button
             data-testid="native-share-button"
             onClick={handleNativeShare}
-            whileTap={{ scale: 0.95 }}
             className={cn(
               'flex-1 h-11 flex items-center justify-center gap-2 rounded-lg border-2 border-neo-black text-xs font-black uppercase tracking-widest transition-all shadow-hard',
               linkCopied
@@ -214,7 +203,7 @@ export function InviteCard({
           >
             {linkCopied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
             <span>{linkCopied ? t('roomCode.copied') : t('share.button')}</span>
-          </m.button>
+          </button>
         </div>
 
         {showHint && (

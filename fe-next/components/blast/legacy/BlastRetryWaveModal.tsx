@@ -1,7 +1,6 @@
 'use client';
 
 import { Play, RotateCcw, Trophy } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 
 interface BlastRetryWaveModalProps {
@@ -35,19 +34,13 @@ export function BlastRetryWaveModal({
   if (!isOpen) return null;
 
   return (
-    <AdaptiveAnimatePresence>
-      <AdaptiveMotion.div
+    <>
+      <div
         data-testid="blast-retry-wave-modal"
-        className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/80 p-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/80 p-4 animate-in fade-in-0 duration-300"
       >
-        <AdaptiveMotion.div
-          className="relative w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg"
-          initial={{ scale: 0.85, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.85, y: 20 }}
+        <div
+          className="relative w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
         >
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="rounded-full border-neo border-black bg-neo-cyan p-3 shadow-hard">
@@ -83,9 +76,9 @@ export function BlastRetryWaveModal({
               </button>
             </div>
           </div>
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-    </AdaptiveAnimatePresence>
+        </div>
+      </div>
+    </>
   );
 }
 

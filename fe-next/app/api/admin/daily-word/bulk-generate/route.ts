@@ -17,17 +17,17 @@ const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const NO_REPEAT_DAYS = 30;
 
 // Word length range by language (min, max)
-// IMPORTANT: Minimum length must be 4 for all languages except Japanese (kanji compounds)
-// This matches the validation in wikipediaWordProcessor.ts
-// Max must stay <= MAX_TARGET_WORD_LENGTH (6) so daily targets fit gameplay cap.
+// Target words live in the fun-to-reveal 5-7 band: long enough to not feel
+// trivial, short enough to stay common. Max must stay <= MAX_TARGET_WORD_LENGTH (7).
+// Japanese is the exception (kanji compounds are 2-4 characters).
 const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
-  en: { min: 4, max: 6 },
-  he: { min: 4, max: 6 },
-  sv: { min: 4, max: 6 },
+  en: { min: 5, max: 7 },
+  he: { min: 5, max: 7 },
+  sv: { min: 5, max: 7 },
   ja: { min: 2, max: 4 }, // Japanese uses kanji compounds (2-4 characters)
-  es: { min: 4, max: 6 },
-  fr: { min: 4, max: 6 },
-  de: { min: 4, max: 6 },
+  es: { min: 5, max: 7 },
+  fr: { min: 5, max: 7 },
+  de: { min: 5, max: 7 },
 };
 
 

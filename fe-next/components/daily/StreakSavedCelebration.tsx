@@ -13,7 +13,6 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, X } from 'lucide-react';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Button } from '@/components/ui/button';
@@ -75,21 +74,14 @@ const StreakSavedCelebration: React.FC<StreakSavedCelebrationProps> = ({
       : null;
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4"
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4 animate-in fade-in-0 duration-300"
           onClick={onClose}
         >
-          <m.div
-            initial={{ scale: 0.5, opacity: 0, rotate: -8 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.5, opacity: 0, rotate: 8 }}
-            transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            className="relative bg-linear-to-br from-neo-navy to-neo-navy-light rounded-neo border-4 border-neo-cyan p-8 max-w-md w-full text-center shadow-hard-lg"
+          <div
+            className="relative bg-linear-to-br from-neo-navy to-neo-navy-light rounded-neo border-4 border-neo-cyan p-8 max-w-md w-full text-center shadow-hard-lg animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <Button
@@ -108,55 +100,46 @@ const StreakSavedCelebration: React.FC<StreakSavedCelebrationProps> = ({
             </div>
 
             {/* Animated frost shield */}
-            <m.div
-              initial={{ scale: 0, rotate: -20 }}
-              animate={{ scale: [0, 1.25, 1], rotate: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="mx-auto mb-4 w-24 h-24 flex items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-cyan/10 shadow-hard"
+            <div
+              className="mx-auto mb-4 w-24 h-24 flex items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-cyan/10 shadow-hard animate-in zoom-in-50 duration-300"
+              style={{ animationDelay: '0.15s' }}
             >
               <ShieldCheck className="w-14 h-14 text-neo-cyan" strokeWidth={2.5} />
-            </m.div>
+            </div>
 
             {/* Title */}
-            <m.h2
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
-              className="text-3xl md:text-4xl font-black text-white mb-2 uppercase"
+            <h2
+              className="text-3xl md:text-4xl font-black text-white mb-2 uppercase animate-in fade-in-0 zoom-in-95 duration-300"
+              style={{ animationDelay: '0.3s' }}
             >
               {t('streak.saved.title')}
-            </m.h2>
+            </h2>
 
             {/* Subtitle */}
-            <m.p
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.42, type: 'spring', stiffness: 280, damping: 26 }}
-              className="text-slate-300 text-base mb-4"
+            <p
+              className="text-slate-300 text-base mb-4 animate-in fade-in-0 zoom-in-95 duration-300"
+              style={{ animationDelay: '0.42s' }}
             >
               {t('streak.saved.subtitle')}
-            </m.p>
+            </p>
 
             {/* Freezes remaining pill */}
             {freezesLabel && (
-              <m.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', delay: 0.5, stiffness: 400, damping: 22 }}
-                className="inline-flex items-center gap-2 px-5 py-2 bg-neo-cyan/15 rounded-neo border-3 border-neo-cyan/50 shadow-hard-sm mb-6"
+              <div
+                className="inline-flex items-center gap-2 px-5 py-2 bg-neo-cyan/15 rounded-neo border-3 border-neo-cyan/50 shadow-hard-sm mb-6 animate-in zoom-in-50 duration-300"
+                style={{ animationDelay: '0.5s' }}
               >
                 <span className="text-lg" aria-hidden>❄️</span>
                 <span className="text-sm font-black text-neo-cyan uppercase tracking-wide">
                   {freezesLabel}
                 </span>
-              </m.div>
+              </div>
             )}
 
             {/* Dismiss */}
-            <m.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
+            <div
+              className="animate-in fade-in-0 zoom-in-95 duration-300"
+              style={{ animationDelay: '0.6s' }}
             >
               <Button
                 onClick={onClose}
@@ -164,11 +147,11 @@ const StreakSavedCelebration: React.FC<StreakSavedCelebrationProps> = ({
               >
                 {t('streak.saved.dismiss')}
               </Button>
-            </m.div>
-          </m.div>
-        </m.div>
+            </div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 

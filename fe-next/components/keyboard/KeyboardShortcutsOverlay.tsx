@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { X, Keyboard, MousePointer, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -81,27 +80,20 @@ export function KeyboardShortcutsOverlay({
   };
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <m.div
+        <div
           ref={overlayRef}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neo-black/80 backdrop-blur-xs"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neo-black/80 backdrop-blur-xs animate-in fade-in-0 duration-200"
           onClick={handleBackdropClick}
           role="dialog"
           aria-modal="true"
           aria-labelledby="keyboard-shortcuts-title"
         >
-          <m.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          <div
             className={cn(
               'relative w-full max-w-md',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-200',
               'bg-neo-navy text-neo-white',
               'border-4 border-neo-black',
               'rounded-neo-lg shadow-hard-xl',
@@ -205,10 +197,10 @@ export function KeyboardShortcutsOverlay({
                 </span>
               </div>
             </div>
-          </m.div>
-        </m.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
 

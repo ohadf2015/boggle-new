@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
 import { Share2, Image as ImageIcon, ImageDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ShareImageResult } from '@/utils/shareImageGenerator';
@@ -26,19 +25,12 @@ export function ImagePreviewModal({
   t,
 }: ImagePreviewModalProps): React.JSX.Element {
   return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/85 backdrop-blur-xs flex items-center justify-center z-50 p-4"
+    <div
+      className="fixed inset-0 bg-black/85 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-300"
       onClick={onClose}
     >
-      <m.div
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 10 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-neo-navy rounded-xl border-2 border-slate-700 p-5 max-w-lg w-full shadow-2xl"
+      <div
+        className="bg-neo-navy rounded-xl border-2 border-slate-700 p-5 max-w-lg w-full shadow-2xl animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -91,7 +83,7 @@ export function ImagePreviewModal({
         >
           {t('daily.close')}
         </button>
-      </m.div>
-    </m.div>
+      </div>
+    </div>
   );
 }

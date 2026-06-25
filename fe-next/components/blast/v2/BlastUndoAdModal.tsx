@@ -1,5 +1,4 @@
 'use client';
-import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 type Props = {
@@ -19,22 +18,15 @@ type Props = {
 export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onCancel }: Props) {
   const { t } = useLanguage();
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <m.div
+        <div
           data-testid="blast-undo-ad-modal"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm px-6"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm px-6 animate-in fade-in-0 duration-300"
           onClick={onCancel}
         >
-          <m.div
-            initial={{ scale: 0.85, y: 16 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.85, y: 16 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-            className="max-w-sm w-full rounded-2xl bg-[#0b1530] text-white p-6 flex flex-col items-center gap-4"
+          <div
+            className="max-w-sm w-full rounded-2xl bg-[#0b1530] text-white p-6 flex flex-col items-center gap-4 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4 duration-300"
             style={{
               border: `3px solid ${modeColor}`,
               boxShadow: `0 8px 30px rgba(0,0,0,0.6), 0 0 24px color-mix(in srgb, ${modeColor} 40%, transparent)`,
@@ -68,9 +60,9 @@ export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onC
                 {t('blast.undoAdGate.cancel', 'Not now')}
               </button>
             </div>
-          </m.div>
-        </m.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

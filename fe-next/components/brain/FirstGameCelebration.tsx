@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain, Sparkles, X } from 'lucide-react';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { cn } from '@/lib/utils';
@@ -67,12 +67,9 @@ export default function FirstGameCelebration({
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-in fade-in-0 duration-300"
         onClick={onClose}
       >
         {/* Confetti Particles */}
@@ -112,13 +109,9 @@ export default function FirstGameCelebration({
         )}
 
         {/* Modal Content */}
-        <m.div
-          initial={{ scale: 0.8, rotate: -5 }}
-          animate={{ scale: 1, rotate: 0 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ type: "spring", damping: 20 }}
+        <div
           className={cn(
-            'relative max-w-md w-full rounded-neo border-4 border-neo-black shadow-hard-lg p-8',
+            'relative max-w-md w-full rounded-neo border-4 border-neo-black shadow-hard-lg p-8 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300',
             isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
           )}
           onClick={(e) => e.stopPropagation()}
@@ -155,40 +148,34 @@ export default function FirstGameCelebration({
           </m.div>
 
           {/* Title */}
-          <m.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 25 }}
+          <h2
             className={cn(
-              'text-3xl font-black text-center mb-2 uppercase',
+              'text-3xl font-black text-center mb-2 uppercase animate-in fade-in-0 zoom-in-95 duration-300',
               isDarkMode ? 'text-neo-white' : 'text-neo-black'
             )}
+            style={{ animationDelay: '0.2s' }}
           >
             {t('brain.firstGameComplete')}
-          </m.h2>
+          </h2>
 
           {/* Subtitle */}
-          <m.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+          <p
             className={cn(
-              'text-center mb-6 text-sm',
+              'text-center mb-6 text-sm animate-in fade-in-0 duration-300',
               isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}
+            style={{ animationDelay: '0.3s' }}
           >
             {t('brain.baselineEstablished')}
-          </m.p>
+          </p>
 
           {/* Overall Score */}
-          <m.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4, type: "spring" }}
+          <div
             className={cn(
-              'mb-6 p-4 rounded-neo border-3 border-neo-black text-center',
+              'mb-6 p-4 rounded-neo border-3 border-neo-black text-center animate-in fade-in-0 zoom-in-95 duration-300',
               isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream'
             )}
+            style={{ animationDelay: '0.4s' }}
           >
             <p className={cn(
               'text-sm font-bold uppercase mb-1',
@@ -197,17 +184,15 @@ export default function FirstGameCelebration({
               {t('brain.overallScore')}
             </p>
             <div className="flex items-baseline justify-center gap-2">
-              <m.span
+              <span
                 className={cn(
-                  'text-5xl font-black',
+                  'text-5xl font-black animate-in fade-in-0 duration-300',
                   isDarkMode ? 'text-neo-lime' : 'text-emerald-600'
                 )}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
+                style={{ animationDelay: '0.6s' }}
               >
                 {overallScore}
-              </m.span>
+              </span>
               <span className={cn(
                 'text-2xl font-bold',
                 isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
@@ -221,25 +206,21 @@ export default function FirstGameCelebration({
             )}>
               {t(`brain.tiers.${tier}`)}
             </p>
-          </m.div>
+          </div>
 
           {/* Domain Scores Preview */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="space-y-2 mb-6"
+          <div
+            className="space-y-2 mb-6 animate-in fade-in-0 zoom-in-95 duration-300"
+            style={{ animationDelay: '0.7s' }}
           >
             {Object.entries(domains).map(([key, value], index) => (
-              <m.div
+              <div
                 key={key}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 + index * 0.05, type: 'spring', stiffness: 300, damping: 25 }}
                 className={cn(
-                  'flex items-center justify-between p-2 rounded-neo border-2 border-neo-black',
+                  'flex items-center justify-between p-2 rounded-neo border-2 border-neo-black animate-in fade-in-0 zoom-in-95 duration-300',
                   isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-white'
                 )}
+                style={{ animationDelay: `${0.8 + index * 0.05}s` }}
               >
                 <span className={cn(
                   'text-xs font-bold',
@@ -261,19 +242,17 @@ export default function FirstGameCelebration({
                     </span>
                   </div>
                 </div>
-              </m.div>
+              </div>
             ))}
-          </m.div>
+          </div>
 
           {/* Call to Action */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
+          <div
             className={cn(
-              'p-4 rounded-neo border-2 border-neo-black text-center',
+              'p-4 rounded-neo border-2 border-neo-black text-center animate-in fade-in-0 zoom-in-95 duration-300',
               'bg-linear-to-r from-neo-lime to-lime-400'
             )}
+            style={{ animationDelay: '1.2s' }}
           >
             <p className="text-sm font-bold text-neo-black mb-2">
               🔥 {t('brain.playMoreForTrends', { count: 2 })}
@@ -289,7 +268,7 @@ export default function FirstGameCelebration({
             >
               {t('brain.playAgain')}
             </button>
-          </m.div>
+          </div>
 
           {/* Celebration Mascot - positioned at corner */}
           <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 pointer-events-none z-10">
@@ -301,8 +280,8 @@ export default function FirstGameCelebration({
               clipBorder="none"
             />
           </div>
-        </m.div>
-      </m.div>
-    </AnimatePresence>
+        </div>
+      </div>
+    </>
   );
 }

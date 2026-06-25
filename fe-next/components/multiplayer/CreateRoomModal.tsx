@@ -18,7 +18,6 @@ import {
 import { sanitizeRoomName } from '@/utils/consts';
 import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Reveal } from '@/components/ui/Reveal';
 import { Swords, Loader2, MapPin } from 'lucide-react';
 import type { Language } from '@/shared/types/game';
@@ -221,35 +220,29 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               />
               {/* Feedback row */}
               <div className="flex items-center justify-between mt-1.5 px-1">
-                <AdaptiveAnimatePresence mode="wait">
+                <>
                   {nameError ? (
-                    <AdaptiveMotion.span
+                    <span
                       key="error"
                       id="create-username-error"
-                      initial={{ opacity: 0, x: -4 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="text-[10px] font-bold text-red-400"
+                      className="text-[10px] font-bold text-red-400 animate-in fade-in-0 duration-300"
                       role="alert"
                     >
                       {t(nameError)}
-                    </AdaptiveMotion.span>
+                    </span>
                   ) : isNameValid ? (
-                    <AdaptiveMotion.span
+                    <span
                       key="ok"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="text-[10px] font-bold text-neo-lime"
+                      className="text-[10px] font-bold text-neo-lime animate-in fade-in-0 zoom-in-95 duration-300"
                     >
                       {isAuthenticated ? `✓ ${t('common.verified')}` : `✓ ${t('common.looksGood')}`}
-                    </AdaptiveMotion.span>
+                    </span>
                   ) : (
                     <span className="text-[10px] text-neo-white">
                       {t('multiplayerFlow.profileSetup.usernameHint')}
                     </span>
                   )}
-                </AdaptiveAnimatePresence>
+                </>
                 <span className={cn(
                   'text-[10px] font-mono tabular-nums',
                   username.length >= MAX_NAME_LENGTH ? 'text-neo-orange font-bold' : 'text-neo-white',
@@ -293,11 +286,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             </p>
             <div className="flex flex-wrap gap-1.5">
               {LANGUAGES.map(lang => (
-                <AdaptiveMotion.button
+                <button
                   key={lang.code}
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.92 }}
-                  transition={BUTTON_SPRING}
                   onClick={() => setLanguage(lang.code)}
                   className={cn(
                     'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 font-bold text-sm transition-all',
@@ -308,20 +298,15 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 >
                   <span className="text-base leading-none">{lang.flag}</span>
                   <span className="text-xs">{t(lang.labelKey)}</span>
-                </AdaptiveMotion.button>
+                </button>
               ))}
             </div>
           </Reveal>
         </div>
 
         {/* ── CTA ── */}
-        <div className="px-5 pt-1" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 1.25rem))' }}>
-          <AdaptiveMotion.button
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...SPRING, delay: 0.28 }}
-            whileHover={!isCreating ? { scale: 1.02, y: -2 } : undefined}
-            whileTap={!isCreating ? { scale: 0.97, y: 1 } : undefined}
+        <div className="px-5 pt-1 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 1.25rem))' }}>
+          <button
             onClick={handleCreate}
             disabled={isCreating}
             className={cn(
@@ -344,7 +329,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 {t('multiplayerFlow.createModal.createButton')}
               </>
             )}
-          </AdaptiveMotion.button>
+          </button>
         </div>
       </DialogContent>
     </Dialog>

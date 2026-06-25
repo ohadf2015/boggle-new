@@ -1,7 +1,6 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { BLAST_TILE_TYPE_LIST } from '@/shared/types/blast';
 import { TILE_VISUALS } from './blastTileVisuals';
 
@@ -18,25 +17,15 @@ interface BlastTileGuideProps {
  */
 export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
   return (
-    <AdaptiveAnimatePresence>
+    <>
       {isOpen && (
-        <AdaptiveMotion.div
-          key="tile-guide-backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-in fade-in-0 duration-200"
           onClick={onClose}
           data-testid="blast-tile-guide"
         >
-          <AdaptiveMotion.div
-            key="tile-guide-panel"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="relative w-full max-w-sm max-h-[80vh] bg-neo-navy-light border-neo border-neo-black rounded-neo shadow-hard overflow-hidden flex flex-col"
+          <div
+            className="relative w-full max-w-sm max-h-[80vh] bg-neo-navy-light border-neo border-neo-black rounded-neo shadow-hard overflow-hidden flex flex-col animate-in fade-in-0 zoom-in-90 duration-200"
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             {/* Header */}
@@ -84,10 +73,10 @@ export function BlastTileGuide({ isOpen, onClose, t }: BlastTileGuideProps) {
                 })}
               </div>
             </div>
-          </AdaptiveMotion.div>
-        </AdaptiveMotion.div>
+          </div>
+        </div>
       )}
-    </AdaptiveAnimatePresence>
+    </>
   );
 }
 

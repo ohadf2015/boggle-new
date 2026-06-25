@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
 import { NeoPanel } from '@/components/ui/panel';
@@ -22,23 +21,17 @@ export default function PracticeContinuePrompt({
   const { t } = useLanguage();
 
   return (
-    <AnimatePresence>
+    <>
       {open && (
-        <m.div
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-neo-black/60 px-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-neo-black/60 px-4 animate-in fade-in-0 duration-300"
           role="dialog"
           aria-modal="true"
           aria-labelledby="practice-continue-title"
         >
-          <NeoPanel asChild tone="cream" className="p-5 lg:p-6 max-w-sm w-full flex flex-col items-center gap-3">
-          <m.div
-            initial={{ scale: 0.9, y: 12, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+          <NeoPanel asChild tone="cream" className="p-5 lg:p-6 max-w-sm w-full flex flex-col items-center gap-3 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300">
+          <div
+            className="animate-in fade-in-0 zoom-in-95 duration-300"
           >
             <Mascot variant="celebration" size="md" />
             <h2
@@ -64,10 +57,10 @@ export default function PracticeContinuePrompt({
             >
               {t('practiceContinue.skip')}
             </button>
-          </m.div>
+          </div>
           </NeoPanel>
-        </m.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

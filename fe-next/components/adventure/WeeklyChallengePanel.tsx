@@ -8,7 +8,6 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Trophy, X, Clock, ChevronRight, Crown, Medal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -68,22 +67,19 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
   if (!isOpen) return null;
 
   return (
-    <AdaptiveAnimatePresence>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-xs"
+      onClick={onClose}
+    >
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-xs"
-        onClick={onClose}
+        onClick={(e) => e.stopPropagation()}
+        className={cn(
+          'relative w-full max-w-lg mx-4 max-h-[85dvh] overflow-y-auto',
+          'bg-neo-navy border-4 border-neo-black',
+          'rounded-neo shadow-hard-lg p-6',
+          'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
+        )}
       >
-        <AdaptiveMotion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          onClick={(e) => e.stopPropagation()}
-          className={cn(
-            'relative w-full max-w-lg mx-4 max-h-[85dvh] overflow-y-auto',
-            'bg-neo-navy border-4 border-neo-black',
-            'rounded-neo shadow-hard-lg p-6'
-          )}
-        >
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -113,9 +109,7 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
 
           {/* Play Button */}
           {onPlay && (
-            <AdaptiveMotion.button
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
+            <button
               onClick={onPlay}
               className={cn(
                 'w-full py-3 px-4 mb-5',
@@ -125,12 +119,13 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
                 'border-3 border-neo-black rounded-neo shadow-hard',
                 'hover:-translate-y-0.5 hover:shadow-hard-lg',
                 'active:translate-y-0.5 active:shadow-hard-pressed',
-                'transition-all duration-150'
+                'transition-all duration-150',
+                'animate-in fade-in-0 zoom-in-95 duration-300'
               )}
             >
               {t('adventure.weeklyChallenge.play')}
               <ChevronRight className="w-5 h-5 rtl:scale-x-[-1]" />
-            </AdaptiveMotion.button>
+            </button>
           )}
 
           {/* Leaderboard */}
@@ -182,9 +177,8 @@ const WeeklyChallengePanel = memo<WeeklyChallengePanelProps>(({
               })}
             </div>
           )}
-        </AdaptiveMotion.div>
       </div>
-    </AdaptiveAnimatePresence>
+    </div>
   );
 });
 

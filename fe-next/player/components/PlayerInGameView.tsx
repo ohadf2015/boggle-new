@@ -37,6 +37,8 @@ import { CrosswordVersus } from '@/components/multiplayer/crossword/CrosswordVer
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
+import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
+import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   useGameMode,
@@ -305,6 +307,10 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     setShowTournamentStandings(false);
   }, [setShowTournamentStandings]);
 
+  // Desktop 3-column chassis (≥1024px + flag): wraps each mode's canvas with
+  // roster/words/insight rails instead of a mobile grid floating in empty space.
+  const shellEnabled = useDesktopShellEnabled();
+
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   // caused by the host handler setting tableData (React state) and gameMode (Zustand)
   // in separate calls, producing two render cycles.
@@ -312,7 +318,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Wheel-rush has no letter grid — render dedicated view before grid guard
   if (gameMode === 'wheel-rush') {
-    return (
+    const wheelCanvas = (
       <WheelRushView
         socket={socket}
         username={username}
@@ -322,6 +328,24 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         remainingTime={remainingTime}
       />
     );
+    if (shellEnabled) {
+      return (
+        <div className={getMpInGameContainerClass(gameMode)}>
+          <MpDesktopShellFrame
+            gameMode={gameMode}
+            canvas={wheelCanvas}
+            leaderboard={leaderboard}
+            foundWords={foundWords}
+            socket={socket}
+            meId={username}
+            roomId={gameCode}
+            remainingTime={remainingTime}
+            totalTime={totalTime}
+          />
+        </div>
+      );
+    }
+    return wheelCanvas;
   }
 
   // Word Tower versus — per-player towers, no shared grid
@@ -364,12 +388,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     );
   }
 
-  return (
-    <div className={getMpInGameContainerClass(gameMode)}>
-
-
-      {/* Main Game Content — Blast/WordHunt use dedicated components, others use InGameScreen */}
-      {gameMode === 'blast' ? (
+  // The active mode's game component. On desktop it becomes the shell's center
+  // slot; on mobile/tablet it's rendered directly.
+  const gameCanvas = gameMode === 'blast' ? (
           <BlastGame
             config={blastBridge.config}
             mode="multiplayer"
@@ -459,6 +480,26 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           // Tutorial callback
           onShowTutorial={onShowTutorial}
         />
+      );
+
+  return (
+    <div className={getMpInGameContainerClass(gameMode)}>
+      {/* Desktop wraps the mode canvas in the 3-column shell (roster / game /
+          words+insights); mobile/tablet renders the canvas directly. */}
+      {shellEnabled && isShellMode(gameMode) ? (
+        <MpDesktopShellFrame
+          gameMode={gameMode}
+          canvas={gameCanvas}
+          leaderboard={leaderboard}
+          foundWords={foundWords}
+          socket={socket}
+          meId={username}
+          roomId={gameCode}
+          remainingTime={remainingTime}
+          totalTime={totalTime}
+        />
+      ) : (
+        gameCanvas
       )}
 
       {/* Pending word chips — optimistic submit feedback */}

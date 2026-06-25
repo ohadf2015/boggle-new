@@ -197,14 +197,8 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
     // "play" CTA, which is portaled to <body> at z-[100]. Equal z-index let that
     // later-in-DOM portal paint over the tutorial's action buttons.
     <div className="fixed inset-0 bg-black/80 text-white flex items-center justify-center z-[120] p-4">
-      <m.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        // Flex column so the body scrolls and the footer stays pinned. The card
-        // never exceeds the viewport (max-h) and clips its own overflow; only
-        // the inner body scrolls.
-        className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black max-w-md w-full p-6 shadow-neo-brutalist relative flex flex-col max-h-[92vh] overflow-hidden"
+      <div
+        className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black max-w-md w-full p-6 shadow-neo-brutalist relative flex flex-col max-h-[92vh] overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
         {...swipeHandlers}
       >
         {/* Close button */}
@@ -266,7 +260,7 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
             {t('tutorial.swipeHint')}
           </div>
         </div>
-      </m.div>
+      </div>
     </div>
   );
 };

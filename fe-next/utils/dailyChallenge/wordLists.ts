@@ -5,6 +5,10 @@
  */
 
 import type { Language } from '@/types';
+import enHuntTargets from '@/lib/practice/data/wordHuntTargets.en.json';
+import heHuntTargets from '@/lib/practice/data/wordHuntTargets.he.json';
+import svHuntTargets from '@/lib/practice/data/wordHuntTargets.sv.json';
+import esHuntTargets from '@/lib/practice/data/wordHuntTargets.es.json';
 
 /**
  * Bonus words to embed in the grid for survival mode playability
@@ -72,7 +76,7 @@ export const BONUS_WORD_LISTS: Record<Language, string[]> = {
  * violence-primary (abuse), purely functional (about, also, their).
  * See wordQuality.ts for the full blacklist.
  */
-export const TARGET_WORD_LISTS: Record<Language, string[]> = {
+const CURATED_TARGET_WORD_LISTS: Record<Language, string[]> = {
   en: [
     // Window: 5-6 letters only (MIN_ANSWER_LENGTH=5, MAX_TARGET_WORD_LENGTH=6).
     // ── Animals & Creatures ──
@@ -192,6 +196,35 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'GARTEN', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER',
     'HERBST', 'SCHULE', 'KIRCHE', 'BRÜCKE', 'DRACHE', 'RITTER',
   ],
+};
+
+/**
+ * Daily target pools = the curated lists above + the validated 5-7 letter Word
+ * Hunt pools (lib/practice/data/wordHuntTargets.*). This unifies the target
+ * source across daily, practice, and MP onto one large, dictionary-validated,
+ * fun-to-reveal set — which kills the small-pool target repetition ("recurring")
+ * and the obscure-dictionary-noun problem. Curated words stay first (dedup keeps
+ * the earlier occurrence). en/sv/es pools are uppercase, he is base-form; both
+ * match the existing list conventions. JA keeps its curated list (no pool).
+ */
+function mergeUnique(...lists: string[][]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const list of lists) {
+    for (const w of list) {
+      const k = w.toUpperCase();
+      if (!seen.has(k)) { seen.add(k); out.push(w); }
+    }
+  }
+  return out;
+}
+
+export const TARGET_WORD_LISTS: Record<Language, string[]> = {
+  ...CURATED_TARGET_WORD_LISTS,
+  en: mergeUnique(CURATED_TARGET_WORD_LISTS.en, enHuntTargets as string[]),
+  he: mergeUnique(CURATED_TARGET_WORD_LISTS.he, heHuntTargets as string[]),
+  sv: mergeUnique(CURATED_TARGET_WORD_LISTS.sv, svHuntTargets as string[]),
+  es: mergeUnique(CURATED_TARGET_WORD_LISTS.es, esHuntTargets as string[]),
 };
 
 /**

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Share2, Check, Copy, ArrowRight, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -201,12 +201,9 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   if (!isOpen) return null;
 
   return (
-    <AdaptiveAnimatePresence>
-      <AdaptiveMotion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-neo-black/70 backdrop-blur-xs flex items-center justify-center p-4"
+    <>
+      <div
+        className="fixed inset-0 z-50 bg-neo-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in-0 duration-300"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         {/* Word Input Phase */}
@@ -238,11 +235,8 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
         {/* Share Phase */}
         {phase === 'share' && puzzleCode && creatorResult && (
-          <AdaptiveMotion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg max-w-md w-full overflow-hidden"
+          <div
+            className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg max-w-md w-full overflow-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
           >
             {/* Success Header */}
             <div className="bg-linear-to-r from-neo-lime to-neo-cyan border-b-4 border-neo-black p-6 text-center relative overflow-hidden">
@@ -261,14 +255,12 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 ✨
               </AdaptiveMotion.div>
 
-              <AdaptiveMotion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', damping: 10, delay: 0.2 }}
-                className="w-20 h-20 bg-neo-cream border-4 border-neo-black rounded-full flex items-center justify-center mx-auto mb-3 shadow-hard"
+              <div
+                className="w-20 h-20 bg-neo-cream border-4 border-neo-black rounded-full flex items-center justify-center mx-auto mb-3 shadow-hard animate-in zoom-in-50 duration-300"
+                style={{ animationDelay: '0.2s' }}
               >
                 <Trophy className="w-10 h-10 text-neo-lime" />
-              </AdaptiveMotion.div>
+              </div>
               <h2 className="text-2xl font-black text-neo-black ltr:drop-shadow-[1px_1px_0px_white] rtl:drop-shadow-[-1px_1px_0px_white]">
                 {t('customPuzzle.created')}
               </h2>
@@ -279,32 +271,27 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
             <div className="p-5 space-y-4">
               {/* Score Display */}
-              <AdaptiveMotion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="bg-neo-lime border-3 border-neo-black rounded-neo p-4 shadow-hard text-center"
+              <div
+                className="bg-neo-lime border-3 border-neo-black rounded-neo p-4 shadow-hard text-center animate-in fade-in-0 zoom-in-95 duration-300"
+                style={{ animationDelay: '0.3s' }}
               >
                 <p className="text-sm text-neo-black/70 font-bold uppercase tracking-wide mb-1">
                   {t('customPuzzle.yourScore')}
                 </p>
                 <p className="text-5xl font-black text-neo-black">{Math.round(creatorResult.efficiencyScore)}</p>
-              </AdaptiveMotion.div>
+              </div>
 
               {/* Share URL */}
               <NeoPanel asChild tone="navy" shadow="sm" className="p-3 flex items-center gap-2">
-              <AdaptiveMotion.div
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
+              <div
+                className="animate-in fade-in-0 zoom-in-95 duration-300"
+                style={{ animationDelay: '0.4s' }}
               >
                 <code className="flex-1 text-sm truncate text-neo-white font-mono">
                   {buildPuzzleShareUrl(puzzleCode, language)}
                 </code>
-                <AdaptiveMotion.button
+                <button
                   onClick={handleCopyLink}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
                   className={cn(
                     "w-10 h-10 rounded-neo border-2 border-neo-cream/50 flex items-center justify-center transition-all",
                     copied ? "bg-neo-lime border-neo-lime" : "bg-neo-navy-light hover:bg-neo-cream/20"
@@ -315,16 +302,14 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   ) : (
                     <Copy className="w-5 h-5 text-neo-white" />
                   )}
-                </AdaptiveMotion.button>
-              </AdaptiveMotion.div>
+                </button>
+              </div>
               </NeoPanel>
 
               {/* Actions */}
-              <AdaptiveMotion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="space-y-3 pt-2"
+              <div
+                className="space-y-3 pt-2 animate-in fade-in-0 zoom-in-95 duration-300"
+                style={{ animationDelay: '0.5s' }}
               >
                 <Button
                   onClick={handleShare}
@@ -342,12 +327,12 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   {t('common.done')}
                   <ArrowRight className="w-5 h-5 ms-2" />
                 </Button>
-              </AdaptiveMotion.div>
+              </div>
             </div>
-          </AdaptiveMotion.div>
+          </div>
         )}
-      </AdaptiveMotion.div>
-    </AdaptiveAnimatePresence>
+      </div>
+    </>
   );
 };
 

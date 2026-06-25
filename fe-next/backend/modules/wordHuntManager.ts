@@ -135,15 +135,20 @@ export function selectTargetWord(
     const common = getCommonWords(lang);
     if (common.size > 0) {
       const commonCandidates = candidates.filter(w => common.has(w.toLowerCase()));
-      if (commonCandidates.length > 0) {
-        return commonCandidates[Math.floor(Math.random() * commonCandidates.length)];
+      // Apply the quality filter to the common pool too — raising the length cap
+      // to 7 surfaces longer common words that may still be jargon/clinical.
+      // Fall back to the unfiltered common pool only if quality leaves nothing.
+      const quality = commonCandidates.filter(w => isWordHuntQuality(w, lang));
+      const pool = quality.length > 0 ? quality : commonCandidates;
+      if (pool.length > 0) {
+        return pool[Math.floor(Math.random() * pool.length)];
       }
     }
   }
 
   // Filter out low-quality words (jargon, medical, offensive, boring)
   // before falling back to any dictionary word
-  const qualityCandidates = candidates.filter(w => isWordHuntQuality(w));
+  const qualityCandidates = candidates.filter(w => isWordHuntQuality(w, lang));
   if (qualityCandidates.length > 0) {
     return qualityCandidates[Math.floor(Math.random() * qualityCandidates.length)];
   }

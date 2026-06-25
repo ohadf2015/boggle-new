@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import type { LeagueTier, LeagueZone } from '@/hooks/useLeague';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
@@ -45,10 +44,8 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <AdaptiveMotion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="border-3 border-black rounded-neo shadow-hard-lg bg-neo-navy p-6 max-w-sm w-full mx-4"
+      <div
+        className="border-3 border-black rounded-neo shadow-hard-lg bg-neo-navy p-6 max-w-sm w-full mx-4 animate-in fade-in-0 zoom-in-95 duration-300"
       >
         <h2 className="font-neo-display text-2xl font-bold text-neo-white text-center mb-4">
           {t('league.finalResults')}
@@ -79,7 +76,7 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
         >
           {t('common.continue')}
         </button>
-      </AdaptiveMotion.div>
+      </div>
     </div>
   );
 }

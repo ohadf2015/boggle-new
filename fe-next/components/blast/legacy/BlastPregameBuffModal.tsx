@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Play, X, Shield, Bomb, Zap, Sparkles } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 
 export type BlastPregameBuff = 'shield' | 'bomb' | 'combo2x';
@@ -39,19 +38,13 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
   const selectedDesc = selected ? t(`blast.pregameBuff.${selected}Desc`) : t('blast.pregameBuff.ctaDefault');
 
   return (
-    <AdaptiveAnimatePresence>
-      <AdaptiveMotion.div
+    <>
+      <div
         data-testid="blast-pregame-buff-modal"
-        className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/90 p-4 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/90 p-4 backdrop-blur-sm animate-in fade-in-0 duration-300"
       >
-        <AdaptiveMotion.div
-          className="relative w-full max-w-md rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg"
-          initial={{ scale: 0.85, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.85, y: 20 }}
+        <div
+          className="relative w-full max-w-md rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
         >
           {/* Sparkle ribbon — "FREE" badge to amplify reward feel */}
           <div className="absolute -top-3 -right-3 flex items-center gap-1 rounded-full border-2 border-black bg-neo-lime px-3 py-1 font-neo-display text-xs font-black uppercase tracking-wider text-neo-navy shadow-hard">
@@ -124,9 +117,9 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
               </button>
             </div>
           </div>
-        </AdaptiveMotion.div>
-      </AdaptiveMotion.div>
-    </AdaptiveAnimatePresence>
+        </div>
+      </div>
+    </>
   );
 }
 

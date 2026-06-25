@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 
@@ -70,57 +69,45 @@ export const WinCinematic: React.FC<WinCinematicProps> = ({
   }, []);
 
   return (
-    <m.div
+    <div
       data-testid="win-cinematic"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-neo-navy flex flex-col items-center justify-center cursor-pointer select-none"
+      className="fixed inset-0 z-50 bg-neo-navy flex flex-col items-center justify-center cursor-pointer select-none animate-in fade-in-0 duration-300"
       onClick={handleClick}
     >
       {/* Puzzle label — number rendered explicitly so it's always in the DOM */}
-      <m.div
-        initial={{ scale: 0, rotate: -10 }}
-        animate={{ scale: 1, rotate: -3 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.1 }}
-        className="text-slate-500 text-sm font-black uppercase tracking-widest mb-4"
+      <div
+        className="text-slate-500 text-sm font-black uppercase tracking-widest mb-4 animate-in zoom-in-50 duration-300"
+        style={{ animationDelay: '0.1s' }}
       >
         {t('wordHunt.title')} #{puzzleNumber}
-      </m.div>
+      </div>
 
       {/* Rolling score */}
-      <m.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
-        className="text-[8rem] font-black text-neo-lime leading-none tabular-nums"
+      <div
+        className="text-[8rem] font-black text-neo-lime leading-none tabular-nums animate-in fade-in-0 zoom-in-95 duration-300"
+        style={{ animationDelay: '0.2s' }}
       >
         {displayScore}
-      </m.div>
+      </div>
 
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, type: 'spring', stiffness: 280, damping: 26 }}
-        className="text-slate-400 text-lg font-bold uppercase tracking-widest"
+      <div
+        className="text-slate-400 text-lg font-bold uppercase tracking-widest animate-in fade-in-0 duration-300"
+        style={{ animationDelay: '0.3s' }}
       >
         {t('common.pts')}
-      </m.div>
+      </div>
 
       {/* Tap to continue */}
-      <AnimatePresence>
+      <>
         {showTap && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-            className="absolute bottom-12 text-slate-500 text-sm uppercase tracking-widest"
+          <div
+            className="absolute bottom-12 text-slate-500 text-sm uppercase tracking-widest animate-in fade-in-0 duration-300"
           >
             {t('common.tapToContinue')}
-          </m.div>
+          </div>
         )}
-      </AnimatePresence>
-    </m.div>
+      </>
+    </div>
   );
 };
 

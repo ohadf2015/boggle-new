@@ -6,7 +6,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Hand, Target, Swords } from 'lucide-react';
 
@@ -55,15 +54,10 @@ export function AdventureTutorial({ onComplete }: AdventureTutorialProps) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 p-4"
       data-testid="adventure-tutorial"
     >
-      <AdaptiveAnimatePresence mode="wait">
-        <AdaptiveMotion.div
-          key={step}
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: -20 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-6 max-w-sm w-full"
-        >
+      <div
+        key={step}
+        className="bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-6 max-w-sm w-full animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
+      >
           {/* Icon */}
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-full bg-neo-lime/15 border-2 border-neo-lime/30 flex items-center justify-center">
@@ -110,8 +104,7 @@ export function AdventureTutorial({ onComplete }: AdventureTutorialProps) {
               {step < totalSteps - 1 ? t('adventure.tutorial.next') : t('adventure.tutorial.gotIt')}
             </button>
           </div>
-        </AdaptiveMotion.div>
-      </AdaptiveAnimatePresence>
+      </div>
     </div>
   );
 }

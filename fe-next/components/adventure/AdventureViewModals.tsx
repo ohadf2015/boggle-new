@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -62,28 +61,21 @@ export default function AdventureViewModals({
   useFocusTrap(shopRef, showShop && !isPlaying, onCloseShop);
 
   return (
-    <AdaptiveAnimatePresence>
+    <>
       {showShop && !isPlaying && (
-        <AdaptiveMotion.div
-          key="shop-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in-0 duration-300"
           onClick={onCloseShop}
         >
-          <AdaptiveMotion.div
+          <div
             ref={shopRef}
             role="dialog"
             aria-modal="true"
             aria-label={t('adventure.upgrades.shopTitle')}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
               'relative w-full max-w-lg lg:max-w-2xl max-h-[min(80dvh,600px)] lg:max-h-[min(85dvh,800px)] overflow-y-auto',
-              'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4 lg:p-6'
+              'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4 lg:p-6',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
             )}
             onClick={(e) => e.stopPropagation()}
           >
@@ -104,8 +96,8 @@ export default function AdventureViewModals({
               currentWorld={selectedWorld ?? 1}
               onPurchase={onShopPurchase}
             />
-          </AdaptiveMotion.div>
-        </AdaptiveMotion.div>
+          </div>
+        </div>
       )}
 
       {/* Word Album Panel */}
@@ -139,25 +131,18 @@ export default function AdventureViewModals({
       )}
       {/* Achievement Grid */}
       {showAchievements && (
-        <AdaptiveMotion.div
-          key="achievements-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in-0 duration-300"
           onClick={onCloseAchievements}
         >
-          <AdaptiveMotion.div
+          <div
             role="dialog"
             aria-modal="true"
             aria-label={t('adventure.achievements.title')}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
               'relative w-full max-w-lg lg:max-w-2xl max-h-[min(80dvh,600px)] lg:max-h-[min(85dvh,800px)] overflow-y-auto',
-              'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4 lg:p-6'
+              'bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard-lg p-4 lg:p-6',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
             )}
             onClick={(e) => e.stopPropagation()}
           >
@@ -173,9 +158,9 @@ export default function AdventureViewModals({
               <X className="w-4 h-4" />
             </button>
             <AchievementGrid />
-          </AdaptiveMotion.div>
-        </AdaptiveMotion.div>
+          </div>
+        </div>
       )}
-    </AdaptiveAnimatePresence>
+    </>
   );
 }

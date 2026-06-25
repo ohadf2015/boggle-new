@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 5873,
+    "totalKeysInCode": 5885,
     "keyCountByLanguage": {
-      "en": 11248,
-      "he": 11376,
-      "sv": 11355,
-      "ja": 11356,
-      "es": 11384
+      "en": 11275,
+      "he": 11403,
+      "sv": 11382,
+      "ja": 11383,
+      "es": 11411
     },
-    "missingFromEnglish": 6,
+    "missingFromEnglish": 5,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 26,
@@ -431,19 +431,6 @@
         {
           "file": "components/adventure/boss/WeaknessBadge.tsx",
           "line": 51
-        }
-      ]
-    },
-    {
-      "key": "crossword.switchDir",
-      "usages": [
-        {
-          "file": "components/crossword/ClueBar.tsx",
-          "line": 39
-        },
-        {
-          "file": "components/crossword/ClueBar.tsx",
-          "line": 41
         }
       ]
     }

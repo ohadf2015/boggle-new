@@ -13,7 +13,6 @@
  */
 
 import { useEffect, useState } from 'react';
-import { m } from 'framer-motion';
 import { WifiOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -47,12 +46,9 @@ export function DuelDisconnectOverlay({
   }, []);
 
   return (
-    <m.div
+    <div
       data-testid="disconnect-overlay"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-xs"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-xs animate-in fade-in-0 duration-300"
     >
       <div className="bg-neo-navy border-neo-thick rounded-neo shadow-hard p-8 max-w-md text-center">
         {/* Icon */}
@@ -73,6 +69,6 @@ export function DuelDisconnectOverlay({
           </p>
         </div>
       </div>
-    </m.div>
+    </div>
   );
 }

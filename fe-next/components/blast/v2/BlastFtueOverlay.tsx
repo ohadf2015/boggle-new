@@ -30,16 +30,11 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
 
   if (isVeteran) {
     return (
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 flex items-center justify-center bg-black/75 z-50"
+      <div
+        className="fixed inset-0 flex items-center justify-center bg-black/75 z-50 animate-in fade-in-0 duration-300"
       >
-        <m.div
-          className="bg-[#0b1530] border-neo-thick border-black rounded-neo p-6 max-w-sm text-center text-white space-y-4"
-          initial={{ scale: reducedMotion === true ? 1 : 0.9 }}
-          animate={{ scale: 1 }}
+        <div
+          className="bg-[#0b1530] border-neo-thick border-black rounded-neo p-6 max-w-sm text-center text-white space-y-4 animate-in fade-in-0 zoom-in-95 duration-300"
         >
           <div className="text-2xl font-bold">
             {t('blast.tutorial.veteran.title', 'Welcome back!')}
@@ -53,8 +48,8 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
           >
             {t('blast.tutorial.veteran.cta', "Let's go")}
           </button>
-        </m.div>
-      </m.div>
+        </div>
+      </div>
     );
   }
 
@@ -73,14 +68,10 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
       {/* Soft vignette scrim. Radial gradient leaves the board bright while
           fading edges. Pointer-events still off so play continues. */}
       {showScrim && (
-        <m.div
+        <div
           aria-hidden
           data-testid="blast-ftue-scrim"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="absolute inset-0"
+          className="absolute inset-0 animate-in fade-in-0 duration-300"
           style={{
             background:
               'radial-gradient(ellipse 80% 55% at 50% 60%, transparent 0%, rgba(0,0,0,0.55) 100%)',
@@ -95,7 +86,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
         <AnimatePresence mode="wait">
           <m.div
             key={`ftue-step-${step}`}
-            initial={{ y: -20, opacity: 0 }}
+            initial={{ y: -20 }}
             animate={{
               y: 0,
               opacity: 1,

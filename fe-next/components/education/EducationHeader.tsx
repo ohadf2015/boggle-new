@@ -2,7 +2,6 @@
 
 import { memo, useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
@@ -270,33 +269,26 @@ export const EducationHeader = memo<EducationHeaderProps>(({
 
       {/* Mobile Menu Slide-out Pane */}
       {mounted && createPortal(
-        <AdaptiveAnimatePresence>
+        <>
           {showMobileMenu && (
             <>
               {/* Backdrop overlay */}
-              <AdaptiveMotion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="fixed inset-0 bg-neo-black/50 z-70 sm:hidden"
+              <div
+                className="fixed inset-0 bg-neo-black/50 z-70 sm:hidden animate-in fade-in-0 duration-200"
                 onClick={() => setShowMobileMenu(false)}
               />
               {/* Slide-out pane */}
-              <AdaptiveMotion.div
+              <div
                 ref={mobileMenuRef}
-                initial={{ x: isRTL ? '-100%' : '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: isRTL ? '-100%' : '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 className={cn(
                   'fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-80 sm:hidden',
                   'bg-neo-cream dark:bg-neo-navy border-neo-black dark:border-slate-600',
                   'shadow-hard-xl overflow-y-auto',
                   'pb-[max(env(safe-area-inset-bottom),1rem)]',
+                  'animate-in duration-300',
                   isRTL
-                    ? 'left-0 border-r-4 rounded-r-neo-lg'
-                    : 'right-0 border-l-4 rounded-l-neo-lg'
+                    ? 'left-0 border-r-4 rounded-r-neo-lg slide-in-from-left-full'
+                    : 'right-0 border-l-4 rounded-l-neo-lg slide-in-from-right-full'
                 )}
               >
                 {/* Pane Header */}
@@ -440,10 +432,10 @@ export const EducationHeader = memo<EducationHeaderProps>(({
                     </>
                   )}
                 </div>
-              </AdaptiveMotion.div>
+              </div>
             </>
           )}
-        </AdaptiveAnimatePresence>,
+        </>,
         document.body
       )}
     </header>
@@ -509,19 +501,15 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
         <Menu size={18} />
       </button>
 
-      <AdaptiveAnimatePresence>
-        {isOpen && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
+      {isOpen && (
+          <div
             className={cn(
               'absolute top-full mt-2 w-56',
               'bg-neo-cream dark:bg-neo-navy',
               'border-3 border-neo-black dark:border-slate-500',
               'rounded-neo shadow-hard-lg',
               'overflow-hidden z-50',
+              'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150',
               isRTL ? 'left-0' : 'right-0'
             )}
           >
@@ -605,9 +593,8 @@ const EducationMenuDropdown = memo<EducationMenuDropdownProps>(({
                 </div>
               </>
             )}
-          </AdaptiveMotion.div>
+          </div>
         )}
-      </AdaptiveAnimatePresence>
     </div>
   );
 });

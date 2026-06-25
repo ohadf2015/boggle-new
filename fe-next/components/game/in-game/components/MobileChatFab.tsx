@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useContext, memo, useCallback } from 'react';
 import { MessageSquare, X } from 'lucide-react';
-import { AnimatePresence, m } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { SocketContext } from '@/utils/SocketContext';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -86,8 +86,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
   return (
     <div className="lg:hidden">
       {/* Unread badge — only visible when a new message arrives, auto-hides after 5s */}
-      <AnimatePresence>
-        {hasUnread && !isOpen && (
+      {hasUnread && !isOpen && (
           <m.button
             key="chat-badge"
             initial={{ scale: 0, opacity: 0 }}
@@ -113,27 +112,18 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
             />
           </m.button>
         )}
-      </AnimatePresence>
 
       {/* Chat Sheet Overlay */}
-      <AnimatePresence>
-        {isOpen && (
+      {isOpen && (
           <>
             {/* Backdrop */}
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/40"
+            <div
+              className="fixed inset-0 z-50 bg-black/40 animate-in fade-in-0 duration-300"
               onClick={handleClose}
             />
 
             {/* Chat Sheet */}
-            <m.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            <div
               className={cn(
                 'fixed bottom-0 left-0 right-0 z-50',
                 'h-[55dvh] max-h-[380px]',
@@ -141,6 +131,7 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
                 'rounded-t-neo-lg shadow-hard-lg',
                 'flex flex-col',
                 'pb-[env(safe-area-inset-bottom)]',
+                'animate-in slide-in-from-bottom-full duration-300',
               )}
             >
               {/* Header */}
@@ -173,10 +164,9 @@ export const MobileChatFab = memo<MobileChatFabProps>(({ username, isHost, gameC
                   variant="embedded"
                 />
               </div>
-            </m.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
     </div>
   );
 });

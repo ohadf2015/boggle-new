@@ -45,6 +45,9 @@ import {
 } from '@/hooks/gameState/store';
 import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
 import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
+import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
+import { MpDesktopShellFrame, isShellMode } from '@/components/multiplayer/desktop/MpDesktopShellFrame';
+import { getMpInGameContainerClass } from '@/lib/multiplayer/inGameContainerClass';
 
 // ==================== Types ====================
 
@@ -268,6 +271,29 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
     }));
   }, [hostFoundWords]);
 
+  // Desktop 3-column chassis — only when the host is actually playing (the rails
+  // are player-centric, e.g. "my words"); a non-playing TV/scoreboard host keeps
+  // its full-screen layout. Mobile/tablet path is byte-identical to before.
+  const shellEnabled = useDesktopShellEnabled();
+  const wrapCanvas = (canvas: React.ReactNode) =>
+    shellEnabled && isShellMode(gameMode) && hostPlaying ? (
+      <div className={getMpInGameContainerClass(gameMode as string)}>
+        <MpDesktopShellFrame
+          gameMode={gameMode as string}
+          canvas={canvas}
+          leaderboard={leaderboard}
+          foundWords={foundWords}
+          socket={socket}
+          meId={username}
+          roomId={gameCode}
+          remainingTime={remainingTime}
+          totalTime={totalTime}
+        />
+      </div>
+    ) : (
+      canvas
+    );
+
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   if (!gameModeConfirmed) return null;
 
@@ -275,6 +301,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   if (gameMode === 'wheel-rush') {
     return (
       <>
+        {wrapCanvas(
         <WheelRushView
           socket={socket}
           username={username}
@@ -283,6 +310,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           t={t}
           remainingTime={remainingTime}
         />
+        )}
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
@@ -352,6 +380,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   if (gameMode === 'blast' && hostPlaying) {
     return (
       <>
+        {wrapCanvas(
         <BlastGame
           config={blastBridge.config}
           mode="multiplayer"
@@ -368,6 +397,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           blastSeed={blastBridge.blastSeed}
           serverGrid={blastBridge.serverGrid}
         />
+        )}
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
@@ -393,6 +423,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   if (gameMode === 'word-hunt' && hostPlaying) {
     return (
       <>
+        {wrapCanvas(
         <WordHuntGame
           grid={tableData}
           gameLanguage={roomLanguage}
@@ -407,6 +438,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           socket={socket}
           foundWords={foundWords}
         />
+        )}
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
         {showAbortModal && <MPGameAbortedModal wordCount={hostFoundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onStopGame} />}
         {showStopConfirm && (
@@ -430,6 +462,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
   return (
     <>
+    {wrapCanvas(
     <div className="relative flex-1 flex flex-col min-h-0">
     <InGameScreen
       // Core identity
@@ -476,6 +509,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       totalGamesPlayed={profile?.total_games}
     />
     </div>
+    )}
     {/* Pending word chips — optimistic submit feedback */}
     {pendingWords.size > 0 && (
       <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">

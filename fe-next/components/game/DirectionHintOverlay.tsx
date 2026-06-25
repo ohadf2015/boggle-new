@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, memo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m } from 'framer-motion';
 import { NeoPanel } from '@/components/ui/panel';
 
 const AUTO_DISMISS_MS = 4000;
@@ -70,23 +70,15 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
     ZIGZAG_PATH.slice(0, activeStep).some(([r, c]) => r === row && c === col);
 
   return (
-    <AnimatePresence>
+    <>
       {visible && (
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 animate-in fade-in-0 duration-200"
           onClick={dismiss}
           data-testid="direction-hint-overlay"
         >
-          <NeoPanel asChild tone="navy" shadow="lg" className="p-5 max-w-[280px] flex flex-col items-center gap-3">
-          <m.div
-            initial={{ scale: 0.8, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.8, opacity: 0, y: 20 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          <NeoPanel asChild tone="navy" shadow="lg" className="p-5 max-w-[280px] flex flex-col items-center gap-3 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300">
+          <div
             onClick={(e) => e.stopPropagation()}
           >
             {/* Mini 3x3 grid with zigzag path */}
@@ -163,11 +155,11 @@ const DirectionHintOverlay = memo<DirectionHintOverlayProps>(function DirectionH
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
               />
             </m.div>
-          </m.div>
+          </div>
           </NeoPanel>
-        </m.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 });
 

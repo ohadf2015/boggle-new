@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-25T07:27:21.807Z",
+  "generatedAt": "2026-06-25T17:44:20.109Z",
   "commits": [
     {
-      "sha": "545fe1aff913f12b6a619d5005ccee55b2f9a44d",
-      "shortSha": "545fe1a",
-      "subject": "fix(home): desktop daily card reuses HomeDailyHero banner",
+      "sha": "ce210f158b5876a208e29732965d1f0ad4656de5",
+      "shortSha": "ce210f1",
+      "subject": "fix(onboarding): skip lands new player on home, not multiplayer",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T10:19:47+03:00"
+      "date": "2026-06-25T20:39:53+03:00"
     },
     {
-      "sha": "282955516a214d355304938caffb9256d61c5d92",
-      "shortSha": "2829555",
-      "subject": "Merge pull request #623 from ohadf2015/claude/word-tower-physics-ui-xq155q",
-      "author": "ohadf2015",
-      "date": "2026-06-25T09:32:16+03:00"
-    },
-    {
-      "sha": "b636fab59579f3cf244f68acf988b4e4bced3008",
-      "shortSha": "b636fab",
-      "subject": "feat(word-tower): centre the tower sway, fix stuck toasts + HUD overlap, wire all upgrades",
-      "author": "Claude",
-      "date": "2026-06-25T06:27:37Z"
-    },
-    {
-      "sha": "87ce8460c0cf330ffa5d5e180cde9da2724c9422",
-      "shortSha": "87ce846",
-      "subject": "Merge pull request #622 from ohadf2015/claude/word-wheel-gradient-bg-67y74t",
-      "author": "ohadf2015",
-      "date": "2026-06-25T09:11:48+03:00"
-    },
-    {
-      "sha": "d35c1e1af125b27dc09b15d4466d810720ced177",
-      "shortSha": "d35c1e1",
-      "subject": "fix(word-wheel): restore radial gradient backdrop behind the wheel",
-      "author": "Claude",
-      "date": "2026-06-25T06:04:58Z"
-    },
-    {
-      "sha": "f37142f2a7fbff0aee47774aa29397bc35d58d65",
-      "shortSha": "f37142f",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-25",
+      "sha": "494fe3b7404ad10a25e4650b059f66aea2c70bf6",
+      "shortSha": "494fe3b",
+      "subject": "feat(ftue): coach solo Blast + daily Word Hunt, add mode-coach analytics",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T04:53:28+03:00"
+      "date": "2026-06-25T20:39:17+03:00"
     },
     {
-      "sha": "ec9ca75a80b78f3c182ad28089b012dda569d40a",
-      "shortSha": "ec9ca75",
-      "subject": "feat(ads): Monetag web banner (In-Page Push) mirroring the native AdMob banner",
+      "sha": "6d50fdc41244d920b51784cb67eac3917e370ce7",
+      "shortSha": "6d50fdc",
+      "subject": "feat(results): idle float + winner score glow on hero",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T03:58:46+03:00"
+      "date": "2026-06-25T20:38:44+03:00"
     },
     {
-      "sha": "8135ce73c5d2cb74d6fdd820375052438ebefaec",
-      "shortSha": "8135ce7",
-      "subject": "feat(home): random avatar + loading skeletons + always-show all modes",
+      "sha": "ff45b730d53b5b20f32fe510b8ef6fe18d806f73",
+      "shortSha": "ff45b73",
+      "subject": "fix(landing): remove side-stripe border tell in DailyMissionsHub",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T03:41:37+03:00"
+      "date": "2026-06-25T20:38:24+03:00"
     },
     {
-      "sha": "bce4d76736f444f3c0a257e07ca3f662e06108c1",
-      "shortSha": "bce4d76",
-      "subject": "fix(crossword): drop vulgar/non-Swedish answers from sv bank",
+      "sha": "987920282a634401ab48dbb55047238077422222",
+      "shortSha": "9879202",
+      "subject": "chore(ads): remove Monetag completely (rewarded waterfall, banner, CSP, SW verifier)",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T02:16:27+03:00"
+      "date": "2026-06-25T13:53:27+03:00"
     },
     {
-      "sha": "dc356c908ba14b217e4f773f10cf550b01b78e0e",
-      "shortSha": "dc356c9",
-      "subject": "feat(crossword): infinite Swedish crosswords",
+      "sha": "d9fb48cb2796b2ff309fdb626edbcb1ef6a37beb",
+      "shortSha": "d9fb48c",
+      "subject": "feat(bots): face-shape accuracy pass for celebrity lookalikes",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T02:09:26+03:00"
+      "date": "2026-06-25T12:28:57+03:00"
     },
     {
-      "sha": "5b2c7de47ae81cd23dd5ff707149013b0745b797",
-      "shortSha": "5b2c7de",
-      "subject": "feat(crossword): infinite Spanish crosswords via accent-folded fill",
+      "sha": "0767281917ea3a9def43738f768af487a22a04fc",
+      "shortSha": "0767281",
+      "subject": "feat(bots): earsOut part + sharpen Obama/Brad/Oprah lookalikes",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T01:51:35+03:00"
+      "date": "2026-06-25T11:47:27+03:00"
     },
     {
-      "sha": "ee767c0729bccf2346295d0d2b5b0b7c43261bb5",
-      "shortSha": "ee767c0",
-      "subject": "feat(crossword): difficulty-coloured grid shadow (glance-readable difficulty)",
+      "sha": "a2075ed38fb10d26e0470b13c17582130a87bec1",
+      "shortSha": "a2075ed",
+      "subject": "feat(bots): microphone legendary accessory for singer lookalikes",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T01:02:54+03:00"
+      "date": "2026-06-25T11:42:46+03:00"
     },
     {
-      "sha": "e5fda370c0d6d71496fdc67205402088a8df0226",
-      "shortSha": "e5fda37",
-      "subject": "feat(crossword): difficulty-coded shadow colors on grid",
+      "sha": "0cef359c958eb460398bda0b692d357b399ed732",
+      "shortSha": "0cef359",
+      "subject": "feat(ads): discoverable 'watch ad for coins' option in Profile",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:57:50+03:00"
+      "date": "2026-06-25T11:33:39+03:00"
     },
     {
-      "sha": "27af54cafa604e86e6b934c18664d99b10bad085",
-      "shortSha": "27af54c",
-      "subject": "feat(crossword): discoverable horizontal↔vertical direction toggle",
+      "sha": "4b283b8a75049524b6af38a49a2851d48b02305d",
+      "shortSha": "4b283b8",
+      "subject": "feat(bots): highAndTight legendary hair — Kim Jong-un shaved-side bouffant",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:35:54+03:00"
+      "date": "2026-06-25T11:28:46+03:00"
     },
     {
-      "sha": "7d85af820b6d174b521903339abdd7f6c57fd99a",
-      "shortSha": "7d85af8",
-      "subject": "test(crossword): add evaluateEsClue + audit tests for Spanish & Swedish clue banks",
+      "sha": "2144d1769244c13434253ec7636f232e402933b0",
+      "shortSha": "2144d17",
+      "subject": "polish(bots): stronger lookalike cues + unique emojis",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:31:15+03:00"
+      "date": "2026-06-25T11:25:02+03:00"
     },
     {
-      "sha": "886dd6cb600802fe725d019da1514168c5c526d0",
-      "shortSha": "886dd6c",
-      "subject": "chore(crossword): re-score Spanish and Swedish clue banks",
+      "sha": "e27ccc9d08d3b8ce3f9155ac7fc135a5f0bdcc79",
+      "shortSha": "e27ccc9",
+      "subject": "fix(bots): sharpen Greta + Elon lookalikes",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:19:01+03:00"
+      "date": "2026-06-25T11:20:38+03:00"
     },
     {
-      "sha": "ec0840b1c564be059d785f9bb8e154b9d122bc24",
-      "shortSha": "ec0840b",
-      "subject": "fix(crossword): eliminate all poor-scoring Swedish clues through targeted improvements",
+      "sha": "99560740969cfeedb5f7ddedefa369aaf91bd28c",
+      "shortSha": "9956074",
+      "subject": "fix(ads): disable spammy Monetag In-Page Push web banner",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:17:48+03:00"
+      "date": "2026-06-25T11:18:38+03:00"
     },
     {
-      "sha": "e8e9097b01b1dc1dd02cd6ac3bc15ac4184d5210",
-      "shortSha": "e8e9097",
-      "subject": "fix(crossword): unwire es/sv live generation (keep banks as dictionaries)",
+      "sha": "243713321013adb47b56446024418a219993e165",
+      "shortSha": "2437133",
+      "subject": "feat(bots): recedingHair legendary part for Elon lookalike",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:16:05+03:00"
+      "date": "2026-06-25T11:11:29+03:00"
     },
     {
-      "sha": "7d5e4372975e3efe30b55ac53e4f266c709db9bb",
-      "shortSha": "7d5e437",
-      "subject": "fix(crossword): remove 25 circular clues from Swedish clue bank",
+      "sha": "c730d6de7259810b96f4651845c2b82ac1d47527",
+      "shortSha": "c730d6d",
+      "subject": "feat(results): situational random avatar moods on MP brag card",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:13:54+03:00"
+      "date": "2026-06-25T11:04:25+03:00"
     },
     {
-      "sha": "65d6ac14d8d9641bdff1718434bc1fc087999492",
-      "shortSha": "65d6ac1",
-      "subject": "fix(crossword): continue improving Swedish clue bank quality",
+      "sha": "60c7343e22837171e865d7ca418202e71acf585b",
+      "shortSha": "60c7343",
+      "subject": "feat(bots): trumpSwoop legendary hair + tier-gate celebrity lookalike parts",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T00:06:37+03:00"
+      "date": "2026-06-25T10:55:06+03:00"
+    },
+    {
+      "sha": "ac78176d7ccde1b2bc08f24103c8bbbf95b35574",
+      "shortSha": "ac78176",
+      "subject": "fix(ads): allow Monetag In-Page Push creative domain (tzegilo) in CSP",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T10:53:26+03:00"
+    },
+    {
+      "sha": "d57d674976387d4f15a66e0e9363dd39dff55f21",
+      "shortSha": "d57d674",
+      "subject": "feat(results): screenshot-first MP brag card + share tracking",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T10:46:40+03:00"
+    },
+    {
+      "sha": "fdd509911668ec4e9ee7da622604d743f84d65d0",
+      "shortSha": "fdd5099",
+      "subject": "fix(ads): inline NEXT_PUBLIC env reads so web ads actually serve",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T10:41:38+03:00"
+    },
+    {
+      "sha": "a27d6e657fd64fdb83f902b51e9eaf35d4d64896",
+      "shortSha": "a27d6e6",
+      "subject": "fix(practice): square-fit mobile board (cqmin) + declutter teaching chrome",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T10:37:53+03:00"
     }
   ]
 }

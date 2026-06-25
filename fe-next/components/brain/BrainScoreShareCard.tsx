@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useRef, useState, useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import {
   Brain,
   Share2,
@@ -154,19 +153,13 @@ lexiclash.com`;
   );
 
   return (
-    <AnimatePresence>
-      <m.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 animate-in fade-in-0 duration-300"
         onClick={onClose}
       >
-        <m.div
-          initial={{ scale: 0.9, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.9, y: 20 }}
-          className="w-full max-w-sm"
+        <div
+          className="w-full max-w-sm animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
           onClick={(e) => e.stopPropagation()}
         >
           {/* The Shareable Card */}
@@ -193,15 +186,13 @@ lexiclash.com`;
               )}
 
               {/* Main Score */}
-              <m.div
-                initial={{ scale: 0.5 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', delay: 0.1 }}
-                className="my-4"
+              <div
+                className="my-4 animate-in zoom-in-50 duration-300"
+                style={{ animationDelay: '0.1s' }}
               >
                 <div className="text-7xl font-black drop-shadow-lg">{score}</div>
                 <div className="text-xl font-bold opacity-80">/100</div>
-              </m.div>
+              </div>
 
               {/* Tier Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-xs">
@@ -326,8 +317,8 @@ lexiclash.com`;
               )}
             </div>
           </div>
-        </m.div>
-      </m.div>
-    </AnimatePresence>
+        </div>
+      </div>
+    </>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
 import { Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -37,18 +36,12 @@ export function SharePanelModal({
   t,
 }: SharePanelModalProps): React.JSX.Element {
   return (
-    <m.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in-0 duration-300"
       onClick={onClose}
     >
-      <m.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black p-6 max-w-sm w-full"
+      <div
+        className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black p-6 max-w-sm w-full animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
         onClick={e => e.stopPropagation()}
       >
         <h3 className="text-xl font-black mb-4">{t('daily.shareScore')}</h3>
@@ -95,7 +88,7 @@ export function SharePanelModal({
         >
           {t('daily.close')}
         </Button>
-      </m.div>
-    </m.div>
+      </div>
+    </div>
   );
 }

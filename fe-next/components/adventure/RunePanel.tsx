@@ -3,7 +3,6 @@
 import { memo, useMemo } from 'react';
 import { X, Gem, Shield, ShieldOff } from 'lucide-react';
 import Image from 'next/image';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -78,15 +77,13 @@ const RunePanel = memo<RunePanelProps>(({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <AdaptiveMotion.div
+      <div
         data-testid="rune-panel"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
         className={cn(
           'w-full max-w-lg max-h-[85dvh] flex flex-col',
           'bg-neo-navy border-3 border-black rounded-neo shadow-hard-lg',
-          'overflow-hidden'
+          'overflow-hidden',
+          'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
         )}
       >
         {/* Header */}
@@ -139,7 +136,7 @@ const RunePanel = memo<RunePanelProps>(({
             ))}
           </div>
         </div>
-      </AdaptiveMotion.div>
+      </div>
     </div>
   );
 });

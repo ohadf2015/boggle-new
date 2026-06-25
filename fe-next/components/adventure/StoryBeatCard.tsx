@@ -6,7 +6,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { NeoPanel } from '@/components/ui/panel';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -52,22 +51,15 @@ export function StoryBeatCard({
   };
 
   return (
-    <AdaptiveAnimatePresence>
+    <>
       {isVisible && (
-        <AdaptiveMotion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+        <div
           data-testid="story-beat-card"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 p-4 animate-in fade-in-0 duration-300"
           onClick={!isComplete ? skipToEnd : undefined}
         >
-          <NeoPanel asChild tone="navy" shadow="lg" className="p-6 max-w-md w-full">
-          <AdaptiveMotion.div
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          >
+          <NeoPanel asChild tone="navy" shadow="lg" className="p-6 max-w-md w-full animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300">
+          <div>
             <div className="text-neo-yellow font-neo-display font-bold text-lg mb-3">
               {characterName}
             </div>
@@ -77,23 +69,19 @@ export function StoryBeatCard({
               {!isComplete && <span className="animate-pulse">▌</span>}
             </div>
 
-            <AdaptiveAnimatePresence>
-              {isComplete && (
-                <AdaptiveMotion.button
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  onClick={onContinue}
-                  data-testid="story-continue"
-                  className="w-full bg-neo-lime text-neo-black py-2.5 rounded-neo border-2 border-neo-black shadow-hard font-neo-display font-bold text-sm hover:shadow-hard-pressed"
-                >
-                  {t('adventure.continue')}
-                </AdaptiveMotion.button>
-              )}
-            </AdaptiveAnimatePresence>
-          </AdaptiveMotion.div>
+            {isComplete && (
+              <button
+                onClick={onContinue}
+                data-testid="story-continue"
+                className="w-full bg-neo-lime text-neo-black py-2.5 rounded-neo border-2 border-neo-black shadow-hard font-neo-display font-bold text-sm hover:shadow-hard-pressed animate-in fade-in-0 zoom-in-95 duration-300"
+              >
+                {t('adventure.continue')}
+              </button>
+            )}
+          </div>
           </NeoPanel>
-        </AdaptiveMotion.div>
+        </div>
       )}
-    </AdaptiveAnimatePresence>
+    </>
   );
 }

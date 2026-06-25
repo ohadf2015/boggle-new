@@ -9,7 +9,6 @@
 'use client';
 
 import { memo, useMemo, useState } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { BookOpen, X, Star, Coins, Zap, Check, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
@@ -48,22 +47,19 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
   if (!isOpen) return null;
 
   return (
-    <AdaptiveAnimatePresence>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-xs"
+      onClick={onClose}
+    >
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/80 backdrop-blur-xs"
-        onClick={onClose}
+        onClick={(e) => e.stopPropagation()}
+        className={cn(
+          'relative w-full max-w-lg mx-4 max-h-[85dvh] overflow-y-auto',
+          'bg-neo-navy border-4 border-neo-black',
+          'rounded-neo shadow-hard-lg p-6',
+          'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
+        )}
       >
-        <AdaptiveMotion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          onClick={(e) => e.stopPropagation()}
-          className={cn(
-            'relative w-full max-w-lg mx-4 max-h-[85dvh] overflow-y-auto',
-            'bg-neo-navy border-4 border-neo-black',
-            'rounded-neo shadow-hard-lg p-6'
-          )}
-        >
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -177,9 +173,8 @@ const WordAlbumPanel = memo<WordAlbumPanelProps>(({
               )}
             </>
           )}
-        </AdaptiveMotion.div>
       </div>
-    </AdaptiveAnimatePresence>
+    </div>
   );
 });
 

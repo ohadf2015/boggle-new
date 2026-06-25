@@ -19,11 +19,13 @@ describe('getWordHuntTargets', () => {
     expect(getWordHuntTargets('ja')).toEqual([]);
   });
 
-  it('contains only 3-4 letter words', () => {
+  it('contains only 5-7 letter words (fun-to-reveal target range)', () => {
     for (const lang of ['en', 'he', 'sv', 'es']) {
-      for (const w of getWordHuntTargets(lang)) {
-        expect(w.length).toBeGreaterThanOrEqual(3);
-        expect(w.length).toBeLessThanOrEqual(4);
+      const pool = getWordHuntTargets(lang);
+      expect(pool.length).toBeGreaterThan(150); // year-sized so daily targets rarely repeat
+      for (const w of pool) {
+        expect([...w].length).toBeGreaterThanOrEqual(5);
+        expect([...w].length).toBeLessThanOrEqual(7);
       }
     }
   });

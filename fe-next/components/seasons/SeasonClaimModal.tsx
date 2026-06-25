@@ -197,12 +197,9 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
       : { delay, type: 'spring' as const, stiffness: 280, damping: 18 };
 
   return (
-    <AnimatePresence>
-      <m.div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 texture-halftone"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    <>
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 texture-halftone animate-in fade-in-0 duration-300"
         onClick={onClose}
         data-testid="season-claim-modal"
         data-season-id={seasonId}
@@ -239,21 +236,15 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
             ))}
           </div>
         )}
-        <m.div
+        <div
           ref={dialogRef}
           tabIndex={-1}
           className={`
             relative w-full max-w-md bg-neo-navy border-neo-thick border-black
             rounded-neo shadow-hard-lg p-6 flex flex-col gap-4 outline-none
             border-l-8 ${color.border}
-            max-h-[92vh] overflow-y-auto overflow-x-hidden
+            max-h-[92vh] overflow-y-auto overflow-x-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300
           `}
-          initial={reduceMotion ? false : { scale: 0.85, y: 32 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={reduceMotion
-            ? { opacity: 0 }
-            : { scale: [1, 1.05, 0.9], opacity: [1, 1, 0], transition: { duration: 0.35 } }}
-          transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 280, damping: 20 }}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -304,15 +295,13 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                 </div>
               )}
             </div>
-            <m.h2
+            <h2
               id="season-claim-title"
-              className="font-neo-display font-black text-2xl text-neo-lime tracking-tight"
-              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={stagger(0.35)}
+              className="font-neo-display font-black text-2xl text-neo-lime tracking-tight animate-in fade-in-0 duration-300"
+              style={{ animationDelay: '0.35s' }}
             >
               {seasonName}
-            </m.h2>
+            </h2>
             <h3 className="font-neo-display font-black text-2xl text-neo-pink uppercase tracking-tight">
               <SplitChars
                 text={
@@ -362,11 +351,9 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
           </div>
 
           {rewards.badges.length > 0 && (
-            <m.div
-              className="flex flex-wrap gap-2 justify-center"
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={stagger(0.6)}
+            <div
+              className="flex flex-wrap gap-2 justify-center animate-in fade-in-0 duration-300"
+              style={{ animationDelay: '0.6s' }}
             >
               {rewards.badges.map((badge) => (
                 <span
@@ -376,13 +363,12 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
                   {badge.name}
                 </span>
               ))}
-            </m.div>
+            </div>
           )}
 
-          <m.div
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={stagger(0.68)}
+          <div
+            className="animate-in fade-in-0 duration-300"
+            style={{ animationDelay: '0.68s' }}
           >
             {isClaimed ? (
               <>
@@ -443,9 +429,9 @@ export const SeasonClaimModal: React.FC<SeasonClaimModalProps> = ({
               </div>
               </>
             )}
-          </m.div>
-        </m.div>
-      </m.div>
-    </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };

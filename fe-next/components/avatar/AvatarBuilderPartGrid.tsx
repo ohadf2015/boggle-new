@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Lock, Coins, X } from 'lucide-react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import PartPreview from './PartPreview';
 import {
   type CustomAvatarConfig,
@@ -18,27 +17,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { getSetsForPart, getSetProgress } from '@/lib/avatar/avatarSets';
 import '@/styles/avatar-tier-animations.css';
-
-// Staggered grid entrance — cascading waterfall (from animate-ai: playful-staggered-list)
-const gridContainerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.03, delayChildren: 0.05 },
-  },
-};
-
-const gridItemVariants = {
-  hidden: { opacity: 0, y: 16, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
-  },
-};
-
-// Bounce button spring (from animate-ai: playful-spring-bounce-button)
-const BUTTON_SPRING = { type: 'spring' as const, stiffness: 400, damping: 17 };
 
 export interface PartPreviewGridProps<T extends string> {
   label: string;
@@ -145,10 +123,7 @@ export default function PartPreviewGrid<T extends string>({
   return (
     <div>
       <p className="text-neo-white text-xs font-bold uppercase mb-2">{label}</p>
-      <AdaptiveMotion.div
-        variants={gridContainerVariants}
-        initial="hidden"
-        animate="visible"
+      <div
         className="grid grid-cols-3 @[24rem]:grid-cols-4 @[36rem]:grid-cols-5 gap-2"
       >
         {sortedOptions.map(option => {
@@ -160,14 +135,11 @@ export default function PartPreviewGrid<T extends string>({
           const isNew = isNewPart(cat, option);
 
           return (
-            <AdaptiveMotion.button
+            <button
               key={option}
-              variants={gridItemVariants}
               onClick={() => handleClick(option)}
-              whileHover={{ scale: 1.06 }}
-              whileTap={{ scale: 0.88 }}
-              transition={BUTTON_SPRING}
-              className={`relative flex flex-col items-center p-1.5 rounded-neo border-2 transition-colors ${
+              style={{ animationDelay: `${sortedOptions.indexOf(option) * 0.03}s` }}
+              className={`relative flex flex-col items-center p-1.5 rounded-neo border-2 transition-colors animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both hover:scale-[1.06] active:scale-[0.88] transition-transform ${
                 selected === option
                   ? 'bg-neo-lime/15 border-neo-lime shadow-hard-sm ring-1 ring-neo-lime/30'
                   : isLocked && isLegendary
@@ -230,27 +202,20 @@ export default function PartPreviewGrid<T extends string>({
                   {option === 'none' ? (noneLabel ?? option) : option}
                 </span>
               )}
-            </AdaptiveMotion.button>
+            </button>
           );
         })}
-      </AdaptiveMotion.div>
+      </div>
 
       {/* Purchase confirmation modal */}
-      <AdaptiveAnimatePresence>
+      <>
         {confirmPurchase && (
-          <AdaptiveMotion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 animate-in fade-in-0 duration-300"
             onClick={() => setConfirmPurchase(null)}
           >
-            <AdaptiveMotion.div
-              initial={{ scale: 0.85, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.85, y: 20 }}
-              transition={{ type: 'spring', damping: 22, stiffness: 300 }}
-              className={`relative mx-4 p-5 rounded-neo-lg border-3 border-black shadow-hard-lg max-w-xs w-full ${
+            <div
+              className={`relative mx-4 p-5 rounded-neo-lg border-3 border-black shadow-hard-lg max-w-xs w-full animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300 ${
                 confirmPurchase.isLegendary
                   ? 'bg-linear-to-b from-amber-950 to-neo-navy'
                   : confirmPurchase.isEpic
@@ -360,13 +325,10 @@ export default function PartPreviewGrid<T extends string>({
                 >
                   {_t?.('avatarBuilder.cancel') || 'Cancel'}
                 </button>
-                <AdaptiveMotion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={BUTTON_SPRING}
+                <button
                   onClick={handleConfirmPurchase}
                   disabled={premium?.isPurchasing}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-bold rounded-neo border-2 border-black shadow-hard-sm transition-colors disabled:opacity-50 ${
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-bold rounded-neo border-2 border-black shadow-hard-sm transition-colors disabled:opacity-50 hover:scale-[1.03] active:scale-95 ${
                     confirmPurchase.isLegendary
                       ? 'bg-linear-to-r from-amber-500 to-amber-600 text-black'
                       : confirmPurchase.isEpic
@@ -376,12 +338,12 @@ export default function PartPreviewGrid<T extends string>({
                 >
                   <Coins className="w-4 h-4" />
                   {_t?.('avatar.premium.unlock') || 'Unlock'}
-                </AdaptiveMotion.button>
+                </button>
               </div>
-            </AdaptiveMotion.div>
-          </AdaptiveMotion.div>
+            </div>
+          </div>
         )}
-      </AdaptiveAnimatePresence>
+      </>
     </div>
   );
 }

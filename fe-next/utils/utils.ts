@@ -273,7 +273,11 @@ function attemptGenerateBoard(
   let embeddedCount = 0;
   for (const word of sortedWords) {
     if (embeddedCount >= targetWords) break;
-    if (word.length > Math.max(rows, cols)) continue;
+    // A self-avoiding snake path (tryEmbedWord) can wind through up to every
+    // cell, so the real cap is the cell count — not the board dimension. Using
+    // max(rows,cols) here silently skipped all 5+ letter words on a 4×4 board,
+    // which is why Word Hunt targets were stuck at 3-4 letters.
+    if (word.length > rows * cols) continue;
 
     if (tryEmbedWord(grid, word, rows, cols, usedCells, language)) {
       embeddedWords.push(word);
@@ -307,7 +311,7 @@ function generateVerifiedBoard(
   const usedCells = new Set<string>();
 
   for (const word of sortedWords) {
-    if (word.length > Math.max(rows, cols)) continue;
+    if (word.length > rows * cols) continue; // snake path can use every cell
 
     // Try to embed the word
     const gridCopy = grid.map(row => [...row]);

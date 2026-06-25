@@ -112,12 +112,9 @@ export const SeasonAnnouncementModal: React.FC = () => {
   if (isOnCrazyGamesPlatform) return null;
 
   return (
-    <AnimatePresence>
-      <m.div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 texture-halftone"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+    <>
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 texture-halftone animate-in fade-in-0 duration-300"
         onClick={dismiss}
         data-testid="season-announcement-modal"
         data-season-id={season.id}
@@ -154,14 +151,10 @@ export const SeasonAnnouncementModal: React.FC = () => {
             ))}
           </div>
         )}
-        <m.div
+        <div
           ref={dialogRef}
           tabIndex={-1}
-          className="relative w-full max-w-md bg-neo-navy border-neo-thick border-black rounded-neo shadow-hard-lg p-6 flex flex-col gap-4 outline-none border-l-8 border-l-neo-lime max-h-[92vh] overflow-y-auto overflow-x-hidden"
-          initial={reduceMotion ? false : { scale: 0.85, y: 32 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={reduceMotion ? { opacity: 0 } : { scale: 0.9, opacity: 0 }}
-          transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 280, damping: 20 }}
+          className="relative w-full max-w-md bg-neo-navy border-neo-thick border-black rounded-neo shadow-hard-lg p-6 flex flex-col gap-4 outline-none border-l-8 border-l-neo-lime max-h-[92vh] overflow-y-auto overflow-x-hidden animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -209,32 +202,24 @@ export const SeasonAnnouncementModal: React.FC = () => {
               </m.div>
             </div>
 
-            <m.div
-              className="flex items-center gap-2 px-4 py-1.5 bg-neo-lime border-neo-thick border-black rounded-neo shadow-hard"
-              initial={reduceMotion ? false : { opacity: 0, y: -8, scale: 0.8 }}
-              animate={
-                reduceMotion
-                  ? { opacity: 1 }
-                  : { opacity: 1, y: 0, scale: [0.8, 1.1, 1] }
-              }
-              transition={reduceMotion ? { duration: 0 } : { delay: 0.3, duration: 0.5 }}
+            <div
+              className="flex items-center gap-2 px-4 py-1.5 bg-neo-lime border-neo-thick border-black rounded-neo shadow-hard animate-in fade-in-0 zoom-in-95 duration-300"
+              style={{ animationDelay: '0.3s' }}
             >
               <Sparkles className="w-4 h-4 text-black" aria-hidden="true" />
               <span className="font-neo-display font-black text-sm text-black uppercase tracking-wider">
                 {t('season.newSeason')}
               </span>
               <Sparkles className="w-4 h-4 text-black" aria-hidden="true" />
-            </m.div>
+            </div>
 
-            <m.h2
+            <h2
               id="season-announcement-title"
-              className="font-neo-display font-black text-2xl text-neo-white tracking-tight"
-              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={reduceMotion ? { duration: 0 } : { delay: 0.4 }}
+              className="font-neo-display font-black text-2xl text-neo-white tracking-tight animate-in fade-in-0 duration-300"
+              style={{ animationDelay: '0.4s' }}
             >
               {t('season.name', { number: season.id, theme: season.theme })}
-            </m.h2>
+            </h2>
           </div>
 
           {/*
@@ -244,11 +229,9 @@ export const SeasonAnnouncementModal: React.FC = () => {
             Each tile: snappy spring entrance + idle wobble + hover lift.
           */}
           {prev && prevColor && (
-            <m.div
-              className="grid grid-cols-3 gap-2 text-center"
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={reduceMotion ? { duration: 0 } : { delay: 0.55 }}
+            <div
+              className="grid grid-cols-3 gap-2 text-center animate-in fade-in-0 duration-300"
+              style={{ animationDelay: '0.55s' }}
               data-testid="season-prev-summary"
             >
               {[
@@ -306,27 +289,25 @@ export const SeasonAnnouncementModal: React.FC = () => {
                   </p>
                 </m.div>
               ))}
-            </m.div>
+            </div>
           )}
 
-          <m.button
+          <button
             onClick={dismiss}
             className="
               w-full py-3 bg-neo-lime text-black font-neo-display font-black
               border-neo-thick border-black rounded-neo shadow-hard
               hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-pink
-              transition-all uppercase tracking-wider
+              transition-all uppercase tracking-wider animate-in fade-in-0 duration-300
             "
-            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { delay: 0.65 }}
+            style={{ animationDelay: '0.65s' }}
             aria-label={t('season.continue')}
           >
             {t('season.continue')}
-          </m.button>
-        </m.div>
-      </m.div>
-    </AnimatePresence>
+          </button>
+        </div>
+      </div>
+    </>
   );
 };

@@ -29,8 +29,10 @@ export const HUNT_SUBSEQUENT_FINDER_BONUSES = [20, 12, 8, 5];
 export const HUNT_WRONG_GUESS_PENALTY = 10;
 /** Score awarded per letter when a non-target board word is found in word-hunt mode */
 export const BOARD_WORD_SCORE_PER_LETTER = 2;
-export const HUNT_TARGET_MIN_LENGTH = 4;
-export const HUNT_TARGET_MAX_LENGTH = 5;
+// Target words are 5-7 letters: long enough to be a fun reveal and to leave
+// room for clue-farming, short enough to stay common/recognizable.
+export const HUNT_TARGET_MIN_LENGTH = 5;
+export const HUNT_TARGET_MAX_LENGTH = 7;
 export const HUNT_LIFE_DRAIN_INTERVAL_MS = 1000;
 
 /** Minimum seconds before discovery clues start being revealed */

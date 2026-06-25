@@ -7,7 +7,6 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { m, AnimatePresence } from 'framer-motion';
 import { Copy, Check, Send, ImageDown, Mail, MessageSquare, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { XTwitterIcon, WhatsAppIcon, LinkedInIcon, FacebookIcon } from './icons';
@@ -52,20 +51,14 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain scrollable-area"
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain scrollable-area animate-in fade-in-0 duration-300"
           onClick={onClose}
         >
-          <m.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black p-6 max-w-2xl w-full my-4"
+          <div
+            className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black p-6 max-w-2xl w-full my-4 animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-xl font-black mb-4">{t('wordHunt.shareResult')}</h3>
@@ -149,13 +142,11 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             </button>
 
             {/* Secondary Share Options */}
-            <AnimatePresence>
+            <>
               {showMoreOptions && (
-                <m.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
+                <div
+                  className="overflow-hidden animate-in fade-in-0 duration-300"
+                  style={{ maxHeight: showMoreOptions ? '500px' : '0px', transition: 'max-height 300ms' }}
                 >
                   <div className="grid grid-cols-2 gap-3 pt-3">
                     <Button
@@ -199,9 +190,9 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                       )}
                     </Button>
                   </div>
-                </m.div>
+                </div>
               )}
-            </AnimatePresence>
+            </>
 
             {/* Download Image Button */}
             {onDownloadImage && (
@@ -229,9 +220,9 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             <Button onClick={onClose} variant="ghost" className="w-full mt-4">
               {t('daily.close')}
             </Button>
-          </m.div>
-        </m.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useCallback, useMemo, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -153,21 +152,14 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
   }, [isOpen, triggerCelebration, cleanupAnimations]);
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
-        <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4"
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4 animate-in fade-in-0 duration-300"
           onClick={onClose}
         >
-          <m.div
-            initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.5, opacity: 0, rotate: 10 }}
-            transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            className="bg-linear-to-br from-neo-cream to-white dark:from-neo-navy dark:to-neo-navy-light rounded-neo border-4 border-neo-black p-8 max-w-md w-full text-center shadow-hard-lg"
+          <div
+            className="bg-linear-to-br from-neo-cream to-white dark:from-neo-navy dark:to-neo-navy-light rounded-neo border-4 border-neo-black p-8 max-w-md w-full text-center shadow-hard-lg animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
@@ -187,51 +179,42 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
             </div>
 
             {/* Animated emoji */}
-            <m.div
-              initial={{ scale: 0 }}
-              animate={{ scale: [0, 1.3, 1] }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-8xl mb-4"
+            <div
+              className="text-8xl mb-4 animate-in zoom-in-50 duration-300"
+              style={{ animationDelay: '0.2s' }}
             >
               {emoji}
-            </m.div>
+            </div>
 
             {/* Title with animation */}
-            <m.h2
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
-              className="text-3xl md:text-4xl font-black text-neo-black dark:text-white mb-2"
+            <h2
+              className="text-3xl md:text-4xl font-black text-neo-black dark:text-white mb-2 animate-in fade-in-0 zoom-in-95 duration-300"
+              style={{ animationDelay: '0.3s' }}
             >
               {title}
-            </m.h2>
+            </h2>
 
             {/* Streak number */}
-            <m.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.4, stiffness: 400, damping: 22 }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard mb-4"
+            <div
+              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-orange-400 to-red-500 rounded-neo border-3 border-neo-black shadow-hard mb-4 animate-in zoom-in-50 duration-300"
+              style={{ animationDelay: '0.4s' }}
             >
               <span className="text-4xl font-black text-white">{streak}</span>
               <span className="text-lg font-bold text-white">DAYS</span>
-            </m.div>
+            </div>
 
             {/* Subtitle */}
-            <m.p
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
-              className="text-gray-600 dark:text-gray-300 text-lg mb-6"
+            <p
+              className="text-gray-600 dark:text-gray-300 text-lg mb-6 animate-in fade-in-0 zoom-in-95 duration-300"
+              style={{ animationDelay: '0.5s' }}
             >
               {subtitle}
-            </m.p>
+            </p>
 
             {/* Dismiss button */}
-            <m.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6, type: 'spring', stiffness: 300, damping: 26 }}
+            <div
+              className="animate-in fade-in-0 zoom-in-95 duration-300"
+              style={{ animationDelay: '0.6s' }}
             >
               <Button
                 onClick={onClose}
@@ -239,11 +222,11 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
               >
                 Keep the streak going!
               </Button>
-            </m.div>
-          </m.div>
-        </m.div>
+            </div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };
 
