@@ -30,6 +30,7 @@ import { AdMobProvider } from '@/contexts/AdMobContext';
 import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
 import BannerCoordinatorMount from '@/components/ads/BannerCoordinatorMount';
 import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
+import MonetagWebBanner from '@/components/ads/MonetagWebBanner';
 import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
@@ -255,6 +256,10 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     so bottom CTAs (e.g. daily Play button) clear the injected
                                                     fixed anchor the AdMob var can't see. No-op on native AdMob. */}
                                                 <WebAnchorAdObserver />
+                                                {/* WEB Monetag anchored/in-page banner — web analog of the
+                                                    native AdMob banner. Same route/surface/tier gates; ships
+                                                    dark until NEXT_PUBLIC_MONETAG_BANNER_ZONE_ID is set. */}
+                                                <MonetagWebBanner />
                                             </NavigationProvider>
                                             </AdMobProvider>
                                         </HapticsProvider>
