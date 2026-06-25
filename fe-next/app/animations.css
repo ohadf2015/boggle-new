@@ -534,6 +534,35 @@
   }
 }
 
+/* Hero idle float — the one continuous "alive" loop on the results hero avatar.
+   Entrance animations (framer-motion) settle in ~2.4s then freeze; this keeps
+   the focal point breathing afterward. Applied to the avatar's INNER circle
+   (transform-free) so it never fights the framer entrance spring on the outer
+   wrapper. Reduced-motion is enforced globally (iteration-count:1 in the
+   prefers-reduced-motion block) and the class is also JS-gated on !reducedMotion. */
+@keyframes hero-idle-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.hero-idle-bob {
+  animation: hero-idle-bob 3.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Champion score glow — the winner's total-points number is the eye's landing
+   spot and freezes after the count-up. A gentle lime breathing glow (drop-shadow
+   filter, NOT transform, so it never fights the avatar bob) reads as a victory
+   heartbeat. Winner-only by design; losing screens stay calm. Reduced-motion
+   handled globally (iteration-count:1) and JS-gated on rank===1 && !reducedMotion. */
+@keyframes score-champion-glow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(191, 255, 0, 0.35)); }
+  50% { filter: drop-shadow(0 0 16px rgba(191, 255, 0, 0.7)); }
+}
+.score-champion-glow {
+  display: inline-block;
+  animation: score-champion-glow 2.4s ease-in-out infinite;
+}
+
 /* NEW: Board wobble animation */
 @keyframes board-wobble {
 

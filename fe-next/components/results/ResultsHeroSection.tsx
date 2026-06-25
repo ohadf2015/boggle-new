@@ -241,6 +241,9 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 'relative w-28 h-28 medium-short:w-20 medium-short:h-20 short:w-16 short:h-16 sm:w-40 sm:h-40 medium-short:sm:w-24 medium-short:sm:h-24 rounded-full border-4 p-1 bg-neo-navy',
                 displayAccent.border,
                 isEliminated ? 'grayscale ring-8 ring-red-500/5' : '',
+                // Continuous idle float keeps the focal hero alive after the
+                // one-shot entrance springs settle. Eliminated = no celebration.
+                !reducedMotion && !isEliminated ? 'hero-idle-bob' : '',
                 `shadow-[0_0_40px_rgba(0,255,255,0.3)]`,
               )}
             >
@@ -280,11 +283,19 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
             transition={{ type: 'spring', stiffness: 150, damping: 20, delay: 0.85 }}
           >
             <div>
-              <AnimatedScore
-                target={score}
-                skipAnimation={reducedMotion}
-                className="font-neo-display text-4xl medium-short:text-3xl short:text-2xl xs:text-5xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-lg"
-              />
+              <span
+                className={cn(
+                  // Winner's score breathes a lime glow — the celebratory accent
+                  // that keeps the emotional center alive after the count-up lands.
+                  rank === 1 && !reducedMotion && !isEliminated ? 'score-champion-glow' : '',
+                )}
+              >
+                <AnimatedScore
+                  target={score}
+                  skipAnimation={reducedMotion}
+                  className="font-neo-display text-4xl medium-short:text-3xl short:text-2xl xs:text-5xl sm:text-7xl font-black text-white tabular-nums tracking-tighter drop-shadow-lg"
+                />
+              </span>
               <m.p
                 initial={reducedMotion ? undefined : { opacity: 0 }}
                 animate={{ opacity: 1 }}
