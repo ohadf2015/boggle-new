@@ -85,7 +85,17 @@ describe('celebrity legendary part gating (bots free, players pay)', () => {
   it('never hands a legendary celebrity part to a free random player avatar', () => {
     const legendary = new Set(CELEB_LEGENDARY_HAIR.map((p) => p.value));
     for (let i = 0; i < 300; i++) {
-      expect(legendary.has(getRandomAvatarConfig().hair)).toBe(false);
+      const cfg = getRandomAvatarConfig();
+      expect(legendary.has(cfg.hair)).toBe(false);
+      expect(cfg.accessory).not.toBe('microphone');
     }
+  });
+
+  it('microphone is a legendary accessory worn by the singer bots', () => {
+    expect(isLegendaryPart('accessory', 'microphone')).toBe(true);
+    expect(isPremiumPart('accessory', 'microphone')).toBe(true);
+    expect(getPartPrice('accessory', 'microphone')).toBeGreaterThanOrEqual(5000);
+    const singers = CELEBRITY_BOTS.filter((c) => c.customAvatar.accessory === 'microphone');
+    expect(singers.map((c) => c.name).sort()).toEqual(['Beyoncé', 'Taylor']);
   });
 });

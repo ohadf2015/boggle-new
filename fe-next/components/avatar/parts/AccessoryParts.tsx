@@ -1181,8 +1181,26 @@ function CrystalCrown({ fill }: AccessoryPartProps) {
   );
 }
 
+function Microphone({ fill }: AccessoryPartProps) {
+  // Handheld stage mic held up to the mouth at a jaunty angle (singer cue).
+  return (
+    <g transform="rotate(20 64 68)">
+      {/* handle */}
+      <rect x="60" y="64" width="7" height="28" rx="3.5" fill={fill} stroke="#000" strokeWidth={SO} />
+      <rect x="59.5" y="68" width="8" height="2.5" fill="#000" opacity="0.25" />
+      {/* mesh-ball head near the mouth */}
+      <circle cx="63.5" cy="58" r="9" fill={fill} stroke="#000" strokeWidth={SO} />
+      <circle cx="63.5" cy="58" r="9" fill="#000" opacity="0.12" />
+      <path d="M56 55 H71 M56 58 H71 M56 61 H71" stroke="#000" strokeWidth={0.6} opacity="0.28" />
+      <path d="M60 51 V65 M63.5 50 V66 M67 51 V65" stroke="#000" strokeWidth={0.6} opacity="0.2" />
+      <circle cx="60" cy="55" r="2" fill="#fff" opacity="0.4" />
+    </g>
+  );
+}
+
 export const ACCESSORY_PARTS = {
   none: None,
+  microphone: Microphone,
   glasses: Glasses,
   sunglasses: Sunglasses,
   hat: Hat,

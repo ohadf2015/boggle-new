@@ -138,6 +138,8 @@ export const AVATAR_ACCESSORIES = [
   'angelWings', 'demonWings', 'butterflyWings', 'gamerHeadset', 'cowboyHat',
   'pirateHat', 'topHat', 'graduationCap', 'tinfoilHat', 'duckHat', 'vrHeadset',
   'frogHat', 'flamingHalo', 'iceCrown', 'crystalCrown',
+  /* Celebrity lookalike cue */
+  'microphone',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
@@ -256,7 +258,8 @@ export const EPIC_EYE_STYLES = ['galaxy', 'flame', 'robot', 'void', 'infinity', 
 export const EPIC_MOUTH_STYLES = ['dragon', 'diamond', 'glitch', 'grillz', 'neonSmile'] as const;
 export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown', 'cyberpunkVisor',
   // New epic accessories
-  'angelWings', 'demonWings', 'butterflyWings', 'frogHat', 'flamingHalo', 'iceCrown', 'crystalCrown'] as const;
+  'angelWings', 'demonWings', 'butterflyWings', 'frogHat', 'flamingHalo', 'iceCrown', 'crystalCrown',
+  'microphone'] as const;
 export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon', 'lightning', 'rainbowMohawk', 'iceSpikes', 'trumpSwoop', 'recedingHair', 'highAndTight'] as const;
 export const EPIC_BASES = ['skull', 'shield', 'dragonHead', 'robotHead', 'alienHead', 'ghostFace'] as const;
 
@@ -383,6 +386,7 @@ export const EPIC_PART_PRICES: Record<string, number> = {
   'hair:trumpSwoop': 9000, // celebrity lookalike part — legendary
   'hair:recedingHair': 6000, // celebrity lookalike part — legendary
   'hair:highAndTight': 6000, // celebrity lookalike part — legendary
+  'accessory:microphone': 5000, // celebrity lookalike cue — legendary
 };
 
 /** Get price for a part (epic > vip per-part > category default) */
@@ -402,7 +406,7 @@ export function isEpicPart(category: string, value: string): boolean {
 }
 
 /** The 3 rarest items — shown with special golden LEGENDARY badge */
-export const LEGENDARY_PARTS = ['eyes:infinity', 'accessory:phoenixCrown', 'base:dragonHead', 'accessory:crystalCrown', 'eyes:thirdEye', 'hair:trumpSwoop', 'hair:recedingHair', 'hair:highAndTight'] as const;
+export const LEGENDARY_PARTS = ['eyes:infinity', 'accessory:phoenixCrown', 'base:dragonHead', 'accessory:crystalCrown', 'eyes:thirdEye', 'hair:trumpSwoop', 'hair:recedingHair', 'hair:highAndTight', 'accessory:microphone'] as const;
 
 /** Check if a part is legendary (subset of epic) */
 export function isLegendaryPart(category: string, value: string): boolean {
