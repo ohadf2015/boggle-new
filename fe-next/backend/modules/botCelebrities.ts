@@ -48,9 +48,9 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
   {
     name: 'Obama', emoji: '🦅', color: '#3B82F6',
     customAvatar: {
-      gender: 'male', base: 'oval', skinColor: '#8D5524',
+      gender: 'male', base: 'oblong', skinColor: '#8D5524',
       hair: 'buzz', hairColor: '#2C1B18',
-      eyes: 'happy', eyeColor: '#6B4423', noseStyle: 'round', eyebrows: 'natural',
+      eyes: 'happy', eyeColor: '#6B4423', noseStyle: 'long', eyebrows: 'natural',
       facialHair: 'none', mouth: 'grin',
       accessory: 'earsOut', accessoryColor: '#8D5524',
       bgColor: '#1a1a2e', shirtColor: '#4A90D9', bodyStyle: 'suit',
@@ -70,7 +70,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
   {
     name: 'Kim', emoji: '🇰🇵', color: '#C62828',
     customAvatar: {
-      gender: 'male', base: 'round', skinColor: '#FFE0BD',
+      gender: 'male', base: 'pear', skinColor: '#FFE0BD',
       hair: 'highAndTight', hairColor: '#2C1B18',
       eyes: 'squint', eyeColor: '#6B4423', noseStyle: 'round', eyebrows: 'thick',
       facialHair: 'none', mouth: 'flat',
@@ -125,7 +125,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
   {
     name: 'Brad', emoji: '😎', color: '#FFD700',
     customAvatar: {
-      gender: 'male', base: 'oval', skinColor: '#F8D5C2',
+      gender: 'male', base: 'square', skinColor: '#F8D5C2',
       hair: 'sideSwept', hairColor: '#D4A574',
       eyes: 'confident', eyeColor: '#3B82F6', noseStyle: 'pointed', eyebrows: 'natural',
       facialHair: 'stubble', mouth: 'smirk',
@@ -136,12 +136,12 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
   {
     name: 'Keanu', emoji: '🕶️', color: '#2C1B18',
     customAvatar: {
-      gender: 'male', base: 'oval', skinColor: '#EDB98A',
+      gender: 'male', base: 'oblong', skinColor: '#EDB98A',
       hair: 'long', hairColor: '#2C1B18',
       eyes: 'relaxed', eyeColor: '#6B4423', noseStyle: 'pointed', eyebrows: 'natural',
       facialHair: 'shortBeard', mouth: 'flat',
       accessory: 'sunglasses', accessoryColor: '#000000',
-      bgColor: '#1a1a2e', shirtColor: '#2C1B18', bodyStyle: 'default',
+      bgColor: '#1a1a2e', shirtColor: '#2C1B18', bodyStyle: 'suit',
     },
   },
   {
@@ -158,7 +158,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
   {
     name: 'Ramsay', emoji: '🔥', color: '#FF3366',
     customAvatar: {
-      gender: 'male', base: 'square', skinColor: '#F8D5C2',
+      gender: 'male', base: 'oblong', skinColor: '#F8D5C2',
       hair: 'shag', hairColor: '#C0C0C0',
       eyes: 'angry', eyeColor: '#3B82F6', noseStyle: 'pointed', eyebrows: 'angry',
       facialHair: 'stubble', mouth: 'flat',
@@ -202,7 +202,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
   {
     name: 'Snoop', emoji: '🌿', color: '#BFFF00',
     customAvatar: {
-      gender: 'male', base: 'oval', skinColor: '#8D5524',
+      gender: 'male', base: 'oblong', skinColor: '#8D5524',
       hair: 'braids', hairColor: '#2C1B18',
       eyes: 'relaxed', eyeColor: '#6B4423', noseStyle: 'wide', eyebrows: 'natural',
       facialHair: 'goatee', mouth: 'smirk',
