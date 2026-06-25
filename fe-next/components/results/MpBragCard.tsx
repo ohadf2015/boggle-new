@@ -4,6 +4,8 @@ import React, { memo, useCallback, useState } from 'react';
 import Avatar from '@/components/Avatar';
 import type { Avatar as AvatarType } from '@/types';
 import { cn } from '@/lib/utils';
+import { hashString } from '@/shared/types/customAvatar';
+import type { AvatarMood } from '@/lib/avatar/avatarMood';
 import type { BragCardData, BragAccent } from '@/lib/results/bragCard';
 
 type TFunction = (key: string, params?: Record<string, string | number>) => string;
@@ -38,6 +40,16 @@ const ACCENT: Record<BragAccent, { bg: string; text: string; on: string }> = {
   purple: { bg: 'bg-neo-purple', text: 'text-neo-purple', on: 'text-white' },
 };
 
+/** Situational expression pools — winners look triumphant/smug/fierce, losers
+ * defeated/stunned/salty. Pick is deterministic (hash of name+score) so it's
+ * varied across cards but stable per result — no flicker, no Math.random. */
+const WINNER_MOODS: AvatarMood[] = ['win', 'emoteLaugh', 'emoteCool', 'streak'];
+const LOSER_MOODS: AvatarMood[] = ['lose', 'wrong', 'emoteShock', 'emoteAngry'];
+
+function pickMood(pool: AvatarMood[], seed: string): AvatarMood {
+  return pool[hashString(seed) % pool.length];
+}
+
 /**
  * Screenshot-first "brag card" for multiplayer results. There is no Share button —
  * the card is built to be screenshotted, so the link is PRINTED on it (a screenshot
@@ -48,6 +60,14 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onC
   const a = ACCENT[data.accent];
   const headToHead = data.outcome === 'winner_2p' && !!opponent;
   const [copied, setCopied] = useState(false);
+
+  // Current player wears a winner face unless they lost; the opponent on a
+  // head-to-head card always lost, so they wear a defeated one — amplifying the win.
+  const currentPool = data.outcome === 'non_winner' ? LOSER_MOODS : WINNER_MOODS;
+  const currentMood = pickMood(currentPool, `${current.name}:${current.score}`);
+  const opponentMood = opponent
+    ? pickMood(LOSER_MOODS, `${opponent.name}:${opponent.score}`)
+    : undefined;
 
   const handleCopy = useCallback(async () => {
     try {
@@ -88,7 +108,7 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onC
               customAvatar={current.avatar?.customAvatar}
               userId={current.name}
               size="2xl"
-              mood={data.outcome === 'non_winner' ? 'emoteWink' : 'win'}
+              mood={currentMood}
               tierMarker
             />
             <span className="max-w-[22cqw] truncate font-neo-display text-[3.2cqw] font-bold text-neo-white">
@@ -107,6 +127,7 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onC
                   customAvatar={opponent.avatar?.customAvatar}
                   userId={opponent.name}
                   size="xl"
+                  mood={opponentMood}
                   disableEffects
                 />
                 <span className="max-w-[22cqw] truncate font-neo-body text-[2.8cqw] font-semibold text-neo-white/70">
