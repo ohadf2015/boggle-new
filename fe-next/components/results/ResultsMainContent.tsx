@@ -175,6 +175,15 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const isWordHunt = gameMode === 'word-hunt';
   const isMultiplayer = sortedScores.length > 1;
 
+  // Standings dedup (see JSX §2). The old layout stacked Podium AND RivalsPanel
+  // AND a consolation row, restating the player's rank/score up to 3×. Now we
+  // show exactly ONE standings block, sized to the lobby:
+  //   • 2 players  → head-to-head RivalsPanel (you vs them, with delta).
+  //   • 3+ players → Top-3 Podium (your own row added below when you placed 4th+).
+  // hideStandings (wheel-rush/blast — their scene owns placement) turns it all off.
+  const showRivals = !hideStandings && isMultiplayer && sortedScores.length === 2;
+  const showPodium = !hideStandings && isMultiplayer && sortedScores.length >= 3;
+
   const { variant: feedbackPosition } = useExperiment('exp-mp-round-feedback-top-v1');
 
   useEffect(() => {
@@ -335,7 +344,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         <NearRankTeaser nextTier={nearRankData.nextTier} eloNeeded={nearRankData.eloNeeded} />
       )}
 
-      {/* 1. YOUR RESULT HERO */}
+      {/* ── 1. YOUR RESULT — the verdict: rank, score, gap to #1. The one big
+          standing statement; every block below references it, never restates it
+          at the same size. */}
       {currentPlayerData && (
         <ResultsHeroSection
           rank={currentPlayerRank}
@@ -352,42 +363,10 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
-      {/* Loser-feedback card removed: the personalized Revenge/Defend card
-          below is the single significant encouraging line, so we don't stack a
-          second generic "good fight" message on top of it. */}
-
-      {/* 2. HIGHLIGHTS BAR */}
-      {currentPlayerData && (
-        <HighlightsBar stats={highlightStats} />
-      )}
-
-      {/* 2.05 BRAG CARD — screenshot-first share artifact (MP only). No Share
-          button by design: players screenshot it, so the play link is printed
-          on the card itself. */}
-      {bragData && (
-        <MpBragCard
-          data={bragData.data}
-          current={bragData.current}
-          opponent={bragData.opponent}
-          modeLabel={BRAG_MODE_LABEL[gameMode ?? ''] ?? 'MULTIPLAYER'}
-          shareUrl="https://lexiclash.live"
-          onCopyLink={() =>
-            trackGrowthEvent('mp_brag_card_copy_link', {
-              gameMode: gameMode ?? 'unknown',
-              outcome: bragData.data.outcome,
-              language,
-            })
-          }
-          t={t}
-        />
-      )}
-
-      {/* 2.1 YOU vs RIVALS — final standing + closest rivals w/ signed deltas.
-          Feeds purely off sortedScores; renders nothing for solo. Gated by
-          !hideStandings so it owns rivalry on the modes that DON'T ship a custom
-          rival scene (classic, tower, connections…); on blast/wheel-rush their
-          own scene already shows rivals + deltas, so we don't stack a third. */}
-      {isMultiplayer && !hideStandings && (
+      {/* ── 2. STANDINGS — exactly ONE block (see showRivals/showPodium above).
+          2p → head-to-head rivals; 3+ → Top-3 podium with your own row added
+          when you placed 4th+. Replaces the old Podium+Rivals+Consolation stack. */}
+      {showRivals && (
         <ResultsRivalsPanel
           sortedScores={sortedScores}
           username={username}
@@ -396,9 +375,46 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           allPlayerWords={allPlayerWords as Record<string, WordObject[]> | undefined}
         />
       )}
+      {showPodium && (
+        <ResultsPodium
+          players={podiumPlayers}
+          currentUsername={username}
+          isWordHunt={isWordHunt}
+          t={t}
+          onReaction={onPodiumReaction}
+        />
+      )}
+      {showPodium && currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username) && (
+        <ConsolationRows
+          players={consolationPlayers.filter(p => p.username === username)}
+          crowns={consolationCrowns}
+          currentUsername={username}
+          startRank={currentPlayerRank}
+          t={t}
+        />
+      )}
 
-      {/* 2.2 YOUR PROGRESS — XP / level / streak from server-authoritative
-          signals. Renders nothing for guests with no progress to show. */}
+      {/* SERIES STANDINGS — best-of-N progress sits with the standings. */}
+      {seriesStandings && seriesRoundNumber != null && (
+        <SeriesStandingsBanner
+          standings={seriesStandings}
+          roundNumber={seriesRoundNumber}
+          totalGames={seriesTotalGames}
+          seriesLeader={seriesLeader}
+          currentUsername={username}
+          t={t}
+        />
+      )}
+
+      {/* ── 3. HOW YOU PLAYED — best word / words found / only-you. */}
+      {currentPlayerData && (
+        <HighlightsBar stats={highlightStats} />
+      )}
+
+      {/* ── 4. WHAT YOU EARNED — XP / level / streak, then coins, read as one
+          progress beat. ImprovementPanel renders nothing for guests w/ no
+          progress; the rewards row only appears when there's a coin reward
+          (MP) or a solo/daily share button. */}
       <ImprovementPanel
         xp={xpGainedData ?? null}
         levelUp={levelUpData ?? null}
@@ -406,10 +422,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         t={t}
         reducedMotion={reducedMotion}
       />
-
-      {/* 2.3 + 2.5 SHARE + REWARDS — single row to reclaim vertical space.
-          MP uses the screenshot-first BragCard above (no Share button); the
-          text ShareButton stays for solo/daily where the brag card doesn't run. */}
       {(coinReward || (shareParams && !isMultiplayer)) && (
         <div className="flex flex-wrap items-stretch gap-2">
           {coinReward && (
@@ -428,34 +440,33 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         </div>
       )}
 
-      {/* 3. TOP 3 PODIUM */}
-      {!hideStandings && isMultiplayer && podiumPlayers.length >= 2 && (
-        <ResultsPodium
-          players={podiumPlayers}
-          currentUsername={username}
-          isWordHunt={isWordHunt}
+      {/* ── 5. FLEX IT — the brag card lands AFTER result + stats + rewards, so
+          sharing reads as the reward beat instead of interrupting the recap mid-
+          stream (where it used to sit, between score and standings). MP-only,
+          screenshot-first: no Share button, the play link is printed on the card. */}
+      {bragData && (
+        <MpBragCard
+          data={bragData.data}
+          current={bragData.current}
+          opponent={bragData.opponent}
+          modeLabel={BRAG_MODE_LABEL[gameMode ?? ''] ?? 'MULTIPLAYER'}
+          shareUrl="https://lexiclash.live"
+          onCopyLink={() =>
+            trackGrowthEvent('mp_brag_card_copy_link', {
+              gameMode: gameMode ?? 'unknown',
+              outcome: bragData.data.outcome,
+              language,
+            })
+          }
           t={t}
-          onReaction={onPodiumReaction}
         />
       )}
 
-      {/* 3.5 SERIES STANDINGS */}
-      {seriesStandings && seriesRoundNumber != null && (
-        <SeriesStandingsBanner
-          standings={seriesStandings}
-          roundNumber={seriesRoundNumber}
-          totalGames={seriesTotalGames}
-          seriesLeader={seriesLeader}
-          currentUsername={username}
-          t={t}
-        />
-      )}
-
-      {/* 3.6 BETWEEN-ROUNDS FEEDBACK — one-tap round sentiment → PostHog
+      {/* BETWEEN-ROUNDS FEEDBACK — one-tap round sentiment → PostHog
           (game_feedback, surface=mp_round). Eligible only between live rounds
           (multiplayer + room + not the series finale); the shared throttle in
-          useGameFeedback keeps it to ~once every few days across all surfaces.
-          top-prompt variant renders above the fold instead (see top of return). */}
+          useGameFeedback keeps it to ~once every few days. top-prompt variant
+          renders above the fold instead (see top of return). */}
       {feedbackPosition !== 'top-prompt' && (
         <GameFeedback
           surface="mp_round"
@@ -467,20 +478,6 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           gameMode={gameMode}
           language={language}
           throttleKey={gameCode}
-        />
-      )}
-
-      {/* 4. CONSOLATION ROW — current player only (their placement + crown).
-          Keeps the recap focused on the player instead of listing every
-          also-ran. startRank carries their TRUE rank since ConsolationRows
-          derives rank from list index. */}
-      {!hideStandings && currentPlayerRank > 3 && consolationPlayers.some(p => p.username === username) && (
-        <ConsolationRows
-          players={consolationPlayers.filter(p => p.username === username)}
-          crowns={consolationCrowns}
-          currentUsername={username}
-          startRank={currentPlayerRank}
-          t={t}
         />
       )}
 

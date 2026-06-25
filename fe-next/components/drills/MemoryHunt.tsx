@@ -1,8 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw, Lightbulb } from 'lucide-react';
+import { Heart, Eye, EyeOff, CheckCircle2, XCircle, X, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
@@ -14,6 +13,7 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMemoryHuntGame } from './useMemoryHuntGame';
 import { MemoryHuntCompletePhase } from './MemoryHuntCompletePhase';
+import { MemoryHuntCluePanel } from './MemoryHuntCluePanel';
 import DrillBriefing from '@/components/brain/DrillBriefing';
 
 interface MemoryHuntProps {
@@ -114,22 +114,25 @@ export default function MemoryHunt({
         </div>
       </div>
 
-      {/* Game Area */}
-      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4 relative">
-        {/* Ready Phase — warm, instantly-legible briefing */}
+      {/* Game Area — no page scroll; each phase owns its own fit. */}
+      <div className="flex-1 min-h-0 flex flex-col relative">
+        {/* Ready Phase — warm, instantly-legible briefing. Own scroll container
+            (screen-fit-locked body can't scroll) so the CTA is never clipped. */}
         {game.phase === 'ready' && (
-          <DrillBriefing
-            drillId="memory-hunt"
-            level={level}
-            goalText={`${t('brain.drills.memory-hunt.wordsToRemember')}: ${game.levelConfig.wordCount} · ${t('brain.drills.memory-hunt.studyTime')}: ${game.levelConfig.studyTime / 1000}s`}
-            onStart={() => { playDrillStartSound(); game.startGame(); }}
-          />
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col items-center justify-start p-4">
+            <DrillBriefing
+              drillId="memory-hunt"
+              level={level}
+              goalText={`${t('brain.drills.memory-hunt.wordsToRemember')}: ${game.levelConfig.wordCount} · ${t('brain.drills.memory-hunt.studyTime')}: ${game.levelConfig.studyTime / 1000}s`}
+              onStart={() => { playDrillStartSound(); game.startGame(); }}
+            />
+          </div>
         )}
 
-        {/* Study Phase */}
+        {/* Study Phase — grid preview centered behind the fixed study modal */}
         {game.phase === 'study' && (
-          <div className="w-full max-w-md lg:max-w-lg space-y-4">
-            <div className="relative">
+          <div className="flex-1 min-h-0 flex items-center justify-center p-4 w-full max-w-md lg:max-w-lg mx-auto">
+            <div className="relative w-full">
               <GridComponent
                 grid={grid}
                 interactive={false}
@@ -137,22 +140,17 @@ export default function MemoryHunt({
                 className="w-full opacity-50"
               />
             </div>
-            <AdaptiveAnimatePresence>
+            <>
               {game.showStudyModal && (
-                <AdaptiveMotion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                <div
                   ref={studyModalRef}
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-in fade-in-0 duration-300"
                 >
-                  <AdaptiveMotion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
+                  <div
                     className={cn(
                       'w-full max-w-lg p-6 rounded-neo border-4 border-neo-black shadow-hard-lg',
-                      'bg-neo-navy-light'
+                      'bg-neo-navy-light',
+                      'animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300'
                     )}
                   >
                     <div className="flex items-center justify-between mb-6">
@@ -183,152 +181,163 @@ export default function MemoryHunt({
                     </p>
                     <div className="space-y-3 mb-6">
                       {game.targetWords.map((tw, i) => (
-                        <AdaptiveMotion.div
+                        <div
                           key={`${tw.word}-${i}`}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.1 }}
+                          style={{ animationDelay: `${i * 0.1}s` }}
                           className={cn(
                             'flex items-center justify-between gap-3 px-4 py-3 rounded-neo border-3 border-neo-black',
-                            'bg-neo-purple'
+                            'bg-neo-purple',
+                            'animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both'
                           )}
                         >
                           <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-wide">
                             {tw.word}
                           </span>
-                          <AdaptiveMotion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                          <button
                             onClick={() => game.replaceInvalidWord(tw.word)}
                             className={cn(
                               'flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
                               'text-xs font-bold uppercase',
                               'bg-neo-red/20 hover:bg-neo-red/40 text-neo-black',
-                              'transition-colors'
+                              'transition-colors hover:scale-110 active:scale-90'
                             )}
                             title={t('brain.drills.memory-hunt.markInvalid')}
                           >
                             <X className="w-4 h-4" />
                             <RefreshCw className="w-3 h-3" />
-                          </AdaptiveMotion.button>
-                        </AdaptiveMotion.div>
+                          </button>
+                        </div>
                       ))}
                     </div>
-                    <AdaptiveMotion.button
-                      whileTap={{ scale: 0.95 }}
+                    <button
                       onClick={game.skipStudyPhase}
                       className={cn(
                         'w-full px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                         'font-bold text-lg uppercase',
-                        'transition-all hover:translate-y-[-2px]',
+                        'transition-all hover:translate-y-[-2px] active:scale-95',
                         'bg-neo-green text-neo-black'
                       )}
                     >
                       {t('brain.drills.memory-hunt.readyToStart')}
-                    </AdaptiveMotion.button>
-                  </AdaptiveMotion.div>
-                </AdaptiveMotion.div>
+                    </button>
+                  </div>
+                </div>
               )}
-            </AdaptiveAnimatePresence>
+            </>
           </div>
         )}
 
         {/* Recall Phase */}
         {(game.phase === 'recall' || game.phase === 'feedback') && (
-          <div className="w-full max-w-md lg:max-w-lg space-y-4">
-            <div className="flex items-center justify-center gap-2">
-              <EyeOff className={cn(
-                'w-5 h-5',
-                'text-neo-orange'
-              )} />
-              <span className={cn(
-                'font-bold uppercase',
-                'text-neo-white'
-              )}>
-                {t('brain.drills.memory-hunt.recallPhase')}
-              </span>
+          <div className="flex-1 min-h-0 w-full flex flex-col items-center gap-2 px-3 py-2">
+            {/* Slim status row: typed word on desktop, else a thin recall cue */}
+            <div className="h-8 shrink-0 w-full max-w-md flex items-center justify-center">
+              {keyboard.isTypingMode && keyboard.typedWord ? (
+                <div
+                  className={cn(
+                    'px-4 py-1.5 rounded-neo border-2 border-neo-black font-black text-lg uppercase',
+                    keyboard.isValidOnGrid
+                      ? 'bg-neo-cyan text-neo-black'
+                      : 'bg-neo-red/60 text-neo-black',
+                    'animate-in fade-in-0 slide-in-from-top-2 duration-300'
+                  )}
+                >
+                  {keyboard.typedWord}
+                </div>
+              ) : (
+                <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-neo-cream">
+                  <EyeOff className="w-4 h-4 text-neo-orange" />
+                  {t('brain.drills.memory-hunt.recallPhase')}
+                </span>
+              )}
             </div>
 
-            {keyboard.isTypingMode && keyboard.typedWord && (
-              <AdaptiveMotion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cn(
-                  'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-black text-lg uppercase mb-2',
-                  keyboard.isValidOnGrid
-                    ? 'bg-neo-cyan text-neo-black'
-                    : 'bg-neo-red/50 text-neo-black'
-                )}
+            {/* Board centerpiece — largest square that fits the space, never squashed. */}
+            <div
+              className="flex-1 min-h-0 w-full flex items-center justify-center"
+              style={{ containerType: 'size' }}
+            >
+              <div
+                className="relative aspect-square"
+                style={{ width: 'min(100cqw, 100cqh)', maxWidth: 'min(100%, 32rem)' }}
               >
-                {keyboard.typedWord}
-              </AdaptiveMotion.div>
-            )}
-
-            <div className="relative">
-              <GridComponent
-                grid={grid}
-                interactive={game.phase === 'recall'}
-                onWordSubmit={game.handleWordSubmit}
-                highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : game.currentHighlight}
-                language={language}
-                className="w-full"
-              />
-              <AdaptiveAnimatePresence>
-                {game.lastFeedback && (
-                  <AdaptiveMotion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    className={cn(
-                      "absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-neo p-4 text-center",
-                      game.lastFeedback === 'correct'
-                        ? "bg-neo-green/90"
-                        : game.lastFeedback === 'free'
-                          ? "bg-neo-purple/90"
-                          : "bg-neo-red/90"
-                    )}
-                  >
-                    {game.lastFeedback === 'correct' ? (
-                      <CheckCircle2 className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
-                    ) : game.lastFeedback === 'free' ? (
-                      <>
-                        <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-white drop-shadow-lg" />
-                        <p className="text-sm font-bold text-white max-w-[14rem]">
-                          {t('brain.drills.firstMissFree')}
-                        </p>
-                      </>
-                    ) : (
-                      <XCircle className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
-                    )}
-                  </AdaptiveMotion.div>
-                )}
-              </AdaptiveAnimatePresence>
+                <GridComponent
+                  grid={grid}
+                  interactive={game.phase === 'recall'}
+                  onWordSubmit={game.handleWordSubmit}
+                  highlightedPath={keyboard.isTypingMode && !game.isHintActive ? keyboard.highlightedCells : game.currentHighlight}
+                  language={language}
+                  className="w-full h-full"
+                />
+                <>
+                  {game.lastFeedback && (
+                    <div
+                      className={cn(
+                        'absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-neo p-4 text-center',
+                        game.lastFeedback === 'correct'
+                          ? 'bg-neo-green/90'
+                          : game.lastFeedback === 'free'
+                            ? 'bg-neo-purple/90'
+                            : 'bg-neo-red/90',
+                        'animate-in fade-in-0 zoom-in-50 duration-300'
+                      )}
+                    >
+                      {game.lastFeedback === 'correct' ? (
+                        <CheckCircle2 className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
+                      ) : game.lastFeedback === 'free' ? (
+                        <>
+                          <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-white drop-shadow-lg" />
+                          <p className="text-sm font-bold text-white max-w-[14rem]">
+                            {t('brain.drills.firstMissFree')}
+                          </p>
+                        </>
+                      ) : (
+                        <XCircle className="w-14 h-14 sm:w-20 sm:h-20 text-white drop-shadow-lg" />
+                      )}
+                    </div>
+                  )}
+                </>
+              </div>
             </div>
 
-            <div className={cn(
-              'p-3 rounded-neo border-2 border-neo-black text-center',
-              'bg-neo-navy-light'
-            )}>
-              <p className={cn(
-                'text-xs font-medium mb-2',
-                'text-neo-white'
-              )}>
-                {t('brain.drills.memory-hunt.remaining')}: {game.remainingWords.length}
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center min-h-[40px]">
+            {/* Compact footer: word chips + clue / finish (no scroll) */}
+            <div className="shrink-0 w-full max-w-md space-y-2">
+              <div className="flex flex-wrap gap-1.5 justify-center">
                 {game.targetWords.map((tw, i) => (
                   <span
                     key={`${tw.word}-${i}`}
                     className={cn(
-                      'px-3 py-1.5 rounded-neo border-2 border-neo-black text-base font-bold min-w-[5ch] text-center',
+                      'px-2.5 py-1 rounded-neo border-2 border-neo-black text-sm font-black min-w-[4ch] text-center tracking-wide',
                       tw.found
                         ? 'bg-neo-green/30 text-neo-green line-through'
-                        : 'bg-neo-navy-elevated text-gray-300'
+                        : 'bg-neo-navy-elevated text-neo-cream'
                     )}
                   >
                     {tw.found ? tw.word : '???'}
                   </span>
                 ))}
+              </div>
+
+              <div className="flex gap-2">
+                <MemoryHuntCluePanel
+                  hintsRemaining={game.hintsRemaining}
+                  isHintActive={game.isHintActive}
+                  onUseClue={game.useHint}
+                  onGrantClues={game.grantClues}
+                  t={t}
+                />
+                <button
+                  onClick={game.finishGame}
+                  aria-label={t('brain.drills.finishGame')}
+                  className={cn(
+                    'px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard',
+                    'font-black text-sm uppercase tracking-wide',
+                    'transition-all hover:-translate-y-px active:shadow-hard-pressed',
+                    'bg-neo-navy-elevated text-neo-cream'
+                  )}
+                >
+                  {t('brain.drills.finishGame')}
+                </button>
               </div>
             </div>
 
@@ -347,40 +356,6 @@ export default function MemoryHunt({
                 />
               </>
             )}
-
-            <div className="flex gap-3 mt-4">
-              {game.hintsRemaining > 0 && (
-                <AdaptiveMotion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={game.useHint}
-                  disabled={game.isHintActive}
-                  className={cn(
-                    'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
-                    'font-bold text-sm uppercase',
-                    'transition-all hover:-translate-y-px',
-                    game.isHintActive
-                      ? 'bg-neo-lime text-neo-black cursor-not-allowed'
-                      : 'bg-neo-yellow text-neo-black hover:bg-neo-lime'
-                  )}
-                >
-                  <Lightbulb className="w-4 h-4" />
-                  {t('brain.drills.useHint')} ({game.hintsRemaining})
-                </AdaptiveMotion.button>
-              )}
-              <AdaptiveMotion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={game.finishGame}
-                aria-label={t('brain.drills.finishGame')}
-                className={cn(
-                  'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
-                  'font-bold text-sm uppercase',
-                  'transition-all hover:-translate-y-px',
-                  'bg-neo-navy-elevated text-neo-white'
-                )}
-              >
-                {t('brain.drills.finishGame')}
-              </AdaptiveMotion.button>
-            </div>
           </div>
         )}
 

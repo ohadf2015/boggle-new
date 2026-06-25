@@ -63,8 +63,8 @@ const sv = {
     },
     "wordHunt": {
       "title": "Gissa ordet",
-      "step1": "Tryck på bokstäver för att gissa",
-      "step2": "Färgen visar hur nära du är",
+      "step1": "Hitta det dolda ordet",
+      "step2": "Stava ord för att avslöja ledtrådar",
       "scoreTip": "Rätt först ger bonus!"
     },
     "wheelRush": {
@@ -2785,12 +2785,12 @@ const sv = {
   "results": {
     "rivals": {
       "aria": "Du mot dina rivaler",
-      "header": "Tätt lopp",
-      "headerWon": "Du vann!",
+      "header": "Målfoto",
+      "headerWon": "Du krossade alla!",
       "of": "av",
       "you": "Du",
-      "aheadBy": "{n} att ta in",
-      "youBeatBy": "Du slog med {n}",
+      "aheadBy": "{n} kvar att jaga",
+      "youBeatBy": "{n} i dammet",
       "tie": "Lika",
       "uniqueWords": "Ord bara du hittade: {count}"
     },
@@ -2934,12 +2934,12 @@ const sv = {
       "tank": "Stridsvagnen"
     },
     "crownDesc": {
-      "sniper": "Högst medelpoäng per ord",
-      "speedDemon": "Hittade flest ord",
-      "explorer": "Hittade flest unika ord",
-      "scholar": "Längst genomsnittlig ordlängd",
-      "clutch": "Högst poäng på ett enda ord",
-      "tank": "Mest jämn poängsättning"
+      "sniper": "Flest poäng per ord. Kirurgiskt.",
+      "speedDemon": "Hittade fler ord än alla andra.",
+      "explorer": "Grävde fram ord ingen annan såg.",
+      "scholar": "Längst ord i snitt. Skrytmåns.",
+      "clutch": "Släppte det enskilt största ordet.",
+      "tank": "Missade aldrig ett slag. Stabilt."
     },
     "everyoneReady": "Alla redo!",
     "waitingForPlayers": "Väntar på spelare",
@@ -3066,7 +3066,7 @@ const sv = {
     "aheadOf": "före {player}",
     "you": "DU",
     "words": "Ord",
-    "matchResults": "Matchresultat",
+    "matchResults": "Prispallen",
     "eliminated": "ELIMINERAD",
     "survived": "ÖVERLEVDE",
     "ordinal1": "1:A PLATS",
@@ -3074,7 +3074,7 @@ const sv = {
     "ordinal3": "3:E PLATS",
     "ordinal4": "4:E PLATS",
     "ordinalN": "{n}:E PLATS",
-    "soClose": "Så nära! Bara {points} poäng efter #1.",
+    "soClose": "Så nära att det svider — {points} poäng från toppen.",
     "crowns": {
       "sniper": "Prickskytten",
       "speedDemon": "Blixtsnabb",
@@ -3084,12 +3084,12 @@ const sv = {
       "tank": "Pansarvagnen"
     },
     "crownDesc": {
-      "sniper": "Högst medelpoäng per ord",
-      "speedDemon": "Hittade flest ord",
-      "explorer": "Hittade flest unika ord",
-      "scholar": "Längst genomsnittlig ordlängd",
-      "clutch": "Högst poäng på ett enda ord",
-      "tank": "Mest jämn poängsättning"
+      "sniper": "Flest poäng per ord. Kirurgiskt.",
+      "speedDemon": "Hittade fler ord än alla andra.",
+      "explorer": "Grävde fram ord ingen annan såg.",
+      "scholar": "Längst ord i snitt. Skrytmåns.",
+      "clutch": "Släppte det enskilt största ordet.",
+      "tank": "Missade aldrig ett slag. Stabilt."
     },
     "potentialScore": "+{points} möjliga poäng",
     "comparativeInsights": {
@@ -7422,6 +7422,15 @@ const sv = {
     "score": "Hjärnpoäng",
     "points": "Hjärnpoäng",
     "loading": "Värmer upp hjärnan...",
+    "insights": {
+      "title": "Ditt minne den här veckan",
+      "memoryUp": "Ditt minne är {pct}% skarpare än förra veckan 🧠",
+      "wordsUp": "Du minns {n} fler ord per omgång än förra veckan",
+      "firstWeek": "Första veckan loggad! Spela igen nästa vecka för att se dina framsteg.",
+      "comeback": "Lite under förra veckan — en snabb omgång tar dig tillbaka.",
+      "steady": "Stadigt — håll din svit vid liv!",
+      "memoryScore": "Minnespoäng: {score}"
+    },
     "nav": {
       "profile": "Profil",
       "home": "Hem",
@@ -7531,7 +7540,12 @@ const sv = {
       "betterThanLast": "Bättre än förra gången!",
       "firstAttempt": "Första försöket loggat!",
       "finishGame": "Avsluta Spel",
-      "useHint": "Använd Tips",
+      "useHint": "Ledtråd",
+      "clue": {
+        "watchAd": "Se annons · +3 ledtrådar",
+        "unlock": "Lås upp 3 ledtrådar",
+        "loading": "Laddar annons…"
+      },
       "lightning-round": {
         "name": "Blixtrundan",
         "description": "Hitta ord så snabbt som möjligt",

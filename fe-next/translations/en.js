@@ -2699,13 +2699,13 @@ const en = {
   "results": {
     "rivals": {
       "aria": "You versus your rivals",
-      "header": "Close Race",
-      "headerWon": "You Won!",
+      "header": "Photo Finish",
+      "headerWon": "You Ran the Table",
       "of": "of",
       "you": "You",
-      "aheadBy": "{n} to catch",
-      "youBeatBy": "Beat by {n}",
-      "tie": "Tied",
+      "aheadBy": "{n} to reel them in",
+      "youBeatBy": "{n} in the dust",
+      "tie": "Dead even",
       "uniqueWords": "Words only you found: {count}"
     },
     "progress": {
@@ -2843,12 +2843,12 @@ const en = {
       "tank": "The Tank"
     },
     "crownDesc": {
-      "sniper": "Highest avg score per word",
-      "speedDemon": "Found the most words",
-      "explorer": "Found the most unique words",
-      "scholar": "Longest average word length",
-      "clutch": "Highest single-word score",
-      "tank": "Most consistent scoring"
+      "sniper": "Most points per word. Surgical.",
+      "speedDemon": "Found more words than anyone.",
+      "explorer": "Dug up words nobody else saw.",
+      "scholar": "Longest words on average. Showoff.",
+      "clutch": "Dropped the single biggest word.",
+      "tank": "Never missed a beat. Rock solid."
     },
     "everyoneReady": "All Set!",
     "waitingForPlayers": "Waiting for players to ready up...",
@@ -2967,13 +2967,13 @@ const en = {
     "revengeVs": "REVENGE vs {player}",
     "wordsFound": "Words found",
     "score": "Score",
-    "matchResults": "Match Results",
+    "matchResults": "The Podium",
     "ordinal1": "1ST PLACE",
     "ordinal2": "2ND PLACE",
     "ordinal3": "3RD PLACE",
     "ordinal4": "4TH PLACE",
     "ordinalN": "{n}TH PLACE",
-    "soClose": "So close! Just {points} pts behind #1.",
+    "soClose": "So close it stings — {points} pts off the crown.",
     "potentialScore": "+{points} pts potential",
     "comparativeInsights": {
       "title": "How You Compared",
@@ -7259,6 +7259,15 @@ const en = {
     "score": "Brain Score",
     "points": "Brain Points",
     "loading": "Warming up your brain...",
+    "insights": {
+      "title": "Your memory this week",
+      "memoryUp": "Your memory is {pct}% sharper than last week 🧠",
+      "wordsUp": "You remember {n} more words per round than last week",
+      "firstWeek": "First week logged! Play again next week to see your gains.",
+      "comeback": "A touch below last week — one quick round gets you back.",
+      "steady": "Holding steady — keep your streak alive!",
+      "memoryScore": "Memory score: {score}"
+    },
     "nav": {
       "profile": "Profile",
       "home": "Home",
@@ -7377,7 +7386,12 @@ const en = {
       "betterThanLast": "Better than last time!",
       "firstAttempt": "First attempt logged!",
       "finishGame": "Finish Game",
-      "useHint": "Use Hint",
+      "useHint": "Clue",
+      "clue": {
+        "watchAd": "Watch ad · +3 clues",
+        "unlock": "Unlock 3 clues",
+        "loading": "Loading ad…"
+      },
       "points": "pts",
       "wpm": "WPM",
       "letters": "letters",
@@ -11981,9 +11995,9 @@ const en = {
     },
     "wordHunt": {
       "title": "Crack the Word",
-      "step1": "Tap letters to guess",
-      "step2": "Colors show how close you are",
-      "scoreTip": "Guess it first for big points!"
+      "step1": "Find the hidden word",
+      "step2": "Spell words to reveal clues",
+      "scoreTip": "Crack it first for big points!"
     },
     "wheelRush": {
       "title": "Spin & Spell",

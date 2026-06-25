@@ -22,6 +22,21 @@ export interface MemoryWord {
 
 export type GamePhase = 'ready' | 'study' | 'recall' | 'feedback' | 'complete';
 
+// How long a clue stays lit. A 7-cell path needs time to trace, so this is
+// generous — the brief flash was a big reason clues felt like they "did nothing".
+export const HINT_REVEAL_MS = 2600;
+// Free clues at the start of a game. The user's ask: "first one for free",
+// then more are unlocked by watching a rewarded ad (or free fallback on web).
+export const FREE_CLUES = 1;
+export const AD_CLUE_GRANT = 3;
+
+// Pick the word a clue should reveal: the first unfound word that actually has
+// a path to light up. Skipping empty-path words is the root-cause fix for
+// "the clue shows nothing" — an empty path highlighted zero cells.
+export function pickHintWord(words: MemoryWord[]): MemoryWord | null {
+  return words.find(w => !w.found && w.path.length > 0) ?? null;
+}
+
 interface UseMemoryHuntGameProps {
   grid: LetterGrid;
   availableWords: { word: string; path: { row: number; col: number }[] }[];
@@ -61,7 +76,7 @@ export function useMemoryHuntGame({
   const [currentHighlight, setCurrentHighlight] = useState<HighlightedCell[]>([]);
   const [excludedWords, setExcludedWords] = useState<Set<string>>(new Set());
   const [showStudyModal, setShowStudyModal] = useState(false);
-  const [hintsRemaining, setHintsRemaining] = useState(2);
+  const [hintsRemaining, setHintsRemaining] = useState(FREE_CLUES);
   const [isHintActive, setIsHintActive] = useState(false);
   // Forgiveness: each round grants one free warm-up miss before lives drop.
   const [firstMissUsedThisRound, setFirstMissUsedThisRound] = useState(false);
@@ -69,9 +84,14 @@ export function useMemoryHuntGame({
   // Ref to track study countdown interval for cleanup
   const studyIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Select random words for this round (excluding marked invalid words)
+  // Select random words for this round. Only words WITH a board path qualify —
+  // Memory Hunt highlights each word during study and on a clue, so a pathless
+  // word (e.g. a solver-found word the grid builder couldn't trace) would show
+  // nothing. Filtering here is the root-cause fix for "the clue does nothing".
   const selectTargetWords = useCallback((currentExcluded: Set<string> = excludedWords) => {
-    const filtered = availableWords.filter(w => !currentExcluded.has(w.word.toUpperCase()));
+    const filtered = availableWords.filter(
+      w => !currentExcluded.has(w.word.toUpperCase()) && w.path.length > 0,
+    );
     const shuffled = [...filtered].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, levelConfig.wordCount);
 
@@ -93,7 +113,8 @@ export function useMemoryHuntGame({
     const currentWordSet = new Set(targetWords.map(tw => tw.word));
     const availableReplacements = availableWords.filter(w =>
       !newExcluded.has(w.word.toUpperCase()) &&
-      !currentWordSet.has(w.word.toUpperCase())
+      !currentWordSet.has(w.word.toUpperCase()) &&
+      w.path.length > 0
     );
 
     if (availableReplacements.length > 0) {
@@ -188,26 +209,32 @@ export function useMemoryHuntGame({
     setLives(levelConfig.lives);
     setScore(0);
     setRound(1);
-    setHintsRemaining(2);
+    setHintsRemaining(FREE_CLUES);
     setStartTime(Date.now());
     startRound();
   }, [levelConfig.lives, startRound]);
 
-  // Use hint to briefly reveal one unfound word
+  // Grant extra clues (from a rewarded ad, or the free fallback when no ad is
+  // available). Marks the unlock used so the UI shows the offer once per game.
+  const grantClues = useCallback((amount: number) => {
+    setHintsRemaining(prev => prev + amount);
+  }, []);
+
+  // Use a clue to reveal one unfound word's path long enough to trace it.
   const useHint = useCallback(() => {
     if (hintsRemaining <= 0 || phase !== 'recall' || isHintActive) return;
 
-    const unfoundWord = targetWords.find(tw => !tw.found);
-    if (!unfoundWord) return;
+    const hintWord = pickHintWord(targetWords);
+    if (!hintWord) return; // every unfound word lacks a path — nothing to show
 
     setIsHintActive(true);
-    setCurrentHighlight(unfoundWord.path);
+    setCurrentHighlight(hintWord.path);
     setHintsRemaining(prev => prev - 1);
 
     setTimeout(() => {
       setCurrentHighlight([]);
       setIsHintActive(false);
-    }, 1500);
+    }, HINT_REVEAL_MS);
   }, [hintsRemaining, phase, targetWords, isHintActive]);
 
   // Handle word submission
@@ -346,6 +373,7 @@ export function useMemoryHuntGame({
     skipStudyPhase,
     finishGame,
     useHint,
+    grantClues,
     handleWordSubmit,
     replaceInvalidWord,
     resetGame,

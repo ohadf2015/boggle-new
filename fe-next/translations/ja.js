@@ -2628,12 +2628,12 @@ const ja = {
   "results": {
     "rivals": {
       "aria": "ライバルとの対戦",
-      "header": "接戦",
-      "headerWon": "勝利！",
+      "header": "大接戦",
+      "headerWon": "圧勝！",
       "of": "/",
       "you": "あなた",
-      "aheadBy": "あと{n}点",
-      "youBeatBy": "{n}点差で勝利",
+      "aheadBy": "あと{n}点で逆転",
+      "youBeatBy": "{n}点差で突き放した",
       "tie": "同点",
       "uniqueWords": "あなただけが見つけた語: {count}"
     },
@@ -2777,12 +2777,12 @@ const ja = {
       "tank": "タンク"
     },
     "crownDesc": {
-      "sniper": "1単語あたりの平均スコアが最高",
-      "speedDemon": "最も多くの単語を発見",
-      "explorer": "最もユニークな単語を発見",
-      "scholar": "平均単語長が最長",
-      "clutch": "1単語の最高スコア",
-      "tank": "最も安定したスコア"
+      "sniper": "1語あたりの得点が最高。職人技。",
+      "speedDemon": "誰よりも多くの単語を発見。",
+      "explorer": "誰も気づかない単語を発掘。",
+      "scholar": "平均が一番長い。さすが。",
+      "clutch": "一番大きな単語を決めた。",
+      "tank": "ブレない安定感。鉄壁。"
     },
     "everyoneReady": "全員準備完了！",
     "waitingForPlayers": "プレイヤーを待っています",
@@ -2909,7 +2909,7 @@ const ja = {
     "aheadOf": "{player}に差をつけて",
     "you": "あなた",
     "words": "単語",
-    "matchResults": "試合結果",
+    "matchResults": "表彰台",
     "eliminated": "敗退",
     "survived": "生存",
     "ordinal1": "1位",
@@ -2917,7 +2917,7 @@ const ja = {
     "ordinal3": "3位",
     "ordinal4": "4位",
     "ordinalN": "{n}位",
-    "soClose": "惜しい！1位まであと{points}ポイント。",
+    "soClose": "悔しいほど惜しい——王座まであと{points}点。",
     "crowns": {
       "sniper": "スナイパー",
       "speedDemon": "スピードデーモン",
@@ -2927,12 +2927,12 @@ const ja = {
       "tank": "タンク"
     },
     "crownDesc": {
-      "sniper": "1単語あたりの平均スコアが最高",
-      "speedDemon": "最も多くの単語を発見",
-      "explorer": "最もユニークな単語を発見",
-      "scholar": "平均単語長が最長",
-      "clutch": "1単語の最高スコア",
-      "tank": "最も安定したスコア"
+      "sniper": "1語あたりの得点が最高。職人技。",
+      "speedDemon": "誰よりも多くの単語を発見。",
+      "explorer": "誰も気づかない単語を発掘。",
+      "scholar": "平均が一番長い。さすが。",
+      "clutch": "一番大きな単語を決めた。",
+      "tank": "ブレない安定感。鉄壁。"
     },
     "potentialScore": "+{points}点の可能性",
     "comparativeInsights": {
@@ -7314,6 +7314,15 @@ const ja = {
     "score": "ブレインスコア",
     "points": "ブレインポイント",
     "loading": "脳をウォームアップ中...",
+    "insights": {
+      "title": "今週の記憶力",
+      "memoryUp": "記憶力が先週より{pct}%アップ 🧠",
+      "wordsUp": "1ラウンドあたり先週より{n}単語多く思い出せています",
+      "firstWeek": "最初の週を記録！来週またプレイして成長を確認しましょう。",
+      "comeback": "先週より少し下がりました — 1ラウンドで取り戻せます。",
+      "steady": "安定しています — 連続記録を続けましょう！",
+      "memoryScore": "記憶スコア：{score}"
+    },
     "nav": {
       "profile": "プロフィール",
       "home": "ホーム",
@@ -7422,7 +7431,12 @@ const ja = {
       "betterThanLast": "前回より良い！",
       "firstAttempt": "初挑戦を記録！",
       "finishGame": "ゲーム終了",
-      "useHint": "ヒントを使う",
+      "useHint": "ヒント",
+      "clue": {
+        "watchAd": "広告を見る · +3 ヒント",
+        "unlock": "ヒントを3つ解放",
+        "loading": "広告を読み込み中…"
+      },
       "lightning-round": {
         "name": "ライトニングラウンド",
         "description": "できるだけ速く単語を見つけろ",
@@ -13868,8 +13882,8 @@ const ja = {
     },
     "wordHunt": {
       "title": "単語を当てる",
-      "step1": "マスをタップして答えを当てよう",
-      "step2": "色で正解のヒント",
+      "step1": "隠れた単語を見つけよう",
+      "step2": "言葉を作ってヒントを集めよう",
       "scoreTip": "いち早く当てると大加点！"
     },
     "wheelRush": {

@@ -2487,12 +2487,12 @@ const es = {
   "results": {
     "rivals": {
       "aria": "Tú contra tus rivales",
-      "header": "Carrera reñida",
-      "headerWon": "¡Ganaste!",
+      "header": "Final de foto",
+      "headerWon": "¡Arrasaste!",
       "of": "de",
       "you": "Tú",
-      "aheadBy": "{n} para alcanzar",
-      "youBeatBy": "Ganaste por {n}",
+      "aheadBy": "{n} para darles caza",
+      "youBeatBy": "{n} mordiendo el polvo",
       "tie": "Empate",
       "uniqueWords": "Palabras que solo tú encontraste: {count}"
     },
@@ -2635,12 +2635,12 @@ const es = {
       "tank": "El Tanque"
     },
     "crownDesc": {
-      "sniper": "Mayor puntuación promedio por palabra",
-      "speedDemon": "Encontró más palabras",
-      "explorer": "Encontró más palabras únicas",
-      "scholar": "Mayor longitud promedio de palabra",
-      "clutch": "Mayor puntuación en una sola palabra",
-      "tank": "Puntuación más consistente"
+      "sniper": "Más puntos por palabra. Quirúrgico.",
+      "speedDemon": "Encontró más palabras que nadie.",
+      "explorer": "Sacó palabras que nadie más vio.",
+      "scholar": "Las palabras más largas de media. Presumido.",
+      "clutch": "Soltó la palabra más grande.",
+      "tank": "No falló ni una. Sólido como roca."
     },
     "everyoneReady": "¡Todos listos!",
     "waitingForPlayers": "Esperando jugadores",
@@ -2767,7 +2767,7 @@ const es = {
     "aheadOf": "por delante de {player}",
     "you": "TÚ",
     "words": "Palabras",
-    "matchResults": "Resultados",
+    "matchResults": "El podio",
     "eliminated": "ELIMINADO",
     "survived": "SOBREVIVIÓ",
     "ordinal1": "1ER LUGAR",
@@ -2775,7 +2775,7 @@ const es = {
     "ordinal3": "3ER LUGAR",
     "ordinal4": "4TO LUGAR",
     "ordinalN": "{n}TO LUGAR",
-    "soClose": "¡Tan cerca! Solo {points} pts detrás del #1.",
+    "soClose": "Tan cerca que duele — {points} pts de la corona.",
     "crowns": {
       "sniper": "El Francotirador",
       "speedDemon": "Demonio Veloz",
@@ -2785,12 +2785,12 @@ const es = {
       "tank": "El Tanque"
     },
     "crownDesc": {
-      "sniper": "Mayor puntuación promedio por palabra",
-      "speedDemon": "Encontró más palabras",
-      "explorer": "Encontró más palabras únicas",
-      "scholar": "Mayor longitud promedio de palabra",
-      "clutch": "Mayor puntuación en una sola palabra",
-      "tank": "Puntuación más consistente"
+      "sniper": "Más puntos por palabra. Quirúrgico.",
+      "speedDemon": "Encontró más palabras que nadie.",
+      "explorer": "Sacó palabras que nadie más vio.",
+      "scholar": "Las palabras más largas de media. Presumido.",
+      "clutch": "Soltó la palabra más grande.",
+      "tank": "No falló ni una. Sólido como roca."
     },
     "potentialScore": "+{points} pts potencial",
     "comparativeInsights": {
@@ -7294,6 +7294,15 @@ const es = {
     "score": "Puntos de Cerebro",
     "points": "Puntos de Cerebro",
     "loading": "Calentando el cerebro...",
+    "insights": {
+      "title": "Tu memoria esta semana",
+      "memoryUp": "Tu memoria está un {pct}% más afilada que la semana pasada 🧠",
+      "wordsUp": "Recuerdas {n} palabras más por ronda que la semana pasada",
+      "firstWeek": "¡Primera semana registrada! Vuelve la próxima semana para ver tu progreso.",
+      "comeback": "Un poco por debajo de la semana pasada — una ronda rápida te recupera.",
+      "steady": "Te mantienes estable — ¡no rompas tu racha!",
+      "memoryScore": "Puntuación de memoria: {score}"
+    },
     "nav": {
       "profile": "Perfil",
       "home": "Inicio",
@@ -7402,7 +7411,12 @@ const es = {
       "betterThanLast": "¡Mejor que la última vez!",
       "firstAttempt": "¡Primer intento registrado!",
       "finishGame": "Terminar Juego",
-      "useHint": "Usar Pista",
+      "useHint": "Pista",
+      "clue": {
+        "watchAd": "Ver anuncio · +3 pistas",
+        "unlock": "Desbloquear 3 pistas",
+        "loading": "Cargando anuncio…"
+      },
       "lightning-round": {
         "name": "Ronda Relámpago",
         "description": "Encuentra palabras lo más rápido posible",
@@ -12021,9 +12035,9 @@ const es = {
     },
     "wordHunt": {
       "title": "Adivina la Palabra",
-      "step1": "Toca letras para probar",
-      "step2": "Los colores te dicen qué tan cerca",
-      "scoreTip": "Aciertas primero, ganas más"
+      "step1": "Encuentra la palabra oculta",
+      "step2": "Forma palabras para ver pistas",
+      "scoreTip": "¡Aciértala primero y gana más!"
     },
     "wheelRush": {
       "title": "Rueda y Juega",
