@@ -23,6 +23,8 @@ interface DailyChallengePreloadedStats {
 interface HomeHubProps {
   className?: string;
   profile: ProfileData | null;
+  /** auth still resolving — drives the top-bar profile skeletons */
+  authLoading?: boolean;
   language: string;
   isAdmin?: boolean;
   /** live-room stats (active players powers the section live pill + arena count) */
@@ -49,6 +51,7 @@ interface HomeHubProps {
 export function HomeHub({
   className,
   profile,
+  authLoading,
   language,
   isAdmin,
   liveRoomStats,
@@ -65,7 +68,14 @@ export function HomeHub({
 
   return (
     <div className={cn('flex w-full flex-col gap-[18px] px-1.5 pt-1', className)}>
-      <HomeTopBar profile={profile} streak={dailyChallengeStats.currentStreak} language={language} t={t} />
+      <HomeTopBar
+        profile={profile}
+        streak={dailyChallengeStats.currentStreak}
+        language={language}
+        t={t}
+        profileLoading={authLoading}
+        streakLoading={dailyChallengeStats.loading}
+      />
 
       <LandingChallengeCards
         layout="hub"

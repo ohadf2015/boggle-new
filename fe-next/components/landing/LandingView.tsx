@@ -70,7 +70,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile } = useAuth();
+  const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
   const isMobilePortrait = useMobilePortrait();
   // The in-content InlineBannerAd below is a WEB monetization slot. On native it
   // would register a banner-coordinator 'slot' (priority > the bottom anchor),
@@ -207,6 +207,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
         <HomeHub
           className="md:hidden"
           profile={profile}
+          authLoading={authLoading}
           language={language}
           isAdmin={isAdmin}
           liveRoomStats={liveRoomStats}

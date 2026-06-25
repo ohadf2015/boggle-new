@@ -143,46 +143,22 @@ describe('LandingChallengeCards', () => {
     });
   });
 
-  describe('newcomer collapse — modes hidden until 3 games played', () => {
+  describe('all modes always surfaced — no newcomer collapse', () => {
     afterEach(() => {
-      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 5 }, isLoading: false });
       mockIsVeteran.mockReturnValue(false);
     });
 
-    it('player with 0 games sees the More-Game-Modes expander (extras hidden by default)', () => {
-      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
-      const { container } = render(<LandingChallengeCards {...baseProps} />);
-      // Expander is present
-      expect(container.querySelector('[data-testid="landing-cubes-more"]')).not.toBeNull();
-    });
-
-    it('player with 0 games does NOT see connections/brainGym above the fold', () => {
-      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
-      const { container } = render(<LandingChallengeCards {...baseProps} />);
-      const moreSection = container.querySelector('[data-testid="landing-cubes-more"]');
-      // The extras live INSIDE the expander, not above it
-      expect(moreSection?.textContent).toContain('landing.wordChainMode');
-      expect(moreSection?.textContent).toContain('landing.brainTraining');
-    });
-
-    it('player with 3 games sees all modes above the fold (no expander needed)', () => {
-      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 3 }, isLoading: false });
+    it('brand-new player (0 games) sees every mode — no More-Game-Modes expander', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
       expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
     });
 
-    it('CrazyGames bypass overrides newcomer collapse', () => {
-      mockUserStats.mockReturnValue({ userStats: { totalGamesPlayed: 0 }, isLoading: false });
-      mockIsOnCG.mockReturnValue(true);
+    it('connections + brainGym render above the fold for a brand-new player', () => {
       const { container } = render(<LandingChallengeCards {...baseProps} />);
+      // No expander, so the discovery modes live directly in the grid.
       expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
-      mockIsOnCG.mockReturnValue(false);
-    });
-
-    it('null userStats (auth still loading) does not collapse — default to open landing', () => {
-      mockUserStats.mockReturnValue({ userStats: null, isLoading: true });
-      const { container } = render(<LandingChallengeCards {...baseProps} />);
-      expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+      expect(container.textContent).toContain('landing.wordChainMode');
+      expect(container.textContent).toContain('landing.brainTraining');
     });
   });
 });

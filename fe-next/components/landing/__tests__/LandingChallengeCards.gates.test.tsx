@@ -346,26 +346,26 @@ describe('LandingChallengeCards — Adventure beta/admin gate', () => {
   });
 });
 
-describe('LandingChallengeCards — collapse-after-MP gate', () => {
-  it('renders the "More Game Modes" expander for a brand-new player (zero MP games)', () => {
+describe('LandingChallengeCards — all modes always surfaced', () => {
+  it('never renders the "More Game Modes" expander, even for a brand-new player', () => {
     mockIsNewPlayer.mockReturnValue(true);
     mockGamesCompleted.mockReturnValue(0);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 0 });
     mockUserEmail.mockReturnValue(undefined);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
-    // Non-essential modes are tucked behind the <details> expander.
-    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
+    // Every non-essential mode lives directly in the visible grid.
+    expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
   });
 
-  it('omits the expander once the player has completed any MP game', () => {
-    mockIsNewPlayer.mockReturnValue(true); // would normally collapse
-    mockGamesCompleted.mockReturnValue(1); // overrides — MP played at least once
+  it('still shows all modes directly once the player has completed any MP game', () => {
+    mockIsNewPlayer.mockReturnValue(true);
+    mockGamesCompleted.mockReturnValue(1);
     mockUserStats.mockReturnValue({ totalGamesPlayed: 1 });
     mockUserEmail.mockReturnValue(undefined);
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
-    // And every non-essential mode lives directly in the visible grid (not hidden in details).
-    // The visible grid contains both blast and connections.
     expect(container.querySelector('[data-cube-key="blast"]')).toBeInTheDocument();
     expect(container.querySelector('[data-cube-key="connections"]')).toBeInTheDocument();
   });

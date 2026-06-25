@@ -5,11 +5,9 @@ import DailyChallengeCube from '@/components/daily/DailyChallengeCube';
 import { HomeDailyHero } from './home/HomeDailyHero';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
-import { getGamesCompleted, isNewPlayer } from '@/utils/multiplayerProgressStorage';
+import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import { trackModeSelected, trackLandingCtaClick } from '@/utils/growthTracking';
 import { useIsPracticeVeteran } from '@/hooks/useIsPracticeVeteran';
-import { useUserStats } from '@/hooks/useUserStats';
-import { THRESHOLDS } from '@/utils/featureGates';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
@@ -146,26 +144,6 @@ export function LandingChallengeCards({
   // Multiplayer + Practice lit up for brand-new players.
   const practiceWinsHighlight = !isVeteran;
 
-  // Mode-roster newcomer gate — independent of onboarding-completed and MP-joined
-  // flags (both flip too eagerly in production: onboarding completes before the
-  // first real game, and isNewPlayer requires an MP join). Drives the
-  // "More Game Modes" collapse so a brand-new player doesn't see eight options
-  // on first paint.
-  const { userStats } = useUserStats();
-  // Homepage mode section is the cubes bento (legacy control card grid retired).
-  const isNewcomerByGames =
-    mounted &&
-    !isOnCrazyGamesPlatform &&
-    !!userStats &&
-    userStats.totalGamesPlayed < THRESHOLDS.modeRoster;
-  // Once a player has finished even one multiplayer round they're past the
-  // choice-paralysis window — surface every mode unconditionally instead of
-  // hiding half behind a "More Game Modes" expander.
-  const [hasPlayedMpRaw] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return getGamesCompleted() > 0;
-  });
-  const hasPlayedMp = mounted && hasPlayedMpRaw;
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
   //   2. Inject the synthetic `'quickPlay'` card just after `'daily'` so the
@@ -227,29 +205,18 @@ export function LandingChallengeCards({
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
   const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall']);
-  // Newcomer-essential modes — always visible above the fold. Everything else
-  // collapses into a "More Game Modes" expander to reduce choice paralysis
-  // without removing the cards from the DOM (preserves SEO + AI-crawler links).
-  // Arena (multiplayer) stays surfaced for newbies so the live-rooms entry
-  // point isn't buried — players consistently asked for it on landing.
-  const ESSENTIAL_FOR_NEWBIES = new Set<LandingCardKey>(['daily', 'practice', 'arena']);
 
-  const mpCardsAll = cardOrder.filter((m) => MP_MODES.has(m));
+  // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
+  // New and returning players alike see the full roster (the old newcomer
+  // choice-paralysis gate hid half the modes; players asked to see them all).
+  const mpCards = cardOrder.filter((m) => MP_MODES.has(m));
   // Non-veterans see practice promoted to a dedicated featured row above the SP grid
   // so it stops looking like just another card. Locked siblings (blast/adventure/etc.)
   // already de-emphasize the rest.
   const featurePractice = !isVeteran && cardOrder.includes('practice');
-  const spCardsAll = cardOrder
+  const spCards = cardOrder
     .filter((m) => SP_MODES.has(m))
     .filter((m) => !(featurePractice && m === 'practice'));
-  // Split visible vs. collapsed for first-timers / newbies / newcomers (< 3 games).
-  // The newcomer-by-games signal is the durable gate — onboarding-flag and MP-join
-  // signals expire too quickly. Veterans + CG players still see everything.
-  const collapseExtras = !hasPlayedMp && (isFirstTimer || isNewbie || isNewcomerByGames);
-  const mpCards = collapseExtras ? mpCardsAll.filter((m) => ESSENTIAL_FOR_NEWBIES.has(m)) : mpCardsAll;
-  const mpCardsExtra = collapseExtras ? mpCardsAll.filter((m) => !ESSENTIAL_FOR_NEWBIES.has(m)) : [];
-  const spCards = collapseExtras ? spCardsAll.filter((m) => ESSENTIAL_FOR_NEWBIES.has(m)) : spCardsAll;
-  const spCardsExtra = collapseExtras ? spCardsAll.filter((m) => !ESSENTIAL_FOR_NEWBIES.has(m)) : [];
 
 
   // Modes that fire `mode_selected` in the control switch — preserve so the
@@ -295,11 +262,7 @@ export function LandingChallengeCards({
   };
 
   const isModel = (m: ModeCubeModel | null): m is ModeCubeModel => m !== null;
-  // SAME above-fold/collapsed split as the control card grid — newcomers see
-  // the essential set, the rest goes into the "more modes" expander. Keeps the
-  // A/B a pure layout test (identical visible + collapsed sets both sides). The
-  // sparse-grid look a 2-mode newcomer set would give is handled by the
-  // adaptive anchor in LandingModeCubes (no forced 2×2 when few cubes).
+  // Every mode renders directly in the grid — no above-fold/collapsed split.
   const visibleKeys: LandingCardKey[] = [
     ...mpCards,
     ...(featurePractice ? (['practice'] as LandingCardKey[]) : []),
@@ -307,9 +270,6 @@ export function LandingChallengeCards({
   ];
   const visibleModels = visibleKeys
     .map((k) => buildCubeModel(k, k === 'arena' ? 'anchor' : 'normal'))
-    .filter(isModel);
-  const extraModels = [...mpCardsExtra, ...spCardsExtra]
-    .map((k) => buildCubeModel(k, 'normal'))
     .filter(isModel);
   // Daily is the cubes hero — always present (it's the once-a-day hook), not
   // gated on heroCards like the control arm. It renders above the bento grid.
@@ -325,12 +285,8 @@ export function LandingChallengeCards({
   return (
     <LandingModeCubes
       models={visibleModels}
-      extras={extraModels}
       dailyNode={dailyNode}
       sectionLabel={layout === 'hub' ? t('landing.home.gameModes') : t('landing.sectionSoloTitle')}
-      moreLabel={t('landing.moreGameModes')}
-      moreHint={t('landing.moreGameModesHint')}
-      collapseLabel={t('common.collapse')}
       t={t}
       layout={layout}
       liveCount={activePlayers}

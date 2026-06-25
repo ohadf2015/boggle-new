@@ -1,20 +1,15 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { renderToString } from 'react-dom/server';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LandingChallengeCards } from '../LandingChallengeCards';
 
 /**
- * Hydration safety: the newbie "collapse extras" personalization reads
- * localStorage (isFirstTimer/isNewbie/hasPlayedMp) in useState initializers.
- * SSR has no localStorage → all false → collapseExtras=false → no <details>.
- * A newbie client reads localStorage → true → collapseExtras=true → <details landing-cubes-more>.
- * The element creation (none↔<details>) is a React #418 → tree regeneration.
- *
- * SSR always paints the expanded layout, so gating the flags until mount has the
- * SAME visual reflow for newbies but removes the hydration error. Contract: the
- * first render (renderToString = no effects = pre-mount) has NO <details>.
+ * Hydration safety: all game modes are surfaced directly — there is no newcomer
+ * "collapse extras" expander anymore. So no <details> is ever rendered, on the
+ * server or the client, for any player. This keeps the SSR/client trees identical
+ * (no React #418 element-type flip from a localStorage-gated <details>).
  */
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -59,13 +54,11 @@ const baseProps: any = {
 describe('LandingChallengeCards - hydration safety', () => {
   it('SSR/first render has no <details> expander (even for a newbie)', () => {
     const html = renderToString(<LandingChallengeCards {...baseProps} />);
-    // Pre-mount: no <details> with landing-cubes-more testid
     expect(html).not.toContain('landing-cubes-more');
   });
 
-  it('collapses extras into <details> for a newbie after mount', () => {
-    render(<LandingChallengeCards {...baseProps} />);
-    // Post-mount (effects flushed) the real newbie state applies.
-    expect(screen.getByTestId('landing-cubes-more')).toBeInTheDocument();
+  it('has no <details> expander after mount either — all modes surfaced directly', () => {
+    const { container } = render(<LandingChallengeCards {...baseProps} />);
+    expect(container.querySelector('[data-testid="landing-cubes-more"]')).toBeNull();
   });
 });

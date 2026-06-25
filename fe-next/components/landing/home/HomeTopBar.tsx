@@ -5,9 +5,14 @@ import Link from 'next/link';
 import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
+import { NeoSkeleton } from '@/components/ui/skeleton';
 import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
 import { clampPercent } from '@/lib/landing/homeHubFormat';
 import type { ProfileData } from '@/contexts/auth/authTypes';
+
+/** localStorage key — a stable per-device seed so a guest's random avatar is the
+ *  same across reloads (and matches whatever they later see pre-sign-in). */
+const GUEST_AVATAR_SEED_KEY = 'lc:guestAvatarSeed';
 
 interface HomeTopBarProps {
   profile: ProfileData | null;
@@ -20,6 +25,10 @@ interface HomeTopBarProps {
     fallbackOrParams?: string | Record<string, string | number>,
     params?: Record<string, string | number>,
   ) => string;
+  /** auth still resolving — show skeletons for profile-derived values (name/level/coins) */
+  profileLoading?: boolean;
+  /** daily-challenge feed still resolving — show a skeleton for the streak value */
+  streakLoading?: boolean;
 }
 
 /**
@@ -31,17 +40,54 @@ interface HomeTopBarProps {
  * via the shared `xpManager` curve, coins from `profile.total_coins`. Missing
  * fields degrade gracefully (level 1, no title, 0 coins) — never "undefined".
  */
-export function HomeTopBar({ profile, streak, language, t }: HomeTopBarProps) {
+export function HomeTopBar({
+  profile,
+  streak,
+  language,
+  t,
+  profileLoading = false,
+  streakLoading = false,
+}: HomeTopBarProps) {
   // Profile + streak are client-resolved (auth/daily hooks). On the server and
   // the first client render they may differ — and `coins.toLocaleString()` is
   // locale-dependent (Node vs browser) — so gate ALL dynamic values behind a
-  // mount flag. SSR + first client render both paint the neutral state (level 1,
-  // "Player", 0) → identical → no hydration mismatch; real values commit after
+  // mount flag. SSR + first client render both paint the skeleton state → identical
+  // → no hydration mismatch; real values (or the neutral guest state) commit after
   // mount (the same reflow the rest of the landing already accepts).
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // Stable per-device random seed → a new player (or anyone whose profile hasn't
+  // loaded) gets a generated avatar instead of an endless skeleton. localStorage
+  // keeps it identical across reloads. Client-only (SSR can't read it), so the
+  // pre-mount frame still paints the avatar skeleton — accepted to avoid an
+  // avatar-swap flicker from an SSR placeholder seed.
+  const [guestSeed, setGuestSeed] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      let s = localStorage.getItem(GUEST_AVATAR_SEED_KEY);
+      if (!s) {
+        s = Math.random().toString(36).slice(2, 10);
+        localStorage.setItem(GUEST_AVATAR_SEED_KEY, s);
+      }
+      setGuestSeed(s);
+    } catch {
+      setGuestSeed('guest');
+    }
+  }, []);
+
   const p = mounted ? profile : null;
   const liveStreak = mounted ? streak : 0;
+
+  // Skeleton only while genuinely loading — a logged-out guest is NOT loading and
+  // gets the neutral state ("Player", level 1, 0), never an endless skeleton.
+  // Pre-mount paints skeleton too so SSR matches the first client frame.
+  const showProfileSkeleton = !mounted || profileLoading;
+  const showStreakSkeleton = !mounted || streakLoading;
+
+  // The avatar always has a seed → generated avatar, never a skeleton. The real
+  // profile id wins once loaded; otherwise the stable guest seed gives a random one.
+  const avatarSeed = p?.id ?? guestSeed ?? undefined;
 
   const totalXp = p?.total_xp ?? 0;
   const progress = getXpProgress(totalXp);
@@ -74,24 +120,38 @@ export function HomeTopBar({ profile, streak, language, t }: HomeTopBarProps) {
           <div className="h-full w-full overflow-hidden rounded-full border-2 border-black bg-neo-navy-light">
             <Avatar
               customAvatar={p?.avatar_config ?? null}
-              userId={p?.id}
+              userId={avatarSeed}
               pixelSize={44}
               disableEffects
             />
           </div>
-          <span className="absolute -bottom-[3px] -end-[3px] flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-black bg-neo-lime px-1 font-neo-display text-[11px] font-black leading-none text-neo-navy shadow-hard-sm">
-            {level}
-          </span>
+          {/* Level badge — skeleton dot while the profile loads, never empty. */}
+          {showProfileSkeleton ? (
+            <NeoSkeleton variant="circular" width={19} height={19} className="absolute -bottom-[3px] -end-[3px] border-2 border-black" />
+          ) : (
+            <span className="absolute -bottom-[3px] -end-[3px] flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 border-black bg-neo-lime px-1 font-neo-display text-[11px] font-black leading-none text-neo-navy shadow-hard-sm">
+              {level}
+            </span>
+          )}
         </div>
         <div className="min-w-0">
-          <div className="truncate font-neo-display text-[17px] font-bold leading-tight text-neo-cream">
-            {t('landing.home.greeting', { name })}
-          </div>
-          <div className="truncate font-neo-body text-xs font-medium leading-snug text-neo-white/55">
-            {title
-              ? t('landing.home.levelTitle', { level, title })
-              : t('landing.home.levelOnly', { level })}
-          </div>
+          {showProfileSkeleton ? (
+            <div className="flex flex-col gap-1.5 py-0.5">
+              <NeoSkeleton variant="text" width={120} height={15} />
+              <NeoSkeleton variant="text" width={80} height={11} />
+            </div>
+          ) : (
+            <>
+              <div className="truncate font-neo-display text-[17px] font-bold leading-tight text-neo-cream">
+                {t('landing.home.greeting', { name })}
+              </div>
+              <div className="truncate font-neo-body text-xs font-medium leading-snug text-neo-white/55">
+                {title
+                  ? t('landing.home.levelTitle', { level, title })
+                  : t('landing.home.levelOnly', { level })}
+              </div>
+            </>
+          )}
         </div>
       </Link>
 
@@ -99,13 +159,21 @@ export function HomeTopBar({ profile, streak, language, t }: HomeTopBarProps) {
       <div className="flex shrink-0 items-center gap-2">
         <span className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm">
           <Flame className="h-[15px] w-[15px] text-neo-orange" strokeWidth={2.2} aria-hidden="true" />
-          <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream">{liveStreak}</span>
+          {showStreakSkeleton ? (
+            <NeoSkeleton variant="text" width={14} height={14} />
+          ) : (
+            <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream">{liveStreak}</span>
+          )}
         </span>
         <span className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-black bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm">
           <CoinGlyph />
-          <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream">
-            {coins.toLocaleString()}
-          </span>
+          {showProfileSkeleton ? (
+            <NeoSkeleton variant="text" width={28} height={14} />
+          ) : (
+            <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream">
+              {coins.toLocaleString()}
+            </span>
+          )}
         </span>
       </div>
     </div>
