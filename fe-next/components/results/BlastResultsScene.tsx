@@ -35,26 +35,21 @@ function StatChip({ icon, value, label, accent }: {
   );
 }
 
-export default function BlastResultsScene({ playerStats, scores, currentUsername }: BlastResultsSceneProps) {
+export default function BlastResultsScene({ playerStats, currentUsername }: BlastResultsSceneProps) {
   const { t } = useLanguage();
   const prefersReduced = useReducedMotion();
   const v = prefersReduced ? reduced : row;
 
-  // Rank every player by score; tag each with its 1-based placement so the
-  // current user keeps their true rank even when pulled out to the top.
-  const { me, opponents } = useMemo(() => {
-    const ranked = Object.keys(playerStats)
-      .map((username) => ({ username, stats: playerStats[username], score: scores[username] ?? 0 }))
-      .sort((a, b) => b.score - a.score)
-      .map((entry, i) => ({ ...entry, rank: i + 1 }));
-    const meIdx = ranked.findIndex((r) => r.username === currentUsername);
-    return {
-      me: meIdx >= 0 ? ranked[meIdx] : null,
-      opponents: meIdx >= 0 ? ranked.filter((_, i) => i !== meIdx) : ranked,
-    };
-  }, [playerStats, scores, currentUsername]);
+  // Current player's blast stats only. Opponent standings (rank·name·combo·
+  // score) live in BlastMpResults directly above this scene — rendering them
+  // here too was a second copy of the same list, so this scene now contributes
+  // ONLY the blast-specific stat card the standings can't carry.
+  const me = useMemo(() => {
+    if (!currentUsername || !playerStats[currentUsername]) return null;
+    return { username: currentUsername, stats: playerStats[currentUsername] };
+  }, [playerStats, currentUsername]);
 
-  if (!me && opponents.length === 0) return null;
+  if (!me) return null;
 
   return (
     <m.div variants={container} initial="hidden" animate="show" className="space-y-3">
@@ -104,30 +99,6 @@ export default function BlastResultsScene({ playerStats, scores, currentUsername
             )}
           </div>
         </m.div>
-      )}
-
-      {/* Opponents — condensed ranked rows (rank · name · score · peak combo) */}
-      {opponents.length > 0 && (
-        <div className="space-y-1.5">
-          {opponents.map(({ username, stats, score, rank }) => (
-            <m.div
-              key={username}
-              variants={v}
-              data-testid="blast-result-opponent"
-              className="flex items-center gap-2 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy/60"
-            >
-              <span className="text-xs font-black text-neo-white tabular-nums w-6 shrink-0">#{rank}</span>
-              <span className="text-sm font-bold truncate text-neo-white flex-1 min-w-0">{username}</span>
-              {stats.maxCombo > 0 && (
-                <span className="flex items-center gap-0.5 text-neo-orange shrink-0">
-                  <Flame className="w-3 h-3" />
-                  <span className="text-xs font-black tabular-nums">{stats.maxCombo}x</span>
-                </span>
-              )}
-              <span className="text-base font-black tabular-nums text-neo-white shrink-0 w-16 text-right">{score}</span>
-            </m.div>
-          ))}
-        </div>
       )}
     </m.div>
   );

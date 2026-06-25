@@ -97,27 +97,14 @@ describe('BlastResultsScene', () => {
     expect(me).not.toHaveTextContent('800');
   });
 
-  it('renders opponents as compact rows without the full stat grid', () => {
+  it('does NOT render opponent rows — BlastMpResults above already ranks every player', () => {
+    // Dedup: the standings scene (BlastMpResults) lists rank·name·combo·score
+    // for all opponents directly above this scene. Repeating them here as a
+    // second list was the duplication; the blast scene now contributes only the
+    // current player's blast-specific stat card.
     renderScene('bob');
-    const opponents = screen.getAllByTestId('blast-result-opponent');
-    expect(opponents).toHaveLength(1);
-    expect(opponents[0]).toHaveTextContent('alice');
-    expect(opponents[0]).toHaveTextContent('1200');
-    // decluttered: opponent rows don't repeat the four stat labels
-    expect(within(opponents[0]).queryByText('blast.results.gemsCollected')).toBeNull();
-    expect(within(opponents[0]).queryByText('blast.results.boardClears')).toBeNull();
-    expect(within(opponents[0]).queryByText('blast.results.tilesCleared')).toBeNull();
-  });
-
-  it('ranks opponents by score descending with their true placement number', () => {
-    const three = { ...playerStats, carol: stats({ maxCombo: 1 }) };
-    const threeScores = { alice: 1200, bob: 800, carol: 1500 };
-    renderScene('bob', three, threeScores);
-    const opponents = screen.getAllByTestId('blast-result-opponent');
-    expect(opponents[0]).toHaveTextContent('carol'); // #1 — 1500
-    expect(opponents[0]).toHaveTextContent('#1');
-    expect(opponents[1]).toHaveTextContent('alice'); // #2 — 1200
-    expect(opponents[1]).toHaveTextContent('#2');
+    expect(screen.queryAllByTestId('blast-result-opponent')).toHaveLength(0);
+    expect(screen.getByTestId('blast-result-me')).toBeInTheDocument();
   });
 
   it('surfaces the current user best word in their block', () => {
@@ -138,10 +125,13 @@ describe('BlastResultsScene', () => {
     expect(container).toBeTruthy();
   });
 
-  it('falls back to ranked opponent rows when the current user is absent (spectator)', () => {
-    renderScene('zoe');
+  it('renders nothing when the current user is absent (spectator) — BlastMpResults owns standings', () => {
+    const { container } = render(
+      <BlastResultsScene playerStats={playerStats} scores={scores} currentUsername="zoe" />
+    );
     expect(screen.queryByTestId('blast-result-me')).toBeNull();
-    expect(screen.getAllByTestId('blast-result-opponent')).toHaveLength(2);
+    expect(screen.queryAllByTestId('blast-result-opponent')).toHaveLength(0);
+    expect(container.textContent).toBe('');
   });
 
   it('displays the scene title', () => {

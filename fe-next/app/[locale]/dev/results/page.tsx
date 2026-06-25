@@ -9,10 +9,11 @@
 
 import React, { useState } from 'react';
 import ResultsMainContent from '@/components/results/ResultsMainContent';
+import BlastResultsScene from '@/components/results/BlastResultsScene';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Player } from '@/components/results/types';
 
-type Scenario = 'win_1v1' | 'lose_1v1' | 'win_lobby' | 'midpack_lobby' | 'solo';
+type Scenario = 'win_1v1' | 'lose_1v1' | 'win_lobby' | 'midpack_lobby' | 'solo' | 'blast_scene';
 
 const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: 'win_1v1', label: '1v1 — You Win' },
@@ -20,6 +21,7 @@ const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: 'win_lobby', label: '8p — You Win' },
   { id: 'midpack_lobby', label: '8p — You 5th' },
   { id: 'solo', label: 'Solo' },
+  { id: 'blast_scene', label: 'Blast stats' },
 ];
 
 const NAMES = ['Maya', 'Leo', 'Priya', 'Sam', 'Noor', 'Kai', 'Tess', 'Otto'];
@@ -128,7 +130,18 @@ export default function DevResultsPage() {
           ))}
         </div>
         <div id="results-measure">
-          <ResultsMainContent {...(props as any)} />
+          {scenario === 'blast_scene' ? (
+            <BlastResultsScene
+              playerStats={{
+                You: { maxCombo: 6, gemsCollected: 11, wordsFound: ['quartz', 'jumble'], bestWord: 'QUARTZ', tilesCleared: 58, totalTileBonus: 40, boardClears: 2 },
+                Leo: { maxCombo: 3, gemsCollected: 5, wordsFound: ['vex'], bestWord: 'VEX', tilesCleared: 31, totalTileBonus: 12, boardClears: 0 },
+              }}
+              scores={{ You: 312, Leo: 268 }}
+              currentUsername="You"
+            />
+          ) : (
+            <ResultsMainContent {...(props as any)} />
+          )}
         </div>
       </div>
     </div>
