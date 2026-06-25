@@ -91,11 +91,16 @@ describe('celebrity legendary part gating (bots free, players pay)', () => {
     }
   });
 
-  it('microphone is a legendary accessory worn by the singer bots', () => {
-    expect(isLegendaryPart('accessory', 'microphone')).toBe(true);
-    expect(isPremiumPart('accessory', 'microphone')).toBe(true);
-    expect(getPartPrice('accessory', 'microphone')).toBeGreaterThanOrEqual(5000);
-    const singers = CELEBRITY_BOTS.filter((c) => c.customAvatar.accessory === 'microphone');
-    expect(singers.map((c) => c.name).sort()).toEqual(['Beyoncé', 'Taylor']);
+  it.each(['microphone', 'earsOut'])('%s is a legendary accessory', (acc) => {
+    expect(isLegendaryPart('accessory', acc)).toBe(true);
+    expect(isPremiumPart('accessory', acc)).toBe(true);
+    expect(getPartPrice('accessory', acc)).toBeGreaterThanOrEqual(5000);
+  });
+
+  it('microphone worn by the singer/host bots; earsOut by Obama', () => {
+    const mic = CELEBRITY_BOTS.filter((c) => c.customAvatar.accessory === 'microphone');
+    expect(mic.map((c) => c.name).sort()).toEqual(['Beyoncé', 'Oprah', 'Taylor']);
+    const ears = CELEBRITY_BOTS.filter((c) => c.customAvatar.accessory === 'earsOut');
+    expect(ears.map((c) => c.name)).toEqual(['Obama']);
   });
 });

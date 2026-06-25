@@ -1198,9 +1198,22 @@ function Microphone({ fill }: AccessoryPartProps) {
   );
 }
 
+function EarsOut({ fill }: AccessoryPartProps) {
+  // Big protruding ears at the head sides (set accessoryColor to skin tone).
+  return (
+    <g>
+      <ellipse cx="15" cy="50" rx="7" ry="10" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M14 45 Q18 50 14 56" fill="none" stroke="#000" strokeWidth={1} opacity="0.25" strokeLinecap="round" />
+      <ellipse cx="85" cy="50" rx="7" ry="10" fill={fill} stroke="#000" strokeWidth={SO} />
+      <path d="M86 45 Q82 50 86 56" fill="none" stroke="#000" strokeWidth={1} opacity="0.25" strokeLinecap="round" />
+    </g>
+  );
+}
+
 export const ACCESSORY_PARTS = {
   none: None,
   microphone: Microphone,
+  earsOut: EarsOut,
   glasses: Glasses,
   sunglasses: Sunglasses,
   hat: Hat,
