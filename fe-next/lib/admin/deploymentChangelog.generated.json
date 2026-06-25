@@ -1,12 +1,40 @@
 {
-  "generatedAt": "2026-06-25T17:44:20.109Z",
+  "generatedAt": "2026-06-25T18:02:30.901Z",
   "commits": [
     {
-      "sha": "ce210f158b5876a208e29732965d1f0ad4656de5",
-      "shortSha": "ce210f1",
-      "subject": "fix(onboarding): skip lands new player on home, not multiplayer",
+      "sha": "7f16221e8b003fede5aed5279726886ba655939f",
+      "shortSha": "7f16221",
+      "subject": "feat(results): dedup Blast results — scene shows only the player's stat card",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T20:39:53+03:00"
+      "date": "2026-06-25T21:01:31+03:00"
+    },
+    {
+      "sha": "1d7566d7522b05a7e7ecaf001628b75da0e60728",
+      "shortSha": "1d7566d",
+      "subject": "feat(ftue): coach MP sealed-bid + crossword (getCoachMode was missing them)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T20:57:57+03:00"
+    },
+    {
+      "sha": "16958cc64f0f1a61229cd6957c6227ef28f240b1",
+      "shortSha": "16958cc",
+      "subject": "chore: land in-flight working tree (motion codemod + concurrent fixes/tests)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T20:55:01+03:00"
+    },
+    {
+      "sha": "3eb52fd7b10a366eeccaf9fd0abcf1297725991d",
+      "shortSha": "3eb52fd",
+      "subject": "fix(daily): correct Ron prank user id to real profiles.id UUID",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T20:48:33+03:00"
+    },
+    {
+      "sha": "7e52c414474e32f3fa71b15672943030b810ec34",
+      "shortSha": "7e52c41",
+      "subject": "feat(brain): Memory Hunt clue fix, ad-gated clues, no-scroll board, real memory insights",
+      "author": "Ohad Fisher",
+      "date": "2026-06-25T20:46:54+03:00"
     },
     {
       "sha": "494fe3b7404ad10a25e4650b059f66aea2c70bf6",
@@ -112,34 +140,6 @@
       "subject": "feat(bots): trumpSwoop legendary hair + tier-gate celebrity lookalike parts",
       "author": "Ohad Fisher",
       "date": "2026-06-25T10:55:06+03:00"
-    },
-    {
-      "sha": "ac78176d7ccde1b2bc08f24103c8bbbf95b35574",
-      "shortSha": "ac78176",
-      "subject": "fix(ads): allow Monetag In-Page Push creative domain (tzegilo) in CSP",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T10:53:26+03:00"
-    },
-    {
-      "sha": "d57d674976387d4f15a66e0e9363dd39dff55f21",
-      "shortSha": "d57d674",
-      "subject": "feat(results): screenshot-first MP brag card + share tracking",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T10:46:40+03:00"
-    },
-    {
-      "sha": "fdd509911668ec4e9ee7da622604d743f84d65d0",
-      "shortSha": "fdd5099",
-      "subject": "fix(ads): inline NEXT_PUBLIC env reads so web ads actually serve",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T10:41:38+03:00"
-    },
-    {
-      "sha": "a27d6e657fd64fdb83f902b51e9eaf35d4d64896",
-      "shortSha": "a27d6e6",
-      "subject": "fix(practice): square-fit mobile board (cqmin) + declutter teaching chrome",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T10:37:53+03:00"
     }
   ]
 }

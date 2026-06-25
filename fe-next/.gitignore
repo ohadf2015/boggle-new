@@ -99,3 +99,6 @@ public/dicts/
 
 # Lighthouse CI report output (npm run lighthouse:ci)
 .lighthouseci/
+
+# Impeccable skill critique scratch output
+.impeccable/
