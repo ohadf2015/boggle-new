@@ -126,6 +126,32 @@ describe('computeEffects', () => {
     expect(e.rewardMult).toBeLessThanOrEqual(2);
   });
 
+  it('every upgrade is LIVE (the shop never sells a no-op)', () => {
+    for (const id of UPGRADE_IDS) {
+      expect(LIVE_UPGRADE_IDS).toContain(id);
+    }
+  });
+
+  it('the new upgrades each move their own effect (tailwind/salvage/momentum)', () => {
+    const tail = computeEffects({ tailwind: UPGRADE_DEFS.tailwind.maxLevel });
+    expect(tail.heightMult).toBeGreaterThan(1); // every floor a little taller
+
+    const salv = computeEffects({ salvage: UPGRADE_DEFS.salvage.maxLevel });
+    expect(salv.toppleReduction).toBeGreaterThanOrEqual(1); // softer collapses
+
+    const mom = computeEffects({ momentum: UPGRADE_DEFS.momentum.maxLevel });
+    expect(mom.perfectBonus).toBeGreaterThan(0); // fatter perfect streaks
+  });
+
+  it('new effects stay inside safe bounds even fully maxed', () => {
+    const full = Object.fromEntries(UPGRADE_IDS.map((id) => [id, UPGRADE_DEFS[id].maxLevel])) as UpgradeLevels;
+    const e = computeEffects(full);
+    expect(e.heightMult).toBeLessThanOrEqual(1.4);
+    expect(e.toppleReduction).toBeLessThanOrEqual(3);
+    expect(e.perfectBonus).toBeLessThanOrEqual(0.5);
+    expect(e.leanResetMult).toBeLessThanOrEqual(2);
+  });
+
   it('clamps levels above max (corrupt save can never over-power)', () => {
     const cheat: UpgradeLevels = { masterArchitect: 999 };
     const e = computeEffects(cheat);

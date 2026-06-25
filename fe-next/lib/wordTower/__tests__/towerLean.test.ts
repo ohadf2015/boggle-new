@@ -1,5 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import { pushLeanOffset, leanFromOffsets, LEAN_HISTORY_MAX, LEAN_MAX_DEG } from '../towerLean';
+import { pushLeanOffset, leanFromOffsets, relaxLean, LEAN_HISTORY_MAX, LEAN_MAX_DEG } from '../towerLean';
+
+describe('relaxLean — Quick Recovery straightens the tower faster', () => {
+  it('×1 is a no-op (base game untouched)', () => {
+    const hist = [0.4, -0.6, 0.8];
+    expect(relaxLean(hist, 1)).toEqual(hist);
+  });
+
+  it('shrinks every offset toward 0, reducing the visible lean', () => {
+    const hist = [0.8, 0.8, 0.8];
+    const relaxed = relaxLean(hist, 2);
+    expect(relaxed).toEqual([0.4, 0.4, 0.4]);
+    expect(Math.abs(leanFromOffsets(relaxed))).toBeLessThan(Math.abs(leanFromOffsets(hist)));
+  });
+
+  it('never flips the lean sign and returns a fresh array', () => {
+    const hist = [-0.5, -0.9];
+    const relaxed = relaxLean(hist, 1.5);
+    expect(relaxed).not.toBe(hist);
+    expect(relaxed.every((o) => o <= 0)).toBe(true);
+  });
+});
 
 describe('pushLeanOffset — rolling window of signed drop offsets', () => {
   it('appends to the end', () => {

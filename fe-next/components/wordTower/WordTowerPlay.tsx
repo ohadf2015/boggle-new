@@ -364,9 +364,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const upgradeEffects = useMemo(() => computeUpgradeEffects(upgradeLevels), [upgradeLevels]);
   const craneMods = useMemo(() => {
     const withMutator = mutator ? combineModifiers(perks.modifiers, mutatorModifiers(mutator)) : perks.modifiers;
-    return upgradeEffects.extraTopple > 0
-      ? combineModifiers(withMutator, { brinkExtra: upgradeEffects.extraTopple })
-      : withMutator;
+    // Fold EVERY modifier-shaped upgrade effect into the run via the same algebra
+    // perks + mutators use: Reinforced Core (brinkExtra), Tailwind (heightMult),
+    // Salvage (toppleReduction), Momentum (perfectBonus). Sweep/wind/reward/perfect-
+    // band/lean-recovery are read at their own sites.
+    return combineModifiers(withMutator, {
+      brinkExtra: upgradeEffects.extraTopple,
+      heightMult: upgradeEffects.heightMult,
+      toppleReduction: upgradeEffects.toppleReduction,
+      perfectBonus: upgradeEffects.perfectBonus,
+    });
   }, [perks.modifiers, mutator, upgradeEffects]);
   // Word-aware mutator height × (golden letter / vowels / length). Read at drop
   // time from the held word — the only mutator effect that can't fit PerkModifiers.
@@ -380,7 +387,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Crane Stack — cosy reward-amplifier; logic in useCraneDrop. Combined modifiers
   // tune the perfect bonus, height, brink forgiveness, and wobble cushioning; the
   // word-mult getter applies the day's word-aware twist on the drop.
-  const crane = useCraneDrop(tower.commitPlacement, tower.hazard, craneMods, wordHeightMult);
+  // Quick Recovery upgrade getter — read live (imperative) so the calm-down speed
+  // tracks the owned level without churning the stable drop callback.
+  const leanRelaxGetter = useCallback(() => upgradeEffects.leanResetMult, [upgradeEffects.leanResetMult]);
+  const crane = useCraneDrop(tower.commitPlacement, tower.hazard, craneMods, wordHeightMult, leanRelaxGetter);
 
   // Imperative handle on the crane so the bottom HUD's swapped-in DROP CTA
   // can fire drop() — the player's thumb stays on the same button instead of
@@ -477,9 +487,22 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // timer was starved. (useAutoDismiss/useExitReveal now also self-heal via rAF.)
   useEffect(() => {
     if (tower.word.length === 1) {
+      // Hard guarantee against the founder's "notifications stay stuck on the
+      // screen and don't disappear" report: the instant the player begins the
+      // NEXT word (first tile selected), drop EVERY transient post-drop banner —
+      // the big centre verdict AND every peripheral toast — so none can ever
+      // bleed across builds, even if a dismiss timer was starved on a busy frame.
       setVerdict(null);
       setComboFx(null);
       setSurpriseFx(null);
+      setZoneText(null);
+      setMilestoneText(null);
+      setLandmarkText(null);
+      setAchToast(null);
+      setSkinUnlock(null);
+      setHazardText(null);
+      setClutchText(null);
+      setNewBestText(null);
     }
   }, [tower.word.length]);
 
@@ -972,6 +995,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           reducedMotion={reducedMotion}
           periodMs={sweepMs}
           instability={instability}
+          perfectBandBonus={upgradeEffects.perfectBandBonus}
           blockColorHex={blockColorHex}
           blockTextHex={blockTextHex}
           hideOwnButton
@@ -1128,17 +1152,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* Roguelike perk draft — pick 1 of 3 at each daily milestone. */}
       <WordTowerPerkDraft choices={perks.draft} onChoose={perks.choose} onSkip={perks.skip} t={t} dir={dir} />
 
-      {/* Persistent upgrade shop — opened from the corner pill, spends coins on
-          permanent tower boosts (calmer crane, fatter rewards, tougher tower…). */}
-      <button
-        type="button"
-        onClick={() => setShowUpgrades(true)}
-        className="absolute start-2 top-2 z-40 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-cyan px-2.5 py-1.5 font-neo-display text-xs font-black uppercase text-black shadow-hard-sm active:translate-y-px"
-        aria-label={t('wordTower.upgrade.title')}
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        {t('wordTower.upgrade.open')}
-      </button>
+      {/* Persistent upgrade shop — opened from the top-bar actions row (see the
+          Sparkles button beside Share); spends coins on permanent tower boosts.
+          (Moved out of the top-left corner where it sat ON TOP of the Back
+          button — founder 2026-06-25: "the hud on the top has some buttons
+          overlap each other".) */}
       {showUpgrades && (
         <WordTowerUpgradePanel onClose={() => setShowUpgrades(false)} t={t} dir={dir} />
       )}
@@ -1186,7 +1204,15 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             (InGameAudioButton: fixed top-inline-end, 40px + 8px inset = 48px),
             so no button ever sits behind the mute/unmute control. RTL-safe:
             margin-inline-end + the FAB both flip to the same corner. */}
-        <div className="pointer-events-auto me-12 flex shrink-0 items-center gap-2">
+        <div className="pointer-events-auto me-12 flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setShowUpgrades(true)}
+            aria-label={t('wordTower.upgrade.title')}
+            className="rounded-neo border-neo-thick border-black bg-neo-cyan p-2 text-black shadow-hard"
+          >
+            <Sparkles className="h-4 w-4" />
+          </button>
           <button
             type="button"
             onClick={shareTower}

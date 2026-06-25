@@ -11,7 +11,7 @@ import {
   TOPPLE_AFTER_SLOPPY,
   type PlacementOutcome,
 } from '@/lib/wordTower/cranePlacement';
-import { leanFromOffsets, pushLeanOffset } from '@/lib/wordTower/towerLean';
+import { leanFromOffsets, pushLeanOffset, relaxLean } from '@/lib/wordTower/towerLean';
 import {
   evaluateClutch,
   clutchSaveIntensity,
@@ -42,12 +42,18 @@ export function useCraneDrop(
   mods: PerkModifiers = NO_MODIFIERS,
   /** Word-aware height × for the held word (daily mutator). Default 1 = no twist. */
   wordHeightMult: () => number = () => 1,
+  /** Lean-recovery multiplier (Quick Recovery upgrade); >1 straightens the tower
+   *  faster after a clean drop. Read as a getter so the live upgrade level applies
+   *  without re-creating the stable onDrop callback. Default 1 = base game. */
+  leanRelaxMult: () => number = () => 1,
 ) {
   // Keep perk modifiers current without re-creating the stable onDrop callback.
   const modsRef = useRef(mods);
   modsRef.current = mods;
   const wordMultRef = useRef(wordHeightMult);
   wordMultRef.current = wordHeightMult;
+  const leanRelaxRef = useRef(leanRelaxMult);
+  leanRelaxRef.current = leanRelaxMult;
 
   const sloppyRef = useRef(0);
   const perfectRef = useRef(0);
@@ -118,6 +124,12 @@ export function useCraneDrop(
       else if (o.quality === 'perfect') { playPerfectWordSound(); haptics.levelComplete(); }
       else if (o.quality === 'miss') { playErrorSound(); haptics.bossHit(); }
       else { playWordAcceptedSound(); haptics.selection(); }
+
+      // Quick Recovery: a clean drop straightens the tower FASTER — pull the lean
+      // window toward upright by the upgrade's multiplier (no-op at ×1).
+      if (verdict !== 'save' && !topples && (o.quality === 'perfect' || o.quality === 'good')) {
+        leanHistoryRef.current = relaxLean(leanHistoryRef.current, leanRelaxRef.current());
+      }
 
       setStreaks({
         sloppy: sloppyRef.current,

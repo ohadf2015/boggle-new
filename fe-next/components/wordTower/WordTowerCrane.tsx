@@ -41,6 +41,10 @@ interface WordTowerCraneProps {
    *  the player must time the drop against a moving top. WYSIWYG: the target
    *  guide + landing shadow track the same offset that scores the drop. */
   instability?: number;
+  /** Widens the PERFECT landing band (Wide Footing upgrade) so the green sweet-
+   *  spot is easier to nail. Applied to both the live preview band and the scored
+   *  drop, so WYSIWYG holds. 0 = base window. */
+  perfectBandBonus?: number;
   /** Test/override seam: returns the signed offset [-1,1] at drop time. */
   getOffset?: () => number;
   /** When true, the crane chrome renders without its own drop button — the
@@ -111,6 +115,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     reducedMotion = false,
     periodMs = 1800,
     instability = 0,
+    perfectBandBonus = 0,
     getOffset,
     hideOwnButton = false,
     blockColorHex = '#7c8a99',
@@ -201,7 +206,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     // tracker and the verdict, so tracking a swinging tower lands clean.
     const residual = signedOffset - swayOffset;
     onSignedDrop?.(residual);
-    const outcome = evaluatePlacement(effectiveDropError(signedOffset, swayOffset), consecutiveSloppy);
+    const outcome = evaluatePlacement(effectiveDropError(signedOffset, swayOffset), consecutiveSloppy, perfectBandBonus);
     setDroppedQuality(outcome.quality);
     dropAtRef.current = performance.now();
     dropIntensityRef.current = dropQualityIntensity(outcome.quality);
@@ -212,7 +217,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
       setResult(outcome);
       onDrop(outcome);
     }, reducedMotion ? 0 : 300);
-  }, [getOffset, onSignedDrop, onDrop, consecutiveSloppy, reducedMotion]);
+  }, [getOffset, onSignedDrop, onDrop, consecutiveSloppy, reducedMotion, perfectBandBonus]);
 
   useImperativeHandle(ref, () => ({ drop }), [drop]);
 
@@ -221,7 +226,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   // The band the CURRENT sweep position would score AGAINST THE SWAYING TOP —
   // drives the live beam tint + landing shadow so the drop is a readable skill
   // shot even while the target swings (WYSIWYG).
-  const liveBand = alignmentBand(effectiveDropError(pos, sway));
+  const liveBand = alignmentBand(effectiveDropError(pos, sway), perfectBandBonus);
   const aiming = !falling && !result;
   // Release celebration — fires DURING the fall when the drop scored well, so the
   // "you let go in the right spot!" payoff lands before the crane unmounts. Perfect

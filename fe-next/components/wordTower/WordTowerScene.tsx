@@ -159,7 +159,15 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  */
 function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
+  // OUTER container — owns ONLY the vertical translation (climb-follow + user pan).
   const containerRef = useRef<Container | null>(null);
+  // INNER container — holds every tile and owns the lean/sway ROTATION, pivoted at
+  // the on-screen ground line so the tower tilts from its base and stays centred
+  // instead of swinging in a wide arc about a far screen corner.
+  const tiltRef = useRef<Container | null>(null);
+  // Screen-y of the ground line the sway pivots about (deck top), kept fresh by
+  // the diff effect so the rAF can pivot correctly even mid-pan.
+  const groundYRef = useRef(0);
   const registry = useRef<Map<string, TileSprite>>(new Map());
   const firstRender = useRef(true);
   const prevMaxPos = useRef(-1);
@@ -175,17 +183,21 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // One persistent container for the whole tower.
   useEffect(() => {
     const ps = panState.current; // stable object for the component's life
-    const c = new Container();
-    c.sortableChildren = true;
+    const c = new Container();            // OUTER — translation only
+    const tilt = new Container();         // INNER — lean/sway rotation, holds tiles
+    tilt.sortableChildren = true;         // tiles z-order by their stack position
+    c.addChild(tilt);
     c.y = ps.shift + ps.y;
     engine.camera.addChild(c);
     containerRef.current = c;
+    tiltRef.current = tilt;
     ps.container = c;
     const reg = registry.current;
     return () => {
       ps.container = null;
       try { c.destroy({ children: true }); } catch { /* */ }
       containerRef.current = null;
+      tiltRef.current = null;
       reg.clear();
       firstRender.current = true;
       prevMaxPos.current = -1;
@@ -195,11 +207,13 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // Diff the visible window of the column against the live sprite registry.
   useEffect(() => {
     const c = containerRef.current;
-    if (!c) return;
+    const tilt = tiltRef.current;
+    if (!c || !tilt) return;
 
     const { width: W, height: H } = engine;
     const centerX = W / 2;
     centerXRef.current = centerX; // shaft-wind tick reads this
+    groundYRef.current = H - bottomInsetPx; // sway/lean pivot rides the deck line
 
     // Build the unified bottom→top stack: committed letters/bricks + pending ghosts.
     const committed = buildTowerColumn(floors);
@@ -276,7 +290,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         const tile = makeTile(l.char, size, l.color, l.pending, l.shared, l.pos, l.surface);
         tile.x = centerX;
         tile.zIndex = l.pos;
-        c.addChild(tile);
+        tilt.addChild(tile);
         registry.current.set(l.key, tile);
         const isNewTop = l.pos > prevMaxPos.current;
         if (firstRender.current || reducedMotion || !isNewTop) {
@@ -288,7 +302,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           const depth = l.pending ? Math.max(0, l.pos - C) : 0;
           const fx = letterPlacementFx(depth);
           dropIn(tile, y, 0, () => {
-            impactRing(c, centerX, y + half, half, l.color, fx.ringScale * 0.6);
+            impactRing(tilt, centerX, y + half, half, l.color, fx.ringScale * 0.6);
             engine.particles.burst(COMBO_FLASH, centerX, y + half, Math.round(fx.particles * 0.6)); // light puff
           });
         }
@@ -333,8 +347,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           // with the word's heft, and a camera kick. Punchier than the old single
           // ring so the placement lands with weight (founder: more satisfying FX).
           const heft = committing.length;
-          impactRing(c, pivotX, pivotY, half, baseColor, 1.6);
-          impactRing(c, pivotX, pivotY, half, baseColor, 0.85);
+          impactRing(tilt, pivotX, pivotY, half, baseColor, 1.6);
+          impactRing(tilt, pivotX, pivotY, half, baseColor, 0.85);
           engine.particles.burst(COMBO_FLASH, pivotX, pivotY, 14 + heft * 3);
           engine.shake.shake({ intensity: Math.min(13, 5 + heft * 1.6), duration: 0.24, decay: 'exponential' });
         }
@@ -431,8 +445,9 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   windMultRef.current = BIOME_THEME[biomeId].windMult * useTowerUpgradeStore.getState().effects().windMult;
   useEffect(() => {
     const c = containerRef.current;
-    if (!c) return;
-    if (reducedMotion) { c.angle = 0; return; }
+    const tl0 = tiltRef.current;
+    if (!c || !tl0) return;
+    if (reducedMotion) { tl0.angle = 0; return; }
     let raf = 0;
     // Use the ABSOLUTE rAF timestamp (not a per-mount epoch) so this swing stays
     // phase-locked with the crane's target-guide swing — both read the same clock
@@ -443,12 +458,24 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     const WIND_COMMIT_TAIL_MS = 120;
     const tick = (now: number) => {
       const cc = containerRef.current;
+      const tl = tiltRef.current;
       // angle = lean (drift) + heavy pendulum sway + a tiny high-freq jitter so
       // a stressed-but-not-yet-swaying tower still reads as nervous/on-edge. The
       // jitter is render-only (never in swayNormalizedOffset) so WYSIWYG holds.
-      if (cc) {
+      //
+      // The rotation is applied to the INNER tilt container, pivoted at the
+      // on-screen ground line (deck top) directly UNDER the tower's centre column.
+      // Anchoring the pivot to the base means a lean/sway tilts the tower in place
+      // — its base stays planted and centred — instead of the old whole-stack
+      // swing about the canvas's top-left corner that flung the tower off to one
+      // side and made it "go crazy" when shaky. The pivot tracks the live scroll
+      // (cc.y) so it stays under the base through pans and climbs.
+      if (cc && tl) {
         const inst0 = instabilityRef.current;
-        cc.angle = leanRef.current + swayAngleAt(now, inst0) + swayJitterDeg(now, inst0);
+        const groundLocal = groundYRef.current - cc.y;
+        tl.pivot.set(centerXRef.current, groundLocal);
+        tl.position.set(centerXRef.current, groundLocal);
+        tl.angle = leanRef.current + swayAngleAt(now, inst0) + swayJitterDeg(now, inst0);
       }
       // Upper-shaft wind: a tiny travelling x-sway on settled crown tiles so a
       // tall tower feels exposed and alive between drops. x-only (never y/scale),
@@ -511,10 +538,13 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     const q = dropQualityRef.current ?? 'good';
     const biomePal = BIOME_THEME[biomeIdRef.current].particles.map(toHexStr);
     if (q === 'perfect') {
-      // Triumph — a bright lime wash, a biome-tinted star shower, and a kick.
-      engine.flash.flash({ color: 0xbfff00, duration: 0.32, intensity: 0.34 });
-      engine.particles.burst({ ...GOLD_STARS, colors: biomePal }, x, y, 40);
-      engine.shake.shake({ intensity: 8, duration: 0.32, decay: 'exponential' });
+      // Triumph — a bright lime wash, a fat biome-tinted star shower + confetti
+      // double-burst, and a satisfying kick so nailing the green sweet-spot really
+      // feels like a win (founder 2026-06-25: "really celebrate" the good drop).
+      engine.flash.flash({ color: 0xbfff00, duration: 0.36, intensity: 0.4 });
+      engine.particles.burst({ ...GOLD_STARS, colors: biomePal }, x, y, 64);
+      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, 30);
+      engine.shake.shake({ intensity: 10, duration: 0.34, decay: 'exponential' });
     } else if (q === 'good') {
       // Solid — a cool cyan wash + a biome-tinted confetti pop.
       engine.flash.flash({ color: 0x22d3ee, duration: 0.26, intensity: 0.22 });

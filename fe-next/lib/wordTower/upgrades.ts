@@ -17,7 +17,10 @@ export type UpgradeId =
   | 'windbreak' // calmer shaft wind / sway
   | 'masterArchitect' // bigger coin rewards
   | 'reinforcedCore' // extra wobble before a topple
-  | 'quickRecovery'; // faster lean recovery after a clean drop
+  | 'quickRecovery' // faster lean recovery after a clean drop
+  | 'tailwind' // every floor is a little taller (climb faster)
+  | 'salvage' // a topple/hazard knocks fewer floors off
+  | 'momentum'; // perfect drops pay an even bigger streak bonus
 
 export const UPGRADE_IDS: readonly UpgradeId[] = [
   'steadyCable',
@@ -26,21 +29,24 @@ export const UPGRADE_IDS: readonly UpgradeId[] = [
   'masterArchitect',
   'reinforcedCore',
   'quickRecovery',
+  'tailwind',
+  'salvage',
+  'momentum',
 ] as const;
 
 /**
- * The upgrades whose effects are wired into the live run today (sweep speed,
- * wind, coin reward, brink forgiveness). `wideFooting` (perfect-band widen) and
- * `quickRecovery` (lean recovery) are defined in the economy but their effects
- * await the WYSIWYG-sensitive crane-band / lean wiring, so the shop only SELLS
- * what actually does something — never a no-op purchase.
+ * Every upgrade is now WIRED into the live run, so the shop never sells a no-op:
+ *  - steadyCable → crane sweep speed
+ *  - wideFooting → perfect-landing band widen (crane)
+ *  - windbreak → ambient sway/wind intensity
+ *  - masterArchitect → coin reward multiplier
+ *  - reinforcedCore → extra wobble before a topple (brink)
+ *  - quickRecovery → faster visible lean recovery after a clean drop
+ *  - tailwind → global height multiplier on every floor
+ *  - salvage → fewer floors lost to a topple/hazard
+ *  - momentum → fatter perfect-streak bonus
  */
-export const LIVE_UPGRADE_IDS: readonly UpgradeId[] = [
-  'steadyCable',
-  'windbreak',
-  'masterArchitect',
-  'reinforcedCore',
-] as const;
+export const LIVE_UPGRADE_IDS: readonly UpgradeId[] = UPGRADE_IDS;
 
 export interface UpgradeDef {
   /** Hard cap on levels. */
@@ -55,11 +61,14 @@ export interface UpgradeDef {
 
 export const UPGRADE_DEFS: Record<UpgradeId, UpgradeDef> = {
   steadyCable: { maxLevel: 5, baseCost: 150, costGrowth: 1.7, perLevel: 0.08 },
-  wideFooting: { maxLevel: 4, baseCost: 220, costGrowth: 1.8, perLevel: 0.02 },
+  wideFooting: { maxLevel: 4, baseCost: 220, costGrowth: 1.8, perLevel: 0.03 },
   windbreak: { maxLevel: 4, baseCost: 180, costGrowth: 1.7, perLevel: 0.12 },
   masterArchitect: { maxLevel: 5, baseCost: 200, costGrowth: 1.75, perLevel: 0.1 },
   reinforcedCore: { maxLevel: 2, baseCost: 400, costGrowth: 2.2, perLevel: 1 },
-  quickRecovery: { maxLevel: 3, baseCost: 260, costGrowth: 1.8, perLevel: 0.15 },
+  quickRecovery: { maxLevel: 3, baseCost: 260, costGrowth: 1.8, perLevel: 0.4 },
+  tailwind: { maxLevel: 5, baseCost: 240, costGrowth: 1.8, perLevel: 0.06 },
+  salvage: { maxLevel: 3, baseCost: 320, costGrowth: 1.9, perLevel: 1 },
+  momentum: { maxLevel: 4, baseCost: 280, costGrowth: 1.8, perLevel: 0.1 },
 };
 
 export type UpgradeLevels = Partial<Record<UpgradeId, number>>;
@@ -118,6 +127,12 @@ export interface UpgradeEffects {
   extraTopple: number;
   /** Lean-recovery speed multiplier (>1 = snaps back faster). */
   leanResetMult: number;
+  /** Global height multiplier on every floor (>1 = taller floors, faster climb). */
+  heightMult: number;
+  /** Floors subtracted from any topple/hazard (≥ 0 = a softer collapse). */
+  toppleReduction: number;
+  /** Added to the per-drop PERFECT streak bonus (fatter perfect payouts). */
+  perfectBonus: number;
 }
 
 export const NEUTRAL_EFFECTS: UpgradeEffects = {
@@ -127,6 +142,9 @@ export const NEUTRAL_EFFECTS: UpgradeEffects = {
   rewardMult: 1,
   extraTopple: 0,
   leanResetMult: 1,
+  heightMult: 1,
+  toppleReduction: 0,
+  perfectBonus: 0,
 };
 
 /**
@@ -144,5 +162,8 @@ export function computeEffects(levels: UpgradeLevels): UpgradeEffects {
     rewardMult: clamp(1 + lv('masterArchitect') * UPGRADE_DEFS.masterArchitect.perLevel, 1, 2),
     extraTopple: clamp(lv('reinforcedCore') * UPGRADE_DEFS.reinforcedCore.perLevel, 0, 4),
     leanResetMult: clamp(1 + lv('quickRecovery') * UPGRADE_DEFS.quickRecovery.perLevel, 1, 2),
+    heightMult: clamp(1 + lv('tailwind') * UPGRADE_DEFS.tailwind.perLevel, 1, 1.4),
+    toppleReduction: clamp(lv('salvage') * UPGRADE_DEFS.salvage.perLevel, 0, 3),
+    perfectBonus: clamp(lv('momentum') * UPGRADE_DEFS.momentum.perLevel, 0, 0.5),
   };
 }

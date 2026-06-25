@@ -11,6 +11,21 @@ import {
   SLOPPY_MAX,
 } from '../cranePlacement';
 
+describe('perfectBandBonus — Wide Footing widens ONLY the green sweet-spot', () => {
+  it('an offset just past the base perfect edge becomes perfect with the bonus', () => {
+    const off = PERFECT_MAX + 0.05;
+    expect(alignmentBand(off)).toBe('good'); // base window
+    expect(alignmentBand(off, 0.08)).toBe('perfect'); // widened window
+    expect(evaluatePlacement(off, 0).quality).toBe('good');
+    expect(evaluatePlacement(off, 0, 0.08).quality).toBe('perfect');
+  });
+
+  it('never rescues a clear miss (only the perfect edge moves)', () => {
+    expect(alignmentBand(SLOPPY_MAX + 0.2, 0.12)).toBe('miss');
+    expect(alignmentBand(GOOD_MAX, 0.12)).toBe('good');
+  });
+});
+
 describe('alignmentBand — live drop-quality preview (matches the scorer)', () => {
   it('classifies the absolute offset into the same bands evaluatePlacement scores', () => {
     expect(alignmentBand(0)).toBe('perfect');
