@@ -981,6 +981,23 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onPointerCancel={handlePointerUp}
         onPointerLeave={handlePointerUp}
       >
+        {/* Depth backdrop disc — an always-on radial gradient centred on the
+            wheel. The orbit box carries no fill of its own and the stage's
+            radial gradient peaks above the wheel, so without this the disc
+            behind the letters read as flat solid black. Elevated navy center
+            (#2a2a4e) fading out to transparent lifts the disc above the navy
+            edge while still blending into the stage. zIndex -10 keeps it behind
+            the pixi layer, the rings, and every letter. */}
+        <div
+          data-testid="wheel-backdrop"
+          aria-hidden
+          className="absolute -inset-6 rounded-full pointer-events-none"
+          style={{
+            zIndex: -10,
+            background:
+              'radial-gradient(circle at center, var(--neo-navy-elevated) 0%, var(--neo-navy) 58%, transparent 78%)',
+          }}
+        />
         {/* PixiJS wheel decorations: orbital rings + connection lines */}
         <WordWheelPixiRing
           selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
