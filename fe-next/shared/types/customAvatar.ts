@@ -18,7 +18,7 @@ export const AVATAR_SKIN_COLORS = [
 export const AVATAR_HAIR_STYLES = [
   'none', 'spiky', 'curly', 'long', 'buzz', 'mohawk', 'bob', 'ponytail', 'afro', 'wavy',
   'pigtails', 'topknot', 'sideshave', 'dreads', 'braids', 'bun', 'bangs', 'twintails',
-  'mullet', 'combover', 'trumpSwoop', 'recedingHair', 'elvis', 'ramen', 'flame', 'galaxy', 'neon',
+  'mullet', 'combover', 'trumpSwoop', 'recedingHair', 'highAndTight', 'elvis', 'ramen', 'flame', 'galaxy', 'neon',
   'pixie', 'undercut', 'spaceBuns', 'straight', 'fade', 'cornrows', 'wolfCut',
   'curtainBangs', 'halfUp', 'himecut',
   'frenchBob', 'shag', 'flatTop', 'lob', 'fingerWaves', 'curlyBangs', 'quiff', 'sideSwept',
@@ -50,7 +50,7 @@ export const FEMALE_HAIR_STYLES = [
 /** Styles that look masculine — shown when gender is male. */
 export const MALE_HAIR_STYLES = [
   'none', 'spiky', 'buzz', 'mohawk', 'topknot',
-  'mullet', 'combover', 'trumpSwoop', 'recedingHair', 'elvis', 'ramen',
+  'mullet', 'combover', 'trumpSwoop', 'recedingHair', 'highAndTight', 'elvis', 'ramen',
   'undercut', 'fade', 'wolfCut', 'ponytail', 'bun',
   'flatTop', 'quiff', 'shag', 'sideSwept', 'fadeCurly',
   'frizzle', 'durag', 'locsShort',
@@ -257,7 +257,7 @@ export const EPIC_MOUTH_STYLES = ['dragon', 'diamond', 'glitch', 'grillz', 'neon
 export const EPIC_ACCESSORIES = ['samurai', 'astronaut', 'wizardHat', 'ninjaScarf', 'phoenixCrown', 'cyberpunkVisor',
   // New epic accessories
   'angelWings', 'demonWings', 'butterflyWings', 'frogHat', 'flamingHalo', 'iceCrown', 'crystalCrown'] as const;
-export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon', 'lightning', 'rainbowMohawk', 'iceSpikes', 'trumpSwoop', 'recedingHair'] as const;
+export const EPIC_HAIR_STYLES = ['flame', 'galaxy', 'neon', 'lightning', 'rainbowMohawk', 'iceSpikes', 'trumpSwoop', 'recedingHair', 'highAndTight'] as const;
 export const EPIC_BASES = ['skull', 'shield', 'dragonHead', 'robotHead', 'alienHead', 'ghostFace'] as const;
 
 export const PREMIUM_EYEBROW_STYLES = ['arched', 'bushy', 'scarred'] as const;
@@ -382,6 +382,7 @@ export const EPIC_PART_PRICES: Record<string, number> = {
   'accessory:crystalCrown': 12000,
   'hair:trumpSwoop': 9000, // celebrity lookalike part — legendary
   'hair:recedingHair': 6000, // celebrity lookalike part — legendary
+  'hair:highAndTight': 6000, // celebrity lookalike part — legendary
 };
 
 /** Get price for a part (epic > vip per-part > category default) */
@@ -401,7 +402,7 @@ export function isEpicPart(category: string, value: string): boolean {
 }
 
 /** The 3 rarest items — shown with special golden LEGENDARY badge */
-export const LEGENDARY_PARTS = ['eyes:infinity', 'accessory:phoenixCrown', 'base:dragonHead', 'accessory:crystalCrown', 'eyes:thirdEye', 'hair:trumpSwoop', 'hair:recedingHair'] as const;
+export const LEGENDARY_PARTS = ['eyes:infinity', 'accessory:phoenixCrown', 'base:dragonHead', 'accessory:crystalCrown', 'eyes:thirdEye', 'hair:trumpSwoop', 'hair:recedingHair', 'hair:highAndTight'] as const;
 
 /** Check if a part is legendary (subset of epic) */
 export function isLegendaryPart(category: string, value: string): boolean {

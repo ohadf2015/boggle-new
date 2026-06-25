@@ -65,6 +65,7 @@ describe('celebrity bots', () => {
 const CELEB_LEGENDARY_HAIR: Array<{ value: string; wornBy: string }> = [
   { value: 'trumpSwoop', wornBy: 'Trump' },
   { value: 'recedingHair', wornBy: 'Elon' },
+  { value: 'highAndTight', wornBy: 'Kim' },
 ];
 
 describe('celebrity legendary part gating (bots free, players pay)', () => {

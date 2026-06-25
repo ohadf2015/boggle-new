@@ -71,7 +71,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     name: 'Kim', emoji: '🇰🇵', color: '#C62828',
     customAvatar: {
       gender: 'male', base: 'round', skinColor: '#FFE0BD',
-      hair: 'flatTop', hairColor: '#2C1B18',
+      hair: 'highAndTight', hairColor: '#2C1B18',
       eyes: 'squint', eyeColor: '#6B4423', noseStyle: 'round', eyebrows: 'thick',
       facialHair: 'none', mouth: 'flat',
       accessory: 'none', accessoryColor: '#000000',
