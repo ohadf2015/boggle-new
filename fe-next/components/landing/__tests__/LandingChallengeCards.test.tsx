@@ -8,10 +8,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-vi.mock('@/components/daily/DailyChallengeCube', () => {
-  const DailyChallengeCube = () => <div data-testid="daily-challenge-cube" />;
-  DailyChallengeCube.displayName = 'DailyChallengeCube';
-  return { __esModule: true, default: DailyChallengeCube };
+vi.mock('@/components/landing/home/HomeDailyHero', () => {
+  const HomeDailyHero = () => <div data-testid="home-daily-hero" />;
+  HomeDailyHero.displayName = 'HomeDailyHero';
+  return { __esModule: true, HomeDailyHero };
 });
 
 vi.mock('@/utils/contextualGuidanceStorage', () => ({
@@ -73,7 +73,7 @@ describe('LandingChallengeCards', () => {
 
   it('renders daily challenge cube', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('daily-challenge-cube')).toBeInTheDocument();
+    expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
   });
 
   describe('practice card emphasis for non-veterans', () => {

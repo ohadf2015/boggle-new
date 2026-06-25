@@ -69,6 +69,9 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       aria-label={`${t('daily.title')} #${puzzleNumber}`}
       className={cn(
         'group relative block min-h-[138px] overflow-hidden rounded-neo-xl border-neo-thick border-black bg-neo-navy-light shadow-hard-lg',
+        // Desktop bento slot is ~768px wide — switch to a row so the content
+        // spreads across the width (no dead navy gap) and vertically centres.
+        'md:flex md:min-h-[150px] md:items-center',
         'transition-[transform,box-shadow] duration-150 active:translate-x-px active:translate-y-px active:shadow-hard-pressed',
       )}
     >
@@ -86,7 +89,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
         style={{ background: 'radial-gradient(120% 120% at 100% 50%, rgba(255,225,53,0.16), transparent 60%)' }}
       />
       {/* floating daily mascot */}
-      <div className="pointer-events-none absolute -bottom-2.5 -end-3.5 h-[150px] w-[150px] motion-safe:animate-bob">
+      <div className="pointer-events-none absolute -bottom-2.5 -end-3.5 h-[150px] w-[150px] motion-safe:animate-bob md:-bottom-4 md:h-[185px] md:w-[185px]">
         <Image
           src={DAILY_ART}
           alt=""
@@ -99,34 +102,36 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
         />
       </div>
 
-      <div className="relative max-w-[250px] p-3.5">
-        <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black bg-neo-yellow px-2.5 py-[3px] font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-navy shadow-hard-sm">
-          <span className="relative flex h-[7px] w-[7px]">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-neo-navy opacity-60 motion-safe:animate-ping" />
-            <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-neo-navy" />
+      <div className="relative max-w-[250px] p-3.5 md:flex md:max-w-none md:items-center md:gap-12 md:py-5 md:ps-7 md:pe-52">
+        <div className="md:flex-shrink-0">
+          <span className="inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black bg-neo-yellow px-2.5 py-[3px] font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-navy shadow-hard-sm">
+            <span className="relative flex h-[7px] w-[7px]">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-neo-navy opacity-60 motion-safe:animate-ping" />
+              <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-neo-navy" />
+            </span>
+            {t('daily.title')}
           </span>
-          {t('daily.title')}
-        </span>
 
-        <h2 className="mt-2.5 font-neo-display text-2xl font-bold uppercase leading-none tracking-tight text-neo-cream">
-          {t('landing.home.todaysPuzzle')}
-        </h2>
-        <div className="mt-1.5 font-neo-body text-xs font-medium text-neo-white/55 tabular-nums" suppressHydrationWarning>
-          {t('landing.home.puzzleNo', { n: puzzleNumber })} · {t('landing.home.resetsIn', { time: countdown })}
+          <h2 className="mt-2.5 font-neo-display text-2xl font-bold uppercase leading-none tracking-tight text-neo-cream md:text-3xl">
+            {t('landing.home.todaysPuzzle')}
+          </h2>
+          <div className="mt-1.5 font-neo-body text-xs font-medium text-neo-white/55 tabular-nums md:text-sm" suppressHydrationWarning>
+            {t('landing.home.puzzleNo', { n: puzzleNumber })} · {t('landing.home.resetsIn', { time: countdown })}
+          </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-1">
+        <div className="mt-3 flex items-center gap-1 md:mt-0 md:gap-1.5">
           {cells.map((filled, i) => (
             <span
               key={i}
               className={cn(
-                'h-[13px] w-[13px] rounded-[3px] border-[1.5px] border-black',
+                'h-[13px] w-[13px] rounded-[3px] border-[1.5px] border-black md:h-4 md:w-4',
                 filled ? 'bg-neo-yellow' : 'bg-neo-navy/60',
               )}
             />
           ))}
           {streak > 0 && (
-            <span className="ms-1.5 inline-flex items-center gap-1 font-neo-display text-[11px] font-semibold text-neo-yellow">
+            <span className="ms-1.5 inline-flex items-center gap-1 font-neo-display text-[11px] font-semibold text-neo-yellow md:text-xs">
               <Flame className="h-3 w-3 text-neo-orange" strokeWidth={2.4} aria-hidden="true" />
               {t('landing.home.dayStreak', { n: streak })}
             </span>
@@ -138,7 +143,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
           prompt to a calmer "View results" so it never invites a replay it can't grant. */}
       <span
         className={cn(
-          'absolute end-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black px-3 py-[7px] font-neo-display text-[13px] font-bold uppercase shadow-hard transition-transform group-hover:translate-x-0.5',
+          'absolute end-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black px-3 py-[7px] font-neo-display text-[13px] font-bold uppercase shadow-hard transition-transform group-hover:translate-x-0.5 md:end-5 md:top-5 md:px-4 md:py-2 md:text-sm',
           hasPlayed ? 'bg-neo-navy-light text-neo-cream' : 'bg-neo-lime text-neo-navy',
         )}
       >

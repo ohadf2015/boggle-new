@@ -9,9 +9,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-vi.mock('@/components/daily/DailyChallengeCube', () => ({
+vi.mock('@/components/landing/home/HomeDailyHero', () => ({
   __esModule: true,
-  default: () => <div data-testid="daily-challenge-cube" />,
+  HomeDailyHero: () => <div data-testid="home-daily-hero" />,
 }));
 
 vi.mock('@/utils/contextualGuidanceStorage', () => ({ shouldShowGuidance: () => false }));
@@ -61,7 +61,7 @@ describe('LandingChallengeCards — cubes layout', () => {
 
   it('renders daily challenge cube (hero node)', () => {
     render(<LandingChallengeCards {...baseProps} />);
-    expect(screen.getByTestId('daily-challenge-cube')).toBeInTheDocument();
+    expect(screen.getByTestId('home-daily-hero')).toBeInTheDocument();
   });
 
   it('preserves analytics on cube click (mode_selected + landing_cta_clicked)', () => {

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DailyChallengeCube from '@/components/daily/DailyChallengeCube';
 import { HomeDailyHero } from './home/HomeDailyHero';
 import { shouldShowGuidance } from '@/utils/contextualGuidanceStorage';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
@@ -273,14 +272,9 @@ export function LandingChallengeCards({
     .filter(isModel);
   // Daily is the cubes hero — always present (it's the once-a-day hook), not
   // gated on heroCards like the control arm. It renders above the bento grid.
-  // The mobile Home Hub promotes it to a richer banner (HomeDailyHero); desktop
-  // keeps the slim inline cube. Same `useDailyChallengeStats` feed + `/daily` route.
-  const dailyNode =
-    layout === 'hub' ? (
-      <HomeDailyHero preloadedStats={dailyChallengeStats} />
-    ) : (
-      <DailyChallengeCube preloadedStats={dailyChallengeStats} />
-    );
+  // Both mobile Home Hub and desktop bento use the richer HomeDailyHero banner
+  // (it widens to fill the slot at md+). Same `useDailyChallengeStats` feed.
+  const dailyNode = <HomeDailyHero preloadedStats={dailyChallengeStats} />;
 
   return (
     <LandingModeCubes

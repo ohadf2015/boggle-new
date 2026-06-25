@@ -21,10 +21,11 @@ export const LandingCubesSkeleton: React.FC<{ className?: string }> = ({ classNa
       aria-hidden="true"
       className={cn('mx-auto w-full max-w-5xl space-y-5 md:space-y-6 xl:max-w-6xl', className)}
     >
-      {/* Daily-hero strip — matches the wide DailyChallengeCube tile */}
+      {/* Daily-hero strip — matches the HomeDailyHero banner (max-w-3xl, taller
+          on desktop) so the skeleton→content swap reflows nothing. */}
       <div
         data-testid="cubes-skeleton-daily"
-        className="h-[64px] w-full rounded-neo border-2 border-white/10 bg-neo-navy-light sm:h-[76px] motion-safe:animate-pulse"
+        className="mx-auto h-[138px] w-full max-w-3xl rounded-neo-xl border-neo-thick border-white/10 bg-neo-navy-light md:h-[150px] motion-safe:animate-pulse"
       />
 
       <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">

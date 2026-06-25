@@ -16,9 +16,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en', dir: 'ltr' }),
 }));
 
-vi.mock('@/components/daily/DailyChallengeCube', () => ({
+vi.mock('@/components/landing/home/HomeDailyHero', () => ({
   __esModule: true,
-  default: () => <div data-testid="daily-challenge-cube" />,
+  HomeDailyHero: () => <div data-testid="home-daily-hero" />,
 }));
 
 vi.mock('@/components/daily/DailyChallengeBanner', () => ({
