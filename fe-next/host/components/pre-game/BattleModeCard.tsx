@@ -126,10 +126,12 @@ export function BattleModeCard({
       <h3 className="text-[10px] font-bold uppercase tracking-widest text-neo-cream/50 px-0.5">
         {t('hostView.battleMode')}
       </h3>
-      {/* Showcase cards: each mode shows its own icon + name + one-line rule.
-          2-col on mobile, 3-col on wide rails — the per-card vertical layout
-          gives long labels (e.g. Spanish "CAZA DE PALABRAS") room to wrap, so
-          they no longer overflow as they did in the old single-row chips. */}
+      {/* Compact picker: every mode is a short icon + name chip, so the whole
+          grid stays low. ONLY the selected mode expands to reveal its one-line
+          rule — tapping a card both selects it and shows the details, instead of
+          every card permanently spending two lines on a description. 2-col on
+          mobile, 3-col on wide rails; long labels (e.g. Spanish "CAZA DE
+          PALABRAS") still wrap without overflowing. */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-1.5">
         {visibleModes.map(({ mode, icon, nameKey, activeBg }) => {
             const isActive = selectedGameMode === mode;
@@ -138,12 +140,13 @@ export function BattleModeCard({
               <m.button
                 key={mode}
                 type="button"
+                layout
                 whileTap={{ scale: 0.97 }}
                 onClick={() => handleSelect(mode)}
                 data-testid={`game-mode-${mode}`}
                 aria-pressed={isActive}
                 className={cn(
-                  'flex flex-col items-start gap-1.5 p-2.5 rounded-xl border-2 text-left transition-all',
+                  'flex flex-col items-start gap-1 p-2 rounded-xl border-2 text-left transition-colors',
                   isActive
                     ? `${activeBg} border-neo-black shadow-hard-lg`
                     : 'bg-white/5 border-neo-white/15 hover:border-neo-white/30 hover:bg-white/10'
@@ -180,14 +183,21 @@ export function BattleModeCard({
                     )}
                   </AnimatePresence>
                 </div>
-                <span
-                  className={cn(
-                    'text-[10px] leading-snug line-clamp-2',
-                    isActive ? 'text-neo-black/70' : 'text-neo-cream/45'
+                {/* Details reveal only for the selected mode — keeps the grid short. */}
+                <AnimatePresence initial={false}>
+                  {isActive && (
+                    <m.span
+                      key="desc"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.18 }}
+                      className="block overflow-hidden text-[10px] leading-snug text-neo-black/70"
+                    >
+                      {getModeDescription(mode, t)}
+                    </m.span>
                   )}
-                >
-                  {getModeDescription(mode, t)}
-                </span>
+                </AnimatePresence>
               </m.button>
             );
           })}

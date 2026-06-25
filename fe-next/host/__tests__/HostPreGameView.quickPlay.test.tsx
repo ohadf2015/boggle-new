@@ -4,7 +4,7 @@ import { act, render } from '@testing-library/react';
 import HostPreGameView from '../components/HostPreGameView';
 
 const emitMock = vi.fn();
-const mockSocket = { emit: emitMock } as unknown as { emit: (...args: unknown[]) => void };
+const mockSocket = { emit: emitMock, on: vi.fn(), off: vi.fn() } as unknown as { emit: (...args: unknown[]) => void };
 
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: mockSocket }),

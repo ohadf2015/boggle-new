@@ -20,7 +20,7 @@ const { setHostSelectedGameModeMock } = vi.hoisted(() => ({
 }));
 
 const emitMock = vi.fn();
-const mockSocket = { emit: emitMock } as unknown as { emit: (...args: unknown[]) => void };
+const mockSocket = { emit: emitMock, on: vi.fn(), off: vi.fn() } as unknown as { emit: (...args: unknown[]) => void };
 
 vi.mock('../../utils/SocketContext', () => ({ useSocket: () => ({ socket: mockSocket }) }));
 vi.mock('../../contexts/AuthContext', () => ({

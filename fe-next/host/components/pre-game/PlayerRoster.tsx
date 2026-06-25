@@ -39,6 +39,8 @@ interface PlayerRosterProps {
   canEditSelfName?: boolean;
   /** Optional element rendered on the right side of the header row (e.g., TV/projector toggle) */
   headerExtra?: React.ReactNode;
+  /** Optional self-only controls rendered beneath the avatar grid (e.g., emote picker + avatar reward) */
+  selfActions?: React.ReactNode;
   /** Usernames the server reports as lobby-ready (non-host). Shows check badges + a count. */
   readyUsernames?: string[];
 }
@@ -89,7 +91,7 @@ const reducedMotionVariants = {
   exit: { opacity: 0, transition: { duration: 0 } },
 };
 
-export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false, headerExtra, readyUsernames = [] }: PlayerRosterProps): React.ReactElement {
+export const PlayerRoster = memo(function PlayerRoster({ players, username, gameCode, maxPlayers, t, compact = false, onSelfAvatarClick, onSelfNameChange, canEditSelfName = false, headerExtra, selfActions, readyUsernames = [] }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
 
   // Receive lobby emotes from players and render them on the roster avatars.
@@ -390,6 +392,8 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
           </div>
         )}
       </div>
+
+      {selfActions ? <div className="pt-1">{selfActions}</div> : null}
 
       <ConfirmationDialog
         open={pendingKick !== null}
