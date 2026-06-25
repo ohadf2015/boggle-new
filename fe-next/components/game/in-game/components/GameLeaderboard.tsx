@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useRef, useEffect, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { Trophy, Crown, TrendingUp, TrendingDown, Flame } from 'lucide-react';
+import { Trophy, Crown, TrendingUp, TrendingDown, Flame, ChevronUp, ChevronDown } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useReactiveAvatarMood } from '@/hooks/useReactiveAvatarMood';
 import { moodToOverlay } from '@/lib/avatar/avatarOverlay';
@@ -52,6 +52,39 @@ interface LeaderboardRowProps {
   t: TranslationFn;
   rankChange: number; // positive = moved up, negative = moved down
   scoreChange: number;
+}
+
+/**
+ * How many rows the in-game leaderboard shows at once. Capped to a tight window
+ * (rival above → you → rival below) so the player's own position is always
+ * centred and visible instead of being buried in a long, scrolling roster.
+ */
+const LEADERBOARD_WINDOW = 3;
+
+/**
+ * Window the (pre-sorted) roster down to `size` rows centred on the current
+ * player so their position is always visible without scrolling. Returns the
+ * visible slice plus how many players are hidden above/below so the UI can show
+ * a "+N" cue. When the player isn't on the board (spectator) the window falls
+ * back to the top of the roster.
+ */
+export function windowAroundUser<T>(
+  players: T[],
+  meIndex: number,
+  size = LEADERBOARD_WINDOW,
+): { slice: T[]; start: number; hiddenAbove: number; hiddenBelow: number } {
+  if (players.length <= size) {
+    return { slice: players, start: 0, hiddenAbove: 0, hiddenBelow: 0 };
+  }
+  const half = Math.floor((size - 1) / 2);
+  const anchor = meIndex < 0 ? 0 : meIndex - half;
+  const start = Math.min(Math.max(anchor, 0), players.length - size);
+  return {
+    slice: players.slice(start, start + size),
+    start,
+    hiddenAbove: start,
+    hiddenBelow: players.length - (start + size),
+  };
 }
 
 /** Combo badge thresholds and styling */
@@ -112,7 +145,7 @@ const LeaderboardRow = memo<LeaderboardRowProps>(function LeaderboardRow({
         hover:-translate-x-px hover:-translate-y-px hover:shadow-hard
         focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1
         ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}
-        ${player.isMe ? 'ring-2 ring-neo-cyan/60' : ''}`}
+        ${player.isMe ? 'ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-cream shadow-hard scale-[1.02] z-10' : ''}`}
     >
       {/* Rank badge with change indicator */}
       <div className="relative shrink-0">
@@ -247,6 +280,18 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
     [leaderboard, username]
   );
 
+  // Cap the visible roster to a tight window centred on the current player so
+  // their position is always front-and-centre (their neighbours are their real
+  // rivals; distant players are summarised by the "+N" cues above/below).
+  const myIndex = useMemo(
+    () => memoizedLeaderboard.findIndex((p) => p.isMe),
+    [memoizedLeaderboard],
+  );
+  const { slice: visiblePlayers, hiddenAbove, hiddenBelow } = useMemo(
+    () => windowAroundUser(memoizedLeaderboard, myIndex, LEADERBOARD_WINDOW),
+    [memoizedLeaderboard, myIndex],
+  );
+
   // Compute rank and score changes
   const changes = useMemo(() => {
     const map = new Map<string, { rankChange: number; scoreChange: number }>();
@@ -319,10 +364,21 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
         </div>
       )}
 
-      {/* Content */}
+      {/* Content — only a 3-row window around the current player is shown; the
+          "+N" chevron cues summarise everyone ranked further above/below. */}
       <div className={cn('p-2.5', compact ? 'overflow-y-auto custom-scrollbar' : 'overflow-y-auto flex-1 custom-scrollbar')}>
         <div className="space-y-1.5" role="list">
-          {memoizedLeaderboard.map((player) => {
+          {hiddenAbove > 0 && (
+            <div
+              data-testid="leaderboard-more-above"
+              className="flex items-center justify-center gap-1 text-[10px] font-black text-neo-black/55 tabular-nums select-none"
+            >
+              <ChevronUp className="w-3 h-3 shrink-0" />
+              <span>+{hiddenAbove}</span>
+            </div>
+          )}
+
+          {visiblePlayers.map((player) => {
             const change = changes.get(player.username);
             return (
               <LeaderboardRow
@@ -336,6 +392,16 @@ export const GameLeaderboard = memo<GameLeaderboardProps>(function GameLeaderboa
               />
             );
           })}
+
+          {hiddenBelow > 0 && (
+            <div
+              data-testid="leaderboard-more-below"
+              className="flex items-center justify-center gap-1 text-[10px] font-black text-neo-black/55 tabular-nums select-none"
+            >
+              <ChevronDown className="w-3 h-3 shrink-0" />
+              <span>+{hiddenBelow}</span>
+            </div>
+          )}
 
           {leaderboard.length === 0 && (
             <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
