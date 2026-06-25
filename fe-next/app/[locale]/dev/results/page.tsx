@@ -10,10 +10,11 @@
 import React, { useState } from 'react';
 import ResultsMainContent from '@/components/results/ResultsMainContent';
 import BlastResultsScene from '@/components/results/BlastResultsScene';
+import WheelRushResultsScene from '@/components/results/WheelRushResultsScene';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Player } from '@/components/results/types';
 
-type Scenario = 'win_1v1' | 'lose_1v1' | 'win_lobby' | 'midpack_lobby' | 'solo' | 'blast_scene';
+type Scenario = 'win_1v1' | 'lose_1v1' | 'win_lobby' | 'midpack_lobby' | 'solo' | 'blast_scene' | 'wheel_scene';
 
 const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: 'win_1v1', label: '1v1 — You Win' },
@@ -22,6 +23,7 @@ const SCENARIOS: { id: Scenario; label: string }[] = [
   { id: 'midpack_lobby', label: '8p — You 5th' },
   { id: 'solo', label: 'Solo' },
   { id: 'blast_scene', label: 'Blast stats' },
+  { id: 'wheel_scene', label: 'Wheel Rush' },
 ];
 
 const NAMES = ['Maya', 'Leo', 'Priya', 'Sam', 'Noor', 'Kai', 'Tess', 'Otto'];
@@ -130,7 +132,18 @@ export default function DevResultsPage() {
           ))}
         </div>
         <div id="results-measure">
-          {scenario === 'blast_scene' ? (
+          {scenario === 'wheel_scene' ? (
+            <WheelRushResultsScene
+              playerStats={{
+                You: { totalScore: 312, wordsLocked: 9, wordsStolen: 4, bestWord: 'QUARTZ' } as never,
+                Leo: { totalScore: 268, wordsLocked: 7, wordsStolen: 2, bestWord: 'JUMBLE' } as never,
+                Priya: { totalScore: 240, wordsLocked: 6, wordsStolen: 5, bestWord: 'VEX' } as never,
+                Sam: { totalScore: 198, wordsLocked: 4, wordsStolen: 1, bestWord: 'OWL' } as never,
+              }}
+              scores={[{ username: 'You' }, { username: 'Leo' }, { username: 'Priya' }, { username: 'Sam' }]}
+              currentUsername="You"
+            />
+          ) : scenario === 'blast_scene' ? (
             <BlastResultsScene
               playerStats={{
                 You: { maxCombo: 6, gemsCollected: 11, wordsFound: ['quartz', 'jumble'], bestWord: 'QUARTZ', tilesCleared: 58, totalTileBonus: 40, boardClears: 2 },

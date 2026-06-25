@@ -39,6 +39,17 @@ const RANK_GLOW = [
   'shadow-[0_0_8px_rgba(255,51,102,0.3)]',
 ];
 
+// Placement badge fill, color-matched to RANK_GLOW so badge hue == avatar glow.
+// Gives every player (winner included) one numbered, color-coded rank marker —
+// the orbit positions alone don't read as an ordered 1·2·3·4.
+const RANK_BADGE = [
+  'bg-neo-yellow text-neo-black',
+  'bg-neo-cyan text-neo-black',
+  'bg-neo-pink text-neo-white',
+  'bg-neo-purple text-neo-white',
+  'bg-neo-red text-neo-white',
+];
+
 export default function WheelRushResultsScene({ playerStats, scores, currentUsername }: Props) {
   const { t } = useLanguage();
   const prefersReduced = useReducedMotion();
@@ -173,6 +184,12 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
               size="xl"
               mode="multiplayer"
             />
+            <span
+              data-testid="wheel-rush-winner-rank"
+              className={`absolute -bottom-1 -right-1 w-7 h-7 rounded-full border-2 border-neo-black text-xs font-black flex items-center justify-center shadow-hard-sm z-10 ${RANK_BADGE[0]}`}
+            >
+              1
+            </span>
           </div>
           <div className="mt-1.5 text-center">
             <div className={`text-sm font-black truncate max-w-[140px] ${winner[0] === currentUsername ? 'text-neo-white underline decoration-neo-lime/50 underline-offset-2' : 'text-neo-white'}`}>
@@ -218,7 +235,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
                   size="lg"
                   mode={i === 0 ? 'multiplayer' : undefined}
                 />
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-neo-black border-2 border-neo-white text-[10px] font-black text-neo-white flex items-center justify-center">
+                <span className={`absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full border-2 border-neo-black text-[11px] font-black flex items-center justify-center shadow-hard-sm ${RANK_BADGE[Math.min(i + 1, RANK_BADGE.length - 1)]}`}>
                   {i + 2}
                 </span>
               </div>

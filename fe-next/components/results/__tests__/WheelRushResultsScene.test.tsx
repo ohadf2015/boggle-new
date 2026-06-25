@@ -128,6 +128,20 @@ describe('WheelRushResultsScene', () => {
     expect(screen.getByText('cara')).toBeInTheDocument();
   });
 
+  it('marks the winner with an explicit #1 rank badge so every placement is numbered', () => {
+    render(
+      <WheelRushResultsScene
+        playerStats={{
+          alice: mkStats({ totalScore: 100 }),
+          bob: mkStats({ totalScore: 60 }),
+        }}
+        currentUsername="bob"
+      />
+    );
+    const badge = screen.getByTestId('wheel-rush-winner-rank');
+    expect(badge).toHaveTextContent('1');
+  });
+
   it('shows all three stat tiles', () => {
     render(
       <WheelRushResultsScene
