@@ -580,7 +580,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       {/* Word builder (shared shake + motion). Fixed height (not min-h) mirrors
           the daily challenge so the row never grows as tiles wrap. */}
       <m.div
-        className="relative w-full h-[52px] sm:h-[72px] flex items-center justify-center"
+        className="relative w-full h-[52px] sm:h-[72px] short:h-[44px] flex items-center justify-center"
         animate={
           wordBuilderShake && !prefersReduced
             ? { x: [-4, 4, -3, 3, -1, 0] }
@@ -668,7 +668,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       {/* Wheel + actions cluster — kept tight together, vertically centered.
           container-type:size lets the wheel's max-* height cap (below) read the
           cluster's block size via cqb. */}
-      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1" data-testid="wheel-cluster">
+      <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1 short:gap-0.5 short:py-0" data-testid="wheel-cluster">
         {/* Tap-to-remove + double-tap-to-submit hint — reserved-height slot
             (mirrors the daily challenge) so the wheel never shifts when the
             hint text mounts/unmounts. */}
@@ -689,7 +689,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             // challenge wheel for visual parity; floor 176px.
             isDesktopCanvas
               ? "w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
-              : "w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))]",
+              // On short viewports (<=600px tall) drop the floor to 132px and
+              // the reserve to 72px so the wheel keeps shrinking instead of
+              // overflowing the `justify-center` cluster — which spilled the
+              // action bar onto the found-words chips below. Mirrors
+              // WordWheelGame.tsx:977.
+              : "w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 max-w-[max(176px,calc(100cqb-116px))] max-h-[max(176px,calc(100cqb-116px))] short:max-w-[max(132px,min(calc(100cqb-72px),46svh))] short:max-h-[max(132px,min(calc(100cqb-72px),46svh))]",
           )}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -747,7 +752,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
         {/* Actions (Clear / Submit / Remove-last) — sit directly under the wheel
             so the player's thumb stays in the wheel's gravity well. */}
-        <div data-testid="word-wheel-action-bar" className="w-full flex items-center justify-center gap-3 shrink-0 mt-1">
+        <div data-testid="word-wheel-action-bar" className="w-full flex items-center justify-center gap-3 shrink-0 mt-1 short:mt-0">
         <m.button
           type="button"
           onClick={handleClear}

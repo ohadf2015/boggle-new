@@ -150,6 +150,29 @@ describe('WheelRushView — daily-style rival hint', () => {
     }
   });
 
+  it('caps the wheel with a short-viewport height variant so the action bar never overlaps the chips on short screens', () => {
+    const socket = makeMockSocket();
+    render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 10 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => { socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() }); });
+
+    // The wheel must carry a `short:` max-height cap so it shrinks below the
+    // 176px floor on <=600px-tall viewports. Without it the wheel overflows
+    // the `flex-1 justify-center` cluster and the action bar (Submit) spills
+    // downward, colliding with the found-words chip strip below — the
+    // overlap seen in the bug report screenshot. Mirrors WordWheelGame.tsx.
+    const cluster = screen.getByTestId('wheel-cluster');
+    const shortCapped = cluster.querySelector('[class*="short:max-h-"]');
+    expect(shortCapped).toBeTruthy();
+  });
+
   it('does not show the rival pill when self is the leader', () => {
     vi.useFakeTimers();
     try {
