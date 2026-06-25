@@ -32,6 +32,7 @@ export const HAIR_PARTS = {
   mullet: HAIR_PARTS_VOLUME.mullet,
   combover: HAIR_PARTS_CLASSIC.combover,
   trumpSwoop: HAIR_PARTS_CLASSIC.trumpSwoop,
+  recedingHair: HAIR_PARTS_CLASSIC.recedingHair,
   elvis: HAIR_PARTS_CLASSIC.elvis,
   ramen: HAIR_PARTS_CLASSIC.ramen,
   flame: HAIR_PARTS_FANTASY.flame,

@@ -60,23 +60,31 @@ describe('celebrity bots', () => {
   });
 });
 
+// Dedicated celebrity hair parts: each must be legendary+premium+priced for players,
+// worn by exactly one celeb bot (bots bypass purchase since render is ownership-agnostic).
+const CELEB_LEGENDARY_HAIR: Array<{ value: string; wornBy: string }> = [
+  { value: 'trumpSwoop', wornBy: 'Trump' },
+  { value: 'recedingHair', wornBy: 'Elon' },
+];
+
 describe('celebrity legendary part gating (bots free, players pay)', () => {
-  it('trumpSwoop is a legendary, premium, priced part', () => {
-    expect(isLegendaryPart('hair', 'trumpSwoop')).toBe(true);
-    expect(isPremiumPart('hair', 'trumpSwoop')).toBe(true);
-    expect(getPartPrice('hair', 'trumpSwoop')).toBeGreaterThanOrEqual(5000);
+  it.each(CELEB_LEGENDARY_HAIR)('$value is legendary, premium, priced', ({ value }) => {
+    expect(isLegendaryPart('hair', value)).toBe(true);
+    expect(isPremiumPart('hair', value)).toBe(true);
+    expect(getPartPrice('hair', value)).toBeGreaterThanOrEqual(5000);
   });
 
-  it('the Trump bot wears the legendary trumpSwoop (bots bypass purchase via config)', () => {
-    const trump = CELEBRITY_BOTS.find((c) => c.name === 'Trump');
-    expect(trump?.customAvatar.hair).toBe('trumpSwoop');
+  it.each(CELEB_LEGENDARY_HAIR)('$wornBy bot wears legendary $value (config bypasses purchase)', ({ value, wornBy }) => {
+    const bot = CELEBRITY_BOTS.find((c) => c.name === wornBy);
+    expect(bot?.customAvatar.hair).toBe(value);
     // render path is ownership-agnostic: a valid config renders regardless of tier
-    expect(customAvatarSchema.safeParse(trump?.customAvatar).success).toBe(true);
+    expect(customAvatarSchema.safeParse(bot?.customAvatar).success).toBe(true);
   });
 
   it('never hands a legendary celebrity part to a free random player avatar', () => {
-    for (let i = 0; i < 200; i++) {
-      expect(getRandomAvatarConfig().hair).not.toBe('trumpSwoop');
+    const legendary = new Set(CELEB_LEGENDARY_HAIR.map((p) => p.value));
+    for (let i = 0; i < 300; i++) {
+      expect(legendary.has(getRandomAvatarConfig().hair)).toBe(false);
     }
   });
 });

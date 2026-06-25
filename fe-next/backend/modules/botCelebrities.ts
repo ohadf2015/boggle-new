@@ -93,7 +93,7 @@ export const CELEBRITY_BOTS: CelebrityBot[] = [
     name: 'Elon', emoji: '🚀', color: '#00FFFF',
     customAvatar: {
       gender: 'male', base: 'oval', skinColor: '#F8D5C2',
-      hair: 'buzz', hairColor: '#4A3728',
+      hair: 'recedingHair', hairColor: '#4A3728',
       eyes: 'cool', eyeColor: '#6B4423', noseStyle: 'round', eyebrows: 'natural',
       facialHair: 'stubble', mouth: 'smirk',
       accessory: 'none', accessoryColor: '#000000',

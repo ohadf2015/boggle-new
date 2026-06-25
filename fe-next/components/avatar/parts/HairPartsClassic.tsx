@@ -199,6 +199,23 @@ function TrumpSwoop({ fill }: HairPartProps) {
   );
 }
 
+function RecedingHair({ fill }: HairPartProps) {
+  const u = useAvatarUid();
+  // Thinning/receding: hair swept back over the crown, tall exposed forehead,
+  // bald temples (band tapers to nothing at the front corners).
+  const cap = "M16 42 Q13 17 50 11 Q87 17 84 42 Q70 28 50 30 Q30 28 16 42Z";
+  return (
+    <g>
+      <defs><HairPolishDefs uid={u} keyName="recedingHair" /></defs>
+      <path d={cap} fill={fill} stroke="#000" strokeWidth={S} strokeLinejoin="round" />
+      <HairPolish uid={u} keyName="recedingHair" d={cap} />
+      {/* swept-back strands */}
+      <path d="M28 22 Q50 15 72 22" fill="none" stroke="#000" strokeWidth={0.7} opacity="0.1" />
+      <path d="M32 14 Q50 9 68 14" fill="none" stroke="#fff" strokeWidth={1} opacity="0.16" strokeLinecap="round" />
+    </g>
+  );
+}
+
 function Elvis({ fill }: HairPartProps) {
   const u = useAvatarUid();
   const pompadour = "M28 32 Q26 10 40 2 Q52 0 60 8 Q64 16 56 26 Q48 34 38 36";
@@ -334,5 +351,5 @@ function Bob({ fill }: HairPartProps) {
 
 export const HAIR_PARTS_CLASSIC = {
   spiky: Spiky, curly: Curly, buzz: Buzz, mohawk: Mohawk, topknot: Topknot,
-  ponytail: Ponytail, combover: Combover, trumpSwoop: TrumpSwoop, elvis: Elvis, ramen: Ramen, long: Long, bob: Bob,
+  ponytail: Ponytail, combover: Combover, trumpSwoop: TrumpSwoop, recedingHair: RecedingHair, elvis: Elvis, ramen: Ramen, long: Long, bob: Bob,
 } as const;
