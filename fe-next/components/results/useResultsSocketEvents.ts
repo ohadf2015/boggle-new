@@ -21,6 +21,11 @@ import type { ReferralMilestone } from '@/shared/types/socket';
 import type { WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 import type { OneMoreGamePrompt } from '@/shared/types/engagement';
 
+// Delay before the "Build our dictionary" voting modal appears on the results
+// page. Showing it immediately covers the rematch / next-round flow, so we wait
+// ~10s and only ever show it once per results page.
+const WORD_FEEDBACK_DELAY_MS = 10_000;
+
 export interface ResultsSocketEventsState {
   // Word feedback state
   showWordFeedback: boolean;
@@ -78,6 +83,8 @@ export function useResultsSocketEvents({
   const [nearMisses, setNearMisses] = useState<NearMiss[]>([]);
 
   const hasShownLevelUpRef = useRef<boolean>(false); // Prevent duplicate level-up celebrations
+  const hasShownWordFeedbackRef = useRef<boolean>(false); // Show the dictionary-building modal only once per results page
+  const wordFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // Delays the dictionary modal so it never covers the rematch flow
 
   // Referral milestone state
   const [referralMilestone, setReferralMilestone] = useState<ReferralMilestone | null>(null);
@@ -103,12 +110,21 @@ export function useResultsSocketEvents({
     }) => {
       logger.log('[RESULTS] Received word feedback request:', data);
 
+      // Only ever surface the dictionary-building modal once per results page —
+      // repeated socket emissions (or re-entry) must not re-pop it.
+      if (hasShownWordFeedbackRef.current) {
+        logger.log('[RESULTS] Word feedback already shown on this page — ignoring');
+        return;
+      }
+      hasShownWordFeedbackRef.current = true;
+
       // Handle new word queue format (self-healing system)
       // Limit to 2 words to avoid overwhelming the user with modals
-      if (data.wordQueue && data.wordQueue.length > 0) {
-        const limitedQueue = data.wordQueue.slice(0, 2);
-        setWordQueue(limitedQueue);
-        logger.log('[RESULTS] Word queue limited to', limitedQueue.length, 'of', data.wordQueue.length, 'words for voting');
+      const limitedQueue = (data.wordQueue && data.wordQueue.length > 0)
+        ? data.wordQueue.slice(0, 2)
+        : null;
+      if (limitedQueue) {
+        logger.log('[RESULTS] Word queue limited to', limitedQueue.length, 'of', data.wordQueue!.length, 'words for voting');
       }
 
       // Transform voteInfo to match expected VoteInfo interface
@@ -117,16 +133,21 @@ export function useResultsSocketEvents({
         disapprovalCount: data.voteInfo.votesAgainst ?? data.voteInfo.disapprovalCount
       } : undefined;
 
-      setWordToVote({
-        word: data.word,
-        submittedBy: data.submittedBy,
-        submitterAvatar: data.submitterAvatar,
-        voteInfo: transformedVoteInfo,
-        timeoutSeconds: data.timeoutSeconds || 10,
-        gameCode: data.gameCode,
-        language: data.language
-      });
-      setShowWordFeedback(true);
+      // Delay so the modal never lands on top of the rematch / next-round flow.
+      if (wordFeedbackTimerRef.current) clearTimeout(wordFeedbackTimerRef.current);
+      wordFeedbackTimerRef.current = setTimeout(() => {
+        if (limitedQueue) setWordQueue(limitedQueue);
+        setWordToVote({
+          word: data.word,
+          submittedBy: data.submittedBy,
+          submitterAvatar: data.submitterAvatar,
+          voteInfo: transformedVoteInfo,
+          timeoutSeconds: data.timeoutSeconds || 10,
+          gameCode: data.gameCode,
+          language: data.language
+        });
+        setShowWordFeedback(true);
+      }, WORD_FEEDBACK_DELAY_MS);
     };
 
     const handleVoteRecorded = (data: { success: boolean; message?: string }) => {
@@ -199,6 +220,10 @@ export function useResultsSocketEvents({
       socket.off('engagement:referralMilestone', handleReferralMilestone);
       socket.off('engagement:oneMoreGame', handleOneMoreGame);
       socket.off('weeklyQuestCompleted', handleWeeklyQuestCompleted);
+      if (wordFeedbackTimerRef.current) {
+        clearTimeout(wordFeedbackTimerRef.current);
+        wordFeedbackTimerRef.current = null;
+      }
     };
   }, [socket, t]);
 
@@ -256,6 +281,10 @@ export function useResultsSocketEvents({
   // Handle word feedback skip/timeout
   const handleFeedbackSkip = useCallback(() => {
     logger.log('[RESULTS] Skipping word feedback');
+    if (wordFeedbackTimerRef.current) {
+      clearTimeout(wordFeedbackTimerRef.current);
+      wordFeedbackTimerRef.current = null;
+    }
     setShowWordFeedback(false);
     setWordToVote(null);
     setWordQueue([]);
