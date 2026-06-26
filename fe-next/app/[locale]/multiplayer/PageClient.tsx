@@ -39,7 +39,7 @@ import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal'
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
 import { trackInviteRoomDead, trackGrowthEvent, trackInviteConsumed } from '@/utils/growthTracking';
-import type { Language, ActiveRoom, Avatar, GameMode } from '@/shared/types/game';
+import type { Language, ActiveRoom, Avatar, GameMode, GameModeSelection } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
@@ -67,6 +67,29 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
 
 export const VALID_MODES: GameMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 
+/**
+ * Apply a `?mode=` deep-link to the game-mode store. Writes BOTH fields:
+ * `gameMode` (resolved gameplay mode) AND `hostSelectedGameMode` (host intent —
+ * the field the host `startGame` emit reads). Writing only `gameMode` left the
+ * intent at 'random', so deep-linked modes (Word Hunt / Wheel Rush cards) were
+ * silently rolled away by the backend. The else-branch deliberately does NOT
+ * reset `hostSelectedGameMode` — it persists host intent across rounds.
+ */
+export function applyMpPreselectMode(
+  rawMode: GameMode | null,
+  actions: {
+    setGameMode: (m: GameModeSelection) => void;
+    setHostSelectedGameMode: (m: GameModeSelection) => void;
+  },
+): void {
+  if (rawMode && VALID_MODES.includes(rawMode)) {
+    actions.setGameMode(rawMode);
+    actions.setHostSelectedGameMode(rawMode);
+  } else {
+    actions.setGameMode('random');
+  }
+}
+
 function ViewLoadingSkeleton(): React.JSX.Element {
   return (
     <div className="flex-1 flex relative">
@@ -83,7 +106,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
   const autoCreate = searchParams?.get('autoCreate') === 'true';
   const quickPlay = searchParams?.get('quickPlay') === 'true';
-  const { setGameMode: setStoreGameMode } = useGameActions();
+  const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
 
   const [gameCode, setGameCode] = useState<string>('');
   const [roomName, setRoomName] = useState<string>('');
@@ -121,11 +144,10 @@ export default function MultiplayerPageClient(): React.JSX.Element {
   // Pre-select game mode from URL param (e.g., ?mode=word-hunt).
   // Default MP mode is 'random' when no URL override.
   useEffect(() => {
-    if (preselectedMode && VALID_MODES.includes(preselectedMode)) {
-      setStoreGameMode(preselectedMode);
-    } else {
-      setStoreGameMode('random');
-    }
+    applyMpPreselectMode(preselectedMode, {
+      setGameMode: setStoreGameMode,
+      setHostSelectedGameMode,
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
