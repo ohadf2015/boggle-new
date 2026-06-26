@@ -14,8 +14,12 @@
 export const LEAN_HISTORY_MAX = 8;
 /** Cap on the apparent lean — 4° reads as drunk, not broken. */
 export const LEAN_MAX_DEG = 4;
-/** Exponential weight per step further back (lower = recent weights MORE). */
-const RECENT_WEIGHT_DECAY = 0.7;
+/** Exponential weight per step further back (lower = recent weights MORE).
+ *  Lowered 0.7→0.50 so a good drop recovers the lean noticeably faster — the
+ *  tower returns toward centre in 2-3 clean drops instead of 4-5. Founder
+ *  2026-06-26: "tower stays on the side when drop isn't good, should be
+ *  around the center." */
+const RECENT_WEIGHT_DECAY = 0.50;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 

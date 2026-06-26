@@ -1059,3 +1059,24 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - status: deferred (requires refactor to fix correctly)
 - why: function intentionally SECURITY DEFINER — body uses `auth.uid()` AND updates OTHER users' tokens (cross-user cleanup). REVOKE from authenticated breaks the push-token route (uses user-session client). Proper fix: add `p_user_id` param to function, route → service_role client, REVOKE authenticated. No anon grant exists (already safe from anon). 53 total flagged functions; this one is the clearest case.
 - recommended owner: backend (2-step: modify function signature + route, then REVOKE authenticated)
+
+## 2026-06-26
+
+### [Supabase Security] get_random_words_from_bank — search_path mutable
+- status: shipped (migrations: fix_get_random_words_search_path + fix_get_random_words_search_path_v2)
+- what: SECURITY DEFINER function had mutable search_path; pinned to `search_path = 'public'`
+- note: initially applied `= ''` (would break unqualified `daily_challenge_word_bank` ref in body); corrected to `'public'`
+- recommended owner: review-by-eod (verify daily challenge generation still works end-to-end)
+
+### [Sentry] churn-signals 502 (JAVASCRIPT-NEXTJS-1KQ) — carry from 06-25
+- status: no new action — client hook already handles 5xx as `logger.debug` (Sentry-excluded)
+- code even cites this Sentry ID in a comment (`useChurnSignals.ts:108`)
+- recommended owner: monitor — close if Railway restart transient confirmed
+
+### [Supabase Security] rls_policy_always_true — teacher_access_requests tar_insert_any
+- status: deferred — INSERT-always-true is by-design (public teacher access request form)
+- same intentional pattern as school_leads, connections_feedback, custom_puzzles
+- recommended owner: skip unless access-control review needed
+
+### [Supabase Security] upsert_push_token SECURITY DEFINER — carry from 06-25
+- status: no change — still deferred; see 06-25 entry for full rationale

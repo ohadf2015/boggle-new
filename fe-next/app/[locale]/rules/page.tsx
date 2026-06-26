@@ -1,4 +1,5 @@
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import RulesPageClient from './PageClient';
 
 export const revalidate = 86400;
@@ -163,8 +164,13 @@ export default async function RulesPage({ params }: { params: Promise<{ locale: 
       acceptedAnswer: { '@type': 'Answer', text: answer },
     })),
   };
+  const breadcrumbItems = [
+    { name: 'LexiClash', url: `https://www.lexiclash.live/${locale}` },
+    { name: 'Rules', url: `https://www.lexiclash.live/${locale}/rules` },
+  ];
   return (
     <>
+      <BreadcrumbJsonLd items={breadcrumbItems} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <RulesPageClient />
       <GamePageSeoContent

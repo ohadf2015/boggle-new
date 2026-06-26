@@ -1,20 +1,24 @@
 {
-  "date": "2026-06-25",
-  "note": "Twenty-ninth snapshot. /es/multiplayer LCP STABLE: 5932ms (7d n=63, both runs ≥50 floor). Root cause structural — all 4 views are ssr:false dynamic imports + socket-gated content. Needs Chrome profiler trace. /he LCP STABLE: 2927ms (7d n=67, improving trend continues). Backend advisor items confirmed stale: word_clubs FK index already exists in migration 20260322700000; auth_db_connections_absolute deferred to human. SHIPPED: explicit <link rel=preload> for /mascot/winner.webp added to homepage page.tsx server component — fires before client component subtree emits Image priority preload, giving browser early head-start on 402KB LCP image. Mirrors /multiplayer page.tsx pattern.",
+  "date": "2026-06-26",
+  "note": "Thirtieth snapshot. 24h PostHog window: all routes sub-floor (n<50). 7d vitals unchanged. NEW: bundle audit found 6085KB chunk (0g6.ei74erw09.js) = @arvidbt/swedish-words array bundled client-side. serverDicts.ts reads it via fs.readFileSync (correct), but Turbopack still bundles it — no direct import found in source (grep clean). Likely Turbopack static analysis of package.json dependencies picks it up via transitive require. Must move package to devDependencies or add `serverExternalPackages` config. Supabase MCP did not connect this run — advisor items deferred.",
   "backend": {
     "advisor_warnings_count": 1,
-    "note": "Only remaining advisor item is auth_db_connections_absolute (human config change in Supabase dashboard). word_clubs FK index confirmed already exists: idx_word_clubs_owner in migration 20260322700000. idx_word_wheel_attempts_catchup (partial index) — advisor flagged unused but data was STALE; left in place — verify with Supabase MCP when available.",
+    "note": "Supabase MCP did not connect. Advisor items from prior runs: auth_db_connections_absolute (human config), word_clubs FK (confirmed exists), idx_word_wheel_attempts_catchup (flagged unused — verify next run).",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "remaining_advisor_items": [
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human config change in Supabase dashboard (Auth connection pool strategy: absolute→percentage)"
+      },
+      {
+        "id": "idx_word_wheel_attempts_catchup",
+        "status": "PENDING VERIFY — advisor flagged unused partial index. Verify next run via pg_stat_user_indexes idx_scan=0 then drop."
       }
     ]
   },
   "frontend": {
-    "note": "7d window (n>=50 floor). 24h window: all routes sub-floor (empty). Two routes cleared 7d n≥50 floor. LCP metrics unchanged from 06-24 baseline.",
+    "note": "24h window: all routes sub-floor (n<50). 7d window stable. LCP/INP unchanged from 06-25 baseline.",
     "by_route": [
       {
         "route": "/es/multiplayer",
@@ -23,9 +27,9 @@
         "p75_cls": 0.14,
         "n_7d": 63,
         "window": "7d",
-        "lcp_status": "REGRESSION — 5932ms (stable from 06-24). Root cause structural: all 4 multiplayer views are ssr:false dynamic imports; socket-gated. /mascot/play.webp preload already in page.tsx. Needs Chrome profiler trace.",
-        "inp_status": "POOR — 368ms. Still >200ms.",
-        "cls_status": "WATCH — 0.14 (improved from 0.167 on 06-24)"
+        "lcp_status": "REGRESSION — 5932ms stable. Root cause structural: all 4 views ssr:false dynamic imports + socket-gated. Needs Chrome profiler trace.",
+        "inp_status": "POOR — 368ms (>200ms threshold).",
+        "cls_status": "WATCH — 0.14 (improving from 0.167)"
       },
       {
         "route": "/he",
@@ -34,52 +38,50 @@
         "p75_cls": 0.14,
         "n_7d": 67,
         "window": "7d",
-        "lcp_status": "NEEDS IMPROVEMENT — 2927ms (stable from 06-24). Improving trend: 3297→3112→2927ms over 3 weeks. LCP element: /mascot/winner.webp (402KB animated WebP). FIX SHIPPED: explicit <link rel=preload fetchPriority=high> added to homepage page.tsx server component to fire earlier than <Image priority> from client subtree.",
-        "inp_status": "POOR — 352ms. Still >200ms.",
-        "cls_status": "OK — 0.14 (stable)"
+        "lcp_status": "NEEDS IMPROVEMENT — 2927ms. Improving trend: 3297→3112→2927ms. Preload shipped 06-25.",
+        "inp_status": "POOR — 352ms.",
+        "cls_status": "OK — 0.14 stable"
       }
     ]
   },
   "bundle": {
-    "note": "No .next build available locally. No chunk delta computed.",
-    "total_kb": null,
-    "top_chunks": []
+    "total_static_mb": 43,
+    "top_chunks": [
+      { "name": "0g6.ei74erw09.js", "kb": 6085, "note": "swedish_words array — @arvidbt/swedish-words bundled client-side. FIX: add to next.config serverExternalPackages OR move to devDependencies. HIGH PRIORITY." },
+      { "name": "107js-lrs4mq0.js", "kb": 3284, "note": "unknown — needs identification next run" },
+      { "name": "0l2icuu3mnqnv.js", "kb": 1576, "note": "unknown" },
+      { "name": "0ha4f~i.fq32-.js", "kb": 804, "note": "unknown" },
+      { "name": "0wiae6b3iarr3.js", "kb": 650, "note": "unknown" }
+    ]
   },
   "open_watches": [
     {
+      "id": "swedish-words-client-bundle",
+      "description": "6MB @arvidbt/swedish-words chunk in client JS. serverDicts.ts uses fs.readFileSync (safe), but Turbopack bundles it anyway. Fix: add '@arvidbt/swedish-words' to next.config.ts serverExternalPackages array. Expected saving: ~5.5MB from largest client chunk.",
+      "severity": "HIGH",
+      "since": "2026-06-26",
+      "action": "Add to next.config.ts: serverExternalPackages: ['@arvidbt/swedish-words', 'an-array-of-english-words', 'an-array-of-spanish-words']"
+    },
+    {
       "id": "es-multiplayer-lcp-regression",
-      "description": "/es/multiplayer p75 LCP 5932ms (7d, n=63). STABLE from 06-24. Structural root cause. Needs Chrome profiler trace. /mascot/play.webp already preloaded from page.tsx.",
+      "description": "/es/multiplayer p75 LCP 5932ms (7d, n=63). STABLE. Structural root cause.",
       "severity": "HIGH",
       "since": "2026-06-23",
-      "updated": "2026-06-25"
+      "updated": "2026-06-26"
     },
     {
       "id": "he-lcp-high",
-      "description": "/he p75 LCP 2927ms (7d, n=67). Improving trend. SHIPPED 06-25: explicit winner.webp preload in homepage page.tsx server component. Expect ~100-300ms improvement in next 7d window.",
+      "description": "/he p75 LCP 2927ms (7d, n=67). Improving trend. Preload shipped 06-25.",
       "severity": "MEDIUM",
       "since": "2026-06-20",
-      "updated": "2026-06-25"
-    },
-    {
-      "id": "he-inp-poor",
-      "description": "/he p75 INP 352ms (7d, n=67). POOR (>200ms). Stable. Needs profiler to diagnose.",
-      "severity": "MEDIUM",
-      "since": "2026-06-20",
-      "updated": "2026-06-25"
-    },
-    {
-      "id": "es-multiplayer-cls-watch",
-      "description": "/es/multiplayer p75 CLS 0.14 (7d, n=63). Improving (was 0.167 on 06-24). Still >0.1.",
-      "severity": "LOW",
-      "since": "2026-06-21",
-      "updated": "2026-06-25"
+      "updated": "2026-06-26"
     },
     {
       "id": "idx-word-wheel-attempts-catchup-verify",
-      "description": "Supabase advisor (stale) flagged idx_word_wheel_attempts_catchup as unused. Partial index on (player_id, is_catchup) WHERE is_catchup=false, created 06-07. Verify when Supabase MCP available: SELECT indexrelname, idx_scan FROM pg_stat_user_indexes WHERE indexrelname='idx_word_wheel_attempts_catchup'; If idx_scan=0, safe to drop (reduces write overhead).",
+      "description": "Supabase advisor flagged idx_word_wheel_attempts_catchup unused. Verify next run when MCP connects.",
       "severity": "LOW",
       "since": "2026-06-25",
-      "updated": "2026-06-25"
+      "updated": "2026-06-26"
     }
   ]
 }

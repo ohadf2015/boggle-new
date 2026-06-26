@@ -20,24 +20,22 @@
 import { TOPPLE_AFTER_SLOPPY } from './cranePlacement';
 import { LEAN_MAX_DEG } from './towerLean';
 
-/** Max sway angle (deg) at full instability. Tuned DOWN from 5° — at the old
- *  value a tall tower's top whipped side-to-side ("goes crazy"), because the
- *  top's travel is height × sin(angle): same angle throws a 30-floor tower far
- *  wider than a 3-floor one. A gentler base angle + the height dampen below keep
- *  the swing legible instead of frantic. */
-export const SWAY_MAX_DEG = 3.4;
+/** Max sway angle (deg) at full instability. Tuned DOWN from 3.4° — a smaller
+ *  angle keeps the tower top from flying far to the side on tall stacks while
+ *  still reading as clearly unstable. Founder 2026-06-26: "it should be around
+ *  the center." */
+export const SWAY_MAX_DEG = 2.2;
 /** Below this instability the main pendulum sway is silent. Lowered 0.3→0.18 in
  *  the 2026-06-21 feel pass so the tower starts visibly leaning into its swing
  *  earlier — the player feels it getting shaky sooner, before the brink. The
  *  cosmetic {@link swayJitterDeg} layer covers the even-lower band below this. */
 export const SWAY_START_INSTABILITY = 0.18;
 /** Sway oscillation period (ms): calmer when barely unstable, frantic at the
- *  brink. Slowed substantially (was 1600/1050) so even a very shaky tower sways
- *  like a heavy, real structure under strain — a slow, weighty lean rather than a
- *  fast nervous wobble (founder 2026-06-25: "it moves too quickly and weird when
- *  it isn't stable — it should shake but not too fast, it should look real"). */
-export const SWAY_PERIOD_CALM_MS = 2600;
-export const SWAY_PERIOD_FRANTIC_MS = 1650;
+ *  brink. Slowed further (was 2600/1650) so the tower sways like a real heavy
+ *  structure under strain — slow, ponderous, not twitchy. Real tall buildings in
+ *  wind sway with periods of 3–8s. Founder 2026-06-26: "not too fast, look real". */
+export const SWAY_PERIOD_CALM_MS = 4500;
+export const SWAY_PERIOD_FRANTIC_MS = 2800;
 /** How far (in crane [-1,1] error space) the top shifts at the max sway angle.
  *  Lowered (0.26→0.20) so the landing target stays nearer the centre even on a
  *  shaky tower — the player can still reliably reach the GREEN window while it

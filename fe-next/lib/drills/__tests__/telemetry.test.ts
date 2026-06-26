@@ -10,12 +10,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const captureMock = vi.fn();
+const trackGameStartMock = vi.fn();
 
 vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: {
     capture: (...args: unknown[]) => captureMock(...args),
     __loaded: true,
   },
+}));
+
+vi.mock('@/utils/growthTracking', () => ({
+  trackGameStart: (...args: unknown[]) => trackGameStartMock(...args),
 }));
 
 import {
@@ -27,6 +32,7 @@ import {
 describe('drill telemetry', () => {
   beforeEach(() => {
     captureMock.mockClear();
+    trackGameStartMock.mockClear();
   });
 
   afterEach(() => {
@@ -39,6 +45,15 @@ describe('drill telemetry', () => {
     expect(captureMock).toHaveBeenCalledWith('drill_started', {
       drill_type: 'combo-master',
       level: 3,
+    });
+  });
+
+  it('trackDrillStart also fires game_started with mode=brain-drill so per-mode funnel is symmetric', () => {
+    trackDrillStart({ drillType: 'lightning-round', level: 2 });
+
+    expect(trackGameStartMock).toHaveBeenCalledWith('brain-drill', {
+      drillType: 'lightning-round',
+      level: 2,
     });
   });
 

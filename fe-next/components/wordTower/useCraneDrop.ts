@@ -46,6 +46,10 @@ export function useCraneDrop(
    *  faster after a clean drop. Read as a getter so the live upgrade level applies
    *  without re-creating the stable onDrop callback. Default 1 = base game. */
   leanRelaxMult: () => number = () => 1,
+  /** Passive lean-pull multiplier (Center Magnet upgrade); applied on EVERY drop
+   *  including misses, so bad drops still nudge the tower toward centre.
+   *  Default 1 = no-op (base game unchanged). */
+  passiveLeanResetMult: () => number = () => 1,
 ) {
   // Keep perk modifiers current without re-creating the stable onDrop callback.
   const modsRef = useRef(mods);
@@ -54,6 +58,8 @@ export function useCraneDrop(
   wordMultRef.current = wordHeightMult;
   const leanRelaxRef = useRef(leanRelaxMult);
   leanRelaxRef.current = leanRelaxMult;
+  const passiveLeanResetRef = useRef(passiveLeanResetMult);
+  passiveLeanResetRef.current = passiveLeanResetMult;
 
   const sloppyRef = useRef(0);
   const perfectRef = useRef(0);
@@ -129,6 +135,12 @@ export function useCraneDrop(
       // window toward upright by the upgrade's multiplier (no-op at ×1).
       if (verdict !== 'save' && !topples && (o.quality === 'perfect' || o.quality === 'good')) {
         leanHistoryRef.current = relaxLean(leanHistoryRef.current, leanRelaxRef.current());
+      }
+      // Center Magnet: passive pull toward centre on EVERY drop (even misses).
+      // Stacks with Quick Recovery on clean drops. No-op at mult=1 (base game).
+      const passive = passiveLeanResetRef.current();
+      if (passive > 1) {
+        leanHistoryRef.current = relaxLean(leanHistoryRef.current, passive);
       }
 
       setStreaks({

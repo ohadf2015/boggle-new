@@ -4,6 +4,8 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import type { Metadata } from 'next';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 
 export const dynamic = 'force-dynamic';
 
@@ -183,8 +185,14 @@ export default async function HowToPlayPage({ params }: PageParams) {
     const { locale } = await params;
     const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as Locale;
     const content = howToPlaySeoContent[validLocale] ?? howToPlaySeoContent.en;
+    const breadcrumbItems = [
+      { name: 'LexiClash', url: `https://www.lexiclash.live/${locale}` },
+      { name: 'How to Play', url: `https://www.lexiclash.live/${locale}/how-to-play` },
+    ];
     return (
       <>
+        <BreadcrumbJsonLd items={breadcrumbItems} />
+        <FaqPageJsonLd faqs={content.faq.map(({ question, answer }) => ({ q: question, a: answer }))} />
         <HowToPlayPageClient locale={locale} />
         <GuidesCalloutLink locale={locale} />
         <GamePageSeoContent

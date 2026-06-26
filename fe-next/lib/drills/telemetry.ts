@@ -13,6 +13,7 @@
 
 import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
+import { trackGameStart } from '@/utils/growthTracking';
 import type { DrillType } from '@/shared/types/cognitive';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
@@ -37,6 +38,9 @@ export function trackDrillStart(args: DrillStartArgs): void {
     drill_type: args.drillType,
     level: args.level,
   });
+  // Mirror game_started so brain-drill appears in the per-mode funnel alongside
+  // all other modes (game_completed already fires via emitBrainDrillGameEnd).
+  trackGameStart('brain-drill', { drillType: args.drillType, level: args.level });
 }
 
 export interface DrillSessionArgs {

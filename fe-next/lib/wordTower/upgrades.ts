@@ -20,7 +20,8 @@ export type UpgradeId =
   | 'quickRecovery' // faster lean recovery after a clean drop
   | 'tailwind' // every floor is a little taller (climb faster)
   | 'salvage' // a topple/hazard knocks fewer floors off
-  | 'momentum'; // perfect drops pay an even bigger streak bonus
+  | 'momentum' // perfect drops pay an even bigger streak bonus
+  | 'centerMagnet'; // bad drops still pull the tower back toward center
 
 export const UPGRADE_IDS: readonly UpgradeId[] = [
   'steadyCable',
@@ -32,6 +33,7 @@ export const UPGRADE_IDS: readonly UpgradeId[] = [
   'tailwind',
   'salvage',
   'momentum',
+  'centerMagnet',
 ] as const;
 
 /**
@@ -45,6 +47,7 @@ export const UPGRADE_IDS: readonly UpgradeId[] = [
  *  - tailwind → global height multiplier on every floor
  *  - salvage → fewer floors lost to a topple/hazard
  *  - momentum → fatter perfect-streak bonus
+ *  - centerMagnet → passive lean pull toward center on EVERY drop (even misses)
  */
 export const LIVE_UPGRADE_IDS: readonly UpgradeId[] = UPGRADE_IDS;
 
@@ -69,6 +72,10 @@ export const UPGRADE_DEFS: Record<UpgradeId, UpgradeDef> = {
   tailwind: { maxLevel: 5, baseCost: 240, costGrowth: 1.8, perLevel: 0.06 },
   salvage: { maxLevel: 3, baseCost: 320, costGrowth: 1.9, perLevel: 1 },
   momentum: { maxLevel: 4, baseCost: 280, costGrowth: 1.8, perLevel: 0.1 },
+  // Per-level passive lean-reset multiplier added on EVERY drop (even misses).
+  // At level 3 the multiplier is 1.75 — each bad drop still nudges the tower
+  // noticeably toward centre rather than letting the lean pile up indefinitely.
+  centerMagnet: { maxLevel: 3, baseCost: 350, costGrowth: 2.0, perLevel: 0.25 },
 };
 
 export type UpgradeLevels = Partial<Record<UpgradeId, number>>;
@@ -133,6 +140,8 @@ export interface UpgradeEffects {
   toppleReduction: number;
   /** Added to the per-drop PERFECT streak bonus (fatter perfect payouts). */
   perfectBonus: number;
+  /** Passive lean-pull multiplier applied on EVERY drop, including misses (>1 = nudges toward centre). */
+  passiveLeanReset: number;
 }
 
 export const NEUTRAL_EFFECTS: UpgradeEffects = {
@@ -145,6 +154,7 @@ export const NEUTRAL_EFFECTS: UpgradeEffects = {
   heightMult: 1,
   toppleReduction: 0,
   perfectBonus: 0,
+  passiveLeanReset: 1,
 };
 
 /**
@@ -165,5 +175,6 @@ export function computeEffects(levels: UpgradeLevels): UpgradeEffects {
     heightMult: clamp(1 + lv('tailwind') * UPGRADE_DEFS.tailwind.perLevel, 1, 1.4),
     toppleReduction: clamp(lv('salvage') * UPGRADE_DEFS.salvage.perLevel, 0, 3),
     perfectBonus: clamp(lv('momentum') * UPGRADE_DEFS.momentum.perLevel, 0, 0.5),
+    passiveLeanReset: clamp(1 + lv('centerMagnet') * UPGRADE_DEFS.centerMagnet.perLevel, 1, 1.75),
   };
 }
