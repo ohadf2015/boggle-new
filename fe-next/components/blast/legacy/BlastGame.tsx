@@ -85,6 +85,10 @@ interface BlastGameProps {
   modifierScoreMultiplier?: number;
   /** SP-only: active wave modifier descriptor — surfaced as a HUD chip. */
   activeModifier?: BlastWaveModifier | null;
+  /** True when rendered as the center slot of the MP desktop shell. Collapses
+   *  BlastStage's own desktop side-rails (rivals/word-area) so the board fills
+   *  the slot and stops duplicating the shell's rails. */
+  isDesktopCanvas?: boolean;
 }
 
 /**
@@ -118,6 +122,7 @@ export function BlastGame({
   initialBuff,
   modifierScoreMultiplier = 1,
   activeModifier,
+  isDesktopCanvas = false,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
   const { t } = useLanguage();
@@ -667,6 +672,7 @@ export function BlastGame({
         hintToast={<BlastHintToast target={hint.active} t={tAdapter} />}
         remainingTime={_remainingTime}
         totalTime={_totalTime}
+        isDesktopCanvas={isDesktopCanvas}
         t={tAdapter}
       />
     </div>

@@ -113,6 +113,11 @@ interface BlastStageProps {
   // Timer (multiplayer mode)
   remainingTime?: number | null;
   totalTime?: number;
+  /** True when this stage is the center slot of the MP desktop shell. Collapses
+   *  the internal lg: 3-column desktop layout (the shell provides the side rails:
+   *  rivals/roster + found-words), so the board fills the slot and the
+   *  closest-rivals panel isn't duplicated. */
+  isDesktopCanvas?: boolean;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -165,6 +170,7 @@ export const BlastStage = memo(function BlastStage({
   hintToast,
   remainingTime,
   totalTime,
+  isDesktopCanvas = false,
   t,
   activeModifier,
 }: BlastStageProps) {
@@ -317,11 +323,17 @@ export const BlastStage = memo(function BlastStage({
         </div>
       )}
 
-      {/* Desktop: horizontal layout (board center + side panels). Mobile: vertical stack. */}
-      <div className="flex-1 flex flex-col lg:flex-row lg:items-stretch lg:justify-center lg:gap-4 min-h-0 relative z-30 lg:px-4 xl:px-8 lg:max-w-[1400px] lg:mx-auto lg:w-full">
+      {/* Desktop: horizontal layout (board center + side panels). Mobile: vertical stack.
+          Inside the MP desktop shell (isDesktopCanvas) we stay stacked and let the
+          board fill the slot — the shell already supplies the side rails. */}
+      <div className={cn(
+        'flex-1 flex flex-col min-h-0 relative z-30',
+        !isDesktopCanvas && 'lg:flex-row lg:items-stretch lg:justify-center lg:gap-4 lg:px-4 xl:px-8 lg:max-w-[1400px] lg:mx-auto lg:w-full',
+      )}>
 
-      {/* Left panel — word area on desktop */}
-      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center shrink-0">
+      {/* Left panel — word area on desktop (suppressed in shell; the stacked mobile
+          word area below takes over so the board isn't squeezed by a side column). */}
+      <div className={cn('hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-center shrink-0', isDesktopCanvas && '!hidden')}>
         <div
           className={cn(
             'flex items-center justify-center gap-2 px-3 py-2 w-full transition-opacity',
@@ -356,6 +368,9 @@ export const BlastStage = memo(function BlastStage({
         <div
           className={cn(
             'relative w-full max-w-[min(94vw,80dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(640px,76dvh)] 2xl:max-w-[min(760px,82dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
+            // In the shell the board owns the full center column — override the
+            // phone-tuned caps so it fills instead of floating tiny.
+            isDesktopCanvas && '!max-w-[min(680px,82dvh)]',
             (sequencerState?.chainLevel ?? 0) >= 4
               ? 'border-yellow-400'
               : (sequencerState?.chainLevel ?? 0) >= 2
@@ -451,8 +466,10 @@ export const BlastStage = memo(function BlastStage({
         <BlastWaveClearText waveCleared={waveCleared} movesRemaining={movesRemaining} t={t} />
       </div>
 
-      {/* Right panel — closest-rivals rail + notices on desktop */}
-      <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-start lg:pt-2 lg:gap-3 shrink-0">
+      {/* Right panel — closest-rivals rail + notices on desktop. Suppressed in the
+          shell: the shell's left rail already shows the rivals/roster, and the
+          stacked mobile out-of-moves / stuck notices below cover those states. */}
+      <div className={cn('hidden lg:flex lg:flex-col lg:w-56 xl:w-64 lg:justify-start lg:pt-2 lg:gap-3 shrink-0', isDesktopCanvas && '!hidden')}>
         {rivalsView && <ClosestRivalsPanel view={rivalsView} className="w-full" />}
         {/* Out of moves (desktop) */}
         <AdaptiveAnimatePresence>
@@ -535,9 +552,11 @@ export const BlastStage = memo(function BlastStage({
       <ComboMilestoneAnnouncement comboLevel={comboLevel} />
       <BlastMicroToast id={microId} t={t} />
 
-      {/* 4. Word forming area — mobile only */}
+      {/* 4. Word forming area — mobile + shell (the shell hides the desktop left
+          word-area, so this stacked one carries the live word there too). */}
       <div className={cn(
-        'flex items-center justify-center shrink-0 relative z-40 px-4 py-2 lg:hidden',
+        'flex items-center justify-center shrink-0 relative z-40 px-4 py-2',
+        !isDesktopCanvas && 'lg:hidden',
         'max-w-[360px] md:max-w-[480px] mx-auto w-full overflow-visible',
         'min-h-[44px]',
       )}>
@@ -570,7 +589,7 @@ export const BlastStage = memo(function BlastStage({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe lg:hidden"
+            className={cn('px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe', !isDesktopCanvas && 'lg:hidden')}
             data-testid="blast-out-of-moves-notice"
           >
             <div
@@ -597,7 +616,7 @@ export const BlastStage = memo(function BlastStage({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 10 }}
             transition={{ type: 'spring', stiffness: 380, damping: 22 }}
-            className="px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe lg:hidden"
+            className={cn('px-4 max-w-[360px] md:max-w-[480px] mx-auto w-full shrink-0 pb-safe', !isDesktopCanvas && 'lg:hidden')}
             data-testid="blast-stuck-notice"
           >
             <div
