@@ -51,6 +51,7 @@ import {
   submitBotWord,
   clearBehaviorCaches,
   getCacheStats,
+  orderWordPoolByFrequencyBand,
   type Bot,
 } from '../modules/botBehavior';
 import { incrementBotWordUsage } from '../modules/supabaseServer';
@@ -611,6 +612,42 @@ describe('Bot Behavior', () => {
       expect(bot.score).toBe(42);
       expect(bot.comboLevel).toBe(1);
       expect(bot.wordsFound).toContain('hello');
+    });
+  });
+
+  describe('Frequency-banded sampling', () => {
+    // Corpus ordered by frequency DESC: common=rank0, mid=rank1, rare=rank2
+    const rankByWord = new Map([['common', 0], ['mid', 1], ['rare', 2]]);
+    const corpusSize = 3;
+    // Constant rand makes ordering purely a function of weight (deterministic).
+    const constRand = () => 0.5;
+
+    test('easy bot surfaces the most COMMON player words first', () => {
+      const ordered = orderWordPoolByFrequencyBand(
+        ['rare', 'common', 'mid'], rankByWord, corpusSize, 'easy', constRand
+      );
+      expect(ordered).toEqual(['common', 'mid', 'rare']);
+    });
+
+    test('hard bot surfaces the RARE real player words first', () => {
+      const ordered = orderWordPoolByFrequencyBand(
+        ['common', 'mid', 'rare'], rankByWord, corpusSize, 'hard', constRand
+      );
+      expect(ordered).toEqual(['rare', 'mid', 'common']);
+    });
+
+    test('words not in the player corpus sink below corpus words for an easy bot', () => {
+      const ordered = orderWordPoolByFrequencyBand(
+        ['unknownword', 'common'], rankByWord, corpusSize, 'easy', constRand
+      );
+      expect(ordered[0]).toBe('common');
+      expect(ordered[1]).toBe('unknownword');
+    });
+
+    test('returns same words (permutation), drops nothing', () => {
+      const input = ['rare', 'common', 'mid', 'unknownword'];
+      const ordered = orderWordPoolByFrequencyBand(input, rankByWord, corpusSize, 'medium', constRand);
+      expect([...ordered].sort()).toEqual([...input].sort());
     });
   });
 

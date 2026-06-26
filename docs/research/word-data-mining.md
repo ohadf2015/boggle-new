@@ -142,6 +142,13 @@ Once it's live, replace "weakly prefer" with **difficulty-banded sampling** — 
 - *Easy bot* → top-decile common words (what humans find first).
 - *Hard bot* → long-tail rare words **that real humans actually found** (not dictionary obscurities).
 
+> **Status (2026-06-26): SHIPPED.** `orderWordPoolByFrequencyBand()` in `botBehavior.ts` replaces the
+> old binary player-word prioritization with frequency-weighted ordering (Efraimidis–Spirakis
+> weighted-random; `key = rand^(1/weight)`). Weight is banded by difficulty (easy→common, hard→rare
+> real words, medium→mild). Uses the existing `getCachedPlayerWords` (already `times_submitted`-ordered,
+> so array index = freq rank — no new query). Gated on `MIN_CORPUS_FOR_BANDING = 200`: he/en/es band,
+> sv/ja fall back to legacy binary until their corpus grows. TDD-covered (deterministic via injected rand).
+
 Reveal order matters as much as choice: humans find short/common words first → order bot reveals by
 frequency-rank × length with timing jitter. Result: bots feel like opponents, not dictionary scripts.
 

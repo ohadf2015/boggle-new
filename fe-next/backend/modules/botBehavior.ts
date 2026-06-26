@@ -142,6 +142,54 @@ function shuffleArray<T>(array: T[]): void {
   }
 }
 
+// Below this many words in the player-frequency corpus, the distribution is too
+// thin to band meaningfully — fall back to the legacy binary prioritization.
+// Self-adjusting on corpus size (auto-includes a language once it grows) rather
+// than a hardcoded language list. ponytail: count-gate, raise if banding feels noisy.
+export const MIN_CORPUS_FOR_BANDING = 200;
+
+/**
+ * Reorder a bot's candidate words by REAL player-frequency, banded by difficulty.
+ *
+ * `rankByWord` maps a word to its 0-based frequency rank (0 = most-submitted), so a
+ * word's rankRatio ∈ [0,1] is 0 for the commonest word and ~1 for the rarest. Each
+ * word gets a difficulty-dependent weight (easy → favour common, hard → favour rare
+ * real words, medium → mild common lean); words absent from the corpus get a small
+ * base weight so they still appear (more tolerated for hard bots). Final ordering is
+ * weighted-random without replacement (Efraimidis–Spirakis: key = rand^(1/weight),
+ * sort desc) — so two bots on the same board don't reveal an identical sequence.
+ *
+ * `rand` is injectable for deterministic tests.
+ */
+export function orderWordPoolByFrequencyBand(
+  wordPool: string[],
+  rankByWord: Map<string, number>,
+  corpusSize: number,
+  difficulty: 'easy' | 'medium' | 'hard',
+  rand: () => number = Math.random,
+): string[] {
+  const weightFor = (word: string): number => {
+    const rank = rankByWord.get(word);
+    if (rank === undefined) {
+      // Not a known player word — keep it possible, more so for harder bots.
+      return difficulty === 'hard' ? 0.5 : difficulty === 'medium' ? 0.3 : 0.05;
+    }
+    const rankRatio = corpusSize > 1 ? rank / (corpusSize - 1) : 0;
+    if (difficulty === 'easy') return Math.pow(1 - rankRatio, 2) + 0.05; // common-heavy
+    if (difficulty === 'hard') return 0.25 + rankRatio;                  // rare-leaning
+    return 1.1 - rankRatio;                                              // medium: mild common lean
+  };
+
+  return [...wordPool]
+    .map((word) => {
+      const w = Math.max(weightFor(word), 1e-6);
+      const u = Math.min(Math.max(rand(), 1e-9), 1); // guard log(0)
+      return { word, key: Math.pow(u, 1 / w) };
+    })
+    .sort((a, b) => b.key - a.key)
+    .map((e) => e.word);
+}
+
 /**
  * Prepare bot for a game - find words and set up submission queue
  */
@@ -234,13 +282,21 @@ export async function prepareBotWords(bot: Bot, grid: LetterGrid, language: Lang
   }
 
   try {
+    // getCachedPlayerWords returns words already ordered by times_submitted DESC,
+    // so the array index IS the frequency rank — no extra query needed.
     const playerWords = await getCachedPlayerWords(language);
-    if (playerWords.length > 0) {
+    if (playerWords.length >= MIN_CORPUS_FOR_BANDING) {
+      const rankByWord = new Map(playerWords.map((w, i) => [w, i]));
+      wordPool = orderWordPoolByFrequencyBand(wordPool, rankByWord, playerWords.length, bot.difficulty);
+      logger.debug('BOT', `Bot "${bot.username}" frequency-banded ${wordPool.length} words (${bot.difficulty}, corpus ${playerWords.length})`);
+    } else if (playerWords.length > 0) {
+      // Corpus too thin to band — keep the legacy binary prioritization.
+      const playerSet = new Set(playerWords);
       const prioritizedWords: string[] = [];
       const otherWords: string[] = [];
 
       for (const word of wordPool) {
-        if (playerWords.includes(word)) {
+        if (playerSet.has(word)) {
           prioritizedWords.push(word);
         } else {
           otherWords.push(word);
@@ -253,7 +309,7 @@ export async function prepareBotWords(bot: Bot, grid: LetterGrid, language: Lang
       wordPool = [...prioritizedWords, ...otherWords];
 
       if (prioritizedWords.length > 0) {
-        logger.debug('BOT', `Bot "${bot.username}" prioritizing ${prioritizedWords.length} player-submitted words`);
+        logger.debug('BOT', `Bot "${bot.username}" prioritizing ${prioritizedWords.length} player-submitted words (thin corpus)`);
       }
     }
   } catch (err: unknown) {
@@ -423,6 +479,8 @@ export async function submitBotWord(
 module.exports = {
   // Word preparation
   prepareBotWords,
+  orderWordPoolByFrequencyBand,
+  MIN_CORPUS_FOR_BANDING,
   generateWrongWords,
 
   // Timing
