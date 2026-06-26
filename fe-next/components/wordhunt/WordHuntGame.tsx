@@ -42,6 +42,9 @@ export interface WordHuntGameProps {
   minWordLength: number;
   socket: Socket | null;
   foundWords: Array<{ word: string; isValid?: boolean | null; score?: number; duplicate?: boolean }>;
+  /** True when mounted as the MP desktop shell's center slot — collapses the
+   *  internal sidebar layout so the board fills the slot (shell supplies the roster). */
+  isDesktopCanvas?: boolean;
 }
 
 export const WordHuntGame = memo<WordHuntGameProps>(({
@@ -57,6 +60,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
   minWordLength,
   socket,
   foundWords,
+  isDesktopCanvas = false,
 }) => {
   const { t, dir } = useLanguage();
   const { playWordAcceptedSound, playWordRejectedSound, setGameActive } = useSoundEffects();
@@ -281,6 +285,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       score={score}
       onQuit={onQuit}
       onShowHelp={handleShowHelp}
+      isDesktopCanvas={isDesktopCanvas}
 
       // Clue boxes (from bridge)
       targetLength={bridge.targetLength}

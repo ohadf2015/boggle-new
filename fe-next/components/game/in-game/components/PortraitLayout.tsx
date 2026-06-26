@@ -371,7 +371,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-stretch lg:justify-center gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-all duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0">
+      <div className={cn(
+        'flex flex-col gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-all duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0',
+        // In the MP shell the canvas is just the board column — don't run the
+        // internal lg: 3-column split (the shell supplies the side rails).
+        !inDesktopShell && 'lg:flex-row lg:items-stretch lg:justify-center',
+      )}>
         {/* Mobile Header */}
         <GameHeader
           onExitRoom={onExitRoom}
@@ -692,7 +697,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             including classic mode, which runs in gameplayFocusMode. Focus mode
             now only suppresses chat here (it keeps the grid screen calm), NOT the
             standings: desktop players were previously blind to who was winning. */}
-        {((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
+        {!inDesktopShell && ((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
             {/* Single live leaderboard — ranked standings with a "your standing"
                 cue (leading by N / N points to catch). Replaces the previous

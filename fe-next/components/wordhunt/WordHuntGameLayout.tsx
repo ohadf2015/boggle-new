@@ -75,6 +75,11 @@ export interface WordHuntGameLayoutProps {
    *  animation can read `[data-letter]` tile rects. */
   dragFTUE?: { visible: boolean; onDismiss: () => void };
 
+  /** True when this layout is the center slot of the MP desktop shell. Collapses
+   *  the internal min-[720px] sidebar layout (the shell supplies the roster), so
+   *  the board fills the slot instead of being squeezed by a duplicate sidebar. */
+  isDesktopCanvas?: boolean;
+
   // Common
   t: (key: string, params?: Record<string, string | number>) => string;
   gameDir: 'ltr' | 'rtl';
@@ -129,6 +134,8 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
 
   dragFTUE,
 
+  isDesktopCanvas = false,
+
   // Common
   t,
   gameDir,
@@ -142,7 +149,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   const shortLandscape = useMediaQuery('(min-width: 720px) and (max-height: 760px)');
 
   return (
-    <div className="flex-1 flex flex-col min-[720px]:flex-row min-h-0 overflow-x-hidden overflow-y-auto" translate="no">
+    <div className={cn('flex-1 flex flex-col min-h-0 overflow-x-hidden overflow-y-auto', !isDesktopCanvas && 'min-[720px]:flex-row')} translate="no">
       {/* Main game area — capped width on wider screens, with vertical rhythm between sections */}
       <div className={cn(
         'flex-1 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden w-full max-w-3xl mx-auto',
@@ -282,8 +289,9 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         </div>
       </div>
 
-      {/* MP Leaderboard — desktop sidebar */}
-      <div className="hidden min-[720px]:flex min-[720px]:flex-col min-[720px]:w-56 lg:w-72 xl:w-80 min-[720px]:border-s-3 min-[720px]:border-neo-black min-[720px]:bg-neo-navy/50 min-[720px]:overflow-y-auto">
+      {/* MP Leaderboard — desktop sidebar. Suppressed in the shell (its left rail
+          already shows the roster) so it doesn't duplicate or squeeze the board. */}
+      <div className={cn('hidden min-[720px]:flex min-[720px]:flex-col min-[720px]:w-56 lg:w-72 xl:w-80 min-[720px]:border-s-3 min-[720px]:border-neo-black min-[720px]:bg-neo-navy/50 min-[720px]:overflow-y-auto', isDesktopCanvas && '!hidden')}>
         <WordHuntMPLeaderboard
           playerLives={playerLives}
           eliminatedPlayers={eliminatedPlayers}

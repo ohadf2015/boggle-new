@@ -275,8 +275,12 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // are player-centric, e.g. "my words"); a non-playing TV/scoreboard host keeps
   // its full-screen layout. Mobile/tablet path is byte-identical to before.
   const shellEnabled = useDesktopShellEnabled();
+  // True when the mode canvas is mounted as the shell's center slot. Each canvas
+  // gets this so it collapses its own desktop side-rails (the shell supplies them)
+  // — otherwise the canvas double-nests its 3-col layout and the board renders tiny.
+  const inShell = shellEnabled && isShellMode(gameMode) && hostPlaying;
   const wrapCanvas = (canvas: React.ReactNode) =>
-    shellEnabled && isShellMode(gameMode) && hostPlaying ? (
+    inShell ? (
       <div className={getMpInGameContainerClass(gameMode as string)}>
         <MpDesktopShellFrame
           gameMode={gameMode as string}
@@ -309,6 +313,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           onQuit={handleStopGameClick}
           t={t}
           remainingTime={remainingTime}
+          isDesktopCanvas={inShell}
         />
         )}
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
@@ -396,6 +401,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           initialTileStates={blastBridge.initialTileStates}
           blastSeed={blastBridge.blastSeed}
           serverGrid={blastBridge.serverGrid}
+          isDesktopCanvas={inShell}
         />
         )}
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
@@ -437,6 +443,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
           minWordLength={minWordLength}
           socket={socket}
           foundWords={foundWords}
+          isDesktopCanvas={inShell}
         />
         )}
         {isReconnecting && <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />}
@@ -470,6 +477,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       gameCode={gameCode}
       isHost={true}
       isPlaying={hostPlaying}
+      inDesktopShell={inShell}
       gameplayFocusMode={hostPlaying}
       t={t}
       socket={socket}

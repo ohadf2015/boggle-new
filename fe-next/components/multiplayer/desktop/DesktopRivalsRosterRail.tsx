@@ -43,9 +43,15 @@ function DesktopRivalsRosterRailImpl({
     [leaderboard, meId, rivalCount],
   );
 
+  // With a small lobby the "closest rivals" slice IS the whole roster, so the
+  // panel just repeats the roster below it (the "Close Race + Players show the
+  // same 3 names" duplication). Only surface it once it's a genuine subset that
+  // adds neighbor/catch-up context the full roster doesn't.
+  const showRivals = rivalsView !== null && leaderboard.length > rivalCount + 1;
+
   return (
     <div className="flex flex-col gap-3 min-h-0 flex-1">
-      {rivalsView && <ClosestRivalsPanel view={rivalsView} />}
+      {showRivals && <ClosestRivalsPanel view={rivalsView} />}
       <ThemedPanel
         mode={mode}
         variant="rail"

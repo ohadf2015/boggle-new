@@ -326,6 +326,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         onQuit={onExitRoom}
         t={t}
         remainingTime={remainingTime}
+        isDesktopCanvas={shellEnabled}
       />
     );
     if (shellEnabled) {
@@ -422,6 +423,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             minWordLength={minWordLength}
             socket={socket}
             foundWords={foundWords}
+            isDesktopCanvas={shellEnabled && isShellMode(gameMode)}
           />
       ) : (
         <InGameScreen
@@ -430,6 +432,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           gameCode={gameCode}
           isHost={false}
           isPlaying={true}
+          inDesktopShell={shellEnabled && isShellMode(gameMode ?? '')}
           gameplayFocusMode={true}
           t={t}
           dir={dir}
