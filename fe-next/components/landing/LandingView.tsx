@@ -82,6 +82,14 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const [isNativeApp, setIsNativeApp] = useState(false);
   useEffect(() => { setIsNativeApp(Capacitor.isNativePlatform()); }, []);
 
+  // Hydration gate: the ad/CTA blocks below depend on client-only state
+  // (viewport via isMobilePortrait, native via isNativeApp, onboarding prop) that
+  // differs from the SSR snapshot. Rendering them only after mount keeps the
+  // server HTML and the client's first render identical → no #418 tag mismatch
+  // (they shifted <LandingSEOSection>'s <section> against a client <div>).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // No client-side skeleton gate for the cards. This tree is server-rendered
   // (PageClient is 'use client' but imports LandingView synchronously), so SSR
   // always paints the real cards. A localStorage-token gate would only run on the
@@ -276,7 +284,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
 
       <ScrollIndicator />
 
-      {!isMobilePortrait && !isNativeApp && (
+      {mounted && !isMobilePortrait && !isNativeApp && (
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <InlineBannerAd webZone="menu" className="my-4" />
           {/* B2 — CrazyGames home banner */}
@@ -284,7 +292,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
         </div>
       )}
 
-      {onStartOnboarding && (
+      {mounted && onStartOnboarding && (
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <LandingBottomCTA onPlayClick={onStartOnboarding} />
         </div>
