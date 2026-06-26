@@ -25,7 +25,7 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 export default function FriendsPageClient(): React.JSX.Element {
   const { language, t } = useLanguage();
   const { theme } = useTheme();
-  const { isAuthenticated, profile } = useAuth();
+  const { isAuthenticated, profile, loading: authLoading } = useAuth();
   const { isCrazyGames, isLoggedIn: isCrazyGamesLoggedIn, login: loginCrazyGames, isLoggingIn: isCrazyGamesLoggingIn } = useCrazyGamesAuth();
   const { refresh: refreshFriends } = useFriends();
   const router = useRouter();
@@ -136,7 +136,7 @@ export default function FriendsPageClient(): React.JSX.Element {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {!isAuthenticated && !(isCrazyGames && isCrazyGamesLoggedIn) ? (
+          {!authLoading && !isAuthenticated && !(isCrazyGames && isCrazyGamesLoggedIn) ? (
             <div className="space-y-4">
               {inviterUsername && !isCrazyGames && (
                 <div

@@ -60,7 +60,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
-  const { isAuthenticated, profile } = useAuth();
+  const { isAuthenticated, profile, loading: authLoading } = useAuth();
   const isDark = theme === 'dark';
 
   const {
@@ -420,8 +420,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   const notificationCount = pendingRequests.length + pendingChallenges.length;
 
-  // Not authenticated
-  if (!isAuthenticated) {
+  // Not authenticated — but only once auth has actually resolved. While
+  // `authLoading` is still true, fall through to the loading skeleton below so
+  // a logged-in user never sees a flash of the sign-in screen (Class 1 pitfall).
+  if (!isAuthenticated && !authLoading) {
     return (
       <>
         <div className={cn(
@@ -463,8 +465,8 @@ const FriendsList: React.FC<FriendsListProps> = ({
     );
   }
 
-  // Loading
-  if (isLoading) {
+  // Loading — friend-data fetch in flight, or auth still resolving.
+  if (isLoading || authLoading) {
     return (
       <div className={cn(
         'p-4 rounded-neo border-2 space-y-3',
