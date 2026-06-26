@@ -27,13 +27,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'Bell ringer word games' }],
+      images: [{ url: `${BASE_URL}/images/education-hero-en.webp`, width: 1200, height: 675, alt: 'Bell ringer word games' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'Bell Ringer Word Games — Free',
       description: '5-minute start-of-class word games. No login, no prep. Free.',
-      images: [`${BASE_URL}/og-image-en.webp`],
+      images: [`${BASE_URL}/images/education-hero-en.webp`],
     },
     alternates: {
       canonical: pageUrl,

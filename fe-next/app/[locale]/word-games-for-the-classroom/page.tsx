@@ -27,13 +27,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'Word games for the classroom' }],
+      images: [{ url: `${BASE_URL}/images/education-hero-en.webp`, width: 1200, height: 675, alt: 'Word games for the classroom' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'Word Games for the Classroom — Free',
       description: 'Live multiplayer word games. No login, no download. Free.',
-      images: [`${BASE_URL}/og-image-en.webp`],
+      images: [`${BASE_URL}/images/education-hero-en.webp`],
     },
     alternates: {
       canonical: pageUrl,
