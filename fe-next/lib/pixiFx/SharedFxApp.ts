@@ -116,6 +116,22 @@ function isSSR(): boolean {
   return typeof window === 'undefined';
 }
 
+// True while any FX queue has work to animate. Drives ticker start/stop so the
+// global rAF loop only runs when something is actually on screen.
+function hasActiveFxWork(): boolean {
+  return (
+    coinStreams.length > 0 ||
+    fireworkParticles.length > 0 ||
+    getActiveEmitterCount() > 0
+  );
+}
+
+// Resume the rAF loop. Called after every spawn; the ticker self-stops via tickerFn
+// once all queues drain. No-op if not mounted.
+function wakeTicker(): void {
+  app?.ticker.start();
+}
+
 async function mount(
   parent: HTMLElement,
   device: Partial<DeviceConfig> = {},
@@ -179,8 +195,14 @@ async function mount(
       pool?.update(t.deltaMS / 1000);
       updateCoinStreams(t.deltaMS);
       updateFireworks(t.deltaMS);
+      // Idle-stop: once every queue has drained, halt the rAF loop. A free-running
+      // ticker on this global singleton burned ~1.2–2.0s main-thread per 6s on an
+      // idle homepage (high input_delay → "taps feel stuck"). Restarted by spawn*.
+      if (!hasActiveFxWork()) instance.ticker.stop();
     };
     instance.ticker.add(tickerFn);
+    // Start stopped — nothing to animate until the first spawn.
+    instance.ticker.stop();
 
     resizeHandler = () => {
       instance.renderer?.resize?.(window.innerWidth, window.innerHeight);
@@ -267,6 +289,7 @@ function spawnCoinStream(req: CoinStreamRequest): void {
       duration: duration * (0.85 + Math.random() * 0.3),
     });
   }
+  wakeTicker();
 }
 
 function updateCoinStreams(deltaMS: number): void {
@@ -348,6 +371,7 @@ function spawnFirework(req: FireworkRequest): void {
     const vy = (Math.sin(angle) * radius * 1.3 * 1000) / FIREWORK_TRAIL_DURATION_MS;
     addFireworkParticle('trail', req, vx, vy, FIREWORK_TRAIL_DURATION_MS, delay);
   }
+  wakeTicker();
 }
 
 function addFireworkParticle(
@@ -452,6 +476,7 @@ function spawnBurst(
     : config;
 
   pool.burst(finalConfig, x, y, count);
+  wakeTicker();
 }
 
 function isInitialized(): boolean {

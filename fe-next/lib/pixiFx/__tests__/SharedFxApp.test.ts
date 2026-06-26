@@ -27,13 +27,16 @@ vi.mock('pixi.js', () => {
   }
   class MockTicker {
     listeners: Array<(t: { deltaMS: number }) => void> = [];
+    started = true; // Pixi Application autoStart default
     add = vi.fn((fn: (t: { deltaMS: number }) => void) => {
       this.listeners.push(fn);
     });
     remove = vi.fn((fn: (t: { deltaMS: number }) => void) => {
       this.listeners = this.listeners.filter((l) => l !== fn);
     });
-    // Test helper: fire a frame
+    start = vi.fn(() => { this.started = true; });
+    stop = vi.fn(() => { this.started = false; });
+    // Test helper: fire a frame (unconditional so frame-driving tests still work)
     tick(deltaMS = 16) {
       this.listeners.forEach((l) => l({ deltaMS }));
     }
@@ -195,6 +198,45 @@ describe('SharedFxApp', () => {
       };
       SharedFxApp.unmount();
       expect(app.ticker.remove).toHaveBeenCalled();
+    });
+  });
+
+  // Perf root-cause (2026-06-26): the Pixi ticker is a global rAF loop mounted on
+  // EVERY page via essential-providers. Left free-running it burned ~1.2–2.0s of
+  // main-thread per 6s on an idle homepage (measured) → high input_delay = "taps
+  // feel stuck". The ticker must idle-stop when no FX are queued and only run while
+  // there is work to animate.
+  describe('idle ticker gating (perf)', () => {
+    it('stops the ticker after mount when no FX are queued', async () => {
+      await SharedFxApp.mount(parent);
+      const app = SharedFxApp.getApplication() as unknown as {
+        ticker: { started: boolean; stop: ReturnType<typeof vi.fn> };
+      };
+      expect(app.ticker.stop).toHaveBeenCalled();
+      expect(app.ticker.started).toBe(false);
+    });
+
+    it('starts the ticker when an FX is spawned', async () => {
+      await SharedFxApp.mount(parent);
+      const app = SharedFxApp.getApplication() as unknown as {
+        ticker: { started: boolean };
+      };
+      SharedFxApp.spawnFirework({ x: 10, y: 10, color: 0xffffff, size: 20 });
+      expect(app.ticker.started).toBe(true);
+    });
+
+    it('stops the ticker again once all FX have drained', async () => {
+      await SharedFxApp.mount(parent);
+      const app = SharedFxApp.getApplication() as unknown as {
+        ticker: { started: boolean; tick: (d?: number) => void };
+      };
+      SharedFxApp.spawnFirework({ x: 10, y: 10, color: 0xffffff, size: 20 });
+      expect(app.ticker.started).toBe(true);
+      // Advance well past the longest firework duration (700ms) so every
+      // particle completes and the queues drain to zero.
+      for (let i = 0; i < 80; i++) app.ticker.tick(16);
+      expect(SharedFxApp.getActiveFireworkCount()).toBe(0);
+      expect(app.ticker.started).toBe(false);
     });
   });
 
